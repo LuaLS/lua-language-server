@@ -348,7 +348,7 @@ function m.rename(uri, pos, newname)
     local mark = {}
 
     rename(source, newname, function (target, start, finish, text)
-        local turi = files.getOriginUri(guide.getUri(target))
+        local turi = guide.getUri(target)
         if not turi then
             return
         end

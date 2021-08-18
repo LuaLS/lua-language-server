@@ -1518,7 +1518,7 @@ function m.compileAllNodes(source)
     guide.eachSource(root, function (src)
         m.compileNode(noders, src)
     end)
-    log.debug('compileNodes finish:', files.getOriginUri(guide.getUri(root)))
+    log.debug('compileNodes finish:', guide.getUri(root))
     return noders
 end
 
@@ -1658,7 +1658,6 @@ function m.compileGlobalNodes(root)
 end
 
 files.watch(function (ev, uri)
-    uri = files.asKey(uri)
     if ev == 'update' then
         local state = files.getState(uri)
         if state then

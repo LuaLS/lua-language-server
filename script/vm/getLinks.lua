@@ -23,7 +23,6 @@ local function getFileLinks(uri)
         end
         local uris = ws.findUrisByRequirePath(args[1][1])
         for _, u in ipairs(uris) do
-            u = files.asKey(u)
             if not links[u] then
                 links[u] = {}
             end
@@ -41,7 +40,6 @@ local function getFileLinksOrCache(uri)
 end
 
 local function getLinksTo(uri)
-    uri = files.asKey(uri)
     local links = {}
     for u in files.eachFile() do
         local ls = getFileLinksOrCache(u)

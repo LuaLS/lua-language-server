@@ -119,7 +119,7 @@ return function (uri, offset)
     if uris then
         for i, uri in ipairs(uris) do
             results[#results+1] = {
-                uri    = files.getOriginUri(uri),
+                uri    = uri,
                 source = source,
                 target = {
                     start  = 0,
@@ -170,7 +170,7 @@ return function (uri, offset)
 
         results[#results+1] = {
             target = src,
-            uri    = files.getOriginUri(root.uri),
+            uri    = root.uri,
             source = source,
         }
         ::CONTINUE::

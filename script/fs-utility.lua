@@ -56,7 +56,7 @@ function m.relative(path, base)
     local sPath = fs.absolute(path):string()
     local sBase = fs.absolute(base):string()
     --TODO 先只支持最简单的情况
-    if  sPath:sub(1, #sBase):lower() == sBase:lower()
+    if  sPath:sub(1, #sBase) == sBase
     and sPath:sub(#sBase + 1, #sBase + 1):match '^[/\\]' then
         return fs.path(sPath:sub(#sBase + 1):gsub('^[/\\]+', ''))
     end
@@ -490,13 +490,7 @@ function m.fileList(option)
         if not path then
             return nil
         end
-        local key
-        if os == 'Windows' then
-            key = path:string():lower()
-        else
-            key = path:string()
-        end
-        return key
+        return path:string()
     end
     return setmetatable({}, {
         __index = function (_, path)

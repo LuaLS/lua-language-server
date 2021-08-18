@@ -39,55 +39,34 @@ m.linesMap       = setmetatable({}, { __mode = 'v' })
 m.originLinesMap = setmetatable({}, { __mode = 'v' })
 m.astMap         = {} -- setmetatable({}, { __mode = 'v' })
 
-local uriMap = {}
-local function getUriKey(uri)
-    if not uri then
-        return nil
-    end
-    if not uriMap[uri] then
-        if platform.OS == 'Windows' then
-            uriMap[uri] = uri:lower()
-        else
-            uriMap[uri] = uri
-        end
-    end
-    return uriMap[uri]
-end
-
 --- 打开文件
 ---@param uri uri
 function m.open(uri)
-    local originUri = uri
-    uri = getUriKey(uri)
     m.openMap[uri] = {
         cache = {},
     }
-    m.onWatch('open', originUri)
+    m.onWatch('open', uri)
 end
 
 --- 关闭文件
 ---@param uri uri
 function m.close(uri)
-    local originUri = uri
-    uri = getUriKey(uri)
     m.openMap[uri] = nil
     local file = m.fileMap[uri]
     if file then
         file.trusted = false
     end
-    m.onWatch('close', originUri)
+    m.onWatch('close', uri)
 end
 
 --- 是否打开
 ---@param uri uri
 ---@return boolean
 function m.isOpen(uri)
-    uri = getUriKey(uri)
     return m.openMap[uri] ~= nil
 end
 
 function m.getOpenedCache(uri)
-    uri = getUriKey(uri)
     local data = m.openMap[uri]
     if not data then
         return nil
@@ -97,19 +76,16 @@ end
 
 --- 标记为库文件
 function m.setLibraryPath(uri, libraryPath)
-    uri = getUriKey(uri)
     m.libraryMap[uri] = libraryPath
 end
 
 --- 是否是库文件
 function m.isLibrary(uri)
-    uri = getUriKey(uri)
     return m.libraryMap[uri] ~= nil
 end
 
 --- 获取库文件的根目录
 function m.getLibraryPath(uri)
-    uri = getUriKey(uri)
     return m.libraryMap[uri]
 end
 
@@ -120,13 +96,7 @@ end
 --- 是否存在
 ---@return boolean
 function m.exists(uri)
-    uri = getUriKey(uri)
     return m.fileMap[uri] ~= nil
-end
-
-function m.asKey(uri)
-    uri = getUriKey(uri)
-    return uri
 end
 
 local function pluginOnSetText(file, text)
@@ -163,12 +133,10 @@ function m.setText(uri, text, isTrust, instance)
         return
     end
     --log.debug('setText', uri)
-    local originUri = uri
-    uri = getUriKey(uri)
     local create
     if not m.fileMap[uri] then
         m.fileMap[uri] = {
-            uri = originUri,
+            uri = uri,
             version = 0,
         }
         m.fileCount = m.fileCount + 1
@@ -202,7 +170,7 @@ function m.setText(uri, text, isTrust, instance)
     await.close('files.version')
     m.onWatch('version')
     if create then
-        m.onWatch('create', originUri)
+        m.onWatch('create', uri)
     end
     if DEVELOP then
         if text ~= newText then
@@ -211,14 +179,14 @@ function m.setText(uri, text, isTrust, instance)
     end
 
     if instance or TEST then
-        m.onWatch('update', originUri)
+        m.onWatch('update', uri)
     else
         await.call(function ()
-            await.close('update:' .. originUri)
-            await.setID('update:' .. originUri)
+            await.close('update:' .. uri)
+            await.setID('update:' .. uri)
             await.delay()
-            if m.exists(originUri) then
-                m.onWatch('update', originUri)
+            if m.exists(uri) then
+                m.onWatch('update', uri)
             end
         end)
     end
@@ -235,7 +203,6 @@ function m.setRawText(uri, text)
     if not text then
         return
     end
-    uri = getUriKey(uri)
     local file = m.fileMap[uri]
     file.text             = text
     file.originText       = text
@@ -245,7 +212,6 @@ function m.setRawText(uri, text)
 end
 
 function m.getCachedRows(uri)
-    uri = getUriKey(uri)
     local file = m.fileMap[uri]
     if not file then
         return nil
@@ -254,7 +220,6 @@ function m.getCachedRows(uri)
 end
 
 function m.setCachedRows(uri, rows)
-    uri = getUriKey(uri)
     local file = m.fileMap[uri]
     if not file then
         return
@@ -263,7 +228,6 @@ function m.setCachedRows(uri, rows)
 end
 
 function m.getWords(uri)
-    uri = getUriKey(uri)
     local file = m.fileMap[uri]
     if not file then
         return
@@ -292,7 +256,6 @@ function m.getWords(uri)
 end
 
 function m.getWordsOfHead(uri, head)
-    uri = getUriKey(uri)
     local file = m.fileMap[uri]
     if not file then
         return nil
@@ -306,7 +269,6 @@ end
 
 --- 获取文件版本
 function m.getVersion(uri)
-    uri = getUriKey(uri)
     local file = m.fileMap[uri]
     if not file then
         return nil
@@ -318,7 +280,6 @@ end
 ---@param uri uri
 ---@return string text
 function m.getText(uri)
-    uri = getUriKey(uri)
     local file = m.fileMap[uri]
     if not file then
         return nil
@@ -330,7 +291,6 @@ end
 ---@param uri uri
 ---@return string text
 function m.getOriginText(uri)
-    uri = getUriKey(uri)
     local file = m.fileMap[uri]
     if not file then
         return nil
@@ -339,7 +299,6 @@ function m.getOriginText(uri)
 end
 
 function m.getChildFiles(uri)
-    uri = getUriKey(uri)
     local results = {}
     local uris = m.getAllUris()
     for _, curi in ipairs(uris) do
@@ -356,7 +315,6 @@ end
 ---@param uri uri
 function m.remove(uri)
     local originUri = uri
-    uri = getUriKey(uri)
     local file = m.fileMap[uri]
     if not file then
         return
@@ -473,7 +431,7 @@ function m.compileState(uri, text)
             m.notifyCache['preloadFileSize'][uri] = true
             m.notifyCache['skipLargeFileCount'] = m.notifyCache['skipLargeFileCount'] + 1
             local message = lang.script('WORKSPACE_SKIP_LARGE_FILE'
-                        , ws.getRelativePath(m.getOriginUri(uri))
+                        , ws.getRelativePath(uri)
                         , config.get 'Lua.workspace.preloadFileSize'
                         , #text / 1000
                     )
@@ -486,7 +444,7 @@ function m.compileState(uri, text)
         return nil
     end
     local prog <close> = progress.create(lang.script.WINDOW_COMPILING, 0.5)
-    prog:setMessage(ws.getRelativePath(m.getOriginUri(uri)))
+    prog:setMessage(ws.getRelativePath(uri))
     local clock = os.clock()
     local state, err = parser:compile(text
         , 'lua'
@@ -523,7 +481,7 @@ function m.compileState(uri, text)
         end})
         return state
     else
-        log.error('Compile failed:', m.getOriginUri(uri), err)
+        log.error('Compile failed:', uri, err)
         return nil
     end
 end
@@ -532,7 +490,6 @@ end
 ---@param uri uri
 ---@return table state
 function m.getState(uri)
-    uri = getUriKey(uri)
     if uri ~= '' and not m.isLua(uri) then
         return nil
     end
@@ -551,19 +508,17 @@ function m.getState(uri)
 end
 
 ---设置文件的当前可见范围
----@param originUri uri
----@param ranges    range[]
-function m.setVisibles(originUri, ranges)
-    local uri = m.getUri(originUri)
+---@param uri    uri
+---@param ranges range[]
+function m.setVisibles(uri, ranges)
     m.visible[uri] = ranges
-    m.onWatch('updateVisible', originUri)
+    m.onWatch('updateVisible', uri)
 end
 
 ---获取文件的当前可见范围
 ---@param uri uri
 ---@return table[]
 function m.getVisibles(uri)
-    uri = m.getUri(uri)
     local file = m.fileMap[uri]
     if not file then
         return nil
@@ -587,7 +542,6 @@ end
 ---@param uri uri
 ---@return table lines
 function m.getLines(uri)
-    uri = getUriKey(uri)
     local file = m.fileMap[uri]
     if not file then
         return nil
@@ -601,7 +555,6 @@ function m.getLines(uri)
 end
 
 function m.getOriginLines(uri)
-    uri = getUriKey(uri)
     local file = m.fileMap[uri]
     if not file then
         return nil
@@ -614,23 +567,7 @@ function m.getOriginLines(uri)
     return lines
 end
 
---- 获取原始uri
-function m.getOriginUri(uri)
-    uri = getUriKey(uri)
-    local file = m.fileMap[uri] or m.dllMap[uri]
-    if not file then
-        return nil
-    end
-    return file.uri
-end
-
-function m.getUri(uri)
-    uri = getUriKey(uri)
-    return uri
-end
-
 function m.getFile(uri)
-    uri = getUriKey(uri)
     return m.fileMap[uri]
         or m.dllMap[uri]
 end
@@ -857,22 +794,12 @@ end
 
 --- 获取文件的自定义缓存信息（在文件内容更新后自动失效）
 function m.getCache(uri)
-    uri = getUriKey(uri)
     local file = m.fileMap[uri]
     if not file then
         return nil
     end
     --file.cacheActiveTime = timer.clock()
     return file.cache
-end
-
---- 判断文件名相等
-function m.eq(a, b)
-    if platform.OS == 'Windows' then
-        return a:lower():gsub('[/\\]+', '/') == b:lower():gsub('[/\\]+', '/')
-    else
-        return a == b
-    end
 end
 
 --- 获取文件关联
@@ -883,14 +810,11 @@ function m.getAssoc()
     m.assocVersion = config.get 'version'
     local patt = {}
     for k, v in pairs(config.get 'files.associations') do
-        if m.eq(v, 'lua') then
+        if v == 'lua' then
             patt[#patt+1] = k
         end
     end
     m.assocMatcher = glob.glob(patt)
-    if platform.OS == 'Windows' then
-        m.assocMatcher:setOption 'ignoreCase'
-    end
     return m.assocMatcher
 end
 
@@ -902,7 +826,7 @@ function m.isLua(uri)
     if not ext then
         return false
     end
-    if m.eq(ext, 'lua') then
+    if ext == 'lua' then
         return true
     end
     local matcher = m.getAssoc()
@@ -919,11 +843,11 @@ function m.isDll(uri)
         return false
     end
     if platform.OS == 'Windows' then
-        if m.eq(ext, 'dll') then
+        if ext == 'dll' then
             return true
         end
     else
-        if m.eq(ext, 'so') then
+        if ext == 'so' then
             return true
         end
     end
@@ -937,7 +861,6 @@ function m.saveDll(uri, content)
     if not content then
         return
     end
-    local luri = getUriKey(uri)
     local file = {
         uri   = uri,
         opens = {},
@@ -959,7 +882,7 @@ function m.saveDll(uri, content)
         end
     end
 
-    m.dllMap[luri] = file
+    m.dllMap[uri] = file
     m.onWatch('dll', uri)
 end
 
@@ -967,7 +890,6 @@ end
 ---@param uri uri
 ---@return string[]|nil
 function m.getDllOpens(uri)
-    uri = getUriKey(uri)
     local file = m.dllMap[uri]
     if not file then
         return nil
@@ -979,7 +901,6 @@ end
 ---@param uri uri
 ---@return string[]|nil
 function m.getDllWords(uri)
-    uri = getUriKey(uri)
     local file = m.dllMap[uri]
     if not file then
         return nil
@@ -1009,7 +930,6 @@ function m.flushCache()
 end
 
 function m.flushFileCache(uri)
-    uri = getUriKey(uri)
     local file = m.fileMap[uri]
     if not file then
         return

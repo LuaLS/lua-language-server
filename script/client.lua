@@ -217,7 +217,6 @@ end
 function m.editText(uri, edits)
     local files     = require 'files'
     local textEdits = {}
-    uri = files.getOriginUri(uri)
     for i, edit in ipairs(edits) do
         textEdits[i] = define.textEdit(files.range(uri, edit.start, edit.finish), edit.text)
     end

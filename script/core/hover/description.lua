@@ -31,9 +31,8 @@ local function asStringInRequire(source, literal)
             local shows = {}
             for i, uri in ipairs(result) do
                 local searcher = searchers and searchers[uri]
-                uri = files.getOriginUri(uri)
                 local path = furi.decode(uri)
-                if files.eq(path:sub(1, #rootPath), rootPath) then
+                if path:sub(1, #rootPath) == rootPath then
                     path = path:sub(#rootPath + 1)
                 end
                 path = path:gsub('^[/\\]*', '')

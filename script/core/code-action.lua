@@ -397,7 +397,6 @@ local function checkSwapParams(results, uri, start, finish)
         return a.source.start > b.source.start
     end)
     local target = args[1]
-    uri = files.getOriginUri(uri)
     local myArg = target.source[target.index]
     for i, targetArg in ipairs(target.source) do
         if i ~= target.index then

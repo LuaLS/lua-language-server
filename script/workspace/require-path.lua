@@ -18,7 +18,7 @@ local function getOnePath(path, searcher)
     for pos = start, #stemPath do
         local word = stemPath:sub(start, pos)
         local newSearcher = stemSearcher:gsub('%?', (word:gsub('%%', '%%%%')))
-        if files.eq(newSearcher, stemPath) then
+        if newSearcher == stemPath then
             return word
         end
     end

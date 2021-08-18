@@ -61,7 +61,7 @@ return function (key)
     local results = {}
 
     for uri in files.eachFile() do
-        searchFile(files.getOriginUri(uri), key, results)
+        searchFile(uri, key, results)
         if #results > 1000 then
             break
         end

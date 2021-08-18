@@ -134,8 +134,8 @@ proto.on('workspace/didChangeWatchedFiles', function (params)
                 local path = furi.decode(uri)
                 local filename = fs.path(path):filename():string()
                 -- 排除类文件发生更改需要重新扫描
-                if files.eq(filename, '.gitignore')
-                or files.eq(filename, '.gitmodules') then
+                if filename == '.gitignore'
+                or filename == '.gitmodules' then
                     workspace.reload()
                     break
                 end
@@ -180,7 +180,7 @@ proto.on('workspace/didRenameFiles', function (params)
         for _, uri in ipairs(childs) do
             local ctext = files.getOriginText(uri)
             if ctext then
-                local ouri = files.getOriginUri(uri)
+                local ouri = uri
                 local tail = ouri:sub(#file.oldUri)
                 local nuri = file.newUri .. tail
                 log.debug('workspace/didRenameFiles#child', ouri, nuri)

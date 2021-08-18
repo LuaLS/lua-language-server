@@ -26,9 +26,7 @@ m.waitingReady   = {}
 m.requireCache   = {}
 m.cache          = {}
 m.watchers       = {}
-m.matchOption    = {
-    ignoreCase = platform.OS == 'Windows',
-}
+m.matchOption    = {}
 
 --- 初始化工作区
 function m.initPath(uri)
@@ -373,9 +371,6 @@ function m.findUrisByFilePath(path)
         return {}
     end
     local lpath = furi.encode(path):gsub('^file:///', '')
-    if platform.OS == 'Windows' then
-        lpath = lpath:lower()
-    end
     local vm    = require 'vm'
     local resultCache = vm.getCache 'findUrisByRequirePath.result'
     if resultCache[path] then
@@ -385,19 +380,16 @@ function m.findUrisByFilePath(path)
     local results = {}
     local posts = {}
     for uri in files.eachFile() do
-        if platform.OS ~= 'Windows' then
-            uri = files.getOriginUri(uri)
-        end
         if not uri:find(lpath, 1, true) then
             goto CONTINUE
         end
         local pathLen = #path
-        local curPath = furi.decode(files.getOriginUri(uri))
+        local curPath = furi.decode(uri)
         local curLen  = #curPath
         local seg = curPath:sub(curLen - pathLen, curLen - pathLen)
         if seg == '/' or seg == '\\' or seg == '' then
             local see = curPath:sub(curLen - pathLen + 1, curLen)
-            if files.eq(see, path) then
+            if see == path then
                 results[#results+1] = uri
                 local post = curPath:sub(1, curLen - pathLen)
                 posts[uri] = post:gsub('^[/\\]+', '')
@@ -506,12 +498,7 @@ function m.getRelativePath(uriOrPath)
         local relative = m.normalize(path)
         return relative:gsub('^[/\\]+', '')
     end
-    local _, pos
-    if platform.OS == 'Windows' then
-        _, pos = m.normalize(path):lower():find(m.path:lower(), 1, true)
-    else
-        _, pos = m.normalize(path):find(m.path, 1, true)
-    end
+    local _, pos = m.normalize(path):find(m.path, 1, true)
     if pos then
         return m.normalize(path:sub(pos + 1)):gsub('^[/\\]+', '')
     else
@@ -523,9 +510,8 @@ function m.isWorkspaceUri(uri)
     if not m.uri then
         return false
     end
-    local luri = files.getUri(uri)
-    local ruri = files.getUri(m.uri)
-    return luri:sub(1, #ruri) == ruri
+    local ruri = m.uri
+    return uri:sub(1, #ruri) == ruri
 end
 
 --- 获取工作区等级的缓存

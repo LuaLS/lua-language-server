@@ -155,19 +155,19 @@ TEST {
     },
 }
 
-if require 'bee.platform'.OS == 'Windows' then
-TEST {
-    {
-        path = 'a.lua',
-        content = '',
-        target = {0, 0},
-    },
-    {
-        path = 'b.lua',
-        content = 'require <?"A"?>',
-    },
-}
-end
+--if require 'bee.platform'.OS == 'Windows' then
+--TEST {
+--    {
+--        path = 'a.lua',
+--        content = '',
+--        target = {0, 0},
+--    },
+--    {
+--        path = 'b.lua',
+--        content = 'require <?"A"?>',
+--    },
+--}
+--end
 
 TEST {
     {

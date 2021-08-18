@@ -255,7 +255,7 @@ local function buildInsertRequire(ast, targetUri, stemName)
 end
 
 local function isSameSource(ast, source, pos)
-    if not files.eq(guide.getUri(source), guide.getUri(ast.ast)) then
+    if guide.getUri(source) ~= guide.getUri(ast.ast) then
         return false
     end
     if source.type == 'field'
@@ -337,11 +337,10 @@ local function checkModule(ast, word, offset, results)
     end
     local locals  = guide.getVisibleLocals(ast.ast, offset)
     for uri in files.eachFile() do
-        if files.eq(uri, guide.getUri(ast.ast)) then
+        if uri == guide.getUri(ast.ast) then
             goto CONTINUE
         end
-        local originUri = files.getOriginUri(uri)
-        local path = furi.decode(originUri)
+        local path = furi.decode(uri)
         local fileName = path:match '[^/\\]*$'
         local stemName = fileName:gsub('%..+', '')
         if  not locals[stemName]
@@ -380,7 +379,7 @@ local function checkModule(ast, word, offset, results)
                     arguments = {
                         {
                             uri    = guide.getUri(ast.ast),
-                            target = originUri,
+                            target = uri,
                             name   = stemName,
                         },
                     },
@@ -389,8 +388,8 @@ local function checkModule(ast, word, offset, results)
                     return {
                         detail      = buildDetail(targetSource),
                         description = lang.script('COMPLETION_IMPORT_FROM', ('[%s](%s)'):format(
-                            workspace.getRelativePath(originUri),
-                            originUri
+                            workspace.getRelativePath(uri),
+                            uri
                         ))
                             .. '\n' .. buildDesc(targetSource),
                         --additionalTextEdits = buildInsertRequire(ast, originUri, stemName),
@@ -637,7 +636,7 @@ local function checkCommon(myUri, word, text, offset, results)
             if #results >= 100 then
                 break
             end
-            if myUri and files.eq(myUri, uri) then
+            if myUri == uri then
                 goto CONTINUE
             end
             local words = files.getWordsOfHead(uri, myHead)
@@ -886,8 +885,7 @@ local function checkUri(ast, text, offset, results)
         end
         if     libName == 'require' then
             for uri in files.eachFile() do
-                uri = files.getOriginUri(uri)
-                if files.eq(myUri, uri) then
+                if myUri == uri then
                     goto CONTINUE
                 end
                 local path = workspace.getRelativePath(uri)
@@ -940,8 +938,7 @@ local function checkUri(ast, text, offset, results)
         elseif libName == 'dofile'
         or     libName == 'loadfile' then
             for uri in files.eachFile() do
-                uri = files.getOriginUri(uri)
-                if files.eq(myUri, uri) then
+                if myUri == uri then
                     goto CONTINUE
                 end
                 if vm.isMetaFile(uri) then

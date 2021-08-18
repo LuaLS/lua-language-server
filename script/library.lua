@@ -271,7 +271,7 @@ local function loadSingle3rdConfig(libraryDir)
     if cfg.files then
         for i, filename in ipairs(cfg.files) do
             if plat.OS == 'Windows' then
-                filename = filename:lower():gsub('/', '\\')
+                filename = filename:gsub('/', '\\')
             else
                 filename = filename:gsub('\\', '/')
             end
@@ -413,9 +413,6 @@ local function check3rdByFileName(uri, configs)
     if not path then
         return
     end
-    if plat.OS == 'Windows' then
-        path = path:lower()
-    end
     await.call(function ()
         for _, cfg in ipairs(configs) do
             if cfg.files then
@@ -473,7 +470,7 @@ end)
 files.watch(function (ev, uri)
     if ev == 'update'
     or ev == 'dll' then
-        check3rd(files.asKey(uri))
+        check3rd(uri)
     end
 end)
 

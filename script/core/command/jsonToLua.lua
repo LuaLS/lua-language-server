@@ -24,7 +24,7 @@ return function (data)
         label = 'json to lua',
         edit  = {
             changes = {
-                [files.getOriginUri(data.uri)] = {
+                [data.uri] = {
                     {
                         range   = files.range(data.uri, data.start, data.finish),
                         newText = luaStr,

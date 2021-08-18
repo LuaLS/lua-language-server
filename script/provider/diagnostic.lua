@@ -45,7 +45,7 @@ local function buildSyntaxError(uri, err)
             else
                 rmessage = text:sub(rel.start, rel.finish)
             end
-            local relUri = files.getOriginUri(rel.uri)
+            local relUri = rel.uri
             relatedInformation[#relatedInformation+1] = {
                 message  = rmessage,
                 location = define.location(relUri, files.range(relUri, rel.start, rel.finish)),
@@ -126,16 +126,15 @@ local function mergeSyntaxAndDiags(a, b)
 end
 
 function m.clear(uri)
-    local luri = files.asKey(uri)
-    if not m.cache[luri] then
+    if not m.cache[uri] then
         return
     end
-    m.cache[luri] = nil
+    m.cache[uri] = nil
     proto.notify('textDocument/publishDiagnostics', {
-        uri = files.getOriginUri(luri) or uri,
+        uri = uri,
         diagnostics = {},
     })
-    log.debug('clearDiagnostics', files.getOriginUri(uri))
+    log.debug('clearDiagnostics', uri)
 end
 
 function m.clearAll()
@@ -183,7 +182,6 @@ function m.doDiagnostic(uri)
     if not config.get 'Lua.diagnostics.enable' then
         return
     end
-    uri = files.asKey(uri)
     if files.isLibrary(uri) or ws.isIgnored(uri) then
         return
     end
@@ -197,7 +195,7 @@ function m.doDiagnostic(uri)
     end
 
     local prog <close> = progress.create(lang.script.WINDOW_DIAGNOSING, 0.5)
-    prog:setMessage(ws.getRelativePath(files.getOriginUri(uri)))
+    prog:setMessage(ws.getRelativePath(uri))
 
     local syntax = m.syntaxErrors(uri, ast)
     local diags = {}
@@ -216,11 +214,11 @@ function m.doDiagnostic(uri)
         m.cache[uri] = full
 
         proto.notify('textDocument/publishDiagnostics', {
-            uri = files.getOriginUri(uri),
+            uri = uri,
             diagnostics = full,
         })
         if #full > 0 then
-            log.debug('publishDiagnostics', files.getOriginUri(uri), #full)
+            log.debug('publishDiagnostics', uri, #full)
         end
     end
 

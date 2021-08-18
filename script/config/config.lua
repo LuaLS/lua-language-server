@@ -166,6 +166,8 @@ local Template = {
                                             >> util.deepCopy(define.DiagnosticDefaultNeededFileStatus),
     ['Lua.diagnostics.workspaceDelay']      = Type.Integer >> 0,
     ['Lua.diagnostics.workspaceRate']       = Type.Integer >> 100,
+    ['Lua.diagnostics.libraryFiles']        = Type.String  >> 'Disable',
+    ['Lua.diagnostics.ignoredFiles']        = Type.String  >> 'Disable',
     ['Lua.workspace.ignoreDir']             = Type.Hash(Type.String, Type.Boolean, ';'),
     ['Lua.workspace.ignoreSubmodules']      = Type.Boolean >> true,
     ['Lua.workspace.useGitIgnore']          = Type.Boolean >> true,

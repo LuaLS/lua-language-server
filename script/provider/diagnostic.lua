@@ -182,8 +182,25 @@ function m.doDiagnostic(uri)
     if not config.get 'Lua.diagnostics.enable' then
         return
     end
-    if files.isLibrary(uri) or ws.isIgnored(uri) then
-        return
+    if files.isLibrary(uri) then
+        local status = config.get 'Lua.diagnostics.libraryFiles'
+        if status == 'Disable' then
+            return
+        elseif status == 'Opened' then
+            if not files.isOpen(uri) then
+                return
+            end
+        end
+    end
+    if ws.isIgnored(uri) then
+        local status = config.get 'Lua.diagnostics.ignoredFiles'
+        if status == 'Disable' then
+            return
+        elseif status == 'Opened' then
+            if not files.isOpen(uri) then
+                return
+            end
+        end
     end
 
     await.delay()

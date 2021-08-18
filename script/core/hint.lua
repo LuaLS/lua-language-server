@@ -70,9 +70,6 @@ local function getArgNames(func)
         return nil
     end
     local names = {}
-    if func.parent.type == 'setmethod' then
-        names[#names+1] = 'self'
-    end
     for _, arg in ipairs(func.args) do
         if arg.type == '...' then
             break
@@ -114,6 +111,9 @@ local function paramName(uri, edits, start, finish)
         if paramConfig == 'Literal' and not hasLiteralArgInCall(source) then
             return
         end
+        if not source.args then
+            return
+        end
         await.delay()
         local defs = vm.getDefs(source.node)
         if not defs then
@@ -134,10 +134,12 @@ local function paramName(uri, edits, start, finish)
         if not args then
             return
         end
+        local firstIndex = 1
         if source.node and source.node.type == 'getmethod' then
-            table.remove(args, 1)
+            firstIndex = 2
         end
-        for i, arg in ipairs(source.args) do
+        for i = firstIndex, #source.args do
+            local arg = source.args[i]
             if  not mark[arg]
             and (paramConfig ~= 'Literal' or guide.isLiteral(arg)) then
                 mark[arg] = true

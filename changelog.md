@@ -1,10 +1,12 @@
 # changelog
 
 ## 2.4.0
+* `NEW` settings: `Lua.diagnostics.libraryFiles`, `Lua.diagnostics.ignoredFiles`
 * `CHG` hint: `Lua.hint.paramName` now supports `Disable`, `Literal` and `All`
 * `CHG` no longer ignore file names case in Windows
 * `CHG` watching library changes
 * `FIX` runtime errors
+* `FIX` hint: may show param-2 as `self`
 
 ## 2.3.7
 `2021-8-17`

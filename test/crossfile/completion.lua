@@ -392,12 +392,12 @@ config.set('Lua.runtime.path', originRuntimePath)
 
 local originRuntimePath = config.get 'Lua.runtime.path'
 config.set('Lua.runtime.path', {
-    'd:/?/1.lua',
+    'D:/?/1.lua',
 })
 
 TEST {
     {
-        path = 'd:/xxxx/1.lua',
+        path = 'D:/xxxx/1.lua',
         content = '',
     },
     {

@@ -78,7 +78,7 @@ function m.decode(uri)
     if scheme == 'file' and #authority > 0 and #path > 1 then
         value = '//' .. authority .. path
     elseif path:match '/%a:' then
-        value = path:sub(2, 2) .. path:sub(3)
+        value = path:sub(2, 2):upper() .. path:sub(3)
     else
         value = path
     end

@@ -624,6 +624,10 @@ local function checkTableField(ast, word, start, results)
 end
 
 local function checkCommon(myUri, word, text, offset, results)
+    if not config.get 'Lua.completion.word' then
+        return
+    end
+
     results.enableCommon = true
     local used = {}
     for _, result in ipairs(results) do

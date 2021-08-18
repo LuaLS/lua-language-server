@@ -98,7 +98,8 @@ local function hasLiteralArgInCall(call)
 end
 
 local function paramName(uri, edits, start, finish)
-    if not config.get 'Lua.hint.paramName' then
+    local paramConfig = config.get 'Lua.hint.paramName'
+    if not paramConfig or paramConfig == 'None' then
         return
     end
     local ast = files.getState(uri)
@@ -110,7 +111,7 @@ local function paramName(uri, edits, start, finish)
         if source.type ~= 'call' then
             return
         end
-        if not hasLiteralArgInCall(source) then
+        if paramConfig == 'Literal' and not hasLiteralArgInCall(source) then
             return
         end
         await.delay()
@@ -137,7 +138,8 @@ local function paramName(uri, edits, start, finish)
             table.remove(args, 1)
         end
         for i, arg in ipairs(source.args) do
-            if not mark[arg] and guide.isLiteral(arg) then
+            if  not mark[arg]
+            and (paramConfig ~= 'Literal' or guide.isLiteral(arg)) then
                 mark[arg] = true
                 if args[i] and args[i] ~= '' then
                     edits[#edits+1] = {

@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.4.0
+* `CHG` hint: `Lua.hint.paramName` now supports `Disable`, `Literal` and `All`
 * `FIX` runtime errors
 
 ## 2.3.7

@@ -39,9 +39,6 @@ local function isValidLuaUri(uri)
     if not files.isLua(uri) then
         return false
     end
-    if not files.isOpen(uri) then
-        return false
-    end
     if  workspace.isIgnored(uri)
     and not files.isLibrary(uri) then
         return false
@@ -67,32 +64,19 @@ proto.on('initialized', function (params)
     updateConfig()
     local registrations = {}
 
-    nonil.enable()
-    if client.info.capabilities.workspace.didChangeWatchedFiles.dynamicRegistration then
+    if client.getAbility 'workspace.didChangeWatchedFiles.dynamicRegistration'
+    and workspace.path then
         -- 监视文件变化
-        registrations[#registrations+1] = {
-            id = 'workspace/didChangeWatchedFiles',
-            method = 'workspace/didChangeWatchedFiles',
-            registerOptions = {
-                watchers = {
-                    {
-                        globPattern = '**/',
-                        kind = 1 | 2 | 4,
-                    }
-                },
-            },
-        }
+        client.watchFiles(workspace.path)
     end
 
-    if client.info.capabilities.workspace.didChangeConfiguration.dynamicRegistration then
+    if client.getAbility 'workspace.didChangeConfiguration.dynamicRegistration' then
         -- 监视配置变化
         registrations[#registrations+1] = {
             id = 'workspace/didChangeConfiguration',
             method = 'workspace/didChangeConfiguration',
         }
     end
-
-    nonil.disable()
 
     if #registrations ~= 0 then
         proto.awaitRequest('client/registerCapability', {
@@ -125,7 +109,8 @@ proto.on('workspace/didChangeWatchedFiles', function (params)
     workspace.awaitReady()
     for _, change in ipairs(params.changes) do
         local uri = change.uri
-        if not workspace.isWorkspaceUri(uri) then
+        if  not workspace.isWorkspaceUri(uri)
+        and not files.isLibrary(uri) then
             goto CONTINUE
         end
         if     change.type == define.FileChangeType.Created then
@@ -140,9 +125,11 @@ proto.on('workspace/didChangeWatchedFiles', function (params)
                 files.remove(curi)
             end
         elseif change.type == define.FileChangeType.Changed then
-            -- 如果文件处于关闭状态，则立即更新；否则等待didChange协议来更新
             if isValidLuaUri(uri) then
-                files.setText(uri, pub.awaitTask('loadFile', uri), false)
+                -- 如果文件处于关闭状态，则立即更新；否则等待didChange协议来更新
+                if not files.isOpen(uri) then
+                    files.setText(uri, pub.awaitTask('loadFile', uri), false)
+                end
             else
                 local path = furi.decode(uri)
                 local filename = fs.path(path):filename():string()

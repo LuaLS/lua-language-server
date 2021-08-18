@@ -117,6 +117,39 @@ function m.logMessage(type, ...)
     })
 end
 
+function m.watchFiles(path)
+    path = path:gsub('\\', '/')
+    local registration = {
+        id              = path,
+        method          = 'workspace/didChangeWatchedFiles',
+        registerOptions = {
+            watchers = {
+                {
+                    globPattern = path .. '/**',
+                    kind = 1 | 2 | 4,
+                }
+            },
+        },
+    }
+    proto.request('client/registerCapability', {
+        registrations = {
+            registration,
+        }
+    })
+
+    return function ()
+        local unregisteration = {
+            id     = path,
+            method = 'workspace/didChangeWatchedFiles',
+        }
+        proto.request('client/registerCapability', {
+            unregisterations = {
+                unregisteration,
+            }
+        })
+    end
+end
+
 ---@class config.change
 ---@field key       string
 ---@field prop?     string

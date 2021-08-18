@@ -15,8 +15,6 @@ function require(modname) end
 
 ---#DES 'package'
 ---@class packagelib
----#DES 'package.config'
----@field config    string
 ---#DES 'package.cpath'
 ---@field cpath     string
 ---#DES 'package.loaded'
@@ -26,6 +24,14 @@ function require(modname) end
 ---#DES 'package.preload'
 ---@field preload   table
 package = {}
+
+---#DES 'package.config'
+package.config = [[
+/
+;
+?
+!
+-]]
 
 ---@version <5.1
 ---#DES 'package.loaders'

@@ -88,6 +88,9 @@ function TEST(script)
                     item[k] = nil
                 end
             end
+            if item.description then
+                item.description = tostring(item.description)
+            end
         end
         if IgnoreFunction then
             for i = #result, 1, -1 do

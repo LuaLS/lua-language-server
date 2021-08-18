@@ -197,7 +197,7 @@ local function buildDesc(source)
     md:add('md',  hover.description)
     md:splitLine()
     md:add('lua', getSnip(source))
-    return md:string()
+    return md
 end
 
 local function buildFunction(results, source, value, oop, data)
@@ -385,13 +385,15 @@ local function checkModule(ast, word, offset, results)
                     },
                 },
                 id     = stack(function ()
+                    local md = markdown()
+                    md:add('md', lang.script('COMPLETION_IMPORT_FROM', ('[%s](%s)'):format(
+                        workspace.getRelativePath(uri),
+                        uri
+                    )))
+                    md:add('md', buildDesc(targetSource))
                     return {
                         detail      = buildDetail(targetSource),
-                        description = lang.script('COMPLETION_IMPORT_FROM', ('[%s](%s)'):format(
-                            workspace.getRelativePath(uri),
-                            uri
-                        ))
-                            .. '\n' .. buildDesc(targetSource),
+                        description = md,
                         --additionalTextEdits = buildInsertRequire(ast, originUri, stemName),
                     }
                 end)

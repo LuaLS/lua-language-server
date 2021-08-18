@@ -71,6 +71,9 @@ function TEST(expect)
     if hover.label then
         hover.label = hover.label:gsub('\r\n', '\n')
     end
+    if hover.description then
+        hover.description = tostring(hover.description)
+    end
     assert(eq(hover.label, expect.hover.label))
     assert(eq(hover.description, expect.hover.description))
 end

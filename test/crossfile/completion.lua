@@ -116,7 +116,7 @@ function TEST(data)
             end
         end
         if item['description'] then
-            item['description'] = item['description']
+            item['description'] = tostring(item['description'])
                 : gsub('\r\n', '\n')
         end
     end
@@ -727,6 +727,7 @@ TEST {
             detail = 'function',
             description = [[
 从 [myfunc.lua](file:///myfunc.lua) 中导入
+
 ```lua
 function (a: any, b: any)
 ```]],
@@ -757,6 +758,7 @@ TEST {
             detail = 'function',
             description = [[
 从 [dir\myfunc.lua](file:///dir/myfunc.lua) 中导入
+
 ```lua
 function (a: any, b: any)
 ```]],

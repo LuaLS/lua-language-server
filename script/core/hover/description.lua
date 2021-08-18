@@ -50,7 +50,7 @@ local function asStringInRequire(source, literal)
             table.sort(shows)
             local md = markdown()
             md:add('md', table.concat(shows, '\n'))
-            return md:string()
+            return md
         end
     end
 end
@@ -68,7 +68,7 @@ local function asStringView(source, literal)
         end
         local md = markdown()
         md:add('txt', view)
-        return md:string()
+        return md
     end
 end
 
@@ -314,7 +314,7 @@ local function getFunctionComment(source)
     local md = markdown()
     md:add('md', comments)
     md:add('lua', enums)
-    return md:string()
+    return md
 end
 
 local function tryDocComment(source)

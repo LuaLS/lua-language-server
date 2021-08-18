@@ -4,6 +4,10 @@ mt.__name = 'markdown'
 
 mt._splitLine = false
 
+function mt:__tostring()
+    return self:string()
+end
+
 local function checkSplitLine(self)
     if not self._splitLine then
         return

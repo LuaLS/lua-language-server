@@ -445,7 +445,7 @@ proto.on('textDocument/completion', function (params)
                 return t
             end)(),
             documentation    = res.description and {
-                value = res.description,
+                value = tostring(res.description),
                 kind  = 'markdown',
             },
         }
@@ -455,7 +455,7 @@ proto.on('textDocument/completion', function (params)
                 if resolved then
                     item.detail = resolved.detail
                     item.documentation = resolved.description and {
-                        value = resolved.description,
+                        value = tostring(resolved.description),
                         kind  = 'markdown',
                     }
                 end
@@ -491,7 +491,7 @@ proto.on('completionItem/resolve', function (item)
     end
     item.detail = resolved.detail or item.detail
     item.documentation = resolved.description and {
-        value = resolved.description,
+        value = tostring(resolved.description),
         kind  = 'markdown',
     } or item.documentation
     item.additionalTextEdits = resolved.additionalTextEdits and (function ()
@@ -545,7 +545,7 @@ proto.on('textDocument/signatureHelp', function (params)
             parameters      = parameters,
             activeParameter = result.index - 1,
             documentation   = result.description and {
-                value = result.description,
+                value = tostring(result.description),
                 kind  = 'markdown',
             },
         }

@@ -35,17 +35,6 @@ local function updateConfig()
     log.debug('loaded config dump:', util.dump(new))
 end
 
-local function isValidLuaUri(uri)
-    if not files.isLua(uri) then
-        return false
-    end
-    if  workspace.isIgnored(uri)
-    and not files.isLibrary(uri) then
-        return false
-    end
-    return true
-end
-
 proto.on('initialize', function (params)
     client.init(params)
     config.init()
@@ -63,12 +52,6 @@ proto.on('initialized', function (params)
     local _ <close> = progress.create(lang.script.WINDOW_INITIALIZING, 0.5)
     updateConfig()
     local registrations = {}
-
-    if client.getAbility 'workspace.didChangeWatchedFiles.dynamicRegistration'
-    and workspace.path then
-        -- 监视文件变化
-        client.watchFiles(workspace.path)
-    end
 
     if client.getAbility 'workspace.didChangeConfiguration.dynamicRegistration' then
         -- 监视配置变化
@@ -105,50 +88,10 @@ proto.on('workspace/didChangeConfiguration', function ()
     updateConfig()
 end)
 
-proto.on('workspace/didChangeWatchedFiles', function (params)
-    workspace.awaitReady()
-    for _, change in ipairs(params.changes) do
-        local uri = change.uri
-        if  not workspace.isWorkspaceUri(uri)
-        and not files.isLibrary(uri) then
-            goto CONTINUE
-        end
-        if     change.type == define.FileChangeType.Created then
-            log.debug('FileChangeType.Created', uri)
-            workspace.awaitLoadFile(uri)
-        elseif change.type == define.FileChangeType.Deleted then
-            log.debug('FileChangeType.Deleted', uri)
-            files.remove(uri)
-            local childs = files.getChildFiles(uri)
-            for _, curi in ipairs(childs) do
-                log.debug('FileChangeType.Deleted.Child', curi)
-                files.remove(curi)
-            end
-        elseif change.type == define.FileChangeType.Changed then
-            if isValidLuaUri(uri) then
-                -- 如果文件处于关闭状态，则立即更新；否则等待didChange协议来更新
-                if not files.isOpen(uri) then
-                    files.setText(uri, pub.awaitTask('loadFile', uri), false)
-                end
-            else
-                local path = furi.decode(uri)
-                local filename = fs.path(path):filename():string()
-                -- 排除类文件发生更改需要重新扫描
-                if filename == '.gitignore'
-                or filename == '.gitmodules' then
-                    workspace.reload()
-                    break
-                end
-            end
-        end
-        ::CONTINUE::
-    end
-end)
-
 proto.on('workspace/didCreateFiles', function (params)
     log.debug('workspace/didCreateFiles', util.dump(params))
     for _, file in ipairs(params.files) do
-        if isValidLuaUri(file.uri) then
+        if workspace.isValidLuaUri(file.uri) then
             files.setText(file.uri, pub.awaitTask('loadFile', file.uri), false)
         end
     end
@@ -172,7 +115,7 @@ proto.on('workspace/didRenameFiles', function (params)
         local text = files.getOriginText(file.oldUri)
         if text then
             files.remove(file.oldUri)
-            if isValidLuaUri(file.newUri) then
+            if workspace.isValidLuaUri(file.newUri) then
                 files.setText(file.newUri, text, false)
             end
         end
@@ -185,7 +128,7 @@ proto.on('workspace/didRenameFiles', function (params)
                 local nuri = file.newUri .. tail
                 log.debug('workspace/didRenameFiles#child', ouri, nuri)
                 files.remove(uri)
-                if isValidLuaUri(nuri) then
+                if workspace.isValidLuaUri(nuri) then
                     files.setText(nuri, text, false)
                 end
             end

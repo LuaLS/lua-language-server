@@ -14,6 +14,7 @@ local define     = require "proto.define"
 local client     = require 'client'
 local plugin     = require 'plugin'
 local util       = require 'utility'
+local fw         = require 'filewatch'
 
 local m = {}
 m.type = 'workspace'
@@ -41,6 +42,8 @@ function m.initPath(uri)
     client.logMessage('Log', 'Log path: ' .. furi.encode(logPath:string()))
     log.info('Log path: ', logPath)
     log.init(ROOT, logPath)
+
+    fw.watch(m.path)
 end
 
 local globInteferFace = {
@@ -181,6 +184,17 @@ function m.isIgnored(uri)
         return false
     end
     return ignore(path)
+end
+
+function m.isValidLuaUri(uri)
+    if not files.isLua(uri) then
+        return false
+    end
+    if  m.isIgnored(uri)
+    and not files.isLibrary(uri) then
+        return false
+    end
+    return true
 end
 
 local function loadFileFactory(root, progressData, isLibrary)
@@ -325,7 +339,7 @@ function m.awaitPreload()
         local libraryLoader = loadFileFactory(library.path, progressData, true)
         log.info('Scan library at:', library.path)
         library.matcher:scan(library.path, libraryLoader)
-        m.watchers[#m.watchers+1] = client.watchFiles(library.path)
+        m.watchers[#m.watchers+1] = fw.watch(library.path)
     end
 
     local isLoadingFiles = false
@@ -593,6 +607,46 @@ config.watch(function (key, value, oldValue)
         if value ~= oldValue then
             m.reload()
         end
+    end
+end)
+
+fw.event(function (changes)
+    m.awaitReady()
+    for _, change in ipairs(changes) do
+        local path = change.path
+        local uri  = furi.encode(path)
+        if  not m.isWorkspaceUri(uri)
+        and not files.isLibrary(uri) then
+            goto CONTINUE
+        end
+        if     change.type == 'create' then
+            log.debug('FileChangeType.Created', uri)
+            m.awaitLoadFile(uri)
+        elseif change.type == 'delete' then
+            log.debug('FileChangeType.Deleted', uri)
+            files.remove(uri)
+            local childs = files.getChildFiles(uri)
+            for _, curi in ipairs(childs) do
+                log.debug('FileChangeType.Deleted.Child', curi)
+                files.remove(curi)
+            end
+        elseif change.type == 'change' then
+            if m.isValidLuaUri(uri) then
+                -- 如果文件处于关闭状态，则立即更新；否则等待didChange协议来更新
+                if not files.isOpen(uri) then
+                    files.setText(uri, pub.awaitTask('loadFile', uri), false)
+                end
+            else
+                local filename = fs.path(path):filename():string()
+                -- 排除类文件发生更改需要重新扫描
+                if filename == '.gitignore'
+                or filename == '.gitmodules' then
+                    m.reload()
+                    break
+                end
+            end
+        end
+        ::CONTINUE::
     end
 end)
 

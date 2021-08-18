@@ -3,6 +3,7 @@
 ## 2.4.0
 * `CHG` hint: `Lua.hint.paramName` now supports `Disable`, `Literal` and `All`
 * `CHG` no longer ignore file names case in Windows
+* `CHG` watching library changes
 * `FIX` runtime errors
 
 ## 2.3.7

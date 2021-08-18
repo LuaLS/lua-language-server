@@ -10,6 +10,7 @@ local files  = require 'files'
 local lang   = require 'language'
 local ws     = require 'workspace'
 local time   = require 'bee.time'
+local fw     = require 'filewatch'
 
 local m = {}
 m.type = 'service'
@@ -173,6 +174,9 @@ function m.pulse()
     --end)
     timer.loop(0.1, function ()
         m.reportStatus()
+    end)
+    timer.loop(1, function ()
+        fw.update()
     end)
 end
 

@@ -470,7 +470,7 @@ proto.on('textDocument/completion', function (params)
         items[i] = item
     end
     return {
-        isIncomplete = false,
+        isIncomplete = true,
         items        = items,
     }
 end)

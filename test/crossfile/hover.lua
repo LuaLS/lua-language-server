@@ -534,7 +534,9 @@ hover = {
     name = 'f',
     description = [[
 @*param* `arg3` — comment3
+
 ---
+
 @*param* `arg1` — comment1
 
 @*param* `arg2` — comment2]]
@@ -592,7 +594,7 @@ function f()
   -> boolean
   2. string]],
     name = 'f',
-    description = nil
+    description = ''
 }}
 
 TEST {{ path = 'a.lua', content = '', }, {

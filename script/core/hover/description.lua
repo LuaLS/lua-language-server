@@ -246,34 +246,23 @@ local function getFunctionComment(source)
         end
     end
 
-    local comments = {}
-    local isComment = true
+    local md = markdown()
     for _, doc in ipairs(docGroup) do
         if doc.type == 'doc.comment' then
-            if not isComment then
-                comments[#comments+1] = '\n'
-            end
-            isComment = true
             if doc.comment.text:sub(1, 1) == '-' then
-                comments[#comments+1] = doc.comment.text:sub(2)
+                md:add('md', doc.comment.text:sub(2))
             else
-                comments[#comments+1] = doc.comment.text
+                md:add('md', doc.comment.text)
             end
-            comments[#comments+1] = '\n'
         elseif doc.type == 'doc.param' then
             if doc.comment then
-                isComment = false
-                comments[#comments+1] = '\n'
-                comments[#comments+1] = ('@*param* `%s` — %s'):format(
+                md:add('md', ('@*param* `%s` — %s'):format(
                     doc.param[1],
                     doc.comment.text
-                )
-                comments[#comments+1] = '\n'
+                ))
             end
         elseif doc.type == 'doc.return' then
             if hasReturnComment then
-                isComment = false
-                comments[#comments+1] = '\n'
                 local name = {}
                 for _, rtn in ipairs(doc.returns) do
                     if rtn.name then
@@ -282,37 +271,24 @@ local function getFunctionComment(source)
                 end
                 if doc.comment then
                     if #name == 0 then
-                        comments[#comments+1] = ('@*return* — %s'):format(doc.comment.text)
+                        md:add('md', ('@*return* — %s'):format(doc.comment.text))
                     else
-                        comments[#comments+1] = ('@*return* `%s` — %s'):format(table.concat(name, ','), doc.comment.text)
+                        md:add('md', ('@*return* `%s` — %s'):format(table.concat(name, ','), doc.comment.text))
                     end
                 else
                     if #name == 0 then
-                        comments[#comments+1] = '@*return*'
+                        md:add('md', '@*return*')
                     else
-                        comments[#comments+1] = ('@*return* `%s`'):format(table.concat(name, ','))
+                        md:add('md', ('@*return* `%s`'):format(table.concat(name, ',')))
                     end
                 end
-                comments[#comments+1] = '\n'
             end
         elseif doc.type == 'doc.overload' then
-            comments[#comments+1] = '---'
+            md:splitLine()
         end
     end
-    if comments[1] == '\n' then
-        table.remove(comments, 1)
-    end
-    if comments[#comments] == '\n' then
-        table.remove(comments)
-    end
-    comments = table.concat(comments)
 
     local enums = getBindEnums(source, docGroup)
-    if comments == '' and not enums then
-        return
-    end
-    local md = markdown()
-    md:add('md', comments)
     md:add('lua', enums)
     return md
 end

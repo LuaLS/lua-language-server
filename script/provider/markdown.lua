@@ -58,9 +58,7 @@ function mt:string()
             elseif obj.type == 'markdown' then
                 concat(obj.markdown)
             else
-                if obj.language == language then
-                    lines[#lines+1] = obj.text
-                else
+                if obj.language ~= language then
                     if language ~= 'md' then
                         lines[#lines+1] = '```'
                     end
@@ -70,9 +68,18 @@ function mt:string()
                     if obj.language ~= 'md' then
                         lines[#lines+1] = '```' .. obj.language
                     end
-                    lines[#lines+1] = obj.text
-                    language = obj.language
                 end
+                if obj.language == 'md' and #lines > 0 then
+                    local last = lines[#lines]
+                    if obj.text:sub(1, 1) == '@'
+                    or last:sub(1, 1) == '@' then
+                        if lines[#lines] ~= '' then
+                            lines[#lines+1] = ''
+                        end
+                    end
+                end
+                lines[#lines+1] = obj.text
+                language = obj.language
             end
         end
     end

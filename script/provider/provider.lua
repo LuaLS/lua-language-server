@@ -470,7 +470,7 @@ proto.on('textDocument/completion', function (params)
         items[i] = item
     end
     return {
-        isIncomplete = true,
+        isIncomplete = not result.complete,
         items        = items,
     }
 end)
@@ -682,6 +682,8 @@ end)
 
 proto.on('textDocument/semanticTokens/full', function (params)
     workspace.awaitReady()
+    await.close('textDocument/semanticTokens/full')
+    await.setID('textDocument/semanticTokens/full')
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
     local core = require 'core.semantic-tokens'
     local uri = params.textDocument.uri
@@ -697,6 +699,8 @@ end)
 
 proto.on('textDocument/semanticTokens/range', function (params)
     workspace.awaitReady()
+    await.close('textDocument/semanticTokens/range')
+    await.setID('textDocument/semanticTokens/range')
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_RANGE, 0.5)
     local core = require 'core.semantic-tokens'
     local uri = params.textDocument.uri
@@ -722,6 +726,8 @@ proto.on('textDocument/foldingRange', function (params)
     if not files.exists(uri) then
         return nil
     end
+    await.close('textDocument/foldingRange')
+    await.setID('textDocument/foldingRange')
     local regions = core(uri)
     if not regions then
         return nil

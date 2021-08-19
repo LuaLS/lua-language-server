@@ -1,6 +1,7 @@
 local files = require "files"
 local guide = require "parser.guide"
 local util  = require 'utility'
+local await = require 'await'
 
 local Care = {
     ['function'] = function (source, text, results)
@@ -156,12 +157,14 @@ return function (uri)
     guide.eachSource(ast.ast, function (source)
         local tp = source.type
         if Care[tp] then
+            await.delay()
             Care[tp](source, text, regions)
         end
     end)
     for _, source in ipairs(ast.comms) do
         local tp = source.type
         if Care[tp] then
+            await.delay()
             Care[tp](source, text, regions, status)
         end
     end

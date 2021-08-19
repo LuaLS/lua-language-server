@@ -633,6 +633,7 @@ local function checkCommon(myUri, word, text, offset, results)
         used[data[1]] = true
     end
     if config.get 'Lua.completion.workspaceWord' and #word >= 2 then
+        results.complete = true
         local myHead = word:sub(1, 2)
         for uri in files.eachFile() do
             if #results >= 100 then
@@ -696,6 +697,9 @@ local function checkCommon(myUri, word, text, offset, results)
                 }
             end
         end
+    end
+    if #results >= 100 then
+        results.complete = false
     end
 end
 

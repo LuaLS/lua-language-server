@@ -221,17 +221,13 @@ return function (uri, start, finish)
     end
 
     local results = {}
-    local count = 0
     guide.eachSourceBetween(ast.ast, start, finish, function (source)
         local method = Care[source.type]
         if not method then
             return
         end
         method(source, results)
-        count = count + 1
-        if count % 100 == 0 then
-            await.delay()
-        end
+        await.delay()
     end)
 
     for _, comm in ipairs(ast.comms) do

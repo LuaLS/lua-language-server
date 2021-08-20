@@ -624,7 +624,14 @@ local function checkTableField(ast, word, start, results)
 end
 
 local function checkCommon(myUri, word, text, offset, results)
+    local showWord = config.get 'Lua.completion.showWord'
+    if showWord == 'Disable' then
+        return
+    end
     results.enableCommon = true
+    if showWord == 'Fallback' and #results ~= 0 then
+        return
+    end
     local used = {}
     for _, result in ipairs(results) do
         used[result.label:match '^[^(]*'] = true

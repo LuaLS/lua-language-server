@@ -6,8 +6,8 @@ local config = require 'config'
 local isEnable = false
 
 local function allWords()
-    local str = [[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.:('"[,#*@|=-{ ]]
-    local list = {'\t', '\n'}
+    local str = '\t\n.:(\'"[,#*@|=-{ '
+    local list = {}
     for c in str:gmatch '.' do
         list[#list+1] = c
     end

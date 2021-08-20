@@ -15,6 +15,7 @@ function mt:add(language, text)
     if not text then
         return
     end
+    self._cacheResult = nil
     if type(text) == 'table' then
         self[#self+1] = {
             type     = 'markdown',
@@ -34,12 +35,16 @@ function mt:add(language, text)
 end
 
 function mt:splitLine()
+    self._cacheResult = nil
     self[#self+1] = {
         type = 'splitline',
     }
 end
 
 function mt:string()
+    if self._cacheResult then
+        return self._cacheResult
+    end
     local lines = {}
     local language = 'md'
 
@@ -97,7 +102,9 @@ function mt:string()
         end
     end
 
-    return table.concat(lines, '\n')
+    local result = table.concat(lines, '\n')
+    self._cacheResult = result
+    return result
 end
 
 return function ()

@@ -68,14 +68,8 @@ function TEST(expect)
     local sourcePos = (sourceList[1][1] + sourceList[1][2]) // 2
     local hover = core.byUri(sourceUri, sourcePos)
     assert(hover)
-    if hover.label then
-        hover.label = hover.label:gsub('\r\n', '\n')
-    end
-    if hover.description then
-        hover.description = tostring(hover.description)
-    end
-    assert(eq(hover.label, expect.hover.label))
-    assert(eq(hover.description, expect.hover.description))
+    hover = tostring(hover):gsub('\r\n', '\n')
+    assert(eq(hover, expect.hover))
 end
 
 TEST {
@@ -87,10 +81,13 @@ TEST {
         path = 'b.lua',
         content = 'require <?"a"?>',
     },
-    hover = {
-        label = '1 个字节',
-        description = [[* [a.lua](file:///a.lua) （搜索路径： `?.lua`）]],
-    }
+    hover = [[
+```lua
+1 个字节
+```
+
+---
+* [a.lua](file:///a.lua) （搜索路径： `?.lua`）]],
 }
 
 if require 'bee.platform'.OS == 'Windows' then

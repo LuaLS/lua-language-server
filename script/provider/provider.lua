@@ -186,20 +186,16 @@ proto.on('textDocument/hover', function (params)
         return nil
     end
     local offset = files.offsetOfWord(uri, params.position)
-    local hover = core.byUri(uri, offset)
+    local hover, source = core.byUri(uri, offset)
     if not hover then
         return nil
     end
-    local md = markdown()
-    md:add('lua', hover.label)
-    md:splitLine()
-    md:add('md',  hover.description)
     return {
         contents = {
-            value = md:string(),
+            value = tostring(hover),
             kind  = 'markdown',
         },
-        range = files.range(uri, hover.source.start, hover.source.finish),
+        range = files.range(uri, source.start, source.finish),
     }
 end)
 

@@ -1,7 +1,24 @@
-local core  = require 'core.hover'
-local files = require 'files'
+local core       = require 'core.hover'
+local findSource = require 'core.find-source'
+local getLabel   = require 'core.hover.label'
+local files      = require 'files'
 
 rawset(_G, 'TEST', true)
+
+local accept = {
+    ['local']         = true,
+    ['setlocal']      = true,
+    ['getlocal']      = true,
+    ['setglobal']     = true,
+    ['getglobal']     = true,
+    ['field']         = true,
+    ['method']        = true,
+    ['string']        = true,
+    ['number']        = true,
+    ['integer']       = true,
+    ['doc.type.name'] = true,
+    ['function']      = true,
+}
 
 function TEST(script)
     return function (expect)
@@ -14,7 +31,7 @@ function TEST(script)
         local hover = core.byUri('', pos)
         assert(hover)
         expect = expect:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
-        local label = hover.label:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
+        local label = tostring(hover):match('```lua[\r\n]*(.-)[\r\n]*```'):gsub('\r\n', '\n')
         assert(expect == label)
     end
 end
@@ -571,9 +588,7 @@ end
 <?F?>()
 ]]
 [[
-(3 个定义，2 个原型)
-(2) function F(a: any)
-(1) function F(b: any)
+function F(a: any)
 ]]
 
 -- 不根据参数推断
@@ -1278,9 +1293,7 @@ function f(x, y, z) end
 print(<?f?>)
 ]]
 [[
-(2 个定义，2 个原型)
-(1) function f(x: number, y: boolean, z: string)
-(1) function f(y: boolean)
+function f(x: number, y: boolean, z: string)
 ]]
 
 TEST [[
@@ -1397,8 +1410,7 @@ local t = {}
 function t.<?f?>() end
 ]]
 [[
-(2 个定义，1 个原型)
-(2) function c.f()
+function c.f()
 ]]
 
 TEST [[
@@ -1409,8 +1421,7 @@ t = {}
 function t.<?f?>() end
 ]]
 [[
-(2 个定义，1 个原型)
-(2) function t.f()
+function t.f()
 ]]
 
 TEST [[

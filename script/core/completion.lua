@@ -902,7 +902,7 @@ local function checkUri(ast, text, offset, results)
                             collect[info.expect] = {
                                 textEdit = {
                                     start   = source.start + #source[2],
-                                    finish  = source.finish - #source[2],
+                                    finish  = offset,
                                     newText = info.expect,
                                 }
                             }

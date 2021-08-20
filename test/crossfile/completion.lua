@@ -786,3 +786,15 @@ TEST {
     },
     completion = EXISTS,
 }
+
+TEST {
+    { path = 'a.lua', content = '' },
+    {
+        path = 'main.lua',
+        main = true,
+        content = [[
+            require'$
+        ]]
+    },
+    completion = EXISTS
+}

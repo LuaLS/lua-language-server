@@ -184,7 +184,7 @@ function m.setText(uri, text, isTrust, instance)
         await.call(function ()
             await.close('update:' .. uri)
             await.setID('update:' .. uri)
-            await.sleep(0.2)
+            await.sleep(0.1)
             if m.exists(uri) then
                 m.onWatch('update', uri)
             end

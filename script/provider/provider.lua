@@ -840,10 +840,9 @@ do
             local piece = hint(uri, visible.start, visible.finish)
             if piece then
                 for _, edit in ipairs(piece) do
-                    local offset = edit.where == 'left' and edit.offset - 1 or edit.offset
                     edits[#edits+1] = {
-                        newText = edit.text,
-                        range   = files.range(uri, offset, offset)
+                        text = edit.text,
+                        pos  = files.position(uri, edit.offset, edit.where),
                     }
                 end
             end

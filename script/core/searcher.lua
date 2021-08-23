@@ -753,6 +753,7 @@ function m.searchRefsByID(status, suri, expect, mode)
             local ruri = uris[i]
             if uri ~= ruri then
                 searchID(ruri, 'mainreturn', field, uri)
+                break
             end
         end
     end

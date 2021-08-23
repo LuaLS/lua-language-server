@@ -834,18 +834,24 @@ TEST {
     {
         path = 'a.lua',
         content = [[
----@type Class
-local m
-m.<!xx!> = 1
-        ]]
+return {
+    <!x!> = 1,
+}
+]],
+    },
+    {
+        path = 'f/a.lua',
+        content = [[
+return {
+    x = 1,
+}
+]]
     },
     {
         path = 'b.lua',
         content = [[
----@class Class
-local m
-
-print(m.<?xx?>)
+local t = require 'a'
+print(t.<?x?>)
         ]]
     }
 }

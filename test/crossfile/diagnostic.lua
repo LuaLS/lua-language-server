@@ -135,3 +135,22 @@ TEST {
         content = 'require "f.a"',
     },
 }
+
+TEST {
+    {
+        path = 'a/init.lua',
+        content = '',
+    },
+    {
+        path = 'f/a.lua',
+        content = '',
+    },
+    {
+        path = 'b.lua',
+        content = 'require "a"',
+    },
+    {
+        path = 'c.lua',
+        content = 'require "f.a"',
+    },
+}

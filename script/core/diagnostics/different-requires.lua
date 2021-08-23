@@ -22,10 +22,10 @@ return function (uri, callback)
         end
         local literal = arg1[1]
         local results = ws.findUrisByRequirePath(literal)
-        local result = results and results[1]
-        if not result then
+        if not results or #results ~= 1 then
             return
         end
+        local result = results[1]
         if not files.isLua(result) then
             return
         end

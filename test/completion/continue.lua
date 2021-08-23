@@ -29,4 +29,16 @@ io.z$
     }
 }
 
+
+TEST [[
+-- provider
+pro$
+]]
+{
+    {
+        label = 'provider',
+        kind = define.CompletionItemKind.Text,
+    }
+}
+
 ContinueTyping = false

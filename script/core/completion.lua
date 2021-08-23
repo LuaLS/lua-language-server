@@ -302,6 +302,7 @@ local function checkLocal(ast, word, offset, results)
                     local funcLabel = name .. getParams(def, false)
                     buildFunction(results, source, def, false, {
                         label  = funcLabel,
+                        match  = name,
                         insertText = name,
                         kind   = define.CompletionItemKind.Function,
                         id     = stack(function ()
@@ -469,6 +470,7 @@ local function checkFieldThen(name, src, word, start, offset, parent, oop, resul
         buildFunction(results, src, value, oop, {
             label      = name,
             kind       = kind,
+            match      = name:match '^[^(]+',
             insertText = name:match '^[^(]+',
             deprecated = vm.isDeprecated(src) or nil,
             id         = stack(function ()
@@ -853,6 +855,7 @@ local function checkFunctionArgByDocParam(ast, word, start, results)
             end
             results[#results+1] = {
                 label = table.concat(label, ', '),
+                match = firstParam.param[1],
                 kind  = define.CompletionItemKind.Snippet,
             }
         end
@@ -1016,6 +1019,7 @@ local function checkLenPlusOne(ast, text, offset, results)
                 end
                 results[#results+1] = {
                     label    = label,
+                    match    = nodeText,
                     kind     = define.CompletionItemKind.Snippet,
                     textEdit = {
                         start   = pos,
@@ -1945,22 +1949,25 @@ local function getCache(uri, offset)
 
     local ext = #word - cache.length
     cache.length = #word
-    for _, result in ipairs(cache.results) do
-        if result.textEdit then
-            result.textEdit.finish = result.textEdit.finish + ext
+    local results = cache.results
+    for i = #results, 1, -1 do
+        local result = results[i]
+        local match = result.match or result.label
+        if results.enableCommon and result.kind == define.CompletionItemKind.Text then
+            results[i] = results[#results]
+            results[#results] = nil
+        elseif matchKey(word, match) then
+            if result.textEdit then
+                result.textEdit.finish = result.textEdit.finish + ext
+            end
+        else
+            results[i] = results[#results]
+            results[#results] = nil
         end
     end
 
-    if cache.results.enableCommon then
-        local results = cache.results
-        for i = #results, 1, -1 do
-            local res = results[i]
-            if res.kind == define.CompletionItemKind.Text then
-                results[i] = results[#results]
-                results[#results] = nil
-            end
-        end
-        checkCommon(nil, word, text, offset, results)
+    if results.enableCommon then
+        checkCommon(uri, word, text, offset, results)
     end
 
     return cache.results

@@ -148,7 +148,6 @@ local Template = {
     ['Lua.runtime.path']                    = Type.Array(Type.String) >> {
                                                 "?.lua",
                                                 "?/init.lua",
-                                                "?/?.lua"
                                             },
     ['Lua.runtime.special']                 = Type.Hash(Type.String, Type.String),
     ['Lua.runtime.meta']                    = Type.String >> '${version} ${language}',

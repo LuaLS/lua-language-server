@@ -13,21 +13,22 @@ local function getHover(source)
     local labelMark = {}
     local descMark  = {}
 
-    local function addHover(def)
+    local function addHover(def, checkLable)
         if defMark[def] then
             return
         end
         defMark[def] = true
 
-        local label = getLabel(def)
-        local desc  = getDesc(def)
-
-        if not labelMark[tostring(label)] then
-            labelMark[tostring(label)] = true
-            md:add('lua', label)
-            md:splitLine()
+        if checkLable then
+            local label = getLabel(def)
+            if not labelMark[tostring(label)] then
+                labelMark[tostring(label)] = true
+                md:add('lua', label)
+                md:splitLine()
+            end
         end
 
+        local desc  = getDesc(def)
         if not descMark[tostring(desc)] then
             descMark[tostring(desc)] = true
             md:add('md', desc)
@@ -39,13 +40,18 @@ local function getHover(source)
         for _, def in ipairs(vm.getDefs(source)) do
             if def.type == 'function'
             or def.type == 'doc.type.function' then
-                addHover(def)
+                addHover(def, true)
             end
         end
     else
-        addHover(source)
+        addHover(source, true)
         for _, def in ipairs(vm.getDefs(source)) do
-            addHover(def)
+            local isFunction
+            if def.type == 'function'
+            or def.type == 'doc.type.function' then
+                isFunction = true
+            end
+            addHover(def, isFunction)
         end
     end
 

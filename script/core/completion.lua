@@ -190,8 +190,12 @@ local function buildDesc(source)
     if source.type == 'dummy' then
         return
     end
+    local desc = markdown()
     local hover = getHover.get(source)
-    return hover
+    desc:add('md', hover)
+    desc:splitLine()
+    desc:add('lua', getSnip(source))
+    return desc
 end
 
 local function buildFunction(results, source, value, oop, data)

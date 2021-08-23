@@ -2,6 +2,7 @@
 
 ## 2.4.0
 * `NEW` settings: `Lua.diagnostics.libraryFiles`, `Lua.diagnostics.ignoredFiles`
+* `CHG` hover: improve showing multi defines
 * `CHG` hint: `Lua.hint.paramName` now supports `Disable`, `Literal` and `All`
 * `CHG` no longer ignore file names case in Windows
 * `CHG` watching library changes

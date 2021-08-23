@@ -14,6 +14,7 @@
 * `CHG` only search first file by `require`
 * `CHG` no longer ignore file names case in Windows
 * `CHG` watching library changes
+* `CHG` completion: improve misspelling results
 * `FIX` runtime errors
 * `FIX` hint: may show param-2 as `self`
 

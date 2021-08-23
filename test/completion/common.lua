@@ -4,6 +4,7 @@ local config = require 'config'
 config.set('Lua.completion.callSnippet',    'Both')
 config.set('Lua.completion.keywordSnippet', 'Both')
 config.set('Lua.completion.workspaceWord',  false)
+config.set('Lua.completion.showWord',       'Enable')
 
 TEST [[
 local zabcde
@@ -213,14 +214,6 @@ loc$
     },
     {
         label = 'local function',
-        kind = define.CompletionItemKind.Snippet,
-    },
-    {
-        label = 'collectgarbage(opt, ...)',
-        kind = define.CompletionItemKind.Function,
-    },
-    {
-        label = 'collectgarbage(opt, ...)',
         kind = define.CompletionItemKind.Snippet,
     },
 }
@@ -1443,22 +1436,6 @@ end
         label = 'type',
         kind = define.CompletionItemKind.Event,
     },
-    {
-        label = 'return',
-        kind = define.CompletionItemKind.Event,
-    },
-    {
-        label = 'deprecated',
-        kind = define.CompletionItemKind.Event,
-    },
-    {
-        label = 'meta',
-        kind = define.CompletionItemKind.Event,
-    },
-    {
-        label = 'diagnostic',
-        kind = define.CompletionItemKind.Event,
-    }
 }
 
 TEST [[

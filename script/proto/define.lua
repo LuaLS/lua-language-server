@@ -301,4 +301,10 @@ m.BuiltinClass = {
     ['Function']      = true,
 }
 
+m.InlayHintKind = {
+    Other     = 0,
+    Type      = 1,
+    Parameter = 2,
+}
+
 return m

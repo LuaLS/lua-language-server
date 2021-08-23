@@ -4,6 +4,7 @@ local vm       = require 'vm'
 local config   = require 'config'
 local guide    = require 'parser.guide'
 local await    = require 'await'
+local define   = require 'proto.define'
 
 local function typeHint(uri, edits, start, finish)
     local ast = files.getState(uri)
@@ -58,9 +59,9 @@ local function typeHint(uri, edits, start, finish)
         end
         mark[src] = true
         edits[#edits+1] = {
-            newText = (':%s'):format(view),
-            start   = src.finish,
-            finish  = src.finish,
+            text   = view,
+            offset = src.finish,
+            kind   = define.InlayHintKind.Type,
         }
     end)
 end
@@ -145,9 +146,9 @@ local function paramName(uri, edits, start, finish)
                 mark[arg] = true
                 if args[i] and args[i] ~= '' then
                     edits[#edits+1] = {
-                        newText = ('%s:'):format(args[i]),
-                        start   = arg.start,
-                        finish  = arg.start - 1,
+                        text   = args[i],
+                        offset = arg.start,
+                        kind   = define.InlayHintKind.Parameter,
                     }
                 end
             end

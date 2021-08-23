@@ -821,8 +821,8 @@ do
             if piece then
                 for _, edit in ipairs(piece) do
                     edits[#edits+1] = {
-                        newText = edit.newText,
-                        range   = files.range(uri, edit.start, edit.finish)
+                        newText = ':' .. edit.text,
+                        range   = files.range(uri, edit.offset, edit.offset)
                     }
                 end
             end

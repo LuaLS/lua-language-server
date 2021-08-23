@@ -184,6 +184,7 @@ local Template = {
     ['Lua.completion.showWord']             = Type.String  >> 'Enable',
     ['Lua.completion.autoRequire']          = Type.Boolean >> true,
     ['Lua.completion.showParams']           = Type.Boolean >> true,
+    ['Lua.completion.requireSeparator']     = Type.String  >> '.',
     ['Lua.signatureHelp.enable']            = Type.Boolean >> true,
     ['Lua.hover.enable']                    = Type.Boolean >> true,
     ['Lua.hover.viewString']                = Type.Boolean >> true,
@@ -324,6 +325,7 @@ function m.update(new)
     expand(new)
 end
 
+---@param callback fun(key: string, value: any, oldValue: any)
 function m.watch(callback)
     m.watchList[#m.watchList+1] = callback
 end

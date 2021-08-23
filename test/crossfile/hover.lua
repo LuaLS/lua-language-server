@@ -108,6 +108,42 @@ TEST {
 ---
 * [Folder\a.lua](file:///Folder/a.lua) （搜索路径： `Folder\?.lua`）]],
 }
+
+TEST {
+    {
+        path = 'Folder/a.lua',
+        content = '',
+    },
+    {
+        path = 'b.lua',
+        content = 'require <?"Folder.a"?>',
+    },
+    hover = [[
+```lua
+8 个字节
+```
+
+---
+* [Folder\a.lua](file:///Folder/a.lua) （搜索路径： `?.lua`）]],
+}
+
+TEST {
+    {
+        path = 'Folder/a.lua',
+        content = '',
+    },
+    {
+        path = 'b.lua',
+        content = 'require <?"Folder/a"?>',
+    },
+    hover = [[
+```lua
+8 个字节
+```
+
+---
+* [Folder\a.lua](file:///Folder/a.lua) （搜索路径： `?.lua`）]],
+}
 else
 TEST {
     {

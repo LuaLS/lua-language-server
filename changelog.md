@@ -5,6 +5,7 @@
 * `CHG` hover: improve showing multi defines
 * `CHG` hint: `Lua.hint.paramName` now supports `Disable`, `Literal` and `All`
 * `CHG` completion: new setting `Lua.completion.showWord`
+* `CHG` completion: new setting `Lua.completion.requireSeparator`
 * `CHG` no longer ignore file names case in Windows
 * `CHG` watching library changes
 * `FIX` runtime errors

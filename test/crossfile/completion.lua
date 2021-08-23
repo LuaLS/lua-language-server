@@ -302,6 +302,32 @@ TEST {
     }
 }
 
+local originSeparator = config.get 'Lua.completion.requireSeparator'
+config.set('Lua.completion.requireSeparator', '/')
+TEST {
+    {
+        path = 'abc.lua',
+        content = '',
+    },
+    {
+        path = 'abc/init.lua',
+        content = '',
+    },
+    {
+        path = 'test.lua',
+        content = 'require "abc/i$"',
+        main = true,
+    },
+    completion = {
+        {
+            label = 'abc/init',
+            kind = CompletionItemKind.Reference,
+            textEdit = EXISTS,
+        },
+    }
+}
+config.set('Lua.completion.requireSeparator', originSeparator)
+
 TEST {
     {
         path = 'core/core.lua',

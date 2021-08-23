@@ -1,19 +1,21 @@
-local platform = require 'bee.platform'
-local files    = require 'files'
-local furi     = require 'file-uri'
+local platform  = require 'bee.platform'
+local files     = require 'files'
+local furi      = require 'file-uri'
 local workspace = require "workspace"
+local config    = require 'config'
 local m = {}
 
 m.cache = {}
 
 --- `aaa/bbb/ccc.lua` 与 `?.lua` 将返回 `aaa.bbb.cccc`
 local function getOnePath(path, searcher)
+    local separator    = config.get 'Lua.completion.requireSeparator'
     local stemPath     = path
                         : gsub('%.[^%.]+$', '')
-                        : gsub('[/\\]+', '.')
+                        : gsub('[/\\%.]+', separator)
     local stemSearcher = searcher
                         : gsub('%.[^%.]+$', '')
-                        : gsub('[/\\]+', '.')
+                        : gsub('[/\\%.]+', separator)
     local start        = stemSearcher:match '()%?' or 1
     for pos = start, #stemPath do
         local word = stemPath:sub(start, pos)
@@ -84,6 +86,12 @@ end
 files.watch(function (ev)
     if ev == 'create'
     or ev == 'remove' then
+        m.flush()
+    end
+end)
+
+config.watch(function (key, value, oldValue)
+    if key == 'Lua.completion.requireSeparator' then
         m.flush()
     end
 end)

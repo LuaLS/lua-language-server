@@ -799,6 +799,28 @@ proto.on('textDocument/onTypeFormatting', function (params)
     return results
 end)
 
+proto.on('$/requestHint', function (params)
+    local core = require 'core.hint'
+    await.setID 'hint'
+    await.close 'hint'
+    if not config.get 'Lua.hint.enable' then
+        return
+    end
+    workspace.awaitReady()
+    local uri           = params.textDocument.uri
+    local start, finish = files.unrange(uri, params.range)
+    local results = core(uri, start, finish)
+    local hintResults = {}
+    for i, res in ipairs(results) do
+        hintResults[i] = {
+            text = res.text,
+            pos  = files.position(uri, res.offset, res.where),
+            kind = res.kind,
+        }
+    end
+    return hintResults
+end)
+
 -- Hint
 do
     local function updateHint(uri)
@@ -821,7 +843,7 @@ do
             if piece then
                 for _, edit in ipairs(piece) do
                     edits[#edits+1] = {
-                        newText = ':' .. edit.text,
+                        newText = edit.text,
                         range   = files.range(uri, edit.offset, edit.offset)
                     }
                 end

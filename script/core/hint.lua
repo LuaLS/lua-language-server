@@ -6,7 +6,7 @@ local guide    = require 'parser.guide'
 local await    = require 'await'
 local define   = require 'proto.define'
 
-local function typeHint(uri, edits, start, finish)
+local function typeHint(uri, results, start, finish)
     local ast = files.getState(uri)
     if not ast then
         return
@@ -58,10 +58,11 @@ local function typeHint(uri, edits, start, finish)
             return
         end
         mark[src] = true
-        edits[#edits+1] = {
-            text   = view,
+        results[#results+1] = {
+            text   = ':' .. view,
             offset = src.finish,
             kind   = define.InlayHintKind.Type,
+            where  = 'right',
         }
     end)
 end
@@ -95,7 +96,7 @@ local function hasLiteralArgInCall(call)
     return false
 end
 
-local function paramName(uri, edits, start, finish)
+local function paramName(uri, results, start, finish)
     local paramConfig = config.get 'Lua.hint.paramName'
     if not paramConfig or paramConfig == 'None' then
         return
@@ -145,10 +146,11 @@ local function paramName(uri, edits, start, finish)
             and (paramConfig ~= 'Literal' or guide.isLiteral(arg)) then
                 mark[arg] = true
                 if args[i] and args[i] ~= '' then
-                    edits[#edits+1] = {
-                        text   = args[i],
+                    results[#results+1] = {
+                        text   = args[i] .. ':',
                         offset = arg.start,
                         kind   = define.InlayHintKind.Parameter,
+                        where  = 'left',
                     }
                 end
             end
@@ -157,8 +159,8 @@ local function paramName(uri, edits, start, finish)
 end
 
 return function (uri, start, finish)
-    local edits = {}
-    typeHint(uri, edits, start, finish)
-    paramName(uri, edits, start, finish)
-    return edits
+    local results = {}
+    typeHint(uri, results, start, finish)
+    paramName(uri, results, start, finish)
+    return results
 end

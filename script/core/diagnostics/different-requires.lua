@@ -26,6 +26,9 @@ return function (uri, callback)
         if not result then
             return
         end
+        if not files.isLua(result) then
+            return
+        end
         local other = cache[result]
         if not other then
             cache[result] = {

@@ -74,6 +74,7 @@ m.DiagnosticDefaultSeverity = {
     ['count-down-loop']         = 'Warning',
     ['no-implicit-any']         = 'Information',
     ['deprecated']              = 'Warning',
+    ['different-requires']      = 'Warning',
 
     ['duplicate-doc-class']     = 'Warning',
     ['undefined-doc-class']     = 'Warning',
@@ -125,6 +126,7 @@ m.DiagnosticDefaultNeededFileStatus = {
     ['count-down-loop']         = 'Any',
     ['no-implicit-any']         = 'None',
     ['deprecated']              = 'Opened',
+    ['different-requires']      = 'Any',
 
     ['duplicate-doc-class']     = 'Any',
     ['undefined-doc-class']     = 'Any',

@@ -41,6 +41,7 @@ DIAG_COSE_NON_OBJECT    = 'Cannot close a value of this type. (Unless set `__clo
 DIAG_COUNT_DOWN_LOOP    = 'Do you mean `{}` ?'
 DIAG_IMPLICIT_ANY       = 'Can not infer type.'
 DIAG_DEPRECATED         = 'Deprecated.'
+DIAG_DIFFERENT_REQUIRES = 'The same file is required with different names.'
 
 DIAG_CIRCLE_DOC_CLASS                 = 'Circularly inherited classes.'
 DIAG_DOC_FIELD_NO_CLASS               = 'The field must be defined after the class.'

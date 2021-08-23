@@ -722,6 +722,9 @@ function m.eachSource(ast, callback)
 end
 
 --- 获取指定的 special
+---@param ast      parser.guide.object
+---@param name     string
+---@param callback fun(source: parser.guide.object)
 function m.eachSpecialOf(ast, name, callback)
     local root = m.getRoot(ast)
     if not root.specials then

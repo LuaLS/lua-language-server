@@ -2,7 +2,6 @@ local core   = require 'core.diagnostics'
 local files  = require 'files'
 local config = require 'config'
 local util   = require 'utility'
-local define = require 'proto.define'
 
 config.get 'Lua.diagnostics.neededFileStatus'['deprecated'] = 'Any'
 

@@ -954,3 +954,34 @@ local t: string|fun():string
 function t()
   -> string
 ```]]}
+
+TEST {{ path = 'a.lua', content = '', }, {
+    path = 'b.lua',
+    content = [[
+---@alias T
+---comment 1
+---comment 2
+---| 'a'
+---comment 3
+---comment 4
+---| 'b'
+
+---@param p T
+local function <?f?>(p)
+end
+]]
+},
+hover = [[
+```lua
+function f(p: a|b)
+```
+
+---
+
+```lua
+p: T
+    | a -- comment 1
+        -- comment 2
+    | b -- comment 3
+        -- comment 4
+```]]}

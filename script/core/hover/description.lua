@@ -166,13 +166,25 @@ local function buildEnumChunk(docType, name)
     end
     lines[#lines+1] = ('%s: %s'):format(name, table.concat(types))
     for _, enum in ipairs(enums) do
-        lines[#lines+1] = ('   %s %s%s'):format(
-               (enum.default    and '->')
+        local enumDes = ('   %s %s'):format(
+                (enum.default    and '->')
             or (enum.additional and '+>')
             or ' |',
-            enum[1],
-            enum.comment and (' -- %s'):format(enum.comment) or ''
+            enum[1]
         )
+        if enum.comment then
+            local first = true
+            local len = #enumDes
+            for comm in enum.comment:gmatch '[^\r\n]+' do
+                if first then
+                    first = false
+                    enumDes = ('%s -- %s'):format(enumDes, comm)
+                else
+                    enumDes = ('%s\n%s -- %s'):format(enumDes, (' '):rep(len), comm)
+                end
+            end
+        end
+        lines[#lines+1] = enumDes
     end
     return table.concat(lines, '\n')
 end

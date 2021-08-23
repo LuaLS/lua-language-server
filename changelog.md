@@ -7,6 +7,7 @@
   + `Lua.completion.showWord`
   + `Lua.completion.requireSeparator`
 * `CHG` hover: improve showing multi defines
+* `CHG` hover: improve showing multi comments at enums
 * `CHG` hint: `Lua.hint.paramName` now supports `Disable`, `Literal` and `All`
 * `CHG` no longer ignore file names case in Windows
 * `CHG` watching library changes

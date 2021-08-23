@@ -801,8 +801,6 @@ end)
 
 proto.on('$/requestHint', function (params)
     local core = require 'core.hint'
-    await.setID 'hint'
-    await.close 'hint'
     if not config.get 'Lua.hint.enable' then
         return
     end
@@ -842,9 +840,10 @@ do
             local piece = hint(uri, visible.start, visible.finish)
             if piece then
                 for _, edit in ipairs(piece) do
+                    local offset = edit.where == 'left' and edit.offset - 1 or edit.offset
                     edits[#edits+1] = {
                         newText = edit.text,
-                        range   = files.range(uri, edit.offset, edit.offset)
+                        range   = files.range(uri, offset, offset)
                     }
                 end
             end

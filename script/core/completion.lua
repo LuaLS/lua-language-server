@@ -1956,7 +1956,8 @@ local function getCache(uri, offset)
         if results.enableCommon and result.kind == define.CompletionItemKind.Text then
             results[i] = results[#results]
             results[#results] = nil
-        elseif matchKey(word, match) then
+        elseif matchKey(word, match)
+        or     (result.textEdit and matchKey(word, result.textEdit.newText:match '[%w_]*')) then
             if result.textEdit then
                 result.textEdit.finish = result.textEdit.finish + ext
             end

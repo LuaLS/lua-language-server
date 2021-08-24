@@ -41,4 +41,18 @@ pro$
     }
 }
 
+TEST [[
+---@param n '"abcdefg"'
+local function f(n) end
+
+f 'abc$'
+]]
+{
+    {
+        label    = "'abcdefg'",
+        kind     = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS,
+    }
+}
+
 ContinueTyping = false

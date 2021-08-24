@@ -2637,3 +2637,19 @@ m.$
 {
     [1] = EXISTS,
 }
+
+TEST [[
+---@class class1
+class1 = {}
+
+function class1:method1() end
+
+---@class class2 : class1
+class2 = {}
+
+class2:$
+
+]]
+{
+    [1] = EXISTS,
+}

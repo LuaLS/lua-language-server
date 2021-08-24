@@ -617,7 +617,7 @@ function m.searchRefsByID(status, suri, expect, mode)
     ---@param info node.info
     local function checkInfoFilter(id, field, info)
         for filter in next, filters do
-            if not filter(id, field) then
+            if not filter(id, field, mode) then
                 return false
             end
         end

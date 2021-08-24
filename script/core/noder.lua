@@ -57,8 +57,10 @@ local INFO_META_INDEX = {
     end
 }
 local INFO_CLASS_TO_EXNTENDS = {
-    filter = function (_, field)
+    filter = function (_, field, mode)
         return field ~= nil
+            or mode == 'field'
+            or mode == 'allfield'
     end,
     filterValid = function (_, field)
         return not field

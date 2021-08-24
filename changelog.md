@@ -17,6 +17,7 @@
 * `CHG` completion: improve misspelling results
 * `FIX` runtime errors
 * `FIX` hint: may show param-2 as `self`
+* `FIX` [#660](https://github.com/sumneko/lua-language-server/issues/660)
 
 ## 2.3.7
 `2021-8-17`

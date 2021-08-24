@@ -188,14 +188,19 @@ function m.setConfig(changes, onlyMemory)
     if #finalChanges == 0 then
         return
     end
-    if m.getOption 'changeConfiguration' then
+    if  m.getOption 'changeConfiguration'
+    and config.getSource() == 'client' then
         proto.notify('$/command', {
             command   = 'lua.config',
             data      = finalChanges,
         })
     else
         local messages = {}
-        messages[1] = lang.script('WINDOW_CLIENT_NOT_SUPPORT_CONFIG')
+        if not m.getOption 'changeConfiguration' then
+            messages[1] = lang.script('WINDOW_CLIENT_NOT_SUPPORT_CONFIG')
+        elseif config.getSource() ~= 'client' then
+            messages[1] = lang.script('WINDOW_LCONFIG_NOT_SUPPORT_CONFIG')
+        end
         for _, change in ipairs(finalChanges) do
             if change.action == 'add' then
                 messages[#messages+1] = lang.script('WINDOW_MANUAL_CONFIG_ADD', change)

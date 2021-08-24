@@ -7,24 +7,22 @@ local define     = require 'proto.define'
 local workspace  = require 'workspace'
 local config     = require 'config'
 local library    = require 'library'
-local markdown   = require 'provider.markdown'
 local client     = require 'client'
-local furi       = require 'file-uri'
 local pub        = require 'pub'
-local fs         = require 'bee.filesystem'
 local lang       = require 'language'
 local progress   = require 'progress'
 local tm         = require 'text-merger'
-local nonil      = require 'without-check-nil'
 local cfgLoader  = require 'config.loader'
 
 local function updateConfig()
     local new
     if CONFIGPATH then
         new = cfgLoader.loadLocalConfig(CONFIGPATH)
+        config.setSource 'path'
         log.debug('load config from local', CONFIGPATH)
     else
         new = cfgLoader.loadClientConfig()
+        config.setSource 'client'
         log.debug('load config from client')
     end
     if not new then

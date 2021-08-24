@@ -236,6 +236,7 @@ WINDOW_TELEMETRY_HINT            = '请允许发送匿名的使用数据与错�
 WINDOW_TELEMETRY_ENABLE          = '允许'
 WINDOW_TELEMETRY_DISABLE         = '禁止'
 WINDOW_CLIENT_NOT_SUPPORT_CONFIG = '你的客户端不支持从服务侧修改设置，请手动修改如下设置：'
+WINDOW_LCONFIG_NOT_SUPPORT_CONFIG= '暂不支持自动修改本地设置，请手动修改如下设置：'
 WINDOW_MANUAL_CONFIG_ADD         = '为 `{key}` 添加值 `{value:q}`;'
 WINDOW_MANUAL_CONFIG_SET         = '将 `{key}` 的值设置为 `{value:q}`;'
 WINDOW_MANUAL_CONFIG_PROP        = '将 `{key}` 的属性 `{prop}` 设置为 `{value:q}`;'

@@ -237,6 +237,7 @@ WINDOW_TELEMETRY_HINT            = 'Please allow sending anonymous usage data an
 WINDOW_TELEMETRY_ENABLE          = 'Allow'
 WINDOW_TELEMETRY_DISABLE         = 'Prohibit'
 WINDOW_CLIENT_NOT_SUPPORT_CONFIG = 'Your client does not support modifying settings from the server side, please manually modify the following settings:'
+WINDOW_LCONFIG_NOT_SUPPORT_CONFIG= 'Automatic modification of local settings is not currently supported, please manually modify the following settings:'
 WINDOW_MANUAL_CONFIG_ADD         = '`{key}`: add element `{value:q}` ;'
 WINDOW_MANUAL_CONFIG_SET         = '`{key}`: set to `{value:q}` ;'
 WINDOW_MANUAL_CONFIG_PROP        = '`{key}`: set the property `{prop}` to `{value:q}`;'

@@ -2,6 +2,8 @@ local util   = require 'utility'
 local define = require 'proto.define'
 local timer  = require 'timer'
 
+---@alias config.source '"client"'|'"path"'|'"local"'
+
 ---@class config.unit
 ---@field caller function
 local mt = {}
@@ -347,6 +349,16 @@ function m.event(key, value, oldValue)
         value    = value,
         oldValue = oldValue,
     }
+end
+
+---@param source config.source
+function m.setSource(source)
+    m._source = source
+end
+
+---@return config.source
+function m.getSource()
+    return m._source
 end
 
 function m.init()

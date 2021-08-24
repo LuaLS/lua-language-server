@@ -1,5 +1,4 @@
----@diagnostic disable-next-line
----@class vm
+---@type vm
 local vm       = require 'vm.vm'
 local searcher = require 'core.searcher'
 

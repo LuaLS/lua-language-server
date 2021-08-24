@@ -74,6 +74,7 @@ local function testAll()
     test 'highlight'
     test 'rename'
     test 'signature'
+    test 'command'
     test 'document_symbol'
     test 'code_action'
     test 'type_formatting'

@@ -107,7 +107,6 @@ return function (data)
         return
     end
 
-    local offset, fmt = findInsertOffset(uri)
     local path = furi.decode(target)
     local visiblePaths = rpath.getVisiblePath(path, config.get 'Lua.runtime.path')
     if not visiblePaths or #visiblePaths == 0 then
@@ -122,5 +121,6 @@ return function (data)
         return
     end
 
+    local offset, fmt = findInsertOffset(uri)
     applyAutoRequire(uri, offset, name, result, fmt)
 end

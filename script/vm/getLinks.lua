@@ -1,6 +1,5 @@
 local guide = require 'parser.guide'
----@diagnostic disable-next-line
----@class vm
+---@type vm
 local vm    = require 'vm.vm'
 local files = require 'files'
 

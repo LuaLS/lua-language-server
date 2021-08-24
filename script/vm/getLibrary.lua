@@ -1,4 +1,3 @@
----@diagnostic disable-next-line
 ---@class vm
 local vm      = require 'vm.vm'
 

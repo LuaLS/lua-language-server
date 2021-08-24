@@ -13,8 +13,8 @@ local mathHuge       = math.huge
 local weakMT = { __mode = 'kv' }
 
 _ENV = nil
----@diagnostic disable-next-line
----@class vm
+
+---@type vm
 local m = {}
 
 function m.getArgInfo(source)

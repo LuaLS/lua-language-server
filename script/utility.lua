@@ -17,6 +17,7 @@ local mathRandom   = math.random
 local ioOpen       = io.open
 local utf8Len      = utf8.len
 local getenv       = os.getenv
+local getupvalue   = debug.getupvalue
 local mathHuge     = math.huge
 local inf          = 1 / 0
 local nan          = 0 / 0
@@ -682,6 +683,19 @@ function m.switch()
         end
     }
     return obj
+end
+
+function m.getUpvalue(f, name)
+    for i = 1, 999 do
+        local uname, value = getupvalue(f, i)
+        if not uname then
+            break
+        end
+        if name == uname then
+            return value, true
+        end
+    end
+    return nil, false
 end
 
 return m

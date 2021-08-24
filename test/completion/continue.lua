@@ -55,4 +55,18 @@ f 'abc$'
     }
 }
 
+TEST [[
+---@type '"abcdefg"'
+local t
+
+if t == 'abc$'
+]]
+{
+    {
+        label    = "'abcdefg'",
+        kind     = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS,
+    }
+}
+
 ContinueTyping = false

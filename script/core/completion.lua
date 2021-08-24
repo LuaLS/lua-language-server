@@ -1933,6 +1933,23 @@ local function makeCache(uri, offset, results)
     cache.length  = #word
 end
 
+local function isValidCache(word, result)
+    if result.kind == define.CompletionItemKind.Text then
+        return false
+    end
+    local match = result.match or result.label
+    if matchKey(word, match) then
+        return true
+    end
+    if result.textEdit then
+        match = result.textEdit.newText:match '[%w_]+'
+        if match and matchKey(word, match) then
+            return true
+        end
+    end
+    return false
+end
+
 local function getCache(uri, offset)
     local cache = workspace.getCache 'completion'
     if not cache.results then
@@ -1952,12 +1969,7 @@ local function getCache(uri, offset)
     local results = cache.results
     for i = #results, 1, -1 do
         local result = results[i]
-        local match = result.match or result.label
-        if results.enableCommon and result.kind == define.CompletionItemKind.Text then
-            results[i] = results[#results]
-            results[#results] = nil
-        elseif matchKey(word, match)
-        or     (result.textEdit and matchKey(word, result.textEdit.newText:match '[%w_]*')) then
+        if isValidCache(word, result) then
             if result.textEdit then
                 result.textEdit.finish = result.textEdit.finish + ext
             end

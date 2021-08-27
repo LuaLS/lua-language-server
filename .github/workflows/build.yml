@@ -6,17 +6,14 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, ubuntu-16.04, macos-latest]
+        os: [windows-latest, ubuntu-18.04, macos-latest]
     steps:
     - uses: actions/checkout@v1
       with:
         ref: refs/heads/master
         submodules : recursive
     - uses: actboy168/setup-luamake@master
-    - if: runner.os != 'Linux'
-      run: luamake
-    - if: runner.os == 'Linux'
-      run: luamake -cc gcc-9
+    - run: luamake
     - uses: actions/upload-artifact@v1.0.0
       with:
         name: lua-language-server

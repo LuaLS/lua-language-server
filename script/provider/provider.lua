@@ -693,8 +693,8 @@ end)
 
 proto.on('textDocument/semanticTokens/range', function (params)
     workspace.awaitReady()
-    await.close('textDocument/semanticTokens/range')
-    await.setID('textDocument/semanticTokens/range')
+    --await.close('textDocument/semanticTokens/range')
+    --await.setID('textDocument/semanticTokens/range')
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_RANGE, 0.5)
     local core = require 'core.semantic-tokens'
     local uri = params.textDocument.uri

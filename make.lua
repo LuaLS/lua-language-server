@@ -1,8 +1,7 @@
 local lm       = require 'luamake'
 
-lm:import("3rd/bee.lua/make.lua", {
-    EXE_RESOURCE = "../../make/lua-language-server.rc"
-})
+lm.EXE_RESOURCE = "../../make/lua-language-server.rc"
+lm:import "3rd/bee.lua/make.lua"
 
 lm:lua_dll 'lpeglabel' {
     rootdir = '3rd',

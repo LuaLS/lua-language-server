@@ -1049,7 +1049,7 @@ local function tryLabelInString(label, source)
     if not source or source.type ~= 'string' then
         return label
     end
-    local str = parser:grammar(label, 'String')
+    local str = parser.grammar(label, 'String')
     if not str then
         return label
     end

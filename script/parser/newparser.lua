@@ -1598,8 +1598,9 @@ local function parseSimple(node, funcName)
                     finish = lastRightPosition(),
                 }
             end
-            node.next = getfield
-            node = getfield
+            node.parent = getfield
+            node.next   = getfield
+            node        = getfield
         elseif token == ':' then
             local colon = {
                 type   = token,
@@ -1627,8 +1628,9 @@ local function parseSimple(node, funcName)
                     finish = lastRightPosition(),
                 }
             end
-            node.next  = getmethod
-            node       = getmethod
+            node.parent = getmethod
+            node.next   = getmethod
+            node        = getmethod
             if lastMethod then
                 missSymbol('(', node.node.finish, node.node.finish)
             end
@@ -1678,28 +1680,30 @@ local function parseSimple(node, funcName)
                 call.node.node.mirror = newNode
                 tinsert(call.args, 1, newNode)
             end
+            node.parent = call
             node = call
         elseif token == '{' then
             if funcName then
                 break
             end
-            local str = parseTable()
+            local tbl = parseTable()
             local call = {
                 type   = 'call',
                 start  = node.start,
-                finish = str.finish,
+                finish = tbl.finish,
                 node   = node,
             }
             local args = {
                 type   = 'callargs',
-                start  = str.start,
-                finish = str.finish,
+                start  = tbl.start,
+                finish = tbl.finish,
                 parent = call,
-                [1]    = str,
+                [1]    = tbl,
             }
-            call.args  = args
-            str.parent = args
-            return call
+            call.args   = args
+            tbl.parent  = args
+            node.parent = call
+            node        = call
         elseif CharMapStrSH[token] then
             if funcName then
                 break
@@ -1718,9 +1722,10 @@ local function parseSimple(node, funcName)
                 parent = call,
                 [1]    = str,
             }
-            call.args  = args
-            str.parent = args
-            return call
+            call.args   = args
+            str.parent  = args
+            node.parent = args
+            node        = call
         elseif CharMapStrLH[token] then
             local str = parseLongString()
             if str then
@@ -1740,9 +1745,10 @@ local function parseSimple(node, funcName)
                     parent = call,
                     [1]    = str,
                 }
-                call.args  = args
-                str.parent = args
-                return call
+                call.args   = args
+                str.parent  = args
+                node.parent = call
+                node        = call
             else
                 local index = parseIndex()
                 index.type   = 'getindex'
@@ -1750,7 +1756,8 @@ local function parseSimple(node, funcName)
                 index.start  = node.start
                 index.node   = node
                 node.next    = index
-                node = index
+                node.parent  = index
+                node         = index
                 if funcName then
                     pushError {
                         type   = 'INDEX_IN_FUNC_NAME',
@@ -3458,6 +3465,7 @@ local function parseLua()
         start  = 0,
         finish = 0,
         effect = 0,
+        parent = main,
         tag    = '_ENV',
         special= '_G',
         [1]    = State.ENVMode,

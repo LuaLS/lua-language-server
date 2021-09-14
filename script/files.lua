@@ -446,14 +446,13 @@ function m.compileState(uri, text)
     local prog <close> = progress.create(lang.script.WINDOW_COMPILING, 0.5)
     prog:setMessage(ws.getRelativePath(uri))
     local clock = os.clock()
-    local state, err = parser:compile(text
-        , 'lua'
+    local state, err = parser.compile(text
+        , 'Lua'
         , config.get 'Lua.runtime.version'
         , {
             special           = config.get 'Lua.runtime.special',
             unicodeName       = config.get 'Lua.runtime.unicodeName',
             nonstandardSymbol = config.get 'Lua.runtime.nonstandardSymbol',
-            delay             = await.delay,
         }
     )
     local passed = os.clock() - clock
@@ -465,7 +464,7 @@ function m.compileState(uri, text)
         state.uri = uri
         state.ast.uri = uri
         local clock = os.clock()
-        parser:luadoc(state)
+        parser.luadoc(state)
         local passed = os.clock() - clock
         if passed > 0.1 then
             log.warn(('Parse LuaDoc of [%s] takes [%.3f] sec, size [%.3f] kb.'):format(uri, passed, #text / 1000))
@@ -548,7 +547,7 @@ function m.getLines(uri)
     end
     local lines = m.linesMap[uri]
     if not lines then
-        lines = parser:lines(file.text)
+        lines = parser.lines(file.text)
         m.linesMap[uri] = lines
     end
     return lines
@@ -561,7 +560,7 @@ function m.getOriginLines(uri)
     end
     local lines = m.originLinesMap[uri]
     if not lines then
-        lines = parser:lines(file.originText)
+        lines = parser.lines(file.originText)
         m.originLinesMap[uri] = lines
     end
     return lines

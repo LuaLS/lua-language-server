@@ -26,12 +26,12 @@ brave.on('timer', function (time)
 end)
 
 brave.on('compile', function (text)
-    local state, err = parser:compile(text, 'lua', 'Lua 5.4')
+    local state, err = parser.compile(text, 'lua', 'Lua 5.4')
     if not state then
         log.error(err)
         return
     end
-    local lines = parser:lines(text)
+    local lines = parser.lines(text)
     return {
         root  = state.root,
         value = state.value,

@@ -11,12 +11,12 @@ local function isValidFunctionPos(source, offset)
     return false
 end
 
-return function (ast, offset, accept)
+return function (ast, position, accept)
     local len = math.huge
     local result
-    guide.eachSourceContain(ast.ast, offset, function (source)
+    guide.eachSourceContain(ast.ast, position, function (source)
         if source.type == 'function' then
-            if not isValidFunctionPos(source, offset) then
+            if not isValidFunctionPos(source, position) then
                 return
             end
         end

@@ -186,7 +186,7 @@ local function makeDiagRange(uri, doc, results)
             names[name] = true
         end
     end
-    local row = guide.positionOf(lines, doc.start)
+    local row = guide.positionOf(doc.start)
     if doc.mode == 'disable-next-line' then
         if lines[row+1] then
             results[#results+1] = {

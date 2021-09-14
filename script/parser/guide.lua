@@ -548,24 +548,24 @@ function m.getRange(source)
     return start, finish
 end
 
---- 判断source是否包含offset
-function m.isContain(source, offset)
+--- 判断source是否包含position
+function m.isContain(source, position)
     local start, finish = m.getStartFinish(source)
     if not start then
         return false
     end
-    return start <= offset and finish >= offset
+    return start <= position and finish >= position
 end
 
---- 判断offset在source的影响范围内
+--- 判断position在source的影响范围内
 ---
 --- 主要针对赋值等语句时，key包含value
-function m.isInRange(source, offset)
+function m.isInRange(source, position)
     local start, finish = m.getRange(source)
     if not start then
         return false
     end
-    return start <= offset and finish >= offset
+    return start <= position and finish >= position
 end
 
 function m.isBetween(source, tStart, tFinish)
@@ -597,8 +597,8 @@ local function addChilds(list, obj)
     f(obj, list)
 end
 
---- 遍历所有包含offset的source
-function m.eachSourceContain(ast, offset, callback)
+--- 遍历所有包含position的source
+function m.eachSourceContain(ast, position, callback)
     local list = { ast }
     local mark = {}
     while true do
@@ -610,8 +610,8 @@ function m.eachSourceContain(ast, offset, callback)
         list[len] = nil
         if not mark[obj] then
             mark[obj] = true
-            if m.isInRange(obj, offset) then
-                if m.isContain(obj, offset) then
+            if m.isInRange(obj, position) then
+                if m.isContain(obj, position) then
                     local res = callback(obj)
                     if res ~= nil then
                         return res
@@ -737,64 +737,24 @@ function m.eachSpecialOf(ast, name, callback)
     end
 end
 
---- 获取光标偏移对应的坐标。
---- 如果在换行符的右侧，则认为在新的一行。
---- 第一行的行号是1不是0。
----@param lines table
----@return integer {name = 'row'}
----@return integer {name = 'col'}
-function m.positionOf(lines, offset)
-    if offset <= 0 then
-        return 1, 0
-    end
-    local lastLine = lines[#lines]
-    if offset >= lastLine.finish then
-        return #lines, lastLine.finish - lastLine.start
-    end
-    local min = 1
-    local max = #lines
-    for _ = 1, 100 do
-        if max <= min then
-            local line = lines[min]
-            return min, offset - line.start
-        end
-        local row = (max - min) // 2 + min
-        local line = lines[row]
-        if offset < line.start then
-            max = row - 1
-        elseif offset >= line.finish then
-            min = row + 1
-        else
-            return row, offset - line.start
-        end
-    end
-    error('Stack overflow!')
+--- 将 position 拆分成行号与列号
+---
+--- 第一行是0
+---@param position integer
+---@return integer row
+---@return integer col
+function m.positionOf(position)
+    return position // 10000, position % 10000
 end
 
---- 获取坐标对应的光标偏移。
---- 一定会落在当前行的换行符左侧。
---- 第一行的行号是1不是0。
----@param lines table
+--- 将行列合并为 position
+---
+--- 第一行是0
 ---@param row integer
 ---@param col integer
----@return integer {name = 'offset'}
-function m.offsetOf(lines, row, col)
-    if row < 1 then
-        return 0
-    end
-    if row > #lines then
-        local lastLine = lines[#lines]
-        return lastLine.finish
-    end
-    local line = lines[row]
-    local len = line.range - line.start
-    if col < 0 then
-        return line.start
-    elseif col > len then
-        return line.range
-    else
-        return line.start + col
-    end
+---@return integer
+function m.offsetOf(row, col)
+    return row * 10000 + col
 end
 
 function m.lineContent(lines, text, row, ignoreNL)

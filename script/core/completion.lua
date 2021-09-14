@@ -176,7 +176,7 @@ local function getSnip(source)
             if vm.isMetaFile(uri) then
                 goto CONTINUE
             end
-            local row = guide.positionOf(lines, def.start)
+            local row = guide.positionOf(def.start)
             local firstRow = lines[row]
             local lastRow = lines[math.min(row + context - 1, #lines)]
             local snip = text:sub(firstRow.start, lastRow.finish)

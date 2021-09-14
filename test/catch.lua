@@ -1,3 +1,22 @@
+local mt = {}
+
+local function catchedTable()
+    return setmetatable({}, mt)
+end
+
+function mt.__add(a, b)
+    if not a or not b then
+        return a or b
+    end
+    local t = catchedTable()
+    for _, v in ipairs(a) do
+        t[#t+1] = v
+    end
+    for _, v in ipairs(b) do
+        t[#t+1] = v
+    end
+    return t
+end
 
 local function getLine(offset, lns)
     for i = 0, #lns do
@@ -20,7 +39,7 @@ end
 ---@param script string
 ---@param sep string
 return function (script, sep)
-    local pattern = ('()<%%%s.-%%%s>()'):format(sep, sep)
+    local pattern = ('()<(%s).-%s>()'):format(sep, sep)
     local lns = {}
     lns[0] = 0
     for pos in script:gmatch '()\n' do
@@ -33,7 +52,7 @@ return function (script, sep)
     local list = {}
     local cuted = 0
     local lastLine = 0
-    for a, b in script:gmatch(pattern) do
+    for a, char, b in script:gmatch(pattern) do
         codes[#codes+1] = script:sub(pos, a - 1)
         codes[#codes+1] = script:sub(a + 2, b - 3)
         pos = b
@@ -51,7 +70,10 @@ return function (script, sep)
         end
         local right = getPosition(b - 3, lns) - cuted
         cuted = cuted + 2
-        list[#list+1] = { left, right }
+        if not list[char] then
+            list[char] = catchedTable()
+        end
+        list[char][#list[char]+1] = { left, right }
     end
     codes[#codes+1] = script:sub(pos)
     return table.concat(codes), list

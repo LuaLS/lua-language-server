@@ -1,19 +1,6 @@
 local core  = require 'core.reference'
 local files = require 'files'
-
-local function catch_target(script)
-    local list = {}
-    local cur = 1
-    while true do
-        local start, finish  = script:find('<[!?].-[!?]>', cur)
-        if not start then
-            break
-        end
-        list[#list+1] = { start + 2, finish - 2 }
-        cur = finish + 1
-    end
-    return list
-end
+local catch = require 'catch'
 
 local function founded(targets, results)
     if #targets ~= #results then
@@ -33,14 +20,12 @@ end
 
 function TEST(script)
     files.removeAll()
-    local expect = catch_target(script)
-    local start  = script:find('<[?~]')
-    local finish = script:find('[?~]>')
-    local pos = (start + finish) // 2 + 1
-    local new_script = script:gsub('<[!?~]', '  '):gsub('[!?~]>', '  ')
-    files.setText('', new_script)
+    local newScript, catched = catch(script, '[!?~]')
+    files.setText('', newScript)
 
-    local results = core('', pos)
+    local input  = catched['?'] + catched['~']
+    local expect = catched['!'] + catched['?'] + catched['~']
+    local results = core('', input[1][1])
     if results then
         local positions = {}
         for i, result in ipairs(results) do

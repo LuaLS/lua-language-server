@@ -635,7 +635,7 @@ function parseType(parent)
     result.finish = getFinish()
     result.firstFinish = result.finish
 
-    local row = guide.positionOf(Lines, result.finish)
+    local row = guide.positionOf(result.finish)
 
     local function pushResume()
         local comments
@@ -1178,8 +1178,8 @@ end
 
 local function isTailComment(lns, text, binded, doc)
     local lastDoc = binded[#binded]
-    local lastDocStartRow = guide.positionOf(lns, lastDoc.originalComment.start)
-    local lastDocStartLineData = guide.lineData(lns, lastDocStartRow)
+    local lastDocStartRow = guide.positionOf(lastDoc.originalComment.start)
+    local lastDocStartLineData = guide.lineData(lastDocStartRow)
     if haveCodeBeforeDocInCurLine(text, lastDocStartLineData, lastDoc.originalComment.start) then
         return true
     end
@@ -1191,8 +1191,8 @@ local function isNextLine(lns, text, binded, doc)
         return false
     end
     local lastDoc = binded[#binded]
-    local lastRow = guide.positionOf(lns, lastDoc.finish)
-    local newRow  = guide.positionOf(lns, doc.start)
+    local lastRow = guide.positionOf(lastDoc.finish)
+    local newRow  = guide.positionOf(doc.start)
     return newRow - lastRow == 1
 end
 
@@ -1332,7 +1332,7 @@ local function bindDoc(sources, lns, binded)
         doc.bindSources = bindSources
     end
     bindGeneric(binded)
-    local row = guide.positionOf(lns, lastDoc.finish)
+    local row = guide.positionOf(lastDoc.finish)
     local cstart, cfinish = guide.lineRange(lns, row)
     local nstart, nfinish = guide.lineRange(lns, row + 1)
     bindDocsBetween(sources, binded, bindSources, cstart, cfinish)

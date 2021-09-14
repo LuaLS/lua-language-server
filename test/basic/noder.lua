@@ -33,7 +33,7 @@ local function TEST(script)
         files.removeAll()
         local newScript, catched = catch(script, '?')
         files.setText('', newScript)
-        local source = getSource(catched[1][1])
+        local source = getSource(catched['?'][1][1])
         assert(source)
         local result = {
             id = noder.getID(source),

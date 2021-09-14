@@ -1,5 +1,6 @@
 local lm       = require 'luamake'
 
+lm.EXE = "lua"
 lm.EXE_RESOURCE = "../../make/lua-language-server.rc"
 lm:import "3rd/bee.lua/make.lua"
 
@@ -18,7 +19,6 @@ lm:build 'install' {
         'lua',
         'lpeglabel',
         'bee',
-        'bootstrap',
     }
 }
 
@@ -30,7 +30,6 @@ lm:build 'unittest' {
     pool = "console",
     deps = {
         'install',
-        'test',
     }
 }
 

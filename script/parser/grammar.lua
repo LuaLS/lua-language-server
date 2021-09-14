@@ -557,7 +557,7 @@ Lua         <-  Head?
 Head        <-  '#' (!%nl .)*
 ]]
 
-return function (self, lua, mode)
+return function (lua, mode)
     local gram = compiled[mode] or compiled['Lua']
     local r, _, pos = gram:match(lua)
     if not r then

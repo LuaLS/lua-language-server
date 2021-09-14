@@ -1375,7 +1375,7 @@ local function bindDocs(state)
     bindDoc(sources, Lines, binded)
 end
 
-return function (_, state)
+return function (state)
     local ast = state.ast
     local comments = state.comms
     table.sort(comments, function (a, b)
@@ -1389,7 +1389,7 @@ return function (_, state)
 
     pushError = state.pushError
 
-    Lines = lines(nil, state.lua)
+    Lines = lines(state.lua)
 
     local ci = 1
     NextComment = function (offset, peek)

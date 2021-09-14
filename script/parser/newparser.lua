@@ -1589,7 +1589,7 @@ local function parseSimple(node, funcName)
                 field  = field
             }
             if field then
-                field.parent = node
+                field.parent = getfield
                 field.type   = 'field'
             else
                 pushError {
@@ -1619,7 +1619,7 @@ local function parseSimple(node, funcName)
                 method = method
             }
             if method then
-                method.parent = node
+                method.parent = getmethod
                 method.type   = 'method'
             else
                 pushError {
@@ -3462,9 +3462,9 @@ local function parseLua()
     pushChunk(main)
     createLocal{
         type   = 'local',
-        start  = 0,
-        finish = 0,
-        effect = 0,
+        start  = -1,
+        finish = -1,
+        effect = -1,
         parent = main,
         tag    = '_ENV',
         special= '_G',

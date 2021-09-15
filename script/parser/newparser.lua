@@ -514,7 +514,7 @@ local function skipComment(isAction)
             type   = 'comment.shot',
             start  = left,
             finish = getPosition(Tokens[Index], 'right'),
-            text   = ssub(start, Tokens[Index] or #Lua),
+            text   = ssub(Lua, start + 2, Tokens[Index] and (Tokens[Index] - 1) or #Lua),
         }
         return true
     end

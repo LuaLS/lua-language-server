@@ -1,22 +1,9 @@
 local core  = require 'core.definition'
 local files = require 'files'
 local vm    = require 'vm'
+local catch = require 'catch'
 
 rawset(_G, 'TEST', true)
-
-local function catch_target(script)
-    local list = {}
-    local cur = 1
-    while true do
-        local start, finish  = script:find('<!.-!>', cur)
-        if not start then
-            break
-        end
-        list[#list+1] = { start + 2, finish - 2 }
-        cur = finish + 1
-    end
-    return list
-end
 
 local function founded(targets, results)
     if #targets ~= #results then
@@ -36,15 +23,11 @@ end
 
 function TEST(script)
     files.removeAll()
-    script = script:gsub('\n', '\r\n')
-    local target = catch_target(script)
-    local start  = script:find('<?', 1, true)
-    local finish = script:find('?>', 1, true)
-    local pos = (start + finish) // 2 + 1
-    local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
-    files.setText('', new_script)
+    local newScript, catched = catch(script, '!?')
 
-    local results = core('', pos)
+    files.setText('', newScript)
+
+    local results = core('', catched['?'][1][1])
     if results then
         local positions = {}
         for i, result in ipairs(results) do
@@ -52,15 +35,9 @@ function TEST(script)
                 positions[i] = { result.target.start, result.target.finish }
             end
         end
-        if not founded(target, positions) then
-            core('', pos)
-        end
-        assert(founded(target, positions))
+        assert(founded(catched['!'], positions))
     else
-        if #target ~= 0 then
-            core('', pos)
-        end
-        assert(#target == 0)
+        assert(#catched['!'] == 0)
     end
 end
 

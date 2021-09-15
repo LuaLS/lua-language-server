@@ -4,7 +4,7 @@ local guide      = require 'parser.guide'
 local grammar    = require 'parser.grammar'
 
 local TokenTypes, TokenStarts, TokenFinishs, TokenContents
-local Ci, Offset, pushError, NextComment
+local Ci, Offset, pushError, NextComment, Lines
 local parseType
 local Parser = re.compile([[
 Main                <-  (Token / Sp)*
@@ -1171,19 +1171,13 @@ local function buildLuaDoc(comment)
     }
 end
 
----当前行在注释doc前是否有代码
-local function haveCodeBeforeDocInCurLine(text, lineData, docStart)
-    return text:sub(lineData.start + 1, docStart - 1):find '[%w_]'
-end
-
 local function isTailComment(text, binded)
-    local lastDoc = binded[#binded]
-    local lastDocStartRow = guide.rowColOf(lastDoc.originalComment.start)
-    local lastDocStartLineData = guide.lineData(lastDocStartRow)
-    if haveCodeBeforeDocInCurLine(text, lastDocStartLineData, lastDoc.originalComment.start) then
-        return true
-    end
-    return false
+    local lastDoc       = binded[#binded]
+    local left          = lastDoc.originalComment.start
+    local row, col      = guide.rowColOf(left)
+    local lineStart     = Lines[row] or 0
+    local hasCodeBefore = text:sub(lineStart, lineStart + col):find '[%w_]'
+    return hasCodeBefore
 end
 
 local function isNextLine(binded, doc)
@@ -1386,6 +1380,7 @@ return function (state)
     }
 
     pushError = state.pushError
+    Lines     = state.lines
 
     local ci = 1
     NextComment = function (offset, peek)

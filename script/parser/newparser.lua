@@ -488,13 +488,19 @@ local function skipComment(isAction)
     local token = Tokens[Index + 1]
     if token == '--'
     or (token == '//' and isAction) then
-        local left = getPosition(Tokens[Index], 'left')
+        local start = Tokens[Index]
+        local left = getPosition(start, 'left')
         if token == '//' then
             pushCommentHeadError(left)
         end
         Index = Index + 2
         local longComment = parseLongString()
         if longComment then
+            longComment.type = 'comment.long'
+            longComment.text = longComment[1]
+            longComment[1]   = nil
+            longComment[2]   = nil
+            State.comms[#State.comms+1] = longComment
             return true
         end
         while true do
@@ -504,13 +510,26 @@ local function skipComment(isAction)
             end
             Index = Index + 2
         end
+        State.comms[#State.comms+1] = {
+            type   = 'comment.shot',
+            start  = left,
+            finish = getPosition(Tokens[Index], 'right'),
+            text   = ssub(start, Tokens[Index] or #Lua),
+        }
         return true
     end
     if token == '/*' then
-        local left = getPosition(Tokens[Index], 'left')
+        local start = Tokens[Index]
+        local left = getPosition(start, 'left')
         Index = Index + 2
         local result, right = resolveLongString '*/'
         pushLongCommentError(left, right)
+        State.comms[#State.comms+1] = {
+            type   = 'comment.long',
+            start  = left,
+            finish = right,
+            text   = result,
+        }
         return true
     end
     return false

@@ -781,10 +781,6 @@ function m.lineRange(lines, row, ignoreNL)
     end
 end
 
-function m.lineData(lines, row)
-    return lines[row]
-end
-
 local isSetMap = {
     ['setglobal']      = true,
     ['local']          = true,

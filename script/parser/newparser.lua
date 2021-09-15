@@ -1405,7 +1405,10 @@ local function parseExpList(mini)
                 end
                 local nextToken = peekWord()
                 if  isKeyWord(nextToken)
-                and nextToken ~= 'function' then
+                and nextToken ~= 'function'
+                and nextToken ~= 'true'
+                and nextToken ~= 'false'
+                and nextToken ~= 'nil' then
                     break
                 end
             end

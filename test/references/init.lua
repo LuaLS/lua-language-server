@@ -24,7 +24,7 @@ function TEST(script)
     files.setText('', newScript)
 
     local input  = catched['?'] + catched['~']
-    local expect = catched['!'] + catched['?'] + catched['~']
+    local expect = catched['!'] + catched['?']
     local results = core('', input[1][1])
     if results then
         local positions = {}

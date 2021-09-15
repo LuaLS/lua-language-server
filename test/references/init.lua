@@ -20,7 +20,7 @@ end
 
 function TEST(script)
     files.removeAll()
-    local newScript, catched = catch(script, '[!?~]')
+    local newScript, catched = catch(script, '!?~')
     files.setText('', newScript)
 
     local input  = catched['?'] + catched['~']

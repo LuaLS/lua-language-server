@@ -35,9 +35,9 @@ function TEST(script)
                 positions[i] = { result.target.start, result.target.finish }
             end
         end
-        assert(founded(catched['!'], positions))
+        assert(founded(catched['!'] or {}, positions))
     else
-        assert(#catched['!'] == 0)
+        assert(catched['!'] == nil)
     end
 end
 

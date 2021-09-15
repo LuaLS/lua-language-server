@@ -1905,6 +1905,9 @@ local function resolveName(node)
             loc.ref = {}
         end
         loc.ref[#loc.ref+1] = node
+        if loc.special then
+            addSpecial(loc.special, node)
+        end
     else
         node.type = 'getglobal'
         local env = getLocal(State.ENVMode, node.start)
@@ -2517,6 +2520,9 @@ end
 local function bindValue(n, v, index, lastValue, isLocal, isSet)
     if isLocal then
         n.effect = lastRightPosition()
+        if v and v.special then
+            addSpecial(v.special, n)
+        end
     elseif isSet then
         n.type = GetToSetMap[n.type] or n.type
         if n.type == 'setlocal' then

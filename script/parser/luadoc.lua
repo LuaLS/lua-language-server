@@ -1238,7 +1238,7 @@ local function bindDocsBetween(sources, binded, bindSources, start, finish)
     for i = index, max do
         local src = sources[i]
         if src and src.start >= start then
-            if src.start > finish then
+            if src.start >= finish then
                 break
             end
             -- 遇到table后中断，处理以下情况：

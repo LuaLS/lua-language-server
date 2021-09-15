@@ -5,7 +5,7 @@ local guide        = require "parser.guide"
 local function insertIndentation(uri, offset, edits)
     local lines  = files.getLines(uri)
     local text   = files.getOriginText(uri)
-    local row    = guide.positionOf(offset)
+    local row    = guide.rowColOf(offset)
     local line   = lines[row]
     local indent = text:sub(line.start, line.finish):match '^%s*'
     for _, edit in ipairs(edits) do

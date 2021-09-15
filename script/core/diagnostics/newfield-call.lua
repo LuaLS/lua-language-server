@@ -27,8 +27,8 @@ return function (uri, callback)
             local func = call.node
             local args = call.args
             if args then
-                local funcLine = guide.positionOf(func.finish)
-                local argsLine = guide.positionOf(args.start)
+                local funcLine = guide.rowColOf(func.finish)
+                local argsLine = guide.rowColOf(args.start)
                 if argsLine > funcLine then
                     callback {
                         start   = call.start,

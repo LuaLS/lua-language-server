@@ -743,7 +743,7 @@ end
 ---@param position integer
 ---@return integer row
 ---@return integer col
-function m.positionOf(position)
+function m.rowColOf(position)
     return position // 10000, position % 10000
 end
 
@@ -753,7 +753,7 @@ end
 ---@param row integer
 ---@param col integer
 ---@return integer
-function m.offsetOf(row, col)
+function m.positionOf(row, col)
     return row * 10000 + col
 end
 

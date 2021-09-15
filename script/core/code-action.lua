@@ -57,7 +57,7 @@ end
 
 local function disableDiagnostic(uri, code, start, results)
     local lines = files.getLines(uri)
-    local row   = guide.positionOf(start)
+    local row   = guide.rowColOf(start)
     results[#results+1] = {
         title   = lang.script('ACTION_DISABLE_DIAG', code),
         kind    = 'quickfix',

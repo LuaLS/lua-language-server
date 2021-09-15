@@ -26,8 +26,8 @@ return function (uri, callback)
             return
         end
 
-        local nodeRow = guide.positionOf(node.finish)
-        local argRow  = guide.positionOf(args.start)
+        local nodeRow = guide.rowColOf(node.finish)
+        local argRow  = guide.rowColOf(args.start)
         if nodeRow == argRow then
             return
         end

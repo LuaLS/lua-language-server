@@ -361,6 +361,7 @@ local function skipNL()
         Line       = Line + 1
         LineOffset = Tokens[Index] + #token
         Index = Index + 2
+        State.lines[Line] = LineOffset
         return true
     end
     return false
@@ -392,8 +393,11 @@ local function resolveLongString(finishMark)
         local result, count = stringResult
             : gsub('\r\n', '\n')
             : gsub('[\r\n]', '\n')
-        Line       = Line + count
         LineOffset = lastLN + start
+        for i = Line + 1, Line + count do
+            State.lines[i] = LineOffset
+        end
+        Line       = Line + count
         stringResult = result
     end
     fastForwardToken(finishOffset + #finishMark)
@@ -3503,6 +3507,7 @@ local function initState(lua, version, options)
         errs    = {},
         diags   = {},
         comms   = {},
+        lines   = {},
         options = options or {},
     }
     if version == 'Lua 5.1' or version == 'LuaJIT' then

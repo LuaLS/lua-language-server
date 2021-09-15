@@ -1,11 +1,10 @@
 local m          = require 'lpeglabel'
 local re         = require 'parser.relabel'
-local lines      = require 'parser.lines'
 local guide      = require 'parser.guide'
 local grammar    = require 'parser.grammar'
 
 local TokenTypes, TokenStarts, TokenFinishs, TokenContents
-local Ci, Offset, pushError, Ct, NextComment, Lines
+local Ci, Offset, pushError, NextComment
 local parseType
 local Parser = re.compile([[
 Main                <-  (Token / Sp)*
@@ -635,7 +634,7 @@ function parseType(parent)
     result.finish = getFinish()
     result.firstFinish = result.finish
 
-    local row = guide.positionOf(result.finish)
+    local row = guide.rowColOf(result.finish)
 
     local function pushResume()
         local comments
@@ -644,8 +643,9 @@ function parseType(parent)
             if not nextComm then
                 return false
             end
-            local line = Lines[row + i + 1]
-            if not line or line.finish < nextComm.start then
+            local nextCommRow = guide.rowColOf(nextComm.start)
+            local currentRow = row + i + 1
+            if currentRow > nextCommRow then
                 return false
             end
             if nextComm.text:sub(1, 2) == '-@' then
@@ -1176,9 +1176,9 @@ local function haveCodeBeforeDocInCurLine(text, lineData, docStart)
     return text:sub(lineData.start + 1, docStart - 1):find '[%w_]'
 end
 
-local function isTailComment(lns, text, binded, doc)
+local function isTailComment(text, binded)
     local lastDoc = binded[#binded]
-    local lastDocStartRow = guide.positionOf(lastDoc.originalComment.start)
+    local lastDocStartRow = guide.rowColOf(lastDoc.originalComment.start)
     local lastDocStartLineData = guide.lineData(lastDocStartRow)
     if haveCodeBeforeDocInCurLine(text, lastDocStartLineData, lastDoc.originalComment.start) then
         return true
@@ -1186,13 +1186,13 @@ local function isTailComment(lns, text, binded, doc)
     return false
 end
 
-local function isNextLine(lns, text, binded, doc)
+local function isNextLine(binded, doc)
     if not binded then
         return false
     end
     local lastDoc = binded[#binded]
-    local lastRow = guide.positionOf(lastDoc.finish)
-    local newRow  = guide.positionOf(doc.start)
+    local lastRow = guide.rowColOf(lastDoc.finish)
+    local newRow  = guide.rowColOf(doc.start)
     return newRow - lastRow == 1
 end
 
@@ -1318,7 +1318,7 @@ local function bindClassAndFields(binded)
     end
 end
 
-local function bindDoc(sources, lns, binded)
+local function bindDoc(sources, binded)
     if not binded then
         return
     end
@@ -1332,12 +1332,10 @@ local function bindDoc(sources, lns, binded)
         doc.bindSources = bindSources
     end
     bindGeneric(binded)
-    local row = guide.positionOf(lastDoc.finish)
-    local cstart, cfinish = guide.lineRange(lns, row)
-    local nstart, nfinish = guide.lineRange(lns, row + 1)
-    bindDocsBetween(sources, binded, bindSources, cstart, cfinish)
+    local row = guide.rowColOf(lastDoc.finish)
+    bindDocsBetween(sources, binded, bindSources, guide.positionOf(row, 0), lastDoc.start)
     if #bindSources == 0 then
-        bindDocsBetween(sources, binded, bindSources, nstart, nfinish)
+        bindDocsBetween(sources, binded, bindSources, guide.positionOf(row + 1, 0), guide.positionOf(row + 2, 0))
     end
     bindParamAndReturnIndex(binded)
     bindClassAndFields(binded)
@@ -1361,18 +1359,18 @@ local function bindDocs(state)
     end)
     local binded
     for _, doc in ipairs(state.ast.docs) do
-        if not isNextLine(Lines, text, binded, doc) then
-            bindDoc(sources, Lines, binded)
+        if not isNextLine(binded, doc) then
+            bindDoc(sources, binded)
             binded = {}
             state.ast.docs.groups[#state.ast.docs.groups+1] = binded
         end
         binded[#binded+1] = doc
-        if isTailComment(Lines, text, binded, doc) then
-            bindDoc(sources, Lines, binded)
+        if isTailComment(text, binded) then
+            bindDoc(sources, binded)
             binded = nil
         end
     end
-    bindDoc(sources, Lines, binded)
+    bindDoc(sources, binded)
 end
 
 return function (state)
@@ -1388,8 +1386,6 @@ return function (state)
     }
 
     pushError = state.pushError
-
-    Lines = lines(state.lua)
 
     local ci = 1
     NextComment = function (offset, peek)

@@ -744,7 +744,7 @@ function m.position(uri, offset, leftOrRight)
         lines  = m.getOriginLines(uri)
         text   = m.getOriginText(uri)
     end
-    local row, col      = guide.positionOf(offset)
+    local row, col      = guide.rowColOf(offset)
     local start, finish = guide.lineRange(lines, row, true)
     start = start + 1
     if col <= finish - start + 1 then

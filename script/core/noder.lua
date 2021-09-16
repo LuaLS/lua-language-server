@@ -379,7 +379,7 @@ local getKeyMap = util.switch()
     end)
     : case 'generic.closure'
     : call(function (source)
-        return 'gc:' .. source.call.start, nil
+        return 'gc:' .. source.call.finish, nil
     end)
     : case 'generic.value'
     : call(function (source)
@@ -388,7 +388,7 @@ local getKeyMap = util.switch()
             tail = URI_CHAR .. guide.getUri(source.closure.call)
         end
         return sformat('gv:%s|%s%s'
-            , source.closure.call.start
+            , source.closure.call.finish
             , getKey(source.proto)
             , tail
         )
@@ -1229,6 +1229,58 @@ compileNodeMap = util.switch()
                     pushForward(noders, valueID, getID(firstField))
                 end
             end
+        end
+    end)
+    : case 'in'
+    : call(function (noders, id, source)
+        local keys = source.keys
+        local exps = source.exps
+        if not keys or not exps then
+            return
+        end
+        local node   = exps[1]
+        local param1 = exps[2]
+        local param2 = exps[3]
+        local nodeID   = getID(node)
+        local param1ID = getID(param1)
+        local param2ID = getID(param2)
+        if node.type == 'call' then
+            if not param1ID then
+                param1ID = sformat('%s%s%s'
+                    , nodeID
+                    , RETURN_INDEX
+                    , 2
+                )
+                if not param2ID then
+                    param2ID = sformat('%s%s%s'
+                        , nodeID
+                        , RETURN_INDEX
+                        , 3
+                    )
+                end
+            end
+        end
+        local call = {
+            type   = 'dummy',
+            _id    = 'c:' .. source.keyword[3],
+            finish = source.finish,
+            node   = {
+                type = 'dummy',
+                _id  = nodeID,
+            },
+            args   = {
+                [1] = {
+                    type = 'dummy',
+                    _id  = param1ID,
+                },
+                [2] = {
+                    type = 'dummy',
+                    _id  = param2ID,
+                }
+            }
+        }
+        for i = 1, #keys do
+            compileCallReturn(noders, call, getID(keys[i]), i)
         end
     end)
     : case 'main'

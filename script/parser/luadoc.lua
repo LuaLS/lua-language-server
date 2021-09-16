@@ -160,7 +160,7 @@ local function getFinish()
     if Ci == 0 then
         return Offset
     end
-    return TokenFinishs[Ci] + Offset
+    return TokenFinishs[Ci] + Offset + 1
 end
 
 local function try(callback)
@@ -182,7 +182,7 @@ local function parseName(tp, parent)
     local class = {
         type   = tp,
         start  = getStart(),
-        finish = getFinish() + 1,
+        finish = getFinish(),
         parent = parent,
         [1]    = nameText,
     }
@@ -242,12 +242,12 @@ local function parseClass(parent)
         pushError {
             type   = 'LUADOC_MISS_CLASS_NAME',
             start  = getFinish(),
-            finish = getFinish() + 1,
+            finish = getFinish(),
         }
         return nil
     end
     result.start  = getStart()
-    result.finish = getFinish() + 1
+    result.finish = getFinish()
     if not peekToken() then
         return result
     end
@@ -269,12 +269,12 @@ local function parseClass(parent)
             pushError {
                 type   = 'LUADOC_MISS_CLASS_EXTENDS_NAME',
                 start  = getFinish(),
-                finish = getFinish() + 1,
+                finish = getFinish(),
             }
             return result
         end
         result.extends[#result.extends+1] = extend
-        result.finish = getFinish() + 1
+        result.finish = getFinish()
         if not checkToken('symbol', ',', 1) then
             break
         end
@@ -291,7 +291,7 @@ local function parseTypeUnitArray(parent, node)
     local result = {
         type   = 'doc.type.array',
         start  = node.start,
-        finish = getFinish() + 1,
+        finish = getFinish(),
         node   = node,
         parent = parent,
     }
@@ -325,7 +325,7 @@ local function parseTypeUnitTable(parent, node)
     nextSymbolOrError('>')
 
     node.parent = result;
-    result.finish = getFinish() + 1
+    result.finish = getFinish()
     result.tkey = key
     result.tvalue = value
 
@@ -356,7 +356,7 @@ local function  parseTypeUnitFunction()
             local vararg = {
                 type   = 'doc.type.name',
                 start  = getStart(),
-                finish = getFinish() + 1,
+                finish = getFinish(),
                 parent = arg,
                 [1]    = '...',
             }
@@ -364,14 +364,14 @@ local function  parseTypeUnitFunction()
             if not arg.start then
                 arg.start = arg.name.start
             end
-            arg.finish = getFinish() + 1
+            arg.finish = getFinish()
         else
             arg.name = parseName('doc.type.name', arg)
             if not arg.name then
                 pushError {
                     type   = 'LUADOC_MISS_ARG_NAME',
                     start  = getFinish(),
-                    finish = getFinish() + 1,
+                    finish = getFinish(),
                 }
                 break
             end
@@ -382,7 +382,7 @@ local function  parseTypeUnitFunction()
                 nextToken()
                 arg.optional = true
             end
-            arg.finish = getFinish() + 1
+            arg.finish = getFinish()
             if not nextSymbolOrError(':') then
                 break
             end
@@ -390,7 +390,7 @@ local function  parseTypeUnitFunction()
             if not arg.extends then
                 break
             end
-            arg.finish = getFinish() + 1
+            arg.finish = getFinish()
         end
         typeUnit.args[#typeUnit.args+1] = arg
         if checkToken('symbol', ',', 1) then
@@ -419,7 +419,7 @@ local function  parseTypeUnitFunction()
             end
         end
     end
-    typeUnit.finish = getFinish() + 1
+    typeUnit.finish = getFinish()
     return typeUnit
 end
 
@@ -447,7 +447,7 @@ local function parseTypeUnitLiteralTable()
                 pushError {
                     type   = 'LUADOC_MISS_FIELD_NAME',
                     start  = getFinish(),
-                    finish = getFinish() + 1,
+                    finish = getFinish(),
                 }
                 break
             end
@@ -458,7 +458,7 @@ local function parseTypeUnitLiteralTable()
                 nextToken()
                 field.optional = true
             end
-            field.finish = getFinish() + 1
+            field.finish = getFinish()
             if not nextSymbolOrError(':') then
                 break
             end
@@ -466,7 +466,7 @@ local function parseTypeUnitLiteralTable()
             if not field.extends then
                 break
             end
-            field.finish = getFinish() + 1
+            field.finish = getFinish()
         end
 
         typeUnit.fields[#typeUnit.fields+1] = field
@@ -477,7 +477,7 @@ local function parseTypeUnitLiteralTable()
             break
         end
     end
-    typeUnit.finish = getFinish() + 1
+    typeUnit.finish = getFinish()
     return typeUnit
 end
 
@@ -493,7 +493,7 @@ local function parseTypeUnit(parent, content)
         result = {
             type   = 'doc.type.name',
             start  = getStart(),
-            finish = getFinish() + 1,
+            finish = getFinish(),
             [1]    = content,
         }
     end
@@ -533,14 +533,14 @@ local function parseResume(parent)
         pushError {
             type   = 'LUADOC_MISS_STRING',
             start  = getFinish(),
-            finish = getFinish() + 1,
+            finish = getFinish(),
         }
         return nil
     end
     local _, str = nextToken()
     result[1] = str
     result.start = getStart()
-    result.finish = getFinish() + 1
+    result.finish = getFinish()
     return result
 end
 
@@ -592,7 +592,7 @@ function parseType(parent)
             local typeEnum = {
                 type   = 'doc.type.enum',
                 start  = getStart(),
-                finish = getFinish() + 1,
+                finish = getFinish(),
                 parent = result,
                 [1]    = content,
             }
@@ -615,7 +615,7 @@ function parseType(parent)
             local vararg = {
                 type   = 'doc.type.name',
                 start  = getStart(),
-                finish = getFinish() + 1,
+                finish = getFinish(),
                 parent = result,
                 [1]    = content,
             }
@@ -630,9 +630,9 @@ function parseType(parent)
         nextToken()
     end
     if not result.start then
-        result.start = getFinish() + 1
+        result.start = getFinish()
     end
-    result.finish = getFinish() + 1
+    result.finish = getFinish()
     result.firstFinish = result.finish
 
     local row = guide.rowColOf(result.finish)
@@ -699,8 +699,8 @@ function parseType(parent)
     if #result.types == 0 and #result.enums == 0 and #result.resumes == 0 then
         pushError {
             type   = 'LUADOC_MISS_TYPE_NAME',
-            start  = getFinish() + 1,
-            finish = getFinish() + 1,
+            start  = getFinish(),
+            finish = getFinish(),
         }
         return nil
     end
@@ -716,7 +716,7 @@ local function parseAlias()
         pushError {
             type   = 'LUADOC_MISS_ALIAS_NAME',
             start  = getFinish(),
-            finish = getFinish() + 1,
+            finish = getFinish(),
         }
         return nil
     end
@@ -726,11 +726,11 @@ local function parseAlias()
         pushError {
             type   = 'LUADOC_MISS_ALIAS_EXTENDS',
             start  = getFinish(),
-            finish = getFinish() + 1,
+            finish = getFinish(),
         }
         return nil
     end
-    result.finish = getFinish() + 1
+    result.finish = getFinish()
     return result
 end
 
@@ -743,7 +743,7 @@ local function parseParam()
         pushError {
             type   = 'LUADOC_MISS_PARAM_NAME',
             start  = getFinish(),
-            finish = getFinish() + 1,
+            finish = getFinish(),
         }
         return nil
     end
@@ -752,17 +752,17 @@ local function parseParam()
         result.optional = true
     end
     result.start  = result.param.start
-    result.finish = getFinish() + 1
+    result.finish = getFinish()
     result.extends = parseType(result)
     if not result.extends then
         pushError {
             type   = 'LUADOC_MISS_PARAM_EXTENDS',
             start  = getFinish(),
-            finish = getFinish() + 1,
+            finish = getFinish(),
         }
         return result
     end
-    result.finish = getFinish() + 1
+    result.finish = getFinish()
     result.firstFinish = result.extends.firstFinish
     return result
 end
@@ -794,7 +794,7 @@ local function parseReturn()
     if #result.returns == 0 then
         return nil
     end
-    result.finish = getFinish() + 1
+    result.finish = getFinish()
     return result
 end
 
@@ -821,7 +821,7 @@ local function parseField()
         pushError {
             type   = 'LUADOC_MISS_FIELD_NAME',
             start  = getFinish(),
-            finish = getFinish() + 1,
+            finish = getFinish(),
         }
         return nil
     end
@@ -837,11 +837,11 @@ local function parseField()
         pushError {
             type   = 'LUADOC_MISS_FIELD_EXTENDS',
             start  = getFinish(),
-            finish = getFinish() + 1,
+            finish = getFinish(),
         }
         return nil
     end
-    result.finish = getFinish() + 1
+    result.finish = getFinish()
     return result
 end
 
@@ -860,7 +860,7 @@ local function parseGeneric()
             pushError {
                 type   = 'LUADOC_MISS_GENERIC_NAME',
                 start  = getFinish(),
-                finish = getFinish() + 1,
+                finish = getFinish(),
             }
             return nil
         end
@@ -872,14 +872,14 @@ local function parseGeneric()
             nextToken()
             object.extends = parseType(object)
         end
-        object.finish = getFinish() + 1
+        object.finish = getFinish()
         result.generics[#result.generics+1] = object
         if not checkToken('symbol', ',', 1) then
             break
         end
         nextToken()
     end
-    result.finish = getFinish() + 1
+    result.finish = getFinish()
     return result
 end
 
@@ -892,7 +892,7 @@ local function parseVararg()
         pushError {
             type   = 'LUADOC_MISS_VARARG_TYPE',
             start  = getFinish(),
-            finish = getFinish() + 1,
+            finish = getFinish(),
         }
         return
     end
@@ -907,7 +907,7 @@ local function parseOverload()
         pushError {
             type   = 'LUADOC_MISS_FUN_AFTER_OVERLOAD',
             start  = getFinish(),
-            finish = getFinish() + 1,
+            finish = getFinish(),
         }
         return nil
     end
@@ -929,7 +929,7 @@ local function parseDeprecated()
     return {
         type   = 'doc.deprecated',
         start  = getFinish(),
-        finish = getFinish() + 1,
+        finish = getFinish(),
     }
 end
 
@@ -937,7 +937,7 @@ local function parseMeta()
     return {
         type   = 'doc.meta',
         start  = getFinish(),
-        finish = getFinish() + 1,
+        finish = getFinish(),
     }
 end
 
@@ -951,8 +951,8 @@ local function parseVersion()
         if not tp then
             pushError {
                 type  = 'LUADOC_MISS_VERSION',
-                start  = getStart(),
-                finish = getFinish() + 1,
+                start  = getFinish(),
+                finish = getFinish(),
             }
             break
         end
@@ -975,12 +975,12 @@ local function parseVersion()
             pushError {
                 type  = 'LUADOC_MISS_VERSION',
                 start  = getStart(),
-                finish = getFinish() + 1,
+                finish = getFinish(),
             }
             break
         end
         version.version = tonumber(text) or text
-        version.finish = getFinish() + 1
+        version.finish = getFinish()
         result.versions[#result.versions+1] = version
         if not checkToken('symbol', ',', 1) then
             break
@@ -990,7 +990,7 @@ local function parseVersion()
     if #result.versions == 0 then
         return nil
     end
-    result.finish = getFinish() + 1
+    result.finish = getFinish()
     return result
 end
 
@@ -1007,7 +1007,7 @@ local function parseSee()
     if checkToken('symbol', '#', 1) then
         nextToken()
         result.field = parseName('doc.see.field', result)
-        result.finish = getFinish() + 1
+        result.finish = getFinish()
     end
     return result
 end
@@ -1021,13 +1021,13 @@ local function parseDiagnostic()
         pushError {
             type   = 'LUADOC_MISS_DIAG_MODE',
             start  = getFinish(),
-            finish = getFinish() + 1,
+            finish = getFinish(),
         }
         return nil
     end
     result.mode   = mode
     result.start  = getStart()
-    result.finish = getFinish() + 1
+    result.finish = getFinish()
     if  mode ~= 'disable-next-line'
     and mode ~= 'disable-line'
     and mode ~= 'disable'
@@ -1048,7 +1048,7 @@ local function parseDiagnostic()
                 pushError {
                     type   = 'LUADOC_MISS_DIAG_NAME',
                     start  = getFinish(),
-                    finish = getFinish() + 1,
+                    finish = getFinish(),
                 }
                 return result
             end
@@ -1060,7 +1060,7 @@ local function parseDiagnostic()
         end
     end
 
-    result.finish = getFinish() + 1
+    result.finish = getFinish()
 
     return result
 end
@@ -1074,7 +1074,7 @@ local function convertTokens()
         pushError {
             type   = 'LUADOC_MISS_CATE_NAME',
             start  = getStart(),
-            finish = getFinish() + 1,
+            finish = getFinish(),
         }
         return nil
     end

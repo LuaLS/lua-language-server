@@ -552,7 +552,6 @@ function parseType(parent)
         enums   = {},
         resumes = {},
     }
-    result.start = getStart()
     while true do
         local tp, content = peekToken()
         if not tp then
@@ -630,6 +629,9 @@ function parseType(parent)
         end
         nextToken()
     end
+    if not result.start then
+        result.start = getFinish() + 1
+    end
     result.finish = getFinish() + 1
     result.firstFinish = result.finish
 
@@ -697,7 +699,7 @@ function parseType(parent)
     if #result.types == 0 and #result.enums == 0 and #result.resumes == 0 then
         pushError {
             type   = 'LUADOC_MISS_TYPE_NAME',
-            start  = getFinish(),
+            start  = getFinish() + 1,
             finish = getFinish() + 1,
         }
         return nil

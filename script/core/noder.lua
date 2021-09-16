@@ -1245,6 +1245,7 @@ compileNodeMap = util.switch()
             if not param1 then
                 param1 = {
                     type   = 'select',
+                    dummy  = true,
                     sindex = 2,
                     start  = node.start,
                     finish = node.finish,
@@ -1254,6 +1255,7 @@ compileNodeMap = util.switch()
                 if not param2 then
                     param2 = {
                         type   = 'select',
+                        dummy  = true,
                         sindex = 2,
                         start  = node.start,
                         finish = node.finish,

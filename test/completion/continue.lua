@@ -9,7 +9,7 @@ ContinueTyping = true
 
 TEST [[
 local zabcde
-za$
+za<??>
 ]]
 {
     {
@@ -20,7 +20,7 @@ za$
 
 TEST [[
 -- zabcde
-io.z$
+io.z<??>
 ]]
 {
     {
@@ -32,7 +32,7 @@ io.z$
 
 TEST [[
 -- provider
-pro$
+pro<??>
 ]]
 {
     {
@@ -45,7 +45,7 @@ TEST [[
 ---@param n '"abcdefg"'
 local function f(n) end
 
-f 'abc$'
+f 'abc<??>'
 ]]
 {
     {
@@ -59,7 +59,7 @@ TEST [[
 ---@type '"abcdefg"'
 local t
 
-if t == 'abc$'
+if t == 'abc<??>'
 ]]
 {
     {

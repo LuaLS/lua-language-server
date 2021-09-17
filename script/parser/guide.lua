@@ -757,6 +757,15 @@ function m.positionOf(row, col)
     return row * 10000 + col
 end
 
+--- 返回全文光标位置
+---@param state any
+---@param position integer
+function m.offsetOf(state, position)
+    local lines = state.lines
+    local row, col = m.rowColOf(position)
+    return (lines[row] or 1) + col - 1
+end
+
 function m.lineContent(lines, text, row, ignoreNL)
     local line = lines[row]
     if not line then

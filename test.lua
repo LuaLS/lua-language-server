@@ -10,7 +10,7 @@ ROOT = fs.path(rootPath)
 TEST = true
 DEVELOP = true
 --FOOTPRINT = true
-TRACE = true
+--TRACE = true
 LOGPATH  = LOGPATH  or (ROOT .. '/log')
 METAPATH = METAPATH or (ROOT .. '/meta')
 

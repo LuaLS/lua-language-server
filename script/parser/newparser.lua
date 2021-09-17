@@ -2340,17 +2340,26 @@ function parseExp(asAction, level)
     if uop then
         skipSpace()
         local child = parseExp(asAction, uopLevel)
-        exp = {
-            type   = 'unary',
-            op     = uop,
-            start  = uop.start,
-            finish = child and child.finish or uop.finish,
-            [1]    = child,
-        }
-        if child then
-            child.parent = exp
+        -- 预计算负数
+        if  uop.type == '-'
+        and child
+        and (child.type == 'number' or child.type == 'integer') then
+            child.start = uop.start
+            child[1]    = - child[1]
+            exp = child
         else
-            missExp()
+            exp = {
+                type   = 'unary',
+                op     = uop,
+                start  = uop.start,
+                finish = child and child.finish or uop.finish,
+                [1]    = child,
+            }
+            if child then
+                child.parent = exp
+            else
+                missExp()
+            end
         end
     else
         exp = parseExpUnit()

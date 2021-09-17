@@ -27,7 +27,7 @@ local function findForward(text, offset, ...)
 end
 
 local function findBackward(text, offset, ...)
-    local pos = lookBackward.findAnyPos(text, offset)
+    local pos = lookBackward.findAnyOffset(text, offset)
     for _, symbol in ipairs { ... } do
         if text:sub(pos - #symbol + 1, pos) == symbol then
             return pos - #symbol + 1, symbol

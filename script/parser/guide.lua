@@ -763,7 +763,7 @@ end
 function m.positionToOffset(state, position)
     local lines = state.lines
     local row, col = m.rowColOf(position)
-    return (lines[row] or 1) + col - 1
+    return lines[row] + col - 1
 end
 
 function m.offsetToPosition(state, offset)
@@ -788,7 +788,7 @@ function m.offsetToPosition(state, offset)
             left  = row
         end
     end
-    local col = offset - (lines[row] or 1)
+    local col = offset - lines[row] + 1
     return m.positionOf(row, col)
 end
 

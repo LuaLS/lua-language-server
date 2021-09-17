@@ -75,7 +75,8 @@ local function findNearestTableField(state, position)
 end
 
 local function findParent(state, text, position)
-    for i = position, 1, -1 do
+    local offset = guide.positionToOffset(state, position)
+    for i = offset, 1, -1 do
         local char = text:sub(i, i)
         if lookBackward.isSpace(char) then
             goto CONTINUE
@@ -92,10 +93,11 @@ local function findParent(state, text, position)
         else
             return nil, nil
         end
-        local anyPos = lookBackward.findAnyPos(text, i-1)
-        if not anyPos then
+        local anyOffset = lookBackward.findAnyOffset(text, i-1)
+        if not anyOffset then
             return nil, nil
         end
+        local anyPos = guide.offsetToPosition(state, anyOffset)
         local parent = guide.eachSourceContain(state.ast, anyPos, function (source)
             if source.finish == anyPos then
                 return source
@@ -169,17 +171,18 @@ local function getSnip(source)
         if def ~= source and def.type == 'function' then
             local uri = guide.getUri(def)
             local text = files.getText(uri)
-            local lines = files.getLines(uri)
+            local state = files.getState(uri)
+            local lines = state.lines
             if not text then
                 goto CONTINUE
             end
             if vm.isMetaFile(uri) then
                 goto CONTINUE
             end
-            local row = guide.rowColOf(def.start)
-            local firstRow = lines[row]
-            local lastRow = lines[math.min(row + context - 1, #lines)]
-            local snip = text:sub(firstRow.start, lastRow.finish)
+            local firstRow = guide.rowColOf(def.start)
+            local lastRow  = firstRow + context
+            local lastOffset = lines[lastRow] and (lines[lastRow] - 1) or #text
+            local snip = text:sub(lines[firstRow], lastOffset)
             return snip
         end
         ::CONTINUE::
@@ -698,7 +701,7 @@ local function checkCommon(myUri, word, text, position, results)
         end
         if  #str >= 3
         and not used[str]
-        and guide.offsetToPosition(state, offset) ~= position then
+        and guide.offsetToPosition(state, offset - 1) ~= position then
             used[str] = true
             if matchKey(word, str) then
                 results[#results+1] = {
@@ -723,7 +726,7 @@ end
 
 local function checkKeyWord(state, text, start, position, word, hasSpace, afterLocal, results)
     local snipType = config.get 'Lua.completion.keywordSnippet'
-    local symbol = lookBackward.findSymbol(text, guide.positionToOffset(state, start - 1))
+    local symbol = lookBackward.findSymbol(text, guide.positionToOffset(state, start))
     local isExp = symbol == '(' or symbol == ',' or symbol == '='
     local info = {
         hasSpace = hasSpace,
@@ -1215,7 +1218,7 @@ local function tryWord(state, text, position, triggerCharacter, results)
             return nil
         end
     else
-        startPos = guide.offsetToPosition(state, start)
+        startPos = guide.offsetToPosition(state, start - 1)
     end
     local hasSpace = triggerCharacter ~= nil and finish ~= offset
     if isInString(state, position) then
@@ -1416,7 +1419,7 @@ local function checkTableLiteralField(state, text, position, tbl, fields, result
     -- {$}
     local left = lookBackward.findWord(text, guide.positionToOffset(state, position))
     if not left then
-        local pos = lookBackward.findAnyPos(text, guide.positionToOffset(state, position))
+        local pos = lookBackward.findAnyOffset(text, guide.positionToOffset(state, position))
         local char = text:sub(pos, pos)
         if char == '{' or char == ',' or char == ';' then
             left = ''

@@ -3544,7 +3544,9 @@ local function initState(lua, version, options)
         errs    = {},
         diags   = {},
         comms   = {},
-        lines   = {},
+        lines   = {
+            [0] = 1,
+        },
         options = options or {},
     }
     if version == 'Lua 5.1' or version == 'LuaJIT' then

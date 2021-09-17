@@ -24,14 +24,12 @@ end",
         end
         return true
     end, function (info)
-        return guide.eachSourceContain(info.ast.ast, info.start, function (source)
+        return guide.eachSourceContain(info.state.ast, info.start, function (source)
             if source.type == 'while'
             or source.type == 'in'
             or source.type == 'loop' then
-                for i = 1, #source.keyword do
-                    if info.start == source.keyword[i] then
-                        return true
-                    end
+                if source.finish - info.start <= 2 then
+                    return true
                 end
             end
         end)

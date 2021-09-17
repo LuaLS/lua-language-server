@@ -760,10 +760,36 @@ end
 --- 返回全文光标位置
 ---@param state any
 ---@param position integer
-function m.offsetOf(state, position)
+function m.positionToOffset(state, position)
     local lines = state.lines
     local row, col = m.rowColOf(position)
     return (lines[row] or 1) + col - 1
+end
+
+function m.offsetToPosition(state, offset)
+    local lines = state.lines
+    local left  = 0
+    local right = #lines
+    local row   = 0
+    while true do
+        row = (left + right) // 2
+        if row == left then
+            if right ~= left then
+                if lines[right] <= offset then
+                    row = right
+                end
+            end
+            break
+        end
+        local start = lines[row]
+        if start > offset then
+            right = row
+        else
+            left  = row
+        end
+    end
+    local col = offset - (lines[row] or 1)
+    return m.positionOf(row, col)
 end
 
 function m.lineContent(lines, text, row, ignoreNL)

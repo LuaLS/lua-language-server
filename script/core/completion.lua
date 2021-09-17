@@ -691,11 +691,14 @@ local function checkCommon(myUri, word, text, position, results)
             end
         end
     end
-    for str, pos in text:gmatch '([%a_][%w_]+)()' do
+    local state = files.getState(myUri)
+    for str, offset in text:gmatch '([%a_][%w_]+)()' do
         if #results >= 100 then
             break
         end
-        if #str >= 3 and not used[str] and pos - 1 ~= position then
+        if  #str >= 3
+        and not used[str]
+        and guide.offsetToPosition(state, offset) ~= position then
             used[str] = true
             if matchKey(word, str) then
                 results[#results+1] = {
@@ -720,7 +723,7 @@ end
 
 local function checkKeyWord(state, text, start, position, word, hasSpace, afterLocal, results)
     local snipType = config.get 'Lua.completion.keywordSnippet'
-    local symbol = lookBackward.findSymbol(text, guide.offsetOf(state, start - 1))
+    local symbol = lookBackward.findSymbol(text, guide.positionToOffset(state, start - 1))
     local isExp = symbol == '(' or symbol == ',' or symbol == '='
     local info = {
         hasSpace = hasSpace,
@@ -1120,7 +1123,7 @@ local function checkEqualEnumLeft(state, text, position, source, results)
 end
 
 local function checkEqualEnum(state, text, position, results)
-    local start =  lookBackward.findTargetSymbol(text, guide.offsetOf(state, position), '=')
+    local start =  lookBackward.findTargetSymbol(text, guide.positionToOffset(state, position), '=')
     if not start then
         return
     end
@@ -1200,17 +1203,21 @@ local function tryIndex(state, text, position, results)
 end
 
 local function tryWord(state, text, position, triggerCharacter, results)
-    local finish = lookBackward.skipSpace(text, guide.offsetOf(state, position))
-    local word, start = lookBackward.findWord(text, guide.offsetOf(state, position))
+    local offset = guide.positionToOffset(state, position)
+    local finish = lookBackward.skipSpace(text, offset)
+    local word, start = lookBackward.findWord(text, offset)
+    local startPos
     if not word then
         if triggerCharacter == nil then
             word = ''
-            start = position + 1
+            startPos = position + 1
         else
             return nil
         end
+    else
+        startPos = guide.offsetToPosition(state, start)
     end
-    local hasSpace = triggerCharacter ~= nil and finish ~= position
+    local hasSpace = triggerCharacter ~= nil and finish ~= offset
     if isInString(state, position) then
         if not hasSpace then
             if #results == 0 then
@@ -1218,29 +1225,29 @@ local function tryWord(state, text, position, triggerCharacter, results)
             end
         end
     else
-        local parent, oop = findParent(state, text, start - 1)
+        local parent, oop = findParent(state, text, startPos)
         if parent then
             if not hasSpace then
-                checkField(state, word, start, position, parent, oop, results)
+                checkField(state, word, startPos, position, parent, oop, results)
             end
         elseif isFuncArg(state, position) then
-            checkProvideLocal(state, word, start, results)
-            checkFunctionArgByDocParam(state, word, start, results)
+            checkProvideLocal(state, word, startPos, results)
+            checkFunctionArgByDocParam(state, word, startPos, results)
         else
-            local afterLocal = isAfterLocal(text, start)
-            local stop = checkKeyWord(state, text, start, position, word, hasSpace, afterLocal, results)
+            local afterLocal = isAfterLocal(text, startPos)
+            local stop = checkKeyWord(state, text, startPos, position, word, hasSpace, afterLocal, results)
             if stop then
                 return
             end
             if not hasSpace then
                 if afterLocal then
-                    checkProvideLocal(state, word, start, results)
+                    checkProvideLocal(state, word, startPos, results)
                 else
-                    checkLocal(state, word, start, results)
-                    checkTableField(state, word, start, results)
-                    local env = guide.getENV(state.ast, start)
-                    checkGlobal(state, word, start, position, env, false, results)
-                    checkModule(state, word, start, results)
+                    checkLocal(state, word, startPos, results)
+                    checkTableField(state, word, startPos, results)
+                    local env = guide.getENV(state.ast, startPos)
+                    checkGlobal(state, word, startPos, position, env, false, results)
+                    checkModule(state, word, startPos, results)
                 end
             end
         end
@@ -1251,7 +1258,7 @@ local function tryWord(state, text, position, triggerCharacter, results)
 end
 
 local function trySymbol(state, text, position, results)
-    local symbol, start = lookBackward.findSymbol(text, guide.offsetOf(state, position))
+    local symbol, start = lookBackward.findSymbol(text, guide.positionToOffset(state, position))
     if not symbol then
         return nil
     end
@@ -1407,9 +1414,9 @@ local function checkTableLiteralField(state, text, position, tbl, fields, result
         return guide.getKeyName(a) < guide.getKeyName(b)
     end)
     -- {$}
-    local left = lookBackward.findWord(text, guide.offsetOf(state, position))
+    local left = lookBackward.findWord(text, guide.positionToOffset(state, position))
     if not left then
-        local pos = lookBackward.findAnyPos(text, guide.offsetOf(state, position))
+        local pos = lookBackward.findAnyPos(text, guide.positionToOffset(state, position))
         local char = text:sub(pos, pos)
         if char == '{' or char == ',' or char == ';' then
             left = ''
@@ -1497,7 +1504,7 @@ local function tryCallArg(state, text, position, results)
 end
 
 local function tryTable(state, text, position, results)
-    position = lookBackward.skipSpace(text, guide.offsetOf(state, position))
+    position = lookBackward.skipSpace(text, guide.positionToOffset(state, position))
     local source = findNearestTableField(state, position)
     if not source then
         return
@@ -1890,7 +1897,7 @@ local function tryComment(state, text, position, results)
     if #results > 0 then
         return
     end
-    local word = lookBackward.findWord(text, guide.offsetOf(state, position))
+    local word = lookBackward.findWord(text, guide.positionToOffset(state, position))
     local doc  = getLuaDoc(state, position)
     if not word then
         local comment = getComment(state, position)
@@ -1923,7 +1930,7 @@ local function makeCache(uri, position, results)
     end
     local text  = files.getText(uri)
     local state = files.getState(uri)
-    local word = lookBackward.findWord(text, guide.offsetOf(state, position))
+    local word = lookBackward.findWord(text, guide.positionToOffset(state, position))
     if not word or #word < 2 then
         cache.results = nil
         return
@@ -1958,7 +1965,7 @@ local function getCache(uri, position)
     end
     local text  = files.getText(uri)
     local state = files.getState(uri)
-    local word = lookBackward.findWord(text, guide.offsetOf(state, position))
+    local word = lookBackward.findWord(text, guide.positionToOffset(state, position))
     if not word then
         return nil
     end
@@ -2020,7 +2027,7 @@ local function completion(uri, position, triggerCharacter)
             trySymbol(state, text, position, results)
         end
     else
-        local word = lookBackward.findWord(text, guide.offsetOf(state, position))
+        local word = lookBackward.findWord(text, guide.positionToOffset(state, position))
         if word then
             checkCommon(nil, word, text, position, results)
         end

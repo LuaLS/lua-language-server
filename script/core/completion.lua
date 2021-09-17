@@ -1268,17 +1268,18 @@ local function trySymbol(state, text, position, results)
     if isInString(state, position) then
         return nil
     end
+    local startPos = guide.offsetToPosition(state, start)
     if symbol == '.'
     or symbol == ':' then
-        local parent, oop = findParent(state, text, start)
+        local parent, oop = findParent(state, text, startPos)
         if parent then
             tracy.ZoneBeginN 'completion.trySymbol'
-            checkField(state, '', start, position, parent, oop, results)
+            checkField(state, '', startPos, position, parent, oop, results)
             tracy.ZoneEnd()
         end
     end
     if symbol == '(' then
-        checkFunctionArgByDocParam(state, '', start, results)
+        checkFunctionArgByDocParam(state, '', startPos, results)
     end
 end
 

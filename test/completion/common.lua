@@ -443,7 +443,7 @@ collectgarbage('<??>')
         label       = "'collect'",
         kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
-            start   = 16,
+            start   = 15,
             finish  = 17,
             newText = "'collect'",
         },
@@ -452,7 +452,7 @@ collectgarbage('<??>')
         label       = "'stop'",
         kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
-            start   = 16,
+            start   = 15,
             finish  = 17,
             newText = "'stop'",
         },
@@ -461,7 +461,7 @@ collectgarbage('<??>')
         label       = "'restart'",
         kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
-            start   = 16,
+            start   = 15,
             finish  = 17,
             newText = "'restart'",
         },
@@ -470,7 +470,7 @@ collectgarbage('<??>')
         label       = "'count'",
         kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
-            start   = 16,
+            start   = 15,
             finish  = 17,
             newText = "'count'",
         },
@@ -479,7 +479,7 @@ collectgarbage('<??>')
         label       = "'step'",
         kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
-            start   = 16,
+            start   = 15,
             finish  = 17,
             newText = "'step'",
         },
@@ -488,7 +488,7 @@ collectgarbage('<??>')
         label       = "'isrunning'",
         kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
-            start   = 16,
+            start   = 15,
             finish  = 17,
             newText = "'isrunning'",
         },
@@ -497,7 +497,7 @@ collectgarbage('<??>')
         label       = "'incremental'",
         kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
-            start   = 16,
+            start   = 15,
             finish  = 17,
             newText = "'incremental'",
         },
@@ -506,7 +506,7 @@ collectgarbage('<??>')
         label       = "'generational'",
         kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
-            start   = 16,
+            start   = 15,
             finish  = 17,
             newText = "'generational'",
         },
@@ -554,7 +554,7 @@ self.results.list[#<??>]
         label = '#self.results.list+1',
         kind = define.CompletionItemKind.Snippet,
         textEdit = {
-            start = 19,
+            start = 18,
             finish = 20,
             newText = '#self.results.list+1] = ',
         },
@@ -570,7 +570,7 @@ local n = 1
         label = '#self.results.list+1',
         kind = define.CompletionItemKind.Snippet,
         textEdit = {
-            start = 19,
+            start = 18,
             finish = 20,
             newText = '#self.results.list+1] = ',
         },
@@ -585,7 +585,7 @@ self.results.list[#<??>] = 1
         label = '#self.results.list+1',
         kind = define.CompletionItemKind.Snippet,
         textEdit = {
-            start = 19,
+            start = 18,
             finish = 20,
             newText = '#self.results.list+1]',
         },
@@ -600,7 +600,7 @@ self.results.list[#self.re<??>]
         label = '#self.results.list+1',
         kind = define.CompletionItemKind.Snippet,
         textEdit = {
-            start = 19,
+            start = 18,
             finish = 27,
             newText = '#self.results.list+1] = ',
         },
@@ -619,7 +619,7 @@ fff[#ff<??>]
         label = '#fff+1',
         kind = define.CompletionItemKind.Snippet,
         textEdit = {
-            start = 5,
+            start = 4,
             finish = 8,
             newText = '#fff+1] = ',
         },
@@ -638,7 +638,7 @@ local _ = fff.kkk[#<??>]
         label = '#fff.kkk',
         kind = define.CompletionItemKind.Snippet,
         textEdit = {
-            start = 19,
+            start = 18,
             finish = 20,
             newText = '#fff.kkk]',
         },
@@ -653,7 +653,7 @@ fff.kkk[#<??>].yy
         label = '#fff.kkk',
         kind = define.CompletionItemKind.Snippet,
         textEdit = {
-            start = 9,
+            start = 8,
             finish = 10,
             newText = '#fff.kkk]',
         },
@@ -911,7 +911,7 @@ mt:f<??>
     {
         label = 'f(a, b, c)',
         kind = define.CompletionItemKind.Snippet,
-        insertText = 'f(<??>{1:a: any}, <??>{2:b: any}, <??>{3:c: any})',
+        insertText = 'f(${1:a: any}, ${2:b: any}, ${3:c: any})',
     },
 }
 
@@ -927,8 +927,8 @@ function<??>
         label = 'function ()',
         kind  = define.CompletionItemKind.Snippet,
         insertText = "\z
-function <??>1(<??>2)\
-\t<??>0\
+function $1($2)\
+\t$0\
 end",
     },
 }
@@ -945,8 +945,8 @@ local t = function<??>
         label = 'function ()',
         kind  = define.CompletionItemKind.Snippet,
         insertText = "\z
-function (<??>1)\
-\t<??>0\
+function ($1)\
+\t$0\
 end",
     },
 }
@@ -986,14 +986,14 @@ t.<??>
         label = 'a.b.c',
         kind = define.CompletionItemKind.Field,
         textEdit = {
-            start = 37,
-            finish = 36,
+            start = 40002,
+            finish = 40002,
             newText = '["a.b.c"]',
         },
         additionalTextEdits = {
             {
-                start   = 36,
-                finish  = 36,
+                start   = 40001,
+                finish  = 40002,
                 newText = '',
             },
         },
@@ -1012,14 +1012,14 @@ t.   <??>
         label = 'a.b.c',
         kind = define.CompletionItemKind.Field,
         textEdit = {
-            start = 40,
-            finish = 39,
+            start = 40005,
+            finish = 40005,
             newText = '["a.b.c"]',
         },
         additionalTextEdits = {
             {
-                start   = 36,
-                finish  = 36,
+                start   = 40001,
+                finish  = 40002,
                 newText = '',
             },
         },
@@ -1038,8 +1038,8 @@ t['<??>']
         label = 'a.b.c',
         kind = define.CompletionItemKind.Field,
         textEdit = {
-            start = 38,
-            finish = 37,
+            start = 40003,
+            finish = 40003,
             newText = 'a.b.c',
         }
     }
@@ -1055,8 +1055,8 @@ z<??>
         label = 'z.b.c',
         kind = define.CompletionItemKind.Field,
         textEdit = {
-            start = 21,
-            finish = 21,
+            start = 20001,
+            finish = 20001,
             newText = '_ENV["z.b.c"]',
         },
     },

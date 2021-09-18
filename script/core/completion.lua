@@ -405,19 +405,28 @@ local function checkModule(state, word, position, results)
     end
 end
 
-local function checkFieldFromFieldToIndex(name, src, parent, word, start, position)
+local function checkFieldFromFieldToIndex(name, src, parent, word, startPos, position)
     if name:match '^[%a_][%w_]*$' then
         return nil
     end
     local textEdit, additionalTextEdits
-    local uri = guide.getUri(parent)
-    local text = files.getText(uri)
-    local wordStart
+    local uri   = guide.getUri(parent)
+    local text  = files.getText(uri)
+    local state = files.getState(uri)
+    local startOffset = guide.positionToOffset(state, startPos)
+    local offset      = guide.positionToOffset(state, position)
+    local wordStartOffset
     if word == '' then
-        wordStart = text:match('()%S', start + 1) or (position + 1)
+        wordStartOffset = text:match('()%S', startOffset + 1)
+        if wordStartOffset then
+            wordStartOffset = wordStartOffset - 1
+        else
+            wordStartOffset = offset
+        end
     else
-        wordStart = position - #word + 1
+        wordStartOffset = offset - #word
     end
+    local wordStartPos = guide.offsetToPosition(state, wordStartOffset)
     local newText
     if vm.getKeyType(src) == 'string' then
         newText = ('[%q]'):format(name)
@@ -425,26 +434,28 @@ local function checkFieldFromFieldToIndex(name, src, parent, word, start, positi
         newText = ('[%s]'):format(name)
     end
     textEdit = {
-        start   = wordStart,
+        start   = wordStartPos,
         finish  = position,
         newText = newText,
     }
     local nxt = parent.next
     if nxt then
-        local dotStart
+        local dotStart, dotFinish
         if nxt.type == 'setfield'
         or nxt.type == 'getfield'
         or nxt.type == 'tablefield' then
             dotStart = nxt.dot.start
+            dotFinish = nxt.dot.finish
         elseif nxt.type == 'setmethod'
         or     nxt.type == 'getmethod' then
             dotStart = nxt.colon.start
+            dotFinish = nxt.colon.finish
         end
         if dotStart then
             additionalTextEdits = {
                 {
                     start   = dotStart,
-                    finish  = dotStart,
+                    finish  = dotFinish,
                     newText = '',
                 }
             }
@@ -460,7 +471,7 @@ local function checkFieldFromFieldToIndex(name, src, parent, word, start, positi
     return textEdit, additionalTextEdits
 end
 
-local function checkFieldThen(name, src, word, start, position, parent, oop, results)
+local function checkFieldThen(name, src, word, startPos, position, parent, oop, results)
     local value = searcher.getObjectValue(src) or src
     local kind = define.CompletionItemKind.Field
     if value.type == 'function'
@@ -501,7 +512,7 @@ local function checkFieldThen(name, src, word, start, position, parent, oop, res
             newText = name,
         }
     else
-        textEdit, additionalTextEdits = checkFieldFromFieldToIndex(name, src, parent, word, start, position)
+        textEdit, additionalTextEdits = checkFieldFromFieldToIndex(name, src, parent, word, startPos, position)
     end
     results[#results+1] = {
         label      = name,
@@ -518,7 +529,7 @@ local function checkFieldThen(name, src, word, start, position, parent, oop, res
     }
 end
 
-local function checkFieldOfRefs(refs, state, word, start, position, parent, oop, results, locals, isGlobal)
+local function checkFieldOfRefs(refs, state, word, startPos, position, parent, oop, results, locals, isGlobal)
     local fields = {}
     local funcs  = {}
     local count = 0
@@ -527,7 +538,7 @@ local function checkFieldOfRefs(refs, state, word, start, position, parent, oop,
         if not name then
             goto CONTINUE
         end
-        if isSameSource(state, src, start) then
+        if isSameSource(state, src, startPos) then
             goto CONTINUE
         end
         if isGlobal and locals and locals[name] then
@@ -576,15 +587,15 @@ local function checkFieldOfRefs(refs, state, word, start, position, parent, oop,
     end
     for name, src in util.sortPairs(fields) do
         if src then
-            checkFieldThen(name, src, word, start, position, parent, oop, results)
+            checkFieldThen(name, src, word, startPos, position, parent, oop, results)
         end
     end
 end
 
-local function checkGlobal(state, word, start, position, parent, oop, results)
+local function checkGlobal(state, word, startPos, position, parent, oop, results)
     local locals = guide.getVisibleLocals(state.ast, position)
     local globals = vm.getGlobalSets '*'
-    checkFieldOfRefs(globals, state, word, start, position, parent, oop, results, locals, 'global')
+    checkFieldOfRefs(globals, state, word, startPos, position, parent, oop, results, locals, 'global')
 end
 
 local function checkField(state, word, start, position, parent, oop, results)
@@ -876,9 +887,10 @@ local function checkFunctionArgByDocParam(state, word, start, results)
     end
 end
 
-local function isAfterLocal(text, start)
-    local pos = lookBackward.skipSpace(text, start-1)
-    local word = lookBackward.findWord(text, pos)
+local function isAfterLocal(state, text, startPos)
+    local offset = guide.positionToOffset(state, startPos)
+    local pos    = lookBackward.skipSpace(text, offset)
+    local word   = lookBackward.findWord(text, pos)
     return word == 'local'
 end
 
@@ -1006,19 +1018,23 @@ local function checkLenPlusOne(state, text, position, results)
     guide.eachSourceContain(state.ast, position, function (source)
         if source.type == 'getindex'
         or source.type == 'setindex' then
-            local _, pos = text:find('%s*%[%s*%#', source.node.finish)
-            if not pos then
+            local finish = guide.positionToOffset(state, source.node.finish)
+            local _, offset = text:find('%s*%[%s*%#', finish)
+            if not offset then
                 return
             end
-            local nodeText = text:sub(source.node.start, source.node.finish)
-            local writingText = trim(text:sub(pos + 1, position - 1)) or ''
+            local start = guide.positionToOffset(state, source.node.start) + 1
+            local nodeText = text:sub(start, finish)
+            local writingText = trim(text:sub(offset + 1, guide.positionToOffset(state, position))) or ''
             if not matchKey(writingText, nodeText) then
                 return
             end
+            local offsetPos = guide.offsetToPosition(state, offset) - 1
             if source.parent == guide.getParentBlock(source) then
+                local sourceFinish = guide.positionToOffset(state, source.finish)
                 -- state
-                local label = text:match('%#[ \t]*', pos) .. nodeText .. '+1'
-                local eq = text:find('^%s*%]?%s*%=', source.finish)
+                local label = text:match('%#[ \t]*', offset) .. nodeText .. '+1'
+                local eq = text:find('^%s*%]?%s*%=', sourceFinish)
                 local newText = label .. ']'
                 if not eq then
                     newText = newText .. ' = '
@@ -1028,20 +1044,20 @@ local function checkLenPlusOne(state, text, position, results)
                     match    = nodeText,
                     kind     = define.CompletionItemKind.Snippet,
                     textEdit = {
-                        start   = pos,
+                        start   = offsetPos,
                         finish  = source.finish,
                         newText = newText,
                     },
                 }
             else
                 -- exp
-                local label = text:match('%#[ \t]*', pos) .. nodeText
+                local label = text:match('%#[ \t]*', offset) .. nodeText
                 local newText = label .. ']'
                 results[#results+1] = {
                     label    = label,
                     kind     = define.CompletionItemKind.Snippet,
                     textEdit = {
-                        start   = pos,
+                        start   = offsetPos,
                         finish  = source.finish,
                         newText = newText,
                     },
@@ -1137,7 +1153,7 @@ local function checkEqualEnum(state, text, position, results)
         eqOrNeq = true
     end
     start = lookBackward.skipSpace(text, start - 1)
-    local source = findNearestSource(state, start)
+    local source = findNearestSource(state, guide.offsetToPosition(state, start))
     if not source then
         return
     end
@@ -1237,7 +1253,7 @@ local function tryWord(state, text, position, triggerCharacter, results)
             checkProvideLocal(state, word, startPos, results)
             checkFunctionArgByDocParam(state, word, startPos, results)
         else
-            local afterLocal = isAfterLocal(text, startPos)
+            local afterLocal = isAfterLocal(state, text, startPos)
             local stop = checkKeyWord(state, text, startPos, position, word, hasSpace, afterLocal, results)
             if stop then
                 return

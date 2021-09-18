@@ -38,8 +38,9 @@ end",
     {'break'},
     {'else'},
     {'elseif', function (info, results)
-        if info.text:find('^%s*then', info.offset + 1)
-        or info.text:find('^%s*do', info.offset + 1) then
+        local offset = guide.positionToOffset(info.state, info.position)
+        if info.text:find('^%s*then', offset + 1)
+        or info.text:find('^%s*do',   offset + 1) then
             return false
         end
         if info.hasSpace then
@@ -153,8 +154,9 @@ end"
     end},
     {'goto'},
     {'if', function (info, results)
-        if info.text:find('^%s*then', info.offset + 1)
-        or info.text:find('^%s*do', info.offset + 1) then
+        local offset = guide.positionToOffset(info.state, info.position)
+        if info.text:find('^%s*then', offset + 1)
+        or info.text:find('^%s*do',   offset + 1) then
             return false
         end
         if info.hasSpace then
@@ -181,8 +183,9 @@ end"
         return true
     end},
     {'in', function (info, results)
-        if info.text:find('^%s*then', info.offset + 1)
-        or info.text:find('^%s*do', info.offset + 1) then
+        local offset = guide.positionToOffset(info.state, info.position)
+        if info.text:find('^%s*then', offset + 1)
+        or info.text:find('^%s*do',   offset + 1) then
             return false
         end
         if info.hasSpace then

@@ -1884,14 +1884,14 @@ local function tryLuaDoc(state, text, position, results)
         return
     end
     if doc.type == 'doc.comment' then
-        local line = text:sub(doc.start, doc.range)
+        local line = doc.originalComment.text
         -- 尝试 ---$
         if line == '-' then
             tryLuaDocOfFunction(doc, results)
             return
         end
         -- 尝试 ---@$
-        local cate = line:match('^-%s*@(%a*)$')
+        local cate = line:match('^-+%s*@(%a*)$')
         if cate then
             tryLuaDocCate(cate, results)
             return

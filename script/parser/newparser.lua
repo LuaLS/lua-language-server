@@ -207,21 +207,7 @@ local LocalLimit = 200
 
 local parseExp, parseAction
 
-local function pushError(err)
-    local errs = State.errs
-    if err.finish < err.start then
-        err.finish = err.start
-    end
-    local last = errs[#errs]
-    if last then
-        if last.start <= err.start and last.finish >= err.finish then
-            return
-        end
-    end
-    err.level = err.level or 'error'
-    errs[#errs+1] = err
-    return err
-end
+local pushError
 
 local function addSpecial(name, obj)
     local root = State.ast
@@ -3537,7 +3523,7 @@ local function initState(lua, version, options)
     Chunk               = {}
     Tokens              = tokens(lua)
     Index               = 1
-    State = {
+    local state = {
         version = version,
         lua     = lua,
         ast     = {},
@@ -3549,11 +3535,30 @@ local function initState(lua, version, options)
         },
         options = options or {},
     }
+    State = state
     if version == 'Lua 5.1' or version == 'LuaJIT' then
-        State.ENVMode = '@fenv'
+        state.ENVMode = '@fenv'
     else
-        State.ENVMode = '_ENV'
+        state.ENVMode = '_ENV'
     end
+
+    pushError = function (err)
+        local errs = state.errs
+        if err.finish < err.start then
+            err.finish = err.start
+        end
+        local last = errs[#errs]
+        if last then
+            if last.start <= err.start and last.finish >= err.finish then
+                return
+            end
+        end
+        err.level = err.level or 'error'
+        errs[#errs+1] = err
+        return err
+    end
+
+    state.pushError = pushError
 end
 
 return function (lua, mode, version, options)

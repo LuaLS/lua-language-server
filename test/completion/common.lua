@@ -1055,7 +1055,7 @@ z<??>
         label = 'z.b.c',
         kind = define.CompletionItemKind.Field,
         textEdit = {
-            start = 20001,
+            start = 20000,
             finish = 20001,
             newText = '_ENV["z.b.c"]',
         },

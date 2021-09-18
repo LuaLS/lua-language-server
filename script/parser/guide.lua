@@ -781,7 +781,7 @@ function m.offsetToPosition(state, offset)
             end
             break
         end
-        local start = lines[row]
+        local start = lines[row] - 1
         if start > offset then
             right = row
         else

@@ -1238,9 +1238,9 @@ end
         label = 'a, b, c',
         kind = define.CompletionItemKind.Snippet,
         insertText = [[
-a <??>{1:any}
----@param b <??>{2:any}
----@param c <??>{3:any}]]
+a ${1:any}
+---@param b ${2:any}
+---@param c ${3:any}]]
     },
     {
         label = 'a',
@@ -1267,9 +1267,9 @@ function f2(a) end
         label = 'a, b, c',
         kind = define.CompletionItemKind.Snippet,
         insertText = [[
-a <??>{1:any}
----@param b <??>{2:any}
----@param c <??>{3:any}]]
+a ${1:any}
+---@param b ${2:any}
+---@param c ${3:any}]]
     },
     {
         label = 'a',
@@ -1309,9 +1309,9 @@ end
         label = 'a, b, c',
         kind = define.CompletionItemKind.Snippet,
         insertText = [[
-a <??>{1:any}
----@param b <??>{2:any}
----@param c <??>{3:any}]]
+a ${1:any}
+---@param b ${2:any}
+---@param c ${3:any}]]
     },
     {
         label = 'a',
@@ -1337,9 +1337,9 @@ end
         label = 'a, b, c',
         kind = define.CompletionItemKind.Snippet,
         insertText = [[
-a <??>{1:any}
----@param b <??>{2:any}
----@param c <??>{3:any}]],
+a ${1:any}
+---@param b ${2:any}
+---@param c ${3:any}]],
     },
     {
         label = 'self',
@@ -1864,7 +1864,7 @@ f(<??>)
         label  = 'fun(x: number, y: number):string',
         kind   = define.CompletionItemKind.Function,
         insertText = "\z
-function (<??>{1:x}, <??>{2:y})\
+function (${1:x}, ${2:y})\
 \t<??>0\
 end",
     },
@@ -1881,13 +1881,13 @@ end
         label  = '@param;@return',
         kind   = define.CompletionItemKind.Snippet,
         insertText = "\z
-<??>{1:comment}\
----@param a <??>{2:number}\
----@param b <??>{3:string}\
----@param c <??>{4:table}\
----@return <??>{5:number}\
----@return <??>{6:string}\
----@return <??>{7:any}",
+${1:comment}\
+---@param a ${2:number}\
+---@param b ${3:string}\
+---@param c ${4:table}\
+---@return ${5:number}\
+---@return ${6:string}\
+---@return ${7:any}",
     },
 }
 
@@ -2376,7 +2376,7 @@ zzzz<??>
     {
         label = 'zzzz(a)',
         kind  = define.CompletionItemKind.Snippet,
-        insertText = 'zzzz(<??>{1:a: any})',
+        insertText = 'zzzz(${1:a: any})',
     },
     {
         label = 'zzzz(a, b)',
@@ -2386,7 +2386,7 @@ zzzz<??>
     {
         label = 'zzzz(a, b)',
         kind  = define.CompletionItemKind.Snippet,
-        insertText = 'zzzz(<??>{1:a: any}, <??>{2:b: any})',
+        insertText = 'zzzz(${1:a: any}, ${2:b: any})',
     },
 }
 Cared['insertText'] = false
@@ -2470,7 +2470,7 @@ f(fun<??>)
         label    = 'fun(a: any, b: any):boolean',
         kind     = define.CompletionItemKind.Function,
         textEdit = {
-            newText = 'function (<??>{1:a}, <??>{2:b})\n\t<??>0\nend',
+            newText = 'function (${1:a}, ${2:b})\n\t<??>0\nend',
             start   = 68,
             finish  = 70,
         }

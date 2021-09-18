@@ -842,8 +842,8 @@ local function checkProvideLocal(state, word, start, results)
     end)
 end
 
-local function checkFunctionArgByDocParam(state, word, start, results)
-    local func = guide.eachSourceContain(state.ast, start, function (source)
+local function checkFunctionArgByDocParam(state, word, startPos, results)
+    local func = guide.eachSourceContain(state.ast, startPos, function (source)
         if source.type == 'function' then
             return source
         end
@@ -863,7 +863,7 @@ local function checkFunctionArgByDocParam(state, word, start, results)
     end
     local firstArg = func.args and func.args[1]
     if not firstArg
-    or firstArg.start <= start and firstArg.finish >= start then
+    or firstArg.start <= startPos and firstArg.finish >= startPos then
         local firstParam = params[1]
         if firstParam and matchKey(word, firstParam.param[1]) then
             local label = {}

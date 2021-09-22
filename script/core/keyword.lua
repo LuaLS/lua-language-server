@@ -271,15 +271,16 @@ until $1"
         return false
     end},
     {'then', function (info, results)
-        local lines = files.getLines(info.uri)
-        local pos, first = info.text:match('%S+%s+()(%S+)', info.start)
+        local startOffset = guide.positionToOffset(info.state, info.start)
+        local pos, first = info.text:match('%S+%s+()(%S+)', startOffset + 1)
         if first == 'end'
         or first == 'else'
         or first == 'elseif' then
-            local startRow  = guide.rowColOf(info.start)
-            local finishRow = guide.rowColOf(pos)
-            local startSp   = info.text:match('^%s*', lines[startRow].start + 1)
-            local finishSp  = info.text:match('^%s*', lines[finishRow].start + 1)
+            local startRow       = guide.rowColOf(info.start)
+            local finishPosition = guide.offsetToPosition(info.state, pos)
+            local finishRow      = guide.rowColOf(finishPosition)
+            local startSp   = info.text:match('^%s*', info.state.lines[startRow])
+            local finishSp  = info.text:match('^%s*', info.state.lines[finishRow])
             if startSp == finishSp then
                 return false
             end

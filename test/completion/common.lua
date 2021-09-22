@@ -1865,7 +1865,7 @@ f(<??>)
         kind   = define.CompletionItemKind.Function,
         insertText = "\z
 function (${1:x}, ${2:y})\
-\t<??>0\
+\t$0\
 end",
     },
 }

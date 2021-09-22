@@ -1,16 +1,21 @@
 local core  = require 'core.rename'
 local files = require 'files'
+local catch = require 'catch'
+local guide = require 'parser.guide'
 
 local function replace(text, positions)
+    local state = files.getState('')
     local buf = {}
     table.sort(positions, function (a, b)
         return a.start < b.start
     end)
     local lastPos = 1
     for _, info in ipairs(positions) do
-        buf[#buf+1] = text:sub(lastPos, info.start - 1)
+        local start  = guide.positionToOffset(state, info.start)
+        local finish = guide.positionToOffset(state, info.finish)
+        buf[#buf+1] = text:sub(lastPos, start)
         buf[#buf+1] = info.text
-        lastPos = info.finish + 1
+        lastPos = finish + 1
     end
     buf[#buf+1] = text:sub(lastPos)
     return table.concat(buf)
@@ -21,10 +26,12 @@ function TEST(oldName, newName)
         return function (expectScript)
             files.removeAll()
             files.setText('', oldScript)
-            local pos = oldScript:find('[^%w_]'..oldName..'[^%w_]')
-            assert(pos)
+            local state = files.getState('')
+            local offset = oldScript:find('[^%w_]'..oldName..'[^%w_]')
+            assert(offset)
+            local position = guide.offsetToPosition(state, offset)
 
-            local positions = core.rename('', pos+1, newName)
+            local positions = core.rename('', position, newName)
             local script = oldScript
             if positions then
                 script = replace(script, positions)

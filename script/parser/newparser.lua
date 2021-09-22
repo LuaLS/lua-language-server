@@ -416,11 +416,11 @@ local function parseLongString()
     fastForwardToken(finish + 1)
     local startPos     = getPosition(start, 'left')
     local finishMark   = sgsub(mark, '%[', ']')
-    local stringResult, finishOffset = resolveLongString(finishMark)
+    local stringResult, finishPos = resolveLongString(finishMark)
     return {
         type   = 'string',
         start  = startPos,
-        finish = getPosition(finishOffset, 'right'),
+        finish = finishPos,
         [1]    = stringResult,
         [2]    = mark,
     }
@@ -1430,14 +1430,14 @@ local function parseExpList(mini)
 end
 
 local function parseIndex()
-    local bstart = getPosition(Tokens[Index], 'left')
+    local start = getPosition(Tokens[Index], 'left')
     Index = Index + 2
     skipSpace()
     local exp = parseExp()
     local index = {
         type   = 'index',
-        start  = bstart,
-        finish = exp and exp.finish or (bstart + 1),
+        start  = start,
+        finish = exp and exp.finish or (start + 1),
         index  = exp
     }
     if exp then
@@ -1764,9 +1764,9 @@ local function parseSimple(node, funcName)
                 node.parent = call
                 node        = call
             else
-                local index = parseIndex()
+                local index  = parseIndex()
+                local bstart = index.start
                 index.type   = 'getindex'
-                index.bstart = index.start
                 index.start  = node.start
                 index.node   = node
                 node.next    = index
@@ -1775,7 +1775,7 @@ local function parseSimple(node, funcName)
                 if funcName then
                     pushError {
                         type   = 'INDEX_IN_FUNC_NAME',
-                        start  = index.bstart,
+                        start  = bstart,
                         finish = index.finish,
                     }
                 end

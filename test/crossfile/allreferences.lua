@@ -9,10 +9,9 @@ TEST {
     {
         path = 'lib.lua',
         content = [[
-            return <~function~> ()
-            end
+            return <!<?function?> ()
+            end!>
         ]],
-        target = {22, 50},
     },
 }
 

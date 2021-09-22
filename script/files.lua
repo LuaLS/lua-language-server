@@ -35,8 +35,6 @@ m.assocMatcher   = nil
 m.globalVersion  = 0
 m.fileCount      = 0
 m.astCount       = 0
-m.linesMap       = setmetatable({}, { __mode = 'v' })
-m.originLinesMap = setmetatable({}, { __mode = 'v' })
 m.astMap         = {} -- setmetatable({}, { __mode = 'v' })
 
 --- 打开文件
@@ -160,8 +158,6 @@ function m.setText(uri, text, isTrust, instance)
     file.trusted    = isTrust
     file.originText = text
     file.words      = nil
-    m.linesMap[uri] = nil
-    m.originLinesMap[uri] = nil
     m.astMap[uri] = nil
     file.cache = {}
     file.cacheActiveTime = math.huge
@@ -346,7 +342,6 @@ function m.removeAll()
             m.fileCount     = m.fileCount - 1
             m.fileMap[uri]  = nil
             m.astMap[uri]   = nil
-            m.linesMap[uri] = nil
             m.onWatch('remove', uri)
         end
     end
@@ -366,7 +361,6 @@ function m.removeAllClosed()
             m.fileCount     = m.fileCount - 1
             m.fileMap[uri]  = nil
             m.astMap[uri]   = nil
-            m.linesMap[uri] = nil
             m.onWatch('remove', uri)
         end
     end

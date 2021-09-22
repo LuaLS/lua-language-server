@@ -41,7 +41,7 @@ function TEST(script, ...)
     end
 
     if results[1] then
-        if not founded(catched['!'], results) then
+        if not founded(catched['!'] or {}, results) then
             error(('%s\n%s'):format(util.dump(catched['!']), util.dump(results)))
         end
     else

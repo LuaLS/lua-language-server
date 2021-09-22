@@ -2573,6 +2573,7 @@ local function parseMultiVars(n1, parser, isLocal)
     skipSpace()
     local v1, v2, vrest
     local isSet
+    local max = 1
     if expectAssign() then
         v1, v2, vrest = parseSetValues()
         isSet = true
@@ -2583,6 +2584,7 @@ local function parseMultiVars(n1, parser, isLocal)
     bindValue(n1, v1, 1, nil, isLocal, isSet)
     local lastValue = v1
     if n2 then
+        max = 2
         bindValue(n2, v2, 2, lastValue, isLocal, isSet)
         lastValue = v2 or lastValue
         pushActionIntoCurrentChunk(n2)
@@ -2591,21 +2593,28 @@ local function parseMultiVars(n1, parser, isLocal)
         for i = 1, #nrest do
             local n = nrest[i]
             local v = vrest and vrest[i]
-            bindValue(n, v, i + 2, lastValue, isLocal, isSet)
+            max = i + 2
+            bindValue(n, v, max, lastValue, isLocal, isSet)
             lastValue = v or lastValue
             pushActionIntoCurrentChunk(n)
         end
     end
 
     if v2 and not n2 then
-        v2.redundant = true
+        v2.redundant = {
+            max    = max,
+            passed = 2,
+        }
         pushActionIntoCurrentChunk(v2)
     end
     if vrest then
         for i = 1, #vrest do
             local v = vrest[i]
             if not nrest or not nrest[i] then
-                v.redundant = true
+                v.redundant = {
+                    max    = max,
+                    passed = v + 2,
+                }
                 pushActionIntoCurrentChunk(v)
             end
         end
@@ -3530,7 +3539,6 @@ local function initState(lua, version, options)
         lua     = lua,
         ast     = {},
         errs    = {},
-        diags   = {},
         comms   = {},
         lines   = {
             [0] = 1,

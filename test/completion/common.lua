@@ -2354,8 +2354,8 @@ TEST [[
         label = 'AAA.BBB',
         kind  = define.CompletionItemKind.Class,
         textEdit    = {
-            start   = 29,
-            finish  = 32,
+            start   = 20009,
+            finish  = 20013,
             newText = 'AAA.BBB',
         },
     }
@@ -2470,9 +2470,9 @@ f(fun<??>)
         label    = 'fun(a: any, b: any):boolean',
         kind     = define.CompletionItemKind.Function,
         textEdit = {
-            newText = 'function (${1:a}, ${2:b})\n\t<??>0\nend',
-            start   = 68,
-            finish  = 70,
+            newText = 'function (${1:a}, ${2:b})\n\t$0\nend',
+            start   = 30002,
+            finish  = 30005,
         }
     },
     {
@@ -2497,13 +2497,13 @@ t.<??>
         kind     = define.CompletionItemKind.Field,
         textEdit = {
             newText = '[1]',
-            start   = 35,
-            finish  = 34,
+            start   = 30002,
+            finish  = 30002,
         },
         additionalTextEdits = {
             {
-                start   = 34,
-                finish  = 34,
+                start   = 30001,
+                finish  = 30002,
                 newText = '',
             },
         },
@@ -2522,13 +2522,13 @@ t.<??>
         kind     = define.CompletionItemKind.Field,
         textEdit = {
             newText = '[1]',
-            start   = 35,
-            finish  = 34,
+            start   = 30002,
+            finish  = 30002,
         },
         additionalTextEdits = {
             {
-                start   = 34,
-                finish  = 34,
+                start   = 30001,
+                finish  = 30002,
                 newText = '',
             },
         },
@@ -2551,8 +2551,8 @@ local r = f('<??>')
         kind  = define.CompletionItemKind.EnumMember,
         textEdit = {
             newText = "'aaa'",
-            start   = 103,
-            finish  = 104,
+            start   = 70012,
+            finish  = 70014,
         },
     },
     {
@@ -2560,8 +2560,8 @@ local r = f('<??>')
         kind  = define.CompletionItemKind.EnumMember,
         textEdit = {
             newText = "'bbb'",
-            start   = 103,
-            finish  = 104,
+            start   = 70012,
+            finish  = 70014,
         },
     },
 }
@@ -2578,8 +2578,8 @@ f('<??>')
         kind  = define.CompletionItemKind.EnumMember,
         textEdit = {
             newText = "'aaa'",
-            start   = 45,
-            finish  = 46,
+            start   = 30002,
+            finish  = 30004,
         },
     },
     {
@@ -2587,8 +2587,8 @@ f('<??>')
         kind  = define.CompletionItemKind.EnumMember,
         textEdit = {
             newText = "'bbb'",
-            start   = 45,
-            finish  = 46,
+            start   = 30002,
+            finish  = 30004,
         },
     },
 }

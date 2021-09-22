@@ -1524,7 +1524,6 @@ local function tryCallArg(state, text, position, results)
 end
 
 local function tryTable(state, text, position, results)
-    position = lookBackward.skipSpace(text, guide.positionToOffset(state, position))
     local source = findNearestTableField(state, position)
     if not source then
         return
@@ -1553,7 +1552,7 @@ end
 
 local function getComment(state, position)
     for _, comm in ipairs(state.comms) do
-        if position >= comm.start - 2 and position <= comm.finish then
+        if position > comm.start and position <= comm.finish then
             return comm
         end
     end

@@ -7,20 +7,22 @@ local guide      = require 'parser.guide'
 local lookback   = require 'core.look-backward'
 
 local function findNearCall(uri, ast, pos)
-    local text = files.getText(uri)
+    local text  = files.getText(uri)
+    local state = files.getState(uri)
     local nearCall
     guide.eachSourceContain(ast.ast, pos, function (src)
         if src.type == 'call'
         or src.type == 'table'
         or src.type == 'function' then
+            local finishOffset = guide.positionToOffset(state, src.finish)
             -- call(),$
             if  src.finish <= pos
-            and text:sub(src.finish, src.finish) == ')' then
+            and text:sub(finishOffset, finishOffset) == ')' then
                 return
             end
             -- {},$
             if  src.finish <= pos
-            and text:sub(src.finish, src.finish) == '}' then
+            and text:sub(finishOffset, finishOffset) == '}' then
                 return
             end
             if not nearCall or nearCall.start <= src.start then
@@ -56,13 +58,13 @@ local function makeOneSignature(source, oop, index)
     for start, finish in converted:gmatch '%s*()[^,]+()' do
         i = i + 1
         params[i] = {
-            label = {start + argStart, finish - 1 + argStart},
+            label = {start + argStart - 1, finish - 1 + argStart},
         }
     end
     -- 不定参数
     if index > i and i > 0 then
         local lastLabel = params[i].label
-        local text = label:sub(lastLabel[1], lastLabel[2])
+        local text = label:sub(lastLabel[1] + 1, lastLabel[2])
         if text == '...' then
             index = i
         end
@@ -88,11 +90,15 @@ local function makeSignatures(text, call, pos)
                 args[#args+1] = arg
             end
         end
+        local uri   = guide.getUri(call)
+        local state = files.getState(uri)
         for i, arg in ipairs(args) do
-            local start =  lookback.findTargetSymbol(text, arg.start - 1, '(')
-                        or lookback.findTargetSymbol(text, arg.start - 1, ',')
-                        or arg.start
-            if start > pos then
+            local startOffset = guide.positionToOffset(state, arg.start)
+            startOffset =  lookback.findTargetSymbol(text, startOffset, '(')
+                        or lookback.findTargetSymbol(text, startOffset, ',')
+                        or startOffset
+            local startPos = guide.offsetToPosition(state, startOffset)
+            if startPos > pos then
                 index = i - 1
                 break
             end
@@ -102,7 +108,8 @@ local function makeSignatures(text, call, pos)
             end
         end
         if not index then
-            local backSymbol = lookback.findSymbol(text, pos)
+            local offset     = guide.positionToOffset(state, pos)
+            local backSymbol = lookback.findSymbol(text, offset)
             if backSymbol == ','
             or backSymbol == '(' then
                 index = #args + 1
@@ -130,13 +137,14 @@ local function makeSignatures(text, call, pos)
 end
 
 return function (uri, pos)
-    local ast = files.getState(uri)
-    if not ast then
+    local state = files.getState(uri)
+    if not state then
         return nil
     end
     local text = files.getText(uri)
-    pos = lookback.skipSpace(text, pos)
-    local call = findNearCall(uri, ast, pos)
+    local offset = guide.positionToOffset(state, pos)
+    pos = guide.offsetToPosition(state, lookback.skipSpace(text, offset))
+    local call = findNearCall(uri, state, pos)
     if not call then
         return nil
     end

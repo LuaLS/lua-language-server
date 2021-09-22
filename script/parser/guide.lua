@@ -725,10 +725,11 @@ end
 --- 获取指定的 special
 function m.eachSpecialOf(ast, name, callback)
     local root = m.getRoot(ast)
-    if not root.specials then
+    local state = root.state
+    if not state.specials then
         return
     end
-    local specials = root.specials[name]
+    local specials = state.specials[name]
     if not specials then
         return
     end

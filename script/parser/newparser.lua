@@ -210,14 +210,13 @@ local parseExp, parseAction
 local pushError
 
 local function addSpecial(name, obj)
-    local root = State.ast
-    if not root.specials then
-        root.specials = {}
+    if not State.specials then
+        State.specials = {}
     end
-    if not root.specials[name] then
-        root.specials[name] = {}
+    if not State.specials[name] then
+        State.specials[name] = {}
     end
-    root.specials[name][#root.specials[name]+1] = obj
+    State.specials[name][#State.specials[name]+1] = obj
     obj.special = name
 end
 
@@ -1739,7 +1738,7 @@ local function parseSimple(node, funcName)
             }
             call.args   = args
             str.parent  = args
-            node.parent = args
+            node.parent = call
             node        = call
         elseif CharMapStrLH[token] then
             local str = parseLongString()
@@ -3583,6 +3582,7 @@ return function (lua, mode, version, options)
     elseif mode == 'Action' then
         State.ast = parseAction()
     end
+    State.ast.state = State
 
     return State
 end

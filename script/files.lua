@@ -202,8 +202,6 @@ function m.setRawText(uri, text)
     local file = m.fileMap[uri]
     file.text             = text
     file.originText       = text
-    m.linesMap[uri]       = nil
-    m.originLinesMap[uri] = nil
     m.astMap[uri]         = nil
 end
 
@@ -317,8 +315,6 @@ function m.remove(uri)
     end
     m.fileMap[uri]        = nil
     m.astMap[uri]         = nil
-    m.linesMap[uri]       = nil
-    m.originLinesMap[uri] = nil
     m._pairsCache         = nil
     m.flushFileCache(uri)
 
@@ -548,109 +544,6 @@ local function isNameChar(text)
 end
 
 ---@alias position table
-
---- 获取 position 对应的光标位置
----@param uri      uri
----@param position position
----@param isFinish? boolean
----@return integer
-function m.offset(uri, position, isFinish)
-    local file  = m.getFile(uri)
-    local lines = m.getLines(uri)
-    local text  = m.getText(uri)
-    if not file then
-        return 0
-    end
-    if file._diffInfo then
-        lines = m.getOriginLines(uri)
-        text  = m.getOriginText(uri)
-    end
-    local row = position.line + 1
-    local start, finish, char
-    if row > #lines then
-        start, finish = guide.lineRange(lines, #lines)
-        start = start + 1
-        char = util.utf8Len(text, start, finish)
-    else
-        start, finish = guide.lineRange(lines, row)
-        start = start + 1
-        char = position.character
-    end
-    local utf8Len = util.utf8Len(text, start, finish)
-    local offset
-    if char <= 0 then
-        offset = start
-    else
-        if char >= utf8Len then
-            char = utf8Len
-        end
-        local left  = utf8.offset(text, char,     start)
-        local right = utf8.offset(text, char + 1, start)
-        if isFinish then
-            offset = left
-        else
-            offset = right
-        end
-    end
-    if file._diffInfo then
-        local start, finish = smerger.getOffset(file._diffInfo, offset)
-        if isFinish then
-            offset = finish
-        else
-            offset = start
-        end
-    end
-    return offset
-end
-
---- 获取 position 对应的光标位置(根据附近的单词)
----@param uri uri
----@param position position
----@return integer
-function m.offsetOfWord(uri, position)
-    local file  = m.getFile(uri)
-    local lines = m.getLines(uri)
-    local text  = m.getText(uri)
-    if not file then
-        return 0
-    end
-    if file._diffInfo then
-        lines = m.getOriginLines(uri)
-        text  = m.getOriginText(uri)
-    end
-    local row = position.line + 1
-    local start, finish, char
-    if row > #lines then
-        start, finish = guide.lineRange(lines, #lines)
-        start = start + 1
-        char = util.utf8Len(text, start, finish)
-    else
-        start, finish = guide.lineRange(lines, row)
-        start = start + 1
-        char = position.character
-    end
-    local utf8Len = util.utf8Len(text, start, finish)
-    local offset
-    if char <= 0 then
-        offset = start
-    else
-        if char >= utf8Len then
-            char = utf8Len
-        end
-        local left  = utf8.offset(text, char,     start)
-        local right = utf8.offset(text, char + 1, start)
-        if  isNameChar(text:sub(left, right - 1))
-        and not isNameChar(text:sub(right, right)) then
-            offset = left
-        else
-            offset = right
-        end
-    end
-    if file._diffInfo then
-        offset = smerger.getOffset(file._diffInfo, offset)
-    end
-    return offset
-end
 
 --- 将应用差异前的offset转换为应用差异后的offset
 ---@param uri    uri

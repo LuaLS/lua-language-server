@@ -5,9 +5,10 @@ local util    = require 'utility'
 rawset(_G, 'TEST', true)
 
 function TEST(script)
-    local ast = parser:compile(script, 'lua', 'Lua 5.3')
-    assert(ast)
-    return ast
+    local clock = os.clock()
+    local state = parser.compile(script, 'Lua', 'Lua 5.3')
+    state.compileClock = os.clock() - clock
+    return state
 end
 
 local function startCollectDiagTimes()

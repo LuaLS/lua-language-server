@@ -1583,11 +1583,6 @@ local partNodersMap = util.switch()
                 m.compilePartNodes(noders, ref)
             end
         end
-
-        local nxt = source.next
-        if nxt then
-            m.compilePartNodes(noders, nxt)
-        end
     end)
     : case 'setlocal'
     : case 'getlocal'
@@ -1602,6 +1597,14 @@ local partNodersMap = util.switch()
         local parent = source.parent
         if parent.value == source then
             m.compilePartNodes(noders, parent)
+        end
+
+        if parent.type == 'call' then
+            local node = parent.node
+            if node.special == 'rawset'
+            or node.special == 'rawget' then
+                m.compilePartNodes(noders, parent)
+            end
         end
     end)
     : case 'setfield'
@@ -1633,6 +1636,14 @@ local partNodersMap = util.switch()
         local parent = source.parent
         if parent.value == source then
             m.compilePartNodes(noders, parent)
+        end
+
+        if parent.type == 'call' then
+            local node = parent.node
+            if node.special == 'rawset'
+            or node.special == 'rawget' then
+                m.compilePartNodes(noders, parent)
+            end
         end
     end)
     : case 'label'

@@ -2,6 +2,7 @@ local files  = require 'files'
 local furi   = require 'file-uri'
 local core   = require 'core.hover'
 local config = require 'config'
+local catch  = require 'catch'
 
 rawset(_G, 'TEST', true)
 
@@ -36,36 +37,19 @@ local function eq(a, b)
     return a == b
 end
 
-local function catch_target(script, sep)
-    local list = {}
-    local cur = 1
-    local cut = 0
-    while true do
-        local start, finish  = script:find(('<%%%s.-%%%s>'):format(sep, sep), cur)
-        if not start then
-            break
-        end
-        list[#list+1] = { start - cut, finish - 4 - cut }
-        cur = finish + 1
-        cut = cut + 4
-    end
-    local new_script = script:gsub(('<%%%s(.-)%%%s>'):format(sep, sep), '%1')
-    return new_script, list
-end
-
 function TEST(expect)
     files.removeAll()
 
     local targetScript = expect[1].content
     local targetUri = furi.encode(expect[1].path)
 
-    local sourceScript, sourceList = catch_target(expect[2].content, '?')
+    local sourceScript, sourceList = catch(expect[2].content, '?')
     local sourceUri = furi.encode(expect[2].path)
 
     files.setText(targetUri, targetScript)
     files.setText(sourceUri, sourceScript)
 
-    local sourcePos = (sourceList[1][1] + sourceList[1][2]) // 2
+    local sourcePos = (sourceList['?'][1][1] + sourceList['?'][1][2]) // 2
     local hover = core.byUri(sourceUri, sourcePos)
     assert(hover)
     hover = tostring(hover):gsub('\r\n', '\n')

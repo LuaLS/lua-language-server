@@ -1,7 +1,7 @@
 local m          = require 'lpeglabel'
 local re         = require 'parser.relabel'
 local guide      = require 'parser.guide'
-local grammar    = require 'parser.grammar'
+local parser     = require 'parser.newparser'
 
 local TokenTypes, TokenStarts, TokenFinishs, TokenContents
 local Ci, Offset, pushError, NextComment, Lines
@@ -1121,9 +1121,9 @@ local function trimTailComment(text)
         comment = text:sub(3)
     end
     if comment:find '^%s*[\'"[]' then
-        local result = grammar(nil, comment:gsub('^%s+', ''), 'string')
-        if result and result[1] then
-            comment = result[1][1]
+        local state = parser(comment:gsub('^%s+', ''), 'String')
+        if state and state.ast then
+            comment = state.ast[1]
         end
     end
     return comment
@@ -1148,7 +1148,7 @@ local function buildLuaDoc(comment)
     local result = convertTokens()
     if result then
         result.range = comment.finish
-        local cstart = text:find('%S', (result.firstFinish or result.finish) - comment.start + 2)
+        local cstart = text:find('%S', (result.firstFinish or result.finish) - comment.start)
         if cstart and cstart < comment.finish then
             result.comment = {
                 type   = 'doc.tailcomment',

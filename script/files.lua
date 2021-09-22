@@ -537,35 +537,6 @@ function m.getVisibles(uri)
     return visibles
 end
 
---- 获取文件行信息
----@param uri uri
----@return table lines
-function m.getLines(uri)
-    local file = m.fileMap[uri]
-    if not file then
-        return nil
-    end
-    local lines = m.linesMap[uri]
-    if not lines then
-        lines = parser.lines(file.text)
-        m.linesMap[uri] = lines
-    end
-    return lines
-end
-
-function m.getOriginLines(uri)
-    local file = m.fileMap[uri]
-    if not file then
-        return nil
-    end
-    local lines = m.originLinesMap[uri]
-    if not lines then
-        lines = parser.lines(file.originText)
-        m.originLinesMap[uri] = lines
-    end
-    return lines
-end
-
 function m.getFile(uri)
     return m.fileMap[uri]
         or m.dllMap[uri]

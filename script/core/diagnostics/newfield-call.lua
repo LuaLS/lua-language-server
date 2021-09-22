@@ -8,7 +8,6 @@ return function (uri, callback)
         return
     end
 
-    local lines = files.getLines(uri)
     local text  = files.getText(uri)
 
     guide.eachSourceType(ast.ast, 'table', function (source)

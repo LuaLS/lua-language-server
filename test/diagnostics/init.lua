@@ -2,35 +2,11 @@ local core   = require 'core.diagnostics'
 local files  = require 'files'
 local config = require 'config'
 local util   = require 'utility'
+local catch  = require 'catch'
 
 config.get 'Lua.diagnostics.neededFileStatus'['deprecated'] = 'Any'
 
 rawset(_G, 'TEST', true)
-
-local function catch_target(script, ...)
-    local list = {}
-    local function catch(buf)
-        local cur = 1
-        local cut = 0
-        while true do
-            local start, finish  = buf:find('<!.-!>', cur)
-            if not start then
-                break
-            end
-            list[#list+1] = { start - cut, finish - 4 - cut }
-            cur = finish + 1
-            cut = cut + 4
-        end
-    end
-    catch(script)
-    if ... then
-        for _, buf in ipairs {...} do
-            catch(buf)
-        end
-    end
-    local new_script = script:gsub('<!(.-)!>', '%1')
-    return new_script, list
-end
 
 local function founded(targets, results)
     if #targets ~= #results then
@@ -50,8 +26,8 @@ end
 
 function TEST(script, ...)
     files.removeAll()
-    local new_script, target = catch_target(script, ...)
-    files.setText('', new_script)
+    local newScript, catched = catch(script, '!')
+    files.setText('', newScript)
     files.open('')
     local datas = {}
     core('', function (results)
@@ -65,11 +41,11 @@ function TEST(script, ...)
     end
 
     if results[1] then
-        if not founded(target, results) then
-            error(('%s\n%s'):format(util.dump(target), util.dump(results)))
+        if not founded(catched['!'], results) then
+            error(('%s\n%s'):format(util.dump(catched['!']), util.dump(results)))
         end
     else
-        assert(#target == 0)
+        assert(catched['!'] == nil)
     end
 end
 
@@ -99,15 +75,11 @@ local <!t!> = {}
 <!t!>.a = 1
 ]]
 
-TEST([[
-local <!function x()
+TEST [[
+local <!function <!x!>()
 end!>
-]],
-[[
-local function <!x!>()
-end
 ]]
-)
+
 
 TEST [[
 local <!x!> = <!function () end!>
@@ -118,21 +90,13 @@ local <!x!>
 <!x!> = <!function () end!>
 ]]
 
-TEST([[
+TEST [[
 local <!function x()
 end!>
-local <!function y()
+local <!function <!y!>()
     x()
 end!>
-]],
-[[
-local function x()
-end
-local function <!y!>()
-    x()
-end
 ]]
-)
 
 TEST [[
 local print, _G
@@ -151,6 +115,11 @@ TEST [[
 ]]
 
 TEST [[
+<!    !>
+]]
+
+TEST [[
+
 <!    !>
 ]]
 

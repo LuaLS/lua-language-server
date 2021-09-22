@@ -13,7 +13,6 @@ end
 
 return function (data)
     local uri   = data.uri
-    local lines = files.getLines(uri)
     local text  = files.getText(uri)
     local ast   = files.getState(uri)
     if not lines then

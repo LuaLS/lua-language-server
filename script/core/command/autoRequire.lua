@@ -6,7 +6,6 @@ local client = require 'client'
 local lang   = require 'language'
 
 local function findInsertOffset(uri)
-    local lines = files.getLines(uri)
     local text  = files.getText(uri)
     local fmt   = {
         pair = false,

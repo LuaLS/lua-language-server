@@ -805,18 +805,6 @@ function m.lineContent(lines, text, row, ignoreNL)
     end
 end
 
-function m.lineRange(lines, row, ignoreNL)
-    local line = lines[row]
-    if not line then
-        return 0, 0
-    end
-    if ignoreNL then
-        return line.start, line.range
-    else
-        return line.start, line.finish
-    end
-end
-
 local isSetMap = {
     ['setglobal']      = true,
     ['local']          = true,

@@ -4,9 +4,8 @@ local lang  = require 'language'
 
 return function (uri, callback)
     local ast   = files.getState(uri)
-    local lines = files.getLines(uri)
     local text  = files.getText(uri)
-    if not ast or not lines then
+    if not ast then
         return
     end
 

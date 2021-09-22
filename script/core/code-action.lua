@@ -5,7 +5,6 @@ local sp       = require 'bee.subprocess'
 local guide    = require "parser.guide"
 
 local function checkDisableByLuaDocExits(uri, row, mode, code)
-    local lines = files.getLines(uri)
     local ast   = files.getState(uri)
     local text  = files.getOriginText(uri)
     local line  = lines[row]
@@ -41,7 +40,6 @@ local function checkDisableByLuaDocExits(uri, row, mode, code)
 end
 
 local function checkDisableByLuaDocInsert(uri, row, mode, code)
-    local lines = files.getLines(uri)
     local ast   = files.getState(uri)
     local text  = files.getOriginText(uri)
     -- 先看看上一行是不是已经有了
@@ -56,7 +54,6 @@ local function checkDisableByLuaDocInsert(uri, row, mode, code)
 end
 
 local function disableDiagnostic(uri, code, start, results)
-    local lines = files.getLines(uri)
     local row   = guide.rowColOf(start)
     results[#results+1] = {
         title   = lang.script('ACTION_DISABLE_DIAG', code),

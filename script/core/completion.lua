@@ -227,7 +227,6 @@ end
 
 local function buildInsertRequire(state, targetUri, stemName)
     local uri   = guide.getUri(state.ast)
-    local lines = files.getLines(uri)
     local text  = files.getText(uri)
     local start = 1
     for i = 1, #lines do

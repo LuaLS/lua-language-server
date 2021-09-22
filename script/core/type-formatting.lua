@@ -3,7 +3,6 @@ local lookBackward = require 'core.look-backward'
 local guide        = require "parser.guide"
 
 local function insertIndentation(uri, offset, edits)
-    local lines  = files.getLines(uri)
     local text   = files.getOriginText(uri)
     local row    = guide.rowColOf(offset)
     local line   = lines[row]

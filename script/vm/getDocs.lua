@@ -177,7 +177,6 @@ function vm.isDeprecated(value, deep)
 end
 
 local function makeDiagRange(uri, doc, results)
-    local lines  = files.getLines(uri)
     local names
     if doc.names then
         names = {}

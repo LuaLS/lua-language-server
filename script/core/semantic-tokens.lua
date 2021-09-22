@@ -214,7 +214,6 @@ end
 
 return function (uri, start, finish)
     local ast   = files.getState(uri)
-    local lines = files.getLines(uri)
     local text  = files.getText(uri)
     if not ast then
         return nil

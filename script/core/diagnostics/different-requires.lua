@@ -12,7 +12,7 @@ return function (uri, callback)
     end
     local cache = vm.getCache 'different-requires'
     guide.eachSpecialOf(state.ast, 'require', function (source)
-        local call = source.next
+        local call = source.parent
         if not call or call.type ~= 'call' then
             return
         end

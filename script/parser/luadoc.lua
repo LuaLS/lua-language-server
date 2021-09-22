@@ -646,7 +646,7 @@ function parseType(parent)
             end
             local nextCommRow = guide.rowColOf(nextComm.start)
             local currentRow = row + i + 1
-            if currentRow > nextCommRow then
+            if currentRow < nextCommRow then
                 return false
             end
             if nextComm.text:sub(1, 2) == '-@' then

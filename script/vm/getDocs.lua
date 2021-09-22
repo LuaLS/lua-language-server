@@ -187,55 +187,49 @@ local function makeDiagRange(uri, doc, results)
     end
     local row = guide.rowColOf(doc.start)
     if doc.mode == 'disable-next-line' then
-        if lines[row+1] then
-            results[#results+1] = {
-                mode   = 'disable',
-                names  = names,
-                offset = lines[row+1].start,
-                source = doc,
-            }
-            results[#results+1] = {
-                mode   = 'enable',
-                names  = names,
-                offset = lines[row+1].finish,
-                source = doc,
-            }
-        end
-    elseif doc.mode == 'disable-line' then
         results[#results+1] = {
             mode   = 'disable',
             names  = names,
-            offset = lines[row].start,
+            row    = row + 1,
             source = doc,
         }
         results[#results+1] = {
             mode   = 'enable',
             names  = names,
-            offset = lines[row].finish,
+            row    = row + 2,
+            source = doc,
+        }
+    elseif doc.mode == 'disable-line' then
+        results[#results+1] = {
+            mode   = 'disable',
+            names  = names,
+            row    = row,
+            source = doc,
+        }
+        results[#results+1] = {
+            mode   = 'enable',
+            names  = names,
+            row    = row + 1,
             source = doc,
         }
     elseif doc.mode == 'disable' then
-        if lines[row+1] then
-            results[#results+1] = {
-                mode   = 'disable',
-                names  = names,
-                offset = lines[row+1].start,
-                source = doc,
-            }
-        end
+        results[#results+1] = {
+            mode   = 'disable',
+            names  = names,
+            row    = row + 1,
+            source = doc,
+        }
     elseif doc.mode == 'enable' then
-        if lines[row+1] then
-            results[#results+1] = {
-                mode   = 'enable',
-                names  = names,
-                offset = lines[row+1].start,
-                source = doc,
-            }
-        end
+        results[#results+1] = {
+            mode   = 'enable',
+            names  = names,
+            row    = row + 1,
+            source = doc,
+        }
     end
 end
 
-function vm.isDiagDisabledAt(uri, offset, name)
+function vm.isDiagDisabledAt(uri, position, name)
     local status = files.getState(uri)
     if not status then
         return false
@@ -252,29 +246,26 @@ function vm.isDiagDisabledAt(uri, offset, name)
             end
         end
         table.sort(cache.diagnosticRanges, function (a, b)
-            return a.offset < b.offset
+            return a.row < b.row
         end)
     end
     if #cache.diagnosticRanges == 0 then
         return false
     end
-    local stack = {}
+    local myRow = guide.rowColOf(position)
+    local count = 0
     for _, range in ipairs(cache.diagnosticRanges) do
-        if range.offset <= offset then
+        if range.row <= myRow then
             if not range.names or range.names[name] then
                 if range.mode == 'disable' then
-                    stack[#stack+1] = range
+                    count = count + 1
                 elseif range.mode == 'enable' then
-                    stack[#stack] = nil
+                    count = count - 1
                 end
             end
         else
             break
         end
     end
-    local current = stack[#stack]
-    if not current then
-        return false
-    end
-    return true
+    return count > 0
 end

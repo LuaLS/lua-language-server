@@ -1250,6 +1250,7 @@ compileNodeMap = util.switch()
                     start  = node.start,
                     finish = node.finish,
                     vararg = node,
+                    parent = source,
                 }
                 compileCallReturn(noders, node, getID(param1), 2)
                 if not param2 then
@@ -1260,6 +1261,7 @@ compileNodeMap = util.switch()
                         start  = node.start,
                         finish = node.finish,
                         vararg = node,
+                        parent = source,
                     }
                     compileCallReturn(noders, node, getID(param2), 3)
                 end
@@ -1271,7 +1273,8 @@ compileNodeMap = util.switch()
             start  = source.keyword[3],
             finish = source.keyword[6],
             node   = node,
-            args   = { param1, param2 }
+            args   = { param1, param2 },
+            parent = source,
         }
         for i = 1, #keys do
             compileCallReturn(noders, call, getID(keys[i]), i)

@@ -4,6 +4,7 @@ local furi     = require 'file-uri'
 local platform = require 'bee.platform'
 local util     = require 'utility'
 local config   = require 'config'
+local catch    = require 'catch'
 
 rawset(_G, 'TEST', true)
 
@@ -88,8 +89,9 @@ function TEST(data)
         local uri = furi.encode(info.path)
         local script = info.content
         if info.main then
-            pos = script:find('$', 1, true) - 1
-            script = script:gsub('%$', '')
+            local newScript, catched = catch(script, '?')
+            pos = catched['?'][1][1]
+            script = newScript
             mainUri = uri
         end
         files.setText(uri, script)
@@ -139,7 +141,7 @@ TEST {
     },
     {
         path = 'test.lua',
-        content = 'require "a$"',
+        content = 'require "a<??>"',
         main = true,
     },
     completion = {
@@ -178,7 +180,7 @@ TEST {
     },
     {
         path = 'test.lua',
-        content = 'require "A$"',
+        content = 'require "A<??>"',
         main = true,
     },
     completion = {
@@ -201,7 +203,7 @@ TEST {
     },
     {
         path = 'test.lua',
-        content = 'require "a$"',
+        content = 'require "a<??>"',
         main = true,
     },
     completion = {
@@ -229,7 +231,7 @@ TEST {
     },
     {
         path = 'test.lua',
-        content = 'require "abc$"',
+        content = 'require "abc<??>"',
         main = true,
     },
     completion = {
@@ -257,7 +259,7 @@ TEST {
     },
     {
         path = 'test.lua',
-        content = 'require "abc$"',
+        content = 'require "abc<??>"',
         main = true,
     },
     completion = {
@@ -290,7 +292,7 @@ TEST {
     },
     {
         path = 'test.lua',
-        content = 'require "abc.i$"',
+        content = 'require "abc.i<??>"',
         main = true,
     },
     completion = {
@@ -315,7 +317,7 @@ TEST {
     },
     {
         path = 'test.lua',
-        content = 'require "abc/i$"',
+        content = 'require "abc/i<??>"',
         main = true,
     },
     completion = {
@@ -339,7 +341,7 @@ TEST {
     },
     {
         path = 'test.lua',
-        content = 'require "core.co$"',
+        content = 'require "core.co<??>"',
         main = true,
     },
     completion = {
@@ -362,7 +364,7 @@ TEST {
     },
     {
         path = 'abc/test.lua',
-        content = 'require "x$"',
+        content = 'require "x<??>"',
         main = true,
     },
     completion = {
@@ -397,7 +399,7 @@ TEST {
     },
     {
         path = 'main.lua',
-        content = 'require "x$"',
+        content = 'require "x<??>"',
         main = true,
     },
     completion = {
@@ -428,7 +430,7 @@ TEST {
     },
     {
         path = 'main.lua',
-        content = 'require "x$"',
+        content = 'require "x<??>"',
         main = true,
     },
     completion = {
@@ -457,7 +459,7 @@ TEST {
         path = 'b.lua',
         content = [[
             local t = require 'a'
-            t.$
+            t.<??>
         ]],
         main = true,
     },
@@ -499,7 +501,7 @@ TEST {
     {
         path = 'b.lua',
         content = [[
-            zab$
+            zab<??>
         ]],
         main = true,
     },
@@ -533,7 +535,7 @@ TEST {
     {
         path = 'b.lua',
         content = [[
-            zab$
+            zab<??>
         ]],
         main = true,
     },
@@ -557,7 +559,7 @@ TEST {
         path = 'a.lua',
         content = [[
             local japi = require 'jass.japi'
-            japi.xxxaaaax$
+            japi.xxxaaaax<??>
         ]],
         main = true,
     },
@@ -571,7 +573,7 @@ TEST {
     {
         path = 'xxxx.lua',
         content = [[
-            require 'xx$'
+            require 'xx<??>'
         ]],
         main = true,
     },
@@ -592,7 +594,7 @@ TEST {
     {
         path = 'main.lua',
         content = [[
-            require 'xx$'
+            require 'xx<??>'
         ]],
         main = true,
     },
@@ -613,7 +615,7 @@ TEST {
     {
         path = 'main.lua',
         content = [[
-            require [=[xx$]=]'
+            require [=[xx<??>]=]'
         ]],
         main = true,
     },
@@ -635,7 +637,7 @@ TEST {
     {
         path = 'main.lua',
         content = [[
-            dofile 'ab$'
+            dofile 'ab<??>'
         ]],
         main = true,
     },
@@ -656,7 +658,7 @@ TEST {
     {
         path = 'main.lua',
         content = [[
-            dofile 'ab$'
+            dofile 'ab<??>'
         ]],
         main = true,
     },
@@ -686,7 +688,7 @@ TEST {
         content = [[
             local t = require 'a'
             local v = setmetatable({}, {__index = t})
-            v.$
+            v.<??>
         ]]
     },
     completion = {
@@ -712,7 +714,7 @@ TEST {
         content = [[
             local z = require 'a'
 
-            z$
+            z<??>
         ]],
         main = true,
     },
@@ -743,7 +745,7 @@ TEST {
         path = 'main.lua',
         main = true,
         content = [[
-            myfun$
+            myfun<??>
         ]],
     },
     completion = {
@@ -774,7 +776,7 @@ TEST {
         path = 'main.lua',
         main = true,
         content = [[
-            myfun$
+            myfun<??>
         ]],
     },
     completion = {
@@ -807,7 +809,7 @@ TEST {
         path = 'main.lua',
         main = true,
         content = [[
-            A.$
+            A.<??>
         ]],
     },
     completion = EXISTS,
@@ -819,7 +821,7 @@ TEST {
         path = 'main.lua',
         main = true,
         content = [[
-            require'$
+            require'<??>
         ]]
     },
     completion = EXISTS

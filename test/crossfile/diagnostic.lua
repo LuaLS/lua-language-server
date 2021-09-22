@@ -3,27 +3,11 @@ local furi     = require 'file-uri'
 local core     = require 'core.diagnostics'
 local config   = require 'config'
 local platform = require 'bee.platform'
+local catch    = require 'catch'
 
 config.get 'Lua.diagnostics.neededFileStatus'['deprecated'] = 'Any'
 
 rawset(_G, 'TEST', true)
-
-local function catch_target(script, sep)
-    local list = {}
-    local cur = 1
-    local cut = 0
-    while true do
-        local start, finish  = script:find(('<%%%s.-%%%s>'):format(sep, sep), cur)
-        if not start then
-            break
-        end
-        list[#list+1] = { start - cut, finish - 4 - cut }
-        cur = finish + 1
-        cut = cut + 4
-    end
-    local new_script = script:gsub(('<%%%s(.-)%%%s>'):format(sep, sep), '%1')
-    return new_script, list
-end
 
 local function founded(targets, results)
     if #targets ~= #results then
@@ -48,19 +32,18 @@ function TEST(datas)
     files.removeAll()
 
     local targetList = {}
-    local sourceUri
     for _, data in ipairs(datas) do
         local uri = furi.encode(data.path)
-        local new, list = catch_target(data.content, '!')
-        for _, position in ipairs(list) do
+        local newScript, catched = catch(data.content, '!')
+        for _, position in ipairs(catched['!'] or {}) do
             targetList[#targetList+1] = {
                 position[1],
                 position[2],
                 uri,
             }
         end
-        data.content = new
-        files.setText(uri, new)
+        data.content = newScript
+        files.setText(uri, newScript)
     end
 
     local result = {}

@@ -194,8 +194,13 @@ local function solveSyntaxByAddDoEnd(uri, err, results)
                 [uri] = {
                     {
                         start   = err.start,
+                        finish  = err.start,
+                        newText = 'do ',
+                    },
+                    {
+                        start   = err.finish,
                         finish  = err.finish,
-                        newText = ('do %s end'):format(text:sub(err.start, err.finish)),
+                        newText = ' end',
                     },
                 }
             }
@@ -262,7 +267,7 @@ local function solveSyntax(uri, diag, results)
 end
 
 local function solveNewlineCall(uri, diag, results)
-    local start   = files.unrange(uri, diag.range)
+    local start = files.unrange(uri, diag.range)
     results[#results+1] = {
         title = lang.script.ACTION_ADD_SEMICOLON,
         kind = 'quickfix',
@@ -346,18 +351,18 @@ local function checkQuickFix(results, uri, start, diagnostics)
 end
 
 local function checkSwapParams(results, uri, start, finish)
-    local ast  = files.getState(uri)
-    local text = files.getText(uri)
-    if not ast then
+    local state = files.getState(uri)
+    local text  = files.getText(uri)
+    if not state then
         return
     end
     local args = {}
-    guide.eachSourceBetween(ast.ast, start, finish, function (source)
+    guide.eachSourceBetween(state.ast, start, finish, function (source)
         if source.type == 'callargs'
         or source.type == 'funcargs' then
             local targetIndex
             for index, arg in ipairs(source) do
-                if arg.start - 1 <= finish and arg.finish >= start then
+                if arg.start <= finish and arg.finish >= start then
                     -- should select only one param
                     if targetIndex then
                         return
@@ -370,11 +375,17 @@ local function checkSwapParams(results, uri, start, finish)
             end
             local node
             if source.type == 'callargs' then
-                node = text:sub(source.parent.node.start, source.parent.node.finish)
+                node = text:sub(
+                    guide.positionToOffset(state, source.parent.node.start) + 1,
+                    guide.positionToOffset(state, source.parent.node.finish)
+                )
             elseif source.type == 'funcargs' then
                 local var = source.parent.parent
                 if guide.isSet(var) then
-                    node = text:sub(var.start, var.finish)
+                    node = text:sub(
+                        guide.positionToOffset(state, var.start) + 1,
+                        guide.positionToOffset(state, var.finish)
+                    )
                 else
                     node = lang.script.SYMBOL_ANONYMOUS
                 end
@@ -408,12 +419,18 @@ local function checkSwapParams(results, uri, start, finish)
                             {
                                 start   = myArg.start,
                                 finish  = myArg.finish,
-                                newText = text:sub(targetArg.start, targetArg.finish),
+                                newText = text:sub(
+                                    guide.positionToOffset(state, targetArg.start) + 1,
+                                    guide.positionToOffset(state, targetArg.finish)
+                                ),
                             },
                             {
                                 start   = targetArg.start,
                                 finish  = targetArg.finish,
-                                newText = text:sub(myArg.start, myArg.finish),
+                                newText = text:sub(
+                                    guide.positionToOffset(state, myArg.start) + 1,
+                                    guide.positionToOffset(state, myArg.finish)
+                                ),
                             },
                         }
                     }
@@ -496,13 +513,16 @@ end
 --end
 
 local function checkJsonToLua(results, uri, start, finish)
-    local text = files.getText(uri)
-    local jsonStart = text:match ('()[%{%[]', start)
+    local text  = files.getText(uri)
+    local state = files.getState(uri)
+    local startOffset  = guide.positionToOffset(state, start)
+    local finishOffset = guide.positionToOffset(state, finish)
+    local jsonStart = text:match ('()[%{%[]', startOffset + 1)
     if not jsonStart then
         return
     end
     local jsonFinish
-    for i = math.min(finish, #text), jsonStart + 1, -1 do
+    for i = math.min(finishOffset, #text), jsonStart + 1, -1 do
         local char = text:sub(i, i)
         if char == ']'
         or char == '}' then
@@ -525,8 +545,8 @@ local function checkJsonToLua(results, uri, start, finish)
             arguments = {
                 {
                     uri    = uri,
-                    start  = jsonStart,
-                    finish = jsonFinish,
+                    start  = guide.offsetToPosition(state, jsonStart) - 1,
+                    finish = guide.offsetToPosition(state, jsonFinish),
                 }
             }
         },

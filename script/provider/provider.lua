@@ -530,7 +530,7 @@ proto.on('textDocument/signatureHelp', function (params)
         for j, param in ipairs(result.params) do
             parameters[j] = {
                 label = {
-                    param.label[1] - 1,
+                    param.label[1],
                     param.label[2],
                 }
             }

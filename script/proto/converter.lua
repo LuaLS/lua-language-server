@@ -35,7 +35,7 @@ function m.unpackPosition(uri, position)
         local text  = files.getText(uri)
         if text then
             local lineOffset = state.lines[row]
-            col = utf8.offset(text, col + 1, lineOffset) - 1
+            col = utf8.offset(text, col + 1, lineOffset) - lineOffset
         end
     end
     local pos = guide.positionOf(row, col)

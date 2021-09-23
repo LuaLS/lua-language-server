@@ -20,11 +20,10 @@ return function (data)
         return
     end
 
-    local lines = {}
+    local lines = state.lines
     local textEdit = {}
     for i = 0, #lines do
-        local startPos  = lines[i]
-        local startOffset  = guide.positionToOffset(state, startPos)
+        local startOffset  = lines[i]
         local finishOffset = text:find('[\r\n]', startOffset) or (#text + 1)
         local lastOffset   = finishOffset - 1
         local lastChar     = text:sub(lastOffset, lastOffset)

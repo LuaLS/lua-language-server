@@ -216,15 +216,15 @@ function m.setConfig(changes, onlyMemory)
     end
 end
 
----@alias textEdit {start: integer, finish: integer, text: string}
+---@alias textEditor {start: integer, finish: integer, text: string}
 
 ---@param uri   uri
----@param edits textEdit[]
+---@param edits textEditor[]
 function m.editText(uri, edits)
     local files     = require 'files'
     local textEdits = {}
     for i, edit in ipairs(edits) do
-        textEdits[i] = define.textEdit(converter.packRange(uri, edit.start, edit.finish), edit.text)
+        textEdits[i] = converter.textEdit(converter.packRange(uri, edit.start, edit.finish), edit.text)
     end
     proto.request('workspace/applyEdit', {
         edit = {

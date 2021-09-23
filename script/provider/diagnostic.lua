@@ -49,7 +49,7 @@ local function buildSyntaxError(uri, err)
             local relUri = rel.uri
             relatedInformation[#relatedInformation+1] = {
                 message  = rmessage,
-                location = define.location(relUri, converter.packRange(relUri, rel.start, rel.finish)),
+                location = converter.location(relUri, converter.packRange(relUri, rel.start, rel.finish)),
             }
         end
     end
@@ -76,7 +76,7 @@ local function buildDiagnostic(uri, diag)
             local rtext  = files.getText(rel.uri)
             relatedInformation[#relatedInformation+1] = {
                 message  = rel.message or rtext:sub(rel.start, rel.finish),
-                location = define.location(rel.uri, converter.packRange(rel.uri, rel.start, rel.finish))
+                location = converter.location(rel.uri, converter.packRange(rel.uri, rel.start, rel.finish))
             }
         end
     end

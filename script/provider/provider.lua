@@ -217,13 +217,13 @@ proto.on('textDocument/definition', function (params)
         if targetUri then
             if files.exists(targetUri) then
                 if client.getAbility 'textDocument.definition.linkSupport' then
-                    response[i] = define.locationLink(targetUri
+                    response[i] = converter.locationLink(targetUri
                         , converter.packRange(targetUri, info.target.start, info.target.finish)
                         , converter.packRange(targetUri, info.target.start, info.target.finish)
                         , converter.packRange(uri,       info.source.start, info.source.finish)
                     )
                 else
-                    response[i] = define.location(targetUri
+                    response[i] = converter.location(targetUri
                         , converter.packRange(targetUri, info.target.start, info.target.finish)
                     )
                 end
@@ -252,13 +252,13 @@ proto.on('textDocument/typeDefinition', function (params)
         if targetUri then
             if files.exists(targetUri) then
                 if client.getAbility 'textDocument.typeDefinition.linkSupport' then
-                    response[i] = define.locationLink(targetUri
+                    response[i] = converter.locationLink(targetUri
                         , converter.packRange(targetUri, info.target.start, info.target.finish)
                         , converter.packRange(targetUri, info.target.start, info.target.finish)
                         , converter.packRange(uri,       info.source.start, info.source.finish)
                     )
                 else
-                    response[i] = define.location(targetUri
+                    response[i] = converter.location(targetUri
                         , converter.packRange(targetUri, info.target.start, info.target.finish)
                     )
                 end
@@ -284,7 +284,7 @@ proto.on('textDocument/references', function (params)
     local response = {}
     for i, info in ipairs(result) do
         local targetUri = info.uri
-        response[i] = define.location(targetUri
+        response[i] = converter.location(targetUri
             , converter.packRange(targetUri, info.target.start, info.target.finish)
         )
     end
@@ -333,7 +333,7 @@ proto.on('textDocument/rename', function (params)
         if not workspaceEdit.changes[ruri] then
             workspaceEdit.changes[ruri] = {}
         end
-        local textEdit = define.textEdit(converter.packRange(ruri, info.start, info.finish), info.text)
+        local textEdit = converter.textEdit(converter.packRange(ruri, info.start, info.finish), info.text)
         workspaceEdit.changes[ruri][#workspaceEdit.changes[ruri]+1] = textEdit
     end
     return workspaceEdit
@@ -656,7 +656,7 @@ proto.on('workspace/symbol', function (params)
     end
 
     local function convert(symbol)
-        symbol.location = define.location(
+        symbol.location = converter.location(
             symbol.uri,
             converter.packRange(
                 symbol.uri,

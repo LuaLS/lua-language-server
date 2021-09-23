@@ -18,6 +18,7 @@ end
 
 ---@param uri      uri
 ---@param position position
+---@return integer
 function m.unpackPosition(uri, position)
     local pos = guide.positionOf(position.line, position.character)
     return pos
@@ -45,6 +46,46 @@ function m.unpackRange(uri, range)
     local start  = m.unpackPosition(uri, range.start)
     local finish = m.unpackPosition(uri, range['end'])
     return start, finish
+end
+
+---@alias location {uri: uri, range: range}
+
+---@param uri string
+---@param range range
+---@return location
+function m.location(uri, range)
+    return {
+        uri   = uri,
+        range = range,
+    }
+end
+
+---@alias locationLink {targetUri:uri, targetRange: range, targetSelectionRange: range, originSelectionRange: range}
+
+---@param uri string
+---@param range range
+---@param selection range
+---@param origin range
+---@return locationLink
+function m.locationLink(uri, range, selection, origin)
+    return {
+        targetUri            = uri,
+        targetRange          = range,
+        targetSelectionRange = selection,
+        originSelectionRange = origin,
+    }
+end
+
+---@alias textEdit {range: range, newText: string}
+
+---@param range   range
+---@param newtext string
+---@return textEdit
+function m.textEdit(range, newtext)
+    return {
+        range   = range,
+        newText = newtext,
+    }
 end
 
 return m

@@ -1,37 +1,5 @@
 local m = {}
 
----@alias location table
----@param uri string
----@param range range
----@return location
-function m.location(uri, range)
-    return {
-        uri   = uri,
-        range = range,
-    }
-end
-
----@alias locationLink table
----@param uri string
----@param range range
----@param selection range
----@param origin range
-function m.locationLink(uri, range, selection, origin)
-    return {
-        targetUri            = uri,
-        targetRange          = range,
-        targetSelectionRange = selection,
-        originSelectionRange = origin,
-    }
-end
-
-function m.textEdit(range, newtext)
-    return {
-        range   = range,
-        newText = newtext,
-    }
-end
-
 --- 诊断等级
 m.DiagnosticSeverity = {
     Error       = 1,

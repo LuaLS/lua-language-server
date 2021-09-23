@@ -6,10 +6,13 @@ local guide     = require "parser.guide"
 local converter = require 'proto.converter'
 
 local function checkDisableByLuaDocExits(uri, row, mode, code)
+    if row < 0 then
+        return nil
+    end
     local state = files.getState(uri)
     local lines = state.lines
     if state.ast.docs and lines then
-        guide.eachSourceBetween(state.ast.docs, guide.positionOf(row, 0), guide.positionOf(row + 1, 0), function (doc)
+        return guide.eachSourceBetween(state.ast.docs, guide.positionOf(row, 0), guide.positionOf(row + 1, 0), function (doc)
             if  doc.type == 'doc.diagnostic'
             and doc.mode == mode then
                 if doc.names then
@@ -73,8 +76,8 @@ local function disableDiagnostic(uri, code, start, results)
            checkDisableByLuaDocExits (uri, row - 1, 'disable-next-line', code)
         or checkDisableByLuaDocInsert(uri, row,     'disable-next-line', code))
     pushEdit(lang.script('ACTION_DISABLE_DIAG_FILE', code),
-           checkDisableByLuaDocExits (uri, 1,   'disable',           code)
-        or checkDisableByLuaDocInsert(uri, 1,   'disable',           code))
+           checkDisableByLuaDocExits (uri, 0,   'disable',           code)
+        or checkDisableByLuaDocInsert(uri, 0,   'disable',           code))
 end
 
 local function markGlobal(uri, name, results)

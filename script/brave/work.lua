@@ -26,7 +26,7 @@ brave.on('timer', function (time)
 end)
 
 brave.on('compile', function (text)
-    local state, err = parser.compile(text, 'lua', 'Lua 5.4')
+    local state, err = parser.compile(text, 'Lua', 'Lua 5.4')
     if not state then
         log.error(err)
         return

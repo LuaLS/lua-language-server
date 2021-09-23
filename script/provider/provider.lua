@@ -194,7 +194,7 @@ proto.on('textDocument/hover', function (params)
             value = tostring(hover),
             kind  = 'markdown',
         },
-        range = files.range(uri, source.start, source.finish),
+        range = converter.packRange(uri, source.start, source.finish),
     }
 end)
 
@@ -218,13 +218,13 @@ proto.on('textDocument/definition', function (params)
             if files.exists(targetUri) then
                 if client.getAbility 'textDocument.definition.linkSupport' then
                     response[i] = define.locationLink(targetUri
-                        , files.range(targetUri, info.target.start, info.target.finish)
-                        , files.range(targetUri, info.target.start, info.target.finish)
-                        , files.range(uri,       info.source.start, info.source.finish)
+                        , converter.packRange(targetUri, info.target.start, info.target.finish)
+                        , converter.packRange(targetUri, info.target.start, info.target.finish)
+                        , converter.packRange(uri,       info.source.start, info.source.finish)
                     )
                 else
                     response[i] = define.location(targetUri
-                        , files.range(targetUri, info.target.start, info.target.finish)
+                        , converter.packRange(targetUri, info.target.start, info.target.finish)
                     )
                 end
             end
@@ -253,13 +253,13 @@ proto.on('textDocument/typeDefinition', function (params)
             if files.exists(targetUri) then
                 if client.getAbility 'textDocument.typeDefinition.linkSupport' then
                     response[i] = define.locationLink(targetUri
-                        , files.range(targetUri, info.target.start, info.target.finish)
-                        , files.range(targetUri, info.target.start, info.target.finish)
-                        , files.range(uri,       info.source.start, info.source.finish)
+                        , converter.packRange(targetUri, info.target.start, info.target.finish)
+                        , converter.packRange(targetUri, info.target.start, info.target.finish)
+                        , converter.packRange(uri,       info.source.start, info.source.finish)
                     )
                 else
                     response[i] = define.location(targetUri
-                        , files.range(targetUri, info.target.start, info.target.finish)
+                        , converter.packRange(targetUri, info.target.start, info.target.finish)
                     )
                 end
             end
@@ -285,7 +285,7 @@ proto.on('textDocument/references', function (params)
     for i, info in ipairs(result) do
         local targetUri = info.uri
         response[i] = define.location(targetUri
-            , files.range(targetUri, info.target.start, info.target.finish)
+            , converter.packRange(targetUri, info.target.start, info.target.finish)
         )
     end
     return response
@@ -305,7 +305,7 @@ proto.on('textDocument/documentHighlight', function (params)
     local response = {}
     for _, info in ipairs(result) do
         response[#response+1] = {
-            range = files.range(uri, info.start, info.finish),
+            range = converter.packRange(uri, info.start, info.finish),
             kind  = info.kind,
         }
     end
@@ -333,7 +333,7 @@ proto.on('textDocument/rename', function (params)
         if not workspaceEdit.changes[ruri] then
             workspaceEdit.changes[ruri] = {}
         end
-        local textEdit = define.textEdit(files.range(ruri, info.start, info.finish), info.text)
+        local textEdit = define.textEdit(converter.packRange(ruri, info.start, info.finish), info.text)
         workspaceEdit.changes[ruri][#workspaceEdit.changes[ruri]+1] = textEdit
     end
     return workspaceEdit
@@ -351,7 +351,7 @@ proto.on('textDocument/prepareRename', function (params)
         return nil
     end
     return {
-        range       = files.range(uri, result.start, result.finish),
+        range       = converter.packRange(uri, result.start, result.finish),
         placeholder = result.text,
     }
 end)
@@ -418,7 +418,7 @@ proto.on('textDocument/completion', function (params)
             commitCharacters = res.commitCharacters,
             command          = res.command,
             textEdit         = res.textEdit and {
-                range   = files.range(
+                range   = converter.packRange(
                     uri,
                     res.textEdit.start,
                     res.textEdit.finish
@@ -429,7 +429,7 @@ proto.on('textDocument/completion', function (params)
                 local t = {}
                 for j, edit in ipairs(res.additionalTextEdits) do
                     t[j] = {
-                        range   = files.range(
+                        range   = converter.packRange(
                             uri,
                             edit.start,
                             edit.finish
@@ -493,7 +493,7 @@ proto.on('completionItem/resolve', function (item)
         local t = {}
         for j, edit in ipairs(resolved.additionalTextEdits) do
             t[j] = {
-                range   = files.range(
+                range   = converter.packRange(
                     uri,
                     edit.start,
                     edit.finish
@@ -563,12 +563,12 @@ proto.on('textDocument/documentSymbol', function (params)
 
     local function convert(symbol)
         await.delay()
-        symbol.range = files.range(
+        symbol.range = converter.packRange(
             uri,
             symbol.range[1],
             symbol.range[2]
         )
-        symbol.selectionRange = files.range(
+        symbol.selectionRange = converter.packRange(
             uri,
             symbol.selectionRange[1],
             symbol.selectionRange[2]
@@ -611,7 +611,7 @@ proto.on('textDocument/codeAction', function (params)
         if res.edit then
             for turi, changes in pairs(res.edit.changes) do
                 for _, change in ipairs(changes) do
-                    change.range = files.range(turi, change.start, change.finish)
+                    change.range = converter.packRange(turi, change.start, change.finish)
                     change.start  = nil
                     change.finish = nil
                 end
@@ -658,7 +658,7 @@ proto.on('workspace/symbol', function (params)
     local function convert(symbol)
         symbol.location = define.location(
             symbol.uri,
-            files.range(
+            converter.packRange(
                 symbol.uri,
                 symbol.range[1],
                 symbol.range[2]
@@ -790,7 +790,7 @@ proto.on('textDocument/onTypeFormatting', function (params)
     local results = {}
     for i, edit in ipairs(edits) do
         results[i] = {
-            range   = files.range(uri, edit.start, edit.finish),
+            range   = converter.packRange(uri, edit.start, edit.finish),
             newText = edit.text:gsub('\t', tab),
         }
     end

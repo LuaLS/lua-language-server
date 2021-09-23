@@ -1,14 +1,15 @@
-local await    = require 'await'
-local proto    = require 'proto.proto'
-local define   = require 'proto.define'
-local lang     = require 'language'
-local files    = require 'files'
-local config   = require 'config'
-local core     = require 'core.diagnostics'
-local util     = require 'utility'
-local ws       = require 'workspace'
-local progress = require "progress"
-local client   = require 'client'
+local await     = require 'await'
+local proto     = require 'proto.proto'
+local define    = require 'proto.define'
+local lang      = require 'language'
+local files     = require 'files'
+local config    = require 'config'
+local core      = require 'core.diagnostics'
+local util      = require 'utility'
+local ws        = require 'workspace'
+local progress  = require "progress"
+local client    = require 'client'
+local converter = require 'proto.converter'
 
 local m = {}
 m._start = false
@@ -48,14 +49,14 @@ local function buildSyntaxError(uri, err)
             local relUri = rel.uri
             relatedInformation[#relatedInformation+1] = {
                 message  = rmessage,
-                location = define.location(relUri, files.range(relUri, rel.start, rel.finish)),
+                location = define.location(relUri, converter.packRange(relUri, rel.start, rel.finish)),
             }
         end
     end
 
     return {
         code     = err.type:lower():gsub('_', '-'),
-        range    = files.range(uri, err.start, err.finish),
+        range    = converter.packRange(uri, err.start, err.finish),
         severity = define.DiagnosticSeverity.Error,
         source   = lang.script.DIAG_SYNTAX_CHECK,
         message  = message,
@@ -75,13 +76,13 @@ local function buildDiagnostic(uri, diag)
             local rtext  = files.getText(rel.uri)
             relatedInformation[#relatedInformation+1] = {
                 message  = rel.message or rtext:sub(rel.start, rel.finish),
-                location = define.location(rel.uri, files.range(rel.uri, rel.start, rel.finish))
+                location = define.location(rel.uri, converter.packRange(rel.uri, rel.start, rel.finish))
             }
         end
     end
 
     return {
-        range    = files.range(uri, diag.start, diag.finish),
+        range    = converter.packRange(uri, diag.start, diag.finish),
         source   = lang.script.DIAG_DIAGNOSTICS,
         severity = diag.level,
         message  = diag.message,

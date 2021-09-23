@@ -85,7 +85,7 @@ return function (data)
             changes = {
                 [uri] = {
                     {
-                        range   = files.range(uri, result.start, result.finish),
+                        range   = converter.packRange(uri, result.start, result.finish),
                         newText = ('(%s)'):format(text:sub(result.start, result.finish)),
                     }
                 },

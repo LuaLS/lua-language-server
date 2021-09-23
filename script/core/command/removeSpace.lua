@@ -1,7 +1,8 @@
-local files    = require 'files'
-local guide    = require 'parser.guide'
-local proto    = require 'proto'
-local lang     = require 'language'
+local files     = require 'files'
+local guide     = require 'parser.guide'
+local proto     = require 'proto'
+local lang      = require 'language'
+local converter = require 'proto.converter'
 
 local function isInString(ast, offset)
     return guide.eachSourceContain(ast.ast, offset, function (source)
@@ -30,7 +31,7 @@ return function (data)
                 goto NEXT_LINE
             end
             textEdit[#textEdit+1] = {
-                range = files.range(uri, start, finish),
+                range = converter.packRange(uri, start, finish),
                 newText = '',
             }
             goto NEXT_LINE

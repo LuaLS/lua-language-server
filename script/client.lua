@@ -4,6 +4,7 @@ local lang      = require 'language'
 local proto     = require 'proto'
 local define    = require 'proto.define'
 local config    = require 'config'
+local converter = require 'proto.converter'
 
 local m = {}
 
@@ -223,7 +224,7 @@ function m.editText(uri, edits)
     local files     = require 'files'
     local textEdits = {}
     for i, edit in ipairs(edits) do
-        textEdits[i] = define.textEdit(files.range(uri, edit.start, edit.finish), edit.text)
+        textEdits[i] = define.textEdit(converter.packRange(uri, edit.start, edit.finish), edit.text)
     end
     proto.request('workspace/applyEdit', {
         edit = {

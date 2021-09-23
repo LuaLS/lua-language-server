@@ -1337,7 +1337,7 @@ function m.compileNode(noders, source)
     local id = getID(source)
     bindValue(noders, source, id)
 
-    if specialMap[source.special] then
+    if id and specialMap[source.special] then
         noders.skip[id] = true
     end
 

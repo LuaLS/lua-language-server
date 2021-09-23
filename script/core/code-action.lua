@@ -166,7 +166,7 @@ local function findSyntax(uri, diag)
     local ast = files.getState(uri)
     for _, err in ipairs(ast.errs) do
         if err.type:lower():gsub('_', '-') == diag.code then
-            local range = files.range(uri, err.start, err.finish)
+            local range = converter.packRange(uri, err.start, err.finish)
             if util.equal(range, diag.range) then
                 return err
             end

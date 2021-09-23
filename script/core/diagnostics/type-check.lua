@@ -118,7 +118,7 @@ return function (uri, callback)
                     argm = argm .. v[1]..' '
                 end
                 argm = argm .. ']'
-                message = 'callArg: '..argm..' has no type belong to ['..flag..' ]'
+                message = 'Argument of type in '..argm..' is not assignable to parameter of type in ['..flag..' ]'
                 callback{
                     start   = arg.start,
                     finish  = arg.finish,

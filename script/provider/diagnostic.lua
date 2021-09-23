@@ -46,7 +46,7 @@ local function buildSyntaxError(uri, err)
             else
                 rmessage = text:sub(rel.start, rel.finish)
             end
-            local relUri = rel.uri
+            local relUri = rel.uri or uri
             relatedInformation[#relatedInformation+1] = {
                 message  = rmessage,
                 location = converter.location(relUri, converter.packRange(relUri, rel.start, rel.finish)),

@@ -11,11 +11,13 @@ local m = {}
 ---@return position
 function m.packPosition(uri, pos)
     local row, col = guide.rowColOf(pos)
-    local state = files.getState(uri)
-    local text  = files.getText(uri)
-    if text then
-        local lineOffset = state.lines[row]
-        col = utf8.len(text, lineOffset, lineOffset + col - 1, true)
+    if col > 0 then
+        local state = files.getState(uri)
+        local text  = files.getText(uri)
+        if text then
+            local lineOffset = state.lines[row]
+            col = utf8.len(text, lineOffset, lineOffset + col - 1, true)
+        end
     end
     return {
         line      = row,
@@ -28,11 +30,13 @@ end
 ---@return integer
 function m.unpackPosition(uri, position)
     local row, col = position.line, position.character
-    local state = files.getState(uri)
-    local text  = files.getText(uri)
-    if text then
-        local lineOffset = state.lines[row]
-        col = utf8.offset(text, lineOffset + col, lineOffset) - 1
+    if col > 0 then
+        local state = files.getState(uri)
+        local text  = files.getText(uri)
+        if text then
+            local lineOffset = state.lines[row]
+            col = utf8.offset(text, col + 1, lineOffset) - 1
+        end
     end
     local pos = guide.positionOf(row, col)
     return pos

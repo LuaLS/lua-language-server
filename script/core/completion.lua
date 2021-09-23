@@ -225,35 +225,6 @@ local function buildFunction(results, source, value, oop, data)
     end
 end
 
-local function buildInsertRequire(state, targetUri, stemName)
-    local uri   = guide.getUri(state.ast)
-    local text  = files.getText(uri)
-    local start = 1
-    for i = 1, #lines do
-        local ln = lines[i]
-        local lnText = text:sub(ln.start, ln.finish)
-        if not lnText:find('require', 1, true) then
-            start = ln.start
-            break
-        end
-    end
-    local path = furi.decode(targetUri)
-    local visiblePaths = rpath.getVisiblePath(path, config.get 'Lua.runtime.path', true)
-    if not visiblePaths or #visiblePaths == 0 then
-        return nil
-    end
-    table.sort(visiblePaths, function (a, b)
-        return #a.expect < #b.expect
-    end)
-    return {
-        {
-            start   = start,
-            finish  = start - 1,
-            newText = ('local %s = require %q\n'):format(stemName, visiblePaths[1].expect)
-        }
-    }
-end
-
 local function isSameSource(state, source, pos)
     if guide.getUri(source) ~= guide.getUri(state.ast) then
         return false

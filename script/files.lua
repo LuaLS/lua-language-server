@@ -576,78 +576,6 @@ function m.diffedOffsetBack(uri, offset)
     return smerger.getOffsetBack(file._diffInfo, offset)
 end
 
---- 将光标位置转化为 position
----@param uri uri
----@param offset integer
----@param leftOrRight? '"left"'|'"right"'
----@return position
-function m.position(uri, offset, leftOrRight)
-    local file  = m.getFile(uri)
-    local lines = m.getLines(uri)
-    local text  = m.getText(uri)
-    if not file then
-        return {
-            line      = 0,
-            character = 0,
-        }
-    end
-    if file._diffInfo then
-        local start, finish = smerger.getOffsetBack(file._diffInfo, offset)
-        if leftOrRight == 'right' then
-            offset = finish
-        else
-            offset = start
-        end
-        lines  = m.getOriginLines(uri)
-        text   = m.getOriginText(uri)
-    end
-    local row, col      = guide.rowColOf(offset)
-    local start, finish = guide.lineRange(lines, row, true)
-    start = start + 1
-    if col <= finish - start + 1 then
-        local ucol     = util.utf8Len(text, start, start + col - 1)
-        if row < 1 then
-            row = 1
-        end
-        if leftOrRight == 'left' and ucol > 0 then
-            ucol = ucol - 1
-        end
-        return {
-            line      = row - 1,
-            character = ucol,
-        }
-    else
-        return {
-            line      = row - 1,
-            character = util.utf8Len(text, start, finish),
-        }
-    end
-end
-
---- 将起点与终点位置转化为 range
-
----@param uri     uri
----@param offset1 integer
----@param offset2 integer
-function m.range(uri, offset1, offset2)
-    local range = {
-        start   = m.position(uri, offset1, 'left'),
-        ['end'] = m.position(uri, offset2, 'right'),
-    }
-    return range
-end
-
---- convert `range` to `offsetStart` and `offsetFinish`
----@param uri   table
----@param range table
----@return integer start
----@return integer finish
-function m.unrange(uri, range)
-    local start  = m.offset(uri, range.start, true)
-    local finish = m.offset(uri, range['end'], false)
-    return start, finish
-end
-
 --- 获取文件的自定义缓存信息（在文件内容更新后自动失效）
 function m.getCache(uri)
     local file = m.fileMap[uri]
@@ -778,8 +706,6 @@ end
 function m.flushCache()
     for uri, file in pairs(m.fileMap) do
         file.cacheActiveTime = math.huge
-        m.linesMap[uri] = nil
-        m.originLinesMap[uri] = nil
         m.astMap[uri] = nil
         file.cache = {}
     end
@@ -791,8 +717,6 @@ function m.flushFileCache(uri)
         return
     end
     file.cacheActiveTime = math.huge
-    m.linesMap[uri] = nil
-    m.originLinesMap[uri] = nil
     m.astMap[uri] = nil
     file.cache = {}
 end

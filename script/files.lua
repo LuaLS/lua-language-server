@@ -518,11 +518,11 @@ function m.getVisibles(uri)
     end
     local visibles = {}
     for i, range in ipairs(ranges) do
-        -- TODO 改成行号
-        local start, finish = m.unrange(uri, range)
+        local startRow  = guide.rowColOf(range.start)
+        local finishRow = guide.rowColOf(range['end'])
         visibles[i] = {
-            start  = start,
-            finish = finish,
+            start  = guide.positionOf(startRow, 0),
+            finish = guide.positionOf(finishRow, 0),
         }
     end
     return visibles

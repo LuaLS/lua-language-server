@@ -6,51 +6,37 @@ local guide     = require "parser.guide"
 local converter = require 'proto.converter'
 
 local function checkDisableByLuaDocExits(uri, row, mode, code)
-    local ast   = files.getState(uri)
+    local state = files.getState(uri)
     local text  = files.getOriginText(uri)
-    local line  = lines[row]
-    if ast.ast.docs and line then
-        for _, doc in ipairs(ast.ast.docs) do
-            if  doc.start >= line.start
-            and doc.finish <= line.finish then
-                if doc.type == 'doc.diagnostic' then
-                    if doc.mode == mode then
-                        if doc.names then
-                            return {
-                                start   = doc.finish,
-                                finish  = doc.finish,
-                                newText = text:sub(doc.finish, doc.finish)
-                                        .. ', '
-                                        .. code
-                            }
-                        else
-                            return {
-                                start   = doc.finish,
-                                finish  = doc.finish,
-                                newText = text:sub(doc.finish, doc.finish)
-                                        .. ': '
-                                        .. code
-                            }
-                        end
-                    end
+    local lines = state.lines
+    if state.ast.docs and lines then
+        guide.eachSourceBetween(state.ast.docs, guide.positionOf(row, 0), guide.positionOf(row + 1, 0), function (doc)
+            if  doc.type == 'doc.diagnostic'
+            and doc.mode == mode then
+                if doc.names then
+                    return {
+                        start   = doc.finish,
+                        finish  = doc.finish,
+                        newText = ', ' .. code,
+                    }
+                else
+                    return {
+                        start   = doc.finish,
+                        finish  = doc.finish,
+                        newText = ': ' .. code,
+                    }
                 end
             end
-        end
+        end)
     end
     return nil
 end
 
 local function checkDisableByLuaDocInsert(uri, row, mode, code)
-    local ast   = files.getState(uri)
-    local text  = files.getOriginText(uri)
-    -- 先看看上一行是不是已经有了
-    -- 没有的话就插入一行
-    local line = lines[row]
     return {
-        start   = line.start,
-        finish  = line.start,
-        newText = '---@diagnostic ' .. mode .. ': ' .. code .. '\n'
-                .. text:sub(line.start, line.start)
+        start   = guide.positionOf(row, 0),
+        finish  = guide.positionOf(row, 0),
+        newText = '---@diagnostic ' .. mode .. ': ' .. code .. '\n',
     }
 end
 

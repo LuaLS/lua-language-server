@@ -759,17 +759,19 @@ function m.positionOf(row, col)
     return row * 10000 + col
 end
 
---- 返回全文光标位置
----@param state any
----@param position integer
-function m.positionToOffset(state, position)
-    local lines = state.lines
+function m.positionToOffsetByLines(lines, position)
     local row, col = m.rowColOf(position)
     return lines[row] + col - 1
 end
 
-function m.offsetToPosition(state, offset)
-    local lines = state.lines
+--- 返回全文光标位置
+---@param state any
+---@param position integer
+function m.positionToOffset(state, position)
+    return m.positionToOffsetByLines(state.lines, position)
+end
+
+function m.offsetToPositionByLines(lines, offset)
     local left  = 0
     local right = #lines
     local row   = 0
@@ -794,16 +796,8 @@ function m.offsetToPosition(state, offset)
     return m.positionOf(row, col)
 end
 
-function m.lineContent(lines, text, row, ignoreNL)
-    local line = lines[row]
-    if not line then
-        return ''
-    end
-    if ignoreNL then
-        return text:sub(line.start, line.range)
-    else
-        return text:sub(line.start, line.finish)
-    end
+function m.offsetToPosition(state, offset)
+    return m.offsetToPositionByLines(state.lines, offset)
 end
 
 local isSetMap = {

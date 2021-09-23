@@ -112,6 +112,7 @@ local function pluginOnSetText(file, text)
         suc, result, diffs = xpcall(smerger.mergeDiff, log.error, text, result)
         if suc then
             file._diffInfo = diffs
+            file.originLines = parser.lines(text)
             return result
         else
             if DEVELOP and result then
@@ -289,6 +290,17 @@ function m.getOriginText(uri)
         return nil
     end
     return file.originText
+end
+
+--- 获取文件原始行表
+---@param uri uri
+---@return integer[]
+function m.getOriginLines(uri)
+    local file = m.fileMap[uri]
+    if not file then
+        return nil
+    end
+    return file.originLines
 end
 
 function m.getChildFiles(uri)
@@ -574,6 +586,14 @@ function m.diffedOffsetBack(uri, offset)
         return offset, offset
     end
     return smerger.getOffsetBack(file._diffInfo, offset)
+end
+
+function m.hasDiffed(uri)
+    local file = m.getFile(uri)
+    if not file then
+        return false
+    end
+    return file._diffInfo ~= nil
 end
 
 --- 获取文件的自定义缓存信息（在文件内容更新后自动失效）

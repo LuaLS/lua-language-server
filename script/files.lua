@@ -7,12 +7,10 @@ local proto    = require 'proto'
 local lang     = require 'language'
 local await    = require 'await'
 local timer    = require 'timer'
-local plugin   = require 'plugin'
 local util     = require 'utility'
 local guide    = require 'parser.guide'
 local smerger  = require 'string-merger'
 local progress = require "progress"
-local client   = require 'client'
 
 local unicode
 
@@ -98,6 +96,7 @@ function m.exists(uri)
 end
 
 local function pluginOnSetText(file, text)
+    local plugin   = require 'plugin'
     file._diffInfo = nil
     local suc, result = plugin.dispatch('OnSetText', file.uri, text)
     if not suc then
@@ -409,7 +408,8 @@ function m.eachDll()
 end
 
 function m.compileState(uri, text)
-    local ws = require 'workspace'
+    local ws     = require 'workspace'
+    local client = require 'client'
     if  not m.isOpen(uri)
     and not m.isLibrary(uri)
     and #text >= config.get 'Lua.workspace.preloadFileSize' * 1000 then

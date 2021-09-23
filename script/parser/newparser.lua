@@ -192,13 +192,28 @@ local ChunkFinishMap = {
     ['else']   = true,
     ['elseif'] = true,
     ['in']     = true,
-    ['do']     = true,
     ['then']   = true,
     ['until']  = true,
     [';']      = true,
     [']']      = true,
     [')']      = true,
     ['}']      = true,
+}
+
+local ListFinishMap = {
+    ['end']      = true,
+    ['else']     = true,
+    ['elseif']   = true,
+    ['in']       = true,
+    ['then']     = true,
+    ['do']       = true,
+    ['until']    = true,
+    ['for']      = true,
+    ['if']       = true,
+    ['local']    = true,
+    ['repeat']   = true,
+    ['return']   = true,
+    ['while']    = true,
 }
 
 local State, Lua, Line, LineOffset, Chunk, Tokens, Index, LastTokenFinish, Mode, LocalCount
@@ -1367,7 +1382,7 @@ local function parseExpList(mini)
         if not token then
             break
         end
-        if ChunkFinishMap[token] then
+        if ListFinishMap[token] then
             break
         end
         if token == ',' then
@@ -1395,7 +1410,8 @@ local function parseExpList(mini)
                 and nextToken ~= 'function'
                 and nextToken ~= 'true'
                 and nextToken ~= 'false'
-                and nextToken ~= 'nil' then
+                and nextToken ~= 'nil'
+                and nextToken ~= 'not' then
                     break
                 end
             end
@@ -1820,7 +1836,9 @@ local function parseVarargs()
             break
         end
     end
-    if not varargs.node and Mode == 'Lua' then
+    if  not varargs.node
+    and Mode == 'Lua'
+    and Chunk[#Chunk].type ~= 'main' then
         pushError {
             type   = 'UNEXPECT_DOTS',
             start  = varargs.start,
@@ -1931,8 +1949,7 @@ local function isChunkFinishToken(token)
     if tp == 'for'
     or tp == 'in'
     or tp == 'loop' then
-        return token == 'do'
-            or token == 'end'
+        return token == 'end'
     end
     if tp == 'if'
     or tp == 'ifblock'
@@ -1943,7 +1960,7 @@ local function isChunkFinishToken(token)
             or token == 'else'
             or token == 'elseif'
     end
-    return token ~= 'do'
+    return true
 end
 
 local function parseActions()
@@ -2226,16 +2243,13 @@ local function parseExpUnit()
     return nil
 end
 
-local function parseUnaryOP(level)
+local function parseUnaryOP()
     local token  = Tokens[Index + 1]
     local symbol = UnarySymbol[token] and token or UnaryAlias[token]
     if not symbol then
         return nil
     end
     local myLevel = UnarySymbol[symbol]
-    if level and myLevel < level then
-        return nil
-    end
     local op = {
         type   = symbol,
         start  = getPosition(Tokens[Index], 'left'),
@@ -2324,7 +2338,7 @@ end
 
 function parseExp(asAction, level)
     local exp
-    local uop, uopLevel = parseUnaryOP(level)
+    local uop, uopLevel = parseUnaryOP()
     if uop then
         skipSpace()
         local child = parseExp(asAction, uopLevel)
@@ -3249,7 +3263,10 @@ local function parseWhile()
     Index = Index + 2
 
     skipSpace()
-    local filter = parseExp()
+    local nextToken = Tokens[Index + 1]
+    local filter =  nextToken ~= 'do'
+                and nextToken ~= 'then'
+                and parseExp()
     if filter then
         action.filter = filter
         action.finish = filter.finish

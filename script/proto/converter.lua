@@ -1,4 +1,5 @@
 local guide = require 'parser.guide'
+local files = require 'files'
 
 local m = {}
 
@@ -10,6 +11,12 @@ local m = {}
 ---@return position
 function m.packPosition(uri, pos)
     local row, col = guide.rowColOf(pos)
+    local state = files.getState(uri)
+    local text  = files.getText(uri)
+    if text then
+        local lineOffset = state.lines[row]
+        col = utf8.len(text, lineOffset, lineOffset + col - 1, true)
+    end
     return {
         line      = row,
         character = col,
@@ -20,7 +27,14 @@ end
 ---@param position position
 ---@return integer
 function m.unpackPosition(uri, position)
-    local pos = guide.positionOf(position.line, position.character)
+    local row, col = position.line, position.character
+    local state = files.getState(uri)
+    local text  = files.getText(uri)
+    if text then
+        local lineOffset = state.lines[row]
+        col = utf8.offset(text, lineOffset + col, lineOffset) - 1
+    end
+    local pos = guide.positionOf(row, col)
     return pos
 end
 

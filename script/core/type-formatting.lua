@@ -36,6 +36,7 @@ local function findBackward(text, offset, ...)
 end
 
 local function checkSplitOneLine(results, uri, offset, ch)
+    do return end
     if ch ~= '\n' then
         return
     end

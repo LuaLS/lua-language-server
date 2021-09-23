@@ -491,7 +491,7 @@ f(1, 2, 3)
 ]]
 
 TEST [[
-<!unpack!>(1)
+<!unpack!>(<!1!>)
 ]]
 
 TEST [[
@@ -1163,4 +1163,69 @@ return {
     1, <!2!>, 3,
     [<!2!>] = 4,
 }
+]]
+
+TEST [[
+---@param table     table
+---@param metatable table
+---@return table
+function Setmetatable(table, metatable) end
+
+Setmetatable(<!1!>, {})
+]]
+
+TEST [[
+---@param table     table
+---@param metatable table
+---@return table
+function Setmetatable(table, metatable) end
+
+Setmetatable(<!'name'!>, {})
+
+]]
+
+TEST [[
+---@param table     table
+---@param metatable table
+---@return table
+function Setmetatable(table, metatable) end
+
+---@type table
+local name
+---@type function
+local mt
+---err
+Setmetatable(name, <!mt!>)
+]]
+
+TEST [[
+---@param p1 string
+---@param p2 number
+---@return table
+local function func1(p1, p2) end
+
+---@type string
+local s
+---@type table
+local t
+---err
+func1(s, <!t!>)
+]]
+
+TEST [[
+---@class bird
+---@field wing string
+
+---@class eagle
+---@field family bird
+
+---@class chicken
+---@field family bird
+
+---@param bd eagle
+local function fly(bd) end
+
+---@type chicken
+local h
+fly(<!h!>)
 ]]

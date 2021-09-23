@@ -13,6 +13,7 @@ local lang       = require 'language'
 local progress   = require 'progress'
 local tm         = require 'text-merger'
 local cfgLoader  = require 'config.loader'
+local converter  = require 'proto.converter'
 
 local function updateConfig()
     local new
@@ -183,8 +184,8 @@ proto.on('textDocument/hover', function (params)
     if not files.exists(uri) then
         return nil
     end
-    local offset = files.offsetOfWord(uri, params.position)
-    local hover, source = core.byUri(uri, offset)
+    local pos = converter.unpackPosition(uri, params.position)
+    local hover, source = core.byUri(uri, pos)
     if not hover then
         return nil
     end
@@ -205,8 +206,8 @@ proto.on('textDocument/definition', function (params)
     if not files.exists(uri) then
         return nil
     end
-    local offset = files.offsetOfWord(uri, params.position)
-    local result = core(uri, offset)
+    local pos = converter.unpackPosition(uri, params.position)
+    local result = core(uri, pos)
     if not result then
         return nil
     end
@@ -240,8 +241,8 @@ proto.on('textDocument/typeDefinition', function (params)
     if not files.exists(uri) then
         return nil
     end
-    local offset = files.offsetOfWord(uri, params.position)
-    local result = core(uri, offset)
+    local pos = converter.unpackPosition(uri, params.position)
+    local result = core(uri, pos)
     if not result then
         return nil
     end
@@ -275,8 +276,8 @@ proto.on('textDocument/references', function (params)
     if not files.exists(uri) then
         return nil
     end
-    local offset = files.offsetOfWord(uri, params.position)
-    local result = core(uri, offset)
+    local pos    = converter.unpackPosition(uri, params.position)
+    local result = core(uri, pos)
     if not result then
         return nil
     end
@@ -296,8 +297,8 @@ proto.on('textDocument/documentHighlight', function (params)
     if not files.exists(uri) then
         return nil
     end
-    local offset = files.offsetOfWord(uri, params.position)
-    local result = core(uri, offset)
+    local pos    = converter.unpackPosition(uri, params.position)
+    local result = core(uri, pos)
     if not result then
         return nil
     end
@@ -319,8 +320,8 @@ proto.on('textDocument/rename', function (params)
     if not files.exists(uri) then
         return nil
     end
-    local offset = files.offsetOfWord(uri, params.position)
-    local result = core.rename(uri, offset, params.newName)
+    local pos    = converter.unpackPosition(uri, params.position)
+    local result = core.rename(uri, pos, params.newName)
     if not result then
         return nil
     end
@@ -344,8 +345,8 @@ proto.on('textDocument/prepareRename', function (params)
     if not files.exists(uri) then
         return nil
     end
-    local offset = files.offsetOfWord(uri, params.position)
-    local result = core.prepareRename(uri, offset)
+    local pos    = converter.unpackPosition(uri, params.position)
+    local result = core.prepareRename(uri, pos)
     if not result then
         return nil
     end
@@ -391,8 +392,8 @@ proto.on('textDocument/completion', function (params)
     end
     await.setPriority(1000)
     local clock  = os.clock()
-    local offset = files.offset(uri, params.position)
-    local result = core.completion(uri, offset - 1, triggerCharacter)
+    local pos    = converter.unpackPosition(uri, params.position)
+    local result = core.completion(uri, pos, triggerCharacter)
     local passed = os.clock() - clock
     if passed > 0.1 then
         log.warn(('Completion takes %.3f sec.'):format(passed))
@@ -517,9 +518,9 @@ proto.on('textDocument/signatureHelp', function (params)
     end
     await.close('signatureHelp')
     await.setID('signatureHelp')
-    local offset = files.offset(uri, params.position)
+    local pos = converter.unpackPosition(uri, params.position)
     local core = require 'core.signature'
-    local results = core(uri, offset - 1)
+    local results = core(uri, pos)
     if not results then
         return nil
     end
@@ -599,7 +600,7 @@ proto.on('textDocument/codeAction', function (params)
         return nil
     end
 
-    local start, finish = files.unrange(uri, range)
+    local start, finish = converter.unpackRange(uri, range)
     local results = core(uri, start, finish, diagnostics)
 
     if not results or #results == 0 then
@@ -705,8 +706,7 @@ proto.on('textDocument/semanticTokens/range', function (params)
         start  = 0
         finish = #files.getText(uri)
     else
-        start  = files.offsetOfWord(uri, params.range.start)
-        finish = files.offsetOfWord(uri, params.range['end'])
+        start, finish = converter.unpackRange(uri, params.range)
     end
     local results = core(uri, start, finish)
     return {
@@ -729,8 +729,8 @@ proto.on('textDocument/foldingRange', function (params)
 
     local results = {}
     for _, region in ipairs(regions) do
-        local startLine = files.position(uri, region.start, 'left').line
-        local endLine   = files.position(uri, region.finish, 'right').line
+        local startLine = converter.packPosition(uri, region.start).line
+        local endLine   = converter.packPosition(uri, region.finish).line
         if not region.hideLastLine then
             endLine = endLine - 1
         end
@@ -778,8 +778,8 @@ proto.on('textDocument/onTypeFormatting', function (params)
         return nil
     end
     local core   = require 'core.type-formatting'
-    local offset = files.offset(uri, params.position)
-    local edits  = core(uri, offset - 1, ch)
+    local pos    = converter.unpackPosition(uri, params.position)
+    local edits  = core(uri, pos, ch)
     if not edits or #edits == 0 then
         return nil
     end
@@ -804,13 +804,13 @@ proto.on('$/requestHint', function (params)
     end
     workspace.awaitReady()
     local uri           = params.textDocument.uri
-    local start, finish = files.unrange(uri, params.range)
+    local start, finish = converter.unpackRange(uri, params.range)
     local results = core(uri, start, finish)
     local hintResults = {}
     for i, res in ipairs(results) do
         hintResults[i] = {
             text = res.text,
-            pos  = files.position(uri, res.offset, res.where),
+            pos  = converter.packPosition(uri, res.offset),
             kind = res.kind,
         }
     end
@@ -840,7 +840,7 @@ do
                 for _, edit in ipairs(piece) do
                     edits[#edits+1] = {
                         text = edit.text,
-                        pos  = files.position(uri, edit.offset, edit.where),
+                        pos  = converter.packPosition(uri, edit.offset),
                     }
                 end
             end

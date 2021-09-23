@@ -5,6 +5,7 @@ local define         = require 'proto.define'
 local vm             = require 'vm'
 local util           = require 'utility'
 local guide          = require 'parser.guide'
+local converter      = require 'proto.converter'
 
 local Care = {}
 Care['setglobal'] = function (source, results)
@@ -188,8 +189,8 @@ local function buildTokens(uri, results)
     local lastLine = 0
     local lastStartChar = 0
     for i, source in ipairs(results) do
-        local startPos  = files.position(uri, source.start, 'left')
-        local finishPos = files.position(uri, source.finish, 'right')
+        local startPos  = converter.packPosition(uri, source.start)
+        local finishPos = converter.packPosition(uri, source.finish)
         local line      = startPos.line
         local startChar = startPos.character
         local deltaLine = line - lastLine

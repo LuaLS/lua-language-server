@@ -1,8 +1,9 @@
-local files    = require 'files'
-local lang     = require 'language'
-local util     = require 'utility'
-local sp       = require 'bee.subprocess'
-local guide    = require "parser.guide"
+local files     = require 'files'
+local lang      = require 'language'
+local util      = require 'utility'
+local sp        = require 'bee.subprocess'
+local guide     = require "parser.guide"
+local converter = require 'proto.converter'
 
 local function checkDisableByLuaDocExits(uri, row, mode, code)
     local ast   = files.getState(uri)
@@ -131,8 +132,8 @@ end
 
 local function solveUndefinedGlobal(uri, diag, results)
     local ast    = files.getState(uri)
-    local offset = files.offsetOfWord(uri, diag.range.start)
-    guide.eachSourceContain(ast.ast, offset, function (source)
+    local start  = converter.unpackRange(uri, diag.range)
+    guide.eachSourceContain(ast.ast, start, function (source)
         if source.type ~= 'getglobal' then
             return
         end
@@ -150,8 +151,8 @@ end
 
 local function solveLowercaseGlobal(uri, diag, results)
     local ast    = files.getState(uri)
-    local offset = files.offsetOfWord(uri, diag.range.start)
-    guide.eachSourceContain(ast.ast, offset, function (source)
+    local start  = converter.unpackRange(uri, diag.range)
+    guide.eachSourceContain(ast.ast, start, function (source)
         if source.type ~= 'setglobal' then
             return
         end
@@ -267,7 +268,7 @@ local function solveSyntax(uri, diag, results)
 end
 
 local function solveNewlineCall(uri, diag, results)
-    local start = files.unrange(uri, diag.range)
+    local start = converter.unpackRange(uri, diag.range)
     results[#results+1] = {
         title = lang.script.ACTION_ADD_SEMICOLON,
         kind = 'quickfix',

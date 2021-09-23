@@ -518,6 +518,7 @@ function m.getVisibles(uri)
     end
     local visibles = {}
     for i, range in ipairs(ranges) do
+        -- TODO 改成行号
         local start, finish = m.unrange(uri, range)
         visibles[i] = {
             start  = start,
@@ -542,8 +543,6 @@ local function isNameChar(text)
     end
     return false
 end
-
----@alias position table
 
 --- 将应用差异前的offset转换为应用差异后的offset
 ---@param uri    uri
@@ -626,7 +625,7 @@ function m.position(uri, offset, leftOrRight)
 end
 
 --- 将起点与终点位置转化为 range
----@alias range table
+
 ---@param uri     uri
 ---@param offset1 integer
 ---@param offset2 integer

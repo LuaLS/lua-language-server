@@ -2627,7 +2627,7 @@ local function parseMultiVars(n1, parser, isLocal)
             if not nrest or not nrest[i] then
                 v.redundant = {
                     max    = max,
-                    passed = v + 2,
+                    passed = i + 2,
                 }
                 pushActionIntoCurrentChunk(v)
             end

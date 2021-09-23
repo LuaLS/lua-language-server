@@ -7,7 +7,6 @@ local converter = require 'proto.converter'
 
 local function checkDisableByLuaDocExits(uri, row, mode, code)
     local state = files.getState(uri)
-    local text  = files.getOriginText(uri)
     local lines = state.lines
     if state.ast.docs and lines then
         guide.eachSourceBetween(state.ast.docs, guide.positionOf(row, 0), guide.positionOf(row + 1, 0), function (doc)

@@ -77,7 +77,7 @@ local function testAll()
     test 'command'
     test 'document_symbol'
     test 'code_action'
-    --test 'type_formatting'
+    test 'type_formatting'
     --test 'other'
 end
 

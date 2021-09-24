@@ -16,6 +16,7 @@
 * `CHG` no longer ignore file names case in Windows
 * `CHG` watching library changes
 * `CHG` completion: improve misspelling results
+* `CHG` completion: `Lua.completion.displayContext` default to `0`
 * `FIX` runtime errors
 * `FIX` hint: may show param-2 as `self`
 * `FIX` semantic: may fail when scrolling

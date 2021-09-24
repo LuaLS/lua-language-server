@@ -883,8 +883,8 @@ compileNodeMap = util.switch()
     : call(function (noders, id, source)
         if source.bindSources then
             for _, src in ipairs(source.bindSources) do
-                pushForward(noders, getID(src), id, INFO_REJECT_SET)
-                pushForward(noders, id, getID(src))
+                pushForward(noders, getID(src), id)
+                pushBackward(noders, id, getID(src))
             end
         end
         for _, enumUnit in ipairs(source.enums) do
@@ -898,7 +898,7 @@ compileNodeMap = util.switch()
             pushForward(noders, id, unitID)
             if source.bindSources then
                 for _, src in ipairs(source.bindSources) do
-                    pushBackward(noders, unitID, getID(src), INFO_REJECT_SET)
+                    pushBackward(noders, unitID, getID(src))
                 end
             end
         end
@@ -972,7 +972,7 @@ compileNodeMap = util.switch()
         if source.bindSources then
             for _, src in ipairs(source.bindSources) do
                 pushForward(noders, getID(src), id)
-                pushForward(noders, id, getID(src), INFO_REJECT_SET)
+                pushForward(noders, id, getID(src))
             end
         end
         for _, field in ipairs(source.fields) do

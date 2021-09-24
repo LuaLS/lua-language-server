@@ -21,14 +21,13 @@ local function rawPackPosition(uri, pos)
     }
 end
 
-
-local function diffedPackPosition(uri, originPos)
+local function diffedPackPosition(uri, pos)
     local state        = files.getState(uri)
+    local offset       = guide.positionToOffset(state, pos)
+    local originOffset = files.diffedOffsetBack(uri, offset)
     local originLines  = files.getOriginLines(uri)
-    local originOffset = guide.positionToOffsetByLines(originLines, originPos)
-    local offset       = files.diffedOffsetBack(uri, originOffset)
-    local pos          = guide.offsetToPosition(state, offset)
-    local row, col     = guide.rowColOf(pos)
+    local originPos    = guide.offsetToPositionByLines(originLines, originOffset)
+    local row, col     = guide.rowColOf(originPos)
     if col > 0 then
         local text = files.getOriginText(uri)
         if text then
@@ -80,7 +79,7 @@ local function diffedUnpackPosition(uri, position)
     local state        = files.getState(uri)
     local originPos    = guide.positionOf(row, col)
     local originOffset = guide.positionToOffsetByLines(originLines, originPos)
-    local offset       = files.diffedOffset(originOffset)
+    local offset       = files.diffedOffset(uri, originOffset)
     local pos          = guide.offsetToPosition(state, offset)
     return pos
 end

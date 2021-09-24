@@ -1496,36 +1496,6 @@ local function parseTable()
             goto CONTINUE
         end
         local lastRight = lastRightPosition()
-        if token == '[' then
-            if wantSep then
-                pushError {
-                    type   = 'MISS_SEP_IN_TABLE',
-                    start  = lastRight,
-                    finish = getPosition(Tokens[Index], 'left'),
-                }
-            end
-            wantSep = true
-            index = index + 1
-            local tindex = parseIndex()
-            skipSpace()
-            if expectAssign() then
-                skipSpace()
-                local ivalue = parseExp()
-                tindex.type   = 'tableindex'
-                tindex.parent = tbl
-                if ivalue then
-                    ivalue.parent = tindex
-                    tindex.finish = ivalue.finish
-                    tindex.value  = ivalue
-                else
-                    missExp()
-                end
-                tbl[index] = tindex
-            else
-                missSymbol '='
-            end
-            goto CONTINUE
-        end
 
         local exp = parseExp(true)
         if exp then
@@ -1581,6 +1551,38 @@ local function parseTable()
             tbl[index] = texp
             goto CONTINUE
         end
+
+        if token == '[' then
+            if wantSep then
+                pushError {
+                    type   = 'MISS_SEP_IN_TABLE',
+                    start  = lastRight,
+                    finish = getPosition(Tokens[Index], 'left'),
+                }
+            end
+            wantSep = true
+            index = index + 1
+            local tindex = parseIndex()
+            skipSpace()
+            if expectAssign() then
+                skipSpace()
+                local ivalue = parseExp()
+                tindex.type   = 'tableindex'
+                tindex.parent = tbl
+                if ivalue then
+                    ivalue.parent = tindex
+                    tindex.finish = ivalue.finish
+                    tindex.value  = ivalue
+                else
+                    missExp()
+                end
+                tbl[index] = tindex
+            else
+                missSymbol '='
+            end
+            goto CONTINUE
+        end
+
         missSymbol '}'
         break
         ::CONTINUE::

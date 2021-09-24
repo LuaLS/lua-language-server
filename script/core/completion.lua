@@ -1994,7 +1994,7 @@ local function completion(uri, position, triggerCharacter)
     local results = getCache(uri, position)
     tracy.ZoneEnd()
     if results then
-        return results
+        --return results
     end
     tracy.ZoneBeginN 'completion #1'
     local state = files.getState(uri)

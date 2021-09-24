@@ -905,6 +905,9 @@ compileNodeMap = util.switch()
     end)
     : case 'doc.type.table'
     : call(function (noders, id, source)
+        if source.node then
+            pushForward(noders, id, getID(source.node), INFO_CLASS_TO_EXNTENDS)
+        end
         if source.tkey then
             local keyID = id .. TABLE_KEY
             pushForward(noders, keyID, getID(source.tkey))

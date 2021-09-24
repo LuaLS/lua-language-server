@@ -374,6 +374,12 @@ local function fastForwardToken(offset)
         or myOffset >= offset then
             break
         end
+        local token = Tokens[Index + 1]
+        if NLMap[token] then
+            Line       = Line + 1
+            LineOffset = Tokens[Index] + #token
+            State.lines[Line] = LineOffset
+        end
         Index = Index + 2
     end
 end
@@ -390,14 +396,8 @@ local function resolveLongString(finishMark)
     local stringResult = ssub(Lua, start, finishOffset - 1)
     local lastLN = stringResult:find '[\r\n][^\r\n]*$'
     if lastLN then
-        local result, count = stringResult
-            : gsub('\r\n', '\n')
-            : gsub('[\r\n]', '\n')
-        LineOffset = lastLN + start
-        for i = Line + 1, Line + count do
-            State.lines[i] = LineOffset
-        end
-        Line       = Line + count
+        local result = stringResult
+            : gsub('\r\n?', '\n')
         stringResult = result
     end
     fastForwardToken(finishOffset + #finishMark)

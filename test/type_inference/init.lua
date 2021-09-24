@@ -353,6 +353,13 @@ TEST 'table<string, number>' [[
 local <?x?>
 ]]
 
+TEST 'A<string, number>' [[
+---@class A
+
+---@type A<string, number>
+local <?x?>
+]]
+
 TEST 'table' [[
 self.<?t?>[#self.t+1] = {}
 ]]

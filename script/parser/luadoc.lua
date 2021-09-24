@@ -324,7 +324,7 @@ local function parseTypeUnitTable(parent, node)
     end
     nextSymbolOrError('>')
 
-    node.parent = result;
+    node.parent = result
     result.finish = getFinish()
     result.tkey = key
     result.tvalue = value

@@ -8,6 +8,7 @@
   + `Lua.completion.requireSeparator`
 * `NEW` diagnostics:
   + `different-requires`
+* `NEW` supports `---@CustomClass<string, number>`
 * `CHG` hover: improve showing multi defines
 * `CHG` hover: improve showing multi comments at enums
 * `CHG` hint: `Lua.hint.paramName` now supports `Disable`, `Literal` and `All`

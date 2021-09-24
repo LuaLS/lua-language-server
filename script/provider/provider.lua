@@ -805,6 +805,10 @@ proto.on('textDocument/onTypeFormatting', function (params)
     return results
 end)
 
+proto.on('$/cancelRequest', function (params)
+    await.close('proto:' .. params.id)
+end)
+
 proto.on('$/requestHint', function (params)
     local core = require 'core.hint'
     if not config.get 'Lua.hint.enable' then

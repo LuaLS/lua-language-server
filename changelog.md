@@ -17,6 +17,7 @@
 * `CHG` watching library changes
 * `CHG` completion: improve misspelling results
 * `CHG` completion: `Lua.completion.displayContext` default to `0`
+* `CHG` completion: `autoRequire` has better inserting position
 * `CHG` [#663](https://github.com/sumneko/lua-language-server/issues/663)
 * `FIX` runtime errors
 * `FIX` hint: may show param-2 as `self`

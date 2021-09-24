@@ -15,12 +15,21 @@ local function findInsertRow(uri)
         quot = '"',
         col  = nil,
     }
+    local hasFounded
     for i = 0, #lines do
         local ln = lines[i]
         local lnText = text:match('[^\r\n]*', ln)
         if not lnText:find('require', 1, true) then
-            return i, fmt
+            if hasFounded then
+                return i, fmt
+            end
+            if  not lnText:match '^local%s'
+            and not lnText:match '^%s*$'
+            and not lnText:match '^%-%-' then
+                return i, fmt
+            end
         else
+            hasFounded = true
             local lpPos = lnText:find '%('
             if lpPos then
                 fmt.pair = true

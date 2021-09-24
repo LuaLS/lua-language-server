@@ -904,8 +904,15 @@ local function parseShortString()
             Index = Index + 2
             break
         end
-        if not token
-        or NLMap[token] then
+        if NLMap[token] then
+            stringIndex = stringIndex + 1
+            stringPool[stringIndex] = ssub(Lua, currentOffset, Tokens[Index] - 1)
+            missSymbol(mark)
+            break
+        end
+        if not token then
+            stringIndex = stringIndex + 1
+            stringPool[stringIndex] = ssub(Lua, currentOffset)
             missSymbol(mark)
             break
         end

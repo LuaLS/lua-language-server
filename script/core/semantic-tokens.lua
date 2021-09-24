@@ -5,33 +5,83 @@ local define         = require 'proto.define'
 local vm             = require 'vm'
 local util           = require 'utility'
 local guide          = require 'parser.guide'
+local infer          = require 'core.infer'
+local config         = require 'config'
+
+local isEnhanced = config.get 'Lua.color.mode' == 'SemanticEnhanced'
 
 local Care = {}
-Care['setglobal'] = function (source, results)
-    local isLib = vm.isGlobalLibraryName(source[1])
-    if not isLib then
-        results[#results+1] = {
-            start      = source.start,
-            finish     = source.finish,
-            type       = define.TokenTypes.namespace,
-            modifieres = define.TokenModifiers.deprecated,
-        }
-    end
-end
 Care['getglobal'] = function (source, results)
     local isLib = vm.isGlobalLibraryName(source[1])
-    if not isLib then
-        results[#results+1] =  {
-            start      = source.start,
-            finish     = source.finish,
-            type       = define.TokenTypes.namespace,
-            modifieres = define.TokenModifiers.deprecated,
+    local isFunc = (source.value and source.value.type == 'function') or
+                   (source.next and source.next.type == 'call')
+    local type = isFunc and define.TokenTypes['function'] or define.TokenTypes.variable
+    local modifier = isLib and define.TokenModifiers.defaultLibrary or define.TokenModifiers.static
+
+    results[#results+1] = {
+        start      = source.start,
+        finish     = source.finish,
+        type       = type,
+        modifieres = modifier,
+    }
+end
+Care['setglobal'] = Care['getglobal']
+Care['getmethod'] = function (source, results)
+    local method = source.method
+    if method and method.type == 'method' then
+        results[#results+1] = {
+            start      = method.start,
+            finish     = method.finish,
+            type       = define.TokenTypes.method,
+            modifieres = source.type == 'setmethod' and define.TokenModifiers.declaration or nil,
         }
     end
 end
+Care['setmethod'] = Care['getmethod']
+Care['getfield'] = function (source, results)
+    local field = source.field
+    if not field then
+        return
+    end
+    if isEnhanced and infer.hasType(source.field, 'function') then
+        results[#results+1] = {
+            start      = field.start,
+            finish     = field.finish,
+            type       = define.TokenTypes['function'],
+        }
+        return
+    end
+    if source.dot and (not source.next or source.next.type ~= "call") then
+        results[#results+1] = {
+            start      = field.start,
+            finish     = field.finish,
+            type       = define.TokenTypes.property,
+        }
+        return
+    end
+end
+Care['setfield'] = Care['getfield']
 Care['tablefield'] = function (source, results)
     local field = source.field
     if not field then
+        return
+    end
+    local value = source.value
+    local isFunction = false
+    if value then
+        if isEnhanced then
+            isFunction = value.type == 'function' or infer.hasType(value, 'function')
+        else
+            isFunction = value.type == 'function'
+        end
+    end
+    if isFunction then
+        results[#results+1] = {
+            start      = field.start,
+            finish     = field.finish,
+            type       = define.TokenTypes.method,
+            modifieres = define.TokenModifiers.declaration,
+        }
         return
     end
     results[#results+1] = {
@@ -43,38 +93,31 @@ Care['tablefield'] = function (source, results)
 end
 Care['getlocal'] = function (source, results)
     local loc = source.node
-    -- 1. 值为函数的局部变量
-    local hasFunc
-    local node = loc.node
-    if node then
-        for _, ref in ipairs(node.ref) do
-            local def = ref.value
-            if def.type == 'function' then
-                hasFunc = true
-                break
+    -- 1. 值为函数的局部变量 | Local variable whose value is a function
+    if loc.refs then
+        for _, ref in ipairs(loc.refs) do
+            if ref.value and ref.value.type == 'function' then
+                results[#results+1] = {
+                    start      = source.start,
+                    finish     = source.finish,
+                    type       = define.TokenTypes['function'],
+                }
+                return
             end
         end
     end
-    if hasFunc then
-        results[#results+1] = {
-            start      = source.start,
-            finish     = source.finish,
-            type       = define.TokenTypes.interface,
-            modifieres = define.TokenModifiers.declaration,
-        }
-        return
-    end
-    -- 2. 对象
+    -- 2. 对象 | Object
     if  source.parent.type == 'getmethod'
+    or  source.parent.type == 'setmethod'
     and source.parent.node == source then
         return
     end
-    -- 3. 特殊变量
+    -- 3. 特殊变量 | Special variable
     if source[1] == '_ENV'
     or source[1] == 'self' then
         return
     end
-    -- 4. 函数的参数
+    -- 4. 函数的参数 | Function parameters
     if loc.parent and loc.parent.type == 'funcargs' then
         results[#results+1] = {
             start      = source.start,
@@ -84,7 +127,57 @@ Care['getlocal'] = function (source, results)
         }
         return
     end
-    -- 5. const 变量
+    -- 5. References to other functions
+    if isEnhanced and infer.hasType(loc, 'function') then
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes['function'],
+            modifieres = source.type == 'setlocal' and define.TokenModifiers.declaration or nil,
+        }
+        return
+    end
+    -- 6. Class declaration
+    if isEnhanced then
+        -- search all defs
+        for _, def in ipairs(vm.getDefs(source)) do
+            if def.bindDocs then
+                for i, doc in ipairs(def.bindDocs) do
+                    if doc.type == "doc.class" and doc.bindSources then
+                        for _, src in ipairs(doc.bindSources) do
+                            if src == def then
+                                results[#results+1] = {
+                                    start      = source.start,
+                                    finish     = source.finish,
+                                    type       = define.TokenTypes.class,
+                                }
+                                return
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    else
+        -- only search this local
+        if loc.bindDocs then
+            for i, doc in ipairs(loc.bindDocs) do
+                if doc.type == "doc.class" and doc.bindSources then
+                    for _, src in ipairs(doc.bindSources) do
+                        if src == loc then
+                            results[#results+1] = {
+                                start      = source.start,
+                                finish     = source.finish,
+                                type       = define.TokenTypes.class,
+                            }
+                            return
+                        end
+                    end
+                end
+            end
+        end
+    end
+    -- 6. const 变量 | Const variable
     if loc.attrs then
         for _, attr in ipairs(loc.attrs) do
             local name = attr[1]
@@ -107,20 +200,69 @@ Care['getlocal'] = function (source, results)
             end
         end
     end
-    -- 6. 函数调用
+    -- 7. 函数调用 | Function call
     if  source.parent.type == 'call'
     and source.parent.node == source then
         return
     end
-    -- 7. 其他
+    local isLocal = loc.parent ~= guide.getRoot(loc)
+    -- 8. 其他 | Other
     results[#results+1] = {
         start      = source.start,
         finish     = source.finish,
         type       = define.TokenTypes.variable,
+        modifieres = isLocal and define.TokenModifiers['local'] or nil,
     }
 end
 Care['setlocal'] = Care['getlocal']
-Care['local'] = function (source, results)
+Care['local'] = function (source, results) -- Local declaration, i.e. "local x", "local y = z", or "local function() end"
+    if source[1] == '_ENV'
+    or source[1] == 'self' then
+        return
+    end
+    if source.parent and source.parent.type == 'funcargs' then
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.parameter,
+            modifieres = define.TokenModifiers.declaration,
+        }
+        return
+    end
+    if source.value then
+        local isFunction = false
+
+        if isEnhanced then
+            isFunction = source.value.type == 'function' or infer.hasType(source.value, 'function')
+        else
+            isFunction = source.value.type == 'function'
+        end
+
+        if isFunction then
+            -- Function declaration, either a new one or an alias for another one
+            results[#results+1] = {
+                start      = source.start,
+                finish     = source.finish,
+                type       = define.TokenTypes['function'],
+                modifieres = define.TokenModifiers.declaration,
+            }
+            return
+        end
+    end
+    if source.value and source.value.type == 'table' and source.bindDocs then
+        for _, doc in ipairs(source.bindDocs) do
+            if doc.type == "doc.class" then
+                -- Class declaration (explicit)
+                results[#results+1] = {
+                    start      = source.start,
+                    finish     = source.finish,
+                    type       = define.TokenTypes.class,
+                    modifieres = define.TokenModifiers.declaration,
+                }
+                return
+            end
+        end
+    end
     if source.attrs then
         for _, attr in ipairs(source.attrs) do
             local name = attr[1]
@@ -129,7 +271,7 @@ Care['local'] = function (source, results)
                     start      = source.start,
                     finish     = source.finish,
                     type       = define.TokenTypes.variable,
-                    modifieres = define.TokenModifiers.static,
+                    modifieres = define.TokenModifiers.declaration | define.TokenModifiers.static,
                 }
                 return
             elseif name == 'close' then
@@ -137,12 +279,26 @@ Care['local'] = function (source, results)
                     start      = source.start,
                     finish     = source.finish,
                     type       = define.TokenTypes.variable,
-                    modifieres = define.TokenModifiers.abstract,
+                    modifieres = define.TokenModifiers.declaration | define.TokenModifiers.abstract,
                 }
                 return
             end
         end
     end
+
+    local isLocal = source.parent ~= guide.getRoot(source)
+    local modifiers = define.TokenModifiers.declaration
+
+    if isLocal then
+        modifiers = modifiers | define.TokenModifiers['local']
+    end
+
+    results[#results+1] = {
+        start      = source.start,
+        finish     = source.finish,
+        type       = define.TokenTypes.variable,
+        modifieres = modifiers,
+    }
 end
 Care['doc.return.name'] = function (source, results)
     results[#results+1] = {
@@ -211,6 +367,12 @@ local function buildTokens(uri, results)
     end
     return tokens
 end
+
+config.watch(function (key, value, oldValue)
+    if key == 'Lua.color.mode' then
+        isEnhanced = value == 'SemanticEnhanced'
+    end
+end)
 
 return function (uri, start, finish)
     local ast   = files.getState(uri)

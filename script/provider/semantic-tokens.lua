@@ -108,8 +108,12 @@ end
 
 config.watch(function (key, value)
     if key == 'Lua.color.mode' then
-        if value == 'Semantic' then
-            enable()
+        if value == 'Semantic' or value == 'SemanticEnhanced' then
+            if isEnable then
+                refresh()
+            else
+                enable()
+            end
         else
             disable()
         end

@@ -238,12 +238,14 @@ m.SymbolKind = {
 }
 
 m.TokenModifiers = {
-    ["declaration"]   = 1 << 0,
-    ["documentation"] = 1 << 1,
-    ["static"]        = 1 << 2,
-    ["abstract"]      = 1 << 3,
-    ["deprecated"]    = 1 << 4,
-    ["readonly"]      = 1 << 5,
+    ["declaration"]    = 1 << 0,
+    ["documentation"]  = 1 << 1,
+    ["static"]         = 1 << 2,
+    ["abstract"]       = 1 << 3,
+    ["deprecated"]     = 1 << 4,
+    ["readonly"]       = 1 << 5,
+    ["defaultLibrary"] = 1 << 6,
+    ["local"]          = 1 << 7,
 }
 
 m.TokenTypes = {
@@ -266,6 +268,7 @@ m.TokenTypes = {
     ["parameter"]     = 16,
     ["property"]      = 17,
     ["label"]         = 18,
+    ["method"]        = 19,
 }
 
 m.BuiltIn = {

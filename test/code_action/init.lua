@@ -1,6 +1,7 @@
 local core  = require 'core.code-action'
 local files = require 'files'
 local lang  = require 'language'
+local catch = require 'catch'
 
 rawset(_G, 'TEST', true)
 
@@ -38,11 +39,10 @@ end
 function TEST(script)
     return function (expect)
         files.removeAll()
-        local start  = script:find('<?', 1, true)
-        local finish = script:find('?>', 1, true)
-        local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
-        files.setText('', new_script)
-        local results = core('', start, finish)
+
+        local newScript, catched = catch(script, '?')
+        files.setText('', newScript)
+        local results = core('', catched['?'][1][1], catched['?'][1][2])
         assert(results)
         assert(eq(expect, results))
     end

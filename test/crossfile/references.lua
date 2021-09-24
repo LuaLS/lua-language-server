@@ -1,6 +1,7 @@
 local files = require 'files'
 local furi  = require 'file-uri'
 local core  = require 'core.reference'
+local catch = require 'catch'
 
 rawset(_G, 'TEST', true)
 
@@ -32,21 +33,6 @@ local function eq(a, b)
     return a == b
 end
 
-local function catch_target(script, sep)
-    local list = {}
-    local cur = 1
-    while true do
-        local start, finish  = script:find(('<%%%s.-%%%s>'):format(sep, sep), cur)
-        if not start then
-            break
-        end
-        list[#list+1] = { start + 2, finish - 2 }
-        cur = finish + 1
-    end
-    local new_script = script:gsub(('<%%%s(.-)%%%s>'):format(sep, sep), '  %1  ')
-    return new_script, list
-end
-
 local function founded(targets, results)
     if #targets ~= #results then
         return false
@@ -74,37 +60,9 @@ function TEST(datas)
     local sourceUri
     for i, data in ipairs(datas) do
         local uri = furi.encode(data.path)
-        local new, list = catch_target(data.content, '!')
-        if new ~= data.content or data.target then
-            if data.target then
-                targetList[#targetList+1] = {
-                    data.target[1],
-                    data.target[2],
-                    uri,
-                }
-            else
-                for _, position in ipairs(list) do
-                    targetList[#targetList+1] = {
-                        position[1],
-                        position[2],
-                        uri,
-                    }
-                end
-            end
-            data.content = new
-        end
-        new, list = catch_target(data.content, '~')
-        if new ~= data.content then
-            sourceList = list
-            sourceUri = uri
-            data.content = new
-        end
-        new, list = catch_target(data.content, '?')
-        if new ~= data.content then
-            sourceList = list
-            sourceUri = uri
-            data.content = new
-            for _, position in ipairs(list) do
+        local newScript, catched = catch(data.content, '!?~')
+        if catched['!'] or catched['~'] then
+            for _, position in ipairs(catched['!'] + catched['~']) do
                 targetList[#targetList+1] = {
                     position[1],
                     position[2],
@@ -112,7 +70,11 @@ function TEST(datas)
                 }
             end
         end
-        files.setText(uri, data.content)
+        if catched['?'] or catched['~'] then
+            sourceList = catched['?'] + catched['~']
+            sourceUri = uri
+        end
+        files.setText(uri, newScript)
     end
 
     local sourcePos = (sourceList[1][1] + sourceList[1][2]) // 2
@@ -143,7 +105,7 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            local <?f?> = require 'lib'
+            local <~f~> = require 'lib'
         ]],
     },
 }
@@ -158,7 +120,7 @@ TEST {
     {
         path = 'b.lua',
         content = [[
-            print(<?ROOT?>)
+            print(<~ROOT~>)
         ]],
     },
 }
@@ -167,7 +129,7 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            <?ROOT?> = 1
+            <~ROOT~> = 1
         ]],
     },
     {
@@ -183,7 +145,7 @@ TEST {
         path = 'a.lua',
         content = [[
             local f = require 'lib'
-            local <?o?> = f()
+            local <~o~> = f()
         ]],
     },
     {
@@ -212,7 +174,7 @@ TEST {
             ---@class A
             local mt
 
-            function mt.<?f?>()
+            function mt.<~f~>()
             end
         ]]
     }

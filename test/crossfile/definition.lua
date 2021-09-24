@@ -3,25 +3,9 @@ local furi     = require 'file-uri'
 local core     = require 'core.definition'
 local config   = require 'config'
 local platform = require 'bee.platform'
+local catch    = require 'catch'
 
 rawset(_G, 'TEST', true)
-
-local function catch_target(script, sep)
-    local list = {}
-    local cur = 1
-    local cut = 0
-    while true do
-        local start, finish  = script:find(('<%%%s.-%%%s>'):format(sep, sep), cur)
-        if not start then
-            break
-        end
-        list[#list+1] = { start - cut, finish - 4 - cut }
-        cur = finish + 1
-        cut = cut + 4
-    end
-    local new_script = script:gsub(('<%%%s(.-)%%%s>'):format(sep, sep), '%1')
-    return new_script, list
-end
 
 local function founded(targets, results)
     if #targets ~= #results then
@@ -50,32 +34,26 @@ function TEST(datas)
     local sourceUri
     for i, data in ipairs(datas) do
         local uri = furi.encode(data.path)
-        local new, list = catch_target(data.content, '!')
-        if new ~= data.content or data.target then
-            if data.target then
-                targetList[#targetList+1] = {
-                    data.target[1],
-                    data.target[2],
-                    uri,
-                }
-            else
-                for _, position in ipairs(list) do
-                    targetList[#targetList+1] = {
-                        position[1],
-                        position[2],
-                        uri,
-                    }
-                end
-            end
-            data.content = new
+        local newScript, catched = catch(data.content, '!?~')
+        for _, position in ipairs(catched['!'] or {}) do
+            targetList[#targetList+1] = {
+                position[1],
+                position[2],
+                uri,
+            }
         end
-        new, list = catch_target(data.content, '?')
-        if new ~= data.content then
-            sourceList = list
+        for _, position in ipairs(catched['~'] or {}) do
+            targetList[#targetList+1] = {
+                position[1],
+                position[2],
+                uri,
+            }
+        end
+        if catched['?'] or catched['~'] then
+            sourceList = catched['?'] or catched['~']
             sourceUri = uri
-            data.content = new
         end
-        files.setText(uri, data.content)
+        files.setText(uri, newScript)
     end
 
     local sourcePos = (sourceList[1][1] + sourceList[1][2]) // 2
@@ -98,8 +76,7 @@ end
 TEST {
     {
         path = 'a.lua',
-        content = '',
-        target = {0, 0},
+        content = '<!!>',
     },
     {
         path = 'b.lua',
@@ -110,8 +87,7 @@ TEST {
 TEST {
     {
         path = 'aaa/bbb.lua',
-        content = '',
-        target = {0, 0},
+        content = '<!!>',
     },
     {
         path = 'b.lua',
@@ -122,8 +98,7 @@ TEST {
 TEST {
     {
         path = '@bbb.lua',
-        content = '',
-        target = {0, 0},
+        content = '<!!>',
     },
     {
         path = 'b.lua',
@@ -134,8 +109,7 @@ TEST {
 TEST {
     {
         path = 'aaa/bbb.lua',
-        content = '',
-        target = {0, 0},
+        content = '<!!>',
     },
     {
         path = 'b.lua',
@@ -150,8 +124,7 @@ TEST {
     },
     {
         path = 'b.lua',
-        content = 'local <?t?> = require "a"',
-        target = {7, 7},
+        content = 'local <~t~> = require "a"',
     },
 }
 
@@ -176,8 +149,7 @@ TEST {
     },
     {
         path = 'b.lua',
-        content = 'local <?t?> = require "a"',
-        target = {7, 7},
+        content = 'local <~t~> = require "a"',
     },
 }
 
@@ -245,9 +217,8 @@ TEST {
     {
         path = 'b.lua',
         content = [[
-            local <?t?> = require 'a'
+            local <~t~> = require 'a'
         ]],
-        target = {19, 19},
     },
 }
 

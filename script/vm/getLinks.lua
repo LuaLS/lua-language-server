@@ -6,12 +6,12 @@ local files = require 'files'
 local function getFileLinks(uri)
     local ws    = require 'workspace'
     local links = {}
-    local ast = files.getState(uri)
-    if not ast then
+    local state = files.getState(uri)
+    if not state then
         return links
     end
     tracy.ZoneBeginN('getFileLinks')
-    guide.eachSpecialOf(ast.ast, 'require', function (source)
+    guide.eachSpecialOf(state.ast, 'require', function (source)
         local call = source.parent
         if not call or call.type ~= 'call' then
             return

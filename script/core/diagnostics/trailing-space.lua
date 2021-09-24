@@ -13,40 +13,43 @@ local function isInString(ast, offset)
 end
 
 return function (uri, callback)
-    local ast   = files.getState(uri)
-    if not ast then
+    local state = files.getState(uri)
+    if not state then
         return
     end
     local text  = files.getText(uri)
-    local lines = files.getLines(uri)
-    for i = 1, #lines do
-        local start  = lines[i].start
-        local range  = lines[i].range
-        local lastChar = text:sub(range, range)
+    local lines = state.lines
+    for i = 0, #lines do
+        local startOffset  = lines[i]
+        local finishOffset = text:find('[\r\n]', startOffset) or (#text + 1)
+        local lastOffset   = finishOffset - 1
+        local lastChar     = text:sub(lastOffset, lastOffset)
         if lastChar ~= ' ' and lastChar ~= '\t' then
             goto NEXT_LINE
         end
-        if isInString(ast.ast, range) then
+        local lastPos = guide.offsetToPosition(state, lastOffset)
+        if isInString(state.ast, lastPos) then
             goto NEXT_LINE
         end
-        local first = start
-        for n = range - 1, start, -1 do
+        local firstOffset = startOffset
+        for n = lastOffset - 1, startOffset, -1 do
             local char = text:sub(n, n)
             if char ~= ' ' and char ~= '\t' then
-                first = n + 1
+                firstOffset = n + 1
                 break
             end
         end
-        if first == start then
+        local firstPos = guide.offsetToPosition(state, firstOffset) - 1
+        if firstOffset == startOffset then
             callback {
-                start   = first,
-                finish  = range,
+                start   = firstPos,
+                finish  = lastPos,
                 message = lang.script.DIAG_LINE_ONLY_SPACE,
             }
         else
             callback {
-                start   = first,
-                finish  = range,
+                start   = firstPos,
+                finish  = lastPos,
                 message = lang.script.DIAG_LINE_POST_SPACE,
             }
         end

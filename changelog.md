@@ -8,6 +8,7 @@
   + `Lua.completion.requireSeparator`
 * `NEW` diagnostics:
   + `different-requires`
+* `NEW` supports `---@CustomClass<string, number>`
 * `CHG` hover: improve showing multi defines
 * `CHG` hover: improve showing multi comments at enums
 * `CHG` hint: `Lua.hint.paramName` now supports `Disable`, `Literal` and `All`
@@ -15,10 +16,13 @@
 * `CHG` no longer ignore file names case in Windows
 * `CHG` watching library changes
 * `CHG` completion: improve misspelling results
+* `CHG` completion: `Lua.completion.displayContext` default to `0`
+* `CHG` [#663](https://github.com/sumneko/lua-language-server/issues/663)
 * `FIX` runtime errors
 * `FIX` hint: may show param-2 as `self`
 * `FIX` semantic: may fail when scrolling
 * `FIX` [#660](https://github.com/sumneko/lua-language-server/issues/660)
+* `FIX` [#673](https://github.com/sumneko/lua-language-server/issues/673)
 
 ## 2.3.7
 `2021-8-17`

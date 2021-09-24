@@ -1,7 +1,6 @@
 local core       = require 'core.hover'
-local findSource = require 'core.find-source'
-local getLabel   = require 'core.hover.label'
 local files      = require 'files'
+local catch      = require 'catch'
 
 rawset(_G, 'TEST', true)
 
@@ -23,12 +22,9 @@ local accept = {
 function TEST(script)
     return function (expect)
         files.removeAll()
-        local start  = script:find('<?', 1, true)
-        local finish = script:find('?>', 1, true)
-        local pos = (start + finish) // 2 + 1
-        local new_script = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
-        files.setText('', new_script)
-        local hover = core.byUri('', pos)
+        local newScript, catched = catch(script, '?')
+        files.setText('', newScript)
+        local hover = core.byUri('', catched['?'][1][1])
         assert(hover)
         expect = expect:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
         local label = tostring(hover):match('```lua[\r\n]*(.-)[\r\n]*```'):gsub('\r\n', '\n')
@@ -1702,4 +1698,19 @@ print(b.<?x?>)
 ]]
 [[
 field A.x: any
+]]
+
+TEST [[
+---@class A
+---@field x number
+---@field y number
+
+---@type A<string, number>
+local <?t?>
+]]
+[[
+local t: A<string, number> {
+    x: number,
+    y: number,
+}
 ]]

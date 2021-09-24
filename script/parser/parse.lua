@@ -1,6 +1,7 @@
-local ast = require 'parser.ast'
+local ast     = require 'parser.ast'
+local grammar = require 'parser.grammar'
 
-return function (self, lua, mode, version, options)
+local function buildState(lua, version, options)
     local errs  = {}
     local diags = {}
     local comms = {}
@@ -36,9 +37,19 @@ return function (self, lua, mode, version, options)
             comms[#comms+1] = comment
         end
     }
+    if version == 'Lua 5.1' or version == 'LuaJIT' then
+        state.ENVMode = '@fenv'
+    else
+        state.ENVMode = '_ENV'
+    end
+    return state
+end
+
+return function (lua, mode, version, options)
+    local state = buildState(lua, version, options)
     local clock = os.clock()
     ast.init(state)
-    local suc, res, err = xpcall(self.grammar, debug.traceback, self, lua, mode)
+    local suc, res, err = xpcall(grammar, debug.traceback, lua, mode)
     ast.close()
     if not suc then
         return nil, res

@@ -5,6 +5,7 @@ local config    = require 'config'
 local guide     = require 'parser.guide'
 local noder     = require 'core.noder'
 local collector = require 'core.collector'
+local await     = require 'await'
 
 local requireLike = {
     ['include'] = true,
@@ -35,6 +36,7 @@ return function (uri, callback)
         if node.tag ~= '_ENV' then
             return
         end
+        await.delay()
         local id = 'def:' .. noder.getID(src)
         if not collector.has(id) then
             local message = lang.script('DIAG_UNDEF_GLOBAL', key)

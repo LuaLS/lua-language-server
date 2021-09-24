@@ -7,12 +7,10 @@ local proto    = require 'proto'
 local lang     = require 'language'
 local await    = require 'await'
 local timer    = require 'timer'
-local plugin   = require 'plugin'
 local util     = require 'utility'
 local guide    = require 'parser.guide'
 local smerger  = require 'string-merger'
 local progress = require "progress"
-local client   = require 'client'
 
 local unicode
 
@@ -35,8 +33,6 @@ m.assocMatcher   = nil
 m.globalVersion  = 0
 m.fileCount      = 0
 m.astCount       = 0
-m.linesMap       = setmetatable({}, { __mode = 'v' })
-m.originLinesMap = setmetatable({}, { __mode = 'v' })
 m.astMap         = {} -- setmetatable({}, { __mode = 'v' })
 
 --- 打开文件
@@ -100,6 +96,7 @@ function m.exists(uri)
 end
 
 local function pluginOnSetText(file, text)
+    local plugin   = require 'plugin'
     file._diffInfo = nil
     local suc, result = plugin.dispatch('OnSetText', file.uri, text)
     if not suc then
@@ -115,6 +112,7 @@ local function pluginOnSetText(file, text)
         suc, result, diffs = xpcall(smerger.mergeDiff, log.error, text, result)
         if suc then
             file._diffInfo = diffs
+            file.originLines = parser.lines(text)
             return result
         else
             if DEVELOP and result then
@@ -160,8 +158,6 @@ function m.setText(uri, text, isTrust, instance)
     file.trusted    = isTrust
     file.originText = text
     file.words      = nil
-    m.linesMap[uri] = nil
-    m.originLinesMap[uri] = nil
     m.astMap[uri] = nil
     file.cache = {}
     file.cacheActiveTime = math.huge
@@ -206,8 +202,6 @@ function m.setRawText(uri, text)
     local file = m.fileMap[uri]
     file.text             = text
     file.originText       = text
-    m.linesMap[uri]       = nil
-    m.originLinesMap[uri] = nil
     m.astMap[uri]         = nil
 end
 
@@ -298,6 +292,17 @@ function m.getOriginText(uri)
     return file.originText
 end
 
+--- 获取文件原始行表
+---@param uri uri
+---@return integer[]
+function m.getOriginLines(uri)
+    local file = m.fileMap[uri]
+    if not file then
+        return nil
+    end
+    return file.originLines
+end
+
 function m.getChildFiles(uri)
     local results = {}
     local uris = m.getAllUris()
@@ -321,8 +326,6 @@ function m.remove(uri)
     end
     m.fileMap[uri]        = nil
     m.astMap[uri]         = nil
-    m.linesMap[uri]       = nil
-    m.originLinesMap[uri] = nil
     m._pairsCache         = nil
     m.flushFileCache(uri)
 
@@ -346,7 +349,6 @@ function m.removeAll()
             m.fileCount     = m.fileCount - 1
             m.fileMap[uri]  = nil
             m.astMap[uri]   = nil
-            m.linesMap[uri] = nil
             m.onWatch('remove', uri)
         end
     end
@@ -366,7 +368,6 @@ function m.removeAllClosed()
             m.fileCount     = m.fileCount - 1
             m.fileMap[uri]  = nil
             m.astMap[uri]   = nil
-            m.linesMap[uri] = nil
             m.onWatch('remove', uri)
         end
     end
@@ -419,7 +420,8 @@ function m.eachDll()
 end
 
 function m.compileState(uri, text)
-    local ws = require 'workspace'
+    local ws     = require 'workspace'
+    local client = require 'client'
     if  not m.isOpen(uri)
     and not m.isLibrary(uri)
     and #text >= config.get 'Lua.workspace.preloadFileSize' * 1000 then
@@ -446,14 +448,13 @@ function m.compileState(uri, text)
     local prog <close> = progress.create(lang.script.WINDOW_COMPILING, 0.5)
     prog:setMessage(ws.getRelativePath(uri))
     local clock = os.clock()
-    local state, err = parser:compile(text
-        , 'lua'
+    local state, err = parser.compile(text
+        , 'Lua'
         , config.get 'Lua.runtime.version'
         , {
             special           = config.get 'Lua.runtime.special',
             unicodeName       = config.get 'Lua.runtime.unicodeName',
             nonstandardSymbol = config.get 'Lua.runtime.nonstandardSymbol',
-            delay             = await.delay,
         }
     )
     local passed = os.clock() - clock
@@ -465,7 +466,7 @@ function m.compileState(uri, text)
         state.uri = uri
         state.ast.uri = uri
         local clock = os.clock()
-        parser:luadoc(state)
+        parser.luadoc(state)
         local passed = os.clock() - clock
         if passed > 0.1 then
             log.warn(('Parse LuaDoc of [%s] takes [%.3f] sec, size [%.3f] kb.'):format(uri, passed, #text / 1000))
@@ -529,42 +530,14 @@ function m.getVisibles(uri)
     end
     local visibles = {}
     for i, range in ipairs(ranges) do
-        local start, finish = m.unrange(uri, range)
+        local startRow  = range.start.line
+        local finishRow = range['end'].line
         visibles[i] = {
-            start  = start,
-            finish = finish,
+            start  = guide.positionOf(startRow, 0),
+            finish = guide.positionOf(finishRow, 0),
         }
     end
     return visibles
-end
-
---- 获取文件行信息
----@param uri uri
----@return table lines
-function m.getLines(uri)
-    local file = m.fileMap[uri]
-    if not file then
-        return nil
-    end
-    local lines = m.linesMap[uri]
-    if not lines then
-        lines = parser:lines(file.text)
-        m.linesMap[uri] = lines
-    end
-    return lines
-end
-
-function m.getOriginLines(uri)
-    local file = m.fileMap[uri]
-    if not file then
-        return nil
-    end
-    local lines = m.originLinesMap[uri]
-    if not lines then
-        lines = parser:lines(file.originText)
-        m.originLinesMap[uri] = lines
-    end
-    return lines
 end
 
 function m.getFile(uri)
@@ -581,111 +554,6 @@ local function isNameChar(text)
         return true
     end
     return false
-end
-
----@alias position table
-
---- 获取 position 对应的光标位置
----@param uri      uri
----@param position position
----@param isFinish? boolean
----@return integer
-function m.offset(uri, position, isFinish)
-    local file  = m.getFile(uri)
-    local lines = m.getLines(uri)
-    local text  = m.getText(uri)
-    if not file then
-        return 0
-    end
-    if file._diffInfo then
-        lines = m.getOriginLines(uri)
-        text  = m.getOriginText(uri)
-    end
-    local row = position.line + 1
-    local start, finish, char
-    if row > #lines then
-        start, finish = guide.lineRange(lines, #lines)
-        start = start + 1
-        char = util.utf8Len(text, start, finish)
-    else
-        start, finish = guide.lineRange(lines, row)
-        start = start + 1
-        char = position.character
-    end
-    local utf8Len = util.utf8Len(text, start, finish)
-    local offset
-    if char <= 0 then
-        offset = start
-    else
-        if char >= utf8Len then
-            char = utf8Len
-        end
-        local left  = utf8.offset(text, char,     start)
-        local right = utf8.offset(text, char + 1, start)
-        if isFinish then
-            offset = left
-        else
-            offset = right
-        end
-    end
-    if file._diffInfo then
-        local start, finish = smerger.getOffset(file._diffInfo, offset)
-        if isFinish then
-            offset = finish
-        else
-            offset = start
-        end
-    end
-    return offset
-end
-
---- 获取 position 对应的光标位置(根据附近的单词)
----@param uri uri
----@param position position
----@return integer
-function m.offsetOfWord(uri, position)
-    local file  = m.getFile(uri)
-    local lines = m.getLines(uri)
-    local text  = m.getText(uri)
-    if not file then
-        return 0
-    end
-    if file._diffInfo then
-        lines = m.getOriginLines(uri)
-        text  = m.getOriginText(uri)
-    end
-    local row = position.line + 1
-    local start, finish, char
-    if row > #lines then
-        start, finish = guide.lineRange(lines, #lines)
-        start = start + 1
-        char = util.utf8Len(text, start, finish)
-    else
-        start, finish = guide.lineRange(lines, row)
-        start = start + 1
-        char = position.character
-    end
-    local utf8Len = util.utf8Len(text, start, finish)
-    local offset
-    if char <= 0 then
-        offset = start
-    else
-        if char >= utf8Len then
-            char = utf8Len
-        end
-        local left  = utf8.offset(text, char,     start)
-        local right = utf8.offset(text, char + 1, start)
-        if  isNameChar(text:sub(left, right - 1))
-        and not isNameChar(text:sub(right, right)) then
-            offset = left
-        else
-            offset = right
-        end
-    end
-    if file._diffInfo then
-        offset = smerger.getOffset(file._diffInfo, offset)
-    end
-    return offset
 end
 
 --- 将应用差异前的offset转换为应用差异后的offset
@@ -720,76 +588,12 @@ function m.diffedOffsetBack(uri, offset)
     return smerger.getOffsetBack(file._diffInfo, offset)
 end
 
---- 将光标位置转化为 position
----@param uri uri
----@param offset integer
----@param leftOrRight? '"left"'|'"right"'
----@return position
-function m.position(uri, offset, leftOrRight)
-    local file  = m.getFile(uri)
-    local lines = m.getLines(uri)
-    local text  = m.getText(uri)
+function m.hasDiffed(uri)
+    local file = m.getFile(uri)
     if not file then
-        return {
-            line      = 0,
-            character = 0,
-        }
+        return false
     end
-    if file._diffInfo then
-        local start, finish = smerger.getOffsetBack(file._diffInfo, offset)
-        if leftOrRight == 'right' then
-            offset = finish
-        else
-            offset = start
-        end
-        lines  = m.getOriginLines(uri)
-        text   = m.getOriginText(uri)
-    end
-    local row, col      = guide.positionOf(lines, offset)
-    local start, finish = guide.lineRange(lines, row, true)
-    start = start + 1
-    if col <= finish - start + 1 then
-        local ucol     = util.utf8Len(text, start, start + col - 1)
-        if row < 1 then
-            row = 1
-        end
-        if leftOrRight == 'left' and ucol > 0 then
-            ucol = ucol - 1
-        end
-        return {
-            line      = row - 1,
-            character = ucol,
-        }
-    else
-        return {
-            line      = row - 1,
-            character = util.utf8Len(text, start, finish),
-        }
-    end
-end
-
---- 将起点与终点位置转化为 range
----@alias range table
----@param uri     uri
----@param offset1 integer
----@param offset2 integer
-function m.range(uri, offset1, offset2)
-    local range = {
-        start   = m.position(uri, offset1, 'left'),
-        ['end'] = m.position(uri, offset2, 'right'),
-    }
-    return range
-end
-
---- convert `range` to `offsetStart` and `offsetFinish`
----@param uri   table
----@param range table
----@return integer start
----@return integer finish
-function m.unrange(uri, range)
-    local start  = m.offset(uri, range.start, true)
-    local finish = m.offset(uri, range['end'], false)
-    return start, finish
+    return file._diffInfo ~= nil
 end
 
 --- 获取文件的自定义缓存信息（在文件内容更新后自动失效）
@@ -922,8 +726,6 @@ end
 function m.flushCache()
     for uri, file in pairs(m.fileMap) do
         file.cacheActiveTime = math.huge
-        m.linesMap[uri] = nil
-        m.originLinesMap[uri] = nil
         m.astMap[uri] = nil
         file.cache = {}
     end
@@ -935,8 +737,6 @@ function m.flushFileCache(uri)
         return
     end
     file.cacheActiveTime = math.huge
-    m.linesMap[uri] = nil
-    m.originLinesMap[uri] = nil
     m.astMap[uri] = nil
     file.cache = {}
 end

@@ -12,26 +12,24 @@ local function testIfExit(path)
     config.set('Lua.workspace.preloadFileSize', 1000000000)
     local buf = util.loadFile(path:string())
     if buf then
-        local vm
+        local state
 
         local clock = os.clock()
         local max = 1
         local need
-        local parseClock = 0
         local compileClock = 0
         local luadocClock = 0
         local noderClock = 0
         local total
         for i = 1, max do
-            vm = TEST(buf)
+            state = TEST(buf)
             local luadocStart = os.clock()
-            luadoc(nil, vm)
+            luadoc(state)
             local luadocPassed = os.clock() - luadocStart
             local passed = os.clock() - clock
             local noderStart = os.clock()
             local noderPassed = os.clock() - noderStart
-            parseClock   = parseClock   + vm.parseClock
-            compileClock = compileClock + vm.compileClock
+            compileClock = compileClock + state.compileClock
             luadocClock  = luadocClock  + luadocPassed
             noderClock   = noderClock   + noderPassed
             if passed >= 1.0 or i == max then
@@ -40,10 +38,9 @@ local function testIfExit(path)
                 break
             end
         end
-        print(('基准编译测试[%s]单次耗时：%.10f(解析：%.10f, 编译：%.10f, LuaDoc: %.10f, Noder: %.10f)'):format(
+        print(('基准编译测试[%s]单次耗时：%.10f(解析：%.10f, LuaDoc: %.10f, Noder: %.10f)'):format(
             path:filename():string(),
             need,
-            parseClock / total,
             compileClock / total,
             luadocClock / total,
             noderClock / total
@@ -52,7 +49,6 @@ local function testIfExit(path)
         local clock = os.clock()
         local max = 100
         local need
-        local lines = parser:lines(buf)
         for i = 1, max do
             files.removeAll()
             files.open('')

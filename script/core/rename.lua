@@ -36,12 +36,12 @@ local function isValidFunctionName(str)
     if isValidGlobal(str) then
         return true
     end
-    local pos = str:find(':', 1, true)
-    if not pos then
+    local offset = str:find(':', 1, true)
+    if not offset then
         return false
     end
-    return  isValidGlobal(trim(str:sub(1, pos-1)))
-        and isValidName(trim(str:sub(pos+1)))
+    return  isValidGlobal(trim(str:sub(1, offset-1)))
+        and isValidName(trim(str:sub(offset+1)))
 end
 
 local function isFunctionGlobalName(source)
@@ -81,21 +81,26 @@ local function renameField(source, newname, callback)
     elseif parent.type == 'getmethod' then
         callback(source, source.start, source.finish, newname)
     elseif parent.type == 'setmethod' then
-        local uri  = guide.getUri(source)
-        local text = files.getText(uri)
+        local uri   = guide.getUri(source)
+        local text  = files.getText(uri)
+        local state = files.getState(uri)
         local func = parent.value
         -- function mt:name () end --> mt['newname'] = function (self) end
+        local startOffset  = guide.positionToOffset(state, parent.start) + 1
+        local finishOffset = guide.positionToOffset(state, parent.node.finish)
         local newstr = string.format('%s[%s] = function '
-            , text:sub(parent.start, parent.node.finish)
+            , text:sub(startOffset, finishOffset)
             , util.viewString(newname)
         )
         callback(source, func.start, parent.finish, newstr)
-        local pl = text:find('(', parent.finish, true)
+        local finishOffset = guide.positionToOffset(state, parent.finish)
+        local pl = text:find('(', finishOffset, true)
         if pl then
+            local insertPos = guide.offsetToPosition(state, pl)
             if text:find('^%s*%)', pl + 1) then
-                callback(source, pl + 1, pl, 'self')
+                callback(source, insertPos, insertPos, 'self')
             else
-                callback(source, pl + 1, pl, 'self, ')
+                callback(source, insertPos, insertPos, 'self, ')
             end
         end
     end

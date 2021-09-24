@@ -586,7 +586,7 @@ end
 ---@param lines table
 ---@return integer {name = 'row'}
 ---@return integer {name = 'col'}
-function m.positionOf(lines, offset)
+function m.rowColOf(lines, offset)
     if offset < 1 then
         return 0, 0
     end
@@ -619,7 +619,7 @@ end
 ---@param row integer
 ---@param col integer
 ---@return integer {name = 'offset'}
-function m.offsetOf(lines, row, col)
+function m.positionOf(lines, row, col)
     if row < 1 then
         return 0
     end

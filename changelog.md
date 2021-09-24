@@ -22,6 +22,7 @@
 * `FIX` hint: may show param-2 as `self`
 * `FIX` semantic: may fail when scrolling
 * `FIX` [#660](https://github.com/sumneko/lua-language-server/issues/660)
+* `FIX` [#673](https://github.com/sumneko/lua-language-server/issues/673)
 
 ## 2.3.7
 `2021-8-17`

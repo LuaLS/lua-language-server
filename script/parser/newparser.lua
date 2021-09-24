@@ -1001,9 +1001,10 @@ local function parseShortString()
                 goto CONTINUE
             end
             if NLMap[nextToken] then
+                stringIndex = stringIndex + 1
                 stringPool[stringIndex] = '\n'
                 currentOffset = Tokens[Index] + #nextToken
-                Index = Index + 2
+                skipNL()
                 goto CONTINUE
             end
             pushError {

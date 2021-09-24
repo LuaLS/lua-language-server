@@ -59,7 +59,10 @@ local function rawUnpackPosition(uri, position)
         local text  = files.getText(uri)
         if text then
             local lineOffset = state.lines[row]
-            col = utf8.offset(text, col + 1, lineOffset) - lineOffset
+            local textOffset = utf8.offset(text, col + 1, lineOffset)
+            if textOffset then
+                col = textOffset - lineOffset
+            end
         end
     end
     local pos = guide.positionOf(row, col)
@@ -73,7 +76,10 @@ local function diffedUnpackPosition(uri, position)
         local text  = files.getOriginText(uri)
         if text then
             local lineOffset = originLines[row]
-            col = utf8.offset(text, col + 1, lineOffset) - lineOffset
+            local textOffset = utf8.offset(text, col + 1, lineOffset)
+            if textOffset then
+                col = textOffset - lineOffset
+            end
         end
     end
     local state        = files.getState(uri)

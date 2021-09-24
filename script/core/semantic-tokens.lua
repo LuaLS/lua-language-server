@@ -214,14 +214,14 @@ local function buildTokens(uri, results)
 end
 
 return function (uri, start, finish)
-    local ast   = files.getState(uri)
+    local state = files.getState(uri)
     local text  = files.getText(uri)
-    if not ast then
+    if not state then
         return nil
     end
 
     local results = {}
-    guide.eachSourceBetween(ast.ast, start, finish, function (source)
+    guide.eachSourceBetween(state.ast, start, finish, function (source)
         local method = Care[source.type]
         if not method then
             return
@@ -230,7 +230,7 @@ return function (uri, start, finish)
         await.delay()
     end)
 
-    for _, comm in ipairs(ast.comms) do
+    for _, comm in ipairs(state.comms) do
         if comm.type == 'comment.cshort' then
             results[#results+1] = {
                 start  = comm.start,

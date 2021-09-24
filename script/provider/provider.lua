@@ -166,8 +166,11 @@ proto.on('textDocument/didChange', function (params)
 end)
 
 proto.on('textDocument/hover', function (params)
+    local doc    = params.textDocument
+    local uri    = doc.uri
     await.close 'hover'
     await.setID 'hover'
+    await.setID('update:' .. uri)
     if not workspace.isReady() then
         local count, max = workspace.getLoadProcess()
         return {
@@ -179,8 +182,6 @@ proto.on('textDocument/hover', function (params)
     end
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_HOVER, 0.5)
     local core = require 'core.hover'
-    local doc    = params.textDocument
-    local uri    = doc.uri
     if not files.exists(uri) then
         return nil
     end
@@ -357,8 +358,10 @@ proto.on('textDocument/prepareRename', function (params)
 end)
 
 proto.on('textDocument/completion', function (params)
+    local uri  = params.textDocument.uri
     await.close 'completion'
     await.setID 'completion'
+    await.setID('update:' .. uri)
     if not workspace.isReady() then
         local count, max = workspace.getLoadProcess()
         return {
@@ -378,7 +381,6 @@ proto.on('textDocument/completion', function (params)
     local core  = require 'core.completion'
     --log.debug('textDocument/completion')
     --log.debug('completion:', params.context and params.context.triggerKind, params.context and params.context.triggerCharacter)
-    local uri  = params.textDocument.uri
     if not files.exists(uri) then
         return nil
     end
@@ -475,10 +477,11 @@ proto.on('completionItem/resolve', function (item)
     if not item.data then
         return item
     end
-    await.close 'completion.resolve'
-    await.setID 'completion.resolve'
     local id            = item.data.id
     local uri           = item.data.uri
+    await.close 'completion.resolve'
+    await.setID 'completion.resolve'
+    await.setID('update:' .. uri)
     --await.setPriority(1000)
     local resolved = core.resolve(id)
     if not resolved then
@@ -518,6 +521,7 @@ proto.on('textDocument/signatureHelp', function (params)
     end
     await.close('signatureHelp')
     await.setID('signatureHelp')
+    await.setID('update:' .. uri)
     local pos = converter.unpackPosition(uri, params.position)
     local core = require 'core.signature'
     local results = core(uri, pos)
@@ -649,6 +653,7 @@ proto.on('workspace/symbol', function (params)
 
     await.close('workspace/symbol')
     await.setID('workspace/symbol')
+    await.setID('files.version')
 
     local symbols = core(params.query)
     if not symbols or #symbols == 0 then
@@ -676,12 +681,13 @@ end)
 
 
 proto.on('textDocument/semanticTokens/full', function (params)
-    workspace.awaitReady()
+    local uri = params.textDocument.uri
     await.close('textDocument/semanticTokens/full')
     await.setID('textDocument/semanticTokens/full')
+    await.setID('update:' .. uri)
+    workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
     local core = require 'core.semantic-tokens'
-    local uri = params.textDocument.uri
     local text  = files.getText(uri)
     if not text then
         return nil
@@ -693,12 +699,13 @@ proto.on('textDocument/semanticTokens/full', function (params)
 end)
 
 proto.on('textDocument/semanticTokens/range', function (params)
+    local uri = params.textDocument.uri
+    await.close('textDocument/semanticTokens/range')
+    await.setID('textDocument/semanticTokens/range')
+    await.setID('update:' .. uri)
     workspace.awaitReady()
-    --await.close('textDocument/semanticTokens/range')
-    --await.setID('textDocument/semanticTokens/range')
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_RANGE, 0.5)
     local core = require 'core.semantic-tokens'
-    local uri = params.textDocument.uri
     local cache  = files.getOpenedCache(uri)
     local start, finish
     if cache and not cache['firstSemantic'] then
@@ -722,6 +729,7 @@ proto.on('textDocument/foldingRange', function (params)
     end
     await.close('textDocument/foldingRange')
     await.setID('textDocument/foldingRange')
+    await.setID('update:' .. uri)
     local regions = core(uri)
     if not regions then
         return nil
@@ -826,6 +834,7 @@ do
             return
         end
         await.setID(awaitID)
+        await.setID('update:' .. uri)
         workspace.awaitReady()
         local visibles = files.getVisibles(uri)
         if not visibles then

@@ -42,7 +42,7 @@ local function enable()
                         tokenModifiers = toArray(define.TokenModifiers),
                     },
                     range = true,
-                    full  = false,
+                    full  = true,
                 },
             },
         }
@@ -106,10 +106,10 @@ local function refresh()
     proto.request('workspace/semanticTokens/refresh', json.null)
 end
 
-config.watch(function (key, value)
+config.watch(function (key, value, oldValue)
     if key == 'Lua.color.mode' then
         if value == 'Semantic' or value == 'SemanticEnhanced' then
-            if isEnable then
+            if isEnable and value ~= oldValue then
                 refresh()
             else
                 enable()

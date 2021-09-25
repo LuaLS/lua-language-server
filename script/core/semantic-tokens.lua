@@ -142,7 +142,7 @@ Care['getlocal'] = function (source, results)
         -- search all defs
         for _, def in ipairs(vm.getDefs(source)) do
             if def.bindDocs then
-                for i, doc in ipairs(def.bindDocs) do
+                for _, doc in ipairs(def.bindDocs) do
                     if doc.type == "doc.class" and doc.bindSources then
                         for _, src in ipairs(doc.bindSources) do
                             if src == def then
@@ -368,7 +368,7 @@ local function buildTokens(uri, results)
     return tokens
 end
 
-config.watch(function (key, value, oldValue)
+config.watch(function (key, value)
     if key == 'Lua.color.mode' then
         isEnhanced = value == 'SemanticEnhanced'
     end

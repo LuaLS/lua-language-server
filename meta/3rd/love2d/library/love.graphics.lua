@@ -530,12 +530,13 @@ function love.graphics.newFont(filename) end
 ---
 ---Creates a new Image from a filepath, FileData, an ImageData, or a CompressedImageData, and optionally generates or specifies mipmaps for the image.
 ---
----@overload fun(imageData: love.ImageData):love.Image
----@overload fun(compressedImageData: love.CompressedImageData):love.Image
----@overload fun(filename: string, flags: table):love.Image
+---@overload fun(fileData: love.FileData, flags: table):love.Image
+---@overload fun(imageData: love.ImageData, flags: table):love.Image
+---@overload fun(compressedImageData: love.CompressedImageData, flags: table):love.Image
 ---@param filename string # The filepath to the image file.
----@return love.Image image # An Image object which can be drawn on screen.
-function love.graphics.newImage(filename) end
+---@param flags {dpiscale: number, linear: boolean, mipmaps: boolean} # A table containing the following fields:
+---@return love.Image image # A new Image object which can be drawn on screen.
+function love.graphics.newImage(filename, flags) end
 
 ---
 ---Creates a new specifically formatted image.

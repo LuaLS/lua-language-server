@@ -883,8 +883,8 @@ compileNodeMap = util.switch()
     : call(function (noders, id, source)
         if source.bindSources then
             for _, src in ipairs(source.bindSources) do
-                pushForward(noders, getID(src), id, INFO_REJECT_SET)
-                pushForward(noders, id, getID(src))
+                pushForward(noders, getID(src), id)
+                pushBackward(noders, id, getID(src))
             end
         end
         for _, enumUnit in ipairs(source.enums) do
@@ -898,13 +898,16 @@ compileNodeMap = util.switch()
             pushForward(noders, id, unitID)
             if source.bindSources then
                 for _, src in ipairs(source.bindSources) do
-                    pushBackward(noders, unitID, getID(src), INFO_REJECT_SET)
+                    pushBackward(noders, unitID, getID(src))
                 end
             end
         end
     end)
     : case 'doc.type.table'
     : call(function (noders, id, source)
+        if source.node then
+            pushForward(noders, id, getID(source.node), INFO_CLASS_TO_EXNTENDS)
+        end
         if source.tkey then
             local keyID = id .. TABLE_KEY
             pushForward(noders, keyID, getID(source.tkey))
@@ -969,7 +972,7 @@ compileNodeMap = util.switch()
         if source.bindSources then
             for _, src in ipairs(source.bindSources) do
                 pushForward(noders, getID(src), id)
-                pushForward(noders, id, getID(src), INFO_REJECT_SET)
+                pushForward(noders, id, getID(src))
             end
         end
         for _, field in ipairs(source.fields) do
@@ -1231,6 +1234,55 @@ compileNodeMap = util.switch()
             end
         end
     end)
+    : case 'in'
+    : call(function (noders, id, source)
+        local keys = source.keys
+        local exps = source.exps
+        if not keys or not exps then
+            return
+        end
+        local node   = exps[1]
+        local param1 = exps[2]
+        local param2 = exps[3]
+        if node.type == 'call' then
+            if not param1 then
+                param1 = {
+                    type   = 'select',
+                    dummy  = true,
+                    sindex = 2,
+                    start  = node.start,
+                    finish = node.finish,
+                    vararg = node,
+                    parent = source,
+                }
+                compileCallReturn(noders, node, getID(param1), 2)
+                if not param2 then
+                    param2 = {
+                        type   = 'select',
+                        dummy  = true,
+                        sindex = 3,
+                        start  = node.start,
+                        finish = node.finish,
+                        vararg = node,
+                        parent = source,
+                    }
+                    compileCallReturn(noders, node, getID(param2), 3)
+                end
+            end
+        end
+        local call = {
+            type   = 'call',
+            dummy  = true,
+            start  = source.keyword[3],
+            finish = exps[#exps].finish,
+            node   = node,
+            args   = { param1, param2 },
+            parent = source,
+        }
+        for i = 1, #keys do
+            compileCallReturn(noders, call, getID(keys[i]), i)
+        end
+    end)
     : case 'main'
     : call(function (noders, id, source)
         if source.returns then
@@ -1288,7 +1340,7 @@ function m.compileNode(noders, source)
     local id = getID(source)
     bindValue(noders, source, id)
 
-    if specialMap[source.special] then
+    if id and specialMap[source.special] then
         noders.skip[id] = true
     end
 
@@ -1534,11 +1586,6 @@ local partNodersMap = util.switch()
                 m.compilePartNodes(noders, ref)
             end
         end
-
-        local nxt = source.next
-        if nxt then
-            m.compilePartNodes(noders, nxt)
-        end
     end)
     : case 'setlocal'
     : case 'getlocal'
@@ -1553,6 +1600,14 @@ local partNodersMap = util.switch()
         local parent = source.parent
         if parent.value == source then
             m.compilePartNodes(noders, parent)
+        end
+
+        if parent.type == 'call' then
+            local node = parent.node
+            if node.special == 'rawset'
+            or node.special == 'rawget' then
+                m.compilePartNodes(noders, parent)
+            end
         end
     end)
     : case 'setfield'
@@ -1584,6 +1639,14 @@ local partNodersMap = util.switch()
         local parent = source.parent
         if parent.value == source then
             m.compilePartNodes(noders, parent)
+        end
+
+        if parent.type == 'call' then
+            local node = parent.node
+            if node.special == 'rawset'
+            or node.special == 'rawget' then
+                m.compilePartNodes(noders, parent)
+            end
         end
     end)
     : case 'label'

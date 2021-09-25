@@ -1,24 +1,24 @@
 local files  = require 'files'
 local define = require 'proto.define'
 local lang   = require 'language'
+local guide  = require 'parser.guide'
+local await  = require 'await'
 
-return function (uri, callback, code)
-    local ast = files.getState(uri)
-    if not ast then
+return function (uri, callback)
+    local state = files.getState(uri)
+    if not state then
         return
     end
 
-    local diags = ast.diags[code]
-    if not diags then
-        return
-    end
-
-    for _, info in ipairs(diags) do
-        callback {
-            start   = info.start,
-            finish  = info.finish,
-            tags    = { define.DiagnosticTag.Unnecessary },
-            message = lang.script('DIAG_OVER_MAX_VALUES', info.max, info.passed)
-        }
-    end
+    guide.eachSource(state.ast, function (src)
+        await.delay()
+        if src.redundant then
+            callback {
+                start   = src.start,
+                finish  = src.finish,
+                tags    = { define.DiagnosticTag.Unnecessary },
+                message = lang.script('DIAG_OVER_MAX_VALUES', src.redundant.max, src.redundant.passed)
+            }
+        end
+    end)
 end

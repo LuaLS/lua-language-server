@@ -1,11 +1,12 @@
 local timer = require 'timer'
-local util  = require 'utility'
+
+local wkmt = { __mode = 'k' }
 
 ---@class await
 local m = {}
 m.type = 'await'
 
-m.coMap = setmetatable({}, { __mode = 'k' })
+m.coMap = setmetatable({}, wkmt)
 m.idMap = {}
 m.delayQueue = {}
 m.delayQueueIndex = 1
@@ -74,7 +75,7 @@ function m.setID(id, co)
         return
     end
     if not m.idMap[id] then
-        m.idMap[id] = setmetatable({}, { __mode = 'k' })
+        m.idMap[id] = setmetatable({}, wkmt)
     end
     m.idMap[id][co] = true
 end
@@ -85,6 +86,7 @@ function m.close(id)
     if not map then
         return
     end
+    m.idMap[id] = nil
     for co in pairs(map) do
         if coroutine.status(co) == 'suspended' then
             map[co] = nil

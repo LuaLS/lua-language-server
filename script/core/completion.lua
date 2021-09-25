@@ -53,17 +53,17 @@ local function trim(str)
     return str:match '^%s*(%S+)%s*$'
 end
 
-local function findNearestSource(ast, offset)
+local function findNearestSource(state, position)
     local source
-    guide.eachSourceContain(ast.ast, offset, function (src)
+    guide.eachSourceContain(state.ast, position, function (src)
         source = src
     end)
     return source
 end
 
-local function findNearestTableField(ast, offset)
+local function findNearestTableField(state, position)
     local source
-    guide.eachSourceContain(ast.ast, offset, function (src)
+    guide.eachSourceContain(state.ast, position, function (src)
         if src.type == 'table'
         or src.type == 'tablefield'
         or src.type == 'tableindex'
@@ -74,7 +74,8 @@ local function findNearestTableField(ast, offset)
     return source
 end
 
-local function findParent(ast, text, offset)
+local function findParent(state, text, position)
+    local offset = guide.positionToOffset(state, position)
     for i = offset, 1, -1 do
         local char = text:sub(i, i)
         if lookBackward.isSpace(char) then
@@ -92,11 +93,12 @@ local function findParent(ast, text, offset)
         else
             return nil, nil
         end
-        local anyPos = lookBackward.findAnyPos(text, i-1)
-        if not anyPos then
+        local anyOffset = lookBackward.findAnyOffset(text, i-1)
+        if not anyOffset then
             return nil, nil
         end
-        local parent = guide.eachSourceContain(ast.ast, anyPos, function (source)
+        local anyPos = guide.offsetToPosition(state, anyOffset)
+        local parent = guide.eachSourceContain(state.ast, anyPos, function (source)
             if source.finish == anyPos then
                 return source
             end
@@ -109,9 +111,9 @@ local function findParent(ast, text, offset)
     return nil, nil
 end
 
-local function findParentInStringIndex(ast, text, offset)
+local function findParentInStringIndex(state, text, position)
     local near, nearStart
-    guide.eachSourceContain(ast.ast, offset, function (source)
+    guide.eachSourceContain(state.ast, position, function (source)
         local start = guide.getStartFinish(source)
         if not start then
             return
@@ -169,17 +171,18 @@ local function getSnip(source)
         if def ~= source and def.type == 'function' then
             local uri = guide.getUri(def)
             local text = files.getText(uri)
-            local lines = files.getLines(uri)
+            local state = files.getState(uri)
+            local lines = state.lines
             if not text then
                 goto CONTINUE
             end
             if vm.isMetaFile(uri) then
                 goto CONTINUE
             end
-            local row = guide.positionOf(lines, def.start)
-            local firstRow = lines[row]
-            local lastRow = lines[math.min(row + context - 1, #lines)]
-            local snip = text:sub(firstRow.start, lastRow.finish)
+            local firstRow = guide.rowColOf(def.start)
+            local lastRow  = firstRow + context
+            local lastOffset = lines[lastRow] and (lines[lastRow] - 1) or #text
+            local snip = text:sub(lines[firstRow], lastOffset)
             return snip
         end
         ::CONTINUE::
@@ -222,38 +225,8 @@ local function buildFunction(results, source, value, oop, data)
     end
 end
 
-local function buildInsertRequire(ast, targetUri, stemName)
-    local uri   = guide.getUri(ast.ast)
-    local lines = files.getLines(uri)
-    local text  = files.getText(uri)
-    local start = 1
-    for i = 1, #lines do
-        local ln = lines[i]
-        local lnText = text:sub(ln.start, ln.finish)
-        if not lnText:find('require', 1, true) then
-            start = ln.start
-            break
-        end
-    end
-    local path = furi.decode(targetUri)
-    local visiblePaths = rpath.getVisiblePath(path, config.get 'Lua.runtime.path', true)
-    if not visiblePaths or #visiblePaths == 0 then
-        return nil
-    end
-    table.sort(visiblePaths, function (a, b)
-        return #a.expect < #b.expect
-    end)
-    return {
-        {
-            start   = start,
-            finish  = start - 1,
-            newText = ('local %s = require %q\n'):format(stemName, visiblePaths[1].expect)
-        }
-    }
-end
-
-local function isSameSource(ast, source, pos)
-    if guide.getUri(source) ~= guide.getUri(ast.ast) then
+local function isSameSource(state, source, pos)
+    if guide.getUri(source) ~= guide.getUri(state.ast) then
         return false
     end
     if source.type == 'field'
@@ -283,10 +256,10 @@ local function getParams(func, oop)
     return '(' .. table.concat(args, ', ') .. ')'
 end
 
-local function checkLocal(ast, word, offset, results)
-    local locals = guide.getVisibleLocals(ast.ast, offset)
+local function checkLocal(state, word, position, results)
+    local locals = guide.getVisibleLocals(state.ast, position)
     for name, source in util.sortPairs(locals) do
-        if isSameSource(ast, source, offset) then
+        if isSameSource(state, source, position) then
             goto CONTINUE
         end
         if not matchKey(word, name) then
@@ -330,13 +303,13 @@ local function checkLocal(ast, word, offset, results)
     end
 end
 
-local function checkModule(ast, word, offset, results)
+local function checkModule(state, word, position, results)
     if not config.get 'Lua.completion.autoRequire' then
         return
     end
-    local locals  = guide.getVisibleLocals(ast.ast, offset)
+    local locals  = guide.getVisibleLocals(state.ast, position)
     for uri in files.eachFile() do
-        if uri == guide.getUri(ast.ast) then
+        if uri == guide.getUri(state.ast) then
             goto CONTINUE
         end
         local path = furi.decode(uri)
@@ -347,11 +320,11 @@ local function checkModule(ast, word, offset, results)
         and not config.get 'Lua.diagnostics.globals'[stemName]
         and stemName:match '^[%a_][%w_]*$'
         and matchKey(word, stemName) then
-            local targetAst = files.getState(uri)
-            if not targetAst then
+            local targetState = files.getState(uri)
+            if not targetState then
                 goto CONTINUE
             end
-            local targetReturns = targetAst.ast.returns
+            local targetReturns = targetState.ast.returns
             if not targetReturns then
                 goto CONTINUE
             end
@@ -377,7 +350,7 @@ local function checkModule(ast, word, offset, results)
                     command   = 'lua.autoRequire:' .. sp:get_id(),
                     arguments = {
                         {
-                            uri    = guide.getUri(ast.ast),
+                            uri    = guide.getUri(state.ast),
                             target = uri,
                             name   = stemName,
                         },
@@ -393,7 +366,7 @@ local function checkModule(ast, word, offset, results)
                     return {
                         detail      = buildDetail(targetSource),
                         description = md,
-                        --additionalTextEdits = buildInsertRequire(ast, originUri, stemName),
+                        --additionalTextEdits = buildInsertRequire(state, originUri, stemName),
                     }
                 end)
             }
@@ -402,19 +375,28 @@ local function checkModule(ast, word, offset, results)
     end
 end
 
-local function checkFieldFromFieldToIndex(name, src, parent, word, start, offset)
+local function checkFieldFromFieldToIndex(name, src, parent, word, startPos, position)
     if name:match '^[%a_][%w_]*$' then
         return nil
     end
     local textEdit, additionalTextEdits
-    local uri = guide.getUri(parent)
-    local text = files.getText(uri)
-    local wordStart
+    local uri   = guide.getUri(parent)
+    local text  = files.getText(uri)
+    local state = files.getState(uri)
+    local startOffset = guide.positionToOffset(state, startPos)
+    local offset      = guide.positionToOffset(state, position)
+    local wordStartOffset
     if word == '' then
-        wordStart = text:match('()%S', start + 1) or (offset + 1)
+        wordStartOffset = text:match('()%S', startOffset + 1)
+        if wordStartOffset then
+            wordStartOffset = wordStartOffset - 1
+        else
+            wordStartOffset = offset
+        end
     else
-        wordStart = offset - #word + 1
+        wordStartOffset = offset - #word
     end
+    local wordStartPos = guide.offsetToPosition(state, wordStartOffset)
     local newText
     if vm.getKeyType(src) == 'string' then
         newText = ('[%q]'):format(name)
@@ -422,26 +404,28 @@ local function checkFieldFromFieldToIndex(name, src, parent, word, start, offset
         newText = ('[%s]'):format(name)
     end
     textEdit = {
-        start   = wordStart,
-        finish  = offset,
+        start   = wordStartPos,
+        finish  = position,
         newText = newText,
     }
     local nxt = parent.next
     if nxt then
-        local dotStart
+        local dotStart, dotFinish
         if nxt.type == 'setfield'
         or nxt.type == 'getfield'
         or nxt.type == 'tablefield' then
             dotStart = nxt.dot.start
+            dotFinish = nxt.dot.finish
         elseif nxt.type == 'setmethod'
         or     nxt.type == 'getmethod' then
             dotStart = nxt.colon.start
+            dotFinish = nxt.colon.finish
         end
         if dotStart then
             additionalTextEdits = {
                 {
                     start   = dotStart,
-                    finish  = dotStart,
+                    finish  = dotFinish,
                     newText = '',
                 }
             }
@@ -457,7 +441,7 @@ local function checkFieldFromFieldToIndex(name, src, parent, word, start, offset
     return textEdit, additionalTextEdits
 end
 
-local function checkFieldThen(name, src, word, start, offset, parent, oop, results)
+local function checkFieldThen(name, src, word, startPos, position, parent, oop, results)
     local value = searcher.getObjectValue(src) or src
     local kind = define.CompletionItemKind.Field
     if value.type == 'function'
@@ -494,11 +478,11 @@ local function checkFieldThen(name, src, word, start, offset, parent, oop, resul
         local str = parent.next.index
         textEdit = {
             start   = str.start + #str[2],
-            finish  = offset,
+            finish  = position,
             newText = name,
         }
     else
-        textEdit, additionalTextEdits = checkFieldFromFieldToIndex(name, src, parent, word, start, offset)
+        textEdit, additionalTextEdits = checkFieldFromFieldToIndex(name, src, parent, word, startPos, position)
     end
     results[#results+1] = {
         label      = name,
@@ -515,7 +499,7 @@ local function checkFieldThen(name, src, word, start, offset, parent, oop, resul
     }
 end
 
-local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results, locals, isGlobal)
+local function checkFieldOfRefs(refs, state, word, startPos, position, parent, oop, results, locals, isGlobal)
     local fields = {}
     local funcs  = {}
     local count = 0
@@ -524,7 +508,7 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
         if not name then
             goto CONTINUE
         end
-        if isSameSource(ast, src, start) then
+        if isSameSource(state, src, startPos) then
             goto CONTINUE
         end
         if isGlobal and locals and locals[name] then
@@ -573,29 +557,29 @@ local function checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, res
     end
     for name, src in util.sortPairs(fields) do
         if src then
-            checkFieldThen(name, src, word, start, offset, parent, oop, results)
+            checkFieldThen(name, src, word, startPos, position, parent, oop, results)
         end
     end
 end
 
-local function checkGlobal(ast, word, start, offset, parent, oop, results)
-    local locals = guide.getVisibleLocals(ast.ast, offset)
+local function checkGlobal(state, word, startPos, position, parent, oop, results)
+    local locals = guide.getVisibleLocals(state.ast, position)
     local globals = vm.getGlobalSets '*'
-    checkFieldOfRefs(globals, ast, word, start, offset, parent, oop, results, locals, 'global')
+    checkFieldOfRefs(globals, state, word, startPos, position, parent, oop, results, locals, 'global')
 end
 
-local function checkField(ast, word, start, offset, parent, oop, results)
+local function checkField(state, word, start, position, parent, oop, results)
     if parent.tag == '_ENV' or parent.special == '_G' then
         local globals = vm.getGlobalSets '*'
-        checkFieldOfRefs(globals, ast, word, start, offset, parent, oop, results)
+        checkFieldOfRefs(globals, state, word, start, position, parent, oop, results)
     else
         local refs = vm.getRefs(parent, '*')
-        checkFieldOfRefs(refs, ast, word, start, offset, parent, oop, results)
+        checkFieldOfRefs(refs, state, word, start, position, parent, oop, results)
     end
 end
 
-local function checkTableField(ast, word, start, results)
-    local source = guide.eachSourceContain(ast.ast, start, function (source)
+local function checkTableField(state, word, start, results)
+    local source = guide.eachSourceContain(state.ast, start, function (source)
         if  source.start == start
         and source.parent
         and source.parent.type == 'table' then
@@ -606,7 +590,7 @@ local function checkTableField(ast, word, start, results)
         return
     end
     local used = {}
-    guide.eachSourceType(ast.ast, 'tablefield', function (src)
+    guide.eachSourceType(state.ast, 'tablefield', function (src)
         if not src.field then
             return
         end
@@ -623,7 +607,7 @@ local function checkTableField(ast, word, start, results)
     end)
 end
 
-local function checkCommon(myUri, word, text, offset, results)
+local function checkCommon(myUri, word, text, position, results)
     local showWord = config.get 'Lua.completion.showWord'
     if showWord == 'Disable' then
         return
@@ -691,11 +675,14 @@ local function checkCommon(myUri, word, text, offset, results)
             end
         end
     end
-    for str, pos in text:gmatch '([%a_][%w_]+)()' do
+    local state = files.getState(myUri)
+    for str, offset in text:gmatch '([%a_][%w_]+)()' do
         if #results >= 100 then
             break
         end
-        if #str >= 3 and not used[str] and pos - 1 ~= offset then
+        if  #str >= 3
+        and not used[str]
+        and guide.offsetToPosition(state, offset - 1) ~= position then
             used[str] = true
             if matchKey(word, str) then
                 results[#results+1] = {
@@ -710,26 +697,26 @@ local function checkCommon(myUri, word, text, offset, results)
     end
 end
 
-local function isInString(ast, offset)
-    return guide.eachSourceContain(ast.ast, offset, function (source)
+local function isInString(state, position)
+    return guide.eachSourceContain(state.ast, position, function (source)
         if source.type == 'string' then
             return true
         end
     end)
 end
 
-local function checkKeyWord(ast, text, start, offset, word, hasSpace, afterLocal, results)
+local function checkKeyWord(state, text, start, position, word, hasSpace, afterLocal, results)
     local snipType = config.get 'Lua.completion.keywordSnippet'
-    local symbol = lookBackward.findSymbol(text, start - 1)
+    local symbol = lookBackward.findSymbol(text, guide.positionToOffset(state, start))
     local isExp = symbol == '(' or symbol == ',' or symbol == '='
     local info = {
         hasSpace = hasSpace,
         isExp    = isExp,
         text     = text,
         start    = start,
-        uri      = guide.getUri(ast.ast),
-        offset   = offset,
-        ast      = ast,
+        uri      = guide.getUri(state.ast),
+        position   = position,
+        state    = state,
     }
     for _, data in ipairs(keyWordMap) do
         local key = data[1]
@@ -789,9 +776,9 @@ local function checkKeyWord(ast, text, start, offset, word, hasSpace, afterLocal
     end
 end
 
-local function checkProvideLocal(ast, word, start, results)
+local function checkProvideLocal(state, word, start, results)
     local block
-    guide.eachSourceContain(ast.ast, start, function (source)
+    guide.eachSourceContain(state.ast, start, function (source)
         if source.type == 'function'
         or source.type == 'main' then
             block = source
@@ -825,8 +812,8 @@ local function checkProvideLocal(ast, word, start, results)
     end)
 end
 
-local function checkFunctionArgByDocParam(ast, word, start, results)
-    local func = guide.eachSourceContain(ast.ast, start, function (source)
+local function checkFunctionArgByDocParam(state, word, startPos, results)
+    local func = guide.eachSourceContain(state.ast, startPos, function (source)
         if source.type == 'function' then
             return source
         end
@@ -846,7 +833,7 @@ local function checkFunctionArgByDocParam(ast, word, start, results)
     end
     local firstArg = func.args and func.args[1]
     if not firstArg
-    or firstArg.start <= start and firstArg.finish >= start then
+    or firstArg.start <= startPos and firstArg.finish >= startPos then
         local firstParam = params[1]
         if firstParam and matchKey(word, firstParam.param[1]) then
             local label = {}
@@ -870,16 +857,17 @@ local function checkFunctionArgByDocParam(ast, word, start, results)
     end
 end
 
-local function isAfterLocal(text, start)
-    local pos = lookBackward.skipSpace(text, start-1)
-    local word = lookBackward.findWord(text, pos)
+local function isAfterLocal(state, text, startPos)
+    local offset = guide.positionToOffset(state, startPos)
+    local pos    = lookBackward.skipSpace(text, offset)
+    local word   = lookBackward.findWord(text, pos)
     return word == 'local'
 end
 
-local function checkUri(ast, text, offset, results)
+local function checkUri(state, text, position, results)
     local collect = {}
-    local myUri = guide.getUri(ast.ast)
-    guide.eachSourceContain(ast.ast, offset, function (source)
+    local myUri = guide.getUri(state.ast)
+    guide.eachSourceContain(state.ast, position, function (source)
         if source.type ~= 'string' then
             return
         end
@@ -910,7 +898,7 @@ local function checkUri(ast, text, offset, results)
                             collect[info.expect] = {
                                 textEdit = {
                                     start   = source.start + #source[2],
-                                    finish  = offset,
+                                    finish  = position,
                                     newText = info.expect,
                                 }
                             }
@@ -996,23 +984,27 @@ local function checkUri(ast, text, offset, results)
     end
 end
 
-local function checkLenPlusOne(ast, text, offset, results)
-    guide.eachSourceContain(ast.ast, offset, function (source)
+local function checkLenPlusOne(state, text, position, results)
+    guide.eachSourceContain(state.ast, position, function (source)
         if source.type == 'getindex'
         or source.type == 'setindex' then
-            local _, pos = text:find('%s*%[%s*%#', source.node.finish)
-            if not pos then
+            local finish = guide.positionToOffset(state, source.node.finish)
+            local _, offset = text:find('%s*%[%s*%#', finish)
+            if not offset then
                 return
             end
-            local nodeText = text:sub(source.node.start, source.node.finish)
-            local writingText = trim(text:sub(pos + 1, offset - 1)) or ''
+            local start = guide.positionToOffset(state, source.node.start) + 1
+            local nodeText = text:sub(start, finish)
+            local writingText = trim(text:sub(offset + 1, guide.positionToOffset(state, position))) or ''
             if not matchKey(writingText, nodeText) then
                 return
             end
+            local offsetPos = guide.offsetToPosition(state, offset) - 1
             if source.parent == guide.getParentBlock(source) then
+                local sourceFinish = guide.positionToOffset(state, source.finish)
                 -- state
-                local label = text:match('%#[ \t]*', pos) .. nodeText .. '+1'
-                local eq = text:find('^%s*%]?%s*%=', source.finish)
+                local label = text:match('%#[ \t]*', offset) .. nodeText .. '+1'
+                local eq = text:find('^%s*%]?%s*%=', sourceFinish)
                 local newText = label .. ']'
                 if not eq then
                     newText = newText .. ' = '
@@ -1022,20 +1014,20 @@ local function checkLenPlusOne(ast, text, offset, results)
                     match    = nodeText,
                     kind     = define.CompletionItemKind.Snippet,
                     textEdit = {
-                        start   = pos,
+                        start   = offsetPos,
                         finish  = source.finish,
                         newText = newText,
                     },
                 }
             else
                 -- exp
-                local label = text:match('%#[ \t]*', pos) .. nodeText
+                local label = text:match('%#[ \t]*', offset) .. nodeText
                 local newText = label .. ']'
                 results[#results+1] = {
                     label    = label,
                     kind     = define.CompletionItemKind.Snippet,
                     textEdit = {
-                        start   = pos,
+                        start   = offsetPos,
                         finish  = source.finish,
                         newText = newText,
                     },
@@ -1049,7 +1041,7 @@ local function tryLabelInString(label, source)
     if not source or source.type ~= 'string' then
         return label
     end
-    local str = parser:grammar(label, 'String')
+    local str = parser.grammar(label, 'String')
     if not str then
         return label
     end
@@ -1084,7 +1076,7 @@ local function mergeEnums(a, b, source)
     end
 end
 
-local function checkTypingEnum(ast, text, offset, defs, str, results)
+local function checkTypingEnum(state, text, position, defs, str, results)
     local enums = {}
     for _, def in ipairs(defs) do
         if def.type == 'doc.type.enum'
@@ -1106,21 +1098,21 @@ local function checkTypingEnum(ast, text, offset, defs, str, results)
     end
 end
 
-local function checkEqualEnumLeft(ast, text, offset, source, results)
+local function checkEqualEnumLeft(state, text, position, source, results)
     if not source then
         return
     end
-    local str = guide.eachSourceContain(ast.ast, offset, function (src)
+    local str = guide.eachSourceContain(state.ast, position, function (src)
         if src.type == 'string' then
             return src
         end
     end)
     local defs = vm.getDefs(source)
-    checkTypingEnum(ast, text, offset, defs, str, results)
+    checkTypingEnum(state, text, position, defs, str, results)
 end
 
-local function checkEqualEnum(ast, text, offset, results)
-    local start =  lookBackward.findTargetSymbol(text, offset, '=')
+local function checkEqualEnum(state, text, position, results)
+    local start =  lookBackward.findTargetSymbol(text, guide.positionToOffset(state, position), '=')
     if not start then
         return
     end
@@ -1131,7 +1123,7 @@ local function checkEqualEnum(ast, text, offset, results)
         eqOrNeq = true
     end
     start = lookBackward.skipSpace(text, start - 1)
-    local source = findNearestSource(ast, start)
+    local source = findNearestSource(state, guide.offsetToPosition(state, start))
     if not source then
         return
     end
@@ -1141,11 +1133,11 @@ local function checkEqualEnum(ast, text, offset, results)
     if source.type == 'call' and not eqOrNeq then
         return
     end
-    checkEqualEnumLeft(ast, text, offset, source, results)
+    checkEqualEnumLeft(state, text, position, source, results)
 end
 
-local function checkEqualEnumInString(ast, text, offset, results)
-    local source = findNearestSource(ast, offset)
+local function checkEqualEnumInString(state, text, position, results)
+    local source = findNearestSource(state, position)
     local parent = source.parent
     if parent.type == 'binary' then
         if source ~= parent[2] then
@@ -1157,118 +1149,123 @@ local function checkEqualEnumInString(ast, text, offset, results)
         if parent.op.type ~= '==' and parent.op.type ~= '~=' then
             return
         end
-        checkEqualEnumLeft(ast, text, offset, parent[1], results)
+        checkEqualEnumLeft(state, text, position, parent[1], results)
     end
     if parent.type == 'local' then
-        checkEqualEnumLeft(ast, text, offset, parent, results)
+        checkEqualEnumLeft(state, text, position, parent, results)
     end
     if parent.type == 'setlocal'
     or parent.type == 'setglobal'
     or parent.type == 'setfield'
     or parent.type == 'setindex' then
-        checkEqualEnumLeft(ast, text, offset, parent.node, results)
+        checkEqualEnumLeft(state, text, position, parent.node, results)
     end
 end
 
-local function isFuncArg(ast, offset)
-    return guide.eachSourceContain(ast.ast, offset, function (source)
+local function isFuncArg(state, position)
+    return guide.eachSourceContain(state.ast, position, function (source)
         if source.type == 'funcargs' then
             return true
         end
     end)
 end
 
-local function trySpecial(ast, text, offset, results)
-    if isInString(ast, offset) then
-        checkUri(ast, text, offset, results)
-        checkEqualEnumInString(ast, text, offset, results)
+local function trySpecial(state, text, position, results)
+    if isInString(state, position) then
+        checkUri(state, text, position, results)
+        checkEqualEnumInString(state, text, position, results)
         return
     end
     -- x[#x+1]
-    checkLenPlusOne(ast, text, offset, results)
+    checkLenPlusOne(state, text, position, results)
     -- type(o) ==
-    checkEqualEnum(ast, text, offset, results)
+    checkEqualEnum(state, text, position, results)
 end
 
-local function tryIndex(ast, text, offset, results)
-    local parent, oop = findParentInStringIndex(ast, text, offset)
+local function tryIndex(state, text, position, results)
+    local parent, oop = findParentInStringIndex(state, text, position)
     if not parent then
         return
     end
     local word = parent.next.index[1]
-    checkField(ast, word, offset, offset, parent, oop, results)
+    checkField(state, word, position, position, parent, oop, results)
 end
 
-local function tryWord(ast, text, offset, triggerCharacter, results)
+local function tryWord(state, text, position, triggerCharacter, results)
+    local offset = guide.positionToOffset(state, position)
     local finish = lookBackward.skipSpace(text, offset)
     local word, start = lookBackward.findWord(text, offset)
+    local startPos
     if not word then
         if triggerCharacter == nil then
             word = ''
-            start = offset + 1
+            startPos = position + 1
         else
             return nil
         end
+    else
+        startPos = guide.offsetToPosition(state, start - 1)
     end
     local hasSpace = triggerCharacter ~= nil and finish ~= offset
-    if isInString(ast, offset) then
+    if isInString(state, position) then
         if not hasSpace then
             if #results == 0 then
-                checkCommon(ast.uri, word, text, offset, results)
+                checkCommon(state.uri, word, text, position, results)
             end
         end
     else
-        local parent, oop = findParent(ast, text, start - 1)
+        local parent, oop = findParent(state, text, startPos)
         if parent then
             if not hasSpace then
-                checkField(ast, word, start, offset, parent, oop, results)
+                checkField(state, word, startPos, position, parent, oop, results)
             end
-        elseif isFuncArg(ast, offset) then
-            checkProvideLocal(ast, word, start, results)
-            checkFunctionArgByDocParam(ast, word, start, results)
+        elseif isFuncArg(state, position) then
+            checkProvideLocal(state, word, startPos, results)
+            checkFunctionArgByDocParam(state, word, startPos, results)
         else
-            local afterLocal = isAfterLocal(text, start)
-            local stop = checkKeyWord(ast, text, start, offset, word, hasSpace, afterLocal, results)
+            local afterLocal = isAfterLocal(state, text, startPos)
+            local stop = checkKeyWord(state, text, startPos, position, word, hasSpace, afterLocal, results)
             if stop then
                 return
             end
             if not hasSpace then
                 if afterLocal then
-                    checkProvideLocal(ast, word, start, results)
+                    checkProvideLocal(state, word, startPos, results)
                 else
-                    checkLocal(ast, word, start, results)
-                    checkTableField(ast, word, start, results)
-                    local env = guide.getENV(ast.ast, start)
-                    checkGlobal(ast, word, start, offset, env, false, results)
-                    checkModule(ast, word, start, results)
+                    checkLocal(state, word, startPos, results)
+                    checkTableField(state, word, startPos, results)
+                    local env = guide.getENV(state.ast, startPos)
+                    checkGlobal(state, word, startPos, position, env, false, results)
+                    checkModule(state, word, startPos, results)
                 end
             end
         end
         if not hasSpace then
-            checkCommon(ast.uri, word, text, offset, results)
+            checkCommon(state.uri, word, text, position, results)
         end
     end
 end
 
-local function trySymbol(ast, text, offset, results)
-    local symbol, start = lookBackward.findSymbol(text, offset)
+local function trySymbol(state, text, position, results)
+    local symbol, start = lookBackward.findSymbol(text, guide.positionToOffset(state, position))
     if not symbol then
         return nil
     end
-    if isInString(ast, offset) then
+    if isInString(state, position) then
         return nil
     end
+    local startPos = guide.offsetToPosition(state, start)
     if symbol == '.'
     or symbol == ':' then
-        local parent, oop = findParent(ast, text, start)
+        local parent, oop = findParent(state, text, startPos)
         if parent then
             tracy.ZoneBeginN 'completion.trySymbol'
-            checkField(ast, '', start, offset, parent, oop, results)
+            checkField(state, '', startPos, position, parent, oop, results)
             tracy.ZoneEnd()
         end
     end
     if symbol == '(' then
-        checkFunctionArgByDocParam(ast, '', start, results)
+        checkFunctionArgByDocParam(state, '', startPos, results)
     end
 end
 
@@ -1354,9 +1351,9 @@ local function getCallEnumsAndFuncs(source, index, oop)
     end
 end
 
-local function findCall(ast, text, offset)
+local function findCall(state, text, position)
     local call
-    guide.eachSourceContain(ast.ast, offset, function (src)
+    guide.eachSourceContain(state.ast, position, function (src)
         if src.type == 'call' then
             if not call or call.start < src.start then
                 call = src
@@ -1366,13 +1363,13 @@ local function findCall(ast, text, offset)
     return call
 end
 
-local function getCallArgInfo(call, text, offset)
+local function getCallArgInfo(call, text, position)
     if not call.args then
         return 1, nil, nil
     end
     local oop = call.node.type == 'getmethod'
     for index, arg in ipairs(call.args) do
-        if arg.start <= offset and arg.finish >= offset then
+        if arg.start <= position and arg.finish >= position then
             return index, arg, oop
         end
     end
@@ -1391,7 +1388,7 @@ local function getFuncParamByCallIndex(func, index)
     return func.args[index]
 end
 
-local function checkTableLiteralField(ast, text, offset, tbl, fields, results)
+local function checkTableLiteralField(state, text, position, tbl, fields, results)
     local mark = {}
     for _, field in ipairs(tbl) do
         if field.type == 'tablefield'
@@ -1407,9 +1404,9 @@ local function checkTableLiteralField(ast, text, offset, tbl, fields, results)
         return guide.getKeyName(a) < guide.getKeyName(b)
     end)
     -- {$}
-    local left = lookBackward.findWord(text, offset)
+    local left = lookBackward.findWord(text, guide.positionToOffset(state, position))
     if not left then
-        local pos = lookBackward.findAnyPos(text, offset)
+        local pos = lookBackward.findAnyOffset(text, guide.positionToOffset(state, position))
         local char = text:sub(pos, pos)
         if char == '{' or char == ',' or char == ';' then
             left = ''
@@ -1435,8 +1432,8 @@ local function checkTableLiteralField(ast, text, offset, tbl, fields, results)
     end
 end
 
-local function checkTableLiteralFieldByCall(ast, text, offset, call, defs, index, results)
-    local source = findNearestTableField(ast, offset)
+local function checkTableLiteralFieldByCall(state, text, position, call, defs, index, results)
+    local source = findNearestTableField(state, position)
     if not source then
         return
     end
@@ -1469,16 +1466,16 @@ local function checkTableLiteralFieldByCall(ast, text, offset, call, defs, index
         end
         ::CONTINUE::
     end
-    checkTableLiteralField(ast, text, offset, tbl, fields, results)
+    checkTableLiteralField(state, text, position, tbl, fields, results)
 end
 
-local function tryCallArg(ast, text, offset, results)
-    local call = findCall(ast, text, offset)
+local function tryCallArg(state, text, position, results)
+    local call = findCall(state, text, position)
     if not call then
         return
     end
     local myResults = {}
-    local argIndex, arg, oop = getCallArgInfo(call, text, offset)
+    local argIndex, arg, oop = getCallArgInfo(call, text, position)
     if arg and arg.type == 'function' then
         return
     end
@@ -1493,12 +1490,11 @@ local function tryCallArg(ast, text, offset, results)
     for _, enum in ipairs(myResults) do
         results[#results+1] = enum
     end
-    checkTableLiteralFieldByCall(ast, text, offset, call, defs, argIndex, results)
+    checkTableLiteralFieldByCall(state, text, position, call, defs, argIndex, results)
 end
 
-local function tryTable(ast, text, offset, results)
-    offset = lookBackward.skipSpace(text, offset)
-    local source = findNearestTableField(ast, offset)
+local function tryTable(state, text, position, results)
+    local source = findNearestTableField(state, position)
     if not source then
         return
     end
@@ -1521,21 +1517,21 @@ local function tryTable(ast, text, offset, results)
             fields[#fields+1] = field
         end
     end
-    checkTableLiteralField(ast, text, offset, tbl, fields, results)
+    checkTableLiteralField(state, text, position, tbl, fields, results)
 end
 
-local function getComment(ast, offset)
-    for _, comm in ipairs(ast.comms) do
-        if offset >= comm.start - 2 and offset <= comm.finish then
+local function getComment(state, position)
+    for _, comm in ipairs(state.comms) do
+        if position > comm.start and position <= comm.finish then
             return comm
         end
     end
     return nil
 end
 
-local function getLuaDoc(ast, offset)
-    for _, doc in ipairs(ast.ast.docs) do
-        if offset >= doc.start and offset <= doc.range then
+local function getLuaDoc(state, position)
+    for _, doc in ipairs(state.ast.docs) do
+        if position >= doc.start and position <= doc.range then
             return doc
         end
     end
@@ -1568,28 +1564,28 @@ local function tryLuaDocCate(word, results)
     end
 end
 
-local function getLuaDocByContain(ast, offset)
+local function getLuaDocByContain(state, position)
     local result
     local range = math.huge
-    guide.eachSourceContain(ast.ast.docs, offset, function (src)
+    guide.eachSourceContain(state.ast.docs, position, function (src)
         if not src.start then
             return
         end
-        if  range  >= offset - src.start
-        and offset <= src.finish then
-            range = offset - src.start
+        if  range  >= position - src.start
+        and position <= src.finish then
+            range = position - src.start
             result = src
         end
     end)
     return result
 end
 
-local function getLuaDocByErr(ast, text, start, offset)
+local function getLuaDocByErr(state, text, start, position)
     local targetError
-    for _, err in ipairs(ast.errs) do
-        if  err.finish <= offset
+    for _, err in ipairs(state.errs) do
+        if  err.finish <= position
         and err.start >= start  then
-            if not text:sub(err.finish + 1, offset):find '%S' then
+            if not text:sub(err.finish + 1, position):find '%S' then
                 targetError = err
                 break
             end
@@ -1599,8 +1595,8 @@ local function getLuaDocByErr(ast, text, start, offset)
         return nil
     end
     local targetDoc
-    for i = #ast.ast.docs, 1, -1 do
-        local doc = ast.ast.docs[i]
+    for i = #state.ast.docs, 1, -1 do
+        local doc = state.ast.docs[i]
         if doc.finish <= targetError.start then
             targetDoc = doc
             break
@@ -1609,7 +1605,7 @@ local function getLuaDocByErr(ast, text, start, offset)
     return targetError, targetDoc
 end
 
-local function tryLuaDocBySource(ast, offset, source, results)
+local function tryLuaDocBySource(state, position, source, results)
     if source.type == 'doc.extends.name' then
         if source.parent.type == 'doc.class' then
             for _, doc in ipairs(vm.getDocDefines '*') do
@@ -1621,7 +1617,7 @@ local function tryLuaDocBySource(ast, offset, source, results)
                         kind        = define.CompletionItemKind.Class,
                         textEdit    = doc[1]:find '[^%w_]' and {
                             start   = source.start,
-                            finish  = offset,
+                            finish  = position,
                             newText = doc[1],
                         },
                     }
@@ -1639,7 +1635,7 @@ local function tryLuaDocBySource(ast, offset, source, results)
                     kind        = define.CompletionItemKind.Class,
                     textEdit    = doc[1]:find '[^%w_]' and {
                         start   = source.start,
-                        finish  = offset,
+                        finish  = position,
                         newText = doc[1],
                     },
                 }
@@ -1648,8 +1644,8 @@ local function tryLuaDocBySource(ast, offset, source, results)
         return true
     elseif source.type == 'doc.param.name' then
         local funcs = {}
-        guide.eachSourceBetween(ast.ast, offset, math.huge, function (src)
-            if src.type == 'function' and src.start > offset then
+        guide.eachSourceBetween(state.ast, position, math.huge, function (src)
+            if src.type == 'function' and src.start > position then
                 funcs[#funcs+1] = src
             end
         end)
@@ -1702,7 +1698,7 @@ local function tryLuaDocBySource(ast, offset, source, results)
     return false
 end
 
-local function tryLuaDocByErr(ast, offset, err, docState, results)
+local function tryLuaDocByErr(state, position, err, docState, results)
     if err.type == 'LUADOC_MISS_CLASS_EXTENDS_NAME' then
         for _, doc in ipairs(vm.getDocDefines '*') do
             if  doc.type == 'doc.class.name'
@@ -1724,8 +1720,8 @@ local function tryLuaDocByErr(ast, offset, err, docState, results)
         end
     elseif err.type == 'LUADOC_MISS_PARAM_NAME' then
         local funcs = {}
-        guide.eachSourceBetween(ast.ast, offset, math.huge, function (src)
-            if src.type == 'function' and src.start > offset then
+        guide.eachSourceBetween(state.ast, position, math.huge, function (src)
+            if src.type == 'function' and src.start > position then
                 funcs[#funcs+1] = src
             end
         end)
@@ -1851,49 +1847,49 @@ local function tryLuaDocOfFunction(doc, results)
     }
 end
 
-local function tryLuaDoc(ast, text, offset, results)
-    local doc = getLuaDoc(ast, offset)
+local function tryLuaDoc(state, text, position, results)
+    local doc = getLuaDoc(state, position)
     if not doc then
         return
     end
     if doc.type == 'doc.comment' then
-        local line = text:sub(doc.start, doc.range)
+        local line = doc.originalComment.text
         -- 尝试 ---$
         if line == '-' then
             tryLuaDocOfFunction(doc, results)
             return
         end
         -- 尝试 ---@$
-        local cate = line:match('^-%s*@(%a*)$')
+        local cate = line:match('^-+%s*@(%a*)$')
         if cate then
             tryLuaDocCate(cate, results)
             return
         end
     end
     -- 根据输入中的source来补全
-    local source = getLuaDocByContain(ast, offset)
+    local source = getLuaDocByContain(state, position)
     if source then
-        local suc = tryLuaDocBySource(ast, offset, source, results)
+        local suc = tryLuaDocBySource(state, position, source, results)
         if suc then
             return
         end
     end
     -- 根据附近的错误消息来补全
-    local err, expectDoc = getLuaDocByErr(ast, text, doc.start, offset)
+    local err, expectDoc = getLuaDocByErr(state, text, doc.start, position)
     if err then
-        tryLuaDocByErr(ast, offset, err, expectDoc, results)
+        tryLuaDocByErr(state, position, err, expectDoc, results)
         return
     end
 end
 
-local function tryComment(ast, text, offset, results)
+local function tryComment(state, text, position, results)
     if #results > 0 then
         return
     end
-    local word = lookBackward.findWord(text, offset)
-    local doc  = getLuaDoc(ast, offset)
+    local word = lookBackward.findWord(text, guide.positionToOffset(state, position))
+    local doc  = getLuaDoc(state, position)
     if not word then
-        local comment = getComment(ast, offset)
+        local comment = getComment(state, position)
         if comment.type == 'comment.short'
         or comment.type == 'comment.cshort' then
             if comment.text == '' then
@@ -1912,23 +1908,24 @@ local function tryComment(ast, text, offset, results)
     if doc and doc.type ~= 'doc.comment' then
         return
     end
-    checkCommon(ast.uri, word, text, offset, results)
+    checkCommon(state.uri, word, text, position, results)
 end
 
-local function makeCache(uri, offset, results)
+local function makeCache(uri, position, results)
     local cache = workspace.getCache 'completion'
     if not uri then
         cache.results = nil
         return
     end
     local text  = files.getText(uri)
-    local word = lookBackward.findWord(text, offset)
+    local state = files.getState(uri)
+    local word = lookBackward.findWord(text, guide.positionToOffset(state, position))
     if not word or #word < 2 then
         cache.results = nil
         return
     end
     cache.results = results
-    cache.offset  = offset
+    cache.position= position
     cache.word    = word:lower()
     cache.length  = #word
 end
@@ -1950,13 +1947,14 @@ local function isValidCache(word, result)
     return false
 end
 
-local function getCache(uri, offset)
+local function getCache(uri, position)
     local cache = workspace.getCache 'completion'
     if not cache.results then
         return nil
     end
     local text  = files.getText(uri)
-    local word = lookBackward.findWord(text, offset)
+    local state = files.getState(uri)
+    local word = lookBackward.findWord(text, guide.positionToOffset(state, position))
     if not word then
         return nil
     end
@@ -1980,7 +1978,7 @@ local function getCache(uri, offset)
     end
 
     if results.enableCommon then
-        checkCommon(uri, word, text, offset, results)
+        checkCommon(uri, word, text, position, results)
     end
 
     return cache.results
@@ -1991,36 +1989,36 @@ local function clearCache()
     cache.results = nil
 end
 
-local function completion(uri, offset, triggerCharacter)
+local function completion(uri, position, triggerCharacter)
     tracy.ZoneBeginN 'completion cache'
-    local results = getCache(uri, offset)
+    local results = getCache(uri, position)
     tracy.ZoneEnd()
     if results then
         return results
     end
     tracy.ZoneBeginN 'completion #1'
-    local ast = files.getState(uri)
+    local state = files.getState(uri)
     local text = files.getText(uri)
     results = {}
     clearStack()
     tracy.ZoneEnd()
     tracy.ZoneBeginN 'completion #2'
-    if ast then
-        if getComment(ast, offset) then
-            tryLuaDoc(ast, text, offset, results)
-            tryComment(ast, text, offset, results)
+    if state then
+        if getComment(state, position) then
+            tryLuaDoc(state, text, position, results)
+            tryComment(state, text, position, results)
         else
-            trySpecial(ast, text, offset, results)
-            tryCallArg(ast, text, offset, results)
-            tryTable(ast, text, offset, results)
-            tryWord(ast, text, offset, triggerCharacter, results)
-            tryIndex(ast, text, offset, results)
-            trySymbol(ast, text, offset, results)
+            trySpecial(state, text, position, results)
+            tryCallArg(state, text, position, results)
+            tryTable(state, text, position, results)
+            tryWord(state, text, position, triggerCharacter, results)
+            tryIndex(state, text, position, results)
+            trySymbol(state, text, position, results)
         end
     else
-        local word = lookBackward.findWord(text, offset)
+        local word = lookBackward.findWord(text, guide.positionToOffset(state, position))
         if word then
-            checkCommon(nil, word, text, offset, results)
+            checkCommon(nil, word, text, position, results)
         end
     end
     tracy.ZoneEnd()
@@ -2031,7 +2029,7 @@ local function completion(uri, offset, triggerCharacter)
     end
 
     tracy.ZoneBeginN 'completion #3'
-    makeCache(uri, offset, results)
+    makeCache(uri, position, results)
     tracy.ZoneEnd()
     return results
 end

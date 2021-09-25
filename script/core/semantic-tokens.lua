@@ -5,6 +5,7 @@ local define         = require 'proto.define'
 local vm             = require 'vm'
 local util           = require 'utility'
 local guide          = require 'parser.guide'
+local converter      = require 'proto.converter'
 local infer          = require 'core.infer'
 local config         = require 'config'
 
@@ -344,8 +345,8 @@ local function buildTokens(uri, results)
     local lastLine = 0
     local lastStartChar = 0
     for i, source in ipairs(results) do
-        local startPos  = files.position(uri, source.start, 'left')
-        local finishPos = files.position(uri, source.finish, 'right')
+        local startPos  = converter.packPosition(uri, source.start)
+        local finishPos = converter.packPosition(uri, source.finish)
         local line      = startPos.line
         local startChar = startPos.character
         local deltaLine = line - lastLine
@@ -375,15 +376,14 @@ config.watch(function (key, value)
 end)
 
 return function (uri, start, finish)
-    local ast   = files.getState(uri)
-    local lines = files.getLines(uri)
+    local state = files.getState(uri)
     local text  = files.getText(uri)
-    if not ast then
+    if not state then
         return nil
     end
 
     local results = {}
-    guide.eachSourceBetween(ast.ast, start, finish, function (source)
+    guide.eachSourceBetween(state.ast, start, finish, function (source)
         local method = Care[source.type]
         if not method then
             return
@@ -392,7 +392,7 @@ return function (uri, start, finish)
         await.delay()
     end)
 
-    for _, comm in ipairs(ast.comms) do
+    for _, comm in ipairs(state.comms) do
         if comm.type == 'comment.cshort' then
             results[#results+1] = {
                 start  = comm.start,

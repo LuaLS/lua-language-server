@@ -1,9 +1,10 @@
-local files  = require 'files'
-local json   = require 'json'
-local util   = require 'utility'
-local proto  = require 'proto'
-local define = require 'proto.define'
-local lang   = require 'language'
+local files     = require 'files'
+local json      = require 'json'
+local util      = require 'utility'
+local proto     = require 'proto'
+local define    = require 'proto.define'
+local lang      = require 'language'
+local converter = require 'proto.converter'
 
 return function (data)
     local text = files.getText(data.uri)
@@ -26,7 +27,7 @@ return function (data)
             changes = {
                 [data.uri] = {
                     {
-                        range   = files.range(data.uri, data.start, data.finish),
+                        range   = converter.packRange(data.uri, data.start, data.finish),
                         newText = luaStr,
                     }
                 }

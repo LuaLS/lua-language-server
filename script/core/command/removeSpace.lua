@@ -1,7 +1,8 @@
-local files    = require 'files'
-local guide    = require 'parser.guide'
-local proto    = require 'proto'
-local lang     = require 'language'
+local files     = require 'files'
+local guide     = require 'parser.guide'
+local proto     = require 'proto'
+local lang      = require 'language'
+local converter = require 'proto.converter'
 
 local function isInString(ast, offset)
     return guide.eachSourceContain(ast.ast, offset, function (source)
@@ -13,29 +14,39 @@ end
 
 return function (data)
     local uri   = data.uri
-    local lines = files.getLines(uri)
     local text  = files.getText(uri)
-    local ast   = files.getState(uri)
-    if not lines then
+    local state = files.getState(uri)
+    if not state then
         return
     end
 
+    local lines = state.lines
     local textEdit = {}
-    for i = 1, #lines do
-        local line = guide.lineContent(lines, text, i, true)
-        local pos  = line:find '[ \t]+$'
-        if pos then
-            local start, finish = guide.lineRange(lines, i, true)
-            start = start + pos
-            if isInString(ast, start) then
-                goto NEXT_LINE
-            end
-            textEdit[#textEdit+1] = {
-                range = files.range(uri, start, finish),
-                newText = '',
-            }
+    for i = 0, #lines do
+        local startOffset  = lines[i]
+        local finishOffset = text:find('[\r\n]', startOffset) or (#text + 1)
+        local lastOffset   = finishOffset - 1
+        local lastChar     = text:sub(lastOffset, lastOffset)
+        if lastChar ~= ' ' and lastChar ~= '\t' then
             goto NEXT_LINE
         end
+        local lastPos = guide.offsetToPosition(state, lastOffset)
+        if isInString(state.ast, lastPos) then
+            goto NEXT_LINE
+        end
+        local firstOffset = startOffset
+        for n = lastOffset - 1, startOffset, -1 do
+            local char = text:sub(n, n)
+            if char ~= ' ' and char ~= '\t' then
+                firstOffset = n + 1
+                break
+            end
+        end
+        local firstPos = guide.offsetToPosition(state, firstOffset) - 1
+        textEdit[#textEdit+1] = {
+            range = converter.packRange(uri, firstPos, lastPos),
+            newText = '',
+        }
 
         ::NEXT_LINE::
     end

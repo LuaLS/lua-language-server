@@ -1,5 +1,6 @@
 local core   = require 'core.completion'
 local files  = require 'files'
+local catch  = require 'catch'
 
 EXISTS = {'EXISTS'}
 
@@ -64,17 +65,17 @@ ContinueTyping = false
 function TEST(script)
     return function (expect)
         files.removeAll()
-        local pos = script:find('$', 1, true) - 1
-        local new_script = script:gsub('%$', '')
+        local newScript, catched = catch(script, '?')
 
-        files.setText('', new_script)
+        files.setText('', newScript)
         core.clearCache()
+        local inputPos = catched['?'][1][1]
         if ContinueTyping then
-            local triggerCharacter = script:sub(pos - 1, pos - 1)
-            core.completion('', pos - 1, triggerCharacter)
+            local triggerCharacter = script:sub(inputPos - 1, inputPos - 1)
+            core.completion('', inputPos, triggerCharacter)
         end
-        local triggerCharacter = script:sub(pos, pos)
-        local result = core.completion('', pos, triggerCharacter)
+        local triggerCharacter = script:sub(inputPos, inputPos)
+        local result = core.completion('', inputPos, triggerCharacter)
         if not expect then
             assert(result == nil)
             return

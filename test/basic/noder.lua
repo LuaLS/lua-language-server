@@ -2,6 +2,7 @@ local noder  = require 'core.noder'
 local files  = require 'files'
 local util   = require 'utility'
 local guide  = require 'parser.guide'
+local catch  = require 'catch'
 
 local function getSource(pos)
     local ast = files.getState('')
@@ -30,12 +31,9 @@ local CARE = {}
 local function TEST(script)
     return function (expect)
         files.removeAll()
-        local start  = script:find('<?', 1, true)
-        local finish = script:find('?>', 1, true)
-        local pos = (start + finish) // 2 + 1
-        local newScript = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
+        local newScript, catched = catch(script, '?')
         files.setText('', newScript)
-        local source = getSource(pos)
+        local source = getSource(catched['?'][1][1])
         assert(source)
         local result = {
             id = noder.getID(source),
@@ -53,21 +51,21 @@ CARE['id'] = true
 TEST [[
 local <?x?>
 ]] {
-    id   = 'l:9',
+    id   = 'l:6',
 }
 
 TEST [[
 local x
 print(<?x?>)
 ]] {
-    id   = 'l:7',
+    id   = 'l:6',
 }
 
 TEST [[
 local x
 <?x?> = 1
 ]] {
-    id   = 'l:7',
+    id   = 'l:6',
 }
 
 TEST [[
@@ -86,14 +84,14 @@ TEST [[
 local x
 print(x.y.<?z?>)
 ]] {
-    id   = 'l:7|.y|.z',
+    id   = 'l:6|.y|.z',
 }
 
 TEST [[
 local x
 function x:<?f?>() end
 ]] {
-    id   = 'l:7|.f',
+    id   = 'l:6|.f',
 }
 
 TEST [[
@@ -113,7 +111,7 @@ TEST [[
     <?x?> = 1,
 }
 ]] {
-    id   = 't:1|.x',
+    id   = 't:0|.x',
 }
 
 TEST [[
@@ -134,12 +132,12 @@ TEST [[
 ::<?label?>::
 goto label
 ]] {
-    id      = 'l:5',
+    id      = 'l:2',
 }
 
 TEST [[
 ::label::
 goto <?label?>
 ]] {
-    id      = 'l:3',
+    id      = 'l:2',
 }

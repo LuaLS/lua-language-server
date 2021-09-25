@@ -9,10 +9,9 @@ TEST {
     {
         path = 'lib.lua',
         content = [[
-            return <~function~> ()
-            end
+            return <!<?function?> ()
+            end!>
         ]],
-        target = {22, 50},
     },
 }
 
@@ -21,7 +20,7 @@ TEST {
         path = 'a.lua',
         content = [[
             local m = {}
-            function m.<?func?>()
+            function m.<~func~>()
             end
             return m
         ]],
@@ -39,7 +38,7 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            return <?function () end?>
+            return <~function () end~>
         ]],
     },
     {
@@ -72,7 +71,7 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            local function <?f?>()
+            local function <~f~>()
             end
 
             return {
@@ -126,7 +125,7 @@ TEST {
             local t = require 'a'
             local <!f!> = t.<!f!>
 
-            <?f?>()
+            <~f~>()
 
             return {
                 <!f!> = <!f!>,
@@ -139,7 +138,7 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            local function <?f?>()
+            local function <~f~>()
             end
 
             return {
@@ -202,7 +201,7 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            local <?t?> = require 'b'
+            local <~t~> = require 'b'
             return <!t!>
         ]]
     },

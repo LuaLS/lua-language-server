@@ -24,14 +24,12 @@ end",
         end
         return true
     end, function (info)
-        return guide.eachSourceContain(info.ast.ast, info.start, function (source)
+        return guide.eachSourceContain(info.state.ast, info.start, function (source)
             if source.type == 'while'
             or source.type == 'in'
             or source.type == 'loop' then
-                for i = 1, #source.keyword do
-                    if info.start == source.keyword[i] then
-                        return true
-                    end
+                if source.finish - info.start <= 2 then
+                    return true
                 end
             end
         end)
@@ -40,8 +38,9 @@ end",
     {'break'},
     {'else'},
     {'elseif', function (info, results)
-        if info.text:find('^%s*then', info.offset + 1)
-        or info.text:find('^%s*do', info.offset + 1) then
+        local offset = guide.positionToOffset(info.state, info.position)
+        if info.text:find('^%s*then', offset + 1)
+        or info.text:find('^%s*do',   offset + 1) then
             return false
         end
         if info.hasSpace then
@@ -155,8 +154,9 @@ end"
     end},
     {'goto'},
     {'if', function (info, results)
-        if info.text:find('^%s*then', info.offset + 1)
-        or info.text:find('^%s*do', info.offset + 1) then
+        local offset = guide.positionToOffset(info.state, info.position)
+        if info.text:find('^%s*then', offset + 1)
+        or info.text:find('^%s*do',   offset + 1) then
             return false
         end
         if info.hasSpace then
@@ -183,8 +183,9 @@ end"
         return true
     end},
     {'in', function (info, results)
-        if info.text:find('^%s*then', info.offset + 1)
-        or info.text:find('^%s*do', info.offset + 1) then
+        local offset = guide.positionToOffset(info.state, info.position)
+        if info.text:find('^%s*then', offset + 1)
+        or info.text:find('^%s*do',   offset + 1) then
             return false
         end
         if info.hasSpace then
@@ -270,15 +271,16 @@ until $1"
         return false
     end},
     {'then', function (info, results)
-        local lines = files.getLines(info.uri)
-        local pos, first = info.text:match('%S+%s+()(%S+)', info.start)
+        local startOffset = guide.positionToOffset(info.state, info.start)
+        local pos, first = info.text:match('%S+%s+()(%S+)', startOffset + 1)
         if first == 'end'
         or first == 'else'
         or first == 'elseif' then
-            local startRow  = guide.positionOf(lines, info.start)
-            local finishRow = guide.positionOf(lines, pos)
-            local startSp   = info.text:match('^%s*', lines[startRow].start + 1)
-            local finishSp  = info.text:match('^%s*', lines[finishRow].start + 1)
+            local startRow       = guide.rowColOf(info.start)
+            local finishPosition = guide.offsetToPosition(info.state, pos)
+            local finishRow      = guide.rowColOf(finishPosition)
+            local startSp   = info.text:match('^%s*', info.state.lines[startRow])
+            local finishSp  = info.text:match('^%s*', info.state.lines[finishRow])
             if startSp == finishSp then
                 return false
             end

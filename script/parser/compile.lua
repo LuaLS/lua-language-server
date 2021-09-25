@@ -1,4 +1,6 @@
 local guide       = require 'parser.guide'
+local parse       = require 'parser.parse'
+local newparser   = require 'parser.newparser'
 local type        = type
 local tableInsert = table.insert
 local pairs       = pairs
@@ -566,8 +568,12 @@ local function PostCompile()
     end
 end
 
-return function (self, lua, mode, version, options)
-    local state, err = self:parse(lua, mode, version, options)
+return function (lua, mode, version, options)
+    do
+        local state, err = newparser(lua, mode, version, options)
+        return state, err
+    end
+    local state, err = parse(lua, mode, version, options)
     if not state then
         return nil, err
     end
@@ -576,11 +582,7 @@ return function (self, lua, mode, version, options)
     --end
     local clock = os.clock()
     pushError = state.pushError
-    if version == 'Lua 5.1' or version == 'LuaJIT' then
-        ENVMode = '@fenv'
-    else
-        ENVMode = '_ENV'
-    end
+    ENVMode = state.ENVMode
     Compiled = {}
     GoToTag = {}
     LocalCount = 0
@@ -590,7 +592,6 @@ return function (self, lua, mode, version, options)
         Root.state = state
     end
     Options = options
-    state.ENVMode = ENVMode
     if type(state.ast) == 'table' then
         Compile(state.ast)
     end

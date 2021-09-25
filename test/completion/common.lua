@@ -8,7 +8,7 @@ config.set('Lua.completion.showWord',       'Enable')
 
 TEST [[
 local zabcde
-za$
+za<??>
 ]]
 {
     {
@@ -20,7 +20,7 @@ za$
 TEST [[
 local zabcdefg
 local zabcde
-zabcde$
+zabcde<??>
 ]]
 {
     {
@@ -35,7 +35,7 @@ zabcde$
 
 TEST [[
 local zabcdefg
-za$
+za<??>
 local zabcde
 ]]
 {
@@ -51,7 +51,7 @@ local zabcde
 
 TEST [[
 local zabcde
-zace$
+zace<??>
 ]]
 {
     {
@@ -63,7 +63,7 @@ zace$
 TEST [[
 ZABC = x
 local zabc
-zac$
+zac<??>
 ]]
 {
     {
@@ -77,7 +77,7 @@ zac$
 }
 
 TEST [[
-ass$
+ass<??>
 ]]
 {
     {
@@ -92,7 +92,7 @@ ass$
 
 TEST [[
 local assert = 1
-ass$
+ass<??>
 ]]
 {
     {
@@ -103,7 +103,7 @@ ass$
 
 TEST [[
 local assert = 1
-_G.ass$
+_G.ass<??>
 ]]
 {
     {
@@ -119,7 +119,7 @@ _G.ass$
 TEST [[
 local function ffff(a, b)
 end
-ff$
+ff<??>
 ]]
 {
     {
@@ -134,7 +134,7 @@ ff$
 
 TEST [[
 local zabc = 1
-z$
+z<??>
 ]]
 {
     {
@@ -145,7 +145,7 @@ z$
 
 TEST [[
 local zabc = 1.0
-z$
+z<??>
 ]]
 {
     {
@@ -158,7 +158,7 @@ TEST [[
 local t = {
     abc = 1,
 }
-t.ab$
+t.ab<??>
 ]]
 {
     {
@@ -172,7 +172,7 @@ local t = {
     abc = 1,
 }
 local n = t.abc
-t.ab$
+t.ab<??>
 ]]
 {
     {
@@ -187,7 +187,7 @@ mt.ggg = 1
 function mt:get(a, b)
     return 1
 end
-mt:g$
+mt:g<??>
 ]]
 {
     {
@@ -205,7 +205,7 @@ mt:g$
 }
 
 TEST [[
-loc$
+loc<??>
 ]]
 {
     {
@@ -220,7 +220,7 @@ loc$
 
 IgnoreFunction = true
 TEST [[
-do$
+do<??>
 ]]
 {
     {
@@ -234,7 +234,7 @@ do$
 }
 
 TEST [[
-while true d$
+while true d<??>
 ]]
 {
     {
@@ -248,18 +248,18 @@ while true d$
 }
 
 TEST [[
-results$
+results<??>
 ]]
 (nil)
 
 TEST [[
-result$
+result<??>
 local results
 ]]
 (EXISTS)
 
 TEST [[
-local a$
+local a<??>
 
 local function f(fff)
     fff = ast
@@ -280,7 +280,7 @@ end
 TEST [[
 t.a = {}
 t.b = {}
-t.$
+t.<??>
 ]]
 {
     {
@@ -296,7 +296,7 @@ t.$
 TEST [[
 t.a = {}
 t.b = {}
-t.   $
+t.   <??>
 ]]
 {
     {
@@ -314,7 +314,7 @@ TEST [[
 t.a = {}
 function t:b()
 end
-t:$
+t:<??>
 ]]
 {
     {
@@ -331,7 +331,7 @@ TEST [[
 local t = {
     a = {},
 }
-t.$
+t.<??>
 xxx()
 ]]
 {
@@ -342,14 +342,14 @@ xxx()
 }
 
 TEST [[
-(''):$
+(''):<??>
 ]]
 (EXISTS)
 
 TEST [[
 local zzz
 
-return 'aa' .. zz$
+return 'aa' .. zz<??>
 ]]
 {
     {
@@ -358,9 +358,9 @@ return 'aa' .. zz$
     },
 }
 
-TEST 'local s = "a:$"' (nil)
+TEST 'local s = "a:<??>"' (nil)
 
-TEST 'debug.$'
+TEST 'debug.<??>'
 (EXISTS)
 
 IgnoreFunction = true
@@ -371,7 +371,7 @@ local xxxx = {
 }
 
 local t = {
-    x$
+    x<??>
 }
 ]]
 {
@@ -392,7 +392,7 @@ local t = {
 TEST [[
 print(ff2)
 local faa
-local f$
+local f<??>
 print(fff)
 ]]
 {
@@ -419,7 +419,7 @@ print(fff)
 }
 
 TEST [[
-local function f(ff$)
+local function f(ff<??>)
     print(fff)
 end
 ]]
@@ -431,19 +431,19 @@ end
 }
 
 TEST [[
-collectgarbage($)
+collectgarbage(<??>)
 ]]
 (EXISTS)
 
 TEST [[
-collectgarbage('$')
+collectgarbage('<??>')
 ]]
 {
     {
         label       = "'collect'",
         kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
-            start   = 16,
+            start   = 15,
             finish  = 17,
             newText = "'collect'",
         },
@@ -452,7 +452,7 @@ collectgarbage('$')
         label       = "'stop'",
         kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
-            start   = 16,
+            start   = 15,
             finish  = 17,
             newText = "'stop'",
         },
@@ -461,7 +461,7 @@ collectgarbage('$')
         label       = "'restart'",
         kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
-            start   = 16,
+            start   = 15,
             finish  = 17,
             newText = "'restart'",
         },
@@ -470,7 +470,7 @@ collectgarbage('$')
         label       = "'count'",
         kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
-            start   = 16,
+            start   = 15,
             finish  = 17,
             newText = "'count'",
         },
@@ -479,7 +479,7 @@ collectgarbage('$')
         label       = "'step'",
         kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
-            start   = 16,
+            start   = 15,
             finish  = 17,
             newText = "'step'",
         },
@@ -488,7 +488,7 @@ collectgarbage('$')
         label       = "'isrunning'",
         kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
-            start   = 16,
+            start   = 15,
             finish  = 17,
             newText = "'isrunning'",
         },
@@ -497,7 +497,7 @@ collectgarbage('$')
         label       = "'incremental'",
         kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
-            start   = 16,
+            start   = 15,
             finish  = 17,
             newText = "'incremental'",
         },
@@ -506,7 +506,7 @@ collectgarbage('$')
         label       = "'generational'",
         kind        = define.CompletionItemKind.EnumMember,
         textEdit    = {
-            start   = 16,
+            start   = 15,
             finish  = 17,
             newText = "'generational'",
         },
@@ -514,7 +514,7 @@ collectgarbage('$')
 }
 
 TEST [[
-io.read($)
+io.read(<??>)
 ]]
 {
     {
@@ -536,25 +536,25 @@ io.read($)
 }
 
 TEST [[
-io.open('', $)
+io.open('', <??>)
 ]]
 (EXISTS)
 
 TEST [[
-local function f(a, $)
+local function f(a, <??>)
 end
 ]]
 (nil)
 
 TEST [[
-self.results.list[#$]
+self.results.list[#<??>]
 ]]
 {
     {
         label = '#self.results.list+1',
         kind = define.CompletionItemKind.Snippet,
         textEdit = {
-            start = 19,
+            start = 18,
             finish = 20,
             newText = '#self.results.list+1] = ',
         },
@@ -562,7 +562,7 @@ self.results.list[#$]
 }
 
 TEST [[
-self.results.list[#$]
+self.results.list[#<??>]
 local n = 1
 ]]
 {
@@ -570,7 +570,7 @@ local n = 1
         label = '#self.results.list+1',
         kind = define.CompletionItemKind.Snippet,
         textEdit = {
-            start = 19,
+            start = 18,
             finish = 20,
             newText = '#self.results.list+1] = ',
         },
@@ -578,14 +578,14 @@ local n = 1
 }
 
 TEST [[
-self.results.list[#$] = 1
+self.results.list[#<??>] = 1
 ]]
 {
     {
         label = '#self.results.list+1',
         kind = define.CompletionItemKind.Snippet,
         textEdit = {
-            start = 19,
+            start = 18,
             finish = 20,
             newText = '#self.results.list+1]',
         },
@@ -593,14 +593,14 @@ self.results.list[#$] = 1
 }
 
 TEST [[
-self.results.list[#self.re$]
+self.results.list[#self.re<??>]
 ]]
 {
     {
         label = '#self.results.list+1',
         kind = define.CompletionItemKind.Snippet,
         textEdit = {
-            start = 19,
+            start = 18,
             finish = 27,
             newText = '#self.results.list+1] = ',
         },
@@ -612,14 +612,14 @@ self.results.list[#self.re$]
 }
 
 TEST [[
-fff[#ff$]
+fff[#ff<??>]
 ]]
 {
     {
         label = '#fff+1',
         kind = define.CompletionItemKind.Snippet,
         textEdit = {
-            start = 5,
+            start = 4,
             finish = 8,
             newText = '#fff+1] = ',
         },
@@ -631,14 +631,14 @@ fff[#ff$]
 }
 
 TEST [[
-local _ = fff.kkk[#$]
+local _ = fff.kkk[#<??>]
 ]]
 {
     {
         label = '#fff.kkk',
         kind = define.CompletionItemKind.Snippet,
         textEdit = {
-            start = 19,
+            start = 18,
             finish = 20,
             newText = '#fff.kkk]',
         },
@@ -646,14 +646,14 @@ local _ = fff.kkk[#$]
 }
 
 TEST [[
-fff.kkk[#$].yy
+fff.kkk[#<??>].yy
 ]]
 {
     {
         label = '#fff.kkk',
         kind = define.CompletionItemKind.Snippet,
         textEdit = {
-            start = 9,
+            start = 8,
             finish = 10,
             newText = '#fff.kkk]',
         },
@@ -665,7 +665,7 @@ local t = {
     a = 1,
 }
 
-t .    $
+t .    <??>
 ]]
 (EXISTS)
 
@@ -674,7 +674,7 @@ local t = {
     a = 1,
 }
 
-t .    $ b
+t .    <??> b
 ]]
 (EXISTS)
 
@@ -683,7 +683,7 @@ local t = {
     a = 1,
 }
 
-t $
+t <??>
 ]]
 (nil)
 
@@ -692,13 +692,13 @@ local t = {
     a = 1,
 }
 
-t $.
+t <??>.
 ]]
 (nil)
 
 TEST [[
 local xxxx
-xxxx$
+xxxx<??>
 ]]
 {
     {
@@ -710,7 +710,7 @@ xxxx$
 TEST [[
 local xxxx
 local XXXX
-xxxx$
+xxxx<??>
 ]]
 {
     {
@@ -727,7 +727,7 @@ TEST [[
 local t = {
     xxxxx = 1,
 }
-xx$
+xx<??>
 ]]
 {
     {
@@ -738,7 +738,7 @@ xx$
 
 TEST [[
 local index
-tbl[inde$]
+tbl[inde<??>]
 ]]
 {
     {
@@ -753,7 +753,7 @@ return function ()
         a = {},
         b = {},
     }
-    t.$
+    t.<??>
 end
 ]]
 {
@@ -769,7 +769,7 @@ end
 
 TEST [[
 local ast = 1
-local t = 'as$'
+local t = 'as<??>'
 local ask = 1
 ]]
 (EXISTS)
@@ -777,7 +777,7 @@ local ask = 1
 TEST [[
 local add
 
-function f(ad$)
+function f(ad<??>)
     local _ = add
 end
 ]]
@@ -789,25 +789,25 @@ end
 }
 
 TEST [[
-function table.i$
+function table.i<??>
 ]]
 (EXISTS)
 
 TEST [[
 do
-    xx.$
+    xx.<??>
 end
 ]]
 (nil)
 
 TEST [[
-print(io.$)
+print(io.<??>)
 ]]
 (EXISTS)
 
 require 'config'.set('Lua.runtime.version', 'Lua 5.4')
 --TEST [[
---local $
+--local <??>
 --]]
 --{
 --    {
@@ -821,7 +821,7 @@ require 'config'.set('Lua.runtime.version', 'Lua 5.4')
 --}
 --
 --TEST [[
---local <toc$
+--local <toc<??>
 --]]
 --{
 --    {
@@ -835,7 +835,7 @@ local mt = {}
 mt.__index = mt
 local t = setmetatable({}, mt)
 
-t.$
+t.<??>
 ]]
 {
     {
@@ -848,7 +848,7 @@ TEST [[
 local elseaaa
 ELSE = 1
 if a then
-else$
+else<??>
 ]]
 {
     {
@@ -877,7 +877,7 @@ Cared['insertText'] = true
 IgnoreFunction = false
 TEST [[
 local xpcal
-xpcal$
+xpcal<??>
 ]]
 {
     {
@@ -900,7 +900,7 @@ TEST [[
 function mt:f(a, b, c)
 end
 
-mt:f$
+mt:f<??>
 ]]
 {
     {
@@ -916,7 +916,7 @@ mt:f$
 }
 
 TEST [[
-function$
+function<??>
 ]]
 {
     {
@@ -934,7 +934,7 @@ end",
 }
 
 TEST [[
-local t = function$
+local t = function<??>
 ]]
 {
     {
@@ -956,7 +956,7 @@ IgnoreFunction = true
 TEST [[
 local function f()
     if a then
-    else$
+    else<??>
 end
 ]]
 {
@@ -979,21 +979,21 @@ local t = {
     ['a.b.c'] = {}
 }
 
-t.$
+t.<??>
 ]]
 {
     {
         label = 'a.b.c',
         kind = define.CompletionItemKind.Field,
         textEdit = {
-            start = 37,
-            finish = 36,
+            start = 40002,
+            finish = 40002,
             newText = '["a.b.c"]',
         },
         additionalTextEdits = {
             {
-                start   = 36,
-                finish  = 36,
+                start   = 40001,
+                finish  = 40002,
                 newText = '',
             },
         },
@@ -1005,21 +1005,21 @@ local t = {
     ['a.b.c'] = {}
 }
 
-t.   $
+t.   <??>
 ]]
 {
     {
         label = 'a.b.c',
         kind = define.CompletionItemKind.Field,
         textEdit = {
-            start = 40,
-            finish = 39,
+            start = 40005,
+            finish = 40005,
             newText = '["a.b.c"]',
         },
         additionalTextEdits = {
             {
-                start   = 36,
-                finish  = 36,
+                start   = 40001,
+                finish  = 40002,
                 newText = '',
             },
         },
@@ -1031,15 +1031,15 @@ local t = {
     ['a.b.c'] = {}
 }
 
-t['$']
+t['<??>']
 ]]
 {
     {
         label = 'a.b.c',
         kind = define.CompletionItemKind.Field,
         textEdit = {
-            start = 38,
-            finish = 37,
+            start = 40003,
+            finish = 40003,
             newText = 'a.b.c',
         }
     }
@@ -1048,33 +1048,33 @@ t['$']
 TEST [[
 _ENV['z.b.c'] = {}
 
-z$
+z<??>
 ]]
 {
     {
         label = 'z.b.c',
         kind = define.CompletionItemKind.Field,
         textEdit = {
-            start = 21,
-            finish = 21,
+            start = 20000,
+            finish = 20001,
             newText = '_ENV["z.b.c"]',
         },
     },
 }
 
 TEST [[
-io.close(1, $)
+io.close(1, <??>)
 ]]
 (nil)
 
 TEST [[
-io$
+io<??>
 ]]
 (EXISTS)
 
 IgnoreFunction = false
 TEST [[
-loadstring$
+loadstring<??>
 ]]
 {
     {
@@ -1090,7 +1090,7 @@ loadstring$
 }
 
 --TEST [[
---bit32$
+--bit32<??>
 --]]
 --{
 --    {
@@ -1103,7 +1103,7 @@ loadstring$
 TEST [[
 function loadstring()
 end
-loadstring$
+loadstring<??>
 ]]
 {
     {
@@ -1127,7 +1127,7 @@ loadstring$
 }
 
 TEST [[
-debug.setcsta$
+debug.setcsta<??>
 ]]
 {
     {
@@ -1143,12 +1143,12 @@ debug.setcsta$
 }
 
 TEST [[
----@$
+---@<??>
 ]]
 (EXISTS)
 
 TEST [[
----@cl$
+---@cl<??>
 ]]
 {
     {
@@ -1159,7 +1159,7 @@ TEST [[
 
 TEST [[
 ---@class ZABC
----@class ZBBC : Z$
+---@class ZBBC : Z<??>
 ]]
 {
     {
@@ -1170,14 +1170,14 @@ TEST [[
 
 TEST [[
 ---@class ZABC
----@class ZBBC : $
+---@class ZBBC : <??>
 ]]
 (EXISTS)
 
 TEST [[
 ---@class zabc
 local abcd
----@type za$
+---@type za<??>
 ]]
 {
     {
@@ -1189,14 +1189,14 @@ local abcd
 TEST [[
 ---@class abc
 local abcd
----@type $
+---@type <??>
 ]]
 (EXISTS)
 
 TEST [[
 ---@class zabc
 local abcd
----@type zxxx|z$
+---@type zxxx|z<??>
 ]]
 {
     {
@@ -1207,7 +1207,7 @@ local abcd
 
 TEST [[
 ---@alias zabc zabb
----@type za$
+---@type za<??>
 ]]
 {
     {
@@ -1218,7 +1218,7 @@ TEST [[
 
 TEST [[
 ---@class ZClass
----@param x ZC$
+---@param x ZC<??>
 ]]
 {
     {
@@ -1229,7 +1229,7 @@ TEST [[
 
 Cared['insertText'] = true
 TEST [[
----@param $
+---@param <??>
 function f(a, b, c)
 end
 ]]
@@ -1257,7 +1257,7 @@ a ${1:any}
 }
 
 TEST [[
----@param $
+---@param <??>
 function f(a, b, c) end
 
 function f2(a) end
@@ -1286,7 +1286,7 @@ a ${1:any}
 }
 
 TEST [[
----@param aa$
+---@param aa<??>
 function f(aaa, bbb, ccc)
 end
 ]]
@@ -1299,7 +1299,7 @@ end
 
 TEST [[
 local function f()
-    ---@param $
+    ---@param <??>
     function f(a, b, c)
     end
 end
@@ -1328,7 +1328,7 @@ a ${1:any}
 }
 
 TEST [[
----@param $
+---@param <??>
 function mt:f(a, b, c, ...)
 end
 ]]
@@ -1360,7 +1360,7 @@ a ${1:any}
 }
 
 TEST [[
----@param aaa $
+---@param aaa <??>
 function f(aaa, bbb, ccc)
 end
 ]]
@@ -1369,7 +1369,7 @@ end
 TEST [[
 ---@param xyz Class
 ---@param xxx Class
-function f(x$)
+function f(x<??>)
 ]]
 {
     {
@@ -1389,7 +1389,7 @@ function f(x$)
 TEST [[
 ---@param xyz Class
 ---@param xxx Class
-function f($
+function f(<??>
 ]]
 {
     {
@@ -1409,7 +1409,7 @@ function f($
 TEST [[
 ---@param xyz Class
 ---@param xxx Class
-function f($)
+function f(<??>)
 ]]
 {
     {
@@ -1428,7 +1428,7 @@ function f($)
 
 TEST [[
 local function f()
-    ---@t$
+    ---@t<??>
 end
 ]]
 {
@@ -1443,7 +1443,7 @@ TEST [[
 ---@field name string
 ---@field id integer
 local mt = {}
-mt.$
+mt.<??>
 ]]
 {
     {
@@ -1461,7 +1461,7 @@ TEST [[
 function f(y, x)
 end
 
-f(1, $)
+f(1, <??>)
 ]]
 {
     {
@@ -1483,7 +1483,7 @@ TEST [[
 function f(y, x)
 end
 
-f(1,$)
+f(1,<??>)
 ]]
 {
     {
@@ -1505,7 +1505,7 @@ TEST [[
 function f(x)
 end
 
-f($)
+f(<??>)
 ]]
 {
     {
@@ -1528,7 +1528,7 @@ TEST [[
 function f(x)
 end
 
-f($)
+f(<??>)
 ]]
 {
     {
@@ -1550,7 +1550,7 @@ TEST [[
 function f(x)
 end
 
-f('$')
+f('<??>')
 ]]
 {
     {
@@ -1586,7 +1586,7 @@ TEST [[
 local function f(x)
 end
 
-f($)
+f(<??>)
 ]]
 {
     {
@@ -1619,7 +1619,7 @@ end
 ---comment 3
 ---| '3'
 
-f($)
+f(<??>)
 ]]
 {
     {
@@ -1638,7 +1638,7 @@ function f(x)
 end
 
 f(function ()
-    $
+    <??>
 end)
 ]]
 (nil)
@@ -1652,7 +1652,7 @@ TEST [[
 ---@return string
 local function zzzzz(list, sep, i, j) end
 
-zzz$
+zzz<??>
 ]]
 {
     {
@@ -1672,7 +1672,7 @@ Cared['description'] = true
 TEST [[
 --- abc
 zzz = 1
-zz$
+zz<??>
 ]]
 {
     {
@@ -1695,7 +1695,7 @@ TEST [[
 ---| "'选项2'" # 注释2
 function f(x) end
 
-f($)
+f(<??>)
 ]]
 {
     {
@@ -1711,7 +1711,7 @@ f($)
 }
 
 TEST [[
-utf8.charpatter$
+utf8.charpatter<??>
 ]]
 {
     {
@@ -1726,7 +1726,7 @@ TEST [[
 ---@type "'a'"|"'b'"|"'c'"
 local x
 
-print(x == $)
+print(x == <??>)
 ]]
 {
     {
@@ -1747,7 +1747,7 @@ TEST [[
 ---@type "'a'"|"'b'"|"'c'"
 local x
 
-x = $
+x = <??>
 ]]
 {
     {
@@ -1768,7 +1768,7 @@ TEST [[
 ---@type "'a'"|"'b'"|"'c'"
 local x
 
-print(x == '$')
+print(x == '<??>')
 ]]
 {
     {
@@ -1792,7 +1792,7 @@ TEST [[
 ---@type "'a'"|"'b'"|"'c'"
 local x
 
-x = '$'
+x = '<??>'
 ]]
 {
     {
@@ -1815,24 +1815,24 @@ x = '$'
 TEST [[
 local t = type()
 
-print(t == $)
+print(t == <??>)
 ]]
 (EXISTS)
 
 TEST [[
-if type(arg) == '$'
+if type(arg) == '<??>'
 ]]
 (EXISTS)
 
 TEST [[
-if type(arg) == $
+if type(arg) == <??>
 ]]
 (EXISTS)
 
 TEST [[
 ---@type string
 local s
-s.$
+s.<??>
 ]]
 (EXISTS)
 
@@ -1841,7 +1841,7 @@ TEST [[
 local t
 
 local vvv = assert(t)
-vvv$
+vvv<??>
 ]]
 {
     {
@@ -1857,7 +1857,7 @@ TEST [[
 ---@param callback fun(x: number, y: number):string
 local function f(callback) end
 
-f($)
+f(<??>)
 ]]
 {
     {
@@ -1871,7 +1871,7 @@ end",
 }
 
 TEST [[
----$
+---<??>
 local function f(a, b, c)
     return a + 1, b .. '', c[1]
 end
@@ -1894,7 +1894,7 @@ ${1:comment}\
 Cared['insertText'] = nil
 
 TEST [[
---$
+--<??>
 ]]
 {
     {
@@ -1918,7 +1918,7 @@ TEST [[
 local function f(x) end
 
 f({
-    $
+    <??>
 })
 ]]
 {
@@ -1942,7 +1942,7 @@ local function f(x) end
 
 f({
     aaa = 1,
-    $
+    <??>
 })
 ]]
 {
@@ -1960,7 +1960,7 @@ TEST [[
 ---@param x cc
 local function f(x) end
 
-f({aaa = 1,$})
+f({aaa = 1,<??>})
 ]]
 {
     {
@@ -1977,7 +1977,7 @@ TEST [[
 ---@param x cc
 local function f(x) end
 
-f({aaa $})
+f({aaa <??>})
 ]]
 (nil)
 
@@ -1988,7 +1988,7 @@ TEST [[
 ---@param x cc
 local function f(x) end
 
-f({if$})
+f({if<??>})
 ]]
 {
     include = true,
@@ -2008,7 +2008,7 @@ local function f(x) end
 
 f({
     {
-        $
+        <??>
     }
 })
 ]]
@@ -2020,7 +2020,7 @@ local function f() end
 
 local s = f()
 
-s.$
+s.<??>
 ]]
 (EXISTS)
 
@@ -2032,7 +2032,7 @@ TEST [[
 
 ---@type cc
 local t
-print(t.aa$)
+print(t.aa<??>)
 ]]
 {
     {
@@ -2050,7 +2050,7 @@ TEST [[
 ---@type table<string, "'a'"|"'b'"|"'c'">
 local x
 
-x.a = $
+x.a = <??>
 ]]
 {
     {
@@ -2071,7 +2071,7 @@ TEST [[
 ---@type table<string, "'a'"|"'b'"|"'c'">
 local x
 
-x['a'] = $
+x['a'] = <??>
 ]]
 {
     {
@@ -2091,7 +2091,7 @@ x['a'] = $
 TEST [[
 ---@type table<string, "'a'"|"'b'"|"'c'">
 local x = {
-    a = $
+    a = <??>
 }
 ]]
 {
@@ -2112,7 +2112,7 @@ local x = {
 TEST [[
 ---@type table<string, "'a'"|"'b'"|"'c'">
 local x = {
-    ['a'] = $
+    ['a'] = <??>
 }
 ]]
 {
@@ -2138,7 +2138,7 @@ local m
 function m.f()
 end
 
-m.f$
+m.f<??>
 ]]{
     {
         label  = "f()",
@@ -2154,7 +2154,7 @@ m.f$
 Cared['insertText'] = nil
 
 TEST [[
-if true then$
+if true then<??>
 ]]
 {
     {
@@ -2168,7 +2168,7 @@ if true then$
 }
 
 TEST [[
-if true then$
+if true then<??>
 end
 ]]
 {
@@ -2179,7 +2179,7 @@ end
 }
 
 TEST [[
-if true then$
+if true then<??>
 else
 ]]
 {
@@ -2190,7 +2190,7 @@ else
 }
 
 TEST [[
-if true then$
+if true then<??>
 elseif
 ]]
 {
@@ -2202,7 +2202,7 @@ elseif
 
 TEST [[
 do
-    if true then$
+    if true then<??>
 end
 ]]
 {
@@ -2226,7 +2226,7 @@ local function f(x, ...)
 end
 
 f(1, {
-    $
+    <??>
 })
 ]]
 {
@@ -2250,7 +2250,7 @@ local function f(x, ...)
 end
 
 f(1, {}, {}, {
-    $
+    <??>
 })
 ]]
 {
@@ -2271,7 +2271,7 @@ TEST [[
 
 ---@type C
 local t = {
-    $
+    <??>
 }
 
 ]]
@@ -2293,7 +2293,7 @@ TEST [[
 
 ---@type C
 local t = {
-    x$
+    x<??>
 }
 
 ]]
@@ -2306,19 +2306,19 @@ local t = {
 }
 
 TEST [[
-if $ then
+if <??> then
 ]]
 (nil)
 
 TEST [[
-elseif $ then
+elseif <??> then
 ]]
 (nil)
 
 TEST [[
 ---@type iolib
 local t = {
-    $
+    <??>
 ]]
 (EXISTS)
 
@@ -2329,7 +2329,7 @@ TEST [[
 ---@param t A
 function api(t) end
 
-api({$})
+api({<??>})
 ]]
 (EXISTS)
 
@@ -2340,22 +2340,22 @@ TEST [[
 ---@param t A
 function m:api(t) end
 
-m:api({$})
+m:api({<??>})
 ]]
 (EXISTS)
 
 TEST [[
 ---@class AAA.BBB
 
----@type AAA.$
+---@type AAA.<??>
 ]]
 {
     {
         label = 'AAA.BBB',
         kind  = define.CompletionItemKind.Class,
         textEdit    = {
-            start   = 29,
-            finish  = 32,
+            start   = 20009,
+            finish  = 20013,
             newText = 'AAA.BBB',
         },
     }
@@ -2365,7 +2365,7 @@ Cared['insertText'] = true
 TEST [[
 ---@overload fun(a: any, b: any)
 local function zzzz(a) end
-zzzz$
+zzzz<??>
 ]]
 {
     {
@@ -2406,13 +2406,13 @@ local tarray
 local b = tdirect    -- type . here, shows "world"
 
 -- Inferred by index
-local c = tarray[1].$  -- type . here, no auto completion
+local c = tarray[1].<??>  -- type . here, no auto completion
 ]]
 (EXISTS)
 
 TEST [[
 local function f()
-    if type() == '$' then
+    if type() == '<??>' then
     end
 end
 ]]
@@ -2425,7 +2425,7 @@ GGG = 1
 GGG = function ()
 end
 
-GGG$
+GGG<??>
 ]]
 {
     {
@@ -2446,7 +2446,7 @@ local t = {}
 t.GGG = function ()
 end
 
-t.GGG$
+t.GGG<??>
 ]]
 {
     {
@@ -2463,7 +2463,7 @@ TEST [[
 ---@param f fun(a: any, b: any):boolean
 local function f(f) end
 
-f(fun$)
+f(fun<??>)
 ]]
 {
     {
@@ -2471,8 +2471,8 @@ f(fun$)
         kind     = define.CompletionItemKind.Function,
         textEdit = {
             newText = 'function (${1:a}, ${2:b})\n\t$0\nend',
-            start   = 68,
-            finish  = 70,
+            start   = 30002,
+            finish  = 30005,
         }
     },
     {
@@ -2489,7 +2489,7 @@ TEST [[
 ---@type {[1]: number}
 local t
 
-t.$
+t.<??>
 ]]
 {
     {
@@ -2497,13 +2497,13 @@ t.$
         kind     = define.CompletionItemKind.Field,
         textEdit = {
             newText = '[1]',
-            start   = 35,
-            finish  = 34,
+            start   = 30002,
+            finish  = 30002,
         },
         additionalTextEdits = {
             {
-                start   = 34,
-                finish  = 34,
+                start   = 30001,
+                finish  = 30002,
                 newText = '',
             },
         },
@@ -2514,7 +2514,7 @@ TEST [[
 ---@type {[1]: number}
 local t
 
-t.$
+t.<??>
 ]]
 {
     {
@@ -2522,13 +2522,13 @@ t.$
         kind     = define.CompletionItemKind.Field,
         textEdit = {
             newText = '[1]',
-            start   = 35,
-            finish  = 34,
+            start   = 30002,
+            finish  = 30002,
         },
         additionalTextEdits = {
             {
-                start   = 34,
-                finish  = 34,
+                start   = 30001,
+                finish  = 30002,
                 newText = '',
             },
         },
@@ -2543,7 +2543,7 @@ TEST [[
 local function f(x)
 end
 
-local r = f('$')
+local r = f('<??>')
 ]]
 {
     {
@@ -2551,8 +2551,8 @@ local r = f('$')
         kind  = define.CompletionItemKind.EnumMember,
         textEdit = {
             newText = "'aaa'",
-            start   = 103,
-            finish  = 104,
+            start   = 70012,
+            finish  = 70014,
         },
     },
     {
@@ -2560,8 +2560,8 @@ local r = f('$')
         kind  = define.CompletionItemKind.EnumMember,
         textEdit = {
             newText = "'bbb'",
-            start   = 103,
-            finish  = 104,
+            start   = 70012,
+            finish  = 70014,
         },
     },
 }
@@ -2570,7 +2570,7 @@ TEST [[
 ---@type fun(x: "'aaa'"|"'bbb'")
 local f
 
-f('$')
+f('<??>')
 ]]
 {
     {
@@ -2578,8 +2578,8 @@ f('$')
         kind  = define.CompletionItemKind.EnumMember,
         textEdit = {
             newText = "'aaa'",
-            start   = 45,
-            finish  = 46,
+            start   = 30002,
+            finish  = 30004,
         },
     },
     {
@@ -2587,8 +2587,8 @@ f('$')
         kind  = define.CompletionItemKind.EnumMember,
         textEdit = {
             newText = "'bbb'",
-            start   = 45,
-            finish  = 46,
+            start   = 30002,
+            finish  = 30004,
         },
     },
 }
@@ -2598,7 +2598,7 @@ TEST [[
 ---@field on fun()
 local c
 
-c:$
+c:<??>
 ]]
 {
     {
@@ -2612,7 +2612,7 @@ TEST [[
 ---@field on fun(x: "'aaa'"|"'bbb'")
 local c
 
-c:on($)
+c:on(<??>)
 ]]
 (EXISTS)
 
@@ -2621,7 +2621,7 @@ TEST [[
 ---@field on fun(x: "'aaa'"|"'bbb'")
 local c
 
-c:on('$')
+c:on('<??>')
 ]]
 (EXISTS)
 
@@ -2632,7 +2632,7 @@ function m.f()
 end
 
 m.f()
-m.$
+m.<??>
 ]]
 {
     [1] = EXISTS,
@@ -2647,7 +2647,7 @@ function class1:method1() end
 ---@class class2 : class1
 class2 = {}
 
-class2:$
+class2:<??>
 
 ]]
 {

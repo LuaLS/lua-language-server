@@ -3,7 +3,7 @@ local files       = require 'files'
 local autoRequire = require 'core.command.autoRequire'
 local client      = require 'client'
 
-local findInsertOffset = util.getUpvalue(autoRequire, 'findInsertOffset')
+local findInsertRow = util.getUpvalue(autoRequire, 'findInsertRow')
 local applyAutoRequire = util.getUpvalue(autoRequire, 'applyAutoRequire')
 
 local originEditText = client.editText
@@ -19,18 +19,25 @@ function TEST(text)
             files.removeAll()
             files.setText('', text)
             EditResult = nil
-            local offset, fmt = findInsertOffset('')
-            applyAutoRequire('', offset, name, name, fmt)
+            local row, fmt = findInsertRow('')
+            applyAutoRequire('', row, name, name, fmt)
             assert(util.equal(EditResult, expect))
         end
     end
 end
 
--- TODO change to position
 TEST '' 'test' {
     start  = 0,
-    finish = -1,
-    text   = '\nlocal test = require "test"\n'
+    finish = 0,
+    text   = 'local test = require "test"\n'
+}
+
+TEST [[
+local aaaaaa = require 'aaa'
+]] 'test' {
+    start  = 10000,
+    finish = 10000,
+    text   = 'local test   = require \'test\'\n'
 }
 
 client.editText = originEditText

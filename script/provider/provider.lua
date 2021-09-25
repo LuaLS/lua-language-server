@@ -688,11 +688,7 @@ proto.on('textDocument/semanticTokens/full', function (params)
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
     local core = require 'core.semantic-tokens'
-    local text  = files.getText(uri)
-    if not text then
-        return nil
-    end
-    local results = core(uri, 0, #text)
+    local results = core(uri, 0, math.huge)
     return {
         data = results
     }
@@ -706,15 +702,7 @@ proto.on('textDocument/semanticTokens/range', function (params)
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_RANGE, 0.5)
     local core = require 'core.semantic-tokens'
-    local cache  = files.getOpenedCache(uri)
-    local start, finish
-    if cache and not cache['firstSemantic'] then
-        cache['firstSemantic'] = true
-        start  = 0
-        finish = #files.getText(uri)
-    else
-        start, finish = converter.unpackRange(uri, params.range)
-    end
+    local start, finish = converter.unpackRange(uri, params.range)
     local results = core(uri, start, finish)
     return {
         data = results

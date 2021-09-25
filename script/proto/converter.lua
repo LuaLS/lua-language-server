@@ -12,7 +12,11 @@ local function rawPackPosition(uri, pos)
         local text  = files.getText(uri)
         if text then
             local lineOffset = state.lines[row]
-            col = utf8.len(text, lineOffset, lineOffset + col - 1, true)
+            if lineOffset then
+                col = utf8.len(text, lineOffset, lineOffset + col - 1, true)
+            else
+                col = 0
+            end
         end
     end
     return {

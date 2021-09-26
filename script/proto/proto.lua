@@ -10,10 +10,10 @@ local reqCounter = util.counter()
 
 local m = {}
 
-m.ability       = {}
-m.waiting       = {}
-m.holdon        = {}
-m.errorOnCancel = {}
+m.ability      = {}
+m.waiting      = {}
+m.holdon       = {}
+m.closeReasons = {}
 
 function m.getMethodName(proto)
     if proto.method:sub(1, 2) == '$/' then
@@ -23,11 +23,12 @@ function m.getMethodName(proto)
     end
 end
 
-function m.on(method, callback, errorOnCancel)
+function m.on(method, callback)
     m.ability[method] = callback
-    if errorOnCancel then
-        m.errorOnCancel[method] = true
-    end
+end
+
+function m.close(id, reason)
+    m.closeReasons[id] = reason
 end
 
 function m.response(id, res)
@@ -128,7 +129,6 @@ function m.doMethod(proto)
             await.setID('proto:' .. proto.id)
         end
         local clock = os.clock()
-        local completed = false
         local ok = true
         local res
         -- 任务可能在执行过程中被中断，通过close来捕获
@@ -143,17 +143,18 @@ function m.doMethod(proto)
             end
             await.close('proto:' .. proto.id)
             if ok then
-                if completed or not m.errorOnCancel[method] then
-                    m.response(proto.id, res)
+                if m.closeReasons[proto.id] then
+                    -- return an error with the reason it was cancelled
+                    m.responseErr(proto.id, m.closeReasons[proto.id], res)
+                    m.closeReasons[proto.id] = nil
                 else
-                    m.responseErr(proto.id, define.ErrorCodes.RequestCancelled, res)
+                    m.response(proto.id, res)
                 end
             else
                 m.responseErr(proto.id, define.ErrorCodes.InternalError, res)
             end
         end
-        ok, res = xpcall(abil, log.error, proto.params)
-        completed = true
+        ok, res = xpcall(abil, log.error, proto.params, proto.id)
     end)
 end
 

@@ -680,11 +680,13 @@ proto.on('workspace/symbol', function (params)
 end)
 
 
-proto.on('textDocument/semanticTokens/full', function (params)
+proto.on('textDocument/semanticTokens/full', function (params, id)
     local uri = params.textDocument.uri
     await.close('textDocument/semanticTokens/full')
     await.setID('textDocument/semanticTokens/full')
-    await.setID('update:' .. uri)
+    await.setID('update:' .. uri, function()
+        proto.close(id, define.ErrorCodes.ContentModified)
+    end)
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
     local core = require 'core.semantic-tokens'
@@ -692,13 +694,15 @@ proto.on('textDocument/semanticTokens/full', function (params)
     return {
         data = results
     }
-end, true)
+end)
 
-proto.on('textDocument/semanticTokens/range', function (params)
+proto.on('textDocument/semanticTokens/range', function (params, id)
     local uri = params.textDocument.uri
     await.close('textDocument/semanticTokens/range')
     await.setID('textDocument/semanticTokens/range')
-    await.setID('update:' .. uri)
+    await.setID('update:' .. uri, function()
+        proto.close(id, define.ErrorCodes.ContentModified)
+    end)
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_RANGE, 0.5)
     local core = require 'core.semantic-tokens'
@@ -715,7 +719,7 @@ proto.on('textDocument/semanticTokens/range', function (params)
     return {
         data = results
     }
-end, true)
+end)
 
 proto.on('textDocument/foldingRange', function (params)
     local core    = require 'core.folding'

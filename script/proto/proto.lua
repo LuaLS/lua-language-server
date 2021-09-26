@@ -10,9 +10,10 @@ local reqCounter = util.counter()
 
 local m = {}
 
-m.ability = {}
-m.waiting = {}
-m.holdon  = {}
+m.ability       = {}
+m.waiting       = {}
+m.holdon        = {}
+m.errorOnCancel = {}
 
 function m.getMethodName(proto)
     if proto.method:sub(1, 2) == '$/' then
@@ -22,8 +23,11 @@ function m.getMethodName(proto)
     end
 end
 
-function m.on(method, callback)
+function m.on(method, callback, errorOnCancel)
     m.ability[method] = callback
+    if errorOnCancel then
+        m.errorOnCancel[method] = true
+    end
 end
 
 function m.response(id, res)
@@ -124,6 +128,7 @@ function m.doMethod(proto)
             await.setID('proto:' .. proto.id)
         end
         local clock = os.clock()
+        local completed = false
         local ok = true
         local res
         -- 任务可能在执行过程中被中断，通过close来捕获
@@ -138,12 +143,17 @@ function m.doMethod(proto)
             end
             await.close('proto:' .. proto.id)
             if ok then
-                m.response(proto.id, res)
+                if completed or not m.errorOnCancel[method] then
+                    m.response(proto.id, res)
+                else
+                    m.responseErr(proto.id, define.ErrorCodes.RequestCancelled, res)
+                end
             else
                 m.responseErr(proto.id, define.ErrorCodes.InternalError, res)
             end
         end
         ok, res = xpcall(abil, log.error, proto.params)
+        completed = true
     end)
 end
 

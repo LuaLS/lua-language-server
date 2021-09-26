@@ -692,7 +692,7 @@ proto.on('textDocument/semanticTokens/full', function (params)
     return {
         data = results
     }
-end)
+end, true)
 
 proto.on('textDocument/semanticTokens/range', function (params)
     local uri = params.textDocument.uri
@@ -707,7 +707,7 @@ proto.on('textDocument/semanticTokens/range', function (params)
     return {
         data = results
     }
-end)
+end, true)
 
 proto.on('textDocument/foldingRange', function (params)
     local core    = require 'core.folding'

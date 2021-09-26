@@ -14,8 +14,18 @@ local isEnhanced = config.get 'Lua.color.mode' == 'SemanticEnhanced'
 local Care = {}
 Care['getglobal'] = function (source, results)
     local isLib = vm.isGlobalLibraryName(source[1])
-    local isFunc = (source.value and source.value.type == 'function') or
-                   (source.next and source.next.type == 'call')
+    local isFunc = false
+    local value = source.value
+    local next = source.next
+
+    if value and value.type == 'function' then
+        isFunc = true
+    elseif next and next.type == 'call' then
+        isFunc = true
+    elseif isEnhanced then
+        isFunc = infer.hasType(source, 'function')
+    end
+
     local type = isFunc and define.TokenTypes['function'] or define.TokenTypes.variable
     local modifier = isLib and define.TokenModifiers.defaultLibrary or define.TokenModifiers.static
 
@@ -44,7 +54,7 @@ Care['getfield'] = function (source, results)
     if not field then
         return
     end
-    if isEnhanced and infer.hasType(source.field, 'function') then
+    if isEnhanced and infer.hasType(field, 'function') then
         results[#results+1] = {
             start      = field.start,
             finish     = field.finish,
@@ -52,7 +62,7 @@ Care['getfield'] = function (source, results)
         }
         return
     end
-    if source.dot and (not source.next or source.next.type ~= "call") then
+    if source.dot and not (source.next and source.next.type ~= "call") then
         results[#results+1] = {
             start      = field.start,
             finish     = field.finish,

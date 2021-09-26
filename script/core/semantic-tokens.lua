@@ -49,57 +49,37 @@ Care['getmethod'] = function (source, results)
     end
 end
 Care['setmethod'] = Care['getmethod']
-Care['getfield'] = function (source, results)
-    local field = source.field
-    if not field then
-        return
+Care['field'] = function (source, results)
+    local modifiers = 0
+    if source.parent and source.parent.type == 'tablefield' then
+        modifiers = define.TokenModifiers.declaration
     end
-    if isEnhanced and infer.hasType(field, 'function') then
-        results[#results+1] = {
-            start      = field.start,
-            finish     = field.finish,
-            type       = define.TokenTypes['function'],
-        }
-        return
-    end
-    if source.dot and not (source.next and source.next.type ~= "call") then
-        results[#results+1] = {
-            start      = field.start,
-            finish     = field.finish,
-            type       = define.TokenTypes.property,
-        }
-        return
-    end
-end
-Care['setfield'] = Care['getfield']
-Care['tablefield'] = function (source, results)
-    local field = source.field
-    if not field then
-        return
-    end
-    local value = source.value
-    local isFunction = false
-    if value then
-        if isEnhanced then
-            isFunction = value.type == 'function' or infer.hasType(value, 'function')
-        else
-            isFunction = value.type == 'function'
+    if source.parent then
+        local value = source.parent.value
+        if value and value.type == 'function' then
+            results[#results+1] = {
+                start      = source.start,
+                finish     = source.finish,
+                type       = define.TokenTypes.method,
+                modifieres = modifiers,
+            }
+            return
         end
     end
-    if isFunction then
+    if isEnhanced and infer.hasType(source, 'function') then
         results[#results+1] = {
-            start      = field.start,
-            finish     = field.finish,
+            start      = source.start,
+            finish     = source.finish,
             type       = define.TokenTypes.method,
-            modifieres = define.TokenModifiers.declaration,
+            modifieres = modifiers,
         }
         return
     end
     results[#results+1] = {
-        start      = field.start,
-        finish     = field.finish,
+        start      = source.start,
+        finish     = source.finish,
         type       = define.TokenTypes.property,
-        modifieres = define.TokenModifiers.declaration,
+        modifieres = modifiers,
     }
 end
 Care['getlocal'] = function (source, results)

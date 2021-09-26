@@ -10,10 +10,9 @@ local reqCounter = util.counter()
 
 local m = {}
 
-m.ability      = {}
-m.waiting      = {}
-m.holdon       = {}
-m.closeReasons = {}
+m.ability = {}
+m.waiting = {}
+m.holdon  = {}
 
 function m.getMethodName(proto)
     if proto.method:sub(1, 2) == '$/' then
@@ -25,10 +24,6 @@ end
 
 function m.on(method, callback)
     m.ability[method] = callback
-end
-
-function m.close(id, reason)
-    m.closeReasons[id] = reason
 end
 
 function m.response(id, res)
@@ -143,18 +138,12 @@ function m.doMethod(proto)
             end
             await.close('proto:' .. proto.id)
             if ok then
-                if m.closeReasons[proto.id] then
-                    -- return an error with the reason it was cancelled
-                    m.responseErr(proto.id, m.closeReasons[proto.id], res)
-                    m.closeReasons[proto.id] = nil
-                else
-                    m.response(proto.id, res)
-                end
+                m.response(proto.id, res)
             else
                 m.responseErr(proto.id, define.ErrorCodes.InternalError, res)
             end
         end
-        ok, res = xpcall(abil, log.error, proto.params, proto.id)
+        ok, res = xpcall(abil, log.error, proto.params)
     end)
 end
 

@@ -174,7 +174,6 @@ m.ErrorCodes = {
 
     -- Defined by the protocol.
     RequestCancelled     = -32800,
-    ContentModified      = -32801,
 }
 
 m.SymbolKind = {

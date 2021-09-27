@@ -182,6 +182,7 @@ function debug.setuservalue(udata, value) end
 ---#end
 
 ---#DES 'debug.traceback'
+---@overload fun(message?: any, level?: integer): string
 ---@param thread   thread
 ---@param message? any
 ---@param level?   integer

@@ -3,21 +3,7 @@ local guide  = require 'parser.guide'
 local vm     = require 'vm'
 local infer  = require 'core.infer'
 local await  = require 'await'
--- local function hasTypeDoc(obj)
---     if obj.type == 'getlocal'
---     and obj.node
---     and obj.node.type == 'local'
---     and obj.node.bindDocs
---     and obj.node.bindDocs[1]
---     and (obj.node.bindDocs[1].type == 'doc.type'
---         or obj.node.bindDocs[1].type == 'doc.param') then
---         return true
---     end
---     return false
--- end
-local function hasInferType(obj)
 
-end
 local function inTypes(param, args)
     for _, v in ipairs(args) do
         if param[1] == v[1] then
@@ -49,13 +35,6 @@ return function (uri, callback)
                     start = arg.start,
                     finish = arg.finish,
                 }
-            -- ---检查传入参数有完整信息的情况
-            -- elseif hasInferType(arg) then
-            --     callArgsType[#callArgsType+1] = {
-            --         type = arg.node.bindDocs[1].types,
-            --         start = arg.start,
-            --         finish = arg.finish,
-            --     }
             else
                 local infers = infer.searchInfers(arg)
                 if infers['_G'] or infer['_ENV'] then

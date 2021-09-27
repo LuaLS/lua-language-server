@@ -729,7 +729,11 @@ proto.on('window/workDoneProgress/cancel', function (params)
 end)
 
 proto.on('$/didChangeVisibleRanges', function (params)
-    files.setVisibles(params.uri, params.ranges)
+    local uri = params.uri
+    await.close('visible:' .. uri)
+    await.setID('visible:' .. uri)
+    await.delay()
+    files.setVisibles(uri, params.ranges)
 end)
 
 proto.on('$/status/click', function ()

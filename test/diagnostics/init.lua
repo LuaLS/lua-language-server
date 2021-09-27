@@ -1198,3 +1198,14 @@ local function fly(bd) end
 local h
 fly(<!h!>)
 ]]
+
+TEST [[
+---@overload fun(x: number, y: number)
+---@param x boolean
+---@param y boolean
+local function f(x, y) end
+
+f(true, true) -- OK
+f(0, 0) -- OK
+
+]]

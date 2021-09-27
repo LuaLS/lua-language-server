@@ -9,6 +9,9 @@ local function inTypes(param, args)
     for _, v in ipairs(args) do
         if param[1] == v[1] then
             return true
+        elseif param[1] == 'number'
+        and v[1] == 'integer' then
+            return true
         end
     end
     return false

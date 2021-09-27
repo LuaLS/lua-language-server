@@ -17,6 +17,7 @@ m.DiagnosticSeverity = {
 --- 诊断类型与默认等级
 ---@type table<string, DiagnosticDefaultSeverity>
 m.DiagnosticDefaultSeverity = {
+    ['type-check']              = "Warning",
     ['unused-local']            = 'Hint',
     ['unused-function']         = 'Hint',
     ['undefined-global']        = 'Warning',

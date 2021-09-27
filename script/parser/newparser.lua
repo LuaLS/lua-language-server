@@ -2124,6 +2124,7 @@ local function parseFunction(isLocal, isAction)
             func.name   = simple
             func.finish = simple.finish
             if not isAction then
+                simple.parent = func
                 pushError {
                     type   = 'UNEXPECT_EFUNC_NAME',
                     start  = simple.start,

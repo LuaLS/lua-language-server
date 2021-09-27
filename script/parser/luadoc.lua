@@ -1152,7 +1152,7 @@ local function buildLuaDoc(comment)
         if cstart and cstart < comment.finish then
             result.comment = {
                 type   = 'doc.tailcomment',
-                start  = cstart + comment.start - 1,
+                start  = cstart + comment.start,
                 finish = comment.finish,
                 text   = trimTailComment(text:sub(cstart)),
             }

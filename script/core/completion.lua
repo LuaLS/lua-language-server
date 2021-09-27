@@ -66,6 +66,9 @@ local function findNearestTableField(state, position)
     local text    = files.getText(uri)
     local offset  = guide.positionToOffset(state, position)
     local soffset = lookBackward.findAnyOffset(text, offset - 1)
+    if not soffset then
+        return nil
+    end
     local symbol  = text:sub(soffset, soffset)
     if symbol == '}' then
         return nil

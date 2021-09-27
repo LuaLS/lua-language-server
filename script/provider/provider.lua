@@ -168,9 +168,6 @@ end)
 proto.on('textDocument/hover', function (params)
     local doc    = params.textDocument
     local uri    = doc.uri
-    await.close 'hover'
-    await.setID 'hover'
-    await.setID('update:' .. uri)
     if not workspace.isReady() then
         local count, max = workspace.getLoadProcess()
         return {
@@ -359,9 +356,6 @@ end)
 
 proto.on('textDocument/completion', function (params)
     local uri  = params.textDocument.uri
-    await.close 'completion'
-    await.setID 'completion'
-    await.setID('update:' .. uri)
     if not workspace.isReady() then
         local count, max = workspace.getLoadProcess()
         return {
@@ -479,9 +473,6 @@ proto.on('completionItem/resolve', function (item)
     end
     local id            = item.data.id
     local uri           = item.data.uri
-    await.close 'completion.resolve'
-    await.setID 'completion.resolve'
-    await.setID('update:' .. uri)
     --await.setPriority(1000)
     local resolved = core.resolve(id)
     if not resolved then
@@ -519,9 +510,6 @@ proto.on('textDocument/signatureHelp', function (params)
     if not files.exists(uri) then
         return nil
     end
-    await.close('signatureHelp')
-    await.setID('signatureHelp')
-    await.setID('update:' .. uri)
     local pos = converter.unpackPosition(uri, params.position)
     local core = require 'core.signature'
     local results = core(uri, pos)
@@ -651,10 +639,6 @@ proto.on('workspace/symbol', function (params)
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_WS_SYMBOL, 0.5)
     local core = require 'core.workspace-symbol'
 
-    await.close('workspace/symbol')
-    await.setID('workspace/symbol')
-    await.setID('files.version')
-
     local symbols = core(params.query)
     if not symbols or #symbols == 0 then
         return nil
@@ -682,9 +666,6 @@ end)
 
 proto.on('textDocument/semanticTokens/full', function (params)
     local uri = params.textDocument.uri
-    await.close('textDocument/semanticTokens/full')
-    await.setID('textDocument/semanticTokens/full')
-    await.setID('update:' .. uri)
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
     local core = require 'core.semantic-tokens'
@@ -696,9 +677,6 @@ end)
 
 proto.on('textDocument/semanticTokens/range', function (params)
     local uri = params.textDocument.uri
-    await.close('textDocument/semanticTokens/range')
-    await.setID('textDocument/semanticTokens/range')
-    await.setID('update:' .. uri)
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_RANGE, 0.5)
     local core = require 'core.semantic-tokens'
@@ -707,7 +685,7 @@ proto.on('textDocument/semanticTokens/range', function (params)
     if cache and not cache['firstSemantic'] then
         cache['firstSemantic'] = true
         start  = 0
-        finish = #files.getText(uri)
+        finish = math.huge
     else
         start, finish = converter.unpackRange(uri, params.range)
     end
@@ -723,9 +701,6 @@ proto.on('textDocument/foldingRange', function (params)
     if not files.exists(uri) then
         return nil
     end
-    await.close('textDocument/foldingRange')
-    await.setID('textDocument/foldingRange')
-    await.setID('update:' .. uri)
     local regions = core(uri)
     if not regions then
         return nil
@@ -802,7 +777,7 @@ proto.on('textDocument/onTypeFormatting', function (params)
 end)
 
 proto.on('$/cancelRequest', function (params)
-    await.close('proto:' .. params.id)
+    proto.close(params.id, define.ErrorCodes.RequestCancelled)
 end)
 
 proto.on('$/requestHint', function (params)
@@ -828,13 +803,9 @@ end)
 -- Hint
 do
     local function updateHint(uri)
-        local awaitID = 'hint:' .. uri
-        await.close(awaitID)
         if not config.get 'Lua.hint.enable' then
             return
         end
-        await.setID(awaitID)
-        await.setID('update:' .. uri)
         workspace.awaitReady()
         local visibles = files.getVisibles(uri)
         if not visibles then

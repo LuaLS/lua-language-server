@@ -102,6 +102,9 @@ local function disable()
 end
 
 local function refresh()
+    if not isEnable then
+        return
+    end
     log.debug('Refresh semantic tokens.')
     proto.request('workspace/semanticTokens/refresh', json.null)
 end

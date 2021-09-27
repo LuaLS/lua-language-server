@@ -173,6 +173,7 @@ m.ErrorCodes = {
     UnknownErrorCode     = -32001,
 
     -- Defined by the protocol.
+    ContentModified      = -32801,
     RequestCancelled     = -32800,
 }
 

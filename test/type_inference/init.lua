@@ -189,7 +189,7 @@ end
 <?y?> = x()
 ]]
 
-TEST 'integer|nil' [[
+TEST 'integer' [[
 local function x()
     return 1
     return nil

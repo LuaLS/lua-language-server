@@ -254,6 +254,12 @@ local function cleanInfers(infers)
         end
     end
     infers['any'] = nil
+    if infers['nil'] then
+        infers['nil'] = nil
+        if not next(infers) then
+            infers['nil'] = true
+        end
+    end
 end
 
 ---合并对象的推断类型

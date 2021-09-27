@@ -116,7 +116,7 @@ function m.doMethod(proto)
         return
     end
     if proto.id then
-        m.holdon[proto.id] = method
+        m.holdon[proto.id] = proto
     end
     await.call(function ()
         --log.debug('Start method:', method)
@@ -124,7 +124,7 @@ function m.doMethod(proto)
             await.setID('proto:' .. proto.id)
         end
         local clock = os.clock()
-        local ok = true
+        local ok = false
         local res
         -- 任务可能在执行过程中被中断，通过close来捕获
         local response <close> = function ()
@@ -140,11 +140,20 @@ function m.doMethod(proto)
             if ok then
                 m.response(proto.id, res)
             else
-                m.responseErr(proto.id, define.ErrorCodes.InternalError, res)
+                m.responseErr(proto.id, proto._closeReason or define.ErrorCodes.InternalError, res)
             end
         end
         ok, res = xpcall(abil, log.error, proto.params)
     end)
+end
+
+function m.close(id, reason)
+    local proto = m.holdon[id]
+    if not proto then
+        return
+    end
+    proto._closeReason = reason
+    await.close('proto:' .. id)
 end
 
 function m.doResponse(proto)

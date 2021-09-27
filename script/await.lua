@@ -21,7 +21,7 @@ local function setID(id, co, callback)
     if not m.idMap[id] then
         m.idMap[id] = setmetatable({}, wkmt)
     end
-    m.idMap[id][co] = callback
+    m.idMap[id][co] = callback or true
 end
 
 --- 设置错误处理器
@@ -94,7 +94,7 @@ function m.close(id)
     for co, callback in pairs(map) do
         if coroutine.status(co) == 'suspended' then
             map[co] = nil
-            if callback then
+            if type(callback) == 'function' then
                 xpcall(callback, log.error)
             end
             coroutine.close(co)

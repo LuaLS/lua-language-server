@@ -684,7 +684,6 @@ proto.on('textDocument/semanticTokens/full', function (params)
     local uri = params.textDocument.uri
     await.close('textDocument/semanticTokens/full')
     await.setID('textDocument/semanticTokens/full')
-    await.setID('update:' .. uri)
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
     local core = require 'core.semantic-tokens'
@@ -702,7 +701,6 @@ proto.on('textDocument/semanticTokens/range', function (params)
     local uri = params.textDocument.uri
     await.close('textDocument/semanticTokens/range')
     await.setID('textDocument/semanticTokens/range')
-    await.setID('update:' .. uri)
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_RANGE, 0.5)
     local core = require 'core.semantic-tokens'
@@ -806,7 +804,7 @@ proto.on('textDocument/onTypeFormatting', function (params)
 end)
 
 proto.on('$/cancelRequest', function (params)
-    await.close('proto:' .. params.id)
+    proto.close(params.id, define.ErrorCodes.RequestCancelled)
 end)
 
 proto.on('$/requestHint', function (params)

@@ -3,7 +3,6 @@ local config   = require 'config'
 local glob     = require 'glob'
 local furi     = require 'file-uri'
 local parser   = require 'parser'
-local proto    = require 'proto'
 local lang     = require 'language'
 local await    = require 'await'
 local timer    = require 'timer'
@@ -174,18 +173,18 @@ function m.setText(uri, text, isTrust, instance)
         end
     end
 
-    if instance or TEST then
-        m.onWatch('update', uri)
-    else
-        await.call(function ()
-            await.close('update:' .. uri)
-            await.setID('update:' .. uri)
-            await.sleep(0.1)
-            if m.exists(uri) then
-                m.onWatch('update', uri)
-            end
-        end)
-    end
+    --if instance or TEST then
+    m.onWatch('update', uri)
+    --else
+    --    await.call(function ()
+    --        await.close('update:' .. uri)
+    --        await.setID('update:' .. uri)
+    --        await.sleep(0.1)
+    --        if m.exists(uri) then
+    --            m.onWatch('update', uri)
+    --        end
+    --    end)
+    --end
 end
 
 function m.resetText(uri)

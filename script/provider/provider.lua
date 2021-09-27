@@ -855,3 +855,14 @@ config.watch(function (key, value)
         end
     end
 end)
+
+files.watch(function (ev, uri)
+    if ev == 'update'
+    or ev == 'remove' then
+        for id, p in pairs(proto.holdon) do
+            if p.params.textDocument and p.params.textDocument.uri == uri then
+                proto.close(id, define.ErrorCodes.ContentModified)
+            end
+        end
+    end
+end)

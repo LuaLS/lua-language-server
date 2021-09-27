@@ -127,6 +127,7 @@ local function mergeSyntaxAndDiags(a, b)
 end
 
 function m.clear(uri)
+    await.close('diag:' .. uri)
     if not m.cache[uri] then
         return
     end
@@ -212,6 +213,8 @@ function m.doDiagnostic(uri)
         return
     end
 
+    await.setID('diag:' .. uri)
+
     local prog <close> = progress.create(lang.script.WINDOW_DIAGNOSING, 0.5)
     prog:setMessage(ws.getRelativePath(uri))
 
@@ -261,6 +264,7 @@ function m.refresh(uri)
     if not m._start then
         return
     end
+    await.close('diag:' .. uri)
     await.call(function ()
         await.delay()
         if uri then

@@ -46,6 +46,8 @@ function m.responseErr(id, code, message)
         log.error('Response id is nil!', util.dump(message))
         return
     end
+    assert(m.holdon[id])
+    m.holdon[id] = nil
     local buf = jsonrpc.encode {
         id    = id,
         error = {

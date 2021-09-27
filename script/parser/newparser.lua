@@ -1595,7 +1595,7 @@ local function parseTable()
         break
         ::CONTINUE::
     end
-    tbl.finish = getPosition(Tokens[Index - 2], 'right')
+    tbl.finish = lastRightPosition()
     return tbl
 end
 

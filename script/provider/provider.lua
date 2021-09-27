@@ -673,7 +673,7 @@ proto.on('textDocument/semanticTokens/full', function (params)
     if not text then
         return nil
     end
-    local results = core(uri, 0, #text)
+    local results = core(uri, 0, math.huge)
     return {
         data = results
     }
@@ -689,7 +689,7 @@ proto.on('textDocument/semanticTokens/range', function (params)
     if cache and not cache['firstSemantic'] then
         cache['firstSemantic'] = true
         start  = 0
-        finish = #files.getText(uri)
+        finish = math.huge
     else
         start, finish = converter.unpackRange(uri, params.range)
     end

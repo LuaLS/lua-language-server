@@ -164,7 +164,7 @@ end
 
 m.f(<??>)
 ]]
-'function m.f(<!self: table!>)'
+'function m.f(<!self: any!>)'
 
 TEST [[
 ---@alias nnn table<number, string>

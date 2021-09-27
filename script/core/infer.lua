@@ -4,9 +4,7 @@ local noder    = require 'core.noder'
 local util     = require 'utility'
 local vm       = require "vm.vm"
 
-local STRING_OR_TABLE = {'STRING_OR_TABLE'}
 local BE_RETURN       = {'BE_RETURN'}
-local BE_CONNACT      = {'BE_CONNACT'}
 local CLASS           = {'CLASS'}
 local TABLE           = {'TABLE'}
 
@@ -234,23 +232,6 @@ local function cleanInfers(infers)
     if infers['stringlib'] and infers['string'] then
         infers['stringlib'] = nil
     end
-    -- 如果是通过 .. 来推测的，且结果里没有 number 与 integer，则推测为string
-    if infers[BE_CONNACT] then
-        infers[BE_CONNACT] = nil
-        if not infers['number'] and not infers['integer'] then
-            infers['string'] = true
-        end
-    end
-    -- 如果是通过 # 来推测的，且结果里没有其他的 table 与 string，则加入这2个类型
-    if infers[STRING_OR_TABLE] then
-        infers[STRING_OR_TABLE] = nil
-        if  not infers['table']
-        and not infers['string']
-        and not infers[CLASS] then
-            infers['table']  = true
-            infers['string'] = true
-        end
-    end
     --  如果有doc标记，则先移除table类型
     if infers[CLASS] then
         infers[CLASS] = nil
@@ -441,61 +422,6 @@ local function searchInfer(source, infers, mark)
         end
         if docName == 'table' then
             infers[TABLE] = true
-        end
-    end
-    if source.parent.type == 'unary' then
-        local op = source.parent.op.type
-        -- # XX -> string | table
-        if op == '#' then
-            infers[STRING_OR_TABLE] = true
-            return
-        end
-        if op == '-' then
-            infers['number'] = true
-            return
-        end
-        if op == '~' then
-            infers['integer'] = true
-            return
-        end
-        return
-    end
-    if source.parent.type == 'binary' then
-        local op = source.parent.op.type
-        if op == '+'
-        or op == '-'
-        or op == '*'
-        or op == '/'
-        or op == '//'
-        or op == '^'
-        or op == '%' then
-            infers['number'] = true
-            return
-        end
-        if op == '<<'
-        or op == '>>'
-        or op == '~'
-        or op == '|'
-        or op == '&' then
-            infers['integer'] = true
-            return
-        end
-        if op == '..' then
-            infers[BE_CONNACT] = true
-            return
-        end
-    end
-    -- X.a -> table
-    if source.next and source.next.node == source then
-        if source.next.type == 'setfield'
-        or source.next.type == 'setindex'
-        or source.next.type == 'setmethod'
-        or source.next.type == 'getfield'
-        or source.next.type == 'getindex' then
-            infers['table'] = true
-        end
-        if source.next.type == 'getmethod' then
-            infers[STRING_OR_TABLE] = true
         end
     end
     -- return XX

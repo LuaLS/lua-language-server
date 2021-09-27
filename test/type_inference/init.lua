@@ -92,10 +92,6 @@ TEST 'any' [[
 <?x?>()
 ]]
 
-TEST 'table' [[
-<?t?>.x = 1
-]]
-
 TEST 'boolean' [[
 <?x?> = not y
 ]]
@@ -230,20 +226,6 @@ end
 _, <?y?> = xpcall(x)
 ]]
 
-TEST 'string|table' [[
-local y = #<?x?>
-]]
-
-TEST 'integer' [[
-local y = <?x?> << 0
-]]
-
-TEST 'integer' [[
-local function f(<?a?>, b)
-    return a << b
-end
-]]
-
 TEST 'A' [[
 ---@class A
 
@@ -360,10 +342,6 @@ TEST 'A<string, number>' [[
 local <?x?>
 ]]
 
-TEST 'table' [[
-self.<?t?>[#self.t+1] = {}
-]]
-
 TEST 'string' [[
 ---@class string
 
@@ -379,28 +357,6 @@ TEST 'string' [[
 local function f() end
 local x = f()
 local <?y?> = x[1]
-]]
-
-TEST 'table' [[
-local <?t?>
-print(t.sub())
-]]
-
-TEST 'string|table' [[
-local <?t?>
-print(t:sub())
-]]
-
-TEST 'string' [[
-local <?t?>
-print(t:sub())
-print(t .. 'a')
-]]
-
-TEST 'string' [[
-local <?t?>
-print(#t)
-print(t .. 'a')
 ]]
 
 TEST 'table' [[

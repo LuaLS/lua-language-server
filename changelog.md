@@ -14,6 +14,7 @@
 * `CHG` hover: improve showing multi comments at enums
 * `CHG` hint: `Lua.hint.paramName` now supports `Disable`, `Literal` and `All`
 * `CHG` only search first file by `require`
+* `CHG` no longer infer by usage
 * `CHG` no longer ignore file names case in Windows
 * `CHG` watching library changes
 * `CHG` completion: improve misspelling results

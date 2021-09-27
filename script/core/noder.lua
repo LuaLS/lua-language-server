@@ -1568,11 +1568,11 @@ function m.compileAllNodes(source)
         collector.dropUri(guide.getUri(root))
     end
     root._compiledGlobals = true
-    log.debug('compileNodes:', guide.getUri(root))
+    --log.debug('compileNodes:', guide.getUri(root))
     guide.eachSource(root, function (src)
         m.compileNode(noders, src)
     end)
-    log.debug('compileNodes finish:', guide.getUri(root))
+    --log.debug('compileNodes finish:', guide.getUri(root))
     return noders
 end
 

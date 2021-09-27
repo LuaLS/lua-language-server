@@ -668,10 +668,6 @@ proto.on('textDocument/semanticTokens/full', function (params)
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
     local core = require 'core.semantic-tokens'
-    local text  = files.getText(uri)
-    if not text then
-        return nil
-    end
     local results = core(uri, 0, math.huge)
     return {
         data = results

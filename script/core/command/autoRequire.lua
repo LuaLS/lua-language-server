@@ -4,21 +4,32 @@ local config = require 'config'
 local rpath  = require 'workspace.require-path'
 local client = require 'client'
 local lang   = require 'language'
+local guide  = require 'parser.guide'
 
-local function findInsertOffset(uri)
-    local lines = files.getLines(uri)
+local function findInsertRow(uri)
     local text  = files.getText(uri)
+    local state = files.getState(uri)
+    local lines = state.lines
     local fmt   = {
         pair = false,
         quot = '"',
         col  = nil,
     }
-    for i = 1, #lines do
+    local hasFounded
+    for i = 0, #lines do
         local ln = lines[i]
-        local lnText = text:sub(ln.start, ln.finish)
+        local lnText = text:match('[^\r\n]*', ln)
         if not lnText:find('require', 1, true) then
-            return ln.start, fmt
+            if hasFounded then
+                return i, fmt
+            end
+            if  not lnText:match '^local%s'
+            and not lnText:match '^%s*$'
+            and not lnText:match '^%-%-' then
+                return i, fmt
+            end
         else
+            hasFounded = true
             local lpPos = lnText:find '%('
             if lpPos then
                 fmt.pair = true
@@ -33,7 +44,7 @@ local function findInsertOffset(uri)
             end
         end
     end
-    return 1, fmt
+    return 0, fmt
 end
 
 local function askAutoRequire(visiblePaths)
@@ -70,7 +81,7 @@ local function askAutoRequire(visiblePaths)
     return nameMap[result]
 end
 
-local function applyAutoRequire(uri, offset, name, result, fmt)
+local function applyAutoRequire(uri, row, name, result, fmt)
     local quotedResult = ('%q'):format(result)
     if fmt.quot == "'" then
         quotedResult = ([['%s']]):format(quotedResult:sub(2, -2)
@@ -88,11 +99,11 @@ local function applyAutoRequire(uri, offset, name, result, fmt)
     if fmt.col and fmt.col > #text then
         sp = (' '):rep(fmt.col - #text - 1)
     end
-    text = ('\nlocal %s%s= require%s\n'):format(name, sp, quotedResult)
+    text = ('local %s%s= require%s\n'):format(name, sp, quotedResult)
     client.editText(uri, {
         {
-            start  = offset,
-            finish = offset - 1,
+            start  = guide.positionOf(row, 0),
+            finish = guide.positionOf(row, 0),
             text   = text,
         }
     })
@@ -121,6 +132,6 @@ return function (data)
         return
     end
 
-    local offset, fmt = findInsertOffset(uri)
+    local offset, fmt = findInsertRow(uri)
     applyAutoRequire(uri, offset, name, result, fmt)
 end

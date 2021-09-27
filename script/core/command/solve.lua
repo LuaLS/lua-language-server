@@ -1,7 +1,8 @@
-local files    = require 'files'
-local guide    = require 'parser.guide'
-local proto    = require 'proto'
-local lang     = require 'language'
+local files     = require 'files'
+local guide     = require 'parser.guide'
+local proto     = require 'proto'
+local lang      = require 'language'
+local converter = require 'proto.converter'
 
 local opMap = {
     ['+']  = true,
@@ -34,8 +35,7 @@ return function (data)
         return
     end
 
-    local start  = files.offsetOfWord(uri, data.range.start)
-    local finish = files.offsetOfWord(uri, data.range['end'])
+    local start, finish = converter.unpackRange(uri, data.range)
 
     local result = guide.eachSourceContain(ast.ast, start, function (source)
         if source.start ~= start
@@ -85,7 +85,7 @@ return function (data)
             changes = {
                 [uri] = {
                     {
-                        range   = files.range(uri, result.start, result.finish),
+                        range   = converter.packRange(uri, result.start, result.finish),
                         newText = ('(%s)'):format(text:sub(result.start, result.finish)),
                     }
                 },

@@ -3,14 +3,13 @@ local guide = require 'parser.guide'
 local lang  = require 'language'
 
 return function (uri, callback)
-    local ast   = files.getState(uri)
-    local lines = files.getLines(uri)
+    local state = files.getState(uri)
     local text  = files.getText(uri)
-    if not ast or not lines then
+    if not state then
         return
     end
 
-    guide.eachSourceType(ast.ast, 'call', function (source)
+    guide.eachSourceType(state.ast, 'call', function (source)
         local node = source.node
         local args = source.args
         if not args then
@@ -21,13 +20,15 @@ return function (uri, callback)
         if not source.next then
             return
         end
-        if text:sub(args.start, args.start)   ~= '('
-        or text:sub(args.finish, args.finish) ~= ')' then
+        local startOffset  = guide.positionToOffset(state, args.start) + 1
+        local finishOffset = guide.positionToOffset(state, args.finish)
+        if text:sub(startOffset,  startOffset)  ~= '('
+        or text:sub(finishOffset, finishOffset) ~= ')' then
             return
         end
 
-        local nodeRow = guide.positionOf(lines, node.finish)
-        local argRow  = guide.positionOf(lines, args.start)
+        local nodeRow = guide.rowColOf(node.finish)
+        local argRow  = guide.rowColOf(args.start)
         if nodeRow == argRow then
             return
         end

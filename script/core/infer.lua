@@ -371,9 +371,10 @@ function m.getDocName(doc)
         return nodeName .. '[]'
     end
     if doc.type == 'doc.type.table' then
-        local key = m.viewDocName(doc.tkey) or '?'
+        local node  = m.viewDocName(doc.node)   or '?'
+        local key   = m.viewDocName(doc.tkey)   or '?'
         local value = m.viewDocName(doc.tvalue) or '?'
-        return ('table<%s, %s>'):format(key, value)
+        return ('%s<%s, %s>'):format(node, key, value)
     end
     if doc.type == 'doc.type.function' then
         return m.viewDocFunction(doc)

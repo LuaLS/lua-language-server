@@ -1,8 +1,8 @@
 local files  = require 'files'
-local vm     = require 'vm'
 local guide  = require 'parser.guide'
 local infer  = require 'core.infer'
 local config = require 'config'
+local catch  = require 'catch'
 
 rawset(_G, 'TEST', true)
 
@@ -24,12 +24,9 @@ end
 function TEST(wanted)
     return function (script)
         files.removeAll()
-        local start  = script:find('<?', 1, true)
-        local finish = script:find('?>', 1, true)
-        local pos = (start + finish) // 2 + 1
-        local newScript = script:gsub('<[!?]', '  '):gsub('[!?]>', '  ')
+        local newScript, catched = catch(script, '?')
         files.setText('', newScript)
-        local source = getSource(pos)
+        local source = getSource(catched['?'][1][1])
         assert(source)
         local result = infer.searchAndViewInfers(source)
         if wanted ~= result then
@@ -353,6 +350,13 @@ TEST 'table<string, number>' [[
 ---@class number
 
 ---@type table<string, number>
+local <?x?>
+]]
+
+TEST 'A<string, number>' [[
+---@class A
+
+---@type A<string, number>
 local <?x?>
 ]]
 

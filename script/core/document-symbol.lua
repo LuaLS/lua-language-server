@@ -5,20 +5,26 @@ local define   = require 'proto.define'
 local util     = require 'utility'
 
 local function buildName(source, text)
+    local uri   = guide.getUri(source)
+    local state = files.getState(uri)
+    local startOffset  = guide.positionToOffset(state, source.start)
     if source.type == 'setmethod'
     or source.type == 'getmethod' then
         if source.method then
-            return text:sub(source.start, source.method.finish)
+            local finishOffset = guide.positionToOffset(state, source.method.finish)
+            return text:sub(startOffset + 1, finishOffset)
         end
     end
     if source.type == 'setfield'
     or source.type == 'tablefield'
     or source.type == 'getfield' then
         if source.field then
-            return text:sub(source.start, source.field.finish)
+            local finishOffset = guide.positionToOffset(state, source.field.finish)
+            return text:sub(startOffset + 1, finishOffset)
         end
     end
-    return text:sub(source.start, source.finish)
+    local finishOffset = guide.positionToOffset(state, source.finish)
+    return text:sub(startOffset + 1, finishOffset)
 end
 
 local function buildFunctionParams(func)
@@ -208,7 +214,7 @@ local function buildAnonymousFunction(source, text, used, symbols)
         detail         = ('%sfunction (%s)'):format(head, buildFunctionParams(source)),
         kind           = define.SymbolKind.Function,
         range          = { source.start, source.finish },
-        selectionRange = { source.start, source.start },
+        selectionRange = { source.keyword[1], source.keyword[2] },
         valueRange     = { source.start, source.finish },
     }
 end

@@ -4,7 +4,6 @@ local await      = require 'await'
 local pub        = require 'pub'
 local jsonrpc    = require 'jsonrpc'
 local define     = require 'proto.define'
-local timer      = require 'timer'
 local json       = require 'json'
 
 local reqCounter = util.counter()
@@ -121,6 +120,9 @@ function m.doMethod(proto)
     end
     await.call(function ()
         --log.debug('Start method:', method)
+        if proto.id then
+            await.setID('proto:' .. proto.id)
+        end
         local clock = os.clock()
         local ok = true
         local res
@@ -134,6 +136,7 @@ function m.doMethod(proto)
             if not proto.id then
                 return
             end
+            await.close('proto:' .. proto.id)
             if ok then
                 m.response(proto.id, res)
             else

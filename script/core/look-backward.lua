@@ -77,7 +77,7 @@ function m.findTargetSymbol(text, offset, symbol)
     return nil
 end
 
-function m.findAnyPos(text, offset)
+function m.findAnyOffset(text, offset)
     for i = offset, 1, -1 do
         if not m.isSpace(text:sub(i, i)) then
             return i

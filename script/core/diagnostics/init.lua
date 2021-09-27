@@ -44,7 +44,7 @@ local function check(uri, name, results)
         if vm.isDiagDisabledAt(uri, result.start, name) then
             return
         end
-        if result.start == 0 then
+        if result.start < 0 then
             return
         end
         if mark[result.start] then

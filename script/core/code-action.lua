@@ -1,63 +1,49 @@
-local files    = require 'files'
-local lang     = require 'language'
-local util     = require 'utility'
-local sp       = require 'bee.subprocess'
-local guide    = require "parser.guide"
+local files     = require 'files'
+local lang      = require 'language'
+local util      = require 'utility'
+local sp        = require 'bee.subprocess'
+local guide     = require "parser.guide"
+local converter = require 'proto.converter'
 
 local function checkDisableByLuaDocExits(uri, row, mode, code)
-    local lines = files.getLines(uri)
-    local ast   = files.getState(uri)
-    local text  = files.getOriginText(uri)
-    local line  = lines[row]
-    if ast.ast.docs and line then
-        for _, doc in ipairs(ast.ast.docs) do
-            if  doc.start >= line.start
-            and doc.finish <= line.finish then
-                if doc.type == 'doc.diagnostic' then
-                    if doc.mode == mode then
-                        if doc.names then
-                            return {
-                                start   = doc.finish,
-                                finish  = doc.finish,
-                                newText = text:sub(doc.finish, doc.finish)
-                                        .. ', '
-                                        .. code
-                            }
-                        else
-                            return {
-                                start   = doc.finish,
-                                finish  = doc.finish,
-                                newText = text:sub(doc.finish, doc.finish)
-                                        .. ': '
-                                        .. code
-                            }
-                        end
-                    end
+    if row < 0 then
+        return nil
+    end
+    local state = files.getState(uri)
+    local lines = state.lines
+    if state.ast.docs and lines then
+        return guide.eachSourceBetween(state.ast.docs, guide.positionOf(row, 0), guide.positionOf(row + 1, 0), function (doc)
+            if  doc.type == 'doc.diagnostic'
+            and doc.mode == mode then
+                if doc.names then
+                    return {
+                        start   = doc.finish,
+                        finish  = doc.finish,
+                        newText = ', ' .. code,
+                    }
+                else
+                    return {
+                        start   = doc.finish,
+                        finish  = doc.finish,
+                        newText = ': ' .. code,
+                    }
                 end
             end
-        end
+        end)
     end
     return nil
 end
 
 local function checkDisableByLuaDocInsert(uri, row, mode, code)
-    local lines = files.getLines(uri)
-    local ast   = files.getState(uri)
-    local text  = files.getOriginText(uri)
-    -- 先看看上一行是不是已经有了
-    -- 没有的话就插入一行
-    local line = lines[row]
     return {
-        start   = line.start,
-        finish  = line.start,
-        newText = '---@diagnostic ' .. mode .. ': ' .. code .. '\n'
-                .. text:sub(line.start, line.start)
+        start   = guide.positionOf(row, 0),
+        finish  = guide.positionOf(row, 0),
+        newText = '---@diagnostic ' .. mode .. ': ' .. code .. '\n',
     }
 end
 
 local function disableDiagnostic(uri, code, start, results)
-    local lines = files.getLines(uri)
-    local row   = guide.positionOf(lines, start)
+    local row   = guide.rowColOf(start)
     results[#results+1] = {
         title   = lang.script('ACTION_DISABLE_DIAG', code),
         kind    = 'quickfix',
@@ -90,8 +76,8 @@ local function disableDiagnostic(uri, code, start, results)
            checkDisableByLuaDocExits (uri, row - 1, 'disable-next-line', code)
         or checkDisableByLuaDocInsert(uri, row,     'disable-next-line', code))
     pushEdit(lang.script('ACTION_DISABLE_DIAG_FILE', code),
-           checkDisableByLuaDocExits (uri, 1,   'disable',           code)
-        or checkDisableByLuaDocInsert(uri, 1,   'disable',           code))
+           checkDisableByLuaDocExits (uri, 0,   'disable',           code)
+        or checkDisableByLuaDocInsert(uri, 0,   'disable',           code))
 end
 
 local function markGlobal(uri, name, results)
@@ -134,8 +120,8 @@ end
 
 local function solveUndefinedGlobal(uri, diag, results)
     local ast    = files.getState(uri)
-    local offset = files.offsetOfWord(uri, diag.range.start)
-    guide.eachSourceContain(ast.ast, offset, function (source)
+    local start  = converter.unpackRange(uri, diag.range)
+    guide.eachSourceContain(ast.ast, start, function (source)
         if source.type ~= 'getglobal' then
             return
         end
@@ -153,8 +139,8 @@ end
 
 local function solveLowercaseGlobal(uri, diag, results)
     local ast    = files.getState(uri)
-    local offset = files.offsetOfWord(uri, diag.range.start)
-    guide.eachSourceContain(ast.ast, offset, function (source)
+    local start  = converter.unpackRange(uri, diag.range)
+    guide.eachSourceContain(ast.ast, start, function (source)
         if source.type ~= 'setglobal' then
             return
         end
@@ -168,7 +154,7 @@ local function findSyntax(uri, diag)
     local ast = files.getState(uri)
     for _, err in ipairs(ast.errs) do
         if err.type:lower():gsub('_', '-') == diag.code then
-            local range = files.range(uri, err.start, err.finish)
+            local range = converter.packRange(uri, err.start, err.finish)
             if util.equal(range, diag.range) then
                 return err
             end
@@ -197,8 +183,13 @@ local function solveSyntaxByAddDoEnd(uri, err, results)
                 [uri] = {
                     {
                         start   = err.start,
+                        finish  = err.start,
+                        newText = 'do ',
+                    },
+                    {
+                        start   = err.finish,
                         finish  = err.finish,
-                        newText = ('do %s end'):format(text:sub(err.start, err.finish)),
+                        newText = ' end',
                     },
                 }
             }
@@ -265,7 +256,7 @@ local function solveSyntax(uri, diag, results)
 end
 
 local function solveNewlineCall(uri, diag, results)
-    local start   = files.unrange(uri, diag.range)
+    local start = converter.unpackRange(uri, diag.range)
     results[#results+1] = {
         title = lang.script.ACTION_ADD_SEMICOLON,
         kind = 'quickfix',
@@ -349,18 +340,18 @@ local function checkQuickFix(results, uri, start, diagnostics)
 end
 
 local function checkSwapParams(results, uri, start, finish)
-    local ast  = files.getState(uri)
-    local text = files.getText(uri)
-    if not ast then
+    local state = files.getState(uri)
+    local text  = files.getText(uri)
+    if not state then
         return
     end
     local args = {}
-    guide.eachSourceBetween(ast.ast, start, finish, function (source)
+    guide.eachSourceBetween(state.ast, start, finish, function (source)
         if source.type == 'callargs'
         or source.type == 'funcargs' then
             local targetIndex
             for index, arg in ipairs(source) do
-                if arg.start - 1 <= finish and arg.finish >= start then
+                if arg.start <= finish and arg.finish >= start then
                     -- should select only one param
                     if targetIndex then
                         return
@@ -373,11 +364,17 @@ local function checkSwapParams(results, uri, start, finish)
             end
             local node
             if source.type == 'callargs' then
-                node = text:sub(source.parent.node.start, source.parent.node.finish)
+                node = text:sub(
+                    guide.positionToOffset(state, source.parent.node.start) + 1,
+                    guide.positionToOffset(state, source.parent.node.finish)
+                )
             elseif source.type == 'funcargs' then
                 local var = source.parent.parent
                 if guide.isSet(var) then
-                    node = text:sub(var.start, var.finish)
+                    node = text:sub(
+                        guide.positionToOffset(state, var.start) + 1,
+                        guide.positionToOffset(state, var.finish)
+                    )
                 else
                     node = lang.script.SYMBOL_ANONYMOUS
                 end
@@ -411,12 +408,18 @@ local function checkSwapParams(results, uri, start, finish)
                             {
                                 start   = myArg.start,
                                 finish  = myArg.finish,
-                                newText = text:sub(targetArg.start, targetArg.finish),
+                                newText = text:sub(
+                                    guide.positionToOffset(state, targetArg.start) + 1,
+                                    guide.positionToOffset(state, targetArg.finish)
+                                ),
                             },
                             {
                                 start   = targetArg.start,
                                 finish  = targetArg.finish,
-                                newText = text:sub(myArg.start, myArg.finish),
+                                newText = text:sub(
+                                    guide.positionToOffset(state, myArg.start) + 1,
+                                    guide.positionToOffset(state, myArg.finish)
+                                ),
                             },
                         }
                     }
@@ -499,13 +502,16 @@ end
 --end
 
 local function checkJsonToLua(results, uri, start, finish)
-    local text = files.getText(uri)
-    local jsonStart = text:match ('()[%{%[]', start)
+    local text  = files.getText(uri)
+    local state = files.getState(uri)
+    local startOffset  = guide.positionToOffset(state, start)
+    local finishOffset = guide.positionToOffset(state, finish)
+    local jsonStart = text:match ('()[%{%[]', startOffset + 1)
     if not jsonStart then
         return
     end
     local jsonFinish
-    for i = math.min(finish, #text), jsonStart + 1, -1 do
+    for i = math.min(finishOffset, #text), jsonStart + 1, -1 do
         local char = text:sub(i, i)
         if char == ']'
         or char == '}' then
@@ -528,8 +534,8 @@ local function checkJsonToLua(results, uri, start, finish)
             arguments = {
                 {
                     uri    = uri,
-                    start  = jsonStart,
-                    finish = jsonFinish,
+                    start  = guide.offsetToPosition(state, jsonStart) - 1,
+                    finish = guide.offsetToPosition(state, jsonFinish),
                 }
             }
         },

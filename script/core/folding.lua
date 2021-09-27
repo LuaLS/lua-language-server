@@ -146,22 +146,22 @@ local Care = {
 }
 
 return function (uri)
-    local ast  = files.getState(uri)
-    local text = files.getText(uri)
-    if not ast or not text then
+    local state = files.getState(uri)
+    local text  = files.getText(uri)
+    if not state or not text then
         return nil
     end
     local regions = {}
     local status = {}
 
-    guide.eachSource(ast.ast, function (source)
+    guide.eachSource(state.ast, function (source)
         local tp = source.type
         if Care[tp] then
             await.delay()
             Care[tp](source, text, regions)
         end
     end)
-    for _, source in ipairs(ast.comms) do
+    for _, source in ipairs(state.comms) do
         local tp = source.type
         if Care[tp] then
             await.delay()

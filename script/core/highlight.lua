@@ -54,12 +54,12 @@ local function find(source, uri, callback)
     end
 end
 
-local function checkInIf(source, text, offset)
+local function checkInIf(state, source, text, position)
     -- 检查 end
-    local endA = source.finish - #'end' + 1
-    local endB = source.finish
-    if  offset >= endA
-    and offset <= endB
+    local endB = guide.positionToOffset(state, source.finish)
+    local endA = endB - #'end' + 1
+    if  position >= source.finish - #'end'
+    and position <= source.finish
     and text:sub(endA, endB) == 'end' then
         return true
     end
@@ -68,7 +68,7 @@ local function checkInIf(source, text, offset)
         for i = 1, #block.keyword, 2 do
             local start  = block.keyword[i]
             local finish = block.keyword[i+1]
-            if offset >= start and offset <= finish then
+            if position >= start and position <= finish then
                 return true
             end
         end
@@ -76,12 +76,12 @@ local function checkInIf(source, text, offset)
     return false
 end
 
-local function makeIf(source, text, callback)
+local function makeIf(state, source, text, callback)
     -- end
-    local endA = source.finish - #'end' + 1
-    local endB = source.finish
+    local endB = guide.positionToOffset(state, source.finish)
+    local endA = endB - #'end' + 1
     if text:sub(endA, endB) == 'end' then
-        callback(endA, endB)
+        callback(source.finish - #'end', source.finish)
     end
     -- 每个子模块
     for _, block in ipairs(source) do
@@ -94,8 +94,8 @@ local function makeIf(source, text, callback)
     return false
 end
 
-local function findKeyWord(ast, text, offset, callback)
-    guide.eachSourceContain(ast.ast, offset, function (source)
+local function findKeyWord(state, text, position, callback)
+    guide.eachSourceContain(state.ast, position, function (source)
         if source.type == 'do'
         or source.type == 'function'
         or source.type == 'loop'
@@ -106,7 +106,7 @@ local function findKeyWord(ast, text, offset, callback)
             for i = 1, #source.keyword, 2 do
                 local start  = source.keyword[i]
                 local finish = source.keyword[i+1]
-                if offset >= start and offset <= finish then
+                if position >= start and position <= finish then
                     ok = true
                     break
                 end
@@ -119,9 +119,9 @@ local function findKeyWord(ast, text, offset, callback)
                 end
             end
         elseif source.type == 'if' then
-            local ok = checkInIf(source, text, offset)
+            local ok = checkInIf(state, source, text, position)
             if ok then
-                makeIf(source, text, callback)
+                makeIf(state, source, text, callback)
             end
         end
     end)
@@ -238,15 +238,15 @@ local function isLiteralValue(source)
 end
 
 return function (uri, offset)
-    local ast = files.getState(uri)
-    if not ast then
+    local state = files.getState(uri)
+    if not state then
         return nil
     end
     local text = files.getText(uri)
     local results = {}
     local mark = {}
 
-    local source = findSource(ast, offset, accept)
+    local source = findSource(state, offset, accept)
     if source then
         local isGlobal  = guide.isGlobal(source)
         local isLiteral = isLiteralValue(source)
@@ -344,7 +344,7 @@ return function (uri, offset)
         end)
     end
 
-    findKeyWord(ast, text, offset, function (start, finish)
+    findKeyWord(state, text, offset, function (start, finish)
         results[#results+1] = {
             start  = start,
             finish = finish,
@@ -352,7 +352,7 @@ return function (uri, offset)
         }
     end)
 
-    checkRegion(ast, text, offset, function (start, finish)
+    checkRegion(state, text, offset, function (start, finish)
         results[#results+1] = {
             start  = start,
             finish = finish,

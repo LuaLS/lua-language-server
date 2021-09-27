@@ -398,7 +398,7 @@ function m.getRoot(obj)
 end
 
 ---@param obj parser.guide.object
----@return string
+---@return uri
 function m.getUri(obj)
     if obj.uri then
         return obj.uri

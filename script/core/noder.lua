@@ -1237,6 +1237,7 @@ compileNodeMap = util.switch()
     : case 'in'
     : call(function (noders, id, source)
         local keys = source.keys
+        ---@type parser.guide.object[]
         local exps = source.exps
         if not keys or not exps then
             return

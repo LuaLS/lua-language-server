@@ -1,7 +1,7 @@
 local guide = require 'parser.guide'
 local noder = require "core.noder"
 
----@class generic.value
+---@class generic.value: parser.guide.object
 ---@field type string
 ---@field closure generic.closure
 ---@field proto parser.guide.object

@@ -663,7 +663,6 @@ proto.on('workspace/symbol', function (params)
     return symbols
 end)
 
-
 proto.on('textDocument/semanticTokens/full', function (params)
     local uri = params.textDocument.uri
     workspace.awaitReady()
@@ -857,6 +856,9 @@ config.watch(function (key, value)
 end)
 
 files.watch(function (ev, uri)
+    if not workspace.isReady() then
+        return
+    end
     if ev == 'update'
     or ev == 'remove' then
         for id, p in pairs(proto.holdon) do

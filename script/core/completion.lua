@@ -62,8 +62,17 @@ local function findNearestSource(state, position)
 end
 
 local function findNearestTableField(state, position)
+    local uri     = state.uri
+    local text    = files.getText(uri)
+    local offset  = guide.positionToOffset(state, position)
+    local soffset = lookBackward.findAnyOffset(text, offset - 1)
+    local symbol  = text:sub(soffset, soffset)
+    if symbol == '}' then
+        return nil
+    end
+    local sposition = guide.offsetToPosition(state, soffset)
     local source
-    guide.eachSourceContain(state.ast, position, function (src)
+    guide.eachSourceContain(state.ast, sposition, function (src)
         if src.type == 'table'
         or src.type == 'tablefield'
         or src.type == 'tableindex'

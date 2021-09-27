@@ -9,8 +9,8 @@ local function inTypes(param, args)
     for _, v in ipairs(args) do
         if param[1] == v[1] then
             return true
-        elseif param[1] == 'number'
-        and v[1] == 'integer' then
+        elseif (param[1] == 'number' or param[1] == 'integer')
+        and (v[1] == 'integer' or v[1] == 'number') then
             return true
         end
     end
@@ -64,7 +64,20 @@ local function getInfoFromDefs(defs)
                     if excludeSituations(types) then
                         goto CONTINUE
                     end
-                    funcArgsType[#funcArgsType+1] = types
+                    local plusAlias = {}
+                    for _, tp in ipairs(types) do
+                        local aliasDefs =  vm.getDefs(tp)
+                        for _, v in ipairs(aliasDefs) do
+                            ---TODO(arthur)
+                            -- if not v.type then
+                            -- end
+                            plusAlias[#plusAlias+1] = {
+                                [1] = v[1],
+                                type = v.type or v[1]
+                            }
+                        end
+                    end
+                    funcArgsType[#funcArgsType+1] = plusAlias
                 end
             end
             if #funcArgsType > 0 then
@@ -83,6 +96,7 @@ local function matchParams(paramsTypes, i, arg)
         if not paramTypes[i] then
             goto CONTINUE
         end
+        flag = ''
         for _, param in ipairs(paramTypes[i]) do
             ---如果形参的类型在实参里面
             if inTypes(param, arg)

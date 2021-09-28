@@ -1,6 +1,6 @@
 local platform = require 'bee.platform'
 
----@class uri: string
+---@alias uri string
 
 local escPatt = '[^%w%-%.%_%~%/]'
 

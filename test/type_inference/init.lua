@@ -878,3 +878,14 @@ local f
 
 f = function (<?x?>) end
 ]]
+
+TEST 'integer' [[
+--- @class Emit
+--- @field on fun(eventName: string, cb: function)
+--- @field on fun(eventName: '"died"', cb: fun(i: integer))
+--- @field on fun(eventName: '"won"', cb: fun(s: string))
+local emit = {}
+
+emit:on("died", function (<?i?>)
+end)
+]]

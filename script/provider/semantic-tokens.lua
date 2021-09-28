@@ -42,7 +42,7 @@ local function enable()
                         tokenModifiers = toArray(define.TokenModifiers),
                     },
                     range = true,
-                    full  = true,
+                    full  = false,
                 },
             },
         }

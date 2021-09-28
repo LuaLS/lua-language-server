@@ -115,6 +115,7 @@ local pushDefResultsMap = util.switch()
     : case 'doc.field.name'
     : case 'doc.type.enum'
     : case 'doc.resume'
+    : case 'doc.param'
     : case 'doc.type.array'
     : case 'doc.type.table'
     : case 'doc.type.ltable'

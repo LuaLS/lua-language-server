@@ -172,6 +172,9 @@ return function (uri, offset)
                 goto CONTINUE
             end
         end
+        if src.type == 'doc.param' then
+            goto CONTINUE
+        end
 
         results[#results+1] = {
             target = src,

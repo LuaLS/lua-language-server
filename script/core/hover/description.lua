@@ -344,16 +344,10 @@ local function tyrDocParamComment(source)
     if source.parent.type ~= 'funcargs' then
         return
     end
-    if not source.bindDocs then
-        return
-    end
-    for _, doc in ipairs(source.bindDocs) do
-        if doc.type == 'doc.param' then
-            if doc.param[1] == source[1] then
-                if doc.comment then
-                    return doc.comment.text
-                end
-                break
+    for _, def in ipairs(vm.getDefs(source)) do
+        if def.type == 'doc.param' then
+            if def.comment then
+                return def.comment.text
             end
         end
     end

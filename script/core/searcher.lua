@@ -123,6 +123,10 @@ local pushDefResultsMap = util.switch()
     : call(function (source, status)
         return true
     end)
+    : case 'doc.type.name'
+    : call(function (source, status)
+        return source.typeGeneric ~= nil
+    end)
     : case 'call'
     : call(function (source, status)
         if source.node.special == 'rawset' then

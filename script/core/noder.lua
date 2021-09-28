@@ -1052,6 +1052,22 @@ compileNodeMap = util.switch()
     end)
     : case 'doc.type.function'
     : call(function (noders, id, source)
+        if source.args then
+            for index, param in ipairs(source.args) do
+                local paramID = sformat('%s%s%s'
+                    , id
+                    , PARAM_NAME
+                    , param.name[1]
+                )
+                pushForward(noders, paramID, getID(param.extends))
+                local indexID = sformat('%s%s%s'
+                    , id
+                    , PARAM_INDEX
+                    , index
+                )
+                pushForward(noders, indexID, getID(param.extends))
+            end
+        end
         if source.returns then
             for index, rtn in ipairs(source.returns) do
                 local returnID = sformat('%s%s%s'
@@ -1060,14 +1076,6 @@ compileNodeMap = util.switch()
                     , index
                 )
                 pushForward(noders, returnID, getID(rtn))
-            end
-            for index, param in ipairs(source.args) do
-                local paramID = sformat('%s%s%s'
-                    , id
-                    , PARAM_NAME
-                    , param.name[1]
-                )
-                pushForward(noders, paramID, getID(param.extends))
             end
         end
         -- @type fun(x: T):T 的情况
@@ -1165,7 +1173,13 @@ compileNodeMap = util.switch()
             end
         end
         if source.args then
-            for _, arg in ipairs(source.args) do
+            for i, arg in ipairs(source.args) do
+                local indexID = sformat('%s%s%s'
+                    , id
+                    , PARAM_INDEX
+                    , i
+                )
+                pushForward(noders, indexID, getID(arg))
                 if arg.type == 'local' then
                     pushForward(noders, getID(arg), sformat('%s%s%s'
                         , id

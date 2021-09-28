@@ -461,7 +461,7 @@ f(1, 2, 3)
 ]]
 
 TEST [[
-<!unpack!>(<!1!>)
+<!unpack!>()
 ]]
 
 TEST [[
@@ -1134,6 +1134,9 @@ return {
     [<!2!>] = 4,
 }
 ]]
+
+-- TODO
+do return end
 
 TEST [[
 ---@param table     table

@@ -461,6 +461,7 @@ function m.searchInfers(source, field, mark)
     if not source then
         return nil
     end
+    local isParam = source.parent.type == 'funcargs'
     local defs = vm.getDefs(source, field)
     local infers = {}
     mark = mark or {}
@@ -478,16 +479,9 @@ function m.searchInfers(source, field, mark)
         end
     end
     for _, def in ipairs(defs) do
-        searchInfer(def, infers, mark)
-    end
-    if source.docParam then
-        local docType = source.docParam.extends
-        if docType and docType.type == 'doc.type' then
-            for _, def in ipairs(docType.types) do
-                if def.typeGeneric then
-                    searchInfer(def, infers, mark)
-                end
-            end
+        if def.typeGeneric and not isParam then
+        else
+            searchInfer(def, infers, mark)
         end
     end
     if source.type == 'doc.type' then

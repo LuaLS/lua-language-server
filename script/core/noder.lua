@@ -1176,6 +1176,8 @@ compileNodeMap = util.switch()
             end
         end
         if source.args then
+            local parent = source.parent
+            local parentID = guide.isSet(parent) and getID(parent)
             for i, arg in ipairs(source.args) do
                 if arg[1] == 'self' then
                     goto CONTINUE
@@ -1192,12 +1194,26 @@ compileNodeMap = util.switch()
                         , PARAM_NAME
                         , arg[1]
                     ))
+                    if parentID then
+                        pushForward(noders, getID(arg), sformat('%s%s%s'
+                            , parentID
+                            , PARAM_NAME
+                            , arg[1]
+                        ))
+                    end
                 else
                     pushForward(noders, getID(arg), sformat('%s%s%s'
                         , id
                         , PARAM_NAME
                         , '...'
                     ))
+                    if parentID then
+                        pushForward(noders, getID(arg), sformat('%s%s%s'
+                            , parentID
+                            , PARAM_NAME
+                            , '...'
+                        ))
+                    end
                 end
                 ::CONTINUE::
             end

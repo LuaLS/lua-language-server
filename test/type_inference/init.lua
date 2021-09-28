@@ -872,9 +872,9 @@ for _, a in ipairs(v) do
 end
 ]]
 
---TEST 'number' [[
------@param x number
---local f
---
---f = function (<?x?>) end
---]]
+TEST 'number' [[
+---@param x number
+local f
+
+f = function (<?x?>) end
+]]

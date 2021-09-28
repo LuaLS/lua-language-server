@@ -1638,6 +1638,8 @@ function m.eachID(noders)
     return next, noders.source
 end
 
+m.getFieldEventName = getFieldEventName
+
 ---获取对象的noders
 ---@param source parser.guide.object
 ---@return noders

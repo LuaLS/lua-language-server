@@ -1009,12 +1009,15 @@ compileNodeMap = util.switch()
         end
         if source.bindSources then
             for _, src in ipairs(source.bindSources) do
-                local paramID = sformat('%s%s%s'
-                    , getID(src)
-                    , PARAM_NAME
-                    , source.param[1]
-                )
-                pushForward(noders, paramID, id)
+                if src.type == 'function'
+                or guide.isSet(src) then
+                    local paramID = sformat('%s%s%s'
+                        , getID(src)
+                        , PARAM_NAME
+                        , source.param[1]
+                    )
+                    pushForward(noders, paramID, id)
+                end
             end
         end
     end)
@@ -1174,6 +1177,9 @@ compileNodeMap = util.switch()
         end
         if source.args then
             for i, arg in ipairs(source.args) do
+                if arg[1] == 'self' then
+                    goto CONTINUE
+                end
                 local indexID = sformat('%s%s%s'
                     , id
                     , PARAM_INDEX
@@ -1193,6 +1199,7 @@ compileNodeMap = util.switch()
                         , '...'
                     ))
                 end
+                ::CONTINUE::
             end
         end
         -- 检查实体返回值
@@ -1305,14 +1312,17 @@ compileNodeMap = util.switch()
         end
         for _, rtn in ipairs(source.returns) do
             for _, src in ipairs(source.bindSources) do
-                local fullID = sformat('%s%s%s'
-                    , getID(src)
-                    , RETURN_INDEX
-                    , rtn.returnIndex
-                )
-                pushForward(noders, fullID, getID(rtn))
-                for _, typeUnit in ipairs(rtn.types) do
-                    pushBackward(noders, getID(typeUnit), fullID, INFO_DEEP_AND_DONT_CROSS)
+                if src.type == 'function'
+                or guide.isSet(src) then
+                    local fullID = sformat('%s%s%s'
+                        , getID(src)
+                        , RETURN_INDEX
+                        , rtn.returnIndex
+                    )
+                    pushForward(noders, fullID, getID(rtn))
+                    for _, typeUnit in ipairs(rtn.types) do
+                        pushBackward(noders, getID(typeUnit), fullID, INFO_DEEP_AND_DONT_CROSS)
+                    end
                 end
             end
         end

@@ -55,6 +55,7 @@ local type         = type
 ---@field returnIndex           integer
 ---@field docs                  parser.guide.object[]
 ---@field state                 table
+---@field comment               table
 ---@field _root                 parser.guide.object
 ---@field _noders               noders
 ---@field _mnode                parser.guide.object

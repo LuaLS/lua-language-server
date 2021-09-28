@@ -969,3 +969,20 @@ p: T
     | b -- comment 3
         -- comment 4
 ```]]}
+
+TEST {{ path = 'a.lua', content = '', }, {
+    path = 'b.lua',
+    content = [[
+---@param x number # aaa
+local f
+
+function f(<?x?>) end
+]]
+},
+hover = [[
+```lua
+local x: number
+```
+
+---
+ aaa]]}

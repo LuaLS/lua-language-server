@@ -26,6 +26,7 @@ local ANY_FIELD_CHAR = '*'
 local INDEX_CHAR     = '['
 local RETURN_INDEX   = SPLIT_CHAR .. '#'
 local PARAM_INDEX    = SPLIT_CHAR .. '&'
+local PARAM_NAME     = SPLIT_CHAR .. '$'
 local TABLE_KEY      = SPLIT_CHAR .. '<'
 local WEAK_TABLE_KEY = SPLIT_CHAR .. '<<'
 local STRING_FIELD   = SPLIT_CHAR .. STRING_CHAR
@@ -857,7 +858,6 @@ compileNodeMap = util.switch()
     : call(function (noders, id, source)
         pushForward(noders, id, 'dn:nil')
     end)
-    -- self -> mt:xx
     : case 'local'
     : call(function (noders, id, source)
         if source[1] ~= 'self' then
@@ -1007,6 +1007,19 @@ compileNodeMap = util.switch()
                 pushForward(noders, getID(src), id)
             end
         end
+        if source.bindSources then
+            for _, src in ipairs(source.bindSources) do
+                if src.type == 'function'
+                or guide.isSet(src) then
+                    local paramID = sformat('%s%s%s'
+                        , getID(src)
+                        , PARAM_NAME
+                        , source.param[1]
+                    )
+                    pushForward(noders, paramID, id)
+                end
+            end
+        end
     end)
     : case 'doc.vararg'
     : call(function (noders, id, source)
@@ -1042,6 +1055,22 @@ compileNodeMap = util.switch()
     end)
     : case 'doc.type.function'
     : call(function (noders, id, source)
+        if source.args then
+            for index, param in ipairs(source.args) do
+                local paramID = sformat('%s%s%s'
+                    , id
+                    , PARAM_NAME
+                    , param.name[1]
+                )
+                pushForward(noders, paramID, getID(param.extends))
+                local indexID = sformat('%s%s%s'
+                    , id
+                    , PARAM_INDEX
+                    , index
+                )
+                pushForward(noders, indexID, getID(param.extends))
+            end
+        end
         if source.returns then
             for index, rtn in ipairs(source.returns) do
                 local returnID = sformat('%s%s%s'
@@ -1050,14 +1079,6 @@ compileNodeMap = util.switch()
                     , index
                 )
                 pushForward(noders, returnID, getID(rtn))
-            end
-            for index, param in ipairs(source.args) do
-                local paramID = sformat('%s%s%s'
-                    , id
-                    , PARAM_INDEX
-                    , index
-                )
-                pushForward(noders, paramID, getID(param.extends))
             end
         end
         -- @type fun(x: T):T 的情况
@@ -1130,40 +1151,12 @@ compileNodeMap = util.switch()
     end)
     : case 'function'
     : call(function (noders, id, source)
-        local hasDocReturn = {}
+        local hasDocReturn
         -- 检查 luadoc
         if source.bindDocs then
             for _, doc in ipairs(source.bindDocs) do
                 if doc.type == 'doc.return' then
-                    for _, rtn in ipairs(doc.returns) do
-                        local fullID = sformat('%s%s%s'
-                            , id
-                            , RETURN_INDEX
-                            , rtn.returnIndex
-                        )
-                        pushForward(noders, fullID, getID(rtn))
-                        for _, typeUnit in ipairs(rtn.types) do
-                            pushBackward(noders, getID(typeUnit), fullID, INFO_DEEP_AND_DONT_CROSS)
-                        end
-                        hasDocReturn[rtn.returnIndex] = true
-                    end
-                end
-                if doc.type == 'doc.param' then
-                    local paramName = doc.param[1]
-                    if source.docParamMap then
-                        local paramIndex = source.docParamMap[paramName]
-                        local param = source.args[paramIndex]
-                        if param then
-                            pushForward(noders, getID(param), getID(doc))
-                            param.docParam = doc
-                            local paramID = sformat('%s%s%s'
-                                , id
-                                , PARAM_INDEX
-                                , paramIndex
-                            )
-                            pushForward(noders, paramID, getID(doc.extends))
-                        end
-                    end
+                    hasDocReturn = true
                 end
                 if doc.type == 'doc.vararg' then
                     if source.args then
@@ -1182,26 +1175,58 @@ compileNodeMap = util.switch()
                 end
             end
         end
-        -- 检查实体返回值
-        if source.returns then
-            local returns = {}
-            for _, rtn in ipairs(source.returns) do
-                for index, rtnObj in ipairs(rtn) do
-                    if not hasDocReturn[index] then
-                        if not returns[index] then
-                            returns[index] = {}
-                        end
-                        returns[index][#returns[index]+1] = rtnObj
+        if source.args then
+            local parent = source.parent
+            local parentID = guide.isSet(parent) and getID(parent)
+            for i, arg in ipairs(source.args) do
+                if arg[1] == 'self' then
+                    goto CONTINUE
+                end
+                local indexID = sformat('%s%s%s'
+                    , id
+                    , PARAM_INDEX
+                    , i
+                )
+                pushForward(noders, indexID, getID(arg))
+                if arg.type == 'local' then
+                    pushForward(noders, getID(arg), sformat('%s%s%s'
+                        , id
+                        , PARAM_NAME
+                        , arg[1]
+                    ))
+                    if parentID then
+                        pushForward(noders, getID(arg), sformat('%s%s%s'
+                            , parentID
+                            , PARAM_NAME
+                            , arg[1]
+                        ))
+                    end
+                else
+                    pushForward(noders, getID(arg), sformat('%s%s%s'
+                        , id
+                        , PARAM_NAME
+                        , '...'
+                    ))
+                    if parentID then
+                        pushForward(noders, getID(arg), sformat('%s%s%s'
+                            , parentID
+                            , PARAM_NAME
+                            , '...'
+                        ))
                     end
                 end
+                ::CONTINUE::
             end
-            for index, rtnObjs in ipairs(returns) do
-                local returnID = sformat('%s%s%s'
-                    , id
-                    , RETURN_INDEX
-                    , index
-                )
-                for _, rtnObj in ipairs(rtnObjs) do
+        end
+        -- 检查实体返回值
+        if source.returns and not hasDocReturn then
+            for _, rtn in ipairs(source.returns) do
+                for index, rtnObj in ipairs(rtn) do
+                    local returnID = sformat('%s%s%s'
+                        , id
+                        , RETURN_INDEX
+                        , index
+                    )
                     pushForward(noders, returnID, getID(rtnObj))
                     pushBackward(noders, getID(rtnObj), returnID, INFO_DEEP_AND_DONT_CROSS)
                 end
@@ -1292,6 +1317,28 @@ compileNodeMap = util.switch()
                 if rtnObj then
                     pushForward(noders, 'mainreturn', getID(rtnObj), INFO_REJECT_SET)
                     pushBackward(noders, getID(rtnObj), 'mainreturn', INFO_DEEP_AND_REJECT_SET)
+                end
+            end
+        end
+    end)
+    : case 'doc.return'
+    : call(function (noders, id, source)
+        if not source.bindSources then
+            return
+        end
+        for _, rtn in ipairs(source.returns) do
+            for _, src in ipairs(source.bindSources) do
+                if src.type == 'function'
+                or guide.isSet(src) then
+                    local fullID = sformat('%s%s%s'
+                        , getID(src)
+                        , RETURN_INDEX
+                        , rtn.returnIndex
+                    )
+                    pushForward(noders, fullID, getID(rtn))
+                    for _, typeUnit in ipairs(rtn.types) do
+                        pushBackward(noders, getID(typeUnit), fullID, INFO_DEEP_AND_DONT_CROSS)
+                    end
                 end
             end
         end
@@ -1436,7 +1483,7 @@ function m.hasField(id)
     end
     local next2Char = ssub(id, #firstID + 2, #firstID + 2)
     if next2Char == RETURN_INDEX
-    or next2Char == PARAM_INDEX then
+    or next2Char == PARAM_NAME then
         return false
     end
     return true
@@ -1460,7 +1507,7 @@ function m.isCommonField(field)
     if ssub(field, 1, #RETURN_INDEX) == RETURN_INDEX then
         return false
     end
-    if ssub(field, 1, #PARAM_INDEX) == PARAM_INDEX then
+    if ssub(field, 1, #PARAM_NAME) == PARAM_NAME then
         return false
     end
     return true

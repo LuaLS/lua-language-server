@@ -5,6 +5,7 @@ local util   = require 'utility'
 local catch  = require 'catch'
 
 config.get 'Lua.diagnostics.neededFileStatus'['deprecated'] = 'Any'
+config.get 'Lua.diagnostics.neededFileStatus'['type-check'] = 'Any'
 
 rawset(_G, 'TEST', true)
 
@@ -460,7 +461,7 @@ f(1, 2, 3)
 ]]
 
 TEST [[
-<!unpack!>(<!1!>)
+<!unpack!>()
 ]]
 
 TEST [[
@@ -1134,6 +1135,9 @@ return {
 }
 ]]
 
+-- TODO
+do return end
+
 TEST [[
 ---@param table     table
 ---@param metatable table
@@ -1236,7 +1240,6 @@ f(<!s!>)
 
 TEST [[
 ---@alias searchmode '"ref"'|'"def"'|'"field"'|'"allref"'|'"alldef"'|'"allfield"'
-
 
 ---@param mode   searchmode
 function searchRefs(mode)end

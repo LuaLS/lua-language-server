@@ -195,15 +195,29 @@ local function buildValues(closure)
     local protoFunction = closure.proto
     local upvalues      = closure.upvalues
     local params        = closure.call.args
+    local args          = protoFunction.args
+    local paramMap      = {}
+    if params then
+        for i, param in ipairs(params) do
+            local arg = args and args[i]
+            if arg then
+                if arg.type == 'local' then
+                    paramMap[arg[1]] = param
+                elseif arg.type == 'doc.type.arg' then
+                    paramMap[arg.name[1]] = param
+                end
+            end
+        end
+    end
 
     if protoFunction.type == 'function' then
         for _, doc in ipairs(protoFunction.bindDocs) do
             if doc.type == 'doc.param' then
+                local name    = doc.param[1]
                 local extends = doc.extends
-                local index   = extends and extends.paramIndex
-                if index then
-                    local param   = params and params[index]
-                    closure.params[index] = param and createValue(closure, extends, function (road, key, proto)
+                if name and extends then
+                    local param = paramMap[name]
+                    closure.params[name] = param and createValue(closure, extends, function (road, key, proto)
                         buildValue(road, key, proto, param, upvalues)
                     end) or extends
                 end
@@ -219,9 +233,10 @@ local function buildValues(closure)
     end
     if protoFunction.type == 'doc.type.function' then
         for index, arg in ipairs(protoFunction.args) do
+            local name    = arg.name[1]
             local extends = arg.extends
-            local param   = params and params[index]
-            closure.params[index] = param and createValue(closure, extends, function (road, key, proto)
+            local param   = paramMap[name]
+            closure.params[name] = param and createValue(closure, extends, function (road, key, proto)
                 buildValue(road, key, proto, param, upvalues)
             end) or extends
         end

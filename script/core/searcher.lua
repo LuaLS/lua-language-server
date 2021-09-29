@@ -115,6 +115,7 @@ local pushDefResultsMap = util.switch()
     : case 'doc.field.name'
     : case 'doc.type.enum'
     : case 'doc.resume'
+    : case 'doc.param'
     : case 'doc.type.array'
     : case 'doc.type.table'
     : case 'doc.type.ltable'
@@ -122,6 +123,10 @@ local pushDefResultsMap = util.switch()
     : case 'doc.type.function'
     : call(function (source, status)
         return true
+    end)
+    : case 'doc.type.name'
+    : call(function (source, status)
+        return source.typeGeneric ~= nil
     end)
     : case 'call'
     : call(function (source, status)

@@ -17,7 +17,6 @@ m.DiagnosticSeverity = {
 --- 诊断类型与默认等级
 ---@type table<string, DiagnosticDefaultSeverity>
 m.DiagnosticDefaultSeverity = {
-    ['type-check']              = "Warning",
     ['unused-local']            = 'Hint',
     ['unused-function']         = 'Hint',
     ['undefined-global']        = 'Warning',
@@ -44,6 +43,7 @@ m.DiagnosticDefaultSeverity = {
     ['no-implicit-any']         = 'Information',
     ['deprecated']              = 'Warning',
     ['different-requires']      = 'Warning',
+    ['type-check']              = 'Warning',
 
     ['duplicate-doc-class']     = 'Warning',
     ['undefined-doc-class']     = 'Warning',
@@ -96,6 +96,7 @@ m.DiagnosticDefaultNeededFileStatus = {
     ['no-implicit-any']         = 'None',
     ['deprecated']              = 'Opened',
     ['different-requires']      = 'Any',
+    ['type-check']              = 'None',
 
     ['duplicate-doc-class']     = 'Any',
     ['undefined-doc-class']     = 'Any',

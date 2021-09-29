@@ -189,7 +189,7 @@ end
 <?y?> = x()
 ]]
 
-TEST 'integer|nil' [[
+TEST 'integer' [[
 local function x()
     return 1
     return nil
@@ -870,4 +870,11 @@ for _, a in ipairs(v) do
     for i, <?b?> in ipairs(a) do
     end
 end
+]]
+
+TEST 'number' [[
+---@param x number
+local f
+
+f = function (<?x?>) end
 ]]

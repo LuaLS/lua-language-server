@@ -1152,7 +1152,7 @@ local function buildLuaDoc(comment)
         if cstart and cstart < comment.finish then
             result.comment = {
                 type   = 'doc.tailcomment',
-                start  = cstart + comment.start - 1,
+                start  = cstart + comment.start,
                 finish = comment.finish,
                 text   = trimTailComment(text:sub(cstart)),
             }
@@ -1265,36 +1265,10 @@ local function bindDocsBetween(sources, binded, bindSources, start, finish)
     end
 end
 
-local function bindParamAndReturnIndex(binded)
-    local func
-    for _, source in ipairs(binded[1].bindSources) do
-        if source.type == 'function' then
-            func = source
-            break
-        end
-    end
-    if not func then
-        return
-    end
-    local paramMap
-    if func.args then
-        local paramIndex = 0
-        paramMap = {}
-        for _, param in ipairs(func.args) do
-            paramIndex = paramIndex + 1
-            if param[1] then
-                paramMap[param[1]] = paramIndex
-            end
-        end
-        func.docParamMap = paramMap
-    end
+local function bindReturnIndex(binded)
     local returnIndex = 0
     for _, doc in ipairs(binded) do
-        if doc.type == 'doc.param' then
-            if paramMap and doc.extends then
-                doc.extends.paramIndex = paramMap[doc.param[1]]
-            end
-        elseif doc.type == 'doc.return' then
+        if doc.type == 'doc.return' then
             for _, rtn in ipairs(doc.returns) do
                 returnIndex = returnIndex + 1
                 rtn.returnIndex = returnIndex
@@ -1340,7 +1314,7 @@ local function bindDoc(sources, binded)
     if #bindSources == 0 then
         bindDocsBetween(sources, binded, bindSources, guide.positionOf(row + 1, 0), guide.positionOf(row + 2, 0))
     end
-    bindParamAndReturnIndex(binded)
+    bindReturnIndex(binded)
     bindClassAndFields(binded)
 end
 

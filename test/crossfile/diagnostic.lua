@@ -6,6 +6,7 @@ local platform = require 'bee.platform'
 local catch    = require 'catch'
 
 config.get 'Lua.diagnostics.neededFileStatus'['deprecated'] = 'Any'
+config.get 'Lua.diagnostics.neededFileStatus'['type-check'] = 'Any'
 
 rawset(_G, 'TEST', true)
 

@@ -10,6 +10,24 @@
   + `different-requires`
 * `NEW` supports `---@CustomClass<string, number>`
 * `NEW` supports `$/cancelRequest`
+* `NEW` supports `EventEmitter`
+    ```lua
+    --- @class Emit
+    --- @field on fun(eventName: string, cb: function)
+    --- @field on fun(eventName: '"died"', cb: fun(i: integer))
+    --- @field on fun(eventName: '"won"', cb: fun(s: string))
+    local emit = {}
+
+    emit:on(--[[support autocomplete fr "died" and "won"]])
+
+    emit:on("died", function (i)
+        -- should be i: integer
+    end)
+
+    emit:on('won', function (s)
+        -- should be s: string
+    end)
+    ```
 * `CHG` hover: improve showing multi defines
 * `CHG` hover: improve showing multi comments at enums
 * `CHG` hint: `Lua.hint.paramName` now supports `Disable`, `Literal` and `All`
@@ -23,6 +41,7 @@
 * `CHG` diagnostics:
   + `redundant-parameter` default severity to `Warning`
   + `redundant-value` default severity to `Warning`
+* `CHG` infer: more strict of calculation results
 * `CHG` [#663](https://github.com/sumneko/lua-language-server/issues/663)
 * `FIX` runtime errors
 * `FIX` hint: may show param-2 as `self`

@@ -19,6 +19,7 @@ local lang         = require 'language'
 local lookBackward = require 'core.look-backward'
 local guide        = require 'parser.guide'
 local infer        = require 'core.infer'
+local noder        = require 'core.noder'
 
 local DiagnosticModes = {
     'disable-next-line',
@@ -1315,7 +1316,7 @@ local function pushCallEnumsAndFuncs(defs)
     return results
 end
 
-local function getCallEnumsAndFuncs(source, index, oop)
+local function getCallEnumsAndFuncs(source, index, oop, call)
     if source.type == 'function' and source.bindDocs then
         if not source.args then
             return
@@ -1360,6 +1361,50 @@ local function getCallEnumsAndFuncs(source, index, oop)
         if arg and arg.extends then
             return pushCallEnumsAndFuncs(vm.getDefs(arg.extends))
         end
+    end
+    if source.type == 'doc.field.name' then
+        local currentIndex = index
+        if oop then
+            currentIndex = index - 1
+        end
+        local class = source.parent.class
+        if not class then
+            return
+        end
+        local results = {}
+        if currentIndex == 1 then
+            for _, doc in ipairs(class.fields) do
+                if  doc.field ~= source
+                and doc.field[1] == source[1] then
+                    local eventName = noder.getFieldEventName(doc)
+                    if eventName then
+                        results[#results+1] = {
+                            label       = ('%q'):format(eventName),
+                            description = doc.comment,
+                            kind        = define.CompletionItemKind.EnumMember,
+                        }
+                    end
+                end
+            end
+        elseif currentIndex == 2 then
+            local myEventName = call.args[index - 1][1]
+            for _, doc in ipairs(class.fields) do
+                if  doc.field ~= source
+                and doc.field[1] == source[1] then
+                    local eventName = noder.getFieldEventName(doc)
+                    if eventName and eventName == myEventName then
+                        local docFunc = doc.extends.types[1].args[2].extends.types[1]
+                        results[#results+1] = {
+                            label       = infer.viewDocFunction(docFunc),
+                            description = doc.comment,
+                            kind        = define.CompletionItemKind.Function,
+                            insertText  = buildInsertDocFunction(docFunc),
+                        }
+                    end
+                end
+            end
+        end
+        return results
     end
 end
 
@@ -1494,7 +1539,7 @@ local function tryCallArg(state, text, position, results)
     local defs = vm.getDefs(call.node)
     for _, def in ipairs(defs) do
         def = searcher.getObjectValue(def) or def
-        local enums = getCallEnumsAndFuncs(def, argIndex, oop)
+        local enums = getCallEnumsAndFuncs(def, argIndex, oop, call)
         if enums then
             mergeEnums(myResults, enums, arg)
         end

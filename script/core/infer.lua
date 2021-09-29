@@ -31,6 +31,12 @@ local function mergeTable(a, b)
     end
 end
 
+local function isBaseType(source, mark)
+    return m.hasType(source, 'number', mark)
+        or m.hasType(source, 'integer', mark)
+        or m.hasType(source, 'string', mark)
+end
+
 local function searchInferOfUnary(value, infers, mark)
     local op = value.op.type
     if op == 'not' then
@@ -38,19 +44,24 @@ local function searchInferOfUnary(value, infers, mark)
         return
     end
     if op == '#' then
-        infers['integer'] = true
+        if m.hasType(value[1], 'table', mark)
+        or m.hasType(value[1], 'string', mark) then
+            infers['integer'] = true
+        end
         return
     end
     if op == '-' then
         if m.hasType(value[1], 'integer', mark) then
             infers['integer'] = true
-        else
+        elseif isBaseType(value[1], mark) then
             infers['number'] = true
         end
         return
     end
     if op == '~' then
-        infers['integer'] = true
+        if isBaseType(value[1], mark) then
+            infers['integer'] = true
+        end
         return
     end
 end
@@ -73,6 +84,7 @@ local function searchInferOfBinary(value, infers, mark)
         end
         return
     end
+    -- must return boolean
     if op == '=='
     or op == '~='
     or op == '<'
@@ -82,28 +94,29 @@ local function searchInferOfBinary(value, infers, mark)
         infers['boolean'] = true
         return
     end
+    -- check number
     if op == '<<'
     or op == '>>'
     or op == '~'
     or op == '&'
     or op == '|' then
-        if  m.hasType(value[1], 'integer', mark)
-        and m.hasType(value[2], 'integer', mark) then
+        if  isBaseType(value[1], mark)
+        and isBaseType(value[2], mark) then
             infers['integer'] = true
         end
         return
     end
     if op == '..' then
-        infers['string'] = true
+        if  isBaseType(value[1], mark)
+        and isBaseType(value[2], mark) then
+            infers['string'] = true
+        end
         return
     end
     if op == '^'
     or op == '/' then
-        if  m.hasType(value[1], 'integer', mark)
-        and m.hasType(value[2], 'integer', mark) then
-            infers['integer'] = true
-        elseif (m.hasType(value[1], 'number', mark) or m.hasType(value[1], 'integer', mark))
-        and (m.hasType(value[2], 'number', mark) or m.hasType(value[2], 'integer', mark))then
+        if  isBaseType(value[1], mark)
+        and isBaseType(value[2], mark) then
             infers['number'] = true
         end
         return
@@ -116,8 +129,8 @@ local function searchInferOfBinary(value, infers, mark)
         if  m.hasType(value[1], 'integer', mark)
         and m.hasType(value[2], 'integer', mark) then
             infers['integer'] = true
-        elseif (m.hasType(value[1], 'number', mark) or m.hasType(value[1], 'integer', mark))
-        and (m.hasType(value[2], 'number', mark) or m.hasType(value[2], 'integer', mark))then
+        elseif isBaseType(value[1], mark)
+        and    isBaseType(value[2], mark) then
             infers['number'] = true
         end
         return
@@ -462,6 +475,24 @@ local function searchLiteral(source, literals, mark)
     end
 end
 
+local function getCachedInfers(source, field)
+    local inferCache = vm.getCache 'infers'
+    local sourceCache = inferCache[source]
+    if not sourceCache then
+        sourceCache = {}
+        inferCache[source] = sourceCache
+    end
+    if not field then
+        field = ''
+    end
+    if sourceCache[field] then
+        return true, sourceCache[field]
+    end
+    local infers = {}
+    sourceCache[field] = infers
+    return false, infers
+end
+
 ---搜索对象的推断类型
 ---@param source parser.guide.object
 ---@param field? string
@@ -472,9 +503,12 @@ function m.searchInfers(source, field, mark)
     if not source then
         return nil
     end
+    local suc, infers = getCachedInfers(source, field)
+    if suc then
+        return infers
+    end
     local isParam = source.parent.type == 'funcargs'
     local defs = vm.getDefs(source, field)
-    local infers = {}
     mark = mark or {}
     if not field then
         searchInfer(source, infers, mark)
@@ -568,22 +602,18 @@ end
 ---判断对象的推断类型是否包含某个类型
 function m.hasType(source, tp, mark)
     mark = mark or {}
-    if not mark.hasType then
-        mark.hasType = {}
+    local infers = m.searchInfers(source, nil, mark)
+    if infers[tp] then
+        return true
     end
-    if mark.hasType[source] == nil then
-        local infers = m.searchInfers(source, nil, mark)
-        mark.hasType[source] = infers[tp] or false
-        if tp == 'function' and not infers[tp] then
-            for infer in pairs(infers) do
-                if infer:sub(1, 4) == 'fun(' then
-                    mark.hasType[source] = true
-                    break
-                end
+    if tp == 'function' then
+        for infer in pairs(infers) do
+            if infer ~= 0 and infer:sub(1, 4) == 'fun(' then
+                return true
             end
         end
     end
-    return mark.hasType[source]
+    return false
 end
 
 ---搜索并显示推断类型

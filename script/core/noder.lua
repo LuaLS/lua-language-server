@@ -27,6 +27,7 @@ local INDEX_CHAR     = '['
 local RETURN_INDEX   = SPLIT_CHAR .. '#'
 local PARAM_INDEX    = SPLIT_CHAR .. '&'
 local PARAM_NAME     = SPLIT_CHAR .. '$'
+local EVENT_ENUM     = SPLIT_CHAR .. '>'
 local TABLE_KEY      = SPLIT_CHAR .. '<'
 local WEAK_TABLE_KEY = SPLIT_CHAR .. '<<'
 local STRING_FIELD   = SPLIT_CHAR .. STRING_CHAR
@@ -130,6 +131,45 @@ local function getMethodNode(source)
         source._mnode = setmethod.node
         return setmethod.node
     end
+end
+
+local function getFieldEventName(field)
+    if field._eventName then
+        return field._eventName or nil
+    end
+    field._eventName = false
+    local fieldType = field.extends
+    if not fieldType then
+        return nil
+    end
+    local docFunc = fieldType.types[1]
+    if not docFunc or docFunc.type ~= 'doc.type.function' then
+        return nil
+    end
+    local firstArg = docFunc.args and #docFunc.args == 2 and docFunc.args[1]
+    if not firstArg then
+        return nil
+    end
+    local secondArg = docFunc.args[2]
+    local firstType = firstArg.extends
+    if not firstType then
+        return nil
+    end
+    local firstEnum = #firstType.enums == 1 and #firstType.types == 0 and firstType.enums[1]
+    if not firstEnum then
+        return nil
+    end
+    local secondType = secondArg.extends
+    if not secondType then
+        return nil
+    end
+    local secondTypeUnit = #secondType.enums == 0 and #secondType.types == 1 and secondType.types[1]
+    if not secondTypeUnit or secondTypeUnit.type ~= 'doc.type.function' then
+        return nil
+    end
+    local eventName = firstEnum[1]:match [[^['"](.+)['"]$]]
+    field._eventName = eventName
+    return eventName
 end
 
 local getKey, getID
@@ -744,8 +784,21 @@ local function compileCallParam(noders, call, sourceID)
     if not nodeID then
         return
     end
+    if node.type == 'getmethod' then
+        fixIndex = fixIndex + 1
+    end
+    local eventNodeID
     for firstIndex, callArg in ipairs(call.args) do
         firstIndex = firstIndex - fixIndex
+        if firstIndex == 1 and callArg.type == 'string' then
+            if callArg[1] then
+                eventNodeID = sformat('%s%s%s'
+                    , nodeID
+                    , EVENT_ENUM
+                    , callArg[1]
+                )
+            end
+        end
         if firstIndex > 0 and callArg.type == 'function' then
             if callArg.args then
                 for secondIndex, funcParam in ipairs(callArg.args) do
@@ -757,6 +810,16 @@ local function compileCallParam(noders, call, sourceID)
                         , secondIndex
                     )
                     pushForward(noders, getID(funcParam), paramID)
+                    if eventNodeID then
+                        local eventParamID = sformat('%s%s%s%s%s'
+                            , eventNodeID
+                            , PARAM_INDEX
+                            , firstIndex
+                            , PARAM_INDEX
+                            , secondIndex
+                        )
+                        pushForward(noders, getID(funcParam), eventParamID)
+                    end
                 end
             end
         end
@@ -985,6 +1048,14 @@ compileNodeMap = util.switch()
                         , STRING_FIELD
                         , key
                     )
+                    local eventName = getFieldEventName(field)
+                    if eventName then
+                        keyID = sformat('%s%s%s'
+                            , keyID
+                            , EVENT_ENUM
+                            , eventName
+                        )
+                    end
                 else
                     keyID = sformat('%s%s%s'
                         , id
@@ -1566,6 +1637,8 @@ end
 function m.eachID(noders)
     return next, noders.source
 end
+
+m.getFieldEventName = getFieldEventName
 
 ---获取对象的noders
 ---@param source parser.guide.object

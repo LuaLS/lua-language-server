@@ -96,16 +96,32 @@ TEST 'boolean' [[
 <?x?> = not y
 ]]
 
-TEST 'integer' [[
+TEST 'any' [[
 <?x?> = #y
 ]]
 
-TEST 'number' [[
-<?x?> = - y
+TEST 'integer' [[
+<?x?> = #'aaaa'
 ]]
 
 TEST 'integer' [[
+<?x?> = #{}
+]]
+
+TEST 'any' [[
+<?x?> = - y
+]]
+
+TEST 'number' [[
+<?x?> = - 1.0
+]]
+
+TEST 'any' [[
 <?x?> = ~ y
+]]
+
+TEST 'integer' [[
+<?x?> = ~ 1
 ]]
 
 TEST 'integer' [[
@@ -124,17 +140,29 @@ TEST 'boolean' [[
 <?x?> = a == b
 ]]
 
--- TEST 'integer' [[
--- <?x?> = a << b
--- ]]
+TEST 'any' [[
+<?x?> = a << b
+]]
 
-TEST 'string' [[
+TEST 'integer' [[
+<?x?> = 1 << 2
+]]
+
+TEST 'any' [[
 <?x?> = a .. b
 ]]
 
--- TEST 'number' [[
--- <?x?> = a + b
--- ]]
+TEST 'string' [[
+<?x?> = 'a' .. 'b'
+]]
+
+TEST 'any' [[
+<?x?> = a + b
+]]
+
+TEST 'number' [[
+<?x?> = 1 + 2.0
+]]
 
 TEST 'tablelib' [[
 ---@class tablelib
@@ -877,4 +905,15 @@ TEST 'number' [[
 local f
 
 f = function (<?x?>) end
+]]
+
+TEST 'integer' [[
+--- @class Emit
+--- @field on fun(eventName: string, cb: function)
+--- @field on fun(eventName: '"died"', cb: fun(i: integer))
+--- @field on fun(eventName: '"won"', cb: fun(s: string))
+local emit = {}
+
+emit:on("died", function (<?i?>)
+end)
 ]]

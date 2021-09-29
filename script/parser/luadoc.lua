@@ -1065,6 +1065,28 @@ local function parseDiagnostic()
     return result
 end
 
+local function parseModule()
+    local result = {
+        type     = 'doc.module',
+        start    = getFinish(),
+        finish   = getFinish(),
+    }
+    local tp, content = peekToken()
+    if tp == 'string' then
+        result.module = content
+        nextToken()
+        result.start  = getStart()
+        result.finish = getFinish()
+    else
+        pushError {
+            type   = 'LUADOC_MISS_MODULE_NAME',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+    end
+    return result
+end
+
 local function convertTokens()
     local tp, text = nextToken()
     if not tp then
@@ -1106,6 +1128,8 @@ local function convertTokens()
         return parseSee()
     elseif text == 'diagnostic' then
         return parseDiagnostic()
+    elseif text == 'module' then
+        return parseModule()
     end
 end
 

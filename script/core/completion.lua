@@ -877,8 +877,106 @@ local function isAfterLocal(state, text, startPos)
     return word == 'local'
 end
 
-local function checkUri(state, text, position, results)
+local function collectRequireNames(mode, myUri, literal, source, smark, position, results)
     local collect = {}
+    if mode == 'require' then
+        for uri in files.eachFile() do
+            if myUri == uri then
+                goto CONTINUE
+            end
+            local path = workspace.getRelativePath(uri)
+            local infos = rpath.getVisiblePath(path, config.get 'Lua.runtime.path')
+            for _, info in ipairs(infos) do
+                if matchKey(literal, info.expect) then
+                    if not collect[info.expect] then
+                        collect[info.expect] = {
+                            textEdit = {
+                                start   = smark and (source.start + #smark) or position,
+                                finish  = smark and (source.start - #smark) or position,
+                                newText = smark and info.expect or util.viewString(info.expect),
+                            }
+                        }
+                    end
+                    if vm.isMetaFile(uri) then
+                        collect[info.expect][#collect[info.expect]+1] = ('* [[meta]](%s)'):format(uri)
+                    else
+                        collect[info.expect][#collect[info.expect]+1] = ([=[* [%s](%s) %s]=]):format(
+                            path,
+                            uri,
+                            lang.script('HOVER_USE_LUA_PATH', info.searcher)
+                        )
+                    end
+                end
+            end
+            ::CONTINUE::
+        end
+        for uri in files.eachDll() do
+            local opens = files.getDllOpens(uri) or {}
+            local path = workspace.getRelativePath(uri)
+            for _, open in ipairs(opens) do
+                if matchKey(literal, open) then
+                    if not collect[open] then
+                        collect[open] = {
+                            textEdit = {
+                                start   = smark and (source.start + #smark) or position,
+                                finish  = smark and (source.start - #smark) or position,
+                                newText = smark and open or util.viewString(open),
+                            }
+                        }
+                    end
+                    collect[open][#collect[open]+1] = ([=[* [%s](%s)]=]):format(
+                        path,
+                        uri
+                    )
+                end
+            end
+        end
+    else
+        for uri in files.eachFile() do
+            if myUri == uri then
+                goto CONTINUE
+            end
+            if vm.isMetaFile(uri) then
+                goto CONTINUE
+            end
+            local path = workspace.getRelativePath(uri)
+            if matchKey(literal, path) then
+                if not collect[path] then
+                    collect[path] = {
+                        textEdit = {
+                            start   = smark and (source.start + #smark) or position,
+                            finish  = smark and (source.start - #smark) or position,
+                            newText = smark and path or util.viewString(path),
+                        }
+                    }
+                end
+                collect[path][#collect[path]+1] = ([=[[%s](%s)]=]):format(
+                    path,
+                    uri
+                )
+            end
+            ::CONTINUE::
+        end
+    end
+    for label, infos in util.sortPairs(collect) do
+        local mark = {}
+        local des  = {}
+        for _, info in ipairs(infos) do
+            if not mark[info] then
+                mark[info] = true
+                des[#des+1] = info
+            end
+        end
+        results[#results+1] = {
+            label = label,
+            kind  = define.CompletionItemKind.Reference,
+            description = table.concat(des, '\n'),
+            textEdit = infos.textEdit,
+        }
+    end
+end
+
+local function checkUri(state, text, position, results)
     local myUri = guide.getUri(state.ast)
     guide.eachSourceContain(state.ast, position, function (source)
         if source.type ~= 'string' then
@@ -898,103 +996,12 @@ local function checkUri(state, text, position, results)
         if not libName then
             return
         end
-        if     libName == 'require' then
-            for uri in files.eachFile() do
-                if myUri == uri then
-                    goto CONTINUE
-                end
-                local path = workspace.getRelativePath(uri)
-                local infos = rpath.getVisiblePath(path, config.get 'Lua.runtime.path')
-                for _, info in ipairs(infos) do
-                    if matchKey(literal, info.expect) then
-                        if not collect[info.expect] then
-                            collect[info.expect] = {
-                                textEdit = {
-                                    start   = source.start + #source[2],
-                                    finish  = position,
-                                    newText = info.expect,
-                                }
-                            }
-                        end
-                        if vm.isMetaFile(uri) then
-                            collect[info.expect][#collect[info.expect]+1] = ('* [[meta]](%s)'):format(uri)
-                        else
-                            collect[info.expect][#collect[info.expect]+1] = ([=[* [%s](%s) %s]=]):format(
-                                path,
-                                uri,
-                                lang.script('HOVER_USE_LUA_PATH', info.searcher)
-                            )
-                        end
-                    end
-                end
-                ::CONTINUE::
-            end
-            for uri in files.eachDll() do
-                local opens = files.getDllOpens(uri) or {}
-                local path = workspace.getRelativePath(uri)
-                for _, open in ipairs(opens) do
-                    if matchKey(literal, open) then
-                        if not collect[open] then
-                            collect[open] = {
-                                textEdit = {
-                                    start   = source.start + #source[2],
-                                    finish  = source.finish - #source[2],
-                                    newText = open,
-                                }
-                            }
-                        end
-                        collect[open][#collect[open]+1] = ([=[* [%s](%s)]=]):format(
-                            path,
-                            uri
-                        )
-                    end
-                end
-            end
-        elseif libName == 'dofile'
-        or     libName == 'loadfile' then
-            for uri in files.eachFile() do
-                if myUri == uri then
-                    goto CONTINUE
-                end
-                if vm.isMetaFile(uri) then
-                    goto CONTINUE
-                end
-                local path = workspace.getRelativePath(uri)
-                if matchKey(literal, path) then
-                    if not collect[path] then
-                        collect[path] = {
-                            textEdit = {
-                                start   = source.start + #source[2],
-                                finish  = source.finish - #source[2],
-                                newText = path,
-                            }
-                        }
-                    end
-                    collect[path][#collect[path]+1] = ([=[[%s](%s)]=]):format(
-                        path,
-                        uri
-                    )
-                end
-                ::CONTINUE::
-            end
+        if libName == 'require'
+        or libName == 'dofile'
+        or libName == 'loadfile' then
+            collectRequireNames(libName, myUri, literal, source, source[2], position, results)
         end
     end)
-    for label, infos in util.sortPairs(collect) do
-        local mark = {}
-        local des  = {}
-        for _, info in ipairs(infos) do
-            if not mark[info] then
-                mark[info] = true
-                des[#des+1] = info
-            end
-        end
-        results[#results+1] = {
-            label = label,
-            kind  = define.CompletionItemKind.Reference,
-            description = table.concat(des, '\n'),
-            textEdit = infos.textEdit,
-        }
-    end
 end
 
 local function checkLenPlusOne(state, text, position, results)
@@ -1611,6 +1618,7 @@ local function tryLuaDocCate(word, results)
         'version',
         'see',
         'diagnostic',
+        'module',
     } do
         if matchKey(word, docType) then
             results[#results+1] = {
@@ -1829,6 +1837,8 @@ local function tryLuaDocByErr(state, position, err, docState, results)
                 kind  = define.CompletionItemKind.Value,
             }
         end
+    elseif err.type == 'LUADOC_MISS_MODULE_NAME' then
+        collectRequireNames('require', state.uri, '', docState, nil, position, results)
     end
 end
 

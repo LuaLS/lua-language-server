@@ -82,36 +82,46 @@ local function searchInferOfBinary(value, infers, mark)
         infers['boolean'] = true
         return
     end
-    -- if op == '<<'
-    -- or op == '>>'
-    -- or op == '~'
-    -- or op == '&'
-    -- or op == '|' then
-    --     infers['integer'] = true
-    --     return
-    -- end
+    if op == '<<'
+    or op == '>>'
+    or op == '~'
+    or op == '&'
+    or op == '|' then
+        if  m.hasType(value[1], 'integer', mark)
+        and m.hasType(value[2], 'integer', mark) then
+            infers['integer'] = true
+        end
+        return
+    end
     if op == '..' then
         infers['string'] = true
         return
     end
-    -- if op == '^'
-    -- or op == '/' then
-    --     infers['number'] = true
-    --     return
-    -- end
-    -- if op == '+'
-    -- or op == '-'
-    -- or op == '*'
-    -- or op == '%'
-    -- or op == '//' then
-    --     if  m.hasType(value[1], 'integer', mark)
-    --     and m.hasType(value[2], 'integer', mark) then
-    --         infers['integer'] = true
-    --     else
-    --         infers['number'] = true
-    --     end
-    --     return
-    -- end
+    if op == '^'
+    or op == '/' then
+        if  m.hasType(value[1], 'integer', mark)
+        and m.hasType(value[2], 'integer', mark) then
+            infers['integer'] = true
+        elseif (m.hasType(value[1], 'number', mark) or m.hasType(value[1], 'integer', mark))
+        and (m.hasType(value[2], 'number', mark) or m.hasType(value[2], 'integer', mark))then
+            infers['number'] = true
+        end
+        return
+    end
+    if op == '+'
+    or op == '-'
+    or op == '*'
+    or op == '%'
+    or op == '//' then
+        if  m.hasType(value[1], 'integer', mark)
+        and m.hasType(value[2], 'integer', mark) then
+            infers['integer'] = true
+        elseif (m.hasType(value[1], 'number', mark) or m.hasType(value[1], 'integer', mark))
+        and (m.hasType(value[2], 'number', mark) or m.hasType(value[2], 'integer', mark))then
+            infers['number'] = true
+        end
+        return
+    end
 end
 
 local function searchInferOfValue(value, infers, mark)
@@ -235,7 +245,7 @@ local function cleanInfers(infers)
     --  如果有doc标记，则先移除table类型
     if infers[CLASS] then
         infers[CLASS] = nil
-        -- infers['table'] = nil
+        infers['table'] = nil
     end
     -- 用doc标记的table，加入table类型
     if infers[TABLE] then
@@ -457,6 +467,7 @@ end
 ---@param field? string
 ---@param mark? table
 ---@return string[]
+---@return boolean
 function m.searchInfers(source, field, mark)
     if not source then
         return nil
@@ -491,8 +502,12 @@ function m.searchInfers(source, field, mark)
             end
         end
     end
+    local hasTable = false
+    if infers[CLASS] and infers['table'] then
+        hasTable = true
+    end
     cleanInfers(infers)
-    return infers
+    return infers, hasTable
 end
 
 ---搜索对象的字面量值

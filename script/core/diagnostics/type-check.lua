@@ -6,11 +6,15 @@ local await  = require 'await'
 local hasVarargs
 
 local function inTypes(param, args)
+    if string.sub(param.type, 1, 9) == 'doc.type.'
+    and not param[1] then
+        param[1] = string.sub(param.type, 10)
+    end
+
     for _, v in ipairs(args) do
         if v[1] == 'any' then
             return true
-        end
-        if param[1] == v[1] then
+        elseif param[1] == v[1] then
             return true
         elseif (param[1] == 'number' or param[1] == 'integer')
         and (v[1] == 'integer' or v[1] == 'number') then
@@ -42,15 +46,59 @@ local function addFatherClass(infers)
         end
     end
 end
-local function excludeSituations(types)
-    if not types[1]
-    or not types[1][1]
-    or types[1].typeGeneric then
-        return true
-    end
-    return false
-end
 
+local function getParamTypes(arg)
+    if not arg then
+        return false
+    end
+    local types
+    if arg.type == '...' then
+        types = {
+            [1] = {
+                [1] = '...',
+                type = 'varargs'
+            }
+        }
+        return true, types
+    end
+    ---处理doc.type.function
+    if arg.type == 'doc.type.arg' then
+        if arg.name and arg.name[1] == '...' then
+            types = {
+                [1] = {
+                    [1] = '...',
+                    type = 'varargs'
+                }
+            }
+            return true, types
+        end
+        types = arg.extends.types
+        return true, types
+    end
+    ---处理function
+    local argDefs = vm.getDefs(arg)
+    if #argDefs == 0 then
+        return false
+    end
+    for _, argDef in ipairs(argDefs) do
+        if argDef.type == 'doc.param' and argDef.extends then
+            types = argDef.extends.types
+            return true, types
+        ---变长参数
+        elseif argDef.name and argDef.name[1] == '...' then
+            types = {
+                [1] = {
+                    [1] = '...',
+                    type = 'varargs'
+                }
+            }
+            break
+        end
+    end
+    if not types then
+        return false
+    end
+end
 local function getInfoFromDefs(defs)
     local paramsTypes = {}
     local funcArgsType
@@ -69,40 +117,28 @@ local function getInfoFromDefs(defs)
         or def.type == 'doc.type.function' then
             if def.args then
                 for _, arg in ipairs(def.args) do
-                    local types
-                    if arg.docParam and arg.docParam.extends then
-                        types = arg.docParam.extends.types
-                    ---变长参数
-                    elseif arg.name and arg.name[1] == '...' then
-                        types = {
-                            [1] = {
-                                [1] = '...',
-                                type = 'varargs'
-                            }
-                        }
-                    elseif arg.type == 'doc.type.arg' then
-                        types = arg.extends.types
-                    else
-                        goto CONTINUE
-                    end
-                    ---如果是很复杂的type，比如泛型什么的，先不检查
-                    if excludeSituations(types) then
-                        goto CONTINUE
-                    end
-                    local plusAlias = {}
-                    for _, tp in ipairs(types) do
-                        local aliasDefs =  vm.getDefs(tp)
-                        for _, v in ipairs(aliasDefs) do
-                            ---TODO(arthur)
-                            -- if not v.type then
-                            -- end
-                            plusAlias[#plusAlias+1] = {
-                                [1] = v[1],
-                                type = v.type or v[1]
-                            }
+                    local suc, types = getParamTypes(arg)
+                    if suc then
+                        local plusAlias = {}
+                        for i, tp in ipairs(types) do
+                            local aliasDefs =  vm.getDefs(tp)
+                            for _, v in ipairs(aliasDefs) do
+                                ---TODO(arthur)
+                                -- if not v.type then
+                                -- end
+                                if v[1] ~= tp[1] then
+                                    plusAlias[#plusAlias+1] = v
+                                end
+                                if not v[1] or not v.type then
+                                    log.warn('type-check: if not v[1] or not v.type')
+                                end
+                            end
+                            plusAlias[#plusAlias+1] = types[i]
                         end
+                        funcArgsType[#funcArgsType+1] = plusAlias
+                    else
+                        funcArgsType = {}
                     end
-                    funcArgsType[#funcArgsType+1] = plusAlias
                 end
             end
             if #funcArgsType > 0 then
@@ -114,6 +150,12 @@ local function getInfoFromDefs(defs)
     return paramsTypes
 end
 
+local function isGeneric(type)
+    if type.typeGeneric then
+        return true
+    end
+    return false
+end
 local function matchParams(paramsTypes, i, arg)
     local flag = ''
     local messages = {}
@@ -133,6 +175,9 @@ local function matchParams(paramsTypes, i, arg)
                 return true
             elseif param[1] == '...' then
                 hasVarargs = true
+                return true
+            ---如果是泛型，不检查
+            elseif isGeneric(param) then
                 return true
             else
                 ---TODO(arthur) 什么时候param[1]是nil？
@@ -155,6 +200,44 @@ local function matchParams(paramsTypes, i, arg)
     end
     return false, messages
 end
+
+local function getArgsInfo(callArgs)
+    local callArgsType = {}
+    for _, arg in ipairs(callArgs) do
+        local infers, hasTable = infer.searchInfers(arg)
+        if infers['_G'] or infer['_ENV'] then
+            infers['_G'] = nil
+            infers['_ENV'] = nil
+            infers['table'] = true
+        end
+        if hasTable then
+            infers['table'] = true
+        end
+        local hasAny = infers['any']
+        ---处理继承
+        addFatherClass(infers)
+        if not hasAny then
+            infers['any'] = nil
+            infers['unknown'] = nil
+        end
+        local types = {}
+        for k in pairs(infers) do
+            if k then
+                types[#types+1] = {
+                    [1] = k,
+                    type = k
+                }
+            end
+        end
+        if #types < 1 then
+            return false
+        end
+        types.start = arg.start
+        types.finish = arg.finish
+        callArgsType[#callArgsType+1] = types
+    end
+    return true, callArgsType
+end
 return function (uri, callback)
     local ast = files.getState(uri)
     if not ast then
@@ -166,36 +249,9 @@ return function (uri, callback)
         end
         await.delay()
         local callArgs = source.args
-        local callArgsType = {}
-        for _, arg in ipairs(callArgs) do
-            local infers = infer.searchInfers(arg)
-            if infers['_G'] or infer['_ENV'] then
-                infers['_G'] = nil
-                infers['_ENV'] = nil
-                infers['table'] = true
-            end
-            local hasAny = infers['any']
-            ---处理继承
-            addFatherClass(infers)
-            if not hasAny then
-                infers['any'] = nil
-                infers['unknown'] = nil
-            end
-            local types = {}
-            for k in pairs(infers) do
-                if k then
-                    types[#types+1] = {
-                        [1] = k,
-                        type = k
-                    }
-                end
-            end
-            if #types < 1 then
-                return
-            end
-            types.start = arg.start
-            types.finish = arg.finish
-            callArgsType[#callArgsType+1] = types
+        local suc, callArgsType = getArgsInfo(callArgs)
+        if not suc then
+            return
         end
         local func = source.node
         local defs = vm.getDefs(func)

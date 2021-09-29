@@ -1135,9 +1135,6 @@ return {
 }
 ]]
 
--- TODO
-do return end
-
 TEST [[
 ---@param table     table
 ---@param metatable table
@@ -1242,6 +1239,6 @@ TEST [[
 ---@alias searchmode '"ref"'|'"def"'|'"field"'|'"allref"'|'"alldef"'|'"allfield"'
 
 ---@param mode   searchmode
-function searchRefs(mode)end
+local function searchRefs(mode)end
 searchRefs('ref')
 ]]

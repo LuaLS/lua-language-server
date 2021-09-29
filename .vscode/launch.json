@@ -9,7 +9,6 @@
 			"stopOnEntry": false,
 			"program": "${workspaceRoot}/test.lua",
 			"cpath": "${workspaceFolder}/bin/Windows/?.dll",
-			"luaexe":"${workspaceFolder}/bin/Windows/lua-language-server.exe",
 			"arg": [
 			],
 			"luaVersion": "latest",

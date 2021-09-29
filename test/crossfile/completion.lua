@@ -838,3 +838,15 @@ TEST {
     },
     completion = EXISTS
 }
+
+TEST {
+    { path = 'abcde.lua', content = '' },
+    {
+        path = 'main.lua',
+        main = true,
+        content = [[
+            ---@module 'ab<??>'
+        ]]
+    },
+    completion = EXISTS
+}

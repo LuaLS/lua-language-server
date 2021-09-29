@@ -892,7 +892,7 @@ local function collectRequireNames(mode, myUri, literal, source, smark, position
                         collect[info.expect] = {
                             textEdit = {
                                 start   = smark and (source.start + #smark) or position,
-                                finish  = smark and (source.start - #smark) or position,
+                                finish  = smark and (source.finish - #smark) or position,
                                 newText = smark and info.expect or util.viewString(info.expect),
                             }
                         }
@@ -919,7 +919,7 @@ local function collectRequireNames(mode, myUri, literal, source, smark, position
                         collect[open] = {
                             textEdit = {
                                 start   = smark and (source.start + #smark) or position,
-                                finish  = smark and (source.start - #smark) or position,
+                                finish  = smark and (source.finish - #smark) or position,
                                 newText = smark and open or util.viewString(open),
                             }
                         }
@@ -945,7 +945,7 @@ local function collectRequireNames(mode, myUri, literal, source, smark, position
                     collect[path] = {
                         textEdit = {
                             start   = smark and (source.start + #smark) or position,
-                            finish  = smark and (source.start - #smark) or position,
+                            finish  = smark and (source.finish - #smark) or position,
                             newText = smark and path or util.viewString(path),
                         }
                     }
@@ -1759,6 +1759,8 @@ local function tryLuaDocBySource(state, position, source, results)
                 }
             end
         end
+    elseif source.type == 'doc.module' then
+        collectRequireNames('require', state.uri, source.module or '', source, source.smark, position, results)
     end
     return false
 end

@@ -2696,6 +2696,8 @@ local function compileExpAsAction(exp)
         start  = exp.start,
         finish = exp.finish,
     }
+
+    return exp
 end
 
 local function parseLocal()

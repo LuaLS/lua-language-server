@@ -12,16 +12,17 @@ local function isValidFirstChar(input, other)
     if first == other:sub(1, 1):upper() then
         return true
     end
-    local pos, char = other:find(first, 2, true)
+    local pos = other:find(first, 2, true)
     if not pos and uppers[first] then
         -- word after symbol?
         if other:find('%A' .. first:lower(), 2) then
             return true
         end
     end
-    if not char then
+    if not pos then
         return false
     end
+    local char = other:sub(pos, pos)
     -- symbol?
     if not uppers[char] then
         return true

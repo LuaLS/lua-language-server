@@ -2659,3 +2659,24 @@ emit:on('won', <??>)
         kind     = define.CompletionItemKind.Function,
     }
 }
+
+TEST [[
+local function f()
+    local inferCache
+    in<??>
+end
+]]
+{
+    [1] = {
+        label = 'in',
+        kind  = define.CompletionItemKind.Keyword,
+    },
+    [2] = {
+        label = 'in ..',
+        kind  = define.CompletionItemKind.Snippet,
+    },
+    [3] = {
+        label = 'inferCache',
+        kind  = define.CompletionItemKind.Variable,
+    }
+}

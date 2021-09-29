@@ -1958,7 +1958,8 @@ local function isChunkFinishToken(token)
     end
     if tp == 'for'
     or tp == 'in'
-    or tp == 'loop' then
+    or tp == 'loop'
+    or tp == 'function' then
         return token == 'end'
     end
     if tp == 'if'
@@ -1969,6 +1970,9 @@ local function isChunkFinishToken(token)
             or token == 'end'
             or token == 'else'
             or token == 'elseif'
+    end
+    if tp == 'repeat' then
+        return token == 'until'
     end
     return true
 end
@@ -1988,7 +1992,9 @@ local function parseActions()
         end
         local action, failed = parseAction()
         if failed then
-            break
+            if not skipUnknownSymbol() then
+                break
+            end
         end
         if action then
             if action.type == 'return' then

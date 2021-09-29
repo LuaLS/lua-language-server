@@ -16,7 +16,7 @@ local function asFunction(source, oop)
     local arg   = buildArg(source, oop)
     local rtn   = buildReturn(source)
     local lines = {}
-    lines[1] = ('function %s(%s)'):format(name or '', arg)
+    lines[1] = ('%s %s(%s)'):format(oop and 'method' or 'function', name or '', arg)
     lines[2] = rtn
     return table.concat(lines, '\n')
 end

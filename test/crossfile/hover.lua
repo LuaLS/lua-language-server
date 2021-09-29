@@ -216,7 +216,7 @@ TEST {
     },
     hover = [[
 ```lua
-function mt:add(a: any, b: any)
+method mt:add(a: any, b: any)
 ```]]
 }
 

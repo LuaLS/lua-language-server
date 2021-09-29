@@ -3,7 +3,7 @@ local re         = require 'parser.relabel'
 local guide      = require 'parser.guide'
 local parser     = require 'parser.newparser'
 
-local TokenTypes, TokenStarts, TokenFinishs, TokenContents
+local TokenTypes, TokenStarts, TokenFinishs, TokenContents, TokenMarks
 local Ci, Offset, pushError, NextComment, Lines
 local parseType
 local Parser = re.compile([[
@@ -18,15 +18,15 @@ Integer             <-  ({} {[0-9]+} !'.' {})
                     ->  Integer
 String              <-  ({} StringDef {})
                     ->  String
-StringDef           <-  '"'
+StringDef           <-  {'"'}
                         {~(Esc / !'"' .)*~} -> 1
                         ('"'?)
-                    /   "'"
+                    /   {"'"}
                         {~(Esc / !"'" .)*~} -> 1
                         ("'"?)
-                    /   ('[' {:eq: '='* :} '['
+                    /   {'[' {:eq: '='* :} '['}
                         {(!StringClose .)*} -> 1
-                        (StringClose?))
+                        StringClose?
 StringClose         <-  ']' =eq ']'
 Esc                 <-  '\' -> ''
                         EChar
@@ -92,12 +92,13 @@ Symbol              <-  ({} {
         TokenFinishs[Ci]  = finish - 1
         TokenContents[Ci] = content
     end,
-    String = function (start, content, finish)
+    String = function (start, mark, content, finish)
         Ci = Ci + 1
         TokenTypes[Ci]    = 'string'
         TokenStarts[Ci]   = start
         TokenFinishs[Ci]  = finish - 1
         TokenContents[Ci] = content
+        TokenMarks[Ci]    = mark
     end,
     Integer = function (start, content, finish)
         Ci = Ci + 1
@@ -126,6 +127,7 @@ local function parseTokens(text, offset)
     TokenStarts   = {}
     TokenFinishs  = {}
     TokenContents = {}
+    TokenMarks    = {}
     Parser:match(text)
     Ci = 0
 end
@@ -161,6 +163,10 @@ local function getFinish()
         return Offset
     end
     return TokenFinishs[Ci] + Offset + 1
+end
+
+local function getMark()
+    return TokenMarks[Ci]
 end
 
 local function try(callback)
@@ -1065,6 +1071,29 @@ local function parseDiagnostic()
     return result
 end
 
+local function parseModule()
+    local result = {
+        type     = 'doc.module',
+        start    = getFinish(),
+        finish   = getFinish(),
+    }
+    local tp, content = peekToken()
+    if tp == 'string' then
+        result.module = content
+        nextToken()
+        result.start  = getStart()
+        result.finish = getFinish()
+        result.smark  = getMark()
+    else
+        pushError {
+            type   = 'LUADOC_MISS_MODULE_NAME',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+    end
+    return result
+end
+
 local function convertTokens()
     local tp, text = nextToken()
     if not tp then
@@ -1106,6 +1135,8 @@ local function convertTokens()
         return parseSee()
     elseif text == 'diagnostic' then
         return parseDiagnostic()
+    elseif text == 'module' then
+        return parseModule()
     end
 end
 

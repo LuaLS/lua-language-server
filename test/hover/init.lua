@@ -64,7 +64,7 @@ local obj = setmetatable({}, mt)
 obj:<?init?>(1, '测试')
 ]]
 [[
-function mt:init(a: any, b: any, c: any)
+method mt:init(a: any, b: any, c: any)
 ]]
 
 --TEST [[
@@ -114,7 +114,7 @@ local obj = setmetatable({}, mt)
 obj:<?init?>(1, '测试')
 ]]
 [[
-function mt:init(a: any, b: any, c: any)
+method mt:init(a: any, b: any, c: any)
   -> table
 ]]
 
@@ -132,7 +132,7 @@ obj:init(1, '测试')
 obj.<?init?>(obj, 1, '测试')
 ]]
 [[
-function mt:init(a: any, b: any, c: any)
+method mt:init(a: any, b: any, c: any)
   -> table
 ]]
 
@@ -327,7 +327,7 @@ local t = init()
 t:<?add?>()
 ]]
 [[
-function mt:add(a: any, b: any)
+method mt:add(a: any, b: any)
 ]]
 
 TEST [[
@@ -345,7 +345,7 @@ local t = init()
 t:<?add?>()
 ]]
 [[
-function mt:add(a: any, b: any)
+method mt:add(a: any, b: any)
 ]]
 
 TEST [[
@@ -485,7 +485,7 @@ function mt:test(a, b)
 end
 ]]
 [[
-function mt:test(a: any, b: any)
+method mt:test(a: any, b: any)
 ]]
 
 TEST[[

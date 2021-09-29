@@ -1958,7 +1958,8 @@ local function isChunkFinishToken(token)
     end
     if tp == 'for'
     or tp == 'in'
-    or tp == 'loop' then
+    or tp == 'loop'
+    or tp == 'function' then
         return token == 'end'
     end
     if tp == 'if'
@@ -1969,6 +1970,9 @@ local function isChunkFinishToken(token)
             or token == 'end'
             or token == 'else'
             or token == 'elseif'
+    end
+    if tp == 'repeat' then
+        return token == 'until'
     end
     return true
 end
@@ -1988,7 +1992,9 @@ local function parseActions()
         end
         local action, failed = parseAction()
         if failed then
-            break
+            if not skipUnknownSymbol() then
+                break
+            end
         end
         if action then
             if action.type == 'return' then
@@ -2690,6 +2696,8 @@ local function compileExpAsAction(exp)
         start  = exp.start,
         finish = exp.finish,
     }
+
+    return exp
 end
 
 local function parseLocal()
@@ -2945,6 +2953,7 @@ local function parseIfBlock(parent)
     pushChunk(ifblock)
     parseActions()
     popChunk()
+    ifblock.finish = lastRightPosition()
     if ifblock.locals then
         LocalCount = LocalCount - #ifblock.locals
     end
@@ -3003,6 +3012,7 @@ local function parseElseIfBlock(parent)
     pushChunk(elseifblock)
     parseActions()
     popChunk()
+    elseifblock.finish = lastRightPosition()
     if elseifblock.locals then
         LocalCount = LocalCount - #elseifblock.locals
     end
@@ -3027,6 +3037,7 @@ local function parseElseBlock(parent)
     pushChunk(elseblock)
     parseActions()
     popChunk()
+    elseblock.finish = lastRightPosition()
     if elseblock.locals then
         LocalCount = LocalCount - #elseblock.locals
     end

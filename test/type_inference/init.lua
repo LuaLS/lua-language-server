@@ -96,16 +96,32 @@ TEST 'boolean' [[
 <?x?> = not y
 ]]
 
-TEST 'integer' [[
+TEST 'any' [[
 <?x?> = #y
 ]]
 
-TEST 'number' [[
-<?x?> = - y
+TEST 'integer' [[
+<?x?> = #'aaaa'
 ]]
 
 TEST 'integer' [[
+<?x?> = #{}
+]]
+
+TEST 'any' [[
+<?x?> = - y
+]]
+
+TEST 'number' [[
+<?x?> = - 1.0
+]]
+
+TEST 'any' [[
 <?x?> = ~ y
+]]
+
+TEST 'integer' [[
+<?x?> = ~ 1
 ]]
 
 TEST 'integer' [[
@@ -124,16 +140,28 @@ TEST 'boolean' [[
 <?x?> = a == b
 ]]
 
-TEST 'integer' [[
+TEST 'any' [[
 <?x?> = a << b
 ]]
 
-TEST 'string' [[
+TEST 'integer' [[
+<?x?> = 1 << 2
+]]
+
+TEST 'any' [[
 <?x?> = a .. b
 ]]
 
-TEST 'number' [[
+TEST 'string' [[
+<?x?> = 'a' .. 'b'
+]]
+
+TEST 'any' [[
 <?x?> = a + b
+]]
+
+TEST 'number' [[
+<?x?> = 1 + 2.0
 ]]
 
 TEST 'tablelib' [[

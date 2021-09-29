@@ -31,6 +31,12 @@ local function mergeTable(a, b)
     end
 end
 
+local function isBaseType(source, mark)
+    return m.hasType(source, 'number', mark)
+        or m.hasType(source, 'integer', mark)
+        or m.hasType(source, 'string', mark)
+end
+
 local function searchInferOfUnary(value, infers, mark)
     local op = value.op.type
     if op == 'not' then
@@ -38,19 +44,24 @@ local function searchInferOfUnary(value, infers, mark)
         return
     end
     if op == '#' then
-        infers['integer'] = true
+        if m.hasType(value[1], 'table', mark)
+        or m.hasType(value[1], 'string', mark) then
+            infers['integer'] = true
+        end
         return
     end
     if op == '-' then
         if m.hasType(value[1], 'integer', mark) then
             infers['integer'] = true
-        else
+        elseif isBaseType(value[1], mark) then
             infers['number'] = true
         end
         return
     end
     if op == '~' then
-        infers['integer'] = true
+        if isBaseType(value[1], mark) then
+            infers['integer'] = true
+        end
         return
     end
 end
@@ -73,6 +84,7 @@ local function searchInferOfBinary(value, infers, mark)
         end
         return
     end
+    -- must return boolean
     if op == '=='
     or op == '~='
     or op == '<'
@@ -82,21 +94,31 @@ local function searchInferOfBinary(value, infers, mark)
         infers['boolean'] = true
         return
     end
+    -- check number
     if op == '<<'
     or op == '>>'
     or op == '~'
     or op == '&'
     or op == '|' then
-        infers['integer'] = true
+        if  isBaseType(value[1], mark)
+        and isBaseType(value[2], mark) then
+            infers['integer'] = true
+        end
         return
     end
     if op == '..' then
-        infers['string'] = true
+        if  isBaseType(value[1], mark)
+        and isBaseType(value[2], mark) then
+            infers['string'] = true
+        end
         return
     end
     if op == '^'
     or op == '/' then
-        infers['number'] = true
+        if  isBaseType(value[1], mark)
+        and isBaseType(value[2], mark) then
+            infers['number'] = true
+        end
         return
     end
     if op == '+'
@@ -107,7 +129,8 @@ local function searchInferOfBinary(value, infers, mark)
         if  m.hasType(value[1], 'integer', mark)
         and m.hasType(value[2], 'integer', mark) then
             infers['integer'] = true
-        else
+        elseif isBaseType(value[1], mark)
+        and    isBaseType(value[2], mark) then
             infers['number'] = true
         end
         return

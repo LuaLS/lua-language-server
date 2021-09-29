@@ -41,6 +41,7 @@
 * `CHG` diagnostics:
   + `redundant-parameter` default severity to `Warning`
   + `redundant-value` default severity to `Warning`
+* `CHG` infer: more strict of calculation results
 * `CHG` [#663](https://github.com/sumneko/lua-language-server/issues/663)
 * `FIX` runtime errors
 * `FIX` hint: may show param-2 as `self`

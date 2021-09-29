@@ -2632,3 +2632,30 @@ class2:<??>
 {
     [1] = EXISTS,
 }
+
+TEST [[
+--- @class Emit
+--- @field on fun(eventName: string, cb: function)
+--- @field on fun(eventName: '"died"', cb: fun(i: integer))
+--- @field on fun(eventName: '"won"', cb: fun(s: string))
+local emit = {}
+
+emit:on('<??>')
+]]
+(EXISTS)
+
+TEST [[
+--- @class Emit
+--- @field on fun(eventName: string, cb: function)
+--- @field on fun(eventName: '"died"', cb: fun(i: integer))
+--- @field on fun(eventName: '"won"', cb: fun(s: string))
+local emit = {}
+
+emit:on('won', <??>)
+]]
+{
+    [1] = {
+        label    = 'fun(s: string)',
+        kind     = define.CompletionItemKind.Function,
+    }
+}

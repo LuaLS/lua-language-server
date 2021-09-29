@@ -30,6 +30,7 @@
     ```
 * `CHG` hover: improve showing multi defines
 * `CHG` hover: improve showing multi comments at enums
+* `CHG` hover: shows method
 * `CHG` hint: `Lua.hint.paramName` now supports `Disable`, `Literal` and `All`
 * `CHG` only search first file by `require`
 * `CHG` no longer infer by usage

@@ -1209,3 +1209,36 @@ f(true, true) -- OK
 f(0, 0) -- OK
 
 ]]
+
+TEST [[
+---@class bird
+local m = {}
+setmetatable(m, {}) -- OK
+]]
+
+TEST [[
+---@class childString: string
+local s
+---@param name string
+local function f(name) end
+f(s)
+]]
+
+TEST [[
+---@class childString: string
+
+---@type string
+local s
+---@param name childString
+local function f(name) end
+f(<!s!>)
+]]
+
+TEST [[
+---@alias searchmode '"ref"'|'"def"'|'"field"'|'"allref"'|'"alldef"'|'"allfield"'
+
+
+---@param mode   searchmode
+function searchRefs(mode)end
+searchRefs('ref')
+]]

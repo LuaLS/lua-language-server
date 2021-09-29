@@ -124,17 +124,17 @@ TEST 'boolean' [[
 <?x?> = a == b
 ]]
 
-TEST 'integer' [[
-<?x?> = a << b
-]]
+-- TEST 'integer' [[
+-- <?x?> = a << b
+-- ]]
 
 TEST 'string' [[
 <?x?> = a .. b
 ]]
 
-TEST 'number' [[
-<?x?> = a + b
-]]
+-- TEST 'number' [[
+-- <?x?> = a + b
+-- ]]
 
 TEST 'tablelib' [[
 ---@class tablelib

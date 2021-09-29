@@ -7,16 +7,41 @@ local hasVarargs
 
 local function inTypes(param, args)
     for _, v in ipairs(args) do
+        if v[1] == 'any' then
+            return true
+        end
         if param[1] == v[1] then
             return true
         elseif (param[1] == 'number' or param[1] == 'integer')
         and (v[1] == 'integer' or v[1] == 'number') then
             return true
+        elseif v[1] == 'string' then
+            ---处理alias
+            --@alias searchmode '"ref"'|'"def"'
+            if param[1]:sub(1,1) == '"' then
+                return true
+            end
         end
     end
     return false
 end
 
+local function addFatherClass(infers)
+    for k in pairs(infers) do
+        local docDefs = vm.getDocDefines(k)
+        for _, doc in ipairs(docDefs) do
+            if doc.parent
+            and doc.parent.type == 'doc.class'
+            and doc.parent.extends then
+                for _, tp in ipairs(doc.parent.extends) do
+                    if tp.type == 'doc.extends.name' then
+                        infers[tp[1]] = true
+                    end
+                end
+            end
+        end
+    end
+end
 local function excludeSituations(types)
     if not types[1]
     or not types[1][1]
@@ -92,6 +117,9 @@ end
 local function matchParams(paramsTypes, i, arg)
     local flag = ''
     local messages = {}
+    ---paramsTypes 存的是多个定义的参数信息
+    ---paramTypes  存的是单独一个定义的参数信息
+    ---param       是某一个定义中的第i个参数的信息
     for _, paramTypes in ipairs(paramsTypes) do
         if not paramTypes[i] then
             goto CONTINUE
@@ -100,15 +128,15 @@ local function matchParams(paramsTypes, i, arg)
         for _, param in ipairs(paramTypes[i]) do
             ---如果形参的类型在实参里面
             if inTypes(param, arg)
-            or param[1] == 'any'
-            or arg.type == 'any' then
+            or param[1] == 'any' then
                 flag = ''
                 return true
             elseif param[1] == '...' then
                 hasVarargs = true
                 return true
             else
-                flag = flag ..' ' .. param[1]
+                ---TODO(arthur) 什么时候param[1]是nil？
+                flag = flag ..' ' .. (param[1] or '')
             end
         end
         if flag ~= '' then
@@ -145,6 +173,13 @@ return function (uri, callback)
                 infers['_G'] = nil
                 infers['_ENV'] = nil
                 infers['table'] = true
+            end
+            local hasAny = infers['any']
+            ---处理继承
+            addFatherClass(infers)
+            if not hasAny then
+                infers['any'] = nil
+                infers['unknown'] = nil
             end
             local types = {}
             for k in pairs(infers) do

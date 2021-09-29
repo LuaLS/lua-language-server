@@ -452,6 +452,24 @@ local function searchLiteral(source, literals, mark)
     end
 end
 
+local function getCachedInfers(source, field)
+    local inferCache = vm.getCache 'infers'
+    local sourceCache = inferCache[source]
+    if not sourceCache then
+        sourceCache = {}
+        inferCache[source] = sourceCache
+    end
+    if not field then
+        field = ''
+    end
+    if sourceCache[field] then
+        return true, sourceCache[field]
+    end
+    local infers = {}
+    sourceCache[field] = infers
+    return false, infers
+end
+
 ---搜索对象的推断类型
 ---@param source parser.guide.object
 ---@param field? string
@@ -461,9 +479,12 @@ function m.searchInfers(source, field, mark)
     if not source then
         return nil
     end
+    local suc, infers = getCachedInfers(source, field)
+    if suc then
+        return infers
+    end
     local isParam = source.parent.type == 'funcargs'
     local defs = vm.getDefs(source, field)
-    local infers = {}
     mark = mark or {}
     if not field then
         searchInfer(source, infers, mark)
@@ -553,22 +574,18 @@ end
 ---判断对象的推断类型是否包含某个类型
 function m.hasType(source, tp, mark)
     mark = mark or {}
-    if not mark.hasType then
-        mark.hasType = {}
+    local infers = m.searchInfers(source, nil, mark)
+    if infers[tp] then
+        return true
     end
-    if mark.hasType[source] == nil then
-        local infers = m.searchInfers(source, nil, mark)
-        mark.hasType[source] = infers[tp] or false
-        if tp == 'function' and not infers[tp] then
-            for infer in pairs(infers) do
-                if infer:sub(1, 4) == 'fun(' then
-                    mark.hasType[source] = true
-                    break
-                end
+    if tp == 'function' then
+        for infer in pairs(infers) do
+            if infer:sub(1, 4) == 'fun(' then
+                return true
             end
         end
     end
-    return mark.hasType[source]
+    return false
 end
 
 ---搜索并显示推断类型

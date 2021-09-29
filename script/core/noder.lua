@@ -1070,6 +1070,20 @@ compileNodeMap = util.switch()
             end
         end
     end)
+    : case 'doc.module'
+    : call(function (noders, id, source)
+        if not source.module then
+            return
+        end
+        for _, src in ipairs(source.bindSources) do
+            if guide.isSet(src) then
+                local sourceID = getID(src)
+                if sourceID then
+                    noders.require[sourceID] = source.module
+                end
+            end
+        end
+    end)
     : case 'doc.param'
     : call(function (noders, id, source)
         pushForward(noders, id, getID(source.extends))

@@ -1015,8 +1015,8 @@ end
 --- 否则返回 `false`
 ---
 --- 返回的2个 `list` 分别为基准block到达 a 与 b 的路径。
----@param a table
----@param b table
+---@param a parser.guide.object
+---@param b parser.guide.object
 ---@return string|boolean mode
 ---@return table pathA?
 ---@return table pathB?

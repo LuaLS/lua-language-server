@@ -254,3 +254,14 @@ An error occurred in the plugin, please report it to the plugin author.
 Please check the details in the output or log.
 Plugin path: {}
 ]]
+PLUGIN_TRUST_LOAD                = [[
+The current settings try to load the plugin at this location:{}
+
+Note that malicious plugin may harm your computer
+]]
+PLUGIN_TRUST_YES                 = [[
+Trust and load this plugin
+]]
+PLUGIN_TRUST_NO                  = [[
+Don't load this plugin
+]]

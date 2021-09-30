@@ -52,12 +52,14 @@ end
 
 local function checkTrustLoad()
     local filePath = LOGPATH .. '/trusted'
-    local trusted = util.loadFile(filePath) or ''
+    local trusted = util.loadFile(filePath)
     local lines = {}
-    for line in util.eachLine(trusted) do
-        lines[#lines+1] = line
-        if line == m.pluginPath then
-            return true
+    if trusted then
+        for line in util.eachLine(trusted) do
+            lines[#lines+1] = line
+            if line == m.pluginPath then
+                return true
+            end
         end
     end
     local _, index = client.awaitRequestMessage('Warning', lang.script('PLUGIN_TRUST_LOAD', m.pluginPath), {
@@ -73,6 +75,10 @@ local function checkTrustLoad()
 end
 
 function m.init()
+    if m.hasInited then
+        return
+    end
+    m.hasInited = true
     await.call(function ()
         local ws    = require 'workspace'
         m.interface = {}

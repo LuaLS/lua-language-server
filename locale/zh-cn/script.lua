@@ -253,3 +253,14 @@ PLUGIN_RUNTIME_ERROR             = [[
 请在输出或日志中查看详细信息。
 插件路径：{}
 ]]
+PLUGIN_TRUST_LOAD                = [[
+当前设置试图加载位于此位置的插件：{}
+
+注意，恶意的插件可能会危害您的电脑
+]]
+PLUGIN_TRUST_YES                 = [[
+信任并加载插件
+]]
+PLUGIN_TRUST_NO                  = [[
+不要加载此插件
+]]

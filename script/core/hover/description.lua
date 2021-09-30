@@ -10,47 +10,55 @@ local util     = require 'utility'
 local guide    = require 'parser.guide'
 local noder    = require 'core.noder'
 
-local function asStringInRequire(source, literal)
+local function collectRequire(mode, literal)
     local rootPath = ws.path or ''
+    local result, searchers
+    if     mode == 'require' then
+        result, searchers = ws.findUrisByRequirePath(literal)
+    elseif mode == 'dofile'
+    or     mode == 'loadfile' then
+        result = ws.findUrisByFilePath(literal)
+    end
+    if result and #result > 0 then
+        local shows = {}
+        for i, uri in ipairs(result) do
+            local searcher = searchers and searchers[uri]
+            local path = furi.decode(uri)
+            if path:sub(1, #rootPath) == rootPath then
+                path = path:sub(#rootPath + 1)
+            end
+            path = path:gsub('^[/\\]*', '')
+            if vm.isMetaFile(uri) then
+                shows[i] = ('* [[meta]](%s)'):format(uri)
+            elseif searcher then
+                searcher = searcher:sub(#rootPath + 1)
+                searcher = ws.normalize(searcher)
+                searcher = searcher:gsub('^[/\\]+', '')
+                shows[i] = ('* [%s](%s) %s'):format(path, uri, lang.script('HOVER_USE_LUA_PATH', searcher))
+            else
+                shows[i] = ('* [%s](%s)'):format(path, uri)
+            end
+        end
+        table.sort(shows)
+        local md = markdown()
+        md:add('md', table.concat(shows, '\n'))
+        return md
+    end
+end
+
+local function asStringInRequire(source, literal)
     local parent = source.parent
     if parent and parent.type == 'callargs' then
-        local result, searchers
         local call = parent.parent
         local func = call.node
         local libName = vm.getLibraryName(func)
         if not libName then
             return
         end
-        if     libName == 'require' then
-            result, searchers = ws.findUrisByRequirePath(literal)
-        elseif libName == 'dofile'
-        or     libName == 'loadfile' then
-            result = ws.findUrisByFilePath(literal)
-        end
-        if result and #result > 0 then
-            local shows = {}
-            for i, uri in ipairs(result) do
-                local searcher = searchers and searchers[uri]
-                local path = furi.decode(uri)
-                if path:sub(1, #rootPath) == rootPath then
-                    path = path:sub(#rootPath + 1)
-                end
-                path = path:gsub('^[/\\]*', '')
-                if vm.isMetaFile(uri) then
-                    shows[i] = ('* [[meta]](%s)'):format(uri)
-                elseif searcher then
-                    searcher = searcher:sub(#rootPath + 1)
-                    searcher = ws.normalize(searcher)
-                    searcher = searcher:gsub('^[/\\]+', '')
-                    shows[i] = ('* [%s](%s) %s'):format(path, uri, lang.script('HOVER_USE_LUA_PATH', searcher))
-                else
-                    shows[i] = ('* [%s](%s)'):format(path, uri)
-                end
-            end
-            table.sort(shows)
-            local md = markdown()
-            md:add('md', table.concat(shows, '\n'))
-            return md
+        if libName == 'require'
+        or libName == 'dofile'
+        or libName == 'loadfile' then
+            return collectRequire(libName, literal)
         end
     end
 end
@@ -144,6 +152,13 @@ local function tryDocClassComment(source)
             end
         end
     end
+end
+
+local function tryDocModule(source)
+    if not source.module then
+        return
+    end
+    return collectRequire('require', source.module)
 end
 
 local function buildEnumChunk(docType, name)
@@ -365,4 +380,5 @@ return function (source)
         or tyrDocParamComment(source)
         or tryDocComment(source)
         or tryDocClassComment(source)
+        or tryDocModule(source)
 end

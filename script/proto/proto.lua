@@ -38,7 +38,7 @@ function m.response(id, res)
     data.result = res == nil and json.null or res
     local buf = jsonrpc.encode(data)
     --log.debug('Response', id, #buf)
-    io.stdout:write(buf)
+    io.write(buf)
 end
 
 function m.responseErr(id, code, message)
@@ -56,7 +56,7 @@ function m.responseErr(id, code, message)
         }
     }
     --log.debug('ResponseErr', id, #buf)
-    io.stdout:write(buf)
+    io.write(buf)
 end
 
 function m.notify(name, params)
@@ -65,7 +65,7 @@ function m.notify(name, params)
         params = params,
     }
     --log.debug('Notify', name, #buf)
-    io.stdout:write(buf)
+    io.write(buf)
 end
 
 function m.awaitRequest(name, params)
@@ -76,7 +76,7 @@ function m.awaitRequest(name, params)
         params = params,
     }
     --log.debug('Request', name, #buf)
-    io.stdout:write(buf)
+    io.write(buf)
     local result, error = await.wait(function (resume)
         m.waiting[id] = resume
     end)
@@ -94,7 +94,7 @@ function m.request(name, params, callback)
         params = params,
     }
     --log.debug('Request', name, #buf)
-    io.stdout:write(buf)
+    io.write(buf)
     m.waiting[id] = function (result, error)
         if error then
             log.warn(('Response of [%s] error [%d]: %s'):format(name, error.code, error.message))

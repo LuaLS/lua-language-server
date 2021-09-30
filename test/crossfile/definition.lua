@@ -128,6 +128,20 @@ TEST {
     },
 }
 
+TEST {
+    {
+        path = 'a.lua',
+        content = 'local <!t!> = 1; return <!t!>',
+    },
+    {
+        path = 'b.lua',
+        content = [[
+---@module 'a'
+local <~t~>
+]],
+    },
+}
+
 --if require 'bee.platform'.OS == 'Windows' then
 --TEST {
 --    {

@@ -74,6 +74,19 @@ TEST {
 * [a.lua](file:///a.lua) （搜索路径： `?.lua`）]],
 }
 
+TEST {
+    {
+        path = 'a.lua',
+        content = '',
+    },
+    {
+        path = 'b.lua',
+        content = '---@module "<?a?>"',
+    },
+    hover = [[
+* [a.lua](file:///a.lua) （搜索路径： `?.lua`）]],
+}
+
 if require 'bee.platform'.OS == 'Windows' then
 TEST {
     {

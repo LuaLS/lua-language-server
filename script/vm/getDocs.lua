@@ -45,7 +45,7 @@ function vm.getDocDefines(name)
 end
 
 function vm.isDocDefined(name)
-    if define.BuiltinClass[name] then
+    if define.BuiltinType[name] then
         return true
     end
     local id = 'def:dn:' .. name
@@ -53,6 +53,10 @@ function vm.isDocDefined(name)
         return true
     end
     return false
+end
+
+function vm.isBuiltinType(name)
+    return define.BuiltinType[name] == true
 end
 
 function vm.getDocEnums(doc)

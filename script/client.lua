@@ -102,7 +102,7 @@ function m.awaitRequestMessage(type, message, titles)
         map[title] = i
     end
     local item = proto.awaitRequest('window/showMessageRequest', {
-        type    = type,
+        type    = define.MessageType[type] or 3,
         message = message,
         actions = actions,
     })

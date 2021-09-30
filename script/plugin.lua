@@ -51,7 +51,8 @@ local function resetFiles()
 end
 
 local function checkTrustLoad()
-    local trusted = util.loadFile(LOGPATH / 'trusted') or ''
+    local filePath = LOGPATH .. '/trusted'
+    local trusted = util.loadFile(filePath) or ''
     local lines = {}
     for line in util.eachLine(trusted) do
         lines[#lines+1] = line
@@ -67,7 +68,7 @@ local function checkTrustLoad()
         return false
     end
     lines[#lines+1] = m.pluginPath
-    util.saveFile(LOGPATH / 'trusted', table.concat(trusted, '\n'))
+    util.saveFile(filePath, table.concat(lines, '\n'))
     return true
 end
 

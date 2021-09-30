@@ -272,7 +272,7 @@ m.BuiltinType = {
     ['string']        = true,
     ['userdata']      = true,
     ['lightuserdata'] = true,
-    ['Function']      = true,
+    ['function']      = true,
 }
 
 m.InlayHintKind = {

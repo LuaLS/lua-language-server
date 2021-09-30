@@ -1290,12 +1290,26 @@ trim('str', 'left')
 trim('str', nil)
 ]]
 
+---不完整的函数参数定义，会跳过检查
 TEST [[
 ---@param mode string
 local function status(source, field, mode)
-    print(mode)
+    print(source, field, mode)
 end
-status('name')
+status(1, 2, 'name')
+]]
+
+
+TEST [[
+---@alias range {start: number, end: number}
+---@param uri string
+---@param range range
+local function location(uri, range)
+    print(uri, range)
+end
+---@type range
+local val = {}
+location('uri', val)
 ]]
 ---TODO(arthur)
 do return end

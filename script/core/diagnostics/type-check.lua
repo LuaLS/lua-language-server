@@ -3,7 +3,6 @@ local guide  = require 'parser.guide'
 local vm     = require 'vm'
 local infer  = require 'core.infer'
 local await  = require 'await'
-local define = require 'proto.define'
 local hasVarargs, errType
 
 local tableMap = {
@@ -37,7 +36,7 @@ local function isClassOralias(typeName)
     if not typeName then
         return false
     elseif typeNameMap[typeName]
-    or define.BuiltinType[typeName] then
+    or vm.isBuiltinType(typeName) then
         return true
     else
         return false
@@ -124,7 +123,6 @@ local function getParamTypes(arg)
     ---method, 如果self没有定义为一个class或者type，则认为它为any
     if arg.tag == 'self' then
         local types = {}
-        local hasTable = false
         for _, argDef in ipairs(argDefs) do
             if argDef.type == 'doc.class.name'
             or argDef.type == 'doc.type.name' then
@@ -147,6 +145,8 @@ local function getParamTypes(arg)
                 }
             end
         elseif argDef.type == 'doc.type.enum' then
+            types[#types+1] = argDef
+        elseif argDef.type == 'doc.type.ltable' then
             types[#types+1] = argDef
         ---变长参数
         elseif argDef.name and argDef.name[1] == '...' then
@@ -178,7 +178,6 @@ local function getInfoFromDefs(defs)
             goto CONTINUE
         end
         mark[def] = true
-
         if def.type == 'function'
         or def.type == 'doc.type.function' then
             if def.args then
@@ -204,7 +203,9 @@ local function getInfoFromDefs(defs)
                         end
                         funcArgsType[#funcArgsType+1] = plusAlias
                     else
+                        ---如果有一个参数没有定义type，都会跳过检查
                         funcArgsType = {}
+                        break
                     end
                 end
             end
@@ -300,7 +301,7 @@ local function getArgsInfo(callArgs)
         local types = {}
         if not infers['table'] then
             for k in pairs(infers) do
-                if not define.BuiltinType[k]
+                if not vm.isBuiltinType(k)
                 and isUserDefineClass(k) then
                     infers['table'] = true
                     break

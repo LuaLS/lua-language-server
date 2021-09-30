@@ -1289,6 +1289,14 @@ end
 trim('str', 'left')
 trim('str', nil)
 ]]
+
+TEST [[
+---@param mode string
+local function status(source, field, mode)
+    print(mode)
+end
+status('name')
+]]
 ---TODO(arthur)
 do return end
 

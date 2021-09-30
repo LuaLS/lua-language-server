@@ -3,6 +3,7 @@ local guide  = require 'parser.guide'
 local vm     = require 'vm'
 local infer  = require 'core.infer'
 local await  = require 'await'
+local define = require 'proto.define'
 local hasVarargs, errType
 
 local tableMap = {
@@ -36,7 +37,7 @@ local function isClassOralias(typeName)
     if not typeName then
         return false
     elseif typeNameMap[typeName]
-    or infer.isInnerType(typeName) then
+    or define.BuiltinType[typeName] then
         return true
     else
         return false
@@ -299,7 +300,7 @@ local function getArgsInfo(callArgs)
         local types = {}
         if not infers['table'] then
             for k in pairs(infers) do
-                if not infer.isInnerType(k)
+                if not define.BuiltinType[k]
                 and isUserDefineClass(k) then
                     infers['table'] = true
                     break

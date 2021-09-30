@@ -535,7 +535,6 @@ function m.searchInfers(source, field, mark)
             end
         end
     end
-
     cleanInfers(infers)
     return infers
 end

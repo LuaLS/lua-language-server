@@ -20,21 +20,6 @@ local TypeSort = {
     ['nil']      = 999,
 }
 
-local innerTypeMap = {
-    ['unknown']       = true,
-    ['any']           = true,
-    ['nil']           = true,
-    ['boolean']       = true,
-    ['number']        = true,
-    ['integer']       = true,
-    ['thread']        = true,
-    ['table']         = true,
-    ['string']        = true,
-    ['userdata']      = true,
-    ['lightuserdata'] = true,
-    ['function']      = true,
-}
-
 local m = {}
 
 local function mergeTable(a, b)
@@ -661,10 +646,6 @@ function m.getClass(source)
         return nil
     end
     return view
-end
-
-function m.isInnerType(typeName)
-    return innerTypeMap[typeName] == true
 end
 
 return m

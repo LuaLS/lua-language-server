@@ -8,7 +8,7 @@ local thread  = require 'bee.thread'
 brave.on('loadProto', function ()
     local jsonrpc = require 'jsonrpc'
     while true do
-        local proto, err = jsonrpc.decode(io.read, log.error)
+        local proto, err = jsonrpc.decode(io.read)
         --log.debug('loaded proto', proto.method)
         if not proto then
             brave.push('protoerror', err)

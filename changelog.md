@@ -8,9 +8,9 @@
   + `Lua.completion.requireSeparator`
 * `NEW` diagnostics:
   + `different-requires`
-* `NEW` supports `---@CustomClass<string, number>`
+* `NEW` `---@CustomClass<string, number>`
 * `NEW` supports `$/cancelRequest`
-* `NEW` supports `EventEmitter`
+* `NEW` `EventEmitter`
     ```lua
     --- @class Emit
     --- @field on fun(eventName: string, cb: function)
@@ -27,6 +27,11 @@
     emit:on('won', function (s)
         -- should be s: string
     end)
+    ```
+* `NEW` `---@module 'moduleName'`
+    ```lua
+    ---@module 'mylib'
+    local lib -- the same as `local lib = require 'mylib'`
     ```
 * `CHG` hover: improve showing multi defines
 * `CHG` hover: improve showing multi comments at enums

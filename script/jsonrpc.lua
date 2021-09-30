@@ -37,8 +37,8 @@ local function readProtoHead(reader)
     return head
 end
 
-function m.decode(reader, errHandle)
-    local head, err = readProtoHead(reader, errHandle)
+function m.decode(reader)
+    local head, err = readProtoHead(reader)
     if not head then
         return nil, err
     end

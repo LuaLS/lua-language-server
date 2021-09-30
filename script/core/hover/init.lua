@@ -71,14 +71,15 @@ local accept = {
     ['integer']       = true,
     ['doc.type.name'] = true,
     ['function']      = true,
+    ['doc.module']    = true,
 }
 
-local function getHoverByUri(uri, offset)
+local function getHoverByUri(uri, position)
     local ast = files.getState(uri)
     if not ast then
         return nil
     end
-    local source = findSource(ast, offset, accept)
+    local source = findSource(ast, position, accept)
     if not source then
         return nil
     end

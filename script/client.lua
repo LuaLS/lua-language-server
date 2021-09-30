@@ -87,16 +87,19 @@ end
 ---@param message string
 ---@param titles  string[]
 ---@return string action
+---@return integer index
 function m.awaitRequestMessage(type, message, titles)
     proto.notify('window/logMessage', {
         type = define.MessageType[type] or 3,
         message = message,
     })
+    local map = {}
     local actions = {}
     for i, title in ipairs(titles) do
         actions[i] = {
             title = title,
         }
+        map[title] = i
     end
     local item = proto.awaitRequest('window/showMessageRequest', {
         type    = type,
@@ -106,7 +109,7 @@ function m.awaitRequestMessage(type, message, titles)
     if not item then
         return nil
     end
-    return item.title
+    return item.title, map[item.title]
 end
 
 ---@param type message.type

@@ -260,7 +260,7 @@ m.BuiltIn = {
     ['utf8']      = 'default',
 }
 
-m.BuiltinClass = {
+m.BuiltinType = {
     ['unknown']       = true,
     ['any']           = true,
     ['nil']           = true,

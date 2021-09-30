@@ -1259,3 +1259,42 @@ TEST [[
 local function searchRefs(mode)end
 searchRefs('ref')
 ]]
+
+TEST [[
+---@class markdown
+local mt = {}
+---@param language string
+---@param text string|markdown
+function mt:add(language, text)
+    if not text then
+        return
+    end
+end
+---@type markdown
+local desc
+
+desc:add('md', 'hover')
+]]
+
+---可选参数和枚举
+TEST [[
+---@param str string
+---@param mode? '"left"'|'"right"'
+---@return string
+local function trim(str, mode)
+    if mode == "left" then
+        print(1)
+    end
+end
+trim('str', 'left')
+trim('str', nil)
+]]
+---TODO(arthur)
+do return end
+
+TEST [[
+---@type file*
+local f
+f:read '*a'
+f:read('*a')
+]]

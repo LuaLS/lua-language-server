@@ -513,7 +513,6 @@ end
 ---@param field? string
 ---@param mark? table
 ---@return string[]
----@return boolean
 function m.searchInfers(source, field, mark)
     if not source then
         return nil
@@ -551,12 +550,9 @@ function m.searchInfers(source, field, mark)
             end
         end
     end
-    local hasTable = false
-    if infers[CLASS] and infers['table'] then
-        hasTable = true
-    end
+
     cleanInfers(infers)
-    return infers, hasTable
+    return infers
 end
 
 ---搜索对象的字面量值

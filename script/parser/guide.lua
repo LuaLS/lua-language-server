@@ -62,6 +62,7 @@ local type         = type
 ---@field _noded                boolean
 ---@field _initedNoders         boolean
 ---@field _compiledGlobals      boolean
+---@field optional              boolean
 
 ---@class guide
 ---@field debugMode boolean

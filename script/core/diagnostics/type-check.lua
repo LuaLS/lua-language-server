@@ -3,8 +3,46 @@ local guide  = require 'parser.guide'
 local vm     = require 'vm'
 local infer  = require 'core.infer'
 local await  = require 'await'
-local hasVarargs
+local hasVarargs, errType
 
+local tableMap = {
+    ['table']  = true,
+    ['array']  = true,
+    ['ltable'] = true,
+    ['[]']     = true,
+}
+local typeNameMap = {
+    ['doc.extends.name'] = true,
+    ['doc.class.name']   = true,
+    ['doc.alias.name']   = true,
+    ['doc.type.name']    = true,
+    ['doc.type.enum']    = true,
+    ['doc.resume']       = true,
+
+}
+
+local function isTable(name)
+    if tableMap[name]
+    ---table<K: number, V: string> table
+    or tableMap[name:sub(1, 5)]
+    ---string[]
+    or tableMap[name:sub(-2, -1)] then
+        return true
+    end
+    return false
+end
+
+local function isClassOralias(typeName)
+    if not typeName then
+        return false
+    elseif typeNameMap[typeName]
+    or infer.isInnerType(typeName) then
+        return true
+    else
+        return false
+    end
+
+end
 local function inTypes(param, args)
     if string.sub(param.type, 1, 9) == 'doc.type.'
     and not param[1] then
@@ -22,9 +60,11 @@ local function inTypes(param, args)
         elseif v[1] == 'string' then
             ---处理alias
             --@alias searchmode '"ref"'|'"def"'
-            if param[1]:sub(1,1) == '"' then
+            if param[1] and param[1]:sub(1,1) == '"' then
                 return true
             end
+        elseif isTable(v[1] or v.type) and isTable(param[1] or param.type) then
+            return true
         end
     end
     return false
@@ -80,10 +120,33 @@ local function getParamTypes(arg)
     if #argDefs == 0 then
         return false
     end
+    ---method, 如果self没有定义为一个class或者type，则认为它为any
+    if arg.tag == 'self' then
+        local types = {}
+        local hasTable = false
+        for _, argDef in ipairs(argDefs) do
+            if argDef.type == 'doc.class.name'
+            or argDef.type == 'doc.type.name' then
+                types[#types+1] = argDef
+            end
+        end
+        if #types == 0 then
+            return false
+        end
+        return true, types
+    end
+    types = {}
     for _, argDef in ipairs(argDefs) do
         if argDef.type == 'doc.param' and argDef.extends then
             types = argDef.extends.types
-            return true, types
+            if argDef.optional then
+                types[#types+1] = {
+                    [1] = 'nil',
+                    type = 'nil'
+                }
+            end
+        elseif argDef.type == 'doc.type.enum' then
+            types[#types+1] = argDef
         ---变长参数
         elseif argDef.name and argDef.name[1] == '...' then
             types = {
@@ -95,8 +158,10 @@ local function getParamTypes(arg)
             break
         end
     end
-    if not types then
+    if #types == 0 then
         return false
+    else
+        return true, types
     end
 end
 local function getInfoFromDefs(defs)
@@ -126,7 +191,8 @@ local function getInfoFromDefs(defs)
                                 ---TODO(arthur)
                                 -- if not v.type then
                                 -- end
-                                if v[1] ~= tp[1] then
+                                if v[1] ~= tp[1]
+                                and isClassOralias(v.type) then
                                     plusAlias[#plusAlias+1] = v
                                 end
                                 if not v[1] or not v.type then
@@ -181,7 +247,10 @@ local function matchParams(paramsTypes, i, arg)
                 return true
             else
                 ---TODO(arthur) 什么时候param[1]是nil？
-                flag = flag ..' ' .. (param[1] or '')
+                if param[1] and not errType[param[1]] then
+                    errType[param[1]] = true
+                    flag = flag ..' ' .. (param[1] or '')
+                end
             end
         end
         if flag ~= '' then
@@ -201,16 +270,23 @@ local function matchParams(paramsTypes, i, arg)
     return false, messages
 end
 
+local function isUserDefineClass(name)
+    local defs = vm.getDocDefines(name)
+    for _, v in ipairs(defs) do
+        if v.type == 'doc.class.name' then
+            return true
+        end
+    end
+    return false
+end
 local function getArgsInfo(callArgs)
     local callArgsType = {}
     for _, arg in ipairs(callArgs) do
-        local infers, hasTable = infer.searchInfers(arg)
+        local defs = vm.getDefs(arg)
+        local infers = infer.searchInfers(arg)
         if infers['_G'] or infer['_ENV'] then
             infers['_G'] = nil
             infers['_ENV'] = nil
-            infers['table'] = true
-        end
-        if hasTable then
             infers['table'] = true
         end
         local hasAny = infers['any']
@@ -221,6 +297,15 @@ local function getArgsInfo(callArgs)
             infers['unknown'] = nil
         end
         local types = {}
+        if not infers['table'] then
+            for k in pairs(infers) do
+                if not infer.isInnerType(k)
+                and isUserDefineClass(k) then
+                    infers['table'] = true
+                    break
+                end
+            end
+        end
         for k in pairs(infers) do
             if k then
                 types[#types+1] = {
@@ -261,6 +346,7 @@ return function (uri, callback)
         for i, arg in ipairs(callArgsType) do
             ---遍历形参
             hasVarargs = false
+            errType = {}
             local match, messages = matchParams(paramsTypes, i, arg)
             if hasVarargs then
                 return

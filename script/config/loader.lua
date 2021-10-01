@@ -18,20 +18,20 @@ local m = {}
 
 function m.loadLocalConfig(filename)
     local path = fs.path(workspace.getAbsolutePath(filename))
-    local ext  = path:extension():string():lower()
     local buf  = fsu.loadFile(path)
     if not buf then
         errorMessage(lang.script('CONFIG_LOAD_FAILED', path:string()))
         return
     end
-    if ext == '.json' then
+    local firstChar = buf:match '%S'
+    if firstChar == '{' then
         local suc, res = pcall(json.decode, buf)
         if not suc then
             errorMessage(lang.script('CONFIG_LOAD_ERROR', res))
             return
         end
         return res
-    elseif ext == '.lua' then
+    else
         local suc, res = pcall(function ()
             return assert(load(buf, '@' .. path:string(), 't'))()
         end)
@@ -40,9 +40,6 @@ function m.loadLocalConfig(filename)
             return
         end
         return res
-    else
-        errorMessage(lang.script('CONFIG_TYPE_ERROR', path:string()))
-        return
     end
 end
 

@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.4.0
+* `NEW` loading settings from `.luarc.json`
 * `NEW` settings:
   + `Lua.diagnostics.libraryFiles`
   + `Lua.diagnostics.ignoredFiles`

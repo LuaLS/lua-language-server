@@ -14,6 +14,7 @@ local progress   = require 'progress'
 local tm         = require 'text-merger'
 local cfgLoader  = require 'config.loader'
 local converter  = require 'proto.converter'
+local filewatch  = require 'filewatch'
 
 local function updateConfig()
     local new
@@ -21,6 +22,7 @@ local function updateConfig()
         new = cfgLoader.loadLocalConfig(CONFIGPATH)
         config.setSource 'path'
         log.debug('load config from local', CONFIGPATH)
+        filewatch.watch(workspace.getAbsolutePath(CONFIGPATH))
     else
         new = cfgLoader.loadRCConfig('.luarc.json')
         if new then
@@ -39,6 +41,19 @@ local function updateConfig()
     config.update(new)
     log.debug('loaded config dump:', util.dump(new))
 end
+
+filewatch.event(function (changes)
+    local configPath = workspace.getAbsolutePath(CONFIGPATH or '.luarc.json')
+    if not configPath then
+        return
+    end
+    for _, change in ipairs(changes) do
+        if change.path == configPath then
+            updateConfig()
+            return
+        end
+    end
+end)
 
 proto.on('initialize', function (params)
     client.init(params)

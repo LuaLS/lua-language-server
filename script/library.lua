@@ -313,8 +313,10 @@ end
 
 local function apply3rd(cfg, onlyMemory)
     local changes = {}
-    for _, change in ipairs(cfg.configs) do
-        changes[#changes+1] = change
+    if cfg.configs then
+        for _, change in ipairs(cfg.configs) do
+            changes[#changes+1] = change
+        end
     end
 
     if cfg.plugin then

@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.4.0
+`2021-10-1`
 * `NEW` loading settings from `.luarc.json`
 * `NEW` settings:
   + `Lua.diagnostics.libraryFiles`

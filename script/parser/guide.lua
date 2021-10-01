@@ -286,7 +286,7 @@ function m.getBlock(obj)
             return obj
         end
         if obj == obj.parent then
-            error('obj == obj.parent?' .. obj.type)
+            error('obj == obj.parent?', obj.type)
         end
         obj = obj.parent
     end

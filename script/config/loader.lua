@@ -17,8 +17,11 @@ end
 local m = {}
 
 function m.loadRCConfig(filename)
-    local path = fs.path(workspace.getAbsolutePath(filename))
-    local buf  = fsu.loadFile(path)
+    local path = workspace.getAbsolutePath(filename)
+    if not path then
+        return
+    end
+    local buf  = util.loadFile(path)
     if not buf then
         return
     end
@@ -31,10 +34,13 @@ function m.loadRCConfig(filename)
 end
 
 function m.loadLocalConfig(filename)
-    local path = fs.path(workspace.getAbsolutePath(filename))
-    local buf  = fsu.loadFile(path)
+    local path = workspace.getAbsolutePath(filename)
+    if not path then
+        return
+    end
+    local buf  = util.loadFile(path)
     if not buf then
-        errorMessage(lang.script('CONFIG_LOAD_FAILED', path:string()))
+        errorMessage(lang.script('CONFIG_LOAD_FAILED', path))
         return
     end
     local firstChar = buf:match '%S'
@@ -47,7 +53,7 @@ function m.loadLocalConfig(filename)
         return res
     else
         local suc, res = pcall(function ()
-            return assert(load(buf, '@' .. path:string(), 't'))()
+            return assert(load(buf, '@' .. path, 't'))()
         end)
         if not suc then
             errorMessage(lang.script('CONFIG_LOAD_ERROR', res))

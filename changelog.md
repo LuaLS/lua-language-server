@@ -1,5 +1,8 @@
 # changelog
 
+## 2.4.1
+* `FIX` broken with single file
+
 ## 2.4.0
 `2021-10-1`
 * `NEW` loading settings from `.luarc.json`

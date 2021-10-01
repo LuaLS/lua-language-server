@@ -2,6 +2,7 @@
 
 ## 2.4.1
 * `FIX` broken with single file
+* `FIX` #698
 
 ## 2.4.0
 `2021-10-1`

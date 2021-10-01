@@ -54,7 +54,7 @@ local CharMapSign    = stringToCharMap '+-'
 local CharMapSB      = stringToCharMap 'ao|~&=<>.*/%^+-'
 local CharMapSU      = stringToCharMap 'n#~!-'
 local CharMapSimple  = stringToCharMap '.:([\'"{'
-local CharMapStrSH   = stringToCharMap '\'"'
+local CharMapStrSH   = stringToCharMap '\'"`'
 local CharMapStrLH   = stringToCharMap '['
 local CharMapTSep    = stringToCharMap ',;'
 local CharMapWord    = stringToCharMap '_a-zA-Z\x80-\xff'
@@ -882,18 +882,6 @@ local function parseShortString()
     local startOffset = Tokens[Index]
     local startPos    = getPosition(startOffset, 'left')
     Index             = Index + 2
-    -- empty string
-    if Tokens[Index+1] == mark then
-        local finishPos = getPosition(Tokens[Index], 'right')
-        Index = Index + 2
-        return {
-            type   = 'string',
-            start  = startPos,
-            finish = finishPos,
-            [1]    = '',
-            [2]    = mark,
-        }
-    end
     local stringIndex = 0
     local currentOffset = startOffset + 1
     while true do
@@ -1024,13 +1012,41 @@ local function parseShortString()
         ::CONTINUE::
     end
     local stringResult = tconcat(stringPool, '', 1, stringIndex)
-    return {
+    local str = {
         type   = 'string',
         start  = startPos,
         finish = lastRightPosition(),
         [1]    = stringResult,
         [2]    = mark,
     }
+    if mark == '`' then
+        if State.options.nonstandardSymbol and State.options.nonstandardSymbol[mark] then
+        else
+            pushError {
+                type   = 'ERR_NONSTANDARD_SYMBOL',
+                start  = startPos,
+                finish = str.finish,
+                info   = {
+                    symbol = '"',
+                },
+                fix    = {
+                    title  = 'FIX_NONSTANDARD_SYMBOL',
+                    symbol = '"',
+                    {
+                        start  = startPos,
+                        finish = startPos + 1,
+                        text   = '"',
+                    },
+                    {
+                        start  = str.finish - 1,
+                        finish = str.finish,
+                        text   = '"',
+                    },
+                }
+            }
+        end
+    end
+    return str
 end
 
 local function parseString()

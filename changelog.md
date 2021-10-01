@@ -2,7 +2,8 @@
 
 ## 2.4.1
 * `FIX` broken with single file
-* `CHG` [#698](https://github.com/sumneko/lua-language-server/issues/698)
+* `FIX` [#698](https://github.com/sumneko/lua-language-server/issues/698)
+* `FIX` [#699](https://github.com/sumneko/lua-language-server/issues/699)
 
 ## 2.4.0
 `2021-10-1`

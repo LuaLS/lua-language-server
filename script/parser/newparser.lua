@@ -3645,7 +3645,9 @@ return function (lua, mode, version, options)
     elseif mode == 'Action' then
         State.ast = parseAction()
     end
-    State.ast.state = State
+    if State.ast then
+        State.ast.state = State
+    end
 
     return State
 end

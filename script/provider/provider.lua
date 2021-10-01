@@ -22,7 +22,8 @@ local function updateConfig()
         new = cfgLoader.loadLocalConfig(CONFIGPATH)
         config.setSource 'path'
         log.debug('load config from local', CONFIGPATH)
-        filewatch.watch(workspace.getAbsolutePath(CONFIGPATH))
+        -- watch directory
+        filewatch.watch(workspace.getAbsolutePath(CONFIGPATH):gsub('[^/\\]+$', ''))
     else
         new = cfgLoader.loadRCConfig('.luarc.json')
         if new then

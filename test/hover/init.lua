@@ -697,8 +697,8 @@ end
 ]]
 [[
 function f()
-  -> nil
-  2. nil
+  -> any
+  2. any
 ]]
 
 TEST [[
@@ -708,7 +708,7 @@ end
 local <?x?> = f()
 ]]
 [[
-local x: nil
+local x: any
 ]]
 
 TEST [[
@@ -719,7 +719,7 @@ end
 ]]
 [[
 function f()
-  -> integer|nil
+  -> integer
 ]]
 
 TEST [[

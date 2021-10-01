@@ -4,7 +4,6 @@ local noder    = require 'core.noder'
 local util     = require 'utility'
 local vm       = require "vm.vm"
 
-local BE_RETURN       = {'BE_RETURN'}
 local CLASS           = {'CLASS'}
 local TABLE           = {'TABLE'}
 
@@ -17,7 +16,6 @@ local TypeSort = {
     ['function'] = 6,
     ['true']     = 101,
     ['false']    = 102,
-    ['nil']      = 999,
 }
 
 local m = {}
@@ -166,10 +164,6 @@ local function searchInferOfValue(value, infers, mark)
         infers['number'] = true
         return true
     end
-    if value.type == 'nil' then
-        infers['nil'] = true
-        return true
-    end
     if value.type == 'function' then
         infers['function'] = true
         return true
@@ -241,9 +235,6 @@ local function cleanInfers(infers)
     local version = config.get 'Lua.runtime.version'
     local enableInteger = version == 'Lua 5.3' or version == 'Lua 5.4'
     infers['unknown'] = nil
-    if infers['any'] and infers['nil'] then
-        infers['nil'] = nil
-    end
     if infers['number'] then
         enableInteger = false
     end
@@ -265,22 +256,11 @@ local function cleanInfers(infers)
         infers[TABLE] = nil
         infers['table'] = true
     end
-    if infers[BE_RETURN] then
-        infers[BE_RETURN] = nil
-        infers['nil'] = nil
-    end
     if infers['function'] then
         for k in pairs(infers) do
             if k:sub(1, 4) == 'fun(' then
                 infers[k] = nil
             end
-        end
-    end
-    infers['any'] = nil
-    if infers['nil'] then
-        infers['nil'] = nil
-        if not next(infers) then
-            infers['nil'] = true
         end
     end
 end
@@ -444,18 +424,14 @@ local function searchInfer(source, infers, mark)
     end
     -- check LuaDoc
     local docName = m.getDocName(source)
-    if docName then
+    if docName and docName ~= 'nil' and docName ~= 'unknown' then
         infers[docName] = true
-        if docName ~= 'unknown' then
-            infers[CLASS]   = true
+        if not vm.isBuiltinType(docName) then
+            infers[CLASS] = true
         end
         if docName == 'table' then
             infers[TABLE] = true
         end
-    end
-    -- return XX
-    if source.parent.type == 'return' then
-        infers[BE_RETURN] = true
     end
 end
 
@@ -635,14 +611,14 @@ function m.getClass(source)
     local defs = vm.getDefs(source)
     for _, def in ipairs(defs) do
         if def.type == 'doc.class.name' then
-            infers[def[1]] = true
+            if not vm.isBuiltinType(def[1]) then
+                infers[def[1]] = true
+            end
         end
     end
     cleanInfers(infers)
-    infers['nil'] = nil
     local view = m.viewInfers(infers)
-    if view == 'any'
-    or view == 'nil' then
+    if view == 'any' then
         return nil
     end
     return view

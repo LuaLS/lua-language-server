@@ -233,6 +233,14 @@ end
 <?y?> = x()
 ]]
 
+TEST 'any' [[
+local function x()
+    return nil
+    return f()
+end
+<?y?> = x()
+]]
+
 TEST 'integer' [[
 local function x()
     return 1

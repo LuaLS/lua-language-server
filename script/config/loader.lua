@@ -16,6 +16,20 @@ end
 
 local m = {}
 
+function m.loadRCConfig(filename)
+    local path = fs.path(workspace.getAbsolutePath(filename))
+    local buf  = fsu.loadFile(path)
+    if not buf then
+        return
+    end
+    local suc, res = pcall(json.decode, buf)
+    if not suc then
+        errorMessage(lang.script('CONFIG_LOAD_ERROR', res))
+        return
+    end
+    return res
+end
+
 function m.loadLocalConfig(filename)
     local path = fs.path(workspace.getAbsolutePath(filename))
     local buf  = fsu.loadFile(path)

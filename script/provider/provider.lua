@@ -22,9 +22,15 @@ local function updateConfig()
         config.setSource 'path'
         log.debug('load config from local', CONFIGPATH)
     else
-        new = cfgLoader.loadClientConfig()
-        config.setSource 'client'
-        log.debug('load config from client')
+        new = cfgLoader.loadRCConfig('.luarc.json')
+        if new then
+            config.setSource 'luarc'
+            log.debug('load config from luarc')
+        else
+            new = cfgLoader.loadClientConfig()
+            config.setSource 'client'
+            log.debug('load config from client')
+        end
     end
     if not new then
         log.warn('load config failed!')

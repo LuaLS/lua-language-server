@@ -34,6 +34,7 @@
     ---@module 'mylib'
     local lib -- the same as `local lib = require 'mylib'`
     ```
+* `NEW` add supports of `skynet`
 * `CHG` hover: improve showing multi defines
 * `CHG` hover: improve showing multi comments at enums
 * `CHG` hover: shows method

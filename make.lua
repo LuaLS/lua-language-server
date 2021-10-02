@@ -43,6 +43,9 @@ lm:build 'unit-test' {
     deps = {
         "bee-test",
         "lpeglabel",
+    },
+    windows = {
+        deps = "lua54"
     }
 }
 

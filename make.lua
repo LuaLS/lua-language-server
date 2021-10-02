@@ -1,6 +1,12 @@
 local lm       = require 'luamake'
+local platform = require 'bee.platform'
+local fs       = require 'bee.filesystem'
+local exe      = platform.OS == 'Windows' and ".exe" or ""
 
-lm.EXE = "lua"
+lm.bindir = "bin/"..platform.OS
+
+lm.EXE_NAME = "lua-language-server"
+lm.EXE_DIR = lm.bindir
 lm.EXE_RESOURCE = "../../make/lua-language-server.rc"
 lm:import "3rd/bee.lua/make.lua"
 
@@ -14,23 +20,34 @@ lm:lua_dll 'lpeglabel' {
 }
 
 lm:build 'install' {
-    '$luamake', 'lua', 'make/install.lua', lm.builddir,
-    deps = {
-        'lua',
-        'lpeglabel',
-        'bee',
-    }
+    '$luamake', 'lua', 'make/install.lua',
 }
 
-local fs = require 'bee.filesystem'
-local pf = require 'bee.platform'
-local exe = pf.OS == 'Windows' and ".exe" or ""
-lm:build 'unittest' {
-    fs.path 'bin' / pf.OS / ('lua-language-server' .. exe), 'test.lua', '-E',
+lm:copy "copy_bootstrap" {
+    input = "make/bootstrap.lua",
+    output = lm.bindir.."/main.lua",
+}
+
+lm:build "bee-test" {
+    lm.bindir.."/"..lm.EXE_NAME..exe, "3rd/bee.lua/test/test.lua",
     pool = "console",
     deps = {
-        'install',
+        lm.EXE_NAME,
+        "copy_bootstrap"
+    },
+}
+
+lm:build 'unit-test' {
+    lm.bindir.."/"..lm.EXE_NAME..exe, 'test.lua',
+    pool = "console",
+    deps = {
+        "bee-test",
+        "lpeglabel",
     }
 }
 
-lm:default 'unittest'
+lm:default {
+    "bee-test",
+    "unit-test",
+    "install",
+}

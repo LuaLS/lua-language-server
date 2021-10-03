@@ -1,6 +1,4 @@
 ---@meta
----@alias MESSAGETYPE
----|+ PTYPE_TEXT = 0 文字类型
 ---@alias MESSAGENAME
 ---|+'"lua"'
 ---|+'"socket"'
@@ -14,42 +12,35 @@
 ---|+'"debug"'
 ---|+'"trace"'
 ---@alias SERVICEADDR '".servicename"' | '":0000000C"' | integer
+---@alias MESSAGEHANDLER fun(session:integer, source:integer, ...)
 local skynet  = {
     -- read skynet.h
-    PTYPE_TEXT         = 0,
-    PTYPE_RESPONSE     = 1,
-    PTYPE_MULTICAST    = 2,
-    PTYPE_CLIENT       = 3,
-    PTYPE_SYSTEM       = 4,
-    PTYPE_HARBOR       = 5,
-    PTYPE_SOCKET       = 6,
-    PTYPE_ERROR        = 7,
-    PTYPE_QUEUE        = 8, -- used in deprecated mqueue, use skynet.queue instead
-    PTYPE_DEBUG        = 9,
-    PTYPE_LUA          = 10,
-    PTYPE_SNAX         = 11,
-    PTYPE_TRACE        = 12, -- use for debug trace
-    --- add by self
-    PTYPE_CLIENT_MERGE = 13,
-    --- 域逻辑信息，用与服务间通信
-    PTYPE_LOGIC        = 100,
-    PTYPE_ROUTER       = 101,
-    PNAME_TEXT         = "text",
-    PNAME_RESPONSE     = "response",
-    PNAME_MULTICAST    = "muliticast",
-    PNAME_CLIENT       = "client",
-    PNAME_SYSTEM       = "system",
-    PNAME_HARBOR       = "harbor",
-    PNAME_SOCKET       = "socket",
-    PNAME_ERROR        = "error",
-    PNAME_QUEUE        = "queue",
-    PNAME_DEBUG        = "debug",
-    PNAME_LUA          = "lua",
-    PNAME_SNAX         = "snax",
-    PNAME_TRACE        = "trace",
-    PNAME_CLIENT_MERGE = "client_merge",
-    PNAME_LOGIC        = "logic",
-    PNAME_ROUTER       = "router",
+    PTYPE_TEXT      = 0,
+    PTYPE_RESPONSE  = 1,
+    PTYPE_MULTICAST = 2,
+    PTYPE_CLIENT    = 3,
+    PTYPE_SYSTEM    = 4,
+    PTYPE_HARBOR    = 5,
+    PTYPE_SOCKET    = 6,
+    PTYPE_ERROR     = 7,
+    PTYPE_QUEUE     = 8, -- used in deprecated mqueue, use skynet.queue instead
+    PTYPE_DEBUG     = 9,
+    PTYPE_LUA       = 10,
+    PTYPE_SNAX      = 11,
+    PTYPE_TRACE     = 12, -- use for debug trace
+    PNAME_TEXT      = "text",
+    PNAME_RESPONSE  = "response",
+    PNAME_MULTICAST = "muliticast",
+    PNAME_CLIENT    = "client",
+    PNAME_SYSTEM    = "system",
+    PNAME_HARBOR    = "harbor",
+    PNAME_SOCKET    = "socket",
+    PNAME_ERROR     = "error",
+    PNAME_QUEUE     = "queue",
+    PNAME_DEBUG     = "debug",
+    PNAME_LUA       = "lua",
+    PNAME_SNAX      = "snax",
+    PNAME_TRACE     = "trace",
 
 }
 
@@ -100,7 +91,7 @@ end
 ---*    f(...)
 ---*  end)
 ---@param typename MESSAGENAME
----@param func fun(session:integer, source:integer,...)
+---@param func MESSAGEHANDLER
 function skynet.dispatch(typename, func)
 end
 
@@ -384,7 +375,6 @@ end
 ---@vararg any
 function skynet.fork(func, ...)
 end
-
 
 -------------- 日志跟踪 API -------------
 

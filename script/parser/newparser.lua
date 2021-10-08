@@ -496,7 +496,7 @@ local function skipComment(isAction)
             pushCommentHeadError(left)
         end
         Index = Index + 2
-        local longComment = parseLongString()
+        local longComment = start + 2 == Tokens[Index] and parseLongString()
         if longComment then
             longComment.type = 'comment.long'
             longComment.text = longComment[1]
@@ -3640,13 +3640,25 @@ return function (lua, mode, version, options)
         State.ast = parseString()
     elseif mode == 'Number' then
         State.ast = parseNumber()
+    elseif mode == 'Name' then
+        State.ast = parseName()
     elseif mode == 'Exp' then
         State.ast = parseExp()
     elseif mode == 'Action' then
         State.ast = parseAction()
     end
+
     if State.ast then
         State.ast.state = State
+    end
+
+    while true do
+        if Index <= #Tokens then
+            unknownSymbol()
+            Index = Index + 2
+        else
+            break
+        end
     end
 
     return State

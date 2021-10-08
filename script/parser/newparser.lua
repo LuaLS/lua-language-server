@@ -1858,18 +1858,17 @@ local function parseVarargs()
             varargs.node = chunk.vararg
             break
         end
-        if chunk.type == 'function' then
+        if chunk.type == 'main' then
             break
         end
-    end
-    if  not varargs.node
-    and Mode == 'Lua'
-    and Chunk[#Chunk].type ~= 'main' then
-        pushError {
-            type   = 'UNEXPECT_DOTS',
-            start  = varargs.start,
-            finish = varargs.finish,
-        }
+        if chunk.type == 'function' then
+            pushError {
+                type   = 'UNEXPECT_DOTS',
+                start  = varargs.start,
+                finish = varargs.finish,
+            }
+            break
+        end
     end
     return varargs
 end

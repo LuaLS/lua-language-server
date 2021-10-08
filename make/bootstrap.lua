@@ -24,8 +24,11 @@ end
 
 local root; do
     local sep = package.config:sub(1,1)
+    if sep == '\\' then
+        sep = '/\\'
+    end
     local pattern = "["..sep.."][^"..sep.."]+"
-    root = package.cpath:match("(.+)"..pattern..pattern..pattern.."$")
+    root = package.cpath:match("([^;]+)"..pattern..pattern..pattern.."$")
 end
 
 local fs = require "bee.filesystem"

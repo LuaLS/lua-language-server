@@ -867,15 +867,22 @@ do
     end)
 end
 
+local function refreshStatusBar()
+    local value = config.get 'Lua.window.statusBar'
+    if value then
+        proto.notify('$/status/show')
+    else
+        proto.notify('$/status/hide')
+    end
+end
+
 config.watch(function (key, value)
     if key == 'Lua.window.statusBar' then
-        if value then
-            proto.notify('$/status/show')
-        else
-            proto.notify('$/status/hide')
-        end
+        refreshStatusBar()
     end
 end)
+
+proto.on('$/status/refresh', refreshStatusBar)
 
 files.watch(function (ev, uri)
     if not workspace.isReady() then

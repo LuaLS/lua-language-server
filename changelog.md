@@ -1,5 +1,8 @@
 # changelog
 
+## 2.4.2
+* `FIX` [#709](https://github.com/sumneko/lua-language-server/issues/709)
+
 ## 2.4.1
 `2021-10-2`
 * `FIX` broken with single file

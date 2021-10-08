@@ -56,6 +56,7 @@ local type         = type
 ---@field docs                  parser.guide.object[]
 ---@field state                 table
 ---@field comment               table
+---@field optional              boolean
 ---@field _root                 parser.guide.object
 ---@field _noders               noders
 ---@field _mnode                parser.guide.object

@@ -23,9 +23,6 @@ function mt:add(language, text)
         }
     else
         text = tostring(text)
-        if #text == 0 then
-            return
-        end
         self[#self+1] = {
             type     = 'text',
             language = language,

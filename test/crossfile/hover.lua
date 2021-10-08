@@ -999,3 +999,22 @@ local x: number
 
 ---
  aaa]]}
+
+TEST {{ path = 'a.lua', content = '', }, {
+    path = 'b.lua',
+    content = [[
+---line1
+---
+---line2
+local function <?fn?>() end
+]]
+},
+hover = [[
+```lua
+function fn()
+```
+
+---
+line1
+
+line2]]}

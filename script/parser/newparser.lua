@@ -393,7 +393,7 @@ local function resolveLongString(finishMark)
         finishOffset = #Lua + 1
         miss = true
     end
-    local stringResult = ssub(Lua, start, finishOffset - 1)
+    local stringResult = start and ssub(Lua, start, finishOffset - 1)
     local lastLN = stringResult:find '[\r\n][^\r\n]*$'
     if lastLN then
         local result = stringResult

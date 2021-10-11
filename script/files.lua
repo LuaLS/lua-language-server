@@ -490,9 +490,6 @@ end
 ---@param uri uri
 ---@return table state
 function m.getState(uri)
-    if uri ~= '' and not m.isLua(uri) then
-        return nil
-    end
     local file = m.fileMap[uri]
     if not file then
         return nil

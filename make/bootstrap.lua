@@ -6,7 +6,7 @@ while arg[i] do
         i = i + 1
         local expr = assert(arg[i], "'-e' needs argument")
         assert(load(expr, "=(command line)"))()
-        -- TODO
+        -- exit after the executing
         return
     elseif not main and arg[i]:sub(1, 1) ~= '-' then
         main = i

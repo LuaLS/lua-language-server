@@ -1531,8 +1531,8 @@ local function parseTable()
                 }
             end
             wantSep = true
-            index = index + 1
             if exp.type == 'varargs' then
+                index = index + 1
                 tbl[index] = exp
                 exp.parent = tbl
                 goto CONTINUE
@@ -1559,6 +1559,7 @@ local function parseTable()
                     else
                         missExp()
                     end
+                    index = index + 1
                     tbl[index] = tfield
                     goto CONTINUE
                 end
@@ -1572,6 +1573,7 @@ local function parseTable()
                 value  = exp,
             }
             exp.parent = texp
+            index = index + 1
             tbl[index] = texp
             goto CONTINUE
         end
@@ -1585,7 +1587,6 @@ local function parseTable()
                 }
             end
             wantSep = true
-            index = index + 1
             local tindex = parseIndex()
             skipSpace()
             if expectAssign() then
@@ -1600,6 +1601,7 @@ local function parseTable()
                 else
                     missExp()
                 end
+                index = index + 1
                 tbl[index] = tindex
             else
                 missSymbol '='

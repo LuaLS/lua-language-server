@@ -11,10 +11,6 @@ while true do
     i = i + 1
 end
 
-if arg[i] == nil then
-    return
-end
-
 for j = -1, #arg do
     arg[j - i] = arg[j]
 end
@@ -38,4 +34,6 @@ package.path = table.concat({
     root .. "/script/?.lua",
     root .. "/script/?/init.lua",
 }, ";")
-assert(loadfile(arg[0]))(table.unpack(arg))
+
+local main = arg[0] or 'main.lua'
+assert(loadfile(main))(table.unpack(arg))

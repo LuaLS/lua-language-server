@@ -118,6 +118,9 @@ local function getMethodNode(source)
     end
     source._mnode = false
     local func = guide.getParentFunction(source)
+    if not func then
+        return
+    end
     if func.isGeneric then
         return
     end

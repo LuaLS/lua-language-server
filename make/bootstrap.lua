@@ -1,7 +1,4 @@
-local args = {}
-local sep  = package.config:sub(1,1)
-local main = '.' .. sep .. 'main.lua'
-
+local main
 local i = 1
 while arg[i] do
     if arg[i] == '-E' then
@@ -9,20 +6,42 @@ while arg[i] do
         i = i + 1
         local expr = assert(arg[i], "'-e' needs argument")
         assert(load(expr, "=(command line)"))()
-    elseif arg[i]:sub(1, 1) == '-' then
-        args[#args+1] = arg[i]
-    else
-        main = arg[i]
+        -- TODO
+        return
+    elseif not main and arg[i]:sub(1, 1) ~= '-' then
+        main = i
     end
-    i = i + 1
+end
+
+if main then
+    for i = -1, -999, -1 do
+        if not arg[i] then
+            for j = i + 1, -1 do
+                arg[j - main + 1] = arg[j]
+            end
+            break
+        end
+    end
+    for j = 1, #arg do
+        arg[j - main] = arg[j]
+    end
+    for j = #arg - main + 1, #arg do
+        arg[j] = nil
+    end
+else
+    arg[0] = 'main.lua'
+end
+
+for k, v in pairs(arg) do
+    print(k, v)
 end
 
 local root; do
-    local sepp = sep
-    if sepp == '\\' then
-        sepp = '/\\'
+    local sep = package.config:sub(1,1)
+    if sep == '\\' then
+        sep = '/\\'
     end
-    local pattern = "["..sepp.."][^"..sepp.."]+"
+    local pattern = "["..sep.."][^"..sep.."]+"
     root = package.cpath:match("([^;]+)"..pattern..pattern..pattern.."$")
 end
 
@@ -34,4 +53,4 @@ package.path = table.concat({
     root .. "/script/?/init.lua",
 }, ";")
 
-assert(loadfile(main))(table.unpack(args))
+assert(loadfile(arg[0]))(table.unpack(arg))

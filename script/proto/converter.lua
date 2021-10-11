@@ -39,8 +39,9 @@ local function diffedPackPosition(uri, pos)
     if col > 0 then
         local text = files.getOriginText(uri)
         if text then
-            local lineOffset = originLines[row]
-            col = utf8.len(text, lineOffset, lineOffset + col - 1, true)
+            local lineOffset  = originLines[row]
+            local finalOffset = math.min(lineOffset + col - 1, #text + 1)
+            col = utf8.len(text, lineOffset, finalOffset, true)
         end
     end
     return {

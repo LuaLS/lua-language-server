@@ -850,3 +850,16 @@ TEST {
     },
     completion = EXISTS
 }
+
+config.prop('Lua.runtime.special', 'import', 'require')
+TEST {
+    { path = 'abcde.lua', content = '' },
+    {
+        path = 'main.lua',
+        main = true,
+        content = [[
+            import 'ab<??>'
+        ]]
+    },
+    completion = EXISTS
+}

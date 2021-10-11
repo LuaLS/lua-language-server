@@ -1956,7 +1956,7 @@ local function resolveName(node)
     else
         local ospeicals = State.options.special
         if ospeicals and ospeicals[name] then
-            addSpecial(name, node)
+            addSpecial(ospeicals[name], node)
         end
     end
     return node

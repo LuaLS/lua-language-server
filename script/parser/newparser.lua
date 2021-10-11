@@ -909,6 +909,9 @@ local function parseShortString()
             stringPool[stringIndex] = ssub(Lua, currentOffset, Tokens[Index] - 1)
             currentOffset = Tokens[Index]
             Index = Index + 2
+            if not Tokens[Index] then
+                goto CONTINUE
+            end
             -- has space?
             if Tokens[Index] - currentOffset > 1 then
                 pushError {

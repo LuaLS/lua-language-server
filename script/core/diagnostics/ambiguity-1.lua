@@ -37,6 +37,9 @@ return function (uri, callback)
         end
         local first  = source[1]
         local second = source[2]
+        if not first or not second then
+            return
+        end
         -- a + (b or 0) --> (a + b) or 0
         do
             if opMap[first.op and first.op.type]

@@ -763,7 +763,7 @@ end
 
 function m.positionToOffsetByLines(lines, position)
     local row, col = m.rowColOf(position)
-    return lines[row] + col - 1
+    return (lines[row] or 1) + col - 1
 end
 
 --- 返回全文光标位置

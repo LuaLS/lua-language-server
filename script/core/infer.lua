@@ -353,7 +353,7 @@ function m.getDocName(doc)
         if doc.typeGeneric then
             return '<' .. name .. '>'
         else
-            return name
+            return tostring(name)
         end
     end
     if doc.type == 'doc.type.array' then
@@ -372,7 +372,7 @@ function m.getDocName(doc)
     if doc.type == 'doc.type.enum'
     or doc.type == 'doc.resume' then
         local value = doc[1] or '?'
-        return value
+        return tostring(value)
     end
     if doc.type == 'doc.type.ltable' then
         return 'table'
@@ -574,6 +574,9 @@ end
 function m.hasType(source, tp, mark)
     mark = mark or {}
     local infers = m.searchInfers(source, nil, mark)
+    if not infers then
+        return false
+    end
     if infers[tp] then
         return true
     end

@@ -1567,6 +1567,7 @@ local function parseTable()
                     goto CONTINUE
                 end
             end
+            index = index + 1
             local texp = {
                 type   = 'tableexp',
                 start  = exp.start,
@@ -1576,7 +1577,6 @@ local function parseTable()
                 value  = exp,
             }
             exp.parent = texp
-            index = index + 1
             tbl[index] = texp
             goto CONTINUE
         end

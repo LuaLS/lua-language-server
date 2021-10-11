@@ -11,6 +11,7 @@ while arg[i] do
     elseif not main and arg[i]:sub(1, 1) ~= '-' then
         main = i
     end
+    i = i + 1
 end
 
 if main then
@@ -30,10 +31,6 @@ if main then
     end
 else
     arg[0] = 'main.lua'
-end
-
-for k, v in pairs(arg) do
-    print(k, v)
 end
 
 local root; do

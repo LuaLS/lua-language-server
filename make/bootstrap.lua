@@ -1,25 +1,39 @@
+local main
 local i = 1
-while true do
+while arg[i] do
     if arg[i] == '-E' then
     elseif arg[i] == '-e' then
         i = i + 1
         local expr = assert(arg[i], "'-e' needs argument")
         assert(load(expr, "=(command line)"))()
-    else
-        break
+        -- TODO
+        return
+    elseif not main and arg[i]:sub(1, 1) ~= '-' then
+        main = i
     end
-    i = i + 1
 end
 
-if arg[i] == nil then
-    return
+if main then
+    for i = -1, -999, -1 do
+        if not arg[i] then
+            for j = i + 1, -1 do
+                arg[j - main + 1] = arg[j]
+            end
+            break
+        end
+    end
+    for j = 1, #arg do
+        arg[j - main] = arg[j]
+    end
+    for j = #arg - main + 1, #arg do
+        arg[j] = nil
+    end
+else
+    arg[0] = 'main.lua'
 end
 
-for j = -1, #arg do
-    arg[j - i] = arg[j]
-end
-for j = #arg - i + 1, #arg do
-    arg[j] = nil
+for k, v in pairs(arg) do
+    print(k, v)
 end
 
 local root; do
@@ -38,4 +52,5 @@ package.path = table.concat({
     root .. "/script/?.lua",
     root .. "/script/?/init.lua",
 }, ";")
+
 assert(loadfile(arg[0]))(table.unpack(arg))

@@ -16,11 +16,10 @@ Care['getglobal'] = function (source, results)
     local isLib = vm.isGlobalLibraryName(source[1])
     local isFunc = false
     local value = source.value
-    local next = source.next
 
     if value and value.type == 'function' then
         isFunc = true
-    elseif next and next.type == 'call' then
+    elseif source.parent.type == 'call' then
         isFunc = true
     elseif isEnhanced then
         isFunc = infer.hasType(source, 'function')
@@ -67,6 +66,15 @@ Care['field'] = function (source, results)
         end
     end
     if isEnhanced and infer.hasType(source, 'function') then
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.method,
+            modifieres = modifiers,
+        }
+        return
+    end
+    if source.parent.parent.type == 'call' then
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,

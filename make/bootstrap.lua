@@ -1,5 +1,6 @@
 local args = {}
-local main = 'main.lua'
+local sep  = package.config:sub(1,1)
+local main = '.' .. sep .. 'main.lua'
 
 local i = 1
 while arg[i] do
@@ -17,11 +18,11 @@ while arg[i] do
 end
 
 local root; do
-    local sep = package.config:sub(1,1)
-    if sep == '\\' then
-        sep = '/\\'
+    local sepp = sep
+    if sepp == '\\' then
+        sepp = '/\\'
     end
-    local pattern = "["..sep.."][^"..sep.."]+"
+    local pattern = "["..sepp.."][^"..sepp.."]+"
     root = package.cpath:match("([^;]+)"..pattern..pattern..pattern.."$")
 end
 

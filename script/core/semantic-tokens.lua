@@ -289,7 +289,7 @@ Care['local'] = function (source, results) -- Local declaration, i.e. "local x",
     local modifiers = define.TokenModifiers.declaration
 
     if isLocal then
-        modifiers = modifiers | define.TokenModifiers['local']
+        modifiers = modifiers | define.TokenModifiers.definition
     end
 
     results[#results+1] = {

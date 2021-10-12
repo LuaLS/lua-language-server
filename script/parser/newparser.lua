@@ -2114,6 +2114,13 @@ local function parseParams(params)
                     finish = getPosition(Tokens[Index] + #token - 1, 'right'),
                 }
             end
+            if isKeyWord(token) then
+                pushError {
+                    type   = 'KEYWORD',
+                    start  = getPosition(Tokens[Index], 'left'),
+                    finish = getPosition(Tokens[Index] + #token - 1, 'right'),
+                }
+            end
             Index = Index + 2
             goto CONTINUE
         end

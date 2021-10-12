@@ -5,11 +5,12 @@ local version = require 'version'
 local function loadArgs()
     for _, v in ipairs(arg) do
         ---@type string
-        local key, value = v:match '^%-%-([%w_]+)%=(.+)'
+        local key, tail = v:match '^%-%-([%w_]+)(.*)$'
         if not key then
             goto CONTINUE
         end
-        if value == 'true' then
+        local value = tail:match '=(.+)'
+        if value == 'true' or value == nil then
             value = true
         elseif value == 'false' then
             value = false
@@ -31,6 +32,11 @@ rootPath = (rootPath == '' and '.' or rootPath)
 ROOT     = fs.path(util.expandPath(rootPath))
 LOGPATH  = LOGPATH  and util.expandPath(LOGPATH)  or (ROOT:string() .. '/log')
 METAPATH = METAPATH and util.expandPath(METAPATH) or (ROOT:string() .. '/meta')
+
+if _G['VERSION'] then
+    print(version.getVersion())
+    return
+end
 
 ---@diagnostic disable-next-line: deprecated
 debug.setcstacklimit(200)

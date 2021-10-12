@@ -34,29 +34,42 @@ else
 end
 
 local root; do
-    local sep = package.config:sub(1,1)
-    if sep == '\\' then
-        sep = '/\\'
+    if main then
+        local fs = require 'bee.filesystem'
+        local mainPath = fs.path(arg[0])
+        root = mainPath:parent_path():string()
+        if root == '' then
+            root = '.'
+        end
+    else
+        local sep = package.config:sub(1,1)
+        if sep == '\\' then
+            sep = '/\\'
+        end
+        local pattern = "["..sep.."][^"..sep.."]+"
+        root = package.cpath:match("([^;]+)"..pattern..pattern..pattern.."$")
     end
-    local pattern = "["..sep.."][^"..sep.."]+"
-    root = package.cpath:match("([^;]+)"..pattern..pattern..pattern.."$")
 end
 
-local fs = require 'bee.filesystem'
-fs.current_path(fs.path(root))
 package.path = table.concat({
-    "script/?.lua",
-    "script/?/init.lua",
+    root .. "/script/?.lua",
+    root .. "/script/?/init.lua",
 }, ";"):gsub('/', package.config:sub(1,1))
 
-loadfile = function (name)
-    local f, e = io.open(root .. '/' .. name)
-    if not f then
-        return false, e
+package.searchers[2] = function (name)
+    local filename, err = package.searchpath(name, package.path)
+    if not filename then
+        return err
     end
-    local content = f:read 'a'
+    local f = io.open(filename)
+    local buf = f:read '*a'
     f:close()
-    return load(content, '@' .. name)
+    local relative = filename:sub(#root + 2)
+    local init, err = load(buf, '@' .. relative)
+    if not init then
+        return err
+    end
+    return init, filename
 end
 
 assert(loadfile(arg[0]))(table.unpack(arg))

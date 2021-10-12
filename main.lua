@@ -1,4 +1,4 @@
-local fs = require 'bee.filesystem'
+local fs      = require 'bee.filesystem'
 local util    = require 'utility'
 local version = require 'version'
 
@@ -25,7 +25,9 @@ end
 
 loadArgs()
 
-local rootPath = fs.exe_path():parent_path():parent_path():parent_path():string()
+local currentPath = debug.getinfo(1, 'S').source:sub(2)
+local rootPath = currentPath:gsub('[/\\]*[^/\\]-$', '')
+rootPath = (rootPath == '' and '.' or rootPath)
 ROOT     = fs.path(util.expandPath(rootPath))
 LOGPATH  = LOGPATH  and util.expandPath(LOGPATH)  or (ROOT:string() .. '/log')
 METAPATH = METAPATH and util.expandPath(METAPATH) or (ROOT:string() .. '/meta')
@@ -46,7 +48,7 @@ log.debug('VERSION:', version.getVersion())
 
 require 'tracy'
 
-xpcall(dofile, log.debug, rootPath .. '/debugger.lua')
+xpcall(dofile, log.debug, ROOT / 'debugger.lua')
 
 local service = require 'service'
 

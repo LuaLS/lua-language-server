@@ -3521,7 +3521,7 @@ function parseAction()
         return parseRepeat()
     end
 
-    if token == 'goto' then
+    if token == 'goto' and isKeyWord 'goto' then
         return parseGoTo()
     end
 

@@ -6,6 +6,18 @@ local client = require 'client'
 local lang   = require 'language'
 local guide  = require 'parser.guide'
 
+local function inComment(state, pos)
+    for _, comm in ipairs(state.comms) do
+        if comm.start <= pos and comm.finish >= pos then
+            return true
+        end
+        if comm.start > pos then
+            break
+        end
+    end
+    return false
+end
+
 local function findInsertRow(uri)
     local text  = files.getText(uri)
     local state = files.getState(uri)
@@ -17,6 +29,9 @@ local function findInsertRow(uri)
     }
     local hasFounded
     for i = 0, #lines do
+        if inComment(state, guide.positionOf(i, 0)) then
+            goto CONTINUE
+        end
         local ln = lines[i]
         local lnText = text:match('[^\r\n]*', ln)
         if not lnText:find('require', 1, true) then
@@ -43,6 +58,7 @@ local function findInsertRow(uri)
                 fmt.col = eqPos
             end
         end
+        ::CONTINUE::
     end
     return 0, fmt
 end

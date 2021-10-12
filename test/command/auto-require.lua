@@ -40,4 +40,34 @@ local aaaaaa = require 'aaa'
     text   = 'local test   = require \'test\'\n'
 }
 
+TEST [[
+local DEBUG = true
+local aaaaaa = require 'aaa'
+]] 'test' {
+    start  = 20000,
+    finish = 20000,
+    text   = 'local test   = require \'test\'\n'
+}
+
+TEST [[
+-- comment
+-- comment
+local aaaaaa = require 'aaa'
+]] 'test' {
+    start  = 30000,
+    finish = 30000,
+    text   = 'local test   = require \'test\'\n'
+}
+
+TEST [[
+--[=[
+comment chunk
+]=]
+local aaaaaa = require 'aaa'
+]] 'test' {
+    start  = 40000,
+    finish = 40000,
+    text   = 'local test   = require \'test\'\n'
+}
+
 client.editText = originEditText

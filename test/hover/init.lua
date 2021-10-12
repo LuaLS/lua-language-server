@@ -799,7 +799,7 @@ TEST [[
 global _G: _G {
     _G: _G,
     _VERSION: string = "Lua 5.4",
-    arg: table,
+    arg: string[],
     assert: function,
     collectgarbage: function,
     coroutine: coroutinelib,

@@ -42,12 +42,21 @@ local root; do
     root = package.cpath:match("([^;]+)"..pattern..pattern..pattern.."$")
 end
 
-local fs = require "bee.filesystem"
+local fs = require 'bee.filesystem'
 fs.current_path(fs.path(root))
-
 package.path = table.concat({
-    root .. "/script/?.lua",
-    root .. "/script/?/init.lua",
-}, ";")
+    "script/?.lua",
+    "script/?/init.lua",
+}, ";"):gsub('/', package.config:sub(1,1))
+
+loadfile = function (name)
+    local f, e = io.open(root .. '/' .. name)
+    if not f then
+        return false, e
+    end
+    local content = f:read 'a'
+    f:close()
+    return load(content, '@' .. name)
+end
 
 assert(loadfile(arg[0]))(table.unpack(arg))

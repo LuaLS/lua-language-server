@@ -442,7 +442,7 @@ local function parseLongString()
 end
 
 local function pushCommentHeadError(left)
-    if State.options.nonstandardSymbol and State.options.nonstandardSymbol['//'] then
+    if State.options.nonstandardSymbol['//'] then
         return
     end
     pushError {
@@ -461,7 +461,7 @@ local function pushCommentHeadError(left)
 end
 
 local function pushLongCommentError(left, right)
-    if State.options.nonstandardSymbol and State.options.nonstandardSymbol['/**/'] then
+    if State.options.nonstandardSymbol['/**/'] then
         return
     end
     pushError {
@@ -542,7 +542,7 @@ local function skipSpace(isAction)
             and  not skipComment(isAction)
 end
 
-local function expectAssign()
+local function expectAssign(isAction)
     local token = Tokens[Index + 1]
     if token == '=' then
         Index = Index + 2
@@ -566,6 +566,18 @@ local function expectAssign()
         }
         Index = Index + 2
         return true
+    end
+    if isAction then
+        if token == '+='
+        or token == '-='
+        or token == '*='
+        or token == '/=' then
+            if not State.options.nonstandardSymbol[token] then
+                unknownSymbol()
+            end
+            Index = Index + 2
+            return true
+        end
     end
     return false
 end
@@ -1023,8 +1035,7 @@ local function parseShortString()
         [2]    = mark,
     }
     if mark == '`' then
-        if State.options.nonstandardSymbol and State.options.nonstandardSymbol[mark] then
-        else
+        if not State.options.nonstandardSymbol[mark] then
             pushError {
                 type   = 'ERR_NONSTANDARD_SYMBOL',
                 start  = startPos,
@@ -2332,8 +2343,7 @@ local function parseBinaryOP(asAction, level)
         end
     end
     if BinaryAlias[token] then
-        if State.options.nonstandardSymbol and State.options.nonstandardSymbol[token] then
-        else
+        if not State.options.nonstandardSymbol[token] then
             pushError {
                 type   = 'ERR_NONSTANDARD_SYMBOL',
                 start  = op.start,
@@ -2625,7 +2635,7 @@ local function parseMultiVars(n1, parser, isLocal)
     local v1, v2, vrest
     local isSet
     local max = 1
-    if expectAssign() then
+    if expectAssign(not isLocal) then
         v1, v2, vrest = parseSetValues()
         isSet = true
         if not v1 then
@@ -3419,7 +3429,7 @@ end
 
 local function parseBreak()
     local returnLeft  = getPosition(Tokens[Index], 'left')
-    local returnRight = getPosition(Tokens[Index] + 4, 'right')
+    local returnRight = getPosition(Tokens[Index] + #Tokens[Index + 1] - 1, 'right')
     Index = Index + 2
     skipSpace()
     local action = {
@@ -3489,6 +3499,10 @@ function parseAction()
     end
 
     if token == 'break' then
+        return parseBreak()
+    end
+
+    if token == 'continue' and State.options.nonstandardSymbol['continue'] then
         return parseBreak()
     end
 
@@ -3604,6 +3618,9 @@ local function initState(lua, version, options)
         },
         options = options or {},
     }
+    if not state.options.nonstandardSymbol then
+        state.options.nonstandardSymbol = {}
+    end
     State = state
     if version == 'Lua 5.1' or version == 'LuaJIT' then
         state.ENVMode = '@fenv'

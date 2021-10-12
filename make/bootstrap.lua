@@ -1,4 +1,4 @@
-local main
+local main, exec
 local i = 1
 while arg[i] do
     if arg[i] == '-E' then
@@ -7,11 +7,15 @@ while arg[i] do
         local expr = assert(arg[i], "'-e' needs argument")
         assert(load(expr, "=(command line)"))()
         -- exit after the executing
-        return
+        exec = true
     elseif not main and arg[i]:sub(1, 1) ~= '-' then
         main = i
     end
     i = i + 1
+end
+
+if exec and not main then
+    return
 end
 
 if main then
@@ -63,7 +67,7 @@ package.searchers[2] = function (name)
     local f = io.open(filename)
     local buf = f:read '*a'
     f:close()
-    local relative = filename:sub(#root + 2)
+    local relative = filename:sub(1, #root) == root and filename:sub(#root + 2) or filename
     local init, err = load(buf, '@' .. relative)
     if not init then
         return err

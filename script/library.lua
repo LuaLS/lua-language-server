@@ -288,7 +288,7 @@ local function load3rdConfigInDir(dir, configs, inner)
     if not fs.is_directory(dir) then
         return
     end
-    for libraryDir in dir:list_directory() do
+    for libraryDir in fs.pairs(dir) do
         local suc, res = xpcall(loadSingle3rdConfig, log.error, libraryDir)
         if suc and res then
             if inner then

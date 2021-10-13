@@ -434,7 +434,7 @@ local function fileSync(source, target, option)
     if isDir1 then
         if isDir2 then
             local fileList = m.fileList()
-            for filePath in target:list_directory() do
+            for filePath in fs.pairs(target) do
                 fileList[filePath] = true
             end
             for filePath in source:list_directory() do
@@ -558,7 +558,7 @@ function m.fileSync(source, target, option)
 end
 
 function m.scanDirectory(dir, callback)
-    for fullpath in dir:list_directory() do
+    for fullpath in fs.pairs(dir) do
         if fs.is_directory(fullpath) then
             m.scanDirectory(fullpath, callback)
         else

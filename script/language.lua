@@ -4,7 +4,7 @@ local lloader = require 'locale-loader'
 
 local function supportLanguage()
     local list = {}
-    for path in (ROOT / 'locale'):list_directory() do
+    for path in fs.pairs(ROOT / 'locale') do
         if fs.is_directory(path) then
             list[#list+1] = path:filename():string():lower()
         end

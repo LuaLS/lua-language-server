@@ -43,7 +43,7 @@ end)
 brave.on('listDirectory', function (uri)
     local path = fs.path(furi.decode(uri))
     local uris = {}
-    for child in path:list_directory() do
+    for child in fs.pairs(path) do
         local childUri = furi.encode(child:string())
         uris[#uris+1] = childUri
     end

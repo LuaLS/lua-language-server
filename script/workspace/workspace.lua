@@ -65,7 +65,7 @@ local globInteferFace = {
         end
         local paths = {}
         pcall(function ()
-            for fullpath in fullPath:list_directory() do
+            for fullpath in fs.pairs(fullPath) do
                 paths[#paths+1] = fullpath:string()
             end
         end)

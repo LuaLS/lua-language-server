@@ -54,7 +54,7 @@ log.debug('VERSION:', version.getVersion())
 
 require 'tracy'
 
-xpcall(dofile, log.debug, ROOT / 'debugger.lua')
+xpcall(dofile, log.debug, (ROOT / 'debugger.lua'):string())
 
 local service = require 'service'
 

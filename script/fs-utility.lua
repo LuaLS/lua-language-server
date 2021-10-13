@@ -160,7 +160,7 @@ function dfs:string()
     return self.path
 end
 
-function dfs:list_directory()
+function dfs:listDirectory()
     local dir = self:_open()
     if type(dir) ~= 'table' then
         return function () end
@@ -270,6 +270,18 @@ local function fsIsDirectory(path, option)
     if not suc then
         option.err[#option.err+1] = res
         return false
+    end
+    return res
+end
+
+local function fsPairs(path, option)
+    if path.type == 'dummy' then
+        return path:listDirectory()
+    end
+    local suc, res = pcall(fs.pairs, path)
+    if not suc then
+        option.err[#option.err+1] = res
+        return function () end
     end
     return res
 end
@@ -388,7 +400,7 @@ local function fileRemove(path, option)
         return
     end
     if fsIsDirectory(path, option) then
-        for child in path:list_directory() do
+        for child in fsPairs(path) do
             fileRemove(child, option)
         end
     end
@@ -403,7 +415,7 @@ local function fileCopy(source, target, option)
     local isExists = fsExists(target, option)
     if isDir1 then
         if isDir2 or fsCreateDirectories(target, option) then
-            for filePath in source:list_directory() do
+            for filePath in fsPairs(source) do
                 local name = filePath:filename():string()
                 fileCopy(filePath, target / name, option)
             end
@@ -437,7 +449,7 @@ local function fileSync(source, target, option)
             for filePath in fs.pairs(target) do
                 fileList[filePath] = true
             end
-            for filePath in source:list_directory() do
+            for filePath in fsPairs(source) do
                 local name = filePath:filename():string()
                 local targetPath = target / name
                 fileSync(filePath, targetPath, option)
@@ -451,7 +463,7 @@ local function fileSync(source, target, option)
                 fileRemove(target, option)
             end
             if fsCreateDirectories(target) then
-                for filePath in source:list_directory() do
+                for filePath in fsPairs(source) do
                     local name = filePath:filename():string()
                     fileCopy(filePath, target / name, option)
                 end

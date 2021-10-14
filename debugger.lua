@@ -10,7 +10,7 @@ for _, vscodePath in ipairs {'.vscode', '.vscode-insiders', '.vscode-server-insi
     log.debug('Search extensions at:', extensionPath:string())
 
     if fs.exists(extensionPath) then
-        for path in extensionPath:list_directory() do
+        for path in fs.pairs(extensionPath) do
             if fs.is_directory(path) then
                 local name = path:filename():string()
                 if name:find('actboy168.lua-debug-', 1, true) then

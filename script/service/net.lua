@@ -258,18 +258,35 @@ end
 
 local m = {}
 
-function m.listen(...)
-    local fd, err = socket.bind(...)
+function m.listen(protocol, ...)
+    local fd, err = socket(protocol)
     if not fd then
-        return fd, err
+        return nil, err
+    end
+    local ok
+    ok, err = fd:bind(...)
+    if not ok then
+        fd:close()
+        return nil, err
+    end
+    ok, err = fd:listen()
+    if not ok then
+        fd:close()
+        return nil, err
     end
     return new_listen(fd)
 end
 
-function m.connect(...)
-    local fd, err = socket.connect(...)
+function m.connect(protocol, ...)
+    local fd, err = socket(protocol)
     if not fd then
-        return fd, err
+        return nil, err
+    end
+    local ok
+    ok, err = fd:connect(...)
+    if ok == nil then
+        fd:close()
+        return nil, err
     end
     return new_connect(fd)
 end

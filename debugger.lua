@@ -49,7 +49,6 @@ local function tryDebugger()
     local dbg = loadfile(entry)(root)
     dbg:start {
         address = addr,
-        latest  = true,
     }
     log.debug('Debugger startup, listen port:', DBGPORT)
     log.debug('Debugger args:', addr, root, path, cpath)

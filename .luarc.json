@@ -1,0 +1,27 @@
+{
+    "Lua.diagnostics.disable": [
+        "close-non-object"
+    ],
+    "Lua.runtime.version": "Lua 5.4",
+    "Lua.workspace.maxPreload": 1600,
+    "Lua.workspace.preloadFileSize": 1000,
+    "Lua.diagnostics.neededFileStatus": {
+        "undefined-field": "Any"
+    },
+    "Lua.workspace.ignoreDir": [
+        "locale/",
+        "libs/",
+        "3rd",
+        ".vscode",
+        "meta"
+    ],
+    "Lua.workspace.library": [
+        "script/meta",
+        "bin"
+    ],
+    "Lua.runtime.path": [
+        "?.lua",
+        "script/?.lua",
+        "script/?/init.lua"
+    ]
+}

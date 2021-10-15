@@ -5,13 +5,13 @@ local exe      = platform.OS == 'Windows' and ".exe" or ""
 lm.bindir = "bin/"..platform.OS
 
 lm.EXE_DIR = ""
+lm.INTERNAL = "on"
 lm:import "3rd/bee.lua/make.lua"
 
 lm:source_set 'lpeglabel' {
     rootdir = '3rd',
     includes = "bee.lua/3rd/lua",
     sources = "lpeglabel/*.c",
-    visibility = 'default',
     defines = {
         'MAXRECLEVEL=1000',
     },

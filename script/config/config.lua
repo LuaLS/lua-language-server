@@ -317,6 +317,8 @@ function m.update(new)
             end
             if Template[fullKey] then
                 m.set(fullKey, value)
+            elseif Template['Lua.' .. fullKey] then
+                m.set('Lua.' .. fullKey, value)
             elseif type(value) == 'table' then
                 expand(value, fullKey)
             end

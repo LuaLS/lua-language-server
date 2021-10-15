@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.4.4
+`2021-10-15`
 * `CHG` improve `.luarc.json`
 * `FIX` [#722](https://github.com/sumneko/lua-language-server/issues/722)
 

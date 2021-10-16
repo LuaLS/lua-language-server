@@ -24,5 +24,6 @@
         "?.lua",
         "script/?.lua",
         "script/?/init.lua"
-    ]
+    ],
+    "Lua.color.mode": "SemanticEnhanced"
 }

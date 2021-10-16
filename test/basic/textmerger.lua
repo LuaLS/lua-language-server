@@ -1,5 +1,6 @@
 local files = require 'files'
 local tm    = require 'text-merger'
+local json  = require 'json'
 
 local function TEST(source)
     return function (expect)
@@ -217,3 +218,56 @@ print(12345)
         text = "",
     },
 }
+
+---@diagnostic disable:trailing-space
+TEST ''
+[[x = {  "test"  } }]]
+{
+    json.decode [[{"range":{"end":{"line":0,"character":0},"start":{"line":0,"character":0}},"rangeLength":0,"text":"x"}]],
+    json.decode [[{"range":{"end":{"line":0,"character":1},"start":{"line":0,"character":1}},"rangeLength":0,"text":" "}]],
+    json.decode [[{"range":{"end":{"line":0,"character":2},"start":{"line":0,"character":2}},"rangeLength":0,"text":"="}]],
+    json.decode [[{"range":{"end":{"line":0,"character":3},"start":{"line":0,"character":3}},"rangeLength":0,"text":" "}]],
+--[[
+x = 
+]]
+    json.decode [[{"range":{"end":{"line":0,"character":4},"start":{"line":0,"character":4}},"rangeLength":0,"text":"{ \r }"}]],
+--[[
+x = { 
+ }
+]]
+    json.decode [[{"range":{"end":{"line":0,"character":7},"start":{"line":0,"character":6}},"rangeLength":1,"text":""}]],
+--[[
+x = {  }
+    json.decode [[{"range":{"end":{"line":0,"character":6},"start":{"line":0,"character":6}},"rangeLength":0,"text":"\"\r\""}]],
+--[[
+x = { "
+" }
+]]
+    json.decode [[{"range":{"end":{"line":0,"character":8},"start":{"line":0,"character":7}},"rangeLength":1,"text":""}]],
+--[[
+x = { "" }
+]]
+    json.decode [[{"range":{"end":{"line":0,"character":7},"start":{"line":0,"character":7}},"rangeLength":0,"text":"t"}]],
+--[[
+x = { "t" }
+]]
+    json.decode [[{"range":{"end":{"line":0,"character":8},"start":{"line":0,"character":8}},"rangeLength":0,"text":"e"}]],
+    json.decode [[{"range":{"end":{"line":0,"character":9},"start":{"line":0,"character":9}},"rangeLength":0,"text":"s"}]],
+    json.decode [[{"range":{"end":{"line":0,"character":10},"start":{"line":0,"character":10}},"rangeLength":0,"text":"t"}]],
+--[[
+x = { "test" }
+]]
+    json.decode [[{"range":{"end":{"line":0,"character":13},"start":{"line":0,"character":5}},"rangeLength":8,"text":""}]],
+--[[
+x = {}
+]]
+    json.decode [[{"range":{"end":{"line":0,"character":6},"start":{"line":0,"character":4}},"rangeLength":2,"text":""}]],
+--[[
+x = 
+]]
+    json.decode [[{"range":{"end":{"line":0,"character":4},"start":{"line":0,"character":4}},"rangeLength":0,"text":"{  \"test\"  }"}]],
+--[[
+x = {  \"test\"  }
+]]
+}
+---@diagnostic enable:trailing-space

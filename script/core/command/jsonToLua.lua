@@ -5,13 +5,17 @@ local proto     = require 'proto'
 local define    = require 'proto.define'
 local lang      = require 'language'
 local converter = require 'proto.converter'
+local guide     = require 'parser.guide'
 
 return function (data)
-    local text = files.getText(data.uri)
+    local state = files.getState(data.uri)
+    local text  = files.getText(data.uri)
     if not text then
         return
     end
-    local jsonStr = text:sub(data.start, data.finish)
+    local start  = guide.positionToOffset(state, data.start)
+    local finish = guide.positionToOffset(state, data.finish)
+    local jsonStr = text:sub(start + 1, finish)
     local suc, res = pcall(json.decode, jsonStr)
     if not suc then
         proto.notify('window/showMessage', {

@@ -27,11 +27,14 @@ lm:executable "lua-language-server" {
         sources = {
             "make/lua-language-server.rc",
         }
+    },
+    linux = {
+        crt = "static",
     }
 }
 
-lm:build 'install' {
-    '$luamake', 'lua', 'make/install.lua',
+lm:build 'copy_vcrt' {
+    '$luamake', 'lua', 'make/copy_vcrt.lua', lm.bindir,
 }
 
 lm:copy "copy_bootstrap" {
@@ -44,8 +47,13 @@ lm:build "bee-test" {
     pool = "console",
     deps = {
         "lua-language-server",
-        "copy_bootstrap"
+        "copy_bootstrap",
     },
+    windows = {
+        deps = {
+            "copy_vcrt"
+        }
+    }
 }
 
 lm:build 'unit-test' {
@@ -59,5 +67,4 @@ lm:build 'unit-test' {
 lm:default {
     "bee-test",
     "unit-test",
-    "install",
 }

@@ -1,0 +1,3 @@
+local output = ...
+local fs = require 'bee.filesystem'
+require 'msvc'.copy_vcrt('x64', fs.current_path() / output)

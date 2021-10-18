@@ -373,7 +373,7 @@ local function fsCopy(source, target, option)
             end
             return fsSave(target, sourceText, option)
         else
-            local suc, res = pcall(fs.copy_file, source, target, true)
+            local suc, res = pcall(fs.copy_file, source, target, fs.copy_options.overwrite_existing)
             if not suc then
                 option.err[#option.err+1] = res
                 return false

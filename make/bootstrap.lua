@@ -55,7 +55,6 @@ local root; do
 end
 
 package.path = table.concat({
-    package.path,
     root .. "/script/?.lua",
     root .. "/script/?/init.lua",
 }, ";"):gsub('/', package.config:sub(1,1))

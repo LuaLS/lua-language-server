@@ -69,7 +69,7 @@ local function rawUnpackPosition(uri, position)
         if text then
             local lineOffset = state.lines[row]
             local textOffset = utf8.offset(text, col + 1, lineOffset)
-            if textOffset then
+            if textOffset and lineOffset then
                 col = textOffset - lineOffset
             end
         end
@@ -86,7 +86,7 @@ local function diffedUnpackPosition(uri, position)
         if text then
             local lineOffset = originLines[row]
             local textOffset = utf8.offset(text, col + 1, lineOffset)
-            if textOffset then
+            if textOffset and lineOffset then
                 col = textOffset - lineOffset
             end
         end

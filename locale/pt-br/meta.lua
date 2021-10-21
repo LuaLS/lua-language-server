@@ -12,96 +12,96 @@ cgopt.incremental   = 'Altera o modo do coletor para incremental.'
 cgopt.generational  = 'Altera o modo do coletor para geracional.'
 cgopt.isrunning     = 'Retorna um valor booleano indicando se o coletor de lixo (i.e., garbage-collection) está em execução.'
 collectgarbage      = 'Esta função é uma interface genérica para o coletor de lixo (i.e., garbage-collection). Ela executa diferentes funções de acordo com seu primeiro argumento, `opt`.'
-dofile              = 'Opens the named file and executes its content as a Lua chunk. When called without arguments, `dofile` executes the content of the standard input (`stdin`). Returns all values returned by the chunk. In case of errors, `dofile` propagates the error to its caller. (That is, `dofile` does not run in protected mode.)'
+dofile              = 'Abre o arquivo passado por argumento e executa seu conteúdo como código Lua. Quando chamado sem argumentos, `dofile` executa o conteúdo da entrada padrão (`stdin`). Retorna todos os valores retornados pelo trecho de código contido no arquivo. Em caso de erros, o `dofile` propaga o erro para seu chamador. Ou seja, o `dofile` não funciona em modo protegido.'
 error               = [[
-Terminates the last protected function called and returns message as the error object.
+Termina a última chamada de função protegida e retorna `message` como objeto de `erro`.
 
-Usually, `error` adds some information about the error position at the beginning of the message, if the message is a string.
+Normalmente, o 'erro' adiciona algumas informações sobre a localização do erro no início da mensagem, quando a mensagem for uma string.
 ]]
-_G                  = 'A global variable (not a function) that holds the global environment (see §2.2). Lua itself does not use this variable; changing its value does not affect any environment, nor vice versa.'
-getfenv             = 'Returns the current environment in use by the function. `f` can be a Lua function or a number that specifies the function at that stack level.'
-getmetatable        = 'If object does not have a metatable, returns nil. Otherwise, if the object\'s metatable has a __metatable field, returns the associated value. Otherwise, returns the metatable of the given object.'
+_G                  = 'Uma variável global (não uma função) que detém o ambiente global (ver §2.2). Lua em si não usa esta variável; mudar seu valor não afeta nenhum ambiente e vice-versa.'
+getfenv             = 'Retorna o ambiente atual em uso pela função. O `f` pode ser uma função Lua ou um número que especifica a função naquele nível de pilha.'
+getmetatable        = 'Se o objeto não tiver uma metatable, o retorno é `nil`. Mas caso a metatable do objeto tenha um campo `__metatable`, é retornado o valor associado. Caso contrário, retorna a metatable do objeto dado.'
 ipairs              = [[
-Returns three values (an iterator function, the table `t`, and `0`) so that the construction
+Retorna três valores (uma função iteradora, a tabela `t`, e `0`) para que a seguinte construção
 ```lua
     for i,v in ipairs(t) do body end
 ```
-will iterate over the key–value pairs `(1,t[1]), (2,t[2]), ...`, up to the first absent index.
+possa iterar sobre os pares de valor-chave `(1,t[1]), (2,t[2]), ...`, até o primeiro índice ausente.
 ]]
-loadmode.b          = 'Only binary chunks.'
-loadmode.t          = 'Only text chunks.'
-loadmode.bt         = 'Both binary and text.'
-load['<5.1']        = 'Loads a chunk using function `func` to get its pieces. Each call to `func` must return a string that concatenates with previous results.'
+loadmode.b          = 'Somente blocos binários.'
+loadmode.t          = 'Somente blocos de texto.'
+loadmode.bt         = 'Tanto binário quanto texto.'
+load['<5.1']        = 'Carrega um bloco utilizando a função `func` para obter suas partes. Cada chamada para o `func` deve retornar uma string que é concatenada com os resultados anteriores.'
 load['>5.2']        = [[
-Loads a chunk.
+Carrega um bloco.
 
-If `chunk` is a string, the chunk is this string. If `chunk` is a function, `load` calls it repeatedly to get the chunk pieces. Each call to `chunk` must return a string that concatenates with previous results. A return of an empty string, `nil`, or no value signals the end of the chunk.
+Se o bloco (i.e., `chunk`) é uma string, o bloco é essa string. Se o bloco é uma função, a função "load" é chamada repetidamente para obter suas partes. Cada chamada para o bloco deve retornar uma string que é concatenada com os resultados anteriores. O retorno de uma string vazia, `nil`, ou nenhum valor sinaliza o fim do bloco.
 ]]
-loadfile            = 'Loads a chunk from file `filename` or from the standard input, if no file name is given.'
-loadstring          = 'Loads a chunk from the given string.'
-module              = 'Creates a module.'
+loadfile            = 'Carrega um bloco de arquivo `filename` ou da entrada padrão, se nenhum nome de arquivo for dado.'
+loadstring          = 'Carrega um bloco a partir de uma string dada.'
+module              = 'Cria um módulo.'
 next                = [[
-Allows a program to traverse all fields of a table. Its first argument is a table and its second argument is an index in this table. A call to `next` returns the next index of the table and its associated value. When called with `nil` as its second argument, `next` returns an initial index and its associated value. When called with the last index, or with `nil` in an empty table, `next` returns `nil`. If the second argument is absent, then it is interpreted as `nil`. In particular, you can use `next(t)` to check whether a table is empty.
+Permite que um programa percorra todos os campos de uma tabela. Seu primeiro argumento é uma tabela e seu segundo argumento é um índice nesta tabela. Uma chamada `next` retorna o próximo índice da tabela e seu valor associado. Quando chamado usando `nil` como segundo argumento, `next` retorna um índice inicial e seu valor associado. Quando chamado com o último índice, ou com `nil` em uma tabela vazia, o `next` retorna o `nil`. Se o segundo argumento estiver ausente, então é interpretado como `nil`. Portanto, pode-se utilizar o `next(t)` para verificar se uma tabela está vazia.
 
-The order in which the indices are enumerated is not specified, *even for numeric indices*. (To traverse a table in numerical order, use a numerical `for`.)
+A ordem na qual os índices são enumerados não é especificada, *mesmo para índices numéricos*. (Para percorrer uma tabela em ordem numérica, utilize um `for`).
 
-The behavior of `next` is undefined if, during the traversal, you assign any value to a non-existent field in the table. You may however modify existing fields. In particular, you may set existing fields to nil.
+O comportamento do `next` é indefinido se, durante a iteração/travessia, você atribuir qualquer valor a um campo inexistente na tabela. Você pode, entretanto, modificar os campos existentes e pode, inclusive, os definir como nulos.
 ]]
-paris               = [[
-If `t` has a metamethod `__pairs`, calls it with t as argument and returns the first three results from the call.
+pairs               = [[
+Se `t` tem um "meta" método (i.e., metamethod) `__pairs`, a chamada é feita usando t como argumento e retorna os três primeiros resultados.
 
-Otherwise, returns three values: the $next function, the table `t`, and `nil`, so that the construction
+Caso contrário, retorna três valores: a função $next, a tabela `t` e `nil`, para que a seguinte construção
 ```lua
     for k,v in pairs(t) do body end
 ```
-will iterate over all key–value pairs of table `t`.
+possa iterar sobre todos os pares de valor-chave da tabela 't'.
 
-See function $next for the caveats of modifying the table during its traversal.
+Veja a função $next para saber as ressalvas em modificar uma tabela durante sua iteração.
 ]]
 pcall               = [[
-Calls the function `f` with the given arguments in *protected mode*. This means that any error inside `f` is not propagated; instead, `pcall` catches the error and returns a status code. Its first result is the status code (a boolean), which is true if the call succeeds without errors. In such case, `pcall` also returns all results from the call, after this first result. In case of any error, `pcall` returns `false` plus the error object.
+Chama a função `f` com os argumentos dados em modo *protegido*. Isto significa que qualquer erro dentro de `f` não é propagado; em vez disso, o `pcall` captura o erro e retorna um código de status. Seu primeiro resultado é o código de status (booleano), que é verdadeiro se a chamada for bem sucedida sem erros. Neste caso, `pcall' também retorna todos os resultados da chamada, após este primeiro resultado. Em caso de qualquer erro, `pcall` retorna `false` mais o objeto de erro.
 ]]
 print               = [[
-Receives any number of arguments and prints their values to `stdout`, converting each argument to a string following the same rules of $tostring.
-The function print is not intended for formatted output, but only as a quick way to show a value, for instance for debugging. For complete control over the output, use $string.format and $io.write.
+Recebe qualquer número de argumentos e imprime seus valores na saída padrão `stdout`, convertendo cada argumento em uma string seguindo as mesmas regras do $tostring.
+A função `print` não é destinada à saída formatada, mas apenas como uma forma rápida de mostrar um valor, por exemplo, para debugging. Para controle completo sobre a saída, use $string.format e $io.write.
 ]]
-rawequal            = 'Checks whether v1 is equal to v2, without invoking the `__eq` metamethod.'
-rawget              = 'Gets the real value of `table[index]`, without invoking the `__index` metamethod.'
-rawlen              = 'Returns the length of the object `v`, without invoking the `__len` metamethod.'
+rawequal            = 'Verifica se v1 é igual a v2, sem invocar a metatable `__eq`.'
+rawget              = 'Obtém o valor real de `table[index]`, sem invocar a metatable `__index`.'
+rawlen              = 'Retorna o comprimento do objeto `v`, sem invocar a metatable `__len`.'
 rawset              = [[
-Sets the real value of `table[index]` to `value`, without using the `__newindex` metavalue. `table` must be a table, `index` any value different from `nil` and `NaN`, and `value` any Lua value.
-This function returns `table`.
+Define o valor real de `table[index]` para `value`, sem utilizar o metavalue `__newindex`. `table` deve ser uma tabela, `index` qualquer valor diferente de `nil` e `NaN`, e `value` qualquer valor de tipos do Lua.
+Esta função retorna uma `table`.
 ]]
-select              = 'If `index` is a number, returns all arguments after argument number `index`; a negative number indexes from the end (`-1` is the last argument). Otherwise, `index` must be the string `"#"`, and `select` returns the total number of extra arguments it received.'
-setfenv             = 'Sets the environment to be used by the given function. '
+select              = 'Se `index` é um número, retorna todos os argumentos após o número do argumento `index`; um número negativo de índices do final (`-1` é o último argumento). Caso contrário, `index` deve ser a string `"#"`, e `select` retorna o número total de argumentos extras dados.'
+setfenv             = 'Define o ambiente a ser utilizado pela função em questão.'
 setmetatable        = [[
-Sets the metatable for the given table. If `metatable` is `nil`, removes the metatable of the given table. If the original metatable has a `__metatable` field, raises an error.
+Define a metatable para a tabela dada. Se `metatabela` for `nil`, remove a metatable da tabela em questão. Se a metatable original tiver um campo `__metatable', um erro é lançado.
 
-This function returns `table`.
+Esta função retorna uma `table`.
 
-To change the metatable of other types from Lua code, you must use the debug library (§6.10).
+Para alterar a metatable de outros tipos do código Lua, você deve utilizar a biblioteca de debugging (§6.10).
 ]]
 tonumber            = [[
-When called with no `base`, `tonumber` tries to convert its argument to a number. If the argument is already a number or a string convertible to a number, then `tonumber` returns this number; otherwise, it returns `fail`.
+Quando chamado sem a base, `tonumber` tenta converter seu argumento para um número. Se o argumento já for um número ou uma string numérica, então `tonumber` retorna este número; caso contrário, retorna `fail`.
 
-The conversion of strings can result in integers or floats, according to the lexical conventions of Lua (see §3.1). The string may have leading and trailing spaces and a sign.
+A conversão de strings pode resultar em números inteiros ou de ponto flutuante, de acordo com as convenções lexicais de Lua (ver §3.1). A string pode ter espaços antes e depois e um sinal.
 ]]
 tostring            = [[
-Receives a value of any type and converts it to a string in a human-readable format.
+Recebe um valor de qualquer tipo e o converte em uma string em formato legível por humanos.
 
-If the metatable of `v` has a `__tostring` field, then `tostring` calls the corresponding value with `v` as argument, and uses the result of the call as its result. Otherwise, if the metatable of `v` has a `__name` field with a string value, `tostring` may use that string in its final result.
+Se a metatable de `v` tem um campo `__tostring', então `tostring' chama o valor correspondente usando `v` como argumento, e utiliza o resultado da chamada como seu resultado. Caso contrário, se a metatable de `v` tiver um campo `__name` com um valor do tipo string, `tostring` pode utilizar essa string em seu resultado final.
 
-For complete control of how numbers are converted, use $string.format.
+Para controle completo de como os números são convertidos, utilize $string.format.
 ]]
 type                = [[
-Returns the type of its only argument, coded as a string. The possible results of this function are `"nil"` (a string, not the value `nil`), `"number"`, `"string"`, `"boolean"`, `"table"`, `"function"`, `"thread"`, and `"userdata"`.
+Retorna o tipo de seu único argumento, codificado como uma string. Os resultados possíveis desta função são `"nil"` (uma string, não o valor `nil`), `"number"`, `"string"`, `"boolean"`, `"table"`, `"function"`, `"thread"`, e `"userdata"`.
 ]]
-_VERSION            = 'A global variable (not a function) that holds a string containing the running Lua version.'
-warn                = 'Emits a warning with a message composed by the concatenation of all its arguments (which should be strings).'
-xpcall['=5.1']      = 'Calls function `f` with the given arguments in protected mode with a new message handler.'
-xpcall['>5.2']      = 'Calls function `f` with the given arguments in protected mode with a new message handler.'
+_VERSION            = 'Uma variável global (não uma função) que contém uma string contendo a versão Lua em execução.'
+warn                = 'Emite um aviso com uma mensagem composta pela concatenação de todos os seus argumentos (que devem ser strings).'
+xpcall['=5.1']      = 'Faz chamada a função `f` com os argumentos dados e em modo protegido, usando um manipulador de mensagens dado.'
+xpcall['>5.2']      = 'Faz chamada a função `f` com os argumentos dados e em modo protegido, usando um manipulador de mensagens dado.'
 unpack              = [[
-Returns the elements from the given `list`. This function is equivalent to
+Retorna os elementos da lista dada. Esta função é equivalente a
 ```lua
     return list[i], list[i+1], ···, list[j]
 ```

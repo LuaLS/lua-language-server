@@ -70,4 +70,22 @@ local aaaaaa = require 'aaa'
     text   = 'local test   = require \'test\'\n'
 }
 
+TEST [[
+local offset
+local space_size
+
+---@class A
+---@field a string
+---@field b string
+local M = {}
+
+---@return A
+function M.new()
+end
+]] 'test' {
+    start  = 0,
+    finish = 0,
+    text   = 'local test = require "test"\n'
+}
+
 client.editText = originEditText

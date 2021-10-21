@@ -393,7 +393,7 @@ local function resolveLongString(finishMark)
         finishOffset = #Lua + 1
         miss = true
     end
-    local stringResult = start and ssub(Lua, start, finishOffset - 1)
+    local stringResult = start and ssub(Lua, start, finishOffset - 1) or ''
     local lastLN = stringResult:find '[\r\n][^\r\n]*$'
     if lastLN then
         local result = stringResult
@@ -606,6 +606,14 @@ local function parseLocalAttrs()
             attr[1] = word
             attr.finish = wfinish
             Index = Index + 2
+            if  word ~= 'const'
+            and word ~= 'close' then
+                pushError {
+                    type   = 'UNKNOWN_ATTRIBUTE',
+                    start  = wstart,
+                    finish = wfinish,
+                }
+            end
         else
             missName()
         end

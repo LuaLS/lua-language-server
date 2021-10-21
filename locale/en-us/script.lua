@@ -112,6 +112,7 @@ PARSER_UNICODE_NAME      = 'Contains Unicode characters.'
 PARSER_ERR_NONSTANDARD_SYMBOL = 'Lua should use `{symbol}` .'
 PARSER_MISS_SPACE_BETWEEN = 'Spaces must be left between symbols.'
 PARSER_INDEX_IN_FUNC_NAME = 'The `[name]` form cannot be used in the name of a named function.'
+PARSER_UNKNOWN_ATTRIBUTE  = 'Local attribute should be `const` or `close`'
 
 PARSER_LUADOC_MISS_CLASS_NAME           = '<class name> expected.'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       = '`:` expected.'

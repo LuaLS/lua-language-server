@@ -112,6 +112,7 @@ PARSER_UNICODE_NAME      = '包含了 Unicode 字符。'
 PARSER_ERR_NONSTANDARD_SYMBOL = 'Lua中应使用符号 `{symbol}`。'
 PARSER_MISS_SPACE_BETWEEN = '符号之间必须保留空格'
 PARSER_INDEX_IN_FUNC_NAME = '命名函数的名称中不能使用 `[name]` 形式。'
+PARSER_UNKNOWN_ATTRIBUTE  = '局部变量属性应该是 `const` 或 `close`'
 
 PARSER_LUADOC_MISS_CLASS_NAME           = '缺少类名称。'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       = '缺少符号 `:`。'

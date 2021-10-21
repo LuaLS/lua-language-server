@@ -24,7 +24,8 @@ StringDef           <-  {'"'}
                     /   {"'"}
                         {~(Esc / !"'" .)*~} -> 1
                         ("'"?)
-                    /   {'[' {:eq: '='* :} '['}
+                    /   '[' {:eq: '='* :} '['
+                        =eq -> LongStringMark
                         {(!StringClose .)*} -> 1
                         StringClose?
 StringClose         <-  ']' =eq ']'
@@ -84,6 +85,9 @@ Symbol              <-  ({} {
             return utf8.char(v)
         end
         return ''
+    end,
+    LongStringMark = function (back)
+        return '[' .. back .. '['
     end,
     Name = function (start, content, finish)
         Ci = Ci + 1

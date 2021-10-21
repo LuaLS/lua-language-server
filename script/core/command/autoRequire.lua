@@ -27,7 +27,7 @@ local function findInsertRow(uri)
         quot = '"',
         col  = nil,
     }
-    local hasFounded
+    local row
     for i = 0, #lines do
         if inComment(state, guide.positionOf(i, 0)) then
             goto CONTINUE
@@ -35,16 +35,16 @@ local function findInsertRow(uri)
         local ln = lines[i]
         local lnText = text:match('[^\r\n]*', ln)
         if not lnText:find('require', 1, true) then
-            if hasFounded then
-                return i, fmt
+            if row then
+                break
             end
             if  not lnText:match '^local%s'
             and not lnText:match '^%s*$'
             and not lnText:match '^%-%-' then
-                return i, fmt
+                break
             end
         else
-            hasFounded = true
+            row = i + 1
             local lpPos = lnText:find '%('
             if lpPos then
                 fmt.pair = true
@@ -60,7 +60,7 @@ local function findInsertRow(uri)
         end
         ::CONTINUE::
     end
-    return 0, fmt
+    return row or 0, fmt
 end
 
 local function askAutoRequire(visiblePaths)

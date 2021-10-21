@@ -5,6 +5,16 @@ local await = require 'await'
 local MODIFY = 1 << 0
 local RENAME = 1 << 1
 
+local function exists(filename)
+    local path = fs.path(filename)
+    local suc, res = pcall(fs.exists, path)
+    if suc and res then
+        return true
+    else
+        return false
+    end
+end
+
 ---@class filewatch
 local m = {}
 
@@ -53,7 +63,7 @@ function m.update()
     local changes = {}
     for path, flag in pairs(collect) do
         if flag & RENAME ~= 0 then
-            if fs.exists(fs.path(path)) then
+            if exists(path) then
                 changes[#changes+1] = {
                     type = 'create',
                     path = path,

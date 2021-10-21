@@ -715,7 +715,7 @@ end
 
 function m.onWatch(ev, ...)
     for _, callback in ipairs(m.watchList) do
-        callback(ev, ...)
+        xpcall(callback, log.error, ev, ...)
     end
 end
 

@@ -66,7 +66,7 @@ local function rawUnpackPosition(uri, position)
     if col > 0 then
         local state = files.getState(uri)
         local text  = files.getText(uri)
-        if text then
+        if state and text then
             local lineOffset = state.lines[row]
             local textOffset = utf8.offset(text, col + 1, lineOffset)
             if textOffset and lineOffset then

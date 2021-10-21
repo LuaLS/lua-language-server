@@ -21,7 +21,7 @@ function m.loadRCConfig(filename)
     if not path then
         return
     end
-    local buf  = util.loadFile(path)
+    local buf = util.loadFile(path)
     if not buf then
         return
     end

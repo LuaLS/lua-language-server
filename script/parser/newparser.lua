@@ -606,6 +606,14 @@ local function parseLocalAttrs()
             attr[1] = word
             attr.finish = wfinish
             Index = Index + 2
+            if  word ~= 'const'
+            and word ~= 'close' then
+                pushError {
+                    type   = 'UNKNOWN_ATTRIBUTE',
+                    start  = wstart,
+                    finish = wfinish,
+                }
+            end
         else
             missName()
         end

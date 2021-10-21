@@ -1,5 +1,8 @@
 # changelog
 
+## 2.4.6
+* `FIX` [#748](https://github.com/sumneko/lua-language-server/issues/748)
+
 ## 2.4.5
 `2021-10-18`
 * `FIX` accidentally load lua files from user workspace

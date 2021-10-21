@@ -6,6 +6,7 @@ local vm       = require "vm.vm"
 
 local CLASS           = {'CLASS'}
 local TABLE           = {'TABLE'}
+local CACHE           = {'CACHE'}
 
 local TypeSort = {
     ['boolean']  = 1,
@@ -269,12 +270,12 @@ end
 ---@param infers string[]
 ---@return string
 function m.viewInfers(infers)
-    if infers[0] then
-        return infers[0]
+    if infers[CACHE] then
+        return infers[CACHE]
     end
     -- 如果有显性的 any ，则直接显示为 any
     if infers['any'] then
-        infers[0] = 'any'
+        infers[CACHE] = 'any'
         return 'any'
     end
     local result = {}
@@ -285,7 +286,7 @@ function m.viewInfers(infers)
     end
     -- 如果没有任何显性类型，则推测为 unkonwn ，显示为 any
     if count == 0 then
-        infers[0] = 'any'
+        infers[CACHE] = 'any'
         return 'any'
     end
     table.sort(result, function (a, b)
@@ -301,11 +302,11 @@ function m.viewInfers(infers)
     if limit < 0 then
         limit = 0
     end
-    infers[0] = table.concat(result, '|', 1, math.min(count, limit))
+    infers[CACHE] = table.concat(result, '|', 1, math.min(count, limit))
     if count > limit then
-        infers[0] = ('%s...(+%d)'):format(infers[0], count - limit)
+        infers[CACHE] = ('%s...(+%d)'):format(infers[CACHE], count - limit)
     end
-    return infers[0]
+    return infers[CACHE]
 end
 
 ---合并对象的值

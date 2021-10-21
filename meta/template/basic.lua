@@ -132,7 +132,7 @@ function module(name, ...) end
 ---@return V
 function next(table, index) end
 
----#DES 'paris'
+---#DES 'pairs'
 ---@generic T: table, K, V
 ---@param t T
 ---@return fun(table: table<K, V>, index?: K):K, V

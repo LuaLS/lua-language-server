@@ -200,11 +200,13 @@ local function initBuiltIn()
     if not m.inited then
         return
     end
-    local langID  = lang.id
-    local version = config.get 'Lua.runtime.version'
+    local langID   = lang.id
+    local version  = config.get 'Lua.runtime.version'
+    local encoding = config.get 'Lua.runtime.fileEncoding'
     local metaPath = fs.path(METAPATH) / config.get 'Lua.runtime.meta':gsub('%$%{(.-)%}', {
         version  = version,
         language = langID,
+        encoding = encoding,
     })
 
     local metaLang = loadMetaLocale('en-US')

@@ -20,7 +20,7 @@
             "?.lua",
             "script/?.lua",
             "script/?/init.lua"
-        ],
+        ]
     },
     "workspace": {
         "maxPreload": 1600,

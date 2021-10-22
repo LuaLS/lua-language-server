@@ -236,9 +236,7 @@ local function initBuiltIn()
         local metaDoc = compileSingleMetaDoc(fsu.loadFile(libPath), metaLang, status)
         if metaDoc then
             local outPath = metaPath / libName
-            if encoding == 'ansi' then
-                metaDoc = encoder.ansi.encode(metaDoc)
-            end
+            encoder.encode(encoding, metaDoc)
             out:saveFile(libName, metaDoc)
             m.metaPaths[#m.metaPaths+1] = outPath:string()
         end

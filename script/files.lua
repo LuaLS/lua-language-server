@@ -140,9 +140,8 @@ function m.setText(uri, text, isTrust, instance)
         return
     end
     if not isTrust then
-        if config.get 'Lua.runtime.fileEncoding' == 'ansi' then
-            text = encoder.ansi.decode(text)
-        end
+        local encoding = config.get 'Lua.runtime.fileEncoding'
+        text = encoder.decode(encoding, text)
     end
     if file.originText == text then
         return

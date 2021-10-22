@@ -10,6 +10,7 @@ local define  = require "proto.define"
 local files   = require 'files'
 local await   = require 'await'
 local timer   = require 'timer'
+local encoder = require 'encoder'
 
 local m = {}
 
@@ -235,6 +236,9 @@ local function initBuiltIn()
         local metaDoc = compileSingleMetaDoc(fsu.loadFile(libPath), metaLang, status)
         if metaDoc then
             local outPath = metaPath / libName
+            if encoding == 'ansi' then
+                metaDoc = encoder.utf82ansi(metaDoc)
+            end
             out:saveFile(libName, metaDoc)
             m.metaPaths[#m.metaPaths+1] = outPath:string()
         end

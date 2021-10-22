@@ -10,7 +10,7 @@ local util     = require 'utility'
 local guide    = require 'parser.guide'
 local smerger  = require 'string-merger'
 local progress = require "progress"
-local encoding = require 'encoding'
+local encoder  = require 'encoder'
 
 ---@class files
 local m = {}
@@ -141,7 +141,7 @@ function m.setText(uri, text, isTrust, instance)
     end
     if not isTrust then
         if config.get 'Lua.runtime.fileEncoding' == 'ansi' then
-            text = encoding.ansi2utf8(text)
+            text = encoder.ansi2utf8(text)
         end
     end
     if file.originText == text then

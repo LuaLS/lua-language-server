@@ -1,24 +1,5 @@
-local platform = require 'bee.platform'
-local unicode
-
-if platform.OS == 'Windows' then
-    unicode = require 'bee.unicode'
-end
-
-local m = {}
-
-function m.ansi2utf8(text)
-    if not unicode then
-        return text
-    end
-    return unicode.a2u(text)
-end
-
-function m.utf82ansi(text)
-    if not unicode then
-        return text
-    end
-    return unicode.u2a(text)
-end
-
-return m
+return {
+    ansi    = require 'encoder.ansi',
+    utf16le = require 'encoder.utf16le',
+    utf16be = require 'encoder.utf16be'
+}

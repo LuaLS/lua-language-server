@@ -237,7 +237,7 @@ local function initBuiltIn()
         if metaDoc then
             local outPath = metaPath / libName
             if encoding == 'ansi' then
-                metaDoc = encoder.utf82ansi(metaDoc)
+                metaDoc = encoder.ansi.encode(metaDoc)
             end
             out:saveFile(libName, metaDoc)
             m.metaPaths[#m.metaPaths+1] = outPath:string()

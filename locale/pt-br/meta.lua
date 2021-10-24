@@ -109,34 +109,34 @@ Retorna os elementos da lista dada. Esta função é equivalente a
 
 bit32               = ''
 bit32.arshift       = [[
-Returns the number `x` shifted `disp` bits to the right. Negative displacements shift to the left.
+Retorna o número `x` deslocado `disp` bits para a direita. Deslocamentos negativos movem os bits para a esquerda.
 
-This shift operation is what is called arithmetic shift. Vacant bits on the left are filled with copies of the higher bit of `x`; vacant bits on the right are filled with zeros.
+Esta operação de deslocamento é chamada de deslocamento aritmético. Os bits vagos à esquerda são preenchidos com cópias do bit mais significativo de `x`; os bits vagos à direita são preenchidos com zeros.
 ]]
-bit32.band          = 'Returns the bitwise *and* of its operands.'
+bit32.band          = 'Retorna a operação bitwise *and* de seus operandos.'
 bit32.bnot          = [[
-Returns the bitwise negation of `x`.
+Retorna a negação da operação bitwise de `x`.
 
 ```lua
 assert(bit32.bnot(x) == (-1 - x) % 2^32)
 ```
 ]]
-bit32.bor           = 'Returns the bitwise *or* of its operands.'
-bit32.btest         = 'Returns a boolean signaling whether the bitwise *and* of its operands is different from zero.'
-bit32.bxor          = 'Returns the bitwise *exclusive or* of its operands.'
-bit32.extract       = 'Returns the unsigned number formed by the bits `field` to `field + width - 1` from `n`.'
-bit32.replace       = 'Returns a copy of `n` with the bits `field` to `field + width - 1` replaced by the value `v` .'
-bit32.lrotate       = 'Returns the number `x` rotated `disp` bits to the left. Negative displacements rotate to the right.'
+bit32.bor           = 'Retorna a operação bitwise *or* de seus operandos.'
+bit32.btest         = 'Retorna um valor booleano verdadeiro se a operação bitwise *and* de seus operandos for diferente de zero. Falso, caso contrário.'
+bit32.bxor          = 'Retorna a operação bitwise *exclusive or* de seus operandos.'
+bit32.extract       = 'Retorna o número formado pelos bits de `field` a `field + width - 1` de `n`, sem sinal.'
+bit32.replace       = 'Retorna uma cópia de `n` com os bits de `field` a `field + width - 1` substituídos pelo valor `v` .'
+bit32.lrotate       = 'Retorna o número `x` rotacionado `disp` bits para a esquerda. Rotações negativos movem os bits para a direita. '
 bit32.lshift        = [[
-Returns the number `x` shifted `disp` bits to the left. Negative displacements shift to the right. In any direction, vacant bits are filled with zeros.
+Retorna o número `x` deslocado `disp` bits para a esquerda. Deslocamentos negativos movem os bits para a direita. Em ambas as direções, os bits vazios/vagos são preenchidos com zeros.
 
 ```lua
 assert(bit32.lshift(b, disp) == (b * 2^disp) % 2^32)
 ```
 ]]
-bit32.rrotate       = 'Returns the number `x` rotated `disp` bits to the right. Negative displacements rotate to the left.'
+bit32.rrotate       = 'Retorna o número `x` rotacionado `disp` bits para a direita. Deslocamentos negativos movem os bits para a esquerda.'
 bit32.rshift        = [[
-Returns the number `x` shifted `disp` bits to the right. Negative displacements shift to the left. In any direction, vacant bits are filled with zeros.
+Retorna o número `x` deslocado `disp` bits para a direita. Deslocamentos negativos movem os bits para a esquerda. Em ambas as direções, os bits vazios são preenchidos com zeros.
 
 ```lua
 assert(bit32.rshift(b, disp) == math.floor(b % 2^32 / 2^disp))
@@ -144,19 +144,19 @@ assert(bit32.rshift(b, disp) == math.floor(b % 2^32 / 2^disp))
 ]]
 
 coroutine                   = ''
-coroutine.create            = 'Creates a new coroutine, with body `f`. `f` must be a function. Returns this new coroutine, an object with type `"thread"`.'
-coroutine.isyieldable       = 'Returns true when the running coroutine can yield.'
-coroutine.isyieldable['>5.4']= 'Returns true when the coroutine `co` can yield. The default for `co` is the running coroutine.'
-coroutine.close             = 'Closes coroutine `co` , closing all its pending to-be-closed variables and putting the coroutine in a dead state.'
-coroutine.resume            = 'Starts or continues the execution of coroutine `co`.'
-coroutine.running           = 'Returns the running coroutine plus a boolean, true when the running coroutine is the main one.'
-coroutine.status            = 'Returns the status of coroutine `co`.'
-coroutine.wrap              = 'Creates a new coroutine, with body `f`; `f` must be a function. Returns a function that resumes the coroutine each time it is called.'
-coroutine.yield             = 'Suspends the execution of the calling coroutine.'
-costatus.running            = 'Is running.'
-costatus.suspended          = 'Is suspended or not started.'
-costatus.normal             = 'Is active but not running.'
-costatus.dead               = 'Has finished or stopped with an error.'
+coroutine.create            = 'Cria uma nova `coroutine`, a partir de uma função `f` e retorna esta coroutine como objeto do tipo `"thread"`.'
+coroutine.isyieldable       = 'Retorna verdadeiro quando a `coroutine` em execução for finalizada.'
+coroutine.isyieldable['>5.4']= 'Retorna verdadeiro quando a `coroutine` `co` for finalizada. Por padrão `co` é uma coroutine em execução.'
+coroutine.close             = 'Finaliza a coroutine `co` , encerrando todas as variáveis pendentes e colocando a coroutine em um estado morto.'
+coroutine.resume            = 'Inicia ou continua a execução da coroutine `co`.'
+coroutine.running           = 'Retorna a `coroutine` corrente e um booleana verdadeiro quando a coroutine corrente é a principal.'
+coroutine.status            = 'Retorna o status da `coroutine `co`.'
+coroutine.wrap              = 'Cria uma nova `coroutine`, a partir de uma função `f` e retorna uma função que retorna a coroutine cada vez que ele é chamado.'
+coroutine.yield             = 'Suspende a execução da coroutine chamada.'
+costatus.running            = 'Está em execução.'
+costatus.suspended          = 'Está suspenso ou não foi iniciado.'
+costatus.normal             = 'Está ativo, mas não está em execução.'
+costatus.dead               = 'Terminou ou parou devido a erro'
 
 debug                       = ''
 debug.debug                 = 'Enters an interactive mode with the user, running each string that the user enters.'

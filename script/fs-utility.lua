@@ -579,4 +579,12 @@ function m.scanDirectory(dir, callback)
     end
 end
 
+function m.listDirectory(dir)
+    if dir.type == 'dummy' then
+        return dir:listDirectory()
+    else
+        return fs.pairs(dir)
+    end
+end
+
 return m

@@ -10,6 +10,7 @@ local define  = require "proto.define"
 local files   = require 'files'
 local await   = require 'await'
 local timer   = require 'timer'
+local encoder = require 'encoder'
 
 local m = {}
 
@@ -200,11 +201,13 @@ local function initBuiltIn()
     if not m.inited then
         return
     end
-    local langID  = lang.id
-    local version = config.get 'Lua.runtime.version'
+    local langID   = lang.id
+    local version  = config.get 'Lua.runtime.version'
+    local encoding = config.get 'Lua.runtime.fileEncoding'
     local metaPath = fs.path(METAPATH) / config.get 'Lua.runtime.meta':gsub('%$%{(.-)%}', {
         version  = version,
         language = langID,
+        encoding = encoding,
     })
 
     local metaLang = loadMetaLocale('en-US')
@@ -233,6 +236,7 @@ local function initBuiltIn()
         local metaDoc = compileSingleMetaDoc(fsu.loadFile(libPath), metaLang, status)
         if metaDoc then
             local outPath = metaPath / libName
+            encoder.encode(encoding, metaDoc)
             out:saveFile(libName, metaDoc)
             m.metaPaths[#m.metaPaths+1] = outPath:string()
         end

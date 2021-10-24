@@ -152,7 +152,7 @@ local Template = {
                                                 "?/init.lua",
                                             },
     ['Lua.runtime.special']                 = Type.Hash(Type.String, Type.String),
-    ['Lua.runtime.meta']                    = Type.String >> '${version} ${language}',
+    ['Lua.runtime.meta']                    = Type.String >> '${version} ${language} ${encoding}',
     ['Lua.runtime.unicodeName']             = Type.Boolean,
     ['Lua.runtime.nonstandardSymbol']       = Type.Hash(Type.String, Type.Boolean, ';'),
     ['Lua.runtime.plugin']                  = Type.String,

@@ -47,7 +47,7 @@ The order in which the indices are enumerated is not specified, *even for numeri
 
 The behavior of `next` is undefined if, during the traversal, you assign any value to a non-existent field in the table. You may however modify existing fields. In particular, you may set existing fields to nil.
 ]]
-paris               = [[
+pairs               = [[
 If `t` has a metamethod `__pairs`, calls it with t as argument and returns the first three results from the call.
 
 Otherwise, returns three values: the $next function, the table `t`, and `nil`, so that the construction

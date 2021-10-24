@@ -583,7 +583,7 @@ function m.hasType(source, tp, mark)
     end
     if tp == 'function' then
         for infer in pairs(infers) do
-            if infer ~= 0 and infer:sub(1, 4) == 'fun(' then
+            if infer ~= CACHE and infer:sub(1, 4) == 'fun(' then
                 return true
             end
         end

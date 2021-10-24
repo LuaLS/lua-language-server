@@ -1,5 +1,9 @@
-local files = require 'files'
-local util  = require 'utility'
+local files   = require 'files'
+local util    = require 'utility'
+local encoder = require 'encoder'
+
+-- TODO
+local offsetEncoding = 'utf16'
 
 local function splitRows(text)
     local rows = {}
@@ -14,14 +18,14 @@ local function getLeft(text, char)
         return ''
     end
     local left
-    local length = util.utf8Len(text)
+    local length = encoder.len(offsetEncoding, text)
 
     if char == 0 then
         left = ''
     elseif char >= length then
         left = text
     else
-        left = text:sub(1, utf8.offset(text, char + 1) - 1)
+        left = text:sub(1, encoder.offset(offsetEncoding, text, char + 1) - 1)
     end
 
     return left
@@ -32,14 +36,14 @@ local function getRight(text, char)
         return ''
     end
     local right
-    local length = util.utf8Len(text)
+    local length = encoder.len(offsetEncoding, text)
 
     if char == 0 then
         right = text
     elseif char >= length then
         right = ''
     else
-        right = text:sub(utf8.offset(text, char + 1))
+        right = text:sub(encoder.offset(offsetEncoding, text, char + 1))
     end
 
     return right

@@ -1,5 +1,9 @@
-local guide = require 'parser.guide'
-local files = require 'files'
+local guide   = require 'parser.guide'
+local files   = require 'files'
+local encoder = require 'encoder'
+
+-- TODO
+local offsetEncoding = 'utf16'
 
 local m = {}
 
@@ -16,7 +20,7 @@ local function rawPackPosition(uri, pos)
                 local start = lineOffset
                 local finish = lineOffset + col - 1
                 if start <= #text and finish <= #text then
-                    col = utf8.len(text, lineOffset, lineOffset + col - 1, true)
+                    col = encoder.len(offsetEncoding, text, lineOffset, lineOffset + col - 1)
                 end
             else
                 col = 0
@@ -41,7 +45,7 @@ local function diffedPackPosition(uri, pos)
         if text then
             local lineOffset  = originLines[row]
             local finalOffset = math.min(lineOffset + col - 1, #text + 1)
-            col = utf8.len(text, lineOffset, finalOffset, true)
+            col = encoder.len(offsetEncoding, text, lineOffset, finalOffset)
         end
     end
     return {
@@ -68,7 +72,7 @@ local function rawUnpackPosition(uri, position)
         local text  = files.getText(uri)
         if state and text then
             local lineOffset = state.lines[row]
-            local textOffset = utf8.offset(text, col + 1, lineOffset)
+            local textOffset = encoder.offset(offsetEncoding, text, col + 1, lineOffset)
             if textOffset and lineOffset then
                 col = textOffset - lineOffset
             end
@@ -85,7 +89,7 @@ local function diffedUnpackPosition(uri, position)
         local text  = files.getOriginText(uri)
         if text then
             local lineOffset = originLines[row]
-            local textOffset = utf8.offset(text, col + 1, lineOffset)
+            local textOffset = encoder.offset(offsetEncoding, text, col + 1, lineOffset)
             if textOffset and lineOffset then
                 col = textOffset - lineOffset
             end

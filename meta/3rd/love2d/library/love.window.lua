@@ -98,12 +98,18 @@ function love.window.getMode() end
 ---
 ---The window position is in the coordinate space of the display it is currently in.
 ---
+---@return number x # The x-coordinate of the window's position.
+---@return number y # The y-coordinate of the window's position.
 ---@return number displayindex # The index of the display that the window is in.
 function love.window.getPosition() end
 
 ---
 ---Gets area inside the window which is known to be unobstructed by a system title bar, the iPhone X notch, etc. Useful for making sure UI elements can be seen by the user.
 ---
+---@return number x # Starting position of safe area (x-axis).
+---@return number y # Starting position of safe area (y-axis).
+---@return number w # Width of safe area.
+---@return number h # Height of safe area.
 function love.window.getSafeArea() end
 
 ---
@@ -232,8 +238,10 @@ function love.window.setMode(width, height, flags) end
 ---
 ---The window position is in the coordinate space of the specified display.
 ---
+---@param x number # The x-coordinate of the window's position.
+---@param y number # The y-coordinate of the window's position.
 ---@param displayindex number # The index of the display that the new window position is relative to.
-function love.window.setPosition(displayindex) end
+function love.window.setPosition(x, y, displayindex) end
 
 ---
 ---Sets the window title.

@@ -39,7 +39,8 @@
 			"name": "love-api",
 			"type": "lua",
 			"request": "launch",
-			"stopOnEntry": false,
+			"756stopOnEntry": false,
+			"luaexe": "${workspaceFolder}/bin/Windows/lua-language-server.exe",
 			"program": "${workspaceRoot}/tools/love-api.lua",
 			"cpath": "${workspaceFolder}/bin/Windows/?.dll",
 			"arg": [

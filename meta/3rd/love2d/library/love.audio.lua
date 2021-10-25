@@ -63,6 +63,9 @@ function love.audio.getOrientation() end
 ---
 ---Returns the position of the listener. Please note that positional audio only works for mono (i.e. non-stereo) sources.
 ---
+---@return number x # The X position of the listener.
+---@return number y # The Y position of the listener.
+---@return number z # The Z position of the listener.
 function love.audio.getPosition() end
 
 ---
@@ -84,6 +87,9 @@ function love.audio.getSourceCount() end
 ---
 ---Returns the velocity of the listener.
 ---
+---@return number x # The X velocity of the listener.
+---@return number y # The Y velocity of the listener.
+---@return number z # The Z velocity of the listener.
 function love.audio.getVelocity() end
 
 ---
@@ -182,12 +188,18 @@ function love.audio.setOrientation(fx, fy, fz, ux, uy, uz) end
 ---
 ---Sets the position of the listener, which determines how sounds play.
 ---
-function love.audio.setPosition() end
+---@param x number # The x position of the listener.
+---@param y number # The y position of the listener.
+---@param z number # The z position of the listener.
+function love.audio.setPosition(x, y, z) end
 
 ---
 ---Sets the velocity of the listener.
 ---
-function love.audio.setVelocity() end
+---@param x number # The X velocity of the listener.
+---@param y number # The Y velocity of the listener.
+---@param z number # The Z velocity of the listener.
+function love.audio.setVelocity(x, y, z) end
 
 ---
 ---Sets the master volume.
@@ -325,6 +337,9 @@ function Source:getCone() end
 ---
 ---Gets the direction of the Source.
 ---
+---@return number x # The X part of the direction vector.
+---@return number y # The Y part of the direction vector.
+---@return number z # The Z part of the direction vector.
 function Source:getDirection() end
 
 ---
@@ -365,6 +380,9 @@ function Source:getPitch() end
 ---
 ---Gets the position of the Source.
 ---
+---@return number x # The X position of the Source.
+---@return number y # The Y position of the Source.
+---@return number z # The Z position of the Source.
 function Source:getPosition() end
 
 ---
@@ -382,6 +400,9 @@ function Source:getType() end
 ---
 ---Gets the velocity of the Source.
 ---
+---@return number x # The X part of the velocity vector.
+---@return number y # The Y part of the velocity vector.
+---@return number z # The Z part of the velocity vector.
 function Source:getVelocity() end
 
 ---
@@ -472,7 +493,10 @@ function Source:setCone(innerAngle, outerAngle, outerVolume) end
 ---
 ---Sets the direction vector of the Source. A zero vector makes the source non-directional.
 ---
-function Source:setDirection() end
+---@param x number # The X part of the direction vector.
+---@param y number # The Y part of the direction vector.
+---@param z number # The Z part of the direction vector.
+function Source:setDirection(x, y, z) end
 
 ---
 ---Applies an audio effect to the Source.
@@ -508,7 +532,10 @@ function Source:setPitch(pitch) end
 ---
 ---Sets the position of the Source. Please note that this only works for mono (i.e. non-stereo) sound files!
 ---
-function Source:setPosition() end
+---@param x number # The X position of the Source.
+---@param y number # The Y position of the Source.
+---@param z number # The Z position of the Source.
+function Source:setPosition(x, y, z) end
 
 ---
 ---Sets whether the Source's position, velocity, direction, and cone angles are relative to the listener, or absolute.
@@ -531,7 +558,10 @@ function Source:setRolloff(rolloff) end
 ---
 ---This does '''not''' change the position of the Source, but lets the application know how it has to calculate the doppler effect.
 ---
-function Source:setVelocity() end
+---@param x number # The X part of the velocity vector.
+---@param y number # The Y part of the velocity vector.
+---@param z number # The Z part of the velocity vector.
+function Source:setVelocity(x, y, z) end
 
 ---
 ---Sets the current volume of the Source.

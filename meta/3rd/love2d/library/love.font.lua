@@ -79,6 +79,8 @@ function GlyphData:getBearing() end
 ---
 ---Gets glyph bounding box.
 ---
+---@return number x # Glyph position x.
+---@return number y # Glyph position y.
 ---@return number width # Glyph width.
 ---@return number height # Glyph height.
 function GlyphData:getBoundingBox() end

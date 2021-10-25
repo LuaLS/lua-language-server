@@ -25,11 +25,13 @@ function love.graphics.applyTransform(transform) end
 ---
 ---@overload fun(drawmode: love.DrawMode, arctype: love.ArcType, x: number, y: number, radius: number, angle1: number, angle2: number, segments: number)
 ---@param drawmode love.DrawMode # How to draw the arc.
+---@param x number # The position of the center along x-axis.
+---@param y number # The position of the center along y-axis.
 ---@param radius number # Radius of the arc.
 ---@param angle1 number # The angle at which the arc begins.
 ---@param angle2 number # The angle at which the arc terminates.
 ---@param segments number # The number of segments used for drawing the arc.
-function love.graphics.arc(drawmode, radius, angle1, angle2, segments) end
+function love.graphics.arc(drawmode, x, y, radius, angle1, angle2, segments) end
 
 ---
 ---Creates a screenshot once the current frame is done (after love.draw has finished).
@@ -46,8 +48,10 @@ function love.graphics.captureScreenshot(filename) end
 ---
 ---@overload fun(mode: love.DrawMode, x: number, y: number, radius: number, segments: number)
 ---@param mode love.DrawMode # How to draw the circle.
+---@param x number # The position of the center along x-axis.
+---@param y number # The position of the center along y-axis.
 ---@param radius number # The radius of the circle.
-function love.graphics.circle(mode, radius) end
+function love.graphics.circle(mode, x, y, radius) end
 
 ---
 ---Clears the screen or active Canvas to the specified color.
@@ -94,13 +98,16 @@ function love.graphics.discard(discardcolor, discardstencil) end
 ---@overload fun(drawable: love.Drawable, transform: love.Transform)
 ---@overload fun(texture: love.Texture, quad: love.Quad, transform: love.Transform)
 ---@param drawable love.Drawable # A drawable object.
+---@param x number # The position to draw the object (x-axis).
+---@param y number # The position to draw the object (y-axis).
+---@param r number # Orientation (radians).
 ---@param sx number # Scale factor (x-axis).
 ---@param sy number # Scale factor (y-axis).
 ---@param ox number # Origin offset (x-axis).
 ---@param oy number # Origin offset (y-axis).
 ---@param kx number # Shearing factor (x-axis).
 ---@param ky number # Shearing factor (y-axis).
-function love.graphics.draw(drawable, sx, sy, ox, oy, kx, ky) end
+function love.graphics.draw(drawable, x, y, r, sx, sy, ox, oy, kx, ky) end
 
 ---
 ---Draws many instances of a Mesh with a single draw call, using hardware geometry instancing.
@@ -112,13 +119,16 @@ function love.graphics.draw(drawable, sx, sy, ox, oy, kx, ky) end
 ---@overload fun(mesh: love.Mesh, instancecount: number, transform: love.Transform)
 ---@param mesh love.Mesh # The mesh to render.
 ---@param instancecount number # The number of instances to render.
+---@param x number # The position to draw the instances (x-axis).
+---@param y number # The position to draw the instances (y-axis).
+---@param r number # Orientation (radians).
 ---@param sx number # Scale factor (x-axis).
 ---@param sy number # Scale factor (y-axis).
 ---@param ox number # Origin offset (x-axis).
 ---@param oy number # Origin offset (y-axis).
 ---@param kx number # Shearing factor (x-axis).
 ---@param ky number # Shearing factor (y-axis).
-function love.graphics.drawInstanced(mesh, instancecount, sx, sy, ox, oy, kx, ky) end
+function love.graphics.drawInstanced(mesh, instancecount, x, y, r, sx, sy, ox, oy, kx, ky) end
 
 ---
 ---Draws a layer of an Array Texture.
@@ -128,22 +138,27 @@ function love.graphics.drawInstanced(mesh, instancecount, sx, sy, ox, oy, kx, ky
 ---@overload fun(texture: love.Texture, layerindex: number, quad: love.Quad, transform: love.Transform)
 ---@param texture love.Texture # The Array Texture to draw.
 ---@param layerindex number # The index of the layer to use when drawing.
+---@param x number # The position to draw the texture (x-axis).
+---@param y number # The position to draw the texture (y-axis).
+---@param r number # Orientation (radians).
 ---@param sx number # Scale factor (x-axis).
 ---@param sy number # Scale factor (y-axis).
 ---@param ox number # Origin offset (x-axis).
 ---@param oy number # Origin offset (y-axis).
 ---@param kx number # Shearing factor (x-axis).
 ---@param ky number # Shearing factor (y-axis).
-function love.graphics.drawLayer(texture, layerindex, sx, sy, ox, oy, kx, ky) end
+function love.graphics.drawLayer(texture, layerindex, x, y, r, sx, sy, ox, oy, kx, ky) end
 
 ---
 ---Draws an ellipse.
 ---
 ---@overload fun(mode: love.DrawMode, x: number, y: number, radiusx: number, radiusy: number, segments: number)
 ---@param mode love.DrawMode # How to draw the ellipse.
+---@param x number # The position of the center along x-axis.
+---@param y number # The position of the center along y-axis.
 ---@param radiusx number # The radius of the ellipse along the x-axis (half the ellipse's width).
 ---@param radiusy number # The radius of the ellipse along the y-axis (half the ellipse's height).
-function love.graphics.ellipse(mode, radiusx, radiusy) end
+function love.graphics.ellipse(mode, x, y, radiusx, radiusy) end
 
 ---
 ---Immediately renders any pending automatically batched draws.
@@ -161,6 +176,10 @@ function love.graphics.flushBatch() end
 ---
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
 ---
+---@return number r # The red component (0-1).
+---@return number g # The green component (0-1).
+---@return number b # The blue component (0-1).
+---@return number a # The alpha component (0-1).
 function love.graphics.getBackgroundColor() end
 
 ---
@@ -188,6 +207,10 @@ function love.graphics.getCanvasFormats() end
 ---
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
 ---
+---@return number r # The red component (0-1).
+---@return number g # The green component (0-1).
+---@return number b # The blue component (0-1).
+---@return number a # The alpha component (0-1).
 function love.graphics.getColor() end
 
 ---
@@ -195,6 +218,10 @@ function love.graphics.getColor() end
 ---
 ---The color mask determines whether individual components of the colors of drawn objects will affect the color of the screen. They affect love.graphics.clear and Canvas:clear as well.
 ---
+---@return boolean r # Whether the red color component is active when rendering.
+---@return boolean g # Whether the green color component is active when rendering.
+---@return boolean b # Whether the blue color component is active when rendering.
+---@return boolean a # Whether the alpha color component is active when rendering.
 function love.graphics.getColorMask() end
 
 ---
@@ -328,6 +355,8 @@ function love.graphics.getRendererInfo() end
 ---
 ---Gets the current scissor box.
 ---
+---@return number x # The x-component of the top-left point of the box.
+---@return number y # The y-component of the top-left point of the box.
 ---@return number width # The width of the box.
 ---@return number height # The height of the box.
 function love.graphics.getScissor() end
@@ -395,9 +424,11 @@ function love.graphics.getWidth() end
 ---
 ---The dimensions of the scissor is unaffected by graphical transformations (translate, scale, ...).
 ---
+---@param x number # The x-coordinate of the upper left corner of the rectangle to intersect with the existing scissor rectangle.
+---@param y number # The y-coordinate of the upper left corner of the rectangle to intersect with the existing scissor rectangle.
 ---@param width number # The width of the rectangle to intersect with the existing scissor rectangle.
 ---@param height number # The height of the rectangle to intersect with the existing scissor rectangle.
-function love.graphics.intersectScissor(width, height) end
+function love.graphics.intersectScissor(x, y, width, height) end
 
 ---
 ---Converts the given 2D position from screen-space into global coordinates.
@@ -581,12 +612,14 @@ function love.graphics.newParticleSystem(image, buffer) end
 ---
 ---The purpose of a Quad is to use a fraction of an image to draw objects, as opposed to drawing entire image. It is most useful for sprite sheets and atlases: in a sprite atlas, multiple sprites reside in same image, quad is used to draw a specific sprite from that image; in animated sprites with all frames residing in the same image, quad is used to draw specific frame from the animation.
 ---
+---@param x number # The top-left position in the Image along the x-axis.
+---@param y number # The top-left position in the Image along the y-axis.
 ---@param width number # The width of the Quad in the Image. (Must be greater than 0.)
 ---@param height number # The height of the Quad in the Image. (Must be greater than 0.)
 ---@param sw number # The reference width, the width of the Image. (Must be greater than 0.)
 ---@param sh number # The reference height, the height of the Image. (Must be greater than 0.)
 ---@return love.Quad quad # The new Quad.
-function love.graphics.newQuad(width, height, sw, sh) end
+function love.graphics.newQuad(x, y, width, height, sw, sh) end
 
 ---
 ---Creates a new Shader object for hardware-accelerated vertex and pixel effects. A Shader contains either vertex shader code, pixel shader code, or both.
@@ -655,7 +688,9 @@ function love.graphics.origin() end
 ---
 ---@overload fun(points: table)
 ---@overload fun(points: table)
-function love.graphics.points() end
+---@param x number # The position of the first point on the x-axis.
+---@param y number # The position of the first point on the y-axis.
+function love.graphics.points(x, y) end
 
 ---
 ---Draw a polygon.
@@ -695,13 +730,16 @@ function love.graphics.present() end
 ---@overload fun(text: string, font: love.Font, transform: love.Transform)
 ---@overload fun(coloredtext: table, font: love.Font, transform: love.Transform)
 ---@param text string # The text to draw.
+---@param x number # The position to draw the object (x-axis).
+---@param y number # The position to draw the object (y-axis).
+---@param r number # Orientation (radians).
 ---@param sx number # Scale factor (x-axis).
 ---@param sy number # Scale factor (y-axis).
 ---@param ox number # Origin offset (x-axis).
 ---@param oy number # Origin offset (y-axis).
 ---@param kx number # Shearing factor (x-axis).
 ---@param ky number # Shearing factor (y-axis).
-function love.graphics.print(text, sx, sy, ox, oy, kx, ky) end
+function love.graphics.print(text, x, y, r, sx, sy, ox, oy, kx, ky) end
 
 ---
 ---Draws formatted text, with word wrap and alignment.
@@ -722,15 +760,18 @@ function love.graphics.print(text, sx, sy, ox, oy, kx, ky) end
 ---@overload fun(coloredtext: table, transform: love.Transform, limit: number, align: love.AlignMode)
 ---@overload fun(coloredtext: table, font: love.Font, transform: love.Transform, limit: number, align: love.AlignMode)
 ---@param text string # A text string.
+---@param x number # The position on the x-axis.
+---@param y number # The position on the y-axis.
 ---@param limit number # Wrap the line after this many horizontal pixels.
 ---@param align love.AlignMode # The alignment.
+---@param r number # Orientation (radians).
 ---@param sx number # Scale factor (x-axis).
 ---@param sy number # Scale factor (y-axis).
 ---@param ox number # Origin offset (x-axis).
 ---@param oy number # Origin offset (y-axis).
 ---@param kx number # Shearing factor (x-axis).
 ---@param ky number # Shearing factor (y-axis).
-function love.graphics.printf(text, limit, align, sx, sy, ox, oy, kx, ky) end
+function love.graphics.printf(text, x, y, limit, align, r, sx, sy, ox, oy, kx, ky) end
 
 ---
 ---Copies and pushes the current coordinate transformation to the transformation stack.
@@ -745,9 +786,11 @@ function love.graphics.push() end
 ---
 ---@overload fun(mode: love.DrawMode, x: number, y: number, width: number, height: number, rx: number, ry: number, segments: number)
 ---@param mode love.DrawMode # How to draw the rectangle.
+---@param x number # The position of top-left corner along the x-axis.
+---@param y number # The position of top-left corner along the y-axis.
 ---@param width number # Width of the rectangle.
 ---@param height number # Height of the rectangle.
-function love.graphics.rectangle(mode, width, height) end
+function love.graphics.rectangle(mode, x, y, width, height) end
 
 ---
 ---Replaces the current coordinate transformation with the given Transform object.
@@ -923,9 +966,11 @@ function love.graphics.setPointSize(size) end
 ---The dimensions of the scissor is unaffected by graphical transformations (translate, scale, ...).
 ---
 ---@overload fun()
+---@param x number # x coordinate of upper left corner.
+---@param y number # y coordinate of upper left corner.
 ---@param width number # width of clipping rectangle.
 ---@param height number # height of clipping rectangle.
-function love.graphics.setScissor(width, height) end
+function love.graphics.setScissor(x, y, width, height) end
 
 ---
 ---Sets or resets a Shader as the current pixel effect or vertex shaders. All drawing operations until the next ''love.graphics.setShader'' will be drawn using the Shader object specified.
@@ -1209,8 +1254,10 @@ function Image:isCompressed() end
 ---@param data love.ImageData # The new ImageData to replace the contents with.
 ---@param slice number # Which cubemap face, array index, or volume layer to replace, if applicable.
 ---@param mipmap number # The mimap level to replace, if the Image has mipmaps.
+---@param x number # The x-offset in pixels from the top-left of the image to replace. The given ImageData's width plus this value must not be greater than the pixel width of the Image's specified mipmap level.
+---@param y number # The y-offset in pixels from the top-left of the image to replace. The given ImageData's height plus this value must not be greater than the pixel height of the Image's specified mipmap level.
 ---@param reloadmipmaps boolean # Whether to generate new mipmaps after replacing the Image's pixels. True by default if the Image was created with automatically generated mipmaps, false by default otherwise.
-function Image:replacePixels(data, slice, mipmap, reloadmipmaps) end
+function Image:replacePixels(data, slice, mipmap, x, y, reloadmipmaps) end
 
 ---
 ---A 2D polygon mesh used for drawing arbitrary textured shapes.
@@ -1492,6 +1539,8 @@ function ParticleSystem:getParticleLifetime() end
 ---
 ---Gets the position of the emitter.
 ---
+---@return number x # Position along x-axis.
+---@return number y # Position along y-axis.
 function ParticleSystem:getPosition() end
 
 ---
@@ -1595,7 +1644,9 @@ function ParticleSystem:isStopped() end
 ---
 ---Moves the position of the emitter. This results in smoother particle spawning behaviour than if ParticleSystem:setPosition is used every frame.
 ---
-function ParticleSystem:moveTo() end
+---@param x number # Position along x-axis.
+---@param y number # Position along y-axis.
+function ParticleSystem:moveTo(x, y) end
 
 ---
 ---Pauses the particle emitter.
@@ -1691,7 +1742,9 @@ function ParticleSystem:setLinearDamping(min, max) end
 ---
 ---If this function is not used, the particles rotate around their center.
 ---
-function ParticleSystem:setOffset() end
+---@param x number # The x coordinate of the rotation offset.
+---@param y number # The y coordinate of the rotation offset.
+function ParticleSystem:setOffset(x, y) end
 
 ---
 ---Sets the lifetime of the particles.
@@ -1703,7 +1756,9 @@ function ParticleSystem:setParticleLifetime(min, max) end
 ---
 ---Sets the position of the emitter.
 ---
-function ParticleSystem:setPosition() end
+---@param x number # Position along x-axis.
+---@param y number # Position along y-axis.
+function ParticleSystem:setPosition(x, y) end
 
 ---
 ---Sets a series of Quads to use for the particle sprites. Particles will choose a Quad from the list based on the particle's current lifetime, allowing for the use of animated sprite sheets with ParticleSystems.
@@ -1822,14 +1877,22 @@ function Quad:getTextureDimensions() end
 ---
 ---Gets the current viewport of this Quad.
 ---
+---@return number x # The top-left corner along the x-axis.
+---@return number y # The top-left corner along the y-axis.
+---@return number w # The width of the viewport.
+---@return number h # The height of the viewport.
 function Quad:getViewport() end
 
 ---
 ---Sets the texture coordinates according to a viewport.
 ---
+---@param x number # The top-left corner along the x-axis.
+---@param y number # The top-left corner along the y-axis.
+---@param w number # The width of the viewport.
+---@param h number # The height of the viewport.
 ---@param sw number # The reference width, the width of the Image. (Must be greater than 0.)
 ---@param sh number # The reference height, the height of the Image. (Must be greater than 0.)
-function Quad:setViewport(sw, sh) end
+function Quad:setViewport(x, y, w, h, sw, sh) end
 
 ---
 ---A Shader is used for advanced hardware-accelerated pixel or vertex manipulation. These effects are written in a language based on GLSL (OpenGL Shading Language) with a few things simplified for easier coding.
@@ -1917,6 +1980,9 @@ local SpriteBatch = {}
 ---Adds a sprite to the batch. Sprites are drawn in the order they are added.
 ---
 ---@overload fun(quad: love.Quad, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number):number
+---@param x number # The position to draw the object (x-axis).
+---@param y number # The position to draw the object (y-axis).
+---@param r number # Orientation (radians).
 ---@param sx number # Scale factor (x-axis).
 ---@param sy number # Scale factor (y-axis).
 ---@param ox number # Origin offset (x-axis).
@@ -1924,7 +1990,7 @@ local SpriteBatch = {}
 ---@param kx number # Shear factor (x-axis).
 ---@param ky number # Shear factor (y-axis).
 ---@return number id # An identifier for the added sprite.
-function SpriteBatch:add(sx, sy, ox, oy, kx, ky) end
+function SpriteBatch:add(x, y, r, sx, sy, ox, oy, kx, ky) end
 
 ---
 ---Adds a sprite to a batch created with an Array Texture.
@@ -1933,6 +1999,9 @@ function SpriteBatch:add(sx, sy, ox, oy, kx, ky) end
 ---@overload fun(layerindex: number, transform: love.Transform):number
 ---@overload fun(layerindex: number, quad: love.Quad, transform: love.Transform):number
 ---@param layerindex number # The index of the layer to use for this sprite.
+---@param x number # The position to draw the sprite (x-axis).
+---@param y number # The position to draw the sprite (y-axis).
+---@param r number # Orientation (radians).
 ---@param sx number # Scale factor (x-axis).
 ---@param sy number # Scale factor (y-axis).
 ---@param ox number # Origin offset (x-axis).
@@ -1940,7 +2009,7 @@ function SpriteBatch:add(sx, sy, ox, oy, kx, ky) end
 ---@param kx number # Shearing factor (x-axis).
 ---@param ky number # Shearing factor (y-axis).
 ---@return number spriteindex # The index of the added sprite, for use with SpriteBatch:set or SpriteBatch:setLayer.
-function SpriteBatch:addLayer(layerindex, sx, sy, ox, oy, kx, ky) end
+function SpriteBatch:addLayer(layerindex, x, y, r, sx, sy, ox, oy, kx, ky) end
 
 ---
 ---Attaches a per-vertex attribute from a Mesh onto this SpriteBatch, for use when drawing. This can be combined with a Shader to augment a SpriteBatch with per-vertex or additional per-sprite information instead of just having per-sprite colors.
@@ -1978,6 +2047,10 @@ function SpriteBatch:getBufferSize() end
 ---
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
 ---
+---@return number r # The red component (0-1).
+---@return number g # The green component (0-1).
+---@return number b # The blue component (0-1).
+---@return number a # The alpha component (0-1).
 function SpriteBatch:getColor() end
 
 ---
@@ -1997,13 +2070,16 @@ function SpriteBatch:getTexture() end
 ---
 ---@overload fun(spriteindex: number, quad: love.Quad, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number)
 ---@param spriteindex number # The index of the sprite that will be changed.
+---@param x number # The position to draw the object (x-axis).
+---@param y number # The position to draw the object (y-axis).
+---@param r number # Orientation (radians).
 ---@param sx number # Scale factor (x-axis).
 ---@param sy number # Scale factor (y-axis).
 ---@param ox number # Origin offset (x-axis).
 ---@param oy number # Origin offset (y-axis).
 ---@param kx number # Shear factor (x-axis).
 ---@param ky number # Shear factor (y-axis).
-function SpriteBatch:set(spriteindex, sx, sy, ox, oy, kx, ky) end
+function SpriteBatch:set(spriteindex, x, y, r, sx, sy, ox, oy, kx, ky) end
 
 ---
 ---Sets the color that will be used for the next add and set operations. Calling the function without arguments will disable all per-sprite colors for the SpriteBatch.
@@ -2013,7 +2089,11 @@ function SpriteBatch:set(spriteindex, sx, sy, ox, oy, kx, ky) end
 ---In version 0.9.2 and older, the global color set with love.graphics.setColor will not work on the SpriteBatch if any of the sprites has its own color.
 ---
 ---@overload fun()
-function SpriteBatch:setColor() end
+---@param r number # The amount of red.
+---@param g number # The amount of green.
+---@param b number # The amount of blue.
+---@param a number # The amount of alpha.
+function SpriteBatch:setColor(r, g, b, a) end
 
 ---
 ---Restricts the drawn sprites in the SpriteBatch to a subset of the total.
@@ -2031,13 +2111,16 @@ function SpriteBatch:setDrawRange(start, count) end
 ---@overload fun(spriteindex: number, layerindex: number, quad: love.Quad, transform: love.Transform)
 ---@param spriteindex number # The index of the existing sprite to replace.
 ---@param layerindex number # The index of the layer in the Array Texture to use for this sprite.
+---@param x number # The position to draw the sprite (x-axis).
+---@param y number # The position to draw the sprite (y-axis).
+---@param r number # Orientation (radians).
 ---@param sx number # Scale factor (x-axis).
 ---@param sy number # Scale factor (y-axis).
 ---@param ox number # Origin offset (x-axis).
 ---@param oy number # Origin offset (y-axis).
 ---@param kx number # Shearing factor (x-axis).
 ---@param ky number # Shearing factor (y-axis).
-function SpriteBatch:setLayer(spriteindex, layerindex, sx, sy, ox, oy, kx, ky) end
+function SpriteBatch:setLayer(spriteindex, layerindex, x, y, r, sx, sy, ox, oy, kx, ky) end
 
 ---
 ---Sets the texture (Image or Canvas) used for the sprites in the batch, when drawing.
@@ -2056,6 +2139,8 @@ local Text = {}
 ---
 ---@overload fun(coloredtext: table, x: number, y: number, angle: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number):number
 ---@param textstring string # The text to add to the object.
+---@param x number # The position of the new text on the x-axis.
+---@param y number # The position of the new text on the y-axis.
 ---@param angle number # The orientation of the new text in radians.
 ---@param sx number # Scale factor on the x-axis.
 ---@param sy number # Scale factor on the y-axis.
@@ -2064,7 +2149,7 @@ local Text = {}
 ---@param kx number # Shearing / skew factor on the x-axis.
 ---@param ky number # Shearing / skew factor on the y-axis.
 ---@return number index # An index number that can be used with Text:getWidth or Text:getHeight.
-function Text:add(textstring, angle, sx, sy, ox, oy, kx, ky) end
+function Text:add(textstring, x, y, angle, sx, sy, ox, oy, kx, ky) end
 
 ---
 ---Adds additional formatted / colored text to the Text object at the specified position.
@@ -2075,6 +2160,8 @@ function Text:add(textstring, angle, sx, sy, ox, oy, kx, ky) end
 ---@param textstring string # The text to add to the object.
 ---@param wraplimit number # The maximum width in pixels of the text before it gets automatically wrapped to a new line.
 ---@param align love.AlignMode # The alignment of the text.
+---@param x number # The position of the new text (x-axis).
+---@param y number # The position of the new text (y-axis).
 ---@param angle number # Orientation (radians).
 ---@param sx number # Scale factor (x-axis).
 ---@param sy number # Scale factor (y-axis).
@@ -2083,7 +2170,7 @@ function Text:add(textstring, angle, sx, sy, ox, oy, kx, ky) end
 ---@param kx number # Shearing / skew factor (x-axis).
 ---@param ky number # Shearing / skew factor (y-axis).
 ---@return number index # An index number that can be used with Text:getWidth or Text:getHeight.
-function Text:addf(textstring, wraplimit, align, angle, sx, sy, ox, oy, kx, ky) end
+function Text:addf(textstring, wraplimit, align, x, y, angle, sx, sy, ox, oy, kx, ky) end
 
 ---
 ---Clears the contents of the Text object.

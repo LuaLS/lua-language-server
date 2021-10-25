@@ -110,7 +110,7 @@ function love.audio.isEffectsSupported() end
 ---@param samplerate number # Number of samples per second when playing.
 ---@param bitdepth number # Bits per sample (8 or 16).
 ---@param channels number # 1 for mono or 2 for stereo.
----@param buffercount number # The number of buffers that can be queued up at any given time with Source:queue. Cannot be greater than 64. A sensible default (~8) is chosen if no value is specified.
+---@param buffercount? number # The number of buffers that can be queued up at any given time with Source:queue. Cannot be greater than 64. A sensible default (~8) is chosen if no value is specified.
 ---@return love.Source source # The new Source usable with Source:queue.
 function love.audio.newQueueableSource(samplerate, bitdepth, channels, buffercount) end
 
@@ -269,9 +269,9 @@ function RecordingDevice:isRecording() end
 ---Begins recording audio using this device.
 ---
 ---@param samplecount number # The maximum number of samples to store in an internal ring buffer when recording. RecordingDevice:getData clears the internal buffer when called.
----@param samplerate number # The number of samples per second to store when recording.
----@param bitdepth number # The number of bits per sample.
----@param channels number # Whether to record in mono or stereo. Most microphones don't support more than 1 channel.
+---@param samplerate? number # The number of samples per second to store when recording.
+---@param bitdepth? number # The number of bits per sample.
+---@param channels? number # Whether to record in mono or stereo. Most microphones don't support more than 1 channel.
 ---@return boolean success # True if the device successfully began recording using the specified parameters, false if not.
 function RecordingDevice:start(samplecount, samplerate, bitdepth, channels) end
 
@@ -345,7 +345,7 @@ function Source:getDirection() end
 ---
 ---Gets the duration of the Source. For streaming Sources it may not always be sample-accurate, and may return -1 if the duration cannot be determined at all.
 ---
----@param unit love.TimeUnit # The time unit for the return value.
+---@param unit? love.TimeUnit # The time unit for the return value.
 ---@return number duration # The duration of the Source, or -1 if it cannot be determined.
 function Source:getDuration(unit) end
 
@@ -355,7 +355,7 @@ function Source:getDuration(unit) end
 ---This function returns nil if the effect was applied with no filter settings associated to it.
 ---
 ---@param name string # The name of the effect.
----@param filtersettings table # An optional empty table that will be filled with the filter settings.
+---@param filtersettings? table # An optional empty table that will be filled with the filter settings.
 ---@return {volume: number, highgain: number, lowgain: number} filtersettings # The settings for the filter associated to this effect, or nil if the effect is not present in this Source or has no filter associated. The table has the following fields:
 function Source:getEffect(name, filtersettings) end
 
@@ -460,7 +460,7 @@ function Source:queue(sounddata) end
 ---Sets the currently playing position of the Source.
 ---
 ---@param offset number # The position to seek to.
----@param unit love.TimeUnit # The unit of the position value.
+---@param unit? love.TimeUnit # The unit of the position value.
 function Source:seek(offset, unit) end
 
 ---
@@ -487,7 +487,7 @@ function Source:setAttenuationDistances(ref, max) end
 ---
 ---@param innerAngle number # The inner angle from the Source's direction, in radians. The Source will play at normal volume if the listener is inside the cone defined by this angle.
 ---@param outerAngle number # The outer angle from the Source's direction, in radians. The Source will play at a volume between the normal and outer volumes, if the listener is in between the cones defined by the inner and outer angles.
----@param outerVolume number # The Source's volume when the listener is outside both the inner and outer cone angles.
+---@param outerVolume? number # The Source's volume when the listener is outside both the inner and outer cone angles.
 function Source:setCone(innerAngle, outerAngle, outerVolume) end
 
 ---
@@ -505,7 +505,7 @@ function Source:setDirection(x, y, z) end
 ---
 ---@overload fun(name: string, filtersettings: table):boolean
 ---@param name string # The name of the effect previously set up with love.audio.setEffect.
----@param enable boolean # If false and the given effect name was previously enabled on this Source, disables the effect.
+---@param enable? boolean # If false and the given effect name was previously enabled on this Source, disables the effect.
 ---@return boolean success # Whether the effect was successfully applied to this Source.
 function Source:setEffect(name, enable) end
 
@@ -542,7 +542,7 @@ function Source:setPosition(x, y, z) end
 ---
 ---By default, all sources are absolute and therefore relative to the origin of love's coordinate system 0, 0. Only absolute sources are affected by the position of the listener. Please note that positional audio only works for mono (i.e. non-stereo) sources. 
 ---
----@param enable boolean # True to make the position, velocity, direction and cone angles relative to the listener, false to make them absolute.
+---@param enable? boolean # True to make the position, velocity, direction and cone angles relative to the listener, false to make them absolute.
 function Source:setRelative(enable) end
 
 ---
@@ -584,7 +584,7 @@ function Source:stop() end
 ---
 ---Gets the currently playing position of the Source.
 ---
----@param unit love.TimeUnit # The type of unit for the return value.
+---@param unit? love.TimeUnit # The type of unit for the return value.
 ---@return number position # The currently playing position of the Source.
 function Source:tell(unit) end
 

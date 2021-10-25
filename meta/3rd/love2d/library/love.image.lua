@@ -92,7 +92,7 @@ local ImageData = {}
 ---@overload fun(outFile: string)
 ---@overload fun(outFile: string, format: love.ImageFormat)
 ---@param format love.ImageFormat # The format to encode the image as.
----@param filename string # The filename to write the file to. If nil, no file will be written but the FileData will still be returned.
+---@param filename? string # The filename to write the file to. If nil, no file will be written but the FileData will still be returned.
 ---@return love.FileData filedata # The encoded image as a new FileData object.
 function ImageData:encode(format, filename) end
 
@@ -152,10 +152,10 @@ function ImageData:getWidth() end
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
 ---
 ---@param pixelFunction function # Function to apply to every pixel.
----@param x number # The x-axis of the top-left corner of the area within the ImageData to apply the function to.
----@param y number # The y-axis of the top-left corner of the area within the ImageData to apply the function to.
----@param width number # The width of the area within the ImageData to apply the function to.
----@param height number # The height of the area within the ImageData to apply the function to.
+---@param x? number # The x-axis of the top-left corner of the area within the ImageData to apply the function to.
+---@param y? number # The y-axis of the top-left corner of the area within the ImageData to apply the function to.
+---@param width? number # The width of the area within the ImageData to apply the function to.
+---@param height? number # The height of the area within the ImageData to apply the function to.
 function ImageData:mapPixel(pixelFunction, x, y, width, height) end
 
 ---

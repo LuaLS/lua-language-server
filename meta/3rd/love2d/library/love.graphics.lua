@@ -30,7 +30,7 @@ function love.graphics.applyTransform(transform) end
 ---@param radius number # Radius of the arc.
 ---@param angle1 number # The angle at which the arc begins.
 ---@param angle2 number # The angle at which the arc terminates.
----@param segments number # The number of segments used for drawing the arc.
+---@param segments? number # The number of segments used for drawing the arc.
 function love.graphics.arc(drawmode, x, y, radius, angle1, angle2, segments) end
 
 ---
@@ -77,8 +77,8 @@ function love.graphics.clear() end
 ---On some desktop systems this function may do nothing.
 ---
 ---@overload fun(discardcolors: table, discardstencil: boolean)
----@param discardcolor boolean # Whether to discard the texture(s) of the active Canvas(es) (the contents of the screen if no Canvas is active.)
----@param discardstencil boolean # Whether to discard the contents of the stencil buffer of the screen / active Canvas.
+---@param discardcolor? boolean # Whether to discard the texture(s) of the active Canvas(es) (the contents of the screen if no Canvas is active.)
+---@param discardstencil? boolean # Whether to discard the contents of the stencil buffer of the screen / active Canvas.
 function love.graphics.discard(discardcolor, discardstencil) end
 
 ---
@@ -98,15 +98,15 @@ function love.graphics.discard(discardcolor, discardstencil) end
 ---@overload fun(drawable: love.Drawable, transform: love.Transform)
 ---@overload fun(texture: love.Texture, quad: love.Quad, transform: love.Transform)
 ---@param drawable love.Drawable # A drawable object.
----@param x number # The position to draw the object (x-axis).
----@param y number # The position to draw the object (y-axis).
----@param r number # Orientation (radians).
----@param sx number # Scale factor (x-axis).
----@param sy number # Scale factor (y-axis).
----@param ox number # Origin offset (x-axis).
----@param oy number # Origin offset (y-axis).
----@param kx number # Shearing factor (x-axis).
----@param ky number # Shearing factor (y-axis).
+---@param x? number # The position to draw the object (x-axis).
+---@param y? number # The position to draw the object (y-axis).
+---@param r? number # Orientation (radians).
+---@param sx? number # Scale factor (x-axis).
+---@param sy? number # Scale factor (y-axis).
+---@param ox? number # Origin offset (x-axis).
+---@param oy? number # Origin offset (y-axis).
+---@param kx? number # Shearing factor (x-axis).
+---@param ky? number # Shearing factor (y-axis).
 function love.graphics.draw(drawable, x, y, r, sx, sy, ox, oy, kx, ky) end
 
 ---
@@ -119,15 +119,15 @@ function love.graphics.draw(drawable, x, y, r, sx, sy, ox, oy, kx, ky) end
 ---@overload fun(mesh: love.Mesh, instancecount: number, transform: love.Transform)
 ---@param mesh love.Mesh # The mesh to render.
 ---@param instancecount number # The number of instances to render.
----@param x number # The position to draw the instances (x-axis).
----@param y number # The position to draw the instances (y-axis).
----@param r number # Orientation (radians).
----@param sx number # Scale factor (x-axis).
----@param sy number # Scale factor (y-axis).
----@param ox number # Origin offset (x-axis).
----@param oy number # Origin offset (y-axis).
----@param kx number # Shearing factor (x-axis).
----@param ky number # Shearing factor (y-axis).
+---@param x? number # The position to draw the instances (x-axis).
+---@param y? number # The position to draw the instances (y-axis).
+---@param r? number # Orientation (radians).
+---@param sx? number # Scale factor (x-axis).
+---@param sy? number # Scale factor (y-axis).
+---@param ox? number # Origin offset (x-axis).
+---@param oy? number # Origin offset (y-axis).
+---@param kx? number # Shearing factor (x-axis).
+---@param ky? number # Shearing factor (y-axis).
 function love.graphics.drawInstanced(mesh, instancecount, x, y, r, sx, sy, ox, oy, kx, ky) end
 
 ---
@@ -138,15 +138,15 @@ function love.graphics.drawInstanced(mesh, instancecount, x, y, r, sx, sy, ox, o
 ---@overload fun(texture: love.Texture, layerindex: number, quad: love.Quad, transform: love.Transform)
 ---@param texture love.Texture # The Array Texture to draw.
 ---@param layerindex number # The index of the layer to use when drawing.
----@param x number # The position to draw the texture (x-axis).
----@param y number # The position to draw the texture (y-axis).
----@param r number # Orientation (radians).
----@param sx number # Scale factor (x-axis).
----@param sy number # Scale factor (y-axis).
----@param ox number # Origin offset (x-axis).
----@param oy number # Origin offset (y-axis).
----@param kx number # Shearing factor (x-axis).
----@param ky number # Shearing factor (y-axis).
+---@param x? number # The position to draw the texture (x-axis).
+---@param y? number # The position to draw the texture (y-axis).
+---@param r? number # Orientation (radians).
+---@param sx? number # Scale factor (x-axis).
+---@param sy? number # Scale factor (y-axis).
+---@param ox? number # Origin offset (x-axis).
+---@param oy? number # Origin offset (y-axis).
+---@param kx? number # Shearing factor (x-axis).
+---@param ky? number # Shearing factor (y-axis).
 function love.graphics.drawLayer(texture, layerindex, x, y, r, sx, sy, ox, oy, kx, ky) end
 
 ---
@@ -482,7 +482,7 @@ function love.graphics.line(x1, y1, x2, y2) end
 ---To use an array image in a Shader, it must be declared as a ArrayImage or sampler2DArray type (instead of Image or sampler2D). The Texel(ArrayImage image, vec3 texturecoord) shader function must be used to get pixel colors from a slice of the array image. The vec3 argument contains the texture coordinate in the first two components, and the 0-based slice index in the third component.
 ---
 ---@param slices table # A table containing filepaths to images (or File, FileData, ImageData, or CompressedImageData objects), in an array. Each sub-image must have the same dimensions. A table of tables can also be given, where each sub-table contains all mipmap levels for the slice index of that sub-table.
----@param settings {mipmaps: boolean, linear: boolean, dpiscale: number} # Optional table of settings to configure the array image, containing the following fields:
+---@param settings? {mipmaps: boolean, linear: boolean, dpiscale: number} # Optional table of settings to configure the array image, containing the following fields:
 ---@return love.Image image # An Array Image object.
 function love.graphics.newArrayImage(slices, settings) end
 
@@ -542,7 +542,7 @@ function love.graphics.newCanvas() end
 ---
 ---@overload fun(faces: table, settings: table):love.Image
 ---@param filename string # The filepath to a cubemap image file (or a File, FileData, or ImageData).
----@param settings {mipmaps: boolean, linear: boolean} # Optional table of settings to configure the cubemap image, containing the following fields:
+---@param settings? {mipmaps: boolean, linear: boolean} # Optional table of settings to configure the cubemap image, containing the following fields:
 ---@return love.Image image # An cubemap Image object.
 function love.graphics.newCubeImage(filename, settings) end
 
@@ -593,8 +593,8 @@ function love.graphics.newImageFont(filename, glyphs) end
 ---@overload fun(vertexformat: table, vertexcount: number, mode: love.MeshDrawMode, usage: love.SpriteBatchUsage):love.Mesh
 ---@overload fun(vertexcount: number, texture: love.Texture, mode: love.MeshDrawMode):love.Mesh
 ---@param vertices {["1"]: number, ["2"]: number, ["3"]: number, ["4"]: number, ["5"]: number, ["6"]: number, ["7"]: number, ["8"]: number} # The table filled with vertex information tables for each vertex as follows:
----@param mode love.MeshDrawMode # How the vertices are used when drawing. The default mode 'fan' is sufficient for simple convex polygons.
----@param usage love.SpriteBatchUsage # The expected usage of the Mesh. The specified usage mode affects the Mesh's memory usage and performance.
+---@param mode? love.MeshDrawMode # How the vertices are used when drawing. The default mode 'fan' is sufficient for simple convex polygons.
+---@param usage? love.SpriteBatchUsage # The expected usage of the Mesh. The specified usage mode affects the Mesh's memory usage and performance.
 ---@return love.Mesh mesh # The new mesh.
 function love.graphics.newMesh(vertices, mode, usage) end
 
@@ -603,7 +603,7 @@ function love.graphics.newMesh(vertices, mode, usage) end
 ---
 ---@overload fun(texture: love.Texture, buffer: number):love.ParticleSystem
 ---@param image love.Image # The image to use.
----@param buffer number # The max number of particles at the same time.
+---@param buffer? number # The max number of particles at the same time.
 ---@return love.ParticleSystem system # A new ParticleSystem.
 function love.graphics.newParticleSystem(image, buffer) end
 
@@ -637,7 +637,7 @@ function love.graphics.newShader(code) end
 ---@overload fun(image: love.Image, maxsprites: number, usage: love.SpriteBatchUsage):love.SpriteBatch
 ---@overload fun(texture: love.Texture, maxsprites: number, usage: love.SpriteBatchUsage):love.SpriteBatch
 ---@param image love.Image # The Image to use for the sprites.
----@param maxsprites number # The maximum number of sprites that the SpriteBatch can contain at any given time. Since version 11.0, additional sprites added past this number will automatically grow the spritebatch.
+---@param maxsprites? number # The maximum number of sprites that the SpriteBatch can contain at any given time. Since version 11.0, additional sprites added past this number will automatically grow the spritebatch.
 ---@return love.SpriteBatch spriteBatch # The new SpriteBatch.
 function love.graphics.newSpriteBatch(image, maxsprites) end
 
@@ -645,7 +645,7 @@ function love.graphics.newSpriteBatch(image, maxsprites) end
 ---Creates a new drawable Text object.
 ---
 ---@param font love.Font # The font to use for the text.
----@param textstring string # The initial string of text that the new Text object will contain. May be nil.
+---@param textstring? string # The initial string of text that the new Text object will contain. May be nil.
 ---@return love.Text text # The new drawable Text object.
 function love.graphics.newText(font, textstring) end
 
@@ -672,7 +672,7 @@ function love.graphics.newVideo(filename) end
 ---Array images are a much better choice than volume images for storing multiple different sprites in a single array image for directly drawing them.
 ---
 ---@param layers table # A table containing filepaths to images (or File, FileData, ImageData, or CompressedImageData objects), in an array. A table of tables can also be given, where each sub-table represents a single mipmap level and contains all layers for that mipmap.
----@param settings {mipmaps: boolean, linear: boolean} # Optional table of settings to configure the volume image, containing the following fields:
+---@param settings? {mipmaps: boolean, linear: boolean} # Optional table of settings to configure the volume image, containing the following fields:
 ---@return love.Image image # A volume Image object.
 function love.graphics.newVolumeImage(layers, settings) end
 
@@ -730,15 +730,15 @@ function love.graphics.present() end
 ---@overload fun(text: string, font: love.Font, transform: love.Transform)
 ---@overload fun(coloredtext: table, font: love.Font, transform: love.Transform)
 ---@param text string # The text to draw.
----@param x number # The position to draw the object (x-axis).
----@param y number # The position to draw the object (y-axis).
----@param r number # Orientation (radians).
----@param sx number # Scale factor (x-axis).
----@param sy number # Scale factor (y-axis).
----@param ox number # Origin offset (x-axis).
----@param oy number # Origin offset (y-axis).
----@param kx number # Shearing factor (x-axis).
----@param ky number # Shearing factor (y-axis).
+---@param x? number # The position to draw the object (x-axis).
+---@param y? number # The position to draw the object (y-axis).
+---@param r? number # Orientation (radians).
+---@param sx? number # Scale factor (x-axis).
+---@param sy? number # Scale factor (y-axis).
+---@param ox? number # Origin offset (x-axis).
+---@param oy? number # Origin offset (y-axis).
+---@param kx? number # Shearing factor (x-axis).
+---@param ky? number # Shearing factor (y-axis).
 function love.graphics.print(text, x, y, r, sx, sy, ox, oy, kx, ky) end
 
 ---
@@ -763,14 +763,14 @@ function love.graphics.print(text, x, y, r, sx, sy, ox, oy, kx, ky) end
 ---@param x number # The position on the x-axis.
 ---@param y number # The position on the y-axis.
 ---@param limit number # Wrap the line after this many horizontal pixels.
----@param align love.AlignMode # The alignment.
----@param r number # Orientation (radians).
----@param sx number # Scale factor (x-axis).
----@param sy number # Scale factor (y-axis).
----@param ox number # Origin offset (x-axis).
----@param oy number # Origin offset (y-axis).
----@param kx number # Shearing factor (x-axis).
----@param ky number # Shearing factor (y-axis).
+---@param align? love.AlignMode # The alignment.
+---@param r? number # Orientation (radians).
+---@param sx? number # Scale factor (x-axis).
+---@param sy? number # Scale factor (y-axis).
+---@param ox? number # Origin offset (x-axis).
+---@param oy? number # Origin offset (y-axis).
+---@param kx? number # Shearing factor (x-axis).
+---@param ky? number # Shearing factor (y-axis).
 function love.graphics.printf(text, x, y, limit, align, r, sx, sy, ox, oy, kx, ky) end
 
 ---
@@ -825,7 +825,7 @@ function love.graphics.rotate(angle) end
 ---Scaling lasts until love.draw() exits.
 ---
 ---@param sx number # The scaling in the direction of the x-axis.
----@param sy number # The scaling in the direction of the y-axis. If omitted, it defaults to same as parameter sx.
+---@param sy? number # The scaling in the direction of the y-axis. If omitted, it defaults to same as parameter sx.
 function love.graphics.scale(sx, sy) end
 
 ---
@@ -836,7 +836,7 @@ function love.graphics.scale(sx, sy) end
 ---@param red number # The red component (0-1).
 ---@param green number # The green component (0-1).
 ---@param blue number # The blue component (0-1).
----@param alpha number # The alpha component (0-1).
+---@param alpha? number # The alpha component (0-1).
 function love.graphics.setBackgroundColor(red, green, blue, alpha) end
 
 ---
@@ -854,7 +854,7 @@ function love.graphics.setBlendMode(mode) end
 ---@overload fun(canvas: love.Canvas, slice: number, mipmap: number)
 ---@overload fun(setup: table)
 ---@param canvas love.Canvas # The new target.
----@param mipmap number # The mipmap level to render to, for Canvases with mipmaps.
+---@param mipmap? number # The mipmap level to render to, for Canvases with mipmaps.
 function love.graphics.setCanvas(canvas, mipmap) end
 
 ---
@@ -866,7 +866,7 @@ function love.graphics.setCanvas(canvas, mipmap) end
 ---@param red number # The amount of red.
 ---@param green number # The amount of green.
 ---@param blue number # The amount of blue.
----@param alpha number # The amount of alpha.  The alpha value will be applied to all subsequent draw operations, even the drawing of an image.
+---@param alpha? number # The amount of alpha.  The alpha value will be applied to all subsequent draw operations, even the drawing of an image.
 function love.graphics.setColor(red, green, blue, alpha) end
 
 ---
@@ -884,7 +884,7 @@ function love.graphics.setColorMask(red, green, blue, alpha) end
 ---
 ---@param min love.FilterMode # Filter mode used when scaling the image down.
 ---@param mag love.FilterMode # Filter mode used when scaling the image up.
----@param anisotropy number # Maximum amount of Anisotropic Filtering used.
+---@param anisotropy? number # Maximum amount of Anisotropic Filtering used.
 function love.graphics.setDefaultFilter(min, mag, anisotropy) end
 
 ---
@@ -948,7 +948,7 @@ function love.graphics.setMeshCullMode(mode) end
 ---@overload fun(file: love.File, size: number):love.Font
 ---@overload fun(data: love.Data, size: number):love.Font
 ---@overload fun(rasterizer: love.Rasterizer):love.Font
----@param size number # The size of the font.
+---@param size? number # The size of the font.
 ---@return love.Font font # The new font.
 function love.graphics.setNewFont(size) end
 
@@ -1010,9 +1010,9 @@ function love.graphics.shear(kx, ky) end
 ---Stencil values are integers within the range of 255.
 ---
 ---@param stencilfunction function # Function which draws geometry. The stencil values of pixels, rather than the color of each pixel, will be affected by the geometry.
----@param action love.StencilAction # How to modify any stencil values of pixels that are touched by what's drawn in the stencil function.
----@param value number # The new stencil value to use for pixels if the 'replace' stencil action is used. Has no effect with other stencil actions. Must be between 0 and 255.
----@param keepvalues boolean # True to preserve old stencil values of pixels, false to re-set every pixel's stencil value to 0 before executing the stencil function. love.graphics.clear will also re-set all stencil values.
+---@param action? love.StencilAction # How to modify any stencil values of pixels that are touched by what's drawn in the stencil function.
+---@param value? number # The new stencil value to use for pixels if the 'replace' stencil action is used. Has no effect with other stencil actions. Must be between 0 and 255.
+---@param keepvalues? boolean # True to preserve old stencil values of pixels, false to re-set every pixel's stencil value to 0 before executing the stencil function. love.graphics.clear will also re-set all stencil values.
 function love.graphics.stencil(stencilfunction, action, value, keepvalues) end
 
 ---
@@ -1217,7 +1217,7 @@ function Font:setFallbacks(fallbackfont1) end
 ---
 ---@param min love.FilterMode # How to scale a font down.
 ---@param mag love.FilterMode # How to scale a font up.
----@param anisotropy number # Maximum amount of anisotropic filtering used.
+---@param anisotropy? number # Maximum amount of anisotropic filtering used.
 function Font:setFilter(min, mag, anisotropy) end
 
 ---
@@ -1253,9 +1253,9 @@ function Image:isCompressed() end
 ---
 ---@param data love.ImageData # The new ImageData to replace the contents with.
 ---@param slice number # Which cubemap face, array index, or volume layer to replace, if applicable.
----@param mipmap number # The mimap level to replace, if the Image has mipmaps.
----@param x number # The x-offset in pixels from the top-left of the image to replace. The given ImageData's width plus this value must not be greater than the pixel width of the Image's specified mipmap level.
----@param y number # The y-offset in pixels from the top-left of the image to replace. The given ImageData's height plus this value must not be greater than the pixel height of the Image's specified mipmap level.
+---@param mipmap? number # The mimap level to replace, if the Image has mipmaps.
+---@param x? number # The x-offset in pixels from the top-left of the image to replace. The given ImageData's width plus this value must not be greater than the pixel width of the Image's specified mipmap level.
+---@param y? number # The y-offset in pixels from the top-left of the image to replace. The given ImageData's height plus this value must not be greater than the pixel height of the Image's specified mipmap level.
 ---@param reloadmipmaps boolean # Whether to generate new mipmaps after replacing the Image's pixels. True by default if the Image was created with automatically generated mipmaps, false by default otherwise.
 function Image:replacePixels(data, slice, mipmap, x, y, reloadmipmaps) end
 
@@ -1414,7 +1414,7 @@ function Mesh:setVertexMap(map) end
 ---@overload fun(data: love.Data, startvertex: number)
 ---@overload fun(vertices: table)
 ---@param vertices {attributecomponent: number} # The table filled with vertex information tables for each vertex, in the form of {vertex, ...} where each vertex is a table in the form of {attributecomponent, ...}.
----@param startvertex number # The index of the first vertex to replace.
+---@param startvertex? number # The index of the first vertex to replace.
 function Mesh:setVertices(vertices, startvertex) end
 
 ---
@@ -1697,8 +1697,8 @@ function ParticleSystem:setDirection(direction) end
 ---@param distribution love.AreaSpreadDistribution # The type of distribution for new particles.
 ---@param dx number # The maximum spawn distance from the emitter along the x-axis for uniform distribution, or the standard deviation along the x-axis for normal distribution.
 ---@param dy number # The maximum spawn distance from the emitter along the y-axis for uniform distribution, or the standard deviation along the y-axis for normal distribution.
----@param angle number # The angle in radians of the emission area.
----@param directionRelativeToCenter boolean # True if newly spawned particles will be oriented relative to the center of the emission area, false otherwise.
+---@param angle? number # The angle in radians of the emission area.
+---@param directionRelativeToCenter? boolean # True if newly spawned particles will be oriented relative to the center of the emission area, false otherwise.
 function ParticleSystem:setEmissionArea(distribution, dx, dy, angle, directionRelativeToCenter) end
 
 ---
@@ -1726,15 +1726,15 @@ function ParticleSystem:setInsertMode(mode) end
 ---
 ---@param xmin number # The minimum acceleration along the x axis.
 ---@param ymin number # The minimum acceleration along the y axis.
----@param xmax number # The maximum acceleration along the x axis.
----@param ymax number # The maximum acceleration along the y axis.
+---@param xmax? number # The maximum acceleration along the x axis.
+---@param ymax? number # The maximum acceleration along the y axis.
 function ParticleSystem:setLinearAcceleration(xmin, ymin, xmax, ymax) end
 
 ---
 ---Sets the amount of linear damping (constant deceleration) for particles.
 ---
 ---@param min number # The minimum amount of linear damping applied to particles.
----@param max number # The maximum amount of linear damping applied to particles.
+---@param max? number # The maximum amount of linear damping applied to particles.
 function ParticleSystem:setLinearDamping(min, max) end
 
 ---
@@ -1750,7 +1750,7 @@ function ParticleSystem:setOffset(x, y) end
 ---Sets the lifetime of the particles.
 ---
 ---@param min number # The minimum life of the particles (in seconds).
----@param max number # The maximum life of the particles (in seconds).
+---@param max? number # The maximum life of the particles (in seconds).
 function ParticleSystem:setParticleLifetime(min, max) end
 
 ---
@@ -1772,7 +1772,7 @@ function ParticleSystem:setQuads(quad1, quad2) end
 ---Set the radial acceleration (away from the emitter).
 ---
 ---@param min number # The minimum acceleration.
----@param max number # The maximum acceleration.
+---@param max? number # The maximum acceleration.
 function ParticleSystem:setRadialAcceleration(min, max) end
 
 ---
@@ -1785,7 +1785,7 @@ function ParticleSystem:setRelativeRotation(enable) end
 ---Sets the rotation of the image upon particle creation (in radians).
 ---
 ---@param min number # The minimum initial angle (radians).
----@param max number # The maximum initial angle (radians).
+---@param max? number # The maximum initial angle (radians).
 function ParticleSystem:setRotation(min, max) end
 
 ---
@@ -1808,14 +1808,14 @@ function ParticleSystem:setSizes(size1, size2, size8) end
 ---Sets the speed of the particles.
 ---
 ---@param min number # The minimum linear speed of the particles.
----@param max number # The maximum linear speed of the particles.
+---@param max? number # The maximum linear speed of the particles.
 function ParticleSystem:setSpeed(min, max) end
 
 ---
 ---Sets the spin of the sprite.
 ---
 ---@param min number # The minimum spin (radians per second).
----@param max number # The maximum spin (radians per second).
+---@param max? number # The maximum spin (radians per second).
 function ParticleSystem:setSpin(min, max) end
 
 ---
@@ -1834,7 +1834,7 @@ function ParticleSystem:setSpread(spread) end
 ---Sets the tangential acceleration (acceleration perpendicular to the particle's direction).
 ---
 ---@param min number # The minimum acceleration.
----@param max number # The maximum acceleration.
+---@param max? number # The maximum acceleration.
 function ParticleSystem:setTangentialAcceleration(min, max) end
 
 ---
@@ -1982,13 +1982,13 @@ local SpriteBatch = {}
 ---@overload fun(quad: love.Quad, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number):number
 ---@param x number # The position to draw the object (x-axis).
 ---@param y number # The position to draw the object (y-axis).
----@param r number # Orientation (radians).
----@param sx number # Scale factor (x-axis).
----@param sy number # Scale factor (y-axis).
----@param ox number # Origin offset (x-axis).
----@param oy number # Origin offset (y-axis).
----@param kx number # Shear factor (x-axis).
----@param ky number # Shear factor (y-axis).
+---@param r? number # Orientation (radians).
+---@param sx? number # Scale factor (x-axis).
+---@param sy? number # Scale factor (y-axis).
+---@param ox? number # Origin offset (x-axis).
+---@param oy? number # Origin offset (y-axis).
+---@param kx? number # Shear factor (x-axis).
+---@param ky? number # Shear factor (y-axis).
 ---@return number id # An identifier for the added sprite.
 function SpriteBatch:add(x, y, r, sx, sy, ox, oy, kx, ky) end
 
@@ -1999,15 +1999,15 @@ function SpriteBatch:add(x, y, r, sx, sy, ox, oy, kx, ky) end
 ---@overload fun(layerindex: number, transform: love.Transform):number
 ---@overload fun(layerindex: number, quad: love.Quad, transform: love.Transform):number
 ---@param layerindex number # The index of the layer to use for this sprite.
----@param x number # The position to draw the sprite (x-axis).
----@param y number # The position to draw the sprite (y-axis).
----@param r number # Orientation (radians).
----@param sx number # Scale factor (x-axis).
----@param sy number # Scale factor (y-axis).
----@param ox number # Origin offset (x-axis).
----@param oy number # Origin offset (y-axis).
----@param kx number # Shearing factor (x-axis).
----@param ky number # Shearing factor (y-axis).
+---@param x? number # The position to draw the sprite (x-axis).
+---@param y? number # The position to draw the sprite (y-axis).
+---@param r? number # Orientation (radians).
+---@param sx? number # Scale factor (x-axis).
+---@param sy? number # Scale factor (y-axis).
+---@param ox? number # Origin offset (x-axis).
+---@param oy? number # Origin offset (y-axis).
+---@param kx? number # Shearing factor (x-axis).
+---@param ky? number # Shearing factor (y-axis).
 ---@return number spriteindex # The index of the added sprite, for use with SpriteBatch:set or SpriteBatch:setLayer.
 function SpriteBatch:addLayer(layerindex, x, y, r, sx, sy, ox, oy, kx, ky) end
 
@@ -2072,13 +2072,13 @@ function SpriteBatch:getTexture() end
 ---@param spriteindex number # The index of the sprite that will be changed.
 ---@param x number # The position to draw the object (x-axis).
 ---@param y number # The position to draw the object (y-axis).
----@param r number # Orientation (radians).
----@param sx number # Scale factor (x-axis).
----@param sy number # Scale factor (y-axis).
----@param ox number # Origin offset (x-axis).
----@param oy number # Origin offset (y-axis).
----@param kx number # Shear factor (x-axis).
----@param ky number # Shear factor (y-axis).
+---@param r? number # Orientation (radians).
+---@param sx? number # Scale factor (x-axis).
+---@param sy? number # Scale factor (y-axis).
+---@param ox? number # Origin offset (x-axis).
+---@param oy? number # Origin offset (y-axis).
+---@param kx? number # Shear factor (x-axis).
+---@param ky? number # Shear factor (y-axis).
 function SpriteBatch:set(spriteindex, x, y, r, sx, sy, ox, oy, kx, ky) end
 
 ---
@@ -2092,7 +2092,7 @@ function SpriteBatch:set(spriteindex, x, y, r, sx, sy, ox, oy, kx, ky) end
 ---@param r number # The amount of red.
 ---@param g number # The amount of green.
 ---@param b number # The amount of blue.
----@param a number # The amount of alpha.
+---@param a? number # The amount of alpha.
 function SpriteBatch:setColor(r, g, b, a) end
 
 ---
@@ -2111,15 +2111,15 @@ function SpriteBatch:setDrawRange(start, count) end
 ---@overload fun(spriteindex: number, layerindex: number, quad: love.Quad, transform: love.Transform)
 ---@param spriteindex number # The index of the existing sprite to replace.
 ---@param layerindex number # The index of the layer in the Array Texture to use for this sprite.
----@param x number # The position to draw the sprite (x-axis).
----@param y number # The position to draw the sprite (y-axis).
----@param r number # Orientation (radians).
----@param sx number # Scale factor (x-axis).
----@param sy number # Scale factor (y-axis).
----@param ox number # Origin offset (x-axis).
----@param oy number # Origin offset (y-axis).
----@param kx number # Shearing factor (x-axis).
----@param ky number # Shearing factor (y-axis).
+---@param x? number # The position to draw the sprite (x-axis).
+---@param y? number # The position to draw the sprite (y-axis).
+---@param r? number # Orientation (radians).
+---@param sx? number # Scale factor (x-axis).
+---@param sy? number # Scale factor (y-axis).
+---@param ox? number # Origin offset (x-axis).
+---@param oy? number # Origin offset (y-axis).
+---@param kx? number # Shearing factor (x-axis).
+---@param ky? number # Shearing factor (y-axis).
 function SpriteBatch:setLayer(spriteindex, layerindex, x, y, r, sx, sy, ox, oy, kx, ky) end
 
 ---
@@ -2139,15 +2139,15 @@ local Text = {}
 ---
 ---@overload fun(coloredtext: table, x: number, y: number, angle: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number):number
 ---@param textstring string # The text to add to the object.
----@param x number # The position of the new text on the x-axis.
----@param y number # The position of the new text on the y-axis.
----@param angle number # The orientation of the new text in radians.
----@param sx number # Scale factor on the x-axis.
----@param sy number # Scale factor on the y-axis.
----@param ox number # Origin offset on the x-axis.
----@param oy number # Origin offset on the y-axis.
----@param kx number # Shearing / skew factor on the x-axis.
----@param ky number # Shearing / skew factor on the y-axis.
+---@param x? number # The position of the new text on the x-axis.
+---@param y? number # The position of the new text on the y-axis.
+---@param angle? number # The orientation of the new text in radians.
+---@param sx? number # Scale factor on the x-axis.
+---@param sy? number # Scale factor on the y-axis.
+---@param ox? number # Origin offset on the x-axis.
+---@param oy? number # Origin offset on the y-axis.
+---@param kx? number # Shearing / skew factor on the x-axis.
+---@param ky? number # Shearing / skew factor on the y-axis.
 ---@return number index # An index number that can be used with Text:getWidth or Text:getHeight.
 function Text:add(textstring, x, y, angle, sx, sy, ox, oy, kx, ky) end
 
@@ -2162,13 +2162,13 @@ function Text:add(textstring, x, y, angle, sx, sy, ox, oy, kx, ky) end
 ---@param align love.AlignMode # The alignment of the text.
 ---@param x number # The position of the new text (x-axis).
 ---@param y number # The position of the new text (y-axis).
----@param angle number # Orientation (radians).
----@param sx number # Scale factor (x-axis).
----@param sy number # Scale factor (y-axis).
----@param ox number # Origin offset (x-axis).
----@param oy number # Origin offset (y-axis).
----@param kx number # Shearing / skew factor (x-axis).
----@param ky number # Shearing / skew factor (y-axis).
+---@param angle? number # Orientation (radians).
+---@param sx? number # Scale factor (x-axis).
+---@param sy? number # Scale factor (y-axis).
+---@param ox? number # Origin offset (x-axis).
+---@param oy? number # Origin offset (y-axis).
+---@param kx? number # Shearing / skew factor (x-axis).
+---@param ky? number # Shearing / skew factor (y-axis).
 ---@return number index # An index number that can be used with Text:getWidth or Text:getHeight.
 function Text:addf(textstring, wraplimit, align, x, y, angle, sx, sy, ox, oy, kx, ky) end
 
@@ -2375,7 +2375,7 @@ function Texture:setDepthSampleMode(compare) end
 ---
 ---@param min love.FilterMode # Filter mode to use when minifying the texture (rendering it at a smaller size on-screen than its size in pixels).
 ---@param mag love.FilterMode # Filter mode to use when magnifying the texture (rendering it at a larger size on-screen than its size in pixels).
----@param anisotropy number # Maximum amount of anisotropic filtering to use.
+---@param anisotropy? number # Maximum amount of anisotropic filtering to use.
 function Texture:setFilter(min, mag, anisotropy) end
 
 ---
@@ -2389,7 +2389,7 @@ function Texture:setFilter(min, mag, anisotropy) end
 ---
 ---@overload fun()
 ---@param filtermode love.FilterMode # The filter mode to use in between mipmap levels. 'nearest' will often give better performance.
----@param sharpness number # A positive sharpness value makes the texture use a more detailed mipmap level when drawing, at the expense of performance. A negative value does the reverse.
+---@param sharpness? number # A positive sharpness value makes the texture use a more detailed mipmap level when drawing, at the expense of performance. A negative value does the reverse.
 function Texture:setMipmapFilter(filtermode, sharpness) end
 
 ---
@@ -2400,8 +2400,8 @@ function Texture:setMipmapFilter(filtermode, sharpness) end
 ---Clamped textures appear only once (with the edges of the texture stretching to fill the extent of the Quad), whereas repeated ones repeat as many times as there is room in the Quad.
 ---
 ---@param horiz love.WrapMode # Horizontal wrapping mode of the texture.
----@param vert love.WrapMode # Vertical wrapping mode of the texture.
----@param depth love.WrapMode # Wrapping mode for the z-axis of a Volume texture.
+---@param vert? love.WrapMode # Vertical wrapping mode of the texture.
+---@param depth? love.WrapMode # Wrapping mode for the z-axis of a Volume texture.
 function Texture:setWrap(horiz, vert, depth) end
 
 ---
@@ -2481,13 +2481,13 @@ function Video:seek(offset) end
 ---
 ---@param min love.FilterMode # The filter mode used when scaling the Video down.
 ---@param mag love.FilterMode # The filter mode used when scaling the Video up.
----@param anisotropy number # Maximum amount of anisotropic filtering used.
+---@param anisotropy? number # Maximum amount of anisotropic filtering used.
 function Video:setFilter(min, mag, anisotropy) end
 
 ---
 ---Sets the audio Source used for playing back the video's audio. The audio Source also controls playback speed and synchronization.
 ---
----@param source love.Source # The audio Source used for audio playback, or nil to disable audio synchronization.
+---@param source? love.Source # The audio Source used for audio playback, or nil to disable audio synchronization.
 function Video:setSource(source) end
 
 ---

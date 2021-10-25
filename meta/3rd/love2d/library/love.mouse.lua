@@ -89,8 +89,8 @@ function love.mouse.isVisible() end
 ---@overload fun(filename: string, hotx: number, hoty: number):love.Cursor
 ---@overload fun(fileData: love.FileData, hotx: number, hoty: number):love.Cursor
 ---@param imageData love.ImageData # The ImageData to use for the new Cursor.
----@param hotx number # The x-coordinate in the ImageData of the cursor's hot spot.
----@param hoty number # The y-coordinate in the ImageData of the cursor's hot spot.
+---@param hotx? number # The x-coordinate in the ImageData of the cursor's hot spot.
+---@param hoty? number # The y-coordinate in the ImageData of the cursor's hot spot.
 ---@return love.Cursor cursor # The new Cursor object.
 function love.mouse.newCursor(imageData, hotx, hoty) end
 

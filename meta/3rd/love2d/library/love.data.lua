@@ -13,7 +13,7 @@ love.data = {}
 ---@param container love.ContainerType # What type to return the compressed data as.
 ---@param format love.CompressedDataFormat # The format to use when compressing the string.
 ---@param rawstring string # The raw (un-compressed) string to compress.
----@param level number # The level of compression to use, between 0 and 9. -1 indicates the default level. The meaning of this argument depends on the compression format being used.
+---@param level? number # The level of compression to use, between 0 and 9. -1 indicates the default level. The meaning of this argument depends on the compression format being used.
 ---@return love.CompressedData|string compressedData # CompressedData/string which contains the compressed version of rawstring.
 function love.data.compress(container, format, rawstring, level) end
 
@@ -44,7 +44,7 @@ function love.data.decompress(container, compressedData) end
 ---@param container love.ContainerType # What type to return the encoded data as.
 ---@param format love.EncodeFormat # The format of the output data.
 ---@param sourceString string # The raw data to encode.
----@param linelength number # The maximum line length of the output. Only supported for base64, ignored if 0.
+---@param linelength? number # The maximum line length of the output. Only supported for base64, ignored if 0.
 ---@return love.ByteData|string encoded # ByteData/string which contains the encoded version of source.
 function love.data.encode(container, format, sourceString, linelength) end
 
@@ -105,7 +105,7 @@ function love.data.pack(container, format, v1) end
 ---@overload fun(format: string, data: love.Data, pos: number):number|boolean|string, number|boolean|string, number
 ---@param format string # A string determining how the values were packed. Follows the rules of Lua 5.3's string.pack format strings.
 ---@param datastring string # A string containing the packed (serialized) data.
----@param pos number # Where to start reading in the string. Negative values can be used to read relative from the end of the string.
+---@param pos? number # Where to start reading in the string. Negative values can be used to read relative from the end of the string.
 ---@return number|boolean|string v1 # The first value (number, boolean, or string) that was unpacked.
 ---@return number index # The index of the first unread byte in the data string.
 function love.data.unpack(format, datastring, pos) end

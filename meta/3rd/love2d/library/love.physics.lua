@@ -42,9 +42,9 @@ function love.physics.getMeter() end
 ---The mass of the body gets calculated when a Fixture is attached or removed, but can be changed at any time with Body:setMass or Body:resetMassData.
 ---
 ---@param world love.World # The world to create the body in.
----@param x number # The x position of the body.
----@param y number # The y position of the body.
----@param type love.BodyType # The type of the body.
+---@param x? number # The x position of the body.
+---@param y? number # The y position of the body.
+---@param type? love.BodyType # The type of the body.
 ---@return love.Body body # A new body.
 function love.physics.newBody(world, x, y, type) end
 
@@ -79,7 +79,7 @@ function love.physics.newCircleShape(radius) end
 ---@param y1 number # The y position of the first anchor point (world space).
 ---@param x2 number # The x position of the second anchor point (world space).
 ---@param y2 number # The y position of the second anchor point (world space).
----@param collideConnected boolean # Specifies whether the two bodies should collide with each other.
+---@param collideConnected? boolean # Specifies whether the two bodies should collide with each other.
 ---@return love.DistanceJoint joint # The new distance joint.
 function love.physics.newDistanceJoint(body1, body2, x1, y1, x2, y2, collideConnected) end
 
@@ -100,7 +100,7 @@ function love.physics.newEdgeShape(x1, y1, x2, y2) end
 ---
 ---@param body love.Body # The body which gets the fixture attached.
 ---@param shape love.Shape # The shape to be copied to the fixture.
----@param density number # The density of the fixture.
+---@param density? number # The density of the fixture.
 ---@return love.Fixture fixture # The new fixture.
 function love.physics.newFixture(body, shape, density) end
 
@@ -112,7 +112,7 @@ function love.physics.newFixture(body, shape, density) end
 ---@param body2 love.Body # The second body to attach to the joint.
 ---@param x number # The x position of the anchor point.
 ---@param y number # The y position of the anchor point.
----@param collideConnected boolean # Specifies whether the two bodies should collide with each other.
+---@param collideConnected? boolean # Specifies whether the two bodies should collide with each other.
 ---@return love.FrictionJoint joint # The new FrictionJoint.
 function love.physics.newFrictionJoint(body1, body2, x, y, collideConnected) end
 
@@ -125,8 +125,8 @@ function love.physics.newFrictionJoint(body1, body2, x, y, collideConnected) end
 ---
 ---@param joint1 love.Joint # The first joint to connect with a gear joint.
 ---@param joint2 love.Joint # The second joint to connect with a gear joint.
----@param ratio number # The gear ratio.
----@param collideConnected boolean # Specifies whether the two bodies should collide with each other.
+---@param ratio? number # The gear ratio.
+---@param collideConnected? boolean # Specifies whether the two bodies should collide with each other.
 ---@return love.GearJoint joint # The new gear joint.
 function love.physics.newGearJoint(joint1, joint2, ratio, collideConnected) end
 
@@ -138,7 +138,7 @@ function love.physics.newGearJoint(joint1, joint2, ratio, collideConnected) end
 ---@overload fun(body1: love.Body, body2: love.Body, correctionFactor: number, collideConnected: boolean):love.MotorJoint
 ---@param body1 love.Body # The first body to attach to the joint.
 ---@param body2 love.Body # The second body to attach to the joint.
----@param correctionFactor number # The joint's initial position correction factor, in the range of 1.
+---@param correctionFactor? number # The joint's initial position correction factor, in the range of 1.
 ---@return love.MotorJoint joint # The new MotorJoint.
 function love.physics.newMotorJoint(body1, body2, correctionFactor) end
 
@@ -183,7 +183,7 @@ function love.physics.newPolygonShape(x1, y1, x2, y2, x3, y3) end
 ---@param y number # The y coordinate of the anchor point.
 ---@param ax number # The x coordinate of the axis vector.
 ---@param ay number # The y coordinate of the axis vector.
----@param collideConnected boolean # Specifies whether the two bodies should collide with each other.
+---@param collideConnected? boolean # Specifies whether the two bodies should collide with each other.
 ---@return love.PrismaticJoint joint # The new prismatic joint.
 function love.physics.newPrismaticJoint(body1, body2, x, y, ax, ay, collideConnected) end
 
@@ -204,8 +204,8 @@ function love.physics.newPrismaticJoint(body1, body2, x, y, ax, ay, collideConne
 ---@param y1 number # The y coordinate of the pulley joint anchor in the first body.
 ---@param x2 number # The x coordinate of the pulley joint anchor in the second body.
 ---@param y2 number # The y coordinate of the pulley joint anchor in the second body.
----@param ratio number # The joint ratio.
----@param collideConnected boolean # Specifies whether the two bodies should collide with each other.
+---@param ratio? number # The joint ratio.
+---@param collideConnected? boolean # Specifies whether the two bodies should collide with each other.
 ---@return love.PulleyJoint joint # The new pulley joint.
 function love.physics.newPulleyJoint(body1, body2, gx1, gy1, gx2, gy2, x1, y1, x2, y2, ratio, collideConnected) end
 
@@ -230,7 +230,7 @@ function love.physics.newRectangleShape(width, height) end
 ---@param body2 love.Body # The second body.
 ---@param x number # The x position of the connecting point.
 ---@param y number # The y position of the connecting point.
----@param collideConnected boolean # Specifies whether the two bodies should collide with each other.
+---@param collideConnected? boolean # Specifies whether the two bodies should collide with each other.
 ---@return love.RevoluteJoint joint # The new revolute joint.
 function love.physics.newRevoluteJoint(body1, body2, x, y, collideConnected) end
 
@@ -244,7 +244,7 @@ function love.physics.newRevoluteJoint(body1, body2, x, y, collideConnected) end
 ---@param x2 number # The x position of the second anchor point.
 ---@param y2 number # The y position of the second anchor point.
 ---@param maxLength number # The maximum distance for the bodies.
----@param collideConnected boolean # Specifies whether the two bodies should collide with each other.
+---@param collideConnected? boolean # Specifies whether the two bodies should collide with each other.
 ---@return love.RopeJoint joint # The new RopeJoint.
 function love.physics.newRopeJoint(body1, body2, x1, y1, x2, y2, maxLength, collideConnected) end
 
@@ -257,7 +257,7 @@ function love.physics.newRopeJoint(body1, body2, x1, y1, x2, y2, maxLength, coll
 ---@param body2 love.Body # The second body to attach to the joint.
 ---@param x number # The x position of the anchor point (world space).
 ---@param y number # The y position of the anchor point (world space).
----@param collideConnected boolean # Specifies whether the two bodies should collide with each other.
+---@param collideConnected? boolean # Specifies whether the two bodies should collide with each other.
 ---@return love.WeldJoint joint # The new WeldJoint.
 function love.physics.newWeldJoint(body1, body2, x, y, collideConnected) end
 
@@ -271,16 +271,16 @@ function love.physics.newWeldJoint(body1, body2, x, y, collideConnected) end
 ---@param y number # The y position of the anchor point.
 ---@param ax number # The x position of the axis unit vector.
 ---@param ay number # The y position of the axis unit vector.
----@param collideConnected boolean # Specifies whether the two bodies should collide with each other.
+---@param collideConnected? boolean # Specifies whether the two bodies should collide with each other.
 ---@return love.WheelJoint joint # The new WheelJoint.
 function love.physics.newWheelJoint(body1, body2, x, y, ax, ay, collideConnected) end
 
 ---
 ---Creates a new World.
 ---
----@param xg number # The x component of gravity.
----@param yg number # The y component of gravity.
----@param sleep boolean # Whether the bodies in this world are allowed to sleep.
+---@param xg? number # The x component of gravity.
+---@param yg? number # The y component of gravity.
+---@param sleep? boolean # Whether the bodies in this world are allowed to sleep.
 ---@return love.World world # A brave new World.
 function love.physics.newWorld(xg, yg, sleep) end
 
@@ -1142,7 +1142,7 @@ function Fixture:getBody() end
 ---
 ---Returns the points of the fixture bounding box. In case the fixture has multiple children a 1-based index can be specified. For example, a fixture will have multiple children with a chain shape.
 ---
----@param index number # A bounding box of the fixture.
+---@param index? number # A bounding box of the fixture.
 ---@return number topLeftX # The x position of the top-left point.
 ---@return number topLeftY # The y position of the top-left point.
 ---@return number bottomRightX # The x position of the bottom-right point.
@@ -1248,7 +1248,7 @@ function Fixture:isSensor() end
 ---@param x2 number # The x position of the input line end point.
 ---@param y2 number # The y position of the input line end point.
 ---@param maxFraction number # Ray length parameter.
----@param childIndex number # The index of the child the ray gets cast against.
+---@param childIndex? number # The index of the child the ray gets cast against.
 ---@return number xn # The x component of the normal vector of the edge where the ray hit the shape.
 ---@return number yn # The y component of the normal vector of the edge where the ray hit the shape.
 ---@return number fraction # The position on the input line where the intersection happened as a factor of the line length.
@@ -1917,7 +1917,7 @@ local Shape = {}
 ---@param tx number # The translation of the shape on the x-axis.
 ---@param ty number # The translation of the shape on the y-axis.
 ---@param tr number # The shape rotation.
----@param childIndex number # The index of the child to compute the bounding box of.
+---@param childIndex? number # The index of the child to compute the bounding box of.
 ---@return number topLeftX # The x position of the top-left point.
 ---@return number topLeftY # The y position of the top-left point.
 ---@return number bottomRightX # The x position of the bottom-right point.
@@ -1973,7 +1973,7 @@ function Shape:getType() end
 ---@param tx number # The translation of the shape on the x-axis.
 ---@param ty number # The translation of the shape on the y-axis.
 ---@param tr number # The shape rotation.
----@param childIndex number # The index of the child the ray gets cast against.
+---@param childIndex? number # The index of the child the ray gets cast against.
 ---@return number xn # The x component of the normal vector of the edge where the ray hit the shape.
 ---@return number yn # The y component of the normal vector of the edge where the ray hit the shape.
 ---@return number fraction # The position on the input line where the intersection happened as a factor of the line length.
@@ -2266,8 +2266,8 @@ function World:translateOrigin(x, y) end
 ---Update the state of the world.
 ---
 ---@param dt number # The time (in seconds) to advance the physics simulation.
----@param velocityiterations number # The maximum number of steps used to determine the new velocities when resolving a collision.
----@param positioniterations number # The maximum number of steps used to determine the new positions when resolving a collision.
+---@param velocityiterations? number # The maximum number of steps used to determine the new velocities when resolving a collision.
+---@param positioniterations? number # The maximum number of steps used to determine the new positions when resolving a collision.
 function World:update(dt, velocityiterations, positioniterations) end
 
 ---

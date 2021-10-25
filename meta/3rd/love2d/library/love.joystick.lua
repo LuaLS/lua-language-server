@@ -58,7 +58,7 @@ function love.joystick.saveGamepadMappings(filename) end
 ---@param button love.GamepadButton # The virtual gamepad button to bind.
 ---@param inputtype love.JoystickInputType # The type of input to bind the virtual gamepad button to.
 ---@param inputindex number # The index of the axis, button, or hat to bind the virtual gamepad button to.
----@param hatdir love.JoystickHat # The direction of the hat, if the virtual gamepad button will be bound to a hat. nil otherwise.
+---@param hatdir? love.JoystickHat # The direction of the hat, if the virtual gamepad button will be bound to a hat. nil otherwise.
 ---@return boolean success # Whether the virtual gamepad button was successfully bound.
 function love.joystick.setGamepadMapping(guid, button, inputtype, inputindex, hatdir) end
 

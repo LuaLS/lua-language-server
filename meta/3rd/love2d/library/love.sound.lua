@@ -11,7 +11,7 @@ love.sound = {}
 ---
 ---@overload fun(filename: string, buffer: number):love.Decoder
 ---@param file love.File # The file with encoded sound data.
----@param buffer number # The size of each decoded chunk, in bytes.
+---@param buffer? number # The size of each decoded chunk, in bytes.
 ---@return love.Decoder decoder # A new Decoder object.
 function love.sound.newDecoder(file, buffer) end
 

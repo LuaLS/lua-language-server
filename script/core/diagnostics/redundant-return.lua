@@ -14,13 +14,8 @@ return function (uri, callback)
         if not source.parent or source.parent.type ~= "function" then
             return
         end
-        for _, node in ipairs(source) do
-            while node and node.type == "paren" do
-                node = node.exp
-            end
-            if node and (node.type ~= "nil" or #node > 0) then
-                return
-            end
+        if #source > 0 then
+            return
         end
         callback {
             start   = source.start,

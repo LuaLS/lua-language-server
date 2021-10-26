@@ -108,9 +108,11 @@ function TEST(data)
     result.enableCommon = nil
     removeMetas(result)
     for _, item in ipairs(result) do
-        local r = core.resolve(item.id)
-        for k, v in pairs(r or {}) do
-            item[k] = v
+        if item.id then
+            local r = core.resolve(item.id)
+            for k, v in pairs(r or {}) do
+                item[k] = v
+            end
         end
         for k in pairs(item) do
             if not Cared[k] then

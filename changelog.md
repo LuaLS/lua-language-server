@@ -6,6 +6,7 @@
 * `FIX` [#748](https://github.com/sumneko/lua-language-server/issues/748)
 * `FIX` [#749](https://github.com/sumneko/lua-language-server/issues/749)
 * `FIX` [#752](https://github.com/sumneko/lua-language-server/issues/752)
+* `FIX` [#753](https://github.com/sumneko/lua-language-server/issues/753)
 * `FIX` [#756](https://github.com/sumneko/lua-language-server/issues/756)
 * `FIX` [#758](https://github.com/sumneko/lua-language-server/issues/758)
 

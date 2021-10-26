@@ -960,6 +960,7 @@ function m.searchRefsByID(status, suri, expect, mode)
     end
 
     search(suri, expect, nil)
+    flushGeneric()
 end
 
 local function prepareSearch(source)

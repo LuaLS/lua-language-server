@@ -3,7 +3,7 @@ local guide   = require 'parser.guide'
 local lang    = require 'language'
 local define  = require 'proto.define'
 
--- reports 'return' or 'return nil' at the end of functions
+-- reports 'return' without any return values at the end of functions
 return function (uri, callback)
     local ast = files.getState(uri)
     if not ast then

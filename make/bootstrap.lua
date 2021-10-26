@@ -52,6 +52,7 @@ local root; do
         root = package.cpath:match("([^;]+)"..pattern..pattern..pattern.."$")
         arg[0] = root .. package.config:sub(1,1) .. 'main.lua'
     end
+    root = root:gsub('[/\\]', package.config:sub(1,1))
 end
 
 package.path = table.concat({

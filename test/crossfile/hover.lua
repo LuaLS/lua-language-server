@@ -49,9 +49,11 @@ function TEST(expect)
     files.setText(targetUri, targetScript)
     files.setText(sourceUri, sourceScript)
 
-    local cachedList = targetList['?'] + sourceList['?']
-
-    local sourcePos = (cachedList[1][1] + cachedList[1][2]) // 2
+    if targetList['?'] then
+        local targetPos = (targetList['?'][1][1] + targetList['?'][1][2]) // 2
+        core.byUri(targetUri, targetPos)
+    end
+    local sourcePos = (sourceList['?'][1][1] + sourceList['?'][1][2]) // 2
     local hover = core.byUri(sourceUri, sourcePos)
     assert(hover)
     hover = tostring(hover):gsub('\r\n', '\n')
@@ -1025,22 +1027,22 @@ TEST {
     {
         path = 'a.lua',
         content = [[
+---@type string[]
+local ss
 
-
-
-for _, x in ipairs({} and {}) do
-    print(<?x?>) -- `x` is infered as `string`
+for _, s in ipairs(ss) do
+    print(<?s?>)
 end
 ]],
     },
     {
         path = 'b.lua',
         content = [[
----@type string[]
-local ss
 
-for _, s in ipairs(ss) do
-    print(s)
+
+
+for _, x in ipairs({} and {}) do
+    print(<?x?>) -- `x` is infered as `string`
 end
 ]],
     },

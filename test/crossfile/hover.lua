@@ -40,7 +40,7 @@ end
 function TEST(expect)
     files.removeAll()
 
-    local targetScript = expect[1].content
+    local targetScript, targetList = catch(expect[1].content, '?')
     local targetUri = furi.encode(expect[1].path)
 
     local sourceScript, sourceList = catch(expect[2].content, '?')
@@ -49,7 +49,9 @@ function TEST(expect)
     files.setText(targetUri, targetScript)
     files.setText(sourceUri, sourceScript)
 
-    local sourcePos = (sourceList['?'][1][1] + sourceList['?'][1][2]) // 2
+    local cachedList = targetList['?'] + sourceList['?']
+
+    local sourcePos = (cachedList[1][1] + cachedList[1][2]) // 2
     local hover = core.byUri(sourceUri, sourcePos)
     assert(hover)
     hover = tostring(hover):gsub('\r\n', '\n')
@@ -1018,3 +1020,32 @@ function fn()
 line1
 
 line2]]}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+
+
+
+for _, x in ipairs({} and {}) do
+    print(<?x?>) -- `x` is infered as `string`
+end
+]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+---@type string[]
+local ss
+
+for _, s in ipairs(ss) do
+    print(s)
+end
+]],
+    },
+    hover = [[
+```lua
+local x: any
+```]]
+}

@@ -30,13 +30,13 @@ function m.decode(s)
     local i = 1
     while i < #s do
         local code1 = tobyte(s, i)
-        if code1 < 0xFFFF then
-            r[#r+1] = utf8.char(code1)
-        else
+        if code1 >= 0xD800 and code1 < 0xE000 then
             i = i + 2
             local code2 = tobyte(s, i)
             local code = 0x10000 + ((code1 - 0xD800) << 10) + ((code2 - 0xDC00) & 0x3FF)
             r[#r+1] = utf8.char(code)
+        else
+            r[#r+1] = utf8.char(code1)
         end
         i = i + 2
     end

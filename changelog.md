@@ -1,5 +1,9 @@
 # changelog
 
+## 2.4.7
+`2021-10-27`
+* `FIX` [#762](https://github.com/sumneko/lua-language-server/issues/762)
+
 ## 2.4.6
 `2021-10-26`
 * `NEW` diagnostic: `redundant-return`

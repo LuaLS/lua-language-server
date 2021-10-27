@@ -8,7 +8,7 @@ local function tobyte(s, i)
 end
 
 local function char(code)
-    if code <= 0xffff then
+    if code <= 0xFFFF then
         return tochar(code)
     end
     code = code - 0x10000
@@ -19,7 +19,7 @@ local m = {}
 
 function m.encode(s)
     local r = {}
-    for _, c in utf8.codes(s) do
+    for _, c in utf8.codes(s, true) do
         r[#r+1] = char(c)
     end
     return table.concat(r)
@@ -30,7 +30,7 @@ function m.decode(s)
     local i = 1
     while i < #s do
         local code1 = tobyte(s, i)
-        if code1 < 0xD800 then
+        if code1 < 0xFFFF then
             r[#r+1] = utf8.char(code1)
         else
             i = i + 2

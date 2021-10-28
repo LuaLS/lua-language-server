@@ -6,7 +6,6 @@ lm.bindir = "bin/"..platform.OS
 
 lm.EXE_DIR = ""
 lm:import "3rd/bee.lua/make.lua"
-lm:import "make/code_style.lua"
 
 lm:source_set 'lpeglabel' {
     rootdir = '3rd',
@@ -18,7 +17,7 @@ lm:source_set 'lpeglabel' {
 }
 
 lm:executable "lua-language-server" {
-    deps = {"lpeglabel", "source_bootstrap", "codeFormatLib"},
+    deps = {"lpeglabel", "source_bootstrap"},
     includes = {
         "3rd/bee.lua",
         "3rd/bee.lua/3rd/lua",

@@ -23,7 +23,7 @@ lm:static_library 'codeService' {
 }
 
 lm:static_library 'codeFormatLib' {
-    deps = {"codeService"},
+    deps = {"codeService", "luaParser"},
     rootdir = '../3rd/EmmyLuaCodeStyle',
     includes = {
         "include",

@@ -808,14 +808,14 @@ proto.on('textDocument/formatting', function (params)
     if not files.exists(uri) then
         return nil
     end
-    local core   = require 'core.formatting'
+    local core = require 'core.formatting'
 
-    local status, range, formattedText  = core(uri)
+    local status, result = core(uri)
     if status then
         local results = {
             {
-                range   = range,
-                newText = formattedText,
+                range   = converter.packRange(uri, result.start, result.finish),
+                newText = result.formattedText,
             }
         }
         return results

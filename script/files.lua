@@ -11,7 +11,6 @@ local guide    = require 'parser.guide'
 local smerger  = require 'string-merger'
 local progress = require "progress"
 local encoder  = require 'encoder'
-local client   = require 'client'
 
 ---@class files
 local m = {}
@@ -126,6 +125,7 @@ function m.setText(uri, text, isTrust)
         return
     end
     if #text > 1024 * 1024 * 100 then
+        local client = require 'client'
         client.showMessage('Warning', lang.script('WORKSPACE_SKIP_HUGE_FILE', uri))
         return
     end

@@ -1,6 +1,6 @@
 local lm = require "luamake"
 
-lm:static_library 'luaParser' {
+lm:source_set 'luaParser' {
     rootdir = '../3rd/EmmyLuaCodeStyle',
     includes = "include",
     sources = "LuaParser/src/*.cpp",
@@ -9,8 +9,7 @@ lm:static_library 'luaParser' {
     },
 }
 
-lm:static_library 'codeService' {
-    deps = {"luaParser"},
+lm:source_set 'codeService' {
     rootdir = '../3rd/EmmyLuaCodeStyle',
     includes = "include",
     sources = {

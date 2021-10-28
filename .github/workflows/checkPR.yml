@@ -10,7 +10,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
       with:
-        ref: refs/heads/master
+        ref: ${{ github.event.pull_request.head.sha }}
         submodules : recursive
     - uses: actboy168/setup-luamake@master
     - run: luamake

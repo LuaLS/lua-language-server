@@ -102,7 +102,7 @@ Please [help me][en-US] improve the quality of `en-US`.
 ## Setting
 
 * In VSCode: Just use the setting of VSCode.
-* Standalone: See https://github.com/sumneko/lua-language-server/wiki/Setting-without-VSCode
+* Standalone: See https://github.com/sumneko/lua-language-server/wiki/Setting
 
 ## Credit
 

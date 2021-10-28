@@ -117,6 +117,31 @@ TEST {
     },
 }
 
+config.set('Lua.runtime.pathStrict', true)
+TEST {
+    {
+        path = 'aaa/bbb.lua',
+        content = '',
+    },
+    {
+        path = 'b.lua',
+        content = 'require "<?bbb?>"',
+    },
+}
+
+TEST {
+    {
+        path = 'aaa/bbb.lua',
+        content = '<!!>',
+    },
+    {
+        path = 'b.lua',
+        content = 'require "<?aaa.bbb?>"',
+    },
+}
+
+config.set('Lua.runtime.pathStrict', false)
+
 TEST {
     {
         path = 'a.lua',

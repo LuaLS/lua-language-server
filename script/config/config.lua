@@ -151,6 +151,7 @@ local Template = {
                                                 "?.lua",
                                                 "?/init.lua",
                                             },
+    ['Lua.runtime.pathStrict']              = Type.Boolean >> false,
     ['Lua.runtime.special']                 = Type.Hash(Type.String, Type.String),
     ['Lua.runtime.meta']                    = Type.String >> '${version} ${language} ${encoding}',
     ['Lua.runtime.unicodeName']             = Type.Boolean,

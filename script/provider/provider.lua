@@ -801,6 +801,29 @@ proto.on('textDocument/onTypeFormatting', function (params)
     return results
 end)
 
+proto.on('textDocument/formatting', function (params)
+    workspace.awaitReady()
+    local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
+    local uri    = params.textDocument.uri
+    if not files.exists(uri) then
+        return nil
+    end
+    local core   = require 'core.formatting'
+
+    local status, range, formattedText  = core(uri)
+    if status then
+        local results = {
+            {
+                range   = range,
+                newText = formattedText,
+            }
+        }
+        return results
+    end
+
+    return nil
+end)
+
 proto.on('$/cancelRequest', function (params)
     proto.close(params.id, define.ErrorCodes.RequestCancelled)
 end)

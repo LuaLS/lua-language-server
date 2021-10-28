@@ -100,7 +100,7 @@ function m.init()
             m.showError(err)
             return
         end
-        if not checkTrustLoad() then
+        if not client.isVSCode() and not checkTrustLoad() then
             return
         end
         local suc, err = xpcall(f, log.error, f)

@@ -2,6 +2,7 @@
 
 ## 2.5.0
 * `NEW` setting `Lua.runtime.pathStrict`
+* `CHG` no longer asks to trust plugin in VSCode, because VSCode already provides the workspace trust feature
 
 ## 2.4.7
 `2021-10-27`

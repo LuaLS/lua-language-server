@@ -11,6 +11,7 @@ DEVELOP = true
 LOGPATH  = LOGPATH  or (ROOT .. '/log')
 METAPATH = METAPATH or (ROOT .. '/meta')
 
+-- just test
 collectgarbage 'generational'
 
 io.write = function () end

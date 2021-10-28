@@ -22,7 +22,6 @@ lm:static_library 'codeService' {
     },
 }
 
-
 lm:static_library 'codeFormatLib' {
     deps = {"codeService"},
     rootdir = '../3rd/EmmyLuaCodeStyle',

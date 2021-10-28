@@ -815,7 +815,7 @@ proto.on('textDocument/formatting', function (params)
         local results = {
             {
                 range   = converter.packRange(uri, result.start, result.finish),
-                newText = result.formattedText,
+                newText = result.formatedText,
             }
         }
         return results

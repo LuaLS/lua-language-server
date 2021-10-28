@@ -885,7 +885,7 @@ local function collectRequireNames(mode, myUri, literal, source, smark, position
                 goto CONTINUE
             end
             local path = workspace.getRelativePath(uri)
-            local infos = rpath.getVisiblePath(path, config.get 'Lua.runtime.path')
+            local infos = rpath.getVisiblePath(path)
             for _, info in ipairs(infos) do
                 if matchKey(literal, info.expect) then
                     if not collect[info.expect] then

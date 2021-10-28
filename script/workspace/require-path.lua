@@ -27,7 +27,9 @@ local function getOnePath(path, searcher)
     return nil
 end
 
-function m.getVisiblePath(path, searchers, strict)
+function m.getVisiblePath(path)
+    local searchers = config.get 'Lua.runtime.path'
+    local strict    = config.get 'Lua.runtime.pathStrict'
     path = path:gsub('^[/\\]+', '')
     local uri = furi.encode(path)
     local libraryPath = files.getLibraryPath(uri)
@@ -91,7 +93,9 @@ files.watch(function (ev)
 end)
 
 config.watch(function (key, value, oldValue)
-    if key == 'Lua.completion.requireSeparator' then
+    if key == 'Lua.completion.requireSeparator'
+    or key == 'Lua.runtime.path'
+    or key == 'Lua.runtime.pathStrict' then
         m.flush()
     end
 end)

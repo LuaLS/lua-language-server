@@ -15,4 +15,5 @@ return function(uri)
         start = startPosition,
         finish = endPosition
     }
-end     
+end
+  

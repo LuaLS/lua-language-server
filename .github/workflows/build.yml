@@ -1,5 +1,5 @@
 name: build
-on: [push, pull_request]
+on: push
 jobs:
   compile:
     runs-on: ${{ matrix.os }}
@@ -18,3 +18,20 @@ jobs:
       with:
         name: lua-language-server
         path: bin
+
+name: checkPR
+on: pull_request
+jobs:
+  compile:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-18.04, macos-latest]
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        ref: refs/heads/master
+        submodules : recursive
+    - uses: actboy168/setup-luamake@master
+    - run: luamake

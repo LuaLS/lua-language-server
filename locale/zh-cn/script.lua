@@ -66,6 +66,7 @@ MWS_WCONFIG_UPDATED     = '工作区配置已更新。'
 WORKSPACE_SKIP_LARGE_FILE = '已跳过过大的文件：{}。当前设置的大小限制为：{} KB，该文件大小为：{} KB'
 WORKSPACE_LOADING         = '正在加载工作目录'
 WORKSPACE_DIAGNOSTIC      = '正在对工作目录进行诊断'
+WORKSPACE_SKIP_HUGE_FILE  = '出于性能考虑，已停止对此文件解析：{}'
 
 PARSER_CRASH            = '语法解析崩溃了！遗言：{}'
 PARSER_UNKNOWN          = '未知语法错误...'

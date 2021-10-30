@@ -15,6 +15,8 @@ function love.mouse.getCursor() end
 ---
 ---Returns the current position of the mouse.
 ---
+---@return number x # The position of the mouse along the x-axis.
+---@return number y # The position of the mouse along the y-axis.
 function love.mouse.getPosition() end
 
 ---
@@ -39,11 +41,13 @@ function love.mouse.getSystemCursor(ctype) end
 ---
 ---Returns the current x-position of the mouse.
 ---
+---@return number x # The position of the mouse along the x-axis.
 function love.mouse.getX() end
 
 ---
 ---Returns the current y-position of the mouse.
 ---
+---@return number y # The position of the mouse along the y-axis.
 function love.mouse.getY() end
 
 ---
@@ -85,8 +89,8 @@ function love.mouse.isVisible() end
 ---@overload fun(filename: string, hotx: number, hoty: number):love.Cursor
 ---@overload fun(fileData: love.FileData, hotx: number, hoty: number):love.Cursor
 ---@param imageData love.ImageData # The ImageData to use for the new Cursor.
----@param hotx number # The x-coordinate in the ImageData of the cursor's hot spot.
----@param hoty number # The y-coordinate in the ImageData of the cursor's hot spot.
+---@param hotx? number # The x-coordinate in the ImageData of the cursor's hot spot.
+---@param hoty? number # The y-coordinate in the ImageData of the cursor's hot spot.
 ---@return love.Cursor cursor # The new Cursor object.
 function love.mouse.newCursor(imageData, hotx, hoty) end
 
@@ -106,7 +110,9 @@ function love.mouse.setGrabbed(grab) end
 ---
 ---Sets the current position of the mouse. Non-integer values are floored.
 ---
-function love.mouse.setPosition() end
+---@param x number # The new position of the mouse along the x-axis.
+---@param y number # The new position of the mouse along the y-axis.
+function love.mouse.setPosition(x, y) end
 
 ---
 ---Sets whether relative mode is enabled for the mouse.
@@ -129,14 +135,16 @@ function love.mouse.setVisible(visible) end
 ---
 ---Non-integer values are floored.
 ---
-function love.mouse.setX() end
+---@param x number # The new position of the mouse along the x-axis.
+function love.mouse.setX(x) end
 
 ---
 ---Sets the current Y position of the mouse.
 ---
 ---Non-integer values are floored.
 ---
-function love.mouse.setY() end
+---@param y number # The new position of the mouse along the y-axis.
+function love.mouse.setY(y) end
 
 ---
 ---Represents a hardware cursor.

@@ -12,25 +12,33 @@ love.math = {}
 ---@param rb number # Red color component in 0..255 range.
 ---@param gb number # Green color component in 0..255 range.
 ---@param bb number # Blue color component in 0..255 range.
----@param ab number # Alpha color component in 0..255 range.
+---@param ab? number # Alpha color component in 0..255 range.
+---@return number r # Red color component in 0..1 range.
+---@return number g # Green color component in 0..1 range.
+---@return number b # Blue color component in 0..1 range.
+---@return number a # Alpha color component in 0..1 range or nil if alpha is not specified.
 function love.math.colorFromBytes(rb, gb, bb, ab) end
 
 ---
 ---Converts a color from 0..1 to 0..255 range.
 ---
+---@param r number # Red color component.
+---@param g number # Green color component.
+---@param b number # Blue color component.
+---@param a? number # Alpha color component.
 ---@return number rb # Red color component in 0..255 range.
 ---@return number gb # Green color component in 0..255 range.
 ---@return number bb # Blue color component in 0..255 range.
 ---@return number ab # Alpha color component in 0..255 range or nil if alpha is not specified.
-function love.math.colorToBytes() end
+function love.math.colorToBytes(r, g, b, a) end
 
 ---
 ---Compresses a string or data using a specific compression algorithm.
 ---
 ---@overload fun(data: love.Data, format: love.CompressedDataFormat, level: number):love.CompressedData
 ---@param rawstring string # The raw (un-compressed) string to compress.
----@param format love.CompressedDataFormat # The format to use when compressing the string.
----@param level number # The level of compression to use, between 0 and 9. -1 indicates the default level. The meaning of this argument depends on the compression format being used.
+---@param format? love.CompressedDataFormat # The format to use when compressing the string.
+---@param level? number # The level of compression to use, between 0 and 9. -1 indicates the default level. The meaning of this argument depends on the compression format being used.
 ---@return love.CompressedData compressedData # A new Data object containing the compressed version of the string.
 function love.math.compress(rawstring, format, level) end
 
@@ -52,10 +60,13 @@ function love.math.decompress(compressedData) end
 ---
 ---@overload fun(color: table):number, number, number
 ---@overload fun(c: number):number
+---@param r number # The red channel of the sRGB color to convert.
+---@param g number # The green channel of the sRGB color to convert.
+---@param b number # The blue channel of the sRGB color to convert.
 ---@return number lr # The red channel of the converted color in linear RGB space.
 ---@return number lg # The green channel of the converted color in linear RGB space.
 ---@return number lb # The blue channel of the converted color in linear RGB space.
-function love.math.gammaToLinear() end
+function love.math.gammaToLinear(r, g, b) end
 
 ---
 ---Gets the seed of the random number generator.
@@ -138,8 +149,9 @@ function love.math.newTransform() end
 ---@overload fun(x: number, y: number):number
 ---@overload fun(x: number, y: number, z: number):number
 ---@overload fun(x: number, y: number, z: number, w: number):number
+---@param x number # The number used to generate the noise value.
 ---@return number value # The noise value in the range of 1.
-function love.math.noise() end
+function love.math.noise(x) end
 
 ---
 ---Generates a pseudo-random number in a platform independent manner. The default love.run seeds this function at startup, so you generally don't need to seed it yourself.
@@ -152,8 +164,8 @@ function love.math.random() end
 ---
 ---Get a normally distributed pseudo random number.
 ---
----@param stddev number # Standard deviation of the distribution.
----@param mean number # The mean of the distribution.
+---@param stddev? number # Standard deviation of the distribution.
+---@param mean? number # The mean of the distribution.
 ---@return number number # Normally distributed random number with variance (stddev)² and the specified mean.
 function love.math.randomNormal(stddev, mean) end
 
@@ -193,12 +205,18 @@ local BezierCurve = {}
 ---
 ---This function can be used to move objects along paths or tween parameters. However it should not be used to render the curve, see BezierCurve:render for that purpose.
 ---
-function BezierCurve:evaluate() end
+---@param t number # Where to evaluate the curve.
+---@return number x # x coordinate of the curve at parameter t.
+---@return number y # y coordinate of the curve at parameter t.
+function BezierCurve:evaluate(t) end
 
 ---
 ---Get coordinates of the i-th control point. Indices start with 1.
 ---
-function BezierCurve:getControlPoint() end
+---@param i number # Index of the control point.
+---@return number x # Position of the control point along the x axis.
+---@return number y # Position of the control point along the y axis.
+function BezierCurve:getControlPoint(i) end
 
 ---
 ---Get the number of control points in the Bézier curve.
@@ -231,7 +249,10 @@ function BezierCurve:getSegment(startpoint, endpoint) end
 ---
 ---Insert control point as the new i-th control point. Existing control points from i onwards are pushed back by 1. Indices start with 1. Negative indices wrap around: -1 is the last control point, -2 the one before the last, etc.
 ---
-function BezierCurve:insertControlPoint() end
+---@param x number # Position of the control point along the x axis.
+---@param y number # Position of the control point along the y axis.
+---@param i? number # Index of the control point.
+function BezierCurve:insertControlPoint(x, y, i) end
 
 ---
 ---Removes the specified control point.
@@ -246,7 +267,7 @@ function BezierCurve:removeControlPoint(index) end
 ---
 ---If you are just interested to know the position on the curve given a parameter, use BezierCurve:evaluate.
 ---
----@param depth number # Number of recursive subdivision steps.
+---@param depth? number # Number of recursive subdivision steps.
 ---@return table coordinates # List of x,y-coordinate pairs of points on the curve.
 function BezierCurve:render(depth) end
 
@@ -259,7 +280,7 @@ function BezierCurve:render(depth) end
 ---
 ---@param startpoint number # The starting point along the curve. Must be between 0 and 1.
 ---@param endpoint number # The end of the segment to render. Must be between 0 and 1.
----@param depth number # Number of recursive subdivision steps.
+---@param depth? number # Number of recursive subdivision steps.
 ---@return table coordinates # List of x,y-coordinate pairs of points on the specified part of the curve.
 function BezierCurve:renderSegment(startpoint, endpoint, depth) end
 
@@ -267,21 +288,25 @@ function BezierCurve:renderSegment(startpoint, endpoint, depth) end
 ---Rotate the Bézier curve by an angle.
 ---
 ---@param angle number # Rotation angle in radians.
----@param ox number # X coordinate of the rotation center.
----@param oy number # Y coordinate of the rotation center.
+---@param ox? number # X coordinate of the rotation center.
+---@param oy? number # Y coordinate of the rotation center.
 function BezierCurve:rotate(angle, ox, oy) end
 
 ---
 ---Scale the Bézier curve by a factor.
 ---
----@param ox number # X coordinate of the scaling center.
----@param oy number # Y coordinate of the scaling center.
-function BezierCurve:scale(ox, oy) end
+---@param s number # Scale factor.
+---@param ox? number # X coordinate of the scaling center.
+---@param oy? number # Y coordinate of the scaling center.
+function BezierCurve:scale(s, ox, oy) end
 
 ---
 ---Set coordinates of the i-th control point. Indices start with 1.
 ---
-function BezierCurve:setControlPoint() end
+---@param i number # Index of the control point.
+---@param x number # Position of the control point along the x axis.
+---@param y number # Position of the control point along the y axis.
+function BezierCurve:setControlPoint(i, x, y) end
 
 ---
 ---Move the Bézier curve by an offset.
@@ -324,8 +349,8 @@ function RandomGenerator:random() end
 ---
 ---Get a normally distributed pseudo random number.
 ---
----@param stddev number # Standard deviation of the distribution.
----@param mean number # The mean of the distribution.
+---@param stddev? number # Standard deviation of the distribution.
+---@param mean? number # The mean of the distribution.
 ---@return number number # Normally distributed random number with variance (stddev)² and the specified mean.
 function RandomGenerator:randomNormal(stddev, mean) end
 
@@ -417,7 +442,7 @@ function Transform:rotate(angle) end
 ---Scales the Transform's coordinate system. This method does not reset any previously applied transformations.
 ---
 ---@param sx number # The relative scale factor along the x-axis.
----@param sy number # The relative scale factor along the y-axis.
+---@param sy? number # The relative scale factor along the y-axis.
 ---@return love.Transform transform # The Transform object the method was called on. Allows easily chaining Transform methods.
 function Transform:scale(sx, sy) end
 
@@ -436,15 +461,17 @@ function Transform:setMatrix(e1_1, e1_2, e4_4) end
 ---
 ---Resets the Transform to the specified transformation parameters.
 ---
----@param angle number # The orientation of the Transform in radians.
----@param sx number # Scale factor on the x-axis.
----@param sy number # Scale factor on the y-axis.
----@param ox number # Origin offset on the x-axis.
----@param oy number # Origin offset on the y-axis.
----@param kx number # Shearing / skew factor on the x-axis.
----@param ky number # Shearing / skew factor on the y-axis.
+---@param x number # The position of the Transform on the x-axis.
+---@param y number # The position of the Transform on the y-axis.
+---@param angle? number # The orientation of the Transform in radians.
+---@param sx? number # Scale factor on the x-axis.
+---@param sy? number # Scale factor on the y-axis.
+---@param ox? number # Origin offset on the x-axis.
+---@param oy? number # Origin offset on the y-axis.
+---@param kx? number # Shearing / skew factor on the x-axis.
+---@param ky? number # Shearing / skew factor on the y-axis.
 ---@return love.Transform transform # The Transform object the method was called on. Allows easily chaining Transform methods.
-function Transform:setTransformation(angle, sx, sy, ox, oy, kx, ky) end
+function Transform:setTransformation(x, y, angle, sx, sy, ox, oy, kx, ky) end
 
 ---
 ---Applies a shear factor (skew) to the Transform's coordinate system. This method does not reset any previously applied transformations.

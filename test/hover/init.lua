@@ -1714,3 +1714,12 @@ local t: A<string, number> {
     y: number,
 }
 ]]
+
+TEST [[
+---@return nil
+local function <?f?>() end
+]]
+[[
+function f()
+  -> nil
+]]

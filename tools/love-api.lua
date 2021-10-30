@@ -129,17 +129,18 @@ local function buildFunction(func, node)
     end
     local params = {}
     for _, param in ipairs(func.variants[1].arguments or {}) do
-        for paramName in param.name:gmatch '[%a_][%w_]+' do
+        for paramName in param.name:gmatch '[%a_][%w_]*' do
             params[#params+1] = paramName
-            text[#text+1] = ('---@param %s %s # %s'):format(
+            text[#text+1] = ('---@param %s%s %s # %s'):format(
                 paramName,
+                param.default == nil and '' or '?',
                 buildType(param),
                 param.description
             )
         end
     end
     for _, rtn in ipairs(func.variants[1].returns or {}) do
-        for returnName in rtn.name:gmatch '[%a_][%w_]+' do
+        for returnName in rtn.name:gmatch '[%a_][%w_]*' do
             text[#text+1] = ('---@return %s %s # %s'):format(
                 buildType(rtn),
                 returnName,

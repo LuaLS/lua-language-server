@@ -12,7 +12,7 @@ love.font = {}
 ---@overload fun(fileName: string, glyphs: string, dpiscale: number):love.Rasterizer
 ---@param imageData love.ImageData # The image data containing the drawable pictures of font glyphs.
 ---@param glyphs string # The sequence of glyphs in the ImageData.
----@param dpiscale number # DPI scale.
+---@param dpiscale? number # DPI scale.
 ---@return love.Rasterizer rasterizer # The rasterizer.
 function love.font.newBMFontRasterizer(imageData, glyphs, dpiscale) end
 
@@ -28,8 +28,8 @@ function love.font.newGlyphData(rasterizer, glyph) end
 ---
 ---@param imageData love.ImageData # Font image data.
 ---@param glyphs string # String containing font glyphs.
----@param extraSpacing number # Font extra spacing.
----@param dpiscale number # Font DPI scale.
+---@param extraSpacing? number # Font extra spacing.
+---@param dpiscale? number # Font DPI scale.
 ---@return love.Rasterizer rasterizer # The rasterizer.
 function love.font.newImageRasterizer(imageData, glyphs, extraSpacing, dpiscale) end
 
@@ -51,9 +51,9 @@ function love.font.newRasterizer(filename) end
 ---
 ---@overload fun(fileName: string, size: number, hinting: love.HintingMode, dpiscale: number):love.Rasterizer
 ---@overload fun(fileData: love.FileData, size: number, hinting: love.HintingMode, dpiscale: number):love.Rasterizer
----@param size number # The font size.
----@param hinting love.HintingMode # True Type hinting mode.
----@param dpiscale number # The font DPI scale.
+---@param size? number # The font size.
+---@param hinting? love.HintingMode # True Type hinting mode.
+---@param dpiscale? number # The font DPI scale.
 ---@return love.Rasterizer rasterizer # The rasterizer.
 function love.font.newTrueTypeRasterizer(size, hinting, dpiscale) end
 
@@ -79,6 +79,8 @@ function GlyphData:getBearing() end
 ---
 ---Gets glyph bounding box.
 ---
+---@return number x # Glyph position x.
+---@return number y # Glyph position y.
 ---@return number width # Glyph width.
 ---@return number height # Glyph height.
 function GlyphData:getBoundingBox() end

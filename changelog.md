@@ -1,10 +1,25 @@
 # changelog
 
+## 2.5.0
+* `NEW` setting `Lua.runtime.pathStrict`
+* `NEW` skip huge files (>= 100 MB)
+* `CHG` no longer asks to trust plugin in VSCode, because VSCode already provides the workspace trust feature
+
+## 2.4.7
+`2021-10-27`
+* `FIX` [#762](https://github.com/sumneko/lua-language-server/issues/762)
+
 ## 2.4.6
+`2021-10-26`
+* `NEW` diagnostic: `redundant-return`
 * `FIX` [#744](https://github.com/sumneko/lua-language-server/issues/744)
 * `FIX` [#748](https://github.com/sumneko/lua-language-server/issues/748)
 * `FIX` [#749](https://github.com/sumneko/lua-language-server/issues/749)
 * `FIX` [#752](https://github.com/sumneko/lua-language-server/issues/752)
+* `FIX` [#753](https://github.com/sumneko/lua-language-server/issues/753)
+* `FIX` [#756](https://github.com/sumneko/lua-language-server/issues/756)
+* `FIX` [#758](https://github.com/sumneko/lua-language-server/issues/758)
+* `FIX` [#760](https://github.com/sumneko/lua-language-server/issues/760)
 
 ## 2.4.5
 `2021-10-18`

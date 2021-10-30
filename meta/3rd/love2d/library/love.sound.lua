@@ -11,7 +11,7 @@ love.sound = {}
 ---
 ---@overload fun(filename: string, buffer: number):love.Decoder
 ---@param file love.File # The file with encoded sound data.
----@param buffer number # The size of each decoded chunk, in bytes.
+---@param buffer? number # The size of each decoded chunk, in bytes.
 ---@return love.Decoder decoder # A new Decoder object.
 function love.sound.newDecoder(file, buffer) end
 
@@ -95,8 +95,9 @@ function SoundData:getDuration() end
 ---Gets the value of the sample-point at the specified position. For stereo SoundData objects, the data from the left and right channels are interleaved in that order.
 ---
 ---@overload fun(i: number, channel: number):number
+---@param i number # An integer value specifying the position of the sample (starting at 0).
 ---@return number sample # The normalized samplepoint (range -1.0 to 1.0).
-function SoundData:getSample() end
+function SoundData:getSample(i) end
 
 ---
 ---Returns the number of samples per channel of the SoundData.
@@ -114,5 +115,6 @@ function SoundData:getSampleRate() end
 ---Sets the value of the sample-point at the specified position. For stereo SoundData objects, the data from the left and right channels are interleaved in that order.
 ---
 ---@overload fun(i: number, channel: number, sample: number)
+---@param i number # An integer value specifying the position of the sample (starting at 0).
 ---@param sample number # The normalized samplepoint (range -1.0 to 1.0).
-function SoundData:setSample(sample) end
+function SoundData:setSample(i, sample) end

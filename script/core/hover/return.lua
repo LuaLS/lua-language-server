@@ -54,6 +54,13 @@ local function asFunction(source)
             line[#line+1] = ('% 3d. '):format(i)
         end
         for n = 1, #rtn do
+            if rtn[n].type == 'doc.type' then
+                for _, typeUnit in ipairs(rtn[n].types) do
+                    if typeUnit[1] == 'nil' then
+                        infers['nil'] = true
+                    end
+                end
+            end
             local values = infer.searchInfers(rtn[n])
             for tp in pairs(values) do
                 infers[tp] = true

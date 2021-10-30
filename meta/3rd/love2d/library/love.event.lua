@@ -14,6 +14,7 @@ function love.event.clear() end
 ---
 ---Returns an iterator for messages in the event queue.
 ---
+---@return function i # Iterator function usable in a for loop.
 function love.event.poll() end
 
 ---
@@ -32,7 +33,14 @@ function love.event.pump() end
 ---
 ---From 0.10.0 onwards, you may pass an arbitrary amount of arguments with this function, though the default callbacks don't ever use more than six.
 ---
-function love.event.push() end
+---@param n love.Event # The name of the event.
+---@param a? any # First event argument.
+---@param b? any # Second event argument.
+---@param c? any # Third event argument.
+---@param d? any # Fourth event argument.
+---@param e? any # Fifth event argument.
+---@param f? any # Sixth event argument.
+function love.event.push(n, a, b, c, d, e, f) end
 
 ---
 ---Adds the quit event to the queue.
@@ -40,12 +48,19 @@ function love.event.push() end
 ---The quit event is a signal for the event handler to close LÖVE. It's possible to abort the exit process with the love.quit callback.
 ---
 ---@overload fun(restart: string|"'restart'")
----@param exitstatus number # The program exit status to use when closing the application.
+---@param exitstatus? number # The program exit status to use when closing the application.
 function love.event.quit(exitstatus) end
 
 ---
 ---Like love.event.poll(), but blocks until there is an event in the queue.
 ---
+---@return love.Event n # The name of event.
+---@return any a # First event argument.
+---@return any b # Second event argument.
+---@return any c # Third event argument.
+---@return any d # Fourth event argument.
+---@return any e # Fifth event argument.
+---@return any f # Sixth event argument.
 function love.event.wait() end
 
 ---

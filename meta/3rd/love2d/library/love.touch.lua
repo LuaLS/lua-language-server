@@ -10,6 +10,8 @@ love.touch = {}
 ---Gets the current position of the specified touch-press, in pixels.
 ---
 ---@param id lightuserdata # The identifier of the touch-press. Use love.touch.getTouches, love.touchpressed, or love.touchmoved to obtain touch id values.
+---@return number x # The position along the x-axis of the touch-press inside the window, in pixels.
+---@return number y # The position along the y-axis of the touch-press inside the window, in pixels.
 function love.touch.getPosition(id) end
 
 ---

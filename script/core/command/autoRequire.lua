@@ -135,7 +135,7 @@ return function (data)
     end
 
     local path = furi.decode(target)
-    local visiblePaths = rpath.getVisiblePath(path, config.get 'Lua.runtime.path')
+    local visiblePaths = rpath.getVisiblePath(path)
     if not visiblePaths or #visiblePaths == 0 then
         return
     end

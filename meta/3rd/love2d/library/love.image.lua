@@ -92,7 +92,7 @@ local ImageData = {}
 ---@overload fun(outFile: string)
 ---@overload fun(outFile: string, format: love.ImageFormat)
 ---@param format love.ImageFormat # The format to encode the image as.
----@param filename string # The filename to write the file to. If nil, no file will be written but the FileData will still be returned.
+---@param filename? string # The filename to write the file to. If nil, no file will be written but the FileData will still be returned.
 ---@return love.FileData filedata # The encoded image as a new FileData object.
 function ImageData:encode(format, filename) end
 
@@ -116,7 +116,13 @@ function ImageData:getHeight() end
 ---
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
 ---
-function ImageData:getPixel() end
+---@param x number # The position of the pixel on the x-axis.
+---@param y number # The position of the pixel on the y-axis.
+---@return number r # The red component (0-1).
+---@return number g # The green component (0-1).
+---@return number b # The blue component (0-1).
+---@return number a # The alpha component (0-1).
+function ImageData:getPixel(x, y) end
 
 ---
 ---Gets the width of the ImageData in pixels.
@@ -146,9 +152,11 @@ function ImageData:getWidth() end
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
 ---
 ---@param pixelFunction function # Function to apply to every pixel.
----@param width number # The width of the area within the ImageData to apply the function to.
----@param height number # The height of the area within the ImageData to apply the function to.
-function ImageData:mapPixel(pixelFunction, width, height) end
+---@param x? number # The x-axis of the top-left corner of the area within the ImageData to apply the function to.
+---@param y? number # The y-axis of the top-left corner of the area within the ImageData to apply the function to.
+---@param width? number # The width of the area within the ImageData to apply the function to.
+---@param height? number # The height of the area within the ImageData to apply the function to.
+function ImageData:mapPixel(pixelFunction, x, y, width, height) end
 
 ---
 ---Paste into ImageData from another source ImageData.
@@ -169,7 +177,13 @@ function ImageData:paste(source, dx, dy, sx, sy, sw, sh) end
 ---
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
 ---
-function ImageData:setPixel() end
+---@param x number # The position of the pixel on the x-axis.
+---@param y number # The position of the pixel on the y-axis.
+---@param r number # The red component (0-1).
+---@param g number # The green component (0-1).
+---@param b number # The blue component (0-1).
+---@param a number # The alpha component (0-1).
+function ImageData:setPixel(x, y, r, g, b, a) end
 
 ---
 ---Compressed image data formats. Here and here are a couple overviews of many of the formats.

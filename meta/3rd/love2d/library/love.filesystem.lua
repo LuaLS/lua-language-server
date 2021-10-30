@@ -12,7 +12,7 @@ love.filesystem = {}
 ---@overload fun(name: string, data: love.Data, size: number):boolean, string
 ---@param name string # The name (and path) of the file.
 ---@param data string # The string data to append to the file.
----@param size number # How many bytes to write.
+---@param size? number # How many bytes to write.
 ---@return boolean success # True if the operation was successful, or nil if there was an error.
 ---@return string errormsg # The error message on failure.
 function love.filesystem.append(name, data, size) end
@@ -72,7 +72,7 @@ function love.filesystem.getIdentity() end
 ---@overload fun(path: string, info: table):table
 ---@overload fun(path: string, filtertype: love.FileType, info: table):table
 ---@param path string # The file or directory path to check.
----@param filtertype love.FileType # If supplied, this parameter causes getInfo to only return the info table if the item at the given path matches the specified file type.
+---@param filtertype? love.FileType # If supplied, this parameter causes getInfo to only return the info table if the item at the given path matches the specified file type.
 ---@return {type: love.FileType, size: number, modtime: number} info # A table containing information about the specified path, or nil if nothing exists at the path. The table contains the following fields:
 function love.filesystem.getInfo(path, filtertype) end
 
@@ -171,7 +171,7 @@ function love.filesystem.load(name) end
 ---@overload fun(data: love.Data, archivename: string, mountpoint: string, appendToPath: boolean):boolean
 ---@param archive string # The folder or zip file in the game's save directory to mount.
 ---@param mountpoint string # The new path the archive will be mounted to.
----@param appendToPath boolean # Whether the archive will be searched when reading a filepath before or after already-mounted archives. This includes the game's source and save directories.
+---@param appendToPath? boolean # Whether the archive will be searched when reading a filepath before or after already-mounted archives. This includes the game's source and save directories.
 ---@return boolean success # True if the archive was successfully mounted, false otherwise.
 function love.filesystem.mount(archive, mountpoint, appendToPath) end
 
@@ -199,7 +199,7 @@ function love.filesystem.newFileData(contents, name) end
 ---
 ---@overload fun(container: love.ContainerType, name: string, size: number):love.FileData|string, number, nil, string
 ---@param name string # The name (and path) of the file.
----@param size number # How many bytes to read.
+---@param size? number # How many bytes to read.
 ---@return string contents # The file contents.
 ---@return number size # How many bytes have been read.
 ---@return nil contents # returns nil as content.
@@ -267,7 +267,7 @@ function love.filesystem.unmount(archive) end
 ---@overload fun(name: string, data: love.Data, size: number):boolean, string
 ---@param name string # The name (and path) of the file.
 ---@param data string # The string data to write to the file.
----@param size number # How many bytes to write.
+---@param size? number # How many bytes to write.
 ---@return boolean success # If the operation was successful.
 ---@return string message # Error message if operation was unsuccessful.
 function love.filesystem.write(name, data, size) end
@@ -354,7 +354,7 @@ function File:open(mode) end
 ---Read a number of bytes from a file.
 ---
 ---@overload fun(container: love.ContainerType, bytes: number):love.FileData|string, number
----@param bytes number # The number of bytes to read.
+---@param bytes? number # The number of bytes to read.
 ---@return string contents # The contents of the read bytes.
 ---@return number size # How many bytes have been read.
 function File:read(bytes) end
@@ -372,7 +372,7 @@ function File:seek(pos) end
 ---File:flush will force any buffered data to be written to the disk.
 ---
 ---@param mode love.BufferMode # The buffer mode to use.
----@param size number # The maximum size in bytes of the file's buffer.
+---@param size? number # The maximum size in bytes of the file's buffer.
 ---@return boolean success # Whether the buffer mode was successfully set.
 ---@return string errorstr # The error string, if the buffer mode could not be set and an error occurred.
 function File:setBuffer(mode, size) end
@@ -388,7 +388,7 @@ function File:tell() end
 ---
 ---@overload fun(data: love.Data, size: number):boolean, string
 ---@param data string # The string data to write.
----@param size number # How many bytes to write.
+---@param size? number # How many bytes to write.
 ---@return boolean success # Whether the operation was successful.
 ---@return string err # The error string if an error occurred.
 function File:write(data, size) end

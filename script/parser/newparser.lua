@@ -1639,6 +1639,30 @@ local function parseTable()
     return tbl
 end
 
+local function addDummySelf(node, call)
+    if node.type ~= 'getmethod' then
+        return
+    end
+    -- dummy param `self`
+    if not call.args then
+        call.args = {
+            type   = 'callargs',
+            start  = call.start,
+            finish = call.finish,
+            parent = call,
+        }
+    end
+    local newNode = {}
+    for k, v in next, call.node.node do
+        newNode[k] = v
+    end
+    newNode.mirror = call.node.node
+    newNode.dummy  = true
+    newNode.parent = call.args
+    call.node.node.mirror = newNode
+    tinsert(call.args, 1, newNode)
+end
+
 local function parseSimple(node, funcName)
     local lastMethod
     while true do
@@ -1740,26 +1764,7 @@ local function parseSimple(node, funcName)
                 args.parent = call
                 call.args   = args
             end
-            if node.type == 'getmethod' then
-                -- dummy param `self`
-                if not call.args then
-                    call.args = {
-                        type   = 'callargs',
-                        start  = call.start,
-                        finish = call.finish,
-                        parent = call,
-                    }
-                end
-                local newNode = {}
-                for k, v in next, call.node.node do
-                    newNode[k] = v
-                end
-                newNode.mirror = call.node.node
-                newNode.dummy  = true
-                newNode.parent = call.args
-                call.node.node.mirror = newNode
-                tinsert(call.args, 1, newNode)
-            end
+            addDummySelf(node, call)
             node.parent = call
             node = call
         elseif token == '{' then
@@ -1781,6 +1786,7 @@ local function parseSimple(node, funcName)
                 [1]    = tbl,
             }
             call.args   = args
+            addDummySelf(node, call)
             tbl.parent  = args
             node.parent = call
             node        = call
@@ -1803,6 +1809,7 @@ local function parseSimple(node, funcName)
                 [1]    = str,
             }
             call.args   = args
+            addDummySelf(node, call)
             str.parent  = args
             node.parent = call
             node        = call
@@ -1826,6 +1833,7 @@ local function parseSimple(node, funcName)
                     [1]    = str,
                 }
                 call.args   = args
+                addDummySelf(node, call)
                 str.parent  = args
                 node.parent = call
                 node        = call

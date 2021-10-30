@@ -87,7 +87,7 @@ function TEST(data)
     local pos
     for _, info in ipairs(data) do
         local uri = furi.encode(info.path)
-        local script = info.content
+        local script = info.content or ''
         if info.main then
             local newScript, catched = catch(script, '?')
             pos = catched['?'][1][1]
@@ -108,9 +108,11 @@ function TEST(data)
     result.enableCommon = nil
     removeMetas(result)
     for _, item in ipairs(result) do
-        local r = core.resolve(item.id)
-        for k, v in pairs(r or {}) do
-            item[k] = v
+        if item.id then
+            local r = core.resolve(item.id)
+            for k, v in pairs(r or {}) do
+                item[k] = v
+            end
         end
         for k in pairs(item) do
             if not Cared[k] then
@@ -563,7 +565,113 @@ TEST {
         ]],
         main = true,
     },
+    completion = nil,
 }
+
+TEST {
+    { path = 'f/a.lua' },
+    { path = 'f/b.lua' },
+    {
+        path = 'c.lua',
+        content = [[
+            require '<??>'
+        ]],
+        main = true,
+    },
+    completion = {
+        {
+            label = 'a',
+            kind = CompletionItemKind.Reference,
+            textEdit = EXISTS,
+        },
+        {
+            label = 'b',
+            kind = CompletionItemKind.Reference,
+            textEdit = EXISTS,
+        },
+        {
+            label = 'f.a',
+            kind = CompletionItemKind.Reference,
+            textEdit = EXISTS,
+        },
+        {
+            label = 'f.b',
+            kind = CompletionItemKind.Reference,
+            textEdit = EXISTS,
+        },
+    }
+}
+
+TEST {
+    { path = 'f/a.lua' },
+    { path = 'f/b.lua' },
+    {
+        path = 'c.lua',
+        content = [[
+            require 'a<??>'
+        ]],
+        main = true,
+    },
+    completion = {
+        {
+            label = 'a',
+            kind = CompletionItemKind.Reference,
+            textEdit = EXISTS,
+        },
+        {
+            label = 'f.a',
+            kind = CompletionItemKind.Reference,
+            textEdit = EXISTS,
+        },
+    }
+}
+
+config.set('Lua.runtime.pathStrict', true)
+
+TEST {
+    { path = 'f/a.lua' },
+    { path = 'f/b.lua' },
+    {
+        path = 'c.lua',
+        content = [[
+            require '<??>'
+        ]],
+        main = true,
+    },
+    completion = {
+        {
+            label = 'f.a',
+            kind = CompletionItemKind.Reference,
+            textEdit = EXISTS,
+        },
+        {
+            label = 'f.b',
+            kind = CompletionItemKind.Reference,
+            textEdit = EXISTS,
+        },
+    }
+}
+
+TEST {
+    { path = 'f/a.lua' },
+    { path = 'f/b.lua' },
+    {
+        path = 'c.lua',
+        content = [[
+            require 'a<??>'
+        ]],
+        main = true,
+    },
+    completion = {
+        {
+            label = 'f.a',
+            kind = CompletionItemKind.Reference,
+            textEdit = EXISTS,
+        },
+    }
+}
+
+config.set('Lua.runtime.pathStrict', false)
 
 TEST {
     {

@@ -216,7 +216,6 @@ local function searchLiteralOfValue(value, literals, mark)
             end
         end
     end
-    return
 end
 
 local function bindClassOrType(source)

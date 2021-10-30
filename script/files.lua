@@ -120,8 +120,13 @@ end
 --- 设置文件文本
 ---@param uri uri
 ---@param text string
-function m.setText(uri, text, isTrust, instance)
+function m.setText(uri, text, isTrust)
     if not text then
+        return
+    end
+    if #text > 1024 * 1024 * 100 then
+        local client = require 'client'
+        client.showMessage('Warning', lang.script('WORKSPACE_SKIP_HUGE_FILE', uri))
         return
     end
     --log.debug('setText', uri)

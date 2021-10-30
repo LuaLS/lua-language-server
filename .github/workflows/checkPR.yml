@@ -1,0 +1,16 @@
+name: checkPR
+on: pull_request
+jobs:
+  compile:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-18.04, macos-latest]
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        submodules : recursive
+    - uses: actboy168/setup-luamake@master
+    - run: luamake

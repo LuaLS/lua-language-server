@@ -346,29 +346,29 @@ osdate.yday                 = 'Dia do ano, 1–366'
 osdate.isdst                = 'Bandeira para indicar horário de verão (i.e., `Daylight Saving Time`), um valor booleano.'
 
 package                     = ''
-require['<5.3']             = 'Loads the given module, returns any value returned by the given module(`true` when `nil`).'
-require['>5.4']             = 'Loads the given module, returns any value returned by the searcher(`true` when `nil`). Besides that value, also returns as a second result the loader data returned by the searcher, which indicates how `require` found the module. (For instance, if the module came from a file, this loader data is the file path.)'
-package.config              = 'A string describing some compile-time configurations for packages.'
-package.cpath               = 'The path used by `require` to search for a C loader.'
-package.loaded              = 'A table used by `require` to control which modules are already loaded.'
-package.loaders             = 'A table used by `require` to control how to load modules.'
-package.loadlib             = 'Dynamically links the host program with the C library `libname`.'
-package.path                = 'The path used by `require` to search for a Lua loader.'
-package.preload             = 'A table to store loaders for specific modules.'
-package.searchers           = 'A table used by `require` to control how to load modules.'
-package.searchpath          = 'Searches for the given `name` in the given `path`.'
-package.seeall              = 'Sets a metatable for `module` with its `__index` field referring to the global environment, so that this module inherits values from the global environment. To be used as an option to function `module` .'
+require['<5.3']             = 'Carrega o módulo fornecido e retorna qualquer valor retornado pelo módulo (`true` quando `nil`).'
+require['>5.4']             = 'Carrega o módulo fornecido e retorna qualquer valor retornado pelo pesquisador (`true` quando `nil`). Além desse valor, também retorna como segundo resultado um carregador de dados retornados pelo pesquisador, o que indica como `require` encontrou o módulo. (Por exemplo, se o módulo vier de um arquivo, este carregador de dados é o caminho do arquivo.)'
+package.config              = 'Uma string descrevendo configurações a serem utilizadas durante a compilação de pacotes.'
+package.cpath               = 'O caminho usado pelo `require` para procurar pelo carregador C.'
+package.loaded              = 'Uma tabela usada pelo `require` para controlar quais módulos já estão carregados.'
+package.loaders             = 'Uma tabela usada pelo `require` para controlar como carregar módulos.'
+package.loadlib             = 'Dinamicamente vincula o programa no `host` com a biblioteca C `libname`.'
+package.path                = 'O caminho usado pelo `require` para procurar por um carregador Lua.'
+package.preload             = 'Uma tabela para armazenar carregadores de módulos específicos.'
+package.searchers           = 'Uma tabela usada pelo `require` para controlar como buscar módulos.'
+package.searchpath          = 'Procura por `name` em `path`.'
+package.seeall              = 'Define uma `metatable` `module` com o campo `__index` referenciando o ambiente global, para que este módulo herde valores do ambiente global. Para ser usado como uma opção a função `module`.'
 
 string                      = ''
-string.byte                 = 'Returns the internal numeric codes of the characters `s[i], s[i+1], ..., s[j]`.'
-string.char                 = 'Returns a string with length equal to the number of arguments, in which each character has the internal numeric code equal to its corresponding argument.'
-string.dump                 = 'Returns a string containing a binary representation (a *binary chunk*) of the given function.'
-string.find                 = 'Looks for the first match of `pattern` (see §6.4.1) in the string.'
-string.format               = 'Returns a formatted version of its variable number of arguments following the description given in its first argument.'
+string.byte                 = 'Retorna os códigos numéricos internos dos caracteres `s[i], s[i+1], ..., s[j]`.'
+string.char                 = 'Retorna uma string com comprimento igual ao número de argumentos, no qual cada caractere possui o código numérico interno igual ao seu argumento correspondente.'
+string.dump                 = 'Retorna uma string contendo uma representação binária (i.e., *binary chunk*) da função dada.'
+string.find                 = 'Procura a primeira correspondencia de `pattern` (veja §6.4.1) na string.'
+string.format               = 'Retorna uma versão formatada de seu número variável de argumentos após a descrição dada em seu primeiro argumento.'
 string.gmatch               = [[
-Returns an iterator function that, each time it is called, returns the next captures from `pattern` (see §6.4.1) over the string s. 
+Retorna um iterator que, a cada vez que é chamado, retorna as próximas capturas de `pattern` (veja §6.4.1) sobre a string *s*.
 
-As an example, the following loop will iterate over all the words from string s, printing one per line:
+Por exemplo, o loop a seguir irá iterar em todas as palavras da string *s*, imprimindo cada palavra por linha:
 ```lua
     s = "hello world from Lua"
     for w in string.gmatch(s, "%a+") do
@@ -376,53 +376,54 @@ As an example, the following loop will iterate over all the words from string s,
     end
 ```
 ]]
-string.gsub                 = 'Returns a copy of s in which all (or the first `n`, if given) occurrences of the `pattern` (see §6.4.1) have been replaced by a replacement string specified by `repl`.'
-string.len                  = 'Returns its length.'
-string.lower                = 'Returns a copy of this string with all uppercase letters changed to lowercase.'
-string.match                = 'Looks for the first match of `pattern` (see §6.4.1) in the string.'
-string.pack                 = 'Returns a binary string containing the values `v1`, `v2`, etc. packed (that is, serialized in binary form) according to the format string `fmt` (see §6.4.2) .'
-string.packsize             = 'Returns the size of a string resulting from `string.pack` with the given format string `fmt` (see §6.4.2) .'
-string.rep['>5.2']          = 'Returns a string that is the concatenation of `n` copies of the string `s` separated by the string `sep`.'
-string.rep['<5.1']          = 'Returns a string that is the concatenation of `n` copies of the string `s` .'
-string.reverse              = 'Returns a string that is the string `s` reversed.'
-string.sub                  = 'Returns the substring of the string that starts at `i` and continues until `j`.'
-string.unpack               = 'Returns the values packed in string according to the format string `fmt` (see §6.4.2) .'
-string.upper                = 'Returns a copy of this string with all lowercase letters changed to uppercase.'
+string.gsub                 = 'Retorna uma cópia da *s* em que todas, ou as primeiras `n`, caso fornecido, ocorrências de `pattern` (veja §6.4.1) que tiverem sido substituídas por uma string de substituição especificada por `repl`.'
+string.len                  = 'Retorna o comprimento.'
+string.lower                = 'Retorna uma cópia desta string com todas as letras maiúsculas alteradas para minúsculas.'
+string.match                = 'Procura a primeira ocorrência do `pattern` (veja §6.4.1) na string.'
+string.pack                 = 'Retorna uma string binária contendo os valores `V1`, `v2`, etc. empacotados (isto é, serializado de forma binário) de acordo com o formato da string `fmt` fornecida (veja §6.4.2).'
+string.packsize             = 'Retorna o tamanho de uma string resultante de `string.pack` com o formato da string `fmt` fornecida (veja §6.4.2).'
+string.rep['>5.2']          = 'Retorna uma string que é a concatenação de `n` cópias da string `s` separadas pela string `sep`.'
+string.rep['<5.1']          = 'Retorna uma string que é a concatenação de `n` cópias da string `s`.'
+string.reverse              = 'Retorna uma string que representa a string `s` invertida.'
+string.sub                  = 'Retorna a substring da string `s` que começa no índice `i` e continua até o índice `j`.'
+string.unpack               = 'Retorna os valores empacotados na string de acordo com o formato da string `fmt` fornecida (veja §6.4.2).'
+string.upper                = 'Retorna uma cópia desta string com todas as letras minúsculas alteradas para maiúsculas.'
 
 table                       = ''
-table.concat                = 'Given a list where all elements are strings or numbers, returns the string `list[i]..sep..list[i+1] ··· sep..list[j]`.'
-table.insert                = 'Inserts element `value` at position `pos` in `list`.'
-table.maxn                  = 'Returns the largest positive numerical index of the given table, or zero if the table has no positive numerical indices.'
+table.concat                = 'Dada uma lista onde todos os elementos são strings ou números, retorna a string `list[i]..sep..list[i+1] ··· sep..list[j]`.'
+table.insert                = 'Insere o elemento `value` na posição `pos` de `list`.'
+table.maxn                  = 'Retorna o maior índice numérico positivo da tabela fornecida ou zero se a tabela não tiver índices numéricos positivos.'
 table.move                  = [[
-Moves elements from table `a1` to table `a2`.
+Move os elementos da tabela `a1` para tabela `a2`.
 ```lua
 a2[t],··· = a1[f],···,a1[e]
 return a2
 ```
 ]]
-table.pack                  = 'Returns a new table with all arguments stored into keys `1`, `2`, etc. and with a field `"n"` with the total number of arguments.'
-table.remove                = 'Removes from `list` the element at position `pos`, returning the value of the removed element.'
-table.sort                  = 'Sorts list elements in a given order, *in-place*, from `list[1]` to `list[#list]`.'
+table.pack                  = 'Retorna uma nova tabela com todos os argumentos armazenados em chaves `1`, `2`, etc. e com um campo `"n"` com o número total de argumentos.'
+table.remove                = 'Remove de `list` o elemento na posição `pos`, retornando o valor do elemento removido.'
+table.sort                  = 'Ordena os elementos de `list` em uma determinada ordem, *in-place*, de `list[1]` para `list[#list]`.'
 table.unpack                = [[
-Returns the elements from the given list. This function is equivalent to
+Retorna os elementos da lista fornecida. Esta função é equivalente a
 ```lua
     return list[i], list[i+1], ···, list[j]
 ```
-By default, `i` is `1` and `j` is `#list`.
+Por padrão, `i` é `1` e `j` é `#list`.
 ]]
 
 utf8                        = ''
-utf8.char                   = 'Receives zero or more integers, converts each one to its corresponding UTF-8 byte sequence and returns a string with the concatenation of all these sequences.'
-utf8.charpattern            = 'The pattern which matches exactly one UTF-8 byte sequence, assuming that the subject is a valid UTF-8 string.'
+utf8.char                   = 'Recebe zero ou mais inteiros, converte cada um à sua sequência de byte UTF-8 correspondente e retorna uma string com a concatenação de todas essas sequências.'
+utf8.charpattern            = 'O padrão que corresponde exatamente uma sequência de byte UTF-8, supondo que seja uma sequência válida UTF-8.'
 utf8.codes                  = [[
-Returns values so that the construction
+Retorna valores tal que a seguinte construção
 ```lua
 for p, c in utf8.codes(s) do
     body
 end
 ```
-will iterate over all UTF-8 characters in string s, with p being the position (in bytes) and c the code point of each character. It raises an error if it meets any invalid byte sequence.
+itere em todos os caracteres UTF-8 na string s, com p sendo a posição (em bytes) e c o *codepoint* de cada caractere. Ele gera um erro se encontrado qualquer sequência de byte inválida.
 ]]
-utf8.codepoint              = 'Returns the codepoints (as integers) from all characters in `s` that start between byte position `i` and `j` (both included).'
-utf8.len                    = 'Returns the number of UTF-8 characters in string `s` that start between positions `i` and `j` (both inclusive).'
+utf8.codepoint              = 'Retorna os *codepoints* (em inteiros) de todos os caracteres em `s` que iniciam entre as posições do byte `i` e `j` (ambos inclusos).'
+utf8.len                    = 'Retorna o número de caracteres UTF-8 na string `s` que começa entre as posições `i` e `j` (ambos inclusos).'
 utf8.offset                 = 'Returns the position (in bytes) where the encoding of the `n`-th character of `s` (counting from position `i`) starts.'
+utf8.offset                 = 'Retorna a posição (em bytes) onde a codificação do `n`-ésimo caractere de `s` inícia (contando a partir da posição `i`).'

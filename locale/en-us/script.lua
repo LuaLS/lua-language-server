@@ -54,7 +54,7 @@ DIAG_UNDEFINED_DOC_NAME               = 'Undefined type or alias `{}`.'
 DIAG_UNDEFINED_DOC_PARAM              = 'Undefined param `{}`.'
 DIAG_UNKNOWN_DIAG_CODE                = 'Unknown diagnostic code `{}`.'
 
-MWS_NOT_SUPPORT         = '{} dose not support multi workspace for now, I may need to restart to support the new workspace ...'
+MWS_NOT_SUPPORT         = '{} does not support multi workspace for now, I may need to restart to support the new workspace ...'
 MWS_RESTART             = 'Restart'
 MWS_NOT_COMPLETE        = 'Workspace is not complete yet. You may try again later...'
 MWS_COMPLETE            = 'Workspace is complete now. You may try again...'

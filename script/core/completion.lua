@@ -20,6 +20,7 @@ local lookBackward = require 'core.look-backward'
 local guide        = require 'parser.guide'
 local infer        = require 'core.infer'
 local noder        = require 'core.noder'
+local await        = require 'await'
 
 local DiagnosticModes = {
     'disable-next-line',
@@ -571,6 +572,7 @@ local function checkFieldOfRefs(refs, state, word, startPos, position, parent, o
     for name, src in util.sortPairs(fields) do
         if src then
             checkFieldThen(name, src, word, startPos, position, parent, oop, results)
+            await.delay()
         end
     end
 end
@@ -2065,12 +2067,14 @@ local function completion(uri, position, triggerCharacter)
     if results then
         return results
     end
+    await.delay()
     tracy.ZoneBeginN 'completion #1'
     local state = files.getState(uri)
     local text = files.getText(uri)
     results = {}
     clearStack()
     tracy.ZoneEnd()
+    await.delay()
     tracy.ZoneBeginN 'completion #2'
     if state then
         if getComment(state, position) then

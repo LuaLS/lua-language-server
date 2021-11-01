@@ -146,6 +146,7 @@ function m.doMethod(proto)
             end
         end
         ok, res = xpcall(abil, log.error, proto.params)
+        await.delay()
     end)
 end
 

@@ -32,6 +32,9 @@ end
 
 ---@param names string
 local function getTypeName(names)
+    if names == '*' then
+        return 'any'
+    end
     local types = {}
     names = names:gsub('%sor%s', '|')
     for name in names:gmatch '[^|]+' do
@@ -64,7 +67,7 @@ function buildType(param)
     if param.table then
         return buildDocTable(param.table)
     end
-    if param.type and param.type ~= '*' then
+    if param.type then
         return getTypeName(param.type)
     end
     return 'any'
@@ -186,12 +189,6 @@ local function buildFile(defs)
         end
     end
 
-    for _, cb in ipairs(defs.callbacks or {}) do
-        text[#text+1] = ''
-        text[#text+1] = buildDescription(cb.description)
-        text[#text+1] = ('---@alias %s %s'):format(getTypeName(cb.name), buildMultiDocFunc(cb))
-    end
-
     for _, enum in ipairs(defs.enums or {}) do
         text[#text+1] = ''
         text[#text+1] = buildDescription(enum.description)
@@ -211,6 +208,26 @@ local function buildFile(defs)
 
     fsu.saveFile(filePath, table.concat(text, '\n'))
 end
+
+local function buildCallback(defs)
+    local filePath = libraryPath / ('callback.lua')
+    local text = {}
+
+    text[#text+1] = '---@meta'
+
+    for _, cb in ipairs(defs.callbacks or {}) do
+        text[#text+1] = ''
+        text[#text+1] = buildDescription(cb.description)
+        text[#text+1] = ('---@type %s'):format(buildMultiDocFunc(cb))
+        text[#text+1] = ('%s = nil'):format(cb.key)
+    end
+
+    text[#text+1] = ''
+
+    fsu.saveFile(filePath, table.concat(text, '\n'))
+end
+
+buildCallback(api)
 
 for _, module in ipairs(api.modules) do
     buildFile(module)

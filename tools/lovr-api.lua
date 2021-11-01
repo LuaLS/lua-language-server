@@ -117,7 +117,7 @@ local function buildMultiDocFunc(tp)
     return table.concat(cbs, '|')
 end
 
-local function buildFunction(func, node)
+local function buildFunction(func)
     local text = {}
     text[#text+1] = buildDescription(func.description)
     for i = 2, #func.variants do
@@ -145,15 +145,15 @@ local function buildFunction(func, node)
             )
         end
     end
-    text[#text+1] = ('function %s%s(%s) end'):format(
-        node,
-        func.name,
+    text[#text+1] = ('function %s(%s) end'):format(
+        func.key,
         table.concat(params, ', ')
     )
     return table.concat(text, '\n')
 end
 
-local function buildFile(class, defs)
+local function buildFile(defs)
+    local class = defs.key
     local filePath = libraryPath / (class .. '.lua')
     local text = {}
 
@@ -165,22 +165,7 @@ local function buildFile(class, defs)
 
     for _, func in ipairs(defs.functions or {}) do
         text[#text+1] = ''
-        text[#text+1] = buildFunction(func, class .. '.')
-    end
-
-    for _, tp in ipairs(defs.types or {}) do
-        local mark = {}
-        text[#text+1] = ''
-        text[#text+1] = buildDescription(tp.description)
-        text[#text+1] = ('---@class %s%s'):format(getTypeName(tp.name), buildSuper(tp))
-        text[#text+1] = ('local %s = {}'):format(tp.name)
-        for _, func in ipairs(tp.functions or {}) do
-            if not mark[func.name] then
-                mark[func.name] = true
-                text[#text+1] = ''
-                text[#text+1] = buildFunction(func, tp.name .. ':')
-            end
-        end
+        text[#text+1] = buildFunction(func)
     end
 
     for _, cb in ipairs(defs.callbacks or {}) do
@@ -209,8 +194,6 @@ local function buildFile(class, defs)
     fsu.saveFile(filePath, table.concat(text, '\n'))
 end
 
-buildFile('lovr', api)
-
 for _, module in ipairs(api.modules) do
-    buildFile('lovr.' .. module.name, module)
+    buildFile(module)
 end

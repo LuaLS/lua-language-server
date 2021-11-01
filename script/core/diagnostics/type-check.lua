@@ -118,14 +118,16 @@ end
 
 local function addFatherClass(infers)
     for k in pairs(infers) do
-        local docDefs = vm.getDocDefines(k)
-        for _, doc in ipairs(docDefs) do
-            if doc.parent
-            and doc.parent.type == 'doc.class'
-            and doc.parent.extends then
-                for _, tp in ipairs(doc.parent.extends) do
-                    if tp.type == 'doc.extends.name' then
-                        infers[tp[1]] = true
+        if type(k) == 'string' then
+            local docDefs = vm.getDocDefines(k)
+            for _, doc in ipairs(docDefs) do
+                if doc.parent
+                and doc.parent.type == 'doc.class'
+                and doc.parent.extends then
+                    for _, tp in ipairs(doc.parent.extends) do
+                        if tp.type == 'doc.extends.name' then
+                            infers[tp[1]] = true
+                        end
                     end
                 end
             end

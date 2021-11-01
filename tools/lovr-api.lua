@@ -1,11 +1,9 @@
-package.path = package.path .. ';3rd/love-api/?.lua'
-
-local lua51 = require 'Lua51'
-local api   = lua51.require 'love_api'
 local fs    = require 'bee.filesystem'
 local fsu   = require 'fs-utility'
 
-local metaPath    = fs.path 'meta/3rd/love2d'
+local api = dofile('3rd/lovr-api/api/init.lua')
+
+local metaPath    = fs.path 'meta/3rd/lovr'
 local libraryPath = metaPath / 'library'
 fs.create_directories(libraryPath)
 
@@ -38,7 +36,7 @@ local function getTypeName(names)
     names = names:gsub('%sor%s', '|')
     for name in names:gmatch '[^|]+' do
         name = trim(name)
-        types[#types+1] = knownTypes[name] or ('love.' .. name)
+        types[#types+1] = knownTypes[name] or ('lovr.' .. name)
     end
     return table.concat(types, '|')
 end
@@ -161,9 +159,6 @@ local function buildFile(class, defs)
 
     text[#text+1] = '---@meta'
     text[#text+1] = ''
-    if defs.version then
-        text[#text+1] = ('-- version: %s'):format(defs.version)
-    end
     text[#text+1] = buildDescription(defs.description)
     text[#text+1] = ('---@class %s'):format(class)
     text[#text+1] = ('%s = {}'):format(class)
@@ -198,7 +193,7 @@ local function buildFile(class, defs)
         text[#text+1] = ''
         text[#text+1] = buildDescription(enum.description)
         text[#text+1] = ('---@class %s'):format(getTypeName(enum.name))
-        for _, constant in ipairs(enum.constants) do
+        for _, constant in ipairs(enum.values) do
             text[#text+1] = buildDescription(constant.description)
             text[#text+1] = ('---@field %s integer'):format(formatIndex(constant.name))
         end
@@ -214,8 +209,8 @@ local function buildFile(class, defs)
     fsu.saveFile(filePath, table.concat(text, '\n'))
 end
 
-buildFile('love', api)
+buildFile('lovr', api)
 
 for _, module in ipairs(api.modules) do
-    buildFile('love.' .. module.name, module)
+    buildFile('lovr.' .. module.name, module)
 end

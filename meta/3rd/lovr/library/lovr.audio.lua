@@ -176,6 +176,213 @@ function lovr.audio.start(type) end
 function lovr.audio.stop(type) end
 
 ---
+---A Source is an object representing a single sound.  Currently ogg, wav, and mp3 formats are supported.
+---
+---When a Source is playing, it will send audio to the speakers.  Sources do not play automatically when they are created.  Instead, the `play`, `pause`, and `stop` functions can be used to control when they should play.
+---
+---`Source:seek` and `Source:tell` can be used to control the playback position of the Source.  A Source can be set to loop when it reaches the end using `Source:setLooping`.
+---
+---@class lovr.Source
+local Source = {}
+
+---
+---Creates a copy of the Source, referencing the same `Sound` object and inheriting all of the settings of this Source.  However, it will be created in the stopped state and will be rewound to the beginning.
+---
+---@return lovr.Source source # A genetically identical copy of the Source.
+function Source:clone() end
+
+---
+---Returns the directivity settings for the Source.
+---
+---The directivity is controlled by two parameters: the weight and the power.
+---
+---The weight is a number between 0 and 1 controlling the general "shape" of the sound emitted. 0.0 results in a completely omnidirectional sound that can be heard from all directions.  1.0 results in a full dipole shape that can be heard only from the front and back.  0.5 results in a cardioid shape that can only be heard from one direction.  Numbers in between will smoothly transition between these.
+---
+---The power is a number that controls how "focused" or sharp the shape is.  Lower power values can be heard from a wider set of angles.  It is an exponent, so it can get arbitrarily large.  Note that a power of zero will still result in an omnidirectional source, regardless of the weight.
+---
+---@return number weight # The dipole weight.  0.0 is omnidirectional, 1.0 is a dipole, 0.5 is cardioid.
+---@return number power # The dipole power, controlling how focused the directivity shape is.
+function Source:getDirectivity() end
+
+---
+---Returns the duration of the Source.
+---
+---@param unit? lovr.TimeUnit # The unit to return.
+---@return number duration # The duration of the Source.
+function Source:getDuration(unit) end
+
+---
+---Returns the orientation of the Source, in angle/axis representation.
+---
+---@return number angle # The number of radians the Source is rotated around its axis of rotation.
+---@return number ax # The x component of the axis of rotation.
+---@return number ay # The y component of the axis of rotation.
+---@return number az # The z component of the axis of rotation.
+function Source:getOrientation() end
+
+---
+---Returns the position and orientation of the Source.
+---
+---@return number x # The x position of the Source, in meters.
+---@return number y # The y position of the Source, in meters.
+---@return number z # The z position of the Source, in meters.
+---@return number angle # The number of radians the Source is rotated around its axis of rotation.
+---@return number ax # The x component of the axis of rotation.
+---@return number ay # The y component of the axis of rotation.
+---@return number az # The z component of the axis of rotation.
+function Source:getPose() end
+
+---
+---Returns the position of the Source, in meters.  Setting the position will cause the Source to be distorted and attenuated based on its position relative to the listener.
+---
+---@return number x # The x coordinate.
+---@return number y # The y coordinate.
+---@return number z # The z coordinate.
+function Source:getPosition() end
+
+---
+---Returns the radius of the Source, in meters.
+---
+---This does not control falloff or attenuation.  It is only used for smoothing out occlusion.  If a Source doesn't have a radius, then when it becomes occluded by a wall its volume will instantly drop.  Giving the Source a radius that approximates its emitter's size will result in a smooth transition between audible and occluded, improving realism.
+---
+---@return number radius # The radius of the Source, in meters.
+function Source:getRadius() end
+
+---
+---Returns the `Sound` object backing the Source.  Multiple Sources can share one Sound, allowing its data to only be loaded once.  An easy way to do this sharing is by using `Source:clone`.
+---
+---@return lovr.Sound sound # The Sound object.
+function Source:getSound() end
+
+---
+---Returns the current volume factor for the Source.
+---
+---@param units? lovr.VolumeUnit # The units to return (linear or db).
+---@return number volume # The volume of the Source.
+function Source:getVolume(units) end
+
+---
+---Returns whether a given `Effect` is enabled for the Source.
+---
+---@param effect lovr.Effect # The effect.
+---@return boolean enabled # Whether the effect is enabled.
+function Source:isEffectEnabled(effect) end
+
+---
+---Returns whether or not the Source will loop when it finishes.
+---
+---@return boolean looping # Whether or not the Source is looping.
+function Source:isLooping() end
+
+---
+---Returns whether or not the Source is playing.
+---
+---@return boolean playing # Whether the Source is playing.
+function Source:isPlaying() end
+
+---
+---Pauses the source.  It can be resumed with `Source:resume` or `Source:play`. If a paused source is rewound, it will remain paused.
+---
+function Source:pause() end
+
+---
+---Plays the Source.  This doesn't do anything if the Source is already playing.
+---
+---@return boolean success # Whether the Source successfully started playing.
+function Source:play() end
+
+---
+---Seeks the Source to the specified position.
+---
+---@param position number # The position to seek to.
+---@param unit? lovr.TimeUnit # The units for the seek position.
+function Source:seek(position, unit) end
+
+---
+---Sets the directivity settings for the Source.
+---
+---The directivity is controlled by two parameters: the weight and the power.
+---
+---The weight is a number between 0 and 1 controlling the general "shape" of the sound emitted. 0.0 results in a completely omnidirectional sound that can be heard from all directions.  1.0 results in a full dipole shape that can be heard only from the front and back.  0.5 results in a cardioid shape that can only be heard from one direction.  Numbers in between will smoothly transition between these.
+---
+---The power is a number that controls how "focused" or sharp the shape is.  Lower power values can be heard from a wider set of angles.  It is an exponent, so it can get arbitrarily large.  Note that a power of zero will still result in an omnidirectional source, regardless of the weight.
+---
+---@param weight number # The dipole weight.  0.0 is omnidirectional, 1.0 is a dipole, 0.5 is cardioid.
+---@param power number # The dipole power, controlling how focused the directivity shape is.
+function Source:setDirectivity(weight, power) end
+
+---
+---Enables or disables an effect on the Source.
+---
+---@param effect lovr.Effect # The effect.
+---@param enable boolean # Whether the effect should be enabled.
+function Source:setEffectEnabled(effect, enable) end
+
+---
+---Sets whether or not the Source loops.
+---
+---@param loop boolean # Whether or not the Source will loop.
+function Source:setLooping(loop) end
+
+---
+---Sets the orientation of the Source in angle/axis representation.
+---
+---@param angle number # The number of radians the Source should be rotated around its rotation axis.
+---@param ax number # The x component of the axis of rotation.
+---@param ay number # The y component of the axis of rotation.
+---@param az number # The z component of the axis of rotation.
+function Source:setOrientation(angle, ax, ay, az) end
+
+---
+---Sets the position and orientation of the Source.
+---
+---@param x number # The x position of the Source, in meters.
+---@param y number # The y position of the Source, in meters.
+---@param z number # The z position of the Source, in meters.
+---@param angle number # The number of radians the Source is rotated around its axis of rotation.
+---@param ax number # The x component of the axis of rotation.
+---@param ay number # The y component of the axis of rotation.
+---@param az number # The z component of the axis of rotation.
+function Source:setPose(x, y, z, angle, ax, ay, az) end
+
+---
+---Sets the position of the Source, in meters.  Setting the position will cause the Source to be distorted and attenuated based on its position relative to the listener.
+---
+---Only mono sources can be positioned.  Setting the position of a stereo Source will cause an error.
+---
+---@param x number # The x coordinate.
+---@param y number # The y coordinate.
+---@param z number # The z coordinate.
+function Source:setPosition(x, y, z) end
+
+---
+---Sets the radius of the Source, in meters.
+---
+---This does not control falloff or attenuation.  It is only used for smoothing out occlusion.  If a Source doesn't have a radius, then when it becomes occluded by a wall its volume will instantly drop.  Giving the Source a radius that approximates its emitter's size will result in a smooth transition between audible and occluded, improving realism.
+---
+---@param radius number # The new radius of the Source, in meters.
+function Source:setRadius(radius) end
+
+---
+---Sets the current volume factor for the Source.
+---
+---@param volume number # The new volume.
+---@param units? lovr.VolumeUnit # The units of the value.
+function Source:setVolume(volume, units) end
+
+---
+---Stops the source, also rewinding it to the beginning.
+---
+function Source:stop() end
+
+---
+---Returns the current playback position of the Source.
+---
+---@param unit? lovr.TimeUnit # The unit to return.
+---@return number position # The current playback position.
+function Source:tell(unit) end
+
+---
 ---Different types of audio material presets, for use with `lovr.audio.setGeometry`.
 ---
 ---@class lovr.AudioMaterial

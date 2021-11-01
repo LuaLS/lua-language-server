@@ -756,6 +756,756 @@ function lovr.graphics.transform(x, y, z, sx, sy, sz, angle, ax, ay, az) end
 function lovr.graphics.translate(x, y, z) end
 
 ---
+---A Canvas is also known as a framebuffer or render-to-texture.  It allows you to render to a texture instead of directly to the screen.  This lets you postprocess or transform the results later before finally rendering them to the screen.
+---
+---After creating a Canvas, you can attach Textures to it using `Canvas:setTexture`.
+---
+---@class lovr.Canvas
+local Canvas = {}
+
+---
+---Returns the depth buffer used by the Canvas as a Texture.  If the Canvas was not created with a readable depth buffer (the `depth.readable` flag in `lovr.graphics.newCanvas`), then this function will return `nil`.
+---
+---@return lovr.Texture texture # The depth Texture of the Canvas.
+function Canvas:getDepthTexture() end
+
+---
+---Returns the dimensions of the Canvas, its Textures, and its depth buffer.
+---
+---@return number width # The width of the Canvas, in pixels.
+---@return number height # The height of the Canvas, in pixels.
+function Canvas:getDimensions() end
+
+---
+---Returns the height of the Canvas, its Textures, and its depth buffer.
+---
+---@return number height # The height of the Canvas, in pixels.
+function Canvas:getHeight() end
+
+---
+---Returns the number of multisample antialiasing samples to use when rendering to the Canvas. Increasing this number will make the contents of the Canvas appear more smooth at the cost of performance.  It is common to use powers of 2 for this value.
+---
+---@return number samples # The number of MSAA samples.
+function Canvas:getMSAA() end
+
+---
+---Returns the set of Textures currently attached to the Canvas.
+---
+function Canvas:getTexture() end
+
+---
+---Returns the width of the Canvas, its Textures, and its depth buffer.
+---
+---@return number width # The width of the Canvas, in pixels.
+function Canvas:getWidth() end
+
+---
+---Returns whether the Canvas was created with the `stereo` flag.  Drawing something to a stereo Canvas will draw it to two viewports in the left and right half of the Canvas, using transform information from two different eyes.
+---
+---@return boolean stereo # Whether the Canvas is stereo.
+function Canvas:isStereo() end
+
+---
+---Returns a new Image containing the contents of a Texture attached to the Canvas.
+---
+---@param index? number # The index of the Texture to read from.
+---@return lovr.Image image # The new Image.
+function Canvas:newImage(index) end
+
+---
+---Renders to the Canvas using a function.  All graphics functions inside the callback will affect the Canvas contents instead of directly rendering to the headset.  This can be used in `lovr.update`.
+---
+---@param callback function # The function to use to render to the Canvas.
+function Canvas:renderTo(callback) end
+
+---
+---Attaches one or more Textures to the Canvas.  When rendering to the Canvas, everything will be drawn to all attached Textures.  You can attach different layers of an array, cubemap, or volume texture, and also attach different mipmap levels of Textures.
+---
+function Canvas:setTexture() end
+
+---
+---A Font is an object created from a TTF file.  It can be used to render text with `lovr.graphics.print`.
+---
+---@class lovr.Font
+local Font = {}
+
+---
+---Returns the maximum distance that any glyph will extend above the Font's baseline.  Units are generally in meters, see `Font:getPixelDensity`.
+---
+---@return number ascent # The ascent of the Font.
+function Font:getAscent() end
+
+---
+---Returns the baseline of the Font.  This is where the characters "rest on", relative to the y coordinate of the drawn text.  Units are generally in meters, see `Font:setPixelDensity`.
+---
+---@return number baseline # The baseline of the Font.
+function Font:getBaseline() end
+
+---
+---Returns the maximum distance that any glyph will extend below the Font's baseline.  Units are generally in meters, see `Font:getPixelDensity` for more information.  Note that due to the coordinate system for fonts, this is a negative value.
+---
+---@return number descent # The descent of the Font.
+function Font:getDescent() end
+
+---
+---Returns the height of a line of text.  Units are in meters, see `Font:setPixelDensity`.
+---
+---@return number height # The height of a rendered line of text.
+function Font:getHeight() end
+
+---
+---Returns the current line height multiplier of the Font.  The default is 1.0.
+---
+---@return number lineHeight # The line height.
+function Font:getLineHeight() end
+
+---
+---Returns the current pixel density for the Font.  The default is 1.0.  Normally, this is in pixels per meter.  When rendering to a 2D texture, the units are pixels.
+---
+---@return number pixelDensity # The current pixel density.
+function Font:getPixelDensity() end
+
+---
+---Returns the underlying `Rasterizer` object for a Font.
+---
+---@return lovr.Rasterizer rasterizer # The rasterizer.
+function Font:getRasterizer() end
+
+---
+---Returns the width and line count of a string when rendered using the font, taking into account an optional wrap limit.
+---
+---@param text string # The text to get the width of.
+---@param wrap? number # The width at which to wrap lines, or 0 for no wrap.
+---@return number width # The maximum width of any line in the text.
+---@return number lines # The number of lines in the wrapped text.
+function Font:getWidth(text, wrap) end
+
+---
+---Returns whether the Font has a set of glyphs.  Any combination of strings and numbers (corresponding to character codes) can be specified.  This function will return true if the Font is able to render *all* of the glyphs.
+---
+---@return boolean has # Whether the Font has the glyphs.
+function Font:hasGlyphs() end
+
+---
+---Sets the line height of the Font, which controls how far lines apart lines are vertically separated.  This value is a ratio and the default is 1.0.
+---
+---@param lineHeight number # The new line height.
+function Font:setLineHeight(lineHeight) end
+
+---
+---Sets the pixel density for the Font.  Normally, this is in pixels per meter.  When rendering to a 2D texture, the units are pixels.
+---
+---@overload fun()
+---@param pixelDensity number # The new pixel density.
+function Font:setPixelDensity(pixelDensity) end
+
+---
+---A Material is an object used to control how objects appear, through coloring, texturing, and shading.  The Material itself holds sets of colors, textures, and other parameters that are made available to Shaders.
+---
+---@class lovr.Material
+local Material = {}
+
+---
+---Returns a color property for a Material.  Different types of colors are supported for different lighting parameters.  Colors default to `(1.0, 1.0, 1.0, 1.0)` and are gamma corrected.
+---
+---@param colorType? lovr.MaterialColor # The type of color to get.
+---@return number r # The red component of the color.
+---@return number g # The green component of the color.
+---@return number b # The blue component of the color.
+---@return number a # The alpha component of the color.
+function Material:getColor(colorType) end
+
+---
+---Returns a numeric property of a Material.  Scalar properties default to 1.0.
+---
+---@param scalarType lovr.MaterialScalar # The type of property to get.
+---@return number x # The value of the property.
+function Material:getScalar(scalarType) end
+
+---
+---Returns a texture for a Material.  Several predefined `MaterialTexture`s are supported.  Any texture that is `nil` will use a single white pixel as a fallback.
+---
+---@param textureType? lovr.MaterialTexture # The type of texture to get.
+---@return lovr.Texture texture # The texture that is set, or `nil` if no texture is set.
+function Material:getTexture(textureType) end
+
+---
+---Returns the transformation applied to texture coordinates of the Material.
+---
+---@return number ox # The texture coordinate x offset.
+---@return number oy # The texture coordinate y offset.
+---@return number sx # The texture coordinate x scale.
+---@return number sy # The texture coordinate y scale.
+---@return number angle # The texture coordinate rotation, in radians.
+function Material:getTransform() end
+
+---
+---Sets a color property for a Material.  Different types of colors are supported for different lighting parameters.  Colors default to `(1.0, 1.0, 1.0, 1.0)` and are gamma corrected.
+---
+---@overload fun(r: number, g: number, b: number, a: number)
+---@overload fun(colorType: lovr.MaterialColor, hex: number, a: number)
+---@overload fun(hex: number, a: number)
+---@param colorType? lovr.MaterialColor # The type of color to set.
+---@param r number # The red component of the color.
+---@param g number # The green component of the color.
+---@param b number # The blue component of the color.
+---@param a? number # The alpha component of the color.
+function Material:setColor(colorType, r, g, b, a) end
+
+---
+---Sets a numeric property of a Material.  Scalar properties default to 1.0.
+---
+---@param scalarType lovr.MaterialScalar # The type of property to set.
+---@param x number # The value of the property.
+function Material:setScalar(scalarType, x) end
+
+---
+---Sets a texture for a Material.  Several predefined `MaterialTexture`s are supported.  Any texture that is `nil` will use a single white pixel as a fallback.
+---
+---@overload fun(texture: lovr.Texture)
+---@param textureType? lovr.MaterialTexture # The type of texture to set.
+---@param texture lovr.Texture # The texture to apply, or `nil` to use the default.
+function Material:setTexture(textureType, texture) end
+
+---
+---Sets the transformation applied to texture coordinates of the Material.  This lets you offset, scale, or rotate textures as they are applied to geometry.
+---
+---@param ox number # The texture coordinate x offset.
+---@param oy number # The texture coordinate y offset.
+---@param sx number # The texture coordinate x scale.
+---@param sy number # The texture coordinate y scale.
+---@param angle number # The texture coordinate rotation, in radians.
+function Material:setTransform(ox, oy, sx, sy, angle) end
+
+---
+---A Mesh is a low-level graphics object that stores and renders a list of vertices.
+---
+---Meshes are really flexible since you can pack pretty much whatever you want in them.  This makes them great for rendering arbitrary geometry, but it also makes them kinda difficult to use since you have to place each vertex yourself.
+---
+---It's possible to batch geometry with Meshes too.  Instead of drawing a shape 100 times, it's much faster to pack 100 copies of the shape into a Mesh and draw the Mesh once.  Even storing just one copy in the Mesh and drawing that 100 times is usually faster.
+---
+---Meshes are also a good choice if you have an object that changes its shape over time.
+---
+---@class lovr.Mesh
+local Mesh = {}
+
+---
+---Attaches attributes from another Mesh onto this one.  This can be used to share vertex data across multiple meshes without duplicating the data, and can also be used for instanced rendering by using the `divisor` parameter.
+---
+---@overload fun(mesh: lovr.Mesh, divisor: number, ...)
+---@overload fun(mesh: lovr.Mesh, divisor: number, attributes: table)
+---@param mesh lovr.Mesh # The Mesh to attach attributes from.
+---@param divisor? number # The attribute divisor for all attached attributes.
+function Mesh:attachAttributes(mesh, divisor) end
+
+---
+---Detaches attributes that were attached using `Mesh:attachAttributes`.
+---
+---@overload fun(mesh: lovr.Mesh, ...)
+---@overload fun(mesh: lovr.Mesh, attributes: table)
+---@param mesh lovr.Mesh # A Mesh.  The names of all of the attributes from this Mesh will be detached.
+function Mesh:detachAttributes(mesh) end
+
+---
+---Draws the contents of the Mesh.
+---
+---@overload fun(transform: lovr.mat4, instances: number)
+---@param x? number # The x coordinate to draw the Mesh at.
+---@param y? number # The y coordinate to draw the Mesh at.
+---@param z? number # The z coordinate to draw the Mesh at.
+---@param scale? number # The scale to draw the Mesh at.
+---@param angle? number # The angle to rotate the Mesh around the axis of rotation, in radians.
+---@param ax? number # The x component of the axis of rotation.
+---@param ay? number # The y component of the axis of rotation.
+---@param az? number # The z component of the axis of rotation.
+---@param instances? number # The number of copies of the Mesh to draw.
+function Mesh:draw(x, y, z, scale, angle, ax, ay, az, instances) end
+
+---
+---Get the draw mode of the Mesh, which controls how the vertices are connected together.
+---
+---@return lovr.DrawMode mode # The draw mode of the Mesh.
+function Mesh:getDrawMode() end
+
+---
+---Retrieve the current draw range for the Mesh.  The draw range is a subset of the vertices of the Mesh that will be drawn.
+---
+---@return number start # The index of the first vertex that will be drawn, or nil if no draw range is set.
+---@return number count # The number of vertices that will be drawn, or nil if no draw range is set.
+function Mesh:getDrawRange() end
+
+---
+---Get the Material applied to the Mesh.
+---
+---@return lovr.Material material # The current material applied to the Mesh.
+function Mesh:getMaterial() end
+
+---
+---Gets the data for a single vertex in the Mesh.  The set of data returned depends on the Mesh's vertex format.  The default vertex format consists of 8 floating point numbers: the vertex position, the vertex normal, and the texture coordinates.
+---
+---@param index number # The index of the vertex to retrieve.
+function Mesh:getVertex(index) end
+
+---
+---Returns the components of a specific attribute of a single vertex in the Mesh.
+---
+---@param index number # The index of the vertex to retrieve the attribute of.
+---@param attribute number # The index of the attribute to retrieve the components of.
+function Mesh:getVertexAttribute(index, attribute) end
+
+---
+---Returns the maximum number of vertices the Mesh can hold.
+---
+---@return number size # The number of vertices the Mesh can hold.
+function Mesh:getVertexCount() end
+
+---
+---Get the format table of the Mesh's vertices.  The format table describes the set of data that each vertex contains.
+---
+---@return table format # The table of vertex attributes.  Each attribute is a table containing the name of the attribute, the `AttributeType`, and the number of components.
+function Mesh:getVertexFormat() end
+
+---
+---Returns the current vertex map for the Mesh.  The vertex map is a list of indices in the Mesh, allowing the reordering or reuse of vertices.
+---
+---@overload fun(t: table):table
+---@overload fun(blob: lovr.Blob)
+---@return table map # The list of indices in the vertex map, or `nil` if no vertex map is set.
+function Mesh:getVertexMap() end
+
+---
+---Returns whether or not a vertex attribute is enabled.  Disabled attributes won't be sent to shaders.
+---
+---@param attribute string # The name of the attribute.
+---@return boolean enabled # Whether or not the attribute is enabled when drawing the Mesh.
+function Mesh:isAttributeEnabled(attribute) end
+
+---
+---Sets whether a vertex attribute is enabled.  Disabled attributes won't be sent to shaders.
+---
+---@param attribute string # The name of the attribute.
+---@param enabled boolean # Whether or not the attribute is enabled when drawing the Mesh.
+function Mesh:setAttributeEnabled(attribute, enabled) end
+
+---
+---Set a new draw mode for the Mesh.
+---
+---@param mode lovr.DrawMode # The new draw mode for the Mesh.
+function Mesh:setDrawMode(mode) end
+
+---
+---Set the draw range for the Mesh.  The draw range is a subset of the vertices of the Mesh that will be drawn.
+---
+---@overload fun()
+---@param start number # The first vertex that will be drawn.
+---@param count number # The number of vertices that will be drawn.
+function Mesh:setDrawRange(start, count) end
+
+---
+---Applies a Material to the Mesh.  This will cause it to use the Material's properties whenever it is rendered.
+---
+---@param material lovr.Material # The Material to apply.
+function Mesh:setMaterial(material) end
+
+---
+---Update a single vertex in the Mesh.
+---
+---@param index number # The index of the vertex to set.
+function Mesh:setVertex(index) end
+
+---
+---Set the components of a specific attribute of a vertex in the Mesh.
+---
+---@param index number # The index of the vertex to update.
+---@param attribute number # The index of the attribute to update.
+function Mesh:setVertexAttribute(index, attribute) end
+
+---
+---Sets the vertex map.  The vertex map is a list of indices in the Mesh, allowing the reordering or reuse of vertices.
+---
+---Often, a vertex map is used to improve performance, since it usually requires less data to specify the index of a vertex than it does to specify all of the data for a vertex.
+---
+---@overload fun(blob: lovr.Blob, size: number)
+---@param map table # The new vertex map.  Each element of the table is an index of a vertex.
+function Mesh:setVertexMap(map) end
+
+---
+---Updates multiple vertices in the Mesh.
+---
+---@overload fun(blob: lovr.Blob, start: number, count: number)
+---@param vertices table # The new set of vertices.
+---@param start? number # The index of the vertex to start replacing at.
+---@param count? number # The number of vertices to replace.  If nil, all vertices will be used.
+function Mesh:setVertices(vertices, start, count) end
+
+---
+---A Model is a drawable object loaded from a 3D file format.  The supported 3D file formats are OBJ, glTF, and STL.
+---
+---@class lovr.Model
+local Model = {}
+
+---
+---Applies an animation to the current pose of the Model.
+---
+---The animation is evaluated at the specified timestamp, and mixed with the current pose of the Model using the alpha value.  An alpha value of 1.0 will completely override the pose of the Model with the animation's pose.
+---
+---@overload fun(index: number, time: number, alpha: number)
+---@param name string # The name of an animation.
+---@param time number # The timestamp to evaluate the keyframes at, in seconds.
+---@param alpha? number # How much of the animation to mix in, from 0 to 1.
+function Model:animate(name, time, alpha) end
+
+---
+---Draw the Model.
+---
+---@overload fun(transform: lovr.mat4, instances: number)
+---@param x? number # The x coordinate to draw the Model at.
+---@param y? number # The y coordinate to draw the Model at.
+---@param z? number # The z coordinate to draw the Model at.
+---@param scale? number # The scale to draw the Model at.
+---@param angle? number # The angle to rotate the Model around the axis of rotation, in radians.
+---@param ax? number # The x component of the axis of rotation.
+---@param ay? number # The y component of the axis of rotation.
+---@param az? number # The z component of the axis of rotation.
+---@param instances? number # The number of copies of the Model to draw.
+function Model:draw(x, y, z, scale, angle, ax, ay, az, instances) end
+
+---
+---Returns a bounding box that encloses the vertices of the Model.
+---
+---@return number minx # The minimum x coordinate of the box.
+---@return number maxx # The maximum x coordinate of the box.
+---@return number miny # The minimum y coordinate of the box.
+---@return number maxy # The maximum y coordinate of the box.
+---@return number minz # The minimum z coordinate of the box.
+---@return number maxz # The maximum z coordinate of the box.
+function Model:getAABB() end
+
+---
+---Returns the number of animations in the Model.
+---
+---@return number count # The number of animations in the Model.
+function Model:getAnimationCount() end
+
+---
+---Returns the duration of an animation in the Model, in seconds.
+---
+function Model:getAnimationDuration() end
+
+---
+---Returns the name of one of the animations in the Model.
+---
+---@param index number # The index of the animation to get the name of.
+---@return string name # The name of the animation.
+function Model:getAnimationName(index) end
+
+---
+---Returns a Material loaded from the Model, by name or index.
+---
+---This includes `Texture` objects and other properties like colors, metalness/roughness, and more.
+---
+---@overload fun(index: number):lovr.Material
+---@param name string # The name of the Material to return.
+---@return lovr.Material material # The material.
+function Model:getMaterial(name) end
+
+---
+---Returns the number of materials in the Model.
+---
+---@return number count # The number of materials in the Model.
+function Model:getMaterialCount() end
+
+---
+---Returns the name of one of the materials in the Model.
+---
+---@param index number # The index of the material to get the name of.
+---@return string name # The name of the material.
+function Model:getMaterialName(index) end
+
+---
+---Returns the number of nodes (bones) in the Model.
+---
+---@return number count # The number of nodes in the Model.
+function Model:getNodeCount() end
+
+---
+---Returns the name of one of the nodes (bones) in the Model.
+---
+---@param index number # The index of the node to get the name of.
+---@return string name # The name of the node.
+function Model:getNodeName(index) end
+
+---
+---Returns the pose of a single node in the Model in a given `CoordinateSpace`.
+---
+---@overload fun(index: number, space: lovr.CoordinateSpace):number, number, number, number, number, number, number
+---@param name string # The name of the node.
+---@param space? lovr.CoordinateSpace # Whether the pose should be returned relative to the node's parent or relative to the root node of the Model.
+---@return number x # The x position of the node.
+---@return number y # The y position of the node.
+---@return number z # The z position of the node.
+---@return number angle # The number of radians the node is rotated around its rotational axis.
+---@return number ax # The x component of the axis of rotation.
+---@return number ay # The y component of the axis of rotation.
+---@return number az # The z component of the axis of rotation.
+function Model:getNodePose(name, space) end
+
+---
+---Returns 2 tables containing mesh data for the Model.
+---
+---The first table is a list of vertex positions and contains 3 numbers for the x, y, and z coordinate of each vertex.  The second table is a list of triangles and contains 1-based indices into the first table representing the first, second, and third vertices that make up each triangle.
+---
+---The vertex positions will be affected by node transforms.
+---
+---@return table vertices # A flat table of numbers containing vertex positions.
+---@return table indices # A flat table of numbers containing triangle vertex indices.
+function Model:getTriangles() end
+
+---
+---Returns whether the Model has any nodes associated with animated joints.  This can be used to approximately determine whether an animated shader needs to be used with an arbitrary Model.
+---
+---@return boolean skeletal # Whether the Model has any nodes that use skeletal animation.
+function Model:hasJoints() end
+
+---
+---Applies a pose to a single node of the Model.  The input pose is assumed to be relative to the pose of the node's parent.  This is useful for applying inverse kinematics (IK) to a chain of bones in a skeleton.
+---
+---The alpha parameter can be used to mix between the node's current pose and the input pose.
+---
+---@overload fun(index: number, x: number, y: number, z: number, angle: number, ax: number, ay: number, az: number, alpha: number)
+---@overload fun()
+---@param name string # The name of the node.
+---@param x number # The x position.
+---@param y number # The y position.
+---@param z number # The z position.
+---@param angle number # The angle of rotation around the axis, in radians.
+---@param ax number # The x component of the rotation axis.
+---@param ay number # The y component of the rotation axis.
+---@param az number # The z component of the rotation axis.
+---@param alpha? number # How much of the pose to mix in, from 0 to 1.
+function Model:pose(name, x, y, z, angle, ax, ay, az, alpha) end
+
+---
+---Shaders are GLSL programs that transform the way vertices and pixels show up on the screen. They can be used for lighting, postprocessing, particles, animation, and much more.  You can use `lovr.graphics.setShader` to change the active Shader.
+---
+---@class lovr.Shader
+local Shader = {}
+
+---
+---Returns the type of the Shader, which will be "graphics" or "compute".
+---
+---Graphics shaders are created with `lovr.graphics.newShader` and can be used for rendering with `lovr.graphics.setShader`.  Compute shaders are created with `lovr.graphics.newComputeShader` and can be run using `lovr.graphics.compute`.
+---
+---@return lovr.ShaderType type # The type of the Shader.
+function Shader:getType() end
+
+---
+---Returns whether a Shader has a block.
+---
+---A block is added to the Shader code at creation time using `ShaderBlock:getShaderCode`.  The block name (not the namespace) is used to link up the ShaderBlock object to the Shader.  This function can be used to check if a Shader was created with a block using the given name.
+---
+---@param block string # The name of the block.
+---@return boolean present # Whether the shader has the specified block.
+function Shader:hasBlock(block) end
+
+---
+---Returns whether a Shader has a particular uniform variable.
+---
+---@param uniform string # The name of the uniform variable.
+---@return boolean present # Whether the shader has the specified uniform.
+function Shader:hasUniform(uniform) end
+
+---
+---Updates a uniform variable in the Shader.
+---
+---@param uniform string # The name of the uniform to update.
+---@param value lovr.* # The new value of the uniform.
+---@return boolean success # Whether the uniform exists and was updated.
+function Shader:send(uniform, value) end
+
+---
+---Sends a ShaderBlock to a Shader.  After the block is sent, you can update the data in the block without needing to resend the block.  The block can be sent to multiple shaders and they will all see the same data from the block.
+---
+---@param name string # The name of the block to send to.
+---@param block lovr.ShaderBlock # The ShaderBlock to associate with the specified block.
+---@param access? lovr.UniformAccess # How the Shader will use this block (used as an optimization hint).
+function Shader:sendBlock(name, block, access) end
+
+---
+---Sends a Texture to a Shader for writing.  This is meant to be used with compute shaders and only works with uniforms declared as `image2D`, `imageCube`, `image2DArray`, and `image3D`.  The normal `Shader:send` function accepts Textures and should be used most of the time.
+---
+---@overload fun(name: string, index: number, texture: lovr.Texture, slice: number, mipmap: number, access: lovr.UniformAccess)
+---@param name string # The name of the image uniform.
+---@param texture lovr.Texture # The Texture to assign.
+---@param slice? number # The slice of a cube, array, or volume texture to use, or `nil` for all slices.
+---@param mipmap? number # The mipmap of the texture to use.
+---@param access? lovr.UniformAccess # Whether the image will be read from, written to, or both.
+function Shader:sendImage(name, texture, slice, mipmap, access) end
+
+---
+---ShaderBlocks are objects that can hold large amounts of data and can be sent to Shaders.  It is common to use "uniform" variables to send data to shaders, but uniforms are usually limited to a few kilobytes in size.  ShaderBlocks are useful for a few reasons:
+---
+---- They can hold a lot more data.
+---- Shaders can modify the data in them, which is really useful for compute shaders.
+---- Setting the data in a ShaderBlock updates the data for all Shaders using the block, so you
+---  don't need to go around setting the same uniforms in lots of different shaders.
+---
+---On systems that support compute shaders, ShaderBlocks can optionally be "writable".  A writable ShaderBlock is a little bit slower than a non-writable one, but shaders can modify its contents and it can be much, much larger than a non-writable ShaderBlock.
+---
+---@class lovr.ShaderBlock
+local ShaderBlock = {}
+
+---
+---Returns the byte offset of a variable in a ShaderBlock.  This is useful if you want to manually send binary data to the ShaderBlock using a `Blob` in `ShaderBlock:send`.
+---
+---@param field string # The name of the variable to get the offset of.
+---@return number offset # The byte offset of the variable.
+function ShaderBlock:getOffset(field) end
+
+---
+---Before a ShaderBlock can be used in a Shader, the Shader has to have the block's variables defined in its source code.  This can be a tedious process, so you can call this function to return a GLSL string that contains this definition.  Roughly, it will look something like this:
+---
+---    layout(std140) uniform <label> {
+---      <type> <name>[<count>];
+---    } <namespace>;
+---
+---@param label string # The label of the block in the shader code.  This will be used to identify it when using `Shader:sendBlock`.
+---@param namespace? string # The namespace to use when accessing the block's variables in the shader code.  This can be used to prevent naming conflicts if two blocks have variables with the same name.  If the namespace is nil, the block's variables will be available in the global scope.
+---@return string code # The code that can be prepended to `Shader` code.
+function ShaderBlock:getShaderCode(label, namespace) end
+
+---
+---Returns the size of the ShaderBlock's data, in bytes.
+---
+---@return number size # The size of the ShaderBlock, in bytes.
+function ShaderBlock:getSize() end
+
+---
+---Returns the type of the ShaderBlock.
+---
+---@return lovr.BlockType type # The type of the ShaderBlock.
+function ShaderBlock:getType() end
+
+---
+---Returns a variable in the ShaderBlock.
+---
+---@param name string # The name of the variable to read.
+---@return lovr.* value # The value of the variable.
+function ShaderBlock:read(name) end
+
+---
+---Updates a variable in the ShaderBlock.
+---
+---@overload fun(blob: lovr.Blob, offset: number, extent: number):number
+---@param variable string # The name of the variable to update.
+---@param value lovr.* # The new value of the uniform.
+function ShaderBlock:send(variable, value) end
+
+---
+---A Texture is an image that can be applied to `Material`s.  The supported file formats are `.png`, `.jpg`, `.hdr`, `.dds`, `.ktx`, and `.astc`.  DDS and ASTC are compressed formats, which are recommended because they're smaller and faster.
+---
+---@class lovr.Texture
+local Texture = {}
+
+---
+---Returns the compare mode for the texture.
+---
+---@return lovr.CompareMode compareMode # The current compare mode, or `nil` if none is set.
+function Texture:getCompareMode() end
+
+---
+---Returns the depth of the Texture, or the number of images stored in the Texture.
+---
+---@param mipmap? number # The mipmap level to get the depth of.  This is only valid for volume textures.
+---@return number depth # The depth of the Texture.
+function Texture:getDepth(mipmap) end
+
+---
+---Returns the dimensions of the Texture.
+---
+---@param mipmap? number # The mipmap level to get the dimensions of.
+---@return number width # The width of the Texture, in pixels.
+---@return number height # The height of the Texture, in pixels.
+---@return number depth # The number of images stored in the Texture, for non-2D textures.
+function Texture:getDimensions(mipmap) end
+
+---
+---Returns the current FilterMode for the Texture.
+---
+---@return lovr.FilterMode mode # The filter mode for the Texture.
+---@return number anisotropy # The level of anisotropic filtering.
+function Texture:getFilter() end
+
+---
+---Returns the format of the Texture.  This describes how many color channels are in the texture as well as the size of each one.  The most common format used is `rgba`, which contains red, green, blue, and alpha color channels.  See `TextureFormat` for all of the possible formats.
+---
+---@return lovr.TextureFormat format # The format of the Texture.
+function Texture:getFormat() end
+
+---
+---Returns the height of the Texture.
+---
+---@param mipmap? number # The mipmap level to get the height of.
+---@return number height # The height of the Texture, in pixels.
+function Texture:getHeight(mipmap) end
+
+---
+---Returns the number of mipmap levels of the Texture.
+---
+---@return number mipmaps # The number of mipmap levels in the Texture.
+function Texture:getMipmapCount() end
+
+---
+---Returns the type of the Texture.
+---
+---@return lovr.TextureType type # The type of the Texture.
+function Texture:getType() end
+
+---
+---Returns the width of the Texture.
+---
+---@param mipmap? number # The mipmap level to get the width of.
+---@return number width # The width of the Texture, in pixels.
+function Texture:getWidth(mipmap) end
+
+---
+---Returns the current WrapMode for the Texture.
+---
+---@return lovr.WrapMode horizontal # How the texture wraps horizontally.
+---@return lovr.WrapMode vertical # How the texture wraps vertically.
+function Texture:getWrap() end
+
+---
+---Replaces pixels in the Texture, sourcing from an `Image` object.
+---
+---@param image lovr.Image # The Image containing the pixels to use.  Currently, the Image needs to have the same dimensions as the source Texture.
+---@param x? number # The x offset to replace at.
+---@param y? number # The y offset to replace at.
+---@param slice? number # The slice to replace.  Not applicable for 2D textures.
+---@param mipmap? number # The mipmap to replace.
+function Texture:replacePixels(image, x, y, slice, mipmap) end
+
+---
+---Sets the compare mode for a texture.  This is only used for "shadow samplers", which are uniform variables in shaders with type `sampler2DShadow`.  Sampling a shadow sampler uses a sort of virtual depth test, and the compare mode of the texture is used to control how the depth test is performed.
+---
+---@param compareMode? lovr.CompareMode # The new compare mode.  Use `nil` to disable the compare mode.
+function Texture:setCompareMode(compareMode) end
+
+---
+---Sets the `FilterMode` used by the texture.
+---
+---@param mode lovr.FilterMode # The filter mode.
+---@param anisotropy number # The level of anisotropy to use.
+function Texture:setFilter(mode, anisotropy) end
+
+---
+---Sets the wrap mode of a texture.  The wrap mode controls how the texture is sampled when texture coordinates lie outside the usual 0 - 1 range.  The default for both directions is `repeat`.
+---
+---@param horizontal lovr.WrapMode # How the texture should wrap horizontally.
+---@param vertical? lovr.WrapMode # How the texture should wrap vertically.
+function Texture:setWrap(horizontal, vertical) end
+
+---
 ---Different ways arcs can be drawn with `lovr.graphics.arc`.
 ---
 ---@class lovr.ArcMode

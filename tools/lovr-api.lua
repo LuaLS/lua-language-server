@@ -64,7 +64,7 @@ function buildType(param)
     if param.table then
         return buildDocTable(param.table)
     end
-    return getTypeName(param.type)
+    return getTypeName(param.type or param.name)
 end
 
 local function buildSuper(tp)
@@ -166,6 +166,21 @@ local function buildFile(defs)
     for _, func in ipairs(defs.functions or {}) do
         text[#text+1] = ''
         text[#text+1] = buildFunction(func)
+    end
+
+    for _, obj in ipairs(defs.objects or {}) do
+        local mark = {}
+        text[#text+1] = ''
+        text[#text+1] = buildDescription(obj.description)
+        text[#text+1] = ('---@class %s%s'):format(getTypeName(obj.name), buildSuper(obj))
+        text[#text+1] = ('local %s = {}'):format(obj.name)
+        for _, func in ipairs(obj.methods or {}) do
+            if not mark[func.name] then
+                mark[func.name] = true
+                text[#text+1] = ''
+                text[#text+1] = buildFunction(func)
+            end
+        end
     end
 
     for _, cb in ipairs(defs.callbacks or {}) do

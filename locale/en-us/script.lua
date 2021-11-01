@@ -66,6 +66,7 @@ MWS_WCONFIG_UPDATED     = 'Workspace setting updated.'
 WORKSPACE_SKIP_LARGE_FILE = 'Too large file: {} skipped. The currently set size limit is: {} KB, and the file size is: {} KB.'
 WORKSPACE_LOADING         = 'Loading workspace'
 WORKSPACE_DIAGNOSTIC      = 'Diagnosing workspace'
+WORKSPACE_SKIP_HUGE_FILE  = 'For performance reasons, the parsing of this file has been stopped: {}'
 
 PARSER_CRASH            = 'Parser crashed! Last words:{}'
 PARSER_UNKNOWN          = 'Unknown syntax error...'

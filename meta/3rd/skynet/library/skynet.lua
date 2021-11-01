@@ -12,35 +12,35 @@
 ---|+'"debug"'
 ---|+'"trace"'
 ---@alias SERVICEADDR '".servicename"' | '":0000000C"' | integer
----@alias MESSAGEHANDLER fun(session:integer, source:integer, ...)
+---@alias MESSAGEHANDLER fun(session:integer, source:integer, cmd:string, ...)
 local skynet  = {
-    -- read skynet.h
-    PTYPE_TEXT      = 0,
-    PTYPE_RESPONSE  = 1,
-    PTYPE_MULTICAST = 2,
-    PTYPE_CLIENT    = 3,
-    PTYPE_SYSTEM    = 4,
-    PTYPE_HARBOR    = 5,
-    PTYPE_SOCKET    = 6,
-    PTYPE_ERROR     = 7,
-    PTYPE_QUEUE     = 8, -- used in deprecated mqueue, use skynet.queue instead
-    PTYPE_DEBUG     = 9,
-    PTYPE_LUA       = 10,
-    PTYPE_SNAX      = 11,
-    PTYPE_TRACE     = 12, -- use for debug trace
-    PNAME_TEXT      = "text",
-    PNAME_RESPONSE  = "response",
-    PNAME_MULTICAST = "muliticast",
-    PNAME_CLIENT    = "client",
-    PNAME_SYSTEM    = "system",
-    PNAME_HARBOR    = "harbor",
-    PNAME_SOCKET    = "socket",
-    PNAME_ERROR     = "error",
-    PNAME_QUEUE     = "queue",
-    PNAME_DEBUG     = "debug",
-    PNAME_LUA       = "lua",
-    PNAME_SNAX      = "snax",
-    PNAME_TRACE     = "trace",
+  -- read skynet.h
+  PTYPE_TEXT      = 0,
+  PTYPE_RESPONSE  = 1,
+  PTYPE_MULTICAST = 2,
+  PTYPE_CLIENT    = 3,
+  PTYPE_SYSTEM    = 4,
+  PTYPE_HARBOR    = 5,
+  PTYPE_SOCKET    = 6,
+  PTYPE_ERROR     = 7,
+  PTYPE_QUEUE     = 8, -- used in deprecated mqueue, use skynet.queue instead
+  PTYPE_DEBUG     = 9,
+  PTYPE_LUA       = 10,
+  PTYPE_SNAX      = 11,
+  PTYPE_TRACE     = 12, -- use for debug trace
+  PNAME_TEXT      = "text",
+  PNAME_RESPONSE  = "response",
+  PNAME_MULTICAST = "muliticast",
+  PNAME_CLIENT    = "client",
+  PNAME_SYSTEM    = "system",
+  PNAME_HARBOR    = "harbor",
+  PNAME_SOCKET    = "socket",
+  PNAME_ERROR     = "error",
+  PNAME_QUEUE     = "queue",
+  PNAME_DEBUG     = "debug",
+  PNAME_LUA       = "lua",
+  PNAME_SNAX      = "snax",
+  PNAME_TRACE     = "trace",
 
 }
 
@@ -97,9 +97,12 @@ end
 
 ---* 向当前会话返回数据
 ---* 会自动获取当前线程所关联的会话ID和返回地址
----* 由于某些历史原因（早期的 skynet 默认消息类别是文本，而没有经过特殊编码），这个 API 被设计成传递一个 C 指针和长度，而不是经过当前消息的 pack 函数打包。或者你也可以省略 size 而传入一个字符串。
+---* 由于某些历史原因（早期的 skynet 默认消息类别是文本，而没有经过特殊编码），
+---这个 API 被设计成传递一个 C 指针和长度，而不是经过当前消息的 pack 函数打包。或者你也可以省略 size 而传入一个字符串。
 ---* 在同一个消息处理的 coroutine 中只可以被调用一次，多次调用会触发异常。
----* 你需要挂起一个请求，等将来时机满足，再回应它。而回应的时候已经在别的 coroutine 中了。针对这种情况，你可以调用 skynet.response(skynet.pack) 获得一个闭包，以后调用这个闭包即可把回应消息发回。这里的参数 skynet.pack 是可选的，你可以传入其它打包函数，默认即是 skynet.pack 。
+---* 你需要挂起一个请求，等将来时机满足，再回应它。而回应的时候已经在别的 coroutine 中了。
+---针对这种情况，你可以调用 skynet.response(skynet.pack) 获得一个闭包，以后调用这个闭包即可把回应消息发回。
+---这里的参数 skynet.pack 是可选的，你可以传入其它打包函数，默认即是 skynet.pack 。
 ---@param msg lightuserdata
 ---@param sz integer
 function skynet.ret(msg, sz)
@@ -110,8 +113,8 @@ function skynet.retpack(...)
 end
 
 ---返回一个闭包以进行延迟回应
----@param pack fun(...):string| userdata,sz
----@return fun(isOK:boolean | 'TEST', ...):
+---@param pack fun(...):string|lightuserdata,integer #默认会用 skynet.pack
+---@return fun(isOK:boolean | 'TEST', ...)
 function skynet.response(pack)
 end
 
@@ -138,7 +141,9 @@ end
 --------------------序列化相关API---------------
 
 ---* 可以将一组 lua 对象序列化为一个由 malloc 分配出来的 C 指针加一个数字长度
----* 你需要考虑 C 指针引用的数据块何时释放的问题。当然，如果你只是将 skynet.pack 填在消息处理框架里时，框架解决了这个管理问题。skynet 将 C 指针发送到其他服务，而接收方会在使用完后释放这个指针。
+---* 你需要考虑 C 指针引用的数据块何时释放的问题。当然，如果你只是将 skynet.pack 填在消息
+---  处理框架里时，框架解决了这个管理问题。skynet 将 C 指针发送到其他服务，而接收方会在使用完
+---  后释放这个指针。
 ---@vararg any
 ---@return lightuserdata, number
 function skynet.pack(...)
@@ -159,8 +164,8 @@ function skynet.unpack(msg, sz)
 end
 
 ---* 将 C 指针转换成 Lua 字符串
----@param msg lightuserdata
----@param sz number
+---@param msg lightuserdata|string
+---@param sz number #如果是传递的 string，则不需要 此参数
 ---@return string
 function skynet.tostring(msg, sz)
 end
@@ -176,7 +181,8 @@ end
 ---* **非阻塞API**
 ---* 这条 API 可以把一条类别为 typename 的消息发送给 address 。它会先经过事先注册的 pack 函数打包 ... 的内容。
 ---* 实际上也是利用了 c.send 不过传送的会话ID是0
----* 接收端接收完毕消息后，默认情况下，消息会由 skynet 释放。具体可以查看 skynet-server.c 中的 dispatch_message 的代码
+---* 接收端接收完毕消息后，默认情况下，消息会由 skynet 释放。
+---  具体可以查看 skynet-server.c 中的 dispatch_message 的代码
 ---@param addr SERVICEADDR
 ---@param typename string @类型名
 ---@vararg any @传输的数据
@@ -239,7 +245,7 @@ end
 function request:select(timeout)
 end
 
----@param obj?
+---@param obj? table
 ---@return request
 function skynet.request(obj)
 end
@@ -286,6 +292,8 @@ end
 
 --- 用于启动一个新的 Lua 服务。name 是脚本的名字（不用写 .lua 后缀）。只有被启动的脚本的 start 函数返回后，这个 API 才会返回启动的服务的地址，这是一个阻塞 API 。如果被启动的脚本在初始化环节抛出异常，或在初始化完成前就调用 skynet.exit 退出，skynet.newservice 都会抛出异常。如果被启动的脚本的 start 函数是一个永不结束的循环，那么 newservice 也会被永远阻塞住。
 --- > 启动参数其实是以字符串拼接的方式传递过去的。所以不要在参数中传递复杂的 Lua 对象。接收到的参数都是字符串，且字符串中不可以有空格（否则会被分割成多个参数）。这种参数传递方式是历史遗留下来的，有很多潜在的问题。目前推荐的惯例是，让你的服务响应一个启动消息。在 newservice 之后，立刻调用 skynet.call 发送启动请求。
+---@param name string #脚本名字
+---@vararg string #可选参数
 function skynet.newservice(name, ...)
 end
 
@@ -475,25 +483,31 @@ function skynet.memlimit(bytes)
 end
 
 ------------------以下是属于 skynet.manager 中的 api
+
+---* **skynet.manager API**
 ---* 启动一个C 服务，具体参数要看 C服务是怎么编写的
 ---@vararg any
 function skynet.launch(...)
 end
 
+---* **skynet.manager API**
 --- 可以用来强制关闭别的服务。但强烈不推荐这样做。因为对象会在任意一条消息处理完毕后，毫无征兆的退出。所以推荐的做法是，发送一条消息，让对方自己善后以及调用 skynet.exit 。注：skynet.kill(skynet.self()) 不完全等价于 skynet.exit() ，后者更安全。
 ---@param name number|string
 function skynet.kill(name)
 end
 
+---* **skynet.manager API**
 ---* 向引擎发送一个 ABORT 命令，退出自身服务
 function skynet.abort()
 end
 
+---* **skynet.manager API**
 ---* 给服务注册一个名字
 ---@param name string
 function skynet.register(name)
 end
 
+---* **skynet.manager API**
 ---* 给服务命名 以 . 开头的名字是在同一 skynet 节点下有效的
 ---* skynet.name(name, skynet.self()) 和 skynet.register(name) 功能等价。
 ---@param name string
@@ -501,6 +515,7 @@ end
 function skynet.name(name, handle)
 end
 
+---* **skynet.manager API**
 ---* 将本服务实现为消息转发器，对一类消息进行转发
 ---* 设置指定类型的消息，不由 skynet 框架释放
 ---* 对于在 map 中的消息，不进行释放
@@ -510,12 +525,14 @@ end
 function skynet.forward_type(map, start_func)
 end
 
+---* **skynet.manager API**
 ---过滤消息再处理。（注：filter 可以将 type, msg, sz, session, source 五个参数先处理过再返回新的 5 个参数。）
 ---@param f any
 ---@param start_func any
 function skynet.filter(f, start_func)
 end
 
+---* **skynet.manager API**
 ---给当前 skynet 进程设置一个全局的服务监控。
 ---@param service any
 ---@param query any

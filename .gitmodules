@@ -13,3 +13,6 @@
 [submodule "3rd/love-api"]
 	path = 3rd/love-api
 	url = https://github.com/love2d-community/love-api
+[submodule "3rd/lovr-api"]
+	path = 3rd/lovr-api
+	url = https://github.com/bjornbytes/lovr-docs

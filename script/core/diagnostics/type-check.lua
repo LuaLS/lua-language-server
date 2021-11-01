@@ -23,6 +23,9 @@ local typeNameMap = {
 }
 
 local function isTable(name)
+    if type(name ~= 'string') then
+        return
+    end
     if tableMap[name]
     ---table<K: number, V: string> table
     or tableMap[name:sub(1, 5)]
@@ -84,7 +87,8 @@ local function compatibleType(param, args)
             if param[1] and param[1]:sub(1,1) == '"' then
                 return true
             end
-        elseif isTable(v.type or v[1]) and isTable(param[1] or param.type) then
+        elseif (isTable(v.type) or isTable(v[1]))
+        and (isTable(param[1]) or isTable(param.type)) then
             return true
         end
     end
@@ -237,9 +241,6 @@ local function getInfoFromDefs(defs)
                                     if v[1] ~= tp[1]
                                     and isClassOralias(v.type) then
                                         plusAlias[#plusAlias+1] = v
-                                    end
-                                    if not v[1] or not v.type then
-                                        log.warn('type-check: if not v[1] or not v.type')
                                     end
                                 end
                                 plusAlias[#plusAlias+1] = types[i]

@@ -4,6 +4,7 @@
 * `NEW` setting `Lua.runtime.pathStrict`
 * `NEW` skip huge files (>= 100 MB)
 * `CHG` no longer asks to trust plugin in VSCode, because VSCode already provides the workspace trust feature
+* `FIX` [#778](https://github.com/sumneko/lua-language-server/issues/778)
 
 ## 2.4.7
 `2021-10-27`

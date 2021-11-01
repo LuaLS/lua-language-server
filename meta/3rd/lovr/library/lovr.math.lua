@@ -425,7 +425,7 @@ function Quat:normalize() end
 ---@overload fun(v: lovr.vec3, u: lovr.vec3):lovr.quat
 ---@overload fun(m: lovr.mat4):lovr.quat
 ---@overload fun():lovr.quat
----@param angle? lovr.angle # The angle to use for the rotation, in radians.
+---@param angle? any # The angle to use for the rotation, in radians.
 ---@param ax? number # The x component of the axis of rotation.
 ---@param ay? number # The y component of the axis of rotation.
 ---@param az? number # The z component of the axis of rotation.

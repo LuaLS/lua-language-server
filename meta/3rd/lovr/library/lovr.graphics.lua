@@ -1319,7 +1319,7 @@ function Shader:hasUniform(uniform) end
 ---Updates a uniform variable in the Shader.
 ---
 ---@param uniform string # The name of the uniform to update.
----@param value lovr.* # The new value of the uniform.
+---@param value any # The new value of the uniform.
 ---@return boolean success # Whether the uniform exists and was updated.
 function Shader:send(uniform, value) end
 
@@ -1390,7 +1390,7 @@ function ShaderBlock:getType() end
 ---Returns a variable in the ShaderBlock.
 ---
 ---@param name string # The name of the variable to read.
----@return lovr.* value # The value of the variable.
+---@return any value # The value of the variable.
 function ShaderBlock:read(name) end
 
 ---
@@ -1398,7 +1398,7 @@ function ShaderBlock:read(name) end
 ---
 ---@overload fun(blob: lovr.Blob, offset: number, extent: number):number
 ---@param variable string # The name of the variable to update.
----@param value lovr.* # The new value of the uniform.
+---@param value any # The new value of the uniform.
 function ShaderBlock:send(variable, value) end
 
 ---

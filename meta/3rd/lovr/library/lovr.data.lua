@@ -57,7 +57,7 @@ function lovr.data.newRasterizer(size) end
 ---@param format? lovr.SampleFormat # The sample data type.
 ---@param channels? lovr.ChannelLayout # The channel layout.
 ---@param sampleRate? number # The sample rate, in Hz.
----@param contents? lovr.* # A Blob containing raw audio samples to use as the initial contents, 'stream' to create an audio stream, or `nil` to leave the data initialized to zero.
+---@param contents? any # A Blob containing raw audio samples to use as the initial contents, 'stream' to create an audio stream, or `nil` to leave the data initialized to zero.
 ---@return lovr.Sound sound # Sounds good.
 function lovr.data.newSound(frames, format, channels, sampleRate, contents) end
 

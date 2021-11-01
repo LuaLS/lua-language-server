@@ -64,7 +64,10 @@ function buildType(param)
     if param.table then
         return buildDocTable(param.table)
     end
-    return getTypeName(param.type or param.name)
+    if param.type and param.type ~= '*' then
+        return getTypeName(param.type)
+    end
+    return 'any'
 end
 
 local function buildSuper(tp)

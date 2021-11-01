@@ -405,7 +405,7 @@ function Collider:getTag() end
 ---
 ---Returns the user data associated with the Collider.
 ---
----@return lovr.* data # The custom value associated with the Collider.
+---@return any data # The custom value associated with the Collider.
 function Collider:getUserData() end
 
 ---
@@ -586,7 +586,7 @@ function Collider:setTag(tag) end
 ---
 ---Associates a custom value with the Collider.
 ---
----@param data lovr.* # The custom value to associate with the Collider.
+---@param data any # The custom value to associate with the Collider.
 function Collider:setUserData(data) end
 
 ---
@@ -795,7 +795,7 @@ function Joint:getType() end
 ---
 ---Returns the user data associated with the Joint.
 ---
----@return lovr.* data # The custom value associated with the Joint.
+---@return any data # The custom value associated with the Joint.
 function Joint:getUserData() end
 
 ---
@@ -813,7 +813,7 @@ function Joint:setEnabled(enabled) end
 ---
 ---Sets the user data associated with the Joint.
 ---
----@param data lovr.* # The custom value associated with the Joint.
+---@param data any # The custom value associated with the Joint.
 function Joint:setUserData(data) end
 
 ---
@@ -881,7 +881,7 @@ function Shape:getType() end
 ---
 ---Returns the user data associated with the Shape.
 ---
----@return lovr.* data # The custom value associated with the Shape.
+---@return any data # The custom value associated with the Shape.
 function Shape:getUserData() end
 
 ---
@@ -928,7 +928,7 @@ function Shape:setSensor(sensor) end
 ---
 ---Sets the user data associated with the Shape.
 ---
----@param data lovr.* # The custom value associated with the Shape.
+---@param data any # The custom value associated with the Shape.
 function Shape:setUserData(data) end
 
 ---

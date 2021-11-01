@@ -62,7 +62,7 @@ function Channel:hasRead(id) end
 ---
 ---Returns a message from the Channel without popping it from the queue.  If the Channel is empty, `nil` is returned.  This can be useful to determine if the Channel is empty.
 ---
----@return lovr.* message # The message, or `nil` if there is no message.
+---@return any message # The message, or `nil` if there is no message.
 ---@return boolean present # Whether a message was returned (use to detect nil).
 function Channel:peek() end
 
@@ -70,13 +70,13 @@ function Channel:peek() end
 ---Pops a message from the Channel.  If the Channel is empty, an optional timeout argument can be used to wait for a message, otherwise `nil` is returned.
 ---
 ---@param wait? number # How long to wait for a message to be popped, in seconds.  `true` can be used to wait forever and `false` can be used to avoid waiting.
----@return lovr.* message # The received message, or `nil` if nothing was received.
+---@return any message # The received message, or `nil` if nothing was received.
 function Channel:pop(wait) end
 
 ---
 ---Pushes a message onto the Channel.  The following types of data can be pushed: nil, boolean, number, string, and userdata.  Tables should be serialized to strings.
 ---
----@param message lovr.* # The message to push.
+---@param message any # The message to push.
 ---@param wait? number # How long to wait for the message to be popped, in seconds.  `true` can be used to wait forever and `false` can be used to avoid waiting.
 ---@return number id # The ID of the pushed message.
 ---@return boolean read # Whether the message was read by another thread before the wait timeout.
@@ -105,7 +105,7 @@ function Thread:isRunning() end
 ---
 ---Starts the Thread.
 ---
----@param arguments lovr.* # Up to 4 arguments to pass to the Thread's function.
+---@param arguments any # Up to 4 arguments to pass to the Thread's function.
 function Thread:start(arguments) end
 
 ---

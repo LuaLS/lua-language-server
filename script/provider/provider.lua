@@ -831,6 +831,8 @@ do
         if not config.get 'Lua.hint.enable' then
             return
         end
+        await.close 'updateHint'
+        await.setID 'updateHint'
         workspace.awaitReady()
         local visibles = files.getVisibles(uri)
         if not visibles then

@@ -124,7 +124,7 @@ function m.setText(uri, text, isTrust)
     if not text then
         return
     end
-    if #text > 1024 * 1024 * 100 then
+    if #text > 1024 * 1024 * 10 then
         local client = require 'client'
         client.showMessage('Warning', lang.script('WORKSPACE_SKIP_HUGE_FILE', uri))
         return

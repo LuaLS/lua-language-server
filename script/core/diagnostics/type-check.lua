@@ -23,7 +23,7 @@ local typeNameMap = {
 }
 
 local function isTable(name)
-    if type(name ~= 'string') then
+    if type(name) ~= 'string' then
         return
     end
     if tableMap[name]

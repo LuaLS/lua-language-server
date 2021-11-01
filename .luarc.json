@@ -9,8 +9,7 @@
             "close-non-object"
         ],
         "neededFileStatus": {
-            "undefined-field": "Any",
-            "type-check": "Any"
+            "undefined-field": "Any"
         },
         "ignoredFiles": "Opened",
         "libraryFiles": "Opened"

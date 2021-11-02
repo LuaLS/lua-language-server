@@ -275,17 +275,23 @@ end
 
 --- 读取文件
 ---@param path string
-function m.loadFile(path)
+function m.loadFile(path, keepBom)
     local f, e = ioOpen(path, 'rb')
     if not f then
         return nil, e
     end
-    if f:read(3) ~= '\xEF\xBB\xBF' then
-        f:seek("set")
-    end
-    local buf = f:read 'a'
+    local text = f:read 'a'
     f:close()
-    return buf
+    if not keepBom then
+        if text:sub(1, 3) == '\xEF\xBB\xBF' then
+            return text:sub(4)
+        end
+        if text:sub(1, 2) == '\xFF\xFE'
+        or text:sub(1, 2) == '\xFE\xFF' then
+            return text:sub(3)
+        end
+    end
+    return text
 end
 
 --- 写入文件

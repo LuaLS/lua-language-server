@@ -417,7 +417,7 @@ return function (uri, callback)
     if not ast then
         return
     end
-    guide.eachSourceType(ast.ast, 'call', function (source)
+    guide.eachSourceType(ast.ast, 'call', function (source) ---@async
         if not source.args then
             return
         end

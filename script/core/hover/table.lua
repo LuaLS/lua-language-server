@@ -134,6 +134,7 @@ local function getOptionalMap(fields)
     return optionals
 end
 
+---@async
 return function (source)
     local maxFields = config.get 'Lua.hover.previewFields'
     if maxFields <= 0 then

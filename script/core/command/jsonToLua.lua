@@ -7,6 +7,7 @@ local lang      = require 'language'
 local converter = require 'proto.converter'
 local guide     = require 'parser.guide'
 
+---@async
 return function (data)
     local state = files.getState(data.uri)
     local text  = files.getText(data.uri)

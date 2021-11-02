@@ -27,6 +27,7 @@ local literalMap = {
     ['table']   = true,
 }
 
+---@async
 return function (data)
     local uri   = data.uri
     local text  = files.getText(uri)

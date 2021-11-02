@@ -19,6 +19,7 @@ local accept = {
     ['function']      = true,
 }
 
+---@diagnostic disable: await-in-sync
 function TEST(script)
     return function (expect)
         files.removeAll()

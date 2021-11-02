@@ -68,6 +68,7 @@ function m.notify(name, params)
     io.write(buf)
 end
 
+---@async
 function m.awaitRequest(name, params)
     local id  = reqCounter()
     local buf = jsonrpc.encode {
@@ -120,7 +121,7 @@ function m.doMethod(proto)
     if proto.id then
         m.holdon[proto.id] = proto
     end
-    await.call(function ()
+    await.call(function () ---@async
         --log.debug('Start method:', method)
         if proto.id then
             await.setID('proto:' .. proto.id)

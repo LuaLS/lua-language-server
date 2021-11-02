@@ -44,6 +44,7 @@ local function asDocTypeName(source)
     end
 end
 
+---@async
 local function asValue(source, title)
     local name    = buildName(source, false) or ''
     local type    = infer.searchAndViewInfers(source)
@@ -76,10 +77,12 @@ local function asValue(source, title)
     return table.concat(pack, ' ')
 end
 
+---@async
 local function asLocal(source)
     return asValue(source, 'local')
 end
 
+---@async
 local function asGlobal(source)
     return asValue(source, 'global')
 end
@@ -111,6 +114,7 @@ local function isGlobalField(source)
     end
 end
 
+---@async
 local function asField(source)
     if isGlobalField(source) then
         return asGlobal(source)
@@ -175,6 +179,7 @@ local function asNumber(source)
     return formatNumber(num)
 end
 
+---@async
 return function (source, oop)
     if source.type == 'function' then
         return asFunction(source, oop)

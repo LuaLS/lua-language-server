@@ -66,6 +66,7 @@ function m.call(callback, ...)
 end
 
 --- 创建一个任务，并挂起当前线程，当任务完成后再延续当前线程/若任务被关闭，则返回nil
+---@async
 function m.await(callback, ...)
     if not coroutine.isyieldable() then
         return callback(...)
@@ -109,6 +110,7 @@ end
 
 --- 休眠一段时间
 ---@param time number
+---@async
 function m.sleep(time)
     if not coroutine.isyieldable() then
         if m.errorHandle then
@@ -128,6 +130,7 @@ end
 
 --- 等待直到唤醒
 ---@param callback function
+---@async
 function m.wait(callback, ...)
     if not coroutine.isyieldable() then
         return
@@ -148,6 +151,7 @@ function m.wait(callback, ...)
 end
 
 --- 延迟
+---@async
 function m.delay()
     if not m._enable then
         return
@@ -174,6 +178,7 @@ function m.delay()
 end
 
 --- stop then close
+---@async
 function m.stop()
     if not coroutine.isyieldable() then
         return

@@ -203,6 +203,7 @@ local function getSnip(source)
     end
 end
 
+---@async
 local function buildDesc(source)
     if source.type == 'dummy' then
         return
@@ -229,7 +230,7 @@ local function buildFunction(results, source, value, oop, data)
             title = 'trigger signature',
             command = 'editor.action.triggerParameterHints',
         }
-        snipData.id  = stack(function ()
+        snipData.id  = stack(function () ---@async
             return {
                 detail      = buildDetail(source),
                 description = buildDesc(source),
@@ -292,7 +293,7 @@ local function checkLocal(state, word, position, results)
                         match  = name,
                         insertText = name,
                         kind   = define.CompletionItemKind.Function,
-                        id     = stack(function ()
+                        id     = stack(function () ---@async
                             return {
                                 detail      = buildDetail(source),
                                 description = buildDesc(source),
@@ -305,7 +306,7 @@ local function checkLocal(state, word, position, results)
             results[#results+1] = {
                 label  = name,
                 kind   = define.CompletionItemKind.Variable,
-                id     = stack(function ()
+                id     = stack(function () ---@async
                     return {
                         detail      = buildDetail(source),
                         description = buildDesc(source),
@@ -370,7 +371,7 @@ local function checkModule(state, word, position, results)
                         },
                     },
                 },
-                id     = stack(function ()
+                id     = stack(function () ---@async
                     local md = markdown()
                     md:add('md', lang.script('COMPLETION_IMPORT_FROM', ('[%s](%s)'):format(
                         workspace.getRelativePath(uri),
@@ -471,7 +472,7 @@ local function checkFieldThen(name, src, word, startPos, position, parent, oop, 
             match      = name:match '^[^(]+',
             insertText = name:match '^[^(]+',
             deprecated = vm.isDeprecated(src) or nil,
-            id         = stack(function ()
+            id         = stack(function () ---@async
                 return {
                     detail      = buildDetail(src),
                     description = buildDesc(src),
@@ -504,7 +505,7 @@ local function checkFieldThen(name, src, word, startPos, position, parent, oop, 
         deprecated = vm.isDeprecated(src) or nil,
         textEdit   = textEdit,
         additionalTextEdits = additionalTextEdits,
-        id         = stack(function ()
+        id         = stack(function () ---@async
             return {
                 detail      = buildDetail(src),
                 description = buildDesc(src),
@@ -513,6 +514,7 @@ local function checkFieldThen(name, src, word, startPos, position, parent, oop, 
     }
 end
 
+---@async
 local function checkFieldOfRefs(refs, state, word, startPos, position, parent, oop, results, locals, isGlobal)
     local fields = {}
     local funcs  = {}
@@ -577,12 +579,14 @@ local function checkFieldOfRefs(refs, state, word, startPos, position, parent, o
     end
 end
 
+---@async
 local function checkGlobal(state, word, startPos, position, parent, oop, results)
     local locals = guide.getVisibleLocals(state.ast, position)
     local globals = vm.getGlobalSets '*'
     checkFieldOfRefs(globals, state, word, startPos, position, parent, oop, results, locals, 'global')
 end
 
+---@async
 local function checkField(state, word, start, position, parent, oop, results)
     if parent.tag == '_ENV' or parent.special == '_G' then
         local globals = vm.getGlobalSets '*'
@@ -1204,6 +1208,7 @@ local function trySpecial(state, text, position, results)
     checkEqualEnum(state, text, position, results)
 end
 
+---@async
 local function tryIndex(state, text, position, results)
     local parent, oop = findParentInStringIndex(state, text, position)
     if not parent then
@@ -1213,6 +1218,7 @@ local function tryIndex(state, text, position, results)
     checkField(state, word, position, position, parent, oop, results)
 end
 
+---@async
 local function tryWord(state, text, position, triggerCharacter, results)
     local offset = guide.positionToOffset(state, position)
     local finish = lookBackward.skipSpace(text, offset)
@@ -1268,6 +1274,7 @@ local function tryWord(state, text, position, triggerCharacter, results)
     end
 end
 
+---@async
 local function trySymbol(state, text, position, results)
     local symbol, start = lookBackward.findSymbol(text, guide.positionToOffset(state, position))
     if not symbol then
@@ -1486,7 +1493,7 @@ local function checkTableLiteralField(state, text, position, tbl, fields, result
                     label = guide.getKeyName(field),
                     kind  = define.CompletionItemKind.Property,
                     insertText = ('%s = $0'):format(guide.getKeyName(field)),
-                    id    = stack(function ()
+                    id    = stack(function () ---@async
                         return {
                             detail      = buildDetail(field),
                             description = buildDesc(field),
@@ -2061,6 +2068,7 @@ local function clearCache()
     cache.results = nil
 end
 
+---@async
 local function completion(uri, position, triggerCharacter)
     tracy.ZoneBeginN 'completion cache'
     local results = getCache(uri, position)

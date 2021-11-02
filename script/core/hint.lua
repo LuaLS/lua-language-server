@@ -12,7 +12,7 @@ local function typeHint(uri, results, start, finish)
         return
     end
     local mark = {}
-    guide.eachSourceBetween(state.ast, start, finish, function (source)
+    guide.eachSourceBetween(state.ast, start, finish, function (source) ---@async
         if  source.type ~= 'local'
         and source.type ~= 'setglobal'
         and source.type ~= 'tablefield'
@@ -106,7 +106,7 @@ local function paramName(uri, results, start, finish)
         return
     end
     local mark = {}
-    guide.eachSourceBetween(state.ast, start, finish, function (source)
+    guide.eachSourceBetween(state.ast, start, finish, function (source) ---@async
         if source.type ~= 'call' then
             return
         end
@@ -167,7 +167,7 @@ local function awaitHint(uri, results, start, finish)
     if not state then
         return
     end
-    guide.eachSourceBetween(state.ast, start, finish, function (source)
+    guide.eachSourceBetween(state.ast, start, finish, function (source) ---@async
         if source.type ~= 'call' then
             return
         end
@@ -188,7 +188,7 @@ end
 return function (uri, start, finish)
     local results = {}
     typeHint(uri, results, start, finish)
-    paramName(uri, results, start, finish)
     awaitHint(uri, results, start, finish)
+    paramName(uri, results, start, finish)
     return results
 end

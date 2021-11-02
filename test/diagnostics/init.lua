@@ -26,6 +26,7 @@ local function founded(targets, results)
     return true
 end
 
+---@diagnostic disable: await-in-sync
 function TEST(script, ...)
     files.removeAll()
     local newScript, catched = catch(script, '!')

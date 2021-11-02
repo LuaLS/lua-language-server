@@ -104,6 +104,7 @@ end
 ---@parma name string
 ---@param params any
 ---@return any
+---@async
 function m.awaitTask(name, params)
     local info = {
         id     = counter(),

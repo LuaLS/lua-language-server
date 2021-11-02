@@ -25,6 +25,7 @@ return function (uri, callback)
     end
 
     local cache = {}
+    ---@async
     local function checkFunction(source)
         if cache[source] ~= nil then
             return cache[source]
@@ -81,7 +82,7 @@ return function (uri, callback)
     end
 
     -- 只检查局部函数
-    guide.eachSourceType(ast.ast, 'function', function (source)
+    guide.eachSourceType(ast.ast, 'function', function (source) ---@async
         checkFunction(source)
     end)
 end

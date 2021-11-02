@@ -10,7 +10,7 @@ return function (uri, callback)
         return
     end
 
-    guide.eachSource(state.ast, function (src)
+    guide.eachSource(state.ast, function (src) ---@async
         await.delay()
         if src.redundant then
             callback {

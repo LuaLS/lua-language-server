@@ -381,7 +381,7 @@ return function (uri, start, finish)
     end
 
     local results = {}
-    guide.eachSourceBetween(state.ast, start, finish, function (source)
+    guide.eachSourceBetween(state.ast, start, finish, function (source) ---@async
         local method = Care[source.type]
         if not method then
             return

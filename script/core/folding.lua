@@ -145,6 +145,7 @@ local Care = {
     end,
 }
 
+---@async
 return function (uri)
     local state = files.getState(uri)
     local text  = files.getText(uri)
@@ -154,7 +155,7 @@ return function (uri)
     local regions = {}
     local status = {}
 
-    guide.eachSource(state.ast, function (source)
+    guide.eachSource(state.ast, function (source) ---@async
         local tp = source.type
         if Care[tp] then
             await.delay()

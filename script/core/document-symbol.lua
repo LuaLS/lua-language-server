@@ -219,6 +219,7 @@ local function buildAnonymousFunction(source, text, used, symbols)
     }
 end
 
+---@async
 local function buildSource(source, text, used, symbols)
     if     source.type == 'local'
     or     source.type == 'setlocal'
@@ -243,7 +244,7 @@ local function makeSymbol(uri)
 
     local symbols = {}
     local used = {}
-    guide.eachSource(ast.ast, function (source)
+    guide.eachSource(ast.ast, function (source) ---@async
         buildSource(source, text, used, symbols)
     end)
 
@@ -279,6 +280,7 @@ local function packChild(symbols)
     return root
 end
 
+---@async
 local function packSymbols(symbols)
     await.delay()
     table.sort(symbols, function (a, b)
@@ -291,6 +293,7 @@ local function packSymbols(symbols)
     return packChild(symbols)
 end
 
+---@async
 return function (uri)
     local symbols = makeSymbol(uri)
     if not symbols then

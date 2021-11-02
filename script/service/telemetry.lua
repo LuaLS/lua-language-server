@@ -111,7 +111,7 @@ function m.updateConfig()
     end
     m.hasShowedMessage = true
 
-    await.call(function ()
+    await.call(function () ---@async
         local enableTitle  = lang.script.WINDOW_TELEMETRY_ENABLE
         local disableTitle = lang.script.WINDOW_TELEMETRY_DISABLE
         local item = proto.awaitRequest('window/showMessageRequest', {

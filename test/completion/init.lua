@@ -64,6 +64,7 @@ ContinueTyping = false
 
 function TEST(script)
     return function (expect)
+        ---@diagnostic disable: await-in-sync
         files.removeAll()
         local newScript, catched = catch(script, '?')
 

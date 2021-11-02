@@ -63,6 +63,7 @@ local function findInsertRow(uri)
     return row or 0, fmt
 end
 
+---@async
 local function askAutoRequire(visiblePaths)
     local selects = {}
     local nameMap = {}
@@ -125,6 +126,7 @@ local function applyAutoRequire(uri, row, name, result, fmt)
     })
 end
 
+---@async
 return function (data)
     local uri    = data.uri
     local target = data.target

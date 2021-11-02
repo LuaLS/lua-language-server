@@ -29,6 +29,7 @@ local function founded(targets, results)
     return true
 end
 
+---@diagnostic disable: await-in-sync
 function TEST(datas)
     files.removeAll()
 

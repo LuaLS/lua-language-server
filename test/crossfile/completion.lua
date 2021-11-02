@@ -80,6 +80,7 @@ local function removeMetas(results)
     util.tableMultiRemove(results, removes)
 end
 
+---@diagnostic disable: await-in-sync
 function TEST(data)
     files.removeAll()
 

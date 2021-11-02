@@ -37,6 +37,7 @@ local function eq(a, b)
     return a == b
 end
 
+---@diagnostic disable: await-in-sync
 function TEST(expect)
     files.removeAll()
 

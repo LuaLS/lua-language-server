@@ -57,6 +57,7 @@ local function searchFile(uri, key, results)
     end)
 end
 
+---@async
 return function (key)
     local results = {}
 

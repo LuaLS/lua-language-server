@@ -74,6 +74,7 @@ local globInteferFace = {
 }
 
 --- 创建排除文件匹配器
+---@async
 function m.getNativeMatcher()
     if not m.path then
         return nil
@@ -177,6 +178,7 @@ function m.getLibraryMatchers()
 end
 
 --- 文件是否被忽略
+---@async
 function m.isIgnored(uri)
     local path = m.getRelativePath(uri)
     local ignore = m.getNativeMatcher()
@@ -186,6 +188,7 @@ function m.isIgnored(uri)
     return ignore(path)
 end
 
+---@async
 function m.isValidLuaUri(uri)
     if not files.isLua(uri) then
         return false
@@ -198,7 +201,7 @@ function m.isValidLuaUri(uri)
 end
 
 local function loadFileFactory(root, progressData, isLibrary)
-    return function (path)
+    return function (path) ---@async
         local uri = furi.encode(path)
         if files.isLua(uri) then
             if not isLibrary and progressData.preload >= config.get 'Lua.workspace.maxPreload' then
@@ -279,6 +282,7 @@ local function loadFileFactory(root, progressData, isLibrary)
     end
 end
 
+---@async
 function m.awaitLoadFile(uri)
     local progressBar <close> = progress.create(lang.script.WORKSPACE_LOADING)
     local progressData = {
@@ -299,6 +303,7 @@ function m.awaitLoadFile(uri)
 end
 
 --- 预读工作区内所有文件
+---@async
 function m.awaitPreload()
     local diagnostic = require 'provider.diagnostic'
     await.close 'preload'
@@ -347,7 +352,7 @@ function m.awaitPreload()
         if isLoadingFiles then
             return
         end
-        await.call(function ()
+        await.call(function () ---@async
             isLoadingFiles = true
             while true do
                 local loader = table.remove(progressData.loaders)
@@ -563,6 +568,7 @@ function m.init()
     m.reload()
 end
 
+---@async
 function m.awaitReload()
     m.ready = false
     m.hasHitMaxPreload = false
@@ -580,6 +586,7 @@ function m.awaitReload()
 end
 
 ---等待工作目录加载完成
+---@async
 function m.awaitReady()
     if m.isReady() then
         return
@@ -597,7 +604,7 @@ function m.getLoadProcess()
     return m.fileLoaded, m.fileFound
 end
 
-files.watch(function (ev, uri)
+files.watch(function (ev, uri) ---@async
     if  ev == 'close'
     and m.isIgnored(uri)
     and not files.isLibrary(uri) then
@@ -615,7 +622,7 @@ config.watch(function (key, value, oldValue)
     end
 end)
 
-fw.event(function (changes)
+fw.event(function (changes) ---@async
     m.awaitReady()
     for _, change in ipairs(changes) do
         local path = change.path

@@ -8,6 +8,7 @@ local luadoc = require "parser.luadoc"
 local noder  = require 'core.noder'
 
 -- 临时
+---@diagnostic disable: await-in-sync
 local function testIfExit(path)
     config.set('Lua.workspace.preloadFileSize', 1000000000)
     local buf = util.loadFile(path:string())

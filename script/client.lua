@@ -88,6 +88,7 @@ end
 ---@param titles  string[]
 ---@return string action
 ---@return integer index
+---@async
 function m.awaitRequestMessage(type, message, titles)
     proto.notify('window/logMessage', {
         type = define.MessageType[type] or 3,

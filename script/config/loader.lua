@@ -63,6 +63,7 @@ function m.loadLocalConfig(filename)
     end
 end
 
+---@async
 function m.loadClientConfig()
     local configs = proto.awaitRequest('workspace/configuration', {
         items = {

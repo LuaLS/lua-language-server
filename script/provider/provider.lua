@@ -16,6 +16,7 @@ local cfgLoader  = require 'config.loader'
 local converter  = require 'proto.converter'
 local filewatch  = require 'filewatch'
 
+---@async
 local function updateConfig()
     local new
     if CONFIGPATH then
@@ -43,7 +44,7 @@ local function updateConfig()
     log.debug('loaded config dump:', util.dump(new))
 end
 
-filewatch.event(function (changes)
+filewatch.event(function (changes) ---@async
     local configPath = workspace.getAbsolutePath(CONFIGPATH or '.luarc.json')
     if not configPath then
         return
@@ -68,7 +69,7 @@ proto.on('initialize', function (params)
     }
 end)
 
-proto.on('initialized', function (params)
+proto.on('initialized', function (params) ---@async
     files.init()
     local _ <close> = progress.create(lang.script.WINDOW_INITIALIZING, 0.5)
     updateConfig()
@@ -102,14 +103,14 @@ proto.on('shutdown', function ()
     return true
 end)
 
-proto.on('workspace/didChangeConfiguration', function ()
+proto.on('workspace/didChangeConfiguration', function () ---@async
     if CONFIGPATH then
         return
     end
     updateConfig()
 end)
 
-proto.on('workspace/didCreateFiles', function (params)
+proto.on('workspace/didCreateFiles', function (params) ---@async
     log.debug('workspace/didCreateFiles', util.dump(params))
     for _, file in ipairs(params.files) do
         if workspace.isValidLuaUri(file.uri) then
@@ -130,7 +131,7 @@ proto.on('workspace/didDeleteFiles', function (params)
     end
 end)
 
-proto.on('workspace/didRenameFiles', function (params)
+proto.on('workspace/didRenameFiles', function (params) ---@async
     log.debug('workspace/didRenameFiles', util.dump(params))
     for _, file in ipairs(params.files) do
         local text = files.getOriginText(file.oldUri)
@@ -157,7 +158,7 @@ proto.on('workspace/didRenameFiles', function (params)
     end
 end)
 
-proto.on('textDocument/didOpen', function (params)
+proto.on('textDocument/didOpen', function (params) ---@async
     workspace.awaitReady()
     local doc   = params.textDocument
     local uri   = doc.uri
@@ -177,7 +178,7 @@ proto.on('textDocument/didClose', function (params)
     end
 end)
 
-proto.on('textDocument/didChange', function (params)
+proto.on('textDocument/didChange', function (params) ---@async
     workspace.awaitReady()
     local doc     = params.textDocument
     local changes = params.contentChanges
@@ -187,7 +188,7 @@ proto.on('textDocument/didChange', function (params)
     files.setText(uri, text, true)
 end)
 
-proto.on('textDocument/hover', function (params)
+proto.on('textDocument/hover', function (params) ---@async
     local doc    = params.textDocument
     local uri    = doc.uri
     if not workspace.isReady() then
@@ -218,7 +219,7 @@ proto.on('textDocument/hover', function (params)
     }
 end)
 
-proto.on('textDocument/definition', function (params)
+proto.on('textDocument/definition', function (params) ---@async
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_DEFINITION, 0.5)
     local core   = require 'core.definition'
@@ -253,7 +254,7 @@ proto.on('textDocument/definition', function (params)
     return response
 end)
 
-proto.on('textDocument/typeDefinition', function (params)
+proto.on('textDocument/typeDefinition', function (params) ---@async
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_TYPE_DEFINITION, 0.5)
     local core   = require 'core.type-definition'
@@ -288,7 +289,7 @@ proto.on('textDocument/typeDefinition', function (params)
     return response
 end)
 
-proto.on('textDocument/references', function (params)
+proto.on('textDocument/references', function (params) ---@async
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_REFERENCE, 0.5)
     local core   = require 'core.reference'
@@ -332,7 +333,7 @@ proto.on('textDocument/documentHighlight', function (params)
     return response
 end)
 
-proto.on('textDocument/rename', function (params)
+proto.on('textDocument/rename', function (params) ---@async
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_RENAME, 0.5)
     local core = require 'core.rename'
@@ -376,7 +377,7 @@ proto.on('textDocument/prepareRename', function (params)
     }
 end)
 
-proto.on('textDocument/completion', function (params)
+proto.on('textDocument/completion', function (params) ---@async
     local uri  = params.textDocument.uri
     if not workspace.isReady() then
         local count, max = workspace.getLoadProcess()
@@ -522,7 +523,7 @@ proto.on('completionItem/resolve', function (item)
     return item
 end)
 
-proto.on('textDocument/signatureHelp', function (params)
+proto.on('textDocument/signatureHelp', function (params) ---@async
     if not config.get 'Lua.signatureHelp.enable' then
         return nil
     end
@@ -564,7 +565,7 @@ proto.on('textDocument/signatureHelp', function (params)
     }
 end)
 
-proto.on('textDocument/documentSymbol', function (params)
+proto.on('textDocument/documentSymbol', function (params) ---@async
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SYMBOL, 0.5)
     local core = require 'core.document-symbol'
@@ -575,6 +576,7 @@ proto.on('textDocument/documentSymbol', function (params)
         return nil
     end
 
+    ---@async
     local function convert(symbol)
         await.delay()
         symbol.range = converter.packRange(
@@ -636,7 +638,7 @@ proto.on('textDocument/codeAction', function (params)
     return results
 end)
 
-proto.on('workspace/executeCommand', function (params)
+proto.on('workspace/executeCommand', function (params) ---@async
     local command = params.command:gsub(':.+', '')
     if     command == 'lua.removeSpace' then
         local core = require 'core.command.removeSpace'
@@ -656,7 +658,7 @@ proto.on('workspace/executeCommand', function (params)
     end
 end)
 
-proto.on('workspace/symbol', function (params)
+proto.on('workspace/symbol', function (params) ---@async
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_WS_SYMBOL, 0.5)
     local core = require 'core.workspace-symbol'
@@ -685,7 +687,7 @@ proto.on('workspace/symbol', function (params)
     return symbols
 end)
 
-proto.on('textDocument/semanticTokens/full', function (params)
+proto.on('textDocument/semanticTokens/full', function (params) ---@async
     local uri = params.textDocument.uri
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
@@ -696,7 +698,7 @@ proto.on('textDocument/semanticTokens/full', function (params)
     }
 end)
 
-proto.on('textDocument/semanticTokens/range', function (params)
+proto.on('textDocument/semanticTokens/range', function (params) ---@async
     local uri = params.textDocument.uri
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_RANGE, 0.5)
@@ -716,7 +718,7 @@ proto.on('textDocument/semanticTokens/range', function (params)
     }
 end)
 
-proto.on('textDocument/foldingRange', function (params)
+proto.on('textDocument/foldingRange', function (params) ---@async
     local core    = require 'core.folding'
     local uri     = params.textDocument.uri
     if not files.exists(uri) then
@@ -750,7 +752,7 @@ proto.on('window/workDoneProgress/cancel', function (params)
     progress.cancel(params.token)
 end)
 
-proto.on('$/didChangeVisibleRanges', function (params)
+proto.on('$/didChangeVisibleRanges', function (params) ---@async
     local uri = params.uri
     await.close('visible:' .. uri)
     await.setID('visible:' .. uri)
@@ -758,7 +760,7 @@ proto.on('$/didChangeVisibleRanges', function (params)
     files.setVisibles(uri, params.ranges)
 end)
 
-proto.on('$/status/click', function ()
+proto.on('$/status/click', function () ---@async
     -- TODO: translate
     local titleDiagnostic = '进行工作区诊断'
     local result = client.awaitRequestMessage('Info', 'xxx', {
@@ -773,7 +775,7 @@ proto.on('$/status/click', function ()
     end
 end)
 
-proto.on('textDocument/onTypeFormatting', function (params)
+proto.on('textDocument/onTypeFormatting', function (params) ---@async
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
     local ch     = params.ch
@@ -805,7 +807,7 @@ proto.on('$/cancelRequest', function (params)
     proto.close(params.id, define.ErrorCodes.RequestCancelled)
 end)
 
-proto.on('$/requestHint', function (params)
+proto.on('$/requestHint', function (params) ---@async
     local core = require 'core.hint'
     if not config.get 'Lua.hint.enable' then
         return
@@ -827,6 +829,7 @@ end)
 
 -- Hint
 do
+    ---@async
     local function updateHint(uri)
         if not config.get 'Lua.hint.enable' then
             return
@@ -863,7 +866,7 @@ do
     files.watch(function (ev, uri)
         if ev == 'update'
         or ev == 'updateVisible' then
-            await.call(function ()
+            await.call(function () ---@async
                 updateHint(uri)
             end)
         end

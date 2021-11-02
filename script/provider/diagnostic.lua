@@ -182,6 +182,7 @@ function m.diagnostics(uri, diags)
     end)
 end
 
+---@async
 function m.doDiagnostic(uri)
     if not config.get 'Lua.diagnostics.enable' then
         return
@@ -267,7 +268,7 @@ function m.refresh(uri)
         return
     end
     await.close('diag:' .. uri)
-    await.call(function ()
+    await.call(function () ---@async
         await.delay()
         if uri then
             xpcall(m.doDiagnostic, log.error, uri)
@@ -276,6 +277,7 @@ function m.refresh(uri)
     end, 'files.version')
 end
 
+---@async
 local function askForDisable()
     if m.dontAskedForDisable then
         return
@@ -334,7 +336,7 @@ function m.diagnosticsAll(force)
         return
     end
     await.close 'diagnosticsAll'
-    await.call(function ()
+    await.call(function () ---@async
         await.sleep(delay)
         m.diagnosticsAllClock = os.clock()
         local clock = os.clock()
@@ -377,6 +379,7 @@ function m.checkStepResult()
     end
 end
 
+---@async
 function m.checkWorkspaceDiag()
     if not await.hasID 'diagnosticsAll' then
         return
@@ -402,7 +405,7 @@ function m.checkWorkspaceDiag()
     return false
 end
 
-files.watch(function (ev, uri)
+files.watch(function (ev, uri) ---@async
     if ev == 'remove' then
         m.clear(uri)
         m.refresh(uri)
@@ -422,7 +425,7 @@ files.watch(function (ev, uri)
     end
 end)
 
-await.watch(function (ev, co)
+await.watch(function (ev, co) ---@async
     if ev == 'delay' then
         if m.checkStepResult then
             m.checkStepResult()

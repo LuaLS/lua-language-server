@@ -45,6 +45,7 @@ local function checkArcoss(symbols)
     end
 end
 
+---@diagnostic disable: await-in-sync
 function TEST(script)
     return function (expect)
         files.removeAll()

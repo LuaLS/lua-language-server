@@ -39,6 +39,7 @@ local function findNearCall(uri, ast, pos)
     return nearCall
 end
 
+---@async
 local function makeOneSignature(source, oop, index)
     local label = hoverLabel(source, oop)
     -- 去掉返回值
@@ -77,6 +78,7 @@ local function makeOneSignature(source, oop, index)
     }
 end
 
+---@async
 local function makeSignatures(text, call, pos)
     local node = call.node
     local oop = node.type == 'method'
@@ -136,6 +138,7 @@ local function makeSignatures(text, call, pos)
     return signs
 end
 
+---@async
 return function (uri, pos)
     local state = files.getState(uri)
     if not state then

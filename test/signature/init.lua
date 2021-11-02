@@ -4,6 +4,7 @@ local catch = require 'catch'
 
 rawset(_G, 'TEST', true)
 
+---@diagnostic disable: await-in-sync
 function TEST(script)
     return function (expect)
         local newScript, catched1 = catch(script, '?')

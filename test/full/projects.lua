@@ -9,6 +9,7 @@ local fs     = require 'bee.filesystem'
 config.set('Lua.workspace.preloadFileSize',    1000000)
 config.set('Lua.diagnostics.neededFileStatus', {})
 
+---@diagnostic disable: await-in-sync
 local function doProjects(pathname)
     files.removeAll()
 

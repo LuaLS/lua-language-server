@@ -25,6 +25,7 @@ diag.start()
 
 local clock = os.clock()
 
+---@diagnostic disable: await-in-sync
 for uri in files.eachFile() do
     local fileClock = os.clock()
     diag.doDiagnostic(uri)

@@ -44,6 +44,7 @@ DIAG_DEPRECATED         = '已废弃。'
 DIAG_DIFFERENT_REQUIRES = '使用了不同的名字 require 了同一个文件。'
 DIAG_REDUNDANT_RETURN   = '冗余返回。'
 DIAG_AWAIT_IN_SYNC      = '只能在标记为异步的函数中调用异步函数。'
+DIAG_NOT_YIELDABLE      = '此函数的第 {} 个参数没有被标记为可让出，但是传入了异步函数。（使用 `---@param name async fun()` 来标记为可让出）'
 
 DIAG_CIRCLE_DOC_CLASS                 = '循环继承的类。'
 DIAG_DOC_FIELD_NO_CLASS               = '字段必须定义在类之后。'

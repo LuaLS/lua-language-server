@@ -44,6 +44,7 @@ DIAG_DEPRECATED         = 'Deprecated.'
 DIAG_DIFFERENT_REQUIRES = 'The same file is required with different names.'
 DIAG_REDUNDANT_RETURN   = 'Redundant return.'
 DIAG_AWAIT_IN_SYNC      = 'Async function can only be called in async function.'
+DIAG_NOT_YIELDABLE      = 'The {}th parameter of this function was not marked as yieldable, but an async function was passed in. (Use `---@param name async fun()` to mark as yieldable)'
 
 DIAG_CIRCLE_DOC_CLASS                 = 'Circularly inherited classes.'
 DIAG_DOC_FIELD_NO_CLASS               = 'The field must be defined after the class.'

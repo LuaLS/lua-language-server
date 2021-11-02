@@ -1098,6 +1098,14 @@ local function parseModule()
     return result
 end
 
+local function parseAsync()
+    return {
+        type   = 'doc.async',
+        start  = getFinish(),
+        finish = getFinish(),
+    }
+end
+
 local function convertTokens()
     local tp, text = nextToken()
     if not tp then
@@ -1141,6 +1149,8 @@ local function convertTokens()
         return parseDiagnostic()
     elseif text == 'module' then
         return parseModule()
+    elseif text == 'async' then
+        return parseAsync()
     end
 end
 

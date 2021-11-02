@@ -7,12 +7,12 @@ local await    = require 'await'
 local define   = require 'proto.define'
 
 local function typeHint(uri, results, start, finish)
-    local ast = files.getState(uri)
-    if not ast then
+    local state = files.getState(uri)
+    if not state then
         return
     end
     local mark = {}
-    guide.eachSourceBetween(ast.ast, start, finish, function (source)
+    guide.eachSourceBetween(state.ast, start, finish, function (source)
         if  source.type ~= 'local'
         and source.type ~= 'setglobal'
         and source.type ~= 'tablefield'
@@ -101,12 +101,12 @@ local function paramName(uri, results, start, finish)
     if not paramConfig or paramConfig == 'None' then
         return
     end
-    local ast = files.getState(uri)
-    if not ast then
+    local state = files.getState(uri)
+    if not state then
         return
     end
     local mark = {}
-    guide.eachSourceBetween(ast.ast, start, finish, function (source)
+    guide.eachSourceBetween(state.ast, start, finish, function (source)
         if source.type ~= 'call' then
             return
         end
@@ -158,9 +158,37 @@ local function paramName(uri, results, start, finish)
     end)
 end
 
+local function awaitHint(uri, results, start, finish)
+    local awaitConfig = config.get 'Lua.hint.await'
+    if not awaitConfig then
+        return
+    end
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
+    guide.eachSourceBetween(state.ast, start, finish, function (source)
+        if source.type ~= 'call' then
+            return
+        end
+        await.delay()
+        local node = source.node
+        if not vm.isAsync(node, true) then
+            return
+        end
+        results[#results+1] = {
+            text   = 'await ',
+            offset = node.start,
+            kind   = define.InlayHintKind.Other,
+            where  = 'left',
+        }
+    end)
+end
+
 return function (uri, start, finish)
     local results = {}
     typeHint(uri, results, start, finish)
     paramName(uri, results, start, finish)
+    awaitHint(uri, results, start, finish)
     return results
 end

@@ -1621,6 +1621,7 @@ local function tryLuaDocCate(word, results)
         'see',
         'diagnostic',
         'module',
+        'async',
     } do
         if matchKey(word, docType) then
             results[#results+1] = {

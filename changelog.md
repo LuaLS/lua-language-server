@@ -1,9 +1,13 @@
 # changelog
 
 ## 2.5.0
-* `NEW` setting `Lua.runtime.pathStrict`
+* `NEW` settings:
+  + `Lua.runtime.pathStrict`: not check subdirectories when using `runtime.path`
+  + `Lua.hint.await`: display `await` when calling a function marked as async
 * `NEW` add supports of `lovr`
 * `NEW` file encoding supports `utf16le` and `utf16be`
+* `NEW` `LuaDoc` annotations:
+  + `---@async`: mark a function as async
 * `CHG` `LuaDoc` supports unicode
 * `CHG` no longer asks to trust plugin in VSCode, because VSCode already provides the workspace trust feature
 * `CHG` skip huge files (>= 10 MB)

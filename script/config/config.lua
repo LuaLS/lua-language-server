@@ -199,6 +199,7 @@ local Template = {
     ['Lua.hint.paramType']                  = Type.Boolean >> true,
     ['Lua.hint.setType']                    = Type.Boolean >> false,
     ['Lua.hint.paramName']                  = Type.String  >> 'All',
+    ['Lua.hint.await']                      = Type.Boolean >> true,
     ['Lua.window.statusBar']                = Type.Boolean >> true,
     ['Lua.window.progressBar']              = Type.Boolean >> true,
     ['Lua.telemetry.enable']                = Type.Or(Type.Boolean >> false, Type.Nil),

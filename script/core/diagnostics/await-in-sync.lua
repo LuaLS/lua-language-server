@@ -2,6 +2,7 @@ local files = require 'files'
 local guide = require 'parser.guide'
 local vm    = require 'vm'
 local lang  = require 'language'
+local await = require 'await'
 
 return function (uri, callback)
     local state = files.getState(uri)
@@ -9,11 +10,12 @@ return function (uri, callback)
         return
     end
 
-    guide.eachSourceType(state.ast, 'call', function (source)
+    guide.eachSourceType(state.ast, 'call', function (source) ---@async
         local currentFunc = guide.getParentFunction(source)
-        if currentFunc and vm.isAsync(currentFunc) then
+        if currentFunc and vm.isAsync(currentFunc, false) then
             return
         end
+        await.delay()
         if not vm.isAsync(source.node, true) then
             return
         end

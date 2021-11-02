@@ -4,9 +4,10 @@ local config = require 'config'
 local util   = require 'utility'
 local catch  = require 'catch'
 
-config.get 'Lua.diagnostics.neededFileStatus'['deprecated'] = 'Any'
-config.get 'Lua.diagnostics.neededFileStatus'['type-check'] = 'Any'
+config.get 'Lua.diagnostics.neededFileStatus'['deprecated']    = 'Any'
+config.get 'Lua.diagnostics.neededFileStatus'['type-check']    = 'Any'
 config.get 'Lua.diagnostics.neededFileStatus'['await-in-sync'] = 'Any'
+config.get 'Lua.diagnostics.neededFileStatus'['not-yieldable'] = 'Any'
 
 rawset(_G, 'TEST', true)
 
@@ -1387,4 +1388,58 @@ local f
 function F()
     f()
 end
+]]
+
+TEST [[
+---@param f async fun()
+function CB(f)
+    <!f!>()
+end
+]]
+
+TEST [[
+local cb
+
+cb(function () ---@async
+    return nil
+end)
+]]
+
+TEST [[
+---@param f async fun()
+function CB(f)
+    return f
+end
+
+CB(function () ---@async
+    return nil
+end)
+]]
+
+TEST [[
+function CB(f)
+    return f
+end
+
+<!CB!>(function () ---@async
+    return nil
+end)
+]]
+
+TEST [[
+---@type fun(f: async fun())
+local cb
+
+cb(function () ---@async
+    return nil
+end)
+]]
+
+TEST [[
+---@type fun(f: fun())
+local cb
+
+<!cb!>(function () ---@async
+    return nil
+end)
 ]]

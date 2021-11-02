@@ -308,6 +308,44 @@ local function solveTrailingSpace(uri, diag, results)
     }
 end
 
+local function solveAwaitInSync(uri, diag, results)
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
+    local start, finish = converter.unpackRange(uri, diag.range)
+    local parentFunction
+    guide.eachSourceType(state.ast, 'function', function (source)
+        if source.start > finish
+        or source.finish < start then
+            return
+        end
+        if not parentFunction or parentFunction.start < source.start then
+            parentFunction = source
+        end
+    end)
+    if not parentFunction then
+        return
+    end
+    local row = guide.rowColOf(parentFunction.start)
+    local pos = guide.positionOf(row, 0)
+    results[#results+1] = {
+        title = lang.script.ACTION_MARK_ASYNC,
+        kind = 'quickfix',
+        edit = {
+            changes = {
+                [uri] = {
+                    {
+                        start  = pos,
+                        finish = pos,
+                        newText = '---@async\n',
+                    }
+                }
+            }
+        },
+    }
+end
+
 local function solveDiagnostic(uri, diag, start, results)
     if diag.source == lang.script.DIAG_SYNTAX_CHECK then
         solveSyntax(uri, diag, results)
@@ -326,6 +364,8 @@ local function solveDiagnostic(uri, diag, start, results)
         solveAmbiguity1(uri, diag, results)
     elseif diag.code == 'trailing-space' then
         solveTrailingSpace(uri, diag, results)
+    elseif diag.code == 'await-in-sync' then
+        solveAwaitInSync(uri, diag, results)
     end
     disableDiagnostic(uri, diag.code, start, results)
 end

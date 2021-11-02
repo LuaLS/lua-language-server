@@ -8,6 +8,8 @@
 * `NEW` file encoding supports `utf16le` and `utf16be`
 * `NEW` `LuaDoc` annotations:
   + `---@async`: mark a function as async
+* `NEW` diagnostics:
+  + `await-in-sync`: check if calls async function in sync function. disabled by default.
 * `CHG` `LuaDoc` supports unicode
 * `CHG` no longer asks to trust plugin in VSCode, because VSCode already provides the workspace trust feature
 * `CHG` skip huge files (>= 10 MB)

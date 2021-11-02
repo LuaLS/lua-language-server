@@ -44,6 +44,7 @@ m.DiagnosticDefaultSeverity = {
     ['no-implicit-any']         = 'Information',
     ['deprecated']              = 'Warning',
     ['different-requires']      = 'Warning',
+    ['await-in-sync']           = 'Warning',
     ['type-check']              = 'Warning',
 
     ['duplicate-doc-class']     = 'Warning',
@@ -98,6 +99,7 @@ m.DiagnosticDefaultNeededFileStatus = {
     ['no-implicit-any']         = 'None',
     ['deprecated']              = 'Opened',
     ['different-requires']      = 'Any',
+    ['await-in-sync']           = 'None',
     ['type-check']              = 'None',
 
     ['duplicate-doc-class']     = 'Any',

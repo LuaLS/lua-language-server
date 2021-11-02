@@ -6,6 +6,7 @@ local catch  = require 'catch'
 
 config.get 'Lua.diagnostics.neededFileStatus'['deprecated'] = 'Any'
 config.get 'Lua.diagnostics.neededFileStatus'['type-check'] = 'Any'
+config.get 'Lua.diagnostics.neededFileStatus'['await-in-sync'] = 'Any'
 
 rawset(_G, 'TEST', true)
 
@@ -1348,12 +1349,22 @@ end
 f()
 ]]
 
----TODO(arthur)
-do return end
-
 TEST [[
 ---@type file*
 local f
 f:read '*a'
 f:read('*a')
+]]
+
+TEST [[
+function F()
+    <!coroutine.yield!>()
+end
+]]
+
+TEST [[
+---@async
+function F()
+    coroutine.yield()
+end
 ]]

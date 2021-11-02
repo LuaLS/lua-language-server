@@ -55,6 +55,7 @@ function coroutine.status(co) end
 function coroutine.wrap(f) end
 
 ---#DES 'coroutine.yield'
+---@async
 ---@return ...
 function coroutine.yield(...) end
 

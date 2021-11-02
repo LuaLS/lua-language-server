@@ -235,36 +235,36 @@ Arquivos em cache: {ast}/{max}
 Uso de memória: {mem:.f}M
 ]]
 WINDOW_APPLY_SETTING             = 'Aplicar configuração'
-WINDOW_CHECK_SEMANTIC            = 'If you are using the color theme in the market, you may need to modify `editor.semanticHighlighting.enabled` to `true` to make semantic tokens take effect.'
-WINDOW_TELEMETRY_HINT            = 'Please allow sending anonymous usage data and error reports to help us further improve this extension. Read our privacy policy [here](https://github.com/sumneko/lua-language-server/wiki/Privacy-Policy) .'
-WINDOW_TELEMETRY_ENABLE          = 'Allow'
-WINDOW_TELEMETRY_DISABLE         = 'Prohibit'
-WINDOW_CLIENT_NOT_SUPPORT_CONFIG = 'Your client does not support modifying settings from the server side, please manually modify the following settings:'
-WINDOW_LCONFIG_NOT_SUPPORT_CONFIG= 'Automatic modification of local settings is not currently supported, please manually modify the following settings:'
-WINDOW_MANUAL_CONFIG_ADD         = '`{key}`: add element `{value:q}` ;'
-WINDOW_MANUAL_CONFIG_SET         = '`{key}`: set to `{value:q}` ;'
-WINDOW_MANUAL_CONFIG_PROP        = '`{key}`: set the property `{prop}` to `{value:q}`;'
-WINDOW_APPLY_WHIT_SETTING        = 'Apply and modify settings'
-WINDOW_APPLY_WHITOUT_SETTING     = 'Apply but do not modify settings'
-WINDOW_ASK_APPLY_LIBRARY         = 'Do you need to configure your work environment as `{}`?'
+WINDOW_CHECK_SEMANTIC            = 'Se você estiver usando o tema de cores do market, talvez seja necessário modificar `editor.semanticHighlighting.enabled` para `true` para fazer com tokens semânticas sejam habilitados.'
+WINDOW_TELEMETRY_HINT            = 'Por favor, permita o envio de dados de uso e relatórios de erro anônimos para nos ajudar a melhorar ainda mais essa extensão. Leia nossa política de privacidade [aqui](https://github.com/sumneko/lua-language-server/wiki/Privacy-Policy) .'
+WINDOW_TELEMETRY_ENABLE          = 'Permitir'
+WINDOW_TELEMETRY_DISABLE         = 'Desabilitar'
+WINDOW_CLIENT_NOT_SUPPORT_CONFIG = 'Seu cliente não suporta configurações de modificação do lado do servidor, modifique manualmente as seguintes configurações:'
+WINDOW_LCONFIG_NOT_SUPPORT_CONFIG= 'A modificação automática de configurações locais não é suportada atualmente, modifique manualmente as seguintes configurações:'
+WINDOW_MANUAL_CONFIG_ADD         = '`{key}`: adiciona o elemento `{value:q}` ;'
+WINDOW_MANUAL_CONFIG_SET         = '`{key}`: defini como `{value:q}` ;'
+WINDOW_MANUAL_CONFIG_PROP        = '`{key}`: define a propriedade `{prop}` para `{value:q}`;'
+WINDOW_APPLY_WHIT_SETTING        = 'Aplicar e modificar configurações'
+WINDOW_APPLY_WHITOUT_SETTING     = 'Aplicar mas não modificar configurações'
+WINDOW_ASK_APPLY_LIBRARY         = 'Você precisa configurar seu ambiente de trabalho como `{}`?'
 
-CONFIG_LOAD_FAILED               = 'Unable to read the settings file: {}'
-CONFIG_LOAD_ERROR                = 'Setting file loading error: {}'
-CONFIG_TYPE_ERROR                = 'The setting file must be in lua or json format: {}'
+CONFIG_LOAD_FAILED               = 'Não é possível ler o arquivo de configurações: {}'
+CONFIG_LOAD_ERROR                = 'Configurando o erro de carregamento do arquivo: {}'
+CONFIG_TYPE_ERROR                = 'O arquivo de configuração deve estar no formato LUA ou JSON: {}'
 
 PLUGIN_RUNTIME_ERROR             = [[
-An error occurred in the plugin, please report it to the plugin author.
-Please check the details in the output or log.
-Plugin path: {}
+Ocorreu um erro no plugin, envie o erro ao autor do plugin.
+Por favor, verifique os detalhes na saída ou log.
+Caminho do plugin: {}
 ]]
 PLUGIN_TRUST_LOAD                = [[
-The current settings try to load the plugin at this location:{}
+As configurações atuais tentam carregar o plugin neste local: {}
 
-Note that malicious plugin may harm your computer
+Note que plugins mal-intencionados podem prejudicar seu computador
 ]]
 PLUGIN_TRUST_YES                 = [[
-Trust and load this plugin
+Confie e carregue este plugin
 ]]
 PLUGIN_TRUST_NO                  = [[
-Don't load this plugin
+Não carregue este plugin
 ]]

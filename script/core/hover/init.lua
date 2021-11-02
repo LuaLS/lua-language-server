@@ -39,11 +39,16 @@ local function getHover(source)
     end
 
     if infer.searchAndViewInfers(source) == 'function' then
+        local hasFunc
         for _, def in ipairs(vm.getDefs(source)) do
             if def.type == 'function'
             or def.type == 'doc.type.function' then
+                hasFunc = true
                 addHover(def, true)
             end
+        end
+        if not hasFunc then
+            addHover(source, true)
         end
     else
         addHover(source, true)

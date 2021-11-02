@@ -64,6 +64,9 @@ local function asValue(source, title)
     local pack = {}
     pack[#pack+1] = title
     pack[#pack+1] = name .. ':'
+    if vm.isAsync(source, true) then
+        pack[#pack+1] = 'async'
+    end
     if  cont
     and (  type == 'table'
         or type == 'any'

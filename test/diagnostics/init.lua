@@ -1369,3 +1369,22 @@ function F()
     coroutine.yield()
 end
 ]]
+
+TEST [[
+---@type async fun()
+local f
+
+function F()
+    <!f!>()
+end
+]]
+
+TEST [[
+---@type async fun()
+local f
+
+---@async
+function F()
+    f()
+end
+]]

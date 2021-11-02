@@ -1732,3 +1732,19 @@ local function <?f?>() end
 [[
 async function f()
 ]]
+
+TEST [[
+---@type function
+local <?f?>
+]]
+[[
+local f: function
+]]
+
+TEST [[
+---@type async fun()
+local <?f?>
+]]
+[[
+local f: async fun()
+]]

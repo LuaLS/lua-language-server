@@ -492,6 +492,19 @@ local function parseTypeUnitLiteralTable()
 end
 
 local function parseTypeUnit(parent, content)
+    if content == 'async' then
+        local tp, cont = peekToken()
+        if tp == 'name' then
+            if cont == 'fun' then
+                nextToken()
+                local func = parseTypeUnit(parent, cont)
+                if func then
+                    func.async = true
+                    return func
+                end
+            end
+        end
+    end
     local result
     if content == 'fun' then
         result = parseTypeUnitFunction()

@@ -164,23 +164,23 @@ local function isDeprecated(value)
 end
 
 local function isAsync(value)
-    if value.type ~= 'function' then
-        return false
-    end
-    if not value.bindDocs then
-        return false
-    end
-    if value._async ~= nil then
-        return value._async
-    end
-    for _, doc in ipairs(value.bindDocs) do
-        if doc.type == 'doc.async' then
-            value._async = true
-            return true
+    if value.type == 'function' then
+        if not value.bindDocs then
+            return false
         end
+        if value._async ~= nil then
+            return value._async
+        end
+        for _, doc in ipairs(value.bindDocs) do
+            if doc.type == 'doc.async' then
+                value._async = true
+                return true
+            end
+        end
+        value._async = false
+        return false
     end
-    value._async = false
-    return false
+    return value.async == true
 end
 
 function vm.isDeprecated(value, deep)

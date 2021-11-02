@@ -3,7 +3,7 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "🍺测试",
+			"name": "🍺test",
 			"type": "lua",
 			"request": "launch",
 			"stopOnEntry": false,
@@ -21,7 +21,7 @@
 			],
 		},
 		{
-			"name": "附加",
+			"name": "attach",
 			"type": "lua",
 			"request": "attach",
 			"stopOnEntry": false,
@@ -36,12 +36,12 @@
 			]
 		},
 		{
-			"name": "love-api",
+			"name": "build-3rd-meta",
 			"type": "lua",
 			"request": "launch",
 			"stopOnEntry": false,
 			"luaexe": "${workspaceFolder}/bin/Windows/lua-language-server.exe",
-			"program": "${workspaceRoot}/tools/love-api.lua",
+			"program": "${workspaceRoot}/tools/build-3rd-meta.lua",
 			"cpath": "${workspaceFolder}/bin/Windows/?.dll",
 			"arg": [
 			],

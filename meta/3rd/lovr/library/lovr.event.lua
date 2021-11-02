@@ -1,0 +1,387 @@
+---@meta
+
+---
+---The `lovr.event` module handles events from the operating system.
+---
+---Due to its low-level nature, it's rare to use `lovr.event` in simple projects.
+---
+---@class lovr.event
+lovr.event = {}
+
+---
+---Clears the event queue, removing any unprocessed events.
+---
+function lovr.event.clear() end
+
+---
+---This function returns a Lua iterator for all of the unprocessed items in the event queue.  Each event consists of a name as a string, followed by event-specific arguments.  This function is called in the default implementation of `lovr.run`, so it is normally not necessary to poll for events yourself.
+---
+---@return function iterator # The iterator function, usable in a for loop.
+function lovr.event.poll() end
+
+---
+---Fills the event queue with unprocessed events from the operating system.  This function should be called often, otherwise the operating system will consider the application unresponsive. This function is called in the default implementation of `lovr.run`.
+---
+function lovr.event.pump() end
+
+---
+---Pushes an event onto the event queue.  It will be processed the next time `lovr.event.poll` is called.  For an event to be processed properly, there needs to be a function in the `lovr.handlers` table with a key that's the same as the event name.
+---
+---@param name string # The name of the event.
+function lovr.event.push(name) end
+
+---
+---Pushes an event to quit.  An optional number can be passed to set the exit code for the application.  An exit code of zero indicates normal termination, whereas a nonzero exit code indicates that an error occurred.
+---
+---@param code? number # The exit code of the program.
+function lovr.event.quit(code) end
+
+---
+---Pushes an event to restart the framework.
+---
+function lovr.event.restart() end
+
+---
+---Keys that can be pressed on a keyboard.  Notably, numpad keys are missing right now.
+---
+---@class lovr.KeyCode
+---
+---The A key.
+---
+---@field a integer
+---
+---The B key.
+---
+---@field b integer
+---
+---The C key.
+---
+---@field c integer
+---
+---The D key.
+---
+---@field d integer
+---
+---The E key.
+---
+---@field e integer
+---
+---The F key.
+---
+---@field f integer
+---
+---The G key.
+---
+---@field g integer
+---
+---The H key.
+---
+---@field h integer
+---
+---The I key.
+---
+---@field i integer
+---
+---The J key.
+---
+---@field j integer
+---
+---The K key.
+---
+---@field k integer
+---
+---The L key.
+---
+---@field l integer
+---
+---The M key.
+---
+---@field m integer
+---
+---The N key.
+---
+---@field n integer
+---
+---The O key.
+---
+---@field o integer
+---
+---The P key.
+---
+---@field p integer
+---
+---The Q key.
+---
+---@field q integer
+---
+---The R key.
+---
+---@field r integer
+---
+---The S key.
+---
+---@field s integer
+---
+---The T key.
+---
+---@field t integer
+---
+---The U key.
+---
+---@field u integer
+---
+---The V key.
+---
+---@field v integer
+---
+---The W key.
+---
+---@field w integer
+---
+---The X key.
+---
+---@field x integer
+---
+---The Y key.
+---
+---@field y integer
+---
+---The Z key.
+---
+---@field z integer
+---
+---The 0 key.
+---
+---@field ["0"] integer
+---
+---The 1 key.
+---
+---@field ["1"] integer
+---
+---The 2 key.
+---
+---@field ["2"] integer
+---
+---The 3 key.
+---
+---@field ["3"] integer
+---
+---The 4 key.
+---
+---@field ["4"] integer
+---
+---The 5 key.
+---
+---@field ["5"] integer
+---
+---The 6 key.
+---
+---@field ["6"] integer
+---
+---The 7 key.
+---
+---@field ["7"] integer
+---
+---The 8 key.
+---
+---@field ["8"] integer
+---
+---The 9 key.
+---
+---@field ["9"] integer
+---
+---The space bar.
+---
+---@field space integer
+---
+---The enter key.
+---
+---@field return integer
+---
+---The tab key.
+---
+---@field tab integer
+---
+---The escape key.
+---
+---@field escape integer
+---
+---The backspace key.
+---
+---@field backspace integer
+---
+---The up arrow key.
+---
+---@field up integer
+---
+---The down arrow key.
+---
+---@field down integer
+---
+---The left arrow key.
+---
+---@field left integer
+---
+---The right arrow key.
+---
+---@field right integer
+---
+---The home key.
+---
+---@field home integer
+---
+---The end key.
+---
+---@field end integer
+---
+---The page up key.
+---
+---@field pageup integer
+---
+---The page down key.
+---
+---@field pagedown integer
+---
+---The insert key.
+---
+---@field insert integer
+---
+---The delete key.
+---
+---@field delete integer
+---
+---The F1 key.
+---
+---@field f1 integer
+---
+---The F2 key.
+---
+---@field f2 integer
+---
+---The F3 key.
+---
+---@field f3 integer
+---
+---The F4 key.
+---
+---@field f4 integer
+---
+---The F5 key.
+---
+---@field f5 integer
+---
+---The F6 key.
+---
+---@field f6 integer
+---
+---The F7 key.
+---
+---@field f7 integer
+---
+---The F8 key.
+---
+---@field f8 integer
+---
+---The F9 key.
+---
+---@field f9 integer
+---
+---The F10 key.
+---
+---@field f10 integer
+---
+---The F11 key.
+---
+---@field f11 integer
+---
+---The F12 key.
+---
+---@field f12 integer
+---
+---The backtick/backquote/grave accent key.
+---
+---@field ["`"] integer
+---
+---The dash/hyphen/minus key.
+---
+---@field ["-"] integer
+---
+---The equal sign key.
+---
+---@field ["="] integer
+---
+---The left bracket key.
+---
+---@field ["["] integer
+---
+---The right bracket key.
+---
+---@field ["]"] integer
+---
+---The backslash key.
+---
+---@field ["\\"] integer
+---
+---The semicolon key.
+---
+---@field [";"] integer
+---
+---The single quote key.
+---
+---@field ["'"] integer
+---
+---The comma key.
+---
+---@field [","] integer
+---
+---The period key.
+---
+---@field ["."] integer
+---
+---The slash key.
+---
+---@field ["/"] integer
+---
+---The left control key.
+---
+---@field lctrl integer
+---
+---The left shift key.
+---
+---@field lshift integer
+---
+---The left alt key.
+---
+---@field lalt integer
+---
+---The left OS key (windows, command, super).
+---
+---@field lgui integer
+---
+---The right control key.
+---
+---@field rctrl integer
+---
+---The right shift key.
+---
+---@field rshift integer
+---
+---The right alt key.
+---
+---@field ralt integer
+---
+---The right OS key (windows, command, super).
+---
+---@field rgui integer
+---
+---The caps lock key.
+---
+---@field capslock integer
+---
+---The scroll lock key.
+---
+---@field scrolllock integer
+---
+---The numlock key.
+---
+---@field numlock integer

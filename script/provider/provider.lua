@@ -408,7 +408,7 @@ proto.on('textDocument/completion', function (params)
             return
         end
     end
-    await.setPriority(1000)
+    --await.setPriority(1000)
     local clock  = os.clock()
     local pos    = converter.unpackPosition(uri, params.position)
     local result = core.completion(uri, pos, triggerCharacter)
@@ -854,6 +854,9 @@ do
         if not config.get 'Lua.hint.enable' then
             return
         end
+        await.close 'updateHint'
+        await.setID 'updateHint'
+        await.delay()
         workspace.awaitReady()
         local visibles = files.getVisibles(uri)
         if not visibles then

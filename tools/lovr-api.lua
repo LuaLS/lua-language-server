@@ -1,11 +1,9 @@
-package.path = package.path .. ';3rd/love-api/?.lua'
-
-local lua51 = require 'Lua51'
-local api   = lua51.require 'love_api'
 local fs    = require 'bee.filesystem'
 local fsu   = require 'fs-utility'
 
-local metaPath    = fs.path 'meta/3rd/love2d'
+local api = dofile('3rd/lovr-api/api/init.lua')
+
+local metaPath    = fs.path 'meta/3rd/lovr'
 local libraryPath = metaPath / 'library'
 fs.create_directories(libraryPath)
 
@@ -34,11 +32,14 @@ end
 
 ---@param names string
 local function getTypeName(names)
+    if names == '*' then
+        return 'any'
+    end
     local types = {}
     names = names:gsub('%sor%s', '|')
     for name in names:gmatch '[^|]+' do
         name = trim(name)
-        types[#types+1] = knownTypes[name] or ('love.' .. name)
+        types[#types+1] = knownTypes[name] or ('lovr.' .. name)
     end
     return table.concat(types, '|')
 end
@@ -66,7 +67,10 @@ function buildType(param)
     if param.table then
         return buildDocTable(param.table)
     end
-    return getTypeName(param.type)
+    if param.type then
+        return getTypeName(param.type)
+    end
+    return 'any'
 end
 
 local function buildSuper(tp)
@@ -119,7 +123,7 @@ local function buildMultiDocFunc(tp)
     return table.concat(cbs, '|')
 end
 
-local function buildFunction(func, node)
+local function buildFunction(func)
     local text = {}
     text[#text+1] = buildDescription(func.description)
     for i = 2, #func.variants do
@@ -147,58 +151,49 @@ local function buildFunction(func, node)
             )
         end
     end
-    text[#text+1] = ('function %s%s(%s) end'):format(
-        node,
-        func.name,
+    text[#text+1] = ('function %s(%s) end'):format(
+        func.key,
         table.concat(params, ', ')
     )
     return table.concat(text, '\n')
 end
 
-local function buildFile(class, defs)
+local function buildFile(defs)
+    local class = defs.key
     local filePath = libraryPath / (class .. '.lua')
     local text = {}
 
     text[#text+1] = '---@meta'
     text[#text+1] = ''
-    if defs.version then
-        text[#text+1] = ('-- version: %s'):format(defs.version)
-    end
     text[#text+1] = buildDescription(defs.description)
     text[#text+1] = ('---@class %s'):format(class)
     text[#text+1] = ('%s = {}'):format(class)
 
     for _, func in ipairs(defs.functions or {}) do
         text[#text+1] = ''
-        text[#text+1] = buildFunction(func, class .. '.')
+        text[#text+1] = buildFunction(func)
     end
 
-    for _, tp in ipairs(defs.types or {}) do
+    for _, obj in ipairs(defs.objects or {}) do
         local mark = {}
         text[#text+1] = ''
-        text[#text+1] = buildDescription(tp.description)
-        text[#text+1] = ('---@class %s%s'):format(getTypeName(tp.name), buildSuper(tp))
-        text[#text+1] = ('local %s = {}'):format(tp.name)
-        for _, func in ipairs(tp.functions or {}) do
+        text[#text+1] = buildDescription(obj.description)
+        text[#text+1] = ('---@class %s%s'):format(getTypeName(obj.name), buildSuper(obj))
+        text[#text+1] = ('local %s = {}'):format(obj.name)
+        for _, func in ipairs(obj.methods or {}) do
             if not mark[func.name] then
                 mark[func.name] = true
                 text[#text+1] = ''
-                text[#text+1] = buildFunction(func, tp.name .. ':')
+                text[#text+1] = buildFunction(func)
             end
         end
-    end
-
-    for _, cb in ipairs(defs.callbacks or {}) do
-        text[#text+1] = ''
-        text[#text+1] = buildDescription(cb.description)
-        text[#text+1] = ('---@alias %s %s'):format(getTypeName(cb.name), buildMultiDocFunc(cb))
     end
 
     for _, enum in ipairs(defs.enums or {}) do
         text[#text+1] = ''
         text[#text+1] = buildDescription(enum.description)
         text[#text+1] = ('---@class %s'):format(getTypeName(enum.name))
-        for _, constant in ipairs(enum.constants) do
+        for _, constant in ipairs(enum.values) do
             text[#text+1] = buildDescription(constant.description)
             text[#text+1] = ('---@field %s integer'):format(formatIndex(constant.name))
         end
@@ -214,8 +209,26 @@ local function buildFile(class, defs)
     fsu.saveFile(filePath, table.concat(text, '\n'))
 end
 
-buildFile('love', api)
+local function buildCallback(defs)
+    local filePath = libraryPath / ('callback.lua')
+    local text = {}
+
+    text[#text+1] = '---@meta'
+
+    for _, cb in ipairs(defs.callbacks or {}) do
+        text[#text+1] = ''
+        text[#text+1] = buildDescription(cb.description)
+        text[#text+1] = ('---@type %s'):format(buildMultiDocFunc(cb))
+        text[#text+1] = ('%s = nil'):format(cb.key)
+    end
+
+    text[#text+1] = ''
+
+    fsu.saveFile(filePath, table.concat(text, '\n'))
+end
+
+buildCallback(api)
 
 for _, module in ipairs(api.modules) do
-    buildFile('love.' .. module.name, module)
+    buildFile(module)
 end

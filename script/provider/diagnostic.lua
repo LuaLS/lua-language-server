@@ -152,11 +152,13 @@ function m.syntaxErrors(uri, ast)
 
     local results = {}
 
-    for _, err in ipairs(ast.errs) do
-        if not config.get 'Lua.diagnostics.disable'[err.type:lower():gsub('_', '-')] then
-            results[#results+1] = buildSyntaxError(uri, err)
+    pcall(function ()
+        for _, err in ipairs(ast.errs) do
+            if not config.get 'Lua.diagnostics.disable'[err.type:lower():gsub('_', '-')] then
+                results[#results+1] = buildSyntaxError(uri, err)
+            end
         end
-    end
+    end)
 
     return results
 end
@@ -268,7 +270,7 @@ function m.refresh(uri)
     await.call(function ()
         await.delay()
         if uri then
-            m.doDiagnostic(uri)
+            xpcall(m.doDiagnostic, log.error, uri)
         end
         m.diagnosticsAll()
     end, 'files.version')
@@ -347,7 +349,7 @@ function m.diagnosticsAll(force)
         for i, uri in ipairs(uris) do
             bar:setMessage(('%d/%d'):format(i, #uris))
             bar:setPercentage(i / #uris * 100)
-            m.doDiagnostic(uri)
+            xpcall(m.doDiagnostic, log.error, uri)
             await.delay()
             if cancelled then
                 log.debug('Break workspace diagnostics')
@@ -410,7 +412,7 @@ files.watch(function (ev, uri)
         end
     elseif ev == 'open' then
         if ws.isReady() then
-            m.doDiagnostic(uri)
+            xpcall(m.doDiagnostic, log.error, uri)
         end
     elseif ev == 'close' then
         if files.isLibrary(uri)

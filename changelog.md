@@ -2,10 +2,10 @@
 
 ## 2.5.0
 * `NEW` setting `Lua.runtime.pathStrict`
-* `NEW` skip huge files (>= 10 MB)
 * `NEW` add supports of `lovr`
 * `NEW` file encoding supports `utf16le` and `utf16be`
 * `CHG` no longer asks to trust plugin in VSCode, because VSCode already provides the workspace trust feature
+* `CHG` skip huge files (>= 10 MB)
 * `FIX` [#778](https://github.com/sumneko/lua-language-server/issues/778)
 
 ## 2.4.7

@@ -236,7 +236,7 @@ local function initBuiltIn()
         local metaDoc = compileSingleMetaDoc(fsu.loadFile(libPath), metaLang, status)
         if metaDoc then
             local outPath = metaPath / libName
-            encoder.encode(encoding, metaDoc)
+            metaDoc = encoder.encode(encoding, metaDoc, 'auto')
             out:saveFile(libName, metaDoc)
             m.metaPaths[#m.metaPaths+1] = outPath:string()
         end

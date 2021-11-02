@@ -4,6 +4,8 @@ local utf16be = require 'encoder.utf16be'
 
 ---@alias encoder.encoding '"utf8"'|'"utf16"'|'"utf16le"'|'"utf16be"'
 
+---@alias encoder.bom '"no"'|'"yes"'|'"auto"'
+
 local m = {}
 
 ---@param encoding encoder.encoding
@@ -63,9 +65,13 @@ end
 
 ---@param encoding encoder.encoding
 ---@param text string
+---@param bom encoder.bom
 ---@return string
-function m.encode(encoding, text)
+function m.encode(encoding, text, bom)
     if encoding == 'utf8' then
+        if bom == 'yes' then
+            text = '\xEF\xBB\xBF' .. text
+        end
         return text
     end
     if encoding == 'ansi' then
@@ -73,10 +79,20 @@ function m.encode(encoding, text)
     end
     if encoding == 'utf16'
     or encoding == 'utf16le' then
-        return utf16le.encode(text)
+        text = utf16le.encode(text)
+        if bom == 'yes'
+        or bom == 'auto' then
+            text = '\xFF\xFE' .. text
+        end
+        return text
     end
     if encoding == 'utf16be' then
-        return utf16be.encode(text)
+        text = utf16be.encode(text)
+        if bom == 'yes'
+        or bom == 'auto' then
+            text = '\xFE\xFF' .. text
+        end
+        return text
     end
     log.error('Unsupport encode encoding:', encoding)
     return text

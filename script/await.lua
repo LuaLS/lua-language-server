@@ -25,7 +25,7 @@ local function setID(id, co, callback)
 end
 
 --- 设置错误处理器
----@param errHandle function {comment = '当有错误发生时，会以错误堆栈为参数调用该函数'}
+---@param errHandle function # 当有错误发生时，会以错误堆栈为参数调用该函数
 function m.setErrorHandle(errHandle)
     m.errorHandle = errHandle
 end

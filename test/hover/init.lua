@@ -1724,3 +1724,11 @@ local function <?f?>() end
 function f()
   -> nil
 ]]
+
+TEST [[
+---@async
+local function <?f?>() end
+]]
+[[
+async function f()
+]]

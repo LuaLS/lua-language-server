@@ -10,9 +10,8 @@ local Parser = re.compile([[
 Main                <-  (Token / Sp)*
 Sp                  <-  %s+
 X16                 <-  [a-fA-F0-9]
-Word                <-  [a-zA-Z0-9_]
 Token               <-  Integer / Name / String / Symbol
-Name                <-  ({} {[a-zA-Z_0-9] [a-zA-Z0-9_.*-]*} {})
+Name                <-  ({} {%name} {})
                     ->  Name
 Integer             <-  ({} {[0-9]+} !'.' {})
                     ->  Integer
@@ -45,7 +44,7 @@ EChar               <-  'a' -> ea
                     /   ('z' (%nl / %s)*)     -> ''
                     /   ('x' {X16 X16})       -> Char16
                     /   ([0-9] [0-9]? [0-9]?) -> Char10
-                    /   ('u{' {Word*} '}')    -> CharUtf8
+                    /   ('u{' {X16*} '}')    -> CharUtf8
 Symbol              <-  ({} {
                             [:|,<>()?+#`{}]
                         /   '[]'
@@ -63,6 +62,7 @@ Symbol              <-  ({} {
     er = '\r',
     et = '\t',
     ev = '\v',
+    name = (m.R('az', 'AZ', '09', '\x80\xff') + m.S('_')) * (m.R('az', 'AZ', '__', '09', '\x80\xff') + m.S('_.*-'))^0,
     Char10 = function (char)
         char = tonumber(char)
         if not char or char < 0 or char > 255 then

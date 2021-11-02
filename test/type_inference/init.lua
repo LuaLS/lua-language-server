@@ -925,3 +925,8 @@ local emit = {}
 emit:on("died", function (<?i?>)
 end)
 ]]
+
+TEST '👍' [[
+---@class 👍
+local <?x?>
+]]

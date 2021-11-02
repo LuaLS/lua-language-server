@@ -7,7 +7,7 @@ local noder = require "core.noder"
 ---@field proto parser.guide.object
 ---@field parent parser.guide.object
 
----@class generic.closure
+---@class generic.closure: parser.guide.object
 ---@field type string
 ---@field proto parser.guide.object
 ---@field upvalues table<string, generic.value[]>

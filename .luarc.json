@@ -10,7 +10,8 @@
         ],
         "neededFileStatus": {
             "undefined-field": "Any",
-            "await-in-sync": "any"
+            "await-in-sync": "Any",
+            "not-yieldable": "Any"
         },
         "ignoredFiles": "Opened",
         "libraryFiles": "Opened"

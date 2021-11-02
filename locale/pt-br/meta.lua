@@ -1,5 +1,5 @@
 -- basic
-arg                 = 'Argumentos de inicialização para a versão Standalone da linguagem Lua.'
+arg                 = 'Argumentos de inicialização para a versão standalone da linguagem Lua.'
 assert              = 'Emite um erro se o valor de seu argumento v for falso (i.e., `nil` ou `false`); caso contrário, devolve todos os seus argumentos. Em caso de erro, `message` é o objeto de erro que, quando ausente, por padrão é `"assertion failed!"`'
 cgopt.collect       = 'Realiza um ciclo completo de coleta de lixo (i.e., garbage-collection cycle).'
 cgopt.stop          = 'Interrompe a execução automática.'
@@ -12,7 +12,7 @@ cgopt.incremental   = 'Altera o modo do coletor para incremental.'
 cgopt.generational  = 'Altera o modo do coletor para geracional.'
 cgopt.isrunning     = 'Retorna um valor booleano indicando se o coletor de lixo (i.e., garbage-collection) está em execução.'
 collectgarbage      = 'Esta função é uma interface genérica para o coletor de lixo (i.e., garbage-collection). Ela executa diferentes funções de acordo com seu primeiro argumento, `opt`.'
-dofile              = 'Abre o arquivo passado por argumento e executa seu conteúdo como código Lua. Quando chamado sem argumentos, `dofile` executa o conteúdo da entrada padrão (`stdin`). Retorna todos os valores retornados pelo trecho de código contido no arquivo. Em caso de erros, o `dofile` propaga o erro para seu chamador. Ou seja, o `dofile` não funciona em modo protegido.'
+dofile              = 'Abre o arquivo fornecido por argumento e executa seu conteúdo como código Lua. Quando chamado sem argumentos, `dofile` executa o conteúdo da entrada padrão (`stdin`). Retorna todos os valores retornados pelo trecho de código contido no arquivo. Em caso de erros, o `dofile` propaga o erro para seu chamador. Ou seja, o `dofile` não funciona em modo protegido.'
 error               = [[
 Termina a última chamada de função protegida e retorna `message` como objeto de `erro`.
 
@@ -35,7 +35,7 @@ load['<5.1']        = 'Carrega um bloco utilizando a função `func` para obter 
 load['>5.2']        = [[
 Carrega um bloco.
 
-Se o bloco (i.e., `chunk`) é uma string, o bloco é essa string. Se o bloco é uma função, a função "load" é chamada repetidamente para obter suas partes. Cada chamada para o bloco deve retornar uma string que é concatenada com os resultados anteriores. O retorno de uma string vazia, `nil`, ou nenhum valor sinaliza o fim do bloco.
+Se o bloco (i.e., `chunk`) é uma string, o bloco é essa string. Se o bloco é uma função, a função "load" é chamada repetidamente para obter suas partes. Cada chamada para o bloco deve retornar uma string que é concatenada com os resultados anteriores. O fim do bloco é sinalizado com o retorno de uma string vazia ou `nil`.
 ]]
 loadfile            = 'Carrega um bloco de arquivo `filename` ou da entrada padrão, se nenhum nome de arquivo for dado.'
 loadstring          = 'Carrega um bloco a partir de uma string dada.'
@@ -219,7 +219,7 @@ for c in file:lines(...) do
 end
 ```
 ]]
-file[':read']               = 'Lê o arquivo de acordo com os formatos indicados, que especificam o que ler.'
+file[':read']               = 'Lê o arquivo de acordo com o formato fornecido e que especifica o que deve ser lido.'
 file[':seek']               = 'Define e obtém a posição do arquivo, medida a partir do início do arquivo.'
 file[':setvbuf']            = 'Define o modo de `buffer` para um arquivo de saída.'
 file[':write']              = 'Escreve o valor de cada um de seus argumentos no arquivo.'
@@ -252,22 +252,22 @@ end
 io.open                     = 'Abre um arquivo no modo especificado pela *string* `mode`.'
 io.output                   = 'Define o arquivo de saída padrão.'
 io.popen                    = 'Inicia o programa dado em um processo separado.'
-io.read                     = 'Lê o arquivo de acordo com o formato passado, que especifica o que deve ser lido.'
+io.read                     = 'Lê o arquivo de acordo com o formato fornecido e que especifica o que deve ser lido.'
 io.tmpfile                  = 'Em caso de sucesso, retorna um `handler` para um arquivo temporário.'
 io.type                     = 'Verifica se `obj` é um identificador de arquivo válido.'
 io.write                    = 'Escreve o valor de cada um dos seus argumentos para o arquivo de saída padrão.'
 openmode.r                  = 'Modo de leitura.'
-openmode.w                  = 'Modo de escrita/gravação.'
+openmode.w                  = 'Modo de escrita.'
 openmode.a                  = 'Modo de anexação.'
 openmode['.r+']             = 'Modo de atualização, todos os dados anteriores são preservados.'
 openmode['.w+']             = 'Modo de atualização, todos os dados anteriores são apagados.'
-openmode['.a+']             = 'Modo de anexação e atualização, os dados anteriores são preservados, a gravação/escrita só é permitida no final do arquivo.'
+openmode['.a+']             = 'Modo de anexação e atualização, os dados anteriores são preservados, a escrita só é permitida no final do arquivo.'
 openmode.rb                 = 'Modo de leitura. (em modo binário)'
-openmode.wb                 = 'Modo de escrita/gravação. (em modo binário)'
+openmode.wb                 = 'Modo de escrita. (em modo binário)'
 openmode.ab                 = 'Modo de anexação. (em modo binário)'
 openmode['.r+b']            = 'Modo de atualização, todos os dados anteriores são preservados. (em modo binário)'
 openmode['.w+b']            = 'Modo de atualização, todos os dados anteriores são apagados. (em modo binário)'
-openmode['.a+b']            = 'Modo de anexação e atualização, todos os dados anteriores são preservados, a escrita/gravação só é permitida no final do arquivo. (em modo binário)'
+openmode['.a+b']            = 'Modo de anexação e atualização, todos os dados anteriores são preservados, a escrita só é permitida no final do arquivo. (em modo binário)'
 popenmode.r                 = 'Leia dados deste programa pelo arquivo.'
 popenmode.w                 = 'Escreva dados neste programa pelo arquivo.'
 filetype.file               = '`handler` para arquivo aberto.'
@@ -348,7 +348,7 @@ osdate.isdst                = 'Bandeira para indicar horário de verão (i.e., `
 package                     = ''
 require['<5.3']             = 'Carrega o módulo fornecido e retorna qualquer valor retornado pelo módulo (`true` quando `nil`).'
 require['>5.4']             = 'Carrega o módulo fornecido e retorna qualquer valor retornado pelo pesquisador (`true` quando `nil`). Além desse valor, também retorna como segundo resultado um carregador de dados retornados pelo pesquisador, o que indica como `require` encontrou o módulo. (Por exemplo, se o módulo vier de um arquivo, este carregador de dados é o caminho do arquivo.)'
-package.config              = 'Uma string descrevendo configurações a serem utilizadas durante a compilação de pacotes.'
+package.config              = 'string descrevendo configurações a serem utilizadas durante a compilação de pacotes.'
 package.cpath               = 'O caminho usado pelo `require` para procurar pelo carregador C.'
 package.loaded              = 'Uma tabela usada pelo `require` para controlar quais módulos já estão carregados.'
 package.loaders             = 'Uma tabela usada pelo `require` para controlar como carregar módulos.'
@@ -376,8 +376,8 @@ Por exemplo, o loop a seguir irá iterar em todas as palavras da string *s*, imp
     end
 ```
 ]]
-string.gsub                 = 'Retorna uma cópia da *s* em que todas, ou as primeiras `n`, caso fornecido, ocorrências de `pattern` (veja §6.4.1) que tiverem sido substituídas por uma string de substituição especificada por `repl`.'
-string.len                  = 'Retorna o comprimento.'
+string.gsub                 = 'Retorna uma cópia da *s* em que todas ou, caso fornecido, as primeiras `n` ocorrências de `pattern` (veja §6.4.1) que tiverem sido substituídas por uma string de substituição especificada por `repl`.'
+string.len                  = 'Retorna o comprimento da string.'
 string.lower                = 'Retorna uma cópia desta string com todas as letras maiúsculas alteradas para minúsculas.'
 string.match                = 'Procura a primeira ocorrência do `pattern` (veja §6.4.1) na string.'
 string.pack                 = 'Retorna uma string binária contendo os valores `V1`, `v2`, etc. empacotados (isto é, serializado de forma binário) de acordo com o formato da string `fmt` fornecida (veja §6.4.2).'

@@ -2680,3 +2680,13 @@ end
         kind  = define.CompletionItemKind.Variable,
     }
 }
+
+TEST [[
+utf<??>'xxx'
+]]
+{
+    [1] = {
+        label = 'utf8',
+        kind  = define.CompletionItemKind.Field,
+    }
+}

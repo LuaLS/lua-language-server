@@ -712,7 +712,8 @@ end
 
 local function isInString(state, position)
     return guide.eachSourceContain(state.ast, position, function (source)
-        if source.type == 'string' then
+        if  source.type == 'string'
+        and source.start  < position then
             return true
         end
     end)

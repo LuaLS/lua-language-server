@@ -2,6 +2,7 @@
 
 ## 2.4.8
 * `FIX` [#778](https://github.com/sumneko/lua-language-server/issues/778)
+* `FIX` [#780](https://github.com/sumneko/lua-language-server/issues/780)
 
 ## 2.4.7
 `2021-10-27`

@@ -48,6 +48,7 @@ end
 
 function m.getIniter()
     local initer = {
+        offsetEncoding = client.getOffsetEncoding(),
         -- 文本同步方式
         textDocumentSync = {
             -- 打开关闭文本时通知

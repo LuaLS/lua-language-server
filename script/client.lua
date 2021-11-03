@@ -59,6 +59,23 @@ function m.getAbility(name)
     return current
 end
 
+function m.getOffsetEncoding()
+    if m._offsetEncoding then
+        return m._offsetEncoding
+    end
+    local clientEncodings = m.getAbility 'offsetEncoding'
+    if type(clientEncodings) == 'table' then
+        for _, encoding in ipairs(clientEncodings) do
+            if encoding == 'utf-8' then
+                m._offsetEncoding = 'utf-8'
+                return m._offsetEncoding
+            end
+        end
+    end
+    m._offsetEncoding = 'utf-16'
+    return m._offsetEncoding
+end
+
 local function packMessage(...)
     local strs = table.pack(...)
     for i = 1, strs.n do
@@ -255,6 +272,7 @@ function m.init(t)
     m.client(t.clientInfo.name)
     nonil.disable()
     lang(LOCALE or t.locale)
+    converter.setOffsetEncoding(m.getOffsetEncoding())
     hookPrint()
 end
 

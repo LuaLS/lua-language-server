@@ -13,6 +13,7 @@
   + `await-in-sync`: check whether calls async function in sync function. disabled by default.
   + `discard-returns`: check whether the return value is discarded
 * `NEW` locale `pt-br`, thanks [Jeferson Ferreira](https://github.com/jefersonf)
+* `NEW` supports [utf-8-offsets](https://clangd.llvm.org/extensions#utf-8-offsets)
 * `CHG` `LuaDoc` supports unicode
 * `CHG` no longer asks to trust plugin in VSCode, because VSCode already provides the workspace trust feature
 * `CHG` skip huge files (>= 10 MB)

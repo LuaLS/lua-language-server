@@ -2,7 +2,6 @@ local guide   = require 'parser.guide'
 local files   = require 'files'
 local encoder = require 'encoder'
 
--- TODO
 local offsetEncoding = 'utf16'
 
 local m = {}
@@ -176,6 +175,10 @@ function m.textEdit(range, newtext)
         range   = range,
         newText = newtext,
     }
+end
+
+function m.setOffsetEncoding(encoding)
+    offsetEncoding = encoding:lower():gsub('%-', '')
 end
 
 return m

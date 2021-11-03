@@ -373,6 +373,7 @@ config.watch(function (key, value)
     end
 end)
 
+---@async
 return function (uri, start, finish)
     local state = files.getState(uri)
     local text  = files.getText(uri)

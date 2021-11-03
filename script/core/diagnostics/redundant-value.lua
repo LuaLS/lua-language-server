@@ -4,6 +4,7 @@ local lang   = require 'language'
 local guide  = require 'parser.guide'
 local await  = require 'await'
 
+---@async
 return function (uri, callback)
     local state = files.getState(uri)
     if not state then

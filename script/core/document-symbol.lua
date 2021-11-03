@@ -235,6 +235,7 @@ local function buildSource(source, text, used, symbols)
     end
 end
 
+---@async
 local function makeSymbol(uri)
     local ast = files.getState(uri)
     local text = files.getText(uri)

@@ -412,6 +412,7 @@ local function matchParams(paramsTypes, i, arg)
     return false, messages
 end
 
+---@async
 return function (uri, callback)
     local ast = files.getState(uri)
     if not ast then

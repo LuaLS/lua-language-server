@@ -1119,6 +1119,14 @@ local function parseAsync()
     }
 end
 
+local function parseNoDiscard()
+    return {
+        type   = 'doc.nodiscard',
+        start  = getFinish(),
+        finish = getFinish(),
+    }
+end
+
 local function convertTokens()
     local tp, text = nextToken()
     if not tp then
@@ -1164,6 +1172,8 @@ local function convertTokens()
         return parseModule()
     elseif text == 'async' then
         return parseAsync()
+    elseif text == 'nodiscard' then
+        return parseNoDiscard()
     end
 end
 

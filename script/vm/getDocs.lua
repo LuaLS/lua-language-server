@@ -163,6 +163,23 @@ local function isDeprecated(value)
     return false
 end
 
+function vm.isDeprecated(value, deep)
+    if deep then
+        local defs = vm.getDefs(value)
+        if #defs == 0 then
+            return false
+        end
+        for _, def in ipairs(defs) do
+            if not isDeprecated(def) then
+                return false
+            end
+        end
+        return true
+    else
+        return isDeprecated(value)
+    end
+end
+
 local function isAsync(value)
     if value.type == 'function' then
         if not value.bindDocs then
@@ -183,23 +200,6 @@ local function isAsync(value)
     return value.async == true
 end
 
-function vm.isDeprecated(value, deep)
-    if deep then
-        local defs = vm.getDefs(value)
-        if #defs == 0 then
-            return false
-        end
-        for _, def in ipairs(defs) do
-            if not isDeprecated(def) then
-                return false
-            end
-        end
-        return true
-    else
-        return isDeprecated(value)
-    end
-end
-
 function vm.isAsync(value, deep)
     if isAsync(value) then
         return true
@@ -211,6 +211,44 @@ function vm.isAsync(value, deep)
         end
         for _, def in ipairs(defs) do
             if isAsync(def) then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+local function isNoDiscard(value)
+    if value.type == 'function' then
+        if not value.bindDocs then
+            return false
+        end
+        if value._nodiscard ~= nil then
+            return value._nodiscard
+        end
+        for _, doc in ipairs(value.bindDocs) do
+            if doc.type == 'doc.nodiscard' then
+                value._nodiscard = true
+                return true
+            end
+        end
+        value._nodiscard = false
+        return false
+    end
+    return false
+end
+
+function vm.isNoDiscard(value, deep)
+    if isNoDiscard(value) then
+        return true
+    end
+    if deep then
+        local defs = vm.getDefs(value)
+        if #defs == 0 then
+            return false
+        end
+        for _, def in ipairs(defs) do
+            if isNoDiscard(def) then
                 return true
             end
         end

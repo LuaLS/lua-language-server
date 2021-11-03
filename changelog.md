@@ -13,6 +13,7 @@
 * `CHG` `LuaDoc` supports unicode
 * `CHG` no longer asks to trust plugin in VSCode, because VSCode already provides the workspace trust feature
 * `CHG` skip huge files (>= 10 MB)
+* `FIX` [#777](https://github.com/sumneko/lua-language-server/issues/777)
 * `FIX` [#778](https://github.com/sumneko/lua-language-server/issues/778)
 
 ## 2.4.7

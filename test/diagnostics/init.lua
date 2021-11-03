@@ -1388,3 +1388,23 @@ function F()
     f()
 end
 ]]
+
+TEST [[
+local function f(cb)
+    cb()
+end
+
+<!f!>(function () ---@async
+    return nil
+end)
+]]
+
+TEST [[
+local function f(cb)
+    pcall(cb)
+end
+
+<!f!>(function () ---@async
+    return nil
+end)
+]]

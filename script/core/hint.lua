@@ -173,7 +173,7 @@ local function awaitHint(uri, results, start, finish)
         end
         await.delay()
         local node = source.node
-        if not vm.isAsync(node, true) then
+        if not vm.isAsyncCall(source) then
             return
         end
         results[#results+1] = {

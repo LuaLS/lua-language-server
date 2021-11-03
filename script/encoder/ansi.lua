@@ -7,14 +7,14 @@ end
 
 local m = {}
 
-function m.decode(text)
+function m.toutf8(text)
     if not unicode then
         return text
     end
     return unicode.a2u(text)
 end
 
-function m.encode(text)
+function m.fromutf8(text)
     if not unicode then
         return text
     end

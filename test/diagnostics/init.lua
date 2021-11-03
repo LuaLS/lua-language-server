@@ -306,7 +306,7 @@ Instance = _G[InstanceName]
 ]]
 
 TEST [[
-(''):sub(1, 2)
+local _ = (''):sub(1, 2)
 ]]
 
 TEST [=[
@@ -431,7 +431,7 @@ f(1, 2, 3, 4)
 ]]
 
 TEST [[
-next({}, 1, <!2!>)
+local _ = next({}, 1, <!2!>)
 print(1, 2, 3, 4, 5)
 ]]
 
@@ -463,7 +463,7 @@ f(1, 2, 3)
 ]]
 
 TEST [[
-<!unpack!>()
+local _ = <!unpack!>()
 ]]
 
 TEST [[
@@ -1353,8 +1353,8 @@ f()
 TEST [[
 ---@type file*
 local f
-f:read '*a'
-f:read('*a')
+local _ = f:read '*a'
+local _ = f:read('*a')
 ]]
 
 TEST [[

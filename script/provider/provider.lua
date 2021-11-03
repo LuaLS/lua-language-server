@@ -185,7 +185,7 @@ proto.on('textDocument/didChange', function (params) ---@async
     local uri     = doc.uri
     --log.debug('changes', util.dump(changes))
     local text = tm(uri, changes)
-    files.setText(uri, text, true)
+    files.setText(uri, text, true, doc.version)
 end)
 
 proto.on('textDocument/hover', function (params) ---@async

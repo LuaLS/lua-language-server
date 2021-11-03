@@ -26,21 +26,24 @@ function ffi.cdef(def) end
 ---@param name    string
 ---@param global? boolean
 ---@return ffi.namespace* clib
+---@nodiscard
 function ffi.load(name, global) end
 
 ---@param ct     ffi.ct*
 ---@param nelem? integer
 ---@param init?  any
 ---@return ffi.cdata* cdata
+---@nodiscard
 function ffi.new(ct, nelem, init, ...) end
 
 ---@param nelem? integer
 ---@param init?  any
 ---@return ffi.cdata* cdata
-function ctype(nelem, init, ...) end
+function ffi.ctype(nelem, init, ...) end
 
 ---@param ct ffi.ct*
 ---@return ffi.ctype* ctype
+---@nodiscard
 function ffi.typeof(ct) end
 
 ---@param ct   ffi.ct*
@@ -61,10 +64,12 @@ function ffi.gc(cdata, finalizer) end
 ---@param ct     ffi.ct*
 ---@param nelem? integer
 ---@return integer|nil size
+---@nodiscard
 function ffi.sizeof(ct, nelem) end
 
 ---@param ct ffi.ct*
 ---@return integer align
+---@nodiscard
 function ffi.alignof(ct) end
 
 ---@param ct    ffi.ct*
@@ -72,15 +77,18 @@ function ffi.alignof(ct) end
 ---@return integer  ofs
 ---@return integer? bpos
 ---@return integer? bsize
+---@nodiscard
 function ffi.offsetof(ct, field) end
 
 ---@param ct  ffi.ct*
 ---@param obj any
 ---@return boolean status
+---@nodiscard
 function ffi.istype(ct, obj) end
 
 ---@param newerr? integer
 ---@return integer err
+---@nodiscard
 function ffi.errno(newerr) end
 
 ---@param ptr  any

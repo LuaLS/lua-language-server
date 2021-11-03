@@ -57,11 +57,13 @@ _G = {}
 ---#DES 'getfenv'
 ---@param f? function
 ---@return table
+---@nodiscard
 function getfenv(f) end
 
 ---#DES 'getmetatable'
 ---@param object any
 ---@return table metatable
+---@nodiscard
 function getmetatable(object) end
 
 ---#DES 'ipairs'
@@ -83,6 +85,7 @@ function ipairs(t) end
 ---@param chunkname? string
 ---@return function
 ---@return string   error_message
+---@nodiscard
 function load(func, chunkname) end
 ---#else
 ---#DES 'load>5.2'
@@ -92,6 +95,7 @@ function load(func, chunkname) end
 ---@param env?       table
 ---@return function
 ---@return string   error_message
+---@nodiscard
 function load(chunk, chunkname, mode, env) end
 ---#end
 
@@ -100,6 +104,7 @@ function load(chunk, chunkname, mode, env) end
 ---@param filename? string
 ---@return function
 ---@return string   error_message
+---@nodiscard
 function loadfile(filename) end
 ---#else
 ---#DES 'loadfile'
@@ -108,6 +113,7 @@ function loadfile(filename) end
 ---@param env?      table
 ---@return function
 ---@return string   error_message
+---@nodiscard
 function loadfile(filename, mode, env) end
 ---#end
 
@@ -117,6 +123,7 @@ function loadfile(filename, mode, env) end
 ---@param chunkname? string
 ---@return function
 ---@return string error_message
+---@nodiscard
 function loadstring(text, chunkname) end
 
 ---@version 5.1
@@ -130,6 +137,7 @@ function module(name, ...) end
 ---@param index? K
 ---@return K
 ---@return V
+---@nodiscard
 function next(table, index) end
 
 ---#DES 'pairs'
@@ -154,17 +162,20 @@ function print(...) end
 ---@param v1 any
 ---@param v2 any
 ---@return boolean
+---@nodiscard
 function rawequal(v1, v2) end
 
 ---#DES 'rawget'
 ---@param table table
 ---@param index any
 ---@return any
+---@nodiscard
 function rawget(table, index) end
 
 ---#DES 'rawlen'
 ---@param v table|string
 ---@return integer len
+---@nodiscard
 function rawlen(v) end
 
 ---#DES 'rawset'
@@ -177,6 +188,7 @@ function rawset(table, index, value) end
 ---#DES 'select'
 ---@param index integer|'"#"'
 ---@return any
+---@nodiscard
 function select(index, ...) end
 
 ---@version 5.1
@@ -196,11 +208,13 @@ function setmetatable(table, metatable) end
 ---@param e     string|number
 ---@param base? integer
 ---@return number?
+---@nodiscard
 function tonumber(e, base) end
 
 ---#DES 'tostring'
 ---@param v any
 ---@return string
+---@nodiscard
 function tostring(v) end
 
 ---@alias type
@@ -216,6 +230,7 @@ function tostring(v) end
 ---#DES 'type'
 ---@param v any
 ---@return type type
+---@nodiscard
 function type(v) end
 
 ---#DES '_VERSION'
@@ -258,4 +273,5 @@ function xpcall(f, msgh, arg1, ...) end
 ---@param list table
 ---@param i?   integer
 ---@param j?   integer
+---@nodiscard
 function unpack(list, i, j) end

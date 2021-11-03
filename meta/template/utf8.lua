@@ -12,6 +12,7 @@ utf8 = {}
 ---@param code integer
 ---@vararg integer
 ---@return string
+---@nodiscard
 function utf8.char(code, ...) end
 
 ---#DES 'utf8.codes'
@@ -33,6 +34,7 @@ function utf8.codes(s, lax) end
 ---@param j?   integer
 ---@return integer code
 ---@return ...
+---@nodiscard
 function utf8.codepoint(s, i, j) end
 ---#else
 ---@param s    string
@@ -41,6 +43,7 @@ function utf8.codepoint(s, i, j) end
 ---@param lax? boolean
 ---@return integer code
 ---@return ...
+---@nodiscard
 function utf8.codepoint(s, i, j, lax) end
 ---#end
 
@@ -51,6 +54,7 @@ function utf8.codepoint(s, i, j, lax) end
 ---@param j?   integer
 ---@return integer?
 ---@return integer? errpos
+---@nodiscard
 function utf8.len(s, i, j) end
 ---#else
 ---@param s    string
@@ -59,6 +63,7 @@ function utf8.len(s, i, j) end
 ---@param lax? boolean
 ---@return integer?
 ---@return integer? errpos
+---@nodiscard
 function utf8.len(s, i, j, lax) end
 ---#end
 
@@ -67,6 +72,7 @@ function utf8.len(s, i, j, lax) end
 ---@param n integer
 ---@param i integer
 ---@return integer p
+---@nodiscard
 function utf8.offset(s, n, i) end
 
 return utf8

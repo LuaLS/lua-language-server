@@ -44,6 +44,7 @@ DIAG_DEPRECATED         = 'Deprecated.'
 DIAG_DIFFERENT_REQUIRES = 'The same file is required with different names.'
 DIAG_REDUNDANT_RETURN   = 'Redundant return.'
 DIAG_AWAIT_IN_SYNC      = 'Async function can only be called in async function.'
+DIAG_DISCARD_RETURNS    = 'The return values of this function cannot be discarded.'
 
 DIAG_CIRCLE_DOC_CLASS                 = 'Circularly inherited classes.'
 DIAG_DOC_FIELD_NO_CLASS               = 'The field must be defined after the class.'

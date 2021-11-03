@@ -10,6 +10,7 @@ table = {}
 ---@param i?   integer
 ---@param j?   integer
 ---@return string
+---@nodiscard
 function table.concat(list, sep, i, j) end
 
 ---#DES 'table.insert'
@@ -23,6 +24,7 @@ function table.insert(list, pos, value) end
 ---#DES 'table.maxn'
 ---@param table table
 ---@return integer
+---@nodiscard
 function table.maxn(table) end
 
 ---@version >5.3
@@ -38,6 +40,7 @@ function table.move(a1, f, e, t, a2) end
 ---@version >5.2, JIT
 ---#DES 'table.pack'
 ---@return table
+---@nodiscard
 function table.pack(...) end
 
 ---#DES 'table.remove'
@@ -56,6 +59,7 @@ function table.sort(list, comp) end
 ---@param list table
 ---@param i?   integer
 ---@param j?   integer
+---@nodiscard
 function table.unpack(list, i, j) end
 
 return table

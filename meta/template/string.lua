@@ -10,6 +10,7 @@ string = {}
 ---@param j? integer
 ---@return integer
 ---@return ...
+---@nodiscard
 function string.byte(s, i, j) end
 
 ---#DES 'string.char'
@@ -17,12 +18,14 @@ function string.byte(s, i, j) end
 ---@vararg integer
 ---@return string
 ---@return ...
+---@nodiscard
 function string.char(byte, ...) end
 
 ---#DES 'string.dump'
 ---@param f      function
 ---@param strip? boolean
 ---@return string
+---@nodiscard
 function string.dump(f, strip) end
 
 ---#DES 'string.find'
@@ -33,12 +36,14 @@ function string.dump(f, strip) end
 ---@return integer start
 ---@return integer end
 ---@return ... captured
+---@nodiscard
 function string.find(s, pattern, init, plain) end
 
 ---#DES 'string.format'
 ---@param s string
 ---@vararg string
 ---@return string
+---@nodiscard
 function string.format(s, ...) end
 
 ---#DES 'string.gmatch'
@@ -62,16 +67,19 @@ function string.gmatch(s, pattern, init) end
 ---@param n       integer
 ---@return string
 ---@return integer count
+---@nodiscard
 function string.gsub(s, pattern, repl, n) end
 
 ---#DES 'string.len'
 ---@param s string
 ---@return integer
+---@nodiscard
 function string.len(s) end
 
 ---#DES 'string.lower'
 ---@param s string
 ---@return string
+---@nodiscard
 function string.lower(s) end
 
 ---#DES 'string.match'
@@ -79,6 +87,7 @@ function string.lower(s) end
 ---@param pattern string
 ---@param init?   integer
 ---@return string | number captured
+---@nodiscard
 function string.match(s, pattern, init) end
 
 ---@version >5.3
@@ -88,12 +97,14 @@ function string.match(s, pattern, init) end
 ---@param v2? string
 ---@vararg string
 ---@return string binary
+---@nodiscard
 function string.pack(fmt, v1, v2, ...) end
 
 ---@version >5.3
 ---#DES 'string.packsize'
 ---@param fmt string
 ---@return integer
+---@nodiscard
 function string.packsize(fmt) end
 
 ---#if VERSION <= 5.1 and not JIT then
@@ -101,6 +112,7 @@ function string.packsize(fmt) end
 ---@param s    string
 ---@param n    integer
 ---@return string
+---@nodiscard
 function string.rep(s, n) end
 ---#else
 ---#DES 'string.rep>5.2'
@@ -108,12 +120,14 @@ function string.rep(s, n) end
 ---@param n    integer
 ---@param sep? string
 ---@return string
+---@nodiscard
 function string.rep(s, n, sep) end
 ---#end
 
 ---#DES 'string.reverse'
 ---@param s string
 ---@return string
+---@nodiscard
 function string.reverse(s) end
 
 ---#DES 'string.sub'
@@ -121,6 +135,7 @@ function string.reverse(s) end
 ---@param i  integer
 ---@param j? integer
 ---@return string
+---@nodiscard
 function string.sub(s, i, j) end
 
 ---@version >5.3
@@ -130,11 +145,13 @@ function string.sub(s, i, j) end
 ---@param pos? integer
 ---@return ...
 ---@return integer offset
+---@nodiscard
 function string.unpack(fmt, s, pos) end
 
 ---#DES 'string.upper'
 ---@param s string
 ---@return string
+---@nodiscard
 function string.upper(s) end
 
 return string

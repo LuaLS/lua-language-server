@@ -11,7 +11,8 @@
   + `---@nodiscard`: the return value of the marking function cannot be discarded
 * `NEW` diagnostics:
   + `await-in-sync`: check whether calls async function in sync function. disabled by default.
-  + `discard-returns`: check whether the return value is discarded
+  + `not-yieldable`: check whether the function supports async functions as parameters. disabled by default.
+  + `discard-returns`: check whether the return value is discarded.
 * `NEW` locale `pt-br`, thanks [Jeferson Ferreira](https://github.com/jefersonf)
 * `NEW` supports [utf-8-offsets](https://clangd.llvm.org/extensions#utf-8-offsets)
 * `CHG` `LuaDoc` supports unicode

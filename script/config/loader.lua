@@ -19,37 +19,43 @@ local m = {}
 function m.loadRCConfig(filename)
     local path = workspace.getAbsolutePath(filename)
     if not path then
-        return
+        m.lastRCConfig = nil
+        return nil
     end
     local buf = util.loadFile(path)
     if not buf then
-        return
+        m.lastRCConfig = nil
+        return nil
     end
     local suc, res = pcall(json.decode, buf)
     if not suc then
         errorMessage(lang.script('CONFIG_LOAD_ERROR', res))
-        return
+        return m.lastRCConfig
     end
+    m.lastRCConfig = res
     return res
 end
 
 function m.loadLocalConfig(filename)
     local path = workspace.getAbsolutePath(filename)
     if not path then
-        return
+        m.lastLocalConfig = nil
+        return nil
     end
     local buf  = util.loadFile(path)
     if not buf then
         errorMessage(lang.script('CONFIG_LOAD_FAILED', path))
-        return
+        m.lastLocalConfig = nil
+        return nil
     end
     local firstChar = buf:match '%S'
     if firstChar == '{' then
         local suc, res = pcall(json.decode, buf)
         if not suc then
             errorMessage(lang.script('CONFIG_LOAD_ERROR', res))
-            return
+            return m.lastLocalConfig
         end
+        m.lastLocalConfig = res
         return res
     else
         local suc, res = pcall(function ()
@@ -57,8 +63,9 @@ function m.loadLocalConfig(filename)
         end)
         if not suc then
             errorMessage(lang.script('CONFIG_LOAD_ERROR', res))
-            return
+            return m.lastLocalConfig
         end
+        m.lastLocalConfig = res
         return res
     end
 end

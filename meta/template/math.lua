@@ -138,14 +138,14 @@ function math.log10(x) end
 
 ---#DES 'math.max'
 ---@param x number
----@vararg number
+---@param ... number
 ---@return number
 ---@nodiscard
 function math.max(x, ...) end
 
 ---#DES 'math.min'
 ---@param x number
----@vararg number
+---@param ... number
 ---@return number
 ---@nodiscard
 function math.min(x, ...) end

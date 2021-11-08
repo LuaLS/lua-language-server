@@ -41,7 +41,7 @@ function io.input(file) end
 
 ---#DES 'io.lines'
 ---@param filename string?
----@vararg readmode
+---@param ... readmode
 ---@return fun():string|number
 function io.lines(filename, ...) end
 
@@ -70,7 +70,7 @@ function io.output(file) end
 function io.popen(prog, mode) end
 
 ---#DES 'io.read'
----@vararg readmode
+---@param ... readmode
 ---@return string|number
 ---@return ...
 ---@nodiscard
@@ -128,12 +128,12 @@ function file:close() end
 function file:flush() end
 
 ---#DES 'file:lines'
----@vararg readmode
+---@param ... readmode
 ---@return fun():string|number
 function file:lines(...) end
 
 ---#DES 'file:read'
----@vararg readmode
+---@param ... readmode
 ---@return string|number
 ---@nodiscard
 function file:read(...) end
@@ -161,7 +161,7 @@ function file:seek(whence, offset) end
 function file:setvbuf(mode, size) end
 
 ---#DES 'file:write'
----@vararg string|number
+---@param ... string|number
 ---@return file*?
 ---@return string? errmsg
 function file:write(...) end

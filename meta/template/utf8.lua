@@ -10,7 +10,7 @@ utf8 = {}
 
 ---#DES 'utf8.char'
 ---@param code integer
----@vararg integer
+---@param ... integer
 ---@return string
 ---@nodiscard
 function utf8.char(code, ...) end

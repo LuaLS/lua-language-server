@@ -21,23 +21,23 @@ function bit.tohex(x, n) end
 ---@nodiscard
 function bit.bnot(x) end
 
----@param x  integer
----@param x2 integer
----@vararg integer
+---@param x   integer
+---@param x2  integer
+---@param ... integer
 ---@return integer y
 ---@nodiscard
 function bit.bor(x, x2, ...) end
 
----@param x  integer
----@param x2 integer
----@vararg integer
+---@param x   integer
+---@param x2  integer
+---@param ... integer
 ---@return integer y
 ---@nodiscard
 function bit.band(x, x2, ...) end
 
----@param x  integer
----@param x2 integer
----@vararg integer
+---@param x   integer
+---@param x2  integer
+---@param ... integer
 ---@return integer y
 ---@nodiscard
 function bit.bxor(x, x2, ...) end

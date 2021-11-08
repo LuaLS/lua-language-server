@@ -15,7 +15,7 @@ function string.byte(s, i, j) end
 
 ---#DES 'string.char'
 ---@param byte integer
----@vararg integer
+---@param ... integer
 ---@return string
 ---@return ...
 ---@nodiscard
@@ -41,7 +41,7 @@ function string.find(s, pattern, init, plain) end
 
 ---#DES 'string.format'
 ---@param s string
----@vararg string
+---@param ... string
 ---@return string
 ---@nodiscard
 function string.format(s, ...) end
@@ -95,7 +95,7 @@ function string.match(s, pattern, init) end
 ---@param fmt string
 ---@param v1  string
 ---@param v2? string
----@vararg string
+---@param ... string
 ---@return string binary
 ---@nodiscard
 function string.pack(fmt, v1, v2, ...) end

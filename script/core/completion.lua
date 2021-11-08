@@ -91,7 +91,8 @@ local function findNearestTableField(state, position)
     return source
 end
 
-local function findParent(state, text, position)
+local function findParent(state, position)
+    local text = state.lua
     local offset = guide.positionToOffset(state, position)
     for i = offset, 1, -1 do
         local char = text:sub(i, i)
@@ -128,7 +129,7 @@ local function findParent(state, text, position)
     return nil, nil
 end
 
-local function findParentInStringIndex(state, text, position)
+local function findParentInStringIndex(state, position)
     local near, nearStart
     guide.eachSourceContain(state.ast, position, function (source)
         local start = guide.getStartFinish(source)
@@ -365,7 +366,7 @@ local function checkModule(state, word, position, results)
                 commitCharacters = {'.'},
                 command = {
                     title     = 'autoRequire',
-                    command   = 'lua.autoRequire:' .. sp:get_id(),
+                    command   = 'Lua.autoRequire:' .. sp:get_id(),
                     arguments = {
                         {
                             uri    = guide.getUri(state.ast),
@@ -393,19 +394,16 @@ local function checkModule(state, word, position, results)
     end
 end
 
-local function checkFieldFromFieldToIndex(name, src, parent, word, startPos, position)
+local function checkFieldFromFieldToIndex(state, name, src, parent, word, startPos, position)
     if name:match '^[%a_][%w_]*$' then
         return nil
     end
     local textEdit, additionalTextEdits
-    local uri   = guide.getUri(parent)
-    local text  = files.getText(uri)
-    local state = files.getState(uri)
     local startOffset = guide.positionToOffset(state, startPos)
     local offset      = guide.positionToOffset(state, position)
     local wordStartOffset
     if word == '' then
-        wordStartOffset = text:match('()%S', startOffset + 1)
+        wordStartOffset = state.lua:match('()%S', startOffset + 1)
         if wordStartOffset then
             wordStartOffset = wordStartOffset - 1
         else
@@ -449,8 +447,8 @@ local function checkFieldFromFieldToIndex(name, src, parent, word, startPos, pos
             }
         end
     else
-        if config.get 'Lua.runtime.version' == 'Lua 5.1'
-        or config.get 'Lua.runtime.version' == 'LuaJIT' then
+        if config.get 'Lua.runtime.version' == 'lua 5.1'
+        or config.get 'Lua.runtime.version' == 'luaJIT' then
             textEdit.newText = '_G' .. textEdit.newText
         else
             textEdit.newText = '_ENV' .. textEdit.newText
@@ -459,7 +457,7 @@ local function checkFieldFromFieldToIndex(name, src, parent, word, startPos, pos
     return textEdit, additionalTextEdits
 end
 
-local function checkFieldThen(name, src, word, startPos, position, parent, oop, results)
+local function checkFieldThen(state, name, src, word, startPos, position, parent, oop, results)
     local value = searcher.getObjectValue(src) or src
     local kind = define.CompletionItemKind.Field
     if value.type == 'function'
@@ -500,7 +498,7 @@ local function checkFieldThen(name, src, word, startPos, position, parent, oop, 
             newText = name,
         }
     else
-        textEdit, additionalTextEdits = checkFieldFromFieldToIndex(name, src, parent, word, startPos, position)
+        textEdit, additionalTextEdits = checkFieldFromFieldToIndex(state, name, src, parent, word, startPos, position)
     end
     results[#results+1] = {
         label      = name,
@@ -576,7 +574,7 @@ local function checkFieldOfRefs(refs, state, word, startPos, position, parent, o
     end
     for name, src in util.sortPairs(fields) do
         if src then
-            checkFieldThen(name, src, word, startPos, position, parent, oop, results)
+            checkFieldThen(state, name, src, word, startPos, position, parent, oop, results)
             await.delay()
         end
     end
@@ -629,7 +627,8 @@ local function checkTableField(state, word, start, results)
     end)
 end
 
-local function checkCommon(myUri, word, text, position, results)
+local function checkCommon(state, word, position, results)
+    local myUri = state.uri
     local showWord = config.get 'Lua.completion.showWord'
     if showWord == 'Disable' then
         return
@@ -697,8 +696,7 @@ local function checkCommon(myUri, word, text, position, results)
             end
         end
     end
-    local state = files.getState(myUri)
-    for str, offset in text:gmatch '([%a_][%w_]+)()' do
+    for str, offset in state.lua:gmatch '([%a_][%w_]+)()' do
         if #results >= 100 then
             break
         end
@@ -728,7 +726,8 @@ local function isInString(state, position)
     end)
 end
 
-local function checkKeyWord(state, text, start, position, word, hasSpace, afterLocal, results)
+local function checkKeyWord(state, start, position, word, hasSpace, afterLocal, results)
+    local text = state.lua
     local snipType = config.get 'Lua.completion.keywordSnippet'
     local symbol = lookBackward.findSymbol(text, guide.positionToOffset(state, start))
     local isExp = symbol == '(' or symbol == ',' or symbol == '='
@@ -880,7 +879,8 @@ local function checkFunctionArgByDocParam(state, word, startPos, results)
     end
 end
 
-local function isAfterLocal(state, text, startPos)
+local function isAfterLocal(state, startPos)
+    local text = state.lua
     local offset = guide.positionToOffset(state, startPos)
     local pos    = lookBackward.skipSpace(text, offset)
     local word   = lookBackward.findWord(text, pos)
@@ -986,7 +986,7 @@ local function collectRequireNames(mode, myUri, literal, source, smark, position
     end
 end
 
-local function checkUri(state, text, position, results)
+local function checkUri(state, position, results)
     local myUri = guide.getUri(state.ast)
     guide.eachSourceContain(state.ast, position, function (source)
         if source.type ~= 'string' then
@@ -1014,7 +1014,8 @@ local function checkUri(state, text, position, results)
     end)
 end
 
-local function checkLenPlusOne(state, text, position, results)
+local function checkLenPlusOne(state, position, results)
+    local text = state.lua
     guide.eachSourceContain(state.ast, position, function (source)
         if source.type == 'getindex'
         or source.type == 'setindex' then
@@ -1106,7 +1107,7 @@ local function mergeEnums(a, b, source)
     end
 end
 
-local function checkTypingEnum(state, text, position, defs, str, results)
+local function checkTypingEnum(state, position, defs, str, results)
     local enums = {}
     for _, def in ipairs(defs) do
         if def.type == 'doc.type.enum'
@@ -1128,7 +1129,7 @@ local function checkTypingEnum(state, text, position, defs, str, results)
     end
 end
 
-local function checkEqualEnumLeft(state, text, position, source, results)
+local function checkEqualEnumLeft(state, position, source, results)
     if not source then
         return
     end
@@ -1138,10 +1139,11 @@ local function checkEqualEnumLeft(state, text, position, source, results)
         end
     end)
     local defs = vm.getDefs(source)
-    checkTypingEnum(state, text, position, defs, str, results)
+    checkTypingEnum(state, position, defs, str, results)
 end
 
-local function checkEqualEnum(state, text, position, results)
+local function checkEqualEnum(state, position, results)
+    local text = state.lua
     local start =  lookBackward.findTargetSymbol(text, guide.positionToOffset(state, position), '=')
     if not start then
         return
@@ -1163,10 +1165,10 @@ local function checkEqualEnum(state, text, position, results)
     if source.type == 'call' and not eqOrNeq then
         return
     end
-    checkEqualEnumLeft(state, text, position, source, results)
+    checkEqualEnumLeft(state, position, source, results)
 end
 
-local function checkEqualEnumInString(state, text, position, results)
+local function checkEqualEnumInString(state, position, results)
     local source = findNearestSource(state, position)
     local parent = source.parent
     if parent.type == 'binary' then
@@ -1179,16 +1181,16 @@ local function checkEqualEnumInString(state, text, position, results)
         if parent.op.type ~= '==' and parent.op.type ~= '~=' then
             return
         end
-        checkEqualEnumLeft(state, text, position, parent[1], results)
+        checkEqualEnumLeft(state, position, parent[1], results)
     end
     if parent.type == 'local' then
-        checkEqualEnumLeft(state, text, position, parent, results)
+        checkEqualEnumLeft(state, position, parent, results)
     end
     if parent.type == 'setlocal'
     or parent.type == 'setglobal'
     or parent.type == 'setfield'
     or parent.type == 'setindex' then
-        checkEqualEnumLeft(state, text, position, parent.node, results)
+        checkEqualEnumLeft(state, position, parent.node, results)
     end
 end
 
@@ -1200,21 +1202,21 @@ local function isFuncArg(state, position)
     end)
 end
 
-local function trySpecial(state, text, position, results)
+local function trySpecial(state, position, results)
     if isInString(state, position) then
-        checkUri(state, text, position, results)
-        checkEqualEnumInString(state, text, position, results)
+        checkUri(state, position, results)
+        checkEqualEnumInString(state, position, results)
         return
     end
     -- x[#x+1]
-    checkLenPlusOne(state, text, position, results)
+    checkLenPlusOne(state, position, results)
     -- type(o) ==
-    checkEqualEnum(state, text, position, results)
+    checkEqualEnum(state, position, results)
 end
 
 ---@async
-local function tryIndex(state, text, position, results)
-    local parent, oop = findParentInStringIndex(state, text, position)
+local function tryIndex(state, position, results)
+    local parent, oop = findParentInStringIndex(state, position)
     if not parent then
         return
     end
@@ -1223,7 +1225,8 @@ local function tryIndex(state, text, position, results)
 end
 
 ---@async
-local function tryWord(state, text, position, triggerCharacter, results)
+local function tryWord(state, position, triggerCharacter, results)
+    local text = state.lua
     local offset = guide.positionToOffset(state, position)
     local finish = lookBackward.skipSpace(text, offset)
     local word, start = lookBackward.findWord(text, offset)
@@ -1242,11 +1245,11 @@ local function tryWord(state, text, position, triggerCharacter, results)
     if isInString(state, position) then
         if not hasSpace then
             if #results == 0 then
-                checkCommon(state.uri, word, text, position, results)
+                checkCommon(state, word, position, results)
             end
         end
     else
-        local parent, oop = findParent(state, text, startPos)
+        local parent, oop = findParent(state, startPos)
         if parent then
             if not hasSpace then
                 checkField(state, word, startPos, position, parent, oop, results)
@@ -1255,8 +1258,8 @@ local function tryWord(state, text, position, triggerCharacter, results)
             checkProvideLocal(state, word, startPos, results)
             checkFunctionArgByDocParam(state, word, startPos, results)
         else
-            local afterLocal = isAfterLocal(state, text, startPos)
-            local stop = checkKeyWord(state, text, startPos, position, word, hasSpace, afterLocal, results)
+            local afterLocal = isAfterLocal(state, startPos)
+            local stop = checkKeyWord(state, startPos, position, word, hasSpace, afterLocal, results)
             if stop then
                 return
             end
@@ -1273,13 +1276,14 @@ local function tryWord(state, text, position, triggerCharacter, results)
             end
         end
         if not hasSpace then
-            checkCommon(state.uri, word, text, position, results)
+            checkCommon(state, word, position, results)
         end
     end
 end
 
 ---@async
-local function trySymbol(state, text, position, results)
+local function trySymbol(state, position, results)
+    local text = state.lua
     local symbol, start = lookBackward.findSymbol(text, guide.positionToOffset(state, position))
     if not symbol then
         return nil
@@ -1290,7 +1294,7 @@ local function trySymbol(state, text, position, results)
     local startPos = guide.offsetToPosition(state, start)
     if symbol == '.'
     or symbol == ':' then
-        local parent, oop = findParent(state, text, startPos)
+        local parent, oop = findParent(state, startPos)
         if parent then
             tracy.ZoneBeginN 'completion.trySymbol'
             checkField(state, '', startPos, position, parent, oop, results)
@@ -1428,7 +1432,7 @@ local function getCallEnumsAndFuncs(source, index, oop, call)
     end
 end
 
-local function findCall(state, text, position)
+local function findCall(state, position)
     local call
     guide.eachSourceContain(state.ast, position, function (src)
         if src.type == 'call' then
@@ -1440,7 +1444,7 @@ local function findCall(state, text, position)
     return call
 end
 
-local function getCallArgInfo(call, text, position)
+local function getCallArgInfo(call, position)
     if not call.args then
         return 1, nil, nil
     end
@@ -1465,7 +1469,8 @@ local function getFuncParamByCallIndex(func, index)
     return func.args[index]
 end
 
-local function checkTableLiteralField(state, text, position, tbl, fields, results)
+local function checkTableLiteralField(state, position, tbl, fields, results)
+    local text = state.lua
     local mark = {}
     for _, field in ipairs(tbl) do
         if field.type == 'tablefield'
@@ -1509,7 +1514,7 @@ local function checkTableLiteralField(state, text, position, tbl, fields, result
     end
 end
 
-local function checkTableLiteralFieldByCall(state, text, position, call, defs, index, results)
+local function checkTableLiteralFieldByCall(state, position, call, defs, index, results)
     local source = findNearestTableField(state, position)
     if not source then
         return
@@ -1543,16 +1548,16 @@ local function checkTableLiteralFieldByCall(state, text, position, call, defs, i
         end
         ::CONTINUE::
     end
-    checkTableLiteralField(state, text, position, tbl, fields, results)
+    checkTableLiteralField(state, position, tbl, fields, results)
 end
 
-local function tryCallArg(state, text, position, results)
-    local call = findCall(state, text, position)
+local function tryCallArg(state, position, results)
+    local call = findCall(state, position)
     if not call then
         return
     end
     local myResults = {}
-    local argIndex, arg, oop = getCallArgInfo(call, text, position)
+    local argIndex, arg, oop = getCallArgInfo(call, position)
     if arg and arg.type == 'function' then
         return
     end
@@ -1567,10 +1572,10 @@ local function tryCallArg(state, text, position, results)
     for _, enum in ipairs(myResults) do
         results[#results+1] = enum
     end
-    checkTableLiteralFieldByCall(state, text, position, call, defs, argIndex, results)
+    checkTableLiteralFieldByCall(state, position, call, defs, argIndex, results)
 end
 
-local function tryTable(state, text, position, results)
+local function tryTable(state, position, results)
     local source = findNearestTableField(state, position)
     if not source then
         return
@@ -1594,7 +1599,7 @@ local function tryTable(state, text, position, results)
             fields[#fields+1] = field
         end
     end
-    checkTableLiteralField(state, text, position, tbl, fields, results)
+    checkTableLiteralField(state, position, tbl, fields, results)
 end
 
 local function getComment(state, position)
@@ -1606,7 +1611,7 @@ local function getComment(state, position)
     return nil
 end
 
-local function getLuaDoc(state, position)
+local function getluaDoc(state, position)
     for _, doc in ipairs(state.ast.docs) do
         if position >= doc.start and position <= doc.range then
             return doc
@@ -1615,7 +1620,7 @@ local function getLuaDoc(state, position)
     return nil
 end
 
-local function tryLuaDocCate(word, results)
+local function tryluaDocCate(word, results)
     for _, docType in ipairs {
         'class',
         'type',
@@ -1644,7 +1649,7 @@ local function tryLuaDocCate(word, results)
     end
 end
 
-local function getLuaDocByContain(state, position)
+local function getluaDocByContain(state, position)
     local result
     local range = math.huge
     guide.eachSourceContain(state.ast.docs, position, function (src)
@@ -1660,12 +1665,12 @@ local function getLuaDocByContain(state, position)
     return result
 end
 
-local function getLuaDocByErr(state, text, start, position)
+local function getluaDocByErr(state, start, position)
     local targetError
     for _, err in ipairs(state.errs) do
         if  err.finish <= position
         and err.start >= start  then
-            if not text:sub(err.finish + 1, position):find '%S' then
+            if not state.lua:sub(err.finish + 1, position):find '%S' then
                 targetError = err
                 break
             end
@@ -1685,7 +1690,7 @@ local function getLuaDocByErr(state, text, start, position)
     return targetError, targetDoc
 end
 
-local function tryLuaDocBySource(state, position, source, results)
+local function tryluaDocBySource(state, position, source, results)
     if source.type == 'doc.extends.name' then
         if source.parent.type == 'doc.class' then
             for _, doc in ipairs(vm.getDocDefines '*') do
@@ -1780,7 +1785,7 @@ local function tryLuaDocBySource(state, position, source, results)
     return false
 end
 
-local function tryLuaDocByErr(state, position, err, docState, results)
+local function tryluaDocByErr(state, position, err, docState, results)
     if err.type == 'LUADOC_MISS_CLASS_EXTENDS_NAME' then
         for _, doc in ipairs(vm.getDocDefines '*') do
             if  doc.type == 'doc.class.name'
@@ -1859,7 +1864,7 @@ local function tryLuaDocByErr(state, position, err, docState, results)
     end
 end
 
-local function buildLuaDocOfFunction(func)
+local function buildluaDocOfFunction(func)
     local index = 1
     local buf = {}
     buf[#buf+1] = '${1:comment}'
@@ -1901,7 +1906,7 @@ local function buildLuaDocOfFunction(func)
     return insertText
 end
 
-local function tryLuaDocOfFunction(doc, results)
+local function tryluaDocOfFunction(doc, results)
     if not doc.bindSources then
         return
     end
@@ -1921,7 +1926,7 @@ local function tryLuaDocOfFunction(doc, results)
             return
         end
     end
-    local insertText = buildLuaDocOfFunction(func)
+    local insertText = buildluaDocOfFunction(func)
     results[#results+1] = {
         label   = '@param;@return',
         kind    = define.CompletionItemKind.Snippet,
@@ -1931,8 +1936,8 @@ local function tryLuaDocOfFunction(doc, results)
     }
 end
 
-local function tryLuaDoc(state, text, position, results)
-    local doc = getLuaDoc(state, position)
+local function tryluaDoc(state, position, results)
+    local doc = getluaDoc(state, position)
     if not doc then
         return
     end
@@ -1940,38 +1945,38 @@ local function tryLuaDoc(state, text, position, results)
         local line = doc.originalComment.text
         -- 尝试 ---$
         if line == '-' then
-            tryLuaDocOfFunction(doc, results)
+            tryluaDocOfFunction(doc, results)
             return
         end
         -- 尝试 ---@$
         local cate = line:match('^-+%s*@(%a*)$')
         if cate then
-            tryLuaDocCate(cate, results)
+            tryluaDocCate(cate, results)
             return
         end
     end
     -- 根据输入中的source来补全
-    local source = getLuaDocByContain(state, position)
+    local source = getluaDocByContain(state, position)
     if source then
-        local suc = tryLuaDocBySource(state, position, source, results)
+        local suc = tryluaDocBySource(state, position, source, results)
         if suc then
             return
         end
     end
     -- 根据附近的错误消息来补全
-    local err, expectDoc = getLuaDocByErr(state, text, doc.start, position)
+    local err, expectDoc = getluaDocByErr(state, doc.start, position)
     if err then
-        tryLuaDocByErr(state, position, err, expectDoc, results)
+        tryluaDocByErr(state, position, err, expectDoc, results)
         return
     end
 end
 
-local function tryComment(state, text, position, results)
+local function tryComment(state, position, results)
     if #results > 0 then
         return
     end
-    local word = lookBackward.findWord(text, guide.positionToOffset(state, position))
-    local doc  = getLuaDoc(state, position)
+    local word = lookBackward.findWord(state.lua, guide.positionToOffset(state, position))
+    local doc  = getluaDoc(state, position)
     if not word then
         local comment = getComment(state, position)
         if comment.type == 'comment.short'
@@ -1992,7 +1997,7 @@ local function tryComment(state, text, position, results)
     if doc and doc.type ~= 'doc.comment' then
         return
     end
-    checkCommon(state.uri, word, text, position, results)
+    checkCommon(state, word, position, results)
 end
 
 local function makeCache(uri, position, results)
@@ -2062,7 +2067,7 @@ local function getCache(uri, position)
     end
 
     if results.enableCommon then
-        checkCommon(uri, word, text, position, results)
+        checkCommon(uri, word, position, results)
     end
 
     return cache.results
@@ -2075,37 +2080,36 @@ end
 
 ---@async
 local function completion(uri, position, triggerCharacter)
-    tracy.ZoneBeginN 'completion cache'
-    local results = getCache(uri, position)
-    tracy.ZoneEnd()
-    if results then
-        return results
-    end
-    await.delay()
+    --tracy.ZoneBeginN 'completion cache'
+    --local results = getCache(uri, position)
+    --tracy.ZoneEnd()
+    --if results then
+    --    return results
+    --end
+    --await.delay()
     tracy.ZoneBeginN 'completion #1'
     local state = files.getState(uri)
     local text = files.getText(uri)
-    results = {}
+    local results = {}
     clearStack()
     tracy.ZoneEnd()
-    await.delay()
     tracy.ZoneBeginN 'completion #2'
     if state then
         if getComment(state, position) then
-            tryLuaDoc(state, text, position, results)
-            tryComment(state, text, position, results)
+            tryluaDoc(state, position, results)
+            tryComment(state, position, results)
         else
-            trySpecial(state, text, position, results)
-            tryCallArg(state, text, position, results)
-            tryTable(state, text, position, results)
-            tryWord(state, text, position, triggerCharacter, results)
-            tryIndex(state, text, position, results)
-            trySymbol(state, text, position, results)
+            trySpecial(state, position, results)
+            tryCallArg(state, position, results)
+            tryTable(state, position, results)
+            tryWord(state, position, triggerCharacter, results)
+            tryIndex(state, position, results)
+            trySymbol(state, position, results)
         end
     else
         local word = lookBackward.findWord(text, guide.positionToOffset(state, position))
         if word then
-            checkCommon(nil, word, text, position, results)
+            checkCommon(nil, word, position, results)
         end
     end
     tracy.ZoneEnd()
@@ -2116,7 +2120,7 @@ local function completion(uri, position, triggerCharacter)
     end
 
     tracy.ZoneBeginN 'completion #3'
-    makeCache(uri, position, results)
+    --makeCache(uri, position, results)
     tracy.ZoneEnd()
     return results
 end

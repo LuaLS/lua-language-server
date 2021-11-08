@@ -291,6 +291,10 @@ local function isLinkedCall(node, index)
     return false
 end
 
+function vm.isLinkedCall(node, index)
+    return isLinkedCall(node, index)
+end
+
 function vm.isAsyncCall(call)
     if vm.isAsync(call.node, true) then
         return true

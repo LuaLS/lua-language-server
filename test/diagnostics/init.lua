@@ -7,7 +7,6 @@ local catch  = require 'catch'
 config.get 'Lua.diagnostics.neededFileStatus'['deprecated']    = 'Any'
 config.get 'Lua.diagnostics.neededFileStatus'['type-check']    = 'Any'
 config.get 'Lua.diagnostics.neededFileStatus'['await-in-sync'] = 'Any'
-config.get 'Lua.diagnostics.neededFileStatus'['not-yieldable'] = 'Any'
 
 rawset(_G, 'TEST', true)
 
@@ -1419,7 +1418,6 @@ end
 <!f()!>
 ]]
 
-
 TEST [[
 ---@nodiscard
 local function f()
@@ -1427,4 +1425,61 @@ local function f()
 end
 
 X = f()
+]]
+
+config.get 'Lua.diagnostics.neededFileStatus'['not-yieldable'] = 'Any'
+TEST [[
+local function f(cb)
+    return cb
+end
+
+---@async
+local function af()
+    return nil
+end
+
+f(<!af!>)
+]]
+
+TEST [[
+---@param cb async fun()
+local function f(cb)
+    return cb
+end
+
+---@async
+local function af()
+    return nil
+end
+
+f(af)
+]]
+
+TEST [[
+local function f(cb)
+    cb()
+end
+
+local function af()
+    <!f!>(function () ---@async
+        return nil
+    end)
+end
+
+return af
+]]
+
+TEST [[
+local function f(cb)
+    cb()
+end
+
+---@async
+local function af()
+    f(function () ---@async
+        return nil
+    end)
+end
+
+return af
 ]]

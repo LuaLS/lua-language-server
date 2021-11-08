@@ -43,10 +43,11 @@ return function (uri, callback)
         end
         for i, arg in ipairs(source.args) do
             if  vm.isAsync(arg, true)
+            and not vm.isLinkedCall(source.node, i)
             and not isYieldAble(defs, i) then
                 callback {
-                    start   = source.node.start,
-                    finish  = source.node.finish,
+                    start   = arg.start,
+                    finish  = arg.finish,
                     message = lang.script('DIAG_NOT_YIELDABLE', i),
                 }
             end

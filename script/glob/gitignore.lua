@@ -164,6 +164,7 @@ function mt:getRelativePath(path)
 end
 
 ---@param callback async fun()
+---@async
 function mt:scan(path, callback)
     local files = {}
     if type(callback) ~= 'function' then
@@ -171,6 +172,7 @@ function mt:scan(path, callback)
     end
     local list = {}
 
+    ---@async
     local function check(current)
         local fileType = self:callInterface('type', current)
         if fileType == 'file' then

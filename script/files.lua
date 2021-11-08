@@ -709,13 +709,16 @@ function m.getDllWords(uri)
 end
 
 --- 注册事件
+---@param callback async fun(ev: string, uri: uri)
 function m.watch(callback)
     m.watchList[#m.watchList+1] = callback
 end
 
-function m.onWatch(ev, ...)
+function m.onWatch(ev, uri)
     for _, callback in ipairs(m.watchList) do
-        xpcall(callback, log.error, ev, ...)
+        await.call(function ()
+            callback(ev, uri)
+        end)
     end
 end
 

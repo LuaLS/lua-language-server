@@ -245,6 +245,7 @@ function m.disable()
 end
 
 --- 注册事件
+---@param callback async fun(ev: string, ...)
 function m.watch(callback)
     m.watchList[#m.watchList+1] = callback
 end

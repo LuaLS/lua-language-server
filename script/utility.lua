@@ -691,6 +691,7 @@ function m.switch()
     return obj
 end
 
+---@param f async fun()
 function m.getUpvalue(f, name)
     for i = 1, 999 do
         local uname, value = getupvalue(f, i)

@@ -5,7 +5,7 @@
 coroutine = {}
 
 ---#DES 'coroutine.create'
----@param f async fun(...):...
+---@param f async fun()
 ---@return thread
 ---@nodiscard
 function coroutine.create(f) end
@@ -55,8 +55,8 @@ function coroutine.running() end
 function coroutine.status(co) end
 
 ---#DES 'coroutine.wrap'
----@param f async fun(...):...
----@return fun(...):...
+---@param f async fun()
+---@return fun()
 ---@nodiscard
 function coroutine.wrap(f) end
 

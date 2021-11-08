@@ -22,6 +22,7 @@ function m.getMethodName(proto)
     end
 end
 
+---@param callback async fun()
 function m.on(method, callback)
     m.ability[method] = callback
 end

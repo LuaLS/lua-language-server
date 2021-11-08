@@ -1483,3 +1483,9 @@ end
 
 return af
 ]]
+
+TEST [[
+local _ = type(function () ---@async
+    return nil
+end)
+]]

@@ -257,6 +257,9 @@ function vm.isNoDiscard(value, deep)
 end
 
 local function isCalledInFunction(param)
+    if not param.ref then
+        return false
+    end
     local func = guide.getParentFunction(param)
     for _, ref in ipairs(param.ref) do
         if ref.type == 'getlocal' then

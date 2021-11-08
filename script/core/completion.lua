@@ -31,6 +31,8 @@ local DiagnosticModes = {
 
 local stackID = 0
 local stacks = {}
+
+---@param callback async fun()
 local function stack(callback)
     stackID = stackID + 1
     stacks[stackID] = callback
@@ -41,6 +43,7 @@ local function clearStack()
     stacks = {}
 end
 
+---@async
 local function resolveStack(id)
     local callback = stacks[id]
     if not callback then
@@ -2118,6 +2121,7 @@ local function completion(uri, position, triggerCharacter)
     return results
 end
 
+---@async
 local function resolve(id)
     local item = resolveStack(id)
     local cache = workspace.getCache 'completion'

@@ -489,6 +489,7 @@ proto.on('textDocument/completion', function (params) ---@async
     }
 end)
 
+---@async
 proto.on('completionItem/resolve', function (item)
     local core = require 'core.completion'
     if not item.data then

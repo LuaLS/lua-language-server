@@ -39,6 +39,7 @@ function m.checkResult(co, ...)
 end
 
 --- 创建一个任务
+---@param callback async fun()
 function m.call(callback, ...)
     local co = coroutine.create(callback)
     local closers = {}

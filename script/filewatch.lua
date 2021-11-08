@@ -27,6 +27,7 @@ function m.watch(path)
     end
 end
 
+---@param callback async fun()
 function m.event(callback)
     m._eventList[#m._eventList+1] = callback
 end

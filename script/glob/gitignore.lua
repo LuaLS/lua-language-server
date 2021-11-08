@@ -163,6 +163,7 @@ function mt:getRelativePath(path)
     return path
 end
 
+---@param callback async fun()
 function mt:scan(path, callback)
     local files = {}
     if type(callback) ~= 'function' then

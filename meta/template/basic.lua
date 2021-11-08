@@ -55,7 +55,7 @@ _G = {}
 
 ---@version 5.1
 ---#DES 'getfenv'
----@param f? function
+---@param f? async fun(...):...
 ---@return table
 ---@nodiscard
 function getfenv(f) end
@@ -148,7 +148,11 @@ function next(table, index) end
 function pairs(t) end
 
 ---#DES 'pcall'
+---#if VERSION == 5.1 and not JIT then
 ---@param f     function
+---#else
+---@param f     async fun(...):...
+---#end
 ---@param arg1? any
 ---@return boolean success
 ---@return any result
@@ -193,7 +197,7 @@ function select(index, ...) end
 
 ---@version 5.1
 ---#DES 'setfenv'
----@param f     function|integer
+---@param f     async fun(...):...|integer
 ---@param table table
 ---@return function
 function setfenv(f, table) end
@@ -259,7 +263,7 @@ function warn(message, ...) end
 function xpcall(f, err) end
 ---#else
 ---#DES 'xpcall>5.2'
----@param f     function
+---@param f     async fun(...):...
 ---@param msgh  function
 ---@param arg1? any
 ---@return boolean success

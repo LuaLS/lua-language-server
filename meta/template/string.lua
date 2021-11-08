@@ -22,7 +22,7 @@ function string.byte(s, i, j) end
 function string.char(byte, ...) end
 
 ---#DES 'string.dump'
----@param f      function
+---@param f      async fun(...):...
 ---@param strip? boolean
 ---@return string
 ---@nodiscard

@@ -3,6 +3,7 @@ local await = require 'await'
 local guide = require 'parser.guide'
 local vm    = require 'vm'
 local lang  = require 'language'
+local infer = require 'core.infer'
 
 local function isYieldAble(defs, i)
     local hasFuncDef
@@ -10,15 +11,21 @@ local function isYieldAble(defs, i)
         if def.type == 'function' then
             hasFuncDef = true
             local arg = def.args and def.args[i]
-            if arg and vm.isAsync(arg, true) then
-                return true
+            if arg then
+                if infer.hasType(arg, 'any')
+                or vm.isAsync(arg, true) then
+                    return true
+                end
             end
         end
         if def.type == 'doc.type.function' then
             hasFuncDef = true
             local arg = def.args and def.args[i]
-            if arg and vm.isAsync(arg.extends, true) then
-                return true
+            if arg then
+                if infer.hasType(arg.extends, 'any')
+                or vm.isAsync(arg.extends, true) then
+                    return true
+                end
             end
         end
     end

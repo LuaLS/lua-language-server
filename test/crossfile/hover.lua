@@ -593,7 +593,7 @@ function f(arg1: integer, arg2: integer)
 ---
 
 ```lua
-function f()
+function f(arg3: any)
 ```]]}
 
 

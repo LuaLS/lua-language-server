@@ -60,18 +60,11 @@ local function asDocFunction(source)
     for i = 1, #source.args do
         local arg = source.args[i]
         local name = arg.name[1]
-        if arg.extends then
-            args[i] = ('%s%s: %s'):format(
-                name,
-                arg.optional and '?' or '',
-                infer.searchAndViewInfers(arg.extends)
-            )
-        else
-            args[i] = ('%s%s'):format(
-                name,
-                arg.optional and '?' or ''
-            )
-        end
+        args[i] = ('%s%s: %s'):format(
+            name,
+            arg.optional and '?' or '',
+            arg.extends and infer.searchAndViewInfers(arg.extends) or 'any'
+        )
     end
     return table.concat(args, ', ')
 end

@@ -1489,3 +1489,20 @@ local _ = type(function () ---@async
     return nil
 end)
 ]]
+
+TEST [[
+---@param ... number
+local function f(...)
+    return ...
+end
+
+return f
+]]
+
+TEST [[
+---@type fun(...: string)
+]]
+
+TEST [[
+---@type fun(xxx, yyy, ...): boolean
+]]

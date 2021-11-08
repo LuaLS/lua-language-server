@@ -15,7 +15,11 @@
   + `discard-returns`: check whether the return value is discarded.
 * `NEW` locale `pt-br`, thanks [Jeferson Ferreira](https://github.com/jefersonf)
 * `NEW` supports [utf-8-offsets](https://clangd.llvm.org/extensions#utf-8-offsets)
-* `CHG` `LuaDoc` supports unicode
+* `CHG` `LuaDoc`:
+  + supports unicode
+  + supports `---@param ... number`, equivalent to `---@vararg number`
+  + supports `fun(...: string)`
+  + supports `fun(x, y, ...)`, equivalent to `fun(x: any, y: any, ...: any)`
 * `CHG` no longer asks to trust plugin in VSCode, because VSCode already provides the workspace trust feature
 * `CHG` skip huge files (>= 10 MB)
 * `FIX` [#777](https://github.com/sumneko/lua-language-server/issues/777)

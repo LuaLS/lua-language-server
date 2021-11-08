@@ -100,6 +100,11 @@ function f(<?...?>) end
 ]]
 
 TEST [[
+---@param ... <!fun():void!>
+function f(<?...?>) end
+]]
+
+TEST [[
 ---@overload <!fun(y: boolean)!>
 ---@param x number
 ---@param y boolean

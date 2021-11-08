@@ -385,7 +385,7 @@ function m.viewDocFunction(doc)
     end
     local args = {}
     for i, arg in ipairs(doc.args) do
-        args[i] = ('%s: %s'):format(arg.name[1], m.viewDocName(arg.extends))
+        args[i] = ('%s: %s'):format(arg.name[1], arg.extends and m.viewDocName(arg.extends) or 'any')
     end
     local label = ('fun(%s)'):format(table.concat(args, ', '))
     if #doc.returns > 0 then

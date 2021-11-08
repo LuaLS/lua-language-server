@@ -1118,6 +1118,45 @@ local t: Class[]
 ]]
 
 TEST [[
+---@class Class
+
+---@param ... Class
+local function f(...)
+    local _, <?x?> = ...
+end
+f(1, 2, 3)
+]]
+[[
+local x: Class
+]]
+
+TEST [[
+---@class Class
+
+---@param ... Class
+local function f(...)
+    local t = {...}
+    local <?v?> = t[1]
+end
+]]
+[[
+local v: Class
+]]
+
+TEST [[
+---@class Class
+
+---@param ... Class
+local function f(...)
+    local <?t?> = {...}
+end
+f(1, 2, 3)
+]]
+[[
+local t: Class[]
+]]
+
+TEST [[
 ---@type string[]
 local <?x?>
 ]]
@@ -1454,7 +1493,7 @@ TEST [[
 local function f(<?callback?>) end
 ]]
 [[
-local callback: fun(x: integer, ...: nil)
+local callback: fun(x: integer, ...: any)
 ]]
 
 TEST [[

@@ -342,6 +342,21 @@ local function parseTypeUnitTable(parent, node)
     return result
 end
 
+local function parseDots(tp, parent)
+    if not checkToken('symbol', '...', 1) then
+        return
+    end
+    nextToken()
+    local dots = {
+        type   = tp,
+        start  = getStart(),
+        finish = getFinish(),
+        parent = parent,
+        [1]    = '...',
+    }
+    return dots
+end
+
 local function  parseTypeUnitFunction()
     local typeUnit = {
         type    = 'doc.type.function',
@@ -361,47 +376,29 @@ local function  parseTypeUnitFunction()
             type   = 'doc.type.arg',
             parent = typeUnit,
         }
-        if checkToken('symbol', '...', 1) then
-            nextToken()
-            local vararg = {
-                type   = 'doc.type.name',
-                start  = getStart(),
+        arg.name = parseName('doc.type.name', arg)
+                or parseDots('doc.type.name', arg)
+        if not arg.name then
+            pushError {
+                type   = 'LUADOC_MISS_ARG_NAME',
+                start  = getFinish(),
                 finish = getFinish(),
-                parent = arg,
-                [1]    = '...',
             }
-            arg.name   = vararg
-            if not arg.start then
-                arg.start = arg.name.start
-            end
-            arg.finish = getFinish()
-        else
-            arg.name = parseName('doc.type.name', arg)
-            if not arg.name then
-                pushError {
-                    type   = 'LUADOC_MISS_ARG_NAME',
-                    start  = getFinish(),
-                    finish = getFinish(),
-                }
-                break
-            end
-            if not arg.start then
-                arg.start = arg.name.start
-            end
-            if checkToken('symbol', '?', 1) then
-                nextToken()
-                arg.optional = true
-            end
-            arg.finish = getFinish()
-            if not nextSymbolOrError(':') then
-                break
-            end
-            arg.extends = parseType(arg)
-            if not arg.extends then
-                break
-            end
-            arg.finish = getFinish()
+            break
         end
+        if not arg.start then
+            arg.start = arg.name.start
+        end
+        if checkToken('symbol', '?', 1) then
+            nextToken()
+            arg.optional = true
+        end
+        arg.finish = getFinish()
+        if checkToken('symbol', ':', 1) then
+            nextToken()
+            arg.extends = parseType(arg)
+        end
+        arg.finish = getFinish()
         typeUnit.args[#typeUnit.args+1] = arg
         if checkToken('symbol', ',', 1) then
             nextToken()
@@ -762,6 +759,7 @@ local function parseParam()
         type   = 'doc.param',
     }
     result.param = parseName('doc.param.name', result)
+                or parseDots('doc.param.name', result)
     if not result.param then
         pushError {
             type   = 'LUADOC_MISS_PARAM_NAME',

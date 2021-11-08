@@ -12,6 +12,9 @@ local function hasParamName(func, name)
         if arg[1] == name then
             return true
         end
+        if arg.type == '...' and name == '...' then
+            return true
+        end
     end
     return false
 end

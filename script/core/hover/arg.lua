@@ -38,7 +38,10 @@ local function asFunction(source, oop)
                     infer.searchAndViewInfers(arg)
                 )
             elseif arg.type == '...' then
-                args[#args+1] = '...'
+                args[#args+1] = ('%s: %s'):format(
+                    '...',
+                    infer.searchAndViewInfers(arg)
+                )
             else
                 args[#args+1] = ('%s'):format(infer.searchAndViewInfers(arg))
             end

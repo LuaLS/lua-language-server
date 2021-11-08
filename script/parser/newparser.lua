@@ -2094,6 +2094,7 @@ local function parseParams(params)
                 start  = getPosition(Tokens[Index], 'left'),
                 finish = getPosition(Tokens[Index] + 2, 'right'),
                 parent = params,
+                [1]    = '...',
             }
             local chunk = Chunk[#Chunk]
             chunk.vararg = vararg

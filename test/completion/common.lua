@@ -1334,12 +1334,13 @@ end
 ]]
 {
     {
-        label = 'a, b, c',
+        label = 'a, b, c, ...',
         kind = define.CompletionItemKind.Snippet,
         insertText = [[
 a ${1:any}
 ---@param b ${2:any}
----@param c ${3:any}]],
+---@param c ${3:any}
+---@param ... ${4:any}]],
     },
     {
         label = 'self',
@@ -1355,6 +1356,10 @@ a ${1:any}
     },
     {
         label = 'c',
+        kind = define.CompletionItemKind.Interface,
+    },
+    {
+        label = '...',
         kind = define.CompletionItemKind.Interface,
     },
 }

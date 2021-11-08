@@ -245,7 +245,7 @@ TEST [[
 <?print?>()
 ]]
 [[
-function print(...)
+function print(...: any)
 ]]
 
 TEST [[
@@ -299,7 +299,7 @@ end
 <?x?>(1, 2, 3, 4, 5, 6, 7)
 ]]
 [[
-function x(a: any, ...)
+function x(a: any, ...: any)
 ]]
 
 TEST [[

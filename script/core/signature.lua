@@ -66,7 +66,7 @@ local function makeOneSignature(source, oop, index)
     if index > i and i > 0 then
         local lastLabel = params[i].label
         local text = label:sub(lastLabel[1] + 1, lastLabel[2])
-        if text == '...' then
+        if text:sub(1, 3) == '...' then
             index = i
         end
     end

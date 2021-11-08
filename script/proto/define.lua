@@ -46,6 +46,7 @@ m.DiagnosticDefaultSeverity = {
     ['different-requires']      = 'Warning',
     ['await-in-sync']           = 'Warning',
     ['not-yieldable']           = 'Warning',
+    ['discard-returns']         = 'Warning',
     ['type-check']              = 'Warning',
 
     ['duplicate-doc-class']     = 'Warning',
@@ -102,6 +103,7 @@ m.DiagnosticDefaultNeededFileStatus = {
     ['different-requires']      = 'Any',
     ['await-in-sync']           = 'None',
     ['not-yieldable']           = 'None',
+    ['discard-returns']         = 'Opened',
     ['type-check']              = 'None',
 
     ['duplicate-doc-class']     = 'Any',

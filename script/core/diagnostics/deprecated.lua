@@ -8,6 +8,7 @@ local await    = require 'await'
 local noder    = require 'core.noder'
 
 local types = {'getglobal', 'getfield', 'getindex', 'getmethod'}
+---@async
 return function (uri, callback)
     local ast = files.getState(uri)
     if not ast then

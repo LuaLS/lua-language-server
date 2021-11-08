@@ -307,7 +307,7 @@ Instance = _G[InstanceName]
 ]]
 
 TEST [[
-(''):sub(1, 2)
+local _ = (''):sub(1, 2)
 ]]
 
 TEST [=[
@@ -432,7 +432,7 @@ f(1, 2, 3, 4)
 ]]
 
 TEST [[
-next({}, 1, <!2!>)
+local _ = next({}, 1, <!2!>)
 print(1, 2, 3, 4, 5)
 ]]
 
@@ -464,7 +464,7 @@ f(1, 2, 3)
 ]]
 
 TEST [[
-<!unpack!>()
+local _ = <!unpack!>()
 ]]
 
 TEST [[
@@ -1354,8 +1354,8 @@ f()
 TEST [[
 ---@type file*
 local f
-f:read '*a'
-f:read('*a')
+local _ = f:read '*a'
+local _ = f:read('*a')
 ]]
 
 TEST [[
@@ -1391,55 +1391,40 @@ end
 ]]
 
 TEST [[
----@param f async fun()
-function CB(f)
-    <!f!>()
-end
-]]
-
-TEST [[
-local cb
-
-cb(function () ---@async
-    return nil
-end)
-]]
-
-TEST [[
----@param f async fun()
-function CB(f)
-    return f
+local function f(cb)
+    cb()
 end
 
-CB(function () ---@async
+<!f!>(function () ---@async
     return nil
 end)
 ]]
 
 TEST [[
-function CB(f)
-    return f
+local function f(cb)
+    pcall(cb)
 end
 
-<!CB!>(function () ---@async
+<!f!>(function () ---@async
     return nil
 end)
 ]]
 
 TEST [[
----@type fun(f: async fun())
-local cb
+---@nodiscard
+local function f()
+    return 1
+end
 
-cb(function () ---@async
-    return nil
-end)
+<!f()!>
 ]]
 
-TEST [[
----@type fun(f: fun())
-local cb
 
-<!cb!>(function () ---@async
-    return nil
-end)
+TEST [[
+---@nodiscard
+local function f()
+    return 1
+end
+
+X = f()
 ]]

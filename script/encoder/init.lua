@@ -1,6 +1,7 @@
 local ansi    = require 'encoder.ansi'
-local utf16le = require 'encoder.utf16le'
-local utf16be = require 'encoder.utf16be'
+local utf16   = require 'encoder.utf16'
+local utf16le = utf16('le', utf8.codepoint '�')
+local utf16be = utf16('be', utf8.codepoint '�')
 
 ---@alias encoder.encoding '"utf8"'|'"utf16"'|'"utf16le"'|'"utf16be"'
 
@@ -17,11 +18,11 @@ function m.len(encoding, s, i, j)
     j = j or #s
     if encoding == 'utf16'
     or encoding == 'utf16' then
-        local us = utf16le.encode(s:sub(i, j))
+        local us = utf16le.fromutf8(s:sub(i, j))
         return #us // 2
     end
     if encoding == 'utf16be' then
-        local us = utf16be.encode(s:sub(i, j))
+        local us = utf16be.fromutf8(s:sub(i, j))
         return #us // 2
     end
     if encoding == 'utf8' then
@@ -43,8 +44,8 @@ function m.offset(encoding, s, n, i)
         if not line:find '[\x80-\xff]' then
             return n + i - 1
         end
-        local us = utf16le.encode(line)
-        local os = utf16le.decode(us:sub(1, n * 2 - 2))
+        local us = utf16le.fromutf8(line)
+        local os = utf16le.toutf8(us:sub(1, n * 2 - 2))
         return #os + i
     end
     if encoding == 'utf16be' then
@@ -52,8 +53,8 @@ function m.offset(encoding, s, n, i)
         if not line:find '[\x80-\xff]' then
             return n + i - 1
         end
-        local us = utf16be.encode(line)
-        local os = utf16be.decode(us:sub(1, n * 2 - 2))
+        local us = utf16be.fromutf8(line)
+        local os = utf16be.toutf8(us:sub(1, n * 2 - 2))
         return #os + i
     end
     if encoding == 'utf8' then
@@ -75,11 +76,11 @@ function m.encode(encoding, text, bom)
         return text
     end
     if encoding == 'ansi' then
-        return ansi.encode(text)
+        return ansi.fromutf8(text)
     end
     if encoding == 'utf16'
     or encoding == 'utf16le' then
-        text = utf16le.encode(text)
+        text = utf16le.fromutf8(text)
         if bom == 'yes'
         or bom == 'auto' then
             text = '\xFF\xFE' .. text
@@ -87,7 +88,7 @@ function m.encode(encoding, text, bom)
         return text
     end
     if encoding == 'utf16be' then
-        text = utf16be.encode(text)
+        text = utf16be.fromutf8(text)
         if bom == 'yes'
         or bom == 'auto' then
             text = '\xFE\xFF' .. text
@@ -106,14 +107,14 @@ function m.decode(encoding, text)
         return text
     end
     if encoding == 'ansi' then
-        return ansi.decode(text)
+        return ansi.toutf8(text)
     end
     if encoding == 'utf16'
     or encoding == 'utf16le' then
-        return utf16le.decode(text)
+        return utf16le.toutf8(text)
     end
     if encoding == 'utf16be' then
-        return utf16be.decode(text)
+        return utf16be.toutf8(text)
     end
     log.error('Unsupport encode encoding:', encoding)
     return text

@@ -87,8 +87,9 @@ If you find any mistakes, please [tell me][issues] or use [Pull Requests][@meta]
 
 ## Locale
 
-- [x] en-US
-- [x] zh-CN
+- [x] en-us
+- [x] zh-cn
+- [x] pt-br (thanks [Jeferson Ferreira](https://github.com/jefersonf))
 
 Please [help me][en-US] improve the quality of `en-US`.
 

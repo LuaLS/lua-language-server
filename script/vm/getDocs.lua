@@ -163,6 +163,23 @@ local function isDeprecated(value)
     return false
 end
 
+function vm.isDeprecated(value, deep)
+    if deep then
+        local defs = vm.getDefs(value)
+        if #defs == 0 then
+            return false
+        end
+        for _, def in ipairs(defs) do
+            if not isDeprecated(def) then
+                return false
+            end
+        end
+        return true
+    else
+        return isDeprecated(value)
+    end
+end
+
 local function isAsync(value)
     if value.type == 'function' then
         if not value.bindDocs then
@@ -183,24 +200,10 @@ local function isAsync(value)
     return value.async == true
 end
 
-function vm.isDeprecated(value, deep)
-    if deep then
-        local defs = vm.getDefs(value)
-        if #defs == 0 then
-            return false
-        end
-        for _, def in ipairs(defs) do
-            if not isDeprecated(def) then
-                return false
-            end
-        end
-        return true
-    else
-        return isDeprecated(value)
-    end
-end
-
 function vm.isAsync(value, deep)
+    if isAsync(value) then
+        return true
+    end
     if deep then
         local defs = vm.getDefs(value)
         if #defs == 0 then
@@ -211,10 +214,97 @@ function vm.isAsync(value, deep)
                 return true
             end
         end
-        return false
-    else
-        return isAsync(value)
     end
+    return false
+end
+
+local function isNoDiscard(value)
+    if value.type == 'function' then
+        if not value.bindDocs then
+            return false
+        end
+        if value._nodiscard ~= nil then
+            return value._nodiscard
+        end
+        for _, doc in ipairs(value.bindDocs) do
+            if doc.type == 'doc.nodiscard' then
+                value._nodiscard = true
+                return true
+            end
+        end
+        value._nodiscard = false
+        return false
+    end
+    return false
+end
+
+function vm.isNoDiscard(value, deep)
+    if isNoDiscard(value) then
+        return true
+    end
+    if deep then
+        local defs = vm.getDefs(value)
+        if #defs == 0 then
+            return false
+        end
+        for _, def in ipairs(defs) do
+            if isNoDiscard(def) then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+local function isCalledInFunction(param)
+    local func = guide.getParentFunction(param)
+    for _, ref in ipairs(param.ref) do
+        if ref.type == 'getlocal' then
+            if  ref.parent.type == 'call'
+            and guide.getParentFunction(ref) == func then
+                return true
+            end
+            if  ref.parent.type == 'callargs'
+            and ref.parent[1] == ref
+            and guide.getParentFunction(ref) == func then
+                if ref.parent.parent.node.special == 'pcall'
+                or ref.parent.parent.node.special == 'xpcall' then
+                    return true
+                end
+            end
+        end
+    end
+    return false
+end
+
+local function isLinkedCall(node, index)
+    for _, def in ipairs(vm.getDefs(node)) do
+        if def.type == 'function' then
+            local param = def.args and def.args[index]
+            if param then
+                if isCalledInFunction(param) then
+                    return true
+                end
+            end
+        end
+    end
+    return false
+end
+
+function vm.isAsyncCall(call)
+    if vm.isAsync(call.node, true) then
+        return true
+    end
+    if not call.args then
+        return
+    end
+    for i, arg in ipairs(call.args) do
+        if  vm.isAsync(arg, true)
+        and isLinkedCall(call.node, i) then
+            return true
+        end
+    end
+    return false
 end
 
 local function makeDiagRange(uri, doc, results)

@@ -7,16 +7,19 @@ coroutine = {}
 ---#DES 'coroutine.create'
 ---@param f function
 ---@return thread
+---@nodiscard
 function coroutine.create(f) end
 
 ---#if VERSION >= 5.4 then
 ---#DES 'coroutine.isyieldable>5.4'
 ---@param co? thread
 ---@return boolean
+---@nodiscard
 function coroutine.isyieldable(co) end
 ---#else
 ---#DES 'coroutine.isyieldable'
 ---@return boolean
+---@nodiscard
 function coroutine.isyieldable() end
 ---#end
 
@@ -38,6 +41,7 @@ function coroutine.resume(co, val1, ...) end
 ---#DES 'coroutine.running'
 ---@return thread running
 ---@return boolean ismain
+---@nodiscard
 function coroutine.running() end
 
 ---#DES 'coroutine.status'
@@ -47,11 +51,13 @@ function coroutine.running() end
 ---| '"suspended"' # ---#DESTAIL 'costatus.suspended'
 ---| '"normal"'    # ---#DESTAIL 'costatus.normal'
 ---| '"dead"'      # ---#DESTAIL 'costatus.dead'
+---@nodiscard
 function coroutine.status(co) end
 
 ---#DES 'coroutine.wrap'
 ---@param f function
 ---@return fun(...):...
+---@nodiscard
 function coroutine.wrap(f) end
 
 ---#DES 'coroutine.yield'

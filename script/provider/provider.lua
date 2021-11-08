@@ -185,7 +185,7 @@ proto.on('textDocument/didChange', function (params) ---@async
     local uri     = doc.uri
     --log.debug('changes', util.dump(changes))
     local text = tm(uri, changes)
-    files.setText(uri, text, true)
+    files.setText(uri, text, true, doc.version)
 end)
 
 proto.on('textDocument/hover', function (params) ---@async
@@ -834,14 +834,14 @@ do
         if not config.get 'Lua.hint.enable' then
             return
         end
-        await.close 'updateHint'
-        await.setID 'updateHint'
-        await.delay()
-        workspace.awaitReady()
         local visibles = files.getVisibles(uri)
         if not visibles then
             return
         end
+        await.close 'updateHint'
+        await.setID 'updateHint'
+        await.delay()
+        workspace.awaitReady()
         local edits = {}
         local hint = require 'core.hint'
         local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_HINT, 0.5)

@@ -33,6 +33,7 @@ function debug.debug() end
 ---#DES 'debug.getfenv'
 ---@param o any
 ---@return table
+---@nodiscard
 function debug.getfenv(o) end
 
 ---#DES 'debug.gethook'
@@ -40,6 +41,7 @@ function debug.getfenv(o) end
 ---@return function hook
 ---@return string mask
 ---@return integer count
+---@nodiscard
 function debug.gethook(co) end
 
 ---@alias infowhat string
@@ -64,6 +66,7 @@ function debug.gethook(co) end
 ---@param f      integer|function
 ---@param what?  infowhat
 ---@return debuginfo
+---@nodiscard
 function debug.getinfo(thread, f, what) end
 
 ---#if VERSION <= 5.1 and not JIT then
@@ -74,6 +77,7 @@ function debug.getinfo(thread, f, what) end
 ---@param index   integer
 ---@return string name
 ---@return any    value
+---@nodiscard
 function debug.getlocal(thread, level, index) end
 ---#else
 ---#DES 'debug.getlocal>5.2'
@@ -83,16 +87,19 @@ function debug.getlocal(thread, level, index) end
 ---@param index   integer
 ---@return string name
 ---@return any    value
+---@nodiscard
 function debug.getlocal(thread, f, index) end
 ---#end
 
 ---#DES 'debug.getmetatable'
 ---@param object any
 ---@return table metatable
+---@nodiscard
 function debug.getmetatable(object) end
 
 ---#DES 'debug.getregistry'
 ---@return table
+---@nodiscard
 function debug.getregistry() end
 
 ---#DES 'debug.getupvalue'
@@ -100,6 +107,7 @@ function debug.getregistry() end
 ---@param up integer
 ---@return string name
 ---@return any    value
+---@nodiscard
 function debug.getupvalue(f, up) end
 
 ---#if VERSION >= 5.4 then
@@ -108,11 +116,13 @@ function debug.getupvalue(f, up) end
 ---@param n integer
 ---@return any
 ---@return boolean
+---@nodiscard
 function debug.getuservalue(u, n) end
 ---#elseif VERSION >= 5.2 or JIT then
 ---#DES 'debug.getuservalue<5.3'
 ---@param u userdata
 ---@return any
+---@nodiscard
 function debug.getuservalue(u) end
 ---#end
 
@@ -187,6 +197,7 @@ function debug.setuservalue(udata, value) end
 ---@param message? any
 ---@param level?   integer
 ---@return string  message
+---@nodiscard
 function debug.traceback(thread, message, level) end
 
 ---@version >5.2, JIT
@@ -194,6 +205,7 @@ function debug.traceback(thread, message, level) end
 ---@param f function
 ---@param n integer
 ---@return lightuserdata id
+---@nodiscard
 function debug.upvalueid(f, n) end
 
 ---@version >5.2, JIT

@@ -216,6 +216,8 @@ function m.doDiagnostic(uri)
         return
     end
 
+    local version = files.getVersion(uri)
+
     await.setID('diag:' .. uri)
 
     local prog <close> = progress.create(lang.script.WINDOW_DIAGNOSING, 0.5)
@@ -239,6 +241,7 @@ function m.doDiagnostic(uri)
 
         proto.notify('textDocument/publishDiagnostics', {
             uri = uri,
+            version = version,
             diagnostics = full,
         })
         if #full > 0 then

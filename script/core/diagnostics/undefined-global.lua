@@ -14,6 +14,7 @@ local requireLike = {
     ['load']    = true,
 }
 
+---@async
 return function (uri, callback)
     local ast = files.getState(uri)
     if not ast then

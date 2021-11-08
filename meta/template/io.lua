@@ -50,6 +50,7 @@ function io.lines(filename, ...) end
 ---@param mode     openmode
 ---@return file*?
 ---@return string? errmsg
+---@nodiscard
 function io.open(filename, mode) end
 
 ---#DES 'io.output'
@@ -72,10 +73,12 @@ function io.popen(prog, mode) end
 ---@vararg readmode
 ---@return string|number
 ---@return ...
+---@nodiscard
 function io.read(...) end
 
 ---#DES 'io.tmpfile'
 ---@return file*
+---@nodiscard
 function io.tmpfile() end
 
 ---@alias filetype
@@ -86,6 +89,7 @@ function io.tmpfile() end
 ---#DES 'io.type'
 ---@param file file*
 ---@return filetype
+---@nodiscard
 function io.type(file) end
 
 ---#DES 'io.write'
@@ -131,6 +135,7 @@ function file:lines(...) end
 ---#DES 'file:read'
 ---@vararg readmode
 ---@return string|number
+---@nodiscard
 function file:read(...) end
 
 ---@alias seekwhence

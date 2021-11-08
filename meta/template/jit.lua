@@ -27,6 +27,7 @@ function jit.flush(func, recursive) end
 
 ---@return boolean status
 ---@return ...
+---@nodiscard
 function jit.status() end
 
 return jit

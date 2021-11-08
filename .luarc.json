@@ -11,7 +11,8 @@
         "neededFileStatus": {
             "undefined-field": "Any",
             "await-in-sync": "Any",
-            "not-yieldable": "Any"
+            "not-yieldable": "Any",
+            "discard-returns": "Any"
         },
         "ignoredFiles": "Opened",
         "libraryFiles": "Opened"
@@ -19,10 +20,10 @@
     "runtime": {
         "version": "Lua 5.4",
         "path": [
-            "?.lua",
             "script/?.lua",
             "script/?/init.lua"
-        ]
+        ],
+        "pathStrict": true
     },
     "workspace": {
         "maxPreload": 1600,

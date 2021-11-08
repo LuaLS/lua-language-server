@@ -120,7 +120,9 @@ end
 --- 设置文件文本
 ---@param uri uri
 ---@param text string
-function m.setText(uri, text, isTrust)
+---@param isTrust boolean
+---@param version integer
+function m.setText(uri, text, isTrust, version)
     if not text then
         return
     end
@@ -134,7 +136,6 @@ function m.setText(uri, text, isTrust)
     if not m.fileMap[uri] then
         m.fileMap[uri] = {
             uri = uri,
-            version = 0,
         }
         m.fileCount = m.fileCount + 1
         create = true
@@ -159,7 +160,7 @@ function m.setText(uri, text, isTrust)
     m.astMap[uri] = nil
     file.cache = {}
     file.cacheActiveTime = math.huge
-    file.version = file.version + 1
+    file.version = version
     m.globalVersion = m.globalVersion + 1
     await.close('files.version')
     m.onWatch('version')

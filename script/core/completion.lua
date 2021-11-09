@@ -2067,7 +2067,7 @@ local function getCache(uri, position)
     end
 
     if results.enableCommon then
-        checkCommon(uri, word, position, results)
+        checkCommon(state, word, position, results)
     end
 
     return cache.results

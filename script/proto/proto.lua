@@ -8,6 +8,20 @@ local json       = require 'json'
 
 local reqCounter = util.counter()
 
+local function logSend(buf)
+    if not RPCLOG then
+        return
+    end
+    log.debug('rpc send:', buf)
+end
+
+local function logRecieve(proto)
+    if not RPCLOG then
+        return
+    end
+    log.debug('rpc recieve:', json.encode(proto))
+end
+
 local m = {}
 
 m.ability = {}
@@ -39,6 +53,7 @@ function m.response(id, res)
     data.result = res == nil and json.null or res
     local buf = jsonrpc.encode(data)
     --log.debug('Response', id, #buf)
+    logSend(buf)
     io.write(buf)
 end
 
@@ -57,6 +72,7 @@ function m.responseErr(id, code, message)
         }
     }
     --log.debug('ResponseErr', id, #buf)
+    logSend(buf)
     io.write(buf)
 end
 
@@ -66,6 +82,7 @@ function m.notify(name, params)
         params = params,
     }
     --log.debug('Notify', name, #buf)
+    logSend(buf)
     io.write(buf)
 end
 
@@ -78,6 +95,7 @@ function m.awaitRequest(name, params)
         params = params,
     }
     --log.debug('Request', name, #buf)
+    logSend(buf)
     io.write(buf)
     local result, error = await.wait(function (resume)
         m.waiting[id] = resume
@@ -96,6 +114,7 @@ function m.request(name, params, callback)
         params = params,
     }
     --log.debug('Request', name, #buf)
+    logSend(buf)
     io.write(buf)
     m.waiting[id] = function (result, error)
         if error then
@@ -108,6 +127,7 @@ function m.request(name, params, callback)
 end
 
 function m.doMethod(proto)
+    logRecieve(proto)
     local method, optional = m.getMethodName(proto)
     local abil = m.ability[method]
     if not abil then
@@ -162,6 +182,7 @@ function m.close(id, reason)
 end
 
 function m.doResponse(proto)
+    logRecieve(proto)
     local id = proto.id
     local resume = m.waiting[id]
     if not resume then

@@ -11,7 +11,7 @@ DBGPORT = 0
 DBGWAIT = false
 
 ---displayed language, use command line: --locale="en-us"
----@type '"en-us"'|'"zh-cn"'
+---@type '"en-us"'|'"zh-cn"'|'"pt-br"'
 LOCALE = 'en-us'
 
 ---path of local config file, use command line: --configpath="config.lua"
@@ -27,4 +27,9 @@ SHOWSOURCE = false
 TRACE = false
 
 ---trace searching with `too deep!` into log, use command line: --footprint=true
+---@type boolean
 FOOTPRINT = false
+
+---trace rpc, use command line: --rpclog=true
+---@type boolean
+RPCLOG = false

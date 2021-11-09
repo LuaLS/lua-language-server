@@ -11,6 +11,7 @@ local progress  = require "progress"
 local client    = require 'client'
 local converter = require 'proto.converter'
 
+---@class diagnosticProvider
 local m = {}
 m._start = false
 m.cache = {}
@@ -137,6 +138,10 @@ function m.clear(uri)
         diagnostics = {},
     })
     log.debug('clearDiagnostics', uri)
+end
+
+function m.clearCache(uri)
+    m.cache[uri] = false
 end
 
 function m.clearAll()
@@ -274,7 +279,7 @@ function m.refresh(uri)
     await.call(function () ---@async
         await.delay()
         if uri then
-            m.clear(uri)
+            m.clearCache(uri)
             xpcall(m.doDiagnostic, log.error, uri)
         end
         m.diagnosticsAll()

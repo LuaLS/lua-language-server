@@ -2080,13 +2080,13 @@ end
 
 ---@async
 local function completion(uri, position, triggerCharacter)
-    --tracy.ZoneBeginN 'completion cache'
-    --local results = getCache(uri, position)
-    --tracy.ZoneEnd()
-    --if results then
-    --    return results
-    --end
-    --await.delay()
+    tracy.ZoneBeginN 'completion cache'
+    local results = getCache(uri, position)
+    tracy.ZoneEnd()
+    if results then
+        return results
+    end
+    await.delay()
     tracy.ZoneBeginN 'completion #1'
     local state = files.getState(uri)
     local text = files.getText(uri)
@@ -2120,7 +2120,7 @@ local function completion(uri, position, triggerCharacter)
     end
 
     tracy.ZoneBeginN 'completion #3'
-    --makeCache(uri, position, results)
+    makeCache(uri, position, results)
     tracy.ZoneEnd()
     return results
 end

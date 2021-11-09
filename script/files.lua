@@ -463,6 +463,7 @@ function m.compileState(uri, text)
     --await.delay()
     if state then
         state.uri = uri
+        state.lua = text
         state.ast.uri = uri
         local clock = os.clock()
         parser.luadoc(state)
@@ -494,14 +495,14 @@ function m.getState(uri)
     if not file then
         return nil
     end
-    local ast = m.astMap[uri]
-    if not ast then
-        ast = m.compileState(uri, file.text)
-        m.astMap[uri] = ast
+    local state = m.astMap[uri]
+    if not state then
+        state = m.compileState(uri, file.text)
+        m.astMap[uri] = state
         --await.delay()
     end
     file.cacheActiveTime = timer.clock()
-    return ast
+    return state
 end
 
 ---设置文件的当前可见范围

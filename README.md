@@ -96,9 +96,11 @@ Please [help me][en-US] improve the quality of `en-US`.
 [en-US]: https://github.com/sumneko/lua-language-server/tree/master/locale/en-us
 
 ## Build
+The extensions in the VSCode market already come with pre-compiled binary files, usually you don't need to compile them.
 
-* [Build and Run (In VSCode)](https://github.com/sumneko/lua-language-server/wiki/Build-and-Run-(In-VSCode))
-* [Build and Run (Standalone)](https://github.com/sumneko/lua-language-server/wiki/Build-and-Run-(Standalone))
+Other clients can first try to download and use [pre-compiled binary files](https://github.com/sumneko/lua-language-server/wiki/PreCompiled-Binaries).
+
+If you need to compile by yourself, please refer to [here](https://github.com/sumneko/lua-language-server/wiki/Build-and-Run)
 
 ## Setting
 

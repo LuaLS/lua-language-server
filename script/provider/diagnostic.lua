@@ -274,6 +274,7 @@ function m.refresh(uri)
     await.call(function () ---@async
         await.delay()
         if uri then
+            m.clear(uri)
             xpcall(m.doDiagnostic, log.error, uri)
         end
         m.diagnosticsAll()

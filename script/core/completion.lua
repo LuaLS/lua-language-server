@@ -1232,12 +1232,7 @@ local function tryWord(state, position, triggerCharacter, results)
     local word, start = lookBackward.findWord(text, offset)
     local startPos
     if not word then
-        if triggerCharacter == nil then
-            word = ''
-            startPos = position + 1
-        else
-            return nil
-        end
+        return nil
     else
         startPos = guide.offsetToPosition(state, start - 1)
     end

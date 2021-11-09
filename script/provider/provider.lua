@@ -47,8 +47,11 @@ end
 ---@class provider
 local m = {}
 
+m.attributes = {}
+
 function m.register(method)
     return function (attrs)
+        m.attributes[method] = attrs
         proto.on(method, attrs[1])
     end
 end
@@ -225,6 +228,7 @@ m.register 'textDocument/didChange' {
 }
 
 m.register 'textDocument/hover' {
+    abortByFileUpdate = true,
     ---@async
     function (params)
         local doc    = params.textDocument
@@ -259,6 +263,7 @@ m.register 'textDocument/hover' {
 }
 
 m.register 'textDocument/definition' {
+    abortByFileUpdate = true,
     ---@async
     function (params)
         workspace.awaitReady()
@@ -297,6 +302,7 @@ m.register 'textDocument/definition' {
 }
 
 m.register 'textDocument/typeDefinition' {
+    abortByFileUpdate = true,
     ---@async
     function (params)
         workspace.awaitReady()
@@ -335,6 +341,7 @@ m.register 'textDocument/typeDefinition' {
 }
 
 m.register 'textDocument/references' {
+    abortByFileUpdate = true,
     ---@async
     function (params)
         workspace.awaitReady()
@@ -361,6 +368,7 @@ m.register 'textDocument/references' {
 }
 
 m.register 'textDocument/documentHighlight' {
+    abortByFileUpdate = true,
     function (params)
         local core = require 'core.highlight'
         local uri  = params.textDocument.uri
@@ -384,6 +392,7 @@ m.register 'textDocument/documentHighlight' {
 }
 
 m.register 'textDocument/rename' {
+    abortByFileUpdate = true,
     ---@async
     function (params)
         workspace.awaitReady()
@@ -414,6 +423,7 @@ m.register 'textDocument/rename' {
 }
 
 m.register 'textDocument/prepareRename' {
+    abortByFileUpdate = true,
     function (params)
         local core = require 'core.rename'
         local uri  = params.textDocument.uri
@@ -585,6 +595,7 @@ m.register 'completionItem/resolve' {
 }
 
 m.register 'textDocument/signatureHelp' {
+    abortByFileUpdate = true,
     ---@async
     function (params)
         if not config.get 'Lua.signatureHelp.enable' then
@@ -630,6 +641,7 @@ m.register 'textDocument/signatureHelp' {
 }
 
 m.register 'textDocument/documentSymbol' {
+    abortByFileUpdate = true,
     ---@async
     function (params)
         workspace.awaitReady()
@@ -675,6 +687,7 @@ m.register 'textDocument/documentSymbol' {
 }
 
 m.register 'textDocument/codeAction' {
+    abortByFileUpdate = true,
     function (params)
         local core        = require 'core.code-action'
         local uri         = params.textDocument.uri
@@ -708,6 +721,7 @@ m.register 'textDocument/codeAction' {
 }
 
 m.register 'workspace/executeCommand' {
+    abortByFileUpdate = true,
     ---@async
     function (params)
         local command = params.command:gsub(':.+', '')
@@ -731,6 +745,7 @@ m.register 'workspace/executeCommand' {
 }
 
 m.register 'workspace/symbol' {
+    abortByFileUpdate = true,
     ---@async
     function (params)
         workspace.awaitReady()
@@ -763,6 +778,7 @@ m.register 'workspace/symbol' {
 }
 
 m.register 'textDocument/semanticTokens/full' {
+    abortByFileUpdate = true,
     ---@async
     function (params)
         local uri = params.textDocument.uri
@@ -777,6 +793,7 @@ m.register 'textDocument/semanticTokens/full' {
 }
 
 m.register 'textDocument/semanticTokens/range' {
+    abortByFileUpdate = true,
     ---@async
     function (params)
         local uri = params.textDocument.uri
@@ -800,6 +817,7 @@ m.register 'textDocument/semanticTokens/range' {
 }
 
 m.register 'textDocument/foldingRange' {
+    abortByFileUpdate = true,
     ---@async
     function (params)
         local core    = require 'core.folding'
@@ -868,6 +886,7 @@ m.register '$/status/click' {
 }
 
 m.register 'textDocument/onTypeFormatting' {
+    abortByFileUpdate = true,
     ---@async
     function (params)
         workspace.awaitReady()
@@ -997,7 +1016,7 @@ files.watch(function (ev, uri)
     if ev == 'update'
     or ev == 'remove' then
         for id, p in pairs(proto.holdon) do
-            if p.params.textDocument and p.params.textDocument.uri == uri then
+            if m.attributes[p.method].abortByFileUpdate then
                 proto.close(id, define.ErrorCodes.ContentModified)
             end
         end

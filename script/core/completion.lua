@@ -366,7 +366,7 @@ local function checkModule(state, word, position, results)
                 commitCharacters = {'.'},
                 command = {
                     title     = 'autoRequire',
-                    command   = 'Lua.autoRequire:' .. sp:get_id(),
+                    command   = 'lua.autoRequire:' .. sp:get_id(),
                     arguments = {
                         {
                             uri    = guide.getUri(state.ast),

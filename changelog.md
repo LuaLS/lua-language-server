@@ -4,7 +4,7 @@
 * `NEW` settings:
   + `Lua.runtime.pathStrict`: not check subdirectories when using `runtime.path`
   + `Lua.hint.await`: display `await` when calling a function marked as async
-* `NEW` add supports of `lovr`
+* `NEW` add supports for `lovr`
 * `NEW` file encoding supports `utf16le` and `utf16be`
 * `NEW` `LuaDoc` annotations:
   + `---@async`: mark a function as async
@@ -22,6 +22,7 @@
   + supports `fun(x, y, ...)`, equivalent to `fun(x: any, y: any, ...: any)`
 * `CHG` no longer asks to trust plugin in VSCode, because VSCode already provides the workspace trust feature
 * `CHG` skip huge files (>= 10 MB)
+* `CHG` after using `Lua.runtime.nonstandardSymbol` to treat `//` as a comment, `//` is no longer parsed as an operator
 * `FIX` [#777](https://github.com/sumneko/lua-language-server/issues/777)
 * `FIX` [#778](https://github.com/sumneko/lua-language-server/issues/778)
 * `FIX` [#779](https://github.com/sumneko/lua-language-server/issues/779)

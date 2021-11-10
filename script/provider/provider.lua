@@ -721,7 +721,6 @@ m.register 'textDocument/codeAction' {
 }
 
 m.register 'workspace/executeCommand' {
-    abortByFileUpdate = true,
     ---@async
     function (params)
         local command = params.command:gsub(':.+', '')
@@ -852,6 +851,7 @@ m.register 'textDocument/foldingRange' {
 
 m.register 'window/workDoneProgress/cancel' {
     function (params)
+        log.debug('close proto(cancel):', params.token)
         progress.cancel(params.token)
     end
 }
@@ -1017,6 +1017,7 @@ files.watch(function (ev, uri)
     or ev == 'remove' then
         for id, p in pairs(proto.holdon) do
             if m.attributes[p.method].abortByFileUpdate then
+                log.debug('close proto(ContentModified):', id, p.method)
                 proto.close(id, define.ErrorCodes.ContentModified)
             end
         end

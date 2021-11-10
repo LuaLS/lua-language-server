@@ -487,7 +487,13 @@ end
 local function skipComment(isAction)
     local token = Tokens[Index + 1]
     if token == '--'
-    or (token == '//' and isAction) then
+    or (
+        token == '//'
+        and (
+            isAction
+            or State.options.nonstandardSymbol['//']
+        )
+    ) then
         local start = Tokens[Index]
         local left = getPosition(start, 'left')
         local chead = false
@@ -1527,7 +1533,7 @@ local function parseTable()
     local index = 0
     local wantSep = false
     while true do
-        skipSpace()
+        skipSpace(true)
         local token = Tokens[Index + 1]
         if token == '}' then
             Index = Index + 2
@@ -2162,7 +2168,7 @@ local function parseFunction(isLocal, isAction)
     Index = Index + 2
     local LastLocalCount = LocalCount
     LocalCount = 0
-    skipSpace()
+    skipSpace(true)
     local hasLeftParen = Tokens[Index + 1] == '('
     if not hasLeftParen then
         local name = parseName()
@@ -2192,7 +2198,7 @@ local function parseFunction(isLocal, isAction)
                     finish = simple.finish,
                 }
             end
-            skipSpace()
+            skipSpace(true)
             hasLeftParen = Tokens[Index + 1] == '('
         end
     end
@@ -2223,7 +2229,7 @@ local function parseFunction(isLocal, isAction)
             params.parent = func
             func.args     = params
         end
-        skipSpace()
+        skipSpace(true)
         if Tokens[Index + 1] == ')' then
             local parenRight = getPosition(Tokens[Index], 'right')
             func.finish = parenRight
@@ -2231,7 +2237,7 @@ local function parseFunction(isLocal, isAction)
                 params.finish = parenRight
             end
             Index = Index + 2
-            skipSpace()
+            skipSpace(true)
         else
             func.finish = lastRightPosition()
             if params then
@@ -2338,6 +2344,9 @@ local function parseBinaryOP(asAction, level)
                 or BinaryAlias[token]
                 or (not asAction and BinaryActionAlias[token])
     if not symbol then
+        return nil
+    end
+    if symbol == '//' and State.options.nonstandardSymbol['//'] then
         return nil
     end
     local myLevel = BinarySymbol[symbol]

@@ -1,6 +1,7 @@
 local core       = require 'core.hover'
 local files      = require 'files'
 local catch      = require 'catch'
+local config     = require 'config'
 
 rawset(_G, 'TEST', true)
 
@@ -1787,3 +1788,12 @@ local <?f?>
 [[
 local f: async fun()
 ]]
+
+config.set('Lua.runtime.nonstandardSymbol', { '//' })
+TEST [[
+local <?x?> = 1 // 2
+]]
+[[
+local x: integer = 1
+]]
+config.set('runtime.nonstandardSymbol', {})

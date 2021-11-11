@@ -644,6 +644,14 @@ function m.trim(str, mode)
 end
 
 function m.expandPath(path)
+    -- Substitute {env:MY_ENV} with concrete value
+    local env_pattern = "[$][{]env[:].*[}]"
+    local env_pattern_i, env_pattern_j = sfind(path, env_pattern)
+    if (0 < env_pattern_i) and (env_pattern_i < env_pattern_j) then
+        local env_name = ssub(path, env_pattern_i + 6, env_pattern_j - 1)
+        local env_value = getenv(env_name)
+        path = gsub(path, env_pattern, env_value)
+    end
     if path:sub(1, 1) == '~' then
         local home = getenv('HOME')
         if not home then -- has to be Windows

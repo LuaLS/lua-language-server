@@ -23,6 +23,9 @@ local inf          = 1 / 0
 local nan          = 0 / 0
 local utf8         = utf8
 local error        = error
+local ssub         = string.sub
+local gsub         = string.gsub
+local sfind        = string.find
 
 _ENV = nil
 

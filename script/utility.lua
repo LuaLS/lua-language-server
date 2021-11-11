@@ -650,7 +650,7 @@ function m.expandPath(path)
     -- Substitute ${env:ENV_VARIABLE} with concrete value
     local env_pattern = "[$][{]env[:].*[}]"
     local env_pattern_i, env_pattern_j = sfind(path, env_pattern)
-    if (0 < env_pattern_i) and (env_pattern_i < env_pattern_j) then
+    if (nil ~= env_pattern_i) and (nil ~= env_pattern_j) then
         local env_name = ssub(path, env_pattern_i + 6, env_pattern_j - 1)
         local env_value = getenv(env_name)
         path = gsub(path, env_pattern, env_value)

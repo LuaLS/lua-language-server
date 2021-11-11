@@ -647,7 +647,7 @@ function m.trim(str, mode)
 end
 
 function m.expandPath(path)
-    -- Substitute ${env:MY_ENV} with concrete value
+    -- Substitute ${env:ENV_VARIABLE} with concrete value
     local env_pattern = "[$][{]env[:].*[}]"
     local env_pattern_i, env_pattern_j = sfind(path, env_pattern)
     if (0 < env_pattern_i) and (env_pattern_i < env_pattern_j) then

@@ -14,7 +14,7 @@ local weakMT = { __mode = 'kv' }
 
 _ENV = nil
 
----@type vm
+---@class vm
 local m = {}
 
 function m.getArgInfo(source)

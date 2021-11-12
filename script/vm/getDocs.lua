@@ -1,6 +1,6 @@
 local files     = require 'files'
 local guide     = require 'parser.guide'
----@type vm
+---@class vm
 local vm        = require 'vm.vm'
 local config    = require 'config'
 local collector = require 'core.collector'

@@ -1,4 +1,4 @@
----@type vm
+---@class vm
 local vm       = require 'vm.vm'
 local searcher = require 'core.searcher'
 

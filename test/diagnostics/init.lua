@@ -676,10 +676,10 @@ T = {}
 T['x'], <!T['y']!>, <!T['z']!> = 1
 ]]
 
-TEST [[
----@class <!Class!>
----@class <!Class!>
-]]
+--TEST [[
+-----@class <!Class!>
+-----@class <!Class!>
+--]]
 
 TEST [[
 ---@class A : <!B!>
@@ -720,7 +720,7 @@ TEST [[
 ]]
 
 TEST [[
----@class <!A!>
+---@class A
 ---@class B
 ---@alias <!A B!>
 ]]

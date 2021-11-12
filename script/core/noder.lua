@@ -1184,46 +1184,6 @@ compileNodeMap = util.switch()
     : call(function (noders, id, source)
         local uri = guide.getUri(source)
         collector.subscribe(uri, id, noders)
-
-        local parent = source.parent
-        if parent.type ~= 'doc.type' then
-            goto BREAK
-        end
-        local bindSources = parent.bindSources
-        if not bindSources then
-            goto BREAK
-        end
-        for i = 1, #bindSources do
-            local src = bindSources[i]
-            if src.type ~= 'local' then
-                goto CONTINUE1
-            end
-            local refs = src.ref
-            if not refs then
-                goto CONTINUE1
-            end
-            for j = 1, #refs do
-                local ref = refs[j]
-                if ref.type ~= 'getlocal' then
-                    goto CONTINUE2
-                end
-                local nxt = ref.next
-                if not nxt then
-                    goto CONTINUE2
-                end
-                local nxtType = nxt.type
-                if nxtType == 'setfield'
-                or nxtType == 'setmethod'
-                or nxtType == 'setindex' then
-                    local defID = 'def:' .. id
-                    collector.subscribe(uri, defID, noders)
-                    goto BREAK
-                end
-                ::CONTINUE2::
-            end
-            ::CONTINUE1::
-        end
-        ::BREAK::
     end)
     : case 'doc.class.name'
     : case 'doc.alias.name'

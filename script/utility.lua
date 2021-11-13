@@ -24,7 +24,7 @@ local nan          = 0 / 0
 local utf8         = utf8
 local error        = error
 local ssub         = string.sub
-local gsub         = string.gsub
+local sgsub        = string.gsub
 local sfind        = string.find
 
 _ENV = nil
@@ -646,15 +646,21 @@ function m.trim(str, mode)
     return str:match '^%s*(%S+)%s*$'
 end
 
-function m.expandPath(path)
-    -- Substitute ${env:ENV_VARIABLE} with concrete value
-    local env_pattern = "[$][{]env[:].*[}]"
-    local env_pattern_i, env_pattern_j = sfind(path, env_pattern)
-    if (nil ~= env_pattern_i) and (nil ~= env_pattern_j) then
-        local env_name = ssub(path, env_pattern_i + 6, env_pattern_j - 1)
-        local env_value = getenv(env_name)
-        path = gsub(path, env_pattern, env_value)
+function m.resolveEnvironmentVariables(str)
+    -- Substitute ${env:MY_ENV} with concrete value
+    local envPattern = "[$][{]env[:].*[}]"
+    local envPatternBegin, envPatternEnd = sfind(str, envPattern)
+    while (nil ~= envPatternBegin) and (nil ~= envPatternEnd) do
+        local envName = ssub(str, envPatternBegin + 6, envPatternEnd - 1)
+        local envValue = getenv(envName)
+        str = sgsub(str, envPattern, envValue)
+        envPatternBegin, envPatternEnd = sfind(str, envPattern)
     end
+    return str
+end
+            
+function m.expandPath(path)
+    path = m.resolveEnvironmentVariables(path)
     if path:sub(1, 1) == '~' then
         local home = getenv('HOME')
         if not home then -- has to be Windows

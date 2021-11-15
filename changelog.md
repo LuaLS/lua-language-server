@@ -24,6 +24,10 @@
 * `CHG` no longer asks to trust plugin in VSCode, because VSCode already provides the workspace trust feature
 * `CHG` skip huge files (>= 10 MB)
 * `CHG` after using `Lua.runtime.nonstandardSymbol` to treat `//` as a comment, `//` is no longer parsed as an operator
+
+## 2.4.8
+`2021-11-15`
+* `FIX` incorrect IntelliSense in specific situations
 * `FIX` [#777](https://github.com/sumneko/lua-language-server/issues/777)
 * `FIX` [#778](https://github.com/sumneko/lua-language-server/issues/778)
 * `FIX` [#779](https://github.com/sumneko/lua-language-server/issues/779)

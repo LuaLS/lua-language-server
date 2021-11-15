@@ -850,7 +850,6 @@ function m.searchRefsByID(status, suri, expect, mode)
     local function searchNode(uri, id, field)
         local noders = nodersMap[uri]
         local call   = noders.call[id]
-        local global = isGlobalID(id)
         callStack[#callStack+1] = call
 
         if field == nil and not ignoredSources[id] then
@@ -865,8 +864,8 @@ function m.searchRefsByID(status, suri, expect, mode)
             checkRequire(uri, requireName, field)
         end
 
-        local elock = global and elockMap['@global'] or elockMap[uri]
-        local ecall = global and ecallMap['@global'] or ecallMap[uri]
+        local elock = elockMap[uri]
+        local ecall = ecallMap[uri]
 
         if lockExpanding(elock, ecall, id, field) then
             if noders.forward[id] then

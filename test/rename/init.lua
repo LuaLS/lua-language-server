@@ -2,6 +2,7 @@ local core   = require 'core.rename'
 local files  = require 'files'
 local catch  = require 'catch'
 local guide  = require 'parser.guide'
+local config = require 'config'
 
 local function replace(text, positions)
     local state = files.getState('')
@@ -89,6 +90,7 @@ local function f(b)
 end
 ]]
 
+config.set('Lua.IntelliSense.traceBeSetted', true)
 TEST ('a', '!!!') [[
 t = {
     a = 0
@@ -116,6 +118,7 @@ t = {
 t["!!!"] = 1
 a = t["!!!"]
 ]]
+config.set('Lua.IntelliSense.traceBeSetted', false)
 
 TEST ('a', '"') [[
 print(t[ "a" ])

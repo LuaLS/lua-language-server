@@ -937,33 +937,11 @@ compileNodeMap = util.switch()
     : call(function (noders, id, source)
         pushForward(noders, id, 'dn:nil')
     end)
-    : case 'local'
-    : call(function (noders, id, source)
-        if source[1] ~= 'self' then
-            return
-        end
-        local func = guide.getParentFunction(source)
-        if func.isGeneric then
-            return
-        end
-        if source.parent.type ~= 'funcargs' then
-            return
-        end
-        local setmethod = func.parent
-        -- guess `self`
-        if setmethod and ( setmethod.type == 'setmethod'
-                        or setmethod.type == 'setfield'
-                        or setmethod.type == 'setindex') then
-            pushForward(noders, id, getID(setmethod.node))
-            pushBackward(noders, getID(setmethod.node), id, INFO_DEEP)
-        end
-    end)
     : case 'doc.type'
     : call(function (noders, id, source)
         if source.bindSources then
             for _, src in ipairs(source.bindSources) do
                 pushForward(noders, getID(src), id)
-                pushBackward(noders, id, getID(src))
             end
         end
         for _, enumUnit in ipairs(source.enums) do
@@ -1082,7 +1060,6 @@ compileNodeMap = util.switch()
                 pushForward(noders, keyID, getID(field.field))
                 pushForward(noders, getID(field.field), keyID)
                 pushForward(noders, keyID, getID(field.extends))
-                pushBackward(noders, getID(field.extends), keyID)
             end
         end
     end)
@@ -1468,7 +1445,6 @@ compileNodeMap = util.switch()
             if upvalues[key] then
                 for _, paramID in ipairs(upvalues[key]) do
                     pushForward(noders, id, paramID)
-                    pushBackward(noders, paramID, id)
                 end
             end
         end

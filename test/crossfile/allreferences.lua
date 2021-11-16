@@ -1,3 +1,4 @@
+local config = require 'config'
 
 TEST {
     {
@@ -67,6 +68,7 @@ TEST {
     },
 }
 
+config.set('Lua.IntelliSense.traceBeSetted', true)
 TEST {
     {
         path = 'a.lua',
@@ -213,3 +215,5 @@ TEST {
         ]]
     },
 }
+config.set('Lua.IntelliSense.traceBeSetted', false)
+

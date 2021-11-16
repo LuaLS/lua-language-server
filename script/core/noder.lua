@@ -766,10 +766,7 @@ local function bindValue(noders, source, id)
     -- x = y : x -> y
     pushForward(noders, id, valueID, INFO_REJECT_SET)
     if  not config.get 'Lua.IntelliSense.traceBeSetted'
-    and source.type ~= 'local'
-    and source.type ~= 'tablefield'
-    and source.type ~= 'tableindex'
-    and source.type ~= 'setglobal' then
+    and source.type ~= 'local' then
         return
     end
     -- 参数/call禁止反向查找赋值

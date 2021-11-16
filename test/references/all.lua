@@ -1,3 +1,5 @@
+local config = require 'config'
+
 TEST [[
 ---@class A
 local a = {}
@@ -76,6 +78,7 @@ end
 local _, <!f2!> = f()
 ]]
 
+config.set('Lua.IntelliSense.traceReturn', true)
 TEST [[
 local <?x?>
 local function f()
@@ -93,7 +96,7 @@ local function f()
 end
 local <!y!> = f()()
 ]]
-
+config.set('Lua.IntelliSense.traceReturn', false)
 
 TEST [[
 ---@class A

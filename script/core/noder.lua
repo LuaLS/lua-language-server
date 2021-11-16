@@ -1320,7 +1320,9 @@ compileNodeMap = util.switch()
                         , index
                     )
                     pushForward(noders, returnID, getID(rtnObj))
-                    pushBackward(noders, getID(rtnObj), returnID, INFO_DEEP_AND_DONT_CROSS)
+                    if config.get 'Lua.IntelliSense.traceReturn' then
+                        pushBackward(noders, getID(rtnObj), returnID, INFO_DEEP_AND_DONT_CROSS)
+                    end
                 end
             end
         end

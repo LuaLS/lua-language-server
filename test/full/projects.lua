@@ -7,7 +7,10 @@ local ws     = require 'workspace'
 local fs     = require 'bee.filesystem'
 
 config.set('Lua.workspace.preloadFileSize',    1000000)
-config.set('Lua.diagnostics.neededFileStatus', {})
+config.set('Lua.diagnostics.neededFileStatus', {
+    ['await-in-sync'] = 'Any',
+    ['not-yieldable'] = 'Any',
+})
 
 ---@diagnostic disable: await-in-sync
 local function doProjects(pathname)

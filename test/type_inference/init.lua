@@ -925,3 +925,22 @@ local emit = {}
 emit:on("died", function (<?i?>)
 end)
 ]]
+
+TEST '👍' [[
+---@class 👍
+local <?x?>
+]]
+
+TEST 'boolean' [[
+---@type boolean
+local x
+
+<?x?> = 1
+]]
+
+TEST 'Class' [[
+---@class Class
+local x
+
+<?x?> = 1
+]]

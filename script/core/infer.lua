@@ -478,6 +478,10 @@ function m.searchInfers(source, field, mark)
     if not source then
         return nil
     end
+    if source.type == 'setlocal'
+    or source.type == 'getlocal' then
+        source = source.node
+    end
     local suc, infers = getCachedInfers(source, field)
     if suc then
         return infers
@@ -487,22 +491,16 @@ function m.searchInfers(source, field, mark)
     mark = mark or {}
     if not field then
         searchInfer(source, infers, mark)
-        local id = noder.getID(source)
-        if id then
-            local noders = noder.getNoders(source)
-            for src in noder.eachSource(noders, id) do
-                searchInfer(src, infers, mark)
-            end
-        end
-        if source.type == 'field' or source.type == 'method' then
-            searchInfer(source.parent, infers, mark)
-        end
     end
     for _, def in ipairs(defs) do
         if def.typeGeneric and not isParam then
-        else
-            searchInfer(def, infers, mark)
+            goto CONTINUE
         end
+        if def.type == 'setlocal' then
+            goto CONTINUE
+        end
+        searchInfer(def, infers, mark)
+        ::CONTINUE::
     end
     if source.type == 'doc.type' then
         for _, def in ipairs(source.types) do

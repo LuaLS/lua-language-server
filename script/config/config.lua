@@ -202,6 +202,7 @@ local Template = {
     ['Lua.hint.await']                      = Type.Boolean >> true,
     ['Lua.window.statusBar']                = Type.Boolean >> true,
     ['Lua.window.progressBar']              = Type.Boolean >> true,
+    ['Lua.IntelliSense.localSet']           = Type.Boolean >> false,
     ['Lua.telemetry.enable']                = Type.Or(Type.Boolean >> false, Type.Nil),
     ['files.associations']                  = Type.Hash(Type.String, Type.String),
     ['files.exclude']                       = Type.Hash(Type.String, Type.Boolean),

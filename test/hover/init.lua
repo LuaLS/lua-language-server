@@ -838,6 +838,7 @@ local t: {
 }
 ]]
 
+config.set('Lua.IntelliSense.localSet', true)
 TEST [[
 local x
 x = 1
@@ -848,6 +849,7 @@ print(<?x?>)
 [[
 local x: number = 1
 ]]
+config.set('Lua.IntelliSense.localSet', false)
 
 TEST [[
 local <?x?> <close> = 1
@@ -1728,6 +1730,7 @@ t.<?x?>()
 field t.x: any
 ]]
 
+config.set('Lua.IntelliSense.localSet', true)
 TEST [[
 ---@class A
 local a
@@ -1740,6 +1743,7 @@ print(b.<?x?>)
 [[
 field A.x: any
 ]]
+config.set('Lua.IntelliSense.localSet', false)
 
 TEST [[
 ---@class A

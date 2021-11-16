@@ -1,3 +1,5 @@
+local config = require "config"
+
 TEST [[
 local <!x!>
 function _(x)
@@ -170,6 +172,7 @@ string.xx:<?format?>()
 --v.<?bar1?>
 --]]
 
+config.set('Lua.IntelliSense.localSet', true)
 TEST [[
 local A, B
 
@@ -229,6 +232,7 @@ end
 local <!b!> = B:get()
 print(<?b?>)
 ]]
+config.set('Lua.IntelliSense.localSet', false)
 
 TEST [[
 g[a.b.c] = 1

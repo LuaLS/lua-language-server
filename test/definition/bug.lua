@@ -172,7 +172,7 @@ string.xx:<?format?>()
 --v.<?bar1?>
 --]]
 
-config.set('Lua.IntelliSense.localSet', true)
+config.set('Lua.IntelliSense.traceLocalSet', true)
 TEST [[
 local A, B
 
@@ -232,7 +232,7 @@ end
 local <!b!> = B:get()
 print(<?b?>)
 ]]
-config.set('Lua.IntelliSense.localSet', false)
+config.set('Lua.IntelliSense.traceLocalSet', false)
 
 TEST [[
 g[a.b.c] = 1

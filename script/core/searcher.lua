@@ -939,9 +939,9 @@ function m.searchRefsByID(status, suri, expect, mode)
     end
 
     local stepCount = 0
-    local stepMaxCount = 1e3
+    local stepMaxCount = 1e4
     if mode == 'allref' or mode == 'alldef' then
-        stepMaxCount = 1e4
+        stepMaxCount = 1e5
     end
 
     function searchStep(uri, id, field)

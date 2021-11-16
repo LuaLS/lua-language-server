@@ -57,6 +57,7 @@ local var = '111'
 t.<?x?> = var
 ]]
 
+config.set('Lua.IntelliSense.localSet', true)
 TEST 'string' [[
 local <?var?>
 var = '111'
@@ -67,6 +68,7 @@ local var
 var = '111'
 print(<?var?>)
 ]]
+config.set('Lua.IntelliSense.localSet', false)
 
 TEST 'function' [[
 function <?xx?>()
@@ -78,11 +80,13 @@ local function <?xx?>()
 end
 ]]
 
+config.set('Lua.IntelliSense.localSet', true)
 TEST 'function' [[
 local xx
 <?xx?> = function ()
 end
 ]]
+config.set('Lua.IntelliSense.localSet', false)
 
 TEST 'table' [[
 local <?t?> = {}

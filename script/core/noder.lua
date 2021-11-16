@@ -2,6 +2,7 @@ local util      = require 'utility'
 local guide     = require 'parser.guide'
 local collector = require 'core.collector'
 local files     = require 'files'
+local config    = require 'config'
 
 local tostring = tostring
 local error    = error
@@ -747,6 +748,9 @@ local function bindValue(noders, source, id)
     end
     if source.type == 'getlocal'
     or source.type == 'setlocal' then
+        if not config.get 'Lua.IntelliSense.localSet' then
+            return
+        end
         source = source.node
     end
     if source.bindDocs and value.type ~= 'table' then

@@ -1484,6 +1484,12 @@ function m.compileNode(noders, source)
             local defID = 'def:' .. id
             collector.subscribe(uri, defID, noders)
 
+            local fieldID = m.getLastID(id)
+            if fieldID then
+                local defNodeID = 'field:' .. fieldID
+                collector.subscribe(uri, defNodeID, noders)
+            end
+
             if guide.isGlobal(source) then
                 local defAnyID = 'def:g:'
                 collector.subscribe(uri, defAnyID, noders)

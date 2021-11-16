@@ -6,7 +6,7 @@ local config = require 'config'
 local ws     = require 'workspace'
 files.removeAll()
 
-local path = ROOT
+local path = ROOT / 'script'
 
 fsu.scanDirectory(path, function (path)
     if path:extension():string() ~= '.lua' then

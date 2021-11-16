@@ -1,7 +1,7 @@
-local core  = require 'core.rename'
-local files = require 'files'
-local catch = require 'catch'
-local guide = require 'parser.guide'
+local core   = require 'core.rename'
+local files  = require 'files'
+local catch  = require 'catch'
+local guide  = require 'parser.guide'
 
 local function replace(text, positions)
     local state = files.getState('')

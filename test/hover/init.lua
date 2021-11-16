@@ -836,7 +836,7 @@ local t: {
 }
 ]]
 
-config.set('Lua.IntelliSense.localSet', true)
+config.set('Lua.IntelliSense.traceLocalSet', true)
 TEST [[
 local x
 x = 1
@@ -847,7 +847,7 @@ print(<?x?>)
 [[
 local x: number = 1
 ]]
-config.set('Lua.IntelliSense.localSet', false)
+config.set('Lua.IntelliSense.traceLocalSet', false)
 
 TEST [[
 local <?x?> <close> = 1
@@ -1689,7 +1689,7 @@ t.<?x?>()
 field t.x: any
 ]]
 
-config.set('Lua.IntelliSense.localSet', true)
+config.set('Lua.IntelliSense.traceLocalSet', true)
 TEST [[
 ---@class A
 local a
@@ -1702,7 +1702,7 @@ print(b.<?x?>)
 [[
 field A.x: any
 ]]
-config.set('Lua.IntelliSense.localSet', false)
+config.set('Lua.IntelliSense.traceLocalSet', false)
 
 TEST [[
 ---@class A

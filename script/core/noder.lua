@@ -748,7 +748,7 @@ local function bindValue(noders, source, id)
     end
     if source.type == 'getlocal'
     or source.type == 'setlocal' then
-        if not config.get 'Lua.IntelliSense.localSet' then
+        if not config.get 'Lua.IntelliSense.traceLocalSet' then
             return
         end
         source = source.node

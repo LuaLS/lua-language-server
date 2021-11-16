@@ -775,8 +775,18 @@ function m.searchRefsByID(status, suri, expect, mode)
         local crossed = {}
         if mode == 'def'
         or mode == 'alldef'
-        or field then
+        or field
+        or hasCall(field) then
             for _, guri in ceach('def:' .. id) do
+                if uri == guri then
+                    goto CONTINUE
+                end
+                searchID(guri, id, field, uri)
+                ::CONTINUE::
+            end
+        elseif mode == 'field'
+        or     mode == 'allfield' then
+            for _, guri in ceach('field:' .. id) do
                 if uri == guri then
                     goto CONTINUE
                 end
@@ -929,9 +939,9 @@ function m.searchRefsByID(status, suri, expect, mode)
     end
 
     local stepCount = 0
-    local stepMaxCount = 1e4
+    local stepMaxCount = 1e3
     if mode == 'allref' or mode == 'alldef' then
-        stepMaxCount = 1e5
+        stepMaxCount = 1e4
     end
 
     function searchStep(uri, id, field)

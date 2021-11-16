@@ -746,15 +746,17 @@ local function bindValue(noders, source, id)
     if not valueID then
         return
     end
+
+    local bindDocs = source.bindDocs
     if source.type == 'getlocal'
     or source.type == 'setlocal' then
         if not config.get 'Lua.IntelliSense.traceLocalSet' then
             return
         end
-        source = source.node
+        bindDocs = source.node.bindDocs
     end
-    if source.bindDocs and value.type ~= 'table' then
-        for _, doc in ipairs(source.bindDocs) do
+    if bindDocs and value.type ~= 'table' then
+        for _, doc in ipairs(bindDocs) do
             if doc.type == 'doc.class'
             or doc.type == 'doc.type' then
                 return
@@ -763,6 +765,13 @@ local function bindValue(noders, source, id)
     end
     -- x = y : x -> y
     pushForward(noders, id, valueID, INFO_REJECT_SET)
+    if  not config.get 'Lua.IntelliSense.traceBeSetted'
+    and source.type ~= 'local'
+    and source.type ~= 'tablefield'
+    and source.type ~= 'tableindex'
+    and source.type ~= 'setglobal' then
+        return
+    end
     -- 参数/call禁止反向查找赋值
     local valueType = smatch(valueID, '^(.-:).')
     if not valueType then

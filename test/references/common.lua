@@ -1,3 +1,4 @@
+local config = require "config"
 TEST [[
 local <?a?> = 1
 <!a!> = <!a!>
@@ -95,6 +96,7 @@ t.x = 1
 t[a.b.<?x?>] = 1
 ]]
 
+config.set('Lua.IntelliSense.traceBeSetted', true)
 TEST [[
 local t
 local <!f!> = t.<?f?>
@@ -105,6 +107,7 @@ return {
     <!f!> = <!f!>,
 }
 ]]
+config.set('Lua.IntelliSense.traceBeSetted', false)
 
 TEST [[
 self = {
@@ -139,6 +142,7 @@ a.<!b!>.c = 1
 print(a.<?b?>.c)
 ]]
 
+config.set('Lua.IntelliSense.traceBeSetted', true)
 TEST [[
 local <?f?>
 local t = {
@@ -146,12 +150,14 @@ local t = {
 }
 print(t.<!a!>)
 ]]
+config.set('Lua.IntelliSense.traceBeSetted', false)
 
 TEST [[
 local <!f!>
 local <!t!> = <?f?>
 ]]
 
+config.set('Lua.IntelliSense.traceBeSetted', true)
 TEST [[
 local <!f!>
 a.<!t!> = <?f?>
@@ -160,16 +166,19 @@ a.<!t!> = <?f?>
 TEST [[
 <!t!>.<!f!> = <?t?>
 ]]
+config.set('Lua.IntelliSense.traceBeSetted', false)
 
 TEST [[
 local <!f!>
 local <?t?> = <!f!>
 ]]
 
+config.set('Lua.IntelliSense.traceBeSetted', true)
 TEST [[
 local <!t!>
 <!t!>.<!f!> = <?t?>
 ]]
+config.set('Lua.IntelliSense.traceBeSetted', false)
 
 TEST [[
 _G.<?xxx?> = 1

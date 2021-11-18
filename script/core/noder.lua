@@ -1027,8 +1027,13 @@ compileNodeMap = util.switch()
         end
         if source.bindSources then
             for _, src in ipairs(source.bindSources) do
-                pushForward(noders, getID(src), id)
-                pushForward(noders, id, getID(src))
+                if src.type == 'local'
+                or src.type == 'tablefield'
+                or src.type == 'tableindex'
+                or src.type == 'setglobal' then
+                    pushForward(noders, getID(src), id)
+                    pushForward(noders, id, getID(src))
+                end
             end
         end
         for _, field in ipairs(source.fields) do

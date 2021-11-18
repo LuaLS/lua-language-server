@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.4.9
+`2021-11-18`
 * `CHG` for performance reasons, some of the features that are not cost-effective in IntelliSense have been disabled by default, and you can re-enable them through the following settings:
   + `Lua.IntelliSense.traceLocalSet`
   + `Lua.IntelliSense.traceReturn`

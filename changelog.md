@@ -5,7 +5,7 @@
   + `Lua.IntelliSense.traceLocalSet`
   + `Lua.IntelliSense.traceReturn`
   + `Lua.IntelliSense.traceBeSetted`
-  + `Lua.IntelliSense.traceGlobalInject`
+  + `Lua.IntelliSense.traceFieldInject`
 
   [read more](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)
 

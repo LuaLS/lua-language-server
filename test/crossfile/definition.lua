@@ -770,6 +770,7 @@ TEST {
     },
 }
 
+config.set('Lua.IntelliSense.traceGlobalInject', true)
 TEST {
     {
         path = 'a.lua',
@@ -790,6 +791,7 @@ print(b.<?test?>)
         ]]
     }
 }
+config.set('Lua.IntelliSense.traceGlobalInject', false)
 
 TEST {
     {

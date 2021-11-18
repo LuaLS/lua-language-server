@@ -930,11 +930,6 @@ emit:on("died", function (<?i?>)
 end)
 ]]
 
-TEST '👍' [[
----@class 👍
-local <?x?>
-]]
-
 TEST 'boolean' [[
 ---@type boolean
 local x

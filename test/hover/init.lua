@@ -1,6 +1,7 @@
 local core       = require 'core.hover'
 local files      = require 'files'
 local catch      = require 'catch'
+local config     = require 'config'
 
 rawset(_G, 'TEST', true)
 

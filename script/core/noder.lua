@@ -482,9 +482,11 @@ local function getNodeKey(source)
     if methodNode then
         return getNodeKey(methodNode)
     end
-    local localValueID = getLocalValueID(source)
-    if localValueID then
-        return localValueID
+    if config.get 'Lua.IntelliSense.traceGlobalInject' then
+        local localValueID = getLocalValueID(source)
+        if localValueID then
+            return localValueID
+        end
     end
     local key, node = getKey(source)
     if key and guide.isGlobal(source) then

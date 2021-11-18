@@ -795,6 +795,7 @@ TEST {
     },
 }
 
+config.set('Lua.IntelliSense.traceFieldInject', true)
 TEST {
     {
         path = 'a.lua',
@@ -815,6 +816,7 @@ print(b.<?test?>)
         ]]
     }
 }
+config.set('Lua.IntelliSense.traceFieldInject', false)
 
 TEST {
     {

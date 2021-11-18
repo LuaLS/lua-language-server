@@ -482,9 +482,11 @@ local function getNodeKey(source)
     if methodNode then
         return getNodeKey(methodNode)
     end
-    local localValueID = getLocalValueID(source)
-    if localValueID then
-        return localValueID
+    if config.get 'Lua.IntelliSense.traceFieldInject' then
+        local localValueID = getLocalValueID(source)
+        if localValueID then
+            return localValueID
+        end
     end
     local key, node = getKey(source)
     if key and guide.isGlobal(source) then
@@ -1025,8 +1027,13 @@ compileNodeMap = util.switch()
         end
         if source.bindSources then
             for _, src in ipairs(source.bindSources) do
-                pushForward(noders, getID(src), id)
-                pushForward(noders, id, getID(src))
+                if src.type == 'local'
+                or src.type == 'tablefield'
+                or src.type == 'tableindex'
+                or src.type == 'setglobal' then
+                    pushForward(noders, getID(src), id)
+                    pushForward(noders, id, getID(src))
+                end
             end
         end
         for _, field in ipairs(source.fields) do

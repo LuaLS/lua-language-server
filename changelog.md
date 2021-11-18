@@ -1,5 +1,12 @@
 # changelog
 
+## 2.4.9
+* `NEW` For performance reasons, some of the features that are not cost-effective in IntelliSense have been disabled by default, and you can re-enable them through the following settings:
+  + `Lua.IntelliSense.traceLocalSet`
+  + `Lua.IntelliSense.traceReturn`
+  + `Lua.IntelliSense.traceBeSetted`
+  + `Lua.IntelliSense.traceGlobalInject`
+
 ## 2.4.8
 `2021-11-15`
 * `FIX` incorrect IntelliSense in specific situations

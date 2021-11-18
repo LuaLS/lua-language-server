@@ -7,6 +7,8 @@
   + `Lua.IntelliSense.traceBeSetted`
   + `Lua.IntelliSense.traceGlobalInject`
 
+  [read more](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)
+
 ## 2.4.8
 `2021-11-15`
 * `FIX` incorrect IntelliSense in specific situations

@@ -2695,3 +2695,31 @@ utf<??>'xxx'
         kind  = define.CompletionItemKind.Field,
     }
 }
+
+TEST [[
+---@class AAA
+
+---@class AAA
+
+---@type AAA<??>
+]]
+{
+    [1] = {
+        label = 'AAA',
+        kind  = define.CompletionItemKind.Class,
+    }
+}
+
+TEST [[
+---@class AAA
+
+---@class AAA
+
+---@class BBB: AAA<??>
+]]
+{
+    [1] = {
+        label = 'AAA',
+        kind  = define.CompletionItemKind.Class,
+    }
+}

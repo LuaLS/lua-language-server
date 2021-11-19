@@ -1688,10 +1688,13 @@ end
 local function tryluaDocBySource(state, position, source, results)
     if source.type == 'doc.extends.name' then
         if source.parent.type == 'doc.class' then
+            local used = {}
             for _, doc in ipairs(vm.getDocDefines '*') do
                 if  doc.type == 'doc.class.name'
                 and doc.parent ~= source.parent
+                and not used[doc[1]]
                 and matchKey(source[1], doc[1]) then
+                    used[doc[1]] = true
                     results[#results+1] = {
                         label       = doc[1],
                         kind        = define.CompletionItemKind.Class,
@@ -1706,10 +1709,13 @@ local function tryluaDocBySource(state, position, source, results)
         end
         return true
     elseif source.type == 'doc.type.name' then
+        local used = {}
         for _, doc in ipairs(vm.getDocDefines '*') do
             if  (doc.type == 'doc.class.name' or doc.type == 'doc.alias.name')
             and doc.parent ~= source.parent
+            and not used[doc[1]]
             and matchKey(source[1], doc[1]) then
+                used[doc[1]] = true
                 results[#results+1] = {
                     label       = doc[1],
                     kind        = define.CompletionItemKind.Class,

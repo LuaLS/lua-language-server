@@ -3561,6 +3561,16 @@ function parseAction()
             name.vstart = exp.start
             name.range  = exp.finish
             exp.parent  = name
+            if name.type == 'setlocal' then
+                local loc = name.node
+                if loc.attrs then
+                    pushError {
+                        type   = 'SET_CONST',
+                        start  = name.start,
+                        finish = name.finish,
+                    }
+                end
+            end
             pushActionIntoCurrentChunk(name)
             return name
         else

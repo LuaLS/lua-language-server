@@ -30,14 +30,14 @@ local literalMap = {
 return function (data)
     local uri   = data.uri
     local text  = files.getText(uri)
-    local ast   = files.getState(uri)
-    if not ast then
+    local state = files.getState(uri)
+    if not state then
         return
     end
 
     local start, finish = converter.unpackRange(uri, data.range)
 
-    local result = guide.eachSourceContain(ast.ast, start, function (source)
+    local result = guide.eachSourceContain(state.ast, start, function (source)
         if source.start ~= start
         or source.finish ~= finish then
             return
@@ -86,7 +86,10 @@ return function (data)
                 [uri] = {
                     {
                         range   = converter.packRange(uri, result.start, result.finish),
-                        newText = ('(%s)'):format(text:sub(result.start, result.finish)),
+                        newText = ('(%s)'):format(text:sub(
+                                    guide.positionToOffset(state, result.start + 1),
+                                    guide.positionToOffset(state, result.finish)
+                                  )),
                     }
                 },
             }

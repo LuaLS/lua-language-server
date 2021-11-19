@@ -165,7 +165,7 @@ function love.graphics.ellipse(mode, x, y, radiusx, radiusy) end
 ---
 ---LÖVE will call this function internally as needed when most state is changed, so it is not necessary to manually call it.
 ---
----The current batch will be automatically flushed by color), as well as Shader:send and methods on Textures which change their state. Using a different Image in consecutive love.graphics.draw calls will also flush the current batch.
+---The current batch will be automatically flushed by love.graphics state changes (except for the transform stack and the current color), as well as Shader:send and methods on Textures which change their state. Using a different Image in consecutive love.graphics.draw calls will also flush the current batch.
 ---
 ---SpriteBatches, ParticleSystems, Meshes, and Text objects do their own batching and do not affect automatic batching of other draws, aside from flushing the current batch when they're drawn.
 ---

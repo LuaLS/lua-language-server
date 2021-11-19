@@ -491,7 +491,9 @@ function RandomGenerator:randomNormal(sigma, mu) end
 ---
 ---Seed the RandomGenerator with a new seed.  Each seed will cause the RandomGenerator to produce a unique sequence of random numbers.
 ---
-function RandomGenerator:setSeed() end
+---@overload fun(low: number, high: number)
+---@param seed number # The random seed.
+function RandomGenerator:setSeed(seed) end
 
 ---
 ---Sets the state of the RandomGenerator, as previously obtained using `RandomGenerator:getState`. This can be used to reliably restore a previous state of the generator.

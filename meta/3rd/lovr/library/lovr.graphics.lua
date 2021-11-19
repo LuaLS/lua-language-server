@@ -1190,7 +1190,10 @@ function Model:getAnimationCount() end
 ---
 ---Returns the duration of an animation in the Model, in seconds.
 ---
-function Model:getAnimationDuration() end
+---@overload fun(index: number):number
+---@param name string # The name of the animation.
+---@return number duration # The duration of the animation, in seconds.
+function Model:getAnimationDuration(name) end
 
 ---
 ---Returns the name of one of the animations in the Model.

@@ -948,3 +948,47 @@ local x
 
 <?x?> = 1
 ]]
+
+TEST 'any' [[
+---@return number
+local function f(x)
+    local <?y?> = x()
+end
+]]
+
+TEST 'any' [[
+local mt
+
+---@return number
+function mt:f() end
+
+local <?v?> = mt()
+]]
+
+TEST 'any' [[
+local <?mt?>
+
+---@class X
+function mt:f(x) end
+]]
+
+TEST 'any' [[
+local mt
+
+---@class X
+function mt:f(<?x?>) end
+]]
+
+TEST 'any' [[
+local <?mt?>
+
+---@type number
+function mt:f(x) end
+]]
+
+TEST 'any' [[
+local mt
+
+---@type number
+function mt:f(<?x?>) end
+]]

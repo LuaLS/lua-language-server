@@ -26,12 +26,12 @@ local literalMap = {
 }
 
 return function (uri, callback)
-    local ast = files.getState(uri)
-    if not ast then
+    local state = files.getState(uri)
+    if not state then
         return
     end
     local text = files.getText(uri)
-    guide.eachSourceType(ast.ast, 'binary', function (source)
+    guide.eachSourceType(state.ast, 'binary', function (source)
         if source.op.type ~= 'or' then
             return
         end
@@ -51,7 +51,10 @@ return function (uri, callback)
                 callback {
                     start   = source.start,
                     finish  = source.finish,
-                    message = lang.script('DIAG_AMBIGUITY_1', text:sub(first.start, first.finish))
+                    message = lang.script('DIAG_AMBIGUITY_1', text:sub(
+                                guide.positionToOffset(state, first.start + 1),
+                                guide.positionToOffset(state, first.finish)
+                              ))
                 }
             end
         end
@@ -65,7 +68,10 @@ return function (uri, callback)
                 callback {
                     start   = source.start,
                     finish  = source.finish,
-                    message = lang.script('DIAG_AMBIGUITY_1', text:sub(second.start, second.finish))
+                    message = lang.script('DIAG_AMBIGUITY_1', text:sub(
+                                guide.positionToOffset(state, second.start + 1),
+                                guide.positionToOffset(state, second.finish)
+                              ))
                 }
             end
         end

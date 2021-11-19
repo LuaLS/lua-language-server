@@ -25,6 +25,13 @@
 * `CHG` skip huge files (>= 10 MB)
 * `CHG` after using `Lua.runtime.nonstandardSymbol` to treat `//` as a comment, `//` is no longer parsed as an operator
 
+## 2.4.10
+* `FIX` [#790](https://github.com/sumneko/lua-language-server/issues/790)
+* `FIX` [#798](https://github.com/sumneko/lua-language-server/issues/798)
+* `FIX` [#804](https://github.com/sumneko/lua-language-server/issues/804)
+* `FIX` [#806](https://github.com/sumneko/lua-language-server/issues/806)
+* `FIX` [#807](https://github.com/sumneko/lua-language-server/issues/807)
+
 ## 2.4.9
 `2021-11-18`
 * `CHG` for performance reasons, some of the features that are not cost-effective in IntelliSense have been disabled by default, and you can re-enable them through the following settings:

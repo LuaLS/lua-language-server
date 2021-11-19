@@ -31,8 +31,6 @@ local function collectRequire(mode, literal)
             if vm.isMetaFile(uri) then
                 shows[i] = ('* [[meta]](%s)'):format(uri)
             elseif searcher then
-                searcher = searcher:sub(#rootPath + 1)
-                searcher = ws.normalize(searcher)
                 searcher = searcher:gsub('^[/\\]+', '')
                 shows[i] = ('* [%s](%s) %s'):format(path, uri, lang.script('HOVER_USE_LUA_PATH', searcher))
             else

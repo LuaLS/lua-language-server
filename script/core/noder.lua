@@ -1412,8 +1412,7 @@ compileNodeMap = util.switch()
         end
         for _, rtn in ipairs(source.returns) do
             for _, src in ipairs(source.bindSources) do
-                if src.type == 'function'
-                or guide.isSet(src) then
+                if src.type == 'function' then
                     local fullID = sformat('%s%s%s'
                         , getID(src)
                         , RETURN_INDEX

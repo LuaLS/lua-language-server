@@ -943,3 +943,19 @@ local x
 
 <?x?> = 1
 ]]
+
+TEST 'any' [[
+---@return number
+local function f(x)
+    local <?y?> = x()
+end
+]]
+
+TEST 'any' [[
+local mt
+
+---@return number
+function mt:f() end
+
+local <?v?> = mt()
+]]

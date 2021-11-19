@@ -29,6 +29,7 @@
 * `FIX` [#790](https://github.com/sumneko/lua-language-server/issues/790)
 * `FIX` [#798](https://github.com/sumneko/lua-language-server/issues/798)
 * `FIX` [#804](https://github.com/sumneko/lua-language-server/issues/804)
+* `FIX` [#805](https://github.com/sumneko/lua-language-server/issues/805)
 * `FIX` [#806](https://github.com/sumneko/lua-language-server/issues/806)
 * `FIX` [#807](https://github.com/sumneko/lua-language-server/issues/807)
 

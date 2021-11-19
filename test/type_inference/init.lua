@@ -987,3 +987,8 @@ local mt
 ---@type number
 function mt:f(<?x?>) end
 ]]
+
+TEST 'Test' [[
+---@class Test
+_G.<?Test?> = {}
+]]

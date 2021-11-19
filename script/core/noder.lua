@@ -940,7 +940,10 @@ compileNodeMap = util.switch()
     : call(function (noders, id, source)
         if source.bindSources then
             for _, src in ipairs(source.bindSources) do
-                pushForward(noders, getID(src), id)
+                if  src.parent.type ~= 'funcargs'
+                and not src.dummy then
+                    pushForward(noders, getID(src), id)
+                end
             end
         end
         for _, enumUnit in ipairs(source.enums) do
@@ -954,7 +957,10 @@ compileNodeMap = util.switch()
             pushForward(noders, id, unitID)
             if source.bindSources then
                 for _, src in ipairs(source.bindSources) do
-                    pushBackward(noders, unitID, getID(src))
+                    if  src.parent.type ~= 'funcargs'
+                    and not src.dummy then
+                        pushBackward(noders, unitID, getID(src))
+                    end
                 end
             end
         end
@@ -1031,8 +1037,11 @@ compileNodeMap = util.switch()
                 or src.type == 'tablefield'
                 or src.type == 'tableindex'
                 or src.type == 'setglobal' then
-                    pushForward(noders, getID(src), id)
-                    pushForward(noders, id, getID(src))
+                    if  src.parent.type ~= 'funcargs'
+                    and not src.dummy then
+                        pushForward(noders, getID(src), id)
+                        pushForward(noders, id, getID(src))
+                    end
                 end
             end
         end

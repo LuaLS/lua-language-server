@@ -130,7 +130,7 @@ function m.getNativeMatcher()
         end
     end
     -- config.get 'workspace.ignoreDir'
-    for path in pairs(config.get 'Lua.workspace.ignoreDir') do
+    for _, path in ipairs(config.get 'Lua.workspace.ignoreDir') do
         log.info('Ignore directory:', path)
         pattern[#pattern+1] = path
     end

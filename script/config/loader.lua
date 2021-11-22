@@ -98,7 +98,7 @@ function m.loadClientConfig()
     })
     if not configs or not configs[1] then
         log.warn('No config?', util.dump(configs))
-        return
+        return nil
     end
 
     local newConfig = {

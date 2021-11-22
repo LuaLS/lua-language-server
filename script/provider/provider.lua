@@ -15,33 +15,48 @@ local tm         = require 'text-merger'
 local cfgLoader  = require 'config.loader'
 local converter  = require 'proto.converter'
 local filewatch  = require 'filewatch'
+local json       = require 'json'
+
+local function mergeConfig(a, b)
+    for k, v in pairs(b) do
+        if a[k] == nil then
+            a[k] = v
+        end
+    end
+end
 
 ---@async
 local function updateConfig()
-    local new
+    local merged = {}
+
     if CONFIGPATH then
-        new = cfgLoader.loadLocalConfig(CONFIGPATH)
-        config.setSource 'path'
+        local cfg = cfgLoader.loadLocalConfig(CONFIGPATH)
         log.debug('load config from local', CONFIGPATH)
         -- watch directory
         filewatch.watch(workspace.getAbsolutePath(CONFIGPATH):gsub('[^/\\]+$', ''))
-    else
-        new = cfgLoader.loadRCConfig('.luarc.json')
-        if new then
-            config.setSource 'luarc'
-            log.debug('load config from luarc')
-        else
-            new = cfgLoader.loadClientConfig()
-            config.setSource 'client'
-            log.debug('load config from client')
+        mergeConfig(merged, cfg)
+    end
+
+    local rc = cfgLoader.loadRCConfig('.luarc.json')
+    if rc then
+        log.debug('load config from luarc')
+        mergeConfig(merged, rc)
+    end
+
+    local clientConfig = cfgLoader.loadClientConfig()
+    if clientConfig then
+        log.debug('load config from client')
+        mergeConfig(merged, clientConfig)
+    end
+
+    for k, v in pairs(merged) do
+        if v == json.null then
+            merged[k] = nil
         end
     end
-    if not new then
-        log.warn('load config failed!')
-        return
-    end
-    config.update(new)
-    log.debug('loaded config dump:', util.dump(new))
+
+    config.update(merged)
+    log.debug('loaded config dump:', util.dump(merged))
 end
 
 ---@class provider

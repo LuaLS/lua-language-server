@@ -21,6 +21,7 @@
   + supports `---@param ... number`, equivalent to `---@vararg number`
   + supports `fun(...: string)`
   + supports `fun(x, y, ...)`, equivalent to `fun(x: any, y: any, ...: any)`
+* `CHG` settings from `--configpath`, `.luarc.json`, `client` no longer prevent subsequent settings, instead they are merged in order
 * `CHG` no longer asks to trust plugin in VSCode, because VSCode already provides the workspace trust feature
 * `CHG` skip huge files (>= 10 MB)
 * `CHG` after using `Lua.runtime.nonstandardSymbol` to treat `//` as a comment, `//` is no longer parsed as an operator

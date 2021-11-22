@@ -70,7 +70,7 @@ local function findNearestTableField(state, position)
     local uri     = state.uri
     local text    = files.getText(uri)
     local offset  = guide.positionToOffset(state, position)
-    local soffset = lookBackward.findAnyOffset(text, offset - 1)
+    local soffset = lookBackward.findAnyOffset(text, offset)
     if not soffset then
         return nil
     end

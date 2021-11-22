@@ -72,12 +72,11 @@ function m.register(method)
 end
 
 filewatch.event(function (changes) ---@async
-    local configPath = workspace.getAbsolutePath(CONFIGPATH or '.luarc.json')
-    if not configPath then
-        return
-    end
+    local configPath = CONFIGPATH and workspace.getAbsolutePath(CONFIGPATH)
+    local rcPath     = workspace.getAbsolutePath('.luarc.json')
     for _, change in ipairs(changes) do
-        if change.path == configPath then
+        if change.path == configPath
+        or change.path == rcPath then
             updateConfig()
             return
         end

@@ -482,6 +482,10 @@ function m.normalize(path)
         if key == '3rd' then
             return (ROOT / 'meta' / '3rd'):string()
         end
+        if key:sub(1, 4) == 'env:' then
+            local env = os.getenv(key:sub(5))
+            return env
+        end
     end)
     path = util.expandPath(path)
     if platform.OS == 'Windows' then

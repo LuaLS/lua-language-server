@@ -150,11 +150,23 @@ local function getFieldEventName(field)
     if not docFunc or docFunc.type ~= 'doc.type.function' then
         return nil
     end
-    local firstArg = docFunc.args and #docFunc.args == 2 and docFunc.args[1]
+    local firstArg = docFunc.args and docFunc.args[1]
     if not firstArg then
         return nil
     end
-    local secondArg = docFunc.args[2]
+    local secondArg
+    if firstArg.name[1] == 'self' then
+        firstArg = docFunc.args[2]
+        if not firstArg then
+            return nil
+        end
+        secondArg = docFunc.args[3]
+    else
+        secondArg = docFunc.args[2]
+    end
+    if not secondArg then
+        return
+    end
     local firstType = firstArg.extends
     if not firstType then
         return nil
@@ -799,8 +811,10 @@ local function compileCallParam(noders, call, sourceID)
     if not nodeID then
         return
     end
+    local methodIndex = 0
     if node.type == 'getmethod' then
         fixIndex = fixIndex + 1
+        methodIndex = 1
     end
     local eventNodeID
     for firstIndex, callArg in ipairs(call.args) do
@@ -820,7 +834,7 @@ local function compileCallParam(noders, call, sourceID)
                     local paramID = sformat('%s%s%s%s%s'
                         , nodeID
                         , PARAM_INDEX
-                        , firstIndex
+                        , firstIndex + methodIndex
                         , PARAM_INDEX
                         , secondIndex
                     )
@@ -829,7 +843,7 @@ local function compileCallParam(noders, call, sourceID)
                         local eventParamID = sformat('%s%s%s%s%s'
                             , eventNodeID
                             , PARAM_INDEX
-                            , firstIndex
+                            , firstIndex + methodIndex
                             , PARAM_INDEX
                             , secondIndex
                         )

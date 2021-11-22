@@ -926,6 +926,17 @@ TEST 'integer' [[
 --- @field on fun(eventName: '"won"', cb: fun(s: string))
 local emit = {}
 
+emit.on("died", function (<?i?>)
+end)
+]]
+
+TEST 'integer' [[
+--- @class Emit
+--- @field on fun(self: Emit, eventName: string, cb: function)
+--- @field on fun(self: Emit, eventName: '"died"', cb: fun(i: integer))
+--- @field on fun(self: Emit, eventName: '"won"', cb: fun(s: string))
+local emit = {}
+
 emit:on("died", function (<?i?>)
 end)
 ]]
@@ -996,4 +1007,15 @@ function mt:f(<?x?>) end
 TEST 'Test' [[
 ---@class Test
 _G.<?Test?> = {}
+]]
+
+TEST 'integer' [[
+local mt = {}
+
+---@param callback fun(i: integer)
+function mt:loop(callback) end
+
+mt:loop(function (<?i?>)
+    
+end)
 ]]

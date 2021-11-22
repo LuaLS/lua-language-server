@@ -362,7 +362,7 @@ TEST [[
 ---@generic T
 ---@param x T
 ---@return fun():T
-local function f(x) end
+local function f(<!x!>) end
 
 local v1 = f(<!{}!>)
 local <?<!v2!>?> = v1()

@@ -6,6 +6,7 @@
   + `Lua.hint.await`: display `await` when calling a function marked as async
 * `NEW` add supports for `lovr`
 * `NEW` file encoding supports `utf16le` and `utf16be`
+* `NEW` completion supports table fields in calling, see [#727](https://github.com/sumneko/lua-language-server/issues/727)
 * `NEW` `LuaDoc` annotations:
   + `---@async`: mark a function as async
   + `---@nodiscard`: the return value of the marking function cannot be discarded

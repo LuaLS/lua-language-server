@@ -852,6 +852,14 @@ local function compileCallParam(noders, call, sourceID)
                 end
             end
         end
+        if callArg.type == 'table' then
+            local paramID = sformat('%s%s%s'
+                , nodeID
+                , PARAM_INDEX
+                , firstIndex + methodIndex
+            )
+            pushForward(noders, getID(callArg), paramID)
+        end
     end
 end
 
@@ -1280,6 +1288,13 @@ compileNodeMap = util.switch()
                             , '...'
                         ))
                     end
+                    for j = i + 1, i + 10 do
+                        pushForward(noders, sformat('%s%s%s'
+                            , id
+                            , PARAM_INDEX
+                            , j
+                        ), getID(arg))
+                    end
                 end
                 ::CONTINUE::
             end
@@ -1325,6 +1340,10 @@ compileNodeMap = util.switch()
                     pushForward(noders, valueID, getID(firstField))
                 end
             end
+        end
+        local parent = source.parent
+        if guide.isSet(parent)  then
+            pushForward(noders, id, getID(parent))
         end
     end)
     : case 'in'

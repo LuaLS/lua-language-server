@@ -1452,18 +1452,6 @@ local function getCallArgInfo(call, position)
     return #call.args + 1, nil, oop
 end
 
-local function getFuncParamByCallIndex(func, index)
-    if not func.args or #func.args == 0 then
-        return nil
-    end
-    if index > #func.args then
-        if func.args[#func.args].type == '...' then
-            return func.args[#func.args]
-        end
-    end
-    return func.args[index]
-end
-
 local function checkTableLiteralField(state, position, tbl, fields, results)
     local text = state.lua
     local mark = {}
@@ -1509,43 +1497,6 @@ local function checkTableLiteralField(state, position, tbl, fields, results)
     end
 end
 
-local function checkTableLiteralFieldByCall(state, position, call, defs, index, results)
-    local source = findNearestTableField(state, position)
-    if not source then
-        return
-    end
-    if  source.type ~= 'table'
-    and (not source.parent or source.parent.type ~= 'table') then
-        return
-    end
-    local mark = {}
-    local fields = {}
-    local tbl = source
-    if source.type ~= 'table' then
-        tbl = source.parent
-    end
-    if tbl.parent ~= call.args then
-        return
-    end
-    for _, def in ipairs(defs) do
-        local func = searcher.getObjectValue(def) or def
-        local param = getFuncParamByCallIndex(func, index)
-        if not param then
-            goto CONTINUE
-        end
-        local defs = vm.getDefs(param, '*')
-        for _, field in ipairs(defs) do
-            local name = guide.getKeyName(field)
-            if name and not mark[name] then
-                mark[name] = true
-                fields[#fields+1] = field
-            end
-        end
-        ::CONTINUE::
-    end
-    checkTableLiteralField(state, position, tbl, fields, results)
-end
-
 local function tryCallArg(state, position, results)
     local call = findCall(state, position)
     if not call then
@@ -1567,7 +1518,6 @@ local function tryCallArg(state, position, results)
     for _, enum in ipairs(myResults) do
         results[#results+1] = enum
     end
-    checkTableLiteralFieldByCall(state, position, call, defs, argIndex, results)
 end
 
 local function tryTable(state, position, results)
@@ -1585,8 +1535,7 @@ local function tryTable(state, position, results)
     if source.type ~= 'table' then
         tbl = source.parent
     end
-    local parent = tbl.parent
-    local defs = vm.getDefs(parent, '*')
+    local defs = vm.getDefs(tbl, '*')
     for _, field in ipairs(defs) do
         local name = guide.getKeyName(field)
         if name and not mark[name] then

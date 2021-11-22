@@ -2723,3 +2723,19 @@ TEST [[
         kind  = define.CompletionItemKind.Class,
     }
 }
+
+TEST [[
+---@class A
+---@field zzzz number
+
+---@param x A
+local function f(x) end
+
+f({zzz<??>})
+]]
+{
+    [1] = {
+        label = 'zzzz',
+        kind  = define.CompletionItemKind.Property,
+    }
+}

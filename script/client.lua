@@ -207,7 +207,7 @@ end
 
 local function tryModifyRC(finalChanges, create)
     if #finalChanges == 0 then
-        return
+        return false
     end
     local workspace = require 'workspace'
     local loader    = require 'config.loader'
@@ -219,7 +219,9 @@ local function tryModifyRC(finalChanges, create)
     if not buf and not create then
         return false
     end
-    local rc = loader.lastRCConfig or {}
+    local rc = loader.lastRCConfig or {
+        ['$schema'] = lang.id == 'zh-cn' and [[https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema-zh-cn.json]] or [[https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json]]
+    }
     applyConfig(rc, finalChanges)
     util.saveFile(path, json.beautify(rc, { indent = '    ' }))
     return true
@@ -227,7 +229,7 @@ end
 
 local function tryModifyClient(finalChanges)
     if #finalChanges == 0 then
-        return
+        return false
     end
     if not m.getOption 'changeConfiguration' then
         return false

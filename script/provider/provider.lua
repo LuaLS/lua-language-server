@@ -29,8 +29,8 @@ end
 local function updateConfig()
     local merged = {}
 
-    if CONFIGPATH then
-        local cfg = cfgLoader.loadLocalConfig(CONFIGPATH)
+    local cfg = cfgLoader.loadLocalConfig(CONFIGPATH)
+    if cfg then
         log.debug('load config from local', CONFIGPATH)
         -- watch directory
         filewatch.watch(workspace.getAbsolutePath(CONFIGPATH):gsub('[^/\\]+$', ''))

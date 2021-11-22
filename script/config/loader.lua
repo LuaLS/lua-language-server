@@ -40,12 +40,14 @@ function m.loadLocalConfig(filename)
     local path = workspace.getAbsolutePath(filename)
     if not path then
         m.lastLocalConfig = nil
+        m.lastLocalType = nil
         return nil
     end
     local buf  = util.loadFile(path)
     if not buf then
         errorMessage(lang.script('CONFIG_LOAD_FAILED', path))
         m.lastLocalConfig = nil
+        m.lastLocalType = nil
         return nil
     end
     local firstChar = buf:match '%S'
@@ -56,6 +58,7 @@ function m.loadLocalConfig(filename)
             return m.lastLocalConfig
         end
         m.lastLocalConfig = res
+        m.lastLocalType = 'json'
         return res
     else
         local suc, res = pcall(function ()
@@ -66,6 +69,7 @@ function m.loadLocalConfig(filename)
             return m.lastLocalConfig
         end
         m.lastLocalConfig = res
+        m.lastLocalType = 'lua'
         return res
     end
 end

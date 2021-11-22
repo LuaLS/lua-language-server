@@ -5,6 +5,7 @@ local proto     = require 'proto'
 local define    = require 'proto.define'
 local config    = require 'config'
 local converter = require 'proto.converter'
+local json      = require 'json-beautify'
 
 local m = {}
 
@@ -181,6 +182,86 @@ end
 ---@field isGlobal? boolean
 ---@field uri?      uri
 
+---@param cfg table
+---@param changes config.change[]
+local function applyConfig(cfg, changes)
+    for _, change in ipairs(changes) do
+        cfg[change.key] = config.getRaw(change.key)
+    end
+end
+
+local function tryModifySpecifiedConfig(finalChanges)
+    if #finalChanges == 0 then
+        return false
+    end
+    local workspace = require 'workspace'
+    local loader    = require 'config.loader'
+    if loader.lastLocalType ~= 'json' then
+        return false
+    end
+    applyConfig(loader.lastLocalConfig, finalChanges)
+    local path = workspace.getAbsolutePath(CONFIGPATH)
+    util.saveFile(path, json.beautify(loader.lastLocalConfig, { indent = '    ' }))
+    return true
+end
+
+local function tryModifyRC(finalChanges, create)
+    if #finalChanges == 0 then
+        return
+    end
+    local workspace = require 'workspace'
+    local loader    = require 'config.loader'
+    local path = workspace.getAbsolutePath '.luarc.json'
+    if not path then
+        return false
+    end
+    local buf = util.loadFile(path)
+    if not buf and not create then
+        return false
+    end
+    local rc = loader.lastRCConfig or {}
+    applyConfig(rc, finalChanges)
+    util.saveFile(path, json.beautify(rc, { indent = '    ' }))
+    return true
+end
+
+local function tryModifyClient(finalChanges)
+    if #finalChanges == 0 then
+        return
+    end
+    if not m.getOption 'changeConfiguration' then
+        return false
+    end
+    proto.notify('$/command', {
+        command   = 'lua.config',
+        data      = finalChanges,
+    })
+    return true
+end
+
+---@param finalChanges config.change[]
+local function tryModifyClientGlobal(finalChanges)
+    if #finalChanges == 0 then
+        return
+    end
+    if not m.getOption 'changeConfiguration' then
+        return
+    end
+    local changes = {}
+    for i = #finalChanges, 1, -1 do
+        local change = finalChanges[i]
+        if change.isGlobal then
+            changes[#changes+1] = change
+            finalChanges[i] = finalChanges[#finalChanges]
+            finalChanges[#finalChanges] = nil
+        end
+    end
+    proto.notify('$/command', {
+        command   = 'lua.config',
+        data      = changes,
+    })
+end
+
 ---@param changes config.change[]
 ---@param onlyMemory boolean
 function m.setConfig(changes, onlyMemory)
@@ -210,31 +291,19 @@ function m.setConfig(changes, onlyMemory)
     if #finalChanges == 0 then
         return
     end
-    if  m.getOption 'changeConfiguration'
-    and config.getSource() == 'client' then
-        proto.notify('$/command', {
-            command   = 'lua.config',
-            data      = finalChanges,
-        })
-    else
-        local messages = {}
-        if not m.getOption 'changeConfiguration' then
-            messages[1] = lang.script('WINDOW_CLIENT_NOT_SUPPORT_CONFIG')
-        elseif config.getSource() ~= 'client' then
-            messages[1] = lang.script('WINDOW_LCONFIG_NOT_SUPPORT_CONFIG')
+    xpcall(function ()
+        tryModifyClientGlobal(finalChanges)
+        if tryModifySpecifiedConfig(finalChanges) then
+            return
         end
-        for _, change in ipairs(finalChanges) do
-            if change.action == 'add' then
-                messages[#messages+1] = lang.script('WINDOW_MANUAL_CONFIG_ADD', change)
-            elseif change.action == 'set' then
-                messages[#messages+1] = lang.script('WINDOW_MANUAL_CONFIG_SET', change)
-            elseif change.action == 'prop' then
-                messages[#messages+1] = lang.script('WINDOW_MANUAL_CONFIG_PROP', change)
-            end
+        if tryModifyRC(finalChanges) then
+            return
         end
-        local message = table.concat(messages, '\n')
-        m.showMessage('Info', message)
-    end
+        if tryModifyClient(finalChanges) then
+            return
+        end
+        tryModifyRC(finalChanges, true)
+    end, log.error)
 end
 
 ---@alias textEditor {start: integer, finish: integer, text: string}

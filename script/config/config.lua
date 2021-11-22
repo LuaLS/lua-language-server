@@ -216,6 +216,7 @@ local Template = {
 local config    = {}
 local rawConfig = {}
 
+---@class config.api
 local m = {}
 m.watchList = {}
 
@@ -292,6 +293,10 @@ function m.get(key)
     return config[key]
 end
 
+function m.getRaw(key)
+   return rawConfig[key]
+end
+
 function m.dump()
     local dump = {}
 
@@ -357,16 +362,6 @@ function m.event(key, value, oldValue)
         value    = value,
         oldValue = oldValue,
     }
-end
-
----@param source config.source
-function m.setSource(source)
-    m._source = source
-end
-
----@return config.source
-function m.getSource()
-    return m._source
 end
 
 function m.init()

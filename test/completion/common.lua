@@ -2755,3 +2755,30 @@ f(1, {<??>})
         kind  = define.CompletionItemKind.Property,
     }
 }
+
+TEST [[
+xx@pcall<??>
+]]
+{
+    [1] = {
+        label = 'pcall',
+        kind  = define.CompletionItemKind.Event,
+        textEdit = {
+            start   = 2,
+            finish  = 8,
+            newText = '',
+        },
+        additionalTextEdits = {
+            {
+                start   = 0,
+                finish  = 0,
+                newText = 'pcall(',
+            },
+            {
+                start   = 2,
+                finish  = 2,
+                newText = ')',
+            },
+        }
+    }
+}

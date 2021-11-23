@@ -21,6 +21,7 @@ local guide        = require 'parser.guide'
 local infer        = require 'core.infer'
 local noder        = require 'core.noder'
 local await        = require 'await'
+local postfix      = require 'core.completion.postfix'
 
 local DiagnosticModes = {
     'disable-next-line',
@@ -2029,6 +2030,33 @@ local function clearCache()
 end
 
 ---@async
+local function tryCompletions(state, position, triggerCharacter, results)
+    local text = state.lua
+    if not state then
+        local word = lookBackward.findWord(text, guide.positionToOffset(state, position))
+        if not word then
+            return
+        end
+        checkCommon(nil, word, position, results)
+        return
+    end
+    if getComment(state, position) then
+        tryluaDoc(state, position, results)
+        tryComment(state, position, results)
+        return
+    end
+    if postfix(state, position, results) then
+        return
+    end
+    trySpecial(state, position, results)
+    tryCallArg(state, position, results)
+    tryTable(state, position, results)
+    tryWord(state, position, triggerCharacter, results)
+    tryIndex(state, position, results)
+    trySymbol(state, position, results)
+end
+
+---@async
 local function completion(uri, position, triggerCharacter)
     tracy.ZoneBeginN 'completion cache'
     local results = getCache(uri, position)
@@ -2039,29 +2067,11 @@ local function completion(uri, position, triggerCharacter)
     await.delay()
     tracy.ZoneBeginN 'completion #1'
     local state = files.getState(uri)
-    local text = files.getText(uri)
-    local results = {}
+    results = {}
     clearStack()
     tracy.ZoneEnd()
     tracy.ZoneBeginN 'completion #2'
-    if state then
-        if getComment(state, position) then
-            tryluaDoc(state, position, results)
-            tryComment(state, position, results)
-        else
-            trySpecial(state, position, results)
-            tryCallArg(state, position, results)
-            tryTable(state, position, results)
-            tryWord(state, position, triggerCharacter, results)
-            tryIndex(state, position, results)
-            trySymbol(state, position, results)
-        end
-    else
-        local word = lookBackward.findWord(text, guide.positionToOffset(state, position))
-        if word then
-            checkCommon(nil, word, position, results)
-        end
-    end
+    tryCompletions(state, position, triggerCharacter, results)
     tracy.ZoneEnd()
 
     if #results == 0 then

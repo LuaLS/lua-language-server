@@ -1,6 +1,7 @@
 local guide        = require 'parser.guide'
 local lookback     = require 'core.look-backward'
 local matchKey     = require 'core.matchkey'
+local subString    = require 'core.substring'
 local define       = require 'proto.define'
 
 local actions = {}
@@ -15,16 +16,9 @@ local function register(key)
 end
 
 register 'pcall' {
-    function (source, callback)
-        callback({
-            start   = source.start,
-            finish  = source.start,
-            newText = 'pcall(',
-        }, {
-            start   = source.finish,
-            finish  = source.finish,
-            newText = ')',
-        })
+    function (state, source, callback)
+        local subber = subString(state)
+        callback(('pcall(%s)'):format(subber(source.start + 1, source.finish)))
     end
 }
 
@@ -44,16 +38,22 @@ local function checkPostFix(state, word, wordPosition, position, results)
     end)
     for _, action in ipairs(actions) do
         if matchKey(word, action.key) then
-            action.data[1](source, function (...)
+            action.data[1](state, source, function (newText)
                 results[#results+1] = {
-                    label    = action.key,
-                    kind     = define.CompletionItemKind.Event,
-                    textEdit = {
-                        start   = wordPosition,
+                    label      = action.key,
+                    kind       = define.CompletionItemKind.Event,
+                    textEdit   = {
+                        start   = wordPosition + 1,
                         finish  = position,
                         newText = '',
                     },
-                    additionalTextEdits = { ... }
+                    additionalTextEdits = {
+                        {
+                            start   = source.start,
+                            finish  = wordPosition + 1,
+                            newText = newText,
+                        },
+                    },
                 }
             end)
         end

@@ -1019,3 +1019,37 @@ mt:loop(function (<?i?>)
     
 end)
 ]]
+
+TEST 'integer' [[
+---@class D
+---@field y integer # D comment
+
+---@class C
+---@field x integer # C comment
+---@field d D
+
+---@param c C
+local function f(c) end
+
+f {
+    <?x?> = ,
+}
+]]
+
+TEST 'integer' [[
+---@class D
+---@field y integer # D comment
+
+---@class C
+---@field x integer # C comment
+---@field d D
+
+---@param c C
+local function f(c) end
+
+f {
+    d = {
+        <?y?> = ,
+    }
+}
+]]

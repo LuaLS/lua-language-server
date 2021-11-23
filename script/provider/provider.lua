@@ -564,6 +564,7 @@ m.register 'textDocument/completion' {
             end
             items[i] = item
         end
+        print(util.dump(items))
         return {
             isIncomplete = not result.complete,
             items        = items,

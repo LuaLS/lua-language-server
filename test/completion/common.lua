@@ -2766,13 +2766,57 @@ xx@pcall<??>
         textEdit = {
             start   = 3,
             finish  = 8,
-            newText = '',
+            newText = 'pcall(xx)',
         },
         additionalTextEdits = {
             {
                 start   = 0,
                 finish  = 3,
-                newText = 'pcall(xx)'
+                newText = ''
+            }
+        }
+    }
+}
+
+TEST [[
+xx()@pcall<??>
+]]
+{
+    [1] = {
+        label = 'pcall',
+        kind  = define.CompletionItemKind.Event,
+        textEdit = {
+            start   = 5,
+            finish  = 10,
+            newText = 'pcall(xx)',
+        },
+        additionalTextEdits = {
+            {
+                start   = 0,
+                finish  = 5,
+                newText = ''
+            }
+        }
+    }
+}
+
+TEST [[
+xx(1, 2, 3)@pcall<??>
+]]
+{
+    [1] = {
+        label = 'pcall',
+        kind  = define.CompletionItemKind.Event,
+        textEdit = {
+            start   = 12,
+            finish  = 17,
+            newText = 'pcall(xx, 1, 2, 3)',
+        },
+        additionalTextEdits = {
+            {
+                start   = 0,
+                finish  = 12,
+                newText = ''
             }
         }
     }

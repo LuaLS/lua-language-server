@@ -18,7 +18,22 @@ end
 register 'pcall' {
     function (state, source, callback)
         local subber = subString(state)
-        callback(('pcall(%s)'):format(subber(source.start + 1, source.finish)))
+        if source.type == 'call' then
+            if source.args and #source.args > 0 then
+                callback(string.format('pcall(%s, %s)'
+                    , subber(source.node.start + 1, source.node.finish)
+                    , subber(source.args[1].start + 1, source.args[#source.args].finish)
+                ))
+            else
+                callback(string.format('pcall(%s)'
+                    , subber(source.node.start + 1, source.node.finish)
+                ))
+            end
+        else
+            callback(string.format('pcall(%s)'
+                , subber(source.start + 1, source.finish)
+            ))
+        end
     end
 }
 
@@ -45,13 +60,13 @@ local function checkPostFix(state, word, wordPosition, position, results)
                     textEdit   = {
                         start   = wordPosition + 1,
                         finish  = position,
-                        newText = '',
+                        newText = newText,
                     },
                     additionalTextEdits = {
                         {
                             start   = source.start,
                             finish  = wordPosition + 1,
-                            newText = newText,
+                            newText = '',
                         },
                     },
                 }

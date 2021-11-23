@@ -30,7 +30,29 @@ register 'pcall' {
                 ))
             end
         else
-            callback(string.format('pcall(%s)'
+            callback(string.format('pcall(%s$1)$0'
+                , subber(source.start + 1, source.finish)
+            ))
+        end
+    end
+}
+
+register 'xpcall' {
+    function (state, source, callback)
+        local subber = subString(state)
+        if source.type == 'call' then
+            if source.args and #source.args > 0 then
+                callback(string.format('xpcall(%s, ${1:debug.traceback}, %s)$0'
+                    , subber(source.node.start + 1, source.node.finish)
+                    , subber(source.args[1].start + 1, source.args[#source.args].finish)
+                ))
+            else
+                callback(string.format('xpcall(%s, ${1:debug.traceback})$0'
+                    , subber(source.node.start + 1, source.node.finish)
+                ))
+            end
+        else
+            callback(string.format('xpcall(%s, ${1:debug.traceback}$2)$0'
                 , subber(source.start + 1, source.finish)
             ))
         end

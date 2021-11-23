@@ -2766,7 +2766,7 @@ xx@pcall<??>
         textEdit = {
             start   = 3,
             finish  = 8,
-            newText = 'pcall(xx)',
+            newText = 'pcall(xx$1)$0',
         },
         additionalTextEdits = {
             {
@@ -2775,7 +2775,7 @@ xx@pcall<??>
                 newText = ''
             }
         }
-    }
+    },
 }
 
 TEST [[
@@ -2797,7 +2797,7 @@ xx()@pcall<??>
                 newText = ''
             }
         }
-    }
+    },
 }
 
 TEST [[
@@ -2819,5 +2819,71 @@ xx(1, 2, 3)@pcall<??>
                 newText = ''
             }
         }
-    }
+    },
+}
+
+TEST [[
+xx@xpcall<??>
+]]
+{
+    [1] = {
+        label = 'xpcall',
+        kind  = define.CompletionItemKind.Event,
+        textEdit = {
+            start   = 3,
+            finish  = 9,
+            newText = 'xpcall(xx, ${1:debug.traceback}$2)$0',
+        },
+        additionalTextEdits = {
+            {
+                start   = 0,
+                finish  = 3,
+                newText = ''
+            }
+        }
+    },
+}
+
+TEST [[
+xx()@xpcall<??>
+]]
+{
+    [1] = {
+        label = 'xpcall',
+        kind  = define.CompletionItemKind.Event,
+        textEdit = {
+            start   = 5,
+            finish  = 11,
+            newText = 'xpcall(xx, ${1:debug.traceback})$0',
+        },
+        additionalTextEdits = {
+            {
+                start   = 0,
+                finish  = 5,
+                newText = ''
+            }
+        }
+    },
+}
+
+TEST [[
+xx(1, 2, 3)@xpcall<??>
+]]
+{
+    [1] = {
+        label = 'xpcall',
+        kind  = define.CompletionItemKind.Event,
+        textEdit = {
+            start   = 12,
+            finish  = 18,
+            newText = 'xpcall(xx, ${1:debug.traceback}, 1, 2, 3)$0',
+        },
+        additionalTextEdits = {
+            {
+                start   = 0,
+                finish  = 12,
+                newText = ''
+            }
+        }
+    },
 }

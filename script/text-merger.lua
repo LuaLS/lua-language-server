@@ -91,25 +91,18 @@ local function mergeRows(rows, change)
     end
 end
 
-return function (uri, changes)
-    local text
+return function (text, rows, changes)
     for _, change in ipairs(changes) do
         if change.range then
-            local rows = files.getCachedRows(uri)
-            if not rows then
-                text = text or files.getOriginText(uri) or ''
-                rows = splitRows(text)
-            end
+            rows = rows or splitRows(text)
             mergeRows(rows, change)
-            files.setCachedRows(uri, rows)
         else
-            files.setCachedRows(uri, nil)
+            rows = nil
             text = change.text
         end
     end
-    local rows = files.getCachedRows(uri)
     if rows then
         text = table.concat(rows)
     end
-    return text
+    return text, rows
 end

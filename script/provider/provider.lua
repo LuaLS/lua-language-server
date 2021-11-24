@@ -183,8 +183,11 @@ proto.on('textDocument/didChange', function (params)
     local changes = params.contentChanges
     local uri     = doc.uri
     --log.debug('changes', util.dump(changes))
-    local text = tm(uri, changes)
+    local text = files.getOriginText(uri) or ''
+    local rows = files.getCachedRows(uri)
+    text, rows = tm(text, rows, changes)
     files.setText(uri, text, true)
+    files.setCachedRows(uri, rows)
 end)
 
 proto.on('textDocument/hover', function (params)

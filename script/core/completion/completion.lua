@@ -2036,7 +2036,9 @@ local function tryCompletions(state, position, triggerCharacter, results)
         tryComment(state, position, results)
         return
     end
-    postfix(state, position, results)
+    if postfix(state, position, results) then
+        return
+    end
     trySpecial(state, position, results)
     tryCallArg(state, position, results)
     tryTable(state, position, results)

@@ -193,7 +193,7 @@ return function (state, position, results)
     if symbol == config.get 'Lua.completion.postfix' then
         local wordPosition = guide.offsetToPosition(state, offset - 1)
         checkPostFix(state, word or '', wordPosition, position, results)
-        return true
+        return symbol ~= '.' and symbol ~= ':'
     end
     return false
 end

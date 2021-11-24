@@ -786,6 +786,13 @@ function m.searchRefsByID(status, suri, expect, mode)
             end
         elseif mode == 'field'
         or     mode == 'allfield' then
+            for _, guri in ceach('def:' .. id) do
+                if uri == guri then
+                    goto CONTINUE
+                end
+                searchID(guri, id, field, uri)
+                ::CONTINUE::
+            end
             for _, guri in ceach('field:' .. id) do
                 if uri == guri then
                     goto CONTINUE

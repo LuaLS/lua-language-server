@@ -1051,3 +1051,26 @@ end
 local x: any
 ```]]
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+---@class A
+---@field x number
+G = {}
+]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+<?G?>
+]],
+    },
+    hover = [[
+```lua
+global G: A {
+    x: number,
+}
+```]]
+}

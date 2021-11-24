@@ -18,7 +18,7 @@
 * `NEW` locale `pt-br`, thanks [Jeferson Ferreira](https://github.com/jefersonf)
 * `NEW` supports [utf-8-offsets](https://clangd.llvm.org/extensions#utf-8-offsets)
 * `NEW` supports quickfix for `.luarc.json`
-* `NEW` completion postifx: `@function`, `@method`, `@pcall`, `@xpcall`, `++`, `++?`
+* `NEW` completion postifx: `@function`, `@method`, `@pcall`, `@xpcall`, `@insert`, `@remove`, `@concat`, `++`, `++?`
 * `CHG` `LuaDoc`:
   + `---@class` can be re-declared
   + supports unicode

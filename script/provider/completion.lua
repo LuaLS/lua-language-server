@@ -6,7 +6,7 @@ local config = require 'config'
 local isEnable = false
 
 local function allWords()
-    local str = '\t\n.:(\'"[,#*@|=-{/\\ '
+    local str = '\t\n.:(\'"[,#*@|=-{/\\ +?'
     local mark = {}
     local list = {}
     for c in str:gmatch '.' do

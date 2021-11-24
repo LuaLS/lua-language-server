@@ -133,6 +133,38 @@ register 'xpcall' {
     end
 }
 
+register '++' {
+    function (state, source, callback)
+        if  source.type ~= 'getglobal'
+        and source.type ~= 'getfield'
+        and source.type ~= 'getindex'
+        and source.type ~= 'getlocal' then
+            return
+        end
+        local subber = subString(state)
+        callback(string.format('%s = %s + 1'
+            , subber(source.start + 1, source.finish)
+            , subber(source.start + 1, source.finish)
+        ))
+    end
+}
+
+register '++?' {
+    function (state, source, callback)
+        if  source.type ~= 'getglobal'
+        and source.type ~= 'getfield'
+        and source.type ~= 'getindex'
+        and source.type ~= 'getlocal' then
+            return
+        end
+        local subber = subString(state)
+        callback(string.format('%s = (%s or 0) + 1'
+            , subber(source.start + 1, source.finish)
+            , subber(source.start + 1, source.finish)
+        ))
+    end
+}
+
 local accepts = {
     ['local']     = true,
     ['getlocal']  = true,
@@ -194,6 +226,21 @@ return function (state, position, results)
         local wordPosition = guide.offsetToPosition(state, offset - 1)
         checkPostFix(state, word or '', wordPosition, position, results)
         return symbol ~= '.' and symbol ~= ':'
+    end
+    if not word then
+        if symbol == '+' then
+            word = text:sub(offset - 1, offset)
+            offset = offset - 2
+        end
+        if symbol == '?' then
+            word = text:sub(offset - 2, offset)
+            offset = offset - 3
+        end
+        if word then
+            local wordPosition = guide.offsetToPosition(state, offset - 1)
+            checkPostFix(state, word or '', wordPosition, position, results)
+            return true
+        end
     end
     return false
 end

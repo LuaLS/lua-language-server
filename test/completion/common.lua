@@ -2953,3 +2953,41 @@ xx:yy@method<??>
         }
     },
 }
+
+TEST [[
+xx++<??>
+]]
+{
+    [1] = {
+        label = '++',
+        kind  = define.CompletionItemKind.Event,
+        textEdit = {
+            start   = 2,
+            finish  = 4,
+            newText = 'xx = xx + 1',
+        },
+        additionalTextEdits = {
+            {
+                start   = 0,
+                finish  = 2,
+                newText = ''
+            }
+        }
+    },
+    [2] = {
+        label = '++?',
+        kind  = define.CompletionItemKind.Event,
+        textEdit = {
+            start   = 2,
+            finish  = 4,
+            newText = 'xx = (xx or 0) + 1',
+        },
+        additionalTextEdits = {
+            {
+                start   = 0,
+                finish  = 2,
+                newText = ''
+            }
+        }
+    },
+}

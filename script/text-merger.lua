@@ -1,9 +1,15 @@
 local files   = require 'files'
 local util    = require 'utility'
 local encoder = require 'encoder'
+local client  = require 'client'
 
--- TODO
-local offsetEncoding = 'utf16'
+local offsetEncoding
+local function getOffsetEncoding()
+    if not offsetEncoding then
+        offsetEncoding = client.getOffsetEncoding():lower():gsub('%-', '')
+    end
+    return offsetEncoding
+end
 
 local function splitRows(text)
     local rows = {}
@@ -17,6 +23,7 @@ local function getLeft(text, char)
     if not text then
         return ''
     end
+    local offsetEncoding = getOffsetEncoding()
     local left
     local length = encoder.len(offsetEncoding, text)
 
@@ -35,6 +42,7 @@ local function getRight(text, char)
     if not text then
         return ''
     end
+    local offsetEncoding = getOffsetEncoding()
     local right
     local length = encoder.len(offsetEncoding, text)
 

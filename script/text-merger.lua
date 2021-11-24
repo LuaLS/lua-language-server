@@ -23,16 +23,16 @@ local function getLeft(text, char)
     if not text then
         return ''
     end
-    local offsetEncoding = getOffsetEncoding()
+    local encoding = getOffsetEncoding()
     local left
-    local length = encoder.len(offsetEncoding, text)
+    local length = encoder.len(encoding, text)
 
     if char == 0 then
         left = ''
     elseif char >= length then
         left = text
     else
-        left = text:sub(1, encoder.offset(offsetEncoding, text, char + 1) - 1)
+        left = text:sub(1, encoder.offset(encoding, text, char + 1) - 1)
     end
 
     return left
@@ -42,16 +42,16 @@ local function getRight(text, char)
     if not text then
         return ''
     end
-    local offsetEncoding = getOffsetEncoding()
+    local encoding = getOffsetEncoding()
     local right
-    local length = encoder.len(offsetEncoding, text)
+    local length = encoder.len(encoding, text)
 
     if char == 0 then
         right = text
     elseif char >= length then
         right = ''
     else
-        right = text:sub(encoder.offset(offsetEncoding, text, char + 1))
+        right = text:sub(encoder.offset(encoding, text, char + 1))
     end
 
     return right

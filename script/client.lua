@@ -41,6 +41,10 @@ function m.getOption(name)
 end
 
 function m.getAbility(name)
+    if not m.info
+    or not m.info.capabilities then
+        return nil
+    end
     local current = m.info.capabilities
     while true do
         local parent, nextPos = name:match '^([^%.]+)()'

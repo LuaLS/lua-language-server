@@ -1,12 +1,9 @@
-local files = require 'files'
 local tm    = require 'text-merger'
 
 local function TEST(source)
     return function (expect)
         return function (changes)
-            files.removeAll()
-            files.setText('', source)
-            local text = tm('', changes)
+            local text = tm(source, nil, changes)
             assert(text == expect)
         end
     end

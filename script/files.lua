@@ -150,6 +150,7 @@ function m.setText(uri, text, isTrust, instance)
     file.text       = newText
     file.trusted    = isTrust
     file.originText = text
+    file.rows       = nil
     file.words      = nil
     m.astMap[uri] = nil
     file.cache = {}

@@ -133,6 +133,60 @@ register 'xpcall' {
     end
 }
 
+register 'insert' {
+    function (state, source, callback)
+        if  source.type ~= 'getglobal'
+        and source.type ~= 'getfield'
+        and source.type ~= 'getmethod'
+        and source.type ~= 'getindex'
+        and source.type ~= 'getlocal'
+        and source.type ~= 'call'
+        and source.type ~= 'table' then
+            return
+        end
+        local subber = subString(state)
+        callback(string.format('table.insert(%s, $0)'
+            , subber(source.start + 1, source.finish)
+        ))
+    end
+}
+
+register 'remove' {
+    function (state, source, callback)
+        if  source.type ~= 'getglobal'
+        and source.type ~= 'getfield'
+        and source.type ~= 'getmethod'
+        and source.type ~= 'getindex'
+        and source.type ~= 'getlocal'
+        and source.type ~= 'call'
+        and source.type ~= 'table' then
+            return
+        end
+        local subber = subString(state)
+        callback(string.format('table.remove(%s, $0)'
+            , subber(source.start + 1, source.finish)
+        ))
+    end
+}
+
+register 'concat' {
+    function (state, source, callback)
+        if  source.type ~= 'getglobal'
+        and source.type ~= 'getfield'
+        and source.type ~= 'getmethod'
+        and source.type ~= 'getindex'
+        and source.type ~= 'getlocal'
+        and source.type ~= 'call'
+        and source.type ~= 'table' then
+            return
+        end
+        local subber = subString(state)
+        callback(string.format('table.concat(%s, $0)'
+            , subber(source.start + 1, source.finish)
+        ))
+    end
+}
+
 register '++' {
     function (state, source, callback)
         if  source.type ~= 'getglobal'
@@ -173,6 +227,7 @@ local accepts = {
     ['getindex']  = true,
     ['getmethod'] = true,
     ['call']      = true,
+    ['table']     = true,
 }
 
 local function checkPostFix(state, word, wordPosition, position, results)

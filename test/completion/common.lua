@@ -2955,6 +2955,28 @@ xx:yy@method<??>
 }
 
 TEST [[
+xx@insert<??>
+]]
+{
+    [1] = {
+        label = 'insert',
+        kind  = define.CompletionItemKind.Event,
+        textEdit = {
+            start   = 3,
+            finish  = 9,
+            newText = 'table.insert(xx, $0)',
+        },
+        additionalTextEdits = {
+            {
+                start   = 0,
+                finish  = 3,
+                newText = ''
+            }
+        }
+    },
+}
+
+TEST [[
 xx++<??>
 ]]
 {

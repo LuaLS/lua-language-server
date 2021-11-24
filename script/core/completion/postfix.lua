@@ -3,6 +3,7 @@ local lookback     = require 'core.look-backward'
 local matchKey     = require 'core.matchkey'
 local subString    = require 'core.substring'
 local define       = require 'proto.define'
+local markdown     = require 'provider.markdown'
 
 local actions = {}
 
@@ -79,6 +80,9 @@ local function checkPostFix(state, word, wordPosition, position, results)
                 results[#results+1] = {
                     label      = action.key,
                     kind       = define.CompletionItemKind.Event,
+                    description= markdown()
+                                    : add('lua', newText)
+                                    : string(),
                     textEdit   = {
                         start   = wordPosition + 1,
                         finish  = position,

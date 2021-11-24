@@ -13,7 +13,7 @@ end
 ---@param text string|markdown
 function mt:add(language, text)
     if not text then
-        return
+        return self
     end
     self._cacheResult = nil
     if type(text) == 'table' then
@@ -29,6 +29,7 @@ function mt:add(language, text)
             text     = text,
         }
     end
+    return self
 end
 
 function mt:splitLine()
@@ -36,6 +37,7 @@ function mt:splitLine()
     self[#self+1] = {
         type = 'splitline',
     }
+    return self
 end
 
 function mt:string()

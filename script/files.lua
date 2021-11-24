@@ -1,4 +1,5 @@
 local platform = require 'bee.platform'
+local fs       = require 'bee.filesystem'
 local config   = require 'config'
 local glob     = require 'glob'
 local furi     = require 'file-uri'
@@ -28,6 +29,33 @@ m.globalVersion  = 0
 m.fileCount      = 0
 m.astCount       = 0
 m.astMap         = {} -- setmetatable({}, { __mode = 'v' })
+
+local fixedUri = {}
+--- 获取文件的真实uri(真实大小写)
+---@param uri uri
+---@return uri
+function m.getRealUri(uri)
+    if platform.OS ~= 'Windows' then
+        return uri
+    end
+    local filename = furi.decode(uri)
+    local path = fs.path(filename)
+    local suc, res = pcall(fs.exists, path)
+    if not suc or not res then
+        return uri
+    end
+    suc, res = pcall(fs.canonical, path)
+    if not suc or res:string() == filename then
+        return uri
+    end
+    filename = res:string()
+    local ruri = furi.encode(filename)
+    if not fixedUri[ruri] then
+        fixedUri[ruri] = true
+        log.warn(('Fix real file uri: %s -> %s'):format(uri, ruri))
+    end
+    return ruri
+end
 
 --- 打开文件
 ---@param uri uri

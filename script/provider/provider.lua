@@ -112,7 +112,7 @@ end)
 proto.on('textDocument/didOpen', function (params)
     workspace.awaitReady()
     local doc   = params.textDocument
-    local uri   = doc.uri
+    local uri   = files.getRealUri(doc.uri)
     local text  = doc.text
     log.debug('didOpen', uri)
     files.setText(uri, text, true)
@@ -121,7 +121,7 @@ end)
 
 proto.on('textDocument/didClose', function (params)
     local doc   = params.textDocument
-    local uri   = doc.uri
+    local uri   = files.getRealUri(doc.uri)
     log.debug('didClose', uri)
     files.close(uri)
     if not files.isLua(uri) then
@@ -133,7 +133,7 @@ proto.on('textDocument/didChange', function (params)
     workspace.awaitReady()
     local doc     = params.textDocument
     local changes = params.contentChanges
-    local uri     = doc.uri
+    local uri     = files.getRealUri(doc.uri)
     --log.debug('changes', util.dump(changes))
     local text = files.getOriginText(uri) or ''
     local rows = files.getCachedRows(uri)
@@ -144,7 +144,7 @@ end)
 
 proto.on('textDocument/hover', function (params)
     local doc    = params.textDocument
-    local uri    = doc.uri
+    local uri    = files.getRealUri(doc.uri)
     if not workspace.isReady() then
         local count, max = workspace.getLoadProcess()
         return {
@@ -177,7 +177,7 @@ proto.on('textDocument/definition', function (params)
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_DEFINITION, 0.5)
     local core   = require 'core.definition'
-    local uri    = params.textDocument.uri
+    local uri    = files.getRealUri(params.textDocument.uri)
     if not files.exists(uri) then
         return nil
     end
@@ -212,7 +212,7 @@ proto.on('textDocument/typeDefinition', function (params)
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_TYPE_DEFINITION, 0.5)
     local core   = require 'core.type-definition'
-    local uri    = params.textDocument.uri
+    local uri    = files.getRealUri(params.textDocument.uri)
     if not files.exists(uri) then
         return nil
     end
@@ -247,7 +247,7 @@ proto.on('textDocument/references', function (params)
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_REFERENCE, 0.5)
     local core   = require 'core.reference'
-    local uri    = params.textDocument.uri
+    local uri    = files.getRealUri(params.textDocument.uri)
     if not files.exists(uri) then
         return nil
     end
@@ -268,7 +268,7 @@ end)
 
 proto.on('textDocument/documentHighlight', function (params)
     local core = require 'core.highlight'
-    local uri  = params.textDocument.uri
+    local uri  = files.getRealUri(params.textDocument.uri)
     if not files.exists(uri) then
         return nil
     end
@@ -291,7 +291,7 @@ proto.on('textDocument/rename', function (params)
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_RENAME, 0.5)
     local core = require 'core.rename'
-    local uri  = params.textDocument.uri
+    local uri  = files.getRealUri(params.textDocument.uri)
     if not files.exists(uri) then
         return nil
     end
@@ -316,7 +316,7 @@ end)
 
 proto.on('textDocument/prepareRename', function (params)
     local core = require 'core.rename'
-    local uri  = params.textDocument.uri
+    local uri  = files.getRealUri(params.textDocument.uri)
     if not files.exists(uri) then
         return nil
     end
@@ -332,7 +332,7 @@ proto.on('textDocument/prepareRename', function (params)
 end)
 
 proto.on('textDocument/completion', function (params)
-    local uri  = params.textDocument.uri
+    local uri  = files.getRealUri(params.textDocument.uri)
     if not workspace.isReady() then
         local count, max = workspace.getLoadProcess()
         return {
@@ -483,7 +483,7 @@ proto.on('textDocument/signatureHelp', function (params)
     end
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SIGNATURE, 0.5)
-    local uri = params.textDocument.uri
+    local uri = files.getRealUri(params.textDocument.uri)
     if not files.exists(uri) then
         return nil
     end
@@ -523,7 +523,7 @@ proto.on('textDocument/documentSymbol', function (params)
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SYMBOL, 0.5)
     local core = require 'core.document-symbol'
-    local uri   = params.textDocument.uri
+    local uri   = files.getRealUri(params.textDocument.uri)
 
     local symbols = core(uri)
     if not symbols then
@@ -562,7 +562,7 @@ end)
 
 proto.on('textDocument/codeAction', function (params)
     local core        = require 'core.code-action'
-    local uri         = params.textDocument.uri
+    local uri         = files.getRealUri(params.textDocument.uri)
     local range       = params.range
     local diagnostics = params.context.diagnostics
     if not files.exists(uri) then
@@ -641,7 +641,7 @@ proto.on('workspace/symbol', function (params)
 end)
 
 proto.on('textDocument/semanticTokens/full', function (params)
-    local uri = params.textDocument.uri
+    local uri = files.getRealUri(params.textDocument.uri)
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
     local core = require 'core.semantic-tokens'
@@ -652,7 +652,7 @@ proto.on('textDocument/semanticTokens/full', function (params)
 end)
 
 proto.on('textDocument/semanticTokens/range', function (params)
-    local uri = params.textDocument.uri
+    local uri = files.getRealUri(params.textDocument.uri)
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_RANGE, 0.5)
     local core = require 'core.semantic-tokens'
@@ -673,7 +673,7 @@ end)
 
 proto.on('textDocument/foldingRange', function (params)
     local core    = require 'core.folding'
-    local uri     = params.textDocument.uri
+    local uri     = files.getRealUri(params.textDocument.uri)
     if not files.exists(uri) then
         return nil
     end
@@ -706,7 +706,7 @@ proto.on('window/workDoneProgress/cancel', function (params)
 end)
 
 proto.on('$/didChangeVisibleRanges', function (params)
-    local uri = params.uri
+    local uri = files.getRealUri(params.uri)
     await.close('visible:' .. uri)
     await.setID('visible:' .. uri)
     await.delay()
@@ -732,7 +732,7 @@ proto.on('textDocument/onTypeFormatting', function (params)
     workspace.awaitReady()
     local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
     local ch     = params.ch
-    local uri    = params.textDocument.uri
+    local uri    = files.getRealUri(params.textDocument.uri)
     if not files.exists(uri) then
         return nil
     end
@@ -766,7 +766,7 @@ proto.on('$/requestHint', function (params)
         return
     end
     workspace.awaitReady()
-    local uri           = params.textDocument.uri
+    local uri           = files.getRealUri(params.textDocument.uri)
     local start, finish = converter.unpackRange(uri, params.range)
     local results = core(uri, start, finish)
     local hintResults = {}
@@ -848,7 +848,7 @@ files.watch(function (ev, uri)
     if ev == 'update'
     or ev == 'remove' then
         for id, p in pairs(proto.holdon) do
-            if p.params.textDocument and p.params.textDocument.uri == uri then
+            if p.params.textDocument and files.getRealUri(p.params.textDocument.uri) == uri then
                 proto.close(id, define.ErrorCodes.ContentModified)
             end
         end

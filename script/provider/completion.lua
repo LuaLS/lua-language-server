@@ -7,9 +7,16 @@ local isEnable = false
 
 local function allWords()
     local str = '\t\n.:(\'"[,#*@|=-{/\\ '
+    local mark = {}
     local list = {}
     for c in str:gmatch '.' do
         list[#list+1] = c
+        mark[c] = true
+    end
+    local postfix = config.get 'Lua.completion.postfix'
+    if postfix ~= '' and not mark[postfix] then
+        list[#list+1] = postfix
+        mark[postfix] = true
     end
     return list
 end
@@ -66,6 +73,12 @@ config.watch(function (key, value)
             enable()
         else
             disable()
+        end
+    end
+    if key == 'Lua.completion.postfix' then
+        if config.get 'Lua.completion.enable' then
+            disable()
+            enable()
         end
     end
 end)

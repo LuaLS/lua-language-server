@@ -718,15 +718,6 @@ local function checkCommon(state, word, position, results)
     end
 end
 
-local function isInString(state, position)
-    return guide.eachSourceContain(state.ast, position, function (source)
-        if  source.type == 'string'
-        and source.start  < position then
-            return true
-        end
-    end)
-end
-
 local function checkKeyWord(state, start, position, word, hasSpace, afterLocal, results)
     local text = state.lua
     local snipType = config.get 'Lua.completion.keywordSnippet'
@@ -1204,7 +1195,7 @@ local function isFuncArg(state, position)
 end
 
 local function trySpecial(state, position, results)
-    if isInString(state, position) then
+    if guide.isInString(state.ast, position) then
         checkUri(state, position, results)
         checkEqualEnumInString(state, position, results)
         return
@@ -1238,7 +1229,7 @@ local function tryWord(state, position, triggerCharacter, results)
         startPos = guide.offsetToPosition(state, start - 1)
     end
     local hasSpace = triggerCharacter ~= nil and finish ~= offset
-    if isInString(state, position) then
+    if guide.isInString(state.ast, position) then
         if not hasSpace then
             if #results == 0 then
                 checkCommon(state, word, position, results)
@@ -1284,7 +1275,7 @@ local function trySymbol(state, position, results)
     if not symbol then
         return nil
     end
-    if isInString(state, position) then
+    if guide.isInString(state.ast, position) then
         return nil
     end
     local startPos = guide.offsetToPosition(state, start)
@@ -2045,9 +2036,7 @@ local function tryCompletions(state, position, triggerCharacter, results)
         tryComment(state, position, results)
         return
     end
-    if postfix(state, position, results) then
-        return
-    end
+    postfix(state, position, results)
     trySpecial(state, position, results)
     tryCallArg(state, position, results)
     tryTable(state, position, results)

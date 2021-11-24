@@ -4,6 +4,7 @@
 * `NEW` settings:
   + `Lua.runtime.pathStrict`: not check subdirectories when using `runtime.path`
   + `Lua.hint.await`: display `await` when calling a function marked as async
+  + `Lua.completion.postfix`: the symbol that triggers postfix, default is `@`
 * `NEW` add supports for `lovr`
 * `NEW` file encoding supports `utf16le` and `utf16be`
 * `NEW` full IntelliSense supports for literal tables, see [#720](https://github.com/sumneko/lua-language-server/issues/720) and [#727](https://github.com/sumneko/lua-language-server/issues/727)
@@ -17,6 +18,7 @@
 * `NEW` locale `pt-br`, thanks [Jeferson Ferreira](https://github.com/jefersonf)
 * `NEW` supports [utf-8-offsets](https://clangd.llvm.org/extensions#utf-8-offsets)
 * `NEW` supports quickfix for `.luarc.json`
+* `NEW` completion postifx: `@function`, `@method`, `@pcall`, `@xpcall`
 * `CHG` `LuaDoc`:
   + `---@class` can be re-declared
   + supports unicode

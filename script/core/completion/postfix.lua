@@ -4,6 +4,7 @@ local matchKey     = require 'core.matchkey'
 local subString    = require 'core.substring'
 local define       = require 'proto.define'
 local markdown     = require 'provider.markdown'
+local config       = require 'config'
 
 local actions = {}
 
@@ -148,6 +149,9 @@ local function checkPostFix(state, word, wordPosition, position, results)
             return source
         end
     end)
+    if not source then
+        return
+    end
     for _, action in ipairs(actions) do
         if matchKey(word, action.key) then
             action.data[1](state, source, function (newText)
@@ -176,6 +180,9 @@ local function checkPostFix(state, word, wordPosition, position, results)
 end
 
 return function (state, position, results)
+    if guide.isInString(state.ast, position) then
+        return false
+    end
     local text = state.lua
     local offset = guide.positionToOffset(state, position)
     local word, newOffset = lookback.findWord(text, offset)
@@ -183,7 +190,7 @@ return function (state, position, results)
         offset = newOffset - 1
     end
     local symbol = text:sub(offset, offset)
-    if symbol == '@' then
+    if symbol == config.get 'Lua.completion.postfix' then
         local wordPosition = guide.offsetToPosition(state, offset - 1)
         checkPostFix(state, word or '', wordPosition, position, results)
         return true

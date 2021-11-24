@@ -1151,4 +1151,14 @@ function m.isGlobal(source)
     return false
 end
 
+function m.isInString(ast, position)
+    return m.eachSourceContain(ast, position, function (source)
+        if  source.type == 'string'
+        and source.start < position then
+            return true
+        end
+    end)
+end
+
+
 return m

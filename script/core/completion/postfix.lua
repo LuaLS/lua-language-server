@@ -16,8 +16,72 @@ local function register(key)
     end
 end
 
+local function hasNonFieldInNode(source)
+    local block = guide.getParentBlock(source)
+    while source ~= block do
+        if source.type == 'call'
+        or source.type == 'getindex'
+        or source.type == 'getmethod' then
+            return true
+        end
+        source = source.parent
+    end
+    return false
+end
+
+register 'function' {
+    function (state, source, callback)
+        if  source.type ~= 'getglobal'
+        and source.type ~= 'getfield'
+        and source.type ~= 'getlocal'
+        and source.type ~= 'local' then
+            return
+        end
+        if hasNonFieldInNode(source) then
+            return
+        end
+        local subber = subString(state)
+        callback(string.format('function %s($1)\n\t$0\nend'
+            , subber(source.start + 1, source.finish)
+        ))
+    end
+}
+
+register 'method' {
+    function (state, source, callback)
+        if  source.type == 'getfield' then
+            if hasNonFieldInNode(source) then
+                return
+            end
+            local subber = subString(state)
+            callback(string.format('function %s:%s($1)\n\t$0\nend'
+                , subber(source.start + 1, source.dot.start)
+                , subber(source.dot .finish + 1, source.finish)
+            ))
+        end
+        if  source.type == 'getmethod' then
+            if hasNonFieldInNode(source.parent) then
+                return
+            end
+            local subber = subString(state)
+            callback(string.format('function %s:%s($1)\n\t$0\nend'
+                , subber(source.start + 1, source.colon.start)
+                , subber(source.colon.finish + 1, source.finish)
+            ))
+        end
+    end
+}
+
 register 'pcall' {
     function (state, source, callback)
+        if  source.type ~= 'getglobal'
+        and source.type ~= 'getfield'
+        and source.type ~= 'getmethod'
+        and source.type ~= 'getindex'
+        and source.type ~= 'getlocal'
+        and source.type ~= 'call' then
+            return
+        end
         local subber = subString(state)
         if source.type == 'call' then
             if source.args and #source.args > 0 then
@@ -40,6 +104,14 @@ register 'pcall' {
 
 register 'xpcall' {
     function (state, source, callback)
+        if  source.type ~= 'getglobal'
+        and source.type ~= 'getfield'
+        and source.type ~= 'getmethod'
+        and source.type ~= 'getindex'
+        and source.type ~= 'getlocal'
+        and source.type ~= 'call' then
+            return
+        end
         local subber = subString(state)
         if source.type == 'call' then
             if source.args and #source.args > 0 then
@@ -61,6 +133,8 @@ register 'xpcall' {
 }
 
 local accepts = {
+    ['local']     = true,
+    ['getlocal']  = true,
     ['getglobal'] = true,
     ['getfield']  = true,
     ['getindex']  = true,

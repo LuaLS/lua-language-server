@@ -2887,3 +2887,69 @@ xx(1, 2, 3)@xpcall<??>
         }
     },
 }
+
+TEST [[
+xx@function<??>
+]]
+{
+    [1] = {
+        label = 'function',
+        kind  = define.CompletionItemKind.Event,
+        textEdit = {
+            start   = 3,
+            finish  = 11,
+            newText = 'function xx($1)\n\t$0\nend',
+        },
+        additionalTextEdits = {
+            {
+                start   = 0,
+                finish  = 3,
+                newText = ''
+            }
+        }
+    },
+}
+
+TEST [[
+xx.yy@method<??>
+]]
+{
+    [1] = {
+        label = 'method',
+        kind  = define.CompletionItemKind.Event,
+        textEdit = {
+            start   = 6,
+            finish  = 12,
+            newText = 'function xx:yy($1)\n\t$0\nend',
+        },
+        additionalTextEdits = {
+            {
+                start   = 0,
+                finish  = 6,
+                newText = ''
+            }
+        }
+    },
+}
+
+TEST [[
+xx:yy@method<??>
+]]
+{
+    [1] = {
+        label = 'method',
+        kind  = define.CompletionItemKind.Event,
+        textEdit = {
+            start   = 6,
+            finish  = 12,
+            newText = 'function xx:yy($1)\n\t$0\nend',
+        },
+        additionalTextEdits = {
+            {
+                start   = 0,
+                finish  = 6,
+                newText = ''
+            }
+        }
+    },
+}

@@ -109,54 +109,6 @@ proto.on('workspace/didChangeConfiguration', function ()
     updateConfig()
 end)
 
-proto.on('workspace/didCreateFiles', function (params)
-    log.debug('workspace/didCreateFiles', util.dump(params))
-    for _, file in ipairs(params.files) do
-        if workspace.isValidLuaUri(file.uri) then
-            files.setText(file.uri, pub.awaitTask('loadFile', file.uri), false)
-        end
-    end
-end)
-
-proto.on('workspace/didDeleteFiles', function (params)
-    log.debug('workspace/didDeleteFiles', util.dump(params))
-    for _, file in ipairs(params.files) do
-        files.remove(file.uri)
-        local childs = files.getChildFiles(file.uri)
-        for _, uri in ipairs(childs) do
-            log.debug('workspace/didDeleteFiles#child', uri)
-            files.remove(uri)
-        end
-    end
-end)
-
-proto.on('workspace/didRenameFiles', function (params)
-    log.debug('workspace/didRenameFiles', util.dump(params))
-    for _, file in ipairs(params.files) do
-        local text = files.getOriginText(file.oldUri)
-        if text then
-            files.remove(file.oldUri)
-            if workspace.isValidLuaUri(file.newUri) then
-                files.setText(file.newUri, text, false)
-            end
-        end
-        local childs = files.getChildFiles(file.oldUri)
-        for _, uri in ipairs(childs) do
-            local ctext = files.getOriginText(uri)
-            if ctext then
-                local ouri = uri
-                local tail = ouri:sub(#file.oldUri)
-                local nuri = file.newUri .. tail
-                log.debug('workspace/didRenameFiles#child', ouri, nuri)
-                files.remove(uri)
-                if workspace.isValidLuaUri(nuri) then
-                    files.setText(nuri, text, false)
-                end
-            end
-        end
-    end
-end)
-
 proto.on('textDocument/didOpen', function (params)
     workspace.awaitReady()
     local doc   = params.textDocument

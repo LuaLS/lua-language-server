@@ -45,7 +45,7 @@ function m.getRealUri(uri)
         return uri
     end
     suc, res = pcall(fs.canonical, path)
-    if not suc or res:string() == filename then
+    if not suc or res:string():gsub('/', '\\') == filename then
         return uri
     end
     filename = res:string()

@@ -1047,16 +1047,11 @@ compileNodeMap = util.switch()
         end
         if source.bindSources then
             for _, src in ipairs(source.bindSources) do
-                if src.type == 'local'
-                or src.type == 'tablefield'
-                or src.type == 'tableindex'
-                or src.type == 'setglobal'
-                or guide.isGlobal(src) then
-                    if  src.parent.type ~= 'funcargs'
-                    and not src.dummy then
-                        pushForward(noders, getID(src), id)
-                        pushForward(noders, id, getID(src))
-                    end
+                if  src.parent.type ~= 'funcargs'
+                and src.type ~= 'setmethod'
+                and not src.dummy then
+                    pushForward(noders, getID(src), id)
+                    pushForward(noders, id, getID(src))
                 end
             end
         end

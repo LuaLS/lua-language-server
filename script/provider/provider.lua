@@ -87,7 +87,19 @@ m.register 'initialize' {
     function (params)
         client.init(params)
         config.init()
-        workspace.initPath(params.rootUri)
+
+        if params.rootUri then
+            workspace.initRoot(params.rootUri)
+        end
+
+        if params.workspaceFolders then
+            for _, folder in ipairs(params.workspaceFolders) do
+                workspace.create(folder.uri)
+            end
+        elseif params.rootUri then
+            workspace.create(params.rootUri)
+        end
+
         return {
             capabilities = cap.getIniter(),
             serverInfo   = {

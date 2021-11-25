@@ -11,7 +11,7 @@ local guide    = require 'parser.guide'
 local noder    = require 'core.noder'
 
 local function collectRequire(mode, literal)
-    local rootPath = ws.path or ''
+    local rootPath = ws.rootPath or ''
     local result, searchers
     if     mode == 'require' then
         result, searchers = ws.findUrisByRequirePath(literal)

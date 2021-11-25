@@ -190,7 +190,7 @@ function m.reportStatus()
         info.text = '😺Lua'
     end
     info.tooltip = lang.script('WINDOW_LUA_STATUS', {
-        ws  = ws.path or '',
+        ws  = ws.rootPath or '',
         ast = files.astCount,
         max = files.fileCount,
         mem = collectgarbage('count') / 1000,

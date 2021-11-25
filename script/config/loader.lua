@@ -79,23 +79,23 @@ function m.loadClientConfig()
     local configs = proto.awaitRequest('workspace/configuration', {
         items = {
             {
-                scopeUri = workspace.uri,
+                scopeUri = workspace.rootUri,
                 section = 'Lua',
             },
             {
-                scopeUri = workspace.uri,
+                scopeUri = workspace.rootUri,
                 section = 'files.associations',
             },
             {
-                scopeUri = workspace.uri,
+                scopeUri = workspace.rootUri,
                 section = 'files.exclude',
             },
             {
-                scopeUri = workspace.uri,
+                scopeUri = workspace.rootUri,
                 section = 'editor.semanticHighlighting.enabled',
             },
             {
-                scopeUri = workspace.uri,
+                scopeUri = workspace.rootUri,
                 section = 'editor.acceptSuggestionOnEnter',
             },
         },

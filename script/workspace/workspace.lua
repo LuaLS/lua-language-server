@@ -16,6 +16,7 @@ local plugin     = require 'plugin'
 local util       = require 'utility'
 local fw         = require 'filewatch'
 
+---@class workspace
 local m = {}
 m.type = 'workspace'
 m.nativeVersion  = -1
@@ -28,22 +29,29 @@ m.requireCache   = {}
 m.cache          = {}
 m.watchers       = {}
 m.matchOption    = {}
+---@type {uri: uri, path: string}[]
+m.workSpaces     = {}
 
---- 初始化工作区
-function m.initPath(uri)
-    log.info('Workspace inited: ', uri)
-    if not uri then
-        return
-    end
-    m.uri  = uri
-    m.path = m.normalize(furi.decode(uri))
-    plugin.workspace = m.path
+function m.initRoot(uri)
+    m.rootUri  = uri
+    m.rootPath = furi.decode(uri)
+    log.info('Workspace init root: ', uri)
+
     local logPath = fs.path(LOGPATH) / (uri:gsub('[/:]+', '_') .. '.log')
     client.logMessage('Log', 'Log path: ' .. furi.encode(logPath:string()))
     log.info('Log path: ', logPath)
     log.init(ROOT, logPath)
+end
 
-    fw.watch(m.path)
+--- 初始化工作区
+function m.create(uri)
+    log.info('Workspace create: ', uri)
+    local path = m.normalize(furi.decode(uri))
+    m.workSpaces[#m.workSpaces+1] = {
+        uri  = uri,
+        path = path,
+    }
+    fw.watch(path)
 end
 
 local globInteferFace = {
@@ -76,7 +84,7 @@ local globInteferFace = {
 --- 创建排除文件匹配器
 ---@async
 function m.getNativeMatcher()
-    if not m.path then
+    if not m.rootPath then
         return nil
     end
     if m.nativeMatcher then
@@ -93,7 +101,7 @@ function m.getNativeMatcher()
     end
     -- config.get 'workspace.useGitIgnore'
     if config.get 'Lua.workspace.useGitIgnore' then
-        local buf = pub.awaitTask('loadFile', furi.encode(m.path .. '/.gitignore'))
+        local buf = pub.awaitTask('loadFile', furi.encode(m.rootPath .. '/.gitignore'))
         if buf then
             for line in buf:gmatch '[^\r\n]+' do
                 if line:sub(1, 1) ~= '#' then
@@ -102,7 +110,7 @@ function m.getNativeMatcher()
                 end
             end
         end
-        buf = pub.awaitTask('loadFile', furi.encode(m.path .. '/.git/info/exclude'))
+        buf = pub.awaitTask('loadFile', furi.encode(m.rootPath .. '/.git/info/exclude'))
         if buf then
             for line in buf:gmatch '[^\r\n]+' do
                 if line:sub(1, 1) ~= '#' then
@@ -114,7 +122,7 @@ function m.getNativeMatcher()
     end
     -- config.get 'workspace.ignoreSubmodules'
     if config.get 'Lua.workspace.ignoreSubmodules' then
-        local buf = pub.awaitTask('loadFile', furi.encode(m.path .. '/.gitmodules'))
+        local buf = pub.awaitTask('loadFile', furi.encode(m.rootPath .. '/.gitmodules'))
         if buf then
             for path in buf:gmatch('path = ([^\r\n]+)') do
                 log.info('Ignore by .gitmodules:', path)
@@ -137,7 +145,7 @@ function m.getNativeMatcher()
     end
 
     m.nativeMatcher = glob.gitignore(pattern, m.matchOption, globInteferFace)
-    m.nativeMatcher:setOption('root', m.path)
+    m.nativeMatcher:setOption('root', m.rootPath)
 
     m.nativeVersion = config.get 'version'
     return m.nativeMatcher
@@ -294,10 +302,10 @@ function m.awaitLoadFile(uri)
             progressBar:setPercentage(self.read / self.max * 100)
         end
     }
-    local nativeLoader    = loadFileFactory(m.path, progressData)
+    local nativeLoader    = loadFileFactory(m.rootPath, progressData)
     local native          = m.getNativeMatcher()
     if native then
-        log.info('Scan files at:', m.path)
+        log.info('Scan files at:', m.rootPath)
         native:scan(furi.decode(uri), nativeLoader)
     end
 end
@@ -333,12 +341,12 @@ function m.awaitPreload()
         end
     }
     log.info('Preload start.')
-    local nativeLoader    = loadFileFactory(m.path, progressData)
+    local nativeLoader    = loadFileFactory(m.rootPath, progressData)
     local native          = m.getNativeMatcher()
     local librarys        = m.getLibraryMatchers()
     if native then
-        log.info('Scan files at:', m.path)
-        native:scan(m.path, nativeLoader)
+        log.info('Scan files at:', m.rootPath)
+        native:scan(m.rootPath, nativeLoader)
     end
     for _, library in ipairs(librarys) do
         local libraryLoader = loadFileFactory(library.path, progressData, true)
@@ -505,10 +513,10 @@ function m.getAbsolutePath(path)
     end
     path = m.normalize(path)
     if fs.path(path):is_relative() then
-        if not m.path then
+        if not m.rootPath then
             return nil
         end
-        path = m.normalize(m.path .. '/' .. path)
+        path = m.normalize(m.rootPath .. '/' .. path)
     end
     return path
 end
@@ -522,11 +530,11 @@ function m.getRelativePath(uriOrPath)
     else
         path = uriOrPath
     end
-    if not m.path then
+    if not m.rootPath then
         local relative = m.normalize(path)
         return relative:gsub('^[/\\]+', '')
     end
-    local _, pos = m.normalize(path):find(m.path, 1, true)
+    local _, pos = m.normalize(path):find(m.rootPath, 1, true)
     if pos then
         return m.normalize(path:sub(pos + 1)):gsub('^[/\\]+', '')
     else
@@ -535,10 +543,10 @@ function m.getRelativePath(uriOrPath)
 end
 
 function m.isWorkspaceUri(uri)
-    if not m.uri then
+    if not m.rootUri then
         return false
     end
-    local ruri = m.uri
+    local ruri = m.rootUri
     return uri:sub(1, #ruri) == ruri
 end
 

@@ -221,14 +221,14 @@ local rawConfig = {}
 local m = {}
 m.watchList = {}
 
-local function update(key, value, raw)
+local function update(uri, key, value, raw)
     local oldValue = config[key]
     config[key]    = value
     rawConfig[key] = raw
     m.event(key, value, oldValue)
 end
 
-function m.set(key, value)
+function m.set(uri, key, value)
     local unit = Template[key]
     if not unit then
         return false
@@ -237,14 +237,14 @@ function m.set(key, value)
         return false
     end
     if unit:checker(value) then
-        update(key, unit:loader(value), value)
+        update(uri, key, unit:loader(value), value)
     else
-        update(key, unit.default, unit.default)
+        update(uri, key, unit.default, unit.default)
     end
     return true
 end
 
-function m.add(key, value)
+function m.add(uri, key, value)
     local unit = Template[key]
     if not unit then
         return false
@@ -262,12 +262,12 @@ function m.add(key, value)
     end
     copyed[#copyed+1] = value
     if unit:checker(copyed) then
-        update(key, unit:loader(copyed), copyed)
+        update(uri, key, unit:loader(copyed), copyed)
     end
     return true
 end
 
-function m.prop(key, prop, value)
+function m.prop(uri, key, prop, value)
     local unit = Template[key]
     if not unit then
         return false
@@ -285,12 +285,12 @@ function m.prop(key, prop, value)
     end
     copyed[prop] = value
     if unit:checker(copyed) then
-        update(key, unit:loader(copyed), copyed)
+        update(uri, key, unit:loader(copyed), copyed)
     end
     return true
 end
 
-function m.get(key)
+function m.get(uri, key)
     return config[key]
 end
 
@@ -320,7 +320,7 @@ function m.dump()
     return dump
 end
 
-function m.update(new)
+function m.update(uri, new)
     local function expand(t, left)
         for key, value in pairs(t) do
             local fullKey = key
@@ -328,9 +328,9 @@ function m.update(new)
                 fullKey = left .. '.' .. key
             end
             if Template[fullKey] then
-                m.set(fullKey, value)
+                m.set(uri, fullKey, value)
             elseif Template['Lua.' .. fullKey] then
-                m.set('Lua.' .. fullKey, value)
+                m.set(uri, 'Lua.' .. fullKey, value)
             elseif type(value) == 'table' then
                 expand(value, fullKey)
             end
@@ -371,7 +371,7 @@ function m.init()
     end
     m.inited = true
     for key, unit in pairs(Template) do
-        m.set(key, unit.default)
+        m.set(nil, key, unit.default)
     end
 end
 

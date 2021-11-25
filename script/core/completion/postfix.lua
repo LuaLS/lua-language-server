@@ -277,7 +277,7 @@ return function (state, position, results)
         offset = newOffset - 1
     end
     local symbol = text:sub(offset, offset)
-    if symbol == config.get 'Lua.completion.postfix' then
+    if symbol == config.get(nil, 'Lua.completion.postfix') then
         local wordPosition = guide.offsetToPosition(state, offset - 1)
         checkPostFix(state, word or '', wordPosition, position, results)
         return symbol ~= '.' and symbol ~= ':'

@@ -136,7 +136,7 @@ end
 
 ---@async
 return function (source)
-    local maxFields = config.get 'Lua.hover.previewFields'
+    local maxFields = config.get(nil, 'Lua.hover.previewFields')
     if maxFields <= 0 then
         return 'table'
     end

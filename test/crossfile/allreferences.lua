@@ -68,7 +68,7 @@ TEST {
     },
 }
 
-config.set('Lua.IntelliSense.traceBeSetted', true)
+config.set(nil, 'Lua.IntelliSense.traceBeSetted', true)
 TEST {
     {
         path = 'a.lua',
@@ -215,5 +215,4 @@ TEST {
         ]]
     },
 }
-config.set('Lua.IntelliSense.traceBeSetted', false)
-
+config.set(nil, 'Lua.IntelliSense.traceBeSetted', false)

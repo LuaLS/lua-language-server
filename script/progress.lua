@@ -83,7 +83,7 @@ function mt:_update()
     and self._clock + self._delay <= os.clock() then
         self._updated = os.clock()
         self._dirty = false
-        if not config.get 'Lua.window.progressBar' then
+        if not config.get(nil, 'Lua.window.progressBar') then
             return
         end
         proto.request('window/workDoneProgress/create', {
@@ -106,7 +106,7 @@ function mt:_update()
     if not self._showed then
         return
     end
-    if not config.get 'Lua.window.progressBar' then
+    if not config.get(nil, 'Lua.window.progressBar') then
         self:remove()
         return
     end

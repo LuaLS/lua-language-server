@@ -180,7 +180,7 @@ local function buildDetail(source)
 end
 
 local function getSnip(source)
-    local context = config.get 'Lua.completion.displayContext'
+    local context = config.get(nil, 'Lua.completion.displayContext')
     if context <= 0 then
         return nil
     end
@@ -222,7 +222,7 @@ local function buildDesc(source)
 end
 
 local function buildFunction(results, source, value, oop, data)
-    local snipType = config.get 'Lua.completion.callSnippet'
+    local snipType = config.get(nil, 'Lua.completion.callSnippet')
     if snipType == 'Disable' or snipType == 'Both' then
         results[#results+1] = data
     end
@@ -324,7 +324,7 @@ local function checkLocal(state, word, position, results)
 end
 
 local function checkModule(state, word, position, results)
-    if not config.get 'Lua.completion.autoRequire' then
+    if not config.get(nil, 'Lua.completion.autoRequire') then
         return
     end
     local locals  = guide.getVisibleLocals(state.ast, position)
@@ -337,7 +337,7 @@ local function checkModule(state, word, position, results)
         local stemName = fileName:gsub('%..+', '')
         if  not locals[stemName]
         and not vm.hasGlobalSets(stemName)
-        and not config.get 'Lua.diagnostics.globals'[stemName]
+        and not config.get(nil, 'Lua.diagnostics.globals')[stemName]
         and stemName:match '^[%a_][%w_]*$'
         and matchKey(word, stemName) then
             local targetState = files.getState(uri)
@@ -448,8 +448,8 @@ local function checkFieldFromFieldToIndex(state, name, src, parent, word, startP
             }
         end
     else
-        if config.get 'Lua.runtime.version' == 'lua 5.1'
-        or config.get 'Lua.runtime.version' == 'luaJIT' then
+        if config.get(nil, 'Lua.runtime.version') == 'lua 5.1'
+        or config.get(nil, 'Lua.runtime.version') == 'luaJIT' then
             textEdit.newText = '_G' .. textEdit.newText
         else
             textEdit.newText = '_ENV' .. textEdit.newText
@@ -536,7 +536,7 @@ local function checkFieldOfRefs(refs, state, word, startPos, position, parent, o
             goto CONTINUE
         end
         local funcLabel
-        if config.get 'Lua.completion.showParams' then
+        if config.get(nil, 'Lua.completion.showParams') then
             local value = searcher.getObjectValue(src) or src
             if value.type == 'function'
             or value.type == 'doc.type.function' then
@@ -630,7 +630,7 @@ end
 
 local function checkCommon(state, word, position, results)
     local myUri = state.uri
-    local showWord = config.get 'Lua.completion.showWord'
+    local showWord = config.get(nil, 'Lua.completion.showWord')
     if showWord == 'Disable' then
         return
     end
@@ -645,7 +645,7 @@ local function checkCommon(state, word, position, results)
     for _, data in ipairs(keyWordMap) do
         used[data[1]] = true
     end
-    if config.get 'Lua.completion.workspaceWord' and #word >= 2 then
+    if config.get(nil, 'Lua.completion.workspaceWord') and #word >= 2 then
         results.complete = true
         local myHead = word:sub(1, 2)
         for uri in files.eachFile() do
@@ -720,7 +720,7 @@ end
 
 local function checkKeyWord(state, start, position, word, hasSpace, afterLocal, results)
     local text = state.lua
-    local snipType = config.get 'Lua.completion.keywordSnippet'
+    local snipType = config.get(nil, 'Lua.completion.keywordSnippet')
     local symbol = lookBackward.findSymbol(text, guide.positionToOffset(state, start))
     local isExp = symbol == '(' or symbol == ',' or symbol == '='
     local info = {

@@ -64,11 +64,11 @@ end
 local function asStringView(source, literal)
     -- 内部包含转义符？
     local rawLen = source.finish - source.start - 2 * #source[2] + 1
-    if  config.get 'Lua.hover.viewString'
+    if  config.get(nil, 'Lua.hover.viewString')
     and (source[2] == '"' or source[2] == "'")
     and rawLen > #literal then
         local view = literal
-        local max = config.get 'Lua.hover.viewStringMax'
+        local max = config.get(nil, 'Lua.hover.viewStringMax')
         if #view > max then
             view = view:sub(1, max) .. '...'
         end

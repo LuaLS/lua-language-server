@@ -84,7 +84,7 @@ function m.init()
         local ws    = require 'workspace'
         m.interface = {}
 
-        local pluginPath = ws.getAbsolutePath(config.get 'Lua.runtime.plugin')
+        local pluginPath = ws.getAbsolutePath(config.get(nil, 'Lua.runtime.plugin'))
         log.info('plugin path:', pluginPath)
         if not pluginPath then
             return

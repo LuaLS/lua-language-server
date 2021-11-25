@@ -90,7 +90,7 @@ local function f(b)
 end
 ]]
 
-config.set('Lua.IntelliSense.traceBeSetted', true)
+config.set(nil, 'Lua.IntelliSense.traceBeSetted', true)
 TEST ('a', '!!!') [[
 t = {
     a = 0
@@ -118,7 +118,7 @@ t = {
 t["!!!"] = 1
 a = t["!!!"]
 ]]
-config.set('Lua.IntelliSense.traceBeSetted', false)
+config.set(nil, 'Lua.IntelliSense.traceBeSetted', false)
 
 TEST ('a', '"') [[
 print(t[ "a" ])

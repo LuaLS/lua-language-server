@@ -6,8 +6,8 @@ local config = require 'config'
 local ws     = require 'workspace'
 local fs     = require 'bee.filesystem'
 
-config.set('Lua.workspace.preloadFileSize',    1000000)
-config.set('Lua.diagnostics.neededFileStatus', {
+config.set(nil, 'Lua.workspace.preloadFileSize',    1000000)
+config.set(nil, 'Lua.diagnostics.neededFileStatus', {
     ['await-in-sync'] = 'Any',
     ['not-yieldable'] = 'Any',
 })

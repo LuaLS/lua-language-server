@@ -27,36 +27,37 @@ end
 
 ---@async
 local function updateConfig()
-    local merged = {}
+    local baseConfig = {}
 
     local cfg = cfgLoader.loadLocalConfig(CONFIGPATH)
     if cfg then
         log.debug('load config from local', CONFIGPATH)
         -- watch directory
         filewatch.watch(workspace.getAbsolutePath(CONFIGPATH):gsub('[^/\\]+$', ''))
-        mergeConfig(merged, cfg)
+        mergeConfig(baseConfig, cfg)
+
     end
 
     local rc = cfgLoader.loadRCConfig('.luarc.json')
     if rc then
         log.debug('load config from luarc')
-        mergeConfig(merged, rc)
+        mergeConfig(baseConfig, rc)
     end
 
     local clientConfig = cfgLoader.loadClientConfig()
     if clientConfig then
         log.debug('load config from client')
-        mergeConfig(merged, clientConfig)
+        mergeConfig(baseConfig, clientConfig)
     end
 
-    for k, v in pairs(merged) do
+    for k, v in pairs(baseConfig) do
         if v == json.null then
-            merged[k] = nil
+            baseConfig[k] = nil
         end
     end
 
-    config.update(merged)
-    log.debug('loaded config dump:', util.dump(merged))
+    config.update(workspace.rootUri,baseConfig)
+    log.debug('loaded config dump:', util.dump(baseConfig))
 end
 
 ---@class provider
@@ -498,7 +499,7 @@ m.register 'textDocument/completion' {
             return nil
         end
         local triggerCharacter = params.context and params.context.triggerCharacter
-        if config.get 'editor.acceptSuggestionOnEnter' ~= 'off' then
+        if config.get(nil, 'editor.acceptSuggestionOnEnter') ~= 'off' then
             if triggerCharacter == '\n'
             or triggerCharacter == '{'
             or triggerCharacter == ',' then
@@ -627,7 +628,7 @@ m.register 'textDocument/signatureHelp' {
     abortByFileUpdate = true,
     ---@async
     function (params)
-        if not config.get 'Lua.signatureHelp.enable' then
+        if not config.get(nil, 'Lua.signatureHelp.enable') then
             return nil
         end
         workspace.awaitReady()
@@ -956,7 +957,7 @@ m.register '$/requestHint' {
     ---@async
     function (params)
         local core = require 'core.hint'
-        if not config.get 'Lua.hint.enable' then
+        if not config.get(nil, 'Lua.hint.enable') then
             return
         end
         workspace.awaitReady()
@@ -979,7 +980,7 @@ m.register '$/requestHint' {
 do
     ---@async
     local function updateHint(uri)
-        if not config.get 'Lua.hint.enable' then
+        if not config.get(nil, 'Lua.hint.enable') then
             return
         end
         local id = 'updateHint' .. uri
@@ -1026,7 +1027,7 @@ do
 end
 
 local function refreshStatusBar()
-    local value = config.get 'Lua.window.statusBar'
+    local value = config.get(nil, 'Lua.window.statusBar')
     if value then
         proto.notify('$/status/show')
     else

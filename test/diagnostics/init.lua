@@ -4,9 +4,9 @@ local config = require 'config'
 local util   = require 'utility'
 local catch  = require 'catch'
 
-config.get 'Lua.diagnostics.neededFileStatus'['deprecated']    = 'Any'
-config.get 'Lua.diagnostics.neededFileStatus'['type-check']    = 'Any'
-config.get 'Lua.diagnostics.neededFileStatus'['await-in-sync'] = 'Any'
+config.get(nil, 'Lua.diagnostics.neededFileStatus')['deprecated']    = 'Any'
+config.get(nil, 'Lua.diagnostics.neededFileStatus')['type-check']    = 'Any'
+config.get(nil, 'Lua.diagnostics.neededFileStatus')['await-in-sync'] = 'Any'
 
 rawset(_G, 'TEST', true)
 
@@ -177,7 +177,7 @@ local _ENV = { print = print }
 print(1)
 ]]
 
-config.get 'Lua.diagnostics.disable'['undefined-env-child'] = true
+config.get(nil, 'Lua.diagnostics.disable')['undefined-env-child'] = true
 TEST [[
 _ENV = nil
 <!GLOBAL!> = 1 --> _ENV.GLOBAL = 1
@@ -203,7 +203,7 @@ GLOBAL = 1
 _ENV = nil
 ]]
 
-config.get 'Lua.diagnostics.disable'['undefined-env-child'] = nil
+config.get(nil, 'Lua.diagnostics.disable')['undefined-env-child'] = nil
 TEST [[
 <!print()
 ('string')!>:sub(1, 1)
@@ -315,17 +315,17 @@ return [[
 ]]
 ]=]
 
-config.get 'Lua.diagnostics.disable'['close-non-object'] = true
+config.get(nil, 'Lua.diagnostics.disable')['close-non-object'] = true
 TEST [[
 local _ <close> = function () end
 ]]
 
-config.get 'Lua.diagnostics.disable'['close-non-object'] = nil
+config.get(nil, 'Lua.diagnostics.disable')['close-non-object'] = nil
 TEST [[
 local _ <close> = <!1!>
 ]]
 
-config.get 'Lua.diagnostics.disable'['unused-local'] = true
+config.get(nil, 'Lua.diagnostics.disable')['unused-local'] = true
 TEST [[
 local f = <!function () end!>
 ]]
@@ -338,7 +338,7 @@ TEST [[
 local <!function f() end!>
 ]]
 
-config.get 'Lua.diagnostics.disable'['unused-local'] = nil
+config.get(nil, 'Lua.diagnostics.disable')['unused-local'] = nil
 TEST [[
 local mt, x
 function mt:m()
@@ -1427,7 +1427,7 @@ end
 X = f()
 ]]
 
-config.get 'Lua.diagnostics.neededFileStatus'['not-yieldable'] = 'Any'
+config.get(nil, 'Lua.diagnostics.neededFileStatus')['not-yieldable'] = 'Any'
 TEST [[
 local function f(cb)
     return cb

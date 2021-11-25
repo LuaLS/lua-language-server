@@ -838,7 +838,7 @@ local t: {
 }
 ]]
 
-config.set('Lua.IntelliSense.traceLocalSet', true)
+config.set(nil, 'Lua.IntelliSense.traceLocalSet', true)
 TEST [[
 local x
 x = 1
@@ -849,7 +849,7 @@ print(<?x?>)
 [[
 local x: number = 1
 ]]
-config.set('Lua.IntelliSense.traceLocalSet', false)
+config.set(nil, 'Lua.IntelliSense.traceLocalSet', false)
 
 TEST [[
 local <?x?> <close> = 1
@@ -1730,7 +1730,7 @@ t.<?x?>()
 field t.x: any
 ]]
 
-config.set('Lua.IntelliSense.traceLocalSet', true)
+config.set(nil, 'Lua.IntelliSense.traceLocalSet', true)
 TEST [[
 ---@class A
 local a
@@ -1743,7 +1743,7 @@ print(b.<?x?>)
 [[
 field A.x: any
 ]]
-config.set('Lua.IntelliSense.traceLocalSet', false)
+config.set(nil, 'Lua.IntelliSense.traceLocalSet', false)
 
 TEST [[
 ---@class A
@@ -1793,11 +1793,11 @@ local <?f?>
 local f: async fun()
 ]]
 
-config.set('Lua.runtime.nonstandardSymbol', { '//' })
+config.set(nil, 'Lua.runtime.nonstandardSymbol', { '//' })
 TEST [[
 local <?x?> = 1 // 2
 ]]
 [[
 local x: integer = 1
 ]]
-config.set('runtime.nonstandardSymbol', {})
+config.set(nil, 'runtime.nonstandardSymbol', {})

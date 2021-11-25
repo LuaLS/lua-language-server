@@ -47,7 +47,7 @@ local function enable()
             },
         }
     })
-    if config.get 'editor.semanticHighlighting.enabled' == 'configuredByTheme' and not dontShowAgain then
+    if config.get(nil, 'editor.semanticHighlighting.enabled') == 'configuredByTheme' and not dontShowAgain then
         proto.request('window/showMessageRequest', {
             type    = define.MessageType.Info,
             message = lang.script.WINDOW_CHECK_SEMANTIC,

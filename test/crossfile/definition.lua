@@ -117,7 +117,7 @@ TEST {
     },
 }
 
-config.set('Lua.runtime.pathStrict', true)
+config.set(nil, 'Lua.runtime.pathStrict', true)
 TEST {
     {
         path = 'aaa/bbb.lua',
@@ -140,7 +140,7 @@ TEST {
     },
 }
 
-config.set('Lua.runtime.pathStrict', false)
+config.set(nil, 'Lua.runtime.pathStrict', false)
 
 TEST {
     {
@@ -740,8 +740,8 @@ TEST {
 }
 platform.OS = originOS
 
-local originRuntimePath = config.get 'Lua.runtime.path'
-config.set('Lua.runtime.path', {
+local originRuntimePath = config.get(nil, 'Lua.runtime.path')
+config.set(nil, 'Lua.runtime.path', {
     '?/1.lua',
 })
 TEST {
@@ -760,7 +760,7 @@ TEST {
     },
 }
 
-config.set('Lua.runtime.path', {
+config.set(nil, 'Lua.runtime.path', {
     'D:/?/1.lua',
 })
 TEST {
@@ -778,7 +778,7 @@ TEST {
         ]],
     },
 }
-config.set('Lua.runtime.path', originRuntimePath)
+config.set(nil, 'Lua.runtime.path', originRuntimePath)
 
 TEST {
     {
@@ -795,7 +795,7 @@ TEST {
     },
 }
 
-config.set('Lua.IntelliSense.traceFieldInject', true)
+config.set(nil, 'Lua.IntelliSense.traceFieldInject', true)
 TEST {
     {
         path = 'a.lua',
@@ -816,7 +816,7 @@ print(b.<?test?>)
         ]]
     }
 }
-config.set('Lua.IntelliSense.traceFieldInject', false)
+config.set(nil, 'Lua.IntelliSense.traceFieldInject', false)
 
 TEST {
     {

@@ -13,7 +13,7 @@ local function allWords()
         list[#list+1] = c
         mark[c] = true
     end
-    local postfix = config.get 'Lua.completion.postfix'
+    local postfix = config.get(nil, 'Lua.completion.postfix')
     if postfix ~= '' and not mark[postfix] then
         list[#list+1] = postfix
         mark[postfix] = true
@@ -76,7 +76,7 @@ config.watch(function (key, value)
         end
     end
     if key == 'Lua.completion.postfix' then
-        if config.get 'Lua.completion.enable' then
+        if config.get(nil, 'Lua.completion.enable') then
             disable()
             enable()
         end

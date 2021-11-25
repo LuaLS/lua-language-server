@@ -30,7 +30,7 @@ m.cache          = {}
 m.watchers       = {}
 m.matchOption    = {}
 ---@type {uri: uri, path: string}[]
-m.workSpaces     = {}
+m.folders        = {}
 
 function m.initRoot(uri)
     m.rootUri  = uri
@@ -47,7 +47,7 @@ end
 function m.create(uri)
     log.info('Workspace create: ', uri)
     local path = m.normalize(furi.decode(uri))
-    m.workSpaces[#m.workSpaces+1] = {
+    m.folders[#m.folders+1] = {
         uri  = uri,
         path = path,
     }
@@ -92,15 +92,15 @@ function m.getNativeMatcher()
     end
 
     local pattern = {}
-    -- config.get 'files.exclude'
-    for path, ignore in pairs(config.get 'files.exclude') do
+    -- config.get(nil, 'files.exclude'
+    for path, ignore in pairs(config.get(nil, 'files.exclude')) do
         if ignore then
             log.info('Ignore by exclude:', path)
             pattern[#pattern+1] = path
         end
     end
-    -- config.get 'workspace.useGitIgnore'
-    if config.get 'Lua.workspace.useGitIgnore' then
+    -- config.get(nil, 'workspace.useGitIgnore'
+    if config.get(nil, 'Lua.workspace.useGitIgnore') then
         local buf = pub.awaitTask('loadFile', furi.encode(m.rootPath .. '/.gitignore'))
         if buf then
             for line in buf:gmatch '[^\r\n]+' do
@@ -120,8 +120,8 @@ function m.getNativeMatcher()
             end
         end
     end
-    -- config.get 'workspace.ignoreSubmodules'
-    if config.get 'Lua.workspace.ignoreSubmodules' then
+    -- config.get(nil, 'workspace.ignoreSubmodules'
+    if config.get(nil, 'Lua.workspace.ignoreSubmodules') then
         local buf = pub.awaitTask('loadFile', furi.encode(m.rootPath .. '/.gitmodules'))
         if buf then
             for path in buf:gmatch('path = ([^\r\n]+)') do
@@ -130,16 +130,16 @@ function m.getNativeMatcher()
             end
         end
     end
-    -- config.get 'workspace.library'
-    for path in pairs(config.get 'Lua.workspace.library') do
+    -- config.get(nil, 'workspace.library'
+    for path in pairs(config.get(nil, 'Lua.workspace.library')) do
         path = m.getAbsolutePath(path)
         if path then
             log.info('Ignore by library:', path)
             pattern[#pattern+1] = path
         end
     end
-    -- config.get 'workspace.ignoreDir'
-    for _, path in ipairs(config.get 'Lua.workspace.ignoreDir') do
+    -- config.get(nil, 'workspace.ignoreDir'
+    for _, path in ipairs(config.get(nil, 'Lua.workspace.ignoreDir')) do
         log.info('Ignore directory:', path)
         pattern[#pattern+1] = path
     end
@@ -147,7 +147,7 @@ function m.getNativeMatcher()
     m.nativeMatcher = glob.gitignore(pattern, m.matchOption, globInteferFace)
     m.nativeMatcher:setOption('root', m.rootPath)
 
-    m.nativeVersion = config.get 'version'
+    m.nativeVersion = config.get(nil, 'version')
     return m.nativeMatcher
 end
 
@@ -158,7 +158,7 @@ function m.getLibraryMatchers()
     end
 
     local librarys = {}
-    for path in pairs(config.get 'Lua.workspace.library') do
+    for path in pairs(config.get(nil, 'Lua.workspace.library')) do
         path = m.getAbsolutePath(path)
         if path then
             librarys[m.normalize(path)] = true
@@ -181,7 +181,7 @@ function m.getLibraryMatchers()
         end
     end
 
-    m.libraryVersion = config.get 'version'
+    m.libraryVersion = config.get(nil, 'version')
     return m.libraryMatchers
 end
 
@@ -212,12 +212,12 @@ local function loadFileFactory(root, progressData, isLibrary)
     return function (path) ---@async
         local uri = furi.encode(path)
         if files.isLua(uri) then
-            if not isLibrary and progressData.preload >= config.get 'Lua.workspace.maxPreload' then
+            if not isLibrary and progressData.preload >= config.get(nil, 'Lua.workspace.maxPreload') then
                 if not m.hasHitMaxPreload then
                     m.hasHitMaxPreload = true
                     proto.request('window/showMessageRequest', {
                         type    = define.MessageType.Info,
-                        message = lang.script('MWS_MAX_PRELOAD', config.get 'Lua.workspace.maxPreload'),
+                        message = lang.script('MWS_MAX_PRELOAD', config.get(nil, 'Lua.workspace.maxPreload')),
                         actions = {
                             {
                                 title = lang.script.WINDOW_INCREASE_UPPER_LIMIT,
@@ -235,8 +235,8 @@ local function loadFileFactory(root, progressData, isLibrary)
                                 {
                                     key    = 'Lua.workspace.maxPreload',
                                     action = 'set',
-                                    value  = config.get 'Lua.workspace.maxPreload'
-                                           + math.max(1000, config.get 'Lua.workspace.maxPreload'),
+                                    value  = config.get(nil, 'Lua.workspace.maxPreload')
+                                           + math.max(1000, config.get(nil, 'Lua.workspace.maxPreload')),
                                 }
                             }
                         end
@@ -404,7 +404,7 @@ function m.findUrisByFilePath(path)
         return resultCache[path].results, resultCache[path].posts
     end
     tracy.ZoneBeginN('findUrisByFilePath #1')
-    local strict = config.get 'Lua.runtime.pathStrict'
+    local strict = config.get(nil, 'Lua.runtime.pathStrict')
     local results = {}
     local posts = {}
     for uri in files.eachFile() do
@@ -463,7 +463,7 @@ function m.findUrisByRequirePath(path)
 
     local input = path:gsub('%.', '/')
                       :gsub('%%', '%%%%')
-    for _, luapath in ipairs(config.get 'Lua.runtime.path') do
+    for _, luapath in ipairs(config.get(nil, 'Lua.runtime.path')) do
         local part = m.normalize(luapath:gsub('%?', input))
         local uris, posts = m.findUrisByFilePath(part)
         for _, uri in ipairs(uris) do

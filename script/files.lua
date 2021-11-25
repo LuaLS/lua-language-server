@@ -174,7 +174,7 @@ function m.setText(uri, text, isTrust, version)
         return
     end
     if not isTrust then
-        local encoding = config.get 'Lua.runtime.fileEncoding'
+        local encoding = config.get(nil, 'Lua.runtime.fileEncoding')
         text = encoder.decode(encoding, text)
     end
     if file.originText == text then
@@ -452,7 +452,7 @@ function m.compileState(uri, text)
     local client = require 'client'
     if  not m.isOpen(uri)
     and not m.isLibrary(uri)
-    and #text >= config.get 'Lua.workspace.preloadFileSize' * 1000 then
+    and #text >= config.get(nil, 'Lua.workspace.preloadFileSize') * 1000 then
         if not m.notifyCache['preloadFileSize'] then
             m.notifyCache['preloadFileSize'] = {}
             m.notifyCache['skipLargeFileCount'] = 0
@@ -462,7 +462,7 @@ function m.compileState(uri, text)
             m.notifyCache['skipLargeFileCount'] = m.notifyCache['skipLargeFileCount'] + 1
             local message = lang.script('WORKSPACE_SKIP_LARGE_FILE'
                         , ws.getRelativePath(uri)
-                        , config.get 'Lua.workspace.preloadFileSize'
+                        , config.get(nil, 'Lua.workspace.preloadFileSize')
                         , #text / 1000
                     )
             if m.notifyCache['skipLargeFileCount'] <= 1 then
@@ -478,11 +478,11 @@ function m.compileState(uri, text)
     local clock = os.clock()
     local state, err = parser.compile(text
         , 'Lua'
-        , config.get 'Lua.runtime.version'
+        , config.get(nil, 'Lua.runtime.version')
         , {
-            special           = config.get 'Lua.runtime.special',
-            unicodeName       = config.get 'Lua.runtime.unicodeName',
-            nonstandardSymbol = config.get 'Lua.runtime.nonstandardSymbol',
+            special           = config.get(nil, 'Lua.runtime.special'),
+            unicodeName       = config.get(nil, 'Lua.runtime.unicodeName'),
+            nonstandardSymbol = config.get(nil, 'Lua.runtime.nonstandardSymbol'),
         }
     )
     local passed = os.clock() - clock
@@ -634,12 +634,12 @@ end
 
 --- 获取文件关联
 function m.getAssoc()
-    if m.assocVersion == config.get 'version' then
+    if m.assocVersion == config.get(nil, 'version') then
         return m.assocMatcher
     end
-    m.assocVersion = config.get 'version'
+    m.assocVersion = config.get(nil, 'version')
     local patt = {}
-    for k, v in pairs(config.get 'files.associations') do
+    for k, v in pairs(config.get(nil, 'files.associations')) do
         if v == 'lua' then
             patt[#patt+1] = k
         end

@@ -9,7 +9,7 @@ local converter      = require 'proto.converter'
 local infer          = require 'core.infer'
 local config         = require 'config'
 
-local isEnhanced = config.get 'Lua.color.mode' == 'SemanticEnhanced'
+local isEnhanced = config.get(nil, 'Lua.color.mode') == 'SemanticEnhanced'
 
 local Care = {}
 Care['getglobal'] = function (source, results)

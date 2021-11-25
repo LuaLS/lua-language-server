@@ -20,13 +20,13 @@ table.sort(diagList, function (a, b)
 end)
 
 local function check(uri, name, results)
-    if config.get 'Lua.diagnostics.disable'[name] then
+    if config.get(nil, 'Lua.diagnostics.disable')[name] then
         return
     end
-    local level =  config.get 'Lua.diagnostics.severity'[name]
+    local level =  config.get(nil, 'Lua.diagnostics.severity')[name]
                 or define.DiagnosticDefaultSeverity[name]
 
-    local neededFileStatus =   config.get 'Lua.diagnostics.neededFileStatus'[name]
+    local neededFileStatus =   config.get(nil, 'Lua.diagnostics.neededFileStatus')[name]
                             or define.DiagnosticDefaultNeededFileStatus[name]
 
     if neededFileStatus == 'None' then

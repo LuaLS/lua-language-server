@@ -214,22 +214,6 @@ local Template = {
     ['editor.acceptSuggestionOnEnter']      = Type.String  >> 'on',
 }
 
----@alias config.scope '"specified"'|'"folder"'|'"global"'
-
-local configs = {
-    specified = {},
-    ---@type {uri: uri, config: table}[]
-    folder    = {},
-    global    = {},
-}
-
-local rawConfigs = {
-    specified = {},
-    ---@type {uri: uri, config: table}[]
-    folder    = {},
-    global    = {},
-}
-
 local config    = {}
 local rawConfig = {}
 

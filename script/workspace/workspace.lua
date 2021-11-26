@@ -507,16 +507,22 @@ function m.normalize(path)
 end
 
 ---@return string
-function m.getAbsolutePath(path)
+function m.getAbsolutePath(folderUriOrPath, path)
     if not path or path == '' then
         return nil
     end
     path = m.normalize(path)
     if fs.path(path):is_relative() then
-        if not m.rootPath then
+        if not folderUriOrPath then
             return nil
         end
-        path = m.normalize(m.rootPath .. '/' .. path)
+        local folderPath
+        if folderUriOrPath:sub(1, 5) == 'file:' then
+            folderPath = furi.decode(folderUriOrPath)
+        else
+            folderPath = folderUriOrPath
+        end
+        path = m.normalize(folderPath .. '/' .. path)
     end
     return path
 end

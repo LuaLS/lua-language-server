@@ -27,26 +27,28 @@ end
 
 ---@async
 local function updateConfig()
-    local baseConfig = {}
-
     local cfg = cfgLoader.loadLocalConfig(CONFIGPATH)
     if cfg then
         log.debug('load config from local', CONFIGPATH)
         -- watch directory
         filewatch.watch(workspace.getAbsolutePath(CONFIGPATH):gsub('[^/\\]+$', ''))
-        mergeConfig(baseConfig, cfg)
+        config.update('specified', nil, cfg)
     end
 
-    local rc = cfgLoader.loadRCConfig('.luarc.json')
-    if rc then
-        log.debug('load config from luarc')
-        mergeConfig(baseConfig, rc)
-    end
+    for _, folder in ipairs(workspace.folders) do
+        local uri = folder.uri
+        local folderConfig = {}
+        local rc = cfgLoader.loadRCConfig(uri, '.luarc.json')
+        if rc then
+            log.debug('load config from luarc')
+            mergeConfig(folderConfig, rc)
+        end
 
-    local clientConfig = cfgLoader.loadClientConfig()
-    if clientConfig then
-        log.debug('load config from client')
-        mergeConfig(baseConfig, clientConfig)
+        local clientConfig = cfgLoader.loadClientConfig(uri)
+        if clientConfig then
+            log.debug('load config from client')
+            mergeConfig(folderConfig, clientConfig)
+        end
     end
 
     for k, v in pairs(baseConfig) do

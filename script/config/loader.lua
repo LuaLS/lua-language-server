@@ -16,8 +16,8 @@ end
 
 local m = {}
 
-function m.loadRCConfig(filename)
-    local path = workspace.getAbsolutePath(filename)
+function m.loadRCConfig(uri, filename)
+    local path = workspace.getAbsolutePath(uri, filename)
     if not path then
         m.lastRCConfig = nil
         return nil
@@ -75,27 +75,27 @@ function m.loadLocalConfig(filename)
 end
 
 ---@async
-function m.loadClientConfig()
+function m.loadClientConfig(uri)
     local configs = proto.awaitRequest('workspace/configuration', {
         items = {
             {
-                scopeUri = workspace.rootUri,
+                scopeUri = uri,
                 section = 'Lua',
             },
             {
-                scopeUri = workspace.rootUri,
+                scopeUri = uri,
                 section = 'files.associations',
             },
             {
-                scopeUri = workspace.rootUri,
+                scopeUri = uri,
                 section = 'files.exclude',
             },
             {
-                scopeUri = workspace.rootUri,
+                scopeUri = uri,
                 section = 'editor.semanticHighlighting.enabled',
             },
             {
-                scopeUri = workspace.rootUri,
+                scopeUri = uri,
                 section = 'editor.acceptSuggestionOnEnter',
             },
         },

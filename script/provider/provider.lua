@@ -35,7 +35,6 @@ local function updateConfig()
         -- watch directory
         filewatch.watch(workspace.getAbsolutePath(CONFIGPATH):gsub('[^/\\]+$', ''))
         mergeConfig(baseConfig, cfg)
-
     end
 
     local rc = cfgLoader.loadRCConfig('.luarc.json')
@@ -56,7 +55,7 @@ local function updateConfig()
         end
     end
 
-    config.update(workspace.rootUri,baseConfig)
+    config.update('global', workspace.rootUri,baseConfig)
     log.debug('loaded config dump:', util.dump(baseConfig))
 end
 

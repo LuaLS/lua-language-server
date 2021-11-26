@@ -214,12 +214,30 @@ local Template = {
     ['editor.acceptSuggestionOnEnter']      = Type.String  >> 'on',
 }
 
+---@alias config.scope '"specified"'|'"folder"'|'"global"'
+
+local configs = {
+    specified = {},
+    ---@type {uri: uri, config: table}[]
+    folder    = {},
+    global    = {},
+}
+
+local rawConfigs = {
+    specified = {},
+    ---@type {uri: uri, config: table}[]
+    folder    = {},
+    global    = {},
+}
+
 local config    = {}
 local rawConfig = {}
 
 ---@class config.api
 local m = {}
 m.watchList = {}
+
+m.NULL = {}
 
 local function update(uri, key, value, raw)
     local oldValue = config[key]
@@ -298,6 +316,47 @@ function m.getRaw(key)
    return rawConfig[key]
 end
 
+local function convertValue(v)
+    if v == m.NULL then
+        return nil
+    end
+    return v
+end
+
+---@param uri uri
+---@param key string
+function m.get2(uri, key)
+    if configs.specified[key] ~= nil then
+        return convertValue(configs.specified[key])
+    end
+    if uri then
+        for _, folder in ipairs(configs.folder) do
+            if  uri:sub(1, #folder.uri) == folder.uri
+            and folder.config[key] ~= nil then
+                return convertValue(folder.config[key])
+            end
+        end
+    end
+    return convertValue(configs.global[key])
+end
+
+---@param uri uri
+---@param key string
+function m.getRaw2(uri, key)
+    if rawConfigs.specified[key] ~= nil then
+        return convertValue(rawConfigs.specified[key])
+    end
+    if uri then
+        for _, folder in ipairs(rawConfigs.folder) do
+            if  uri:sub(1, #folder.uri) == folder.uri
+            and folder.config[key] ~= nil then
+                return convertValue(folder.config[key])
+            end
+        end
+    end
+    return convertValue(rawConfigs.global[key])
+end
+
 function m.dump()
     local dump = {}
 
@@ -320,7 +379,10 @@ function m.dump()
     return dump
 end
 
-function m.update(uri, new)
+---@param scope config.scope
+---@param uri uri
+---@param new table
+function m.update(scope, uri, new)
     local function expand(t, left)
         for key, value in pairs(t) do
             local fullKey = key

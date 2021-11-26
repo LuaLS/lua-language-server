@@ -1,6 +1,7 @@
 local util   = require 'utility'
 local define = require 'proto.define'
 local timer  = require 'timer'
+local scope  = require 'workspace.scope'
 
 ---@alias config.source '"client"'|'"path"'|'"local"'
 
@@ -214,34 +215,40 @@ local Template = {
     ['editor.acceptSuggestionOnEnter']      = Type.String  >> 'on',
 }
 
-local config    = {}
-local rawConfig = {}
-
 ---@class config.api
 local m = {}
 m.watchList = {}
 
 m.NULL = {}
 
-local function update(uri, key, value, raw)
-    local oldValue = config[key]
-    config[key]    = value
-    rawConfig[key] = raw
-    m.event(key, value, oldValue)
+---@param scp      scope
+---@param key      string
+---@param nowValue any
+---@param rawValue any
+local function update(scp, key, nowValue, rawValue)
+    local now = scp:get 'config.now'
+    local raw = scp:get 'config.raw'
+
+    now[key] = nowValue
+    raw[key] = rawValue
 end
 
-function m.set(uri, key, value)
+---@param scp   scope
+---@param key   string
+---@param value any
+function m.setByScope(scp, key, value)
     local unit = Template[key]
     if not unit then
         return false
     end
-    if util.equal(rawConfig[key], value) then
+    local raw = scp:get 'config.raw'
+    if util.equal(raw[key], value) then
         return false
     end
     if unit:checker(value) then
-        update(uri, key, unit:loader(value), value)
+        update(scp, key, unit:loader(value), value)
     else
-        update(uri, key, unit.default, unit.default)
+        update(scp, key, unit.default, unit.default)
     end
     return true
 end
@@ -300,47 +307,6 @@ function m.getRaw(key)
    return rawConfig[key]
 end
 
-local function convertValue(v)
-    if v == m.NULL then
-        return nil
-    end
-    return v
-end
-
----@param uri uri
----@param key string
-function m.get2(uri, key)
-    if configs.specified[key] ~= nil then
-        return convertValue(configs.specified[key])
-    end
-    if uri then
-        for _, folder in ipairs(configs.folder) do
-            if  uri:sub(1, #folder.uri) == folder.uri
-            and folder.config[key] ~= nil then
-                return convertValue(folder.config[key])
-            end
-        end
-    end
-    return convertValue(configs.global[key])
-end
-
----@param uri uri
----@param key string
-function m.getRaw2(uri, key)
-    if rawConfigs.specified[key] ~= nil then
-        return convertValue(rawConfigs.specified[key])
-    end
-    if uri then
-        for _, folder in ipairs(rawConfigs.folder) do
-            if  uri:sub(1, #folder.uri) == folder.uri
-            and folder.config[key] ~= nil then
-                return convertValue(folder.config[key])
-            end
-        end
-    end
-    return convertValue(rawConfigs.global[key])
-end
-
 function m.dump()
     local dump = {}
 
@@ -363,20 +329,28 @@ function m.dump()
     return dump
 end
 
----@param scope config.scope
----@param uri uri
----@param new table
-function m.update(scope, uri, new)
+---@param scp  scope
+---@param new  table
+---@param null any
+function m.update(scp, new, null)
+    local oldConfig = scp:get 'config.now'
+
+    scp:set('config.now', {})
+    scp:set('config.raw', {})
+
     local function expand(t, left)
         for key, value in pairs(t) do
             local fullKey = key
             if left then
                 fullKey = left .. '.' .. key
             end
+            if value == null then
+                value = m.NULL
+            end
             if Template[fullKey] then
-                m.set(uri, fullKey, value)
+                m.setByScope(scp, fullKey, value)
             elseif Template['Lua.' .. fullKey] then
-                m.set(uri, 'Lua.' .. fullKey, value)
+                m.setByScope(scp, 'Lua.' .. fullKey, value)
             elseif type(value) == 'table' then
                 expand(value, fullKey)
             end
@@ -384,6 +358,11 @@ function m.update(scope, uri, new)
     end
 
     expand(new)
+
+    -- compare then fire event
+    if oldConfig then
+        
+    end
 end
 
 ---@param callback fun(key: string, value: any, oldValue: any)
@@ -409,16 +388,6 @@ function m.event(key, value, oldValue)
         value    = value,
         oldValue = oldValue,
     }
-end
-
-function m.init()
-    if m.inited then
-        return
-    end
-    m.inited = true
-    for key, unit in pairs(Template) do
-        m.set(nil, key, unit.default)
-    end
 end
 
 return m

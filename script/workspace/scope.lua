@@ -37,6 +37,7 @@ end
 ---@param v any
 function mt:set(k, v)
     self._data[k] = v
+    return v
 end
 
 ---@param k string
@@ -44,16 +45,6 @@ end
 function mt:get(k)
     return self._data[k]
 end
-
----@class scope.manager
-local m = {}
-
----@type scope[]
-m.folders = {}
----@type scope
-m.override = nil
----@type scope
-m.fallback = nil
 
 ---@param scopeType scope.type
 ---@return scope
@@ -66,6 +57,14 @@ local function createScope(scopeType)
 
     return scope
 end
+
+---@class scope.manager
+local m = {}
+
+---@type scope[]
+m.folders  = {}
+m.override = createScope 'override'
+m.fallback = createScope 'fallback'
 
 ---@param uri uri
 ---@return scope
@@ -114,7 +113,5 @@ function m.getLinkedScope(uri)
         return m.fallback
     end
 end
-
-m.fallback = createScope 'fallback'
 
 return m

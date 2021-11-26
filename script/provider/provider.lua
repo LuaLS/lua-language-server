@@ -16,49 +16,43 @@ local cfgLoader  = require 'config.loader'
 local converter  = require 'proto.converter'
 local filewatch  = require 'filewatch'
 local json       = require 'json'
-
-local function mergeConfig(a, b)
-    for k, v in pairs(b) do
-        if a[k] == nil then
-            a[k] = v
-        end
-    end
-end
+local scope      = require 'workspace.scope'
 
 ---@async
 local function updateConfig()
-    local cfg = cfgLoader.loadLocalConfig(CONFIGPATH)
-    if cfg then
-        log.debug('load config from local', CONFIGPATH)
+    local specified = cfgLoader.loadLocalConfig(CONFIGPATH)
+    if specified then
+        log.debug('Load config from specified', CONFIGPATH)
+        log.debug(util.dump(specified))
         -- watch directory
         filewatch.watch(workspace.getAbsolutePath(CONFIGPATH):gsub('[^/\\]+$', ''))
-        config.update('specified', nil, cfg)
+        config.update(scope.override, specified, json.null)
+    else
+        config.update(scope.override, {}, json.null)
     end
 
-    for _, folder in ipairs(workspace.folders) do
+    for _, folder in ipairs(scope.folders) do
         local uri = folder.uri
-        local folderConfig = {}
-        local rc = cfgLoader.loadRCConfig(uri, '.luarc.json')
-        if rc then
-            log.debug('load config from luarc')
-            mergeConfig(folderConfig, rc)
-        end
 
         local clientConfig = cfgLoader.loadClientConfig(uri)
         if clientConfig then
-            log.debug('load config from client')
-            mergeConfig(folderConfig, clientConfig)
+            log.debug('Load config from client', uri)
+            log.debug(util.dump(clientConfig))
+            config.update(folder, clientConfig, json.null)
+        end
+
+        local rc = cfgLoader.loadRCConfig(uri, '.luarc.json')
+        if rc then
+            log.debug('Load config from luarc.json', uri)
+            log.debug(util.dump(rc))
+            config.update(folder, rc, json.null)
         end
     end
 
-    for k, v in pairs(baseConfig) do
-        if v == json.null then
-            baseConfig[k] = nil
-        end
-    end
-
-    config.update('global', workspace.rootUri,baseConfig)
-    log.debug('loaded config dump:', util.dump(baseConfig))
+    local global = cfgLoader.loadClientConfig()
+    log.debug('Load config from client', 'fallback')
+    log.debug(util.dump(global))
+    config.update(scope.fallback, global, json.null)
 end
 
 ---@class provider
@@ -88,7 +82,6 @@ end)
 m.register 'initialize' {
     function (params)
         client.init(params)
-        config.init()
 
         if params.rootUri then
             workspace.initRoot(params.rootUri)

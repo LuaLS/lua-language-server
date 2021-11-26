@@ -15,6 +15,7 @@ local client     = require 'client'
 local plugin     = require 'plugin'
 local util       = require 'utility'
 local fw         = require 'filewatch'
+local scope      = require 'workspace.scope'
 
 ---@class workspace
 local m = {}
@@ -29,8 +30,6 @@ m.requireCache   = {}
 m.cache          = {}
 m.watchers       = {}
 m.matchOption    = {}
----@type {uri: uri, path: string}[]
-m.folders        = {}
 
 function m.initRoot(uri)
     m.rootUri  = uri
@@ -47,11 +46,8 @@ end
 function m.create(uri)
     log.info('Workspace create: ', uri)
     local path = m.normalize(furi.decode(uri))
-    m.folders[#m.folders+1] = {
-        uri  = uri,
-        path = path,
-    }
     fw.watch(path)
+    scope.createFolder(uri)
 end
 
 local globInteferFace = {

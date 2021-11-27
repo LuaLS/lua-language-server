@@ -414,4 +414,6 @@ function m.event(key, value, oldValue)
     }
 end
 
+m.update(scope.fallback, {})
+
 return m

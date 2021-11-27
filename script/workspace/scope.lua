@@ -50,7 +50,7 @@ end
 ---@return scope
 local function createScope(scopeType)
     local scope = setmetatable({
-        type   = 'folder',
+        type   = scopeType,
         _links = {},
         _data  = {},
     }, mt)

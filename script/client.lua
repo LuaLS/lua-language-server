@@ -190,7 +190,7 @@ end
 ---@param changes config.change[]
 local function applyConfig(cfg, changes)
     for _, change in ipairs(changes) do
-        cfg[change.key] = config.getRaw(change.key)
+        cfg[change.key] = config.getRaw(change.uri, change.key)
     end
 end
 
@@ -274,17 +274,17 @@ function m.setConfig(changes, onlyMemory)
     local finalChanges = {}
     for _, change in ipairs(changes) do
         if change.action == 'add' then
-            local suc = config.add(change.key, change.value)
+            local suc = config.add(change.uri, change.key, change.value)
             if suc then
                 finalChanges[#finalChanges+1] = change
             end
         elseif change.action == 'set' then
-            local suc = config.set(change.key, change.value)
+            local suc = config.set(change.uri, change.key, change.value)
             if suc then
                 finalChanges[#finalChanges+1] = change
             end
         elseif change.action == 'prop' then
-            local suc = config.prop(change.key, change.prop, change.value)
+            local suc = config.prop(change.uri, change.key, change.prop, change.value)
             if suc then
                 finalChanges[#finalChanges+1] = change
             end

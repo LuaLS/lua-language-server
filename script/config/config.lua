@@ -233,6 +233,28 @@ local function update(scp, key, nowValue, rawValue)
     raw[key] = rawValue
 end
 
+---@param uri uri
+---@param key? string
+---@return scope
+local function getScope(uri, key)
+    local raw = scope.override:get 'config.raw'
+    if raw then
+        if not key or raw[key] ~= nil then
+            return scope.override
+        end
+    end
+    if uri then
+        ---@type scope
+        local scp = scope.getFolder(uri) or scope.getLinkedScope(uri)
+        if scp then
+            if not key or scp:get 'config.raw' [key] ~= nil then
+                return scp
+            end
+        end
+    end
+    return scope.fallback
+end
+
 ---@param scp   scope
 ---@param key   string
 ---@param value any
@@ -253,12 +275,20 @@ function m.setByScope(scp, key, value)
     return true
 end
 
+---@param uri   uri
+---@param key   string
+---@param value any
+function m.set(uri, key, value)
+    local scp = getScope(uri)
+    return m.setByScope(scp, key, value)
+end
+
 function m.add(uri, key, value)
     local unit = Template[key]
     if not unit then
         return false
     end
-    local list = rawConfig[key]
+    local list = m.getRaw(uri, key)
     if type(list) ~= 'table' then
         return false
     end
@@ -270,10 +300,7 @@ function m.add(uri, key, value)
         copyed[i] = v
     end
     copyed[#copyed+1] = value
-    if unit:checker(copyed) then
-        update(uri, key, unit:loader(copyed), copyed)
-    end
-    return true
+    return m.set(uri, key, copyed)
 end
 
 function m.prop(uri, key, prop, value)
@@ -281,7 +308,7 @@ function m.prop(uri, key, prop, value)
     if not unit then
         return false
     end
-    local map = rawConfig[key]
+    local map = m.getRaw(uri, key)
     if type(map) ~= 'table' then
         return false
     end
@@ -293,40 +320,37 @@ function m.prop(uri, key, prop, value)
         copyed[k] = v
     end
     copyed[prop] = value
-    if unit:checker(copyed) then
-        update(uri, key, unit:loader(copyed), copyed)
-    end
-    return true
+    return m.set(uri, key, copyed)
 end
 
+---@param uri uri
+---@param key string
+---@return any
 function m.get(uri, key)
-    return config[key]
+    local scp = getScope(uri, key)
+    local value = scp:get 'config.now' [key]
+    if value == nil then
+        value = Template[key].default
+    end
+    if value == m.NULL then
+        value = nil
+    end
+    return value
 end
 
-function m.getRaw(key)
-   return rawConfig[key]
-end
-
-function m.dump()
-    local dump = {}
-
-    local function expand(parent, key, value)
-        local left, right = key:match '([^%.]+)%.(.+)'
-        if left then
-            if not parent[left] then
-                parent[left] = {}
-            end
-            expand(parent[left], right, value)
-        else
-            parent[key] = value
-        end
+---@param uri uri
+---@param key string
+---@return any
+function m.getRaw(uri, key)
+    local scp = getScope(uri, key)
+    local value = scp:get 'config.raw' [key]
+    if value == nil then
+        value = Template[key].default
     end
-
-    for key, value in pairs(config) do
-        expand(dump, key, value)
+    if value == m.NULL then
+        value = nil
     end
-
-    return dump
+    return value
 end
 
 ---@param scp  scope

@@ -27,8 +27,6 @@ local function updateConfig()
         -- watch directory
         filewatch.watch(workspace.getAbsolutePath(CONFIGPATH):gsub('[^/\\]+$', ''))
         config.update(scope.override, specified, json.null)
-    else
-        config.update(scope.override, {}, json.null)
     end
 
     for _, folder in ipairs(scope.folders) do

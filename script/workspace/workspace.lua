@@ -16,20 +16,11 @@ local plugin     = require 'plugin'
 local util       = require 'utility'
 local fw         = require 'filewatch'
 local scope      = require 'workspace.scope'
+local loading    = require 'workspace.loading'
 
 ---@class workspace
 local m = {}
 m.type = 'workspace'
-m.nativeVersion  = -1
-m.libraryVersion = -1
-m.nativeMatcher  = nil
-m.fileLoaded = 0
-m.fileFound  = 0
-m.waitingReady   = {}
-m.requireCache   = {}
-m.cache          = {}
-m.watchers       = {}
-m.matchOption    = {}
 
 function m.initRoot(uri)
     m.rootUri  = uri
@@ -308,22 +299,24 @@ end
 
 --- 预读工作区内所有文件
 ---@async
-function m.awaitPreload()
+---@param scp scope
+function m.awaitPreload(scp)
     local diagnostic = require 'provider.diagnostic'
     await.close 'preload'
     await.setID 'preload'
     await.sleep(0.1)
-    diagnostic.pause()
-    m.libraryMatchers = nil
-    m.nativeMatcher   = nil
-    m.fileLoaded      = 0
-    m.fileFound       = 0
-    m.cache           = {}
-    for i, watchers in ipairs(m.watchers) do
-        watchers()
-        m.watchers[i] = nil
+    diagnostic.pause(scp)
+
+    if scp:get 'watchers' then
+        for _, dispose in ipairs(scp:get 'watchers') do
+            dispose()
+        end
     end
-    local progressBar <close> = progress.create(lang.script.WORKSPACE_LOADING)
+    scp:set('watchers', {})
+
+    local ld = loading.create(scp)
+
+    local progressBar <close> = progress.create(lang.script('WORKSPACE_LOADING', scp.uri))
     local progressData = {
         max     = 0,
         read    = 0,
@@ -337,6 +330,7 @@ function m.awaitPreload()
         end
     }
     log.info('Preload start.')
+
     local nativeLoader    = loadFileFactory(m.rootPath, progressData)
     local native          = m.getNativeMatcher()
     local librarys        = m.getLibraryMatchers()
@@ -564,14 +558,18 @@ function m.flushCache()
     m.cache = {}
 end
 
-function m.reload()
+---@param scp scope
+function m.reload(scp)
     if not m.inited then
         return
     end
     if TEST then
         return
     end
-    await.call(m.awaitReload)
+    ---@async
+    await.call(function ()
+        m.awaitReload(scp)
+    end)
 end
 
 function m.init()
@@ -579,39 +577,59 @@ function m.init()
         return
     end
     m.inited = true
-    m.reload()
+    if m.rootUri then
+        for _, folder in ipairs(scope.folders) do
+            m.reload(folder)
+        end
+    else
+        m.reload(scope.fallback)
+    end
 end
 
 ---@async
-function m.awaitReload()
-    m.ready = false
-    m.hasHitMaxPreload = false
-    files.flushAllLibrary()
-    files.removeAllClosed()
-    files.flushCache()
-    plugin.init()
-    m.awaitPreload()
-    m.ready = true
-    local waiting = m.waitingReady
-    m.waitingReady = {}
-    for _, waker in ipairs(waiting) do
-        waker()
+---@param scp scope
+function m.awaitReload(scp)
+    files.flushAllLibrary(scp)
+    files.removeAllClosed(scp)
+    files.flushCache(scp)
+    plugin.init(scp)
+    m.awaitPreload(scp)
+    scp:set('ready', true)
+    local waiting = scp:get('waitingReady')
+    if waiting then
+        scp:set('waitingReady', nil)
+        for _, waker in ipairs(waiting) do
+            waker()
+        end
     end
+end
+
+---@param uri uri
+---@return scope
+function m.getScope(uri)
+    return scope.getFolder(uri)
+        or scope.getLinkedScope(uri)
+        or scope.fallback
 end
 
 ---等待工作目录加载完成
 ---@async
-function m.awaitReady()
-    if m.isReady() then
+function m.awaitReady(uri)
+    if m.isReady(uri) then
         return
     end
+    local scp = m.getScope(uri)
+    local waitingReady = scp:get('waitingReady')
+                    or   scp:set('waitingReady', {})
     await.wait(function (waker)
-        m.waitingReady[#m.waitingReady+1] = waker
+        waitingReady[#waitingReady+1] = waker
     end)
 end
 
-function m.isReady()
-    return m.ready == true
+---@param uri uri
+function m.isReady(uri)
+    local scp = m.getScope(uri)
+    return scp:get('ready') == true
 end
 
 function m.getLoadProcess()
@@ -637,6 +655,7 @@ config.watch(function (key, value, oldValue)
 end)
 
 fw.event(function (changes) ---@async
+    -- TODO
     m.awaitReady()
     for _, change in ipairs(changes) do
         local path = change.path

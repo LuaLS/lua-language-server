@@ -211,9 +211,9 @@ m.register 'workspace/didRenameFiles' {
 m.register 'textDocument/didOpen' {
     ---@async
     function (params)
-        workspace.awaitReady()
         local doc   = params.textDocument
         local uri   = files.getRealUri(doc.uri)
+        workspace.awaitReady(uri)
         local text  = doc.text
         log.debug('didOpen', uri)
         files.setText(uri, text, true)
@@ -236,10 +236,10 @@ m.register 'textDocument/didClose' {
 m.register 'textDocument/didChange' {
     ---@async
     function (params)
-        workspace.awaitReady()
         local doc     = params.textDocument
         local changes = params.contentChanges
         local uri     = files.getRealUri(doc.uri)
+        workspace.awaitReady(uri)
         --log.debug('changes', util.dump(changes))
         local text = files.getOriginText(uri) or ''
         local rows = files.getCachedRows(uri)
@@ -288,13 +288,13 @@ m.register 'textDocument/definition' {
     abortByFileUpdate = true,
     ---@async
     function (params)
-        workspace.awaitReady()
-        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_DEFINITION, 0.5)
-        local core   = require 'core.definition'
         local uri    = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
         if not files.exists(uri) then
             return nil
         end
+        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_DEFINITION, 0.5)
+        local core   = require 'core.definition'
         local pos = converter.unpackPosition(uri, params.position)
         local result = core(uri, pos)
         if not result then
@@ -327,13 +327,13 @@ m.register 'textDocument/typeDefinition' {
     abortByFileUpdate = true,
     ---@async
     function (params)
-        workspace.awaitReady()
-        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_TYPE_DEFINITION, 0.5)
-        local core   = require 'core.type-definition'
         local uri    = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
         if not files.exists(uri) then
             return nil
         end
+        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_TYPE_DEFINITION, 0.5)
+        local core   = require 'core.type-definition'
         local pos = converter.unpackPosition(uri, params.position)
         local result = core(uri, pos)
         if not result then
@@ -366,13 +366,13 @@ m.register 'textDocument/references' {
     abortByFileUpdate = true,
     ---@async
     function (params)
-        workspace.awaitReady()
-        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_REFERENCE, 0.5)
-        local core   = require 'core.reference'
         local uri    = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
         if not files.exists(uri) then
             return nil
         end
+        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_REFERENCE, 0.5)
+        local core   = require 'core.reference'
         local pos    = converter.unpackPosition(uri, params.position)
         local result = core(uri, pos)
         if not result then
@@ -417,13 +417,13 @@ m.register 'textDocument/rename' {
     abortByFileUpdate = true,
     ---@async
     function (params)
-        workspace.awaitReady()
-        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_RENAME, 0.5)
-        local core = require 'core.rename'
         local uri  = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
         if not files.exists(uri) then
             return nil
         end
+        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_RENAME, 0.5)
+        local core = require 'core.rename'
         local pos    = converter.unpackPosition(uri, params.position)
         local result = core.rename(uri, pos, params.newName)
         if not result then
@@ -620,15 +620,15 @@ m.register 'textDocument/signatureHelp' {
     abortByFileUpdate = true,
     ---@async
     function (params)
-        if not config.get(nil, 'Lua.signatureHelp.enable') then
+        local uri = files.getRealUri(params.textDocument.uri)
+        if not config.get(uri, 'Lua.signatureHelp.enable') then
             return nil
         end
-        workspace.awaitReady()
-        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SIGNATURE, 0.5)
-        local uri = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
         if not files.exists(uri) then
             return nil
         end
+        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SIGNATURE, 0.5)
         local pos = converter.unpackPosition(uri, params.position)
         local core = require 'core.signature'
         local results = core(uri, pos)
@@ -666,11 +666,11 @@ m.register 'textDocument/documentSymbol' {
     abortByFileUpdate = true,
     ---@async
     function (params)
-        workspace.awaitReady()
-        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SYMBOL, 0.5)
-        local core = require 'core.document-symbol'
         local uri   = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
+        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SYMBOL, 0.5)
 
+        local core = require 'core.document-symbol'
         local symbols = core(uri)
         if not symbols then
             return nil
@@ -769,7 +769,6 @@ m.register 'workspace/symbol' {
     abortByFileUpdate = true,
     ---@async
     function (params)
-        workspace.awaitReady()
         local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_WS_SYMBOL, 0.5)
         local core = require 'core.workspace-symbol'
 
@@ -803,7 +802,7 @@ m.register 'textDocument/semanticTokens/full' {
     ---@async
     function (params)
         local uri = files.getRealUri(params.textDocument.uri)
-        workspace.awaitReady()
+        workspace.awaitReady(uri)
         local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
         local core = require 'core.semantic-tokens'
         local results = core(uri, 0, math.huge)
@@ -818,7 +817,7 @@ m.register 'textDocument/semanticTokens/range' {
     ---@async
     function (params)
         local uri = files.getRealUri(params.textDocument.uri)
-        workspace.awaitReady()
+        workspace.awaitReady(uri)
         local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_RANGE, 0.5)
         local core = require 'core.semantic-tokens'
         local cache  = files.getOpenedCache(uri)
@@ -911,10 +910,10 @@ m.register 'textDocument/onTypeFormatting' {
     abortByFileUpdate = true,
     ---@async
     function (params)
-        workspace.awaitReady()
+        local uri    = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
         local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
         local ch     = params.ch
-        local uri    = files.getRealUri(params.textDocument.uri)
         if not files.exists(uri) then
             return nil
         end
@@ -948,12 +947,12 @@ m.register '$/cancelRequest' {
 m.register '$/requestHint' {
     ---@async
     function (params)
-        local core = require 'core.hint'
-        if not config.get(nil, 'Lua.hint.enable') then
+        local uri  = files.getRealUri(params.textDocument.uri)
+        if not config.get(uri, 'Lua.hint.enable') then
             return
         end
-        workspace.awaitReady()
-        local uri           = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
+        local core = require 'core.hint'
         local start, finish = converter.unpackRange(uri, params.range)
         local results = core(uri, start, finish)
         local hintResults = {}
@@ -972,13 +971,13 @@ m.register '$/requestHint' {
 do
     ---@async
     local function updateHint(uri)
-        if not config.get(nil, 'Lua.hint.enable') then
+        if not config.get(uri, 'Lua.hint.enable') then
             return
         end
         local id = 'updateHint' .. uri
         await.close(id)
         await.setID(id)
-        workspace.awaitReady()
+        workspace.awaitReady(uri)
         local visibles = files.getVisibles(uri)
         if not visibles then
             return
@@ -986,7 +985,7 @@ do
         await.close(id)
         await.setID(id)
         await.delay()
-        workspace.awaitReady()
+        workspace.awaitReady(uri)
         local edits = {}
         local hint = require 'core.hint'
         local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_HINT, 0.5)

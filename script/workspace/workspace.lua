@@ -70,6 +70,7 @@ local globInteferFace = {
 
 --- 创建排除文件匹配器
 ---@async
+---@param scp scope
 function m.getNativeMatcher(scp)
     if scp:get 'nativeMatcher' then
         return scp:get 'nativeMatcher'
@@ -199,113 +200,23 @@ function m.isValidLuaUri(uri)
     return true
 end
 
-local function loadFileFactory(scp, progressData, isLibrary)
-    return function (path) ---@async
-        local uri = furi.encode(path)
-        if files.isLua(uri) then
-            if not isLibrary and progressData.preload >= config.get(nil, 'Lua.workspace.maxPreload') then
-                if not m.hasHitMaxPreload then
-                    m.hasHitMaxPreload = true
-                    proto.request('window/showMessageRequest', {
-                        type    = define.MessageType.Info,
-                        message = lang.script('MWS_MAX_PRELOAD', config.get(nil, 'Lua.workspace.maxPreload')),
-                        actions = {
-                            {
-                                title = lang.script.WINDOW_INCREASE_UPPER_LIMIT,
-                            },
-                            {
-                                title = lang.script.WINDOW_CLOSE,
-                            }
-                        }
-                    }, function (item)
-                        if not item then
-                            return
-                        end
-                        if item.title == lang.script.WINDOW_INCREASE_UPPER_LIMIT then
-                            client.setConfig {
-                                {
-                                    key    = 'Lua.workspace.maxPreload',
-                                    action = 'set',
-                                    value  = config.get(nil, 'Lua.workspace.maxPreload')
-                                           + math.max(1000, config.get(nil, 'Lua.workspace.maxPreload')),
-                                }
-                            }
-                        end
-                    end)
-                end
-                return
-            end
-            if not isLibrary then
-                progressData.preload = progressData.preload + 1
-            end
-            progressData.max = progressData.max + 1
-            progressData:update()
-            pub.task('loadFile', uri, function (text)
-                local loader = function ()
-                    if text then
-                        log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #text / 1024.0))
-                        if isLibrary then
-                            log.info('++++As library of:', root)
-                            files.setLibraryPath(uri, root)
-                        end
-                        files.setText(uri, text, false)
-                    else
-                        files.remove(uri)
-                    end
-                    progressData.read = progressData.read + 1
-                    progressData:update()
-                end
-                if progressData.loaders then
-                    progressData.loaders[#progressData.loaders+1] = loader
-                else
-                    loader()
-                end
-            end)
-        end
-        if files.isDll(uri) then
-            progressData.max = progressData.max + 1
-            progressData:update()
-            pub.task('loadFile', uri, function (content)
-                if content then
-                    log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
-                    if isLibrary then
-                        log.info('++++As library of:', root)
-                    end
-                    files.saveDll(uri, content)
-                end
-                progressData.read = progressData.read + 1
-                progressData:update()
-            end)
-        end
-        await.delay()
-    end
-end
-
 ---@async
 function m.awaitLoadFile(uri)
-    local progressBar <close> = progress.create(lang.script.WORKSPACE_LOADING)
-    local progressData = {
-        max     = 0,
-        read    = 0,
-        preload = 0,
-        update  = function (self)
-            progressBar:setMessage(('%d/%d'):format(self.read, self.max))
-            progressBar:setPercentage(self.read / self.max * 100)
-        end
-    }
-    local nativeLoader    = loadFileFactory(m.rootPath, progressData)
-    local native          = m.getNativeMatcher()
-    if native then
-        log.info('Scan files at:', m.rootPath)
-        native:scan(furi.decode(uri), nativeLoader)
-    end
+    local scp = m.getScope(uri)
+    local ld <close> = loading.create(scp)
+    local native = m.getNativeMatcher(scp)
+    log.info('Scan files at:', uri)
+    ---@async
+    native:scan(furi.decode(uri), function (path)
+        ld:scanFile(furi.encode(path))
+    end)
+    ld:loadAll()
 end
 
 --- 预读工作区内所有文件
 ---@async
 ---@param scp scope
 function m.awaitPreload(scp)
-    local diagnostic = require 'provider.diagnostic'
     await.close 'preload'
     await.setID 'preload'
     await.sleep(0.1)
@@ -323,26 +234,28 @@ function m.awaitPreload(scp)
 
     log.info('Preload start:', scp.uri)
 
-    local nativeLoader    = loadFileFactory(scp, ld)
-    local native          = m.getNativeMatcher(scp)
-    local librarys        = m.getLibraryMatchers(scp)
-    if native then
+    local native   = m.getNativeMatcher(scp)
+    local librarys = m.getLibraryMatchers(scp)
+
+    do
         log.info('Scan files at:', m.rootPath)
-        native:scan(m.rootPath, nativeLoader)
+        ---@async
+        native:scan(furi.decode(scp.uri), function (path)
+            ld:scanFile(furi.encode(path))
+        end)
     end
+
     for _, libMatcher in ipairs(librarys) do
-        local libraryLoader = loadFileFactory(scp, ld, libMatcher.uri)
         log.info('Scan library at:', libMatcher.uri)
-        libMatcher.matcher:scan(furi.decode(libMatcher.uri), libraryLoader)
+        ---@async
+        libMatcher.matcher:scan(furi.decode(libMatcher.uri), function (path)
+            ld:scanFile(furi.encode(path), libMatcher.uri)
+        end)
         watchers[#watchers+1] = fw.watch(furi.decode(libMatcher.uri))
     end
 
     log.info(('Found %d files.'):format(ld.max))
-    while not ld:isFinished() do
-        log.info(('Loaded %d/%d files'):format(ld.read, ld.max))
-        ld:load()
-        await.sleep(0.1)
-    end
+    ld:loadAll()
     log.info('Preload finish.')
 end
 

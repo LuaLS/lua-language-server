@@ -6,6 +6,7 @@ local define    = require 'proto.define'
 local config    = require 'config'
 local converter = require 'proto.converter'
 local json      = require 'json-beautify'
+local await     = require 'await'
 
 local m = {}
 
@@ -108,10 +109,8 @@ end
 ---@param type message.type
 ---@param message string
 ---@param titles  string[]
----@return string action
----@return integer index
----@async
-function m.awaitRequestMessage(type, message, titles)
+---@param callback fun(action: string, index: integer)
+function m.requestMessage(type, message, titles, callback)
     proto.notify('window/logMessage', {
         type = define.MessageType[type] or 3,
         message = message,
@@ -124,15 +123,29 @@ function m.awaitRequestMessage(type, message, titles)
         }
         map[title] = i
     end
-    local item = proto.awaitRequest('window/showMessageRequest', {
+    proto.request('window/showMessageRequest', {
         type    = define.MessageType[type] or 3,
         message = message,
         actions = actions,
-    })
-    if not item then
-        return nil
-    end
-    return item.title, map[item.title]
+    }, function (item)
+        if item then
+            callback(item.title, map[item.title])
+        else
+            callback(nil, nil)
+        end
+    end)
+end
+
+---@param type message.type
+---@param message string
+---@param titles  string[]
+---@return string action
+---@return integer index
+---@async
+function m.awaitRequestMessage(type, message, titles)
+    return await.wait(function (waker)
+        m.requestMessage(type, message, titles, waker)
+    end)
 end
 
 ---@param type message.type
@@ -289,7 +302,6 @@ function m.setConfig(changes, onlyMemory)
                 finalChanges[#finalChanges+1] = change
             end
         end
-        change.uri = m.info.rootUri
     end
     if onlyMemory then
         return

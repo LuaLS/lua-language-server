@@ -93,7 +93,7 @@ function m.getOpenedCache(uri)
 end
 
 --- 标记为库文件
-function m.setLibraryPath(uri, libraryPath)
+function m.setLibraryUri(uri, libraryPath)
     m.libraryMap[uri] = libraryPath
 end
 

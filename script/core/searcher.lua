@@ -777,7 +777,7 @@ function m.searchRefsByID(status, suri, expect, mode)
         or mode == 'alldef'
         or field
         or hasCall(field) then
-            for _, guri in ceach('def:' .. id) do
+            for _, guri in ceach(uri, 'def:' .. id) do
                 if uri == guri then
                     goto CONTINUE
                 end
@@ -786,14 +786,14 @@ function m.searchRefsByID(status, suri, expect, mode)
             end
         elseif mode == 'field'
         or     mode == 'allfield' then
-            for _, guri in ceach('def:' .. id) do
+            for _, guri in ceach(uri, 'def:' .. id) do
                 if uri == guri then
                     goto CONTINUE
                 end
                 searchID(guri, id, field, uri)
                 ::CONTINUE::
             end
-            for _, guri in ceach('field:' .. id) do
+            for _, guri in ceach(uri, 'field:' .. id) do
                 if uri == guri then
                     goto CONTINUE
                 end
@@ -801,7 +801,7 @@ function m.searchRefsByID(status, suri, expect, mode)
                 ::CONTINUE::
             end
         else
-            for _, guri in ceach(id) do
+            for _, guri in ceach(uri, id) do
                 if crossed[guri] then
                     goto CONTINUE
                 end
@@ -829,7 +829,7 @@ function m.searchRefsByID(status, suri, expect, mode)
         or ignoredIDs[id]
         or id == 'dn:string'
         or hasCall(field) then
-            for _, guri in ceach('def:' .. id) do
+            for _, guri in ceach(uri, 'def:' .. id) do
                 if uri == guri then
                     goto CONTINUE
                 end
@@ -837,7 +837,7 @@ function m.searchRefsByID(status, suri, expect, mode)
                 ::CONTINUE::
             end
         else
-            for _, guri in ceach(id) do
+            for _, guri in ceach(uri, id) do
                 if crossed[guri] then
                     goto CONTINUE
                 end

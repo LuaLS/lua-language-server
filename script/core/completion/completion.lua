@@ -584,14 +584,14 @@ end
 ---@async
 local function checkGlobal(state, word, startPos, position, parent, oop, results)
     local locals = guide.getVisibleLocals(state.ast, position)
-    local globals = vm.getGlobalSets '*'
+    local globals = vm.getGlobalSets(state.uri, '*')
     checkFieldOfRefs(globals, state, word, startPos, position, parent, oop, results, locals, 'global')
 end
 
 ---@async
 local function checkField(state, word, start, position, parent, oop, results)
     if parent.tag == '_ENV' or parent.special == '_G' then
-        local globals = vm.getGlobalSets '*'
+        local globals = vm.getGlobalSets(state.uri, '*')
         checkFieldOfRefs(globals, state, word, start, position, parent, oop, results)
     else
         local refs = vm.getRefs(parent, '*')
@@ -1630,7 +1630,7 @@ local function tryluaDocBySource(state, position, source, results)
     if source.type == 'doc.extends.name' then
         if source.parent.type == 'doc.class' then
             local used = {}
-            for _, doc in ipairs(vm.getDocDefines '*') do
+            for _, doc in ipairs(vm.getDocDefines(state.uri, '*')) do
                 if  doc.type == 'doc.class.name'
                 and doc.parent ~= source.parent
                 and not used[doc[1]]
@@ -1651,7 +1651,7 @@ local function tryluaDocBySource(state, position, source, results)
         return true
     elseif source.type == 'doc.type.name' then
         local used = {}
-        for _, doc in ipairs(vm.getDocDefines '*') do
+        for _, doc in ipairs(vm.getDocDefines(state.uri, '*')) do
             if  (doc.type == 'doc.class.name' or doc.type == 'doc.alias.name')
             and doc.parent ~= source.parent
             and not used[doc[1]]
@@ -1729,7 +1729,7 @@ end
 
 local function tryluaDocByErr(state, position, err, docState, results)
     if err.type == 'LUADOC_MISS_CLASS_EXTENDS_NAME' then
-        for _, doc in ipairs(vm.getDocDefines '*') do
+        for _, doc in ipairs(vm.getDocDefines(state.uri, '*')) do
             if  doc.type == 'doc.class.name'
             and doc.parent ~= docState then
                 results[#results+1] = {
@@ -1739,7 +1739,7 @@ local function tryluaDocByErr(state, position, err, docState, results)
             end
         end
     elseif err.type == 'LUADOC_MISS_TYPE_NAME' then
-        for _, doc in ipairs(vm.getDocDefines '*') do
+        for _, doc in ipairs(vm.getDocDefines(state.uri, '*')) do
             if  (doc.type == 'doc.class.name' or doc.type == 'doc.alias.name') then
                 results[#results+1] = {
                     label       = doc[1],

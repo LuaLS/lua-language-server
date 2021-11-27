@@ -19,7 +19,7 @@ return function (uri, callback)
         if doc.type == 'doc.alias' then
             local name = guide.getKeyName(doc)
             if not cache[name] then
-                local docs = vm.getDocDefines(name)
+                local docs = vm.getDocDefines(uri, name)
                 cache[name] = {}
                 for _, otherDoc in ipairs(docs) do
                     if otherDoc.type == 'doc.class.name'

@@ -10,14 +10,14 @@ local noder     = require 'core.noder'
 ---获取class与alias
 ---@param name? string
 ---@return parser.guide.object[]
-function vm.getDocDefines(name)
+function vm.getDocDefines(uri, name)
     local cache = vm.getCache 'getDocDefines'
     if cache[name] then
         return cache[name]
     end
     local results = {}
     if name == '*' then
-        for noders in collector.each('def:dn:') do
+        for noders in collector.each(uri, 'def:dn:') do
             for id in noder.eachID(noders) do
                 if  id:sub(1, 3) == 'dn:'
                 and not id:find(noder.SPLIT_CHAR) then
@@ -31,7 +31,7 @@ function vm.getDocDefines(name)
         end
     else
         local id = 'dn:' .. name
-        for noders in collector.each('def:' .. id) do
+        for noders in collector.each(uri, 'def:' .. id) do
             for source in noder.eachSource(noders, id) do
                 if source.type == 'doc.class.name'
                 or source.type == 'doc.alias.name' then

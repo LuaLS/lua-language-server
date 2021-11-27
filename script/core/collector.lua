@@ -1,3 +1,5 @@
+local scope = require 'workspace.scope'
+
 local collect    = {}
 local subscribed = {}
 
@@ -58,17 +60,34 @@ end
 local DUMMY_FUNCTION = function () end
 
 --- 迭代某个名字的订阅
+---@param uri  uri
 ---@param name string
-function m.each(name)
+function m.each(uri, name)
     local nameCollect = collect[name]
     if not nameCollect then
         return DUMMY_FUNCTION
     end
-    local uri, value
-    return function ()
-        uri, value = next(nameCollect, uri)
-        return value, uri
+    ---@type scope
+    local scp = scope.getFolder(uri)
+            or  scope.getLinkedScope(uri)
+    if not scp then
+        return DUMMY_FUNCTION
     end
+
+    local curi, value
+    local function getNext()
+        curi, value = next(nameCollect, curi)
+        if not curi then
+            return nil, nil
+        end
+        if  not scp:isChildUri(curi)
+        and not scp:isLinkedUri(curi) then
+            return getNext()
+        end
+
+        return value, curi
+    end
+    return getNext
 end
 
 return m

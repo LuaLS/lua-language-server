@@ -70,24 +70,21 @@ local globInteferFace = {
 
 --- 创建排除文件匹配器
 ---@async
-function m.getNativeMatcher()
-    if not m.rootPath then
-        return nil
-    end
-    if m.nativeMatcher then
-        return m.nativeMatcher
+function m.getNativeMatcher(scp)
+    if scp:get 'nativeMatcher' then
+        return scp:get 'nativeMatcher'
     end
 
     local pattern = {}
     -- config.get(nil, 'files.exclude'
-    for path, ignore in pairs(config.get(nil, 'files.exclude')) do
+    for path, ignore in pairs(config.get(scp.uri, 'files.exclude')) do
         if ignore then
             log.info('Ignore by exclude:', path)
             pattern[#pattern+1] = path
         end
     end
     -- config.get(nil, 'workspace.useGitIgnore'
-    if config.get(nil, 'Lua.workspace.useGitIgnore') then
+    if config.get(scp.uri, 'Lua.workspace.useGitIgnore') then
         local buf = pub.awaitTask('loadFile', furi.encode(m.rootPath .. '/.gitignore'))
         if buf then
             for line in buf:gmatch '[^\r\n]+' do
@@ -108,7 +105,7 @@ function m.getNativeMatcher()
         end
     end
     -- config.get(nil, 'workspace.ignoreSubmodules'
-    if config.get(nil, 'Lua.workspace.ignoreSubmodules') then
+    if config.get(scp.uri, 'Lua.workspace.ignoreSubmodules') then
         local buf = pub.awaitTask('loadFile', furi.encode(m.rootPath .. '/.gitmodules'))
         if buf then
             for path in buf:gmatch('path = ([^\r\n]+)') do
@@ -118,7 +115,7 @@ function m.getNativeMatcher()
         end
     end
     -- config.get(nil, 'workspace.library'
-    for path in pairs(config.get(nil, 'Lua.workspace.library')) do
+    for path in pairs(config.get(scp.uri, 'Lua.workspace.library')) do
         path = m.getAbsolutePath(path)
         if path then
             log.info('Ignore by library:', path)
@@ -126,50 +123,57 @@ function m.getNativeMatcher()
         end
     end
     -- config.get(nil, 'workspace.ignoreDir'
-    for _, path in ipairs(config.get(nil, 'Lua.workspace.ignoreDir')) do
+    for _, path in ipairs(config.get(scp.uri, 'Lua.workspace.ignoreDir')) do
         log.info('Ignore directory:', path)
         pattern[#pattern+1] = path
     end
 
-    m.nativeMatcher = glob.gitignore(pattern, m.matchOption, globInteferFace)
-    m.nativeMatcher:setOption('root', m.rootPath)
+    local matcher = glob.gitignore(pattern, {
+        root       = furi.decode(scp.uri),
+        ignoreCase = platform.OS == 'Windows',
+    }, globInteferFace)
 
-    m.nativeVersion = config.get(nil, 'version')
-    return m.nativeMatcher
+    scp:set('nativeMatcher', matcher)
+    return matcher
 end
 
 --- 创建代码库筛选器
-function m.getLibraryMatchers()
-    if m.libraryMatchers then
-        return m.libraryMatchers
+---@param scp scope
+function m.getLibraryMatchers(scp)
+    if scp:get 'nativeMatcher' then
+        return scp:get 'nativeMatcher'
     end
 
     local librarys = {}
-    for path in pairs(config.get(nil, 'Lua.workspace.library')) do
+    for path in pairs(config.get(scp.uri, 'Lua.workspace.library')) do
         path = m.getAbsolutePath(path)
         if path then
             librarys[m.normalize(path)] = true
         end
     end
+    -- TODO
     if library.metaPath then
         librarys[m.normalize(library.metaPath)] = true
     end
-    m.libraryMatchers = {}
+
+    local matchers = {}
     for path in pairs(librarys) do
         if fs.exists(fs.path(path)) then
             local nPath = fs.absolute(fs.path(path)):string()
-            local matcher = glob.gitignore(true, m.matchOption, globInteferFace)
-            matcher:setOption('root', path)
-            log.debug('getLibraryMatchers', path, nPath)
-            m.libraryMatchers[#m.libraryMatchers+1] = {
-                path    = nPath,
+            local matcher = glob.gitignore(true, {
+                root       = path,
+                ignoreCase = platform.OS == 'Windows',
+            }, globInteferFace)
+            matchers[#matchers+1] = {
+                uri     = furi.encode(nPath),
                 matcher = matcher
             }
         end
     end
 
-    m.libraryVersion = config.get(nil, 'version')
-    return m.libraryMatchers
+    scp:set('nativeMatcher', matchers)
+
+    return matchers
 end
 
 --- 文件是否被忽略
@@ -195,7 +199,7 @@ function m.isValidLuaUri(uri)
     return true
 end
 
-local function loadFileFactory(root, progressData, isLibrary)
+local function loadFileFactory(scp, progressData, isLibrary)
     return function (path) ---@async
         local uri = furi.encode(path)
         if files.isLua(uri) then
@@ -305,80 +309,41 @@ function m.awaitPreload(scp)
     await.close 'preload'
     await.setID 'preload'
     await.sleep(0.1)
-    diagnostic.pause(scp)
 
-    if scp:get 'watchers' then
-        for _, dispose in ipairs(scp:get 'watchers') do
+    local watchers = scp:get 'watchers'
+    if watchers then
+        for _, dispose in ipairs(watchers) do
             dispose()
         end
     end
-    scp:set('watchers', {})
+    watchers = {}
+    scp:set('watchers', watchers)
 
-    local ld = loading.create(scp)
+    local ld <close> = loading.create(scp)
 
-    local progressBar <close> = progress.create(lang.script('WORKSPACE_LOADING', scp.uri))
-    local progressData = {
-        max     = 0,
-        read    = 0,
-        preload = 0,
-        loaders = {},
-        update  = function (self)
-            progressBar:setMessage(('%d/%d'):format(self.read, self.max))
-            progressBar:setPercentage(self.read / self.max * 100)
-            m.fileLoaded = self.read
-            m.fileFound  = self.max
-        end
-    }
-    log.info('Preload start.')
+    log.info('Preload start:', scp.uri)
 
-    local nativeLoader    = loadFileFactory(m.rootPath, progressData)
-    local native          = m.getNativeMatcher()
-    local librarys        = m.getLibraryMatchers()
+    local nativeLoader    = loadFileFactory(scp, ld)
+    local native          = m.getNativeMatcher(scp)
+    local librarys        = m.getLibraryMatchers(scp)
     if native then
         log.info('Scan files at:', m.rootPath)
         native:scan(m.rootPath, nativeLoader)
     end
-    for _, library in ipairs(librarys) do
-        local libraryLoader = loadFileFactory(library.path, progressData, true)
-        log.info('Scan library at:', library.path)
-        library.matcher:scan(library.path, libraryLoader)
-        m.watchers[#m.watchers+1] = fw.watch(library.path)
+    for _, libMatcher in ipairs(librarys) do
+        local libraryLoader = loadFileFactory(scp, ld, libMatcher.uri)
+        log.info('Scan library at:', libMatcher.uri)
+        libMatcher.matcher:scan(furi.decode(libMatcher.uri), libraryLoader)
+        watchers[#watchers+1] = fw.watch(furi.decode(libMatcher.uri))
     end
 
-    local isLoadingFiles = false
-    local function loadSomeFiles()
-        if isLoadingFiles then
-            return
-        end
-        await.call(function () ---@async
-            isLoadingFiles = true
-            while true do
-                local loader = table.remove(progressData.loaders)
-                if not loader then
-                    break
-                end
-                loader()
-                await.delay()
-            end
-            isLoadingFiles = false
-        end)
-    end
-
-    log.info(('Found %d files.'):format(progressData.max))
-    while true do
-        loadSomeFiles()
-        log.info(('Loaded %d/%d files'):format(progressData.read, progressData.max))
-        progressData:update()
-        if progressData.read >= progressData.max then
-            break
-        end
+    log.info(('Found %d files.'):format(ld.max))
+    while not ld:isFinished() do
+        log.info(('Loaded %d/%d files'):format(ld.read, ld.max))
+        ld:load()
         await.sleep(0.1)
     end
-    progressBar:remove()
-
     log.info('Preload finish.')
-
-    diagnostic.start()
 end
 
 --- 查找符合指定file path的所有uri

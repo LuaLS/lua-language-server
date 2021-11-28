@@ -41,7 +41,7 @@ local function loadDocMetas()
     for _, path in ipairs(library.metaPaths) do
         local uri = furi.encode(path)
         files.setText(uri, fsu.loadFile(path))
-        files.setLibraryPath(uri, library.metaPath)
+        files.addRef(uri)
     end
 end
 

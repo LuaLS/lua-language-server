@@ -64,6 +64,7 @@ function m.open(uri)
         cache = {},
     }
     m.onWatch('open', uri)
+    m.addRef(uri)
 end
 
 --- 关闭文件
@@ -75,6 +76,7 @@ function m.close(uri)
         file.trusted = false
     end
     m.onWatch('close', uri)
+    m.delRef(uri)
 end
 
 --- 是否打开
@@ -93,8 +95,11 @@ function m.getOpenedCache(uri)
 end
 
 --- 标记为库文件
-function m.setLibraryUri(uri, libraryPath)
-    m.libraryMap[uri] = libraryPath
+---@param scp scope
+---@param uri uri
+---@param libraryUri uri
+function m.setLibraryUri(scp, uri, libraryUri)
+    scp:get 'libraryMap' [uri] = libraryUri
 end
 
 --- 是否是库文件
@@ -107,8 +112,9 @@ function m.getLibraryPath(uri)
     return m.libraryMap[uri]
 end
 
-function m.flushAllLibrary()
-    m.libraryMap = {}
+---@param scp scope
+function m.flushAllLibrary(scp)
+    scp:set('libraryMap', {})
 end
 
 --- 是否存在
@@ -344,6 +350,25 @@ function m.getChildFiles(uri)
     return results
 end
 
+function m.addRef(uri)
+    local file = m.fileMap[uri]
+    if not file then
+        return
+    end
+    file._ref = (file._ref or 0) + 1
+end
+
+function m.delRef(uri)
+    local file = m.fileMap[uri]
+    if not file then
+        return
+    end
+    file._ref = (file._ref or 0) - 1
+    if file._ref <= 0 then
+        m.remove(uri)
+    end
+end
+
 --- 移除文件
 ---@param uri uri
 function m.remove(uri)
@@ -355,7 +380,6 @@ function m.remove(uri)
     m.fileMap[uri]        = nil
     m.astMap[uri]         = nil
     m._pairsCache         = nil
-    m.flushFileCache(uri)
 
     m.fileCount     = m.fileCount - 1
     m.globalVersion = m.globalVersion + 1
@@ -750,24 +774,6 @@ function m.onWatch(ev, uri)
             callback(ev, uri)
         end)
     end
-end
-
-function m.flushCache()
-    for uri, file in pairs(m.fileMap) do
-        file.cacheActiveTime = math.huge
-        m.astMap[uri] = nil
-        file.cache = {}
-    end
-end
-
-function m.flushFileCache(uri)
-    local file = m.fileMap[uri]
-    if not file then
-        return
-    end
-    file.cacheActiveTime = math.huge
-    m.astMap[uri] = nil
-    file.cache = {}
 end
 
 function m.init()

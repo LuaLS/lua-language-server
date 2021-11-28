@@ -10,6 +10,7 @@ local pub      = require 'pub.pub'
 ---@field scp scope
 ---@field _bar progress
 ---@field _stash function[]
+---@field _refs uri[]
 local mt = {}
 mt.__index = mt
 
@@ -75,27 +76,33 @@ function mt:scanFile(uri, libraryUri)
                     return
                 end
                 log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
+                table.insert(self.scp:get 'cachedUris', uri)
+                files.setText(uri, content, false)
+                files.addRef(uri)
                 if libraryUri then
                     log.info('++++As library of:', libraryUri)
-                    files.setLibraryUri(uri, libraryUri)
+                    files.setLibraryUri(self.scp, uri, libraryUri)
                 end
-                files.setText(uri, content, false)
             end
         end)
     elseif files.isDll(uri) then
         self.max = self.max + 1
         self:update()
         pub.task('loadFile', uri, function (content)
-            self.read = self.read + 1
-            self:update()
-            if not content then
-                return
+            self._stash[#self._stash+1] = function ()
+                self.read = self.read + 1
+                self:update()
+                if not content then
+                    return
+                end
+                log.info(('Preload dll at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
+                table.insert(self.scp:get 'cachedUris', uri)
+                files.saveDll(uri, content)
+                files.addRef(uri)
+                if libraryUri then
+                    log.info('++++As library of:', libraryUri)
+                end
             end
-            log.info(('Preload dll at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
-            if libraryUri then
-                log.info('++++As library of:', libraryUri)
-            end
-            files.saveDll(uri, content)
         end)
         await.delay()
     end
@@ -148,6 +155,7 @@ function m.create(scp)
         _bar   = progress.create(lang.script('WORKSPACE_LOADING', scp.uri)),
         _stash = {},
     }, mt)
+    scp:set('cachedUris', {})
     return loading
 end
 

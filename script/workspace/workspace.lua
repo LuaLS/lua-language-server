@@ -6,11 +6,7 @@ local config     = require 'config'
 local glob       = require 'glob'
 local platform   = require 'bee.platform'
 local await      = require 'await'
-local proto      = require 'proto.proto'
-local lang       = require 'language'
 local library    = require 'library'
-local progress   = require 'progress'
-local define     = require "proto.define"
 local client     = require 'client'
 local plugin     = require 'plugin'
 local util       = require 'utility'
@@ -24,7 +20,6 @@ m.type = 'workspace'
 
 function m.initRoot(uri)
     m.rootUri  = uri
-    m.rootPath = furi.decode(uri)
     log.info('Workspace init root: ', uri)
 
     local logPath = fs.path(LOGPATH) / (uri:gsub('[/:]+', '_') .. '.log')
@@ -86,7 +81,7 @@ function m.getNativeMatcher(scp)
     end
     -- config.get(nil, 'workspace.useGitIgnore'
     if config.get(scp.uri, 'Lua.workspace.useGitIgnore') then
-        local buf = pub.awaitTask('loadFile', furi.encode(m.rootPath .. '/.gitignore'))
+        local buf = pub.awaitTask('loadFile', m.rootUri .. '/.gitignore')
         if buf then
             for line in buf:gmatch '[^\r\n]+' do
                 if line:sub(1, 1) ~= '#' then
@@ -95,7 +90,7 @@ function m.getNativeMatcher(scp)
                 end
             end
         end
-        buf = pub.awaitTask('loadFile', furi.encode(m.rootPath .. '/.git/info/exclude'))
+        buf = pub.awaitTask('loadFile', m.rootUri .. '/.git/info/exclude')
         if buf then
             for line in buf:gmatch '[^\r\n]+' do
                 if line:sub(1, 1) ~= '#' then
@@ -107,7 +102,7 @@ function m.getNativeMatcher(scp)
     end
     -- config.get(nil, 'workspace.ignoreSubmodules'
     if config.get(scp.uri, 'Lua.workspace.ignoreSubmodules') then
-        local buf = pub.awaitTask('loadFile', furi.encode(m.rootPath .. '/.gitmodules'))
+        local buf = pub.awaitTask('loadFile', m.rootUri .. '/.gitmodules')
         if buf then
             for path in buf:gmatch('path = ([^\r\n]+)') do
                 log.info('Ignore by .gitmodules:', path)
@@ -179,9 +174,11 @@ end
 
 --- 文件是否被忽略
 ---@async
+---@param uri uri
 function m.isIgnored(uri)
-    local path = m.getRelativePath(uri)
-    local ignore = m.getNativeMatcher()
+    local scp    = m.getScope(uri)
+    local path   = m.getRelativePath(uri)
+    local ignore = m.getNativeMatcher(scp)
     if not ignore then
         return false
     end
@@ -238,7 +235,7 @@ function m.awaitPreload(scp)
     local librarys = m.getLibraryMatchers(scp)
 
     do
-        log.info('Scan files at:', m.rootPath)
+        log.info('Scan files at:', m.rootUri)
         ---@async
         native:scan(furi.decode(scp.uri), function (path)
             ld:scanFile(furi.encode(path))
@@ -398,30 +395,25 @@ end
 ---@param uriOrPath uri|string
 ---@return string
 function m.getRelativePath(uriOrPath)
-    local path
+    local path, uri
     if uriOrPath:sub(1, 5) == 'file:' then
         path = furi.decode(uriOrPath)
+        uri  = uriOrPath
     else
         path = uriOrPath
+        uri  = furi.encode(uriOrPath)
     end
-    if not m.rootPath then
+    local scp = m.getScope(uri)
+    if not scp.uri then
         local relative = m.normalize(path)
         return relative:gsub('^[/\\]+', '')
     end
-    local _, pos = m.normalize(path):find(m.rootPath, 1, true)
+    local _, pos = m.normalize(path):find(furi.decode(scp.uri), 1, true)
     if pos then
         return m.normalize(path:sub(pos + 1)):gsub('^[/\\]+', '')
     else
         return m.normalize(path):gsub('^[/\\]+', '')
     end
-end
-
-function m.isWorkspaceUri(uri)
-    if not m.rootUri then
-        return false
-    end
-    local ruri = m.rootUri
-    return uri:sub(1, #ruri) == ruri
 end
 
 --- 获取工作区等级的缓存
@@ -464,12 +456,33 @@ function m.init()
     end
 end
 
+---@param scp scope
+function m.removeFiles(scp)
+    local cachedUris = scp:get 'cachedUris'
+    if not cachedUris then
+        return
+    end
+    scp:set('cachedUris', nil)
+    for _, uri in ipairs(cachedUris) do
+        files.delRef(uri)
+    end
+end
+
+---@param scp scope
+function m.resetFiles(scp)
+    local cachedUris = scp:get 'cachedUris'
+    if not cachedUris then
+        return
+    end
+    for _, uri in ipairs(cachedUris) do
+        files.resetText(uri)
+    end
+end
+
 ---@async
 ---@param scp scope
 function m.awaitReload(scp)
-    files.flushAllLibrary(scp)
-    files.removeAllClosed(scp)
-    files.flushCache(scp)
+    m.removeFiles(scp)
     plugin.init(scp)
     m.awaitPreload(scp)
     scp:set('ready', true)
@@ -538,8 +551,8 @@ fw.event(function (changes) ---@async
     for _, change in ipairs(changes) do
         local path = change.path
         local uri  = furi.encode(path)
-        if  not m.isWorkspaceUri(uri)
-        and not files.isLibrary(uri) then
+        local scp  = m.getScope(uri)
+        if scp.type == 'fallback' then
             goto CONTINUE
         end
         if     change.type == 'create' then
@@ -564,7 +577,7 @@ fw.event(function (changes) ---@async
                 -- 排除类文件发生更改需要重新扫描
                 if filename == '.gitignore'
                 or filename == '.gitmodules' then
-                    m.reload()
+                    m.reload(scp)
                     break
                 end
             end

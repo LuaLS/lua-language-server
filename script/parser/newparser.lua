@@ -371,10 +371,15 @@ local function getSavePoint()
     local index = Index
     local line  = Line
     local lineOffset = LineOffset
+    local errs  = State.errs
+    local errCount = #errs
     return function ()
         Index = index
         Line  = line
         LineOffset = lineOffset
+        for i = errCount + 1, #errs do
+            errs[i] = nil
+        end
     end
 end
 
@@ -1560,41 +1565,43 @@ local function parseTable()
         end
         local lastRight = lastRightPosition()
 
-        local savePoint = getSavePoint()
-        local name = parseName()
-        if name then
-            skipSpace()
-            if Tokens[Index + 1] == '=' then
-                Index = Index + 2
-                if wantSep then
-                    pushError {
-                        type   = 'MISS_SEP_IN_TABLE',
-                        start  = lastRight,
-                        finish = getPosition(Tokens[Index], 'left'),
-                    }
-                end
-                wantSep = true
-                local eqRight = lastRightPosition()
+        if peekWord() then
+            local savePoint = getSavePoint()
+            local name = parseName()
+            if name then
                 skipSpace()
-                local fvalue = parseExp()
-                local tfield = {
-                    type   = 'tablefield',
-                    start  = name.start,
-                    finish = fvalue and fvalue.finish or eqRight,
-                    parent = tbl,
-                    field  = name,
-                    value  = fvalue,
-                }
-                name.type   = 'field'
-                name.parent = tfield
-                if fvalue then
-                    fvalue.parent = tfield
-                else
-                    missExp()
+                if Tokens[Index + 1] == '=' then
+                    Index = Index + 2
+                    if wantSep then
+                        pushError {
+                            type   = 'MISS_SEP_IN_TABLE',
+                            start  = lastRight,
+                            finish = getPosition(Tokens[Index], 'left'),
+                        }
+                    end
+                    wantSep = true
+                    local eqRight = lastRightPosition()
+                    skipSpace()
+                    local fvalue = parseExp()
+                    local tfield = {
+                        type   = 'tablefield',
+                        start  = name.start,
+                        finish = fvalue and fvalue.finish or eqRight,
+                        parent = tbl,
+                        field  = name,
+                        value  = fvalue,
+                    }
+                    name.type   = 'field'
+                    name.parent = tfield
+                    if fvalue then
+                        fvalue.parent = tfield
+                    else
+                        missExp()
+                    end
+                    index = index + 1
+                    tbl[index] = tfield
+                    goto CONTINUE
                 end
-                index = index + 1
-                tbl[index] = tfield
-                goto CONTINUE
             end
             savePoint()
         end

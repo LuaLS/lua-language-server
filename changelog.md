@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.5.0
+`2021-11-29`
 * `NEW` settings:
   + `Lua.runtime.pathStrict`: not check subdirectories when using `runtime.path`
   + `Lua.hint.await`: display `await` when calling a function marked as async

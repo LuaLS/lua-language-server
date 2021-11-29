@@ -367,6 +367,17 @@ local function skipNL()
     return false
 end
 
+local function getSavePoint()
+    local index = Index
+    local line  = Line
+    local lineOffset = LineOffset
+    return function ()
+        Index = index
+        Line  = line
+        LineOffset = lineOffset
+    end
+end
+
 local function fastForwardToken(offset)
     while true do
         local myOffset = Tokens[Index]
@@ -1549,6 +1560,45 @@ local function parseTable()
         end
         local lastRight = lastRightPosition()
 
+        local savePoint = getSavePoint()
+        local name = parseName()
+        if name then
+            skipSpace()
+            if Tokens[Index + 1] == '=' then
+                Index = Index + 2
+                if wantSep then
+                    pushError {
+                        type   = 'MISS_SEP_IN_TABLE',
+                        start  = lastRight,
+                        finish = getPosition(Tokens[Index], 'left'),
+                    }
+                end
+                wantSep = true
+                local eqRight = lastRightPosition()
+                skipSpace()
+                local fvalue = parseExp()
+                local tfield = {
+                    type   = 'tablefield',
+                    start  = name.start,
+                    finish = fvalue and fvalue.finish or eqRight,
+                    parent = tbl,
+                    field  = name,
+                    value  = fvalue,
+                }
+                name.type   = 'field'
+                name.parent = tfield
+                if fvalue then
+                    fvalue.parent = tfield
+                else
+                    missExp()
+                end
+                index = index + 1
+                tbl[index] = tfield
+                goto CONTINUE
+            end
+            savePoint()
+        end
+
         local exp = parseExp(true)
         if exp then
             if wantSep then
@@ -1564,33 +1614,6 @@ local function parseTable()
                 tbl[index] = exp
                 exp.parent = tbl
                 goto CONTINUE
-            end
-            if exp.type == 'getlocal'
-            or exp.type == 'getglobal' then
-                skipSpace()
-                if expectAssign() then
-                    local eqRight = lastRightPosition()
-                    skipSpace()
-                    local fvalue = parseExp()
-                    local tfield = {
-                        type   = 'tablefield',
-                        start  = exp.start,
-                        finish = fvalue and fvalue.finish or eqRight,
-                        parent = tbl,
-                        field  = exp,
-                        value  = fvalue,
-                    }
-                    exp.type   = 'field'
-                    exp.parent = tfield
-                    if fvalue then
-                        fvalue.parent = tfield
-                    else
-                        missExp()
-                    end
-                    index = index + 1
-                    tbl[index] = tfield
-                    goto CONTINUE
-                end
             end
             index = index + 1
             local texp = {

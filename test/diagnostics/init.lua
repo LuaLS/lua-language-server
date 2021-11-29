@@ -1506,3 +1506,11 @@ TEST [[
 TEST [[
 ---@type fun(xxx, yyy, ...): boolean
 ]]
+
+TEST [[
+local <!x!>
+
+return {
+    x = 1,
+}
+]]

@@ -1547,6 +1547,7 @@ local function parseTable()
     }
     Index = Index + 2
     local index = 0
+    local tindex = 0
     local wantSep = false
     while true do
         skipSpace(true)
@@ -1623,11 +1624,12 @@ local function parseTable()
                 goto CONTINUE
             end
             index = index + 1
+            tindex = tindex + 1
             local texp = {
                 type   = 'tableexp',
                 start  = exp.start,
                 finish = exp.finish,
-                tindex = index,
+                tindex = tindex,
                 parent = tbl,
                 value  = exp,
             }

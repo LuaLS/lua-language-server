@@ -155,6 +155,9 @@ return function (uri, offset)
         or  src.type == 'setindex'
         or  src.type == 'tableindex' then
             src = src.index
+            if not src then
+                goto CONTINUE
+            end
             if not guide.isLiteral(src) then
                 goto CONTINUE
             end

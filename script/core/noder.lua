@@ -27,7 +27,6 @@ local ANY_FIELD_CHAR = '*'
 local INDEX_CHAR     = '['
 local RETURN_INDEX   = SPLIT_CHAR .. '#'
 local PARAM_INDEX    = SPLIT_CHAR .. '&'
-local PARAM_NAME     = SPLIT_CHAR .. '$'
 local EVENT_ENUM     = SPLIT_CHAR .. '>'
 local TABLE_KEY      = SPLIT_CHAR .. '<'
 local WEAK_TABLE_KEY = SPLIT_CHAR .. '<<'
@@ -1118,14 +1117,12 @@ compileNodeMap = util.switch()
         end
         if source.bindSources then
             for _, src in ipairs(source.bindSources) do
-                if src.type == 'function'
-                or guide.isSet(src) then
-                    local paramID = sformat('%s%s%s'
-                        , getID(src)
-                        , PARAM_NAME
-                        , source.param[1]
-                    )
-                    pushForward(noders, paramID, id)
+                if src.type == 'function' and src.args then
+                    for _, arg in ipairs(src.args) do
+                        if arg[1] == source.param[1] then
+                            pushForward(noders, getID(arg), id)
+                        end
+                    end
                 end
             end
         end
@@ -1166,12 +1163,6 @@ compileNodeMap = util.switch()
     : call(function (noders, id, source)
         if source.args then
             for index, param in ipairs(source.args) do
-                local paramID = sformat('%s%s%s'
-                    , id
-                    , PARAM_NAME
-                    , param.name[1]
-                )
-                pushForward(noders, paramID, getID(param.extends))
                 local indexID = sformat('%s%s%s'
                     , id
                     , PARAM_INDEX
@@ -1257,32 +1248,7 @@ compileNodeMap = util.switch()
                     , i
                 )
                 pushForward(noders, indexID, getID(arg))
-                if arg.type == 'local' then
-                    pushForward(noders, getID(arg), sformat('%s%s%s'
-                        , id
-                        , PARAM_NAME
-                        , arg[1]
-                    ))
-                    if parentID then
-                        pushForward(noders, getID(arg), sformat('%s%s%s'
-                            , parentID
-                            , PARAM_NAME
-                            , arg[1]
-                        ))
-                    end
-                else
-                    pushForward(noders, getID(arg), sformat('%s%s%s'
-                        , id
-                        , PARAM_NAME
-                        , '...'
-                    ))
-                    if parentID then
-                        pushForward(noders, getID(arg), sformat('%s%s%s'
-                            , parentID
-                            , PARAM_NAME
-                            , '...'
-                        ))
-                    end
+                if arg.type ~= 'local' then
                     for j = i + 1, i + 10 do
                         pushForward(noders, sformat('%s%s%s'
                             , id
@@ -1576,7 +1542,7 @@ function m.hasField(id)
     end
     local next2Char = ssub(id, #firstID + 2, #firstID + 2)
     if next2Char == RETURN_INDEX
-    or next2Char == PARAM_NAME then
+    or next2Char == PARAM_INDEX then
         return false
     end
     return true
@@ -1598,9 +1564,6 @@ function m.isCommonField(field)
         return false
     end
     if ssub(field, 1, #RETURN_INDEX) == RETURN_INDEX then
-        return false
-    end
-    if ssub(field, 1, #PARAM_NAME) == PARAM_NAME then
         return false
     end
     return true

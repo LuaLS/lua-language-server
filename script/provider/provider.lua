@@ -210,8 +210,7 @@ m.register 'textDocument/didOpen' {
         local doc   = params.textDocument
         local uri   = files.getRealUri(doc.uri)
         local text  = doc.text
-        log.debug('didOpen', uri)
-        files.setText(uri, text, true)
+        files.setText(uri, text, true, doc.version)
         files.open(uri)
     end
 }
@@ -239,7 +238,7 @@ m.register 'textDocument/didChange' {
         local text = files.getOriginText(uri) or ''
         local rows = files.getCachedRows(uri)
         text, rows = tm(text, rows, changes)
-        files.setText(uri, text, true)
+        files.setText(uri, text, true, doc.version)
         files.setCachedRows(uri, rows)
     end
 }

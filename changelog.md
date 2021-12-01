@@ -1,5 +1,8 @@
 # changelog
 
+## 2.5.2
+* `FIX` [#837](https://github.com/sumneko/lua-language-server/issues/837)
+
 ## 2.5.1
 `2021-11-29`
 * `FIX` incorrect syntax error

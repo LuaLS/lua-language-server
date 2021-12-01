@@ -1341,6 +1341,13 @@ compileNodeMap = util.switch()
             pushForward(noders, id, getID(parent))
         end
     end)
+    : case 'loop'
+    : call(function (noders, id, source)
+        local loc = source.loc
+        if loc then
+            pushForward(noders, getID(loc), 'dn:integer')
+        end
+    end)
     : case 'in'
     : call(function (noders, id, source)
         local keys = source.keys

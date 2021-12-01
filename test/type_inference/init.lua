@@ -1053,3 +1053,7 @@ f {
     }
 }
 ]]
+
+TEST 'integer' [[
+for <?i?> = a, b, c do end
+]]

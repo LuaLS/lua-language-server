@@ -1514,3 +1514,11 @@ return {
     x = 1,
 }
 ]]
+
+TEST [[
+---@class A #1
+]]
+
+TEST [[
+---@class A 1
+]]

@@ -258,15 +258,7 @@ local function parseClass(parent)
     end
     result.start  = getStart()
     result.finish = getFinish()
-    if not peekToken() then
-        return result
-    end
     if not checkToken('symbol', ':', 1) then
-        pushError {
-            type   = 'LUADOC_MISS_EXTENDS_SYMBOL',
-            start  = result.finish + 1,
-            finish = getStart(),
-        }
         return result
     end
     nextToken()

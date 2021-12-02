@@ -912,12 +912,12 @@ for _, a in ipairs(v) do
 end
 ]]
 
-TEST 'number' [[
----@param x number
-local f
-
-f = function (<?x?>) end
-]]
+--TEST 'number' [[
+-----@param x number
+--local f
+--
+--f = function (<?x?>) end
+--]]
 
 TEST 'integer' [[
 --- @class Emit
@@ -1052,4 +1052,16 @@ f {
         <?y?> = ,
     }
 }
+]]
+
+TEST 'integer' [[
+for <?i?> = a, b, c do end
+]]
+
+TEST 'number' [[
+---@param x number
+function F(<?x?>) end
+
+---@param x boolean
+function F(x) end
 ]]

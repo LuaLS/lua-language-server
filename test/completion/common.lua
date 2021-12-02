@@ -3013,3 +3013,27 @@ xx++<??>
         }
     },
 }
+
+TEST [[
+fff(function ()
+    xx@xpcall<??>
+end)
+]]
+{
+    [1] = {
+        label = 'xpcall',
+        kind  = define.CompletionItemKind.Event,
+        textEdit = {
+            start   = 10007,
+            finish  = 10013,
+            newText = 'xpcall(xx, ${1:debug.traceback}$2)$0',
+        },
+        additionalTextEdits = {
+            {
+                start   = 10004,
+                finish  = 10007,
+                newText = '',
+            }
+        }
+    },
+}

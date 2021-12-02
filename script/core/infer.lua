@@ -598,6 +598,10 @@ function m.searchAndViewInfers(source, field, mark)
     end
     local infers = m.searchInfers(source, field, mark)
     local view = m.viewInfers(infers)
+    if type(view) == 'boolean' then
+        log.error('Why view is boolean?', util.dump(infers))
+        return 'any'
+    end
     return view
 end
 

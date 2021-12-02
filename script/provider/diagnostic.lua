@@ -223,8 +223,6 @@ function m.doDiagnostic(uri)
 
     local version = files.getVersion(uri)
 
-    await.setID('diag:' .. uri)
-
     local prog <close> = progress.create(lang.script.WINDOW_DIAGNOSING, 0.5)
     prog:setMessage(ws.getRelativePath(uri))
 
@@ -277,8 +275,9 @@ function m.refresh(uri)
     end
     await.close('diag:' .. uri)
     await.call(function () ---@async
-        await.delay()
         if uri then
+            await.setID('diag:' .. uri)
+            await.sleep(0.1)
             m.clearCache(uri)
             xpcall(m.doDiagnostic, log.error, uri)
         end

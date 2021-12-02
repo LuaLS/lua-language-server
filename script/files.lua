@@ -45,7 +45,7 @@ function m.getRealUri(uri)
         return uri
     end
     suc, res = pcall(fs.canonical, path)
-    if not suc or res:string() == filename then
+    if not suc or res:string():gsub('/', '\\') == filename then
         return uri
     end
     filename = res:string()
@@ -183,6 +183,7 @@ function m.setText(uri, text, isTrust, version)
         local encoding = config.get(nil, 'Lua.runtime.fileEncoding')
         text = encoder.decode(encoding, text)
     end
+    file.version = version
     if file.originText == text then
         return
     end
@@ -195,7 +196,6 @@ function m.setText(uri, text, isTrust, version)
     m.astMap[uri] = nil
     file.cache = {}
     file.cacheActiveTime = math.huge
-    file.version = version
     m.globalVersion = m.globalVersion + 1
     await.close('files.version')
     m.onWatch('version')

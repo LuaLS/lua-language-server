@@ -230,9 +230,10 @@ local accepts = {
     ['table']     = true,
 }
 
-local function checkPostFix(state, word, wordPosition, position, results)
+local function checkPostFix(state, word, wordPosition, position, symbol, results)
     local source = guide.eachSourceContain(state.ast, wordPosition, function (source)
-        if accepts[source.type] then
+        if  accepts[source.type]
+        and source.finish == wordPosition then
             return source
         end
     end)
@@ -249,14 +250,14 @@ local function checkPostFix(state, word, wordPosition, position, results)
                                     : add('lua', newText)
                                     : string(),
                     textEdit   = {
-                        start   = wordPosition + 1,
+                        start   = wordPosition + #symbol,
                         finish  = position,
                         newText = newText,
                     },
                     additionalTextEdits = {
                         {
                             start   = source.start,
-                            finish  = wordPosition + 1,
+                            finish  = wordPosition + #symbol,
                             newText = '',
                         },
                     },
@@ -279,7 +280,7 @@ return function (state, position, results)
     local symbol = text:sub(offset, offset)
     if symbol == config.get(nil, 'Lua.completion.postfix') then
         local wordPosition = guide.offsetToPosition(state, offset - 1)
-        checkPostFix(state, word or '', wordPosition, position, results)
+        checkPostFix(state, word or '', wordPosition, position, symbol, results)
         return symbol ~= '.' and symbol ~= ':'
     end
     if not word then
@@ -292,8 +293,8 @@ return function (state, position, results)
             offset = offset - 3
         end
         if word then
-            local wordPosition = guide.offsetToPosition(state, offset - 1)
-            checkPostFix(state, word or '', wordPosition, position, results)
+            local wordPosition = guide.offsetToPosition(state, offset)
+            checkPostFix(state, word or '', wordPosition, position, '', results)
             return true
         end
     end

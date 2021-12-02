@@ -184,12 +184,10 @@ function math.random(m, n) end
 ---#DES 'math.randomseed>5.4'
 ---@param x? integer
 ---@param y? integer
----@nodiscard
 function math.randomseed(x, y) end
 ---#else
 ---#DES 'math.randomseed<5.3'
 ---@param x integer
----@nodiscard
 function math.randomseed(x) end
 ---#end
 

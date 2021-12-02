@@ -17,46 +17,29 @@ local converter  = require 'proto.converter'
 local filewatch  = require 'filewatch'
 local json       = require 'json'
 
-local function mergeConfig(a, b)
-    for k, v in pairs(b) do
-        if a[k] == nil then
-            a[k] = v
-        end
-    end
-end
-
 ---@async
 local function updateConfig()
-    local merged = {}
+    local clientConfig = cfgLoader.loadClientConfig()
+    if clientConfig then
+        log.debug('load config from client')
+        config.update(clientConfig, json.null)
+    end
+
+    local rc = cfgLoader.loadRCConfig('.luarc.json')
+    if rc then
+        log.debug('load config from luarc')
+        config.update(rc, json.null)
+    end
 
     local cfg = cfgLoader.loadLocalConfig(CONFIGPATH)
     if cfg then
         log.debug('load config from local', CONFIGPATH)
         -- watch directory
         filewatch.watch(workspace.getAbsolutePath(CONFIGPATH):gsub('[^/\\]+$', ''))
-        mergeConfig(merged, cfg)
+        config.update(cfg, json.null)
     end
 
-    local rc = cfgLoader.loadRCConfig('.luarc.json')
-    if rc then
-        log.debug('load config from luarc')
-        mergeConfig(merged, rc)
-    end
-
-    local clientConfig = cfgLoader.loadClientConfig()
-    if clientConfig then
-        log.debug('load config from client')
-        mergeConfig(merged, clientConfig)
-    end
-
-    for k, v in pairs(merged) do
-        if v == json.null then
-            merged[k] = nil
-        end
-    end
-
-    config.update(merged)
-    log.debug('loaded config dump:', util.dump(merged))
+    log.debug('loaded config dump:', util.dump(config.dump()))
 end
 
 ---@class provider

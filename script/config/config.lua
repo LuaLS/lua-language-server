@@ -320,12 +320,15 @@ function m.dump()
     return dump
 end
 
-function m.update(new)
+function m.update(new, null)
     local function expand(t, left)
         for key, value in pairs(t) do
             local fullKey = key
             if left then
                 fullKey = left .. '.' .. key
+            end
+            if value == null then
+                value = nil
             end
             if Template[fullKey] then
                 m.set(fullKey, value)

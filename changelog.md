@@ -5,6 +5,7 @@
 * `FIX` [#825](https://github.com/sumneko/lua-language-server/issues/825)
 * `FIX` [#826](https://github.com/sumneko/lua-language-server/issues/826)
 * `FIX` [#827](https://github.com/sumneko/lua-language-server/issues/827)
+* `FIX` [#831](https://github.com/sumneko/lua-language-server/issues/831)
 * `FIX` [#837](https://github.com/sumneko/lua-language-server/issues/837)
 * `FIX` runtime errors
 

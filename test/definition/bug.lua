@@ -253,3 +253,60 @@ local <!v!> = t[a]
 
 t[a] = <?v?>
 ]]
+
+TEST [[
+---@class A
+---@field x number
+
+---@class B: A
+---@field <!x!> boolean
+
+---@type B
+local t
+
+local <!<?v?>!> = t.x
+]]
+
+TEST [[
+---@class A
+---@field <!x!> number
+
+---@class B: A
+
+---@type B
+local t
+
+local <!<?v?>!> = t.x
+]]
+
+TEST [[
+---@class A
+local A
+
+function A:x() end
+
+---@class B: A
+local B
+
+function B:<!x!>() end
+
+---@type B
+local t
+
+local <!<?v?>!> = t.x
+]]
+
+TEST [[
+---@class A
+local A
+
+function A:<!x!>() end
+
+---@class B: A
+local B
+
+---@type B
+local t
+
+local <!<?v?>!> = t.x
+]]

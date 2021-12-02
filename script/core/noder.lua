@@ -94,6 +94,10 @@ local INFO_DEEP_AND_DONT_CROSS = {
 ---@field binfo?    table<node.id, node.info>
 -- 后退的关联ID与info
 ---@field backwards table<node.id, node.id[]|table<node.id, node.info>>
+-- 第一个继承
+---@field extend    table<node.id, node.id>
+-- 其他继承
+---@field extends   table<node.id, node.id[]>
 -- 函数调用参数信息（用于泛型）
 ---@field call      table<node.id, parser.guide.object>
 ---@field require   table<node.id, string>
@@ -548,8 +552,8 @@ end
 
 ---添加关联的前进ID
 ---@param noders    noders
----@param id        string
----@param forwardID string
+---@param id        node.id
+---@param forwardID node.id
 ---@param info?     node.info
 local function pushForward(noders, id, forwardID, info)
     if not id
@@ -580,8 +584,8 @@ end
 
 ---添加关联的后退ID
 ---@param noders     noders
----@param id         string
----@param backwardID string
+---@param id         node.id
+---@param backwardID node.id
 ---@param info?      node.info
 local function pushBackward(noders, id, backwardID, info)
     if not id
@@ -608,6 +612,36 @@ local function pushBackward(noders, id, backwardID, info)
     end
     backwards[backwardID] = info or false
     backwards[#backwards+1] = backwardID
+end
+
+---添加继承的关联ID
+---@param noders     noders
+---@param id         node.id
+---@param extendID   node.id
+local function pushExtend(noders, id, extendID)
+    if not id
+    or not extendID
+    or extendID == ''
+    or id == extendID then
+        return
+    end
+    if not noders.extend[id] then
+        noders.extend[id] = extendID
+        return
+    end
+    if noders.extend[id] == extendID then
+        return
+    end
+    local extends = noders.extends[id]
+    if not extends then
+        extends = {}
+        noders.extends[id] = extends
+    end
+    if extends[extendID] ~= nil then
+        return
+    end
+    extends[extendID] = false
+    extends[#extends+1] = extendID
 end
 
 ---@class noder
@@ -747,6 +781,31 @@ function m.eachBackward(noders, id)
         local id  = backwards[index]
         local tag = backwards[id]
         return id, tag
+    end
+end
+
+---遍历extend
+---@param noders noders
+---@param id node.id
+---@return fun():string, node.info
+function m.eachExtend(noders, id)
+    local extend = noders.extend[id]
+    if not extend then
+        return DUMMY_FUNCTION
+    end
+    local index
+    local extends = noders.extends[id]
+    return function ()
+        if not index then
+            index = 0
+            return extend
+        end
+        if not extends then
+            return nil
+        end
+        index = index + 1
+        local id  = extends[index]
+        return id
     end
 end
 
@@ -1049,7 +1108,7 @@ compileNodeMap = util.switch()
         pushForward(noders, getID(source.class), id)
         if source.extends then
             for _, ext in ipairs(source.extends) do
-                pushForward(noders, id, getID(ext), INFO_CLASS_TO_EXNTENDS)
+                pushExtend(noders, id, getID(ext))
             end
         end
         if source.bindSources then
@@ -1517,6 +1576,11 @@ function m.getLastID(id)
     return lastID
 end
 
+function m.getFieldID(id)
+    local fieldID = smatch(id, LAST_REGEX)
+    return fieldID
+end
+
 ---获取ID的长度
 ---@param id string
 ---@return integer
@@ -1641,6 +1705,8 @@ function m.getNoders(source)
             backward  = {},
             binfo     = {},
             backwards = {},
+            extend    = {},
+            extends   = {},
             call      = {},
             require   = {},
             skip      = {},

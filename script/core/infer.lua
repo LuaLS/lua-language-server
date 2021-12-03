@@ -28,6 +28,7 @@ local function mergeTable(a, b)
     for v in pairs(b) do
         a[v] = true
     end
+    a[CACHE] = nil
 end
 
 local function isBaseType(source, mark)

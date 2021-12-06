@@ -975,6 +975,14 @@ end
 
 TEST [[
 ---@param a number
+return function (<!a!>)
+end
+]]
+
+TEST [[
+---@meta
+
+---@param a number
 return function (a)
 end
 ]]
@@ -1154,6 +1162,7 @@ TEST [[
 local emit = {}
 ]]
 
+config.get 'Lua.diagnostics.neededFileStatus' ['unused-local'] = 'None'
 TEST [[
 ---@param table     table
 ---@param metatable table
@@ -1291,6 +1300,8 @@ end
 trim('str', 'left')
 trim('str', nil)
 ]]
+
+config.get 'Lua.diagnostics.neededFileStatus' ['unused-local'] = 'Any'
 
 ---不完整的函数参数定义，会跳过检查
 TEST [[

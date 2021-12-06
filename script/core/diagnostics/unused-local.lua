@@ -2,6 +2,7 @@ local files  = require 'files'
 local guide  = require 'parser.guide'
 local define = require 'proto.define'
 local lang   = require 'language'
+local vm     = require 'vm.vm'
 
 local function hasGet(loc)
     if not loc.ref then
@@ -96,7 +97,7 @@ return function (uri, callback)
         if isDocClass(source) then
             return
         end
-        if isDocParam(source) then
+        if vm.isMetaFile(uri) and isDocParam(source) then
             return
         end
         local data = hasGet(source)

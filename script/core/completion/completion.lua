@@ -1354,20 +1354,6 @@ local function getCallEnumsAndFuncs(source, index, oop, call)
         end
     end
     if source.type == 'doc.type.function' then
-        --[[
-        always use literal index, that is:
-        ```
-        ---@class Class
-        ---@field f(x: number, y: boolean)
-        local c
-
-        c.f(1, true) -- correct
-        c:f(1, true) -- also correct
-        ```
-        --]]
-        if oop then
-            index = index - 1
-        end
         local arg = source.args[index]
         if arg and arg.extends then
             return pushCallEnumsAndFuncs(vm.getDefs(arg.extends))

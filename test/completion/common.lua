@@ -2593,7 +2593,7 @@ c:<??>
 
 TEST [[
 ---@class Class
----@field on fun(x: "'aaa'"|"'bbb'")
+---@field on fun(self, x: "'aaa'"|"'bbb'")
 local c
 
 c:on(<??>)
@@ -2605,7 +2605,7 @@ TEST [[
 ---@field on fun(x: "'aaa'"|"'bbb'")
 local c
 
-c:on('<??>')
+c.on('<??>')
 ]]
 (EXISTS)
 
@@ -3037,3 +3037,26 @@ end)
         }
     },
 }
+
+TEST [[
+---@meta
+
+---@alias testAlias
+---| "'test1'"
+---| "'test2'"
+---| "'test3'"
+
+---@class TestClass
+local TestClass = {}
+
+---@overload fun(self: TestClass, arg2: testAlias)
+---@param arg1 integer
+---@param arg2 testAlias
+function TestClass:testFunc2(arg1, arg2) end
+
+---@type TestClass
+local t
+
+t:testFunc2(<??>)
+]]
+(EXISTS)

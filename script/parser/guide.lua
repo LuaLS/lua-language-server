@@ -1160,5 +1160,17 @@ function m.isInString(ast, position)
     end)
 end
 
+function m.isOOP(source, oop)
+    if source.type == 'setmethod'
+    or source.type == 'getmethod' then
+        return true
+    end
+    if source.type == 'method'
+    or source.type == 'field'
+    or source.type == 'function' then
+        return m.isOOP(source.parent)
+    end
+    return false
+end
 
 return m

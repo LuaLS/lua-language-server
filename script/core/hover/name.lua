@@ -66,11 +66,6 @@ local function asDocField(source)
 end
 
 function buildName(source, oop)
-    if oop == nil then
-        oop =  source.type == 'setmethod'
-            or source.type == 'getmethod'
-            or nil
-    end
     if source.type == 'local' then
         return asLocal(source) or '', oop
     end

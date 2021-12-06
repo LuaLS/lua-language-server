@@ -41,20 +41,17 @@ end
 function TEST(expect)
     files.removeAll()
 
-    local targetScript, targetList = catch(expect[1].content, '?')
-    local targetUri = furi.encode(expect[1].path)
-
-    local sourceScript, sourceList = catch(expect[2].content, '?')
-    local sourceUri = furi.encode(expect[2].path)
-
-    files.setText(targetUri, targetScript)
-    files.setText(sourceUri, sourceScript)
-
-    if targetList['?'] then
-        local targetPos = (targetList['?'][1][1] + targetList['?'][1][2]) // 2
-        core.byUri(targetUri, targetPos)
+    local sourcePos, sourceUri
+    for _, file in ipairs(expect) do
+        local script, list = catch(file.content, '?')
+        local uri          = furi.encode(file.path)
+        files.setText(uri, script)
+        if list['?'] then
+            sourceUri = uri
+            sourcePos = (list['?'][1][1] + list['?'][1][2]) // 2
+        end
     end
-    local sourcePos = (sourceList['?'][1][1] + sourceList['?'][1][2]) // 2
+
     local hover = core.byUri(sourceUri, sourcePos)
     assert(hover)
     hover = tostring(hover):gsub('\r\n', '\n')

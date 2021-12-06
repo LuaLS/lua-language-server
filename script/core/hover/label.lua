@@ -11,26 +11,33 @@ local files       = require 'files'
 local guide       = require 'parser.guide'
 
 local function asFunction(source, oop)
-    local name
-    name, oop   = buildName(source, oop)
+    if oop == nil then
+        oop = guide.isOOP(source, oop)
+    end
+    local name  = buildName(source, oop)
     local arg   = buildArg(source, oop)
     local rtn   = buildReturn(source)
     local lines = {}
-    lines[1] = ('%s%s %s(%s)'):format(
-        vm.isAsync(source) and 'async ' or '',
-        oop and 'method' or 'function',
-        name or '', arg
+    lines[1] = string.format('%s%s %s(%s)'
+        , vm.isAsync(source) and 'async ' or ''
+        , oop and 'method' or 'function'
+        , name or ''
+        , arg
     )
     lines[2] = rtn
     return table.concat(lines, '\n')
 end
 
-local function asDocFunction(source)
-    local name = buildName(source)
-    local arg  = buildArg(source)
-    local rtn  = buildReturn(source)
+local function asDocFunction(source, oop)
+    local name  = buildName(source, oop)
+    local arg   = buildArg(source, oop)
+    local rtn   = buildReturn(source)
     local lines = {}
-    lines[1] = ('function %s(%s)'):format(name or '', arg)
+    lines[1] = string.format('%s%s %s(%s)'
+        , ''
+        , oop and 'method' or 'function'
+        , name or ''
+        , arg)
     lines[2] = rtn
     return table.concat(lines, '\n')
 end
@@ -211,7 +218,7 @@ return function (source, oop)
     or     source.type == 'integer' then
         return asNumber(source)
     elseif source.type == 'doc.type.function' then
-        return asDocFunction(source)
+        return asDocFunction(source, oop)
     elseif source.type == 'doc.type.name' then
         return asDocTypeName(source)
     elseif source.type == 'doc.field.name' then

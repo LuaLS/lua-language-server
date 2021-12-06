@@ -480,7 +480,9 @@ local function parseTypeUnitLiteralTable()
     return typeUnit
 end
 
-local function parseTypeUnit(parent, content)
+local parseTypeUnit
+
+local function parseDocFunction(parent, content)
     if content == 'async' then
         local tp, cont = peekToken()
         if tp == 'name' then
@@ -494,12 +496,17 @@ local function parseTypeUnit(parent, content)
             end
         end
     end
-    local result
     if content == 'fun' then
-        result = parseTypeUnitFunction()
+        return parseTypeUnitFunction()
     end
-    if content == '{' then
-        result = parseTypeUnitLiteralTable()
+end
+
+function parseTypeUnit(parent, content)
+    local result = parseDocFunction(parent, content)
+    if not result then
+        if content == '{' then
+            result = parseTypeUnitLiteralTable()
+        end
     end
     if not result then
         result = {
@@ -916,7 +923,8 @@ end
 
 local function parseOverload()
     local tp, name = peekToken()
-    if tp ~= 'name' or name ~= 'fun' then
+    if tp ~= 'name'
+    or (name ~= 'fun' and name ~= 'async') then
         pushError {
             type   = 'LUADOC_MISS_FUN_AFTER_OVERLOAD',
             start  = getFinish(),
@@ -928,7 +936,7 @@ local function parseOverload()
     local result = {
         type = 'doc.overload',
     }
-    result.overload = parseTypeUnitFunction()
+    result.overload = parseDocFunction(result, name)
     if not result.overload then
         return nil
     end

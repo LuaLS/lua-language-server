@@ -1072,3 +1072,64 @@ global G: A {
 }
 ```]]
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@overload fun(self, a)
+            function C:<?f?>(a, b) end
+        ]]
+    },
+    hover = [[
+```lua
+method C:f(a: any, b: any)
+```
+
+---
+
+```lua
+method C:f(a: any)
+```]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@overload fun(self, a)
+            function C.<?f?>(a, b) end
+        ]]
+    },
+    hover = [[
+```lua
+function C.f(a: any, b: any)
+```
+
+---
+
+```lua
+function C.f(self: any, a: any)
+```]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@async
+            ---@overload async fun(self, a)
+            function C:<?f?>(a, b) end
+        ]]
+    },
+    hover = [[
+```lua
+async method C:f(a: any, b: any)
+```
+
+---
+
+```lua
+async method C:f(a: any)
+```]]
+}

@@ -1160,7 +1160,7 @@ function m.isInString(ast, position)
     end)
 end
 
-function m.isOOP(source, oop)
+function m.isOOP(source)
     if source.type == 'setmethod'
     or source.type == 'getmethod' then
         return true

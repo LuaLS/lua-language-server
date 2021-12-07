@@ -2,37 +2,26 @@ name: build
 on: push
 jobs:
   compile:
-    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, ubuntu-18.04, macos-latest]
+        job:
+          - { os: windows-latest, target: windows }
+          - { os: ubuntu-18.04, target: linux }
+          - { os: macos-latest, target: macos }
+    runs-on: ${{ matrix.job.os }}
     steps:
-    - uses: actions/checkout@v1
-      with:
-        ref: refs/heads/master
-        submodules : recursive
-    - uses: actboy168/setup-luamake@master
-    - run: luamake
-    - uses: actions/upload-artifact@v2
-      with:
-        name: lua-language-server
-        path: |
-          changelog.md
-          bin
-  resource:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-      with:
-        ref: refs/heads/master
-        submodules : recursive
-    - uses: actions/upload-artifact@v2
-      with:
-        name: lua-language-server
-        path: |
-          main.lua
-          debugger.lua
-          locale
-          meta
-          script
+      - uses: actions/checkout@v2
+        with:
+          ref: refs/heads/master
+          submodules: recursive
+
+      - uses: actboy168/setup-luamake@master
+
+      - name: Running `luamake`
+        run: luamake
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: lua-language-server-${{ matrix.job.target }}
+          path: bin

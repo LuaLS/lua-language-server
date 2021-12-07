@@ -1,4 +1,5 @@
 name: build
+
 on: push
 
 env:
@@ -18,7 +19,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
         with:
-          ref: refs/heads/master
           submodules: recursive
 
       - uses: actboy168/setup-luamake@master
@@ -35,9 +35,18 @@ jobs:
         id: package
         shell: bash
         run: |
+          # Some variables
           PKG_BASENAME="${{ env.PROJECT }}-${{ matrix.job.target }}"
+          PKG_STAGING="ci_staging/${PKG_BASENAME}"
 
-          pushd "${{ env.BIN }}/" >/dev/null
+          # Making the staging area
+          mkdir -p ${PKG_STAGING}
+
+          # Copying binary and runtime files to staging area
+          cp -r main.lua debugger.lua locale meta script ${{ env.BIN }} ${PKG_STAGING}
+
+          # Creating release assets
+          pushd "${PKG_STAGING}/" >/dev/null
           case "${{ matrix.job.target }}" in
             windows)
               PKG_NAME="${PKG_BASENAME}.zip"
@@ -50,8 +59,8 @@ jobs:
           esac;
           popd >/dev/null
 
-          echo ::set-output name=PKG_PATH::"${{ env.BIN }}/${PKG_NAME}"
           echo ::set-output name=PKG_NAME::${PKG_NAME}
+          echo ::set-output name=PKG_PATH::"${PKG_STAGING}/${PKG_NAME}"
 
       - name: Publish release assets
         uses: softprops/action-gh-release@v1

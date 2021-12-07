@@ -1,14 +1,19 @@
 name: build
 on: push
+
+env:
+  PROJECT: lua-language-server
+  BIN: bin
+
 jobs:
   compile:
     strategy:
       fail-fast: false
       matrix:
         job:
-          - { os: windows-latest, target: windows }
           - { os: ubuntu-18.04, target: linux }
           - { os: macos-latest, target: macos }
+          - { os: windows-latest, target: windows }
     runs-on: ${{ matrix.job.os }}
     steps:
       - uses: actions/checkout@v2
@@ -18,10 +23,39 @@ jobs:
 
       - uses: actboy168/setup-luamake@master
 
-      - name: Running `luamake`
-        run: luamake
+      - run: luamake
 
       - uses: actions/upload-artifact@v2
         with:
-          name: lua-language-server-${{ matrix.job.target }}
-          path: bin
+          name: ${{ env.PROJECT }}-${{ matrix.job.target }}
+          path: ${{ env.BIN }}
+
+      - name: Package
+        if: startsWith(github.ref, 'refs/tags/')
+        id: package
+        shell: bash
+        run: |
+          PKG_BASENAME="${{ env.PROJECT }}-${{ matrix.job.target }}"
+
+          pushd "${{ env.BIN }}/" >/dev/null
+          case "${{ matrix.job.target }}" in
+            windows)
+              PKG_NAME="${PKG_BASENAME}.zip"
+              7z -y a ${PKG_NAME} * | tail -2
+              ;;
+            *)
+              PKG_NAME="${PKG_BASENAME}.tar.gz"
+              tar czf ${PKG_NAME} *
+              ;;
+          esac;
+          popd >/dev/null
+
+          echo ::set-output name=PKG_PATH::"${{ env.BIN }}/${PKG_NAME}"
+          echo ::set-output name=PKG_NAME::${PKG_NAME}
+
+      - name: Publish release assets
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          generate_release_notes: true
+          files: ${{ steps.package.outputs.PKG_PATH }}

@@ -19,6 +19,8 @@ jobs:
         name: lua-language-server
         path: |
           bin
+          !bin/**/*.lib
+          !bin/**/*.exp
   resource:
     runs-on: ubuntu-latest
     steps:

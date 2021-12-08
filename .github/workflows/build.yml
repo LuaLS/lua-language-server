@@ -21,50 +21,76 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Setting up workflow variables
+        id: vars
+        shell: bash
+        run: |
+          # Package version
+          if [[ $GITHUB_REF = refs/tags/* ]]; then
+            PKG_VERSION=${GITHUB_REF##*/}
+          else
+            PKG_VERSION=${GITHUB_SHA:0:7}
+          fi
+
+          # Package suffix relative to the platform
+          if [[ "${{ matrix.job.target }}" = windows ]]; then
+            PKG_SUFFIX="zip"
+          else
+            PKG_SUFFIX="tar.gz"
+          fi
+
+          # Package name w/ version
+          PKG_BASENAME="${{ env.PROJECT }}-${PKG_VERSION}-${{ matrix.job.target }}"
+
+          # Full name of the tarball asset
+          PKG_NAME="${PKG_BASENAME}.${PKG_SUFFIX}"
+
+          # Staging area for tarballs
+          PKG_STAGING="ci_staging/$PKG_BASENAME"
+
+          echo ::set-output name=PKG_VERSION::${PKG_VERSION}
+          echo ::set-output name=PKG_BASENAME::${PKG_BASENAME}
+          echo ::set-output name=PKG_NAME::${PKG_NAME}
+          echo ::set-output name=PKG_PATH::"${PKG_STAGING}/${PKG_NAME}"
+          echo ::set-output name=PKG_STAGING::${PKG_STAGING}
+
       - uses: actboy168/setup-luamake@master
 
       - run: luamake
 
       - uses: actions/upload-artifact@v2
         with:
-          name: ${{ env.PROJECT }}-${{ matrix.job.target }}
+          name: ${{ steps.vars.outputs.PKG_BASENAME }}
           path: ${{ env.BIN }}
 
-      - name: Package
+      - name: Package tarballs
         if: startsWith(github.ref, 'refs/tags/')
-        id: package
         shell: bash
         run: |
-          # Some variables
-          PKG_BASENAME="${{ env.PROJECT }}-${{ matrix.job.target }}"
-          PKG_STAGING="ci_staging/${PKG_BASENAME}"
+          STAGING=${{ steps.vars.outputs.PKG_STAGING }}
+          NAME=${{ steps.vars.outputs.PKG_NAME }}
 
           # Making the staging area
-          mkdir -p ${PKG_STAGING}
+          mkdir -p ${STAGING}
 
           # Copying binary and runtime files to staging area
-          cp -r main.lua debugger.lua locale meta script ${{ env.BIN }} ${PKG_STAGING}
+          cp -r main.lua debugger.lua locale meta script ${{ env.BIN }} ${STAGING}
 
           # Creating release assets
-          pushd "${PKG_STAGING}/" >/dev/null
+          pushd "${STAGING}/" >/dev/null
           case "${{ matrix.job.target }}" in
             windows)
-              PKG_NAME="${PKG_BASENAME}.zip"
-              7z -y a ${PKG_NAME} * | tail -2
+              7z -y a ${NAME} * | tail -2
               ;;
             *)
-              PKG_NAME="${PKG_BASENAME}.tar.gz"
-              tar czf ${PKG_NAME} *
+              tar czf ${NAME} *
               ;;
           esac;
           popd >/dev/null
-
-          echo ::set-output name=PKG_NAME::${PKG_NAME}
-          echo ::set-output name=PKG_PATH::"${PKG_STAGING}/${PKG_NAME}"
 
       - name: Publish release assets
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           generate_release_notes: true
-          files: ${{ steps.package.outputs.PKG_PATH }}
+          files: ${{ steps.vars.outputs.PKG_PATH }}

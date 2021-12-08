@@ -88,9 +88,24 @@ jobs:
           esac;
           popd >/dev/null
 
+      # Packaging submodules for homebrew distribution
+      - name: Package submodules
+        id: submodules
+        if: ${{ startsWith(github.ref, 'refs/tags/') && matrix.job.target == 'macos' }}
+        run: |
+          PKG_SUBMOD_NAME="${{ env.PROJECT }}-${{ steps.vars.outputs.PKG_VERSION }}-submodules.zip"
+          PKG_SUBMOD_PATH="${{ steps.vars.outputs.PKG_STAGING }}/$PKG_SUBMOD_NAME"
+
+          zip -r $PKG_SUBMOD_PATH ./ -x "*.git*" -x "*.vscode*" -x "${{ env.BIN }}*" -x "${{ steps.vars.outputs.PKG_STAGING }}*"
+
+          echo ::set-output name=PKG_SUBMOD_NAME::${PKG_SUBMOD_NAME}
+          echo ::set-output name=PKG_SUBMOD_PATH::${PKG_SUBMOD_PATH}
+
       - name: Publish release assets
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
           generate_release_notes: true
-          files: ${{ steps.vars.outputs.PKG_PATH }}
+          files: |
+            ${{ steps.vars.outputs.PKG_PATH }}
+            ${{ steps.submodules.outputs.PKG_SUBMOD_PATH }}

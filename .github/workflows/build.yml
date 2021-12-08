@@ -17,7 +17,8 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: lua-language-server
-        path: bin
+        path: |
+          bin
   resource:
     runs-on: ubuntu-latest
     steps:

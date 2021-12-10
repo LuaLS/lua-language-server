@@ -1,10 +1,18 @@
 name: build
 
-on: push
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - "*"
+  pull_request:
+    branches:
+      - master
 
 env:
   PROJECT: lua-language-server
-  BIN: bin
+  BIN_DIR: bin
 
 jobs:
   compile:
@@ -61,7 +69,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ steps.vars.outputs.PKG_BASENAME }}
-          path: ${{ env.BIN }}
+          path: ${{ env.BIN_DIR }}
 
       - name: Package tarballs
         if: startsWith(github.ref, 'refs/tags/')
@@ -74,18 +82,15 @@ jobs:
           mkdir -p ${STAGING}
 
           # Copying binary and runtime files to staging area
-          cp -r main.lua debugger.lua locale meta script ${{ env.BIN }} ${STAGING}
+          cp -r main.lua debugger.lua locale meta script ${{ env.BIN_DIR }} ${STAGING}
 
           # Creating release assets
           pushd "${STAGING}/" >/dev/null
-          case "${{ matrix.job.target }}" in
-            windows)
-              7z -y a ${NAME} * | tail -2
-              ;;
-            *)
-              tar czf ${NAME} *
-              ;;
-          esac;
+          if [[ "${{ matrix.job.target }}" = windows ]]; then
+            7z -y a ${NAME} * | tail -2
+          else
+            tar czf ${NAME} *
+          fi
           popd >/dev/null
 
       # Packaging submodules for homebrew distribution
@@ -93,12 +98,12 @@ jobs:
         id: submodules
         if: ${{ startsWith(github.ref, 'refs/tags/') && matrix.job.target == 'macos' }}
         run: |
+          STAGING=${{ steps.vars.outputs.PKG_STAGING }}
           PKG_SUBMOD_NAME="${{ env.PROJECT }}-${{ steps.vars.outputs.PKG_VERSION }}-submodules.zip"
-          PKG_SUBMOD_PATH="${{ steps.vars.outputs.PKG_STAGING }}/$PKG_SUBMOD_NAME"
+          PKG_SUBMOD_PATH="${STAGING}/$PKG_SUBMOD_NAME"
 
-          zip -r $PKG_SUBMOD_PATH ./ -x "*.git*" -x "*.vscode*" -x "${{ env.BIN }}*" -x "${{ steps.vars.outputs.PKG_STAGING }}*"
+          zip -r $PKG_SUBMOD_PATH ./ -x "*.git*" -x "*.vscode*" -x "${{ env.BIN_DIR }}*" -x "${STAGING}*"
 
-          echo ::set-output name=PKG_SUBMOD_NAME::${PKG_SUBMOD_NAME}
           echo ::set-output name=PKG_SUBMOD_PATH::${PKG_SUBMOD_PATH}
 
       - name: Publish release assets

@@ -17,7 +17,9 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: lua-language-server
-        path: ./bin
+        path: |
+          changelog.md
+          bin
   resource:
     runs-on: ubuntu-latest
     steps:
@@ -31,7 +33,6 @@ jobs:
         path: |
           main.lua
           debugger.lua
-          changelog.md
           locale
           meta
           script

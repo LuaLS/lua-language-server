@@ -34,6 +34,7 @@ jobs:
         path: |
           main.lua
           debugger.lua
+          changelog.md
           locale
           meta
           script

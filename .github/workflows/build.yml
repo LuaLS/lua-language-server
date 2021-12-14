@@ -68,7 +68,15 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ steps.vars.outputs.PKG_BASENAME }}
-          path: ${{ env.BIN_DIR }}
+          path: |
+            ${{ env.BIN_DIR }}
+            main.lua
+            debugger.lua
+            LICENSE
+            changelog.md
+            locale
+            meta
+            script
 
       - name: Package tarballs
         if: startsWith(github.ref, 'refs/tags/')
@@ -81,7 +89,7 @@ jobs:
           mkdir -p ${STAGING}
 
           # Copying binary and runtime files to staging area
-          cp -r main.lua debugger.lua locale meta script ${{ env.BIN_DIR }} ${STAGING}
+          cp -r main.lua debugger.lua LICENSE changelog.md locale meta script ${{ env.BIN_DIR }} ${STAGING}
 
           # Creating release assets
           pushd "${STAGING}/" >/dev/null
@@ -95,7 +103,7 @@ jobs:
       # Packaging submodules for homebrew distribution
       - name: Package submodules
         id: submodules
-        if: ${{ startsWith(github.ref, 'refs/tags/') && matrix.job.target == 'macos' }}
+        if: ${{ startsWith(github.ref, 'refs/tags/') && matrix.job.target == 'darwin' }}
         run: |
           STAGING=${{ steps.vars.outputs.PKG_STAGING }}
           PKG_SUBMOD_NAME="${{ env.PROJECT }}-${{ steps.vars.outputs.PKG_VERSION }}-submodules.zip"

@@ -18,11 +18,13 @@ jobs:
   compile:
     strategy:
       matrix:
-        job:
-          - { os: ubuntu-latest, target: linux }
-          - { os: macos-latest, target: darwin }
-          - { os: windows-latest, target: windows }
-    runs-on: ${{ matrix.job.os }}
+        include:
+          - { os: ubuntu-18.04,   target: linux,   platform: linux-x64    }
+          - { os: macos-11,       target: darwin,  platform: darwin-x64   }
+          - { os: macos-11,       target: darwin,  platform: darwin-arm64 }
+          - { os: windows-latest, target: windows, platform: win32-ia32   }
+          - { os: windows-latest, target: windows, platform: win32-x64    }
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -40,14 +42,14 @@ jobs:
           fi
 
           # Package suffix relative to the platform
-          if [[ "${{ matrix.job.target }}" = windows ]]; then
+          if [[ "${{ matrix.target }}" = windows ]]; then
             PKG_SUFFIX="zip"
           else
             PKG_SUFFIX="tar.gz"
           fi
 
           # Package name w/ version
-          PKG_BASENAME="${{ env.PROJECT }}-${PKG_VERSION}-${{ matrix.job.target }}"
+          PKG_BASENAME="${{ env.PROJECT }}-${PKG_VERSION}-${{ matrix.platform }}"
 
           # Full name of the tarball asset
           PKG_NAME="${PKG_BASENAME}.${PKG_SUFFIX}"
@@ -63,7 +65,7 @@ jobs:
 
       - uses: actboy168/setup-luamake@master
 
-      - run: luamake
+      - run: luamake -platform ${{ matrix.platform }}
 
       - uses: actions/upload-artifact@v2
         with:
@@ -93,7 +95,7 @@ jobs:
 
           # Creating release assets
           pushd "${STAGING}/" >/dev/null
-          if [[ "${{ matrix.job.target }}" = windows ]]; then
+          if [[ "${{ matrix.target }}" = windows ]]; then
             7z -y a ${NAME} * | tail -2
           else
             tar czf ${NAME} *
@@ -103,7 +105,7 @@ jobs:
       # Packaging submodules for homebrew distribution
       - name: Package submodules
         id: submodules
-        if: ${{ startsWith(github.ref, 'refs/tags/') && matrix.job.target == 'darwin' }}
+        if: ${{ startsWith(github.ref, 'refs/tags/') && matrix.target == 'darwin' }}
         run: |
           STAGING=${{ steps.vars.outputs.PKG_STAGING }}
           PKG_SUBMOD_NAME="${{ env.PROJECT }}-${{ steps.vars.outputs.PKG_VERSION }}-submodules.zip"

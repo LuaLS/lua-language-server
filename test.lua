@@ -2,7 +2,7 @@ package.path  = package.path
       .. ';./test/?.lua'
       .. ';./test/?/init.lua'
 local fs = require 'bee.filesystem'
-local rootPath = fs.exe_path():parent_path():parent_path():parent_path():string()
+local rootPath = fs.exe_path():parent_path():parent_path():string()
 ROOT = fs.path(rootPath)
 TEST = true
 DEVELOP = true

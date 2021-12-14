@@ -8,7 +8,7 @@
 			"request": "launch",
 			"stopOnEntry": false,
 			"program": "${workspaceRoot}/test.lua",
-			"luaexe": "${workspaceFolder}/bin/Windows/lua-language-server.exe",
+			"luaexe": "${workspaceFolder}/Windows/lua-language-server.exe",
 			"cpath": null,
 			"arg": [
 			],
@@ -40,9 +40,9 @@
 			"type": "lua",
 			"request": "launch",
 			"stopOnEntry": false,
-			"luaexe": "${workspaceFolder}/bin/Windows/lua-language-server.exe",
+			"luaexe": "${workspaceFolder}/Windows/lua-language-server.exe",
 			"program": "${workspaceRoot}/tools/build-3rd-meta.lua",
-			"cpath": "${workspaceFolder}/bin/Windows/?.dll",
+			"cpath": "${workspaceFolder}/Windows/?.dll",
 			"arg": [
 			],
 			"luaVersion": "latest",

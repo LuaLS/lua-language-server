@@ -5,6 +5,19 @@ local exe      = platform.OS == 'Windows' and ".exe" or ""
 lm.bindir = "bin"
 
 lm.EXE_DIR = ""
+
+if lm.platform == "darwin-arm64" then
+    lm.target = "arm64-apple-macos11"
+else
+    lm.target = "x86_64-apple-macos10.12"
+end
+
+if lm.platform == "win32-ia32" then
+    lm.target = "x86"
+else
+    lm.target = "x86_64"
+end
+
 lm:import "3rd/bee.lua/make.lua"
 
 lm:source_set 'lpeglabel' {

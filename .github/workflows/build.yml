@@ -105,7 +105,7 @@ jobs:
       # Packaging submodules for homebrew distribution
       - name: Package submodules
         id: submodules
-        if: ${{ startsWith(github.ref, 'refs/tags/') && matrix.target == 'darwin' }}
+        if: ${{ startsWith(github.ref, 'refs/tags/') && matrix.platform == 'darwin-x64' }}
         run: |
           STAGING=${{ steps.vars.outputs.PKG_STAGING }}
           PKG_SUBMOD_NAME="${{ env.PROJECT }}-${{ steps.vars.outputs.PKG_VERSION }}-submodules.zip"

@@ -6,16 +6,20 @@ lm.bindir = "bin"
 
 lm.EXE_DIR = ""
 
-if lm.platform == "darwin-arm64" then
-    lm.target = "arm64-apple-macos11"
-else
-    lm.target = "x86_64-apple-macos10.12"
+if platform.OS == 'macOS' then
+    if lm.platform == "darwin-arm64" then
+        lm.target = "arm64-apple-macos11"
+    else
+        lm.target = "x86_64-apple-macos10.12"
+    end
 end
 
-if lm.platform == "win32-ia32" then
-    lm.target = "x86"
-else
-    lm.target = "x86_64"
+if platform.OS == 'Windows' then
+    if lm.platform == "win32-ia32" then
+        lm.target = "x86"
+    else
+        lm.target = "x86_64"
+    end
 end
 
 lm:import "3rd/bee.lua/make.lua"

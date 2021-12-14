@@ -17,6 +17,7 @@ env:
 jobs:
   compile:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - { os: ubuntu-18.04,   target: linux,   platform: linux-x64    }

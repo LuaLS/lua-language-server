@@ -18,9 +18,7 @@ jobs:
       with:
         name: lua-language-server
         path: |
-          bin/Windows
-          bin/Linux
-          bin/macOS
+          bin
   resource:
     runs-on: ubuntu-latest
     steps:

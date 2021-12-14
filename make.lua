@@ -2,7 +2,7 @@ local lm       = require 'luamake'
 local platform = require 'bee.platform'
 local exe      = platform.OS == 'Windows' and ".exe" or ""
 
-lm.bindir = platform.OS
+lm.bindir = 'bin-' .. platform.OS
 
 lm.EXE_DIR = ""
 lm:import "3rd/bee.lua/make.lua"

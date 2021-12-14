@@ -17,11 +17,10 @@ env:
 jobs:
   compile:
     strategy:
-      fail-fast: false
       matrix:
         job:
-          - { os: ubuntu-18.04, target: linux }
-          - { os: macos-latest, target: macos }
+          - { os: ubuntu-latest, target: linux }
+          - { os: macos-latest, target: darwin }
           - { os: windows-latest, target: windows }
     runs-on: ${{ matrix.job.os }}
     steps:

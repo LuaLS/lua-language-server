@@ -50,10 +50,6 @@ lm:executable "lua-language-server" {
     }
 }
 
-lm:build 'copy_vcrt' {
-    '$luamake', 'lua', 'make/copy_vcrt.lua', lm.bindir,
-}
-
 lm:copy "copy_bootstrap" {
     input = "make/bootstrap.lua",
     output = lm.bindir.."/main.lua",
@@ -62,6 +58,10 @@ lm:copy "copy_bootstrap" {
 if lm.target == 'arm64-apple-macos11' then
     return
 end
+
+lm:build 'copy_vcrt' {
+    '$luamake', 'lua', 'make/copy_vcrt.lua', lm.bindir,
+}
 
 lm:build "bee-test" {
     lm.bindir.."/lua-language-server"..exe, "3rd/bee.lua/test/test.lua",

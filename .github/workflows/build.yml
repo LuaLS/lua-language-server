@@ -30,6 +30,8 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
+      - uses: actboy168/setup-luamake@master
+      - run: luamake -platform ${{ matrix.platform }}
 
       - name: Setting up workflow variables
         id: vars
@@ -63,11 +65,7 @@ jobs:
           echo ::set-output name=PKG_NAME::${PKG_NAME}
           echo ::set-output name=PKG_PATH::"${PKG_STAGING}/${PKG_NAME}"
           echo ::set-output name=PKG_STAGING::${PKG_STAGING}
-
-      - uses: actboy168/setup-luamake@master
-
-      - run: luamake -platform ${{ matrix.platform }}
-
+      
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ steps.vars.outputs.PKG_BASENAME }}

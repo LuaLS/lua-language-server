@@ -59,6 +59,10 @@ lm:copy "copy_bootstrap" {
     output = lm.bindir.."/main.lua",
 }
 
+if lm.target == 'arm64-apple-macos11' then
+    return
+end
+
 lm:build "bee-test" {
     lm.bindir.."/lua-language-server"..exe, "3rd/bee.lua/test/test.lua",
     pool = "console",

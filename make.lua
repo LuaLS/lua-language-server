@@ -16,9 +16,9 @@ end
 
 if platform.OS == 'Windows' then
     if lm.platform == "win32-ia32" then
-        lm.target = "x86"
+        lm.arch = "x86"
     else
-        lm.target = "x86_64"
+        lm.arch = "x86_64"
     end
 end
 

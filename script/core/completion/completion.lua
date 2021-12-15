@@ -1945,6 +1945,7 @@ local function makeCache(uri, position, results)
     cache.position= position
     cache.word    = word:lower()
     cache.length  = #word
+    cache.uri     = uri
 end
 
 local function isValidCache(word, result)
@@ -1967,6 +1968,9 @@ end
 local function getCache(uri, position)
     local cache = workspace.getCache 'completion'
     if not cache.results then
+        return nil
+    end
+    if cache.uri ~= uri then
         return nil
     end
     local text  = files.getText(uri)

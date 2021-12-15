@@ -55,17 +55,11 @@ lm:copy "copy_bootstrap" {
     output = lm.bindir.."/main.lua",
 }
 
-if lm.target == 'arm64-apple-macos11' then
-    return
-end
-
 lm:build 'copy_vcrt' {
     '$luamake', 'lua', 'make/copy_vcrt.lua', lm.bindir, lm.arch,
 }
 
-lm:build "bee-test" {
-    lm.bindir.."/lua-language-server"..exe, "3rd/bee.lua/test/test.lua",
-    pool = "console",
+lm:phony "all" {
     deps = {
         "lua-language-server",
         "copy_bootstrap",
@@ -74,6 +68,54 @@ lm:build "bee-test" {
         deps = {
             "copy_vcrt"
         }
+    }
+}
+
+local function detectWindowsArch()
+    if os.getenv "PROCESSOR_ARCHITECTURE" == "ARM64" then
+        return "arm64"
+    end
+    if os.getenv "PROCESSOR_ARCHITECTURE" == "AMD64" or os.getenv "PROCESSOR_ARCHITEW6432" == "AMD64" then
+        return "x64"
+    end
+    return "ia32"
+end
+
+local function detectPosixArch()
+    local f <close> = assert(io.popen("uname -m", 'r'))
+    return f:read 'l':lower()
+end
+
+local function detectArch()
+    if platform.OS == 'Windows' then
+        return detectWindowsArch()
+    end
+    return detectPosixArch()
+end
+
+local function targetPlatformArch()
+    if lm.platform == nil then
+        return detectArch()
+    end
+    return lm.platform:match "^[^-]*-(.*)$"
+end
+
+local notest = platform.OS == 'macOS'
+    and targetPlatformArch() == "arm64"
+    and detectArch() == "x64"
+
+if notest then
+    lm:default {
+        "all",
+    }
+    return
+end
+
+lm:build "bee-test" {
+    lm.bindir.."/lua-language-server"..exe, "3rd/bee.lua/test/test.lua",
+    pool = "console",
+    deps = {
+        "all",
     }
 }
 

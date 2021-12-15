@@ -102,7 +102,7 @@ end
 
 local notest = platform.OS == 'macOS'
     and targetPlatformArch() == "arm64"
-    and detectArch() == "x64"
+    and detectArch() == "x86_64"
 
 if notest then
     lm:default {

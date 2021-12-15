@@ -60,7 +60,7 @@ if lm.target == 'arm64-apple-macos11' then
 end
 
 lm:build 'copy_vcrt' {
-    '$luamake', 'lua', 'make/copy_vcrt.lua', lm.bindir,
+    '$luamake', 'lua', 'make/copy_vcrt.lua', lm.bindir, lm.arch,
 }
 
 lm:build "bee-test" {

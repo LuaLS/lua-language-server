@@ -63,7 +63,7 @@ end
 
 local function asStringView(source, literal)
     -- 内部包含转义符？
-    local rawLen = source.finish - source.start - 2 * #source[2] + 1
+    local rawLen = source.finish - source.start - 2 * #source[2]
     if  config.get 'Lua.hover.viewString'
     and (source[2] == '"' or source[2] == "'")
     and rawLen > #literal then

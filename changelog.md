@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.5.4
+`2021-12-16`
 * `FIX` [#847](https://github.com/sumneko/lua-language-server/issues/847)
 * `FIX` [#848](https://github.com/sumneko/lua-language-server/issues/848)
 * `FIX` completion: incorrect cache

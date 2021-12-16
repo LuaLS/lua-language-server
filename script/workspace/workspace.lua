@@ -488,6 +488,7 @@ function m.normalize(path)
         end
     end)
     path = util.expandPath(path)
+    path = path:gsub('^%.[/\\]+', '')
     if platform.OS == 'Windows' then
         path = path:gsub('[/\\]+', '\\')
                    :gsub('[/\\]+$', '')

@@ -81,6 +81,51 @@ function m.getVisiblePath(path)
     return m.cache[path]
 end
 
+--- 查找符合指定require path的所有uri
+---@param path string
+function m.findUrisByRequirePath(path)
+    if type(path) ~= 'string' then
+        return {}
+    end
+    local vm    = require 'vm'
+    local cache = vm.getCache 'findUrisByRequirePath'
+    if cache[path] then
+        return cache[path].results, cache[path].searchers
+    end
+    tracy.ZoneBeginN('findUrisByRequirePath')
+    local results = {}
+    local mark = {}
+    local searchers = {}
+    for uri in files.eachDll() do
+        local opens = files.getDllOpens(uri) or {}
+        for _, open in ipairs(opens) do
+            if open == path then
+                results[#results+1] = uri
+            end
+        end
+    end
+
+    local input = path:gsub('%.', '/')
+                      :gsub('%%', '%%%%')
+    for _, luapath in ipairs(config.get 'Lua.runtime.path') do
+        local part = workspace.normalize(luapath:gsub('%?', input))
+        local uris, posts = workspace.findUrisByFilePath(part)
+        for _, uri in ipairs(uris) do
+            if not mark[uri] then
+                mark[uri] = true
+                results[#results+1] = uri
+                searchers[uri] = posts[uri] .. luapath
+            end
+        end
+    end
+    tracy.ZoneEnd()
+    cache[path] = {
+        results   = results,
+        searchers = searchers,
+    }
+    return results, searchers
+end
+
 function m.flush()
     m.cache = {}
 end

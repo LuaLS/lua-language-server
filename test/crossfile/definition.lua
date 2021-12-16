@@ -869,10 +869,10 @@ print(t.<?x?>)
 }
 
 local originRuntimePath = config.get 'Lua.runtime.path'
+
 config.set('Lua.runtime.path', {
     './?.lua'
 })
-
 TEST {
     {
         path = 'a.lua',
@@ -890,5 +890,26 @@ print(t.<?x?>)
         ]]
     }
 }
+
+--config.set('Lua.runtime.path', {
+--    '/home/?.lua'
+--})
+--TEST {
+--    {
+--        path = '/home/a.lua',
+--        content = [[
+--return {
+--    <!x!> = 1,
+--}
+--]],
+--    },
+--    {
+--        path = 'b.lua',
+--        content = [[
+--local t = require 'a'
+--print(t.<?x?>)
+--        ]]
+--    }
+--}
 
 config.set('Lua.runtime.path', originRuntimePath)

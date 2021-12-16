@@ -9,12 +9,13 @@ local lang     = require 'language'
 local util     = require 'utility'
 local guide    = require 'parser.guide'
 local noder    = require 'core.noder'
+local rpath    = require 'workspace.require-path'
 
 local function collectRequire(mode, literal)
     local rootPath = ws.path or ''
     local result, searchers
     if     mode == 'require' then
-        result, searchers = ws.findUrisByRequirePath(literal)
+        result, searchers = rpath.findUrisByRequirePath(literal)
     elseif mode == 'dofile'
     or     mode == 'loadfile' then
         result = ws.findUrisByFilePath(literal)

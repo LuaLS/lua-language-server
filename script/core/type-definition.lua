@@ -5,6 +5,7 @@ local vm         = require 'vm'
 local findSource = require 'core.find-source'
 local guide      = require 'parser.guide'
 local infer      = require 'core.infer'
+local rpath      = require 'workspace.require-path'
 
 local function sortResults(results)
     -- 先按照顺序排序
@@ -75,7 +76,7 @@ local function checkRequire(source, offset)
         return nil
     end
     if     libName == 'require' then
-        return workspace.findUrisByRequirePath(literal)
+        return rpath.findUrisByRequirePath(literal)
     elseif libName == 'dofile'
     or     libName == 'loadfile' then
         return workspace.findUrisByFilePath(literal)

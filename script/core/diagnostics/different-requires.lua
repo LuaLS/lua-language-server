@@ -3,7 +3,7 @@ local guide   = require 'parser.guide'
 local lang    = require 'language'
 local config  = require 'config'
 local vm      = require 'vm'
-local ws      = require 'workspace'
+local rpath   = require 'workspace.require-path'
 
 return function (uri, callback)
     local state = files.getState(uri)
@@ -21,7 +21,7 @@ return function (uri, callback)
             return
         end
         local literal = arg1[1]
-        local results = ws.findUrisByRequirePath(literal)
+        local results = rpath.findUrisByRequirePath(literal)
         if not results or #results ~= 1 then
             return
         end

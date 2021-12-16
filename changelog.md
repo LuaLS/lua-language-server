@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.5.4
+* `FIX` [#847](https://github.com/sumneko/lua-language-server/issues/847)
 * `FIX` [#848](https://github.com/sumneko/lua-language-server/issues/848)
 * `FIX` completion: incorrect cache
 * `FIX` hover: always view string

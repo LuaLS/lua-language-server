@@ -30,7 +30,7 @@ end
 function m.getVisiblePath(path)
     local searchers = config.get 'Lua.runtime.path'
     local strict    = config.get 'Lua.runtime.pathStrict'
-    path = path:gsub('^[/\\]+', '')
+    path = workspace.normalize(path)
     local uri = furi.encode(path)
     local libraryPath = files.getLibraryPath(uri)
     if not m.cache[path] then
@@ -42,6 +42,7 @@ function m.getVisiblePath(path)
         for _, searcher in ipairs(searchers) do
             local isAbsolute = searcher:match '^[/\\]'
                             or searcher:match '^%a+%:'
+            searcher = workspace.normalize(searcher)
             local cutedPath = path
             local currentPath = path
             local head
@@ -87,6 +88,8 @@ function m.findUrisByRequirePath(path)
     if type(path) ~= 'string' then
         return {}
     end
+    local separator = config.get 'Lua.completion.requireSeparator'
+    local fspath = path:gsub('%' .. separator, '/')
     local vm    = require 'vm'
     local cache = vm.getCache 'findUrisByRequirePath'
     if cache[path] then
@@ -94,30 +97,27 @@ function m.findUrisByRequirePath(path)
     end
     tracy.ZoneBeginN('findUrisByRequirePath')
     local results = {}
-    local mark = {}
     local searchers = {}
     for uri in files.eachDll() do
         local opens = files.getDllOpens(uri) or {}
         for _, open in ipairs(opens) do
-            if open == path then
+            if open == fspath then
                 results[#results+1] = uri
             end
         end
     end
 
-    local input = path:gsub('%.', '/')
-                      :gsub('%%', '%%%%')
-    for _, luapath in ipairs(config.get 'Lua.runtime.path') do
-        local part = workspace.normalize(luapath:gsub('%?', input))
-        local uris, posts = workspace.findUrisByFilePath(part)
-        for _, uri in ipairs(uris) do
-            if not mark[uri] then
-                mark[uri] = true
+    for uri in files.eachFile() do
+        local infos = m.getVisiblePath(furi.decode(uri))
+        for _, info in ipairs(infos) do
+            local fsexpect = info.expect:gsub('%' .. separator, '/')
+            if fsexpect == fspath then
                 results[#results+1] = uri
-                searchers[uri] = posts[uri] .. luapath
+                searchers[uri] = info.searcher
             end
         end
     end
+
     tracy.ZoneEnd()
     cache[path] = {
         results   = results,

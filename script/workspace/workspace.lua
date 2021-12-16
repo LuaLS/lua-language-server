@@ -389,44 +389,20 @@ function m.findUrisByFilePath(path)
     if type(path) ~= 'string' then
         return {}
     end
-    local lpath = furi.encode(path):gsub('^file:///', '')
+    local myUri = furi.encode(path)
     local vm    = require 'vm'
     local resultCache = vm.getCache 'findUrisByRequirePath.result'
     if resultCache[path] then
-        return resultCache[path].results, resultCache[path].posts
+        return resultCache[path]
     end
-    tracy.ZoneBeginN('findUrisByFilePath #1')
-    local strict = config.get 'Lua.runtime.pathStrict'
     local results = {}
-    local posts = {}
     for uri in files.eachFile() do
-        if not uri:find(lpath, 1, true) then
-            goto CONTINUE
+        if uri == myUri then
+            results[#results+1] = uri
         end
-        local relat = m.getRelativePath(uri)
-        local pathLen = #path
-        local curPath = relat
-        local curLen  = #curPath
-        local seg = curPath:sub(curLen - pathLen, curLen - pathLen)
-        if seg == '/' or seg == '\\' or seg == '' then
-            if strict and seg ~= '' then
-                goto CONTINUE
-            end
-            local see = curPath:sub(curLen - pathLen + 1, curLen)
-            if see == path then
-                results[#results+1] = uri
-                local post = curPath:sub(1, curLen - pathLen)
-                posts[uri] = post:gsub('^[/\\]+', '')
-            end
-        end
-        ::CONTINUE::
     end
-    tracy.ZoneEnd()
-    resultCache[path] = {
-        results = results,
-        posts   = posts,
-    }
-    return results, posts
+    resultCache[path] = results
+    return results
 end
 
 function m.normalize(path)

@@ -7,18 +7,22 @@ lm.bindir = "bin"
 lm.EXE_DIR = ""
 
 if platform.OS == 'macOS' then
-    if lm.platform == "darwin-arm64" then
+    if lm.platform == nil then
+    elseif lm.platform == "darwin-arm64" then
         lm.target = "arm64-apple-macos11"
-    else
+    elseif lm.platform == "darwin-x64" then
         lm.target = "x86_64-apple-macos10.12"
-    end
-end
-
-if platform.OS == 'Windows' then
-    if lm.platform == "win32-ia32" then
-        lm.arch = "x86"
     else
+        error "unknown platform"
+    end
+elseif platform.OS == 'Windows' then
+    if lm.platform == nil then
+    elseif lm.platform == "win32-ia32" then
+        lm.arch = "x86"
+    elseif lm.platform == "win32-x64" then
         lm.arch = "x86_64"
+    else
+        error "unknown platform"
     end
 end
 

@@ -1,5 +1,9 @@
 # changelog
 
+## 2.5.5
+`2021-12-16`
+* `FIX` dose not work in VSCode
+
 ## 2.5.4
 `2021-12-16`
 * `FIX` [#847](https://github.com/sumneko/lua-language-server/issues/847)

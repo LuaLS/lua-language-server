@@ -1064,14 +1064,14 @@ local function tryLabelInString(label, source)
     if not source or source.type ~= 'string' then
         return label
     end
-    local str = parser.grammar(label, 'String')
-    if not str then
+    local state = parser.parse(label, 'String')
+    if not state or not state.ast then
         return label
     end
-    if not matchKey(source[1], str[1]) then
+    if not matchKey(source[1], state.ast[1]) then
         return nil
     end
-    return util.viewString(str[1], source[2])
+    return util.viewString(state.ast[1], source[2])
 end
 
 local function mergeEnums(a, b, source)
@@ -2048,6 +2048,9 @@ local function completion(uri, position, triggerCharacter)
     await.delay()
     tracy.ZoneBeginN 'completion #1'
     local state = files.getState(uri)
+    if not state then
+        return nil
+    end
     results = {}
     clearStack()
     tracy.ZoneEnd()

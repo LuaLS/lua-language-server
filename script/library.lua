@@ -221,8 +221,13 @@ local function initBuiltIn()
     end
     m.metaPath = metaPath:string()
     m.metaPaths = {}
-    if not fs.exists(metaPath) then
-        fs.create_directories(metaPath)
+    local suc = xpcall(function ()
+        if not fs.exists(metaPath) then
+            fs.create_directories(metaPath)
+        end
+    end, log.error)
+    if not suc then
+        return
     end
     local out = fsu.dummyFS()
     local templateDir = ROOT / 'meta' / 'template'
@@ -462,7 +467,9 @@ local function check3rd(uri)
     if checkedUri(uri) then
         if files.isLua(uri) then
             local text = files.getText(uri)
-            check3rdByWords(text, thirdConfigs)
+            if text then
+                check3rdByWords(text, thirdConfigs)
+            end
         end
         check3rdByFileName(uri, thirdConfigs)
     end

@@ -942,7 +942,7 @@ local function parseShortString()
         end
         if not token then
             stringIndex = stringIndex + 1
-            stringPool[stringIndex] = ssub(Lua, currentOffset)
+            stringPool[stringIndex] = ssub(Lua, currentOffset or -1)
             missSymbol(mark)
             break
         end

@@ -92,6 +92,8 @@ local function utf8next(s, n)
         return n+3, utf8byte(s, n)
     elseif strmatch(s, "^[\xED][\x80-\x9F][\x80-\xBF]", n) then
         return n+3, utf8byte(s, n)
+    elseif strmatch(s, "^[\xEE-\xEF][\x80-\xBF][\x80-\xBF]", n) then
+        return n+3, utf8byte(s, n)
     elseif strmatch(s, "^[\xF0][\x90-\xBF][\x80-\xBF][\x80-\xBF]", n) then
         return n+4, utf8byte(s, n)
     elseif strmatch(s, "^[\xF1-\xF3][\x80-\xBF][\x80-\xBF][\x80-\xBF]", n) then

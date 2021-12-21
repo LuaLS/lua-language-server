@@ -12,8 +12,6 @@ local mathModf       = math.modf
 local debugGetInfo   = debug.getinfo
 local ioStdErr       = io.stderr
 
-_ENV = nil
-
 local m = {}
 
 m.file = nil
@@ -91,9 +89,6 @@ function m.raw(thd, level, msg, source, currentline, clock)
         return
     end
     init_log_file()
-    if not m.file then
-        return ''
-    end
     local sec, ms = mathModf((m.startTime + clock) / 1000)
     local timestr = osDate('%H:%M:%S', sec)
     local agl = ''
@@ -107,11 +102,13 @@ function m.raw(thd, level, msg, source, currentline, clock)
         buf = ('[%s.%03.f][%s]%s[#%d:%s:%s]: %s\n'):format(timestr, ms * 1000, level, agl, thd, trimSrc(source), currentline, msg)
     end
     m.size = m.size + #buf
-    if m.size > m.maxSize then
-        m.file:write(buf:sub(1, m.size - m.maxSize))
-        m.file:write('[REACH MAX SIZE]')
-    else
-        m.file:write(buf)
+    if m.file then
+        if m.size > m.maxSize then
+            m.file:write(buf:sub(1, m.size - m.maxSize))
+            m.file:write('[REACH MAX SIZE]')
+        else
+            m.file:write(buf)
+        end
     end
     return buf
 end
@@ -130,9 +127,11 @@ function m.init(root, path)
     m.path = path:string()
     m.prefixLen = #root:string()
     m.size = 0
-    if not fs.exists(path:parent_path()) then
-        fs.create_directories(path:parent_path())
-    end
+    pcall(function ()
+        if not fs.exists(path:parent_path()) then
+            fs.create_directories(path:parent_path())
+        end
+    end)
     if lastBuf then
         init_log_file()
         if m.file then

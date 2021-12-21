@@ -942,7 +942,7 @@ local function parseShortString()
         end
         if not token then
             stringIndex = stringIndex + 1
-            stringPool[stringIndex] = ssub(Lua, currentOffset)
+            stringPool[stringIndex] = ssub(Lua, currentOffset or -1)
             missSymbol(mark)
             break
         end
@@ -1649,11 +1649,13 @@ local function parseTable()
             wantSep = true
             local tindex = parseIndex()
             skipSpace()
+            tindex.type   = 'tableindex'
+            tindex.parent = tbl
+            index = index + 1
+            tbl[index] = tindex
             if expectAssign() then
                 skipSpace()
                 local ivalue = parseExp()
-                tindex.type   = 'tableindex'
-                tindex.parent = tbl
                 if ivalue then
                     ivalue.parent = tindex
                     tindex.finish = ivalue.finish
@@ -1661,8 +1663,6 @@ local function parseTable()
                 else
                     missExp()
                 end
-                index = index + 1
-                tbl[index] = tindex
             else
                 missSymbol '='
             end
@@ -3714,7 +3714,7 @@ local function initState(lua, version, options)
                 return
             end
         end
-        err.level = err.level or 'error'
+        err.level = err.level or 'Error'
         errs[#errs+1] = err
         return err
     end

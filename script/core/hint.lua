@@ -100,7 +100,7 @@ end
 ---@async
 local function paramName(uri, results, start, finish)
     local paramConfig = config.get(nil, 'Lua.hint.paramName')
-    if not paramConfig or paramConfig == 'None' then
+    if not paramConfig or paramConfig == 'Disable' then
         return
     end
     local state = files.getState(uri)

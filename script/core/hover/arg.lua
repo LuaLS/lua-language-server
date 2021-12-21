@@ -55,7 +55,7 @@ local function asFunction(source, oop)
     end
 end
 
-local function asDocFunction(source)
+local function asDocFunction(source, oop)
     if not source.args then
         return ''
     end
@@ -69,7 +69,11 @@ local function asDocFunction(source)
             arg.extends and infer.searchAndViewInfers(arg.extends) or 'any'
         )
     end
-    return table.concat(args, ', ')
+    if oop then
+        return table.concat(args, ', ', 2)
+    else
+        return table.concat(args, ', ')
+    end
 end
 
 return function (source, oop)
@@ -77,7 +81,7 @@ return function (source, oop)
         return asFunction(source, oop)
     end
     if source.type == 'doc.type.function' then
-        return asDocFunction(source)
+        return asDocFunction(source, oop)
     end
     return ''
 end

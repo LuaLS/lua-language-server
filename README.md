@@ -141,6 +141,7 @@ If you need to compile by yourself, please refer to [here](https://github.com/su
 * [CppCXY](https://github.com/CppCXY)
 * [Ketho](https://github.com/Ketho)
 * [Folke Lemaitre](https://github.com/folke)
+* [Vikas Raj](https://github.com/numToStr)
 
 ## Telemetry
 

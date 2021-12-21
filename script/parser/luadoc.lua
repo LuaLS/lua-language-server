@@ -4,7 +4,7 @@ local guide      = require 'parser.guide'
 local parser     = require 'parser.newparser'
 
 local TokenTypes, TokenStarts, TokenFinishs, TokenContents, TokenMarks
-local Ci, Offset, pushError, NextComment, Lines
+local Ci, Offset, pushWarning, NextComment, Lines
 local parseType
 local Parser = re.compile([[
 Main                <-  (Token / Sp)*
@@ -204,7 +204,7 @@ local function nextSymbolOrError(symbol)
         nextToken()
         return true
     end
-    pushError {
+    pushWarning {
         type   = 'LUADOC_MISS_SYMBOL',
         start  = getFinish(),
         finish = getFinish(),
@@ -229,7 +229,7 @@ local function parseIndexField(tp, parent)
     local indexTP, index = nextToken()
     if  indexTP ~= 'integer'
     and indexTP ~= 'string' then
-        pushError {
+        pushWarning {
             type   = 'LUADOC_INDEX_MUST_INT',
             start  = getStart(),
             finish = getFinish(),
@@ -249,7 +249,7 @@ local function parseClass(parent)
     }
     result.class = parseName('doc.class.name', result)
     if not result.class then
-        pushError {
+        pushWarning {
             type   = 'LUADOC_MISS_CLASS_NAME',
             start  = getFinish(),
             finish = getFinish(),
@@ -268,7 +268,7 @@ local function parseClass(parent)
     while true do
         local extend = parseName('doc.extends.name', result)
         if not extend then
-            pushError {
+            pushWarning {
                 type   = 'LUADOC_MISS_CLASS_EXTENDS_NAME',
                 start  = getFinish(),
                 finish = getFinish(),
@@ -371,7 +371,7 @@ local function  parseTypeUnitFunction()
         arg.name = parseName('doc.type.name', arg)
                 or parseDots('doc.type.name', arg)
         if not arg.name then
-            pushError {
+            pushWarning {
                 type   = 'LUADOC_MISS_ARG_NAME',
                 start  = getFinish(),
                 finish = getFinish(),
@@ -443,7 +443,7 @@ local function parseTypeUnitLiteralTable()
             field.name = parseName('doc.field.name', field)
                     or   parseIndexField('doc.field.name', field)
             if not field.name then
-                pushError {
+                pushWarning {
                     type   = 'LUADOC_MISS_FIELD_NAME',
                     start  = getFinish(),
                     finish = getFinish(),
@@ -480,7 +480,9 @@ local function parseTypeUnitLiteralTable()
     return typeUnit
 end
 
-local function parseTypeUnit(parent, content)
+local parseTypeUnit
+
+local function parseDocFunction(parent, content)
     if content == 'async' then
         local tp, cont = peekToken()
         if tp == 'name' then
@@ -494,12 +496,17 @@ local function parseTypeUnit(parent, content)
             end
         end
     end
-    local result
     if content == 'fun' then
-        result = parseTypeUnitFunction()
+        return parseTypeUnitFunction()
     end
-    if content == '{' then
-        result = parseTypeUnitLiteralTable()
+end
+
+function parseTypeUnit(parent, content)
+    local result = parseDocFunction(parent, content)
+    if not result then
+        if content == '{' then
+            result = parseTypeUnitLiteralTable()
+        end
     end
     if not result then
         result = {
@@ -542,7 +549,7 @@ local function parseResume(parent)
 
     local tp = peekToken()
     if tp ~= 'string' then
-        pushError {
+        pushWarning {
             type   = 'LUADOC_MISS_STRING',
             start  = getFinish(),
             finish = getFinish(),
@@ -709,7 +716,7 @@ function parseType(parent)
     end
 
     if #result.types == 0 and #result.enums == 0 and #result.resumes == 0 then
-        pushError {
+        pushWarning {
             type   = 'LUADOC_MISS_TYPE_NAME',
             start  = getFinish(),
             finish = getFinish(),
@@ -725,7 +732,7 @@ local function parseAlias()
     }
     result.alias = parseName('doc.alias.name', result)
     if not result.alias then
-        pushError {
+        pushWarning {
             type   = 'LUADOC_MISS_ALIAS_NAME',
             start  = getFinish(),
             finish = getFinish(),
@@ -735,7 +742,7 @@ local function parseAlias()
     result.start  = getStart()
     result.extends = parseType(result)
     if not result.extends then
-        pushError {
+        pushWarning {
             type   = 'LUADOC_MISS_ALIAS_EXTENDS',
             start  = getFinish(),
             finish = getFinish(),
@@ -753,7 +760,7 @@ local function parseParam()
     result.param = parseName('doc.param.name', result)
                 or parseDots('doc.param.name', result)
     if not result.param then
-        pushError {
+        pushWarning {
             type   = 'LUADOC_MISS_PARAM_NAME',
             start  = getFinish(),
             finish = getFinish(),
@@ -768,7 +775,7 @@ local function parseParam()
     result.finish = getFinish()
     result.extends = parseType(result)
     if not result.extends then
-        pushError {
+        pushWarning {
             type   = 'LUADOC_MISS_PARAM_EXTENDS',
             start  = getFinish(),
             finish = getFinish(),
@@ -831,7 +838,7 @@ local function parseField()
     result.field = parseName('doc.field.name', result)
                 or parseIndexField('doc.field.name', result)
     if not result.field then
-        pushError {
+        pushWarning {
             type   = 'LUADOC_MISS_FIELD_NAME',
             start  = getFinish(),
             finish = getFinish(),
@@ -847,7 +854,7 @@ local function parseField()
     end
     result.extends = parseType(result)
     if not result.extends then
-        pushError {
+        pushWarning {
             type   = 'LUADOC_MISS_FIELD_EXTENDS',
             start  = getFinish(),
             finish = getFinish(),
@@ -870,7 +877,7 @@ local function parseGeneric()
         }
         object.generic = parseName('doc.generic.name', object)
         if not object.generic then
-            pushError {
+            pushWarning {
                 type   = 'LUADOC_MISS_GENERIC_NAME',
                 start  = getFinish(),
                 finish = getFinish(),
@@ -902,7 +909,7 @@ local function parseVararg()
     }
     result.vararg = parseType(result)
     if not result.vararg then
-        pushError {
+        pushWarning {
             type   = 'LUADOC_MISS_VARARG_TYPE',
             start  = getFinish(),
             finish = getFinish(),
@@ -916,8 +923,9 @@ end
 
 local function parseOverload()
     local tp, name = peekToken()
-    if tp ~= 'name' or name ~= 'fun' then
-        pushError {
+    if tp ~= 'name'
+    or (name ~= 'fun' and name ~= 'async') then
+        pushWarning {
             type   = 'LUADOC_MISS_FUN_AFTER_OVERLOAD',
             start  = getFinish(),
             finish = getFinish(),
@@ -928,7 +936,7 @@ local function parseOverload()
     local result = {
         type = 'doc.overload',
     }
-    result.overload = parseTypeUnitFunction()
+    result.overload = parseDocFunction(result, name)
     if not result.overload then
         return nil
     end
@@ -962,7 +970,7 @@ local function parseVersion()
     while true do
         local tp, text = nextToken()
         if not tp then
-            pushError {
+            pushWarning {
                 type  = 'LUADOC_MISS_VERSION',
                 start  = getFinish(),
                 finish = getFinish(),
@@ -985,7 +993,7 @@ local function parseVersion()
             tp, text = nextToken()
         end
         if tp ~= 'name' then
-            pushError {
+            pushWarning {
                 type  = 'LUADOC_MISS_VERSION',
                 start  = getStart(),
                 finish = getFinish(),
@@ -1031,7 +1039,7 @@ local function parseDiagnostic()
     }
     local nextTP, mode = nextToken()
     if nextTP ~= 'name' then
-        pushError {
+        pushWarning {
             type   = 'LUADOC_MISS_DIAG_MODE',
             start  = getFinish(),
             finish = getFinish(),
@@ -1045,7 +1053,7 @@ local function parseDiagnostic()
     and mode ~= 'disable-line'
     and mode ~= 'disable'
     and mode ~= 'enable' then
-        pushError {
+        pushWarning {
             type   = 'LUADOC_ERROR_DIAG_MODE',
             start  = result.start,
             finish = result.finish,
@@ -1058,7 +1066,7 @@ local function parseDiagnostic()
         while true do
             local name = parseName('doc.diagnostic.name', result)
             if not name then
-                pushError {
+                pushWarning {
                     type   = 'LUADOC_MISS_DIAG_NAME',
                     start  = getFinish(),
                     finish = getFinish(),
@@ -1092,7 +1100,7 @@ local function parseModule()
         result.finish = getFinish()
         result.smark  = getMark()
     else
-        pushError {
+        pushWarning {
             type   = 'LUADOC_MISS_MODULE_NAME',
             start  = getFinish(),
             finish = getFinish(),
@@ -1123,7 +1131,7 @@ local function convertTokens()
         return
     end
     if tp ~= 'name' then
-        pushError {
+        pushWarning {
             type   = 'LUADOC_MISS_CATE_NAME',
             start  = getStart(),
             finish = getFinish(),
@@ -1420,8 +1428,11 @@ return function (state)
         groups = {},
     }
 
-    pushError = state.pushError
-    Lines     = state.lines
+    pushWarning = function (err)
+        err.level = err.level or 'Warning'
+        state.pushError(err)
+    end
+    Lines       = state.lines
 
     local ci = 1
     NextComment = function (offset, peek)

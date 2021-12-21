@@ -46,14 +46,14 @@ local function asGlobal(source)
     return guide.getKeyName(source)
 end
 
-local function asDocFunction(source)
+local function asDocFunction(source, oop)
     local doc = guide.getParentType(source, 'doc.type')
             or  guide.getParentType(source, 'doc.overload')
     if not doc or not doc.bindSources then
         return ''
     end
     for _, src in ipairs(doc.bindSources) do
-        local name = buildName(src)
+        local name = buildName(src, oop)
         if name ~= '' then
             return name
         end
@@ -66,11 +66,6 @@ local function asDocField(source)
 end
 
 function buildName(source, oop)
-    if oop == nil then
-        oop =  source.type == 'setmethod'
-            or source.type == 'getmethod'
-            or nil
-    end
     if source.type == 'local' then
         return asLocal(source) or '', oop
     end
@@ -94,7 +89,7 @@ function buildName(source, oop)
         return asTableField(source) or '', oop
     end
     if source.type == 'doc.type.function' then
-        return asDocFunction(source), oop
+        return asDocFunction(source, oop), oop
     end
     if source.type == 'doc.field' then
         return asDocField(source), oop

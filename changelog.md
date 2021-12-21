@@ -1,5 +1,26 @@
 # changelog
 
+## 2.5.6
+* `CHG` diagnostic: now syntax errors in `LuaDoc` are shown as `Warning`
+* `FIX` return type of `math.floor`
+* `FIX` runtime errors
+
+## 2.5.5
+`2021-12-16`
+* `FIX` dose not work in VSCode
+
+## 2.5.4
+`2021-12-16`
+* `FIX` [#847](https://github.com/sumneko/lua-language-server/issues/847)
+* `FIX` [#848](https://github.com/sumneko/lua-language-server/issues/848)
+* `FIX` completion: incorrect cache
+* `FIX` hover: always view string
+
+## 2.5.3
+`2021-12-6`
+* `FIX` [#842](https://github.com/sumneko/lua-language-server/issues/844)
+* `FIX` [#844](https://github.com/sumneko/lua-language-server/issues/844)
+
 ## 2.5.2
 `2021-12-2`
 * `FIX` [#815](https://github.com/sumneko/lua-language-server/issues/815)

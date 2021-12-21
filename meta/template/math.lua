@@ -87,7 +87,7 @@ function math.exp(x) end
 
 ---#DES 'math.floor'
 ---@param x number
----@return number
+---@return integer
 ---@nodiscard
 function math.floor(x) end
 

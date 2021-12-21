@@ -9,12 +9,13 @@ local lang     = require 'language'
 local util     = require 'utility'
 local guide    = require 'parser.guide'
 local noder    = require 'core.noder'
+local rpath    = require 'workspace.require-path'
 
 local function collectRequire(mode, literal)
     local rootPath = ws.rootPath or ''
     local result, searchers
     if     mode == 'require' then
-        result, searchers = ws.findUrisByRequirePath(literal)
+        result, searchers = rpath.findUrisByRequirePath(literal)
     elseif mode == 'dofile'
     or     mode == 'loadfile' then
         result = ws.findUrisByFilePath(literal)
@@ -63,7 +64,7 @@ end
 
 local function asStringView(source, literal)
     -- 内部包含转义符？
-    local rawLen = source.finish - source.start - 2 * #source[2] + 1
+    local rawLen = source.finish - source.start - 2 * #source[2]
     if  config.get(nil, 'Lua.hover.viewString')
     and (source[2] == '"' or source[2] == "'")
     and rawLen > #literal then

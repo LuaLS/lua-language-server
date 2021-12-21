@@ -49,7 +49,7 @@ local root; do
             sep = '/\\'
         end
         local pattern = "["..sep.."][^"..sep.."]+"
-        root = package.cpath:match("([^;]+)"..pattern..pattern..pattern.."$")
+        root = package.cpath:match("([^;]+)"..pattern..pattern.."$")
         arg[0] = root .. package.config:sub(1,1) .. 'main.lua'
     end
     root = root:gsub('[/\\]', package.config:sub(1,1))

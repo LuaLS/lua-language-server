@@ -1,9 +1,10 @@
 /log
 /build
-/bin
-!*.exe
 /test/temp.lua
 /meta/*
 !/meta/template
 !/meta/3rd
-/bin2
+/bin-Windows
+/bin-Linux
+/bin-macOS
+/bin

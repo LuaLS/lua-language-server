@@ -6,6 +6,7 @@ local util       = require 'utility'
 local findSource = require 'core.find-source'
 local markdown   = require 'provider.markdown'
 local infer      = require 'core.infer'
+local guide      = require 'parser.guide'
 
 ---@async
 local function getHover(source)
@@ -15,14 +16,14 @@ local function getHover(source)
     local descMark  = {}
 
     ---@async
-    local function addHover(def, checkLable)
+    local function addHover(def, checkLable, oop)
         if defMark[def] then
             return
         end
         defMark[def] = true
 
         if checkLable then
-            local label = getLabel(def)
+            local label = getLabel(def, oop)
             if not labelMark[tostring(label)] then
                 labelMark[tostring(label)] = true
                 md:add('lua', label)
@@ -38,27 +39,34 @@ local function getHover(source)
         end
     end
 
+    local oop
     if infer.searchAndViewInfers(source) == 'function' then
         local hasFunc
         for _, def in ipairs(vm.getDefs(source)) do
+            if guide.isOOP(def) then
+                oop = true
+            end
             if def.type == 'function'
             or def.type == 'doc.type.function' then
                 hasFunc = true
-                addHover(def, true)
+                addHover(def, true, oop)
             end
         end
         if not hasFunc then
-            addHover(source, true)
+            addHover(source, true, oop)
         end
     else
-        addHover(source, true)
+        addHover(source, true, oop)
         for _, def in ipairs(vm.getDefs(source)) do
+            if guide.isOOP(def) then
+                oop = true
+            end
             local isFunction
             if def.type == 'function'
             or def.type == 'doc.type.function' then
                 isFunction = true
             end
-            addHover(def, isFunction)
+            addHover(def, isFunction, oop)
         end
     end
 

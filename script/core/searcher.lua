@@ -2,7 +2,7 @@ local noder     = require 'core.noder'
 local guide     = require 'parser.guide'
 local files     = require 'files'
 local generic   = require 'core.generic'
-local ws        = require 'workspace'
+local rpath     = require 'workspace.require-path'
 local vm        = require 'vm.vm'
 local collector = require 'core.collector'
 local util      = require 'utility'
@@ -796,7 +796,7 @@ function m.searchRefsByID(status, suri, expect, mode)
         if not requireName then
             return
         end
-        local uris = ws.findUrisByRequirePath(requireName)
+        local uris = rpath.findUrisByRequirePath(requireName)
         footprint(status, 'require:', requireName)
         for i = 1, #uris do
             local ruri = uris[i]

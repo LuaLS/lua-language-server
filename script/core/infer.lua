@@ -28,6 +28,7 @@ local function mergeTable(a, b)
     for v in pairs(b) do
         a[v] = true
     end
+    a[CACHE] = nil
 end
 
 local function isBaseType(source, mark)
@@ -519,6 +520,9 @@ end
 ---@param mark? table
 ---@return table
 function m.searchLiterals(source, field, mark)
+    if not source then
+        return nil
+    end
     local defs = vm.getDefs(source, field)
     local literals = {}
     mark = mark or {}
@@ -540,6 +544,9 @@ function m.searchAndViewLiterals(source, field, mark)
         return nil
     end
     local literals = m.searchLiterals(source, field, mark)
+    if not literals then
+        return nil
+    end
     local view = m.viewLiterals(literals)
     return view
 end
@@ -558,10 +565,12 @@ function m.isTrue(source, mark)
     if mark.isTrue[source] == nil then
         mark.isTrue[source] = false
         local literals = m.searchLiterals(source, nil, mark)
-        for literal in pairs(literals) do
-            if literal ~= false then
-                mark.isTrue[source] = true
-                break
+        if literals then
+            for literal in pairs(literals) do
+                if literal ~= false then
+                    mark.isTrue[source] = true
+                    break
+                end
             end
         end
     end

@@ -1,13 +1,16 @@
 ---@meta
-resty_websocket_server={}
-function resty_websocket_server.send_text(self, data) end
-function resty_websocket_server.new(self, opts) end
-function resty_websocket_server.send_ping(self, data) end
-function resty_websocket_server.set_timeout(self, time) end
-function resty_websocket_server.send_binary(self, data) end
-function resty_websocket_server.send_frame() end
-function resty_websocket_server.recv_frame(self) end
-function resty_websocket_server.send_close(self, code, msg) end
-resty_websocket_server._VERSION="0.07"
-function resty_websocket_server.send_pong(self, data) end
+
+---@class resty.websocket.server : resty.websocket
+resty_websocket_server = {
+  _VERSION = "0.09"
+}
+
+---Performs the websocket handshake process on the server side and returns a WebSocket server object.
+---
+---In case of error, it returns nil and a string describing the error.
+---@param  opts?                   resty.websocket.new.opts
+---@return resty.websocket.server? server
+---@return string?                 error
+function resty_websocket_server:new(opts) end
+
 return resty_websocket_server

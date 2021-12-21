@@ -17,46 +17,29 @@ local converter  = require 'proto.converter'
 local filewatch  = require 'filewatch'
 local json       = require 'json'
 
-local function mergeConfig(a, b)
-    for k, v in pairs(b) do
-        if a[k] == nil then
-            a[k] = v
-        end
-    end
-end
-
 ---@async
 local function updateConfig()
-    local merged = {}
+    local clientConfig = cfgLoader.loadClientConfig()
+    if clientConfig then
+        log.debug('load config from client')
+        config.update(clientConfig, json.null)
+    end
+
+    local rc = cfgLoader.loadRCConfig('.luarc.json')
+    if rc then
+        log.debug('load config from luarc')
+        config.update(rc, json.null)
+    end
 
     local cfg = cfgLoader.loadLocalConfig(CONFIGPATH)
     if cfg then
         log.debug('load config from local', CONFIGPATH)
         -- watch directory
         filewatch.watch(workspace.getAbsolutePath(CONFIGPATH):gsub('[^/\\]+$', ''))
-        mergeConfig(merged, cfg)
+        config.update(cfg, json.null)
     end
 
-    local rc = cfgLoader.loadRCConfig('.luarc.json')
-    if rc then
-        log.debug('load config from luarc')
-        mergeConfig(merged, rc)
-    end
-
-    local clientConfig = cfgLoader.loadClientConfig()
-    if clientConfig then
-        log.debug('load config from client')
-        mergeConfig(merged, clientConfig)
-    end
-
-    for k, v in pairs(merged) do
-        if v == json.null then
-            merged[k] = nil
-        end
-    end
-
-    config.update(merged)
-    log.debug('loaded config dump:', util.dump(merged))
+    log.debug('loaded config dump:', util.dump(config.dump()))
 end
 
 ---@class provider
@@ -210,8 +193,7 @@ m.register 'textDocument/didOpen' {
         local doc   = params.textDocument
         local uri   = files.getRealUri(doc.uri)
         local text  = doc.text
-        log.debug('didOpen', uri)
-        files.setText(uri, text, true)
+        files.setText(uri, text, true, doc.version)
         files.open(uri)
     end
 }
@@ -239,7 +221,7 @@ m.register 'textDocument/didChange' {
         local text = files.getOriginText(uri) or ''
         local rows = files.getCachedRows(uri)
         text, rows = tm(text, rows, changes)
-        files.setText(uri, text, true)
+        files.setText(uri, text, true, doc.version)
         files.setCachedRows(uri, rows)
     end
 }

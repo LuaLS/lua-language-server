@@ -28,6 +28,9 @@ return function (uri, callback)
     local cache = {}
     ---@async
     local function checkFunction(source)
+        if not source then
+            return
+        end
         if cache[source] ~= nil then
             return cache[source]
         end

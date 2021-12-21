@@ -28,6 +28,7 @@ local function mergeTable(a, b)
     for v in pairs(b) do
         a[v] = true
     end
+    a[CACHE] = nil
 end
 
 local function isBaseType(source, mark)
@@ -598,6 +599,10 @@ function m.searchAndViewInfers(source, field, mark)
     end
     local infers = m.searchInfers(source, field, mark)
     local view = m.viewInfers(infers)
+    if type(view) == 'boolean' then
+        log.error('Why view is boolean?', util.dump(infers))
+        return 'any'
+    end
     return view
 end
 

@@ -30,7 +30,7 @@ end
 function m.getVisiblePath(path)
     local searchers = config.get 'Lua.runtime.path'
     local strict    = config.get 'Lua.runtime.pathStrict'
-    path = path:gsub('^[/\\]+', '')
+    path = workspace.normalize(path)
     local uri = furi.encode(path)
     local libraryPath = files.getLibraryPath(uri)
     if not m.cache[path] then
@@ -42,6 +42,7 @@ function m.getVisiblePath(path)
         for _, searcher in ipairs(searchers) do
             local isAbsolute = searcher:match '^[/\\]'
                             or searcher:match '^%a+%:'
+            searcher = workspace.normalize(searcher)
             local cutedPath = path
             local currentPath = path
             local head
@@ -59,10 +60,8 @@ function m.getVisiblePath(path)
                 pos = currentPath:match('[/\\]+()', pos)
                 if platform.OS == 'Windows' then
                     searcher = searcher :gsub('[/\\]+', '\\')
-                                        :gsub('^[/\\]+', '')
                 else
                     searcher = searcher :gsub('[/\\]+', '/')
-                                        :gsub('^[/\\]+', '')
                 end
                 local expect = getOnePath(cutedPath, searcher)
                 if expect then
@@ -79,6 +78,50 @@ function m.getVisiblePath(path)
         end
     end
     return m.cache[path]
+end
+
+--- 查找符合指定require path的所有uri
+---@param path string
+function m.findUrisByRequirePath(path)
+    if type(path) ~= 'string' then
+        return {}
+    end
+    local separator = config.get 'Lua.completion.requireSeparator'
+    local fspath = path:gsub('%' .. separator, '/')
+    local vm    = require 'vm'
+    local cache = vm.getCache 'findUrisByRequirePath'
+    if cache[path] then
+        return cache[path].results, cache[path].searchers
+    end
+    tracy.ZoneBeginN('findUrisByRequirePath')
+    local results = {}
+    local searchers = {}
+    for uri in files.eachDll() do
+        local opens = files.getDllOpens(uri) or {}
+        for _, open in ipairs(opens) do
+            if open == fspath then
+                results[#results+1] = uri
+            end
+        end
+    end
+
+    for uri in files.eachFile() do
+        local infos = m.getVisiblePath(furi.decode(uri))
+        for _, info in ipairs(infos) do
+            local fsexpect = info.expect:gsub('%' .. separator, '/')
+            if fsexpect == fspath then
+                results[#results+1] = uri
+                searchers[uri] = info.searcher
+            end
+        end
+    end
+
+    tracy.ZoneEnd()
+    cache[path] = {
+        results   = results,
+        searchers = searchers,
+    }
+    return results, searchers
 end
 
 function m.flush()

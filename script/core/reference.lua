@@ -111,6 +111,9 @@ return function (uri, position)
         elseif src.type == 'table' and src.parent.type ~= 'return' then
             goto CONTINUE
         end
+        if not src then
+            goto CONTINUE
+        end
         results[#results+1] = {
             target = src,
             uri    = root.uri,

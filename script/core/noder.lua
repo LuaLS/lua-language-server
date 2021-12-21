@@ -27,7 +27,6 @@ local ANY_FIELD_CHAR = '*'
 local INDEX_CHAR     = '['
 local RETURN_INDEX   = SPLIT_CHAR .. '#'
 local PARAM_INDEX    = SPLIT_CHAR .. '&'
-local PARAM_NAME     = SPLIT_CHAR .. '$'
 local EVENT_ENUM     = SPLIT_CHAR .. '>'
 local TABLE_KEY      = SPLIT_CHAR .. '<'
 local WEAK_TABLE_KEY = SPLIT_CHAR .. '<<'
@@ -95,6 +94,10 @@ local INFO_DEEP_AND_DONT_CROSS = {
 ---@field binfo?    table<node.id, node.info>
 -- 后退的关联ID与info
 ---@field backwards table<node.id, node.id[]|table<node.id, node.info>>
+-- 第一个继承
+---@field extend    table<node.id, node.id>
+-- 其他继承
+---@field extends   table<node.id, node.id[]>
 -- 函数调用参数信息（用于泛型）
 ---@field call      table<node.id, parser.guide.object>
 ---@field require   table<node.id, string>
@@ -549,8 +552,8 @@ end
 
 ---添加关联的前进ID
 ---@param noders    noders
----@param id        string
----@param forwardID string
+---@param id        node.id
+---@param forwardID node.id
 ---@param info?     node.info
 local function pushForward(noders, id, forwardID, info)
     if not id
@@ -581,8 +584,8 @@ end
 
 ---添加关联的后退ID
 ---@param noders     noders
----@param id         string
----@param backwardID string
+---@param id         node.id
+---@param backwardID node.id
 ---@param info?      node.info
 local function pushBackward(noders, id, backwardID, info)
     if not id
@@ -609,6 +612,36 @@ local function pushBackward(noders, id, backwardID, info)
     end
     backwards[backwardID] = info or false
     backwards[#backwards+1] = backwardID
+end
+
+---添加继承的关联ID
+---@param noders     noders
+---@param id         node.id
+---@param extendID   node.id
+local function pushExtend(noders, id, extendID)
+    if not id
+    or not extendID
+    or extendID == ''
+    or id == extendID then
+        return
+    end
+    if not noders.extend[id] then
+        noders.extend[id] = extendID
+        return
+    end
+    if noders.extend[id] == extendID then
+        return
+    end
+    local extends = noders.extends[id]
+    if not extends then
+        extends = {}
+        noders.extends[id] = extends
+    end
+    if extends[extendID] ~= nil then
+        return
+    end
+    extends[extendID] = false
+    extends[#extends+1] = extendID
 end
 
 ---@class noder
@@ -748,6 +781,31 @@ function m.eachBackward(noders, id)
         local id  = backwards[index]
         local tag = backwards[id]
         return id, tag
+    end
+end
+
+---遍历extend
+---@param noders noders
+---@param id node.id
+---@return fun():string, node.info
+function m.eachExtend(noders, id)
+    local extend = noders.extend[id]
+    if not extend then
+        return DUMMY_FUNCTION
+    end
+    local index
+    local extends = noders.extends[id]
+    return function ()
+        if not index then
+            index = 0
+            return extend
+        end
+        if not extends then
+            return nil
+        end
+        index = index + 1
+        local id  = extends[index]
+        return id
     end
 end
 
@@ -1050,7 +1108,7 @@ compileNodeMap = util.switch()
         pushForward(noders, getID(source.class), id)
         if source.extends then
             for _, ext in ipairs(source.extends) do
-                pushForward(noders, id, getID(ext), INFO_CLASS_TO_EXNTENDS)
+                pushExtend(noders, id, getID(ext))
             end
         end
         if source.bindSources then
@@ -1118,14 +1176,12 @@ compileNodeMap = util.switch()
         end
         if source.bindSources then
             for _, src in ipairs(source.bindSources) do
-                if src.type == 'function'
-                or guide.isSet(src) then
-                    local paramID = sformat('%s%s%s'
-                        , getID(src)
-                        , PARAM_NAME
-                        , source.param[1]
-                    )
-                    pushForward(noders, paramID, id)
+                if src.type == 'function' and src.args then
+                    for _, arg in ipairs(src.args) do
+                        if arg[1] == source.param[1] then
+                            pushForward(noders, getID(arg), id)
+                        end
+                    end
                 end
             end
         end
@@ -1166,12 +1222,6 @@ compileNodeMap = util.switch()
     : call(function (noders, id, source)
         if source.args then
             for index, param in ipairs(source.args) do
-                local paramID = sformat('%s%s%s'
-                    , id
-                    , PARAM_NAME
-                    , param.name[1]
-                )
-                pushForward(noders, paramID, getID(param.extends))
                 local indexID = sformat('%s%s%s'
                     , id
                     , PARAM_INDEX
@@ -1257,32 +1307,7 @@ compileNodeMap = util.switch()
                     , i
                 )
                 pushForward(noders, indexID, getID(arg))
-                if arg.type == 'local' then
-                    pushForward(noders, getID(arg), sformat('%s%s%s'
-                        , id
-                        , PARAM_NAME
-                        , arg[1]
-                    ))
-                    if parentID then
-                        pushForward(noders, getID(arg), sformat('%s%s%s'
-                            , parentID
-                            , PARAM_NAME
-                            , arg[1]
-                        ))
-                    end
-                else
-                    pushForward(noders, getID(arg), sformat('%s%s%s'
-                        , id
-                        , PARAM_NAME
-                        , '...'
-                    ))
-                    if parentID then
-                        pushForward(noders, getID(arg), sformat('%s%s%s'
-                            , parentID
-                            , PARAM_NAME
-                            , '...'
-                        ))
-                    end
+                if arg.type ~= 'local' then
                     for j = i + 1, i + 10 do
                         pushForward(noders, sformat('%s%s%s'
                             , id
@@ -1339,6 +1364,13 @@ compileNodeMap = util.switch()
         local parent = source.parent
         if guide.isSet(parent)  then
             pushForward(noders, id, getID(parent))
+        end
+    end)
+    : case 'loop'
+    : call(function (noders, id, source)
+        local loc = source.loc
+        if loc then
+            pushForward(noders, getID(loc), 'dn:integer')
         end
     end)
     : case 'in'
@@ -1544,6 +1576,11 @@ function m.getLastID(id)
     return lastID
 end
 
+function m.getFieldID(id)
+    local fieldID = smatch(id, LAST_REGEX)
+    return fieldID
+end
+
 ---获取ID的长度
 ---@param id string
 ---@return integer
@@ -1569,7 +1606,7 @@ function m.hasField(id)
     end
     local next2Char = ssub(id, #firstID + 2, #firstID + 2)
     if next2Char == RETURN_INDEX
-    or next2Char == PARAM_NAME then
+    or next2Char == PARAM_INDEX then
         return false
     end
     return true
@@ -1591,9 +1628,6 @@ function m.isCommonField(field)
         return false
     end
     if ssub(field, 1, #RETURN_INDEX) == RETURN_INDEX then
-        return false
-    end
-    if ssub(field, 1, #PARAM_NAME) == PARAM_NAME then
         return false
     end
     return true
@@ -1671,6 +1705,8 @@ function m.getNoders(source)
             backward  = {},
             binfo     = {},
             backwards = {},
+            extend    = {},
+            extends   = {},
             call      = {},
             require   = {},
             skip      = {},

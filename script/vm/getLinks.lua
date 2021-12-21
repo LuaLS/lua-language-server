@@ -2,9 +2,9 @@ local guide = require 'parser.guide'
 ---@class vm
 local vm    = require 'vm.vm'
 local files = require 'files'
+local rpath = require 'workspace.require-path'
 
 local function getFileLinks(uri)
-    local ws    = require 'workspace'
     local links = {}
     local state = files.getState(uri)
     if not state then
@@ -20,7 +20,7 @@ local function getFileLinks(uri)
         if not args or not args[1] or args[1].type ~= 'string' then
             return
         end
-        local uris = ws.findUrisByRequirePath(args[1][1])
+        local uris = rpath.findUrisByRequirePath(args[1][1])
         for _, u in ipairs(uris) do
             if not links[u] then
                 links[u] = {}

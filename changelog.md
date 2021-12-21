@@ -2,6 +2,7 @@
 
 ## 2.5.6
 * `CHG` diagnostic: now syntax errors in `LuaDoc` are shown as `Warning`
+* `FIX` return type of `math.floor`
 
 ## 2.5.5
 `2021-12-16`

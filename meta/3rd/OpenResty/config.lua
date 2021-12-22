@@ -17,4 +17,9 @@ configs = {
         action = 'set',
         value  = 'LuaJIT',
     },
+    {
+        key    = 'Lua.diagnostics.globals',
+        action = 'add',
+        value  = 'ngx',
+    },
 }

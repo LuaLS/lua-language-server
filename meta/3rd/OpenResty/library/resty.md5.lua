@@ -1,8 +1,16 @@
 ---@meta
-resty_md5={}
-function resty_md5.final(self) end
-function resty_md5.new(self) end
-function resty_md5.reset(self) end
-resty_md5._VERSION="0.11"
-function resty_md5.update(self, s) end
-return resty_md5
+
+---@class resty.md5 : resty.string.checksum
+local md5={}
+
+--- Create a new md5 checksum object.
+---@return resty.md5
+function md5:new() end
+
+--- Add a string to the md5 checksum data
+---@param  s       string
+---@param  len?    number Optional length (defaults to the length of `s`)
+---@return boolean ok
+function md5:update(s, len) end
+
+return md5

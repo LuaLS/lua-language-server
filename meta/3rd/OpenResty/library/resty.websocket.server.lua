@@ -1,7 +1,7 @@
 ---@meta
 
 ---@class resty.websocket.server : resty.websocket
-resty_websocket_server = {
+local server = {
   _VERSION = "0.09"
 }
 
@@ -11,6 +11,6 @@ resty_websocket_server = {
 ---@param  opts?                   resty.websocket.new.opts
 ---@return resty.websocket.server? server
 ---@return string?                 error
-function resty_websocket_server:new(opts) end
+function server:new(opts) end
 
-return resty_websocket_server
+return server

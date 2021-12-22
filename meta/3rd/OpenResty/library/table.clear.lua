@@ -1,3 +1,7 @@
 ---@meta
-function table_clear() end
-return table_clear
+
+--- Clear a table of its contents.
+---@param t table
+local function clear(t) end
+
+return clear

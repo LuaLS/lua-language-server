@@ -1,5 +1,10 @@
 ---@meta
-resty_random={}
-resty_random._VERSION="0.11"
-function resty_random.bytes(len, strong) end
-return resty_random
+local random={}
+
+--- Generate random bytes.
+---@param len integer
+---@param strong boolean
+---@return string
+function random.bytes(len, strong) end
+
+return random

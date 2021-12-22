@@ -1,8 +1,10 @@
 ---@meta
-resty_sha256={}
-function resty_sha256.final(self) end
-function resty_sha256.new(self) end
-function resty_sha256.reset(self) end
-resty_sha256._VERSION="0.11"
-function resty_sha256.update(self, s) end
-return resty_sha256
+
+---@class resty.sha256 : resty.string.checksum
+local sha256={}
+
+--- Create a new sha256 checksum object.
+---@return resty.sha256
+function sha256:new() end
+
+return sha256

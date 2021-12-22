@@ -1,4 +1,4 @@
 ---@meta
-resty_core={}
-resty_core.version="0.1.17"
+local resty_core={}
+resty_core.version = require("resty.core.base").version
 return resty_core

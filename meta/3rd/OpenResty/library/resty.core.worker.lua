@@ -1,4 +1,4 @@
 ---@meta
-resty_core_worker={}
-resty_core_worker._VERSION="0.1.17"
+local resty_core_worker={}
+resty_core_worker._VERSION = require("resty.core.base").version
 return resty_core_worker

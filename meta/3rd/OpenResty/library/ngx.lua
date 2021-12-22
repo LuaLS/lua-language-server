@@ -1924,9 +1924,216 @@ function DICT:free_space() end
 ---
 --- This API requires a relatively expensive metamethod call and it is recommended to avoid using it on hot code paths.
 ---
+---@type table
+ngx.var = {}
+
+--- Embedded Variables
+--- see https://nginx.org/en/docs/http/ngx_http_core_module.html#variables
+
+--- client address in a binary form, value’s length is always 4 bytes for IPv4 addresses or 16 bytes for IPv6 addresses
+---@type string
+ngx.var.binary_remote_addr = nil
+
+--- number of bytes sent to a client, not counting the response header; this variable is compatible with the “%B” parameter of the mod_log_config Apache module
+---@type number
+ngx.var.body_bytes_sent = nil
+
+--- number of bytes sent to a client (1.3.8, 1.2.5)
+---@type number
+ngx.var.bytes_sent = nil
+
+--- connection serial number (1.3.8, 1.2.5)
+---@type string
+ngx.var.connection = nil
+
+--- current number of requests made through a connection (1.3.8, 1.2.5)
+---@type string
+ngx.var.connection_requests = nil
+
+--- connection time in seconds with a milliseconds resolution (1.19.10)
+---@type string
+ngx.var.connection_time = nil
+
+--- “Content-Length” request header field
+---@type string
+ngx.var.content_length = nil
+
+--- “Content-Type” request header field
+---@type string
+ngx.var.content_type = nil
+
+--- root or alias directive’s value for the current request
+---@type string
+ngx.var.document_root = nil
+
+--- same as ngx.var.uri
+---@type string
+ngx.var.document_uri = nil
+
+--- in this order of precedence: host name from the request line, or host name from the “Host” request header field, or the server name matching a request
+---@type string
+ngx.var.host = nil
+
+--- host name
+---@type string
+ngx.var.hostname = nil
+
+--- “on” if connection operates in SSL mode, or an empty string otherwise
+---@type string '"on"'|'""'
+ngx.var.https = nil
+
+--- “?” if a request line has arguments, or an empty string otherwise
+---@type string
+ngx.var.is_args = nil
+
+--- setting this variable enables response rate limiting; see limit_rate
+---@type string
+ngx.var.limit_rate = nil
+
+--- current time in seconds with the milliseconds resolution (1.3.9, 1.2.6)
+---@type string
+ngx.var.msec = nil
+
+--- nginx version
+---@type string
+ngx.var.nginx_version = nil
+
+--- PID of the worker process
+---@type string
+ngx.var.pid = nil
+
+--- “p” if request was pipelined, “.” otherwise (1.3.12, 1.2.7)
+---@type string
+ngx.var.pipe = nil
+
+--- client address from the PROXY protocol header (1.5.12)
+--- The PROXY protocol must be previously enabled by setting the proxy_protocol parameter in the listen directive.
+---@type string
+ngx.var.proxy_protocol_addr = nil
+
+--- client port from the PROXY protocol header (1.11.0)
 ---
----@class ngx.var : table<string, any>
+--- The PROXY protocol must be previously enabled by setting the proxy_protocol parameter in the listen directive.
+---@type string
+ngx.var.proxy_protocol_port = nil
+
+--- server address from the PROXY protocol header (1.17.6)
 ---
+--- The PROXY protocol must be previously enabled by setting the proxy_protocol parameter in the listen directive.
+---@type string
+ngx.var.proxy_protocol_server_addr = nil
+
+--- server port from the PROXY protocol header (1.17.6)
+---
+--- The PROXY protocol must be previously enabled by setting the proxy_protocol parameter in the listen directive.
+---@type string
+ngx.var.proxy_protocol_server_port = nil
+
+--- same as ngx.var.args
+---@type string
+ngx.var.query_string = nil
+
+--- an absolute pathname corresponding to the root or alias directive’s value for the current request, with all symbolic links resolved to real paths
+---@type string
+ngx.var.realpath_root = nil
+
+--- client address
+---@type string
+ngx.var.remote_addr = nil
+
+--- client port
+---@type string
+ngx.var.remote_port = nil
+
+--- user name supplied with the Basic authentication
+---@type string
+ngx.var.remote_user = nil
+
+--- full original request line
+---@type string
+ngx.var.request = nil
+
+--- request body
+---
+--- The variable’s value is made available in locations processed by the proxy_pass, fastcgi_pass, uwsgi_pass, and scgi_pass directives when the request body was read to a memory buffer.
+---@type string
+ngx.var.request_body = nil
+
+--- name of a temporary file with the request body
+---
+--- At the end of processing, the file needs to be removed.
+--- To always write the request body to a file, client_body_in_file_only needs to be enabled.
+--- When the name of a temporary file is passed in a proxied request or in a request to a FastCGI/uwsgi/SCGI server, passing the request body should be disabled by the proxy_pass_request_body off, fastcgi_pass_request_body off, uwsgi_pass_request_body off, or scgi_pass_request_body off directives, respectively.
+---@type string
+ngx.var.request_body_file = nil
+
+--- “OK” if a request has completed, or an empty string otherwise
+---@type string
+ngx.var.request_completion = nil
+
+--- file path for the current request, based on the root or alias directives, and the request URI
+---@type string
+ngx.var.request_filename = nil
+
+--- unique request identifier generated from 16 random bytes, in hexadecimal (1.11.0)
+---@type string
+ngx.var.request_id = nil
+
+--- request length (including request line, header, and request body) (1.3.12, 1.2.7)
+---@type string
+ngx.var.request_length = nil
+
+--- request method, usually “GET” or “POST”
+---@type string
+ngx.var.request_method = nil
+
+--- request processing time in seconds with a milliseconds resolution (1.3.9, 1.2.6); time elapsed since the first bytes were read from the client
+---@type string
+ngx.var.request_time = nil
+
+--- full original request URI (with arguments)
+---@type string
+ngx.var.request_uri = nil
+
+--- request scheme, “http” or “https”
+---@type string
+ngx.var.scheme = nil
+
+--- an address of the server which accepted a request
+---
+--- Computing a value of this variable usually requires one system call. To avoid a system call, the listen directives must specify addresses and use the bind parameter.
+---@type string
+ngx.var.server_addr = nil
+
+--- name of the server which accepted a request
+---@type string
+ngx.var.server_name = nil
+
+--- port of the server which accepted a request
+---@type string
+ngx.var.server_port = nil
+
+--- request protocol, usually “HTTP/1.0”, “HTTP/1.1”, or “HTTP/2.0”
+---@type string
+ngx.var.server_protocol = nil
+
+--- response status (1.3.2, 1.2.2)
+---@type string
+ngx.var.status = nil
+
+--- local time in the ISO 8601 standard format (1.3.12, 1.2.7)
+---@type string
+ngx.var.time_iso8601 = nil
+
+--- local time in the Common Log Format (1.3.12, 1.2.7)
+---@type string
+ngx.var.time_local = nil
+
+--- current URI in request, normalized
+--- The value of $uri may change during request processing, e.g. when doing internal redirects, or when using index files.
+---@type string
+ngx.var.uri = nil
+
 --- Updating query arguments via the Nginx variable `$args` (or `ngx.var.args` in Lua) at runtime is also supported:
 ---
 --- ```lua
@@ -1943,10 +2150,70 @@ function DICT:free_space() end
 --- ```
 ---
 --- regardless of the actual request query string.
----@field args string
+---@type string
+ngx.var.args = nil
+
+--- embedded upstream variables
+--- https://nginx.org/en/docs/http/ngx_http_upstream_module.html#variables
+
+--- IP address and port, or the path to the UNIX-domain socket of the upstream server.
+--- If several servers were contacted during request processing, their addresses are separated by commas, e.g. “192.168.1.1:80, 192.168.1.2:80, unix:/tmp/sock”.
+--- If an internal redirect from one server group to another happens, initiated by “X-Accel-Redirect” or error_page, then the server addresses from different groups are separated by colons, e.g. “192.168.1.1:80, 192.168.1.2:80, unix:/tmp/sock : 192.168.10.1:80, 192.168.10.2:80”.
+--- If a server cannot be selected, the variable keeps the name of the server group.
+---@type string
+ngx.var.upstream_addr = nil
+
+--- number of bytes received from an upstream server (1.11.4). Values from several connections are separated by commas and colons like addresses in the $upstream_addr variable.
+---@type string
+ngx.var.upstream_bytes_received = nil
+
+--- number of bytes sent to an upstream server (1.15.8). Values from several connections are separated by commas and colons like addresses in the $upstream_addr variable.
+---@type string
+ngx.var.upstream_bytes_sent = nil
+
+--- status of accessing a response cache (0.8.3). The status can be either “MISS”, “BYPASS”, “EXPIRED”, “STALE”, “UPDATING”, “REVALIDATED”, or “HIT”.
+---@type string
+ngx.var.upstream_cache_status = nil
+
+--- time spent on establishing a connection with the upstream server (1.9.1)
+--
+--- the time is kept in seconds with millisecond resolution.
+--- In case of SSL, includes time spent on handshake.
+--- Times of several connections are separated by commas and colons like addresses in the $upstream_addr variable.
+---@type string
+ngx.var.upstream_connect_time = nil
+
+--- time spent on receiving the response header from the upstream server (1.7.10)
+--- the time is kept in seconds with millisecond resolution.
+--- Times of several responses are separated by commas and colons like addresses in the $upstream_addr variable.
+---@type string
+ngx.var.upstream_header_time = nil
+
+--- the time the request spent in the upstream queue (1.13.9).
+--- the time is kept in seconds with millisecond resolution.
+--- Times of several responses are separated by commas and colons like addresses in the $upstream_addr variable.
+---@type string
+ngx.var.upstream_queue_time = nil
+
+--- the length of the response obtained from the upstream server (0.7.27).
+--- the length is kept in bytes.
+--- Lengths of several responses are separated by commas and colons like addresses in the $upstream_addr variable.
+---@type string
+ngx.var.upstream_response_length = nil
+
+--- time spent on receiving the response from the upstream server
 ---
----
-ngx.var = {}
+--- the time is kept in seconds with millisecond resolution.
+--- Times of several responses are separated by commas and colons like addresses in the $upstream_addr variable.
+---@type string
+ngx.var.upstream_response_time = nil
+
+--- status code of the response obtained from the upstream server.
+--- Status codes of several responses are separated by commas and colons like addresses in the $upstream_addr variable.
+--- If a server cannot be selected, the variable keeps the 502 (Bad Gateway) status code.
+---@type string
+ngx.var.upstream_status = nil
+
 
 ngx.req = {}
 

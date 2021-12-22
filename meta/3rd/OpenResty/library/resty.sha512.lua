@@ -1,8 +1,10 @@
 ---@meta
-resty_sha512={}
-function resty_sha512.final(self) end
-function resty_sha512.new(self) end
-function resty_sha512.reset(self) end
-resty_sha512._VERSION="0.11"
-function resty_sha512.update(self, s) end
-return resty_sha512
+
+---@class resty.sha512 : resty.string.checksum
+local sha512={}
+
+--- Create a new sha512 checksum object.
+---@return resty.sha512
+function sha512:new() end
+
+return sha512

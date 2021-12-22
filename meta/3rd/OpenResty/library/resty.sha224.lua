@@ -1,8 +1,10 @@
 ---@meta
-resty_sha224={}
-function resty_sha224.final(self) end
-function resty_sha224.new(self) end
-function resty_sha224.reset(self) end
-resty_sha224._VERSION="0.11"
-function resty_sha224.update(self, s) end
-return resty_sha224
+
+---@class resty.sha244 : resty.string.checksum
+local sha224={}
+
+--- Create a new sha244 checksum object.
+---@return resty.sha244
+function sha224:new() end
+
+return sha224

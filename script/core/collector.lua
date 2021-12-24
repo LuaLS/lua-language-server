@@ -70,9 +70,7 @@ function m.each(uri, name)
     ---@type scope
     local scp = scope.getFolder(uri)
             or  scope.getLinkedScope(uri)
-    if not scp then
-        return DUMMY_FUNCTION
-    end
+            or  scope.fallback
 
     local curi, value
     local function getNext()

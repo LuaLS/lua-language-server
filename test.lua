@@ -37,11 +37,12 @@ local function loadDocMetas()
     local furi    = require 'file-uri'
     local fsu     = require 'fs-utility'
     local client  = require 'client'
+    local scope   = require 'workspace.scope'
     client.client 'vscode'
     for _, path in ipairs(library.metaPaths) do
         local uri = furi.encode(path)
         files.setText(uri, fsu.loadFile(path))
-        files.addRef(uri)
+        --scope.fallback:addLink(uri)
     end
 end
 

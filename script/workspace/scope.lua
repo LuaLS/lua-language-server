@@ -25,6 +25,9 @@ end
 ---@param uri uri
 ---@return boolean
 function mt:isChildUri(uri)
+    if not self.uri then
+        return true
+    end
     return uri:sub(1, #self.uri) == self.uri
 end
 

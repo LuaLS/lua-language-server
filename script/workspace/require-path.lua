@@ -86,7 +86,7 @@ function m.findUrisByRequirePath(path)
     if type(path) ~= 'string' then
         return {}
     end
-    local separator = config.get 'Lua.completion.requireSeparator'
+    local separator = config.get(nil, 'Lua.completion.requireSeparator')
     local fspath = path:gsub('%' .. separator, '/')
     local vm    = require 'vm'
     local cache = vm.getCache 'findUrisByRequirePath'

@@ -1928,88 +1928,6 @@ local function tryComment(state, position, results)
     checkCommon(state, word, position, results)
 end
 
-local function makeCache(uri, position, results)
-    local cache = workspace.getCache 'completion'
-    if not uri then
-        cache.results = nil
-        return
-    end
-    local text  = files.getText(uri)
-    local state = files.getState(uri)
-    local word = lookBackward.findWord(text, guide.positionToOffset(state, position))
-    if not word or #word < 2 then
-        cache.results = nil
-        return
-    end
-    cache.results = results
-    cache.position= position
-    cache.word    = word:lower()
-    cache.length  = #word
-    cache.uri     = uri
-end
-
-local function isValidCache(word, result)
-    if result.kind == define.CompletionItemKind.Text then
-        return false
-    end
-    local match = result.match or result.label
-    if matchKey(word, match) then
-        return true
-    end
-    if result.textEdit then
-        match = result.textEdit.newText:match '[%w_]+'
-        if match and matchKey(word, match) then
-            return true
-        end
-    end
-    return false
-end
-
-local function getCache(uri, position)
-    local cache = workspace.getCache 'completion'
-    if not cache.results then
-        return nil
-    end
-    if cache.uri ~= uri then
-        return nil
-    end
-    local text  = files.getText(uri)
-    local state = files.getState(uri)
-    local word = lookBackward.findWord(text, guide.positionToOffset(state, position))
-    if not word then
-        return nil
-    end
-    if word:sub(1, #cache.word):lower() ~= cache.word then
-        return nil
-    end
-
-    local ext = #word - cache.length
-    cache.length = #word
-    local results = cache.results
-    for i = #results, 1, -1 do
-        local result = results[i]
-        if isValidCache(word, result) then
-            if result.textEdit then
-                result.textEdit.finish = result.textEdit.finish + ext
-            end
-        else
-            results[i] = results[#results]
-            results[#results] = nil
-        end
-    end
-
-    if results.enableCommon then
-        checkCommon(state, word, position, results)
-    end
-
-    return cache.results
-end
-
-local function clearCache()
-    local cache = workspace.getCache 'completion'
-    cache.results = nil
-end
-
 ---@async
 local function tryCompletions(state, position, triggerCharacter, results)
     local text = state.lua
@@ -2039,56 +1957,30 @@ end
 
 ---@async
 local function completion(uri, position, triggerCharacter)
-    tracy.ZoneBeginN 'completion cache'
-    local results = getCache(uri, position)
-    tracy.ZoneEnd()
-    if results then
-        return results
-    end
-    await.delay()
-    tracy.ZoneBeginN 'completion #1'
     local state = files.getState(uri)
     if not state then
         return nil
     end
-    results = {}
     clearStack()
-    tracy.ZoneEnd()
+    local results = {}
     tracy.ZoneBeginN 'completion #2'
     tryCompletions(state, position, triggerCharacter, results)
     tracy.ZoneEnd()
 
     if #results == 0 then
-        clearCache()
         return nil
     end
 
-    tracy.ZoneBeginN 'completion #3'
-    makeCache(uri, position, results)
-    tracy.ZoneEnd()
     return results
 end
 
 ---@async
 local function resolve(id)
     local item = resolveStack(id)
-    local cache = workspace.getCache 'completion'
-    if item and cache.results then
-        for _, res in ipairs(cache.results) do
-            if res and res.id == id then
-                for k, v in pairs(item) do
-                    res[k] = v
-                end
-                res.id = nil
-                break
-            end
-        end
-    end
     return item
 end
 
 return {
     completion   = completion,
     resolve      = resolve,
-    clearCache   = clearCache,
 }

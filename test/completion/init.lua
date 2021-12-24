@@ -68,7 +68,6 @@ function TEST(script)
         local newScript, catched = catch(script, '?')
 
         files.setText('', newScript)
-        core.clearCache()
         local inputPos = catched['?'][1][1]
         if ContinueTyping then
             local triggerCharacter = script:sub(inputPos - 1, inputPos - 1)

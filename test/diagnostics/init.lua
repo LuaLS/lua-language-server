@@ -1163,7 +1163,7 @@ TEST [[
 local emit = {}
 ]]
 
-config.get 'Lua.diagnostics.neededFileStatus' ['unused-local'] = 'None'
+config.get(nil, 'Lua.diagnostics.neededFileStatus')['unused-local'] = 'None'
 TEST [[
 ---@param table     table
 ---@param metatable table
@@ -1302,7 +1302,7 @@ trim('str', 'left')
 trim('str', nil)
 ]]
 
-config.get 'Lua.diagnostics.neededFileStatus' ['unused-local'] = 'Any'
+config.get(nil, 'Lua.diagnostics.neededFileStatus')['unused-local'] = 'Any'
 
 ---不完整的函数参数定义，会跳过检查
 TEST [[

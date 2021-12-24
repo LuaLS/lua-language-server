@@ -348,18 +348,6 @@ function m.getRelativePath(uriOrPath)
     end
 end
 
---- 获取工作区等级的缓存
-function m.getCache(name)
-    if not m.cache[name] then
-        m.cache[name] = {}
-    end
-    return m.cache[name]
-end
-
-function m.flushCache()
-    m.cache = {}
-end
-
 ---@param scp scope
 function m.reload(scp)
     if not m.inited then

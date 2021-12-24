@@ -51,6 +51,7 @@ function string.format(s, ...) end
 ---@param s       string
 ---@param pattern string
 ---@return fun():string, ...
+---@nodiscard
 function string.gmatch(s, pattern) end
 ---#else
 ---@param s       string

@@ -38,13 +38,12 @@ end
 
 function TEST(script)
     return function (expect)
-        files.removeAll()
-
         local newScript, catched = catch(script, '?')
         files.setText('', newScript)
         local results = core('', catched['?'][1][1], catched['?'][1][2])
         assert(results)
         assert(eq(expect, results))
+        files.remove('')
     end
 end
 

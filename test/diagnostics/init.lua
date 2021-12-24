@@ -28,7 +28,6 @@ end
 
 ---@diagnostic disable: await-in-sync
 function TEST(script, ...)
-    files.removeAll()
     local newScript, catched = catch(script, '!')
     files.setText('', newScript)
     files.open('')
@@ -50,6 +49,8 @@ function TEST(script, ...)
     else
         assert(catched['!'] == nil)
     end
+
+    files.remove('')
 end
 
 TEST [[

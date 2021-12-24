@@ -14,12 +14,12 @@ config.set(nil, 'Lua.diagnostics.neededFileStatus', {
 
 ---@diagnostic disable: await-in-sync
 local function doProjects(pathname)
-    files.removeAll()
-
     local path = fs.path(pathname)
     if not fs.exists(path) then
         return
     end
+
+    local uris = {}
 
     print('基准诊断目录：', path)
     fsu.scanDirectory(path, function (path)
@@ -30,7 +30,14 @@ local function doProjects(pathname)
         local text = fsu.loadFile(path)
         files.setText(uri, text)
         files.open(uri)
+        uris[#uris+1] = uri
     end)
+
+    local _ <close> = function ()
+        for _, uri in ipairs(uris) do
+            files.remove(uri)
+        end
+    end
 
     print('开始诊断...')
 

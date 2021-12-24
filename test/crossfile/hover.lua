@@ -39,8 +39,6 @@ end
 
 ---@diagnostic disable: await-in-sync
 function TEST(expect)
-    files.removeAll()
-
     local sourcePos, sourceUri
     for _, file in ipairs(expect) do
         local script, list = catch(file.content, '?')
@@ -49,6 +47,12 @@ function TEST(expect)
         if list['?'] then
             sourceUri = uri
             sourcePos = (list['?'][1][1] + list['?'][1][2]) // 2
+        end
+    end
+
+    local _ <close> = function ()
+        for _, info in ipairs(expect) do
+            files.remove(furi.encode(info.path))
         end
     end
 

@@ -31,8 +31,6 @@ end
 
 ---@diagnostic disable: await-in-sync
 function TEST(datas)
-    files.removeAll()
-
     local targetList = {}
     for _, data in ipairs(datas) do
         local uri = furi.encode(data.path)
@@ -47,6 +45,13 @@ function TEST(datas)
         data.content = newScript
         files.setText(uri, newScript)
     end
+
+    local _ <close> = function ()
+        for _, info in ipairs(datas) do
+            files.remove(furi.encode(info.path))
+        end
+    end
+
 
     local result = {}
     for _, data in ipairs(datas) do

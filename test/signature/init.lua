@@ -9,7 +9,6 @@ function TEST(script)
     return function (expect)
         local newScript, catched1 = catch(script, '?')
         local newExpect, catched2 = catch(expect or '', '!')
-        files.removeAll()
         files.setText('', newScript)
         local hovers = core('', catched1['?'][1][1])
         if hovers then
@@ -24,6 +23,7 @@ function TEST(script)
         else
             assert(expect == nil)
         end
+        files.remove('')
     end
 end
 

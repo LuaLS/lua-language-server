@@ -65,7 +65,6 @@ ContinueTyping = false
 function TEST(script)
     return function (expect)
         ---@diagnostic disable: await-in-sync
-        files.removeAll()
         local newScript, catched = catch(script, '?')
 
         files.setText('', newScript)
@@ -77,6 +76,8 @@ function TEST(script)
         end
         local triggerCharacter = script:sub(inputPos, inputPos)
         local result = core.completion('', inputPos, triggerCharacter)
+
+        files.remove('')
         if not expect then
             assert(result == nil)
             return

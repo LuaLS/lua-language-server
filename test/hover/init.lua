@@ -23,7 +23,6 @@ local accept = {
 ---@diagnostic disable: await-in-sync
 function TEST(script)
     return function (expect)
-        files.removeAll()
         local newScript, catched = catch(script, '?')
         files.setText('', newScript)
         local hover = core.byUri('', catched['?'][1][1])
@@ -31,6 +30,7 @@ function TEST(script)
         expect = expect:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
         local label = tostring(hover):match('```lua[\r\n]*(.-)[\r\n]*```'):gsub('\r\n', '\n')
         assert(expect == label)
+        files.remove('')
     end
 end
 

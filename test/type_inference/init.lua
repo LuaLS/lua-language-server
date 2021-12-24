@@ -23,7 +23,6 @@ end
 
 function TEST(wanted)
     return function (script)
-        files.removeAll()
         local newScript, catched = catch(script, '?')
         files.setText('', newScript)
         local source = getSource(catched['?'][1][1])
@@ -33,6 +32,7 @@ function TEST(wanted)
             infer.searchAndViewInfers(source)
         end
         assert(wanted == result)
+        files.remove('')
     end
 end
 

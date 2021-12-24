@@ -353,9 +353,12 @@ end
 function m.addRef(uri)
     local file = m.fileMap[uri]
     if not file then
-        return
+        return nil
     end
     file._ref = (file._ref or 0) + 1
+    return function ()
+        m.delRef(uri)
+    end
 end
 
 function m.delRef(uri)
@@ -387,43 +390,6 @@ function m.remove(uri)
     await.close('files.version')
     m.onWatch('version')
     m.onWatch('remove', originUri)
-end
-
---- 移除所有文件
-function m.removeAll()
-    local ws = require 'workspace.workspace'
-    m.globalVersion = m.globalVersion + 1
-    await.close('files.version')
-    m.onWatch('version')
-    m._pairsCache = nil
-    for uri in pairs(m.fileMap) do
-        if not m.libraryMap[uri] then
-            m.fileCount     = m.fileCount - 1
-            m.fileMap[uri]  = nil
-            m.astMap[uri]   = nil
-            m.onWatch('remove', uri)
-        end
-    end
-    ws.flushCache()
-    --m.notifyCache = {}
-end
-
---- 移除所有关闭的文件
-function m.removeAllClosed()
-    m.globalVersion = m.globalVersion + 1
-    await.close('files.version')
-    m.onWatch('version')
-    m._pairsCache = nil
-    for uri in pairs(m.fileMap) do
-        if  not m.openMap[uri]
-        and not m.libraryMap[uri] then
-            m.fileCount     = m.fileCount - 1
-            m.fileMap[uri]  = nil
-            m.astMap[uri]   = nil
-            m.onWatch('remove', uri)
-        end
-    end
-    --m.notifyCache = {}
 end
 
 --- 获取一个包含所有文件uri的数组

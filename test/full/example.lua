@@ -51,7 +51,6 @@ local function testIfExit(path)
         local max = 100
         local need
         for i = 1, max do
-            files.removeAll()
             files.open('')
             files.setText('', buf)
             diag('', function () end)
@@ -60,6 +59,7 @@ local function testIfExit(path)
                 need = passed / i
                 break
             end
+            files.remove('')
         end
         print(('基准诊断测试[%s]单次耗时：%.10f'):format(path:filename():string(), need))
     end

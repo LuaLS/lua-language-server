@@ -82,8 +82,6 @@ end
 
 ---@diagnostic disable: await-in-sync
 function TEST(data)
-    files.removeAll()
-
     local mainUri
     local pos
     for _, info in ipairs(data) do
@@ -96,6 +94,12 @@ function TEST(data)
             mainUri = uri
         end
         files.setText(uri, script)
+    end
+
+    local _ <close> = function ()
+        for _, info in ipairs(data) do
+            files.remove(furi.encode(info.path))
+        end
     end
 
     local expect = data.completion

@@ -1525,8 +1525,14 @@ local function tryTable(state, position, results)
 end
 
 local function getComment(state, position)
+    local offset = guide.positionToOffset(state, position)
+    local symbolOffset = lookBackward.findAnyOffset(state.lua, offset)
+    if not symbolOffset then
+        return
+    end
+    local symbolPosition = guide.offsetToPosition(state, symbolOffset)
     for _, comm in ipairs(state.comms) do
-        if position > comm.start and position <= comm.finish then
+        if symbolPosition > comm.start and symbolPosition <= comm.finish then
             return comm
         end
     end
@@ -1534,8 +1540,14 @@ local function getComment(state, position)
 end
 
 local function getluaDoc(state, position)
+    local offset = guide.positionToOffset(state, position)
+    local symbolOffset = lookBackward.findAnyOffset(state.lua, offset)
+    if not symbolOffset then
+        return
+    end
+    local symbolPosition = guide.offsetToPosition(state, symbolOffset)
     for _, doc in ipairs(state.ast.docs) do
-        if position >= doc.start and position <= doc.range then
+        if symbolPosition >= doc.start and symbolPosition <= doc.range then
             return doc
         end
     end

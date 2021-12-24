@@ -1966,6 +1966,7 @@ local function isValidCache(word, result)
 end
 
 local function getCache(uri, position)
+    do return nil end
     local cache = workspace.getCache 'completion'
     if not cache.results then
         return nil
@@ -2063,9 +2064,9 @@ local function completion(uri, position, triggerCharacter)
         return nil
     end
 
-    tracy.ZoneBeginN 'completion #3'
-    makeCache(uri, position, results)
-    tracy.ZoneEnd()
+    --tracy.ZoneBeginN 'completion #3'
+    --makeCache(uri, position, results)
+    --tracy.ZoneEnd()
     return results
 end
 

@@ -781,7 +781,7 @@ function m.offsetToPositionByLines(lines, offset)
         row = (left + right) // 2
         if row == left then
             if right ~= left then
-                if lines[right] <= offset then
+                if lines[right] - 1 <= offset then
                     row = right
                 end
             end

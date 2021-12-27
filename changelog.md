@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.5.6
+`2021-12-27`
 * `CHG` diagnostic: now syntax errors in `LuaDoc` are shown as `Warning`
 * `FIX` [#863](https://github.com/sumneko/lua-language-server/issues/863)
 * `FIX` return type of `math.floor`

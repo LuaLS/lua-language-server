@@ -14,7 +14,7 @@ local mongo_client     = {}
 
 ---@class mongo_db
 ---@field connection mongo_client
----@field name string 
+---@field name string
 ---@field full_name string
 ---@field database mongo_db
 ---@field _cmd string dbname.$cmd
@@ -76,8 +76,11 @@ end
 function mongo_collection:insert(doc)
 end
 ---向集合安全的插入数据
----@param dco table
-function mongo_collection:safe_insert(dco)
+---@param doc table
+---@return boolean ok #是否成功
+---@return string err #错误消息
+---@return table r #错误返回数据
+function mongo_collection:safe_insert(doc)
 end
 
 ---插入批量数据
@@ -87,6 +90,9 @@ function mongo_collection:batch_insert(docs)
 end
 ---安全插入批量数据
 ---@param docs table[]
+---@return boolean ok #是否成功
+---@return string err #错误消息
+---@return table r #错误返回数据
 function mongo_collection:safe_batch_insert(docs)
 
 end
@@ -103,6 +109,9 @@ end
 ---@param update table
 ---@param upsert boolean
 ---@param multi boolean
+---@return boolean ok #是否成功
+---@return string err #错误消息
+---@return table r #错误返回数据
 function mongo_collection:safe_update(selector, update, upsert, multi)
 
 end
@@ -116,6 +125,9 @@ end
 ---安全删除数据
 ---@param selector table
 ---@param single boolean
+---@return boolean ok #是否成功
+---@return string err #错误消息
+---@return table r #错误返回数据
 function mongo_collection:safe_delete(selector, single)
 
 end
@@ -155,7 +167,7 @@ end
 --- 删除索引
 ---* collection:dropIndex("age_1")
 ---* collection:dropIndex("*")
----@param indexName  string 
+---@param indexName  string
 function mongo_collection:dropIndex(indexName)
 
 end

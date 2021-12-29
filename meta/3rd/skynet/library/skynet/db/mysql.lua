@@ -25,7 +25,7 @@ end
 local STMT = {}
 ---@param sql string
 ---@return boolean #whether ok
----@return STMT # error description table or rows list
+---@return STMT|table # error description table or STMT
 function _M:prepare(sql)
 end
 

@@ -154,7 +154,7 @@ function m.doMethod(proto)
         local response <close> = function ()
             local passed = os.clock() - clock
             if passed > 0.2 then
-                log.debug(('Method [%s] takes [%.3f]sec.'):format(method, passed))
+                log.debug(('Method [%s] takes [%.3f]sec. %s'):format(method, passed, util.dump(proto)))
             end
             --log.debug('Finish method:', method)
             if not proto.id then

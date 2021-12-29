@@ -1,5 +1,8 @@
 # changelog
 
+## 2.5.7
+* `FIX` [#879](https://github.com/sumneko/lua-language-server/issues/879)
+
 ## 2.5.6
 `2021-12-27`
 * `CHG` diagnostic: now syntax errors in `LuaDoc` are shown as `Warning`

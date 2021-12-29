@@ -154,7 +154,7 @@ function m.doMethod(proto)
         local response <close> = function ()
             local passed = os.clock() - clock
             if passed > 0.2 then
-                log.debug(('Method [%s] takes [%.3f]sec.'):format(method, passed))
+                log.debug(('Method [%s] takes [%.3f]sec. %s'):format(method, passed, util.dump(proto)))
             end
             --log.debug('Finish method:', method)
             if not proto.id then
@@ -164,7 +164,7 @@ function m.doMethod(proto)
             if ok then
                 m.response(proto.id, res)
             else
-                m.responseErr(proto.id, proto._closeReason or define.ErrorCodes.InternalError, res)
+                m.responseErr(proto.id, proto._closeReason or define.ErrorCodes.InternalError, proto._closeMessage or res)
             end
         end
         ok, res = xpcall(abil, log.error, proto.params)
@@ -172,12 +172,13 @@ function m.doMethod(proto)
     end)
 end
 
-function m.close(id, reason)
+function m.close(id, reason, message)
     local proto = m.holdon[id]
     if not proto then
         return
     end
     proto._closeReason = reason
+    proto._closeMessage = message
     await.close('proto:' .. id)
 end
 

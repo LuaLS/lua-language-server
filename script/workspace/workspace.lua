@@ -297,7 +297,7 @@ function m.awaitLoadFile(uri)
     local nativeLoader    = loadFileFactory(m.path, progressData)
     local native          = m.getNativeMatcher()
     if native then
-        log.info('Scan files at:', m.path)
+        log.info('Scan files at:', furi.decode(uri))
         native:scan(furi.decode(uri), nativeLoader)
     end
 end

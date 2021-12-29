@@ -918,7 +918,7 @@ m.register 'textDocument/onTypeFormatting' {
 
 m.register '$/cancelRequest' {
     function (params)
-        proto.close(params.id, define.ErrorCodes.RequestCancelled)
+        proto.close(params.id, define.ErrorCodes.RequestCancelled, 'Request cancelled.')
     end
 }
 
@@ -1021,7 +1021,7 @@ files.watch(function (ev, uri)
         for id, p in pairs(proto.holdon) do
             if m.attributes[p.method].abortByFileUpdate then
                 log.debug('close proto(ContentModified):', id, p.method)
-                proto.close(id, define.ErrorCodes.ContentModified)
+                proto.close(id, define.ErrorCodes.ContentModified, 'Content modified.')
             end
         end
     end

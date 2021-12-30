@@ -16,6 +16,7 @@ local m = {}
 m._start = false
 m.cache = {}
 m.sleepRest = 0.0
+m.coroutineUri = setmetatable({}, { __mode = 'k' })
 
 local function concat(t, sep)
     if type(t) ~= 'table' then
@@ -215,18 +216,19 @@ function m.doDiagnostic(uri)
 
     await.delay()
 
-    local ast = files.getState(uri)
-    if not ast then
+    local state = files.getState(uri)
+    if not state then
         m.clear(uri)
         return
     end
 
     local version = files.getVersion(uri)
+    local scp = ws.getScope(uri)
 
     local prog <close> = progress.create(lang.script.WINDOW_DIAGNOSING, 0.5)
     prog:setMessage(ws.getRelativePath(uri))
 
-    local syntax = m.syntaxErrors(uri, ast)
+    local syntax = m.syntaxErrors(uri, state)
     local diags = {}
     local function pushResult()
         tracy.ZoneBeginN 'mergeSyntaxAndDiags'
@@ -252,21 +254,21 @@ function m.doDiagnostic(uri)
         end
     end
 
-    if await.hasID 'diagnosticsAll' then
-        m.checkStepResult = nil
+    if await.hasID 'diagnosticsScope' then
+        scp:set('diagStepPush', nil)
     else
         local clock = os.clock()
-        m.checkStepResult = function ()
+        scp:set('diagStepPush', function ()
             if os.clock() - clock >= 0.2 then
                 pushResult()
                 clock = os.clock()
             end
-        end
+        end)
     end
 
     m.diagnostics(uri, diags)
     pushResult()
-    m.checkStepResult = nil
+    scp:set('diagStepPush', nil)
 end
 
 function m.refresh(uri)
@@ -281,7 +283,7 @@ function m.refresh(uri)
             m.clearCache(uri)
             xpcall(m.doDiagnostic, log.error, uri)
         end
-        m.diagnosticsAll()
+        m.diagnosticsScope(uri)
     end, 'files.version')
 end
 
@@ -332,6 +334,12 @@ local function askForDisable()
 end
 
 function m.diagnosticsAll(force)
+    for _, scp in ipairs(ws.folders) do
+        m.diagnosticsScope(scp.uri, force)
+    end
+end
+
+function m.diagnosticsScope(uri, force)
     if not force and not config.get(uri, 'Lua.diagnostics.enable') then
         m.clearAll()
         return
@@ -343,8 +351,9 @@ function m.diagnosticsAll(force)
     if not force and delay < 0 then
         return
     end
-    await.close 'diagnosticsAll'
+    await.close 'diagnosticsScope'
     await.call(function () ---@async
+        m.coroutineUri[coroutine.running()] = uri
         await.sleep(delay)
         m.diagnosticsAllClock = os.clock()
         local clock = os.clock()
@@ -368,7 +377,7 @@ function m.diagnosticsAll(force)
         end
         bar:remove()
         log.debug('全文诊断耗时：', os.clock() - clock)
-    end, 'files.version', 'diagnosticsAll')
+    end, 'files.version', 'diagnosticsScope')
 end
 
 function m.start()
@@ -378,18 +387,23 @@ end
 
 function m.pause()
     m._start = false
-    await.close 'diagnosticsAll'
+    await.close 'diagnosticsScope'
 end
 
-function m.checkStepResult()
-    if await.hasID 'diagnosticsAll' then
+function m.checkStepResult(uri)
+    if await.hasID 'diagnosticsScope' then
         return
+    end
+    local scp = ws.getScope(uri)
+    local stepPush = scp:get 'diagStepPush'
+    if stepPush then
+        stepPush()
     end
 end
 
 ---@async
-function m.checkWorkspaceDiag()
-    if not await.hasID 'diagnosticsAll' then
+function m.checkWorkspaceDiag(uri)
+    if not await.hasID 'diagnosticsScope' then
         return
     end
     local speedRate = config.get(uri, 'Lua.diagnostics.workspaceRate')
@@ -435,17 +449,16 @@ end)
 
 await.watch(function (ev, co) ---@async
     if ev == 'delay' then
-        if m.checkStepResult then
-            m.checkStepResult()
-        end
-        return m.checkWorkspaceDiag()
+        local uri = m.coroutineUri[co]
+        m.checkStepResult(uri)
+        return m.checkWorkspaceDiag(uri)
     end
 end)
 
 config.watch(function (uri, key, value, oldValue)
     if key:find 'Lua.diagnostics' then
         if value ~= oldValue then
-            m.diagnosticsAll()
+            m.diagnosticsScope(uri)
         end
     end
 end)

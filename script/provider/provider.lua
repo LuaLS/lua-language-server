@@ -252,7 +252,7 @@ m.register 'textDocument/hover' {
     abortByFileUpdate = true,
     ---@async
     function (params)
-        if not config.get('Lua.hover.enable') then
+        if not config.get(nil, 'Lua.hover.enable') then
             return
         end
         local doc    = params.textDocument

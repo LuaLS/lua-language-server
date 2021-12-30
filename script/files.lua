@@ -624,10 +624,6 @@ end
 
 --- 获取文件关联
 function m.getAssoc()
-    if m.assocVersion == config.get(nil, 'version') then
-        return m.assocMatcher
-    end
-    m.assocVersion = config.get(nil, 'version')
     local patt = {}
     for k, v in pairs(config.get(nil, 'files.associations')) do
         if v == 'lua' then

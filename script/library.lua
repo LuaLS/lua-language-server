@@ -11,6 +11,8 @@ local files   = require 'files'
 local await   = require 'await'
 local timer   = require 'timer'
 local encoder = require 'encoder'
+local ws      = require 'workspace.workspace'
+local scope   = require 'workspace.scope'
 
 local m = {}
 
@@ -197,10 +199,8 @@ local function loadMetaLocale(langID, result)
     return result
 end
 
-local function initBuiltIn()
-    if not m.inited then
-        return
-    end
+local function initBuiltIn(uri)
+    local scp      = ws.getScope(uri)
     local langID   = lang.id
     local version  = config.get(uri, 'Lua.runtime.version')
     local encoding = config.get(uri, 'Lua.runtime.fileEncoding')
@@ -214,19 +214,20 @@ local function initBuiltIn()
     if langID ~= 'en-US' then
         loadMetaLocale(langID, metaLang)
     end
-    --log.debug('metaLang:', util.dump(metaLang))
 
-    if m.metaPath == metaPath:string() then
+
+    if scp:get('metaPath') == metaPath:string() then
         return
     end
-    m.metaPath = metaPath:string()
-    m.metaPaths = {}
-    local suc = xpcall(function ()
+    scp:set('metaPath', metaPath:string())
+    local suc, ok = xpcall(function ()
         if not fs.exists(metaPath) then
             fs.create_directories(metaPath)
+            return true
         end
+        return false
     end, log.error)
-    if not suc then
+    if not suc or not ok then
         return
     end
     local out = fsu.dummyFS()
@@ -240,10 +241,8 @@ local function initBuiltIn()
         local libPath = templateDir / libName
         local metaDoc = compileSingleMetaDoc(uri, fsu.loadFile(libPath), metaLang, status)
         if metaDoc then
-            local outPath = metaPath / libName
             metaDoc = encoder.encode(encoding, metaDoc, 'auto')
             out:saveFile(libName, metaDoc)
-            m.metaPaths[#m.metaPaths+1] = outPath:string()
         end
         ::CONTINUE::
     end
@@ -310,7 +309,7 @@ local function load3rdConfigInDir(dir, configs, inner)
     end
 end
 
-local function load3rdConfig()
+local function load3rdConfig(uri)
     local configs = {}
     load3rdConfigInDir(innerThirdDir, configs, true)
     local thirdDirs = config.get(uri, 'Lua.workspace.userThirdParty')
@@ -459,7 +458,7 @@ local function check3rd(uri)
         return
     end
     if thirdConfigs == nil then
-        thirdConfigs = load3rdConfig() or false
+        thirdConfigs = load3rdConfig(uri) or false
     end
     if not thirdConfigs then
         return
@@ -475,7 +474,7 @@ local function check3rd(uri)
     end
 end
 
-config.watch(function (key, value, oldValue)
+config.watch(function (uri, key, value, oldValue)
     if key:find '^Lua.runtime' then
         initBuiltIn(uri)
     end
@@ -493,7 +492,13 @@ function m.init()
         return
     end
     m.inited = true
-    initBuiltIn()
+    if #ws.folders == 0 then
+        initBuiltIn(nil)
+    else
+        for _, scp in ipairs(ws.folders) do
+            initBuiltIn(scp.uri)
+        end
+    end
 end
 
 return m

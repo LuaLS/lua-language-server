@@ -442,7 +442,7 @@ await.watch(function (ev, co) ---@async
     end
 end)
 
-config.watch(function (key, value, oldValue)
+config.watch(function (uri, key, value, oldValue)
     if key:find 'Lua.diagnostics' then
         if value ~= oldValue then
             m.diagnosticsAll()

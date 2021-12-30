@@ -102,7 +102,7 @@ end)
 
 local m = {}
 
-function m.updateConfig()
+function m.updateConfig(uri)
     if config.get(uri, 'Lua.telemetry.enable') ~= nil then
         return
     end
@@ -151,9 +151,9 @@ function m.updateConfig()
     end)
 end
 
-config.watch(function (key)
+config.watch(function (uri, key)
     if key == 'Lua.telemetry.enable' then
-        m.updateConfig()
+        m.updateConfig(uri)
     end
 end)
 

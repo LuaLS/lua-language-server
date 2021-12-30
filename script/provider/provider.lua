@@ -1019,7 +1019,7 @@ do
     end)
 end
 
-local function refreshStatusBar()
+local function refreshStatusBar(uri)
     local value = config.get(uri, 'Lua.window.statusBar')
     if value then
         proto.notify('$/status/show')
@@ -1028,9 +1028,9 @@ local function refreshStatusBar()
     end
 end
 
-config.watch(function (key, value)
+config.watch(function (uri, key, value)
     if key == 'Lua.window.statusBar' then
-        refreshStatusBar()
+        refreshStatusBar(uri)
     end
 end)
 

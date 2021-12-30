@@ -15,7 +15,7 @@ local function collectRequire(mode, literal, uri)
     local rootPath = ws.getRootUri(uri) or ''
     local result, searchers
     if     mode == 'require' then
-        result, searchers = rpath.findUrisByRequirePath(literal)
+        result, searchers = rpath.findUrisByRequirePath(uri, literal)
     elseif mode == 'dofile'
     or     mode == 'loadfile' then
         result = ws.findUrisByFilePath(literal)

@@ -796,7 +796,7 @@ function m.searchRefsByID(status, suri, expect, mode)
         if not requireName then
             return
         end
-        local uris = rpath.findUrisByRequirePath(requireName)
+        local uris = rpath.findUrisByRequirePath(suri, requireName)
         footprint(status, 'require:', requireName)
         for i = 1, #uris do
             local ruri = uris[i]

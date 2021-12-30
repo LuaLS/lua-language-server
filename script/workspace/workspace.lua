@@ -151,8 +151,8 @@ function m.getLibraryMatchers(scp)
         end
     end
     -- TODO
-    if library.metaPath then
-        librarys[m.normalize(library.metaPath)] = true
+    if scp:get 'metaPath' then
+        librarys[m.normalize(scp:get 'metaPath')] = true
     end
 
     local matchers = {}
@@ -281,7 +281,7 @@ function m.findUrisByFilePath(path)
     end
     local myUri = furi.encode(path)
     local vm    = require 'vm'
-    local resultCache = vm.getCache 'findUrisByRequirePath.result'
+    local resultCache = vm.getCache 'findUrisByFilePath.result'
     if resultCache[path] then
         return resultCache[path]
     end
@@ -475,12 +475,12 @@ files.watch(function (ev, uri) ---@async
     end
 end)
 
-config.watch(function (key, value, oldValue)
+config.watch(function (uri, key, value, oldValue)
     if key:find '^Lua.runtime'
     or key:find '^Lua.workspace'
     or key:find '^files' then
         if value ~= oldValue then
-            m.reload()
+            m.reload(m.getScope(uri))
         end
     end
 end)

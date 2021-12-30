@@ -20,7 +20,7 @@ local function getFileLinks(uri)
         if not args or not args[1] or args[1].type ~= 'string' then
             return
         end
-        local uris = rpath.findUrisByRequirePath(args[1][1])
+        local uris = rpath.findUrisByRequirePath(uri, args[1][1])
         for _, u in ipairs(uris) do
             if not links[u] then
                 links[u] = {}

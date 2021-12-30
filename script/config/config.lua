@@ -390,12 +390,12 @@ function m.update(scp, new, null)
     end
 end
 
----@param callback fun(key: string, value: any, oldValue: any)
+---@param callback fun(uri: uri, key: string, value: any, oldValue: any)
 function m.watch(callback)
     m.watchList[#m.watchList+1] = callback
 end
 
-function m.event(key, value, oldValue)
+function m.event(uri, key, value, oldValue)
     if not m.delay then
         m.delay = {}
         timer.wait(0, function ()
@@ -403,7 +403,7 @@ function m.event(key, value, oldValue)
             m.delay = nil
             for _, info in ipairs(delay) do
                 for _, callback in ipairs(m.watchList) do
-                    callback(info.key, info.value, info.oldValue)
+                    callback(uri, info.key, info.value, info.oldValue)
                 end
             end
         end)

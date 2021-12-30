@@ -75,7 +75,7 @@ local function checkRequire(source, offset)
         return nil
     end
     if     libName == 'require' then
-        return rpath.findUrisByRequirePath(literal)
+        return rpath.findUrisByRequirePath(guide.getUri(source), literal)
     elseif libName == 'dofile'
     or     libName == 'loadfile' then
         return workspace.findUrisByFilePath(literal)

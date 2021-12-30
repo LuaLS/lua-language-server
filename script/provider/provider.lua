@@ -258,7 +258,7 @@ m.register 'textDocument/hover' {
         local doc    = params.textDocument
         local uri    = files.getRealUri(doc.uri)
         if not workspace.isReady() then
-            local count, max = workspace.getLoadProcess()
+            local count, max = workspace.getLoadingProcess(uri)
             return {
                 contents = {
                     value = lang.script('HOVER_WS_LOADING', count, max),
@@ -471,7 +471,7 @@ m.register 'textDocument/completion' {
     function (params)
         local uri  = files.getRealUri(params.textDocument.uri)
         if not workspace.isReady() then
-            local count, max = workspace.getLoadProcess()
+            local count, max = workspace.getLoadingProcess(uri)
             return {
                 {
                     label = lang.script('HOVER_WS_LOADING', count, max),textEdit         = {

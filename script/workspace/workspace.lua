@@ -17,6 +17,8 @@ local loading    = require 'workspace.loading'
 ---@class workspace
 local m = {}
 m.type = 'workspace'
+---@type scope[]
+m.folders = {}
 
 function m.initRoot(uri)
     m.rootUri  = uri
@@ -33,7 +35,13 @@ function m.create(uri)
     log.info('Workspace create: ', uri)
     local path = m.normalize(furi.decode(uri))
     fw.watch(path)
-    scope.createFolder(uri)
+    local scp = scope.createFolder(uri)
+    m.folders[#m.folders+1] = scp
+end
+
+function m.getRootUri(uri)
+    local scp = m.getScope(uri)
+    return scp.uri
 end
 
 local globInteferFace = {
@@ -228,6 +236,7 @@ function m.awaitPreload(scp)
     scp:set('watchers', watchers)
 
     local ld <close> = loading.create(scp)
+    scp:set('loading', ld)
 
     log.info('Preload start:', scp.uri)
 
@@ -443,8 +452,11 @@ function m.isReady(uri)
     return scp:get('ready') == true
 end
 
-function m.getLoadProcess()
-    return m.fileLoaded, m.fileFound
+function m.getLoadingProcess(uri)
+    local scp = m.getScope(uri)
+    ---@type workspace.loading
+    local ld  = scp:get 'loading'
+    return ld.read, ld.max
 end
 
 files.watch(function (ev, uri) ---@async

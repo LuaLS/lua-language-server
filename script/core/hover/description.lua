@@ -11,8 +11,8 @@ local guide    = require 'parser.guide'
 local noder    = require 'core.noder'
 local rpath    = require 'workspace.require-path'
 
-local function collectRequire(mode, literal)
-    local rootPath = ws.rootPath or ''
+local function collectRequire(mode, literal, uri)
+    local rootPath = ws.getRootUri(uri) or ''
     local result, searchers
     if     mode == 'require' then
         result, searchers = rpath.findUrisByRequirePath(literal)
@@ -57,7 +57,7 @@ local function asStringInRequire(source, literal)
         if libName == 'require'
         or libName == 'dofile'
         or libName == 'loadfile' then
-            return collectRequire(libName, literal)
+            return collectRequire(libName, literal, guide.getUri(source))
         end
     end
 end
@@ -157,7 +157,7 @@ local function tryDocModule(source)
     if not source.module then
         return
     end
-    return collectRequire('require', source.module)
+    return collectRequire('require', source.module, guide.getUri(source))
 end
 
 local function buildEnumChunk(docType, name)

@@ -137,7 +137,7 @@ return function (data)
     end
 
     local path = furi.decode(target)
-    local visiblePaths = rpath.getVisiblePath(path)
+    local visiblePaths = rpath.getVisiblePath(uri, path)
     if not visiblePaths or #visiblePaths == 0 then
         return
     end

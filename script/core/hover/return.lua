@@ -1,4 +1,5 @@
 local infer    = require 'core.infer'
+local guide    = require 'parser.guide'
 
 local function getReturnDualByDoc(source)
     local docs = source.bindDocs
@@ -67,7 +68,7 @@ local function asFunction(source)
             end
         end
         if next(infers) or rtn[1] then
-            local tp = infer.viewInfers(infers)
+            local tp = infer.viewInfers(guide.getUri(source), infers)
             if rtn[1].name then
                 line[#line+1] = ('%s%s: %s'):format(
                     rtn[1].name[1],

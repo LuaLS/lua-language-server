@@ -12,9 +12,10 @@ local await   = require 'await'
 local timer   = require 'timer'
 local encoder = require 'encoder'
 local ws      = require 'workspace.workspace'
-local scope   = require 'workspace.scope'
 
 local m = {}
+
+m.metaPaths = {}
 
 local function getDocFormater(uri)
     local version = config.get(uri, 'Lua.runtime.version')
@@ -215,19 +216,16 @@ local function initBuiltIn(uri)
         loadMetaLocale(langID, metaLang)
     end
 
-
     if scp:get('metaPath') == metaPath:string() then
         return
     end
     scp:set('metaPath', metaPath:string())
-    local suc, ok = xpcall(function ()
+    local suc = xpcall(function ()
         if not fs.exists(metaPath) then
             fs.create_directories(metaPath)
-            return true
         end
-        return false
     end, log.error)
-    if not suc or not ok then
+    if not suc then
         return
     end
     local out = fsu.dummyFS()
@@ -243,6 +241,8 @@ local function initBuiltIn(uri)
         if metaDoc then
             metaDoc = encoder.encode(encoding, metaDoc, 'auto')
             out:saveFile(libName, metaDoc)
+            local outputPath = metaPath / libName
+            m.metaPaths[outputPath:string()] = true
         end
         ::CONTINUE::
     end
@@ -419,7 +419,6 @@ local function check3rdByFileName(uri, configs)
     if hasAsked then
         return
     end
-    local ws   = require 'workspace'
     local path = ws.getRelativePath(uri)
     if not path then
         return

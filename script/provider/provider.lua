@@ -1019,9 +1019,15 @@ do
     end)
 end
 
-local function refreshStatusBar(uri)
-    local value = config.get(uri, 'Lua.window.statusBar')
-    if value then
+local function refreshStatusBar()
+    local valid = true
+    for _, scp in ipairs(workspace.folders) do
+        if not config.get(scp.uri, 'Lua.window.statusBar') then
+            valid = false
+            break
+        end
+    end
+    if valid then
         proto.notify('$/status/show')
     else
         proto.notify('$/status/hide')
@@ -1030,7 +1036,7 @@ end
 
 config.watch(function (uri, key, value)
     if key == 'Lua.window.statusBar' then
-        refreshStatusBar(uri)
+        refreshStatusBar()
     end
 end)
 

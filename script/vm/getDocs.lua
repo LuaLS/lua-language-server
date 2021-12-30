@@ -153,7 +153,7 @@ local function isDeprecated(value)
             return true
         elseif doc.type == 'doc.version' then
             local valids = vm.getValidVersions(doc)
-            if not valids[config.get(nil, 'Lua.runtime.version')] then
+            if not valids[config.get(guide.getUri(value), 'Lua.runtime.version')] then
                 value._deprecated = true
                 return true
             end

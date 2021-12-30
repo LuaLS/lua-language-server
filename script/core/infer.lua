@@ -3,6 +3,7 @@ local config   = require 'config'
 local noder    = require 'core.noder'
 local util     = require 'utility'
 local vm       = require "vm.vm"
+local guide    = require "parser.guide"
 
 local CLASS           = {'CLASS'}
 local TABLE           = {'TABLE'}
@@ -232,8 +233,8 @@ local function bindClassOrType(source)
     return false
 end
 
-local function cleanInfers(infers)
-    local version = config.get(nil, 'Lua.runtime.version')
+local function cleanInfers(uri, infers)
+    local version = config.get(uri, 'Lua.runtime.version')
     local enableInteger = version == 'Lua 5.3' or version == 'Lua 5.4'
     infers['unknown'] = nil
     if infers['number'] then
@@ -269,7 +270,7 @@ end
 ---合并对象的推断类型
 ---@param infers string[]
 ---@return string
-function m.viewInfers(infers)
+function m.viewInfers(uri, infers)
     if infers[CACHE] then
         return infers[CACHE]
     end
@@ -298,7 +299,7 @@ function m.viewInfers(infers)
             return sa < sb
         end
     end)
-    local limit = config.get(nil, 'Lua.hover.enumsLimit')
+    local limit = config.get(uri, 'Lua.hover.enumsLimit')
     if limit < 0 then
         limit = 0
     end
@@ -510,7 +511,7 @@ function m.searchInfers(source, field, mark)
             end
         end
     end
-    cleanInfers(infers)
+    cleanInfers(guide.getUri(source), infers)
     return infers
 end
 
@@ -606,7 +607,7 @@ function m.searchAndViewInfers(source, field, mark)
         return 'any'
     end
     local infers = m.searchInfers(source, field, mark)
-    local view = m.viewInfers(infers)
+    local view = m.viewInfers(guide.getUri(source), infers)
     if type(view) == 'boolean' then
         log.error('Why view is boolean?', util.dump(infers))
         return 'any'
@@ -630,8 +631,8 @@ function m.getClass(source)
             end
         end
     end
-    cleanInfers(infers)
-    local view = m.viewInfers(infers)
+    cleanInfers(guide.getUri(source), infers)
+    local view = m.viewInfers(guide.getUri(source), infers)
     if view == 'any' then
         return nil
     end

@@ -80,14 +80,12 @@ function m.getNativeMatcher(scp)
     end
 
     local pattern = {}
-    -- config.get(nil, 'files.exclude'
     for path, ignore in pairs(config.get(scp.uri, 'files.exclude')) do
         if ignore then
             log.info('Ignore by exclude:', path)
             pattern[#pattern+1] = path
         end
     end
-    -- config.get(nil, 'workspace.useGitIgnore'
     if config.get(scp.uri, 'Lua.workspace.useGitIgnore') then
         local buf = pub.awaitTask('loadFile', m.rootUri .. '/.gitignore')
         if buf then
@@ -108,7 +106,6 @@ function m.getNativeMatcher(scp)
             end
         end
     end
-    -- config.get(nil, 'workspace.ignoreSubmodules'
     if config.get(scp.uri, 'Lua.workspace.ignoreSubmodules') then
         local buf = pub.awaitTask('loadFile', m.rootUri .. '/.gitmodules')
         if buf then
@@ -118,7 +115,6 @@ function m.getNativeMatcher(scp)
             end
         end
     end
-    -- config.get(nil, 'workspace.library'
     for path in pairs(config.get(scp.uri, 'Lua.workspace.library')) do
         path = m.getAbsolutePath(path)
         if path then
@@ -126,7 +122,6 @@ function m.getNativeMatcher(scp)
             pattern[#pattern+1] = path
         end
     end
-    -- config.get(nil, 'workspace.ignoreDir'
     for _, path in ipairs(config.get(scp.uri, 'Lua.workspace.ignoreDir')) do
         log.info('Ignore directory:', path)
         pattern[#pattern+1] = path

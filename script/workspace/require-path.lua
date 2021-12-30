@@ -9,7 +9,7 @@ m.cache = {}
 
 --- `aaa/bbb/ccc.lua` 与 `?.lua` 将返回 `aaa.bbb.cccc`
 local function getOnePath(path, searcher)
-    local separator    = config.get(nil, 'Lua.completion.requireSeparator')
+    local separator    = config.get(uri, 'Lua.completion.requireSeparator')
     local stemPath     = path
                         : gsub('%.[^%.]+$', '')
                         : gsub('[/\\%.]+', separator)
@@ -28,8 +28,8 @@ local function getOnePath(path, searcher)
 end
 
 function m.getVisiblePath(path)
-    local searchers = config.get(nil, 'Lua.runtime.path')
-    local strict    = config.get(nil, 'Lua.runtime.pathStrict')
+    local searchers = config.get(uri, 'Lua.runtime.path')
+    local strict    = config.get(uri, 'Lua.runtime.pathStrict')
     path = workspace.normalize(path)
     local uri = furi.encode(path)
     local libraryPath = files.getLibraryPath(uri)
@@ -86,7 +86,7 @@ function m.findUrisByRequirePath(path)
     if type(path) ~= 'string' then
         return {}
     end
-    local separator = config.get(nil, 'Lua.completion.requireSeparator')
+    local separator = config.get(uri, 'Lua.completion.requireSeparator')
     local fspath = path:gsub('%' .. separator, '/')
     local vm    = require 'vm'
     local cache = vm.getCache 'findUrisByRequirePath'

@@ -3,6 +3,7 @@ local util     = require 'utility'
 local config   = require 'config'
 local infer    = require 'core.infer'
 local await    = require 'await'
+local guide    = require 'parser.guide'
 
 local function formatKey(key)
     if type(key) == 'string' then
@@ -136,7 +137,7 @@ end
 
 ---@async
 return function (source)
-    local maxFields = config.get(nil, 'Lua.hover.previewFields')
+    local maxFields = config.get(guide.getUri(source), 'Lua.hover.previewFields')
     if maxFields <= 0 then
         return 'table'
     end

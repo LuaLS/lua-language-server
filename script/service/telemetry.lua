@@ -74,7 +74,7 @@ end
 
 timer.wait(5, function ()
     timer.loop(300, function ()
-        if not config.get(nil, 'Lua.telemetry.enable') then
+        if not config.get(uri, 'Lua.telemetry.enable') then
             return
         end
         local suc, link = pcall(net.connect, 'tcp', 'moe-moe.love', 11577)
@@ -93,7 +93,7 @@ timer.wait(5, function ()
         end
     end)()
     timer.loop(1, function ()
-        if not config.get(nil, 'Lua.telemetry.enable') then
+        if not config.get(uri, 'Lua.telemetry.enable') then
             return
         end
         net.update()
@@ -103,7 +103,7 @@ end)
 local m = {}
 
 function m.updateConfig()
-    if config.get(nil, 'Lua.telemetry.enable') ~= nil then
+    if config.get(uri, 'Lua.telemetry.enable') ~= nil then
         return
     end
     if m.hasShowedMessage then

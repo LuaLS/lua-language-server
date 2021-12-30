@@ -252,11 +252,11 @@ m.register 'textDocument/hover' {
     abortByFileUpdate = true,
     ---@async
     function (params)
-        if not config.get(nil, 'Lua.hover.enable') then
-            return
-        end
         local doc    = params.textDocument
         local uri    = files.getRealUri(doc.uri)
+        if not config.get(uri, 'Lua.hover.enable') then
+            return
+        end
         if not workspace.isReady() then
             local count, max = workspace.getLoadingProcess(uri)
             return {
@@ -493,7 +493,7 @@ m.register 'textDocument/completion' {
             return nil
         end
         local triggerCharacter = params.context and params.context.triggerCharacter
-        if config.get(nil, 'editor.acceptSuggestionOnEnter') ~= 'off' then
+        if config.get(uri, 'editor.acceptSuggestionOnEnter') ~= 'off' then
             if triggerCharacter == '\n'
             or triggerCharacter == '{'
             or triggerCharacter == ',' then
@@ -1020,7 +1020,7 @@ do
 end
 
 local function refreshStatusBar()
-    local value = config.get(nil, 'Lua.window.statusBar')
+    local value = config.get(uri, 'Lua.window.statusBar')
     if value then
         proto.notify('$/status/show')
     else

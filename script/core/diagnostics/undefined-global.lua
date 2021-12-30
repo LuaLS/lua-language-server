@@ -27,10 +27,10 @@ return function (uri, callback)
         if not key then
             return
         end
-        if config.get(nil, 'Lua.diagnostics.globals')[key] then
+        if config.get(uri, 'Lua.diagnostics.globals')[key] then
             return
         end
-        if config.get(nil, 'Lua.runtime.special')[key] then
+        if config.get(uri, 'Lua.runtime.special')[key] then
             return
         end
         local node = src.node

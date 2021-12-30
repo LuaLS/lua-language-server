@@ -9,10 +9,8 @@ local converter      = require 'proto.converter'
 local infer          = require 'core.infer'
 local config         = require 'config'
 
-local isEnhanced = config.get(nil, 'Lua.color.mode') == 'SemanticEnhanced'
-
 local Care = {}
-Care['getglobal'] = function (source, results)
+Care['getglobal'] = function (source, options, results)
     local isLib = vm.isGlobalLibraryName(source[1])
     local isFunc = false
     local value = source.value
@@ -21,7 +19,7 @@ Care['getglobal'] = function (source, results)
         isFunc = true
     elseif source.parent.type == 'call' then
         isFunc = true
-    elseif isEnhanced then
+    elseif options.isEnhanced then
         isFunc = infer.hasType(source, 'function')
     end
 
@@ -36,7 +34,7 @@ Care['getglobal'] = function (source, results)
     }
 end
 Care['setglobal'] = Care['getglobal']
-Care['getmethod'] = function (source, results)
+Care['getmethod'] = function (source, options, results)
     local method = source.method
     if method and method.type == 'method' then
         results[#results+1] = {
@@ -48,7 +46,7 @@ Care['getmethod'] = function (source, results)
     end
 end
 Care['setmethod'] = Care['getmethod']
-Care['field'] = function (source, results)
+Care['field'] = function (source, options, results)
     local modifiers = 0
     if source.parent and source.parent.type == 'tablefield' then
         modifiers = define.TokenModifiers.declaration
@@ -65,7 +63,7 @@ Care['field'] = function (source, results)
             return
         end
     end
-    if isEnhanced and infer.hasType(source, 'function') then
+    if options.isEnhanced and infer.hasType(source, 'function') then
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
@@ -90,7 +88,7 @@ Care['field'] = function (source, results)
         modifieres = modifiers,
     }
 end
-Care['getlocal'] = function (source, results)
+Care['getlocal'] = function (source, options, results)
     local loc = source.node
     -- 1. 值为函数的局部变量 | Local variable whose value is a function
     if loc.refs then
@@ -127,7 +125,7 @@ Care['getlocal'] = function (source, results)
         return
     end
     -- 5. References to other functions
-    if isEnhanced and infer.hasType(loc, 'function') then
+    if options.isEnhanced and infer.hasType(loc, 'function') then
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
@@ -137,7 +135,7 @@ Care['getlocal'] = function (source, results)
         return
     end
     -- 6. Class declaration
-    if isEnhanced then
+    if options.isEnhanced then
         -- search all defs
         for _, def in ipairs(vm.getDefs(source)) do
             if def.bindDocs then
@@ -214,7 +212,7 @@ Care['getlocal'] = function (source, results)
     }
 end
 Care['setlocal'] = Care['getlocal']
-Care['local'] = function (source, results) -- Local declaration, i.e. "local x", "local y = z", or "local function() end"
+Care['local'] = function (source, options, results) -- Local declaration, i.e. "local x", "local y = z", or "local function() end"
     if source[1] == '_ENV'
     or source[1] == 'self' then
         return
@@ -231,7 +229,7 @@ Care['local'] = function (source, results) -- Local declaration, i.e. "local x",
     if source.value then
         local isFunction = false
 
-        if isEnhanced then
+        if options.isEnhanced then
             isFunction = source.value.type == 'function' or infer.hasType(source.value, 'function')
         else
             isFunction = source.value.type == 'function'
@@ -299,21 +297,21 @@ Care['local'] = function (source, results) -- Local declaration, i.e. "local x",
         modifieres = modifiers,
     }
 end
-Care['doc.return.name'] = function (source, results)
+Care['doc.return.name'] = function (source, options, results)
     results[#results+1] = {
         start  = source.start,
         finish = source.finish,
         type   = define.TokenTypes.parameter,
     }
 end
-Care['doc.tailcomment'] = function (source, results)
+Care['doc.tailcomment'] = function (source, options, results)
     results[#results+1] = {
         start  = source.start,
         finish = source.finish,
         type   = define.TokenTypes.comment,
     }
 end
-Care['doc.type.name'] = function (source, results)
+Care['doc.type.name'] = function (source, options, results)
     if source.typeGeneric then
         results[#results+1] = {
             start  = source.start,
@@ -323,14 +321,14 @@ Care['doc.type.name'] = function (source, results)
     end
 end
 
-Care['nonstandardSymbol.comment'] = function (source, results)
+Care['nonstandardSymbol.comment'] = function (source, options, results)
     results[#results+1] = {
         start  = source.start,
         finish = source.finish,
         type   = define.TokenTypes.comment,
     }
 end
-Care['nonstandardSymbol.continue'] = function (source, results)
+Care['nonstandardSymbol.continue'] = function (source, options, results)
     results[#results+1] = {
         start  = source.start,
         finish = source.finish,
@@ -367,19 +365,16 @@ local function buildTokens(uri, results)
     return tokens
 end
 
-config.watch(function (key, value)
-    if key == 'Lua.color.mode' then
-        isEnhanced = value == 'SemanticEnhanced'
-    end
-end)
-
 ---@async
 return function (uri, start, finish)
     local state = files.getState(uri)
-    local text  = files.getText(uri)
     if not state then
         return nil
     end
+
+    local options = {
+        isEnhanced = config.get(uri, 'Lua.color.mode') == 'SemanticEnhanced',
+    }
 
     local results = {}
     guide.eachSourceBetween(state.ast, start, finish, function (source) ---@async
@@ -387,7 +382,7 @@ return function (uri, start, finish)
         if not method then
             return
         end
-        method(source, results)
+        method(source, options, results)
         await.delay()
     end)
 

@@ -247,7 +247,8 @@ local function getScope(uri, key)
         ---@type scope
         local scp = scope.getFolder(uri) or scope.getLinkedScope(uri)
         if scp then
-            if not key or scp:get 'config.raw' [key] ~= nil then
+            if not key
+            or (scp:get 'config.raw' and scp:get 'config.raw' [key] ~= nil) then
                 return scp
             end
         end

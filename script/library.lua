@@ -14,8 +14,8 @@ local encoder = require 'encoder'
 
 local m = {}
 
-local function getDocFormater()
-    local version = config.get(nil, 'Lua.runtime.version')
+local function getDocFormater(uri)
+    local version = config.get(uri, 'Lua.runtime.version')
     if client.isVSCode() then
         if version == 'Lua 5.1' then
             return 'HOVER_NATIVE_DOCUMENT_LUA51'
@@ -43,8 +43,8 @@ local function getDocFormater()
     end
 end
 
-local function convertLink(text)
-    local fmt = getDocFormater()
+local function convertLink(uri, text)
+    local fmt = getDocFormater(uri)
     return text:gsub('%$([%.%w]+)', function (name)
         local lastDot = ''
         if name:sub(-1) == '.' then
@@ -82,7 +82,7 @@ local function createViewDocument(name)
     return ('[%s](%s)'):format(lang.script.HOVER_VIEW_DOCUMENTS, lang.script(fmt, 'pdf-' .. name))
 end
 
-local function compileSingleMetaDoc(script, metaLang, status)
+local function compileSingleMetaDoc(uri, script, metaLang, status)
     if not script then
         return nil
     end
@@ -99,11 +99,11 @@ local function compileSingleMetaDoc(script, metaLang, status)
     middleBuf[#middleBuf+1] = ('PUSH [===[%s]===]'):format(script:sub(last))
     local middleScript = table.concat(middleBuf, '\n')
     local version, jit
-    if config.get(nil, 'Lua.runtime.version') == 'LuaJIT' then
+    if config.get(uri, 'Lua.runtime.version') == 'LuaJIT' then
         version = 5.1
         jit = true
     else
-        version = tonumber(config.get(nil, 'Lua.runtime.version'):sub(-3))
+        version = tonumber(config.get(uri, 'Lua.runtime.version'):sub(-3))
         jit = false
     end
 
@@ -122,7 +122,7 @@ local function compileSingleMetaDoc(script, metaLang, status)
             compileBuf[#compileBuf+1] = '---\n'
             for line in util.eachLine(des) do
                 compileBuf[#compileBuf+1] = '---'
-                compileBuf[#compileBuf+1] = convertLink(line)
+                compileBuf[#compileBuf+1] = convertLink(uri, line)
                 compileBuf[#compileBuf+1] = '\n'
             end
             local viewDocument = createViewDocument(name)
@@ -138,7 +138,7 @@ local function compileSingleMetaDoc(script, metaLang, status)
             if not des then
                 des = ('Miss locale <%s>'):format(name)
             end
-            compileBuf[#compileBuf+1] = convertLink(des)
+            compileBuf[#compileBuf+1] = convertLink(uri, des)
             compileBuf[#compileBuf+1] = '\n'
         end,
         ALIVE   = function (str)
@@ -202,9 +202,9 @@ local function initBuiltIn()
         return
     end
     local langID   = lang.id
-    local version  = config.get(nil, 'Lua.runtime.version')
-    local encoding = config.get(nil, 'Lua.runtime.fileEncoding')
-    local metaPath = fs.path(METAPATH) / config.get(nil, 'Lua.runtime.meta'):gsub('%$%{(.-)%}', {
+    local version  = config.get(uri, 'Lua.runtime.version')
+    local encoding = config.get(uri, 'Lua.runtime.fileEncoding')
+    local metaPath = fs.path(METAPATH) / config.get(uri, 'Lua.runtime.meta'):gsub('%$%{(.-)%}', {
         version  = version,
         language = langID,
         encoding = encoding,
@@ -232,13 +232,13 @@ local function initBuiltIn()
     local out = fsu.dummyFS()
     local templateDir = ROOT / 'meta' / 'template'
     for libName, status in pairs(define.BuiltIn) do
-        status = config.get(nil, 'Lua.runtime.builtin')[libName] or status
+        status = config.get(uri, 'Lua.runtime.builtin')[libName] or status
         if status == 'disable' then
             goto CONTINUE
         end
         libName = libName .. '.lua'
         local libPath = templateDir / libName
-        local metaDoc = compileSingleMetaDoc(fsu.loadFile(libPath), metaLang, status)
+        local metaDoc = compileSingleMetaDoc(uri, fsu.loadFile(libPath), metaLang, status)
         if metaDoc then
             local outPath = metaPath / libName
             metaDoc = encoder.encode(encoding, metaDoc, 'auto')
@@ -313,7 +313,7 @@ end
 local function load3rdConfig()
     local configs = {}
     load3rdConfigInDir(innerThirdDir, configs, true)
-    local thirdDirs = config.get(nil, 'Lua.workspace.userThirdParty')
+    local thirdDirs = config.get(uri, 'Lua.workspace.userThirdParty')
     for _, thirdDir in ipairs(thirdDirs) do
         load3rdConfigInDir(fs.path(thirdDir), configs)
     end
@@ -455,7 +455,7 @@ local function check3rd(uri)
     if hasAsked then
         return
     end
-    if not config.get(nil, 'Lua.workspace.checkThirdParty') then
+    if not config.get(uri, 'Lua.workspace.checkThirdParty') then
         return
     end
     if thirdConfigs == nil then
@@ -477,7 +477,7 @@ end
 
 config.watch(function (key, value, oldValue)
     if key:find '^Lua.runtime' then
-        initBuiltIn()
+        initBuiltIn(uri)
     end
 end)
 

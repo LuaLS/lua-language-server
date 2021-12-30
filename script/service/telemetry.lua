@@ -72,9 +72,12 @@ local function pushErrorLog(link)
     ))
 end
 
+local validMap = {}
+local isValid  = false
+
 timer.wait(5, function ()
     timer.loop(300, function ()
-        if not config.get(uri, 'Lua.telemetry.enable') then
+        if not isValid then
             return
         end
         local suc, link = pcall(net.connect, 'tcp', 'moe-moe.love', 11577)
@@ -93,7 +96,7 @@ timer.wait(5, function ()
         end
     end)()
     timer.loop(1, function ()
-        if not config.get(uri, 'Lua.telemetry.enable') then
+        if not isValid then
             return
         end
         net.update()
@@ -102,8 +105,26 @@ end)
 
 local m = {}
 
-function m.updateConfig(uri)
-    if config.get(uri, 'Lua.telemetry.enable') ~= nil then
+function m.updateConfig(uri, value)
+    validMap[uri] = value
+    isValid = config.get(nil, 'Lua.telemetry.enable')
+    if isValid == false then
+        return
+    end
+    -- one false, all false
+    for _, v in pairs(validMap) do
+        if v == false then
+            isValid = false
+            return
+        end
+    end
+    for _, v in pairs(validMap) do
+        if v == true then
+            isValid = true
+            break
+        end
+    end
+    if isValid ~= nil then
         return
     end
     if m.hasShowedMessage then
@@ -151,9 +172,9 @@ function m.updateConfig(uri)
     end)
 end
 
-config.watch(function (uri, key)
+config.watch(function (uri, key, value)
     if key == 'Lua.telemetry.enable' then
-        m.updateConfig(uri)
+        m.updateConfig(uri, value)
     end
 end)
 

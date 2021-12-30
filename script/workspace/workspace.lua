@@ -213,9 +213,22 @@ function m.awaitLoadFile(uri)
     log.info('Scan files at:', uri)
     ---@async
     native:scan(furi.decode(uri), function (path)
-        ld:scanFile(furi.encode(path))
+        ld:loadFile(furi.encode(path))
     end)
     ld:loadAll()
+end
+
+function m.removeFile(uri)
+    for _, scp in ipairs(m.folders) do
+        if scp:isChildUri(uri)
+        or scp:isLinkedUri(uri) then
+            local cachedUris = scp:get 'cachedUris'
+            if cachedUris[uri] then
+                cachedUris[uri] = nil
+                files.delRef(uri)
+            end
+        end
+    end
 end
 
 --- 预读工作区内所有文件
@@ -247,7 +260,7 @@ function m.awaitPreload(scp)
         log.info('Scan files at:', m.rootUri)
         ---@async
         native:scan(furi.decode(scp.uri), function (path)
-            ld:scanFile(furi.encode(path))
+            ld:loadFile(furi.encode(path))
         end)
     end
 
@@ -255,7 +268,7 @@ function m.awaitPreload(scp)
         log.info('Scan library at:', libMatcher.uri)
         ---@async
         libMatcher.matcher:scan(furi.decode(libMatcher.uri), function (path)
-            ld:scanFile(furi.encode(path), libMatcher.uri)
+            ld:loadFile(furi.encode(path), libMatcher.uri)
         end)
         watchers[#watchers+1] = fw.watch(furi.decode(libMatcher.uri))
     end
@@ -386,13 +399,13 @@ function m.init()
 end
 
 ---@param scp scope
-function m.removeFiles(scp)
+function m.flushFiles(scp)
     local cachedUris = scp:get 'cachedUris'
     if not cachedUris then
         return
     end
     scp:set('cachedUris', nil)
-    for _, uri in ipairs(cachedUris) do
+    for uri in pairs(cachedUris) do
         files.delRef(uri)
     end
 end
@@ -403,7 +416,7 @@ function m.resetFiles(scp)
     if not cachedUris then
         return
     end
-    for _, uri in ipairs(cachedUris) do
+    for uri in pairs(cachedUris) do
         files.resetText(uri)
     end
 end
@@ -411,7 +424,7 @@ end
 ---@async
 ---@param scp scope
 function m.awaitReload(scp)
-    m.removeFiles(scp)
+    m.flushFiles(scp)
     plugin.init(scp)
     m.awaitPreload(scp)
     scp:set('ready', true)
@@ -483,20 +496,18 @@ fw.event(function (changes) ---@async
     for _, change in ipairs(changes) do
         local path = change.path
         local uri  = furi.encode(path)
-        local scp  = m.getScope(uri)
-        if scp.type == 'fallback' then
-            goto CONTINUE
-        end
         if     change.type == 'create' then
             log.debug('FileChangeType.Created', uri)
             m.awaitLoadFile(uri)
         elseif change.type == 'delete' then
             log.debug('FileChangeType.Deleted', uri)
             files.remove(uri)
+            m.removeFile(uri)
             local childs = files.getChildFiles(uri)
             for _, curi in ipairs(childs) do
                 log.debug('FileChangeType.Deleted.Child', curi)
                 files.remove(curi)
+                m.removeFile(uri)
             end
         elseif change.type == 'change' then
             if m.isValidLuaUri(uri) then
@@ -509,7 +520,10 @@ fw.event(function (changes) ---@async
                 -- 排除类文件发生更改需要重新扫描
                 if filename == '.gitignore'
                 or filename == '.gitmodules' then
-                    m.reload(scp)
+                    local scp = m.getScope(uri)
+                    if scp.type ~= 'fallback' then
+                        m.reload(scp)
+                    end
                     break
                 end
             end

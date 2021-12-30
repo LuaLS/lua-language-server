@@ -11,6 +11,7 @@ local pub      = require 'pub.pub'
 ---@field _bar progress
 ---@field _stash function[]
 ---@field _refs uri[]
+---@field _cache table<uri, boolean>
 local mt = {}
 mt.__index = mt
 
@@ -58,7 +59,7 @@ end
 ---@param uri uri
 ---@param libraryUri boolean
 ---@async
-function mt:scanFile(uri, libraryUri)
+function mt:loadFile(uri, libraryUri)
     if files.isLua(uri) then
         if not libraryUri then
             self.preload = self.preload + 1
@@ -75,8 +76,11 @@ function mt:scanFile(uri, libraryUri)
                 if not content then
                     return
                 end
+                if self._cache[uri] then
+                    return
+                end
                 log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
-                table.insert(self.scp:get 'cachedUris', uri)
+                self._cache[uri] = true
                 files.setText(uri, content, false)
                 files.addRef(uri)
                 if libraryUri then
@@ -95,8 +99,11 @@ function mt:scanFile(uri, libraryUri)
                 if not content then
                     return
                 end
+                if self._cache[uri] then
+                    return
+                end
                 log.info(('Preload dll at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
-                table.insert(self.scp:get 'cachedUris', uri)
+                self._cache[uri] = true
                 files.saveDll(uri, content)
                 files.addRef(uri)
                 if libraryUri then
@@ -154,8 +161,9 @@ function m.create(scp)
         scp    = scp,
         _bar   = progress.create(lang.script('WORKSPACE_LOADING', scp.uri)),
         _stash = {},
+        _cache = {},
     }, mt)
-    scp:set('cachedUris', {})
+    scp:set('cachedUris', loading._cache)
     return loading
 end
 

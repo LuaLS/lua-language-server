@@ -76,7 +76,6 @@ function TEST(script)
         local triggerCharacter = script:sub(inputPos, inputPos)
         local result = core.completion('', inputPos, triggerCharacter)
 
-        files.remove('')
         if not expect then
             assert(result == nil)
             return
@@ -116,6 +115,7 @@ function TEST(script)
         else
             assert(eq(expect, result))
         end
+        files.remove('')
     end
 end
 

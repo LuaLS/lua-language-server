@@ -106,7 +106,7 @@ end)
 local m = {}
 
 function m.updateConfig(uri, value)
-    validMap[uri] = value
+    validMap[uri or ''] = value
     isValid = config.get(nil, 'Lua.telemetry.enable')
     if isValid == false then
         return

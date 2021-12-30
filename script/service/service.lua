@@ -197,7 +197,7 @@ function m.reportStatus()
     end
 
     info.tooltip = lang.script('WINDOW_LUA_STATUS', {
-        ws  = table.concat(roots, '/'),
+        ws  = table.concat(roots, ';'),
         ast = files.astCount,
         max = files.fileCount,
         mem = collectgarbage('count') / 1000,

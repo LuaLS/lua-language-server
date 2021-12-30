@@ -229,8 +229,12 @@ local function update(scp, key, nowValue, rawValue)
     local now = scp:get 'config.now'
     local raw = scp:get 'config.raw'
 
+    local oldValue = now[key]
+
     now[key] = nowValue
     raw[key] = rawValue
+
+    m.event(scp.uri, key, nowValue, oldValue)
 end
 
 ---@param uri uri
@@ -359,8 +363,9 @@ end
 ---@param null any
 function m.update(scp, new, null)
     local oldConfig = scp:get 'config.now'
+    local newConfig = {}
 
-    scp:set('config.now', {})
+    scp:set('config.now', newConfig)
     scp:set('config.raw', {})
 
     local function expand(t, left)
@@ -386,7 +391,9 @@ function m.update(scp, new, null)
 
     -- compare then fire event
     if oldConfig then
-        
+        for key, oldValue in pairs(oldConfig) do
+            m.event(scp.uri, key, oldValue, newConfig[key])
+        end
     end
 end
 
@@ -403,12 +410,13 @@ function m.event(uri, key, value, oldValue)
             m.delay = nil
             for _, info in ipairs(delay) do
                 for _, callback in ipairs(m.watchList) do
-                    callback(uri, info.key, info.value, info.oldValue)
+                    callback(info.uri, info.key, info.value, info.oldValue)
                 end
             end
         end)
     end
     m.delay[#m.delay+1] = {
+        uri      = uri,
         key      = key,
         value    = value,
         oldValue = oldValue,

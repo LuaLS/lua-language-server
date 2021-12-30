@@ -1,4 +1,4 @@
 ---@meta
-resty_core_ndk={}
-resty_core_ndk.version="0.1.17"
+local resty_core_ndk={}
+resty_core_ndk.version = require("resty.core.base").version
 return resty_core_ndk

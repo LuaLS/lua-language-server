@@ -1,7 +1,7 @@
 ---@meta
 
 ---@class resty.websocket.client : resty.websocket
-resty_websocket_client = {
+local client = {
   _VERSION = "0.09"
 }
 
@@ -14,7 +14,7 @@ resty_websocket_client = {
 ---@param  opts?                   resty.websocket.new.opts
 ---@return resty.websocket.client? client
 ---@return string?                 error
-function resty_websocket_client:new(opts) end
+function client:new(opts) end
 
 ---Connects to the remote WebSocket service port and performs the websocket
 ---handshake process on the client side.
@@ -27,7 +27,7 @@ function resty_websocket_client:new(opts) end
 ---@param  opts?   resty.websocket.client.connect.opts
 ---@return boolean ok
 ---@return string? error
-function resty_websocket_client:connect(uri, opts) end
+function client:connect(uri, opts) end
 
 --- Puts the current WebSocket connection immediately into the ngx_lua cosocket connection pool.
 ---
@@ -41,7 +41,7 @@ function resty_websocket_client:connect(uri, opts) end
 ---@param  pool_size        integer
 ---@return boolean          ok
 ---@return string?          error
-function resty_websocket_client:set_keepalive(max_idle_timeout, pool_size) end
+function client:set_keepalive(max_idle_timeout, pool_size) end
 
 ---Closes the current WebSocket connection.
 ---
@@ -49,7 +49,7 @@ function resty_websocket_client:set_keepalive(max_idle_timeout, pool_size) end
 ---
 ---@return boolean ok
 ---@return string? error
-function resty_websocket_client:close() end
+function client:close() end
 
 ---@class resty.websocket.client.connect.opts : table
 ---
@@ -60,4 +60,4 @@ function resty_websocket_client:close() end
 ---@field headers    string[]         custom headers to be sent in the handshake request. The table is expected to contain strings in the format {"a-header: a header value", "another-header: another header value"}.
 
 
-return resty_websocket_client
+return client

@@ -537,7 +537,7 @@ local function skipComment(isAction)
         State.comms[#State.comms+1] = {
             type   = chead and 'comment.cshort' or 'comment.short',
             start  = left,
-            finish = getPosition(Tokens[Index], 'right'),
+            finish = lastRightPosition(),
             text   = ssub(Lua, start + 2, Tokens[Index] and (Tokens[Index] - 1) or #Lua),
         }
         return true

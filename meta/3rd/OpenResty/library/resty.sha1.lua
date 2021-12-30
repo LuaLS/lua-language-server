@@ -1,8 +1,10 @@
 ---@meta
-resty_sha1={}
-function resty_sha1.final(self) end
-function resty_sha1.new(self) end
-function resty_sha1.reset(self) end
-resty_sha1._VERSION="0.11"
-function resty_sha1.update(self, s) end
-return resty_sha1
+
+---@class resty.sha1 : resty.string.checksum
+local sha1={}
+
+--- Create a new sha1 checksum object.
+---@return resty.sha1
+function sha1:new() end
+
+return sha1

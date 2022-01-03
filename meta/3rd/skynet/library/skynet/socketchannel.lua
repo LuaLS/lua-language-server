@@ -2,11 +2,6 @@
 ---socket channel 在创建时，并不会立即建立连接。如果你什么都不做，那么连接建立会推迟到第一次 request 请求时。这种被动建立连接的过程会不断的尝试，即使第一次没有连接上，也会重试。
 ---@class socketchannel
 local socket_channel = {}
-socket_channel.error = setmetatable({}, {
-  __tostring = function()
-    return "[Error: socket]"
-  end,
-})
 
 ---创建一个新的套接字频道
 ---返回结构：

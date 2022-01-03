@@ -230,6 +230,9 @@ m.register 'textDocument/hover' {
     abortByFileUpdate = true,
     ---@async
     function (params)
+        if not config.get('Lua.hover.enable') then
+            return
+        end
         local doc    = params.textDocument
         local uri    = files.getRealUri(doc.uri)
         if not workspace.isReady() then

@@ -81,12 +81,11 @@ function m.getIniter()
         },
         executeCommandProvider = {
             commands = {
-                -- TODO: 不再需要 get_id
-                'lua.removeSpace:' .. sp:get_id(),
-                'lua.solve:'       .. sp:get_id(),
-                'lua.jsonToLua:'   .. sp:get_id(),
-                'lua.setConfig:'   .. sp:get_id(),
-                'lua.autoRequire:' .. sp:get_id(),
+                'lua.removeSpace',
+                'lua.solve',
+                'lua.jsonToLua',
+                'lua.setConfig',
+                'lua.autoRequire',
             },
         },
         foldingRangeProvider = true,

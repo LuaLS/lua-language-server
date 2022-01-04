@@ -472,6 +472,9 @@ end
 ---@param uri uri
 function m.isReady(uri)
     local scp = m.getScope(uri)
+    if scp.type == 'fallback' then
+        return true
+    end
     return scp:get('ready') == true
 end
 

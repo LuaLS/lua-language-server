@@ -348,7 +348,7 @@ return function (uri, offset)
         results[#results+1] = {
             start  = start,
             finish = finish,
-            kind   = define.DocumentHighlightKind.Write
+            kind   = define.DocumentHighlightKind.Text
         }
     end)
 

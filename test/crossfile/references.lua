@@ -183,3 +183,22 @@ TEST {
         ]]
     }
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            local t = {}
+            t.<~x~> = 1
+            return t
+        ]]
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local t = require 'a'
+
+            print(t.<!x!>)
+        ]]
+    }
+}

@@ -183,14 +183,7 @@ end
 
 local function ofField(source, newname, callback)
     local key = guide.getKeyName(source)
-    local node
-    if source.type == 'tablefield'
-    or source.type == 'tableindex' then
-        node = source.parent
-    else
-        node = source.node
-    end
-    for _, src in ipairs(vm.getAllRefs(node, '*')) do
+    for _, src in ipairs(vm.getAllRefs(source)) do
         ofFieldThen(key, src, newname, callback)
     end
 end
@@ -276,7 +269,6 @@ local function rename(source, newname, callback)
             return ofField(parent, newname, callback)
         end
     end
-    return
 end
 
 local function prepareRename(source)

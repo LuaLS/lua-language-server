@@ -1,5 +1,3 @@
-local fs        = require 'bee.filesystem'
-local fsu       = require 'fs-utility'
 local json      = require 'json'
 local proto     = require 'proto'
 local lang      = require 'language'
@@ -14,40 +12,43 @@ local function errorMessage(msg)
     log.error(msg)
 end
 
+---@class config.loader
 local m = {}
 
 function m.loadRCConfig(uri, filename)
+    local scp  = workspace.getScope(uri)
     local path = workspace.getAbsolutePath(uri, filename)
     if not path then
-        m.lastRCConfig = nil
+        scp:set('lastRCConfig', nil)
         return nil
     end
     local buf = util.loadFile(path)
     if not buf then
-        m.lastRCConfig = nil
+        scp:set('lastRCConfig', nil)
         return nil
     end
     local suc, res = pcall(json.decode, buf)
     if not suc then
         errorMessage(lang.script('CONFIG_LOAD_ERROR', res))
-        return m.lastRCConfig
+        return scp:get('lastRCConfig')
     end
-    m.lastRCConfig = res
+    scp:set('lastRCConfig', res)
     return res
 end
 
-function m.loadLocalConfig(filename)
-    local path = workspace.getAbsolutePath(filename)
+function m.loadLocalConfig(uri, filename)
+    local scp  = workspace.getScope(uri)
+    local path = workspace.getAbsolutePath(uri, filename)
     if not path then
-        m.lastLocalConfig = nil
-        m.lastLocalType = nil
+        scp:set('lastLocalConfig', nil)
+        scp:set('lastLocalType', nil)
         return nil
     end
     local buf  = util.loadFile(path)
     if not buf then
         errorMessage(lang.script('CONFIG_LOAD_FAILED', path))
-        m.lastLocalConfig = nil
-        m.lastLocalType = nil
+        scp:set('lastLocalConfig', nil)
+        scp:set('lastLocalType', nil)
         return nil
     end
     local firstChar = buf:match '%S'
@@ -55,10 +56,10 @@ function m.loadLocalConfig(filename)
         local suc, res = pcall(json.decode, buf)
         if not suc then
             errorMessage(lang.script('CONFIG_LOAD_ERROR', res))
-            return m.lastLocalConfig
+            return scp:get('lastLocalConfig')
         end
-        m.lastLocalConfig = res
-        m.lastLocalType = 'json'
+        scp:set('lastLocalConfig', res)
+        scp:set('lastLocalType', 'json')
         return res
     else
         local suc, res = pcall(function ()
@@ -66,10 +67,10 @@ function m.loadLocalConfig(filename)
         end)
         if not suc then
             errorMessage(lang.script('CONFIG_LOAD_ERROR', res))
-            return m.lastLocalConfig
+            scp:set('lastLocalConfig', res)
         end
-        m.lastLocalConfig = res
-        m.lastLocalType = 'lua'
+        scp:set('lastLocalConfig', res)
+        scp:set('lastLocalType', 'lua')
         return res
     end
 end

@@ -81,6 +81,7 @@ function m.getIniter()
         },
         executeCommandProvider = {
             commands = {
+                -- TODO: 不再需要 get_id
                 'lua.removeSpace:' .. sp:get_id(),
                 'lua.solve:'       .. sp:get_id(),
                 'lua.jsonToLua:'   .. sp:get_id(),

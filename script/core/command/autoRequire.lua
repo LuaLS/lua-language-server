@@ -64,7 +64,7 @@ local function findInsertRow(uri)
 end
 
 ---@async
-local function askAutoRequire(visiblePaths)
+local function askAutoRequire(uri, visiblePaths)
     local selects = {}
     local nameMap = {}
     for _, visible in ipairs(visiblePaths) do
@@ -91,6 +91,7 @@ local function askAutoRequire(visiblePaths)
                 key    = 'Lua.completion.autoRequire',
                 action = 'set',
                 value  = false,
+                uri    = uri,
             }
         }
         return
@@ -145,7 +146,7 @@ return function (data)
         return #a.expect < #b.expect
     end)
 
-    local result = askAutoRequire(visiblePaths)
+    local result = askAutoRequire(uri, visiblePaths)
     if not result then
         return
     end

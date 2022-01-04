@@ -319,7 +319,7 @@ local function load3rdConfig(uri)
     return configs
 end
 
-local function apply3rd(cfg, onlyMemory)
+local function apply3rd(uri, cfg, onlyMemory)
     local changes = {}
     if cfg.configs then
         for _, change in ipairs(cfg.configs) do
@@ -332,6 +332,7 @@ local function apply3rd(cfg, onlyMemory)
             key    = 'Lua.runtime.plugin',
             action = 'set',
             value  = ('%s/plugin.lua'):format(cfg.dirname),
+            uri    = uri,
         }
     end
 
@@ -339,6 +340,7 @@ local function apply3rd(cfg, onlyMemory)
         key    = 'Lua.workspace.library',
         action = 'add',
         value  = ('%s/library'):format(cfg.dirname),
+        uri    = uri,
     }
 
     client.setConfig(changes, onlyMemory)
@@ -346,7 +348,7 @@ end
 
 local hasAsked
 ---@async
-local function askFor3rd(cfg)
+local function askFor3rd(uri, cfg)
     hasAsked = true
     local yes1 = lang.script.WINDOW_APPLY_WHIT_SETTING
     local yes2 = lang.script.WINDOW_APPLY_WHITOUT_SETTING
@@ -359,21 +361,23 @@ local function askFor3rd(cfg)
         return nil
     end
     if result == yes1 then
-        apply3rd(cfg, false)
+        apply3rd(uri, cfg, false)
         client.setConfig({
             {
                 key    = 'Lua.workspace.checkThirdParty',
                 action = 'set',
                 value  = false,
+                uri    = uri,
             },
         }, false)
     elseif result == yes2 then
-        apply3rd(cfg, true)
+        apply3rd(uri, cfg, true)
         client.setConfig({
             {
                 key    = 'Lua.workspace.checkThirdParty',
                 action = 'set',
                 value  = false,
+                uri    = uri,
             },
         }, true)
     end
@@ -396,7 +400,7 @@ local function wholeMatch(a, b)
     return true
 end
 
-local function check3rdByWords(text, configs)
+local function check3rdByWords(uri, text, configs)
     if hasAsked then
         return
     end
@@ -406,7 +410,7 @@ local function check3rdByWords(text, configs)
                 for _, word in ipairs(cfg.words) do
                     await.delay()
                     if wholeMatch(text, word) then
-                        askFor3rd(cfg)
+                        askFor3rd(uri, cfg)
                         return
                     end
                 end
@@ -429,7 +433,7 @@ local function check3rdByFileName(uri, configs)
                 for _, filename in ipairs(cfg.files) do
                     await.delay()
                     if wholeMatch(path, filename) then
-                        askFor3rd(cfg)
+                        askFor3rd(uri, cfg)
                         return
                     end
                 end
@@ -466,7 +470,7 @@ local function check3rd(uri)
         if files.isLua(uri) then
             local text = files.getText(uri)
             if text then
-                check3rdByWords(text, thirdConfigs)
+                check3rdByWords(uri, text, thirdConfigs)
             end
         end
         check3rdByFileName(uri, thirdConfigs)

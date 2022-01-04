@@ -708,4 +708,12 @@ function m.getUpvalue(f, name)
     return nil, false
 end
 
+function m.stringStartWith(str, head)
+    return str:sub(1, #head) == head
+end
+
+function m.stringEndWith(str, tail)
+    return str:sub(-#tail) == tail
+end
+
 return m

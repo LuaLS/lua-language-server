@@ -130,7 +130,7 @@ function m.getNativeMatcher(scp)
         end
     end
     for path in pairs(config.get(scp.uri, 'Lua.workspace.library')) do
-        path = m.getAbsolutePath(path)
+        path = m.getAbsolutePath(scp.uri, path)
         if path then
             log.info('Ignore by library:', path)
             pattern[#pattern+1] = path
@@ -159,7 +159,7 @@ function m.getLibraryMatchers(scp)
 
     local librarys = {}
     for path in pairs(config.get(scp.uri, 'Lua.workspace.library')) do
-        path = m.getAbsolutePath(path)
+        path = m.getAbsolutePath(scp.uri, path)
         if path then
             librarys[m.normalize(path)] = true
         end
@@ -335,21 +335,16 @@ function m.normalize(path)
 end
 
 ---@return string
-function m.getAbsolutePath(folderUriOrPath, path)
+function m.getAbsolutePath(folderUri, path)
     if not path or path == '' then
         return nil
     end
     path = m.normalize(path)
     if fs.path(path):is_relative() then
-        if not folderUriOrPath then
+        if not folderUri then
             return nil
         end
-        local folderPath
-        if folderUriOrPath:sub(1, 5) == 'file:' then
-            folderPath = furi.decode(folderUriOrPath)
-        else
-            folderPath = folderUriOrPath
-        end
+        local folderPath = furi.decode(folderUri)
         path = m.normalize(folderPath .. '/' .. path)
     end
     return path
@@ -506,11 +501,10 @@ config.watch(function (uri, key, value, oldValue)
 end)
 
 fw.event(function (changes) ---@async
-    -- TODO
-    m.awaitReady()
     for _, change in ipairs(changes) do
         local path = change.path
         local uri  = furi.encode(path)
+        m.awaitReady(uri)
         if     change.type == 'create' then
             log.debug('FileChangeType.Created', uri)
             m.awaitLoadFile(uri)

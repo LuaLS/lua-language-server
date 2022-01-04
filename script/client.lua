@@ -200,35 +200,49 @@ end
 ---@field uri?      uri
 
 ---@param cfg table
+---@param uri uri
 ---@param changes config.change[]
-local function applyConfig(cfg, changes)
+---@return boolean
+local function applyConfig(cfg, uri, changes)
+    local ws = require 'workspace'
+    local scp = ws.getScope(uri)
+    local ok = false
     for _, change in ipairs(changes) do
-        cfg[change.key] = config.getRaw(change.uri, change.key)
+        if scp:isChildUri(change.uri)
+        or scp:isLinkedUri(change.uri) then
+            cfg[change.key] = config.getRaw(change.uri, change.key)
+            ok = true
+        end
     end
+    return ok
 end
 
-local function tryModifySpecifiedConfig(finalChanges)
+local function tryModifySpecifiedConfig(uri, finalChanges)
     if #finalChanges == 0 then
         return false
     end
     local workspace = require 'workspace'
     local loader    = require 'config.loader'
-    if loader.lastLocalType ~= 'json' then
+    local scp = workspace.getScope(uri)
+    if scp:get('lastLocalType') ~= 'json' then
         return false
     end
-    applyConfig(loader.lastLocalConfig, finalChanges)
-    local path = workspace.getAbsolutePath(CONFIGPATH)
-    util.saveFile(path, json.beautify(loader.lastLocalConfig, { indent = '    ' }))
+    local suc = applyConfig(scp:get('lastLocalConfig'), uri, finalChanges)
+    if not suc then
+        return false
+    end
+    local path = workspace.getAbsolutePath(uri, CONFIGPATH)
+    util.saveFile(path, json.beautify(scp:get('lastLocalConfig'), { indent = '    ' }))
     return true
 end
 
-local function tryModifyRC(finalChanges, create)
+local function tryModifyRC(uri, finalChanges, create)
     if #finalChanges == 0 then
         return false
     end
     local workspace = require 'workspace'
     local loader    = require 'config.loader'
-    local path = workspace.getAbsolutePath '.luarc.json'
+    local path = workspace.getAbsolutePath(uri, '.luarc.json')
     if not path then
         return false
     end
@@ -236,10 +250,14 @@ local function tryModifyRC(finalChanges, create)
     if not buf and not create then
         return false
     end
-    local rc = loader.lastRCConfig or {
+    local scp = workspace.getScope(uri)
+    local rc = scp:get('lastRCConfig') or {
         ['$schema'] = lang.id == 'zh-cn' and [[https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema-zh-cn.json]] or [[https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json]]
     }
-    applyConfig(rc, finalChanges)
+    local suc = applyConfig(rc, uri, finalChanges)
+    if not suc then
+        return false
+    end
     util.saveFile(path, json.beautify(rc, { indent = '    ' }))
     return true
 end
@@ -310,17 +328,25 @@ function m.setConfig(changes, onlyMemory)
         return
     end
     xpcall(function ()
+        local ws = require 'workspace'
+        if #ws.folders == 0 then
+            tryModifyClient(finalChanges)
+            return
+        end
         tryModifyClientGlobal(finalChanges)
-        if tryModifySpecifiedConfig(finalChanges) then
-            return
+        for _, scp in ipairs(ws.folders) do
+            if tryModifySpecifiedConfig(scp.uri, finalChanges) then
+                goto CONTINUE
+            end
+            if tryModifyRC(scp.uri, finalChanges, false) then
+                goto CONTINUE
+            end
+            if tryModifyClient(finalChanges) then
+                goto CONTINUE
+            end
+            tryModifyRC(scp.uri, finalChanges, true)
+            ::CONTINUE::
         end
-        if tryModifyRC(finalChanges) then
-            return
-        end
-        if tryModifyClient(finalChanges) then
-            return
-        end
-        tryModifyRC(finalChanges, true)
     end, log.error)
 end
 

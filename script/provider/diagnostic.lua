@@ -283,7 +283,7 @@ function m.refresh(uri)
 end
 
 ---@async
-local function askForDisable()
+local function askForDisable(uri)
     if m.dontAskedForDisable then
         return
     end
@@ -315,6 +315,7 @@ local function askForDisable()
                 key    = 'Lua.diagnostics.workspaceDelay',
                 action = 'set',
                 value  = delay * 1000,
+                uri    = uri,
             }
         }
     elseif item.title == lang.script.WINDOW_DISABLE_DIAGNOSTIC then
@@ -323,6 +324,7 @@ local function askForDisable()
                 key    = 'Lua.diagnostics.workspaceDelay',
                 action = 'set',
                 value  = -1,
+                uri    = uri,
             }
         }
     end
@@ -351,7 +353,10 @@ function m.diagnosticsScope(uri, force)
         bar:onCancel(function ()
             log.debug('Cancel workspace diagnostics')
             cancelled = true
-            await.call(askForDisable)
+            ---@async
+            await.call(function ()
+                askForDisable(uri)
+            end)
         end)
         local uris = files.getAllUris()
         for i, uri in ipairs(uris) do

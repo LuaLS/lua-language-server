@@ -19,13 +19,13 @@ local json       = require 'json'
 local scope      = require 'workspace.scope'
 
 ---@async
-local function updateConfig()
-    local specified = cfgLoader.loadLocalConfig(CONFIGPATH)
+local function updateConfig(uri)
+    local specified = cfgLoader.loadLocalConfig(uri, CONFIGPATH)
     if specified then
         log.debug('Load config from specified', CONFIGPATH)
         log.debug(util.dump(specified))
         -- watch directory
-        filewatch.watch(workspace.getAbsolutePath(CONFIGPATH):gsub('[^/\\]+$', ''))
+        filewatch.watch(workspace.getAbsolutePath(uri, CONFIGPATH):gsub('[^/\\]+$', ''))
         config.update(scope.override, specified, json.null)
     end
 
@@ -66,13 +66,22 @@ function m.register(method)
 end
 
 filewatch.event(function (changes) ---@async
-    local configPath = CONFIGPATH and workspace.getAbsolutePath(CONFIGPATH)
-    local rcPath     = workspace.getAbsolutePath('.luarc.json')
     for _, change in ipairs(changes) do
-        if change.path == configPath
-        or change.path == rcPath then
-            updateConfig()
-            return
+        if (CONFIGPATH and util.stringEndWith(change.path, CONFIGPATH)) then
+            for _, scp in ipairs(workspace.folders) do
+                local configPath = workspace.getAbsolutePath(scp.uri, CONFIGPATH)
+                if change.path == configPath then
+                    updateConfig(scp.uri)
+                end
+            end
+        end
+        if util.stringEndWith(change.path, '.luarc.json') then
+            for _, scp in ipairs(workspace.folders) do
+                local rcPath     = workspace.getAbsolutePath(scp.uri, '.luarc.json')
+                if change.path == rcPath then
+                    updateConfig(scp.uri)
+                end
+            end
         end
     end
 end)
@@ -903,7 +912,9 @@ m.register '$/status/click' {
         end
         if result == titleDiagnostic then
             local diagnostic = require 'provider.diagnostic'
-            diagnostic.diagnosticsAll(true)
+            for _, scp in ipairs(workspace.folders) do
+                diagnostic.diagnosticsScope(scp.uri, true)
+            end
         end
     end
 }
@@ -1043,7 +1054,7 @@ end)
 m.register '$/status/refresh' { refreshStatusBar }
 
 files.watch(function (ev, uri)
-    if not workspace.isReady() then
+    if not workspace.isReady(uri) then
         return
     end
     if ev == 'update'

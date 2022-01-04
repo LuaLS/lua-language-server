@@ -57,7 +57,7 @@ end
 function mongo_db:auth(user, pass)
 
 end
----执行命令，命令的格式需要参考  https://docs.mongodb.com/manual/reference/command/,
+---执行命令，命令的格式需要参考  [https://docs.mongodb.com/manual/reference/command/]( https://docs.mongodb.com/manual/reference/command/),
 ---命令的键要单独分开来放，如 mongo_db:runCommand('find','account','limit','1')
 function mongo_db:runCommand(cmd, cmd_v, ...)
 end

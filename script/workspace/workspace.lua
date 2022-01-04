@@ -18,6 +18,21 @@ local m = {}
 m.type = 'workspace'
 ---@type scope[]
 m.folders = {}
+m.watchList = {}
+
+--- 注册事件
+---@param callback async fun(ev: string, uri: uri)
+function m.watch(callback)
+    m.watchList[#m.watchList+1] = callback
+end
+
+function m.onWatch(ev, uri)
+    for _, callback in ipairs(m.watchList) do
+        await.call(function ()
+            callback(ev, uri)
+        end)
+    end
+end
 
 function m.initRoot(uri)
     m.rootUri  = uri
@@ -433,6 +448,8 @@ function m.awaitReload(scp)
             waker()
         end
     end
+
+    m.onWatch('reload', scp.uri)
 end
 
 ---@param uri uri

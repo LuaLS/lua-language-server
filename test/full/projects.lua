@@ -42,7 +42,7 @@ local function doProjects(pathname)
     print('开始诊断...')
 
     ws.ready = true
-    diag.start()
+    diag.diagnosticsScope(furi.encode(path:string()))
 
     local clock = os.clock()
 

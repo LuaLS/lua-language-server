@@ -29,7 +29,7 @@ end
 print('基准诊断目录：', path)
 
 ws.ready = true
-diag.start()
+diag.diagnosticsScope(furi.encode(path:string()))
 
 local clock = os.clock()
 

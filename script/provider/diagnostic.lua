@@ -13,7 +13,6 @@ local converter = require 'proto.converter'
 
 ---@class diagnosticProvider
 local m = {}
-m._start = false
 m.cache = {}
 m.sleepRest = 0.0
 m.coroutineUri = setmetatable({}, { __mode = 'k' })
@@ -170,11 +169,7 @@ function m.syntaxErrors(uri, ast)
 end
 
 function m.diagnostics(uri, diags)
-    if not m._start then
-        return
-    end
-
-    if not ws.isReady() then
+    if not ws.isReady(uri) then
         return
     end
 
@@ -272,7 +267,7 @@ function m.doDiagnostic(uri)
 end
 
 function m.refresh(uri)
-    if not m._start then
+    if not ws.isReady(uri) then
         return
     end
     await.close('diag:' .. uri)
@@ -333,18 +328,12 @@ local function askForDisable()
     end
 end
 
-function m.diagnosticsAll(force)
-    for _, scp in ipairs(ws.folders) do
-        m.diagnosticsScope(scp.uri, force)
-    end
-end
-
 function m.diagnosticsScope(uri, force)
-    if not force and not config.get(uri, 'Lua.diagnostics.enable') then
-        m.clearAll()
+    if not ws.isReady(uri) then
         return
     end
-    if not m._start then
+    if not force and not config.get(uri, 'Lua.diagnostics.enable') then
+        m.clearAll()
         return
     end
     local delay = config.get(uri, 'Lua.diagnostics.workspaceDelay') / 1000
@@ -378,16 +367,6 @@ function m.diagnosticsScope(uri, force)
         bar:remove()
         log.debug('全文诊断耗时：', os.clock() - clock)
     end, 'files.version', 'diagnosticsScope')
-end
-
-function m.start()
-    m._start = true
-    m.diagnosticsAll()
-end
-
-function m.pause()
-    m._start = false
-    await.close 'diagnosticsScope'
 end
 
 function m.checkStepResult(uri)
@@ -426,6 +405,12 @@ function m.checkWorkspaceDiag(uri)
     m.diagnosticsAllClock = os.clock()
     return false
 end
+
+ws.watch(function (ev, uri)
+    if ev == 'reload' then
+        m.diagnosticsScope(uri)
+    end
+end)
 
 files.watch(function (ev, uri) ---@async
     if ev == 'remove' then

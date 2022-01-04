@@ -126,6 +126,19 @@ function m.request(name, params, callback)
     end
 end
 
+local secretOption = {
+    format = {
+        ['text'] = function (value, _, _, stack)
+            if  stack[1] == 'params'
+            and stack[2] == 'textDocument'
+            and stack[3] == nil then
+                return '"***"'
+            end
+            return ('%q'):format(value)
+        end
+    }
+}
+
 function m.doMethod(proto)
     logRecieve(proto)
     local method, optional = m.getMethodName(proto)
@@ -154,7 +167,7 @@ function m.doMethod(proto)
         local response <close> = function ()
             local passed = os.clock() - clock
             if passed > 0.2 then
-                log.debug(('Method [%s] takes [%.3f]sec. %s'):format(method, passed, util.dump(proto)))
+                log.debug(('Method [%s] takes [%.3f]sec. %s'):format(method, passed, util.dump(proto, secretOption)))
             end
             --log.debug('Finish method:', method)
             if not proto.id then

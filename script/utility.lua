@@ -94,8 +94,10 @@ function m.dump(tbl, option)
     end
     local lines = {}
     local mark = {}
+    local stack = {}
     lines[#lines+1] = '{'
-    local function unpack(tbl, deep)
+    local function unpack(tbl)
+        local deep = #stack
         mark[tbl] = (mark[tbl] or 0) + 1
         local keys = {}
         local keymap = {}
@@ -153,8 +155,9 @@ function m.dump(tbl, option)
             end
             local value = tbl[key]
             local tp = type(value)
-            if option['format'] and option['format'][key] then
-                lines[#lines+1] = ('%s%s%s,'):format(TAB[deep+1], keyWord, option['format'][key](value, unpack, deep+1))
+            local format = option['format'] and option['format'][key]
+            if format then
+                lines[#lines+1] = ('%s%s%s,'):format(TAB[deep+1], keyWord, format(value, unpack, deep+1, stack))
             elseif tp == 'table' then
                 if mark[value] and mark[value] > 0 then
                     lines[#lines+1] = ('%s%s%s,'):format(TAB[deep+1], keyWord, option['loop'] or '"<Loop>"')
@@ -162,7 +165,9 @@ function m.dump(tbl, option)
                     lines[#lines+1] = ('%s%s%s,'):format(TAB[deep+1], keyWord, '"<Deep>"')
                 else
                     lines[#lines+1] = ('%s%s{'):format(TAB[deep+1], keyWord)
-                    unpack(value, deep+1)
+                    stack[#stack+1] = key
+                    unpack(value)
+                    stack[#stack] = nil
                     lines[#lines+1] = ('%s},'):format(TAB[deep+1])
                 end
             elseif tp == 'string' then
@@ -176,7 +181,7 @@ function m.dump(tbl, option)
         end
         mark[tbl] = mark[tbl] - 1
     end
-    unpack(tbl, 0)
+    unpack(tbl)
     lines[#lines+1] = '}'
     return tableConcat(lines, '\r\n')
 end

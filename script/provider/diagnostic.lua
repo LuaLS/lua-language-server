@@ -249,7 +249,7 @@ function m.doDiagnostic(uri)
         end
     end
 
-    if await.hasID 'diagnosticsScope' then
+    if await.hasID('diagnosticsScope:' .. uri) then
         scp:set('diagStepPush', nil)
     else
         local clock = os.clock()
@@ -342,7 +342,7 @@ function m.diagnosticsScope(uri, force)
     if not force and delay < 0 then
         return
     end
-    await.close 'diagnosticsScope'
+    await.close ('diagnosticsScope:' .. uri)
     await.call(function () ---@async
         m.coroutineUri[coroutine.running()] = uri
         await.sleep(delay)
@@ -371,11 +371,11 @@ function m.diagnosticsScope(uri, force)
         end
         bar:remove()
         log.debug('全文诊断耗时：', os.clock() - clock)
-    end, 'files.version', 'diagnosticsScope')
+    end, 'files.version', ('diagnosticsScope:' .. uri))
 end
 
 function m.checkStepResult(uri)
-    if await.hasID 'diagnosticsScope' then
+    if await.hasID('diagnosticsScope:' .. uri) then
         return
     end
     local scp = ws.getScope(uri)
@@ -387,7 +387,7 @@ end
 
 ---@async
 function m.checkWorkspaceDiag(uri)
-    if not await.hasID 'diagnosticsScope' then
+    if not await.hasID('diagnosticsScope:' .. uri) then
         return
     end
     local speedRate = config.get(uri, 'Lua.diagnostics.workspaceRate')
@@ -440,6 +440,9 @@ end)
 await.watch(function (ev, co) ---@async
     if ev == 'delay' then
         local uri = m.coroutineUri[co]
+        if not uri then
+            return
+        end
         m.checkStepResult(uri)
         return m.checkWorkspaceDiag(uri)
     end

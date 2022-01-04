@@ -262,16 +262,28 @@ local function tryModifyRC(uri, finalChanges, create)
     return true
 end
 
-local function tryModifyClient(finalChanges)
+local function tryModifyClient(uri, finalChanges)
     if #finalChanges == 0 then
         return false
     end
     if not m.getOption 'changeConfiguration' then
         return false
     end
+    local ws = require 'workspace'
+    local scp = ws.getScope(uri)
+    local scpChanges = {}
+    for _, change in ipairs(finalChanges) do
+        if  change.uri
+        and (scp:isChildUri(change.uri) or scp:isLinkedUri(change.uri)) then
+            scpChanges[#scpChanges+1] = change
+        end
+    end
+    if #scpChanges == 0 then
+        return false
+    end
     proto.notify('$/command', {
         command   = 'lua.config',
-        data      = finalChanges,
+        data      = scpChanges,
     })
     return true
 end
@@ -341,7 +353,7 @@ function m.setConfig(changes, onlyMemory)
             if tryModifyRC(scp.uri, finalChanges, false) then
                 goto CONTINUE
             end
-            if tryModifyClient(finalChanges) then
+            if tryModifyClient(scp.uri, finalChanges) then
                 goto CONTINUE
             end
             tryModifyRC(scp.uri, finalChanges, true)

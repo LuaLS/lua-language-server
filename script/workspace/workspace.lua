@@ -244,8 +244,8 @@ end
 ---@async
 ---@param scp scope
 function m.awaitPreload(scp)
-    await.close 'preload'
-    await.setID 'preload'
+    await.close('preload:' .. scp.uri)
+    await.setID('preload:' .. scp.uri)
     await.sleep(0.1)
 
     local watchers = scp:get 'watchers'
@@ -282,9 +282,9 @@ function m.awaitPreload(scp)
         watchers[#watchers+1] = fw.watch(furi.decode(libMatcher.uri))
     end
 
-    log.info(('Found %d files.'):format(ld.max))
+    log.info(('Found %d files at:'):format(ld.max), scp.uri)
     ld:loadAll()
-    log.info('Preload finish.')
+    log.info('Preload finish at:', scp.uri)
 end
 
 --- 查找符合指定file path的所有uri
@@ -479,7 +479,11 @@ function m.getLoadingProcess(uri)
     local scp = m.getScope(uri)
     ---@type workspace.loading
     local ld  = scp:get 'loading'
-    return ld.read, ld.max
+    if ld then
+        return ld.read, ld.max
+    else
+        return 0, 0
+    end
 end
 
 files.watch(function (ev, uri) ---@async

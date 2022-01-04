@@ -1,4 +1,5 @@
 local scope = require 'workspace.scope'
+local ws    = require 'workspace'
 
 local collect    = {}
 local subscribed = {}
@@ -88,4 +89,28 @@ function m.each(uri, name)
     return getNext
 end
 
+--- 迭代某个名字的引用订阅
+---@param uri  uri
+---@param name string
+function m.eachRef(uri, name)
+    local nameCollect = collect[name]
+    if not nameCollect then
+        return DUMMY_FUNCTION
+    end
+    ---@type scope
+    if scope.getFolder(uri) then
+        return m.each(uri, name)
+    end
+
+    local curi, value
+    local function getNext()
+        curi, value = next(nameCollect, curi)
+        if not curi then
+            return nil, nil
+        end
+
+        return value, curi
+    end
+    return getNext
+end
 return m

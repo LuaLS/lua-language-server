@@ -27,6 +27,7 @@ local getUri       = guide.getUri
 local getRoot      = guide.getRoot
 
 local ceach        = collector.each
+local ceachref     = collector.eachRef
 
 local getState     = files.getState
 
@@ -844,7 +845,7 @@ function m.searchRefsByID(status, suri, expect, mode)
                 ::CONTINUE::
             end
         else
-            for _, guri in ceach(suri, id) do
+            for _, guri in ceachref(suri, id) do
                 if crossed[guri] then
                     goto CONTINUE
                 end
@@ -880,7 +881,7 @@ function m.searchRefsByID(status, suri, expect, mode)
                 ::CONTINUE::
             end
         else
-            for _, guri in ceach(suri, id) do
+            for _, guri in ceachref(suri, id) do
                 if crossed[guri] then
                     goto CONTINUE
                 end

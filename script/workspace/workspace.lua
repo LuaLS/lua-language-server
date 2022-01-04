@@ -138,8 +138,8 @@ end
 --- 创建代码库筛选器
 ---@param scp scope
 function m.getLibraryMatchers(scp)
-    if scp:get 'nativeMatcher' then
-        return scp:get 'nativeMatcher'
+    if scp:get 'libraryMatcher' then
+        return scp:get 'libraryMatcher'
     end
 
     local librarys = {}
@@ -169,7 +169,7 @@ function m.getLibraryMatchers(scp)
         end
     end
 
-    scp:set('nativeMatcher', matchers)
+    scp:set('libraryMatcher', matchers)
 
     return matchers
 end
@@ -418,7 +418,11 @@ end
 ---@async
 ---@param scp scope
 function m.awaitReload(scp)
+    scp:set('ready', false)
+    scp:set('nativeMatcher', nil)
+    scp:set('libraryMatcher', nil)
     m.flushFiles(scp)
+    files.flushAllLibrary(scp)
     plugin.init(scp)
     m.awaitPreload(scp)
     scp:set('ready', true)

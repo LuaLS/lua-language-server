@@ -464,7 +464,7 @@ function m.compileState(uri, text)
         end
         return nil
     end
-    local prog <close> = progress.create(lang.script.WINDOW_COMPILING, 0.5)
+    local prog <close> = progress.create(ws.getScope(uri), lang.script.WINDOW_COMPILING, 0.5)
     prog:setMessage(ws.getRelativePath(uri))
     local clock = os.clock()
     local state, err = parser.compile(text

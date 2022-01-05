@@ -220,7 +220,7 @@ function m.doDiagnostic(uri)
     local version = files.getVersion(uri)
     local scp = ws.getScope(uri)
 
-    local prog <close> = progress.create(lang.script.WINDOW_DIAGNOSING, 0.5)
+    local prog <close> = progress.create(scp, lang.script.WINDOW_DIAGNOSING, 0.5)
     prog:setMessage(ws.getRelativePath(uri))
 
     local syntax = m.syntaxErrors(uri, state)
@@ -249,7 +249,9 @@ function m.doDiagnostic(uri)
         end
     end
 
-    if await.hasID('diagnosticsScope:' .. uri) then
+    m.coroutineUri[coroutine.running()] = uri
+
+    if await.hasID('diagnosticsScope:' .. scp.uri) then
         scp:set('diagStepPush', nil)
     else
         local clock = os.clock()
@@ -262,6 +264,8 @@ function m.doDiagnostic(uri)
     end
 
     m.diagnostics(uri, diags)
+    await.sleep(1.0)
+    await.sleep(1.0)
     pushResult()
     scp:set('diagStepPush', nil)
 end
@@ -344,11 +348,10 @@ function m.diagnosticsScope(uri, force)
     end
     await.close ('diagnosticsScope:' .. uri)
     await.call(function () ---@async
-        m.coroutineUri[coroutine.running()] = uri
         await.sleep(delay)
         m.diagnosticsAllClock = os.clock()
         local clock = os.clock()
-        local bar <close> = progress.create(lang.script.WORKSPACE_DIAGNOSTIC, 1)
+        local bar <close> = progress.create(ws.getScope(uri), lang.script.WORKSPACE_DIAGNOSTIC, 1)
         local cancelled
         bar:onCancel(function ()
             log.debug('Cancel workspace diagnostics')
@@ -375,10 +378,10 @@ function m.diagnosticsScope(uri, force)
 end
 
 function m.checkStepResult(uri)
-    if await.hasID('diagnosticsScope:' .. uri) then
+    local scp = ws.getScope(uri)
+    if await.hasID('diagnosticsScope:' .. scp.uri) then
         return
     end
-    local scp = ws.getScope(uri)
     local stepPush = scp:get 'diagStepPush'
     if stepPush then
         stepPush()
@@ -422,11 +425,11 @@ files.watch(function (ev, uri) ---@async
         m.clear(uri)
         m.refresh(uri)
     elseif ev == 'update' then
-        if ws.isReady() then
+        if ws.isReady(uri) then
             m.refresh(uri)
         end
     elseif ev == 'open' then
-        if ws.isReady() then
+        if ws.isReady(uri) then
             xpcall(m.doDiagnostic, log.error, uri)
         end
     elseif ev == 'close' then

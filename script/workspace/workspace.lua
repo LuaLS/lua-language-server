@@ -455,6 +455,11 @@ function m.getScope(uri)
         or scope.fallback
 end
 
+---@return scope
+function m.getFirstScope()
+    return m.folders[1] or scope.fallback
+end
+
 ---等待工作目录加载完成
 ---@async
 function m.awaitReady(uri)

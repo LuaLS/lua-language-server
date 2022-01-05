@@ -24,10 +24,8 @@ local sfind        = string.find
 local sformat      = string.format
 
 local getUri       = guide.getUri
-local getRoot      = guide.getRoot
 
 local ceach        = collector.each
-local ceachref     = collector.each
 
 local getState     = files.getState
 
@@ -44,8 +42,6 @@ local eachBackward      = noder.eachBackward
 local eachExtend        = noder.eachExtend
 local eachSource        = noder.eachSource
 local compileAllNodes   = noder.compileAllNodes
-local compilePartNoders = noder.compilePartNodes
-local isGlobalID        = noder.isGlobalID
 local hasCall           = noder.hasCall
 
 local SPLIT_CHAR     = noder.SPLIT_CHAR
@@ -845,7 +841,7 @@ function m.searchRefsByID(status, suri, expect, mode)
                 ::CONTINUE::
             end
         else
-            for _, guri in ceachref(suri, id) do
+            for _, guri in ceach(suri, id) do
                 if crossed[guri] then
                     goto CONTINUE
                 end
@@ -881,7 +877,7 @@ function m.searchRefsByID(status, suri, expect, mode)
                 ::CONTINUE::
             end
         else
-            for _, guri in ceachref(suri, id) do
+            for _, guri in ceach(suri, id) do
                 if crossed[guri] then
                     goto CONTINUE
                 end

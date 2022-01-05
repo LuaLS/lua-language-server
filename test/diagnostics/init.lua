@@ -33,7 +33,7 @@ function TEST(script, ...)
     files.open('')
     local origins = {}
     local results = {}
-    core('', function (result)
+    core('', false, function (result)
         results[#results+1] = { result.start, result.finish }
         origins[#origins+1] = result
     end)

@@ -56,7 +56,7 @@ function TEST(datas)
     local results = {}
     for _, data in ipairs(datas) do
         local uri = furi.encode(data.path)
-        core(uri, function (result)
+        core(uri, false, function (result)
             results[#results+1] = {
                 result.start,
                 result.finish,

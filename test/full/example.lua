@@ -53,7 +53,7 @@ local function testIfExit(path)
         for i = 1, max do
             files.open('')
             files.setText('', buf)
-            diag('', function () end)
+            diag('', false, function () end)
             local passed = os.clock() - clock
             if passed >= 1.0 or i == max then
                 need = passed / i

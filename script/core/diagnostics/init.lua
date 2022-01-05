@@ -116,6 +116,8 @@ return function (uri, isScopeDiag, response, checked)
     for _, name in ipairs(diagList) do
         await.delay()
         check(uri, name, isScopeDiag, response)
-        checked(name)
+        if checked then
+            checked(name)
+        end
     end
 end

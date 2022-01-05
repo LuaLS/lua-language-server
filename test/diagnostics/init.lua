@@ -31,16 +31,10 @@ function TEST(script, ...)
     local newScript, catched = catch(script, '!')
     files.setText('', newScript)
     files.open('')
-    local datas = {}
-    core('', function (results)
-        for _, res in ipairs(results) do
-            datas[#datas+1] = res
-        end
-    end)
     local results = {}
-    for i, data in ipairs(datas) do
-        results[i] = { data.start, data.finish }
-    end
+    core('', function (result)
+        results[#results+1] = { result.start, result.finish }
+    end)
 
     if results[1] then
         if not founded(catched['!'] or {}, results) then

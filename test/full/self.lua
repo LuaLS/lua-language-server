@@ -36,7 +36,7 @@ local clock = os.clock()
 ---@diagnostic disable: await-in-sync
 for uri in files.eachFile() do
     local fileClock = os.clock()
-    diag.doDiagnostic(uri)
+    diag.doDiagnostic(uri, true)
     print('诊断文件耗时：', os.clock() - fileClock, uri)
 end
 

@@ -19,7 +19,7 @@ table.sort(diagList, function (a, b)
     return (diagSort[a] or 0) < (diagSort[b] or 0)
 end)
 
-local function check(uri, name, results)
+local function check(uri, name, response)
     if config.get(uri, 'Lua.diagnostics.disable')[name] then
         return
     end
@@ -53,7 +53,7 @@ local function check(uri, name, results)
         mark[result.start] = true
         result.level = severity or result.level
         result.code  = name
-        results[#results+1] = result
+        response(result)
     end, name)
     local passed = os.clock() - clock
     if passed >= 0.5 then
@@ -77,8 +77,6 @@ return function (uri, response)
 
     for _, name in ipairs(diagList) do
         await.delay()
-        local results = {}
-        check(uri, name, results)
-        response(results)
+        check(uri, name, response)
     end
 end

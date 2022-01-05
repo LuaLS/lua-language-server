@@ -53,24 +53,18 @@ function TEST(datas)
     end
 
 
-    local result = {}
+    local results = {}
     for _, data in ipairs(datas) do
         local uri = furi.encode(data.path)
-        local results = {}
         core(uri, function (result)
-            for _, res in ipairs(result) do
-                results[#results+1] = res
-            end
-        end)
-        for i, position in ipairs(results) do
-            result[i] = {
-                position.start,
-                position.finish,
+            results[#results+1] = {
+                result.start,
+                result.finish,
                 uri,
             }
-        end
+        end)
     end
-    assert(founded(targetList, result))
+    assert(founded(targetList, results))
 end
 
 TEST {

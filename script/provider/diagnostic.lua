@@ -15,7 +15,6 @@ local converter = require 'proto.converter'
 local m = {}
 m.cache = {}
 m.sleepRest = 0.0
-m.coroutineUri = setmetatable({}, { __mode = 'k' })
 
 local function concat(t, sep)
     if type(t) ~= 'table' then
@@ -173,18 +172,13 @@ function m.diagnostics(uri, diags)
         return
     end
 
-    xpcall(core, log.error, uri, function (results)
-        if #results == 0 then
-            return
-        end
-        for i = 1, #results do
-            diags[#diags+1] = buildDiagnostic(uri, results[i])
-        end
+    xpcall(core, log.error, uri, function (result)
+        diags[#diags+1] = buildDiagnostic(uri, result)
     end)
 end
 
 ---@async
-function m.doDiagnostic(uri)
+function m.doDiagnostic(uri, isScopeDiag)
     if not config.get(uri, 'Lua.diagnostics.enable') then
         return
     end
@@ -249,25 +243,8 @@ function m.doDiagnostic(uri)
         end
     end
 
-    m.coroutineUri[coroutine.running()] = uri
-
-    if await.hasID('diagnosticsScope:' .. scp.uri) then
-        scp:set('diagStepPush', nil)
-    else
-        local clock = os.clock()
-        scp:set('diagStepPush', function ()
-            if os.clock() - clock >= 0.2 then
-                pushResult()
-                clock = os.clock()
-            end
-        end)
-    end
-
     m.diagnostics(uri, diags)
-    await.sleep(1.0)
-    await.sleep(1.0)
     pushResult()
-    scp:set('diagStepPush', nil)
 end
 
 function m.refresh(uri)
@@ -365,7 +342,7 @@ function m.diagnosticsScope(uri, force)
         for i, uri in ipairs(uris) do
             bar:setMessage(('%d/%d'):format(i, #uris))
             bar:setPercentage(i / #uris * 100)
-            xpcall(m.doDiagnostic, log.error, uri)
+            xpcall(m.doDiagnostic, log.error, uri, true)
             await.delay()
             if cancelled then
                 log.debug('Break workspace diagnostics')
@@ -375,17 +352,6 @@ function m.diagnosticsScope(uri, force)
         bar:remove()
         log.debug('全文诊断耗时：', os.clock() - clock)
     end, 'files.version', ('diagnosticsScope:' .. uri))
-end
-
-function m.checkStepResult(uri)
-    local scp = ws.getScope(uri)
-    if await.hasID('diagnosticsScope:' .. scp.uri) then
-        return
-    end
-    local stepPush = scp:get 'diagStepPush'
-    if stepPush then
-        stepPush()
-    end
 end
 
 ---@async
@@ -437,17 +403,6 @@ files.watch(function (ev, uri) ---@async
         or ws.isIgnored(uri) then
             m.clear(uri)
         end
-    end
-end)
-
-await.watch(function (ev, co) ---@async
-    if ev == 'delay' then
-        local uri = m.coroutineUri[co]
-        if not uri then
-            return
-        end
-        m.checkStepResult(uri)
-        return m.checkWorkspaceDiag(uri)
     end
 end)
 

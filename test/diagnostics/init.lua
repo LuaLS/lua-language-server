@@ -31,9 +31,11 @@ function TEST(script, ...)
     local newScript, catched = catch(script, '!')
     files.setText('', newScript)
     files.open('')
+    local origins = {}
     local results = {}
     core('', function (result)
         results[#results+1] = { result.start, result.finish }
+        origins[#origins+1] = result
     end)
 
     if results[1] then
@@ -1411,6 +1413,49 @@ local function f(cb)
 end
 
 <!f!>(function () ---@async
+    return nil
+end)
+]]
+
+TEST [[
+---@param c any
+local function f(c)
+    return c
+end
+
+f(function () ---@async
+    return nil
+end)
+]]
+
+TEST [[
+---@param ... any
+local function f(...)
+    return ...
+end
+
+f(function () ---@async
+    return nil
+end)
+]]
+
+TEST [[
+---@vararg any
+local function f(...)
+    return ...
+end
+
+f(function () ---@async
+    return nil
+end)
+]]
+
+TEST [[
+local function f(...)
+    return ...
+end
+
+f(function () ---@async
     return nil
 end)
 ]]

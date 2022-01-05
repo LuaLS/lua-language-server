@@ -60,6 +60,82 @@ end
 
 local DUMMY_FUNCTION = function () end
 
+---@param scp scope
+local function eachOfFolder(nameCollect, scp)
+    local curi, value
+
+    local function getNext()
+        curi, value = next(nameCollect, curi)
+        if not curi then
+            return nil, nil
+        end
+        if scp:isChildUri(curi)
+        or scp:isLinkedUri(curi) then
+            return value, curi
+        end
+        return getNext()
+    end
+
+    return getNext
+end
+
+---@param scp scope
+local function eachOfLinked(nameCollect, scp)
+    local curi, value
+
+    local function getNext()
+        curi, value = next(nameCollect, curi)
+        if not curi then
+            return nil, nil
+        end
+        if  scp:isChildUri(curi)
+        and scp:isLinkedUri(curi) then
+            return value, curi
+        end
+
+        local cscp =   scope.getFolder(curi)
+                    or scope.getLinkedScope(curi)
+                    or scope.fallback
+
+        if cscp == scp
+        or cscp:isChildUri(scp.uri)
+        or cscp:isLinkedUri(scp.uri) then
+            return value, curi
+        end
+
+        return getNext()
+    end
+
+    return getNext
+end
+
+---@param scp scope
+local function eachOfFallback(nameCollect, scp)
+    local curi, value
+
+    local function getNext()
+        curi, value = next(nameCollect, curi)
+        if not curi then
+            return nil, nil
+        end
+        if scp:isLinkedUri(curi) then
+            return value, curi
+        end
+
+        local cscp =   scope.getFolder(curi)
+                    or scope.getLinkedScope(curi)
+                    or scope.fallback
+
+        if cscp == scp then
+            return value, curi
+        end
+
+        return getNext()
+    end
+
+    return getNext
+end
+
 --- 迭代某个名字的订阅
 ---@param uri  uri
 ---@param name string
@@ -68,25 +144,20 @@ function m.each(uri, name)
     if not nameCollect then
         return DUMMY_FUNCTION
     end
-    ---@type scope
+
     local scp = scope.getFolder(uri)
-            or  scope.getLinkedScope(uri)
-            or  scope.fallback
 
-    local curi, value
-    local function getNext()
-        curi, value = next(nameCollect, curi)
-        if not curi then
-            return nil, nil
-        end
-        if  not scp:isChildUri(curi)
-        and not scp:isLinkedUri(curi) then
-            return getNext()
-        end
-
-        return value, curi
+    if scp then
+        return eachOfFolder(nameCollect, scp)
     end
-    return getNext
+
+    scp = scope.getLinkedScope(uri)
+
+    if scp then
+        return eachOfLinked(nameCollect, scp)
+    end
+
+    return eachOfFallback(nameCollect, scope.fallback)
 end
 
 --- 迭代某个名字的引用订阅

@@ -27,7 +27,7 @@ local getUri       = guide.getUri
 local getRoot      = guide.getRoot
 
 local ceach        = collector.each
-local ceachref     = collector.eachRef
+local ceachref     = collector.each
 
 local getState     = files.getState
 

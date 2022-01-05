@@ -495,12 +495,9 @@ function m.init()
         return
     end
     m.inited = true
-    if #ws.folders == 0 then
-        initBuiltIn(nil)
-    else
-        for _, scp in ipairs(ws.folders) do
-            initBuiltIn(scp.uri)
-        end
+    initBuiltIn(nil)
+    for _, scp in ipairs(ws.folders) do
+        initBuiltIn(scp.uri)
     end
 end
 

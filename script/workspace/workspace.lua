@@ -100,8 +100,8 @@ function m.getNativeMatcher(scp)
             pattern[#pattern+1] = path
         end
     end
-    if config.get(scp.uri, 'Lua.workspace.useGitIgnore') then
-        local buf = pub.awaitTask('loadFile', m.rootUri .. '/.gitignore')
+    if scp.uri and config.get(scp.uri, 'Lua.workspace.useGitIgnore') then
+        local buf = pub.awaitTask('loadFile', scp.uri .. '/.gitignore')
         if buf then
             for line in buf:gmatch '[^\r\n]+' do
                 if line:sub(1, 1) ~= '#' then
@@ -110,7 +110,7 @@ function m.getNativeMatcher(scp)
                 end
             end
         end
-        buf = pub.awaitTask('loadFile', m.rootUri .. '/.git/info/exclude')
+        buf = pub.awaitTask('loadFile', scp.uri .. '/.git/info/exclude')
         if buf then
             for line in buf:gmatch '[^\r\n]+' do
                 if line:sub(1, 1) ~= '#' then
@@ -120,8 +120,8 @@ function m.getNativeMatcher(scp)
             end
         end
     end
-    if config.get(scp.uri, 'Lua.workspace.ignoreSubmodules') then
-        local buf = pub.awaitTask('loadFile', m.rootUri .. '/.gitmodules')
+    if scp.uri and config.get(scp.uri, 'Lua.workspace.ignoreSubmodules') then
+        local buf = pub.awaitTask('loadFile', scp.uri .. '/.gitmodules')
         if buf then
             for path in buf:gmatch('path = ([^\r\n]+)') do
                 log.info('Ignore by .gitmodules:', path)
@@ -244,8 +244,9 @@ end
 ---@async
 ---@param scp scope
 function m.awaitPreload(scp)
-    await.close('preload:' .. scp.uri)
-    await.setID('preload:' .. scp.uri)
+    local displayedUri = scp.uri or '<fallback>'
+    await.close('preload:' .. displayedUri)
+    await.setID('preload:' .. displayedUri)
     await.sleep(0.1)
 
     local watchers = scp:get 'watchers'
@@ -260,13 +261,13 @@ function m.awaitPreload(scp)
     local ld <close> = loading.create(scp)
     scp:set('loading', ld)
 
-    log.info('Preload start:', scp.uri)
+    log.info('Preload start:', displayedUri)
 
     local native   = m.getNativeMatcher(scp)
     local librarys = m.getLibraryMatchers(scp)
 
-    do
-        log.info('Scan files at:', m.rootUri)
+    if scp.uri then
+        log.info('Scan files at:', displayedUri)
         ---@async
         native:scan(furi.decode(scp.uri), function (path)
             ld:loadFile(furi.encode(path))
@@ -282,9 +283,9 @@ function m.awaitPreload(scp)
         watchers[#watchers+1] = fw.watch(furi.decode(libMatcher.uri))
     end
 
-    log.info(('Found %d files at:'):format(ld.max), scp.uri)
+    log.info(('Found %d files at:'):format(ld.max), displayedUri)
     ld:loadAll()
-    log.info('Preload finish at:', scp.uri)
+    log.info('Preload finish at:', displayedUri)
 end
 
 --- 查找符合指定file path的所有uri
@@ -397,9 +398,8 @@ function m.init()
         for _, folder in ipairs(scope.folders) do
             m.reload(folder)
         end
-    else
-        m.reload(scope.fallback)
     end
+    m.reload(scope.fallback)
 end
 
 ---@param scp scope

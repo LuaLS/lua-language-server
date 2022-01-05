@@ -167,16 +167,6 @@ function m.syntaxErrors(uri, ast)
     return results
 end
 
-function m.diagnostics(uri, diags)
-    if not ws.isReady(uri) then
-        return
-    end
-
-    xpcall(core, log.error, uri, function (result)
-        diags[#diags+1] = buildDiagnostic(uri, result)
-    end)
-end
-
 ---@async
 function m.doDiagnostic(uri, isScopeDiag)
     if not config.get(uri, 'Lua.diagnostics.enable') then
@@ -243,7 +233,17 @@ function m.doDiagnostic(uri, isScopeDiag)
         end
     end
 
-    m.diagnostics(uri, diags)
+    pushResult()
+
+    local lastPushClock = os.clock()
+    xpcall(core, log.error, uri, function (result)
+        diags[#diags+1] = buildDiagnostic(uri, result)
+        if not isScopeDiag and os.clock() - lastPushClock >= 0.2 then
+            lastPushClock = os.clock()
+            pushResult()
+        end
+    end)
+
     pushResult()
 end
 

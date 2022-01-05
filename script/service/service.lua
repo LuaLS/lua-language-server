@@ -191,17 +191,19 @@ function m.reportStatus()
         info.text = '😺Lua'
     end
 
-    local roots = {}
-    for i, scp in ipairs(ws.folders) do
-        roots[i] = furi.decode(scp.uri)
-    end
-
-    info.tooltip = lang.script('WINDOW_LUA_STATUS', {
-        ws  = table.concat(roots, ';'),
+    local tooltips = {}
+    local params = {
         ast = files.astCount,
         max = files.fileCount,
         mem = collectgarbage('count') / 1000,
-    })
+    }
+    for i, scp in ipairs(ws.folders) do
+        tooltips[i] = lang.script('WINDOW_LUA_STATUS_WORKSPACE', furi.decode(scp.uri))
+    end
+    tooltips[#tooltips+1] = lang.script('WINDOW_LUA_STATUS_CACHED_FILES', params)
+    tooltips[#tooltips+1] = lang.script('WINDOW_LUA_STATUS_MEMORY_COUNT', params)
+
+    info.tooltip = table.concat(tooltips, '\n')
     if util.equal(m.lastInfo, info) then
         return
     end

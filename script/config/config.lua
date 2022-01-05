@@ -221,6 +221,10 @@ m.watchList = {}
 
 m.NULL = {}
 
+m.nullSymbols = {
+    [m.NULL] = true,
+}
+
 ---@param scp      scope
 ---@param key      string
 ---@param nowValue any
@@ -229,12 +233,8 @@ local function update(scp, key, nowValue, rawValue)
     local now = scp:get 'config.now'
     local raw = scp:get 'config.raw'
 
-    local oldValue = now[key]
-
     now[key] = nowValue
     raw[key] = rawValue
-
-    m.event(scp.uri, key, nowValue, oldValue)
 end
 
 ---@param uri uri
@@ -285,7 +285,14 @@ end
 ---@param value any
 function m.set(uri, key, value)
     local scp = getScope(uri)
-    return m.setByScope(scp, key, value)
+    local oldValue = m.get(uri, key)
+    m.setByScope(scp, key, value)
+    local newValue = m.get(uri, key)
+    if not util.equal(oldValue, newValue) then
+        m.event(uri, key, newValue, oldValue)
+        return true
+    end
+    return false
 end
 
 function m.add(uri, key, value)
@@ -305,7 +312,14 @@ function m.add(uri, key, value)
         copyed[i] = v
     end
     copyed[#copyed+1] = value
-    return m.set(uri, key, copyed)
+    local oldValue = m.get(uri, key)
+    m.set(uri, key, copyed)
+    local newValue = m.get(uri, key)
+    if not util.equal(oldValue, newValue) then
+        m.event(uri, key, newValue, oldValue)
+        return true
+    end
+    return false
 end
 
 function m.prop(uri, key, prop, value)
@@ -325,7 +339,14 @@ function m.prop(uri, key, prop, value)
         copyed[k] = v
     end
     copyed[prop] = value
-    return m.set(uri, key, copyed)
+    local oldValue = m.get(uri, key)
+    m.set(uri, key, copyed)
+    local newValue = m.get(uri, key)
+    if not util.equal(oldValue, newValue) then
+        m.event(uri, key, newValue, oldValue)
+        return true
+    end
+    return false
 end
 
 ---@param uri uri
@@ -358,18 +379,13 @@ function m.getRaw(uri, key)
     return value
 end
 
----@param scp scope
-function m.clean(scp)
-    scp:set('config.now', {})
-    scp:set('config.raw', {})
-end
-
 ---@param scp  scope
----@param new  table
----@param null any
-function m.update(scp, new, null)
-    local newConfig = scp:get 'config.now'
-    local oldConfig = util.deepCopy(newConfig)
+---@param ...  table
+function m.update(scp, ...)
+    local oldConfig = scp:get 'config.now'
+    local newConfig = {}
+    scp:set('config.now', newConfig)
+    scp:set('config.raw', {})
 
     local function expand(t, left)
         for key, value in pairs(t) do
@@ -377,7 +393,7 @@ function m.update(scp, new, null)
             if left then
                 fullKey = left .. '.' .. key
             end
-            if value == null then
+            if m.nullSymbols[value] then
                 value = m.NULL
             end
             if Template[fullKey] then
@@ -390,12 +406,20 @@ function m.update(scp, new, null)
         end
     end
 
-    expand(new)
+    local news = table.pack(...)
+    for i = 1, news.n do
+        if news[i] then
+            expand(news[i])
+        end
+    end
 
     -- compare then fire event
     if oldConfig then
         for key, oldValue in pairs(oldConfig) do
-            m.event(scp.uri, key, oldValue, newConfig[key])
+            local newValue = newConfig[key]
+            if not util.equal(oldValue, newValue) then
+                m.event(scp.uri, key, oldValue, newValue)
+            end
         end
     end
 end
@@ -406,11 +430,11 @@ function m.watch(callback)
 end
 
 function m.event(uri, key, value, oldValue)
-    if not m.delay then
-        m.delay = {}
+    if not m.changes then
+        m.changes = {}
         timer.wait(0, function ()
-            local delay = m.delay
-            m.delay = nil
+            local delay = m.changes
+            m.changes = nil
             for _, info in ipairs(delay) do
                 for _, callback in ipairs(m.watchList) do
                     callback(info.uri, info.key, info.value, info.oldValue)
@@ -418,12 +442,16 @@ function m.event(uri, key, value, oldValue)
             end
         end)
     end
-    m.delay[#m.delay+1] = {
+    m.changes[#m.changes+1] = {
         uri      = uri,
         key      = key,
         value    = value,
         oldValue = oldValue,
     }
+end
+
+function m.addNullSymbol(null)
+    m.nullSymbols[null] = true
 end
 
 m.update(scope.fallback, {})

@@ -20,40 +20,36 @@ local scope      = require 'workspace.scope'
 
 ---@async
 local function updateConfig(uri)
+    config.addNullSymbol(json.null)
     local specified = cfgLoader.loadLocalConfig(uri, CONFIGPATH)
-    config.clean(scope.override)
     if specified then
         log.debug('Load config from specified', CONFIGPATH)
         log.debug(util.dump(specified))
         -- watch directory
         filewatch.watch(workspace.getAbsolutePath(uri, CONFIGPATH):gsub('[^/\\]+$', ''))
-        config.update(scope.override, specified, json.null)
+        config.update(scope.override, specified)
     end
 
     for _, folder in ipairs(scope.folders) do
-        local uri = folder.uri
-
-        config.clean(folder)
-        local clientConfig = cfgLoader.loadClientConfig(uri)
+        local clientConfig = cfgLoader.loadClientConfig(folder.uri)
         if clientConfig then
-            log.debug('Load config from client', uri)
+            log.debug('Load config from client', folder.uri)
             log.debug(util.dump(clientConfig))
-            config.update(folder, clientConfig, json.null)
         end
 
-        local rc = cfgLoader.loadRCConfig(uri, '.luarc.json')
+        local rc = cfgLoader.loadRCConfig(folder.uri, '.luarc.json')
         if rc then
-            log.debug('Load config from luarc.json', uri)
+            log.debug('Load config from luarc.json', folder.uri)
             log.debug(util.dump(rc))
-            config.update(folder, rc, json.null)
         end
+
+        config.update(folder, clientConfig, rc)
     end
 
     local global = cfgLoader.loadClientConfig()
     log.debug('Load config from client', 'fallback')
     log.debug(util.dump(global))
-    config.clean(scope.fallback)
-    config.update(scope.fallback, global, json.null)
+    config.update(scope.fallback, global)
 end
 
 ---@class provider

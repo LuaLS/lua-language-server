@@ -1800,4 +1800,4 @@ local <?x?> = 1 // 2
 [[
 local x: integer = 1
 ]]
-config.set(nil, 'runtime.nonstandardSymbol', {})
+config.set(nil, 'Lua.runtime.nonstandardSymbol', {})

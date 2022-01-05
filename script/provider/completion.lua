@@ -71,6 +71,10 @@ local function disable(uri)
 end
 
 config.watch(function (uri, key, value)
+    if key == '' then
+        key   = 'Lua.completion.enable'
+        value = config.get(uri, key)
+    end
     if key == 'Lua.completion.enable' then
         if value == true then
             enable(uri)

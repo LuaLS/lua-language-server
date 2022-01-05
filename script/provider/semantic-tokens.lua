@@ -110,6 +110,10 @@ local function refresh()
 end
 
 config.watch(function (uri, key, value, oldValue)
+    if key == '' then
+        key   = 'Lua.color.mode'
+        value = config.get(uri, key)
+    end
     if key == 'Lua.color.mode' then
         if value == 'Semantic' or value == 'SemanticEnhanced' then
             if isEnable and value ~= oldValue then

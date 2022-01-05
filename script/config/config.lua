@@ -418,10 +418,12 @@ function m.update(scp, ...)
         for key, oldValue in pairs(oldConfig) do
             local newValue = newConfig[key]
             if not util.equal(oldValue, newValue) then
-                m.event(scp.uri, key, oldValue, newValue)
+                m.event(scp.uri, key, newValue, oldValue)
             end
         end
     end
+
+    m.event(scp.uri, '')
 end
 
 ---@param callback fun(uri: uri, key: string, value: any, oldValue: any)

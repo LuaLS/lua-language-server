@@ -21,6 +21,7 @@ local scope      = require 'workspace.scope'
 ---@async
 local function updateConfig(uri)
     local specified = cfgLoader.loadLocalConfig(uri, CONFIGPATH)
+    config.clean(scope.override)
     if specified then
         log.debug('Load config from specified', CONFIGPATH)
         log.debug(util.dump(specified))
@@ -32,6 +33,7 @@ local function updateConfig(uri)
     for _, folder in ipairs(scope.folders) do
         local uri = folder.uri
 
+        config.clean(folder)
         local clientConfig = cfgLoader.loadClientConfig(uri)
         if clientConfig then
             log.debug('Load config from client', uri)
@@ -50,6 +52,7 @@ local function updateConfig(uri)
     local global = cfgLoader.loadClientConfig()
     log.debug('Load config from client', 'fallback')
     log.debug(util.dump(global))
+    config.clean(scope.fallback)
     config.update(scope.fallback, global, json.null)
 end
 

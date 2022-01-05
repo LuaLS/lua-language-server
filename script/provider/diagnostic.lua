@@ -168,28 +168,6 @@ function m.syntaxErrors(uri, ast)
 end
 
 ---@async
-local function checkSleep(uri)
-    local speedRate = config.get(uri, 'Lua.diagnostics.workspaceRate')
-    if speedRate <= 0 or speedRate >= 100 then
-        return
-    end
-    local currentClock = os.clock()
-    local passed = currentClock - m.diagnosticsAllClock
-    local sleepTime = passed * (100 - speedRate) / speedRate + m.sleepRest
-    m.sleepRest = 0.0
-    if sleepTime < 0.001 then
-        m.sleepRest = m.sleepRest + sleepTime
-        return
-    end
-    if sleepTime > 0.1 then
-        m.sleepRest = sleepTime - 0.1
-        sleepTime = 0.1
-    end
-    await.sleep(sleepTime)
-    m.diagnosticsAllClock = os.clock()
-end
-
----@async
 function m.doDiagnostic(uri, isScopeDiag)
     if not config.get(uri, 'Lua.diagnostics.enable') then
         return
@@ -265,10 +243,6 @@ function m.doDiagnostic(uri, isScopeDiag)
         if not isScopeDiag and os.clock() - lastPushClock >= 0.2 then
             lastPushClock = os.clock()
             pushResult()
-        end
-
-        if isScopeDiag then
-            checkSleep(uri)
         end
     end)
 
@@ -354,7 +328,6 @@ function m.diagnosticsScope(uri, force)
     await.close ('diagnosticsScope:' .. uri)
     await.call(function () ---@async
         await.sleep(delay)
-        m.diagnosticsAllClock = os.clock()
         local clock = os.clock()
         local bar <close> = progress.create(ws.getScope(uri), lang.script.WORKSPACE_DIAGNOSTIC, 1)
         local cancelled

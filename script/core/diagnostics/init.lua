@@ -19,6 +19,32 @@ table.sort(diagList, function (a, b)
     return (diagSort[a] or 0) < (diagSort[b] or 0)
 end)
 
+local sleepRest = 0.0
+
+---@async
+local function checkSleep(uri, passed)
+    local speedRate = config.get(uri, 'Lua.diagnostics.workspaceRate')
+    if speedRate <= 0 or speedRate >= 100 then
+        return
+    end
+    local sleepTime = passed * (100 - speedRate) / speedRate
+    if sleepTime + sleepRest < 0.001 then
+        sleepRest = sleepRest + sleepTime
+        return
+    end
+    sleepRest = sleepTime + sleepRest
+    sleepTime = sleepRest
+    if sleepTime > 0.1 then
+        sleepTime = 0.1
+    end
+    local clock = os.clock()
+    await.sleep(sleepTime)
+    local sleeped = os.clock() - clock
+
+    sleepRest = sleepRest - sleeped
+end
+
+---@async
 ---@param uri uri
 ---@param name string
 ---@param response async fun(result: any)
@@ -63,6 +89,7 @@ local function check(uri, name, response)
     if passed >= 0.5 then
         log.warn(('Diagnostics [%s] @ [%s] takes [%.3f] sec!'):format(name, uri, passed))
     end
+    checkSleep(uri, passed)
     if DIAGTIMES then
         DIAGTIMES[name] = (DIAGTIMES[name] or 0) + passed
     end

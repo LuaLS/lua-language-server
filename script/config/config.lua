@@ -358,15 +358,18 @@ function m.getRaw(uri, key)
     return value
 end
 
+---@param scp scope
+function m.clean(scp)
+    scp:set('config.now', {})
+    scp:set('config.raw', {})
+end
+
 ---@param scp  scope
 ---@param new  table
 ---@param null any
 function m.update(scp, new, null)
-    local oldConfig = scp:get 'config.now'
-    local newConfig = {}
-
-    scp:set('config.now', newConfig)
-    scp:set('config.raw', {})
+    local newConfig = scp:get 'config.now'
+    local oldConfig = util.deepCopy(newConfig)
 
     local function expand(t, left)
         for key, value in pairs(t) do

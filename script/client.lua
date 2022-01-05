@@ -6,6 +6,7 @@ local define    = require 'proto.define'
 local config    = require 'config'
 local converter = require 'proto.converter'
 local json      = require 'json-beautify'
+local await     = require 'await'
 
 local m = {}
 
@@ -108,10 +109,8 @@ end
 ---@param type message.type
 ---@param message string
 ---@param titles  string[]
----@return string action
----@return integer index
----@async
-function m.awaitRequestMessage(type, message, titles)
+---@param callback fun(action: string, index: integer)
+function m.requestMessage(type, message, titles, callback)
     proto.notify('window/logMessage', {
         type = define.MessageType[type] or 3,
         message = message,
@@ -124,15 +123,29 @@ function m.awaitRequestMessage(type, message, titles)
         }
         map[title] = i
     end
-    local item = proto.awaitRequest('window/showMessageRequest', {
+    proto.request('window/showMessageRequest', {
         type    = define.MessageType[type] or 3,
         message = message,
         actions = actions,
-    })
-    if not item then
-        return nil
-    end
-    return item.title, map[item.title]
+    }, function (item)
+        if item then
+            callback(item.title, map[item.title])
+        else
+            callback(nil, nil)
+        end
+    end)
+end
+
+---@param type message.type
+---@param message string
+---@param titles  string[]
+---@return string action
+---@return integer index
+---@async
+function m.awaitRequestMessage(type, message, titles)
+    return await.wait(function (waker)
+        m.requestMessage(type, message, titles, waker)
+    end)
 end
 
 ---@param type message.type
@@ -187,35 +200,49 @@ end
 ---@field uri?      uri
 
 ---@param cfg table
+---@param uri uri
 ---@param changes config.change[]
-local function applyConfig(cfg, changes)
+---@return boolean
+local function applyConfig(cfg, uri, changes)
+    local ws = require 'workspace'
+    local scp = ws.getScope(uri)
+    local ok = false
     for _, change in ipairs(changes) do
-        cfg[change.key] = config.getRaw(change.key)
+        if scp:isChildUri(change.uri)
+        or scp:isLinkedUri(change.uri) then
+            cfg[change.key] = config.getRaw(change.uri, change.key)
+            ok = true
+        end
     end
+    return ok
 end
 
-local function tryModifySpecifiedConfig(finalChanges)
+local function tryModifySpecifiedConfig(uri, finalChanges)
     if #finalChanges == 0 then
         return false
     end
     local workspace = require 'workspace'
     local loader    = require 'config.loader'
-    if loader.lastLocalType ~= 'json' then
+    local scp = workspace.getScope(uri)
+    if scp:get('lastLocalType') ~= 'json' then
         return false
     end
-    applyConfig(loader.lastLocalConfig, finalChanges)
-    local path = workspace.getAbsolutePath(CONFIGPATH)
-    util.saveFile(path, json.beautify(loader.lastLocalConfig, { indent = '    ' }))
+    local suc = applyConfig(scp:get('lastLocalConfig'), uri, finalChanges)
+    if not suc then
+        return false
+    end
+    local path = workspace.getAbsolutePath(uri, CONFIGPATH)
+    util.saveFile(path, json.beautify(scp:get('lastLocalConfig'), { indent = '    ' }))
     return true
 end
 
-local function tryModifyRC(finalChanges, create)
+local function tryModifyRC(uri, finalChanges, create)
     if #finalChanges == 0 then
         return false
     end
     local workspace = require 'workspace'
     local loader    = require 'config.loader'
-    local path = workspace.getAbsolutePath '.luarc.json'
+    local path = workspace.getAbsolutePath(uri, '.luarc.json')
     if not path then
         return false
     end
@@ -223,24 +250,40 @@ local function tryModifyRC(finalChanges, create)
     if not buf and not create then
         return false
     end
-    local rc = loader.lastRCConfig or {
+    local scp = workspace.getScope(uri)
+    local rc = scp:get('lastRCConfig') or {
         ['$schema'] = lang.id == 'zh-cn' and [[https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema-zh-cn.json]] or [[https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json]]
     }
-    applyConfig(rc, finalChanges)
+    local suc = applyConfig(rc, uri, finalChanges)
+    if not suc then
+        return false
+    end
     util.saveFile(path, json.beautify(rc, { indent = '    ' }))
     return true
 end
 
-local function tryModifyClient(finalChanges)
+local function tryModifyClient(uri, finalChanges)
     if #finalChanges == 0 then
         return false
     end
     if not m.getOption 'changeConfiguration' then
         return false
     end
+    local ws = require 'workspace'
+    local scp = ws.getScope(uri)
+    local scpChanges = {}
+    for _, change in ipairs(finalChanges) do
+        if  change.uri
+        and (scp:isChildUri(change.uri) or scp:isLinkedUri(change.uri)) then
+            scpChanges[#scpChanges+1] = change
+        end
+    end
+    if #scpChanges == 0 then
+        return false
+    end
     proto.notify('$/command', {
         command   = 'lua.config',
-        data      = finalChanges,
+        data      = scpChanges,
     })
     return true
 end
@@ -274,22 +317,21 @@ function m.setConfig(changes, onlyMemory)
     local finalChanges = {}
     for _, change in ipairs(changes) do
         if change.action == 'add' then
-            local suc = config.add(change.key, change.value)
+            local suc = config.add(change.uri, change.key, change.value)
             if suc then
                 finalChanges[#finalChanges+1] = change
             end
         elseif change.action == 'set' then
-            local suc = config.set(change.key, change.value)
+            local suc = config.set(change.uri, change.key, change.value)
             if suc then
                 finalChanges[#finalChanges+1] = change
             end
         elseif change.action == 'prop' then
-            local suc = config.prop(change.key, change.prop, change.value)
+            local suc = config.prop(change.uri, change.key, change.prop, change.value)
             if suc then
                 finalChanges[#finalChanges+1] = change
             end
         end
-        change.uri = m.info.rootUri
     end
     if onlyMemory then
         return
@@ -298,17 +340,25 @@ function m.setConfig(changes, onlyMemory)
         return
     end
     xpcall(function ()
+        local ws = require 'workspace'
+        if #ws.folders == 0 then
+            tryModifyClient(finalChanges)
+            return
+        end
         tryModifyClientGlobal(finalChanges)
-        if tryModifySpecifiedConfig(finalChanges) then
-            return
+        for _, scp in ipairs(ws.folders) do
+            if tryModifySpecifiedConfig(scp.uri, finalChanges) then
+                goto CONTINUE
+            end
+            if tryModifyRC(scp.uri, finalChanges, false) then
+                goto CONTINUE
+            end
+            if tryModifyClient(scp.uri, finalChanges) then
+                goto CONTINUE
+            end
+            tryModifyRC(scp.uri, finalChanges, true)
+            ::CONTINUE::
         end
-        if tryModifyRC(finalChanges) then
-            return
-        end
-        if tryModifyClient(finalChanges) then
-            return
-        end
-        tryModifyRC(finalChanges, true)
     end, log.error)
 end
 

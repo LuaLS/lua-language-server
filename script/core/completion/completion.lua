@@ -180,7 +180,7 @@ local function buildDetail(source)
 end
 
 local function getSnip(source)
-    local context = config.get 'Lua.completion.displayContext'
+    local context = config.get(guide.getUri(source), 'Lua.completion.displayContext')
     if context <= 0 then
         return nil
     end
@@ -222,7 +222,7 @@ local function buildDesc(source)
 end
 
 local function buildFunction(results, source, value, oop, data)
-    local snipType = config.get 'Lua.completion.callSnippet'
+    local snipType = config.get(guide.getUri(source), 'Lua.completion.callSnippet')
     if snipType == 'Disable' or snipType == 'Both' then
         results[#results+1] = data
     end
@@ -324,7 +324,7 @@ local function checkLocal(state, word, position, results)
 end
 
 local function checkModule(state, word, position, results)
-    if not config.get 'Lua.completion.autoRequire' then
+    if not config.get(state.uri, 'Lua.completion.autoRequire') then
         return
     end
     local locals  = guide.getVisibleLocals(state.ast, position)
@@ -337,7 +337,7 @@ local function checkModule(state, word, position, results)
         local stemName = fileName:gsub('%..+', '')
         if  not locals[stemName]
         and not vm.hasGlobalSets(stemName)
-        and not config.get 'Lua.diagnostics.globals'[stemName]
+        and not config.get(state.uri, 'Lua.diagnostics.globals')[stemName]
         and stemName:match '^[%a_][%w_]*$'
         and matchKey(word, stemName) then
             local targetState = files.getState(uri)
@@ -367,7 +367,7 @@ local function checkModule(state, word, position, results)
                 commitCharacters = {'.'},
                 command = {
                     title     = 'autoRequire',
-                    command   = 'lua.autoRequire:' .. sp:get_id(),
+                    command   = 'lua.autoRequire',
                     arguments = {
                         {
                             uri    = guide.getUri(state.ast),
@@ -448,8 +448,8 @@ local function checkFieldFromFieldToIndex(state, name, src, parent, word, startP
             }
         end
     else
-        if config.get 'Lua.runtime.version' == 'lua 5.1'
-        or config.get 'Lua.runtime.version' == 'luaJIT' then
+        if config.get(state.uri, 'Lua.runtime.version') == 'lua 5.1'
+        or config.get(state.uri, 'Lua.runtime.version') == 'luaJIT' then
             textEdit.newText = '_G' .. textEdit.newText
         else
             textEdit.newText = '_ENV' .. textEdit.newText
@@ -536,7 +536,7 @@ local function checkFieldOfRefs(refs, state, word, startPos, position, parent, o
             goto CONTINUE
         end
         local funcLabel
-        if config.get 'Lua.completion.showParams' then
+        if config.get(state.uri, 'Lua.completion.showParams') then
             local value = searcher.getObjectValue(src) or src
             if value.type == 'function'
             or value.type == 'doc.type.function' then
@@ -584,14 +584,14 @@ end
 ---@async
 local function checkGlobal(state, word, startPos, position, parent, oop, results)
     local locals = guide.getVisibleLocals(state.ast, position)
-    local globals = vm.getGlobalSets '*'
+    local globals = vm.getGlobalSets(state.uri, '*')
     checkFieldOfRefs(globals, state, word, startPos, position, parent, oop, results, locals, 'global')
 end
 
 ---@async
 local function checkField(state, word, start, position, parent, oop, results)
     if parent.tag == '_ENV' or parent.special == '_G' then
-        local globals = vm.getGlobalSets '*'
+        local globals = vm.getGlobalSets(state.uri, '*')
         checkFieldOfRefs(globals, state, word, start, position, parent, oop, results)
     else
         local refs = vm.getRefs(parent, '*')
@@ -630,7 +630,7 @@ end
 
 local function checkCommon(state, word, position, results)
     local myUri = state.uri
-    local showWord = config.get 'Lua.completion.showWord'
+    local showWord = config.get(state.uri, 'Lua.completion.showWord')
     if showWord == 'Disable' then
         return
     end
@@ -645,7 +645,7 @@ local function checkCommon(state, word, position, results)
     for _, data in ipairs(keyWordMap) do
         used[data[1]] = true
     end
-    if config.get 'Lua.completion.workspaceWord' and #word >= 2 then
+    if config.get(state.uri, 'Lua.completion.workspaceWord') and #word >= 2 then
         results.complete = true
         local myHead = word:sub(1, 2)
         for uri in files.eachFile() do
@@ -720,7 +720,7 @@ end
 
 local function checkKeyWord(state, start, position, word, hasSpace, afterLocal, results)
     local text = state.lua
-    local snipType = config.get 'Lua.completion.keywordSnippet'
+    local snipType = config.get(state.uri, 'Lua.completion.keywordSnippet')
     local symbol = lookBackward.findSymbol(text, guide.positionToOffset(state, start))
     local isExp = symbol == '(' or symbol == ',' or symbol == '='
     local info = {
@@ -887,7 +887,7 @@ local function collectRequireNames(mode, myUri, literal, source, smark, position
                 goto CONTINUE
             end
             local path = workspace.getRelativePath(uri)
-            local infos = rpath.getVisiblePath(path)
+            local infos = rpath.getVisiblePath(uri, path)
             for _, info in ipairs(infos) do
                 if matchKey(literal, info.expect) then
                     if not collect[info.expect] then
@@ -1628,7 +1628,7 @@ local function tryluaDocBySource(state, position, source, results)
     if source.type == 'doc.extends.name' then
         if source.parent.type == 'doc.class' then
             local used = {}
-            for _, doc in ipairs(vm.getDocDefines '*') do
+            for _, doc in ipairs(vm.getDocDefines(state.uri, '*')) do
                 if  doc.type == 'doc.class.name'
                 and doc.parent ~= source.parent
                 and not used[doc[1]]
@@ -1649,7 +1649,7 @@ local function tryluaDocBySource(state, position, source, results)
         return true
     elseif source.type == 'doc.type.name' then
         local used = {}
-        for _, doc in ipairs(vm.getDocDefines '*') do
+        for _, doc in ipairs(vm.getDocDefines(state.uri, '*')) do
             if  (doc.type == 'doc.class.name' or doc.type == 'doc.alias.name')
             and doc.parent ~= source.parent
             and not used[doc[1]]
@@ -1727,7 +1727,7 @@ end
 
 local function tryluaDocByErr(state, position, err, docState, results)
     if err.type == 'LUADOC_MISS_CLASS_EXTENDS_NAME' then
-        for _, doc in ipairs(vm.getDocDefines '*') do
+        for _, doc in ipairs(vm.getDocDefines(state.uri, '*')) do
             if  doc.type == 'doc.class.name'
             and doc.parent ~= docState then
                 results[#results+1] = {
@@ -1737,7 +1737,7 @@ local function tryluaDocByErr(state, position, err, docState, results)
             end
         end
     elseif err.type == 'LUADOC_MISS_TYPE_NAME' then
-        for _, doc in ipairs(vm.getDocDefines '*') do
+        for _, doc in ipairs(vm.getDocDefines(state.uri, '*')) do
             if  (doc.type == 'doc.class.name' or doc.type == 'doc.alias.name') then
                 results[#results+1] = {
                     label       = doc[1],
@@ -1940,89 +1940,6 @@ local function tryComment(state, position, results)
     checkCommon(state, word, position, results)
 end
 
-local function makeCache(uri, position, results)
-    local cache = workspace.getCache 'completion'
-    if not uri then
-        cache.results = nil
-        return
-    end
-    local text  = files.getText(uri)
-    local state = files.getState(uri)
-    local word = lookBackward.findWord(text, guide.positionToOffset(state, position))
-    if not word or #word < 2 then
-        cache.results = nil
-        return
-    end
-    cache.results = results
-    cache.position= position
-    cache.word    = word:lower()
-    cache.length  = #word
-    cache.uri     = uri
-end
-
-local function isValidCache(word, result)
-    if result.kind == define.CompletionItemKind.Text then
-        return false
-    end
-    local match = result.match or result.label
-    if matchKey(word, match) then
-        return true
-    end
-    if result.textEdit then
-        match = result.textEdit.newText:match '[%w_]+'
-        if match and matchKey(word, match) then
-            return true
-        end
-    end
-    return false
-end
-
-local function getCache(uri, position)
-    do return nil end
-    local cache = workspace.getCache 'completion'
-    if not cache.results then
-        return nil
-    end
-    if cache.uri ~= uri then
-        return nil
-    end
-    local text  = files.getText(uri)
-    local state = files.getState(uri)
-    local word = lookBackward.findWord(text, guide.positionToOffset(state, position))
-    if not word then
-        return nil
-    end
-    if word:sub(1, #cache.word):lower() ~= cache.word then
-        return nil
-    end
-
-    local ext = #word - cache.length
-    cache.length = #word
-    local results = cache.results
-    for i = #results, 1, -1 do
-        local result = results[i]
-        if isValidCache(word, result) then
-            if result.textEdit then
-                result.textEdit.finish = result.textEdit.finish + ext
-            end
-        else
-            results[i] = results[#results]
-            results[#results] = nil
-        end
-    end
-
-    if results.enableCommon then
-        checkCommon(state, word, position, results)
-    end
-
-    return cache.results
-end
-
-local function clearCache()
-    local cache = workspace.getCache 'completion'
-    cache.results = nil
-end
-
 ---@async
 local function tryCompletions(state, position, triggerCharacter, results)
     local text = state.lua
@@ -2052,56 +1969,30 @@ end
 
 ---@async
 local function completion(uri, position, triggerCharacter)
-    tracy.ZoneBeginN 'completion cache'
-    local results = getCache(uri, position)
-    tracy.ZoneEnd()
-    if results then
-        return results
-    end
-    await.delay()
-    tracy.ZoneBeginN 'completion #1'
     local state = files.getState(uri)
     if not state then
         return nil
     end
-    results = {}
     clearStack()
-    tracy.ZoneEnd()
+    local results = {}
     tracy.ZoneBeginN 'completion #2'
     tryCompletions(state, position, triggerCharacter, results)
     tracy.ZoneEnd()
 
     if #results == 0 then
-        clearCache()
         return nil
     end
 
-    --tracy.ZoneBeginN 'completion #3'
-    --makeCache(uri, position, results)
-    --tracy.ZoneEnd()
     return results
 end
 
 ---@async
 local function resolve(id)
     local item = resolveStack(id)
-    local cache = workspace.getCache 'completion'
-    if item and cache.results then
-        for _, res in ipairs(cache.results) do
-            if res and res.id == id then
-                for k, v in pairs(item) do
-                    res[k] = v
-                end
-                res.id = nil
-                break
-            end
-        end
-    end
     return item
 end
 
 return {
     completion   = completion,
     resolve      = resolve,
-    clearCache   = clearCache,
 }

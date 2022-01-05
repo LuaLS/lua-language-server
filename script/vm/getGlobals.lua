@@ -14,7 +14,7 @@ function vm.hasGlobalSets(name)
     return collector.has(id)
 end
 
-function vm.getGlobalSets(name)
+function vm.getGlobalSets(uri, name)
     local cache = vm.getCache 'getGlobalSets'
     if cache[name] then
         return cache[name]
@@ -22,7 +22,7 @@ function vm.getGlobalSets(name)
     local results = {}
     cache[name] = results
     if name == '*' then
-        for noders in collector.each('def:g:') do
+        for noders in collector.each(uri, 'def:g:') do
             for id in noder.eachID(noders) do
                 if  id:sub(1, 2) == 'g:'
                 and not id:find(noder.SPLIT_CHAR) then
@@ -41,7 +41,7 @@ function vm.getGlobalSets(name)
         else
             id = ('g:%s'):format(noder.STRING_CHAR, name)
         end
-        for noders in collector.each('def:' .. id) do
+        for noders in collector.each(uri, 'def:' .. id) do
             for source in noder.eachSource(noders, id) do
                 if guide.isSet(source) then
                     results[#results+1] = source

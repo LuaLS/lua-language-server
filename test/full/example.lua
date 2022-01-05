@@ -10,7 +10,7 @@ local noder  = require 'core.noder'
 -- 临时
 ---@diagnostic disable: await-in-sync
 local function testIfExit(path)
-    config.set('Lua.workspace.preloadFileSize', 1000000000)
+    config.set(nil, 'Lua.workspace.preloadFileSize', 1000000000)
     local buf = util.loadFile(path:string())
     if buf then
         local state
@@ -51,7 +51,6 @@ local function testIfExit(path)
         local max = 100
         local need
         for i = 1, max do
-            files.removeAll()
             files.open('')
             files.setText('', buf)
             diag('', function () end)
@@ -60,6 +59,7 @@ local function testIfExit(path)
                 need = passed / i
                 break
             end
+            files.remove('')
         end
         print(('基准诊断测试[%s]单次耗时：%.10f'):format(path:filename():string(), need))
     end

@@ -2082,7 +2082,7 @@ local function parseActions()
             end
         end
         if action then
-            if action.type == 'return' then
+            if not rtn and action.type == 'return' then
                 rtn = action
             end
             last = action

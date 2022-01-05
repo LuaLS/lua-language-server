@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.5.7
+* `NEW` supports multi-workspace in server side
 * `FIX` [#879](https://github.com/sumneko/lua-language-server/issues/879)
 * `FIX` [#884](https://github.com/sumneko/lua-language-server/issues/884)
 * `FIX` [#885](https://github.com/sumneko/lua-language-server/issues/885)

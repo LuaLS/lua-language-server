@@ -11,11 +11,14 @@ local files   = require 'files'
 local await   = require 'await'
 local timer   = require 'timer'
 local encoder = require 'encoder'
+local ws      = require 'workspace.workspace'
 
 local m = {}
 
-local function getDocFormater()
-    local version = config.get 'Lua.runtime.version'
+m.metaPaths = {}
+
+local function getDocFormater(uri)
+    local version = config.get(uri, 'Lua.runtime.version')
     if client.isVSCode() then
         if version == 'Lua 5.1' then
             return 'HOVER_NATIVE_DOCUMENT_LUA51'
@@ -43,8 +46,8 @@ local function getDocFormater()
     end
 end
 
-local function convertLink(text)
-    local fmt = getDocFormater()
+local function convertLink(uri, text)
+    local fmt = getDocFormater(uri)
     return text:gsub('%$([%.%w]+)', function (name)
         local lastDot = ''
         if name:sub(-1) == '.' then
@@ -82,7 +85,7 @@ local function createViewDocument(name)
     return ('[%s](%s)'):format(lang.script.HOVER_VIEW_DOCUMENTS, lang.script(fmt, 'pdf-' .. name))
 end
 
-local function compileSingleMetaDoc(script, metaLang, status)
+local function compileSingleMetaDoc(uri, script, metaLang, status)
     if not script then
         return nil
     end
@@ -99,11 +102,11 @@ local function compileSingleMetaDoc(script, metaLang, status)
     middleBuf[#middleBuf+1] = ('PUSH [===[%s]===]'):format(script:sub(last))
     local middleScript = table.concat(middleBuf, '\n')
     local version, jit
-    if config.get 'Lua.runtime.version' == 'LuaJIT' then
+    if config.get(uri, 'Lua.runtime.version') == 'LuaJIT' then
         version = 5.1
         jit = true
     else
-        version = tonumber(config.get 'Lua.runtime.version':sub(-3))
+        version = tonumber(config.get(uri, 'Lua.runtime.version'):sub(-3))
         jit = false
     end
 
@@ -122,7 +125,7 @@ local function compileSingleMetaDoc(script, metaLang, status)
             compileBuf[#compileBuf+1] = '---\n'
             for line in util.eachLine(des) do
                 compileBuf[#compileBuf+1] = '---'
-                compileBuf[#compileBuf+1] = convertLink(line)
+                compileBuf[#compileBuf+1] = convertLink(uri, line)
                 compileBuf[#compileBuf+1] = '\n'
             end
             local viewDocument = createViewDocument(name)
@@ -138,7 +141,7 @@ local function compileSingleMetaDoc(script, metaLang, status)
             if not des then
                 des = ('Miss locale <%s>'):format(name)
             end
-            compileBuf[#compileBuf+1] = convertLink(des)
+            compileBuf[#compileBuf+1] = convertLink(uri, des)
             compileBuf[#compileBuf+1] = '\n'
         end,
         ALIVE   = function (str)
@@ -197,14 +200,12 @@ local function loadMetaLocale(langID, result)
     return result
 end
 
-local function initBuiltIn()
-    if not m.inited then
-        return
-    end
+local function initBuiltIn(uri)
+    local scp      = ws.getScope(uri)
     local langID   = lang.id
-    local version  = config.get 'Lua.runtime.version'
-    local encoding = config.get 'Lua.runtime.fileEncoding'
-    local metaPath = fs.path(METAPATH) / config.get 'Lua.runtime.meta':gsub('%$%{(.-)%}', {
+    local version  = config.get(uri, 'Lua.runtime.version')
+    local encoding = config.get(uri, 'Lua.runtime.fileEncoding')
+    local metaPath = fs.path(METAPATH) / config.get(uri, 'Lua.runtime.meta'):gsub('%$%{(.-)%}', {
         version  = version,
         language = langID,
         encoding = encoding,
@@ -214,13 +215,11 @@ local function initBuiltIn()
     if langID ~= 'en-US' then
         loadMetaLocale(langID, metaLang)
     end
-    --log.debug('metaLang:', util.dump(metaLang))
 
-    if m.metaPath == metaPath:string() then
+    if scp:get('metaPath') == metaPath:string() then
         return
     end
-    m.metaPath = metaPath:string()
-    m.metaPaths = {}
+    scp:set('metaPath', metaPath:string())
     local suc = xpcall(function ()
         if not fs.exists(metaPath) then
             fs.create_directories(metaPath)
@@ -232,18 +231,18 @@ local function initBuiltIn()
     local out = fsu.dummyFS()
     local templateDir = ROOT / 'meta' / 'template'
     for libName, status in pairs(define.BuiltIn) do
-        status = config.get 'Lua.runtime.builtin'[libName] or status
+        status = config.get(uri, 'Lua.runtime.builtin')[libName] or status
         if status == 'disable' then
             goto CONTINUE
         end
         libName = libName .. '.lua'
         local libPath = templateDir / libName
-        local metaDoc = compileSingleMetaDoc(fsu.loadFile(libPath), metaLang, status)
+        local metaDoc = compileSingleMetaDoc(uri, fsu.loadFile(libPath), metaLang, status)
         if metaDoc then
-            local outPath = metaPath / libName
             metaDoc = encoder.encode(encoding, metaDoc, 'auto')
             out:saveFile(libName, metaDoc)
-            m.metaPaths[#m.metaPaths+1] = outPath:string()
+            local outputPath = metaPath / libName
+            m.metaPaths[outputPath:string()] = true
         end
         ::CONTINUE::
     end
@@ -310,17 +309,17 @@ local function load3rdConfigInDir(dir, configs, inner)
     end
 end
 
-local function load3rdConfig()
+local function load3rdConfig(uri)
     local configs = {}
     load3rdConfigInDir(innerThirdDir, configs, true)
-    local thirdDirs = config.get 'Lua.workspace.userThirdParty'
+    local thirdDirs = config.get(uri, 'Lua.workspace.userThirdParty')
     for _, thirdDir in ipairs(thirdDirs) do
         load3rdConfigInDir(fs.path(thirdDir), configs)
     end
     return configs
 end
 
-local function apply3rd(cfg, onlyMemory)
+local function apply3rd(uri, cfg, onlyMemory)
     local changes = {}
     if cfg.configs then
         for _, change in ipairs(cfg.configs) do
@@ -333,6 +332,7 @@ local function apply3rd(cfg, onlyMemory)
             key    = 'Lua.runtime.plugin',
             action = 'set',
             value  = ('%s/plugin.lua'):format(cfg.dirname),
+            uri    = uri,
         }
     end
 
@@ -340,6 +340,7 @@ local function apply3rd(cfg, onlyMemory)
         key    = 'Lua.workspace.library',
         action = 'add',
         value  = ('%s/library'):format(cfg.dirname),
+        uri    = uri,
     }
 
     client.setConfig(changes, onlyMemory)
@@ -347,7 +348,7 @@ end
 
 local hasAsked
 ---@async
-local function askFor3rd(cfg)
+local function askFor3rd(uri, cfg)
     hasAsked = true
     local yes1 = lang.script.WINDOW_APPLY_WHIT_SETTING
     local yes2 = lang.script.WINDOW_APPLY_WHITOUT_SETTING
@@ -360,21 +361,23 @@ local function askFor3rd(cfg)
         return nil
     end
     if result == yes1 then
-        apply3rd(cfg, false)
+        apply3rd(uri, cfg, false)
         client.setConfig({
             {
                 key    = 'Lua.workspace.checkThirdParty',
                 action = 'set',
                 value  = false,
+                uri    = uri,
             },
         }, false)
     elseif result == yes2 then
-        apply3rd(cfg, true)
+        apply3rd(uri, cfg, true)
         client.setConfig({
             {
                 key    = 'Lua.workspace.checkThirdParty',
                 action = 'set',
                 value  = false,
+                uri    = uri,
             },
         }, true)
     end
@@ -397,7 +400,7 @@ local function wholeMatch(a, b)
     return true
 end
 
-local function check3rdByWords(text, configs)
+local function check3rdByWords(uri, text, configs)
     if hasAsked then
         return
     end
@@ -407,7 +410,7 @@ local function check3rdByWords(text, configs)
                 for _, word in ipairs(cfg.words) do
                     await.delay()
                     if wholeMatch(text, word) then
-                        askFor3rd(cfg)
+                        askFor3rd(uri, cfg)
                         return
                     end
                 end
@@ -420,7 +423,6 @@ local function check3rdByFileName(uri, configs)
     if hasAsked then
         return
     end
-    local ws   = require 'workspace'
     local path = ws.getRelativePath(uri)
     if not path then
         return
@@ -431,7 +433,7 @@ local function check3rdByFileName(uri, configs)
                 for _, filename in ipairs(cfg.files) do
                     await.delay()
                     if wholeMatch(path, filename) then
-                        askFor3rd(cfg)
+                        askFor3rd(uri, cfg)
                         return
                     end
                 end
@@ -455,11 +457,11 @@ local function check3rd(uri)
     if hasAsked then
         return
     end
-    if not config.get 'Lua.workspace.checkThirdParty' then
+    if not config.get(uri, 'Lua.workspace.checkThirdParty') then
         return
     end
     if thirdConfigs == nil then
-        thirdConfigs = load3rdConfig() or false
+        thirdConfigs = load3rdConfig(uri) or false
     end
     if not thirdConfigs then
         return
@@ -468,16 +470,16 @@ local function check3rd(uri)
         if files.isLua(uri) then
             local text = files.getText(uri)
             if text then
-                check3rdByWords(text, thirdConfigs)
+                check3rdByWords(uri, text, thirdConfigs)
             end
         end
         check3rdByFileName(uri, thirdConfigs)
     end
 end
 
-config.watch(function (key, value, oldValue)
+config.watch(function (uri, key, value, oldValue)
     if key:find '^Lua.runtime' then
-        initBuiltIn()
+        initBuiltIn(uri)
     end
 end)
 
@@ -493,7 +495,10 @@ function m.init()
         return
     end
     m.inited = true
-    initBuiltIn()
+    initBuiltIn(nil)
+    for _, scp in ipairs(ws.folders) do
+        initBuiltIn(scp.uri)
+    end
 end
 
 return m

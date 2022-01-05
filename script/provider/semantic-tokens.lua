@@ -20,7 +20,7 @@ local function toArray(map)
 end
 
 local dontShowAgain = false
-local function enable()
+local function enable(uri)
     if isEnable then
         return
     end
@@ -47,7 +47,7 @@ local function enable()
             },
         }
     })
-    if config.get 'editor.semanticHighlighting.enabled' == 'configuredByTheme' and not dontShowAgain then
+    if config.get(uri, 'editor.semanticHighlighting.enabled') == 'configuredByTheme' and not dontShowAgain then
         proto.request('window/showMessageRequest', {
             type    = define.MessageType.Info,
             message = lang.script.WINDOW_CHECK_SEMANTIC,
@@ -80,7 +80,7 @@ local function enable()
     end
 end
 
-local function disable()
+local function disable(uri)
     if not isEnable then
         return
     end
@@ -109,16 +109,16 @@ local function refresh()
     proto.request('workspace/semanticTokens/refresh', json.null)
 end
 
-config.watch(function (key, value, oldValue)
+config.watch(function (uri, key, value, oldValue)
     if key == 'Lua.color.mode' then
         if value == 'Semantic' or value == 'SemanticEnhanced' then
             if isEnable and value ~= oldValue then
                 refresh()
             else
-                enable()
+                enable(uri)
             end
         else
-            disable()
+            disable(uri)
         end
     end
     if key:find '^Lua.runtime'

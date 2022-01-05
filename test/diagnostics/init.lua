@@ -4,9 +4,9 @@ local config = require 'config'
 local util   = require 'utility'
 local catch  = require 'catch'
 
-config.get 'Lua.diagnostics.neededFileStatus'['deprecated']    = 'Any'
-config.get 'Lua.diagnostics.neededFileStatus'['type-check']    = 'Any'
-config.get 'Lua.diagnostics.neededFileStatus'['await-in-sync'] = 'Any'
+config.get(nil, 'Lua.diagnostics.neededFileStatus')['deprecated']    = 'Any'
+config.get(nil, 'Lua.diagnostics.neededFileStatus')['type-check']    = 'Any'
+config.get(nil, 'Lua.diagnostics.neededFileStatus')['await-in-sync'] = 'Any'
 
 rawset(_G, 'TEST', true)
 
@@ -28,20 +28,15 @@ end
 
 ---@diagnostic disable: await-in-sync
 function TEST(script, ...)
-    files.removeAll()
     local newScript, catched = catch(script, '!')
     files.setText('', newScript)
     files.open('')
-    local datas = {}
-    core('', function (results)
-        for _, res in ipairs(results) do
-            datas[#datas+1] = res
-        end
-    end)
+    local origins = {}
     local results = {}
-    for i, data in ipairs(datas) do
-        results[i] = { data.start, data.finish }
-    end
+    core('', function (result)
+        results[#results+1] = { result.start, result.finish }
+        origins[#origins+1] = result
+    end)
 
     if results[1] then
         if not founded(catched['!'] or {}, results) then
@@ -50,6 +45,8 @@ function TEST(script, ...)
     else
         assert(catched['!'] == nil)
     end
+
+    files.remove('')
 end
 
 TEST [[
@@ -177,7 +174,7 @@ local _ENV = { print = print }
 print(1)
 ]]
 
-config.get 'Lua.diagnostics.disable'['undefined-env-child'] = true
+config.get(nil, 'Lua.diagnostics.disable')['undefined-env-child'] = true
 TEST [[
 _ENV = nil
 <!GLOBAL!> = 1 --> _ENV.GLOBAL = 1
@@ -203,7 +200,7 @@ GLOBAL = 1
 _ENV = nil
 ]]
 
-config.get 'Lua.diagnostics.disable'['undefined-env-child'] = nil
+config.get(nil, 'Lua.diagnostics.disable')['undefined-env-child'] = nil
 TEST [[
 <!print()
 ('string')!>:sub(1, 1)
@@ -315,17 +312,17 @@ return [[
 ]]
 ]=]
 
-config.get 'Lua.diagnostics.disable'['close-non-object'] = true
+config.get(nil, 'Lua.diagnostics.disable')['close-non-object'] = true
 TEST [[
 local _ <close> = function () end
 ]]
 
-config.get 'Lua.diagnostics.disable'['close-non-object'] = nil
+config.get(nil, 'Lua.diagnostics.disable')['close-non-object'] = nil
 TEST [[
 local _ <close> = <!1!>
 ]]
 
-config.get 'Lua.diagnostics.disable'['unused-local'] = true
+config.get(nil, 'Lua.diagnostics.disable')['unused-local'] = true
 TEST [[
 local f = <!function () end!>
 ]]
@@ -338,7 +335,7 @@ TEST [[
 local <!function f() end!>
 ]]
 
-config.get 'Lua.diagnostics.disable'['unused-local'] = nil
+config.get(nil, 'Lua.diagnostics.disable')['unused-local'] = nil
 TEST [[
 local mt, x
 function mt:m()
@@ -1162,7 +1159,7 @@ TEST [[
 local emit = {}
 ]]
 
-config.get 'Lua.diagnostics.neededFileStatus' ['unused-local'] = 'None'
+config.get(nil, 'Lua.diagnostics.neededFileStatus')['unused-local'] = 'None'
 TEST [[
 ---@param table     table
 ---@param metatable table
@@ -1301,7 +1298,7 @@ trim('str', 'left')
 trim('str', nil)
 ]]
 
-config.get 'Lua.diagnostics.neededFileStatus' ['unused-local'] = 'Any'
+config.get(nil, 'Lua.diagnostics.neededFileStatus')['unused-local'] = 'Any'
 
 ---不完整的函数参数定义，会跳过检查
 TEST [[
@@ -1421,6 +1418,49 @@ end)
 ]]
 
 TEST [[
+---@param c any
+local function f(c)
+    return c
+end
+
+f(function () ---@async
+    return nil
+end)
+]]
+
+TEST [[
+---@param ... any
+local function f(...)
+    return ...
+end
+
+f(function () ---@async
+    return nil
+end)
+]]
+
+TEST [[
+---@vararg any
+local function f(...)
+    return ...
+end
+
+f(function () ---@async
+    return nil
+end)
+]]
+
+TEST [[
+local function f(...)
+    return ...
+end
+
+f(function () ---@async
+    return nil
+end)
+]]
+
+TEST [[
 ---@nodiscard
 local function f()
     return 1
@@ -1438,7 +1478,7 @@ end
 X = f()
 ]]
 
-config.get 'Lua.diagnostics.neededFileStatus'['not-yieldable'] = 'Any'
+config.get(nil, 'Lua.diagnostics.neededFileStatus')['not-yieldable'] = 'Any'
 TEST [[
 local function f(cb)
     return cb

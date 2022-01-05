@@ -1,10 +1,10 @@
 local define = require 'proto.define'
 local config = require 'config'
 
-config.set('Lua.completion.callSnippet',    'Both')
-config.set('Lua.completion.keywordSnippet', 'Both')
-config.set('Lua.completion.workspaceWord',  false)
-config.set('Lua.completion.showWord',       'Enable')
+config.set(nil, 'Lua.completion.callSnippet',    'Both')
+config.set(nil, 'Lua.completion.keywordSnippet', 'Both')
+config.set(nil, 'Lua.completion.workspaceWord',  false)
+config.set(nil, 'Lua.completion.showWord',       'Enable')
 
 TEST [[
 local zabcde
@@ -805,7 +805,7 @@ print(io.<??>)
 ]]
 (EXISTS)
 
-require 'config'.set('Lua.runtime.version', 'Lua 5.4')
+require 'config'.set(nil, 'Lua.runtime.version', 'Lua 5.4')
 --TEST [[
 --local <??>
 --]]
@@ -2402,7 +2402,7 @@ end
 ]]
 (EXISTS)
 
-config.set('Lua.completion.callSnippet',    'Disable')
+config.set(nil, 'Lua.completion.callSnippet',    'Disable')
 
 TEST [[
 GGG = 1

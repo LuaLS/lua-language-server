@@ -32,11 +32,11 @@ local function typeHint(uri, results, start, finish)
             return
         end
         if source.parent.type == 'funcargs' then
-            if not config.get 'Lua.hint.paramType' then
+            if not config.get(uri, 'Lua.hint.paramType') then
                 return
             end
         else
-            if not config.get 'Lua.hint.setType' then
+            if not config.get(uri, 'Lua.hint.setType') then
                 return
             end
         end
@@ -99,7 +99,7 @@ end
 
 ---@async
 local function paramName(uri, results, start, finish)
-    local paramConfig = config.get 'Lua.hint.paramName'
+    local paramConfig = config.get(uri, 'Lua.hint.paramName')
     if not paramConfig or paramConfig == 'Disable' then
         return
     end
@@ -162,7 +162,7 @@ end
 
 ---@async
 local function awaitHint(uri, results, start, finish)
-    local awaitConfig = config.get 'Lua.hint.await'
+    local awaitConfig = config.get(uri, 'Lua.hint.await')
     if not awaitConfig then
         return
     end

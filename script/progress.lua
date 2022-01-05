@@ -10,6 +10,7 @@ local m = {}
 m.map = {}
 
 ---@class progress
+---@field _scp  scope
 local mt = {}
 mt.__index     = mt
 mt._token      = nil
@@ -83,7 +84,7 @@ function mt:_update()
     and self._clock + self._delay <= os.clock() then
         self._updated = os.clock()
         self._dirty = false
-        if not config.get 'Lua.window.progressBar' then
+        if not config.get(self._scp.uri, 'Lua.window.progressBar') then
             return
         end
         proto.request('window/workDoneProgress/create', {
@@ -106,7 +107,7 @@ function mt:_update()
     if not self._showed then
         return
     end
-    if not config.get 'Lua.window.progressBar' then
+    if not config.get(self._scp.uri, 'Lua.window.progressBar') then
         self:remove()
         return
     end
@@ -143,14 +144,16 @@ function m.update()
 end
 
 ---创建一个进度条
+---@param scp   scope
 ---@param title string # 标题
 ---@param delay number # 至少经过这么久之后才会显示出来
-function m.create(title, delay)
+function m.create(scp, title, delay)
     local prog = setmetatable({
         _token = nextToken(),
         _title = title,
         _clock = os.clock(),
         _delay = delay,
+        _scp   = scp,
     }, mt)
 
     m.map[prog._token] = prog

@@ -24,7 +24,6 @@ local sfind        = string.find
 local sformat      = string.format
 
 local getUri       = guide.getUri
-local getRoot      = guide.getRoot
 
 local ceach        = collector.each
 
@@ -43,8 +42,6 @@ local eachBackward      = noder.eachBackward
 local eachExtend        = noder.eachExtend
 local eachSource        = noder.eachSource
 local compileAllNodes   = noder.compileAllNodes
-local compilePartNoders = noder.compilePartNodes
-local isGlobalID        = noder.isGlobalID
 local hasCall           = noder.hasCall
 
 local SPLIT_CHAR     = noder.SPLIT_CHAR
@@ -796,7 +793,7 @@ function m.searchRefsByID(status, suri, expect, mode)
         if not requireName then
             return
         end
-        local uris = rpath.findUrisByRequirePath(requireName)
+        local uris = rpath.findUrisByRequirePath(suri, requireName)
         footprint(status, 'require:', requireName)
         for i = 1, #uris do
             local ruri = uris[i]
@@ -820,7 +817,7 @@ function m.searchRefsByID(status, suri, expect, mode)
         or mode == 'alldef'
         or field
         or hasCall(field) then
-            for _, guri in ceach('def:' .. id) do
+            for _, guri in ceach(suri, 'def:' .. id) do
                 if uri == guri then
                     goto CONTINUE
                 end
@@ -829,14 +826,14 @@ function m.searchRefsByID(status, suri, expect, mode)
             end
         elseif mode == 'field'
         or     mode == 'allfield' then
-            for _, guri in ceach('def:' .. id) do
+            for _, guri in ceach(suri, 'def:' .. id) do
                 if uri == guri then
                     goto CONTINUE
                 end
                 searchID(guri, id, field, uri)
                 ::CONTINUE::
             end
-            for _, guri in ceach('field:' .. id) do
+            for _, guri in ceach(suri, 'field:' .. id) do
                 if uri == guri then
                     goto CONTINUE
                 end
@@ -844,7 +841,7 @@ function m.searchRefsByID(status, suri, expect, mode)
                 ::CONTINUE::
             end
         else
-            for _, guri in ceach(id) do
+            for _, guri in ceach(suri, id) do
                 if crossed[guri] then
                     goto CONTINUE
                 end
@@ -872,7 +869,7 @@ function m.searchRefsByID(status, suri, expect, mode)
         or ignoredIDs[id]
         or id == 'dn:string'
         or hasCall(field) then
-            for _, guri in ceach('def:' .. id) do
+            for _, guri in ceach(suri, 'def:' .. id) do
                 if uri == guri then
                     goto CONTINUE
                 end
@@ -880,7 +877,7 @@ function m.searchRefsByID(status, suri, expect, mode)
                 ::CONTINUE::
             end
         else
-            for _, guri in ceach(id) do
+            for _, guri in ceach(suri, id) do
                 if crossed[guri] then
                     goto CONTINUE
                 end

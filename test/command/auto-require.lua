@@ -16,12 +16,12 @@ end
 function TEST(text)
     return function (name)
         return function (expect)
-            files.removeAll()
             files.setText('', text)
             EditResult = nil
             local row, fmt = findInsertRow('')
             applyAutoRequire('', row, name, name, fmt)
             assert(util.equal(EditResult, expect))
+            files.remove('')
         end
     end
 end

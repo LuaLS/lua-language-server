@@ -48,11 +48,11 @@ end
 ---@diagnostic disable: await-in-sync
 function TEST(script)
     return function (expect)
-        files.removeAll()
         files.setText('', script)
         local result = core('')
         assert(eq(expect, result))
         checkArcoss(result)
+        files.remove('')
     end
 end
 

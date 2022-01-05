@@ -23,7 +23,6 @@ local accept = {
 ---@diagnostic disable: await-in-sync
 function TEST(script)
     return function (expect)
-        files.removeAll()
         local newScript, catched = catch(script, '?')
         files.setText('', newScript)
         local hover = core.byUri('', catched['?'][1][1])
@@ -31,6 +30,7 @@ function TEST(script)
         expect = expect:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
         local label = tostring(hover):match('```lua[\r\n]*(.-)[\r\n]*```'):gsub('\r\n', '\n')
         assert(expect == label)
+        files.remove('')
     end
 end
 
@@ -838,7 +838,7 @@ local t: {
 }
 ]]
 
-config.set('Lua.IntelliSense.traceLocalSet', true)
+config.set(nil, 'Lua.IntelliSense.traceLocalSet', true)
 TEST [[
 local x
 x = 1
@@ -849,7 +849,7 @@ print(<?x?>)
 [[
 local x: number = 1
 ]]
-config.set('Lua.IntelliSense.traceLocalSet', false)
+config.set(nil, 'Lua.IntelliSense.traceLocalSet', false)
 
 TEST [[
 local <?x?> <close> = 1
@@ -1730,7 +1730,7 @@ t.<?x?>()
 field t.x: any
 ]]
 
-config.set('Lua.IntelliSense.traceLocalSet', true)
+config.set(nil, 'Lua.IntelliSense.traceLocalSet', true)
 TEST [[
 ---@class A
 local a
@@ -1743,7 +1743,7 @@ print(b.<?x?>)
 [[
 field A.x: any
 ]]
-config.set('Lua.IntelliSense.traceLocalSet', false)
+config.set(nil, 'Lua.IntelliSense.traceLocalSet', false)
 
 TEST [[
 ---@class A
@@ -1793,11 +1793,11 @@ local <?f?>
 local f: async fun()
 ]]
 
-config.set('Lua.runtime.nonstandardSymbol', { '//' })
+config.set(nil, 'Lua.runtime.nonstandardSymbol', { '//' })
 TEST [[
 local <?x?> = 1 // 2
 ]]
 [[
 local x: integer = 1
 ]]
-config.set('runtime.nonstandardSymbol', {})
+config.set(nil, 'runtime.nonstandardSymbol', {})

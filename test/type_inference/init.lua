@@ -23,7 +23,6 @@ end
 
 function TEST(wanted)
     return function (script)
-        files.removeAll()
         local newScript, catched = catch(script, '?')
         files.setText('', newScript)
         local source = getSource(catched['?'][1][1])
@@ -33,6 +32,7 @@ function TEST(wanted)
             infer.searchAndViewInfers(source)
         end
         assert(wanted == result)
+        files.remove('')
     end
 end
 
@@ -57,7 +57,7 @@ local var = '111'
 t.<?x?> = var
 ]]
 
-config.set('Lua.IntelliSense.traceLocalSet', true)
+config.set(nil, 'Lua.IntelliSense.traceLocalSet', true)
 TEST 'string' [[
 local <?var?>
 var = '111'
@@ -68,7 +68,7 @@ local var
 var = '111'
 print(<?var?>)
 ]]
-config.set('Lua.IntelliSense.traceLocalSet', false)
+config.set(nil, 'Lua.IntelliSense.traceLocalSet', false)
 
 TEST 'function' [[
 function <?xx?>()
@@ -80,13 +80,13 @@ local function <?xx?>()
 end
 ]]
 
-config.set('Lua.IntelliSense.traceLocalSet', true)
+config.set(nil, 'Lua.IntelliSense.traceLocalSet', true)
 TEST 'function' [[
 local xx
 <?xx?> = function ()
 end
 ]]
-config.set('Lua.IntelliSense.traceLocalSet', false)
+config.set(nil, 'Lua.IntelliSense.traceLocalSet', false)
 
 TEST 'table' [[
 local <?t?> = {}
@@ -748,25 +748,25 @@ TEST 'function' [[
 string.gsub():gsub():<?gsub?>()
 ]]
 
-config.set('Lua.hover.enumsLimit', 5)
+config.set(nil, 'Lua.hover.enumsLimit', 5)
 TEST 'a|b|c|d|e...(+5)' [[
 ---@type 'a'|'b'|'c'|'d'|'e'|'f'|'g'|'h'|'i'|'j'
 local <?t?>
 ]]
 
-config.set('Lua.hover.enumsLimit', 1)
+config.set(nil, 'Lua.hover.enumsLimit', 1)
 TEST 'a...(+9)' [[
 ---@type 'a'|'b'|'c'|'d'|'e'|'f'|'g'|'h'|'i'|'j'
 local <?t?>
 ]]
 
-config.set('Lua.hover.enumsLimit', 0)
+config.set(nil, 'Lua.hover.enumsLimit', 0)
 TEST '...(+10)' [[
 ---@type 'a'|'b'|'c'|'d'|'e'|'f'|'g'|'h'|'i'|'j'
 local <?t?>
 ]]
 
-config.set('Lua.hover.enumsLimit', 5)
+config.set(nil, 'Lua.hover.enumsLimit', 5)
 
 TEST 'string|fun():string' [[
 ---@type string | fun(): string

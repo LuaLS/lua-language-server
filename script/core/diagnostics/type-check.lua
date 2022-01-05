@@ -36,11 +36,11 @@ local function isTable(name)
     return false
 end
 
-local function isUserDefineClass(name)
+local function isUserDefineClass(uri, name)
     if vm.isBuiltinType(name) then
         return false
     else
-        local defs = vm.getDocDefines(name)
+        local defs = vm.getDocDefines(uri, name)
         for _, v in ipairs(defs) do
             if v.type == 'doc.class.name' then
                 return true
@@ -116,10 +116,10 @@ end
 --     end
 -- end
 
-local function addFatherClass(infers)
+local function addFatherClass(uri, infers)
     for k in pairs(infers) do
         if type(k) == 'string' then
-            local docDefs = vm.getDocDefines(k)
+            local docDefs = vm.getDocDefines(uri, k)
             for _, doc in ipairs(docDefs) do
                 if doc.parent
                 and doc.parent.type == 'doc.class'
@@ -264,7 +264,7 @@ local function getInfoFromDefs(defs)
     return paramsTypes
 end
 
-local function getArgsInfo(callArgs)
+local function getArgsInfo(uri, callArgs)
     local callArgsType = {}
     for _, arg in ipairs(callArgs) do
         -- local defs = vm.getDefs(arg)
@@ -276,7 +276,7 @@ local function getArgsInfo(callArgs)
         end
         local hasAny = infers['any']
         ---处理继承
-        addFatherClass(infers)
+        addFatherClass(uri, infers)
         if not hasAny then
             infers['any'] = nil
             infers['unknown'] = nil
@@ -285,7 +285,7 @@ local function getArgsInfo(callArgs)
         if not infers['table'] then
             for k in pairs(infers) do
                 if not vm.isBuiltinType(k)
-                and isUserDefineClass(k) then
+                and isUserDefineClass(uri, k) then
                     infers['table'] = true
                     break
                 end
@@ -424,7 +424,7 @@ return function (uri, callback)
         end
         await.delay()
         local callArgs = source.args
-        local suc, callArgsType = getArgsInfo(callArgs)
+        local suc, callArgsType = getArgsInfo(uri, callArgs)
         if not suc then
             return
         end

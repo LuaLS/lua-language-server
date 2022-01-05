@@ -13,7 +13,8 @@ local function isYieldAble(defs, i)
             local arg = def.args and def.args[i]
             if arg then
                 if infer.hasType(arg, 'any')
-                or vm.isAsync(arg, true) then
+                or vm.isAsync(arg, true)
+                or arg.type == '...' then
                     return true
                 end
             end

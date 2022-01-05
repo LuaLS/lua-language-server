@@ -19,7 +19,6 @@ local function founded(targets, results)
 end
 
 function TEST(script)
-    files.removeAll()
     local newScript, catched = catch(script, '!')
     files.setText('', newScript)
     for _, enter in ipairs(catched['!']) do
@@ -32,6 +31,7 @@ function TEST(script)
         end
         assert(founded(catched['!'], results))
     end
+    files.remove('')
 end
 
 TEST [[

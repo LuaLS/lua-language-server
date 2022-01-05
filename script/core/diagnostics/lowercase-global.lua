@@ -24,7 +24,7 @@ return function (uri, callback)
     end
 
     local definedGlobal = {}
-    for name in pairs(config.get 'Lua.diagnostics.globals') do
+    for name in pairs(config.get(uri, 'Lua.diagnostics.globals')) do
         definedGlobal[name] = true
     end
 

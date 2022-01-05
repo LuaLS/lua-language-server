@@ -25,7 +25,6 @@ end
 function TEST(oldName, newName)
     return function (oldScript)
         return function (expectScript)
-            files.removeAll()
             files.setText('', oldScript)
             local state = files.getState('')
             local offset = oldScript:find('[^%w_]'..oldName..'[^%w_]')
@@ -38,6 +37,7 @@ function TEST(oldName, newName)
                 script = replace(script, positions)
             end
             assert(script == expectScript)
+            files.remove('')
         end
     end
 end

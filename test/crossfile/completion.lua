@@ -82,8 +82,6 @@ end
 
 ---@diagnostic disable: await-in-sync
 function TEST(data)
-    files.removeAll()
-
     local mainUri
     local pos
     for _, info in ipairs(data) do
@@ -98,8 +96,13 @@ function TEST(data)
         files.setText(uri, script)
     end
 
+    local _ <close> = function ()
+        for _, info in ipairs(data) do
+            files.remove(furi.encode(info.path))
+        end
+    end
+
     local expect = data.completion
-    core.clearCache()
     local result = core.completion(mainUri, pos, '')
     if not expect then
         assert(result == nil)
@@ -307,8 +310,8 @@ TEST {
     }
 }
 
-local originSeparator = config.get 'Lua.completion.requireSeparator'
-config.set('Lua.completion.requireSeparator', '/')
+local originSeparator = config.get(nil, 'Lua.completion.requireSeparator')
+config.set(nil, 'Lua.completion.requireSeparator', '/')
 TEST {
     {
         path = 'abc.lua',
@@ -331,7 +334,7 @@ TEST {
         },
     }
 }
-config.set('Lua.completion.requireSeparator', originSeparator)
+config.set(nil, 'Lua.completion.requireSeparator', originSeparator)
 
 TEST {
     {
@@ -390,8 +393,8 @@ TEST {
 }
 
 
-local originRuntimePath = config.get 'Lua.runtime.path'
-config.set('Lua.runtime.path', {
+local originRuntimePath = config.get(nil, 'Lua.runtime.path')
+config.set(nil, 'Lua.runtime.path', {
     '?/1.lua',
 })
 
@@ -419,10 +422,10 @@ TEST {
     }
 }
 
-config.set('Lua.runtime.path', originRuntimePath)
+config.set(nil, 'Lua.runtime.path', originRuntimePath)
 
-local originRuntimePath = config.get 'Lua.runtime.path'
-config.set('Lua.runtime.path', {
+local originRuntimePath = config.get(nil, 'Lua.runtime.path')
+config.set(nil, 'Lua.runtime.path', {
     'D:/?/1.lua',
 })
 
@@ -445,7 +448,7 @@ TEST {
     }
 }
 
-config.set('Lua.runtime.path', originRuntimePath)
+config.set(nil, 'Lua.runtime.path', originRuntimePath)
 
 TEST {
     {
@@ -627,7 +630,7 @@ TEST {
     }
 }
 
-config.set('Lua.runtime.pathStrict', true)
+config.set(nil, 'Lua.runtime.pathStrict', true)
 
 TEST {
     { path = 'f/a.lua' },
@@ -672,7 +675,7 @@ TEST {
     }
 }
 
-config.set('Lua.runtime.pathStrict', false)
+config.set(nil, 'Lua.runtime.pathStrict', false)
 
 TEST {
     {
@@ -960,7 +963,7 @@ TEST {
     completion = EXISTS
 }
 
-config.prop('Lua.runtime.special', 'import', 'require')
+config.prop(nil, 'Lua.runtime.special', 'import', 'require')
 TEST {
     { path = 'abcde.lua', content = '' },
     {

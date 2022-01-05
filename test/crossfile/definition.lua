@@ -27,8 +27,6 @@ local function founded(targets, results)
 end
 
 function TEST(datas)
-    files.removeAll()
-
     local targetList = {}
     local sourceList
     local sourceUri
@@ -54,6 +52,12 @@ function TEST(datas)
             sourceUri = uri
         end
         files.setText(uri, newScript)
+    end
+
+    local _ <close> = function ()
+        for _, info in ipairs(datas) do
+            files.remove(furi.encode(info.path))
+        end
     end
 
     local sourcePos = (sourceList[1][1] + sourceList[1][2]) // 2
@@ -117,7 +121,7 @@ TEST {
     },
 }
 
-config.set('Lua.runtime.pathStrict', true)
+config.set(nil, 'Lua.runtime.pathStrict', true)
 TEST {
     {
         path = 'aaa/bbb.lua',
@@ -140,7 +144,7 @@ TEST {
     },
 }
 
-config.set('Lua.runtime.pathStrict', false)
+config.set(nil, 'Lua.runtime.pathStrict', false)
 
 TEST {
     {
@@ -740,8 +744,8 @@ TEST {
 }
 platform.OS = originOS
 
-local originRuntimePath = config.get 'Lua.runtime.path'
-config.set('Lua.runtime.path', {
+local originRuntimePath = config.get(nil, 'Lua.runtime.path')
+config.set(nil, 'Lua.runtime.path', {
     '?/1.lua',
 })
 TEST {
@@ -760,7 +764,7 @@ TEST {
     },
 }
 
-config.set('Lua.runtime.path', {
+config.set(nil, 'Lua.runtime.path', {
     'D:/?/1.lua',
 })
 TEST {
@@ -778,7 +782,7 @@ TEST {
         ]],
     },
 }
-config.set('Lua.runtime.path', originRuntimePath)
+config.set(nil, 'Lua.runtime.path', originRuntimePath)
 
 TEST {
     {
@@ -795,7 +799,7 @@ TEST {
     },
 }
 
-config.set('Lua.IntelliSense.traceFieldInject', true)
+config.set(nil, 'Lua.IntelliSense.traceFieldInject', true)
 TEST {
     {
         path = 'a.lua',
@@ -816,7 +820,7 @@ print(b.<?test?>)
         ]]
     }
 }
-config.set('Lua.IntelliSense.traceFieldInject', false)
+config.set(nil, 'Lua.IntelliSense.traceFieldInject', false)
 
 TEST {
     {
@@ -868,9 +872,9 @@ print(t.<?x?>)
     }
 }
 
-local originRuntimePath = config.get 'Lua.runtime.path'
+local originRuntimePath = config.get(nil, 'Lua.runtime.path')
 
-config.set('Lua.runtime.path', {
+config.set(nil, 'Lua.runtime.path', {
     './?.lua'
 })
 TEST {
@@ -891,7 +895,7 @@ print(t.<?x?>)
     }
 }
 
-config.set('Lua.runtime.path', {
+config.set(nil, 'Lua.runtime.path', {
     '/home/?.lua'
 })
 TEST {
@@ -912,8 +916,8 @@ print(t.<?x?>)
     }
 }
 
-config.set('Lua.runtime.pathStrict', true)
-config.set('Lua.runtime.path', {
+config.set(nil, 'Lua.runtime.pathStrict', true)
+config.set(nil, 'Lua.runtime.path', {
     './?.lua'
 })
 TEST {
@@ -934,7 +938,7 @@ print(t.<?x?>)
     }
 }
 
-config.set('Lua.runtime.path', {
+config.set(nil, 'Lua.runtime.path', {
     '/home/?.lua'
 })
 TEST {
@@ -955,5 +959,5 @@ print(t.<?x?>)
     }
 }
 
-config.set('Lua.runtime.pathStrict', false)
-config.set('Lua.runtime.path', originRuntimePath)
+config.set(nil, 'Lua.runtime.pathStrict', false)
+config.set(nil, 'Lua.runtime.path', originRuntimePath)

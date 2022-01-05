@@ -157,7 +157,7 @@ local function formatNumber(n)
 end
 
 local function asNumber(source)
-    if not config.get 'Lua.hover.viewNumber' then
+    if not config.get(guide.getUri(source), 'Lua.hover.viewNumber') then
         return nil
     end
     local num = source[1]

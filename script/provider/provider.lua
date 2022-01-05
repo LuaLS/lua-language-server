@@ -16,30 +16,40 @@ local cfgLoader  = require 'config.loader'
 local converter  = require 'proto.converter'
 local filewatch  = require 'filewatch'
 local json       = require 'json'
+local scope      = require 'workspace.scope'
 
 ---@async
-local function updateConfig()
-    local clientConfig = cfgLoader.loadClientConfig()
-    if clientConfig then
-        log.debug('load config from client')
-        config.update(clientConfig, json.null)
-    end
-
-    local rc = cfgLoader.loadRCConfig('.luarc.json')
-    if rc then
-        log.debug('load config from luarc')
-        config.update(rc, json.null)
-    end
-
-    local cfg = cfgLoader.loadLocalConfig(CONFIGPATH)
-    if cfg then
-        log.debug('load config from local', CONFIGPATH)
+local function updateConfig(uri)
+    config.addNullSymbol(json.null)
+    local specified = cfgLoader.loadLocalConfig(uri, CONFIGPATH)
+    if specified then
+        log.debug('Load config from specified', CONFIGPATH)
+        log.debug(util.dump(specified))
         -- watch directory
-        filewatch.watch(workspace.getAbsolutePath(CONFIGPATH):gsub('[^/\\]+$', ''))
-        config.update(cfg, json.null)
+        filewatch.watch(workspace.getAbsolutePath(uri, CONFIGPATH):gsub('[^/\\]+$', ''))
+        config.update(scope.override, specified)
     end
 
-    log.debug('loaded config dump:', util.dump(config.dump()))
+    for _, folder in ipairs(scope.folders) do
+        local clientConfig = cfgLoader.loadClientConfig(folder.uri)
+        if clientConfig then
+            log.debug('Load config from client', folder.uri)
+            log.debug(util.dump(clientConfig))
+        end
+
+        local rc = cfgLoader.loadRCConfig(folder.uri, '.luarc.json')
+        if rc then
+            log.debug('Load config from luarc.json', folder.uri)
+            log.debug(util.dump(rc))
+        end
+
+        config.update(folder, clientConfig, rc)
+    end
+
+    local global = cfgLoader.loadClientConfig()
+    log.debug('Load config from client', 'fallback')
+    log.debug(util.dump(global))
+    config.update(scope.fallback, global)
 end
 
 ---@class provider
@@ -55,13 +65,22 @@ function m.register(method)
 end
 
 filewatch.event(function (changes) ---@async
-    local configPath = CONFIGPATH and workspace.getAbsolutePath(CONFIGPATH)
-    local rcPath     = workspace.getAbsolutePath('.luarc.json')
     for _, change in ipairs(changes) do
-        if change.path == configPath
-        or change.path == rcPath then
-            updateConfig()
-            return
+        if (CONFIGPATH and util.stringEndWith(change.path, CONFIGPATH)) then
+            for _, scp in ipairs(workspace.folders) do
+                local configPath = workspace.getAbsolutePath(scp.uri, CONFIGPATH)
+                if change.path == configPath then
+                    updateConfig(scp.uri)
+                end
+            end
+        end
+        if util.stringEndWith(change.path, '.luarc.json') then
+            for _, scp in ipairs(workspace.folders) do
+                local rcPath     = workspace.getAbsolutePath(scp.uri, '.luarc.json')
+                if change.path == rcPath then
+                    updateConfig(scp.uri)
+                end
+            end
         end
     end
 end)
@@ -69,8 +88,19 @@ end)
 m.register 'initialize' {
     function (params)
         client.init(params)
-        config.init()
-        workspace.initPath(params.rootUri)
+
+        if params.rootUri then
+            workspace.initRoot(params.rootUri)
+        end
+
+        if params.workspaceFolders then
+            for _, folder in ipairs(params.workspaceFolders) do
+                workspace.create(folder.uri)
+            end
+        elseif params.rootUri then
+            workspace.create(params.rootUri)
+        end
+
         return {
             capabilities = cap.getIniter(),
             serverInfo   = {
@@ -84,7 +114,7 @@ m.register 'initialized'{
     ---@async
     function (params)
         files.init()
-        local _ <close> = progress.create(lang.script.WINDOW_INITIALIZING, 0.5)
+        local _ <close> = progress.create(workspace.getFirstScope(), lang.script.WINDOW_INITIALIZING, 0.5)
         updateConfig()
         local registrations = {}
 
@@ -189,9 +219,9 @@ m.register 'workspace/didRenameFiles' {
 m.register 'textDocument/didOpen' {
     ---@async
     function (params)
-        workspace.awaitReady()
         local doc   = params.textDocument
         local uri   = files.getRealUri(doc.uri)
+        workspace.awaitReady(uri)
         local text  = doc.text
         files.setText(uri, text, true, doc.version)
         files.open(uri)
@@ -213,10 +243,10 @@ m.register 'textDocument/didClose' {
 m.register 'textDocument/didChange' {
     ---@async
     function (params)
-        workspace.awaitReady()
         local doc     = params.textDocument
         local changes = params.contentChanges
         local uri     = files.getRealUri(doc.uri)
+        workspace.awaitReady(uri)
         --log.debug('changes', util.dump(changes))
         local text = files.getOriginText(uri) or ''
         local rows = files.getCachedRows(uri)
@@ -230,13 +260,13 @@ m.register 'textDocument/hover' {
     abortByFileUpdate = true,
     ---@async
     function (params)
-        if not config.get('Lua.hover.enable') then
-            return
-        end
         local doc    = params.textDocument
         local uri    = files.getRealUri(doc.uri)
-        if not workspace.isReady() then
-            local count, max = workspace.getLoadProcess()
+        if not config.get(uri, 'Lua.hover.enable') then
+            return
+        end
+        if not workspace.isReady(uri) then
+            local count, max = workspace.getLoadingProcess(uri)
             return {
                 contents = {
                     value = lang.script('HOVER_WS_LOADING', count, max),
@@ -244,7 +274,7 @@ m.register 'textDocument/hover' {
                 }
             }
         end
-        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_HOVER, 0.5)
+        local _ <close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_HOVER, 0.5)
         local core = require 'core.hover'
         if not files.exists(uri) then
             return nil
@@ -268,13 +298,13 @@ m.register 'textDocument/definition' {
     abortByFileUpdate = true,
     ---@async
     function (params)
-        workspace.awaitReady()
-        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_DEFINITION, 0.5)
-        local core   = require 'core.definition'
         local uri    = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
         if not files.exists(uri) then
             return nil
         end
+        local _ <close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_DEFINITION, 0.5)
+        local core   = require 'core.definition'
         local pos = converter.unpackPosition(uri, params.position)
         local result = core(uri, pos)
         if not result then
@@ -307,13 +337,13 @@ m.register 'textDocument/typeDefinition' {
     abortByFileUpdate = true,
     ---@async
     function (params)
-        workspace.awaitReady()
-        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_TYPE_DEFINITION, 0.5)
-        local core   = require 'core.type-definition'
         local uri    = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
         if not files.exists(uri) then
             return nil
         end
+        local _ <close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_TYPE_DEFINITION, 0.5)
+        local core   = require 'core.type-definition'
         local pos = converter.unpackPosition(uri, params.position)
         local result = core(uri, pos)
         if not result then
@@ -346,13 +376,13 @@ m.register 'textDocument/references' {
     abortByFileUpdate = true,
     ---@async
     function (params)
-        workspace.awaitReady()
-        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_REFERENCE, 0.5)
-        local core   = require 'core.reference'
         local uri    = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
         if not files.exists(uri) then
             return nil
         end
+        local _ <close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_REFERENCE, 0.5)
+        local core   = require 'core.reference'
         local pos    = converter.unpackPosition(uri, params.position)
         local result = core(uri, pos)
         if not result then
@@ -397,13 +427,13 @@ m.register 'textDocument/rename' {
     abortByFileUpdate = true,
     ---@async
     function (params)
-        workspace.awaitReady()
-        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_RENAME, 0.5)
-        local core = require 'core.rename'
         local uri  = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
         if not files.exists(uri) then
             return nil
         end
+        local _ <close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_RENAME, 0.5)
+        local core = require 'core.rename'
         local pos    = converter.unpackPosition(uri, params.position)
         local result = core.rename(uri, pos, params.newName)
         if not result then
@@ -448,8 +478,8 @@ m.register 'textDocument/completion' {
     ---@async
     function (params)
         local uri  = files.getRealUri(params.textDocument.uri)
-        if not workspace.isReady() then
-            local count, max = workspace.getLoadProcess()
+        if not workspace.isReady(uri) then
+            local count, max = workspace.getLoadingProcess(uri)
             return {
                 {
                     label = lang.script('HOVER_WS_LOADING', count, max),textEdit         = {
@@ -462,7 +492,7 @@ m.register 'textDocument/completion' {
                 }
             }
         end
-        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_COMPLETION, 0.5)
+        local _ <close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_COMPLETION, 0.5)
         --log.info(util.dump(params))
         local core  = require 'core.completion'
         --log.debug('textDocument/completion')
@@ -471,7 +501,7 @@ m.register 'textDocument/completion' {
             return nil
         end
         local triggerCharacter = params.context and params.context.triggerCharacter
-        if config.get 'editor.acceptSuggestionOnEnter' ~= 'off' then
+        if config.get(uri, 'editor.acceptSuggestionOnEnter') ~= 'off' then
             if triggerCharacter == '\n'
             or triggerCharacter == '{'
             or triggerCharacter == ',' then
@@ -600,15 +630,15 @@ m.register 'textDocument/signatureHelp' {
     abortByFileUpdate = true,
     ---@async
     function (params)
-        if not config.get 'Lua.signatureHelp.enable' then
+        local uri = files.getRealUri(params.textDocument.uri)
+        if not config.get(uri, 'Lua.signatureHelp.enable') then
             return nil
         end
-        workspace.awaitReady()
-        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SIGNATURE, 0.5)
-        local uri = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
         if not files.exists(uri) then
             return nil
         end
+        local _ <close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_SIGNATURE, 0.5)
         local pos = converter.unpackPosition(uri, params.position)
         local core = require 'core.signature'
         local results = core(uri, pos)
@@ -646,11 +676,11 @@ m.register 'textDocument/documentSymbol' {
     abortByFileUpdate = true,
     ---@async
     function (params)
-        workspace.awaitReady()
-        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SYMBOL, 0.5)
-        local core = require 'core.document-symbol'
         local uri   = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
+        local _ <close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_SYMBOL, 0.5)
 
+        local core = require 'core.document-symbol'
         local symbols = core(uri)
         if not symbols then
             return nil
@@ -749,8 +779,7 @@ m.register 'workspace/symbol' {
     abortByFileUpdate = true,
     ---@async
     function (params)
-        workspace.awaitReady()
-        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_WS_SYMBOL, 0.5)
+        local _ <close> = progress.create(workspace.getFirstScope(), lang.script.WINDOW_PROCESSING_WS_SYMBOL, 0.5)
         local core = require 'core.workspace-symbol'
 
         local symbols = core(params.query)
@@ -783,8 +812,8 @@ m.register 'textDocument/semanticTokens/full' {
     ---@async
     function (params)
         local uri = files.getRealUri(params.textDocument.uri)
-        workspace.awaitReady()
-        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
+        workspace.awaitReady(uri)
+        local _ <close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
         local core = require 'core.semantic-tokens'
         local results = core(uri, 0, math.huge)
         return {
@@ -798,8 +827,8 @@ m.register 'textDocument/semanticTokens/range' {
     ---@async
     function (params)
         local uri = files.getRealUri(params.textDocument.uri)
-        workspace.awaitReady()
-        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_SEMANTIC_RANGE, 0.5)
+        workspace.awaitReady(uri)
+        local _ <close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_SEMANTIC_RANGE, 0.5)
         local core = require 'core.semantic-tokens'
         local cache  = files.getOpenedCache(uri)
         local start, finish
@@ -882,7 +911,9 @@ m.register '$/status/click' {
         end
         if result == titleDiagnostic then
             local diagnostic = require 'provider.diagnostic'
-            diagnostic.diagnosticsAll(true)
+            for _, scp in ipairs(workspace.folders) do
+                diagnostic.diagnosticsScope(scp.uri, true)
+            end
         end
     end
 }
@@ -891,10 +922,10 @@ m.register 'textDocument/onTypeFormatting' {
     abortByFileUpdate = true,
     ---@async
     function (params)
-        workspace.awaitReady()
-        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
-        local ch     = params.ch
         local uri    = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
+        local _ <close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
+        local ch     = params.ch
         if not files.exists(uri) then
             return nil
         end
@@ -928,12 +959,12 @@ m.register '$/cancelRequest' {
 m.register '$/requestHint' {
     ---@async
     function (params)
-        local core = require 'core.hint'
-        if not config.get 'Lua.hint.enable' then
+        local uri  = files.getRealUri(params.textDocument.uri)
+        if not config.get(uri, 'Lua.hint.enable') then
             return
         end
-        workspace.awaitReady()
-        local uri           = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
+        local core = require 'core.hint'
         local start, finish = converter.unpackRange(uri, params.range)
         local results = core(uri, start, finish)
         local hintResults = {}
@@ -952,13 +983,13 @@ m.register '$/requestHint' {
 do
     ---@async
     local function updateHint(uri)
-        if not config.get 'Lua.hint.enable' then
+        if not config.get(uri, 'Lua.hint.enable') then
             return
         end
         local id = 'updateHint' .. uri
         await.close(id)
         await.setID(id)
-        workspace.awaitReady()
+        workspace.awaitReady(uri)
         local visibles = files.getVisibles(uri)
         if not visibles then
             return
@@ -966,10 +997,10 @@ do
         await.close(id)
         await.setID(id)
         await.delay()
-        workspace.awaitReady()
+        workspace.awaitReady(uri)
         local edits = {}
         local hint = require 'core.hint'
-        local _ <close> = progress.create(lang.script.WINDOW_PROCESSING_HINT, 0.5)
+        local _ <close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_HINT, 0.5)
         for _, visible in ipairs(visibles) do
             local piece = hint(uri, visible.start, visible.finish)
             if piece then
@@ -999,15 +1030,21 @@ do
 end
 
 local function refreshStatusBar()
-    local value = config.get 'Lua.window.statusBar'
-    if value then
+    local valid = true
+    for _, scp in ipairs(workspace.folders) do
+        if not config.get(scp.uri, 'Lua.window.statusBar') then
+            valid = false
+            break
+        end
+    end
+    if valid then
         proto.notify('$/status/show')
     else
         proto.notify('$/status/hide')
     end
 end
 
-config.watch(function (key, value)
+config.watch(function (uri, key, value)
     if key == 'Lua.window.statusBar' then
         refreshStatusBar()
     end
@@ -1016,7 +1053,7 @@ end)
 m.register '$/status/refresh' { refreshStatusBar }
 
 files.watch(function (ev, uri)
-    if not workspace.isReady() then
+    if not workspace.isReady(uri) then
         return
     end
     if ev == 'update'

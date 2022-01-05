@@ -494,14 +494,6 @@ function m.getLoadingProcess(uri)
     end
 end
 
-files.watch(function (ev, uri) ---@async
-    if  ev == 'close'
-    and m.isIgnored(uri)
-    and not files.isLibrary(uri) then
-        files.remove(uri)
-    end
-end)
-
 config.watch(function (uri, key, value, oldValue)
     if key:find '^Lua.runtime'
     or key:find '^Lua.workspace'

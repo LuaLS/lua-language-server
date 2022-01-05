@@ -208,7 +208,7 @@ function m.doDiagnostic(uri, isScopeDiag)
     local syntax = m.syntaxErrors(uri, state)
 
     local diags = {}
-    local lastDiag = m.cache[uri]
+    local lastDiag = util.deepCopy(m.cache[uri])
     local function pushResult()
         tracy.ZoneBeginN 'mergeSyntaxAndDiags'
         local _ <close> = tracy.ZoneEnd

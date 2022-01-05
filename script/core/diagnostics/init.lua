@@ -47,8 +47,9 @@ end
 ---@async
 ---@param uri uri
 ---@param name string
+---@param isScopeDiag boolean
 ---@param response async fun(result: any)
-local function check(uri, name, response)
+local function check(uri, name, isScopeDiag, response)
     if config.get(uri, 'Lua.diagnostics.disable')[name] then
         return
     end
@@ -89,7 +90,9 @@ local function check(uri, name, response)
     if passed >= 0.5 then
         log.warn(('Diagnostics [%s] @ [%s] takes [%.3f] sec!'):format(name, uri, passed))
     end
-    checkSleep(uri, passed)
+    if isScopeDiag then
+        checkSleep(uri, passed)
+    end
     if DIAGTIMES then
         DIAGTIMES[name] = (DIAGTIMES[name] or 0) + passed
     end
@@ -97,9 +100,10 @@ end
 
 ---@async
 ---@param uri uri
+---@param isScopeDiag boolean
 ---@param response async fun(result: any)
 ---@param checked  async fun(name: string)
-return function (uri, response, checked)
+return function (uri, isScopeDiag, response, checked)
     local ast = files.getState(uri)
     if not ast then
         return nil
@@ -111,7 +115,7 @@ return function (uri, response, checked)
 
     for _, name in ipairs(diagList) do
         await.delay()
-        check(uri, name, response)
+        check(uri, name, isScopeDiag, response)
         checked(name)
     end
 end

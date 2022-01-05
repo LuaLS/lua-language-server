@@ -237,7 +237,7 @@ function m.doDiagnostic(uri, isScopeDiag)
 
     local lastPushClock = os.clock()
     ---@async
-    xpcall(core, log.error, uri, function (result)
+    xpcall(core, log.error, uri, isScopeDiag, function (result)
         diags[#diags+1] = buildDiagnostic(uri, result)
 
         if not isScopeDiag and os.clock() - lastPushClock >= 0.2 then

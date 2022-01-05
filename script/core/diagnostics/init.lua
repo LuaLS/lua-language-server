@@ -19,6 +19,9 @@ table.sort(diagList, function (a, b)
     return (diagSort[a] or 0) < (diagSort[b] or 0)
 end)
 
+---@param uri uri
+---@param name string
+---@param response async fun(result: any)
 local function check(uri, name, response)
     if config.get(uri, 'Lua.diagnostics.disable')[name] then
         return
@@ -40,6 +43,7 @@ local function check(uri, name, response)
     local severity = define.DiagnosticSeverity[level]
     local clock = os.clock()
     local mark = {}
+    ---@async
     require('core.diagnostics.' .. name)(uri, function (result)
         if vm.isDiagDisabledAt(uri, result.start, name) then
             return
@@ -65,6 +69,8 @@ local function check(uri, name, response)
 end
 
 ---@async
+---@param uri uri
+---@param response async fun(result: any)
 return function (uri, response)
     local ast = files.getState(uri)
     if not ast then

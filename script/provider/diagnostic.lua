@@ -168,6 +168,28 @@ function m.syntaxErrors(uri, ast)
 end
 
 ---@async
+local function checkSleep(uri)
+    local speedRate = config.get(uri, 'Lua.diagnostics.workspaceRate')
+    if speedRate <= 0 or speedRate >= 100 then
+        return
+    end
+    local currentClock = os.clock()
+    local passed = currentClock - m.diagnosticsAllClock
+    local sleepTime = passed * (100 - speedRate) / speedRate + m.sleepRest
+    m.sleepRest = 0.0
+    if sleepTime < 0.001 then
+        m.sleepRest = m.sleepRest + sleepTime
+        return
+    end
+    if sleepTime > 0.1 then
+        m.sleepRest = sleepTime - 0.1
+        sleepTime = 0.1
+    end
+    await.sleep(sleepTime)
+    m.diagnosticsAllClock = os.clock()
+end
+
+---@async
 function m.doDiagnostic(uri, isScopeDiag)
     if not config.get(uri, 'Lua.diagnostics.enable') then
         return
@@ -236,11 +258,17 @@ function m.doDiagnostic(uri, isScopeDiag)
     pushResult()
 
     local lastPushClock = os.clock()
+    ---@async
     xpcall(core, log.error, uri, function (result)
         diags[#diags+1] = buildDiagnostic(uri, result)
+
         if not isScopeDiag and os.clock() - lastPushClock >= 0.2 then
             lastPushClock = os.clock()
             pushResult()
+        end
+
+        if isScopeDiag then
+            checkSleep(uri)
         end
     end)
 
@@ -352,32 +380,6 @@ function m.diagnosticsScope(uri, force)
         bar:remove()
         log.debug('全文诊断耗时：', os.clock() - clock)
     end, 'files.version', ('diagnosticsScope:' .. uri))
-end
-
----@async
-function m.checkWorkspaceDiag(uri)
-    if not await.hasID('diagnosticsScope:' .. uri) then
-        return
-    end
-    local speedRate = config.get(uri, 'Lua.diagnostics.workspaceRate')
-    if speedRate <= 0 or speedRate >= 100 then
-        return
-    end
-    local currentClock = os.clock()
-    local passed = currentClock - m.diagnosticsAllClock
-    local sleepTime = passed * (100 - speedRate) / speedRate + m.sleepRest
-    m.sleepRest = 0.0
-    if sleepTime < 0.001 then
-        m.sleepRest = m.sleepRest + sleepTime
-        return
-    end
-    if sleepTime > 0.1 then
-        m.sleepRest = sleepTime - 0.1
-        sleepTime = 0.1
-    end
-    await.sleep(sleepTime)
-    m.diagnosticsAllClock = os.clock()
-    return false
 end
 
 ws.watch(function (ev, uri)

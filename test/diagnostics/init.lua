@@ -1461,6 +1461,16 @@ end)
 ]]
 
 TEST [[
+local function f(...)
+    return ...
+end
+
+f(1, function () ---@async
+    return nil
+end)
+]]
+
+TEST [[
 ---@nodiscard
 local function f()
     return 1

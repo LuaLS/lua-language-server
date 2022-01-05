@@ -9,9 +9,9 @@ local function isYieldAble(defs, i)
     local hasFuncDef
     for _, def in ipairs(defs) do
         if def.type == 'function' then
-            hasFuncDef = true
             local arg = def.args and def.args[i]
             if arg then
+                hasFuncDef = true
                 if infer.hasType(arg, 'any')
                 or vm.isAsync(arg, true)
                 or arg.type == '...' then
@@ -20,9 +20,9 @@ local function isYieldAble(defs, i)
             end
         end
         if def.type == 'doc.type.function' then
-            hasFuncDef = true
             local arg = def.args and def.args[i]
             if arg then
+                hasFuncDef = true
                 if infer.hasType(arg.extends, 'any')
                 or vm.isAsync(arg.extends, true) then
                     return true

@@ -98,7 +98,8 @@ end
 ---@async
 ---@param uri uri
 ---@param response async fun(result: any)
-return function (uri, response)
+---@param checked  async fun(name: string)
+return function (uri, response, checked)
     local ast = files.getState(uri)
     if not ast then
         return nil
@@ -111,5 +112,6 @@ return function (uri, response)
     for _, name in ipairs(diagList) do
         await.delay()
         check(uri, name, response)
+        checked(name)
     end
 end

@@ -93,36 +93,34 @@ local function buildDiagnostic(uri, diag)
     }
 end
 
-local function mergeSyntaxAndDiags(a, b)
-    if not a and not b then
+local function mergeDiags(a, b, c)
+    if not a and not b and not c then
         return nil
     end
-    local count = 0
     local t = {}
-    if a then
-        for i = 1, #a do
-            local severity = a[i].severity
+
+    local function merge(diags)
+        if not diags then
+            return
+        end
+        for i = 1, #diags do
+            local diag = diags[i]
+            local severity = diag.severity
             if severity == define.DiagnosticSeverity.Hint
             or severity == define.DiagnosticSeverity.Information then
-                t[#t+1] = a[i]
-            elseif count < 10000 then
-                count = count + 1
-                t[#t+1] = a[i]
+                if #t > 10000 then
+                    goto CONTINUE
+                end
             end
+            t[#t+1] = diag
+            ::CONTINUE::
         end
     end
-    if b then
-        for i = 1, #b do
-            local severity = b[i].severity
-            if severity == define.DiagnosticSeverity.Hint
-            or severity == define.DiagnosticSeverity.Information then
-                t[#t+1] = b[i]
-            elseif count < 10000 then
-                count = count + 1
-                t[#t+1] = b[i]
-            end
-        end
-    end
+
+    merge(a)
+    merge(b)
+    merge(c)
+
     return t
 end
 
@@ -208,11 +206,13 @@ function m.doDiagnostic(uri, isScopeDiag)
     prog:setMessage(ws.getRelativePath(uri))
 
     local syntax = m.syntaxErrors(uri, state)
+
     local diags = {}
+    local lastDiag = m.cache[uri]
     local function pushResult()
         tracy.ZoneBeginN 'mergeSyntaxAndDiags'
         local _ <close> = tracy.ZoneEnd
-        local full = mergeSyntaxAndDiags(syntax, diags)
+        local full = mergeDiags(syntax, lastDiag, diags)
         if not full then
             m.clear(uri)
             return
@@ -244,8 +244,19 @@ function m.doDiagnostic(uri, isScopeDiag)
             lastPushClock = os.clock()
             pushResult()
         end
+    end, function (checkedName)
+        if not lastDiag then
+            return
+        end
+        for i, diag in ipairs(lastDiag) do
+            if diag.code == checkedName then
+                lastDiag[i] = lastDiag[#lastDiag]
+                lastDiag[#lastDiag] = nil
+            end
+        end
     end)
 
+    lastDiag = nil
     pushResult()
 end
 
@@ -258,7 +269,6 @@ function m.refresh(uri)
         if uri then
             await.setID('diag:' .. uri)
             await.sleep(0.1)
-            m.clearCache(uri)
             xpcall(m.doDiagnostic, log.error, uri)
         end
         m.diagnosticsScope(uri)

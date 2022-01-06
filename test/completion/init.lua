@@ -109,6 +109,7 @@ function TEST(script)
             end
         end
         assert(result)
+        result.complete = nil
         if expect.include then
             expect.include = nil
             assert(include(expect, result))

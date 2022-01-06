@@ -109,6 +109,7 @@ function TEST(data)
         return
     end
     assert(result ~= nil)
+    result.complete = nil
     result.enableCommon = nil
     removeMetas(result)
     for _, item in ipairs(result) do

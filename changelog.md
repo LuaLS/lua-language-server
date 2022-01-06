@@ -1,7 +1,7 @@
 # changelog
 
 ## 2.5.7
-* `NEW` supports multi-workspace in server side
+* `NEW` supports multi-workspace in server side, for developers of language clients, please [read here](https://github.com/sumneko/lua-language-server/wiki/Multi-workspace-supports) to learn more.
 * `NEW` setting: `Lua.hint.arrayIndex`
 * `CHG` diagnostic: smoother
 * `FIX` [#879](https://github.com/sumneko/lua-language-server/issues/879)

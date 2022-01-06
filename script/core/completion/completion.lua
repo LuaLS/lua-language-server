@@ -645,8 +645,11 @@ local function checkCommon(state, word, position, results)
     for _, data in ipairs(keyWordMap) do
         used[data[1]] = true
     end
-    if config.get(state.uri, 'Lua.completion.workspaceWord') and #word >= 2 then
+    if not config.get(state.uri, 'Lua.completion.workspaceWord')
+    or #word >= 2 then
         results.complete = true
+    end
+    if config.get(state.uri, 'Lua.completion.workspaceWord') and #word >= 2 then
         local myHead = word:sub(1, 2)
         for uri in files.eachFile() do
             if #results >= 100 then

@@ -154,27 +154,27 @@ TEST {
     completion = {
         {
             label = 'aaa',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'abc',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'abc.aaa',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'abcde',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'xxx.abcde',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -193,7 +193,7 @@ TEST {
     completion = {
         {
             label = 'abc',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -216,12 +216,12 @@ TEST {
     completion = {
         {
             label = 'ABCD',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'abc',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -244,12 +244,12 @@ TEST {
     completion = {
         {
             label = 'abc',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'abc.init',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -272,17 +272,17 @@ TEST {
     completion = {
         {
             label = 'abc',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'abc.bbc',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'abc.init',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -305,7 +305,7 @@ TEST {
     completion = {
         {
             label = 'abc.init',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -330,7 +330,7 @@ TEST {
     completion = {
         {
             label = 'abc/init',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -354,7 +354,7 @@ TEST {
     completion = {
         {
             label = 'core.core',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -377,17 +377,17 @@ TEST {
     completion = {
         {
             label = 'abc.x111',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'x000',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'x111',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -412,12 +412,12 @@ TEST {
     completion = {
         {
             label = 'D:.xxxx',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'xxxx',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -443,7 +443,7 @@ TEST {
     completion = {
         {
             label = 'xxxx',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -586,22 +586,22 @@ TEST {
     completion = {
         {
             label = 'a',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'b',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'f.a',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'f.b',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -620,12 +620,12 @@ TEST {
     completion = {
         {
             label = 'a',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'f.a',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -646,12 +646,12 @@ TEST {
     completion = {
         {
             label = 'f.a',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'f.b',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -670,7 +670,7 @@ TEST {
     completion = {
         {
             label = 'f.a',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -693,7 +693,7 @@ TEST {
     completion = {
         {
             label = 'xxx',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -714,7 +714,7 @@ TEST {
     completion = {
         {
             label = [[xx'xx]],
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -735,7 +735,7 @@ TEST {
     completion = {
         {
             label = [[xx]=]xx]],
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -756,8 +756,8 @@ TEST {
     },
     completion = {
         {
-            label = [[abc\init.lua]],
-            kind = CompletionItemKind.Reference,
+            label = [[abc/init.lua]],
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -778,7 +778,7 @@ TEST {
     completion = {
         {
             label = [[abc/init.lua]],
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }

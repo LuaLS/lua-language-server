@@ -61,6 +61,7 @@ local function buildSyntaxError(uri, err)
         source   = lang.script.DIAG_SYNTAX_CHECK,
         message  = message,
         relatedInformation = relatedInformation,
+        data     = 'syntax',
     }
 end
 
@@ -155,14 +156,28 @@ function m.syntaxErrors(uri, ast)
     local results = {}
 
     pcall(function ()
+        local disables = config.get(uri, 'Lua.diagnostics.disable')
         for _, err in ipairs(ast.errs) do
-            if not config.get(uri, 'Lua.diagnostics.disable')[err.type:lower():gsub('_', '-')] then
+            if not disables[err.type:lower():gsub('_', '-')] then
                 results[#results+1] = buildSyntaxError(uri, err)
             end
         end
     end)
 
     return results
+end
+
+local function copyDiagsWithoutSyntax(diags)
+    if not diags then
+        return nil
+    end
+    local copyed = {}
+    for _, diag in ipairs(diags) do
+        if diag.data ~= 'syntax' then
+            copyed[#copyed+1] = diag
+        end
+    end
+    return copyed
 end
 
 ---@async
@@ -208,7 +223,7 @@ function m.doDiagnostic(uri, isScopeDiag)
     local syntax = m.syntaxErrors(uri, state)
 
     local diags = {}
-    local lastDiag = util.deepCopy(m.cache[uri])
+    local lastDiag = copyDiagsWithoutSyntax(m.cache[uri])
     local function pushResult()
         tracy.ZoneBeginN 'mergeSyntaxAndDiags'
         local _ <close> = tracy.ZoneEnd

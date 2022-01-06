@@ -945,6 +945,7 @@ local function collectRequireNames(mode, myUri, literal, source, smark, position
                 goto CONTINUE
             end
             local path = workspace.getRelativePath(uri)
+            path = path:gsub('\\', '/')
             if matchKey(literal, path) then
                 if not collect[path] then
                     collect[path] = {
@@ -974,7 +975,7 @@ local function collectRequireNames(mode, myUri, literal, source, smark, position
         end
         results[#results+1] = {
             label = label,
-            kind  = define.CompletionItemKind.Reference,
+            kind  = define.CompletionItemKind.File,
             description = table.concat(des, '\n'),
             textEdit = infos.textEdit,
         }

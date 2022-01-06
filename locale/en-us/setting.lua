@@ -1,6 +1,5 @@
 ---@diagnostic disable: undefined-global
 
-config.awakened.cat               = 'PLAY WITH ME >_<\n\n(This will enable the beta version which is still in development. Feedback is welcome! Reload the window after changing this option!)'
 config.runtime.version            = "Lua runtime version."
 config.runtime.path               = [[
 When using `require`, how to find the file based on the input name.
@@ -28,7 +27,6 @@ Adjust the enabled state of the built-in library. You can disable (or redefine) 
 * `enable`: always enable
 * `disable`: always disable
 ]]
-config.workspace.userThirdParty          = 'Add private third-party library configuration file paths here, please refer to the built-in [configuration file path](https://github.com/sumneko/lua-language-server/tree/master/meta/3rd)'
 config.diagnostics.enable         = "Enable diagnostics."
 config.diagnostics.disable        = "Disabled diagnostic (Use code in hover brackets)."
 config.diagnostics.globals        = "Defined global variables."
@@ -61,6 +59,7 @@ Automatic detection and adaptation of third-party libraries, currently supported
 * skynet
 * Jass
 ]]
+config.workspace.userThirdParty          = 'Add private third-party library configuration file paths here, please refer to the built-in [configuration file path](https://github.com/sumneko/lua-language-server/tree/master/meta/3rd)'
 config.completion.enable                 = 'Enable completion.'
 config.completion.callSnippet            = 'Shows function call snippets.'
 config.completion.callSnippet.Disable    = "Only shows `function name`."
@@ -92,7 +91,6 @@ config.hover.viewNumber                  = "Hover to view numeric content (only 
 config.hover.fieldInfer                  = "When hovering to view a table, type infer will be performed for each field. When the accumulated time of type infer reaches the set value (MS), the type infer of subsequent fields will be skipped."
 config.hover.previewFields               = "When hovering to view a table, limits the maximum number of previews for fields."
 config.hover.enumsLimit                  = "When the value corresponds to multiple types, limit the number of types displaying."
-config.zzzzzz.cat                        = 'DONT TOUCH ME, LET ME SLEEP >_<'
 config.develop.enable                    = 'Developer mode. Do not enable, performance will be affected.'
 config.develop.debuggerPort              = 'Listen port of debugger.'
 config.develop.debuggerWait              = 'Suspend before debugger connects.'
@@ -107,6 +105,10 @@ config.hint.paramName                    = 'Show hints of parameter name at the 
 config.hint.paramName.All                = 'All types of parameters are shown.'
 config.hint.paramName.Literal            = 'Only literal type parameters are shown.'
 config.hint.paramName.Disable            = 'Disable parameter hints.'
+config.hint.arrayIndex                   = 'Show hints of array index when constructing a table.'
+config.hint.arrayIndex.Enable            = 'Show hints in all tables.'
+config.hint.arrayIndex.Auto              = 'Show hints only when the table is greater than 3 items, or the table is a mixed table.'
+config.hint.arrayIndex.Disable           = 'Disable hints of array index.'
 config.telemetry.enable                  = [[
 Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://github.com/sumneko/lua-language-server/wiki/Privacy-Policy).
 ]]

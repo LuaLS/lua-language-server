@@ -91,7 +91,6 @@ config.hover.viewNumber                  = "悬停提示查看数字内容（仅
 config.hover.fieldInfer                  = "悬停提示查看表时，会对表的每个字段进行类型推测，当类型推测的用时累计达到该设定值（毫秒）时，将跳过后续字段的类型推测。"
 config.hover.previewFields               = "悬停提示查看表时，限制表内字段的最大预览数量。"
 config.hover.enumsLimit                  = "当值对应多个类型时，限制类型的显示数量。"
-config.zzzzzz.cat                        = 'DONT TOUCH ME, LET ME SLEEP >_<'
 config.develop.enable                    = '开发者模式。请勿开启，会影响性能。'
 config.develop.debuggerPort              = '调试器监听端口。'
 config.develop.debuggerWait              = '调试器连接之前挂起。'
@@ -106,6 +105,10 @@ config.hint.paramName                    = '在函数调用处提示参数名。
 config.hint.paramName.All                = '所有类型的参数均进行提示。'
 config.hint.paramName.Literal            = '只有字面量类型的参数进行提示。'
 config.hint.paramName.Disable            = '禁用参数提示。'
+config.hint.arrayIndex                   = '在构造表时提示数组索引。'
+config.hint.arrayIndex.Enable            = '所有的表中都提示数组索引。'
+config.hint.arrayIndex.Auto              = '只有表大于3项，或者表是混合类型时才进行提示。'
+config.hint.arrayIndex.Disable           = '禁用数组索引提示。'
 config.telemetry.enable                  = [[
 启用遥测，通过网络发送你的编辑器信息与错误日志。在[此处](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%90%E7%A7%81%E5%A3%B0%E6%98%8E)阅读我们的隐私声明。
 ]]

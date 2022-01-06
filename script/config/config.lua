@@ -202,6 +202,7 @@ local Template = {
     ['Lua.hint.setType']                    = Type.Boolean >> false,
     ['Lua.hint.paramName']                  = Type.String  >> 'All',
     ['Lua.hint.await']                      = Type.Boolean >> true,
+    ['Lua.hint.arrayIndex']                 = Type.Boolean >> 'Auto',
     ['Lua.window.statusBar']                = Type.Boolean >> true,
     ['Lua.window.progressBar']              = Type.Boolean >> true,
     ['Lua.IntelliSense.traceLocalSet']      = Type.Boolean >> false,

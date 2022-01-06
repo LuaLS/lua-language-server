@@ -161,6 +161,56 @@ local function paramName(uri, results, start, finish)
 end
 
 ---@async
+local function arrayIndex(uri, results, start, finish)
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
+    local option = config.get(uri, 'Lua.hint.arrayIndex')
+    if option == 'Disable' then
+        return
+    end
+
+    local mixedOrLargeTable = {}
+    local function isMixedOrLargeTable(tbl)
+        if mixedOrLargeTable[tbl] ~= nil then
+            return mixedOrLargeTable[tbl]
+        end
+        if #tbl > 3 then
+            mixedOrLargeTable[tbl] = true
+            return true
+        end
+        for _, child in ipairs(tbl) do
+            if child.type ~= 'tableexp' then
+                mixedOrLargeTable[tbl] = true
+                return true
+            end
+        end
+        mixedOrLargeTable[tbl] = false
+        return false
+    end
+
+    ---@async
+    guide.eachSourceBetween(state.ast, start, finish, function (source)
+        if source.type ~= 'tableexp' then
+            return
+        end
+        await.delay()
+        if option == 'Auto' then
+            if not isMixedOrLargeTable(source.parent) then
+                return
+            end
+        end
+        results[#results+1] = {
+            text   = ('[%d]'):format(source.tindex),
+            offset = source.start,
+            kind   = define.InlayHintKind.Other,
+            where  = 'left',
+        }
+    end)
+end
+
+---@async
 local function awaitHint(uri, results, start, finish)
     local awaitConfig = config.get(uri, 'Lua.hint.await')
     if not awaitConfig then
@@ -194,5 +244,6 @@ return function (uri, start, finish)
     typeHint(uri, results, start, finish)
     awaitHint(uri, results, start, finish)
     paramName(uri, results, start, finish)
+    arrayIndex(uri, results, start, finish)
     return results
 end

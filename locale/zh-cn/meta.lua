@@ -1,3 +1,5 @@
+---@diagnostic disable: undefined-global, lowercase-global
+
 -- basic
 arg                 = '独立版Lua的启动参数。'
 assert              = '如果其参数 `v` 的值为假（`nil` 或 `false`）， 它就调用 $error； 否则，返回所有的参数。 在错误情况时， `message` 指那个错误对象； 如果不提供这个参数，参数默认为 `"assertion failed!"` 。'

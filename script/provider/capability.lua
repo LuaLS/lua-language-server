@@ -1,10 +1,21 @@
-local sp         = require 'bee.subprocess'
 local nonil      = require 'without-check-nil'
 local client     = require 'client'
 local platform   = require 'bee.platform'
 local completion = require 'provider.completion'
+local define     = require 'proto.define'
 
 require 'provider.semantic-tokens'
+
+local function toArray(map)
+    local array = {}
+    for k in pairs(map) do
+        array[#array+1] = k
+    end
+    table.sort(array, function (a, b)
+        return map[a] < map[b]
+    end)
+    return array
+end
 
 local m = {}
 
@@ -92,6 +103,14 @@ function m.getIniter()
         documentOnTypeFormattingProvider = {
             firstTriggerCharacter = '\n',
             moreTriggerCharacter  = nil, -- string[]
+        },
+        semanticTokensProvider = {
+            legend = {
+                tokenTypes     = toArray(define.TokenTypes),
+                tokenModifiers = toArray(define.TokenModifiers),
+            },
+            range = true,
+            full  = false,
         },
         --documentOnTypeFormattingProvider = {
         --    firstTriggerCharacter = '}',

@@ -131,6 +131,7 @@ m.register 'initialized'{
                 registrations = registrations
             })
         end
+        client.setReady()
         library.init()
         workspace.init()
         return true
@@ -823,9 +824,9 @@ m.register 'textDocument/semanticTokens/full' {
 }
 
 m.register 'textDocument/semanticTokens/range' {
-    abortByFileUpdate = true,
     ---@async
     function (params)
+        log.debug('textDocument/semanticTokens/range')
         local uri = files.getRealUri(params.textDocument.uri)
         workspace.awaitReady(uri)
         local _ <close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_SEMANTIC_RANGE, 0.5)

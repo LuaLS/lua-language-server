@@ -381,6 +381,14 @@ function m.editText(uri, edits)
     })
 end
 
+function m.setReady()
+    m._ready = true
+end
+
+function m.isReady()
+    return m._ready == true
+end
+
 local function hookPrint()
     if TEST then
         return

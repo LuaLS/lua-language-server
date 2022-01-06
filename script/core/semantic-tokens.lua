@@ -367,6 +367,9 @@ end
 
 ---@async
 return function (uri, start, finish)
+    if config.get(uri, 'Lua.color.mode') == 'Grammar' then
+        return nil
+    end
     local state = files.getState(uri)
     if not state then
         return nil

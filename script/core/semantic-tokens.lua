@@ -9,51 +9,64 @@ local converter      = require 'proto.converter'
 local infer          = require 'core.infer'
 local config         = require 'config'
 
-local Care = {}
-Care['getglobal'] = function (source, options, results)
-    local isLib = vm.isGlobalLibraryName(source[1])
-    local isFunc = false
-    local value = source.value
+local Care = util.switch()
+    : case 'getglobal'
+    : case 'setglobal'
+    : call(function (source, options, results)
+        local isLib = vm.isGlobalLibraryName(source[1])
+        local isFunc = false
+        local value = source.value
 
-    if value and value.type == 'function' then
-        isFunc = true
-    elseif source.parent.type == 'call' then
-        isFunc = true
-    elseif options.isEnhanced then
-        isFunc = infer.hasType(source, 'function')
-    end
-
-    local type = isFunc and define.TokenTypes['function'] or define.TokenTypes.variable
-    local modifier = isLib and define.TokenModifiers.defaultLibrary or define.TokenModifiers.static
-
-    results[#results+1] = {
-        start      = source.start,
-        finish     = source.finish,
-        type       = type,
-        modifieres = modifier,
-    }
-end
-Care['setglobal'] = Care['getglobal']
-Care['getmethod'] = function (source, options, results)
-    local method = source.method
-    if method and method.type == 'method' then
-        results[#results+1] = {
-            start      = method.start,
-            finish     = method.finish,
-            type       = define.TokenTypes.method,
-            modifieres = source.type == 'setmethod' and define.TokenModifiers.declaration or nil,
-        }
-    end
-end
-Care['setmethod'] = Care['getmethod']
-Care['field'] = function (source, options, results)
-    local modifiers = 0
-    if source.parent and source.parent.type == 'tablefield' then
-        modifiers = define.TokenModifiers.declaration
-    end
-    if source.parent then
-        local value = source.parent.value
         if value and value.type == 'function' then
+            isFunc = true
+        elseif source.parent.type == 'call' then
+            isFunc = true
+        elseif options.isEnhanced then
+            isFunc = infer.hasType(source, 'function')
+        end
+
+        local type = isFunc and define.TokenTypes['function'] or define.TokenTypes.variable
+        local modifier = isLib and define.TokenModifiers.defaultLibrary or define.TokenModifiers.static
+
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = type,
+            modifieres = modifier,
+        }
+    end)
+    : case 'getmethod'
+    : case 'setmethod'
+    : call(function (source, options, results)
+        local method = source.method
+        if method and method.type == 'method' then
+            results[#results+1] = {
+                start      = method.start,
+                finish     = method.finish,
+                type       = define.TokenTypes.method,
+                modifieres = source.type == 'setmethod' and define.TokenModifiers.declaration or nil,
+            }
+        end
+    end)
+    : case 'field'
+    : call(function (source, options, results)
+        local modifiers = 0
+        if source.parent and source.parent.type == 'tablefield' then
+            modifiers = define.TokenModifiers.declaration
+        end
+        if source.parent then
+            local value = source.parent.value
+            if value and value.type == 'function' then
+                results[#results+1] = {
+                    start      = source.start,
+                    finish     = source.finish,
+                    type       = define.TokenTypes.method,
+                    modifieres = modifiers,
+                }
+                return
+            end
+        end
+        if options.isEnhanced and infer.hasType(source, 'function') then
             results[#results+1] = {
                 start      = source.start,
                 finish     = source.finish,
@@ -62,87 +75,98 @@ Care['field'] = function (source, options, results)
             }
             return
         end
-    end
-    if options.isEnhanced and infer.hasType(source, 'function') then
+        if source.parent.parent.type == 'call' then
+            results[#results+1] = {
+                start      = source.start,
+                finish     = source.finish,
+                type       = define.TokenTypes.method,
+                modifieres = modifiers,
+            }
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
-            type       = define.TokenTypes.method,
+            type       = define.TokenTypes.property,
             modifieres = modifiers,
         }
-        return
-    end
-    if source.parent.parent.type == 'call' then
-        results[#results+1] = {
-            start      = source.start,
-            finish     = source.finish,
-            type       = define.TokenTypes.method,
-            modifieres = modifiers,
-        }
-        return
-    end
-    results[#results+1] = {
-        start      = source.start,
-        finish     = source.finish,
-        type       = define.TokenTypes.property,
-        modifieres = modifiers,
-    }
-end
-Care['getlocal'] = function (source, options, results)
-    local loc = source.node
-    -- 1. 值为函数的局部变量 | Local variable whose value is a function
-    if loc.refs then
-        for _, ref in ipairs(loc.refs) do
-            if ref.value and ref.value.type == 'function' then
-                results[#results+1] = {
-                    start      = source.start,
-                    finish     = source.finish,
-                    type       = define.TokenTypes['function'],
-                }
-                return
+    end)
+    : case 'getlocal'
+    : case 'setlocal'
+    : call(function (source, options, results)
+        local loc = source.node
+        -- 1. 值为函数的局部变量 | Local variable whose value is a function
+        if loc.refs then
+            for _, ref in ipairs(loc.refs) do
+                if ref.value and ref.value.type == 'function' then
+                    results[#results+1] = {
+                        start      = source.start,
+                        finish     = source.finish,
+                        type       = define.TokenTypes['function'],
+                    }
+                    return
+                end
             end
         end
-    end
-    -- 2. 对象 | Object
-    if  source.parent.type == 'getmethod'
-    or  source.parent.type == 'setmethod'
-    and source.parent.node == source then
-        return
-    end
-    -- 3. 特殊变量 | Special variable
-    if source[1] == '_ENV'
-    or source[1] == 'self' then
-        return
-    end
-    -- 4. 函数的参数 | Function parameters
-    if loc.parent and loc.parent.type == 'funcargs' then
-        results[#results+1] = {
-            start      = source.start,
-            finish     = source.finish,
-            type       = define.TokenTypes.parameter,
-            modifieres = define.TokenModifiers.declaration,
-        }
-        return
-    end
-    -- 5. References to other functions
-    if options.isEnhanced and infer.hasType(loc, 'function') then
-        results[#results+1] = {
-            start      = source.start,
-            finish     = source.finish,
-            type       = define.TokenTypes['function'],
-            modifieres = source.type == 'setlocal' and define.TokenModifiers.declaration or nil,
-        }
-        return
-    end
-    -- 6. Class declaration
-    if options.isEnhanced then
-        -- search all defs
-        for _, def in ipairs(vm.getDefs(source)) do
-            if def.bindDocs then
-                for _, doc in ipairs(def.bindDocs) do
+        -- 2. 对象 | Object
+        if  source.parent.type == 'getmethod'
+        or  source.parent.type == 'setmethod'
+        and source.parent.node == source then
+            return
+        end
+        -- 3. 特殊变量 | Special variable
+        if source[1] == '_ENV'
+        or source[1] == 'self' then
+            return
+        end
+        -- 4. 函数的参数 | Function parameters
+        if loc.parent and loc.parent.type == 'funcargs' then
+            results[#results+1] = {
+                start      = source.start,
+                finish     = source.finish,
+                type       = define.TokenTypes.parameter,
+                modifieres = define.TokenModifiers.declaration,
+            }
+            return
+        end
+        -- 5. References to other functions
+        if options.isEnhanced and infer.hasType(loc, 'function') then
+            results[#results+1] = {
+                start      = source.start,
+                finish     = source.finish,
+                type       = define.TokenTypes['function'],
+                modifieres = source.type == 'setlocal' and define.TokenModifiers.declaration or nil,
+            }
+            return
+        end
+        -- 6. Class declaration
+        if options.isEnhanced then
+            -- search all defs
+            for _, def in ipairs(vm.getDefs(source)) do
+                if def.bindDocs then
+                    for _, doc in ipairs(def.bindDocs) do
+                        if doc.type == "doc.class" and doc.bindSources then
+                            for _, src in ipairs(doc.bindSources) do
+                                if src == def then
+                                    results[#results+1] = {
+                                        start      = source.start,
+                                        finish     = source.finish,
+                                        type       = define.TokenTypes.class,
+                                    }
+                                    return
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        else
+            -- only search this local
+            if loc.bindDocs then
+                for i, doc in ipairs(loc.bindDocs) do
                     if doc.type == "doc.class" and doc.bindSources then
                         for _, src in ipairs(doc.bindSources) do
-                            if src == def then
+                            if src == loc then
                                 results[#results+1] = {
                                     start      = source.start,
                                     finish     = source.finish,
@@ -155,186 +179,172 @@ Care['getlocal'] = function (source, options, results)
                 end
             end
         end
-    else
-        -- only search this local
-        if loc.bindDocs then
-            for i, doc in ipairs(loc.bindDocs) do
-                if doc.type == "doc.class" and doc.bindSources then
-                    for _, src in ipairs(doc.bindSources) do
-                        if src == loc then
-                            results[#results+1] = {
-                                start      = source.start,
-                                finish     = source.finish,
-                                type       = define.TokenTypes.class,
-                            }
-                            return
-                        end
-                    end
+        -- 6. const 变量 | Const variable
+        if loc.attrs then
+            for _, attr in ipairs(loc.attrs) do
+                local name = attr[1]
+                if name == 'const' then
+                    results[#results+1] = {
+                        start      = source.start,
+                        finish     = source.finish,
+                        type       = define.TokenTypes.variable,
+                        modifieres = define.TokenModifiers.static,
+                    }
+                    return
+                elseif name == 'close' then
+                    results[#results+1] = {
+                        start      = source.start,
+                        finish     = source.finish,
+                        type       = define.TokenTypes.variable,
+                        modifieres = define.TokenModifiers.abstract,
+                    }
+                    return
                 end
             end
         end
-    end
-    -- 6. const 变量 | Const variable
-    if loc.attrs then
-        for _, attr in ipairs(loc.attrs) do
-            local name = attr[1]
-            if name == 'const' then
-                results[#results+1] = {
-                    start      = source.start,
-                    finish     = source.finish,
-                    type       = define.TokenTypes.variable,
-                    modifieres = define.TokenModifiers.static,
-                }
-                return
-            elseif name == 'close' then
-                results[#results+1] = {
-                    start      = source.start,
-                    finish     = source.finish,
-                    type       = define.TokenTypes.variable,
-                    modifieres = define.TokenModifiers.abstract,
-                }
-                return
-            end
+        -- 7. 函数调用 | Function call
+        if  source.parent.type == 'call'
+        and source.parent.node == source then
+            return
         end
-    end
-    -- 7. 函数调用 | Function call
-    if  source.parent.type == 'call'
-    and source.parent.node == source then
-        return
-    end
-    local isLocal = loc.parent ~= guide.getRoot(loc)
-    -- 8. 其他 | Other
-    results[#results+1] = {
-        start      = source.start,
-        finish     = source.finish,
-        type       = define.TokenTypes.variable,
-        modifieres = isLocal and define.TokenModifiers['local'] or nil,
-    }
-end
-Care['setlocal'] = Care['getlocal']
-Care['local'] = function (source, options, results) -- Local declaration, i.e. "local x", "local y = z", or "local function() end"
-    if source[1] == '_ENV'
-    or source[1] == 'self' then
-        return
-    end
-    if source.parent and source.parent.type == 'funcargs' then
+        local isLocal = loc.parent ~= guide.getRoot(loc)
+        -- 8. 其他 | Other
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
-            type       = define.TokenTypes.parameter,
-            modifieres = define.TokenModifiers.declaration,
+            type       = define.TokenTypes.variable,
+            modifieres = isLocal and define.TokenModifiers['local'] or nil,
         }
-        return
-    end
-    if source.value then
-        local isFunction = false
-
-        if options.isEnhanced then
-            isFunction = source.value.type == 'function' or infer.hasType(source.value, 'function')
-        else
-            isFunction = source.value.type == 'function'
+    end)
+    : case 'local'
+    : call(function (source, options, results) -- Local declaration, i.e. "local x", "local y = z", or "local function() end"
+        if source[1] == '_ENV'
+        or source[1] == 'self' then
+            return
         end
-
-        if isFunction then
-            -- Function declaration, either a new one or an alias for another one
+        if source.parent and source.parent.type == 'funcargs' then
             results[#results+1] = {
                 start      = source.start,
                 finish     = source.finish,
-                type       = define.TokenTypes['function'],
+                type       = define.TokenTypes.parameter,
                 modifieres = define.TokenModifiers.declaration,
             }
             return
         end
-    end
-    if source.value and source.value.type == 'table' and source.bindDocs then
-        for _, doc in ipairs(source.bindDocs) do
-            if doc.type == "doc.class" then
-                -- Class declaration (explicit)
+        if source.value then
+            local isFunction = false
+
+            if options.isEnhanced then
+                isFunction = source.value.type == 'function' or infer.hasType(source.value, 'function')
+            else
+                isFunction = source.value.type == 'function'
+            end
+
+            if isFunction then
+                -- Function declaration, either a new one or an alias for another one
                 results[#results+1] = {
                     start      = source.start,
                     finish     = source.finish,
-                    type       = define.TokenTypes.class,
+                    type       = define.TokenTypes['function'],
                     modifieres = define.TokenModifiers.declaration,
                 }
                 return
             end
         end
-    end
-    if source.attrs then
-        for _, attr in ipairs(source.attrs) do
-            local name = attr[1]
-            if name == 'const' then
-                results[#results+1] = {
-                    start      = source.start,
-                    finish     = source.finish,
-                    type       = define.TokenTypes.variable,
-                    modifieres = define.TokenModifiers.declaration | define.TokenModifiers.static,
-                }
-                return
-            elseif name == 'close' then
-                results[#results+1] = {
-                    start      = source.start,
-                    finish     = source.finish,
-                    type       = define.TokenTypes.variable,
-                    modifieres = define.TokenModifiers.declaration | define.TokenModifiers.abstract,
-                }
-                return
+        if source.value and source.value.type == 'table' and source.bindDocs then
+            for _, doc in ipairs(source.bindDocs) do
+                if doc.type == "doc.class" then
+                    -- Class declaration (explicit)
+                    results[#results+1] = {
+                        start      = source.start,
+                        finish     = source.finish,
+                        type       = define.TokenTypes.class,
+                        modifieres = define.TokenModifiers.declaration,
+                    }
+                    return
+                end
             end
         end
-    end
+        if source.attrs then
+            for _, attr in ipairs(source.attrs) do
+                local name = attr[1]
+                if name == 'const' then
+                    results[#results+1] = {
+                        start      = source.start,
+                        finish     = source.finish,
+                        type       = define.TokenTypes.variable,
+                        modifieres = define.TokenModifiers.declaration | define.TokenModifiers.static,
+                    }
+                    return
+                elseif name == 'close' then
+                    results[#results+1] = {
+                        start      = source.start,
+                        finish     = source.finish,
+                        type       = define.TokenTypes.variable,
+                        modifieres = define.TokenModifiers.declaration | define.TokenModifiers.abstract,
+                    }
+                    return
+                end
+            end
+        end
 
-    local isLocal = source.parent ~= guide.getRoot(source)
-    local modifiers = define.TokenModifiers.declaration
+        local isLocal = source.parent ~= guide.getRoot(source)
+        local modifiers = define.TokenModifiers.declaration
 
-    if isLocal then
-        modifiers = modifiers | define.TokenModifiers.definition
-    end
+        if isLocal then
+            modifiers = modifiers | define.TokenModifiers.definition
+        end
 
-    results[#results+1] = {
-        start      = source.start,
-        finish     = source.finish,
-        type       = define.TokenTypes.variable,
-        modifieres = modifiers,
-    }
-end
-Care['doc.return.name'] = function (source, options, results)
-    results[#results+1] = {
-        start  = source.start,
-        finish = source.finish,
-        type   = define.TokenTypes.parameter,
-    }
-end
-Care['doc.tailcomment'] = function (source, options, results)
-    results[#results+1] = {
-        start  = source.start,
-        finish = source.finish,
-        type   = define.TokenTypes.comment,
-    }
-end
-Care['doc.type.name'] = function (source, options, results)
-    if source.typeGeneric then
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.variable,
+            modifieres = modifiers,
+        }
+    end)
+    : case 'doc.return.name'
+    : call(function (source, options, results)
         results[#results+1] = {
             start  = source.start,
             finish = source.finish,
-            type   = define.TokenTypes.macro,
+            type   = define.TokenTypes.parameter,
         }
-    end
-end
-
-Care['nonstandardSymbol.comment'] = function (source, options, results)
-    results[#results+1] = {
-        start  = source.start,
-        finish = source.finish,
-        type   = define.TokenTypes.comment,
-    }
-end
-Care['nonstandardSymbol.continue'] = function (source, options, results)
-    results[#results+1] = {
-        start  = source.start,
-        finish = source.finish,
-        type   = define.TokenTypes.keyword,
-    }
-end
+    end)
+    : case 'doc.tailcomment'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start  = source.start,
+            finish = source.finish,
+            type   = define.TokenTypes.comment,
+        }
+    end)
+    : case 'doc.type.name'
+    : call(function (source, options, results)
+        if source.typeGeneric then
+            results[#results+1] = {
+                start  = source.start,
+                finish = source.finish,
+                type   = define.TokenTypes.macro,
+            }
+        end
+    end)
+    : case 'nonstandardSymbol.comment'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start  = source.start,
+            finish = source.finish,
+            type   = define.TokenTypes.comment,
+        }
+    end)
+    : case 'nonstandardSymbol.continue'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start  = source.start,
+            finish = source.finish,
+            type   = define.TokenTypes.keyword,
+        }
+    end)
+    : getMap()
 
 local function buildTokens(uri, results)
     local tokens = {}

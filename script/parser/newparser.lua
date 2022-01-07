@@ -2796,6 +2796,7 @@ local function compileExpAsAction(exp)
 end
 
 local function parseLocal()
+    local locPos = getPosition(Tokens[Index], 'left')
     Index = Index + 2
     skipSpace()
     local word = peekWord()
@@ -2828,6 +2829,7 @@ local function parseLocal()
         return nil
     end
     local loc = createLocal(name, parseLocalAttrs())
+    loc.locPos = locPos
     loc.effect = maxinteger
     pushActionIntoCurrentChunk(loc)
     skipSpace()

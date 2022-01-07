@@ -91,10 +91,19 @@ local Care = util.switch()
             modifieres = modifiers,
         }
     end)
+    : case 'local'
     : case 'getlocal'
     : case 'setlocal'
     : call(function (source, options, results)
-        local loc = source.node
+        if source.locPos then
+            results[#results+1] = {
+                start      = source.locPos,
+                finish     = source.locPos + #'local',
+                type       = define.TokenTypes.keyword,
+                modifieres = define.TokenModifiers.declaration,
+            }
+        end
+        local loc = source.node or source
         -- 1. 值为函数的局部变量 | Local variable whose value is a function
         if loc.refs then
             for _, ref in ipairs(loc.refs) do
@@ -108,19 +117,27 @@ local Care = util.switch()
                 end
             end
         end
-        -- 2. 对象 | Object
-        if  source.parent.type == 'getmethod'
-        or  source.parent.type == 'setmethod'
-        and source.parent.node == source then
+        -- 3. 特殊变量 | Special variableif source[1] == '_ENV' then
+        if loc[1] == '_ENV' then
+            results[#results+1] = {
+                start      = source.start,
+                finish     = source.finish,
+                type       = define.TokenTypes.variable,
+                modifieres = define.TokenModifiers.readonly,
+            }
             return
         end
-        -- 3. 特殊变量 | Special variable
-        if source[1] == '_ENV'
-        or source[1] == 'self' then
+        if loc[1] == 'self' then
+            results[#results+1] = {
+                start      = source.start,
+                finish     = source.finish,
+                type       = define.TokenTypes.variable,
+                modifieres = define.TokenModifiers.abstract,
+            }
             return
         end
         -- 4. 函数的参数 | Function parameters
-        if loc.parent and loc.parent.type == 'funcargs' then
+        if source.parent and source.parent.type == 'funcargs' then
             results[#results+1] = {
                 start      = source.start,
                 finish     = source.finish,
@@ -207,99 +224,57 @@ local Care = util.switch()
         and source.parent.node == source then
             return
         end
-        local isLocal = loc.parent ~= guide.getRoot(loc)
+        local mod
+        if source.type == 'local' then
+            mod = define.TokenModifiers.declaration
+        end
         -- 8. 其他 | Other
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
             type       = define.TokenTypes.variable,
-            modifieres = isLocal and define.TokenModifiers['local'] or nil,
+            modifieres = mod,
         }
     end)
-    : case 'local'
-    : call(function (source, options, results) -- Local declaration, i.e. "local x", "local y = z", or "local function() end"
-        if source[1] == '_ENV'
-        or source[1] == 'self' then
-            return
-        end
-        if source.parent and source.parent.type == 'funcargs' then
-            results[#results+1] = {
-                start      = source.start,
-                finish     = source.finish,
-                type       = define.TokenTypes.parameter,
-                modifieres = define.TokenModifiers.declaration,
-            }
-            return
-        end
-        if source.value then
-            local isFunction = false
-
-            if options.isEnhanced then
-                isFunction = source.value.type == 'function' or infer.hasType(source.value, 'function')
-            else
-                isFunction = source.value.type == 'function'
-            end
-
-            if isFunction then
-                -- Function declaration, either a new one or an alias for another one
+    : case 'function'
+    : case 'ifblock'
+    : case 'elseifblock'
+    : case 'elseblock'
+    : case 'do'
+    : case 'for'
+    : case 'loop'
+    : case 'in'
+    : case 'while'
+    : case 'repeat'
+    : call(function (source, options, results)
+        local keyword = source.keyword
+        if keyword then
+            for i = 1, #keyword, 2 do
                 results[#results+1] = {
-                    start      = source.start,
-                    finish     = source.finish,
-                    type       = define.TokenTypes['function'],
-                    modifieres = define.TokenModifiers.declaration,
+                    start      = keyword[i],
+                    finish     = keyword[i + 1],
+                    type       = define.TokenTypes.keyword,
                 }
-                return
             end
         end
-        if source.value and source.value.type == 'table' and source.bindDocs then
-            for _, doc in ipairs(source.bindDocs) do
-                if doc.type == "doc.class" then
-                    -- Class declaration (explicit)
-                    results[#results+1] = {
-                        start      = source.start,
-                        finish     = source.finish,
-                        type       = define.TokenTypes.class,
-                        modifieres = define.TokenModifiers.declaration,
-                    }
-                    return
-                end
-            end
+    end)
+    : case 'if'
+    : call(function (source, options, results)
+        local offset = guide.positionToOffset(options.state, source.finish)
+        if options.text:sub(offset - 2, offset) == 'end' then
+            results[#results+1] = {
+                start      = source.finish - #'end',
+                finish     = source.finish,
+                type       = define.TokenTypes.keyword,
+            }
         end
-        if source.attrs then
-            for _, attr in ipairs(source.attrs) do
-                local name = attr[1]
-                if name == 'const' then
-                    results[#results+1] = {
-                        start      = source.start,
-                        finish     = source.finish,
-                        type       = define.TokenTypes.variable,
-                        modifieres = define.TokenModifiers.declaration | define.TokenModifiers.static,
-                    }
-                    return
-                elseif name == 'close' then
-                    results[#results+1] = {
-                        start      = source.start,
-                        finish     = source.finish,
-                        type       = define.TokenTypes.variable,
-                        modifieres = define.TokenModifiers.declaration | define.TokenModifiers.abstract,
-                    }
-                    return
-                end
-            end
-        end
-
-        local isLocal = source.parent ~= guide.getRoot(source)
-        local modifiers = define.TokenModifiers.declaration
-
-        if isLocal then
-            modifiers = modifiers | define.TokenModifiers.definition
-        end
-
+    end)
+    : case 'return'
+    : call(function (source, options, results)
         results[#results+1] = {
             start      = source.start,
-            finish     = source.finish,
-            type       = define.TokenTypes.variable,
-            modifieres = modifiers,
+            finish     = source.start + #'return',
+            type       = define.TokenTypes.keyword,
         }
     end)
     : case 'doc.return.name'
@@ -386,6 +361,9 @@ return function (uri, start, finish)
     end
 
     local options = {
+        uri        = uri,
+        state      = state,
+        text       = files.getText(uri),
         isEnhanced = config.get(uri, 'Lua.color.mode') == 'SemanticEnhanced',
     }
 

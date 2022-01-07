@@ -132,7 +132,7 @@ local Care = util.switch()
                 start      = source.start,
                 finish     = source.finish,
                 type       = define.TokenTypes.variable,
-                modifieres = define.TokenModifiers.abstract,
+                modifieres = define.TokenModifiers.definition,
             }
             return
         end
@@ -292,7 +292,7 @@ local Care = util.switch()
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
-            type       = define.TokenTypes.variable,
+            type       = define.TokenTypes.keyword,
             modifieres = define.TokenModifiers.readonly,
         }
     end)

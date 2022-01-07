@@ -205,7 +205,7 @@ local Care = util.switch()
                         start      = source.start,
                         finish     = source.finish,
                         type       = define.TokenTypes.variable,
-                        modifieres = define.TokenModifiers.static,
+                        modifieres = define.TokenModifiers.readonly,
                     }
                     return
                 elseif name == 'close' then
@@ -275,6 +275,67 @@ local Care = util.switch()
             start      = source.start,
             finish     = source.start + #'return',
             type       = define.TokenTypes.keyword,
+        }
+    end)
+    : case 'binary'
+    : case 'unary'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.op.start,
+            finish     = source.op.finish,
+            type       = define.TokenTypes.operator,
+        }
+    end)
+    : case 'boolean'
+    : case 'nil'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.variable,
+            modifieres = define.TokenModifiers.readonly,
+        }
+    end)
+    : case 'string'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.string,
+        }
+        local escs = source.escs
+        if escs then
+            for i = 1, #escs, 3 do
+                local mod
+                if escs[i + 2] == 'err' then
+                    mod = define.TokenModifiers.deprecated
+                else
+                    mod = define.TokenModifiers.modification
+                end
+                results[#results+1] = {
+                    start      = escs[i],
+                    finish     = escs[i + 1],
+                    type       = define.TokenTypes.string,
+                    modifieres = mod,
+                }
+            end
+        end
+    end)
+    : case 'integer'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.number,
+            modifieres = define.TokenModifiers.static,
+        }
+    end)
+    : case 'number'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.number,
         }
     end)
     : case 'doc.return.name'

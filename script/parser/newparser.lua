@@ -926,6 +926,7 @@ local function parseShortString()
     Index             = Index + 2
     local stringIndex = 0
     local currentOffset = startOffset + 1
+    local escs        = {}
     while true do
         local token = Tokens[Index + 1]
         if token == mark then
@@ -954,13 +955,18 @@ local function parseShortString()
             if not Tokens[Index] then
                 goto CONTINUE
             end
+            local escLeft = getPosition(currentOffset, 'left')
             -- has space?
             if Tokens[Index] - currentOffset > 1 then
+                local right = getPosition(currentOffset + 1, 'right')
                 pushError {
                     type   = 'ERR_ESC',
-                    start  = getPosition(currentOffset, 'left'),
-                    finish = getPosition(currentOffset + 1, 'right'),
+                    start  = escLeft,
+                    finish = right,
                 }
+                escs[#escs+1] = escLeft
+                escs[#escs+1] = right
+                escs[#escs+1] = 'err'
                 goto CONTINUE
             end
             local nextToken = ssub(Tokens[Index + 1], 1, 1)
@@ -969,6 +975,9 @@ local function parseShortString()
                 stringPool[stringIndex] = EscMap[nextToken]
                 currentOffset = Tokens[Index] + #nextToken
                 Index = Index + 2
+                escs[#escs+1] = escLeft
+                escs[#escs+1] = escLeft + 2
+                escs[#escs+1] = 'normal'
                 goto CONTINUE
             end
             if nextToken == mark then
@@ -976,12 +985,18 @@ local function parseShortString()
                 stringPool[stringIndex] = mark
                 currentOffset = Tokens[Index] + #nextToken
                 Index = Index + 2
+                escs[#escs+1] = escLeft
+                escs[#escs+1] = escLeft + 2
+                escs[#escs+1] = 'normal'
                 goto CONTINUE
             end
             if nextToken == 'z' then
                 Index = Index + 2
                 repeat until not skipNL()
                 currentOffset = Tokens[Index]
+                escs[#escs+1] = escLeft
+                escs[#escs+1] = escLeft + 2
+                escs[#escs+1] = 'normal'
                 goto CONTINUE
             end
             if CharMapNumber[nextToken] then
@@ -991,13 +1006,21 @@ local function parseShortString()
                 end
                 currentOffset = Tokens[Index] + #numbers
                 fastForwardToken(currentOffset)
+                local right = getPosition(currentOffset - 1, 'right')
                 local byte = tointeger(numbers)
                 if byte <= 255 then
                     stringIndex = stringIndex + 1
                     stringPool[stringIndex] = schar(byte)
                 else
-                    -- TODO pushError
+                    pushError {
+                        type   = 'ERR_ESC',
+                        start  = escLeft,
+                        finish = right,
+                    }
                 end
+                escs[#escs+1] = escLeft
+                escs[#escs+1] = right
+                escs[#escs+1] = 'byte'
                 goto CONTINUE
             end
             if nextToken == 'x' then
@@ -1016,6 +1039,10 @@ local function parseShortString()
                         finish = getPosition(currentOffset + 1, 'right'),
                     }
                 end
+                local right = getPosition(currentOffset + 1, 'right')
+                escs[#escs+1] = escLeft
+                escs[#escs+1] = right
+                escs[#escs+1] = 'byte'
                 if State.version == 'Lua 5.1' then
                     pushError {
                         type    = 'ERR_ESC',
@@ -1038,6 +1065,10 @@ local function parseShortString()
                 end
                 currentOffset = newOffset
                 fastForwardToken(currentOffset - 1)
+                local right = getPosition(currentOffset + 1, 'right')
+                escs[#escs+1] = escLeft
+                escs[#escs+1] = right
+                escs[#escs+1] = 'unicode'
                 goto CONTINUE
             end
             if NLMap[nextToken] then
@@ -1045,13 +1076,21 @@ local function parseShortString()
                 stringPool[stringIndex] = '\n'
                 currentOffset = Tokens[Index] + #nextToken
                 skipNL()
+                local right = getPosition(currentOffset + 1, 'right')
+                escs[#escs+1] = escLeft
+                escs[#escs+1] = right
+                escs[#escs+1] = 'normal'
                 goto CONTINUE
             end
+            local right = getPosition(currentOffset + 1, 'right')
             pushError {
                 type   = 'ERR_ESC',
-                start  = getPosition(currentOffset, 'left'),
-                finish = getPosition(currentOffset + 1, 'right'),
+                start  = escLeft,
+                finish = right,
             }
+            escs[#escs+1] = escLeft
+            escs[#escs+1] = right
+            escs[#escs+1] = 'err'
         end
         Index = Index + 2
         ::CONTINUE::
@@ -1061,6 +1100,7 @@ local function parseShortString()
         type   = 'string',
         start  = startPos,
         finish = lastRightPosition(),
+        escs   = #escs > 0 and escs or nil,
         [1]    = stringResult,
         [2]    = mark,
     }
@@ -2082,7 +2122,7 @@ local function parseActions()
             end
         end
         if action then
-            if action.type == 'return' then
+            if not rtn and action.type == 'return' then
                 rtn = action
             end
             last = action
@@ -2796,6 +2836,7 @@ local function compileExpAsAction(exp)
 end
 
 local function parseLocal()
+    local locPos = getPosition(Tokens[Index], 'left')
     Index = Index + 2
     skipSpace()
     local word = peekWord()
@@ -2828,6 +2869,7 @@ local function parseLocal()
         return nil
     end
     local loc = createLocal(name, parseLocalAttrs())
+    loc.locPos = locPos
     loc.effect = maxinteger
     pushActionIntoCurrentChunk(loc)
     skipSpace()

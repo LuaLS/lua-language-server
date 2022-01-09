@@ -49,7 +49,7 @@ local function disableDiagnostic(uri, code, start, results)
         kind    = 'quickfix',
         command = {
             title    = lang.script.COMMAND_DISABLE_DIAG,
-            command = 'lua.setConfig:' .. sp:get_id(),
+            command = 'lua.setConfig',
             arguments = {
                 {
                     key    = 'Lua.diagnostics.disable',
@@ -86,7 +86,7 @@ local function markGlobal(uri, name, results)
         kind    = 'quickfix',
         command = {
             title     = lang.script.COMMAND_MARK_GLOBAL,
-            command = 'lua.setConfig:' .. sp:get_id(),
+            command = 'lua.setConfig',
             arguments = {
                 {
                     key    = 'Lua.diagnostics.globals',
@@ -105,7 +105,7 @@ local function changeVersion(uri, version, results)
         kind    = 'quickfix',
         command = {
             title     = lang.script.COMMAND_RUNTIME_VERSION,
-            command   = 'lua.setConfig:' .. sp:get_id(),
+            command   = 'lua.setConfig',
             arguments = {
                 {
                     key    = 'Lua.runtime.version',
@@ -223,7 +223,7 @@ local function solveSyntaxUnicodeName(uri, err, results)
         kind    = 'quickfix',
         command = {
             title     = lang.script.COMMAND_UNICODE_NAME,
-            command   = 'lua.setConfig:' .. sp:get_id(),
+            command   = 'lua.setConfig',
             arguments = {
                 {
                     key    = 'Lua.runtime.unicodeName',
@@ -280,7 +280,7 @@ local function solveAmbiguity1(uri, diag, results)
         kind = 'quickfix',
         command = {
             title = lang.script.COMMAND_ADD_BRACKETS,
-            command = 'lua.solve:' .. sp:get_id(),
+            command = 'lua.solve',
             arguments = {
                 {
                     name  = 'ambiguity-1',
@@ -298,7 +298,7 @@ local function solveTrailingSpace(uri, diag, results)
         kind = 'quickfix',
         command = {
             title = lang.script.COMMAND_REMOVE_SPACE,
-            command = 'lua.removeSpace:' .. sp:get_id(),
+            command = 'lua.removeSpace',
             arguments = {
                 {
                     uri = uri,
@@ -570,7 +570,7 @@ local function checkJsonToLua(results, uri, start, finish)
         kind = 'refactor.rewrite',
         command = {
             title = lang.script.COMMAND_JSON_TO_LUA,
-            command = 'lua.jsonToLua:' .. sp:get_id(),
+            command = 'lua.jsonToLua',
             arguments = {
                 {
                     uri    = uri,

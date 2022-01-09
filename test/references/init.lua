@@ -19,7 +19,6 @@ local function founded(targets, results)
 end
 
 function TEST(script)
-    files.removeAll()
     local newScript, catched = catch(script, '!?~')
     files.setText('', newScript)
 
@@ -35,6 +34,7 @@ function TEST(script)
     else
         assert(#expect == 0)
     end
+    files.remove('')
 end
 
 require 'references.common'

@@ -7,7 +7,6 @@ rawset(_G, 'TEST', true)
 
 function TEST(script)
     return function (expect)
-        files.removeAll()
         local newScript, catched = catch(script, '?')
         files.setText('', newScript)
         local edits = core('', catched['?'][1][1], expect.ch)
@@ -17,6 +16,7 @@ function TEST(script)
         else
             assert(expect.edits == nil)
         end
+        files.remove('')
     end
 end
 

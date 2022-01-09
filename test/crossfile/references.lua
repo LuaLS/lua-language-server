@@ -53,8 +53,6 @@ local function founded(targets, results)
 end
 
 function TEST(datas)
-    files.removeAll()
-
     local targetList = {}
     local sourceList
     local sourceUri
@@ -75,6 +73,12 @@ function TEST(datas)
             sourceUri = uri
         end
         files.setText(uri, newScript)
+    end
+
+    local _ <close> = function ()
+        for _, info in ipairs(datas) do
+            files.remove(furi.encode(info.path))
+        end
     end
 
     local sourcePos = (sourceList[1][1] + sourceList[1][2]) // 2

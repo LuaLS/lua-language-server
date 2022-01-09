@@ -232,11 +232,9 @@ WINDOW_SETTING_WS_DIAGNOSTIC     = '你可以在设置中延迟或禁用工作�
 WINDOW_DONT_SHOW_AGAIN           = '不再提示'
 WINDOW_DELAY_WS_DIAGNOSTIC       = '空闲时诊断（延迟{}秒）'
 WINDOW_DISABLE_DIAGNOSTIC        = '禁用工作区诊断'
-WINDOW_LUA_STATUS                = [[
-工作区：{ws}
-已缓存文件：{ast}/{max}
-内存占用：{mem:.f}M
-]]
+WINDOW_LUA_STATUS_WORKSPACE      = '工作区：{}'
+WINDOW_LUA_STATUS_CACHED_FILES   = '已缓存文件：{ast}/{max}'
+WINDOW_LUA_STATUS_MEMORY_COUNT   = '内存占用：{mem:.f}M'
 WINDOW_APPLY_SETTING             = '应用设置'
 WINDOW_CHECK_SEMANTIC            = '如果你正在使用市场中的颜色主题，你可能需要同时修改 `editor.semanticHighlighting.enabled` 选项为 `true` 才会使语义着色生效。'
 WINDOW_TELEMETRY_HINT            = '请允许发送匿名的使用数据与错误报告，帮助我们进一步完善此插件。在[此处](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%90%E7%A7%81%E5%A3%B0%E6%98%8E)阅读我们的隐私声明。'

@@ -229,11 +229,9 @@ WINDOW_SETTING_WS_DIAGNOSTIC     = 'Você pode atrasar ou desativar os diagnóst
 WINDOW_DONT_SHOW_AGAIN           = 'Não mostre novamente'
 WINDOW_DELAY_WS_DIAGNOSTIC       = 'Diagnóstico de tempo ocioso (atraso de {} segundos)'
 WINDOW_DISABLE_DIAGNOSTIC        = 'Desativa diagnósticos do espaço de trabalho'
-WINDOW_LUA_STATUS                = [[
-Área de trabalho   : {ws}
-Arquivos em cache: {ast}/{max}
-Uso de memória: {mem:.f}M
-]]
+WINDOW_LUA_STATUS_WORKSPACE      = 'Área de trabalho : {}'
+WINDOW_LUA_STATUS_CACHED_FILES   = 'Arquivos em cache: {ast}/{max}'
+WINDOW_LUA_STATUS_MEMORY_COUNT   = 'Uso de memória   : {mem:.f}M'
 WINDOW_APPLY_SETTING             = 'Aplicar configuração'
 WINDOW_CHECK_SEMANTIC            = 'Se você estiver usando o tema de cores do market, talvez seja necessário modificar `editor.semanticHighlighting.enabled` para `true` para fazer com tokens semânticas sejam habilitados.'
 WINDOW_TELEMETRY_HINT            = 'Por favor, permita o envio de dados de uso e relatórios de erro anônimos para nos ajudar a melhorar ainda mais essa extensão. Leia nossa política de privacidade [aqui](https://github.com/sumneko/lua-language-server/wiki/Privacy-Policy) .'

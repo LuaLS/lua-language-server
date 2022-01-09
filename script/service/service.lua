@@ -11,6 +11,7 @@ local lang   = require 'language'
 local ws     = require 'workspace'
 local time   = require 'bee.time'
 local fw     = require 'filewatch'
+local furi   = require 'file-uri'
 
 local m = {}
 m.type = 'service'
@@ -189,12 +190,20 @@ function m.reportStatus()
     else
         info.text = '😺Lua'
     end
-    info.tooltip = lang.script('WINDOW_LUA_STATUS', {
-        ws  = ws.path or '',
+
+    local tooltips = {}
+    local params = {
         ast = files.astCount,
         max = files.fileCount,
         mem = collectgarbage('count') / 1000,
-    })
+    }
+    for i, scp in ipairs(ws.folders) do
+        tooltips[i] = lang.script('WINDOW_LUA_STATUS_WORKSPACE', furi.decode(scp.uri))
+    end
+    tooltips[#tooltips+1] = lang.script('WINDOW_LUA_STATUS_CACHED_FILES', params)
+    tooltips[#tooltips+1] = lang.script('WINDOW_LUA_STATUS_MEMORY_COUNT', params)
+
+    info.tooltip = table.concat(tooltips, '\n')
     if util.equal(m.lastInfo, info) then
         return
     end
@@ -226,8 +235,6 @@ function m.start()
     require 'provider'
 
     m.startTimer()
-
-    ws.reload()
 end
 
 return m

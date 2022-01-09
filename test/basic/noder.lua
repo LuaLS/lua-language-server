@@ -30,7 +30,6 @@ end
 local CARE = {}
 local function TEST(script)
     return function (expect)
-        files.removeAll()
         local newScript, catched = catch(script, '?')
         files.setText('', newScript)
         local source = getSource(catched['?'][1][1])
@@ -44,6 +43,7 @@ local function TEST(script)
         for key in pairs(CARE) do
             assert(result[key] == expect[key])
         end
+        files.remove('')
     end
 end
 

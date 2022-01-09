@@ -43,13 +43,6 @@ function m.isReady()
     return m.interface ~= nil
 end
 
-local function resetFiles()
-    local files = require 'files'
-    for uri in files.eachFile() do
-        files.resetText(uri)
-    end
-end
-
 ---@async
 local function checkTrustLoad()
     local filePath = LOGPATH .. '/trusted'
@@ -75,7 +68,8 @@ local function checkTrustLoad()
     return true
 end
 
-function m.init()
+---@param scp scope
+function m.init(scp)
     if m.hasInited then
         return
     end
@@ -84,7 +78,7 @@ function m.init()
         local ws    = require 'workspace'
         m.interface = {}
 
-        local pluginPath = ws.getAbsolutePath(config.get 'Lua.runtime.plugin')
+        local pluginPath = ws.getAbsolutePath(scp.uri, config.get(scp.uri, 'Lua.runtime.plugin'))
         log.info('plugin path:', pluginPath)
         if not pluginPath then
             return
@@ -110,7 +104,7 @@ function m.init()
             return
         end
 
-        resetFiles()
+        ws.resetFiles(scp)
     end)
 end
 

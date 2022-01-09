@@ -8,8 +8,8 @@ local m = {}
 m.cache = {}
 
 --- `aaa/bbb/ccc.lua` 与 `?.lua` 将返回 `aaa.bbb.cccc`
-local function getOnePath(path, searcher)
-    local separator    = config.get 'Lua.completion.requireSeparator'
+local function getOnePath(uri, path, searcher)
+    local separator    = config.get(uri, 'Lua.completion.requireSeparator')
     local stemPath     = path
                         : gsub('%.[^%.]+$', '')
                         : gsub('[/\\%.]+', separator)
@@ -27,9 +27,9 @@ local function getOnePath(path, searcher)
     return nil
 end
 
-function m.getVisiblePath(path)
-    local searchers = config.get 'Lua.runtime.path'
-    local strict    = config.get 'Lua.runtime.pathStrict'
+function m.getVisiblePath(suri, path)
+    local searchers = config.get(suri, 'Lua.runtime.path')
+    local strict    = config.get(suri, 'Lua.runtime.pathStrict')
     path = workspace.normalize(path)
     local uri = furi.encode(path)
     local libraryPath = files.getLibraryPath(uri)
@@ -63,7 +63,7 @@ function m.getVisiblePath(path)
                 else
                     searcher = searcher :gsub('[/\\]+', '/')
                 end
-                local expect = getOnePath(cutedPath, searcher)
+                local expect = getOnePath(suri, cutedPath, searcher)
                 if expect then
                     local mySearcher = searcher
                     if head then
@@ -82,11 +82,11 @@ end
 
 --- 查找符合指定require path的所有uri
 ---@param path string
-function m.findUrisByRequirePath(path)
+function m.findUrisByRequirePath(suri, path)
     if type(path) ~= 'string' then
         return {}
     end
-    local separator = config.get 'Lua.completion.requireSeparator'
+    local separator = config.get(suri, 'Lua.completion.requireSeparator')
     local fspath = path:gsub('%' .. separator, '/')
     local vm    = require 'vm'
     local cache = vm.getCache 'findUrisByRequirePath'
@@ -106,7 +106,7 @@ function m.findUrisByRequirePath(path)
     end
 
     for uri in files.eachFile() do
-        local infos = m.getVisiblePath(furi.decode(uri))
+        local infos = m.getVisiblePath(suri, furi.decode(uri))
         for _, info in ipairs(infos) do
             local fsexpect = info.expect:gsub('%' .. separator, '/')
             if fsexpect == fspath then
@@ -135,7 +135,7 @@ files.watch(function (ev)
     end
 end)
 
-config.watch(function (key, value, oldValue)
+config.watch(function (uri, key, value, oldValue)
     if key == 'Lua.completion.requireSeparator'
     or key == 'Lua.runtime.path'
     or key == 'Lua.runtime.pathStrict' then

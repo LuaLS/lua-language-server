@@ -497,7 +497,7 @@ local function getNodeKey(source)
     if methodNode then
         return getNodeKey(methodNode)
     end
-    if config.get 'Lua.IntelliSense.traceFieldInject' then
+    if config.get(guide.getUri(source), 'Lua.IntelliSense.traceFieldInject') then
         local localValueID = getLocalValueID(source)
         if localValueID then
             return localValueID
@@ -822,7 +822,7 @@ local function bindValue(noders, source, id)
     local bindDocs = source.bindDocs
     if source.type == 'getlocal'
     or source.type == 'setlocal' then
-        if not config.get 'Lua.IntelliSense.traceLocalSet' then
+        if not config.get(guide.getUri(source), 'Lua.IntelliSense.traceLocalSet') then
             return
         end
         bindDocs = source.node.bindDocs
@@ -837,7 +837,7 @@ local function bindValue(noders, source, id)
     end
     -- x = y : x -> y
     pushForward(noders, id, valueID, INFO_REJECT_SET)
-    if  not config.get 'Lua.IntelliSense.traceBeSetted'
+    if  not config.get(guide.getUri(source), 'Lua.IntelliSense.traceBeSetted')
     and source.type ~= 'local' then
         return
     end
@@ -1329,7 +1329,7 @@ compileNodeMap = util.switch()
                         , index
                     )
                     pushForward(noders, returnID, getID(rtnObj))
-                    if config.get 'Lua.IntelliSense.traceReturn' then
+                    if config.get(guide.getUri(source), 'Lua.IntelliSense.traceReturn') then
                         pushBackward(noders, getID(rtnObj), returnID, INFO_DEEP_AND_DONT_CROSS)
                     end
                 end

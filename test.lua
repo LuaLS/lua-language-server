@@ -38,10 +38,10 @@ local function loadDocMetas()
     local fsu     = require 'fs-utility'
     local client  = require 'client'
     client.client 'vscode'
-    for _, path in ipairs(library.metaPaths) do
+    for path in pairs(library.metaPaths) do
         local uri = furi.encode(path)
         files.setText(uri, fsu.loadFile(path))
-        files.setLibraryPath(uri, library.metaPath)
+        --scope.fallback:addLink(uri)
     end
 end
 
@@ -82,7 +82,6 @@ end
 
 local function main()
     require 'utility'.enableCloseFunction()
-    require 'config'.init()
     require 'core.searcher'.debugMode = true
     require 'language' 'zh-cn'
     require 'library'.init()

@@ -10,7 +10,6 @@ m.coMap = setmetatable({}, wkmt)
 m.idMap = {}
 m.delayQueue = {}
 m.delayQueueIndex = 1
-m.watchList = {}
 m.needClose = {}
 m._enable = true
 
@@ -162,9 +161,6 @@ function m.delay()
     end
     local co = coroutine.running()
     local current = m.coMap[co]
-    if m.onWatch('delay', co) == false then
-        return
-    end
     -- TODO
     if current.priority then
         return
@@ -242,21 +238,6 @@ end
 
 function m.disable()
     m._enable = false
-end
-
---- 注册事件
----@param callback async fun(ev: string, ...)
-function m.watch(callback)
-    m.watchList[#m.watchList+1] = callback
-end
-
-function m.onWatch(ev, ...)
-    for _, callback in ipairs(m.watchList) do
-        local res = callback(ev, ...)
-        if res ~= nil then
-            return res
-        end
-    end
 end
 
 return m

@@ -1,9 +1,9 @@
 local define = require 'proto.define'
 local config = require 'config'
 
-config.set('Lua.completion.callSnippet',    'Disable')
-config.set('Lua.completion.keywordSnippet', 'Disable')
-config.set('Lua.completion.workspaceWord',  false)
+config.set(nil, 'Lua.completion.callSnippet',    'Disable')
+config.set(nil, 'Lua.completion.keywordSnippet', 'Disable')
+config.set(nil, 'Lua.completion.workspaceWord',  false)
 
 ContinueTyping = true
 

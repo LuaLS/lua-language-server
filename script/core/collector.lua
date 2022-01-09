@@ -1,3 +1,6 @@
+local scope = require 'workspace.scope'
+local ws    = require 'workspace'
+
 local collect    = {}
 local subscribed = {}
 
@@ -57,18 +60,104 @@ end
 
 local DUMMY_FUNCTION = function () end
 
+---@param scp scope
+local function eachOfFolder(nameCollect, scp)
+    local curi, value
+
+    local function getNext()
+        curi, value = next(nameCollect, curi)
+        if not curi then
+            return nil, nil
+        end
+        if scp:isChildUri(curi)
+        or scp:isLinkedUri(curi) then
+            return value, curi
+        end
+        return getNext()
+    end
+
+    return getNext
+end
+
+---@param scp scope
+local function eachOfLinked(nameCollect, scp)
+    local curi, value
+
+    local function getNext()
+        curi, value = next(nameCollect, curi)
+        if not curi then
+            return nil, nil
+        end
+        if  scp:isChildUri(curi)
+        and scp:isLinkedUri(curi) then
+            return value, curi
+        end
+
+        local cscp =   scope.getFolder(curi)
+                    or scope.getLinkedScope(curi)
+                    or scope.fallback
+
+        if cscp == scp
+        or cscp:isChildUri(scp.uri)
+        or cscp:isLinkedUri(scp.uri) then
+            return value, curi
+        end
+
+        return getNext()
+    end
+
+    return getNext
+end
+
+---@param scp scope
+local function eachOfFallback(nameCollect, scp)
+    local curi, value
+
+    local function getNext()
+        curi, value = next(nameCollect, curi)
+        if not curi then
+            return nil, nil
+        end
+        if scp:isLinkedUri(curi) then
+            return value, curi
+        end
+
+        local cscp =   scope.getFolder(curi)
+                    or scope.getLinkedScope(curi)
+                    or scope.fallback
+
+        if cscp == scp then
+            return value, curi
+        end
+
+        return getNext()
+    end
+
+    return getNext
+end
+
 --- 迭代某个名字的订阅
+---@param uri  uri
 ---@param name string
-function m.each(name)
+function m.each(uri, name)
     local nameCollect = collect[name]
     if not nameCollect then
         return DUMMY_FUNCTION
     end
-    local uri, value
-    return function ()
-        uri, value = next(nameCollect, uri)
-        return value, uri
+
+    local scp = scope.getFolder(uri)
+
+    if scp then
+        return eachOfFolder(nameCollect, scp)
     end
+
+    scp = scope.getLinkedScope(uri)
+
+    if scp then
+        return eachOfLinked(nameCollect, scp)
+    end
+
+    return eachOfFallback(nameCollect, scope.fallback)
 end
 
 return m

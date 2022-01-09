@@ -1,3 +1,5 @@
+---@diagnostic disable: undefined-global, lowercase-global
+
 -- basic
 arg                 = 'Argumentos de inicialização para a versão standalone da linguagem Lua.'
 assert              = 'Emite um erro se o valor de seu argumento v for falso (i.e., `nil` ou `false`); caso contrário, devolve todos os seus argumentos. Em caso de erro, `message` é o objeto de erro que, quando ausente, por padrão é `"assertion failed!"`'

@@ -6,48 +6,14 @@ local config         = require 'config'
 local lang           = require 'language'
 local nonil          = require 'without-check-nil'
 
-local isEnable = false
-
-local function toArray(map)
-    local array = {}
-    for k in pairs(map) do
-        array[#array+1] = k
-    end
-    table.sort(array, function (a, b)
-        return map[a] < map[b]
-    end)
-    return array
-end
-
 local dontShowAgain = false
-local function enable()
-    if isEnable then
+local function check(uri)
+    if dontShowAgain then
         return
     end
-    nonil.enable()
-    if not client.info.capabilities.textDocument.semanticTokens.dynamicRegistration then
-        return
-    end
+    dontShowAgain = true
     nonil.disable()
-    isEnable = true
-    log.debug('Enable semantic tokens.')
-    proto.request('client/registerCapability', {
-        registrations = {
-            {
-                id = 'semantic-tokens',
-                method = 'textDocument/semanticTokens',
-                registerOptions = {
-                    legend = {
-                        tokenTypes     = toArray(define.TokenTypes),
-                        tokenModifiers = toArray(define.TokenModifiers),
-                    },
-                    range = true,
-                    full  = false,
-                },
-            },
-        }
-    })
-    if config.get 'editor.semanticHighlighting.enabled' == 'configuredByTheme' and not dontShowAgain then
+    if config.get(uri, 'editor.semanticHighlighting.enabled') == 'configuredByTheme' then
         proto.request('window/showMessageRequest', {
             type    = define.MessageType.Info,
             message = lang.script.WINDOW_CHECK_SEMANTIC,
@@ -73,53 +39,25 @@ local function enable()
                     }
                 }
             end
-            if item.title == lang.script.WINDOW_DONT_SHOW_AGAIN then
-                dontShowAgain = true
-            end
         end)
     end
 end
 
-local function disable()
-    if not isEnable then
-        return
-    end
-    nonil.enable()
-    if not client.info.capabilities.textDocument.semanticTokens.dynamicRegistration then
-        return
-    end
-    nonil.disable()
-    isEnable = false
-    log.debug('Disable semantic tokens.')
-    proto.request('client/unregisterCapability', {
-        unregisterations = {
-            {
-                id = 'semantic-tokens',
-                method = 'textDocument/semanticTokens',
-            },
-        }
-    })
-end
-
 local function refresh()
-    if not isEnable then
+    if not client.isReady() then
         return
     end
     log.debug('Refresh semantic tokens.')
     proto.request('workspace/semanticTokens/refresh', json.null)
+    check()
 end
 
-config.watch(function (key, value, oldValue)
+config.watch(function (uri, key, value, oldValue)
+    if key == '' then
+        refresh()
+    end
     if key == 'Lua.color.mode' then
-        if value == 'Semantic' or value == 'SemanticEnhanced' then
-            if isEnable and value ~= oldValue then
-                refresh()
-            else
-                enable()
-            end
-        else
-            disable()
-        end
+        refresh()
     end
     if key:find '^Lua.runtime'
     or key:find '^Lua.workspace'
@@ -128,8 +66,4 @@ config.watch(function (key, value, oldValue)
     end
 end)
 
-return {
-    enable  = enable,
-    disable = disable,
-    refresh = refresh,
-}
+return {}

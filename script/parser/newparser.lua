@@ -1078,7 +1078,7 @@ local function parseShortString()
                 skipNL()
                 local right = getPosition(currentOffset + 1, 'right')
                 escs[#escs+1] = escLeft
-                escs[#escs+1] = right
+                escs[#escs+1] = escLeft + 1
                 escs[#escs+1] = 'normal'
                 goto CONTINUE
             end

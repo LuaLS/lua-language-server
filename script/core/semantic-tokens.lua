@@ -104,6 +104,15 @@ local Care = util.switch()
                 modifieres = define.TokenModifiers.declaration,
             }
         end
+        if source.attrs then
+            for _, attr in ipairs(source.attrs) do
+                results[#results+1] = {
+                    start      = attr.start,
+                    finish     = attr.finish,
+                    type       = define.TokenTypes.typeParameter,
+                }
+            end
+        end
         local loc = source.node or source
         -- 1. 值为函数的局部变量 | Local variable whose value is a function
         if loc.refs then
@@ -219,11 +228,6 @@ local Care = util.switch()
                     return
                 end
             end
-        end
-        -- 7. 函数调用 | Function call
-        if  source.parent.type == 'call'
-        and source.parent.node == source then
-            return
         end
         local mod
         if source.type == 'local' then

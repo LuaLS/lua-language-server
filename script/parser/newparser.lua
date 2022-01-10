@@ -2853,6 +2853,7 @@ local function parseLocal()
             name.value  = func
             name.vstart = func.start
             name.range  = func.finish
+            name.locPos = locPos
             func.parent  = name
             pushActionIntoCurrentChunk(name)
             return name

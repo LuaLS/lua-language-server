@@ -831,15 +831,7 @@ m.register 'textDocument/semanticTokens/range' {
         workspace.awaitReady(uri)
         local _ <close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_SEMANTIC_RANGE, 0.5)
         local core = require 'core.semantic-tokens'
-        local cache  = files.getOpenedCache(uri)
-        local start, finish
-        if cache and not cache['firstSemantic'] then
-            cache['firstSemantic'] = true
-            start  = 0
-            finish = math.huge
-        else
-            start, finish = converter.unpackRange(uri, params.range)
-        end
+        local start, finish = converter.unpackRange(uri, params.range)
         local results = core(uri, start, finish)
         return {
             data = results

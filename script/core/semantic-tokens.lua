@@ -8,6 +8,7 @@ local guide          = require 'parser.guide'
 local converter      = require 'proto.converter'
 local infer          = require 'core.infer'
 local config         = require 'config'
+local linkedTable    = require 'linked-table'
 
 local Care = util.switch()
     : case 'getglobal'
@@ -412,6 +413,91 @@ local function buildTokens(uri, results)
 end
 
 ---@async
+local function solveMultilineAndOverlapping(state, results)
+    table.sort(results, function (a, b)
+        if a.start == b.start then
+            return a.finish < b.finish
+        else
+            return a.start < b.start
+        end
+    end)
+
+    await.delay()
+
+    local tokens = linkedTable()
+
+    local function findToken(pos)
+        for token in tokens:pairs(nil ,true) do
+            if token.start <= pos and token.finish >= pos then
+                return token
+            end
+            if token.finish < pos then
+                break
+            end
+        end
+        return nil
+    end
+
+    for _, current in ipairs(results) do
+        local left = findToken(current.start)
+        if not left then
+            tokens:pushTail(current)
+            goto CONTINUE
+        end
+        local right = findToken(current.finish)
+        tokens:pushAfter(current, left)
+        tokens:pop(left)
+        if left.start < current.start then
+            tokens:pushBefore({
+                start      = left.start,
+                finish     = current.start,
+                type       = left.type,
+                modifieres = left.modifieres
+            }, current)
+        end
+        if right and right.finish > current.finish then
+            tokens:pushAfter({
+                start      = current.finish,
+                finish     = right.finish,
+                type       = right.type,
+                modifieres = right.modifieres
+            }, current)
+        end
+        ::CONTINUE::
+    end
+
+    await.delay()
+
+    local new = {}
+    for token in tokens:pairs() do
+        new[#new+1] = token
+        local startRow,  startCol  = guide.rowColOf(token.start)
+        local finishRow, finishCol = guide.rowColOf(token.finish)
+        if finishRow > startRow then
+            token.finish = guide.positionOf(startRow, 9999)
+        end
+        for i = startRow + 1, finishRow - 1 do
+            new[#new+1] = {
+                start      = guide.positionOf(i, 0),
+                finish     = guide.positionOf(i, 9999),
+                type       = token.type,
+                modifieres = token.modifieres,
+            }
+        end
+        if finishCol > 0 then
+            new[#new+1] = {
+                start      = guide.positionOf(finishRow, 0),
+                finish     = token.finish,
+                type       = token.type,
+                modifieres = token.modifieres,
+            }
+        end
+    end
+
+    return new
+end
+
+---@async
 return function (uri, start, finish)
     if config.get(uri, 'Lua.color.mode') == 'Grammar' then
         return nil
@@ -448,9 +534,11 @@ return function (uri, start, finish)
         end
     end
 
-    table.sort(results, function (a, b)
-        return a.start < b.start
-    end)
+    if #results == 0 then
+        return nil
+    end
+
+    results = solveMultilineAndOverlapping(state, results)
 
     local tokens = buildTokens(uri, results)
 

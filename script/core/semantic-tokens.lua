@@ -278,6 +278,36 @@ local Care = util.switch()
             type       = define.TokenTypes.keyword,
         }
     end)
+    : case 'break'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.start + #'break',
+            type       = define.TokenTypes.keyword,
+        }
+    end)
+    : case 'goto'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.keyStart,
+            finish     = source.keyStart + #'goto',
+            type       = define.TokenTypes.keyword,
+        }
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.struct,
+        }
+    end)
+    : case 'label'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.struct,
+            modifieres = define.TokenModifiers.declaration,
+        }
+    end)
     : case 'binary'
     : case 'unary'
     : call(function (source, options, results)
@@ -475,22 +505,22 @@ local function solveMultilineAndOverlapping(state, results)
         local finishRow, finishCol = guide.rowColOf(token.finish)
         if finishRow > startRow then
             token.finish = guide.positionOf(startRow, guide.getLineRange(state, startRow))
-        end
-        for i = startRow + 1, finishRow - 1 do
-            new[#new+1] = {
-                start      = guide.positionOf(i, 0),
-                finish     = guide.positionOf(i, guide.getLineRange(state, i)),
-                type       = token.type,
-                modifieres = token.modifieres,
-            }
-        end
-        if finishCol > 0 then
-            new[#new+1] = {
-                start      = guide.positionOf(finishRow, 0),
-                finish     = guide.positionOf(finishRow, finishCol),
-                type       = token.type,
-                modifieres = token.modifieres,
-            }
+            for i = startRow + 1, finishRow - 1 do
+                new[#new+1] = {
+                    start      = guide.positionOf(i, 0),
+                    finish     = guide.positionOf(i, guide.getLineRange(state, i)),
+                    type       = token.type,
+                    modifieres = token.modifieres,
+                }
+            end
+            if finishCol > 0 then
+                new[#new+1] = {
+                    start      = guide.positionOf(finishRow, 0),
+                    finish     = guide.positionOf(finishRow, finishCol),
+                    type       = token.type,
+                    modifieres = token.modifieres,
+                }
+            end
         end
     end
 

@@ -3011,6 +3011,7 @@ local function parseLabel()
 end
 
 local function parseGoTo()
+    local start = getPosition(Tokens[Index], 'left')
     Index = Index + 2
     skipSpace()
 
@@ -3021,6 +3022,7 @@ local function parseGoTo()
     end
 
     action.type = 'goto'
+    action.keyStart = start
 
     for i = #Chunk, 1, -1 do
         local chunk = Chunk[i]

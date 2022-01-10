@@ -802,6 +802,17 @@ function m.offsetToPosition(state, offset)
     return m.offsetToPositionByLines(state.lines, offset)
 end
 
+function m.getLineRange(state, row)
+    local nextLineStart = state.lines[row + 1] or #state.lua
+    for i = nextLineStart - 1, state.lines[row], -1 do
+        local w = state.lua:sub(i, i)
+        if w ~= '\r' and w ~= '\n' then
+            return i - state.lines[row] + 1
+        end
+    end
+    return 0
+end
+
 local isSetMap = {
     ['setglobal']      = true,
     ['local']          = true,

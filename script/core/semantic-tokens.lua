@@ -474,12 +474,12 @@ local function solveMultilineAndOverlapping(state, results)
         local startRow,  startCol  = guide.rowColOf(token.start)
         local finishRow, finishCol = guide.rowColOf(token.finish)
         if finishRow > startRow then
-            token.finish = guide.positionOf(startRow, 9999)
+            token.finish = guide.positionOf(startRow, guide.getLineRange(state, startRow))
         end
         for i = startRow + 1, finishRow - 1 do
             new[#new+1] = {
                 start      = guide.positionOf(i, 0),
-                finish     = guide.positionOf(i, 9999),
+                finish     = guide.positionOf(i, guide.getLineRange(state, i)),
                 type       = token.type,
                 modifieres = token.modifieres,
             }
@@ -487,7 +487,7 @@ local function solveMultilineAndOverlapping(state, results)
         if finishCol > 0 then
             new[#new+1] = {
                 start      = guide.positionOf(finishRow, 0),
-                finish     = token.finish,
+                finish     = guide.positionOf(finishRow, finishCol),
                 type       = token.type,
                 modifieres = token.modifieres,
             }
@@ -525,13 +525,11 @@ return function (uri, start, finish)
     end)
 
     for _, comm in ipairs(state.comms) do
-        if comm.type == 'comment.cshort' then
-            results[#results+1] = {
-                start  = comm.start,
-                finish = comm.finish,
-                type   = define.TokenTypes.comment,
-            }
-        end
+        results[#results+1] = {
+            start  = comm.start,
+            finish = comm.finish,
+            type   = define.TokenTypes.comment,
+        }
     end
 
     if #results == 0 then

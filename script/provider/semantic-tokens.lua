@@ -49,18 +49,16 @@ local function refresh()
     end
     log.debug('Refresh semantic tokens.')
     proto.request('workspace/semanticTokens/refresh', json.null)
-    check()
+    --check()
 end
 
 config.watch(function (uri, key, value, oldValue)
     if key == '' then
         refresh()
     end
-    if key == 'Lua.color.mode' then
-        refresh()
-    end
     if key:find '^Lua.runtime'
     or key:find '^Lua.workspace'
+    or key:find '^Lua.semantic'
     or key:find '^files' then
         refresh()
     end

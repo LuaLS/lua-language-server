@@ -15,16 +15,7 @@ local Care = util.switch()
     : case 'setglobal'
     : call(function (source, options, results)
         local isLib = vm.isGlobalLibraryName(source[1])
-        local isFunc = false
-        local value = source.value
-
-        if value and value.type == 'function' then
-            isFunc = true
-        elseif source.parent.type == 'call' then
-            isFunc = true
-        elseif options.isEnhanced then
-            isFunc = infer.hasType(source, 'function')
-        end
+        local isFunc = infer.hasType(source, 'function')
 
         local type = isFunc and define.TokenTypes['function'] or define.TokenTypes.variable
         local modifier = isLib and define.TokenModifiers.defaultLibrary or define.TokenModifiers.static
@@ -67,7 +58,7 @@ local Care = util.switch()
                 return
             end
         end
-        if options.isEnhanced and infer.hasType(source, 'function') then
+        if infer.hasType(source, 'function') then
             results[#results+1] = {
                 start      = source.start,
                 finish     = source.finish,
@@ -157,7 +148,7 @@ local Care = util.switch()
             return
         end
         -- 5. References to other functions
-        if options.isEnhanced and infer.hasType(loc, 'function') then
+        if infer.hasType(loc, 'function') then
             results[#results+1] = {
                 start      = source.start,
                 finish     = source.finish,
@@ -167,40 +158,18 @@ local Care = util.switch()
             return
         end
         -- 6. Class declaration
-        if options.isEnhanced then
-            -- search all defs
-            for _, def in ipairs(vm.getDefs(source)) do
-                if def.bindDocs then
-                    for _, doc in ipairs(def.bindDocs) do
-                        if doc.type == "doc.class" and doc.bindSources then
-                            for _, src in ipairs(doc.bindSources) do
-                                if src == def then
-                                    results[#results+1] = {
-                                        start      = source.start,
-                                        finish     = source.finish,
-                                        type       = define.TokenTypes.class,
-                                    }
-                                    return
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        else
             -- only search this local
-            if loc.bindDocs then
-                for i, doc in ipairs(loc.bindDocs) do
-                    if doc.type == "doc.class" and doc.bindSources then
-                        for _, src in ipairs(doc.bindSources) do
-                            if src == loc then
-                                results[#results+1] = {
-                                    start      = source.start,
-                                    finish     = source.finish,
-                                    type       = define.TokenTypes.class,
-                                }
-                                return
-                            end
+        if loc.bindDocs then
+            for i, doc in ipairs(loc.bindDocs) do
+                if doc.type == "doc.class" and doc.bindSources then
+                    for _, src in ipairs(doc.bindSources) do
+                        if src == loc then
+                            results[#results+1] = {
+                                start      = source.start,
+                                finish     = source.finish,
+                                type       = define.TokenTypes.class,
+                            }
+                            return
                         end
                     end
                 end
@@ -708,7 +677,7 @@ end
 
 ---@async
 return function (uri, start, finish)
-    if config.get(uri, 'Lua.color.mode') == 'Grammar' then
+    if not config.get(uri, 'Lua.semantic.enable') then
         return nil
     end
     local state = files.getState(uri)
@@ -720,7 +689,6 @@ return function (uri, start, finish)
         uri        = uri,
         state      = state,
         text       = files.getText(uri),
-        isEnhanced = config.get(uri, 'Lua.color.mode') == 'SemanticEnhanced',
     }
 
     local results = {}

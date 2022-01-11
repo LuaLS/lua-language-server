@@ -14,6 +14,9 @@ local Care = util.switch()
     : case 'getglobal'
     : case 'setglobal'
     : call(function (source, options, results)
+        if not options.variable then
+            return
+        end
         local isLib = vm.isGlobalLibraryName(source[1])
         local isFunc = infer.hasType(source, 'function')
 
@@ -30,6 +33,9 @@ local Care = util.switch()
     : case 'getmethod'
     : case 'setmethod'
     : call(function (source, options, results)
+        if not options.variable then
+            return
+        end
         local method = source.method
         if method and method.type == 'method' then
             results[#results+1] = {
@@ -42,6 +48,9 @@ local Care = util.switch()
     end)
     : case 'field'
     : call(function (source, options, results)
+        if not options.variable then
+            return
+        end
         local modifiers = 0
         if source.parent and source.parent.type == 'tablefield' then
             modifiers = define.TokenModifiers.declaration
@@ -87,22 +96,27 @@ local Care = util.switch()
     : case 'getlocal'
     : case 'setlocal'
     : call(function (source, options, results)
-        if source.locPos then
-            results[#results+1] = {
-                start      = source.locPos,
-                finish     = source.locPos + #'local',
-                type       = define.TokenTypes.keyword,
-                modifieres = define.TokenModifiers.declaration,
-            }
-        end
-        if source.attrs then
-            for _, attr in ipairs(source.attrs) do
+        if options.keyword then
+            if source.locPos then
                 results[#results+1] = {
-                    start      = attr.start,
-                    finish     = attr.finish,
-                    type       = define.TokenTypes.typeParameter,
+                    start      = source.locPos,
+                    finish     = source.locPos + #'local',
+                    type       = define.TokenTypes.keyword,
+                    modifieres = define.TokenModifiers.declaration,
                 }
             end
+            if source.attrs then
+                for _, attr in ipairs(source.attrs) do
+                    results[#results+1] = {
+                        start      = attr.start,
+                        finish     = attr.finish,
+                        type       = define.TokenTypes.typeParameter,
+                    }
+                end
+            end
+        end
+        if not options.variable then
+            return
         end
         local loc = source.node or source
         -- 1. 值为函数的局部变量 | Local variable whose value is a function
@@ -221,6 +235,9 @@ local Care = util.switch()
     : case 'while'
     : case 'repeat'
     : call(function (source, options, results)
+        if not options.keyword then
+            return
+        end
         local keyword = source.keyword
         if keyword then
             for i = 1, #keyword, 2 do
@@ -234,6 +251,9 @@ local Care = util.switch()
     end)
     : case 'if'
     : call(function (source, options, results)
+        if not options.keyword then
+            return
+        end
         local offset = guide.positionToOffset(options.state, source.finish)
         if options.text:sub(offset - 2, offset) == 'end' then
             results[#results+1] = {
@@ -245,6 +265,9 @@ local Care = util.switch()
     end)
     : case 'return'
     : call(function (source, options, results)
+        if not options.keyword then
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.start + #'return',
@@ -253,6 +276,9 @@ local Care = util.switch()
     end)
     : case 'break'
     : call(function (source, options, results)
+        if not options.keyword then
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.start + #'break',
@@ -261,6 +287,9 @@ local Care = util.switch()
     end)
     : case 'goto'
     : call(function (source, options, results)
+        if not options.keyword then
+            return
+        end
         results[#results+1] = {
             start      = source.keyStart,
             finish     = source.keyStart + #'goto',
@@ -274,6 +303,9 @@ local Care = util.switch()
     end)
     : case 'label'
     : call(function (source, options, results)
+        if not options.keyword then
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
@@ -284,6 +316,9 @@ local Care = util.switch()
     : case 'binary'
     : case 'unary'
     : call(function (source, options, results)
+        if not options.keyword then
+            return
+        end
         results[#results+1] = {
             start      = source.op.start,
             finish     = source.op.finish,
@@ -293,6 +328,9 @@ local Care = util.switch()
     : case 'boolean'
     : case 'nil'
     : call(function (source, options, results)
+        if not options.keyword then
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
@@ -302,6 +340,9 @@ local Care = util.switch()
     end)
     : case 'string'
     : call(function (source, options, results)
+        if not options.keyword then
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
@@ -327,6 +368,9 @@ local Care = util.switch()
     end)
     : case 'integer'
     : call(function (source, options, results)
+        if not options.keyword then
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
@@ -336,6 +380,9 @@ local Care = util.switch()
     end)
     : case 'number'
     : call(function (source, options, results)
+        if not options.keyword then
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
@@ -344,6 +391,9 @@ local Care = util.switch()
     end)
     : case 'doc.class.name'
     : call(function (source, options, results)
+        if not options.annotation then
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
@@ -353,6 +403,9 @@ local Care = util.switch()
     end)
     : case 'doc.extends.name'
     : call(function (source, options, results)
+        if not options.annotation then
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
@@ -361,6 +414,9 @@ local Care = util.switch()
     end)
     : case 'doc.type.name'
     : call(function (source, options, results)
+        if not options.annotation then
+            return
+        end
         if source.typeGeneric then
             results[#results+1] = {
                 start      = source.start,
@@ -378,6 +434,9 @@ local Care = util.switch()
     end)
     : case 'doc.alias.name'
     : call(function (source, options, results)
+        if not options.annotation then
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
@@ -386,6 +445,9 @@ local Care = util.switch()
     end)
     : case 'doc.param.name'
     : call(function (source, options, results)
+        if not options.annotation then
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
@@ -394,6 +456,9 @@ local Care = util.switch()
     end)
     : case 'doc.field'
     : call(function (source, options, results)
+        if not options.annotation then
+            return
+        end
         if source.visible then
             results[#results+1] = {
                 start      = source.start,
@@ -404,6 +469,9 @@ local Care = util.switch()
     end)
     : case 'doc.field.name'
     : call(function (source, options, results)
+        if not options.annotation then
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
@@ -413,6 +481,9 @@ local Care = util.switch()
     end)
     : case 'doc.return.name'
     : call(function (source, options, results)
+        if not options.annotation then
+            return
+        end
         results[#results+1] = {
             start  = source.start,
             finish = source.finish,
@@ -421,6 +492,9 @@ local Care = util.switch()
     end)
     : case 'doc.generic.name'
     : call(function (source, options, results)
+        if not options.annotation then
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
@@ -430,6 +504,9 @@ local Care = util.switch()
     end)
     : case 'doc.type.enum'
     : call(function (source, options, results)
+        if not options.annotation then
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
@@ -439,6 +516,9 @@ local Care = util.switch()
     end)
     : case 'doc.resume'
     : call(function (source, options, results)
+        if not options.annotation then
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
@@ -454,6 +534,9 @@ local Care = util.switch()
     end)
     : case 'doc.type.function'
     : call(function (source, options, results)
+        if not options.annotation then
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.start + #'fun',
@@ -470,6 +553,9 @@ local Care = util.switch()
     end)
     : case 'doc.type.table'
     : call(function (source, options, results)
+        if not options.annotation then
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.start + #'table',
@@ -478,6 +564,9 @@ local Care = util.switch()
     end)
     : case 'doc.type.arg.name'
     : call(function (source, options, results)
+        if not options.annotation then
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
@@ -487,6 +576,9 @@ local Care = util.switch()
     end)
     : case 'doc.version.unit'
     : call(function (source, options, results)
+        if not options.annotation then
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
@@ -495,6 +587,9 @@ local Care = util.switch()
     end)
     : case 'doc.see.name'
     : call(function (source, options, results)
+        if not options.annotation then
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
@@ -503,6 +598,9 @@ local Care = util.switch()
     end)
     : case 'doc.see.field'
     : call(function (source, options, results)
+        if not options.annotation then
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
@@ -511,6 +609,9 @@ local Care = util.switch()
     end)
     : case 'doc.diagnostic'
     : call(function (source, options, results)
+        if not options.annotation then
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.start + #source.mode,
@@ -519,6 +620,9 @@ local Care = util.switch()
     end)
     : case 'doc.diagnostic.name'
     : call(function (source, options, results)
+        if not options.annotation then
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
@@ -528,6 +632,9 @@ local Care = util.switch()
     end)
     : case 'doc.module'
     : call(function (source, options, results)
+        if not options.annotation then
+            return
+        end
         results[#results+1] = {
             start      = source.start,
             finish     = source.finish,
@@ -537,6 +644,9 @@ local Care = util.switch()
     end)
     : case 'doc.tailcomment'
     : call(function (source, options, results)
+        if not options.annotation then
+            return
+        end
         results[#results+1] = {
             start  = source.start,
             finish = source.finish,
@@ -689,6 +799,9 @@ return function (uri, start, finish)
         uri        = uri,
         state      = state,
         text       = files.getText(uri),
+        variable   = config.get(uri, 'Lua.semantic.variable'),
+        annotation = config.get(uri, 'Lua.semantic.annotation'),
+        keyword    = config.get(uri, 'Lua.semantic.keyword'),
     }
 
     local results = {}

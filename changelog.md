@@ -2,9 +2,15 @@
 
 ## 2.5.7
 * `NEW` supports multi-workspace in server side, for developers of language clients, please [read here](https://github.com/sumneko/lua-language-server/wiki/Multi-workspace-supports) to learn more.
-* `NEW` setting: `Lua.hint.arrayIndex`
+* `NEW` setting:
+  + `Lua.hint.arrayIndex`
+  + `Lua.semantic.enable`
+  + `Lua.semantic.variable`
+  + `Lua.semantic.annotation`
+  + `Lua.semantic.keyword`
 * `CHG` diagnostic: smoother
 * `CHG` completion: can be triggered in `LuaDoc` and strings
+* `CHG` settings `Lua.color.mode` removed
 * `FIX` [#879](https://github.com/sumneko/lua-language-server/issues/879)
 * `FIX` [#884](https://github.com/sumneko/lua-language-server/issues/884)
 * `FIX` [#885](https://github.com/sumneko/lua-language-server/issues/885)

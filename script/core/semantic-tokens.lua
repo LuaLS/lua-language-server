@@ -373,12 +373,115 @@ local Care = util.switch()
             type       = define.TokenTypes.number,
         }
     end)
+    : case 'doc.class.name'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.class,
+            modifieres = define.TokenModifiers.declaration,
+        }
+    end)
+    : case 'doc.extends.name'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.class,
+        }
+    end)
+    : case 'doc.type.name'
+    : call(function (source, options, results)
+        if source.typeGeneric then
+            results[#results+1] = {
+                start      = source.start,
+                finish     = source.finish,
+                type       = define.TokenTypes.type,
+                modifieres = define.TokenModifiers.modification,
+            }
+        else
+            results[#results+1] = {
+                start  = source.start,
+                finish = source.finish,
+                type   = define.TokenTypes.type,
+            }
+        end
+    end)
+    : case 'doc.alias.name'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.macro,
+        }
+    end)
+    : case 'doc.param.name'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.parameter,
+        }
+    end)
+    : case 'doc.field'
+    : call(function (source, options, results)
+        if source.visible then
+            results[#results+1] = {
+                start      = source.start,
+                finish     = source.start + #source.visible,
+                type       = define.TokenTypes.keyword,
+            }
+        end
+    end)
+    : case 'doc.field.name'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.property,
+            modifieres = define.TokenModifiers.declaration,
+        }
+    end)
     : case 'doc.return.name'
     : call(function (source, options, results)
         results[#results+1] = {
             start  = source.start,
             finish = source.finish,
             type   = define.TokenTypes.parameter,
+        }
+    end)
+    : case 'doc.generic.name'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.type,
+            modifieres = define.TokenModifiers.modification,
+        }
+    end)
+    : case 'doc.type.function'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.start + #'fun',
+            type       = define.TokenTypes.keyword,
+        }
+        if source.async then
+            results[#results+1] = {
+                start      = source.asyncPos,
+                finish     = source.asyncPos + #'async',
+                type       = define.TokenTypes.keyword,
+                modifieres = define.TokenModifiers.async,
+            }
+        end
+    end)
+    : case 'doc.type.arg.name'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.parameter,
+            modifieres = define.TokenModifiers.declaration,
         }
     end)
     : case 'doc.tailcomment'
@@ -388,16 +491,6 @@ local Care = util.switch()
             finish = source.finish,
             type   = define.TokenTypes.comment,
         }
-    end)
-    : case 'doc.type.name'
-    : call(function (source, options, results)
-        if source.typeGeneric then
-            results[#results+1] = {
-                start  = source.start,
-                finish = source.finish,
-                type   = define.TokenTypes.macro,
-            }
-        end
     end)
     : case 'nonstandardSymbol.comment'
     : call(function (source, options, results)
@@ -559,11 +652,26 @@ return function (uri, start, finish)
     end)
 
     for _, comm in ipairs(state.comms) do
-        results[#results+1] = {
-            start  = comm.start,
-            finish = comm.finish,
-            type   = define.TokenTypes.comment,
-        }
+        if  comm.type == 'comment.short'
+        and comm.text:sub(1, 2) == '-@' then
+            results[#results+1] = {
+                start  = comm.start,
+                finish = comm.start + 3,
+                type   = define.TokenTypes.comment,
+            }
+            results[#results+1] = {
+                start      = comm.start + 3,
+                finish     = comm.start + 2 +  #comm.text:match '%S+',
+                type       = define.TokenTypes.comment,
+                modifieres = define.TokenModifiers.documentation,
+            }
+        else
+            results[#results+1] = {
+                start  = comm.start,
+                finish = comm.finish,
+                type   = define.TokenTypes.comment,
+            }
+        end
     end
 
     if #results == 0 then

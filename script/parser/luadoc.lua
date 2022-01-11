@@ -368,8 +368,8 @@ local function  parseTypeUnitFunction()
             type   = 'doc.type.arg',
             parent = typeUnit,
         }
-        arg.name = parseName('doc.type.name', arg)
-                or parseDots('doc.type.name', arg)
+        arg.name = parseName('doc.type.arg.name', arg)
+                or parseDots('doc.type.arg.name', arg)
         if not arg.name then
             pushWarning {
                 type   = 'LUADOC_MISS_ARG_NAME',
@@ -484,6 +484,7 @@ local parseTypeUnit
 
 local function parseDocFunction(parent, content)
     if content == 'async' then
+        local pos = getStart()
         local tp, cont = peekToken()
         if tp == 'name' then
             if cont == 'fun' then
@@ -491,6 +492,7 @@ local function parseDocFunction(parent, content)
                 local func = parseTypeUnit(parent, cont)
                 if func then
                     func.async = true
+                    func.asyncPos = pos
                     return func
                 end
             end

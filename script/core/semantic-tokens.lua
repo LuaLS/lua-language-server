@@ -459,6 +459,30 @@ local Care = util.switch()
             modifieres = define.TokenModifiers.modification,
         }
     end)
+    : case 'doc.type.enum'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.string,
+            modifieres = define.TokenModifiers.static,
+        }
+    end)
+    : case 'doc.resume'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.string,
+            modifieres = define.TokenModifiers.static,
+        }
+        local row = guide.rowColOf(source.start)
+        results[#results+1] = {
+            start      = source.finish,
+            finish     = guide.positionOf(row, guide.getLineRange(options.state, row)),
+            type       = define.TokenTypes.comment,
+        }
+    end)
     : case 'doc.type.function'
     : call(function (source, options, results)
         results[#results+1] = {
@@ -475,6 +499,14 @@ local Care = util.switch()
             }
         end
     end)
+    : case 'doc.type.table'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.start + #'table',
+            type       = define.TokenTypes.type,
+        }
+    end)
     : case 'doc.type.arg.name'
     : call(function (source, options, results)
         results[#results+1] = {
@@ -482,6 +514,56 @@ local Care = util.switch()
             finish     = source.finish,
             type       = define.TokenTypes.parameter,
             modifieres = define.TokenModifiers.declaration,
+        }
+    end)
+    : case 'doc.version.unit'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.enumMember,
+        }
+    end)
+    : case 'doc.see.name'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.class,
+        }
+    end)
+    : case 'doc.see.field'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.property,
+        }
+    end)
+    : case 'doc.diagnostic'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.start + #source.mode,
+            type       = define.TokenTypes.keyword,
+        }
+    end)
+    : case 'doc.diagnostic.name'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.event,
+            modifieres = define.TokenModifiers.static,
+        }
+    end)
+    : case 'doc.module'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.string,
+            modifieres = define.TokenModifiers.defaultLibrary,
         }
     end)
     : case 'doc.tailcomment'
@@ -652,19 +734,28 @@ return function (uri, start, finish)
     end)
 
     for _, comm in ipairs(state.comms) do
-        if  comm.type == 'comment.short'
-        and comm.text:sub(1, 2) == '-@' then
-            results[#results+1] = {
-                start  = comm.start,
-                finish = comm.start + 3,
-                type   = define.TokenTypes.comment,
-            }
-            results[#results+1] = {
-                start      = comm.start + 3,
-                finish     = comm.start + 2 +  #comm.text:match '%S+',
-                type       = define.TokenTypes.comment,
-                modifieres = define.TokenModifiers.documentation,
-            }
+        if comm.type == 'comment.short' then
+            local head = comm.text:sub(1, 2)
+            if head == '-@'
+            or head == '-|' then
+                results[#results+1] = {
+                    start  = comm.start,
+                    finish = comm.start + 3,
+                    type   = define.TokenTypes.comment,
+                }
+                results[#results+1] = {
+                    start      = comm.start + 3,
+                    finish     = comm.start + 2 +  #comm.text:match '%S+',
+                    type       = define.TokenTypes.comment,
+                    modifieres = define.TokenModifiers.documentation,
+                }
+            else
+                results[#results+1] = {
+                    start  = comm.start,
+                    finish = comm.finish,
+                    type   = define.TokenTypes.comment,
+                }
+            end
         else
             results[#results+1] = {
                 start  = comm.start,

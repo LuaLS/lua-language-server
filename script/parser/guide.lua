@@ -145,6 +145,8 @@ local childMap = {
     ['doc.type.field']     = {'extends'},
     ['doc.overload']       = {'overload', 'comment'},
     ['doc.see']            = {'name', 'field'},
+    ['doc.version']        = {'#versions'},
+    ['doc.diagnostic']     = {'#names'},
 }
 
 ---@type table<string, fun(obj: parser.guide.object, list: parser.guide.object[])>

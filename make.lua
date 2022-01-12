@@ -29,7 +29,7 @@ elseif platform.OS == 'Linux' then
     elseif lm.platform == "linux-x64" then
     elseif lm.platform == "linux-arm64" then
         lm.compiler = "clang"
-        lm.arch     = "arm64"
+        lm.target   = "arm64-pc-linux-gnu"
     else
         error "unknown platform"
     end

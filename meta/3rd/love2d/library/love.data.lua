@@ -135,75 +135,75 @@ function CompressedData:getFormat() end
 ---
 ---Compressed data formats.
 ---
----@class love.CompressedDataFormat
+---@alias love.CompressedDataFormat
 ---
 ---The LZ4 compression format. Compresses and decompresses very quickly, but the compression ratio is not the best. LZ4-HC is used when compression level 9 is specified. Some benchmarks are available here.
 ---
----@field lz4 integer
+---| '"lz4"'
 ---
 ---The zlib format is DEFLATE-compressed data with a small bit of header data. Compresses relatively slowly and decompresses moderately quickly, and has a decent compression ratio.
 ---
----@field zlib integer
+---| '"zlib"'
 ---
 ---The gzip format is DEFLATE-compressed data with a slightly larger header than zlib. Since it uses DEFLATE it has the same compression characteristics as the zlib format.
 ---
----@field gzip integer
+---| '"gzip"'
 ---
 ---Raw DEFLATE-compressed data (no header).
 ---
----@field deflate integer
+---| '"deflate"'
 
 ---
 ---Return type of various data-returning functions.
 ---
----@class love.ContainerType
+---@alias love.ContainerType
 ---
 ---Return type is ByteData.
 ---
----@field data integer
+---| '"data"'
 ---
 ---Return type is string.
 ---
----@field string integer
+---| '"string"'
 
 ---
 ---Encoding format used to encode or decode data.
 ---
----@class love.EncodeFormat
+---@alias love.EncodeFormat
 ---
 ---Encode/decode data as base64 binary-to-text encoding.
 ---
----@field base64 integer
+---| '"base64"'
 ---
 ---Encode/decode data as hexadecimal string.
 ---
----@field hex integer
+---| '"hex"'
 
 ---
 ---Hash algorithm of love.data.hash.
 ---
----@class love.HashFunction
+---@alias love.HashFunction
 ---
 ---MD5 hash algorithm (16 bytes).
 ---
----@field md5 integer
+---| '"md5"'
 ---
 ---SHA1 hash algorithm (20 bytes).
 ---
----@field sha1 integer
+---| '"sha1"'
 ---
 ---SHA2 hash algorithm with message digest size of 224 bits (28 bytes).
 ---
----@field sha224 integer
+---| '"sha224"'
 ---
 ---SHA2 hash algorithm with message digest size of 256 bits (32 bytes).
 ---
----@field sha256 integer
+---| '"sha256"'
 ---
 ---SHA2 hash algorithm with message digest size of 384 bits (48 bytes).
 ---
----@field sha384 integer
+---| '"sha384"'
 ---
 ---SHA2 hash algorithm with message digest size of 512 bits (64 bytes).
 ---
----@field sha512 integer
+---| '"sha512"'

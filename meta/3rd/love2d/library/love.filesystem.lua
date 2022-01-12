@@ -414,71 +414,71 @@ function FileData:getFilename() end
 ---
 ---Buffer modes for File objects.
 ---
----@class love.BufferMode
+---@alias love.BufferMode
 ---
 ---No buffering. The result of write and append operations appears immediately.
 ---
----@field none integer
+---| '"none"'
 ---
 ---Line buffering. Write and append operations are buffered until a newline is output or the buffer size limit is reached.
 ---
----@field line integer
+---| '"line"'
 ---
 ---Full buffering. Write and append operations are always buffered until the buffer size limit is reached.
 ---
----@field full integer
+---| '"full"'
 
 ---
 ---How to decode a given FileData.
 ---
----@class love.FileDecoder
+---@alias love.FileDecoder
 ---
 ---The data is unencoded.
 ---
----@field file integer
+---| '"file"'
 ---
 ---The data is base64-encoded.
 ---
----@field base64 integer
+---| '"base64"'
 
 ---
 ---The different modes you can open a File in.
 ---
----@class love.FileMode
+---@alias love.FileMode
 ---
 ---Open a file for read.
 ---
----@field r integer
+---| '"r"'
 ---
 ---Open a file for write.
 ---
----@field w integer
+---| '"w"'
 ---
 ---Open a file for append.
 ---
----@field a integer
+---| '"a"'
 ---
 ---Do not open a file (represents a closed file.)
 ---
----@field c integer
+---| '"c"'
 
 ---
 ---The type of a file.
 ---
----@class love.FileType
+---@alias love.FileType
 ---
 ---Regular file.
 ---
----@field file integer
+---| '"file"'
 ---
 ---Directory.
 ---
----@field directory integer
+---| '"directory"'
 ---
 ---Symbolic link.
 ---
----@field symlink integer
+---| '"symlink"'
 ---
 ---Something completely different like a device.
 ---
----@field other integer
+---| '"other"'

@@ -192,10 +192,10 @@ local function buildFile(defs)
     for _, enum in ipairs(defs.enums or {}) do
         text[#text+1] = ''
         text[#text+1] = buildDescription(enum.description)
-        text[#text+1] = ('---@class %s'):format(getTypeName(enum.name))
+        text[#text+1] = ('---@alias %s'):format(getTypeName(enum.name))
         for _, constant in ipairs(enum.values) do
             text[#text+1] = buildDescription(constant.description)
-            text[#text+1] = ('---@field %s integer'):format(formatIndex(constant.name))
+            text[#text+1] = ([[---| '%s']]):format(('%q'):format(constant.name):gsub("'", "\\'"))
         end
     end
 

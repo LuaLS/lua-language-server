@@ -296,58 +296,58 @@ function love.window.updateMode(width, height, settings) end
 ---
 ---Types of device display orientation.
 ---
----@class love.DisplayOrientation
+---@alias love.DisplayOrientation
 ---
 ---Orientation cannot be determined.
 ---
----@field unknown integer
+---| '"unknown"'
 ---
 ---Landscape orientation.
 ---
----@field landscape integer
+---| '"landscape"'
 ---
 ---Landscape orientation (flipped).
 ---
----@field landscapeflipped integer
+---| '"landscapeflipped"'
 ---
 ---Portrait orientation.
 ---
----@field portrait integer
+---| '"portrait"'
 ---
 ---Portrait orientation (flipped).
 ---
----@field portraitflipped integer
+---| '"portraitflipped"'
 
 ---
 ---Types of fullscreen modes.
 ---
----@class love.FullscreenType
+---@alias love.FullscreenType
 ---
 ---Sometimes known as borderless fullscreen windowed mode. A borderless screen-sized window is created which sits on top of all desktop UI elements. The window is automatically resized to match the dimensions of the desktop, and its size cannot be changed.
 ---
----@field desktop integer
+---| '"desktop"'
 ---
 ---Standard exclusive-fullscreen mode. Changes the display mode (actual resolution) of the monitor.
 ---
----@field exclusive integer
+---| '"exclusive"'
 ---
 ---Standard exclusive-fullscreen mode. Changes the display mode (actual resolution) of the monitor.
 ---
----@field normal integer
+---| '"normal"'
 
 ---
 ---Types of message box dialogs. Different types may have slightly different looks.
 ---
----@class love.MessageBoxType
+---@alias love.MessageBoxType
 ---
 ---Informational dialog.
 ---
----@field info integer
+---| '"info"'
 ---
 ---Warning dialog.
 ---
----@field warning integer
+---| '"warning"'
 ---
 ---Error dialog.
 ---
----@field error integer
+---| '"error"'

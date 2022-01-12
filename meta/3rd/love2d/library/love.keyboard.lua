@@ -81,583 +81,583 @@ function love.keyboard.setTextInput(enable) end
 ---
 ---All the keys you can press. Note that some keys may not be available on your keyboard or system.
 ---
----@class love.KeyConstant
+---@alias love.KeyConstant
 ---
 ---The A key
 ---
----@field a integer
+---| '"a"'
 ---
 ---The B key
 ---
----@field b integer
+---| '"b"'
 ---
 ---The C key
 ---
----@field c integer
+---| '"c"'
 ---
 ---The D key
 ---
----@field d integer
+---| '"d"'
 ---
 ---The E key
 ---
----@field e integer
+---| '"e"'
 ---
 ---The F key
 ---
----@field f integer
+---| '"f"'
 ---
 ---The G key
 ---
----@field g integer
+---| '"g"'
 ---
 ---The H key
 ---
----@field h integer
+---| '"h"'
 ---
 ---The I key
 ---
----@field i integer
+---| '"i"'
 ---
 ---The J key
 ---
----@field j integer
+---| '"j"'
 ---
 ---The K key
 ---
----@field k integer
+---| '"k"'
 ---
 ---The L key
 ---
----@field l integer
+---| '"l"'
 ---
 ---The M key
 ---
----@field m integer
+---| '"m"'
 ---
 ---The N key
 ---
----@field n integer
+---| '"n"'
 ---
 ---The O key
 ---
----@field o integer
+---| '"o"'
 ---
 ---The P key
 ---
----@field p integer
+---| '"p"'
 ---
 ---The Q key
 ---
----@field q integer
+---| '"q"'
 ---
 ---The R key
 ---
----@field r integer
+---| '"r"'
 ---
 ---The S key
 ---
----@field s integer
+---| '"s"'
 ---
 ---The T key
 ---
----@field t integer
+---| '"t"'
 ---
 ---The U key
 ---
----@field u integer
+---| '"u"'
 ---
 ---The V key
 ---
----@field v integer
+---| '"v"'
 ---
 ---The W key
 ---
----@field w integer
+---| '"w"'
 ---
 ---The X key
 ---
----@field x integer
+---| '"x"'
 ---
 ---The Y key
 ---
----@field y integer
+---| '"y"'
 ---
 ---The Z key
 ---
----@field z integer
+---| '"z"'
 ---
 ---The zero key
 ---
----@field ["0"] integer
+---| '"0"'
 ---
 ---The one key
 ---
----@field ["1"] integer
+---| '"1"'
 ---
 ---The two key
 ---
----@field ["2"] integer
+---| '"2"'
 ---
 ---The three key
 ---
----@field ["3"] integer
+---| '"3"'
 ---
 ---The four key
 ---
----@field ["4"] integer
+---| '"4"'
 ---
 ---The five key
 ---
----@field ["5"] integer
+---| '"5"'
 ---
 ---The six key
 ---
----@field ["6"] integer
+---| '"6"'
 ---
 ---The seven key
 ---
----@field ["7"] integer
+---| '"7"'
 ---
 ---The eight key
 ---
----@field ["8"] integer
+---| '"8"'
 ---
 ---The nine key
 ---
----@field ["9"] integer
+---| '"9"'
 ---
 ---Space key
 ---
----@field space integer
+---| '"space"'
 ---
 ---Exclamation mark key
 ---
----@field ["!"] integer
+---| '"!"'
 ---
 ---Double quote key
 ---
----@field ["\""] integer
+---| '"\""'
 ---
 ---Hash key
 ---
----@field ["#"] integer
+---| '"#"'
 ---
 ---Dollar key
 ---
----@field ["$"] integer
+---| '"$"'
 ---
 ---Ampersand key
 ---
----@field ["&"] integer
+---| '"&"'
 ---
 ---Single quote key
 ---
----@field ["'"] integer
+---| '"\'"'
 ---
 ---Left parenthesis key
 ---
----@field ["("] integer
+---| '"("'
 ---
 ---Right parenthesis key
 ---
----@field [")"] integer
+---| '")"'
 ---
 ---Asterisk key
 ---
----@field ["*"] integer
+---| '"*"'
 ---
 ---Plus key
 ---
----@field ["+"] integer
+---| '"+"'
 ---
 ---Comma key
 ---
----@field [","] integer
+---| '","'
 ---
 ---Hyphen-minus key
 ---
----@field ["-"] integer
+---| '"-"'
 ---
 ---Full stop key
 ---
----@field ["."] integer
+---| '"."'
 ---
 ---Slash key
 ---
----@field ["/"] integer
+---| '"/"'
 ---
 ---Colon key
 ---
----@field [":"] integer
+---| '":"'
 ---
 ---Semicolon key
 ---
----@field [";"] integer
+---| '";"'
 ---
 ---Less-than key
 ---
----@field ["<"] integer
+---| '"<"'
 ---
 ---Equal key
 ---
----@field ["="] integer
+---| '"="'
 ---
 ---Greater-than key
 ---
----@field [">"] integer
+---| '">"'
 ---
 ---Question mark key
 ---
----@field ["?"] integer
+---| '"?"'
 ---
 ---At sign key
 ---
----@field ["@"] integer
+---| '"@"'
 ---
 ---Left square bracket key
 ---
----@field ["["] integer
+---| '"["'
 ---
 ---Backslash key
 ---
----@field ["\\"] integer
+---| '"\\"'
 ---
 ---Right square bracket key
 ---
----@field ["]"] integer
+---| '"]"'
 ---
 ---Caret key
 ---
----@field ["^"] integer
+---| '"^"'
 ---
 ---Underscore key
 ---
----@field _ integer
+---| '"_"'
 ---
 ---Grave accent key
 ---
----@field ["`"] integer
+---| '"`"'
 ---
 ---The numpad zero key
 ---
----@field kp0 integer
+---| '"kp0"'
 ---
 ---The numpad one key
 ---
----@field kp1 integer
+---| '"kp1"'
 ---
 ---The numpad two key
 ---
----@field kp2 integer
+---| '"kp2"'
 ---
 ---The numpad three key
 ---
----@field kp3 integer
+---| '"kp3"'
 ---
 ---The numpad four key
 ---
----@field kp4 integer
+---| '"kp4"'
 ---
 ---The numpad five key
 ---
----@field kp5 integer
+---| '"kp5"'
 ---
 ---The numpad six key
 ---
----@field kp6 integer
+---| '"kp6"'
 ---
 ---The numpad seven key
 ---
----@field kp7 integer
+---| '"kp7"'
 ---
 ---The numpad eight key
 ---
----@field kp8 integer
+---| '"kp8"'
 ---
 ---The numpad nine key
 ---
----@field kp9 integer
+---| '"kp9"'
 ---
 ---The numpad decimal point key
 ---
----@field ["kp."] integer
+---| '"kp."'
 ---
 ---The numpad division key
 ---
----@field ["kp/"] integer
+---| '"kp/"'
 ---
 ---The numpad multiplication key
 ---
----@field ["kp*"] integer
+---| '"kp*"'
 ---
 ---The numpad substraction key
 ---
----@field ["kp-"] integer
+---| '"kp-"'
 ---
 ---The numpad addition key
 ---
----@field ["kp+"] integer
+---| '"kp+"'
 ---
 ---The numpad enter key
 ---
----@field kpenter integer
+---| '"kpenter"'
 ---
 ---The numpad equals key
 ---
----@field ["kp="] integer
+---| '"kp="'
 ---
 ---Up cursor key
 ---
----@field up integer
+---| '"up"'
 ---
 ---Down cursor key
 ---
----@field down integer
+---| '"down"'
 ---
 ---Right cursor key
 ---
----@field right integer
+---| '"right"'
 ---
 ---Left cursor key
 ---
----@field left integer
+---| '"left"'
 ---
 ---Home key
 ---
----@field home integer
+---| '"home"'
 ---
 ---End key
 ---
----@field end integer
+---| '"end"'
 ---
 ---Page up key
 ---
----@field pageup integer
+---| '"pageup"'
 ---
 ---Page down key
 ---
----@field pagedown integer
+---| '"pagedown"'
 ---
 ---Insert key
 ---
----@field insert integer
+---| '"insert"'
 ---
 ---Backspace key
 ---
----@field backspace integer
+---| '"backspace"'
 ---
 ---Tab key
 ---
----@field tab integer
+---| '"tab"'
 ---
 ---Clear key
 ---
----@field clear integer
+---| '"clear"'
 ---
 ---Return key
 ---
----@field return integer
+---| '"return"'
 ---
 ---Delete key
 ---
----@field delete integer
+---| '"delete"'
 ---
 ---The 1st function key
 ---
----@field f1 integer
+---| '"f1"'
 ---
 ---The 2nd function key
 ---
----@field f2 integer
+---| '"f2"'
 ---
 ---The 3rd function key
 ---
----@field f3 integer
+---| '"f3"'
 ---
 ---The 4th function key
 ---
----@field f4 integer
+---| '"f4"'
 ---
 ---The 5th function key
 ---
----@field f5 integer
+---| '"f5"'
 ---
 ---The 6th function key
 ---
----@field f6 integer
+---| '"f6"'
 ---
 ---The 7th function key
 ---
----@field f7 integer
+---| '"f7"'
 ---
 ---The 8th function key
 ---
----@field f8 integer
+---| '"f8"'
 ---
 ---The 9th function key
 ---
----@field f9 integer
+---| '"f9"'
 ---
 ---The 10th function key
 ---
----@field f10 integer
+---| '"f10"'
 ---
 ---The 11th function key
 ---
----@field f11 integer
+---| '"f11"'
 ---
 ---The 12th function key
 ---
----@field f12 integer
+---| '"f12"'
 ---
 ---The 13th function key
 ---
----@field f13 integer
+---| '"f13"'
 ---
 ---The 14th function key
 ---
----@field f14 integer
+---| '"f14"'
 ---
 ---The 15th function key
 ---
----@field f15 integer
+---| '"f15"'
 ---
 ---Num-lock key
 ---
----@field numlock integer
+---| '"numlock"'
 ---
 ---Caps-lock key
 ---
----@field capslock integer
+---| '"capslock"'
 ---
 ---Scroll-lock key
 ---
----@field scrollock integer
+---| '"scrollock"'
 ---
 ---Right shift key
 ---
----@field rshift integer
+---| '"rshift"'
 ---
 ---Left shift key
 ---
----@field lshift integer
+---| '"lshift"'
 ---
 ---Right control key
 ---
----@field rctrl integer
+---| '"rctrl"'
 ---
 ---Left control key
 ---
----@field lctrl integer
+---| '"lctrl"'
 ---
 ---Right alt key
 ---
----@field ralt integer
+---| '"ralt"'
 ---
 ---Left alt key
 ---
----@field lalt integer
+---| '"lalt"'
 ---
 ---Right meta key
 ---
----@field rmeta integer
+---| '"rmeta"'
 ---
 ---Left meta key
 ---
----@field lmeta integer
+---| '"lmeta"'
 ---
 ---Left super key
 ---
----@field lsuper integer
+---| '"lsuper"'
 ---
 ---Right super key
 ---
----@field rsuper integer
+---| '"rsuper"'
 ---
 ---Mode key
 ---
----@field mode integer
+---| '"mode"'
 ---
 ---Compose key
 ---
----@field compose integer
+---| '"compose"'
 ---
 ---Pause key
 ---
----@field pause integer
+---| '"pause"'
 ---
 ---Escape key
 ---
----@field escape integer
+---| '"escape"'
 ---
 ---Help key
 ---
----@field help integer
+---| '"help"'
 ---
 ---Print key
 ---
----@field print integer
+---| '"print"'
 ---
 ---System request key
 ---
----@field sysreq integer
+---| '"sysreq"'
 ---
 ---Break key
 ---
----@field break integer
+---| '"break"'
 ---
 ---Menu key
 ---
----@field menu integer
+---| '"menu"'
 ---
 ---Power key
 ---
----@field power integer
+---| '"power"'
 ---
 ---Euro (&euro;) key
 ---
----@field euro integer
+---| '"euro"'
 ---
 ---Undo key
 ---
----@field undo integer
+---| '"undo"'
 ---
 ---WWW key
 ---
----@field www integer
+---| '"www"'
 ---
 ---Mail key
 ---
----@field mail integer
+---| '"mail"'
 ---
 ---Calculator key
 ---
----@field calculator integer
+---| '"calculator"'
 ---
 ---Application search key
 ---
----@field appsearch integer
+---| '"appsearch"'
 ---
 ---Application home key
 ---
----@field apphome integer
+---| '"apphome"'
 ---
 ---Application back key
 ---
----@field appback integer
+---| '"appback"'
 ---
 ---Application forward key
 ---
----@field appforward integer
+---| '"appforward"'
 ---
 ---Application refresh key
 ---
----@field apprefresh integer
+---| '"apprefresh"'
 ---
 ---Application bookmarks key
 ---
----@field appbookmarks integer
+---| '"appbookmarks"'
 
 ---
 ---Keyboard scancodes.
@@ -668,780 +668,780 @@ function love.keyboard.setTextInput(enable) end
 ---
 ---One could use textinput or textedited instead, but those only give back the end result of keys used, i.e. you can't get modifiers on their own from it, only the final symbols that were generated.
 ---
----@class love.Scancode
+---@alias love.Scancode
 ---
 ---The 'A' key on an American layout.
 ---
----@field a integer
+---| '"a"'
 ---
 ---The 'B' key on an American layout.
 ---
----@field b integer
+---| '"b"'
 ---
 ---The 'C' key on an American layout.
 ---
----@field c integer
+---| '"c"'
 ---
 ---The 'D' key on an American layout.
 ---
----@field d integer
+---| '"d"'
 ---
 ---The 'E' key on an American layout.
 ---
----@field e integer
+---| '"e"'
 ---
 ---The 'F' key on an American layout.
 ---
----@field f integer
+---| '"f"'
 ---
 ---The 'G' key on an American layout.
 ---
----@field g integer
+---| '"g"'
 ---
 ---The 'H' key on an American layout.
 ---
----@field h integer
+---| '"h"'
 ---
 ---The 'I' key on an American layout.
 ---
----@field i integer
+---| '"i"'
 ---
 ---The 'J' key on an American layout.
 ---
----@field j integer
+---| '"j"'
 ---
 ---The 'K' key on an American layout.
 ---
----@field k integer
+---| '"k"'
 ---
 ---The 'L' key on an American layout.
 ---
----@field l integer
+---| '"l"'
 ---
 ---The 'M' key on an American layout.
 ---
----@field m integer
+---| '"m"'
 ---
 ---The 'N' key on an American layout.
 ---
----@field n integer
+---| '"n"'
 ---
 ---The 'O' key on an American layout.
 ---
----@field o integer
+---| '"o"'
 ---
 ---The 'P' key on an American layout.
 ---
----@field p integer
+---| '"p"'
 ---
 ---The 'Q' key on an American layout.
 ---
----@field q integer
+---| '"q"'
 ---
 ---The 'R' key on an American layout.
 ---
----@field r integer
+---| '"r"'
 ---
 ---The 'S' key on an American layout.
 ---
----@field s integer
+---| '"s"'
 ---
 ---The 'T' key on an American layout.
 ---
----@field t integer
+---| '"t"'
 ---
 ---The 'U' key on an American layout.
 ---
----@field u integer
+---| '"u"'
 ---
 ---The 'V' key on an American layout.
 ---
----@field v integer
+---| '"v"'
 ---
 ---The 'W' key on an American layout.
 ---
----@field w integer
+---| '"w"'
 ---
 ---The 'X' key on an American layout.
 ---
----@field x integer
+---| '"x"'
 ---
 ---The 'Y' key on an American layout.
 ---
----@field y integer
+---| '"y"'
 ---
 ---The 'Z' key on an American layout.
 ---
----@field z integer
+---| '"z"'
 ---
 ---The '1' key on an American layout.
 ---
----@field ["1"] integer
+---| '"1"'
 ---
 ---The '2' key on an American layout.
 ---
----@field ["2"] integer
+---| '"2"'
 ---
 ---The '3' key on an American layout.
 ---
----@field ["3"] integer
+---| '"3"'
 ---
 ---The '4' key on an American layout.
 ---
----@field ["4"] integer
+---| '"4"'
 ---
 ---The '5' key on an American layout.
 ---
----@field ["5"] integer
+---| '"5"'
 ---
 ---The '6' key on an American layout.
 ---
----@field ["6"] integer
+---| '"6"'
 ---
 ---The '7' key on an American layout.
 ---
----@field ["7"] integer
+---| '"7"'
 ---
 ---The '8' key on an American layout.
 ---
----@field ["8"] integer
+---| '"8"'
 ---
 ---The '9' key on an American layout.
 ---
----@field ["9"] integer
+---| '"9"'
 ---
 ---The '0' key on an American layout.
 ---
----@field ["0"] integer
+---| '"0"'
 ---
 ---The 'return' / 'enter' key on an American layout.
 ---
----@field return integer
+---| '"return"'
 ---
 ---The 'escape' key on an American layout.
 ---
----@field escape integer
+---| '"escape"'
 ---
 ---The 'backspace' key on an American layout.
 ---
----@field backspace integer
+---| '"backspace"'
 ---
 ---The 'tab' key on an American layout.
 ---
----@field tab integer
+---| '"tab"'
 ---
 ---The spacebar on an American layout.
 ---
----@field space integer
+---| '"space"'
 ---
 ---The minus key on an American layout.
 ---
----@field ["-"] integer
+---| '"-"'
 ---
 ---The equals key on an American layout.
 ---
----@field ["="] integer
+---| '"="'
 ---
 ---The left-bracket key on an American layout.
 ---
----@field ["["] integer
+---| '"["'
 ---
 ---The right-bracket key on an American layout.
 ---
----@field ["]"] integer
+---| '"]"'
 ---
 ---The backslash key on an American layout.
 ---
----@field ["\\"] integer
+---| '"\\"'
 ---
 ---The non-U.S. hash scancode.
 ---
----@field ["nonus#"] integer
+---| '"nonus#"'
 ---
 ---The semicolon key on an American layout.
 ---
----@field [";"] integer
+---| '";"'
 ---
 ---The apostrophe key on an American layout.
 ---
----@field ["'"] integer
+---| '"\'"'
 ---
 ---The back-tick / grave key on an American layout.
 ---
----@field ["`"] integer
+---| '"`"'
 ---
 ---The comma key on an American layout.
 ---
----@field [","] integer
+---| '","'
 ---
 ---The period key on an American layout.
 ---
----@field ["."] integer
+---| '"."'
 ---
 ---The forward-slash key on an American layout.
 ---
----@field ["/"] integer
+---| '"/"'
 ---
 ---The capslock key on an American layout.
 ---
----@field capslock integer
+---| '"capslock"'
 ---
 ---The F1 key on an American layout.
 ---
----@field f1 integer
+---| '"f1"'
 ---
 ---The F2 key on an American layout.
 ---
----@field f2 integer
+---| '"f2"'
 ---
 ---The F3 key on an American layout.
 ---
----@field f3 integer
+---| '"f3"'
 ---
 ---The F4 key on an American layout.
 ---
----@field f4 integer
+---| '"f4"'
 ---
 ---The F5 key on an American layout.
 ---
----@field f5 integer
+---| '"f5"'
 ---
 ---The F6 key on an American layout.
 ---
----@field f6 integer
+---| '"f6"'
 ---
 ---The F7 key on an American layout.
 ---
----@field f7 integer
+---| '"f7"'
 ---
 ---The F8 key on an American layout.
 ---
----@field f8 integer
+---| '"f8"'
 ---
 ---The F9 key on an American layout.
 ---
----@field f9 integer
+---| '"f9"'
 ---
 ---The F10 key on an American layout.
 ---
----@field f10 integer
+---| '"f10"'
 ---
 ---The F11 key on an American layout.
 ---
----@field f11 integer
+---| '"f11"'
 ---
 ---The F12 key on an American layout.
 ---
----@field f12 integer
+---| '"f12"'
 ---
 ---The F13 key on an American layout.
 ---
----@field f13 integer
+---| '"f13"'
 ---
 ---The F14 key on an American layout.
 ---
----@field f14 integer
+---| '"f14"'
 ---
 ---The F15 key on an American layout.
 ---
----@field f15 integer
+---| '"f15"'
 ---
 ---The F16 key on an American layout.
 ---
----@field f16 integer
+---| '"f16"'
 ---
 ---The F17 key on an American layout.
 ---
----@field f17 integer
+---| '"f17"'
 ---
 ---The F18 key on an American layout.
 ---
----@field f18 integer
+---| '"f18"'
 ---
 ---The F19 key on an American layout.
 ---
----@field f19 integer
+---| '"f19"'
 ---
 ---The F20 key on an American layout.
 ---
----@field f20 integer
+---| '"f20"'
 ---
 ---The F21 key on an American layout.
 ---
----@field f21 integer
+---| '"f21"'
 ---
 ---The F22 key on an American layout.
 ---
----@field f22 integer
+---| '"f22"'
 ---
 ---The F23 key on an American layout.
 ---
----@field f23 integer
+---| '"f23"'
 ---
 ---The F24 key on an American layout.
 ---
----@field f24 integer
+---| '"f24"'
 ---
 ---The left control key on an American layout.
 ---
----@field lctrl integer
+---| '"lctrl"'
 ---
 ---The left shift key on an American layout.
 ---
----@field lshift integer
+---| '"lshift"'
 ---
 ---The left alt / option key on an American layout.
 ---
----@field lalt integer
+---| '"lalt"'
 ---
 ---The left GUI (command / windows / super) key on an American layout.
 ---
----@field lgui integer
+---| '"lgui"'
 ---
 ---The right control key on an American layout.
 ---
----@field rctrl integer
+---| '"rctrl"'
 ---
 ---The right shift key on an American layout.
 ---
----@field rshift integer
+---| '"rshift"'
 ---
 ---The right alt / option key on an American layout.
 ---
----@field ralt integer
+---| '"ralt"'
 ---
 ---The right GUI (command / windows / super) key on an American layout.
 ---
----@field rgui integer
+---| '"rgui"'
 ---
 ---The printscreen key on an American layout.
 ---
----@field printscreen integer
+---| '"printscreen"'
 ---
 ---The scroll-lock key on an American layout.
 ---
----@field scrolllock integer
+---| '"scrolllock"'
 ---
 ---The pause key on an American layout.
 ---
----@field pause integer
+---| '"pause"'
 ---
 ---The insert key on an American layout.
 ---
----@field insert integer
+---| '"insert"'
 ---
 ---The home key on an American layout.
 ---
----@field home integer
+---| '"home"'
 ---
 ---The numlock / clear key on an American layout.
 ---
----@field numlock integer
+---| '"numlock"'
 ---
 ---The page-up key on an American layout.
 ---
----@field pageup integer
+---| '"pageup"'
 ---
 ---The forward-delete key on an American layout.
 ---
----@field delete integer
+---| '"delete"'
 ---
 ---The end key on an American layout.
 ---
----@field end integer
+---| '"end"'
 ---
 ---The page-down key on an American layout.
 ---
----@field pagedown integer
+---| '"pagedown"'
 ---
 ---The right-arrow key on an American layout.
 ---
----@field right integer
+---| '"right"'
 ---
 ---The left-arrow key on an American layout.
 ---
----@field left integer
+---| '"left"'
 ---
 ---The down-arrow key on an American layout.
 ---
----@field down integer
+---| '"down"'
 ---
 ---The up-arrow key on an American layout.
 ---
----@field up integer
+---| '"up"'
 ---
 ---The non-U.S. backslash scancode.
 ---
----@field nonusbackslash integer
+---| '"nonusbackslash"'
 ---
 ---The application key on an American layout. Windows contextual menu, compose key.
 ---
----@field application integer
+---| '"application"'
 ---
 ---The 'execute' key on an American layout.
 ---
----@field execute integer
+---| '"execute"'
 ---
 ---The 'help' key on an American layout.
 ---
----@field help integer
+---| '"help"'
 ---
 ---The 'menu' key on an American layout.
 ---
----@field menu integer
+---| '"menu"'
 ---
 ---The 'select' key on an American layout.
 ---
----@field select integer
+---| '"select"'
 ---
 ---The 'stop' key on an American layout.
 ---
----@field stop integer
+---| '"stop"'
 ---
 ---The 'again' key on an American layout.
 ---
----@field again integer
+---| '"again"'
 ---
 ---The 'undo' key on an American layout.
 ---
----@field undo integer
+---| '"undo"'
 ---
 ---The 'cut' key on an American layout.
 ---
----@field cut integer
+---| '"cut"'
 ---
 ---The 'copy' key on an American layout.
 ---
----@field copy integer
+---| '"copy"'
 ---
 ---The 'paste' key on an American layout.
 ---
----@field paste integer
+---| '"paste"'
 ---
 ---The 'find' key on an American layout.
 ---
----@field find integer
+---| '"find"'
 ---
 ---The keypad forward-slash key on an American layout.
 ---
----@field ["kp/"] integer
+---| '"kp/"'
 ---
 ---The keypad '*' key on an American layout.
 ---
----@field ["kp*"] integer
+---| '"kp*"'
 ---
 ---The keypad minus key on an American layout.
 ---
----@field ["kp-"] integer
+---| '"kp-"'
 ---
 ---The keypad plus key on an American layout.
 ---
----@field ["kp+"] integer
+---| '"kp+"'
 ---
 ---The keypad equals key on an American layout.
 ---
----@field ["kp="] integer
+---| '"kp="'
 ---
 ---The keypad enter key on an American layout.
 ---
----@field kpenter integer
+---| '"kpenter"'
 ---
 ---The keypad '1' key on an American layout.
 ---
----@field kp1 integer
+---| '"kp1"'
 ---
 ---The keypad '2' key on an American layout.
 ---
----@field kp2 integer
+---| '"kp2"'
 ---
 ---The keypad '3' key on an American layout.
 ---
----@field kp3 integer
+---| '"kp3"'
 ---
 ---The keypad '4' key on an American layout.
 ---
----@field kp4 integer
+---| '"kp4"'
 ---
 ---The keypad '5' key on an American layout.
 ---
----@field kp5 integer
+---| '"kp5"'
 ---
 ---The keypad '6' key on an American layout.
 ---
----@field kp6 integer
+---| '"kp6"'
 ---
 ---The keypad '7' key on an American layout.
 ---
----@field kp7 integer
+---| '"kp7"'
 ---
 ---The keypad '8' key on an American layout.
 ---
----@field kp8 integer
+---| '"kp8"'
 ---
 ---The keypad '9' key on an American layout.
 ---
----@field kp9 integer
+---| '"kp9"'
 ---
 ---The keypad '0' key on an American layout.
 ---
----@field kp0 integer
+---| '"kp0"'
 ---
 ---The keypad period key on an American layout.
 ---
----@field ["kp."] integer
+---| '"kp."'
 ---
 ---The 1st international key on an American layout. Used on Asian keyboards.
 ---
----@field international1 integer
+---| '"international1"'
 ---
 ---The 2nd international key on an American layout.
 ---
----@field international2 integer
+---| '"international2"'
 ---
 ---The 3rd international  key on an American layout. Yen.
 ---
----@field international3 integer
+---| '"international3"'
 ---
 ---The 4th international key on an American layout.
 ---
----@field international4 integer
+---| '"international4"'
 ---
 ---The 5th international key on an American layout.
 ---
----@field international5 integer
+---| '"international5"'
 ---
 ---The 6th international key on an American layout.
 ---
----@field international6 integer
+---| '"international6"'
 ---
 ---The 7th international key on an American layout.
 ---
----@field international7 integer
+---| '"international7"'
 ---
 ---The 8th international key on an American layout.
 ---
----@field international8 integer
+---| '"international8"'
 ---
 ---The 9th international key on an American layout.
 ---
----@field international9 integer
+---| '"international9"'
 ---
 ---Hangul/English toggle scancode.
 ---
----@field lang1 integer
+---| '"lang1"'
 ---
 ---Hanja conversion scancode.
 ---
----@field lang2 integer
+---| '"lang2"'
 ---
 ---Katakana scancode.
 ---
----@field lang3 integer
+---| '"lang3"'
 ---
 ---Hiragana scancode.
 ---
----@field lang4 integer
+---| '"lang4"'
 ---
 ---Zenkaku/Hankaku scancode.
 ---
----@field lang5 integer
+---| '"lang5"'
 ---
 ---The mute key on an American layout.
 ---
----@field mute integer
+---| '"mute"'
 ---
 ---The volume up key on an American layout.
 ---
----@field volumeup integer
+---| '"volumeup"'
 ---
 ---The volume down key on an American layout.
 ---
----@field volumedown integer
+---| '"volumedown"'
 ---
 ---The audio next track key on an American layout.
 ---
----@field audionext integer
+---| '"audionext"'
 ---
 ---The audio previous track key on an American layout.
 ---
----@field audioprev integer
+---| '"audioprev"'
 ---
 ---The audio stop key on an American layout.
 ---
----@field audiostop integer
+---| '"audiostop"'
 ---
 ---The audio play key on an American layout.
 ---
----@field audioplay integer
+---| '"audioplay"'
 ---
 ---The audio mute key on an American layout.
 ---
----@field audiomute integer
+---| '"audiomute"'
 ---
 ---The media select key on an American layout.
 ---
----@field mediaselect integer
+---| '"mediaselect"'
 ---
 ---The 'WWW' key on an American layout.
 ---
----@field www integer
+---| '"www"'
 ---
 ---The Mail key on an American layout.
 ---
----@field mail integer
+---| '"mail"'
 ---
 ---The calculator key on an American layout.
 ---
----@field calculator integer
+---| '"calculator"'
 ---
 ---The 'computer' key on an American layout.
 ---
----@field computer integer
+---| '"computer"'
 ---
 ---The AC Search key on an American layout.
 ---
----@field acsearch integer
+---| '"acsearch"'
 ---
 ---The AC Home key on an American layout.
 ---
----@field achome integer
+---| '"achome"'
 ---
 ---The AC Back key on an American layout.
 ---
----@field acback integer
+---| '"acback"'
 ---
 ---The AC Forward key on an American layout.
 ---
----@field acforward integer
+---| '"acforward"'
 ---
 ---Th AC Stop key on an American layout.
 ---
----@field acstop integer
+---| '"acstop"'
 ---
 ---The AC Refresh key on an American layout.
 ---
----@field acrefresh integer
+---| '"acrefresh"'
 ---
 ---The AC Bookmarks key on an American layout.
 ---
----@field acbookmarks integer
+---| '"acbookmarks"'
 ---
 ---The system power scancode.
 ---
----@field power integer
+---| '"power"'
 ---
 ---The brightness-down scancode.
 ---
----@field brightnessdown integer
+---| '"brightnessdown"'
 ---
 ---The brightness-up scancode.
 ---
----@field brightnessup integer
+---| '"brightnessup"'
 ---
 ---The display switch scancode.
 ---
----@field displayswitch integer
+---| '"displayswitch"'
 ---
 ---The keyboard illumination toggle scancode.
 ---
----@field kbdillumtoggle integer
+---| '"kbdillumtoggle"'
 ---
 ---The keyboard illumination down scancode.
 ---
----@field kbdillumdown integer
+---| '"kbdillumdown"'
 ---
 ---The keyboard illumination up scancode.
 ---
----@field kbdillumup integer
+---| '"kbdillumup"'
 ---
 ---The eject scancode.
 ---
----@field eject integer
+---| '"eject"'
 ---
 ---The system sleep scancode.
 ---
----@field sleep integer
+---| '"sleep"'
 ---
 ---The alt-erase key on an American layout.
 ---
----@field alterase integer
+---| '"alterase"'
 ---
 ---The sysreq key on an American layout.
 ---
----@field sysreq integer
+---| '"sysreq"'
 ---
 ---The 'cancel' key on an American layout.
 ---
----@field cancel integer
+---| '"cancel"'
 ---
 ---The 'clear' key on an American layout.
 ---
----@field clear integer
+---| '"clear"'
 ---
 ---The 'prior' key on an American layout.
 ---
----@field prior integer
+---| '"prior"'
 ---
 ---The 'return2' key on an American layout.
 ---
----@field return2 integer
+---| '"return2"'
 ---
 ---The 'separator' key on an American layout.
 ---
----@field separator integer
+---| '"separator"'
 ---
 ---The 'out' key on an American layout.
 ---
----@field out integer
+---| '"out"'
 ---
 ---The 'oper' key on an American layout.
 ---
----@field oper integer
+---| '"oper"'
 ---
 ---The 'clearagain' key on an American layout.
 ---
----@field clearagain integer
+---| '"clearagain"'
 ---
 ---The 'crsel' key on an American layout.
 ---
----@field crsel integer
+---| '"crsel"'
 ---
 ---The 'exsel' key on an American layout.
 ---
----@field exsel integer
+---| '"exsel"'
 ---
 ---The keypad 00 key on an American layout.
 ---
----@field kp00 integer
+---| '"kp00"'
 ---
 ---The keypad 000 key on an American layout.
 ---
----@field kp000 integer
+---| '"kp000"'
 ---
 ---The thousands-separator key on an American layout.
 ---
----@field thsousandsseparator integer
+---| '"thsousandsseparator"'
 ---
 ---The decimal separator key on an American layout.
 ---
----@field decimalseparator integer
+---| '"decimalseparator"'
 ---
 ---The currency unit key on an American layout.
 ---
----@field currencyunit integer
+---| '"currencyunit"'
 ---
 ---The currency sub-unit key on an American layout.
 ---
----@field currencysubunit integer
+---| '"currencysubunit"'
 ---
 ---The 'app1' scancode.
 ---
----@field app1 integer
+---| '"app1"'
 ---
 ---The 'app2' scancode.
 ---
----@field app2 integer
+---| '"app2"'
 ---
 ---An unknown key.
 ---
----@field unknown integer
+---| '"unknown"'

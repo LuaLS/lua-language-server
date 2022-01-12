@@ -1511,98 +1511,98 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---Different ways arcs can be drawn with `lovr.graphics.arc`.
 ---
----@class lovr.ArcMode
+---@alias lovr.ArcMode
 ---
 ---The arc is drawn with the center of its circle included in the list of points (default).
 ---
----@field pie integer
+---| '"pie"'
 ---
 ---The curve of the arc is drawn as a single line.
 ---
----@field open integer
+---| '"open"'
 ---
 ---The starting and ending points of the arc's curve are connected.
 ---
----@field closed integer
+---| '"closed"'
 
 ---
 ---Here are the different data types available for vertex attributes in a Mesh.  The ones that have a smaller range take up less memory, which improves performance a bit.  The "u" stands for "unsigned", which means it can't hold negative values but instead has a larger positive range.
 ---
----@class lovr.AttributeType
+---@alias lovr.AttributeType
 ---
 ---A signed 8 bit number, from -128 to 127.
 ---
----@field byte integer
+---| '"byte"'
 ---
 ---An unsigned 8 bit number, from 0 to 255.
 ---
----@field ubyte integer
+---| '"ubyte"'
 ---
 ---A signed 16 bit number, from -32768 to 32767.
 ---
----@field short integer
+---| '"short"'
 ---
 ---An unsigned 16 bit number, from 0 to 65535.
 ---
----@field ushort integer
+---| '"ushort"'
 ---
 ---A signed 32 bit number, from -2147483648 to 2147483647.
 ---
----@field int integer
+---| '"int"'
 ---
 ---An unsigned 32 bit number, from 0 to 4294967295.
 ---
----@field uint integer
+---| '"uint"'
 ---
 ---A 32 bit floating-point number (large range, but can start to lose precision).
 ---
----@field float integer
+---| '"float"'
 
 ---
 ---Different ways the alpha channel of pixels affects blending.
 ---
----@class lovr.BlendAlphaMode
+---@alias lovr.BlendAlphaMode
 ---
 ---Color channel values are multiplied by the alpha channel during blending.
 ---
----@field alphamultiply integer
+---| '"alphamultiply"'
 ---
 ---Color channels are not multiplied by the alpha channel.  This should be used if the pixels being drawn have already been blended, or "pre-multiplied", by the alpha channel.
 ---
----@field premultiplied integer
+---| '"premultiplied"'
 
 ---
 ---Blend modes control how overlapping pixels are blended together, similar to layers in Photoshop.
 ---
----@class lovr.BlendMode
+---@alias lovr.BlendMode
 ---
 ---Normal blending where the alpha value controls how the colors are blended.
 ---
----@field alpha integer
+---| '"alpha"'
 ---
 ---The incoming pixel color is added to the destination pixel color.
 ---
----@field add integer
+---| '"add"'
 ---
 ---The incoming pixel color is subtracted from the destination pixel color.
 ---
----@field subtract integer
+---| '"subtract"'
 ---
 ---The color channels from the two pixel values are multiplied together to produce a result.
 ---
----@field multiply integer
+---| '"multiply"'
 ---
 ---The maximum value from each color channel is used, resulting in a lightening effect.
 ---
----@field lighten integer
+---| '"lighten"'
 ---
 ---The minimum value from each color channel is used, resulting in a darkening effect.
 ---
----@field darken integer
+---| '"darken"'
 ---
 ---The opposite of multiply: The pixel values are inverted, multiplied, and inverted again, resulting in a lightening effect.
 ---
----@field screen integer
+---| '"screen"'
 
 ---
 ---There are two types of ShaderBlocks that can be used: `uniform` and `compute`.
@@ -1611,448 +1611,448 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---Compute blocks can be written to by compute shaders, might be slightly slower than uniform blocks, and have a much, much larger maximum size.
 ---
----@class lovr.BlockType
+---@alias lovr.BlockType
 ---
 ---A uniform block.
 ---
----@field uniform integer
+---| '"uniform"'
 ---
 ---A compute block.
 ---
----@field compute integer
+---| '"compute"'
 
 ---
 ---This acts as a hint to the graphics driver about what kinds of data access should be optimized for.
 ---
----@class lovr.BufferUsage
+---@alias lovr.BufferUsage
 ---
 ---A buffer that you intend to create once and never modify.
 ---
----@field static integer
+---| '"static"'
 ---
 ---A buffer which is modified occasionally.
 ---
----@field dynamic integer
+---| '"dynamic"'
 ---
 ---A buffer which is entirely replaced on the order of every frame.
 ---
----@field stream integer
+---| '"stream"'
 
 ---
 ---The method used to compare z values when deciding how to overlap rendered objects.  This is called the "depth test", and it happens on a pixel-by-pixel basis every time new objects are drawn.  If the depth test "passes" for a pixel, then the pixel color will be replaced by the new color and the depth value in the depth buffer will be updated.  Otherwise, the pixel will not be changed and the depth value will not be updated.
 ---
----@class lovr.CompareMode
+---@alias lovr.CompareMode
 ---
 ---The depth test passes when the depth values are equal.
 ---
----@field equal integer
+---| '"equal"'
 ---
 ---The depth test passes when the depth values are not equal.
 ---
----@field notequal integer
+---| '"notequal"'
 ---
 ---The depth test passes when the new depth value is less than the existing one.
 ---
----@field less integer
+---| '"less"'
 ---
 ---The depth test passes when the new depth value is less than or equal to the existing one.
 ---
----@field lequal integer
+---| '"lequal"'
 ---
 ---The depth test passes when the new depth value is greater than or equal to the existing one.
 ---
----@field gequal integer
+---| '"gequal"'
 ---
 ---The depth test passes when the new depth value is greater than the existing one.
 ---
----@field greater integer
+---| '"greater"'
 
 ---
 ---Different coordinate spaces for nodes in a Model.
 ---
----@class lovr.CoordinateSpace
+---@alias lovr.CoordinateSpace
 ---
 ---The coordinate space relative to the node's parent.
 ---
----@field local integer
+---| '"local"'
 ---
 ---The coordinate space relative to the root node of the Model.
 ---
----@field global integer
+---| '"global"'
 
 ---
 ---The following shaders are built in to LÖVR, and can be used as an argument to `lovr.graphics.newShader` instead of providing raw GLSL shader code.  The shaders can be further customized by using the `flags` argument.  If you pass in `nil` to `lovr.graphics.setShader`, LÖVR will automatically pick a DefaultShader to use based on whatever is being drawn.
 ---
----@class lovr.DefaultShader
+---@alias lovr.DefaultShader
 ---
 ---A simple shader without lighting, using only colors and a diffuse texture.
 ---
----@field unlit integer
+---| '"unlit"'
 ---
 ---A physically-based rendering (PBR) shader, using advanced material properties.
 ---
----@field standard integer
+---| '"standard"'
 ---
 ---A shader that renders a cubemap texture.
 ---
----@field cube integer
+---| '"cube"'
 ---
 ---A shader that renders a 2D equirectangular texture with spherical coordinates.
 ---
----@field pano integer
+---| '"pano"'
 ---
 ---A shader that renders font glyphs.
 ---
----@field font integer
+---| '"font"'
 ---
 ---A shader that passes its vertex coordinates unmodified to the fragment shader, used to render view-independent fixed geometry like fullscreen quads.
 ---
----@field fill integer
+---| '"fill"'
 
 ---
 ---Meshes are lists of arbitrary vertices.  These vertices can be connected in different ways, leading to different shapes like lines and triangles.
 ---
----@class lovr.DrawMode
+---@alias lovr.DrawMode
 ---
 ---Draw each vertex as a single point.
 ---
----@field points integer
+---| '"points"'
 ---
 ---The vertices represent a list of line segments. Each pair of vertices will have a line drawn between them.
 ---
----@field lines integer
+---| '"lines"'
 ---
 ---The first two vertices have a line drawn between them, and each vertex after that will be connected to the previous vertex with a line.
 ---
----@field linestrip integer
+---| '"linestrip"'
 ---
 ---Similar to linestrip, except the last vertex is connected back to the first.
 ---
----@field lineloop integer
+---| '"lineloop"'
 ---
 ---The first three vertices define a triangle.  Each vertex after that creates a triangle using the new vertex and last two vertices.
 ---
----@field strip integer
+---| '"strip"'
 ---
 ---Each set of three vertices represents a discrete triangle.
 ---
----@field triangles integer
+---| '"triangles"'
 ---
 ---Draws a set of triangles.  Each one shares the first vertex as a common point, leading to a fan-like shape.
 ---
----@field fan integer
+---| '"fan"'
 
 ---
 ---Most graphics primitives can be drawn in one of two modes: a filled mode and a wireframe mode.
 ---
----@class lovr.DrawStyle
+---@alias lovr.DrawStyle
 ---
 ---The shape is drawn as a filled object.
 ---
----@field fill integer
+---| '"fill"'
 ---
 ---The shape is drawn as a wireframe object.
 ---
----@field line integer
+---| '"line"'
 
 ---
 ---The method used to downsample (or upsample) a texture.  "nearest" can be used for a pixelated effect, whereas "linear" leads to more smooth results.  Nearest is slightly faster than linear.
 ---
----@class lovr.FilterMode
+---@alias lovr.FilterMode
 ---
 ---Fast nearest-neighbor sampling.  Leads to a pixelated style.
 ---
----@field nearest integer
+---| '"nearest"'
 ---
 ---Smooth pixel sampling.
 ---
----@field bilinear integer
+---| '"bilinear"'
 ---
 ---Smooth pixel sampling, with smooth sampling across mipmap levels.
 ---
----@field trilinear integer
+---| '"trilinear"'
 
 ---
 ---Different ways to horizontally align text when using `lovr.graphics.print`.
 ---
----@class lovr.HorizontalAlign
+---@alias lovr.HorizontalAlign
 ---
 ---Left aligned lines of text.
 ---
----@field left integer
+---| '"left"'
 ---
 ---Centered aligned lines of text.
 ---
----@field center integer
+---| '"center"'
 ---
 ---Right aligned lines of text.
 ---
----@field right integer
+---| '"right"'
 
 ---
 ---The different types of color parameters `Material`s can hold.
 ---
----@class lovr.MaterialColor
+---@alias lovr.MaterialColor
 ---
 ---The diffuse color.
 ---
----@field diffuse integer
+---| '"diffuse"'
 ---
 ---The emissive color.
 ---
----@field emissive integer
+---| '"emissive"'
 
 ---
 ---The different types of float parameters `Material`s can hold.
 ---
----@class lovr.MaterialScalar
+---@alias lovr.MaterialScalar
 ---
 ---The constant metalness factor.
 ---
----@field metalness integer
+---| '"metalness"'
 ---
 ---The constant roughness factor.
 ---
----@field roughness integer
+---| '"roughness"'
 
 ---
 ---The different types of texture parameters `Material`s can hold.
 ---
----@class lovr.MaterialTexture
+---@alias lovr.MaterialTexture
 ---
 ---The diffuse texture.
 ---
----@field diffuse integer
+---| '"diffuse"'
 ---
 ---The emissive texture.
 ---
----@field emissive integer
+---| '"emissive"'
 ---
 ---The metalness texture.
 ---
----@field metalness integer
+---| '"metalness"'
 ---
 ---The roughness texture.
 ---
----@field roughness integer
+---| '"roughness"'
 ---
 ---The ambient occlusion texture.
 ---
----@field occlusion integer
+---| '"occlusion"'
 ---
 ---The normal map.
 ---
----@field normal integer
+---| '"normal"'
 ---
 ---The environment map, should be specified as a cubemap texture.
 ---
----@field environment integer
+---| '"environment"'
 
 ---
 ---Meshes can have a usage hint, describing how they are planning on being updated.  Setting the usage hint allows the graphics driver optimize how it handles the data in the Mesh.
 ---
----@class lovr.MeshUsage
+---@alias lovr.MeshUsage
 ---
 ---The Mesh contents will rarely change.
 ---
----@field static integer
+---| '"static"'
 ---
 ---The Mesh contents will change often.
 ---
----@field dynamic integer
+---| '"dynamic"'
 ---
 ---The Mesh contents will change constantly, potentially multiple times each frame.
 ---
----@field stream integer
+---| '"stream"'
 
 ---
 ---Shaders can be used for either rendering operations or generic compute tasks.  Graphics shaders are created with `lovr.graphics.newShader` and compute shaders are created with `lovr.graphics.newComputeShader`.  `Shader:getType` can be used on an existing Shader to figure out what type it is.
 ---
----@class lovr.ShaderType
+---@alias lovr.ShaderType
 ---
 ---A graphics shader.
 ---
----@field graphics integer
+---| '"graphics"'
 ---
 ---A compute shader.
 ---
----@field compute integer
+---| '"compute"'
 
 ---
 ---How to modify pixels in the stencil buffer when using `lovr.graphics.stencil`.
 ---
----@class lovr.StencilAction
+---@alias lovr.StencilAction
 ---
 ---Stencil values will be replaced with a custom value.
 ---
----@field replace integer
+---| '"replace"'
 ---
 ---Stencil values will increment every time they are rendered to.
 ---
----@field increment integer
+---| '"increment"'
 ---
 ---Stencil values will decrement every time they are rendered to.
 ---
----@field decrement integer
+---| '"decrement"'
 ---
 ---Similar to `increment`, but the stencil value will be set to 0 if it exceeds 255.
 ---
----@field incrementwrap integer
+---| '"incrementwrap"'
 ---
 ---Similar to `decrement`, but the stencil value will be set to 255 if it drops below 0.
 ---
----@field decrementwrap integer
+---| '"decrementwrap"'
 ---
 ---Stencil values will be bitwise inverted every time they are rendered to.
 ---
----@field invert integer
+---| '"invert"'
 
 ---
 ---Textures can store their pixels in different formats.  The set of color channels and the number of bits stored for each channel can differ, allowing Textures to optimize their storage for certain kinds of image formats or rendering techniques.
 ---
----@class lovr.TextureFormat
+---@alias lovr.TextureFormat
 ---
 ---Each pixel is 24 bits, or 8 bits for each channel.
 ---
----@field rgb integer
+---| '"rgb"'
 ---
 ---Each pixel is 32 bits, or 8 bits for each channel (including alpha).
 ---
----@field rgba integer
+---| '"rgba"'
 ---
 ---An rgba format where the colors occupy 4 bits instead of the usual 8.
 ---
----@field rgba4 integer
+---| '"rgba4"'
 ---
 ---Each pixel is 64 bits. Each channel is a 16 bit floating point number.
 ---
----@field rgba16f integer
+---| '"rgba16f"'
 ---
 ---Each pixel is 128 bits. Each channel is a 32 bit floating point number.
 ---
----@field rgba32f integer
+---| '"rgba32f"'
 ---
 ---A 16-bit floating point format with a single color channel.
 ---
----@field r16f integer
+---| '"r16f"'
 ---
 ---A 32-bit floating point format with a single color channel.
 ---
----@field r32f integer
+---| '"r32f"'
 ---
 ---A 16-bit floating point format with two color channels.
 ---
----@field rg16f integer
+---| '"rg16f"'
 ---
 ---A 32-bit floating point format with two color channels.
 ---
----@field rg32f integer
+---| '"rg32f"'
 ---
 ---A 16 bit format with 5-bit color channels and a single alpha bit.
 ---
----@field rgb5a1 integer
+---| '"rgb5a1"'
 ---
 ---A 32 bit format with 10-bit color channels and two alpha bits.
 ---
----@field rgb10a2 integer
+---| '"rgb10a2"'
 ---
 ---Each pixel is 32 bits, and packs three color channels into 10 or 11 bits each.
 ---
----@field rg11b10f integer
+---| '"rg11b10f"'
 ---
 ---A 16 bit depth buffer.
 ---
----@field d16 integer
+---| '"d16"'
 ---
 ---A 32 bit floating point depth buffer.
 ---
----@field d32f integer
+---| '"d32f"'
 ---
 ---A depth buffer with 24 bits for depth and 8 bits for stencil.
 ---
----@field d24s8 integer
+---| '"d24s8"'
 
 ---
 ---Different types of Textures.
 ---
----@class lovr.TextureType
+---@alias lovr.TextureType
 ---
 ---A 2D texture.
 ---
----@field ["2d"] integer
+---| '"2d"'
 ---
 ---A 2D array texture with multiple independent 2D layers.
 ---
----@field array integer
+---| '"array"'
 ---
 ---A cubemap texture with 6 2D faces.
 ---
----@field cube integer
+---| '"cube"'
 ---
 ---A 3D volumetric texture consisting of multiple 2D layers.
 ---
----@field volume integer
+---| '"volume"'
 
 ---
 ---When binding writable resources to shaders using `Shader:sendBlock` and `Shader:sendImage`, an access pattern can be specified as a hint that says whether you plan to read or write to the resource (or both).  Sometimes, LÖVR or the GPU driver can use this hint to get better performance or avoid stalling.
 ---
----@class lovr.UniformAccess
+---@alias lovr.UniformAccess
 ---
 ---The Shader will use the resource in a read-only fashion.
 ---
----@field read integer
+---| '"read"'
 ---
 ---The Shader will use the resource in a write-only fashion.
 ---
----@field write integer
+---| '"write"'
 ---
 ---The resource will be available for reading and writing.
 ---
----@field readwrite integer
+---| '"readwrite"'
 
 ---
 ---Different ways to vertically align text when using `lovr.graphics.print`.
 ---
----@class lovr.VerticalAlign
+---@alias lovr.VerticalAlign
 ---
 ---Align the top of the text to the origin.
 ---
----@field top integer
+---| '"top"'
 ---
 ---Vertically center the text.
 ---
----@field middle integer
+---| '"middle"'
 ---
 ---Align the bottom of the text to the origin.
 ---
----@field bottom integer
+---| '"bottom"'
 
 ---
 ---Whether the points on triangles are specified in a clockwise or counterclockwise order.
 ---
----@class lovr.Winding
+---@alias lovr.Winding
 ---
 ---Triangle vertices are specified in a clockwise order.
 ---
----@field clockwise integer
+---| '"clockwise"'
 ---
 ---Triangle vertices are specified in a counterclockwise order.
 ---
----@field counterclockwise integer
+---| '"counterclockwise"'
 
 ---
 ---The method used to render textures when texture coordinates are outside of the 0-1 range.
 ---
----@class lovr.WrapMode
+---@alias lovr.WrapMode
 ---
 ---The texture will be clamped at its edges.
 ---
----@field clamp integer
+---| '"clamp"'
 ---
 ---The texture repeats.
 ---
----@field repeat integer
+---| '"repeat"'
 ---
 ---The texture will repeat, mirroring its appearance each time it repeats.
 ---
----@field mirroredrepeat integer
+---| '"mirroredrepeat"'

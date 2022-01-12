@@ -218,151 +218,151 @@ function Joystick:setVibration(left, right) end
 ---
 ---Virtual gamepad axes.
 ---
----@class love.GamepadAxis
+---@alias love.GamepadAxis
 ---
 ---The x-axis of the left thumbstick.
 ---
----@field leftx integer
+---| '"leftx"'
 ---
 ---The y-axis of the left thumbstick.
 ---
----@field lefty integer
+---| '"lefty"'
 ---
 ---The x-axis of the right thumbstick.
 ---
----@field rightx integer
+---| '"rightx"'
 ---
 ---The y-axis of the right thumbstick.
 ---
----@field righty integer
+---| '"righty"'
 ---
 ---Left analog trigger.
 ---
----@field triggerleft integer
+---| '"triggerleft"'
 ---
 ---Right analog trigger.
 ---
----@field triggerright integer
+---| '"triggerright"'
 
 ---
 ---Virtual gamepad buttons.
 ---
----@class love.GamepadButton
+---@alias love.GamepadButton
 ---
 ---Bottom face button (A).
 ---
----@field a integer
+---| '"a"'
 ---
 ---Right face button (B).
 ---
----@field b integer
+---| '"b"'
 ---
 ---Left face button (X).
 ---
----@field x integer
+---| '"x"'
 ---
 ---Top face button (Y).
 ---
----@field y integer
+---| '"y"'
 ---
 ---Back button.
 ---
----@field back integer
+---| '"back"'
 ---
 ---Guide button.
 ---
----@field guide integer
+---| '"guide"'
 ---
 ---Start button.
 ---
----@field start integer
+---| '"start"'
 ---
 ---Left stick click button.
 ---
----@field leftstick integer
+---| '"leftstick"'
 ---
 ---Right stick click button.
 ---
----@field rightstick integer
+---| '"rightstick"'
 ---
 ---Left bumper.
 ---
----@field leftshoulder integer
+---| '"leftshoulder"'
 ---
 ---Right bumper.
 ---
----@field rightshoulder integer
+---| '"rightshoulder"'
 ---
 ---D-pad up.
 ---
----@field dpup integer
+---| '"dpup"'
 ---
 ---D-pad down.
 ---
----@field dpdown integer
+---| '"dpdown"'
 ---
 ---D-pad left.
 ---
----@field dpleft integer
+---| '"dpleft"'
 ---
 ---D-pad right.
 ---
----@field dpright integer
+---| '"dpright"'
 
 ---
 ---Joystick hat positions.
 ---
----@class love.JoystickHat
+---@alias love.JoystickHat
 ---
 ---Centered
 ---
----@field c integer
+---| '"c"'
 ---
 ---Down
 ---
----@field d integer
+---| '"d"'
 ---
 ---Left
 ---
----@field l integer
+---| '"l"'
 ---
 ---Left+Down
 ---
----@field ld integer
+---| '"ld"'
 ---
 ---Left+Up
 ---
----@field lu integer
+---| '"lu"'
 ---
 ---Right
 ---
----@field r integer
+---| '"r"'
 ---
 ---Right+Down
 ---
----@field rd integer
+---| '"rd"'
 ---
 ---Right+Up
 ---
----@field ru integer
+---| '"ru"'
 ---
 ---Up
 ---
----@field u integer
+---| '"u"'
 
 ---
 ---Types of Joystick inputs.
 ---
----@class love.JoystickInputType
+---@alias love.JoystickInputType
 ---
 ---Analog axis.
 ---
----@field axis integer
+---| '"axis"'
 ---
 ---Button.
 ---
----@field button integer
+---| '"button"'
 ---
 ---8-direction hat value.
 ---
----@field hat integer
+---| '"hat"'

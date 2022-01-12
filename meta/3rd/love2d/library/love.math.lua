@@ -503,12 +503,12 @@ function Transform:translate(dx, dy) end
 ---
 ---The layout of matrix elements (row-major or column-major).
 ---
----@class love.MatrixLayout
+---@alias love.MatrixLayout
 ---
 ---The matrix is row-major:
 ---
----@field row integer
+---| '"row"'
 ---
 ---The matrix is column-major:
 ---
----@field column integer
+---| '"column"'

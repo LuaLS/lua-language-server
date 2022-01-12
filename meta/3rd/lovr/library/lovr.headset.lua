@@ -302,210 +302,210 @@ function lovr.headset.wasReleased(device, button) end
 ---
 ---Different types of input devices supported by the `lovr.headset` module.
 ---
----@class lovr.Device
+---@alias lovr.Device
 ---
 ---The headset.
 ---
----@field head integer
+---| '"head"'
 ---
 ---The left controller.
 ---
----@field ["hand/left"] integer
+---| '"hand/left"'
 ---
 ---The right controller.
 ---
----@field ["hand/right"] integer
+---| '"hand/right"'
 ---
 ---A shorthand for hand/left.
 ---
----@field left integer
+---| '"left"'
 ---
 ---A shorthand for hand/right.
 ---
----@field right integer
+---| '"right"'
 ---
 ---A device tracking the left elbow.
 ---
----@field ["elbow/left"] integer
+---| '"elbow/left"'
 ---
 ---A device tracking the right elbow.
 ---
----@field ["elbow/right"] integer
+---| '"elbow/right"'
 ---
 ---A device tracking the left shoulder.
 ---
----@field ["shoulder/left"] integer
+---| '"shoulder/left"'
 ---
 ---A device tracking the right shoulder.
 ---
----@field ["shoulder/right"] integer
+---| '"shoulder/right"'
 ---
 ---A device tracking the chest.
 ---
----@field chest integer
+---| '"chest"'
 ---
 ---A device tracking the waist.
 ---
----@field waist integer
+---| '"waist"'
 ---
 ---A device tracking the left knee.
 ---
----@field ["knee/left"] integer
+---| '"knee/left"'
 ---
 ---A device tracking the right knee.
 ---
----@field ["knee/right"] integer
+---| '"knee/right"'
 ---
 ---A device tracking the left foot or ankle.
 ---
----@field ["foot/left"] integer
+---| '"foot/left"'
 ---
 ---A device tracking the right foot or ankle.
 ---
----@field ["foot/right"] integer
+---| '"foot/right"'
 ---
 ---A device used as a camera in the scene.
 ---
----@field camera integer
+---| '"camera"'
 ---
 ---A tracked keyboard.
 ---
----@field keyboard integer
+---| '"keyboard"'
 ---
 ---The left eye.
 ---
----@field ["eye/left"] integer
+---| '"eye/left"'
 ---
 ---The right eye.
 ---
----@field ["eye/right"] integer
+---| '"eye/right"'
 ---
 ---The first tracking device (i.e. lighthouse).
 ---
----@field ["beacon/1"] integer
+---| '"beacon/1"'
 ---
 ---The second tracking device (i.e. lighthouse).
 ---
----@field ["beacon/2"] integer
+---| '"beacon/2"'
 ---
 ---The third tracking device (i.e. lighthouse).
 ---
----@field ["beacon/3"] integer
+---| '"beacon/3"'
 ---
 ---The fourth tracking device (i.e. lighthouse).
 ---
----@field ["beacon/4"] integer
+---| '"beacon/4"'
 
 ---
 ---Axes on an input device.
 ---
----@class lovr.DeviceAxis
+---@alias lovr.DeviceAxis
 ---
 ---A trigger (1D).
 ---
----@field trigger integer
+---| '"trigger"'
 ---
 ---A thumbstick (2D).
 ---
----@field thumbstick integer
+---| '"thumbstick"'
 ---
 ---A touchpad (2D).
 ---
----@field touchpad integer
+---| '"touchpad"'
 ---
 ---A grip button or grab gesture (1D).
 ---
----@field grip integer
+---| '"grip"'
 
 ---
 ---Buttons on an input device.
 ---
----@class lovr.DeviceButton
+---@alias lovr.DeviceButton
 ---
 ---The trigger button.
 ---
----@field trigger integer
+---| '"trigger"'
 ---
 ---The thumbstick.
 ---
----@field thumbstick integer
+---| '"thumbstick"'
 ---
 ---The touchpad.
 ---
----@field touchpad integer
+---| '"touchpad"'
 ---
 ---The grip button.
 ---
----@field grip integer
+---| '"grip"'
 ---
 ---The menu button.
 ---
----@field menu integer
+---| '"menu"'
 ---
 ---The A button.
 ---
----@field a integer
+---| '"a"'
 ---
 ---The B button.
 ---
----@field b integer
+---| '"b"'
 ---
 ---The X button.
 ---
----@field x integer
+---| '"x"'
 ---
 ---The Y button.
 ---
----@field y integer
+---| '"y"'
 ---
 ---The proximity sensor on a headset.
 ---
----@field proximity integer
+---| '"proximity"'
 
 ---
 ---These are all of the supported VR APIs that LÖVR can use to power the lovr.headset module.  You can change the order of headset drivers using `lovr.conf` to prefer or exclude specific VR APIs.
 ---
 ---At startup, LÖVR searches through the list of drivers in order.  One headset driver will be used for rendering to the VR display, and all supported headset drivers will be used for device input.  The way this works is that when poses or button input is requested, the input drivers are queried (in the order they appear in `conf.lua`) to see if any of them currently have data for the specified device.  The first one that returns data will be used to provide the result. This allows projects to support multiple types of hardware devices.
 ---
----@class lovr.HeadsetDriver
+---@alias lovr.HeadsetDriver
 ---
 ---A VR simulator using keyboard/mouse.
 ---
----@field desktop integer
+---| '"desktop"'
 ---
 ---Oculus Desktop SDK.
 ---
----@field oculus integer
+---| '"oculus"'
 ---
 ---OpenVR.
 ---
----@field openvr integer
+---| '"openvr"'
 ---
 ---OpenXR.
 ---
----@field openxr integer
+---| '"openxr"'
 ---
 ---Oculus Mobile SDK.
 ---
----@field vrapi integer
+---| '"vrapi"'
 ---
 ---Pico.
 ---
----@field pico integer
+---| '"pico"'
 ---
 ---WebXR.
 ---
----@field webxr integer
+---| '"webxr"'
 
 ---
 ---Represents the different types of origins for coordinate spaces.  An origin of "floor" means that the origin is on the floor in the middle of a room-scale play area.  An origin of "head" means that no positional tracking is available, and consequently the origin is always at the position of the headset.
 ---
----@class lovr.HeadsetOrigin
+---@alias lovr.HeadsetOrigin
 ---
 ---The origin is at the head.
 ---
----@field head integer
+---| '"head"'
 ---
 ---The origin is on the floor.
 ---
----@field floor integer
+---| '"floor"'

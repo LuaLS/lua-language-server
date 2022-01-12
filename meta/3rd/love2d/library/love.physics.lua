@@ -2273,78 +2273,78 @@ function World:update(dt, velocityiterations, positioniterations) end
 ---
 ---The types of a Body. 
 ---
----@class love.BodyType
+---@alias love.BodyType
 ---
 ---Static bodies do not move.
 ---
----@field static integer
+---| '"static"'
 ---
 ---Dynamic bodies collide with all bodies.
 ---
----@field dynamic integer
+---| '"dynamic"'
 ---
 ---Kinematic bodies only collide with dynamic bodies.
 ---
----@field kinematic integer
+---| '"kinematic"'
 
 ---
 ---Different types of joints.
 ---
----@class love.JointType
+---@alias love.JointType
 ---
 ---A DistanceJoint.
 ---
----@field distance integer
+---| '"distance"'
 ---
 ---A FrictionJoint.
 ---
----@field friction integer
+---| '"friction"'
 ---
 ---A GearJoint.
 ---
----@field gear integer
+---| '"gear"'
 ---
 ---A MouseJoint.
 ---
----@field mouse integer
+---| '"mouse"'
 ---
 ---A PrismaticJoint.
 ---
----@field prismatic integer
+---| '"prismatic"'
 ---
 ---A PulleyJoint.
 ---
----@field pulley integer
+---| '"pulley"'
 ---
 ---A RevoluteJoint.
 ---
----@field revolute integer
+---| '"revolute"'
 ---
 ---A RopeJoint.
 ---
----@field rope integer
+---| '"rope"'
 ---
 ---A WeldJoint.
 ---
----@field weld integer
+---| '"weld"'
 
 ---
 ---The different types of Shapes, as returned by Shape:getType.
 ---
----@class love.ShapeType
+---@alias love.ShapeType
 ---
 ---The Shape is a CircleShape.
 ---
----@field circle integer
+---| '"circle"'
 ---
 ---The Shape is a PolygonShape.
 ---
----@field polygon integer
+---| '"polygon"'
 ---
 ---The Shape is a EdgeShape.
 ---
----@field edge integer
+---| '"edge"'
 ---
 ---The Shape is a ChainShape.
 ---
----@field chain integer
+---| '"chain"'

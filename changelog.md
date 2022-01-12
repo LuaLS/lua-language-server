@@ -15,6 +15,7 @@
 * `FIX` [#884](https://github.com/sumneko/lua-language-server/issues/884)
 * `FIX` [#885](https://github.com/sumneko/lua-language-server/issues/885)
 * `FIX` [#886](https://github.com/sumneko/lua-language-server/issues/886)
+* `FIX` [#902](https://github.com/sumneko/lua-language-server/issues/902)
 
 ## 2.5.6
 `2021-12-27`

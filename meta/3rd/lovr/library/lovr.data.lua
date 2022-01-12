@@ -359,29 +359,29 @@ function Sound:setFrames(t, count, dstOffset, srcOffset) end
 ---
 ---Sounds can have different numbers of channels, and those channels can map to various speaker layouts.
 ---
----@class lovr.ChannelLayout
+---@alias lovr.ChannelLayout
 ---
 ---1 channel.
 ---
----@field mono integer
+---| '"mono"'
 ---
 ---2 channels.  The first channel is for the left speaker and the second is for the right.
 ---
----@field stereo integer
+---| '"stereo"'
 ---
 ---4 channels.  Ambisonic channels don't map directly to speakers but instead represent directions in 3D space, sort of like the images of a skybox.  Currently, ambisonic sounds can only be loaded, not played.
 ---
----@field ambisonic integer
+---| '"ambisonic"'
 
 ---
 ---Sounds can store audio samples as 16 bit integers or 32 bit floats.
 ---
----@class lovr.SampleFormat
+---@alias lovr.SampleFormat
 ---
 ---32 bit floating point samples (between -1.0 and 1.0).
 ---
----@field f32 integer
+---| '"f32"'
 ---
 ---16 bit integer samples (between -32768 and 32767).
 ---
----@field i16 integer
+---| '"i16"'

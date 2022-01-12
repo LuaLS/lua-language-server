@@ -161,56 +161,56 @@ function Cursor:getType() end
 ---
 ---Types of hardware cursors.
 ---
----@class love.CursorType
+---@alias love.CursorType
 ---
 ---The cursor is using a custom image.
 ---
----@field image integer
+---| '"image"'
 ---
 ---An arrow pointer.
 ---
----@field arrow integer
+---| '"arrow"'
 ---
 ---An I-beam, normally used when mousing over editable or selectable text.
 ---
----@field ibeam integer
+---| '"ibeam"'
 ---
 ---Wait graphic.
 ---
----@field wait integer
+---| '"wait"'
 ---
 ---Small wait cursor with an arrow pointer.
 ---
----@field waitarrow integer
+---| '"waitarrow"'
 ---
 ---Crosshair symbol.
 ---
----@field crosshair integer
+---| '"crosshair"'
 ---
 ---Double arrow pointing to the top-left and bottom-right.
 ---
----@field sizenwse integer
+---| '"sizenwse"'
 ---
 ---Double arrow pointing to the top-right and bottom-left.
 ---
----@field sizenesw integer
+---| '"sizenesw"'
 ---
 ---Double arrow pointing left and right.
 ---
----@field sizewe integer
+---| '"sizewe"'
 ---
 ---Double arrow pointing up and down.
 ---
----@field sizens integer
+---| '"sizens"'
 ---
 ---Four-pointed arrow pointing up, down, left, and right.
 ---
----@field sizeall integer
+---| '"sizeall"'
 ---
 ---Slashed circle or crossbones.
 ---
----@field no integer
+---| '"no"'
 ---
 ---Hand symbol.
 ---
----@field hand integer
+---| '"hand"'

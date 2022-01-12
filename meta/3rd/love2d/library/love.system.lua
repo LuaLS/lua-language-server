@@ -62,24 +62,24 @@ function love.system.vibrate(seconds) end
 ---
 ---The basic state of the system's power supply.
 ---
----@class love.PowerState
+---@alias love.PowerState
 ---
 ---Cannot determine power status.
 ---
----@field unknown integer
+---| '"unknown"'
 ---
 ---Not plugged in, running on a battery.
 ---
----@field battery integer
+---| '"battery"'
 ---
 ---Plugged in, no battery available.
 ---
----@field nobattery integer
+---| '"nobattery"'
 ---
 ---Plugged in, charging battery.
 ---
----@field charging integer
+---| '"charging"'
 ---
 ---Plugged in, battery is fully charged.
 ---
----@field charged integer
+---| '"charged"'

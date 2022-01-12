@@ -27,8 +27,8 @@ function lovr.system.requestPermission(permission) end
 ---
 ---These are the different permissions that need to be requested using `lovr.system.requestPermission` on some platforms.
 ---
----@class lovr.Permission
+---@alias lovr.Permission
 ---
 ---Requests microphone access.
 ---
----@field audiocapture integer
+---| '"audiocapture"'

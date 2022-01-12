@@ -593,139 +593,139 @@ function Source:tell(unit) end
 ---
 ---Extended information can be found in the chapter "3.4. Attenuation By Distance" of the OpenAL 1.1 specification.
 ---
----@class love.DistanceModel
+---@alias love.DistanceModel
 ---
 ---Sources do not get attenuated.
 ---
----@field none integer
+---| '"none"'
 ---
 ---Inverse distance attenuation.
 ---
----@field inverse integer
+---| '"inverse"'
 ---
 ---Inverse distance attenuation. Gain is clamped. In version 0.9.2 and older this is named '''inverse clamped'''.
 ---
----@field inverseclamped integer
+---| '"inverseclamped"'
 ---
 ---Linear attenuation.
 ---
----@field linear integer
+---| '"linear"'
 ---
 ---Linear attenuation. Gain is clamped. In version 0.9.2 and older this is named '''linear clamped'''.
 ---
----@field linearclamped integer
+---| '"linearclamped"'
 ---
 ---Exponential attenuation.
 ---
----@field exponent integer
+---| '"exponent"'
 ---
 ---Exponential attenuation. Gain is clamped. In version 0.9.2 and older this is named '''exponent clamped'''.
 ---
----@field exponentclamped integer
+---| '"exponentclamped"'
 
 ---
 ---The different types of effects supported by love.audio.setEffect.
 ---
----@class love.EffectType
+---@alias love.EffectType
 ---
 ---Plays multiple copies of the sound with slight pitch and time variation. Used to make sounds sound "fuller" or "thicker".
 ---
----@field chorus integer
+---| '"chorus"'
 ---
 ---Decreases the dynamic range of the sound, making the loud and quiet parts closer in volume, producing a more uniform amplitude throughout time.
 ---
----@field compressor integer
+---| '"compressor"'
 ---
 ---Alters the sound by amplifying it until it clips, shearing off parts of the signal, leading to a compressed and distorted sound.
 ---
----@field distortion integer
+---| '"distortion"'
 ---
 ---Decaying feedback based effect, on the order of seconds. Also known as delay; causes the sound to repeat at regular intervals at a decreasing volume.
 ---
----@field echo integer
+---| '"echo"'
 ---
 ---Adjust the frequency components of the sound using a 4-band (low-shelf, two band-pass and a high-shelf) equalizer.
 ---
----@field equalizer integer
+---| '"equalizer"'
 ---
 ---Plays two copies of the sound; while varying the phase, or equivalently delaying one of them, by amounts on the order of milliseconds, resulting in phasing sounds.
 ---
----@field flanger integer
+---| '"flanger"'
 ---
 ---Decaying feedback based effect, on the order of milliseconds. Used to simulate the reflection off of the surroundings.
 ---
----@field reverb integer
+---| '"reverb"'
 ---
 ---An implementation of amplitude modulation; multiplies the source signal with a simple waveform, to produce either volume changes, or inharmonic overtones.
 ---
----@field ringmodulator integer
+---| '"ringmodulator"'
 
 ---
 ---The different types of waveforms that can be used with the '''ringmodulator''' EffectType.
 ---
----@class love.EffectWaveform
+---@alias love.EffectWaveform
 ---
 ---A sawtooth wave, also known as a ramp wave. Named for its linear rise, and (near-)instantaneous fall along time.
 ---
----@field sawtooth integer
+---| '"sawtooth"'
 ---
 ---A sine wave. Follows a trigonometric sine function.
 ---
----@field sine integer
+---| '"sine"'
 ---
 ---A square wave. Switches between high and low states (near-)instantaneously.
 ---
----@field square integer
+---| '"square"'
 ---
 ---A triangle wave. Follows a linear rise and fall that repeats periodically.
 ---
----@field triangle integer
+---| '"triangle"'
 
 ---
 ---Types of filters for Sources.
 ---
----@class love.FilterType
+---@alias love.FilterType
 ---
 ---Low-pass filter. High frequency sounds are attenuated.
 ---
----@field lowpass integer
+---| '"lowpass"'
 ---
 ---High-pass filter. Low frequency sounds are attenuated.
 ---
----@field highpass integer
+---| '"highpass"'
 ---
 ---Band-pass filter. Both high and low frequency sounds are attenuated based on the given parameters.
 ---
----@field bandpass integer
+---| '"bandpass"'
 
 ---
 ---Types of audio sources.
 ---
 ---A good rule of thumb is to use stream for music files and static for all short sound effects. Basically, you want to avoid loading large files into memory at once.
 ---
----@class love.SourceType
+---@alias love.SourceType
 ---
 ---The whole audio is decoded.
 ---
----@field static integer
+---| '"static"'
 ---
 ---The audio is decoded in chunks when needed.
 ---
----@field stream integer
+---| '"stream"'
 ---
 ---The audio must be manually queued by the user.
 ---
----@field queue integer
+---| '"queue"'
 
 ---
 ---Units that represent time.
 ---
----@class love.TimeUnit
+---@alias love.TimeUnit
 ---
 ---Regular seconds.
 ---
----@field seconds integer
+---| '"seconds"'
 ---
 ---Audio samples.
 ---
----@field samples integer
+---| '"samples"'

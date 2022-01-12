@@ -68,152 +68,152 @@ function love.event.wait() end
 ---
 ---Since 0.8.0, event names are no longer abbreviated.
 ---
----@class love.Event
+---@alias love.Event
 ---
 ---Window focus gained or lost
 ---
----@field focus integer
+---| '"focus"'
 ---
 ---Joystick pressed
 ---
----@field joystickpressed integer
+---| '"joystickpressed"'
 ---
 ---Joystick released
 ---
----@field joystickreleased integer
+---| '"joystickreleased"'
 ---
 ---Key pressed
 ---
----@field keypressed integer
+---| '"keypressed"'
 ---
 ---Key released
 ---
----@field keyreleased integer
+---| '"keyreleased"'
 ---
 ---Mouse pressed
 ---
----@field mousepressed integer
+---| '"mousepressed"'
 ---
 ---Mouse released
 ---
----@field mousereleased integer
+---| '"mousereleased"'
 ---
 ---Quit
 ---
----@field quit integer
+---| '"quit"'
 ---
 ---Window size changed by the user
 ---
----@field resize integer
+---| '"resize"'
 ---
 ---Window is minimized or un-minimized by the user
 ---
----@field visible integer
+---| '"visible"'
 ---
 ---Window mouse focus gained or lost
 ---
----@field mousefocus integer
+---| '"mousefocus"'
 ---
 ---A Lua error has occurred in a thread
 ---
----@field threaderror integer
+---| '"threaderror"'
 ---
 ---Joystick connected
 ---
----@field joystickadded integer
+---| '"joystickadded"'
 ---
 ---Joystick disconnected
 ---
----@field joystickremoved integer
+---| '"joystickremoved"'
 ---
 ---Joystick axis motion
 ---
----@field joystickaxis integer
+---| '"joystickaxis"'
 ---
 ---Joystick hat pressed
 ---
----@field joystickhat integer
+---| '"joystickhat"'
 ---
 ---Joystick's virtual gamepad button pressed
 ---
----@field gamepadpressed integer
+---| '"gamepadpressed"'
 ---
 ---Joystick's virtual gamepad button released
 ---
----@field gamepadreleased integer
+---| '"gamepadreleased"'
 ---
 ---Joystick's virtual gamepad axis moved
 ---
----@field gamepadaxis integer
+---| '"gamepadaxis"'
 ---
 ---User entered text
 ---
----@field textinput integer
+---| '"textinput"'
 ---
 ---Mouse position changed
 ---
----@field mousemoved integer
+---| '"mousemoved"'
 ---
 ---Running out of memory on mobile devices system
 ---
----@field lowmemory integer
+---| '"lowmemory"'
 ---
 ---Candidate text for an IME changed
 ---
----@field textedited integer
+---| '"textedited"'
 ---
 ---Mouse wheel moved
 ---
----@field wheelmoved integer
+---| '"wheelmoved"'
 ---
 ---Touch screen touched
 ---
----@field touchpressed integer
+---| '"touchpressed"'
 ---
 ---Touch screen stop touching
 ---
----@field touchreleased integer
+---| '"touchreleased"'
 ---
 ---Touch press moved inside touch screen
 ---
----@field touchmoved integer
+---| '"touchmoved"'
 ---
 ---Directory is dragged and dropped onto the window
 ---
----@field directorydropped integer
+---| '"directorydropped"'
 ---
 ---File is dragged and dropped onto the window.
 ---
----@field filedropped integer
+---| '"filedropped"'
 ---
 ---Joystick pressed
 ---
----@field jp integer
+---| '"jp"'
 ---
 ---Joystick released
 ---
----@field jr integer
+---| '"jr"'
 ---
 ---Key pressed
 ---
----@field kp integer
+---| '"kp"'
 ---
 ---Key released
 ---
----@field kr integer
+---| '"kr"'
 ---
 ---Mouse pressed
 ---
----@field mp integer
+---| '"mp"'
 ---
 ---Mouse released
 ---
----@field mr integer
+---| '"mr"'
 ---
 ---Quit
 ---
----@field q integer
+---| '"q"'
 ---
 ---Window focus gained or lost
 ---
----@field f integer
+---| '"f"'

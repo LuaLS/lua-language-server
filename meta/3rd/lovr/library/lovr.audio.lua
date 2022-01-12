@@ -385,111 +385,111 @@ function Source:tell(unit) end
 ---
 ---Different types of audio material presets, for use with `lovr.audio.setGeometry`.
 ---
----@class lovr.AudioMaterial
+---@alias lovr.AudioMaterial
 ---
 ---Generic default audio material.
 ---
----@field generic integer
+---| '"generic"'
 ---
 ---Brick.
 ---
----@field brick integer
+---| '"brick"'
 ---
 ---Carpet.
 ---
----@field carpet integer
+---| '"carpet"'
 ---
 ---Ceramic.
 ---
----@field ceramic integer
+---| '"ceramic"'
 ---
 ---Concrete.
 ---
----@field concrete integer
----@field glass integer
----@field gravel integer
----@field metal integer
----@field plaster integer
----@field rock integer
----@field wood integer
+---| '"concrete"'
+---| '"glass"'
+---| '"gravel"'
+---| '"metal"'
+---| '"plaster"'
+---| '"rock"'
+---| '"wood"'
 
 ---
 ---Audio devices can be created in shared mode or exclusive mode.  In exclusive mode, the audio device is the only one active on the system, which gives better performance and lower latency. However, exclusive devices aren't always supported and might not be allowed, so there is a higher chance that creating one will fail.
 ---
----@class lovr.AudioShareMode
+---@alias lovr.AudioShareMode
 ---
 ---Shared mode.
 ---
----@field shared integer
+---| '"shared"'
 ---
 ---Exclusive mode.
 ---
----@field exclusive integer
+---| '"exclusive"'
 
 ---
 ---When referencing audio devices, this indicates whether it's the playback or capture device.
 ---
----@class lovr.AudioType
+---@alias lovr.AudioType
 ---
 ---The playback device (speakers, headphones).
 ---
----@field playback integer
+---| '"playback"'
 ---
 ---The capture device (microphone).
 ---
----@field capture integer
+---| '"capture"'
 
 ---
 ---Different types of effects that can be applied with `Source:setEffectEnabled`.
 ---
----@class lovr.Effect
+---@alias lovr.Effect
 ---
 ---Models absorption as sound travels through the air, water, etc.
 ---
----@field absorption integer
+---| '"absorption"'
 ---
 ---Decreases audio volume with distance (1 / max(distance, 1)).
 ---
----@field falloff integer
+---| '"falloff"'
 ---
 ---Causes audio to drop off when the Source is occluded by geometry.
 ---
----@field occlusion integer
+---| '"occlusion"'
 ---
 ---Models reverb caused by audio bouncing off of geometry.
 ---
----@field reverb integer
+---| '"reverb"'
 ---
 ---Spatializes the Source using either simple panning or an HRTF.
 ---
----@field spatialization integer
+---| '"spatialization"'
 ---
 ---Causes audio to be heard through walls when occluded, based on audio materials.
 ---
----@field transmission integer
+---| '"transmission"'
 
 ---
 ---When figuring out how long a Source is or seeking to a specific position in the sound file, units can be expressed in terms of seconds or in terms of frames.  A frame is one set of samples for each channel (one sample for mono, two samples for stereo).
 ---
----@class lovr.TimeUnit
+---@alias lovr.TimeUnit
 ---
 ---Seconds.
 ---
----@field seconds integer
+---| '"seconds"'
 ---
 ---Frames.
 ---
----@field frames integer
+---| '"frames"'
 
 ---
 ---When accessing the volume of Sources or the audio listener, this can be done in linear units with a 0 to 1 range, or in decibels with a range of -∞ to 0.
 ---
----@class lovr.VolumeUnit
+---@alias lovr.VolumeUnit
 ---
 ---Linear volume range.
 ---
----@field linear integer
+---| '"linear"'
 ---
 ---Decibels.
 ---
----@field db integer
+---| '"db"'

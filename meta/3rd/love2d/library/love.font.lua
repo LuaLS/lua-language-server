@@ -183,20 +183,20 @@ function Rasterizer:hasGlyphs(glyph1, glyph2) end
 ---
 ---True Type hinting mode.
 ---
----@class love.HintingMode
+---@alias love.HintingMode
 ---
 ---Default hinting. Should be preferred for typical antialiased fonts.
 ---
----@field normal integer
+---| '"normal"'
 ---
 ---Results in fuzzier text but can sometimes preserve the original glyph shapes of the text better than normal hinting.
 ---
----@field light integer
+---| '"light"'
 ---
 ---Results in aliased / unsmoothed text with either full opacity or completely transparent pixels. Should be used when antialiasing is not desired for the font.
 ---
----@field mono integer
+---| '"mono"'
 ---
 ---Disables hinting for the font. Results in fuzzier text.
 ---
----@field none integer
+---| '"none"'

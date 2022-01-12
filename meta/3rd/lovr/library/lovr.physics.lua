@@ -1244,41 +1244,41 @@ function World:update(dt, resolver) end
 ---
 ---Represents the different types of physics Joints available.
 ---
----@class lovr.JointType
+---@alias lovr.JointType
 ---
 ---A BallJoint.
 ---
----@field ball integer
+---| '"ball"'
 ---
 ---A DistanceJoint.
 ---
----@field distance integer
+---| '"distance"'
 ---
 ---A HingeJoint.
 ---
----@field hinge integer
+---| '"hinge"'
 ---
 ---A SliderJoint.
 ---
----@field slider integer
+---| '"slider"'
 
 ---
 ---Represents the different types of physics Shapes available.
 ---
----@class lovr.ShapeType
+---@alias lovr.ShapeType
 ---
 ---A BoxShape.
 ---
----@field box integer
+---| '"box"'
 ---
 ---A CapsuleShape.
 ---
----@field capsule integer
+---| '"capsule"'
 ---
 ---A CylinderShape.
 ---
----@field cylinder integer
+---| '"cylinder"'
 ---
 ---A SphereShape.
 ---
----@field sphere integer
+---| '"sphere"'

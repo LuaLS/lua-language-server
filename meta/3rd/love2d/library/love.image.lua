@@ -190,430 +190,430 @@ function ImageData:setPixel(x, y, r, g, b, a) end
 ---
 ---Unlike traditional PNG or jpeg, these formats stay compressed in RAM and in the graphics card's VRAM. This is good for saving memory space as well as improving performance, since the graphics card will be able to keep more of the image's pixels in its fast-access cache when drawing it.
 ---
----@class love.CompressedImageFormat
+---@alias love.CompressedImageFormat
 ---
 ---The DXT1 format. RGB data at 4 bits per pixel (compared to 32 bits for ImageData and regular Images.) Suitable for fully opaque images on desktop systems.
 ---
----@field DXT1 integer
+---| '"DXT1"'
 ---
 ---The DXT3 format. RGBA data at 8 bits per pixel. Smooth variations in opacity do not mix well with this format.
 ---
----@field DXT3 integer
+---| '"DXT3"'
 ---
 ---The DXT5 format. RGBA data at 8 bits per pixel. Recommended for images with varying opacity on desktop systems.
 ---
----@field DXT5 integer
+---| '"DXT5"'
 ---
 ---The BC4 format (also known as 3Dc+ or ATI1.) Stores just the red channel, at 4 bits per pixel.
 ---
----@field BC4 integer
+---| '"BC4"'
 ---
 ---The signed variant of the BC4 format. Same as above but pixel values in the texture are in the range of 1 instead of 1 in shaders.
 ---
----@field BC4s integer
+---| '"BC4s"'
 ---
 ---The BC5 format (also known as 3Dc or ATI2.) Stores red and green channels at 8 bits per pixel.
 ---
----@field BC5 integer
+---| '"BC5"'
 ---
 ---The signed variant of the BC5 format.
 ---
----@field BC5s integer
+---| '"BC5s"'
 ---
 ---The BC6H format. Stores half-precision floating-point RGB data in the range of 65504 at 8 bits per pixel. Suitable for HDR images on desktop systems.
 ---
----@field BC6h integer
+---| '"BC6h"'
 ---
 ---The signed variant of the BC6H format. Stores RGB data in the range of +65504.
 ---
----@field BC6hs integer
+---| '"BC6hs"'
 ---
 ---The BC7 format (also known as BPTC.) Stores RGB or RGBA data at 8 bits per pixel.
 ---
----@field BC7 integer
+---| '"BC7"'
 ---
 ---The ETC1 format. RGB data at 4 bits per pixel. Suitable for fully opaque images on older Android devices.
 ---
----@field ETC1 integer
+---| '"ETC1"'
 ---
 ---The RGB variant of the ETC2 format. RGB data at 4 bits per pixel. Suitable for fully opaque images on newer mobile devices.
 ---
----@field ETC2rgb integer
+---| '"ETC2rgb"'
 ---
 ---The RGBA variant of the ETC2 format. RGBA data at 8 bits per pixel. Recommended for images with varying opacity on newer mobile devices.
 ---
----@field ETC2rgba integer
+---| '"ETC2rgba"'
 ---
 ---The RGBA variant of the ETC2 format where pixels are either fully transparent or fully opaque. RGBA data at 4 bits per pixel.
 ---
----@field ETC2rgba1 integer
+---| '"ETC2rgba1"'
 ---
 ---The single-channel variant of the EAC format. Stores just the red channel, at 4 bits per pixel.
 ---
----@field EACr integer
+---| '"EACr"'
 ---
 ---The signed single-channel variant of the EAC format. Same as above but pixel values in the texture are in the range of 1 instead of 1 in shaders.
 ---
----@field EACrs integer
+---| '"EACrs"'
 ---
 ---The two-channel variant of the EAC format. Stores red and green channels at 8 bits per pixel.
 ---
----@field EACrg integer
+---| '"EACrg"'
 ---
 ---The signed two-channel variant of the EAC format.
 ---
----@field EACrgs integer
+---| '"EACrgs"'
 ---
 ---The 2 bit per pixel RGB variant of the PVRTC1 format. Stores RGB data at 2 bits per pixel. Textures compressed with PVRTC1 formats must be square and power-of-two sized.
 ---
----@field PVR1rgb2 integer
+---| '"PVR1rgb2"'
 ---
 ---The 4 bit per pixel RGB variant of the PVRTC1 format. Stores RGB data at 4 bits per pixel.
 ---
----@field PVR1rgb4 integer
+---| '"PVR1rgb4"'
 ---
 ---The 2 bit per pixel RGBA variant of the PVRTC1 format.
 ---
----@field PVR1rgba2 integer
+---| '"PVR1rgba2"'
 ---
 ---The 4 bit per pixel RGBA variant of the PVRTC1 format.
 ---
----@field PVR1rgba4 integer
+---| '"PVR1rgba4"'
 ---
 ---The 4x4 pixels per block variant of the ASTC format. RGBA data at 8 bits per pixel.
 ---
----@field ASTC4x4 integer
+---| '"ASTC4x4"'
 ---
 ---The 5x4 pixels per block variant of the ASTC format. RGBA data at 6.4 bits per pixel.
 ---
----@field ASTC5x4 integer
+---| '"ASTC5x4"'
 ---
 ---The 5x5 pixels per block variant of the ASTC format. RGBA data at 5.12 bits per pixel.
 ---
----@field ASTC5x5 integer
+---| '"ASTC5x5"'
 ---
 ---The 6x5 pixels per block variant of the ASTC format. RGBA data at 4.27 bits per pixel.
 ---
----@field ASTC6x5 integer
+---| '"ASTC6x5"'
 ---
 ---The 6x6 pixels per block variant of the ASTC format. RGBA data at 3.56 bits per pixel.
 ---
----@field ASTC6x6 integer
+---| '"ASTC6x6"'
 ---
 ---The 8x5 pixels per block variant of the ASTC format. RGBA data at 3.2 bits per pixel.
 ---
----@field ASTC8x5 integer
+---| '"ASTC8x5"'
 ---
 ---The 8x6 pixels per block variant of the ASTC format. RGBA data at 2.67 bits per pixel.
 ---
----@field ASTC8x6 integer
+---| '"ASTC8x6"'
 ---
 ---The 8x8 pixels per block variant of the ASTC format. RGBA data at 2 bits per pixel.
 ---
----@field ASTC8x8 integer
+---| '"ASTC8x8"'
 ---
 ---The 10x5 pixels per block variant of the ASTC format. RGBA data at 2.56 bits per pixel.
 ---
----@field ASTC10x5 integer
+---| '"ASTC10x5"'
 ---
 ---The 10x6 pixels per block variant of the ASTC format. RGBA data at 2.13 bits per pixel.
 ---
----@field ASTC10x6 integer
+---| '"ASTC10x6"'
 ---
 ---The 10x8 pixels per block variant of the ASTC format. RGBA data at 1.6 bits per pixel.
 ---
----@field ASTC10x8 integer
+---| '"ASTC10x8"'
 ---
 ---The 10x10 pixels per block variant of the ASTC format. RGBA data at 1.28 bits per pixel.
 ---
----@field ASTC10x10 integer
+---| '"ASTC10x10"'
 ---
 ---The 12x10 pixels per block variant of the ASTC format. RGBA data at 1.07 bits per pixel.
 ---
----@field ASTC12x10 integer
+---| '"ASTC12x10"'
 ---
 ---The 12x12 pixels per block variant of the ASTC format. RGBA data at 0.89 bits per pixel.
 ---
----@field ASTC12x12 integer
+---| '"ASTC12x12"'
 
 ---
 ---Encoded image formats.
 ---
----@class love.ImageFormat
+---@alias love.ImageFormat
 ---
 ---Targa image format.
 ---
----@field tga integer
+---| '"tga"'
 ---
 ---PNG image format.
 ---
----@field png integer
+---| '"png"'
 ---
 ---JPG image format.
 ---
----@field jpg integer
+---| '"jpg"'
 ---
 ---BMP image format.
 ---
----@field bmp integer
+---| '"bmp"'
 
 ---
 ---Pixel formats for Textures, ImageData, and CompressedImageData.
 ---
----@class love.PixelFormat
+---@alias love.PixelFormat
 ---
 ---Indicates unknown pixel format, used internally.
 ---
----@field unknown integer
+---| '"unknown"'
 ---
 ---Alias for rgba8, or srgba8 if gamma-correct rendering is enabled.
 ---
----@field normal integer
+---| '"normal"'
 ---
 ---A format suitable for high dynamic range content - an alias for the rgba16f format, normally.
 ---
----@field hdr integer
+---| '"hdr"'
 ---
 ---Single-channel (red component) format (8 bpp).
 ---
----@field r8 integer
+---| '"r8"'
 ---
 ---Two channels (red and green components) with 8 bits per channel (16 bpp).
 ---
----@field rg8 integer
+---| '"rg8"'
 ---
 ---8 bits per channel (32 bpp) RGBA. Color channel values range from 0-255 (0-1 in shaders).
 ---
----@field rgba8 integer
+---| '"rgba8"'
 ---
 ---gamma-correct version of rgba8.
 ---
----@field srgba8 integer
+---| '"srgba8"'
 ---
 ---Single-channel (red component) format (16 bpp).
 ---
----@field r16 integer
+---| '"r16"'
 ---
 ---Two channels (red and green components) with 16 bits per channel (32 bpp).
 ---
----@field rg16 integer
+---| '"rg16"'
 ---
 ---16 bits per channel (64 bpp) RGBA. Color channel values range from 0-65535 (0-1 in shaders).
 ---
----@field rgba16 integer
+---| '"rgba16"'
 ---
 ---Floating point single-channel format (16 bpp). Color values can range from [-65504, +65504].
 ---
----@field r16f integer
+---| '"r16f"'
 ---
 ---Floating point two-channel format with 16 bits per channel (32 bpp). Color values can range from [-65504, +65504].
 ---
----@field rg16f integer
+---| '"rg16f"'
 ---
 ---Floating point RGBA with 16 bits per channel (64 bpp). Color values can range from [-65504, +65504].
 ---
----@field rgba16f integer
+---| '"rgba16f"'
 ---
 ---Floating point single-channel format (32 bpp).
 ---
----@field r32f integer
+---| '"r32f"'
 ---
 ---Floating point two-channel format with 32 bits per channel (64 bpp).
 ---
----@field rg32f integer
+---| '"rg32f"'
 ---
 ---Floating point RGBA with 32 bits per channel (128 bpp).
 ---
----@field rgba32f integer
+---| '"rgba32f"'
 ---
 ---Same as rg8, but accessed as (L, L, L, A)
 ---
----@field la8 integer
+---| '"la8"'
 ---
 ---4 bits per channel (16 bpp) RGBA.
 ---
----@field rgba4 integer
+---| '"rgba4"'
 ---
 ---RGB with 5 bits each, and a 1-bit alpha channel (16 bpp).
 ---
----@field rgb5a1 integer
+---| '"rgb5a1"'
 ---
 ---RGB with 5, 6, and 5 bits each, respectively (16 bpp). There is no alpha channel in this format.
 ---
----@field rgb565 integer
+---| '"rgb565"'
 ---
 ---RGB with 10 bits per channel, and a 2-bit alpha channel (32 bpp).
 ---
----@field rgb10a2 integer
+---| '"rgb10a2"'
 ---
 ---Floating point RGB with 11 bits in the red and green channels, and 10 bits in the blue channel (32 bpp). There is no alpha channel. Color values can range from [0, +65024].
 ---
----@field rg11b10f integer
+---| '"rg11b10f"'
 ---
 ---No depth buffer and 8-bit stencil buffer.
 ---
----@field stencil8 integer
+---| '"stencil8"'
 ---
 ---16-bit depth buffer and no stencil buffer.
 ---
----@field depth16 integer
+---| '"depth16"'
 ---
 ---24-bit depth buffer and no stencil buffer.
 ---
----@field depth24 integer
+---| '"depth24"'
 ---
 ---32-bit float depth buffer and no stencil buffer.
 ---
----@field depth32f integer
+---| '"depth32f"'
 ---
 ---24-bit depth buffer and 8-bit stencil buffer.
 ---
----@field depth24stencil8 integer
+---| '"depth24stencil8"'
 ---
 ---32-bit float depth buffer and 8-bit stencil buffer.
 ---
----@field depth32fstencil8 integer
+---| '"depth32fstencil8"'
 ---
 ---The DXT1 format. RGB data at 4 bits per pixel (compared to 32 bits for ImageData and regular Images.) Suitable for fully opaque images on desktop systems.
 ---
----@field DXT1 integer
+---| '"DXT1"'
 ---
 ---The DXT3 format. RGBA data at 8 bits per pixel. Smooth variations in opacity do not mix well with this format.
 ---
----@field DXT3 integer
+---| '"DXT3"'
 ---
 ---The DXT5 format. RGBA data at 8 bits per pixel. Recommended for images with varying opacity on desktop systems.
 ---
----@field DXT5 integer
+---| '"DXT5"'
 ---
 ---The BC4 format (also known as 3Dc+ or ATI1.) Stores just the red channel, at 4 bits per pixel.
 ---
----@field BC4 integer
+---| '"BC4"'
 ---
 ---The signed variant of the BC4 format. Same as above but pixel values in the texture are in the range of 1 instead of 1 in shaders.
 ---
----@field BC4s integer
+---| '"BC4s"'
 ---
 ---The BC5 format (also known as 3Dc or ATI2.) Stores red and green channels at 8 bits per pixel.
 ---
----@field BC5 integer
+---| '"BC5"'
 ---
 ---The signed variant of the BC5 format.
 ---
----@field BC5s integer
+---| '"BC5s"'
 ---
 ---The BC6H format. Stores half-precision floating-point RGB data in the range of 65504 at 8 bits per pixel. Suitable for HDR images on desktop systems.
 ---
----@field BC6h integer
+---| '"BC6h"'
 ---
 ---The signed variant of the BC6H format. Stores RGB data in the range of +65504.
 ---
----@field BC6hs integer
+---| '"BC6hs"'
 ---
 ---The BC7 format (also known as BPTC.) Stores RGB or RGBA data at 8 bits per pixel.
 ---
----@field BC7 integer
+---| '"BC7"'
 ---
 ---The ETC1 format. RGB data at 4 bits per pixel. Suitable for fully opaque images on older Android devices.
 ---
----@field ETC1 integer
+---| '"ETC1"'
 ---
 ---The RGB variant of the ETC2 format. RGB data at 4 bits per pixel. Suitable for fully opaque images on newer mobile devices.
 ---
----@field ETC2rgb integer
+---| '"ETC2rgb"'
 ---
 ---The RGBA variant of the ETC2 format. RGBA data at 8 bits per pixel. Recommended for images with varying opacity on newer mobile devices.
 ---
----@field ETC2rgba integer
+---| '"ETC2rgba"'
 ---
 ---The RGBA variant of the ETC2 format where pixels are either fully transparent or fully opaque. RGBA data at 4 bits per pixel.
 ---
----@field ETC2rgba1 integer
+---| '"ETC2rgba1"'
 ---
 ---The single-channel variant of the EAC format. Stores just the red channel, at 4 bits per pixel.
 ---
----@field EACr integer
+---| '"EACr"'
 ---
 ---The signed single-channel variant of the EAC format. Same as above but pixel values in the texture are in the range of 1 instead of 1 in shaders.
 ---
----@field EACrs integer
+---| '"EACrs"'
 ---
 ---The two-channel variant of the EAC format. Stores red and green channels at 8 bits per pixel.
 ---
----@field EACrg integer
+---| '"EACrg"'
 ---
 ---The signed two-channel variant of the EAC format.
 ---
----@field EACrgs integer
+---| '"EACrgs"'
 ---
 ---The 2 bit per pixel RGB variant of the PVRTC1 format. Stores RGB data at 2 bits per pixel. Textures compressed with PVRTC1 formats must be square and power-of-two sized.
 ---
----@field PVR1rgb2 integer
+---| '"PVR1rgb2"'
 ---
 ---The 4 bit per pixel RGB variant of the PVRTC1 format. Stores RGB data at 4 bits per pixel.
 ---
----@field PVR1rgb4 integer
+---| '"PVR1rgb4"'
 ---
 ---The 2 bit per pixel RGBA variant of the PVRTC1 format.
 ---
----@field PVR1rgba2 integer
+---| '"PVR1rgba2"'
 ---
 ---The 4 bit per pixel RGBA variant of the PVRTC1 format.
 ---
----@field PVR1rgba4 integer
+---| '"PVR1rgba4"'
 ---
 ---The 4x4 pixels per block variant of the ASTC format. RGBA data at 8 bits per pixel.
 ---
----@field ASTC4x4 integer
+---| '"ASTC4x4"'
 ---
 ---The 5x4 pixels per block variant of the ASTC format. RGBA data at 6.4 bits per pixel.
 ---
----@field ASTC5x4 integer
+---| '"ASTC5x4"'
 ---
 ---The 5x5 pixels per block variant of the ASTC format. RGBA data at 5.12 bits per pixel.
 ---
----@field ASTC5x5 integer
+---| '"ASTC5x5"'
 ---
 ---The 6x5 pixels per block variant of the ASTC format. RGBA data at 4.27 bits per pixel.
 ---
----@field ASTC6x5 integer
+---| '"ASTC6x5"'
 ---
 ---The 6x6 pixels per block variant of the ASTC format. RGBA data at 3.56 bits per pixel.
 ---
----@field ASTC6x6 integer
+---| '"ASTC6x6"'
 ---
 ---The 8x5 pixels per block variant of the ASTC format. RGBA data at 3.2 bits per pixel.
 ---
----@field ASTC8x5 integer
+---| '"ASTC8x5"'
 ---
 ---The 8x6 pixels per block variant of the ASTC format. RGBA data at 2.67 bits per pixel.
 ---
----@field ASTC8x6 integer
+---| '"ASTC8x6"'
 ---
 ---The 8x8 pixels per block variant of the ASTC format. RGBA data at 2 bits per pixel.
 ---
----@field ASTC8x8 integer
+---| '"ASTC8x8"'
 ---
 ---The 10x5 pixels per block variant of the ASTC format. RGBA data at 2.56 bits per pixel.
 ---
----@field ASTC10x5 integer
+---| '"ASTC10x5"'
 ---
 ---The 10x6 pixels per block variant of the ASTC format. RGBA data at 2.13 bits per pixel.
 ---
----@field ASTC10x6 integer
+---| '"ASTC10x6"'
 ---
 ---The 10x8 pixels per block variant of the ASTC format. RGBA data at 1.6 bits per pixel.
 ---
----@field ASTC10x8 integer
+---| '"ASTC10x8"'
 ---
 ---The 10x10 pixels per block variant of the ASTC format. RGBA data at 1.28 bits per pixel.
 ---
----@field ASTC10x10 integer
+---| '"ASTC10x10"'
 ---
 ---The 12x10 pixels per block variant of the ASTC format. RGBA data at 1.07 bits per pixel.
 ---
----@field ASTC12x10 integer
+---| '"ASTC12x10"'
 ---
 ---The 12x12 pixels per block variant of the ASTC format. RGBA data at 0.89 bits per pixel.
 ---
----@field ASTC12x12 integer
+---| '"ASTC12x12"'

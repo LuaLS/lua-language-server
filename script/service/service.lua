@@ -143,25 +143,35 @@ end
 
 function m.eventLoop()
     pub.task('timer', 1)
+    pub.on('wakeup', function ()
+        m.reportStatus()
+    end)
+
+    local function busy()
+        if not m.workingClock then
+            m.workingClock = time.monotonic()
+            m.reportStatus()
+        end
+    end
+
+    local function idle()
+        if m.workingClock then
+            m.workingClock = nil
+            m.reportStatus()
+        end
+    end
 
     local function doSomething()
         pub.step(false)
         if not await.step() then
             return false
         end
-        m.sleeping = false
-        if not m.workingClock then
-            m.workingClock = time.monotonic()
-        end
+        busy()
         return true
     end
 
     local function sleep()
-        if m.workingClock then
-            m.workingClock = nil
-            m.idleClock = time.monotonic()
-            m.reportStatus()
-        end
+        idle()
         for _ = 1, 10 do
             thread.sleep(0.1)
             if doSomething() then
@@ -196,9 +206,6 @@ function m.pulse()
     --    end
     --    m.reportStatus()
     --end)
-    timer.loop(0.1, function ()
-        m.reportStatus()
-    end)
     timer.loop(1, function ()
         fw.update()
     end)
@@ -252,7 +259,6 @@ function m.start()
     proto.listen()
     m.report()
     m.pulse()
-    m.reportStatus()
     m.testVersion()
 
     require 'provider'

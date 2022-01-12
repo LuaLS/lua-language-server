@@ -645,14 +645,11 @@ local function checkCommon(state, word, position, results)
     for _, data in ipairs(keyWordMap) do
         used[data[1]] = true
     end
-    if not config.get(state.uri, 'Lua.completion.workspaceWord')
-    or #word >= 2 then
-        results.complete = true
-    end
     if config.get(state.uri, 'Lua.completion.workspaceWord') and #word >= 2 then
         local myHead = word:sub(1, 2)
         for uri in files.eachFile() do
             if #results >= 100 then
+                results.incomplete = true
                 break
             end
             if myUri == uri then
@@ -702,6 +699,7 @@ local function checkCommon(state, word, position, results)
     end
     for str, offset in state.lua:gmatch '([%a_][%w_]+)()' do
         if #results >= 100 then
+            results.incomplete = true
             break
         end
         if  #str >= 3
@@ -715,9 +713,6 @@ local function checkCommon(state, word, position, results)
                 }
             end
         end
-    end
-    if #results >= 100 then
-        results.complete = false
     end
 end
 
@@ -1973,7 +1968,7 @@ end
 
 ---@async
 local function completion(uri, position, triggerCharacter)
-    local state = files.getState(uri)
+    local state = files.getLastState(uri) or files.getState(uri)
     if not state then
         return nil
     end

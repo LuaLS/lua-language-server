@@ -584,7 +584,7 @@ m.register 'textDocument/completion' {
             items[i] = item
         end
         return {
-            isIncomplete = not result.complete,
+            isIncomplete = result.incomplete,
             items        = items,
         }
     end

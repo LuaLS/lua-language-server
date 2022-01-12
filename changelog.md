@@ -8,8 +8,9 @@
   + `Lua.semantic.variable`
   + `Lua.semantic.annotation`
   + `Lua.semantic.keyword`
-* `CHG` diagnostic: smoother
+* `CHG` completion: improve response speed
 * `CHG` completion: can be triggered in `LuaDoc` and strings
+* `CHG` diagnostic: smoother
 * `CHG` settings `Lua.color.mode` removed
 * `FIX` [#879](https://github.com/sumneko/lua-language-server/issues/879)
 * `FIX` [#884](https://github.com/sumneko/lua-language-server/issues/884)

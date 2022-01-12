@@ -11,6 +11,7 @@ _ENV = nil
 local curFrame = 0
 local maxFrame = 0
 local curIndex = 0
+local tarFrame = 0
 local freeQueue = {}
 local timer = {}
 
@@ -29,7 +30,7 @@ local function mTimeout(self, timeout)
     if self._pauseRemaining or self._running then
         return
     end
-    local ti = curFrame + timeout
+    local ti = tarFrame + timeout
     local q = timer[ti]
     if q == nil then
         q = allocQueue()
@@ -212,6 +213,7 @@ function m.update()
         curFrame = curFrame - 1
     end
     maxFrame = maxFrame + delta
+    tarFrame = mathFloor(maxFrame)
     while curFrame < maxFrame do
         curFrame = curFrame + 1
         onTick()

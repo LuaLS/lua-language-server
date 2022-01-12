@@ -141,23 +141,46 @@ function m.report()
     t:onTimer()
 end
 
-function m.startTimer()
+function m.eventLoop()
     pub.task('timer', 1)
-    while true do
-        pub.step(not m.workingClock)
-        if await.step() then
-            m.sleeping = false
-            if not m.workingClock then
-                m.workingClock = time.monotonic()
-            end
-        else
-            if m.workingClock then
-                m.workingClock = nil
-                m.idleClock = time.monotonic()
-                m.reportStatus()
+
+    local function doSomething()
+        pub.step(false)
+        if not await.step() then
+            return false
+        end
+        m.sleeping = false
+        if not m.workingClock then
+            m.workingClock = time.monotonic()
+        end
+        return true
+    end
+
+    local function sleep()
+        if m.workingClock then
+            m.workingClock = nil
+            m.idleClock = time.monotonic()
+            m.reportStatus()
+        end
+        for _ = 1, 10 do
+            thread.sleep(0.1)
+            if doSomething() then
+                return
             end
         end
+        pub.step(true)
+    end
+
+    while true do
+        if doSomething() then
+            goto CONTINUE
+        end
         timer.update()
+        if doSomething() then
+            goto CONTINUE
+        end
+        sleep()
+        ::CONTINUE::
     end
 end
 
@@ -234,7 +257,7 @@ function m.start()
 
     require 'provider'
 
-    m.startTimer()
+    m.eventLoop()
 end
 
 return m

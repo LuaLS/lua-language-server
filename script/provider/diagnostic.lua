@@ -352,7 +352,7 @@ function m.diagnosticsScope(uri, force)
     end
     await.close ('diagnosticsScope:' .. uri)
     await.call(function () ---@async
-        await.sleep(delay)
+        await.sleep(math.max(delay, 0.1))
         local clock = os.clock()
         local bar <close> = progress.create(ws.getScope(uri), lang.script.WORKSPACE_DIAGNOSTIC, 1)
         local cancelled

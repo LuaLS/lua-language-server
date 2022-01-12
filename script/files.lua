@@ -194,7 +194,7 @@ function m.setText(uri, text, isTrust, version)
     file.originText = text
     file.rows       = nil
     file.words      = nil
-    m.astMap[uri] = nil
+    m.astMap[uri]   = nil
     file.cache = {}
     file.cacheActiveTime = math.huge
     m.globalVersion = m.globalVersion + 1
@@ -202,6 +202,9 @@ function m.setText(uri, text, isTrust, version)
     m.onWatch('version')
     if create then
         m.onWatch('create', uri)
+        m.onWatch('update', uri)
+    else
+        m.onWatch('update', uri)
     end
     if DEVELOP then
         if text ~= newText then
@@ -210,7 +213,6 @@ function m.setText(uri, text, isTrust, version)
     end
 
     --if instance or TEST then
-    m.onWatch('update', uri)
     --else
     --    await.call(function ()
     --        await.close('update:' .. uri)
@@ -519,10 +521,19 @@ function m.getState(uri)
     if not state then
         state = m.compileState(uri, file.text)
         m.astMap[uri] = state
+        file.ast = state
         --await.delay()
     end
     file.cacheActiveTime = timer.clock()
     return state
+end
+
+function m.getLastState(uri)
+    local file = m.fileMap[uri]
+    if not file then
+        return nil
+    end
+    return file.ast
 end
 
 ---设置文件的当前可见范围

@@ -24,6 +24,15 @@ elseif platform.OS == 'Windows' then
     else
         error "unknown platform"
     end
+elseif platform.OS == 'Linux' then
+    if lm.platform == nil then
+    elseif lm.platform == "linux-x64" then
+    elseif lm.platform == "linux-arm64" then
+        lm.compiler = "clang"
+        lm.target   = "arm64-linux-gnu"
+    else
+        error "unknown platform"
+    end
 end
 
 lm:import "3rd/bee.lua/make.lua"

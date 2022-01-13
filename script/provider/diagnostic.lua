@@ -350,7 +350,7 @@ function m.diagnosticsScope(uri, force)
     if not force and delay < 0 then
         return
     end
-    await.close ('diagnosticsScope:' .. uri)
+    await.close ('diagnosticsScope:' .. (uri or '<fallback>'))
     await.call(function () ---@async
         await.sleep(math.max(delay, 0.1))
         local clock = os.clock()
@@ -377,7 +377,7 @@ function m.diagnosticsScope(uri, force)
         end
         bar:remove()
         log.debug('全文诊断耗时：', os.clock() - clock)
-    end, 'files.version', ('diagnosticsScope:' .. uri))
+    end, 'files.version', ('diagnosticsScope:' .. (uri or '<fallback>')))
 end
 
 ws.watch(function (ev, uri)

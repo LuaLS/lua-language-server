@@ -25,6 +25,9 @@ end
 ---@param uri uri
 ---@return boolean
 function mt:isChildUri(uri)
+    if not uri then
+        return false
+    end
     if not self.uri then
         return true
     end
@@ -34,6 +37,9 @@ end
 ---@param uri uri
 ---@return boolean
 function mt:isLinkedUri(uri)
+    if not uri then
+        return false
+    end
     for linkUri in pairs(self._links) do
         if uri:sub(1, #linkUri) == linkUri then
             return true

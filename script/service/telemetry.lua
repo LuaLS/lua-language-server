@@ -10,6 +10,7 @@ local lang     = require 'language'
 local define   = require 'proto.define'
 local await    = require 'await'
 local version  = require 'version'
+local ws       = require 'workspace'
 
 local tokenPath = (ROOT / 'log' / 'token'):string()
 local token = util.loadFile(tokenPath)
@@ -105,21 +106,19 @@ end)
 
 local m = {}
 
-function m.updateConfig(uri, value)
-    validMap[uri or ''] = value
+function m.updateConfig()
     isValid = config.get(nil, 'Lua.telemetry.enable')
     if isValid == false then
         return
     end
-    -- one false, all false
-    for _, v in pairs(validMap) do
-        if v == false then
+    for _, scp in ipairs(ws.folders) do
+        if config.get(scp.uri, 'Lua.telemetry.enable') == false then
             isValid = false
             return
         end
     end
-    for _, v in pairs(validMap) do
-        if v == true then
+    for _, scp in ipairs(ws.folders) do
+        if config.get(scp.uri, 'Lua.telemetry.enable') == true then
             isValid = true
             break
         end
@@ -173,8 +172,9 @@ function m.updateConfig(uri, value)
 end
 
 config.watch(function (uri, key, value)
-    if key == 'Lua.telemetry.enable' then
-        m.updateConfig(uri, value)
+    if key == 'Lua.telemetry.enable'
+    or key == '' then
+        m.updateConfig()
     end
 end)
 

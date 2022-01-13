@@ -1023,7 +1023,7 @@ do
 end
 
 local function refreshStatusBar()
-    local valid = true
+    local valid = config.get(nil, 'Lua.window.statusBar')
     for _, scp in ipairs(workspace.folders) do
         if not config.get(scp.uri, 'Lua.window.statusBar') then
             valid = false
@@ -1038,7 +1038,8 @@ local function refreshStatusBar()
 end
 
 config.watch(function (uri, key, value)
-    if key == 'Lua.window.statusBar' then
+    if key == 'Lua.window.statusBar'
+    or key == '' then
         refreshStatusBar()
     end
 end)

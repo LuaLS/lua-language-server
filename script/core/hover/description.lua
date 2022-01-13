@@ -24,11 +24,7 @@ local function collectRequire(mode, literal, uri)
         local shows = {}
         for i, uri in ipairs(result) do
             local searcher = searchers and searchers[uri]
-            local path = furi.decode(uri)
-            if path:sub(1, #rootPath) == rootPath then
-                path = path:sub(#rootPath + 1)
-            end
-            path = path:gsub('^[/\\]*', '')
+            local path = ws.getRelativePath(uri)
             if vm.isMetaFile(uri) then
                 shows[i] = ('* [[meta]](%s)'):format(uri)
             elseif searcher then

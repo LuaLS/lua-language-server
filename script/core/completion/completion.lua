@@ -894,7 +894,8 @@ local function collectRequireNames(mode, myUri, literal, source, smark, position
                                 start   = smark and (source.start + #smark) or position,
                                 finish  = smark and (source.finish - #smark) or position,
                                 newText = smark and info.expect or util.viewString(info.expect),
-                            }
+                            },
+                            path = path,
                         }
                     end
                     if vm.isMetaFile(uri) then
@@ -921,7 +922,8 @@ local function collectRequireNames(mode, myUri, literal, source, smark, position
                                 start   = smark and (source.start + #smark) or position,
                                 finish  = smark and (source.finish - #smark) or position,
                                 newText = smark and open or util.viewString(open),
-                            }
+                            },
+                            path = path,
                         }
                     end
                     collect[open][#collect[open]+1] = ([=[* [%s](%s)]=]):format(
@@ -969,8 +971,9 @@ local function collectRequireNames(mode, myUri, literal, source, smark, position
             end
         end
         results[#results+1] = {
-            label = label,
-            kind  = define.CompletionItemKind.File,
+            label  = label,
+            detail = infos.path,
+            kind   = define.CompletionItemKind.File,
             description = table.concat(des, '\n'),
             textEdit = infos.textEdit,
         }

@@ -1,7 +1,5 @@
 local vm       = require 'vm'
 local ws       = require 'workspace'
-local furi     = require 'file-uri'
-local files    = require 'files'
 local searcher = require 'core.searcher'
 local markdown = require 'provider.markdown'
 local config   = require 'config'
@@ -12,7 +10,6 @@ local noder    = require 'core.noder'
 local rpath    = require 'workspace.require-path'
 
 local function collectRequire(mode, literal, uri)
-    local rootPath = ws.getRootUri(uri) or ''
     local result, searchers
     if     mode == 'require' then
         result, searchers = rpath.findUrisByRequirePath(uri, literal)

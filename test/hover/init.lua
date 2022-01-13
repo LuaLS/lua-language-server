@@ -1644,6 +1644,7 @@ TEST [[
 ---@field x  number
 ---@field y  number
 ---@field z? number
+---@field [3]? number
 local <?t?>
 
 t.z = any
@@ -1653,6 +1654,7 @@ local t: Position {
     x: number,
     y: number,
     z?: number,
+    [3]?: number,
 }
 ]]
 

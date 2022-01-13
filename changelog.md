@@ -12,6 +12,7 @@
 * `CHG` completion: can be triggered in `LuaDoc` and strings
 * `CHG` diagnostic: smoother
 * `CHG` settings `Lua.color.mode` removed
+* `FIX` [#876](https://github.com/sumneko/lua-language-server/issues/876)
 * `FIX` [#879](https://github.com/sumneko/lua-language-server/issues/879)
 * `FIX` [#884](https://github.com/sumneko/lua-language-server/issues/884)
 * `FIX` [#885](https://github.com/sumneko/lua-language-server/issues/885)

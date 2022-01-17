@@ -76,10 +76,14 @@ end
 ---@class scope.manager
 local m = {}
 
----@type scope[]
-m.folders  = {}
-m.override = createScope 'override'
-m.fallback = createScope 'fallback'
+function m.reset()
+    ---@type scope[]
+    m.folders  = {}
+    m.override = createScope 'override'
+    m.fallback = createScope 'fallback'
+end
+
+m.reset()
 
 ---@param uri uri
 ---@return scope

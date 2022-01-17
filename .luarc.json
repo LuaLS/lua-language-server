@@ -20,7 +20,9 @@
         "version": "Lua 5.4",
         "path": [
             "script/?.lua",
-            "script/?/init.lua"
+            "script/?/init.lua",
+            "test/?.lua",
+            "test/?/init.lua"
         ],
         "pathStrict": true
     },

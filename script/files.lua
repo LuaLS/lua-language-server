@@ -16,19 +16,24 @@ local encoder  = require 'encoder'
 ---@class files
 local m = {}
 
-m.openMap        = {}
-m.libraryMap     = {}
-m.fileMap        = {}
-m.dllMap         = {}
 m.watchList      = {}
 m.notifyCache    = {}
-m.visible        = {}
 m.assocVersion   = -1
 m.assocMatcher   = nil
-m.globalVersion  = 0
-m.fileCount      = 0
-m.astCount       = 0
-m.astMap         = {} -- setmetatable({}, { __mode = 'v' })
+
+function m.reset()
+    m.openMap        = {}
+    m.libraryMap     = {}
+    m.fileMap        = {}
+    m.dllMap         = {}
+    m.visible        = {}
+    m.globalVersion  = 0
+    m.fileCount      = 0
+    m.astCount       = 0
+    m.astMap         = {}
+end
+
+m.reset()
 
 local fixedUri = {}
 --- 获取文件的真实uri(真实大小写)

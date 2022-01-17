@@ -16,8 +16,6 @@ local loading    = require 'workspace.loading'
 ---@class workspace
 local m = {}
 m.type = 'workspace'
----@type scope[]
-m.folders = {}
 m.watchList = {}
 
 --- 注册事件
@@ -51,6 +49,12 @@ function m.create(uri)
     fw.watch(path)
     local scp = scope.createFolder(uri)
     m.folders[#m.folders+1] = scp
+end
+
+function m.reset()
+    ---@type scope[]
+    m.folders = {}
+    m.rootUri = nil
 end
 
 function m.getRootUri(uri)

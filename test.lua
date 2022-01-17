@@ -99,7 +99,9 @@ local function main()
     require 'bee.platform'.OS = 'macOS'
     testAll()
 
-    test 'full'
+    test 'client'
+
+    --test 'full'
 
     print('测试完成')
 end

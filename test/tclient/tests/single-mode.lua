@@ -5,6 +5,10 @@ local util      = require 'utility'
 
 ---@async
 lclient():start(function (client)
+    client:register('workspace/configuration', function ()
+        return nil
+    end)
+
     client:awaitRequest('initialize', {
         clientInfo = {
             name    = 'unit-test',

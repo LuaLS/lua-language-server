@@ -111,17 +111,10 @@ function mt:update()
     for _, out in ipairs(outs) do
         if out.method then
             local callback = self._methods[out.method]
-            if callback then
-                proto.doResponse {
-                    id     = out.id,
-                    params = callback(out.params),
-                }
-            else
-                proto.doResponse {
-                    id     = out.id,
-                    params = nil,
-                }
-            end
+            proto.doResponse {
+                id     = out.id,
+                params = callback(out.params),
+            }
         else
             local callback = self._waiting[out.id]
             self._waiting[out.id] = nil

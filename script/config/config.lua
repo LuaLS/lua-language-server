@@ -234,8 +234,8 @@ m.nullSymbols = {
 ---@param nowValue any
 ---@param rawValue any
 local function update(scp, key, nowValue, rawValue)
-    local now = scp:get 'config.now'
-    local raw = scp:get 'config.raw'
+    local now = m.getNowTable(scp)
+    local raw = m.getRawTable(scp)
 
     now[key] = nowValue
     raw[key] = rawValue
@@ -245,7 +245,7 @@ end
 ---@param key? string
 ---@return scope
 local function getScope(uri, key)
-    local raw = scope.override:get 'config.raw'
+    local raw = m.getRawTable(scope.override)
     if raw then
         if not key or raw[key] ~= nil then
             return scope.override
@@ -256,7 +256,7 @@ local function getScope(uri, key)
         local scp = scope.getFolder(uri) or scope.getLinkedScope(uri)
         if scp then
             if not key
-            or (scp:get 'config.raw' and scp:get 'config.raw' [key] ~= nil) then
+            or m.getRawTable(scp)[key] ~= nil then
                 return scp
             end
         end
@@ -272,7 +272,7 @@ function m.setByScope(scp, key, value)
     if not unit then
         return false
     end
-    local raw = scp:get 'config.raw'
+    local raw = m.getRawTable(scp)
     if util.equal(raw[key], value) then
         return false
     end
@@ -358,7 +358,7 @@ end
 ---@return any
 function m.get(uri, key)
     local scp = getScope(uri, key)
-    local value = scp:get 'config.now' [key]
+    local value = m.getNowTable(scp)[key]
     if value == nil then
         value = Template[key].default
     end
@@ -373,7 +373,7 @@ end
 ---@return any
 function m.getRaw(uri, key)
     local scp = getScope(uri, key)
-    local value = scp:get 'config.raw' [key]
+    local value = m.getRawTable(scp)[key]
     if value == nil then
         value = Template[key].default
     end
@@ -384,9 +384,21 @@ function m.getRaw(uri, key)
 end
 
 ---@param scp  scope
+function m.getNowTable(scp)
+    return scp:get 'config.now'
+        or scp:set('config.now', {})
+end
+
+---@param scp  scope
+function m.getRawTable(scp)
+    return scp:get 'config.raw'
+        or scp:set('config.raw', {})
+end
+
+---@param scp  scope
 ---@param ...  table
 function m.update(scp, ...)
-    local oldConfig = scp:get 'config.now'
+    local oldConfig = m.getNowTable(scp)
     local newConfig = {}
     scp:set('config.now', newConfig)
     scp:set('config.raw', {})
@@ -459,7 +471,5 @@ end
 function m.addNullSymbol(null)
     m.nullSymbols[null] = true
 end
-
-m.update(scope.fallback, {})
 
 return m

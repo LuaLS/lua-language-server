@@ -12,6 +12,7 @@ local curFrame = 0
 local maxFrame = 0
 local curIndex = 0
 local tarFrame = 0
+local fwFrame  = 0
 local freeQueue = {}
 local timer = {}
 
@@ -206,7 +207,7 @@ end
 
 local lastClock = monotonic()
 function m.update()
-    local currentClock = monotonic()
+    local currentClock = monotonic() + fwFrame
     local delta = currentClock - lastClock
     lastClock = currentClock
     if curIndex ~= 0 then
@@ -218,6 +219,10 @@ function m.update()
         curFrame = curFrame + 1
         onTick()
     end
+end
+
+function m.timeJump(delta)
+    fwFrame = fwFrame + mathFloor(delta * 1000.0)
 end
 
 return m

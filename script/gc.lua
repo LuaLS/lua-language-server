@@ -1,4 +1,4 @@
-local util = require 'share.utility'
+local util = require 'utility'
 
 ---@class gc
 ---@field _list table

@@ -41,6 +41,12 @@ function m.on(method, callback)
     m.ability[method] = callback
 end
 
+function m.send(data)
+    local buf = jsonrpc.encode(data)
+    logSend(buf)
+    io.write(buf)
+end
+
 function m.response(id, res)
     if id == nil then
         log.error('Response id is nil!', util.dump(res))
@@ -51,10 +57,7 @@ function m.response(id, res)
     local data  = {}
     data.id     = id
     data.result = res == nil and json.null or res
-    local buf = jsonrpc.encode(data)
-    --log.debug('Response', id, #buf)
-    logSend(buf)
-    io.write(buf)
+    m.send(data)
 end
 
 function m.responseErr(id, code, message)
@@ -64,39 +67,30 @@ function m.responseErr(id, code, message)
     end
     assert(m.holdon[id])
     m.holdon[id] = nil
-    local buf = jsonrpc.encode {
+    m.send {
         id    = id,
         error = {
             code    = code,
             message = message,
         }
     }
-    --log.debug('ResponseErr', id, #buf)
-    logSend(buf)
-    io.write(buf)
 end
 
 function m.notify(name, params)
-    local buf = jsonrpc.encode {
+    m.send {
         method = name,
         params = params,
     }
-    --log.debug('Notify', name, #buf)
-    logSend(buf)
-    io.write(buf)
 end
 
 ---@async
 function m.awaitRequest(name, params)
     local id  = reqCounter()
-    local buf = jsonrpc.encode {
+    m.send {
         id     = id,
         method = name,
         params = params,
     }
-    --log.debug('Request', name, #buf)
-    logSend(buf)
-    io.write(buf)
     local result, error = await.wait(function (resume)
         m.waiting[id] = resume
     end)

@@ -56,6 +56,7 @@ function m.reset()
     m.folders = {}
     m.rootUri = nil
 end
+m.reset()
 
 function m.getRootUri(uri)
     local scp = m.getScope(uri)

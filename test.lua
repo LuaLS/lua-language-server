@@ -86,6 +86,7 @@ local function main()
     require 'language' 'zh-cn'
     require 'library'.init()
     loadDocMetas()
+    test 'tclient'
 
     --config.Lua.intelliSense.searchDepth = 5
     --loadDocMetas()
@@ -99,7 +100,7 @@ local function main()
     require 'bee.platform'.OS = 'macOS'
     testAll()
 
-    test 'client'
+    test 'tclient'
 
     --test 'full'
 

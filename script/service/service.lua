@@ -13,9 +13,11 @@ local time   = require 'bee.time'
 local fw     = require 'filewatch'
 local furi   = require 'file-uri'
 
+---@class service
 local m = {}
 m.type = 'service'
 m.idleClock = 0.0
+m.sleeping = false
 
 local function countMemory()
     local mems = {}
@@ -145,6 +147,7 @@ function m.eventLoop()
     pub.task('timer', 1)
     pub.on('wakeup', function ()
         m.reportStatus()
+        fw.update()
     end)
 
     local function busy()
@@ -194,23 +197,6 @@ function m.eventLoop()
     end
 end
 
-function m.pulse()
-    --timer.loop(10, function ()
-    --    if not m.workingClock and not m.sleeping and time.monotonic() - m.idleClock >= 300000 then
-    --        m.sleeping = true
-    --        files.flushCache()
-    --        vm.flushCache()
-    --        ws.flushCache()
-    --        collectgarbage()
-    --        collectgarbage()
-    --    end
-    --    m.reportStatus()
-    --end)
-    timer.loop(1, function ()
-        fw.update()
-    end)
-end
-
 function m.reportStatus()
     local info = {}
     if m.workingClock and time.monotonic() - m.workingClock > 100 then
@@ -258,7 +244,6 @@ function m.start()
     pub.recruitBraves(4)
     proto.listen()
     m.report()
-    m.pulse()
     m.testVersion()
 
     require 'provider'

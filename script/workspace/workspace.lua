@@ -385,9 +385,6 @@ function m.reload(scp)
     if not m.inited then
         return
     end
-    if TEST then
-        return
-    end
     ---@async
     await.call(function ()
         m.awaitReload(scp)

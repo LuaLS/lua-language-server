@@ -137,6 +137,9 @@ function m.doMethod(proto)
     logRecieve(proto)
     local method, optional = m.getMethodName(proto)
     local abil = m.ability[method]
+    if proto.id then
+        m.holdon[proto.id] = proto
+    end
     if not abil then
         if not optional then
             log.warn('Recieved unknown proto: ' .. method)
@@ -145,9 +148,6 @@ function m.doMethod(proto)
             m.responseErr(proto.id, define.ErrorCodes.MethodNotFound, method)
         end
         return
-    end
-    if proto.id then
-        m.holdon[proto.id] = proto
     end
     await.call(function () ---@async
         --log.debug('Start method:', method)

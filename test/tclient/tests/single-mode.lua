@@ -5,9 +5,7 @@ local util      = require 'utility'
 
 ---@async
 lclient():start(function (client)
-    client:register('workspace/configuration', function ()
-        return nil
-    end)
+    client:registerFakers()
 
     client:awaitRequest('initialize', {
         clientInfo = {
@@ -33,7 +31,7 @@ print(x)
 
     ws.awaitReady()
 
-    local locations = client:awaitRequest('textDocument.definition', {
+    local locations = client:awaitRequest('textDocument/definition', {
         textDocument = { uri = 'test://single-file.lua' },
         position = { line = 1, character = 7 },
     })

@@ -82,17 +82,18 @@ end
 
 local function main()
     require 'utility'.enableCloseFunction()
-    require 'core.searcher'.debugMode = true
-    require 'language' 'zh-cn'
     require 'library'.init()
-    loadDocMetas()
-    --test 'tclient'
+    test 'tclient'
 
     --config.Lua.intelliSense.searchDepth = 5
     --loadDocMetas()
 
     --test 'full';do return end
-
+    require 'workspace.workspace'.reset()
+    require 'files'.reset()
+    require 'workspace.scope'.reset()
+    require 'language' 'zh-cn'
+    loadDocMetas()
     require 'bee.platform'.OS = 'Windows'
     testAll()
     require 'bee.platform'.OS = 'Linux'
@@ -102,7 +103,7 @@ local function main()
 
     --test 'tclient'
 
-    --test 'full'
+    test 'full'
 
     print('测试完成')
 end

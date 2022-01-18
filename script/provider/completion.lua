@@ -30,6 +30,7 @@ local function enable(uri)
     end
     nonil.enable()
     if not client.info.capabilities.textDocument.completion.dynamicRegistration then
+        nonil.disable()
         return
     end
     nonil.disable()
@@ -55,6 +56,7 @@ local function disable(uri)
     end
     nonil.enable()
     if not client.info.capabilities.textDocument.completion.dynamicRegistration then
+        nonil.disable()
         return
     end
     nonil.disable()

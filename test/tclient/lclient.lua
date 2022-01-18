@@ -49,6 +49,8 @@ function mt:start(callback)
         finished = true
     end)
 
+    local jumpedTime = 0
+
     while true do
         if finished then
             break
@@ -64,6 +66,10 @@ function mt:start(callback)
             goto CONTINUE
         end
         timer.timeJump(1.0)
+        jumpedTime = jumpedTime + 1.0
+        if jumpedTime > 2 * 60 * 60 then
+            error('two hours later ...')
+        end
         ::CONTINUE::
     end
 
@@ -111,10 +117,14 @@ function mt:update()
     for _, out in ipairs(outs) do
         if out.method then
             local callback = self._methods[out.method]
-            proto.doResponse {
-                id     = out.id,
-                params = callback(out.params),
-            }
+            if callback then
+                proto.doResponse {
+                    id     = out.id,
+                    params = callback(out.params),
+                }
+            elseif out.method:sub(1, 2) ~= '$/' then
+                error('Unknown method: ' .. out.method)
+            end
         else
             local callback = self._waiting[out.id]
             self._waiting[out.id] = nil
@@ -124,8 +134,19 @@ function mt:update()
     return true
 end
 
-function mt:register(name, callback)
-    self._methods[name] = callback
+function mt:register(method, callback)
+    self._methods[method] = callback
+end
+
+function mt:registerFakers()
+    for _, method in ipairs {
+        'workspace/configuration',
+        'textDocument/publishDiagnostics',
+    } do
+        self:register(method, function ()
+            return nil
+        end)
+    end
 end
 
 ---@return languageClient

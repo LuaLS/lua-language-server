@@ -12,6 +12,7 @@ local guide    = require 'parser.guide'
 local smerger  = require 'string-merger'
 local progress = require "progress"
 local encoder  = require 'encoder'
+local scope    = require 'workspace.scope'
 
 ---@class files
 local m = {}
@@ -23,7 +24,6 @@ m.assocMatcher   = nil
 
 function m.reset()
     m.openMap        = {}
-    m.libraryMap     = {}
     m.fileMap        = {}
     m.dllMap         = {}
     m.visible        = {}
@@ -110,12 +110,28 @@ end
 
 --- 是否是库文件
 function m.isLibrary(uri)
-    return m.libraryMap[uri] ~= nil
+    for _, scp in ipairs(scope.folders) do
+        local map = scp:get 'libraryMap'
+        if map and map[uri] ~= nil then
+            return true
+        end
+    end
+    local map = scope.fallback:get 'libraryMap'
+    if map and map[uri] ~= nil then
+        return true
+    end
+    return false
 end
 
 --- 获取库文件的根目录
 function m.getLibraryPath(uri)
-    return m.libraryMap[uri]
+    for _, scp in ipairs(scope.folders) do
+        local map = scp:get 'libraryMap'
+        if map and map[uri] ~= nil then
+            return scp.uri
+        end
+    end
+    return nil
 end
 
 ---@param scp scope

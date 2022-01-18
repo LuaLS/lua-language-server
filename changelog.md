@@ -2,6 +2,7 @@
 
 ## 2.6.1
 * `FIX` modify luarc failed
+* `FIX` library files not recognized correctly
 
 ## 2.6.0
 `2022-1-13`

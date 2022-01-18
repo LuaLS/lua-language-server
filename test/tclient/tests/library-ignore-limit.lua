@@ -3,6 +3,7 @@ local util    = require 'utility'
 local ws      = require 'workspace'
 local files   = require 'files'
 local furi    = require 'file-uri'
+local fs      = require 'bee.filesystem'
 
 local libraryPath   = LOGPATH .. '/large-file-library'
 local largeFilePath = LOGPATH .. '/large-file-library/large-file.lua'
@@ -13,11 +14,14 @@ lclient():start(function (client)
 
     client:register('workspace/configuration', function ()
         return {
-            ['Lua.workspace.library'] = { libraryPath }
+            {
+                ['workspace.library'] = { libraryPath }
+            },
         }
     end)
 
-    util.saveFile(largeFilePath, string.rep('--this is a large file\n', 20000))
+    fs.create_directories(fs.path(libraryPath))
+    util.saveFile(largeFilePath, string.rep('--this is a large file\n', 100000))
 
     client:initialize()
 

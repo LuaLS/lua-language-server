@@ -63,6 +63,11 @@ function mt:start(callback)
 
     local finished = false
 
+    await.setErrorHandle(function (...)
+        local msg = log.error(...)
+        error(msg)
+    end)
+
     ---@async
     await.call(function ()
         callback(self)
@@ -144,7 +149,7 @@ function mt:update()
             if callback then
                 proto.doResponse {
                     id     = out.id,
-                    params = callback(out.params),
+                    result = callback(out.params),
                 }
             elseif out.method:sub(1, 2) ~= '$/' then
                 error('Unknown method: ' .. out.method)
@@ -164,10 +169,12 @@ end
 
 function mt:registerFakers()
     for _, method in ipairs {
+        'textDocument/publishDiagnostics',
         'workspace/configuration',
         'workspace/semanticTokens/refresh',
         'window/workDoneProgress/create',
-        'textDocument/publishDiagnostics',
+        'window/showMessage',
+        'window/logMessage',
     } do
         self:register(method, function ()
             return nil

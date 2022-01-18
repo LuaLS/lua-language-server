@@ -4,7 +4,8 @@ local await    = require 'await'
 local files    = require 'files'
 local config   = require 'config.config'
 local client   = require 'client'
-local pub      = require 'pub.pub'
+local util     = require 'utility'
+local furi     = require 'file-uri'
 
 ---@class workspace.loading
 ---@field scp scope
@@ -69,50 +70,48 @@ function mt:loadFile(uri, libraryUri)
         end
         self.max = self.max + 1
         self:update()
-        pub.task('loadFile', uri, function (content)
-            self._stash[#self._stash+1] = function ()
-                self.read = self.read + 1
-                self:update()
-                if not content then
-                    return
-                end
-                if self._cache[uri] then
-                    return
-                end
-                log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
-                self._cache[uri] = true
-                files.setText(uri, content, false)
-                files.addRef(uri)
-                if libraryUri then
-                    log.info('++++As library of:', libraryUri)
-                    files.setLibraryUri(self.scp, uri, libraryUri)
-                end
+        self._stash[#self._stash+1] = function ()
+            local content = util.loadFile(furi.decode(uri))
+            self.read = self.read + 1
+            self:update()
+            if not content then
+                return
             end
-        end)
+            if self._cache[uri] then
+                return
+            end
+            log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
+            self._cache[uri] = true
+            files.setText(uri, content, false)
+            files.addRef(uri)
+            if libraryUri then
+                log.info('++++As library of:', libraryUri)
+                files.setLibraryUri(self.scp, uri, libraryUri)
+            end
+        end
     elseif files.isDll(uri) then
         self.max = self.max + 1
         self:update()
-        pub.task('loadFile', uri, function (content)
-            self._stash[#self._stash+1] = function ()
-                self.read = self.read + 1
-                self:update()
-                if not content then
-                    return
-                end
-                if self._cache[uri] then
-                    return
-                end
-                log.info(('Preload dll at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
-                self._cache[uri] = true
-                files.saveDll(uri, content)
-                files.addRef(uri)
-                if libraryUri then
-                    log.info('++++As library of:', libraryUri)
-                end
+        self._stash[#self._stash+1] = function ()
+            local content = util.loadFile(furi.decode(uri))
+            self.read = self.read + 1
+            self:update()
+            if not content then
+                return
             end
-        end)
-        await.delay()
+            if self._cache[uri] then
+                return
+            end
+            log.info(('Preload dll at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
+            self._cache[uri] = true
+            files.saveDll(uri, content)
+            files.addRef(uri)
+            if libraryUri then
+                log.info('++++As library of:', libraryUri)
+            end
+        end
     end
+    await.delay()
 end
 
 function mt:loadStashed()

@@ -55,6 +55,7 @@ function m.reset()
     ---@type scope[]
     m.folders = {}
     m.rootUri = nil
+    m.inited  = false
 end
 m.reset()
 

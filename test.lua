@@ -77,6 +77,8 @@ local function main()
     local lclient = require 'tclient.lclient'
     local ws      = require 'workspace'
 
+    log.info = print
+
     for _, os in ipairs {'Windows', 'Linux', 'macOS'} do
         require 'bee.platform'.OS = os
         ---@async

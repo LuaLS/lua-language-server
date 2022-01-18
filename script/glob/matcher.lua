@@ -3,7 +3,7 @@ local m = require 'lpeglabel'
 local Slash  = m.S('/\\')^1
 local Symbol = m.S',{}[]*?/\\'
 local Char   = 1 - Symbol
-local Path   = Char^1 * Slash
+local Path   = (1 - m.S[[\/:*?"<>|]])^1 * Slash
 local NoWord = #(m.P(-1) + Symbol)
 local function whatHappened()
     return m.Cmt(m.P(1)^1, function (...)

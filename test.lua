@@ -1,4 +1,3 @@
-local files = require "files"
 package.path  = package.path
       .. ';./test/?.lua'
       .. ';./test/?/init.lua'
@@ -68,6 +67,8 @@ local function testAll()
     test 'type_formatting'
     --test 'other'
 end
+
+local files = require "files"
 
 local function main()
     require 'utility'.enableCloseFunction()

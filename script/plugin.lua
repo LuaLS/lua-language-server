@@ -70,10 +70,6 @@ end
 
 ---@param scp scope
 function m.init(scp)
-    if m.hasInited then
-        return
-    end
-    m.hasInited = true
     await.call(function () ---@async
         local ws    = require 'workspace'
         m.interface = {}

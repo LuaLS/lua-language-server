@@ -1,4 +1,3 @@
-local await     = require 'await'
 local lclient   = require 'tclient.lclient'
 local ws        = require 'workspace'
 local util      = require 'utility'

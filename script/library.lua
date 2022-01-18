@@ -496,10 +496,6 @@ files.watch(function (ev, uri)
 end)
 
 function m.init()
-    if m.inited then
-        return
-    end
-    m.inited = true
     initBuiltIn(nil)
     for _, scp in ipairs(ws.folders) do
         initBuiltIn(scp.uri)

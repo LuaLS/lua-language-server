@@ -17,6 +17,7 @@ local converter  = require 'proto.converter'
 local filewatch  = require 'filewatch'
 local json       = require 'json'
 local scope      = require 'workspace.scope'
+local furi       = require 'file-uri'
 
 ---@async
 local function updateConfig(uri)
@@ -167,7 +168,7 @@ m.register 'workspace/didCreateFiles' {
         log.debug('workspace/didCreateFiles', util.dump(params))
         for _, file in ipairs(params.files) do
             if workspace.isValidLuaUri(file.uri) then
-                files.setText(file.uri, pub.awaitTask('loadFile', file.uri), false)
+                files.setText(file.uri, util.loadFile(furi.decode(file.uri)), false)
             end
         end
     end

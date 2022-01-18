@@ -55,7 +55,6 @@ function m.reset()
     ---@type scope[]
     m.folders = {}
     m.rootUri = nil
-    m.inited  = false
 end
 m.reset()
 
@@ -92,7 +91,6 @@ local globInteferFace = {
 }
 
 --- 创建排除文件匹配器
----@async
 ---@param scp scope
 function m.getNativeMatcher(scp)
     if scp:get 'nativeMatcher' then
@@ -107,7 +105,7 @@ function m.getNativeMatcher(scp)
         end
     end
     if scp.uri and config.get(scp.uri, 'Lua.workspace.useGitIgnore') then
-        local buf = pub.awaitTask('loadFile', scp.uri .. '/.gitignore')
+        local buf = util.loadFile(furi.decode(scp.uri) .. '/.gitignore')
         if buf then
             for line in buf:gmatch '[^\r\n]+' do
                 if line:sub(1, 1) ~= '#' then
@@ -116,7 +114,7 @@ function m.getNativeMatcher(scp)
                 end
             end
         end
-        buf = pub.awaitTask('loadFile', scp.uri .. '/.git/info/exclude')
+        buf = util.loadFile(furi.decode(scp.uri).. '/.git/info/exclude')
         if buf then
             for line in buf:gmatch '[^\r\n]+' do
                 if line:sub(1, 1) ~= '#' then
@@ -127,7 +125,7 @@ function m.getNativeMatcher(scp)
         end
     end
     if scp.uri and config.get(scp.uri, 'Lua.workspace.ignoreSubmodules') then
-        local buf = pub.awaitTask('loadFile', scp.uri .. '/.gitmodules')
+        local buf = util.loadFile(furi.decode(scp.uri) .. '/.gitmodules')
         if buf then
             for path in buf:gmatch('path = ([^\r\n]+)') do
                 log.info('Ignore by .gitmodules:', path)
@@ -383,9 +381,6 @@ end
 
 ---@param scp scope
 function m.reload(scp)
-    if not m.inited then
-        return
-    end
     ---@async
     await.call(function ()
         m.awaitReload(scp)
@@ -393,10 +388,6 @@ function m.reload(scp)
 end
 
 function m.init()
-    if m.inited then
-        return
-    end
-    m.inited = true
     if m.rootUri then
         for _, folder in ipairs(scope.folders) do
             m.reload(folder)
@@ -526,7 +517,7 @@ fw.event(function (changes) ---@async
             if m.isValidLuaUri(uri) then
                 -- 如果文件处于关闭状态，则立即更新；否则等待didChange协议来更新
                 if not files.isOpen(uri) then
-                    files.setText(uri, pub.awaitTask('loadFile', uri), false)
+                    files.setText(uri, util.loadFile(furi.decode(uri)), false)
                 end
             else
                 local filename = fs.path(path):filename():string()

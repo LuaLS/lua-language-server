@@ -31,20 +31,6 @@ local function loadAllLibs()
     assert(require 'lpeglabel')
 end
 
-local function loadDocMetas()
-    local files   = require 'files'
-    local library = require 'library'
-    local furi    = require 'file-uri'
-    local fsu     = require 'fs-utility'
-    local client  = require 'client'
-    client.client 'vscode'
-    for path in pairs(library.metaPaths) do
-        local uri = furi.encode(path)
-        files.setText(uri, fsu.loadFile(path))
-        --scope.fallback:addLink(uri)
-    end
-end
-
 local function test(name)
     local clock = os.clock()
     print(('测试[%s]...'):format(name))
@@ -81,30 +67,28 @@ local function testAll()
 end
 
 local function main()
+    LOCALE = 'zh-cn'
     require 'utility'.enableCloseFunction()
-    require 'library'.init()
+    require 'client' .client 'VSCode'
+
+    local lclient = require 'tclient.lclient'
+    local ws      = require 'workspace'
+
+    for _, os in ipairs {'Windows', 'Linux', 'macOS'} do
+        require 'bee.platform'.OS = os
+        ---@async
+        lclient():start(function (client)
+            client:registerFakers()
+            client:initialize()
+
+            ws.awaitReady()
+
+            testAll()
+        end)
+    end
+
     test 'tclient'
-
-    --config.Lua.intelliSense.searchDepth = 5
-    --loadDocMetas()
-
-    --test 'full';do return end
-    require 'workspace.workspace'.reset()
-    require 'files'.reset()
-    require 'workspace.scope'.reset()
-    require 'language' 'zh-cn'
-    loadDocMetas()
-    require 'bee.platform'.OS = 'Windows'
-    testAll()
-    require 'bee.platform'.OS = 'Linux'
-    testAll()
-    require 'bee.platform'.OS = 'macOS'
-    testAll()
-
-    --test 'tclient'
-
     test 'full'
-
     print('测试完成')
 end
 

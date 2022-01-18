@@ -21,7 +21,9 @@ lclient():start(function (client)
     end)
 
     fs.create_directories(fs.path(libraryPath))
-    util.saveFile(largeFilePath, string.rep('--this is a large file\n', 100000))
+    if not fs.exists(fs.path(largeFilePath)) then
+        util.saveFile(largeFilePath, string.rep('--this is a large file\n', 100000))
+    end
 
     client:initialize()
 

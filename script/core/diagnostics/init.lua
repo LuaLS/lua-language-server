@@ -109,10 +109,6 @@ return function (uri, isScopeDiag, response, checked)
         return nil
     end
 
-    if TEST then
-        log.debug('do diagnostic @', uri)
-    end
-
     for _, name in ipairs(diagList) do
         await.delay()
         check(uri, name, isScopeDiag, response)

@@ -77,7 +77,7 @@ local function main()
     local lclient = require 'tclient.lclient'
     local ws      = require 'workspace'
 
-    log.info = print
+    log.print = true
 
     for _, os in ipairs {'Windows', 'Linux', 'macOS'} do
         require 'bee.platform'.OS = os
@@ -100,12 +100,11 @@ local function main()
 
     test 'tclient'
     test 'full'
-    print('测试完成')
 end
 
 loadAllLibs()
 main()
 
-log.debug('测试完成')
+log.debug('test finish.')
 require 'bee.thread'.sleep(1)
 os.exit()

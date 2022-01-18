@@ -201,6 +201,7 @@ local function loadMetaLocale(langID, result)
 end
 
 local function initBuiltIn(uri)
+    log.info('Init builtin library at:', uri)
     local scp      = ws.getScope(uri)
     local langID   = lang.id
     local version  = config.get(uri, 'Lua.runtime.version')

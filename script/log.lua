@@ -55,7 +55,13 @@ local function pushLog(level, ...)
         str = str .. '\n' .. debugTraceBack(nil, 3)
     end
     local info = debugGetInfo(3, 'Sl')
-    return m.raw(0, level, str, info.source, info.currentline, monotonic())
+    local text = m.raw(0, level, str, info.source, info.currentline, monotonic())
+
+    if log.print then
+        print(text)
+    end
+
+    return text
 end
 
 function m.info(...)

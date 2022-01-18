@@ -92,7 +92,12 @@ function m.awaitRequest(name, params)
         params = params,
     }
     local result, error = await.wait(function (resume)
-        m.waiting[id] = resume
+        m.waiting[id] = {
+            id     = id,
+            method = name,
+            params = params,
+            resume = resume,
+        }
     end)
     if error then
         log.warn(('Response of [%s] error [%d]: %s'):format(name, error.code, error.message))
@@ -110,14 +115,19 @@ function m.request(name, params, callback)
     --log.debug('Request', name, #buf)
     logSend(buf)
     io.write(buf)
-    m.waiting[id] = function (result, error)
-        if error then
-            log.warn(('Response of [%s] error [%d]: %s'):format(name, error.code, error.message))
+    m.waiting[id] = {
+        id     = id,
+        method = name,
+        params = params,
+        resume = function (result, error)
+            if error then
+                log.warn(('Response of [%s] error [%d]: %s'):format(name, error.code, error.message))
+            end
+            if callback then
+                callback(result)
+            end
         end
-        if callback then
-            callback(result)
-        end
-    end
+    }
 end
 
 local secretOption = {
@@ -137,6 +147,9 @@ function m.doMethod(proto)
     logRecieve(proto)
     local method, optional = m.getMethodName(proto)
     local abil = m.ability[method]
+    if proto.id then
+        m.holdon[proto.id] = proto
+    end
     if not abil then
         if not optional then
             log.warn('Recieved unknown proto: ' .. method)
@@ -145,9 +158,6 @@ function m.doMethod(proto)
             m.responseErr(proto.id, define.ErrorCodes.MethodNotFound, method)
         end
         return
-    end
-    if proto.id then
-        m.holdon[proto.id] = proto
     end
     await.call(function () ---@async
         --log.debug('Start method:', method)
@@ -192,17 +202,17 @@ end
 function m.doResponse(proto)
     logRecieve(proto)
     local id = proto.id
-    local resume = m.waiting[id]
-    if not resume then
+    local waiting = m.waiting[id]
+    if not waiting then
         log.warn('Response id not found: ' .. util.dump(proto))
         return
     end
     m.waiting[id] = nil
     if proto.error then
-        resume(nil, proto.error)
+        waiting.resume(nil, proto.error)
         return
     end
-    resume(proto.result)
+    waiting.resume(proto.result)
 end
 
 function m.listen()

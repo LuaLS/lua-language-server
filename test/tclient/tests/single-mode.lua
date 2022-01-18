@@ -5,19 +5,8 @@ local util      = require 'utility'
 
 ---@async
 lclient():start(function (client)
-    client:register('workspace/configuration', function ()
-        return nil
-    end)
-
-    client:awaitRequest('initialize', {
-        clientInfo = {
-            name    = 'unit-test',
-            version = 'single-mode',
-        },
-        rootUri = nil,
-    })
-
-    client:notify('initialized')
+    client:registerFakers()
+    client:initialize()
 
     client:notify('textDocument/didOpen', {
         textDocument = {
@@ -33,7 +22,7 @@ print(x)
 
     ws.awaitReady()
 
-    local locations = client:awaitRequest('textDocument.definition', {
+    local locations = client:awaitRequest('textDocument/definition', {
         textDocument = { uri = 'test://single-file.lua' },
         position = { line = 1, character = 7 },
     })

@@ -55,6 +55,7 @@ function m.reset()
     ---@type scope[]
     m.folders = {}
     m.rootUri = nil
+    m.inited  = false
 end
 m.reset()
 
@@ -383,9 +384,6 @@ end
 ---@param scp scope
 function m.reload(scp)
     if not m.inited then
-        return
-    end
-    if TEST then
         return
     end
     ---@async

@@ -323,7 +323,12 @@ local function apply3rd(uri, cfg, onlyMemory)
     local changes = {}
     if cfg.configs then
         for _, change in ipairs(cfg.configs) do
-            changes[#changes+1] = change
+            changes[#changes+1] = {
+                key    = change.key,
+                action = change.action,
+                value  = change.value,
+                uri    = uri,
+            }
         end
     end
 

@@ -36,6 +36,26 @@ function mt:_flushServer()
     files.reset()
 end
 
+---@async
+function mt:initialize(params)
+    self:awaitRequest('initialize', params or {})
+    self:notify('initialized')
+end
+
+function mt:reportHangs()
+    local hangs = {}
+    hangs[#hangs+1] = ('====== C -> S ======')
+    for _, waiting in util.sortPairs(self._waiting) do
+        hangs[#hangs+1] = ('%03d %s'):format(waiting.id, waiting.method)
+    end
+    hangs[#hangs+1] = ('====== S -> C ======')
+    for _, waiting in util.sortPairs(proto.waiting) do
+        hangs[#hangs+1] = ('%03d %s'):format(waiting.id, waiting.method)
+    end
+    hangs[#hangs+1] = ('====================')
+    return table.concat(hangs, '\n')
+end
+
 ---@param callback async fun(client: languageClient)
 function mt:start(callback)
     self:_fakeProto()
@@ -43,11 +63,18 @@ function mt:start(callback)
 
     local finished = false
 
+    await.setErrorHandle(function (...)
+        local msg = log.error(...)
+        error(msg)
+    end)
+
     ---@async
     await.call(function ()
         callback(self)
         finished = true
     end)
+
+    local jumpedTime = 0
 
     while true do
         if finished then
@@ -64,6 +91,10 @@ function mt:start(callback)
             goto CONTINUE
         end
         timer.timeJump(1.0)
+        jumpedTime = jumpedTime + 1.0
+        if jumpedTime > 2 * 60 * 60 then
+            error('two hours later ...\n' .. self:reportHangs())
+        end
         ::CONTINUE::
     end
 
@@ -87,7 +118,11 @@ end
 
 function mt:request(method, params, callback)
     local id = counter()
-    self._waiting[id] = callback
+    self._waiting[id] = {
+        id       = id,
+        params   = params,
+        callback = callback,
+    }
     proto.doMethod {
         id     = id,
         method = method,
@@ -111,12 +146,16 @@ function mt:update()
     for _, out in ipairs(outs) do
         if out.method then
             local callback = self._methods[out.method]
-            proto.doResponse {
-                id     = out.id,
-                params = callback(out.params),
-            }
+            if callback then
+                proto.doResponse {
+                    id     = out.id,
+                    result = callback(out.params),
+                }
+            elseif out.method:sub(1, 2) ~= '$/' then
+                error('Unknown method: ' .. out.method)
+            end
         else
-            local callback = self._waiting[out.id]
+            local callback = self._waiting[out.id].callback
             self._waiting[out.id] = nil
             callback(out.result, out.error)
         end
@@ -124,8 +163,23 @@ function mt:update()
     return true
 end
 
-function mt:register(name, callback)
-    self._methods[name] = callback
+function mt:register(method, callback)
+    self._methods[method] = callback
+end
+
+function mt:registerFakers()
+    for _, method in ipairs {
+        'textDocument/publishDiagnostics',
+        'workspace/configuration',
+        'workspace/semanticTokens/refresh',
+        'window/workDoneProgress/create',
+        'window/showMessage',
+        'window/logMessage',
+    } do
+        self:register(method, function ()
+            return nil
+        end)
+    end
 end
 
 ---@return languageClient

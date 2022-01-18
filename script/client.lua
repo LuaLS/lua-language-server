@@ -241,7 +241,6 @@ local function tryModifyRC(uri, finalChanges, create)
         return false
     end
     local workspace = require 'workspace'
-    local loader    = require 'config.loader'
     local path = workspace.getAbsolutePath(uri, '.luarc.json')
     if not path then
         return false

@@ -20,6 +20,8 @@ log = require 'log'
 log.init(ROOT, ROOT / 'log' / 'test.log')
 log.debug('测试开始')
 
+LOCALE = 'zh-cn'
+
 --dofile((ROOT / 'build_package.lua'):string())
 require 'tracy'
 
@@ -67,7 +69,6 @@ local function testAll()
 end
 
 local function main()
-    LOCALE = 'zh-cn'
     require 'utility'.enableCloseFunction()
     require 'client' .client 'VSCode'
 

@@ -1,6 +1,10 @@
 # changelog
 
 ## 2.6.1
+* `CHG` default values of settings:
+  + `Lua.diagnostics.workspaceDelay`: `0` sec -> `3` sec
+  + `Lua.workspace.maxPreload`: `1000` -> `5000`
+  + `Lua.workspace.preloadFileSize`: `100` KB -> `500` KB
 * `FIX` modify luarc failed
 * `FIX` library files not recognized correctly
 * `FIX` [#906](https://github.com/sumneko/lua-language-server/issues/906)

@@ -1,3 +1,4 @@
+local files = require "files"
 package.path  = package.path
       .. ';./test/?.lua'
       .. ';./test/?/init.lua'
@@ -83,6 +84,12 @@ local function main()
             client:initialize()
 
             ws.awaitReady()
+
+            print('Loaded files in', os)
+            for uri in files.eachFile() do
+                print(uri)
+            end
+            print('===============')
 
             testAll()
         end)

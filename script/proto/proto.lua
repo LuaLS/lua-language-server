@@ -92,7 +92,12 @@ function m.awaitRequest(name, params)
         params = params,
     }
     local result, error = await.wait(function (resume)
-        m.waiting[id] = resume
+        m.waiting[id] = {
+            id     = id,
+            method = name,
+            params = params,
+            resume = resume,
+        }
     end)
     if error then
         log.warn(('Response of [%s] error [%d]: %s'):format(name, error.code, error.message))
@@ -110,14 +115,19 @@ function m.request(name, params, callback)
     --log.debug('Request', name, #buf)
     logSend(buf)
     io.write(buf)
-    m.waiting[id] = function (result, error)
-        if error then
-            log.warn(('Response of [%s] error [%d]: %s'):format(name, error.code, error.message))
+    m.waiting[id] = {
+        id     = id,
+        method = name,
+        params = params,
+        resume = function (result, error)
+            if error then
+                log.warn(('Response of [%s] error [%d]: %s'):format(name, error.code, error.message))
+            end
+            if callback then
+                callback(result)
+            end
         end
-        if callback then
-            callback(result)
-        end
-    end
+    }
 end
 
 local secretOption = {
@@ -192,17 +202,17 @@ end
 function m.doResponse(proto)
     logRecieve(proto)
     local id = proto.id
-    local resume = m.waiting[id]
-    if not resume then
+    local waiting = m.waiting[id]
+    if not waiting then
         log.warn('Response id not found: ' .. util.dump(proto))
         return
     end
     m.waiting[id] = nil
     if proto.error then
-        resume(nil, proto.error)
+        waiting.resume(nil, proto.error)
         return
     end
-    resume(proto.result)
+    waiting.resume(proto.result)
 end
 
 function m.listen()

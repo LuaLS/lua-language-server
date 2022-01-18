@@ -6,16 +6,7 @@ local util      = require 'utility'
 ---@async
 lclient():start(function (client)
     client:registerFakers()
-
-    client:awaitRequest('initialize', {
-        clientInfo = {
-            name    = 'unit-test',
-            version = 'single-mode',
-        },
-        rootUri = nil,
-    })
-
-    client:notify('initialized')
+    client:initialize()
 
     client:notify('textDocument/didOpen', {
         textDocument = {

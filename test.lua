@@ -8,8 +8,8 @@ TEST = true
 DEVELOP = true
 --FOOTPRINT = true
 --TRACE = true
-LOGPATH  = LOGPATH  or (ROOT .. '/log')
-METAPATH = METAPATH or (ROOT .. '/meta')
+LOGPATH  = LOGPATH  or (ROOT:string() .. '/log')
+METAPATH = METAPATH or (ROOT:string() .. '/meta')
 
 collectgarbage 'generational'
 

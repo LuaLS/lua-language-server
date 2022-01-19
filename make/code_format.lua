@@ -19,5 +19,9 @@ lm:source_set 'code_format' {
         "CodeService/src/*.cpp",
         "CodeService/src/FormatElement/*.cpp",
         "CodeService/src/NameStyle/*.cpp"
-    }
+    },
+    macos = {
+        -- macosx10.12不支持完整的std filesystem，只好砍功能
+        defines = "NOT_SURPPORT_FILE_SYSTEM",
+    },
 }

@@ -1,6 +1,6 @@
 local util      = require 'utility'
 local guide     = require 'parser.guide'
-local collector = require 'core.collector'
+local collector = require 'core.collector' 'searcher'
 local files     = require 'files'
 local config    = require 'config'
 
@@ -1254,19 +1254,19 @@ compileNodeMap = util.switch()
     : case 'doc.type.name'
     : call(function (noders, id, source)
         local uri = guide.getUri(source)
-        collector.subscribe(uri, id, noders)
+        collector:subscribe(uri, id, noders)
     end)
     : case 'doc.class.name'
     : case 'doc.alias.name'
     : call(function (noders, id, source)
         local uri = guide.getUri(source)
-        collector.subscribe(uri, id, noders)
+        collector:subscribe(uri, id, noders)
 
         local defID = 'def:' .. id
-        collector.subscribe(uri, defID, noders)
+        collector:subscribe(uri, defID, noders)
 
         local defAnyID = 'def:dn:'
-        collector.subscribe(uri, defAnyID, noders)
+        collector:subscribe(uri, defAnyID, noders)
     end)
     : case 'function'
     : call(function (noders, id, source)
@@ -1511,24 +1511,24 @@ function m.compileNode(noders, source)
 
     if id and ssub(id, 1, 2) == 'g:' then
         local uri = guide.getUri(source)
-        collector.subscribe(uri, id, noders)
+        collector:subscribe(uri, id, noders)
         if  guide.isSet(source)
         -- local t = Global --> t: g:.Global
         and source.type ~= 'local'
         and source.type ~= 'setlocal' then
 
             local defID = 'def:' .. id
-            collector.subscribe(uri, defID, noders)
+            collector:subscribe(uri, defID, noders)
 
             local fieldID = m.getLastID(id)
             if fieldID then
                 local defNodeID = 'field:' .. fieldID
-                collector.subscribe(uri, defNodeID, noders)
+                collector:subscribe(uri, defNodeID, noders)
             end
 
             if guide.isGlobal(source) then
                 local defAnyID = 'def:g:'
-                collector.subscribe(uri, defAnyID, noders)
+                collector:subscribe(uri, defAnyID, noders)
             end
         end
     end
@@ -1737,7 +1737,7 @@ function m.compileAllNodes(source)
     end
     root._initedNoders = true
     if not root._compiledGlobals then
-        collector.dropUri(guide.getUri(root))
+        collector:dropUri(guide.getUri(root))
     end
     root._compiledGlobals = true
     --log.debug('compileNodes:', guide.getUri(root))
@@ -1876,7 +1876,7 @@ function m.compileGlobalNodes(root)
         return
     end
     if not root._compiledGlobals then
-        collector.dropUri(guide.getUri(root))
+        collector:dropUri(guide.getUri(root))
     end
     root._compiledGlobals = true
     local noders = m.getNoders(root)
@@ -1909,7 +1909,7 @@ files.watch(function (ev, uri)
         end
     end
     if ev == 'remove' then
-        collector.dropUri(uri)
+        collector:dropUri(uri)
     end
 end)
 

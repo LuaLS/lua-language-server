@@ -4,7 +4,7 @@ local lang      = require 'language'
 local config    = require 'config'
 local guide     = require 'parser.guide'
 local noder     = require 'core.noder'
-local collector = require 'core.collector'
+local collector = require 'core.collector' 'searcher'
 local await     = require 'await'
 
 local requireLike = {
@@ -39,7 +39,7 @@ return function (uri, callback)
         end
         await.delay()
         local id = 'def:' .. noder.getID(src)
-        if not collector.has(id) then
+        if not collector:has(id) then
             local message = lang.script('DIAG_UNDEF_GLOBAL', key)
             if requireLike[key:lower()] then
                 message = ('%s(%s)'):format(message, lang.script('DIAG_REQUIRE_LIKE', key))

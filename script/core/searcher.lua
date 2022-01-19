@@ -4,7 +4,7 @@ local files     = require 'files'
 local generic   = require 'core.generic'
 local rpath     = require 'workspace.require-path'
 local vm        = require 'vm.vm'
-local collector = require 'core.collector'
+local collector = require 'core.collector' 'searcher'
 local util      = require 'utility'
 
 local TRACE        = TRACE
@@ -24,8 +24,6 @@ local sfind        = string.find
 local sformat      = string.format
 
 local getUri       = guide.getUri
-
-local ceach        = collector.each
 
 local getState     = files.getState
 
@@ -817,7 +815,7 @@ function m.searchRefsByID(status, suri, expect, mode)
         or mode == 'alldef'
         or field
         or hasCall(field) then
-            for _, guri in ceach(suri, 'def:' .. id) do
+            for _, guri in collector:each(suri, 'def:' .. id) do
                 if uri == guri then
                     goto CONTINUE
                 end
@@ -826,14 +824,14 @@ function m.searchRefsByID(status, suri, expect, mode)
             end
         elseif mode == 'field'
         or     mode == 'allfield' then
-            for _, guri in ceach(suri, 'def:' .. id) do
+            for _, guri in collector:each(suri, 'def:' .. id) do
                 if uri == guri then
                     goto CONTINUE
                 end
                 searchID(guri, id, field, uri)
                 ::CONTINUE::
             end
-            for _, guri in ceach(suri, 'field:' .. id) do
+            for _, guri in collector:each(suri, 'field:' .. id) do
                 if uri == guri then
                     goto CONTINUE
                 end
@@ -841,7 +839,7 @@ function m.searchRefsByID(status, suri, expect, mode)
                 ::CONTINUE::
             end
         else
-            for _, guri in ceach(suri, id) do
+            for _, guri in collector:each(suri, id) do
                 if crossed[guri] then
                     goto CONTINUE
                 end
@@ -869,7 +867,7 @@ function m.searchRefsByID(status, suri, expect, mode)
         or ignoredIDs[id]
         or id == 'dn:string'
         or hasCall(field) then
-            for _, guri in ceach(suri, 'def:' .. id) do
+            for _, guri in collector:each(suri, 'def:' .. id) do
                 if uri == guri then
                     goto CONTINUE
                 end
@@ -877,7 +875,7 @@ function m.searchRefsByID(status, suri, expect, mode)
                 ::CONTINUE::
             end
         else
-            for _, guri in ceach(suri, id) do
+            for _, guri in collector:each(suri, id) do
                 if crossed[guri] then
                     goto CONTINUE
                 end

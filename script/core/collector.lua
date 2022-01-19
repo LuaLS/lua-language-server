@@ -1,28 +1,29 @@
 local scope = require 'workspace.scope'
-local ws    = require 'workspace'
 
-local collect    = {}
-local subscribed = {}
-
-local m = {}
+---@class collector
+---@field subscribed table<uri, table<string, any>>
+---@field collect table<string, table<uri, any>>
+local mt = {}
+mt.__index = mt
 
 --- 订阅一个名字
 ---@param uri uri
 ---@param name string
 ---@param value any
-function m.subscribe(uri, name, value)
+function mt:subscribe(uri, name, value)
+    uri = uri or '<fallback>'
     -- 订阅部分
-    local uriSubscribed = subscribed[uri]
+    local uriSubscribed = self.subscribed[uri]
     if not uriSubscribed then
         uriSubscribed = {}
-        subscribed[uri] = uriSubscribed
+        self.subscribed[uri] = uriSubscribed
     end
     uriSubscribed[name] = true
     -- 收集部分
-    local nameCollect = collect[name]
+    local nameCollect = self.collect[name]
     if not nameCollect then
         nameCollect = {}
-        collect[name] = nameCollect
+        self.collect[name] = nameCollect
     end
     if value == nil then
         value = true
@@ -32,27 +33,33 @@ end
 
 --- 丢弃掉某个 uri 中收集的所有信息
 ---@param uri uri
-function m.dropUri(uri)
-    local uriSubscribed = subscribed[uri]
+function mt:dropUri(uri)
+    uri = uri or '<fallback>'
+    local uriSubscribed = self.subscribed[uri]
     if not uriSubscribed then
         return
     end
-    subscribed[uri] = nil
+    self.subscribed[uri] = nil
     for name in pairs(uriSubscribed) do
-        collect[name][uri] = nil
+        self.collect[name][uri] = nil
     end
+end
+
+function mt:dropAll()
+    self.subscribed = {}
+    self.collect    = {}
 end
 
 --- 是否包含某个名字的订阅
 ---@param name string
 ---@return boolean
-function m.has(name)
-    local nameCollect = collect[name]
+function mt:has(name)
+    local nameCollect = self.collect[name]
     if not nameCollect then
         return false
     end
     if next(nameCollect) == nil then
-        collect[name] = nil
+        self.collect[name] = nil
         return false
     end
     return true
@@ -139,8 +146,9 @@ end
 --- 迭代某个名字的订阅
 ---@param uri  uri
 ---@param name string
-function m.each(uri, name)
-    local nameCollect = collect[name]
+function mt:each(uri, name)
+    uri = uri or '<fallback>'
+    local nameCollect = self.collect[name]
     if not nameCollect then
         return DUMMY_FUNCTION
     end
@@ -160,4 +168,21 @@ function m.each(uri, name)
     return eachOfFallback(nameCollect, scope.fallback)
 end
 
-return m
+local collectors = {}
+
+local function new()
+    return setmetatable({
+        collect    = {},
+        subscribed = {},
+    }, mt)
+end
+
+---@return collector
+return function (name)
+    if name then
+        collectors[name] = collectors[name] or new()
+        return collectors[name]
+    else
+        return new()
+    end
+end

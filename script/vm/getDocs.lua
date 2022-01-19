@@ -3,7 +3,7 @@ local guide     = require 'parser.guide'
 ---@class vm
 local vm        = require 'vm.vm'
 local config    = require 'config'
-local collector = require 'core.collector'
+local collector = require 'core.collector' 'searcher'
 local define    = require 'proto.define'
 local noder     = require 'core.noder'
 
@@ -17,7 +17,7 @@ function vm.getDocDefines(uri, name)
     end
     local results = {}
     if name == '*' then
-        for noders in collector.each(uri, 'def:dn:') do
+        for noders in collector:each(uri, 'def:dn:') do
             for id in noder.eachID(noders) do
                 if  id:sub(1, 3) == 'dn:'
                 and not id:find(noder.SPLIT_CHAR) then
@@ -31,7 +31,7 @@ function vm.getDocDefines(uri, name)
         end
     else
         local id = 'dn:' .. name
-        for noders in collector.each(uri, 'def:' .. id) do
+        for noders in collector:each(uri, 'def:' .. id) do
             for source in noder.eachSource(noders, id) do
                 if source.type == 'doc.class.name'
                 or source.type == 'doc.alias.name' then
@@ -49,7 +49,7 @@ function vm.isDocDefined(name)
         return true
     end
     local id = 'def:dn:' .. name
-    if collector.has(id) then
+    if collector:has(id) then
         return true
     end
     return false

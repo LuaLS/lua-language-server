@@ -3,9 +3,16 @@ local files     = require 'files'
 local furi      = require 'file-uri'
 local workspace = require "workspace"
 local config    = require 'config'
+local collector = require 'core.collector' 'require-path'
+
+---@class require-path
 local m = {}
 
-m.cache = {}
+local function addRequireName(suri, uri, name)
+    local separator    = config.get(uri, 'Lua.completion.requireSeparator')
+    local fsname = name:gsub('%' .. separator, '/')
+    collector:subscribe(suri, fsname, uri)
+end
 
 --- `aaa/bbb/ccc.lua` 与 `?.lua` 将返回 `aaa.bbb.cccc`
 local function getOnePath(uri, path, searcher)
@@ -33,9 +40,11 @@ function m.getVisiblePath(suri, path)
     path = workspace.normalize(path)
     local uri = furi.encode(path)
     local libraryPath = files.getLibraryPath(uri)
-    if not m.cache[path] then
+    local scp = workspace.getScope(suri)
+    local cache = scp:get('visiblePath') or scp:set('visiblePath', {})
+    if not cache[path] then
         local result = {}
-        m.cache[path] = result
+        cache[path] = result
         if libraryPath then
             libraryPath = libraryPath:gsub('^[/\\]+', '')
         end
@@ -73,11 +82,12 @@ function m.getVisiblePath(suri, path)
                         searcher = mySearcher,
                         expect   = expect,
                     }
+                    addRequireName(suri, uri, expect)
                 end
             until not pos or strict
         end
     end
-    return m.cache[path]
+    return cache[path]
 end
 
 --- 查找符合指定require path的所有uri
@@ -88,11 +98,6 @@ function m.findUrisByRequirePath(suri, path)
     end
     local separator = config.get(suri, 'Lua.completion.requireSeparator')
     local fspath = path:gsub('%' .. separator, '/')
-    local vm    = require 'vm'
-    local cache = vm.getCache 'findUrisByRequirePath'
-    if cache[path] then
-        return cache[path].results, cache[path].searchers
-    end
     tracy.ZoneBeginN('findUrisByRequirePath')
     local results = {}
     local searchers = {}
@@ -105,7 +110,7 @@ function m.findUrisByRequirePath(suri, path)
         end
     end
 
-    for uri in files.eachFile() do
+    for uri in collector:each(suri, fspath) do
         local infos = m.getVisiblePath(suri, furi.decode(uri))
         for _, info in ipairs(infos) do
             local fsexpect = info.expect:gsub('%' .. separator, '/')
@@ -117,21 +122,37 @@ function m.findUrisByRequirePath(suri, path)
     end
 
     tracy.ZoneEnd()
-    cache[path] = {
-        results   = results,
-        searchers = searchers,
-    }
     return results, searchers
 end
 
-function m.flush()
-    m.cache = {}
+local function createVisiblePath(uri)
+    for _, scp in ipairs(workspace.folders) do
+        m.getVisiblePath(scp.uri, furi.decode(uri))
+    end
+    m.getVisiblePath(nil, furi.decode(uri))
 end
 
-files.watch(function (ev)
-    if ev == 'create'
-    or ev == 'remove' then
-        m.flush()
+function m.flush(suri)
+    local scp = workspace.getScope(suri)
+    scp:set('visiblePath', {})
+    collector:dropAll()
+    for uri in files.eachFile() do
+        createVisiblePath(uri)
+    end
+end
+
+m.flush(nil)
+
+files.watch(function (ev, uri)
+    if ev == 'create' then
+        createVisiblePath(uri)
+    end
+    if ev == 'remove' then
+        for _, scp in ipairs(workspace.folders) do
+            scp:get('visiblePath')[uri] = nil
+        end
+        workspace.getScope(nil):get('visiblePath')[uri] = nil
+        collector:dropUri(uri)
     end
 end)
 
@@ -139,7 +160,7 @@ config.watch(function (uri, key, value, oldValue)
     if key == 'Lua.completion.requireSeparator'
     or key == 'Lua.runtime.path'
     or key == 'Lua.runtime.pathStrict' then
-        m.flush()
+        m.flush(uri)
     end
 end)
 

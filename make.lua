@@ -11,7 +11,7 @@ if platform.OS == 'macOS' then
     elseif lm.platform == "darwin-arm64" then
         lm.target = "arm64-apple-macos11"
     elseif lm.platform == "darwin-x64" then
-        lm.target = "x86_64-apple-macos10.15"
+        lm.target = "x86_64-apple-macos10.12"
     else
         error "unknown platform"
     end

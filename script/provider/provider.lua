@@ -954,6 +954,36 @@ m.register 'textDocument/formatting' {
     end
 }
 
+m.register 'textDocument/rangeFormatting' {
+    abortByFileUpdate = true,
+    ---@async
+    function(params)
+        local uri = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
+        local _<close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
+
+        if not files.exists(uri) then
+            return nil
+        end
+
+        local core = require 'core.rangeformatting'
+        local edits = core(uri, params.range)
+        if not edits or #edits == 0 then
+            return nil
+        end
+
+        local results = {}
+        for i, edit in ipairs(edits) do
+            results[i] = {
+                range   = converter.packRange(uri, edit.start, edit.finish),
+                newText = edit.text,
+            }
+        end
+
+        return results
+    end
+}
+
 m.register 'config/editorconfig/update' {
     abortByFileUpdate = true,
     ---@async

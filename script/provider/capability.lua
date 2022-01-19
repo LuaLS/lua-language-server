@@ -112,7 +112,8 @@ function m.getIniter()
             range = true,
             full  = false,
         },
-        documentFormattingProvider = true
+        documentFormattingProvider = true,
+        documentRangeFormattingProvider = true
         --documentOnTypeFormattingProvider = {
         --    firstTriggerCharacter = '}',
         --},

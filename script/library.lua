@@ -87,6 +87,7 @@ end
 
 local function compileSingleMetaDoc(uri, script, metaLang, status)
     if not script then
+        log.error('no meta?', uri)
         return nil
     end
 
@@ -247,6 +248,7 @@ local function initBuiltIn(uri)
             out:saveFile(libName, metaDoc)
             local outputPath = metaPath / libName
             m.metaPaths[outputPath:string()] = true
+            log.info('Meta path:', outputPath:string())
         end
         ::CONTINUE::
     end

@@ -8,6 +8,14 @@
 local mt = {}
 mt.__index = mt
 
+function mt:__tostring()
+    if self.uri then
+        return ('{scope|%s|%s}'):format(self.type, self.uri)
+    else
+        return ('{scope|%s}'):format(self.type)
+    end
+end
+
 ---@param uri uri
 function mt:addLink(uri)
     self._links[uri] = true

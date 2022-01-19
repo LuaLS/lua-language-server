@@ -160,6 +160,7 @@ function m.getLibraryMatchers(scp)
     if scp:get 'libraryMatcher' then
         return scp:get 'libraryMatcher'
     end
+    log.info('Build library matchers:', scp)
 
     local librarys = {}
     for path in pairs(config.get(scp.uri, 'Lua.workspace.library')) do
@@ -168,7 +169,7 @@ function m.getLibraryMatchers(scp)
             librarys[m.normalize(path)] = true
         end
     end
-    -- TODO
+    log.info('meta path:', scp:get 'metaPath')
     if scp:get 'metaPath' then
         librarys[m.normalize(scp:get 'metaPath')] = true
     end
@@ -189,6 +190,7 @@ function m.getLibraryMatchers(scp)
     end
 
     scp:set('libraryMatcher', matchers)
+    log.debug('library matcher:', util.dump(matchers))
 
     return matchers
 end

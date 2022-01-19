@@ -79,24 +79,21 @@ local function main()
 
     log.print = true
 
-    for _, os in ipairs {'Windows', 'Linux', 'macOS'} do
-        require 'bee.platform'.OS = os
-        ---@async
-        lclient():start(function (client)
-            client:registerFakers()
-            client:initialize()
+    ---@async
+    lclient():start(function (client)
+        client:registerFakers()
+        client:initialize()
 
-            ws.awaitReady()
+        ws.awaitReady()
 
-            print('Loaded files in', os)
-            for uri in files.eachFile() do
-                print(uri)
-            end
-            print('===============')
+        print('Loaded files in', os)
+        for uri in files.eachFile() do
+            print(uri)
+        end
+        print('===============')
 
-            testAll()
-        end)
-    end
+        testAll()
+    end)
 
     test 'tclient'
     test 'full'

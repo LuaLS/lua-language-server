@@ -688,8 +688,8 @@ TEST {
     }
 }
 
-local originOS = platform.OS
-platform.OS = 'Linux'
+
+if platform.OS == 'Linux' then
 
 TEST {
     {
@@ -742,7 +742,8 @@ TEST {
         ]]
     }
 }
-platform.OS = originOS
+
+end
 
 local originRuntimePath = config.get(nil, 'Lua.runtime.path')
 config.set(nil, 'Lua.runtime.path', {

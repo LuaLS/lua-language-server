@@ -3510,7 +3510,7 @@ function ngx.redirect(uri, status) end
 ---
 ---@param callback fun()
 ---@return boolean ok
----@return string? error
+---@return string|'"lua_check_client_abort is off"'|'"duplicate call"' error
 function ngx.on_abort(callback) end
 
 
@@ -4214,7 +4214,7 @@ ngx.resp = {}
 ---@param max_headers number
 ---@param raw boolean
 ---@return table<string, string|string[]>
----@return string? error
+---@return string|'"truncated"' error
 function ngx.resp.get_headers(max_headers, raw) end
 
 

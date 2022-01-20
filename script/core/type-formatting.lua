@@ -2,8 +2,8 @@ local files        = require 'files'
 local lookBackward = require 'core.look-backward'
 local guide        = require "parser.guide"
 local code_format  = require "code_format"
-local log          = require("server.script.log")
-local converter = require("server.script.proto.converter")
+local log          = require "log"
+local converter    = require "proto.converter"
 
 local function insertIndentation(uri, position, edits)
     local text   = files.getText(uri)

@@ -78,10 +78,10 @@ local function checkSplitOneLine(results, uri, position, ch)
     -- for _, edit in ipairs(edits) do
     --     results[#results+1] = edit
     -- end
-
+    local pos = converter.packPosition(uri, position)
     local text = files.getText(uri)
     local status, formattedText, startLine, endLine = code_format.range_format(
-        uri, text, position.line - 1, position.line)
+        uri, text, pos.line - 1, pos.line)
 
     if not status then
         if formattedText ~= nil then

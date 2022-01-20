@@ -11,7 +11,7 @@ clienthello.version = require("resty.core.base").version
 ---
 ---Note that the SNI name is gotten from the raw extensions of the client hello message associated with the current downstream SSL connection.
 ---
----So this function can only be called in the context of [ssl_client_hello_by_lua*](https://github.com/openresty/lua-nginx-module/#ssl_client_hello_by_lua_block).
+---So this function can only be called in the context of `ssl_client_hello_by_lua*`.
 ---@return string? host
 ---@return string? error
 function clienthello.get_client_hello_server_name() end
@@ -25,7 +25,7 @@ function clienthello.get_client_hello_server_name() end
 ---
 --- Note that the ext is gotten from the raw extensions of the client hello message associated with the current downstream SSL connection.
 ---
---- So this function can only be called in the context of [ssl_client_hello_by_lua*](https://github.com/openresty/lua-nginx-module/#ssl_client_hello_by_lua_block).
+--- So this function can only be called in the context of `ssl_client_hello_by_lua*`.
 ---
 --- Example:
 ---
@@ -86,9 +86,13 @@ function clienthello.get_client_hello_ext(ext_type) end
 --- Returns `true` on success, or a `nil` value and a string describing the error otherwise.
 ---
 --- Considering it is meaningless to set ssl protocols after the protocol is determined,
---- so this function may only be called in the context of [ssl_client_hello_by_lua*](https://github.com/openresty/lua-nginx-module/#ssl_client_hello_by_lua_block).
+--- so this function may only be called in the context of `ssl_client_hello_by_lua*`.
 ---
---- Example: `ssl_clt.set_protocols({"TLSv1.1", "TLSv1.2", "TLSv1.3"})`
+--- Example:
+--- ```lua
+---  ssl_clt.set_protocols({"TLSv1.1", "TLSv1.2", "TLSv1.3"})`
+--- ```
+---
 ---@param protocols string[]
 ---@return boolean ok
 ---@return string? error

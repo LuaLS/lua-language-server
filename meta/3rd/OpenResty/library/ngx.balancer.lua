@@ -43,8 +43,6 @@ function balancer.set_current_peer(addr, port) end
 ---
 --- For the best performance, you should use the OpenResty bundle.
 ---
---- This function was first added in the 0.1.7 version of this library.
----
 ---@param  connect_timeout? number
 ---@param  send_timeout?    number
 ---@param  read_timeout?    number
@@ -112,8 +110,6 @@ function balancer.set_more_tries(count) end
 --- often or memory leaks may be noticeable. Even so, a call to this function
 --- should be made only if you know the request buffer must be regenerated,
 --- instead of unconditionally in each balancer retries.
----
---- This function was first added in the 0.1.20 version of this library.
 ---
 ---@return boolean ok
 ---@return string? error

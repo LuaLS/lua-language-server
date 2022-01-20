@@ -5,9 +5,6 @@ local process = {
 
 --- Returns a number value for the nginx master process's process ID (or PID).
 ---
---- This function requires NGINX 1.13.8+ cores to work properly. Otherwise it returns nil.
----
---- This feature first appeared in lua-resty-core v0.1.14.
 ---@return integer? pid
 function process.get_master_pid() end
 

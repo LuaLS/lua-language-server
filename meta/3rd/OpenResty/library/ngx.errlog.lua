@@ -16,8 +16,6 @@ function errlog.get_sys_filter_level() end
 ---
 --- This API should always work with directive `lua_capture_error_log`.
 ---
---- See Nginx log level constants for all nginx log levels.
----
 ---@param  level   ngx.log.level
 ---@return boolean ok
 ---@return string? err

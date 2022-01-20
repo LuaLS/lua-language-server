@@ -934,7 +934,119 @@ function ngx.quote_sql_str(raw_value) end
 
 ngx.re = {}
 
---- Similar to [ngx.re.match](#ngxrematch) but only returns the beginning index (`from`) and end index (`to`) of the matched substring. The returned indexes are 1-based and can be fed directly into the [string.sub](https://www.lua.org/manual/5.1/manual.html#pdf-string.sub) API function to obtain the matched substring.
+
+--- PCRE regex options string
+---
+--- This is a string made up of single-letter PCRE option names, usable in all `ngx.re.*` functions.
+---
+--- Options:
+---
+--- a - anchored mode (only match from the beginning)
+--- d - enable the DFA mode (or the longest token match semantics).
+--- D - enable duplicate named pattern support. This allows named subpattern names to be repeated, returning the captures in an array-like Lua table.
+--- i - case insensitive mode
+--- j - enable PCRE JIT compilation. For optimum performance, this option should always be used together with the 'o' option.
+--- J - enable the PCRE Javascript compatible mode
+--- m - multi-line mode
+--- o - compile-once mode, to enable the worker-process-level compiled-regex cache
+--- s - single-line mode
+--- u - UTF-8 mode.
+--- U - similar to "u" but disables PCRE's UTF-8 validity check on the subject string
+--- x - extended mode
+---
+--- These options can be combined:
+---
+--- ```lua
+---  local m, err = ngx.re.match("hello, world", "HEL LO", "ix")
+---  -- m[0] == "hello"
+--- ```
+---
+--- ```lua
+---  local m, err = ngx.re.match("hello, 美好生活", "HELLO, (.{2})", "iu")
+---  -- m[0] == "hello, 美好"
+---  -- m[1] == "美好"
+--- ```
+---
+--- The `o` option is useful for performance tuning, because the regex pattern in question will only be compiled once, cached in the worker-process level, and shared among all requests in the current Nginx worker process. The upper limit of the regex cache can be tuned via the `lua_regex_cache_max_entries` directive.
+---
+---@alias ngx.re.options string
+
+
+--- ngx.re.match capture table
+---
+--- This table may have both integer and string keys.
+---
+--- `captures[0]` is special and contains the whole substring match
+---
+--- `captures[1]` through `captures[n]` contain the values of unnamed, parenthesized sub-pattern captures
+---
+--- ```lua
+---  local m, err = ngx.re.match("hello, 1234", "[0-9]+")
+---  if m then
+---      -- m[0] == "1234"
+---
+---  else
+---      if err then
+---          ngx.log(ngx.ERR, "error: ", err)
+---          return
+---      end
+---
+---      ngx.say("match not found")
+---  end
+--- ```
+---
+--- ```lua
+---  local m, err = ngx.re.match("hello, 1234", "([0-9])[0-9]+")
+---  -- m[0] == "1234"
+---  -- m[1] == "1"
+--- ```
+---
+--- Named captures are stored with string keys corresponding to the capture name (e.g. `captures["my_capture_name"]`) _in addition to_ their sequential integer key (`captures[n]`):
+---
+--- ```lua
+---  local m, err = ngx.re.match("hello, 1234", "([0-9])(?<remaining>[0-9]+)")
+---  -- m[0] == "1234"
+---  -- m[1] == "1"
+---  -- m[2] == "234"
+---  -- m["remaining"] == "234"
+--- ```
+---
+--- Unmatched captures (named or unnamed) take the value `false`.
+---
+--- ```lua
+---  local m, err = ngx.re.match("hello, world", "(world)|(hello)|(?<named>howdy)")
+---  -- m[0] == "hello"
+---  -- m[1] == false
+---  -- m[2] == "hello"
+---  -- m[3] == false
+---  -- m["named"] == false
+--- ```
+---
+---@alias ngx.re.captures table<integer|string, string|string[]|'false'>
+
+--- ngx.re.match context table
+---
+--- A Lua table holding an optional `pos` field. When the `pos` field in the `ctx` table argument is specified, `ngx.re.match` will start matching from that offset (starting from 1). Regardless of the presence of the `pos` field in the `ctx` table, `ngx.re.match` will always set this `pos` field to the position *after* the substring matched by the whole pattern in case of a successful match. When match fails, the `ctx` table will be left intact.
+---
+--- ```lua
+---  local ctx = {}
+---  local m, err = ngx.re.match("1234, hello", "[0-9]+", "", ctx)
+---       -- m[0] = "1234"
+---       -- ctx.pos == 5
+--- ```
+---
+--- ```lua
+---  local ctx = { pos = 2 }
+---  local m, err = ngx.re.match("1234, hello", "[0-9]+", "", ctx)
+---       -- m[0] = "234"
+---       -- ctx.pos == 5
+--- ```
+---
+---@class ngx.re.ctx : table
+---@field pos? integer
+
+
+--- Similar to `ngx.re.match` but only returns the beginning index (`from`) and end index (`to`) of the matched substring. The returned indexes are 1-based and can be fed directly into the `string.sub` API function to obtain the matched substring.
 ---
 --- In case of errors (like bad regexes or any PCRE runtime errors), this API function returns two `nil` values followed by a string describing the error.
 ---
@@ -965,12 +1077,11 @@ ngx.re = {}
 ---     to: 11
 ---     matched: 1234
 ---
---- Because this API function does not create new Lua strings nor new Lua tables, it is much faster than [ngx.re.match](#ngxrematch). It should be used wherever possible.
+--- Because this API function does not create new Lua strings nor new Lua tables, it is much faster than `ngx.re.match`. It should be used wherever possible.
 ---
---- Since the `0.9.3` release, an optional 5th argument, `nth`, is supported to specify which (submatch) capture's indexes to return. When `nth` is 0 (which is the default), the indexes for the whole matched substring is returned; when `nth` is 1, then the 1st submatch capture's indexes are returned; when `nth` is 2, then the 2nd submatch capture is returned, and so on. When the specified submatch does not have a match, then two `nil` values will be returned. Below is an example for this:
+--- The optional 5th argument, `nth`, allows the caller to specify which (submatch) capture's indexes to return. When `nth` is 0 (which is the default), the indexes for the whole matched substring is returned; when `nth` is 1, then the 1st submatch capture's indexes are returned; when `nth` is 2, then the 2nd submatch capture is returned, and so on. When the specified submatch does not have a match, then two `nil` values will be returned. Below is an example for this:
 ---
 --- ```lua
----
 ---  local str = "hello, 1234"
 ---  local from, to = ngx.re.find(str, "([0-9])([0-9]+)", "jo", nil, 2)
 ---  if from then
@@ -978,24 +1089,24 @@ ngx.re = {}
 ---  end
 --- ```
 ---
---- This API function was first introduced in the `v0.9.2` release.
----
----@param subject string
----@param regex string
----@param options string@see ngx.re.match
----@param ctx table@see ngx.re.match
----@param nth number
----@return number,number,string@from, to, err
+---@param  subject  string
+---@param  regex    string
+---@param  options  ngx.re.options
+---@param  ctx?     ngx.re.ctx
+---@param  nth?     integer
+---@return integer? from
+---@return integer? to
+---@return string?  error
 function ngx.re.find(subject, regex, options, ctx, nth) end
 
---- Similar to [ngx.re.match](#ngxrematch), but returns a Lua iterator instead, so as to let the user programmer iterate all the matches over the `<subject>` string argument with the PCRE `regex`.
+
+--- Similar to `ngx.re.match`, but returns a Lua iterator instead, so as to let the user programmer iterate all the matches over the `<subject>` string argument with the PCRE `regex`.
 ---
 --- In case of errors, like seeing an ill-formed regular expression, `nil` and a string describing the error will be returned.
 ---
 --- Here is a small example to demonstrate its basic usage:
 ---
 --- ```lua
----
 ---  local iterator, err = ngx.re.gmatch("hello, world!", "([a-z]+)", "i")
 ---  if not iterator then
 ---      ngx.log(ngx.ERR, "error: ", err)
@@ -1025,7 +1136,6 @@ function ngx.re.find(subject, regex, options, ctx, nth) end
 --- More often we just put it into a Lua loop:
 ---
 --- ```lua
----
 ---  local it, err = ngx.re.gmatch("hello, world!", "([a-z]+)", "i")
 ---  if not it then
 ---      ngx.log(ngx.ERR, "error: ", err)
@@ -1050,137 +1160,21 @@ function ngx.re.find(subject, regex, options, ctx, nth) end
 ---  end
 --- ```
 ---
---- The optional `options` argument takes exactly the same semantics as the [ngx.re.match](#ngxrematch) method.
----
 --- The current implementation requires that the iterator returned should only be used in a single request. That is, one should *not* assign it to a variable belonging to persistent namespace like a Lua package.
 ---
---- This method requires the PCRE library enabled in Nginx ([Known Issue With Special Escaping Sequences](#special-escaping-sequences)).
+---@alias ngx.re.gmatch.iterator fun():string,string
 ---
---- This feature was first introduced in the `v0.2.1rc12` release.
----
----@alias re.gmatch.iterator fun():string,string
----@param subject string
----@param regex string@see ngx.re.match
----@param options string@see ngx.re.match
----@return re.gmatch.iterator,string@iterator,err
+---@param  subject                 string
+---@param  regex                   string
+---@param  options                 ngx.re.options
+---@return ngx.re.gmatch.iterator? iterator
+---@return string?                 error
 function ngx.re.gmatch(subject, regex, options) end
 
 
 --- Matches the `subject` string using the Perl compatible regular expression `regex` with the optional `options`.
 ---
 --- Only the first occurrence of the match is returned, or `nil` if no match is found. In case of errors, like seeing a bad regular expression or exceeding the PCRE stack limit, `nil` and a string describing the error will be returned.
----
---- When a match is found, a Lua table `captures` is returned, where `captures[0]` holds the whole substring being matched, and `captures[1]` holds the first parenthesized sub-pattern's capturing, `captures[2]` the second, and so on.
----
---- ```lua
----
----  local m, err = ngx.re.match("hello, 1234", "[0-9]+")
----  if m then
----      -- m[0] == "1234"
----
----  else
----      if err then
----          ngx.log(ngx.ERR, "error: ", err)
----          return
----      end
----
----      ngx.say("match not found")
----  end
---- ```
----
---- ```lua
----
----  local m, err = ngx.re.match("hello, 1234", "([0-9])[0-9]+")
----  -- m[0] == "1234"
----  -- m[1] == "1"
---- ```
----
---- Named captures are also supported since the `v0.7.14` release
---- and are returned in the same Lua table as key-value pairs as the numbered captures.
----
---- ```lua
----
----  local m, err = ngx.re.match("hello, 1234", "([0-9])(?<remaining>[0-9]+)")
----  -- m[0] == "1234"
----  -- m[1] == "1"
----  -- m[2] == "234"
----  -- m["remaining"] == "234"
---- ```
----
---- Unmatched subpatterns will have `false` values in their `captures` table fields.
----
---- ```lua
----
----  local m, err = ngx.re.match("hello, world", "(world)|(hello)|(?<named>howdy)")
----  -- m[0] == "hello"
----  -- m[1] == false
----  -- m[2] == "hello"
----  -- m[3] == false
----  -- m["named"] == false
---- ```
----
---- Specify `options` to control how the match operation will be performed. The following option characters are supported:
----
----
----     a             anchored mode (only match from the beginning)
----
----     d             enable the DFA mode (or the longest token match semantics).
----                   this requires PCRE 6.0+ or else a Lua exception will be thrown.
----                   first introduced in ngx_lua v0.3.1rc30.
----
----     D             enable duplicate named pattern support. This allows named
----                   subpattern names to be repeated, returning the captures in
----                   an array-like Lua table. for example,
----                     local m = ngx.re.match("hello, world",
----                                            "(?<named>\w+), (?<named>\w+)",
----                                            "D")
----                     -- m["named"] == {"hello", "world"}
----                   this option was first introduced in the v0.7.14 release.
----                   this option requires at least PCRE 8.12.
----
----     i             case insensitive mode (similar to Perl's /i modifier)
----
----     j             enable PCRE JIT compilation, this requires PCRE 8.21+ which
----                   must be built with the --enable-jit option. for optimum performance,
----                   this option should always be used together with the 'o' option.
----                   first introduced in ngx_lua v0.3.1rc30.
----
----     J             enable the PCRE Javascript compatible mode. this option was
----                   first introduced in the v0.7.14 release. this option requires
----                   at least PCRE 8.12.
----
----     m             multi-line mode (similar to Perl's /m modifier)
----
----     o             compile-once mode (similar to Perl's /o modifier),
----                   to enable the worker-process-level compiled-regex cache
----
----     s             single-line mode (similar to Perl's /s modifier)
----
----     u             UTF-8 mode. this requires PCRE to be built with
----                   the --enable-utf8 option or else a Lua exception will be thrown.
----
----     U             similar to "u" but disables PCRE's UTF-8 validity check on
----                   the subject string. first introduced in ngx_lua v0.8.1.
----
----     x             extended mode (similar to Perl's /x modifier)
----
----
---- These options can be combined:
----
---- ```nginx
----
----  local m, err = ngx.re.match("hello, world", "HEL LO", "ix")
----  -- m[0] == "hello"
---- ```
----
---- ```nginx
----
----  local m, err = ngx.re.match("hello, 美好生活", "HELLO, (.{2})", "iu")
----  -- m[0] == "hello, 美好"
----  -- m[1] == "美好"
---- ```
----
---- The `o` option is useful for performance tuning, because the regex pattern in question will only be compiled once, cached in the worker-process level, and shared among all requests in the current Nginx worker process. The upper limit of the regex cache can be tuned via the [lua_regex_cache_max_entries](#lua_regex_cache_max_entries) directive.
 ---
 --- The optional fourth argument, `ctx`, can be a Lua table holding an optional `pos` field. When the `pos` field in the `ctx` table argument is specified, `ngx.re.match` will start matching from that offset (starting from 1). Regardless of the presence of the `pos` field in the `ctx` table, `ngx.re.match` will always set this `pos` field to the position *after* the substring matched by the whole pattern in case of a successful match. When match fails, the `ctx` table will be left intact.
 ---
@@ -1204,32 +1198,22 @@ function ngx.re.gmatch(subject, regex, options) end
 ---
 --- Note that, the `options` argument is not optional when the `ctx` argument is specified and that the empty Lua string (`""`) must be used as placeholder for `options` if no meaningful regex options are required.
 ---
---- This method requires the PCRE library enabled in Nginx ([Known Issue With Special Escaping Sequences](#special-escaping-sequences)).
+--- The optional 5th argument, `res_table`, allows the caller to supply the Lua table used to hold all the capturing results. Starting from `0.9.6`, it is the caller's responsibility to ensure this table is empty. This is very useful for recycling Lua tables and saving GC and table allocation overhead.
 ---
---- To confirm that PCRE JIT is enabled, activate the Nginx debug log by adding the `--with-debug` option to Nginx or OpenResty's `./configure` script. Then, enable the "debug" error log level in `error_log` directive. The following message will be generated if PCRE JIT is enabled:
----
----
----     pcre JIT compiling result: 1
----
----
---- Starting from the `0.9.4` release, this function also accepts a 5th argument, `res_table`, for letting the caller supply the Lua table used to hold all the capturing results. Starting from `0.9.6`, it is the caller's responsibility to ensure this table is empty. This is very useful for recycling Lua tables and saving GC and table allocation overhead.
----
---- This feature was introduced in the `v0.2.1rc11` release.
----
----@param subject string
----@param regex string
----@param options string
----@param ctx table
----@param res_table table
----@return table<number,string>,err @captures, err
-function ngx.re.match(subject, regex, options, ctx, res_table) end
+---@param  subject          string
+---@param  regex            string
+---@param  options          ngx.re.options
+---@param  ctx?             ngx.re.ctx
+---@param  res?             ngx.re.captures
+---@return ngx.re.captures? captures
+---@return string?          error
+function ngx.re.match(subject, regex, options, ctx, res) end
 
---- Just like [ngx.re.sub](#ngxresub), but does global substitution.
+--- Just like `ngx.re.sub`, but does global substitution.
 ---
 --- Here is some examples:
 ---
 --- ```lua
----
 ---  local newstr, n, err = ngx.re.gsub("hello, world", "([a-z])[a-z]+", "[$0,$1]", "i")
 ---  if newstr then
 ---      -- newstr == "[hello,h], [world,w]"
@@ -1241,7 +1225,6 @@ function ngx.re.match(subject, regex, options, ctx, res_table) end
 --- ```
 ---
 --- ```lua
----
 ---  local func = function (m)
 ---      return "[" .. m[0] .. "," .. m[1] .. "]"
 ---  end
@@ -1250,26 +1233,18 @@ function ngx.re.match(subject, regex, options, ctx, res_table) end
 ---      -- n == 2
 --- ```
 ---
---- This method requires the PCRE library enabled in Nginx ([Known Issue With Special Escaping Sequences](#special-escaping-sequences)).
----
---- This feature was first introduced in the `v0.2.1rc15` release.
----
----@param subject string
----@param regex string
----@param replace string
----@param options string
----@return string,number,string @newStr,n,err
+---@param  subject  string
+---@param  regex    string
+---@param  replace  ngx.re.replace
+---@param  options  ngx.re.options
+---@return string?  new
+---@return integer? n
+---@return string?  error
 function ngx.re.gsub(subject, regex, replace, options) end
 
-
---- Substitutes the first match of the Perl compatible regular expression `regex` on the `subject` argument string with the string or function argument `replace`. The optional `options` argument has exactly the same meaning as in [ngx.re.match](#ngxrematch).
----
---- This method returns the resulting new string as well as the number of successful substitutions. In case of failures, like syntax errors in the regular expressions or the `<replace>` string argument, it will return `nil` and a string describing the error.
----
---- When the `replace` is a string, then it is treated as a special template for string replacement. For example,
+--- When `replace` is string, then it is treated as a special template for string replacement:
 ---
 --- ```lua
----
 ---  local newstr, n, err = ngx.re.sub("hello, 1234", "([0-9])[0-9]", "[$0][$1]")
 ---  if newstr then
 ---      -- newstr == "hello, [12][1]34"
@@ -1280,32 +1255,30 @@ function ngx.re.gsub(subject, regex, replace, options) end
 ---  end
 --- ```
 ---
---- where `$0` referring to the whole substring matched by the pattern and `$1` referring to the first parenthesized capturing substring.
+--- ...where `$0` refers to the whole substring matched by the pattern, and `$1` referring to the first parenthesized capturing substring.
 ---
 --- Curly braces can also be used to disambiguate variable names from the background string literals:
 ---
 --- ```lua
----
 ---  local newstr, n, err = ngx.re.sub("hello, 1234", "[0-9]", "${0}00")
 ---      -- newstr == "hello, 100234"
 ---      -- n == 1
 --- ```
 ---
---- Literal dollar sign characters (`$`) in the `replace` string argument can be escaped by another dollar sign, for instance,
+--- Literal dollar sign characters (`$`) in the `replace` string argument can be escaped by another dollar sign:
 ---
 --- ```lua
----
 ---  local newstr, n, err = ngx.re.sub("hello, 1234", "[0-9]", "$$")
 ---      -- newstr == "hello, $234"
 ---      -- n == 1
 --- ```
 ---
 --- Do not use backlashes to escape dollar signs; it will not work as expected.
----
---- When the `replace` argument is of type "function", then it will be invoked with the "match table" as the argument to generate the replace string literal for substitution. The "match table" fed into the `replace` function is exactly the same as the return value of [ngx.re.match](#ngxrematch). Here is an example:
+---@alias ngx.re.replace.string string
+
+--- When `replace` is a function, it will be invoked with the capture table as the argument to generate the replace string literal for substitution. The capture table fed into the `replace` function is exactly the same as the return value of [ngx.re.match](#ngxrematch). Here is an example:
 ---
 --- ```lua
----
 ---  local func = function (m)
 ---      return "[" .. m[0] .. "][" .. m[1] .. "]"
 ---  end
@@ -1316,16 +1289,23 @@ function ngx.re.gsub(subject, regex, replace, options) end
 ---
 --- The dollar sign characters in the return value of the `replace` function argument are not special at all.
 ---
---- This method requires the PCRE library enabled in Nginx ([Known Issue With Special Escaping Sequences](#special-escaping-sequences)).
+---@alias ngx.re.replace.fn fun(m:ngx.re.captures):string
+
+---@alias ngx.re.replace ngx.re.replace.string|ngx.re.replace.fn
+
+--- Substitutes the first match of the Perl compatible regular expression `regex` on the `subject` argument string with the string or function argument `replace`.
 ---
---- This feature was first introduced in the `v0.2.1rc13` release.
+--- This method returns the resulting new string as well as the number of successful substitutions. In case of failures, like syntax errors in the regular expressions or the `<replace>` string argument, it will return `nil` and a string describing the error.
 ---
----@param subject string
----@param regex string
----@param replace string
----@param options string
----@return string,number,string @newStr,n,err
+---@param  subject  string
+---@param  regex    string
+---@param  replace  ngx.re.replace
+---@param  options  ngx.re.options
+---@return string?  new
+---@return integer? n
+---@return string?  error
 function ngx.re.sub(subject, regex, replace, options) end
+
 
 --- Decodes the `str` argument as a base64 digest to the raw form. Returns `nil` if `str` is not well formed.
 ---

@@ -7,25 +7,28 @@ local await  = require 'await'
 ---@class plugin
 local m = {}
 
-function m.showError(err)
+function m.showError(scp, err)
     if m._hasShowedError then
         return
     end
     m._hasShowedError = true
-    client.showMessage('Error', lang.script('PLUGIN_RUNTIME_ERROR', m.pluginPath, err))
+    client.showMessage('Error', lang.script('PLUGIN_RUNTIME_ERROR', scp:get('pluginPath'), err))
 end
 
-function m.dispatch(event, ...)
-    if not m.interface then
+function m.dispatch(event, uri, ...)
+    local ws = require 'workspace'
+    local scp = ws.getScope(uri)
+    local interface = scp:get('pluginInterface')
+    if not interface then
         return false
     end
-    local method = m.interface[event]
+    local method = interface[event]
     if type(method) ~= 'function' then
         return false
     end
     local clock = os.clock()
     tracy.ZoneBeginN('plugin dispatch:' .. event)
-    local suc, res1, res2 = xpcall(method, log.error, ...)
+    local suc, res1, res2 = xpcall(method, log.error, uri, ...)
     tracy.ZoneEnd()
     local passed = os.clock() - clock
     if passed > 0.1 then
@@ -34,36 +37,34 @@ function m.dispatch(event, ...)
     if suc then
         return true, res1, res2
     else
-        m.showError(res1)
+        m.showError(scp, res1)
     end
     return false, res1
 end
 
-function m.isReady()
-    return m.interface ~= nil
-end
-
 ---@async
-local function checkTrustLoad()
+---@param scp scope
+local function checkTrustLoad(scp)
+    local pluginPath = scp:get('pluginPath')
     local filePath = LOGPATH .. '/trusted'
     local trusted = util.loadFile(filePath)
     local lines = {}
     if trusted then
         for line in util.eachLine(trusted) do
             lines[#lines+1] = line
-            if line == m.pluginPath then
+            if line == pluginPath then
                 return true
             end
         end
     end
-    local _, index = client.awaitRequestMessage('Warning', lang.script('PLUGIN_TRUST_LOAD', m.pluginPath), {
+    local _, index = client.awaitRequestMessage('Warning', lang.script('PLUGIN_TRUST_LOAD', pluginPath), {
         lang.script('PLUGIN_TRUST_YES'),
         lang.script('PLUGIN_TRUST_NO'),
     })
     if not index then
         return false
     end
-    lines[#lines+1] = m.pluginPath
+    lines[#lines+1] = pluginPath
     util.saveFile(filePath, table.concat(lines, '\n'))
     return true
 end
@@ -72,7 +73,8 @@ end
 function m.init(scp)
     await.call(function () ---@async
         local ws    = require 'workspace'
-        m.interface = {}
+        local interface = {}
+        scp:set('pluginInterface', interface)
 
         local pluginPath = ws.getAbsolutePath(scp.uri, config.get(scp.uri, 'Lua.runtime.plugin'))
         log.info('plugin path:', pluginPath)
@@ -83,20 +85,22 @@ function m.init(scp)
         if not pluginLua then
             return
         end
-        m.pluginPath = pluginPath
-        local env = setmetatable(m.interface, { __index = _ENV })
+
+        scp:set('pluginPath', pluginPath)
+
+        local env = setmetatable(interface, { __index = _ENV })
         local f, err = load(pluginLua, '@'..pluginPath, "t", env)
         if not f then
             log.error(err)
-            m.showError(err)
+            m.showError(scp, err)
             return
         end
-        if not client.isVSCode() and not checkTrustLoad() then
+        if not client.isVSCode() and not checkTrustLoad(scp) then
             return
         end
         local suc, err = xpcall(f, log.error, f)
         if not suc then
-            m.showError(err)
+            m.showError(scp, err)
             return
         end
 

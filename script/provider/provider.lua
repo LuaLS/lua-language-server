@@ -103,9 +103,9 @@ m.register 'initialize' {
 
         if params.initializationOptions then
             if params.initializationOptions.editorConfigFiles then
-                local code_format = require "code_format"
+                local codeFormat = require "code_format"
                 for _, config in pairs(params.initializationOptions.editorConfigFiles) do
-                    local status, err = code_format.update_config(1, config.workspace, config.path)
+                    local status, err = codeFormat.update_config(1, config.workspace, config.path)
 
                     if not status and err ~= nil then
                         log.error(err)

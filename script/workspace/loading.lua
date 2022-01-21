@@ -6,6 +6,7 @@ local config   = require 'config.config'
 local client   = require 'client'
 local util     = require 'utility'
 local furi     = require 'file-uri'
+local pub      = require 'pub'
 
 ---@class workspace.loading
 ---@field scp scope
@@ -75,14 +76,18 @@ function mt:loadFile(uri, libraryUri)
         end
         self.max = self.max + 1
         self:update()
+        ---@async
         self._stash[#self._stash+1] = function ()
-            self.read = self.read + 1
             if files.getFile(uri) then
+                self.read = self.read + 1
+                self:update()
+                self._cache[uri] = true
                 files.addRef(uri)
                 log.info(('Skip loaded file: %s'):format(uri))
                 return
             end
-            local content = util.loadFile(furi.decode(uri))
+            local content = pub.awaitTask('loadFile', furi.decode(uri))
+            self.read = self.read + 1
             self:update()
             if not content then
                 return
@@ -102,14 +107,18 @@ function mt:loadFile(uri, libraryUri)
     elseif files.isDll(uri) then
         self.max = self.max + 1
         self:update()
+        ---@async
         self._stash[#self._stash+1] = function ()
-            self.read = self.read + 1
             if files.getFile(uri) then
+                self.read = self.read + 1
+                self:update()
+                self._cache[uri] = true
                 files.addRef(uri)
                 log.info(('Skip loaded file: %s'):format(uri))
                 return
             end
-            local content = util.loadFile(furi.decode(uri))
+            local content = pub.awaitTask('loadFile', furi.decode(uri))
+            self.read = self.read + 1
             self:update()
             if not content then
                 return
@@ -129,28 +138,23 @@ function mt:loadFile(uri, libraryUri)
     await.delay()
 end
 
----@async
 function mt:loadStashed(max)
     for _ = 1, max do
         local loader = table.remove(self._stash)
         if not loader then
-            return false
+            return
         end
-        loader()
-        await.delay()
+        await.call(loader)
     end
-    return true
 end
 
 ---@async
 function mt:loadAll()
-    while true do
+    while self.read < self.max do
         log.info(('Loaded %d/%d files'):format(self.read, self.max))
-        local suc = self:loadStashed(10)
+        self:loadStashed(100)
         self:update()
-        if not suc then
-            break
-        end
+        await.sleep(0.1)
     end
     log.info('Loaded finish.')
 end

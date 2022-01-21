@@ -3,6 +3,7 @@ local util    = require 'utility'
 local proto   = require 'proto'
 local await   = require 'await'
 local timer   = require 'timer'
+local pub     = require 'pub'
 
 require 'provider'
 
@@ -36,6 +37,23 @@ function mt:_flushServer()
     files.reset()
 end
 
+function mt:_localLoadFile()
+    local awaitTask = pub.awaitTask
+    ---@async
+    ---@param name   string
+    ---@param params any
+    pub.awaitTask = function (name, params)
+        if name == 'loadFile' then
+            local path = params
+            return util.loadFile(path)
+        end
+        return awaitTask(name, params)
+    end
+    self:gc(function ()
+        pub.awaitTask = awaitTask
+    end)
+end
+
 ---@async
 function mt:initialize(params)
     self:awaitRequest('initialize', params or {})
@@ -60,6 +78,7 @@ end
 function mt:start(callback)
     self:_fakeProto()
     self:_flushServer()
+    self:_localLoadFile()
 
     local finished = false
 

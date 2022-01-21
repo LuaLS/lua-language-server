@@ -24,3 +24,7 @@ brave.on('timer', function (time)
         brave.push('wakeup')
     end
 end)
+
+brave.on('loadFile', function (path)
+    return util.loadFile(path)
+end)

@@ -930,7 +930,7 @@ m.register 'textDocument/formatting' {
     function(params)
         local uri = files.getRealUri(params.textDocument.uri)
         workspace.awaitReady(uri)
-        local _<close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
+        local _ <close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
 
         if not files.exists(uri) then
             return nil
@@ -960,7 +960,7 @@ m.register 'textDocument/rangeFormatting' {
     function(params)
         local uri = files.getRealUri(params.textDocument.uri)
         workspace.awaitReady(uri)
-        local _<close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
+        local _ <close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
 
         if not files.exists(uri) then
             return nil

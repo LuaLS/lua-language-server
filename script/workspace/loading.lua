@@ -76,8 +76,13 @@ function mt:loadFile(uri, libraryUri)
         self.max = self.max + 1
         self:update()
         self._stash[#self._stash+1] = function ()
-            local content = util.loadFile(furi.decode(uri))
             self.read = self.read + 1
+            if files.getFile(uri) then
+                files.addRef(uri)
+                log.info(('Skip loaded file: %s'):format(uri))
+                return
+            end
+            local content = util.loadFile(furi.decode(uri))
             self:update()
             if not content then
                 return
@@ -98,8 +103,13 @@ function mt:loadFile(uri, libraryUri)
         self.max = self.max + 1
         self:update()
         self._stash[#self._stash+1] = function ()
-            local content = util.loadFile(furi.decode(uri))
             self.read = self.read + 1
+            if files.getFile(uri) then
+                files.addRef(uri)
+                log.info(('Skip loaded file: %s'):format(uri))
+                return
+            end
+            local content = util.loadFile(furi.decode(uri))
             self:update()
             if not content then
                 return

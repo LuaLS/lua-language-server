@@ -988,8 +988,8 @@ m.register 'config/editorconfig/update' {
     abortByFileUpdate = true,
     ---@async
     function(params)
-        local code_format = require "code_format"
-        local status, err = code_format.update_config(params.type, params.source.workspace, params.source.path)
+        local codeFormat = require "code_format"
+        local status, err = codeFormat.update_config(params.type, params.source.workspace, params.source.path)
 
         if not status and err ~= nil then
             log.error(err)

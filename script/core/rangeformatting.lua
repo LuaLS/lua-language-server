@@ -1,11 +1,11 @@
-local code_format = require "code_format"
+local codeFormat = require("code_format")
 local files = require("files")
 local log = require("log")
 local converter = require("proto.converter")
 
 return function(uri, range)
     local text = files.getText(uri)
-    local status, formattedText, startLine, endLine = code_format.range_format(
+    local status, formattedText, startLine, endLine = codeFormat.range_format(
         uri, text, range.start.line, range["end"].line)
 
     if not status then

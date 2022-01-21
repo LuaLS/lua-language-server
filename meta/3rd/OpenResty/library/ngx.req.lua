@@ -9,8 +9,6 @@ req.version = require("resty.core.base").version
 ---
 ---The `header_value` argument can either be a string or a non-empty, array-like table. A nil or empty table value will cause this function to throw an error.
 ---
----This feature was first introduced in the v0.1.18 release.
----
 ---@param header_name string            must be a non-empty string.
 ---@param header_value string|string[]
 function req.add_header(header_name, header_value) end

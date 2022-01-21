@@ -21,8 +21,6 @@ function ssl.set_der_priv_key(der_priv_key) end
 ---
 --- This function can be called in any context.
 ---
---- This function was first added in version 0.1.7.
----
 ---@param pem_priv_key string
 ---@return string? priv_key
 ---@return string? error
@@ -51,8 +49,6 @@ function ssl.get_tls1_version() end
 ---
 --- Note that this set_cert function will run slightly faster, in terms of CPU cycles wasted, than the set_der_cert variant, since the first function uses opaque cdata pointers which do not require any additional conversion needed to be performed by the SSL library during the SSL handshake.
 ---
---- This function was first added in version 0.1.7.
----
 ---@param cert_chain string
 ---@return boolean ok
 ---@return string? error
@@ -66,8 +62,6 @@ ssl.TLS1_VERSION=769
 --- Returns true on success, or a nil value and a string describing the error otherwise.
 ---
 --- Note that this set_priv_key function will run slightly faster, in terms of CPU cycles wasted, than the set_der_priv_key variant, since the first function uses opaque cdata pointers which do not require any additional conversion needed to be performed by the SSL library during the SSL handshake.
----
---- This function was first added in version 0.1.7.
 ---
 ---@param priv_key string
 ---@return boolean ok
@@ -166,8 +160,6 @@ function ssl.clear_certs() end
 ---
 --- This function can be called in any context where downstream https is used.
 ---
---- This function was first introduced in lua-resty-core 0.1.14.
----
 ---@return string?            addr_data
 ---@return ngx.ssl.addr_type? addr_type
 ---@return string?            error
@@ -181,8 +173,6 @@ function ssl.raw_client_addr() end
 --- You can always use libraries like lua-resty-lrucache to cache the cdata result.
 ---
 --- This function can be called in any context.
----
---- This function was first added in version 0.1.7.
 ---
 ---@return string? cert_chain
 ---@return string? error
@@ -286,7 +276,7 @@ function ssl.cert_pem_to_der(pem_cert_chain) end
 ---
 --- This function was first added in version 0.1.20.
 ---
----@param  ca_certs? # the CA certificate chain opaque pointer returned by the parse_pem_cert function for the current SSL connection. The list of certificates will be sent to clients. Also, they will be added to trusted store. If omitted, will not send any CA certificate to clients.
+---@param  ca_certs? any # the CA certificate chain opaque pointer returned by the parse_pem_cert function for the current SSL connection. The list of certificates will be sent to clients. Also, they will be added to trusted store. If omitted, will not send any CA certificate to clients.
 ---@param  depth?  number verification depth in the client certificates chain. If omitted, will use the value specified by ssl_verify_depth.
 ---@return boolean ok
 ---@return string? error

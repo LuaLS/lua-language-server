@@ -26,10 +26,6 @@ re.version = require("resty.core.base").version
 ---
 --- The `jit_stack_size` cannot be set to a value lower than PCRE's default of 32K.
 ---
---- This method requires the PCRE library enabled in Nginx.
----
---- This feature was first introduced in the v0.1.12 release.
----
 ---@param option string '"jit_stack_size"'
 ---@param value any
 function re.opt(option, value) end
@@ -56,15 +52,6 @@ function re.opt(option, value) end
 ---
 --- local res, err = ngx_re.split("abcd", "")
 --- -- res is now {"a", "b", "c", "d"}
----```
----
---- The optional ctx table argument can be a Lua table holding an optional pos field. When the pos field in the ctx table argument is specified, `split()` will start splitting the subject from that index:
----
----```lua
---- local ngx_re = require "ngx.re"
----
---- local res, err = ngx_re.split("a,b,c,d", ",", nil, {pos = 5})
---- -- res is now {"c", "d"}
 ---```
 ---
 --- The optional max argument is a number that when specified, will prevent `split()` from adding more than max matches to the res array:
@@ -104,8 +91,8 @@ function re.opt(option, value) end
 ---
 ---@param  subj      string
 ---@param  regex     string
----@param  opts      string
----@param  ctx?      table    a Lua table holding an optional `pos` field
+---@param  opts      ngx.re.options
+---@param  ctx?      ngx.re.ctx
 ---@param  max?      number
 ---@param  res?      string[]
 ---@return string[]? res

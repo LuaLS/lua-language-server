@@ -47,7 +47,7 @@ function semaphore:count() end
 ---
 ---@param  timeout? number
 ---@return boolean  ok
----@return string?  error
+---@return string|'"timeout"'  error
 function semaphore:wait(timeout) end
 
 

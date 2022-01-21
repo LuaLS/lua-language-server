@@ -129,7 +129,7 @@ local proc = {}
 ---
 ---@param write_timeout?       number
 ---@param stdout_read_timeout? number
----@param write_timeout?       number
+---@param stderr_read_timeout? number
 ---@param wait_timeout?        number
 function proc:set_timeouts(write_timeout, stdout_read_timeout, stderr_read_timeout, wait_timeout) end
 

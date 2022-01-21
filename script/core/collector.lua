@@ -42,6 +42,9 @@ function mt:dropUri(uri)
     self.subscribed[uri] = nil
     for name in pairs(uriSubscribed) do
         self.collect[name][uri] = nil
+        if not next(self.collect[name]) then
+            self.collect[name] = nil
+        end
     end
 end
 

@@ -884,7 +884,7 @@ local function collectRequireNames(mode, myUri, literal, source, smark, position
             if myUri == uri then
                 goto CONTINUE
             end
-            local path = workspace.getRelativePath(uri)
+            local path = furi.decode(uri)
             local infos = rpath.getVisiblePath(uri, path)
             for _, info in ipairs(infos) do
                 if matchKey(literal, info.expect) then

@@ -3,7 +3,7 @@ local files     = require 'files'
 local furi      = require 'file-uri'
 local workspace = require "workspace"
 local config    = require 'config'
-local collector = require 'core.collector' 'require-path'
+local collector = require 'core.collector'
 
 ---@class require-path
 local m = {}
@@ -11,7 +11,10 @@ local m = {}
 local function addRequireName(suri, uri, name)
     local separator    = config.get(uri, 'Lua.completion.requireSeparator')
     local fsname = name:gsub('%' .. separator, '/')
-    collector:subscribe(suri, fsname, uri)
+    local scp = workspace.getScope(suri)
+    ---@type collector
+    local clt = scp:get('requireName') or scp:set('requireName', collector())
+    clt:subscribe(uri, fsname, name)
 end
 
 --- `aaa/bbb/ccc.lua` 与 `?.lua` 将返回 `aaa.bbb.cccc`
@@ -110,13 +113,17 @@ function m.findUrisByRequirePath(suri, path)
         end
     end
 
-    for uri in collector:each(suri, fspath) do
-        local infos = m.getVisiblePath(suri, furi.decode(uri))
-        for _, info in ipairs(infos) do
-            local fsexpect = info.expect:gsub('%' .. separator, '/')
-            if fsexpect == fspath then
-                results[#results+1] = uri
-                searchers[uri] = info.searcher
+    ---@type collector
+    local clt = workspace.getScope(suri):get('requireName')
+    if clt then
+        for _, uri in clt:each(suri, fspath) do
+            local infos = m.getVisiblePath(suri, furi.decode(uri))
+            for _, info in ipairs(infos) do
+                local fsexpect = info.expect:gsub('%' .. separator, '/')
+                if fsexpect == fspath then
+                    results[#results+1] = uri
+                    searchers[uri] = info.searcher
+                end
             end
         end
     end
@@ -132,12 +139,27 @@ local function createVisiblePath(uri)
     m.getVisiblePath(nil, furi.decode(uri))
 end
 
+local function removeVisiblePath(uri)
+    local path = furi.decode(uri)
+    path = workspace.normalize(path)
+    for _, scp in ipairs(workspace.folders) do
+        scp:get('visiblePath')[path] = nil
+        scp:get('requireName'):dropUri(uri)
+    end
+    workspace.getScope(nil):get('visiblePath')[path] = nil
+    workspace.getScope(nil):get('requireName'):dropUri(uri)
+end
+
 function m.flush(suri)
     local scp = workspace.getScope(suri)
     scp:set('visiblePath', {})
-    collector:dropAll()
+    ---@type collector
+    local clt = scp:get('requireName')
+    if clt then
+        clt:dropAll()
+    end
     for uri in files.eachFile() do
-        createVisiblePath(uri)
+        m.getVisiblePath(scp.uri, furi.decode(uri))
     end
 end
 
@@ -148,11 +170,7 @@ files.watch(function (ev, uri)
         createVisiblePath(uri)
     end
     if ev == 'remove' then
-        for _, scp in ipairs(workspace.folders) do
-            scp:get('visiblePath')[uri] = nil
-        end
-        workspace.getScope(nil):get('visiblePath')[uri] = nil
-        collector:dropUri(uri)
+        removeVisiblePath(uri)
     end
 end)
 

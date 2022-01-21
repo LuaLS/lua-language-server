@@ -13,6 +13,7 @@ local furi     = require 'file-uri'
 ---@field _stash function[]
 ---@field _refs uri[]
 ---@field _cache table<uri, boolean>
+---@field _removed boolean
 local mt = {}
 mt.__index = mt
 
@@ -20,6 +21,10 @@ mt._loadLock = false
 mt.read      = 0
 mt.max       = 0
 mt.preload   = 0
+
+function mt:__close()
+    self:remove()
+end
 
 function mt:update()
     self._bar:setMessage(('%d/%d'):format(self.read, self.max))
@@ -114,45 +119,49 @@ function mt:loadFile(uri, libraryUri)
     await.delay()
 end
 
-function mt:loadStashed()
-    self:update()
-    if self._loadLock then
-        return
-    end
-    self._loadLock = true
-    ---@async
-    await.call(function ()
-        while true do
-            local loader = table.remove(self._stash)
-            if not loader then
-                break
-            end
-            loader()
-            await.delay()
+---@async
+function mt:loadStashed(max)
+    for _ = 1, max do
+        local loader = table.remove(self._stash)
+        if not loader then
+            return false
         end
-        self._loadLock = false
-    end)
+        loader()
+        await.delay()
+    end
+    return true
 end
 
 ---@async
 function mt:loadAll()
-    while self.read < self.max do
+    while true do
         log.info(('Loaded %d/%d files'):format(self.read, self.max))
-        self:loadStashed()
-        await.sleep(0.1)
+        local suc = self:loadStashed(10)
+        self:update()
+        if not suc then
+            break
+        end
     end
+    log.info('Loaded finish.')
 end
 
 function mt:remove()
+    if self._removed then
+        return
+    end
+    self._removed = true
     self._bar:remove()
 end
 
-function mt:__close()
-    self:remove()
+function mt:isRemoved()
+    return self._removed == true
 end
 
 ---@class workspace.loading.manager
 local m = {}
+
+---@type table<workspace.loading, boolean>
+m._loadings = setmetatable({}, { __mode = 'k' })
 
 ---@return workspace.loading
 function m.create(scp)
@@ -163,7 +172,20 @@ function m.create(scp)
         _cache = {},
     }, mt)
     scp:set('cachedUris', loading._cache)
+    m._loadings[loading] = true
     return loading
+end
+
+function m.count()
+    local num = 0
+    for ld in pairs(m._loadings) do
+        if ld:isRemoved() then
+            m._loadings[ld] = nil
+        else
+            num = num + 1
+        end
+    end
+    return num
 end
 
 return m

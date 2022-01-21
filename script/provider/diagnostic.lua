@@ -10,6 +10,7 @@ local ws        = require 'workspace'
 local progress  = require "progress"
 local client    = require 'client'
 local converter = require 'proto.converter'
+local loading   = require 'workspace.loading'
 
 ---@class diagnosticProvider
 local m = {}
@@ -364,8 +365,13 @@ function m.diagnosticsScope(uri, force)
                 askForDisable(uri)
             end)
         end)
-        local uris = files.getAllUris()
+        local scp = ws.getScope(uri)
+        local uris = files.getAllUris(scp)
+        log.info(('diagnostics scope [%s], files count:[%d]'):format(scp, #uris))
         for i, uri in ipairs(uris) do
+            while loading.count() > 0 do
+                await.sleep(1.0)
+            end
             bar:setMessage(('%d/%d'):format(i, #uris))
             bar:setPercentage(i / #uris * 100)
             xpcall(m.doDiagnostic, log.error, uri, true)

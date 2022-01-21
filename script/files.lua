@@ -417,20 +417,20 @@ function m.remove(uri)
 end
 
 --- 获取一个包含所有文件uri的数组
+---@param scp? scope
 ---@return uri[]
-function m.getAllUris()
-    local files = m._pairsCache
+function m.getAllUris(scp)
+    local files = {}
     local i = 0
-    if not files then
-        files = {}
-        m._pairsCache = files
-        for uri in pairs(m.fileMap) do
+    for uri in pairs(m.fileMap) do
+        if not scp
+        or scp:isChildUri(uri)
+        or scp:isLinkedUri(uri) then
             i = i + 1
             files[i] = uri
         end
-        table.sort(files)
     end
-    return m._pairsCache
+    return files
 end
 
 --- 遍历文件

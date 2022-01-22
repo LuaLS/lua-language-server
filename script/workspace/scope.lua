@@ -123,7 +123,7 @@ end
 ---@return scope
 function m.getFolder(uri)
     for _, scope in ipairs(m.folders) do
-        if not uri or scope:isChildUri(uri) then
+        if scope:isChildUri(uri) then
             return scope
         end
     end

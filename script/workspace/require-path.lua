@@ -164,6 +164,9 @@ function m.flush(suri)
     end
 end
 
+for _, scp in ipairs(scope.folders) do
+    m.flush(scp.uri)
+end
 m.flush(nil)
 
 files.watch(function (ev, uri)

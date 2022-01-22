@@ -4,6 +4,7 @@ local proto   = require 'proto'
 local await   = require 'await'
 local timer   = require 'timer'
 local pub     = require 'pub'
+local json    = require 'json'
 
 require 'provider'
 
@@ -152,7 +153,12 @@ end
 ---@async
 function mt:awaitRequest(method, params)
     return await.wait(function (waker)
-        self:request(method, params, waker)
+        self:request(method, params, function (result)
+            if result == json.null then
+                result = nil
+            end
+            waker(result)
+        end)
     end)
 end
 

@@ -3065,5 +3065,5 @@ TEST [[
 require '<??>'
 ]]
 (function (results)
-    assert(#results == 11)
+    assert(#results == 11, require 'utility'.dump(results))
 end)

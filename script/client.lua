@@ -7,6 +7,7 @@ local config    = require 'config'
 local converter = require 'proto.converter'
 local json      = require 'json-beautify'
 local await     = require 'await'
+local scope     = require 'workspace.scope'
 
 local m = {}
 
@@ -204,8 +205,7 @@ end
 ---@param changes config.change[]
 ---@return boolean
 local function applyConfig(cfg, uri, changes)
-    local ws = require 'workspace'
-    local scp = ws.getScope(uri)
+    local scp = scope.getScope(uri)
     local ok = false
     for _, change in ipairs(changes) do
         if scp:isChildUri(change.uri)
@@ -222,8 +222,7 @@ local function tryModifySpecifiedConfig(uri, finalChanges)
         return false
     end
     local workspace = require 'workspace'
-    local loader    = require 'config.loader'
-    local scp = workspace.getScope(uri)
+    local scp = scope.getScope(uri)
     if scp:get('lastLocalType') ~= 'json' then
         return false
     end
@@ -249,7 +248,7 @@ local function tryModifyRC(uri, finalChanges, create)
     if not buf and not create then
         return false
     end
-    local scp = workspace.getScope(uri)
+    local scp = scope.getScope(uri)
     local rc = scp:get('lastRCConfig') or {
         ['$schema'] = lang.id == 'zh-cn' and [[https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema-zh-cn.json]] or [[https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json]]
     }
@@ -268,8 +267,7 @@ local function tryModifyClient(uri, finalChanges)
     if not m.getOption 'changeConfiguration' then
         return false
     end
-    local ws = require 'workspace'
-    local scp = ws.getScope(uri)
+    local scp = scope.getScope(uri)
     local scpChanges = {}
     for _, change in ipairs(finalChanges) do
         if  change.uri

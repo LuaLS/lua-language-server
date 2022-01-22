@@ -3,6 +3,7 @@ local util   = require 'utility'
 local client = require 'client'
 local lang   = require 'language'
 local await  = require 'await'
+local scope  = require 'workspace.scope'
 
 ---@class plugin
 local m = {}
@@ -16,8 +17,7 @@ function m.showError(scp, err)
 end
 
 function m.dispatch(event, uri, ...)
-    local ws = require 'workspace'
-    local scp = ws.getScope(uri)
+    local scp = scope.getScope(uri)
     local interface = scp:get('pluginInterface')
     if not interface then
         return false

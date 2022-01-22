@@ -11,6 +11,7 @@ local progress  = require "progress"
 local client    = require 'client'
 local converter = require 'proto.converter'
 local loading   = require 'workspace.loading'
+local scope     = require 'workspace.scope'
 
 ---@class diagnosticProvider
 local m = {}
@@ -216,7 +217,7 @@ function m.doDiagnostic(uri, isScopeDiag)
     end
 
     local version = files.getVersion(uri)
-    local scp = ws.getScope(uri)
+    local scp = scope.getScope(uri)
 
     local prog <close> = progress.create(scp, lang.script.WINDOW_DIAGNOSING, 0.5)
     prog:setMessage(ws.getRelativePath(uri))
@@ -351,7 +352,7 @@ function m.diagnosticsScope(uri, force)
     if not force and delay < 0 then
         return
     end
-    local scp = ws.getScope(uri)
+    local scp = scope.getScope(uri)
     local id = 'diagnosticsScope:' .. scp:getName()
     await.close(id)
     await.call(function () ---@async
@@ -360,7 +361,7 @@ function m.diagnosticsScope(uri, force)
             await.sleep(1.0)
         end
         local clock = os.clock()
-        local bar <close> = progress.create(ws.getScope(uri), lang.script.WORKSPACE_DIAGNOSTIC, 1)
+        local bar <close> = progress.create(scope.getScope(uri), lang.script.WORKSPACE_DIAGNOSTIC, 1)
         local cancelled
         bar:onCancel(function ()
             log.debug('Cancel workspace diagnostics')

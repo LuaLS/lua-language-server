@@ -3,6 +3,7 @@ local proto     = require 'proto'
 local lang      = require 'language'
 local util      = require 'utility'
 local workspace = require 'workspace'
+local scope     = require 'workspace.scope'
 
 local function errorMessage(msg)
     proto.notify('window/showMessage', {
@@ -16,7 +17,7 @@ end
 local m = {}
 
 function m.loadRCConfig(uri, filename)
-    local scp  = workspace.getScope(uri)
+    local scp  = scope.getScope(uri)
     local path = workspace.getAbsolutePath(uri, filename)
     if not path then
         scp:set('lastRCConfig', nil)
@@ -37,7 +38,7 @@ function m.loadRCConfig(uri, filename)
 end
 
 function m.loadLocalConfig(uri, filename)
-    local scp  = workspace.getScope(uri)
+    local scp  = scope.getScope(uri)
     local path = workspace.getAbsolutePath(uri, filename)
     if not path then
         scp:set('lastLocalConfig', nil)

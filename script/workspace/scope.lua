@@ -37,7 +37,7 @@ function mt:isChildUri(uri)
         return false
     end
     if not self.uri then
-        return true
+        return false
     end
     return uri:sub(1, #self.uri) == self.uri
 end
@@ -144,6 +144,14 @@ function m.getLinkedScope(uri)
     if m.fallback:isLinkedUri(uri) then
         return m.fallback
     end
+end
+
+---@param uri uri
+---@return scope
+function m.getScope(uri)
+    return m.getFolder(uri)
+        or m.getLinkedScope(uri)
+        or m.fallback
 end
 
 return m

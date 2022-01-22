@@ -59,7 +59,7 @@ end
 m.reset()
 
 function m.getRootUri(uri)
-    local scp = m.getScope(uri)
+    local scp = scope.getScope(uri)
     return scp.uri
 end
 
@@ -199,7 +199,7 @@ end
 ---@async
 ---@param uri uri
 function m.isIgnored(uri)
-    local scp    = m.getScope(uri)
+    local scp    = scope.getScope(uri)
     local path   = m.getRelativePath(uri)
     local ignore = m.getNativeMatcher(scp)
     if not ignore then
@@ -222,7 +222,7 @@ end
 
 ---@async
 function m.awaitLoadFile(uri)
-    local scp = m.getScope(uri)
+    local scp = scope.getScope(uri)
     local ld <close> = loading.create(scp)
     local native = m.getNativeMatcher(scp)
     log.info('Scan files at:', uri)
@@ -368,7 +368,7 @@ function m.getRelativePath(uriOrPath)
         path = uriOrPath
         uri  = furi.encode(uriOrPath)
     end
-    local scp = m.getScope(uri)
+    local scp = scope.getScope(uri)
     if not scp.uri then
         local relative = m.normalize(path)
         return relative:gsub('^[/\\]+', '')
@@ -443,14 +443,6 @@ function m.awaitReload(scp)
     m.onWatch('reload', scp.uri)
 end
 
----@param uri uri
----@return scope
-function m.getScope(uri)
-    return scope.getFolder(uri)
-        or scope.getLinkedScope(uri)
-        or scope.fallback
-end
-
 ---@return scope
 function m.getFirstScope()
     return m.folders[1] or scope.fallback
@@ -462,7 +454,7 @@ function m.awaitReady(uri)
     if m.isReady(uri) then
         return
     end
-    local scp = m.getScope(uri)
+    local scp = scope.getScope(uri)
     local waitingReady = scp:get('waitingReady')
                     or   scp:set('waitingReady', {})
     await.wait(function (waker)
@@ -472,12 +464,12 @@ end
 
 ---@param uri uri
 function m.isReady(uri)
-    local scp = m.getScope(uri)
+    local scp = scope.getScope(uri)
     return scp:get('ready') == true
 end
 
 function m.getLoadingProcess(uri)
-    local scp = m.getScope(uri)
+    local scp = scope.getScope(uri)
     ---@type workspace.loading
     local ld  = scp:get 'loading'
     if ld then
@@ -492,7 +484,7 @@ config.watch(function (uri, key, value, oldValue)
     or key:find '^Lua.workspace'
     or key:find '^files' then
         if value ~= oldValue then
-            m.reload(m.getScope(uri))
+            m.reload(scope.getScope(uri))
         end
     end
 end)
@@ -526,7 +518,7 @@ fw.event(function (changes) ---@async
                 -- 排除类文件发生更改需要重新扫描
                 if filename == '.gitignore'
                 or filename == '.gitmodules' then
-                    local scp = m.getScope(uri)
+                    local scp = scope.getScope(uri)
                     if scp.type ~= 'fallback' then
                         m.reload(scp)
                     end

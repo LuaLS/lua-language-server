@@ -4,6 +4,7 @@ local furi      = require 'file-uri'
 local workspace = require "workspace"
 local config    = require 'config'
 local collector = require 'core.collector'
+local scope     = require 'workspace.scope'
 
 ---@class require-path
 local m = {}
@@ -11,7 +12,7 @@ local m = {}
 local function addRequireName(suri, uri, name)
     local separator    = config.get(uri, 'Lua.completion.requireSeparator')
     local fsname = name:gsub('%' .. separator, '/')
-    local scp = workspace.getScope(suri)
+    local scp = scope.getScope(suri)
     ---@type collector
     local clt = scp:get('requireName') or scp:set('requireName', collector())
     clt:subscribe(uri, fsname, name)
@@ -43,7 +44,7 @@ function m.getVisiblePath(suri, path)
     path = workspace.normalize(path)
     local uri = furi.encode(path)
     local libraryPath = files.getLibraryPath(uri)
-    local scp = workspace.getScope(suri)
+    local scp = scope.getScope(suri)
     local cache = scp:get('visiblePath') or scp:set('visiblePath', {})
     if not cache[path] then
         local result = {}
@@ -114,7 +115,7 @@ function m.findUrisByRequirePath(suri, path)
     end
 
     ---@type collector
-    local clt = workspace.getScope(suri):get('requireName')
+    local clt = scope.getScope(suri):get('requireName')
     if clt then
         for _, uri in clt:each(suri, fspath) do
             local infos = m.getVisiblePath(suri, furi.decode(uri))
@@ -146,12 +147,12 @@ local function removeVisiblePath(uri)
         scp:get('visiblePath')[path] = nil
         scp:get('requireName'):dropUri(uri)
     end
-    workspace.getScope(nil):get('visiblePath')[path] = nil
-    workspace.getScope(nil):get('requireName'):dropUri(uri)
+    scope.getScope(nil):get('visiblePath')[path] = nil
+    scope.getScope(nil):get('requireName'):dropUri(uri)
 end
 
 function m.flush(suri)
-    local scp = workspace.getScope(suri)
+    local scp = scope.getScope(suri)
     scp:set('visiblePath', {})
     ---@type collector
     local clt = scp:get('requireName')

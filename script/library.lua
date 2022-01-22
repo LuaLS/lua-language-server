@@ -12,6 +12,7 @@ local await   = require 'await'
 local timer   = require 'timer'
 local encoder = require 'encoder'
 local ws      = require 'workspace.workspace'
+local scope   = require 'workspace.scope'
 
 local m = {}
 
@@ -203,7 +204,7 @@ end
 
 local function initBuiltIn(uri)
     log.info('Init builtin library at:', uri)
-    local scp      = ws.getScope(uri)
+    local scp      = scope.getScope(uri)
     local langID   = lang.id
     local version  = config.get(uri, 'Lua.runtime.version')
     local encoding = config.get(uri, 'Lua.runtime.fileEncoding')

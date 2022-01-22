@@ -9,6 +9,7 @@
 * `FIX` modify luarc failed
 * `FIX` library files not recognized correctly
 * `FIX` [#906](https://github.com/sumneko/lua-language-server/issues/906)
+* `FIX` [#920](https://github.com/sumneko/lua-language-server/issues/920)
 
 ## 2.6.0
 `2022-1-13`

@@ -3060,3 +3060,10 @@ local t
 t:testFunc2(<??>)
 ]]
 (EXISTS)
+
+TEST [[
+require '<??>'
+]]
+(function (results)
+    assert(#results == 11)
+end)

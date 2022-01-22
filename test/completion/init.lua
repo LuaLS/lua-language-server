@@ -110,11 +110,15 @@ function TEST(script)
         end
         assert(result)
         result.complete = nil
-        if expect.include then
-            expect.include = nil
-            assert(include(expect, result))
+        if type(expect) == 'function' then
+            expect(result)
         else
-            assert(eq(expect, result))
+            if expect.include then
+                expect.include = nil
+                assert(include(expect, result))
+            else
+                assert(eq(expect, result))
+            end
         end
         files.remove('')
     end

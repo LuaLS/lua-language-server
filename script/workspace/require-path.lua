@@ -43,7 +43,7 @@ function m.getVisiblePath(suri, path)
     local strict    = config.get(suri, 'Lua.runtime.pathStrict')
     path = workspace.normalize(path)
     local uri = furi.encode(path)
-    local libraryPath = files.getLibraryPath(uri)
+    local libraryPath = furi.decode(files.getLibraryUri(uri))
     local scp = scope.getScope(suri)
     local cache = scp:get('visiblePath') or scp:set('visiblePath', {})
     if not cache[path] then
@@ -145,10 +145,18 @@ local function removeVisiblePath(uri)
     path = workspace.normalize(path)
     for _, scp in ipairs(workspace.folders) do
         scp:get('visiblePath')[path] = nil
-        scp:get('requireName'):dropUri(uri)
+        ---@type collector
+        local clt = scp:get('requireName')
+        if clt then
+            clt:dropUri(uri)
+        end
     end
-    scope.getScope(nil):get('visiblePath')[path] = nil
-    scope.getScope(nil):get('requireName'):dropUri(uri)
+    scope.fallback:get('visiblePath')[path] = nil
+    ---@type collector
+    local clt = scope.fallback:get('requireName')
+    if clt then
+        clt:dropUri(uri)
+    end
 end
 
 function m.flush(suri)

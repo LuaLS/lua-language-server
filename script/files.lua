@@ -362,7 +362,7 @@ end
 
 function m.getChildFiles(uri)
     local results = {}
-    local uris = m.getAllUris()
+    local uris = m.getAllUris(uri)
     for _, curi in ipairs(uris) do
         if  #curi > #uri
         and curi:sub(1, #uri) == uri
@@ -415,9 +415,10 @@ function m.remove(uri)
 end
 
 --- 获取一个包含所有文件uri的数组
----@param scp? scope
+---@param suri? uri
 ---@return uri[]
-function m.getAllUris(scp)
+function m.getAllUris(suri)
+    local scp = suri and scope.getScope(suri) or nil
     local files = {}
     local i = 0
     for uri in pairs(m.fileMap) do
@@ -432,8 +433,9 @@ function m.getAllUris(scp)
 end
 
 --- 遍历文件
-function m.eachFile()
-    local files = m.getAllUris()
+---@param suri? uri
+function m.eachFile(suri)
+    local files = m.getAllUris(suri)
     local i = 0
     return function ()
         i = i + 1

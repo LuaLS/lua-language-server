@@ -40,7 +40,7 @@ end
 
 local function getLinksTo(uri)
     local links = {}
-    for u in files.eachFile() do
+    for u in files.eachFile(uri) do
         local ls = getFileLinksOrCache(u)
         if ls[uri] then
             for _, l in ipairs(ls[uri]) do

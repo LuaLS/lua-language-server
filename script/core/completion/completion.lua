@@ -328,7 +328,7 @@ local function checkModule(state, word, position, results)
         return
     end
     local locals  = guide.getVisibleLocals(state.ast, position)
-    for uri in files.eachFile() do
+    for uri in files.eachFile(state.uri) do
         if uri == guide.getUri(state.ast) then
             goto CONTINUE
         end
@@ -647,7 +647,7 @@ local function checkCommon(state, word, position, results)
     end
     if config.get(state.uri, 'Lua.completion.workspaceWord') and #word >= 2 then
         local myHead = word:sub(1, 2)
-        for uri in files.eachFile() do
+        for uri in files.eachFile(state.uri) do
             if #results >= 100 then
                 results.incomplete = true
                 break
@@ -880,7 +880,7 @@ end
 local function collectRequireNames(mode, myUri, literal, source, smark, position, results)
     local collect = {}
     if mode == 'require' then
-        for uri in files.eachFile() do
+        for uri in files.eachFile(myUri) do
             if myUri == uri then
                 goto CONTINUE
             end
@@ -934,7 +934,7 @@ local function collectRequireNames(mode, myUri, literal, source, smark, position
             end
         end
     else
-        for uri in files.eachFile() do
+        for uri in files.eachFile(myUri) do
             if myUri == uri then
                 goto CONTINUE
             end

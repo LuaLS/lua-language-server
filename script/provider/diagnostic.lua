@@ -371,7 +371,7 @@ function m.diagnosticsScope(uri, force)
                 askForDisable(uri)
             end)
         end)
-        local uris = files.getAllUris(scp)
+        local uris = files.getAllUris(uri)
         log.info(('diagnostics scope [%s], files count:[%d]'):format(scp:getName(), #uris))
         for i, uri in ipairs(uris) do
             while loading.count() > 0 do

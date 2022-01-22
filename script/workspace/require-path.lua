@@ -159,7 +159,7 @@ function m.flush(suri)
     if clt then
         clt:dropAll()
     end
-    for uri in files.eachFile() do
+    for uri in files.eachFile(suri) do
         m.getVisiblePath(scp.uri, furi.decode(uri))
     end
 end

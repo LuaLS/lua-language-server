@@ -105,7 +105,7 @@ end
 ---@param libraryUri uri
 function m.setLibraryUri(scp, uri, libraryUri)
     scp:get 'libraryMap' [uri] = libraryUri
-    scp:addLink(uri)
+    scp:addLink(libraryUri)
 end
 
 --- 是否是库文件

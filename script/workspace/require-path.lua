@@ -43,15 +43,12 @@ function m.getVisiblePath(suri, path)
     local strict    = config.get(suri, 'Lua.runtime.pathStrict')
     path = workspace.normalize(path)
     local uri = furi.encode(path)
-    local libraryPath = furi.decode(files.getLibraryUri(uri))
+    local libraryPath = furi.decode(files.getLibraryUri(suri, uri))
     local scp = scope.getScope(suri)
     local cache = scp:get('visiblePath') or scp:set('visiblePath', {})
     if not cache[path] then
         local result = {}
         cache[path] = result
-        if libraryPath then
-            libraryPath = libraryPath:gsub('^[/\\]+', '')
-        end
         for _, searcher in ipairs(searchers) do
             local isAbsolute = searcher:match '^[/\\]'
                             or searcher:match '^%a+%:'

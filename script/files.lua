@@ -124,12 +124,11 @@ function m.isLibrary(uri)
 end
 
 --- 获取库文件的根目录
-function m.getLibraryUri(uri)
-    for _, scp in ipairs(scope.folders) do
-        local map = scp:get 'libraryMap'
-        if map and map[uri] ~= nil then
-            return map[uri]
-        end
+function m.getLibraryUri(suri, uri)
+    local scp = scope.getScope(suri)
+    local map = scp:get 'libraryMap'
+    if map and map[uri] ~= nil then
+        return map[uri]
     end
     return nil
 end

@@ -81,23 +81,21 @@ function mt:loadFile(uri, libraryUri)
             if files.getFile(uri) then
                 self.read = self.read + 1
                 self:update()
-                self._cache[uri] = true
-                files.addRef(uri)
                 log.info(('Skip loaded file: %s'):format(uri))
-                return
+            else
+                local content = pub.awaitTask('loadFile', furi.decode(uri))
+                if self._cache[uri] then
+                    return
+                end
+                self._cache[uri] = true
+                self.read = self.read + 1
+                self:update()
+                if not content then
+                    return
+                end
+                log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
+                files.setText(uri, content, false)
             end
-            local content = pub.awaitTask('loadFile', furi.decode(uri))
-            self.read = self.read + 1
-            self:update()
-            if not content then
-                return
-            end
-            if self._cache[uri] then
-                return
-            end
-            log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
-            self._cache[uri] = true
-            files.setText(uri, content, false)
             files.addRef(uri)
             if libraryUri then
                 log.info('++++As library of:', libraryUri)
@@ -112,23 +110,21 @@ function mt:loadFile(uri, libraryUri)
             if files.getFile(uri) then
                 self.read = self.read + 1
                 self:update()
-                self._cache[uri] = true
-                files.addRef(uri)
                 log.info(('Skip loaded file: %s'):format(uri))
-                return
+            else
+                local content = pub.awaitTask('loadFile', furi.decode(uri))
+                if self._cache[uri] then
+                    return
+                end
+                self._cache[uri] = true
+                self.read = self.read + 1
+                self:update()
+                if not content then
+                    return
+                end
+                log.info(('Preload dll at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
+                files.saveDll(uri, content)
             end
-            local content = pub.awaitTask('loadFile', furi.decode(uri))
-            self.read = self.read + 1
-            self:update()
-            if not content then
-                return
-            end
-            if self._cache[uri] then
-                return
-            end
-            log.info(('Preload dll at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
-            self._cache[uri] = true
-            files.saveDll(uri, content)
             files.addRef(uri)
             if libraryUri then
                 log.info('++++As library of:', libraryUri)

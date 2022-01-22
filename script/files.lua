@@ -219,7 +219,6 @@ function m.setText(uri, text, isTrust, version)
     file.cache = {}
     file.cacheActiveTime = math.huge
     m.globalVersion = m.globalVersion + 1
-    await.close('files.version')
     m.onWatch('version')
     if create then
         m.onWatch('create', uri)
@@ -411,7 +410,6 @@ function m.remove(uri)
     m.fileCount     = m.fileCount - 1
     m.globalVersion = m.globalVersion + 1
 
-    await.close('files.version')
     m.onWatch('version')
     m.onWatch('remove', originUri)
 end

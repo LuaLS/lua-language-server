@@ -69,6 +69,11 @@ function mt:get(k)
     return self._data[k]
 end
 
+---@return string
+function mt:getName()
+    return self.uri or ('<' .. self.type .. '>')
+end
+
 ---@param scopeType scope.type
 ---@return scope
 local function createScope(scopeType)

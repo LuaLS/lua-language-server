@@ -288,7 +288,7 @@ function m.refresh(uri)
             xpcall(m.doDiagnostic, log.error, uri)
         end
         m.diagnosticsScope(uri)
-    end, 'files.version')
+    end)
 end
 
 ---@async
@@ -351,9 +351,14 @@ function m.diagnosticsScope(uri, force)
     if not force and delay < 0 then
         return
     end
-    await.close ('diagnosticsScope:' .. (uri or '<fallback>'))
+    local scp = ws.getScope(uri)
+    local id = 'diagnosticsScope:' .. scp:getName()
+    await.close(id)
     await.call(function () ---@async
         await.sleep(math.max(delay, 0.1))
+        while loading.count() > 0 do
+            await.sleep(1.0)
+        end
         local clock = os.clock()
         local bar <close> = progress.create(ws.getScope(uri), lang.script.WORKSPACE_DIAGNOSTIC, 1)
         local cancelled
@@ -365,9 +370,8 @@ function m.diagnosticsScope(uri, force)
                 askForDisable(uri)
             end)
         end)
-        local scp = ws.getScope(uri)
         local uris = files.getAllUris(scp)
-        log.info(('diagnostics scope [%s], files count:[%d]'):format(scp, #uris))
+        log.info(('diagnostics scope [%s], files count:[%d]'):format(scp:getName(), #uris))
         for i, uri in ipairs(uris) do
             while loading.count() > 0 do
                 await.sleep(1.0)
@@ -383,7 +387,7 @@ function m.diagnosticsScope(uri, force)
         end
         bar:remove()
         log.debug('全文诊断耗时：', os.clock() - clock)
-    end, 'files.version', ('diagnosticsScope:' .. (uri or '<fallback>')))
+    end, id)
 end
 
 ws.watch(function (ev, uri)
@@ -397,9 +401,7 @@ files.watch(function (ev, uri) ---@async
         m.clear(uri)
         m.refresh(uri)
     elseif ev == 'update' then
-        if ws.isReady(uri) then
-            m.refresh(uri)
-        end
+        m.refresh(uri)
     elseif ev == 'open' then
         if ws.isReady(uri) then
             xpcall(m.doDiagnostic, log.error, uri)

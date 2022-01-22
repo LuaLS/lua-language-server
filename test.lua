@@ -82,7 +82,9 @@ local function main()
     ---@async
     lclient():start(function (client)
         client:registerFakers()
-        client:initialize()
+        client:initialize {
+            rootUri = '',
+        }
 
         ws.awaitReady()
 

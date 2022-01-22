@@ -4,6 +4,7 @@ local util    = require 'utility'
 local furi    = require 'file-uri'
 local ws      = require 'workspace'
 local files   = require 'files'
+local scope   = require 'workspace.scope'
 
 local rootPath = LOGPATH .. '/multi-workspace'
 local rootUri  = furi.encode(rootPath)
@@ -66,11 +67,11 @@ lclient():start(function (client)
     assert(files.getState(rootUri .. '/lb1/test.lua')   ~= nil)
     assert(files.getState(rootUri .. '/lb2/test.lua')   ~= nil)
 
-    assert(ws.getScope(rootUri .. '/ws1/test.lua').uri   == rootUri .. '/ws1')
-    assert(ws.getScope(rootUri .. '/ws2/test.lua').uri   == rootUri .. '/ws2')
-    assert(ws.getScope(rootUri .. '/share/test.lua').uri == rootUri .. '/ws1')
-    assert(ws.getScope(rootUri .. '/lb1/test.lua').uri   == rootUri .. '/ws1')
-    assert(ws.getScope(rootUri .. '/lb2/test.lua').uri   == rootUri .. '/ws2')
+    assert(scope.getScope(rootUri .. '/ws1/test.lua').uri   == rootUri .. '/ws1')
+    assert(scope.getScope(rootUri .. '/ws2/test.lua').uri   == rootUri .. '/ws2')
+    assert(scope.getScope(rootUri .. '/share/test.lua').uri == rootUri .. '/ws1')
+    assert(scope.getScope(rootUri .. '/lb1/test.lua').uri   == rootUri .. '/ws1')
+    assert(scope.getScope(rootUri .. '/lb2/test.lua').uri   == rootUri .. '/ws2')
 
     assert(files.isLibrary(rootUri .. '/ws1/test.lua')   == false)
     assert(files.isLibrary(rootUri .. '/ws2/test.lua')   == false)

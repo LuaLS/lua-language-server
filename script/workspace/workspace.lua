@@ -250,9 +250,8 @@ end
 ---@async
 ---@param scp scope
 function m.awaitPreload(scp)
-    local displayedUri = scp.uri or '<fallback>'
-    await.close('preload:' .. displayedUri)
-    await.setID('preload:' .. displayedUri)
+    await.close('preload:' .. scp:getName())
+    await.setID('preload:' .. scp:getName())
     await.sleep(0.1)
 
     local watchers = scp:get 'watchers'
@@ -267,13 +266,13 @@ function m.awaitPreload(scp)
     local ld <close> = loading.create(scp)
     scp:set('loading', ld)
 
-    log.info('Preload start:', displayedUri)
+    log.info('Preload start:', scp:getName())
 
     local native   = m.getNativeMatcher(scp)
     local librarys = m.getLibraryMatchers(scp)
 
     if scp.uri then
-        log.info('Scan files at:', displayedUri)
+        log.info('Scan files at:', scp:getName())
         ---@async
         native:scan(furi.decode(scp.uri), function (path)
             ld:loadFile(furi.encode(path))
@@ -289,9 +288,9 @@ function m.awaitPreload(scp)
         watchers[#watchers+1] = fw.watch(furi.decode(libMatcher.uri))
     end
 
-    log.info(('Found %d files at:'):format(ld.max), displayedUri)
+    log.info(('Found %d files at:'):format(ld.max), scp:getName())
     ld:loadAll()
-    log.info('Preload finish at:', displayedUri)
+    log.info('Preload finish at:', scp:getName())
 end
 
 --- 查找符合指定file path的所有uri

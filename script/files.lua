@@ -176,8 +176,8 @@ end
 ---@param uri uri
 ---@param text string
 ---@param isTrust boolean
----@param version integer
-function m.setText(uri, text, isTrust, version)
+---@param callback function
+function m.setText(uri, text, isTrust, callback)
     if not text then
         return
     end
@@ -204,7 +204,9 @@ function m.setText(uri, text, isTrust, version)
         local encoding = config.get(uri, 'Lua.runtime.fileEncoding')
         text = encoder.decode(encoding, text)
     end
-    file.version = version
+    if callback then
+        callback(file)
+    end
     if file.originText == text then
         return
     end

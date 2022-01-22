@@ -225,7 +225,9 @@ m.register 'textDocument/didOpen' {
         local uri   = files.getRealUri(doc.uri)
         workspace.awaitReady(uri)
         local text  = doc.text
-        files.setText(uri, text, true, doc.version)
+        files.setText(uri, text, true, function (file)
+            file.version = doc.version
+        end)
         files.open(uri)
     end
 }
@@ -253,7 +255,9 @@ m.register 'textDocument/didChange' {
         local text = files.getOriginText(uri) or ''
         local rows = files.getCachedRows(uri)
         text, rows = tm(text, rows, changes)
-        files.setText(uri, text, true, doc.version)
+        files.setText(uri, text, true, function (file)
+            file.version = doc.version
+        end)
         files.setCachedRows(uri, rows)
     end
 }

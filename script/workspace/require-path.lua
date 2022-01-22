@@ -46,9 +46,12 @@ function m.getVisiblePath(suri, path)
     local libraryPath = furi.decode(files.getLibraryUri(suri, uri))
     local scp = scope.getScope(suri)
     local cache = scp:get('visiblePath') or scp:set('visiblePath', {})
-    if not cache[path] then
-        local result = {}
-        cache[path] = result
+    local result = cache[path]
+    if not result then
+        result = {}
+        if libraryPath then
+            cache[path] = result
+        end
         for _, searcher in ipairs(searchers) do
             local isAbsolute = searcher:match '^[/\\]'
                             or searcher:match '^%a+%:'
@@ -88,7 +91,7 @@ function m.getVisiblePath(suri, path)
             until not pos or strict
         end
     end
-    return cache[path]
+    return result
 end
 
 --- 查找符合指定require path的所有uri

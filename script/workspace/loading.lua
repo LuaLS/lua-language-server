@@ -82,10 +82,6 @@ function mt:loadFile(uri, libraryUri)
                 self.read = self.read + 1
                 self:update()
                 log.info(('Skip loaded file: %s'):format(uri))
-                if libraryUri then
-                    log.info('++++As library of:', libraryUri)
-                    files.setLibraryUri(self.scp, uri, libraryUri)
-                end
             else
                 local content = pub.awaitTask('loadFile', furi.decode(uri))
                 if self._cache[uri] then
@@ -98,14 +94,13 @@ function mt:loadFile(uri, libraryUri)
                     return
                 end
                 log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
-                files.setText(uri, content, false, function ()
-                    if libraryUri then
-                        log.info('++++As library of:', libraryUri)
-                        files.setLibraryUri(self.scp, uri, libraryUri)
-                    end
-                end)
+                files.setText(uri, content, false)
             end
             files.addRef(uri)
+            if libraryUri then
+                log.info('++++As library of:', libraryUri)
+                files.setLibraryUri(self.scp, uri, libraryUri)
+            end
         end
     elseif files.isDll(uri) then
         self.max = self.max + 1
@@ -116,9 +111,6 @@ function mt:loadFile(uri, libraryUri)
                 self.read = self.read + 1
                 self:update()
                 log.info(('Skip loaded file: %s'):format(uri))
-                if libraryUri then
-                    log.info('++++As library of:', libraryUri)
-                end
             else
                 local content = pub.awaitTask('loadFile', furi.decode(uri))
                 if self._cache[uri] then
@@ -132,11 +124,11 @@ function mt:loadFile(uri, libraryUri)
                 end
                 log.info(('Preload dll at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
                 files.saveDll(uri, content)
-                if libraryUri then
-                    log.info('++++As library of:', libraryUri)
-                end
             end
             files.addRef(uri)
+            if libraryUri then
+                log.info('++++As library of:', libraryUri)
+            end
         end
     end
     await.delay()

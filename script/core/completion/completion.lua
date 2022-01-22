@@ -336,7 +336,7 @@ local function checkModule(state, word, position, results)
         local fileName = path:match '[^/\\]*$'
         local stemName = fileName:gsub('%..+', '')
         if  not locals[stemName]
-        and not vm.hasGlobalSets(stemName)
+        and not vm.hasGlobalSets(state.uri, stemName)
         and not config.get(state.uri, 'Lua.diagnostics.globals')[stemName]
         and stemName:match '^[%a_][%w_]*$'
         and matchKey(word, stemName) then

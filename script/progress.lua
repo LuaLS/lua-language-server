@@ -43,8 +43,6 @@ function mt:remove()
         })
         --log.info('Remove progress:', token, self._title)
     end
-
-    log.info('Remove progress:', self._title, self._token)
 end
 
 ---设置描述
@@ -159,8 +157,6 @@ function m.create(scp, title, delay)
     }, mt)
 
     m.map[prog._token] = prog
-
-    log.info('Create progress:', title, prog._token)
 
     return prog
 end

@@ -39,7 +39,7 @@ return function (uri, callback)
         end
         await.delay()
         local id = 'def:' .. noder.getID(src)
-        if not collector:has(id) then
+        if not collector:has(uri, id) then
             local message = lang.script('DIAG_UNDEF_GLOBAL', key)
             if requireLike[key:lower()] then
                 message = ('%s(%s)'):format(message, lang.script('DIAG_REQUIRE_LIKE', key))

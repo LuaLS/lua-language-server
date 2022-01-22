@@ -35,7 +35,7 @@ return function (uri, callback)
         if name == '...' then
             return
         end
-        if vm.isDocDefined(name)
+        if vm.isDocDefined(uri, name)
         or hasNameOfGeneric(name, source) then
             return
         end

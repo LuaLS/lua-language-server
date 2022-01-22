@@ -4,14 +4,14 @@ local guide     = require 'parser.guide'
 local vm        = require 'vm.vm'
 local noder     = require 'core.noder'
 
-function vm.hasGlobalSets(name)
+function vm.hasGlobalSets(uri, name)
     local id
     if type(name) == 'string' then
         id = ('def:g:%s%s'):format(noder.STRING_CHAR, name)
     else
         id = ('def:g:%s'):format(noder.STRING_CHAR, name)
     end
-    return collector:has(id)
+    return collector:has(uri, id)
 end
 
 function vm.getGlobalSets(uri, name)

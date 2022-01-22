@@ -54,18 +54,15 @@ function mt:dropAll()
 end
 
 --- 是否包含某个名字的订阅
+---@param uri uri
 ---@param name string
 ---@return boolean
-function mt:has(name)
-    local nameCollect = self.collect[name]
-    if not nameCollect then
+function mt:has(uri, name)
+    if self:each(uri, name)() then
+        return true
+    else
         return false
     end
-    if next(nameCollect) == nil then
-        self.collect[name] = nil
-        return false
-    end
-    return true
 end
 
 local DUMMY_FUNCTION = function () end

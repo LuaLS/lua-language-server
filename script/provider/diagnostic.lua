@@ -282,12 +282,12 @@ function m.refresh(uri)
     end
     await.close('diag:' .. uri)
     await.call(function () ---@async
+        m.diagnosticsScope(uri)
         if uri then
             await.setID('diag:' .. uri)
             await.sleep(0.1)
             xpcall(m.doDiagnostic, log.error, uri)
         end
-        m.diagnosticsScope(uri)
     end)
 end
 
@@ -355,7 +355,7 @@ function m.diagnosticsScope(uri, force)
     local id = 'diagnosticsScope:' .. scp:getName()
     await.close(id)
     await.call(function () ---@async
-        await.sleep(math.max(delay, 0.1))
+        await.sleep(math.max(delay, 0.2))
         while loading.count() > 0 do
             await.sleep(1.0)
         end

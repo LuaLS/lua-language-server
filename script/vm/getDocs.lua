@@ -44,12 +44,12 @@ function vm.getDocDefines(uri, name)
     return results
 end
 
-function vm.isDocDefined(name)
+function vm.isDocDefined(uri, name)
     if define.BuiltinType[name] then
         return true
     end
     local id = 'def:dn:' .. name
-    if collector:has(id) then
+    if collector:has(uri, id) then
         return true
     end
     return false

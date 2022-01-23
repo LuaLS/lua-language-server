@@ -886,6 +886,7 @@ local function collectRequireNames(mode, myUri, literal, source, smark, position
             end
             local path = furi.decode(uri)
             local infos = rpath.getVisiblePath(uri, path)
+            local relative = workspace.getRelativePath(path)
             for _, info in ipairs(infos) do
                 if matchKey(literal, info.expect) then
                     if not collect[info.expect] then
@@ -895,14 +896,14 @@ local function collectRequireNames(mode, myUri, literal, source, smark, position
                                 finish  = smark and (source.finish - #smark) or position,
                                 newText = smark and info.expect or util.viewString(info.expect),
                             },
-                            path = path,
+                            path = relative,
                         }
                     end
                     if vm.isMetaFile(uri) then
                         collect[info.expect][#collect[info.expect]+1] = ('* [[meta]](%s)'):format(uri)
                     else
                         collect[info.expect][#collect[info.expect]+1] = ([=[* [%s](%s) %s]=]):format(
-                            path,
+                            relative,
                             uri,
                             lang.script('HOVER_USE_LUA_PATH', info.searcher)
                         )

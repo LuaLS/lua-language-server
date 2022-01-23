@@ -108,7 +108,14 @@ function m.setLibraryUri(scp, uri, libraryUri)
 end
 
 --- 是否是库文件
-function m.isLibrary(uri)
+function m.isLibrary(uri, excludeFolder)
+    if excludeFolder then
+        for _, scp in ipairs(scope.folders) do
+            if scp:isChildUri(uri) then
+                return false
+            end
+        end
+    end
     for _, scp in ipairs(scope.folders) do
         local map = scp:get 'libraryMap'
         if map and map[uri] ~= nil then

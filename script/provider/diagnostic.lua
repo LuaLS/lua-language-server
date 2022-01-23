@@ -187,7 +187,7 @@ function m.doDiagnostic(uri, isScopeDiag)
     if not config.get(uri, 'Lua.diagnostics.enable') then
         return
     end
-    if files.isLibrary(uri) then
+    if files.isLibrary(uri, true) then
         local status = config.get(uri, 'Lua.diagnostics.libraryFiles')
         if status == 'Disable' then
             return
@@ -411,7 +411,7 @@ files.watch(function (ev, uri) ---@async
             xpcall(m.doDiagnostic, log.error, uri)
         end
     elseif ev == 'close' then
-        if files.isLibrary(uri)
+        if files.isLibrary(uri, true)
         or ws.isIgnored(uri) then
             m.clear(uri)
         end

@@ -372,13 +372,13 @@ function m.getRelativePath(uriOrPath)
     local scp = scope.getScope(uri)
     if not scp.uri then
         local relative = m.normalize(path)
-        return relative:gsub('^[/\\]+', '')
+        return relative:gsub('^[/\\]+', ''), false
     end
     local _, pos = m.normalize(path):find(furi.decode(scp.uri), 1, true)
     if pos then
-        return m.normalize(path:sub(pos + 1)):gsub('^[/\\]+', '')
+        return m.normalize(path:sub(pos + 1)):gsub('^[/\\]+', ''), true
     else
-        return m.normalize(path):gsub('^[/\\]+', '')
+        return m.normalize(path):gsub('^[/\\]+', ''), false
     end
 end
 

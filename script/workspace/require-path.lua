@@ -28,7 +28,10 @@ local function getOnePath(uri, path, searcher)
                         : gsub('%.[^%.]+$', '')
                         : gsub('[/\\%.]+', separator)
     local start        = stemSearcher:match '()%?' or 1
-    for pos = start, #stemPath do
+    if stemPath:sub(1, start - 1) ~= stemSearcher:sub(1, start - 1) then
+        return nil
+    end
+    for pos = #stemPath, start, -1 do
         local word = stemPath:sub(start, pos)
         local newSearcher = stemSearcher:gsub('%?', (word:gsub('%%', '%%%%')))
         if newSearcher == stemPath then
@@ -43,8 +46,12 @@ function m.getVisiblePath(suri, path)
     local strict    = config.get(suri, 'Lua.runtime.pathStrict')
     path = workspace.normalize(path)
     local uri = furi.encode(path)
-    local libraryPath = furi.decode(files.getLibraryUri(suri, uri))
     local scp = scope.getScope(suri)
+    if  not scp:isChildUri(uri)
+    and not scp:isLinkedUri(uri) then
+        return {}
+    end
+    local libraryPath = furi.decode(files.getLibraryUri(suri, uri))
     local cache = scp:get('visiblePath') or scp:set('visiblePath', {})
     local result = cache[path]
     if not result then
@@ -62,9 +69,13 @@ function m.getVisiblePath(suri, path)
             local pos = 1
             if not isAbsolute then
                 if libraryPath then
-                    pos = #libraryPath + 2
+                    currentPath = currentPath:sub(#libraryPath + 2)
                 else
-                    currentPath = workspace.getRelativePath(uri)
+                    local isRelative
+                    currentPath, isRelative = workspace.getRelativePath(uri)
+                    if not isAbsolute and not isRelative then
+                        goto CONTINUE
+                    end
                 end
             end
             repeat
@@ -89,6 +100,7 @@ function m.getVisiblePath(suri, path)
                     addRequireName(suri, uri, expect)
                 end
             until not pos or strict
+            ::CONTINUE::
         end
     end
     return result

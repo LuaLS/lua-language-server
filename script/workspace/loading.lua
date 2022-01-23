@@ -84,12 +84,12 @@ function mt:loadFile(uri, libraryUri)
                 log.info(('Skip loaded file: %s'):format(uri))
             else
                 local content = pub.awaitTask('loadFile', furi.decode(uri))
+                self.read = self.read + 1
+                self:update()
                 if self._cache[uri] then
                     return
                 end
                 self._cache[uri] = true
-                self.read = self.read + 1
-                self:update()
                 if not content then
                     return
                 end
@@ -113,12 +113,12 @@ function mt:loadFile(uri, libraryUri)
                 log.info(('Skip loaded file: %s'):format(uri))
             else
                 local content = pub.awaitTask('loadFile', furi.decode(uri))
+                self.read = self.read + 1
+                self:update()
                 if self._cache[uri] then
                     return
                 end
                 self._cache[uri] = true
-                self.read = self.read + 1
-                self:update()
                 if not content then
                     return
                 end

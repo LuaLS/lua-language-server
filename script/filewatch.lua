@@ -45,7 +45,7 @@ end
 
 function m.update()
     local collect
-    for _ = 1, 100 do
+    for _ = 1, 10000 do
         local ev, path = fw.select()
         if not ev then
             break

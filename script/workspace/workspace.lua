@@ -228,7 +228,8 @@ function m.awaitLoadFile(uri)
     log.info('Scan files at:', uri)
     ---@async
     native:scan(furi.decode(uri), function (path)
-        ld:loadFile(furi.encode(path))
+        files.remove(furi.encode(path))
+        ld:loadFile(furi.encode(path), nil)
     end)
     ld:loadAll()
 end
@@ -238,7 +239,7 @@ function m.removeFile(uri)
         if scp:isChildUri(uri)
         or scp:isLinkedUri(uri) then
             local cachedUris = scp:get 'cachedUris'
-            if cachedUris[uri] then
+            if cachedUris and cachedUris[uri] then
                 cachedUris[uri] = nil
                 files.delRef(uri)
             end
@@ -281,9 +282,10 @@ function m.awaitPreload(scp)
 
     for _, libMatcher in ipairs(librarys) do
         log.info('Scan library at:', libMatcher.uri)
+        scp:addLink(libMatcher.uri)
         ---@async
         libMatcher.matcher:scan(furi.decode(libMatcher.uri), function (path)
-            ld:loadFile(furi.encode(path), libMatcher.uri)
+            ld:loadFile(furi.encode(path))
         end)
         watchers[#watchers+1] = fw.watch(furi.decode(libMatcher.uri))
     end
@@ -490,42 +492,42 @@ end)
 
 fw.event(function (changes) ---@async
     for _, change in ipairs(changes) do
-        local path = change.path
-        local uri  = furi.encode(path)
-        m.awaitReady(uri)
-        if     change.type == 'create' then
-            log.debug('FileChangeType.Created', uri)
-            m.awaitLoadFile(uri)
-        elseif change.type == 'delete' then
-            log.debug('FileChangeType.Deleted', uri)
-            files.remove(uri)
-            m.removeFile(uri)
-            local childs = files.getChildFiles(uri)
-            for _, curi in ipairs(childs) do
-                log.debug('FileChangeType.Deleted.Child', curi)
-                files.remove(curi)
+        ---@async
+        await.call(function ()
+            local path = change.path
+            local uri  = furi.encode(path)
+            if     change.type == 'create' then
+                log.debug('FileChangeType.Created', uri)
+                m.awaitLoadFile(uri)
+            elseif change.type == 'delete' then
+                log.debug('FileChangeType.Deleted', uri)
+                files.remove(uri)
                 m.removeFile(uri)
-            end
-        elseif change.type == 'change' then
-            if m.isValidLuaUri(uri) then
-                -- 如果文件处于关闭状态，则立即更新；否则等待didChange协议来更新
-                if not files.isOpen(uri) then
-                    files.setText(uri, util.loadFile(furi.decode(uri)), false)
+                local childs = files.getChildFiles(uri)
+                for _, curi in ipairs(childs) do
+                    log.debug('FileChangeType.Deleted.Child', curi)
+                    files.remove(curi)
+                    m.removeFile(uri)
                 end
-            else
-                local filename = fs.path(path):filename():string()
-                -- 排除类文件发生更改需要重新扫描
-                if filename == '.gitignore'
-                or filename == '.gitmodules' then
-                    local scp = scope.getScope(uri)
-                    if scp.type ~= 'fallback' then
-                        m.reload(scp)
+            elseif change.type == 'change' then
+                if m.isValidLuaUri(uri) then
+                    -- 如果文件处于关闭状态，则立即更新；否则等待didChange协议来更新
+                    if not files.isOpen(uri) then
+                        files.setText(uri, pub.awaitTask('loadFile', furi.decode(uri)), false)
                     end
-                    break
+                else
+                    local filename = fs.path(path):filename():string()
+                    -- 排除类文件发生更改需要重新扫描
+                    if filename == '.gitignore'
+                    or filename == '.gitmodules' then
+                        local scp = scope.getScope(uri)
+                        if scp.type ~= 'fallback' then
+                            m.reload(scp)
+                        end
+                    end
                 end
             end
-        end
-        ::CONTINUE::
+        end)
     end
 end)
 

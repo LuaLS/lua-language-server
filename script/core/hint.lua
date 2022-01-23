@@ -242,8 +242,8 @@ end
 return function (uri, start, finish)
     local results = {}
     typeHint(uri, results, start, finish)
-    awaitHint(uri, results, start, finish)
     paramName(uri, results, start, finish)
+    awaitHint(uri, results, start, finish)
     arrayIndex(uri, results, start, finish)
     return results
 end

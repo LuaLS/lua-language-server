@@ -229,7 +229,7 @@ function m.awaitLoadFile(uri)
     ---@async
     native:scan(furi.decode(uri), function (path)
         files.remove(furi.encode(path))
-        ld:loadFile(furi.encode(path), nil)
+        ld:loadFile(furi.encode(path))
     end)
     ld:loadAll()
 end
@@ -285,7 +285,7 @@ function m.awaitPreload(scp)
         scp:addLink(libMatcher.uri)
         ---@async
         libMatcher.matcher:scan(furi.decode(libMatcher.uri), function (path)
-            ld:loadFile(furi.encode(path))
+            ld:loadFile(furi.encode(path), libMatcher.uri)
         end)
         watchers[#watchers+1] = fw.watch(furi.decode(libMatcher.uri))
     end

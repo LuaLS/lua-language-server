@@ -222,6 +222,8 @@ function m.doDiagnostic(uri, isScopeDiag)
     local prog <close> = progress.create(scp, lang.script.WINDOW_DIAGNOSING, 0.5)
     prog:setMessage(ws.getRelativePath(uri))
 
+    log.debug('Diagnostic file:', uri)
+
     local syntax = m.syntaxErrors(uri, state)
 
     local diags = {}
@@ -230,6 +232,7 @@ function m.doDiagnostic(uri, isScopeDiag)
         tracy.ZoneBeginN 'mergeSyntaxAndDiags'
         local _ <close> = tracy.ZoneEnd
         local full = mergeDiags(syntax, lastDiag, diags)
+        log.debug(('Pushed [%d] results'):format(full and #full or 0))
         if not full then
             m.clear(uri)
             return
@@ -372,7 +375,7 @@ function m.diagnosticsScope(uri, force)
             end)
         end)
         local uris = files.getAllUris(uri)
-        log.info(('diagnostics scope [%s], files count:[%d]'):format(scp:getName(), #uris))
+        log.info(('Diagnostics scope [%s], files count:[%d]'):format(scp:getName(), #uris))
         for i, uri in ipairs(uris) do
             while loading.count() > 0 do
                 await.sleep(1.0)
@@ -387,7 +390,7 @@ function m.diagnosticsScope(uri, force)
             end
         end
         bar:remove()
-        log.debug('全文诊断耗时：', os.clock() - clock)
+        log.debug(('Diagnostics scope [%s] finished, takes [%.3f] sec.'):format(scp:getName(), os.clock() - clock))
     end, id)
 end
 

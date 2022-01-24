@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.6.1
+`2022-1-24`
 * `CHG` default values of settings:
   + `Lua.diagnostics.workspaceDelay`: `0` sec -> `3` sec
   + `Lua.workspace.maxPreload`: `1000` -> `5000`

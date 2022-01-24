@@ -8,6 +8,7 @@
 * `CHG` improve performance
 * `FIX` modify luarc failed
 * `FIX` library files not recognized correctly
+* `FIX` [#903](https://github.com/sumneko/lua-language-server/issues/903)
 * `FIX` [#906](https://github.com/sumneko/lua-language-server/issues/906)
 * `FIX` [#920](https://github.com/sumneko/lua-language-server/issues/920)
 

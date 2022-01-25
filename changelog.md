@@ -1,5 +1,8 @@
 # changelog
 
+## 2.6.2
+* `FIX` [#925](https://github.com/sumneko/lua-language-server/issues/925)
+
 ## 2.6.1
 `2022-1-24`
 * `CHG` default values of settings:

@@ -99,7 +99,6 @@ function mt:loadFile(uri, libraryUri)
             files.addRef(uri)
             if libraryUri then
                 log.info('++++As library of:', libraryUri)
-                files.setLibraryUri(self.scp, uri, libraryUri)
             end
         end
     elseif files.isDll(uri) then

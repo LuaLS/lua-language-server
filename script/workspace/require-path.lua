@@ -56,9 +56,7 @@ function m.getVisiblePath(suri, path)
     local result = cache[path]
     if not result then
         result = {}
-        if libraryPath then
-            cache[path] = result
-        end
+        cache[path] = result
         for _, searcher in ipairs(searchers) do
             local isAbsolute = searcher:match '^[/\\]'
                             or searcher:match '^%a+%:'
@@ -71,11 +69,7 @@ function m.getVisiblePath(suri, path)
                 if libraryPath then
                     currentPath = currentPath:sub(#libraryPath + 2)
                 else
-                    local isRelative
-                    currentPath, isRelative = workspace.getRelativePath(uri)
-                    if not isAbsolute and not isRelative then
-                        goto CONTINUE
-                    end
+                    currentPath = workspace.getRelativePath(uri)
                 end
             end
             repeat
@@ -100,7 +94,6 @@ function m.getVisiblePath(suri, path)
                     addRequireName(suri, uri, expect)
                 end
             until not pos or strict
-            ::CONTINUE::
         end
     end
     return result

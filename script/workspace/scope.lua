@@ -56,6 +56,20 @@ function mt:isLinkedUri(uri)
     return false
 end
 
+---@param uri uri
+---@return uri?
+function mt:getLinkedUri(uri)
+    if not uri then
+        return nil
+    end
+    for linkUri in pairs(self._links) do
+        if uri:sub(1, #linkUri) == linkUri then
+            return linkUri
+        end
+    end
+    return nil
+end
+
 ---@param k string
 ---@param v any
 function mt:set(k, v)

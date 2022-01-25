@@ -99,14 +99,6 @@ function m.getOpenedCache(uri)
     return data.cache
 end
 
---- 标记为库文件
----@param scp scope
----@param uri uri
----@param libraryUri uri
-function m.setLibraryUri(scp, uri, libraryUri)
-    scp:get 'libraryMap' [uri] = libraryUri
-end
-
 --- 是否是库文件
 function m.isLibrary(uri, excludeFolder)
     if excludeFolder then
@@ -117,13 +109,11 @@ function m.isLibrary(uri, excludeFolder)
         end
     end
     for _, scp in ipairs(scope.folders) do
-        local map = scp:get 'libraryMap'
-        if map and map[uri] ~= nil then
+        if scp:isLinkedUri(uri) then
             return true
         end
     end
-    local map = scope.fallback:get 'libraryMap'
-    if map and map[uri] ~= nil then
+    if scope.fallback:isLinkedUri(uri) then
         return true
     end
     return false
@@ -132,16 +122,7 @@ end
 --- 获取库文件的根目录
 function m.getLibraryUri(suri, uri)
     local scp = scope.getScope(suri)
-    local map = scp:get 'libraryMap'
-    if map and map[uri] ~= nil then
-        return map[uri]
-    end
-    return nil
-end
-
----@param scp scope
-function m.flushAllLibrary(scp)
-    scp:set('libraryMap', {})
+    return scp:getLinkedUri(uri)
 end
 
 --- 是否存在

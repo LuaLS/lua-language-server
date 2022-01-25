@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.6.2
+`2022-1-25`
 * `FIX` [#925](https://github.com/sumneko/lua-language-server/issues/925)
 
 ## 2.6.1

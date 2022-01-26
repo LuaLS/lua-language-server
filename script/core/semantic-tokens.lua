@@ -152,12 +152,12 @@ local Care = util.switch()
             return
         end
         -- 4. 函数的参数 | Function parameters
-        if source.parent and source.parent.type == 'funcargs' then
+        if loc.parent and loc.parent.type == 'funcargs' then
             results[#results+1] = {
                 start      = source.start,
                 finish     = source.finish,
                 type       = define.TokenTypes.parameter,
-                modifieres = define.TokenModifiers.declaration,
+                modifieres = loc == source and define.TokenModifiers.declaration or nil,
             }
             return
         end

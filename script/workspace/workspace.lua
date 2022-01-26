@@ -162,6 +162,18 @@ function m.getLibraryMatchers(scp)
     end
     log.info('Build library matchers:', scp)
 
+    local pattern = {}
+    for path, ignore in pairs(config.get(scp.uri, 'files.exclude')) do
+        if ignore then
+            log.info('Ignore by exclude:', path)
+            pattern[#pattern+1] = path
+        end
+    end
+    for _, path in ipairs(config.get(scp.uri, 'Lua.workspace.ignoreDir')) do
+        log.info('Ignore directory:', path)
+        pattern[#pattern+1] = path
+    end
+
     local librarys = {}
     for path in pairs(config.get(scp.uri, 'Lua.workspace.library')) do
         path = m.getAbsolutePath(scp.uri, path)
@@ -178,7 +190,7 @@ function m.getLibraryMatchers(scp)
     for path in pairs(librarys) do
         if fs.exists(fs.path(path)) then
             local nPath = fs.absolute(fs.path(path)):string()
-            local matcher = glob.gitignore(true, {
+            local matcher = glob.gitignore(pattern, {
                 root       = path,
                 ignoreCase = platform.OS == 'Windows',
             }, globInteferFace)

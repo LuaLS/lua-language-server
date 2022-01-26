@@ -70,6 +70,15 @@ function mt:getLinkedUri(uri)
     return nil
 end
 
+---@param uri uri
+---@return uri
+function mt:getRootUri(uri)
+    if self:isChildUri(uri) then
+        return self.uri
+    end
+    return self:getLinkedUri(uri)
+end
+
 ---@param k string
 ---@param v any
 function mt:set(k, v)

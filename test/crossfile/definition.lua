@@ -149,7 +149,7 @@ config.set(nil, 'Lua.runtime.pathStrict', false)
 TEST {
     {
         path = 'a.lua',
-        content = 'local <!t!> = 1; return <!t!>',
+        content = 'local <!t!> = 1; return t',
     },
     {
         path = 'b.lua',
@@ -160,7 +160,7 @@ TEST {
 TEST {
     {
         path = 'a.lua',
-        content = 'local <!t!> = 1; return <!t!>',
+        content = 'local <!t!> = 1; return t',
     },
     {
         path = 'b.lua',
@@ -188,7 +188,7 @@ local <~t~>
 TEST {
     {
         path = 'a.lua',
-        content = 'local <!t!> = 1; return <!t!>',
+        content = 'local <!t!> = 1; return t',
     },
     {
         path = 'b.lua',
@@ -254,7 +254,7 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            return <!a():b():c()!>
+            return a():b():c()
         ]],
     },
     {
@@ -397,7 +397,7 @@ TEST {
         content = [[
             local function <!f!>()
             end
-            return <!f!>
+            return f
         ]]
     },
     {

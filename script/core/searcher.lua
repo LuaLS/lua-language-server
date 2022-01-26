@@ -219,13 +219,13 @@ local function pushResult(status, mode, source, force)
         end
     end
 
-    local parent = source.parent
-    if parent.type == 'return' then
-        if source ~= status.source then
-            results[#results+1] = source
-            return true
-        end
-    end
+    --local parent = source.parent
+    --if parent.type == 'return' then
+    --    if source ~= status.source then
+    --        results[#results+1] = source
+    --        return true
+    --    end
+    --end
 
     return false
 end

@@ -1,7 +1,7 @@
 TEST [[
 function f()
     local <!x!>
-    return <!x!>
+    return x
 end
 local <!y!> = f()
 print(<?y?>)

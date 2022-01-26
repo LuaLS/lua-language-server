@@ -178,42 +178,42 @@ local A, B
 
 function A:get1()
     local <!a!> = B:get()
-    return <!a!>
+    return a
 end
 
 function A:get2()
     local <!a!> = B:get()
-    return <!a!>
+    return a
 end
 
 function A:get3()
     local <!a!> = B:get()
-    return <!a!>
+    return a
 end
 
 function A:get4()
     local <!a!> = B:get()
-    return <!a!>
+    return a
 end
 
 function A:get5()
     local <!a!> = B:get()
-    return <!a!>
+    return a
 end
 
 function A:get6()
     local <!a!> = B:get()
-    return <!a!>
+    return a
 end
 
 function A:get7()
     local <!a!> = B:get()
-    return <!a!>
+    return a
 end
 
 function A:get8()
     local <!a!> = B:get()
-    return <!a!>
+    return a
 end
 
 function B:get()
@@ -226,7 +226,7 @@ function B:get()
     <!b!> = A:get6()
     <!b!> = A:get7()
     <!b!> = A:get8()
-    return <!b!>
+    return b
 end
 
 local <!b!> = B:get()

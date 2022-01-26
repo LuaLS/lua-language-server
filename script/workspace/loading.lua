@@ -134,23 +134,18 @@ function mt:loadFile(uri, libraryUri)
     await.delay()
 end
 
-function mt:loadStashed(max)
-    for _ = 1, max do
-        local loader = table.remove(self._stash)
-        if not loader then
-            return
-        end
-        await.call(loader)
-    end
-end
-
 ---@async
 function mt:loadAll()
     while self.read < self.max do
         log.info(('Loaded %d/%d files'):format(self.read, self.max))
-        self:loadStashed(100)
         self:update()
-        await.sleep(0.1)
+        local loader = table.remove(self._stash)
+        if loader then
+            await.call(loader)
+            await.delay()
+        else
+            await.sleep(0.1)
+        end
     end
     log.info('Loaded finish.')
 end

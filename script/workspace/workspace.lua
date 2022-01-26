@@ -491,10 +491,11 @@ end)
 
 fw.event(function (changes) ---@async
     for _, change in ipairs(changes) do
+        local path = change.path
+        local uri  = furi.encode(path)
+
         ---@async
         await.call(function ()
-            local path = change.path
-            local uri  = furi.encode(path)
             if     change.type == 'create' then
                 log.debug('FileChangeType.Created', uri)
                 m.awaitLoadFile(uri)
@@ -514,19 +515,19 @@ fw.event(function (changes) ---@async
                     if not files.isOpen(uri) then
                         files.setText(uri, pub.awaitTask('loadFile', furi.decode(uri)), false)
                     end
-                else
-                    local filename = fs.path(path):filename():string()
-                    -- 排除类文件发生更改需要重新扫描
-                    if filename == '.gitignore'
-                    or filename == '.gitmodules' then
-                        local scp = scope.getScope(uri)
-                        if scp.type ~= 'fallback' then
-                            m.reload(scp)
-                        end
-                    end
                 end
             end
         end)
+
+        local filename = fs.path(path):filename():string()
+        -- 排除类文件发生更改需要重新扫描
+        if filename == '.gitignore'
+        or filename == '.gitmodules' then
+            local scp = scope.getScope(uri)
+            if scp.type ~= 'fallback' then
+                m.reload(scp)
+            end
+        end
     end
 end)
 

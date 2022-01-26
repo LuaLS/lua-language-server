@@ -228,7 +228,6 @@ function m.awaitLoadFile(uri)
     log.info('Scan files at:', uri)
     ---@async
     native:scan(furi.decode(uri), function (path)
-        files.remove(furi.encode(path))
         ld:loadFile(furi.encode(path))
     end)
     ld:loadAll()

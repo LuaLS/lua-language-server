@@ -81,13 +81,15 @@ function mt:loadFile(uri, libraryUri)
             if files.getFile(uri) then
                 self.read = self.read + 1
                 self:update()
+                files.addRef(uri)
+                self._cache[uri] = true
                 log.info(('Skip loaded file: %s'):format(uri))
             else
                 local content = pub.awaitTask('loadFile', furi.decode(uri))
                 self.read = self.read + 1
                 self:update()
-                if self._cache[uri] then
-                    return
+                if not self._cache[uri] then
+                    files.addRef(uri)
                 end
                 self._cache[uri] = true
                 if not content then
@@ -96,7 +98,6 @@ function mt:loadFile(uri, libraryUri)
                 log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
                 files.setText(uri, content, false)
             end
-            files.addRef(uri)
             if libraryUri then
                 log.info('++++As library of:', libraryUri)
             end
@@ -109,13 +110,14 @@ function mt:loadFile(uri, libraryUri)
             if files.getFile(uri) then
                 self.read = self.read + 1
                 self:update()
+                files.addRef(uri)
                 log.info(('Skip loaded file: %s'):format(uri))
             else
                 local content = pub.awaitTask('loadFile', furi.decode(uri))
                 self.read = self.read + 1
                 self:update()
-                if self._cache[uri] then
-                    return
+                if not self._cache[uri] then
+                    files.addRef(uri)
                 end
                 self._cache[uri] = true
                 if not content then
@@ -124,7 +126,6 @@ function mt:loadFile(uri, libraryUri)
                 log.info(('Preload dll at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
                 files.saveDll(uri, content)
             end
-            files.addRef(uri)
             if libraryUri then
                 log.info('++++As library of:', libraryUri)
             end

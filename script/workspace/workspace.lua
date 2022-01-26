@@ -228,6 +228,7 @@ function m.awaitLoadFile(uri)
     log.info('Scan files at:', uri)
     ---@async
     native:scan(furi.decode(uri), function (path)
+        scp:get('cachedUris')[furi.encode(path)] = true
         ld:loadFile(furi.encode(path))
     end)
     ld:loadAll()
@@ -275,6 +276,7 @@ function m.awaitPreload(scp)
         log.info('Scan files at:', scp:getName())
         ---@async
         native:scan(furi.decode(scp.uri), function (path)
+            scp:get('cachedUris')[furi.encode(path)] = true
             ld:loadFile(furi.encode(path))
         end)
     end
@@ -284,6 +286,7 @@ function m.awaitPreload(scp)
         scp:addLink(libMatcher.uri)
         ---@async
         libMatcher.matcher:scan(furi.decode(libMatcher.uri), function (path)
+            scp:get('cachedUris')[furi.encode(path)] = true
             ld:loadFile(furi.encode(path), libMatcher.uri)
         end)
         watchers[#watchers+1] = fw.watch(furi.decode(libMatcher.uri))
@@ -401,10 +404,10 @@ end
 ---@param scp scope
 function m.flushFiles(scp)
     local cachedUris = scp:get 'cachedUris'
+    scp:set('cachedUris', {})
     if not cachedUris then
         return
     end
-    scp:set('cachedUris', nil)
     for uri in pairs(cachedUris) do
         files.delRef(uri)
     end

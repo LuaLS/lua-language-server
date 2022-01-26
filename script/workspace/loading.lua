@@ -111,6 +111,7 @@ function mt:loadFile(uri, libraryUri)
                 self.read = self.read + 1
                 self:update()
                 files.addRef(uri)
+                self._cache[uri] = true
                 log.info(('Skip loaded file: %s'):format(uri))
             else
                 local content = pub.awaitTask('loadFile', furi.decode(uri))
@@ -176,7 +177,6 @@ function m.create(scp)
         _stash = {},
         _cache = {},
     }, mt)
-    scp:set('cachedUris', loading._cache)
     m._loadings[loading] = true
     return loading
 end

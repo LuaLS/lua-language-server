@@ -367,6 +367,7 @@ function m.addRef(uri)
         return nil
     end
     file._ref = (file._ref or 0) + 1
+    log.debug('add ref', uri)
     return function ()
         m.delRef(uri)
     end
@@ -378,6 +379,7 @@ function m.delRef(uri)
         return
     end
     file._ref = (file._ref or 0) - 1
+    log.debug('del ref', uri)
     if file._ref <= 0 then
         m.remove(uri)
     end

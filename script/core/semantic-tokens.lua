@@ -815,21 +815,29 @@ return function (uri, start, finish)
     end)
 
     for _, comm in ipairs(state.comms) do
-        if comm.type == 'comment.short' then
-            local head = comm.text:sub(1, 2)
-            if head == '-@'
-            or head == '-|' then
-                results[#results+1] = {
-                    start  = comm.start,
-                    finish = comm.start + 3,
-                    type   = define.TokenTypes.comment,
-                }
-                results[#results+1] = {
-                    start      = comm.start + 3,
-                    finish     = comm.start + 2 +  #comm.text:match '%S+',
-                    type       = define.TokenTypes.comment,
-                    modifieres = define.TokenModifiers.documentation,
-                }
+        if start <= comm.start and comm.finish <= finish then
+            if comm.type == 'comment.short' then
+                local head = comm.text:sub(1, 2)
+                if head == '-@'
+                or head == '-|' then
+                    results[#results+1] = {
+                        start  = comm.start,
+                        finish = comm.start + 3,
+                        type   = define.TokenTypes.comment,
+                    }
+                    results[#results+1] = {
+                        start      = comm.start + 3,
+                        finish     = comm.start + 2 +  #comm.text:match '%S+',
+                        type       = define.TokenTypes.comment,
+                        modifieres = define.TokenModifiers.documentation,
+                    }
+                else
+                    results[#results+1] = {
+                        start  = comm.start,
+                        finish = comm.finish,
+                        type   = define.TokenTypes.comment,
+                    }
+                end
             else
                 results[#results+1] = {
                     start  = comm.start,
@@ -837,12 +845,6 @@ return function (uri, start, finish)
                     type   = define.TokenTypes.comment,
                 }
             end
-        else
-            results[#results+1] = {
-                start  = comm.start,
-                finish = comm.finish,
-                type   = define.TokenTypes.comment,
-            }
         end
     end
 

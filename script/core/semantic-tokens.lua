@@ -849,7 +849,7 @@ return function (uri, start, finish)
     end
 
     if #results == 0 then
-        return nil
+        return {}
     end
 
     results = solveMultilineAndOverlapping(state, results)

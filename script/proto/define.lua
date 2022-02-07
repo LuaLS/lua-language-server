@@ -58,6 +58,7 @@ m.DiagnosticDefaultSeverity = {
     ['doc-field-no-class']      = 'Warning',
     ['duplicate-doc-field']     = 'Warning',
     ['unknown-diag-code']       = 'Waiting',
+    ['codestyle-check']         = "Warning",
 }
 
 ---@alias DiagnosticDefaultNeededFileStatus

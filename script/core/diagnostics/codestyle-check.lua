@@ -1,0 +1,34 @@
+local files = require("files")
+local codeFormat = require "code_format"
+local converter = require("proto.converter")
+local log = require("log")
+local config = require("config")
+
+
+---@async
+return function(uri, callback)
+    local text = files.getText(uri)
+    if not text then
+        return
+    end
+
+    local status, diagnosticInfos = codeFormat.diagnose_file(uri, text)
+
+    if not status then
+        if diagnosticInfos ~= nil then
+            log.error(diagnosticInfos)
+        end
+
+        return
+    end
+    
+    if diagnosticInfos then
+        for _, diagnosticInfo in pairs(diagnosticInfos) do
+            callback {
+                start = converter.unpackPosition(uri, diagnosticInfo.range.start),
+                finish = converter.unpackPosition(uri, diagnosticInfo.range["end"]),
+                message = diagnosticInfo.message
+            }
+        end
+    end
+end

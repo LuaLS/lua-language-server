@@ -103,9 +103,9 @@ m.register 'initialize' {
 
         if params.initializationOptions then
             if params.initializationOptions.editorConfigFiles then
-                local code_format = require "code_format"
+                local codeFormat = require "code_format"
                 for _, config in pairs(params.initializationOptions.editorConfigFiles) do
-                    local status, err = code_format.update_config(1, config.workspace, config.path)
+                    local status, err = codeFormat.update_config(1, config.workspace, config.path)
 
                     if not status and err ~= nil then
                         log.error(err)
@@ -930,7 +930,7 @@ m.register 'textDocument/formatting' {
     function(params)
         local uri = files.getRealUri(params.textDocument.uri)
         workspace.awaitReady(uri)
-        local _<close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
+        local _ <close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
 
         if not files.exists(uri) then
             return nil
@@ -960,7 +960,7 @@ m.register 'textDocument/rangeFormatting' {
     function(params)
         local uri = files.getRealUri(params.textDocument.uri)
         workspace.awaitReady(uri)
-        local _<close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
+        local _ <close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
 
         if not files.exists(uri) then
             return nil
@@ -988,8 +988,8 @@ m.register 'config/editorconfig/update' {
     abortByFileUpdate = true,
     ---@async
     function(params)
-        local code_format = require "code_format"
-        local status, err = code_format.update_config(params.type, params.source.workspace, params.source.path)
+        local codeFormat = require "code_format"
+        local status, err = codeFormat.update_config(params.type, params.source.workspace, params.source.path)
 
         if not status and err ~= nil then
             log.error(err)

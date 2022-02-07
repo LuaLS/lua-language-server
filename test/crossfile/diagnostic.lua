@@ -5,8 +5,10 @@ local config   = require 'config'
 local platform = require 'bee.platform'
 local catch    = require 'catch'
 
+
 config.get(nil, 'Lua.diagnostics.neededFileStatus')['deprecated'] = 'Any'
 config.get(nil, 'Lua.diagnostics.neededFileStatus')['type-check'] = 'Any'
+config.get(nil, 'Lua.diagnostics.neededFileStatus')['codestyle-check'] = 'None'
 
 rawset(_G, 'TEST', true)
 

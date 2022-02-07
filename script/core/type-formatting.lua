@@ -46,6 +46,7 @@ local function checkSplitOneLine(results, uri, position, ch)
     if ch ~= '\n' then
         return
     end
+
     local fPosition, fSymbol = findForward(uri, position, 'end', '}')
     if not fPosition then
         return
@@ -77,7 +78,7 @@ local function checkSplitOneLine(results, uri, position, ch)
 end
 
 return function (uri, position, ch)
-    local ast  = files.getState(uri)
+    local ast = files.getState(uri)
     if not ast then
         return nil
     end

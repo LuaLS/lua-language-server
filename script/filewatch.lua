@@ -22,11 +22,30 @@ end
 local m = {}
 
 m._eventList = {}
+m._watchings = {}
 
 function m.watch(path)
-    local id = fw.add(path)
+    if m._watchings[path] then
+        m._watchings[path].count = m._watchings[path].count + 1
+    else
+        m._watchings[path] = {
+            count = 1,
+            id    = fw.add(path),
+        }
+        log.debug('fw.add', path)
+    end
+    local removed
     return function ()
-        fw.remove(id)
+        if removed then
+            return
+        end
+        removed = true
+        m._watchings[path].count = m._watchings[path].count - 1
+        if m._watchings[path].count == 0 then
+            fw.remove(m._watchings[path].id)
+            m._watchings[path] = nil
+            log.debug('fw.remove', path)
+        end
     end
 end
 

@@ -1,3 +1,5 @@
+local gc = require 'gc'
+
 ---@alias scope.type '"override"'|'"folder"'|'"fallback"'
 
 ---@class scope
@@ -5,6 +7,7 @@
 ---@field uri?   uri
 ---@field _links table<uri, boolean>
 ---@field _data  table<string, any>
+---@field _gc    gc
 local mt = {}
 mt.__index = mt
 
@@ -97,6 +100,15 @@ function mt:getName()
     return self.uri or ('<' .. self.type .. '>')
 end
 
+function mt:gc(obj)
+    self._gc:add(obj)
+end
+
+function mt:flushGC()
+    self._gc:remove()
+    self._gc = gc()
+end
+
 ---@param scopeType scope.type
 ---@return scope
 local function createScope(scopeType)
@@ -104,6 +116,7 @@ local function createScope(scopeType)
         type   = scopeType,
         _links = {},
         _data  = {},
+        _gc    = gc(),
     }, mt)
 
     return scope

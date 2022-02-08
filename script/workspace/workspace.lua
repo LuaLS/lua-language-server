@@ -267,14 +267,7 @@ function m.awaitPreload(scp)
     await.setID('preload:' .. scp:getName())
     await.sleep(0.1)
 
-    local watchers = scp:get 'watchers'
-    if watchers then
-        for _, dispose in ipairs(watchers) do
-            dispose()
-        end
-    end
-    watchers = {}
-    scp:set('watchers', watchers)
+    scp:flushGC()
 
     local ld <close> = loading.create(scp)
     scp:set('loading', ld)
@@ -301,7 +294,7 @@ function m.awaitPreload(scp)
             scp:get('cachedUris')[furi.encode(path)] = true
             ld:loadFile(furi.encode(path), libMatcher.uri)
         end)
-        watchers[#watchers+1] = fw.watch(furi.decode(libMatcher.uri))
+        scp:gc(fw.watch(furi.decode(libMatcher.uri)))
     end
 
     -- must wait for other scopes to add library

@@ -186,12 +186,13 @@ function love.filesystem.mount(archive, mountpoint, appendToPath) end
 function love.filesystem.newFile(filename) end
 
 ---
----Creates a new FileData object.
+---Creates a new FileData object from a file on disk, or from a string in memory.
 ---
+---@overload fun(originaldata: love.Data, name: string):love.FileData
 ---@overload fun(filepath: string):love.FileData, string
----@param contents string # The contents of the file.
----@param name string # The name of the file.
----@return love.FileData data # Your new FileData.
+---@param contents string # The contents of the file in memory represented as a string.
+---@param name string # The name of the file. The extension may be parsed and used by LÖVE when passing the FileData object into love.audio.newSource.
+---@return love.FileData data # The new FileData.
 function love.filesystem.newFileData(contents, name) end
 
 ---

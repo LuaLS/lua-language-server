@@ -493,6 +493,19 @@ function Body:getLocalCenter() end
 function Body:getLocalPoint(worldX, worldY) end
 
 ---
+---Transforms multiple points from world coordinates to local coordinates.
+---
+---@param x1 number # (Argument) The x position of the first point.
+---@param y1 number # (Argument) The y position of the first point.
+---@param x2 number # (Argument) The x position of the second point.
+---@param y2 number # (Argument) The y position of the second point.
+---@return number x1 # (Result) The transformed x position of the first point.
+---@return number y1 # (Result) The transformed y position of the first point.
+---@return number x2 # (Result) The transformed x position of the second point.
+---@return number y2 # (Result) The transformed y position of the second point.
+function Body:getLocalPoints(x1, y1, x2, y2) end
+
+---
 ---Transform a vector from world coordinates to local coordinates.
 ---
 ---@param worldX number # The vector x component in world coordinates.

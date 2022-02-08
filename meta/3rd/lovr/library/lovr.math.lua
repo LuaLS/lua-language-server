@@ -784,6 +784,7 @@ function Vec4:sub(u) end
 ---@return number x # The x value.
 ---@return number y # The y value.
 ---@return number z # The z value.
+---@return number w # The w value.
 function Vec4:unpack() end
 
 ---

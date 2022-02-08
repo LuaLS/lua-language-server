@@ -1172,6 +1172,17 @@ function Font:getFilter() end
 function Font:getHeight() end
 
 ---
+---Gets the kerning between two characters in the Font.
+---
+---Kerning is normally handled automatically in love.graphics.print, Text objects, Font:getWidth, Font:getWrap, etc. This function is useful when stitching text together manually.
+---
+---@overload fun(leftglyph: number, rightglyph: number):number
+---@param leftchar string # The left character.
+---@param rightchar string # The right character.
+---@return number kerning # The kerning amount to add to the spacing between the two characters. May be negative.
+function Font:getKerning(leftchar, rightchar) end
+
+---
 ---Gets the line height.
 ---
 ---This will be the value previously set by Font:setLineHeight, or 1.0 by default.
@@ -1945,6 +1956,7 @@ function Shader:hasUniform(name) end
 ---@overload fun(name: string, matrixlayout: love.MatrixLayout, matrix: table, ...)
 ---@overload fun(name: string, data: love.Data, offset: number, size: number)
 ---@overload fun(name: string, data: love.Data, matrixlayout: love.MatrixLayout, offset: number, size: number)
+---@overload fun(name: string, matrixlayout: love.MatrixLayout, data: love.Data, offset: number, size: number)
 ---@param name string # Name of the number to send to the shader.
 ---@param number number # Number to send to store in the uniform variable.
 function Shader:send(name, number) end

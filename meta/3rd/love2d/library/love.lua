@@ -1,6 +1,6 @@
 ---@meta
 
--- version: 11.3
+-- version: 11.4
 ---@class love
 love = {}
 

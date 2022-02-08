@@ -304,6 +304,9 @@ function m.awaitPreload(scp)
         watchers[#watchers+1] = fw.watch(furi.decode(libMatcher.uri))
     end
 
+    -- must wait for other scopes to add library
+    await.sleep(0.1)
+
     log.info(('Found %d files at:'):format(ld.max), scp:getName())
     ld:loadAll()
     log.info('Preload finish at:', scp:getName())

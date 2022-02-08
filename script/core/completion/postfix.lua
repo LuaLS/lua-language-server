@@ -133,6 +133,60 @@ register 'xpcall' {
     end
 }
 
+register 'local' {
+    function (state, source, callback)
+        if  source.type ~= 'getglobal'
+        and source.type ~= 'getfield'
+        and source.type ~= 'getmethod'
+        and source.type ~= 'getindex'
+        and source.type ~= 'getlocal'
+        and source.type ~= 'call'
+        and source.type ~= 'table' then
+            return
+        end
+        local subber = subString(state)
+        callback(string.format('local $1 = %s$0'
+            , subber(source.start + 1, source.finish)
+        ))
+    end
+}
+
+register 'ipairs' {
+    function (state, source, callback)
+        if  source.type ~= 'getglobal'
+        and source.type ~= 'getfield'
+        and source.type ~= 'getmethod'
+        and source.type ~= 'getindex'
+        and source.type ~= 'getlocal'
+        and source.type ~= 'call'
+        and source.type ~= 'table' then
+            return
+        end
+        local subber = subString(state)
+        callback(string.format('for ${1:i}, ${2:v} in ipairs(%s) do\n\t$0\nend'
+            , subber(source.start + 1, source.finish)
+        ))
+    end
+}
+
+register 'pairs' {
+    function (state, source, callback)
+        if  source.type ~= 'getglobal'
+        and source.type ~= 'getfield'
+        and source.type ~= 'getmethod'
+        and source.type ~= 'getindex'
+        and source.type ~= 'getlocal'
+        and source.type ~= 'call'
+        and source.type ~= 'table' then
+            return
+        end
+        local subber = subString(state)
+        callback(string.format('for ${1:k}, ${2:v} in pairs(%s) do\n\t$0\nend'
+            , subber(source.start + 1, source.finish)
+        ))
+    end
+}
+
 register 'insert' {
     function (state, source, callback)
         if  source.type ~= 'getglobal'

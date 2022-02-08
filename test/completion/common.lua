@@ -3067,3 +3067,10 @@ require '<??>'
 (function (results)
     assert(#results == 11, require 'utility'.dump(results))
 end)
+
+TEST [[
+AAA = 1
+
+<??>
+]]
+(EXISTS)

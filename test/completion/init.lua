@@ -1,6 +1,7 @@
 local core   = require 'core.completion'
 local files  = require 'files'
 local catch  = require 'catch'
+local guide  = require 'parser.guide'
 
 EXISTS = {'EXISTS'}
 
@@ -68,12 +69,17 @@ function TEST(script)
         local newScript, catched = catch(script, '?')
 
         files.setText('', newScript)
-        local inputPos = catched['?'][1][1]
+        local state = files.getState('')
+        local inputPos = catched['?'][1][2]
         if ContinueTyping then
             local triggerCharacter = script:sub(inputPos - 1, inputPos - 1)
             core.completion('', inputPos, triggerCharacter)
         end
-        local triggerCharacter = script:sub(inputPos, inputPos)
+        local offset = guide.positionToOffset(state, inputPos)
+        local triggerCharacter = script:sub(offset, offset)
+        if triggerCharacter == '\n' then
+            triggerCharacter = nil
+        end
         local result = core.completion('', inputPos, triggerCharacter)
 
         if not expect then

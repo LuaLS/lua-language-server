@@ -1221,13 +1221,20 @@ end
 
 ---@async
 local function tryWord(state, position, triggerCharacter, results)
+    if triggerCharacter == '('
+    or triggerCharacter == '#'
+    or triggerCharacter == ','
+    or triggerCharacter == '{' then
+        return
+    end
     local text = state.lua
     local offset = guide.positionToOffset(state, position)
     local finish = lookBackward.skipSpace(text, offset)
     local word, start = lookBackward.findWord(text, offset)
     local startPos
     if not word then
-        return nil
+        word = ''
+        startPos = position
     else
         startPos = guide.offsetToPosition(state, start - 1)
     end
@@ -1241,17 +1248,17 @@ local function tryWord(state, position, triggerCharacter, results)
     else
         local parent, oop = findParent(state, startPos)
         if parent then
-            if not hasSpace then
-                checkField(state, word, startPos, position, parent, oop, results)
-            end
+            checkField(state, word, startPos, position, parent, oop, results)
         elseif isFuncArg(state, position) then
             checkProvideLocal(state, word, startPos, results)
             checkFunctionArgByDocParam(state, word, startPos, results)
         else
             local afterLocal = isAfterLocal(state, startPos)
-            local stop = checkKeyWord(state, startPos, position, word, hasSpace, afterLocal, results)
-            if stop then
-                return
+            if triggerCharacter ~= nil then
+                local stop = checkKeyWord(state, startPos, position, word, hasSpace, afterLocal, results)
+                if stop then
+                    return
+                end
             end
             if not hasSpace then
                 if afterLocal then
@@ -1265,7 +1272,7 @@ local function tryWord(state, position, triggerCharacter, results)
                 end
             end
         end
-        if not hasSpace then
+        if not hasSpace and (#results == 0 or word ~= '') then
             checkCommon(state, word, position, results)
         end
     end
@@ -1282,15 +1289,15 @@ local function trySymbol(state, position, results)
         return nil
     end
     local startPos = guide.offsetToPosition(state, start)
-    if symbol == '.'
-    or symbol == ':' then
-        local parent, oop = findParent(state, startPos)
-        if parent then
-            tracy.ZoneBeginN 'completion.trySymbol'
-            checkField(state, '', startPos, position, parent, oop, results)
-            tracy.ZoneEnd()
-        end
-    end
+    --if symbol == '.'
+    --or symbol == ':' then
+    --    local parent, oop = findParent(state, startPos)
+    --    if parent then
+    --        tracy.ZoneBeginN 'completion.trySymbol'
+    --        checkField(state, '', startPos, position, parent, oop, results)
+    --        tracy.ZoneEnd()
+    --    end
+    --end
     if symbol == '(' then
         checkFunctionArgByDocParam(state, '', startPos, results)
     end

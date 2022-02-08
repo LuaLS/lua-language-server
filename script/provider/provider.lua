@@ -535,7 +535,7 @@ m.register 'textDocument/completion' {
                 kind             = res.kind,
                 detail           = res.detail,
                 deprecated       = res.deprecated,
-                sortText         = ('%04d'):format(i),
+                sortText         = res.sortText or ('%04d'):format(i),
                 filterText       = res.filterText,
                 insertText       = res.insertText,
                 insertTextFormat = 2,

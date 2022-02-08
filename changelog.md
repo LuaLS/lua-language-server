@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.6.4
+* `CHG` completion: reduced sorting priority for postfix completion
 * `FIX` [#937](https://github.com/sumneko/lua-language-server/issues/937)
 * `FIX` [#941](https://github.com/sumneko/lua-language-server/issues/941)
 

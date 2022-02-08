@@ -240,7 +240,7 @@ local function checkPostFix(state, word, wordPosition, position, symbol, results
     if not source then
         return
     end
-    for _, action in ipairs(actions) do
+    for i, action in ipairs(actions) do
         if matchKey(word, action.key) then
             action.data[1](state, source, function (newText)
                 results[#results+1] = {
@@ -261,6 +261,7 @@ local function checkPostFix(state, word, wordPosition, position, symbol, results
                             newText = '',
                         },
                     },
+                    sortText = ('postfix-%04d'):format(i),
                 }
             end)
         end

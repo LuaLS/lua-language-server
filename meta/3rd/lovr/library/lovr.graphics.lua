@@ -895,7 +895,7 @@ function Font:setLineHeight(lineHeight) end
 ---
 ---Sets the pixel density for the Font.  Normally, this is in pixels per meter.  When rendering to a 2D texture, the units are pixels.
 ---
----@overload fun()
+---@overload fun(self: lovr.Font)
 ---@param pixelDensity number # The new pixel density.
 function Font:setPixelDensity(pixelDensity) end
 
@@ -942,9 +942,9 @@ function Material:getTransform() end
 ---
 ---Sets a color property for a Material.  Different types of colors are supported for different lighting parameters.  Colors default to `(1.0, 1.0, 1.0, 1.0)` and are gamma corrected.
 ---
----@overload fun(r: number, g: number, b: number, a: number)
----@overload fun(colorType: lovr.MaterialColor, hex: number, a: number)
----@overload fun(hex: number, a: number)
+---@overload fun(self: lovr.Material, r: number, g: number, b: number, a: number)
+---@overload fun(self: lovr.Material, colorType: lovr.MaterialColor, hex: number, a: number)
+---@overload fun(self: lovr.Material, hex: number, a: number)
 ---@param colorType? lovr.MaterialColor # The type of color to set.
 ---@param r number # The red component of the color.
 ---@param g number # The green component of the color.
@@ -962,7 +962,7 @@ function Material:setScalar(scalarType, x) end
 ---
 ---Sets a texture for a Material.  Several predefined `MaterialTexture`s are supported.  Any texture that is `nil` will use a single white pixel as a fallback.
 ---
----@overload fun(texture: lovr.Texture)
+---@overload fun(self: lovr.Material, texture: lovr.Texture)
 ---@param textureType? lovr.MaterialTexture # The type of texture to set.
 ---@param texture lovr.Texture # The texture to apply, or `nil` to use the default.
 function Material:setTexture(textureType, texture) end
@@ -992,8 +992,8 @@ local Mesh = {}
 ---
 ---Attaches attributes from another Mesh onto this one.  This can be used to share vertex data across multiple meshes without duplicating the data, and can also be used for instanced rendering by using the `divisor` parameter.
 ---
----@overload fun(mesh: lovr.Mesh, divisor: number, ...)
----@overload fun(mesh: lovr.Mesh, divisor: number, attributes: table)
+---@overload fun(self: lovr.Mesh, mesh: lovr.Mesh, divisor: number, ...)
+---@overload fun(self: lovr.Mesh, mesh: lovr.Mesh, divisor: number, attributes: table)
 ---@param mesh lovr.Mesh # The Mesh to attach attributes from.
 ---@param divisor? number # The attribute divisor for all attached attributes.
 function Mesh:attachAttributes(mesh, divisor) end
@@ -1001,15 +1001,15 @@ function Mesh:attachAttributes(mesh, divisor) end
 ---
 ---Detaches attributes that were attached using `Mesh:attachAttributes`.
 ---
----@overload fun(mesh: lovr.Mesh, ...)
----@overload fun(mesh: lovr.Mesh, attributes: table)
+---@overload fun(self: lovr.Mesh, mesh: lovr.Mesh, ...)
+---@overload fun(self: lovr.Mesh, mesh: lovr.Mesh, attributes: table)
 ---@param mesh lovr.Mesh # A Mesh.  The names of all of the attributes from this Mesh will be detached.
 function Mesh:detachAttributes(mesh) end
 
 ---
 ---Draws the contents of the Mesh.
 ---
----@overload fun(transform: lovr.mat4, instances: number)
+---@overload fun(self: lovr.Mesh, transform: lovr.mat4, instances: number)
 ---@param x? number # The x coordinate to draw the Mesh at.
 ---@param y? number # The y coordinate to draw the Mesh at.
 ---@param z? number # The z coordinate to draw the Mesh at.
@@ -1068,8 +1068,8 @@ function Mesh:getVertexFormat() end
 ---
 ---Returns the current vertex map for the Mesh.  The vertex map is a list of indices in the Mesh, allowing the reordering or reuse of vertices.
 ---
----@overload fun(t: table):table
----@overload fun(blob: lovr.Blob)
+---@overload fun(self: lovr.Mesh, t: table):table
+---@overload fun(self: lovr.Mesh, blob: lovr.Blob)
 ---@return table map # The list of indices in the vertex map, or `nil` if no vertex map is set.
 function Mesh:getVertexMap() end
 
@@ -1096,7 +1096,7 @@ function Mesh:setDrawMode(mode) end
 ---
 ---Set the draw range for the Mesh.  The draw range is a subset of the vertices of the Mesh that will be drawn.
 ---
----@overload fun()
+---@overload fun(self: lovr.Mesh)
 ---@param start number # The first vertex that will be drawn.
 ---@param count number # The number of vertices that will be drawn.
 function Mesh:setDrawRange(start, count) end
@@ -1125,14 +1125,14 @@ function Mesh:setVertexAttribute(index, attribute) end
 ---
 ---Often, a vertex map is used to improve performance, since it usually requires less data to specify the index of a vertex than it does to specify all of the data for a vertex.
 ---
----@overload fun(blob: lovr.Blob, size: number)
+---@overload fun(self: lovr.Mesh, blob: lovr.Blob, size: number)
 ---@param map table # The new vertex map.  Each element of the table is an index of a vertex.
 function Mesh:setVertexMap(map) end
 
 ---
 ---Updates multiple vertices in the Mesh.
 ---
----@overload fun(blob: lovr.Blob, start: number, count: number)
+---@overload fun(self: lovr.Mesh, blob: lovr.Blob, start: number, count: number)
 ---@param vertices table # The new set of vertices.
 ---@param start? number # The index of the vertex to start replacing at.
 ---@param count? number # The number of vertices to replace.  If nil, all vertices will be used.
@@ -1149,7 +1149,7 @@ local Model = {}
 ---
 ---The animation is evaluated at the specified timestamp, and mixed with the current pose of the Model using the alpha value.  An alpha value of 1.0 will completely override the pose of the Model with the animation's pose.
 ---
----@overload fun(index: number, time: number, alpha: number)
+---@overload fun(self: lovr.Model, index: number, time: number, alpha: number)
 ---@param name string # The name of an animation.
 ---@param time number # The timestamp to evaluate the keyframes at, in seconds.
 ---@param alpha? number # How much of the animation to mix in, from 0 to 1.
@@ -1158,7 +1158,7 @@ function Model:animate(name, time, alpha) end
 ---
 ---Draw the Model.
 ---
----@overload fun(transform: lovr.mat4, instances: number)
+---@overload fun(self: lovr.Model, transform: lovr.mat4, instances: number)
 ---@param x? number # The x coordinate to draw the Model at.
 ---@param y? number # The y coordinate to draw the Model at.
 ---@param z? number # The z coordinate to draw the Model at.
@@ -1190,7 +1190,7 @@ function Model:getAnimationCount() end
 ---
 ---Returns the duration of an animation in the Model, in seconds.
 ---
----@overload fun(index: number):number
+---@overload fun(self: lovr.Model, index: number):number
 ---@param name string # The name of the animation.
 ---@return number duration # The duration of the animation, in seconds.
 function Model:getAnimationDuration(name) end
@@ -1207,7 +1207,7 @@ function Model:getAnimationName(index) end
 ---
 ---This includes `Texture` objects and other properties like colors, metalness/roughness, and more.
 ---
----@overload fun(index: number):lovr.Material
+---@overload fun(self: lovr.Model, index: number):lovr.Material
 ---@param name string # The name of the Material to return.
 ---@return lovr.Material material # The material.
 function Model:getMaterial(name) end
@@ -1241,7 +1241,7 @@ function Model:getNodeName(index) end
 ---
 ---Returns the pose of a single node in the Model in a given `CoordinateSpace`.
 ---
----@overload fun(index: number, space: lovr.CoordinateSpace):number, number, number, number, number, number, number
+---@overload fun(self: lovr.Model, index: number, space: lovr.CoordinateSpace):number, number, number, number, number, number, number
 ---@param name string # The name of the node.
 ---@param space? lovr.CoordinateSpace # Whether the pose should be returned relative to the node's parent or relative to the root node of the Model.
 ---@return number x # The x position of the node.
@@ -1275,8 +1275,8 @@ function Model:hasJoints() end
 ---
 ---The alpha parameter can be used to mix between the node's current pose and the input pose.
 ---
----@overload fun(index: number, x: number, y: number, z: number, angle: number, ax: number, ay: number, az: number, alpha: number)
----@overload fun()
+---@overload fun(self: lovr.Model, index: number, x: number, y: number, z: number, angle: number, ax: number, ay: number, az: number, alpha: number)
+---@overload fun(self: lovr.Model)
 ---@param name string # The name of the node.
 ---@param x number # The x position.
 ---@param y number # The y position.
@@ -1337,7 +1337,7 @@ function Shader:sendBlock(name, block, access) end
 ---
 ---Sends a Texture to a Shader for writing.  This is meant to be used with compute shaders and only works with uniforms declared as `image2D`, `imageCube`, `image2DArray`, and `image3D`.  The normal `Shader:send` function accepts Textures and should be used most of the time.
 ---
----@overload fun(name: string, index: number, texture: lovr.Texture, slice: number, mipmap: number, access: lovr.UniformAccess)
+---@overload fun(self: lovr.Shader, name: string, index: number, texture: lovr.Texture, slice: number, mipmap: number, access: lovr.UniformAccess)
 ---@param name string # The name of the image uniform.
 ---@param texture lovr.Texture # The Texture to assign.
 ---@param slice? number # The slice of a cube, array, or volume texture to use, or `nil` for all slices.
@@ -1399,7 +1399,7 @@ function ShaderBlock:read(name) end
 ---
 ---Updates a variable in the ShaderBlock.
 ---
----@overload fun(blob: lovr.Blob, offset: number, extent: number):number
+---@overload fun(self: lovr.ShaderBlock, blob: lovr.Blob, offset: number, extent: number):number
 ---@param variable string # The name of the variable to update.
 ---@param value any # The new value of the uniform.
 function ShaderBlock:send(variable, value) end

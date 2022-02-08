@@ -47,7 +47,7 @@ local CompressedImageData = {}
 ---
 ---Gets the width and height of the CompressedImageData.
 ---
----@overload fun(level: number):number, number
+---@overload fun(self: love.CompressedImageData, level: number):number, number
 ---@return number width # The width of the CompressedImageData.
 ---@return number height # The height of the CompressedImageData.
 function CompressedImageData:getDimensions() end
@@ -61,7 +61,7 @@ function CompressedImageData:getFormat() end
 ---
 ---Gets the height of the CompressedImageData.
 ---
----@overload fun(level: number):number
+---@overload fun(self: love.CompressedImageData, level: number):number
 ---@return number height # The height of the CompressedImageData.
 function CompressedImageData:getHeight() end
 
@@ -74,7 +74,7 @@ function CompressedImageData:getMipmapCount() end
 ---
 ---Gets the width of the CompressedImageData.
 ---
----@overload fun(level: number):number
+---@overload fun(self: love.CompressedImageData, level: number):number
 ---@return number width # The width of the CompressedImageData.
 function CompressedImageData:getWidth() end
 
@@ -89,8 +89,8 @@ local ImageData = {}
 ---
 ---Encodes the ImageData and optionally writes it to the save directory.
 ---
----@overload fun(outFile: string)
----@overload fun(outFile: string, format: love.ImageFormat)
+---@overload fun(self: love.ImageData, outFile: string)
+---@overload fun(self: love.ImageData, outFile: string, format: love.ImageFormat)
 ---@param format love.ImageFormat # The format to encode the image as.
 ---@param filename? string # The filename to write the file to. If nil, no file will be written but the FileData will still be returned.
 ---@return love.FileData filedata # The encoded image as a new FileData object.

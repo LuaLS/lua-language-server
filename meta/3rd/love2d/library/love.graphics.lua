@@ -1087,7 +1087,7 @@ function Canvas:getMipmapMode() end
 ---
 ---Generates ImageData from the contents of the Canvas.
 ---
----@overload fun(slice: number, mipmap: number, x: number, y: number, width: number, height: number):love.ImageData
+---@overload fun(self: love.Canvas, slice: number, mipmap: number, x: number, y: number, width: number, height: number):love.ImageData
 ---@return love.ImageData data # The new ImageData made from the Canvas' contents.
 function Canvas:newImageData() end
 
@@ -1176,7 +1176,7 @@ function Font:getHeight() end
 ---
 ---Kerning is normally handled automatically in love.graphics.print, Text objects, Font:getWidth, Font:getWrap, etc. This function is useful when stitching text together manually.
 ---
----@overload fun(leftglyph: number, rightglyph: number):number
+---@overload fun(self: love.Font, leftglyph: number, rightglyph: number):number
 ---@param leftchar string # The left character.
 ---@param rightchar string # The right character.
 ---@return number kerning # The kerning amount to add to the spacing between the two characters. May be negative.
@@ -1211,8 +1211,8 @@ function Font:getWrap(text, wraplimit) end
 ---
 ---Gets whether the Font can render a character or string.
 ---
----@overload fun(character1: string, character2: string):boolean
----@overload fun(codepoint1: number, codepoint2: number):boolean
+---@overload fun(self: love.Font, character1: string, character2: string):boolean
+---@overload fun(self: love.Font, codepoint1: number, codepoint2: number):boolean
 ---@param text string # A UTF-8 encoded unicode string.
 ---@return boolean hasglyph # Whether the font can render all the UTF-8 characters in the string.
 function Font:hasGlyphs(text) end
@@ -1279,7 +1279,7 @@ local Mesh = {}
 ---
 ---Attaches a vertex attribute from a different Mesh onto this Mesh, for use when drawing. This can be used to share vertex attribute data between several different Meshes.
 ---
----@overload fun(name: string, mesh: love.Mesh, step: love.VertexAttributeStep, attachname: string)
+---@overload fun(self: love.Mesh, name: string, mesh: love.Mesh, step: love.VertexAttributeStep, attachname: string)
 ---@param name string # The name of the vertex attribute to attach.
 ---@param mesh love.Mesh # The Mesh to get the vertex attribute from.
 function Mesh:attachAttribute(name, mesh) end
@@ -1315,7 +1315,7 @@ function Mesh:getTexture() end
 ---
 ---In versions prior to 11.0, color and byte component values were within the range of 0 to 255 instead of 0 to 1.
 ---
----@overload fun(index: number):number, number, number, number, number, number, number, number
+---@overload fun(self: love.Mesh, index: number):number, number, number, number, number, number, number, number
 ---@param index number # The one-based index of the vertex you want to retrieve the information for.
 ---@return number attributecomponent # The first component of the first vertex attribute in the specified vertex.
 function Mesh:getVertex(index) end
@@ -1374,7 +1374,7 @@ function Mesh:setDrawMode(mode) end
 ---
 ---Restricts the drawn vertices of the Mesh to a subset of the total.
 ---
----@overload fun()
+---@overload fun(self: love.Mesh)
 ---@param start number # The index of the first vertex to use when drawing, or the index of the first value in the vertex map to use if one is set for this Mesh.
 ---@param count number # The number of vertices to use when drawing, or number of values in the vertex map to use if one is set for this Mesh.
 function Mesh:setDrawRange(start, count) end
@@ -1382,7 +1382,7 @@ function Mesh:setDrawRange(start, count) end
 ---
 ---Sets the texture (Image or Canvas) used when drawing the Mesh.
 ---
----@overload fun()
+---@overload fun(self: love.Mesh)
 ---@param texture love.Texture # The Image or Canvas to texture the Mesh with when drawing.
 function Mesh:setTexture(texture) end
 
@@ -1391,9 +1391,9 @@ function Mesh:setTexture(texture) end
 ---
 ---In versions prior to 11.0, color and byte component values were within the range of 0 to 255 instead of 0 to 1.
 ---
----@overload fun(index: number, vertex: table)
----@overload fun(index: number, x: number, y: number, u: number, v: number, r: number, g: number, b: number, a: number)
----@overload fun(index: number, vertex: table)
+---@overload fun(self: love.Mesh, index: number, vertex: table)
+---@overload fun(self: love.Mesh, index: number, x: number, y: number, u: number, v: number, r: number, g: number, b: number, a: number)
+---@overload fun(self: love.Mesh, index: number, vertex: table)
 ---@param index number # The index of the the vertex you want to modify (one-based).
 ---@param attributecomponent number # The first component of the first vertex attribute in the specified vertex.
 function Mesh:setVertex(index, attributecomponent) end
@@ -1414,16 +1414,16 @@ function Mesh:setVertexAttribute(vertexindex, attributeindex, value1, value2) en
 ---
 ---The vertex map allows you to re-order or reuse vertices when drawing without changing the actual vertex parameters or duplicating vertices. It is especially useful when combined with different Mesh Draw Modes.
 ---
----@overload fun(vi1: number, vi2: number, vi3: number)
----@overload fun(data: love.Data, datatype: love.IndexDataType)
+---@overload fun(self: love.Mesh, vi1: number, vi2: number, vi3: number)
+---@overload fun(self: love.Mesh, data: love.Data, datatype: love.IndexDataType)
 ---@param map table # A table containing a list of vertex indices to use when drawing. Values must be in the range of Mesh:getVertexCount().
 function Mesh:setVertexMap(map) end
 
 ---
 ---Replaces a range of vertices in the Mesh with new ones. The total number of vertices in a Mesh cannot be changed after it has been created. This is often more efficient than calling Mesh:setVertex in a loop.
 ---
----@overload fun(data: love.Data, startvertex: number)
----@overload fun(vertices: table)
+---@overload fun(self: love.Mesh, data: love.Data, startvertex: number)
+---@overload fun(self: love.Mesh, vertices: table)
 ---@param vertices {attributecomponent: number} # The table filled with vertex information tables for each vertex, in the form of {vertex, ...} where each vertex is a table in the form of {attributecomponent, ...}.
 ---@param startvertex? number # The index of the first vertex to replace.
 function Mesh:setVertices(vertices, startvertex) end
@@ -1774,7 +1774,7 @@ function ParticleSystem:setPosition(x, y) end
 ---
 ---Sets a series of Quads to use for the particle sprites. Particles will choose a Quad from the list based on the particle's current lifetime, allowing for the use of animated sprite sheets with ParticleSystems.
 ---
----@overload fun(quads: table)
+---@overload fun(self: love.ParticleSystem, quads: table)
 ---@param quad1 love.Quad # The first Quad to use.
 ---@param quad2 love.Quad # The second Quad to use.
 function ParticleSystem:setQuads(quad1, quad2) end
@@ -1949,14 +1949,14 @@ function Shader:hasUniform(name) end
 ---
 ---Uniform / extern variables are read-only in the shader code and remain constant until modified by a Shader:send call. Uniform variables can be accessed in both the Vertex and Pixel components of a shader, as long as the variable is declared in each.
 ---
----@overload fun(name: string, vector: table, ...)
----@overload fun(name: string, matrix: table, ...)
----@overload fun(name: string, texture: love.Texture)
----@overload fun(name: string, boolean: boolean, ...)
----@overload fun(name: string, matrixlayout: love.MatrixLayout, matrix: table, ...)
----@overload fun(name: string, data: love.Data, offset: number, size: number)
----@overload fun(name: string, data: love.Data, matrixlayout: love.MatrixLayout, offset: number, size: number)
----@overload fun(name: string, matrixlayout: love.MatrixLayout, data: love.Data, offset: number, size: number)
+---@overload fun(self: love.Shader, name: string, vector: table, ...)
+---@overload fun(self: love.Shader, name: string, matrix: table, ...)
+---@overload fun(self: love.Shader, name: string, texture: love.Texture)
+---@overload fun(self: love.Shader, name: string, boolean: boolean, ...)
+---@overload fun(self: love.Shader, name: string, matrixlayout: love.MatrixLayout, matrix: table, ...)
+---@overload fun(self: love.Shader, name: string, data: love.Data, offset: number, size: number)
+---@overload fun(self: love.Shader, name: string, data: love.Data, matrixlayout: love.MatrixLayout, offset: number, size: number)
+---@overload fun(self: love.Shader, name: string, matrixlayout: love.MatrixLayout, data: love.Data, offset: number, size: number)
 ---@param name string # Name of the number to send to the shader.
 ---@param number number # Number to send to store in the uniform variable.
 function Shader:send(name, number) end
@@ -1991,7 +1991,7 @@ local SpriteBatch = {}
 ---
 ---Adds a sprite to the batch. Sprites are drawn in the order they are added.
 ---
----@overload fun(quad: love.Quad, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number):number
+---@overload fun(self: love.SpriteBatch, quad: love.Quad, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number):number
 ---@param x number # The position to draw the object (x-axis).
 ---@param y number # The position to draw the object (y-axis).
 ---@param r? number # Orientation (radians).
@@ -2007,9 +2007,9 @@ function SpriteBatch:add(x, y, r, sx, sy, ox, oy, kx, ky) end
 ---
 ---Adds a sprite to a batch created with an Array Texture.
 ---
----@overload fun(layerindex: number, quad: love.Quad, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number):number
----@overload fun(layerindex: number, transform: love.Transform):number
----@overload fun(layerindex: number, quad: love.Quad, transform: love.Transform):number
+---@overload fun(self: love.SpriteBatch, layerindex: number, quad: love.Quad, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number):number
+---@overload fun(self: love.SpriteBatch, layerindex: number, transform: love.Transform):number
+---@overload fun(self: love.SpriteBatch, layerindex: number, quad: love.Quad, transform: love.Transform):number
 ---@param layerindex number # The index of the layer to use for this sprite.
 ---@param x? number # The position to draw the sprite (x-axis).
 ---@param y? number # The position to draw the sprite (y-axis).
@@ -2080,7 +2080,7 @@ function SpriteBatch:getTexture() end
 ---
 ---Changes a sprite in the batch. This requires the sprite index returned by SpriteBatch:add or SpriteBatch:addLayer.
 ---
----@overload fun(spriteindex: number, quad: love.Quad, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number)
+---@overload fun(self: love.SpriteBatch, spriteindex: number, quad: love.Quad, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number)
 ---@param spriteindex number # The index of the sprite that will be changed.
 ---@param x number # The position to draw the object (x-axis).
 ---@param y number # The position to draw the object (y-axis).
@@ -2100,7 +2100,7 @@ function SpriteBatch:set(spriteindex, x, y, r, sx, sy, ox, oy, kx, ky) end
 ---
 ---In version 0.9.2 and older, the global color set with love.graphics.setColor will not work on the SpriteBatch if any of the sprites has its own color.
 ---
----@overload fun()
+---@overload fun(self: love.SpriteBatch)
 ---@param r number # The amount of red.
 ---@param g number # The amount of green.
 ---@param b number # The amount of blue.
@@ -2110,7 +2110,7 @@ function SpriteBatch:setColor(r, g, b, a) end
 ---
 ---Restricts the drawn sprites in the SpriteBatch to a subset of the total.
 ---
----@overload fun()
+---@overload fun(self: love.SpriteBatch)
 ---@param start number # The index of the first sprite to draw. Index 1 corresponds to the first sprite added with SpriteBatch:add.
 ---@param count number # The number of sprites to draw.
 function SpriteBatch:setDrawRange(start, count) end
@@ -2118,9 +2118,9 @@ function SpriteBatch:setDrawRange(start, count) end
 ---
 ---Changes a sprite previously added with add or addLayer, in a batch created with an Array Texture.
 ---
----@overload fun(spriteindex: number, layerindex: number, quad: love.Quad, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number)
----@overload fun(spriteindex: number, layerindex: number, transform: love.Transform)
----@overload fun(spriteindex: number, layerindex: number, quad: love.Quad, transform: love.Transform)
+---@overload fun(self: love.SpriteBatch, spriteindex: number, layerindex: number, quad: love.Quad, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number)
+---@overload fun(self: love.SpriteBatch, spriteindex: number, layerindex: number, transform: love.Transform)
+---@overload fun(self: love.SpriteBatch, spriteindex: number, layerindex: number, quad: love.Quad, transform: love.Transform)
 ---@param spriteindex number # The index of the existing sprite to replace.
 ---@param layerindex number # The index of the layer in the Array Texture to use for this sprite.
 ---@param x? number # The position to draw the sprite (x-axis).
@@ -2149,7 +2149,7 @@ local Text = {}
 ---
 ---Adds additional colored text to the Text object at the specified position.
 ---
----@overload fun(coloredtext: table, x: number, y: number, angle: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number):number
+---@overload fun(self: love.Text, coloredtext: table, x: number, y: number, angle: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number):number
 ---@param textstring string # The text to add to the object.
 ---@param x? number # The position of the new text on the x-axis.
 ---@param y? number # The position of the new text on the y-axis.
@@ -2168,7 +2168,7 @@ function Text:add(textstring, x, y, angle, sx, sy, ox, oy, kx, ky) end
 ---
 ---The word wrap limit is applied before any scaling, rotation, and other coordinate transformations. Therefore the amount of text per line stays constant given the same wrap limit, even if the scale arguments change.
 ---
----@overload fun(coloredtext: table, wraplimit: number, align: love.AlignMode, x: number, y: number, angle: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number):number
+---@overload fun(self: love.Text, coloredtext: table, wraplimit: number, align: love.AlignMode, x: number, y: number, angle: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number):number
 ---@param textstring string # The text to add to the object.
 ---@param wraplimit number # The maximum width in pixels of the text before it gets automatically wrapped to a new line.
 ---@param align love.AlignMode # The alignment of the text.
@@ -2192,7 +2192,7 @@ function Text:clear() end
 ---
 ---Gets the width and height of the text in pixels.
 ---
----@overload fun(index: number):number, number
+---@overload fun(self: love.Text, index: number):number, number
 ---@return number width # The width of the text. If multiple sub-strings have been added with Text:add, the width of the last sub-string is returned.
 ---@return number height # The height of the text. If multiple sub-strings have been added with Text:add, the height of the last sub-string is returned.
 function Text:getDimensions() end
@@ -2206,21 +2206,21 @@ function Text:getFont() end
 ---
 ---Gets the height of the text in pixels.
 ---
----@overload fun(index: number):number
+---@overload fun(self: love.Text, index: number):number
 ---@return number height # The height of the text. If multiple sub-strings have been added with Text:add, the height of the last sub-string is returned.
 function Text:getHeight() end
 
 ---
 ---Gets the width of the text in pixels.
 ---
----@overload fun(index: number):number
+---@overload fun(self: love.Text, index: number):number
 ---@return number width # The width of the text. If multiple sub-strings have been added with Text:add, the width of the last sub-string is returned.
 function Text:getWidth() end
 
 ---
 ---Replaces the contents of the Text object with a new unformatted string.
 ---
----@overload fun(coloredtext: table)
+---@overload fun(self: love.Text, coloredtext: table)
 ---@param textstring string # The new string of text to use.
 function Text:set(textstring) end
 
@@ -2233,7 +2233,7 @@ function Text:setFont(font) end
 ---
 ---Replaces the contents of the Text object with a new formatted string.
 ---
----@overload fun(coloredtext: table, wraplimit: number, align: love.AlignMode)
+---@overload fun(self: love.Text, coloredtext: table, wraplimit: number, align: love.AlignMode)
 ---@param textstring string # The new string of text to use.
 ---@param wraplimit number # The maximum width in pixels of the text before it gets automatically wrapped to a new line.
 ---@param align love.AlignMode # The alignment of the text.
@@ -2399,7 +2399,7 @@ function Texture:setFilter(min, mag, anisotropy) end
 ---
 ---Due to hardware restrictions and driver bugs, in versions prior to 0.10.0 images that weren't loaded from a CompressedData must have power-of-two dimensions (64x64, 512x256, etc.) to use mipmaps.
 ---
----@overload fun()
+---@overload fun(self: love.Texture)
 ---@param filtermode love.FilterMode # The filter mode to use in between mipmap levels. 'nearest' will often give better performance.
 ---@param sharpness? number # A positive sharpness value makes the texture use a more detailed mipmap level when drawing, at the expense of performance. A negative value does the reverse.
 function Texture:setMipmapFilter(filtermode, sharpness) end

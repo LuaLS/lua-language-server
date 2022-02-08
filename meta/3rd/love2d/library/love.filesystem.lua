@@ -354,7 +354,7 @@ function File:open(mode) end
 ---
 ---Read a number of bytes from a file.
 ---
----@overload fun(container: love.ContainerType, bytes: number):love.FileData|string, number
+---@overload fun(self: love.File, container: love.ContainerType, bytes: number):love.FileData|string, number
 ---@param bytes? number # The number of bytes to read.
 ---@return string contents # The contents of the read bytes.
 ---@return number size # How many bytes have been read.
@@ -387,7 +387,7 @@ function File:tell() end
 ---
 ---Write data to a file.
 ---
----@overload fun(data: love.Data, size: number):boolean, string
+---@overload fun(self: love.File, data: love.Data, size: number):boolean, string
 ---@param data string # The string data to write.
 ---@param size? number # How many bytes to write.
 ---@return boolean success # Whether the operation was successful.

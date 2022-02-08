@@ -503,7 +503,7 @@ function Source:setDirection(x, y, z) end
 ---
 ---The effect must have been previously defined using love.audio.setEffect.
 ---
----@overload fun(name: string, filtersettings: table):boolean
+---@overload fun(self: love.Source, name: string, filtersettings: table):boolean
 ---@param name string # The name of the effect previously set up with love.audio.setEffect.
 ---@param enable? boolean # If false and the given effect name was previously enabled on this Source, disables the effect.
 ---@return boolean success # Whether the effect was successfully applied to this Source.
@@ -512,7 +512,7 @@ function Source:setEffect(name, enable) end
 ---
 ---Sets a low-pass, high-pass, or band-pass filter to apply when playing the Source.
 ---
----@overload fun()
+---@overload fun(self: love.Source)
 ---@param settings {type: love.FilterType, volume: number, highgain: number, lowgain: number} # The filter settings to use for this Source, with the following fields:
 ---@return boolean success # Whether the filter was successfully applied to the Source.
 function Source:setFilter(settings) end

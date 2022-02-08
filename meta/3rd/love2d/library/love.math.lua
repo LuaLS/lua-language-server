@@ -341,8 +341,8 @@ function RandomGenerator:getState() end
 ---
 ---Generates a pseudo-random number in a platform independent manner.
 ---
----@overload fun(max: number):number
----@overload fun(min: number, max: number):number
+---@overload fun(self: love.RandomGenerator, max: number):number
+---@overload fun(self: love.RandomGenerator, min: number, max: number):number
 ---@return number number # The pseudo-random number.
 function RandomGenerator:random() end
 
@@ -357,7 +357,7 @@ function RandomGenerator:randomNormal(stddev, mean) end
 ---
 ---Sets the seed of the random number generator using the specified integer number.
 ---
----@overload fun(low: number, high: number)
+---@overload fun(self: love.RandomGenerator, low: number, high: number)
 ---@param seed number # The integer number with which you want to seed the randomization. Must be within the range of 2^53.
 function RandomGenerator:setSeed(seed) end
 
@@ -449,9 +449,9 @@ function Transform:scale(sx, sy) end
 ---
 ---Directly sets the Transform's internal 4x4 transformation matrix.
 ---
----@overload fun(layout: love.MatrixLayout, e1_1: number, e1_2: number, ..., e4_4: number):love.Transform
----@overload fun(layout: love.MatrixLayout, matrix: table):love.Transform
----@overload fun(layout: love.MatrixLayout, matrix: table):love.Transform
+---@overload fun(self: love.Transform, layout: love.MatrixLayout, e1_1: number, e1_2: number, ..., e4_4: number):love.Transform
+---@overload fun(self: love.Transform, layout: love.MatrixLayout, matrix: table):love.Transform
+---@overload fun(self: love.Transform, layout: love.MatrixLayout, matrix: table):love.Transform
 ---@param e1_1 number # The first column of the first row of the matrix.
 ---@param e1_2 number # The second column of the first row of the matrix.
 ---@param e4_4 number # The fourth column of the fourth row of the matrix.

@@ -307,9 +307,9 @@ function Sound:getFrameCount() end
 ---
 ---Reads frames from the Sound into a table, Blob, or another Sound.
 ---
----@overload fun(t: table, count: number, srcOffset: number, dstOffset: number):table, number
----@overload fun(blob: lovr.Blob, count: number, srcOffset: number, dstOffset: number):number
----@overload fun(sound: lovr.Sound, count: number, srcOffset: number, dstOffset: number):number
+---@overload fun(self: lovr.Sound, t: table, count: number, srcOffset: number, dstOffset: number):table, number
+---@overload fun(self: lovr.Sound, blob: lovr.Blob, count: number, srcOffset: number, dstOffset: number):number
+---@overload fun(self: lovr.Sound, sound: lovr.Sound, count: number, srcOffset: number, dstOffset: number):number
 ---@param count? number # The number of frames to read.  If nil, reads as many frames as possible.
 
 Compressed sounds will automatically be decoded.
@@ -347,8 +347,8 @@ function Sound:isStream() end
 ---
 ---Writes frames to the Sound.
 ---
----@overload fun(blob: lovr.Blob, count: number, dstOffset: number, srcOffset: number):number
----@overload fun(sound: lovr.Sound, count: number, dstOffset: number, srcOffset: number):number
+---@overload fun(self: lovr.Sound, blob: lovr.Blob, count: number, dstOffset: number, srcOffset: number):number
+---@overload fun(self: lovr.Sound, sound: lovr.Sound, count: number, dstOffset: number, srcOffset: number):number
 ---@param t table # A table containing frames to write.
 ---@param count? number # How many frames to write.  If nil, writes as many as possible.
 ---@param dstOffset? number # A frame offset to apply when writing the frames.

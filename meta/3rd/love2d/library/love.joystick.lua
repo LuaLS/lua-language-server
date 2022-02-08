@@ -121,7 +121,7 @@ function Joystick:getGamepadAxis(axis) end
 ---
 ---Gets the button, axis or hat that a virtual gamepad input is bound to.
 ---
----@overload fun(button: love.GamepadButton):love.JoystickInputType, number, love.JoystickHat
+---@overload fun(self: love.Joystick, button: love.GamepadButton):love.JoystickInputType, number, love.JoystickHat
 ---@param axis love.GamepadAxis # The virtual gamepad axis to get the binding for.
 ---@return love.JoystickInputType inputtype # The type of input the virtual gamepad axis is bound to.
 ---@return number inputindex # The index of the Joystick's button, axis or hat that the virtual gamepad axis is bound to.
@@ -208,8 +208,8 @@ function Joystick:isVibrationSupported() end
 ---
 ---Sets the vibration motor speeds on a Joystick with rumble support. Most common gamepads have this functionality, although not all drivers give proper support. Use Joystick:isVibrationSupported to check.
 ---
----@overload fun():boolean
----@overload fun(left: number, right: number, duration: number):boolean
+---@overload fun(self: love.Joystick):boolean
+---@overload fun(self: love.Joystick, left: number, right: number, duration: number):boolean
 ---@param left number # Strength of the left vibration motor on the Joystick. Must be in the range of 1.
 ---@param right number # Strength of the right vibration motor on the Joystick. Must be in the range of 1.
 ---@return boolean success # True if the vibration was successfully applied, false if not.

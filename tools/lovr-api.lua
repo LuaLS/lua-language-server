@@ -92,9 +92,12 @@ local function buildDescription(desc)
     end
 end
 
-local function buildDocFunc(variant)
+local function buildDocFunc(variant, overload)
     local params  = {}
     local returns = {}
+    if overload then
+        params[1] = ('self: %s'):format(overload)
+    end
     for _, param in ipairs(variant.arguments or {}) do
         if param.name == '...' then
             params[#params+1] = '...'
@@ -123,12 +126,12 @@ local function buildMultiDocFunc(tp)
     return table.concat(cbs, '|')
 end
 
-local function buildFunction(func)
+local function buildFunction(func, typeName)
     local text = {}
     text[#text+1] = buildDescription(func.description)
     for i = 2, #func.variants do
         local variant = func.variants[i]
-        text[#text+1] = ('---@overload %s'):format(buildDocFunc(variant))
+        text[#text+1] = ('---@overload %s'):format(buildDocFunc(variant, typeName))
     end
     local params = {}
     for _, param in ipairs(func.variants[1].arguments or {}) do
@@ -184,7 +187,7 @@ local function buildFile(defs)
             if not mark[func.name] then
                 mark[func.name] = true
                 text[#text+1] = ''
-                text[#text+1] = buildFunction(func)
+                text[#text+1] = buildFunction(func, getTypeName(obj.name))
             end
         end
     end

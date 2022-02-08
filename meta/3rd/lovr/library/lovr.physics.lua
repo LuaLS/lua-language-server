@@ -215,7 +215,7 @@ function Collider:addShape(shape) end
 ---
 ---Applies a force to the Collider.
 ---
----@overload fun(x: number, y: number, z: number, px: number, py: number, pz: number)
+---@overload fun(self: lovr.Collider, x: number, y: number, z: number, px: number, py: number, pz: number)
 ---@param x number # The x component of the force to apply.
 ---@param y number # The y component of the force to apply.
 ---@param z number # The z component of the force to apply.
@@ -1059,7 +1059,7 @@ function World:getAngularDamping() end
 ---
 ---Returns a table of all Colliders in the World.
 ---
----@overload fun(t: table):table
+---@overload fun(self: lovr.World, t: table):table
 ---@return table colliders # A table of `Collider` objects.
 function World:getColliders() end
 
@@ -1154,7 +1154,7 @@ function World:newCylinderCollider(x, y, z, radius, length) end
 ---
 ---Adds a new Collider to the World with a MeshShape already attached.
 ---
----@overload fun(model: lovr.Model):lovr.Collider
+---@overload fun(self: lovr.World, model: lovr.Model):lovr.Collider
 ---@param vertices table # The table of vertices in the mesh.  Each vertex is a table with 3 numbers.
 ---@param indices table # A table of triangle indices representing how the vertices are connected in the Mesh.
 ---@return lovr.Collider collider # The new Collider.

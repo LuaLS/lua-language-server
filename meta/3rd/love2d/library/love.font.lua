@@ -155,7 +155,7 @@ function Rasterizer:getGlyphCount() end
 ---
 ---Gets glyph data of a specified glyph.
 ---
----@overload fun(glyphNumber: number):love.GlyphData
+---@overload fun(self: love.Rasterizer, glyphNumber: number):love.GlyphData
 ---@param glyph string # Glyph
 ---@return love.GlyphData glyphData # Glyph data
 function Rasterizer:getGlyphData(glyph) end

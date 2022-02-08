@@ -142,6 +142,7 @@ If you need to compile by yourself, please refer to [here](https://github.com/su
 * [Ketho](https://github.com/Ketho)
 * [Folke Lemaitre](https://github.com/folke)
 * [Vikas Raj](https://github.com/numToStr)
+* [kevinhwang91](https://github.com/kevinhwang91)
 
 ## Telemetry
 

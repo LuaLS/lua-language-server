@@ -364,6 +364,9 @@ end
 local hasAsked
 ---@async
 local function askFor3rd(uri, cfg)
+    if hasAsked then
+        return nil
+    end
     hasAsked = true
     local yes1 = lang.script.WINDOW_APPLY_WHIT_SETTING
     local yes2 = lang.script.WINDOW_APPLY_WHITOUT_SETTING

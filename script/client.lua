@@ -250,7 +250,9 @@ local function tryModifyRC(uri, finalChanges, create)
     end
     local scp = scope.getScope(uri)
     local rc = scp:get('lastRCConfig') or {
-        ['$schema'] = lang.id == 'zh-cn' and [[https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema-zh-cn.json]] or [[https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json]]
+        ['$schema'] = lang.id == 'zh-cn'
+            and [[https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema-zh-cn.json]]
+            or  [[https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json]]
     }
     local suc = applyConfig(rc, uri, finalChanges)
     if not suc then

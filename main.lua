@@ -27,7 +27,8 @@ end
 loadArgs()
 
 local currentPath = debug.getinfo(1, 'S').source:sub(2)
-local rootPath = currentPath:gsub('[/\\]*[^/\\]-$', '')
+local rootPath    = currentPath:gsub('[/\\]*[^/\\]-$', '')
+
 rootPath = (rootPath == '' and '.' or rootPath)
 ROOT     = fs.path(util.expandPath(rootPath))
 LOGPATH  = LOGPATH  and util.expandPath(LOGPATH)  or (ROOT:string() .. '/log')

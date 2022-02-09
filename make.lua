@@ -4,6 +4,7 @@ local exe      = platform.OS == 'Windows' and ".exe" or ""
 
 lm.bindir = "bin"
 
+---@diagnostic disable-next-line: codestyle-check
 lm.EXE_DIR = ""
 
 if platform.OS == 'macOS' then
@@ -49,7 +50,7 @@ lm:source_set 'lpeglabel' {
 }
 
 lm:executable "lua-language-server" {
-    deps = {"lpeglabel", "source_bootstrap", "code_format"},
+    deps = { "lpeglabel", "source_bootstrap", "code_format" },
     includes = {
         "3rd/bee.lua",
         "3rd/bee.lua/3rd/lua",
@@ -67,7 +68,7 @@ lm:executable "lua-language-server" {
 
 lm:copy "copy_bootstrap" {
     input = "make/bootstrap.lua",
-    output = lm.bindir.."/main.lua",
+    output = lm.bindir .. "/main.lua",
 }
 
 lm:build 'copy_vcrt' {

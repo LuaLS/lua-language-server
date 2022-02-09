@@ -28,7 +28,7 @@ end
 
 local function buildSyntaxError(uri, err)
     local text    = files.getText(uri)
-    local message = lang.script('PARSER_'..err.type, err.info)
+    local message = lang.script('PARSER_' .. err.type, err.info)
 
     if err.version then
         local version = err.info and err.info.version or config.get(uri, 'Lua.runtime.version')
@@ -45,7 +45,7 @@ local function buildSyntaxError(uri, err)
         for _, rel in ipairs(related) do
             local rmessage
             if rel.message then
-                rmessage = lang.script('PARSER_'..rel.message)
+                rmessage = lang.script('PARSER_' .. rel.message)
             else
                 rmessage = text:sub(rel.start, rel.finish)
             end
@@ -63,8 +63,9 @@ local function buildSyntaxError(uri, err)
         severity = define.DiagnosticSeverity[err.level],
         source   = lang.script.DIAG_SYNTAX_CHECK,
         message  = message,
-        relatedInformation = relatedInformation,
         data     = 'syntax',
+
+        relatedInformation = relatedInformation,
     }
 end
 
@@ -77,7 +78,7 @@ local function buildDiagnostic(uri, diag)
     if diag.related then
         relatedInformation = {}
         for _, rel in ipairs(diag.related) do
-            local rtext  = files.getText(rel.uri)
+            local rtext = files.getText(rel.uri)
             relatedInformation[#relatedInformation+1] = {
                 message  = rel.message or rtext:sub(rel.start, rel.finish),
                 location = converter.location(rel.uri, converter.packRange(rel.uri, rel.start, rel.finish))
@@ -93,6 +94,7 @@ local function buildDiagnostic(uri, diag)
         code     = diag.code,
         tags     = diag.tags,
         data     = diag.data,
+
         relatedInformation = relatedInformation,
     }
 end
@@ -292,12 +294,17 @@ function m.refresh(uri)
     end
     await.close('diag:' .. uri)
     await.call(function () ---@async
-        m.diagnosticsScope(uri)
         if uri then
             await.setID('diag:' .. uri)
             await.sleep(0.1)
             xpcall(m.doDiagnostic, log.error, uri)
         end
+        local delay = config.get(uri, 'Lua.diagnostics.workspaceDelay') / 1000
+        if delay < 0 then
+            return
+        end
+        await.sleep(math.max(delay, 0.2))
+        m.diagnosticsScope(uri)
     end)
 end
 
@@ -357,15 +364,10 @@ function m.diagnosticsScope(uri, force)
         m.clearAll()
         return
     end
-    local delay = config.get(uri, 'Lua.diagnostics.workspaceDelay') / 1000
-    if not force and delay < 0 then
-        return
-    end
     local scp = scope.getScope(uri)
     local id = 'diagnosticsScope:' .. scp:getName()
     await.close(id)
     await.call(function () ---@async
-        await.sleep(math.max(delay, 0.2))
         while loading.count() > 0 do
             await.sleep(1.0)
         end

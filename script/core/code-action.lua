@@ -43,13 +43,13 @@ local function checkDisableByLuaDocInsert(uri, row, mode, code)
 end
 
 local function disableDiagnostic(uri, code, start, results)
-    local row   = guide.rowColOf(start)
+    local row = guide.rowColOf(start)
     results[#results+1] = {
         title   = lang.script('ACTION_DISABLE_DIAG', code),
         kind    = 'quickfix',
         command = {
-            title    = lang.script.COMMAND_DISABLE_DIAG,
-            command = 'lua.setConfig',
+            title     = lang.script.COMMAND_DISABLE_DIAG,
+            command   = 'lua.setConfig',
             arguments = {
                 {
                     key    = 'Lua.diagnostics.disable',
@@ -174,7 +174,6 @@ local function solveSyntaxByChangeVersion(uri, err, results)
 end
 
 local function solveSyntaxByAddDoEnd(uri, err, results)
-    local text   = files.getText(uri)
     results[#results+1] = {
         title = lang.script.ACTION_ADD_DO_END,
         kind = 'quickfix',

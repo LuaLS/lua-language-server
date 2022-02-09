@@ -14,9 +14,9 @@ return function (data)
     if not text then
         return
     end
-    local start  = guide.positionToOffset(state, data.start)
-    local finish = guide.positionToOffset(state, data.finish)
-    local jsonStr = text:sub(start + 1, finish)
+    local start    = guide.positionToOffset(state, data.start)
+    local finish   = guide.positionToOffset(state, data.finish)
+    local jsonStr  = text:sub(start + 1, finish)
     local suc, res = pcall(json.decode, jsonStr)
     if not suc then
         proto.notify('window/showMessage', {

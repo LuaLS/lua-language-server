@@ -1,0 +1,87 @@
+# see https://github.com/CppCXY/EmmyLuaCodeStyle
+[*.lua]
+# [basic code reformat option]
+# optional space/tab
+indent_style = space
+# if indent_style is space, this is valid
+indent_size = 4
+# if indent_style is tab, this is valid
+tab_width = 4
+# only support number
+continuation_indent_size = 4
+# if true, continuation_indent_size for local or assign statement is invalid
+# however, if the expression list has cross row expression, it will not be aligned to the first expression
+local_assign_continuation_align_to_first_expression = false
+# function call expression's args will align to first arg
+# however, if the args has cross row arg, it will not be aligned to the first arg
+align_call_args = false
+# if true, format like this "print( "123", 456 )"
+keep_one_space_between_call_args_and_parentheses = false
+# if true, all function define params will align to first param
+align_function_define_params = true
+# if true, format like this "local t = { 1, 2, 3 }"
+keep_one_space_between_table_and_bracket = true
+# if indent_style is tab, this option is invalid
+align_table_field_to_first_field = false
+# if true, ormat like this "local t <const> = 1"
+keep_one_space_between_namedef_and_attribute = false
+# continous line distance
+max_continuous_line_distance = 1
+# if true, iff any one of the consecutive rows meets the condition of aligning to the equal sign,
+# the consecutive rows will be aligned to the equal sign
+weak_alignment_rule = true
+# see document for detail
+continuous_assign_statement_align_to_equal_sign = true
+# see document for detail
+continuous_assign_table_field_align_to_equal_sign = true
+# if true, the label loses its current indentation
+label_no_indent = false
+# if true, there will be no indentation in the do statement
+do_statement_no_indent = false
+# if true, the conditional expression of the if statement will not be a continuation line indent
+if_condition_no_continuation_indent = false
+
+
+# optional crlf/lf
+end_of_line = crlf
+
+# [line layout]
+# The following configuration supports three expressions
+# minLine:${n}   
+# keepLine   
+# KeepLine:${n}
+
+keep_line_after_if_statement = minLine:0
+keep_line_after_do_statement = minLine:0
+keep_line_after_while_statement = minLine:0
+keep_line_after_repeat_statement = minLine:0
+keep_line_after_for_statement = minLine:0
+keep_line_after_local_or_assign_statement = keepLine
+keep_line_after_function_define_statement = keepLine:1
+
+# [diagnostic]
+# the following is code diagnostic options
+enable_check_codestyle = true
+# this mean utf8 length
+max_line_length = 120
+# this will check text end with new line(format always end with new line)
+insert_final_newline = true
+
+# [name style check]
+enable_name_style_check = true
+# the following is name style check rule 
+# base option off/camel_case/snake_case/upper_snake_case/pascal_case/same(filename/first_param/'<const string>', snake_case/pascal_case/camel_case)
+# all option can use '|' represent or 
+# for example:
+# snake_case | upper_snake_case
+# same(first_param, snake_case)
+# same('m')
+local_name_define_style = camel_case
+function_param_name_style = camel_case
+function_name_define_style = camel_case
+local_function_name_define_style = camel_case
+table_field_name_define_style = camel_case
+global_variable_name_define_style = camel_case|upper_snake_case
+module_name_define_style = camel_case
+require_module_name_style = camel_case
+class_name_define_style = camel_case

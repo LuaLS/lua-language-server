@@ -35,7 +35,8 @@ if main then
     end
 end
 
-local root; do
+local root
+do
     if main then
         local fs = require 'bee.filesystem'
         local mainPath = fs.path(arg[0])
@@ -44,21 +45,21 @@ local root; do
             root = '.'
         end
     else
-        local sep = package.config:sub(1,1)
+        local sep = package.config:sub(1, 1)
         if sep == '\\' then
             sep = '/\\'
         end
-        local pattern = "["..sep.."]+[^"..sep.."]+"
-        root = package.cpath:match("([^;]+)"..pattern..pattern.."$")
-        arg[0] = root .. package.config:sub(1,1) .. 'main.lua'
+        local pattern = "[" .. sep .. "]+[^" .. sep .. "]+"
+        root = package.cpath:match("([^;]+)" .. pattern .. pattern .. "$")
+        arg[0] = root .. package.config:sub(1, 1) .. 'main.lua'
     end
-    root = root:gsub('[/\\]', package.config:sub(1,1))
+    root = root:gsub('[/\\]', package.config:sub(1, 1))
 end
 
 package.path = table.concat({
     root .. "/script/?.lua",
     root .. "/script/?/init.lua",
-}, ";"):gsub('/', package.config:sub(1,1))
+}, ";"):gsub('/', package.config:sub(1, 1))
 
 package.searchers[2] = function (name)
     local filename, err = package.searchpath(name, package.path)

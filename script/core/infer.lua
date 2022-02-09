@@ -337,9 +337,6 @@ function m.viewDocName(doc)
         for _, tp in ipairs(doc.types) do
             list[#list+1] = m.getDocName(tp)
         end
-        for _, enum in ipairs(doc.enums) do
-            list[#list+1] = m.getDocName(enum)
-        end
         return table.concat(list, '|')
     end
     return m.getDocName(doc)

@@ -160,7 +160,10 @@ local function buildEnumChunk(docType, name)
     end
     local types = {}
     for _, tp in ipairs(docType.types) do
-        types[#types+1] = tp[1]
+        if  tp.type ~= 'doc.enum'
+        and tp.type ~= 'doc.resume' then
+            types[#types+1] = tp[1]
+        end
     end
     local lines = {}
     for _, typeUnit in ipairs(docType.types) do
@@ -171,12 +174,12 @@ local function buildEnumChunk(docType, name)
             end
         end
     end
-    lines[#lines+1] = ('%s: %s'):format(name, table.concat(types))
+    lines[#lines+1] = ('%s: %s'):format(name, table.concat(types, '|'))
     for _, enum in ipairs(enums) do
         local enumDes = ('   %s %s'):format(
                 (enum.default    and '->')
-            or (enum.additional and '+>')
-            or ' |',
+            or  (enum.additional and '+>')
+            or  ' |',
             enum[1]
         )
         if enum.comment then

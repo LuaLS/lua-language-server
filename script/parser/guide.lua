@@ -27,8 +27,6 @@ local type         = type
 ---@field index                 parser.guide.object
 ---@field extends               parser.guide.object[]
 ---@field types                 parser.guide.object[]
----@field enums                 parser.guide.object[]
----@field resumes               parser.guide.object[]
 ---@field fields                parser.guide.object[]
 ---@field typeGeneric           table<integer, parser.guide.object[]>
 ---@field tkey                  parser.guide.object
@@ -128,7 +126,7 @@ local childMap = {
 
     ['doc']                = {'#'},
     ['doc.class']          = {'class', '#extends', 'comment'},
-    ['doc.type']           = {'#types', '#enums', '#resumes', 'name', 'comment'},
+    ['doc.type']           = {'#types', 'name', 'comment'},
     ['doc.alias']          = {'alias', 'extends', 'comment'},
     ['doc.param']          = {'param', 'extends', 'comment'},
     ['doc.return']         = {'#returns', 'comment'},

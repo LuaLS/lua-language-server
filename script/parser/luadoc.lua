@@ -570,8 +570,6 @@ function parseType(parent)
         type    = 'doc.type',
         parent  = parent,
         types   = {},
-        enums   = {},
-        resumes = {},
     }
     while true do
         local tp, content = peekToken()
@@ -617,7 +615,7 @@ function parseType(parent)
                 parent = result,
                 [1]    = content,
             }
-            result.enums[#result.enums+1] = typeEnum
+            result.types[#result.types+1] = typeEnum
             if not result.start then
                 result.start = typeEnum.start
             end
@@ -685,7 +683,7 @@ function parseType(parent)
                         else
                             resume.comment = nextComm.text:match('#%s*(.+)', 3)
                         end
-                        result.resumes[#result.resumes+1] = resume
+                        result.types[#result.types+1] = resume
                         result.finish = resume.finish
                     end
                     comments = nil
@@ -717,7 +715,7 @@ function parseType(parent)
         while pushResume() do end
     end
 
-    if #result.types == 0 and #result.enums == 0 and #result.resumes == 0 then
+    if #result.types == 0 then
         pushWarning {
             type   = 'LUADOC_MISS_TYPE_NAME',
             start  = getFinish(),

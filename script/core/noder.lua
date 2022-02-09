@@ -174,7 +174,7 @@ local function getFieldEventName(field)
     if not firstType then
         return nil
     end
-    local firstEnum = #firstType.enums == 1 and #firstType.types == 0 and firstType.enums[1]
+    local firstEnum = firstType.types[1]
     if not firstEnum then
         return nil
     end
@@ -182,7 +182,7 @@ local function getFieldEventName(field)
     if not secondType then
         return nil
     end
-    local secondTypeUnit = #secondType.enums == 0 and #secondType.types == 1 and secondType.types[1]
+    local secondTypeUnit = secondType.types[1]
     if not secondTypeUnit or secondTypeUnit.type ~= 'doc.type.function' then
         return nil
     end
@@ -1025,12 +1025,6 @@ compileNodeMap = util.switch()
                     pushForward(noders, getID(src), id)
                 end
             end
-        end
-        for _, enumUnit in ipairs(source.enums) do
-            pushForward(noders, id, getID(enumUnit))
-        end
-        for _, resumeUnit in ipairs(source.resumes) do
-            pushForward(noders, id, getID(resumeUnit))
         end
         for _, typeUnit in ipairs(source.types) do
             local unitID = getID(typeUnit)

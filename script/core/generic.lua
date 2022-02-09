@@ -52,8 +52,6 @@ local function createValue(closure, proto, callback, road)
         end
         local value = instantValue(closure, proto)
         value.types = types
-        value.enums = proto.enums
-        value.resumes = proto.resumes
         noder.compileNode(noder.getNoders(proto), value)
         return value
     end

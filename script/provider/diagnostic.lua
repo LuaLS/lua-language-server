@@ -292,7 +292,10 @@ function m.refresh(uri)
     if not ws.isReady(uri) then
         return
     end
+    local scp     = scope.getScope(uri)
+    local scopeID = 'diagnosticsScope:' .. scp:getName()
     await.close('diag:' .. uri)
+    await.close(scopeID)
     await.call(function () ---@async
         if uri then
             await.setID('diag:' .. uri)

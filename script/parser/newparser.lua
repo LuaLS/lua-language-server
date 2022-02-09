@@ -200,6 +200,21 @@ local ChunkFinishMap = {
     ['}']      = true,
 }
 
+local ChunkStartMap = {
+    ['do']       = true,
+    ['else']     = true,
+    ['elseif']   = true,
+    ['for']      = true,
+    ['function'] = true,
+    ['if']       = true,
+    ['local']    = true,
+    ['repeat']   = true,
+    ['return']   = true,
+    ['then']     = true,
+    ['until']    = true,
+    ['while']    = true,
+}
+
 local ListFinishMap = {
     ['end']      = true,
     ['else']     = true,
@@ -1354,12 +1369,15 @@ local function isKeyWord(word)
     return false
 end
 
-local function parseName()
+local function parseName(asAction)
     local word = peekWord()
     if not word then
         return nil
     end
     if ChunkFinishMap[word] then
+        return nil
+    end
+    if asAction and ChunkStartMap[word] then
         return nil
     end
     local startPos  = getPosition(Tokens[Index], 'left')
@@ -1400,7 +1418,7 @@ local function parseNameOrList()
         end
         Index = Index + 2
         skipSpace()
-        local name = parseName()
+        local name = parseName(true)
         if not name then
             missName()
             break
@@ -1760,7 +1778,7 @@ local function parseSimple(node, funcName)
             }
             Index = Index + 2
             skipSpace()
-            local field = parseName()
+            local field = parseName(true)
             local getfield = {
                 type   = 'getfield',
                 start  = node.start,
@@ -1790,7 +1808,7 @@ local function parseSimple(node, funcName)
             }
             Index = Index + 2
             skipSpace()
-            local method = parseName()
+            local method = parseName(true)
             local getmethod = {
                 type   = 'getmethod',
                 start  = node.start,
@@ -2864,7 +2882,7 @@ local function parseLocal()
         end
     end
 
-    local name = parseName()
+    local name = parseName(true)
     if not name then
         missName()
         return nil

@@ -112,9 +112,8 @@ function m.getIniter()
             range = true,
             full  = false,
         },
-        --documentOnTypeFormattingProvider = {
-        --    firstTriggerCharacter = '}',
-        --},
+        documentFormattingProvider = true,
+        documentRangeFormattingProvider = true
     }
 
     --testFileEvents()

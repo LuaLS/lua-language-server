@@ -102,6 +102,19 @@ m.register 'initialize' {
             workspace.create(params.rootUri)
         end
 
+        if params.initializationOptions then
+            if params.initializationOptions.editorConfigFiles then
+                local codeFormat = require "code_format"
+                for _, config in pairs(params.initializationOptions.editorConfigFiles) do
+                    local status, err = codeFormat.update_config(1, config.workspace, config.path)
+
+                    if not status and err ~= nil then
+                        log.error(err)
+                    end
+                end
+            end
+        end
+
         return {
             capabilities = cap.getIniter(),
             serverInfo   = {
@@ -912,6 +925,79 @@ m.register '$/status/click' {
             for _, scp in ipairs(workspace.folders) do
                 diagnostic.diagnosticsScope(scp.uri, true)
             end
+        end
+    end
+}
+
+m.register 'textDocument/formatting' {
+    abortByFileUpdate = true,
+    ---@async
+    function(params)
+        local uri = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
+        local _ <close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
+
+        if not files.exists(uri) then
+            return nil
+        end
+
+        local core = require 'core.formatting'
+        local edits = core(uri)
+        if not edits or #edits == 0 then
+            return nil
+        end
+
+        local results = {}
+        for i, edit in ipairs(edits) do
+            results[i] = {
+                range   = converter.packRange(uri, edit.start, edit.finish),
+                newText = edit.text,
+            }
+        end
+
+        return results
+    end
+}
+
+m.register 'textDocument/rangeFormatting' {
+    abortByFileUpdate = true,
+    ---@async
+    function(params)
+        local uri = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
+        local _ <close> = progress.create(workspace.getScope(uri), lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
+
+        if not files.exists(uri) then
+            return nil
+        end
+
+        local core = require 'core.rangeformatting'
+        local edits = core(uri, params.range)
+        if not edits or #edits == 0 then
+            return nil
+        end
+
+        local results = {}
+        for i, edit in ipairs(edits) do
+            results[i] = {
+                range   = converter.packRange(uri, edit.start, edit.finish),
+                newText = edit.text,
+            }
+        end
+
+        return results
+    end
+}
+
+m.register 'config/editorconfig/update' {
+    abortByFileUpdate = true,
+    ---@async
+    function(params)
+        local codeFormat = require "code_format"
+        local status, err = codeFormat.update_config(params.type, params.source.workspace, params.source.path)
+
+        if not status and err ~= nil then
+            log.error(err)
         end
     end
 }

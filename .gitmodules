@@ -16,3 +16,6 @@
 [submodule "3rd/lovr-api"]
 	path = 3rd/lovr-api
 	url = https://github.com/bjornbytes/lovr-docs
+[submodule "3rd/EmmyLuaCodeStyle"]
+	path = 3rd/EmmyLuaCodeStyle
+	url = https://github.com/CppCXY/EmmyLuaCodeStyle

@@ -37,6 +37,7 @@ elseif platform.OS == 'Linux' then
 end
 
 lm:import "3rd/bee.lua/make.lua"
+lm:import "make/code_format.lua"
 
 lm:source_set 'lpeglabel' {
     rootdir = '3rd',
@@ -48,7 +49,7 @@ lm:source_set 'lpeglabel' {
 }
 
 lm:executable "lua-language-server" {
-    deps = {"lpeglabel", "source_bootstrap"},
+    deps = {"lpeglabel", "source_bootstrap", "code_format"},
     includes = {
         "3rd/bee.lua",
         "3rd/bee.lua/3rd/lua",

@@ -998,6 +998,12 @@ m.register 'config/editorconfig/update' {
 
         if not status and err ~= nil then
             log.error(err)
+            return
+        end
+
+        local diagnostic = require 'provider.diagnostic'
+        for _, scp in ipairs(workspace.folders) do
+            diagnostic.diagnosticsScope(scp.uri)
         end
     end
 }

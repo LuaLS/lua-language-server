@@ -3074,3 +3074,8 @@ AAA = 1
 <??>
 ]]
 (EXISTS)
+
+TEST [[
+if<??>
+]]
+(EXISTS)

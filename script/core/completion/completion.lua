@@ -1254,11 +1254,9 @@ local function tryWord(state, position, triggerCharacter, results)
             checkFunctionArgByDocParam(state, word, startPos, results)
         else
             local afterLocal = isAfterLocal(state, startPos)
-            if triggerCharacter ~= nil then
-                local stop = checkKeyWord(state, startPos, position, word, hasSpace, afterLocal, results)
-                if stop then
-                    return
-                end
+            local stop = checkKeyWord(state, startPos, position, word, hasSpace, afterLocal, results)
+            if stop then
+                return
             end
             if not hasSpace then
                 if afterLocal then

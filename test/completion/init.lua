@@ -73,11 +73,16 @@ function TEST(script)
         local inputPos = catched['?'][1][2]
         if ContinueTyping then
             local triggerCharacter = script:sub(inputPos - 1, inputPos - 1)
+            if triggerCharacter == '\n'
+            or triggerCharacter:find '%w_' then
+                triggerCharacter = nil
+            end
             core.completion('', inputPos, triggerCharacter)
         end
         local offset = guide.positionToOffset(state, inputPos)
         local triggerCharacter = script:sub(offset, offset)
-        if triggerCharacter == '\n' then
+        if triggerCharacter == '\n'
+        or triggerCharacter:find '%w_' then
             triggerCharacter = nil
         end
         local result = core.completion('', inputPos, triggerCharacter)

@@ -2,6 +2,7 @@ local proto  = require 'proto.proto'
 local util   = require 'utility'
 local timer  = require "timer"
 local config = require 'config'
+local time   = require 'bee.time'
 
 local nextToken = util.counter()
 
@@ -81,8 +82,8 @@ function mt:_update()
         return
     end
     if  not self._showed
-    and self._clock + self._delay <= os.clock() then
-        self._updated = os.clock()
+    and self._clock + self._delay <= time.time() then
+        self._updated = time.time()
         self._dirty = false
         if not config.get(self._scp.uri, 'Lua.window.progressBar') then
             return
@@ -111,11 +112,11 @@ function mt:_update()
         self:remove()
         return
     end
-    if os.clock() - self._updated < 0.05 then
+    if time.time() - self._updated < 0.05 then
         return
     end
     self._dirty = false
-    self._updated = os.clock()
+    self._updated = time.time()
     proto.notify('$/progress', {
         token = self._token,
         value = {
@@ -151,8 +152,8 @@ function m.create(scp, title, delay)
     local prog = setmetatable({
         _token = nextToken(),
         _title = title,
-        _clock = os.clock(),
-        _delay = delay,
+        _clock = time.time(),
+        _delay = delay * 1000,
         _scp   = scp,
     }, mt)
 

@@ -12,6 +12,7 @@ local client    = require 'client'
 local converter = require 'proto.converter'
 local loading   = require 'workspace.loading'
 local scope     = require 'workspace.scope'
+local time      = require 'bee.time'
 
 ---@class diagnosticProvider
 local m = {}
@@ -260,13 +261,13 @@ function m.doDiagnostic(uri, isScopeDiag)
 
     pushResult()
 
-    local lastPushClock = os.clock()
+    local lastPushClock = time.time()
     ---@async
     xpcall(core, log.error, uri, isScopeDiag, function (result)
         diags[#diags+1] = buildDiagnostic(uri, result)
 
-        if not isScopeDiag and os.clock() - lastPushClock >= 0.2 then
-            lastPushClock = os.clock()
+        if not isScopeDiag and time.time() - lastPushClock >= 200 then
+            lastPushClock = time.time()
             pushResult()
         end
     end, function (checkedName)

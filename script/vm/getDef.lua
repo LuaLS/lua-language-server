@@ -4,7 +4,7 @@ local util     = require 'utility'
 local compiler = require 'vm.node.compiler'
 local guide    = require 'parser.guide'
 
-local simpleMap = util.switch()
+local simpleMap;simpleMap = util.switch()
     : case 'local'
     : call(function (source, results)
         results[#results+1] = source
@@ -15,18 +15,36 @@ local simpleMap = util.switch()
                 end
             end
         end
+
+        if source.dummy then
+            for _, res in ipairs(vm.getDefs(source.method.node)) do
+                results[#results+1] = res
+            end
+        end
     end)
     : case 'getlocal'
     : case 'setlocal'
     : call(function (source, results)
-        results[#results+1] = source.node
-        if source.node.ref then
-            for _, ref in ipairs(source.node.ref) do
-                if ref.type == 'setlocal' then
-                    results[#results+1] = ref
+        simpleMap['local'](source.node, results)
+    end)
+    : case 'field'
+    : call(function (source, results)
+        local node = source.parent.node
+        if node.type == 'getlocal' then
+            local key = guide.getKeyName(source)
+            for _, ref in ipairs(node.node.ref) do
+                if  ref.type == 'getlocal'
+                and guide.isSet(ref.next)
+                and guide.getKeyName(ref.next) == key then
+                    results[#results+1] = ref.next
                 end
             end
         end
+    end)
+    : case 'setfield'
+    : case 'getfield'
+    : call(function (source, results)
+        simpleMap['field'](source.field, results)
     end)
     : getMap()
 
@@ -40,11 +58,11 @@ local noderMap = util.switch()
     end)
     : getMap()
 
-function vm.getDefs(source, field)
+function vm.getDefs(source)
     local results = {}
 
     -- search by simple
-    local simple  = simpleMap[source.type]
+    local simple = simpleMap[source.type]
     if simple then
         simple(source, results)
     end
@@ -60,6 +78,6 @@ function vm.getDefs(source, field)
     return results
 end
 
-function vm.getAllDefs(source, field)
-    return vm.getDefs(source, field)
+function vm.getAllDefs(source)
+    return vm.getDefs(source)
 end

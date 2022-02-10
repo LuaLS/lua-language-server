@@ -721,4 +721,12 @@ function m.stringEndWith(str, tail)
     return str:sub(-#tail) == tail
 end
 
+function m.defaultTable(default)
+    return setmetatable({}, { __index = function (t, k)
+        local v = default(k)
+        t[k] = v
+        return v
+    end })
+end
+
 return m

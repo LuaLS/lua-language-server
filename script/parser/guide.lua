@@ -56,8 +56,6 @@ local type         = type
 ---@field comment               table
 ---@field optional              boolean
 ---@field _root                 parser.guide.object
----@field _mnode                parser.guide.object
----@field _compiledGlobals      boolean
 
 ---@class guide
 ---@field debugMode boolean

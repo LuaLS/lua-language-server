@@ -46,7 +46,7 @@ end
 function mt:dropUri(uri)
     self.links[uri] = nil
     self.setsCache = nil
-    self.setsCache = nil
+    self.getsCache = nil
 end
 
 ---@return vm.node.global

@@ -38,7 +38,7 @@ end
 function m.dropUri(uri)
     local subscription = m.subscriptions[uri]
     m.subscriptions[uri] = nil
-    for name in pairs(subscription) do
+    for name in pairs(subscription.globals) do
         m.globals[name]:dropUri(uri)
     end
 end

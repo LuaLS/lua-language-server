@@ -8,11 +8,25 @@ local simpleMap = util.switch()
     : case 'local'
     : call(function (source, results)
         results[#results+1] = source
+        if source.ref then
+            for _, ref in ipairs(source.ref) do
+                if ref.type == 'setlocal' then
+                    results[#results+1] = ref
+                end
+            end
+        end
     end)
     : case 'getlocal'
     : case 'setlocal'
     : call(function (source, results)
         results[#results+1] = source.node
+        if source.node.ref then
+            for _, ref in ipairs(source.node.ref) do
+                if ref.type == 'setlocal' then
+                    results[#results+1] = ref
+                end
+            end
+        end
     end)
     : getMap()
 

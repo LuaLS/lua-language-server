@@ -1,4 +1,3 @@
-local searcher = require 'core.searcher'
 local config   = require 'config'
 local util     = require 'utility'
 local vm       = require "vm.vm"

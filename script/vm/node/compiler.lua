@@ -1,4 +1,4 @@
-local guide  = require 'guide'
+local guide  = require 'parser.guide'
 local util   = require 'utility'
 local state  = require 'vm.state'
 
@@ -13,27 +13,36 @@ local m = {}
 ---@class vm.node.unknown
 m.UNKNOWN = { type = 'unknown' }
 
+---@alias vm.node vm.node.unknown | vm.node.global | vm.node.class
+
 local compilerMap = util.switch()
     : case 'setglobal'
     : call(function (uri, source)
-        state.declareGlobal(source[1], uri, source)
+        local name = guide.getKeyName(source)
+        source._compiled = state.declareGlobal(name, uri, source)
     end)
+    : case 'getglobal'
     : call(function (uri, source)
-        local global = state.getGlobal(source[1])
+        local name   = guide.getKeyName(source)
+        local global = state.getGlobal(name)
         global:addGet(uri, source)
+        source._compiled = global
     end)
+    : getMap()
 
 ---@param uri    uri
 ---@param source parser.guide.object
+---@return vm.node
 function m.compileNode(uri, source)
     if source._compiled then
-        return
+        return source._compiled
     end
     source._compiled = m.UNKNOWN
     local compiler = compilerMap[source.type]
     if compiler then
         compiler(uri, source)
     end
+    return source._compiled
 end
 
 ---编译全局变量的node
@@ -48,8 +57,10 @@ function m.compileGlobals(root)
     root._compiledGlobals = true
     local uri = guide.getUri(root)
     local env = guide.getENV(root)
-    for _, ref in ipairs(env.refs) do
-        m.compileNode(uri, ref)
+    if env.ref then
+        for _, ref in ipairs(env.ref) do
+            m.compileNode(uri, ref)
+        end
     end
 end
 

@@ -13,6 +13,9 @@ m.subscriptions = util.defaultTable(function ()
     }
 end)
 
+---@param name   string
+---@param uri    uri
+---@param source parser.guide.object
 ---@return vm.node.global
 function m.declareGlobal(name, uri, source)
     m.subscriptions[uri].globals[name] = true
@@ -21,6 +24,8 @@ function m.declareGlobal(name, uri, source)
     return node
 end
 
+---@param name string
+---@param uri? uri
 ---@return vm.node.global
 function m.getGlobal(name, uri)
     if uri then
@@ -29,6 +34,7 @@ function m.getGlobal(name, uri)
     return m.globals[name]
 end
 
+---@param uri uri
 function m.dropUri(uri)
     local subscription = m.subscriptions[uri]
     m.subscriptions[uri] = nil

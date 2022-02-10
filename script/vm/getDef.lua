@@ -1,7 +1,8 @@
-local util = require 'utility'
-
 ---@class vm
-local vm = require 'vm.vm'
+local vm       = require 'vm.vm'
+local util     = require 'utility'
+local compiler = require 'vm.node.compiler'
+local guide    = require 'parser.guide'
 
 local simpleMap = util.switch()
     : case 'local'
@@ -15,12 +16,33 @@ local simpleMap = util.switch()
     end)
     : getMap()
 
+local noderMap = util.switch()
+    : case 'global'
+    ---@param node vm.node.global
+    : call(function (node, results)
+        for _, set in ipairs(node:getSets()) do
+            results[#results+1] = set
+        end
+    end)
+    : getMap()
+
 function vm.getDefs(source, field)
     local results = {}
+
+    -- search by simple
     local simple  = simpleMap[source.type]
     if simple then
         simple(source, results)
     end
+    local uri   = guide.getUri(source)
+
+    -- search by node
+    local node  = compiler.compileNode(uri, source)
+    local noder = noderMap[node.type]
+    if noder then
+        noder(node, results)
+    end
+
     return results
 end
 

@@ -5,7 +5,6 @@ local vm        = require 'vm.vm'
 local config    = require 'config'
 local collector = require 'core.collector' 'searcher'
 local define    = require 'proto.define'
-local noder     = require 'core.noder'
 
 ---获取class与alias
 ---@param name? string

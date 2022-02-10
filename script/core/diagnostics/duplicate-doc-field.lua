@@ -1,6 +1,5 @@
 local files   = require 'files'
 local lang    = require 'language'
-local noder   = require 'core.noder'
 
 return function (uri, callback)
     local state = files.getState(uri)

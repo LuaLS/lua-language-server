@@ -3,7 +3,6 @@ local vm        = require 'vm'
 local lang      = require 'language'
 local config    = require 'config'
 local guide     = require 'parser.guide'
-local noder     = require 'core.noder'
 local collector = require 'core.collector' 'searcher'
 local await     = require 'await'
 

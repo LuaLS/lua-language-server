@@ -1,11 +1,8 @@
 local files      = require 'files'
 local vm         = require 'vm'
-local proto      = require 'proto'
-local define     = require 'proto.define'
 local util       = require 'utility'
 local findSource = require 'core.find-source'
 local guide      = require 'parser.guide'
-local noder      = require 'core.noder'
 
 local Forcing
 

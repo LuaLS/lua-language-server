@@ -5,7 +5,6 @@ local guide    = require 'parser.guide'
 local config   = require 'config'
 local define   = require 'proto.define'
 local await    = require 'await'
-local noder    = require 'core.noder'
 
 local types = {'getglobal', 'getfield', 'getindex', 'getmethod'}
 ---@async

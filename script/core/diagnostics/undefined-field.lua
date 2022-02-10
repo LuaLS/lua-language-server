@@ -2,7 +2,6 @@ local files   = require 'files'
 local vm      = require 'vm'
 local lang    = require 'language'
 local guide   = require 'parser.guide'
-local noder   = require 'core.noder'
 local await   = require 'await'
 
 local SkipCheckClass = {

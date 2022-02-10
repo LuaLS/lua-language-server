@@ -1,6 +1,5 @@
 local searcher = require 'core.searcher'
 local config   = require 'config'
-local noder    = require 'core.noder'
 local util     = require 'utility'
 local vm       = require "vm.vm"
 local guide    = require "parser.guide"

@@ -6,7 +6,6 @@ local config   = require 'config'
 local lang     = require 'language'
 local util     = require 'utility'
 local guide    = require 'parser.guide'
-local noder    = require 'core.noder'
 local rpath    = require 'workspace.require-path'
 
 local function collectRequire(mode, literal, uri)

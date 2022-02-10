@@ -19,7 +19,6 @@ local lang         = require 'language'
 local lookBackward = require 'core.look-backward'
 local guide        = require 'parser.guide'
 local infer        = require 'core.infer'
-local noder        = require 'core.noder'
 local await        = require 'await'
 local postfix      = require 'core.completion.postfix'
 

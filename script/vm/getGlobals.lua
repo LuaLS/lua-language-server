@@ -2,7 +2,6 @@ local collector = require 'core.collector' 'searcher'
 local guide     = require 'parser.guide'
 ---@class vm
 local vm        = require 'vm.vm'
-local noder     = require 'core.noder'
 
 function vm.hasGlobalSets(uri, name)
     local id

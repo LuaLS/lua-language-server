@@ -1,11 +1,8 @@
 local guide     = require 'parser.guide'
-local util      = require 'utility'
 local files     = require 'files'
 local timer     = require 'timer'
 
 local setmetatable   = setmetatable
-local running        = coroutine.running
-local ipairs         = ipairs
 local log            = log
 local xpcall         = xpcall
 local mathHuge       = math.huge

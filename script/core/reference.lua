@@ -1,4 +1,3 @@
-local searcher   = require 'core.searcher'
 local guide      = require 'parser.guide'
 local files      = require 'files'
 local vm         = require 'vm'
@@ -66,20 +65,10 @@ return function (uri, position)
     local metaSource = vm.isMetaFile(uri)
 
     local refs = vm.getAllRefs(source)
-    local values = {}
-    for _, src in ipairs(refs) do
-        local value = searcher.getObjectValue(src)
-        if value and value ~= src and guide.isLiteral(value) then
-            values[value] = true
-        end
-    end
 
     local results = {}
     for _, src in ipairs(refs) do
         if src.dummy then
-            goto CONTINUE
-        end
-        if values[src] then
             goto CONTINUE
         end
         local root = guide.getRoot(src)

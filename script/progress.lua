@@ -112,7 +112,7 @@ function mt:_update()
         self:remove()
         return
     end
-    if time.time() - self._updated < 0.05 then
+    if time.time() - self._updated < 50 then
         return
     end
     self._dirty = false

@@ -930,12 +930,9 @@ m.register '$/status/click' {
 }
 
 m.register 'textDocument/formatting' {
-    abortByFileUpdate = true,
     ---@async
     function(params)
         local uri = files.getRealUri(params.textDocument.uri)
-        workspace.awaitReady(uri)
-        local _ <close> = progress.create(scope.getScope(uri), lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
 
         if not files.exists(uri) then
             return nil
@@ -960,12 +957,9 @@ m.register 'textDocument/formatting' {
 }
 
 m.register 'textDocument/rangeFormatting' {
-    abortByFileUpdate = true,
     ---@async
     function(params)
         local uri = files.getRealUri(params.textDocument.uri)
-        workspace.awaitReady(uri)
-        local _ <close> = progress.create(scope.getScope(uri), lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
 
         if not files.exists(uri) then
             return nil
@@ -990,7 +984,6 @@ m.register 'textDocument/rangeFormatting' {
 }
 
 m.register 'config/editorconfig/update' {
-    abortByFileUpdate = true,
     ---@async
     function(params)
         local codeFormat = require "code_format"

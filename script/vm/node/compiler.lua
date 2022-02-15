@@ -3,9 +3,9 @@ local util   = require 'utility'
 local state  = require 'vm.state'
 
 ---@class parser.guide.object
----@field _compiledGlobals      boolean
----@field _initedNodes          boolean
----@field _compiled             any
+---@field _compiledGlobal boolean
+---@field _initedNodes    boolean
+---@field _compiled       any
 
 ---@class vm.node.compiler
 local m = {}
@@ -45,21 +45,34 @@ function m.compileNode(uri, source)
     return source._compiled
 end
 
+local compilerGlobalMap = util.switch()
+    : getMap()
+
+---@param uri    uri
+---@param source parser.guide.object
+function m.compileGlobalNode(uri, source)
+    if source._compiledGlobal then
+        return
+    end
+    source._compiledGlobal = true
+    m.compileNode(uri, source)
+end
+
 ---编译全局变量的node
 ---@param  root parser.guide.object
 function m.compileGlobals(root)
     if root._initedNodes then
         return
     end
-    if root._compiledGlobals then
+    if root._compiledGlobal then
         return
     end
-    root._compiledGlobals = true
+    root._compiledGlobal = true
     local uri = guide.getUri(root)
     local env = guide.getENV(root)
     if env.ref then
         for _, ref in ipairs(env.ref) do
-            m.compileNode(uri, ref)
+            m.compileGlobalNode(uri, ref)
         end
     end
 end

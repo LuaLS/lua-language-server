@@ -23,6 +23,7 @@ local inf          = 1 / 0
 local nan          = 0 / 0
 local utf8         = utf8
 local error        = error
+local upvalueid    = debug.upvalueid
 
 _ENV = nil
 
@@ -719,6 +720,14 @@ end
 
 function m.stringEndWith(str, tail)
     return str:sub(-#tail) == tail
+end
+
+function m.defaultTable(default)
+    return setmetatable({}, { __index = function (t, k)
+        local v = default(k)
+        t[k] = v
+        return v
+    end })
 end
 
 return m

@@ -54,10 +54,10 @@ function m.event(callback)
     m._eventList[#m._eventList+1] = callback
 end
 
-function m._callEvent(changes)
+function m._callEvent(ev, path)
     for _, callback in ipairs(m._eventList) do
         await.call(function ()
-            callback(changes)
+            callback(ev, path)
         end)
     end
 end
@@ -83,29 +83,18 @@ function m.update()
         return
     end
 
-    local changes = {}
     for path, flag in pairs(collect) do
         if flag & RENAME ~= 0 then
             if exists(path) then
-                changes[#changes+1] = {
-                    type = 'create',
-                    path = path,
-                }
+                m._callEvent('create', path)
             else
-                changes[#changes+1] = {
-                    type = 'delete',
-                    path = path,
-                }
+                m._callEvent('delete', path)
             end
         elseif flag & MODIFY ~= 0 then
-            changes[#changes+1] = {
-                type = 'change',
-                path = path,
-            }
+            m._callEvent('change', path)
         end
     end
 
-    m._callEvent(changes)
 end
 
 return m

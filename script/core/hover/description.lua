@@ -219,7 +219,7 @@ local function getBindEnums(source, docGroup)
     local chunks = {}
     local returnIndex = 0
     for _, doc in ipairs(docGroup) do
-        if doc.type == 'doc.param' then
+        if     doc.type == 'doc.param' then
             local name = doc.param[1]
             if mark[name] then
                 goto CONTINUE
@@ -270,7 +270,7 @@ local function getFunctionComment(source)
 
     local md = markdown()
     for _, doc in ipairs(docGroup) do
-        if doc.type == 'doc.comment' then
+        if     doc.type == 'doc.comment' then
             if doc.comment.text:sub(1, 1) == '-' then
                 md:add('md', doc.comment.text:sub(2))
             else

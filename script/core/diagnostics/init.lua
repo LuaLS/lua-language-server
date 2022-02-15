@@ -82,6 +82,7 @@ local function check(uri, name, isScopeDiag, response)
             return
         end
         mark[result.start] = true
+
         result.level = severity or result.level
         result.code  = name
         response(result)

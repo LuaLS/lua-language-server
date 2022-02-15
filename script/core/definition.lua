@@ -20,8 +20,8 @@ local function sortResults(results)
     -- 如果2个结果处于嵌套状态，则取范围小的那个
     local lf, lu
     for i = #results, 1, -1 do
-        local res  = results[i].target
-        local f    = res.finish
+        local res = results[i].target
+        local f   = res.finish
         local uri = guide.getUri(res)
         if lf and f > lf and uri == lu then
             table.remove(results, i)
@@ -152,9 +152,9 @@ return function (uri, offset)
             goto CONTINUE
         end
         src = src.field or src.method or src
-        if  src.type == 'getindex'
-        or  src.type == 'setindex'
-        or  src.type == 'tableindex' then
+        if src.type == 'getindex'
+        or src.type == 'setindex'
+        or src.type == 'tableindex' then
             src = src.index
             if not src then
                 goto CONTINUE
@@ -163,8 +163,8 @@ return function (uri, offset)
                 goto CONTINUE
             end
         end
-        if  src.type == 'doc.class.name'
-        or  src.type == 'doc.alias.name' then
+        if src.type == 'doc.class.name'
+        or src.type == 'doc.alias.name' then
             if  source.type ~= 'doc.type.name'
             and source.type ~= 'doc.extends.name'
             and source.type ~= 'doc.see.name' then

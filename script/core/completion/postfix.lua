@@ -50,17 +50,17 @@ register 'function' {
 
 register 'method' {
     function (state, source, callback)
-        if  source.type == 'getfield' then
+        if source.type == 'getfield' then
             if hasNonFieldInNode(source) then
                 return
             end
             local subber = subString(state)
             callback(string.format('function %s:%s($1)\n\t$0\nend'
                 , subber(source.start + 1, source.dot.start)
-                , subber(source.dot .finish + 1, source.finish)
+                , subber(source.dot.finish + 1, source.finish)
             ))
         end
-        if  source.type == 'getmethod' then
+        if source.type == 'getmethod' then
             if hasNonFieldInNode(source.parent) then
                 return
             end
@@ -298,16 +298,18 @@ local function checkPostFix(state, word, wordPosition, position, symbol, results
         if matchKey(word, action.key) then
             action.data[1](state, source, function (newText)
                 results[#results+1] = {
-                    label      = action.key,
-                    kind       = define.CompletionItemKind.Event,
-                    description= markdown()
+                    label       = action.key,
+                    kind        = define.CompletionItemKind.Event,
+                    description = markdown()
                                     : add('lua', newText)
                                     : string(),
-                    textEdit   = {
+                    textEdit    = {
                         start   = wordPosition + #symbol,
                         finish  = position,
                         newText = newText,
                     },
+                    sortText    = ('postfix-%04d'):format(i),
+
                     additionalTextEdits = {
                         {
                             start   = source.start,
@@ -315,7 +317,6 @@ local function checkPostFix(state, word, wordPosition, position, symbol, results
                             newText = '',
                         },
                     },
-                    sortText = ('postfix-%04d'):format(i),
                 }
             end)
         end

@@ -119,7 +119,7 @@ local function createValue(closure, proto, callback, road)
         if not tkey and not tvalue then
             return nil
         end
-        local value = instantValue(closure, proto)
+        local value  = instantValue(closure, proto)
         value.tkey   = tkey   or proto.tkey
         value.tvalue = tvalue or proto.tvalue
         noder.compileNode(noder.getNoders(proto), value)
@@ -199,7 +199,7 @@ local function buildValues(closure)
         for i, param in ipairs(params) do
             local arg = args and args[i]
             if arg then
-                if arg.type == 'local' then
+                if     arg.type == 'local' then
                     paramMap[arg[1]] = param
                 elseif arg.type == 'doc.type.arg' then
                     paramMap[arg.name[1]] = param
@@ -234,6 +234,7 @@ local function buildValues(closure)
             local name    = arg.name[1]
             local extends = arg.extends
             local param   = paramMap[name]
+
             closure.params[name] = param and createValue(closure, extends, function (road, key, proto)
                 buildValue(road, key, proto, param, upvalues)
             end) or extends
@@ -249,7 +250,7 @@ end
 ---@return generic.closure
 function m.createClosure(proto, call)
     local protoFunction, parentClosure
-    if proto.type == 'function' then
+    if     proto.type == 'function' then
         protoFunction = proto
     elseif proto.type == 'doc.type.function' then
         protoFunction = proto

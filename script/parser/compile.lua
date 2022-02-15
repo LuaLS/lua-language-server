@@ -61,7 +61,7 @@ local vmMap = {
                 addRef(node, obj)
             end
             local name = obj[1]
-            if specials[name] then
+            if     specials[name] then
                 addSpecial(name, obj)
             elseif Options and Options.special then
                 local asName = Options.special[name]
@@ -90,9 +90,9 @@ local vmMap = {
             for k, v in pairs(obj.node.node) do
                 newNode[k] = v
             end
-            newNode.mirror = obj.node.node
-            newNode.dummy  = true
-            newNode.parent = obj.args
+            newNode.mirror       = obj.node.node
+            newNode.dummy        = true
+            newNode.parent       = obj.args
             obj.node.node.mirror = newNode
             tableInsert(obj.args, 1, newNode)
             Compiled[newNode] = true
@@ -249,7 +249,7 @@ local vmMap = {
                 addRef(node, obj)
             end
             local name = obj[1]
-            if specials[name] then
+            if     specials[name] then
                 addSpecial(name, obj)
             elseif Options and Options.special then
                 local asName = Options.special[name]
@@ -332,9 +332,9 @@ local vmMap = {
                 if Version == 'Lua 5.4'
                 or block == guide.getBlock(label) then
                     pushError {
-                        type   = 'REDEFINED_LABEL',
-                        start  = obj.start,
-                        finish = obj.finish,
+                        type     = 'REDEFINED_LABEL',
+                        start    = obj.start,
+                        finish   = obj.finish,
                         relative = {
                             {
                                 label.start,
@@ -538,10 +538,10 @@ local function compileGoTo(obj)
             local ref = refs[j]
             if ref.finish > label.finish then
                 pushError {
-                    type   = 'JUMP_LOCAL_SCOPE',
-                    start  = obj.start,
-                    finish = obj.finish,
-                    info   = {
+                    type     = 'JUMP_LOCAL_SCOPE',
+                    start    = obj.start,
+                    finish   = obj.finish,
+                    info     = {
                         loc = loc[1],
                     },
                     relative = {

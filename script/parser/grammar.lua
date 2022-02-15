@@ -31,18 +31,19 @@ local RESERVED = {
     ['while']    = true,
 }
 
-defs.nl = (m.P'\r\n' + m.S'\r\n')
-defs.s  = m.S' \t'
-defs.S  = - defs.s
-defs.ea = '\a'
-defs.eb = '\b'
-defs.ef = '\f'
-defs.en = '\n'
-defs.er = '\r'
-defs.et = '\t'
-defs.ev = '\v'
-defs['nil'] = m.Cp() / function () return nil end
+defs.nl       = (m.P'\r\n' + m.S'\r\n')
+defs.s        = m.S' \t'
+defs.S        = - defs.s
+defs.ea       = '\a'
+defs.eb       = '\b'
+defs.ef       = '\f'
+defs.en       = '\n'
+defs.er       = '\r'
+defs.et       = '\t'
+defs.ev       = '\v'
+defs['nil']   = m.Cp() / function () return nil end
 defs['false'] = m.Cp() / function () return false end
+
 defs.NotReserved = function (_, _, str)
     if RESERVED[str] then
         return false

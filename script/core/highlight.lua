@@ -96,12 +96,12 @@ end
 
 local function findKeyWord(state, text, position, callback)
     guide.eachSourceContain(state.ast, position, function (source)
-        if source.type == 'do'
-        or source.type == 'function'
-        or source.type == 'loop'
-        or source.type == 'in'
-        or source.type == 'while'
-        or source.type == 'repeat' then
+        if     source.type == 'do'
+        or     source.type == 'function'
+        or     source.type == 'loop'
+        or     source.type == 'in'
+        or     source.type == 'while'
+        or     source.type == 'repeat' then
             local ok
             for i = 1, #source.keyword, 2 do
                 local start  = source.keyword[i]
@@ -153,7 +153,7 @@ local function checkRegion(ast, text, offset, callback)
             and comment.finish >= offset then
                 local ltext = comment.text:lower()
                 ltext = util.trim(ltext, 'left')
-                if isRegion(ltext) then
+                if     isRegion(ltext) then
                     start = comment.start - 2
                     count = 1
                     selected = i
@@ -177,7 +177,7 @@ local function checkRegion(ast, text, offset, callback)
             if comment.type == 'comment.short' then
                 local ltext = comment.text:lower()
                 ltext = util.trim(ltext, 'left')
-                if isRegion(ltext) then
+                if     isRegion(ltext) then
                     count = count + 1
                 elseif isEndRegion(ltext) then
                     count = count - 1
@@ -195,7 +195,7 @@ local function checkRegion(ast, text, offset, callback)
             if comment.type == 'comment.short' then
                 local ltext = comment.text:lower()
                 ltext = util.trim(ltext, 'left')
-                if isEndRegion(ltext) then
+                if     isEndRegion(ltext) then
                     count = count + 1
                 elseif isRegion(ltext) then
                     count = count - 1
@@ -223,7 +223,7 @@ local accept = {
     ['string']     = true,
     ['boolean']    = true,
     ['number']     = true,
-    ['integer']     = true,
+    ['integer']    = true,
     ['nil']        = true,
 }
 
@@ -289,27 +289,27 @@ return function (uri, offset)
                 kind   = define.DocumentHighlightKind.Read
             elseif target.type == 'field' then
                 if target.parent.type == 'getfield' then
-                    kind   = define.DocumentHighlightKind.Read
+                    kind = define.DocumentHighlightKind.Read
                 else
-                    kind   = define.DocumentHighlightKind.Write
+                    kind = define.DocumentHighlightKind.Write
                 end
             elseif target.type == 'method' then
                 if target.parent.type == 'getmethod' then
-                    kind   = define.DocumentHighlightKind.Read
+                    kind = define.DocumentHighlightKind.Read
                 else
-                    kind   = define.DocumentHighlightKind.Write
+                    kind = define.DocumentHighlightKind.Write
                 end
             elseif target.type == 'index' then
                 if target.parent.type == 'getindex' then
-                    kind   = define.DocumentHighlightKind.Read
+                    kind = define.DocumentHighlightKind.Read
                 else
-                    kind   = define.DocumentHighlightKind.Write
+                    kind = define.DocumentHighlightKind.Write
                 end
             elseif target.type == 'index' then
                 if target.parent.type == 'getindex' then
-                    kind   = define.DocumentHighlightKind.Read
+                    kind = define.DocumentHighlightKind.Read
                 else
-                    kind   = define.DocumentHighlightKind.Write
+                    kind = define.DocumentHighlightKind.Write
                 end
             elseif target.type == 'setindex'
             or     target.type == 'tableindex' then
@@ -318,18 +318,18 @@ return function (uri, offset)
             elseif target.type == 'getlocal'
             or     target.type == 'getglobal'
             or     target.type == 'goto' then
-                kind   = define.DocumentHighlightKind.Read
+                kind = define.DocumentHighlightKind.Read
             elseif target.type == 'setlocal'
             or     target.type == 'local'
             or     target.type == 'setglobal'
             or     target.type == 'label' then
-                kind   = define.DocumentHighlightKind.Write
+                kind = define.DocumentHighlightKind.Write
             elseif target.type == 'string'
             or     target.type == 'boolean'
             or     target.type == 'number'
             or     target.type == 'integer'
             or     target.type == 'nil' then
-                kind   = define.DocumentHighlightKind.Text
+                kind = define.DocumentHighlightKind.Text
             else
                 return
             end

@@ -7,8 +7,8 @@ lm.bindir = "bin"
 ---@diagnostic disable-next-line: codestyle-check
 lm.EXE_DIR = ""
 
-if platform.OS == 'macOS' then
-    if lm.platform == nil then
+if     platform.OS == 'macOS' then
+    if     lm.platform == nil then
     elseif lm.platform == "darwin-arm64" then
         lm.target = "arm64-apple-macos11"
     elseif lm.platform == "darwin-x64" then
@@ -17,7 +17,7 @@ if platform.OS == 'macOS' then
         error "unknown platform"
     end
 elseif platform.OS == 'Windows' then
-    if lm.platform == nil then
+    if     lm.platform == nil then
     elseif lm.platform == "win32-ia32" then
         lm.arch = "x86"
     elseif lm.platform == "win32-x64" then
@@ -26,7 +26,7 @@ elseif platform.OS == 'Windows' then
         error "unknown platform"
     end
 elseif platform.OS == 'Linux' then
-    if lm.platform == nil then
+    if     lm.platform == nil then
     elseif lm.platform == "linux-x64" then
     elseif lm.platform == "linux-arm64" then
         -- TODO: not implement
@@ -128,7 +128,7 @@ if notest then
 end
 
 lm:build "bee-test" {
-    lm.bindir.."/lua-language-server"..exe, "3rd/bee.lua/test/test.lua",
+    lm.bindir .. "/lua-language-server" .. exe, "3rd/bee.lua/test/test.lua",
     pool = "console",
     deps = {
         "all",
@@ -136,7 +136,7 @@ lm:build "bee-test" {
 }
 
 lm:build 'unit-test' {
-    lm.bindir.."/lua-language-server"..exe, 'test.lua',
+    lm.bindir .. "/lua-language-server" .. exe, 'test.lua',
     pool = "console",
     deps = {
         "bee-test",

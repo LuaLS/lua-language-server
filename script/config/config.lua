@@ -47,7 +47,7 @@ end)
 
 register('Integer', 0, function (self, v)
     return type(v) == 'number'
-end,function (self, v)
+end, function (self, v)
     return math.floor(v)
 end)
 
@@ -118,7 +118,7 @@ end, function (self, value)
     end
     if type(value) == 'string' then
         local t = {}
-        for s in value:gmatch('[^'..self.sep..']+') do
+        for s in value:gmatch('[^' .. self.sep .. ']+') do
             t[s] = true
         end
         return t
@@ -143,7 +143,7 @@ end, function (self, value)
         end
     end
 end, function (self, ...)
-    self.subs = {...}
+    self.subs = { ... }
 end)
 
 local Template = {
@@ -412,7 +412,7 @@ function m.update(scp, ...)
             if m.nullSymbols[value] then
                 value = m.NULL
             end
-            if Template[fullKey] then
+            if     Template[fullKey] then
                 m.setByScope(scp, fullKey, value)
             elseif Template['Lua.' .. fullKey] then
                 m.setByScope(scp, 'Lua.' .. fullKey, value)

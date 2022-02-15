@@ -51,10 +51,10 @@ local function isUserDefineClass(uri, name)
 end
 
 local function isClassOralias(typeName)
-    if not typeName then
+    if     not typeName then
         return false
     elseif typeNameMap[typeName]
-    or vm.isBuiltinType(typeName) then
+    or     vm.isBuiltinType(typeName) then
         return true
     else
         return false
@@ -74,21 +74,21 @@ local function compatibleType(param, args)
         param[1] = string.sub(param.type, 10)
     end
     for _, v in ipairs(args) do
-        if v[1] == 'any' then
+        if     v[1] == 'any' then
             return true
         elseif param[1] == v[1] then
             return true
         elseif (param[1] == 'number' or param[1] == 'integer')
-        and (v[1] == 'integer' or v[1] == 'number') then
+        and    (v[1] == 'integer' or v[1] == 'number') then
             return true
         elseif v[1] == 'string' then
             ---处理alias
             --@alias searchmode '"ref"'|'"def"'
-            if param[1] and param[1]:sub(1,1) == '"' then
+            if param[1] and param[1]:sub(1, 1) == '"' then
                 return true
             end
         elseif (isTable(v.type) or isTable(v[1]))
-        and (isTable(param[1]) or isTable(param.type)) then
+        and    (isTable(param[1]) or isTable(param.type)) then
             return true
         end
     end
@@ -140,8 +140,8 @@ local function getParamTypes(arg)
         return false
     end
     local types
-    ---处理doc.type.function
-    if arg.type == 'doc.type.arg' then
+    if     arg.type == 'doc.type.arg' then
+        ---处理doc.type.function
         if arg.name and arg.name[1] == '...' then
             types = {
                 [1] = {
@@ -153,15 +153,15 @@ local function getParamTypes(arg)
         end
         types = arg.extends.types
         return true, types
-    ---处理function
     elseif arg.type == 'local' then
+        ---处理function
         local argDefs = vm.getDefs(arg)
         if #argDefs == 0 then
             return false
         end
         types = {}
-        ---method, 如果self没有定义为一个class或者type，则认为它为any
         if arg.tag == 'self' then
+            ---method, 如果self没有定义为一个class或者type，则认为它为any
             for _, argDef in ipairs(argDefs) do
                 if argDef.type == 'doc.class.name'
                 or argDef.type == 'doc.type.name'
@@ -176,7 +176,7 @@ local function getParamTypes(arg)
             return true, types
         else
             for _, argDef in ipairs(argDefs) do
-                if argDef.type == 'doc.param' and argDef.extends then
+                if     argDef.type == 'doc.param' and argDef.extends then
                     types = argDef.extends.types
                     if argDef.optional then
                         types[#types+1] = {
@@ -185,9 +185,9 @@ local function getParamTypes(arg)
                         }
                     end
                 elseif argDef.type == 'doc.type.enum'
-                or argDef.type == 'doc.type.ltable'  then
+                or     argDef.type == 'doc.type.ltable' then
                     types[#types+1] = argDef
-                ---变长参数
+                    ---变长参数
                 elseif argDef.name and argDef.name[1] == '...' then
                     types = {
                         [1] = {
@@ -204,8 +204,8 @@ local function getParamTypes(arg)
                 return true, types
             end
         end
-    ---处理只有一个可变参数
     elseif arg.type == '...' then
+        ---处理只有一个可变参数
         types = {
             [1] = {
                 [1] = '...',
@@ -235,7 +235,7 @@ local function getInfoFromDefs(defs)
                         if suc then
                             local plusAlias = {}
                             for i, tp in ipairs(types) do
-                                local aliasDefs =  vm.getDefs(tp)
+                                local aliasDefs = vm.getDefs(tp)
                                 for _, v in ipairs(aliasDefs) do
                                     ---TODO(arthur)
                                     -- if not v.type then
@@ -376,32 +376,36 @@ local function matchParams(paramsTypes, i, arg)
         end
         flag = ''
         for _, param in ipairs(paramTypes[i]) do
-            if param[1] == '...' then
+            if     param[1] == '...' then
                 hasVarargs = true
                 return true
-            ---如果形参的类型在实参里面
             elseif compatibleType(param, arg)
-            or param[1] == 'any' then
+            or     param[1] == 'any' then
+                ---如果形参的类型在实参里面
                 flag = ''
                 return true
-            ---如果是泛型，不检查
             elseif isGeneric(param) then
+                ---如果是泛型，不检查
                 return true
             else
-                ---TODO(arthur) 什么时候param[1]是nil？
                 if param[1] and not errType[param[1]] then
+                    ---TODO(arthur) 什么时候param[1]是nil？
                     errType[param[1]] = true
-                    flag = flag ..' ' .. (param[1] or '')
+                    flag = flag .. ' ' .. (param[1] or '')
                 end
             end
         end
         if flag ~= '' then
             local argm = '[ '
             for _, v in ipairs(arg) do
-                argm = argm .. v[1]..' '
+                argm = argm .. v[1] .. ' '
             end
             argm = argm .. ']'
-            local message = 'Argument of type in '..argm..' is not assignable to parameter of type in ['..flag..' ]'
+            local message = 'Argument of type in '
+                .. argm
+                .. ' is not assignable to parameter of type in ['
+                .. flag
+                .. ' ]'
             if not messages[message] then
                 messages[message] = true
                 messages[#messages+1] = message
@@ -413,12 +417,12 @@ local function matchParams(paramsTypes, i, arg)
 end
 
 ---@async
-return function (uri, callback)
+return function(uri, callback)
     local ast = files.getState(uri)
     if not ast then
         return
     end
-    guide.eachSourceType(ast.ast, 'call', function (source) ---@async
+    guide.eachSourceType(ast.ast, 'call', function(source) ---@async
         if not source.args then
             return
         end
@@ -444,7 +448,7 @@ return function (uri, callback)
             ---都不匹配
             if not match then
                 if #messages > 0 then
-                    callback{
+                    callback {
                         start   = arg.start,
                         finish  = arg.finish,
                         message = table.concat(messages, '\n')

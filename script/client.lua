@@ -315,7 +315,7 @@ end
 function m.setConfig(changes, onlyMemory)
     local finalChanges = {}
     for _, change in ipairs(changes) do
-        if change.action == 'add' then
+        if     change.action == 'add' then
             local suc = config.add(change.uri, change.key, change.value)
             if suc then
                 finalChanges[#finalChanges+1] = change

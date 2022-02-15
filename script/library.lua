@@ -336,6 +336,7 @@ local function apply3rd(uri, cfg, onlyMemory)
             changes[#changes+1] = {
                 key    = change.key,
                 action = change.action,
+                prop   = change.prop,
                 value  = change.value,
                 uri    = uri,
             }

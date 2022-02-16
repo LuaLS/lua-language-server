@@ -4,7 +4,20 @@ local util     = require 'utility'
 local compiler = require 'vm.node.compiler'
 local guide    = require 'parser.guide'
 
-local simpleMap;simpleMap = util.switch()
+local simpleMap
+
+local function searchGetLocal(source, node, results)
+    local key = guide.getKeyName(source)
+    for _, ref in ipairs(node.node.ref) do
+        if  ref.type == 'getlocal'
+        and guide.isSet(ref.next)
+        and guide.getKeyName(ref.next) == key then
+            results[#results+1] = ref.next
+        end
+    end
+end
+
+simpleMap = util.switch()
     : case 'local'
     : call(function (source, results)
         results[#results+1] = source
@@ -31,20 +44,21 @@ local simpleMap;simpleMap = util.switch()
     : call(function (source, results)
         local node = source.parent.node
         if node.type == 'getlocal' then
-            local key = guide.getKeyName(source)
-            for _, ref in ipairs(node.node.ref) do
-                if  ref.type == 'getlocal'
-                and guide.isSet(ref.next)
-                and guide.getKeyName(ref.next) == key then
-                    results[#results+1] = ref.next
-                end
-            end
+            searchGetLocal(source, node, results)
         end
     end)
     : case 'setfield'
     : case 'getfield'
     : call(function (source, results)
         simpleMap['field'](source.field, results)
+    end)
+    : case 'getindex'
+    : case 'setindex'
+    : call(function (source, results)
+        local node = source.node
+        if node.type == 'getlocal' then
+            searchGetLocal(source, node, results)
+        end
     end)
     : getMap()
 

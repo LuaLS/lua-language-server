@@ -58,26 +58,52 @@ local noderMap = util.switch()
     end)
     : getMap()
 
-function vm.getDefs(source)
-    local results = {}
-
-    -- search by simple
+---@param source  parser.guide.object
+---@param results parser.guide.object[]
+local function searchBySimple(source, results)
     local simple = simpleMap[source.type]
     if simple then
         simple(source, results)
     end
-    local uri   = guide.getUri(source)
+end
 
-    -- search by node
+---@param source  parser.guide.object
+---@param results parser.guide.object[]
+local function searchByGlobal(source, results)
+    local global = source._globalID
+    if not global then
+        return
+    end
+    for _, src in ipairs(global:getSets()) do
+        results[#results+1] = src
+    end
+end
+
+---@param source  parser.guide.object
+---@param results parser.guide.object[]
+local function searchByNode(source, results)
+    local uri   = guide.getUri(source)
     local node  = compiler.compileNode(uri, source)
     local noder = noderMap[node.type]
     if noder then
         noder(node, results)
     end
+end
+
+---@param source parser.guide.object
+---@return       parser.guide.object[]
+function vm.getDefs(source)
+    local results = {}
+
+    searchBySimple(source, results)
+    searchByGlobal(source, results)
+    searchByNode(source, results)
 
     return results
 end
 
+---@param source parser.guide.object
+---@return       parser.guide.object[]
 function vm.getAllDefs(source)
     return vm.getDefs(source)
 end

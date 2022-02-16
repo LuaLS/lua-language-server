@@ -6,7 +6,7 @@ local state  = require 'vm.state'
 ---@field _compiledGlobal boolean
 ---@field _compiledNodes  boolean
 ---@field _compiled       any
----@field _globalID       string
+---@field _globalID       vm.node.global
 
 ---@class vm.node.compiler
 local m = {}

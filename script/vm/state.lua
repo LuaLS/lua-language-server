@@ -1,5 +1,4 @@
 local util   = require 'utility'
-local guide  = require 'parser.guide'
 local global = require 'vm.node.global'
 
 ---@class vm.state
@@ -16,6 +15,8 @@ m.literals = util.multiTable(2)
 m.literalSubs = util.multiTable(2, function ()
     return setmetatable({}, util.MODE_K)
 end)
+---@type table<parser.object, boolean>
+m.allLiterals = {}
 
 ---@param name   string
 ---@param uri    uri
@@ -41,14 +42,29 @@ end
 ---@param uri    uri
 ---@param source parser.object
 function m.declareLiteral(uri, source)
+    if m.allLiterals[source] then
+        return
+    end
+    m.allLiterals[source] = true
     local literals = m.literals[uri]
     literals[#literals+1] = source
 end
 
----@param literal parser.object
----@param source  parser.object
-function m.subscribeLiteral(literal, source)
-    m.literalSubs[literal][source] = true
+---@param source parser.object
+---@param node   vm.node
+function m.subscribeLiteral(source, node)
+    if not node then
+        return
+    end
+    if node.type == 'union'
+    or node.type == 'cross' then
+        node:subscribeLiteral(source)
+        return
+    end
+    if not m.allLiterals[source] then
+        return
+    end
+    m.literalSubs[node][source] = true
 end
 
 ---@param uri uri
@@ -61,10 +77,11 @@ function m.dropUri(uri)
     local literals = m.literals[uri]
     m.literals[uri] = nil
     for _, literal in ipairs(literals) do
+        m.allLiterals[literal] = nil
         local literalSubs = m.literalSubs[literal]
         m.literalSubs[literal] = nil
         for source in pairs(literalSubs) do
-            source._compiled = nil
+            source._node = nil
         end
     end
 end

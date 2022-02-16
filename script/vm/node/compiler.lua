@@ -1,20 +1,21 @@
-local guide  = require 'parser.guide'
-local util   = require 'utility'
-local state  = require 'vm.state'
+local guide = require 'parser.guide'
+local util  = require 'utility'
+local state = require 'vm.state'
+local union = require 'vm.node.union'
 
 ---@class parser.object
 ---@field _compiledNodes  boolean
----@field _compiled       any
+---@field _node           vm.node
 ---@field _globalID       vm.node.global
 
 ---@class vm.node.compiler
 local m = {}
 
----@class vm.node.unknown
-m.UNKNOWN = { type = 'unknown' }
+---@class vm.node.cross
+
 m.GLOBAL_SPLITE = '\x1F'
 
----@alias vm.node vm.node.unknown | vm.node.global | vm.node.class
+---@alias vm.node parser.object | vm.node.union | vm.node.cross
 
 ---@param  ... string
 ---@return string
@@ -22,26 +23,49 @@ function m.getGlobalID(...)
     return table.concat({...}, m.GLOBAL_SPLITE)
 end
 
+function m.setNode(source, node)
+    local me = source._node
+    if not me then
+        source._node = node
+        return
+    end
+    if me.type == 'union'
+    or me.type == 'cross' then
+        me:merge(source, node)
+        return
+    end
+    source._node = union(source, node)
+end
+
+local function compileValue(uri, source, value)
+    if not value then
+        return
+    end
+    if value.type == 'table'
+    or value.type == 'integer'
+    or value.type == 'number'
+    or value.type == 'string'
+    or value.type == 'function' then
+        state.declareLiteral(uri, value)
+        m.setNode(source, value)
+    end
+end
+
 local compilerMap = util.switch()
     : case 'local'
     : call(function (uri, source)
-        local value = source.value
-        if not value then
-            return
-        end
-        if value.type == 'table'
-        or value.type == 'integer'
-        or value.type == 'number'
-        or value.type == 'string'
-        or value.type == 'function' then
-            source._compiled = value
-            state.declareLiteral(uri, value)
-            state.subscribeLiteral(value, source)
+        compileValue(uri, source, source.value)
+        if source.ref then
+            for _, ref in ipairs(source.ref) do
+                if ref.type == 'setlocal' then
+                    compileValue(uri, source, ref.value)
+                end
+            end
         end
     end)
     : case 'getlocal'
     : call(function (uri, source)
-        source._compiled = m.compileNode(uri, source.node)
+        m.setNode(source, m.compileNode(uri, source.node))
     end)
     : getMap()
 
@@ -49,15 +73,16 @@ local compilerMap = util.switch()
 ---@param source parser.object
 ---@return vm.node
 function m.compileNode(uri, source)
-    if source._compiled then
-        return source._compiled
+    if source._node then
+        return source._node
     end
-    source._compiled = m.UNKNOWN
+    source._node = false
     local compiler = compilerMap[source.type]
     if compiler then
         compiler(uri, source)
     end
-    return source._compiled
+    state.subscribeLiteral(source, source._node)
+    return source._node
 end
 
 local compilerGlobalMap = util.switch()

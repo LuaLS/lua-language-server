@@ -23,6 +23,26 @@ function m.getGlobalID(...)
 end
 
 local compilerMap = util.switch()
+    : case 'local'
+    : call(function (uri, source)
+        local value = source.value
+        if not value then
+            return
+        end
+        if value.type == 'table'
+        or value.type == 'integer'
+        or value.type == 'number'
+        or value.type == 'string'
+        or value.type == 'function' then
+            source._compiled = value
+            state.declareLiteral(uri, value)
+            state.subscribeLiteral(value, source)
+        end
+    end)
+    : case 'getlocal'
+    : call(function (uri, source)
+        source._compiled = m.compileNode(uri, source.node)
+    end)
     : getMap()
 
 ---@param uri    uri

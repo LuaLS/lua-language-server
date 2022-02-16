@@ -62,7 +62,37 @@ simpleMap = util.switch()
     end)
     : getMap()
 
-local noderMap = util.switch()
+local searchFieldMap = util.switch()
+    : case 'table'
+    : call(function (node, key, results)
+        for _, field in ipairs(node) do
+            if field.type == 'tablefield'
+            or field.type == 'tableindex' then
+                if guide.getKeyName(field) == key then
+                    results[#results+1] = field
+                end
+            end
+        end
+    end)
+    : getMap()
+
+local compiledMap;compiledMap = util.switch()
+    : case 'field'
+    : call(function (source, results)
+        local parent = source.parent
+        compiledMap[parent.type](parent, results)
+    end)
+    : case 'getfield'
+    : case 'setfield'
+    : call(function (source, results)
+        local node = compiler.compileNode(guide.getUri(source.node), source.node)
+        if not node then
+            return
+        end
+        if searchFieldMap[node.type] then
+            searchFieldMap[node.type](node, guide.getKeyName(source), results)
+        end
+    end)
     : getMap()
 
 ---@param source  parser.object
@@ -91,12 +121,10 @@ end
 
 ---@param source  parser.object
 ---@param results parser.object[]
-local function searchByNode(source, results)
-    local uri   = guide.getUri(source)
-    local node  = compiler.compileNode(uri, source)
-    local noder = noderMap[node.type]
-    if noder then
-        noder(node, results)
+local function searchByCompiled(source, results)
+    local compiled = compiledMap[source.type]
+    if compiled then
+        compiled(source, results)
     end
 end
 
@@ -107,7 +135,7 @@ function vm.getDefs(source)
 
     searchBySimple(source, results)
     searchByGlobal(source, results)
-    searchByNode(source, results)
+    searchByCompiled(source, results)
 
     return results
 end

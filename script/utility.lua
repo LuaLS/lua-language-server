@@ -21,9 +21,8 @@ local getupvalue   = debug.getupvalue
 local mathHuge     = math.huge
 local inf          = 1 / 0
 local nan          = 0 / 0
-local utf8         = utf8
 local error        = error
-local upvalueid    = debug.upvalueid
+local assert       = assert
 
 _ENV = nil
 
@@ -729,5 +728,33 @@ function m.defaultTable(default)
         return v
     end })
 end
+
+function m.multiTable(count, default)
+    local current
+    if default then
+        current = setmetatable({}, { __index = function (t, k)
+            local v = default(k)
+            t[k] = v
+            return v
+        end })
+    else
+        current = setmetatable({}, { __index = function (t, k)
+            local v = {}
+            t[k] = v
+            return v
+        end })
+    end
+    for _ = 3, count do
+        current = setmetatable({}, { __index = function (t, k)
+            t[k] = current
+            return current
+        end })
+    end
+    return current
+end
+
+m.MODE_K  = { __mode = 'k' }
+m.MODE_V  = { __mode = 'v' }
+m.MODE_KV = { __mode = 'kv' }
 
 return m

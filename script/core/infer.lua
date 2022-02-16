@@ -396,7 +396,7 @@ function m.viewDocFunction(doc)
 end
 
 ---显示对象的推断类型
----@param source parser.guide.object
+---@param source parser.object
 ---@param mark table
 ---@return string
 local function searchInfer(source, infers, mark)
@@ -467,7 +467,7 @@ local function getCachedInfers(source, field)
 end
 
 ---搜索对象的推断类型
----@param source parser.guide.object
+---@param source parser.object
 ---@param field? string
 ---@param mark? table
 ---@return string[]
@@ -511,7 +511,7 @@ function m.searchInfers(source, field, mark)
 end
 
 ---搜索对象的字面量值
----@param source parser.guide.object
+---@param source parser.object
 ---@param field? string
 ---@param mark? table
 ---@return table
@@ -532,7 +532,7 @@ function m.searchLiterals(source, field, mark)
 end
 
 ---搜索并显示推断值
----@param source parser.guide.object
+---@param source parser.object
 ---@param field? string
 ---@return string
 function m.searchAndViewLiterals(source, field, mark)
@@ -548,7 +548,7 @@ function m.searchAndViewLiterals(source, field, mark)
 end
 
 ---判断对象的推断值是否是 true
----@param source parser.guide.object
+---@param source parser.object
 ---@param mark? table
 function m.isTrue(source, mark)
     if not source then
@@ -594,7 +594,7 @@ function m.hasType(source, tp, mark)
 end
 
 ---搜索并显示推断类型
----@param source parser.guide.object
+---@param source parser.object
 ---@param field? string
 ---@return string
 function m.searchAndViewInfers(source, field, mark)
@@ -611,7 +611,7 @@ function m.searchAndViewInfers(source, field, mark)
 end
 
 ---搜索并显示推断的class
----@param source parser.guide.object
+---@param source parser.object
 ---@return string?
 function m.getClass(source)
     if not source then

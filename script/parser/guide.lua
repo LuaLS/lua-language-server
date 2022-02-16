@@ -1,61 +1,61 @@
 local error        = error
 local type         = type
 
----@class parser.guide.object
----@field bindDocs              parser.guide.object[]
----@field bindGroup             parser.guide.object[]
----@field bindSources           parser.guide.object[]
----@field value                 parser.guide.object
----@field parent                parser.guide.object
+---@class parser.object
+---@field bindDocs              parser.object[]
+---@field bindGroup             parser.object[]
+---@field bindSources           parser.object[]
+---@field value                 parser.object
+---@field parent                parser.object
 ---@field type                  string
 ---@field special               string
 ---@field tag                   string
----@field args                  parser.guide.object[]
----@field locals                parser.guide.object[]
----@field returns               parser.guide.object[]
+---@field args                  parser.object[]
+---@field locals                parser.object[]
+---@field returns               parser.object[]
 ---@field uri                   uri
 ---@field start                 integer
 ---@field finish                integer
 ---@field effect                integer
 ---@field attrs                 string[]
----@field specials              parser.guide.object[]
----@field labels                parser.guide.object[]
----@field node                  parser.guide.object
+---@field specials              parser.object[]
+---@field labels                parser.object[]
+---@field node                  parser.object
 ---@field dummy                 boolean
----@field field                 parser.guide.object
----@field method                parser.guide.object
----@field index                 parser.guide.object
----@field extends               parser.guide.object[]
----@field types                 parser.guide.object[]
----@field fields                parser.guide.object[]
----@field typeGeneric           table<integer, parser.guide.object[]>
----@field tkey                  parser.guide.object
----@field tvalue                parser.guide.object
+---@field field                 parser.object
+---@field method                parser.object
+---@field index                 parser.object
+---@field extends               parser.object[]
+---@field types                 parser.object[]
+---@field fields                parser.object[]
+---@field typeGeneric           table<integer, parser.object[]>
+---@field tkey                  parser.object
+---@field tvalue                parser.object
 ---@field tindex                integer
----@field op                    parser.guide.object
----@field next                  parser.guide.object
----@field docParam              parser.guide.object
+---@field op                    parser.object
+---@field next                  parser.object
+---@field docParam              parser.object
 ---@field sindex                integer
----@field name                  parser.guide.object
----@field call                  parser.guide.object
----@field closure               parser.guide.object
----@field proto                 parser.guide.object
----@field exp                   parser.guide.object
+---@field name                  parser.object
+---@field call                  parser.object
+---@field closure               parser.object
+---@field proto                 parser.object
+---@field exp                   parser.object
 ---@field isGeneric             boolean
----@field alias                 parser.guide.object
----@field class                 parser.guide.object
----@field vararg                parser.guide.object
----@field param                 parser.guide.object
----@field overload              parser.guide.object
+---@field alias                 parser.object
+---@field class                 parser.object
+---@field vararg                parser.object
+---@field param                 parser.object
+---@field overload              parser.object
 ---@field docParamMap           table<string, integer>
 ---@field upvalues              table<string, string[]>
----@field ref                   parser.guide.object[]
+---@field ref                   parser.object[]
 ---@field returnIndex           integer
----@field docs                  parser.guide.object[]
+---@field docs                  parser.object[]
 ---@field state                 table
 ---@field comment               table
 ---@field optional              boolean
----@field _root                 parser.guide.object
+---@field _root                 parser.object
 
 ---@class guide
 ---@field debugMode boolean
@@ -142,7 +142,7 @@ local childMap = {
     ['doc.diagnostic']     = {'#names'},
 }
 
----@type table<string, fun(obj: parser.guide.object, list: parser.guide.object[])>
+---@type table<string, fun(obj: parser.object, list: parser.object[])>
 local compiledChildMap = setmetatable({}, {__index = function (self, name)
     local defs = childMap[name]
     if not defs then
@@ -222,7 +222,7 @@ local function formatNumber(n)
 end
 
 --- 是否是字面量
----@param obj parser.guide.object
+---@param obj parser.object
 ---@return boolean
 function m.isLiteral(obj)
     local tp = obj.type
@@ -236,7 +236,7 @@ function m.isLiteral(obj)
 end
 
 --- 获取字面量
----@param obj parser.guide.object
+---@param obj parser.object
 ---@return any
 function m.getLiteral(obj)
     local tp = obj.type
@@ -253,8 +253,8 @@ function m.getLiteral(obj)
 end
 
 --- 寻找父函数
----@param obj parser.guide.object
----@return parser.guide.object
+---@param obj parser.object
+---@return parser.object
 function m.getParentFunction(obj)
     for _ = 1, 1000 do
         obj = obj.parent
@@ -270,8 +270,8 @@ function m.getParentFunction(obj)
 end
 
 --- 寻找所在区块
----@param obj parser.guide.object
----@return parser.guide.object
+---@param obj parser.object
+---@return parser.object
 function m.getBlock(obj)
     for _ = 1, 1000 do
         if not obj then
@@ -299,8 +299,8 @@ function m.getBlock(obj)
 end
 
 --- 寻找所在父区块
----@param obj parser.guide.object
----@return parser.guide.object
+---@param obj parser.object
+---@return parser.object
 function m.getParentBlock(obj)
     for _ = 1, 1000 do
         obj = obj.parent
@@ -316,8 +316,8 @@ function m.getParentBlock(obj)
 end
 
 --- 寻找所在可break的父区块
----@param obj parser.guide.object
----@return parser.guide.object
+---@param obj parser.object
+---@return parser.object
 function m.getBreakBlock(obj)
     for _ = 1, 1000 do
         obj = obj.parent
@@ -336,8 +336,8 @@ function m.getBreakBlock(obj)
 end
 
 --- 寻找doc的主体
----@param obj parser.guide.object
----@return parser.guide.object
+---@param obj parser.object
+---@return parser.object
 function m.getDocState(obj)
     for _ = 1, 1000 do
         local parent = obj.parent
@@ -353,8 +353,8 @@ function m.getDocState(obj)
 end
 
 --- 寻找所在父类型
----@param obj parser.guide.object
----@return parser.guide.object
+---@param obj parser.object
+---@return parser.object
 function m.getParentType(obj, want)
     for _ = 1, 1000 do
         obj = obj.parent
@@ -369,8 +369,8 @@ function m.getParentType(obj, want)
 end
 
 --- 寻找根区块
----@param obj parser.guide.object
----@return parser.guide.object
+---@param obj parser.object
+---@return parser.object
 function m.getRoot(obj)
     local source = obj
     if source._root then
@@ -394,7 +394,7 @@ function m.getRoot(obj)
     error('guide.getRoot overstack')
 end
 
----@param obj parser.guide.object
+---@param obj parser.object
 ---@return uri
 function m.getUri(obj)
     if obj.uri then
@@ -1101,7 +1101,7 @@ function m.getPath(a, b, sameFunction)
 end
 
 ---是否是全局变量（包括 _G.XXX 形式）
----@param source parser.guide.object
+---@param source parser.object
 ---@return boolean
 function m.isGlobal(source)
     if source._isGlobal ~= nil then

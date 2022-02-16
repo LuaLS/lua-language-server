@@ -8,7 +8,7 @@ local define    = require 'proto.define'
 
 ---获取class与alias
 ---@param name? string
----@return parser.guide.object[]
+---@return parser.object[]
 function vm.getDocDefines(uri, name)
     local cache = vm.getCache 'getDocDefines'
     if cache[name] then

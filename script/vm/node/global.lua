@@ -1,24 +1,33 @@
 local util = require 'utility'
 
+---@class vm.node.global.link
+---@field gets   parser.object[]
+---@field sets   parser.object[]
+
 ---@class vm.node.global
----@field links table<uri, { gets: table, sets: table }>
----@field setsCache parser.guide.object[]
----@field getsCache parser.guide.object[]
+---@field links table<uri, vm.node.global.link>
+---@field setsCache parser.object[]
+---@field getsCache parser.object[]
 local mt = {}
 mt.__index = mt
 mt.type = 'global'
 mt.name = ''
 
+---@param uri    uri
+---@param source parser.object
 function mt:addSet(uri, source)
     local link = self.links[uri]
     link.sets[#link.sets+1] = source
 end
 
+---@param uri    uri
+---@param source parser.object
 function mt:addGet(uri, source)
     local link = self.links[uri]
     link.gets[#link.gets+1] = source
 end
 
+---@return parser.object[]
 function mt:getSets()
     if not self.setsCache then
         self.setsCache = {}
@@ -31,6 +40,7 @@ function mt:getSets()
     return self.setsCache
 end
 
+---@return parser.object[]
 function mt:getGets()
     if not self.getsCache then
         self.getsCache = {}
@@ -43,22 +53,27 @@ function mt:getGets()
     return self.getsCache
 end
 
+---@param uri uri
 function mt:dropUri(uri)
     self.links[uri] = nil
     self.setsCache = nil
     self.getsCache = nil
 end
 
+---@return string
+function mt:getName()
+    return self.name
+end
+
 ---@return vm.node.global
 return function (name)
-    local global = setmetatable({
+    return setmetatable({
         name  = name,
         links = util.defaultTable(function ()
             return {
-                sets = {},
-                gets = {},
+                sets   = {},
+                gets   = {},
             }
         end),
     }, mt)
-    return global
 end

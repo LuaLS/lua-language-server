@@ -49,17 +49,10 @@ local simpleMap;simpleMap = util.switch()
     : getMap()
 
 local noderMap = util.switch()
-    : case 'global'
-    ---@param node vm.node.global
-    : call(function (node, results)
-        for _, set in ipairs(node:getSets()) do
-            results[#results+1] = set
-        end
-    end)
     : getMap()
 
----@param source  parser.guide.object
----@param results parser.guide.object[]
+---@param source  parser.object
+---@param results parser.object[]
 local function searchBySimple(source, results)
     local simple = simpleMap[source.type]
     if simple then
@@ -67,9 +60,12 @@ local function searchBySimple(source, results)
     end
 end
 
----@param source  parser.guide.object
----@param results parser.guide.object[]
+---@param source  parser.object
+---@param results parser.object[]
 local function searchByGlobal(source, results)
+    if source.type == 'field' then
+        source = source.parent
+    end
     local global = source._globalID
     if not global then
         return
@@ -79,8 +75,8 @@ local function searchByGlobal(source, results)
     end
 end
 
----@param source  parser.guide.object
----@param results parser.guide.object[]
+---@param source  parser.object
+---@param results parser.object[]
 local function searchByNode(source, results)
     local uri   = guide.getUri(source)
     local node  = compiler.compileNode(uri, source)
@@ -90,8 +86,8 @@ local function searchByNode(source, results)
     end
 end
 
----@param source parser.guide.object
----@return       parser.guide.object[]
+---@param source parser.object
+---@return       parser.object[]
 function vm.getDefs(source)
     local results = {}
 
@@ -102,8 +98,8 @@ function vm.getDefs(source)
     return results
 end
 
----@param source parser.guide.object
----@return       parser.guide.object[]
+---@param source parser.object
+---@return       parser.object[]
 function vm.getAllDefs(source)
     return vm.getDefs(source)
 end

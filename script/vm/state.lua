@@ -15,7 +15,7 @@ end)
 
 ---@param name   string
 ---@param uri    uri
----@param source parser.guide.object
+---@param source parser.object
 ---@return vm.node.global
 function m.declareGlobal(name, uri, source)
     m.subscriptions[uri].globals[name] = true

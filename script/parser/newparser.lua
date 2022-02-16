@@ -2588,9 +2588,9 @@ local function skipSeps()
     end
 end
 
----@return parser.guide.object   first
----@return parser.guide.object   second
----@return parser.guide.object[] rest
+---@return parser.object   first
+---@return parser.object   second
+---@return parser.object[] rest
 local function parseSetValues()
     skipSpace()
     local first = parseExp()
@@ -2645,8 +2645,8 @@ local function pushActionIntoCurrentChunk(action)
     end
 end
 
----@return parser.guide.object   second
----@return parser.guide.object[] rest
+---@return parser.object   second
+---@return parser.object[] rest
 local function parseVarTails(parser, isLocal)
     if Tokens[Index + 1] ~= ',' then
         return

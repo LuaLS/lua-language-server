@@ -1,8 +1,8 @@
-local files = require("files")
-local codeFormat = require "code_format"
-local converter = require("proto.converter")
-local log = require("log")
-local config = require("config")
+local files       = require 'files'
+local codeFormat  = require 'code_format'
+local converter   = require 'proto.converter'
+local log         = require 'log'
+local pformatting = require 'provider.formatting'
 
 
 ---@async
@@ -11,6 +11,8 @@ return function(uri, callback)
     if not text then
         return
     end
+
+    pformatting.updateConfig(uri)
 
     local status, diagnosticInfos = codeFormat.diagnose_file(uri, text)
 
@@ -21,12 +23,12 @@ return function(uri, callback)
 
         return
     end
-    
+
     if diagnosticInfos then
-        for _, diagnosticInfo in pairs(diagnosticInfos) do
+        for _, diagnosticInfo in ipairs(diagnosticInfos) do
             callback {
-                start = converter.unpackPosition(uri, diagnosticInfo.range.start),
-                finish = converter.unpackPosition(uri, diagnosticInfo.range["end"]),
+                start   = converter.unpackPosition(uri, diagnosticInfo.range.start),
+                finish  = converter.unpackPosition(uri, diagnosticInfo.range["end"]),
                 message = diagnosticInfo.message
             }
         end

@@ -5,6 +5,7 @@ local completion = require 'provider.completion'
 local define     = require 'proto.define'
 
 require 'provider.semantic-tokens'
+require 'provider.formatting'
 
 local function toArray(map)
     local array = {}

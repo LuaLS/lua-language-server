@@ -37,7 +37,10 @@ return function (uri, callback)
             callback {
                 start   = node.start,
                 finish  = args.finish,
-                message = lang.script('DIAG_PREVIOUS_CALL', text:sub(node.start, node.finish), text:sub(args.start, args.finish)),
+                message = lang.script('DIAG_PREVIOUS_CALL'
+                    , text:sub(node.start, node.finish)
+                    , text:sub(args.start, args.finish)
+                ),
             }
         end
     end)

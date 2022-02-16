@@ -10,7 +10,7 @@ local function loadArgs()
             goto CONTINUE
         end
         local value = tail:match '=(.+)'
-        if value == 'true' or value == nil then
+        if     value == 'true' or value == nil then
             value = true
         elseif value == 'false' then
             value = false

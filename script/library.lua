@@ -336,6 +336,7 @@ local function apply3rd(uri, cfg, onlyMemory)
             changes[#changes+1] = {
                 key    = change.key,
                 action = change.action,
+                prop   = change.prop,
                 value  = change.value,
                 uri    = uri,
             }
@@ -409,7 +410,7 @@ local function wholeMatch(a, b)
     if not pos1 then
         return false
     end
-    local left  = a:sub(pos1 - 1, pos1-1)
+    local left  = a:sub(pos1 - 1, pos1 - 1)
     local right = a:sub(pos2, pos2)
     if left:match '[%w_]'
     or right:match '[%w_]' then

@@ -1,7 +1,7 @@
 local main, exec
 local i = 1
 while arg[i] do
-    if arg[i] == '-E' then
+    if     arg[i] == '-E' then
     elseif arg[i] == '-e' then
         i = i + 1
         local expr = assert(arg[i], "'-e' needs argument")

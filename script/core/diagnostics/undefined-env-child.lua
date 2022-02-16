@@ -1,8 +1,7 @@
-local files     = require 'files'
-local searcher = require 'core.searcher'
-local guide    = require 'parser.guide'
-local lang     = require 'language'
-local vm = require "vm.vm"
+local files = require 'files'
+local guide = require 'parser.guide'
+local lang  = require 'language'
+local vm    = require "vm.vm"
 
 return function (uri, callback)
     local ast = files.getState(uri)

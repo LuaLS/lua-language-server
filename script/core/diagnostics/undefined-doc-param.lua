@@ -1,8 +1,5 @@
 local files   = require 'files'
-local searcher   = require 'core.searcher'
 local lang    = require 'language'
-local define  = require 'proto.define'
-local vm      = require 'vm'
 
 local function hasParamName(func, name)
     if not func.args then

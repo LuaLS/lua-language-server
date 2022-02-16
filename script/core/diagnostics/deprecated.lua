@@ -82,7 +82,11 @@ return function (uri, callback)
             end
             table.sort(versions)
             if #versions > 0 then
-                message = ('%s(%s)'):format(message, lang.script('DIAG_DEFINED_VERSION', table.concat(versions, '/'), config.get(uri, 'Lua.runtime.version')))
+                message = ('%s(%s)'):format(message
+                    , lang.script('DIAG_DEFINED_VERSION'
+                    , table.concat(versions, '/')
+                    , config.get(uri, 'Lua.runtime.version'))
+                )
             end
         end
         cache[id] = {

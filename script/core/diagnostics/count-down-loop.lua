@@ -20,28 +20,26 @@ return function (uri, callback)
         end
         if not source.step then
             callback {
-                start  = source.init.start,
-                finish = source.max.finish,
+                start   = source.init.start,
+                finish  = source.max.finish,
                 message = lang.script('DIAG_COUNT_DOWN_LOOP'
                     , ('%s, %s'):format(text:sub(
                         guide.positionToOffset(state, source.init.start),
                         guide.positionToOffset(state, source.max.finish)
-                    )
-                    , '-1')
+                    ), '-1')
                 )
             }
         else
             local stepNumber = tonumber(source.step[1])
             if stepNumber and stepNumber > 0 then
                 callback {
-                    start  = source.init.start,
-                    finish = source.step.finish,
+                    start   = source.init.start,
+                    finish  = source.step.finish,
                     message = lang.script('DIAG_COUNT_DOWN_LOOP'
                         , ('%s, -%s'):format(text:sub(
                             guide.positionToOffset(state, source.init.start),
                             guide.positionToOffset(state, source.max.finish)
-                        )
-                        , source.step[1])
+                        ), source.step[1])
                     )
                 }
             end

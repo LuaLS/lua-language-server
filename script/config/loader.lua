@@ -45,7 +45,7 @@ function m.loadLocalConfig(uri, filename)
         scp:set('lastLocalType', nil)
         return nil
     end
-    local buf  = util.loadFile(path)
+    local buf = util.loadFile(path)
     if not buf then
         errorMessage(lang.script('CONFIG_LOAD_FAILED', path))
         scp:set('lastLocalConfig', nil)

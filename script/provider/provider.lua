@@ -65,22 +65,20 @@ function m.register(method)
     end
 end
 
-filewatch.event(function (changes) ---@async
-    for _, change in ipairs(changes) do
-        if (CONFIGPATH and util.stringEndWith(change.path, CONFIGPATH)) then
-            for _, scp in ipairs(workspace.folders) do
-                local configPath = workspace.getAbsolutePath(scp.uri, CONFIGPATH)
-                if change.path == configPath then
-                    updateConfig(scp.uri)
-                end
+filewatch.event(function (ev, path) ---@async
+    if (CONFIGPATH and util.stringEndWith(path, CONFIGPATH)) then
+        for _, scp in ipairs(workspace.folders) do
+            local configPath = workspace.getAbsolutePath(scp.uri, CONFIGPATH)
+            if path == configPath then
+                updateConfig(scp.uri)
             end
         end
-        if util.stringEndWith(change.path, '.luarc.json') then
-            for _, scp in ipairs(workspace.folders) do
-                local rcPath     = workspace.getAbsolutePath(scp.uri, '.luarc.json')
-                if change.path == rcPath then
-                    updateConfig(scp.uri)
-                end
+    end
+    if util.stringEndWith(path, '.luarc.json') then
+        for _, scp in ipairs(workspace.folders) do
+            local rcPath     = workspace.getAbsolutePath(scp.uri, '.luarc.json')
+            if path == rcPath then
+                updateConfig(scp.uri)
             end
         end
     end
@@ -100,19 +98,6 @@ m.register 'initialize' {
             end
         elseif params.rootUri then
             workspace.create(params.rootUri)
-        end
-
-        if params.initializationOptions then
-            if params.initializationOptions.editorConfigFiles then
-                local codeFormat = require "code_format"
-                for _, config in pairs(params.initializationOptions.editorConfigFiles) do
-                    local status, err = codeFormat.update_config(1, config.workspace, config.path)
-
-                    if not status and err ~= nil then
-                        log.error(err)
-                    end
-                end
-            end
         end
 
         return {
@@ -930,16 +915,16 @@ m.register '$/status/click' {
 }
 
 m.register 'textDocument/formatting' {
-    abortByFileUpdate = true,
     ---@async
     function(params)
         local uri = files.getRealUri(params.textDocument.uri)
-        workspace.awaitReady(uri)
-        local _ <close> = progress.create(scope.getScope(uri), lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
 
         if not files.exists(uri) then
             return nil
         end
+
+        local pformatting = require 'provider.formatting'
+        pformatting.updateConfig(uri)
 
         local core = require 'core.formatting'
         local edits = core(uri)
@@ -960,16 +945,16 @@ m.register 'textDocument/formatting' {
 }
 
 m.register 'textDocument/rangeFormatting' {
-    abortByFileUpdate = true,
     ---@async
     function(params)
         local uri = files.getRealUri(params.textDocument.uri)
-        workspace.awaitReady(uri)
-        local _ <close> = progress.create(scope.getScope(uri), lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
 
         if not files.exists(uri) then
             return nil
         end
+
+        local pformatting = require 'provider.formatting'
+        pformatting.updateConfig(uri)
 
         local core = require 'core.rangeformatting'
         local edits = core(uri, params.range)
@@ -986,25 +971,6 @@ m.register 'textDocument/rangeFormatting' {
         end
 
         return results
-    end
-}
-
-m.register 'config/editorconfig/update' {
-    abortByFileUpdate = true,
-    ---@async
-    function(params)
-        local codeFormat = require "code_format"
-        local status, err = codeFormat.update_config(params.type, params.source.workspace, params.source.path)
-
-        if not status and err ~= nil then
-            log.error(err)
-            return
-        end
-
-        local diagnostic = require 'provider.diagnostic'
-        for _, scp in ipairs(workspace.folders) do
-            diagnostic.diagnosticsScope(scp.uri)
-        end
     end
 }
 

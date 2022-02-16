@@ -500,44 +500,38 @@ config.watch(function (uri, key, value, oldValue)
     end
 end)
 
-fw.event(function (changes) ---@async
-    for _, change in ipairs(changes) do
-        local path = change.path
-        local uri  = furi.encode(path)
+fw.event(function (ev, path) ---@async
+    local uri  = furi.encode(path)
 
-        ---@async
-        await.call(function ()
-            if     change.type == 'create' then
-                log.debug('FileChangeType.Created', uri)
-                m.awaitLoadFile(uri)
-            elseif change.type == 'delete' then
-                log.debug('FileChangeType.Deleted', uri)
-                files.remove(uri)
-                m.removeFile(uri)
-                local childs = files.getChildFiles(uri)
-                for _, curi in ipairs(childs) do
-                    log.debug('FileChangeType.Deleted.Child', curi)
-                    files.remove(curi)
-                    m.removeFile(uri)
-                end
-            elseif change.type == 'change' then
-                if m.isValidLuaUri(uri) then
-                    -- 如果文件处于关闭状态，则立即更新；否则等待didChange协议来更新
-                    if not files.isOpen(uri) then
-                        files.setText(uri, pub.awaitTask('loadFile', furi.decode(uri)), false)
-                    end
-                end
+    if     ev == 'create' then
+        log.debug('FileChangeType.Created', uri)
+        m.awaitLoadFile(uri)
+    elseif ev == 'delete' then
+        log.debug('FileChangeType.Deleted', uri)
+        files.remove(uri)
+        m.removeFile(uri)
+        local childs = files.getChildFiles(uri)
+        for _, curi in ipairs(childs) do
+            log.debug('FileChangeType.Deleted.Child', curi)
+            files.remove(curi)
+            m.removeFile(uri)
+        end
+    elseif ev == 'change' then
+        if m.isValidLuaUri(uri) then
+            -- 如果文件处于关闭状态，则立即更新；否则等待didChange协议来更新
+            if not files.isOpen(uri) then
+                files.setText(uri, pub.awaitTask('loadFile', furi.decode(uri)), false)
             end
-        end)
+        end
+    end
 
-        local filename = fs.path(path):filename():string()
-        -- 排除类文件发生更改需要重新扫描
-        if filename == '.gitignore'
-        or filename == '.gitmodules' then
-            local scp = scope.getScope(uri)
-            if scp.type ~= 'fallback' then
-                m.reload(scp)
-            end
+    local filename = fs.path(path):filename():string()
+    -- 排除类文件发生更改需要重新扫描
+    if filename == '.gitignore'
+    or filename == '.gitmodules' then
+        local scp = scope.getScope(uri)
+        if scp.type ~= 'fallback' then
+            m.reload(scp)
         end
     end
 end)

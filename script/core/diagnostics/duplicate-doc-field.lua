@@ -14,7 +14,7 @@ return function (uri, callback)
     local mark
     for _, group in ipairs(state.ast.docs.groups) do
         for _, doc in ipairs(group) do
-            if doc.type == 'doc.class' then
+            if     doc.type == 'doc.class' then
                 mark = {}
             elseif doc.type == 'doc.field' then
                 if mark then
@@ -25,8 +25,8 @@ return function (uri, callback)
                     end
                     if mark[name] then
                         callback {
-                            start  = doc.field.start,
-                            finish = doc.field.finish,
+                            start   = doc.field.start,
+                            finish  = doc.field.finish,
                             message = lang.script('DIAG_DUPLICATE_DOC_FIELD', name),
                         }
                     end

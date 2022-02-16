@@ -76,12 +76,14 @@ enable_name_style_check = true
 # snake_case | upper_snake_case
 # same(first_param, snake_case)
 # same('m')
-local_name_define_style = camel_case
+local_name_define_style = camel_case|upper_snake_case
 function_param_name_style = camel_case
 function_name_define_style = camel_case
 local_function_name_define_style = camel_case
-table_field_name_define_style = camel_case
+table_field_name_define_style = camel_case|pascal_case
 global_variable_name_define_style = camel_case|upper_snake_case
 module_name_define_style = camel_case
 require_module_name_style = camel_case
 class_name_define_style = camel_case
+table_append_expression_no_space = true
+if_condition_align_with_each_other = true

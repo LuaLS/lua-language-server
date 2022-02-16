@@ -4,7 +4,7 @@ local lang    = require 'language'
 local guide   = require 'parser.guide'
 local await   = require 'await'
 
-local SkipCheckClass = {
+local skipCheckClass = {
     ['unknown']       = true,
     ['any']           = true,
     ['table']         = true,
@@ -48,7 +48,7 @@ return function (uri, callback)
             local ok
             for _, def in ipairs(defs) do
                 if  def.type == 'doc.class.name'
-                and not SkipCheckClass[def[1]] then
+                and not skipCheckClass[def[1]] then
                     ok = true
                     break
                 end
@@ -59,7 +59,7 @@ return function (uri, callback)
             end
         end
         local message = lang.script('DIAG_UNDEF_FIELD', guide.getKeyName(src))
-        if src.type == 'getfield' and src.field then
+        if     src.type == 'getfield' and src.field then
             callback {
                 start   = src.field.start,
                 finish  = src.field.finish,

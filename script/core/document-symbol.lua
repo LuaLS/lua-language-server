@@ -5,8 +5,8 @@ local define   = require 'proto.define'
 local util     = require 'utility'
 
 local function buildName(source, text)
-    local uri   = guide.getUri(source)
-    local state = files.getState(uri)
+    local uri          = guide.getUri(source)
+    local state        = files.getState(uri)
     local startOffset  = guide.positionToOffset(state, source.start)
     if source.type == 'setmethod'
     or source.type == 'getmethod' then
@@ -95,10 +95,10 @@ local function buildTable(tbl)
 end
 
 local function buildValue(source, text, symbols)
-    local name  = buildName(source, text)
+    local name = buildName(source, text)
     local range, sRange, valueRange, kind
     local details = {}
-    if source.type == 'local' then
+    if     source.type == 'local' then
         if source.parent.type == 'funcargs' then
             details[1] = 'param'
             range      = { source.start, source.finish }
@@ -141,7 +141,7 @@ local function buildValue(source, text, symbols)
     end
     if source.value then
         local literal = source.value[1]
-        if source.value.type == 'boolean' then
+        if     source.value.type == 'boolean' then
             details[2] = ' boolean'
             if literal ~= nil then
                 details[3] = ' = '
@@ -202,7 +202,7 @@ local function buildAnonymousFunction(source, text, used, symbols)
     used[source] = true
     local head = ''
     local parent = source.parent
-    if parent.type == 'return' then
+    if     parent.type == 'return' then
         head = 'return '
     elseif parent.type == 'callargs' then
         local call = parent.parent

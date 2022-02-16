@@ -3,11 +3,11 @@ local util     = require 'utility'
 local vm       = require "vm.vm"
 local guide    = require "parser.guide"
 
-local CLASS           = {'CLASS'}
-local TABLE           = {'TABLE'}
-local CACHE           = {'CACHE'}
+local CLASS           = { 'CLASS' }
+local TABLE           = { 'TABLE' }
+local CACHE           = { 'CACHE' }
 
-local TypeSort = {
+local typeSort = {
     ['boolean']  = 1,
     ['string']   = 2,
     ['integer']  = 3,
@@ -50,7 +50,7 @@ local function searchInferOfUnary(value, infers, mark)
         return
     end
     if op == '-' then
-        if m.hasType(value[1], 'integer', mark) then
+        if     m.hasType(value[1], 'integer', mark) then
             infers['integer'] = true
         elseif isBaseType(value[1], mark) then
             infers['number'] = true
@@ -125,8 +125,8 @@ local function searchInferOfBinary(value, infers, mark)
     or op == '*'
     or op == '%'
     or op == '//' then
-        if  m.hasType(value[1], 'integer', mark)
-        and m.hasType(value[2], 'integer', mark) then
+        if     m.hasType(value[1], 'integer', mark)
+        and    m.hasType(value[2], 'integer', mark) then
             infers['integer'] = true
         elseif isBaseType(value[1], mark)
         and    isBaseType(value[2], mark) then
@@ -289,8 +289,8 @@ function m.viewInfers(uri, infers)
         return 'any'
     end
     table.sort(result, function (a, b)
-        local sa = TypeSort[a] or 100
-        local sb = TypeSort[b] or 100
+        local sa = typeSort[a] or 100
+        local sb = typeSort[b] or 100
         if sa == sb then
             return a < b
         else

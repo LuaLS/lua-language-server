@@ -248,8 +248,8 @@ local function tryModifyRC(uri, finalChanges, create)
     if not buf and not create then
         return false
     end
-    local scp = scope.getScope(uri)
-    local rc = scp:get('lastRCConfig') or {
+    local loader = require 'config.loader'
+    local rc = loader.loadRCConfig(uri, path) or {
         ['$schema'] = lang.id == 'zh-cn'
             and [[https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema-zh-cn.json]]
             or  [[https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json]]
@@ -315,7 +315,7 @@ end
 function m.setConfig(changes, onlyMemory)
     local finalChanges = {}
     for _, change in ipairs(changes) do
-        if change.action == 'add' then
+        if     change.action == 'add' then
             local suc = config.add(change.uri, change.key, change.value)
             if suc then
                 finalChanges[#finalChanges+1] = change

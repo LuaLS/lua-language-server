@@ -22,7 +22,7 @@ local infer        = require 'core.infer'
 local await        = require 'await'
 local postfix      = require 'core.completion.postfix'
 
-local DiagnosticModes = {
+local diagnosticModes = {
     'disable-next-line',
     'disable-line',
     'disable',
@@ -100,9 +100,9 @@ local function findParent(state, position)
             goto CONTINUE
         end
         local oop
-        if char == '.' then
+        if     char == '.' then
             -- `..` 的情况
-            if text:sub(i-1, i-1) == '.' then
+            if text:sub(i - 1, i - 1) == '.' then
                 return nil, nil
             end
             oop = false
@@ -111,7 +111,7 @@ local function findParent(state, position)
         else
             return nil, nil
         end
-        local anyOffset = lookBackward.findAnyOffset(text, i-1)
+        local anyOffset = lookBackward.findAnyOffset(text, i - 1)
         if not anyOffset then
             return nil, nil
         end
@@ -197,10 +197,10 @@ local function getSnip(source)
             if vm.isMetaFile(uri) then
                 goto CONTINUE
             end
-            local firstRow = guide.rowColOf(def.start)
-            local lastRow  = firstRow + context
+            local firstRow   = guide.rowColOf(def.start)
+            local lastRow    = firstRow + context
             local lastOffset = lines[lastRow] and (lines[lastRow] - 1) or #text
-            local snip = text:sub(lines[firstRow], lastOffset)
+            local snip       = text:sub(lines[firstRow], lastOffset)
             return snip
         end
         ::CONTINUE::
@@ -227,19 +227,21 @@ local function buildFunction(results, source, value, oop, data)
     end
     if snipType == 'Both' or snipType == 'Replace' then
         local snipData = util.deepCopy(data)
-        snipData.kind = define.CompletionItemKind.Snippet
-        snipData.insertText = buildFunctionSnip(source, value, oop)
+
+        snipData.kind             = define.CompletionItemKind.Snippet
+        snipData.insertText       = buildFunctionSnip(source, value, oop)
         snipData.insertTextFormat = 2
-        snipData.command = {
+        snipData.command          = {
             title = 'trigger signature',
             command = 'editor.action.triggerParameterHints',
         }
-        snipData.id  = stack(function () ---@async
+        snipData.id               = stack(function () ---@async
             return {
                 detail      = buildDetail(source),
                 description = buildDesc(source),
             }
         end)
+
         results[#results+1] = snipData
     end
 end
@@ -261,7 +263,7 @@ local function getParams(func, oop)
     end
     local args = {}
     for _, arg in ipairs(func.args) do
-        if arg.type == '...' then
+        if     arg.type == '...' then
             args[#args+1] = '...'
         elseif arg.type == 'doc.type.arg' then
             args[#args+1] = arg.name[1]
@@ -293,11 +295,11 @@ local function checkLocal(state, word, position, results)
                 or def.type == 'doc.type.function' then
                     local funcLabel = name .. getParams(def, false)
                     buildFunction(results, source, def, false, {
-                        label  = funcLabel,
-                        match  = name,
+                        label      = funcLabel,
+                        match      = name,
                         insertText = name,
-                        kind   = define.CompletionItemKind.Function,
-                        id     = stack(function () ---@async
+                        kind       = define.CompletionItemKind.Function,
+                        id         = stack(function () ---@async
                             return {
                                 detail      = buildDetail(source),
                                 description = buildDesc(source),
@@ -326,7 +328,7 @@ local function checkModule(state, word, position, results)
     if not config.get(state.uri, 'Lua.completion.autoRequire') then
         return
     end
-    local locals  = guide.getVisibleLocals(state.ast, position)
+    local locals = guide.getVisibleLocals(state.ast, position)
     for uri in files.eachFile(state.uri) do
         if uri == guide.getUri(state.ast) then
             goto CONTINUE
@@ -361,10 +363,10 @@ local function checkModule(state, word, position, results)
                 goto CONTINUE
             end
             results[#results+1] = {
-                label  = stemName,
-                kind   = define.CompletionItemKind.Variable,
-                commitCharacters = {'.'},
-                command = {
+                label            = stemName,
+                kind             = define.CompletionItemKind.Variable,
+                commitCharacters = { '.' },
+                command          = {
                     title     = 'autoRequire',
                     command   = 'lua.autoRequire',
                     arguments = {
@@ -375,7 +377,7 @@ local function checkModule(state, word, position, results)
                         },
                     },
                 },
-                id     = stack(function () ---@async
+                id               = stack(function () ---@async
                     local md = markdown()
                     md:add('md', lang.script('COMPLETION_IMPORT_FROM', ('[%s](%s)'):format(
                         workspace.getRelativePath(uri),
@@ -427,9 +429,9 @@ local function checkFieldFromFieldToIndex(state, name, src, parent, word, startP
     local nxt = parent.next
     if nxt then
         local dotStart, dotFinish
-        if nxt.type == 'setfield'
-        or nxt.type == 'getfield'
-        or nxt.type == 'tablefield' then
+        if     nxt.type == 'setfield'
+        or     nxt.type == 'getfield'
+        or     nxt.type == 'tablefield' then
             dotStart = nxt.dot.start
             dotFinish = nxt.dot.finish
         elseif nxt.type == 'setmethod'
@@ -505,13 +507,14 @@ local function checkFieldThen(state, name, src, word, startPos, position, parent
         kind       = kind,
         deprecated = vm.isDeprecated(src) or nil,
         textEdit   = textEdit,
-        additionalTextEdits = additionalTextEdits,
         id         = stack(function () ---@async
             return {
                 detail      = buildDetail(src),
                 description = buildDesc(src),
             }
-        end)
+        end),
+
+        additionalTextEdits = additionalTextEdits,
     }
 end
 
@@ -519,7 +522,7 @@ end
 local function checkFieldOfRefs(refs, state, word, startPos, position, parent, oop, results, locals, isGlobal)
     local fields = {}
     local funcs  = {}
-    local count = 0
+    local count  = 0
     for _, src in ipairs(refs) do
         local name = vm.getKeyName(src)
         if not name then
@@ -726,7 +729,7 @@ local function checkKeyWord(state, start, position, word, hasSpace, afterLocal, 
         text     = text,
         start    = start,
         uri      = guide.getUri(state.ast),
-        position   = position,
+        position = position,
         state    = state,
     }
     for _, data in ipairs(keyWordMap) do
@@ -869,7 +872,7 @@ local function checkFunctionArgByDocParam(state, word, startPos, results)
 end
 
 local function isAfterLocal(state, startPos)
-    local text = state.lua
+    local text   = state.lua
     local offset = guide.positionToOffset(state, startPos)
     local pos    = lookBackward.skipSpace(text, offset)
     local word   = lookBackward.findWord(text, pos)
@@ -971,11 +974,11 @@ local function collectRequireNames(mode, myUri, literal, source, smark, position
             end
         end
         results[#results+1] = {
-            label  = label,
-            detail = infos.path,
-            kind   = define.CompletionItemKind.File,
+            label       = label,
+            detail      = infos.path,
+            kind        = define.CompletionItemKind.File,
             description = table.concat(des, '\n'),
-            textEdit = infos.textEdit,
+            textEdit    = infos.textEdit,
         }
     end
 end
@@ -1137,8 +1140,8 @@ local function checkEqualEnumLeft(state, position, source, results)
 end
 
 local function checkEqualEnum(state, position, results)
-    local text = state.lua
-    local start =  lookBackward.findTargetSymbol(text, guide.positionToOffset(state, position), '=')
+    local text  = state.lua
+    local start = lookBackward.findTargetSymbol(text, guide.positionToOffset(state, position), '=')
     if not start then
         return
     end
@@ -1246,7 +1249,7 @@ local function tryWord(state, position, triggerCharacter, results)
         end
     else
         local parent, oop = findParent(state, startPos)
-        if parent then
+        if     parent then
             checkField(state, word, startPos, position, parent, oop, results)
         elseif isFuncArg(state, position) then
             checkProvideLocal(state, word, startPos, results)
@@ -1351,8 +1354,8 @@ local function getCallEnumsAndFuncs(source, index, oop, call)
             end
         end
         for _, doc in ipairs(source.bindDocs) do
-            if  doc.type == 'doc.param'
-            and doc.param[1] == arg[1] then
+            if     doc.type == 'doc.param'
+            and    doc.param[1] == arg[1] then
                 return pushCallEnumsAndFuncs(vm.getDefs(doc.extends))
             elseif doc.type == 'doc.vararg'
             and    arg.type == '...' then
@@ -1376,7 +1379,7 @@ local function getCallEnumsAndFuncs(source, index, oop, call)
             return
         end
         local results = {}
-        if currentIndex == 1 then
+        if     currentIndex == 1 then
             for _, doc in ipairs(class.fields) do
                 if  doc.field ~= source
                 and doc.field[1] == source[1] then
@@ -1467,10 +1470,10 @@ local function checkTableLiteralField(state, position, tbl, fields, results)
             local name = guide.getKeyName(field)
             if not mark[name] and matchKey(left, guide.getKeyName(field)) then
                 results[#results+1] = {
-                    label = guide.getKeyName(field),
-                    kind  = define.CompletionItemKind.Property,
+                    label      = guide.getKeyName(field),
+                    kind       = define.CompletionItemKind.Property,
                     insertText = ('%s = $0'):format(guide.getKeyName(field)),
-                    id    = stack(function () ---@async
+                    id         = stack(function () ---@async
                         return {
                             detail      = buildDetail(field),
                             description = buildDesc(field),
@@ -1597,7 +1600,7 @@ local function getluaDocByContain(state, position)
         if not src.start then
             return
         end
-        if  range  >= position - src.start
+        if  range >= position - src.start
         and position <= src.finish then
             range = position - src.start
             result = src
@@ -1632,7 +1635,7 @@ local function getluaDocByErr(state, start, position)
 end
 
 local function tryluaDocBySource(state, position, source, results)
-    if source.type == 'doc.extends.name' then
+    if     source.type == 'doc.extends.name' then
         if source.parent.type == 'doc.class' then
             local used = {}
             for _, doc in ipairs(vm.getDocDefines(state.uri, '*')) do
@@ -1698,7 +1701,7 @@ local function tryluaDocBySource(state, position, source, results)
         end
         return true
     elseif source.type == 'doc.diagnostic' then
-        for _, mode in ipairs(DiagnosticModes) do
+        for _, mode in ipairs(diagnosticModes) do
             if matchKey(source.mode, mode) then
                 results[#results+1] = {
                     label    = mode,
@@ -1716,8 +1719,8 @@ local function tryluaDocBySource(state, position, source, results)
         for name in util.sortPairs(define.DiagnosticDefaultSeverity) do
             if matchKey(source[1], name) then
                 results[#results+1] = {
-                    label = name,
-                    kind  = define.CompletionItemKind.Value,
+                    label    = name,
+                    kind     = define.CompletionItemKind.Value,
                     textEdit = {
                         start   = source.start,
                         finish  = source.start + #source[1] - 1,
@@ -1733,7 +1736,7 @@ local function tryluaDocBySource(state, position, source, results)
 end
 
 local function tryluaDocByErr(state, position, err, docState, results)
-    if err.type == 'LUADOC_MISS_CLASS_EXTENDS_NAME' then
+    if     err.type == 'LUADOC_MISS_CLASS_EXTENDS_NAME' then
         for _, doc in ipairs(vm.getDocDefines(state.uri, '*')) do
             if  doc.type == 'doc.class.name'
             and doc.parent ~= docState then
@@ -1793,7 +1796,7 @@ local function tryluaDocByErr(state, position, err, docState, results)
             end
         end
     elseif err.type == 'LUADOC_MISS_DIAG_MODE' then
-        for _, mode in ipairs(DiagnosticModes) do
+        for _, mode in ipairs(diagnosticModes) do
             results[#results+1] = {
                 label = mode,
                 kind  = define.CompletionItemKind.Enum,
@@ -1875,11 +1878,11 @@ local function tryluaDocOfFunction(doc, results)
     end
     local insertText = buildluaDocOfFunction(func)
     results[#results+1] = {
-        label   = '@param;@return',
-        kind    = define.CompletionItemKind.Snippet,
+        label            = '@param;@return',
+        kind             = define.CompletionItemKind.Snippet,
         insertTextFormat = 2,
-        filterText   = '---',
-        insertText   = insertText
+        filterText       = '---',
+        insertText       = insertText
     }
 end
 

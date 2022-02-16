@@ -12,24 +12,29 @@ local function checkDisableByLuaDocExits(uri, row, mode, code)
     local state = files.getState(uri)
     local lines = state.lines
     if state.ast.docs and lines then
-        return guide.eachSourceBetween(state.ast.docs, guide.positionOf(row, 0), guide.positionOf(row + 1, 0), function (doc)
-            if  doc.type == 'doc.diagnostic'
-            and doc.mode == mode then
-                if doc.names then
-                    return {
-                        start   = doc.finish,
-                        finish  = doc.finish,
-                        newText = ', ' .. code,
-                    }
-                else
-                    return {
-                        start   = doc.finish,
-                        finish  = doc.finish,
-                        newText = ': ' .. code,
-                    }
+        return guide.eachSourceBetween(
+            state.ast.docs,
+            guide.positionOf(row, 0),
+            guide.positionOf(row + 1, 0),
+            function (doc)
+                if  doc.type == 'doc.diagnostic'
+                and doc.mode == mode then
+                    if doc.names then
+                        return {
+                            start   = doc.finish,
+                            finish  = doc.finish,
+                            newText = ', ' .. code,
+                        }
+                    else
+                        return {
+                            start   = doc.finish,
+                            finish  = doc.finish,
+                            newText = ': ' .. code,
+                        }
+                    end
                 end
             end
-        end)
+        )
     end
     return nil
 end
@@ -86,7 +91,7 @@ local function markGlobal(uri, name, results)
         kind    = 'quickfix',
         command = {
             title     = lang.script.COMMAND_MARK_GLOBAL,
-            command = 'lua.setConfig',
+            command   = 'lua.setConfig',
             arguments = {
                 {
                     key    = 'Lua.diagnostics.globals',
@@ -208,7 +213,7 @@ local function solveSyntaxByFix(uri, err, results)
     results[#results+1] = {
         title = lang.script('ACTION_' .. err.fix.title, err.fix),
         kind  = 'quickfix',
-        edit = {
+        edit  = {
             changes = {
                 [uri] = changes,
             }
@@ -263,8 +268,8 @@ local function solveNewlineCall(uri, diag, results)
             changes = {
                 [uri] = {
                     {
-                        start  = start,
-                        finish = start,
+                        start   = start,
+                        finish  = start,
                         newText = ';',
                     }
                 }
@@ -335,8 +340,8 @@ local function solveAwaitInSync(uri, diag, results)
             changes = {
                 [uri] = {
                     {
-                        start  = pos,
-                        finish = pos,
+                        start   = pos,
+                        finish  = pos,
                         newText = '---@async\n',
                     }
                 }
@@ -541,11 +546,11 @@ end
 --end
 
 local function checkJsonToLua(results, uri, start, finish)
-    local text  = files.getText(uri)
-    local state = files.getState(uri)
+    local text         = files.getText(uri)
+    local state        = files.getState(uri)
     local startOffset  = guide.positionToOffset(state, start)
     local finishOffset = guide.positionToOffset(state, finish)
-    local jsonStart = text:match ('()[%{%[]', startOffset + 1)
+    local jsonStart    = text:match('()[%{%[]', startOffset + 1)
     if not jsonStart then
         return
     end

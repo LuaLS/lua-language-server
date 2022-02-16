@@ -15,6 +15,7 @@ local function asFunction(source, oop)
     local arg   = buildArg(source, oop)
     local rtn   = buildReturn(source)
     local lines = {}
+
     lines[1] = string.format('%s%s %s(%s)'
         , vm.isAsync(source) and 'async ' or ''
         , oop and 'method' or 'function'
@@ -22,6 +23,7 @@ local function asFunction(source, oop)
         , arg
     )
     lines[2] = rtn
+
     return table.concat(lines, '\n')
 end
 
@@ -89,10 +91,10 @@ local function isGlobalField(source)
     or source.type == 'method' then
         source = source.parent
     end
-    if source.type == 'setfield'
-    or source.type == 'getfield'
-    or source.type == 'setmethod'
-    or source.type == 'getmethod' then
+    if     source.type == 'setfield'
+    or     source.type == 'getfield'
+    or     source.type == 'setmethod'
+    or     source.type == 'getmethod' then
         local node = source.node
         if node.type == 'setglobal'
         or node.type == 'getglobal' then
@@ -178,8 +180,8 @@ end
 
 ---@async
 return function (source, oop)
-    if source.type == 'function'
-    or source.type == 'doc.type.function' then
+    if     source.type == 'function'
+    or     source.type == 'doc.type.function' then
         return asFunction(source, oop)
     elseif source.type == 'local'
     or     source.type == 'getlocal'

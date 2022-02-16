@@ -4,8 +4,9 @@ local state  = require 'vm.state'
 
 ---@class parser.guide.object
 ---@field _compiledGlobal boolean
----@field _initedNodes    boolean
+---@field _compiledNodes  boolean
 ---@field _compiled       any
+---@field _globalID       string
 
 ---@class vm.node.compiler
 local m = {}
@@ -16,18 +17,6 @@ m.UNKNOWN = { type = 'unknown' }
 ---@alias vm.node vm.node.unknown | vm.node.global | vm.node.class
 
 local compilerMap = util.switch()
-    : case 'setglobal'
-    : call(function (uri, source)
-        local name = guide.getKeyName(source)
-        source._compiled = state.declareGlobal(name, uri, source)
-    end)
-    : case 'getglobal'
-    : call(function (uri, source)
-        local name   = guide.getKeyName(source)
-        local global = state.getGlobal(name)
-        global:addGet(uri, source)
-        source._compiled = global
-    end)
     : getMap()
 
 ---@param uri    uri
@@ -46,24 +35,36 @@ function m.compileNode(uri, source)
 end
 
 local compilerGlobalMap = util.switch()
+    : case 'setglobal'
+    : call(function (uri, source)
+        local name = guide.getKeyName(source)
+        source._globalID = state.declareGlobal(name, uri, source)
+    end)
+    : case 'getglobal'
+    : call(function (uri, source)
+        local name   = guide.getKeyName(source)
+        local global = state.getGlobal(name)
+        global:addGet(uri, source)
+        source._globalID = global
+    end)
     : getMap()
 
 ---@param uri    uri
 ---@param source parser.guide.object
 function m.compileGlobalNode(uri, source)
-    if source._compiledGlobal then
+    if source._globalID ~= nil then
         return
     end
-    source._compiledGlobal = true
-    m.compileNode(uri, source)
+    source._globalID = false
+    local compiler = compilerGlobalMap[source.type]
+    if compiler then
+        compiler(uri, source)
+    end
 end
 
 ---编译全局变量的node
 ---@param  root parser.guide.object
 function m.compileGlobals(root)
-    if root._initedNodes then
-        return
-    end
     if root._compiledGlobal then
         return
     end

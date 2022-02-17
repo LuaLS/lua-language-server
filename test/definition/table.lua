@@ -134,6 +134,22 @@ local y = {
 t.<?insert?>()
 ]]
 
+
+TEST [[
+local x
+x.y.<!z!> = 1
+print(x.y.<?z?>)
+]]
+
+
+TEST [[
+local x
+x.y = {
+    <!z!> = 1
+}
+print(x.y.<?z?>)
+]]
+
 TEST [[
 local function f()
     local t = {}

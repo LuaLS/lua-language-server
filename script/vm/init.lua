@@ -1,5 +1,5 @@
 local vm = require 'vm.vm'
-require 'vm.node'
+require 'vm.state'
 require 'vm.getGlobals'
 require 'vm.getDocs'
 require 'vm.getLibrary'

@@ -3,6 +3,7 @@ local vm       = require 'vm.vm'
 local util     = require 'utility'
 local compiler = require 'vm.node.compiler'
 local guide    = require 'parser.guide'
+local localID  = require 'vm.local-id'
 
 local simpleMap
 
@@ -42,15 +43,17 @@ simpleMap = util.switch()
     end)
     : case 'field'
     : call(function (source, results)
-        local node = source.parent.node
-        if node.type == 'getlocal' then
-            searchGetLocal(source, node, results)
-        end
+        local parent = source.parent
+        simpleMap[parent.type](parent, results)
     end)
     : case 'setfield'
     : case 'getfield'
     : call(function (source, results)
-        simpleMap['field'](source.field, results)
+        local node = source.node
+        if node.type == 'getlocal' then
+            searchGetLocal(source, node, results)
+            return
+        end
     end)
     : case 'getindex'
     : case 'setindex'
@@ -76,11 +79,11 @@ local searchFieldMap = util.switch()
     end)
     : getMap()
 
-local compiledMap;compiledMap = util.switch()
+local nodeMap;nodeMap = util.switch()
     : case 'field'
     : call(function (source, results)
         local parent = source.parent
-        compiledMap[parent.type](parent, results)
+        nodeMap[parent.type](parent, results)
     end)
     : case 'getfield'
     : case 'setfield'
@@ -119,12 +122,19 @@ local function searchByGlobal(source, results)
     end
 end
 
+local function searchByID(source, results)
+    local idSources = localID.getSources(source)
+    if not idSources then
+        return
+    end
+end
+
 ---@param source  parser.object
 ---@param results parser.object[]
-local function searchByCompiled(source, results)
-    local compiled = compiledMap[source.type]
-    if compiled then
-        compiled(source, results)
+local function searchByNode(source, results)
+    local node = nodeMap[source.type]
+    if node then
+        node(source, results)
     end
 end
 
@@ -135,7 +145,8 @@ function vm.getDefs(source)
 
     searchBySimple(source, results)
     searchByGlobal(source, results)
-    searchByCompiled(source, results)
+    --searchByID(source, results)
+    searchByNode(source, results)
 
     return results
 end

@@ -1,14 +1,9 @@
-local util   = require 'utility'
-local global = require 'vm.node.global'
+local util     = require 'utility'
+local files    = require 'files'
+local globalID = require 'vm.global-id'
 
 ---@class vm.state
 local m = {}
----@type table<string, vm.node.global>
-m.globals = util.defaultTable(global)
----@type table<uri, table<string, boolean>>
-m.globalSubs = util.defaultTable(function ()
-    return {}
-end)
 ---@type table<uri, parser.object[]>
 m.literals = util.multiTable(2)
 ---@type table<parser.object, table<parser.object, boolean>>
@@ -17,27 +12,6 @@ m.literalSubs = util.multiTable(2, function ()
 end)
 ---@type table<parser.object, boolean>
 m.allLiterals = {}
-
----@param name   string
----@param uri    uri
----@param source parser.object
----@return vm.node.global
-function m.declareGlobal(name, uri, source)
-    m.globalSubs[uri][name] = true
-    local node = m.globals[name]
-    node:addSet(uri, source)
-    return node
-end
-
----@param name string
----@param uri? uri
----@return vm.node.global
-function m.getGlobal(name, uri)
-    if uri then
-        m.globalSubs[uri][name] = true
-    end
-    return m.globals[name]
-end
 
 ---@param uri    uri
 ---@param source parser.object
@@ -69,11 +43,6 @@ end
 
 ---@param uri uri
 function m.dropUri(uri)
-    local globalSub = m.globalSubs[uri]
-    m.globalSubs[uri] = nil
-    for name in pairs(globalSub) do
-        m.globals[name]:dropUri(uri)
-    end
     local literals = m.literals[uri]
     m.literals[uri] = nil
     for _, literal in ipairs(literals) do
@@ -85,5 +54,26 @@ function m.dropUri(uri)
         end
     end
 end
+
+for uri in files.eachFile() do
+    local state = files.getState(uri)
+    if state then
+        globalID.compileAst(state.ast)
+    end
+end
+
+files.watch(function (ev, uri)
+    if ev == 'update' then
+        local state = files.getState(uri)
+        if state then
+            globalID.compileAst(state.ast)
+        end
+    end
+    if ev == 'remove' then
+        m.dropUri(uri)
+        globalID.dropUri(uri)
+    end
+end)
+
 
 return m

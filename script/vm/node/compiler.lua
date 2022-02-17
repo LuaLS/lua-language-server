@@ -1,19 +1,17 @@
-local guide = require 'parser.guide'
-local util  = require 'utility'
-local state = require 'vm.state'
-local union = require 'vm.node.union'
+local guide    = require 'parser.guide'
+local util     = require 'utility'
+local state    = require 'vm.state'
+local union    = require 'vm.node.union'
+local globalID = require 'vm.global-id'
 
 ---@class parser.object
 ---@field _compiledNodes  boolean
 ---@field _node           vm.node
----@field _globalID       vm.node.global
 
 ---@class vm.node.compiler
 local m = {}
 
 ---@class vm.node.cross
-
-m.GLOBAL_SPLITE = '\x1F'
 
 ---@alias vm.node parser.object | vm.node.union | vm.node.cross
 
@@ -24,6 +22,9 @@ function m.getGlobalID(...)
 end
 
 function m.setNode(source, node)
+    if not node then
+        return
+    end
     local me = source._node
     if not me then
         source._node = node
@@ -31,23 +32,75 @@ function m.setNode(source, node)
     end
     if me.type == 'union'
     or me.type == 'cross' then
-        me:merge(source, node)
+        me:merge(node)
         return
     end
-    source._node = union(source, node)
+    source._node = union(me, node)
 end
+
+function m.eachNode(node)
+    if node.type == 'union' then
+        return node:eachNode()
+    end
+    local first = true
+    return function ()
+        if first then
+            first = false
+            return node
+        end
+        return nil
+    end
+end
+
+local function getReturnOfFunction(func, index)
+    if not func._returns then
+        func._returns = util.defaultTable(function ()
+            return {
+                type   = 'function.return',
+                parent = func,
+                index  = index,
+            }
+        end)
+    end
+    return m.compileNode(guide.getUri(func), func._returns[index])
+end
+
+local function getReturn(func, index)
+    local node = m.compileNode(guide.getUri(func), func)
+    if not node then
+        return
+    end
+    for cnode in m.eachNode(node) do
+        if cnode.type == 'function' then
+            return getReturnOfFunction(cnode, index)
+        end
+    end
+end
+
+local valueMap = util.switch()
+    : case 'boolean'
+    : case 'table'
+    : case 'integer'
+    : case 'number'
+    : case 'string'
+    : case 'function'
+    : call(function (uri, source, value)
+        state.declareLiteral(uri, value)
+        m.setNode(source, value)
+    end)
+    : case 'call'
+    : call(function (uri, source, value)
+        m.setNode(source, getReturn(value.node, 1))
+    end)
+    : getMap()
 
 local function compileValue(uri, source, value)
     if not value then
         return
     end
-    if value.type == 'table'
-    or value.type == 'integer'
-    or value.type == 'number'
-    or value.type == 'string'
-    or value.type == 'function' then
-        state.declareLiteral(uri, value)
-        m.setNode(source, value)
+    local f = valueMap[value.type]
+    if f then
+        f(uri, source, value)
     end
 end
 
@@ -67,6 +120,14 @@ local compilerMap = util.switch()
     : call(function (uri, source)
         m.setNode(source, m.compileNode(uri, source.node))
     end)
+    : case 'setfield'
+    : case 'getfield'
+    : call(function (uri, source)
+    end)
+    : case 'function.return'
+    : call(function (uri, source)
+        
+    end)
     : getMap()
 
 ---@param uri    uri
@@ -83,87 +144,6 @@ function m.compileNode(uri, source)
     end
     state.subscribeLiteral(source, source._node)
     return source._node
-end
-
-local compilerGlobalMap = util.switch()
-    : case 'local'
-    : call(function (uri, source)
-        if source.tag ~= '_ENV' then
-            return
-        end
-        if source.ref then
-            for _, ref in ipairs(source.ref) do
-                m.compileGlobalNode(uri, ref)
-            end
-        end
-    end)
-    : case 'setglobal'
-    : call(function (uri, source)
-        local name = guide.getKeyName(source)
-        source._globalID = state.declareGlobal(name, uri, source)
-    end)
-    : case 'getglobal'
-    : call(function (uri, source)
-        local name   = guide.getKeyName(source)
-        local global = state.getGlobal(name)
-        global:addGet(uri, source)
-        source._globalID = global
-
-        local nxt = source.next
-        if nxt then
-            m.compileGlobalNode(uri, nxt)
-        end
-    end)
-    : case 'setfield'
-    ---@param uri    uri
-    ---@param source parser.object
-    : call(function (uri, source)
-        local parent = source.node._globalID
-        if not parent then
-            return
-        end
-        local name = m.getGlobalID(parent:getName(), guide.getKeyName(source))
-        source._globalID = state.declareGlobal(name, uri, source)
-    end)
-    : case 'getfield'
-    ---@param uri    uri
-    ---@param source parser.object
-    : call(function (uri, source)
-        local parent = source.node._globalID
-        if not parent then
-            return
-        end
-        local name = m.getGlobalID(parent:getName(), guide.getKeyName(source))
-        local global = state.getGlobal(name)
-        global:addGet(uri, source)
-        source._globalID = global
-
-        local nxt = source.next
-        if nxt then
-            m.compileGlobalNode(uri, nxt)
-        end
-    end)
-    : getMap()
-
----@param uri    uri
----@param source parser.object
-function m.compileGlobalNode(uri, source)
-    if source._globalID ~= nil then
-        return
-    end
-    source._globalID = false
-    local compiler = compilerGlobalMap[source.type]
-    if compiler then
-        compiler(uri, source)
-    end
-end
-
----编译全局变量的node
----@param  root parser.object
-function m.compileGlobals(root)
-    local uri = guide.getUri(root)
-    local env = guide.getENV(root)
-    m.compileGlobalNode(uri, env)
 end
 
 return m

@@ -195,6 +195,8 @@ config.hint.arrayIndex.Auto              =
 'Show hints only when the table is greater than 3 items, or the table is a mixed table.'
 config.hint.arrayIndex.Disable           =
 'Disable hints of array index.'
+config.format.enable                     =
+'Enable code formatter.'
 config.telemetry.enable                  =
 [[
 Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://github.com/sumneko/lua-language-server/wiki/Privacy-Policy).

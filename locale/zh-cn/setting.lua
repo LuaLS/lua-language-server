@@ -195,6 +195,8 @@ config.hint.arrayIndex.Auto              =
 '只有表大于3项，或者表是混合类型时才进行提示。'
 config.hint.arrayIndex.Disable           =
 '禁用数组索引提示。'
+config.format.enable                     =
+'启用代码格式化程序。'
 config.telemetry.enable                  =
 [[
 启用遥测，通过网络发送你的编辑器信息与错误日志。在[此处](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%90%E7%A7%81%E5%A3%B0%E6%98%8E)阅读我们的隐私声明。

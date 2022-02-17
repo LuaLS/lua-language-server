@@ -3,7 +3,7 @@ local guide         = require 'parser.guide'
 local globalBuilder = require 'vm.node.global'
 
 ---@class parser.object
----@field _globalID vm.node.global
+---@field _globalNode vm.node.global
 
 ---@class vm.global-id
 local m = {}
@@ -31,14 +31,14 @@ local compilerGlobalMap = util.switch()
     : case 'setglobal'
     : call(function (uri, source)
         local name = guide.getKeyName(source)
-        source._globalID = m.declareGlobal(name, uri, source)
+        source._globalNode = m.declareGlobal(name, uri, source)
     end)
     : case 'getglobal'
     : call(function (uri, source)
         local name   = guide.getKeyName(source)
         local global = m.getGlobal(name)
         global:addGet(uri, source)
-        source._globalID = global
+        source._globalNode = global
 
         local nxt = source.next
         if nxt then
@@ -49,25 +49,25 @@ local compilerGlobalMap = util.switch()
     ---@param uri    uri
     ---@param source parser.object
     : call(function (uri, source)
-        local parent = source.node._globalID
+        local parent = source.node._globalNode
         if not parent then
             return
         end
         local name = parent:getName() .. m.ID_SPLITE .. guide.getKeyName(source)
-        source._globalID = m.declareGlobal(name, uri, source)
+        source._globalNode = m.declareGlobal(name, uri, source)
     end)
     : case 'getfield'
     ---@param uri    uri
     ---@param source parser.object
     : call(function (uri, source)
-        local parent = source.node._globalID
+        local parent = source.node._globalNode
         if not parent then
             return
         end
         local name = parent:getName() .. m.ID_SPLITE .. guide.getKeyName(source)
         local global = m.getGlobal(name)
         global:addGet(uri, source)
-        source._globalID = global
+        source._globalNode = global
 
         local nxt = source.next
         if nxt then
@@ -100,10 +100,10 @@ end
 
 ---@param source parser.object
 function m.compileNode(uri, source)
-    if source._globalID ~= nil then
+    if source._globalNode ~= nil then
         return
     end
-    source._globalID = false
+    source._globalNode = false
     local compiler = compilerGlobalMap[source.type]
     if compiler then
         compiler(uri, source)
@@ -117,10 +117,16 @@ function m.compileAst(source)
     m.compileNode(uri, env)
 end
 
-function m.getID(source)
-    return source._globalID
+---@return vm.node.global
+function m.getNode(source)
+    if source.type == 'field'
+    or source.type == 'method' then
+        source = source.parent
+    end
+    return source._globalNode
 end
 
+---@param uri uri
 function m.dropUri(uri)
     local globalSub = m.globalSubs[uri]
     m.globalSubs[uri] = nil

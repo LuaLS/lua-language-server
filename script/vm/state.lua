@@ -1,6 +1,6 @@
-local util     = require 'utility'
-local files    = require 'files'
-local globalID = require 'vm.global-id'
+local util       = require 'utility'
+local files      = require 'files'
+local globalNode = require 'vm.global-node'
 
 ---@class vm.state
 local m = {}
@@ -58,7 +58,7 @@ end
 for uri in files.eachFile() do
     local state = files.getState(uri)
     if state then
-        globalID.compileAst(state.ast)
+        globalNode.compileAst(state.ast)
     end
 end
 
@@ -66,12 +66,12 @@ files.watch(function (ev, uri)
     if ev == 'update' then
         local state = files.getState(uri)
         if state then
-            globalID.compileAst(state.ast)
+            globalNode.compileAst(state.ast)
         end
     end
     if ev == 'remove' then
         m.dropUri(uri)
-        globalID.dropUri(uri)
+        globalNode.dropUri(uri)
     end
 end)
 

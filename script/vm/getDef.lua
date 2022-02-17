@@ -1,9 +1,10 @@
 ---@class vm
-local vm       = require 'vm.vm'
-local util     = require 'utility'
-local compiler = require 'vm.node.compiler'
-local guide    = require 'parser.guide'
-local localID  = require 'vm.local-id'
+local vm         = require 'vm.vm'
+local util       = require 'utility'
+local compiler   = require 'vm.node.compiler'
+local guide      = require 'parser.guide'
+local localID    = require 'vm.local-id'
+local globalNode = require 'vm.global-node'
 
 local simpleMap
 
@@ -110,10 +111,7 @@ end
 ---@param source  parser.object
 ---@param results parser.object[]
 local function searchByGlobal(source, results)
-    if source.type == 'field' then
-        source = source.parent
-    end
-    local global = source._globalID
+    local global = globalNode.getNode(source)
     if not global then
         return
     end

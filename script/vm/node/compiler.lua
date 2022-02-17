@@ -2,7 +2,6 @@ local guide    = require 'parser.guide'
 local util     = require 'utility'
 local state    = require 'vm.state'
 local union    = require 'vm.node.union'
-local globalID = require 'vm.global-id'
 
 ---@class parser.object
 ---@field _compiledNodes  boolean
@@ -14,12 +13,6 @@ local m = {}
 ---@class vm.node.cross
 
 ---@alias vm.node parser.object | vm.node.union | vm.node.cross
-
----@param  ... string
----@return string
-function m.getGlobalID(...)
-    return table.concat({...}, m.GLOBAL_SPLITE)
-end
 
 function m.setNode(source, node)
     if not node then

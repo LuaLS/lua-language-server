@@ -2,7 +2,7 @@
 
 ## 2.6.5
 `2022-2-17`
-* `FIX` telemetry is not disabled by default
+* `FIX` telemetry is not disabled by default (since 2.6.0)
 * `FIX` [#934](https://github.com/sumneko/lua-language-server/issues/934)
 * `FIX` [#952](https://github.com/sumneko/lua-language-server/issues/952)
 

@@ -923,6 +923,10 @@ m.register 'textDocument/formatting' {
             return nil
         end
 
+        if not config.get(uri, 'Lua.format.enable') then
+            return nil
+        end
+
         local pformatting = require 'provider.formatting'
         pformatting.updateConfig(uri)
 
@@ -950,6 +954,10 @@ m.register 'textDocument/rangeFormatting' {
         local uri = files.getRealUri(params.textDocument.uri)
 
         if not files.exists(uri) then
+            return nil
+        end
+
+        if not config.get(uri, 'Lua.format.enable') then
             return nil
         end
 

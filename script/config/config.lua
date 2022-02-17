@@ -129,7 +129,7 @@ end, function (self, subkey, subvalue, sep)
     self.sep      = sep
 end)
 
-register('Or', {}, function (self, value)
+register('Or', nil, function (self, value)
     for _, sub in ipairs(self.subs) do
         if sub:checker(value) then
             return true

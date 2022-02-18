@@ -8,72 +8,72 @@ local globalNode = require 'vm.global-node'
 
 local simpleMap
 
-local function searchGetLocal(source, node, results)
+local function searchGetLocal(source, node, pushResult)
     local key = guide.getKeyName(source)
     for _, ref in ipairs(node.node.ref) do
         if  ref.type == 'getlocal'
         and guide.isSet(ref.next)
         and guide.getKeyName(ref.next) == key then
-            results[#results+1] = ref.next
+            pushResult(ref.next)
         end
     end
 end
 
 simpleMap = util.switch()
     : case 'local'
-    : call(function (source, results)
-        results[#results+1] = source
+    : call(function (source, pushResult)
+        pushResult(source)
         if source.ref then
             for _, ref in ipairs(source.ref) do
                 if ref.type == 'setlocal' then
-                    results[#results+1] = ref
+                    pushResult(ref)
                 end
             end
         end
 
         if source.dummy then
             for _, res in ipairs(vm.getDefs(source.method.node)) do
-                results[#results+1] = res
+                pushResult(res)
             end
         end
     end)
     : case 'getlocal'
     : case 'setlocal'
-    : call(function (source, results)
-        simpleMap['local'](source.node, results)
+    : call(function (source, pushResult)
+        simpleMap['local'](source.node, pushResult)
     end)
     : case 'field'
-    : call(function (source, results)
+    : call(function (source, pushResult)
         local parent = source.parent
-        simpleMap[parent.type](parent, results)
+        simpleMap[parent.type](parent, pushResult)
     end)
     : case 'setfield'
     : case 'getfield'
-    : call(function (source, results)
+    : call(function (source, pushResult)
         local node = source.node
         if node.type == 'getlocal' then
-            searchGetLocal(source, node, results)
+            searchGetLocal(source, node, pushResult)
             return
         end
     end)
     : case 'getindex'
     : case 'setindex'
-    : call(function (source, results)
+    : call(function (source, pushResult)
         local node = source.node
         if node.type == 'getlocal' then
-            searchGetLocal(source, node, results)
+            searchGetLocal(source, node, pushResult)
         end
     end)
     : getMap()
 
 local searchFieldMap = util.switch()
     : case 'table'
-    : call(function (node, key, results)
+    : call(function (node, key, pushResult)
         for _, field in ipairs(node) do
             if field.type == 'tablefield'
             or field.type == 'tableindex' then
                 if guide.getKeyName(field) == key then
-                    results[#results+1] = field
+                    pushResult(field)
                 end
             end
         end
@@ -82,57 +82,64 @@ local searchFieldMap = util.switch()
 
 local nodeMap;nodeMap = util.switch()
     : case 'field'
-    : call(function (source, results)
+    : call(function (source, pushResult)
         local parent = source.parent
-        nodeMap[parent.type](parent, results)
+        nodeMap[parent.type](parent, pushResult)
     end)
     : case 'getfield'
     : case 'setfield'
-    : call(function (source, results)
+    : call(function (source, pushResult)
         local node = compiler.compileNode(guide.getUri(source.node), source.node)
         if not node then
             return
         end
         if searchFieldMap[node.type] then
-            searchFieldMap[node.type](node, guide.getKeyName(source), results)
+            searchFieldMap[node.type](node, guide.getKeyName(source), pushResult)
         end
     end)
     : getMap()
 
----@param source  parser.object
----@param results parser.object[]
-local function searchBySimple(source, results)
+    ---@param source  parser.object
+    ---@param pushResult fun(src: parser.object)
+local function searchBySimple(source, pushResult)
     local simple = simpleMap[source.type]
     if simple then
-        simple(source, results)
+        simple(source, pushResult)
     end
 end
 
 ---@param source  parser.object
----@param results parser.object[]
-local function searchByGlobal(source, results)
+---@param pushResult fun(src: parser.object)
+local function searchByGlobal(source, pushResult)
     local global = globalNode.getNode(source)
     if not global then
         return
     end
     for _, src in ipairs(global:getSets()) do
-        results[#results+1] = src
-    end
-end
-
-local function searchByID(source, results)
-    local idSources = localID.getSources(source)
-    if not idSources then
-        return
+        pushResult(src)
     end
 end
 
 ---@param source  parser.object
----@param results parser.object[]
-local function searchByNode(source, results)
+---@param pushResult fun(src: parser.object)
+local function searchByID(source, pushResult)
+    local idSources = localID.getSources(source)
+    if not idSources then
+        return
+    end
+    for _, src in ipairs(idSources) do
+        if guide.isSet(src) then
+            pushResult(src)
+        end
+    end
+end
+
+---@param source  parser.object
+---@param pushResult fun(src: parser.object)
+local function searchByNode(source, pushResult)
     local node = nodeMap[source.type]
     if node then
-        node(source, results)
+        node(source, pushResult)
     end
 end
 
@@ -140,11 +147,19 @@ end
 ---@return       parser.object[]
 function vm.getDefs(source)
     local results = {}
+    local mark    = {}
 
-    searchBySimple(source, results)
-    searchByGlobal(source, results)
-    --searchByID(source, results)
-    searchByNode(source, results)
+    local function pushResult(src)
+        if not mark[src] then
+            mark[src] = true
+            results[#results+1] = src
+        end
+    end
+
+    searchBySimple(source, pushResult)
+    searchByGlobal(source, pushResult)
+    searchByID(source, pushResult)
+    searchByNode(source, pushResult)
 
     return results
 end

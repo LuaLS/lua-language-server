@@ -59,12 +59,28 @@ local function pushVersion(link)
     ))
 end
 
+local function occlusionPath(str)
+    return str:gsub('[^"\r\n]+', function (chunk)
+        if not chunk:find '[/\\]' then
+            return
+        end
+        local newStr, count = chunk:gsub('.+([/\\]script[/\\])', '***%1')
+        if count > 0 then
+            return newStr
+        elseif chunk:find '^%u:'
+        or     chunk:sub(1, 1) == '/' then
+            return '***'
+        end
+    end)
+end
+
 local function pushErrorLog(link)
-    if not log.firstError then
+    local err = log.firstError
+    if not err then
         return
     end
-    local err = log.firstError
     log.firstError = nil
+    err = occlusionPath(err)
     send(link, string.pack('zzzz'
         , 'error'
         , token

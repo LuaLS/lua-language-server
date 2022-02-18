@@ -151,6 +151,15 @@ print(x.y.<?z?>)
 ]]
 
 TEST [[
+local x = {
+    y = {
+        <!z!> = 1
+    }
+}
+print(x.y.<?z?>)
+]]
+
+TEST [[
 local function f()
     local t = {}
     t.field1 = {

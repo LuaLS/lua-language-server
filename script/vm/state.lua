@@ -1,6 +1,7 @@
 local util       = require 'utility'
 local files      = require 'files'
 local globalNode = require 'vm.global-node'
+local guide      = require 'parser.guide'
 
 ---@class vm.state
 local m = {}
@@ -13,13 +14,13 @@ end)
 ---@type table<parser.object, boolean>
 m.allLiterals = {}
 
----@param uri    uri
 ---@param source parser.object
-function m.declareLiteral(uri, source)
+function m.declareLiteral(source)
     if m.allLiterals[source] then
         return
     end
     m.allLiterals[source] = true
+    local uri = guide.getUri(source)
     local literals = m.literals[uri]
     literals[#literals+1] = source
 end

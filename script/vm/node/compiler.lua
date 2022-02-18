@@ -2,6 +2,7 @@ local guide    = require 'parser.guide'
 local util     = require 'utility'
 local state    = require 'vm.state'
 local union    = require 'vm.node.union'
+local localID  = require 'vm.local-id'
 
 ---@class parser.object
 ---@field _compiledNodes  boolean
@@ -55,11 +56,11 @@ local function getReturnOfFunction(func, index)
             }
         end)
     end
-    return m.compileNode(guide.getUri(func), func._returns[index])
+    return m.compileNode(func._returns[index])
 end
 
 local function getReturn(func, index)
-    local node = m.compileNode(guide.getUri(func), func)
+    local node = m.compileNode(func)
     if not node then
         return
     end
@@ -77,63 +78,109 @@ local valueMap = util.switch()
     : case 'number'
     : case 'string'
     : case 'function'
-    : call(function (uri, source, value)
-        state.declareLiteral(uri, value)
+    : call(function (source, value)
+        state.declareLiteral(value)
         m.setNode(source, value)
     end)
     : case 'call'
-    : call(function (uri, source, value)
+    : call(function (source, value)
         m.setNode(source, getReturn(value.node, 1))
     end)
     : getMap()
 
-local function compileValue(uri, source, value)
+local function compileValue(source, value)
     if not value then
         return
     end
     local f = valueMap[value.type]
     if f then
-        f(uri, source, value)
+        f(source, value)
+    end
+end
+
+local function compileByLocalID(source)
+    local sources = localID.getSources(source)
+    if not sources then
+        return
+    end
+    for _, src in ipairs(sources) do
+        if src.value then
+            compileValue(source, src.value)
+        end
+    end
+end
+
+local searchFieldMap = util.switch()
+    : case 'table'
+    : call(function (node, key, pushResult)
+        for _, field in ipairs(node) do
+            if field.type == 'tablefield'
+            or field.type == 'tableindex' then
+                if guide.getKeyName(field) == key then
+                    pushResult(field)
+                end
+            end
+        end
+    end)
+    : getMap()
+
+local function compileByParentNode(source)
+    local parentNode = m.compileNode(source.node)
+    if not parentNode then
+        return
+    end
+    local key = guide.getKeyName(source)
+    for node in m.eachNode(parentNode) do
+        local f = searchFieldMap[node.type]
+        if f then
+            f(node, key, function (field)
+                compileValue(source, field.value)
+            end)
+        end
     end
 end
 
 local compilerMap = util.switch()
     : case 'local'
-    : call(function (uri, source)
-        compileValue(uri, source, source.value)
+    : call(function (source)
+        compileValue(source, source.value)
         if source.ref then
             for _, ref in ipairs(source.ref) do
                 if ref.type == 'setlocal' then
-                    compileValue(uri, source, ref.value)
+                    compileValue(source, ref.value)
                 end
             end
         end
     end)
     : case 'getlocal'
-    : call(function (uri, source)
-        m.setNode(source, m.compileNode(uri, source.node))
+    : call(function (source)
+        m.setNode(source, m.compileNode(source.node))
     end)
     : case 'setfield'
+    : call(function (source)
+        compileByLocalID(source)
+    end)
     : case 'getfield'
-    : call(function (uri, source)
+    : call(function (source)
+        compileByLocalID(source)
+        compileByParentNode(source)
     end)
     : case 'function.return'
-    : call(function (uri, source)
+    : call(function (source)
         
     end)
     : getMap()
 
----@param uri    uri
 ---@param source parser.object
 ---@return vm.node
-function m.compileNode(uri, source)
+function m.compileNode(source)
     if source._node then
         return source._node
     end
     source._node = false
     local compiler = compilerMap[source.type]
     if compiler then
-        compiler(uri, source)
+        compiler(source)
     end
     state.subscribeLiteral(source, source._node)
     return source._node

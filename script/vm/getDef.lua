@@ -89,7 +89,7 @@ local nodeMap;nodeMap = util.switch()
     : case 'getfield'
     : case 'setfield'
     : call(function (source, pushResult)
-        local node = compiler.compileNode(guide.getUri(source.node), source.node)
+        local node = compiler.compileNode(source.node)
         if not node then
             return
         end

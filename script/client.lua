@@ -341,7 +341,7 @@ function m.setConfig(changes, onlyMemory)
     xpcall(function ()
         local ws = require 'workspace'
         if #ws.folders == 0 then
-            tryModifyClient(finalChanges)
+            tryModifyClient(nil, finalChanges)
             return
         end
         tryModifyClientGlobal(finalChanges)

@@ -82,9 +82,12 @@ local valueMap = util.switch()
         state.declareLiteral(value)
         m.setNode(source, value)
     end)
-    : case 'call'
+    : case 'select'
     : call(function (source, value)
-        m.setNode(source, getReturn(value.node, 1))
+        local vararg = value.vararg
+        if vararg.type == 'call' then
+            m.setNode(source, getReturn(vararg.node, value.sindex))
+        end
     end)
     : getMap()
 
@@ -130,13 +133,11 @@ local function compileByParentNode(source)
         return
     end
     local key = guide.getKeyName(source)
-    for node in m.eachNode(parentNode) do
-        local f = searchFieldMap[node.type]
-        if f then
-            f(node, key, function (field)
-                compileValue(source, field.value)
-            end)
-        end
+    local f = searchFieldMap[parentNode.type]
+    if f then
+        f(parentNode, key, function (field)
+            compileValue(source, field.value)
+        end)
     end
 end
 
@@ -167,7 +168,15 @@ local compilerMap = util.switch()
     end)
     : case 'function.return'
     : call(function (source)
-        
+        local func  = source.parent
+        local index = source.index
+        if func.returns then
+            for _, rtn in ipairs(func.returns) do
+                if rtn[index] then
+                    m.setNode(source, m.compileNode(rtn[index]))
+                end
+            end
+        end
     end)
     : getMap()
 

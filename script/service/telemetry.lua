@@ -68,7 +68,8 @@ local function occlusionPath(str)
         if count > 0 then
             return left .. newStr
         elseif chunk:sub(1, 1) == '\\'
-        or     chunk:sub(1, 1) == '/' then
+        or     chunk:sub(1, 1) == '/'
+        or     chunk:sub(1, 3) == '...' then
             return left .. '***'
         end
     end)

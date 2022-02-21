@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.6.6
+* `NEW` formatter preview, use `--preview` to enable this feature, [read more](https://github.com/sumneko/lua-language-server/issues/960)
 * `FIX` [#958](https://github.com/sumneko/lua-language-server/issues/958)
 
 ## 2.6.5

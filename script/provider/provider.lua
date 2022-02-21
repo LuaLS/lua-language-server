@@ -61,6 +61,9 @@ m.attributes = {}
 function m.register(method)
     return function (attrs)
         m.attributes[method] = attrs
+        if attrs.capability then
+            cap.filling(attrs.capability)
+        end
         proto.on(method, attrs[1])
     end
 end
@@ -101,7 +104,7 @@ m.register 'initialize' {
         end
 
         return {
-            capabilities = cap.getIniter(),
+            capabilities = cap.getProvider(),
             serverInfo   = {
                 name    = 'sumneko.lua',
             },
@@ -261,6 +264,9 @@ m.register 'textDocument/didChange' {
 }
 
 m.register 'textDocument/hover' {
+    capability = {
+        hoverProvider = true,
+    },
     abortByFileUpdate = true,
     ---@async
     function (params)
@@ -299,6 +305,9 @@ m.register 'textDocument/hover' {
 }
 
 m.register 'textDocument/definition' {
+    capability = {
+        definitionProvider = true,
+    },
     abortByFileUpdate = true,
     ---@async
     function (params)
@@ -338,6 +347,9 @@ m.register 'textDocument/definition' {
 }
 
 m.register 'textDocument/typeDefinition' {
+    capability = {
+        typeDefinitionProvider = true,
+    },
     abortByFileUpdate = true,
     ---@async
     function (params)
@@ -377,6 +389,9 @@ m.register 'textDocument/typeDefinition' {
 }
 
 m.register 'textDocument/references' {
+    capability = {
+        referencesProvider = true,
+    },
     abortByFileUpdate = true,
     ---@async
     function (params)
@@ -404,6 +419,9 @@ m.register 'textDocument/references' {
 }
 
 m.register 'textDocument/documentHighlight' {
+    capability = {
+        documentHighlightProvider = true,
+    },
     abortByFileUpdate = true,
     function (params)
         local core = require 'core.highlight'
@@ -428,6 +446,11 @@ m.register 'textDocument/documentHighlight' {
 }
 
 m.register 'textDocument/rename' {
+    capability = {
+        renameProvider = {
+            prepareProvider = true,
+        },
+    },
     abortByFileUpdate = true,
     ---@async
     function (params)
@@ -631,6 +654,11 @@ m.register 'completionItem/resolve' {
 }
 
 m.register 'textDocument/signatureHelp' {
+    capability = {
+        signatureHelpProvider = {
+            triggerCharacters = { '(', ',' },
+        },
+    },
     abortByFileUpdate = true,
     ---@async
     function (params)
@@ -677,6 +705,9 @@ m.register 'textDocument/signatureHelp' {
 }
 
 m.register 'textDocument/documentSymbol' {
+    capability = {
+        documentSymbolProvider = true,
+    },
     abortByFileUpdate = true,
     ---@async
     function (params)
@@ -723,6 +754,17 @@ m.register 'textDocument/documentSymbol' {
 }
 
 m.register 'textDocument/codeAction' {
+    capability = {
+        codeActionProvider = {
+            codeActionKinds = {
+                '',
+                'quickfix',
+                'refactor.rewrite',
+                'refactor.extract',
+            },
+            resolveProvider = false,
+        },
+    },
     abortByFileUpdate = true,
     function (params)
         local core        = require 'core.code-action'
@@ -757,6 +799,17 @@ m.register 'textDocument/codeAction' {
 }
 
 m.register 'workspace/executeCommand' {
+    capability = {
+        executeCommandProvider = {
+            commands = {
+                'lua.removeSpace',
+                'lua.solve',
+                'lua.jsonToLua',
+                'lua.setConfig',
+                'lua.autoRequire',
+            },
+        },
+    },
     ---@async
     function (params)
         local command = params.command:gsub(':.+', '')
@@ -780,6 +833,9 @@ m.register 'workspace/executeCommand' {
 }
 
 m.register 'workspace/symbol' {
+    capability = {
+        workspaceSymbolProvider = true,
+    },
     abortByFileUpdate = true,
     ---@async
     function (params)
@@ -826,7 +882,29 @@ m.register 'textDocument/semanticTokens/full' {
     end
 }
 
+local function toArray(map)
+    local array = {}
+    for k in pairs(map) do
+        array[#array+1] = k
+    end
+    table.sort(array, function (a, b)
+        return map[a] < map[b]
+    end)
+    return array
+end
+
+
 m.register 'textDocument/semanticTokens/range' {
+    capability = {
+        semanticTokensProvider = {
+            legend = {
+                tokenTypes     = toArray(define.TokenTypes),
+                tokenModifiers = toArray(define.TokenModifiers),
+            },
+            range = true,
+            full  = false,
+        },
+    },
     ---@async
     function (params)
         log.debug('textDocument/semanticTokens/range')
@@ -843,6 +921,9 @@ m.register 'textDocument/semanticTokens/range' {
 }
 
 m.register 'textDocument/foldingRange' {
+    capability = {
+        foldingRangeProvider = true,
+    },
     abortByFileUpdate = true,
     ---@async
     function (params)
@@ -915,6 +996,9 @@ m.register '$/status/click' {
 }
 
 m.register 'textDocument/formatting' {
+    capability = {
+        documentFormattingProvider = true,
+    },
     ---@async
     function(params)
         local uri = files.getRealUri(params.textDocument.uri)
@@ -949,6 +1033,9 @@ m.register 'textDocument/formatting' {
 }
 
 m.register 'textDocument/rangeFormatting' {
+    capability = {
+        documentRangeFormattingProvider = true,
+    },
     ---@async
     function(params)
         local uri = files.getRealUri(params.textDocument.uri)
@@ -983,6 +1070,12 @@ m.register 'textDocument/rangeFormatting' {
 }
 
 m.register 'textDocument/onTypeFormatting' {
+    capability = {
+        documentOnTypeFormattingProvider = {
+            firstTriggerCharacter = '\n',
+            moreTriggerCharacter  = nil, -- string[]
+        },
+    },
     abortByFileUpdate = true,
     ---@async
     function (params)

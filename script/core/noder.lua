@@ -186,7 +186,11 @@ local function getFieldEventName(field)
     if not secondTypeUnit or secondTypeUnit.type ~= 'doc.type.function' then
         return nil
     end
-    local eventName = firstEnum[1]:match [[^['"](.+)['"]$]]
+    local enmuStr = firstEnum[1]
+    if type(enmuStr) ~= 'string' then
+        return nil
+    end
+    local eventName = enmuStr:match [[^['"](.+)['"]$]]
     field._eventName = eventName
     return eventName
 end

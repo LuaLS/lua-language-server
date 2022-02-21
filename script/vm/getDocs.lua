@@ -11,6 +11,9 @@ local noder     = require 'core.noder'
 ---@param name? string
 ---@return parser.guide.object[]
 function vm.getDocDefines(uri, name)
+    if type(name) ~= 'string' then
+        return {}
+    end
     local cache = vm.getCache 'getDocDefines'
     if cache[name] then
         return cache[name]

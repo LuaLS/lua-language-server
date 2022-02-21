@@ -61,6 +61,9 @@ m.attributes = {}
 function m.register(method)
     return function (attrs)
         m.attributes[method] = attrs
+        if attrs.preview and not PREVIEW then
+            return
+        end
         if attrs.capability then
             cap.filling(attrs.capability)
         end
@@ -999,6 +1002,7 @@ m.register 'textDocument/formatting' {
     capability = {
         documentFormattingProvider = true,
     },
+    preview = true,
     ---@async
     function(params)
         local uri = files.getRealUri(params.textDocument.uri)
@@ -1036,6 +1040,7 @@ m.register 'textDocument/rangeFormatting' {
     capability = {
         documentRangeFormattingProvider = true,
     },
+    preview = true,
     ---@async
     function(params)
         local uri = files.getRealUri(params.textDocument.uri)

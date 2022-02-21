@@ -1,6 +1,7 @@
 // Just some comment
 {
     "Lua.misc.parameters": [
+        "--preview",
         "--develop=true",
         "--dbgport=11413",
     ]

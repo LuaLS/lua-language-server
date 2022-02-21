@@ -425,10 +425,11 @@ m.register 'textDocument/documentHighlight' {
     capability = {
         documentHighlightProvider = true,
     },
-    abortByFileUpdate = true,
+    ---@async
     function (params)
         local core = require 'core.highlight'
         local uri  = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
         if not files.exists(uri) then
             return nil
         end
@@ -927,11 +928,11 @@ m.register 'textDocument/foldingRange' {
     capability = {
         foldingRangeProvider = true,
     },
-    abortByFileUpdate = true,
     ---@async
     function (params)
         local core    = require 'core.folding'
         local uri     = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
         if not files.exists(uri) then
             return nil
         end

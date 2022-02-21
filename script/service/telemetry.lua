@@ -60,16 +60,16 @@ local function pushVersion(link)
 end
 
 local function occlusionPath(str)
-    return str:gsub('[^"\r\n]+', function (chunk)
+    return str:gsub('(%s*)([^:"\r\n]+)', function (left, chunk)
         if not chunk:find '[/\\]' then
             return
         end
         local newStr, count = chunk:gsub('.+([/\\]script[/\\])', '***%1')
         if count > 0 then
-            return newStr
-        elseif chunk:find '^%u:'
+            return left .. newStr
+        elseif chunk:sub(1, 1) == '\\'
         or     chunk:sub(1, 1) == '/' then
-            return '***'
+            return left .. '***'
         end
     end)
 end

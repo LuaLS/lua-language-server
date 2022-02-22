@@ -1,5 +1,11 @@
 # changelog
 
+## 2.6.6
+`2022-2-21`
+* `NEW` formatter preview, use `--preview` to enable this feature, [read more](https://github.com/sumneko/lua-language-server/issues/960)
+* `FIX` [#958](https://github.com/sumneko/lua-language-server/issues/958)
+* `FIX` runtime errors
+
 ## 2.6.5
 `2022-2-17`
 * `FIX` telemetry is not disabled by default (since 2.6.0)

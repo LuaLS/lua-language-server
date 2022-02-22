@@ -148,6 +148,9 @@ end
 local function removeVisiblePath(uri)
     local path = furi.decode(uri)
     path = workspace.normalize(path)
+    if not path then
+        return
+    end
     for _, scp in ipairs(workspace.folders) do
         scp:get('visiblePath')[path] = nil
         ---@type collector

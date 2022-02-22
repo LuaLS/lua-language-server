@@ -234,6 +234,7 @@ end
 
 ---@async
 function m.awaitLoadFile(uri)
+    m.awaitReady(uri)
     local scp = scope.getScope(uri)
     local ld <close> = loading.create(scp)
     local native = m.getNativeMatcher(scp)

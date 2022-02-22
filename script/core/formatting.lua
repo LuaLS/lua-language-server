@@ -1,11 +1,11 @@
 local codeFormat = require("code_format")
-local files = require("files")
-local log = require("log")
+local files      = require("files")
+local log        = require("log")
 
-return function(uri)
+return function(uri, options)
     local text = files.getText(uri)
     local ast = files.getState(uri)
-    local status, formattedText = codeFormat.format(uri, text)
+    local status, formattedText = codeFormat.format(uri, text, options)
 
     if not status then
         if formattedText ~= nil then

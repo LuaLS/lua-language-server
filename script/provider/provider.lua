@@ -1019,7 +1019,7 @@ m.register 'textDocument/formatting' {
         pformatting.updateConfig(uri)
 
         local core = require 'core.formatting'
-        local edits = core(uri)
+        local edits = core(uri, params.options)
         if not edits or #edits == 0 then
             return nil
         end
@@ -1057,7 +1057,7 @@ m.register 'textDocument/rangeFormatting' {
         pformatting.updateConfig(uri)
 
         local core = require 'core.rangeformatting'
-        local edits = core(uri, params.range)
+        local edits = core(uri, params.range, params.options)
         if not edits or #edits == 0 then
             return nil
         end

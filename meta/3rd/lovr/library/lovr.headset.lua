@@ -1,15 +1,33 @@
 ---@meta
 
 ---
----The `lovr.headset` module is where all the magical VR functionality is.  With it, you can access connected VR hardware and get information about the available space the player has.  Note that all units are reported in meters.  Position `(0, 0, 0)` is the center of the play area.
+---The `lovr.headset` module is where all the magical VR functionality is.
+---
+---With it, you can access connected VR hardware and get information about the available space the player has.
+---
+---Note that all units are reported in meters.
+---
+---Position `(0, 0, 0)` is the center of the play area.
 ---
 ---@class lovr.headset
 lovr.headset = {}
 
 ---
----Animates a device model to match its current input state.  The buttons and joysticks on a controller will move as they're pressed/moved and hand models will move to match skeletal input.
+---Animates a device model to match its current input state.
+---
+---The buttons and joysticks on a controller will move as they're pressed/moved and hand models will move to match skeletal input.
 ---
 ---The model should have been created using `lovr.headset.newModel` with the `animated` flag set to `true`.
+---
+---
+---### NOTE:
+---Currently this function is supported for OpenVR controller models and Oculus hand models.
+---
+---This function may animate using node-based animation or skeletal animation.
+---
+---`Model:hasJoints` can be used on a Model so you know if a Shader with the `animated` ShaderFlag needs to be used to render the results properly.
+---
+---It's possible to use models that weren't created with `lovr.headset.newModel` but they need to be set up carefully to have the same structure as the models provided by the headset SDK.
 ---
 ---@param device? lovr.Device # The device to use for the animation data.
 ---@param model lovr.Model # The model to animate.
@@ -26,7 +44,17 @@ function lovr.headset.animate(device, model) end
 function lovr.headset.getAngularVelocity(device) end
 
 ---
----Get the current state of an analog axis on a device.  Some axes are multidimensional, for example a 2D touchpad or thumbstick with x/y axes.  For multidimensional axes, this function will return multiple values, one number for each axis.  In these cases, it can be useful to use the `select` function built in to Lua to select a particular axis component.
+---Get the current state of an analog axis on a device.
+---
+---Some axes are multidimensional, for example a 2D touchpad or thumbstick with x/y axes.
+---
+---For multidimensional axes, this function will return multiple values, one number for each axis.
+---
+---In these cases, it can be useful to use the `select` function built in to Lua to select a particular axis component.
+---
+---
+---### NOTE:
+---The axis values will be between 0 and 1 for 1D axes, and between -1 and 1 for each component of a multidimensional axis.
 ---
 ---@param device lovr.Device # The device.
 ---@param axis lovr.DeviceAxis # The axis.
@@ -35,11 +63,19 @@ function lovr.headset.getAxis(device, axis) end
 ---
 ---Returns the depth of the play area, in meters.
 ---
+---
+---### NOTE:
+---This currently returns 0 on the Quest.
+---
 ---@return number depth # The depth of the play area, in meters.
 function lovr.headset.getBoundsDepth() end
 
 ---
 ---Returns the size of the play area, in meters.
+---
+---
+---### NOTE:
+---This currently returns 0 on the Quest.
 ---
 ---@return number width # The width of the play area, in meters.
 ---@return number depth # The depth of the play area, in meters.
@@ -55,11 +91,23 @@ function lovr.headset.getBoundsGeometry(t) end
 ---
 ---Returns the width of the play area, in meters.
 ---
+---
+---### NOTE:
+---This currently returns 0 on the Quest.
+---
 ---@return number width # The width of the play area, in meters.
 function lovr.headset.getBoundsWidth() end
 
 ---
----Returns the near and far clipping planes used to render to the headset.  Objects closer than the near clipping plane or further than the far clipping plane will be clipped out of view.
+---Returns the near and far clipping planes used to render to the headset.
+---
+---Objects closer than the near clipping plane or further than the far clipping plane will be clipped out of view.
+---
+---
+---### NOTE:
+---The default near and far clipping planes are 0.1 meters and 100.0 meters.
+---
+---This is not currently supported by the `vrapi` headset driver.
 ---
 ---@return number near # The distance to the near clipping plane, in meters.
 ---@return number far # The distance to the far clipping plane, in meters.
@@ -85,7 +133,11 @@ function lovr.headset.getDisplayFrequency() end
 function lovr.headset.getDisplayHeight() end
 
 ---
----Returns 2D triangle vertices that represent areas of the headset display that will never be seen by the user (due to the circular lenses).  This area can be masked out by rendering it to the depth buffer or stencil buffer.  Then, further drawing operations can skip rendering those pixels using the depth test (`lovr.graphics.setDepthTest`) or stencil test (`lovr.graphics.setStencilTest`), which improves performance.
+---Returns 2D triangle vertices that represent areas of the headset display that will never be seen by the user (due to the circular lenses).
+---
+---This area can be masked out by rendering it to the depth buffer or stencil buffer.
+---
+---Then, further drawing operations can skip rendering those pixels using the depth test (`lovr.graphics.setDepthTest`) or stencil test (`lovr.graphics.setStencilTest`), which improves performance.
 ---
 ---@return table points # A table of points.  Each point is a table with two numbers between 0 and 1.
 function lovr.headset.getDisplayMask() end
@@ -97,7 +149,9 @@ function lovr.headset.getDisplayMask() end
 function lovr.headset.getDisplayWidth() end
 
 ---
----Returns the `HeadsetDriver` that is currently in use, optionally for a specific device.  The order of headset drivers can be changed using `lovr.conf` to prefer or exclude specific VR APIs.
+---Returns the `HeadsetDriver` that is currently in use, optionally for a specific device.
+---
+---The order of headset drivers can be changed using `lovr.conf` to prefer or exclude specific VR APIs.
 ---
 ---@overload fun(device: lovr.Device):lovr.HeadsetDriver
 ---@return lovr.HeadsetDriver driver # The driver of the headset in use, e.g. "OpenVR".
@@ -106,27 +160,81 @@ function lovr.headset.getDriver() end
 ---
 ---Returns a table with all of the currently tracked hand devices.
 ---
+---
+---### NOTE:
+---The hand paths will *always* be either `hand/left` or `hand/right`.
+---
 ---@return table hands # The currently tracked hand devices.
 function lovr.headset.getHands() end
 
 ---
 ---Returns a Texture that contains whatever is currently rendered to the headset.
 ---
----Sometimes this can be `nil` if the current headset driver doesn't have a mirror texture, which can happen if the driver renders directly to the display.  Currently the `desktop`, `webxr`, and `vrapi` drivers do not have a mirror texture.
+---Sometimes this can be `nil` if the current headset driver doesn't have a mirror texture, which can happen if the driver renders directly to the display.
 ---
----It also isn't guaranteed that the same Texture will be returned by subsequent calls to this function.  Currently, the `oculus` driver exhibits this behavior.
+---Currently the `desktop`, `webxr`, and `vrapi` drivers do not have a mirror texture.
+---
+---It also isn't guaranteed that the same Texture will be returned by subsequent calls to this function.
+---
+---Currently, the `oculus` driver exhibits this behavior.
 ---
 ---@return lovr.Texture mirror # The mirror texture.
 function lovr.headset.getMirrorTexture() end
 
 ---
----Returns the name of the headset as a string.  The exact string that is returned depends on the hardware and VR SDK that is currently in use.
+---Returns the name of the headset as a string.
+---
+---The exact string that is returned depends on the hardware and VR SDK that is currently in use.
+---
+---
+---### NOTE:
+---<table>
+---  <thead>
+---    <tr>
+---      <td>driver</td>
+---      <td>name</td>
+---    </tr>
+---  </thead>
+---  <tbody>
+---    <tr>
+---      <td>desktop</td>
+---      <td><code>Simulator</code></td>
+---    </tr>
+---    <tr>
+---      <td>openvr</td>
+---      <td>varies</td>
+---    </tr>
+---    <tr>
+---      <td>openxr</td>
+---      <td>varies</td>
+---    </tr>
+---    <tr>
+---      <td>vrapi</td>
+---      <td><code>Oculus Quest</code> or <code>Oculus Quest 2</code></td>
+---    </tr>
+---    <tr>
+---      <td>webxr</td>
+---      <td>always nil</td>
+---    </tr>
+---    <tr>
+---      <td>oculus</td>
+---      <td>varies</td>
+---    </tr>
+---    <tr>
+---      <td>pico</td>
+---      <td><code>Pico</code></td>
+---    </tr>
+---  </tbody> </table>
 ---
 ---@return string name # The name of the headset as a string.
 function lovr.headset.getName() end
 
 ---
 ---Returns the current orientation of a device, in angle/axis form.
+---
+---
+---### NOTE:
+---If the device isn't tracked, all zeroes will be returned.
 ---
 ---@param device? lovr.Device # The device to get the orientation of.
 ---@return number angle # The amount of rotation around the axis of rotation, in radians.
@@ -136,13 +244,21 @@ function lovr.headset.getName() end
 function lovr.headset.getOrientation(device) end
 
 ---
----Returns the type of origin used for the tracking volume.  The different types of origins are explained on the `HeadsetOrigin` page.
+---Returns the type of origin used for the tracking volume.
+---
+---The different types of origins are explained on the `HeadsetOrigin` page.
 ---
 ---@return lovr.HeadsetOrigin origin # The type of origin.
 function lovr.headset.getOriginType() end
 
 ---
 ---Returns the current position and orientation of a device.
+---
+---
+---### NOTE:
+---Units are in meters.
+---
+---If the device isn't tracked, all zeroes will be returned.
 ---
 ---@param device? lovr.Device # The device to get the pose of.
 ---@return number x # The x position.
@@ -157,6 +273,10 @@ function lovr.headset.getPose(device) end
 ---
 ---Returns the current position of a device, in meters, relative to the play area.
 ---
+---
+---### NOTE:
+---If the device isn't tracked, all zeroes will be returned.
+---
 ---@param device? lovr.Device # The device to get the position of.
 ---@return number x # The x position of the device.
 ---@return number y # The y position of the device.
@@ -164,7 +284,140 @@ function lovr.headset.getPose(device) end
 function lovr.headset.getPosition(device) end
 
 ---
----Returns a list of joint poses tracked by a device.  Currently, only hand devices are able to track joints.
+---Returns a list of joint poses tracked by a device.
+---
+---Currently, only hand devices are able to track joints.
+---
+---
+---### NOTE:
+---If the Device does not support tracking joints or the poses are unavailable, `nil` is returned.
+---
+---The joint orientation is similar to the graphics coordinate system: -Z is the forwards direction, pointing towards the fingertips.
+---
+---The +Y direction is "up", pointing out of the back of the hand.
+---
+---The +X direction is to the right, perpendicular to X and Z.
+---
+---Hand joints are returned in the following order:
+---
+---<table>
+---  <thead>
+---    <tr>
+---      <td colspan="2">Joint</td>
+---      <td>Index</td>
+---    </tr>
+---  </thead>
+---  <tbody>
+---    <tr>
+---      <td colspan="2">Palm</td>
+---      <td>1</td>
+---    </tr>
+---    <tr>
+---      <td colspan="2">Wrist</td>
+---      <td>2</td>
+---    </tr>
+---    <tr>
+---      <td rowspan="4">Thumb</td>
+---      <td>Metacarpal</td>
+---      <td>3</td>
+---    </tr>
+---    <tr>
+---      <td>Proximal</td>
+---      <td>4</td>
+---    </tr>
+---    <tr>
+---      <td>Distal</td>
+---      <td>5</td>
+---    </tr>
+---    <tr>
+---      <td>Tip</td>
+---      <td>6</td>
+---    </tr>
+---    <tr>
+---      <td rowspan="5">Index</td>
+---      <td>Metacarpal</td>
+---      <td>7</td>
+---    </tr>
+---    <tr>
+---      <td>Proximal</td>
+---      <td>8</td>
+---    </tr>
+---    <tr>
+---      <td>Intermediate</td>
+---      <td>9</td>
+---    </tr>
+---    <tr>
+---      <td>Distal</td>
+---      <td>10</td>
+---    </tr>
+---    <tr>
+---      <td>Tip</td>
+---      <td>11</td>
+---    </tr>
+---    <tr>
+---      <td rowspan="5">Middle</td>
+---      <td>Metacarpal</td>
+---      <td>12</td>
+---    </tr>
+---    <tr>
+---      <td>Proximal</td>
+---      <td>13</td>
+---    </tr>
+---    <tr>
+---      <td>Intermediate</td>
+---      <td>14</td>
+---    </tr>
+---    <tr>
+---      <td>Distal</td>
+---      <td>15</td>
+---    </tr>
+---    <tr>
+---      <td>Tip</td>
+---      <td>16</td>
+---    </tr>
+---    <tr>
+---      <td rowspan="5">Ring</td>
+---      <td>Metacarpal</td>
+---      <td>17</td>
+---    </tr>
+---    <tr>
+---      <td>Proximal</td>
+---      <td>18</td>
+---    </tr>
+---    <tr>
+---      <td>Intermediate</td>
+---      <td>19</td>
+---    </tr>
+---    <tr>
+---      <td>Distal</td>
+---      <td>20</td>
+---    </tr>
+---    <tr>
+---      <td>Tip</td>
+---      <td>21</td>
+---    </tr>
+---    <tr>
+---      <td rowspan="5">Pinky</td>
+---      <td>Metacarpal</td>
+---      <td>22</td>
+---    </tr>
+---    <tr>
+---      <td>Proximal</td>
+---      <td>23</td>
+---    </tr>
+---    <tr>
+---      <td>Intermediate</td>
+---      <td>24</td>
+---    </tr>
+---    <tr>
+---      <td>Distal</td>
+---      <td>25</td>
+---    </tr>
+---    <tr>
+---      <td>Tip</td>
+---      <td>26</td>
+---    </tr>
+---  </tbody> </table>
 ---
 ---@overload fun(device: lovr.Device, t: table):table
 ---@param device lovr.Device # The Device to query.
@@ -175,6 +428,10 @@ function lovr.headset.getSkeleton(device) end
 ---Returns the estimated time in the future at which the light from the pixels of the current frame will hit the eyes of the user.
 ---
 ---This can be used as a replacement for `lovr.timer.getTime` for timestamps that are used for rendering to get a smoother result that is synchronized with the display of the headset.
+---
+---
+---### NOTE:
+---This has a different epoch than `lovr.timer.getTime`, so it is not guaranteed to be close to that value.
 ---
 ---@return number time # The predicted display time, in seconds.
 function lovr.headset.getTime() end
@@ -203,15 +460,21 @@ function lovr.headset.getVelocity(device) end
 function lovr.headset.getViewAngles(view) end
 
 ---
----Returns the number of views used for rendering.  Each view consists of a pose in space and a set of angle values that determine the field of view.
+---Returns the number of views used for rendering.
 ---
----This is usually 2 for stereo rendering configurations, but it can also be different.  For example, one way of doing foveated rendering uses 2 views for each eye -- one low quality view with a wider field of view, and a high quality view with a narrower field of view.
+---Each view consists of a pose in space and a set of angle values that determine the field of view.
+---
+---This is usually 2 for stereo rendering configurations, but it can also be different.
+---
+---For example, one way of doing foveated rendering uses 2 views for each eye -- one low quality view with a wider field of view, and a high quality view with a narrower field of view.
 ---
 ---@return number count # The number of views.
 function lovr.headset.getViewCount() end
 
 ---
----Returns the pose of one of the headset views.  This info can be used to create view matrices or do other eye-dependent calculations.
+---Returns the pose of one of the headset views.
+---
+---This info can be used to create view matrices or do other eye-dependent calculations.
 ---
 ---If tracking data is unavailable for the view or the index is invalid, `nil` is returned.
 ---
@@ -244,12 +507,20 @@ function lovr.headset.isTouched(device, button) end
 ---
 ---Returns whether any active headset driver is currently returning pose information for a device.
 ---
+---
+---### NOTE:
+---If a device is tracked, it is guaranteed to return a valid pose until the next call to `lovr.headset.update`.
+---
 ---@param device? lovr.Device # The device to get the pose of.
 ---@return boolean tracked # Whether the device is currently tracked.
 function lovr.headset.isTracked(device) end
 
 ---
 ---Returns a new Model for the specified device.
+---
+---
+---### NOTE:
+---This is only supported on the `openvr` and `vrapi` drivers right now.
 ---
 ---@param device? lovr.Device # The device to load a model for.
 ---@param options? {animated: boolean} # Options for loading the model.
@@ -259,15 +530,33 @@ function lovr.headset.newModel(device, options) end
 ---
 ---Renders to each eye of the headset using a function.
 ---
----This function takes care of setting the appropriate graphics transformations to ensure that the scene is rendered as though it is being viewed through each eye of the player.  It also takes care of setting the correct projection for the headset lenses.
+---This function takes care of setting the appropriate graphics transformations to ensure that the scene is rendered as though it is being viewed through each eye of the player.
+---
+---It also takes care of setting the correct projection for the headset lenses.
 ---
 ---If the headset module is enabled, this function is called automatically by `lovr.run` with `lovr.draw` as the callback.
+---
+---
+---### NOTE:
+---When using the `pico` headset driver, headset rendering is asynchronous and the callback passed to `lovr.headset.renderTo` will not be called immediately.
+---
+---At the beginning of the callback, the display is cleared to the background color.
+---
+---The background color can be changed using `lovr.graphics.setBackgroundColor`.
+---
+---If the callback is `nil`, an empty frame cleared to current graphics background color will be submitted to the headset.
 ---
 ---@param callback function # The function used to render.  Any functions called will render to the headset instead of to the window.
 function lovr.headset.renderTo(callback) end
 
 ---
----Sets the near and far clipping planes used to render to the headset.  Objects closer than the near clipping plane or further than the far clipping plane will be clipped out of view.
+---Sets the near and far clipping planes used to render to the headset.
+---
+---Objects closer than the near clipping plane or further than the far clipping plane will be clipped out of view.
+---
+---
+---### NOTE:
+---The default clip distances are 0.1 and 100.0.
 ---
 ---@param near number # The distance to the near clipping plane, in meters.
 ---@param far number # The distance to the far clipping plane, in meters.
@@ -275,6 +564,16 @@ function lovr.headset.setClipDistance(near, far) end
 
 ---
 ---Causes the device to vibrate with a custom strength, duration, and frequency, if possible.
+---
+---
+---### NOTE:
+---When using the `openvr` headset driver on an HTC Vive, the value for the `duration` currently must be less than .004 seconds.
+---
+---Call this function several frames in a row for stronger or prolonged vibration patterns.
+---
+---On the Oculus Quest, devices can only be vibrated once per frame.
+---
+---Any attempts after the first will return `false`.
 ---
 ---@param device? lovr.Device # The device to vibrate.
 ---@param strength? number # The strength of the vibration (amplitude), between 0 and 1.
@@ -286,6 +585,14 @@ function lovr.headset.vibrate(device, strength, duration, frequency) end
 ---
 ---Returns whether a button on a device was pressed this frame.
 ---
+---
+---### NOTE:
+---Some headset backends are not able to return pressed/released information.
+---
+---These drivers will always return false for `lovr.headset.wasPressed` and `lovr.headset.wasReleased`.
+---
+---Typically the internal `lovr.headset.update` function will update pressed/released status.
+---
 ---@param device lovr.Device # The device.
 ---@param button lovr.DeviceButton # The button to check.
 ---@return boolean pressed # Whether the button on the device was pressed this frame.
@@ -293,6 +600,14 @@ function lovr.headset.wasPressed(device, button) end
 
 ---
 ---Returns whether a button on a device was released this frame.
+---
+---
+---### NOTE:
+---Some headset backends are not able to return pressed/released information.
+---
+---These drivers will always return false for `lovr.headset.wasPressed` and `lovr.headset.wasReleased`.
+---
+---Typically the internal `lovr.headset.update` function will update pressed/released status.
 ---
 ---@param device lovr.Device # The device.
 ---@param button lovr.DeviceButton # The button to check.
@@ -463,9 +778,17 @@ function lovr.headset.wasReleased(device, button) end
 ---| '"proximity"'
 
 ---
----These are all of the supported VR APIs that LÖVR can use to power the lovr.headset module.  You can change the order of headset drivers using `lovr.conf` to prefer or exclude specific VR APIs.
+---These are all of the supported VR APIs that LÖVR can use to power the lovr.headset module.
 ---
----At startup, LÖVR searches through the list of drivers in order.  One headset driver will be used for rendering to the VR display, and all supported headset drivers will be used for device input.  The way this works is that when poses or button input is requested, the input drivers are queried (in the order they appear in `conf.lua`) to see if any of them currently have data for the specified device.  The first one that returns data will be used to provide the result. This allows projects to support multiple types of hardware devices.
+---You can change the order of headset drivers using `lovr.conf` to prefer or exclude specific VR APIs.
+---
+---At startup, LÖVR searches through the list of drivers in order.
+---
+---One headset driver will be used for rendering to the VR display, and all supported headset drivers will be used for device input.
+---
+---The way this works is that when poses or button input is requested, the input drivers are queried (in the order they appear in `conf.lua`) to see if any of them currently have data for the specified device.
+---
+---The first one that returns data will be used to provide the result. This allows projects to support multiple types of hardware devices.
 ---
 ---@alias lovr.HeadsetDriver
 ---
@@ -498,7 +821,11 @@ function lovr.headset.wasReleased(device, button) end
 ---| '"webxr"'
 
 ---
----Represents the different types of origins for coordinate spaces.  An origin of "floor" means that the origin is on the floor in the middle of a room-scale play area.  An origin of "head" means that no positional tracking is available, and consequently the origin is always at the position of the headset.
+---Represents the different types of origins for coordinate spaces.
+---
+---An origin of "floor" means that the origin is on the floor in the middle of a room-scale play area.
+---
+---An origin of "head" means that no positional tracking is available, and consequently the origin is always at the position of the headset.
 ---
 ---@alias lovr.HeadsetOrigin
 ---

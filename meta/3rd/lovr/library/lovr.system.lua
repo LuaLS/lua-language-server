@@ -19,7 +19,13 @@ function lovr.system.getCoreCount() end
 function lovr.system.getOS() end
 
 ---
----Requests permission to use a feature.  Usually this will pop up a dialog box that the user needs to confirm.  Once the permission request has been acknowledged, the `lovr.permission` callback will be called with the result.  Currently, this is only used for requesting microphone access on Android devices.
+---Requests permission to use a feature.
+---
+---Usually this will pop up a dialog box that the user needs to confirm.
+---
+---Once the permission request has been acknowledged, the `lovr.permission` callback will be called with the result.
+---
+---Currently, this is only used for requesting microphone access on Android devices.
 ---
 ---@param permission lovr.Permission # The permission to request.
 function lovr.system.requestPermission(permission) end

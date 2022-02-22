@@ -84,12 +84,25 @@ local function buildSuper(tp)
     return (': %s'):format(table.concat(parents, ', '))
 end
 
-local function buildDescription(desc)
+local function buildMD(desc)
+    return desc:gsub('([\r\n])', '%1---')
+               :gsub('%.  ', '.\n---\n---')
+end
+
+local function buildDescription(desc, notes)
+    local lines = {}
     if desc then
-        return ('---\n---%s\n---'):format(desc:gsub('([\r\n])', '%1---'))
-    else
-        return nil
+        lines[#lines+1] = '---'
+        lines[#lines+1] = '---' .. buildMD(desc)
+        lines[#lines+1] = '---'
     end
+    if notes then
+        lines[#lines+1] = '---'
+        lines[#lines+1] = '---### NOTE:'
+        lines[#lines+1] = '---' .. buildMD(notes)
+        lines[#lines+1] = '---'
+    end
+    return table.concat(lines, '\n')
 end
 
 local function buildDocFunc(variant, overload)
@@ -128,7 +141,7 @@ end
 
 local function buildFunction(func, typeName)
     local text = {}
-    text[#text+1] = buildDescription(func.description)
+    text[#text+1] = buildDescription(func.description, func.notes)
     for i = 2, #func.variants do
         local variant = func.variants[i]
         text[#text+1] = ('---@overload %s'):format(buildDocFunc(variant, typeName))
@@ -168,7 +181,7 @@ local function buildFile(defs)
 
     text[#text+1] = '---@meta'
     text[#text+1] = ''
-    text[#text+1] = buildDescription(defs.description)
+    text[#text+1] = buildDescription(defs.description, defs.notes)
     text[#text+1] = ('---@class %s'):format(class)
     text[#text+1] = ('%s = {}'):format(class)
 
@@ -180,7 +193,7 @@ local function buildFile(defs)
     for _, obj in ipairs(defs.objects or {}) do
         local mark = {}
         text[#text+1] = ''
-        text[#text+1] = buildDescription(obj.description)
+        text[#text+1] = buildDescription(obj.description, obj.notes)
         text[#text+1] = ('---@class %s%s'):format(getTypeName(obj.name), buildSuper(obj))
         text[#text+1] = ('local %s = {}'):format(obj.name)
         for _, func in ipairs(obj.methods or {}) do
@@ -194,10 +207,10 @@ local function buildFile(defs)
 
     for _, enum in ipairs(defs.enums or {}) do
         text[#text+1] = ''
-        text[#text+1] = buildDescription(enum.description)
+        text[#text+1] = buildDescription(enum.description, enum.notes)
         text[#text+1] = ('---@alias %s'):format(getTypeName(enum.name))
         for _, constant in ipairs(enum.values) do
-            text[#text+1] = buildDescription(constant.description)
+            text[#text+1] = buildDescription(constant.description, constant.notes)
             text[#text+1] = ([[---| '%s']]):format(('%q'):format(constant.name):gsub("'", "\\'"))
         end
     end
@@ -220,7 +233,7 @@ local function buildCallback(defs)
 
     for _, cb in ipairs(defs.callbacks or {}) do
         text[#text+1] = ''
-        text[#text+1] = buildDescription(cb.description)
+        text[#text+1] = buildDescription(cb.description, cb.notes)
         text[#text+1] = ('---@type %s'):format(buildMultiDocFunc(cb))
         text[#text+1] = ('%s = nil'):format(cb.key)
     end

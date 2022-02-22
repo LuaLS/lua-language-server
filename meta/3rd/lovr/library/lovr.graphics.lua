@@ -1,13 +1,19 @@
 ---@meta
 
 ---
----The `lovr.graphics` module renders graphics to displays.  Anything rendered using this module will automatically show up in the VR headset if one is connected, otherwise it will just show up in a window on the desktop.
+---The `lovr.graphics` module renders graphics to displays.
+---
+---Anything rendered using this module will automatically show up in the VR headset if one is connected, otherwise it will just show up in a window on the desktop.
 ---
 ---@class lovr.graphics
 lovr.graphics = {}
 
 ---
 ---Draws an arc.
+---
+---
+---### NOTE:
+---The local normal vector of the circle is `(0, 0, 1)`.
 ---
 ---@overload fun(material: lovr.Material, x: number, y: number, z: number, radius: number, angle: number, ax: number, ay: number, az: number, start: number, end: number, segments: number)
 ---@overload fun(mode: lovr.DrawStyle, transform: lovr.mat4, start: number, end: number, segments: number)
@@ -31,7 +37,9 @@ lovr.graphics = {}
 function lovr.graphics.arc(mode, x, y, z, radius, angle, ax, ay, az, start, end, segments) end
 
 ---
----Draws a box.  This is similar to `lovr.graphics.cube` except you can have different values for the width, height, and depth of the box.
+---Draws a box.
+---
+---This is similar to `lovr.graphics.cube` except you can have different values for the width, height, and depth of the box.
 ---
 ---@overload fun(material: lovr.Material, x: number, y: number, z: number, width: number, height: number, depth: number, angle: number, ax: number, ay: number, az: number)
 ---@overload fun(mode: lovr.DrawStyle, transform: lovr.mat4)
@@ -52,6 +60,10 @@ function lovr.graphics.box(mode, x, y, z, width, height, depth, angle, ax, ay, a
 ---
 ---Draws a 2D circle.
 ---
+---
+---### NOTE:
+---The local normal vector of the circle is `(0, 0, 1)`.
+---
 ---@overload fun(material: lovr.Material, x: number, y: number, z: number, radius: number, angle: number, ax: number, ay: number, az: number, segments: number)
 ---@overload fun(mode: lovr.DrawStyle, transform: lovr.mat4, segments: number)
 ---@overload fun(material: lovr.Material, transform: lovr.mat4, segments: number)
@@ -68,7 +80,15 @@ function lovr.graphics.box(mode, x, y, z, width, height, depth, angle, ax, ay, a
 function lovr.graphics.circle(mode, x, y, z, radius, angle, ax, ay, az, segments) end
 
 ---
----Clears the screen, resetting the color, depth, and stencil information to default values.  This function is called automatically by `lovr.run` at the beginning of each frame to clear out the data from the previous frame.
+---Clears the screen, resetting the color, depth, and stencil information to default values.
+---
+---This function is called automatically by `lovr.run` at the beginning of each frame to clear out the data from the previous frame.
+---
+---
+---### NOTE:
+---The first two variants of this function can be mixed and matched, meaning you can use booleans for some of the values and numeric values for others.
+---
+---If you are using `lovr.graphics.setStencilTest`, it will not affect how the screen gets cleared. Instead, you can use `lovr.graphics.fill` to draw a fullscreen quad, which will get masked by the active stencil.
 ---
 ---@overload fun(r: number, g: number, b: number, a: number, z: number, s: number)
 ---@overload fun(hex: number)
@@ -78,9 +98,17 @@ function lovr.graphics.circle(mode, x, y, z, radius, angle, ax, ay, az, segments
 function lovr.graphics.clear(color, depth, stencil) end
 
 ---
----This function runs a compute shader on the GPU.  Compute shaders must be created with `lovr.graphics.newComputeShader` and they should implement the `void compute();` GLSL function. Running a compute shader doesn't actually do anything, but the Shader can modify data stored in `Texture`s or `ShaderBlock`s to get interesting things to happen.
+---This function runs a compute shader on the GPU.
+---
+---Compute shaders must be created with `lovr.graphics.newComputeShader` and they should implement the `void compute();` GLSL function. Running a compute shader doesn't actually do anything, but the Shader can modify data stored in `Texture`s or `ShaderBlock`s to get interesting things to happen.
 ---
 ---When running the compute shader, you can specify the number of times to run it in 3 dimensions, which is useful to iterate over large numbers of elements like pixels or array elements.
+---
+---
+---### NOTE:
+---Only compute shaders created with `lovr.graphics.newComputeShader` can be used here.
+---
+---There are GPU-specific limits on the `x`, `y`, and `z` values which can be queried in the `compute` entry of `lovr.graphics.getLimits`.
 ---
 ---@param shader lovr.Shader # The compute shader to run.
 ---@param x? number # The amount of times to run in the x direction.
@@ -90,6 +118,16 @@ function lovr.graphics.compute(shader, x, y, z) end
 
 ---
 ---Create the desktop window, usually used to mirror the headset display.
+---
+---
+---### NOTE:
+---This function can only be called once.
+---
+---It is normally called internally, but you can override this by setting window to `nil` in conf.lua.
+---
+---See `lovr.conf` for more information.
+---
+---The window must be created before any `lovr.graphics` functions can be used.
 ---
 ---@param flags {width: number, height: number, fullscreen: boolean, resizable: boolean, msaa: number, title: string, icon: string, vsync: number} # Flags to customize the window's appearance and behavior.
 function lovr.graphics.createWindow(flags) end
@@ -114,6 +152,10 @@ function lovr.graphics.cube(mode, x, y, z, size, angle, ax, ay, az) end
 ---
 ---Draws a cylinder.
 ---
+---
+---### NOTE:
+---Currently, cylinders don't have UVs.
+---
 ---@overload fun(material: lovr.Material, x: number, y: number, z: number, length: number, angle: number, ax: number, ay: number, az: number, r1: number, r2: number, capped: boolean, segments: number)
 ---@param x? number # The x coordinate of the center of the cylinder.
 ---@param y? number # The y coordinate of the center of the cylinder.
@@ -130,7 +172,9 @@ function lovr.graphics.cube(mode, x, y, z, size, angle, ax, ay, az) end
 function lovr.graphics.cylinder(x, y, z, length, angle, ax, ay, az, r1, r2, capped, segments) end
 
 ---
----Discards pixel information in the active Canvas or display.  This is mostly used as an optimization hint for the GPU, and is usually most helpful on mobile devices.
+---Discards pixel information in the active Canvas or display.
+---
+---This is mostly used as an optimization hint for the GPU, and is usually most helpful on mobile devices.
 ---
 ---@param color? boolean # Whether or not to discard color information.
 ---@param depth? boolean # Whether or not to discard depth information.
@@ -139,6 +183,12 @@ function lovr.graphics.discard(color, depth, stencil) end
 
 ---
 ---Draws a fullscreen textured quad.
+---
+---
+---### NOTE:
+---This function ignores stereo rendering, so it will stretch the input across the entire Canvas if it's stereo.
+---
+---Special shaders are currently required for correct stereo fills.
 ---
 ---@overload fun()
 ---@param texture lovr.Texture # The texture to use.
@@ -149,18 +199,37 @@ function lovr.graphics.discard(color, depth, stencil) end
 function lovr.graphics.fill(texture, u, v, w, h) end
 
 ---
----Flushes the internal queue of draw batches.  Under normal circumstances this is done automatically when needed, but the ability to flush manually may be helpful if you're integrating a LÖVR project with some external rendering code.
+---Flushes the internal queue of draw batches.
+---
+---Under normal circumstances this is done automatically when needed, but the ability to flush manually may be helpful if you're integrating a LÖVR project with some external rendering code.
 ---
 function lovr.graphics.flush() end
 
 ---
----Returns whether or not alpha sampling is enabled.  Alpha sampling is also known as alpha-to-coverage.  When it is enabled, the alpha channel of a pixel is factored into how antialiasing is computed, so the edges of a transparent texture will be correctly antialiased.
+---Returns whether or not alpha sampling is enabled.
+---
+---Alpha sampling is also known as alpha-to-coverage.
+---
+---When it is enabled, the alpha channel of a pixel is factored into how antialiasing is computed, so the edges of a transparent texture will be correctly antialiased.
+---
+---
+---### NOTE:
+---- Alpha sampling is disabled by default.
+---- This feature can be used for a simple transparency effect, pixels with an alpha of zero will
+---  have their depth value discarded, allowing things behind them to show through (normally you
+---  have to sort objects or write a shader for this).
 ---
 ---@return boolean enabled # Whether or not alpha sampling is enabled.
 function lovr.graphics.getAlphaSampling() end
 
 ---
----Returns the current background color.  Color components are from 0.0 to 1.0.
+---Returns the current background color.
+---
+---Color components are from 0.0 to 1.0.
+---
+---
+---### NOTE:
+---The default background color is `(0.0, 0.0, 0.0, 1.0)`.
 ---
 ---@return number r # The red component of the background color.
 ---@return number g # The green component of the background color.
@@ -169,22 +238,40 @@ function lovr.graphics.getAlphaSampling() end
 function lovr.graphics.getBackgroundColor() end
 
 ---
----Returns the current blend mode.  The blend mode controls how each pixel's color is blended with the previous pixel's color when drawn.
+---Returns the current blend mode.
+---
+---The blend mode controls how each pixel's color is blended with the previous pixel's color when drawn.
 ---
 ---If blending is disabled, `nil` will be returned.
+---
+---
+---### NOTE:
+---The default blend mode is `alpha` and `alphamultiply`.
 ---
 ---@return lovr.BlendMode blend # The current blend mode.
 ---@return lovr.BlendAlphaMode alphaBlend # The current alpha blend mode.
 function lovr.graphics.getBlendMode() end
 
 ---
----Returns the active Canvas.  Usually when you render something it will render directly to the headset.  If a Canvas object is active, things will be rendered to the textures attached to the Canvas instead.
+---Returns the active Canvas.
+---
+---Usually when you render something it will render directly to the headset.
+---
+---If a Canvas object is active, things will be rendered to the textures attached to the Canvas instead.
 ---
 ---@return lovr.Canvas canvas # The active Canvas, or `nil` if no canvas is set.
 function lovr.graphics.getCanvas() end
 
 ---
----Returns the current global color factor.  Color components are from 0.0 to 1.0.  Every pixel drawn will be multiplied (i.e. tinted) by this color.
+---Returns the current global color factor.
+---
+---Color components are from 0.0 to 1.0.
+---
+---Every pixel drawn will be multiplied (i.e. tinted) by this color.
+---
+---
+---### NOTE:
+---The default color is `(1.0, 1.0, 1.0, 1.0)`.
 ---
 ---@return number r # The red component of the color.
 ---@return number g # The green component of the color.
@@ -193,12 +280,26 @@ function lovr.graphics.getCanvas() end
 function lovr.graphics.getColor() end
 
 ---
----Returns a boolean for each color channel (red, green, blue, alpha) indicating whether it is enabled.  When a color channel is enabled, it will be affected by drawing commands and clear commands.
+---Returns a boolean for each color channel (red, green, blue, alpha) indicating whether it is enabled.
+---
+---When a color channel is enabled, it will be affected by drawing commands and clear commands.
+---
+---
+---### NOTE:
+---By default, all color channels are enabled.
+---
+---Disabling all of the color channels can be useful if you only want to write to the depth buffer or the stencil buffer.
 ---
 function lovr.graphics.getColorMask() end
 
 ---
----Returns the default filter mode for new Textures.  This controls how textures are sampled when they are minified, magnified, or stretched.
+---Returns the default filter mode for new Textures.
+---
+---This controls how textures are sampled when they are minified, magnified, or stretched.
+---
+---
+---### NOTE:
+---The default filter is `trilinear`.
 ---
 ---@return lovr.FilterMode mode # The filter mode.
 ---@return number anisotropy # The level of anisotropy.
@@ -206,6 +307,28 @@ function lovr.graphics.getDefaultFilter() end
 
 ---
 ---Returns the current depth test settings.
+---
+---
+---### NOTE:
+---The depth test is an advanced technique to control how 3D objects overlap each other when they are rendered.
+---
+---It works as follows:
+---
+---- Each pixel keeps track of its z value as well as its color.
+---- If `write` is enabled when something is drawn, then any pixels that are drawn will have their
+---  z values updated.
+---- Additionally, anything drawn will first compare the existing z value of a pixel with the new z
+---  value.
+---
+---The `compareMode` setting determines how this comparison is performed.
+---
+---If the
+---  comparison succeeds, the new pixel will overwrite the previous one, otherwise that pixel won't
+---  be rendered to.
+---
+---Smaller z values are closer to the camera.
+---
+---The default compare mode is `lequal`, which usually gives good results for normal 3D rendering.
 ---
 ---@return lovr.CompareMode compareMode # The current comparison method for depth testing.
 ---@return boolean write # Whether pixels will have their z value updated when rendered to.
@@ -245,11 +368,23 @@ function lovr.graphics.getLimits() end
 ---
 ---Returns the current line width.
 ---
+---
+---### NOTE:
+---The default line width is `1`.
+---
 ---@return number width # The current line width, in pixels.
 function lovr.graphics.getLineWidth() end
 
 ---
----Returns the pixel density of the window.  On "high-dpi" displays, this will be `2.0`, indicating that there are 2 pixels for every window coordinate.  On a normal display it will be `1.0`, meaning that the pixel to window-coordinate ratio is 1:1.
+---Returns the pixel density of the window.
+---
+---On "high-dpi" displays, this will be `2.0`, indicating that there are 2 pixels for every window coordinate.
+---
+---On a normal display it will be `1.0`, meaning that the pixel to window-coordinate ratio is 1:1.
+---
+---
+---### NOTE:
+---If the window isn't created yet, this function will return 0.
 ---
 ---@return number density # The pixel density of the window.
 function lovr.graphics.getPixelDensity() end
@@ -257,11 +392,23 @@ function lovr.graphics.getPixelDensity() end
 ---
 ---Returns the current point size.
 ---
+---
+---### NOTE:
+---The default point size is `1.0`.
+---
 ---@return number size # The current point size, in pixels.
 function lovr.graphics.getPointSize() end
 
 ---
 ---Returns the projection for a single view.
+---
+---
+---### NOTE:
+---Non-stereo rendering will only use the first view.
+---
+---The projection matrices are available as the `mat4 lovrProjections[2]` variable in shaders.
+---
+---The current projection matrix is available as `lovrProjection`.
 ---
 ---@overload fun(view: number, matrix: lovr.Mat4):lovr.Mat4
 ---@param view number # The view index.
@@ -284,7 +431,19 @@ function lovr.graphics.getShader() end
 function lovr.graphics.getStats() end
 
 ---
----Returns the current stencil test.  The stencil test lets you mask out pixels that meet certain criteria, based on the contents of the stencil buffer.  The stencil buffer can be modified using `lovr.graphics.stencil`.  After rendering to the stencil buffer, the stencil test can be set to control how subsequent drawing functions are masked by the stencil buffer.
+---Returns the current stencil test.
+---
+---The stencil test lets you mask out pixels that meet certain criteria, based on the contents of the stencil buffer.
+---
+---The stencil buffer can be modified using `lovr.graphics.stencil`.
+---
+---After rendering to the stencil buffer, the stencil test can be set to control how subsequent drawing functions are masked by the stencil buffer.
+---
+---
+---### NOTE:
+---Stencil values are between 0 and 255.
+---
+---By default, the stencil test is disabled.
 ---
 ---@return lovr.CompareMode compareMode # The comparison method used to decide if a pixel should be visible, or nil if the stencil test is disabled.
 ---@return number compareValue # The value stencil values are compared against, or nil if the stencil test is disabled.
@@ -311,7 +470,17 @@ function lovr.graphics.getViewPose(view) end
 function lovr.graphics.getWidth() end
 
 ---
----Returns the current polygon winding.  The winding direction determines which face of a triangle is the front face and which is the back face.  This lets the graphics engine cull the back faces of polygons, improving performance.
+---Returns the current polygon winding.
+---
+---The winding direction determines which face of a triangle is the front face and which is the back face.
+---
+---This lets the graphics engine cull the back faces of polygons, improving performance.
+---
+---
+---### NOTE:
+---Culling is initially disabled and must be enabled using `lovr.graphics.setCullingEnabled`.
+---
+---The default winding direction is counterclockwise.
 ---
 ---@return lovr.Winding winding # The current winding direction.
 function lovr.graphics.getWinding() end
@@ -319,11 +488,23 @@ function lovr.graphics.getWinding() end
 ---
 ---Returns whether the desktop window is currently created.
 ---
+---
+---### NOTE:
+---Most of the `lovr.graphics` functionality will only work if a window is created.
+---
 ---@return boolean present # Whether a window is created.
 function lovr.graphics.hasWindow() end
 
 ---
----Returns whether or not culling is active.  Culling is an optimization that avoids rendering the back face of polygons.  This improves performance by reducing the number of polygons drawn, but requires that the vertices in triangles are specified in a consistent clockwise or counter clockwise order.
+---Returns whether or not culling is active.
+---
+---Culling is an optimization that avoids rendering the back face of polygons.
+---
+---This improves performance by reducing the number of polygons drawn, but requires that the vertices in triangles are specified in a consistent clockwise or counter clockwise order.
+---
+---
+---### NOTE:
+---Culling is disabled by default.
 ---
 ---@return boolean isEnabled # Whether or not culling is enabled.
 function lovr.graphics.isCullingEnabled() end
@@ -331,11 +512,19 @@ function lovr.graphics.isCullingEnabled() end
 ---
 ---Returns a boolean indicating whether or not wireframe rendering is enabled.
 ---
+---
+---### NOTE:
+---Wireframe rendering is initially disabled.
+---
+---Wireframe rendering is only supported on desktop systems.
+---
 ---@return boolean isWireframe # Whether or not wireframe rendering is enabled.
 function lovr.graphics.isWireframe() end
 
 ---
----Draws lines between points.  Each point will be connected to the previous point in the list.
+---Draws lines between points.
+---
+---Each point will be connected to the previous point in the list.
 ---
 ---@overload fun(points: table)
 ---@param x1 number # The x coordinate of the first point.
@@ -347,9 +536,17 @@ function lovr.graphics.isWireframe() end
 function lovr.graphics.line(x1, y1, z1, x2, y2, z2) end
 
 ---
----Creates a new Canvas.  You can specify Textures to attach to it, or just specify a width and height and attach textures later using `Canvas:setTexture`.
+---Creates a new Canvas.
+---
+---You can specify Textures to attach to it, or just specify a width and height and attach textures later using `Canvas:setTexture`.
 ---
 ---Once created, you can render to the Canvas using `Canvas:renderTo`, or `lovr.graphics.setCanvas`.
+---
+---
+---### NOTE:
+---Textures created by this function will have `clamp` as their `WrapMode`.
+---
+---Stereo Canvases will either have their width doubled or use array textures for their attachments, depending on their implementation.
 ---
 ---@overload fun(..., flags: table):lovr.Canvas
 ---@overload fun(attachments: table, flags: table):lovr.Canvas
@@ -362,15 +559,31 @@ function lovr.graphics.newCanvas(width, height, flags) end
 ---
 ---Creates a new compute Shader, used for running generic compute operations on the GPU.
 ---
+---
+---### NOTE:
+---Compute shaders are not supported on all hardware, use `lovr.graphics.getFeatures` to check if they're available on the current system.
+---
+---The source code for a compute shader needs to implement the `void compute();` GLSL function. This function doesn't return anything, but the compute shader is able to write data out to `Texture`s or `ShaderBlock`s.
+---
+---The GLSL version used for compute shaders is GLSL 430.
+---
+---Currently, up to 32 shader flags are supported.
+---
 ---@param source string # The code or filename of the compute shader.
 ---@param options? {flags: table} # Optional settings for the Shader.
 ---@return lovr.Shader shader # The new compute Shader.
 function lovr.graphics.newComputeShader(source, options) end
 
 ---
----Creates a new Font.  It can be used to render text with `lovr.graphics.print`.
+---Creates a new Font.
+---
+---It can be used to render text with `lovr.graphics.print`.
 ---
 ---Currently, the only supported font format is TTF.
+---
+---
+---### NOTE:
+---Larger font sizes will lead to more detailed curves at the cost of performance.
 ---
 ---@overload fun(size: number, padding: number, spread: number):lovr.Font
 ---@overload fun(rasterizer: lovr.Rasterizer, padding: number, spread: number):lovr.Font
@@ -382,7 +595,18 @@ function lovr.graphics.newComputeShader(source, options) end
 function lovr.graphics.newFont(filename, size, padding, spread) end
 
 ---
----Creates a new Material.  Materials are sets of colors, textures, and other parameters that affect the appearance of objects.  They can be applied to `Model`s, `Mesh`es, and most graphics primitives accept a Material as an optional first argument.
+---Creates a new Material.
+---
+---Materials are sets of colors, textures, and other parameters that affect the appearance of objects.
+---
+---They can be applied to `Model`s, `Mesh`es, and most graphics primitives accept a Material as an optional first argument.
+---
+---
+---### NOTE:
+---- Scalar properties will default to `1.0`.
+---- Color properties will default to `(1.0, 1.0, 1.0, 1.0)`, except for `emissive` which will
+---  default to `(0.0, 0.0, 0.0, 0.0)`.
+---- Textures will default to `nil` (a single 1x1 white pixel will be used for them).
 ---
 ---@overload fun(texture: lovr.Texture, r: number, g: number, b: number, a: number):lovr.Material
 ---@overload fun(canvas: lovr.Canvas, r: number, g: number, b: number, a: number):lovr.Material
@@ -392,9 +616,27 @@ function lovr.graphics.newFont(filename, size, padding, spread) end
 function lovr.graphics.newMaterial() end
 
 ---
----Creates a new Mesh.  Meshes contain the data for an arbitrary set of vertices, and can be drawn. You must specify either the capacity for the Mesh or an initial set of vertex data.  Optionally, a custom format table can be used to specify the set of vertex attributes the mesh will provide to the active shader.  The draw mode and usage hint can also optionally be specified.
+---Creates a new Mesh.
+---
+---Meshes contain the data for an arbitrary set of vertices, and can be drawn. You must specify either the capacity for the Mesh or an initial set of vertex data.
+---
+---Optionally, a custom format table can be used to specify the set of vertex attributes the mesh will provide to the active shader.
+---
+---The draw mode and usage hint can also optionally be specified.
 ---
 ---The default data type for an attribute is `float`, and the default component count is 1.
+---
+---
+---### NOTE:
+---Once created, the size and format of the Mesh cannot be changed.'
+---
+---The default mesh format is:
+---
+---    {
+---      { 'lovrPosition',    'float', 3 },
+---      { 'lovrNormal',      'float', 3 },
+---      { 'lovrTexCoord',    'float', 2 }
+---    }
 ---
 ---@overload fun(vertices: table, mode: lovr.DrawMode, usage: lovr.MeshUsage, readable: boolean):lovr.Mesh
 ---@overload fun(blob: lovr.Blob, mode: lovr.DrawMode, usage: lovr.MeshUsage, readable: boolean):lovr.Mesh
@@ -409,7 +651,23 @@ function lovr.graphics.newMaterial() end
 function lovr.graphics.newMesh(size, mode, usage, readable) end
 
 ---
----Creates a new Model from a file.  The supported 3D file formats are OBJ, glTF, and STL.
+---Creates a new Model from a file.
+---
+---The supported 3D file formats are OBJ, glTF, and STL.
+---
+---
+---### NOTE:
+---Diffuse and emissive textures will be loaded in the sRGB encoding, all other textures will be loaded as linear.
+---
+---Currently, the following features are not supported by the model importer:
+---
+---- OBJ: Quads are not supported (only triangles).
+---- glTF: Sparse accessors are not supported.
+---- glTF: Morph targets are not supported.
+---- glTF: base64 images are not supported (base64 buffer data works though).
+---- glTF: Only the default scene is loaded.
+---- glTF: Currently, each skin in a Model can have up to 48 joints.
+---- STL: ASCII STL files are not supported.
 ---
 ---@overload fun(modelData: lovr.ModelData):lovr.Model
 ---@param filename string # The filename of the model to load.
@@ -418,6 +676,87 @@ function lovr.graphics.newModel(filename) end
 
 ---
 ---Creates a new Shader.
+---
+---
+---### NOTE:
+---The `flags` table should contain string keys, with boolean or numeric values.
+---
+---These flags can be used to customize the behavior of Shaders from Lua, by using the flags in the shader source code.
+---
+---Numeric flags will be available as constants named `FLAG_<flagName>`.
+---
+---Boolean flags can be used with `#ifdef` and will only be defined if the value in the Lua table was `true`.
+---
+---The following flags are used by shaders provided by LÖVR:
+---
+---- `animated` is a boolean flag that will cause the shader to position vertices based on the pose
+---  of an animated skeleton.
+---
+---This should usually only be used for animated `Model`s, since it
+---  needs a skeleton to work properly and is slower than normal rendering.
+---- `alphaCutoff` is a numeric flag that can be used to implement simple "cutout" style
+---  transparency, where pixels with alpha below a certain threshold will be discarded.
+---
+---The value
+---  of the flag should be a number between 0.0 and 1.0, representing the alpha threshold.
+---- `uniformScale` is a boolean flag used for optimization.
+---
+---If the Shader is only going to be
+---  used with objects that have a *uniform* scale (i.e. the x, y, and z components of the scale
+---  are all the same number), then this flag can be set to use a faster method to compute the
+---  `lovrNormalMatrix` uniform variable.
+---- `multicanvas` is a boolean flag that should be set when rendering to multiple Textures
+---  attached to a `Canvas`.
+---
+---When set, the fragment shader should implement the `colors` function
+---  instead of the `color` function, and can write color values to the `lovrCanvas` array instead
+---  of returning a single color.
+---
+---Each color in the array gets written to the corresponding
+---  texture attached to the canvas.
+---- `highp` is a boolean flag specific to mobile GPUs that changes the default precision for
+---  fragment shaders to use high precision instead of the default medium precision.
+---
+---This can fix
+---  visual issues caused by a lack of precision, but isn't guaranteed to be supported on some
+---  lower-end systems.
+---- The following flags are used only by the `standard` PBR shader:
+---  - `normalMap` should be set to `true` to render objects with a normal map, providing a more
+---  detailed, bumpy appearance.
+---
+---Currently, this requires the model to have vertex tangents.
+---  - `emissive` should be set to `true` to apply emissive maps to rendered objects.
+---
+---This is
+---    usually used to apply glowing lights or screens to objects, since the emissive texture is
+---    not affected at all by lighting.
+---  - `indirectLighting` is an *awesome* boolean flag that will apply realistic reflections and
+---    lighting to the surface of an object, based on a specially-created skybox.
+---
+---See the
+---    `Standard Shader` guide for more information.
+---  - `occlusion` is a boolean flag that uses the ambient occlusion texture in the model.
+---
+---It only
+---    affects indirect lighting, so it will only have an effect if the `indirectLighting` flag is
+---    also enabled.
+---  - `skipTonemap` is a flag that will skip the tonemapping process.
+---
+---Tonemapping is an important
+---    process that maps the high definition physical color values down to a 0 - 1 range for
+---    display.
+---
+---There are lots of different tonemapping algorithms that give different artistic
+---    effects.
+---
+---The default tonemapping in the standard shader is the ACES algorithm, but you can
+---    use this flag to turn off ACES and use your own tonemapping.
+---
+---Currently, up to 32 shader flags are supported.
+---
+---The `stereo` option is only necessary for Android.
+---
+---Currently on Android, only stereo shaders can be used with stereo Canvases, and mono Shaders can only be used with mono Canvases.
 ---
 ---@overload fun(default: lovr.DefaultShader, options: table):lovr.Shader
 ---@param vertex string # The code or filename of the vertex shader.  If nil, the default vertex shader is used.
@@ -429,6 +768,14 @@ function lovr.graphics.newShader(vertex, fragment, options) end
 ---
 ---Creates a new ShaderBlock from a table of variable definitions with their names and types.
 ---
+---
+---### NOTE:
+---`compute` blocks can only be true if compute shaders are supported, see `lovr.graphics.getFeatures`.
+---
+---Compute blocks may be slightly slower than uniform blocks, but they can also be much, much larger.
+---
+---Uniform blocks are usually limited to around 16 kilobytes in size, depending on hardware.
+---
 ---@param type lovr.BlockType # Whether the block will be used for read-only uniform data or compute shaders.
 ---@param uniforms table # A table where the keys are uniform names and the values are uniform types.  Uniform arrays can be specified by supplying a table as the uniform's value containing the type and the array size.
 ---@param flags? {usage: lovr.BufferUsage, readable: boolean} # Optional settings.
@@ -437,6 +784,12 @@ function lovr.graphics.newShaderBlock(type, uniforms, flags) end
 
 ---
 ---Creates a new Texture from an image file.
+---
+---
+---### NOTE:
+---The "linear" flag should be set to true for textures that don't contain color information, such as normal maps.
+---
+---Right now the supported image file formats are png, jpg, hdr, dds (DXT1, DXT3, DXT5), ktx, and astc.
 ---
 ---@overload fun(images: table, flags: table):lovr.Texture
 ---@overload fun(width: number, height: number, depth: number, flags: table):lovr.Texture
@@ -450,10 +803,20 @@ function lovr.graphics.newTexture(filename, flags) end
 ---
 ---Resets the transformation to the origin.
 ---
+---
+---### NOTE:
+---This is called at the beginning of every frame to reset the coordinate space.
+---
 function lovr.graphics.origin() end
 
 ---
 ---Draws a plane with a given position, size, and orientation.
+---
+---
+---### NOTE:
+---The `u`, `v`, `w`, `h` arguments can be used to select a subregion of the diffuse texture to apply to the plane.
+---
+---One efficient technique for rendering many planes with different textures is to pack all of the textures into a single image, and then use the uv arguments to select a sub-rectangle to use for each plane.
 ---
 ---@overload fun(material: lovr.Material, x: number, y: number, z: number, width: number, height: number, angle: number, ax: number, ay: number, az: number, u: number, v: number, w: number, h: number)
 ---@param mode lovr.DrawStyle # How to draw the plane.
@@ -484,15 +847,39 @@ function lovr.graphics.points(x, y, z) end
 ---
 ---Pops the current transform from the stack, returning to the transformation that was applied before `lovr.graphics.push` was called.
 ---
+---
+---### NOTE:
+---An error is thrown if there isn't a transform to pop.
+---
+---This can happen if you forget to call push before calling pop, or if you have an unbalanced sequence of pushes and pops.
+---
 function lovr.graphics.pop() end
 
 ---
----Presents the results of pending drawing operations to the window.  This is automatically called after `lovr.draw` by the default `lovr.run` function.
+---Presents the results of pending drawing operations to the window.
+---
+---This is automatically called after `lovr.draw` by the default `lovr.run` function.
 ---
 function lovr.graphics.present() end
 
 ---
 ---Draws text in 3D space using the active font.
+---
+---
+---### NOTE:
+---Unicode text is supported.
+---
+---Use `\n` to add line breaks.
+---
+---`\t` will be rendered as four spaces.
+---
+---LÖVR uses a fancy technique for font rendering called multichannel signed distance fields.
+---
+---This leads to crisp text in VR, but requires a special shader to use.
+---
+---LÖVR internally switches to the appropriate shader, but only when the default shader is already set.
+---
+---If you see strange font artifacts, make sure you switch back to the default shader by using `lovr.graphics.setShader()` before you draw text.
 ---
 ---@param str string # The text to render.
 ---@param x? number # The x coordinate of the center of the text.
@@ -509,7 +896,15 @@ function lovr.graphics.present() end
 function lovr.graphics.print(str, x, y, z, scale, angle, ax, ay, az, wrap, halign, valign) end
 
 ---
----Pushes a copy of the current transform onto the transformation stack.  After changing the transform using `lovr.graphics.translate`, `lovr.graphics.rotate`, and `lovr.graphics.scale`, the original state can be restored using `lovr.graphics.pop`.
+---Pushes a copy of the current transform onto the transformation stack.
+---
+---After changing the transform using `lovr.graphics.translate`, `lovr.graphics.rotate`, and `lovr.graphics.scale`, the original state can be restored using `lovr.graphics.pop`.
+---
+---
+---### NOTE:
+---An error is thrown if more than 64 matrices are pushed.
+---
+---This can happen accidentally if a push isn't followed by a corresponding pop.
 ---
 function lovr.graphics.push() end
 
@@ -523,6 +918,10 @@ function lovr.graphics.reset() end
 ---
 ---The rotation will last until `lovr.draw` returns or the transformation is popped off the transformation stack.
 ---
+---
+---### NOTE:
+---Order matters when scaling, translating, and rotating the coordinate system.
+---
 ---@param angle? number # The amount to rotate the coordinate system by, in radians.
 ---@param ax? number # The x component of the axis of rotation.
 ---@param ay? number # The y component of the axis of rotation.
@@ -530,9 +929,15 @@ function lovr.graphics.reset() end
 function lovr.graphics.rotate(angle, ax, ay, az) end
 
 ---
----Scales the coordinate system in 3 dimensions.  This will cause objects to appear bigger or smaller.
+---Scales the coordinate system in 3 dimensions.
+---
+---This will cause objects to appear bigger or smaller.
 ---
 ---The scaling will last until `lovr.draw` returns or the transformation is popped off the transformation stack.
+---
+---
+---### NOTE:
+---Order matters when scaling, translating, and rotating the coordinate system.
 ---
 ---@param x? number # The amount to scale on the x axis.
 ---@param y? number # The amount to scale on the y axis.
@@ -540,13 +945,30 @@ function lovr.graphics.rotate(angle, ax, ay, az) end
 function lovr.graphics.scale(x, y, z) end
 
 ---
----Enables or disables alpha sampling.  Alpha sampling is also known as alpha-to-coverage.  When it is enabled, the alpha channel of a pixel is factored into how antialiasing is computed, so the edges of a transparent texture will be correctly antialiased.
+---Enables or disables alpha sampling.
+---
+---Alpha sampling is also known as alpha-to-coverage.
+---
+---When it is enabled, the alpha channel of a pixel is factored into how antialiasing is computed, so the edges of a transparent texture will be correctly antialiased.
+---
+---
+---### NOTE:
+---- Alpha sampling is disabled by default.
+---- This feature can be used for a simple transparency effect, pixels with an alpha of zero will
+---  have their depth value discarded, allowing things behind them to show through (normally you
+---  have to sort objects or write a shader for this).
 ---
 ---@param enabled boolean # Whether or not alpha sampling is enabled.
 function lovr.graphics.setAlphaSampling(enabled) end
 
 ---
----Sets the background color used to clear the screen.  Color components are from 0.0 to 1.0.
+---Sets the background color used to clear the screen.
+---
+---Color components are from 0.0 to 1.0.
+---
+---
+---### NOTE:
+---The default background color is `(0.0, 0.0, 0.0, 1.0)`.
 ---
 ---@overload fun(hex: number, a: number)
 ---@overload fun(color: table)
@@ -557,7 +979,13 @@ function lovr.graphics.setAlphaSampling(enabled) end
 function lovr.graphics.setBackgroundColor(r, g, b, a) end
 
 ---
----Sets the blend mode.  The blend mode controls how each pixel's color is blended with the previous pixel's color when drawn.
+---Sets the blend mode.
+---
+---The blend mode controls how each pixel's color is blended with the previous pixel's color when drawn.
+---
+---
+---### NOTE:
+---The default blend mode is `alpha` and `alphamultiply`.
 ---
 ---@overload fun()
 ---@param blend lovr.BlendMode # The blend mode.
@@ -565,13 +993,25 @@ function lovr.graphics.setBackgroundColor(r, g, b, a) end
 function lovr.graphics.setBlendMode(blend, alphaBlend) end
 
 ---
----Sets or disables the active Canvas object.  If there is an active Canvas, things will be rendered to the Textures attached to that Canvas instead of to the headset.
+---Sets or disables the active Canvas object.
+---
+---If there is an active Canvas, things will be rendered to the Textures attached to that Canvas instead of to the headset.
 ---
 ---@param canvas? lovr.Canvas # The new active Canvas object, or `nil` to just render to the headset.
 function lovr.graphics.setCanvas(canvas) end
 
 ---
----Sets the color used for drawing objects.  Color components are from 0.0 to 1.0.  Every pixel drawn will be multiplied (i.e. tinted) by this color.  This is a global setting, so it will affect all subsequent drawing operations.
+---Sets the color used for drawing objects.
+---
+---Color components are from 0.0 to 1.0.
+---
+---Every pixel drawn will be multiplied (i.e. tinted) by this color.
+---
+---This is a global setting, so it will affect all subsequent drawing operations.
+---
+---
+---### NOTE:
+---The default color is `(1.0, 1.0, 1.0, 1.0)`.
 ---
 ---@overload fun(hex: number, a: number)
 ---@overload fun(color: table)
@@ -582,7 +1022,15 @@ function lovr.graphics.setCanvas(canvas) end
 function lovr.graphics.setColor(r, g, b, a) end
 
 ---
----Enables and disables individual color channels.  When a color channel is enabled, it will be affected by drawing commands and clear commands.
+---Enables and disables individual color channels.
+---
+---When a color channel is enabled, it will be affected by drawing commands and clear commands.
+---
+---
+---### NOTE:
+---By default, all color channels are enabled.
+---
+---Disabling all of the color channels can be useful if you only want to write to the depth buffer or the stencil buffer.
 ---
 ---@param r boolean # Whether the red color channel should be enabled.
 ---@param g boolean # Whether the green color channel should be enabled.
@@ -591,20 +1039,60 @@ function lovr.graphics.setColor(r, g, b, a) end
 function lovr.graphics.setColorMask(r, g, b, a) end
 
 ---
----Enables or disables culling.  Culling is an optimization that avoids rendering the back face of polygons.  This improves performance by reducing the number of polygons drawn, but requires that the vertices in triangles are specified in a consistent clockwise or counter clockwise order.
+---Enables or disables culling.
+---
+---Culling is an optimization that avoids rendering the back face of polygons.
+---
+---This improves performance by reducing the number of polygons drawn, but requires that the vertices in triangles are specified in a consistent clockwise or counter clockwise order.
+---
+---
+---### NOTE:
+---Culling is disabled by default.
 ---
 ---@param isEnabled boolean # Whether or not culling should be enabled.
 function lovr.graphics.setCullingEnabled(isEnabled) end
 
 ---
----Sets the default filter mode for new Textures.  This controls how textures are sampled when they are minified, magnified, or stretched.
+---Sets the default filter mode for new Textures.
+---
+---This controls how textures are sampled when they are minified, magnified, or stretched.
+---
+---
+---### NOTE:
+---The default filter is `trilinear`.
+---
+---The maximum supported anisotropy level can be queried using `lovr.graphics.getLimits`.
 ---
 ---@param mode lovr.FilterMode # The filter mode.
 ---@param anisotropy number # The level of anisotropy to use.
 function lovr.graphics.setDefaultFilter(mode, anisotropy) end
 
 ---
----Sets the current depth test.  The depth test controls how overlapping objects are rendered.
+---Sets the current depth test.
+---
+---The depth test controls how overlapping objects are rendered.
+---
+---
+---### NOTE:
+---The depth test is an advanced technique to control how 3D objects overlap each other when they are rendered.
+---
+---It works as follows:
+---
+---- Each pixel keeps track of its z value as well as its color.
+---- If `write` is enabled when something is drawn, then any pixels that are drawn will have their
+---  z values updated.
+---- Additionally, anything drawn will first compare the existing z value of a pixel with the new z
+---  value.
+---
+---The `compareMode` setting determines how this comparison is performed.
+---
+---If the
+---  comparison succeeds, the new pixel will overwrite the previous one, otherwise that pixel won't
+---  be rendered to.
+---
+---Smaller z values are closer to the camera.
+---
+---The default compare mode is `lequal`, which usually gives good results for normal 3D rendering.
 ---
 ---@param compareMode? lovr.CompareMode # The new depth test.  Use `nil` to disable the depth test.
 ---@param write? boolean # Whether pixels will have their z value updated when rendered to.
@@ -619,19 +1107,49 @@ function lovr.graphics.setFont(font) end
 ---
 ---Sets the width of lines rendered using `lovr.graphics.line`.
 ---
+---
+---### NOTE:
+---The default line width is `1`.
+---
+---GPU driver support for line widths is poor.
+---
+---The actual width of lines may be different from what is set here.
+---
+---In particular, some graphics drivers only support a line width of `1`.
+---
+---Currently this function only supports integer values from 1 to 255.
+---
 ---@param width? number # The new line width, in pixels.
 function lovr.graphics.setLineWidth(width) end
 
 ---
 ---Sets the width of drawn points, in pixels.
 ---
+---
+---### NOTE:
+---The default point size is `1.0`.
+---
 ---@param size? number # The new point size.
 function lovr.graphics.setPointSize(size) end
 
 ---
----Sets the projection for a single view.  4 field of view angles can be used, similar to the field of view returned by `lovr.headset.getViewAngles`.  Alternatively, a projection matrix can be used for other types of projections like orthographic, oblique, etc.
+---Sets the projection for a single view.
 ---
----Two views are supported, one for each eye.  When rendering to the headset, both projections are changed to match the ones used by the headset.
+---4 field of view angles can be used, similar to the field of view returned by `lovr.headset.getViewAngles`.
+---
+---Alternatively, a projection matrix can be used for other types of projections like orthographic, oblique, etc.
+---
+---Two views are supported, one for each eye.
+---
+---When rendering to the headset, both projections are changed to match the ones used by the headset.
+---
+---
+---### NOTE:
+---Non-stereo rendering will only use the first view.
+---
+---The projection matrices are available as the `mat4 lovrProjections[2]` variable in shaders.
+---
+---The current projection matrix is available as `lovrProjection`.
 ---
 ---@overload fun(view: number, matrix: lovr.Mat4)
 ---@param view number # The index of the view to update.
@@ -649,7 +1167,19 @@ function lovr.graphics.setProjection(view, left, right, up, down) end
 function lovr.graphics.setShader(shader) end
 
 ---
----Sets the stencil test.  The stencil test lets you mask out pixels that meet certain criteria, based on the contents of the stencil buffer.  The stencil buffer can be modified using `lovr.graphics.stencil`.  After rendering to the stencil buffer, the stencil test can be set to control how subsequent drawing functions are masked by the stencil buffer.
+---Sets the stencil test.
+---
+---The stencil test lets you mask out pixels that meet certain criteria, based on the contents of the stencil buffer.
+---
+---The stencil buffer can be modified using `lovr.graphics.stencil`.
+---
+---After rendering to the stencil buffer, the stencil test can be set to control how subsequent drawing functions are masked by the stencil buffer.
+---
+---
+---### NOTE:
+---Stencil values are between 0 and 255.
+---
+---By default, the stencil test is disabled.
 ---
 ---@overload fun()
 ---@param compareMode lovr.CompareMode # The comparison method used to decide if a pixel should be visible, or nil if the stencil test is disabled.
@@ -657,9 +1187,23 @@ function lovr.graphics.setShader(shader) end
 function lovr.graphics.setStencilTest(compareMode, compareValue) end
 
 ---
----Sets the pose for a single view.  Objects rendered in this view will appear as though the camera is positioned using the given pose.
+---Sets the pose for a single view.
 ---
----Two views are supported, one for each eye.  When rendering to the headset, both views are changed to match the estimated eye positions.  These view poses are also available using `lovr.headset.getViewPose`.
+---Objects rendered in this view will appear as though the camera is positioned using the given pose.
+---
+---Two views are supported, one for each eye.
+---
+---When rendering to the headset, both views are changed to match the estimated eye positions.
+---
+---These view poses are also available using `lovr.headset.getViewPose`.
+---
+---
+---### NOTE:
+---Non-stereo rendering will only use the first view.
+---
+---The inverted view poses (view matrices) are available as the `mat4 lovrViews[2]` variable in shaders.
+---
+---The current view matrix is available as `lovrView`.
 ---
 ---@overload fun(view: number, matrix: lovr.Mat4, inverted: boolean)
 ---@param view number # The index of the view to update.
@@ -673,19 +1217,41 @@ function lovr.graphics.setStencilTest(compareMode, compareValue) end
 function lovr.graphics.setViewPose(view, x, y, z, angle, ax, ay, az) end
 
 ---
----Sets the polygon winding.  The winding direction determines which face of a triangle is the front face and which is the back face.  This lets the graphics engine cull the back faces of polygons, improving performance.  The default is counterclockwise.
+---Sets the polygon winding.
+---
+---The winding direction determines which face of a triangle is the front face and which is the back face.
+---
+---This lets the graphics engine cull the back faces of polygons, improving performance.
+---
+---The default is counterclockwise.
+---
+---
+---### NOTE:
+---Culling is initially disabled and must be enabled using `lovr.graphics.setCullingEnabled`.
+---
+---The default winding direction is counterclockwise.
 ---
 ---@param winding lovr.Winding # The new winding direction.
 function lovr.graphics.setWinding(winding) end
 
 ---
----Enables or disables wireframe rendering.  This is meant to be used as a debugging tool.
+---Enables or disables wireframe rendering.
+---
+---This is meant to be used as a debugging tool.
+---
+---
+---### NOTE:
+---Wireframe rendering is initially disabled.
+---
+---Wireframe rendering is only supported on desktop systems.
 ---
 ---@param wireframe boolean # Whether or not wireframe rendering should be enabled.
 function lovr.graphics.setWireframe(wireframe) end
 
 ---
----Render a skybox from a texture.  Two common kinds of skybox textures are supported: A 2D equirectangular texture with a spherical coordinates can be used, or a "cubemap" texture created from 6 images.
+---Render a skybox from a texture.
+---
+---Two common kinds of skybox textures are supported: A 2D equirectangular texture with a spherical coordinates can be used, or a "cubemap" texture created from 6 images.
 ---
 ---@param texture lovr.Texture # The texture to use.
 function lovr.graphics.skybox(texture) end
@@ -707,6 +1273,10 @@ function lovr.graphics.sphere(x, y, z, radius, angle, ax, ay, az) end
 ---
 ---Renders to the stencil buffer using a function.
 ---
+---
+---### NOTE:
+---Stencil values are between 0 and 255.
+---
 ---@overload fun(callback: function, action: lovr.StencilAction, value: number, initial: number)
 ---@param callback function # The function that will be called to render to the stencil buffer.
 ---@param action? lovr.StencilAction # How to modify the stencil value of pixels that are rendered to.
@@ -717,18 +1287,46 @@ function lovr.graphics.stencil(callback, action, value, keep) end
 ---
 ---Starts a named timer on the GPU, which can be stopped using `lovr.graphics.tock`.
 ---
+---
+---### NOTE:
+---The timer can be stopped by calling `lovr.graphics.tock` using the same name.
+---
+---All drawing commands between the tick and the tock will be timed.
+---
+---It is not possible to nest calls to tick and tock.
+---
+---GPU timers are not supported on all systems.
+---
+---Check the `timers` feature using `lovr.graphics.getFeatures` to see if it is supported on the current system.
+---
 ---@param label string # The name of the timer.
 function lovr.graphics.tick(label) end
 
 ---
 ---Stops a named timer on the GPU, previously started with `lovr.graphics.tick`.
 ---
+---
+---### NOTE:
+---All drawing commands between tick and tock will be timed.
+---
+---It is not possible to nest calls to tick and tock.
+---
+---The results are delayed, and might be `nil` for the first few frames.
+---
+---This function returns the most recent available timer value.
+---
+---GPU timers are not supported on all systems.
+---
+---Check the `timers` feature using `lovr.graphics.getFeatures` to see if it is supported on the current system.
+---
 ---@param label string # The name of the timer.
 ---@return number time # The number of seconds elapsed, or `nil` if the data isn't ready yet.
 function lovr.graphics.tock(label) end
 
 ---
----Apply a transform to the coordinate system, changing its translation, rotation, and scale using a single function.  A `mat4` can also be used.
+---Apply a transform to the coordinate system, changing its translation, rotation, and scale using a single function.
+---
+---A `mat4` can also be used.
 ---
 ---The transformation will last until `lovr.draw` returns or the transformation is popped off the transformation stack.
 ---
@@ -746,9 +1344,15 @@ function lovr.graphics.tock(label) end
 function lovr.graphics.transform(x, y, z, sx, sy, sz, angle, ax, ay, az) end
 
 ---
----Translates the coordinate system in three dimensions.  All graphics operations that use coordinates will behave as if they are offset by the translation value.
+---Translates the coordinate system in three dimensions.
+---
+---All graphics operations that use coordinates will behave as if they are offset by the translation value.
 ---
 ---The translation will last until `lovr.draw` returns or the transformation is popped off the transformation stack.
+---
+---
+---### NOTE:
+---Order matters when scaling, translating, and rotating the coordinate system.
 ---
 ---@param x? number # The amount to translate on the x axis.
 ---@param y? number # The amount to translate on the y axis.
@@ -756,21 +1360,39 @@ function lovr.graphics.transform(x, y, z, sx, sy, sz, angle, ax, ay, az) end
 function lovr.graphics.translate(x, y, z) end
 
 ---
----A Canvas is also known as a framebuffer or render-to-texture.  It allows you to render to a texture instead of directly to the screen.  This lets you postprocess or transform the results later before finally rendering them to the screen.
+---A Canvas is also known as a framebuffer or render-to-texture.
+---
+---It allows you to render to a texture instead of directly to the screen.
+---
+---This lets you postprocess or transform the results later before finally rendering them to the screen.
 ---
 ---After creating a Canvas, you can attach Textures to it using `Canvas:setTexture`.
+---
+---
+---### NOTE:
+---Up to four textures can be attached to a Canvas and anything rendered to the Canvas will be broadcast to all attached Textures.
+---
+---If you want to do render different things to different textures, use the `multicanvas` shader flag when creating your shader and implement the `void colors` function instead of the usual `vec4 color` function.
+---
+---You can then assign different output colors to `lovrCanvas[0]`, `lovrCanvas[1]`, etc. instead of returning a single color. Each color written to the array will end up in the corresponding texture attached to the Canvas.
 ---
 ---@class lovr.Canvas
 local Canvas = {}
 
 ---
----Returns the depth buffer used by the Canvas as a Texture.  If the Canvas was not created with a readable depth buffer (the `depth.readable` flag in `lovr.graphics.newCanvas`), then this function will return `nil`.
+---Returns the depth buffer used by the Canvas as a Texture.
+---
+---If the Canvas was not created with a readable depth buffer (the `depth.readable` flag in `lovr.graphics.newCanvas`), then this function will return `nil`.
 ---
 ---@return lovr.Texture texture # The depth Texture of the Canvas.
 function Canvas:getDepthTexture() end
 
 ---
 ---Returns the dimensions of the Canvas, its Textures, and its depth buffer.
+---
+---
+---### NOTE:
+---The dimensions of a Canvas can not be changed after it is created.
 ---
 ---@return number width # The width of the Canvas, in pixels.
 ---@return number height # The height of the Canvas, in pixels.
@@ -779,11 +1401,21 @@ function Canvas:getDimensions() end
 ---
 ---Returns the height of the Canvas, its Textures, and its depth buffer.
 ---
+---
+---### NOTE:
+---The height of a Canvas can not be changed after it is created.
+---
 ---@return number height # The height of the Canvas, in pixels.
 function Canvas:getHeight() end
 
 ---
----Returns the number of multisample antialiasing samples to use when rendering to the Canvas. Increasing this number will make the contents of the Canvas appear more smooth at the cost of performance.  It is common to use powers of 2 for this value.
+---Returns the number of multisample antialiasing samples to use when rendering to the Canvas. Increasing this number will make the contents of the Canvas appear more smooth at the cost of performance.
+---
+---It is common to use powers of 2 for this value.
+---
+---
+---### NOTE:
+---All textures attached to the Canvas must be created with this MSAA value.
 ---
 ---@return number samples # The number of MSAA samples.
 function Canvas:getMSAA() end
@@ -791,16 +1423,26 @@ function Canvas:getMSAA() end
 ---
 ---Returns the set of Textures currently attached to the Canvas.
 ---
+---
+---### NOTE:
+---Up to 4 Textures can be attached at once.
+---
 function Canvas:getTexture() end
 
 ---
 ---Returns the width of the Canvas, its Textures, and its depth buffer.
 ---
+---
+---### NOTE:
+---The width of a Canvas can not be changed after it is created.
+---
 ---@return number width # The width of the Canvas, in pixels.
 function Canvas:getWidth() end
 
 ---
----Returns whether the Canvas was created with the `stereo` flag.  Drawing something to a stereo Canvas will draw it to two viewports in the left and right half of the Canvas, using transform information from two different eyes.
+---Returns whether the Canvas was created with the `stereo` flag.
+---
+---Drawing something to a stereo Canvas will draw it to two viewports in the left and right half of the Canvas, using transform information from two different eyes.
 ---
 ---@return boolean stereo # Whether the Canvas is stereo.
 function Canvas:isStereo() end
@@ -813,54 +1455,103 @@ function Canvas:isStereo() end
 function Canvas:newImage(index) end
 
 ---
----Renders to the Canvas using a function.  All graphics functions inside the callback will affect the Canvas contents instead of directly rendering to the headset.  This can be used in `lovr.update`.
+---Renders to the Canvas using a function.
+---
+---All graphics functions inside the callback will affect the Canvas contents instead of directly rendering to the headset.
+---
+---This can be used in `lovr.update`.
+---
+---
+---### NOTE:
+---Make sure you clear the contents of the canvas before rendering by using `lovr.graphics.clear`. Otherwise there might be data in the canvas left over from a previous frame.
+---
+---Also note that the transform stack is not modified by this function.
+---
+---If you plan on modifying the transform stack inside your callback it may be a good idea to use `lovr.graphics.push` and `lovr.graphics.pop` so you can revert to the previous transform afterwards.
 ---
 ---@param callback function # The function to use to render to the Canvas.
 function Canvas:renderTo(callback) end
 
 ---
----Attaches one or more Textures to the Canvas.  When rendering to the Canvas, everything will be drawn to all attached Textures.  You can attach different layers of an array, cubemap, or volume texture, and also attach different mipmap levels of Textures.
+---Attaches one or more Textures to the Canvas.
+---
+---When rendering to the Canvas, everything will be drawn to all attached Textures.
+---
+---You can attach different layers of an array, cubemap, or volume texture, and also attach different mipmap levels of Textures.
+---
+---
+---### NOTE:
+---There are some restrictions on how textures can be attached:
+---
+---- Up to 4 textures can be attached at once.
+---- Textures must have the same dimensions and multisample settings as the Canvas.
+---
+---To specify layers and mipmaps to attach, specify them after the Texture.
+---
+---You can also optionally wrap them in a table.
 ---
 function Canvas:setTexture() end
 
 ---
----A Font is an object created from a TTF file.  It can be used to render text with `lovr.graphics.print`.
+---A Font is an object created from a TTF file.
+---
+---It can be used to render text with `lovr.graphics.print`.
 ---
 ---@class lovr.Font
 local Font = {}
 
 ---
----Returns the maximum distance that any glyph will extend above the Font's baseline.  Units are generally in meters, see `Font:getPixelDensity`.
+---Returns the maximum distance that any glyph will extend above the Font's baseline.
+---
+---Units are generally in meters, see `Font:getPixelDensity`.
 ---
 ---@return number ascent # The ascent of the Font.
 function Font:getAscent() end
 
 ---
----Returns the baseline of the Font.  This is where the characters "rest on", relative to the y coordinate of the drawn text.  Units are generally in meters, see `Font:setPixelDensity`.
+---Returns the baseline of the Font.
+---
+---This is where the characters "rest on", relative to the y coordinate of the drawn text.
+---
+---Units are generally in meters, see `Font:setPixelDensity`.
 ---
 ---@return number baseline # The baseline of the Font.
 function Font:getBaseline() end
 
 ---
----Returns the maximum distance that any glyph will extend below the Font's baseline.  Units are generally in meters, see `Font:getPixelDensity` for more information.  Note that due to the coordinate system for fonts, this is a negative value.
+---Returns the maximum distance that any glyph will extend below the Font's baseline.
+---
+---Units are generally in meters, see `Font:getPixelDensity` for more information.
+---
+---Note that due to the coordinate system for fonts, this is a negative value.
 ---
 ---@return number descent # The descent of the Font.
 function Font:getDescent() end
 
 ---
----Returns the height of a line of text.  Units are in meters, see `Font:setPixelDensity`.
+---Returns the height of a line of text.
+---
+---Units are in meters, see `Font:setPixelDensity`.
 ---
 ---@return number height # The height of a rendered line of text.
 function Font:getHeight() end
 
 ---
----Returns the current line height multiplier of the Font.  The default is 1.0.
+---Returns the current line height multiplier of the Font.
+---
+---The default is 1.0.
 ---
 ---@return number lineHeight # The line height.
 function Font:getLineHeight() end
 
 ---
----Returns the current pixel density for the Font.  The default is 1.0.  Normally, this is in pixels per meter.  When rendering to a 2D texture, the units are pixels.
+---Returns the current pixel density for the Font.
+---
+---The default is 1.0.
+---
+---Normally, this is in pixels per meter.
+---
+---When rendering to a 2D texture, the units are pixels.
 ---
 ---@return number pixelDensity # The current pixel density.
 function Font:getPixelDensity() end
@@ -874,6 +1565,11 @@ function Font:getRasterizer() end
 ---
 ---Returns the width and line count of a string when rendered using the font, taking into account an optional wrap limit.
 ---
+---
+---### NOTE:
+---To get the correct units returned, make sure the pixel density is set with
+---    `Font:setPixelDensity`.
+---
 ---@param text string # The text to get the width of.
 ---@param wrap? number # The width at which to wrap lines, or 0 for no wrap.
 ---@return number width # The maximum width of any line in the text.
@@ -881,32 +1577,52 @@ function Font:getRasterizer() end
 function Font:getWidth(text, wrap) end
 
 ---
----Returns whether the Font has a set of glyphs.  Any combination of strings and numbers (corresponding to character codes) can be specified.  This function will return true if the Font is able to render *all* of the glyphs.
+---Returns whether the Font has a set of glyphs.
+---
+---Any combination of strings and numbers (corresponding to character codes) can be specified.
+---
+---This function will return true if the Font is able to render *all* of the glyphs.
+---
+---
+---### NOTE:
+---It is a good idea to use this function when you're rendering an unknown or user-supplied string to avoid utterly embarrassing crashes.
 ---
 ---@return boolean has # Whether the Font has the glyphs.
 function Font:hasGlyphs() end
 
 ---
----Sets the line height of the Font, which controls how far lines apart lines are vertically separated.  This value is a ratio and the default is 1.0.
+---Sets the line height of the Font, which controls how far lines apart lines are vertically separated.
+---
+---This value is a ratio and the default is 1.0.
 ---
 ---@param lineHeight number # The new line height.
 function Font:setLineHeight(lineHeight) end
 
 ---
----Sets the pixel density for the Font.  Normally, this is in pixels per meter.  When rendering to a 2D texture, the units are pixels.
+---Sets the pixel density for the Font.
+---
+---Normally, this is in pixels per meter.
+---
+---When rendering to a 2D texture, the units are pixels.
 ---
 ---@overload fun(self: lovr.Font)
 ---@param pixelDensity number # The new pixel density.
 function Font:setPixelDensity(pixelDensity) end
 
 ---
----A Material is an object used to control how objects appear, through coloring, texturing, and shading.  The Material itself holds sets of colors, textures, and other parameters that are made available to Shaders.
+---A Material is an object used to control how objects appear, through coloring, texturing, and shading.
+---
+---The Material itself holds sets of colors, textures, and other parameters that are made available to Shaders.
 ---
 ---@class lovr.Material
 local Material = {}
 
 ---
----Returns a color property for a Material.  Different types of colors are supported for different lighting parameters.  Colors default to `(1.0, 1.0, 1.0, 1.0)` and are gamma corrected.
+---Returns a color property for a Material.
+---
+---Different types of colors are supported for different lighting parameters.
+---
+---Colors default to `(1.0, 1.0, 1.0, 1.0)` and are gamma corrected.
 ---
 ---@param colorType? lovr.MaterialColor # The type of color to get.
 ---@return number r # The red component of the color.
@@ -916,14 +1632,20 @@ local Material = {}
 function Material:getColor(colorType) end
 
 ---
----Returns a numeric property of a Material.  Scalar properties default to 1.0.
+---Returns a numeric property of a Material.
+---
+---Scalar properties default to 1.0.
 ---
 ---@param scalarType lovr.MaterialScalar # The type of property to get.
 ---@return number x # The value of the property.
 function Material:getScalar(scalarType) end
 
 ---
----Returns a texture for a Material.  Several predefined `MaterialTexture`s are supported.  Any texture that is `nil` will use a single white pixel as a fallback.
+---Returns a texture for a Material.
+---
+---Several predefined `MaterialTexture`s are supported.
+---
+---Any texture that is `nil` will use a single white pixel as a fallback.
 ---
 ---@param textureType? lovr.MaterialTexture # The type of texture to get.
 ---@return lovr.Texture texture # The texture that is set, or `nil` if no texture is set.
@@ -931,6 +1653,10 @@ function Material:getTexture(textureType) end
 
 ---
 ---Returns the transformation applied to texture coordinates of the Material.
+---
+---
+---### NOTE:
+---Although texture coordinates will automatically be transformed by the Material's transform, the material transform is exposed as the `mat3 lovrMaterialTransform` uniform variable in shaders, allowing it to be used for other purposes.
 ---
 ---@return number ox # The texture coordinate x offset.
 ---@return number oy # The texture coordinate y offset.
@@ -940,7 +1666,11 @@ function Material:getTexture(textureType) end
 function Material:getTransform() end
 
 ---
----Sets a color property for a Material.  Different types of colors are supported for different lighting parameters.  Colors default to `(1.0, 1.0, 1.0, 1.0)` and are gamma corrected.
+---Sets a color property for a Material.
+---
+---Different types of colors are supported for different lighting parameters.
+---
+---Colors default to `(1.0, 1.0, 1.0, 1.0)` and are gamma corrected.
 ---
 ---@overload fun(self: lovr.Material, r: number, g: number, b: number, a: number)
 ---@overload fun(self: lovr.Material, colorType: lovr.MaterialColor, hex: number, a: number)
@@ -953,14 +1683,20 @@ function Material:getTransform() end
 function Material:setColor(colorType, r, g, b, a) end
 
 ---
----Sets a numeric property of a Material.  Scalar properties default to 1.0.
+---Sets a numeric property of a Material.
+---
+---Scalar properties default to 1.0.
 ---
 ---@param scalarType lovr.MaterialScalar # The type of property to set.
 ---@param x number # The value of the property.
 function Material:setScalar(scalarType, x) end
 
 ---
----Sets a texture for a Material.  Several predefined `MaterialTexture`s are supported.  Any texture that is `nil` will use a single white pixel as a fallback.
+---Sets a texture for a Material.
+---
+---Several predefined `MaterialTexture`s are supported.
+---
+---Any texture that is `nil` will use a single white pixel as a fallback.
 ---
 ---@overload fun(self: lovr.Material, texture: lovr.Texture)
 ---@param textureType? lovr.MaterialTexture # The type of texture to set.
@@ -968,7 +1704,13 @@ function Material:setScalar(scalarType, x) end
 function Material:setTexture(textureType, texture) end
 
 ---
----Sets the transformation applied to texture coordinates of the Material.  This lets you offset, scale, or rotate textures as they are applied to geometry.
+---Sets the transformation applied to texture coordinates of the Material.
+---
+---This lets you offset, scale, or rotate textures as they are applied to geometry.
+---
+---
+---### NOTE:
+---Although texture coordinates will automatically be transformed by the Material's transform, the material transform is exposed as the `mat3 lovrMaterialTransform` uniform variable in shaders, allowing it to be used for other purposes.
 ---
 ---@param ox number # The texture coordinate x offset.
 ---@param oy number # The texture coordinate y offset.
@@ -980,17 +1722,85 @@ function Material:setTransform(ox, oy, sx, sy, angle) end
 ---
 ---A Mesh is a low-level graphics object that stores and renders a list of vertices.
 ---
----Meshes are really flexible since you can pack pretty much whatever you want in them.  This makes them great for rendering arbitrary geometry, but it also makes them kinda difficult to use since you have to place each vertex yourself.
+---Meshes are really flexible since you can pack pretty much whatever you want in them.
 ---
----It's possible to batch geometry with Meshes too.  Instead of drawing a shape 100 times, it's much faster to pack 100 copies of the shape into a Mesh and draw the Mesh once.  Even storing just one copy in the Mesh and drawing that 100 times is usually faster.
+---This makes them great for rendering arbitrary geometry, but it also makes them kinda difficult to use since you have to place each vertex yourself.
+---
+---It's possible to batch geometry with Meshes too.
+---
+---Instead of drawing a shape 100 times, it's much faster to pack 100 copies of the shape into a Mesh and draw the Mesh once.
+---
+---Even storing just one copy in the Mesh and drawing that 100 times is usually faster.
 ---
 ---Meshes are also a good choice if you have an object that changes its shape over time.
+---
+---
+---### NOTE:
+---Each vertex in a Mesh can hold several pieces of data.
+---
+---For example, you might want a vertex to keep track of its position, color, and a weight.
+---
+---Each one of these pieces of information is called a vertex **attribute**.
+---
+---A vertex attribute must have a name, a type, and a size.
+---
+---Here's what the "position" attribute would look like as a Lua table:
+---
+---    { 'vPosition', 'float', 3 } -- 3 floats, one for x, y, and z
+---
+---Every vertex in a Mesh must have the same set of attributes.
+---
+---We call this set of attributes the **format** of the Mesh, and it's specified as a simple table of attributes.
+---
+---For example, we could represent the format described above as:
+---
+---    {
+---      { 'vPosition', 'float', 3 },
+---      { 'vColor',    'byte',  4 },
+---      { 'vWeight',   'int',   1 }
+---    }
+---
+---When creating a Mesh, you can give it any format you want, or use the default.
+---
+---The default Mesh format looks like this:
+---
+---    {
+---      { 'lovrPosition',    'float', 3 },
+---      { 'lovrNormal',      'float', 3 },
+---      { 'lovrTexCoord',    'float', 2 }
+---    }
+---
+---Great, so why do we go through the trouble of naming everything in our vertex and saying what type and size it is?  The cool part is that we can access this data in a Shader.
+---
+---We can write a vertex Shader that has `in` variables for every vertex attribute in our Mesh:
+---
+---    in vec3 vPosition;
+---    in vec4 vColor;
+---    in int vWeight;
+---
+---    vec4 position(mat4 projection, mat4 transform, vec4 vertex) {
+---      // Here we can access the vPosition, vColor, and vWeight of each vertex in the Mesh!
+---    }
+---
+---Specifying custom vertex data is really powerful and is often used for lighting, animation, and more!
+---
+---For more on the different data types available for the attributes, see `AttributeType`.
 ---
 ---@class lovr.Mesh
 local Mesh = {}
 
 ---
----Attaches attributes from another Mesh onto this one.  This can be used to share vertex data across multiple meshes without duplicating the data, and can also be used for instanced rendering by using the `divisor` parameter.
+---Attaches attributes from another Mesh onto this one.
+---
+---This can be used to share vertex data across multiple meshes without duplicating the data, and can also be used for instanced rendering by using the `divisor` parameter.
+---
+---
+---### NOTE:
+---The attribute divisor is a  number used to control how the attribute data relates to instancing. If 0, then the attribute data is considered "per vertex", and each vertex will get the next element of the attribute's data.
+---
+---If the divisor 1 or more, then the attribute data is considered "per instance", and every N instances will get the next element of the attribute data.
+---
+---To prevent cycles, it is not possible to attach attributes onto a Mesh that already has attributes attached to a different Mesh.
 ---
 ---@overload fun(self: lovr.Mesh, mesh: lovr.Mesh, divisor: number, ...)
 ---@overload fun(self: lovr.Mesh, mesh: lovr.Mesh, divisor: number, attributes: table)
@@ -1028,7 +1838,9 @@ function Mesh:draw(x, y, z, scale, angle, ax, ay, az, instances) end
 function Mesh:getDrawMode() end
 
 ---
----Retrieve the current draw range for the Mesh.  The draw range is a subset of the vertices of the Mesh that will be drawn.
+---Retrieve the current draw range for the Mesh.
+---
+---The draw range is a subset of the vertices of the Mesh that will be drawn.
 ---
 ---@return number start # The index of the first vertex that will be drawn, or nil if no draw range is set.
 ---@return number count # The number of vertices that will be drawn, or nil if no draw range is set.
@@ -1041,13 +1853,21 @@ function Mesh:getDrawRange() end
 function Mesh:getMaterial() end
 
 ---
----Gets the data for a single vertex in the Mesh.  The set of data returned depends on the Mesh's vertex format.  The default vertex format consists of 8 floating point numbers: the vertex position, the vertex normal, and the texture coordinates.
+---Gets the data for a single vertex in the Mesh.
+---
+---The set of data returned depends on the Mesh's vertex format.
+---
+---The default vertex format consists of 8 floating point numbers: the vertex position, the vertex normal, and the texture coordinates.
 ---
 ---@param index number # The index of the vertex to retrieve.
 function Mesh:getVertex(index) end
 
 ---
 ---Returns the components of a specific attribute of a single vertex in the Mesh.
+---
+---
+---### NOTE:
+---Meshes without a custom format have the vertex position as their first attribute, the normal vector as the second attribute, and the texture coordinate as the third attribute.
 ---
 ---@param index number # The index of the vertex to retrieve the attribute of.
 ---@param attribute number # The index of the attribute to retrieve the components of.
@@ -1056,17 +1876,27 @@ function Mesh:getVertexAttribute(index, attribute) end
 ---
 ---Returns the maximum number of vertices the Mesh can hold.
 ---
+---
+---### NOTE:
+---The size can only be set when creating the Mesh, and cannot be changed afterwards.
+---
+---A subset of the Mesh's vertices can be rendered, see `Mesh:setDrawRange`.
+---
 ---@return number size # The number of vertices the Mesh can hold.
 function Mesh:getVertexCount() end
 
 ---
----Get the format table of the Mesh's vertices.  The format table describes the set of data that each vertex contains.
+---Get the format table of the Mesh's vertices.
+---
+---The format table describes the set of data that each vertex contains.
 ---
 ---@return table format # The table of vertex attributes.  Each attribute is a table containing the name of the attribute, the `AttributeType`, and the number of components.
 function Mesh:getVertexFormat() end
 
 ---
----Returns the current vertex map for the Mesh.  The vertex map is a list of indices in the Mesh, allowing the reordering or reuse of vertices.
+---Returns the current vertex map for the Mesh.
+---
+---The vertex map is a list of indices in the Mesh, allowing the reordering or reuse of vertices.
 ---
 ---@overload fun(self: lovr.Mesh, t: table):table
 ---@overload fun(self: lovr.Mesh, blob: lovr.Blob)
@@ -1074,14 +1904,18 @@ function Mesh:getVertexFormat() end
 function Mesh:getVertexMap() end
 
 ---
----Returns whether or not a vertex attribute is enabled.  Disabled attributes won't be sent to shaders.
+---Returns whether or not a vertex attribute is enabled.
+---
+---Disabled attributes won't be sent to shaders.
 ---
 ---@param attribute string # The name of the attribute.
 ---@return boolean enabled # Whether or not the attribute is enabled when drawing the Mesh.
 function Mesh:isAttributeEnabled(attribute) end
 
 ---
----Sets whether a vertex attribute is enabled.  Disabled attributes won't be sent to shaders.
+---Sets whether a vertex attribute is enabled.
+---
+---Disabled attributes won't be sent to shaders.
 ---
 ---@param attribute string # The name of the attribute.
 ---@param enabled boolean # Whether or not the attribute is enabled when drawing the Mesh.
@@ -1094,7 +1928,9 @@ function Mesh:setAttributeEnabled(attribute, enabled) end
 function Mesh:setDrawMode(mode) end
 
 ---
----Set the draw range for the Mesh.  The draw range is a subset of the vertices of the Mesh that will be drawn.
+---Set the draw range for the Mesh.
+---
+---The draw range is a subset of the vertices of the Mesh that will be drawn.
 ---
 ---@overload fun(self: lovr.Mesh)
 ---@param start number # The first vertex that will be drawn.
@@ -1102,7 +1938,9 @@ function Mesh:setDrawMode(mode) end
 function Mesh:setDrawRange(start, count) end
 
 ---
----Applies a Material to the Mesh.  This will cause it to use the Material's properties whenever it is rendered.
+---Applies a Material to the Mesh.
+---
+---This will cause it to use the Material's properties whenever it is rendered.
 ---
 ---@param material lovr.Material # The Material to apply.
 function Mesh:setMaterial(material) end
@@ -1110,18 +1948,28 @@ function Mesh:setMaterial(material) end
 ---
 ---Update a single vertex in the Mesh.
 ---
+---
+---### NOTE:
+---Any unspecified components will be set to 0.
+---
 ---@param index number # The index of the vertex to set.
 function Mesh:setVertex(index) end
 
 ---
 ---Set the components of a specific attribute of a vertex in the Mesh.
 ---
+---
+---### NOTE:
+---Meshes without a custom format have the vertex position as their first attribute, the normal vector as the second attribute, and the texture coordinate as the third attribute.
+---
 ---@param index number # The index of the vertex to update.
 ---@param attribute number # The index of the attribute to update.
 function Mesh:setVertexAttribute(index, attribute) end
 
 ---
----Sets the vertex map.  The vertex map is a list of indices in the Mesh, allowing the reordering or reuse of vertices.
+---Sets the vertex map.
+---
+---The vertex map is a list of indices in the Mesh, allowing the reordering or reuse of vertices.
 ---
 ---Often, a vertex map is used to improve performance, since it usually requires less data to specify the index of a vertex than it does to specify all of the data for a vertex.
 ---
@@ -1132,6 +1980,10 @@ function Mesh:setVertexMap(map) end
 ---
 ---Updates multiple vertices in the Mesh.
 ---
+---
+---### NOTE:
+---The start index plus the number of vertices in the table should not exceed the maximum size of the Mesh.
+---
 ---@overload fun(self: lovr.Mesh, blob: lovr.Blob, start: number, count: number)
 ---@param vertices table # The new set of vertices.
 ---@param start? number # The index of the vertex to start replacing at.
@@ -1139,7 +1991,9 @@ function Mesh:setVertexMap(map) end
 function Mesh:setVertices(vertices, start, count) end
 
 ---
----A Model is a drawable object loaded from a 3D file format.  The supported 3D file formats are OBJ, glTF, and STL.
+---A Model is a drawable object loaded from a 3D file format.
+---
+---The supported 3D file formats are OBJ, glTF, and STL.
 ---
 ---@class lovr.Model
 local Model = {}
@@ -1147,7 +2001,17 @@ local Model = {}
 ---
 ---Applies an animation to the current pose of the Model.
 ---
----The animation is evaluated at the specified timestamp, and mixed with the current pose of the Model using the alpha value.  An alpha value of 1.0 will completely override the pose of the Model with the animation's pose.
+---The animation is evaluated at the specified timestamp, and mixed with the current pose of the Model using the alpha value.
+---
+---An alpha value of 1.0 will completely override the pose of the Model with the animation's pose.
+---
+---
+---### NOTE:
+---For animations to properly show up, use a Shader created with the `animated` flag set to `true`. See `lovr.graphics.newShader` for more.
+---
+---Animations are always mixed in with the current pose, and the pose only ever changes by calling `Model:animate` and `Model:pose`.
+---
+---To clear the pose of a Model to the default, use `Model:pose(nil)`.
 ---
 ---@overload fun(self: lovr.Model, index: number, time: number, alpha: number)
 ---@param name string # The name of an animation.
@@ -1241,6 +2105,12 @@ function Model:getNodeName(index) end
 ---
 ---Returns the pose of a single node in the Model in a given `CoordinateSpace`.
 ---
+---
+---### NOTE:
+---For skinned nodes to render correctly, use a Shader created with the `animated` flag set to `true`.
+---
+---See `lovr.graphics.newShader` for more.
+---
 ---@overload fun(self: lovr.Model, index: number, space: lovr.CoordinateSpace):number, number, number, number, number, number, number
 ---@param name string # The name of the node.
 ---@param space? lovr.CoordinateSpace # Whether the pose should be returned relative to the node's parent or relative to the root node of the Model.
@@ -1256,7 +2126,9 @@ function Model:getNodePose(name, space) end
 ---
 ---Returns 2 tables containing mesh data for the Model.
 ---
----The first table is a list of vertex positions and contains 3 numbers for the x, y, and z coordinate of each vertex.  The second table is a list of triangles and contains 1-based indices into the first table representing the first, second, and third vertices that make up each triangle.
+---The first table is a list of vertex positions and contains 3 numbers for the x, y, and z coordinate of each vertex.
+---
+---The second table is a list of triangles and contains 1-based indices into the first table representing the first, second, and third vertices that make up each triangle.
 ---
 ---The vertex positions will be affected by node transforms.
 ---
@@ -1265,15 +2137,33 @@ function Model:getNodePose(name, space) end
 function Model:getTriangles() end
 
 ---
----Returns whether the Model has any nodes associated with animated joints.  This can be used to approximately determine whether an animated shader needs to be used with an arbitrary Model.
+---Returns whether the Model has any nodes associated with animated joints.
+---
+---This can be used to approximately determine whether an animated shader needs to be used with an arbitrary Model.
+---
+---
+---### NOTE:
+---A model can still be animated even if this function returns false, since node transforms can still be animated with keyframes without skinning.
+---
+---These types of animations don't need to use a Shader with the `animated = true` flag, though.
 ---
 ---@return boolean skeletal # Whether the Model has any nodes that use skeletal animation.
 function Model:hasJoints() end
 
 ---
----Applies a pose to a single node of the Model.  The input pose is assumed to be relative to the pose of the node's parent.  This is useful for applying inverse kinematics (IK) to a chain of bones in a skeleton.
+---Applies a pose to a single node of the Model.
+---
+---The input pose is assumed to be relative to the pose of the node's parent.
+---
+---This is useful for applying inverse kinematics (IK) to a chain of bones in a skeleton.
 ---
 ---The alpha parameter can be used to mix between the node's current pose and the input pose.
+---
+---
+---### NOTE:
+---For skinned nodes to render correctly, use a Shader created with the `animated` flag set to `true`.
+---
+---See `lovr.graphics.newShader` for more.
 ---
 ---@overload fun(self: lovr.Model, index: number, x: number, y: number, z: number, angle: number, ax: number, ay: number, az: number, alpha: number)
 ---@overload fun(self: lovr.Model)
@@ -1289,7 +2179,100 @@ function Model:hasJoints() end
 function Model:pose(name, x, y, z, angle, ax, ay, az, alpha) end
 
 ---
----Shaders are GLSL programs that transform the way vertices and pixels show up on the screen. They can be used for lighting, postprocessing, particles, animation, and much more.  You can use `lovr.graphics.setShader` to change the active Shader.
+---Shaders are GLSL programs that transform the way vertices and pixels show up on the screen. They can be used for lighting, postprocessing, particles, animation, and much more.
+---
+---You can use `lovr.graphics.setShader` to change the active Shader.
+---
+---
+---### NOTE:
+---GLSL version `330` is used on desktop systems, and `300 es` on WebGL/Android.
+---
+---The default vertex shader:
+---
+---    vec4 position(mat4 projection, mat4 transform, vec4 vertex) {
+---      return projection * transform * vertex;
+---    }
+---
+---The default fragment shader:
+---
+---    vec4 color(vec4 graphicsColor, sampler2D image, vec2 uv) {
+---      return graphicsColor * lovrDiffuseColor * lovrVertexColor * texture(image, uv);
+---    }
+---
+---Additionally, the following headers are prepended to the shader source, giving you convenient access to a default set of uniform variables and vertex attributes.
+---
+---Vertex shader header:
+---
+---    in vec3 lovrPosition; // The vertex position
+---    in vec3 lovrNormal; // The vertex normal vector
+---    in vec2 lovrTexCoord;
+---    in vec4 lovrVertexColor;
+---    in vec3 lovrTangent;
+---    in uvec4 lovrBones;
+---    in vec4 lovrBoneWeights;
+---    in uint lovrDrawID;
+---    out vec4 lovrGraphicsColor;
+---    uniform mat4 lovrModel;
+---    uniform mat4 lovrView;
+---    uniform mat4 lovrProjection;
+---    uniform mat4 lovrTransform; // Model-View matrix
+---    uniform mat3 lovrNormalMatrix; // Inverse-transpose of lovrModel
+---    uniform mat3 lovrMaterialTransform;
+---    uniform float lovrPointSize;
+---    uniform mat4 lovrPose[48];
+---    uniform int lovrViewportCount;
+---    uniform int lovrViewID;
+---    const mat4 lovrPoseMatrix; // Bone-weighted pose
+---    const int lovrInstanceID; // Current instance ID
+---
+---Fragment shader header:
+---
+---    in vec2 lovrTexCoord;
+---    in vec4 lovrVertexColor;
+---    in vec4 lovrGraphicsColor;
+---    out vec4 lovrCanvas[gl_MaxDrawBuffers];
+---    uniform float lovrMetalness;
+---    uniform float lovrRoughness;
+---    uniform vec4 lovrDiffuseColor;
+---    uniform vec4 lovrEmissiveColor;
+---    uniform sampler2D lovrDiffuseTexture;
+---    uniform sampler2D lovrEmissiveTexture;
+---    uniform sampler2D lovrMetalnessTexture;
+---    uniform sampler2D lovrRoughnessTexture;
+---    uniform sampler2D lovrOcclusionTexture;
+---    uniform sampler2D lovrNormalTexture;
+---    uniform samplerCube lovrEnvironmentTexture;
+---    uniform int lovrViewportCount;
+---    uniform int lovrViewID;
+---
+---### Compute Shaders
+---
+---Compute shaders can be created with `lovr.graphics.newComputeShader` and run with `lovr.graphics.compute`.
+---
+---Currently, compute shaders are written with raw GLSL.
+---
+---There is no default compute shader, instead the `void compute();` function must be implemented.
+---
+---You can use the `layout` qualifier to specify a local work group size:
+---
+---    layout(local_size_x = X, local_size_y = Y, local_size_z = Z) in;
+---
+---And the following built in variables can be used:
+---
+---    in uvec3 gl_NumWorkGroups;       // The size passed to lovr.graphics.compute
+---    in uvec3 gl_WorkGroupSize;       // The local work group size
+---    in uvec3 gl_WorkGroupID;         // The current global work group
+---    in uvec3 gl_LocalInvocationID;   // The current local work group
+---    in uvec3 gl_GlobalInvocationID;  // A unique ID combining the global and local IDs
+---    in uint gl_LocalInvocationIndex; // A 1D index of the LocalInvocationID
+---
+---Compute shaders don't return anything but they can write data to `Texture`s or `ShaderBlock`s. To bind a texture in a way that can be written to a compute shader, declare the uniforms with a type of `image2D`, `imageCube`, etc. instead of the usual `sampler2D` or `samplerCube`.
+---
+---Once a texture is bound to an image uniform, you can use the `imageLoad` and `imageStore` GLSL functions to read and write pixels in the image.
+---
+---Variables in `ShaderBlock`s can be written to using assignment syntax.
+---
+---LÖVR handles synchronization of textures and shader blocks so there is no need to use manual memory barriers to synchronize writes to resources from compute shaders.
 ---
 ---@class lovr.Shader
 local Shader = {}
@@ -1297,7 +2280,9 @@ local Shader = {}
 ---
 ---Returns the type of the Shader, which will be "graphics" or "compute".
 ---
----Graphics shaders are created with `lovr.graphics.newShader` and can be used for rendering with `lovr.graphics.setShader`.  Compute shaders are created with `lovr.graphics.newComputeShader` and can be run using `lovr.graphics.compute`.
+---Graphics shaders are created with `lovr.graphics.newShader` and can be used for rendering with `lovr.graphics.setShader`.
+---
+---Compute shaders are created with `lovr.graphics.newComputeShader` and can be run using `lovr.graphics.compute`.
 ---
 ---@return lovr.ShaderType type # The type of the Shader.
 function Shader:getType() end
@@ -1305,7 +2290,11 @@ function Shader:getType() end
 ---
 ---Returns whether a Shader has a block.
 ---
----A block is added to the Shader code at creation time using `ShaderBlock:getShaderCode`.  The block name (not the namespace) is used to link up the ShaderBlock object to the Shader.  This function can be used to check if a Shader was created with a block using the given name.
+---A block is added to the Shader code at creation time using `ShaderBlock:getShaderCode`.
+---
+---The block name (not the namespace) is used to link up the ShaderBlock object to the Shader.
+---
+---This function can be used to check if a Shader was created with a block using the given name.
 ---
 ---@param block string # The name of the block.
 ---@return boolean present # Whether the shader has the specified block.
@@ -1314,6 +2303,10 @@ function Shader:hasBlock(block) end
 ---
 ---Returns whether a Shader has a particular uniform variable.
 ---
+---
+---### NOTE:
+---If a uniform variable is defined but unused in the shader, the shader compiler will optimize it out and the uniform will not report itself as present.
+---
 ---@param uniform string # The name of the uniform variable.
 ---@return boolean present # Whether the shader has the specified uniform.
 function Shader:hasUniform(uniform) end
@@ -1321,13 +2314,106 @@ function Shader:hasUniform(uniform) end
 ---
 ---Updates a uniform variable in the Shader.
 ---
+---
+---### NOTE:
+---The shader does not need to be active to update its uniforms.
+---
+---The following type combinations are supported:
+---
+---<table>
+---  <thead>
+---    <tr>
+---      <td>Uniform type</td>
+---      <td>LÖVR type</td>
+---    </tr>
+---  </thead>
+---  <tbody>
+---    <tr>
+---      <td>float</td>
+---      <td>number</td>
+---    </tr>
+---    <tr>
+---      <td>int</td>
+---      <td>number</td>
+---    </tr>
+---    <tr>
+---      <td>vec2</td>
+---      <td>{ x, y }</td>
+---    </tr>
+---    <tr>
+---      <td>vec3</td>
+---      <td>{ x, y, z } or vec3</td>
+---    </tr>
+---    <tr>
+---      <td>vec4</td>
+---      <td>{ x, y, z, w }</td>
+---    </tr>
+---    <tr>
+---      <td>ivec2</td>
+---      <td>{ x, y }</td>
+---    </tr>
+---    <tr>
+---      <td>ivec3</td>
+---      <td>{ x, y, z }</td>
+---    </tr>
+---    <tr>
+---      <td>ivec4</td>
+---      <td>{ x, y, z, w }</td>
+---    </tr>
+---    <tr>
+---      <td>mat2</td>
+---      <td>{ x, ... }</td>
+---    </tr>
+---    <tr>
+---      <td>mat3</td>
+---      <td>{ x, ... }</td>
+---    </tr>
+---    <tr>
+---      <td>mat4</td>
+---      <td>{ x, ... } or mat4</td>
+---    </tr>
+---    <tr>
+---      <td>sampler</td>
+---      <td>Texture</td>
+---    </tr>
+---    <tr>
+---      <td>image</td>
+---      <td>Texture</td>
+---    </tr>
+---  </tbody> </table>
+---
+---Uniform arrays can be wrapped in tables or passed as multiple arguments.
+---
+---Textures must match the type of sampler or image they are being sent to.
+---
+---The following sampler (and image) types are currently supported:
+---
+---- `sampler2D`
+---- `sampler3D`
+---- `samplerCube`
+---- `sampler2DArray`
+---
+---`Blob`s can be used to pass arbitrary binary data to Shader variables.
+---
 ---@param uniform string # The name of the uniform to update.
 ---@param value any # The new value of the uniform.
 ---@return boolean success # Whether the uniform exists and was updated.
 function Shader:send(uniform, value) end
 
 ---
----Sends a ShaderBlock to a Shader.  After the block is sent, you can update the data in the block without needing to resend the block.  The block can be sent to multiple shaders and they will all see the same data from the block.
+---Sends a ShaderBlock to a Shader.
+---
+---After the block is sent, you can update the data in the block without needing to resend the block.
+---
+---The block can be sent to multiple shaders and they will all see the same data from the block.
+---
+---
+---### NOTE:
+---The Shader does not need to be active to send it a block.
+---
+---Make sure the ShaderBlock's variables line up with the block variables declared in the shader code, otherwise you'll get garbage data in the block.
+---
+---An easy way to do this is to use `ShaderBlock:getShaderCode` to get a GLSL snippet that is compatible with the block.
 ---
 ---@param name string # The name of the block to send to.
 ---@param block lovr.ShaderBlock # The ShaderBlock to associate with the specified block.
@@ -1335,7 +2421,11 @@ function Shader:send(uniform, value) end
 function Shader:sendBlock(name, block, access) end
 
 ---
----Sends a Texture to a Shader for writing.  This is meant to be used with compute shaders and only works with uniforms declared as `image2D`, `imageCube`, `image2DArray`, and `image3D`.  The normal `Shader:send` function accepts Textures and should be used most of the time.
+---Sends a Texture to a Shader for writing.
+---
+---This is meant to be used with compute shaders and only works with uniforms declared as `image2D`, `imageCube`, `image2DArray`, and `image3D`.
+---
+---The normal `Shader:send` function accepts Textures and should be used most of the time.
 ---
 ---@overload fun(self: lovr.Shader, name: string, index: number, texture: lovr.Texture, slice: number, mipmap: number, access: lovr.UniformAccess)
 ---@param name string # The name of the image uniform.
@@ -1346,27 +2436,48 @@ function Shader:sendBlock(name, block, access) end
 function Shader:sendImage(name, texture, slice, mipmap, access) end
 
 ---
----ShaderBlocks are objects that can hold large amounts of data and can be sent to Shaders.  It is common to use "uniform" variables to send data to shaders, but uniforms are usually limited to a few kilobytes in size.  ShaderBlocks are useful for a few reasons:
+---ShaderBlocks are objects that can hold large amounts of data and can be sent to Shaders.
+---
+---It is common to use "uniform" variables to send data to shaders, but uniforms are usually limited to a few kilobytes in size.
+---
+---ShaderBlocks are useful for a few reasons:
 ---
 ---- They can hold a lot more data.
 ---- Shaders can modify the data in them, which is really useful for compute shaders.
 ---- Setting the data in a ShaderBlock updates the data for all Shaders using the block, so you
 ---  don't need to go around setting the same uniforms in lots of different shaders.
 ---
----On systems that support compute shaders, ShaderBlocks can optionally be "writable".  A writable ShaderBlock is a little bit slower than a non-writable one, but shaders can modify its contents and it can be much, much larger than a non-writable ShaderBlock.
+---On systems that support compute shaders, ShaderBlocks can optionally be "writable".
+---
+---A writable ShaderBlock is a little bit slower than a non-writable one, but shaders can modify its contents and it can be much, much larger than a non-writable ShaderBlock.
+---
+---
+---### NOTE:
+---- A Shader can use up to 8 ShaderBlocks.
+---- ShaderBlocks can not contain textures.
+---- Some systems have bugs with `vec3` variables in ShaderBlocks.
+---
+---If you run into strange bugs,
+---  try switching to a `vec4` for the variable.
 ---
 ---@class lovr.ShaderBlock
 local ShaderBlock = {}
 
 ---
----Returns the byte offset of a variable in a ShaderBlock.  This is useful if you want to manually send binary data to the ShaderBlock using a `Blob` in `ShaderBlock:send`.
+---Returns the byte offset of a variable in a ShaderBlock.
+---
+---This is useful if you want to manually send binary data to the ShaderBlock using a `Blob` in `ShaderBlock:send`.
 ---
 ---@param field string # The name of the variable to get the offset of.
 ---@return number offset # The byte offset of the variable.
 function ShaderBlock:getOffset(field) end
 
 ---
----Before a ShaderBlock can be used in a Shader, the Shader has to have the block's variables defined in its source code.  This can be a tedious process, so you can call this function to return a GLSL string that contains this definition.  Roughly, it will look something like this:
+---Before a ShaderBlock can be used in a Shader, the Shader has to have the block's variables defined in its source code.
+---
+---This can be a tedious process, so you can call this function to return a GLSL string that contains this definition.
+---
+---Roughly, it will look something like this:
 ---
 ---    layout(std140) uniform <label> {
 ---      <type> <name>[<count>];
@@ -1392,6 +2503,12 @@ function ShaderBlock:getType() end
 ---
 ---Returns a variable in the ShaderBlock.
 ---
+---
+---### NOTE:
+---This function is really slow!  Only read back values when you need to.
+---
+---Vectors and matrices will be returned as (flat) tables.
+---
 ---@param name string # The name of the variable to read.
 ---@return any value # The value of the variable.
 function ShaderBlock:read(name) end
@@ -1399,13 +2516,25 @@ function ShaderBlock:read(name) end
 ---
 ---Updates a variable in the ShaderBlock.
 ---
+---
+---### NOTE:
+---For scalar or vector types, use tables of numbers or `vec3`s for each vector.
+---
+---For matrix types, use tables of numbers or `mat4` objects.
+---
+---`Blob`s can also be used to pass arbitrary binary data to individual variables.
+---
 ---@overload fun(self: lovr.ShaderBlock, blob: lovr.Blob, offset: number, extent: number):number
 ---@param variable string # The name of the variable to update.
 ---@param value any # The new value of the uniform.
 function ShaderBlock:send(variable, value) end
 
 ---
----A Texture is an image that can be applied to `Material`s.  The supported file formats are `.png`, `.jpg`, `.hdr`, `.dds`, `.ktx`, and `.astc`.  DDS and ASTC are compressed formats, which are recommended because they're smaller and faster.
+---A Texture is an image that can be applied to `Material`s.
+---
+---The supported file formats are `.png`, `.jpg`, `.hdr`, `.dds`, `.ktx`, and `.astc`.
+---
+---DDS and ASTC are compressed formats, which are recommended because they're smaller and faster.
 ---
 ---@class lovr.Texture
 local Texture = {}
@@ -1440,7 +2569,13 @@ function Texture:getDimensions(mipmap) end
 function Texture:getFilter() end
 
 ---
----Returns the format of the Texture.  This describes how many color channels are in the texture as well as the size of each one.  The most common format used is `rgba`, which contains red, green, blue, and alpha color channels.  See `TextureFormat` for all of the possible formats.
+---Returns the format of the Texture.
+---
+---This describes how many color channels are in the texture as well as the size of each one.
+---
+---The most common format used is `rgba`, which contains red, green, blue, and alpha color channels.
+---
+---See `TextureFormat` for all of the possible formats.
 ---
 ---@return lovr.TextureFormat format # The format of the Texture.
 function Texture:getFormat() end
@@ -1489,7 +2624,11 @@ function Texture:getWrap() end
 function Texture:replacePixels(image, x, y, slice, mipmap) end
 
 ---
----Sets the compare mode for a texture.  This is only used for "shadow samplers", which are uniform variables in shaders with type `sampler2DShadow`.  Sampling a shadow sampler uses a sort of virtual depth test, and the compare mode of the texture is used to control how the depth test is performed.
+---Sets the compare mode for a texture.
+---
+---This is only used for "shadow samplers", which are uniform variables in shaders with type `sampler2DShadow`.
+---
+---Sampling a shadow sampler uses a sort of virtual depth test, and the compare mode of the texture is used to control how the depth test is performed.
 ---
 ---@param compareMode? lovr.CompareMode # The new compare mode.  Use `nil` to disable the compare mode.
 function Texture:setCompareMode(compareMode) end
@@ -1497,12 +2636,22 @@ function Texture:setCompareMode(compareMode) end
 ---
 ---Sets the `FilterMode` used by the texture.
 ---
+---
+---### NOTE:
+---The default setting for new textures can be set with `lovr.graphics.setDefaultFilter`.
+---
+---The maximum supported anisotropy level can be queried using `lovr.graphics.getLimits`.
+---
 ---@param mode lovr.FilterMode # The filter mode.
 ---@param anisotropy number # The level of anisotropy to use.
 function Texture:setFilter(mode, anisotropy) end
 
 ---
----Sets the wrap mode of a texture.  The wrap mode controls how the texture is sampled when texture coordinates lie outside the usual 0 - 1 range.  The default for both directions is `repeat`.
+---Sets the wrap mode of a texture.
+---
+---The wrap mode controls how the texture is sampled when texture coordinates lie outside the usual 0 - 1 range.
+---
+---The default for both directions is `repeat`.
 ---
 ---@param horizontal lovr.WrapMode # How the texture should wrap horizontally.
 ---@param vertical? lovr.WrapMode # How the texture should wrap vertically.
@@ -1526,7 +2675,11 @@ function Texture:setWrap(horizontal, vertical) end
 ---| '"closed"'
 
 ---
----Here are the different data types available for vertex attributes in a Mesh.  The ones that have a smaller range take up less memory, which improves performance a bit.  The "u" stands for "unsigned", which means it can't hold negative values but instead has a larger positive range.
+---Here are the different data types available for vertex attributes in a Mesh.
+---
+---The ones that have a smaller range take up less memory, which improves performance a bit.
+---
+---The "u" stands for "unsigned", which means it can't hold negative values but instead has a larger positive range.
 ---
 ---@alias lovr.AttributeType
 ---
@@ -1561,13 +2714,21 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---Different ways the alpha channel of pixels affects blending.
 ---
+---
+---### NOTE:
+---The premultiplied mode should be used if pixels being drawn have already been blended, or "pre-multiplied", by the alpha channel.
+---
+---This happens when rendering a framebuffer that contains pixels with transparent alpha values, since the stored color values have already been faded by alpha and don't need to be faded a second time with the alphamultiply blend mode.
+---
 ---@alias lovr.BlendAlphaMode
 ---
 ---Color channel values are multiplied by the alpha channel during blending.
 ---
 ---| '"alphamultiply"'
 ---
----Color channels are not multiplied by the alpha channel.  This should be used if the pixels being drawn have already been blended, or "pre-multiplied", by the alpha channel.
+---Color channels are not multiplied by the alpha channel.
+---
+---This should be used if the pixels being drawn have already been blended, or "pre-multiplied", by the alpha channel.
 ---
 ---| '"premultiplied"'
 
@@ -1639,7 +2800,13 @@ function Texture:setWrap(horizontal, vertical) end
 ---| '"stream"'
 
 ---
----The method used to compare z values when deciding how to overlap rendered objects.  This is called the "depth test", and it happens on a pixel-by-pixel basis every time new objects are drawn.  If the depth test "passes" for a pixel, then the pixel color will be replaced by the new color and the depth value in the depth buffer will be updated.  Otherwise, the pixel will not be changed and the depth value will not be updated.
+---The method used to compare z values when deciding how to overlap rendered objects.
+---
+---This is called the "depth test", and it happens on a pixel-by-pixel basis every time new objects are drawn.
+---
+---If the depth test "passes" for a pixel, then the pixel color will be replaced by the new color and the depth value in the depth buffer will be updated.
+---
+---Otherwise, the pixel will not be changed and the depth value will not be updated.
 ---
 ---@alias lovr.CompareMode
 ---
@@ -1681,7 +2848,11 @@ function Texture:setWrap(horizontal, vertical) end
 ---| '"global"'
 
 ---
----The following shaders are built in to LÖVR, and can be used as an argument to `lovr.graphics.newShader` instead of providing raw GLSL shader code.  The shaders can be further customized by using the `flags` argument.  If you pass in `nil` to `lovr.graphics.setShader`, LÖVR will automatically pick a DefaultShader to use based on whatever is being drawn.
+---The following shaders are built in to LÖVR, and can be used as an argument to `lovr.graphics.newShader` instead of providing raw GLSL shader code.
+---
+---The shaders can be further customized by using the `flags` argument.
+---
+---If you pass in `nil` to `lovr.graphics.setShader`, LÖVR will automatically pick a DefaultShader to use based on whatever is being drawn.
 ---
 ---@alias lovr.DefaultShader
 ---
@@ -1710,7 +2881,9 @@ function Texture:setWrap(horizontal, vertical) end
 ---| '"fill"'
 
 ---
----Meshes are lists of arbitrary vertices.  These vertices can be connected in different ways, leading to different shapes like lines and triangles.
+---Meshes are lists of arbitrary vertices.
+---
+---These vertices can be connected in different ways, leading to different shapes like lines and triangles.
 ---
 ---@alias lovr.DrawMode
 ---
@@ -1730,7 +2903,9 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---| '"lineloop"'
 ---
----The first three vertices define a triangle.  Each vertex after that creates a triangle using the new vertex and last two vertices.
+---The first three vertices define a triangle.
+---
+---Each vertex after that creates a triangle using the new vertex and last two vertices.
 ---
 ---| '"strip"'
 ---
@@ -1738,7 +2913,9 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---| '"triangles"'
 ---
----Draws a set of triangles.  Each one shares the first vertex as a common point, leading to a fan-like shape.
+---Draws a set of triangles.
+---
+---Each one shares the first vertex as a common point, leading to a fan-like shape.
 ---
 ---| '"fan"'
 
@@ -1756,11 +2933,17 @@ function Texture:setWrap(horizontal, vertical) end
 ---| '"line"'
 
 ---
----The method used to downsample (or upsample) a texture.  "nearest" can be used for a pixelated effect, whereas "linear" leads to more smooth results.  Nearest is slightly faster than linear.
+---The method used to downsample (or upsample) a texture.
+---
+---"nearest" can be used for a pixelated effect, whereas "linear" leads to more smooth results.
+---
+---Nearest is slightly faster than linear.
 ---
 ---@alias lovr.FilterMode
 ---
----Fast nearest-neighbor sampling.  Leads to a pixelated style.
+---Fast nearest-neighbor sampling.
+---
+---Leads to a pixelated style.
 ---
 ---| '"nearest"'
 ---
@@ -1849,7 +3032,9 @@ function Texture:setWrap(horizontal, vertical) end
 ---| '"environment"'
 
 ---
----Meshes can have a usage hint, describing how they are planning on being updated.  Setting the usage hint allows the graphics driver optimize how it handles the data in the Mesh.
+---Meshes can have a usage hint, describing how they are planning on being updated.
+---
+---Setting the usage hint allows the graphics driver optimize how it handles the data in the Mesh.
 ---
 ---@alias lovr.MeshUsage
 ---
@@ -1866,7 +3051,11 @@ function Texture:setWrap(horizontal, vertical) end
 ---| '"stream"'
 
 ---
----Shaders can be used for either rendering operations or generic compute tasks.  Graphics shaders are created with `lovr.graphics.newShader` and compute shaders are created with `lovr.graphics.newComputeShader`.  `Shader:getType` can be used on an existing Shader to figure out what type it is.
+---Shaders can be used for either rendering operations or generic compute tasks.
+---
+---Graphics shaders are created with `lovr.graphics.newShader` and compute shaders are created with `lovr.graphics.newComputeShader`.
+---
+---`Shader:getType` can be used on an existing Shader to figure out what type it is.
 ---
 ---@alias lovr.ShaderType
 ---
@@ -1908,7 +3097,9 @@ function Texture:setWrap(horizontal, vertical) end
 ---| '"invert"'
 
 ---
----Textures can store their pixels in different formats.  The set of color channels and the number of bits stored for each channel can differ, allowing Textures to optimize their storage for certain kinds of image formats or rendering techniques.
+---Textures can store their pixels in different formats.
+---
+---The set of color channels and the number of bits stored for each channel can differ, allowing Textures to optimize their storage for certain kinds of image formats or rendering techniques.
 ---
 ---@alias lovr.TextureFormat
 ---
@@ -1994,7 +3185,9 @@ function Texture:setWrap(horizontal, vertical) end
 ---| '"volume"'
 
 ---
----When binding writable resources to shaders using `Shader:sendBlock` and `Shader:sendImage`, an access pattern can be specified as a hint that says whether you plan to read or write to the resource (or both).  Sometimes, LÖVR or the GPU driver can use this hint to get better performance or avoid stalling.
+---When binding writable resources to shaders using `Shader:sendBlock` and `Shader:sendImage`, an access pattern can be specified as a hint that says whether you plan to read or write to the resource (or both).
+---
+---Sometimes, LÖVR or the GPU driver can use this hint to get better performance or avoid stalling.
 ---
 ---@alias lovr.UniformAccess
 ---

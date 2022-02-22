@@ -9,6 +9,12 @@ lovr.physics = {}
 ---
 ---Creates a new BallJoint.
 ---
+---
+---### NOTE:
+---A ball joint is like a ball and socket between the two colliders.
+---
+---It tries to keep the distance between the colliders and the anchor position the same, but does not constrain the angle between them.
+---
 ---@param colliderA lovr.Collider # The first collider to attach the Joint to.
 ---@param colliderB lovr.Collider # The second collider to attach the Joint to.
 ---@param x number # The x position of the joint anchor point, in world coordinates.
@@ -20,6 +26,10 @@ function lovr.physics.newBallJoint(colliderA, colliderB, x, y, z) end
 ---
 ---Creates a new BoxShape.
 ---
+---
+---### NOTE:
+---A Shape can be attached to a Collider using `Collider:addShape`.
+---
 ---@param width? number # The width of the box, in meters.
 ---@param height? number # The height of the box, in meters.
 ---@param depth? number # The depth of the box, in meters.
@@ -27,7 +37,13 @@ function lovr.physics.newBallJoint(colliderA, colliderB, x, y, z) end
 function lovr.physics.newBoxShape(width, height, depth) end
 
 ---
----Creates a new CapsuleShape.  Capsules are cylinders with hemispheres on each end.
+---Creates a new CapsuleShape.
+---
+---Capsules are cylinders with hemispheres on each end.
+---
+---
+---### NOTE:
+---A Shape can be attached to a Collider using `Collider:addShape`.
 ---
 ---@param radius? number # The radius of the capsule, in meters.
 ---@param length? number # The length of the capsule, not including the caps, in meters.
@@ -37,6 +53,10 @@ function lovr.physics.newCapsuleShape(radius, length) end
 ---
 ---Creates a new CylinderShape.
 ---
+---
+---### NOTE:
+---A Shape can be attached to a Collider using `Collider:addShape`.
+---
 ---@param radius? number # The radius of the cylinder, in meters.
 ---@param length? number # The length of the cylinder, in meters.
 ---@return lovr.CylinderShape cylinder # The new CylinderShape.
@@ -44,6 +64,14 @@ function lovr.physics.newCylinderShape(radius, length) end
 
 ---
 ---Creates a new DistanceJoint.
+---
+---
+---### NOTE:
+---A distance joint tries to keep the two colliders a fixed distance apart.
+---
+---The distance is determined by the initial distance between the anchor points.
+---
+---The joint allows for rotation on the anchor points.
 ---
 ---@param colliderA lovr.Collider # The first collider to attach the Joint to.
 ---@param colliderB lovr.Collider # The second collider to attach the Joint to.
@@ -59,6 +87,10 @@ function lovr.physics.newDistanceJoint(colliderA, colliderB, x1, y1, z1, x2, y2,
 ---
 ---Creates a new HingeJoint.
 ---
+---
+---### NOTE:
+---A hinge joint constrains two colliders to allow rotation only around the hinge's axis.
+---
 ---@param colliderA lovr.Collider # The first collider to attach the Joint to.
 ---@param colliderB lovr.Collider # The second collider to attach the Joint to.
 ---@param x number # The x position of the hinge anchor, in world coordinates.
@@ -73,6 +105,10 @@ function lovr.physics.newHingeJoint(colliderA, colliderB, x, y, z, ax, ay, az) e
 ---
 ---Creates a new SliderJoint.
 ---
+---
+---### NOTE:
+---A slider joint constrains two colliders to only allow movement along the slider's axis.
+---
 ---@param colliderA lovr.Collider # The first collider to attach the Joint to.
 ---@param colliderB lovr.Collider # The second collider to attach the Joint to.
 ---@param ax number # The x component of the slider axis.
@@ -84,12 +120,20 @@ function lovr.physics.newSliderJoint(colliderA, colliderB, ax, ay, az) end
 ---
 ---Creates a new SphereShape.
 ---
+---
+---### NOTE:
+---A Shape can be attached to a Collider using `Collider:addShape`.
+---
 ---@param radius? number # The radius of the sphere, in meters.
 ---@return lovr.SphereShape sphere # The new SphereShape.
 function lovr.physics.newSphereShape(radius) end
 
 ---
 ---Creates a new physics World, which tracks the overall physics simulation, holds collider objects, and resolves collisions between them.
+---
+---
+---### NOTE:
+---A World must be updated with `World:update` in `lovr.update` for the physics simulation to advance.
 ---
 ---@param xg? number # The x component of the gravity force.
 ---@param yg? number # The y component of the gravity force.
@@ -100,13 +144,19 @@ function lovr.physics.newSphereShape(radius) end
 function lovr.physics.newWorld(xg, yg, zg, allowSleep, tags) end
 
 ---
----A BallJoint is a type of `Joint` that acts like a ball and socket between two colliders.  It allows the colliders to rotate freely around an anchor point, but does not allow the colliders' distance from the anchor point to change.
+---A BallJoint is a type of `Joint` that acts like a ball and socket between two colliders.
+---
+---It allows the colliders to rotate freely around an anchor point, but does not allow the colliders' distance from the anchor point to change.
 ---
 ---@class lovr.BallJoint
 local BallJoint = {}
 
 ---
----Returns the anchor points of the BallJoint, in world coordinates.  The first point is the anchor on the first collider, and the second point is on the second collider.  The joint tries to keep these points the same, but they may be different if the joint is forced apart by some other means.
+---Returns the anchor points of the BallJoint, in world coordinates.
+---
+---The first point is the anchor on the first collider, and the second point is on the second collider.
+---
+---The joint tries to keep these points the same, but they may be different if the joint is forced apart by some other means.
 ---
 ---@return number x1 # The x coordinate of the first anchor point, in world coordinates.
 ---@return number y1 # The y coordinate of the first anchor point, in world coordinates.
@@ -117,13 +167,17 @@ local BallJoint = {}
 function BallJoint:getAnchors() end
 
 ---
----Returns the response time of the joint.  See `World:setResponseTime` for more info.
+---Returns the response time of the joint.
+---
+---See `World:setResponseTime` for more info.
 ---
 ---@return number responseTime # The response time setting for the joint.
 function BallJoint:getResponseTime() end
 
 ---
----Returns the tightness of the joint.  See `World:setTightness` for how this affects the joint.
+---Returns the tightness of the joint.
+---
+---See `World:setTightness` for how this affects the joint.
 ---
 ---@return number tightness # The tightness of the joint.
 function BallJoint:getTightness() end
@@ -137,13 +191,17 @@ function BallJoint:getTightness() end
 function BallJoint:setAnchor(x, y, z) end
 
 ---
----Sets the response time of the joint.  See `World:setResponseTime` for more info.
+---Sets the response time of the joint.
+---
+---See `World:setResponseTime` for more info.
 ---
 ---@param responseTime number # The new response time setting for the joint.
 function BallJoint:setResponseTime(responseTime) end
 
 ---
----Sets the tightness of the joint.  See `World:setTightness` for how this affects the joint.
+---Sets the tightness of the joint.
+---
+---See `World:setTightness` for how this affects the joint.
 ---
 ---@param tightness number # The tightness of the joint.
 function BallJoint:setTightness(tightness) end
@@ -201,19 +259,27 @@ function CapsuleShape:setLength(length) end
 function CapsuleShape:setRadius(radius) end
 
 ---
----Colliders are objects that represent a single rigid body in a physics simulation.  They can have forces applied to them and collide with other colliders.
+---Colliders are objects that represent a single rigid body in a physics simulation.
+---
+---They can have forces applied to them and collide with other colliders.
 ---
 ---@class lovr.Collider
 local Collider = {}
 
 ---
----Attaches a Shape to the collider.  Attached shapes will collide with other shapes in the world.
+---Attaches a Shape to the collider.
+---
+---Attached shapes will collide with other shapes in the world.
 ---
 ---@param shape lovr.Shape # The Shape to attach.
 function Collider:addShape(shape) end
 
 ---
 ---Applies a force to the Collider.
+---
+---
+---### NOTE:
+---If the Collider is asleep, it will need to be woken up with `Collider:setAwake` for this function to have any affect.
 ---
 ---@overload fun(self: lovr.Collider, x: number, y: number, z: number, px: number, py: number, pz: number)
 ---@param x number # The x component of the force to apply.
@@ -224,6 +290,10 @@ function Collider:applyForce(x, y, z) end
 ---
 ---Applies torque to the Collider.
 ---
+---
+---### NOTE:
+---If the Collider is asleep, it will need to be woken up with `Collider:setAwake` for this function to have any affect.
+---
 ---@param x number # The x component of the torque.
 ---@param y number # The y component of the torque.
 ---@param z number # The z component of the torque.
@@ -231,6 +301,10 @@ function Collider:applyTorque(x, y, z) end
 
 ---
 ---Destroy the Collider, removing it from the World.
+---
+---
+---### NOTE:
+---Calling functions on the collider after destroying it is a bad idea.
 ---
 function Collider:destroy() end
 
@@ -246,7 +320,13 @@ function Collider:destroy() end
 function Collider:getAABB() end
 
 ---
----Returns the angular damping parameters of the Collider.  Angular damping makes things less "spinny", making them slow down their angular velocity over time.
+---Returns the angular damping parameters of the Collider.
+---
+---Angular damping makes things less "spinny", making them slow down their angular velocity over time.
+---
+---
+---### NOTE:
+---Angular damping can also be set on the World.
 ---
 ---@return number damping # The angular damping.
 ---@return number threshold # Velocity limit below which the damping is not applied.
@@ -261,7 +341,11 @@ function Collider:getAngularDamping() end
 function Collider:getAngularVelocity() end
 
 ---
----Returns the friction of the Collider.  By default, the friction of two Colliders is combined (multiplied) when they collide to generate a friction force.  The initial friction is 0.
+---Returns the friction of the Collider.
+---
+---By default, the friction of two Colliders is combined (multiplied) when they collide to generate a friction force.
+---
+---The initial friction is 0.
 ---
 ---@return number friction # The friction of the Collider.
 function Collider:getFriction() end
@@ -273,14 +357,28 @@ function Collider:getFriction() end
 function Collider:getJoints() end
 
 ---
----Returns the Collider's linear damping parameters.  Linear damping is similar to drag or air resistance, slowing the Collider down over time.
+---Returns the Collider's linear damping parameters.
+---
+---Linear damping is similar to drag or air resistance, slowing the Collider down over time.
+---
+---
+---### NOTE:
+---A linear damping of 0 means the Collider won't slow down over time.
+---
+---This is the default.
+---
+---Linear damping can also be set on the World using `World:setLinearDamping`, which will affect all new colliders.
 ---
 ---@return number damping # The linear damping.
 ---@return number threshold # Velocity limit below which the damping is not applied.
 function Collider:getLinearDamping() end
 
 ---
----Returns the linear velocity of the Collider.  This is how fast the Collider is moving.  There is also angular velocity, which is how fast the Collider is spinning.
+---Returns the linear velocity of the Collider.
+---
+---This is how fast the Collider is moving.
+---
+---There is also angular velocity, which is how fast the Collider is spinning.
 ---
 ---@return number vx # The x velocity of the Collider, in meters per second.
 ---@return number vy # The y velocity of the Collider, in meters per second.
@@ -340,7 +438,9 @@ function Collider:getLocalPoint(wx, wy, wz) end
 function Collider:getLocalVector(wx, wy, wz) end
 
 ---
----Returns the total mass of the Collider.  The mass of a Collider depends on its attached shapes.
+---Returns the total mass of the Collider.
+---
+---The mass of a Collider depends on its attached shapes.
 ---
 ---@return number mass # The mass of the Collider, in kilograms.
 function Collider:getMass() end
@@ -385,7 +485,11 @@ function Collider:getPose() end
 function Collider:getPosition() end
 
 ---
----Returns the restitution (bounciness) of the Collider.  By default, the restitution of two Colliders is combined (the max is used) when they collide to cause them to bounce away from each other.  The initial restitution is 0.
+---Returns the restitution (bounciness) of the Collider.
+---
+---By default, the restitution of two Colliders is combined (the max is used) when they collide to cause them to bounce away from each other.
+---
+---The initial restitution is 0.
 ---
 ---@return number restitution # The restitution of the Collider.
 function Collider:getRestitution() end
@@ -399,17 +503,29 @@ function Collider:getShapes() end
 ---
 ---Returns the Collider's tag.
 ---
+---
+---### NOTE:
+---Collision between tags can be enabled and disabled using `World:enableCollisionBetween` and `World:disableCollisionBetween`.
+---
 ---@return string tag # The Collider's collision tag.
 function Collider:getTag() end
 
 ---
 ---Returns the user data associated with the Collider.
 ---
+---
+---### NOTE:
+---User data can be useful to identify the Collider in callbacks.
+---
 ---@return any data # The custom value associated with the Collider.
 function Collider:getUserData() end
 
 ---
 ---Returns the World the Collider is in.
+---
+---
+---### NOTE:
+---Colliders can only be in one World at a time.
 ---
 ---@return lovr.World world # The World the Collider is in.
 function Collider:getWorld() end
@@ -451,11 +567,25 @@ function Collider:isGravityIgnored() end
 ---
 ---Returns whether the Collider is kinematic.
 ---
+---
+---### NOTE:
+---Kinematic colliders behave as though they have infinite mass, ignoring external forces like gravity, joints, or collisions (though non-kinematic colliders will collide with them). They can be useful for static objects like floors or walls.
+---
 ---@return boolean kinematic # Whether the Collider is kinematic.
 function Collider:isKinematic() end
 
 ---
 ---Returns whether the Collider is allowed to sleep.
+---
+---
+---### NOTE:
+---If sleeping is enabled, the simulation will put the Collider to sleep if it hasn't moved in a while. Sleeping colliders don't impact the physics simulation, which makes updates more efficient and improves physics performance.
+---
+---However, the physics engine isn't perfect at waking up sleeping colliders and this can lead to bugs where colliders don't react to forces or collisions properly.
+---
+---It is possible to set the default value for new colliders using `World:setSleepingAllowed`.
+---
+---Colliders can be manually put to sleep or woken up using `Collider:setAwake`.
 ---
 ---@return boolean allowed # Whether the Collider can go to sleep.
 function Collider:isSleepingAllowed() end
@@ -463,11 +593,21 @@ function Collider:isSleepingAllowed() end
 ---
 ---Removes a Shape from the Collider.
 ---
+---
+---### NOTE:
+---Colliders without any shapes won't collide with anything.
+---
 ---@param shape lovr.Shape # The Shape to remove.
 function Collider:removeShape(shape) end
 
 ---
----Sets the angular damping of the Collider.  Angular damping makes things less "spinny", causing them to slow down their angular velocity over time. Damping is only applied when angular velocity is over the threshold value.
+---Sets the angular damping of the Collider.
+---
+---Angular damping makes things less "spinny", causing them to slow down their angular velocity over time. Damping is only applied when angular velocity is over the threshold value.
+---
+---
+---### NOTE:
+---Angular damping can also be set on the World.
 ---
 ---@param damping number # The angular damping.
 ---@param threshold? number # Velocity limit below which the damping is not applied.
@@ -482,13 +622,19 @@ function Collider:setAngularDamping(damping, threshold) end
 function Collider:setAngularVelocity(vx, vy, vz) end
 
 ---
----Manually puts the Collider to sleep or wakes it up.  You can do this if you know a Collider won't be touched for a while or if you need to it be active.
+---Manually puts the Collider to sleep or wakes it up.
+---
+---You can do this if you know a Collider won't be touched for a while or if you need to it be active.
 ---
 ---@param awake boolean # Whether the Collider should be awake.
 function Collider:setAwake(awake) end
 
 ---
----Sets the friction of the Collider.  By default, the friction of two Colliders is combined (multiplied) when they collide to generate a friction force.  The initial friction is 0.
+---Sets the friction of the Collider.
+---
+---By default, the friction of two Colliders is combined (multiplied) when they collide to generate a friction force.
+---
+---The initial friction is 0.
 ---
 ---@param friction number # The new friction.
 function Collider:setFriction(friction) end
@@ -502,18 +648,34 @@ function Collider:setGravityIgnored(ignored) end
 ---
 ---Sets whether the Collider is kinematic.
 ---
+---
+---### NOTE:
+---Kinematic colliders behave as though they have infinite mass, ignoring external forces like gravity, joints, or collisions (though non-kinematic colliders will collide with them). They can be useful for static objects like floors or walls.
+---
 ---@param kinematic boolean # Whether the Collider is kinematic.
 function Collider:setKinematic(kinematic) end
 
 ---
----Sets the Collider's linear damping parameter.  Linear damping is similar to drag or air resistance, slowing the Collider down over time. Damping is only applied when linear velocity is over the threshold value.
+---Sets the Collider's linear damping parameter.
+---
+---Linear damping is similar to drag or air resistance, slowing the Collider down over time. Damping is only applied when linear velocity is over the threshold value.
+---
+---
+---### NOTE:
+---A linear damping of 0 means the Collider won't slow down over time.
+---
+---This is the default.
+---
+---Linear damping can also be set on the World using `World:setLinearDamping`, which will affect all new colliders.
 ---
 ---@param damping number # The linear damping.
 ---@param threshold? number # Velocity limit below which the damping is not applied.
 function Collider:setLinearDamping(damping, threshold) end
 
 ---
----Sets the linear velocity of the Collider directly.  Usually it's preferred to use `Collider:applyForce` to change velocity since instantaneous velocity changes can lead to weird glitches.
+---Sets the linear velocity of the Collider directly.
+---
+---Usually it's preferred to use `Collider:applyForce` to change velocity since instantaneous velocity changes can lead to weird glitches.
 ---
 ---@param vx number # The x velocity of the Collider, in meters per second.
 ---@param vy number # The y velocity of the Collider, in meters per second.
@@ -566,7 +728,9 @@ function Collider:setPose(x, y, z, angle, ax, ay, az) end
 function Collider:setPosition(x, y, z) end
 
 ---
----Sets the restitution (bounciness) of the Collider.  By default, the restitution of two Colliders is combined (the max is used) when they collide to cause them to bounce away from each other. The initial restitution is 0.
+---Sets the restitution (bounciness) of the Collider.
+---
+---By default, the restitution of two Colliders is combined (the max is used) when they collide to cause them to bounce away from each other. The initial restitution is 0.
 ---
 ---@param restitution number # The new restitution.
 function Collider:setRestitution(restitution) end
@@ -574,17 +738,35 @@ function Collider:setRestitution(restitution) end
 ---
 ---Sets whether the Collider is allowed to sleep.
 ---
+---
+---### NOTE:
+---If sleeping is enabled, the simulation will put the Collider to sleep if it hasn't moved in a while. Sleeping colliders don't impact the physics simulation, which makes updates more efficient and improves physics performance.
+---
+---However, the physics engine isn't perfect at waking up sleeping colliders and this can lead to bugs where colliders don't react to forces or collisions properly.
+---
+---It is possible to set the default value for new colliders using `World:setSleepingAllowed`.
+---
+---Colliders can be manually put to sleep or woken up using `Collider:setAwake`.
+---
 ---@param allowed boolean # Whether the Collider can go to sleep.
 function Collider:setSleepingAllowed(allowed) end
 
 ---
 ---Sets the Collider's tag.
 ---
+---
+---### NOTE:
+---Collision between tags can be enabled and disabled using `World:enableCollisionBetween` and `World:disableCollisionBetween`.
+---
 ---@param tag string # The Collider's collision tag.
 function Collider:setTag(tag) end
 
 ---
 ---Associates a custom value with the Collider.
+---
+---
+---### NOTE:
+---User data can be useful to identify the Collider in callbacks.
 ---
 ---@param data any # The custom value to associate with the Collider.
 function Collider:setUserData(data) end
@@ -620,7 +802,9 @@ function CylinderShape:setLength(length) end
 function CylinderShape:setRadius(radius) end
 
 ---
----A DistanceJoint is a type of `Joint` that tries to keep two colliders a fixed distance apart. The distance is determined by the initial distance between the anchor points.  The joint allows for rotation on the anchor points.
+---A DistanceJoint is a type of `Joint` that tries to keep two colliders a fixed distance apart. The distance is determined by the initial distance between the anchor points.
+---
+---The joint allows for rotation on the anchor points.
 ---
 ---@class lovr.DistanceJoint
 local DistanceJoint = {}
@@ -637,19 +821,25 @@ local DistanceJoint = {}
 function DistanceJoint:getAnchors() end
 
 ---
----Returns the target distance for the DistanceJoint.  The joint tries to keep the Colliders this far apart.
+---Returns the target distance for the DistanceJoint.
+---
+---The joint tries to keep the Colliders this far apart.
 ---
 ---@return number distance # The target distance.
 function DistanceJoint:getDistance() end
 
 ---
----Returns the response time of the joint.  See `World:setResponseTime` for more info.
+---Returns the response time of the joint.
+---
+---See `World:setResponseTime` for more info.
 ---
 ---@return number responseTime # The response time setting for the joint.
 function DistanceJoint:getResponseTime() end
 
 ---
----Returns the tightness of the joint.  See `World:setTightness` for how this affects the joint.
+---Returns the tightness of the joint.
+---
+---See `World:setTightness` for how this affects the joint.
 ---
 ---@return number tightness # The tightness of the joint.
 function DistanceJoint:getTightness() end
@@ -666,19 +856,25 @@ function DistanceJoint:getTightness() end
 function DistanceJoint:setAnchors(x1, y1, z1, x2, y2, z2) end
 
 ---
----Sets the target distance for the DistanceJoint.  The joint tries to keep the Colliders this far apart.
+---Sets the target distance for the DistanceJoint.
+---
+---The joint tries to keep the Colliders this far apart.
 ---
 ---@param distance number # The new target distance.
 function DistanceJoint:setDistance(distance) end
 
 ---
----Sets the response time of the joint.  See `World:setResponseTime` for more info.
+---Sets the response time of the joint.
+---
+---See `World:setResponseTime` for more info.
 ---
 ---@param responseTime number # The new response time setting for the joint.
 function DistanceJoint:setResponseTime(responseTime) end
 
 ---
----Sets the tightness of the joint.  See `World:setTightness` for how this affects the joint.
+---Sets the tightness of the joint.
+---
+---See `World:setTightness` for how this affects the joint.
 ---
 ---@param tightness number # The tightness of the joint.
 function DistanceJoint:setTightness(tightness) end
@@ -701,7 +897,9 @@ local HingeJoint = {}
 function HingeJoint:getAnchors() end
 
 ---
----Get the angle between the two colliders attached to the HingeJoint.  When the joint is created or when the anchor or axis is set, the current angle is the new "zero" angle.
+---Get the angle between the two colliders attached to the HingeJoint.
+---
+---When the joint is created or when the anchor or axis is set, the current angle is the new "zero" angle.
 ---
 ---@return number angle # The hinge angle, in radians.
 function HingeJoint:getAngle() end
@@ -715,20 +913,26 @@ function HingeJoint:getAngle() end
 function HingeJoint:getAxis() end
 
 ---
----Returns the upper and lower limits of the hinge angle.  These will be between -π and π.
+---Returns the upper and lower limits of the hinge angle.
+---
+---These will be between -π and π.
 ---
 ---@return number lower # The lower limit, in radians.
 ---@return number upper # The upper limit, in radians.
 function HingeJoint:getLimits() end
 
 ---
----Returns the lower limit of the hinge angle.  This will be greater than -π.
+---Returns the lower limit of the hinge angle.
+---
+---This will be greater than -π.
 ---
 ---@return number limit # The lower limit, in radians.
 function HingeJoint:getLowerLimit() end
 
 ---
----Returns the upper limit of the hinge angle.  This will be less than π.
+---Returns the upper limit of the hinge angle.
+---
+---This will be less than π.
 ---
 ---@return number limit # The upper limit, in radians.
 function HingeJoint:getUpperLimit() end
@@ -750,20 +954,26 @@ function HingeJoint:setAnchor(x, y, z) end
 function HingeJoint:setAxis(x, y, z) end
 
 ---
----Sets the upper and lower limits of the hinge angle.  These should be between -π and π.
+---Sets the upper and lower limits of the hinge angle.
+---
+---These should be between -π and π.
 ---
 ---@param lower number # The lower limit, in radians.
 ---@param upper number # The upper limit, in radians.
 function HingeJoint:setLimits(lower, upper) end
 
 ---
----Sets the lower limit of the hinge angle.  This should be greater than -π.
+---Sets the lower limit of the hinge angle.
+---
+---This should be greater than -π.
 ---
 ---@param limit number # The lower limit, in radians.
 function HingeJoint:setLowerLimit(limit) end
 
 ---
----Sets the upper limit of the hinge angle.  This should be less than π.
+---Sets the upper limit of the hinge angle.
+---
+---This should be less than π.
 ---
 ---@param limit number # The upper limit, in radians.
 function HingeJoint:setUpperLimit(limit) end
@@ -777,10 +987,16 @@ local Joint = {}
 ---
 ---Destroy the Joint, removing it from Colliders it's attached to.
 ---
+---
+---### NOTE:
+---Calling functions on the Joint after destroying it is a bad idea.
+---
 function Joint:destroy() end
 
 ---
----Returns the Colliders the Joint is attached to.  All Joints are attached to two colliders.
+---Returns the Colliders the Joint is attached to.
+---
+---All Joints are attached to two colliders.
 ---
 ---@return lovr.Collider colliderA # The first Collider.
 ---@return lovr.Collider colliderB # The second Collider.
@@ -825,6 +1041,10 @@ local Shape = {}
 ---
 ---Destroy the Shape, removing it from Colliders it's attached to.
 ---
+---
+---### NOTE:
+---Calling functions on the Shape after destroying it is a bad idea.
+---
 function Shape:destroy() end
 
 ---
@@ -840,6 +1060,10 @@ function Shape:getAABB() end
 
 ---
 ---Returns the Collider the Shape is attached to.
+---
+---
+---### NOTE:
+---A Shape can only be attached to one Collider at a time.
 ---
 ---@return lovr.Collider collider # The Collider the Shape is attached to.
 function Shape:getCollider() end
@@ -881,17 +1105,27 @@ function Shape:getType() end
 ---
 ---Returns the user data associated with the Shape.
 ---
+---
+---### NOTE:
+---User data can be useful to identify the Shape in callbacks.
+---
 ---@return any data # The custom value associated with the Shape.
 function Shape:getUserData() end
 
 ---
 ---Returns whether the Shape is enabled.
 ---
+---
+---### NOTE:
+---Disabled shapes won't collide with anything.
+---
 ---@return boolean enabled # Whether the Shape is enabled.
 function Shape:isEnabled() end
 
 ---
----Returns whether the Shape is a sensor.  Sensors do not trigger any collision response, but they still report collisions in `World:collide`.
+---Returns whether the Shape is a sensor.
+---
+---Sensors do not trigger any collision response, but they still report collisions in `World:collide`.
 ---
 ---@return boolean sensor # Whether the Shape is a sensor.
 function Shape:isSensor() end
@@ -899,11 +1133,19 @@ function Shape:isSensor() end
 ---
 ---Enable or disable the Shape.
 ---
+---
+---### NOTE:
+---Disabled shapes won't collide with anything.
+---
 ---@param enabled boolean # Whether the Shape should be enabled.
 function Shape:setEnabled(enabled) end
 
 ---
 ---Set the orientation of the Shape relative to its Collider.
+---
+---
+---### NOTE:
+---If the Shape isn't attached to a Collider, this will error.
 ---
 ---@param angle number # The number of radians the Shape is rotated.
 ---@param ax number # The x component of the rotation axis.
@@ -914,19 +1156,29 @@ function Shape:setOrientation(angle, ax, ay, az) end
 ---
 ---Set the position of the Shape relative to its Collider.
 ---
+---
+---### NOTE:
+---If the Shape isn't attached to a Collider, this will error.
+---
 ---@param x number # The x offset.
 ---@param y number # The y offset.
 ---@param z number # The z offset.
 function Shape:setPosition(x, y, z) end
 
 ---
----Sets whether this Shape is a sensor.  Sensors do not trigger any collision response, but they still report collisions in `World:collide`.
+---Sets whether this Shape is a sensor.
+---
+---Sensors do not trigger any collision response, but they still report collisions in `World:collide`.
 ---
 ---@param sensor boolean # Whether the Shape should be a sensor.
 function Shape:setSensor(sensor) end
 
 ---
 ---Sets the user data associated with the Shape.
+---
+---
+---### NOTE:
+---User data can be useful to identify the Shape in callbacks.
 ---
 ---@param data any # The custom value associated with the Shape.
 function Shape:setUserData(data) end
@@ -1012,11 +1264,29 @@ function SphereShape:setDimensions(radius) end
 ---
 ---A World is an object that holds the colliders, joints, and shapes in a physics simulation.
 ---
+---
+---### NOTE:
+---Be sure to update the World in `lovr.update` using `World:update`, otherwise everything will stand still.
+---
 ---@class lovr.World
 local World = {}
 
 ---
----Attempt to collide two shapes.  Internally this uses joints and forces to ensure the colliders attached to the shapes do not pass through each other.  Collisions can be customized using friction and restitution (bounciness) parameters, and default to using a mix of the colliders' friction and restitution parameters.  Usually this is called automatically by `World:update`.
+---Attempt to collide two shapes.
+---
+---Internally this uses joints and forces to ensure the colliders attached to the shapes do not pass through each other.
+---
+---Collisions can be customized using friction and restitution (bounciness) parameters, and default to using a mix of the colliders' friction and restitution parameters.
+---
+---Usually this is called automatically by `World:update`.
+---
+---
+---### NOTE:
+---For friction, numbers in the range of 0-1 are common, but larger numbers can also be used.
+---
+---For restitution, numbers in the range 0-1 should be used.
+---
+---This function respects collision tags, so using `World:disableCollisionBetween` and `World:enableCollisionBetween` will change the behavior of this function.
 ---
 ---@param shapeA lovr.Shape # The first shape.
 ---@param shapeB lovr.Shape # The second shape.
@@ -1026,17 +1296,29 @@ local World = {}
 function World:collide(shapeA, shapeB, friction, restitution) end
 
 ---
----Detects which pairs of shapes in the world are near each other and could be colliding.  After calling this function, the `World:overlaps` iterator can be used to iterate over the overlaps, and `World:collide` can be used to resolve a collision for the shapes (if any). Usually this is called automatically by `World:update`.
+---Detects which pairs of shapes in the world are near each other and could be colliding.
+---
+---After calling this function, the `World:overlaps` iterator can be used to iterate over the overlaps, and `World:collide` can be used to resolve a collision for the shapes (if any). Usually this is called automatically by `World:update`.
 ---
 function World:computeOverlaps() end
 
 ---
 ---Destroy the World!
 ---
+---
+---### NOTE:
+---Bad things will happen if you destroy the world and then try to access it or anything that was in it.
+---
 function World:destroy() end
 
 ---
 ---Disables collision between two collision tags.
+---
+---
+---### NOTE:
+---Tags must be set up when creating the World, see `lovr.physics.newWorld`.
+---
+---By default, collision is enabled between all tags.
 ---
 ---@param tag1 string # The first tag.
 ---@param tag2 string # The second tag.
@@ -1045,12 +1327,24 @@ function World:disableCollisionBetween(tag1, tag2) end
 ---
 ---Enables collision between two collision tags.
 ---
+---
+---### NOTE:
+---Tags must be set up when creating the World, see `lovr.physics.newWorld`.
+---
+---By default, collision is enabled between all tags.
+---
 ---@param tag1 string # The first tag.
 ---@param tag2 string # The second tag.
 function World:enableCollisionBetween(tag1, tag2) end
 
 ---
----Returns the angular damping parameters of the World.  Angular damping makes things less "spinny", making them slow down their angular velocity over time.
+---Returns the angular damping parameters of the World.
+---
+---Angular damping makes things less "spinny", making them slow down their angular velocity over time.
+---
+---
+---### NOTE:
+---Angular damping can also be set on individual colliders.
 ---
 ---@return number damping # The angular damping.
 ---@return number threshold # Velocity limit below which the damping is not applied.
@@ -1072,7 +1366,17 @@ function World:getColliders() end
 function World:getGravity() end
 
 ---
----Returns the linear damping parameters of the World.  Linear damping is similar to drag or air resistance, slowing down colliders over time as they move.
+---Returns the linear damping parameters of the World.
+---
+---Linear damping is similar to drag or air resistance, slowing down colliders over time as they move.
+---
+---
+---### NOTE:
+---A linear damping of 0 means colliders won't slow down over time.
+---
+---This is the default.
+---
+---Linear damping can also be set on individual colliders.
 ---
 ---@return number damping # The linear damping.
 ---@return number threshold # Velocity limit below which the damping is not applied.
@@ -1081,21 +1385,33 @@ function World:getLinearDamping() end
 ---
 ---Returns the response time factor of the World.
 ---
----The response time controls how relaxed collisions and joints are in the physics simulation, and functions similar to inertia.  A low response time means collisions are resolved quickly, and higher values make objects more spongy and soft.
+---The response time controls how relaxed collisions and joints are in the physics simulation, and functions similar to inertia.
 ---
----The value can be any positive number.  It can be changed on a per-joint basis for `DistanceJoint` and `BallJoint` objects.
+---A low response time means collisions are resolved quickly, and higher values make objects more spongy and soft.
+---
+---The value can be any positive number.
+---
+---It can be changed on a per-joint basis for `DistanceJoint` and `BallJoint` objects.
 ---
 ---@return number responseTime # The response time setting for the World.
 function World:getResponseTime() end
 
 ---
----Returns the tightness of the joint.  See `World:setTightness` for how this affects the joint.
+---Returns the tightness of the joint.
+---
+---See `World:setTightness` for how this affects the joint.
 ---
 ---@return number tightness # The tightness of the joint.
 function World:getTightness() end
 
 ---
 ---Returns whether collisions are currently enabled between two tags.
+---
+---
+---### NOTE:
+---Tags must be set up when creating the World, see `lovr.physics.newWorld`.
+---
+---By default, collision is enabled between all tags.
 ---
 ---@param tag1 string # The first tag.
 ---@param tag2 string # The second tag.
@@ -1104,6 +1420,18 @@ function World:isCollisionEnabledBetween(tag1, tag2) end
 
 ---
 ---Returns whether colliders can go to sleep in the World.
+---
+---
+---### NOTE:
+---If sleeping is enabled, the World will try to detect colliders that haven't moved for a while and put them to sleep.
+---
+---Sleeping colliders don't impact the physics simulation, which makes updates more efficient and improves physics performance.
+---
+---However, the physics engine isn't perfect at waking up sleeping colliders and this can lead to bugs where colliders don't react to forces or collisions properly.
+---
+---This can be set on individual colliders.
+---
+---Colliders can be manually put to sleep or woken up using `Collider:setAwake`.
 ---
 ---@return boolean allowed # Whether colliders can sleep.
 function World:isSleepingAllowed() end
@@ -1133,6 +1461,17 @@ function World:newCapsuleCollider(x, y, z, radius, length) end
 
 ---
 ---Adds a new Collider to the World.
+---
+---
+---### NOTE:
+---This function creates a collider without any shapes attached to it, which means it won't collide with anything.
+---
+---To add a shape to the collider, use `Collider:addShape`, or use one of the following functions to create the collider:
+---
+---- `World:newBoxCollider`
+---- `World:newCapsuleCollider`
+---- `World:newCylinderCollider`
+---- `World:newSphereCollider`
 ---
 ---@param x? number # The x position of the Collider.
 ---@param y? number # The y position of the Collider.
@@ -1171,13 +1510,19 @@ function World:newMeshCollider(vertices, indices) end
 function World:newSphereCollider(x, y, z, radius) end
 
 ---
----Returns an iterator that can be used to iterate over "overlaps", or potential collisions between pairs of shapes in the World.  This should be called after using `World:detectOverlaps` to compute the list of overlaps. Usually this is called automatically by `World:update`.
+---Returns an iterator that can be used to iterate over "overlaps", or potential collisions between pairs of shapes in the World.
+---
+---This should be called after using `World:detectOverlaps` to compute the list of overlaps. Usually this is called automatically by `World:update`.
 ---
 ---@return function iterator # A Lua iterator, usable in a for loop.
 function World:overlaps() end
 
 ---
 ---Casts a ray through the World, calling a function every time the ray intersects with a Shape.
+---
+---
+---### NOTE:
+---The callback is passed the shape that was hit, the hit position (in world coordinates), and the normal vector of the hit.
 ---
 ---@param x1 number # The x coordinate of the starting position of the ray.
 ---@param y1 number # The y coordinate of the starting position of the ray.
@@ -1189,7 +1534,13 @@ function World:overlaps() end
 function World:raycast(x1, y1, z1, x2, y2, z2, callback) end
 
 ---
----Sets the angular damping of the World.  Angular damping makes things less "spinny", making them slow down their angular velocity over time. Damping is only applied when angular velocity is over the threshold value.
+---Sets the angular damping of the World.
+---
+---Angular damping makes things less "spinny", making them slow down their angular velocity over time. Damping is only applied when angular velocity is over the threshold value.
+---
+---
+---### NOTE:
+---Angular damping can also be set on individual colliders.
 ---
 ---@param damping number # The angular damping.
 ---@param threshold? number # Velocity limit below which the damping is not applied.
@@ -1204,7 +1555,17 @@ function World:setAngularDamping(damping, threshold) end
 function World:setGravity(xg, yg, zg) end
 
 ---
----Sets the linear damping of the World.  Linear damping is similar to drag or air resistance, slowing down colliders over time as they move. Damping is only applied when linear velocity is over the threshold value.
+---Sets the linear damping of the World.
+---
+---Linear damping is similar to drag or air resistance, slowing down colliders over time as they move. Damping is only applied when linear velocity is over the threshold value.
+---
+---
+---### NOTE:
+---A linear damping of 0 means colliders won't slow down over time.
+---
+---This is the default.
+---
+---Linear damping can also be set on individual colliders.
 ---
 ---@param damping number # The linear damping.
 ---@param threshold? number # Velocity limit below which the damping is not applied.
@@ -1213,9 +1574,13 @@ function World:setLinearDamping(damping, threshold) end
 ---
 ---Sets the response time factor of the World.
 ---
----The response time controls how relaxed collisions and joints are in the physics simulation, and functions similar to inertia.  A low response time means collisions are resolved quickly, and higher values make objects more spongy and soft.
+---The response time controls how relaxed collisions and joints are in the physics simulation, and functions similar to inertia.
 ---
----The value can be any positive number.  It can be changed on a per-joint basis for `DistanceJoint` and `BallJoint` objects.
+---A low response time means collisions are resolved quickly, and higher values make objects more spongy and soft.
+---
+---The value can be any positive number.
+---
+---It can be changed on a per-joint basis for `DistanceJoint` and `BallJoint` objects.
 ---
 ---@param responseTime number # The new response time setting for the World.
 function World:setResponseTime(responseTime) end
@@ -1223,19 +1588,58 @@ function World:setResponseTime(responseTime) end
 ---
 ---Sets whether colliders can go to sleep in the World.
 ---
+---
+---### NOTE:
+---If sleeping is enabled, the World will try to detect colliders that haven't moved for a while and put them to sleep.
+---
+---Sleeping colliders don't impact the physics simulation, which makes updates more efficient and improves physics performance.
+---
+---However, the physics engine isn't perfect at waking up sleeping colliders and this can lead to bugs where colliders don't react to forces or collisions properly.
+---
+---This can be set on individual colliders.
+---
+---Colliders can be manually put to sleep or woken up using `Collider:setAwake`.
+---
 ---@param allowed boolean # Whether colliders can sleep.
 function World:setSleepingAllowed(allowed) end
 
 ---
 ---Sets the tightness of joints in the World.
 ---
----The tightness controls how much force is applied to colliders connected by joints.  With a value of 0, no force will be applied and joints won't have any effect.  With a tightness of 1, a strong force will be used to try to keep the Colliders constrained.  A tightness larger than 1 will overcorrect the joints, which can sometimes be desirable.  Negative tightness values are not supported.
+---The tightness controls how much force is applied to colliders connected by joints.
+---
+---With a value of 0, no force will be applied and joints won't have any effect.
+---
+---With a tightness of 1, a strong force will be used to try to keep the Colliders constrained.
+---
+---A tightness larger than 1 will overcorrect the joints, which can sometimes be desirable.
+---
+---Negative tightness values are not supported.
 ---
 ---@param tightness number # The new tightness for the World.
 function World:setTightness(tightness) end
 
 ---
 ---Updates the World, advancing the physics simulation forward in time and resolving collisions between colliders in the World.
+---
+---
+---### NOTE:
+---It is common to pass the `dt` variable from `lovr.update` into this function.
+---
+---The default collision resolver function is:
+---
+---    function defaultResolver(world)
+---      world:computeOverlaps()
+---      for shapeA, shapeB in world:overlaps() do
+---        world:collide(shapeA, shapeB)
+---      end
+---    end
+---
+---Additional logic could be introduced to the collision resolver function to add custom collision behavior or to change the collision parameters (like friction and restitution) on a per-collision basis.
+---
+---> If possible, use a fixed timestep value for updating the World. It will greatly improve the
+---> accuracy of the simulation and reduce bugs. For more information on implementing a fixed
+---> timestep loop, see [this article](http://gafferongames.com/game-physics/fix-your-timestep/).
 ---
 ---@param dt number # The amount of time to advance the simulation forward.
 ---@param resolver? function # The collision resolver function to use.  This will be called before updating to allow for custom collision processing.  If absent, a default will be used.

@@ -44,6 +44,7 @@ end
 
 require 'definition.local'
 require 'definition.set'
+require 'definition.field'
 require 'definition.arg'
 require 'definition.function'
 require 'definition.table'

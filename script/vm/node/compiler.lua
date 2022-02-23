@@ -13,7 +13,7 @@ local m = {}
 
 ---@class vm.node.cross
 
----@alias vm.node parser.object | vm.node.union | vm.node.cross
+---@alias vm.node parser.object | vm.node.union | vm.node.cross | vm.node.global
 
 function m.setNode(source, node)
     if not node then
@@ -71,36 +71,6 @@ local function getReturn(func, index)
     end
 end
 
-local valueMap = util.switch()
-    : case 'boolean'
-    : case 'table'
-    : case 'integer'
-    : case 'number'
-    : case 'string'
-    : case 'function'
-    : call(function (source, value)
-        state.declareLiteral(value)
-        m.setNode(source, value)
-    end)
-    : case 'select'
-    : call(function (source, value)
-        local vararg = value.vararg
-        if vararg.type == 'call' then
-            m.setNode(source, getReturn(vararg.node, value.sindex))
-        end
-    end)
-    : getMap()
-
-local function compileValue(source, value)
-    if not value then
-        return
-    end
-    local f = valueMap[value.type]
-    if f then
-        f(source, value)
-    end
-end
-
 local function compileByLocalID(source)
     local sources = localID.getSources(source)
     if not sources then
@@ -108,7 +78,7 @@ local function compileByLocalID(source)
     end
     for _, src in ipairs(sources) do
         if src.value then
-            compileValue(source, src.value)
+            m.setNode(source, m.compileNode(src.value))
         end
     end
 end
@@ -136,19 +106,30 @@ local function compileByParentNode(source)
     local f = searchFieldMap[parentNode.type]
     if f then
         f(parentNode, key, function (field)
-            compileValue(source, field.value)
+            m.setNode(source, m.compileNode(field.value))
         end)
     end
 end
 
 local compilerMap = util.switch()
+    : case 'boolean'
+    : case 'table'
+    : case 'integer'
+    : case 'number'
+    : case 'string'
+    : case 'function'
+    : call(function (source)
+        m.setNode(source, state.declareLiteral(source))
+    end)
     : case 'local'
     : call(function (source)
-        compileValue(source, source.value)
+        if source.value then
+            m.setNode(source, m.compileNode(source.value))
+        end
         if source.ref then
             for _, ref in ipairs(source.ref) do
                 if ref.type == 'setlocal' then
-                    compileValue(source, ref.value)
+                    m.setNode(source, m.compileNode(ref.value))
                 end
             end
         end
@@ -180,6 +161,13 @@ local compilerMap = util.switch()
                     m.setNode(source, m.compileNode(rtn[index]))
                 end
             end
+        end
+    end)
+    : case 'select'
+    : call(function (source, value)
+        local vararg = value.vararg
+        if vararg.type == 'call' then
+            m.setNode(source, getReturn(vararg.node, value.sindex))
         end
     end)
     : getMap()

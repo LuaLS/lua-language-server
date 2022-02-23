@@ -88,6 +88,10 @@ local nodeMap;nodeMap = util.switch()
     end)
     : case 'getfield'
     : case 'setfield'
+    : case 'getmethod'
+    : case 'setmethod'
+    : case 'getindex'
+    : case 'setindex'
     : call(function (source, pushResult)
         local node = compiler.compileNode(source.node)
         if not node then

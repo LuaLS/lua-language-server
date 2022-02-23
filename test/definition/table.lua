@@ -170,8 +170,8 @@ local t = f()
 t.<?x?>
 ]]
 
-TEST [[
-local t = { <!a!> }
-
-print(t[<?1?>])
-]]
+--TEST [[
+--local t = { <!a!> }
+--
+--print(t[<?1?>])
+--]]

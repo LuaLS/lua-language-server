@@ -158,10 +158,14 @@ local compilerMap = util.switch()
         m.setNode(source, m.compileNode(source.node))
     end)
     : case 'setfield'
+    : case 'setmethod'
+    : case 'setindex'
     : call(function (source)
         compileByLocalID(source)
     end)
     : case 'getfield'
+    : case 'getmethod'
+    : case 'getindex'
     : call(function (source)
         compileByLocalID(source)
         compileByParentNode(source)

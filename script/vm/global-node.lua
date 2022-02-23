@@ -5,7 +5,7 @@ local globalBuilder = require 'vm.node.global'
 ---@class parser.object
 ---@field _globalNode vm.node.global
 
----@class vm.global-id
+---@class vm.global-node
 local m = {}
 ---@type table<string, vm.node.global>
 m.globals = util.defaultTable(globalBuilder)
@@ -46,6 +46,8 @@ local compilerGlobalMap = util.switch()
         end
     end)
     : case 'setfield'
+    : case 'setmethod'
+    : case 'setindex'
     ---@param uri    uri
     ---@param source parser.object
     : call(function (uri, source)
@@ -57,6 +59,8 @@ local compilerGlobalMap = util.switch()
         source._globalNode = m.declareGlobal(name, uri, source)
     end)
     : case 'getfield'
+    : case 'getmethod'
+    : case 'getindex'
     ---@param uri    uri
     ---@param source parser.object
     : call(function (uri, source)

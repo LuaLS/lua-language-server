@@ -5,7 +5,7 @@ local globalBuilder = require 'vm.node.global'
 ---@class parser.object
 ---@field _globalNode vm.node.global
 
----@class vm.global-node
+---@class vm.global-manager
 local m = {}
 ---@type table<string, vm.node.global>
 m.globals = util.defaultTable(globalBuilder)

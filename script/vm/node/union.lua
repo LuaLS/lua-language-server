@@ -1,4 +1,4 @@
-local state = require 'vm.state'
+local literalMgr = require 'vm.literal-manager'
 
 ---@class vm.node.union
 local mt = {}
@@ -22,7 +22,7 @@ end
 ---@param source parser.object
 function mt:subscribeLiteral(source)
     for _, c in ipairs(self) do
-        state.subscribeLiteral(source, c)
+        literalMgr.subscribeLiteral(source, c)
         if c.type == 'cross' then
             c:subscribeLiteral(source)
         end

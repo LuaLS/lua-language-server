@@ -1,8 +1,8 @@
-local guide       = require 'parser.guide'
-local util        = require 'utility'
-local union       = require 'vm.node.union'
-local localID     = require 'vm.local-id'
-local literalNode = require 'vm.literal-node'
+local guide      = require 'parser.guide'
+local util       = require 'utility'
+local union      = require 'vm.node.union'
+local localID    = require 'vm.local-id'
+local literalMgr = require 'vm.literal-manager'
 
 ---@class parser.object
 ---@field _compiledNodes  boolean
@@ -119,7 +119,7 @@ local compilerMap = util.switch()
     : case 'string'
     : case 'function'
     : call(function (source)
-        m.setNode(source, literalNode.declareLiteral(source))
+        m.setNode(source, literalMgr.declareLiteral(source))
     end)
     : case 'local'
     : call(function (source)
@@ -183,7 +183,7 @@ function m.compileNode(source)
     if compiler then
         compiler(source)
     end
-    literalNode.subscribeLiteral(source, source._node)
+    literalMgr.subscribeLiteral(source, source._node)
     if source._globalNode then
         m.setNode(source, source._globalNode)
     end

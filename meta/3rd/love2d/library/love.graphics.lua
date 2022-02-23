@@ -92,7 +92,9 @@ function love.graphics.discard(discardcolor, discardstencil) end
 ---
 ---The right and bottom edges of the object are shifted at an angle defined by the shearing factors.
 ---
----When using the default shader anything drawn with this function will be tinted according to the currently selected color.  Set it to pure white to preserve the object's original colors.
+---When using the default shader anything drawn with this function will be tinted according to the currently selected color.
+---
+---Set it to pure white to preserve the object's original colors.
 ---
 ---@overload fun(texture: love.Texture, quad: love.Quad, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number)
 ---@overload fun(drawable: love.Drawable, transform: love.Transform)
@@ -418,7 +420,9 @@ function love.graphics.getTextureTypes() end
 function love.graphics.getWidth() end
 
 ---
----Sets the scissor to the rectangle created by the intersection of the specified rectangle with the existing scissor.  If no scissor is active yet, it behaves like love.graphics.setScissor.
+---Sets the scissor to the rectangle created by the intersection of the specified rectangle with the existing scissor.
+---
+---If no scissor is active yet, it behaves like love.graphics.setScissor.
 ---
 ---The scissor limits the drawing area to a specified rectangle. This affects all graphics calls, including love.graphics.clear.
 ---
@@ -718,7 +722,9 @@ function love.graphics.present() end
 ---
 ---Draws text on screen. If no Font is set, one will be created and set (once) if needed.
 ---
----As of LOVE 0.7.1, when using translation and scaling functions while drawing text, this function assumes the scale occurs first.  If you don't script with this in mind, the text won't be in the right position, or possibly even on screen.
+---As of LOVE 0.7.1, when using translation and scaling functions while drawing text, this function assumes the scale occurs first.
+---
+---If you don't script with this in mind, the text won't be in the right position, or possibly even on screen.
 ---
 ---love.graphics.print and love.graphics.printf both support UTF-8 encoding. You'll also need a proper Font for special characters.
 ---

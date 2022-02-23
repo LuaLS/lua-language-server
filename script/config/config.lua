@@ -129,7 +129,7 @@ end, function (self, subkey, subvalue, sep)
     self.sep      = sep
 end)
 
-register('Or', {}, function (self, value)
+register('Or', nil, function (self, value)
     for _, sub in ipairs(self.subs) do
         if sub:checker(value) then
             return true
@@ -208,11 +208,14 @@ local Template = {
     ['Lua.hint.arrayIndex']                 = Type.Boolean >> 'Auto',
     ['Lua.window.statusBar']                = Type.Boolean >> true,
     ['Lua.window.progressBar']              = Type.Boolean >> true,
+    ['Lua.format.enable']                   = Type.Boolean >> true,
+    ['Lua.format.defaultConfig']            = Type.Hash(Type.String, Type.String)
+                                            >> {},
     ['Lua.IntelliSense.traceLocalSet']      = Type.Boolean >> false,
     ['Lua.IntelliSense.traceReturn']        = Type.Boolean >> false,
     ['Lua.IntelliSense.traceBeSetted']      = Type.Boolean >> false,
     ['Lua.IntelliSense.traceFieldInject']   = Type.Boolean >> false,
-    ['Lua.telemetry.enable']                = Type.Or(Type.Boolean >> false, Type.Nil),
+    ['Lua.telemetry.enable']                = Type.Or(Type.Boolean >> false, Type.Nil) >> nil,
     ['files.associations']                  = Type.Hash(Type.String, Type.String),
     ['files.exclude']                       = Type.Hash(Type.String, Type.Boolean),
     ['editor.semanticHighlighting.enabled'] = Type.Or(Type.Boolean, Type.String),

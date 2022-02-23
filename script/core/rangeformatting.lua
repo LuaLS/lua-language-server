@@ -3,10 +3,10 @@ local files = require("files")
 local log = require("log")
 local converter = require("proto.converter")
 
-return function(uri, range)
+return function(uri, range, options)
     local text = files.getText(uri)
     local status, formattedText, startLine, endLine = codeFormat.range_format(
-        uri, text, range.start.line, range["end"].line)
+        uri, text, range.start.line, range["end"].line, options)
 
     if not status then
         if formattedText ~= nil then

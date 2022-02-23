@@ -256,7 +256,7 @@ end
 ---@param obj parser.object
 ---@return parser.object
 function m.getParentFunction(obj)
-    for _ = 1, 1000 do
+    for _ = 1, 10000 do
         obj = obj.parent
         if not obj then
             break
@@ -273,7 +273,7 @@ end
 ---@param obj parser.object
 ---@return parser.object
 function m.getBlock(obj)
-    for _ = 1, 1000 do
+    for _ = 1, 10000 do
         if not obj then
             return nil
         end
@@ -302,7 +302,7 @@ end
 ---@param obj parser.object
 ---@return parser.object
 function m.getParentBlock(obj)
-    for _ = 1, 1000 do
+    for _ = 1, 10000 do
         obj = obj.parent
         if not obj then
             return nil
@@ -319,7 +319,7 @@ end
 ---@param obj parser.object
 ---@return parser.object
 function m.getBreakBlock(obj)
-    for _ = 1, 1000 do
+    for _ = 1, 10000 do
         obj = obj.parent
         if not obj then
             return nil
@@ -339,7 +339,7 @@ end
 ---@param obj parser.object
 ---@return parser.object
 function m.getDocState(obj)
-    for _ = 1, 1000 do
+    for _ = 1, 10000 do
         local parent = obj.parent
         if not parent then
             return obj
@@ -356,7 +356,7 @@ end
 ---@param obj parser.object
 ---@return parser.object
 function m.getParentType(obj, want)
-    for _ = 1, 1000 do
+    for _ = 1, 10000 do
         obj = obj.parent
         if not obj then
             return nil
@@ -376,7 +376,7 @@ function m.getRoot(obj)
     if source._root then
         return source._root
     end
-    for _ = 1, 1000 do
+    for _ = 1, 10000 do
         if obj.type == 'main' then
             source._root = obj
             return obj
@@ -445,7 +445,7 @@ end
 ---@param pos integer {comment = '可见位置'}
 function m.getLocal(block, name, pos)
     block = m.getBlock(block)
-    for _ = 1, 1000 do
+    for _ = 1, 10000 do
         if not block then
             return nil
         end
@@ -497,7 +497,7 @@ end
 ---@param name string {comment = '标签名'}
 function m.getLabel(block, name)
     block = m.getBlock(block)
-    for _ = 1, 1000 do
+    for _ = 1, 10000 do
         if not block then
             return nil
         end

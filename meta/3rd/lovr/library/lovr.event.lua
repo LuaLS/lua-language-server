@@ -5,6 +5,12 @@
 ---
 ---Due to its low-level nature, it's rare to use `lovr.event` in simple projects.
 ---
+---
+---### NOTE:
+---You can define your own custom events by adding a function to the `lovr.handlers` table with a key of the name of the event you want to add.
+---
+---Then, push the event using `lovr.event.push`.
+---
 ---@class lovr.event
 lovr.event = {}
 
@@ -14,24 +20,52 @@ lovr.event = {}
 function lovr.event.clear() end
 
 ---
----This function returns a Lua iterator for all of the unprocessed items in the event queue.  Each event consists of a name as a string, followed by event-specific arguments.  This function is called in the default implementation of `lovr.run`, so it is normally not necessary to poll for events yourself.
+---This function returns a Lua iterator for all of the unprocessed items in the event queue.
+---
+---Each event consists of a name as a string, followed by event-specific arguments.
+---
+---This function is called in the default implementation of `lovr.run`, so it is normally not necessary to poll for events yourself.
 ---
 ---@return function iterator # The iterator function, usable in a for loop.
 function lovr.event.poll() end
 
 ---
----Fills the event queue with unprocessed events from the operating system.  This function should be called often, otherwise the operating system will consider the application unresponsive. This function is called in the default implementation of `lovr.run`.
+---Fills the event queue with unprocessed events from the operating system.
+---
+---This function should be called often, otherwise the operating system will consider the application unresponsive. This function is called in the default implementation of `lovr.run`.
 ---
 function lovr.event.pump() end
 
 ---
----Pushes an event onto the event queue.  It will be processed the next time `lovr.event.poll` is called.  For an event to be processed properly, there needs to be a function in the `lovr.handlers` table with a key that's the same as the event name.
+---Pushes an event onto the event queue.
+---
+---It will be processed the next time `lovr.event.poll` is called.
+---
+---For an event to be processed properly, there needs to be a function in the `lovr.handlers` table with a key that's the same as the event name.
+---
+---
+---### NOTE:
+---Only nil, booleans, numbers, strings, and LÖVR objects are supported types for event data.
 ---
 ---@param name string # The name of the event.
 function lovr.event.push(name) end
 
 ---
----Pushes an event to quit.  An optional number can be passed to set the exit code for the application.  An exit code of zero indicates normal termination, whereas a nonzero exit code indicates that an error occurred.
+---Pushes an event to quit.
+---
+---An optional number can be passed to set the exit code for the application.
+---
+---An exit code of zero indicates normal termination, whereas a nonzero exit code indicates that an error occurred.
+---
+---
+---### NOTE:
+---This function is equivalent to calling `lovr.event.push('quit', <args>)`.
+---
+---The event won't be processed until the next time `lovr.event.poll` is called.
+---
+---The `lovr.quit` callback will be called when the event is processed, which can be used to do any cleanup work.
+---
+---The callback can also return `false` to abort the quitting process.
 ---
 ---@param code? number # The exit code of the program.
 function lovr.event.quit(code) end
@@ -39,10 +73,18 @@ function lovr.event.quit(code) end
 ---
 ---Pushes an event to restart the framework.
 ---
+---
+---### NOTE:
+---The event won't be processed until the next time `lovr.event.poll` is called.
+---
+---The `lovr.restart` callback can be used to persist a value between restarts.
+---
 function lovr.event.restart() end
 
 ---
----Keys that can be pressed on a keyboard.  Notably, numpad keys are missing right now.
+---Keys that can be pressed on a keyboard.
+---
+---Notably, numpad keys are missing right now.
 ---
 ---@alias lovr.KeyCode
 ---

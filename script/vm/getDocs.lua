@@ -10,6 +10,9 @@ local define    = require 'proto.define'
 ---@param name? string
 ---@return parser.object[]
 function vm.getDocDefines(uri, name)
+    if type(name) ~= 'string' then
+        return {}
+    end
     local cache = vm.getCache 'getDocDefines'
     if cache[name] then
         return cache[name]

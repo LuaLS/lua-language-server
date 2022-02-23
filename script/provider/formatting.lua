@@ -5,6 +5,7 @@ local fs          = require 'bee.filesystem'
 local fw          = require 'filewatch'
 local util        = require 'utility'
 local diagnostics = require 'provider.diagnostic'
+local config      = require 'config'
 
 local loadedUris = {}
 
@@ -31,10 +32,23 @@ fw.event(function (ev, path)
     end
 end)
 
+config.watch(function (uri, key, value)
+    if key == "Lua.format.defaultConfig" then
+        codeFormat.set_default_config(value)
+    end
+end)
+
 local m = {}
+
+m.loadedDefaultConfig = false
 
 ---@param uri uri
 function m.updateConfig(uri)
+    if not m.loadedDefaultConfig then
+        m.loadedDefaultConfig = true
+        codeFormat.set_default_config(config.get(uri, 'Lua.format.defaultConfig'))
+    end
+
     local currentUri = uri
     while true do
         currentUri = currentUri:match('^(.+)/[^/]*$')

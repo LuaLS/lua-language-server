@@ -197,7 +197,7 @@ end
 ---@field prop?     string
 ---@field value     any
 ---@field action    '"add"'|'"set"'|'"prop"'
----@field isGlobal? boolean
+---@field global?   boolean
 ---@field uri?      uri
 
 ---@param cfg table
@@ -298,7 +298,7 @@ local function tryModifyClientGlobal(finalChanges)
     local changes = {}
     for i = #finalChanges, 1, -1 do
         local change = finalChanges[i]
-        if change.isGlobal then
+        if change.global then
             changes[#changes+1] = change
             finalChanges[i] = finalChanges[#finalChanges]
             finalChanges[#finalChanges] = nil
@@ -341,7 +341,7 @@ function m.setConfig(changes, onlyMemory)
     xpcall(function ()
         local ws = require 'workspace'
         if #ws.folders == 0 then
-            tryModifyClient(finalChanges)
+            tryModifyClient(nil, finalChanges)
             return
         end
         tryModifyClientGlobal(finalChanges)

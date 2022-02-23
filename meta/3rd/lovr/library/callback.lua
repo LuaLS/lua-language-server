@@ -1,19 +1,47 @@
 ---@meta
 
 ---
----The `lovr.conf` callback lets you configure default settings for LÖVR.  It is called once right before the game starts.  Make sure you put `lovr.conf` in a file called `conf.lua`, a special file that's loaded before the rest of the framework initializes.
+---The `lovr.conf` callback lets you configure default settings for LÖVR.
+---
+---It is called once right before the game starts.
+---
+---Make sure you put `lovr.conf` in a file called `conf.lua`, a special file that's loaded before the rest of the framework initializes.
+---
+---
+---### NOTE:
+---Disabling the headset module can improve startup time a lot if you aren't intending to use `lovr.headset`.
+---
+---You can set `t.window` to nil to avoid creating the window. You can do it yourself later by using `lovr.graphics.createWindow`.
+---
+---If the `lovr.graphics` module is disabled or the window isn't created, attempting to use any functionality requiring graphics may cause a crash.
+---
+---Enabling the `t.graphics.debug` flag will add additional error checks and will send messages from the GPU driver to the `lovr.log` callback.
+---
+---This will decrease performance but can help provide information on performance problems or other bugs.
+---
+---The `headset.offset` field is a vertical offset applied to the scene for headsets that do not center their tracking origin on the floor.
+---
+---This can be thought of as a "default user height". Setting this offset makes it easier to design experiences that work in both seated and standing VR configurations.
 ---
 ---@type fun(t: table)
 lovr.conf = nil
 
 ---
----This callback is called every frame.  Use it to render the scene.  If a VR headset is connected, anything rendered by this function will appear in the headset display.  The display is cleared to the background color before this function is called.
+---This callback is called every frame.
+---
+---Use it to render the scene.
+---
+---If a VR headset is connected, anything rendered by this function will appear in the headset display.
+---
+---The display is cleared to the background color before this function is called.
 ---
 ---@type fun()
 lovr.draw = nil
 
 ---
----The "lovr.errhand" callback is run whenever an error occurs.  It receives two parameters. The first is a string containing the error message. The second is either nil, or a string containing a traceback (as returned by "debug.traceback()"); if nil, this means "lovr.errhand" is being called in the stack where the error occurred, and it can call "debug.traceback()" itself.
+---The "lovr.errhand" callback is run whenever an error occurs.
+---
+---It receives two parameters. The first is a string containing the error message. The second is either nil, or a string containing a traceback (as returned by "debug.traceback()"); if nil, this means "lovr.errhand" is being called in the stack where the error occurred, and it can call "debug.traceback()" itself.
 ---
 ---"lovr.errhand" should return a handler function to run in a loop to show the error screen. This handler function is of the same type as the one returned by "lovr.run" and has the same requirements (such as pumping events). If an error occurs while this handler is running, the program will terminate immediately-- "lovr.errhand" will not be given a second chance. Errors which occur inside "lovr.errhand" or in the handler it returns may not be cleanly reported, so be careful.
 ---
@@ -23,7 +51,11 @@ lovr.draw = nil
 lovr.errhand = nil
 
 ---
----The `lovr.focus` callback is called whenever the application acquires or loses focus (for example, when opening or closing the Steam dashboard).  The callback receives a single argument, focused, which is a boolean indicating whether or not the application is now focused.  It may make sense to pause the game or reduce visual fidelity when the application loses focus.
+---The `lovr.focus` callback is called whenever the application acquires or loses focus (for example, when opening or closing the Steam dashboard).
+---
+---The callback receives a single argument, focused, which is a boolean indicating whether or not the application is now focused.
+---
+---It may make sense to pause the game or reduce visual fidelity when the application loses focus.
 ---
 ---@type fun(focused: boolean)
 lovr.focus = nil
@@ -41,35 +73,67 @@ lovr.keypressed = nil
 lovr.keyreleased = nil
 
 ---
----This callback is called once when the app starts.  It should be used to perform initial setup work, like loading resources and initializing classes and variables.
+---This callback is called once when the app starts.
+---
+---It should be used to perform initial setup work, like loading resources and initializing classes and variables.
+---
+---
+---### NOTE:
+---If the project was loaded from a restart using `lovr.event.restart`, the return value from the previously-run `lovr.restart` callback will be made available to this callback as the `restart` key in the `args` table.
+---
+---The `args` table follows the [Lua standard](https://en.wikibooks.org/wiki/Lua_Programming/command_line_parameter).
+---
+---The arguments passed in from the shell are put into a global table named `arg` and passed to `lovr.load`, but with indices offset such that the "script" (the project path) is at index 0.
+---
+---So all arguments (if any) intended for the project are at successive indices starting with 1, and the executable and its "internal" arguments are in normal order but stored in negative indices.
 ---
 ---@type fun(args: table)
 lovr.load = nil
 
 ---
----This callback is called when a message is logged.  The default implementation of this callback prints the message to the console using `print`, but it's possible to override this callback to render messages in VR, write them to a file, filter messages, and more.
+---This callback is called when a message is logged.
+---
+---The default implementation of this callback prints the message to the console using `print`, but it's possible to override this callback to render messages in VR, write them to a file, filter messages, and more.
 ---
 ---The message can have a "tag" that is a short string representing the sender, and a "level" indicating how severe the message is.
 ---
----The `t.graphics.debug` flag in `lovr.conf` can be used to get log messages from the GPU driver (tagged as `GL`).  It is also possible to emit your own log messages using `lovr.event.push`.
+---The `t.graphics.debug` flag in `lovr.conf` can be used to get log messages from the GPU driver (tagged as `GL`).
+---
+---It is also possible to emit your own log messages using `lovr.event.push`.
 ---
 ---@type fun(message: string, level: string, tag: string)
 lovr.log = nil
 
 ---
----This callback is called every frame after rendering to the headset and is usually used to render a mirror of the headset display onto the desktop window.  It can be overridden for custom mirroring behavior.  For example, you could render a single eye instead of a stereo view, apply postprocessing effects, add 2D UI, or render the scene from an entirely different viewpoint for a third person camera.
+---This callback is called every frame after rendering to the headset and is usually used to render a mirror of the headset display onto the desktop window.
+---
+---It can be overridden for custom mirroring behavior.
+---
+---For example, you could render a single eye instead of a stereo view, apply postprocessing effects, add 2D UI, or render the scene from an entirely different viewpoint for a third person camera.
+---
+---
+---### NOTE:
+---When this callback is called, the camera is located at `(0, 0, 0)` and is looking down the negative-z axis.
+---
+---Note that the usual graphics state applies while `lovr.mirror` is invoked, so you may need to reset graphics state at the end of `lovr.draw` to get the result you want.
 ---
 ---@type fun()
 lovr.mirror = nil
 
 ---
----This callback contains a permission response previously requested with `lovr.system.requestPermission`.  The callback contains information on whether permission was granted or denied.
+---This callback contains a permission response previously requested with `lovr.system.requestPermission`.
+---
+---The callback contains information on whether permission was granted or denied.
 ---
 ---@type fun(permission: lovr.Permission, granted: boolean)
 lovr.permission = nil
 
 ---
----This callback is called right before the application is about to quit.  Use it to perform any necessary cleanup work.  A truthy value can be returned from this callback to abort quitting.
+---This callback is called right before the application is about to quit.
+---
+---Use it to perform any necessary cleanup work.
+---
+---A truthy value can be returned from this callback to abort quitting.
 ---
 ---@type fun():boolean
 lovr.quit = nil
@@ -81,13 +145,23 @@ lovr.quit = nil
 lovr.resize = nil
 
 ---
----This callback is called when a restart from `lovr.event.restart` is happening.  A value can be returned to send it to the next LÖVR instance, available as the `restart` key in the argument table passed to `lovr.load`.  Object instances can not be used as the restart value, since they are destroyed as part of the cleanup process.
+---This callback is called when a restart from `lovr.event.restart` is happening.
+---
+---A value can be returned to send it to the next LÖVR instance, available as the `restart` key in the argument table passed to `lovr.load`.
+---
+---Object instances can not be used as the restart value, since they are destroyed as part of the cleanup process.
+---
+---
+---### NOTE:
+---Only nil, booleans, numbers, and strings are supported types for the return value.
 ---
 ---@type fun():any
 lovr.restart = nil
 
 ---
----This callback is the main entry point for a LÖVR program.  It is responsible for calling `lovr.load` and returning the main loop function.
+---This callback is the main entry point for a LÖVR program.
+---
+---It is responsible for calling `lovr.load` and returning the main loop function.
 ---
 ---@type fun():function
 lovr.run = nil
@@ -97,11 +171,21 @@ lovr.run = nil
 ---
 ---For example, when `shift + 1` is pressed on an American keyboard, `lovr.textinput` will be called with `!`.
 ---
+---
+---### NOTE:
+---Some characters in UTF-8 unicode take multiple bytes to encode.
+---
+---Due to the way Lua works, the length of these strings will be bigger than 1 even though they are just a single character. `lovr.graphics.print` is compatible with UTF-8 but doing other string processing on these strings may require a library.
+---
+---Lua 5.3+ has support for working with UTF-8 strings.
+---
 ---@type fun(text: string, code: number)
 lovr.textinput = nil
 
 ---
----The `lovr.threaderror` callback is called whenever an error occurs in a Thread.  It receives the Thread object where the error occurred and an error message.
+---The `lovr.threaderror` callback is called whenever an error occurs in a Thread.
+---
+---It receives the Thread object where the error occurred and an error message.
 ---
 ---The default implementation of this callback will call `lovr.errhand` with the error.
 ---
@@ -109,7 +193,11 @@ lovr.textinput = nil
 lovr.threaderror = nil
 
 ---
----The `lovr.update` callback should be used to update your game's logic.  It receives a single parameter, `dt`, which represents the amount of elapsed time between frames.  You can use this value to scale timers, physics, and animations in your game so they play at a smooth, consistent speed.
+---The `lovr.update` callback should be used to update your game's logic.
+---
+---It receives a single parameter, `dt`, which represents the amount of elapsed time between frames.
+---
+---You can use this value to scale timers, physics, and animations in your game so they play at a smooth, consistent speed.
 ---
 ---@type fun(dt: number)
 lovr.update = nil

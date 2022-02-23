@@ -59,12 +59,29 @@ local function pushVersion(link)
     ))
 end
 
+local function occlusionPath(str)
+    return str:gsub('(%s*)([^:"\'\r\n]+)', function (left, chunk)
+        if not chunk:find '[/\\]' then
+            return
+        end
+        local newStr, count = chunk:gsub('.+([/\\]script[/\\])', '***%1')
+        if count > 0 then
+            return left .. newStr
+        elseif chunk:sub(1, 1) == '\\'
+        or     chunk:sub(1, 1) == '/'
+        or     chunk:sub(1, 3) == '...' then
+            return left .. '***'
+        end
+    end)
+end
+
 local function pushErrorLog(link)
-    if not log.firstError then
+    local err = log.firstError
+    if not err then
         return
     end
-    local err = log.firstError
     log.firstError = nil
+    err = occlusionPath(err)
     send(link, string.pack('zzzz'
         , 'error'
         , token
@@ -78,7 +95,7 @@ local isValid  = false
 
 timer.wait(5, function ()
     timer.loop(300, function ()
-        if not isValid then
+        if isValid ~= true then
             return
         end
         local suc, link = pcall(net.connect, 'tcp', 'moe-moe.love', 11577)
@@ -97,7 +114,7 @@ timer.wait(5, function ()
         end
     end)()
     timer.loop(1, function ()
-        if not isValid then
+        if isValid ~= true then
             return
         end
         net.update()
@@ -107,7 +124,9 @@ end)
 local m = {}
 
 function m.updateConfig()
-    isValid = config.get(nil, 'Lua.telemetry.enable')
+    local enable = config.get(nil, 'Lua.telemetry.enable')
+    assert(enable == true or enable == false or enable == nil)
+    isValid = enable
     if isValid == false then
         return
     end

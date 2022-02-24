@@ -146,6 +146,9 @@ local compilerMap = util.switch()
                 end
             end
         end
+        if source.dummy then
+            m.setNode(source, m.compileNode(source.method.node))
+        end
     end)
     : case 'getlocal'
     : call(function (source)

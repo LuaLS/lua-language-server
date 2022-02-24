@@ -90,11 +90,12 @@ local searchFieldMap = util.switch()
     end)
     : getMap()
 
-local nodeMap;nodeMap = util.switch()
+local searchByNode
+local nodeMap = util.switch()
     : case 'field'
+    : case 'method'
     : call(function (source, pushResult)
-        local parent = source.parent
-        nodeMap[parent.type](parent, pushResult)
+        searchByNode(source.parent, pushResult)
     end)
     : case 'getfield'
     : case 'setfield'
@@ -150,7 +151,7 @@ end
 
 ---@param source  parser.object
 ---@param pushResult fun(src: parser.object)
-local function searchByNode(source, pushResult)
+function searchByNode(source, pushResult)
     local node = nodeMap[source.type]
     if node then
         node(source, pushResult)

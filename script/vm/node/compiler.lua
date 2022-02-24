@@ -131,7 +131,8 @@ local compilerMap = util.switch()
     : case 'string'
     : case 'function'
     : call(function (source)
-        m.setNode(source, literalMgr.declareLiteral(source))
+        literalMgr.declareLiteral(source)
+        m.setNode(source, source)
     end)
     : case 'local'
     : call(function (source)
@@ -163,6 +164,13 @@ local compilerMap = util.switch()
         compileByLocalID(source)
         compileByParentNode(source)
     end)
+    : case 'tablefield'
+    : case 'tableindex'
+    : call(function (source)
+        if source.value then
+            m.setNode(source, m.compileNode(source.value))
+        end
+    end)
     : case 'function.return'
     : call(function (source)
         local func  = source.parent
@@ -176,10 +184,10 @@ local compilerMap = util.switch()
         end
     end)
     : case 'select'
-    : call(function (source, value)
-        local vararg = value.vararg
+    : call(function (source)
+        local vararg = source.vararg
         if vararg.type == 'call' then
-            m.setNode(source, getReturn(vararg.node, value.sindex))
+            m.setNode(source, getReturn(vararg.node, source.sindex))
         end
     end)
     : getMap()

@@ -12,10 +12,16 @@ function mt:merge(node)
     end
     if node.type == 'union' then
         for _, c in ipairs(node) do
-            self[#self+1] = c
+            if not self[c] then
+                self[c]       = true
+                self[#self+1] = c
+            end
         end
     else
-        self[#self+1] = node
+        if not self[node] then
+            self[node]    = true
+            self[#self+1] = node
+        end
     end
 end
 

@@ -14,23 +14,6 @@ _ENV = nil
 ---@class vm
 local m = {}
 
-function m.getArgInfo(source)
-    local callargs = source.parent
-    if not callargs or callargs.type ~= 'callargs' then
-        return nil
-    end
-    local call = callargs.parent
-    if not call or call.type ~= 'call' then
-        return nil
-    end
-    for i = 1, #callargs do
-        if callargs[i] == source then
-            return call.node, i
-        end
-    end
-    return nil
-end
-
 function m.getSpecial(source)
     if not source then
         return nil

@@ -78,6 +78,16 @@ local searchFieldMap = util.switch()
             end
         end
     end)
+    : case 'global'
+    : call(function (node, key, pushResult)
+        local newGlobal = globalMgr.getGlobal(node.name, key)
+        if not newGlobal then
+            return
+        end
+        for set in ipairs(newGlobal:getSets()) do
+            pushResult(set)
+        end
+    end)
     : getMap()
 
 local nodeMap;nodeMap = util.switch()

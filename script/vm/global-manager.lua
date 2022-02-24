@@ -8,11 +8,9 @@ local globalBuilder = require 'vm.node.global'
 ---@class vm.global-manager
 local m = {}
 ---@type table<string, vm.node.global>
-m.globals = util.defaultTable(globalBuilder)
+m.globals = {}
 ---@type table<uri, table<string, boolean>>
-m.globalSubs = util.defaultTable(function ()
-    return {}
-end)
+m.globalSubs = util.multiTable(2)
 
 m.ID_SPLITE = '\x1F'
 
@@ -24,25 +22,29 @@ local compilerGlobalMap = util.switch()
         end
         if source.ref then
             for _, ref in ipairs(source.ref) do
-                m.compileNode(uri, ref)
+                m.compileObject(uri, ref)
             end
         end
     end)
     : case 'setglobal'
     : call(function (uri, source)
-        local name = guide.getKeyName(source)
-        source._globalNode = m.declareGlobal(name, uri, source)
+        local name   = guide.getKeyName(source)
+        local global = m.declareGlobal(name, uri)
+        global:addSet(uri, source)
+        m.globalSubs[uri][name] = true
+        source._globalNode = global
     end)
     : case 'getglobal'
     : call(function (uri, source)
         local name   = guide.getKeyName(source)
-        local global = m.getGlobal(name)
+        local global = m.declareGlobal(name, uri)
         global:addGet(uri, source)
+        m.globalSubs[uri][name] = true
         source._globalNode = global
 
         local nxt = source.next
         if nxt then
-            m.compileNode(uri, nxt)
+            m.compileObject(uri, nxt)
         end
     end)
     : case 'setfield'
@@ -55,8 +57,10 @@ local compilerGlobalMap = util.switch()
         if not parent then
             return
         end
-        local name = parent:getName() .. m.ID_SPLITE .. guide.getKeyName(source)
-        source._globalNode = m.declareGlobal(name, uri, source)
+        local name   = parent:getName() .. m.ID_SPLITE .. guide.getKeyName(source)
+        local global = m.declareGlobal(name, uri)
+        global:addSet(uri, source)
+        m.globalSubs[uri][name] = true
     end)
     : case 'getfield'
     : case 'getmethod'
@@ -70,12 +74,13 @@ local compilerGlobalMap = util.switch()
         end
         local name = parent:getName() .. m.ID_SPLITE .. guide.getKeyName(source)
         local global = m.getGlobal(name)
+        m.globalSubs[uri][name] = true
         global:addGet(uri, source)
         source._globalNode = global
 
         local nxt = source.next
         if nxt then
-            m.compileNode(uri, nxt)
+            m.compileObject(uri, nxt)
         end
     end)
     : getMap()
@@ -83,27 +88,27 @@ local compilerGlobalMap = util.switch()
 
 ---@param name   string
 ---@param uri    uri
----@param source parser.object
 ---@return vm.node.global
-function m.declareGlobal(name, uri, source)
+function m.declareGlobal(name, uri)
     m.globalSubs[uri][name] = true
-    local node = m.globals[name]
-    node:addSet(uri, source)
-    return node
+    if not m.globals[name] then
+        m.globals[name] = globalBuilder(name)
+    end
+    return m.globals[name]
 end
 
 ---@param name string
----@param uri? uri
----@return vm.node.global
-function m.getGlobal(name, uri)
-    if uri then
-        m.globalSubs[uri][name] = true
+---@param field? string
+---@return vm.node.global?
+function m.getGlobal(name, field)
+    if field then
+        name = name .. m.ID_SPLITE .. field
     end
     return m.globals[name]
 end
 
 ---@param source parser.object
-function m.compileNode(uri, source)
+function m.compileObject(uri, source)
     if source._globalNode ~= nil then
         return
     end
@@ -118,7 +123,7 @@ end
 function m.compileAst(source)
     local uri = guide.getUri(source)
     local env = guide.getENV(source)
-    m.compileNode(uri, env)
+    m.compileObject(uri, env)
 end
 
 ---@return vm.node.global
@@ -135,7 +140,11 @@ function m.dropUri(uri)
     local globalSub = m.globalSubs[uri]
     m.globalSubs[uri] = nil
     for name in pairs(globalSub) do
-        m.globals[name]:dropUri(uri)
+        local global = m.globals[name]
+        global:dropUri(uri)
+        if not global:isAlive() then
+            m.globals[name] = nil
+        end
     end
 end
 

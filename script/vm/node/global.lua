@@ -65,6 +65,11 @@ function mt:getName()
     return self.name
 end
 
+---@return boolean
+function mt:isAlive()
+    return next(self.links) ~= nil
+end
+
 ---@return vm.node.global
 return function (name)
     return setmetatable({

@@ -3,6 +3,7 @@ local util       = require 'utility'
 local union      = require 'vm.node.union'
 local localID    = require 'vm.local-id'
 local literalMgr = require 'vm.literal-manager'
+local globalMgr  = require 'vm.global-manager'
 
 ---@class parser.object
 ---@field _compiledNodes  boolean

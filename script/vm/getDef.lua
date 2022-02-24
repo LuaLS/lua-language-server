@@ -64,6 +64,12 @@ simpleMap = util.switch()
             searchGetLocal(source, node, pushResult)
         end
     end)
+    : case 'goto'
+    : call(function (source, pushResult)
+        if source.node then
+            pushResult(source.node)
+        end
+    end)
     : getMap()
 
 local searchFieldMap = util.switch()

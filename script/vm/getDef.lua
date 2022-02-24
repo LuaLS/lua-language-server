@@ -84,7 +84,7 @@ local searchFieldMap = util.switch()
         if not newGlobal then
             return
         end
-        for set in ipairs(newGlobal:getSets()) do
+        for _, set in ipairs(newGlobal:getSets()) do
             pushResult(set)
         end
     end)

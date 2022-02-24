@@ -25,6 +25,9 @@ function m.setNode(source, node)
         source._node = node
         return
     end
+    if me == node then
+        return
+    end
     if me.type == 'union'
     or me.type == 'cross' then
         me:merge(node)
@@ -91,9 +94,17 @@ local searchFieldMap = util.switch()
             if field.type == 'tablefield'
             or field.type == 'tableindex' then
                 if guide.getKeyName(field) == key then
-                    pushResult(field)
+                    pushResult(m.compileNode(field))
                 end
             end
+        end
+    end)
+    : case 'global'
+    ---@param node vm.node.global
+    : call(function (node, key, pushResult)
+        local global = globalMgr.getGlobal(node.name, key)
+        if global then
+            pushResult(global)
         end
     end)
     : getMap()
@@ -106,8 +117,8 @@ local function compileByParentNode(source)
     local key = guide.getKeyName(source)
     local f = searchFieldMap[parentNode.type]
     if f then
-        f(parentNode, key, function (field)
-            m.setNode(source, m.compileNode(field.value))
+        f(parentNode, key, function (fieldNode)
+            m.setNode(source, fieldNode)
         end)
     end
 end

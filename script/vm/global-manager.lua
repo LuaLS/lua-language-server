@@ -31,7 +31,6 @@ local compilerGlobalMap = util.switch()
         local name   = guide.getKeyName(source)
         local global = m.declareGlobal(name, uri)
         global:addSet(uri, source)
-        m.globalSubs[uri][name] = true
         source._globalNode = global
     end)
     : case 'getglobal'
@@ -39,7 +38,6 @@ local compilerGlobalMap = util.switch()
         local name   = guide.getKeyName(source)
         local global = m.declareGlobal(name, uri)
         global:addGet(uri, source)
-        m.globalSubs[uri][name] = true
         source._globalNode = global
 
         local nxt = source.next
@@ -60,7 +58,7 @@ local compilerGlobalMap = util.switch()
         local name   = parent:getName() .. m.ID_SPLITE .. guide.getKeyName(source)
         local global = m.declareGlobal(name, uri)
         global:addSet(uri, source)
-        m.globalSubs[uri][name] = true
+        source._globalNode = global
     end)
     : case 'getfield'
     : case 'getmethod'
@@ -73,8 +71,7 @@ local compilerGlobalMap = util.switch()
             return
         end
         local name = parent:getName() .. m.ID_SPLITE .. guide.getKeyName(source)
-        local global = m.getGlobal(name)
-        m.globalSubs[uri][name] = true
+        local global = m.declareGlobal(name, uri)
         global:addGet(uri, source)
         source._globalNode = global
 

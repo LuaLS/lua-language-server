@@ -1,7 +1,7 @@
 
 local files          = require 'files'
 local globalManager  = require 'vm.global-manager'
-local literalManager = require 'vm.literal-manager'
+local localManager = require 'vm.local-manager'
 
 ---@class vm.state
 local m = {}
@@ -21,7 +21,7 @@ files.watch(function (ev, uri)
     end
     if ev == 'remove' then
         globalManager.dropUri(uri)
-        literalManager.dropUri(uri)
+        localManager.dropUri(uri)
     end
 end)
 

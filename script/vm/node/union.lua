@@ -1,4 +1,4 @@
-local literalMgr = require 'vm.literal-manager'
+local localMgr = require 'vm.local-manager'
 
 ---@class vm.node.union
 local mt = {}
@@ -26,11 +26,11 @@ function mt:merge(node)
 end
 
 ---@param source parser.object
-function mt:subscribeLiteral(source)
+function mt:subscribeLocal(source)
     for _, c in ipairs(self) do
-        literalMgr.subscribeLiteral(source, c)
+        localMgr.subscribeLocal(source, c)
         if c.type == 'cross' then
-            c:subscribeLiteral(source)
+            c:subscribeLocal(source)
         end
     end
 end

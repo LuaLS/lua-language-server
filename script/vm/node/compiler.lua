@@ -179,6 +179,15 @@ local compilerMap = util.switch()
         if source.dummy then
             m.setNode(source, m.compileNode(source.method.node))
         end
+        -- function x.y(self, ...) --> function x:y(...)
+        if  source[1] == 'self'
+        and source.parent.type == 'funcargs'
+        and source.parent[1] == source then
+            local setfield = source.parent.parent.parent
+            if setfield.type == 'setfield' then
+                m.setNode(source, m.compileNode(setfield.node))
+            end
+        end
     end)
     : case 'getlocal'
     : call(function (source)
@@ -228,20 +237,32 @@ local compilerMap = util.switch()
     : getMap()
 
 ---@param source parser.object
+local function compileByNode(source)
+    local compiler = compilerMap[source.type]
+    if compiler then
+        compiler(source)
+    end
+end
+
+---@param source parser.object
+local function compileByGlobal(source)
+    if source._globalNode then
+        m.setNode(source, source._globalNode)
+    end
+end
+
+---@param source parser.object
 ---@return vm.node
 function m.compileNode(source)
     if source._node ~= nil then
         return source._node
     end
     source._node = false
-    local compiler = compilerMap[source.type]
-    if compiler then
-        compiler(source)
-    end
+    compileByNode(source)
+    compileByGlobal(source)
+
     localMgr.subscribeLocal(source, source._node)
-    if source._globalNode then
-        m.setNode(source, source._globalNode)
-    end
+
     return source._node
 end
 

@@ -13,6 +13,7 @@ m.ID_SPLITE = '\x1F'
 local compileMap = util.switch()
     : case 'local'
     : call(function (source)
+        source._localID = ('%d'):format(source.start)
         if not source.ref then
             return
         end
@@ -38,21 +39,56 @@ local compileMap = util.switch()
             m.compileLocalID(source.next)
         end
     end)
+    : case 'getmethod'
+    : case 'setmethod'
+    : call(function (source)
+        local parentID = source.node._localID
+        if not parentID then
+            return
+        end
+        source._localID = parentID .. m.ID_SPLITE .. guide.getKeyName(source)
+        source.method._localID = source._localID
+        if source.type == 'getmethod' then
+            m.compileLocalID(source.next)
+        end
+    end)
+    : case 'getindex'
+    : case 'setindex'
+    : call(function (source)
+        local parentID = source.node._localID
+        if not parentID then
+            return
+        end
+        source._localID = parentID .. m.ID_SPLITE .. guide.getKeyName(source)
+        source.index._localID = source._localID
+        if source.type == 'setindex' then
+            m.compileLocalID(source.next)
+        end
+    end)
     : getMap()
 
 local leftMap = util.switch()
     : case 'field'
+    : case 'method'
     : call(function (source)
         return m.getLocal(source.parent)
     end)
     : case 'getfield'
     : case 'setfield'
+    : case 'getmethod'
+    : case 'setmethod'
+    : case 'getindex'
+    : case 'setindex'
     : call(function (source)
         return m.getLocal(source.node)
     end)
     : case 'getlocal'
     : call(function (source)
         return source.node
+    end)
+    : case 'local'
+    : call(function (source)
+        return source
     end)
     : getMap()
 
@@ -100,8 +136,9 @@ function m.getID(source)
 end
 
 ---@param source parser.object
+---@param key?   string
 ---@return parser.object[]?
-function m.getSources(source)
+function m.getSources(source, key)
     local id = m.getID(source)
     if not id then
         return nil
@@ -109,6 +146,9 @@ function m.getSources(source)
     local root = guide.getRoot(source)
     if not root._localIDs then
         return nil
+    end
+    if key then
+        id = id .. m.ID_SPLITE .. key
     end
     return root._localIDs[id]
 end

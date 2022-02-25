@@ -94,14 +94,25 @@ local searchFieldMap = util.switch()
             pushResult(set)
         end
     end)
+    : case 'local'
+    : call(function (node, key, pushResult)
+        local sources = localID.getSources(node, key)
+        if sources then
+            for _, src in ipairs(sources) do
+                if guide.isSet(src) then
+                    pushResult(src)
+                end
+            end
+        end
+    end)
     : getMap()
 
-local searchByNode
+local searchByParentNode
 local nodeMap = util.switch()
     : case 'field'
     : case 'method'
     : call(function (source, pushResult)
-        searchByNode(source.parent, pushResult)
+        searchByParentNode(source.parent, pushResult)
     end)
     : case 'getfield'
     : case 'setfield'
@@ -114,8 +125,11 @@ local nodeMap = util.switch()
         if not node then
             return
         end
-        if searchFieldMap[node.type] then
-            searchFieldMap[node.type](node, guide.getKeyName(source), pushResult)
+        local key = guide.getKeyName(source)
+        for n in compiler.eachNode(node) do
+            if searchFieldMap[n.type] then
+                searchFieldMap[n.type](n, key, pushResult)
+            end
         end
     end)
     : getMap()
@@ -157,7 +171,7 @@ end
 
 ---@param source  parser.object
 ---@param pushResult fun(src: parser.object)
-function searchByNode(source, pushResult)
+function searchByParentNode(source, pushResult)
     local node = nodeMap[source.type]
     if node then
         node(source, pushResult)
@@ -180,7 +194,7 @@ function vm.getDefs(source)
     searchBySimple(source, pushResult)
     searchByGlobal(source, pushResult)
     searchByID(source, pushResult)
-    searchByNode(source, pushResult)
+    searchByParentNode(source, pushResult)
 
     return results
 end

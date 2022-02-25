@@ -48,7 +48,8 @@ end
 ---@return vm.node.union
 return function (me, node)
     local union = setmetatable({
-        [1] = me,
+        [1]  = me,
+        [me] = true,
     }, mt)
     union:merge(node)
     return union

@@ -50,43 +50,6 @@ function m.eachNode(node)
     end
 end
 
-local function getReturnOfFunction(func, index)
-    if not func._returns then
-        func._returns = util.defaultTable(function ()
-            return {
-                type   = 'function.return',
-                parent = func,
-                index  = index,
-            }
-        end)
-    end
-    return m.compileNode(func._returns[index])
-end
-
-local function getReturn(func, index)
-    local node = m.compileNode(func)
-    if not node then
-        return
-    end
-    for cnode in m.eachNode(node) do
-        if cnode.type == 'function' then
-            return getReturnOfFunction(cnode, index)
-        end
-    end
-end
-
-local function compileByLocalID(source)
-    local sources = localID.getSources(source)
-    if not sources then
-        return
-    end
-    for _, src in ipairs(sources) do
-        if src.value then
-            m.setNode(source, m.compileNode(src.value))
-        end
-    end
-end
-
 local searchFieldMap = util.switch()
     : case 'table'
     : call(function (node, key, pushResult)
@@ -107,19 +70,85 @@ local searchFieldMap = util.switch()
             pushResult(global)
         end
     end)
+    : case 'local'
+    : call(function (node, key, pushResult)
+        local sources = localID.getSources(node, key)
+        if sources then
+            for _, src in ipairs(sources) do
+                pushResult(m.compileNode(src))
+            end
+        end
+    end)
     : getMap()
 
-local function compileByParentNode(source)
-    local parentNode = m.compileNode(source.node)
+local function getReturnOfFunction(func, index)
+    if not func._returns then
+        func._returns = util.defaultTable(function ()
+            return {
+                type   = 'function.return',
+                parent = func,
+                index  = index,
+            }
+        end)
+    end
+    return m.compileNode(func._returns[index])
+end
+
+local function getReturnOfSetMetaTable(source, args)
+    local tbl = args and args[1]
+    local mt  = args and args[2]
+    if tbl then
+        m.setNode(source, m.compileNode(tbl))
+    end
+    if mt then
+        m.compileByParentNode(mt, '__index', function (node)
+            m.setNode(source, node)
+        end)
+    end
+    return source._node
+end
+
+local function getReturn(func, index, source, args)
+    local node = m.compileNode(func)
+    if not node then
+        return
+    end
+    for cnode in m.eachNode(node) do
+        if     cnode.type == 'function' then
+            return getReturnOfFunction(cnode, index)
+        elseif cnode.type == 'global' then
+            if cnode.name == 'setmetatable' and index == 1 then
+                return getReturnOfSetMetaTable(source, args)
+            end
+        end
+    end
+end
+
+local function compileByLocalID(source)
+    local sources = localID.getSources(source)
+    if not sources then
+        return
+    end
+    for _, src in ipairs(sources) do
+        if src.value then
+            m.setNode(source, m.compileNode(src.value))
+        end
+    end
+end
+
+---@param source vm.node
+---@param key any
+---@param pushResult fun(node:vm.node)
+function m.compileByParentNode(source, key, pushResult)
+    local parentNode = m.compileNode(source)
     if not parentNode then
         return
     end
-    local key = guide.getKeyName(source)
-    local f = searchFieldMap[parentNode.type]
-    if f then
-        f(parentNode, key, function (fieldNode)
-            m.setNode(source, fieldNode)
-        end)
+    for node in m.eachNode(parentNode) do
+        local f = searchFieldMap[node.type]
+        if f then
+            f(node, key, pushResult)
+        end
     end
 end
 
@@ -136,6 +165,7 @@ local compilerMap = util.switch()
     end)
     : case 'local'
     : call(function (source)
+        m.setNode(source, source)
         if source.value then
             m.setNode(source, m.compileNode(source.value))
         end
@@ -165,7 +195,9 @@ local compilerMap = util.switch()
     : case 'getindex'
     : call(function (source)
         compileByLocalID(source)
-        compileByParentNode(source)
+        m.compileByParentNode(source.node, guide.getKeyName(source), function (node)
+            m.setNode(source, node)
+        end)
     end)
     : case 'tablefield'
     : case 'tableindex'
@@ -190,7 +222,7 @@ local compilerMap = util.switch()
     : call(function (source)
         local vararg = source.vararg
         if vararg.type == 'call' then
-            m.setNode(source, getReturn(vararg.node, source.sindex))
+            m.setNode(source, getReturn(vararg.node, source.sindex, source, vararg.args))
         end
     end)
     : getMap()
@@ -198,7 +230,7 @@ local compilerMap = util.switch()
 ---@param source parser.object
 ---@return vm.node
 function m.compileNode(source)
-    if source._node then
+    if source._node ~= nil then
         return source._node
     end
     source._node = false

@@ -53,11 +53,6 @@ local compilerGlobalMap = util.switch()
         if nxt then
             m.compileObject(nxt)
         end
-
-        if source.special == 'rawset'
-        or source.special == 'rawget' then
-            m.compileObject(source.parent)
-        end
     end)
     : case 'setfield'
     : case 'setmethod'
@@ -109,6 +104,32 @@ local compilerGlobalMap = util.switch()
             m.compileObject(nxt)
         end
     end)
+    : case 'call'
+    : call(function (source)
+        if source.node.special == 'rawset'
+        or source.node.special == 'rawget' then
+            local g     = source.args[1]
+            local key   = source.args[2]
+            if g and key and g.special == '_G' then
+                local name = guide.getKeyName(key)
+                if name then
+                    local uri    = guide.getUri(source)
+                    local global = m.declareGlobal(name, uri)
+                    if source.node.special == 'rawset' then
+                        global:addSet(uri, source)
+                    else
+                        global:addGet(uri, source)
+                    end
+                    source._globalNode = global
+
+                    local nxt = source.next
+                    if nxt then
+                        m.compileObject(nxt)
+                    end
+                end
+            end
+        end
+    end)
     : getMap()
 
 
@@ -149,6 +170,12 @@ end
 function m.compileAst(source)
     local env = guide.getENV(source)
     m.compileObject(env)
+    guide.eachSpecialOf(source, 'rawset', function (src)
+        m.compileObject(src.parent)
+    end)
+    guide.eachSpecialOf(source, 'rawget', function (src)
+        m.compileObject(src.parent)
+    end)
 end
 
 ---@return vm.node.global

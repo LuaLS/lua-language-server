@@ -34,11 +34,6 @@ ROOT     = fs.path(util.expandPath(rootPath))
 LOGPATH  = LOGPATH  and util.expandPath(LOGPATH)  or (ROOT:string() .. '/log')
 METAPATH = METAPATH and util.expandPath(METAPATH) or (ROOT:string() .. '/meta')
 
-if _G['VERSION'] then
-    print(version.getVersion())
-    return
-end
-
 ---@diagnostic disable-next-line: deprecated
 debug.setcstacklimit(200)
 --collectgarbage('generational', 5, 25)
@@ -52,6 +47,8 @@ log.debug('ROOT:', ROOT:string())
 log.debug('LOGPATH:', LOGPATH)
 log.debug('METAPATH:', METAPATH)
 log.debug('VERSION:', version.getVersion())
+
+require 'ci'
 
 require 'tracy'
 

@@ -10,6 +10,8 @@ while arg[i] do
         exec = true
     elseif not main and arg[i]:sub(1, 1) ~= '-' then
         main = i
+    elseif arg[i]:sub(1, 2) == '--' then
+        break
     end
     i = i + 1
 end

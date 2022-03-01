@@ -1,13 +1,15 @@
-local lclient = require 'lclient'
-local furi    = require 'file-uri'
-local ws      = require 'workspace'
-local files   = require 'files'
-local diag    = require 'provider.diagnostic'
-local util    = require 'utility'
-local json    = require 'json-beautify'
-local lang    = require 'language'
-local define  = require 'proto.define'
-local config  = require 'config.config'
+local lclient  = require 'lclient'
+local furi     = require 'file-uri'
+local ws       = require 'workspace'
+local files    = require 'files'
+local diag     = require 'provider.diagnostic'
+local util     = require 'utility'
+local json     = require 'json-beautify'
+local lang     = require 'language'
+local define   = require 'proto.define'
+local config   = require 'config.config'
+local timer    = require 'timer'
+local platform = require 'bee.platform'
 
 if type(CHECK) ~= 'string' then
     print(('The argument of CHECK must be a string, but got %s'):format(type(CHECK)))
@@ -34,6 +36,8 @@ lclient():start(function (client)
         results[params.uri] = params.diagnostics
     end)
 
+    io.write(lang.script('CLI_CHECK_INITING'))
+
     ws.awaitReady(rootUri)
 
     local checkLevel = define.DiagnosticSeverity[CHECKLEVEL] or define.DiagnosticSeverity.Warning
@@ -53,9 +57,16 @@ lclient():start(function (client)
         diag.doDiagnostic(uri, true)
         if os.clock() - lastClock > 0.2 then
             lastClock = os.clock()
-            print(('%d/%d'):format(i, max))
+            local output = '\x0D'
+                        .. ('>'):rep(math.ceil(i / max * 20))
+                        .. ('='):rep(20 - math.ceil(i / max * 20))
+                        .. ' '
+                        .. ('0'):rep(#tostring(max) - #tostring(i))
+                        .. tostring(i) .. '/' .. tostring(max)
+            io.write(output)
         end
     end
+    io.write('\x0D')
 end)
 
 local count = 0

@@ -511,6 +511,8 @@ PLUGIN_TRUST_NO                  =
 不要加载此插件
 ]]
 
+CLI_CHECK_INITING =
+'正在初始化...'
 CLI_CHECK_SUCCESS =
 '诊断完成，没有发现问题'
 CLI_CHECK_RESULTS =

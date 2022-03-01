@@ -107,9 +107,6 @@ function mt:start(callback)
         if finished and #self._outs == 0 then
             break
         end
-        if await.step() then
-            goto CONTINUE
-        end
         timer.update()
         if await.step() then
             goto CONTINUE

@@ -512,6 +512,12 @@ PLUGIN_TRUST_NO                  =
 Don't load this plugin
 ]]
 
+CLI_CHECK_ERROR_TYPE =
+'The argument of CHECK must be a string, but got {}'
+CLI_CHECK_ERROR_URI =
+'The argument of CHECK must be a valid uri, but got {}'
+CLI_CHECK_ERROR_LEVEL =
+'Checklevel must be one of: {}'
 CLI_CHECK_INITING =
 'Initializing ...'
 CLI_CHECK_SUCCESS =

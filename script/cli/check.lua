@@ -8,17 +8,27 @@ local json     = require 'json-beautify'
 local lang     = require 'language'
 local define   = require 'proto.define'
 local config   = require 'config.config'
-local timer    = require 'timer'
-local platform = require 'bee.platform'
+
+lang(LOCALE)
 
 if type(CHECK) ~= 'string' then
-    print(('The argument of CHECK must be a string, but got %s'):format(type(CHECK)))
+    print(lang.script('CLI_CHECK_ERROR_TYPE', type(CHECK)))
+    return
 end
 
 local rootUri = furi.encode(CHECK)
 if not rootUri then
-    print(('The argument of CHECK must be a valid uri, but got %s'):format(CHECK))
+    print(lang.script('CLI_CHECK_ERROR_URI', CHECK))
+    return
 end
+
+if CHECKLEVEL then
+    if not define.DiagnosticSeverity[CHECKLEVEL] then
+        print(lang.script('CLI_CHECK_ERROR_LEVEL', 'Error, Warning, Information, Hint'))
+        return
+    end
+end
+local checkLevel = define.DiagnosticSeverity[CHECKLEVEL] or define.DiagnosticSeverity.Warning
 
 util.enableCloseFunction()
 
@@ -40,7 +50,6 @@ lclient():start(function (client)
 
     ws.awaitReady(rootUri)
 
-    local checkLevel = define.DiagnosticSeverity[CHECKLEVEL] or define.DiagnosticSeverity.Warning
     local disables   = config.get(rootUri, 'Lua.diagnostics.disable')
     for name, serverity in pairs(define.DiagnosticDefaultSeverity) do
         serverity = config.get(rootUri, 'Lua.diagnostics.severity')[name] or 'Warning'

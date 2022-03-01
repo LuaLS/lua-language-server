@@ -1,9 +1,9 @@
 if _G['VERSION'] then
-    require 'ci.version'
+    require 'cli.version'
     os.exit(0, true)
 end
 
 if _G['CHECK'] then
-    require 'ci.check'
+    require 'cli.check'
     os.exit(0, true)
 end

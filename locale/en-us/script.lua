@@ -511,3 +511,8 @@ PLUGIN_TRUST_NO                  =
 [[
 Don't load this plugin
 ]]
+
+CLI_CHECK_SUCCESS =
+'Diagnosis completed, no problems found'
+CLI_CHECK_RESULTS =
+'Diagnosis complete, {} problems found, see {}'

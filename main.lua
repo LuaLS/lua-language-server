@@ -64,9 +64,8 @@ log.debug('LOGPATH:', LOGPATH)
 log.debug('METAPATH:', METAPATH)
 log.debug('VERSION:', version.getVersion())
 
-require 'ci'
-
 require 'tracy'
+require 'cli'
 
 xpcall(dofile, log.debug, (ROOT / 'debugger.lua'):string())
 

@@ -107,14 +107,11 @@ end
 
 function m.request(name, params, callback)
     local id  = reqCounter()
-    local buf = jsonrpc.encode {
+    m.send {
         id     = id,
         method = name,
         params = params,
     }
-    --log.debug('Request', name, #buf)
-    logSend(buf)
-    io.write(buf)
     m.waiting[id] = {
         id     = id,
         method = name,

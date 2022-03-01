@@ -389,7 +389,7 @@ function m.isReady()
 end
 
 local function hookPrint()
-    if TEST then
+    if TEST or CLI then
         return
     end
     print = function (...)

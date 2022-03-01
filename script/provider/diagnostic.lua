@@ -359,6 +359,42 @@ local function askForDisable(uri)
     end
 end
 
+---@async
+function m.awaitDiagnosticsScope(uri)
+    local scp = scope.getScope(uri)
+    while loading.count() > 0 do
+        await.sleep(1.0)
+    end
+    local clock = os.clock()
+    local bar <close> = progress.create(scope.getScope(uri), lang.script.WORKSPACE_DIAGNOSTIC, 1)
+    local cancelled
+    bar:onCancel(function ()
+        log.debug('Cancel workspace diagnostics')
+        cancelled = true
+        ---@async
+        await.call(function ()
+            askForDisable(uri)
+        end)
+    end)
+    local uris = files.getAllUris(uri)
+    log.info(('Diagnostics scope [%s], files count:[%d]'):format(scp:getName(), #uris))
+    for i, uri in ipairs(uris) do
+        while loading.count() > 0 do
+            await.sleep(1.0)
+        end
+        bar:setMessage(('%d/%d'):format(i, #uris))
+        bar:setPercentage(i / #uris * 100)
+        xpcall(m.doDiagnostic, log.error, uri, true)
+        await.delay()
+        if cancelled then
+            log.debug('Break workspace diagnostics')
+            break
+        end
+    end
+    bar:remove()
+    log.debug(('Diagnostics scope [%s] finished, takes [%.3f] sec.'):format(scp:getName(), os.clock() - clock))
+end
+
 function m.diagnosticsScope(uri, force)
     if not ws.isReady(uri) then
         return
@@ -371,37 +407,7 @@ function m.diagnosticsScope(uri, force)
     local id = 'diagnosticsScope:' .. scp:getName()
     await.close(id)
     await.call(function () ---@async
-        while loading.count() > 0 do
-            await.sleep(1.0)
-        end
-        local clock = os.clock()
-        local bar <close> = progress.create(scope.getScope(uri), lang.script.WORKSPACE_DIAGNOSTIC, 1)
-        local cancelled
-        bar:onCancel(function ()
-            log.debug('Cancel workspace diagnostics')
-            cancelled = true
-            ---@async
-            await.call(function ()
-                askForDisable(uri)
-            end)
-        end)
-        local uris = files.getAllUris(uri)
-        log.info(('Diagnostics scope [%s], files count:[%d]'):format(scp:getName(), #uris))
-        for i, uri in ipairs(uris) do
-            while loading.count() > 0 do
-                await.sleep(1.0)
-            end
-            bar:setMessage(('%d/%d'):format(i, #uris))
-            bar:setPercentage(i / #uris * 100)
-            xpcall(m.doDiagnostic, log.error, uri, true)
-            await.delay()
-            if cancelled then
-                log.debug('Break workspace diagnostics')
-                break
-            end
-        end
-        bar:remove()
-        log.debug(('Diagnostics scope [%s] finished, takes [%.3f] sec.'):format(scp:getName(), os.clock() - clock))
+        m.awaitDiagnosticsScope(uri)
     end, id)
 end
 

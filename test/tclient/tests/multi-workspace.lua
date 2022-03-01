@@ -1,4 +1,4 @@
-local lclient = require 'tclient.lclient'
+local lclient = require 'lclient'
 local fs      = require 'bee.filesystem'
 local util    = require 'utility'
 local furi    = require 'file-uri'

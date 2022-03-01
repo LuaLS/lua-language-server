@@ -74,7 +74,7 @@ local function main()
     require 'utility'.enableCloseFunction()
     require 'client' .client 'VSCode'
 
-    local lclient = require 'tclient.lclient'
+    local lclient = require 'lclient'
     local ws      = require 'workspace'
 
     log.print = true

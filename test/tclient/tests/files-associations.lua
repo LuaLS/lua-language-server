@@ -1,4 +1,4 @@
-local lclient = require 'tclient.lclient'
+local lclient = require 'lclient'
 local ws      = require 'workspace'
 local files   = require 'files'
 local furi    = require 'file-uri'

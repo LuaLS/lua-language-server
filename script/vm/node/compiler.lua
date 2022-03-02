@@ -65,7 +65,7 @@ local searchFieldMap = util.switch()
     : case 'global'
     ---@param node vm.node.global
     : call(function (node, key, pushResult)
-        local global = globalMgr.getGlobal(node.name, key)
+        local global = globalMgr.getGlobal('variable', node.name, key)
         if global then
             pushResult(global)
         end

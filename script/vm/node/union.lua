@@ -5,7 +5,7 @@ local mt = {}
 mt.__index = mt
 mt.type = 'union'
 
----@param node   vm.node
+---@param node vm.node
 function mt:merge(node)
     if not node then
         return

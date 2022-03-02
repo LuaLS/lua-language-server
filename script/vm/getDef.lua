@@ -86,7 +86,7 @@ local searchFieldMap = util.switch()
     end)
     : case 'global'
     : call(function (node, key, pushResult)
-        local newGlobal = globalMgr.getGlobal(node.name, key)
+        local newGlobal = globalMgr.getGlobal('variable', node.name, key)
         if not newGlobal then
             return
         end

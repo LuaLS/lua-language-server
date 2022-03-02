@@ -37,7 +37,7 @@ local compilerGlobalMap = util.switch()
     : call(function (source)
         local uri    = guide.getUri(source)
         local name   = guide.getKeyName(source)
-        local global = m.declareGlobal(name, uri)
+        local global = m.declareGlobal('variable', name, uri)
         global:addSet(uri, source)
         source._globalNode = global
     end)
@@ -45,7 +45,7 @@ local compilerGlobalMap = util.switch()
     : call(function (source)
         local uri    = guide.getUri(source)
         local name   = guide.getKeyName(source)
-        local global = m.declareGlobal(name, uri)
+        local global = m.declareGlobal('variable', name, uri)
         global:addGet(uri, source)
         source._globalNode = global
 
@@ -78,7 +78,7 @@ local compilerGlobalMap = util.switch()
             return
         end
         local uri  = guide.getUri(source)
-        local global = m.declareGlobal(name, uri)
+        local global = m.declareGlobal('variable', name, uri)
         global:addSet(uri, source)
         source._globalNode = global
     end)
@@ -99,7 +99,7 @@ local compilerGlobalMap = util.switch()
             name = guide.getKeyName(source)
         end
         local uri  = guide.getUri(source)
-        local global = m.declareGlobal(name, uri)
+        local global = m.declareGlobal('variable', name, uri)
         global:addGet(uri, source)
         source._globalNode = global
 
@@ -118,7 +118,7 @@ local compilerGlobalMap = util.switch()
                 local name = guide.getKeyName(key)
                 if name then
                     local uri    = guide.getUri(source)
-                    local global = m.declareGlobal(name, uri)
+                    local global = m.declareGlobal('variable', name, uri)
                     if source.node.special == 'rawset' then
                         global:addSet(uri, source)
                         source.value = source.args[3]
@@ -138,25 +138,29 @@ local compilerGlobalMap = util.switch()
     : getMap()
 
 
----@param name   string
----@param uri    uri
+---@param cat  '"variable"' | '"type"' | '"alias"'
+---@param name string
+---@param uri  uri
 ---@return vm.node.global
-function m.declareGlobal(name, uri)
-    m.globalSubs[uri][name] = true
-    if not m.globals[name] then
-        m.globals[name] = globalBuilder(name)
+function m.declareGlobal(cat, name, uri)
+    local key = cat .. '|' .. name
+    m.globalSubs[uri][key] = true
+    if not m.globals[key] then
+        m.globals[key] = globalBuilder(name)
     end
-    return m.globals[name]
+    return m.globals[key]
 end
 
----@param name string
+---@param cat    '"variable"' | '"type"' | '"alias"'
+---@param name   string
 ---@param field? string
 ---@return vm.node.global?
-function m.getGlobal(name, field)
+function m.getGlobal(cat, name, field)
+    local key = cat .. '|' .. name
     if field then
-        name = name .. m.ID_SPLITE .. field
+        key = key .. m.ID_SPLITE .. field
     end
-    return m.globals[name]
+    return m.globals[key]
 end
 
 ---@param source parser.object
@@ -196,11 +200,11 @@ end
 function m.dropUri(uri)
     local globalSub = m.globalSubs[uri]
     m.globalSubs[uri] = nil
-    for name in pairs(globalSub) do
-        local global = m.globals[name]
+    for key in pairs(globalSub) do
+        local global = m.globals[key]
         global:dropUri(uri)
         if not global:isAlive() then
-            m.globals[name] = nil
+            m.globals[key] = nil
         end
     end
 end

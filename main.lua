@@ -2,25 +2,41 @@ local fs      = require 'bee.filesystem'
 local util    = require 'utility'
 local version = require 'version'
 
+local function getValue(value)
+    if     value == 'true' or value == nil then
+        value = true
+    elseif value == 'false' then
+        value = false
+    elseif tonumber(value) then
+        value = tonumber(value)
+    elseif value:sub(1, 1) == '"' and value:sub(-1, -1) == '"' then
+        value = value:sub(2, -2)
+    end
+    return value
+end
+
 local function loadArgs()
+    local lastKey
     for _, v in ipairs(arg) do
         ---@type string
         local key, tail = v:match '^%-%-([%w_]+)(.*)$'
-        if not key then
-            goto CONTINUE
+        local value
+        if key then
+            value   = tail:match '=(.+)'
+            lastKey = nil
+            if not value then
+                lastKey = key
+            end
+        else
+            if lastKey then
+                key     = lastKey
+                value   = v
+                lastKey = nil
+            end
         end
-        local value = tail:match '=(.+)'
-        if     value == 'true' or value == nil then
-            value = true
-        elseif value == 'false' then
-            value = false
-        elseif tonumber(value) then
-            value = tonumber(value)
-        elseif value:sub(1, 1) == '"' and value:sub(-1, -1) == '"' then
-            value = value:sub(2, -2)
+        if key then
+            _G[key:upper()] = getValue(value)
         end
-        _G[key:upper()] = value
-        ::CONTINUE::
     end
 end
 
@@ -33,11 +49,6 @@ rootPath = (rootPath == '' and '.' or rootPath)
 ROOT     = fs.path(util.expandPath(rootPath))
 LOGPATH  = LOGPATH  and util.expandPath(LOGPATH)  or (ROOT:string() .. '/log')
 METAPATH = METAPATH and util.expandPath(METAPATH) or (ROOT:string() .. '/meta')
-
-if _G['VERSION'] then
-    print(version.getVersion())
-    return
-end
 
 ---@diagnostic disable-next-line: deprecated
 debug.setcstacklimit(200)
@@ -54,6 +65,7 @@ log.debug('METAPATH:', METAPATH)
 log.debug('VERSION:', version.getVersion())
 
 require 'tracy'
+require 'cli'
 
 xpcall(dofile, log.debug, (ROOT / 'debugger.lua'):string())
 

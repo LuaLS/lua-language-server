@@ -60,7 +60,7 @@ local function pushVersion(link)
 end
 
 local function occlusionPath(str)
-    return str:gsub('(%s*)([^:"\'\r\n]+)', function (left, chunk)
+    return str:gsub('(%s*)([^:"\'%<%[%]\r\n]+)', function (left, chunk)
         if not chunk:find '[/\\]' then
             return
         end

@@ -39,3 +39,10 @@ RPCLOG = false
 --the current version is `formatting`
 ---@type boolean
 PREVIEW = false
+
+--check path
+---@type string
+CHECK = ''
+
+---@type string | '"Error"' | '"Warning"' | '"Information"' | '"Hint"'
+CHECKLEVEL = 'Warning'

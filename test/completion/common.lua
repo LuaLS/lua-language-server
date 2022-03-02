@@ -3079,3 +3079,12 @@ TEST [[
 if<??>
 ]]
 (EXISTS)
+
+TEST [[
+local t = x[<??>]
+]]
+(function (results)
+    for _, res in ipairs(results) do
+        assert(res.label ~= 'do')
+    end
+end)

@@ -1,4 +1,4 @@
-local lclient   = require 'tclient.lclient'
+local lclient   = require 'lclient'
 local ws        = require 'workspace'
 local util      = require 'utility'
 

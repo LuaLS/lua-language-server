@@ -510,3 +510,16 @@ PLUGIN_TRUST_NO                  =
 [[
 不要加载此插件
 ]]
+
+CLI_CHECK_ERROR_TYPE =
+'check 必须是一个字符串，但是是一个 {}'
+CLI_CHECK_ERROR_URI =
+'check 必须是一个有效的 URI，但是是 {}'
+CLI_CHECK_ERROR_LEVEL =
+'checklevel 必须是这些值之一：{}'
+CLI_CHECK_INITING =
+'正在初始化...'
+CLI_CHECK_SUCCESS =
+'诊断完成，没有发现问题'
+CLI_CHECK_RESULTS =
+'诊断完成，共有 {} 个问题，请查看 {}'

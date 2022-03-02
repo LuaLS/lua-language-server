@@ -871,21 +871,6 @@ m.register 'workspace/symbol' {
     end
 }
 
-m.register 'textDocument/semanticTokens/full' {
-    abortByFileUpdate = true,
-    ---@async
-    function (params)
-        local uri = files.getRealUri(params.textDocument.uri)
-        workspace.awaitReady(uri)
-        local _ <close> = progress.create(scope.getScope(uri), lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
-        local core = require 'core.semantic-tokens'
-        local results = core(uri, 0, math.huge)
-        return {
-            data = results
-        }
-    end
-}
-
 local function toArray(map)
     local array = {}
     for k in pairs(map) do
@@ -897,6 +882,29 @@ local function toArray(map)
     return array
 end
 
+m.register 'textDocument/semanticTokens/full' {
+    capability = {
+        semanticTokensProvider = {
+            legend = {
+                tokenTypes     = toArray(define.TokenTypes),
+                tokenModifiers = toArray(define.TokenModifiers),
+            },
+            full  = true,
+        },
+    },
+    ---@async
+    function (params)
+        log.debug('textDocument/semanticTokens/full')
+        local uri = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
+        local _ <close> = progress.create(scope.getScope(uri), lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
+        local core = require 'core.semantic-tokens'
+        local results = core(uri, 0, math.huge)
+        return {
+            data = results
+        }
+    end
+}
 
 m.register 'textDocument/semanticTokens/range' {
     capability = {
@@ -906,7 +914,6 @@ m.register 'textDocument/semanticTokens/range' {
                 tokenModifiers = toArray(define.TokenModifiers),
             },
             range = true,
-            full  = false,
         },
     },
     ---@async

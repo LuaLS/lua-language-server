@@ -57,7 +57,7 @@ m.DiagnosticDefaultSeverity = {
     ['duplicate-doc-param']     = 'Warning',
     ['doc-field-no-class']      = 'Warning',
     ['duplicate-doc-field']     = 'Warning',
-    ['unknown-diag-code']       = 'Waiting',
+    ['unknown-diag-code']       = 'Warning',
 
     ['codestyle-check']         = "Warning",
 }

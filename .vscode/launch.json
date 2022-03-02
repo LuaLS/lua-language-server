@@ -21,7 +21,7 @@
 			],
 		},
 		{
-			"name": "attach",
+			"name": "🪡attach",
 			"type": "lua",
 			"request": "attach",
 			"stopOnEntry": false,
@@ -36,7 +36,7 @@
 			]
 		},
 		{
-			"name": "build-3rd-meta",
+			"name": "🍉build-3rd-meta",
 			"type": "lua",
 			"request": "launch",
 			"stopOnEntry": false,
@@ -46,6 +46,26 @@
 			"arg": [
 			],
 			"luaVersion": "latest",
+			"consoleCoding": "utf8",
+			"sourceCoding": "utf8",
+			"outputCapture": [
+				"print",
+				"stderr",
+			],
+		},
+		{
+			"name": "🍖cli-check",
+			"type": "lua",
+			"request": "launch",
+			"stopOnEntry": false,
+			"program": "${workspaceRoot}/main.lua",
+			"luaexe": "${workspaceFolder}/bin/lua-language-server.exe",
+			"cpath": null,
+			"arg": [
+				"--check",
+				"${workspaceRoot}",
+			],
+			"luaVersion": "5.4",
 			"consoleCoding": "utf8",
 			"sourceCoding": "utf8",
 			"outputCapture": [

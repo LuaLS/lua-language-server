@@ -11,7 +11,7 @@ local config       = require 'config'
 local util         = require 'utility'
 local markdown     = require 'provider.markdown'
 local parser       = require 'parser'
-local keyWordMap   = require 'core.keyword'
+local keyWordMap   = require 'core.completion.keyword'
 local workspace    = require 'workspace'
 local furi         = require 'file-uri'
 local rpath        = require 'workspace.require-path'
@@ -722,7 +722,7 @@ local function checkKeyWord(state, start, position, word, hasSpace, afterLocal, 
     local text = state.lua
     local snipType = config.get(state.uri, 'Lua.completion.keywordSnippet')
     local symbol = lookBackward.findSymbol(text, guide.positionToOffset(state, start))
-    local isExp = symbol == '(' or symbol == ',' or symbol == '='
+    local isExp = symbol == '(' or symbol == ',' or symbol == '=' or symbol == '['
     local info = {
         hasSpace = hasSpace,
         isExp    = isExp,
@@ -1472,7 +1472,6 @@ local function checkTableLiteralField(state, position, tbl, fields, results)
                 results[#results+1] = {
                     label      = guide.getKeyName(field),
                     kind       = define.CompletionItemKind.Property,
-                    insertText = ('%s = $0'):format(guide.getKeyName(field)),
                     id         = stack(function () ---@async
                         return {
                             detail      = buildDetail(field),

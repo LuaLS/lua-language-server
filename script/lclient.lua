@@ -15,6 +15,7 @@ local counter = util.counter()
 ---@field _gc   gc
 ---@field _waiting table
 ---@field _methods table
+---@field onSend function
 local mt = {}
 mt.__index = mt
 
@@ -25,6 +26,9 @@ end
 function mt:_fakeProto()
     proto.send = function (data)
         self._outs[#self._outs+1] = data
+        if self.onSend then
+            self:onSend(data)
+        end
     end
 end
 
@@ -76,7 +80,10 @@ function mt:reportHangs()
 end
 
 ---@param callback async fun(client: languageClient)
+---@return languageClient
 function mt:start(callback)
+    CLI = true
+
     self:_fakeProto()
     self:_flushServer()
     self:_localLoadFile()
@@ -97,11 +104,8 @@ function mt:start(callback)
     local jumpedTime = 0
 
     while true do
-        if finished then
+        if finished and #self._outs == 0 then
             break
-        end
-        if await.step() then
-            goto CONTINUE
         end
         timer.update()
         if await.step() then
@@ -119,6 +123,8 @@ function mt:start(callback)
     end
 
     self:remove()
+
+    CLI = false
 end
 
 function mt:gc(obj)
@@ -172,10 +178,15 @@ function mt:update()
         if out.method then
             local callback = self._methods[out.method]
             if callback then
-                proto.doResponse {
-                    id     = out.id,
-                    result = callback(out.params),
-                }
+                local result = callback(out.params)
+                await.call(function ()
+                    if out.id then
+                        proto.doResponse {
+                            id     = out.id,
+                            result = result,
+                        }
+                    end
+                end)
             elseif out.method:sub(1, 2) ~= '$/' then
                 error('Unknown method: ' .. out.method)
             end

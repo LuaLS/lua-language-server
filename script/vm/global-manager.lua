@@ -1,6 +1,6 @@
 local util          = require 'utility'
 local guide         = require 'parser.guide'
-local globalBuilder = require 'vm.node.global'
+local globalBuilder = require 'vm.global'
 
 ---@class parser.object
 ---@field _globalNode vm.node.global

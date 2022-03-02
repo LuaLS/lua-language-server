@@ -1,6 +1,6 @@
 local guide     = require 'parser.guide'
 local util      = require 'utility'
-local union     = require 'vm.node.union'
+local union     = require 'vm.union'
 local localID   = require 'vm.local-id'
 local localMgr  = require 'vm.local-manager'
 local globalMgr = require 'vm.global-manager'

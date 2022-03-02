@@ -151,6 +151,10 @@ return function (uri, offset)
             if not guide.isLiteral(src) then
                 goto CONTINUE
             end
+        else
+            if guide.isLiteral(src) then
+                goto CONTINUE
+            end
         end
         if src.type == 'doc.class.name'
         or src.type == 'doc.alias.name' then

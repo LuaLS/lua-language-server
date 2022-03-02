@@ -59,7 +59,11 @@ local compileMap = util.switch()
         if not parentID then
             return
         end
-        source._localID = parentID .. m.ID_SPLITE .. guide.getKeyName(source)
+        local key = guide.getKeyName(source)
+        if not key then
+            return
+        end
+        source._localID = parentID .. m.ID_SPLITE .. key
         source.index._localID = source._localID
         if source.type == 'setindex' then
             m.compileLocalID(source.next)

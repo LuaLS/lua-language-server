@@ -134,7 +134,7 @@ t:<?add?>()
 
 TEST [[
 local t = {}
-t.<!f1!> = 1
+t.f1 = 1
 t.<!f2!> = t.f1
 
 print(t.<?f2?>)
@@ -142,9 +142,9 @@ print(t.<?f2?>)
 
 TEST [[
 local t = {}
-t.<!f1!> = 1
+t.f1 = 1
 t.<!f2!> = t.f1
-t.<!f1!> = t.f2
+t.f1 = t.f2
 
 print(t.<?f2?>)
 ]]
@@ -172,67 +172,65 @@ string.xx:<?format?>()
 --v.<?bar1?>
 --]]
 
-config.set(nil, 'Lua.IntelliSense.traceLocalSet', true)
 TEST [[
 local A, B
 
 function A:get1()
-    local <!a!> = B:get()
+    local a = B:get()
     return a
 end
 
 function A:get2()
-    local <!a!> = B:get()
+    local a = B:get()
     return a
 end
 
 function A:get3()
-    local <!a!> = B:get()
+    local a = B:get()
     return a
 end
 
 function A:get4()
-    local <!a!> = B:get()
+    local a = B:get()
     return a
 end
 
 function A:get5()
-    local <!a!> = B:get()
+    local a = B:get()
     return a
 end
 
 function A:get6()
-    local <!a!> = B:get()
+    local a = B:get()
     return a
 end
 
 function A:get7()
-    local <!a!> = B:get()
+    local a = B:get()
     return a
 end
 
 function A:get8()
-    local <!a!> = B:get()
+    local a = B:get()
     return a
 end
 
 function B:get()
-    local <!b!>
-    <!b!> = A:get1()
-    <!b!> = A:get2()
-    <!b!> = A:get3()
-    <!b!> = A:get4()
-    <!b!> = A:get5()
-    <!b!> = A:get6()
-    <!b!> = A:get7()
-    <!b!> = A:get8()
+    local b
+    b = A:get1()
+    b = A:get2()
+    b = A:get3()
+    b = A:get4()
+    b = A:get5()
+    b = A:get6()
+    b = A:get7()
+    b = A:get8()
     return b
 end
 
 local <!b!> = B:get()
 print(<?b?>)
 ]]
-config.set(nil, 'Lua.IntelliSense.traceLocalSet', false)
 
 TEST [[
 g[a.b.c] = 1

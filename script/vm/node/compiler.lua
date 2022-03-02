@@ -109,16 +109,14 @@ local function getReturnOfSetMetaTable(source, args)
 end
 
 local function getReturn(func, index, source, args)
-    local node = m.compileNode(func)
-    if not node then
-        return
+    if func.special == 'setmetatable' then
+        return getReturnOfSetMetaTable(source, args)
     end
-    for cnode in m.eachNode(node) do
-        if     cnode.type == 'function' then
-            return getReturnOfFunction(cnode, index)
-        elseif cnode.type == 'global' then
-            if cnode.name == 'setmetatable' and index == 1 then
-                return getReturnOfSetMetaTable(source, args)
+    local node = m.compileNode(func)
+    if node then
+        for cnode in m.eachNode(node) do
+            if cnode.type == 'function' then
+                return getReturnOfFunction(cnode, index)
             end
         end
     end
@@ -215,6 +213,11 @@ local compilerMap = util.switch()
             m.setNode(source, m.compileNode(source.value))
         end
     end)
+    : case 'field'
+    : case 'method'
+    : call(function (source)
+        m.setNode(source, m.compileNode(source.parent))
+    end)
     : case 'function.return'
     : call(function (source)
         local func  = source.parent
@@ -234,6 +237,10 @@ local compilerMap = util.switch()
             m.setNode(source, getReturn(vararg.node, source.sindex, source, vararg.args))
         end
     end)
+    : case 'call'
+    : call(function (source)
+        m.setNode(source, getReturn(source.node, 1, source, source.args))
+    end)
     : getMap()
 
 ---@param source parser.object
@@ -248,6 +255,11 @@ end
 local function compileByGlobal(source)
     if source._globalNode then
         m.setNode(source, source._globalNode)
+        for _, set in ipairs(source._globalNode:getSets()) do
+            if set.value then
+                m.setNode(source, m.compileNode(set.value))
+            end
+        end
     end
 end
 

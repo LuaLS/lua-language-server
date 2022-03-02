@@ -60,15 +60,19 @@ local compilerGlobalMap = util.switch()
     ---@param source parser.object
     : call(function (source)
         local name
+        local keyName = guide.getKeyName(source)
+        if not keyName then
+            return
+        end
         if source.node._globalNode then
             local parentName = source.node._globalNode:getName()
             if parentName == '_G' then
-                name = guide.getKeyName(source)
+                name = keyName
             else
-                name = parentName .. m.ID_SPLITE .. guide.getKeyName(source)
+                name = parentName .. m.ID_SPLITE .. keyName
             end
         elseif source.node.special == '_G' then
-            name = guide.getKeyName(source)
+            name = keyName
         end
         if not name then
             return
@@ -117,6 +121,7 @@ local compilerGlobalMap = util.switch()
                     local global = m.declareGlobal(name, uri)
                     if source.node.special == 'rawset' then
                         global:addSet(uri, source)
+                        source.value = source.args[3]
                     else
                         global:addGet(uri, source)
                     end

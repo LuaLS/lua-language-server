@@ -178,13 +178,30 @@ function searchByParentNode(source, pushResult)
     end
 end
 
+local function searchByNode(source, pushResult)
+    local node = compiler.compileNode(source)
+    if not node then
+        return
+    end
+    for n in compiler.eachNode(node) do
+        pushResult(n)
+    end
+end
+
 ---@param source parser.object
 ---@return       parser.object[]
 function vm.getDefs(source)
     local results = {}
     local mark    = {}
 
+    local hasLocal
     local function pushResult(src)
+        if src.type == 'local' and not src.dummy then
+            if hasLocal then
+                return
+            end
+            hasLocal = true
+        end
         if not mark[src] then
             mark[src] = true
             results[#results+1] = src
@@ -195,6 +212,7 @@ function vm.getDefs(source)
     searchByGlobal(source, pushResult)
     searchByID(source, pushResult)
     searchByParentNode(source, pushResult)
+    searchByNode(source, pushResult)
 
     return results
 end

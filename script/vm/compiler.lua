@@ -178,6 +178,17 @@ local function selectNode(source, list, index)
     return m.compileNode(exp)
 end
 
+local function bindDocs(source)
+    local isParam = source.parent.type == 'funcargs'
+    for _, doc in ipairs(source.bindDocs) do
+        if doc.type == 'doc.type' then
+            if not isParam then
+                m.setNode(source, m.compileNode(doc))
+            end
+        end
+    end
+end
+
 local compilerMap = util.switch()
     : case 'boolean'
     : case 'table'
@@ -204,6 +215,9 @@ local compilerMap = util.switch()
         end
         if source.dummy then
             m.setNode(source, m.compileNode(source.method.node))
+        end
+        if source.bindDocs then
+            bindDocs(source)
         end
         -- function x.y(self, ...) --> function x:y(...)
         if  source[1] == 'self'
@@ -262,6 +276,20 @@ local compilerMap = util.switch()
         if vararg.type == 'call' then
             m.setNode(source, getReturn(vararg.node, source.sindex, source, vararg.args))
         end
+    end)
+    : case 'doc.type'
+    : call(function (source)
+        for _, typeUnit in ipairs(source.types) do
+            m.setNode(source, m.compileNode(typeUnit))
+        end
+    end)
+    : case 'doc.type.name'
+    : call(function (source)
+        local name = source[1]
+        local uri  = guide.getUri(source)
+        local type = globalMgr.declareGlobal('type', name, uri)
+        type:addGet(uri, source)
+        m.setNode(source, type)
     end)
     : getMap()
 

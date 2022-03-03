@@ -150,6 +150,34 @@ function m.compileByParentNode(source, key, pushResult)
     end
 end
 
+local function selectNode(source, list, index)
+    local exp
+    if list[index] then
+        exp = list[index]
+    else
+        for i = index, 1, -1 do
+            if list[i] then
+                exp = list[i]
+                if exp.type == 'call'
+                or exp.type == '...' then
+                    index = index - i + 1
+                end
+                break
+            end
+        end
+    end
+    if not exp then
+        return nil
+    end
+    if exp.type == 'call' then
+        return getReturn(exp.node, index, source, exp.args)
+    end
+    if exp.type == '...' then
+        -- TODO
+    end
+    return m.compileNode(exp)
+end
+
 local compilerMap = util.switch()
     : case 'boolean'
     : case 'table'
@@ -224,9 +252,7 @@ local compilerMap = util.switch()
         local index = source.index
         if func.returns then
             for _, rtn in ipairs(func.returns) do
-                if rtn[index] then
-                    m.setNode(source, m.compileNode(rtn[index]))
-                end
+                m.setNode(source, selectNode(source, rtn, index))
             end
         end
     end)
@@ -236,10 +262,6 @@ local compilerMap = util.switch()
         if vararg.type == 'call' then
             m.setNode(source, getReturn(vararg.node, source.sindex, source, vararg.args))
         end
-    end)
-    : case 'call'
-    : call(function (source)
-        m.setNode(source, getReturn(source.node, 1, source, source.args))
     end)
     : getMap()
 

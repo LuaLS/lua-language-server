@@ -828,7 +828,7 @@ return function (uri, start, finish)
                     results[#results+1] = {
                         start      = comm.start + 3,
                         finish     = comm.start + 2 +  #comm.text:match '%S+',
-                        type       = define.TokenTypes.comment,
+                        type       = define.TokenTypes.keyword,
                         modifieres = define.TokenModifiers.documentation,
                     }
                 else

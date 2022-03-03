@@ -135,15 +135,31 @@ local compilerGlobalMap = util.switch()
             end
         end
     end)
+    : case 'doc.class'
+    : call(function (source)
+        local uri  = guide.getUri(source)
+        local name = guide.getKeyName(source)
+        local class = m.declareGlobal('type', name, uri)
+        class:addSet(uri, source)
+    end)
+    : case 'doc.alias'
+    : call(function (source)
+        local uri  = guide.getUri(source)
+        local name = guide.getKeyName(source)
+        local alias = m.declareGlobal('type', name, uri)
+        alias:addSet(uri, source)
+    end)
     : getMap()
 
 
----@param cat  '"variable"' | '"type"' | '"alias"'
+---@alias vm.global.cate '"variable"' | '"type"'
+
+---@param cate vm.global.cate
 ---@param name string
 ---@param uri  uri
 ---@return vm.node.global
-function m.declareGlobal(cat, name, uri)
-    local key = cat .. '|' .. name
+function m.declareGlobal(cate, name, uri)
+    local key = cate .. '|' .. name
     m.globalSubs[uri][key] = true
     if not m.globals[key] then
         m.globals[key] = globalBuilder(name)
@@ -151,12 +167,12 @@ function m.declareGlobal(cat, name, uri)
     return m.globals[key]
 end
 
----@param cat    '"variable"' | '"type"' | '"alias"'
+---@param cate   vm.global.cate
 ---@param name   string
 ---@param field? string
 ---@return vm.node.global?
-function m.getGlobal(cat, name, field)
-    local key = cat .. '|' .. name
+function m.getGlobal(cate, name, field)
+    local key = cate .. '|' .. name
     if field then
         key = key .. m.ID_SPLITE .. field
     end
@@ -184,6 +200,14 @@ function m.compileAst(source)
     end)
     guide.eachSpecialOf(source, 'rawget', function (src)
         m.compileObject(src.parent)
+    end)
+    guide.eachSourceTypes(source.docs, {
+        'doc.class',
+        'doc.alias',
+        'doc.type.name',
+        'doc.extends.name',
+    }, function (src)
+        m.compileObject(src)
     end)
 end
 

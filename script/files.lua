@@ -69,7 +69,6 @@ function m.open(uri)
         cache = {},
     }
     m.onWatch('open', uri)
-    m.addRef(uri)
 end
 
 --- 关闭文件
@@ -81,7 +80,9 @@ function m.close(uri)
         file.trusted = false
     end
     m.onWatch('close', uri)
-    m.delRef(uri)
+    if (file._ref or 0) <= 0 and not file.isOpen(uri) then
+        m.remove(uri)
+    end
 end
 
 --- 是否打开
@@ -380,7 +381,7 @@ function m.delRef(uri)
     end
     file._ref = (file._ref or 0) - 1
     log.debug('del ref', uri)
-    if file._ref <= 0 then
+    if file._ref <= 0 and not m.isOpen(uri) then
         m.remove(uri)
     end
 end

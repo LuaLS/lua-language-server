@@ -225,7 +225,7 @@ function m.doDiagnostic(uri, isScopeDiag)
     local prog <close> = progress.create(scp, lang.script.WINDOW_DIAGNOSING, 0.5)
     prog:setMessage(ws.getRelativePath(uri))
 
-    log.debug('Diagnostic file:', uri)
+    --log.debug('Diagnostic file:', uri)
 
     local syntax = m.syntaxErrors(uri, state)
 
@@ -235,7 +235,7 @@ function m.doDiagnostic(uri, isScopeDiag)
         tracy.ZoneBeginN 'mergeSyntaxAndDiags'
         local _ <close> = tracy.ZoneEnd
         local full = mergeDiags(syntax, lastDiag, diags)
-        log.debug(('Pushed [%d] results'):format(full and #full or 0))
+        --log.debug(('Pushed [%d] results'):format(full and #full or 0))
         if not full then
             m.clear(uri)
             return

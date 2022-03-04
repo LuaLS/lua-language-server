@@ -17,7 +17,7 @@ local x
 
 TEST [[
 ---@class Class
-local <!t!>
+local t
 ---@type Class
 local <?<!x!>?>
 ]]
@@ -35,21 +35,59 @@ obj:<?cast?>()
 
 TEST [[
 ---@class A
-local <!mt!> = {}
-function mt:cast()
-end
+---@field x number
 
----@type A
-local <!obj!>
-<?obj?>:cast()
+---@class B: A
+---@field <!x!> boolean
+
+---@type B
+local t
+
+t.<?x?>
 ]]
 
 TEST [[
----@type A
-local <?<!obj!>?>
-
 ---@class A
-local <!mt!>
+---@field <!x!> number
+
+---@class B: A
+
+---@type B
+local t
+
+t.<?x?>
+]]
+
+TEST [[
+---@class A
+local A
+
+function A:x() end
+
+---@class B: A
+local B
+
+<!function B:x() end!>
+
+---@type B
+local t
+
+local <!<?v?>!> = t.x
+]]
+
+TEST [[
+---@class A
+local A
+
+<!function A:x() end!>
+
+---@class B: A
+local B
+
+---@type B
+local t
+
+local <!<?v?>!> = t.x
 ]]
 
 TEST [[
@@ -116,11 +154,12 @@ print(<?f?>)
 
 TEST [[
 local function f()
-    return 1
+    local x
+    return x
 end
 
 ---@class Class
-local <!mt!>
+local mt
 
 ---@type Class
 local <?<!x!>?> = f()
@@ -209,6 +248,25 @@ TEST [[
    local 	m2
 	 ---@type Cat
 	 	 local <?<!v!>?>
+]]
+
+TEST [[
+---@class A
+local A
+
+---@return A
+function A:x() end
+
+---@class B: A
+local <!B!>
+
+---@return B
+function B:x() end
+
+---@type B
+local t
+
+local <!<?v?>!> = t.x()
 ]]
 
 TEST [[

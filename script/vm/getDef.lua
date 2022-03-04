@@ -97,11 +97,7 @@ local searchFieldMap = util.switch()
             end
         end
         if node.cate == 'type' then
-            compiler.getClassFields(node, key, function (field)
-                if field.type == 'doc.field' then
-                    pushResult(field.field)
-                end
-            end)
+            compiler.getClassFields(node, key, pushResult)
         end
     end)
     : case 'local'
@@ -194,7 +190,13 @@ local function searchByNode(source, pushResult)
         return
     end
     for n in compiler.eachNode(node) do
-        pushResult(n)
+        if n.type == 'global' and n.cate == 'type' then
+            for _, set in ipairs(n:getSets()) do
+                pushResult(set)
+            end
+        else
+            pushResult(n)
+        end
     end
 end
 

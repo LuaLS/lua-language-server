@@ -229,14 +229,23 @@ local function selectNode(source, list, index)
 end
 
 local function bindDocs(source)
+    local hasFounded = false
     local isParam = source.parent.type == 'funcargs'
     for _, doc in ipairs(source.bindDocs) do
         if doc.type == 'doc.type' then
             if not isParam then
+                hasFounded = true
+                m.setNode(source, m.compileNode(doc))
+            end
+        end
+        if doc.type == 'doc.param' then
+            if isParam and source[1] == doc.param[1] then
+                hasFounded = true
                 m.setNode(source, m.compileNode(doc))
             end
         end
     end
+    return hasFounded
 end
 
 local compilerMap = util.switch()
@@ -245,32 +254,50 @@ local compilerMap = util.switch()
     : case 'integer'
     : case 'number'
     : case 'string'
-    : case 'function'
+    : case 'doc.type.function'
+    : case 'doc.type.table'
     : call(function (source)
         localMgr.declareLocal(source)
         m.setNode(source, source)
     end)
+    : case 'function'
+    : call(function (source)
+        localMgr.declareLocal(source)
+        m.setNode(source, source)
+
+        if source.bindDocs then
+            for _, doc in ipairs(source.bindDocs) do
+                if doc.type == 'doc.overload' then
+                    m.setNode(source, m.compileNode(doc))
+                end
+            end
+        end
+    end)
     : case 'local'
     : call(function (source)
         m.setNode(source, source)
-        if source.value then
-            m.setNode(source, m.compileNode(source.value))
+        local hasMarkDoc
+        if source.bindDocs then
+            hasMarkDoc = bindDocs(source)
         end
-        if source.ref then
+        if source.ref and not hasMarkDoc then
             for _, ref in ipairs(source.ref) do
                 if ref.type == 'setlocal' then
                     m.setNode(source, m.compileNode(ref.value))
                 end
             end
         end
-        if source.dummy then
+        if source.dummy and not hasMarkDoc then
             m.setNode(source, m.compileNode(source.method.node))
         end
-        if source.bindDocs then
-            bindDocs(source)
+        if source.value then
+            if not hasMarkDoc or guide.isLiteral(source.value) then
+                m.setNode(source, m.compileNode(source.value))
+            end
         end
         -- function x.y(self, ...) --> function x:y(...)
         if  source[1] == 'self'
+        and not hasMarkDoc
         and source.parent.type == 'funcargs'
         and source.parent[1] == source then
             local setfield = source.parent.parent.parent
@@ -344,6 +371,44 @@ local compilerMap = util.switch()
     : case 'doc.field'
     : call(function (source)
         m.setNode(source, m.compileNode(source.extends))
+    end)
+    : case 'doc.extends.name'
+    : call(function (source)
+        local name = source[1]
+        local uri  = guide.getUri(source)
+        local type = globalMgr.declareGlobal('type', name, uri)
+        type:addGet(uri, source)
+        m.setNode(source, type)
+    end)
+    : case 'doc.param'
+    : call(function (source)
+        m.setNode(source, m.compileNode(source.extends))
+    end)
+    : case 'doc.vararg'
+    : call(function (source)
+        m.setNode(source, m.compileNode(source.vararg))
+    end)
+    : case '...'
+    : call(function (source)
+        local func = source.parent.parent
+        if func.type ~= 'function' then
+            return
+        end
+        if not func.bindDocs then
+            return
+        end
+        for _, doc in ipairs(func.bindDocs) do
+            if doc.type == 'doc.vararg' then
+                m.setNode(source, m.compileNode(doc))
+            end
+            if doc.type == 'doc.param' and doc.param[1] == '...' then
+                m.setNode(source, m.compileNode(doc))
+            end
+        end
+    end)
+    : case 'doc.overload'
+    : call(function (source)
+        m.setNode(source, m.compileNode(source.overload))
     end)
     : getMap()
 

@@ -156,6 +156,12 @@ return function (uri, offset)
                 goto CONTINUE
             end
         end
+        if src.type == 'doc.class' then
+            src = src.class
+        end
+        if src.type == 'doc.alias' then
+            src = src.alias
+        end
         if src.type == 'doc.class.name'
         or src.type == 'doc.alias.name' then
             if  source.type ~= 'doc.type.name'

@@ -2,7 +2,7 @@
 
 ## 2.6.7
 * `NEW` offline diagnostic, [read more](https://github.com/sumneko/lua-language-server/wiki/Offline-Diagnostic)
-* `CHG` `VSCode`: 1.65 has built in new lua syntax files, so this extension no longer provides syntax files, which means you can install other syntax extensions in the marketplace. If you have any suggestions for syntax files, you can [open issues at here](https://github.com/sumneko/lua.tmbundle).
+* `CHG` `VSCode`: 1.65 has built in new `Lua` syntax files, so this extension no longer provides syntax files, which means you can install other syntax extensions in the marketplace. If you have any suggestions or issues, please [open issues here](https://github.com/sumneko/lua.tmbundle).
 * `FIX` [#965](https://github.com/sumneko/lua-language-server/issues/965)
 
 ## 2.6.6

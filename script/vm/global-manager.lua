@@ -141,6 +141,7 @@ local compilerGlobalMap = util.switch()
         local name = guide.getKeyName(source)
         local class = m.declareGlobal('type', name, uri)
         class:addSet(uri, source)
+        source._globalNode = class
     end)
     : case 'doc.alias'
     : call(function (source)
@@ -148,6 +149,23 @@ local compilerGlobalMap = util.switch()
         local name = guide.getKeyName(source)
         local alias = m.declareGlobal('type', name, uri)
         alias:addSet(uri, source)
+        source._globalNode = alias
+    end)
+    : case 'doc.type.name'
+    : call(function (source)
+        local uri  = guide.getUri(source)
+        local name = source[1]
+        local type = m.declareGlobal('type', name, uri)
+        type:addGet(uri, source)
+        source._globalNode = type
+    end)
+    : case 'doc.extends.name'
+    : call(function (source)
+        local uri  = guide.getUri(source)
+        local name = source[1]
+        local class = m.declareGlobal('type', name, uri)
+        class:addGet(uri, source)
+        source._globalNode = class
     end)
     : getMap()
 

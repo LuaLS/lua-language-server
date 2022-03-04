@@ -127,14 +127,26 @@ local nodeMap = util.switch()
     : case 'getindex'
     : case 'setindex'
     : call(function (source, pushResult)
-        local node = compiler.compileNode(source.node)
-        if not node then
+        local parentNode = compiler.compileNode(source.node)
+        if not parentNode then
             return
         end
         local key = guide.getKeyName(source)
-        for n in compiler.eachNode(node) do
-            if searchFieldMap[n.type] then
-                searchFieldMap[n.type](n, key, pushResult)
+        for pn in compiler.eachNode(parentNode) do
+            if searchFieldMap[pn.type] then
+                searchFieldMap[pn.type](pn, key, pushResult)
+            end
+        end
+    end)
+    : case 'doc.see.field'
+    : call(function (source, pushResult)
+        local parentNode = compiler.compileNode(source.parent.name)
+        if not parentNode then
+            return
+        end
+        for pn in compiler.eachNode(parentNode) do
+            if searchFieldMap[pn.type] then
+                searchFieldMap[pn.type](pn, source[1], pushResult)
             end
         end
     end)
@@ -216,7 +228,10 @@ function vm.getDefs(source)
         end
         if not mark[src] then
             mark[src] = true
-            results[#results+1] = src
+            if guide.isSet(src)
+            or guide.isLiteral(src) then
+                results[#results+1] = src
+            end
         end
     end
 

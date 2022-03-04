@@ -238,6 +238,13 @@ local function bindDocs(source)
                 m.setNode(source, m.compileNode(doc))
             end
         end
+        if doc.type == 'doc.class' then
+            if source.type == 'local'
+            or (source._globalNode and guide.isSet(source)) then
+                hasFounded = true
+                m.setNode(source, m.compileNode(doc))
+            end
+        end
         if doc.type == 'doc.param' then
             if isParam and source[1] == doc.param[1] then
                 hasFounded = true
@@ -360,25 +367,9 @@ local compilerMap = util.switch()
             m.setNode(source, m.compileNode(typeUnit))
         end
     end)
-    : case 'doc.type.name'
-    : call(function (source)
-        local name = source[1]
-        local uri  = guide.getUri(source)
-        local type = globalMgr.declareGlobal('type', name, uri)
-        type:addGet(uri, source)
-        m.setNode(source, type)
-    end)
     : case 'doc.field'
     : call(function (source)
         m.setNode(source, m.compileNode(source.extends))
-    end)
-    : case 'doc.extends.name'
-    : call(function (source)
-        local name = source[1]
-        local uri  = guide.getUri(source)
-        local type = globalMgr.declareGlobal('type', name, uri)
-        type:addGet(uri, source)
-        m.setNode(source, type)
     end)
     : case 'doc.param'
     : call(function (source)
@@ -410,6 +401,13 @@ local compilerMap = util.switch()
     : call(function (source)
         m.setNode(source, m.compileNode(source.overload))
     end)
+    : case 'doc.see.name'
+    : call(function (source)
+        local type = globalMgr.getGlobal('type', source[1])
+        if type then
+            m.setNode(source, m.compileNode(type))
+        end
+    end)
     : getMap()
 
 ---@param source parser.object
@@ -428,9 +426,11 @@ local function compileByGlobal(source)
     end
     if source._globalNode then
         m.setNode(source, source._globalNode)
-        for _, set in ipairs(source._globalNode:getSets()) do
-            if set.value then
-                m.setNode(source, m.compileNode(set.value))
+        if source._globalNode.cate == 'variable' then
+            for _, set in ipairs(source._globalNode:getSets()) do
+                if set.value then
+                    m.setNode(source, m.compileNode(set.value))
+                end
             end
         end
         return

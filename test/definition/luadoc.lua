@@ -192,7 +192,7 @@ y.<?a?>
 
 TEST [[
 ---@class <!loli!>
-local <!unit!>
+local unit
 
 function unit:pants()
 end

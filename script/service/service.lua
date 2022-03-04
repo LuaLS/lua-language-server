@@ -197,6 +197,8 @@ function m.eventLoop()
     end
 end
 
+local showStatusTip = math.random(100) == 1
+
 function m.reportStatus()
     local info = {}
     if m.workingClock and time.monotonic() - m.workingClock > 100 then
@@ -218,6 +220,9 @@ function m.reportStatus()
     end
     tooltips[#tooltips+1] = lang.script('WINDOW_LUA_STATUS_CACHED_FILES', params)
     tooltips[#tooltips+1] = lang.script('WINDOW_LUA_STATUS_MEMORY_COUNT', params)
+    if showStatusTip then
+        tooltips[#tooltips+1] = lang.script('WINDOW_LUA_STATUS_TIP')
+    end
 
     info.tooltip = table.concat(tooltips, '\n')
     if util.equal(m.lastInfo, info) then

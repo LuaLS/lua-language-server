@@ -457,6 +457,13 @@ WINDOW_LUA_STATUS_CACHED_FILES   =
 'Cached files: {ast}/{max}'
 WINDOW_LUA_STATUS_MEMORY_COUNT   =
 'Memory usage: {mem:.f}M'
+WINDOW_LUA_STATUS_TIP            =
+[[
+
+This icon is a cat,
+Not a dog nor a fox!
+             ↓↓↓
+]]
 WINDOW_APPLY_SETTING             =
 'Apply setting'
 WINDOW_CHECK_SEMANTIC            =

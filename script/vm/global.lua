@@ -8,6 +8,7 @@ local util = require 'utility'
 ---@field links table<uri, vm.node.global.link>
 ---@field setsCache parser.object[]
 ---@field getsCache parser.object[]
+---@field cate vm.global.cate
 local mt = {}
 mt.__index = mt
 mt.type = 'global'
@@ -70,10 +71,12 @@ function mt:isAlive()
     return next(self.links) ~= nil
 end
 
+---@param cate vm.global.cate
 ---@return vm.node.global
-return function (name)
+return function (name, cate)
     return setmetatable({
         name  = name,
+        cate  = cate,
         links = util.defaultTable(function ()
             return {
                 sets   = {},

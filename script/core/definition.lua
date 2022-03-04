@@ -152,7 +152,7 @@ return function (uri, offset)
                 goto CONTINUE
             end
         else
-            if guide.isLiteral(src) then
+            if guide.isLiteral(src) and src.type ~= 'function' then
                 goto CONTINUE
             end
         end

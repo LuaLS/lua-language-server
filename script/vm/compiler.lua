@@ -57,7 +57,7 @@ local searchFieldMap = util.switch()
             if field.type == 'tablefield'
             or field.type == 'tableindex' then
                 if guide.getKeyName(field) == key then
-                    pushResult(m.compileNode(field))
+                    pushResult(field)
                 end
             end
         end
@@ -65,9 +65,14 @@ local searchFieldMap = util.switch()
     : case 'global'
     ---@param node vm.node.global
     : call(function (node, key, pushResult)
-        local global = globalMgr.getGlobal('variable', node.name, key)
-        if global then
-            pushResult(global)
+        if node.cate == 'variable' then
+            local global = globalMgr.getGlobal('variable', node.name, key)
+            if global then
+                pushResult(global)
+            end
+        end
+        if node.cate == 'type' then
+            m.getClassFields(node, key, pushResult)
         end
     end)
     : case 'local'
@@ -75,11 +80,56 @@ local searchFieldMap = util.switch()
         local sources = localID.getSources(node, key)
         if sources then
             for _, src in ipairs(sources) do
-                pushResult(m.compileNode(src))
+                pushResult(src)
             end
         end
     end)
     : getMap()
+
+
+function m.getClassFields(node, key, pushResult)
+    local mark = {}
+    local function searchClass(class)
+        local name = class.name
+        if mark[name] then
+            return
+        end
+        mark[name] = true
+        for _, set in ipairs(class:getSets()) do
+            if set.type == 'doc.class' then
+                -- check ---@field
+                local hasFounded
+                for _, field in ipairs(set.fields) do
+                    if guide.getKeyName(field) == key then
+                        hasFounded = true
+                        pushResult(field)
+                    end
+                end
+                -- check local field and global field
+                if set.bindSources then
+                    for _, src in ipairs(set.bindSources) do
+                        if searchFieldMap[src.type] then
+                            searchFieldMap[src.type](src, key, function (src)
+                                hasFounded = true
+                                pushResult(src)
+                            end)
+                        end
+                    end
+                end
+                -- look into extends(if field not found)
+                if not hasFounded and set.extends then
+                    for _, extend in ipairs(set.extends) do
+                        local extendType = globalMgr.getGlobal('type', extend[1])
+                        if extendType then
+                            searchClass(extendType)
+                        end
+                    end
+                end
+            end
+        end
+    end
+    searchClass(node)
+end
 
 local function getReturnOfFunction(func, index)
     if not func._returns then
@@ -101,8 +151,8 @@ local function getReturnOfSetMetaTable(source, args)
         m.setNode(source, m.compileNode(tbl))
     end
     if mt then
-        m.compileByParentNode(mt, '__index', function (node)
-            m.setNode(source, node)
+        m.compileByParentNode(mt, '__index', function (src)
+            m.setNode(source, m.compileNode(src))
         end)
     end
     return source._node
@@ -136,7 +186,7 @@ end
 
 ---@param source vm.node
 ---@param key any
----@param pushResult fun(node:vm.node)
+---@param pushResult fun(source: parser.object)
 function m.compileByParentNode(source, key, pushResult)
     local parentNode = m.compileNode(source)
     if not parentNode then
@@ -244,8 +294,8 @@ local compilerMap = util.switch()
     : case 'getindex'
     : call(function (source)
         compileByLocalID(source)
-        m.compileByParentNode(source.node, guide.getKeyName(source), function (node)
-            m.setNode(source, node)
+        m.compileByParentNode(source.node, guide.getKeyName(source), function (src)
+            m.setNode(source, m.compileNode(src))
         end)
     end)
     : case 'tablefield'
@@ -291,6 +341,10 @@ local compilerMap = util.switch()
         type:addGet(uri, source)
         m.setNode(source, type)
     end)
+    : case 'doc.field'
+    : call(function (source)
+        m.setNode(source, m.compileNode(source.extends))
+    end)
     : getMap()
 
 ---@param source parser.object
@@ -303,6 +357,10 @@ end
 
 ---@param source parser.object
 local function compileByGlobal(source)
+    if source.type == 'global' then
+        m.setNode(source, source)
+        return
+    end
     if source._globalNode then
         m.setNode(source, source._globalNode)
         for _, set in ipairs(source._globalNode:getSets()) do
@@ -310,6 +368,7 @@ local function compileByGlobal(source)
                 m.setNode(source, m.compileNode(set.value))
             end
         end
+        return
     end
 end
 
@@ -320,8 +379,8 @@ function m.compileNode(source)
         return source._node
     end
     source._node = false
-    compileByNode(source)
     compileByGlobal(source)
+    compileByNode(source)
 
     localMgr.subscribeLocal(source, source._node)
 

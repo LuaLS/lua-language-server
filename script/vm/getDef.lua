@@ -85,13 +85,23 @@ local searchFieldMap = util.switch()
         end
     end)
     : case 'global'
+    ---@param node vm.node
+    ---@param key string
     : call(function (node, key, pushResult)
-        local newGlobal = globalMgr.getGlobal('variable', node.name, key)
-        if not newGlobal then
-            return
+        if node.cate == 'variable' then
+            local newGlobal = globalMgr.getGlobal('variable', node.name, key)
+            if newGlobal then
+                for _, set in ipairs(newGlobal:getSets()) do
+                    pushResult(set)
+                end
+            end
         end
-        for _, set in ipairs(newGlobal:getSets()) do
-            pushResult(set)
+        if node.cate == 'type' then
+            compiler.getClassFields(node, key, function (field)
+                if field.type == 'doc.field' then
+                    pushResult(field.field)
+                end
+            end)
         end
     end)
     : case 'local'

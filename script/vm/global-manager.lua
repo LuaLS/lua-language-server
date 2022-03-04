@@ -162,7 +162,7 @@ function m.declareGlobal(cate, name, uri)
     local key = cate .. '|' .. name
     m.globalSubs[uri][key] = true
     if not m.globals[key] then
-        m.globals[key] = globalBuilder(name)
+        m.globals[key] = globalBuilder(name, cate)
     end
     return m.globals[key]
 end

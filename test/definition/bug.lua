@@ -262,7 +262,7 @@ TEST [[
 ---@type B
 local t
 
-local <!<?v?>!> = t.x
+t.<?x?>
 ]]
 
 TEST [[
@@ -274,7 +274,7 @@ TEST [[
 ---@type B
 local t
 
-local <!<?v?>!> = t.x
+t.<?x?>
 ]]
 
 TEST [[
@@ -286,7 +286,7 @@ function A:x() end
 ---@class B: A
 local B
 
-function B:<!x!>() end
+<!function B:x() end!>
 
 ---@type B
 local t
@@ -298,7 +298,7 @@ TEST [[
 ---@class A
 local A
 
-function A:<!x!>() end
+<!function A:x() end!>
 
 ---@class B: A
 local B

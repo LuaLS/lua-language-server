@@ -29,9 +29,6 @@ end
 function mt:subscribeLocal(source)
     for _, c in ipairs(self) do
         localMgr.subscribeLocal(source, c)
-        if c.type == 'cross' then
-            c:subscribeLocal(source)
-        end
     end
 end
 

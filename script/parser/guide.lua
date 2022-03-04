@@ -41,7 +41,6 @@ local type         = type
 ---@field closure               parser.object
 ---@field proto                 parser.object
 ---@field exp                   parser.object
----@field isGeneric             boolean
 ---@field alias                 parser.object
 ---@field class                 parser.object
 ---@field vararg                parser.object
@@ -648,10 +647,10 @@ function m.eachSourceBetween(ast, start, finish, callback)
 end
 
 local function getSourceTypeCache(ast)
-    local cache = ast.typeCache
+    local cache = ast._typeCache
     if not cache then
         cache = {}
-        ast.typeCache = cache
+        ast._typeCache = cache
         m.eachSource(ast, function (source)
             local tp = source.type
             if not tp then
@@ -694,10 +693,10 @@ end
 
 --- 遍历所有的source
 function m.eachSource(ast, callback)
-    local cache = ast.eachCache
+    local cache = ast._eachCache
     if not cache then
         cache = { ast }
-        ast.eachCache = cache
+        ast._eachCache = cache
         local mark = {}
         local index = 1
         while true do

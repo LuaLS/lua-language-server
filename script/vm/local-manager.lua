@@ -29,12 +29,11 @@ function m.subscribeLocal(source, node)
     if not node then
         return
     end
-    if node.type == 'union'
-    or node.type == 'cross' then
+    if node.type == 'union' then
         node:subscribeLocal(source)
         return
     end
-    if not m.allLocals[source] then
+    if not m.allLocals[node] then
         return
     end
     m.localSubs[node][source] = true

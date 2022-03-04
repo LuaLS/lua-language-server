@@ -1,9 +1,10 @@
-local guide     = require 'parser.guide'
-local util      = require 'utility'
-local union     = require 'vm.union'
-local localID   = require 'vm.local-id'
-local localMgr  = require 'vm.local-manager'
-local globalMgr = require 'vm.global-manager'
+local guide      = require 'parser.guide'
+local util       = require 'utility'
+local union      = require 'vm.union'
+local localID    = require 'vm.local-id'
+local localMgr   = require 'vm.local-manager'
+local globalMgr  = require 'vm.global-manager'
+local genericMgr = require 'vm.generic-manager'
 
 ---@class parser.object
 ---@field _compiledNodes  boolean
@@ -12,28 +13,27 @@ local globalMgr = require 'vm.global-manager'
 ---@class vm.node.compiler
 local m = {}
 
----@class vm.node.cross
+local nodeCache = {}
 
----@alias vm.node parser.object | vm.node.union | vm.node.cross | vm.node.global
+---@alias vm.node parser.object | vm.node.union | vm.node.global | vm.node.generic
 
 function m.setNode(source, node)
     if not node then
         return
     end
-    local me = source._node
+    local me = nodeCache[source]
     if not me then
-        source._node = node
+        nodeCache[source] = node
         return
     end
     if me == node then
         return
     end
-    if me.type == 'union'
-    or me.type == 'cross' then
+    if me.type == 'union' then
         me:merge(node)
         return
     end
-    source._node = union(me, node)
+    nodeCache[source] = union(me, node)
 end
 
 function m.eachNode(node)
@@ -161,7 +161,7 @@ local function getReturnOfSetMetaTable(source, args)
             m.setNode(source, m.compileNode(src))
         end)
     end
-    return source._node
+    return nodeCache[source]
 end
 
 local function getReturn(func, index, source, args)
@@ -272,6 +272,29 @@ local function selectNode(source, list, index)
     return m.compileNode(exp)
 end
 
+---@class parser.object
+---@field _generic? vm.node.generic-manager
+
+---@param func parser.object
+---@return vm.node.generic-manager?
+local function getFunctionGeneric(func)
+    if func._generic ~= nil then
+        return func._generic
+    end
+    func._generic = false
+    for _, doc in ipairs(func.bindDocs) do
+        if doc.type == 'doc.generic' then
+            if not func._generic then
+                func._generic = genericMgr(func)
+                for _, obj in ipairs(doc) do
+                    func._generic:addSign(obj[1])
+                end
+            end
+        end
+    end
+    return func._generic
+end
+
 local compilerMap = util.switch()
     : case 'boolean'
     : case 'table'
@@ -281,12 +304,12 @@ local compilerMap = util.switch()
     : case 'doc.type.function'
     : case 'doc.type.table'
     : call(function (source)
-        localMgr.declareLocal(source)
+        --localMgr.declareLocal(source)
         m.setNode(source, source)
     end)
     : case 'function'
     : call(function (source)
-        localMgr.declareLocal(source)
+        --localMgr.declareLocal(source)
         m.setNode(source, source)
 
         if source.bindDocs then
@@ -299,6 +322,7 @@ local compilerMap = util.switch()
     end)
     : case 'local'
     : call(function (source)
+        --localMgr.declareLocal(source)
         m.setNode(source, source)
         local hasMarkDoc
         if source.bindDocs then
@@ -367,12 +391,25 @@ local compilerMap = util.switch()
         local index = source.index
         local hasMarkDoc
         if func.bindDocs then
+            local generic = getFunctionGeneric(func)
             for _, doc in ipairs(func.bindDocs) do
                 if doc.type == 'doc.return' then
                     for _, rtn in ipairs(doc.returns) do
                         if rtn.returnIndex == index then
                             hasMarkDoc = true
-                            m.setNode(source, m.compileNode(rtn))
+                            local hasGeneric
+                            if generic then
+                                guide.eachSourceType(rtn, 'doc.type.name', function (src)
+                                    if src.typeGeneric then
+                                        hasGeneric = true
+                                    end
+                                end)
+                            end
+                            if hasGeneric then
+                                m.setNode(source, generic:getChild(rtn))
+                            else
+                                m.setNode(source, m.compileNode(rtn))
+                            end
                         end
                     end
                 end
@@ -481,16 +518,20 @@ end
 ---@param source parser.object
 ---@return vm.node
 function m.compileNode(source)
-    if source._node ~= nil then
-        return source._node
+    if nodeCache[source] ~= nil then
+        return nodeCache[source]
     end
-    source._node = false
+    nodeCache[source] = false
     compileByGlobal(source)
     compileByNode(source)
 
-    localMgr.subscribeLocal(source, source._node)
+    --localMgr.subscribeLocal(source, source._node)
 
-    return source._node
+    return nodeCache[source]
+end
+
+function m.clearNodeCache()
+    nodeCache = {}
 end
 
 return m

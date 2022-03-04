@@ -163,18 +163,6 @@ end
 
 ---@param source  parser.object
 ---@param pushResult fun(src: parser.object)
-local function searchByGlobal(source, pushResult)
-    local global = globalMgr.getNode(source)
-    if not global then
-        return
-    end
-    for _, src in ipairs(global:getSets()) do
-        pushResult(src)
-    end
-end
-
----@param source  parser.object
----@param pushResult fun(src: parser.object)
 local function searchByID(source, pushResult)
     local idSources = localID.getSources(source)
     if not idSources then
@@ -228,6 +216,12 @@ function vm.getDefs(source)
         end
         if not mark[src] then
             mark[src] = true
+            if src.type == 'global' then
+                for _, set in ipairs(src:getSets()) do
+                    pushResult(set)
+                end
+                return
+            end
             if guide.isSet(src)
             or guide.isLiteral(src) then
                 results[#results+1] = src
@@ -236,7 +230,6 @@ function vm.getDefs(source)
     end
 
     searchBySimple(source, pushResult)
-    searchByGlobal(source, pushResult)
     searchByID(source, pushResult)
     searchByParentNode(source, pushResult)
     searchByNode(source, pushResult)

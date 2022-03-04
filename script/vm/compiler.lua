@@ -109,9 +109,15 @@ function m.getClassFields(node, key, pushResult)
                 if set.bindSources then
                     for _, src in ipairs(set.bindSources) do
                         if searchFieldMap[src.type] then
-                            searchFieldMap[src.type](src, key, function (src)
+                            searchFieldMap[src.type](src, key, function (field)
                                 hasFounded = true
-                                pushResult(src)
+                                pushResult(field)
+                            end)
+                        end
+                        if src._globalNode then
+                            searchFieldMap['global'](src._globalNode, key, function (field)
+                                hasFounded = true
+                                pushResult(field)
                             end)
                         end
                     end
@@ -172,14 +178,52 @@ local function getReturn(func, index, source, args)
     end
 end
 
+local function bindDocs(source)
+    local hasFounded = false
+    local isParam = source.parent.type == 'funcargs'
+    for _, doc in ipairs(source.bindDocs) do
+        if doc.type == 'doc.type' then
+            if not isParam then
+                hasFounded = true
+                m.setNode(source, m.compileNode(doc))
+            end
+        end
+        if doc.type == 'doc.class' then
+            if source.type == 'local'
+            or (source._globalNode and guide.isSet(source)) then
+                hasFounded = true
+                m.setNode(source, m.compileNode(doc))
+            end
+        end
+        if doc.type == 'doc.param' then
+            if isParam and source[1] == doc.param[1] then
+                hasFounded = true
+                m.setNode(source, m.compileNode(doc))
+            end
+        end
+    end
+    return hasFounded
+end
+
 local function compileByLocalID(source)
     local sources = localID.getSources(source)
     if not sources then
         return
     end
+    local hasMarkDoc
+    for _, src in ipairs(sources) do
+        if src.bindDocs then
+            if bindDocs(src) then
+                hasMarkDoc = true
+                m.setNode(source, m.compileNode(src))
+            end
+        end
+    end
     for _, src in ipairs(sources) do
         if src.value then
-            m.setNode(source, m.compileNode(src.value))
+            if not hasMarkDoc or guide.isLiteral(src.value) then
+                m.setNode(source, m.compileNode(src.value))
+            end
         end
     end
 end
@@ -226,33 +270,6 @@ local function selectNode(source, list, index)
         -- TODO
     end
     return m.compileNode(exp)
-end
-
-local function bindDocs(source)
-    local hasFounded = false
-    local isParam = source.parent.type == 'funcargs'
-    for _, doc in ipairs(source.bindDocs) do
-        if doc.type == 'doc.type' then
-            if not isParam then
-                hasFounded = true
-                m.setNode(source, m.compileNode(doc))
-            end
-        end
-        if doc.type == 'doc.class' then
-            if source.type == 'local'
-            or (source._globalNode and guide.isSet(source)) then
-                hasFounded = true
-                m.setNode(source, m.compileNode(doc))
-            end
-        end
-        if doc.type == 'doc.param' then
-            if isParam and source[1] == doc.param[1] then
-                hasFounded = true
-                m.setNode(source, m.compileNode(doc))
-            end
-        end
-    end
-    return hasFounded
 end
 
 local compilerMap = util.switch()
@@ -427,9 +444,20 @@ local function compileByGlobal(source)
     if source._globalNode then
         m.setNode(source, source._globalNode)
         if source._globalNode.cate == 'variable' then
+            local hasMarkDoc
+            for _, set in ipairs(source._globalNode:getSets()) do
+                if set.bindDocs then
+                    if bindDocs(set) then
+                        m.setNode(source, m.compileNode(set))
+                        hasMarkDoc = true
+                    end
+                end
+            end
             for _, set in ipairs(source._globalNode:getSets()) do
                 if set.value then
-                    m.setNode(source, m.compileNode(set.value))
+                    if not hasMarkDoc or guide.isLiteral(set.value) then
+                        m.setNode(source, m.compileNode(set.value))
+                    end
                 end
             end
         end

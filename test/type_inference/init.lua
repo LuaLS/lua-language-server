@@ -1065,3 +1065,22 @@ function F(<?x?>) end
 ---@param x boolean
 function F(x) end
 ]]
+
+TEST 'B' [[
+---@class A
+local A
+
+---@return A
+function A:x() end
+
+---@class B: A
+local B
+
+---@return B
+function B:x() end
+
+---@type B
+local t
+
+local <!<?v?>!> = t.x()
+]]

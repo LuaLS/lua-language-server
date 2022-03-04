@@ -192,7 +192,7 @@ y.<?a?>
 
 TEST [[
 ---@class <!loli!>
-local unit
+local unit!>
 
 function unit:pants()
 end
@@ -223,53 +223,6 @@ AAAA.a.<?SSDF?>
 ]]
 
 TEST [[
----@class Cat
-local <!m!> ---hahaha
----@class Dog
-local 	m2
----@type Cat
-local <?<!v!>?>
-]]
-
-TEST [[
----@class Cat
-local <!m!> --hahaha
----@class Dog
-local 	m2
----@type Cat
-local <?<!v!>?>
-]]
-
-TEST [[
----@class Cat
- local <!m!> ---hahaha
-
-  ---@class Dog
-   local 	m2
-	 ---@type Cat
-	 	 local <?<!v!>?>
-]]
-
-TEST [[
----@class A
-local A
-
----@return A
-function A:x() end
-
----@class B: A
-local <!B!>
-
----@return B
-function B:x() end
-
----@type B
-local t
-
-local <!<?v?>!> = t.x()
-]]
-
-TEST [[
 ---@return <!fun()!>
 local function f() end
 
@@ -282,8 +235,8 @@ TEST [[
 ---@return T
 local function f(p) end
 
-local <!k!>
-local <?<!r!>?> = f(<!k!>)
+local k = <!{}!>
+local <?<!r!>?> = f(k)
 ]]
 
 TEST [[

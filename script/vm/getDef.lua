@@ -163,7 +163,7 @@ end
 
 ---@param source  parser.object
 ---@param pushResult fun(src: parser.object)
-local function searchByID(source, pushResult)
+local function searchByLocalID(source, pushResult)
     local idSources = localID.getSources(source)
     if not idSources then
         return
@@ -230,7 +230,7 @@ function vm.getDefs(source)
     end
 
     searchBySimple(source, pushResult)
-    searchByID(source, pushResult)
+    searchByLocalID(source, pushResult)
     searchByParentNode(source, pushResult)
     searchByNode(source, pushResult)
 

@@ -365,7 +365,20 @@ local compilerMap = util.switch()
     : call(function (source)
         local func  = source.parent
         local index = source.index
-        if func.returns then
+        local hasMarkDoc
+        if func.bindDocs then
+            for _, doc in ipairs(func.bindDocs) do
+                if doc.type == 'doc.return' then
+                    for _, rtn in ipairs(doc.returns) do
+                        if rtn.returnIndex == index then
+                            hasMarkDoc = true
+                            m.setNode(source, m.compileNode(rtn))
+                        end
+                    end
+                end
+            end
+        end
+        if func.returns and not hasMarkDoc then
             for _, rtn in ipairs(func.returns) do
                 m.setNode(source, selectNode(source, rtn, index))
             end

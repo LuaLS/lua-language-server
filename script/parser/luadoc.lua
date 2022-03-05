@@ -1263,7 +1263,7 @@ local function bindGeneric(binded)
         if     doc.type == 'doc.generic' then
             for _, obj in ipairs(doc.generics) do
                 local name = obj.generic[1]
-                generics[name] = {}
+                generics[name] = true
             end
         elseif doc.type == 'doc.param'
         or     doc.type == 'doc.return'
@@ -1271,8 +1271,7 @@ local function bindGeneric(binded)
             guide.eachSourceType(doc, 'doc.type.name', function (src)
                 local name = src[1]
                 if generics[name] then
-                    generics[name][#generics[name]+1] = src
-                    src.typeGeneric = generics
+                    src.type = 'doc.generic.name'
                 end
             end)
         end

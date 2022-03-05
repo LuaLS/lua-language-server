@@ -172,10 +172,19 @@ local function getReturn(func, index, source, args)
     if node then
         for cnode in m.eachNode(node) do
             if cnode.type == 'function' then
-                return getReturnOfFunction(cnode, index)
+                local returnNode = getReturnOfFunction(cnode, index)
+                if returnNode and returnNode.type == 'generic' then
+                    local argNodes = {}
+                    for i, arg in ipairs(args) do
+                        argNodes[i] = m.compileNode(arg)
+                    end
+                    returnNode = returnNode:resolve(argNodes)
+                end
+                m.setNode(source, returnNode)
             end
         end
     end
+    return nodeCache[source]
 end
 
 local function bindDocs(source)
@@ -286,10 +295,15 @@ local function getFunctionGeneric(func)
         if doc.type == 'doc.generic' then
             if not func._generic then
                 func._generic = genericMgr(func)
-                for _, obj in ipairs(doc) do
-                    func._generic:addSign(obj[1])
-                end
             end
+        end
+    end
+    if not func._generic then
+        return false
+    end
+    for _, doc in ipairs(func.bindDocs) do
+        if doc.type == 'doc.param' then
+            func._generic:addSign(doc.extends)
         end
     end
     return func._generic
@@ -399,16 +413,15 @@ local compilerMap = util.switch()
                             hasMarkDoc = true
                             local hasGeneric
                             if generic then
-                                guide.eachSourceType(rtn, 'doc.type.name', function (src)
-                                    if src.typeGeneric then
-                                        hasGeneric = true
-                                    end
+                                guide.eachSourceType(rtn, 'doc.generic.name', function (src)
+                                    hasGeneric = true
                                 end)
                             end
+                            local rtnNode = m.compileNode(rtn)
                             if hasGeneric then
-                                m.setNode(source, generic:getChild(rtn))
+                                m.setNode(source, generic:getChild(rtnNode))
                             else
-                                m.setNode(source, m.compileNode(rtn))
+                                m.setNode(source, rtnNode)
                             end
                         end
                     end
@@ -433,6 +446,10 @@ local compilerMap = util.switch()
         for _, typeUnit in ipairs(source.types) do
             m.setNode(source, m.compileNode(typeUnit))
         end
+    end)
+    : case 'doc.generic.name'
+    : call(function (source)
+        m.setNode(source, source)
     end)
     : case 'doc.field'
     : call(function (source)

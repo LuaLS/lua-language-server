@@ -235,7 +235,7 @@ TEST [[
 ---@return T
 local function f(p) end
 
-local k = <!{}!>
+local k = <!function () end!>
 local <?<!r!>?> = f(k)
 ]]
 

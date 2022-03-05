@@ -28,7 +28,6 @@ local type         = type
 ---@field extends               parser.object[]
 ---@field types                 parser.object[]
 ---@field fields                parser.object[]
----@field typeGeneric           table<integer, parser.object[]>
 ---@field tkey                  parser.object
 ---@field tvalue                parser.object
 ---@field tindex                integer

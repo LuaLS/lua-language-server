@@ -5,6 +5,7 @@ local compiler  = require 'vm.compiler'
 local guide     = require 'parser.guide'
 local localID   = require 'vm.local-id'
 local globalMgr = require 'vm.global-manager'
+local nodeMgr   = require 'vm.node'
 
 local simpleMap
 
@@ -132,7 +133,7 @@ local nodeMap = util.switch()
             return
         end
         local key = guide.getKeyName(source)
-        for pn in compiler.eachNode(parentNode) do
+        for pn in nodeMgr.eachNode(parentNode) do
             if searchFieldMap[pn.type] then
                 searchFieldMap[pn.type](pn, key, pushResult)
             end
@@ -144,7 +145,7 @@ local nodeMap = util.switch()
         if not parentNode then
             return
         end
-        for pn in compiler.eachNode(parentNode) do
+        for pn in nodeMgr.eachNode(parentNode) do
             if searchFieldMap[pn.type] then
                 searchFieldMap[pn.type](pn, source[1], pushResult)
             end
@@ -189,7 +190,7 @@ local function searchByNode(source, pushResult)
     if not node then
         return
     end
-    for n in compiler.eachNode(node) do
+    for n in nodeMgr.eachNode(node) do
         if n.type == 'global' and n.cate == 'type' then
             for _, set in ipairs(n:getSets()) do
                 pushResult(set)

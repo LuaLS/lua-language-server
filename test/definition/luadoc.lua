@@ -297,19 +297,22 @@ print(v1.<?bar1?>)
 
 TEST [[
 ---@class A
-local <!t!>
+local t
+
+t.<!x!> = 1
 
 ---@type A[]
 local b
 
-local <?<!c!>?> = b[1]
+local c = b[1]
+c.<?x?>
 ]]
 
 TEST [[
 ---@class A
 local <!t!>
 
----@type table<number, A>
+---@type { [number]: A }
 local b
 
 local <?<!c!>?> = b[1]

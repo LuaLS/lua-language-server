@@ -120,6 +120,9 @@ Symbol              <-  ({} {
     end,
 })
 
+---@class parser.object
+---@field literal boolean
+
 local function trim(str)
     return str:match '^%s*(%S+)%s*$'
 end

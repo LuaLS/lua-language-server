@@ -2,9 +2,7 @@ local guide      = require 'parser.guide'
 local util       = require 'utility'
 local union      = require 'vm.union'
 local localID    = require 'vm.local-id'
-local localMgr   = require 'vm.local-manager'
 local globalMgr  = require 'vm.global-manager'
-local genericMgr = require 'vm.generic-manager'
 
 ---@class parser.object
 ---@field _compiledNodes  boolean
@@ -16,6 +14,19 @@ local m = {}
 local nodeCache = {}
 
 ---@alias vm.node parser.object | vm.node.union | vm.node.global | vm.node.generic
+
+---@param a vm.node
+---@param b vm.node
+function m.mergeNode(a, b)
+    if not b then
+        return a
+    end
+    if a.type == 'union' then
+        a:merge(b)
+        return a
+    end
+    return union(a, b)
+end
 
 function m.setNode(source, node)
     if not node then
@@ -29,11 +40,7 @@ function m.setNode(source, node)
     if me == node then
         return
     end
-    if me.type == 'union' then
-        me:merge(node)
-        return
-    end
-    nodeCache[source] = union(me, node)
+    nodeCache[source] = m.mergeNode(me, node)
 end
 
 function m.eachNode(node)
@@ -291,6 +298,7 @@ local function getFunctionGeneric(func)
         return func._generic
     end
     func._generic = false
+    local genericMgr = require 'vm.generic-manager'
     for _, doc in ipairs(func.bindDocs) do
         if doc.type == 'doc.generic' then
             if not func._generic then

@@ -1,3 +1,5 @@
+local nodeMgr = require 'vm.node'
+
 ---@class vm.node.generic
 ---@field parent vm.node.generic-manager
 ---@field node   vm.node
@@ -22,6 +24,18 @@ function mt:resolve(argNodes)
     local resolved = self.parent:resolve(argNodes)
     local newProto = cloneObject(self.node, resolved)
     return newProto
+end
+
+function mt:eachNode()
+    local nodes = {}
+    for n in nodeMgr.eachNode(self.parent) do
+        nodes[#nodes+1] = n
+    end
+    local i = 0
+    return function ()
+        i = i + 1
+        return nodes[i], self
+    end
 end
 
 ---@param parent vm.node.generic-manager

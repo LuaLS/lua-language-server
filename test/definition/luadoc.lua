@@ -372,7 +372,7 @@ TEST [[
 ---@type fun(x: T):T
 local f
 
-local <?<!v2!>?> = f(<!{}!>)
+local <?<!v2!>?> = f(<!function () end!>)
 ]]
 
 TEST [[

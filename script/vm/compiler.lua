@@ -127,17 +127,78 @@ function m.getClassFields(node, key, pushResult)
     searchClass(node)
 end
 
-local function getReturnOfFunction(func, index)
-    if not func._returns then
-        func._returns = util.defaultTable(function ()
-            return {
-                type   = 'function.return',
-                parent = func,
-                index  = index,
-            }
-        end)
+---@class parser.object
+---@field _generic? vm.node.generic-manager
+
+---@param source parser.object
+---@return vm.node.generic-manager?
+local function getObjectGeneric(source)
+    if source._generic ~= nil then
+        return source._generic
     end
-    return m.compileNode(func._returns[index])
+    source._generic = false
+    if source.type == 'function' then
+        for _, doc in ipairs(source.bindDocs) do
+            if doc.type == 'doc.generic' then
+                if not source._generic then
+                    source._generic = genericMgr(source)
+                    break
+                end
+            end
+        end
+        if not source._generic then
+            return false
+        end
+        for _, doc in ipairs(source.bindDocs) do
+            if doc.type == 'doc.param' then
+                source._generic:addSign(doc.extends)
+            end
+        end
+    end
+    if source.type == 'doc.type.function'
+    or source.type == 'doc.type.table' then
+        local hasGeneric
+        guide.eachSourceType(source, 'doc.generic.name', function ()
+            hasGeneric = true
+        end)
+        if not hasGeneric then
+            return false
+        end
+        source._generic = genericMgr(source)
+        if source.type == 'doc.type.function' then
+            for _, arg in ipairs(source.args) do
+                source._generic:addSign(arg.extends)
+            end
+        end
+    end
+    return source._generic
+end
+
+local function getReturnOfFunction(func, index)
+    if func.type == 'function' then
+        if not func._returns then
+            func._returns = util.defaultTable(function ()
+                return {
+                    type   = 'function.return',
+                    parent = func,
+                    index  = index,
+                }
+            end)
+        end
+        return m.compileNode(func._returns[index])
+    end
+    if func.type == 'doc.type.function' then
+        local rtn = func.returns[index]
+        if not rtn then
+            return nil
+        end
+        local rtnNode = m.compileNode(rtn)
+        local generic = getObjectGeneric(func)
+        if not generic then
+            return rtnNode
+        end
+        return generic:getChild(rtnNode)
+    end
 end
 
 local function getReturnOfSetMetaTable(source, args)
@@ -161,7 +222,8 @@ local function getReturn(func, index, source, args)
     local node = m.compileNode(func)
     if node then
         for cnode in nodeMgr.eachNode(node) do
-            if cnode.type == 'function' then
+            if cnode.type == 'function'
+            or cnode.type == 'doc.type.function' then
                 local returnNode = getReturnOfFunction(cnode, index)
                 if returnNode and returnNode.type == 'generic' then
                     local argNodes = {}
@@ -271,34 +333,6 @@ local function selectNode(source, list, index)
     return m.compileNode(exp)
 end
 
----@class parser.object
----@field _generic? vm.node.generic-manager
-
----@param func parser.object
----@return vm.node.generic-manager?
-local function getFunctionGeneric(func)
-    if func._generic ~= nil then
-        return func._generic
-    end
-    func._generic = false
-    for _, doc in ipairs(func.bindDocs) do
-        if doc.type == 'doc.generic' then
-            if not func._generic then
-                func._generic = genericMgr(func)
-            end
-        end
-    end
-    if not func._generic then
-        return false
-    end
-    for _, doc in ipairs(func.bindDocs) do
-        if doc.type == 'doc.param' then
-            func._generic:addSign(doc.extends)
-        end
-    end
-    return func._generic
-end
-
 local compilerMap = util.switch()
     : case 'boolean'
     : case 'table'
@@ -308,12 +342,10 @@ local compilerMap = util.switch()
     : case 'doc.type.function'
     : case 'doc.type.table'
     : call(function (source)
-        --localMgr.declareLocal(source)
         nodeMgr.setNode(source, source)
     end)
     : case 'function'
     : call(function (source)
-        --localMgr.declareLocal(source)
         nodeMgr.setNode(source, source)
 
         if source.bindDocs then
@@ -395,7 +427,7 @@ local compilerMap = util.switch()
         local index = source.index
         local hasMarkDoc
         if func.bindDocs then
-            local generic = getFunctionGeneric(func)
+            local generic = getObjectGeneric(func)
             for _, doc in ipairs(func.bindDocs) do
                 if doc.type == 'doc.return' then
                     for _, rtn in ipairs(doc.returns) do

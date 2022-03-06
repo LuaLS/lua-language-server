@@ -1,6 +1,6 @@
 local union      = require 'vm.union'
 
----@alias vm.node parser.object | vm.node.union | vm.node.global | vm.node.generic
+---@alias vm.node parser.object | vm.node.union | vm.node.global | vm.node.generic | vm.node.generic-manager
 
 local m = {}
 
@@ -35,6 +35,7 @@ function m.setNode(source, node)
     m.nodeCache[source] = m.mergeNode(me, node)
 end
 
+---@return fun():vm.node
 function m.eachNode(node)
     if node.type == 'union' then
         return node:eachNode()

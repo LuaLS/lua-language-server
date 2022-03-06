@@ -310,12 +310,15 @@ c.<?x?>
 
 TEST [[
 ---@class A
-local <!t!>
+local t
+
+t.<!x!> = 1
 
 ---@type { [number]: A }
 local b
 
-local <?<!c!>?> = b[1]
+local c = b[1]
+c.<?x?>
 ]]
 
 TEST [[
@@ -323,7 +326,7 @@ TEST [[
 local Foo = {}
 function Foo:<!bar1!>() end
 
----@type table<number, Foo>
+---@type { [number]: Foo }
 local v1
 print(v1[1].<?bar1?>)
 ]]
@@ -337,7 +340,7 @@ function Foo:<!bar1!>() end
 local Foo2 = {}
 function Foo2:bar1() end
 
----@type Foo2<number, Foo>
+---@type { [number]: Foo }
 local v1
 print(v1[1].<?bar1?>)
 ]]

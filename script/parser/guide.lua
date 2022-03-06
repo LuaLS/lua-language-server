@@ -128,12 +128,11 @@ local childMap = {
     ['doc.generic.object'] = {'generic', 'extends', 'comment'},
     ['doc.vararg']         = {'vararg', 'comment'},
     ['doc.type.array']     = {'node'},
-    ['doc.type.table']     = {'tkey', 'tvalue', 'comment'},
     ['doc.type.function']  = {'#args', '#returns', 'comment'},
-    ['doc.type.ltable']    = {'#fields', 'comment'},
+    ['doc.type.table']     = {'#fields', 'comment'},
     ['doc.type.literal']   = {'node'},
     ['doc.type.arg']       = {'name', 'extends'},
-    ['doc.type.field']     = {'extends'},
+    ['doc.type.field']     = {'name', 'extends'},
     ['doc.overload']       = {'overload', 'comment'},
     ['doc.see']            = {'name', 'field'},
     ['doc.version']        = {'#versions'},
@@ -885,17 +884,17 @@ function m.getKeyNameOfLiteral(obj)
     elseif tp == 'number' then
         local n = obj[1]
         if n then
-            return formatNumber(obj[1])
+            return obj[1]
         end
     elseif tp == 'integer' then
         local n = obj[1]
         if n then
-            return formatNumber(obj[1])
+            return obj[1]
         end
     elseif tp == 'boolean' then
         local b = obj[1]
         if b then
-            return tostring(b)
+            return b
         end
     end
 end

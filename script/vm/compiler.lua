@@ -46,6 +46,34 @@ local searchFieldMap = util.switch()
             end
         end
     end)
+    : case 'doc.type.array'
+    : call(function (node, key, pushResult)
+        if  type(key) == 'number'
+        and math.tointeger(key)
+        and key >= 1 then
+            pushResult(node.node)
+        end
+    end)
+    : case 'doc.type.table'
+    : call(function (node, key, pushResult)
+        for _, field in ipairs(node.fields) do
+            local fieldKey = field.name
+            if fieldKey.type == 'doc.type' then
+                local fieldNode = m.compileNode(fieldKey)
+                for fn in nodeMgr.eachNode(fieldNode) do
+                    if fn.type == 'global' and fn.cate == 'type' then
+                        if fn.name == 'any'
+                        or (fn.name == 'boolean' and type(key) == 'boolean')
+                        or (fn.name == 'number'  and type(key) == 'number')
+                        or (fn.name == 'integer' and math.tointeger(key))
+                        or (fn.name == 'string'  and type(key) == 'string') then
+                            pushResult(field.extends)
+                        end
+                    end
+                end
+            end
+        end
+    end)
     : getMap()
 
 

@@ -223,25 +223,24 @@ local function parseIndexField(tp, parent)
         return nil
     end
     nextToken()
-    local class = {
-        type   = tp,
-        start  = getStart(),
-        finish = getFinish(),
-        parent = parent,
-    }
-    local indexTP, index = nextToken()
-    if  indexTP ~= 'integer'
-    and indexTP ~= 'string' then
-        pushWarning {
-            type   = 'LUADOC_INDEX_MUST_INT',
+    local indexTP, index = peekToken()
+    if indexTP == 'name' then
+        local field = parseType(parent)
+        nextSymbolOrError ']'
+        return field
+    else
+        nextToken()
+        local class = {
+            type   = tp,
             start  = getStart(),
             finish = getFinish(),
+            parent = parent,
         }
+        class[1] = index
+        nextSymbolOrError ']'
+        class.finish = getFinish()
+        return class
     end
-    class[1] = index
-    nextSymbolOrError ']'
-    class.finish = getFinish()
-    return class
 end
 
 local function parseClass(parent)
@@ -427,7 +426,7 @@ end
 
 local function parseTypeUnitLiteralTable()
     local typeUnit = {
-        type    = 'doc.type.ltable',
+        type    = 'doc.type.table',
         start   = getStart(),
         fields  = {},
     }
@@ -527,7 +526,6 @@ function parseTypeUnit(parent, content)
     result.parent = parent
     while true do
         local newResult = parseTypeUnitArray(parent, result)
-                    or    parseTypeUnitTable(parent, result)
         if not newResult then
             break
         end

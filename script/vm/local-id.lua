@@ -60,7 +60,7 @@ local compileMap = util.switch()
             return
         end
         local key = guide.getKeyName(source)
-        if not key then
+        if not type(key) ~= 'string' then
             return
         end
         source._localID = parentID .. m.ID_SPLITE .. key
@@ -152,6 +152,9 @@ function m.getSources(source, key)
         return nil
     end
     if key then
+        if type(key) ~= 'string' then
+            return nil
+        end
         id = id .. m.ID_SPLITE .. key
     end
     return root._localIDs[id]

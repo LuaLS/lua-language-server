@@ -24,7 +24,9 @@ local function cloneObject(node, resolved)
             types  = {},
         }
         for i, typeUnit in ipairs(node.types) do
-            newType.types[i] = cloneObject(typeUnit, resolved)
+            local newObj     = cloneObject(typeUnit, resolved)
+            newObj.parent    = newType
+            newType.types[i] = newObj
         end
         return newType
     end
@@ -37,7 +39,25 @@ local function cloneObject(node, resolved)
             name    = node.name,
             extends = cloneObject(node.extends, resolved)
         }
+        newArg.name.parent    = newArg
+        newArg.extends.parent = newArg
         return newArg
+    end
+    if node.type == 'doc.type.array' then
+        local newArray = {
+            type   = node.type,
+            start  = node.start,
+            finish = node.finish,
+            parent = node.parent,
+            node   = cloneObject(node.node, resolved),
+        }
+        newArray.node.parent = newArray
+        return newArray
+    end
+    if node.type == 'doc.type.table' then
+        local newTable = {
+        }
+        return newTable
     end
     if node.type == 'doc.type.function' then
         local newDocFunc = {
@@ -49,9 +69,13 @@ local function cloneObject(node, resolved)
             returns = {},
         }
         for i, arg in ipairs(node.args) do
-            newDocFunc.args[i] = cloneObject(arg, resolved)
+            local newObj       = cloneObject(arg, resolved)
+            newObj.parent      = newDocFunc
+            newDocFunc.args[i] = newObj
         end
         for i, ret in ipairs(node.returns) do
+            local newObj          = cloneObject(ret, resolved)
+            newObj.parent         = newDocFunc
             newDocFunc.returns[i] = cloneObject(ret, resolved)
         end
         return newDocFunc

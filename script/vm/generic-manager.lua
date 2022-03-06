@@ -34,6 +34,7 @@ function mt:resolve(argNodes)
         if typeUnit.type == 'doc.generic.name' then
             local key = typeUnit[1]
             if typeUnit.literal then
+                -- 'number' -> `T`
                 for n in nodeMgr.eachNode(node) do
                     if n.type == 'string' then
                         local type = globalMgr.declareGlobal('type', n[1], guide.getUri(n))
@@ -41,21 +42,31 @@ function mt:resolve(argNodes)
                     end
                 end
             else
+                -- number -> T
                 resolved[key] = nodeMgr.mergeNode(node, resolved[key])
             end
         end
         if typeUnit.type == 'doc.type.array' then
             for n in nodeMgr.eachNode(node) do
                 if n.type == 'doc.type.array' then
+                    -- number[] -> T[]
                     resolve(typeUnit.node, n.node)
                 end
             end
         end
         if typeUnit.type == 'doc.type.table' then
             for _, ufield in ipairs(typeUnit.fields) do
-                local utype = ufield.name
-                local tnode = typeMgr.getTableValue(node, utype)
-                resolve(compiler.compileNode(ufield.extends), tnode)
+                local ufieldNode = compiler.compileNode(ufield.name)
+                local uvalueNode = compiler.compileNode(ufield.extends)
+                if ufieldNode.type == 'doc.generic.name' then
+                    -- { [number]: number}|number[] -> { [K]: number }
+                    local tnode = typeMgr.getTableKey(node, uvalueNode)
+                    resolve(ufieldNode, tnode)
+                else
+                    -- { [number]: number}|number[] -> { [number]: V }
+                    local tnode = typeMgr.getTableValue(node, ufieldNode)
+                    resolve(uvalueNode, tnode)
+                end
             end
         end
     end

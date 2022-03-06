@@ -177,13 +177,14 @@ end
 local function getReturnOfFunction(func, index)
     if func.type == 'function' then
         if not func._returns then
-            func._returns = util.defaultTable(function ()
-                return {
-                    type   = 'function.return',
-                    parent = func,
-                    index  = index,
-                }
-            end)
+            func._returns = {}
+        end
+        if not func._returns[index] then
+            func._returns[index] = {
+                type   = 'function.return',
+                parent = func,
+                index  = index,
+            }
         end
         return m.compileNode(func._returns[index])
     end

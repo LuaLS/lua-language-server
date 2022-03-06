@@ -75,4 +75,25 @@ function m.getTableValue(tnode, knode)
     return result
 end
 
+---@param tnode vm.node
+---@param vnode vm.node
+function m.getTableKey(tnode, vnode)
+    local result
+    for tn in nodeMgr.eachNode(tnode) do
+        if tn.type == 'doc.type.table' then
+            for _, field in ipairs(tn.fields) do
+                if m.isSubType(field.extends, vnode) then
+                    result = nodeMgr.mergeNode(compiler.compileNode(field.name), result)
+                end
+            end
+        end
+        if tn.type == 'doc.type.array' then
+            if m.isSubType(tn.node, vnode) then
+                result = nodeMgr.mergeNode(globalMgr.getGlobal('type', 'integer'), result)
+            end
+        end
+    end
+    return result
+end
+
 return m

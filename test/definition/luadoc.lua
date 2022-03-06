@@ -506,12 +506,60 @@ c.<?x?>
 ]]
 
 TEST [[
+---@generic K
+---@param x { [K]: A }
+---@return K
+local function f(x) end
+
+---@class A
+local a
+a.x = 1
+
+---@type A[]
+local b
+
+local c = f(b)
+c.<?x?>
+]]
+
+TEST [[
+---@generic K
+---@param x { [K]: number }
+---@return K
+local function f(x) end
+
+---@class A
+local a
+a.<!x!> = 1
+
+---@type { [A]: integer }
+local b
+
+local c = f(b)
+c.<?x?>
+]]
+
+TEST [[
+---@generic K
+---@param x { [K]: integer }
+---@return K
+local function f(x) end
+
+---@class A
+local a
+a.x = 1
+
+---@type { [A]: number }
+local b
+
+local c = f(b)
+c.<?x?>
+]]
+
+TEST [[
 ---@generic V
 ---@return fun(t: V[]):V
 local function f() end
-
----@class A
-local <!a!>
 
 ---@type A[]
 local b
@@ -529,27 +577,26 @@ TEST [[
 local function f(t) end
 
 ---@class A
-local <!a!>
+local a
+a.<!x!> = 1
 
 ---@type A[]
 local b
 
 local f2, c = f(b)
 
-local <?<!d!>?> = f2(c)
+local d = f2(c)
+d.<?x?>
 ]]
 
 TEST [[
----@class C
-local <!v1!>
-
 ---@generic V, T
 ---@param t T
 ---@return fun(t: V): V
 ---@return T
 local function iterator(t) end
 
-for <!v!> in iterator(<!v1!>) do
+for <!v!> in iterator(<!function () end!>) do
     print(<?v?>)
 end
 ]]

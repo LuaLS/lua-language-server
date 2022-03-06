@@ -227,8 +227,10 @@ local function getReturn(func, index, source, args)
                 local returnNode = getReturnOfFunction(cnode, index)
                 if returnNode and returnNode.type == 'generic' then
                     local argNodes = {}
-                    for i, arg in ipairs(args) do
-                        argNodes[i] = m.compileNode(arg)
+                    if args then
+                        for i, arg in ipairs(args) do
+                            argNodes[i] = m.compileNode(arg)
+                        end
                     end
                     returnNode = returnNode:resolve(argNodes)
                 end

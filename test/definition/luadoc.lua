@@ -410,72 +410,99 @@ TEST [[
 local function f(x) end
 
 ---@class A
-local <!a!>
+local a
+a.<!x!> = 1
 
 ---@type A[]
 local b
 
-local <?<!c!>?> = f(b)
+local c = f(b)
+c.<?x?>
 ]]
 
 TEST [[
 ---@generic V
----@param x table<number, V>
+---@param x { [number]: V }
 ---@return V
 local function f(x) end
 
 ---@class A
-local <!a!>
+local a
+a.<!x!> = 1
 
----@type table<number, A>
+---@type { [number]: A }
 local b
 
-local <?<!c!>?> = f(b)
+local c = f(b)
+c.<?x?>
 ]]
 
 TEST [[
 ---@generic V
----@param x V[]
+---@param x { [number]: V }
 ---@return V
 local function f(x) end
 
 ---@class A
-local <!a!>
+local a
+a.<!x!> = 1
 
----@type table<number, A>
+---@type { [integer]: A }
 local b
 
-local <?<!c!>?> = f(b)
+local c = f(b)
+c.<?x?>
 ]]
 
 TEST [[
 ---@generic V
----@param x table<number, V>
+---@param x { [integer]: V }
 ---@return V
 local function f(x) end
 
 ---@class A
-local <!a!>
+local a
+a.x = 1
+
+---@type { [number]: A }
+local b
+
+local c = f(b)
+c.<?x?>
+]]
+
+TEST [[
+---@generic V
+---@param x { [number]: V }
+---@return V
+local function f(x) end
+
+---@class A
+local a
+a.<!x!> = 1
 
 ---@type A[]
 local b
 
-local <?<!c!>?> = f(b)
+local c = f(b)
+c.<?x?>
 ]]
 
 TEST [[
 ---@generic K
----@param x table<K, number>
+---@param x { [K]: number }
 ---@return K
 local function f(x) end
 
 ---@class A
-local <!a!>
+local a
+a.<!x!> = 1
 
----@type table<A, number>
+---@type { [A]: number }
 local b
 
-local <?<!c!>?> = f(b)
+local c = f(b)
+c.<?x?>
 ]]
 
 TEST [[

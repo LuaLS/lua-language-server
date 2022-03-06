@@ -13,7 +13,7 @@ mt.type = 'generic'
 local function cloneObject(node, resolved)
     if node.type == 'doc.generic.name' then
         local key = node[1]
-        return resolved[key]
+        return resolved[key] or node
     end
     if node.type == 'doc.type' then
         local newType = {
@@ -27,6 +27,17 @@ local function cloneObject(node, resolved)
             newType.types[i] = cloneObject(typeUnit, resolved)
         end
         return newType
+    end
+    if node.type == 'doc.type.arg' then
+        local newArg = {
+            type    = node.type,
+            start   = node.start,
+            finish  = node.finish,
+            parent  = node.parent,
+            name    = node.name,
+            extends = cloneObject(node.extends, resolved)
+        }
+        return newArg
     end
     if node.type == 'doc.type.function' then
         local newDocFunc = {

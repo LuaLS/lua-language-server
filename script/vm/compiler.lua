@@ -234,7 +234,9 @@ local function getReturn(func, index, source, args)
                     end
                     returnNode = returnNode:resolve(argNodes)
                 end
-                nodeMgr.setNode(source, returnNode)
+                if returnNode then
+                    nodeMgr.setNode(source, m.compileNode(returnNode))
+                end
             end
         end
     end
@@ -341,8 +343,10 @@ local compilerMap = util.switch()
     : case 'integer'
     : case 'number'
     : case 'string'
+    : case 'union'
     : case 'doc.type.function'
     : case 'doc.type.table'
+    : case 'doc.type.array'
     : call(function (source)
         nodeMgr.setNode(source, source)
     end)
@@ -470,10 +474,6 @@ local compilerMap = util.switch()
         for _, typeUnit in ipairs(source.types) do
             nodeMgr.setNode(source, m.compileNode(typeUnit))
         end
-    end)
-    : case 'doc.type.array'
-    : case(function (source)
-        nodeMgr.setNode(source, source)
     end)
     : case 'doc.generic.name'
     : call(function (source)

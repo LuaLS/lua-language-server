@@ -2,6 +2,7 @@ local union      = require 'vm.union'
 
 ---@alias vm.node parser.object | vm.node.union | vm.node.global | vm.node.generic | vm.node.generic-manager
 
+---@class vm.node-manager
 local m = {}
 
 ---@type table<parser.object, vm.node>

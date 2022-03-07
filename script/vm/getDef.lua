@@ -112,6 +112,17 @@ local searchFieldMap = util.switch()
             end
         end
     end)
+    : case 'doc.type.table'
+    : call(function (node, key, pushResult)
+        for _, field in ipairs(node.fields) do
+            local fieldKey = field.name
+            if fieldKey.type == 'doc.field.name' then
+                if fieldKey[1] == key then
+                    pushResult(fieldKey)
+                end
+            end
+        end
+    end)
     : getMap()
 
 local searchByParentNode

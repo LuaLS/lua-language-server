@@ -7,10 +7,13 @@ local mt = {}
 mt.__index = mt
 mt.type = 'generic'
 
----@param node     vm.node
----@param resolved table<string, vm.node>
+---@param node      vm.node
+---@param resolved? table<string, vm.node>
 ---@return vm.node
 local function cloneObject(node, resolved)
+    if not resolved then
+        return node
+    end
     if node.type == 'doc.generic.name' then
         local key = node[1]
         return resolved[key] or node
@@ -56,7 +59,25 @@ local function cloneObject(node, resolved)
     end
     if node.type == 'doc.type.table' then
         local newTable = {
+            type   = node.type,
+            start  = node.start,
+            finish = node.finish,
+            parent = node.parent,
+            fields = {},
         }
+        for i, field in ipairs(node.fields) do
+            local newField = {
+                type   = field.type,
+                start  = field.start,
+                finish = field.finish,
+                parent = newTable,
+                name   = field.name,
+                extends = cloneObject(field.extends, resolved)
+            }
+            newField.name.parent    = newField
+            newField.extends.parent = newField
+            newTable.fields[i] = newField
+        end
         return newTable
     end
     if node.type == 'doc.type.function' then

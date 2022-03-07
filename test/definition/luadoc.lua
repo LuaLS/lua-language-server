@@ -633,7 +633,7 @@ end
 ]]
 
 TEST [[
----@class TT<V>: { x: V }
+---@class TT<V>: { <!x!>: V }
 
 ---@type TT<A>
 local t

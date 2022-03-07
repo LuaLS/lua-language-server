@@ -1,6 +1,7 @@
 local util          = require 'utility'
 local guide         = require 'parser.guide'
 local globalBuilder = require 'vm.global'
+local genericMgr    = require 'vm.generic-manager'
 
 ---@class parser.object
 ---@field _globalNode vm.node.global
@@ -142,6 +143,20 @@ local compilerGlobalMap = util.switch()
         local class = m.declareGlobal('type', name, uri)
         class:addSet(uri, source)
         source._globalNode = class
+
+        if source.signs then
+            source._generic = genericMgr(source)
+            for _, sign in ipairs(source.signs) do
+                source._generic:addSign(sign)
+            end
+            if source.extends then
+                for _, ext in ipairs(source.extends) do
+                    if ext.type == 'doc.type.table' then
+                        ext._generic = source._generic:getChild(ext)
+                    end
+                end
+            end
+        end
     end)
     : case 'doc.alias'
     : call(function (source)

@@ -72,6 +72,11 @@ local searchFieldMap = util.switch()
                     end
                 end
             end
+            if fieldKey.type == 'doc.field.name' then
+                if fieldKey[1] == key then
+                    pushResult(field.extends)
+                end
+            end
         end
     end)
     : getMap()
@@ -115,9 +120,11 @@ function m.getClassFields(node, key, pushResult)
                 -- look into extends(if field not found)
                 if not hasFounded and set.extends then
                     for _, extend in ipairs(set.extends) do
-                        local extendType = globalMgr.getGlobal('type', extend[1])
-                        if extendType then
-                            searchClass(extendType)
+                        if extend.type == 'doc.extends.name' then
+                            local extendType = globalMgr.getGlobal('type', extend[1])
+                            if extendType then
+                                searchClass(extendType)
+                            end
                         end
                     end
                 end
@@ -227,13 +234,7 @@ local function getReturn(func, index, source, args)
             or cnode.type == 'doc.type.function' then
                 local returnNode = getReturnOfFunction(cnode, index)
                 if returnNode and returnNode.type == 'generic' then
-                    local argNodes = {}
-                    if args then
-                        for i, arg in ipairs(args) do
-                            argNodes[i] = m.compileNode(arg)
-                        end
-                    end
-                    returnNode = returnNode:resolve(argNodes)
+                    returnNode = returnNode:resolve(args)
                 end
                 if returnNode then
                     nodeMgr.setNode(source, m.compileNode(returnNode))
@@ -586,7 +587,12 @@ local function compileByGlobal(source)
                     if set.extends then
                         for _, ext in ipairs(set.extends) do
                             if ext.type == 'doc.type.table' then
-                                nodeMgr.setNode(source, m.compileNode(ext))
+                                if ext._generic then
+                                    local resolved = ext._generic:resolve(source.signs)
+                                    nodeMgr.setNode(source, resolved)
+                                else
+                                    nodeMgr.setNode(source, m.compileNode(ext))
+                                end
                             end
                         end
                     end

@@ -1,5 +1,4 @@
 local createGeneric = require 'vm.generic'
-local globalMgr     = require 'vm.global-manager'
 local guide         = require 'parser.guide'
 local nodeMgr       = require 'vm.node'
 
@@ -24,8 +23,12 @@ end
 ---@param argNodes vm.node[]
 ---@return table<string, vm.node>
 function mt:resolve(argNodes)
-    local typeMgr  = require 'vm.type'
-    local compiler = require 'vm.compiler'
+    if not argNodes then
+        return nil
+    end
+    local typeMgr   = require 'vm.type'
+    local compiler  = require 'vm.compiler'
+    local globalMgr = require 'vm.global-manager'
     local resolved = {}
 
     ---@param typeUnit parser.object
@@ -76,8 +79,13 @@ function mt:resolve(argNodes)
         if not sign then
             break
         end
-        for _, typeUnit in ipairs(sign.types) do
-            resolve(typeUnit, node)
+        if sign.type == 'doc.type' then
+            for _, typeUnit in ipairs(sign.types) do
+                resolve(typeUnit, compiler.compileNode(node))
+            end
+        end
+        if sign.type == 'doc.generic.name' then
+            resolve(sign, compiler.compileNode(node))
         end
     end
 

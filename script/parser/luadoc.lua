@@ -122,6 +122,7 @@ Symbol              <-  ({} {
 
 ---@class parser.object
 ---@field literal boolean
+---@field signs parser.object[]
 
 local function trim(str)
     return str:match '^%s*(%S+)%s*$'
@@ -306,6 +307,56 @@ local function parseTable(parent)
     return typeUnit
 end
 
+local function parseSigns(parent, mode)
+    if not checkToken('symbol', '<', 1) then
+        return nil
+    end
+    nextToken()
+    local signs = {}
+    while true do
+        local sign
+        if mode == 'name' then
+            sign = parseName('doc.generic.name', parent)
+            if not sign then
+                pushWarning {
+                    type   = 'LUADOC_MISS_SIGN_NAME',
+                    start  = getFinish(),
+                    finish = getFinish(),
+                }
+                break
+            end
+        elseif mode == 'type' then
+            sign = parseType(parent)
+            if not sign then
+                pushWarning {
+                    type   = 'LUADOC_MISS_TYPE_NAME',
+                    start  = getFinish(),
+                    finish = getFinish(),
+                }
+                break
+            end
+        end
+        signs[#signs+1] = sign
+        if checkToken('symbol', ',', 1) then
+            nextToken()
+        else
+            break
+        end
+    end
+    if not checkToken('symbol', '>', 1) then
+        pushWarning {
+            type   = 'LUADOC_MISS_SYMBOL',
+            start  = getFinish(),
+            finish = getFinish(),
+            symbol = {
+                symbol = '>',
+            }
+        }
+    end
+    nextToken()
+    return signs
+end
+
 local function parseClass(parent)
     local result = {
         type   = 'doc.class',
@@ -323,6 +374,7 @@ local function parseClass(parent)
     end
     result.start  = getStart()
     result.finish = getFinish()
+    result.signs  = parseSigns(result, 'name')
     if not checkToken('symbol', ':', 1) then
         return result
     end
@@ -364,39 +416,6 @@ local function parseTypeUnitArray(parent, node)
         parent = parent,
     }
     node.parent = result
-    return result
-end
-
-local function parseTypeUnitTable(parent, node)
-    if not checkToken('symbol', '<', 1) then
-        return nil
-    end
-    if not nextSymbolOrError('<') then
-        return nil
-    end
-
-    local result = {
-        type   = 'doc.type.table',
-        start  = node.start,
-        node   = node,
-        parent = parent,
-    }
-
-    local key = parseType(result)
-    if not key or not nextSymbolOrError(',') then
-        return nil
-    end
-    local value = parseType(result)
-    if not value then
-        return nil
-    end
-    nextSymbolOrError('>')
-
-    node.parent = result
-    result.finish = getFinish()
-    result.tkey = key
-    result.tvalue = value
-
     return result
 end
 
@@ -529,6 +548,7 @@ function parseTypeUnit(parent)
             parent = parent,
             [1]    = token,
         }
+        result.signs = parseSigns(result, 'type')
     end
     if not result then
         return nil
@@ -1267,14 +1287,26 @@ end
 local function bindGeneric(binded)
     local generics = {}
     for _, doc in ipairs(binded) do
-        if     doc.type == 'doc.generic' then
+        if doc.type == 'doc.generic' then
             for _, obj in ipairs(doc.generics) do
                 local name = obj.generic[1]
                 generics[name] = true
             end
-        elseif doc.type == 'doc.param'
-        or     doc.type == 'doc.return'
-        or     doc.type == 'doc.type' then
+        end
+        if doc.type == 'doc.class'
+        or doc.type == 'doc.alias' then
+            if doc.signs then
+                for _, sign in ipairs(doc.signs) do
+                    local name = sign[1]
+                    generics[name] = true
+                end
+            end
+        end
+        if doc.type == 'doc.param'
+        or doc.type == 'doc.return'
+        or doc.type == 'doc.type'
+        or doc.type == 'doc.class'
+        or doc.type == 'doc.alias' then
             guide.eachSourceType(doc, 'doc.type.name', function (src)
                 local name = src[1]
                 if generics[name] then

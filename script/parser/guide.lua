@@ -118,8 +118,9 @@ local childMap = {
     ['unary']       = {1},
 
     ['doc']                = {'#'},
-    ['doc.class']          = {'class', '#extends', 'comment'},
+    ['doc.class']          = {'class', '#extends', '#signs', 'comment'},
     ['doc.type']           = {'#types', 'name', 'comment'},
+    ['doc.type.name']      = {'#signs'},
     ['doc.alias']          = {'alias', 'extends', 'comment'},
     ['doc.param']          = {'param', 'extends', 'comment'},
     ['doc.return']         = {'#returns', 'comment'},

@@ -817,17 +817,16 @@ return function (uri, start, finish)
     for _, comm in ipairs(state.comms) do
         if start <= comm.start and comm.finish <= finish then
             if comm.type == 'comment.short' then
-                local head = comm.text:sub(1, 2)
-                if head == '-@'
-                or head == '-|' then
+                local head = comm.text:match '^%-%s*[@|]'
+                if head then
                     results[#results+1] = {
                         start  = comm.start,
-                        finish = comm.start + 3,
+                        finish = comm.start + #head + 1,
                         type   = define.TokenTypes.comment,
                     }
                     results[#results+1] = {
-                        start      = comm.start + 3,
-                        finish     = comm.start + 2 +  #comm.text:match '%S+',
+                        start      = comm.start + #head + 1,
+                        finish     = comm.start + #head + 2 + #comm.text:match('%S+', #head + 1),
                         type       = define.TokenTypes.keyword,
                         modifieres = define.TokenModifiers.documentation,
                     }

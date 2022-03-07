@@ -668,20 +668,21 @@ function parseType(parent)
             if currentRow < nextCommRow then
                 return false
             end
-            if nextComm.text:sub(1, 2) == '-@' then
+            if nextComm.text:match '^%-%s*%@' then
                 return false
             else
-                if nextComm.text:sub(1, 2) == '-|' then
+                local resumeHead = nextComm.text:match '^%-%s*%|'
+                if resumeHead then
                     NextComment(i)
                     row = row + i + 1
-                    local finishPos = nextComm.text:find('#', 3) or #nextComm.text
-                    parseTokens(nextComm.text:sub(3, finishPos), nextComm.start + 3)
+                    local finishPos = nextComm.text:find('#', #resumeHead + 1) or #nextComm.text
+                    parseTokens(nextComm.text:sub(#resumeHead + 1, finishPos), nextComm.start + #resumeHead + 1)
                     local resume = parseResume(result)
                     if resume then
                         if comments then
                             resume.comment = table.concat(comments, '\n')
                         else
-                            resume.comment = nextComm.text:match('#%s*(.+)', 3)
+                            resume.comment = nextComm.text:match('#%s*(.+)', #resumeHead + 1)
                         end
                         result.types[#result.types+1] = resume
                         result.finish = resume.finish

@@ -143,6 +143,20 @@ function f(<?...?>) end
 ]]
 
 TEST [[
+---@alias A <!fun()!>
+
+---@type A
+local <!<?x?>!>
+]]
+
+TEST [[
+---@class A: <!{}!>
+
+---@type A
+local <!<?x?>!>
+]]
+
+TEST [[
 ---@overload <!fun(y: boolean)!>
 ---@param x number
 ---@param y boolean
@@ -602,26 +616,7 @@ end
 ]]
 
 TEST [[
----@class C
-local <!v!>
-
----@type C
-local <!v1!>
-
----@generic V, T
----@param t T
----@return fun(t: V): V
----@return T
-local function iterator(t) end
-
-for <!v!> in iterator(<!v1!>) do
-    print(<?v?>)
-end
-]]
-
-TEST [[
----@class C
-local <!v!>
+---@alias C <!fun()!>
 
 ---@type C[]
 local v1
@@ -635,6 +630,17 @@ local function iterator(t) end
 for <!v!> in iterator(v1) do
     print(<?v?>)
 end
+]]
+
+TEST [[
+---@class TT<V>: { x: V }
+
+---@type TT<A>
+local t
+
+---@class A: <!{}!>
+
+print(t.<?x?>)
 ]]
 
 TEST [[

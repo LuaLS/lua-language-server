@@ -243,6 +243,69 @@ local function parseIndexField(tp, parent)
     end
 end
 
+local function parseTable(parent)
+    if not checkToken('symbol', '{', 1) then
+        return nil
+    end
+    nextToken()
+    local typeUnit = {
+        type    = 'doc.type.table',
+        start   = getStart(),
+        parent  = parent,
+        fields  = {},
+    }
+
+    while true do
+        if checkToken('symbol', '}', 1) then
+            nextToken()
+            break
+        end
+        local field = {
+            type   = 'doc.type.field',
+            parent = typeUnit,
+        }
+
+        do
+            field.name = parseName('doc.field.name', field)
+                    or   parseIndexField('doc.field.name', field)
+            if not field.name then
+                pushWarning {
+                    type   = 'LUADOC_MISS_FIELD_NAME',
+                    start  = getFinish(),
+                    finish = getFinish(),
+                }
+                break
+            end
+            if not field.start then
+                field.start = field.name.start
+            end
+            if checkToken('symbol', '?', 1) then
+                nextToken()
+                field.optional = true
+            end
+            field.finish = getFinish()
+            if not nextSymbolOrError(':') then
+                break
+            end
+            field.extends = parseType(field)
+            if not field.extends then
+                break
+            end
+            field.finish = getFinish()
+        end
+
+        typeUnit.fields[#typeUnit.fields+1] = field
+        if checkToken('symbol', ',', 1) then
+            nextToken()
+        else
+            nextSymbolOrError('}')
+            break
+        end
+    end
+    typeUnit.finish = getFinish()
+    return typeUnit
+end
+
 local function parseClass(parent)
     local result = {
         type   = 'doc.class',
@@ -269,6 +332,7 @@ local function parseClass(parent)
 
     while true do
         local extend = parseName('doc.extends.name', result)
+                    or parseTable(result)
         if not extend then
             pushWarning {
                 type   = 'LUADOC_MISS_CLASS_EXTENDS_NAME',
@@ -351,9 +415,14 @@ local function parseDots(tp, parent)
     return dots
 end
 
-local function  parseTypeUnitFunction()
+local function  parseTypeUnitFunction(parent)
+    if not checkToken('name', 'fun', 1) then
+        return nil
+    end
+    nextToken()
     local typeUnit = {
         type    = 'doc.type.function',
+        parent  = parent,
         start   = getStart(),
         args    = {},
         returns = {},
@@ -424,74 +493,17 @@ local function  parseTypeUnitFunction()
     return typeUnit
 end
 
-local function parseTypeUnitLiteralTable()
-    local typeUnit = {
-        type    = 'doc.type.table',
-        start   = getStart(),
-        fields  = {},
-    }
-
-    while true do
-        if checkToken('symbol', '}', 1) then
-            nextToken()
-            break
-        end
-        local field = {
-            type   = 'doc.type.field',
-            parent = typeUnit,
-        }
-
-        do
-            field.name = parseName('doc.field.name', field)
-                    or   parseIndexField('doc.field.name', field)
-            if not field.name then
-                pushWarning {
-                    type   = 'LUADOC_MISS_FIELD_NAME',
-                    start  = getFinish(),
-                    finish = getFinish(),
-                }
-                break
-            end
-            if not field.start then
-                field.start = field.name.start
-            end
-            if checkToken('symbol', '?', 1) then
-                nextToken()
-                field.optional = true
-            end
-            field.finish = getFinish()
-            if not nextSymbolOrError(':') then
-                break
-            end
-            field.extends = parseType(field)
-            if not field.extends then
-                break
-            end
-            field.finish = getFinish()
-        end
-
-        typeUnit.fields[#typeUnit.fields+1] = field
-        if checkToken('symbol', ',', 1) then
-            nextToken()
-        else
-            nextSymbolOrError('}')
-            break
-        end
-    end
-    typeUnit.finish = getFinish()
-    return typeUnit
-end
-
 local parseTypeUnit
 
-local function parseDocFunction(parent, content)
+local function parseFunction(parent)
+    local _, content = peekToken()
     if content == 'async' then
+        nextToken()
         local pos = getStart()
         local tp, cont = peekToken()
         if tp == 'name' then
             if cont == 'fun' then
-                nextToken()
-                local func = parseTypeUnit(parent, cont)
+                local func = parseTypeUnit(parent)
                 if func then
                     func.async = true
                     func.asyncPos = pos
@@ -501,29 +513,26 @@ local function parseDocFunction(parent, content)
         end
     end
     if content == 'fun' then
-        return parseTypeUnitFunction()
+        return parseTypeUnitFunction(parent)
     end
 end
 
-function parseTypeUnit(parent, content)
-    local result = parseDocFunction(parent, content)
+function parseTypeUnit(parent)
+    local result = parseFunction(parent)
+                or parseTable(parent)
     if not result then
-        if content == '{' then
-            result = parseTypeUnitLiteralTable()
-        end
-    end
-    if not result then
+        local _, token = nextToken()
         result = {
             type   = 'doc.type.name',
             start  = getStart(),
             finish = getFinish(),
-            [1]    = content,
+            parent = parent,
+            [1]    = token,
         }
     end
     if not result then
         return nil
     end
-    result.parent = parent
     while true do
         local newResult = parseTypeUnitArray(parent, result)
         if not newResult then
@@ -594,8 +603,7 @@ function parseType(parent)
         end
 
         if tp == 'name' then
-            nextToken()
-            local typeUnit = parseTypeUnit(result, content)
+            local typeUnit = parseTypeUnit(result)
             if not typeUnit then
                 break
             end
@@ -621,8 +629,7 @@ function parseType(parent)
                 result.start = typeEnum.start
             end
         elseif tp == 'symbol' and content == '{' then
-            nextToken()
-            local typeUnit = parseTypeUnit(result, content)
+            local typeUnit = parseTypeUnit(result)
             if not typeUnit then
                 break
             end
@@ -933,11 +940,10 @@ local function parseOverload()
         }
         return nil
     end
-    nextToken()
     local result = {
         type = 'doc.overload',
     }
-    result.overload = parseDocFunction(result, name)
+    result.overload = parseFunction(result)
     if not result.overload then
         return nil
     end

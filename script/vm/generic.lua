@@ -80,7 +80,7 @@ local function cloneObject(node, resolved)
         end
         return newDocFunc
     end
-    return nil
+    return node
 end
 
 ---@param argNodes vm.node[]

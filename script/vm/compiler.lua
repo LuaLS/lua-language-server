@@ -335,7 +335,7 @@ local function selectNode(source, list, index)
     if exp.type == '...' then
         -- TODO
     end
-    return m.compileNode(exp)
+    return nodeMgr.setNode(source, m.compileNode(exp))
 end
 
 local compilerMap = util.switch()
@@ -395,6 +395,10 @@ local compilerMap = util.switch()
             if setfield.type == 'setfield' then
                 nodeMgr.setNode(source, m.compileNode(setfield.node))
             end
+        end
+        -- for x in ... do
+        if source.parent.type == 'in' then
+            m.compileNode(source.parent)
         end
     end)
     : case 'getlocal'
@@ -459,7 +463,7 @@ local compilerMap = util.switch()
         end
         if func.returns and not hasMarkDoc then
             for _, rtn in ipairs(func.returns) do
-                nodeMgr.setNode(source, selectNode(source, rtn, index))
+                selectNode(source, rtn, index)
             end
         end
     end)
@@ -467,7 +471,26 @@ local compilerMap = util.switch()
     : call(function (source)
         local vararg = source.vararg
         if vararg.type == 'call' then
-            nodeMgr.setNode(source, getReturn(vararg.node, source.sindex, source, vararg.args))
+            getReturn(vararg.node, source.sindex, source, vararg.args)
+        end
+    end)
+    : case 'in'
+    : call(function (source)
+        if not source._iterator then
+            --  for k, v in pairs(t) do
+            --> for k, v in iterator, status, initValue do
+            --> local k, v = iterator(status, initValue)
+            source._iterator = {}
+            source._iterArgs = {{}, {}}
+            -- iterator
+            selectNode(source._iterator,    source.exps, 1)
+            -- status
+            selectNode(source._iterArgs[1], source.exps, 2)
+            -- initValue
+            selectNode(source._iterArgs[2], source.exps, 3)
+        end
+        for i, loc in ipairs(source.keys) do
+            getReturn(source._iterator, i, loc, source._iterArgs)
         end
     end)
     : case 'doc.type'
@@ -554,6 +577,22 @@ local function compileByGlobal(source)
                     if not hasMarkDoc or guide.isLiteral(set.value) then
                         nodeMgr.setNode(source, m.compileNode(set.value))
                     end
+                end
+            end
+        end
+        if source._globalNode.cate == 'type' then
+            for _, set in ipairs(source._globalNode:getSets()) do
+                if set.type == 'doc.class' then
+                    if set.extends then
+                        for _, ext in ipairs(set.extends) do
+                            if ext.type == 'doc.type.table' then
+                                nodeMgr.setNode(source, m.compileNode(ext))
+                            end
+                        end
+                    end
+                end
+                if set.type == 'doc.alias' then
+                    nodeMgr.setNode(source, m.compileNode(set.extends))
                 end
             end
         end

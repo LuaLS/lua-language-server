@@ -170,10 +170,8 @@ return function (uri, offset)
                 goto CONTINUE
             end
         end
-        if src.type == 'doc.type.name' then
-            if src.typeGeneric then
-                goto CONTINUE
-            end
+        if src.type == 'doc.generic.name' then
+            goto CONTINUE
         end
         if src.type == 'doc.param' then
             goto CONTINUE

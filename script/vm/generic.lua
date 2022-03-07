@@ -67,12 +67,12 @@ local function cloneObject(node, resolved)
         }
         for i, field in ipairs(node.fields) do
             local newField = {
-                type   = field.type,
-                start  = field.start,
-                finish = field.finish,
-                parent = newTable,
-                name   = field.name,
-                extends = cloneObject(field.extends, resolved)
+                type    = field.type,
+                start   = field.start,
+                finish  = field.finish,
+                parent  = newTable,
+                name    = cloneObject(field.name, resolved),
+                extends = cloneObject(field.extends, resolved),
             }
             newField.name.parent    = newField
             newField.extends.parent = newField

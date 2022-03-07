@@ -633,7 +633,7 @@ end
 ]]
 
 TEST [[
----@class TT<V>: { <!x!>: V }
+---@class TT<V>: { <!x: V!> }
 
 ---@type TT<A>
 local t
@@ -644,7 +644,7 @@ print(t.<?x?>)
 ]]
 
 TEST [[
----@alias TT<V> { <!x!>: V }
+---@alias TT<V> { <!x: V!> }
 
 ---@type TT<A>
 local t
@@ -658,6 +658,23 @@ TEST [[
 ---@class TT<V>: { [number]: V }
 
 ---@type TT<<!{}!>>
+local v1
+
+---@generic V, T
+---@param t T
+---@return fun(t: { [number]: V }): V
+---@return T
+local function iterator(t) end
+
+for <!v!> in iterator(v1) do
+    print(<?v?>)
+end
+]]
+
+TEST [[
+---@class TT<K, V>: { [K]: V }
+
+---@type TT<number, <!{}!>>
 local v1
 
 ---@generic V, T
@@ -760,7 +777,7 @@ function Foo:<!bar1!>() end
 
 ---@generic T: table, V
 ---@param t T
----@return fun(table: V[], i?: integer):integer, V
+---@return fun(table: table<number, V>, i?: integer):integer, V
 ---@return T
 ---@return integer i
 local function ipairs(t) end

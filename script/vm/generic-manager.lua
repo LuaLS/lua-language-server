@@ -4,14 +4,15 @@ local nodeMgr       = require 'vm.node'
 
 ---@class vm.node.generic-manager
 ---@field parent   parser.object
----@field signList parser.object[]
+---@field signList vm.node[]
 local mt = {}
 mt.__index = mt
 mt.type = 'generic-manager'
 
 ---@param key parser.object
 function mt:addSign(key)
-    self.signList[#self.signList+1] = key
+    local compiler = require 'vm.compiler'
+    self.signList[#self.signList+1] = compiler.compileNode(key)
 end
 
 ---@param node vm.node
@@ -61,14 +62,22 @@ function mt:resolve(argNodes)
             for _, ufield in ipairs(typeUnit.fields) do
                 local ufieldNode = compiler.compileNode(ufield.name)
                 local uvalueNode = compiler.compileNode(ufield.extends)
-                if ufieldNode.type == 'doc.generic.name' then
-                    -- { [number]: number}|number[] -> { [K]: number }
-                    local tnode = typeMgr.getTableKey(node, uvalueNode)
-                    resolve(ufieldNode, tnode)
+                if ufieldNode.type == 'doc.generic.name' and uvalueNode.type == 'doc.generic.name' then
+                    -- { [number]: number} -> { [K]: V }
+                    local tfieldNode = typeMgr.getTableKey(node, 'any')
+                    local tvalueNode = typeMgr.getTableValue(node, 'any')
+                    resolve(ufieldNode, tfieldNode)
+                    resolve(uvalueNode, tvalueNode)
                 else
-                    -- { [number]: number}|number[] -> { [number]: V }
-                    local tnode = typeMgr.getTableValue(node, ufieldNode)
-                    resolve(uvalueNode, tnode)
+                    if ufieldNode.type == 'doc.generic.name' then
+                        -- { [number]: number}|number[] -> { [K]: number }
+                        local tnode = typeMgr.getTableKey(node, uvalueNode)
+                        resolve(ufieldNode, tnode)
+                    else
+                        -- { [number]: number}|number[] -> { [number]: V }
+                        local tnode = typeMgr.getTableValue(node, ufieldNode)
+                        resolve(uvalueNode, tnode)
+                    end
                 end
             end
         end
@@ -79,13 +88,8 @@ function mt:resolve(argNodes)
         if not sign then
             break
         end
-        if sign.type == 'doc.type' then
-            for _, typeUnit in ipairs(sign.types) do
-                resolve(typeUnit, compiler.compileNode(node))
-            end
-        end
-        if sign.type == 'doc.generic.name' then
-            resolve(sign, compiler.compileNode(node))
+        for n in nodeMgr.eachNode(sign) do
+            resolve(n, compiler.compileNode(node))
         end
     end
 

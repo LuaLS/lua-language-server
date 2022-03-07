@@ -9,6 +9,17 @@ local m = {}
 ---@param parent vm.node
 ---@return boolean
 function m.isSubType(child, parent, mark)
+    if type(parent) == 'string' then
+        parent = globalMgr.getGlobal('type', parent)
+    end
+    if type(child) == 'string' then
+        child = globalMgr.getGlobal('type', child)
+    end
+
+    if parent.type == 'global' and parent.cate == 'type' and parent.name == 'any' then
+        return true
+    end
+
     if child.type == 'doc.type' then
         for _, typeUnit in ipairs(child.types) do
             if not m.isSubType(typeUnit, parent) then
@@ -17,9 +28,11 @@ function m.isSubType(child, parent, mark)
         end
         return true
     end
+
     if child.type == 'doc.type.name' then
         child = globalMgr.getGlobal('type', child[1])
     end
+
     if child.type == 'global' and child.cate == 'type' then
         if parent.type == 'doc.type' then
             for _, typeUnit in ipairs(parent.types) do
@@ -28,9 +41,11 @@ function m.isSubType(child, parent, mark)
                 end
             end
         end
+
         if parent.type == 'doc.type.name' then
             parent = globalMgr.getGlobal('type', parent[1])
         end
+
         if parent.type == 'global' and parent.cate == 'type' then
             if parent.name == child.name then
                 return true
@@ -51,6 +66,7 @@ function m.isSubType(child, parent, mark)
             end
         end
     end
+
     return false
 end
 

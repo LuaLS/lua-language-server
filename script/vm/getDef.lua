@@ -118,7 +118,7 @@ local searchFieldMap = util.switch()
             local fieldKey = field.name
             if fieldKey.type == 'doc.field.name' then
                 if fieldKey[1] == key then
-                    pushResult(fieldKey)
+                    pushResult(field)
                 end
             end
         end

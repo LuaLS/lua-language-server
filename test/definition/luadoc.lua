@@ -644,6 +644,17 @@ print(t.<?x?>)
 ]]
 
 TEST [[
+---@alias TT<V> { <!x!>: V }
+
+---@type TT<A>
+local t
+
+---@class A: <!{}!>
+
+print(t.<?x?>)
+]]
+
+TEST [[
 ---@class Foo
 local Foo = {}
 function Foo:<!bar1!>() end

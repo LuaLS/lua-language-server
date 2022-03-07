@@ -25,7 +25,7 @@ local type         = type
 ---@field field                 parser.object
 ---@field method                parser.object
 ---@field index                 parser.object
----@field extends               parser.object[]
+---@field extends               parser.object[]|parser.object
 ---@field types                 parser.object[]
 ---@field fields                parser.object[]
 ---@field tkey                  parser.object

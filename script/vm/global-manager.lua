@@ -165,6 +165,14 @@ local compilerGlobalMap = util.switch()
         local alias = m.declareGlobal('type', name, uri)
         alias:addSet(uri, source)
         source._globalNode = alias
+
+        if source.signs then
+            source._generic = genericMgr(source)
+            for _, sign in ipairs(source.signs) do
+                source._generic:addSign(sign)
+            end
+            source.extends._generic = source._generic:getChild(source.extends)
+        end
     end)
     : case 'doc.type.name'
     : call(function (source)

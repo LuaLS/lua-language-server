@@ -598,7 +598,12 @@ local function compileByGlobal(source)
                     end
                 end
                 if set.type == 'doc.alias' then
-                    nodeMgr.setNode(source, m.compileNode(set.extends))
+                    if set.extends._generic then
+                        local resolved = set.extends._generic:resolve(source.signs)
+                        nodeMgr.setNode(source, resolved)
+                    else
+                        nodeMgr.setNode(source, m.compileNode(set.extends))
+                    end
                 end
             end
         end

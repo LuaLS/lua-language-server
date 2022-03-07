@@ -768,6 +768,7 @@ local function parseAlias()
         return nil
     end
     result.start  = getStart()
+    result.signs  = parseSigns(result, 'name')
     result.extends = parseType(result)
     if not result.extends then
         pushWarning {

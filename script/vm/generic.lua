@@ -127,9 +127,10 @@ end
 ---@param parent vm.node.generic-manager
 ---@param node   vm.node
 return function (parent, node)
+    local compiler = require 'vm.compiler'
     local generic = setmetatable({
         parent = parent,
-        node   = node,
+        node   = compiler.compileNode(node),
     }, mt)
     return generic
 end

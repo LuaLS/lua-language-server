@@ -662,13 +662,10 @@ end
 ---@param uri uri
 ---@return boolean
 function m.isLua(uri)
-    local ext = uri:match '%.([^%.%/%\\]+)$'
-    if not ext then
-        return false
-    end
-    if ext == 'lua' then
+    if util.stringEndWith(uri:lower(), '.lua') then
         return true
     end
+    -- check customed assoc, e.g. `*.lua.txt = *.lua`
     local matcher = m.getAssoc(uri)
     local path = furi.decode(uri)
     return matcher(path)

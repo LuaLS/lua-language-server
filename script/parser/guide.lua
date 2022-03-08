@@ -928,7 +928,7 @@ function m.getKeyName(obj)
     or     tp == 'tableindex' then
         return m.getKeyNameOfLiteral(obj.index)
     elseif tp == 'tableexp' then
-        return tostring(obj.tindex)
+        return obj.tindex
     elseif tp == 'field'
     or     tp == 'method'
     or     tp == 'doc.see.field' then
@@ -938,11 +938,11 @@ function m.getKeyName(obj)
     elseif tp == 'doc.alias' then
         return obj.alias[1]
     elseif tp == 'doc.field' then
-        return tostring(obj.field[1])
+        return obj.field[1]
     elseif tp == 'doc.field.name' then
-        return tostring(obj[1])
+        return obj[1]
     elseif tp == 'doc.type.field' then
-        return tostring(obj.name[1])
+        return obj.name[1]
     elseif tp == 'dummy' then
         return obj[1]
     end

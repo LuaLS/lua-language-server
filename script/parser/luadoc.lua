@@ -224,6 +224,7 @@ local function parseIndexField(tp, parent)
         return nil
     end
     nextToken()
+    local start = getFinish() - 1
     local indexTP, index = peekToken()
     if indexTP == 'name' then
         local field = parseType(parent)
@@ -233,7 +234,7 @@ local function parseIndexField(tp, parent)
         nextToken()
         local class = {
             type   = tp,
-            start  = getStart(),
+            start  = start,
             finish = getFinish(),
             parent = parent,
         }

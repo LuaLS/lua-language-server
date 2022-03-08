@@ -822,22 +822,22 @@ print(t.<?x?>)
 
 TEST [[
 ---@class A
----@field <![1]!>? boolean
+---@field [1]? <!{}!>
 local t
 
-print(t[<?1?>])
+local <!<?v?>!> = t[1]
 ]]
 
 TEST [[
----@type { <![1]?: boolean!> }
+---@type { [1]?: <!{}!> }
 local t
 
-print(t[<?1?>])
+local <!<?v?>!> = t[1]
 ]]
 
 TEST [[
 ---@class A
----@field <!['xx']!>? boolean
+---@field <!['xx']!>? <!{}!>
 local t
 
 print(t.<?xx?>)

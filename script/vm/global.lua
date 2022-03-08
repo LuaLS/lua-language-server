@@ -19,6 +19,7 @@ mt.name = ''
 function mt:addSet(uri, source)
     local link = self.links[uri]
     link.sets[#link.sets+1] = source
+    self.setsCache = nil
 end
 
 ---@param uri    uri
@@ -26,6 +27,7 @@ end
 function mt:addGet(uri, source)
     local link = self.links[uri]
     link.gets[#link.gets+1] = source
+    self.getsCache = nil
 end
 
 ---@return parser.object[]

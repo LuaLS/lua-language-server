@@ -199,29 +199,38 @@ TEST 'function' [[
 ---@class stringlib
 local string
 
-string.sub = function () end
+string.xxx = function () end
 
-return ('x').<?sub?>
+return ('x').<?xxx?>
+]]
+
+TEST 'function' [[
+---@class stringlib
+String = {}
+
+String.xxx = function () end
+
+return ('x').<?xxx?>
 ]]
 
 TEST 'function' [[
 ---@class stringlib
 local string
 
-string.sub = function () end
+string.xxx = function () end
 
-<?x?> = ('x').sub
+<?x?> = ('x').xxx
 ]]
 
 TEST 'function' [[
 ---@class stringlib
 local string
 
-string.sub = function () end
+string.xxx = function () end
 
 _VERSION = 'Lua 5.4'
 
-<?x?> = _VERSION.sub
+<?x?> = _VERSION.xxx
 ]]
 
 TEST 'table' [[

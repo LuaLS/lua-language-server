@@ -38,6 +38,11 @@ local searchFieldMap = util.switch()
             m.getClassFields(node, key, pushResult)
         end
     end)
+    : case 'string'
+    : call(function (node, key, pushResult)
+        local stringlib = globalMgr.getGlobal('type', 'stringlib')
+        m.getClassFields(stringlib, key, pushResult)
+    end)
     : case 'local'
     : call(function (node, key, pushResult)
         local sources = localID.getSources(node, key)
@@ -364,6 +369,10 @@ local compilerMap = util.switch()
                 end
             end
         end
+    end)
+    : case 'paren'
+    : call(function (source)
+        nodeMgr.setNode(source, m.compileNode(source.exp))
     end)
     : case 'local'
     : call(function (source)
@@ -921,17 +930,13 @@ local function compileByNode(source)
     end
 end
 
----@param source parser.object
+---@param source vm.node
 local function compileByGlobal(source)
     if source.type == 'global' then
         nodeMgr.setNode(source, source)
-        return
-    end
-    if source._globalNode then
-        nodeMgr.setNode(source, source._globalNode)
-        if source._globalNode.cate == 'variable' then
+        if source.cate == 'variable' then
             local hasMarkDoc
-            for _, set in ipairs(source._globalNode:getSets()) do
+            for _, set in ipairs(source:getSets()) do
                 if set.bindDocs then
                     if bindDocs(set) then
                         nodeMgr.setNode(source, m.compileNode(set))
@@ -939,7 +944,7 @@ local function compileByGlobal(source)
                     end
                 end
             end
-            for _, set in ipairs(source._globalNode:getSets()) do
+            for _, set in ipairs(source:getSets()) do
                 if set.value then
                     if not hasMarkDoc or guide.isLiteral(set.value) then
                         nodeMgr.setNode(source, m.compileNode(set.value))
@@ -947,6 +952,30 @@ local function compileByGlobal(source)
                 end
             end
         end
+        if source.cate == 'type' then
+            for _, set in ipairs(source:getSets()) do
+                if set.type == 'doc.class' then
+                    if set.extends then
+                        for _, ext in ipairs(set.extends) do
+                            if ext.type == 'doc.type.table' then
+                                if not ext._generic then
+                                    nodeMgr.setNode(source, m.compileNode(ext))
+                                end
+                            end
+                        end
+                    end
+                end
+                if set.type == 'doc.alias' then
+                    if not set.extends._generic then
+                        nodeMgr.setNode(source, m.compileNode(set.extends))
+                    end
+                end
+            end
+        end
+        return
+    end
+    if source._globalNode then
+        nodeMgr.setNode(source, m.compileNode(source._globalNode))
         if source._globalNode.cate == 'type' then
             for _, set in ipairs(source._globalNode:getSets()) do
                 if set.type == 'doc.class' then
@@ -956,8 +985,6 @@ local function compileByGlobal(source)
                                 if ext._generic then
                                     local resolved = ext._generic:resolve(source.signs)
                                     nodeMgr.setNode(source, resolved)
-                                else
-                                    nodeMgr.setNode(source, m.compileNode(ext))
                                 end
                             end
                         end
@@ -967,8 +994,6 @@ local function compileByGlobal(source)
                     if set.extends._generic then
                         local resolved = set.extends._generic:resolve(source.signs)
                         nodeMgr.setNode(source, resolved)
-                    else
-                        nodeMgr.setNode(source, m.compileNode(set.extends))
                     end
                 end
             end

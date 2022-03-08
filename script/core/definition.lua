@@ -130,7 +130,7 @@ return function (uri, offset)
         end
     end
 
-    local defs = vm.getAllDefs(source)
+    local defs = vm.getDefs(source)
 
     for _, src in ipairs(defs) do
         if src.dummy then

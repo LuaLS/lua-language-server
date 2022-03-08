@@ -248,9 +248,3 @@ function vm.getDefs(source)
 
     return results
 end
-
----@param source parser.object
----@return       parser.object[]
-function vm.getAllDefs(source)
-    return vm.getDefs(source)
-end

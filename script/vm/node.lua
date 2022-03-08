@@ -5,6 +5,8 @@ local union      = require 'vm.union'
 ---@class vm.node-manager
 local m = {}
 
+local DUMMY_FUNCTION = function () end
+
 ---@type table<parser.object, vm.node>
 m.nodeCache = {}
 
@@ -38,6 +40,9 @@ end
 
 ---@return fun():vm.node
 function m.eachNode(node)
+    if not node then
+        return DUMMY_FUNCTION
+    end
     if node.type == 'union' then
         return node:eachNode()
     end

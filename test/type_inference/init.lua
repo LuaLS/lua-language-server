@@ -1,6 +1,6 @@
 local files  = require 'files'
 local guide  = require 'parser.guide'
-local infer  = require 'core.infer'
+local infer  = require 'vm.infer'
 local config = require 'config'
 local catch  = require 'catch'
 
@@ -27,9 +27,9 @@ function TEST(wanted)
         files.setText('', newScript)
         local source = getSource(catched['?'][1][1])
         assert(source)
-        local result = infer.searchAndViewInfers(source)
+        local result = infer.viewType(source)
         if wanted ~= result then
-            infer.searchAndViewInfers(source)
+            infer.viewType(source)
         end
         assert(wanted == result)
         files.remove('')
@@ -52,12 +52,17 @@ TEST 'number' [[
 local <?var?> = 1.0
 ]]
 
+TEST 'number' [[
+local <?var?>
+var = 1
+var = 1.0
+]]
+
 TEST 'string' [[
 local var = '111'
 t.<?x?> = var
 ]]
 
-config.set(nil, 'Lua.IntelliSense.traceLocalSet', true)
 TEST 'string' [[
 local <?var?>
 var = '111'
@@ -68,7 +73,6 @@ local var
 var = '111'
 print(<?var?>)
 ]]
-config.set(nil, 'Lua.IntelliSense.traceLocalSet', false)
 
 TEST 'function' [[
 function <?xx?>()
@@ -80,13 +84,11 @@ local function <?xx?>()
 end
 ]]
 
-config.set(nil, 'Lua.IntelliSense.traceLocalSet', true)
 TEST 'function' [[
 local xx
 <?xx?> = function ()
 end
 ]]
-config.set(nil, 'Lua.IntelliSense.traceLocalSet', false)
 
 TEST 'table' [[
 local <?t?> = {}
@@ -100,7 +102,7 @@ TEST 'boolean' [[
 <?x?> = not y
 ]]
 
-TEST 'any' [[
+TEST 'integer' [[
 <?x?> = #y
 ]]
 
@@ -112,7 +114,7 @@ TEST 'integer' [[
 <?x?> = #{}
 ]]
 
-TEST 'any' [[
+TEST 'number' [[
 <?x?> = - y
 ]]
 
@@ -120,7 +122,7 @@ TEST 'number' [[
 <?x?> = - 1.0
 ]]
 
-TEST 'any' [[
+TEST 'integer' [[
 <?x?> = ~ y
 ]]
 

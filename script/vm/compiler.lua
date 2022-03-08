@@ -4,7 +4,7 @@ local localID    = require 'vm.local-id'
 local globalMgr  = require 'vm.global-manager'
 local nodeMgr    = require 'vm.node'
 local genericMgr = require 'vm.generic-manager'
-local valueMgr   = require 'vm.value'
+local config     = require 'config'
 
 ---@class parser.object
 ---@field _compiledNodes  boolean
@@ -549,6 +549,7 @@ local compilerMap = util.switch()
     end)
     : case 'unary'
     : call(function (source)
+        local valueMgr = require 'vm.value'
         if source.op.type == 'not' then
             local result = valueMgr.test(source[1])
             if result == nil then
@@ -570,16 +571,41 @@ local compilerMap = util.switch()
             return
         end
         if source.op.type == '-' then
-            nodeMgr.setNode(source, globalMgr.getGlobal('type', 'number'))
-            return
+            local v = valueMgr.getNumber(source[1])
+            if v == nil then
+                nodeMgr.setNode(source, globalMgr.getGlobal('type', 'number'))
+                return
+            else
+                nodeMgr.setNode(source, {
+                    type   = 'number',
+                    start  = source.start,
+                    finish = source.finish,
+                    parent = source,
+                    [1]    = -v,
+                })
+                return
+            end
         end
         if source.op.type == '~' then
-            nodeMgr.setNode(source, globalMgr.getGlobal('type', 'integer'))
-            return
+            local v = valueMgr.getInteger(source[1])
+            if v == nil then
+                nodeMgr.setNode(source, globalMgr.getGlobal('type', 'integer'))
+                return
+            else
+                nodeMgr.setNode(source, {
+                    type   = 'integer',
+                    start  = source.start,
+                    finish = source.finish,
+                    parent = source,
+                    [1]    = ~v,
+                })
+                return
+            end
         end
     end)
     : case 'binary'
     : call(function (source)
+        local valueMgr = require 'vm.value'
         if source.op.type == 'and' then
             local r1 = valueMgr.test(source[1])
             if r1 == true then
@@ -607,7 +633,282 @@ local compilerMap = util.switch()
             return
         end
         if source.op.type == '==' then
-            
+            local result = valueMgr.equal(source[1], source[2])
+            if result == nil then
+                nodeMgr.setNode(source, globalMgr.getGlobal('type', 'boolean'))
+                return
+            else
+                nodeMgr.setNode(source, {
+                    type   = 'boolean',
+                    start  = source.start,
+                    finish = source.finish,
+                    parent = source,
+                    [1]    = result,
+                })
+                return
+            end
+        end
+        if source.op.type == '~=' then
+            local result = valueMgr.equal(source[1], source[2])
+            if result == nil then
+                nodeMgr.setNode(source, globalMgr.getGlobal('type', 'boolean'))
+                return
+            else
+                nodeMgr.setNode(source, {
+                    type   = 'boolean',
+                    start  = source.start,
+                    finish = source.finish,
+                    parent = source,
+                    [1]    = not result,
+                })
+                return
+            end
+        end
+        if source.op.type == '<<' then
+            local a = valueMgr.getInteger(source[1])
+            local b = valueMgr.getInteger(source[2])
+            if a and b then
+                nodeMgr.setNode(source, {
+                    type   = 'integer',
+                    start  = source.start,
+                    finish = source.finish,
+                    parent = source,
+                    [1]    = a << b,
+                })
+                return
+            else
+                nodeMgr.setNode(source, globalMgr.getGlobal('type', 'integer'))
+                return
+            end
+        end
+        if source.op.type == '>>' then
+            local a = valueMgr.getInteger(source[1])
+            local b = valueMgr.getInteger(source[2])
+            if a and b then
+                nodeMgr.setNode(source, {
+                    type   = 'integer',
+                    start  = source.start,
+                    finish = source.finish,
+                    parent = source,
+                    [1]    = a >> b,
+                })
+                return
+            else
+                nodeMgr.setNode(source, globalMgr.getGlobal('type', 'integer'))
+                return
+            end
+        end
+        if source.op.type == '&' then
+            local a = valueMgr.getInteger(source[1])
+            local b = valueMgr.getInteger(source[2])
+            if a and b then
+                nodeMgr.setNode(source, {
+                    type   = 'integer',
+                    start  = source.start,
+                    finish = source.finish,
+                    parent = source,
+                    [1]    = a & b,
+                })
+                return
+            else
+                nodeMgr.setNode(source, globalMgr.getGlobal('type', 'integer'))
+                return
+            end
+        end
+        if source.op.type == '|' then
+            local a = valueMgr.getInteger(source[1])
+            local b = valueMgr.getInteger(source[2])
+            if a and b then
+                nodeMgr.setNode(source, {
+                    type   = 'integer',
+                    start  = source.start,
+                    finish = source.finish,
+                    parent = source,
+                    [1]    = a | b,
+                })
+                return
+            else
+                nodeMgr.setNode(source, globalMgr.getGlobal('type', 'integer'))
+                return
+            end
+        end
+        if source.op.type == '~' then
+            local a = valueMgr.getInteger(source[1])
+            local b = valueMgr.getInteger(source[2])
+            if a and b then
+                nodeMgr.setNode(source, {
+                    type   = 'integer',
+                    start  = source.start,
+                    finish = source.finish,
+                    parent = source,
+                    [1]    = a ~ b,
+                })
+                return
+            else
+                nodeMgr.setNode(source, globalMgr.getGlobal('type', 'integer'))
+                return
+            end
+        end
+        if source.op.type == '+' then
+            local a = valueMgr.getNumber(source[1])
+            local b = valueMgr.getNumber(source[2])
+            if a and b then
+                local result = a + b
+                nodeMgr.setNode(source, {
+                    type   = math.type(result) == 'integer' and 'integer' or 'number',
+                    start  = source.start,
+                    finish = source.finish,
+                    parent = source,
+                    [1]    = result,
+                })
+                return
+            else
+                nodeMgr.setNode(source, globalMgr.getGlobal('type', 'number'))
+                return
+            end
+        end
+        if source.op.type == '-' then
+            local a = valueMgr.getNumber(source[1])
+            local b = valueMgr.getNumber(source[2])
+            if a and b then
+                local result = a - b
+                nodeMgr.setNode(source, {
+                    type   = math.type(result) == 'integer' and 'integer' or 'number',
+                    start  = source.start,
+                    finish = source.finish,
+                    parent = source,
+                    [1]    = result,
+                })
+                return
+            else
+                nodeMgr.setNode(source, globalMgr.getGlobal('type', 'number'))
+                return
+            end
+        end
+        if source.op.type == '*' then
+            local a = valueMgr.getNumber(source[1])
+            local b = valueMgr.getNumber(source[2])
+            if a and b then
+                local result = a * b
+                nodeMgr.setNode(source, {
+                    type   = math.type(result) == 'integer' and 'integer' or 'number',
+                    start  = source.start,
+                    finish = source.finish,
+                    parent = source,
+                    [1]    = result,
+                })
+                return
+            else
+                nodeMgr.setNode(source, globalMgr.getGlobal('type', 'number'))
+                return
+            end
+        end
+        if source.op.type == '/' then
+            local a = valueMgr.getNumber(source[1])
+            local b = valueMgr.getNumber(source[2])
+            if a and b then
+                nodeMgr.setNode(source, {
+                    type   = 'number',
+                    start  = source.start,
+                    finish = source.finish,
+                    parent = source,
+                    [1]    = a / b,
+                })
+                return
+            else
+                nodeMgr.setNode(source, globalMgr.getGlobal('type', 'number'))
+                return
+            end
+        end
+        if source.op.type == '%' then
+            local a = valueMgr.getNumber(source[1])
+            local b = valueMgr.getNumber(source[2])
+            if a and b then
+                local result = a % b
+                nodeMgr.setNode(source, {
+                    type   = math.type(result) == 'integer' and 'integer' or 'number',
+                    start  = source.start,
+                    finish = source.finish,
+                    parent = source,
+                    [1]    = result,
+                })
+                return
+            else
+                nodeMgr.setNode(source, globalMgr.getGlobal('type', 'number'))
+                return
+            end
+        end
+        if source.op.type == '^' then
+            local a = valueMgr.getNumber(source[1])
+            local b = valueMgr.getNumber(source[2])
+            if a and b then
+                nodeMgr.setNode(source, {
+                    type   = 'number',
+                    start  = source.start,
+                    finish = source.finish,
+                    parent = source,
+                    [1]    = a ^ b,
+                })
+                return
+            else
+                nodeMgr.setNode(source, globalMgr.getGlobal('type', 'number'))
+                return
+            end
+        end
+        if source.op.type == '//' then
+            local a = valueMgr.getNumber(source[1])
+            local b = valueMgr.getNumber(source[2])
+            if a and b then
+                local result = a // b
+                nodeMgr.setNode(source, {
+                    type   = math.type(result) == 'integer' and 'integer' or 'number',
+                    start  = source.start,
+                    finish = source.finish,
+                    parent = source,
+                    [1]    = result,
+                })
+                return
+            else
+                nodeMgr.setNode(source, globalMgr.getGlobal('type', 'number'))
+                return
+            end
+        end
+        if source.op.type == '..' then
+            local a = valueMgr.getString(source[1])
+                   or valueMgr.getNumber(source[1])
+            local b = valueMgr.getString(source[2])
+                   or valueMgr.getNumber(source[2])
+            if a and b then
+                if type(a) == 'number' or type(b) == 'number' then
+                    local uri     = guide.getUri(source)
+                    local version = config.get(uri, 'Lua.runtime.version')
+                    if math.tointeger(a) and math.type(a) == 'float' then
+                        if version == 'Lua 5.3' or version == 'Lua 5.4' then
+                            a = ('%.1f'):format(a)
+                        else
+                            a = ('%.0f'):format(a)
+                        end
+                    end
+                    if math.tointeger(b) and math.type(b) == 'float' then
+                        if version == 'Lua 5.3' or version == 'Lua 5.4' then
+                            b = ('%.1f'):format(b)
+                        else
+                            b = ('%.0f'):format(b)
+                        end
+                    end
+                end
+                nodeMgr.setNode(source, {
+                    type   = 'string',
+                    start  = source.start,
+                    finish = source.finish,
+                    parent = source,
+                    [1]    = a .. b,
+                })
+                return
+            else
+                nodeMgr.setNode(source, globalMgr.getGlobal('type', 'string'))
+                return
+            end
         end
     end)
     : getMap()

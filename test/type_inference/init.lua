@@ -146,7 +146,7 @@ TEST 'boolean' [[
 <?x?> = a == b
 ]]
 
-TEST 'any' [[
+TEST 'integer' [[
 <?x?> = a << b
 ]]
 
@@ -154,7 +154,7 @@ TEST 'integer' [[
 <?x?> = 1 << 2
 ]]
 
-TEST 'any' [[
+TEST 'string' [[
 <?x?> = a .. b
 ]]
 
@@ -162,12 +162,24 @@ TEST 'string' [[
 <?x?> = 'a' .. 'b'
 ]]
 
-TEST 'any' [[
+TEST 'string' [[
+<?x?> = 'a' .. 1
+]]
+
+TEST 'string' [[
+<?x?> = 'a' .. 1.0
+]]
+
+TEST 'number' [[
 <?x?> = a + b
 ]]
 
 TEST 'number' [[
 <?x?> = 1 + 2.0
+]]
+
+TEST 'integer' [[
+<?x?> = 1 + 2
 ]]
 
 TEST 'tablelib' [[

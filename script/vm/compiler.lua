@@ -4,6 +4,7 @@ local localID    = require 'vm.local-id'
 local globalMgr  = require 'vm.global-manager'
 local nodeMgr    = require 'vm.node'
 local genericMgr = require 'vm.generic-manager'
+local valueMgr   = require 'vm.value'
 
 ---@class parser.object
 ---@field _compiledNodes  boolean
@@ -402,6 +403,7 @@ local compilerMap = util.switch()
             m.compileNode(source.parent)
         end
     end)
+    : case 'setlocal'
     : case 'getlocal'
     : call(function (source)
         nodeMgr.setNode(source, m.compileNode(source.node))
@@ -543,6 +545,32 @@ local compilerMap = util.switch()
         local type = globalMgr.getGlobal('type', source[1])
         if type then
             nodeMgr.setNode(source, m.compileNode(type))
+        end
+    end)
+    : case 'unary'
+    : call(function (source)
+        if source.op.type == 'not' then
+            local result = valueMgr.test(source[1])
+            if result == nil then
+                nodeMgr.setNode(source, globalMgr.getGlobal('type', 'boolean'))
+            else
+                nodeMgr.setNode(source, {
+                    type   = 'boolean',
+                    start  = source.start,
+                    finish = source.finish,
+                    parent = source,
+                    [1]    = not result,
+                })
+            end
+        end
+        if source.op.type == '#' then
+            nodeMgr.setNode(source, globalMgr.getGlobal('type', 'integer'))
+        end
+        if source.op.type == '-' then
+            nodeMgr.setNode(source, globalMgr.getGlobal('type', 'number'))
+        end
+        if source.op.type == '~' then
+            nodeMgr.setNode(source, globalMgr.getGlobal('type', 'integer'))
         end
     end)
     : getMap()

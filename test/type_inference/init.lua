@@ -94,7 +94,7 @@ TEST 'table' [[
 local <?t?> = {}
 ]]
 
-TEST 'any' [[
+TEST 'unknown' [[
 <?x?>()
 ]]
 

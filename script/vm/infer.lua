@@ -14,6 +14,12 @@ local viewNodeMap = util.switch()
     : call(function (source)
         return source.type
     end)
+    : case 'global'
+    : call(function (source)
+        if source.cate == 'type' then
+            return source.name
+        end
+    end)
     : getMap()
 
 ---@param node vm.node

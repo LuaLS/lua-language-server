@@ -1,4 +1,5 @@
 local nodeMgr = require 'vm.node'
+local guide   = require 'parser.guide'
 
 ---@class vm.value-manager
 local m = {}
@@ -37,6 +38,50 @@ function m.test(source)
     else
         return false
     end
+end
+
+---@param v vm.node
+---@return string
+local function getUnique(v)
+    if v.type == 'local' then
+        return ('loc:%s@%d'):format(guide.getUri(v), v.start)
+    end
+    if v.type == 'global' then
+        return ('%s:%s'):format(v.cate, v.name)
+    end
+    if v.type == 'boolean' then
+        return ('bool:%s'):format(v[1])
+    end
+    if v.type == 'number' then
+        return ('num:%s'):format(v[1])
+    end
+    if v.type == 'integer' then
+        return ('num:%s'):format(v[1])
+    end
+end
+
+local function nodeToMap(node)
+    local map = {}
+    for n in nodeMgr.eachNode(node) do
+        if n.type == 'local' then
+            map[n] = true
+        end
+        if n.type == 'global' then
+            
+        end
+    end
+    return map
+end
+
+---@param a vm.node
+---@param b vm.node
+---@return boolean|nil
+function m.equal(a, b)
+    local compiler = require 'vm.compiler'
+    local nodeA = compiler.compileNode(a)
+    local nodeB = compiler.compileNode(b)
+    local mapA = {}
+    local mapB = {}
 end
 
 return m

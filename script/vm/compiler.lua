@@ -553,6 +553,7 @@ local compilerMap = util.switch()
             local result = valueMgr.test(source[1])
             if result == nil then
                 nodeMgr.setNode(source, globalMgr.getGlobal('type', 'boolean'))
+                return
             else
                 nodeMgr.setNode(source, {
                     type   = 'boolean',
@@ -561,16 +562,52 @@ local compilerMap = util.switch()
                     parent = source,
                     [1]    = not result,
                 })
+                return
             end
         end
         if source.op.type == '#' then
             nodeMgr.setNode(source, globalMgr.getGlobal('type', 'integer'))
+            return
         end
         if source.op.type == '-' then
             nodeMgr.setNode(source, globalMgr.getGlobal('type', 'number'))
+            return
         end
         if source.op.type == '~' then
             nodeMgr.setNode(source, globalMgr.getGlobal('type', 'integer'))
+            return
+        end
+    end)
+    : case 'binary'
+    : call(function (source)
+        if source.op.type == 'and' then
+            local r1 = valueMgr.test(source[1])
+            if r1 == true then
+                nodeMgr.setNode(source, m.compileNode(source[2]))
+                return
+            end
+            if r1 == false then
+                nodeMgr.setNode(source, m.compileNode(source[1]))
+                return
+            end
+            nodeMgr.setNode(source, globalMgr.getGlobal('type', 'boolean'))
+            return
+        end
+        if source.op.type == 'or' then
+            local r1 = valueMgr.test(source[1])
+            if r1 == true then
+                nodeMgr.setNode(source, m.compileNode(source[1]))
+                return
+            end
+            if r1 == false then
+                nodeMgr.setNode(source, m.compileNode(source[2]))
+                return
+            end
+            nodeMgr.setNode(source, globalMgr.getGlobal('type', 'boolean'))
+            return
+        end
+        if source.op.type == '==' then
+            
         end
     end)
     : getMap()

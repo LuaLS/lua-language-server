@@ -826,7 +826,7 @@ return function (uri, start, finish)
                     }
                     results[#results+1] = {
                         start      = comm.start + #head + 1,
-                        finish     = comm.start + #head + 2 + #comm.text:match('%S+', #head + 1),
+                        finish     = comm.start + #head + 2 + #comm.text:match('%S*', #head + 1),
                         type       = define.TokenTypes.keyword,
                         modifieres = define.TokenModifiers.documentation,
                     }

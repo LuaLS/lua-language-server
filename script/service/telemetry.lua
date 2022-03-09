@@ -90,7 +90,6 @@ local function pushErrorLog(link)
     ))
 end
 
-local validMap = {}
 local isValid  = false
 
 timer.wait(5, function ()
@@ -143,6 +142,9 @@ function m.updateConfig()
         end
     end
     if isValid ~= nil then
+        return
+    end
+    if not client.getOption 'changeConfiguration' then
         return
     end
     if m.hasShowedMessage then

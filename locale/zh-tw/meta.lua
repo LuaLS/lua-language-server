@@ -10,7 +10,7 @@ cgopt.collect =
 cgopt.stop =
 '停止垃圾回收的執行。 '
 cgopt.restart =
-'重啟垃圾回售的自動執行。 '
+'重啟垃圾回收的自動執行。 '
 cgopt.count =
 '以K 字元數為單位回傳Lua 使用的總記憶體量。 '
 cgopt.step =
@@ -165,7 +165,7 @@ bit32.bor =
 bit32.btest =
 '參數按位與的結果不為0時，回傳`true` 。 '
 bit32.bxor =
-'回傳參數按位異或的結果。 '
+'回傳參數按位互斥或的結果。 '
 bit32.extract =
 '回傳`n` 中第`field` 到第`field + width - 1` 位組成的結果。 '
 bit32.replace =
@@ -271,7 +271,7 @@ debug.setuservalue['>5.4']=
 debug.traceback =
 '回傳呼叫堆疊的堆疊回溯訊息。字串可選項`message` 被添加在堆疊回溯訊息的開頭。 '
 debug.upvalueid =
-'回傳指定函式第`n` 個上值的唯一標識符（一個輕量使用者資料）。 '
+'回傳指定函式第`n` 個上值的唯一識別符（一個輕量使用者資料）。 '
 debug.upvaluejoin =
 '讓Lua 閉包`f1` 的第`n1` 個上值引用`Lua` 閉包`f2` 的第`n2` 個上值。 '
 infowhat.n =
@@ -304,7 +304,7 @@ file =
 file[':close'] =
 '關閉`file`。 '
 file[':flush'] =
-'將寫入的資料保存到`file` 中。 '
+'將寫入的資料儲存到`file` 中。 '
 file[':lines'] =
 [[
 ------
@@ -354,7 +354,7 @@ io.stderr =
 io.close =
 '關閉`file` 或預設輸出檔案。 '
 io.flush =
-'將寫入的資料保存到預設輸出檔案中。 '
+'將寫入的資料儲存到預設輸出檔案中。 '
 io.input =
 '設定`file` 為預設輸入檔案。 '
 io.lines =
@@ -513,9 +513,9 @@ os.difftime =
 os.execute =
 '呼叫系統直譯器執行`command`。 '
 os.exit['<5.1'] =
-'呼叫C 函式`exit` 終止宿主程式。 '
+'呼叫C 函式`exit` 終止主機程式。 '
 os.exit['>5.2'] =
-'呼叫ISO C 函式`exit` 終止宿主程式。 '
+'呼叫ISO C 函式`exit` 終止主機程式。 '
 os.getenv =
 '回傳行程環境變數`varname` 的值。 '
 os.remove =
@@ -562,11 +562,11 @@ package.loaded =
 package.loaders =
 '用於`require` 控制如何載入模組的表。 '
 package.loadlib =
-'讓宿主程式動態連結C 庫`libname` 。 '
+'讓主機程式動態連結C 庫`libname` 。 '
 package.path =
 '這個路徑被`require` 在Lua 載入器中做搜尋時用到。 '
 package.preload =
-'保存有一些特殊模組的載入器。 '
+'儲存有一些特殊模組的載入器。 '
 package.searchers =
 '用於`require` 控制如何載入模組的表。 '
 package.searchpath =
@@ -608,7 +608,7 @@ string.lower =
 string.match =
 '在字串s 中找到第一個能用pattern （參見§6.4.1）匹配到的部分。如果能找到，match 回傳其中的捕獲物； 否則回傳nil 。 '
 string.pack =
-'回傳一個打包了（即以二進制形式序列化） v1, v2 等值的二進製字串。字串fmt 為打包格式（參見§6.4.2）。 '
+'回傳一個打包了（即以二進制形式序列化） v1, v2 等值的二進制字串。字串fmt 為打包格式（參見§6.4.2）。 '
 string.packsize =
 [[回傳以指定格式用$string.pack 打包的字串的長度。格式化字串中不可以有變長選項's' 或'z' （參見§6.4.2）。 ]]
 string.rep['<5.1'] =
@@ -661,7 +661,7 @@ utf8 =
 utf8.char =
 '接收零或多個整數， 將每個整數轉換成對應的UTF-8 字元序列，並回傳這些序列連接到一起的字串。 '
 utf8.charpattern =
-'用於精確匹配到一個UTF-8 字元序列的模式，它假定處理的對像是一個合法的UTF-8 字串。 '
+'用於精確匹配到一個UTF-8 字元序列的模式，它假定處理的對象是一個合法的UTF-8 字串。 '
 utf8.codes =
 [[
 回傳一系列的值，可以讓

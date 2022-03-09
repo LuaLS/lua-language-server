@@ -89,7 +89,7 @@ DIAG_DIFFERENT_REQUIRES =
 DIAG_REDUNDANT_RETURN =
 '冗餘回傳。 '
 DIAG_AWAIT_IN_SYNC =
-'只能在標記為異步的函式中調用異步函式。 '
+'只能在標記為異步的函式中呼叫異步函式。 '
 DIAG_NOT_YIELDABLE =
 '此函式的第{} 個參數沒有被標記為可讓出，但是傳入了異步函式。 （使用`---@param name async fun()` 來標記為可讓出）'
 DIAG_DISCARD_RETURNS =
@@ -115,7 +115,7 @@ DIAG_UNKNOWN_DIAG_CODE =
 '未知的診斷代碼`{}`。 '
 
 MWS_NOT_SUPPORT =
-'{} 目前還不支持多工作目錄，我可能需要重啟才能支持新的工作目錄...'
+'{} 目前還不支援多工作目錄，我可能需要重啟才能支援新的工作目錄...'
 MWS_RESTART =
 '重啟'
 MWS_NOT_COMPLETE =
@@ -138,7 +138,7 @@ WORKSPACE_LOADING =
 WORKSPACE_DIAGNOSTIC =
 '正在對工作目錄進行診斷'
 WORKSPACE_SKIP_HUGE_FILE =
-'出於性能考慮，已停止對此檔案解析：{}'
+'出於效能考慮，已停止對此檔案解析：{}'
 
 PARSER_CRASH =
 '語法解析崩潰了！遺言：{}'
@@ -187,17 +187,17 @@ PARSER_NO_VISIBLE_LABEL =
 PARSER_REDEFINE_LABEL =
 '標籤`{label}`重複定義。 '
 PARSER_UNSUPPORT_SYMBOL =
-'{version} 不支持該符號。 '
+'{version} 不支援該符號。 '
 PARSER_UNEXPECT_DOTS =
 '`...`只能在不定參函式中使用。 '
 PARSER_UNEXPECT_SYMBOL =
 '未知的符號`{symbol}` 。 '
 PARSER_UNKNOWN_TAG =
-'不支持的屬性。 '
+'不支援的屬性。 '
 PARSER_MULTI_TAG =
 '只能設定一個屬性。 '
 PARSER_UNEXPECT_LFUNC_NAME =
-'局部函式只能使用標識符作為名稱。 '
+'局部函式只能使用識別符作為名稱。 '
 PARSER_UNEXPECT_EFUNC_NAME =
 '函式作為表達式時不能命名。 '
 PARSER_ERR_LCOMMENT_END =
@@ -318,7 +318,7 @@ HOVER_USE_LUA_PATH =
 HOVER_EXTENDS =
 '展開為{}'
 HOVER_TABLE_TIME_UP =
-'出於性能考慮，已禁用了部分類型推斷。 '
+'出於效能考慮，已禁用了部分類型推斷。 '
 HOVER_WS_LOADING =
 '正在載入工作目錄：{} / {}'
 
@@ -474,9 +474,9 @@ WINDOW_TELEMETRY_ENABLE =
 WINDOW_TELEMETRY_DISABLE =
 '禁止'
 WINDOW_CLIENT_NOT_SUPPORT_CONFIG =
-'你的使用者端不支持從伺服端修改設定，請手動修改以下設定：'
+'你的使用者端不支援從伺服端修改設定，請手動修改以下設定：'
 WINDOW_LCONFIG_NOT_SUPPORT_CONFIG=
-'暫不支持自動修改本地設定，請手動修改以下設定：'
+'暫不支援自動修改本地設定，請手動修改以下設定：'
 WINDOW_MANUAL_CONFIG_ADD =
 '為`{key}` 添加值`{value:q}`;'
 WINDOW_MANUAL_CONFIG_SET =

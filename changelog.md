@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.6.7
+`2022-3-9`
 * `NEW` offline diagnostic, [read more](https://github.com/sumneko/lua-language-server/wiki/Offline-Diagnostic)
 * `CHG` `VSCode`: 1.65 has built in new `Lua` syntax files, so this extension no longer provides syntax files, which means you can install other syntax extensions in the marketplace. If you have any suggestions or issues, please [open issues here](https://github.com/sumneko/lua.tmbundle).
 * `CHG` telemetry: the prompt will only appear in VSCode to avoid repeated prompts in other platforms due to the inability to automatically modify the settings.

@@ -197,7 +197,7 @@ PARSER_UNKNOWN_TAG =
 PARSER_MULTI_TAG =
 '只能設定一個屬性。 '
 PARSER_UNEXPECT_LFUNC_NAME =
-'局部函式只能使用識別符作為名稱。 '
+'區域函式只能使用識別符作為名稱。 '
 PARSER_UNEXPECT_EFUNC_NAME =
 '函式作為表達式時不能命名。 '
 PARSER_ERR_LCOMMENT_END =

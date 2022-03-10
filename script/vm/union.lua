@@ -2,9 +2,10 @@ local localMgr = require 'vm.local-manager'
 
 ---@class vm.node.union
 local mt = {}
-mt.__index = mt
-mt.type    = 'union'
-mt.falsy   = nil
+mt.__index   = mt
+mt.type      = 'union'
+mt.falsy     = nil
+mt.lastViews = nil
 
 ---@param node vm.node
 function mt:merge(node)

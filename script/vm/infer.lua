@@ -1,5 +1,5 @@
-local util    = require 'utility'
-local nodeMgr = require 'vm.node'
+local util      = require 'utility'
+local nodeMgr   = require 'vm.node'
 
 ---@class vm.infer-manager
 local m = {}
@@ -33,6 +33,10 @@ local viewNodeMap = util.switch()
             return source.name
         end
     end)
+    : case 'doc.type.name'
+    : call(function (source, options)
+        return source[1]
+    end)
     : case 'doc.type.array'
     : call(function (source, options)
         options['hasClass'] = true
@@ -40,7 +44,7 @@ local viewNodeMap = util.switch()
     end)
     : case 'doc.type.enum'
     : call(function (source, options)
-        return source[1]
+        return ('%q'):format(source[1])
     end)
     : getMap()
 
@@ -52,12 +56,36 @@ local function viewNode(node, options)
     end
 end
 
+local function eraseAlias(node, viewMap)
+    for n in nodeMgr.eachNode(node) do
+        if n.type == 'global' and n.cate == 'type' then
+            for _, set in ipairs(n:getSets()) do
+                if set.type == 'doc.alias' then
+                    for _, ext in ipairs(set.extends.types) do
+                        local view = viewNode(ext, {})
+                        if view and view ~= n.name then
+                            viewMap[view] = nil
+                        end
+                    end
+                end
+            end
+        end
+    end
+end
+
 ---@param source parser.object
-function m.viewType(source)
+---@return table<string, boolean>
+function m.getViews(source)
     local compiler = require 'vm.compiler'
     local node     = compiler.compileNode(source)
-    local views    = {}
-    local options  = {}
+    if node.type == 'union' and node.lastViews then
+        return node.lastViews
+    end
+    local views = {}
+    local options = {}
+    if node.type == 'union' then
+        node.lastViews = views
+    end
     for n in nodeMgr.eachNode(node) do
         local view = viewNode(n, options)
         if view then
@@ -70,13 +98,25 @@ function m.viewType(source)
     if options['hasTable'] and not options['hasClass'] then
         views['table'] = true
     end
+    if options['hasClass'] then
+        eraseAlias(node, views)
+    end
+    return views
+end
+
+---@param source parser.object
+---@return string
+function m.viewType(source)
+    local views = m.getViews(source)
+    if not next(views) then
+        return 'unknown'
+    end
+
     local array = {}
     for view in pairs(views) do
         array[#array+1] = view
     end
-    if #array == 0 then
-        return 'unknown'
-    end
+
     table.sort(array, function (a, b)
         local sa = inferSorted[a] or 0
         local sb = inferSorted[b] or 0
@@ -85,7 +125,9 @@ function m.viewType(source)
         end
         return sa < sb
     end)
-    return table.concat(array, '|')
+    local view = table.concat(array, '|')
+
+    return view
 end
 
 return m

@@ -638,6 +638,13 @@ function parseType(parent)
             end
         elseif tp == 'string' then
             nextToken()
+            -- compatibility
+            if content:sub(1, 1) == '"'
+            or content:sub(1, 1) == "'" then
+                if content:sub(1, 1) == content:sub(-1, -1) then
+                    content = content:sub(2, -2)
+                end
+            end
             local typeEnum = {
                 type   = 'doc.type.enum',
                 start  = getStart(),

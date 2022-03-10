@@ -381,7 +381,33 @@ local <?x?>
 ]]
 
 TEST '"enum1"|"enum2"' [[
+---@type 'enum1' | 'enum2'
+local <?x?>
+]]
+
+TEST '"enum1"|"enum2"' [[
 ---@type '"enum1"' | '"enum2"'
+local <?x?>
+]]
+
+TEST 'A' [[
+---@alias A 'enum1' | 'enum2'
+
+---@type A
+local <?x?>
+]]
+
+TEST 'A' [[
+---@alias A 'enum1' | 'enum2' | A
+
+---@type A
+local <?x?>
+]]
+
+TEST 'A' [[
+---@alias A 'enum1' | 'enum2' | B
+
+---@type A
 local <?x?>
 ]]
 

@@ -66,3 +66,70 @@ local o
 ```
 
 Find definition of `o` will not find out `mt`
+
+# Type `unknown`
+
+```lua
+local t = {}
+print(t.x) --> t.x is `unknown` instead of `any`
+```
+
+# Types can be used in doc-table keys
+
+```lua
+---@type { [number]: string }
+local t
+
+print(t[1]) --> t[1] is `string`
+print(t.x) --> t.x is `unknown`
+```
+
+# Type `true` and `false`
+
+```lua
+---@class true: boolean  --> this is builtin
+---@class false: boolean --> this is builtin
+```
+
+You can use `---@type { [string]: true }` now.
+
+# `class` and `alias` support generic inheritance
+
+```lua
+---@class table<K, V>: { [K]: V } --> this is builtin
+
+---@alias mark<K> { [K]: true } 
+```
+
+# `table<integer, string>` can not convert to `string[]`
+
+```lua
+---@type table<integer, string>
+local t = {}
+
+for k, v in ipairs(t) do --> v is `unknown`
+end
+```
+
+# Default value of `unrary` and `binary`
+
+```lua
+---@type unknown
+local x
+
+local y = - x --> y is `number` instead of `unknown`
+```
+
+# `unknown` can form union types with other types
+
+```lua
+function f()
+    if x then
+        return y
+    else
+        return nil
+    end
+end
+
+local n = f() --> n is `unknown|nil`
+```

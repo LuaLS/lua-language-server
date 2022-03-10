@@ -28,6 +28,14 @@ local viewNodeMap = util.switch()
     : call(function (source, options)
         options['hasTable'] = true
     end)
+    : case 'local'
+    : call(function (source, options)
+        if source.parent == 'funcargs' then
+            options['isParam'] = true
+        else
+            options['isLocal'] = true
+        end
+    end)
     : case 'global'
     : call(function (source, options)
         if source.cate == 'type' then
@@ -51,6 +59,33 @@ local viewNodeMap = util.switch()
     : case 'doc.type.enum'
     : call(function (source, options)
         return ('%q'):format(source[1])
+    end)
+    : case 'doc.type.function'
+    : call(function (source, options)
+        local args = {}
+        local rets = {}
+        local argView = ''
+        local regView = ''
+        for i, arg in ipairs(source.args) do
+            args[i] = string.format('%s%s: %s'
+                , arg.name[1]
+                , arg.optional and '?' or ''
+                , m.viewType(arg)
+            )
+        end
+        if #args > 0 then
+            argView = table.concat(args, ', ')
+        end
+        for i, ret in ipairs(source.returns) do
+            rets[i] = string.format('%s%s'
+                , m.viewType(ret)
+                , ret.optional and '?' or ''
+            )
+        end
+        if #rets > 0 then
+            regView = ':' .. table.concat(rets, ', ')
+        end
+        return ('fun(%s)%s'):format(argView, regView)
     end)
     : getMap()
 
@@ -119,6 +154,11 @@ end
 ---@return string
 function m.viewType(source)
     local views = m.getViews(source)
+
+    if views['any'] then
+        return 'any'
+    end
+
     if not next(views) then
         return 'unknown'
     end

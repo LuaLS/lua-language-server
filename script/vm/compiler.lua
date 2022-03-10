@@ -432,6 +432,7 @@ local compilerMap = util.switch()
                 nodeMgr.setNode(source, m.compileNode(source.value))
             end
         end
+        local hasMarkParam
         -- function x.y(self, ...) --> function x:y(...)
         if  source[1] == 'self'
         and not hasMarkDoc
@@ -439,8 +440,12 @@ local compilerMap = util.switch()
         and source.parent[1] == source then
             local setfield = source.parent.parent.parent
             if setfield.type == 'setfield' then
+                hasMarkParam = true
                 nodeMgr.setNode(source, m.compileNode(setfield.node))
             end
+        end
+        if source.parent.type == 'funcargs' and not hasMarkDoc and not hasMarkParam then
+            nodeMgr.setNode(source, globalMgr.getGlobal('type', 'any'))
         end
         -- for x in ... do
         if source.parent.type == 'in' then
@@ -599,6 +604,14 @@ local compilerMap = util.switch()
         local type = globalMgr.getGlobal('type', source[1])
         if type then
             nodeMgr.setNode(source, m.compileNode(type))
+        end
+    end)
+    : case 'doc.type.arg'
+    : call(function (source)
+        if source.extends then
+            nodeMgr.setNode(source, m.compileNode(source.extends))
+        else
+            nodeMgr.setNode(source, globalMgr.getGlobal('type', 'any'))
         end
     end)
     : case 'unary'

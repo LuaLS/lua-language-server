@@ -52,6 +52,27 @@ TEST 'number' [[
 local <?var?> = 1.0
 ]]
 
+TEST 'unknown' [[
+local <?var?>
+]]
+
+TEST 'unknown' [[
+local <?var?>
+var = y
+]]
+
+TEST 'any' [[
+function f(<?x?>)
+    
+end
+]]
+
+TEST 'any' [[
+function f(<?x?>)
+    x = 1
+end
+]]
+
 TEST 'number' [[
 local <?var?>
 var = 1
@@ -447,6 +468,16 @@ local <?x?>
 
 TEST 'fun()' [[
 ---@type fun()
+local <?x?>
+]]
+
+TEST 'fun(a: string, b: any, ...: any)' [[
+---@type fun(a: string, b, ...)
+local <?x?>
+]]
+
+TEST 'fun(a: string, b: any, c?: boolean, ...: any):c, d?, ...' [[
+---@type fun(a: string, b, c?: boolean, ...):c, d?, ...
 local <?x?>
 ]]
 

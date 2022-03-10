@@ -1,8 +1,11 @@
 local nodeMgr = require 'vm.node'
 
----@class vm.node.generic
----@field parent vm.node.generic-manager
----@field node   vm.node
+---@class parser.object
+---@field _generic vm.generic
+
+---@class vm.generic
+---@field sign  vm.sign
+---@field proto vm.node
 local mt = {}
 mt.__index = mt
 mt.type = 'generic'
@@ -107,14 +110,14 @@ end
 ---@param argNodes vm.node[]
 ---@return parser.object
 function mt:resolve(argNodes)
-    local resolved = self.parent:resolve(argNodes)
-    local newProto = cloneObject(self.node, resolved)
+    local resolved = self.sign:resolve(argNodes)
+    local newProto = cloneObject(self.proto, resolved)
     return newProto
 end
 
 function mt:eachNode()
     local nodes = {}
-    for n in nodeMgr.eachNode(self.parent) do
+    for n in nodeMgr.eachNode(self.proto) do
         nodes[#nodes+1] = n
     end
     local i = 0
@@ -124,13 +127,13 @@ function mt:eachNode()
     end
 end
 
----@param parent vm.node.generic-manager
----@param node   vm.node
-return function (parent, node)
+---@param proto vm.node
+---@param sign  vm.sign
+return function (proto, sign)
     local compiler = require 'vm.compiler'
     local generic = setmetatable({
-        parent = parent,
-        node   = compiler.compileNode(node),
+        sign  = sign,
+        proto = compiler.compileNode(proto),
     }, mt)
     return generic
 end

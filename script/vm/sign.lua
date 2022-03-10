@@ -1,24 +1,17 @@
-local createGeneric = require 'vm.generic'
 local guide         = require 'parser.guide'
 local nodeMgr       = require 'vm.node'
 
----@class vm.node.generic-manager
+---@class vm.sign
 ---@field parent   parser.object
 ---@field signList vm.node[]
 local mt = {}
 mt.__index = mt
-mt.type = 'generic-manager'
+mt.type = 'sign'
 
 ---@param key parser.object
 function mt:addSign(key)
     local compiler = require 'vm.compiler'
     self.signList[#self.signList+1] = compiler.compileNode(key)
-end
-
----@param node vm.node
-function mt:getChild(node)
-    local generic = createGeneric(self, node)
-    return generic
 end
 
 ---@param argNodes vm.node[]
@@ -96,10 +89,9 @@ function mt:resolve(argNodes)
     return resolved
 end
 
----@return vm.node.generic-manager
-return function (parent)
+---@return vm.sign
+return function ()
     local genericMgr = setmetatable({
-        parent   = parent,
         signList = {},
     }, mt)
     return genericMgr

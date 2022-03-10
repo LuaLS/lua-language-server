@@ -3,9 +3,10 @@ local util       = require 'utility'
 local localID    = require 'vm.local-id'
 local globalMgr  = require 'vm.global-manager'
 local nodeMgr    = require 'vm.node'
-local genericMgr = require 'vm.generic-manager'
+local signMgr    = require 'vm.sign'
 local config     = require 'config'
 local union      = require 'vm.union'
+local genericMgr = require 'vm.generic'
 
 ---@class parser.object
 ---@field _compiledNodes  boolean
@@ -143,30 +144,30 @@ function m.getClassFields(node, key, pushResult)
 end
 
 ---@class parser.object
----@field _generic? vm.node.generic-manager
+---@field _sign? vm.sign
 
 ---@param source parser.object
----@return vm.node.generic-manager?
-local function getObjectGeneric(source)
-    if source._generic ~= nil then
-        return source._generic
+---@return vm.sign?
+local function getObjectSign(source)
+    if source._sign ~= nil then
+        return source._sign
     end
-    source._generic = false
+    source._sign = false
     if source.type == 'function' then
         for _, doc in ipairs(source.bindDocs) do
             if doc.type == 'doc.generic' then
-                if not source._generic then
-                    source._generic = genericMgr(source)
+                if not source._sign then
+                    source._sign = signMgr()
                     break
                 end
             end
         end
-        if not source._generic then
+        if not source._sign then
             return false
         end
         for _, doc in ipairs(source.bindDocs) do
             if doc.type == 'doc.param' then
-                source._generic:addSign(doc.extends)
+                source._sign:addSign(doc.extends)
             end
         end
     end
@@ -179,14 +180,14 @@ local function getObjectGeneric(source)
         if not hasGeneric then
             return false
         end
-        source._generic = genericMgr(source)
+        source._sign = signMgr()
         if source.type == 'doc.type.function' then
             for _, arg in ipairs(source.args) do
-                source._generic:addSign(arg.extends)
+                source._sign:addSign(arg.extends)
             end
         end
     end
-    return source._generic
+    return source._sign
 end
 
 local function getReturnOfFunction(func, index)
@@ -209,11 +210,11 @@ local function getReturnOfFunction(func, index)
             return nil
         end
         local rtnNode = m.compileNode(rtn)
-        local generic = getObjectGeneric(func)
-        if not generic then
+        local sign = getObjectSign(func)
+        if not sign then
             return rtnNode
         end
-        return generic:getChild(rtnNode)
+        return genericMgr(rtnNode, sign)
     end
 end
 
@@ -490,21 +491,21 @@ local compilerMap = util.switch()
         local index = source.index
         local hasMarkDoc
         if func.bindDocs then
-            local generic = getObjectGeneric(func)
+            local sign = getObjectSign(func)
             for _, doc in ipairs(func.bindDocs) do
                 if doc.type == 'doc.return' then
                     for _, rtn in ipairs(doc.returns) do
                         if rtn.returnIndex == index then
                             hasMarkDoc = true
                             local hasGeneric
-                            if generic then
+                            if sign then
                                 guide.eachSourceType(rtn, 'doc.generic.name', function (src)
                                     hasGeneric = true
                                 end)
                             end
                             local rtnNode = m.compileNode(rtn)
                             if hasGeneric then
-                                nodeMgr.setNode(source, generic:getChild(rtnNode))
+                                nodeMgr.setNode(source, genericMgr(rtnNode, sign))
                             else
                                 nodeMgr.setNode(source, rtnNode)
                             end

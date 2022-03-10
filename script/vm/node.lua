@@ -1,6 +1,6 @@
 local union      = require 'vm.union'
 
----@alias vm.node parser.object | vm.node.union | vm.node.global | vm.node.generic | vm.node.generic-manager
+---@alias vm.node parser.object | vm.node.union | vm.node.global | vm.generic
 
 ---@class vm.node-manager
 local m = {}

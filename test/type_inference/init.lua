@@ -656,6 +656,35 @@ local t
 local <?k?>, v = f2(t)
 ]]
 
+TEST 'fun(a: <V>):integer, <V>' [[
+---@generic K, V
+---@param a K
+---@return fun(a: V):K, V
+local function f(a) end
+
+local <?f2?> = f(1)
+]]
+
+TEST 'integer' [[
+---@generic K, V
+---@param a K
+---@return fun(a: V):K, V
+local function f(a) end
+
+local f2 = f(1)
+local <?i?>, v = f2(true)
+]]
+
+TEST 'boolean' [[
+---@generic K, V
+---@param a K
+---@return fun(a: V):K, V
+local function f(a) end
+
+local f2 = f(1)
+local i, <?v?> = f2(true)
+]]
+
 TEST 'string' [[
 ---@class string
 

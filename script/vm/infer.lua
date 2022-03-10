@@ -60,6 +60,10 @@ local viewNodeMap = util.switch()
             return source[1]
         end
     end)
+    : case 'doc.generic.name'
+    : call(function (source, options)
+        return ('<%s>'):format(source[1])
+    end)
     : case 'doc.type.array'
     : call(function (source, options)
         options['hasClass'] = true

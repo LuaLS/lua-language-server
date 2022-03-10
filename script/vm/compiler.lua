@@ -165,9 +165,9 @@ local function getObjectSign(source)
         if not source._sign then
             return false
         end
-        for _, doc in ipairs(source.bindDocs) do
-            if doc.type == 'doc.param' then
-                source._sign:addSign(doc.extends)
+        if source.args then
+            for _, arg in ipairs(source.args) do
+                source._sign:addSign(m.compileNode(arg))
             end
         end
     end
@@ -183,7 +183,7 @@ local function getObjectSign(source)
         source._sign = signMgr()
         if source.type == 'doc.type.function' then
             for _, arg in ipairs(source.args) do
-                source._sign:addSign(arg.extends)
+                source._sign:addSign(m.compileNode(arg.extends))
             end
         end
     end
@@ -262,7 +262,7 @@ local function getReturn(func, index, args)
                 if returnNode and returnNode.type == 'generic' then
                     returnNode = returnNode:resolve(args)
                 end
-                if returnNode then
+                if returnNode and returnNode.type ~= 'doc.generic.name' then
                     result = result or union()
                     result:merge(m.compileNode(returnNode))
                 end

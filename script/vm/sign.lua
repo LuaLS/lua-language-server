@@ -8,10 +8,9 @@ local mt = {}
 mt.__index = mt
 mt.type = 'sign'
 
----@param key parser.object
-function mt:addSign(key)
-    local compiler = require 'vm.compiler'
-    self.signList[#self.signList+1] = compiler.compileNode(key)
+---@param node vm.node
+function mt:addSign(node)
+    self.signList[#self.signList+1] = node
 end
 
 ---@param argNodes vm.node[]

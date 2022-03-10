@@ -236,6 +236,20 @@ local function getReturn(func, index, args)
     if func.special == 'setmetatable' then
         return getReturnOfSetMetaTable(args)
     end
+    if func.special == 'pcall' and index > 1 then
+        local newArgs = {}
+        for i = 2, #args do
+            newArgs[#newArgs+1] = args[i]
+        end
+        return getReturn(args[1], index - 1, newArgs)
+    end
+    if func.special == 'xpcall' and index > 1 then
+        local newArgs = {}
+        for i = 3, #args do
+            newArgs[#newArgs+1] = args[i]
+        end
+        return getReturn(args[1], index - 1, newArgs)
+    end
     local node = m.compileNode(func)
     ---@type vm.node.union
     local result
@@ -533,6 +547,10 @@ local compilerMap = util.switch()
         for _, typeUnit in ipairs(source.types) do
             nodeMgr.setNode(source, m.compileNode(typeUnit))
         end
+    end)
+    : case 'doc.type.enum'
+    : call(function (source)
+        nodeMgr.setNode(source, source)
     end)
     : case 'doc.generic.name'
     : call(function (source)

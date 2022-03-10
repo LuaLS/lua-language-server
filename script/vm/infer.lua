@@ -12,15 +12,19 @@ local viewNodeMap = util.switch()
     : case 'nil'
     : case 'boolean'
     : case 'string'
-    : case 'table'
     : case 'function'
-    : case 'number'
     : case 'integer'
     : call(function (source, options)
-        if source.type == 'number' then
-            options['hasNumber'] = true
-        end
         return source.type
+    end)
+    : case 'number'
+    : call(function (source, options)
+        options['hasNumber'] = true
+        return source.type
+    end)
+    : case 'table'
+    : call(function (source, options)
+        options['hasTable'] = true
     end)
     : case 'global'
     : call(function (source, options)
@@ -28,6 +32,15 @@ local viewNodeMap = util.switch()
             options['hasClass'] = true
             return source.name
         end
+    end)
+    : case 'doc.type.array'
+    : call(function (source, options)
+        options['hasClass'] = true
+        return m.viewType(source.node) .. '[]'
+    end)
+    : case 'doc.type.enum'
+    : call(function (source, options)
+        return source[1]
     end)
     : getMap()
 
@@ -54,8 +67,8 @@ function m.viewType(source)
     if options['hasNumber'] then
         views['integer'] = nil
     end
-    if options['hasClass'] then
-        views['table'] = nil
+    if options['hasTable'] and not options['hasClass'] then
+        views['table'] = true
     end
     local array = {}
     for view in pairs(views) do

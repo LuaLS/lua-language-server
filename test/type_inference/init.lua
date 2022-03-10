@@ -315,7 +315,7 @@ local <?x?> = f()
 --]]
 
 -- 不根据对方函数内的使用情况来推测
-TEST 'any' [[
+TEST 'unknown' [[
 local function x(a)
     _ = a + 1
 end
@@ -323,7 +323,7 @@ local b
 x(<?b?>)
 ]]
 
-TEST 'any' [[
+TEST 'unknown' [[
 local function x(a, ...)
     local _, <?b?>, _ = ...
 end
@@ -331,18 +331,18 @@ x(nil, 'xx', 1, true)
 ]]
 
 -- 引用不跨越参数
-TEST 'any' [[
+TEST 'unknown' [[
 local function x(a, ...)
     return true, 'ss', ...
 end
 local _, _, _, <?b?>, _ = x(nil, true, 1, 'yy')
 ]]
 
-TEST 'any' [[
+TEST 'unknown' [[
 local <?x?> = next()
 ]]
 
-TEST 'any' [[
+TEST 'unknown' [[
 local a, b
 function a()
     return b()

@@ -4,7 +4,12 @@ local nodeMgr = require 'vm.node'
 ---@class vm.infer-manager
 local m = {}
 
+local inferSorted = {
+    ['nil'] = 100,
+}
+
 local viewNodeMap = util.switch()
+    : case 'nil'
     : case 'boolean'
     : case 'string'
     : case 'table'
@@ -59,7 +64,14 @@ function m.viewType(source)
     if #array == 0 then
         return 'unknown'
     end
-    table.sort(array)
+    table.sort(array, function (a, b)
+        local sa = inferSorted[a] or 0
+        local sb = inferSorted[b] or 0
+        if sa == sb then
+            return a < b
+        end
+        return sa < sb
+    end)
     return table.concat(array, '|')
 end
 

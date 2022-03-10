@@ -244,7 +244,7 @@ end
 <?y?> = x()
 ]]
 
-TEST 'integer' [[
+TEST 'integer|nil' [[
 local function x()
     return 1
     return nil
@@ -252,7 +252,7 @@ end
 <?y?> = x()
 ]]
 
-TEST 'any' [[
+TEST 'unknown|nil' [[
 local function x()
     return a
     return nil
@@ -260,7 +260,7 @@ end
 <?y?> = x()
 ]]
 
-TEST 'any' [[
+TEST 'unknown|nil' [[
 local function x()
     return nil
     return f()

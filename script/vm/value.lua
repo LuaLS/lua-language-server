@@ -50,10 +50,10 @@ local function getUnique(v)
         return ('%s:%s'):format(v.cate, v.name)
     end
     if v.type == 'boolean' then
-        if not v[1] then
+        if v[1] == nil then
             return false
         end
-        return ('bool:%s'):format(v[1])
+        return ('%s'):format(v[1])
     end
     if v.type == 'number' then
         if not v[1] then

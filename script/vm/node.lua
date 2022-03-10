@@ -38,6 +38,15 @@ function m.setNode(source, node)
     m.nodeCache[source] = m.mergeNode(me, node)
 end
 
+---@param node vm.node
+---@return vm.node.union
+function m.setFalsy(node)
+    if node.type ~= 'union' then
+        node = union(node)
+    end
+    return node
+end
+
 ---@return fun():vm.node
 function m.eachNode(node)
     if not node then

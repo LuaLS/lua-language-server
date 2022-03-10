@@ -5,6 +5,7 @@ local globalMgr  = require 'vm.global-manager'
 local nodeMgr    = require 'vm.node'
 local genericMgr = require 'vm.generic-manager'
 local config     = require 'config'
+local union      = require 'vm.union'
 
 ---@class parser.object
 ---@field _compiledNodes  boolean
@@ -40,6 +41,7 @@ local searchFieldMap = util.switch()
     end)
     : case 'string'
     : call(function (node, key, pushResult)
+        -- change to `string: stringlib` ?
         local stringlib = globalMgr.getGlobal('type', 'stringlib')
         m.getClassFields(stringlib, key, pushResult)
     end)
@@ -215,25 +217,28 @@ local function getReturnOfFunction(func, index)
     end
 end
 
-local function getReturnOfSetMetaTable(source, args)
-    local tbl = args and args[1]
-    local mt  = args and args[2]
+local function getReturnOfSetMetaTable(args)
+    local tbl  = args and args[1]
+    local mt   = args and args[2]
+    local node = union()
     if tbl then
-        nodeMgr.setNode(source, m.compileNode(tbl))
+        node:merge(m.compileNode(tbl))
     end
     if mt then
         m.compileByParentNode(mt, '__index', function (src)
-            nodeMgr.setNode(source, m.compileNode(src))
+            node:merge(m.compileNode(src))
         end)
     end
-    return nodeMgr.nodeCache[source]
+    return node
 end
 
-local function getReturn(func, index, source, args)
+local function getReturn(func, index, args)
     if func.special == 'setmetatable' then
-        return getReturnOfSetMetaTable(source, args)
+        return getReturnOfSetMetaTable(args)
     end
     local node = m.compileNode(func)
+    ---@type vm.node.union
+    local result
     if node then
         for cnode in nodeMgr.eachNode(node) do
             if cnode.type == 'function'
@@ -243,12 +248,13 @@ local function getReturn(func, index, source, args)
                     returnNode = returnNode:resolve(args)
                 end
                 if returnNode then
-                    nodeMgr.setNode(source, m.compileNode(returnNode))
+                    result = result or union()
+                    result:merge(m.compileNode(returnNode))
                 end
             end
         end
     end
-    return nodeMgr.nodeCache[source]
+    return result
 end
 
 local function bindDocs(source)
@@ -336,16 +342,31 @@ local function selectNode(source, list, index)
     if not exp then
         return nil
     end
+    local result
     if exp.type == 'call' then
-        return getReturn(exp.node, index, source, exp.args)
-    end
-    if exp.type == '...' then
+        result = getReturn(exp.node, index, exp.args)
+    elseif exp.type == '...' then
         -- TODO
     end
-    return nodeMgr.setNode(source, m.compileNode(exp))
+    result = result
+          or m.compileNode(exp)
+          or union()
+    local hasKnownType
+    for n in nodeMgr.eachNode(result) do
+        if guide.isLiteral(n)
+        or (n.type == 'global' and n.cate == 'type') then
+            hasKnownType = true
+            break
+        end
+    end
+    if not hasKnownType then
+        result = nodeMgr.mergeNode(result, globalMgr.getGlobal('type', 'unknown'))
+    end
+    return nodeMgr.setNode(source, result)
 end
 
 local compilerMap = util.switch()
+    : case 'nil'
     : case 'boolean'
     : case 'table'
     : case 'integer'
@@ -483,7 +504,8 @@ local compilerMap = util.switch()
     : call(function (source)
         local vararg = source.vararg
         if vararg.type == 'call' then
-            getReturn(vararg.node, source.sindex, source, vararg.args)
+            local node = getReturn(vararg.node, source.sindex, vararg.args)
+            nodeMgr.setNode(source, node)
         end
     end)
     : case 'in'
@@ -502,7 +524,8 @@ local compilerMap = util.switch()
             selectNode(source._iterArgs[2], source.exps, 3)
         end
         for i, loc in ipairs(source.keys) do
-            getReturn(source._iterator, i, loc, source._iterArgs)
+            local node = getReturn(source._iterator, i, source._iterArgs)
+            nodeMgr.setNode(loc, node)
         end
     end)
     : case 'doc.type'

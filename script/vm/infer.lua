@@ -49,6 +49,7 @@ local viewNodeMap = util.switch()
     end)
     : case 'doc.type.name'
     : call(function (source, options)
+        options['hasClass'] = true
         if source.signs then
             local buf = {}
             for i, sign in ipairs(source.signs) do
@@ -63,6 +64,10 @@ local viewNodeMap = util.switch()
     : call(function (source, options)
         options['hasClass'] = true
         return m.viewType(source.node) .. '[]'
+    end)
+    : case 'doc.type.table'
+    : call(function (source, options)
+        options['hasTable'] = true
     end)
     : case 'doc.type.enum'
     : call(function (source, options)

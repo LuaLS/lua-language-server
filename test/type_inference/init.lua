@@ -481,6 +481,11 @@ TEST 'fun(a: string, b: any, c?: boolean, ...: any):c, d?, ...' [[
 local <?x?>
 ]]
 
+TEST 'table' [[
+---@type { [string]: string }
+local <?x?>
+]]
+
 TEST 'table<string, number>' [[
 ---@class string
 ---@class number

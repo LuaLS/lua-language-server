@@ -40,10 +40,21 @@ end
 
 ---@param node vm.node
 ---@return vm.node.union
-function m.setFalsy(node)
+function m.addOptional(node)
     if node.type ~= 'union' then
         node = union(node)
     end
+    node = node:addOptional()
+    return node
+end
+
+---@param node vm.node
+---@return vm.node.union
+function m.removeOptional(node)
+    if node.type ~= 'union' then
+        node = union(node)
+    end
+    node = node:removeOptional()
     return node
 end
 

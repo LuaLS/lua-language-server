@@ -167,7 +167,11 @@ local function getObjectSign(source)
         end
         if source.args then
             for _, arg in ipairs(source.args) do
-                source._sign:addSign(m.compileNode(arg))
+                local argNode = m.compileNode(arg)
+                if arg.optional then
+                    argNode = nodeMgr.addOptional(argNode)
+                end
+                source._sign:addSign(argNode)
             end
         end
     end
@@ -183,7 +187,11 @@ local function getObjectSign(source)
         source._sign = signMgr()
         if source.type == 'doc.type.function' then
             for _, arg in ipairs(source.args) do
-                source._sign:addSign(m.compileNode(arg.extends))
+                local argNode = m.compileNode(arg.extends)
+                if arg.optional then
+                    argNode = nodeMgr.addOptional(argNode)
+                end
+                source._sign:addSign(argNode)
             end
         end
     end

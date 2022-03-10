@@ -540,6 +540,22 @@ print(t.<?a?>)
 ]]
 
 TEST 'integer' [[
+---@generic K
+---@type fun(a?: K):K
+local f
+
+local <?n?> = f(1)
+]]
+
+TEST 'unknown' [[
+---@generic K
+---@type fun(a?: K):K
+local f
+
+local <?n?> = f(nil)
+]]
+
+TEST 'integer' [[
 ---@class integer
 
 ---@generic T: table, V
@@ -685,22 +701,91 @@ local f2 = f(1)
 local i, <?v?> = f2(true)
 ]]
 
-TEST 'string' [[
----@class string
-
+TEST 'fun(table: table<<K>, <V>>, index?: <K>):<K>, <V>' [[
 ---@generic T: table, K, V
 ---@param t T
----@return fun(table: table<K, V>, index: K):K, V
+---@return fun(table: table<K, V>, index?: K):K, V
 ---@return T
 ---@return nil
 local function pairs(t) end
 
-local f = pairs(t)
+local <?next?> = pairs(dummy)
+]]
+
+TEST 'string' [[
+---@generic T: table, K, V
+---@param t T
+---@return fun(table: table<K, V>, index?: K):K, V
+---@return T
+---@return nil
+local function pairs(t) end
+
+local next = pairs(dummy)
+
+---@type table<string, boolean>
+local t
+local <?k?>, v = next(t)
+]]
+
+TEST 'boolean' [[
+---@generic T: table, K, V
+---@param t T
+---@return fun(table: table<K, V>, index?: K):K, V
+---@return T
+---@return nil
+local function pairs(t) end
+
+local next = pairs(dummy)
+
+---@type table<string, boolean>
+local t
+local k, <?v?> = next(t)
+]]
+
+TEST 'string' [[
+---@generic T: table, K, V
+---@param t T
+---@return fun(table: table<K, V>, index?: K):K, V
+---@return T
+---@return nil
+local function pairs(t) end
+
+local next = pairs(dummy)
+
+---@type table<string, boolean>
+local t
+local <?k?>, v = next(t, nil)
+]]
+
+TEST 'boolean' [[
+---@generic T: table, K, V
+---@param t T
+---@return fun(table: table<K, V>, index?: K):K, V
+---@return T
+---@return nil
+local function pairs(t) end
+
+local next = pairs(dummy)
+
+---@type table<string, boolean>
+local t
+local k, <?v?> = next(t, nil)
+]]
+
+TEST 'string' [[
+---@generic T: table, K, V
+---@param t T
+---@return fun(table: table<K, V>, index?: K):K, V
+---@return T
+---@return nil
+local function pairs(t) end
+
+local next = pairs(dummy)
 
 ---@type table<string, boolean>
 local t
 
-for <?k?>, v in f, t do
+for <?k?>, v in next, t do
 end
 ]]
 

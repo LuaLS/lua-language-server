@@ -4,8 +4,18 @@ local localMgr = require 'vm.local-manager'
 local mt = {}
 mt.__index   = mt
 mt.type      = 'union'
-mt.falsy     = nil
+mt.optional  = nil
 mt.lastViews = nil
+
+---@param me   parser.object
+---@param node vm.node
+---@return vm.node.union
+local function createUnion(me, node)
+    local union = setmetatable({}, mt)
+    union:merge(me)
+    union:merge(node)
+    return union
+end
 
 ---@param node vm.node
 function mt:merge(node)
@@ -19,10 +29,8 @@ function mt:merge(node)
                 self[#self+1] = c
             end
         end
-        if node:isFalsy() then
-            self:setFalsy()
-        else
-            self.falsy = nil
+        if node:isOptional() then
+            self.optional = true
         end
     else
         if not self[node] then
@@ -47,48 +55,65 @@ function mt:eachNode()
     end
 end
 
-function mt:setFalsy()
-    self.falsy = true
+---@return vm.node.union
+function mt:addOptional()
+    if self:isOptional() then
+        return self
+    end
+    self.optional = true
+    return self
 end
 
-function mt:setTruthy()
-    self.falsy = false
+---@return vm.node.union
+function mt:removeOptional()
+    self.optional = nil
+    if not self:isOptional() then
+        return self
+    end
+    -- copy union
+    local newUnion = createUnion()
+    for _, n in ipairs(self) do
+        if n.type == 'nil' then
+            goto CONTINUE
+        end
+        if n.type == 'boolean' then
+            if n[1] == false then
+                goto CONTINUE
+            end
+        end
+        if n.type == 'false' then
+            goto CONTINUE
+        end
+        newUnion[#newUnion+1] = n
+        ::CONTINUE::
+    end
+    newUnion.optional = false
+    return newUnion
 end
 
-function mt:checkFalsy()
-    if self.falsy ~= nil then
-        return
+---@return boolean
+function mt:isOptional()
+    if self.optional ~= nil then
+        return self.optional
     end
     for _, c in ipairs(self) do
         if c.type == 'nil' then
-            self:setFalsy()
-            return
+            self.optional = true
+            return true
         end
         if c.type == 'boolean' then
             if c[1] == false then
-                self:setFalsy()
-                return
+                self.optional = true
+                return true
             end
         end
+        if c.type == 'false' then
+            self.optional = true
+            return true
+        end
     end
+    self.optional = false
+    return false
 end
 
-function mt:isFalsy()
-    self:checkFalsy()
-    return self.falsy == true
-end
-
-function mt:isTruthy()
-    self:checkFalsy()
-    return self.falsy == false
-end
-
----@param me   parser.object
----@param node vm.node
----@return vm.node.union
-return function (me, node)
-    local union = setmetatable({}, mt)
-    union:merge(me)
-    union:merge(node)
-    return union
-end
+return createUnion

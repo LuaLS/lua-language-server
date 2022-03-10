@@ -95,11 +95,13 @@ local function cloneObject(node, resolved)
         for i, arg in ipairs(node.args) do
             local newObj       = cloneObject(arg, resolved)
             newObj.parent      = newDocFunc
+            newObj.optional    = arg.optional
             newDocFunc.args[i] = newObj
         end
         for i, ret in ipairs(node.returns) do
             local newObj          = cloneObject(ret, resolved)
             newObj.parent         = newDocFunc
+            newObj.optional       = ret.optional
             newDocFunc.returns[i] = cloneObject(ret, resolved)
         end
         return newDocFunc

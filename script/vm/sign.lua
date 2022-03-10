@@ -81,7 +81,11 @@ function mt:resolve(argNodes)
             break
         end
         for n in nodeMgr.eachNode(sign) do
-            resolve(n, compiler.compileNode(node))
+            node = compiler.compileNode(node)
+            if sign.optional then
+                node = nodeMgr.removeOptional(node)
+            end
+            resolve(n, node)
         end
     end
 

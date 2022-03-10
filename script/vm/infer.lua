@@ -49,7 +49,15 @@ local viewNodeMap = util.switch()
     end)
     : case 'doc.type.name'
     : call(function (source, options)
-        return source[1]
+        if source.signs then
+            local buf = {}
+            for i, sign in ipairs(source.signs) do
+                buf[i] = m.viewType(sign)
+            end
+            return ('%s<%s>'):format(source[1], table.concat(buf, ', '))
+        else
+            return source[1]
+        end
     end)
     : case 'doc.type.array'
     : call(function (source, options)

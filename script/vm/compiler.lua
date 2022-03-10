@@ -566,6 +566,33 @@ local compilerMap = util.switch()
     : call(function (source)
         nodeMgr.setNode(source, source)
     end)
+    : case 'doc.type.name'
+    : call(function (source)
+        if source.signs then
+            nodeMgr.setNode(source, source)
+            local global = globalMgr.getGlobal('type', source[1])
+            for _, set in ipairs(global:getSets()) do
+                if set.type == 'doc.class' then
+                    if set.extends then
+                        for _, ext in ipairs(set.extends) do
+                            if ext.type == 'doc.type.table' then
+                                if ext._generic then
+                                    local resolved = ext._generic:resolve(source.signs)
+                                    nodeMgr.setNode(source, resolved)
+                                end
+                            end
+                        end
+                    end
+                end
+                if set.type == 'doc.alias' then
+                    if set.extends._generic then
+                        local resolved = set.extends._generic:resolve(source.signs)
+                        nodeMgr.setNode(source, resolved)
+                    end
+                end
+            end
+        end
+    end)
     : case 'doc.field'
     : call(function (source)
         nodeMgr.setNode(source, m.compileNode(source.extends))
@@ -1035,28 +1062,6 @@ local function compileByGlobal(source)
     end
     if source._globalNode then
         nodeMgr.setNode(source, m.compileNode(source._globalNode))
-        if source._globalNode.cate == 'type' then
-            for _, set in ipairs(source._globalNode:getSets()) do
-                if set.type == 'doc.class' then
-                    if set.extends then
-                        for _, ext in ipairs(set.extends) do
-                            if ext.type == 'doc.type.table' then
-                                if ext._generic then
-                                    local resolved = ext._generic:resolve(source.signs)
-                                    nodeMgr.setNode(source, resolved)
-                                end
-                            end
-                        end
-                    end
-                end
-                if set.type == 'doc.alias' then
-                    if set.extends._generic then
-                        local resolved = set.extends._generic:resolve(source.signs)
-                        nodeMgr.setNode(source, resolved)
-                    end
-                end
-            end
-        end
         return
     end
 end

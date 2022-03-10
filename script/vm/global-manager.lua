@@ -181,7 +181,11 @@ local compilerGlobalMap = util.switch()
         local name = source[1]
         local type = m.declareGlobal('type', name, uri)
         type:addGet(uri, source)
-        source._globalNode = type
+        if source.signs then
+            source._globalNode = source
+        else
+            source._globalNode = type
+        end
     end)
     : case 'doc.extends.name'
     : call(function (source)

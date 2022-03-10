@@ -365,6 +365,11 @@ TEST 'string' [[
 local <?x?>
 ]]
 
+TEST '1' [[
+---@type 1
+local <?v?>
+]]
+
 TEST 'string[]' [[
 ---@class string
 
@@ -390,6 +395,7 @@ TEST '"enum1"|"enum2"' [[
 local <?x?>
 ]]
 
+config.set(nil, 'Lua.hover.expandAlias', false)
 TEST 'A' [[
 ---@alias A 'enum1' | 'enum2'
 
@@ -406,6 +412,34 @@ local <?x?>
 
 TEST 'A' [[
 ---@alias A 'enum1' | 'enum2' | B
+
+---@type A
+local <?x?>
+]]
+config.set(nil, 'Lua.hover.expandAlias', true)
+TEST '"enum1"|"enum2"' [[
+---@alias A 'enum1' | 'enum2'
+
+---@type A
+local <?x?>
+]]
+
+TEST '"enum1"|"enum2"' [[
+---@alias A 'enum1' | 'enum2' | A
+
+---@type A
+local <?x?>
+]]
+
+TEST '"enum1"|"enum2"|B' [[
+---@alias A 'enum1' | 'enum2' | B
+
+---@type A
+local <?x?>
+]]
+
+TEST '1|true' [[
+---@alias A 1 | true
 
 ---@type A
 local <?x?>

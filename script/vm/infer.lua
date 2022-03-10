@@ -1,5 +1,7 @@
 local util      = require 'utility'
 local nodeMgr   = require 'vm.node'
+local config    = require 'config'
+local guide     = require 'parser.guide'
 
 ---@class vm.infer-manager
 local m = {}
@@ -33,6 +35,10 @@ local viewNodeMap = util.switch()
             return source.name
         end
     end)
+    : case 'doc.type.integer'
+    : call(function (source, options)
+        return ('%d'):format(source[1])
+    end)
     : case 'doc.type.name'
     : call(function (source, options)
         return source[1]
@@ -56,15 +62,19 @@ local function viewNode(node, options)
     end
 end
 
-local function eraseAlias(node, viewMap)
+local function eraseAlias(node, viewMap, options)
     for n in nodeMgr.eachNode(node) do
         if n.type == 'global' and n.cate == 'type' then
             for _, set in ipairs(n:getSets()) do
                 if set.type == 'doc.alias' then
-                    for _, ext in ipairs(set.extends.types) do
-                        local view = viewNode(ext, {})
-                        if view and view ~= n.name then
-                            viewMap[view] = nil
+                    if options['expandAlias'] then
+                        viewMap[n.name] = nil
+                    else
+                        for _, ext in ipairs(set.extends.types) do
+                            local view = viewNode(ext, {})
+                            if view and view ~= n.name then
+                                viewMap[view] = nil
+                            end
                         end
                     end
                 end
@@ -81,8 +91,9 @@ function m.getViews(source)
     if node.type == 'union' and node.lastViews then
         return node.lastViews
     end
-    local views = {}
+    local views   = {}
     local options = {}
+    options['expandAlias'] = config.get(guide.getUri(source), 'Lua.hover.expandAlias')
     if node.type == 'union' then
         node.lastViews = views
     end
@@ -99,7 +110,7 @@ function m.getViews(source)
         views['table'] = true
     end
     if options['hasClass'] then
-        eraseAlias(node, views)
+        eraseAlias(node, views, options)
     end
     return views
 end

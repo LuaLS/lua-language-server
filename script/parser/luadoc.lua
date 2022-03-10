@@ -678,6 +678,16 @@ function parseType(parent)
             if not result.start then
                 result.start = vararg.start
             end
+        elseif tp == 'integer' then
+            nextToken()
+            local integer = {
+                type   = 'doc.type.integer',
+                start  = getStart(),
+                finish = getFinish(),
+                parent = result,
+                [1]    = content,
+            }
+            result.types[#result.types+1] = integer
         end
         if not checkToken('symbol', '|', 1) then
             break

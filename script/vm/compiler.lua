@@ -548,6 +548,10 @@ local compilerMap = util.switch()
             nodeMgr.setNode(source, m.compileNode(typeUnit))
         end
     end)
+    : case 'doc.type.integer'
+    : call(function (source)
+        nodeMgr.setNode(source, source)
+    end)
     : case 'doc.type.enum'
     : call(function (source)
         nodeMgr.setNode(source, source)

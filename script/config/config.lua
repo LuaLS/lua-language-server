@@ -196,6 +196,7 @@ local Template = {
     ['Lua.hover.viewNumber']                = Type.Boolean >> true,
     ['Lua.hover.previewFields']             = Type.Integer >> 20,
     ['Lua.hover.enumsLimit']                = Type.Integer >> 5,
+    ['Lua.hover.expandAlias']               = Type.Boolean >> true,
     ['Lua.semantic.enable']                 = Type.Boolean >> true,
     ['Lua.semantic.variable']               = Type.Boolean >> true,
     ['Lua.semantic.annotation']             = Type.Boolean >> true,

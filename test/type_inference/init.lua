@@ -289,6 +289,14 @@ end
 <?y?> = x()
 ]]
 
+TEST 'unknown' [[
+local function x()
+    return nil
+    return f()
+end
+_, <?y?> = x()
+]]
+
 TEST 'integer' [[
 local function x()
     return 1

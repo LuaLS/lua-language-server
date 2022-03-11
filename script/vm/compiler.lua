@@ -261,11 +261,12 @@ local function getReturn(func, index, args)
     end
     local node = m.compileNode(func)
     ---@type vm.node.union
-    local result
+    local result, hasCalled
     if node then
         for cnode in nodeMgr.eachNode(node) do
             if cnode.type == 'function'
             or cnode.type == 'doc.type.function' then
+                hasCalled = true
                 local returnNode = getReturnOfFunction(cnode, index)
                 if returnNode and returnNode.type == 'generic' then
                     returnNode = returnNode:resolve(args)
@@ -276,6 +277,9 @@ local function getReturn(func, index, args)
                 end
             end
         end
+    end
+    if not hasCalled then
+        result = globalMgr.getGlobal('type', 'unknown')
     end
     return result
 end
@@ -374,7 +378,9 @@ local function selectNode(source, list, index)
     end
     result = result
           or m.compileNode(exp)
-          or union()
+    if not result then
+        return nodeMgr.setNode(source, result)
+    end
     local hasKnownType
     for n in nodeMgr.eachNode(result) do
         if guide.isLiteral(n)

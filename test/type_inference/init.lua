@@ -8,17 +8,20 @@ rawset(_G, 'TEST', true)
 
 local function getSource(pos)
     local ast = files.getState('')
-    return guide.eachSourceContain(ast.ast, pos, function (source)
+    local result
+    guide.eachSourceContain(ast.ast, pos, function (source)
         if source.type == 'local'
         or source.type == 'getlocal'
         or source.type == 'setlocal'
         or source.type == 'setglobal'
         or source.type == 'getglobal'
         or source.type == 'field'
-        or source.type == 'method' then
-            return source
+        or source.type == 'method'
+        or source.type == 'function' then
+            result = source
         end
     end)
+    return result
 end
 
 function TEST(wanted)
@@ -1059,13 +1062,18 @@ TEST 'fun():number, boolean' [[
 local <?t?>
 ]]
 
---[[
-l:value
-l:work|&1|&1
-f:|&1|&1
-dfun:|&1
-dn:Class
+
+TEST 'fun(value: Class)' [[
+---@class Class
+
+---@param callback fun(value: Class)
+function work(callback)
+end
+
+work(<?function?> (value)
+end)
 ]]
+
 TEST 'Class' [[
 ---@class Class
 

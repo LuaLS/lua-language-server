@@ -85,6 +85,7 @@ local viewNodeMap = util.switch()
     end)
     : case 'doc.type.function'
     : call(function (source, options)
+        options['hasDocFunction'] = true
         local args = {}
         local rets = {}
         local argView = ''
@@ -166,6 +167,9 @@ function m.getViews(source)
     end
     if options['hasNumber'] then
         views['integer'] = nil
+    end
+    if options['hasDocFunction'] then
+        views['function'] = nil
     end
     if options['hasTable'] and not options['hasClass'] then
         views['table'] = true

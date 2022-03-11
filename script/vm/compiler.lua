@@ -425,6 +425,24 @@ local compilerMap = util.switch()
                 end
             end
         end
+
+        if source.parent.type == 'callargs' then
+            local call = source.parent.parent
+            local callNode = m.compileNode(call.node)
+            for n in nodeMgr.eachNode(callNode) do
+                if n.type == 'function' then
+                    for index, arg in ipairs(n.args) do
+                        if call.args[index] == source then
+                            for fn in nodeMgr.eachNode(m.compileNode(arg)) do
+                                if fn.type == 'doc.type.function' then
+                                    nodeMgr.setNode(source, fn)
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
     end)
     : case 'paren'
     : call(function (source)
@@ -467,7 +485,22 @@ local compilerMap = util.switch()
             end
         end
         if source.parent.type == 'funcargs' and not hasMarkDoc and not hasMarkParam then
-            nodeMgr.setNode(source, globalMgr.getGlobal('type', 'any'))
+            local func = source.parent.parent
+            local funcNode = m.compileNode(func)
+            local hasDocArg
+            for n in nodeMgr.eachNode(funcNode) do
+                if n.type == 'doc.type.function' then
+                    for index, arg in ipairs(n.args) do
+                        if func.args[index] == source then
+                            nodeMgr.setNode(source, m.compileNode(arg))
+                            hasDocArg = true
+                        end
+                    end
+                end
+            end
+            if not hasDocArg then
+                nodeMgr.setNode(source, globalMgr.getGlobal('type', 'any'))
+            end
         end
         -- for x in ... do
         if source.parent.type == 'in' then

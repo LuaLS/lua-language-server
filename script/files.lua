@@ -80,8 +80,10 @@ function m.close(uri)
         file.trusted = false
     end
     m.onWatch('close', uri)
-    if (file._ref or 0) <= 0 and not m.isOpen(uri) then
-        m.remove(uri)
+    if file then
+        if (file._ref or 0) <= 0 and not m.isOpen(uri) then
+            m.remove(uri)
+        end
     end
 end
 

@@ -304,7 +304,7 @@ local function bindDocs(source)
             end
         end
         if doc.type == 'doc.class' then
-            if source.type == 'local'
+            if (source.type == 'local' and not isParam)
             or (source._globalNode and guide.isSet(source)) then
                 hasFounded = true
                 nodeMgr.setNode(source, m.compileNode(doc))
@@ -407,7 +407,21 @@ local function selectNode(source, list, index)
     return nodeMgr.setNode(source, result)
 end
 
-local function setCallBackNode(source, call, callNode, fixIndex)
+---@param source parser.object
+---@param node   vm.node
+---@return boolean
+local function isValidCallArgNode(source, node)
+    if source.type == 'function' then
+        return node.type == 'doc.type.function'
+    end
+    if source.type == 'table' then
+        return node.type == 'doc.type.table'
+            or (node.type == 'global' and node.cate == 'type' and not guide.isBaseType(node.name))
+    end
+    return false
+end
+
+local function setCallArgNode(source, call, callNode, fixIndex)
     local valueMgr = require 'vm.value'
     local myIndex
     for i, arg in ipairs(call.args) do
@@ -416,6 +430,7 @@ local function setCallBackNode(source, call, callNode, fixIndex)
             break
         end
     end
+
     local eventIndex = 1
     local eventArg = call.args[eventIndex + fixIndex]
     if eventArg and eventArg.dummy then
@@ -423,11 +438,12 @@ local function setCallBackNode(source, call, callNode, fixIndex)
         eventArg = call.args[eventIndex + fixIndex]
     end
     local eventMap = valueMgr.getLiterals(eventArg)
+
     for n in nodeMgr.eachNode(callNode) do
         if n.type == 'function' then
             local arg = n.args[myIndex]
             for fn in nodeMgr.eachNode(m.compileNode(arg)) do
-                if fn.type == 'doc.type.function' then
+                if isValidCallArgNode(source, fn) then
                     nodeMgr.setNode(source, fn)
                 end
             end
@@ -440,7 +456,7 @@ local function setCallBackNode(source, call, callNode, fixIndex)
             or eventMap[event[1]] then
                 local arg = n.args[myIndex]
                 for fn in nodeMgr.eachNode(m.compileNode(arg)) do
-                    if fn.type == 'doc.type.function' then
+                    if isValidCallArgNode(source, fn) then
                         nodeMgr.setNode(source, fn)
                     end
                 end
@@ -452,7 +468,6 @@ end
 local compilerMap = util.switch()
     : case 'nil'
     : case 'boolean'
-    : case 'table'
     : case 'integer'
     : case 'number'
     : case 'string'
@@ -462,6 +477,32 @@ local compilerMap = util.switch()
     : case 'doc.type.array'
     : call(function (source)
         nodeMgr.setNode(source, source)
+    end)
+    : case 'table'
+    : call(function (source)
+        nodeMgr.setNode(source, source)
+
+        if source.parent.type == 'callargs' then
+            local call = source.parent.parent
+            local callNode = m.compileNode(call.node)
+            setCallArgNode(source, call, callNode, 0)
+
+            if call.node.special == 'pcall'
+            or call.node.special == 'xpcall' then
+                local fixIndex = call.node.special == 'pcall' and 1 or 2
+                callNode = m.compileNode(call.args[1])
+                setCallArgNode(source, call, callNode, fixIndex)
+            end
+        end
+
+        if source.parent.type == 'setglobal'
+        or source.parent.type == 'setlocal'
+        or source.parent.type == 'tablefield'
+        or source.parent.type == 'tableindex'
+        or source.parent.type == 'setfield'
+        or source.parent.type == 'setindex' then
+            nodeMgr.setNode(source, m.compileNode(source.parent))
+        end
     end)
     : case 'function'
     : call(function (source)
@@ -479,13 +520,13 @@ local compilerMap = util.switch()
         if source.parent.type == 'callargs' then
             local call = source.parent.parent
             local callNode = m.compileNode(call.node)
-            setCallBackNode(source, call, callNode, 0)
+            setCallArgNode(source, call, callNode, 0)
 
             if call.node.special == 'pcall'
             or call.node.special == 'xpcall' then
                 local fixIndex = call.node.special == 'pcall' and 1 or 2
                 callNode = m.compileNode(call.args[1])
-                setCallBackNode(source, call, callNode, fixIndex)
+                setCallArgNode(source, call, callNode, fixIndex)
             end
         end
     end)
@@ -578,6 +619,10 @@ local compilerMap = util.switch()
         if source.value then
             nodeMgr.setNode(source, m.compileNode(source.value))
         end
+
+        m.compileByParentNode(source.parent, guide.getKeyName(source), function (src)
+            nodeMgr.setNode(source, m.compileNode(src))
+        end)
     end)
     : case 'field'
     : case 'method'

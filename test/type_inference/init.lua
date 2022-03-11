@@ -17,7 +17,8 @@ local function getSource(pos)
         or source.type == 'getglobal'
         or source.type == 'field'
         or source.type == 'method'
-        or source.type == 'function' then
+        or source.type == 'function'
+        or source.type == 'table' then
             result = source
         end
     end)
@@ -1210,14 +1211,14 @@ local x
 <?x?> = 1
 ]]
 
-TEST 'any' [[
+TEST 'unknown' [[
 ---@return number
 local function f(x)
     local <?y?> = x()
 end
 ]]
 
-TEST 'any' [[
+TEST 'unknown' [[
 local mt
 
 ---@return number
@@ -1226,7 +1227,7 @@ function mt:f() end
 local <?v?> = mt()
 ]]
 
-TEST 'any' [[
+TEST 'unknown' [[
 local <?mt?>
 
 ---@class X
@@ -1240,7 +1241,7 @@ local mt
 function mt:f(<?x?>) end
 ]]
 
-TEST 'any' [[
+TEST 'unknown' [[
 local <?mt?>
 
 ---@type number
@@ -1268,6 +1269,22 @@ function mt:loop(callback) end
 mt:loop(function (<?i?>)
     
 end)
+]]
+
+TEST 'C' [[
+---@class D
+---@field y integer # D comment
+
+---@class C
+---@field x integer # C comment
+---@field d D
+
+---@param c C
+local function f(c) end
+
+f <?{?>
+    x = ,
+}
 ]]
 
 TEST 'integer' [[

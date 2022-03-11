@@ -1182,4 +1182,25 @@ function m.isOOP(source)
     return false
 end
 
+local baseTypeMap = {
+    ['unknown']  = true,
+    ['any']      = true,
+    ['true']     = true,
+    ['false']    = true,
+    ['nil']      = true,
+    ['boolean']  = true,
+    ['number']   = true,
+    ['string']   = true,
+    ['table']    = true,
+    ['function'] = true,
+    ['thread']   = true,
+    ['userdata'] = true,
+}
+
+---@param str string
+---@return boolean
+function m.isBaseType(str)
+    return baseTypeMap[str] == true
+end
+
 return m

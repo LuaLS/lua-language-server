@@ -1085,14 +1085,14 @@ work(function (<?value?>)
 end)
 ]]
 
-TEST 'Class' [[
+TEST 'fun(value: Class)' [[
 ---@class Class
 
 ---@param callback fun(value: Class)
 function work(callback)
 end
 
-pcall(work, function (<?value?>)
+pcall(work, <?function?> (value)
 end)
 ]]
 

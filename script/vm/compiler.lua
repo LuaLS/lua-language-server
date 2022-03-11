@@ -237,7 +237,14 @@ local function getReturnOfSetMetaTable(args)
     end
     if mt then
         m.compileByParentNode(mt, '__index', function (src)
-            node:merge(m.compileNode(src))
+            for n in nodeMgr.eachNode(m.compileNode(src)) do
+                if n.type == 'global'
+                or n.type == 'local'
+                or n.type == 'table'
+                or n.type == 'doc.type.table' then
+                    node:merge(n)
+                end
+            end
         end)
     end
     return node
@@ -426,6 +433,7 @@ local compilerMap = util.switch()
             end
         end
 
+        -- table.sort(string[], function (<?x?>) end)
         if source.parent.type == 'callargs' then
             local call = source.parent.parent
             local callNode = m.compileNode(call.node)
@@ -436,6 +444,24 @@ local compilerMap = util.switch()
                             for fn in nodeMgr.eachNode(m.compileNode(arg)) do
                                 if fn.type == 'doc.type.function' then
                                     nodeMgr.setNode(source, fn)
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+            if call.node.special == 'pcall'
+            or call.node.special == 'xpcall' then
+                local fixIndex = call.node.special == 'pcall' and 1 or 2
+                callNode = m.compileNode(call.args[1])
+                for n in nodeMgr.eachNode(callNode) do
+                    if n.type == 'function' then
+                        for index, arg in ipairs(n.args) do
+                            if call.args[index + fixIndex] == source then
+                                for fn in nodeMgr.eachNode(m.compileNode(arg)) do
+                                    if fn.type == 'doc.type.function' then
+                                        nodeMgr.setNode(source, fn)
+                                    end
                                 end
                             end
                         end

@@ -16,6 +16,9 @@ function m.mergeNode(a, b)
     if not b then
         return a
     end
+    if not a then
+        return b
+    end
     if a.type == 'union' then
         a:merge(b)
         return a

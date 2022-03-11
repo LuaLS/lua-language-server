@@ -78,13 +78,26 @@ function m.getTableValue(tnode, knode)
         if tn.type == 'doc.type.table' then
             for _, field in ipairs(tn.fields) do
                 if m.isSubType(field.name, knode) then
-                    result = nodeMgr.mergeNode(compiler.compileNode(field.extends), result)
+                    result = nodeMgr.mergeNode(result, compiler.compileNode(field.extends))
                 end
             end
         end
         if tn.type == 'doc.type.array' then
             if m.isSubType(globalMgr.getGlobal('type', 'integer'), knode) then
-                result = nodeMgr.mergeNode(compiler.compileNode(tn.node), result)
+                result = nodeMgr.mergeNode(result, compiler.compileNode(tn.node))
+            end
+        end
+        if tn.type == 'table' then
+            for _, field in ipairs(tn) do
+                if field.type == 'tableindex' then
+                    result = nodeMgr.mergeNode(result, compiler.compileNode(field.value))
+                end
+                if field.type == 'tablefield' then
+                    result = nodeMgr.mergeNode(result, compiler.compileNode(field.value))
+                end
+                if field.type == 'tableexp' then
+                    result = nodeMgr.mergeNode(result, compiler.compileNode(field.value))
+                end
             end
         end
     end
@@ -99,13 +112,26 @@ function m.getTableKey(tnode, vnode)
         if tn.type == 'doc.type.table' then
             for _, field in ipairs(tn.fields) do
                 if m.isSubType(field.extends, vnode) then
-                    result = nodeMgr.mergeNode(compiler.compileNode(field.name), result)
+                    result = nodeMgr.mergeNode(result, compiler.compileNode(field.name))
                 end
             end
         end
         if tn.type == 'doc.type.array' then
             if m.isSubType(tn.node, vnode) then
-                result = nodeMgr.mergeNode(globalMgr.getGlobal('type', 'integer'), result)
+                result = nodeMgr.mergeNode(result, globalMgr.getGlobal('type', 'integer'))
+            end
+        end
+        if tn.type == 'table' then
+            for _, field in ipairs(tn) do
+                if field.type == 'tableindex' then
+                    result = nodeMgr.mergeNode(result, compiler.compileNode(field.index))
+                end
+                if field.type == 'tablefield' then
+                    result = nodeMgr.mergeNode(result, globalMgr.getGlobal('type', 'string'))
+                end
+                if field.type == 'tableexp' then
+                    result = nodeMgr.mergeNode(result, globalMgr.getGlobal('type', 'integer'))
+                end
             end
         end
     end

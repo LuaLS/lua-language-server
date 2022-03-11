@@ -82,10 +82,12 @@ function mt:resolve(argNodes)
         end
         for n in nodeMgr.eachNode(sign) do
             node = compiler.compileNode(node)
-            if sign.optional then
-                node = nodeMgr.removeOptional(node)
+            if node then
+                if sign.optional then
+                    node = nodeMgr.removeOptional(node)
+                end
+                resolve(n, node)
             end
-            resolve(n, node)
         end
     end
 

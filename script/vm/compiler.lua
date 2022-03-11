@@ -353,10 +353,11 @@ local function selectNode(source, list, index)
     else
         for i = index, 1, -1 do
             if list[i] then
-                exp = list[i]
-                if exp.type == 'call'
-                or exp.type == '...' then
+                local last = list[i]
+                if last.type == 'call'
+                or last.type == '...' then
                     index = index - i + 1
+                    exp = last
                 end
                 break
             end
@@ -377,6 +378,9 @@ local function selectNode(source, list, index)
     local hasKnownType
     for n in nodeMgr.eachNode(result) do
         if guide.isLiteral(n)
+        or n.type == 'doc.type.function'
+        or n.type == 'doc.type.table'
+        or n.type == 'doc.type.integer'
         or (n.type == 'global' and n.cate == 'type') then
             hasKnownType = true
             break

@@ -38,10 +38,14 @@ function m.setNode(source, node)
     m.nodeCache[source] = m.mergeNode(me, node)
 end
 
+function m.getNode(source)
+    return m.nodeCache[source]
+end
+
 ---@param node vm.node
 ---@return vm.node.union
 function m.addOptional(node)
-    if node.type ~= 'union' then
+    if not node or node.type ~= 'union' then
         node = union(node)
     end
     node = node:addOptional()
@@ -49,8 +53,11 @@ function m.addOptional(node)
 end
 
 ---@param node vm.node
----@return vm.node.union
+---@return vm.node.union?
 function m.removeOptional(node)
+    if not node then
+        return node
+    end
     if node.type ~= 'union' then
         node = union(node)
     end

@@ -592,6 +592,11 @@ local compilerMap = util.switch()
         if source.parent.type == 'in' then
             m.compileNode(source.parent)
         end
+
+        -- for x = ... do
+        if source.parent.type == 'loop' then
+            nodeMgr.setNode(source, globalMgr.getGlobal('type', 'integer'))
+        end
     end)
     : case 'setlocal'
     : case 'getlocal'

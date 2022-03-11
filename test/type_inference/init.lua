@@ -1349,5 +1349,5 @@ function B:x() end
 ---@type B
 local t
 
-local <!<?v?>!> = t.x()
+local <?v?> = t.x()
 ]]

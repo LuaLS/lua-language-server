@@ -10,7 +10,7 @@
 ---@class integer: number
 ---@class thread
 ---@class table<K, V>: { [K]: V }
----@class string
+---@class string: stringlib
 ---@class userdata
 ---@class lightuserdata
 ---@class function

@@ -7,7 +7,13 @@ local guide     = require 'parser.guide'
 local m = {}
 
 local inferSorted = {
-    ['nil'] = 100,
+    ['boolean']  = - 100,
+    ['string']   = - 99,
+    ['number']   = - 98,
+    ['integer']  = - 97,
+    ['function'] = - 96,
+    ['table']    = - 95,
+    ['nil']      = 100,
 }
 
 local viewNodeMap = util.switch()
@@ -140,6 +146,9 @@ end
 function m.getViews(source)
     local compiler = require 'vm.compiler'
     local node     = compiler.compileNode(source)
+    if not node then
+        return {}
+    end
     if node.type == 'union' and node.lastViews then
         return node.lastViews
     end
@@ -193,9 +202,23 @@ function m.viewType(source)
         end
         return sa < sb
     end)
-    local view = table.concat(array, '|')
 
-    return view
+    local max   = #array
+    local limit = config.get(guide.getUri(source), 'Lua.hover.enumsLimit')
+
+    if max > limit then
+        local view = string.format('%s...(+%d)'
+            , table.concat(array, '|', 1, limit)
+            , max - limit
+        )
+
+        return view
+    else
+        local view = table.concat(array, '|')
+
+        return view
+    end
+
 end
 
 return m

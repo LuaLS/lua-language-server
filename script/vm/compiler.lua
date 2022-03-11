@@ -114,8 +114,10 @@ function m.getClassFields(node, key, pushResult)
                     for _, src in ipairs(set.bindSources) do
                         if searchFieldMap[src.type] then
                             searchFieldMap[src.type](src, key, function (field)
-                                hasFounded = true
-                                pushResult(field)
+                                if guide.isSet(field) then
+                                    hasFounded = true
+                                    pushResult(field)
+                                end
                             end)
                         end
                         if src._globalNode then
@@ -375,9 +377,9 @@ local function selectNode(source, list, index)
         result = getReturn(exp.node, index, exp.args)
     elseif exp.type == '...' then
         -- TODO
+    else
+        result = m.compileNode(exp)
     end
-    result = result
-          or m.compileNode(exp)
     if not result then
         return nodeMgr.setNode(source, result)
     end
@@ -443,7 +445,9 @@ local compilerMap = util.switch()
                 end
             end
         end
+        local hasMarkParam
         if source.dummy and not hasMarkDoc then
+            hasMarkParam = true
             nodeMgr.setNode(source, m.compileNode(source.method.node))
         end
         if source.value then
@@ -451,7 +455,6 @@ local compilerMap = util.switch()
                 nodeMgr.setNode(source, m.compileNode(source.value))
             end
         end
-        local hasMarkParam
         -- function x.y(self, ...) --> function x:y(...)
         if  source[1] == 'self'
         and not hasMarkDoc
@@ -545,6 +548,11 @@ local compilerMap = util.switch()
             local node = getReturn(vararg.node, source.sindex, vararg.args)
             nodeMgr.setNode(source, node)
         end
+    end)
+    : case 'call'
+    : call(function (source)
+        local node = getReturn(source.node, 1, source.args)
+        nodeMgr.setNode(source, node)
     end)
     : case 'in'
     : call(function (source)

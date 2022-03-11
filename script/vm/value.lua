@@ -191,4 +191,37 @@ function m.getBoolean(v)
     return result
 end
 
+---@param v vm.node
+---@return table<any, boolean>?
+function m.getLiterals(v)
+    local map
+    local node = compiler.compileNode(v)
+    for n in nodeMgr.eachNode(node) do
+        local literal
+        if n.type == 'boolean'
+        or n.type == 'string'
+        or n.type == 'number'
+        or n.type == 'integer' then
+            literal = n[1]
+        end
+        if n.type == 'global' and n.cate == 'type' then
+            if n.name == 'true' then
+                literal = true
+            elseif n.name == 'false' then
+                literal = false
+            end
+        end
+        if n.type == 'doc.type.integer' then
+            literal = n[1]
+        end
+        if literal ~= nil then
+            if not map then
+                map = {}
+            end
+            map[literal] = true
+        end
+    end
+    return map
+end
+
 return m

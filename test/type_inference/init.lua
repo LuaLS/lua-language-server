@@ -423,7 +423,7 @@ local <?x?>
 ]]
 
 TEST '"enum1"|"enum2"' [[
----@type '"enum1"' | '"enum2"'
+---@type 'enum1' | 'enum2'
 local <?x?>
 ]]
 
@@ -544,7 +544,7 @@ print(t.<?a?>)
 ]]
 
 TEST '"aaa"|"bbb"' [[
----@type table<string, '"aaa"'|'"bbb"'>
+---@type table<string, 'aaa'|'bbb'>
 local t = {}
 
 print(t.<?a?>)
@@ -1158,11 +1158,22 @@ end
 --f = function (<?x?>) end
 --]]
 
+TEST 'fun(i: integer)' [[
+--- @class Emit
+--- @field on fun(eventName: string, cb: function)
+--- @field on fun(eventName: 'died', cb: fun(i: integer))
+--- @field on fun(eventName: 'won', cb: fun(s: string))
+local emit = {}
+
+emit.on("died", <?function?> (i)
+end)
+]]
+
 TEST 'integer' [[
 --- @class Emit
 --- @field on fun(eventName: string, cb: function)
---- @field on fun(eventName: '"died"', cb: fun(i: integer))
---- @field on fun(eventName: '"won"', cb: fun(s: string))
+--- @field on fun(eventName: 'died', cb: fun(i: integer))
+--- @field on fun(eventName: 'won', cb: fun(s: string))
 local emit = {}
 
 emit.on("died", function (<?i?>)
@@ -1172,8 +1183,8 @@ end)
 TEST 'integer' [[
 --- @class Emit
 --- @field on fun(self: Emit, eventName: string, cb: function)
---- @field on fun(self: Emit, eventName: '"died"', cb: fun(i: integer))
---- @field on fun(self: Emit, eventName: '"won"', cb: fun(s: string))
+--- @field on fun(self: Emit, eventName: 'died', cb: fun(i: integer))
+--- @field on fun(self: Emit, eventName: 'won', cb: fun(s: string))
 local emit = {}
 
 emit:on("died", function (<?i?>)

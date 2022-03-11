@@ -407,6 +407,48 @@ local function selectNode(source, list, index)
     return nodeMgr.setNode(source, result)
 end
 
+local function setCallBackNode(source, call, callNode, fixIndex)
+    local valueMgr = require 'vm.value'
+    local myIndex
+    for i, arg in ipairs(call.args) do
+        if arg == source then
+            myIndex = i - fixIndex
+            break
+        end
+    end
+    local eventIndex = 1
+    local eventArg = call.args[eventIndex + fixIndex]
+    if eventArg and eventArg.dummy then
+        eventIndex = 2
+        eventArg = call.args[eventIndex + fixIndex]
+    end
+    local eventMap = valueMgr.getLiterals(eventArg)
+    for n in nodeMgr.eachNode(callNode) do
+        if n.type == 'function' then
+            local arg = n.args[myIndex]
+            for fn in nodeMgr.eachNode(m.compileNode(arg)) do
+                if fn.type == 'doc.type.function' then
+                    nodeMgr.setNode(source, fn)
+                end
+            end
+        end
+        if n.type == 'doc.type.function' then
+            local event = m.compileNode(n.args[eventIndex])
+            if not event
+            or not eventMap
+            or event.type ~= 'doc.type.enum'
+            or eventMap[event[1]] then
+                local arg = n.args[myIndex]
+                for fn in nodeMgr.eachNode(m.compileNode(arg)) do
+                    if fn.type == 'doc.type.function' then
+                        nodeMgr.setNode(source, fn)
+                    end
+                end
+            end
+        end
+    end
+end
+
 local compilerMap = util.switch()
     : case 'nil'
     : case 'boolean'
@@ -437,36 +479,13 @@ local compilerMap = util.switch()
         if source.parent.type == 'callargs' then
             local call = source.parent.parent
             local callNode = m.compileNode(call.node)
-            for n in nodeMgr.eachNode(callNode) do
-                if n.type == 'function' then
-                    for index, arg in ipairs(n.args) do
-                        if call.args[index] == source then
-                            for fn in nodeMgr.eachNode(m.compileNode(arg)) do
-                                if fn.type == 'doc.type.function' then
-                                    nodeMgr.setNode(source, fn)
-                                end
-                            end
-                        end
-                    end
-                end
-            end
+            setCallBackNode(source, call, callNode, 0)
+
             if call.node.special == 'pcall'
             or call.node.special == 'xpcall' then
                 local fixIndex = call.node.special == 'pcall' and 1 or 2
                 callNode = m.compileNode(call.args[1])
-                for n in nodeMgr.eachNode(callNode) do
-                    if n.type == 'function' then
-                        for index, arg in ipairs(n.args) do
-                            if call.args[index + fixIndex] == source then
-                                for fn in nodeMgr.eachNode(m.compileNode(arg)) do
-                                    if fn.type == 'doc.type.function' then
-                                        nodeMgr.setNode(source, fn)
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
+                setCallBackNode(source, call, callNode, fixIndex)
             end
         end
     end)

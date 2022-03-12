@@ -34,7 +34,7 @@ DIAG_PREFIELD_CALL      =
 'Will be interpreted as `{}{}`. It may be necessary to add a `,` or `;`.'
 DIAG_OVER_MAX_ARGS      =
 'The function takes only {:d} parameters, but you passed {:d}.'
-DIAG_OVER_MAX_ARGS      =
+DIAG_OVER_MAX_VALUES    =
 'Only has {} variables, but you set {} values.'
 DIAG_AMBIGUITY_1        =
 'Compute `{}` first. You may need to add brackets.'

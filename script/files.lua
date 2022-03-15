@@ -36,13 +36,10 @@ end
 m.reset()
 
 local fixedUri = {}
---- 获取文件的真实uri(真实大小写)
+--- 获取文件的真实uri
 ---@param uri uri
 ---@return uri
 function m.getRealUri(uri)
-    if platform.OS ~= 'Windows' then
-        return uri
-    end
     local filename = furi.decode(uri)
     local path = fs.path(filename)
     local suc, res = pcall(fs.exists, path)

@@ -618,6 +618,9 @@ m.register 'textDocument/completion' {
             end
             items[i] = item
         end
+        if result.incomplete == nil then
+            result.incomplete = false
+        end
         return {
             isIncomplete = result.incomplete,
             items        = items,

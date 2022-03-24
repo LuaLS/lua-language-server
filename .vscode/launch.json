@@ -21,7 +21,7 @@
 			],
 		},
 		{
-			"name": "🪡attach",
+			"name": "🍄attach",
 			"type": "lua",
 			"request": "attach",
 			"stopOnEntry": false,

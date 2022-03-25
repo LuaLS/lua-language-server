@@ -13,7 +13,6 @@ local function searchGetLocal(source, node, pushResult)
     local key = guide.getKeyName(source)
     for _, ref in ipairs(node.node.ref) do
         if  ref.type == 'getlocal'
-        and guide.isSet(ref.next)
         and guide.getKeyName(ref.next) == key then
             pushResult(ref.next)
         end
@@ -26,7 +25,8 @@ simpleMap = util.switch()
         pushResult(source)
         if source.ref then
             for _, ref in ipairs(source.ref) do
-                if ref.type == 'setlocal' then
+                if ref.type == 'setlocal'
+                or ref.type == 'getlocal' then
                     pushResult(ref)
                 end
             end
@@ -212,9 +212,7 @@ local function searchByNode(source, pushResult)
     end
 end
 
----@param source parser.object
----@return       parser.object[]
-function vm.getDefs(source)
+function vm.getRefs(source)
     local results = {}
     local mark    = {}
 

@@ -68,7 +68,17 @@ simpleMap = util.switch()
     : case 'goto'
     : call(function (source, pushResult)
         if source.node then
+            simpleMap['label'](source.node, pushResult)
             pushResult(source.node)
+        end
+    end)
+    : case 'label'
+    : call(function (source, pushResult)
+        pushResult(source)
+        if source.ref then
+            for _, ref in ipairs(source.ref) do
+                pushResult(ref)
+            end
         end
     end)
     : getMap()
@@ -106,9 +116,7 @@ local searchFieldMap = util.switch()
         local sources = localID.getSources(node, key)
         if sources then
             for _, src in ipairs(sources) do
-                if guide.isSet(src) then
-                    pushResult(src)
-                end
+                pushResult(src)
             end
         end
     end)
@@ -181,9 +189,7 @@ local function searchByLocalID(source, pushResult)
         return
     end
     for _, src in ipairs(idSources) do
-        if guide.isSet(src) then
-            pushResult(src)
-        end
+        pushResult(src)
     end
 end
 
@@ -202,9 +208,12 @@ local function searchByNode(source, pushResult)
         return
     end
     for n in nodeMgr.eachNode(node) do
-        if n.type == 'global' and n.cate == 'type' then
+        if n.type == 'global' then
             for _, set in ipairs(n:getSets()) do
                 pushResult(set)
+            end
+            for _, get in ipairs(n:getGets()) do
+                pushResult(get)
             end
         else
             pushResult(n)
@@ -226,16 +235,7 @@ function vm.getRefs(source)
         end
         if not mark[src] then
             mark[src] = true
-            if src.type == 'global' then
-                for _, set in ipairs(src:getSets()) do
-                    pushResult(set)
-                end
-                return
-            end
-            if guide.isSet(src)
-            or guide.isLiteral(src) then
-                results[#results+1] = src
-            end
+            results[#results+1] = src
         end
     end
 

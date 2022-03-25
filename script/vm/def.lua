@@ -202,7 +202,7 @@ local function searchByNode(source, pushResult)
         return
     end
     for n in nodeMgr.eachNode(node) do
-        if n.type == 'global' and n.cate == 'type' then
+        if n.type == 'global' then
             for _, set in ipairs(n:getSets()) do
                 pushResult(set)
             end
@@ -228,12 +228,6 @@ function vm.getDefs(source)
         end
         if not mark[src] then
             mark[src] = true
-            if src.type == 'global' then
-                for _, set in ipairs(src:getSets()) do
-                    pushResult(set)
-                end
-                return
-            end
             if guide.isSet(src)
             or guide.isLiteral(src) then
                 results[#results+1] = src

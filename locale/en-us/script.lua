@@ -34,7 +34,7 @@ DIAG_PREFIELD_CALL      =
 'Will be interpreted as `{}{}`. It may be necessary to add a `,` or `;`.'
 DIAG_OVER_MAX_ARGS      =
 'The function takes only {:d} parameters, but you passed {:d}.'
-DIAG_OVER_MAX_ARGS      =
+DIAG_OVER_MAX_VALUES    =
 'Only has {} variables, but you set {} values.'
 DIAG_AMBIGUITY_1        =
 'Compute `{}` first. You may need to add brackets.'
@@ -457,6 +457,13 @@ WINDOW_LUA_STATUS_CACHED_FILES   =
 'Cached files: {ast}/{max}'
 WINDOW_LUA_STATUS_MEMORY_COUNT   =
 'Memory usage: {mem:.f}M'
+WINDOW_LUA_STATUS_TIP            =
+[[
+
+This icon is a cat,
+Not a dog nor a fox!
+             ↓↓↓
+]]
 WINDOW_APPLY_SETTING             =
 'Apply setting'
 WINDOW_CHECK_SEMANTIC            =

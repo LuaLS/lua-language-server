@@ -456,6 +456,13 @@ WINDOW_LUA_STATUS_CACHED_FILES   =
 '已缓存文件：{ast}/{max}'
 WINDOW_LUA_STATUS_MEMORY_COUNT   =
 '内存占用：{mem:.f}M'
+WINDOW_LUA_STATUS_TIP            =
+[[
+
+这个图标是猫，
+不是狗也不是狐狸！
+             ↓↓↓
+]]
 WINDOW_APPLY_SETTING             =
 '应用设置'
 WINDOW_CHECK_SEMANTIC            =

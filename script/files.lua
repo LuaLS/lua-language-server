@@ -36,13 +36,10 @@ end
 m.reset()
 
 local fixedUri = {}
---- 获取文件的真实uri(真实大小写)
+--- 获取文件的真实uri
 ---@param uri uri
 ---@return uri
 function m.getRealUri(uri)
-    if platform.OS ~= 'Windows' then
-        return uri
-    end
     local filename = furi.decode(uri)
     local path = fs.path(filename)
     local suc, res = pcall(fs.exists, path)
@@ -69,7 +66,6 @@ function m.open(uri)
         cache = {},
     }
     m.onWatch('open', uri)
-    m.addRef(uri)
 end
 
 --- 关闭文件
@@ -81,7 +77,11 @@ function m.close(uri)
         file.trusted = false
     end
     m.onWatch('close', uri)
-    m.delRef(uri)
+    if file then
+        if (file._ref or 0) <= 0 and not m.isOpen(uri) then
+            m.remove(uri)
+        end
+    end
 end
 
 --- 是否打开
@@ -380,7 +380,7 @@ function m.delRef(uri)
     end
     file._ref = (file._ref or 0) - 1
     log.debug('del ref', uri)
-    if file._ref <= 0 then
+    if file._ref <= 0 and not m.isOpen(uri) then
         m.remove(uri)
     end
 end
@@ -661,13 +661,10 @@ end
 ---@param uri uri
 ---@return boolean
 function m.isLua(uri)
-    local ext = uri:match '%.([^%.%/%\\]+)$'
-    if not ext then
-        return false
-    end
-    if ext == 'lua' then
+    if util.stringEndWith(uri:lower(), '.lua') then
         return true
     end
+    -- check customed assoc, e.g. `*.lua.txt = *.lua`
     local matcher = m.getAssoc(uri)
     local path = furi.decode(uri)
     return matcher(path)

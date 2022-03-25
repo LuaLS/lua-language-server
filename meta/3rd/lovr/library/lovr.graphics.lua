@@ -1450,6 +1450,10 @@ function Canvas:isStereo() end
 ---
 ---Returns a new Image containing the contents of a Texture attached to the Canvas.
 ---
+---
+---### NOTE:
+---The Image will have the same pixel format as the Texture that is read from.
+---
 ---@param index? number # The index of the Texture to read from.
 ---@return lovr.Image image # The new Image.
 function Canvas:newImage(index) end

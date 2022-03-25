@@ -241,8 +241,9 @@ function m.awaitLoadFile(uri)
     log.info('Scan files at:', uri)
     ---@async
     native:scan(furi.decode(uri), function (path)
-        scp:get('cachedUris')[furi.encode(path)] = true
-        ld:loadFile(furi.encode(path))
+        local uri = files.getRealUri(furi.encode(path))
+        scp:get('cachedUris')[uri] = true
+        ld:loadFile(uri)
     end)
     ld:loadAll()
 end
@@ -282,8 +283,9 @@ function m.awaitPreload(scp)
         log.info('Scan files at:', scp:getName())
         ---@async
         native:scan(furi.decode(scp.uri), function (path)
-            scp:get('cachedUris')[furi.encode(path)] = true
-            ld:loadFile(furi.encode(path))
+            local uri = files.getRealUri(furi.encode(path))
+            scp:get('cachedUris')[uri] = true
+            ld:loadFile(uri)
         end)
     end
 
@@ -292,8 +294,9 @@ function m.awaitPreload(scp)
         scp:addLink(libMatcher.uri)
         ---@async
         libMatcher.matcher:scan(furi.decode(libMatcher.uri), function (path)
-            scp:get('cachedUris')[furi.encode(path)] = true
-            ld:loadFile(furi.encode(path), libMatcher.uri)
+            local uri = files.getRealUri(furi.encode(path))
+            scp:get('cachedUris')[uri] = true
+            ld:loadFile(uri, libMatcher.uri)
         end)
         scp:gc(fw.watch(furi.decode(libMatcher.uri)))
     end

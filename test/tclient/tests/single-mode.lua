@@ -9,7 +9,7 @@ lclient():start(function (client)
 
     client:notify('textDocument/didOpen', {
         textDocument = {
-            uri = 'test://single-file.lua',
+            uri = 'file://single-file.lua',
             languageId = 'lua',
             version = 0,
             text = [[
@@ -22,13 +22,13 @@ print(x)
     ws.awaitReady()
 
     local locations = client:awaitRequest('textDocument/definition', {
-        textDocument = { uri = 'test://single-file.lua' },
+        textDocument = { uri = 'file://single-file.lua' },
         position = { line = 1, character = 7 },
     })
 
     assert(util.equal(locations, {
         {
-            uri = 'test://single-file.lua',
+            uri = 'file://single-file.lua',
             range = {
                 start   = { line = 0, character = 6 },
                 ['end'] = { line = 0, character = 7 },
@@ -37,7 +37,7 @@ print(x)
     }))
 
     local locations = client:awaitRequest('textDocument/definition', {
-        textDocument = { uri = 'test://single-file.lua' },
+        textDocument = { uri = 'file://single-file.lua' },
         position = { line = 1, character = 0 },
     })
 

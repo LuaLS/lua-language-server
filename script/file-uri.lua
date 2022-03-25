@@ -94,4 +94,8 @@ function m.decode(uri)
     return value
 end
 
+function m.split(uri)
+    return uri:match('([^:]*):?/?/?([^/]*)(.*)')
+end
+
 return m

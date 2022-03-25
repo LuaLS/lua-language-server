@@ -13,6 +13,7 @@ local converter = require 'proto.converter'
 local loading   = require 'workspace.loading'
 local scope     = require 'workspace.scope'
 local time      = require 'bee.time'
+local ltable    = require 'linked-table'
 
 ---@class diagnosticProvider
 local m = {}
@@ -225,7 +226,7 @@ function m.doDiagnostic(uri, isScopeDiag)
     local prog <close> = progress.create(scp, lang.script.WINDOW_DIAGNOSING, 0.5)
     prog:setMessage(ws.getRelativePath(uri))
 
-    log.debug('Diagnostic file:', uri)
+    --log.debug('Diagnostic file:', uri)
 
     local syntax = m.syntaxErrors(uri, state)
 
@@ -235,7 +236,7 @@ function m.doDiagnostic(uri, isScopeDiag)
         tracy.ZoneBeginN 'mergeSyntaxAndDiags'
         local _ <close> = tracy.ZoneEnd
         local full = mergeDiags(syntax, lastDiag, diags)
-        log.debug(('Pushed [%d] results'):format(full and #full or 0))
+        --log.debug(('Pushed [%d] results'):format(full and #full or 0))
         if not full then
             m.clear(uri)
             return
@@ -360,28 +361,38 @@ local function askForDisable(uri)
 end
 
 ---@async
-function m.awaitDiagnosticsScope(uri)
-    local scp = scope.getScope(uri)
+function m.awaitDiagnosticsScope(suri)
+    local scp = scope.getScope(suri)
     while loading.count() > 0 do
         await.sleep(1.0)
     end
     local clock = os.clock()
-    local bar <close> = progress.create(scope.getScope(uri), lang.script.WORKSPACE_DIAGNOSTIC, 1)
+    local bar <close> = progress.create(scope.getScope(suri), lang.script.WORKSPACE_DIAGNOSTIC, 1)
     local cancelled
     bar:onCancel(function ()
         log.debug('Cancel workspace diagnostics')
         cancelled = true
         ---@async
         await.call(function ()
-            askForDisable(uri)
+            askForDisable(suri)
         end)
     end)
-    local uris = files.getAllUris(uri)
+    local uris = files.getAllUris(suri)
+    local sortedUris = ltable()
+    for _, uri in ipairs(uris) do
+        if files.isOpen(uri) then
+            sortedUris:pushHead(uri)
+        else
+            sortedUris:pushTail(uri)
+        end
+    end
     log.info(('Diagnostics scope [%s], files count:[%d]'):format(scp:getName(), #uris))
-    for i, uri in ipairs(uris) do
+    local i = 0
+    for uri in sortedUris:pairs() do
         while loading.count() > 0 do
             await.sleep(1.0)
         end
+        i = i + 1
         bar:setMessage(('%d/%d'):format(i, #uris))
         bar:setPercentage(i / #uris * 100)
         xpcall(m.doDiagnostic, log.error, uri, true)

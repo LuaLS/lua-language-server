@@ -225,8 +225,13 @@ m.register 'workspace/didRenameFiles' {
 m.register 'textDocument/didOpen' {
     ---@async
     function (params)
-        local doc   = params.textDocument
-        local uri   = files.getRealUri(doc.uri)
+        local doc    = params.textDocument
+        local scheme = furi.split(doc.uri)
+        if scheme ~= 'file' then
+            return
+        end
+        local uri    = files.getRealUri(doc.uri)
+        log.debug('didOpen', uri)
         workspace.awaitReady(uri)
         local text  = doc.text
         files.setText(uri, text, true, function (file)
@@ -612,6 +617,9 @@ m.register 'textDocument/completion' {
                 end
             end
             items[i] = item
+        end
+        if result.incomplete == nil then
+            result.incomplete = false
         end
         return {
             isIncomplete = result.incomplete,

@@ -45,7 +45,7 @@ print(x)
 
     client:notify('textDocument/didOpen', {
         textDocument = {
-            uri = 'test://single-file.lua',
+            uri = 'file://single-file.lua',
             languageId = 'lua',
             version = 0,
             text = [[
@@ -58,7 +58,7 @@ print(x)
     ws.awaitReady(nil)
 
     local locations = client:awaitRequest('textDocument/definition', {
-        textDocument = { uri = 'test://single-file.lua' },
+        textDocument = { uri = 'file://single-file.lua' },
         position = { line = 1, character = 0 },
     })
 

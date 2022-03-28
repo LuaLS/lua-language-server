@@ -6,6 +6,7 @@ local guide     = require 'parser.guide'
 local localID   = require 'vm.local-id'
 local globalMgr = require 'vm.global-manager'
 local nodeMgr   = require 'vm.node'
+local files     = require 'files'
 
 local simpleMap
 
@@ -13,6 +14,7 @@ local function searchGetLocal(source, node, pushResult)
     local key = guide.getKeyName(source)
     for _, ref in ipairs(node.node.ref) do
         if  ref.type == 'getlocal'
+        and not guide.isSet(ref.next)
         and guide.getKeyName(ref.next) == key then
             pushResult(ref.next)
         end
@@ -46,7 +48,9 @@ simpleMap = util.switch()
     : case 'field'
     : call(function (source, pushResult)
         local parent = source.parent
-        simpleMap[parent.type](parent, pushResult)
+        if parent.type ~= 'tablefield' then
+            simpleMap[parent.type](parent, pushResult)
+        end
     end)
     : case 'setfield'
     : case 'getfield'
@@ -83,55 +87,56 @@ simpleMap = util.switch()
     end)
     : getMap()
 
-local searchFieldMap = util.switch()
-    : case 'table'
-    : call(function (node, key, pushResult)
-        for _, field in ipairs(node) do
-            if field.type == 'tablefield'
-            or field.type == 'tableindex' then
-                if guide.getKeyName(field) == key then
-                    pushResult(field)
-                end
-            end
-        end
-    end)
-    : case 'global'
-    ---@param node vm.node
-    ---@param key string
-    : call(function (node, key, pushResult)
-        if node.cate == 'variable' then
-            local newGlobal = globalMgr.getGlobal('variable', node.name, key)
-            if newGlobal then
-                for _, set in ipairs(newGlobal:getSets()) do
-                    pushResult(set)
-                end
-            end
-        end
-        if node.cate == 'type' then
-            compiler.getClassFields(node, key, pushResult)
-        end
-    end)
-    : case 'local'
-    : call(function (node, key, pushResult)
-        local sources = localID.getSources(node, key)
-        if sources then
-            for _, src in ipairs(sources) do
+local function searchField(source, pushResult)
+    local key = guide.getKeyName(source)
+
+    ---@param src parser.object
+    local function checkDef(src)
+        for _, def in ipairs(vm.getDefs(src)) do
+            if def == source then
                 pushResult(src)
+                return
             end
         end
-    end)
-    : case 'doc.type.table'
-    : call(function (node, key, pushResult)
-        for _, field in ipairs(node.fields) do
-            local fieldKey = field.name
-            if fieldKey.type == 'doc.field.name' then
-                if fieldKey[1] == key then
-                    pushResult(field)
-                end
-            end
+    end
+
+    local pat   = '[:.]%s*' .. key
+
+    local function findWord(uri)
+        local text = files.getText(uri)
+        if not text then
+            return
         end
-    end)
-    : getMap()
+        if not text:match(pat) then
+            return
+        end
+        local state = files.getState(uri)
+        if not state then
+            return
+        end
+        guide.eachSourceType(state.ast, 'getfield', function (src)
+            if src.field[1] == key then
+                checkDef(src)
+            end
+        end)
+        guide.eachSourceType(state.ast, 'getmethod', function (src)
+            if src.method[1] == key then
+                checkDef(src)
+            end
+        end)
+        guide.eachSourceType(state.ast, 'getindex', function (src)
+            if src.index.type == 'string' and src.index[1] == key then
+                checkDef(src)
+            end
+        end)
+    end
+
+    for uri in files.eachFile(guide.getUri(source)) do
+        if not vm.isMetaFile(uri) then
+            findWord(uri)
+        end
+    end
+end
 
 local searchByParentNode
 local nodeMap = util.switch()
@@ -147,28 +152,22 @@ local nodeMap = util.switch()
     : case 'getindex'
     : case 'setindex'
     : call(function (source, pushResult)
+        local key = guide.getKeyName(source)
+        if type(key) ~= 'string' then
+            return
+        end
+
         local parentNode = compiler.compileNode(source.node)
         if not parentNode then
             return
         end
-        local key = guide.getKeyName(source)
-        for pn in nodeMgr.eachNode(parentNode) do
-            if searchFieldMap[pn.type] then
-                searchFieldMap[pn.type](pn, key, pushResult)
-            end
-        end
+
+        searchField(source, pushResult)
     end)
-    : case 'doc.see.field'
+    : case 'tablefield'
+    : case 'tableindex'
     : call(function (source, pushResult)
-        local parentNode = compiler.compileNode(source.parent.name)
-        if not parentNode then
-            return
-        end
-        for pn in nodeMgr.eachNode(parentNode) do
-            if searchFieldMap[pn.type] then
-                searchFieldMap[pn.type](pn, source[1], pushResult)
-            end
-        end
+        searchField(source, pushResult)
     end)
     : getMap()
 
@@ -189,7 +188,9 @@ local function searchByLocalID(source, pushResult)
         return
     end
     for _, src in ipairs(idSources) do
-        pushResult(src)
+        if not guide.isSet(src) then
+            pushResult(src)
+        end
     end
 end
 
@@ -209,9 +210,6 @@ local function searchByNode(source, pushResult)
     end
     for n in nodeMgr.eachNode(node) do
         if n.type == 'global' then
-            for _, set in ipairs(n:getSets()) do
-                pushResult(set)
-            end
             for _, get in ipairs(n:getGets()) do
                 pushResult(get)
             end

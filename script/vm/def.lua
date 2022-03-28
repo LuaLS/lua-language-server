@@ -46,7 +46,9 @@ simpleMap = util.switch()
     : case 'field'
     : call(function (source, pushResult)
         local parent = source.parent
-        simpleMap[parent.type](parent, pushResult)
+        if parent.type ~= 'tablefield' then
+            simpleMap[parent.type](parent, pushResult)
+        end
     end)
     : case 'setfield'
     : case 'getfield'

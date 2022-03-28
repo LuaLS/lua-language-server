@@ -1,35 +1,35 @@
 local config = require "config"
 TEST [[
-local <?a?> = 1
+local <!<?a?>!> = 1
 <!a!> = <!a!>
 ]]
 
 TEST [[
 <?a?> = 1
-<!a!> = <!a!>
+a = <!a!>
 ]]
 
 TEST [[
 local t
 t.<?a?> = 1
-t.<!a!> = t.<!a!>
+t.a = t.<!a!>
 ]]
 
 TEST [[
 t.<?a?> = 1
-t.<!a!> = t.<!a!>
+t.a = t.<!a!>
 ]]
 
 TEST [[
 :: <!LABEL!> ::
-goto <?LABEL?>
+goto <!<?LABEL?>!>
 if true then
     goto <!LABEL!>
 end
 ]]
 
 TEST [[
-:: <?LABEL?> ::
+:: <!<?LABEL?>!> ::
 goto <!LABEL!>
 if true then
     goto <!LABEL!>
@@ -38,25 +38,13 @@ end
 
 TEST [[
 local a = 1
-local <?a?> = 1
+local <!<?a?>!> = 1
 <!a!> = <!a!>
 ]]
 
 TEST [[
-local <!a!>
-local <?b?> = <!a!>
-]]
-
-TEST [[
-local <?a?>
-local <!b!> = <!a!>
-]]
-
-TEST [[
-local t = {
-    <!a!> = 1
-}
-print(t.<?a?>)
+local <!<?a?>!>
+local b = <!a!>
 ]]
 
 TEST [[

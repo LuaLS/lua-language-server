@@ -817,9 +817,9 @@ global _G: _G {
     loadstring: function,
     math: mathlib,
     module: function,
+    newproxy: function,
     next: function,
-    os: oslib,
-    ...(+21)
+    ...(+22)
 }
 ]]
 

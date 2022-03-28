@@ -127,7 +127,7 @@ function loadfile(filename, mode, env) end
 function loadstring(text, chunkname) end
 
 ---@version 5.1
----@param proxy   boolean | table
+---@param proxy boolean|table
 ---@return userdata
 ---@nodiscard
 function newproxy(proxy) end

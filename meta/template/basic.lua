@@ -128,7 +128,7 @@ function loadstring(text, chunkname) end
 
 ---@version 5.1
 ---@param flag_or_proxy   boolean | table
----@return table
+---@return userdata
 ---@nodiscard
 function newproxy(flag_or_proxy) end
 

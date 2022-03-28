@@ -127,6 +127,12 @@ function loadfile(filename, mode, env) end
 function loadstring(text, chunkname) end
 
 ---@version 5.1
+---@param flag_or_proxy   boolean | table
+---@return table
+---@nodiscard
+function newproxy(flag_or_proxy) end
+
+---@version 5.1
 ---#DES 'module'
 ---@param name string
 function module(name, ...) end

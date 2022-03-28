@@ -747,6 +747,10 @@ local compilerMap = util.switch()
             end
         end
     end)
+    : case 'doc.class.name'
+    : call(function (source)
+        nodeMgr.setNode(source, m.compileNode(source.parent))
+    end)
     : case 'doc.field'
     : call(function (source)
         nodeMgr.setNode(source, m.compileNode(source.extends))

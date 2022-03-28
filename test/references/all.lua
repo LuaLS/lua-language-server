@@ -28,7 +28,7 @@ return a.x, b.<!x!>
 TEST [[
 local <?mt?> = {}
 function <!mt!>:x()
-    <!self!>:x()
+    self:x()
 end
 ]]
 

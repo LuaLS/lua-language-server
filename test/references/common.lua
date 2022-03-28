@@ -131,54 +131,10 @@ a.<!b!>.c = 1
 print(a.<!<?b?>!>.c)
 ]]
 
-config.set(nil, 'Lua.IntelliSense.traceBeSetted', true)
-TEST [[
-local <?f?>
-local t = {
-    <!a!> = <!f!>
-}
-print(t.<!a!>)
-]]
-config.set(nil, 'Lua.IntelliSense.traceBeSetted', false)
-
-TEST [[
-local <!f!>
-local <!t!> = <?f?>
-]]
-
-config.set(nil, 'Lua.IntelliSense.traceBeSetted', true)
-TEST [[
-local <!f!>
-a.<!t!> = <?f?>
-]]
-
-TEST [[
-<!t!>.<!f!> = <?t?>
-]]
-config.set(nil, 'Lua.IntelliSense.traceBeSetted', false)
-
-TEST [[
-local <!f!>
-local <?t?> = <!f!>
-]]
-
-config.set(nil, 'Lua.IntelliSense.traceBeSetted', true)
-TEST [[
-local <!t!>
-<!t!>.<!f!> = <?t?>
-]]
-config.set(nil, 'Lua.IntelliSense.traceBeSetted', false)
-
 TEST [[
 _G.<?xxx?> = 1
 
 print(<!xxx!>)
-]]
-
-TEST [[
----@class <!Class!>
----@type <?Class?>
----@type <!Class!>
 ]]
 
 TEST [[
@@ -191,19 +147,19 @@ TEST [[
 ---@class Class
 local <?t?>
 ---@type Class
-local <!x!>
+local x
 ]]
 
 TEST [[
 ---@class Class
-local <!t!>
+local t
 ---@type Class
 local <?x?>
 ]]
 
 -- BUG
 TEST [[
----@return <?xxx?>
+---@return <!<?xxx?>!>
 function f() end
 ]]
 
@@ -215,16 +171,16 @@ TEST [[
 local <?t?>
 ]]
 
-TEST [[
----@class A
-local a
-
----@type A
-local b
-
----@type A
-local c
-
-b.<?x?> = 1
-c.<!x!> = 1
-]]
+--TEST [[
+-----@class A
+--local a
+--
+-----@type A
+--local b
+--
+-----@type A
+--local c
+--
+--b.<?x?> = 1
+--c.<!x!> = 1
+--]]

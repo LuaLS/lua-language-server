@@ -34,9 +34,9 @@ function TEST(script)
                 positions[i] = { result.target.start, result.target.finish }
             end
         end
-        assert(founded(catched['!'] or {}, positions))
+        assert(founded(catched['!'], positions))
     else
-        assert(catched['!'] == nil)
+        assert(#catched['!'] == 0)
     end
 
     files.remove('')

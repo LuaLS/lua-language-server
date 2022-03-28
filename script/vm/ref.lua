@@ -24,19 +24,12 @@ end
 simpleMap = util.switch()
     : case 'local'
     : call(function (source, pushResult)
-        pushResult(source)
         if source.ref then
             for _, ref in ipairs(source.ref) do
                 if ref.type == 'setlocal'
                 or ref.type == 'getlocal' then
                     pushResult(ref)
                 end
-            end
-        end
-
-        if source.dummy then
-            for _, res in ipairs(vm.getDefs(source.method.node)) do
-                pushResult(res)
             end
         end
     end)
@@ -213,8 +206,6 @@ local function searchByNode(source, pushResult)
             for _, get in ipairs(n:getGets()) do
                 pushResult(get)
             end
-        else
-            pushResult(n)
         end
     end
 end

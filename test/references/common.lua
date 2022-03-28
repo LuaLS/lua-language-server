@@ -1,6 +1,6 @@
 local config = require "config"
 TEST [[
-local <!<?a?>!> = 1
+local <?a?> = 1
 <!a!> = <!a!>
 ]]
 
@@ -38,12 +38,12 @@ end
 
 TEST [[
 local a = 1
-local <!<?a?>!> = 1
+local <?a?> = 1
 <!a!> = <!a!>
 ]]
 
 TEST [[
-local <!<?a?>!>
+local <?a?>
 local b = <!a!>
 ]]
 
@@ -81,21 +81,8 @@ t[a.b.c] = 1
 TEST [[
 local t = {}
 t.x = 1
-t[a.b.<?x?>] = 1
+t[a.b.<!<?x?>!>] = 1
 ]]
-
-config.set(nil, 'Lua.IntelliSense.traceBeSetted', true)
-TEST [[
-local t
-local <!f!> = t.<?f?>
-
-<!f!>()
-
-return {
-    <!f!> = <!f!>,
-}
-]]
-config.set(nil, 'Lua.IntelliSense.traceBeSetted', false)
 
 TEST [[
 self = {
@@ -112,22 +99,36 @@ print(a.b.<!c!>)
 ]]
 
 TEST [[
-local <!mt!> = {}
+local mt = {}
+function mt:x()
+    <!<?self?>!>:x()
+end
+]]
+
+TEST [[
+local <?mt?> = {}
 function <!mt!>:x()
-    <?self?>:x()
+    self:x()
 end
 ]]
 
 TEST [[
 local mt = {}
-function mt:<!x!>()
-    self:<?x?>()
+function mt:x()
+    self:<!<?x?>!>()
+end
+]]
+
+TEST [[
+local mt = {}
+function mt:<?x?>()
+    self:<!x!>()
 end
 ]]
 
 TEST [[
 a.<!b!>.c = 1
-print(a.<?b?>.c)
+print(a.<!<?b?>!>.c)
 ]]
 
 config.set(nil, 'Lua.IntelliSense.traceBeSetted', true)

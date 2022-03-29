@@ -1,7 +1,5 @@
-local sp           = require 'bee.subprocess'
 local define       = require 'proto.define'
 local files        = require 'files'
-local searcher     = require 'core.searcher'
 local matchKey     = require 'core.matchkey'
 local vm           = require 'vm'
 local getName      = require 'core.hover.name'
@@ -18,7 +16,7 @@ local rpath        = require 'workspace.require-path'
 local lang         = require 'language'
 local lookBackward = require 'core.look-backward'
 local guide        = require 'parser.guide'
-local infer        = require 'core.infer'
+local infer        = require 'vm.infer'
 local await        = require 'await'
 local postfix      = require 'core.completion.postfix'
 
@@ -169,8 +167,8 @@ local function buildDetail(source)
     if source.type == 'dummy' then
         return
     end
-    local types = infer.searchAndViewInfers(source)
-    local literals = infer.searchAndViewLiterals(source)
+    local types = infer.viewType(source)
+    local literals = infer.viewLiterals(source)
     if literals then
         return types .. ' = ' .. literals
     else
@@ -1821,14 +1819,14 @@ local function buildluaDocOfFunction(func)
     local returns = {}
     if func.args then
         for _, arg in ipairs(func.args) do
-            args[#args+1] = infer.searchAndViewInfers(arg)
+            args[#args+1] = infer.viewType(arg)
         end
     end
     if func.returns then
         for _, rtns in ipairs(func.returns) do
             for n = 1, #rtns do
                 if not returns[n] then
-                    returns[n] = infer.searchAndViewInfers(rtns[n])
+                    returns[n] = infer.viewType(rtns[n])
                 end
             end
         end

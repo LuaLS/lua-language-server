@@ -13,6 +13,7 @@ local function searchGetLocal(source, node, pushResult)
     local key = guide.getKeyName(source)
     for _, ref in ipairs(node.node.ref) do
         if  ref.type == 'getlocal'
+        and ref.next
         and guide.isSet(ref.next)
         and guide.getKeyName(ref.next) == key then
             pushResult(ref.next)

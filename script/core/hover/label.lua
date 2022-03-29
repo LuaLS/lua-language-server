@@ -2,7 +2,7 @@ local buildName   = require 'core.hover.name'
 local buildArg    = require 'core.hover.arg'
 local buildReturn = require 'core.hover.return'
 local buildTable  = require 'core.hover.table'
-local infer       = require 'core.infer'
+local infer       = require 'vm.infer'
 local vm          = require 'vm'
 local util        = require 'utility'
 local lang        = require 'language'
@@ -35,7 +35,7 @@ local function asDocTypeName(source)
         end
         if doc.type == 'doc.alias.name' then
             local extends = doc.parent.extends
-            return lang.script('HOVER_EXTENDS', infer.searchAndViewInfers(extends))
+            return lang.script('HOVER_EXTENDS', infer.viewType(extends))
         end
     end
 end
@@ -43,8 +43,8 @@ end
 ---@async
 local function asValue(source, title)
     local name    = buildName(source, false) or ''
-    local type    = infer.searchAndViewInfers(source)
-    local literal = infer.searchAndViewLiterals(source)
+    local type    = infer.viewType(source)
+    local literal = infer.viewLiterals(source)
     local cont
     if  not infer.hasType(source, 'string')
     and not type:find('%[%]$') then
@@ -131,7 +131,7 @@ local function asDocFieldName(source)
             break
         end
     end
-    local view = infer.searchAndViewInfers(docField.extends)
+    local view = infer.viewType(docField.extends)
     if not class then
         return ('field ?.%s: %s'):format(name, view)
     end

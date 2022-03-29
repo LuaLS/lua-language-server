@@ -1,6 +1,5 @@
 local guide = require 'parser.guide'
-local infer = require 'core.infer'
-local vm    = require 'vm'
+local infer = require 'vm.infer'
 
 local function optionalArg(arg)
     if not arg.bindDocs then
@@ -22,7 +21,7 @@ local function asFunction(source, oop)
         methodDef = true
     end
     if methodDef then
-        args[#args+1] = ('self: %s'):format(infer.searchAndViewInfers(parent.node))
+        args[#args+1] = ('self: %s'):format(infer.viewType(parent.node))
     end
     if source.args then
         for i = 1, #source.args do
@@ -35,15 +34,15 @@ local function asFunction(source, oop)
                 args[#args+1] = ('%s%s: %s'):format(
                     name,
                     optionalArg(arg) and '?' or '',
-                    infer.searchAndViewInfers(arg)
+                    infer.viewType(arg)
                 )
             elseif arg.type == '...' then
                 args[#args+1] = ('%s: %s'):format(
                     '...',
-                    infer.searchAndViewInfers(arg)
+                    infer.viewType(arg)
                 )
             else
-                args[#args+1] = ('%s'):format(infer.searchAndViewInfers(arg))
+                args[#args+1] = ('%s'):format(infer.viewType(arg))
             end
             ::CONTINUE::
         end
@@ -66,7 +65,7 @@ local function asDocFunction(source, oop)
         args[i] = ('%s%s: %s'):format(
             name,
             arg.optional and '?' or '',
-            arg.extends and infer.searchAndViewInfers(arg.extends) or 'any'
+            arg.extends and infer.viewType(arg.extends) or 'any'
         )
     end
     if oop then

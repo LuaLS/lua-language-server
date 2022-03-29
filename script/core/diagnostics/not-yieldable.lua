@@ -3,7 +3,7 @@ local await = require 'await'
 local guide = require 'parser.guide'
 local vm    = require 'vm'
 local lang  = require 'language'
-local infer = require 'core.infer'
+local infer = require 'vm.infer'
 
 local function isYieldAble(defs, i)
     local hasFuncDef

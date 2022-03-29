@@ -1,4 +1,3 @@
-local searcher   = require 'core.searcher'
 local files      = require 'files'
 local vm         = require 'vm'
 local define     = require 'proto.define'

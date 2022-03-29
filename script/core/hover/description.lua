@@ -1,6 +1,5 @@
 local vm       = require 'vm'
 local ws       = require 'workspace'
-local searcher = require 'core.searcher'
 local markdown = require 'provider.markdown'
 local config   = require 'config'
 local lang     = require 'language'

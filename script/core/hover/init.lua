@@ -5,7 +5,7 @@ local getDesc    = require 'core.hover.description'
 local util       = require 'utility'
 local findSource = require 'core.find-source'
 local markdown   = require 'provider.markdown'
-local infer      = require 'core.infer'
+local infer      = require 'vm.infer'
 local guide      = require 'parser.guide'
 
 ---@async
@@ -40,7 +40,7 @@ local function getHover(source)
     end
 
     local oop
-    if infer.searchAndViewInfers(source) == 'function' then
+    if infer.viewType(source) == 'function' then
         local hasFunc
         for _, def in ipairs(vm.getDefs(source)) do
             if guide.isOOP(def) then

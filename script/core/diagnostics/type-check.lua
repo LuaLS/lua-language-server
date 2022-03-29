@@ -1,7 +1,7 @@
 local files  = require 'files'
 local guide  = require 'parser.guide'
 local vm     = require 'vm'
-local infer  = require 'core.infer'
+local infer  = require 'vm.infer'
 local await  = require 'await'
 local hasVarargs, errType
 

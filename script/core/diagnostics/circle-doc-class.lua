@@ -1,5 +1,4 @@
 local files    = require 'files'
-local searcher = require 'core.searcher'
 local lang     = require 'language'
 local vm       = require 'vm'
 local guide    = require 'parser.guide'

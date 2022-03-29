@@ -1,7 +1,5 @@
-local searcher = require 'core.searcher'
-local infer    = require 'core.infer'
+local infer    = require 'vm.infer'
 local guide    = require 'parser.guide'
-local vm       = require 'vm'
 
 local buildName
 
@@ -21,7 +19,7 @@ end
 local function asField(source, oop)
     local class
     if source.node.type ~= 'getglobal' then
-        class = infer.getClass(source.node)
+        class = infer.viewClass(source.node)
     end
     local node = class
         or buildName(source.node, false)

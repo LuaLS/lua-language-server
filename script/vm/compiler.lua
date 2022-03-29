@@ -200,7 +200,7 @@ local function getObjectSign(source)
     return source._sign
 end
 
-local function getReturnOfFunction(func, index)
+function m.getReturnOfFunction(func, index)
     if func.type == 'function' then
         if not func._returns then
             func._returns = {}
@@ -276,7 +276,7 @@ local function getReturn(func, index, args)
             if cnode.type == 'function'
             or cnode.type == 'doc.type.function' then
                 hasCalled = true
-                local returnNode = getReturnOfFunction(cnode, index)
+                local returnNode = m.getReturnOfFunction(cnode, index)
                 if returnNode and returnNode.type == 'generic' then
                     returnNode = returnNode:resolve(args)
                 end

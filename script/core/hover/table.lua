@@ -1,7 +1,7 @@
 local vm       = require 'vm'
 local util     = require 'utility'
 local config   = require 'config'
-local infer    = require 'core.infer'
+local infer    = require 'vm.infer'
 local await    = require 'await'
 local guide    = require 'parser.guide'
 
@@ -177,8 +177,8 @@ return function (source)
         await.delay()
         local key = keys[i]
 
-        inferMap[key]   = infer.searchAndViewInfers(source, key)
-        literalMap[key] = infer.searchAndViewLiterals(source, key)
+        inferMap[key]   = infer.viewType(source, key)
+        literalMap[key] = infer.viewLiterals(source, key)
         if not tonumber(literalMap[key]) then
             isConsts = false
         end

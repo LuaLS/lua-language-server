@@ -1,5 +1,4 @@
 local files      = require 'files'
-local searcher   = require 'core.searcher'
 local vm         = require 'vm'
 local hoverLabel = require 'core.hover.label'
 local hoverDesc  = require 'core.hover.description'

@@ -1,12 +1,11 @@
 local files          = require 'files'
-local searcher       = require 'core.searcher'
 local await          = require 'await'
 local define         = require 'proto.define'
 local vm             = require 'vm'
 local util           = require 'utility'
 local guide          = require 'parser.guide'
 local converter      = require 'proto.converter'
-local infer          = require 'core.infer'
+local infer          = require 'vm.infer'
 local config         = require 'config'
 local linkedTable    = require 'linked-table'
 

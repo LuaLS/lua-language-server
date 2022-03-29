@@ -1,7 +1,8 @@
-local util      = require 'utility'
-local nodeMgr   = require 'vm.node'
-local config    = require 'config'
-local guide     = require 'parser.guide'
+local util     = require 'utility'
+local nodeMgr  = require 'vm.node'
+local config   = require 'config'
+local guide    = require 'parser.guide'
+local compiler = require 'vm.compiler'
 
 ---@class vm.infer-manager
 local m = {}
@@ -144,9 +145,9 @@ end
 
 ---@param source parser.object
 ---@return table<string, boolean>
+---@return table<string, boolean>
 function m.getViews(source)
-    local compiler = require 'vm.compiler'
-    local node     = compiler.compileNode(source)
+    local node = compiler.compileNode(source)
     if not node then
         return {}
     end
@@ -177,7 +178,20 @@ function m.getViews(source)
     if options['hasClass'] then
         eraseAlias(node, views, options)
     end
-    return views
+    return views, options
+end
+
+---@param source parser.object
+---@param tp string
+---@return boolean
+function m.hasType(source, tp)
+    local views = m.getViews(source)
+
+    if views[source] then
+        return true
+    end
+
+    return false
 end
 
 ---@param source parser.object
@@ -223,6 +237,47 @@ function m.viewType(source)
         return view
     end
 
+end
+
+---@param source parser.object
+---@return string?
+function m.viewLiterals(source)
+    local node = compiler.compileNode(source)
+    if not node then
+        return nil
+    end
+    local literals = {}
+    for n in nodeMgr.eachNode(node) do
+        if n.type == 'string'
+        or n.type == 'number' then
+            literals[#literals+1] = util.viewLiteral(n)
+        end
+    end
+    if #literals == 0 then
+        return nil
+    end
+    table.sort(literals)
+    return table.concat(literals, '|')
+end
+
+---@param source parser.object
+---@return string?
+function m.viewClass(source)
+    local node = compiler.compileNode(source)
+    if not node then
+        return nil
+    end
+    local class = {}
+    for n in nodeMgr.eachNode(node) do
+        if n.type == 'global' and n.cate == 'type' then
+            class[#class+1] = n.name
+        end
+    end
+    if #class == 0 then
+        return nil
+    end
+    table.sort(class)
+    return table.concat(class, '|')
 end
 
 return m

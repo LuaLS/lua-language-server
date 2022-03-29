@@ -627,19 +627,6 @@ local function parseResume(parent)
         result.additional = additional
     end
 
-    local tp = peekToken()
-    if tp ~= 'string' then
-        pushWarning {
-            type   = 'LUADOC_MISS_STRING',
-            start  = getFinish(),
-            finish = getFinish(),
-        }
-        return nil
-    end
-    local _, str = nextToken()
-    result[1] = str
-    result.start = getStart()
-    result.finish = getFinish()
     return result
 end
 

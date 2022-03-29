@@ -311,7 +311,7 @@ end
 ]]
 [[
 function x()
-  -> any
+  -> unknown
 ]]
 
 TEST [[
@@ -367,19 +367,19 @@ local function f()
 end
 local <?n?> = f()
 ]]
-[[local n: any]]
+[[local n: unknown]]
 
 TEST [[
 local <?n?> = table.unpack(t)
 ]]
-[[local n: any]]
+[[local n: unknown]]
 
 TEST [[
 local <?n?>
 table.pack(n)
 ]]
 [[
-local n: any
+local n: unknown
 ]]
 
 TEST [[

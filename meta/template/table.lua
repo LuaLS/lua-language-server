@@ -56,9 +56,11 @@ function table.sort(list, comp) end
 
 ---@version >5.2, JIT
 ---#DES 'table.unpack'
----@param list table
+---@generic T
+---@param list T[]
 ---@param i?   integer
 ---@param j?   integer
+---@return T
 ---@nodiscard
 function table.unpack(list, i, j) end
 

@@ -274,8 +274,10 @@ function xpcall(f, msgh, arg1, ...) end
 
 ---@version 5.1
 ---#DES 'unpack'
----@param list table
+---@generic T
+---@param list T[]
 ---@param i?   integer
 ---@param j?   integer
+---@return T
 ---@nodiscard
 function unpack(list, i, j) end

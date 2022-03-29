@@ -149,7 +149,7 @@ obj.<?xxx?>()
 TEST [[
 obj.<?xxx?>()
 ]]
-[[global obj.xxx: any]]
+[[global obj.xxx: unknown]]
 
 TEST [[
 local <?x?> = 1

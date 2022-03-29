@@ -249,8 +249,9 @@ function m.viewLiterals(source)
     local literals = {}
     for n in nodeMgr.eachNode(node) do
         if n.type == 'string'
-        or n.type == 'number' then
-            literals[#literals+1] = util.viewLiteral(n)
+        or n.type == 'number'
+        or n.type == 'integer' then
+            literals[#literals+1] = util.viewLiteral(n[1])
         end
     end
     if #literals == 0 then

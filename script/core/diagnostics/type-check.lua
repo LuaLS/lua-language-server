@@ -17,7 +17,7 @@ local typeNameMap = {
     ['doc.class.name']   = true,
     ['doc.alias.name']   = true,
     ['doc.type.name']    = true,
-    ['doc.type.enum']    = true,
+    ['doc.type.string']    = true,
     ['doc.resume']       = true,
 
 }
@@ -165,7 +165,7 @@ local function getParamTypes(arg)
             for _, argDef in ipairs(argDefs) do
                 if argDef.type == 'doc.class.name'
                 or argDef.type == 'doc.type.name'
-                or argDef.type == 'doc.type.enum'
+                or argDef.type == 'doc.type.string'
                 or argDef.type == 'doc.type.ltable' then
                     types[#types+1] = argDef
                 end
@@ -184,7 +184,7 @@ local function getParamTypes(arg)
                             type = 'nil'
                         }
                     end
-                elseif argDef.type == 'doc.type.enum'
+                elseif argDef.type == 'doc.type.string'
                 or     argDef.type == 'doc.type.ltable' then
                     types[#types+1] = argDef
                     ---变长参数
@@ -316,7 +316,7 @@ local function getArgsInfo(uri, callArgs)
         --         }
         --     elseif def.type == 'doc.class.name'
         --     or def.type == 'doc.type.name'
-        --     or def.type == 'doc.type.enum'
+        --     or def.type == 'doc.type.string'
         --     or def.type == 'doc.type.ltable' then
         --         if def[1] then
         --             if not types.typeMap[def[1]] then

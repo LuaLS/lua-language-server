@@ -193,14 +193,14 @@ local function parseName(tp, parent)
         return nil
     end
     nextToken()
-    local class = {
+    local name = {
         type   = tp,
         start  = getStart(),
         finish = getFinish(),
         parent = parent,
         [1]    = nameText,
     }
-    return class
+    return name
 end
 
 local function nextSymbolOrError(symbol)
@@ -537,22 +537,67 @@ local function parseFunction(parent)
     end
 end
 
+local function parseString(parent)
+    local tp, content = peekToken()
+    if not tp or tp ~= 'string' then
+        return nil
+    end
+
+    nextToken()
+    -- compatibility
+    if content:sub(1, 1) == '"'
+    or content:sub(1, 1) == "'" then
+        if content:sub(1, 1) == content:sub(-1, -1) then
+            content = content:sub(2, -2)
+        end
+    end
+    local str = {
+        type   = 'doc.type.string',
+        start  = getStart(),
+        finish = getFinish(),
+        parent = parent,
+        [1]    = content,
+    }
+    return str
+end
+
+local function parseInteger(parent)
+    local tp, content = peekToken()
+    if not tp or tp ~= 'integer' then
+        return nil
+    end
+
+    nextToken()
+    local integer = {
+        type   = 'doc.type.integer',
+        start  = getStart(),
+        finish = getFinish(),
+        parent = parent,
+        [1]    = content,
+    }
+    return integer
+end
+
 function parseTypeUnit(parent)
     local result = parseFunction(parent)
                 or parseTable(parent)
+                or parseString(parent)
+                or parseInteger(parent)
+                or parseDots('doc.type.name', parent)
     if not result then
-        local _, token = nextToken()
-        result = {
-            type   = 'doc.type.name',
-            start  = getStart(),
-            finish = getFinish(),
-            parent = parent,
-            [1]    = token,
-        }
+        local literal = checkToken('symbol', '`', 1)
+        if literal then
+            nextToken()
+        end
+        result = parseName('doc.type.name', parent)
+        if not result then
+            return nil
+        end
+        if literal then
+            result.literal = true
+            nextSymbolOrError '`'
+        end
         result.signs = parseSigns(result, 'type')
-    end
-    if not result then
-        return nil
     end
     while true do
         local newResult = parseTypeUnitArray(parent, result)
@@ -565,19 +610,21 @@ function parseTypeUnit(parent)
 end
 
 local function parseResume(parent)
-    local result = {
-        type   = 'doc.resume',
-        parent = parent,
-    }
-
+    local default, additional
     if checkToken('symbol', '>', 1) then
         nextToken()
-        result.default = true
+        default = true
     end
 
     if checkToken('symbol', '+', 1) then
         nextToken()
-        result.additional = true
+        additional = true
+    end
+
+    local result = parseTypeUnit(parent)
+    if result then
+        result.default    = default
+        result.additional = additional
     end
 
     local tp = peekToken()
@@ -603,92 +650,16 @@ function parseType(parent)
         types   = {},
     }
     while true do
-        local tp, content = peekToken()
-        if not tp then
+        local typeUnit = parseTypeUnit(result)
+        if not typeUnit then
             break
         end
 
-        -- 处理 `T` 的情况
-        local typeLiteral = nil
-        if tp == 'symbol' and content == '`' then
-            nextToken()
-            if not checkToken('symbol', '`', 2) then
-                break
-            end
-            tp, content = peekToken()
-            if not tp then
-                break
-            end
-            -- TypeLiteral，指代类型的字面值。比如，对于类 Cat 来说，它的 TypeLiteral 是 "Cat"
-            typeLiteral = true
+        result.types[#result.types+1] = typeUnit
+        if not result.start then
+            result.start = typeUnit.start
         end
 
-        if tp == 'name' then
-            local typeUnit = parseTypeUnit(result)
-            if not typeUnit then
-                break
-            end
-            if typeLiteral then
-                nextToken()
-                typeUnit.literal = true
-            end
-            result.types[#result.types+1] = typeUnit
-            if not result.start then
-                result.start = typeUnit.start
-            end
-        elseif tp == 'string' then
-            nextToken()
-            -- compatibility
-            if content:sub(1, 1) == '"'
-            or content:sub(1, 1) == "'" then
-                if content:sub(1, 1) == content:sub(-1, -1) then
-                    content = content:sub(2, -2)
-                end
-            end
-            local typeEnum = {
-                type   = 'doc.type.enum',
-                start  = getStart(),
-                finish = getFinish(),
-                parent = result,
-                [1]    = content,
-            }
-            result.types[#result.types+1] = typeEnum
-            if not result.start then
-                result.start = typeEnum.start
-            end
-        elseif tp == 'symbol' and content == '{' then
-            local typeUnit = parseTypeUnit(result)
-            if not typeUnit then
-                break
-            end
-            result.types[#result.types+1] = typeUnit
-            if not result.start then
-                result.start = typeUnit.start
-            end
-        elseif tp == 'symbol' and content == '...' then
-            nextToken()
-            local vararg = {
-                type   = 'doc.type.name',
-                start  = getStart(),
-                finish = getFinish(),
-                parent = result,
-                [1]    = content,
-            }
-            result.types[#result.types+1] = vararg
-            if not result.start then
-                result.start = vararg.start
-            end
-        elseif tp == 'integer' then
-            nextToken()
-            local integer = {
-                type   = 'doc.type.integer',
-                start  = getStart(),
-                finish = getFinish(),
-                parent = result,
-                [1]    = content,
-            }
-            result.types[#result.types+1] = integer
-        end
         if not checkToken('symbol', '|', 1) then
             break
         end

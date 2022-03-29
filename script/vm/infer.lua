@@ -80,7 +80,7 @@ local viewNodeMap = util.switch()
     : call(function (source, options)
         options['hasTable'] = true
     end)
-    : case 'doc.type.enum'
+    : case 'doc.type.string'
     : call(function (source, options)
         return ('%q'):format(source[1])
     end)
@@ -187,7 +187,7 @@ end
 function m.hasType(source, tp)
     local views = m.getViews(source)
 
-    if views[source] then
+    if views[tp] then
         return true
     end
 
@@ -196,7 +196,7 @@ end
 
 ---@param source parser.object
 ---@return string
-function m.viewType(source)
+function m.viewType(source, default)
     local views = m.getViews(source)
 
     if views['any'] then
@@ -204,7 +204,7 @@ function m.viewType(source)
     end
 
     if not next(views) then
-        return 'unknown'
+        return default or 'unknown'
     end
 
     local array = {}

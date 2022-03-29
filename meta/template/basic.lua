@@ -11,7 +11,7 @@ arg = {}
 ---@return T
 function assert(v, message) end
 
----@alias cgopt
+---@alias gcoptions
 ---|>'"collect"'      # ---#DESTAIL 'cgopt.collect'
 ---| '"stop"'         # ---#DESTAIL 'cgopt.stop'
 ---| '"restart"'      # ---#DESTAIL 'cgopt.restart'
@@ -28,12 +28,12 @@ function assert(v, message) end
 
 ---#if VERSION >= 5.4 then
 ---#DES 'collectgarbage'
----@param opt? cgopt
+---@param opt? gcoptions
 ---@return any
 function collectgarbage(opt, ...) end
 ---#else
 ---#DES 'collectgarbage'
----@param opt? cgopt
+---@param opt? gcoptions
 ---@param arg? integer
 ---@return any
 function collectgarbage(opt, arg) end

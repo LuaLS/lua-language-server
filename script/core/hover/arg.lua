@@ -34,15 +34,15 @@ local function asFunction(source, oop)
                 args[#args+1] = ('%s%s: %s'):format(
                     name,
                     optionalArg(arg) and '?' or '',
-                    infer.viewType(arg)
+                    infer.viewType(arg, 'any')
                 )
             elseif arg.type == '...' then
                 args[#args+1] = ('%s: %s'):format(
                     '...',
-                    infer.viewType(arg)
+                    infer.viewType(arg, 'any')
                 )
             else
-                args[#args+1] = ('%s'):format(infer.viewType(arg))
+                args[#args+1] = ('%s'):format(infer.viewType(arg, 'any'))
             end
             ::CONTINUE::
         end

@@ -69,7 +69,7 @@ function vm.getDocEnums(doc)
     local results = {}
 
     for _, def in ipairs(defs) do
-        if def.type == 'doc.type.enum'
+        if def.type == 'doc.type.string'
         or def.type == 'doc.resume' then
             results[#results+1] = def
         end

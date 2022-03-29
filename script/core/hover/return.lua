@@ -64,8 +64,9 @@ local function asFunction(source)
     for i = 1, num do
         local rtn  = compiler.getReturnOfFunction(source, i)
         local doc  = docs[i]
+        local name = doc and doc.name and doc.name[1] and (doc.name[1] .. ': ')
         local text = ('%s%s%s'):format(
-            doc and doc.name[1] or '',
+            name or '',
             infer.viewType(rtn),
             doc and doc.optional and '?' or ''
         )

@@ -272,9 +272,8 @@ TEST [[
 local type
 w2l:get_default()[<?type?>]
 ]]
-"local type: any"
+"local type: unknown"
 
--- TODO 可选参数（或多原型）
 TEST [[
 <?load?>()
 ]]

@@ -501,7 +501,7 @@ local Care = util.switch()
             modifieres = define.TokenModifiers.modification,
         }
     end)
-    : case 'doc.type.enum'
+    : case 'doc.type.string'
     : call(function (source, options, results)
         if not options.annotation then
             return

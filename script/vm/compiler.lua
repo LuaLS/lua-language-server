@@ -396,6 +396,7 @@ local function selectNode(source, list, index)
         or n.type == 'doc.type.function'
         or n.type == 'doc.type.table'
         or n.type == 'doc.type.integer'
+        or n.type == 'doc.type.string'
         or (n.type == 'global' and n.cate == 'type') then
             hasKnownType = true
             break
@@ -452,7 +453,7 @@ local function setCallArgNode(source, call, callNode, fixIndex)
             local event = m.compileNode(n.args[eventIndex])
             if not event
             or not eventMap
-            or event.type ~= 'doc.type.enum'
+            or event.type ~= 'doc.type.string'
             or eventMap[event[1]] then
                 local arg = n.args[myIndex]
                 for fn in nodeMgr.eachNode(m.compileNode(arg)) do
@@ -712,7 +713,7 @@ local compilerMap = util.switch()
     : call(function (source)
         nodeMgr.setNode(source, source)
     end)
-    : case 'doc.type.enum'
+    : case 'doc.type.string'
     : call(function (source)
         nodeMgr.setNode(source, source)
     end)

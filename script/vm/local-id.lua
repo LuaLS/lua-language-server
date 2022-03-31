@@ -10,7 +10,7 @@ local m = {}
 
 m.ID_SPLITE = '\x1F'
 
-local compileMap = util.switch()
+local compileSwitch = util.switch()
     : case 'local'
     : call(function (source)
         source._localID = ('%d'):format(source.start)
@@ -69,9 +69,8 @@ local compileMap = util.switch()
             m.compileLocalID(source.next)
         end
     end)
-    : getMap()
 
-local leftMap = util.switch()
+local leftSwitch = util.switch()
     : case 'field'
     : case 'method'
     : call(function (source)
@@ -94,16 +93,11 @@ local leftMap = util.switch()
     : call(function (source)
         return source
     end)
-    : getMap()
 
 ---@param source parser.object
 ---@return parser.object?
 function m.getLocal(source)
-    local getLeft = leftMap[source.type]
-    if getLeft then
-        return getLeft(source)
-    end
-    return nil
+    return leftSwitch(source.type, source)
 end
 
 function m.compileLocalID(source)
@@ -111,11 +105,10 @@ function m.compileLocalID(source)
         return
     end
     source._localID = false
-    local compiler = compileMap[source.type]
-    if not compiler then
+    if not compileSwitch:has(source.type) then
         return
     end
-    compiler(source)
+    compileSwitch(source.type, source)
     local root = guide.getRoot(source)
     if not root._localIDs then
         root._localIDs = util.multiTable(2)

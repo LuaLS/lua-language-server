@@ -8,7 +8,7 @@ local globalMgr = require 'vm.global-manager'
 local nodeMgr   = require 'vm.node'
 local files     = require 'files'
 
-local simpleMap
+local simpleSwitch
 
 local function searchGetLocal(source, node, pushResult)
     local key = guide.getKeyName(source)
@@ -21,7 +21,7 @@ local function searchGetLocal(source, node, pushResult)
     end
 end
 
-simpleMap = util.switch()
+simpleSwitch = util.switch()
     : case 'local'
     : call(function (source, pushResult)
         if source.ref then
@@ -36,13 +36,13 @@ simpleMap = util.switch()
     : case 'getlocal'
     : case 'setlocal'
     : call(function (source, pushResult)
-        simpleMap['local'](source.node, pushResult)
+        simpleSwitch('local', source.node, pushResult)
     end)
     : case 'field'
     : call(function (source, pushResult)
         local parent = source.parent
         if parent.type ~= 'tablefield' then
-            simpleMap[parent.type](parent, pushResult)
+            simpleSwitch(parent.type, parent, pushResult)
         end
     end)
     : case 'setfield'
@@ -65,7 +65,7 @@ simpleMap = util.switch()
     : case 'goto'
     : call(function (source, pushResult)
         if source.node then
-            simpleMap['label'](source.node, pushResult)
+            simpleSwitch('label', source.node, pushResult)
             pushResult(source.node)
         end
     end)
@@ -78,7 +78,6 @@ simpleMap = util.switch()
             end
         end
     end)
-    : getMap()
 
 local function searchField(source, pushResult)
     local key = guide.getKeyName(source)
@@ -132,7 +131,7 @@ local function searchField(source, pushResult)
 end
 
 local searchByParentNode
-local nodeMap = util.switch()
+local nodeSwitch = util.switch()
     : case 'field'
     : case 'method'
     : call(function (source, pushResult)
@@ -162,15 +161,11 @@ local nodeMap = util.switch()
     : call(function (source, pushResult)
         searchField(source, pushResult)
     end)
-    : getMap()
 
 ---@param source  parser.object
 ---@param pushResult fun(src: parser.object)
 local function searchBySimple(source, pushResult)
-    local simple = simpleMap[source.type]
-    if simple then
-        simple(source, pushResult)
-    end
+    simpleSwitch(source.type, source, pushResult)
 end
 
 ---@param source  parser.object
@@ -190,10 +185,7 @@ end
 ---@param source  parser.object
 ---@param pushResult fun(src: parser.object)
 function searchByParentNode(source, pushResult)
-    local node = nodeMap[source.type]
-    if node then
-        node(source, pushResult)
-    end
+    nodeSwitch(source.type, source, pushResult)
 end
 
 local function searchByNode(source, pushResult)

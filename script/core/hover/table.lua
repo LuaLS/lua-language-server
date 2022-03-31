@@ -154,7 +154,7 @@ return function (source)
         return 'table'
     end
 
-    local fields = vm.getRefs(source, '*')
+    local fields = vm.getFields(source)
     local keys   = getKeyMap(fields)
     local optMap = getOptionalMap(fields)
 

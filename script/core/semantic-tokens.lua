@@ -668,7 +668,6 @@ local Care = util.switch()
             type   = define.TokenTypes.keyword,
         }
     end)
-    : getMap()
 
 local function buildTokens(uri, results)
     local tokens = {}
@@ -805,11 +804,7 @@ return function (uri, start, finish)
 
     local results = {}
     guide.eachSourceBetween(state.ast, start, finish, function (source) ---@async
-        local method = Care[source.type]
-        if not method then
-            return
-        end
-        method(source, options, results)
+        Care(source.type, source, options, results)
         await.delay()
     end)
 

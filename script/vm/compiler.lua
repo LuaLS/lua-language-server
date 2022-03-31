@@ -15,7 +15,7 @@ local genericMgr = require 'vm.generic'
 ---@class vm.node.compiler
 local m = {}
 
-local searchFieldMap = util.switch()
+local searchFieldSwitch = util.switch()
     : case 'table'
     : call(function (node, key, pushResult)
         for _, field in ipairs(node) do
@@ -88,7 +88,6 @@ local searchFieldMap = util.switch()
             end
         end
     end)
-    : getMap()
 
 
 function m.getClassFields(node, key, pushResult)
@@ -112,16 +111,14 @@ function m.getClassFields(node, key, pushResult)
                 -- check local field and global field
                 if set.bindSources then
                     for _, src in ipairs(set.bindSources) do
-                        if searchFieldMap[src.type] then
-                            searchFieldMap[src.type](src, key, function (field)
-                                if guide.isSet(field) then
-                                    hasFounded = true
-                                    pushResult(field)
-                                end
-                            end)
-                        end
+                        searchFieldSwitch(src.type, src, key, function (field)
+                            if guide.isSet(field) then
+                                hasFounded = true
+                                pushResult(field)
+                            end
+                        end)
                         if src._globalNode then
-                            searchFieldMap['global'](src._globalNode, key, function (field)
+                            searchFieldSwitch('global', src._globalNode, key, function (field)
                                 hasFounded = true
                                 pushResult(field)
                             end)
@@ -352,10 +349,7 @@ function m.compileByParentNode(source, key, pushResult)
         return
     end
     for node in nodeMgr.eachNode(parentNode) do
-        local f = searchFieldMap[node.type]
-        if f then
-            f(node, key, pushResult)
-        end
+        searchFieldSwitch(node.type, node, key, pushResult)
     end
 end
 
@@ -466,7 +460,7 @@ local function setCallArgNode(source, call, callNode, fixIndex)
     end
 end
 
-local compilerMap = util.switch()
+local compilerSwitch = util.switch()
     : case 'nil'
     : case 'boolean'
     : case 'integer'
@@ -1165,14 +1159,10 @@ local compilerMap = util.switch()
             end
         end
     end)
-    : getMap()
 
 ---@param source parser.object
 local function compileByNode(source)
-    local compiler = compilerMap[source.type]
-    if compiler then
-        compiler(source)
-    end
+    compilerSwitch(source.type, source)
 end
 
 ---@param source vm.node

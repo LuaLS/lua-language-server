@@ -16,7 +16,7 @@ m.globalSubs = util.multiTable(2)
 
 m.ID_SPLITE = '\x1F'
 
-local compilerGlobalMap = util.switch()
+local compilerGlobalSwitch = util.switch()
     : case 'local'
     : call(function (source)
         if source.special ~= '_G' then
@@ -195,7 +195,6 @@ local compilerGlobalMap = util.switch()
         class:addGet(uri, source)
         source._globalNode = class
     end)
-    : getMap()
 
 
 ---@alias vm.global.cate '"variable"' | '"type"'
@@ -231,10 +230,7 @@ function m.compileObject(source)
         return
     end
     source._globalNode = false
-    local compiler = compilerGlobalMap[source.type]
-    if compiler then
-        compiler(source)
-    end
+    compilerGlobalSwitch(source.type, source)
 end
 
 ---@param source parser.object

@@ -673,29 +673,59 @@ function m.arrayToHash(l)
     return t
 end
 
-function m.switch()
-    local map = {}
-    local cachedCases = {}
-    local obj = {
-        case = function (self, name)
-            cachedCases[#cachedCases+1] = name
-            return self
-        end,
-        call = function (self, callback)
-            for i = 1, #cachedCases do
-                local name = cachedCases[i]
-                cachedCases[i] = nil
-                if map[name] then
-                    error('Repeated fields:' .. tostring(name))
-                end
-                map[name] = callback
-            end
-            return self
-        end,
-        getMap = function (self)
-            return map
+---@class switch
+---@field cachedCases string[]
+---@field map table<string, function>
+local switchMT = {}
+switchMT.__index = switchMT
+
+---@param name string
+---@return switch
+function switchMT:case(name)
+    self.cachedCases[#self.cachedCases+1] = name
+    return self
+end
+
+---@param callback fun(...):...
+---@return switch
+function switchMT:call(callback)
+    for i = 1, #self.cachedCases do
+        local name = self.cachedCases[i]
+        self.cachedCases[i] = nil
+        if self.map[name] then
+            error('Repeated fields:' .. tostring(name))
         end
-    }
+        self.map[name] = callback
+    end
+    return self
+end
+
+function switchMT:getMap()
+    return self.map
+end
+
+---@param name string
+---@return boolean
+function switchMT:has(name)
+    return self.map[name] ~= nil
+end
+
+---@param name string
+---@return ...
+function switchMT:__call(name, ...)
+    local callback = self.map[name]
+    if not callback then
+        return
+    end
+    return callback(...)
+end
+
+---@return switch
+function m.switch()
+    local obj = setmetatable({
+        map = {},
+        cachedCases = {},
+    }, switchMT)
     return obj
 end
 

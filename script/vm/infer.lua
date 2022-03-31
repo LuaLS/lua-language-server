@@ -17,7 +17,7 @@ local inferSorted = {
     ['nil']      = 100,
 }
 
-local viewNodeMap = util.switch()
+local viewNodeSwitch = util.switch()
     : case 'nil'
     : case 'boolean'
     : case 'string'
@@ -112,14 +112,11 @@ local viewNodeMap = util.switch()
         end
         return ('fun(%s)%s'):format(argView, regView)
     end)
-    : getMap()
 
 ---@param node vm.node
 ---@return string?
 local function viewNode(node, options)
-    if viewNodeMap[node.type] then
-        return viewNodeMap[node.type](node, options)
-    end
+    return viewNodeSwitch(node.type, node, options)
 end
 
 local function eraseAlias(node, viewMap, options)

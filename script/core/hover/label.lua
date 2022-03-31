@@ -44,7 +44,7 @@ end
 local function asValue(source, title)
     local name    = buildName(source, false) or ''
     local type    = infer.getInfer(source):view()
-    local literal = infer.viewLiterals(source)
+    local literal = infer.getInfer(source):viewLiterals()
     local cont
     if  not infer.getInfer(source):hasType 'string'
     and not type:find('%[%]$') then

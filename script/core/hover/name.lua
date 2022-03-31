@@ -19,7 +19,7 @@ end
 local function asField(source, oop)
     local class
     if source.node.type ~= 'getglobal' then
-        class = infer.viewClass(source.node)
+        class = infer.getInfer(source.node):viewClass()
     end
     local node = class
         or buildName(source.node, false)

@@ -168,7 +168,7 @@ local function buildDetail(source)
         return
     end
     local types = infer.getInfer(source):view()
-    local literals = infer.viewLiterals(source)
+    local literals = infer.getInfer(source):viewLiterals()
     if literals then
         return types .. ' = ' .. literals
     else

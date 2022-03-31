@@ -22,7 +22,7 @@ mt.isParam        = false
 mt.isLocal        = false
 mt.hasDocFunction = false
 
-local nullInfer = setmetatable({}, mt)
+m.NULL = setmetatable({}, mt)
 
 local inferSorted = {
     ['boolean']  = - 100,
@@ -135,7 +135,7 @@ local viewNodeSwitch = util.switch()
 function m.getInfer(source)
     local node = compiler.compileNode(source)
     if not node then
-        return nullInfer
+        return m.NULL
     end
     if node.type == 'union' and node.lastInfer then
         return node.lastInfer
@@ -213,8 +213,9 @@ function mt:_computeViews()
 end
 
 ---@param default? string
+---@param uri? uri
 ---@return string
-function mt:view(default)
+function mt:view(default, uri)
     self:_computeViews()
 
     if self.views['any'] then
@@ -244,7 +245,7 @@ function mt:view(default)
     end)
 
     local max   = #array
-    local limit = config.get(self.uri, 'Lua.hover.enumsLimit')
+    local limit = config.get(uri or self.uri, 'Lua.hover.enumsLimit')
 
     if max > limit then
         local view = string.format('%s...(+%d)'
@@ -265,43 +266,30 @@ function mt:view(default)
 end
 
 ---@param other vm.infer
----@param uri? uri
 ---@return vm.infer
-function mt:merge(other, uri)
+function mt:merge(other)
+    if self == m.NULL then
+        return other
+    end
+    if other == m.NULL then
+        return self
+    end
+
     local infer = setmetatable({
         node  = union(self.node, other.node),
-        uri   = uri or self.uri,
-        views = {},
+        uri   = self.uri,
     }, mt)
-
-    for view in pairs(self.views) do
-        infer.views[view] = true
-    end
-    for view in pairs(other.views) do
-        infer.views[view] = true
-    end
-
-    infer.hasClass       = self.hasClass       or other.hasClass
-    infer.hasDocFunction = self.hasDocFunction or other.hasDocFunction
-    infer.hasNumber      = self.hasNumber      or other.hasNumber
-    infer.hasTable       = self.hasTable       or other.hasTable
-    infer.isLocal        = self.isLocal        or other.isLocal
-    infer.isParam        = self.isParam        or other.isParam
-
-    infer:_trim()
 
     return infer
 end
 
----@param source parser.object
 ---@return string?
-function m.viewLiterals(source)
-    local node = compiler.compileNode(source)
-    if not node then
+function mt:viewLiterals()
+    if not self.node then
         return nil
     end
     local literals = {}
-    for n in nodeMgr.eachNode(node) do
+    for n in nodeMgr.eachNode(self.node) do
         if n.type == 'string'
         or n.type == 'number'
         or n.type == 'integer' then
@@ -315,15 +303,13 @@ function m.viewLiterals(source)
     return table.concat(literals, '|')
 end
 
----@param source parser.object
 ---@return string?
-function m.viewClass(source)
-    local node = compiler.compileNode(source)
-    if not node then
+function mt:viewClass()
+    if not self.node then
         return nil
     end
     local class = {}
-    for n in nodeMgr.eachNode(node) do
+    for n in nodeMgr.eachNode(self.node) do
         if n.type == 'global' and n.cate == 'type' then
             class[#class+1] = n.name
         end

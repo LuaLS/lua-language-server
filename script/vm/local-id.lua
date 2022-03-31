@@ -109,6 +109,9 @@ function m.compileLocalID(source)
         return
     end
     compileSwitch(source.type, source)
+    if not source._localID then
+        return
+    end
     local root = guide.getRoot(source)
     if not root._localIDs then
         root._localIDs = util.multiTable(2)
@@ -151,6 +154,32 @@ function m.getSources(source, key)
         id = id .. m.ID_SPLITE .. key
     end
     return root._localIDs[id]
+end
+
+---@param source parser.object
+---@return parser.object[]
+function m.getFields(source)
+    local id = m.getID(source)
+    if not id then
+        return nil
+    end
+    local root = guide.getRoot(source)
+    if not root._localIDs then
+        return nil
+    end
+    -- TODO：optimize
+    local fields = {}
+    for lid, sources in pairs(root._localIDs) do
+        if  lid ~= id
+        and util.stringStartWith(lid, id)
+        -- only one field
+        and not lid:find(m.ID_SPLITE, #id + 2) then
+            for _, src in ipairs(sources) do
+                fields[#fields+1] = src
+            end
+        end
+    end
+    return fields
 end
 
 return m

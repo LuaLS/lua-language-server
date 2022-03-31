@@ -134,7 +134,7 @@ return function (uri, offset)
     local defs = vm.getDefs(source)
     local values = {}
     for _, src in ipairs(defs) do
-        local value = searcher.getObjectValue(src)
+        local value = vm.getObjectValue(src)
         if value and value ~= src and guide.isLiteral(value) then
             values[value] = true
         end

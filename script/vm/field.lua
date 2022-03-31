@@ -7,26 +7,10 @@ local localID   = require 'vm.local-id'
 local globalMgr = require 'vm.global-manager'
 local nodeMgr   = require 'vm.node'
 
-local searchNodeSwitch = util.switch()
-    : case 'table'
-    : call(function (node, pushResult)
-        for _, field in ipairs(node) do
-            if field.type == 'tablefield'
-            or field.type == 'tableindex' then
-                pushResult(field)
-            end
-        end
-    end)
-
 local function searchByNode(source, pushResult)
-    local node = compiler.compileNode(source)
-    if not node then
-        return
-    end
-
-    for n in nodeMgr.eachNode(node) do
-        searchNodeSwitch(n.type, n, pushResult)
-    end
+    compiler.compileByParentNode(source, nil, function (field)
+        pushResult(field)
+    end)
 end
 
 ---@param source parser.object

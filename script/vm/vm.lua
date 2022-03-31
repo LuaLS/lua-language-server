@@ -49,6 +49,18 @@ function m.getKeyType(source)
     return guide.getKeyType(source)
 end
 
+---@param source parser.object
+---@return parser.object?
+function m.getObjectValue(source)
+    if source.value then
+        return source.value
+    end
+    if source.special == 'rawset' then
+        return source.args and source.args[3]
+    end
+    return nil
+end
+
 m.cacheTracker = setmetatable({}, weakMT)
 
 function m.flushCache()

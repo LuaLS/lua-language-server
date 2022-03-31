@@ -183,7 +183,7 @@ local function getSnip(source)
     end
     local defs = vm.getRefs(source)
     for _, def in ipairs(defs) do
-        def = searcher.getObjectValue(def) or def
+        def = vm.getObjectValue(def) or def
         if def ~= source and def.type == 'function' then
             local uri = guide.getUri(def)
             local text = files.getText(uri)
@@ -458,7 +458,7 @@ local function checkFieldFromFieldToIndex(state, name, src, parent, word, startP
 end
 
 local function checkFieldThen(state, name, src, word, startPos, position, parent, oop, results)
-    local value = searcher.getObjectValue(src) or src
+    local value = vm.getObjectValue(src) or src
     local kind = define.CompletionItemKind.Field
     if value.type == 'function'
     or value.type == 'doc.type.function' then
@@ -537,7 +537,7 @@ local function checkFieldOfRefs(refs, state, word, startPos, position, parent, o
         end
         local funcLabel
         if config.get(state.uri, 'Lua.completion.showParams') then
-            local value = searcher.getObjectValue(src) or src
+            local value = vm.getObjectValue(src) or src
             if value.type == 'function'
             or value.type == 'doc.type.function' then
                 funcLabel = name .. getParams(value, oop)
@@ -1494,7 +1494,7 @@ local function tryCallArg(state, position, results)
     end
     local defs = vm.getDefs(call.node)
     for _, def in ipairs(defs) do
-        def = searcher.getObjectValue(def) or def
+        def = vm.getObjectValue(def) or def
         local enums = getCallEnumsAndFuncs(def, argIndex, oop, call)
         if enums then
             mergeEnums(myResults, enums, arg)

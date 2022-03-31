@@ -21,7 +21,8 @@ local searchFieldSwitch = util.switch()
         for _, field in ipairs(node) do
             if field.type == 'tablefield'
             or field.type == 'tableindex' then
-                if guide.getKeyName(field) == key then
+                if not key
+                or key == guide.getKeyName(field) then
                     pushResult(field)
                 end
             end
@@ -48,9 +49,9 @@ local searchFieldSwitch = util.switch()
     end)
     : case 'local'
     : call(function (node, key, pushResult)
-        local sources = localID.getSources(node, key)
-        if sources then
-            for _, src in ipairs(sources) do
+        local fields = key and localID.getSources(node, key) or localID.getFields(node)
+        if fields then
+            for _, src in ipairs(fields) do
                 pushResult(src)
             end
         end
@@ -71,7 +72,8 @@ local searchFieldSwitch = util.switch()
                 local fieldNode = m.compileNode(fieldKey)
                 for fn in nodeMgr.eachNode(fieldNode) do
                     if fn.type == 'global' and fn.cate == 'type' then
-                        if fn.name == 'any'
+                        if not key
+                        or fn.name == 'any'
                         or (fn.name == 'boolean' and type(key) == 'boolean')
                         or (fn.name == 'number'  and type(key) == 'number')
                         or (fn.name == 'integer' and math.tointeger(key))
@@ -82,7 +84,7 @@ local searchFieldSwitch = util.switch()
                 end
             end
             if fieldKey.type == 'doc.field.name' then
-                if fieldKey[1] == key then
+                if not key or fieldKey[1] == key then
                     pushResult(field.extends)
                 end
             end
@@ -103,7 +105,8 @@ function m.getClassFields(node, key, pushResult)
                 -- check ---@field
                 local hasFounded
                 for _, field in ipairs(set.fields) do
-                    if guide.getKeyName(field) == key then
+                    if not key
+                    or guide.getKeyName(field) == key then
                         hasFounded = true
                         pushResult(field)
                     end
@@ -341,7 +344,7 @@ local function compileByLocalID(source)
 end
 
 ---@param source vm.node
----@param key any
+---@param key? any
 ---@param pushResult fun(source: parser.object)
 function m.compileByParentNode(source, key, pushResult)
     local parentNode = m.compileNode(source)

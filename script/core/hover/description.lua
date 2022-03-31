@@ -201,7 +201,7 @@ local function isFunction(source)
     if source.type == 'function' then
         return true
     end
-    local value = searcher.getObjectValue(source)
+    local value = vm.getObjectValue(source)
     if not value then
         return false
     end

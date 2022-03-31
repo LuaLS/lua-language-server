@@ -29,7 +29,7 @@ return function (uri, callback)
                 if not name then
                     goto CONTINUE
                 end
-                local value = searcher.getObjectValue(nxt)
+                local value = vm.getObjectValue(nxt)
                 if not value or value.type ~= 'function' then
                     goto CONTINUE
                 end

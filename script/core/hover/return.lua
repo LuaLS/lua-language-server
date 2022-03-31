@@ -67,7 +67,7 @@ local function asFunction(source)
         local name = doc and doc.name and doc.name[1] and (doc.name[1] .. ': ')
         local text = ('%s%s%s'):format(
             name or '',
-            infer.viewType(rtn),
+            infer.getInfer(rtn):view(),
             doc and doc.optional and '?' or ''
         )
         if i == 1 then
@@ -87,7 +87,7 @@ local function asDocFunction(source)
     local returns = {}
     for i, rtn in ipairs(source.returns) do
         local rtnText = ('%s%s'):format(
-            infer.viewType(rtn),
+            infer.getInfer(rtn):view(),
             rtn.optional and '?' or ''
         )
         if i == 1 then

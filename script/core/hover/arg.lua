@@ -21,7 +21,7 @@ local function asFunction(source, oop)
         methodDef = true
     end
     if methodDef then
-        args[#args+1] = ('self: %s'):format(infer.viewType(parent.node))
+        args[#args+1] = ('self: %s'):format(infer.getInfer(parent.node))
     end
     if source.args then
         for i = 1, #source.args do
@@ -34,15 +34,15 @@ local function asFunction(source, oop)
                 args[#args+1] = ('%s%s: %s'):format(
                     name,
                     optionalArg(arg) and '?' or '',
-                    infer.viewType(arg, 'any')
+                    infer.getInfer(arg):view 'any'
                 )
             elseif arg.type == '...' then
                 args[#args+1] = ('%s: %s'):format(
                     '...',
-                    infer.viewType(arg, 'any')
+                    infer.getInfer(arg):view 'any'
                 )
             else
-                args[#args+1] = ('%s'):format(infer.viewType(arg, 'any'))
+                args[#args+1] = ('%s'):format(infer.getInfer(arg):view 'any')
             end
             ::CONTINUE::
         end
@@ -65,7 +65,7 @@ local function asDocFunction(source, oop)
         args[i] = ('%s%s: %s'):format(
             name,
             arg.optional and '?' or '',
-            arg.extends and infer.viewType(arg.extends) or 'any'
+            arg.extends and infer.getInfer(arg.extends):view 'any' or 'any'
         )
     end
     if oop then

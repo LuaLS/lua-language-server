@@ -5,7 +5,7 @@ local mt = {}
 mt.__index   = mt
 mt.type      = 'union'
 mt.optional  = nil
-mt.lastViews = nil
+mt.lastInfer = nil
 
 ---@param me   parser.object
 ---@param node vm.node

@@ -41,8 +41,9 @@ local function typeHint(uri, results, start, finish)
             end
         end
         await.delay()
-        local view = infer.viewType(source)
+        local view = infer.getInfer(source):view()
         if view == 'any'
+        or view == 'unknown'
         or view == 'nil' then
             return
         end

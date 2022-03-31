@@ -167,7 +167,7 @@ local function buildDetail(source)
     if source.type == 'dummy' then
         return
     end
-    local types = infer.viewType(source)
+    local types = infer.getInfer(source):view()
     local literals = infer.viewLiterals(source)
     if literals then
         return types .. ' = ' .. literals
@@ -1819,14 +1819,14 @@ local function buildluaDocOfFunction(func)
     local returns = {}
     if func.args then
         for _, arg in ipairs(func.args) do
-            args[#args+1] = infer.viewType(arg)
+            args[#args+1] = infer.getInfer(arg):view()
         end
     end
     if func.returns then
         for _, rtns in ipairs(func.returns) do
             for n = 1, #rtns do
                 if not returns[n] then
-                    returns[n] = infer.viewType(rtns[n])
+                    returns[n] = infer.getInfer(rtns[n]):view()
                 end
             end
         end

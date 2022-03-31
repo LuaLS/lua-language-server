@@ -20,7 +20,7 @@ return function (uri, callback)
         and source.type ~= 'tableindex' then
             return
         end
-        if infer.viewType(source) == 'any' then
+        if infer.getInfer(source):view() == 'unknown' then
             callback {
                 start   = source.start,
                 finish  = source.finish,

@@ -35,7 +35,7 @@ local function asDocTypeName(source)
         end
         if doc.type == 'doc.alias.name' then
             local extends = doc.parent.extends
-            return lang.script('HOVER_EXTENDS', infer.viewType(extends))
+            return lang.script('HOVER_EXTENDS', infer.getInfer(extends):view())
         end
     end
 end
@@ -43,12 +43,12 @@ end
 ---@async
 local function asValue(source, title)
     local name    = buildName(source, false) or ''
-    local type    = infer.viewType(source)
+    local type    = infer.getInfer(source):view()
     local literal = infer.viewLiterals(source)
     local cont
-    if  not infer.hasType(source, 'string')
+    if  not infer.getInfer(source):hasType 'string'
     and not type:find('%[%]$') then
-        if infer.hasType(source, 'table') then
+        if infer.getInfer(source):hasType 'table' then
             cont = buildTable(source)
         end
     end
@@ -131,7 +131,7 @@ local function asDocFieldName(source)
             break
         end
     end
-    local view = infer.viewType(docField.extends)
+    local view = infer.getInfer(docField.extends):view()
     if not class then
         return ('field ?.%s: %s'):format(name, view)
     end

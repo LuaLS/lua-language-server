@@ -31,9 +31,9 @@ function TEST(wanted)
         files.setText('', newScript)
         local source = getSource(catched['?'][1][1])
         assert(source)
-        local result = infer.viewType(source)
+        local result = infer.getInfer(source):view()
         if wanted ~= result then
-            infer.viewType(source)
+            infer.getInfer(source):view()
         end
         assert(wanted == result)
         files.remove('')

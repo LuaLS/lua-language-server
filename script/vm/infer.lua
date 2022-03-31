@@ -7,6 +7,22 @@ local compiler = require 'vm.compiler'
 ---@class vm.infer-manager
 local m = {}
 
+---@class vm.infer
+---@field views table<string, boolean>
+---@field source? parser.object
+---@field cachedView? string
+local mt = {}
+mt.__index = mt
+mt.hasNumber      = false
+mt.hasTable       = false
+mt.hasClass       = false
+mt.isParam        = false
+mt.isLocal        = false
+mt.hasDocFunction = false
+mt.expandAlias    = false
+
+local nullInfer = setmetatable({ views = {} }, mt)
+
 local inferSorted = {
     ['boolean']  = - 100,
     ['string']   = - 99,
@@ -23,44 +39,44 @@ local viewNodeSwitch = util.switch()
     : case 'string'
     : case 'function'
     : case 'integer'
-    : call(function (source, options)
+    : call(function (source, infer)
         return source.type
     end)
     : case 'number'
-    : call(function (source, options)
-        options['hasNumber'] = true
+    : call(function (source, infer)
+        infer.hasNumber = true
         return source.type
     end)
     : case 'table'
-    : call(function (source, options)
-        options['hasTable'] = true
+    : call(function (source, infer)
+        infer.hasTable = true
     end)
     : case 'local'
-    : call(function (source, options)
+    : call(function (source, infer)
         if source.parent == 'funcargs' then
-            options['isParam'] = true
+            infer.isParam = true
         else
-            options['isLocal'] = true
+            infer.isLocal = true
         end
     end)
     : case 'global'
-    : call(function (source, options)
+    : call(function (source, infer)
         if source.cate == 'type' then
-            options['hasClass'] = true
+            infer.hasClass = true
             return source.name
         end
     end)
     : case 'doc.type.integer'
-    : call(function (source, options)
+    : call(function (source, infer)
         return ('%d'):format(source[1])
     end)
     : case 'doc.type.name'
-    : call(function (source, options)
-        options['hasClass'] = true
+    : call(function (source, infer)
+        infer.hasClass = true
         if source.signs then
             local buf = {}
             for i, sign in ipairs(source.signs) do
-                buf[i] = m.viewType(sign)
+                buf[i] = m.getInfer(sign):view()
             end
             return ('%s<%s>'):format(source[1], table.concat(buf, ', '))
         else
@@ -68,25 +84,25 @@ local viewNodeSwitch = util.switch()
         end
     end)
     : case 'doc.generic.name'
-    : call(function (source, options)
+    : call(function (source, infer)
         return ('<%s>'):format(source[1])
     end)
     : case 'doc.type.array'
-    : call(function (source, options)
-        options['hasClass'] = true
-        return m.viewType(source.node) .. '[]'
+    : call(function (source, infer)
+        infer.hasClass = true
+        return m.getInfer(source.node):view() .. '[]'
     end)
     : case 'doc.type.table'
-    : call(function (source, options)
-        options['hasTable'] = true
+    : call(function (source, infer)
+        infer.hasTable = true
     end)
     : case 'doc.type.string'
-    : call(function (source, options)
+    : call(function (source, infer)
         return ('%q'):format(source[1])
     end)
     : case 'doc.type.function'
-    : call(function (source, options)
-        options['hasDocFunction'] = true
+    : call(function (source, infer)
+        infer.hasDocFunction = true
         local args = {}
         local rets = {}
         local argView = ''
@@ -95,7 +111,7 @@ local viewNodeSwitch = util.switch()
             args[i] = string.format('%s%s: %s'
                 , arg.name[1]
                 , arg.optional and '?' or ''
-                , m.viewType(arg)
+                , m.getInfer(arg):view()
             )
         end
         if #args > 0 then
@@ -103,7 +119,7 @@ local viewNodeSwitch = util.switch()
         end
         for i, ret in ipairs(source.returns) do
             rets[i] = string.format('%s%s'
-                , m.viewType(ret)
+                , m.getInfer(ret):view()
                 , ret.optional and '?' or ''
             )
         end
@@ -113,24 +129,20 @@ local viewNodeSwitch = util.switch()
         return ('fun(%s)%s'):format(argView, regView)
     end)
 
----@param node vm.node
----@return string?
-local function viewNode(node, options)
-    return viewNodeSwitch(node.type, node, options)
-end
-
-local function eraseAlias(node, viewMap, options)
+---@param infer vm.infer
+local function eraseAlias(infer)
+    local node = compiler.compileNode(infer.source)
     for n in nodeMgr.eachNode(node) do
         if n.type == 'global' and n.cate == 'type' then
             for _, set in ipairs(n:getSets()) do
                 if set.type == 'doc.alias' then
-                    if options['expandAlias'] then
-                        viewMap[n.name] = nil
+                    if infer.expandAlias then
+                        infer.views[n.name] = nil
                     else
                         for _, ext in ipairs(set.extends.types) do
-                            local view = viewNode(ext, {})
+                            local view = viewNodeSwitch(ext.type, ext, {})
                             if view and view ~= n.name then
-                                viewMap[view] = nil
+                                infer.views[view] = nil
                             end
                         end
                     end
@@ -141,71 +153,67 @@ local function eraseAlias(node, viewMap, options)
 end
 
 ---@param source parser.object
----@return table<string, boolean>
----@return table<string, boolean>
-function m.getViews(source)
+---@return vm.infer
+function m.getInfer(source)
     local node = compiler.compileNode(source)
     if not node then
-        return {}
+        return nullInfer
     end
-    if node.type == 'union' and node.lastViews then
-        return node.lastViews
+    if node.type == 'union' and node.lastInfer then
+        return node.lastInfer
     end
-    local views   = {}
-    local options = {}
-    options['expandAlias'] = config.get(guide.getUri(source), 'Lua.hover.expandAlias')
+    local infer = setmetatable({
+        source = source,
+        views  = {}
+    }, mt)
+    infer.expandAlias = config.get(guide.getUri(source), 'Lua.hover.expandAlias')
     if node.type == 'union' then
-        node.lastViews = views
+        node.lastInfer = infer
     end
     for n in nodeMgr.eachNode(node) do
-        local view = viewNode(n, options)
+        local view = viewNodeSwitch(n.type, n, infer)
         if view then
-            views[view] = true
+            infer.views[view] = true
         end
     end
-    if options['hasNumber'] then
-        views['integer'] = nil
+    if infer.hasNumber then
+        infer.views['integer'] = nil
     end
-    if options['hasDocFunction'] then
-        views['function'] = nil
+    if infer.hasDocFunction then
+        infer.views['function'] = nil
     end
-    if options['hasTable'] and not options['hasClass'] then
-        views['table'] = true
+    if infer.hasTable and not infer.hasClass then
+        infer.views['table'] = true
     end
-    if options['hasClass'] then
-        eraseAlias(node, views, options)
+    if infer.hasClass then
+        eraseAlias(infer)
     end
-    return views, options
+    return infer
 end
 
----@param source parser.object
 ---@param tp string
 ---@return boolean
-function m.hasType(source, tp)
-    local views = m.getViews(source)
-
-    if views[tp] then
-        return true
-    end
-
-    return false
+function mt:hasType(tp)
+    return self.views[tp] == true
 end
 
----@param source parser.object
+---@param default? string
 ---@return string
-function m.viewType(source, default)
-    local views = m.getViews(source)
-
-    if views['any'] then
+function mt:view(default)
+    if self.views['any'] then
         return 'any'
     end
 
-    if not next(views) then
+    if not next(self.views) then
         return default or 'unknown'
     end
 
+    if self.cachedView then
+        return self.cachedView
+    end
+
     local array = {}
-    for view in pairs(views) do
+    for view in pairs(self.views) do
         array[#array+1] = view
     end
 
@@ -219,7 +227,7 @@ function m.viewType(source, default)
     end)
 
     local max   = #array
-    local limit = config.get(guide.getUri(source), 'Lua.hover.enumsLimit')
+    local limit = config.get(guide.getUri(self.source), 'Lua.hover.enumsLimit')
 
     if max > limit then
         local view = string.format('%s...(+%d)'
@@ -227,13 +235,16 @@ function m.viewType(source, default)
             , max - limit
         )
 
+        self.cachedView = view
+
         return view
     else
         local view = table.concat(array, '|')
 
+        self.cachedView = view
+
         return view
     end
-
 end
 
 ---@param source parser.object

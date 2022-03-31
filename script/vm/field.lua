@@ -23,7 +23,10 @@ local function searchByNode(source, pushResult)
     if not node then
         return
     end
-    searchNodeSwitch(node.type, node, pushResult)
+
+    for n in nodeMgr.eachNode(node) do
+        searchNodeSwitch(n.type, n, pushResult)
+    end
 end
 
 ---@param source parser.object

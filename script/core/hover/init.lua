@@ -40,7 +40,7 @@ local function getHover(source)
     end
 
     local oop
-    if infer.viewType(source) == 'function' then
+    if infer.getInfer(source):view() == 'function' then
         local hasFunc
         for _, def in ipairs(vm.getDefs(source)) do
             if guide.isOOP(def) then

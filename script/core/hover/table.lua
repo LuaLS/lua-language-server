@@ -85,12 +85,6 @@ local function getKeyMap(fields)
     local mark = {}
     for _, field in ipairs(fields) do
         local key = vm.getKeyName(field)
-        local tp  = vm.getKeyType(field)
-        if     tp == 'number' or tp == 'integer' then
-            key = tonumber(key)
-        elseif tp == 'boolean' then
-            key = key == 'true'
-        end
         if key and not mark[key] then
             mark[key] = true
             keys[#keys+1] = key
@@ -116,35 +110,31 @@ local function getKeyMap(fields)
     return keys
 end
 
-local function getOptionalMap(fields)
-    local optionals = {}
+---@async
+local function getFieldMap(fields, keys)
+    local fieldMap = {}
+    for _, key in ipairs(keys) do
+        fieldMap[key] = {
+            infer   = nil,
+            literal = nil,
+            opt     = false,
+        }
+    end
     for _, field in ipairs(fields) do
         if field.type == 'doc.field.name' then
             if field.parent.optional then
                 local key = vm.getKeyName(field)
-                local tp  = vm.getKeyType(field)
-                if     tp == 'number' or tp == 'integer' then
-                    key = tonumber(key)
-                elseif tp == 'boolean' then
-                    key = key == 'true'
-                end
-                optionals[key] = true
+                fieldMap[key].opt = true
             end
         end
         if field.type == 'doc.type.field' then
             if field.optional then
                 local key = vm.getKeyName(field)
-                local tp  = vm.getKeyType(field)
-                if     tp == 'number' or tp == 'integer' then
-                    key = tonumber(key)
-                elseif tp == 'boolean' then
-                    key = key == 'true'
-                end
-                optionals[key] = true
+                fieldMap[key].opt = true
             end
         end
     end
-    return optionals
+    return fieldMap
 end
 
 ---@async
@@ -154,9 +144,9 @@ return function (source)
         return 'table'
     end
 
-    local fields = vm.getFields(source)
-    local keys   = getKeyMap(fields)
-    local optMap = getOptionalMap(fields)
+    local fields   = vm.getFields(source)
+    local keys     = getKeyMap(fields)
+    local fieldMap = getFieldMap(fields, keys)
 
     if #keys == 0 then
         return '{}'

@@ -3,14 +3,16 @@ local nodeMgr  = require 'vm.node'
 local config   = require 'config'
 local guide    = require 'parser.guide'
 local compiler = require 'vm.compiler'
+local union    = require 'vm.union'
 
 ---@class vm.infer-manager
 local m = {}
 
 ---@class vm.infer
 ---@field views table<string, boolean>
----@field source? parser.object
 ---@field cachedView? string
+---@field node? vm.node
+---@field uri? uri
 local mt = {}
 mt.__index = mt
 mt.hasNumber      = false
@@ -19,9 +21,8 @@ mt.hasClass       = false
 mt.isParam        = false
 mt.isLocal        = false
 mt.hasDocFunction = false
-mt.expandAlias    = false
 
-local nullInfer = setmetatable({ views = {} }, mt)
+local nullInfer = setmetatable({}, mt)
 
 local inferSorted = {
     ['boolean']  = - 100,
@@ -129,29 +130,6 @@ local viewNodeSwitch = util.switch()
         return ('fun(%s)%s'):format(argView, regView)
     end)
 
----@param infer vm.infer
-local function eraseAlias(infer)
-    local node = compiler.compileNode(infer.source)
-    for n in nodeMgr.eachNode(node) do
-        if n.type == 'global' and n.cate == 'type' then
-            for _, set in ipairs(n:getSets()) do
-                if set.type == 'doc.alias' then
-                    if infer.expandAlias then
-                        infer.views[n.name] = nil
-                    else
-                        for _, ext in ipairs(set.extends.types) do
-                            local view = viewNodeSwitch(ext.type, ext, {})
-                            if view and view ~= n.name then
-                                infer.views[view] = nil
-                            end
-                        end
-                    end
-                end
-            end
-        end
-    end
-end
-
 ---@param source parser.object
 ---@return vm.infer
 function m.getInfer(source)
@@ -163,43 +141,82 @@ function m.getInfer(source)
         return node.lastInfer
     end
     local infer = setmetatable({
-        source = source,
-        views  = {}
+        node  = node,
+        uri   = guide.getUri(source),
     }, mt)
-    infer.expandAlias = config.get(guide.getUri(source), 'Lua.hover.expandAlias')
     if node.type == 'union' then
         node.lastInfer = infer
     end
-    for n in nodeMgr.eachNode(node) do
-        local view = viewNodeSwitch(n.type, n, infer)
-        if view then
-            infer.views[view] = true
+
+    return infer
+end
+
+function mt:_trim()
+    if self.hasNumber then
+        self.views['integer'] = nil
+    end
+    if self.hasDocFunction then
+        self.views['function'] = nil
+    end
+    if self.hasTable and not self.hasClass then
+        self.views['table'] = true
+    end
+    if self.hasClass then
+        self:_eraseAlias()
+    end
+end
+
+function mt:_eraseAlias()
+    local expandAlias = config.get(self.uri, 'Lua.hover.expandAlias')
+    for n in nodeMgr.eachNode(self.node) do
+        if n.type == 'global' and n.cate == 'type' then
+            for _, set in ipairs(n:getSets()) do
+                if set.type == 'doc.alias' then
+                    if expandAlias then
+                        self.views[n.name] = nil
+                    else
+                        for _, ext in ipairs(set.extends.types) do
+                            local view = viewNodeSwitch(ext.type, ext, {})
+                            if view and view ~= n.name then
+                                self.views[view] = nil
+                            end
+                        end
+                    end
+                end
+            end
         end
     end
-    if infer.hasNumber then
-        infer.views['integer'] = nil
-    end
-    if infer.hasDocFunction then
-        infer.views['function'] = nil
-    end
-    if infer.hasTable and not infer.hasClass then
-        infer.views['table'] = true
-    end
-    if infer.hasClass then
-        eraseAlias(infer)
-    end
-    return infer
 end
 
 ---@param tp string
 ---@return boolean
 function mt:hasType(tp)
+    self:_computeViews()
     return self.views[tp] == true
+end
+
+function mt:_computeViews()
+    if self.views then
+        return
+    end
+
+    self.views = {}
+
+    for n in nodeMgr.eachNode(self.node) do
+        local view = viewNodeSwitch(n.type, n, self)
+        if view then
+            self.views[view] = true
+        end
+    end
+
+    self:_trim()
 end
 
 ---@param default? string
 ---@return string
 function mt:view(default)
+    self:_computeViews()
+
     if self.views['any'] then
         return 'any'
     end
@@ -227,7 +244,7 @@ function mt:view(default)
     end)
 
     local max   = #array
-    local limit = config.get(guide.getUri(self.source), 'Lua.hover.enumsLimit')
+    local limit = config.get(self.uri, 'Lua.hover.enumsLimit')
 
     if max > limit then
         local view = string.format('%s...(+%d)'
@@ -245,6 +262,35 @@ function mt:view(default)
 
         return view
     end
+end
+
+---@param other vm.infer
+---@param uri? uri
+---@return vm.infer
+function mt:merge(other, uri)
+    local infer = setmetatable({
+        node  = union(self.node, other.node),
+        uri   = uri or self.uri,
+        views = {},
+    }, mt)
+
+    for view in pairs(self.views) do
+        infer.views[view] = true
+    end
+    for view in pairs(other.views) do
+        infer.views[view] = true
+    end
+
+    infer.hasClass       = self.hasClass       or other.hasClass
+    infer.hasDocFunction = self.hasDocFunction or other.hasDocFunction
+    infer.hasNumber      = self.hasNumber      or other.hasNumber
+    infer.hasTable       = self.hasTable       or other.hasTable
+    infer.isLocal        = self.isLocal        or other.isLocal
+    infer.isParam        = self.isParam        or other.isParam
+
+    infer:_trim()
+
+    return infer
 end
 
 ---@param source parser.object

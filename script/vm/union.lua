@@ -7,7 +7,7 @@ mt.type      = 'union'
 mt.optional  = nil
 mt.lastInfer = nil
 
----@param me   parser.object
+---@param me   vm.node
 ---@param node vm.node
 ---@return vm.node.union
 local function createUnion(me, node)

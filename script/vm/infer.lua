@@ -18,9 +18,10 @@ mt.__index = mt
 mt._hasNumber      = false
 mt._hasTable       = false
 mt._hasClass       = false
+mt._hasFunctionDef = false
+mt._hasDocFunction = false
 mt._isParam        = false
 mt._isLocal        = false
-mt._hasDocFunction = false
 
 m.NULL = setmetatable({}, mt)
 
@@ -38,7 +39,6 @@ local viewNodeSwitch = util.switch()
     : case 'nil'
     : case 'boolean'
     : case 'string'
-    : case 'function'
     : case 'integer'
     : call(function (source, infer)
         return source.type
@@ -51,6 +51,14 @@ local viewNodeSwitch = util.switch()
     : case 'table'
     : call(function (source, infer)
         infer._hasTable = true
+    end)
+    : case 'function'
+    : call(function (source, infer)
+        local parent = source.parent
+        if guide.isSet(parent) then
+            infer._hasFunctionDef = true
+        end
+        return source.type
     end)
     : case 'local'
     : call(function (source, infer)
@@ -156,7 +164,15 @@ function mt:_trim()
         self.views['integer'] = nil
     end
     if self._hasDocFunction then
-        self.views['function'] = nil
+        if self._hasFunctionDef then
+            for view in pairs(self.views) do
+                if view:sub(1, 4) == 'fun(' then
+                    self.views[view] = nil
+                end
+            end
+        else
+            self.views['function'] = nil
+        end
     end
     if self._hasTable and not self._hasClass then
         self.views['table'] = true

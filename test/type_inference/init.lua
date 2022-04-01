@@ -1351,3 +1351,8 @@ local t
 
 local <?v?> = t.x()
 ]]
+
+TEST 'function' [[
+---@overload fun()
+function <?f?>() end
+]]

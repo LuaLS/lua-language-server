@@ -15,12 +15,12 @@ local m = {}
 ---@field uri? uri
 local mt = {}
 mt.__index = mt
-mt.hasNumber      = false
-mt.hasTable       = false
-mt.hasClass       = false
-mt.isParam        = false
-mt.isLocal        = false
-mt.hasDocFunction = false
+mt._hasNumber      = false
+mt._hasTable       = false
+mt._hasClass       = false
+mt._isParam        = false
+mt._isLocal        = false
+mt._hasDocFunction = false
 
 m.NULL = setmetatable({}, mt)
 
@@ -45,25 +45,25 @@ local viewNodeSwitch = util.switch()
     end)
     : case 'number'
     : call(function (source, infer)
-        infer.hasNumber = true
+        infer._hasNumber = true
         return source.type
     end)
     : case 'table'
     : call(function (source, infer)
-        infer.hasTable = true
+        infer._hasTable = true
     end)
     : case 'local'
     : call(function (source, infer)
         if source.parent == 'funcargs' then
-            infer.isParam = true
+            infer._isParam = true
         else
-            infer.isLocal = true
+            infer._isLocal = true
         end
     end)
     : case 'global'
     : call(function (source, infer)
         if source.cate == 'type' then
-            infer.hasClass = true
+            infer._hasClass = true
             return source.name
         end
     end)
@@ -73,7 +73,7 @@ local viewNodeSwitch = util.switch()
     end)
     : case 'doc.type.name'
     : call(function (source, infer)
-        infer.hasClass = true
+        infer._hasClass = true
         if source.signs then
             local buf = {}
             for i, sign in ipairs(source.signs) do
@@ -90,12 +90,12 @@ local viewNodeSwitch = util.switch()
     end)
     : case 'doc.type.array'
     : call(function (source, infer)
-        infer.hasClass = true
+        infer._hasClass = true
         return m.getInfer(source.node):view() .. '[]'
     end)
     : case 'doc.type.table'
     : call(function (source, infer)
-        infer.hasTable = true
+        infer._hasTable = true
     end)
     : case 'doc.type.string'
     : call(function (source, infer)
@@ -103,7 +103,7 @@ local viewNodeSwitch = util.switch()
     end)
     : case 'doc.type.function'
     : call(function (source, infer)
-        infer.hasDocFunction = true
+        infer._hasDocFunction = true
         local args = {}
         local rets = {}
         local argView = ''
@@ -152,16 +152,16 @@ function m.getInfer(source)
 end
 
 function mt:_trim()
-    if self.hasNumber then
+    if self._hasNumber then
         self.views['integer'] = nil
     end
-    if self.hasDocFunction then
+    if self._hasDocFunction then
         self.views['function'] = nil
     end
-    if self.hasTable and not self.hasClass then
+    if self._hasTable and not self._hasClass then
         self.views['table'] = true
     end
-    if self.hasClass then
+    if self._hasClass then
         self:_eraseAlias()
     end
 end
@@ -193,6 +193,12 @@ end
 function mt:hasType(tp)
     self:_computeViews()
     return self.views[tp] == true
+end
+
+---@return boolean
+function mt:hasClass()
+    self:_computeViews()
+    return self._hasClass == true
 end
 
 function mt:_computeViews()

@@ -414,7 +414,7 @@ local function isValidCallArgNode(source, node)
     end
     if source.type == 'table' then
         return node.type == 'doc.type.table'
-            or (node.type == 'global' and node.cate == 'type' and not guide.isBaseType(node.name))
+            or (node.type == 'global' and node.cate == 'type' and not guide.isBasicType(node.name))
     end
     return false
 end

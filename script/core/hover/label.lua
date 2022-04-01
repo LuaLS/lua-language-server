@@ -43,14 +43,13 @@ end
 ---@async
 local function asValue(source, title)
     local name    = buildName(source, false) or ''
-    local type    = infer.getInfer(source):view()
-    local literal = infer.getInfer(source):viewLiterals()
+    local ifr     = infer.getInfer(source)
+    local type    = ifr:view()
+    local literal = ifr:viewLiterals()
     local cont
-    if  not infer.getInfer(source):hasType 'string'
-    and not type:find('%[%]$') then
-        if infer.getInfer(source):hasType 'table' then
-            cont = buildTable(source)
-        end
+    if  ifr:hasType 'table'
+    and not ifr:hasType 'string' then
+        cont = buildTable(source)
     end
     local pack = {}
     pack[#pack+1] = title

@@ -1182,7 +1182,7 @@ function m.isOOP(source)
     return false
 end
 
-local baseTypeMap = {
+local basicTypeMap = {
     ['unknown']  = true,
     ['any']      = true,
     ['true']     = true,
@@ -1199,8 +1199,8 @@ local baseTypeMap = {
 
 ---@param str string
 ---@return boolean
-function m.isBaseType(str)
-    return baseTypeMap[str] == true
+function m.isBasicType(str)
+    return basicTypeMap[str] == true
 end
 
 return m

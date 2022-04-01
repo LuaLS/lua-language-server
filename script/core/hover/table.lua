@@ -155,17 +155,18 @@ local function getInferMap(fields, keyMap)
 end
 
 ---@async
+---@return string?
 return function (source)
     local uri = guide.getUri(source)
     local maxFields = config.get(uri, 'Lua.hover.previewFields')
     if maxFields <= 0 then
-        return 'table'
+        return nil
     end
 
     local fields    = vm.getFields(source)
     local keys, map = getKeyMap(fields)
     if #keys == 0 then
-        return '{}'
+        return nil
     end
 
     local reachMax = #keys - maxFields

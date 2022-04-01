@@ -183,7 +183,7 @@ t = {
 TEST [[
 local <?obj?> = {}
 ]]
-"local obj: {}"
+"local obj: table"
 
 --TEST [[
 --local mt = {}
@@ -450,7 +450,7 @@ local any = collectgarbage()
 t[any] = any
 ]]
 [[
-local t: {}
+local t: table
 ]]
 
 TEST[[

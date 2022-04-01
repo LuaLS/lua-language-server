@@ -676,6 +676,7 @@ end
 ---@class switch
 ---@field cachedCases string[]
 ---@field map table<string, function>
+---@field _default fun(...):...
 local switchMT = {}
 switchMT.__index = switchMT
 
@@ -700,6 +701,13 @@ function switchMT:call(callback)
     return self
 end
 
+---@param callback fun(...):...
+---@return switch
+function switchMT:default(callback)
+    self._default = callback
+    return self
+end
+
 function switchMT:getMap()
     return self.map
 end
@@ -713,7 +721,7 @@ end
 ---@param name string
 ---@return ...
 function switchMT:__call(name, ...)
-    local callback = self.map[name]
+    local callback = self.map[name] or self._default
     if not callback then
         return
     end

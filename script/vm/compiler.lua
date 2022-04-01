@@ -32,9 +32,16 @@ local searchFieldSwitch = util.switch()
     ---@param node vm.node.global
     : call(function (node, key, pushResult)
         if node.cate == 'variable' then
-            local global = globalMgr.getGlobal('variable', node.name, key)
-            if global then
-                pushResult(global)
+            if key then
+                local global = globalMgr.getGlobal('variable', node.name, key)
+                if global then
+                    pushResult(global)
+                end
+            else
+                local globals = globalMgr.getFields('variable', node.name)
+                for _, global in ipairs(globals) do
+                    pushResult(global)
+                end
             end
         end
         if node.cate == 'type' then

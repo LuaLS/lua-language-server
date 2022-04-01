@@ -172,6 +172,7 @@ function m.getFields(source)
     for lid, sources in pairs(root._localIDs) do
         if  lid ~= id
         and util.stringStartWith(lid, id)
+        and lid:sub(#id + 1, #id + 1) == m.ID_SPLITE
         -- only one field
         and not lid:find(m.ID_SPLITE, #id + 2) then
             for _, src in ipairs(sources) do

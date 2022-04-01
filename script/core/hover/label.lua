@@ -47,8 +47,7 @@ local function asValue(source, title)
     local type    = ifr:view()
     local literal = ifr:viewLiterals()
     local cont
-    if  ifr:hasType 'table'
-    and not ifr:hasType 'string' then
+    if not ifr:hasType 'string' then
         cont = buildTable(source)
     end
     local pack = {}

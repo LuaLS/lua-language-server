@@ -224,6 +224,26 @@ function m.getGlobal(cate, name, field)
     return m.globals[key]
 end
 
+---@param cate   vm.global.cate
+---@param name   string
+---@return vm.node.global[]
+function m.getFields(cate, name)
+    local globals = {}
+    local key = cate .. '|' .. name
+
+    -- TODO: optimize
+    for gid, global in pairs(m.globals) do
+        if  gid ~= key
+        and util.stringStartWith(gid, key)
+        and gid:sub(#key + 1, #key + 1) == m.ID_SPLITE
+        and not gid:find(m.ID_SPLITE, #key + 2) then
+            globals[#globals+1] = global
+        end
+    end
+
+    return globals
+end
+
 ---@param source parser.object
 function m.compileObject(source)
     if source._globalNode ~= nil then

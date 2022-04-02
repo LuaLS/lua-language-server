@@ -1401,7 +1401,7 @@ local function getCallEnumsAndFuncs(source, index, oop, call)
                 and doc.field[1] == source[1] then
                     local eventName = noder.getFieldEventName(doc)
                     if eventName and eventName == myEventName then
-                        local docFunc = doc.extends.types[1].args[2].extends.types[1]
+                        local docFunc = doc.extends.types[1].args[index].extends.types[1]
                         results[#results+1] = {
                             label       = infer.viewDocFunction(docFunc),
                             description = doc.comment,

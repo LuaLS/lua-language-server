@@ -2682,6 +2682,22 @@ emit:on('won', <??>)
 }
 
 TEST [[
+--- @class Emit
+--- @field on fun(self: Emit, eventName: string, cb: function)
+--- @field on fun(self: Emit, eventName: '"died"', cb: fun(i: integer))
+--- @field on fun(self: Emit, eventName: '"won"', cb: fun(s: string))
+local emit = {}
+
+emit.on(emit, 'won', <??>)
+]]
+{
+    [1] = {
+        label    = 'fun(s: string)',
+        kind     = define.CompletionItemKind.Function,
+    }
+}
+
+TEST [[
 local function f()
     local inferCache
     in<??>

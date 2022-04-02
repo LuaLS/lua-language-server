@@ -1380,34 +1380,37 @@ local function getCallEnumsAndFuncs(source, index, oop, call)
             return
         end
         local results = {}
-        if     currentIndex == 1 then
-            for _, doc in ipairs(class.fields) do
-                if  doc.field ~= source
-                and doc.field[1] == source[1] then
-                    local eventName = noder.getFieldEventName(doc)
-                    if eventName then
-                        results[#results+1] = {
-                            label       = ('%q'):format(eventName),
-                            description = doc.comment,
-                            kind        = define.CompletionItemKind.EnumMember,
-                        }
+        local valueBeforeIndex = index > 1 and call.args[index - 1][1]
+
+        for _, doc in ipairs(class.fields) do
+            if  doc.field ~= source
+            and doc.field[1] == source[1] then
+                local indexType = currentIndex
+                if not oop then
+                    local args = noder.getFieldArgs(doc)
+                    -- offset if doc's first arg is `self`
+                    if args and args[1] and args[1].name[1] == 'self' then
+                        indexType = indexType - 1
                     end
                 end
-            end
-        elseif currentIndex == 2 then
-            local myEventName = call.args[index - 1][1]
-            for _, doc in ipairs(class.fields) do
-                if  doc.field ~= source
-                and doc.field[1] == source[1] then
-                    local eventName = noder.getFieldEventName(doc)
-                    if eventName and eventName == myEventName then
-                        local docFunc = doc.extends.types[1].args[index].extends.types[1]
-                        results[#results+1] = {
-                            label       = infer.viewDocFunction(docFunc),
-                            description = doc.comment,
-                            kind        = define.CompletionItemKind.Function,
-                            insertText  = buildInsertDocFunction(docFunc),
-                        }
+                local eventName = noder.getFieldEventName(doc)
+                if eventName then
+                    if     indexType == 1 then
+                            results[#results+1] = {
+                                label       = ('%q'):format(eventName),
+                                description = doc.comment,
+                                kind        = define.CompletionItemKind.EnumMember,
+                            }
+                    elseif indexType == 2 then
+                        if eventName == valueBeforeIndex then
+                            local docFunc = doc.extends.types[1].args[index].extends.types[1]
+                            results[#results+1] = {
+                                label       = infer.viewDocFunction(docFunc),
+                                description = doc.comment,
+                                kind        = define.CompletionItemKind.Function,
+                                insertText  = buildInsertDocFunction(docFunc),
+                            }
+                        end
                     end
                 end
             end

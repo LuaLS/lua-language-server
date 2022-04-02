@@ -15,7 +15,7 @@ debug = {}
 ---@field currentline     integer
 ---@field istailcall      boolean
 ---@field nups            integer
----#if VERSION >= 5.2 then
+---#if VERSION >= 5.2 or JIT then
 ---@field nparams         integer
 ---@field isvararg        boolean
 ---#end

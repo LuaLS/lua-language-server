@@ -43,7 +43,7 @@ if_condition_no_continuation_indent = false
 
 
 # optional crlf/lf
-end_of_line = crlf
+end_of_line = lf
 
 # [line layout]
 # The following configuration supports three expressions

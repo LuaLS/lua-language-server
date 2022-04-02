@@ -140,11 +140,7 @@ local function getMethodNode(source)
     end
 end
 
-local function getFieldEventName(field)
-    if field._eventName then
-        return field._eventName or nil
-    end
-    field._eventName = false
+local function getFieldArgs(field)
     local fieldType = field.extends
     if not fieldType then
         return nil
@@ -153,19 +149,29 @@ local function getFieldEventName(field)
     if not docFunc or docFunc.type ~= 'doc.type.function' then
         return nil
     end
-    local firstArg = docFunc.args and docFunc.args[1]
+    return docFunc.args
+end
+
+local function getFieldEventName(field)
+    if field._eventName then
+        return field._eventName or nil
+    end
+    field._eventName = false
+
+    local args = getFieldArgs(field)
+    local firstArg = args and args[1]
     if not firstArg then
         return nil
     end
     local secondArg
     if firstArg.name[1] == 'self' then
-        firstArg = docFunc.args[2]
+        firstArg = args[2]
         if not firstArg then
             return nil
         end
-        secondArg = docFunc.args[3]
+        secondArg = args[3]
     else
-        secondArg = docFunc.args[2]
+        secondArg = args[2]
     end
     if not secondArg then
         return
@@ -881,7 +887,8 @@ local function compileCallParam(noders, call, sourceID)
     local eventNodeID
     for firstIndex, callArg in ipairs(call.args) do
         firstIndex = firstIndex - fixIndex
-        if firstIndex == 1 and callArg.type == 'string' then
+        if  (firstIndex == 1 or firstIndex == 2)
+        and callArg.type == 'string' then
             if callArg[1] then
                 eventNodeID = sformat('%s%s%s'
                     , nodeID
@@ -1685,6 +1692,7 @@ function m.eachID(noders)
     return next, noders.source
 end
 
+m.getFieldArgs = getFieldArgs
 m.getFieldEventName = getFieldEventName
 
 ---获取对象的noders

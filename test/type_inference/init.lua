@@ -941,6 +941,17 @@ emit:on("died", function (<?i?>)
 end)
 ]]
 
+TEST 'integer' [[
+--- @class Emit
+--- @field on fun(self: Emit, eventName: string, cb: function)
+--- @field on fun(self: Emit, eventName: '"died"', cb: fun(i: integer))
+--- @field on fun(self: Emit, eventName: '"won"', cb: fun(s: string))
+local emit = {}
+
+emit.on(self, "died", function (<?i?>)
+end)
+]]
+
 TEST '👍' [[
 ---@class 👍
 local <?x?>

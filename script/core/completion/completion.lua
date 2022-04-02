@@ -1396,11 +1396,11 @@ local function getCallEnumsAndFuncs(source, index, oop, call)
                 local eventName = noder.getFieldEventName(doc)
                 if eventName then
                     if     indexType == 1 then
-                            results[#results+1] = {
-                                label       = ('%q'):format(eventName),
-                                description = doc.comment,
-                                kind        = define.CompletionItemKind.EnumMember,
-                            }
+                        results[#results+1] = {
+                            label       = ('%q'):format(eventName),
+                            description = doc.comment,
+                            kind        = define.CompletionItemKind.EnumMember,
+                        }
                     elseif indexType == 2 then
                         if eventName == valueBeforeIndex then
                             local docFunc = doc.extends.types[1].args[index].extends.types[1]

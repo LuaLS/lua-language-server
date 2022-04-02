@@ -1,6 +1,6 @@
 package.path = package.path .. ';3rd/love-api/?.lua'
 
-local lua51 = require 'Lua51'
+local lua51 = require 'lua51'
 local api   = lua51.require 'love_api'
 local fs    = require 'bee.filesystem'
 local fsu   = require 'fs-utility'

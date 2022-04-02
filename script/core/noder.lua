@@ -887,7 +887,8 @@ local function compileCallParam(noders, call, sourceID)
     local eventNodeID
     for firstIndex, callArg in ipairs(call.args) do
         firstIndex = firstIndex - fixIndex
-        if firstIndex == 1 and callArg.type == 'string' then
+        if  (firstIndex == 1 or firstIndex == 2)
+        and callArg.type == 'string' then
             if callArg[1] then
                 eventNodeID = sformat('%s%s%s'
                     , nodeID

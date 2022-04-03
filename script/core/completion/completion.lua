@@ -158,11 +158,14 @@ local function buildFunctionSnip(source, value, oop)
     local args = getArg(value, oop)
     local id = 0
     args = args:gsub('[^,]+', function (arg)
+        if arg:match('^%s+[^?]+%?:') or arg:match('^%s+%.%.%.:') then
+            return ''
+        end
         id = id + 1
         return arg:gsub('^(%s*)(.+)', function (sp, word)
             return ('%s${%d:%s}'):format(sp, id, word)
         end)
-    end)
+    end):gsub(',+$', '')
     return ('%s(%s)'):format(name, args)
 end
 

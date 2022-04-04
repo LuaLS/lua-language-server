@@ -111,14 +111,14 @@ local searchFieldSwitch = util.switch()
                         or (fn.name == 'number'  and type(key) == 'number')
                         or (fn.name == 'integer' and math.tointeger(key))
                         or (fn.name == 'string'  and type(key) == 'string') then
-                            pushResult(field.extends)
+                            pushResult(field)
                         end
                     end
                 end
             end
             if fieldKey.type == 'doc.field.name' then
                 if key == nil or fieldKey[1] == key then
-                    pushResult(field.extends)
+                    pushResult(field)
                 end
             end
         end
@@ -849,6 +849,10 @@ local compilerSwitch = util.switch()
         nodeMgr.setNode(source, m.compileNode(source.parent))
     end)
     : case 'doc.field'
+    : call(function (source)
+        nodeMgr.setNode(source, m.compileNode(source.extends))
+    end)
+    : case 'doc.type.field'
     : call(function (source)
         nodeMgr.setNode(source, m.compileNode(source.extends))
     end)

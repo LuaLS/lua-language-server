@@ -1676,7 +1676,7 @@ TEST [[
 ]]
 [[
 global a: {
-    b: integer,
+    b: integer = 600,
 }
 ]]
 
@@ -1684,7 +1684,7 @@ TEST [[
 a.<?b?> = 10 * 60
 ]]
 [[
-global a.b: integer
+global a.b: integer = 600
 ]]
 
 TEST [[
@@ -1692,7 +1692,7 @@ a.<?b?>.c = 1 * 1
 ]]
 [[
 global a.b: {
-    c: integer,
+    c: integer = 1,
 }
 ]]
 
@@ -1744,20 +1744,6 @@ print(b.<?x?>)
 ]]
 [[
 field A.x: unknown
-]]
-TEST [[
----@class A
----@field x number
----@field y number
-
----@type A<string, number>
-local <?t?>
-]]
-[[
-local t: A<string, number> {
-    x: number,
-    y: number,
-}
 ]]
 
 TEST [[

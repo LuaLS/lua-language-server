@@ -113,8 +113,8 @@ end
 local function getOptMap(fields, keyMap)
     local optMap = {}
     for _, field in ipairs(fields) do
-        if field.type == 'doc.field.name' then
-            if field.parent.optional then
+        if field.type == 'doc.field' then
+            if field.optional then
                 local key = vm.getKeyName(field)
                 if keyMap[key] then
                     optMap[key] = true
@@ -145,7 +145,7 @@ local function getInferMap(fields, keyMap)
         await.delay()
         local ifr = infer.getInfer(field)
         if inferMap[key] then
-            inferMap[key]:merge(ifr)
+            inferMap[key] = inferMap[key]:merge(ifr)
         else
             inferMap[key] = ifr
         end

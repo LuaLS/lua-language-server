@@ -2480,6 +2480,24 @@ foo<??>
         insertText = 'foo(${1:a?: any}, ${2:b: any})',
     },
 }
+
+TEST [[
+---@param f fun(a: any, b: any)
+local function foo(f) end
+foo<??>
+]]
+{
+    {
+        label = 'foo(f)',
+        kind  = define.CompletionItemKind.Function,
+        insertText = 'foo',
+    },
+    {
+        label = 'foo(f)',
+        kind  = define.CompletionItemKind.Snippet,
+        insertText = 'foo(${1:f: fun(a: any, b: any)})',
+    },
+}
 Cared['insertText'] = false
 
 TEST [[

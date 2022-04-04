@@ -1,6 +1,5 @@
 local guide = require 'parser.guide'
 local infer = require 'core.infer'
-local vm    = require 'vm'
 
 local function optionalArg(arg)
     if not arg.bindDocs then
@@ -14,7 +13,7 @@ local function optionalArg(arg)
     end
 end
 
-local function asFunction(source, oop)
+local function asFunction(source)
     local args = {}
     local methodDef
     local parent = source.parent
@@ -48,14 +47,10 @@ local function asFunction(source, oop)
             ::CONTINUE::
         end
     end
-    if oop then
-        return table.concat(args, ', ', 2)
-    else
-        return table.concat(args, ', ')
-    end
+    return args
 end
 
-local function asDocFunction(source, oop)
+local function asDocFunction(source)
     if not source.args then
         return ''
     end
@@ -69,19 +64,15 @@ local function asDocFunction(source, oop)
             arg.extends and infer.searchAndViewInfers(arg.extends) or 'any'
         )
     end
-    if oop then
-        return table.concat(args, ', ', 2)
-    else
-        return table.concat(args, ', ')
-    end
+    return args
 end
 
-return function (source, oop)
+return function (source)
     if source.type == 'function' then
-        return asFunction(source, oop)
+        return asFunction(source)
     end
     if source.type == 'doc.type.function' then
-        return asDocFunction(source, oop)
+        return asDocFunction(source)
     end
-    return ''
+    return {}
 end

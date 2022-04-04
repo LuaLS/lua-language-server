@@ -1,5 +1,5 @@
 local buildName   = require 'core.hover.name'
-local buildArg    = require 'core.hover.arg'
+local buildArgs   = require 'core.hover.args'
 local buildReturn = require 'core.hover.return'
 local buildTable  = require 'core.hover.table'
 local infer       = require 'core.infer'
@@ -12,7 +12,7 @@ local guide       = require 'parser.guide'
 
 local function asFunction(source, oop)
     local name  = buildName(source, oop)
-    local arg   = buildArg(source, oop)
+    local args  = buildArgs(source)
     local rtn   = buildReturn(source)
     local lines = {}
 
@@ -20,7 +20,7 @@ local function asFunction(source, oop)
         , vm.isAsync(source) and 'async ' or ''
         , oop and 'method' or 'function'
         , name or ''
-        , arg
+        , oop and table.concat(args, ', ', 2) or table.concat(args, ', ')
     )
     lines[2] = rtn
 

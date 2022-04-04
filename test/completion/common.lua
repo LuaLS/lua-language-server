@@ -2373,6 +2373,90 @@ zzzz<??>
         insertText = 'zzzz(${1:a: any}, ${2:b: any})',
     },
 }
+
+TEST [[
+---@param a any
+---@param b? any
+---@param c? any
+---@vararg any
+local function foo(a, b, c, ...) end
+foo<??>
+]]
+{
+    {
+        label = 'foo(a, b, c, ...)',
+        kind  = define.CompletionItemKind.Function,
+        insertText = 'foo',
+    },
+    {
+        label = 'foo(a, b, c, ...)',
+        kind  = define.CompletionItemKind.Snippet,
+        insertText = 'foo(${1:a: any})',
+    },
+}
+
+TEST [[
+---@param a any
+---@param b? any
+---@param c? any
+---@vararg any
+local function foo(a, b, c, ...) end
+foo<??>
+]]
+{
+    {
+        label = 'foo(a, b, c, ...)',
+        kind  = define.CompletionItemKind.Function,
+        insertText = 'foo',
+    },
+    {
+        label = 'foo(a, b, c, ...)',
+        kind  = define.CompletionItemKind.Snippet,
+        insertText = 'foo(${1:a: any})',
+    },
+}
+
+TEST [[
+---@param a? any
+---@param b? any
+---@param c? any
+---@vararg any
+local function foo(a, b, c, ...) end
+foo<??>
+]]
+{
+    {
+        label = 'foo(a, b, c, ...)',
+        kind  = define.CompletionItemKind.Function,
+        insertText = 'foo',
+    },
+    {
+        label = 'foo(a, b, c, ...)',
+        kind  = define.CompletionItemKind.Snippet,
+        insertText = 'foo($1)',
+    },
+}
+
+TEST [[
+---@param a? any
+---@param b any
+---@param c? any
+---@vararg any
+local function foo(a, b, c, ...) end
+foo<??>
+]]
+{
+    {
+        label = 'foo(a, b, c, ...)',
+        kind  = define.CompletionItemKind.Function,
+        insertText = 'foo',
+    },
+    {
+        label = 'foo(a, b, c, ...)',
+        kind  = define.CompletionItemKind.Snippet,
+        insertText = 'foo(${1:a?: any}, ${2:b: any})',
+    },
+}
 Cared['insertText'] = false
 
 TEST [[

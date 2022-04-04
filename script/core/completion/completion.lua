@@ -157,12 +157,26 @@ local function buildFunctionSnip(source, value, oop)
     local name = (getName(source) or ''):gsub('^.+[$.:]', '')
     local args = getArg(value, oop)
     local id = 0
+    local needTruncateId = 0
     args = args:gsub('[^,]+', function (arg)
         id = id + 1
+        if arg:match('^%s*[^?]+%?:') or arg:match('^%s*%.%.%.:') then
+            if needTruncateId == 0 then
+                needTruncateId = id
+            end
+        else
+            needTruncateId = 0
+        end
         return arg:gsub('^(%s*)(.+)', function (sp, word)
             return ('%s${%d:%s}'):format(sp, id, word)
         end)
     end)
+    if needTruncateId > 0 then
+        local start = args:find(',?%s*%${' .. needTruncateId)
+        if start then
+            args = start == 1 and '$1' or args:sub(1, start - 1)
+        end
+    end
     return ('%s(%s)'):format(name, args)
 end
 

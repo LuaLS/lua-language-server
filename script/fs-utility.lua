@@ -210,6 +210,9 @@ function dfs:exists()
 end
 
 function dfs:createDirectories(path)
+    if not path then
+        return false
+    end
     if type(path) ~= 'string' then
         path = path:string()
     end
@@ -230,6 +233,9 @@ function dfs:createDirectories(path)
 end
 
 function dfs:saveFile(path, text)
+    if not path then
+        return false, 'no path'
+    end
     if type(path) ~= 'string' then
         path = path:string()
     end
@@ -269,6 +275,9 @@ local function fsAbsolute(path, option)
 end
 
 local function fsIsDirectory(path, option)
+    if not path then
+        return false
+    end
     if path.type == 'dummy' then
         return path:isDirectory()
     end
@@ -281,6 +290,9 @@ local function fsIsDirectory(path, option)
 end
 
 local function fsPairs(path, option)
+    if not path then
+        return function () end
+    end
     if path.type == 'dummy' then
         return path:listDirectory()
     end
@@ -293,6 +305,9 @@ local function fsPairs(path, option)
 end
 
 local function fsRemove(path, option)
+    if not path then
+        return false
+    end
     if path.type == 'dummy' then
         return path:remove()
     end
@@ -304,6 +319,9 @@ local function fsRemove(path, option)
 end
 
 local function fsExists(path, option)
+    if not path then
+        return false
+    end
     if path.type == 'dummy' then
         return path:exists()
     end
@@ -316,6 +334,9 @@ local function fsExists(path, option)
 end
 
 local function fsSave(path, text, option)
+    if not path then
+        return false
+    end
     if path.type == 'dummy' then
         local dir = path:_open(-2)
         if not dir then
@@ -343,6 +364,9 @@ local function fsSave(path, text, option)
 end
 
 local function fsLoad(path, option)
+    if not path then
+        return nil
+    end
     if path.type == 'dummy' then
         local text = path:_open()
         if type(text) == 'string' then
@@ -363,6 +387,9 @@ local function fsLoad(path, option)
 end
 
 local function fsCopy(source, target, option)
+    if not source or not target then
+        return
+    end
     if source.type == 'dummy' then
         local sourceText = source:_open()
         if not sourceText then
@@ -390,6 +417,9 @@ local function fsCopy(source, target, option)
 end
 
 local function fsCreateDirectories(path, option)
+    if not path then
+        return
+    end
     if path.type == 'dummy' then
         return path:createDirectories()
     end
@@ -402,6 +432,9 @@ local function fsCreateDirectories(path, option)
 end
 
 local function fileRemove(path, option)
+    if not path then
+        return
+    end
     if option.onRemove and option.onRemove(path) == false then
         return
     end
@@ -416,6 +449,9 @@ local function fileRemove(path, option)
 end
 
 local function fileCopy(source, target, option)
+    if not source or not target then
+        return
+    end
     local isDir1   = fsIsDirectory(source, option)
     local isDir2   = fsIsDirectory(target, option)
     local isExists = fsExists(target, option)
@@ -446,6 +482,9 @@ local function fileCopy(source, target, option)
 end
 
 local function fileSync(source, target, option)
+    if not source or not target then
+        return
+    end
     local isDir1   = fsIsDirectory(source, option)
     local isDir2   = fsIsDirectory(target, option)
     local isExists = fsExists(target, option)

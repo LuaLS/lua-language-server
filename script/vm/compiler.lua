@@ -20,17 +20,29 @@ local m = {}
 local searchFieldSwitch = util.switch()
     : case 'table'
     : call(function (node, key, pushResult)
+        local hasFiled = false
         for _, field in ipairs(node) do
             if field.type == 'tablefield'
             or field.type == 'tableindex' then
                 if not key
                 or key == guide.getKeyName(field) then
+                    hasFiled = true
                     pushResult(field)
                 end
             end
             if field.type == 'tableexp' then
                 if not key
                 or key == field.tindex then
+                    hasFiled = true
+                    pushResult(field)
+                end
+            end
+            if field.type == 'varargs' then
+                if not hasFiled
+                and key
+                and key >= 1
+                and math.tointeger(key) then
+                    hasFiled = true
                     pushResult(field)
                 end
             end
@@ -432,8 +444,6 @@ local function selectNode(source, list, index)
     local result
     if exp.type == 'call' then
         result = getReturn(exp.node, index, exp.args)
-    elseif exp.type == '...' then
-        -- TODO
     else
         result = m.compileNode(exp)
     end
@@ -748,6 +758,13 @@ local compilerSwitch = util.switch()
             local node = getReturn(vararg.node, source.sindex, vararg.args)
             nodeMgr.setNode(source, node)
         end
+        if vararg.type == 'varargs' then
+            nodeMgr.setNode(source, m.compileNode(vararg))
+        end
+    end)
+    : case 'varargs'
+    : call(function (source)
+        nodeMgr.setNode(source, m.compileNode(source.node))
     end)
     : case 'call'
     : call(function (source)
@@ -871,6 +888,10 @@ local compilerSwitch = util.switch()
         else
             nodeMgr.setNode(source, globalMgr.getGlobal('type', 'any'))
         end
+    end)
+    : case 'generic'
+    : call(function (source)
+        nodeMgr.setNode(source, source)
     end)
     : case 'unary'
     : call(function (source)
@@ -1295,6 +1316,9 @@ end
 ---@param source parser.object
 ---@return vm.node
 function m.compileNode(source)
+    if not source then
+        return false
+    end
     if nodeMgr.nodeCache[source] ~= nil then
         return nodeMgr.nodeCache[source]
     end

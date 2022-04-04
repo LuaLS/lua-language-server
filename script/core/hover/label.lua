@@ -30,12 +30,11 @@ end
 local function asDocTypeName(source)
     local defs = vm.getDefs(source)
     for _, doc in ipairs(defs) do
-        if doc.type == 'doc.class.name' then
-            return 'class ' .. doc[1]
+        if doc.type == 'doc.class' then
+            return 'class ' .. doc.class[1]
         end
-        if doc.type == 'doc.alias.name' then
-            local extends = doc.parent.extends
-            return lang.script('HOVER_EXTENDS', infer.getInfer(extends):view())
+        if doc.type == 'doc.alias' then
+            return lang.script('HOVER_EXTENDS', infer.getInfer(doc.extends):view())
         end
     end
 end

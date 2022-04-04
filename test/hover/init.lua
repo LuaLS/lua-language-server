@@ -6,18 +6,19 @@ local config     = require 'config'
 rawset(_G, 'TEST', true)
 
 local accept = {
-    ['local']         = true,
-    ['setlocal']      = true,
-    ['getlocal']      = true,
-    ['setglobal']     = true,
-    ['getglobal']     = true,
-    ['field']         = true,
-    ['method']        = true,
-    ['string']        = true,
-    ['number']        = true,
-    ['integer']       = true,
-    ['doc.type.name'] = true,
-    ['function']      = true,
+    ['local']          = true,
+    ['setlocal']       = true,
+    ['getlocal']       = true,
+    ['setglobal']      = true,
+    ['getglobal']      = true,
+    ['field']          = true,
+    ['method']         = true,
+    ['string']         = true,
+    ['number']         = true,
+    ['integer']        = true,
+    ['doc.type.name']  = true,
+    ['doc.class.name'] = true,
+    ['function']       = true,
 }
 
 ---@diagnostic disable: await-in-sync
@@ -28,7 +29,7 @@ function TEST(script)
         local hover = core.byUri('', catched['?'][1][1])
         assert(hover)
         expect = expect:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
-        local label = tostring(hover):match('```lua[\r\n]*(.-)[\r\n]*```'):gsub('\r\n', '\n')
+        local label = hover:string():gsub('\r\n', '\n'):match('```lua[\r\n]*(.-)[\r\n]*```')
         assert(expect == label)
         files.remove('')
     end
@@ -1058,7 +1059,7 @@ end
 local <?r?> = f(1)
 ]]
 [[
-local r: integer
+local r: integer = 1
 ]]
 
 TEST [[
@@ -1082,6 +1083,18 @@ f(1, 2, 3)
 ]]
 [[
 local x: Class
+]]
+
+TEST [[
+---@class Class
+
+---@vararg Class
+local function f(...)
+    local <?t?> = {...}
+end
+]]
+[[
+local t: Class[]
 ]]
 
 TEST [[
@@ -1330,7 +1343,7 @@ TEST [[
 local <?f?>
 ]]
 [[
-local f: fun(x: boolean):boolean
+local f: fun(x?: boolean):boolean?
 ]]
 
 TEST [[
@@ -1354,7 +1367,7 @@ end
 [[
 function f(x: any, y: any)
   -> first: table
-  2. second?: string
+  2. second: string?
 ]]
 
 TEST [[
@@ -1386,7 +1399,7 @@ TEST [[
 local <?t?>
 ]]
 [[
-local t: string|'enum1'|'enum2'
+local t: string|"enum1"|"enum2"
 ]]
 
 TEST [[
@@ -1395,7 +1408,7 @@ TEST [[
 ---@type <?A?>
 ]]
 [[
-展开为 string|'enum1'|'enum2'
+展开为 string|"enum1"|"enum2"
 ]]
 
 TEST [[
@@ -1405,7 +1418,7 @@ TEST [[
 local <?t?>
 ]]
 [[
-local t: string|'enum1'|'enum2'
+local t: string|"enum1"|"enum2"
 ]]
 
 TEST [[
@@ -1415,7 +1428,7 @@ TEST [[
 local <?t?>
 ]]
 [[
-local t: string|'enum1'|'enum2'
+local t: string|"enum1"|"enum2"
 ]]
 
 TEST [[
@@ -1501,7 +1514,7 @@ local x --- @type boolean
 local <?y?>
 ]]
 [[
-local y: any
+local y: unknown
 ]]
 
 TEST [[

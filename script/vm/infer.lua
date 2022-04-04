@@ -50,6 +50,13 @@ local viewNodeSwitch = util.switch()
     end)
     : case 'table'
     : call(function (source, infer)
+        if source.type == 'table' then
+            if #source == 1 and source[1].type == 'varargs' then
+                local node = m.getInfer(source[1]):view()
+                return ('%s[]'):format(node)
+            end
+        end
+
         infer._hasTable = true
     end)
     : case 'function'
@@ -91,6 +98,10 @@ local viewNodeSwitch = util.switch()
         else
             return source[1]
         end
+    end)
+    : case 'generic'
+    : call(function (source, infer)
+        return ('<%s>'):format(source.proto[1])
     end)
     : case 'doc.generic.name'
     : call(function (source, infer)

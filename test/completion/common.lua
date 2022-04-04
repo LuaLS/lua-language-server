@@ -76,6 +76,29 @@ zac<??>
     },
 }
 
+config.set(nil, 'Lua.completion.callSnippet',    'Disable')
+TEST [[
+ass<??>
+]]
+{
+    {
+        label = 'assert(v, message)',
+        kind  = define.CompletionItemKind.Function,
+    },
+}
+
+config.set(nil, 'Lua.completion.callSnippet',    'Replace')
+TEST [[
+ass<??>
+]]
+{
+    {
+        label = 'assert(v, message)',
+        kind  = define.CompletionItemKind.Function,
+    },
+}
+
+config.set(nil, 'Lua.completion.callSnippet',    'Both')
 TEST [[
 ass<??>
 ]]

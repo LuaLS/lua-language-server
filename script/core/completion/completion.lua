@@ -243,7 +243,9 @@ local function buildFunction(results, source, value, oop, data)
     if snipType == 'Both' or snipType == 'Replace' then
         local snipData = util.deepCopy(data)
 
-        snipData.kind             = define.CompletionItemKind.Snippet
+        snipData.kind             = snipType == 'Both'
+                                    and define.CompletionItemKind.Snippet
+                                    or  data.kind
         snipData.insertText       = buildFunctionSnip(source, value, oop)
         snipData.insertTextFormat = 2
         snipData.command          = {

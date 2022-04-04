@@ -7,9 +7,6 @@
 [submodule "3rd/lpeglabel"]
 	path = 3rd/lpeglabel
 	url = https://github.com/sqmedeiros/lpeglabel
-[submodule "3rd/rcedit"]
-	path = 3rd/rcedit
-	url = https://github.com/electron/rcedit
 [submodule "3rd/love-api"]
 	path = 3rd/love-api
 	url = https://github.com/love2d-community/love-api

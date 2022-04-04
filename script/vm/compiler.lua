@@ -7,6 +7,8 @@ local signMgr    = require 'vm.sign'
 local config     = require 'config'
 local union      = require 'vm.union'
 local genericMgr = require 'vm.generic'
+local rpath      = require 'workspace.require-path'
+local files      = require 'files'
 
 ---@class parser.object
 ---@field _compiledNodes  boolean
@@ -274,6 +276,26 @@ local function getReturn(func, index, args)
             newArgs[#newArgs+1] = args[i]
         end
         return getReturn(args[1], index - 1, newArgs)
+    end
+    if func.special == 'require' then
+        local nameArg = args[1]
+        if not nameArg or nameArg.type ~= 'string' then
+            return nil
+        end
+        local name = nameArg[1]
+        if not name or type(name) ~= 'string' then
+            return nil
+        end
+        local uri = rpath.findUrisByRequirePath(guide.getUri(func), name)[1]
+        if not uri then
+            return nil
+        end
+        local state = files.getState(uri)
+        local ast   = state and state.ast
+        if not ast then
+            return nil
+        end
+        return m.compileNode(ast)
     end
     local node = m.compileNode(func)
     ---@type vm.node.union
@@ -671,6 +693,14 @@ local compilerSwitch = util.switch()
         if func.returns and not hasMarkDoc then
             for _, rtn in ipairs(func.returns) do
                 selectNode(source, rtn, index)
+            end
+        end
+    end)
+    : case 'main'
+    : call(function (source)
+        if source.returns then
+            for _, rtn in ipairs(source.returns) do
+                nodeMgr.setNode(source, m.compileNode(rtn[1]))
             end
         end
     end)

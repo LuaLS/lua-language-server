@@ -626,7 +626,7 @@ end
 local <?r?> = a(1)
 ]]
 [[
-local r: string
+local r: string = "a"
 ]]
 
 TEST[[
@@ -636,7 +636,7 @@ end
 local _, <?r?> = pcall(a, 1)
 ]]
 [[
-local r: string
+local r: string = "a"
 ]]
 
 TEST[[
@@ -645,15 +645,6 @@ local <?n?> = rawlen()
 [[
 local n: integer
 ]]
-
--- TODO 暂未实现
---TEST[[
---local <?n?> = pairs()
---]]
---[[
---function n<next>(table: table [, index: any])
---  -> key: any, value: any
---]]
 
 TEST[[
 local <?x?> = '\a'
@@ -698,8 +689,8 @@ end
 ]]
 [[
 function f()
-  -> any
-  2. any
+  -> nil
+  2. nil
 ]]
 
 TEST [[
@@ -709,7 +700,7 @@ end
 local <?x?> = f()
 ]]
 [[
-local x: any
+local x: nil
 ]]
 
 TEST [[
@@ -720,7 +711,7 @@ end
 ]]
 [[
 function f()
-  -> integer
+  -> integer|nil
 ]]
 
 TEST [[
@@ -790,7 +781,7 @@ io.<?popen?>()
 [[
 function io.popen(prog: string, mode?: "r"|"w")
   -> file*?
-  2. errmsg?: string
+  2. errmsg: string?
 ]]
 
 TEST [[

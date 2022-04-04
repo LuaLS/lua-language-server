@@ -28,6 +28,12 @@ local searchFieldSwitch = util.switch()
                     pushResult(field)
                 end
             end
+            if field.type == 'tableexp' then
+                if not key
+                or key == field.tindex then
+                    pushResult(field)
+                end
+            end
         end
     end)
     : case 'global'
@@ -340,6 +346,7 @@ end
 local function bindDocs(source)
     local hasFounded = false
     local isParam = source.parent.type == 'funcargs'
+                 or source.parent.type == 'in'
     for _, doc in ipairs(source.bindDocs) do
         if doc.type == 'doc.type' then
             if not isParam then
@@ -349,7 +356,9 @@ local function bindDocs(source)
         end
         if doc.type == 'doc.class' then
             if (source.type == 'local' and not isParam)
-            or (source._globalNode and guide.isSet(source)) then
+            or (source._globalNode and guide.isSet(source))
+            or source.type == 'tablefield'
+            or source.type == 'tableindex' then
                 hasFounded = true
                 nodeMgr.setNode(source, m.compileNode(doc))
             end
@@ -663,18 +672,31 @@ local compilerSwitch = util.switch()
     : case 'tablefield'
     : case 'tableindex'
     : call(function (source)
-        if source.value then
-            nodeMgr.setNode(source, m.compileNode(source.value))
+        local hasMarkDoc
+        if source.bindDocs then
+            hasMarkDoc = bindDocs(source)
         end
 
-        m.compileByParentNode(source.parent, guide.getKeyName(source), function (src)
-            nodeMgr.setNode(source, m.compileNode(src))
-        end)
+        if source.value then
+            if not hasMarkDoc or guide.isLiteral(source.value) then
+                nodeMgr.setNode(source, m.compileNode(source.value))
+            end
+        end
+
+        if not hasMarkDoc then
+            m.compileByParentNode(source.parent, guide.getKeyName(source), function (src)
+                nodeMgr.setNode(source, m.compileNode(src))
+            end)
+        end
     end)
     : case 'field'
     : case 'method'
     : call(function (source)
         nodeMgr.setNode(source, m.compileNode(source.parent))
+    end)
+    : case 'tableexp'
+    : call(function (source)
+        nodeMgr.setNode(source, m.compileNode(source.value))
     end)
     : case 'function.return'
     : call(function (source)

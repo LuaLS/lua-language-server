@@ -414,7 +414,7 @@ t.a = true
 ]]
 [[
 local t: {
-    a: boolean|integer = 1,
+    a: boolean|integer = 1|true,
 }
 ]]
 

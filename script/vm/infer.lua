@@ -315,7 +315,8 @@ function mt:viewLiterals()
     for n in nodeMgr.eachNode(self.node) do
         if n.type == 'string'
         or n.type == 'number'
-        or n.type == 'integer' then
+        or n.type == 'integer'
+        or n.type == 'boolean' then
             local literal = util.viewLiteral(n[1])
             if not mark[literal] then
                 literals[#literals+1] = literal

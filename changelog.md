@@ -1,5 +1,15 @@
 # changelog
 
+## 2.6.8
+* `FIX` [#976](https://github.com/sumneko/lua-language-server/issues/976)
+* `FIX` [#995](https://github.com/sumneko/lua-language-server/issues/995)
+* `FIX` [#1004](https://github.com/sumneko/lua-language-server/issues/1004)
+* `FIX` [#1008](https://github.com/sumneko/lua-language-server/issues/1008)
+* `FIX` [#1009](https://github.com/sumneko/lua-language-server/issues/1009)
+* `FIX` [#1011](https://github.com/sumneko/lua-language-server/issues/1011)
+* `FIX` [#1014](https://github.com/sumneko/lua-language-server/issues/1014)
+* `FIX` runtime errors reported by telemetry
+
 ## 2.6.7
 `2022-3-9`
 * `NEW` offline diagnostic, [read more](https://github.com/sumneko/lua-language-server/wiki/Offline-Diagnostic)

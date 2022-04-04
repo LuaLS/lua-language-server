@@ -103,6 +103,7 @@ local searchFieldSwitch = util.switch()
 
 function m.getClassFields(node, key, pushResult)
     local mark = {}
+
     local function searchClass(class)
         local name = class.name
         if mark[name] then
@@ -151,7 +152,21 @@ function m.getClassFields(node, key, pushResult)
             end
         end
     end
+
+    local function searchGlobal(class)
+        if class.cate == 'type' and class.name == '_G' then
+            local globals = globalMgr.getGlobals('variable')
+            for _, global in ipairs(globals) do
+                local sets = global:getSets()
+                for _, set in ipairs(sets) do
+                    pushResult(set)
+                end
+            end
+        end
+    end
+
     searchClass(node)
+    searchGlobal(node)
 end
 
 ---@class parser.object

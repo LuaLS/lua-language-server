@@ -244,6 +244,22 @@ function m.getFields(cate, name)
     return globals
 end
 
+---@param cate   vm.global.cate
+---@return vm.node.global[]
+function m.getGlobals(cate)
+    local globals = {}
+
+    -- TODO: optimize
+    for gid, global in pairs(m.globals) do
+        if  util.stringStartWith(gid, cate)
+        and not gid:find(m.ID_SPLITE) then
+            globals[#globals+1] = global
+        end
+    end
+
+    return globals
+end
+
 ---@param source parser.object
 function m.compileObject(source)
     if source._globalNode ~= nil then

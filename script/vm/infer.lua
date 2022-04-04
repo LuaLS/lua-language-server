@@ -310,12 +310,17 @@ function mt:viewLiterals()
     if not self.node then
         return nil
     end
+    local mark     = {}
     local literals = {}
     for n in nodeMgr.eachNode(self.node) do
         if n.type == 'string'
         or n.type == 'number'
         or n.type == 'integer' then
-            literals[#literals+1] = util.viewLiteral(n[1])
+            local literal = util.viewLiteral(n[1])
+            if not mark[literal] then
+                literals[#literals+1] = literal
+                mark[literal] = true
+            end
         end
     end
     if #literals == 0 then
@@ -330,10 +335,15 @@ function mt:viewClass()
     if not self.node then
         return nil
     end
+    local mark  = {}
     local class = {}
     for n in nodeMgr.eachNode(self.node) do
         if n.type == 'global' and n.cate == 'type' then
-            class[#class+1] = n.name
+            local name = n.name
+            if not mark[name] then
+                class[#class+1] = name
+                mark[name] = true
+            end
         end
     end
     if #class == 0 then

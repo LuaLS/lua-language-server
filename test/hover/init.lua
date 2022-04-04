@@ -829,7 +829,6 @@ local t: {
 }
 ]]
 
-config.set(nil, 'Lua.IntelliSense.traceLocalSet', true)
 TEST [[
 local x
 x = 1
@@ -840,7 +839,6 @@ print(<?x?>)
 [[
 local x: number = 1
 ]]
-config.set(nil, 'Lua.IntelliSense.traceLocalSet', false)
 
 TEST [[
 local <?x?> <close> = 1
@@ -1574,7 +1572,7 @@ TEST [[
 local <?x?>--测试
 ]]
 [[
-local x: any
+local x: unknown
 ]]
 
 TEST [[
@@ -1596,7 +1594,7 @@ print(u.x)
 ]]
 [[
 local u: number {
-    x: any,
+    x: unknown,
 }
 ]]
 
@@ -1639,7 +1637,7 @@ local f
 <?f?>()
 ]]
 [[
-local f: any
+local f: unknown
 ]]
 
 TEST [[
@@ -1732,10 +1730,9 @@ local t = nil
 t.<?x?>()
 ]]
 [[
-field t.x: any
+field t.x: unknown
 ]]
 
-config.set(nil, 'Lua.IntelliSense.traceLocalSet', true)
 TEST [[
 ---@class A
 local a
@@ -1746,10 +1743,8 @@ b = a
 print(b.<?x?>)
 ]]
 [[
-field A.x: any
+field A.x: unknown
 ]]
-config.set(nil, 'Lua.IntelliSense.traceLocalSet', false)
-
 TEST [[
 ---@class A
 ---@field x number

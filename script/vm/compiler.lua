@@ -24,14 +24,14 @@ local searchFieldSwitch = util.switch()
         for _, field in ipairs(node) do
             if field.type == 'tablefield'
             or field.type == 'tableindex' then
-                if not key
+                if key == nil
                 or key == guide.getKeyName(field) then
                     hasFiled = true
                     pushResult(field)
                 end
             end
             if field.type == 'tableexp' then
-                if not key
+                if key == nil
                 or key == field.tindex then
                     hasFiled = true
                     pushResult(field)
@@ -39,10 +39,13 @@ local searchFieldSwitch = util.switch()
             end
             if field.type == 'varargs' then
                 if not hasFiled
-                and key
+                and type(key) == 'number'
                 and key >= 1
                 and math.tointeger(key) then
                     hasFiled = true
+                    pushResult(field)
+                end
+                if key == nil then
                     pushResult(field)
                 end
             end
@@ -86,8 +89,11 @@ local searchFieldSwitch = util.switch()
     : case 'doc.type.array'
     : call(function (node, key, pushResult)
         if  type(key) == 'number'
-        and math.tointeger(key)
-        and key >= 1 then
+        and key >= 1
+        and math.tointeger(key) then
+            pushResult(node.node)
+        end
+        if key == nil then
             pushResult(node.node)
         end
     end)
@@ -99,7 +105,7 @@ local searchFieldSwitch = util.switch()
                 local fieldNode = m.compileNode(fieldKey)
                 for fn in nodeMgr.eachNode(fieldNode) do
                     if fn.type == 'global' and fn.cate == 'type' then
-                        if not key
+                        if key == nil
                         or fn.name == 'any'
                         or (fn.name == 'boolean' and type(key) == 'boolean')
                         or (fn.name == 'number'  and type(key) == 'number')
@@ -111,7 +117,7 @@ local searchFieldSwitch = util.switch()
                 end
             end
             if fieldKey.type == 'doc.field.name' then
-                if not key or fieldKey[1] == key then
+                if key == nil or fieldKey[1] == key then
                     pushResult(field.extends)
                 end
             end
@@ -133,7 +139,7 @@ function m.getClassFields(node, key, pushResult)
                 -- check ---@field
                 local hasFounded
                 for _, field in ipairs(set.fields) do
-                    if not key
+                    if key == nil
                     or guide.getKeyName(field) == key then
                         hasFounded = true
                         pushResult(field)
@@ -359,11 +365,13 @@ local function bindDocs(source)
     local hasFounded = false
     local isParam = source.parent.type == 'funcargs'
                  or source.parent.type == 'in'
-    for _, doc in ipairs(source.bindDocs) do
+    local docs = source.bindDocs
+    for i = #docs, 1, -1 do
+        local doc = docs[i]
         if doc.type == 'doc.type' then
             if not isParam then
-                hasFounded = true
                 nodeMgr.setNode(source, m.compileNode(doc))
+                return true
             end
         end
         if doc.type == 'doc.class' then
@@ -371,18 +379,18 @@ local function bindDocs(source)
             or (source._globalNode and guide.isSet(source))
             or source.type == 'tablefield'
             or source.type == 'tableindex' then
-                hasFounded = true
                 nodeMgr.setNode(source, m.compileNode(doc))
+                return true
             end
         end
         if doc.type == 'doc.param' then
             if isParam and source[1] == doc.param[1] then
-                hasFounded = true
                 nodeMgr.setNode(source, m.compileNode(doc))
+                return true
             end
         end
     end
-    return hasFounded
+    return false
 end
 
 local function compileByLocalID(source)

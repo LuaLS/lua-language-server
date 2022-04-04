@@ -800,7 +800,6 @@ TEST {
     },
 }
 
-config.set(nil, 'Lua.IntelliSense.traceFieldInject', true)
 TEST {
     {
         path = 'a.lua',
@@ -821,7 +820,6 @@ print(b.<?test?>)
         ]]
     }
 }
-config.set(nil, 'Lua.IntelliSense.traceFieldInject', false)
 
 TEST {
     {

@@ -90,7 +90,6 @@ local function f(b)
 end
 ]]
 
---config.set('Lua.IntelliSense.traceBeSetted', true)
 TEST ('a', '!!!') [[
 t = {
     a = 0

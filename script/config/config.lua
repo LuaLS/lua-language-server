@@ -212,10 +212,6 @@ local Template = {
     ['Lua.format.enable']                   = Type.Boolean >> true,
     ['Lua.format.defaultConfig']            = Type.Hash(Type.String, Type.String)
                                             >> {},
-    ['Lua.IntelliSense.traceLocalSet']      = Type.Boolean >> false,
-    ['Lua.IntelliSense.traceReturn']        = Type.Boolean >> false,
-    ['Lua.IntelliSense.traceBeSetted']      = Type.Boolean >> false,
-    ['Lua.IntelliSense.traceFieldInject']   = Type.Boolean >> false,
     ['Lua.telemetry.enable']                = Type.Or(Type.Boolean >> false, Type.Nil) >> nil,
     ['files.associations']                  = Type.Hash(Type.String, Type.String),
     ['files.exclude']                       = Type.Hash(Type.String, Type.Boolean),

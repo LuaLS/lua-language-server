@@ -1,11 +1,10 @@
-local sp           = require 'bee.subprocess'
 local define       = require 'proto.define'
 local files        = require 'files'
 local searcher     = require 'core.searcher'
 local matchKey     = require 'core.matchkey'
 local vm           = require 'vm'
 local getName      = require 'core.hover.name'
-local getArg       = require 'core.hover.arg'
+local getArgs      = require 'core.hover.args'
 local getHover     = require 'core.hover'
 local config       = require 'config'
 local util         = require 'utility'
@@ -155,29 +154,36 @@ end
 
 local function buildFunctionSnip(source, value, oop)
     local name = (getName(source) or ''):gsub('^.+[$.:]', '')
-    local args = getArg(value, oop)
-    local id = 0
-    local needTruncateId = 0
-    args = args:gsub('[^,]+', function (arg)
-        id = id + 1
-        if arg:match('^%s*[^?]+%?:') or arg:match('^%s*%.%.%.:') then
-            if needTruncateId == 0 then
-                needTruncateId = id
-            end
+    local args = getArgs(value)
+    if oop then
+        table.remove(args, 1)
+    end
+    local len = #args
+    local truncated = false
+    if len > 0 and args[len]:match('^%s*%.%.%.:')  then
+        table.remove(args)
+        truncated = true
+    end
+    for i = #args, 1, -1 do
+        if args[i]:match('^%s*[^?]+%?:') then
+            table.remove(args)
+            truncated = true
         else
-            needTruncateId = 0
-        end
-        return arg:gsub('^(%s*)(.+)', function (sp, word)
-            return ('%s${%d:%s}'):format(sp, id, word)
-        end)
-    end)
-    if needTruncateId > 0 then
-        local start = args:find(',?%s*%${' .. needTruncateId)
-        if start then
-            args = start == 1 and '$1' or args:sub(1, start - 1)
+            break
         end
     end
-    return ('%s(%s)'):format(name, args)
+
+    local snipArgs = {}
+    for id, arg in ipairs(args) do
+        local str =  arg:gsub('^(%s*)(.+)', function (sp, word)
+            return ('%s${%d:%s}'):format(sp, id, word)
+        end)
+        table.insert(snipArgs, str)
+    end
+    if truncated and #snipArgs == 0 then
+        snipArgs = {'$1'}
+    end
+    return ('%s(%s)'):format(name, table.concat(snipArgs, ', '))
 end
 
 local function buildDetail(source)

@@ -158,8 +158,8 @@ local function buildEnumChunk(docType, name)
     end
     local types = {}
     for _, tp in ipairs(docType.types) do
-        if  tp.type ~= 'doc.enum'
-        and tp.type ~= 'doc.resume' then
+        if  tp.type ~= 'doc.string'
+        and tp.type ~= 'doc.integer' then
             types[#types+1] = tp[1]
         end
     end

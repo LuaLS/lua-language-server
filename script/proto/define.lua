@@ -276,21 +276,6 @@ m.BuiltIn = {
     ['utf8']      = 'default',
 }
 
-m.BuiltinType = {
-    ['unknown']       = true,
-    ['any']           = true,
-    ['nil']           = true,
-    ['boolean']       = true,
-    ['number']        = true,
-    ['integer']       = true,
-    ['thread']        = true,
-    ['table']         = true,
-    ['string']        = true,
-    ['userdata']      = true,
-    ['lightuserdata'] = true,
-    ['function']      = true,
-}
-
 m.InlayHintKind = {
     Other     = 0,
     Type      = 1,

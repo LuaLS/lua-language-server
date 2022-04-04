@@ -23,7 +23,7 @@ return function (uri, callback)
             end
             for _, ext in ipairs(doc.extends) do
                 local name = ext[1]
-                local docs = vm.getDocDefines(uri, name)
+                local docs = vm.getDocSets(uri, name)
                 if cache[name] == nil then
                     cache[name] = false
                     for _, otherDoc in ipairs(docs) do

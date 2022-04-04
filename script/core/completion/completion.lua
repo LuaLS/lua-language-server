@@ -19,6 +19,7 @@ local guide        = require 'parser.guide'
 local infer        = require 'vm.infer'
 local await        = require 'await'
 local postfix      = require 'core.completion.postfix'
+local globalMgr    = require 'vm.global-manager'
 
 local diagnosticModes = {
     'disable-next-line',
@@ -287,7 +288,7 @@ local function checkLocal(state, word, position, results)
         if name:sub(1, 1) == '@' then
             goto CONTINUE
         end
-        if infer.hasType(source, 'function') then
+        if infer.getInfer(source):hasType 'function' then
             for _, def in ipairs(vm.getDefs(source)) do
                 if def.type == 'function'
                 or def.type == 'doc.type.function' then
@@ -335,7 +336,7 @@ local function checkModule(state, word, position, results)
         local fileName = path:match '[^/\\]*$'
         local stemName = fileName:gsub('%..+', '')
         if  not locals[stemName]
-        and not vm.hasGlobalSets(state.uri, stemName)
+        and not globalMgr.hasGlobalSets(state.uri, 'variable', stemName)
         and not config.get(state.uri, 'Lua.diagnostics.globals')[stemName]
         and stemName:match '^[%a_][%w_]*$'
         and matchKey(word, stemName) then
@@ -482,7 +483,7 @@ local function checkFieldThen(state, name, src, word, startPos, position, parent
         })
         return
     end
-    if oop and not infer.hasType(src, 'function') then
+    if oop and not infer.getInfer(src):hasType 'function' then
         return
     end
     local literal = guide.getLiteral(value)
@@ -584,17 +585,17 @@ end
 ---@async
 local function checkGlobal(state, word, startPos, position, parent, oop, results)
     local locals = guide.getVisibleLocals(state.ast, position)
-    local globals = vm.getGlobalSets(state.uri, '*')
+    local globals = globalMgr.getGlobalSets(state.uri, 'variable')
     checkFieldOfRefs(globals, state, word, startPos, position, parent, oop, results, locals, 'global')
 end
 
 ---@async
 local function checkField(state, word, start, position, parent, oop, results)
     if parent.tag == '_ENV' or parent.special == '_G' then
-        local globals = vm.getGlobalSets(state.uri, '*')
+        local globals = globalMgr.getGlobalSets(state.uri, 'variable')
         checkFieldOfRefs(globals, state, word, start, position, parent, oop, results)
     else
-        local refs = vm.getRefs(parent, '*')
+        local refs = vm.getFields(parent)
         checkFieldOfRefs(refs, state, word, start, position, parent, oop, results)
     end
 end
@@ -1106,7 +1107,7 @@ local function checkTypingEnum(state, position, defs, str, results)
     local enums = {}
     for _, def in ipairs(defs) do
         if def.type == 'doc.type.string'
-        or def.type == 'doc.resume' then
+        or def.type == 'doc.type.integer' then
             enums[#enums+1] = {
                 label       = def[1],
                 description = def.comment and def.comment.text,
@@ -1312,20 +1313,20 @@ function (%s)\
 end"):format(table.concat(args, ', '))
 end
 
-local function pushCallEnumsAndFuncs(defs)
+local function pushCallEnumsAndFuncs(source)
+    local defs = vm.getDefs(source)
     local results = {}
     for _, def in ipairs(defs) do
-        if def.type == 'doc.type.string'
-        or def.type == 'doc.resume' then
+        if def.type == 'doc.type.string' then
             results[#results+1] = {
-                label       = def[1],
+                label       = util.viewLiteral(def[1]),
                 description = def.comment,
                 kind        = define.CompletionItemKind.EnumMember,
             }
         end
         if def.type == 'doc.type.function' then
             results[#results+1] = {
-                label       = infer.viewDocFunction(def),
+                label       = infer.getInfer(def):view(),
                 description = def.comment,
                 kind        = define.CompletionItemKind.Function,
                 insertText  = buildInsertDocFunction(def),
@@ -1354,17 +1355,17 @@ local function getCallEnumsAndFuncs(source, index, oop, call)
         for _, doc in ipairs(source.bindDocs) do
             if     doc.type == 'doc.param'
             and    doc.param[1] == arg[1] then
-                return pushCallEnumsAndFuncs(vm.getDefs(doc.extends))
+                return pushCallEnumsAndFuncs(doc.extends)
             elseif doc.type == 'doc.vararg'
             and    arg.type == '...' then
-                return pushCallEnumsAndFuncs(vm.getDefs(doc.vararg))
+                return pushCallEnumsAndFuncs(doc.vararg)
             end
         end
     end
     if source.type == 'doc.type.function' then
         local arg = source.args[index]
         if arg and arg.extends then
-            return pushCallEnumsAndFuncs(vm.getDefs(arg.extends))
+            return pushCallEnumsAndFuncs(arg.extends)
         end
     end
     if source.type == 'doc.field.name' then
@@ -1400,7 +1401,7 @@ local function getCallEnumsAndFuncs(source, index, oop, call)
                     if eventName and eventName == myEventName then
                         local docFunc = doc.extends.types[1].args[2].extends.types[1]
                         results[#results+1] = {
-                            label       = infer.viewDocFunction(docFunc),
+                            label       = infer.getInfer(docFunc):view(),
                             description = doc.comment,
                             kind        = define.CompletionItemKind.Function,
                             insertText  = buildInsertDocFunction(docFunc),
@@ -1520,7 +1521,7 @@ local function tryTable(state, position, results)
     if source.type ~= 'table' then
         tbl = source.parent
     end
-    local defs = vm.getDefs(tbl, '*')
+    local defs = vm.getFields(tbl)
     for _, field in ipairs(defs) do
         local name = guide.getKeyName(field)
         if name and not mark[name] then
@@ -1635,19 +1636,20 @@ local function tryluaDocBySource(state, position, source, results)
     if     source.type == 'doc.extends.name' then
         if source.parent.type == 'doc.class' then
             local used = {}
-            for _, doc in ipairs(vm.getDocDefines(state.uri, '*')) do
-                if  doc.type == 'doc.class.name'
-                and doc.parent ~= source.parent
-                and not used[doc[1]]
-                and matchKey(source[1], doc[1]) then
-                    used[doc[1]] = true
+            for _, doc in ipairs(vm.getDocSets(state.uri)) do
+                local name = doc.type == 'doc.class' and doc.class[1]
+                if  name
+                and name ~= source.parent.class[1]
+                and not used[name]
+                and matchKey(source[1], name) then
+                    used[name] = true
                     results[#results+1] = {
-                        label       = doc[1],
+                        label       = name,
                         kind        = define.CompletionItemKind.Class,
-                        textEdit    = doc[1]:find '[^%w_]' and {
+                        textEdit    = name:find '[^%w_]' and {
                             start   = source.start,
                             finish  = position,
-                            newText = doc[1],
+                            newText = name,
                         },
                     }
                 end
@@ -1656,19 +1658,20 @@ local function tryluaDocBySource(state, position, source, results)
         return true
     elseif source.type == 'doc.type.name' then
         local used = {}
-        for _, doc in ipairs(vm.getDocDefines(state.uri, '*')) do
-            if  (doc.type == 'doc.class.name' or doc.type == 'doc.alias.name')
-            and doc.parent ~= source.parent
-            and not used[doc[1]]
-            and matchKey(source[1], doc[1]) then
-                used[doc[1]] = true
+        for _, doc in ipairs(vm.getDocSets(state.uri)) do
+            local name = (doc.type == 'doc.class' and doc.class[1])
+                    or   (doc.type == 'doc.alias' and doc.alias[1])
+            if  name
+            and not used[name]
+            and matchKey(source[1], name) then
+                used[name] = true
                 results[#results+1] = {
-                    label       = doc[1],
+                    label       = name,
                     kind        = define.CompletionItemKind.Class,
-                    textEdit    = doc[1]:find '[^%w_]' and {
+                    textEdit    = name:find '[^%w_]' and {
                         start   = source.start,
                         finish  = position,
-                        newText = doc[1],
+                        newText = name,
                     },
                 }
             end
@@ -1734,17 +1737,17 @@ end
 
 local function tryluaDocByErr(state, position, err, docState, results)
     if     err.type == 'LUADOC_MISS_CLASS_EXTENDS_NAME' then
-        for _, doc in ipairs(vm.getDocDefines(state.uri, '*')) do
-            if  doc.type == 'doc.class.name'
-            and doc.parent ~= docState then
+        for _, doc in ipairs(vm.getDocSets(state.uri)) do
+            if  doc.type == 'doc.class'
+            and doc.class[1] ~= docState.class[1] then
                 results[#results+1] = {
-                    label       = doc[1],
+                    label       = doc.class[1],
                     kind        = define.CompletionItemKind.Class,
                 }
             end
         end
     elseif err.type == 'LUADOC_MISS_TYPE_NAME' then
-        for _, doc in ipairs(vm.getDocDefines(state.uri, '*')) do
+        for _, doc in ipairs(vm.getDocSets(state.uri)) do
             if  (doc.type == 'doc.class.name' or doc.type == 'doc.alias.name') then
                 results[#results+1] = {
                     label       = doc[1],

@@ -607,7 +607,7 @@ self.results.list[#self.re<??>]
     },
     {
         label = 'results',
-        kind = define.CompletionItemKind.Field,
+        kind = define.CompletionItemKind.Text,
     },
 }
 
@@ -1169,10 +1169,51 @@ TEST [[
 }
 
 TEST [[
+---@class ZBBC
+---@class ZBBC : Z<??>
+]]
+(nil)
+
+TEST [[
 ---@class ZABC
 ---@class ZBBC : <??>
 ]]
-(EXISTS)
+(function (results)
+    local ok
+    for _, res in ipairs(results) do
+        if res.label == 'ZABC' then
+            ok = true
+        end
+        if res.label == 'ZBBC' then
+            error('ZBBC should not be here')
+        end
+    end
+    assert(ok, 'ZABC should be here')
+end)
+
+TEST [[
+---@class ZBBC
+---@class ZBBC : <??>
+]]
+(function (results)
+    for _, res in ipairs(results) do
+        if res.label == 'ZBBC' then
+            error('ZBBC should not be here')
+        end
+    end
+end)
+
+TEST [[
+---@class ZABC
+---@class ZABC
+---@class ZBBC : Z<??>
+]]
+{
+    {
+        label = 'ZABC',
+        kind = define.CompletionItemKind.Class,
+    },
+}
 
 TEST [[
 ---@class zabc

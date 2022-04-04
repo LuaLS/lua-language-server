@@ -3,7 +3,7 @@ require 'vm.manager'
 require 'vm.def'
 require 'vm.ref'
 require 'vm.field'
-require 'vm.getDocs'
+require 'vm.doc'
 require 'vm.getLibrary'
 require 'vm.getLinks'
 return vm

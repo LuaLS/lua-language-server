@@ -231,6 +231,10 @@ function m.isLiteral(obj)
         or tp == 'integer'
         or tp == 'table'
         or tp == 'function'
+        or tp == 'doc.type.function'
+        or tp == 'doc.type.table'
+        or tp == 'doc.type.string'
+        or tp == 'doc.type.integer'
 end
 
 --- 获取字面量
@@ -820,8 +824,6 @@ local isSetMap = {
     ['doc.class']         = true,
     ['doc.alias']         = true,
     ['doc.field']         = true,
-    ['doc.type.function'] = true,
-    ['doc.type.table']    = true,
     ['doc.class.name']    = true,
     ['doc.alias.name']    = true,
     ['doc.field.name']    = true,

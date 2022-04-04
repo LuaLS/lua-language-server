@@ -17,8 +17,8 @@ local typeNameMap = {
     ['doc.class.name']   = true,
     ['doc.alias.name']   = true,
     ['doc.type.name']    = true,
-    ['doc.type.string']    = true,
-    ['doc.resume']       = true,
+    ['doc.type.string']  = true,
+    ['doc.type.integer'] = true,
 
 }
 
@@ -37,10 +37,10 @@ local function isTable(name)
 end
 
 local function isUserDefineClass(uri, name)
-    if vm.isBuiltinType(name) then
+    if guide.isBasicType(name) then
         return false
     else
-        local defs = vm.getDocDefines(uri, name)
+        local defs = vm.getDocSets(uri, name)
         for _, v in ipairs(defs) do
             if v.type == 'doc.class.name' then
                 return true
@@ -54,7 +54,7 @@ local function isClassOralias(typeName)
     if     not typeName then
         return false
     elseif typeNameMap[typeName]
-    or     vm.isBuiltinType(typeName) then
+    or     guide.isBasicType(typeName) then
         return true
     else
         return false
@@ -99,7 +99,7 @@ end
 --     if not type[1] then
 --         return
 --     end
---     local docDefs = vm.getDocDefines(type[1])
+--     local docDefs = vm.getDocSets(type[1])
 --     for _, doc in ipairs(docDefs) do
 --         if doc.parent
 --         and doc.parent.type == 'doc.class'
@@ -119,7 +119,7 @@ end
 local function addFatherClass(uri, infers)
     for k in pairs(infers) do
         if type(k) == 'string' then
-            local docDefs = vm.getDocDefines(uri, k)
+            local docDefs = vm.getDocSets(uri, k)
             for _, doc in ipairs(docDefs) do
                 if doc.parent
                 and doc.parent.type == 'doc.class'

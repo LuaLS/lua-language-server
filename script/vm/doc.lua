@@ -5,60 +5,22 @@ local vm        = require 'vm.vm'
 local config    = require 'config'
 local collector = require 'core.collector' 'searcher'
 local define    = require 'proto.define'
+local globalMgr = require 'vm.global-manager'
 
 ---获取class与alias
+---@param suri uri
 ---@param name? string
 ---@return parser.object[]
-function vm.getDocDefines(uri, name)
-    if type(name) ~= 'string' then
-        return {}
-    end
-    local cache = vm.getCache 'getDocDefines'
-    if cache[name] then
-        return cache[name]
-    end
-    local results = {}
-    if name == '*' then
-        for noders in collector:each(uri, 'def:dn:') do
-            for id in noder.eachID(noders) do
-                if  id:sub(1, 3) == 'dn:'
-                and not id:find(noder.SPLIT_CHAR) then
-                    for source in noder.eachSource(noders, id) do
-                        if guide.isSet(source) then
-                            results[#results+1] = source
-                        end
-                    end
-                end
-            end
+function vm.getDocSets(suri, name)
+    if name then
+        local global = globalMgr.getGlobal('type', name)
+        if not global then
+            return {}
         end
+        return global:getSets()
     else
-        local id = 'dn:' .. name
-        for noders in collector:each(uri, 'def:' .. id) do
-            for source in noder.eachSource(noders, id) do
-                if source.type == 'doc.class.name'
-                or source.type == 'doc.alias.name' then
-                    results[#results+1] = source
-                end
-            end
-        end
+        return globalMgr.getGlobalSets(suri, 'type')
     end
-    cache[name] = results
-    return results
-end
-
-function vm.isDocDefined(uri, name)
-    if define.BuiltinType[name] then
-        return true
-    end
-    local id = 'def:dn:' .. name
-    if collector:has(uri, id) then
-        return true
-    end
-    return false
-end
-
-function vm.isBuiltinType(name)
-    return define.BuiltinType[name] == true
 end
 
 function vm.getDocEnums(doc)
@@ -70,7 +32,7 @@ function vm.getDocEnums(doc)
 
     for _, def in ipairs(defs) do
         if def.type == 'doc.type.string'
-        or def.type == 'doc.resume' then
+        or def.type == 'doc.type.integer' then
             results[#results+1] = def
         end
     end

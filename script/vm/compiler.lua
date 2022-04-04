@@ -461,10 +461,6 @@ local function selectNode(source, list, index)
     local hasKnownType
     for n in nodeMgr.eachNode(result) do
         if guide.isLiteral(n)
-        or n.type == 'doc.type.function'
-        or n.type == 'doc.type.table'
-        or n.type == 'doc.type.integer'
-        or n.type == 'doc.type.string'
         or (n.type == 'global' and n.cate == 'type') then
             hasKnownType = true
             break

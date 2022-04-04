@@ -152,7 +152,10 @@ return function (uri, offset)
                 goto CONTINUE
             end
         else
-            if guide.isLiteral(src) and src.type ~= 'function' then
+            if  guide.isLiteral(src)
+            and src.type ~= 'function'
+            and src.type ~= 'doc.type.function'
+            and src.type ~= 'doc.type.table' then
                 goto CONTINUE
             end
         end

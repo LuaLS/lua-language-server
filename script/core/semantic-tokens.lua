@@ -513,24 +513,6 @@ local Care = util.switch()
             modifieres = define.TokenModifiers.static,
         }
     end)
-    : case 'doc.resume'
-    : call(function (source, options, results)
-        if not options.annotation then
-            return
-        end
-        results[#results+1] = {
-            start      = source.start,
-            finish     = source.finish,
-            type       = define.TokenTypes.string,
-            modifieres = define.TokenModifiers.static,
-        }
-        local row = guide.rowColOf(source.start)
-        results[#results+1] = {
-            start      = source.finish,
-            finish     = guide.positionOf(row, guide.getLineRange(options.state, row)),
-            type       = define.TokenTypes.comment,
-        }
-    end)
     : case 'doc.type.function'
     : call(function (source, options, results)
         if not options.annotation then

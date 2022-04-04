@@ -33,7 +33,11 @@ local compileSwitch = util.switch()
         if not parentID then
             return
         end
-        source._localID = parentID .. m.ID_SPLITE .. guide.getKeyName(source)
+        local key = guide.getKeyName(source)
+        if type(key) ~= 'string' then
+            return
+        end
+        source._localID = parentID .. m.ID_SPLITE .. key
         source.field._localID = source._localID
         if source.type == 'getfield' then
             m.compileLocalID(source.next)
@@ -46,7 +50,11 @@ local compileSwitch = util.switch()
         if not parentID then
             return
         end
-        source._localID = parentID .. m.ID_SPLITE .. guide.getKeyName(source)
+        local key = guide.getKeyName(source)
+        if type(key) ~= 'string' then
+            return
+        end
+        source._localID = parentID .. m.ID_SPLITE .. key
         source.method._localID = source._localID
         if source.type == 'getmethod' then
             m.compileLocalID(source.next)
@@ -60,7 +68,7 @@ local compileSwitch = util.switch()
             return
         end
         local key = guide.getKeyName(source)
-        if not type(key) ~= 'string' then
+        if type(key) ~= 'string' then
             return
         end
         source._localID = parentID .. m.ID_SPLITE .. key

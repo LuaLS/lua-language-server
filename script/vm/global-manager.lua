@@ -89,16 +89,15 @@ local compilerGlobalSwitch = util.switch()
     : case 'getindex'
     ---@param source parser.object
     : call(function (source)
-        local name
+        local name = guide.getKeyName(source)
+        if not name then
+            return
+        end
         if source.node._globalNode then
             local parentName = source.node._globalNode:getName()
-            if parentName == '_G' then
-                name = guide.getKeyName(source)
-            else
-                name = parentName .. m.ID_SPLITE .. guide.getKeyName(source)
+            if parentName ~= '_G' then
+                name = parentName .. m.ID_SPLITE .. name
             end
-        elseif source.node.special == '_G' then
-            name = guide.getKeyName(source)
         end
         local uri  = guide.getUri(source)
         local global = m.declareGlobal('variable', name, uri)
@@ -258,6 +257,37 @@ function m.getGlobals(cate)
     end
 
     return globals
+end
+
+---@param suri uri
+---@param cate   vm.global.cate
+---@return parser.object[]
+function m.getGlobalSets(suri, cate)
+    local globals = m.getGlobals(cate)
+    local result = {}
+    for _, global in ipairs(globals) do
+        local sets = global:getSets()
+        for _, set in ipairs(sets) do
+            result[#result+1] = set
+        end
+    end
+    return result
+end
+
+---@param suri uri
+---@param cate vm.global.cate
+---@param name string
+---@return boolean
+function m.hasGlobalSets(suri, cate, name)
+    local global = m.getGlobal(cate, name)
+    if not global then
+        return false
+    end
+    local sets = global:getSets()
+    if #sets == 0 then
+        return false
+    end
+    return true
 end
 
 ---@param source parser.object

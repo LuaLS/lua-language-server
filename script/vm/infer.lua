@@ -156,6 +156,7 @@ function m.getInfer(source)
     if not node then
         return m.NULL
     end
+    -- TODO: more cache?
     if node.type == 'union' and node.lastInfer then
         return node.lastInfer
     end

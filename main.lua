@@ -63,10 +63,10 @@ if LOGLEVEL then
 end
 
 log.info('Lua Lsp startup, root: ', ROOT)
-log.debug('ROOT:', ROOT:string())
-log.debug('LOGPATH:', LOGPATH)
-log.debug('METAPATH:', METAPATH)
-log.debug('VERSION:', version.getVersion())
+log.info('ROOT:', ROOT:string())
+log.info('LOGPATH:', LOGPATH)
+log.info('METAPATH:', METAPATH)
+log.info('VERSION:', version.getVersion())
 
 require 'tracy'
 require 'cli'

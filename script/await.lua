@@ -185,7 +185,7 @@ function m.stop()
 end
 
 local function warnStepTime(passed, waker)
-    if passed < 1 then
+    if passed < 2 then
         log.warn(('Await step takes [%.3f] sec.'):format(passed))
         return
     end
@@ -215,7 +215,7 @@ function m.step()
         local clock = os.clock()
         resume()
         local passed = os.clock() - clock
-        if passed > 0.1 then
+        if passed > 0.5 then
             warnStepTime(passed, resume)
         end
         return true

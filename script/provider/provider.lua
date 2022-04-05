@@ -24,7 +24,7 @@ local function updateConfig(uri)
     config.addNullSymbol(json.null)
     local specified = cfgLoader.loadLocalConfig(uri, CONFIGPATH)
     if specified then
-        log.debug('Load config from specified', CONFIGPATH)
+        log.info('Load config from specified', CONFIGPATH)
         log.debug(util.dump(specified))
         -- watch directory
         filewatch.watch(workspace.getAbsolutePath(uri, CONFIGPATH):gsub('[^/\\]+$', ''))
@@ -34,13 +34,13 @@ local function updateConfig(uri)
     for _, folder in ipairs(scope.folders) do
         local clientConfig = cfgLoader.loadClientConfig(folder.uri)
         if clientConfig then
-            log.debug('Load config from client', folder.uri)
+            log.info('Load config from client', folder.uri)
             log.debug(util.dump(clientConfig))
         end
 
         local rc = cfgLoader.loadRCConfig(folder.uri, '.luarc.json')
         if rc then
-            log.debug('Load config from luarc.json', folder.uri)
+            log.info('Load config from luarc.json', folder.uri)
             log.debug(util.dump(rc))
         end
 
@@ -48,7 +48,7 @@ local function updateConfig(uri)
     end
 
     local global = cfgLoader.loadClientConfig()
-    log.debug('Load config from client', 'fallback')
+    log.info('Load config from client', 'fallback')
     log.debug(util.dump(global))
     config.update(scope.fallback, global)
 end

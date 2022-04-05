@@ -40,7 +40,7 @@ local function enable(uri)
     end
     nonil.disable()
     isEnable = true
-    log.debug('Enable completion.')
+    log.info('Enable completion.')
     proto.request('client/registerCapability', {
         registrations = {
             {
@@ -66,7 +66,7 @@ local function disable(uri)
     end
     nonil.disable()
     isEnable = false
-    log.debug('Disable completion.')
+    log.info('Disable completion.')
     proto.request('client/unregisterCapability', {
         unregisterations = {
             {

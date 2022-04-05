@@ -19,7 +19,7 @@ if not token then
     util.saveFile(tokenPath, token)
 end
 
-log.info('Telemetry Token:', token)
+log.debug('Telemetry Token:', token)
 
 local function getClientName()
     nonil.enable()

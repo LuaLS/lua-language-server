@@ -12,14 +12,14 @@ local function logSend(buf)
     if not RPCLOG then
         return
     end
-    log.debug('rpc send:', buf)
+    log.info('rpc send:', buf)
 end
 
 local function logRecieve(proto)
     if not RPCLOG then
         return
     end
-    log.debug('rpc recieve:', json.encode(proto))
+    log.info('rpc recieve:', json.encode(proto))
 end
 
 local m = {}
@@ -167,8 +167,8 @@ function m.doMethod(proto)
         -- 任务可能在执行过程中被中断，通过close来捕获
         local response <close> = function ()
             local passed = os.clock() - clock
-            if passed > 0.2 then
-                log.debug(('Method [%s] takes [%.3f]sec. %s'):format(method, passed, util.dump(proto, secretOption)))
+            if passed > 0.5 then
+                log.warn(('Method [%s] takes [%.3f]sec. %s'):format(method, passed, util.dump(proto, secretOption)))
             end
             --log.debug('Finish method:', method)
             if not proto.id then

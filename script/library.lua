@@ -220,7 +220,7 @@ local function initBuiltIn(uri)
     end
 
     if scp:get('metaPath') == metaPath:string() then
-        log.info('Has meta path, skip:', metaPath:string())
+        log.debug('Has meta path, skip:', metaPath:string())
         return
     end
     scp:set('metaPath', metaPath:string())
@@ -230,14 +230,14 @@ local function initBuiltIn(uri)
         end
     end, log.error)
     if not suc then
-        log.info('Init builtin failed.')
+        log.warn('Init builtin failed.')
         return
     end
     local out = fsu.dummyFS()
     local templateDir = ROOT / 'meta' / 'template'
     for libName, status in pairs(define.BuiltIn) do
         status = config.get(uri, 'Lua.runtime.builtin')[libName] or status
-        log.info('Builtin status:', libName, status)
+        log.debug('Builtin status:', libName, status)
         if status == 'disable' then
             goto CONTINUE
         end
@@ -249,7 +249,7 @@ local function initBuiltIn(uri)
             out:saveFile(libName, metaDoc)
             local outputPath = metaPath / libName
             m.metaPaths[outputPath:string()] = true
-            log.info('Meta path:', outputPath:string())
+            log.debug('Meta path:', outputPath:string())
         end
         ::CONTINUE::
     end

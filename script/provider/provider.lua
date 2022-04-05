@@ -18,6 +18,7 @@ local filewatch  = require 'filewatch'
 local json       = require 'json'
 local scope      = require 'workspace.scope'
 local furi       = require 'file-uri'
+local inspect    = require 'inspect'
 
 ---@async
 local function updateConfig(uri)
@@ -25,7 +26,7 @@ local function updateConfig(uri)
     local specified = cfgLoader.loadLocalConfig(uri, CONFIGPATH)
     if specified then
         log.info('Load config from specified', CONFIGPATH)
-        log.debug(util.dump(specified))
+        log.debug(inspect(specified))
         -- watch directory
         filewatch.watch(workspace.getAbsolutePath(uri, CONFIGPATH):gsub('[^/\\]+$', ''))
         config.update(scope.override, specified)
@@ -35,13 +36,13 @@ local function updateConfig(uri)
         local clientConfig = cfgLoader.loadClientConfig(folder.uri)
         if clientConfig then
             log.info('Load config from client', folder.uri)
-            log.debug(util.dump(clientConfig))
+            log.debug(inspect(clientConfig))
         end
 
         local rc = cfgLoader.loadRCConfig(folder.uri, '.luarc.json')
         if rc then
             log.info('Load config from luarc.json', folder.uri)
-            log.debug(util.dump(rc))
+            log.debug(inspect(rc))
         end
 
         config.update(folder, clientConfig, rc)
@@ -49,7 +50,7 @@ local function updateConfig(uri)
 
     local global = cfgLoader.loadClientConfig()
     log.info('Load config from client', 'fallback')
-    log.debug(util.dump(global))
+    log.debug(inspect(global))
     config.update(scope.fallback, global)
 end
 
@@ -169,7 +170,7 @@ m.register 'workspace/didChangeConfiguration' {
 m.register 'workspace/didCreateFiles' {
     ---@async
     function (params)
-        log.debug('workspace/didCreateFiles', util.dump(params))
+        log.debug('workspace/didCreateFiles', inspect(params))
         for _, file in ipairs(params.files) do
             if workspace.isValidLuaUri(file.uri) then
                 files.setText(file.uri, util.loadFile(furi.decode(file.uri)), false)
@@ -180,7 +181,7 @@ m.register 'workspace/didCreateFiles' {
 
 m.register 'workspace/didDeleteFiles' {
     function (params)
-        log.debug('workspace/didDeleteFiles', util.dump(params))
+        log.debug('workspace/didDeleteFiles', inspect(params))
         for _, file in ipairs(params.files) do
             files.remove(file.uri)
             local childs = files.getChildFiles(file.uri)
@@ -195,7 +196,7 @@ m.register 'workspace/didDeleteFiles' {
 m.register 'workspace/didRenameFiles' {
     ---@async
     function (params)
-        log.debug('workspace/didRenameFiles', util.dump(params))
+        log.debug('workspace/didRenameFiles', inspect(params))
         for _, file in ipairs(params.files) do
             local text = files.getOriginText(file.oldUri)
             if text then

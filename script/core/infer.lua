@@ -4,6 +4,7 @@ local noder    = require 'core.noder'
 local util     = require 'utility'
 local vm       = require "vm.vm"
 local guide    = require "parser.guide"
+local inspect  = require 'inspect'
 
 local CLASS           = { 'CLASS' }
 local TABLE           = { 'TABLE' }
@@ -606,7 +607,7 @@ function m.searchAndViewInfers(source, field, mark)
     local infers = m.searchInfers(source, field, mark)
     local view = m.viewInfers(guide.getUri(source), infers)
     if type(view) == 'boolean' then
-        log.error('Why view is boolean?', util.dump(infers))
+        log.error('Why view is boolean?', inspect(infers))
         return 'any'
     end
     return view

@@ -123,6 +123,7 @@ If you need to compile by yourself, please refer to [here](https://github.com/su
 * [vscode-lua-doc](https://github.com/actboy168/vscode-lua-doc)
 * [json.lua](https://github.com/actboy168/json.lua)
 * [EmmyLuaCodeStyle](https://github.com/CppCXY/EmmyLuaCodeStyle)
+* [inspect.lua](https://github.com/kikito/inspect.lua)
 
 ## Acknowledgement
 

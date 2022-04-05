@@ -8,6 +8,7 @@ local converter = require 'proto.converter'
 local json      = require 'json-beautify'
 local await     = require 'await'
 local scope     = require 'workspace.scope'
+local inspect   = require 'inspect'
 
 local m = {}
 
@@ -398,7 +399,7 @@ local function hookPrint()
 end
 
 function m.init(t)
-    log.debug('Client init', util.dump(t))
+    log.debug('Client init', inspect(t))
     m.info = t
     nonil.enable()
     m.client(t.clientInfo.name)

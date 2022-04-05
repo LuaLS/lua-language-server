@@ -12,6 +12,7 @@ local util       = require 'utility'
 local fw         = require 'filewatch'
 local scope      = require 'workspace.scope'
 local loading    = require 'workspace.loading'
+local inspect    = require 'inspect'
 
 ---@class workspace
 local m = {}
@@ -202,7 +203,7 @@ function m.getLibraryMatchers(scp)
     end
 
     scp:set('libraryMatcher', matchers)
-    log.debug('library matcher:', util.dump(matchers))
+    log.debug('library matcher:', inspect(matchers))
 
     return matchers
 end

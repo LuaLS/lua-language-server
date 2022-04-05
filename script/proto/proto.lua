@@ -5,6 +5,7 @@ local pub        = require 'pub'
 local jsonrpc    = require 'jsonrpc'
 local define     = require 'proto.define'
 local json       = require 'json'
+local inspect    = require 'inspect'
 
 local reqCounter = util.counter()
 
@@ -49,7 +50,7 @@ end
 
 function m.response(id, res)
     if id == nil then
-        log.error('Response id is nil!', util.dump(res))
+        log.error('Response id is nil!', inspect(res))
         return
     end
     assert(m.holdon[id])
@@ -62,7 +63,7 @@ end
 
 function m.responseErr(id, code, message)
     if id == nil then
-        log.error('Response id is nil!', util.dump(message))
+        log.error('Response id is nil!', inspect(message))
         return
     end
     assert(m.holdon[id])
@@ -128,16 +129,14 @@ function m.request(name, params, callback)
 end
 
 local secretOption = {
-    format = {
-        ['text'] = function (value, _, _, stack)
-            if  stack[1] == 'params'
-            and stack[2] == 'textDocument'
-            and stack[3] == nil then
-                return '"***"'
-            end
-            return ('%q'):format(value)
+    process = function (item, path)
+        if  path[1] == 'params'
+        and path[2] == 'textDocument'
+        and path[3] == nil then
+            return '"***"'
         end
-    }
+        return item
+    end
 }
 
 function m.doMethod(proto)
@@ -168,7 +167,7 @@ function m.doMethod(proto)
         local response <close> = function ()
             local passed = os.clock() - clock
             if passed > 0.5 then
-                log.warn(('Method [%s] takes [%.3f]sec. %s'):format(method, passed, util.dump(proto, secretOption)))
+                log.warn(('Method [%s] takes [%.3f]sec. %s'):format(method, passed, inspect(proto, secretOption)))
             end
             --log.debug('Finish method:', method)
             if not proto.id then
@@ -201,7 +200,7 @@ function m.doResponse(proto)
     local id = proto.id
     local waiting = m.waiting[id]
     if not waiting then
-        log.warn('Response id not found: ' .. util.dump(proto))
+        log.warn('Response id not found: ' .. inspect(proto))
         return
     end
     m.waiting[id] = nil

@@ -13,6 +13,7 @@ local timer   = require 'timer'
 local encoder = require 'encoder'
 local ws      = require 'workspace.workspace'
 local scope   = require 'workspace.scope'
+local inspect = require 'inspect'
 
 local m = {}
 
@@ -255,7 +256,7 @@ local function initBuiltIn(uri)
     end
     local result = fsu.fileSync(out, metaPath)
     if #result.err > 0 then
-        log.warn('File sync error:', util.dump(result))
+        log.warn('File sync error:', inspect(result))
     end
 end
 

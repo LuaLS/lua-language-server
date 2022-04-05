@@ -32,7 +32,11 @@ function m.setNode(source, node)
     end
     local me = m.nodeCache[source]
     if not me then
-        m.nodeCache[source] = node
+        if node.type == 'union' then
+            m.nodeCache[source] = node:copy()
+        else
+            m.nodeCache[source] = node
+        end
         return
     end
     if me == node then

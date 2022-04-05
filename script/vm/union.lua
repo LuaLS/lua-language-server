@@ -40,6 +40,11 @@ function mt:merge(node)
     end
 end
 
+---@return vm.node
+function mt:copy()
+    return createUnion(self, nil)
+end
+
 ---@param source parser.object
 function mt:subscribeLocal(source)
     for _, c in ipairs(self) do

@@ -20,6 +20,8 @@ local infer        = require 'vm.infer'
 local await        = require 'await'
 local postfix      = require 'core.completion.postfix'
 local globalMgr    = require 'vm.global-manager'
+local compiler     = require 'vm.compiler'
+local nodeMgr      = require 'vm.node'
 
 local diagnosticModes = {
     'disable-next-line',
@@ -1101,29 +1103,20 @@ local function tryLabelInString(label, source)
     return util.viewString(state.ast[1], source[2])
 end
 
-local function mergeEnums(a, b, source)
-    local mark = {}
-    for _, enum in ipairs(a) do
-        mark[enum.label] = true
-    end
-    for _, enum in ipairs(b) do
+local function cleanEnums(enums, source)
+    for i = #enums, 1, -1 do
+        local enum = enums[i]
         local label = tryLabelInString(enum.label, source)
-        if label and not mark[label] then
-            mark[label] = true
-            local result = {
-                label       = label,
-                kind        = enum.kind,
-                description = enum.description,
-                insertText  = enum.insertText,
-                textEdit    = source and {
-                    start   = source.start,
-                    finish  = source.finish,
-                    newText = enum.insertText or label,
-                },
+        if label then
+            enum.label    = label
+            enum.textEdit = source and {
+                start   = source.start,
+                finish  = source.finish,
+                newText = enum.insertText or label,
             }
-            a[#a+1] = result
         end
     end
+    return enums
 end
 
 local function checkTypingEnum(state, position, defs, str, results)
@@ -1138,12 +1131,8 @@ local function checkTypingEnum(state, position, defs, str, results)
             }
         end
     end
-    local myResults = {}
-    mergeEnums(myResults, enums, str)
-    table.sort(myResults, function (a, b)
-        return a.label < b.label
-    end)
-    for _, res in ipairs(myResults) do
+    cleanEnums(enums, str)
+    for _, res in ipairs(enums) do
         results[#results+1] = res
     end
 end
@@ -1336,107 +1325,6 @@ function (%s)\
 end"):format(table.concat(args, ', '))
 end
 
-local function pushCallEnumsAndFuncs(source)
-    local defs = vm.getDefs(source)
-    local results = {}
-    for _, def in ipairs(defs) do
-        if def.type == 'doc.type.string'
-        or def.type == 'doc.type.integer' then
-            results[#results+1] = {
-                label       = util.viewLiteral(def[1]),
-                description = def.comment,
-                kind        = define.CompletionItemKind.EnumMember,
-            }
-        end
-        if def.type == 'doc.type.function' then
-            results[#results+1] = {
-                label       = infer.getInfer(def):view(),
-                description = def.comment,
-                kind        = define.CompletionItemKind.Function,
-                insertText  = buildInsertDocFunction(def),
-            }
-        end
-    end
-    return results
-end
-
-local function getCallEnumsAndFuncs(source, index, oop, call)
-    if source.type == 'function' and source.bindDocs then
-        if not source.args then
-            return
-        end
-        local arg
-        if index <= #source.args then
-            arg = source.args[index]
-        else
-            local lastArg = source.args[#source.args]
-            if lastArg.type == '...' then
-                arg = lastArg
-            else
-                return
-            end
-        end
-        for _, doc in ipairs(source.bindDocs) do
-            if     doc.type == 'doc.param'
-            and    doc.param[1] == arg[1] then
-                return pushCallEnumsAndFuncs(doc.extends)
-            elseif doc.type == 'doc.vararg'
-            and    arg.type == '...' then
-                return pushCallEnumsAndFuncs(doc.vararg)
-            end
-        end
-    end
-    if source.type == 'doc.type.function' then
-        local arg = source.args[index]
-        if arg and arg.extends then
-            return pushCallEnumsAndFuncs(arg.extends)
-        end
-    end
-    if source.type == 'doc.field' then
-        local currentIndex = index
-        if oop then
-            currentIndex = index - 1
-        end
-        local results = {}
-        local valueBeforeIndex = index > 1 and call.args[index - 1][1]
-
-        for _, doc in ipairs(class.fields) do
-            if  doc ~= source
-            and doc.field[1] == source[1] then
-                local indexType = currentIndex
-                if not oop then
-                    local args = noder.getFieldArgs(doc)
-                    -- offset if doc's first arg is `self`
-                    if args and args[1] and args[1].name[1] == 'self' then
-                        indexType = indexType - 1
-                    end
-                end
-                local eventName = noder.getFieldEventName(doc)
-                if eventName then
-                    if     indexType == 1 then
-                        results[#results+1] = {
-                            label       = infer.getInfer(docFunc):view(),
-                            description = doc.comment,
-                            kind        = define.CompletionItemKind.EnumMember,
-                        }
-                    elseif indexType == 2 then
-                        if eventName == valueBeforeIndex then
-                            local docFunc = doc.extends.types[1].args[index].extends.types[1]
-                            results[#results+1] = {
-                                label       = infer.viewDocFunction(docFunc),
-                                description = doc.comment,
-                                kind        = define.CompletionItemKind.Function,
-                                insertText  = buildInsertDocFunction(docFunc),
-                            }
-                        end
-                    end
-                end
-            end
-        end
-        return results
-    end
-end
-
 local function findCall(state, position)
     local call
     guide.eachSourceContain(state.ast, position, function (src)
@@ -1451,15 +1339,14 @@ end
 
 local function getCallArgInfo(call, position)
     if not call.args then
-        return 1, nil, nil
+        return 1, nil
     end
-    local oop = call.node.type == 'getmethod'
     for index, arg in ipairs(call.args) do
         if arg.start <= position and arg.finish >= position then
-            return index, arg, oop
+            return index, arg
         end
     end
-    return #call.args + 1, nil, oop
+    return #call.args + 1, nil
 end
 
 local function checkTableLiteralField(state, position, tbl, fields, results)
@@ -1511,23 +1398,32 @@ local function tryCallArg(state, position, results)
     if not call then
         return
     end
-    local myResults = {}
-    local argIndex, arg, oop = getCallArgInfo(call, position)
+    local argIndex, arg = getCallArgInfo(call, position)
     if arg and arg.type == 'function' then
         return
     end
-    if not arg then
-        arg = { type = 'dummy' }
-    end
-    local defs = vm.getDefs(call.node)
-    for _, def in ipairs(defs) do
-        def = vm.getObjectValue(def) or def
-        local enums = getCallEnumsAndFuncs(def, argIndex, oop, call)
-        if enums then
-            mergeEnums(myResults, enums, arg)
+    local node = compiler.compileCallArg({ type = 'dummyarg' }, call, argIndex)
+    local enums = {}
+    for src in nodeMgr.eachNode(node) do
+        if src.type == 'doc.type.string'
+        or src.type == 'doc.type.integer' then
+            enums[#enums+1] = {
+                label       = util.viewLiteral(src[1]),
+                description = src.comment,
+                kind        = define.CompletionItemKind.EnumMember,
+            }
+        end
+        if src.type == 'doc.type.function' then
+            enums[#enums+1] = {
+                label       = infer.getInfer(src):view(),
+                description = src.comment,
+                kind        = define.CompletionItemKind.Function,
+                insertText  = buildInsertDocFunction(src),
+            }
         end
     end
-    for _, enum in ipairs(myResults) do
+    cleanEnums(enums, arg)
+    for _, enum in ipairs(enums) do
         results[#results+1] = enum
     end
 end

@@ -483,7 +483,7 @@ local function isValidCallArgNode(source, node)
         return node.type == 'doc.type.table'
             or (node.type == 'global' and node.cate == 'type' and not guide.isBasicType(node.name))
     end
-    if source.type == 'dummy' then
+    if source.type == 'dummyarg' then
         return true
     end
     return false
@@ -501,7 +501,7 @@ local function getFuncArg(func, index)
         return args[index]
     end
     local lastArg = args[#args]
-    if lastArg.type == '...' then
+    if lastArg and lastArg.type == '...' then
         return lastArg
     end
     return nil
@@ -519,12 +519,14 @@ local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
     end
 
     local eventIndex, eventMap
-    for i = 1, 2 do
-        local eventArg = call.args[i + fixIndex]
-        eventMap = valueMgr.getLiterals(eventArg)
-        if eventMap then
-            eventIndex = i
-            break
+    if call.args then
+        for i = 1, 2 do
+            local eventArg = call.args[i + fixIndex]
+            eventMap = valueMgr.getLiterals(eventArg)
+            if eventMap then
+                eventIndex = i
+                break
+            end
         end
     end
 
@@ -564,6 +566,7 @@ function m.compileCallArg(arg, call, index)
         callNode = m.compileNode(call.args[1])
         compileCallArgNode(arg, call, callNode, fixIndex, index)
     end
+    return nodeMgr.getNode(arg)
 end
 
 local compilerSwitch = util.switch()
@@ -702,7 +705,8 @@ local compilerSwitch = util.switch()
     : case 'setindex'
     : call(function (source)
         compileByLocalID(source)
-        m.compileByParentNode(source.node, guide.getKeyName(source), function (src)
+        local key = guide.getKeyName(source)
+        m.compileByParentNode(source.node, key, function (src)
             if src.type == 'doc.type.field' then
                 nodeMgr.setNode(source, m.compileNode(src))
             end
@@ -713,7 +717,8 @@ local compilerSwitch = util.switch()
     : case 'getindex'
     : call(function (source)
         compileByLocalID(source)
-        m.compileByParentNode(source.node, guide.getKeyName(source), function (src)
+        local key = guide.getKeyName(source)
+        m.compileByParentNode(source.node, key, function (src)
             nodeMgr.setNode(source, m.compileNode(src))
         end)
     end)

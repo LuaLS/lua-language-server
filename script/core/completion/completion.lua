@@ -219,7 +219,7 @@ local function getSnip(source)
                 goto CONTINUE
             end
             local firstRow   = guide.rowColOf(def.start)
-            local lastRow    = firstRow + context
+            local lastRow    = math.min(guide.rowColOf(def.finish) + 1, firstRow + context)
             local lastOffset = lines[lastRow] and (lines[lastRow] - 1) or #text
             local snip       = text:sub(lines[firstRow], lastOffset)
             return snip

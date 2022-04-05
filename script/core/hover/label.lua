@@ -119,16 +119,15 @@ local function asField(source)
 end
 
 local function asDocFieldName(source)
-    local name     = source[1]
-    local docField = source.parent
+    local name     = source.field[1]
     local class
-    for _, doc in ipairs(docField.bindGroup) do
+    for _, doc in ipairs(source.bindGroup) do
         if doc.type == 'doc.class' then
             class = doc
             break
         end
     end
-    local view = infer.getInfer(docField.extends):view()
+    local view = infer.getInfer(source.extends):view()
     if not class then
         return ('field ?.%s: %s'):format(name, view)
     end
@@ -202,7 +201,7 @@ return function (source, oop)
         return asNumber(source)
     elseif source.type == 'doc.type.name' then
         return asDocTypeName(source)
-    elseif source.type == 'doc.field.name' then
+    elseif source.type == 'doc.field' then
         return asDocFieldName(source)
     end
 end

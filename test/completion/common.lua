@@ -1526,7 +1526,7 @@ mt.<??>
 }
 
 TEST [[
----@param x string | "'AAA'" | "'BBB'" | "'CCC'"
+---@param x string | "AAA" | "BBB" | "CCC"
 function f(y, x)
 end
 
@@ -1534,21 +1534,21 @@ f(1, <??>)
 ]]
 {
     {
-        label = "'AAA'",
+        label = '"AAA"',
         kind = define.CompletionItemKind.EnumMember,
     },
     {
-        label = "'BBB'",
+        label = '"BBB"',
         kind = define.CompletionItemKind.EnumMember,
     },
     {
-        label = "'CCC'",
+        label = '"CCC"',
         kind = define.CompletionItemKind.EnumMember,
     }
 }
 
 TEST [[
----@param x string | "'AAA'" | "'BBB'" | "'CCC'"
+---@param x string | "AAA" | "BBB" | "CCC"
 function f(y, x)
 end
 
@@ -1556,21 +1556,21 @@ f(1,<??>)
 ]]
 {
     {
-        label = "'AAA'",
+        label = '"AAA"',
         kind = define.CompletionItemKind.EnumMember,
     },
     {
-        label = "'BBB'",
+        label = '"BBB"',
         kind = define.CompletionItemKind.EnumMember,
     },
     {
-        label = "'CCC'",
+        label = '"CCC"',
         kind = define.CompletionItemKind.EnumMember,
     }
 }
 
 TEST [[
----@param x string | "'AAA'" | "'BBB'" | "'CCC'"
+---@param x string | "AAA" | "BBB" | "CCC"
 function f(x)
 end
 
@@ -1578,21 +1578,21 @@ f(<??>)
 ]]
 {
     {
-        label = "'AAA'",
+        label = '"AAA"',
         kind = define.CompletionItemKind.EnumMember,
     },
     {
-        label = "'BBB'",
+        label = '"BBB"',
         kind = define.CompletionItemKind.EnumMember,
     },
     {
-        label = "'CCC'",
+        label = '"CCC"',
         kind = define.CompletionItemKind.EnumMember,
     }
 }
 
 TEST [[
----@alias Option string | "'AAA'" | "'BBB'" | "'CCC'"
+---@alias Option string | "AAA" | "BBB" | "CCC"
 ---@param x Option
 function f(x)
 end
@@ -1601,21 +1601,21 @@ f(<??>)
 ]]
 {
     {
-        label = "'AAA'",
+        label = '"AAA"',
         kind = define.CompletionItemKind.EnumMember,
     },
     {
-        label = "'BBB'",
+        label = '"BBB"',
         kind = define.CompletionItemKind.EnumMember,
     },
     {
-        label = "'CCC'",
+        label = '"CCC"',
         kind = define.CompletionItemKind.EnumMember,
     }
 }
 
 TEST [[
----@param x string | "'AAA'" | "'BBB'" | "'CCC'"
+---@param x string | "AAA" | "BBB" | "CCC"
 function f(x)
 end
 
@@ -1646,10 +1646,10 @@ TEST [[
 ---@alias XXXX
 ---comment 1
 ---comment 1
----| '1'
+---| 1
 ---comment 2
 ---comment 2
----| '2'
+---| 2
 
 ---@param x XXXX
 local function f(x)
@@ -1675,10 +1675,10 @@ TEST [[
 ---@alias XXXX
 ---comment 1
 ---comment 1
----| '1'
+---| 1
 ---comment 2
 ---comment 2
----| '2'
+---| 2
 ---@param x XXXX
 local function f(x)
 end
@@ -1686,7 +1686,7 @@ end
 
 ---comment 3
 ---comment 3
----| '3'
+---| 3
 
 f(<??>)
 ]]
@@ -1760,20 +1760,20 @@ global zzz: integer = 1
 
 TEST [[
 ---@param x string
----| "'选项1'" # 注释1
----| "'选项2'" # 注释2
+---| "选项1" # 注释1
+---| "选项2" # 注释2
 function f(x) end
 
 f(<??>)
 ]]
 {
     {
-        label = "'选项1'",
+        label = '"选项1"',
         kind = define.CompletionItemKind.EnumMember,
         description = '注释1',
     },
     {
-        label = "'选项2'",
+        label = '"选项2"',
         kind = define.CompletionItemKind.EnumMember,
         description = '注释2',
     },
@@ -1792,49 +1792,49 @@ utf8.charpatter<??>
 }
 
 TEST [[
----@type "'a'"|"'b'"|"'c'"
+---@type "a"|"b"|"c"
 local x
 
 print(x == <??>)
 ]]
 {
     {
-        label  = "'a'",
+        label  = '"a"',
         kind   = define.CompletionItemKind.EnumMember,
     },
     {
-        label  = "'b'",
+        label  = '"b"',
         kind   = define.CompletionItemKind.EnumMember,
     },
     {
-        label  = "'c'",
+        label  = '"c"',
         kind   = define.CompletionItemKind.EnumMember,
     },
 }
 
 TEST [[
----@type "'a'"|"'b'"|"'c'"
+---@type "a"|"b"|"c"
 local x
 
 x = <??>
 ]]
 {
     {
-        label  = "'a'",
+        label  = '"a"',
         kind   = define.CompletionItemKind.EnumMember,
     },
     {
-        label  = "'b'",
+        label  = '"b"',
         kind   = define.CompletionItemKind.EnumMember,
     },
     {
-        label  = "'c'",
+        label  = '"c"',
         kind   = define.CompletionItemKind.EnumMember,
     },
 }
 
 TEST [[
----@type "'a'"|"'b'"|"'c'"
+---@type "a"|"b"|"c"
 local x
 
 print(x == '<??>')
@@ -1858,7 +1858,7 @@ print(x == '<??>')
 }
 
 TEST [[
----@type "'a'"|"'b'"|"'c'"
+---@type "a"|"b"|"c"
 local x
 
 x = '<??>'
@@ -2095,85 +2095,85 @@ field cc.aaa: number
 Cared['description'] = nil
 
 TEST [[
----@type table<string, "'a'"|"'b'"|"'c'">
+---@type table<string, "a"|"b"|"c">
 local x
 
 x.a = <??>
 ]]
 {
     {
-        label  = "'a'",
+        label  = '"a"',
         kind   = define.CompletionItemKind.EnumMember,
     },
     {
-        label  = "'b'",
+        label  = '"b"',
         kind   = define.CompletionItemKind.EnumMember,
     },
     {
-        label  = "'c'",
+        label  = '"c"',
         kind   = define.CompletionItemKind.EnumMember,
     },
 }
 
 TEST [[
----@type table<string, "'a'"|"'b'"|"'c'">
+---@type table<string, "a"|"b"|"c">
 local x
 
 x['a'] = <??>
 ]]
 {
     {
-        label  = "'a'",
+        label  = '"a"',
         kind   = define.CompletionItemKind.EnumMember,
     },
     {
-        label  = "'b'",
+        label  = '"b"',
         kind   = define.CompletionItemKind.EnumMember,
     },
     {
-        label  = "'c'",
+        label  = '"c"',
         kind   = define.CompletionItemKind.EnumMember,
     },
 }
 
 TEST [[
----@type table<string, "'a'"|"'b'"|"'c'">
+---@type table<string, "a"|"b"|"c">
 local x = {
     a = <??>
 }
 ]]
 {
     {
-        label  = "'a'",
+        label  = '"a"',
         kind   = define.CompletionItemKind.EnumMember,
     },
     {
-        label  = "'b'",
+        label  = '"b"',
         kind   = define.CompletionItemKind.EnumMember,
     },
     {
-        label  = "'c'",
+        label  = '"c"',
         kind   = define.CompletionItemKind.EnumMember,
     },
 }
 
 TEST [[
----@type table<string, "'a'"|"'b'"|"'c'">
+---@type table<string, "a"|"b"|"c">
 local x = {
     ['a'] = <??>
 }
 ]]
 {
     {
-        label  = "'a'",
+        label  = '"a"',
         kind   = define.CompletionItemKind.EnumMember,
     },
     {
-        label  = "'b'",
+        label  = '"b"',
         kind   = define.CompletionItemKind.EnumMember,
     },
     {
-        label  = "'c'",
+        label  = '"c"',
         kind   = define.CompletionItemKind.EnumMember,
     },
 }

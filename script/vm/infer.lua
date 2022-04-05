@@ -229,6 +229,13 @@ function mt:hasClass()
     return self._hasClass == true
 end
 
+---@return boolean
+function mt:hasFunction()
+    self:_computeViews()
+    return self.views['function'] == true
+        or self._hasDocFunction   == true
+end
+
 function mt:_computeViews()
     if self.views then
         return

@@ -483,16 +483,38 @@ local function isValidCallArgNode(source, node)
         return node.type == 'doc.type.table'
             or (node.type == 'global' and node.cate == 'type' and not guide.isBasicType(node.name))
     end
+    if source.type == 'dummy' then
+        return true
+    end
     return false
 end
 
-local function setCallArgNode(source, call, callNode, fixIndex)
+---@param func parser.object
+---@param index integer
+---@return parser.object?
+local function getFuncArg(func, index)
+    local args = func.args
+    if not args then
+        return nil
+    end
+    if args[index] then
+        return args[index]
+    end
+    local lastArg = args[#args]
+    if lastArg.type == '...' then
+        return lastArg
+    end
+    return nil
+end
+
+local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
     local valueMgr = require 'vm.value'
-    local myIndex
-    for i, arg in ipairs(call.args) do
-        if arg == source then
-            myIndex = i - fixIndex
-            break
+    if not myIndex then
+        for i, carg in ipairs(call.args) do
+            if carg == arg then
+                myIndex = i - fixIndex
+                break
+            end
         end
     end
 
@@ -508,10 +530,10 @@ local function setCallArgNode(source, call, callNode, fixIndex)
 
     for n in nodeMgr.eachNode(callNode) do
         if n.type == 'function' then
-            local arg = n.args[myIndex]
-            for fn in nodeMgr.eachNode(m.compileNode(arg)) do
-                if isValidCallArgNode(source, fn) then
-                    nodeMgr.setNode(source, fn)
+            local farg = getFuncArg(n, myIndex)
+            for fn in nodeMgr.eachNode(m.compileNode(farg)) do
+                if isValidCallArgNode(arg, fn) then
+                    nodeMgr.setNode(arg, fn)
                 end
             end
         end
@@ -521,14 +543,26 @@ local function setCallArgNode(source, call, callNode, fixIndex)
             or not eventMap
             or event.type ~= 'doc.type.string'
             or eventMap[event[1]] then
-                local arg = n.args[myIndex]
-                for fn in nodeMgr.eachNode(m.compileNode(arg)) do
-                    if isValidCallArgNode(source, fn) then
-                        nodeMgr.setNode(source, fn)
+                local farg = getFuncArg(n, myIndex)
+                for fn in nodeMgr.eachNode(m.compileNode(farg)) do
+                    if isValidCallArgNode(arg, fn) then
+                        nodeMgr.setNode(arg, fn)
                     end
                 end
             end
         end
+    end
+end
+
+function m.compileCallArg(arg, call, index)
+    local callNode = m.compileNode(call.node)
+    compileCallArgNode(arg, call, callNode, 0, index)
+
+    if call.node.special == 'pcall'
+    or call.node.special == 'xpcall' then
+        local fixIndex = call.node.special == 'pcall' and 1 or 2
+        callNode = m.compileNode(call.args[1])
+        compileCallArgNode(arg, call, callNode, fixIndex, index)
     end
 end
 
@@ -551,18 +585,11 @@ local compilerSwitch = util.switch()
 
         if source.parent.type == 'callargs' then
             local call = source.parent.parent
-            local callNode = m.compileNode(call.node)
-            setCallArgNode(source, call, callNode, 0)
-
-            if call.node.special == 'pcall'
-            or call.node.special == 'xpcall' then
-                local fixIndex = call.node.special == 'pcall' and 1 or 2
-                callNode = m.compileNode(call.args[1])
-                setCallArgNode(source, call, callNode, fixIndex)
-            end
+            m.compileCallArg(source, call)
         end
 
         if source.parent.type == 'setglobal'
+        or source.parent.type == 'local'
         or source.parent.type == 'setlocal'
         or source.parent.type == 'tablefield'
         or source.parent.type == 'tableindex'
@@ -586,15 +613,7 @@ local compilerSwitch = util.switch()
         -- table.sort(string[], function (<?x?>) end)
         if source.parent.type == 'callargs' then
             local call = source.parent.parent
-            local callNode = m.compileNode(call.node)
-            setCallArgNode(source, call, callNode, 0)
-
-            if call.node.special == 'pcall'
-            or call.node.special == 'xpcall' then
-                local fixIndex = call.node.special == 'pcall' and 1 or 2
-                callNode = m.compileNode(call.args[1])
-                setCallArgNode(source, call, callNode, fixIndex)
-            end
+            m.compileCallArg(source, call)
         end
     end)
     : case 'paren'
@@ -612,7 +631,11 @@ local compilerSwitch = util.switch()
         if source.ref and not hasMarkDoc then
             for _, ref in ipairs(source.ref) do
                 if ref.type == 'setlocal' then
-                    nodeMgr.setNode(source, m.compileNode(ref.value))
+                    if ref.value.type == 'table' then
+                        nodeMgr.setNode(source, ref.value)
+                    else
+                        nodeMgr.setNode(source, m.compileNode(ref.value))
+                    end
                 end
             end
         end
@@ -623,7 +646,11 @@ local compilerSwitch = util.switch()
         end
         if source.value then
             if not hasMarkDoc or guide.isLiteral(source.value) then
-                nodeMgr.setNode(source, m.compileNode(source.value))
+                if source.value.type == 'table' then
+                    nodeMgr.setNode(source, source.value)
+                else
+                    nodeMgr.setNode(source, m.compileNode(source.value))
+                end
             end
         end
         -- function x.y(self, ...) --> function x:y(...)
@@ -675,6 +702,11 @@ local compilerSwitch = util.switch()
     : case 'setindex'
     : call(function (source)
         compileByLocalID(source)
+        m.compileByParentNode(source.node, guide.getKeyName(source), function (src)
+            if src.type == 'doc.type.field' then
+                nodeMgr.setNode(source, m.compileNode(src))
+            end
+        end)
     end)
     : case 'getfield'
     : case 'getmethod'
@@ -695,7 +727,11 @@ local compilerSwitch = util.switch()
 
         if source.value then
             if not hasMarkDoc or guide.isLiteral(source.value) then
-                nodeMgr.setNode(source, m.compileNode(source.value))
+                if source.value.type == 'table' then
+                    nodeMgr.setNode(source, source.value)
+                else
+                    nodeMgr.setNode(source, m.compileNode(source.value))
+                end
             end
         end
 

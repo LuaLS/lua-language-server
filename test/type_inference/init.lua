@@ -1367,3 +1367,17 @@ TEST 'function' [[
 ---@overload fun()
 function <?f?>() end
 ]]
+
+TEST 'integer' [[
+---@type table<string, integer>
+local t
+
+t.<?a?>
+]]
+
+TEST '"a"|"b"|"c"' [[
+---@type table<string, "a"|"b"|"c">
+local t
+
+t.<?a?>
+]]

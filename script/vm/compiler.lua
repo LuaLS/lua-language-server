@@ -496,13 +496,15 @@ local function setCallArgNode(source, call, callNode, fixIndex)
         end
     end
 
-    local eventIndex = 1
-    local eventArg = call.args[eventIndex + fixIndex]
-    if eventArg and eventArg.dummy then
-        eventIndex = 2
-        eventArg = call.args[eventIndex + fixIndex]
+    local eventIndex, eventMap
+    for i = 1, 2 do
+        local eventArg = call.args[i + fixIndex]
+        eventMap = valueMgr.getLiterals(eventArg)
+        if eventMap then
+            eventIndex = i
+            break
+        end
     end
-    local eventMap = valueMgr.getLiterals(eventArg)
 
     for n in nodeMgr.eachNode(callNode) do
         if n.type == 'function' then

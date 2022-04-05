@@ -1349,11 +1349,23 @@ local function pushCallEnumsAndFuncs(defs)
             }
         end
         if def.type == 'doc.type.function' then
+            local insertText = buildInsertDocFunction(def)
+            local description
+            if def.comment then
+                description = def.comment
+            else
+                local descText = insertText:gsub('%$%{%d+:([^}]+)%}', function (val)
+                    return val
+                end):gsub('%$%{?%d+%}?', '')
+                description = markdown()
+                    : add('lua', descText)
+                    : string()
+            end
             results[#results+1] = {
                 label       = infer.viewDocFunction(def),
-                description = def.comment,
+                description = description,
                 kind        = define.CompletionItemKind.Function,
-                insertText  = buildInsertDocFunction(def),
+                insertText  = insertText,
             }
         end
     end

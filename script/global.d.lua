@@ -46,3 +46,6 @@ CHECK = ''
 
 ---@type string | '"Error"' | '"Warning"' | '"Information"' | '"Hint"'
 CHECKLEVEL = 'Warning'
+
+---@type 'trace' | 'debug' | 'info' | 'warn' | 'error'
+LOGLEVEL = 'warn'

@@ -1895,6 +1895,12 @@ f(<??>)
 function (${1:x}, ${2:y})\
 \t$0\
 end",
+        description = "\z
+```lua\
+function (x, y)\
+\t\
+end\
+```"
     },
 }
 

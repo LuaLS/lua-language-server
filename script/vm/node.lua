@@ -19,10 +19,6 @@ function m.mergeNode(a, b)
     if not a then
         return b
     end
-    if a.type == 'union' then
-        a:merge(b)
-        return a
-    end
     return union(a, b)
 end
 
@@ -32,11 +28,7 @@ function m.setNode(source, node)
     end
     local me = m.nodeCache[source]
     if not me then
-        if node.type == 'union' then
-            m.nodeCache[source] = node:copy()
-        else
-            m.nodeCache[source] = node
-        end
+        m.nodeCache[source] = node
         return
     end
     if me == node then

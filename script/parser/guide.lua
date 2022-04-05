@@ -800,6 +800,9 @@ function m.offsetToPosition(state, offset)
 end
 
 function m.getLineRange(state, row)
+    if not state.lines[row] then
+        return 0
+    end
     local nextLineStart = state.lines[row + 1] or #state.lua
     for i = nextLineStart - 1, state.lines[row], -1 do
         local w = state.lua:sub(i, i)

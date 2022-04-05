@@ -114,7 +114,6 @@ If you need to compile by yourself, please refer to [here](https://github.com/su
 * [lni](https://github.com/actboy168/lni)
 * [LPegLabel](https://github.com/sqmedeiros/lpeglabel)
 * [LuaParser](https://github.com/sumneko/LuaParser)
-* [rcedit](https://github.com/electron/rcedit)
 * [ScreenToGif](https://github.com/NickeManarin/ScreenToGif)
 * [vscode-languageclient](https://github.com/microsoft/vscode-languageserver-node)
 * [lua.tmbundle](https://github.com/textmate/lua.tmbundle)
@@ -124,6 +123,7 @@ If you need to compile by yourself, please refer to [here](https://github.com/su
 * [vscode-lua-doc](https://github.com/actboy168/vscode-lua-doc)
 * [json.lua](https://github.com/actboy168/json.lua)
 * [EmmyLuaCodeStyle](https://github.com/CppCXY/EmmyLuaCodeStyle)
+* [inspect.lua](https://github.com/kikito/inspect.lua)
 
 ## Acknowledgement
 
@@ -144,6 +144,7 @@ If you need to compile by yourself, please refer to [here](https://github.com/su
 * [Folke Lemaitre](https://github.com/folke)
 * [Vikas Raj](https://github.com/numToStr)
 * [kevinhwang91](https://github.com/kevinhwang91)
+* [Cassolette](https://github.com/Cassolette)
 
 ## Telemetry
 

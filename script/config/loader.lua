@@ -4,6 +4,7 @@ local lang      = require 'language'
 local util      = require 'utility'
 local workspace = require 'workspace'
 local scope     = require 'workspace.scope'
+local inspect   = require 'inspect'
 
 local function errorMessage(msg)
     proto.notify('window/showMessage', {
@@ -105,7 +106,7 @@ function m.loadClientConfig(uri)
         },
     })
     if not configs or not configs[1] then
-        log.warn('No config?', util.dump(configs))
+        log.warn('No config?', inspect(configs))
         return nil
     end
 

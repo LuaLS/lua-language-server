@@ -160,17 +160,7 @@ local Care = util.switch()
             }
             return
         end
-        -- 5. References to other functions
-        if infer.hasType(loc, 'function') then
-            results[#results+1] = {
-                start      = source.start,
-                finish     = source.finish,
-                type       = define.TokenTypes['function'],
-                modifieres = source.type == 'setlocal' and define.TokenModifiers.declaration or nil,
-            }
-            return
-        end
-        -- 6. Class declaration
+        -- 5. Class declaration
             -- only search this local
         if loc.bindDocs then
             for i, doc in ipairs(loc.bindDocs) do
@@ -188,7 +178,17 @@ local Care = util.switch()
                 end
             end
         end
-        -- 6. const 变量 | Const variable
+        -- 6. References to other functions
+        if infer.hasType(loc, 'function') then
+            results[#results+1] = {
+                start      = source.start,
+                finish     = source.finish,
+                type       = define.TokenTypes['function'],
+                modifieres = source.type == 'setlocal' and define.TokenModifiers.declaration or nil,
+            }
+            return
+        end
+        -- 7. const 变量 | Const variable
         if loc.attrs then
             for _, attr in ipairs(loc.attrs) do
                 local name = attr[1]

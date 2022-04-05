@@ -3,7 +3,7 @@ local files        = require 'files'
 local matchKey     = require 'core.matchkey'
 local vm           = require 'vm'
 local getName      = require 'core.hover.name'
-local getArg       = require 'core.hover.arg'
+local getArgs      = require 'core.hover.args'
 local getHover     = require 'core.hover'
 local config       = require 'config'
 local util         = require 'utility'
@@ -153,15 +153,36 @@ end
 
 local function buildFunctionSnip(source, value, oop)
     local name = (getName(source) or ''):gsub('^.+[$.:]', '')
-    local args = getArg(value, oop)
-    local id = 0
-    args = args:gsub('[^,]+', function (arg)
-        id = id + 1
-        return arg:gsub('^(%s*)(.+)', function (sp, word)
+    local args = getArgs(value)
+    if oop then
+        table.remove(args, 1)
+    end
+    local len = #args
+    local truncated = false
+    if len > 0 and args[len]:match('^%s*%.%.%.:')  then
+        table.remove(args)
+        truncated = true
+    end
+    for i = #args, 1, -1 do
+        if args[i]:match('^%s*[^?]+%?:') then
+            table.remove(args)
+            truncated = true
+        else
+            break
+        end
+    end
+
+    local snipArgs = {}
+    for id, arg in ipairs(args) do
+        local str =  arg:gsub('^(%s*)(.+)', function (sp, word)
             return ('%s${%d:%s}'):format(sp, id, word)
         end)
-    end)
-    return ('%s(%s)'):format(name, args)
+        table.insert(snipArgs, str)
+    end
+    if truncated and #snipArgs == 0 then
+        snipArgs = {'$1'}
+    end
+    return ('%s(%s)'):format(name, table.concat(snipArgs, ', '))
 end
 
 local function buildDetail(source)
@@ -197,7 +218,7 @@ local function getSnip(source)
                 goto CONTINUE
             end
             local firstRow   = guide.rowColOf(def.start)
-            local lastRow    = firstRow + context
+            local lastRow    = math.min(guide.rowColOf(def.finish) + 1, firstRow + context)
             local lastOffset = lines[lastRow] and (lines[lastRow] - 1) or #text
             local snip       = text:sub(lines[firstRow], lastOffset)
             return snip
@@ -227,7 +248,9 @@ local function buildFunction(results, source, value, oop, data)
     if snipType == 'Both' or snipType == 'Replace' then
         local snipData = util.deepCopy(data)
 
-        snipData.kind             = define.CompletionItemKind.Snippet
+        snipData.kind             = snipType == 'Both'
+                                    and define.CompletionItemKind.Snippet
+                                    or  data.kind
         snipData.insertText       = buildFunctionSnip(source, value, oop)
         snipData.insertTextFormat = 2
         snipData.command          = {
@@ -1378,34 +1401,37 @@ local function getCallEnumsAndFuncs(source, index, oop, call)
             return
         end
         local results = {}
-        if     currentIndex == 1 then
-            for _, doc in ipairs(class.fields) do
-                if  doc.field ~= source
-                and doc.field[1] == source[1] then
-                    local eventName = noder.getFieldEventName(doc)
-                    if eventName then
-                        results[#results+1] = {
-                            label       = ('%q'):format(eventName),
-                            description = doc.comment,
-                            kind        = define.CompletionItemKind.EnumMember,
-                        }
+        local valueBeforeIndex = index > 1 and call.args[index - 1][1]
+
+        for _, doc in ipairs(class.fields) do
+            if  doc.field ~= source
+            and doc.field[1] == source[1] then
+                local indexType = currentIndex
+                if not oop then
+                    local args = noder.getFieldArgs(doc)
+                    -- offset if doc's first arg is `self`
+                    if args and args[1] and args[1].name[1] == 'self' then
+                        indexType = indexType - 1
                     end
                 end
-            end
-        elseif currentIndex == 2 then
-            local myEventName = call.args[index - 1][1]
-            for _, doc in ipairs(class.fields) do
-                if  doc.field ~= source
-                and doc.field[1] == source[1] then
-                    local eventName = noder.getFieldEventName(doc)
-                    if eventName and eventName == myEventName then
-                        local docFunc = doc.extends.types[1].args[2].extends.types[1]
+                local eventName = noder.getFieldEventName(doc)
+                if eventName then
+                    if     indexType == 1 then
                         results[#results+1] = {
                             label       = infer.getInfer(docFunc):view(),
                             description = doc.comment,
-                            kind        = define.CompletionItemKind.Function,
-                            insertText  = buildInsertDocFunction(docFunc),
+                            kind        = define.CompletionItemKind.EnumMember,
                         }
+                    elseif indexType == 2 then
+                        if eventName == valueBeforeIndex then
+                            local docFunc = doc.extends.types[1].args[index].extends.types[1]
+                            results[#results+1] = {
+                                label       = infer.viewDocFunction(docFunc),
+                                description = doc.comment,
+                                kind        = define.CompletionItemKind.Function,
+                                insertText  = buildInsertDocFunction(docFunc),
+                            }
+                        end
                     end
                 end
             end

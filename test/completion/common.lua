@@ -76,6 +76,29 @@ zac<??>
     },
 }
 
+config.set(nil, 'Lua.completion.callSnippet',    'Disable')
+TEST [[
+ass<??>
+]]
+{
+    {
+        label = 'assert(v, message)',
+        kind  = define.CompletionItemKind.Function,
+    },
+}
+
+config.set(nil, 'Lua.completion.callSnippet',    'Replace')
+TEST [[
+ass<??>
+]]
+{
+    {
+        label = 'assert(v, message)',
+        kind  = define.CompletionItemKind.Function,
+    },
+}
+
+config.set(nil, 'Lua.completion.callSnippet',    'Both')
 TEST [[
 ass<??>
 ]]
@@ -2414,6 +2437,108 @@ zzzz<??>
         insertText = 'zzzz(${1:a: any}, ${2:b: any})',
     },
 }
+
+TEST [[
+---@param a any
+---@param b? any
+---@param c? any
+---@vararg any
+local function foo(a, b, c, ...) end
+foo<??>
+]]
+{
+    {
+        label = 'foo(a, b, c, ...)',
+        kind  = define.CompletionItemKind.Function,
+        insertText = 'foo',
+    },
+    {
+        label = 'foo(a, b, c, ...)',
+        kind  = define.CompletionItemKind.Snippet,
+        insertText = 'foo(${1:a: any})',
+    },
+}
+
+TEST [[
+---@param a any
+---@param b? any
+---@param c? any
+---@vararg any
+local function foo(a, b, c, ...) end
+foo<??>
+]]
+{
+    {
+        label = 'foo(a, b, c, ...)',
+        kind  = define.CompletionItemKind.Function,
+        insertText = 'foo',
+    },
+    {
+        label = 'foo(a, b, c, ...)',
+        kind  = define.CompletionItemKind.Snippet,
+        insertText = 'foo(${1:a: any})',
+    },
+}
+
+TEST [[
+---@param a? any
+---@param b? any
+---@param c? any
+---@vararg any
+local function foo(a, b, c, ...) end
+foo<??>
+]]
+{
+    {
+        label = 'foo(a, b, c, ...)',
+        kind  = define.CompletionItemKind.Function,
+        insertText = 'foo',
+    },
+    {
+        label = 'foo(a, b, c, ...)',
+        kind  = define.CompletionItemKind.Snippet,
+        insertText = 'foo($1)',
+    },
+}
+
+TEST [[
+---@param a? any
+---@param b any
+---@param c? any
+---@vararg any
+local function foo(a, b, c, ...) end
+foo<??>
+]]
+{
+    {
+        label = 'foo(a, b, c, ...)',
+        kind  = define.CompletionItemKind.Function,
+        insertText = 'foo',
+    },
+    {
+        label = 'foo(a, b, c, ...)',
+        kind  = define.CompletionItemKind.Snippet,
+        insertText = 'foo(${1:a?: any}, ${2:b: any})',
+    },
+}
+
+TEST [[
+---@param f fun(a: any, b: any)
+local function foo(f) end
+foo<??>
+]]
+{
+    {
+        label = 'foo(f)',
+        kind  = define.CompletionItemKind.Function,
+        insertText = 'foo',
+    },
+    {
+        label = 'foo(f)',
+        kind  = define.CompletionItemKind.Snippet,
+        insertText = 'foo(${1:f: fun(a: any, b: any)})',
+    },
+}
 Cared['insertText'] = false
 
 TEST [[
@@ -2681,9 +2806,9 @@ class2:<??>
 
 TEST [[
 --- @class Emit
---- @field on fun(eventName: string, cb: function)
---- @field on fun(eventName: '"died"', cb: fun(i: integer))
---- @field on fun(eventName: '"won"', cb: fun(s: string))
+--- @field on fun(self: Emit, eventName: string, cb: function)
+--- @field on fun(self: Emit, eventName: '"died"', cb: fun(i: integer))
+--- @field on fun(self: Emit, eventName: '"won"', cb: fun(s: string))
 local emit = {}
 
 emit:on('<??>')
@@ -2697,7 +2822,39 @@ TEST [[
 --- @field on fun(eventName: '"won"', cb: fun(s: string))
 local emit = {}
 
+emit.on('died', <??>)
+]]
+{
+    [1] = {
+        label    = 'fun(i: integer)',
+        kind     = define.CompletionItemKind.Function,
+    }
+}
+
+TEST [[
+--- @class Emit
+--- @field on fun(self: Emit, eventName: string, cb: function)
+--- @field on fun(self: Emit, eventName: '"died"', cb: fun(i: integer))
+--- @field on fun(self: Emit, eventName: '"won"', cb: fun(s: string))
+local emit = {}
+
 emit:on('won', <??>)
+]]
+{
+    [1] = {
+        label    = 'fun(s: string)',
+        kind     = define.CompletionItemKind.Function,
+    }
+}
+
+TEST [[
+--- @class Emit
+--- @field on fun(self: Emit, eventName: string, cb: function)
+--- @field on fun(self: Emit, eventName: '"died"', cb: fun(i: integer))
+--- @field on fun(self: Emit, eventName: '"won"', cb: fun(s: string))
+local emit = {}
+
+emit.on(emit, 'won', <??>)
 ]]
 {
     [1] = {

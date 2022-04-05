@@ -45,7 +45,7 @@ end
 function m.recruitBraves(num)
     for _ = 1, num do
         local id = #m.braves + 1
-        log.info('Create brave:', id)
+        log.debug('Create brave:', id)
         m.braves[id] = {
             id      = id,
             thread  = thread.thread(braveTemplate:format(

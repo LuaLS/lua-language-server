@@ -62,11 +62,11 @@ end
 
 local function findTable(name)
     local pg = {}
-    local current = lua51
+    local current = lua51._G
     for id in stringGmatch(name, '[^%.]+') do
         id = stringMatch(id, '^%s*(.-)%s*$')
         pg[#pg+1] = id
-        local field = current[id]
+        local field = rawget(current, id)
         if field == nil then
             field = {}
             current[id] = field
@@ -80,7 +80,7 @@ end
 
 local function setfenv(f, tbl)
     local tp = type(f)
-    if tp ~= 'function' and tp ~= 'userdata' and tp ~= 'thead' then
+    if tp ~= 'function' and tp ~= 'userdata' and tp ~= 'thread' then
         error [['setfenv' cannot change environment of given object]]
     end
     FenvCache[f] = tbl
@@ -111,10 +111,10 @@ end
 
 local function requireLoad(name)
     local msg = ''
-    if type(package.searchers) ~= 'table' then
-        error("'package.searchers' must be a table", 3)
+    if type(lua51._G.package.loaders) ~= 'table' then
+        error("'package.loaders' must be a table", 3)
     end
-    for _, searcher in ipairs(package.searchers) do
+    for _, searcher in ipairs(lua51._G.package.loaders) do
         local f = searcher(name)
         if type(f) == 'function' then
             return f
@@ -126,7 +126,7 @@ local function requireLoad(name)
 end
 
 local function requireWithEnv(name, env)
-    local loaded = package.loaded
+    local loaded = lua51._G.package.loaded
     if type(name) ~= 'string' then
         error(("bad argument #1 to 'require' (string expected, got %s)"):format(type(name)), 2)
     end
@@ -175,18 +175,18 @@ lua51.getmetatable = getmetatable
 lua51.ipairs = ipairs
 function lua51.load(func, name)
     checkType(func, 'function')
-    return load(func, name, 'bt', lua51)
+    return load(func, name, 'bt', lua51._G)
 end
 function lua51.loadfile(name)
-    return loadfile(name, 'bt', lua51)
+    return loadfile(name, 'bt', lua51._G)
 end
 function lua51.loadstring(str, name)
     checkType(str, 'string')
-    return load(str, name, 'bt', lua51)
+    return load(str, name, 'bt', lua51._G)
 end
 function lua51.module(name, ...)
     checkType(name, 'string')
-    local loaded = lua51.package.loaded
+    local loaded = lua51._G.package.loaded
     local mod = loaded[name]
     if type(mod) ~= 'table' then
         local err
@@ -231,7 +231,7 @@ function lua51.xpcall(f, msgh)
     return xpcall(f, msgh)
 end
 function lua51.require(name)
-    return requireWithEnv(name, lua51)
+    return requireWithEnv(name, lua51._G)
 end
 lua51.unpack = table.unpack
 
@@ -397,7 +397,7 @@ function lua51.package.seeall(mod)
         mt = {}
         setmetatable(mod, mt)
     end
-    mt.__index = lua51
+    mt.__index = lua51._G
 end
 
 -- WTF ('').format

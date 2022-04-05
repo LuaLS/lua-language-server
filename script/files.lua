@@ -52,7 +52,7 @@ function m.getRealUri(uri)
     end
     filename = res:string()
     local ruri = furi.encode(filename)
-    if not fixedUri[ruri] then
+    if uri ~= ruri and not fixedUri[ruri] then
         fixedUri[ruri] = true
         log.warn(('Fix real file uri: %s -> %s'):format(uri, ruri))
     end

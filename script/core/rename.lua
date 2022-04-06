@@ -178,29 +178,33 @@ local function ofFieldThen(key, src, newname, callback)
     end
 end
 
+---@async
 local function ofField(source, newname, callback)
     local key = guide.getKeyName(source)
-    for _, src in ipairs(vm.getAllRefs(source)) do
+    for _, src in ipairs(vm.getRefs(source)) do
         ofFieldThen(key, src, newname, callback)
     end
 end
 
+---@async
 local function ofGlobal(source, newname, callback)
     local key = guide.getKeyName(source)
-    for _, src in ipairs(vm.getAllRefs(source)) do
+    for _, src in ipairs(vm.getRefs(source)) do
         ofFieldThen(key, src, newname, callback)
     end
 end
 
+---@async
 local function ofLabel(source, newname, callback)
-    for _, src in ipairs(vm.getAllRefs(source)) do
+    for _, src in ipairs(vm.getRefs(source)) do
         callback(src, src.start, src.finish, newname)
     end
 end
 
+---@async
 local function ofDocTypeName(source, newname, callback)
     local oldname = source[1]
-    for _, doc in ipairs(vm.getAllRefs(source)) do
+    for _, doc in ipairs(vm.getRefs(source)) do
         if doc.type == 'doc.class.name'
         or doc.type == 'doc.type.name'
         or doc.type == 'doc.alias.name' then
@@ -213,7 +217,7 @@ end
 
 local function ofDocParamName(source, newname, callback)
     callback(source, source.start, source.finish, newname)
-    local doc = noder.getDocState(source)
+    local doc = source.parent
     if doc.bindSources then
         for _, src in ipairs(doc.bindSources) do
             if src.type == 'local'
@@ -230,6 +234,7 @@ local function ofDocParamName(source, newname, callback)
     end
 end
 
+---@async
 local function rename(source, newname, callback)
     if source.type == 'label'
     or source.type == 'goto' then
@@ -326,6 +331,7 @@ local accept = {
 
 local m = {}
 
+---@async
 function m.rename(uri, pos, newname)
     if not newname then
         return nil

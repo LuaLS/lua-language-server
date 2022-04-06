@@ -5,6 +5,7 @@ local findSource = require 'core.find-source'
 local util       = require 'utility'
 local guide      = require 'parser.guide'
 
+---@async
 local function eachRef(source, callback)
     local results = vm.getRefs(source)
     for i = 1, #results do
@@ -21,6 +22,7 @@ local function eachLocal(source, callback)
     end
 end
 
+---@async
 local function find(source, uri, callback)
     if     source.type == 'local' then
         eachLocal(source, callback)
@@ -236,6 +238,7 @@ local function isLiteralValue(source)
     return true
 end
 
+---@async
 return function (uri, offset)
     local state = files.getState(uri)
     if not state then

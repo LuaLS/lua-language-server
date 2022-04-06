@@ -17,7 +17,7 @@ local Care = util.switch()
             return
         end
         local isLib = vm.isGlobalLibraryName(source[1])
-        local isFunc = infer.hasType(source, 'function')
+        local isFunc = infer.getInfer(source):hasFunction()
 
         local type = isFunc and define.TokenTypes['function'] or define.TokenTypes.variable
         local modifier = isLib and define.TokenModifiers.defaultLibrary or define.TokenModifiers.static
@@ -66,7 +66,7 @@ local Care = util.switch()
                 return
             end
         end
-        if infer.hasType(source, 'function') then
+        if infer.getInfer(source):hasFunction() then
             results[#results+1] = {
                 start      = source.start,
                 finish     = source.finish,
@@ -179,7 +179,7 @@ local Care = util.switch()
             end
         end
         -- 6. References to other functions
-        if infer.hasType(loc, 'function') then
+        if infer.getInfer(loc):hasFunction() then
             results[#results+1] = {
                 start      = source.start,
                 finish     = source.finish,

@@ -43,7 +43,7 @@ function TEST(script, ...)
             error(('%s\n%s'):format(util.dump(catched['!']), util.dump(results)))
         end
     else
-        assert(catched['!'] == nil)
+        assert(#catched['!'] == 0)
     end
 
     files.remove('')

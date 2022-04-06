@@ -24,22 +24,11 @@ return function (uri, callback)
         return
     end
 
-    local cache = {}
-
     ---@async
     local function checkUndefinedField(src)
-        local id = noder.getID(src)
-        if not id then
-            return
-        end
-        if cache[id] then
-            return
-        end
-
         await.delay()
 
         if #vm.getDefs(src) > 0 then
-            cache[id] = true
             return
         end
         local node = src.node
@@ -54,7 +43,6 @@ return function (uri, callback)
                 end
             end
             if not ok then
-                cache[id] = true
                 return
             end
         end

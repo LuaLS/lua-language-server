@@ -15,8 +15,8 @@ return function (uri, callback)
             if obj.type == 'tablefield'
             or obj.type == 'tableindex'
             or obj.type == 'tableexp' then
-                local name = noder.getID(obj)
-                if name and name:sub(-1) ~= '*' then
+                local name = guide.getKeyName(obj)
+                if name  then
                     if not mark[name] then
                         mark[name] = {}
                     end

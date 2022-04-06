@@ -1,6 +1,10 @@
 local files   = require 'files'
 local lang    = require 'language'
 
+local function getFieldEventName(doc)
+    
+end
+
 return function (uri, callback)
     local state = files.getState(uri)
     if not state then
@@ -18,8 +22,8 @@ return function (uri, callback)
                 mark = {}
             elseif doc.type == 'doc.field' then
                 if mark then
-                    local name = doc.field[1]
-                    local eventName = noder.getFieldEventName(doc)
+                    local name = ('%q'):format(doc.field[1])
+                    local eventName = getFieldEventName(doc)
                     if eventName then
                         name = name .. '|' .. eventName
                     end

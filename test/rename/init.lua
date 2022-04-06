@@ -1,3 +1,4 @@
+---@diagnostic disable: await-in-sync
 local core   = require 'core.rename'
 local files  = require 'files'
 local catch  = require 'catch'

@@ -29,9 +29,7 @@ elseif platform.OS == 'Linux' then
     if     lm.platform == nil then
     elseif lm.platform == "linux-x64" then
     elseif lm.platform == "linux-arm64" then
-        -- TODO: not implement
-        lm.compiler = "clang"
-        lm.target   = "arm64-pc-linux-gnu"
+        lm.cc = 'aarch64-linux-gnu-gcc'
     else
         error "unknown platform"
     end

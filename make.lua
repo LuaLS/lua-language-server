@@ -114,7 +114,7 @@ local function targetPlatformArch()
     return lm.platform:match "^[^-]*-(.*)$"
 end
 
-local notest = platform.OS == 'macOS'
+local notest = (platform.OS == 'macOS' or platform.OS == 'Linux')
     and targetPlatformArch() == "arm64"
     and detectArch() == "x86_64"
 

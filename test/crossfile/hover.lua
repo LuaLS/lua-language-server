@@ -825,7 +825,7 @@ local <?food?>
 },
 hover = [[
 ```lua
-local food: any
+local food: unknown
 ```
 
 ---
@@ -976,17 +976,17 @@ end
 },
 hover = [[
 ```lua
-function f(p: a|b)
+function f(p: "a"|"b")
 ```
 
 ---
 
 ```lua
-p: T
-    | a -- comment 1
-        -- comment 2
-    | b -- comment 3
-        -- comment 4
+p:
+    | "a" -- comment 1
+          -- comment 2
+    | "b" -- comment 3
+          -- comment 4
 ```]]}
 
 --TEST {{ path = 'a.lua', content = '', }, {
@@ -1044,13 +1044,13 @@ end
 
 
 for _, x in ipairs({} and {}) do
-    print(<?x?>) -- `x` is infered as `string`
+    print(<?x?>) -- `x` is infered as `string` (fixed bug)
 end
 ]],
     },
     hover = [[
 ```lua
-local x: any
+local x: unknown
 ```]]
 }
 

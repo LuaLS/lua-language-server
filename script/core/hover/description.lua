@@ -125,20 +125,10 @@ end
 
 local function tryDocClassComment(source)
     for _, def in ipairs(vm.getDefs(source)) do
-        if def.type == 'doc.class.name'
-        or def.type == 'doc.alias.name' then
-            local class = noder.getDocState(def)
-            local comment = getBindComment(class, class.bindGroup, class)
+        if def.type == 'doc.class'
+        or def.type == 'doc.alias' then
+            local comment = getBindComment(def, def.bindGroup, def)
             if comment then
-                return comment
-            end
-        end
-    end
-    if source.bindDocs then
-        for _, doc in ipairs(source.bindDocs) do
-            if doc.type == 'doc.class'
-            or doc.type == 'doc.alias' then
-                local comment = getBindComment(doc, source.bindDocs, doc)
                 return comment
             end
         end

@@ -720,7 +720,8 @@ local compilerSwitch = util.switch()
         compileByLocalID(source)
         local key = guide.getKeyName(source)
         m.compileByParentNode(source.node, key, function (src)
-            if src.type == 'doc.type.field' then
+            if src.type == 'doc.type.field'
+            or src.type == 'doc.field' then
                 nodeMgr.setNode(source, m.compileNode(src))
             end
         end)

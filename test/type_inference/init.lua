@@ -1381,3 +1381,12 @@ local t
 
 t.<?a?>
 ]]
+
+TEST 'integer' [[
+---@class A
+---@field x integer
+
+---@type A
+local t
+t.<?x?>
+]]

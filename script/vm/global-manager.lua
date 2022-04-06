@@ -33,6 +33,9 @@ local compilerGlobalSwitch = util.switch()
         if source.special ~= '_G' then
             return
         end
+        if not source.next then
+            return
+        end
         m.compileObject(source.next)
     end)
     : case 'setglobal'

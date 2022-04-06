@@ -647,7 +647,7 @@ local compilerSwitch = util.switch()
         if source.ref and not hasMarkDoc then
             for _, ref in ipairs(source.ref) do
                 if ref.type == 'setlocal' then
-                    if ref.value.type == 'table' then
+                    if ref.value and ref.value.type == 'table' then
                         nodeMgr.setNode(source, ref.value)
                     else
                         nodeMgr.setNode(source, m.compileNode(ref.value))
@@ -662,7 +662,7 @@ local compilerSwitch = util.switch()
         end
         if source.value then
             if not hasMarkDoc or guide.isLiteral(source.value) then
-                if source.value.type == 'table' then
+                if source.value and source.value.type == 'table' then
                     nodeMgr.setNode(source, source.value)
                 else
                     nodeMgr.setNode(source, m.compileNode(source.value))
@@ -736,6 +736,29 @@ local compilerSwitch = util.switch()
             nodeMgr.setNode(source, m.compileNode(src))
         end)
     end)
+    : case 'setglobal'
+    : call(function (source)
+        if source.node[1] ~= '_ENV' then
+            return
+        end
+        local key = guide.getKeyName(source)
+        m.compileByParentNode(source.node, key, function (src)
+            if src.type == 'doc.type.field'
+            or src.type == 'doc.field' then
+                nodeMgr.setNode(source, m.compileNode(src))
+            end
+        end)
+    end)
+    : case 'getglobal'
+    : call(function (source)
+        if source.node[1] ~= '_ENV' then
+            return
+        end
+        local key = guide.getKeyName(source)
+        m.compileByParentNode(source.node, key, function (src)
+            nodeMgr.setNode(source, m.compileNode(src))
+        end)
+    end)
     : case 'tablefield'
     : case 'tableindex'
     : call(function (source)
@@ -746,7 +769,7 @@ local compilerSwitch = util.switch()
 
         if source.value then
             if not hasMarkDoc or guide.isLiteral(source.value) then
-                if source.value.type == 'table' then
+                if source.value and source.value.type == 'table' then
                     nodeMgr.setNode(source, source.value)
                 else
                     nodeMgr.setNode(source, m.compileNode(source.value))

@@ -7,6 +7,8 @@ lm.bindir = "bin"
 ---@diagnostic disable-next-line: codestyle-check
 lm.EXE_DIR = ""
 
+local includeCodeFormat = true
+
 if     platform.OS == 'macOS' then
     if     lm.platform == nil then
     elseif lm.platform == "darwin-arm64" then
@@ -30,13 +32,16 @@ elseif platform.OS == 'Linux' then
     elseif lm.platform == "linux-x64" then
     elseif lm.platform == "linux-arm64" then
         lm.cc = 'aarch64-linux-gnu-gcc'
+        includeCodeFormat = false
     else
         error "unknown platform"
     end
 end
 
 lm:import "3rd/bee.lua/make.lua"
-lm:import "make/code_format.lua"
+if includeCodeFormat then
+    lm:import "make/code_format.lua"
+end
 
 lm:source_set 'lpeglabel' {
     rootdir = '3rd',
@@ -51,7 +56,7 @@ lm:executable "lua-language-server" {
     deps = {
         "lpeglabel",
         "source_bootstrap",
-        "code_format",
+        includeCodeFormat and "code_format" or nil,
     },
     includes = {
         "3rd/bee.lua",
@@ -62,6 +67,9 @@ lm:executable "lua-language-server" {
         sources = {
             "make/lua-language-server.rc",
         }
+    },
+    defines = {
+        includeCodeFormat and 'CODE_FORMAT' or nil,
     },
     linux = {
         crt = "static",

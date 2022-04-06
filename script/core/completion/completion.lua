@@ -1406,7 +1406,8 @@ local function tryCallArg(state, position, results)
     local enums = {}
     for src in nodeMgr.eachNode(node) do
         if src.type == 'doc.type.string'
-        or src.type == 'doc.type.integer' then
+        or src.type == 'doc.type.integer'
+        or src.type == 'doc.type.boolean' then
             enums[#enums+1] = {
                 label       = util.viewLiteral(src[1]),
                 description = src.comment,

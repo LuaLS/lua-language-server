@@ -858,10 +858,8 @@ local compilerSwitch = util.switch()
         end
     end)
     : case 'doc.type.integer'
-    : call(function (source)
-        nodeMgr.setNode(source, source)
-    end)
     : case 'doc.type.string'
+    : case 'doc.type.boolean'
     : call(function (source)
         nodeMgr.setNode(source, source)
     end)

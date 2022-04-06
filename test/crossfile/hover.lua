@@ -673,8 +673,8 @@ TEST {{ path = 'a.lua', content = '', }, {
     path = 'b.lua',
     content = [[
         ---@param a boolean # xxx
-        ---| 'true'  # ttt
-        ---| 'false' # fff
+        ---| true  # ttt
+        ---| false # fff
         local function <?f?>(a)
         end
     ]]
@@ -689,7 +689,7 @@ function f(a: boolean|true|false)
 @*param* `a` —  xxx
 
 ```lua
-a: boolean
+a:
     | true -- ttt
     | false -- fff
 ```]]}

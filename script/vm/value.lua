@@ -204,14 +204,9 @@ function m.getLiterals(v)
         or n.type == 'integer' then
             literal = n[1]
         end
-        if n.type == 'global' and n.cate == 'type' then
-            if n.name == 'true' then
-                literal = true
-            elseif n.name == 'false' then
-                literal = false
-            end
-        end
-        if n.type == 'doc.type.integer' then
+        if n.type == 'doc.type.string'
+        or n.type == 'doc.type.integer'
+        or n.type == 'doc.type.boolean' then
             literal = n[1]
         end
         if literal ~= nil then

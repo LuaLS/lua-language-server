@@ -156,10 +156,11 @@ local function buildEnumChunk(docType, name)
     local enums = {}
     local types = {}
     local lines = {}
-    for _, tp in ipairs(docType.types) do
+    for _, tp in ipairs(vm.getDefs(docType)) do
         types[#types+1] = infer.getInfer(tp):view()
         if tp.type == 'doc.type.string'
-        or tp.type == 'doc.type.integer' then
+        or tp.type == 'doc.type.integer'
+        or tp.type == 'doc.type.boolean' then
             enums[#enums+1] = tp
         end
         local comment = tryDocClassComment(tp)
@@ -352,11 +353,15 @@ local function tyrDocParamComment(source)
     if source.parent.type ~= 'funcargs' then
         return
     end
-    for _, def in ipairs(vm.getDefs(source)) do
-        if def.type == 'doc.param' then
-            if def.comment then
-                return def.comment.text
-            end
+    if not source.bindDocs then
+        return
+    end
+    for i = #source.bindDocs, 1, -1 do
+        local doc = source.bindDocs[i]
+        if  doc.type == 'doc.param'
+        and doc.param[1] == source[1]
+        and doc.comment then
+            return doc.comment.text
         end
     end
 end

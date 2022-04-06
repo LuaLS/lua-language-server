@@ -32,6 +32,8 @@ local inferSorted = {
     ['integer']  = - 97,
     ['function'] = - 96,
     ['table']    = - 95,
+    ['true']     = 1,
+    ['false']    = 2,
     ['nil']      = 100,
 }
 
@@ -82,10 +84,6 @@ local viewNodeSwitch = util.switch()
             return source.name
         end
     end)
-    : case 'doc.type.integer'
-    : call(function (source, infer)
-        return ('%d'):format(source[1])
-    end)
     : case 'doc.type.name'
     : call(function (source, infer)
         infer._hasClass = true
@@ -117,6 +115,8 @@ local viewNodeSwitch = util.switch()
         infer._hasTable = true
     end)
     : case 'doc.type.string'
+    : case 'doc.type.integer'
+    : case 'doc.type.boolean'
     : call(function (source, infer)
         return ('%q'):format(source[1])
     end)

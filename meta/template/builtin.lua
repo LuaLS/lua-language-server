@@ -4,8 +4,6 @@
 ---@class any
 ---@class nil
 ---@class boolean
----@class true: boolean
----@class false: boolean
 ---@class number
 ---@class integer: number
 ---@class thread

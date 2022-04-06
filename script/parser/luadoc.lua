@@ -578,11 +578,31 @@ local function parseInteger(parent)
     return integer
 end
 
+local function parseBoolean(parent)
+    local tp, content = peekToken()
+    if not tp
+    or tp ~= 'name'
+    or (content ~= 'true' and content ~= 'false') then
+        return nil
+    end
+
+    nextToken()
+    local boolean = {
+        type   = 'doc.type.boolean',
+        start  = getStart(),
+        finish = getFinish(),
+        parent = parent,
+        [1]    = content == 'true' and true or false,
+    }
+    return boolean
+end
+
 function parseTypeUnit(parent)
     local result = parseFunction(parent)
                 or parseTable(parent)
                 or parseString(parent)
                 or parseInteger(parent)
+                or parseBoolean(parent)
                 or parseDots('doc.type.name', parent)
     if not result then
         local literal = checkToken('symbol', '`', 1)

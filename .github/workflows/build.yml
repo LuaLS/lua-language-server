@@ -32,7 +32,7 @@ jobs:
         if: ${{ matrix.platform == 'linux-arm64' }}
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+          sudo apt-get install -y gcc-9-aarch64-linux-gnu g++-9-aarch64-linux-gnu
 
       - uses: actions/checkout@v2
         with:

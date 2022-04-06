@@ -14,6 +14,8 @@ end
 
 files.watch(function (ev, uri)
     if ev == 'update' then
+        globalManager.dropUri(uri)
+        localManager.dropUri(uri)
         local state = files.getState(uri)
         if state then
             globalManager.compileAst(state.ast)

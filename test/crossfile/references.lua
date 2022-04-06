@@ -1,3 +1,4 @@
+---@diagnostic disable: await-in-sync
 local files = require 'files'
 local furi  = require 'file-uri'
 local core  = require 'core.reference'

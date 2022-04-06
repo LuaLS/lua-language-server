@@ -837,7 +837,7 @@ TEST {
             kind = CompletionItemKind.Variable,
             description = [[
 ```lua
-local z: {}
+local z: table
 ```]]
         },
     }

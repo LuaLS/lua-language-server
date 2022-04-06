@@ -3,8 +3,6 @@ local guide     = require 'parser.guide'
 ---@class vm
 local vm        = require 'vm.vm'
 local config    = require 'config'
-local collector = require 'core.collector' 'searcher'
-local define    = require 'proto.define'
 local globalMgr = require 'vm.global-manager'
 
 ---获取class与alias

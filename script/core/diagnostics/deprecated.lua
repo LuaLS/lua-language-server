@@ -14,7 +14,9 @@ return function (uri, callback)
         return
     end
 
-    local cache = {}
+    local dglobals = config.get(uri, 'Lua.diagnostics.globals')
+    local rspecial = config.get(uri, 'Lua.runtime.special')
+    local cache    = {}
 
     guide.eachSourceTypes(ast.ast, types, function (src) ---@async
         if src.type == 'getglobal' then
@@ -22,37 +24,17 @@ return function (uri, callback)
             if not key then
                 return
             end
-            if config.get(uri, 'Lua.diagnostics.globals')[key] then
+            if dglobals[key] then
                 return
             end
-            if config.get(uri, 'Lua.runtime.special')[key] then
+            if rspecial[key] then
                 return
             end
-        end
-
-        local id = noder.getID(src)
-        if not id then
-            return
-        end
-
-        if cache[id] == false then
-            return
-        end
-
-        if cache[id] then
-            callback {
-                start   = src.start,
-                finish  = src.finish,
-                tags    = { define.DiagnosticTag.Deprecated },
-                message = cache[id].message,
-                data    = cache[id].data,
-            }
         end
 
         await.delay()
 
         if not vm.isDeprecated(src, true) then
-            cache[id] = false
             return
         end
 
@@ -89,12 +71,6 @@ return function (uri, callback)
                 )
             end
         end
-        cache[id] = {
-            message = message,
-            data    = {
-                versions = versions,
-            },
-        }
 
         callback {
             start   = src.start,

@@ -51,6 +51,7 @@ local accept = {
     ['doc.alias.name']   = true,
 }
 
+---@async
 return function (uri, position)
     local ast = files.getState(uri)
     if not ast then

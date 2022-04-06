@@ -280,7 +280,7 @@ TEST {
     hover = [[
 ```lua
 global t: {
-    [1]: integer = 1|2,
+    [1]: integer = 2,
 }
 ```]],
 }

@@ -687,7 +687,7 @@ function switchMT:case(name)
     return self
 end
 
----@param callback fun(...):...
+---@param callback async fun(...):...
 ---@return switch
 function switchMT:call(callback)
     for i = 1, #self.cachedCases do

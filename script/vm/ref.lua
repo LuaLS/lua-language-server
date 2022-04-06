@@ -7,6 +7,7 @@ local localID   = require 'vm.local-id'
 local globalMgr = require 'vm.global-manager'
 local nodeMgr   = require 'vm.node'
 local files     = require 'files'
+local await     = require 'await'
 
 local simpleSwitch
 
@@ -14,6 +15,7 @@ local function searchGetLocal(source, node, pushResult)
     local key = guide.getKeyName(source)
     for _, ref in ipairs(node.node.ref) do
         if  ref.type == 'getlocal'
+        and ref.next
         and not guide.isSet(ref.next)
         and guide.getKeyName(ref.next) == key then
             pushResult(ref.next)
@@ -79,6 +81,7 @@ simpleSwitch = util.switch()
         end
     end)
 
+---@async
 local function searchField(source, pushResult)
     local key = guide.getKeyName(source)
 
@@ -94,6 +97,7 @@ local function searchField(source, pushResult)
 
     local pat   = '[:.]%s*' .. key
 
+    ---@async
     local function findWord(uri)
         local text = files.getText(uri)
         if not text then
@@ -106,19 +110,25 @@ local function searchField(source, pushResult)
         if not state then
             return
         end
+        ---@async
         guide.eachSourceType(state.ast, 'getfield', function (src)
             if src.field[1] == key then
                 checkDef(src)
+                await.delay()
             end
         end)
+        ---@async
         guide.eachSourceType(state.ast, 'getmethod', function (src)
             if src.method[1] == key then
                 checkDef(src)
+                await.delay()
             end
         end)
+        ---@async
         guide.eachSourceType(state.ast, 'getindex', function (src)
             if src.index.type == 'string' and src.index[1] == key then
                 checkDef(src)
+                await.delay()
             end
         end)
     end
@@ -126,6 +136,38 @@ local function searchField(source, pushResult)
     for uri in files.eachFile(guide.getUri(source)) do
         if not vm.isMetaFile(uri) then
             findWord(uri)
+        end
+    end
+end
+
+---@async
+local function searchFunction(source, pushResult)
+    ---@param src parser.object
+    local function checkDef(src)
+        for _, def in ipairs(vm.getDefs(src)) do
+            if def == source then
+                pushResult(src)
+                return
+            end
+        end
+    end
+
+    ---@async
+    local function findCall(uri)
+        local state = files.getState(uri)
+        if not state then
+            return
+        end
+        ---@async
+        guide.eachSourceType(state.ast, 'call', function (src)
+            checkDef(src.node)
+            await.delay()
+        end)
+    end
+
+    for uri in files.eachFile(guide.getUri(source)) do
+        if not vm.isMetaFile(uri) then
+            findCall(uri)
         end
     end
 end
@@ -143,6 +185,7 @@ local nodeSwitch = util.switch()
     : case 'setmethod'
     : case 'getindex'
     : case 'setindex'
+    ---@async
     : call(function (source, pushResult)
         local key = guide.getKeyName(source)
         if type(key) ~= 'string' then
@@ -158,8 +201,15 @@ local nodeSwitch = util.switch()
     end)
     : case 'tablefield'
     : case 'tableindex'
+    ---@async
     : call(function (source, pushResult)
         searchField(source, pushResult)
+    end)
+    : case 'function'
+    : case 'doc.type.function'
+    ---@async
+    : call(function (source, pushResult)
+        searchFunction(source, pushResult)
     end)
 
 ---@param source  parser.object
@@ -202,6 +252,7 @@ local function searchByNode(source, pushResult)
     end
 end
 
+---@async
 function vm.getRefs(source)
     local results = {}
     local mark    = {}

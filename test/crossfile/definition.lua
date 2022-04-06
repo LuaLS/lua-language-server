@@ -47,8 +47,8 @@ function TEST(datas)
                 uri,
             }
         end
-        if catched['?'] or catched['~'] then
-            sourceList = catched['?'] or catched['~']
+        if #catched['?'] > 0 or #catched['~'] > 0 then
+            sourceList = catched['?'] + catched['~']
             sourceUri = uri
         end
         files.setText(uri, newScript)
@@ -149,7 +149,7 @@ config.set(nil, 'Lua.runtime.pathStrict', false)
 TEST {
     {
         path = 'a.lua',
-        content = 'local <!t!> = 1; return t',
+        content = 'return <!function () end!>',
     },
     {
         path = 'b.lua',
@@ -160,7 +160,7 @@ TEST {
 TEST {
     {
         path = 'a.lua',
-        content = 'local <!t!> = 1; return t',
+        content = 'return <!function () end!>',
     },
     {
         path = 'b.lua',
@@ -188,7 +188,7 @@ local <~t~>
 TEST {
     {
         path = 'a.lua',
-        content = 'local <!t!> = 1; return t',
+        content = 'return <!function () end!>',
     },
     {
         path = 'b.lua',
@@ -355,9 +355,7 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            return <!{
-                a = 1,
-            }!>
+            return <!function () end!>
         ]],
     },
     {
@@ -395,8 +393,8 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            local function <!f!>()
-            end
+            local <!function f()
+            end!>
             return f
         ]]
     },
@@ -455,11 +453,11 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            local function <!f!>()
-            end
+            local <!function f()
+            end!>
 
             return {
-                <!f!> = f,
+                f = f,
             }
         ]]
     },
@@ -610,7 +608,7 @@ TEST {
         path = 'a.lua',
         content = [[
             ---@class Class
-            local <!obj!>
+            local obj
         ]]
     },
     {
@@ -636,7 +634,7 @@ TEST {
         path = 'b.lua',
         content = [[
             ---@class Class
-            local <!obj!>
+            local obj
         ]]
     },
 }
@@ -804,10 +802,29 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-local t = GlobalTable
-
-t.settings = {
+GlobalTable.settings = {
     <!test!> = 1
+}
+        ]]
+    },
+    {
+        path = 'b.lua',
+        content = [[
+local b = GlobalTable.settings
+
+print(b.<?test?>)
+        ]]
+    }
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+GlobalTable = {
+    settings = {
+        <!test!> = 1
+    }
 }
         ]]
     },

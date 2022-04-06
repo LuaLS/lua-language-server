@@ -362,7 +362,6 @@ local function getReturn(func, index, args)
 end
 
 local function bindDocs(source)
-    local hasFounded = false
     local isParam = source.parent.type == 'funcargs'
                  or source.parent.type == 'in'
     local docs = source.bindDocs
@@ -388,6 +387,20 @@ local function bindDocs(source)
                 nodeMgr.setNode(source, m.compileNode(doc))
                 return true
             end
+        end
+        if doc.type == 'doc.module' then
+            local name = doc.module
+            local uri = rpath.findUrisByRequirePath(guide.getUri(source), name)[1]
+            if not uri then
+                return nil
+            end
+            local state = files.getState(uri)
+            local ast   = state and state.ast
+            if not ast then
+                return nil
+            end
+            nodeMgr.setNode(source, m.compileNode(ast))
+            return true
         end
     end
     return false

@@ -23,23 +23,6 @@ function vm.getDocSets(suri, name)
     end
 end
 
-function vm.getDocEnums(doc)
-    if not doc then
-        return nil
-    end
-    local defs = vm.getDefs(doc)
-    local results = {}
-
-    for _, def in ipairs(defs) do
-        if def.type == 'doc.type.string'
-        or def.type == 'doc.type.integer' then
-            results[#results+1] = def
-        end
-    end
-
-    return results
-end
-
 function vm.isMetaFile(uri)
     local status = files.getState(uri)
     if not status then

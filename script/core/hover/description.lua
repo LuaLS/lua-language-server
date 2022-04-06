@@ -6,6 +6,7 @@ local lang     = require 'language'
 local util     = require 'utility'
 local guide    = require 'parser.guide'
 local rpath    = require 'workspace.require-path'
+local infer    = require 'vm.infer'
 
 local function collectRequire(mode, literal, uri)
     local result, searchers
@@ -152,29 +153,28 @@ local function tryDocModule(source)
 end
 
 local function buildEnumChunk(docType, name)
-    local enums = vm.getDocEnums(docType)
-    if not enums or #enums == 0 then
-        return
-    end
+    local enums = {}
     local types = {}
-    for _, tp in ipairs(docType.types) do
-        if  tp.type ~= 'doc.string'
-        and tp.type ~= 'doc.integer' then
-            types[#types+1] = tp[1]
-        end
-    end
     local lines = {}
-    for _, typeUnit in ipairs(docType.types) do
-        local comment = tryDocClassComment(typeUnit)
+    for _, tp in ipairs(docType.types) do
+        types[#types+1] = infer.getInfer(tp):view()
+        if tp.type == 'doc.type.string'
+        or tp.type == 'doc.type.integer' then
+            enums[#enums+1] = tp
+        end
+        local comment = tryDocClassComment(tp)
         if comment then
             for line in util.eachLine(comment) do
                 lines[#lines+1] = ('-- %s'):format(line)
             end
         end
     end
-    lines[#lines+1] = ('%s: %s'):format(name, table.concat(types, '|'))
+    if #enums == 0 then
+        return
+    end
+    lines[#lines+1] = ('%s:'):format(name)
     for _, enum in ipairs(enums) do
-        local enumDes = ('   %s %s'):format(
+        local enumDes = ('   %s %q'):format(
                 (enum.default    and '->')
             or  (enum.additional and '+>')
             or  ' |',

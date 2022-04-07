@@ -22,6 +22,13 @@ lm:source_set 'code_format' {
     },
     macos = {
         -- macosx10.12不支持完整的std filesystem，只好砍功能
-        defines = "NOT_SURPPORT_FILE_SYSTEM",
+        defines = "NOT_SUPPORT_FILE_SYSTEM",
     },
+    linux = {
+        defines = (function ()
+            if lm.platform == "linux-arm64" then
+                return "NOT_SUPPORT_FILE_SYSTEM"
+            end
+        end)()
+    }
 }

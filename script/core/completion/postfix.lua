@@ -297,11 +297,14 @@ local function checkPostFix(state, word, wordPosition, position, symbol, results
     for i, action in ipairs(actions) do
         if matchKey(word, action.key) then
             action.data[1](state, source, function (newText)
+                local descText = newText:gsub('%$%{%d+:([^}]+)%}', function (val)
+                    return val
+                end):gsub('%$%{?%d+%}?', '')
                 results[#results+1] = {
                     label       = action.key,
                     kind        = define.CompletionItemKind.Event,
                     description = markdown()
-                                    : add('lua', newText)
+                                    : add('lua', descText)
                                     : string(),
                     textEdit    = {
                         start   = wordPosition + #symbol,

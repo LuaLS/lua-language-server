@@ -82,7 +82,23 @@ simpleSwitch = util.switch()
     end)
 
 ---@async
-local function searchField(source, pushResult)
+local function searchInAllFiles(suri, searcher, notify)
+    searcher(suri)
+
+    for uri in files.eachFile(suri) do
+        if  not vm.isMetaFile(uri)
+        and suri ~= uri then
+            local continue = notify(uri)
+            if continue == false then
+                break
+            end
+            searcher(uri)
+        end
+    end
+end
+
+---@async
+local function searchField(source, pushResult, fileNotify)
     local key = guide.getKeyName(source)
 
     ---@param src parser.object
@@ -133,15 +149,11 @@ local function searchField(source, pushResult)
         end)
     end
 
-    for uri in files.eachFile(guide.getUri(source)) do
-        if not vm.isMetaFile(uri) then
-            findWord(uri)
-        end
-    end
+    searchInAllFiles(guide.getUri(source), findWord, fileNotify)
 end
 
 ---@async
-local function searchFunction(source, pushResult)
+local function searchFunction(source, pushResult, fileNotify)
     ---@param src parser.object
     local function checkDef(src)
         for _, def in ipairs(vm.getDefs(src)) do
@@ -165,19 +177,15 @@ local function searchFunction(source, pushResult)
         end)
     end
 
-    for uri in files.eachFile(guide.getUri(source)) do
-        if not vm.isMetaFile(uri) then
-            findCall(uri)
-        end
-    end
+    searchInAllFiles(guide.getUri(source), findCall, fileNotify)
 end
 
 local searchByParentNode
 local nodeSwitch = util.switch()
     : case 'field'
     : case 'method'
-    : call(function (source, pushResult)
-        searchByParentNode(source.parent, pushResult)
+    : call(function (source, pushResult, fileNotify)
+        searchByParentNode(source.parent, pushResult, fileNotify)
     end)
     : case 'getfield'
     : case 'setfield'
@@ -186,7 +194,7 @@ local nodeSwitch = util.switch()
     : case 'getindex'
     : case 'setindex'
     ---@async
-    : call(function (source, pushResult)
+    : call(function (source, pushResult, fileNotify)
         local key = guide.getKeyName(source)
         if type(key) ~= 'string' then
             return
@@ -197,19 +205,19 @@ local nodeSwitch = util.switch()
             return
         end
 
-        searchField(source, pushResult)
+        searchField(source, pushResult, fileNotify)
     end)
     : case 'tablefield'
     : case 'tableindex'
     ---@async
-    : call(function (source, pushResult)
-        searchField(source, pushResult)
+    : call(function (source, pushResult, fileNotify)
+        searchField(source, pushResult, fileNotify)
     end)
     : case 'function'
     : case 'doc.type.function'
     ---@async
-    : call(function (source, pushResult)
-        searchFunction(source, pushResult)
+    : call(function (source, pushResult, fileNotify)
+        searchFunction(source, pushResult, fileNotify)
     end)
 
 ---@param source  parser.object
@@ -232,10 +240,12 @@ local function searchByLocalID(source, pushResult)
     end
 end
 
+---@async
 ---@param source  parser.object
 ---@param pushResult fun(src: parser.object)
-function searchByParentNode(source, pushResult)
-    nodeSwitch(source.type, source, pushResult)
+---@param fileNotify fun(uri: uri): boolean
+function searchByParentNode(source, pushResult, fileNotify)
+    nodeSwitch(source.type, source, pushResult, fileNotify)
 end
 
 local function searchByNode(source, pushResult)
@@ -253,7 +263,9 @@ local function searchByNode(source, pushResult)
 end
 
 ---@async
-function vm.getRefs(source)
+---@param source parser.object
+---@param fileNotify fun(uri: uri): boolean
+function vm.getRefs(source, fileNotify)
     local results = {}
     local mark    = {}
 
@@ -273,8 +285,8 @@ function vm.getRefs(source)
 
     searchBySimple(source, pushResult)
     searchByLocalID(source, pushResult)
-    searchByParentNode(source, pushResult)
     searchByNode(source, pushResult)
+    searchByParentNode(source, pushResult, fileNotify or await.delay)
 
     return results
 end

@@ -149,6 +149,12 @@ local nodeSwitch = util.switch()
             searchFieldSwitch(pn.type, pn, key, pushResult)
         end
     end)
+    : case 'tableindex'
+    : case 'tablefield'
+    : call(function (source, pushResult)
+        local tbl = source.parent
+        searchFieldSwitch(tbl.type, tbl, guide.getKeyName(source), pushResult)
+    end)
     : case 'doc.see.field'
     : call(function (source, pushResult)
         local parentNode = compiler.compileNode(source.parent.name)

@@ -12,10 +12,8 @@ return function (uri, callback)
         return
     end
 
-    local cache = {
-        ['any'] = true,
-        ['nil'] = true,
-    }
+    local cache = {}
+
     for _, doc in ipairs(state.ast.docs) do
         if doc.type == 'doc.class' then
             if not doc.extends then
@@ -27,7 +25,7 @@ return function (uri, callback)
                 if cache[name] == nil then
                     cache[name] = false
                     for _, otherDoc in ipairs(docs) do
-                        if otherDoc.type == 'doc.class.name' then
+                        if otherDoc.type == 'doc.class' then
                             cache[name] = true
                             break
                         end

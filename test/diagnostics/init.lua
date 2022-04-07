@@ -679,6 +679,11 @@ T['x'], <!T['y']!>, <!T['z']!> = 1
 --]]
 
 TEST [[
+---@alias <!A!> integer
+---@alias <!A!> integer
+]]
+
+TEST [[
 ---@class A : <!B!>
 ]]
 

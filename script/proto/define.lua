@@ -49,7 +49,7 @@ m.DiagnosticDefaultSeverity = {
     ['discard-returns']         = 'Warning',
     ['type-check']              = 'Warning',
 
-    ['duplicate-doc-class']     = 'Warning',
+    ['duplicate-doc-alias']     = 'Warning',
     ['undefined-doc-class']     = 'Warning',
     ['undefined-doc-name']      = 'Warning',
     ['circle-doc-class']        = 'Warning',
@@ -108,7 +108,7 @@ m.DiagnosticDefaultNeededFileStatus = {
     ['discard-returns']         = 'Opened',
     ['type-check']              = 'None',
 
-    ['duplicate-doc-class']     = 'Any',
+    ['duplicate-doc-alias']     = 'Any',
     ['undefined-doc-class']     = 'Any',
     ['undefined-doc-name']      = 'Any',
     ['circle-doc-class']        = 'Any',

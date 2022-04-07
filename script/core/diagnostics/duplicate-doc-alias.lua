@@ -21,8 +21,7 @@ return function (uri, callback)
                 local docs = vm.getDocSets(uri, name)
                 cache[name] = {}
                 for _, otherDoc in ipairs(docs) do
-                    if otherDoc.type == 'doc.class.name'
-                    or otherDoc.type == 'doc.alias.name' then
+                    if otherDoc.type == 'doc.alias' then
                         cache[name][#cache[name]+1] = {
                             start  = otherDoc.start,
                             finish = otherDoc.finish,
@@ -33,8 +32,8 @@ return function (uri, callback)
             end
             if #cache[name] > 1 then
                 callback {
-                    start   = doc.start,
-                    finish  = doc.finish,
+                    start   = doc.alias.start,
+                    finish  = doc.alias.finish,
                     related = cache,
                     message = lang.script('DIAG_DUPLICATE_DOC_CLASS', name)
                 }

@@ -15,7 +15,8 @@ local function getFieldEventName(doc)
     end
     for i = 1, 2 do
         local arg = docFunc.args[i]
-        if arg
+        if  arg
+        and arg.extends
         and #arg.extends.types == 1 then
             local literal = arg.extends.types[1]
             if literal.type == 'doc.type.boolean'

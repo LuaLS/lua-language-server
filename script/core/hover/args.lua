@@ -21,7 +21,7 @@ local function asFunction(source)
         methodDef = true
     end
     if methodDef then
-        args[#args+1] = ('self: %s'):format(infer.getInfer(parent.node))
+        args[#args+1] = ('self: %s'):format(infer.getInfer(parent.node):view 'any')
     end
     if source.args then
         for i = 1, #source.args do

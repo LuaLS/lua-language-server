@@ -5,7 +5,6 @@ local diag   = require 'core.diagnostics'
 local config = require 'config'
 local fs     = require 'bee.filesystem'
 local luadoc = require "parser.luadoc"
-local noder  = require 'core.noder'
 
 -- 临时
 ---@diagnostic disable: await-in-sync

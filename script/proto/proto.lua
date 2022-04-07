@@ -132,7 +132,8 @@ local secretOption = {
     process = function (item, path)
         if  path[1] == 'params'
         and path[2] == 'textDocument'
-        and path[3] == nil then
+        and path[3] == 'text'
+        and path[4] == nil then
             return '"***"'
         end
         return item

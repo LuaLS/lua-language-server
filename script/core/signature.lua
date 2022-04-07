@@ -125,7 +125,6 @@ local function makeSignatures(text, call, pos)
     local defs = vm.getDefs(node)
     local mark = {}
     for _, src in ipairs(defs) do
-        src = vm.getObjectValue(src) or src
         if src.type == 'function'
         or src.type == 'doc.type.function' then
             if not mark[src] then

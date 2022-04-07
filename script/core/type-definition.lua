@@ -132,19 +132,9 @@ return function (uri, offset)
     end
 
     local defs = vm.getDefs(source)
-    local values = {}
-    for _, src in ipairs(defs) do
-        local value = vm.getObjectValue(src)
-        if value and value ~= src and guide.isLiteral(value) then
-            values[value] = true
-        end
-    end
 
     for _, src in ipairs(defs) do
         if src.dummy then
-            goto CONTINUE
-        end
-        if values[src] then
             goto CONTINUE
         end
         local root = guide.getRoot(src)

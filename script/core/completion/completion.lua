@@ -207,7 +207,6 @@ local function getSnip(source)
     end
     local defs = vm.getDefs(source)
     for _, def in ipairs(defs) do
-        def = vm.getObjectValue(def) or def
         if def ~= source and def.type == 'function' then
             local uri = guide.getUri(def)
             local text = files.getText(uri)

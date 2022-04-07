@@ -188,19 +188,8 @@ local function buildEnumChunk(docType, name)
     return table.concat(lines, '\n')
 end
 
-local function isFunction(source)
-    if source.type == 'function' then
-        return true
-    end
-    local value = vm.getObjectValue(source)
-    if not value then
-        return false
-    end
-    return value.type == 'function'
-end
-
 local function getBindEnums(source, docGroup)
-    if not isFunction(source) then
+    if source.type ~= 'function' then
         return
     end
 
@@ -308,7 +297,7 @@ local function tryDocComment(source)
     if not source.bindDocs then
         return
     end
-    if not isFunction(source) then
+    if source.type ~= 'function' then
         local comment = getBindComment(source, source.bindDocs)
         return comment
     end

@@ -724,7 +724,7 @@ TEST [[
 TEST [[
 ---@class A
 ---@class B
----@alias <!A B!>
+---@alias <!A!> B
 ]]
 
 TEST [[

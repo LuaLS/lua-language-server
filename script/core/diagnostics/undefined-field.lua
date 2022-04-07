@@ -36,8 +36,8 @@ return function (uri, callback)
             local defs = vm.getDefs(node)
             local ok
             for _, def in ipairs(defs) do
-                if  def.type == 'doc.class.name'
-                and not skipCheckClass[def[1]] then
+                if  def.type == 'doc.class'
+                and not skipCheckClass[def.class[1]] then
                     ok = true
                     break
                 end

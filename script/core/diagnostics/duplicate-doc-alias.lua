@@ -21,7 +21,8 @@ return function (uri, callback)
                 local docs = vm.getDocSets(uri, name)
                 cache[name] = {}
                 for _, otherDoc in ipairs(docs) do
-                    if otherDoc.type == 'doc.alias' then
+                    if otherDoc.type == 'doc.alias'
+                    or otherDoc.type == 'doc.class' then
                         cache[name][#cache[name]+1] = {
                             start  = otherDoc.start,
                             finish = otherDoc.finish,

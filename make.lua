@@ -32,16 +32,13 @@ elseif platform.OS == 'Linux' then
     elseif lm.platform == "linux-x64" then
     elseif lm.platform == "linux-arm64" then
         lm.cc = 'aarch64-linux-gnu-gcc'
-        includeCodeFormat = false
     else
         error "unknown platform"
     end
 end
 
 lm:import "3rd/bee.lua/make.lua"
-if includeCodeFormat then
-    lm:import "make/code_format.lua"
-end
+lm:import "make/code_format.lua"
 
 lm:source_set 'lpeglabel' {
     rootdir = '3rd',

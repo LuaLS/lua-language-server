@@ -85,15 +85,23 @@ simpleSwitch = util.switch()
 local function searchInAllFiles(suri, searcher, notify)
     searcher(suri)
 
+    local uris = {}
     for uri in files.eachFile(suri) do
         if  not vm.isMetaFile(uri)
         and suri ~= uri then
+            uris[#uris+1] = uri
+        end
+    end
+
+    for _, uri in ipairs(uris) do
+        if notify then
             local continue = notify(uri)
             if continue == false then
                 break
             end
-            searcher(uri)
         end
+        await.delay()
+        searcher(uri)
     end
 end
 
@@ -286,7 +294,7 @@ function vm.getRefs(source, fileNotify)
     searchBySimple(source, pushResult)
     searchByLocalID(source, pushResult)
     searchByNode(source, pushResult)
-    searchByParentNode(source, pushResult, fileNotify or await.delay)
+    searchByParentNode(source, pushResult, fileNotify)
 
     return results
 end

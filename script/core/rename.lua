@@ -3,6 +3,7 @@ local vm         = require 'vm'
 local util       = require 'utility'
 local findSource = require 'core.find-source'
 local guide      = require 'parser.guide'
+local globalMgr  = require 'vm.global-manager'
 
 local Forcing
 
@@ -180,17 +181,36 @@ end
 
 ---@async
 local function ofField(source, newname, callback)
-    local key = guide.getKeyName(source)
-    for _, src in ipairs(vm.getRefs(source)) do
-        ofFieldThen(key, src, newname, callback)
+    local key  = guide.getKeyName(source)
+    local mark = {}
+    local refs = vm.getRefs(source)
+    for _, ref in ipairs(refs) do
+        if not mark[ref] then
+            mark[ref] = true
+            ofFieldThen(key, ref, newname, callback)
+        end
+    end
+    local defs = vm.getDefs(source)
+    for _, def in ipairs(defs) do
+        if not mark[def] then
+            mark[def] = true
+            ofFieldThen(key, def, newname, callback)
+        end
     end
 end
 
 ---@async
 local function ofGlobal(source, newname, callback)
     local key = guide.getKeyName(source)
-    for _, src in ipairs(vm.getRefs(source)) do
-        ofFieldThen(key, src, newname, callback)
+    local global = globalMgr.getGlobal('variable', key)
+    if not global then
+        return
+    end
+    for _, set in ipairs(global:getSets()) do
+        ofFieldThen(key, set, newname, callback)
+    end
+    for _, get in ipairs(global:getGets()) do
+        ofFieldThen(key, get, newname, callback)
     end
 end
 
@@ -204,13 +224,21 @@ end
 ---@async
 local function ofDocTypeName(source, newname, callback)
     local oldname = source[1]
-    for _, doc in ipairs(vm.getRefs(source)) do
-        if doc.type == 'doc.class.name'
-        or doc.type == 'doc.type.name'
-        or doc.type == 'doc.alias.name' then
-            if oldname == doc[1] then
-                callback(doc, doc.start, doc.finish, newname)
-            end
+    local global = globalMgr.getGlobal('type', oldname)
+    if not global then
+        return
+    end
+    for _, doc in ipairs(global:getSets()) do
+        if doc.type == 'doc.class' then
+            callback(doc, doc.class.start, doc.class.finish, newname)
+        end
+        if doc.type == 'doc.alias' then
+            callback(doc, doc.alias.start, doc.alias.finish, newname)
+        end
+    end
+    for _, doc in ipairs(global:getGets()) do
+        if doc.type == 'doc.type.name' then
+            callback(doc, doc.start, doc.finish, newname)
         end
     end
 end

@@ -842,6 +842,16 @@ local compilerSwitch = util.switch()
         local vararg = source.vararg
         if vararg.type == 'call' then
             local node = getReturn(vararg.node, source.sindex, vararg.args)
+            if not node then
+                return
+            end
+            for n in nodeMgr.eachNode(node) do
+                if  n.type == 'global'
+                and n.cate == 'type'
+                and n.name == '...' then
+                    return
+                end
+            end
             nodeMgr.setNode(source, node)
         end
         if vararg.type == 'varargs' then
@@ -855,6 +865,16 @@ local compilerSwitch = util.switch()
     : case 'call'
     : call(function (source)
         local node = getReturn(source.node, 1, source.args)
+        if not node then
+            return
+        end
+        for n in nodeMgr.eachNode(node) do
+            if  n.type == 'global'
+            and n.cate == 'type'
+            and n.name == '...' then
+                return
+            end
+        end
         nodeMgr.setNode(source, node)
     end)
     : case 'in'

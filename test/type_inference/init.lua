@@ -1396,3 +1396,17 @@ local <?var?> = true
 var = 1
 var = 1.0
 ]]
+
+TEST 'unknown' [[
+---@return ...
+local function f() end
+
+local <?x?> = f()
+]]
+
+TEST 'unknown' [[
+---@return ...
+local function f() end
+
+local _, <?x?> = f()
+]]

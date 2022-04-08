@@ -1,6 +1,7 @@
 # changelog
 
 ## 2.6.8
+`2022-4-9`
 * `CHG` completion: call snippet shown as `Function` instead of `Snippet` when `Lua.completion.callSnippet` is `Replace`
 * `FIX` [#976](https://github.com/sumneko/lua-language-server/issues/976)
 * `FIX` [#995](https://github.com/sumneko/lua-language-server/issues/995)

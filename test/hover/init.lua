@@ -1816,3 +1816,15 @@ local <?x?> = '1' .. '2'
 [[
 local x: string = "12"
 ]]
+
+TEST [[
+local t = {
+    x   = 1,
+    [1] = 'x',
+}
+
+local <?x?> = t[#t]
+]]
+[[
+local x: string = "x"
+]]

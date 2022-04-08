@@ -1419,3 +1419,18 @@ local t = {
 
 local <?x?> = t[#t]
 ]]
+
+TEST 'string' [[
+local t = {
+    x   = 1,
+    [1] = 'x',
+}
+
+local <?x?> = t[#t]
+]]
+
+TEST 'string' [[
+local t = { 'x' }
+
+local <?x?> = t[#t]
+]]

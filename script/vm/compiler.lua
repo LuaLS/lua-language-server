@@ -20,19 +20,28 @@ local m = {}
 local searchFieldSwitch = util.switch()
     : case 'table'
     : call(function (node, key, pushResult)
+        local tp
+        if  type(key) == 'table'
+        and key.type == 'global'
+        and key.cate == 'type' then
+            tp = key.name
+        end
         local hasFiled = false
         for _, field in ipairs(node) do
             if field.type == 'tablefield'
             or field.type == 'tableindex' then
+                local fieldKey = guide.getKeyName(field)
                 if key == nil
-                or key == guide.getKeyName(field) then
+                or key == fieldKey
+                or (tp == 'integer' and math.tointeger(fieldKey)) then
                     hasFiled = true
                     pushResult(field)
                 end
             end
             if field.type == 'tableexp' then
                 if key == nil
-                or key == field.tindex then
+                or key == field.tindex
+                or tp  == 'integer' then
                     hasFiled = true
                     pushResult(field)
                 end

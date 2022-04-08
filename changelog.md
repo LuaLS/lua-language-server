@@ -7,6 +7,7 @@
   + `no-implicit-any`: renamed to `no-unknown`
 
 ## 2.6.8
+`2022-4-9`
 * `CHG` completion: call snippet shown as `Function` instead of `Snippet` when `Lua.completion.callSnippet` is `Replace`
 * `FIX` [#976](https://github.com/sumneko/lua-language-server/issues/976)
 * `FIX` [#995](https://github.com/sumneko/lua-language-server/issues/995)
@@ -15,6 +16,8 @@
 * `FIX` [#1009](https://github.com/sumneko/lua-language-server/issues/1009)
 * `FIX` [#1011](https://github.com/sumneko/lua-language-server/issues/1011)
 * `FIX` [#1014](https://github.com/sumneko/lua-language-server/issues/1014)
+* `FIX` [#1016](https://github.com/sumneko/lua-language-server/issues/1016)
+* `FIX` [#1017](https://github.com/sumneko/lua-language-server/issues/1017)
 * `FIX` runtime errors reported by telemetry
 
 ## 2.6.7

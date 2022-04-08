@@ -200,9 +200,10 @@ local function searchByNode(source, pushResult)
     if not node then
         return
     end
+    local suri = guide.getUri(source)
     for n in nodeMgr.eachNode(node) do
         if n.type == 'global' then
-            for _, set in ipairs(n:getSets()) do
+            for _, set in ipairs(n:getSets(suri)) do
                 pushResult(set)
             end
         else

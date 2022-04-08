@@ -269,7 +269,7 @@ function m.getGlobalSets(suri, cate)
     local globals = m.getGlobals(cate)
     local result = {}
     for _, global in ipairs(globals) do
-        local sets = global:getSets()
+        local sets = global:getSets(suri)
         for _, set in ipairs(sets) do
             result[#result+1] = set
         end

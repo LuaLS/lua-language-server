@@ -82,13 +82,13 @@ lclient():start(function (client)
     files.setText(rootUri .. '/ws1/unittest.lua', [[
 GLOBAL = 1
 ---@class ZAAA
----@type 
+---@type Z
     ]])
 
     files.setText(rootUri .. '/ws2/unittest.lua', [[
 GLOBAL = 2
 ---@class ZBBB
----@type 
+---@type Z
     ]])
 
     local defs1 = client:awaitRequest('textDocument/definition', {
@@ -112,4 +112,26 @@ GLOBAL = 2
         },
     })
     assert(#defs2 == 1)
+
+    local comps1 = client:awaitRequest('textDocument/completion', {
+        textDocument = {
+            uri = rootUri .. '/ws1/unittest.lua',
+        },
+        position = {
+            line = 2,
+            character = 10,
+        },
+    })
+    assert(#comps1.items == 1)
+
+    local comps2 = client:awaitRequest('textDocument/completion', {
+        textDocument = {
+            uri = rootUri .. '/ws2/unittest.lua',
+        },
+        position = {
+            line = 2,
+            character = 10,
+        },
+    })
+    assert(#comps2.items == 1)
 end)

@@ -150,7 +150,7 @@ function m.getClassFields(suri, node, key, pushResult)
             return
         end
         mark[name] = true
-        for _, set in ipairs(class:getSets()) do
+        for _, set in ipairs(class:getSets(suri)) do
             if set.type == 'doc.class' then
                 -- check ---@field
                 local hasFounded
@@ -1408,9 +1408,9 @@ local function compileByNode(source)
 end
 
 ---@param source vm.node
-local function compileByGlobal(source)
+local function compileByGlobal(uri, source)
+    uri = uri or guide.getUri(source)
     if source.type == 'global' then
-        local uri = guide.getUri(source)
         nodeMgr.setNode(source, source)
         if source.cate == 'variable' then
             local hasMarkDoc
@@ -1453,7 +1453,7 @@ local function compileByGlobal(source)
         return
     end
     if source._globalNode then
-        nodeMgr.setNode(source, m.compileNode(source._globalNode))
+        nodeMgr.setNode(source, m.compileNode(source._globalNode, uri))
         return
     end
 end
@@ -1478,7 +1478,7 @@ end
 
 ---@param source parser.object
 ---@return vm.node
-function m.compileNode(source)
+function m.compileNode(source, uri)
     if not source then
         return false
     end
@@ -1493,7 +1493,7 @@ function m.compileNode(source)
     end
 
     nodeMgr.nodeCache[source] = false
-    compileByGlobal(source)
+    compileByGlobal(uri, source)
     compileByNode(source)
 
     --localMgr.subscribeLocal(source, source._node)

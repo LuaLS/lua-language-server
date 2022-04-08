@@ -201,7 +201,7 @@ function mt:_eraseAlias()
     local expandAlias = config.get(self.uri, 'Lua.hover.expandAlias')
     for n in nodeMgr.eachNode(self.node) do
         if n.type == 'global' and n.cate == 'type' then
-            for _, set in ipairs(n:getSets()) do
+            for _, set in ipairs(n:getSets(self.uri)) do
                 if set.type == 'doc.alias' then
                     if expandAlias then
                         self.views[n.name] = nil

@@ -91,7 +91,12 @@ local searchFieldSwitch = util.switch()
     end)
     : case 'local'
     : call(function (node, key, pushResult)
-        local fields = key and localID.getSources(node, key) or localID.getFields(node)
+        local fields
+        if key then
+            fields = localID.getSources(node, key)
+        else
+            fields = localID.getFields(node)
+        end
         if fields then
             for _, src in ipairs(fields) do
                 pushResult(src)

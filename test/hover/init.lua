@@ -1828,3 +1828,24 @@ local <?x?> = t[#t]
 [[
 local x: string = "x"
 ]]
+
+TEST [[
+local x = {
+    a = 1,
+    b = 2,
+    [1] = 10,
+}
+
+local y = {
+    _   = x.a,
+    _   = x.b,
+    [1] = <?x?>,
+}
+]]
+[[
+local x: {
+    a: integer = 1,
+    b: integer = 2,
+    [1]: integer = 10,
+}
+]]

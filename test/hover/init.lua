@@ -1737,7 +1737,7 @@ TEST [[
 ---@class A
 local a
 
-local b = nil
+local b
 b = a
 
 print(b.<?x?>)
@@ -1808,4 +1808,11 @@ local <?uri?>
 ]]
 [[
 local uri: string
+]]
+
+TEST [[
+local <?x?> = '1' .. '2'
+]]
+[[
+local x: string = "12"
 ]]

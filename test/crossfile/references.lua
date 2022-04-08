@@ -103,7 +103,7 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            ROOT = 1
+            <!ROOT!> = 1
         ]],
     },
     {
@@ -118,7 +118,7 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            <?ROOT?> = 1
+            <~ROOT~> = 1
         ]],
     },
     {
@@ -145,7 +145,7 @@ TEST {
             ---@class A
             local mt
 
-            function mt.<?f?>()
+            function mt.<~f~>()
             end
         ]]
     }
@@ -156,7 +156,7 @@ TEST {
         path = 'a.lua',
         content = [[
             local t = {}
-            t.<?x?> = 1
+            t.<~x~> = 1
             return t
         ]]
     },
@@ -192,7 +192,7 @@ TEST {
         path = 'a.lua',
         content = [[
             local m = {}
-            function m.<?func?>()
+            function m.<~func~>()
             end
             return m
         ]],
@@ -244,7 +244,7 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            local function <?f?>()
+            local function <~f~>()
             end
 
             return {
@@ -361,7 +361,7 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            local <?t?> = require 'b'
+            local <~t~> = require 'b'
             return <!t!>
         ]]
     },

@@ -7,24 +7,11 @@ local guide      = require 'parser.guide'
 
 ---@async
 local function eachRef(source, callback)
-    local uri = guide.getUri(source)
-    local mark = {}
     local refs = vm.getRefs(source, function ()
         return false
     end)
     for _, ref in ipairs(refs) do
-        if not mark[ref] then
-            mark[ref] = true
-            callback(ref)
-        end
-    end
-    local defs = vm.getDefs(source)
-    for _, def in ipairs(defs) do
-        if  not mark[def]
-        and guide.getUri(def) == uri then
-            mark[def] = true
-            callback(def)
-        end
+        callback(ref)
     end
 end
 

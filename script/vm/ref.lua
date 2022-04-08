@@ -16,7 +16,6 @@ local function searchGetLocal(source, node, pushResult)
     for _, ref in ipairs(node.node.ref) do
         if  ref.type == 'getlocal'
         and ref.next
-        and not guide.isSet(ref.next)
         and guide.getKeyName(ref.next) == key then
             pushResult(ref.next)
         end
@@ -192,6 +191,7 @@ local searchByParentNode
 local nodeSwitch = util.switch()
     : case 'field'
     : case 'method'
+    ---@async
     : call(function (source, pushResult, fileNotify)
         searchByParentNode(source.parent, pushResult, fileNotify)
     end)
@@ -242,9 +242,7 @@ local function searchByLocalID(source, pushResult)
         return
     end
     for _, src in ipairs(idSources) do
-        if not guide.isSet(src) then
-            pushResult(src)
-        end
+        pushResult(src)
     end
 end
 
@@ -267,6 +265,17 @@ local function searchByNode(source, pushResult)
                 pushResult(get)
             end
         end
+    end
+end
+
+local function searchByDef(source, pushResult)
+    if source.type == 'function'
+    or source.type == 'doc.type.function' then
+        return
+    end
+    local defs = vm.getDefs(source)
+    for _, def in ipairs(defs) do
+        pushResult(def)
     end
 end
 
@@ -294,6 +303,7 @@ function vm.getRefs(source, fileNotify)
     searchBySimple(source, pushResult)
     searchByLocalID(source, pushResult)
     searchByNode(source, pushResult)
+    searchByDef(source, pushResult)
     searchByParentNode(source, pushResult, fileNotify)
 
     return results

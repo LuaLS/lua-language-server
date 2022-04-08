@@ -182,20 +182,9 @@ end
 ---@async
 local function ofField(source, newname, callback)
     local key  = guide.getKeyName(source)
-    local mark = {}
     local refs = vm.getRefs(source)
     for _, ref in ipairs(refs) do
-        if not mark[ref] then
-            mark[ref] = true
             ofFieldThen(key, ref, newname, callback)
-        end
-    end
-    local defs = vm.getDefs(source)
-    for _, def in ipairs(defs) do
-        if not mark[def] then
-            mark[def] = true
-            ofFieldThen(key, def, newname, callback)
-        end
     end
 end
 

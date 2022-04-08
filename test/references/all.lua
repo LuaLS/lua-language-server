@@ -3,7 +3,7 @@ local config = require 'config'
 TEST [[
 ---@class A
 local a = {}
-a.<?x?> = 1
+a.<~x~> = 1
 
 ---@return A
 local function f() end
@@ -15,7 +15,7 @@ return b.<!x!>
 TEST [[
 ---@class A
 local a = {}
-a.<?x?> = 1
+a.<~x~> = 1
 
 ---@return table
 ---@return A
@@ -26,7 +26,7 @@ return a.x, b.<!x!>
 ]]
 
 TEST [[
-local <?mt?> = {}
+local <~mt~> = {}
 function <!mt!>:x()
     self:x()
 end
@@ -34,7 +34,7 @@ end
 
 TEST [[
 local mt = {}
-function mt:<?x?>()
+function mt:<~x~>()
     self:<!x!>()
 end
 ]]
@@ -42,7 +42,7 @@ end
 --TEST [[
 -----@class Dog
 --local mt = {}
---function mt:<?eat?>()
+--function mt:<~eat~>()
 --end
 --
 -----@class Master
@@ -86,13 +86,13 @@ TEST [[
 local t
 
 ---@class B: A
-local <?v?>
+local <~v~>
 ]]
 
 TEST [[
 ---@class Dog
 local Dog = {}
-function Dog:<?eat?>()
+function Dog:<~eat~>()
 end
 
 ---@generic T
@@ -109,7 +109,7 @@ v1:<!eat!>()
 TEST [[
 ---@class Dog
 local Dog = {}
-function Dog:<?eat?>()
+function Dog:<~eat~>()
 end
 
 ---@class Master

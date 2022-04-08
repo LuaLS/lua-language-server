@@ -195,10 +195,11 @@ local function ofGlobal(source, newname, callback)
     if not global then
         return
     end
-    for _, set in ipairs(global:getSets()) do
+    local uri = guide.getUri(source)
+    for _, set in ipairs(global:getSets(uri)) do
         ofFieldThen(key, set, newname, callback)
     end
-    for _, get in ipairs(global:getGets()) do
+    for _, get in ipairs(global:getGets(uri)) do
         ofFieldThen(key, get, newname, callback)
     end
 end
@@ -217,7 +218,8 @@ local function ofDocTypeName(source, newname, callback)
     if not global then
         return
     end
-    for _, doc in ipairs(global:getSets()) do
+    local uri = guide.getUri(source)
+    for _, doc in ipairs(global:getSets(uri)) do
         if doc.type == 'doc.class' then
             callback(doc, doc.class.start, doc.class.finish, newname)
         end
@@ -225,7 +227,7 @@ local function ofDocTypeName(source, newname, callback)
             callback(doc, doc.alias.start, doc.alias.finish, newname)
         end
     end
-    for _, doc in ipairs(global:getGets()) do
+    for _, doc in ipairs(global:getGets(uri)) do
         if doc.type == 'doc.type.name' then
             callback(doc, doc.start, doc.finish, newname)
         end

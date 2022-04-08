@@ -286,7 +286,7 @@ function m.hasGlobalSets(suri, cate, name)
     if not global then
         return false
     end
-    local sets = global:getSets()
+    local sets = global:getSets(suri)
     if #sets == 0 then
         return false
     end

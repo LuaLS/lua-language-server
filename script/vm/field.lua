@@ -3,25 +3,23 @@ local vm        = require 'vm.vm'
 local util      = require 'utility'
 local compiler  = require 'vm.compiler'
 local guide     = require 'parser.guide'
-local localID   = require 'vm.local-id'
-local globalMgr = require 'vm.global-manager'
-local nodeMgr   = require 'vm.node'
 
 local searchByNodeSwitch = util.switch()
     : case 'global'
     ---@param global vm.node.global
-    : call(function (global, pushResult)
-        for _, set in ipairs(global:getSets()) do
+    : call(function (suri, global, pushResult)
+        for _, set in ipairs(global:getSets(suri)) do
             pushResult(set)
         end
     end)
-    : default(function (source, pushResult)
+    : default(function (suri, source, pushResult)
         pushResult(source)
     end)
 
 local function searchByNode(source, pushResult)
+    local uri = guide.getUri(source)
     compiler.compileByParentNode(source, nil, function (field)
-        searchByNodeSwitch(field.type, field, pushResult)
+        searchByNodeSwitch(field.type, uri, field, pushResult)
     end)
 end
 

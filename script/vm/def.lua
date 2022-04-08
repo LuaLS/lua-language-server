@@ -94,7 +94,7 @@ local searchFieldSwitch = util.switch()
         if node.cate == 'variable' then
             local newGlobal = globalMgr.getGlobal('variable', node.name, key)
             if newGlobal then
-                for _, set in ipairs(newGlobal:getSets()) do
+                for _, set in ipairs(newGlobal:getSets(suri)) do
                     pushResult(set)
                 end
             end

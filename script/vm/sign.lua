@@ -15,9 +15,10 @@ function mt:addSign(node)
     self.signList[#self.signList+1] = node
 end
 
+---@param uri uri
 ---@param argNodes vm.node[]
 ---@return table<string, vm.node>
-function mt:resolve(argNodes)
+function mt:resolve(uri, argNodes)
     if not argNodes then
         return nil
     end
@@ -57,18 +58,18 @@ function mt:resolve(argNodes)
                 local uvalueNode = compiler.compileNode(ufield.extends)
                 if ufieldNode.type == 'doc.generic.name' and uvalueNode.type == 'doc.generic.name' then
                     -- { [number]: number} -> { [K]: V }
-                    local tfieldNode = vm.getTableKey(node, 'any')
-                    local tvalueNode = vm.getTableValue(node, 'any')
+                    local tfieldNode = vm.getTableKey(uri, node, 'any')
+                    local tvalueNode = vm.getTableValue(uri, node, 'any')
                     resolve(ufieldNode, tfieldNode)
                     resolve(uvalueNode, tvalueNode)
                 else
                     if ufieldNode.type == 'doc.generic.name' then
                         -- { [number]: number}|number[] -> { [K]: number }
-                        local tnode = vm.getTableKey(node, uvalueNode)
+                        local tnode = vm.getTableKey(uri, node, uvalueNode)
                         resolve(ufieldNode, tnode)
                     else
                         -- { [number]: number}|number[] -> { [number]: V }
-                        local tnode = vm.getTableValue(node, ufieldNode)
+                        local tnode = vm.getTableValue(uri, node, ufieldNode)
                         resolve(uvalueNode, tnode)
                     end
                 end

@@ -135,21 +135,21 @@ local function searchField(source, pushResult, defMap, fileNotify)
         end
         ---@async
         guide.eachSourceType(state.ast, 'getfield', function (src)
-            if src.field[1] == key then
+            if src.field and src.field[1] == key then
                 checkDef(src)
                 await.delay()
             end
         end)
         ---@async
         guide.eachSourceType(state.ast, 'getmethod', function (src)
-            if src.method[1] == key then
+            if src.method and src.method[1] == key then
                 checkDef(src)
                 await.delay()
             end
         end)
         ---@async
         guide.eachSourceType(state.ast, 'getindex', function (src)
-            if src.index.type == 'string' and src.index[1] == key then
+            if src.index and src.index.type == 'string' and src.index[1] == key then
                 checkDef(src)
                 await.delay()
             end
@@ -269,11 +269,12 @@ local function searchByNode(source, pushResult)
 end
 
 local function searchByDef(source, pushResult)
+    local defMap = {}
     if source.type == 'function'
     or source.type == 'doc.type.function' then
-        return
+        defMap[source] = true
+        return defMap
     end
-    local defMap = {}
     local defs = vm.getDefs(source)
     for _, def in ipairs(defs) do
         pushResult(def)

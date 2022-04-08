@@ -165,7 +165,7 @@ return function (source)
 
     for view in infer.getInfer(source):eachView() do
         if view == 'string'
-        or vm.isSubType(view, 'string') then
+        or vm.isSubType(uri, view, 'string') then
             return nil
         end
     end

@@ -15,7 +15,7 @@ function vm.getDocSets(suri, name)
         if not global then
             return {}
         end
-        return global:getSets()
+        return global:getSets(suri)
     else
         return globalMgr.getGlobalSets(suri, 'type')
     end

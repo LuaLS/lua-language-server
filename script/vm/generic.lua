@@ -109,10 +109,11 @@ local function cloneObject(node, resolved)
     return node
 end
 
+---@param uri uri
 ---@param argNodes vm.node[]
 ---@return parser.object
-function mt:resolve(argNodes)
-    local resolved = self.sign:resolve(argNodes)
+function mt:resolve(uri, argNodes)
+    local resolved = self.sign:resolve(uri, argNodes)
     local newProto = cloneObject(self.proto, resolved)
     return newProto
 end

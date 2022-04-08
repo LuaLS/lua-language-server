@@ -358,7 +358,7 @@ local function getReturn(func, index, args)
             or cnode.type == 'doc.type.function' then
                 local returnNode = m.getReturnOfFunction(cnode, index)
                 if returnNode and returnNode.type == 'generic' then
-                    returnNode = returnNode:resolve(args)
+                    returnNode = returnNode:resolve(guide.getUri(func), args)
                 end
                 if returnNode and returnNode.type ~= 'doc.generic.name' then
                     result = result or union()
@@ -953,15 +953,16 @@ local compilerSwitch = util.switch()
     : case 'doc.type.name'
     : call(function (source)
         if source.signs then
+            local uri = guide.getUri(source)
             nodeMgr.setNode(source, source)
             local global = globalMgr.getGlobal('type', source[1])
-            for _, set in ipairs(global:getSets()) do
+            for _, set in ipairs(global:getSets(uri)) do
                 if set.type == 'doc.class' then
                     if set.extends then
                         for _, ext in ipairs(set.extends) do
                             if ext.type == 'doc.type.table' then
                                 if ext._generic then
-                                    local resolved = ext._generic:resolve(source.signs)
+                                    local resolved = ext._generic:resolve(uri, source.signs)
                                     nodeMgr.setNode(source, resolved)
                                 end
                             end
@@ -970,7 +971,7 @@ local compilerSwitch = util.switch()
                 end
                 if set.type == 'doc.alias' then
                     if set.extends._generic then
-                        local resolved = set.extends._generic:resolve(source.signs)
+                        local resolved = set.extends._generic:resolve(uri, source.signs)
                         nodeMgr.setNode(source, resolved)
                     end
                 end
@@ -1409,10 +1410,11 @@ end
 ---@param source vm.node
 local function compileByGlobal(source)
     if source.type == 'global' then
+        local uri = guide.getUri(source)
         nodeMgr.setNode(source, source)
         if source.cate == 'variable' then
             local hasMarkDoc
-            for _, set in ipairs(source:getSets()) do
+            for _, set in ipairs(source:getSets(uri)) do
                 if set.bindDocs then
                     if bindDocs(set) then
                         nodeMgr.setNode(source, m.compileNode(set))
@@ -1420,7 +1422,7 @@ local function compileByGlobal(source)
                     end
                 end
             end
-            for _, set in ipairs(source:getSets()) do
+            for _, set in ipairs(source:getSets(uri)) do
                 if set.value then
                     if not hasMarkDoc or guide.isLiteral(set.value) then
                         nodeMgr.setNode(source, m.compileNode(set.value))
@@ -1429,7 +1431,7 @@ local function compileByGlobal(source)
             end
         end
         if source.cate == 'type' then
-            for _, set in ipairs(source:getSets()) do
+            for _, set in ipairs(source:getSets(uri)) do
                 if set.type == 'doc.class' then
                     if set.extends then
                         for _, ext in ipairs(set.extends) do

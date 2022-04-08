@@ -1,4 +1,5 @@
 local util = require 'utility'
+local scope= require 'workspace.scope'
 
 ---@class vm.node.global.link
 ---@field gets   parser.object[]
@@ -6,8 +7,8 @@ local util = require 'utility'
 
 ---@class vm.node.global
 ---@field links table<uri, vm.node.global.link>
----@field setsCache parser.object[]
----@field getsCache parser.object[]
+---@field setsCache table<uri, parser.object[]>
+---@field getsCache table<uri, parser.object[]>
 ---@field cate vm.global.cate
 local mt = {}
 mt.__index = mt
@@ -31,29 +32,53 @@ function mt:addGet(uri, source)
 end
 
 ---@return parser.object[]
-function mt:getSets()
+function mt:getSets(suri)
     if not self.setsCache then
         self.setsCache = {}
-        for _, link in pairs(self.links) do
+    end
+    ---@type scope
+    local scp = suri and scope.getScope(suri) or nil
+    local cacheUri = scp and scp.uri or '<fallback>'
+    if self.setsCache[cacheUri] then
+        return self.setsCache[cacheUri]
+    end
+    self.setsCache[cacheUri] = {}
+    local cache = self.setsCache[cacheUri]
+    for uri, link in pairs(self.links) do
+        if not scp
+        or scp:isChildUri(uri)
+        or scp:isLinkedUri(uri) then
             for _, source in ipairs(link.sets) do
-                self.setsCache[#self.setsCache+1] = source
+                cache[#cache+1] = source
             end
         end
     end
-    return self.setsCache
+    return cache
 end
 
 ---@return parser.object[]
-function mt:getGets()
+function mt:getGets(suri)
     if not self.getsCache then
         self.getsCache = {}
-        for _, link in pairs(self.links) do
+    end
+    ---@type scope
+    local scp = suri and scope.getScope(suri) or nil
+    local cacheUri = scp and scp.uri or '<fallback>'
+    if self.getsCache[cacheUri] then
+        return self.getsCache[cacheUri]
+    end
+    self.getsCache[cacheUri] = {}
+    local cache = self.getsCache[cacheUri]
+    for uri, link in pairs(self.links) do
+        if not scp
+        or scp:isChildUri(uri)
+        or scp:isLinkedUri(uri) then
             for _, source in ipairs(link.gets) do
-                self.getsCache[#self.getsCache+1] = source
+                cache[#cache+1] = source
             end
         end
     end
-    return self.getsCache
+    return cache
 end
 
 ---@param uri uri

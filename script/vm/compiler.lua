@@ -659,6 +659,7 @@ local compilerSwitch = util.switch()
         if  not source.value
         and source.ref
         and not hasMarkDoc then
+            m.pauseCache()
             for _, ref in ipairs(source.ref) do
                 if ref.type == 'setlocal' then
                     if ref.value and ref.value.type == 'table' then
@@ -668,6 +669,7 @@ local compilerSwitch = util.switch()
                     end
                 end
             end
+            m.resumeCache()
         end
         -- function x.y(self, ...) --> function x:y(...)
         if  source[1] == 'self'
@@ -706,20 +708,6 @@ local compilerSwitch = util.switch()
         -- for x = ... do
         if source.parent.type == 'loop' then
             nodeMgr.setNode(source, globalMgr.getGlobal('type', 'integer'))
-        end
-
-        -- avoid self reference
-        -- `local x; x = x`
-        -- the third `x` is unknown here
-        -- x[1] -> value of x[2] -> x[3] -> x[1](locked!)
-        if source.ref then
-            local myNode = nodeMgr.getNode(source)
-            for _, ref in ipairs(source.ref) do
-                if ref.type == 'setlocal'
-                or ref.type == 'getlocal' then
-                    nodeMgr.setNode(ref, myNode, true)
-                end
-            end
         end
     end)
     : case 'setlocal'
@@ -1413,6 +1401,24 @@ local function compileByGlobal(source)
     end
 end
 
+local pauseCacheCount   = 0
+local originCacheKeys   = {}
+local originCacheValues = {}
+function m.pauseCache()
+    pauseCacheCount = pauseCacheCount + 1
+end
+
+function m.resumeCache()
+    pauseCacheCount = pauseCacheCount - 1
+    if pauseCacheCount == 0 then
+        for source in pairs(originCacheKeys) do
+            nodeMgr.nodeCache[source] = originCacheValues[source]
+            originCacheKeys[source]   = nil
+            originCacheValues[source] = nil
+        end
+    end
+end
+
 ---@param source parser.object
 ---@return vm.node
 function m.compileNode(source)
@@ -1422,6 +1428,13 @@ function m.compileNode(source)
     if nodeMgr.nodeCache[source] ~= nil then
         return nodeMgr.nodeCache[source]
     end
+
+    local pauseCache = pauseCacheCount > 0
+    if pauseCache and not originCacheKeys[source] then
+        originCacheKeys[source]   = true
+        originCacheValues[source] = nodeMgr.nodeCache[source]
+    end
+
     nodeMgr.nodeCache[source] = false
     compileByGlobal(source)
     compileByNode(source)

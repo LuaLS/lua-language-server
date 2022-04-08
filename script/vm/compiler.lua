@@ -1070,7 +1070,6 @@ local compilerSwitch = util.switch()
                 nodeMgr.setNode(source, m.compileNode(source[1]))
                 return
             end
-            nodeMgr.setNode(source, globalMgr.getGlobal('type', 'boolean'))
             return
         end
         if source.op.type == 'or' then
@@ -1083,7 +1082,6 @@ local compilerSwitch = util.switch()
                 nodeMgr.setNode(source, m.compileNode(source[2]))
                 return
             end
-            nodeMgr.setNode(source, globalMgr.getGlobal('type', 'boolean'))
             return
         end
         if source.op.type == '==' then

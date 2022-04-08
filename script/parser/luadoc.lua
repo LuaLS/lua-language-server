@@ -6,6 +6,7 @@ local parser     = require 'parser.newparser'
 local TokenTypes, TokenStarts, TokenFinishs, TokenContents, TokenMarks
 local Ci, Offset, pushWarning, NextComment, Lines
 local parseType
+---@type any
 local Parser = re.compile([[
 Main                <-  (Token / Sp)*
 Sp                  <-  %s+

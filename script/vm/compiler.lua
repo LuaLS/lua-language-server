@@ -484,17 +484,28 @@ local function selectNode(source, list, index)
         result = m.compileNode(exp)
     end
     if source.type == 'function.return' then
+        -- remove any for returns
+        local rtnNode = union()
         local hasKnownType
         for n in nodeMgr.eachNode(result) do
-            if guide.isLiteral(n)
-            or (n.type == 'global' and n.cate == 'type') then
+            if guide.isLiteral(n) then
                 hasKnownType = true
-                break
+                rtnNode:merge(n)
+            end
+            if n.type == 'global' and n.cate == 'type' then
+                if  n.name ~= 'any'
+                and n.name ~= 'unknown' then
+                    hasKnownType = true
+                    rtnNode:merge(n)
+                end
+            else
+                rtnNode:merge(n)
             end
         end
         if not hasKnownType then
-            result = nodeMgr.mergeNode(result, globalMgr.getGlobal('type', 'unknown'))
+            rtnNode:merge(globalMgr.getGlobal('type', 'unknown'))
         end
+        return nodeMgr.setNode(source, rtnNode)
     end
     return nodeMgr.setNode(source, result)
 end

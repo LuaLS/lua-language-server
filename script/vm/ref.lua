@@ -160,11 +160,11 @@ local function searchField(source, pushResult, defMap, fileNotify)
 end
 
 ---@async
-local function searchFunction(source, pushResult, fileNotify)
+local function searchFunction(source, pushResult, defMap, fileNotify)
     ---@param src parser.object
     local function checkDef(src)
         for _, def in ipairs(vm.getDefs(src)) do
-            if def == source then
+            if defMap[def] then
                 pushResult(src)
                 return
             end

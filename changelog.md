@@ -9,6 +9,8 @@
 * `FIX` [#1009](https://github.com/sumneko/lua-language-server/issues/1009)
 * `FIX` [#1011](https://github.com/sumneko/lua-language-server/issues/1011)
 * `FIX` [#1014](https://github.com/sumneko/lua-language-server/issues/1014)
+* `FIX` [#1016](https://github.com/sumneko/lua-language-server/issues/1016)
+* `FIX` [#1017](https://github.com/sumneko/lua-language-server/issues/1017)
 * `FIX` runtime errors reported by telemetry
 
 ## 2.6.7

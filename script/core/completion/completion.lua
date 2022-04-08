@@ -1414,11 +1414,23 @@ local function tryCallArg(state, position, results)
             }
         end
         if src.type == 'doc.type.function' then
+            local insertText = buildInsertDocFunction(src)
+            local description
+            if src.comment then
+                description = src.comment
+            else
+                local descText = insertText:gsub('%$%{%d+:([^}]+)%}', function (val)
+                    return val
+                end):gsub('%$%{?%d+%}?', '')
+                description = markdown()
+                    : add('lua', descText)
+                    : string()
+            end
             enums[#enums+1] = {
                 label       = infer.getInfer(src):view(),
-                description = src.comment,
+                description = description,
                 kind        = define.CompletionItemKind.Function,
-                insertText  = buildInsertDocFunction(src),
+                insertText  = insertText,
             }
         end
     end

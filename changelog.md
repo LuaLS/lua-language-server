@@ -1,5 +1,11 @@
 # changelog
 
+## 3.0.0
+* `CHG` [break changes](https://github.com/sumneko/lua-language-server/issues/980)
+* `CHG` diagnostic:
+  + `type-check`: removed for now
+  + `no-implicit-any`: renamed to `no-unknown`
+
 ## 2.6.8
 * `CHG` completion: call snippet shown as `Function` instead of `Snippet` when `Lua.completion.callSnippet` is `Replace`
 * `FIX` [#976](https://github.com/sumneko/lua-language-server/issues/976)

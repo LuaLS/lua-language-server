@@ -56,6 +56,9 @@ local searchFieldSwitch = util.switch()
     : call(function (node, key, pushResult)
         if node.cate == 'variable' then
             if key then
+                if type(key) ~= 'string' then
+                    return
+                end
                 local global = globalMgr.getGlobal('variable', node.name, key)
                 if global then
                     pushResult(global)
@@ -88,14 +91,13 @@ local searchFieldSwitch = util.switch()
     end)
     : case 'doc.type.array'
     : call(function (node, key, pushResult)
-        if  type(key) == 'number'
-        and key >= 1
-        and math.tointeger(key) then
-            pushResult(node.node)
+        if type(key) == 'number' then
+            if key < 1
+            or not math.tointeger(key) then
+                return
+            end
         end
-        if key == nil then
-            pushResult(node.node)
-        end
+        pushResult(node.node)
     end)
     : case 'doc.type.table'
     : call(function (node, key, pushResult)
@@ -721,6 +723,12 @@ local compilerSwitch = util.switch()
     : call(function (source)
         compileByLocalID(source)
         local key = guide.getKeyName(source)
+        if key == nil and source.index then
+            key = m.compileNode(source.index)
+        end
+        if key == nil then
+            return
+        end
         m.compileByParentNode(source.node, key, function (src)
             if src.type == 'doc.type.field'
             or src.type == 'doc.field' then
@@ -734,6 +742,12 @@ local compilerSwitch = util.switch()
     : call(function (source)
         compileByLocalID(source)
         local key = guide.getKeyName(source)
+        if key == nil and source.index then
+            key = m.compileNode(source.index)
+        end
+        if key == nil then
+            return
+        end
         m.compileByParentNode(source.node, key, function (src)
             nodeMgr.setNode(source, m.compileNode(src))
         end)

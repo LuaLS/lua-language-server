@@ -1410,3 +1410,12 @@ local function f() end
 
 local _, <?x?> = f()
 ]]
+
+TEST 'unknown' [[
+local t = {
+    x = 1,
+    y = 2,
+}
+
+local <?x?> = t[#t]
+]]

@@ -443,6 +443,9 @@ function m.compileByParentNode(source, key, pushResult)
 end
 
 local function selectNode(source, list, index)
+    if not list then
+        return nil
+    end
     local exp
     if list[index] then
         exp = list[index]
@@ -644,17 +647,6 @@ local compilerSwitch = util.switch()
         if source.bindDocs then
             hasMarkDoc = bindDocs(source)
         end
-        if source.ref and not hasMarkDoc then
-            for _, ref in ipairs(source.ref) do
-                if ref.type == 'setlocal' then
-                    if ref.value and ref.value.type == 'table' then
-                        nodeMgr.setNode(source, ref.value)
-                    else
-                        nodeMgr.setNode(source, m.compileNode(ref.value))
-                    end
-                end
-            end
-        end
         local hasMarkParam
         if source.dummy and not hasMarkDoc then
             hasMarkParam = true
@@ -666,6 +658,19 @@ local compilerSwitch = util.switch()
                     nodeMgr.setNode(source, source.value)
                 else
                     nodeMgr.setNode(source, m.compileNode(source.value))
+                end
+            end
+        end
+        if  not source.value
+        and source.ref
+        and not hasMarkDoc then
+            for _, ref in ipairs(source.ref) do
+                if ref.type == 'setlocal' then
+                    if ref.value and ref.value.type == 'table' then
+                        nodeMgr.setNode(source, ref.value)
+                    else
+                        nodeMgr.setNode(source, m.compileNode(ref.value))
+                    end
                 end
             end
         end
@@ -707,11 +712,25 @@ local compilerSwitch = util.switch()
         if source.parent.type == 'loop' then
             nodeMgr.setNode(source, globalMgr.getGlobal('type', 'integer'))
         end
+
+        -- avoid self reference
+        -- `local x; x = x`
+        -- the third `x` is unknown here
+        -- x[1] -> value of x[2] -> x[3] -> x[1](locked!)
+        if source.ref then
+            local myNode = nodeMgr.getNode(source)
+            for _, ref in ipairs(source.ref) do
+                if ref.type == 'setlocal'
+                or ref.type == 'getlocal' then
+                    nodeMgr.setNode(ref, myNode, true)
+                end
+            end
+        end
     end)
     : case 'setlocal'
     : case 'getlocal'
     : call(function (source)
-        nodeMgr.setNode(source, m.compileNode(source.node))
+        nodeMgr.setNode(source, m.compileNode(source.node), true)
     end)
     : case 'setfield'
     : case 'setmethod'

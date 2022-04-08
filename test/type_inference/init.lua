@@ -1390,3 +1390,9 @@ TEST 'integer' [[
 local t
 t.<?x?>
 ]]
+
+TEST 'boolean' [[
+local <?var?> = true
+var = 1
+var = 1.0
+]]

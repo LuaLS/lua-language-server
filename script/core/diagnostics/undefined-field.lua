@@ -3,6 +3,7 @@ local vm      = require 'vm'
 local lang    = require 'language'
 local guide   = require 'parser.guide'
 local await   = require 'await'
+local infer   = require 'vm.infer'
 
 local skipCheckClass = {
     ['unknown']       = true,
@@ -33,11 +34,9 @@ return function (uri, callback)
         end
         local node = src.node
         if node then
-            local defs = vm.getDefs(node)
             local ok
-            for _, def in ipairs(defs) do
-                if  def.type == 'doc.class'
-                and not skipCheckClass[def.class[1]] then
+            for view in infer.getInfer(node):eachView() do
+                if not skipCheckClass[view] then
                     ok = true
                     break
                 end

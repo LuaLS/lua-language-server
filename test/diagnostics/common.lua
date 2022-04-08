@@ -1377,3 +1377,9 @@ TEST [[
 TEST [[
 ---@class A 1
 ]]
+
+TEST [[
+local value
+value = '1'
+value = value:gsub()
+]]

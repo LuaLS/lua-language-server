@@ -23,7 +23,14 @@ function m.mergeNode(a, b)
     return union(a, b)
 end
 
-function m.setNode(source, node)
+---@param source parser.object
+---@param node vm.node
+---@param cover? boolean
+function m.setNode(source, node, cover)
+    if cover then
+        m.nodeCache[source] = node
+        return
+    end
     if not node then
         return
     end

@@ -1,5 +1,7 @@
 local guide         = require 'parser.guide'
 local nodeMgr       = require 'vm.node'
+---@class vm
+local vm            = require 'vm.vm'
 
 ---@class vm.sign
 ---@field parent   parser.object
@@ -19,7 +21,6 @@ function mt:resolve(argNodes)
     if not argNodes then
         return nil
     end
-    local typeMgr   = require 'vm.type'
     local compiler  = require 'vm.compiler'
     local globalMgr = require 'vm.global-manager'
     local resolved = {}
@@ -56,18 +57,18 @@ function mt:resolve(argNodes)
                 local uvalueNode = compiler.compileNode(ufield.extends)
                 if ufieldNode.type == 'doc.generic.name' and uvalueNode.type == 'doc.generic.name' then
                     -- { [number]: number} -> { [K]: V }
-                    local tfieldNode = typeMgr.getTableKey(node, 'any')
-                    local tvalueNode = typeMgr.getTableValue(node, 'any')
+                    local tfieldNode = vm.getTableKey(node, 'any')
+                    local tvalueNode = vm.getTableValue(node, 'any')
                     resolve(ufieldNode, tfieldNode)
                     resolve(uvalueNode, tvalueNode)
                 else
                     if ufieldNode.type == 'doc.generic.name' then
                         -- { [number]: number}|number[] -> { [K]: number }
-                        local tnode = typeMgr.getTableKey(node, uvalueNode)
+                        local tnode = vm.getTableKey(node, uvalueNode)
                         resolve(ufieldNode, tnode)
                     else
                         -- { [number]: number}|number[] -> { [number]: V }
-                        local tnode = typeMgr.getTableValue(node, ufieldNode)
+                        local tnode = vm.getTableValue(node, ufieldNode)
                         resolve(uvalueNode, tnode)
                     end
                 end

@@ -309,6 +309,11 @@ function mt:view(default, uri)
     end
 end
 
+function mt:eachView()
+    self:_computeViews()
+    return next, self.views
+end
+
 ---@param other vm.infer
 ---@return vm.infer
 function mt:merge(other)

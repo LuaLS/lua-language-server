@@ -45,10 +45,7 @@ local function asValue(source, title)
     local ifr     = infer.getInfer(source)
     local type    = ifr:view()
     local literal = ifr:viewLiterals()
-    local cont
-    if not ifr:hasType 'string' then
-        cont = buildTable(source)
-    end
+    local cont    = buildTable(source)
     local pack = {}
     pack[#pack+1] = title
     pack[#pack+1] = name .. ':'

@@ -4,6 +4,6 @@ require 'vm.def'
 require 'vm.ref'
 require 'vm.field'
 require 'vm.doc'
-require 'vm.getLibrary'
-require 'vm.getLinks'
+require 'vm.type'
+require 'vm.library'
 return vm

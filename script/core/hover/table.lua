@@ -163,6 +163,13 @@ return function (source)
         return nil
     end
 
+    for view in infer.getInfer(source):eachView() do
+        if view == 'string'
+        or vm.isSubType(view, 'string') then
+            return nil
+        end
+    end
+
     local fields    = vm.getFields(source)
     local keys, map = getKeyMap(fields)
     if #keys == 0 then

@@ -1787,3 +1787,25 @@ local <?x?> = 1 // 2
 local x: integer = 1
 ]]
 config.set(nil, 'Lua.runtime.nonstandardSymbol', {})
+
+config.set(nil, 'Lua.hover.expandAlias', false)
+TEST [[
+---@alias uri string
+
+---@type uri
+local <?uri?>
+]]
+[[
+local uri: uri
+]]
+
+config.set(nil, 'Lua.hover.expandAlias', true)
+TEST [[
+---@alias uri string
+
+---@type uri
+local <?uri?>
+]]
+[[
+local uri: string
+]]

@@ -80,7 +80,7 @@ DIAG_COSE_NON_OBJECT    =
 'Não é possível fechar um valor desse tipo. (A menos que se defina o meta método `__close`)'
 DIAG_COUNT_DOWN_LOOP    =
 'Você quer dizer `{}` ?'
-DIAG_IMPLICIT_ANY       =
+DIAG_UNKNOWN            =
 'Não pode inferir tipo.'
 DIAG_DEPRECATED         =
 'Descontinuada.'

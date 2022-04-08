@@ -24,7 +24,7 @@ return function (uri, callback)
             callback {
                 start   = source.start,
                 finish  = source.finish,
-                message = lang.script('DIAG_IMPLICIT_ANY'),
+                message = lang.script('DIAG_UNKNOWN'),
             }
         end
     end)

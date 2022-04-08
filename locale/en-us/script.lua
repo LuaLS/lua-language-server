@@ -80,7 +80,7 @@ DIAG_COSE_NON_OBJECT    =
 'Cannot close a value of this type. (Unless set `__close` meta method)'
 DIAG_COUNT_DOWN_LOOP    =
 'Do you mean `{}` ?'
-DIAG_IMPLICIT_ANY       =
+DIAG_UNKNOWN            =
 'Can not infer type.'
 DIAG_DEPRECATED         =
 'Deprecated.'

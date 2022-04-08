@@ -1921,7 +1921,6 @@ vvv<??>
     },
 }
 
---[=[
 Cared['insertText'] = true
 TEST [[
 ---@param callback fun(x: number, y: number):string
@@ -1945,7 +1944,6 @@ end\
 ```"
     },
 }
-]=]
 
 Cared['insertText'] = nil
 

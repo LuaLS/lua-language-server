@@ -1019,7 +1019,6 @@ m.register 'textDocument/formatting' {
     capability = {
         documentFormattingProvider = true,
     },
-    preview = true,
     ---@async
     function(params)
         local uri = files.getRealUri(params.textDocument.uri)
@@ -1057,7 +1056,6 @@ m.register 'textDocument/rangeFormatting' {
     capability = {
         documentRangeFormattingProvider = true,
     },
-    preview = true,
     ---@async
     function(params)
         local uri = files.getRealUri(params.textDocument.uri)

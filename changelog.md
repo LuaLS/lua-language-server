@@ -5,6 +5,7 @@
 * `CHG` diagnostic:
   + `type-check`: removed for now
   + `no-implicit-any`: renamed to `no-unknown`
+* `CHG` formatter: no longer need` --preview`
 
 ## 2.6.8
 `2022-4-9`

@@ -1,4 +1,5 @@
 local union      = require 'vm.union'
+local files      = require 'files'
 
 ---@alias vm.node parser.object | vm.node.union | vm.node.global | vm.generic
 
@@ -85,5 +86,11 @@ end
 function m.clearNodeCache()
     m.nodeCache = {}
 end
+
+files.watch(function (ev, uri)
+    if ev == 'version' then
+        m.clearNodeCache()
+    end
+end)
 
 return m

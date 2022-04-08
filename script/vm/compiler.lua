@@ -930,6 +930,7 @@ local compilerSwitch = util.switch()
     : call(function (source)
         nodeMgr.setNode(source, m.compileNode(source.extends))
     end)
+    : case 'doc'
     : case 'doc.param'
     : call(function (source)
         nodeMgr.setNode(source, m.compileNode(source.extends))

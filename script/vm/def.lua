@@ -77,7 +77,7 @@ simpleSwitch = util.switch()
 
 local searchFieldSwitch = util.switch()
     : case 'table'
-    : call(function (node, key, pushResult)
+    : call(function (suri, node, key, pushResult)
         for _, field in ipairs(node) do
             if field.type == 'tablefield'
             or field.type == 'tableindex' then
@@ -90,7 +90,7 @@ local searchFieldSwitch = util.switch()
     : case 'global'
     ---@param node vm.node
     ---@param key string
-    : call(function (node, key, pushResult)
+    : call(function (suri, node, key, pushResult)
         if node.cate == 'variable' then
             local newGlobal = globalMgr.getGlobal('variable', node.name, key)
             if newGlobal then
@@ -100,11 +100,11 @@ local searchFieldSwitch = util.switch()
             end
         end
         if node.cate == 'type' then
-            compiler.getClassFields(node, key, pushResult)
+            compiler.getClassFields(suri, node, key, pushResult)
         end
     end)
     : case 'local'
-    : call(function (node, key, pushResult)
+    : call(function (suri, node, key, pushResult)
         local sources = localID.getSources(node, key)
         if sources then
             for _, src in ipairs(sources) do
@@ -115,7 +115,7 @@ local searchFieldSwitch = util.switch()
         end
     end)
     : case 'doc.type.table'
-    : call(function (node, key, pushResult)
+    : call(function (suri, node, key, pushResult)
         for _, field in ipairs(node.fields) do
             local fieldKey = field.name
             if fieldKey.type == 'doc.field.name' then
@@ -144,16 +144,18 @@ local nodeSwitch = util.switch()
         if not parentNode then
             return
         end
+        local uri = guide.getUri(source)
         local key = guide.getKeyName(source)
         for pn in nodeMgr.eachNode(parentNode) do
-            searchFieldSwitch(pn.type, pn, key, pushResult)
+            searchFieldSwitch(pn.type, uri, pn, key, pushResult)
         end
     end)
     : case 'tableindex'
     : case 'tablefield'
     : call(function (source, pushResult)
         local tbl = source.parent
-        searchFieldSwitch(tbl.type, tbl, guide.getKeyName(source), pushResult)
+        local uri = guide.getUri(source)
+        searchFieldSwitch(tbl.type, uri, tbl, guide.getKeyName(source), pushResult)
     end)
     : case 'doc.see.field'
     : call(function (source, pushResult)
@@ -161,8 +163,9 @@ local nodeSwitch = util.switch()
         if not parentNode then
             return
         end
+        local uri = guide.getUri(source)
         for pn in nodeMgr.eachNode(parentNode) do
-            searchFieldSwitch(pn.type, pn, source[1], pushResult)
+            searchFieldSwitch(pn.type, uri, pn, source[1], pushResult)
         end
     end)
 

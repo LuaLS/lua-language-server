@@ -105,13 +105,13 @@ local function searchInAllFiles(suri, searcher, notify)
 end
 
 ---@async
-local function searchField(source, pushResult, fileNotify)
+local function searchField(source, pushResult, defMap, fileNotify)
     local key = guide.getKeyName(source)
 
     ---@param src parser.object
     local function checkDef(src)
         for _, def in ipairs(vm.getDefs(src)) do
-            if def == source then
+            if defMap[def] then
                 pushResult(src)
                 return
             end
@@ -192,8 +192,8 @@ local nodeSwitch = util.switch()
     : case 'field'
     : case 'method'
     ---@async
-    : call(function (source, pushResult, fileNotify)
-        searchByParentNode(source.parent, pushResult, fileNotify)
+    : call(function (source, pushResult, defMap, fileNotify)
+        searchByParentNode(source.parent, pushResult, defMap, fileNotify)
     end)
     : case 'getfield'
     : case 'setfield'
@@ -202,7 +202,7 @@ local nodeSwitch = util.switch()
     : case 'getindex'
     : case 'setindex'
     ---@async
-    : call(function (source, pushResult, fileNotify)
+    : call(function (source, pushResult, defMap, fileNotify)
         local key = guide.getKeyName(source)
         if type(key) ~= 'string' then
             return
@@ -213,19 +213,19 @@ local nodeSwitch = util.switch()
             return
         end
 
-        searchField(source, pushResult, fileNotify)
+        searchField(source, pushResult, defMap, fileNotify)
     end)
     : case 'tablefield'
     : case 'tableindex'
     ---@async
-    : call(function (source, pushResult, fileNotify)
-        searchField(source, pushResult, fileNotify)
+    : call(function (source, pushResult, defMap, fileNotify)
+        searchField(source, pushResult, defMap, fileNotify)
     end)
     : case 'function'
     : case 'doc.type.function'
     ---@async
-    : call(function (source, pushResult, fileNotify)
-        searchFunction(source, pushResult, fileNotify)
+    : call(function (source, pushResult, defMap, fileNotify)
+        searchFunction(source, pushResult, defMap, fileNotify)
     end)
 
 ---@param source  parser.object
@@ -250,8 +250,8 @@ end
 ---@param source  parser.object
 ---@param pushResult fun(src: parser.object)
 ---@param fileNotify fun(uri: uri): boolean
-function searchByParentNode(source, pushResult, fileNotify)
-    nodeSwitch(source.type, source, pushResult, fileNotify)
+function searchByParentNode(source, pushResult, defMap, fileNotify)
+    nodeSwitch(source.type, source, pushResult, defMap, fileNotify)
 end
 
 local function searchByNode(source, pushResult)
@@ -273,10 +273,13 @@ local function searchByDef(source, pushResult)
     or source.type == 'doc.type.function' then
         return
     end
+    local defMap = {}
     local defs = vm.getDefs(source)
     for _, def in ipairs(defs) do
         pushResult(def)
+        defMap[def] = true
     end
+    return defMap
 end
 
 ---@async
@@ -303,8 +306,8 @@ function vm.getRefs(source, fileNotify)
     searchBySimple(source, pushResult)
     searchByLocalID(source, pushResult)
     searchByNode(source, pushResult)
-    searchByDef(source, pushResult)
-    searchByParentNode(source, pushResult, fileNotify)
+    local defMap = searchByDef(source, pushResult)
+    searchByParentNode(source, pushResult, defMap, fileNotify)
 
     return results
 end

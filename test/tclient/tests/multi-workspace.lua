@@ -78,4 +78,38 @@ lclient():start(function (client)
     assert(files.isLibrary(rootUri .. '/share/test.lua') == true)
     assert(files.isLibrary(rootUri .. '/lb1/test.lua')   == true)
     assert(files.isLibrary(rootUri .. '/lb2/test.lua')   == true)
+
+    files.setText(rootUri .. '/ws1/unittest.lua', [[
+GLOBAL = 1
+---@class ZAAA
+---@type 
+    ]])
+
+    files.setText(rootUri .. '/ws2/unittest.lua', [[
+GLOBAL = 2
+---@class ZBBB
+---@type 
+    ]])
+
+    local defs1 = client:awaitRequest('textDocument/definition', {
+        textDocument = {
+            uri = rootUri .. '/ws1/unittest.lua',
+        },
+        position = {
+            line = 0,
+            character = 0,
+        },
+    })
+    assert(#defs1 == 1)
+
+    local defs2 = client:awaitRequest('textDocument/definition', {
+        textDocument = {
+            uri = rootUri .. '/ws2/unittest.lua',
+        },
+        position = {
+            line = 0,
+            character = 0,
+        },
+    })
+    assert(#defs2 == 1)
 end)

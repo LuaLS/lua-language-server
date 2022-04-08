@@ -11,7 +11,8 @@
             "undefined-field": "Any",
             "await-in-sync": "Any",
             "not-yieldable": "Any",
-            "discard-returns": "Any"
+            "discard-returns": "Any",
+            "codestyle-check": "Any"
         },
         "ignoredFiles": "Opened",
         "libraryFiles": "Opened"

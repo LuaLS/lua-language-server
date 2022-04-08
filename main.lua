@@ -70,9 +70,6 @@ log.info('VERSION:', version.getVersion())
 
 local stdRequire = require
 require = function (name)
-    if name == 'code_format' then
-        error('cannot found code_format')
-    end
     return stdRequire(name)
 end
 

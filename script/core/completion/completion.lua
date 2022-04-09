@@ -1671,9 +1671,12 @@ end
 
 local function tryluaDocByErr(state, position, err, docState, results)
     if     err.type == 'LUADOC_MISS_CLASS_EXTENDS_NAME' then
+        local used = {}
         for _, doc in ipairs(vm.getDocSets(state.uri)) do
             if  doc.type == 'doc.class'
+            and not used[doc.class[1]]
             and doc.class[1] ~= docState.class[1] then
+                used[doc.class[1]] = true
                 results[#results+1] = {
                     label       = doc.class[1],
                     kind        = define.CompletionItemKind.Class,
@@ -1681,14 +1684,19 @@ local function tryluaDocByErr(state, position, err, docState, results)
             end
         end
     elseif err.type == 'LUADOC_MISS_TYPE_NAME' then
+        local used = {}
         for _, doc in ipairs(vm.getDocSets(state.uri)) do
-            if doc.type == 'doc.class' then
+            if  doc.type == 'doc.class'
+            and not used[doc.class[1]] then
+                used[doc.class[1]] = true
                 results[#results+1] = {
                     label       = doc.class[1],
                     kind        = define.CompletionItemKind.Class,
                 }
             end
-            if doc.type == 'doc.alias' then
+            if  doc.type == 'doc.alias'
+            and not used[doc.alias[1]] then
+                used[doc.alias[1]] = true
                 results[#results+1] = {
                     label       = doc.alias[1],
                     kind        = define.CompletionItemKind.Class,

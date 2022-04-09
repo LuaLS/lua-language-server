@@ -3292,3 +3292,22 @@ local t = x[<??>]
         assert(res.label ~= 'do')
     end
 end)
+
+TEST [[
+---@class ZZZZZ.XXXX
+---@class ZZZZZ.XXXX
+---@class ZZZZZ.XXXX
+---@class ZZZZZ.XXXX
+---@class ZZZZZ.XXXX
+
+---@type <??>
+]]
+(function (results)
+    local count = 0
+    for _, res in ipairs(results) do
+        if res.label == 'ZZZZZ.XXXX' then
+            count = count + 1
+        end
+    end
+    assert(count == 1)
+end)

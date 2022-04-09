@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.0.0
+`2022-4-10`
 * `CHG` [break changes](https://github.com/sumneko/lua-language-server/issues/980)
 * `CHG` diagnostic:
   + `type-check`: removed for now

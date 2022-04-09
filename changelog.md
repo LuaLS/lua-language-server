@@ -6,6 +6,7 @@
   + `type-check`: removed for now
   + `no-implicit-any`: renamed to `no-unknown`
 * `CHG` formatter: no longer need` --preview`
+* `FIX` semantic: color of `function`
 * `FIX` [#1028](https://github.com/sumneko/lua-language-server/issues/1028)
 
 ## 2.6.8

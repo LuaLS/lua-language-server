@@ -119,13 +119,14 @@ local Care = util.switch()
         end
         local loc = source.node or source
         -- 1. 值为函数的局部变量 | Local variable whose value is a function
-        if loc.refs then
-            for _, ref in ipairs(loc.refs) do
+        if loc.ref then
+            for _, ref in ipairs(loc.ref) do
                 if ref.value and ref.value.type == 'function' then
                     results[#results+1] = {
                         start      = source.start,
                         finish     = source.finish,
                         type       = define.TokenTypes['function'],
+                        modifieres = define.TokenModifiers.declaration,
                     }
                     return
                 end
@@ -184,7 +185,7 @@ local Care = util.switch()
                 start      = source.start,
                 finish     = source.finish,
                 type       = define.TokenTypes['function'],
-                modifieres = source.type == 'setlocal' and define.TokenModifiers.declaration or nil,
+                modifieres = guide.isSet(source) and define.TokenModifiers.declaration or nil,
             }
             return
         end

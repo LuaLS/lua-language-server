@@ -1577,7 +1577,6 @@ local Defs = {
                 symbol = symbol,
             }
         }
-        return
     end,
     UnknownAction = function (start, symbol)
         PushError {

@@ -53,6 +53,10 @@ local type         = type
 ---@field state                 table
 ---@field comment               table
 ---@field optional              boolean
+---@field max                   parser.object
+---@field init                  parser.object
+---@field step                  parser.object
+---@field redundant             { max: integer, passed: integer }
 ---@field _root                 parser.object
 
 ---@class guide
@@ -672,6 +676,10 @@ local function getSourceTypeCache(ast)
 end
 
 --- 遍历所有指定类型的source
+---@param ast parser.object
+---@param type string
+---@param callback fun(src: parser.object)
+---@return any
 function m.eachSourceType(ast, type, callback)
     local cache = getSourceTypeCache(ast)
     local myCache = cache[type]
@@ -679,10 +687,16 @@ function m.eachSourceType(ast, type, callback)
         return
     end
     for i = 1, #myCache do
-        callback(myCache[i])
+        local res = callback(myCache[i])
+        if res ~= nil then
+            return res
+        end
     end
 end
 
+---@param ast parser.object
+---@param tps string[]
+---@param callback fun(src: parser.object)
 function m.eachSourceTypes(ast, tps, callback)
     local cache = getSourceTypeCache(ast)
     for x = 1, #tps do
@@ -696,6 +710,8 @@ function m.eachSourceTypes(ast, tps, callback)
 end
 
 --- 遍历所有的source
+---@param ast parser.object
+---@param callback fun(src: parser.object)
 function m.eachSource(ast, callback)
     local cache = ast._eachCache
     if not cache then

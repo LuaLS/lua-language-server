@@ -35,8 +35,8 @@ end
 
 m.reset()
 
-local fixedUri = {}
---- 获取文件的真实uri
+local uriMap = {}
+-- 获取文件的真实uri，但不穿透软链接
 ---@param uri uri
 ---@return uri
 function m.getRealUri(uri)
@@ -47,16 +47,19 @@ function m.getRealUri(uri)
         return uri
     end
     suc, res = pcall(fs.canonical, path)
-    if not suc or res:string():gsub('/', '\\') == filename then
+    if not suc then
         return uri
     end
     filename = res:string()
     local ruri = furi.encode(filename)
-    if uri ~= ruri and not fixedUri[ruri] then
-        fixedUri[ruri] = true
+    if uri == ruri then
+        return ruri
+    end
+    if not uriMap[ruri] then
+        uriMap[ruri] = uri
         log.warn(('Fix real file uri: %s -> %s'):format(uri, ruri))
     end
-    return ruri
+    return uriMap[ruri]
 end
 
 --- 打开文件

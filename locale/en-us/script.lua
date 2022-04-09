@@ -490,6 +490,8 @@ WINDOW_APPLY_WHITOUT_SETTING     =
 'Apply but do not modify settings'
 WINDOW_ASK_APPLY_LIBRARY         =
 'Do you need to configure your work environment as `{}`?'
+WINDOW_SEARCHING_IN_FILES        =
+'Searching in files...'
 
 CONFIG_LOAD_FAILED               =
 'Unable to read the settings file: {}'

@@ -489,6 +489,8 @@ WINDOW_APPLY_WHITOUT_SETTING     =
 '应用但不修改设置'
 WINDOW_ASK_APPLY_LIBRARY         =
 '是否需要将你的工作环境配置为 `{}` ？'
+WINDOW_SEARCHING_IN_FILES        =
+'正在文件中搜索...'
 
 CONFIG_LOAD_FAILED               =
 '无法读取设置文件：{}'

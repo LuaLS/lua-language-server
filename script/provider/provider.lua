@@ -120,7 +120,7 @@ m.register 'initialized'{
     ---@async
     function (params)
         files.init()
-        local _ <close> = progress.create(workspace.getFirstScope(), lang.script.WINDOW_INITIALIZING, 0.5)
+        local _ <close> = progress.create(workspace.getFirstScope().uri, lang.script.WINDOW_INITIALIZING, 0.5)
         updateConfig()
         local registrations = {}
 
@@ -293,7 +293,7 @@ m.register 'textDocument/hover' {
                 }
             }
         end
-        local _ <close> = progress.create(scope.getScope(uri), lang.script.WINDOW_PROCESSING_HOVER, 0.5)
+        local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_HOVER, 0.5)
         local core = require 'core.hover'
         if not files.exists(uri) then
             return nil
@@ -325,7 +325,7 @@ m.register 'textDocument/definition' {
         if not files.exists(uri) then
             return nil
         end
-        local _ <close> = progress.create(scope.getScope(uri), lang.script.WINDOW_PROCESSING_DEFINITION, 0.5)
+        local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_DEFINITION, 0.5)
         local core   = require 'core.definition'
         local pos = converter.unpackPosition(uri, params.position)
         local result = core(uri, pos)
@@ -367,7 +367,7 @@ m.register 'textDocument/typeDefinition' {
         if not files.exists(uri) then
             return nil
         end
-        local _ <close> = progress.create(scope.getScope(uri), lang.script.WINDOW_PROCESSING_TYPE_DEFINITION, 0.5)
+        local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_TYPE_DEFINITION, 0.5)
         local core   = require 'core.type-definition'
         local pos = converter.unpackPosition(uri, params.position)
         local result = core(uri, pos)
@@ -409,7 +409,7 @@ m.register 'textDocument/references' {
         if not files.exists(uri) then
             return nil
         end
-        local _ <close> = progress.create(scope.getScope(uri), lang.script.WINDOW_PROCESSING_REFERENCE, 0.5)
+        local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_REFERENCE, 0.5)
         local core   = require 'core.reference'
         local pos    = converter.unpackPosition(uri, params.position)
         local result = core(uri, pos)
@@ -469,7 +469,7 @@ m.register 'textDocument/rename' {
         if not files.exists(uri) then
             return nil
         end
-        local _ <close> = progress.create(scope.getScope(uri), lang.script.WINDOW_PROCESSING_RENAME, 0.5)
+        local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_RENAME, 0.5)
         local core = require 'core.rename'
         local pos    = converter.unpackPosition(uri, params.position)
         local result = core.rename(uri, pos, params.newName)
@@ -529,7 +529,7 @@ m.register 'textDocument/completion' {
                 }
             }
         end
-        local _ <close> = progress.create(scope.getScope(uri), lang.script.WINDOW_PROCESSING_COMPLETION, 0.5)
+        local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_COMPLETION, 0.5)
         --log.info(util.dump(params))
         local core  = require 'core.completion'
         --log.debug('textDocument/completion')
@@ -683,7 +683,7 @@ m.register 'textDocument/signatureHelp' {
         if not files.exists(uri) then
             return nil
         end
-        local _ <close> = progress.create(scope.getScope(uri), lang.script.WINDOW_PROCESSING_SIGNATURE, 0.5)
+        local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_SIGNATURE, 0.5)
         local pos = converter.unpackPosition(uri, params.position)
         local core = require 'core.signature'
         local results = core(uri, pos)
@@ -726,7 +726,7 @@ m.register 'textDocument/documentSymbol' {
     function (params)
         local uri   = files.getRealUri(params.textDocument.uri)
         workspace.awaitReady(uri)
-        local _ <close> = progress.create(scope.getScope(uri), lang.script.WINDOW_PROCESSING_SYMBOL, 0.5)
+        local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_SYMBOL, 0.5)
 
         local core = require 'core.document-symbol'
         local symbols = core(uri)
@@ -852,7 +852,7 @@ m.register 'workspace/symbol' {
     abortByFileUpdate = true,
     ---@async
     function (params)
-        local _ <close> = progress.create(workspace.getFirstScope(), lang.script.WINDOW_PROCESSING_WS_SYMBOL, 0.5)
+        local _ <close> = progress.create(workspace.getFirstScope().uri, lang.script.WINDOW_PROCESSING_WS_SYMBOL, 0.5)
         local core = require 'core.workspace-symbol'
 
         local symbols = core(params.query)
@@ -906,7 +906,7 @@ m.register 'textDocument/semanticTokens/full' {
         log.debug('textDocument/semanticTokens/full')
         local uri = files.getRealUri(params.textDocument.uri)
         workspace.awaitReady(uri)
-        local _ <close> = progress.create(scope.getScope(uri), lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
+        local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
         local core = require 'core.semantic-tokens'
         local results = core(uri, 0, math.huge)
         return {
@@ -930,7 +930,7 @@ m.register 'textDocument/semanticTokens/range' {
         log.debug('textDocument/semanticTokens/range')
         local uri = files.getRealUri(params.textDocument.uri)
         workspace.awaitReady(uri)
-        local _ <close> = progress.create(scope.getScope(uri), lang.script.WINDOW_PROCESSING_SEMANTIC_RANGE, 0.5)
+        local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_SEMANTIC_RANGE, 0.5)
         local core = require 'core.semantic-tokens'
         local start, finish = converter.unpackRange(uri, params.range)
         local results = core(uri, start, finish)
@@ -1101,7 +1101,7 @@ m.register 'textDocument/onTypeFormatting' {
     function (params)
         local uri    = files.getRealUri(params.textDocument.uri)
         workspace.awaitReady(uri)
-        local _ <close> = progress.create(scope.getScope(uri), lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
+        local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
         local ch     = params.ch
         if not files.exists(uri) then
             return nil
@@ -1177,7 +1177,7 @@ do
         workspace.awaitReady(uri)
         local edits = {}
         local hint = require 'core.hint'
-        local _ <close> = progress.create(scope.getScope(uri), lang.script.WINDOW_PROCESSING_HINT, 0.5)
+        local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_HINT, 0.5)
         for _, visible in ipairs(visibles) do
             local piece = hint(uri, visible.start, visible.finish)
             if piece then

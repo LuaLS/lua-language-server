@@ -8,6 +8,8 @@ local globalMgr = require 'vm.global-manager'
 local nodeMgr   = require 'vm.node'
 local files     = require 'files'
 local await     = require 'await'
+local progress  = require 'progress'
+local lang      = require 'language'
 
 local simpleSwitch
 
@@ -92,14 +94,24 @@ local function searchInAllFiles(suri, searcher, notify)
         end
     end
 
-    for _, uri in ipairs(uris) do
+    local loading <close> = progress.create(suri, lang.script.WINDOW_SEARCHING_IN_FILES, 1)
+    local cancelled
+    loading:onCancel(function ()
+        cancelled = true
+    end)
+    for i, uri in ipairs(uris) do
         if notify then
             local continue = notify(uri)
             if continue == false then
                 break
             end
         end
+        loading:setMessage(('%03d/%03d'):format(i, #uris))
+        loading:setPercentage(i / #uris * 100)
         await.delay()
+        if cancelled then
+            break
+        end
         searcher(uri)
     end
 end

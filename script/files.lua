@@ -480,7 +480,7 @@ function m.compileState(uri, text)
         end
         return nil
     end
-    local prog <close> = progress.create(scope.getScope(uri), lang.script.WINDOW_COMPILING, 0.5)
+    local prog <close> = progress.create(uri, lang.script.WINDOW_COMPILING, 0.5)
     prog:setMessage(ws.getRelativePath(uri))
     local clock = os.clock()
     local state, err = parser.compile(text

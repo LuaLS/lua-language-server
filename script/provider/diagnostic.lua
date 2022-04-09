@@ -221,9 +221,8 @@ function m.doDiagnostic(uri, isScopeDiag)
     end
 
     local version = files.getVersion(uri)
-    local scp = scope.getScope(uri)
 
-    local prog <close> = progress.create(scp, lang.script.WINDOW_DIAGNOSING, 0.5)
+    local prog <close> = progress.create(uri, lang.script.WINDOW_DIAGNOSING, 0.5)
     prog:setMessage(ws.getRelativePath(uri))
 
     --log.debug('Diagnostic file:', uri)
@@ -367,7 +366,7 @@ function m.awaitDiagnosticsScope(suri)
         await.sleep(1.0)
     end
     local clock = os.clock()
-    local bar <close> = progress.create(scope.getScope(suri), lang.script.WORKSPACE_DIAGNOSTIC, 1)
+    local bar <close> = progress.create(suri, lang.script.WORKSPACE_DIAGNOSTIC, 1)
     local cancelled
     bar:onCancel(function ()
         log.info('Cancel workspace diagnostics')

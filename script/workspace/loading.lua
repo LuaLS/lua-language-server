@@ -176,7 +176,7 @@ m._loadings = setmetatable({}, { __mode = 'k' })
 function m.create(scp)
     local loading = setmetatable({
         scp    = scp,
-        _bar   = progress.create(scp, lang.script('WORKSPACE_LOADING', scp.uri), 0.5),
+        _bar   = progress.create(scp.uri, lang.script('WORKSPACE_LOADING', scp.uri), 0.5),
         _stash = {},
         _cache = {},
     }, mt)

@@ -68,11 +68,6 @@ log.info('LOGPATH:', LOGPATH)
 log.info('METAPATH:', METAPATH)
 log.info('VERSION:', version.getVersion())
 
-local stdRequire = require
-require = function (name)
-    return stdRequire(name)
-end
-
 require 'tracy'
 require 'cli'
 

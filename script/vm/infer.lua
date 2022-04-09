@@ -111,7 +111,11 @@ local viewNodeSwitch = util.switch()
     : case 'doc.type.array'
     : call(function (source, infer)
         infer._hasClass = true
-        return m.getInfer(source.node):view() .. '[]'
+        local view = m.getInfer(source.node):view()
+        if source.node.type == 'doc.type' then
+            view = '(' .. view .. ')'
+        end
+        return view .. '[]'
     end)
     : case 'doc.type.table'
     : call(function (source, infer)

@@ -6,6 +6,7 @@
   + `type-check`: removed for now
   + `no-implicit-any`: renamed to `no-unknown`
 * `CHG` formatter: no longer need` --preview`
+* `CHG` `LuaDoc`: supports `---@type (string|integer)[]`
 * `FIX` semantic: color of `function`
 * `FIX` [#1027](https://github.com/sumneko/lua-language-server/issues/1027)
 * `FIX` [#1028](https://github.com/sumneko/lua-language-server/issues/1028)

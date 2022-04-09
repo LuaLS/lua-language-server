@@ -598,6 +598,16 @@ local function parseBoolean(parent)
     return boolean
 end
 
+local function parseParen(parent)
+    if not checkToken('symbol', '(', 1) then
+        return
+    end
+    nextToken()
+    local tp = parseType(parent)
+    nextSymbolOrError(')')
+    return tp
+end
+
 function parseTypeUnit(parent)
     local result = parseFunction(parent)
                 or parseTable(parent)
@@ -605,6 +615,7 @@ function parseTypeUnit(parent)
                 or parseInteger(parent)
                 or parseBoolean(parent)
                 or parseDots('doc.type.name', parent)
+                or parseParen(parent)
     if not result then
         local literal = checkToken('symbol', '`', 1)
         if literal then

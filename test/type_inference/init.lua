@@ -1434,3 +1434,8 @@ local t = { 'x' }
 
 local <?x?> = t[#t]
 ]]
+
+TEST '(string|integer)[]' [[
+---@type (string|integer)[]
+local <?x?>
+]]

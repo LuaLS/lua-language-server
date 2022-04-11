@@ -1866,3 +1866,21 @@ local t: B {
     y: string,
 }
 ]]
+
+TEST [[
+---@class A
+---@field x string
+
+---@class B: A
+---@field x integer
+---@field y string
+
+---@type B
+local <?t?>
+]]
+[[
+local t: B {
+    x: integer,
+    y: string,
+}
+]]

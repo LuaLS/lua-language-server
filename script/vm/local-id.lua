@@ -121,10 +121,6 @@ function m.compileLocalID(source)
         return
     end
     local root = guide.getRoot(source)
-    if not root then
-        log.error('No root?', require 'inspect' (source, { depth = 1 }))
-        return
-    end
     if not root._localIDs then
         root._localIDs = util.multiTable(2)
     end

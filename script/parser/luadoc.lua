@@ -1019,6 +1019,7 @@ local function parseVersion()
         end
         local version = {
             type   = 'doc.version.unit',
+            parent = result,
             start  = getStart(),
         }
         if tp == 'symbol' then
@@ -1257,6 +1258,7 @@ local function buildLuaDoc(comment)
                 type   = 'doc.tailcomment',
                 start  = cstart + comment.start,
                 finish = comment.finish,
+                parent = result,
                 text   = trimTailComment(text:sub(cstart)),
             }
         end

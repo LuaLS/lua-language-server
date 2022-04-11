@@ -4,6 +4,7 @@ local furi   = require 'file-uri'
 local diag   = require 'provider.diagnostic'
 local config = require 'config'
 local ws     = require 'workspace'
+local guide  = require 'parser.guide'
 
 local path = ROOT / 'script'
 
@@ -35,6 +36,10 @@ local clock = os.clock()
 
 ---@diagnostic disable: await-in-sync
 for uri in files.eachFile() do
+    local status = files.getState(uri)
+    guide.eachSource(status.ast, function (src)
+        assert(src.parent ~= nil or src.type == 'main')
+    end)
     local fileClock = os.clock()
     diag.doDiagnostic(uri, true)
     print('诊断文件耗时：', os.clock() - fileClock, uri)

@@ -154,14 +154,18 @@ local function removeVisiblePath(uri)
         return
     end
     for _, scp in ipairs(workspace.folders) do
-        scp:get('visiblePath')[path] = nil
+        if scp:get('visiblePath') then
+            scp:get('visiblePath')[path] = nil
+        end
         ---@type collector
         local clt = scp:get('requireName')
         if clt then
             clt:dropUri(uri)
         end
     end
-    scope.fallback:get('visiblePath')[path] = nil
+    if scope.fallback:get('visiblePath') then
+        scope.fallback:get('visiblePath')[path] = nil
+    end
     ---@type collector
     local clt = scope.fallback:get('requireName')
     if clt then

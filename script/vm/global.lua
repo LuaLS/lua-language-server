@@ -21,6 +21,9 @@ local ID_SPLITE = '\x1F'
 ---@param source parser.object
 function mt:addSet(uri, source)
     local link = self.links[uri]
+    if not link.sets then
+        link.sets = {}
+    end
     link.sets[#link.sets+1] = source
     self.setsCache = nil
 end
@@ -29,6 +32,9 @@ end
 ---@param source parser.object
 function mt:addGet(uri, source)
     local link = self.links[uri]
+    if not link.gets then
+        link.gets = {}
+    end
     link.gets[#link.gets+1] = source
     self.getsCache = nil
 end
@@ -38,20 +44,19 @@ function mt:getSets(suri)
     if not self.setsCache then
         self.setsCache = {}
     end
-    ---@type scope
-    local scp = suri and scope.getScope(suri) or nil
-    local cacheUri = scp and scp.uri or '<fallback>'
+    local scp = scope.getScope(suri)
+    local cacheUri = scp.uri or '<callback>'
     if self.setsCache[cacheUri] then
         return self.setsCache[cacheUri]
     end
     self.setsCache[cacheUri] = {}
     local cache = self.setsCache[cacheUri]
     for uri, link in pairs(self.links) do
-        if not scp
-        or scp:isChildUri(uri)
-        or scp:isLinkedUri(uri) then
-            for _, source in ipairs(link.sets) do
-                cache[#cache+1] = source
+        if link.sets then
+            if scp:isVisible(uri) then
+                for _, source in ipairs(link.sets) do
+                    cache[#cache+1] = source
+                end
             end
         end
     end
@@ -63,20 +68,19 @@ function mt:getGets(suri)
     if not self.getsCache then
         self.getsCache = {}
     end
-    ---@type scope
-    local scp = suri and scope.getScope(suri) or nil
-    local cacheUri = scp and scp.uri or '<fallback>'
+    local scp = scope.getScope(suri)
+    local cacheUri = scp.uri or '<callback>'
     if self.getsCache[cacheUri] then
         return self.getsCache[cacheUri]
     end
     self.getsCache[cacheUri] = {}
     local cache = self.getsCache[cacheUri]
     for uri, link in pairs(self.links) do
-        if not scp
-        or scp:isChildUri(uri)
-        or scp:isLinkedUri(uri) then
-            for _, source in ipairs(link.gets) do
-                cache[#cache+1] = source
+        if link.gets then
+            if scp:isVisible(uri) then
+                for _, source in ipairs(link.gets) do
+                    cache[#cache+1] = source
+                end
             end
         end
     end
@@ -111,11 +115,6 @@ return function (name, cate)
     return setmetatable({
         name  = name,
         cate  = cate,
-        links = util.defaultTable(function ()
-            return {
-                sets   = {},
-                gets   = {},
-            }
-        end),
+        links = util.multiTable(2),
     }, mt)
 end

@@ -15,6 +15,9 @@ lclient():start(function (client)
             text = [[
 local x
 print(x)
+
+TEST = 1
+print(TEST)
 ]]
         }
     })
@@ -42,4 +45,19 @@ print(x)
     })
 
     assert(#locations > 0)
+
+    local locations = client:awaitRequest('textDocument/definition', {
+        textDocument = { uri = 'file://single-file.lua' },
+        position = { line = 3, character = 0 },
+    })
+
+    assert(util.equal(locations, {
+        {
+            uri = 'file://single-file.lua',
+            range = {
+                start   = { line = 3, character = 0 },
+                ['end'] = { line = 3, character = 4 },
+            }
+        }
+    }))
 end)

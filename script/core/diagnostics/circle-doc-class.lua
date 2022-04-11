@@ -37,7 +37,7 @@ return function (uri, callback)
                             }
                             goto CONTINUE
                         end
-                        if not mark[newName] then
+                        if newName and not mark[newName] then
                             mark[newName] = true
                             local docs = vm.getDocSets(uri, newName)
                             for _, otherDoc in ipairs(docs) do

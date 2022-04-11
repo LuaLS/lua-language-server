@@ -109,7 +109,7 @@ local function compileSingleMetaDoc(uri, script, metaLang, status)
         version = 5.1
         jit = true
     else
-        version = tonumber(config.get(uri, 'Lua.runtime.version'):sub(-3))
+        version = tonumber(config.get(uri, 'Lua.runtime.version'):sub(-3)) or 5.4
         jit = false
     end
 

@@ -74,7 +74,7 @@ local compilerGlobalSwitch = util.switch()
             if parentName == '_G' then
                 name = keyName
             else
-                name = parentName .. m.ID_SPLITE .. keyName
+                name = ('%s%s%s'):format(parentName, m.ID_SPLITE, keyName)
             end
         elseif source.node.special == '_G' then
             name = keyName
@@ -82,7 +82,7 @@ local compilerGlobalSwitch = util.switch()
         if not name then
             return
         end
-        local uri  = guide.getUri(source)
+        local uri    = guide.getUri(source)
         local global = m.declareGlobal('variable', name, uri)
         global:addSet(uri, source)
         source._globalNode = global
@@ -92,17 +92,22 @@ local compilerGlobalSwitch = util.switch()
     : case 'getindex'
     ---@param source parser.object
     : call(function (source)
-        local name = guide.getKeyName(source)
-        if not name then
+        local name
+        local keyName = guide.getKeyName(source)
+        if not keyName then
             return
         end
         if source.node._globalNode then
             local parentName = source.node._globalNode:getName()
-            if parentName ~= '_G' then
-                name = parentName .. m.ID_SPLITE .. name
+            if parentName == '_G' then
+                name = keyName
+            else
+                name = ('%s%s%s'):format(parentName, m.ID_SPLITE, keyName)
             end
+        elseif source.node.special == '_G' then
+            name = keyName
         end
-        local uri  = guide.getUri(source)
+        local uri    = guide.getUri(source)
         local global = m.declareGlobal('variable', name, uri)
         global:addGet(uri, source)
         source._globalNode = global
@@ -337,9 +342,11 @@ function m.dropUri(uri)
     m.globalSubs[uri] = nil
     for key in pairs(globalSub) do
         local global = m.globals[key]
-        global:dropUri(uri)
-        if not global:isAlive() then
-            m.globals[key] = nil
+        if global then
+            global:dropUri(uri)
+            if not global:isAlive() then
+                m.globals[key] = nil
+            end
         end
     end
 end

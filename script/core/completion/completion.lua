@@ -420,7 +420,7 @@ local function checkModule(state, word, position, results)
 end
 
 local function checkFieldFromFieldToIndex(state, name, src, parent, word, startPos, position)
-    if type(name) == 'string' and name:match '^[%a_][%w_]*$' then
+    if name:match '^[%a_][%w_]*$' then
         return nil
     end
     local textEdit, additionalTextEdits
@@ -493,7 +493,7 @@ local function checkFieldThen(state, name, src, word, startPos, position, parent
             kind = define.CompletionItemKind.Function
         end
         buildFunction(results, src, value, oop, {
-            label      = tostring(name),
+            label      = name,
             kind       = kind,
             match      = name:match '^[^(]+',
             insertText = name:match '^[^(]+',
@@ -526,7 +526,7 @@ local function checkFieldThen(state, name, src, word, startPos, position, parent
         textEdit, additionalTextEdits = checkFieldFromFieldToIndex(state, name, src, parent, word, startPos, position)
     end
     results[#results+1] = {
-        label      = tostring(name),
+        label      = name,
         kind       = kind,
         deprecated = vm.isDeprecated(src) or nil,
         textEdit   = textEdit,
@@ -554,6 +554,7 @@ local function checkFieldOfRefs(refs, state, word, startPos, position, parent, o
         if isSameSource(state, src, startPos) then
             goto CONTINUE
         end
+        name = tostring(name)
         if isGlobal and locals and locals[name] then
             goto CONTINUE
         end
@@ -1376,7 +1377,9 @@ local function checkTableLiteralField(state, position, tbl, fields, results)
     if left then
         for _, field in ipairs(fields) do
             local name = guide.getKeyName(field)
-            if not mark[name] and matchKey(left, guide.getKeyName(field)) then
+            if  name
+            and not mark[name]
+            and matchKey(left, tostring(name)) then
                 results[#results+1] = {
                     label      = guide.getKeyName(field),
                     kind       = define.CompletionItemKind.Property,

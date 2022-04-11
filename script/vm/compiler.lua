@@ -87,7 +87,9 @@ local searchFieldSwitch = util.switch()
     : call(function (suri, node, key, pushResult)
         -- change to `string: stringlib` ?
         local stringlib = globalMgr.getGlobal('type', 'stringlib')
-        m.getClassFields(suri, stringlib, key, pushResult)
+        if stringlib then
+            m.getClassFields(suri, stringlib, key, pushResult)
+        end
     end)
     : case 'local'
     : call(function (suri, node, key, pushResult)
@@ -302,8 +304,8 @@ function m.getReturnOfFunction(func, index)
 end
 
 local function getReturnOfSetMetaTable(args)
-    local tbl  = args and args[1]
-    local mt   = args and args[2]
+    local tbl  = args[1]
+    local mt   = args[2]
     local node = union()
     if tbl then
         node:merge(m.compileNode(tbl))
@@ -325,9 +327,15 @@ end
 
 local function getReturn(func, index, args)
     if func.special == 'setmetatable' then
+        if not args then
+            return nil
+        end
         return getReturnOfSetMetaTable(args)
     end
     if func.special == 'pcall' and index > 1 then
+        if not args then
+            return nil
+        end
         local newArgs = {}
         for i = 2, #args do
             newArgs[#newArgs+1] = args[i]
@@ -335,6 +343,9 @@ local function getReturn(func, index, args)
         return getReturn(args[1], index - 1, newArgs)
     end
     if func.special == 'xpcall' and index > 1 then
+        if not args then
+            return nil
+        end
         local newArgs = {}
         for i = 3, #args do
             newArgs[#newArgs+1] = args[i]
@@ -342,6 +353,9 @@ local function getReturn(func, index, args)
         return getReturn(args[1], index - 1, newArgs)
     end
     if func.special == 'require' then
+        if not args then
+            return nil
+        end
         local nameArg = args[1]
         if not nameArg or nameArg.type ~= 'string' then
             return nil
@@ -941,9 +955,11 @@ local compilerSwitch = util.switch()
             -- initValue
             selectNode(source._iterArgs[2], source.exps, 3)
         end
-        for i, loc in ipairs(source.keys) do
-            local node = getReturn(source._iterator, i, source._iterArgs)
-            nodeMgr.setNode(loc, node)
+        if source.keys then
+            for i, loc in ipairs(source.keys) do
+                local node = getReturn(source._iterator, i, source._iterArgs)
+                nodeMgr.setNode(loc, node)
+            end
         end
     end)
     : case 'doc.type'
@@ -1360,7 +1376,7 @@ local compilerSwitch = util.switch()
         if source.op.type == '//' then
             local a = valueMgr.getNumber(source[1])
             local b = valueMgr.getNumber(source[2])
-            if a and b then
+            if a and b and b ~= 0 then
                 local result = a // b
                 nodeMgr.setNode(source, {
                     type   = math.type(result) == 'integer' and 'integer' or 'number',

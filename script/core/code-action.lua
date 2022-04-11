@@ -415,6 +415,12 @@ local function checkSwapParams(results, uri, start, finish)
             elseif source.type == 'funcargs' then
                 local var = source.parent.parent
                 if guide.isSet(var) then
+                    if var.type == 'tablefield' then
+                        var = var.field
+                    end
+                    if var.type == 'tableindex' then
+                        var = var.index
+                    end
                     node = text:sub(
                         guide.positionToOffset(state, var.start) + 1,
                         guide.positionToOffset(state, var.finish)

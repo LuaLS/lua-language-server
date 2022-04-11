@@ -144,47 +144,59 @@ local searchFieldSwitch = util.switch()
 function m.getClassFields(suri, node, key, pushResult)
     local mark = {}
 
-    local function searchClass(class)
+    local function searchClass(class, searchedFields)
         local name = class.name
         if mark[name] then
             return
         end
         mark[name] = true
+        searchedFields = searchedFields or {}
         for _, set in ipairs(class:getSets(suri)) do
             if set.type == 'doc.class' then
                 -- check ---@field
-                local hasFounded
+                local hasFounded = {}
                 for _, field in ipairs(set.fields) do
+                    local fieldKey = guide.getKeyName(field)
                     if key == nil
-                    or guide.getKeyName(field) == key then
-                        hasFounded = true
-                        pushResult(field)
+                    or fieldKey == key then
+                        if not searchedFields[fieldKey] then
+                            pushResult(field)
+                            hasFounded[fieldKey] = true
+                        end
                     end
                 end
                 -- check local field and global field
                 if set.bindSources then
                     for _, src in ipairs(set.bindSources) do
                         searchFieldSwitch(src.type, suri, src, key, function (field)
-                            if guide.isSet(field) then
-                                hasFounded = true
+                            local fieldKey = guide.getKeyName(field)
+                            if  not searchedFields[fieldKey]
+                            and guide.isSet(field) then
+                                hasFounded[fieldKey] = true
                                 pushResult(field)
                             end
                         end)
                         if src._globalNode then
                             searchFieldSwitch('global', suri, src._globalNode, key, function (field)
-                                hasFounded = true
-                                pushResult(field)
+                                local fieldKey = field:getKeyName()
+                                if not searchedFields[fieldKey] then
+                                    hasFounded[fieldKey] = true
+                                    pushResult(field)
+                                end
                             end)
                         end
                     end
                 end
                 -- look into extends(if field not found)
-                if not hasFounded and set.extends then
+                if not hasFounded[key] and set.extends then
+                    for fieldKey in pairs(hasFounded) do
+                        searchedFields[fieldKey] = true
+                    end
                     for _, extend in ipairs(set.extends) do
                         if extend.type == 'doc.extends.name' then
                             local extendType = globalMgr.getGlobal('type', extend[1])
                             if extendType then
-                                searchClass(extendType)
+                                searchClass(extendType, searchedFields)
                             end
                         end
                     end

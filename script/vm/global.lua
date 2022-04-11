@@ -15,6 +15,8 @@ mt.__index = mt
 mt.type = 'global'
 mt.name = ''
 
+local ID_SPLITE = '\x1F'
+
 ---@param uri    uri
 ---@param source parser.object
 function mt:addSet(uri, source)
@@ -91,6 +93,11 @@ end
 ---@return string
 function mt:getName()
     return self.name
+end
+
+---@return string
+function mt:getKeyName()
+    return self.name:match('[^' .. ID_SPLITE .. ']+$')
 end
 
 ---@return boolean

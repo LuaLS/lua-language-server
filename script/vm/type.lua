@@ -21,50 +21,34 @@ function vm.isSubType(uri, child, parent, mark)
         return false
     end
 
-    if parent.type == 'global' and parent.cate == 'type' and parent.name == 'any' then
-        return true
-    end
-
-    if child.type == 'doc.type' then
-        for _, typeUnit in ipairs(child.types) do
-            if not vm.isSubType(uri, typeUnit, parent) then
-                return false
+    mark = mark or {}
+    for childNode in nodeMgr.eachNode(child) do
+        if childNode.type ~= 'global'
+        or childNode.cate ~= 'type' then
+            goto CONTINUE_CHILD
+        end
+        if mark[childNode.name] then
+            return false
+        end
+        mark[childNode.name] = true
+        for parentNode in nodeMgr.eachNode(parent) do
+            if parentNode.type ~= 'global'
+            or parentNode.cate ~= 'type' then
+                goto CONTINUE_PARENT
             end
-        end
-        return true
-    end
-
-    if child.type == 'doc.type.name' then
-        child = globalMgr.getGlobal('type', child[1])
-    end
-
-    if child.type == 'global' and child.cate == 'type' then
-        if parent.type == 'doc.type' then
-            for _, typeUnit in ipairs(parent.types) do
-                if vm.isSubType(uri, child, typeUnit) then
-                    return true
-                end
-            end
-        end
-
-        if parent.type == 'doc.type.name' then
-            parent = globalMgr.getGlobal('type', parent[1])
-        end
-
-        if parent.type == 'global' and parent.cate == 'type' then
-            if parent.name == child.name then
+            if parentNode.name == 'any' or childNode.name == 'any' then
                 return true
             end
-            mark = mark or {}
-            if mark[child.name] then
-                return false
+
+            if parentNode.name == childNode.name then
+                return true
             end
-            mark[child.name] = true
-            for _, set in ipairs(child:getSets(uri)) do
+
+            for _, set in ipairs(childNode:getSets(uri)) do
                 if set.type == 'doc.class' and set.extends then
                     for _, ext in ipairs(set.extends) do
                         if  ext.type == 'doc.extends.name'
-                        and vm.isSubType(uri, globalMgr.getGlobal('type', ext[1]), parent, mark) then
+                        and vm.isSubType(uri, ext[1], parentNode, mark) then
                             return true
                         end
                     end
@@ -72,13 +56,15 @@ function vm.isSubType(uri, child, parent, mark)
                 if set.type == 'doc.alias' and set.extends then
                     for _, ext in ipairs(set.extends.types) do
                         if  ext.type == 'doc.type.name'
-                        and vm.isSubType(uri, globalMgr.getGlobal('type', ext[1]), parent, mark) then
+                        and vm.isSubType(uri, ext[1], parentNode, mark) then
                             return true
                         end
                     end
                 end
             end
+            ::CONTINUE_PARENT::
         end
+        ::CONTINUE_CHILD::
     end
 
     return false
@@ -92,15 +78,13 @@ function vm.getTableValue(uri, tnode, knode)
     for tn in nodeMgr.eachNode(tnode) do
         if tn.type == 'doc.type.table' then
             for _, field in ipairs(tn.fields) do
-                if vm.isSubType(uri, field.name, knode) then
+                if vm.isSubType(uri, compiler.compileNode(field.name), knode) then
                     result = nodeMgr.mergeNode(result, compiler.compileNode(field.extends))
                 end
             end
         end
         if tn.type == 'doc.type.array' then
-            if vm.isSubType(uri, globalMgr.getGlobal('type', 'integer'), knode) then
-                result = nodeMgr.mergeNode(result, compiler.compileNode(tn.node))
-            end
+            result = nodeMgr.mergeNode(result, compiler.compileNode(tn.node))
         end
         if tn.type == 'table' then
             for _, field in ipairs(tn) do
@@ -108,10 +92,14 @@ function vm.getTableValue(uri, tnode, knode)
                     result = nodeMgr.mergeNode(result, compiler.compileNode(field.value))
                 end
                 if field.type == 'tablefield' then
-                    result = nodeMgr.mergeNode(result, compiler.compileNode(field.value))
+                    if vm.isSubType(uri, knode, 'string') then
+                        result = nodeMgr.mergeNode(result, compiler.compileNode(field.value))
+                    end
                 end
                 if field.type == 'tableexp' then
-                    result = nodeMgr.mergeNode(result, compiler.compileNode(field.value))
+                    if vm.isSubType(uri, knode, 'integer') and field.tindex == 1 then
+                        result = nodeMgr.mergeNode(result, compiler.compileNode(field.value))
+                    end
                 end
             end
         end
@@ -127,15 +115,13 @@ function vm.getTableKey(uri, tnode, vnode)
     for tn in nodeMgr.eachNode(tnode) do
         if tn.type == 'doc.type.table' then
             for _, field in ipairs(tn.fields) do
-                if vm.isSubType(uri, field.extends, vnode) then
+                if vm.isSubType(uri, compiler.compileNode(field.extends), vnode) then
                     result = nodeMgr.mergeNode(result, compiler.compileNode(field.name))
                 end
             end
         end
         if tn.type == 'doc.type.array' then
-            if vm.isSubType(uri, tn.node, vnode) then
-                result = nodeMgr.mergeNode(result, globalMgr.getGlobal('type', 'integer'))
-            end
+            result = nodeMgr.mergeNode(result, globalMgr.getGlobal('type', 'integer'))
         end
         if tn.type == 'table' then
             for _, field in ipairs(tn) do

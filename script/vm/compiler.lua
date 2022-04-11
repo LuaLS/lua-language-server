@@ -9,6 +9,8 @@ local union      = require 'vm.union'
 local genericMgr = require 'vm.generic'
 local rpath      = require 'workspace.require-path'
 local files      = require 'files'
+---@class vm
+local vm         = require 'vm.vm'
 
 ---@class parser.object
 ---@field _compiledNodes  boolean
@@ -20,28 +22,20 @@ local m = {}
 local searchFieldSwitch = util.switch()
     : case 'table'
     : call(function (suri, node, key, pushResult)
-        local tp
-        if  type(key) == 'table'
-        and key.type == 'global'
-        and key.cate == 'type' then
-            tp = key.name
-        end
         local hasFiled = false
         for _, field in ipairs(node) do
             if field.type == 'tablefield'
             or field.type == 'tableindex' then
                 local fieldKey = guide.getKeyName(field)
                 if key == nil
-                or key == fieldKey
-                or (tp == 'integer' and math.tointeger(fieldKey)) then
+                or key == fieldKey then
                     hasFiled = true
                     pushResult(field)
                 end
             end
             if field.type == 'tableexp' then
                 if key == nil
-                or key == field.tindex
-                or tp  == 'integer' then
+                or key == field.tindex then
                     hasFiled = true
                     pushResult(field)
                 end
@@ -772,9 +766,6 @@ local compilerSwitch = util.switch()
     : call(function (source)
         compileByLocalID(source)
         local key = guide.getKeyName(source)
-        if key == nil and source.index then
-            key = m.compileNode(source.index)
-        end
         if key == nil then
             return
         end
@@ -797,9 +788,15 @@ local compilerSwitch = util.switch()
         if key == nil then
             return
         end
-        m.compileByParentNode(source.node, key, function (src)
-            nodeMgr.setNode(source, m.compileNode(src))
-        end)
+        if type(key) == 'table' then
+            local uri = guide.getUri(source)
+            local value = vm.getTableValue(uri, m.compileNode(source.node), key)
+            nodeMgr.setNode(source, value)
+        else
+            m.compileByParentNode(source.node, key, function (src)
+                nodeMgr.setNode(source, m.compileNode(src))
+            end)
+        end
     end)
     : case 'setglobal'
     : call(function (source)

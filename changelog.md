@@ -1,5 +1,8 @@
 # changelog
 
+## 3.0.2
+* `FIX` `table<string, boolean>[string] -> boolean`
+
 ## 3.0.1
 `2022-4-11`
 * `FIX` [#1033](https://github.com/sumneko/lua-language-server/issues/1033)

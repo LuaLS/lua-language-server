@@ -1576,7 +1576,7 @@ local x: unknown
 ]]
 
 TEST [[
----@type any
+---@type unknown
 local <?t?>
 t.a = 1
 ]]

@@ -1439,3 +1439,15 @@ TEST '(string|integer)[]' [[
 ---@type (string|integer)[]
 local <?x?>
 ]]
+
+TEST 'boolean' [[
+---@type table<string, boolean>
+local t
+
+---@alias uri string
+
+---@type string
+local uri
+
+local <?v?> = t[uri]
+]]

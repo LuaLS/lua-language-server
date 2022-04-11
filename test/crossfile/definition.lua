@@ -977,3 +977,14 @@ print(t.<?x?>)
 
 config.set(nil, 'Lua.runtime.pathStrict', false)
 config.set(nil, 'Lua.runtime.path', originRuntimePath)
+
+-- Don't require self
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+local <~f~> = require 'a'
+return function () end
+        ]]
+    }
+}

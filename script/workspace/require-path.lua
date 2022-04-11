@@ -123,12 +123,14 @@ function m.findUrisByRequirePath(suri, path)
     local clt = scope.getScope(suri):get('requireName')
     if clt then
         for _, uri in clt:each(suri, fspath) do
-            local infos = m.getVisiblePath(suri, furi.decode(uri))
-            for _, info in ipairs(infos) do
-                local fsexpect = info.expect:gsub('%' .. separator, '/')
-                if fsexpect == fspath then
-                    results[#results+1] = uri
-                    searchers[uri] = info.searcher
+            if uri ~= suri then
+                local infos = m.getVisiblePath(suri, furi.decode(uri))
+                for _, info in ipairs(infos) do
+                    local fsexpect = info.expect:gsub('%' .. separator, '/')
+                    if fsexpect == fspath then
+                        results[#results+1] = uri
+                        searchers[uri] = info.searcher
+                    end
                 end
             end
         end

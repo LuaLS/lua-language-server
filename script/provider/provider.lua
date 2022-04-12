@@ -999,8 +999,8 @@ m.register '$/status/click' {
     ---@async
     function ()
         -- TODO: translate
-        local titleDiagnostic = '进行工作区诊断'
-        local result = client.awaitRequestMessage('Info', 'xxx', {
+        local titleDiagnostic = 'Perform workspace diagnosis'
+        local result = client.awaitRequestMessage('Info', 'Do you want to perform workspace diagnosis?', {
             titleDiagnostic,
         })
         if not result then

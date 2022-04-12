@@ -272,7 +272,7 @@ local function searchByNode(source, pushResult)
         return
     end
     local uri = guide.getUri(source)
-    for n in nodeMgr.eachNode(node) do
+    for n in nodeMgr.eachObject(node) do
         if n.type == 'global' then
             for _, get in ipairs(n:getGets(uri)) do
                 pushResult(get)

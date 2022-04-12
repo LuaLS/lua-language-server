@@ -5,11 +5,11 @@ local signMgr       = require 'vm.sign'
 local genericMgr    = require 'vm.generic'
 
 ---@class parser.object
----@field _globalNode vm.node.global
+---@field _globalNode vm.global
 
 ---@class vm.global-manager
 local m = {}
----@type table<string, vm.node.global>
+---@type table<string, vm.global>
 m.globals = {}
 ---@type table<uri, table<string, boolean>>
 m.globalSubs = util.multiTable(2)
@@ -209,7 +209,7 @@ local compilerGlobalSwitch = util.switch()
 ---@param cate vm.global.cate
 ---@param name string
 ---@param uri  uri
----@return vm.node.global
+---@return vm.global
 function m.declareGlobal(cate, name, uri)
     local key = cate .. '|' .. name
     m.globalSubs[uri][key] = true
@@ -222,7 +222,7 @@ end
 ---@param cate   vm.global.cate
 ---@param name   string
 ---@param field? string
----@return vm.node.global?
+---@return vm.global?
 function m.getGlobal(cate, name, field)
     local key = cate .. '|' .. name
     if field then
@@ -233,7 +233,7 @@ end
 
 ---@param cate   vm.global.cate
 ---@param name   string
----@return vm.node.global[]
+---@return vm.global[]
 function m.getFields(cate, name)
     local globals = {}
     local key = cate .. '|' .. name
@@ -252,7 +252,7 @@ function m.getFields(cate, name)
 end
 
 ---@param cate   vm.global.cate
----@return vm.node.global[]
+---@return vm.global[]
 function m.getGlobals(cate)
     local globals = {}
 
@@ -327,7 +327,7 @@ function m.compileAst(source)
     end)
 end
 
----@return vm.node.global
+---@return vm.global
 function m.getNode(source)
     if source.type == 'field'
     or source.type == 'method' then

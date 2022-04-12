@@ -45,6 +45,11 @@ function mt:copy()
     return createUnion(self, nil)
 end
 
+---@return boolean
+function mt:isEmpty()
+    return #self == 0
+end
+
 ---@param source parser.object
 function mt:subscribeLocal(source)
     for _, c in ipairs(self) do

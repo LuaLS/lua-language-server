@@ -1406,7 +1406,7 @@ local function tryCallArg(state, position, results)
     end
     local node = compiler.compileCallArg({ type = 'dummyarg' }, call, argIndex)
     local enums = {}
-    for src in nodeMgr.eachNode(node) do
+    for src in nodeMgr.eachObject(node) do
         if src.type == 'doc.type.string'
         or src.type == 'doc.type.integer'
         or src.type == 'doc.type.boolean' then

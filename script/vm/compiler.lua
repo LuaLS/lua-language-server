@@ -55,7 +55,7 @@ local searchFieldSwitch = util.switch()
         end
     end)
     : case 'global'
-    ---@param node vm.node.global
+    ---@param node vm.global
     : call(function (suri, node, key, pushResult)
         if node.cate == 'variable' then
             if key then
@@ -115,7 +115,7 @@ local searchFieldSwitch = util.switch()
             local fieldKey = field.name
             if fieldKey.type == 'doc.type' then
                 local fieldNode = m.compileNode(fieldKey)
-                for fn in nodeMgr.eachNode(fieldNode) do
+                for fn in nodeMgr.eachObject(fieldNode) do
                     if fn.type == 'global' and fn.cate == 'type' then
                         if key == nil
                         or fn.name == 'any'
@@ -306,7 +306,7 @@ local function getReturnOfSetMetaTable(args)
     end
     if mt then
         m.compileByParentNode(mt, '__index', function (src)
-            for n in nodeMgr.eachNode(m.compileNode(src)) do
+            for n in nodeMgr.eachObject(m.compileNode(src)) do
                 if n.type == 'global'
                 or n.type == 'local'
                 or n.type == 'table'
@@ -373,16 +373,26 @@ local function getReturn(func, index, args)
     ---@type vm.node.union
     local result
     if node then
-        for cnode in nodeMgr.eachNode(node) do
+        for cnode in nodeMgr.eachObject(node) do
             if cnode.type == 'function'
             or cnode.type == 'doc.type.function' then
                 local returnNode = m.getReturnOfFunction(cnode, index)
-                if returnNode and returnNode.type == 'generic' then
-                    returnNode = returnNode:resolve(guide.getUri(func), args)
+                if returnNode then
+                    for rnode in nodeMgr.eachObject(returnNode) do
+                        if rnode.type == 'generic' then
+                            returnNode = rnode:resolve(guide.getUri(func), args)
+                            break
+                        end
+                    end
                 end
-                if returnNode and returnNode.type ~= 'doc.generic.name' then
-                    result = result or union()
-                    result:merge(m.compileNode(returnNode))
+                if returnNode then
+                    for rnode in nodeMgr.eachObject(returnNode) do
+                        -- TODO: narrow type
+                        if rnode.type ~= 'doc.generic.name' then
+                            result = result or union()
+                            result:merge(rnode)
+                        end
+                    end
                 end
             end
         end
@@ -467,7 +477,7 @@ function m.compileByParentNode(source, key, pushResult)
         return
     end
     local suri = guide.getUri(source)
-    for node in nodeMgr.eachNode(parentNode) do
+    for node in nodeMgr.eachObject(parentNode) do
         searchFieldSwitch(node.type, suri, node, key, pushResult)
     end
 end
@@ -505,7 +515,7 @@ local function selectNode(source, list, index)
         -- remove any for returns
         local rtnNode = union()
         local hasKnownType
-        for n in nodeMgr.eachNode(result) do
+        for n in nodeMgr.eachObject(result) do
             if guide.isLiteral(n) then
                 hasKnownType = true
                 rtnNode:merge(n)
@@ -529,7 +539,7 @@ local function selectNode(source, list, index)
 end
 
 ---@param source parser.object
----@param node   vm.node
+---@param node   vm.object
 ---@return boolean
 local function isValidCallArgNode(source, node)
     if source.type == 'function' then
@@ -563,6 +573,11 @@ local function getFuncArg(func, index)
     return nil
 end
 
+---@param arg      parser.object
+---@param call     parser.object
+---@param callNode vm.node
+---@param fixIndex integer
+---@param myIndex  integer
 local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
     local valueMgr = require 'vm.value'
     if not myIndex then
@@ -586,10 +601,10 @@ local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
         end
     end
 
-    for n in nodeMgr.eachNode(callNode) do
+    for n in nodeMgr.eachObject(callNode) do
         if n.type == 'function' then
             local farg = getFuncArg(n, myIndex)
-            for fn in nodeMgr.eachNode(m.compileNode(farg)) do
+            for fn in nodeMgr.eachObject(m.compileNode(farg)) do
                 if isValidCallArgNode(arg, fn) then
                     nodeMgr.setNode(arg, fn)
                 end
@@ -602,7 +617,7 @@ local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
             or event.type ~= 'doc.type.string'
             or eventMap[event[1]] then
                 local farg = getFuncArg(n, myIndex)
-                for fn in nodeMgr.eachNode(m.compileNode(farg)) do
+                for fn in nodeMgr.eachObject(m.compileNode(farg)) do
                     if isValidCallArgNode(arg, fn) then
                         nodeMgr.setNode(arg, fn)
                     end
@@ -612,6 +627,9 @@ local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
     end
 end
 
+---@param arg parser.object
+---@param call parser.position
+---@param index integer
 function m.compileCallArg(arg, call, index)
     local callNode = m.compileNode(call.node)
     compileCallArgNode(arg, call, callNode, 0, index)
@@ -631,7 +649,6 @@ local compilerSwitch = util.switch()
     : case 'integer'
     : case 'number'
     : case 'string'
-    : case 'union'
     : case 'doc.type.function'
     : case 'doc.type.table'
     : case 'doc.type.array'
@@ -731,7 +748,7 @@ local compilerSwitch = util.switch()
             local func = source.parent.parent
             local funcNode = m.compileNode(func)
             local hasDocArg
-            for n in nodeMgr.eachNode(funcNode) do
+            for n in nodeMgr.eachObject(funcNode) do
                 if n.type == 'doc.type.function' then
                     for index, arg in ipairs(n.args) do
                         if func.args[index] == source then
@@ -905,7 +922,7 @@ local compilerSwitch = util.switch()
             if not node then
                 return
             end
-            for n in nodeMgr.eachNode(node) do
+            for n in nodeMgr.eachObject(node) do
                 if  n.type == 'global'
                 and n.cate == 'type'
                 and n.name == '...' then
@@ -928,7 +945,7 @@ local compilerSwitch = util.switch()
         if not node then
             return
         end
-        for n in nodeMgr.eachNode(node) do
+        for n in nodeMgr.eachObject(node) do
             if  n.type == 'global'
             and n.cate == 'type'
             and n.name == '...' then
@@ -1427,12 +1444,12 @@ local compilerSwitch = util.switch()
         end
     end)
 
----@param source parser.object
+---@param source vm.object
 local function compileByNode(source)
     compilerSwitch(source.type, source)
 end
 
----@param source vm.node
+---@param source vm.object
 local function compileByGlobal(uri, source)
     uri = uri or guide.getUri(source)
     if source.type == 'global' then
@@ -1501,7 +1518,7 @@ function m.resumeCache()
     end
 end
 
----@param source parser.object
+---@param source vm.object
 ---@return vm.node
 function m.compileNode(source, uri)
     if not source then

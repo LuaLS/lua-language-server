@@ -16,10 +16,10 @@ function mt:addSign(node)
 end
 
 ---@param uri uri
----@param argNodes vm.node[]
+---@param args parser.object
 ---@return table<string, vm.node>
-function mt:resolve(uri, argNodes)
-    if not argNodes then
+function mt:resolve(uri, args)
+    if not args then
         return nil
     end
     local compiler  = require 'vm.compiler'
@@ -33,7 +33,7 @@ function mt:resolve(uri, argNodes)
             local key = typeUnit[1]
             if typeUnit.literal then
                 -- 'number' -> `T`
-                for n in nodeMgr.eachNode(node) do
+                for n in nodeMgr.eachObject(node) do
                     if n.type == 'string' then
                         local type = globalMgr.declareGlobal('type', n[1], guide.getUri(n))
                         resolved[key] = nodeMgr.mergeNode(type, resolved[key])
@@ -45,10 +45,10 @@ function mt:resolve(uri, argNodes)
             end
         end
         if typeUnit.type == 'doc.type.array' then
-            for n in nodeMgr.eachNode(node) do
+            for n in nodeMgr.eachObject(node) do
                 if n.type == 'doc.type.array' then
                     -- number[] -> T[]
-                    resolve(typeUnit.node, n.node)
+                    resolve(typeUnit.node, compiler.compileNode(n.node))
                 end
             end
         end
@@ -56,39 +56,39 @@ function mt:resolve(uri, argNodes)
             for _, ufield in ipairs(typeUnit.fields) do
                 local ufieldNode = compiler.compileNode(ufield.name)
                 local uvalueNode = compiler.compileNode(ufield.extends)
-                if ufieldNode.type == 'doc.generic.name' and uvalueNode.type == 'doc.generic.name' then
+                if ufieldNode[1].type == 'doc.generic.name' and uvalueNode.type[1] == 'doc.generic.name' then
                     -- { [number]: number} -> { [K]: V }
                     local tfieldNode = vm.getTableKey(uri, node, 'any')
                     local tvalueNode = vm.getTableValue(uri, node, 'any')
-                    resolve(ufieldNode, tfieldNode)
-                    resolve(uvalueNode, tvalueNode)
+                    resolve(ufieldNode[1], tfieldNode)
+                    resolve(uvalueNode[1], tvalueNode)
                 else
-                    if ufieldNode.type == 'doc.generic.name' then
+                    if ufieldNode[1].type == 'doc.generic.name' then
                         -- { [number]: number}|number[] -> { [K]: number }
                         local tnode = vm.getTableKey(uri, node, uvalueNode)
-                        resolve(ufieldNode, tnode)
-                    else
+                        resolve(ufieldNode[1], tnode)
+                    elseif uvalueNode[1].type == 'doc.generic.name' then
                         -- { [number]: number}|number[] -> { [number]: V }
                         local tnode = vm.getTableValue(uri, node, ufieldNode)
-                        resolve(uvalueNode, tnode)
+                        resolve(uvalueNode[1], tnode)
                     end
                 end
             end
         end
     end
 
-    for i, node in ipairs(argNodes) do
+    for i, arg in ipairs(args) do
         local sign = self.signList[i]
         if not sign then
             break
         end
-        for n in nodeMgr.eachNode(sign) do
-            node = compiler.compileNode(node)
-            if node then
+        for n in nodeMgr.eachObject(sign) do
+            local argNode = compiler.compileNode(arg)
+            if argNode then
                 if sign.optional then
-                    node = nodeMgr.removeOptional(node)
+                    argNode = nodeMgr.removeOptional(argNode)
                 end
-                resolve(n, node)
+                resolve(n, argNode)
             end
         end
     end

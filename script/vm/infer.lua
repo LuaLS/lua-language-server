@@ -203,7 +203,7 @@ end
 
 function mt:_eraseAlias()
     local expandAlias = config.get(self.uri, 'Lua.hover.expandAlias')
-    for n in nodeMgr.eachNode(self.node) do
+    for n in nodeMgr.eachObject(self.node) do
         if n.type == 'global' and n.cate == 'type' then
             for _, set in ipairs(n:getSets(self.uri)) do
                 if set.type == 'doc.alias' then
@@ -250,7 +250,7 @@ function mt:_computeViews()
 
     self.views = {}
 
-    for n in nodeMgr.eachNode(self.node) do
+    for n in nodeMgr.eachObject(self.node) do
         local view = viewNodeSwitch(n.type, n, self)
         if view then
             self.views[view] = true
@@ -343,7 +343,7 @@ function mt:viewLiterals()
     end
     local mark     = {}
     local literals = {}
-    for n in nodeMgr.eachNode(self.node) do
+    for n in nodeMgr.eachObject(self.node) do
         if n.type == 'string'
         or n.type == 'number'
         or n.type == 'integer'
@@ -369,7 +369,7 @@ function mt:viewClass()
     end
     local mark  = {}
     local class = {}
-    for n in nodeMgr.eachNode(self.node) do
+    for n in nodeMgr.eachObject(self.node) do
         if n.type == 'global' and n.cate == 'type' then
             local name = n.name
             if not mark[name] then

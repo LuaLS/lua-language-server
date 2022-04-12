@@ -10,7 +10,7 @@ local m = {}
 function m.test(source)
     local node = compiler.compileNode(source)
     local hasTrue, hasFalse
-    for n in nodeMgr.eachNode(node) do
+    for n in nodeMgr.eachObject(node) do
         if n.type == 'boolean' then
             if n[1] == true then
                 hasTrue = true
@@ -40,7 +40,7 @@ function m.test(source)
     end
 end
 
----@param v vm.node
+---@param v vm.object
 ---@return string?
 local function getUnique(v)
     if v.type == 'local' then
@@ -83,15 +83,15 @@ function m.equal(a, b)
     local nodeA = compiler.compileNode(a)
     local nodeB = compiler.compileNode(b)
     local mapA = {}
-    for n in nodeMgr.eachNode(nodeA) do
-        local unique = getUnique(n)
+    for obj in nodeMgr.eachObject(nodeA) do
+        local unique = getUnique(obj)
         if not unique then
             return nil
         end
         mapA[unique] = true
     end
-    for n in nodeMgr.eachNode(nodeB) do
-        local unique = getUnique(n)
+    for obj in nodeMgr.eachObject(nodeB) do
+        local unique = getUnique(obj)
         if not unique then
             return nil
         end
@@ -107,7 +107,7 @@ end
 function m.getInteger(v)
     local node = compiler.compileNode(v)
     local result
-    for n in nodeMgr.eachNode(node) do
+    for n in nodeMgr.eachObject(node) do
         if n.type == 'integer' then
             if result then
                 return nil
@@ -135,7 +135,7 @@ end
 function m.getString(v)
     local node = compiler.compileNode(v)
     local result
-    for n in nodeMgr.eachNode(node) do
+    for n in nodeMgr.eachObject(node) do
         if n.type == 'string' then
             if result then
                 return nil
@@ -155,7 +155,7 @@ end
 function m.getNumber(v)
     local node = compiler.compileNode(v)
     local result
-    for n in nodeMgr.eachNode(node) do
+    for n in nodeMgr.eachObject(node) do
         if n.type == 'number'
         or n.type == 'integer' then
             if result then
@@ -176,7 +176,7 @@ end
 function m.getBoolean(v)
     local node = compiler.compileNode(v)
     local result
-    for n in nodeMgr.eachNode(node) do
+    for n in nodeMgr.eachObject(node) do
         if n.type == 'boolean' then
             if result then
                 return nil
@@ -196,7 +196,7 @@ end
 function m.getLiterals(v)
     local map
     local node = compiler.compileNode(v)
-    for n in nodeMgr.eachNode(node) do
+    for n in nodeMgr.eachObject(node) do
         local literal
         if n.type == 'boolean'
         or n.type == 'string'

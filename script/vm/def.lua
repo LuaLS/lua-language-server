@@ -77,8 +77,8 @@ simpleSwitch = util.switch()
 
 local searchFieldSwitch = util.switch()
     : case 'table'
-    : call(function (suri, node, key, pushResult)
-        for _, field in ipairs(node) do
+    : call(function (suri, obj, key, pushResult)
+        for _, field in ipairs(obj) do
             if field.type == 'tablefield'
             or field.type == 'tableindex' then
                 if guide.getKeyName(field) == key then
@@ -88,24 +88,24 @@ local searchFieldSwitch = util.switch()
         end
     end)
     : case 'global'
-    ---@param node vm.node
+    ---@param obj vm.object
     ---@param key string
-    : call(function (suri, node, key, pushResult)
-        if node.cate == 'variable' then
-            local newGlobal = globalMgr.getGlobal('variable', node.name, key)
+    : call(function (suri, obj, key, pushResult)
+        if obj.cate == 'variable' then
+            local newGlobal = globalMgr.getGlobal('variable', obj.name, key)
             if newGlobal then
                 for _, set in ipairs(newGlobal:getSets(suri)) do
                     pushResult(set)
                 end
             end
         end
-        if node.cate == 'type' then
-            compiler.getClassFields(suri, node, key, pushResult)
+        if obj.cate == 'type' then
+            compiler.getClassFields(suri, obj, key, pushResult)
         end
     end)
     : case 'local'
-    : call(function (suri, node, key, pushResult)
-        local sources = localID.getSources(node, key)
+    : call(function (suri, obj, key, pushResult)
+        local sources = localID.getSources(obj, key)
         if sources then
             for _, src in ipairs(sources) do
                 if guide.isSet(src) then
@@ -115,8 +115,8 @@ local searchFieldSwitch = util.switch()
         end
     end)
     : case 'doc.type.table'
-    : call(function (suri, node, key, pushResult)
-        for _, field in ipairs(node.fields) do
+    : call(function (suri, obj, key, pushResult)
+        for _, field in ipairs(obj.fields) do
             local fieldKey = field.name
             if fieldKey.type == 'doc.field.name' then
                 if fieldKey[1] == key then
@@ -146,7 +146,7 @@ local nodeSwitch = util.switch()
         end
         local uri = guide.getUri(source)
         local key = guide.getKeyName(source)
-        for pn in nodeMgr.eachNode(parentNode) do
+        for pn in nodeMgr.eachObject(parentNode) do
             searchFieldSwitch(pn.type, uri, pn, key, pushResult)
         end
     end)
@@ -164,7 +164,7 @@ local nodeSwitch = util.switch()
             return
         end
         local uri = guide.getUri(source)
-        for pn in nodeMgr.eachNode(parentNode) do
+        for pn in nodeMgr.eachObject(parentNode) do
             searchFieldSwitch(pn.type, uri, pn, source[1], pushResult)
         end
     end)
@@ -201,7 +201,7 @@ local function searchByNode(source, pushResult)
         return
     end
     local suri = guide.getUri(source)
-    for n in nodeMgr.eachNode(node) do
+    for n in nodeMgr.eachObject(node) do
         if n.type == 'global' then
             for _, set in ipairs(n:getSets(suri)) do
                 pushResult(set)

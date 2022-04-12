@@ -1,14 +1,15 @@
 local union      = require 'vm.union'
 local files      = require 'files'
 
----@alias vm.node parser.object | vm.node.union | vm.node.global | vm.generic
+---@alias vm.node vm.node.union
+---@alias vm.object parser.object | vm.global | vm.generic
 
 ---@class vm.node-manager
 local m = {}
 
 local DUMMY_FUNCTION = function () end
 
----@type table<parser.object, vm.node>
+---@type table<vm.object, vm.node>
 m.nodeCache = {}
 
 ---@param a vm.node
@@ -23,7 +24,7 @@ function m.mergeNode(a, b)
     return union(a, b)
 end
 
----@param source parser.object
+---@param source vm.object
 ---@param node vm.node
 ---@param cover? boolean
 function m.setNode(source, node, cover)
@@ -36,21 +37,23 @@ function m.setNode(source, node, cover)
     end
     local me = m.nodeCache[source]
     if not me then
-        m.nodeCache[source] = node
+        if node.type == 'union' then
+            m.nodeCache[source] = node
+        else
+            m.nodeCache[source] = union(node)
+        end
         return
     end
-    if me == node then
-        return
-    end
-    m.nodeCache[source] = m.mergeNode(me, node)
+    m.nodeCache[source] = union(me, node)
 end
 
+---@return vm.node?
 function m.getNode(source)
     return m.nodeCache[source]
 end
 
----@param node vm.node
----@return vm.node.union
+---@param node vm.node?
+---@return vm.node
 function m.addOptional(node)
     if not node or node.type ~= 'union' then
         node = union(node)
@@ -59,7 +62,7 @@ function m.addOptional(node)
     return node
 end
 
----@param node vm.node
+---@param node vm.node?
 ---@return vm.node.union?
 function m.removeOptional(node)
     if not node then
@@ -72,8 +75,8 @@ function m.removeOptional(node)
     return node
 end
 
----@return fun():vm.node
-function m.eachNode(node)
+---@return fun():vm.object
+function m.eachObject(node)
     if not node then
         return DUMMY_FUNCTION
     end

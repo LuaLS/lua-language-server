@@ -74,7 +74,7 @@ end
 ---@param uri uri
 ---@param tnode vm.node
 ---@param knode vm.node
----@return vm.node.union?
+---@return vm.union?
 function vm.getTableValue(uri, tnode, knode)
     local result = union()
     for tn in nodeMgr.eachObject(tnode) do
@@ -115,7 +115,7 @@ end
 ---@param uri uri
 ---@param tnode vm.node
 ---@param vnode vm.node
----@return vm.node.union?
+---@return vm.union?
 function vm.getTableKey(uri, tnode, vnode)
     local result = union()
     for tn in nodeMgr.eachObject(tnode) do

@@ -370,7 +370,7 @@ local function getReturn(func, index, args)
         return m.compileNode(ast)
     end
     local node = m.compileNode(func)
-    ---@type vm.node.union
+    ---@type vm.union
     local result
     if node then
         for cnode in nodeMgr.eachObject(node) do
@@ -1519,6 +1519,7 @@ function m.resumeCache()
 end
 
 ---@param source vm.object
+---@param uri? uri
 ---@return vm.node
 function m.compileNode(source, uri)
     if not source then

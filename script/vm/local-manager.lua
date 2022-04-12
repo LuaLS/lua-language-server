@@ -29,7 +29,7 @@ function m.subscribeLocal(source, node)
     if not node then
         return
     end
-    if node.type == 'union' then
+    if node.type == 'vm.union' then
         node:subscribeLocal(source)
         return
     end

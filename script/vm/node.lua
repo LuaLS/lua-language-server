@@ -1,7 +1,7 @@
 local union      = require 'vm.union'
 local files      = require 'files'
 
----@alias vm.node vm.node.union
+---@alias vm.node vm.union
 ---@alias vm.object parser.object | vm.global | vm.generic
 
 ---@class vm.node-manager
@@ -37,7 +37,7 @@ function m.setNode(source, node, cover)
     end
     local me = m.nodeCache[source]
     if not me then
-        if node.type == 'union' then
+        if node.type == 'vm.union' then
             m.nodeCache[source] = node
         else
             m.nodeCache[source] = union(node)
@@ -55,7 +55,7 @@ end
 ---@param node vm.node?
 ---@return vm.node
 function m.addOptional(node)
-    if not node or node.type ~= 'union' then
+    if not node or node.type ~= 'vm.union' then
         node = union(node)
     end
     node = node:addOptional()
@@ -63,12 +63,12 @@ function m.addOptional(node)
 end
 
 ---@param node vm.node?
----@return vm.node.union?
+---@return vm.union?
 function m.removeOptional(node)
     if not node then
         return node
     end
-    if node.type ~= 'union' then
+    if node.type ~= 'vm.union' then
         node = union(node)
     end
     node = node:removeOptional()
@@ -80,7 +80,7 @@ function m.eachObject(node)
     if not node then
         return DUMMY_FUNCTION
     end
-    if node.type == 'union' then
+    if node.type == 'vm.union' then
         return node:eachNode()
     end
     local first = true

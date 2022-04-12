@@ -13,17 +13,22 @@ mt.type = 'generic'
 
 ---@param source    parser.object
 ---@param resolved? table<string, vm.node>
----@return vm.node
+---@return parser.object | vm.union
 local function cloneObject(source, resolved)
     if not resolved then
         return source
     end
     if source.type == 'doc.generic.name' then
         local key = source[1]
-        if not resolved[key] then
-            return source
-        end
-        return resolved[key] or source
+        local newName = {
+            type   = source.type,
+            start  = source.start,
+            finish = source.finish,
+            parent = source.parent,
+            [1]    = source[1],
+        }
+        nodeMgr.setNode(newName, resolved[key], true)
+        return newName
     end
     if source.type == 'doc.type' then
         local newType = {
@@ -35,7 +40,6 @@ local function cloneObject(source, resolved)
         }
         for i, typeUnit in ipairs(source.types) do
             local newObj     = cloneObject(typeUnit, resolved)
-            newObj.parent    = newType
             newType.types[i] = newObj
         end
         return newType
@@ -49,8 +53,6 @@ local function cloneObject(source, resolved)
             name    = source.name,
             extends = cloneObject(source.extends, resolved)
         }
-        newArg.name.parent    = newArg
-        newArg.extends.parent = newArg
         return newArg
     end
     if source.type == 'doc.type.array' then
@@ -61,7 +63,6 @@ local function cloneObject(source, resolved)
             parent = source.parent,
             node   = cloneObject(source.node, resolved),
         }
-        newArray.node.parent = newArray
         return newArray
     end
     if source.type == 'doc.type.table' then
@@ -81,8 +82,6 @@ local function cloneObject(source, resolved)
                 name    = cloneObject(field.name, resolved),
                 extends = cloneObject(field.extends, resolved),
             }
-            newField.name.parent    = newField
-            newField.extends.parent = newField
             newTable.fields[i] = newField
         end
         return newTable
@@ -97,15 +96,18 @@ local function cloneObject(source, resolved)
             returns = {},
         }
         for i, arg in ipairs(source.args) do
-            local newObj       = cloneObject(arg, resolved)
-            newObj.parent      = newDocFunc
-            newObj.optional    = arg.optional
+            local newObj = cloneObject(arg, resolved)
+            if arg.optional and newObj.type == 'vm.union' then
+                newObj:addOptional()
+            end
             newDocFunc.args[i] = newObj
         end
         for i, ret in ipairs(source.returns) do
-            local newObj          = cloneObject(ret, resolved)
-            newObj.parent         = newDocFunc
-            newObj.optional       = ret.optional
+            local newObj  = cloneObject(ret, resolved)
+            newObj.parent = newDocFunc
+            if ret.optional and newObj.type == 'vm.union' then
+                newObj:addOptional()
+            end
             newDocFunc.returns[i] = cloneObject(ret, resolved)
         end
         return newDocFunc
@@ -117,10 +119,12 @@ end
 ---@param args parser.object
 ---@return parser.object
 function mt:resolve(uri, args)
+    local compiler = require 'vm.compiler'
     local resolved = self.sign:resolve(uri, args)
     local result = union()
     for nd in nodeMgr.eachObject(self.proto) do
-        result:merge(cloneObject(nd, resolved))
+        local clonedNode = compiler.compileNode(cloneObject(nd, resolved))
+        result:merge(clonedNode)
     end
     return result
 end

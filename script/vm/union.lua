@@ -1,15 +1,15 @@
 local localMgr = require 'vm.local-manager'
 
----@class vm.node.union
+---@class vm.union
 local mt = {}
 mt.__index   = mt
-mt.type      = 'union'
+mt.type      = 'vm.union'
 mt.optional  = nil
 mt.lastInfer = nil
 
 ---@param me   vm.node
 ---@param node vm.node
----@return vm.node.union
+---@return vm.union
 local function createUnion(me, node)
     local union = setmetatable({}, mt)
     union:merge(me)
@@ -22,7 +22,7 @@ function mt:merge(node)
     if not node then
         return
     end
-    if node.type == 'union' then
+    if node.type == 'vm.union' then
         for _, c in ipairs(node) do
             if not self[c] then
                 self[c]       = true
@@ -65,7 +65,7 @@ function mt:eachNode()
     end
 end
 
----@return vm.node.union
+---@return vm.union
 function mt:addOptional()
     if self:isOptional() then
         return self
@@ -74,7 +74,7 @@ function mt:addOptional()
     return self
 end
 
----@return vm.node.union
+---@return vm.union
 function mt:removeOptional()
     self.optional = nil
     if not self:isOptional() then

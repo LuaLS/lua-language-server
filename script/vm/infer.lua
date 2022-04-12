@@ -164,14 +164,14 @@ function m.getInfer(source)
         return m.NULL
     end
     -- TODO: more cache?
-    if node.type == 'union' and node.lastInfer then
+    if node.type == 'vm.union' and node.lastInfer then
         return node.lastInfer
     end
     local infer = setmetatable({
         node  = node,
         uri   = guide.getUri(source),
     }, mt)
-    if node.type == 'union' then
+    if node.type == 'vm.union' then
         node.lastInfer = infer
     end
 

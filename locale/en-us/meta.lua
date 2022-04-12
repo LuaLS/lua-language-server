@@ -677,6 +677,12 @@ Returns the elements from the given list. This function is equivalent to
 ```
 By default, `i` is `1` and `j` is `#list`.
 ]]
+table.foreach               =
+'Executes the given f over all elements of table. For each element, f is called with the index and respective value as arguments. If f returns a non-nil value, then the loop is broken, and this value is returned as the final value of foreach.'
+table.foreachi              =
+'Executes the given f over the numerical indices of table. For each index, f is called with the index and respective value as arguments. Indices are visited in sequential order, from 1 to n, where n is the size of the table. If f returns a non-nil value, then the loop is broken and this value is returned as the result of foreachi.'
+table.getn                  =
+'Returns the number of elements in the table. This function is equivalent to `#list`.'
 
 utf8                        =
 ''

@@ -655,6 +655,12 @@ table.unpack                =
 ```
 i 默认为 1 ，j 默认为 #list。
 ]]
+table.foreach               =
+'遍历表中的每一个元素，并以key和value执行回调函数。如果回调函数返回一个非nil值则循环终止,并且返回这个值。该函数等同pair(list),比pair(list)更慢。不推荐使用'
+table.foreachi              =
+'遍历数组中的每一个元素，并以索引号index和value执行回调函数。如果回调函数返回一个非nil值则循环终止,并且返回这个值。该函数等同ipair(list),比ipair(list)更慢。不推荐使用'
+table.getn                  =
+'返回表的长度。该函数等价于#list。'
 
 utf8                        =
 ''

@@ -64,4 +64,31 @@ function table.sort(list, comp) end
 ---@nodiscard
 function table.unpack(list, i, j) end
 
+---@version <5.1, JIT
+---#DES 'table.foreach'
+---@generic T
+---@param list any
+---@param callback fun(key: string, value: any):T|nil
+---@return T|nil
+---@deprecated
+function table.foreach(list, callback) end
+
+---@version <5.1, JIT
+---#DES 'table.foreachi'
+---@generic T
+---@param list any
+---@param callback fun(key: string, value: any):T|nil
+---@return T|nil
+---@deprecated
+function table.foreachi(list, callback) end
+
+---@version <5.1, JIT
+---#DES 'table.getn'
+---@generic T
+---@param list T[]
+---@return integer
+---@nodiscard
+---@deprecated
+function table.getn(list) end
+
 return table

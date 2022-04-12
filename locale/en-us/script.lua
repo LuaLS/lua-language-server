@@ -464,6 +464,10 @@ This icon is a cat,
 Not a dog nor a fox!
              ↓↓↓
 ]]
+WINDOW_LUA_STATUS_DIAGNOSIS_TITLE=
+'Perform workspace diagnosis'
+WINDOW_LUA_STATUS_DIAGNOSIS_MSG  =
+'Do you want to perform workspace diagnosis?'
 WINDOW_APPLY_SETTING             =
 'Apply setting'
 WINDOW_CHECK_SEMANTIC            =
@@ -533,3 +537,4 @@ CLI_CHECK_SUCCESS =
 'Diagnosis completed, no problems found'
 CLI_CHECK_RESULTS =
 'Diagnosis complete, {} problems found, see {}'
+

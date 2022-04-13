@@ -1,5 +1,3 @@
-local nodeMgr = require 'vm.node'
-local union   = require 'vm.union'
 local vm      = require 'vm.vm'
 
 ---@class parser.object
@@ -14,7 +12,7 @@ mt.type = 'generic'
 
 ---@param source    parser.object
 ---@param resolved? table<string, vm.node>
----@return parser.object | vm.union
+---@return parser.object | vm.node
 local function cloneObject(source, resolved)
     if not resolved then
         return source
@@ -28,7 +26,9 @@ local function cloneObject(source, resolved)
             parent = source.parent,
             [1]    = source[1],
         }
-        nodeMgr.setNode(newName, resolved[key], true)
+        if resolved[key] then
+            vm.setNode(newName, resolved[key], true)
+        end
         return newName
     end
     if source.type == 'doc.type' then
@@ -118,8 +118,8 @@ end
 function mt:resolve(uri, args)
     local resolved  = self.sign:resolve(uri, args)
     local protoNode = vm.compileNode(self.proto)
-    local result = union()
-    for nd in nodeMgr.eachObject(protoNode) do
+    local result = vm.createNode()
+    for nd in protoNode:eachObject() do
         local clonedNode = vm.compileNode(cloneObject(nd, resolved))
         result:merge(clonedNode)
     end

@@ -4,7 +4,6 @@ local util      = require 'utility'
 local guide     = require 'parser.guide'
 local localID   = require 'vm.local-id'
 local globalMgr = require 'vm.global-manager'
-local nodeMgr   = require 'vm.node'
 local files     = require 'files'
 local await     = require 'await'
 local progress  = require 'progress'
@@ -271,7 +270,7 @@ local function searchByNode(source, pushResult)
         return
     end
     local uri = guide.getUri(source)
-    for n in nodeMgr.eachObject(node) do
+    for n in node:eachObject() do
         if n.type == 'global' then
             for _, get in ipairs(n:getGets(uri)) do
                 pushResult(get)

@@ -26,10 +26,11 @@ end
 ---@param source parser.object
 ---@param node   vm.node
 function m.subscribeLocal(source, node)
+    -- TODO: need delete
     if not node then
         return
     end
-    if node.type == 'vm.union' then
+    if node.type == 'vm.node' then
         node:subscribeLocal(source)
         return
     end

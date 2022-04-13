@@ -1,5 +1,4 @@
 local guide         = require 'parser.guide'
-local nodeMgr       = require 'vm.node'
 local vm            = require 'vm.vm'
 
 ---@class vm.sign
@@ -31,19 +30,19 @@ function mt:resolve(uri, args)
             local key = typeUnit[1]
             if typeUnit.literal then
                 -- 'number' -> `T`
-                for n in nodeMgr.eachObject(node) do
+                for n in node:eachObject() do
                     if n.type == 'string' then
                         local type = globalMgr.declareGlobal('type', n[1], guide.getUri(n))
-                        resolved[key] = nodeMgr.mergeNode(type, resolved[key])
+                        resolved[key] = vm.createNode(type, resolved[key])
                     end
                 end
             else
                 -- number -> T
-                resolved[key] = nodeMgr.mergeNode(node, resolved[key])
+                resolved[key] = vm.createNode(node, resolved[key])
             end
         end
         if typeUnit.type == 'doc.type.array' then
-            for n in nodeMgr.eachObject(node) do
+            for n in node:eachObject() do
                 if n.type == 'doc.type.array' then
                     -- number[] -> T[]
                     resolve(typeUnit.node, vm.compileNode(n.node))
@@ -80,11 +79,11 @@ function mt:resolve(uri, args)
         if not sign then
             break
         end
-        for n in nodeMgr.eachObject(sign) do
+        for n in sign:eachObject() do
             local argNode = vm.compileNode(arg)
             if argNode then
                 if sign.optional then
-                    argNode = nodeMgr.removeOptional(argNode)
+                    argNode:removeOptional()
                 end
                 resolve(n, argNode)
             end

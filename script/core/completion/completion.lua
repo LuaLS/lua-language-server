@@ -20,7 +20,6 @@ local infer        = require 'vm.infer'
 local await        = require 'await'
 local postfix      = require 'core.completion.postfix'
 local globalMgr    = require 'vm.global-manager'
-local nodeMgr      = require 'vm.node'
 
 local diagnosticModes = {
     'disable-next-line',
@@ -1405,7 +1404,7 @@ local function tryCallArg(state, position, results)
     end
     local node = vm.compileCallArg({ type = 'dummyarg' }, call, argIndex)
     local enums = {}
-    for src in nodeMgr.eachObject(node) do
+    for src in node:eachObject() do
         if src.type == 'doc.type.string'
         or src.type == 'doc.type.integer'
         or src.type == 'doc.type.boolean' then

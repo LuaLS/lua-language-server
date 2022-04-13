@@ -4,7 +4,6 @@ local util      = require 'utility'
 local guide     = require 'parser.guide'
 local localID   = require 'vm.local-id'
 local globalMgr = require 'vm.global-manager'
-local nodeMgr   = require 'vm.node'
 
 local simpleSwitch
 
@@ -145,7 +144,7 @@ local nodeSwitch = util.switch()
         end
         local uri = guide.getUri(source)
         local key = guide.getKeyName(source)
-        for pn in nodeMgr.eachObject(parentNode) do
+        for pn in parentNode:eachObject() do
             searchFieldSwitch(pn.type, uri, pn, key, pushResult)
         end
     end)
@@ -163,7 +162,7 @@ local nodeSwitch = util.switch()
             return
         end
         local uri = guide.getUri(source)
-        for pn in nodeMgr.eachObject(parentNode) do
+        for pn in parentNode:eachObject() do
             searchFieldSwitch(pn.type, uri, pn, source[1], pushResult)
         end
     end)
@@ -200,7 +199,7 @@ local function searchByNode(source, pushResult)
         return
     end
     local suri = guide.getUri(source)
-    for n in nodeMgr.eachObject(node) do
+    for n in node:eachObject() do
         if n.type == 'global' then
             for _, set in ipairs(n:getSets(suri)) do
                 pushResult(set)

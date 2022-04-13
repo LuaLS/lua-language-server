@@ -3,6 +3,8 @@ local files          = require 'files'
 local globalManager  = require 'vm.global-manager'
 local localManager = require 'vm.local-manager'
 
+---@alias vm.object parser.object | vm.global | vm.generic
+
 ---@class vm.state
 local m = {}
 for uri in files.eachFile() do

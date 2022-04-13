@@ -3,6 +3,8 @@ local guide         = require 'parser.guide'
 local globalBuilder = require 'vm.global'
 local signMgr       = require 'vm.sign'
 local genericMgr    = require 'vm.generic'
+---@class vm
+local vm            = require 'vm.vm'
 
 ---@class parser.object
 ---@field _globalNode vm.global
@@ -145,6 +147,7 @@ local compilerGlobalSwitch = util.switch()
         end
     end)
     : case 'doc.class'
+    ---@param source parser.object
     : call(function (source)
         local uri  = guide.getUri(source)
         local name = guide.getKeyName(source)
@@ -155,7 +158,7 @@ local compilerGlobalSwitch = util.switch()
         if source.signs then
             source._sign = signMgr()
             for _, sign in ipairs(source.signs) do
-                source._sign:addSign(sign)
+                source._sign:addSign(vm.compileNode(sign))
             end
             if source.extends then
                 for _, ext in ipairs(source.extends) do
@@ -177,7 +180,7 @@ local compilerGlobalSwitch = util.switch()
         if source.signs then
             source._sign = signMgr()
             for _, sign in ipairs(source.signs) do
-                source._sign:addSign(sign)
+                source._sign:addSign(vm.compileNode(sign))
             end
             source.extends._generic = genericMgr(source.extends, source._sign)
         end

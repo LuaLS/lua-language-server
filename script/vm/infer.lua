@@ -1,8 +1,6 @@
 local util     = require 'utility'
-local nodeMgr  = require 'vm.node'
 local config   = require 'config'
 local guide    = require 'parser.guide'
-local union    = require 'vm.union'
 local vm       = require 'vm.vm'
 
 ---@class vm.infer-manager
@@ -163,17 +161,14 @@ function m.getInfer(source)
     if not node then
         return m.NULL
     end
-    -- TODO: more cache?
-    if node.type == 'vm.union' and node.lastInfer then
+    if node.lastInfer then
         return node.lastInfer
     end
     local infer = setmetatable({
         node  = node,
         uri   = guide.getUri(source),
     }, mt)
-    if node.type == 'vm.union' then
-        node.lastInfer = infer
-    end
+    node.lastInfer = infer
 
     return infer
 end
@@ -203,7 +198,7 @@ end
 
 function mt:_eraseAlias()
     local expandAlias = config.get(self.uri, 'Lua.hover.expandAlias')
-    for n in nodeMgr.eachObject(self.node) do
+    for n in self.node:eachObject() do
         if n.type == 'global' and n.cate == 'type' then
             for _, set in ipairs(n:getSets(self.uri)) do
                 if set.type == 'doc.alias' then
@@ -250,7 +245,7 @@ function mt:_computeViews()
 
     self.views = {}
 
-    for n in nodeMgr.eachObject(self.node) do
+    for n in self.node:eachObject() do
         local view = viewNodeSwitch(n.type, n, self)
         if view then
             self.views[view] = true
@@ -329,7 +324,7 @@ function mt:merge(other)
     end
 
     local infer = setmetatable({
-        node  = union(self.node, other.node),
+        node  = vm.createNode(self.node, other.node),
         uri   = self.uri,
     }, mt)
 
@@ -343,7 +338,7 @@ function mt:viewLiterals()
     end
     local mark     = {}
     local literals = {}
-    for n in nodeMgr.eachObject(self.node) do
+    for n in self.node:eachObject() do
         if n.type == 'string'
         or n.type == 'number'
         or n.type == 'integer'
@@ -369,7 +364,7 @@ function mt:viewClass()
     end
     local mark  = {}
     local class = {}
-    for n in nodeMgr.eachObject(self.node) do
+    for n in self.node:eachObject() do
         if n.type == 'global' and n.cate == 'type' then
             local name = n.name
             if not mark[name] then

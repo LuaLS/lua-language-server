@@ -1,6 +1,4 @@
-local nodeMgr   = require 'vm.node'
 local globalMgr = require 'vm.global-manager'
-local union     = require 'vm.union'
 ---@class vm
 local vm        = require 'vm.vm'
 
@@ -11,10 +9,10 @@ local vm        = require 'vm.vm'
 ---@return boolean
 function vm.isSubType(uri, child, parent, mark)
     if type(parent) == 'string' then
-        parent = globalMgr.getGlobal('type', parent)
+        parent = vm.createNode(globalMgr.getGlobal('type', parent))
     end
     if type(child) == 'string' then
-        child = globalMgr.getGlobal('type', child)
+        child = vm.createNode(globalMgr.getGlobal('type', child))
     end
 
     if not child or not parent then
@@ -22,33 +20,33 @@ function vm.isSubType(uri, child, parent, mark)
     end
 
     mark = mark or {}
-    for childNode in nodeMgr.eachObject(child) do
-        if childNode.type ~= 'global'
-        or childNode.cate ~= 'type' then
+    for obj in child:eachObject() do
+        if obj.type ~= 'global'
+        or obj.cate ~= 'type' then
             goto CONTINUE_CHILD
         end
-        if mark[childNode.name] then
+        if mark[obj.name] then
             return false
         end
-        mark[childNode.name] = true
-        for parentNode in nodeMgr.eachObject(parent) do
+        mark[obj.name] = true
+        for parentNode in parent:eachObject() do
             if parentNode.type ~= 'global'
             or parentNode.cate ~= 'type' then
                 goto CONTINUE_PARENT
             end
-            if parentNode.name == 'any' or childNode.name == 'any' then
+            if parentNode.name == 'any' or obj.name == 'any' then
                 return true
             end
 
-            if parentNode.name == childNode.name then
+            if parentNode.name == obj.name then
                 return true
             end
 
-            for _, set in ipairs(childNode:getSets(uri)) do
+            for _, set in ipairs(obj:getSets(uri)) do
                 if set.type == 'doc.class' and set.extends then
                     for _, ext in ipairs(set.extends) do
                         if  ext.type == 'doc.extends.name'
-                        and vm.isSubType(uri, ext[1], parentNode, mark) then
+                        and vm.isSubType(uri, ext[1], parentNode.name, mark) then
                             return true
                         end
                     end
@@ -56,7 +54,7 @@ function vm.isSubType(uri, child, parent, mark)
                 if set.type == 'doc.alias' and set.extends then
                     for _, ext in ipairs(set.extends.types) do
                         if  ext.type == 'doc.type.name'
-                        and vm.isSubType(uri, ext[1], parentNode, mark) then
+                        and vm.isSubType(uri, ext[1], parentNode.name, mark) then
                             return true
                         end
                     end
@@ -73,10 +71,10 @@ end
 ---@param uri uri
 ---@param tnode vm.node
 ---@param knode vm.node
----@return vm.union?
+---@return vm.node?
 function vm.getTableValue(uri, tnode, knode)
-    local result = union()
-    for tn in nodeMgr.eachObject(tnode) do
+    local result = vm.createNode()
+    for tn in tnode:eachObject() do
         if tn.type == 'doc.type.table' then
             for _, field in ipairs(tn.fields) do
                 if vm.isSubType(uri, vm.compileNode(field.name), knode) then
@@ -114,10 +112,10 @@ end
 ---@param uri uri
 ---@param tnode vm.node
 ---@param vnode vm.node
----@return vm.union?
+---@return vm.node?
 function vm.getTableKey(uri, tnode, vnode)
-    local result = union()
-    for tn in nodeMgr.eachObject(tnode) do
+    local result = vm.createNode()
+    for tn in tnode:eachObject() do
         if tn.type == 'doc.type.table' then
             for _, field in ipairs(tn.fields) do
                 if vm.isSubType(uri, vm.compileNode(field.extends), vnode) then

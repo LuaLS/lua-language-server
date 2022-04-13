@@ -1,6 +1,6 @@
 local infer    = require 'vm.infer'
 local guide    = require 'parser.guide'
-local compiler = require 'vm.compiler'
+local vm       = require 'vm.vm'
 
 ---@param source parser.object
 ---@return integer
@@ -62,7 +62,7 @@ local function asFunction(source)
     local returns = {}
 
     for i = 1, num do
-        local rtn  = compiler.getReturnOfFunction(source, i)
+        local rtn  = vm.getReturnOfFunction(source, i)
         local doc  = docs[i]
         local name = doc and doc.name and doc.name[1] and (doc.name[1] .. ': ')
         local text = ('%s%s%s'):format(

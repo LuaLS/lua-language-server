@@ -1,14 +1,12 @@
 local nodeMgr  = require 'vm.node'
 local guide    = require 'parser.guide'
-local compiler = require 'vm.compiler'
-
----@class vm.value-manager
-local m = {}
+---@class vm
+local vm       = require 'vm.vm'
 
 ---@param source parser.object
 ---@return boolean|nil
-function m.test(source)
-    local node = compiler.compileNode(source)
+function vm.test(source)
+    local node = vm.compileNode(source)
     local hasTrue, hasFalse
     for n in nodeMgr.eachObject(node) do
         if n.type == 'boolean' then
@@ -79,9 +77,9 @@ end
 ---@param a vm.node
 ---@param b vm.node
 ---@return boolean|nil
-function m.equal(a, b)
-    local nodeA = compiler.compileNode(a)
-    local nodeB = compiler.compileNode(b)
+function vm.equal(a, b)
+    local nodeA = vm.compileNode(a)
+    local nodeB = vm.compileNode(b)
     local mapA = {}
     for obj in nodeMgr.eachObject(nodeA) do
         local unique = getUnique(obj)
@@ -104,8 +102,8 @@ end
 
 ---@param v vm.node
 ---@return integer?
-function m.getInteger(v)
-    local node = compiler.compileNode(v)
+function vm.getInteger(v)
+    local node = vm.compileNode(v)
     local result
     for n in nodeMgr.eachObject(node) do
         if n.type == 'integer' then
@@ -132,8 +130,8 @@ end
 
 ---@param v vm.node
 ---@return integer?
-function m.getString(v)
-    local node = compiler.compileNode(v)
+function vm.getString(v)
+    local node = vm.compileNode(v)
     local result
     for n in nodeMgr.eachObject(node) do
         if n.type == 'string' then
@@ -152,8 +150,8 @@ end
 
 ---@param v vm.node
 ---@return number?
-function m.getNumber(v)
-    local node = compiler.compileNode(v)
+function vm.getNumber(v)
+    local node = vm.compileNode(v)
     local result
     for n in nodeMgr.eachObject(node) do
         if n.type == 'number'
@@ -173,8 +171,8 @@ end
 
 ---@param v vm.node
 ---@return boolean|nil
-function m.getBoolean(v)
-    local node = compiler.compileNode(v)
+function vm.getBoolean(v)
+    local node = vm.compileNode(v)
     local result
     for n in nodeMgr.eachObject(node) do
         if n.type == 'boolean' then
@@ -193,9 +191,9 @@ end
 
 ---@param v vm.node
 ---@return table<any, boolean>?
-function m.getLiterals(v)
+function vm.getLiterals(v)
     local map
-    local node = compiler.compileNode(v)
+    local node = vm.compileNode(v)
     for n in nodeMgr.eachObject(node) do
         local literal
         if n.type == 'boolean'
@@ -218,5 +216,3 @@ function m.getLiterals(v)
     end
     return map
 end
-
-return m

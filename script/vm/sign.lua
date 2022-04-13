@@ -1,6 +1,5 @@
 local guide         = require 'parser.guide'
 local nodeMgr       = require 'vm.node'
----@class vm
 local vm            = require 'vm.vm'
 
 ---@class vm.sign
@@ -22,7 +21,6 @@ function mt:resolve(uri, args)
     if not args then
         return nil
     end
-    local compiler  = require 'vm.compiler'
     local globalMgr = require 'vm.global-manager'
     local resolved = {}
 
@@ -48,14 +46,14 @@ function mt:resolve(uri, args)
             for n in nodeMgr.eachObject(node) do
                 if n.type == 'doc.type.array' then
                     -- number[] -> T[]
-                    resolve(typeUnit.node, compiler.compileNode(n.node))
+                    resolve(typeUnit.node, vm.compileNode(n.node))
                 end
             end
         end
         if typeUnit.type == 'doc.type.table' then
             for _, ufield in ipairs(typeUnit.fields) do
-                local ufieldNode = compiler.compileNode(ufield.name)
-                local uvalueNode = compiler.compileNode(ufield.extends)
+                local ufieldNode = vm.compileNode(ufield.name)
+                local uvalueNode = vm.compileNode(ufield.extends)
                 if ufieldNode[1].type == 'doc.generic.name' and uvalueNode[1].type == 'doc.generic.name' then
                     -- { [number]: number} -> { [K]: V }
                     local tfieldNode = vm.getTableKey(uri, node, 'any')
@@ -83,7 +81,7 @@ function mt:resolve(uri, args)
             break
         end
         for n in nodeMgr.eachObject(sign) do
-            local argNode = compiler.compileNode(arg)
+            local argNode = vm.compileNode(arg)
             if argNode then
                 if sign.optional then
                     argNode = nodeMgr.removeOptional(argNode)

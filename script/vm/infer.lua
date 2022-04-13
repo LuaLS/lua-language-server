@@ -2,8 +2,8 @@ local util     = require 'utility'
 local nodeMgr  = require 'vm.node'
 local config   = require 'config'
 local guide    = require 'parser.guide'
-local compiler = require 'vm.compiler'
 local union    = require 'vm.union'
+local vm       = require 'vm.vm'
 
 ---@class vm.infer-manager
 local m = {}
@@ -159,7 +159,7 @@ local viewNodeSwitch = util.switch()
 ---@param source parser.object
 ---@return vm.infer
 function m.getInfer(source)
-    local node = compiler.compileNode(source)
+    local node = vm.compileNode(source)
     if not node then
         return m.NULL
     end

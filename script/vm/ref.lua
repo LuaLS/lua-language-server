@@ -1,7 +1,6 @@
 ---@class vm
 local vm        = require 'vm.vm'
 local util      = require 'utility'
-local compiler  = require 'vm.compiler'
 local guide     = require 'parser.guide'
 local localID   = require 'vm.local-id'
 local globalMgr = require 'vm.global-manager'
@@ -220,7 +219,7 @@ local nodeSwitch = util.switch()
             return
         end
 
-        local parentNode = compiler.compileNode(source.node)
+        local parentNode = vm.compileNode(source.node)
         if not parentNode then
             return
         end
@@ -267,7 +266,7 @@ function searchByParentNode(source, pushResult, defMap, fileNotify)
 end
 
 local function searchByNode(source, pushResult)
-    local node = compiler.compileNode(source)
+    local node = vm.compileNode(source)
     if not node then
         return
     end

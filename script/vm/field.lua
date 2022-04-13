@@ -1,7 +1,6 @@
 ---@class vm
 local vm        = require 'vm.vm'
 local util      = require 'utility'
-local compiler  = require 'vm.compiler'
 local guide     = require 'parser.guide'
 
 local searchByNodeSwitch = util.switch()
@@ -18,7 +17,7 @@ local searchByNodeSwitch = util.switch()
 
 local function searchByNode(source, pushResult)
     local uri = guide.getUri(source)
-    compiler.compileByParentNode(source, nil, function (field)
+    vm.compileByParentNode(source, nil, function (field)
         searchByNodeSwitch(field.type, uri, field, pushResult)
     end)
 end

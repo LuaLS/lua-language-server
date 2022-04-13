@@ -1,5 +1,6 @@
 local nodeMgr = require 'vm.node'
 local union   = require 'vm.union'
+local vm      = require 'vm.vm'
 
 ---@class parser.object
 ---@field _generic vm.generic
@@ -115,12 +116,11 @@ end
 ---@param args parser.object
 ---@return parser.object
 function mt:resolve(uri, args)
-    local compiler  = require 'vm.compiler'
     local resolved  = self.sign:resolve(uri, args)
-    local protoNode = compiler.compileNode(self.proto)
+    local protoNode = vm.compileNode(self.proto)
     local result = union()
     for nd in nodeMgr.eachObject(protoNode) do
-        local clonedNode = compiler.compileNode(cloneObject(nd, resolved))
+        local clonedNode = vm.compileNode(cloneObject(nd, resolved))
         result:merge(clonedNode)
     end
     return result

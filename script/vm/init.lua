@@ -1,5 +1,7 @@
 local vm = require 'vm.vm'
 require 'vm.manager'
+require 'vm.compiler'
+require 'vm.value'
 require 'vm.def'
 require 'vm.ref'
 require 'vm.field'

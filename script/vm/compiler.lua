@@ -16,9 +16,6 @@ local vm         = require 'vm.vm'
 ---@field _compiledNodes  boolean
 ---@field _node           vm.node
 
----@class vm.node.compiler
-local m = {}
-
 local searchFieldSwitch = util.switch()
     : case 'table'
     : call(function (suri, node, key, pushResult)
@@ -74,7 +71,7 @@ local searchFieldSwitch = util.switch()
             end
         end
         if node.cate == 'type' then
-            m.getClassFields(suri, node, key, pushResult)
+            vm.getClassFields(suri, node, key, pushResult)
         end
     end)
     : case 'string'
@@ -82,7 +79,7 @@ local searchFieldSwitch = util.switch()
         -- change to `string: stringlib` ?
         local stringlib = globalMgr.getGlobal('type', 'stringlib')
         if stringlib then
-            m.getClassFields(suri, stringlib, key, pushResult)
+            vm.getClassFields(suri, stringlib, key, pushResult)
         end
     end)
     : case 'local'
@@ -114,7 +111,7 @@ local searchFieldSwitch = util.switch()
         for _, field in ipairs(node.fields) do
             local fieldKey = field.name
             if fieldKey.type == 'doc.type' then
-                local fieldNode = m.compileNode(fieldKey)
+                local fieldNode = vm.compileNode(fieldKey)
                 for fn in nodeMgr.eachObject(fieldNode) do
                     if fn.type == 'global' and fn.cate == 'type' then
                         if key == nil
@@ -137,7 +134,7 @@ local searchFieldSwitch = util.switch()
     end)
 
 
-function m.getClassFields(suri, node, key, pushResult)
+function vm.getClassFields(suri, node, key, pushResult)
     local mark = {}
 
     local function searchClass(class, searchedFields)
@@ -238,7 +235,7 @@ local function getObjectSign(source)
         end
         if source.args then
             for _, arg in ipairs(source.args) do
-                local argNode = m.compileNode(arg)
+                local argNode = vm.compileNode(arg)
                 if arg.optional then
                     argNode = nodeMgr.addOptional(argNode)
                 end
@@ -258,7 +255,7 @@ local function getObjectSign(source)
         source._sign = signMgr()
         if source.type == 'doc.type.function' then
             for _, arg in ipairs(source.args) do
-                local argNode = m.compileNode(arg.extends)
+                local argNode = vm.compileNode(arg.extends)
                 if arg.optional then
                     argNode = nodeMgr.addOptional(argNode)
                 end
@@ -272,7 +269,7 @@ end
 ---@param func  parser.object
 ---@param index integer
 ---@return vm.object?
-function m.getReturnOfFunction(func, index)
+function vm.getReturnOfFunction(func, index)
     if func.type == 'function' then
         if not func._returns then
             func._returns = {}
@@ -304,11 +301,11 @@ local function getReturnOfSetMetaTable(args)
     local mt   = args[2]
     local node = union()
     if tbl then
-        node:merge(m.compileNode(tbl))
+        node:merge(vm.compileNode(tbl))
     end
     if mt then
-        m.compileByParentNode(mt, '__index', function (src)
-            for n in nodeMgr.eachObject(m.compileNode(src)) do
+        vm.compileByParentNode(mt, '__index', function (src)
+            for n in nodeMgr.eachObject(vm.compileNode(src)) do
                 if n.type == 'global'
                 or n.type == 'local'
                 or n.type == 'table'
@@ -369,17 +366,17 @@ local function getReturn(func, index, args)
         if not ast then
             return nil
         end
-        return m.compileNode(ast)
+        return vm.compileNode(ast)
     end
-    local node = m.compileNode(func)
+    local node = vm.compileNode(func)
     ---@type vm.union
     local result
     if node then
         for cnode in nodeMgr.eachObject(node) do
             if cnode.type == 'function'
             or cnode.type == 'doc.type.function' then
-                local returnObject = m.getReturnOfFunction(cnode, index)
-                local returnNode   = m.compileNode(returnObject)
+                local returnObject = vm.getReturnOfFunction(cnode, index)
+                local returnNode   = vm.compileNode(returnObject)
                 if returnNode then
                     for rnode in nodeMgr.eachObject(returnNode) do
                         if rnode.type == 'generic' then
@@ -411,7 +408,7 @@ local function bindDocs(source)
         local doc = docs[i]
         if doc.type == 'doc.type' then
             if not isParam then
-                nodeMgr.setNode(source, m.compileNode(doc))
+                nodeMgr.setNode(source, vm.compileNode(doc))
                 return true
             end
         end
@@ -420,13 +417,13 @@ local function bindDocs(source)
             or (source._globalNode and guide.isSet(source))
             or source.type == 'tablefield'
             or source.type == 'tableindex' then
-                nodeMgr.setNode(source, m.compileNode(doc))
+                nodeMgr.setNode(source, vm.compileNode(doc))
                 return true
             end
         end
         if doc.type == 'doc.param' then
             if isParam and source[1] == doc.param[1] then
-                nodeMgr.setNode(source, m.compileNode(doc))
+                nodeMgr.setNode(source, vm.compileNode(doc))
                 return true
             end
         end
@@ -441,7 +438,7 @@ local function bindDocs(source)
             if not ast then
                 return nil
             end
-            nodeMgr.setNode(source, m.compileNode(ast))
+            nodeMgr.setNode(source, vm.compileNode(ast))
             return true
         end
     end
@@ -458,14 +455,14 @@ local function compileByLocalID(source)
         if src.bindDocs then
             if bindDocs(src) then
                 hasMarkDoc = true
-                nodeMgr.setNode(source, m.compileNode(src))
+                nodeMgr.setNode(source, vm.compileNode(src))
             end
         end
     end
     for _, src in ipairs(sources) do
         if src.value then
             if not hasMarkDoc or guide.isLiteral(src.value) then
-                nodeMgr.setNode(source, m.compileNode(src.value))
+                nodeMgr.setNode(source, vm.compileNode(src.value))
             end
         end
     end
@@ -474,8 +471,8 @@ end
 ---@param source vm.node
 ---@param key? any
 ---@param pushResult fun(source: parser.object)
-function m.compileByParentNode(source, key, pushResult)
-    local parentNode = m.compileNode(source)
+function vm.compileByParentNode(source, key, pushResult)
+    local parentNode = vm.compileNode(source)
     if not parentNode then
         return
     end
@@ -512,7 +509,7 @@ local function selectNode(source, list, index)
     if exp.type == 'call' then
         result = getReturn(exp.node, index, exp.args)
     else
-        result = m.compileNode(exp)
+        result = vm.compileNode(exp)
     end
     if source.type == 'function.return' then
         -- remove any for returns
@@ -582,13 +579,11 @@ end
 ---@param fixIndex integer
 ---@param myIndex  integer
 local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
-    local valueMgr = require 'vm.value'
-
     local eventIndex, eventMap
     if call.args then
         for i = 1, 2 do
             local eventArg = call.args[i + fixIndex]
-            eventMap = valueMgr.getLiterals(eventArg)
+            eventMap = vm.getLiterals(eventArg)
             if eventMap then
                 eventIndex = i
                 break
@@ -599,14 +594,14 @@ local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
     for n in nodeMgr.eachObject(callNode) do
         if n.type == 'function' then
             local farg = getFuncArg(n, myIndex)
-            for fn in nodeMgr.eachObject(m.compileNode(farg)) do
+            for fn in nodeMgr.eachObject(vm.compileNode(farg)) do
                 if isValidCallArgNode(arg, fn) then
                     nodeMgr.setNode(arg, fn)
                 end
             end
         end
         if n.type == 'doc.type.function' then
-            local argNode = m.compileNode(n.args[eventIndex])
+            local argNode = vm.compileNode(n.args[eventIndex])
             local event = argNode and argNode[1]
             if not event
             or not eventMap
@@ -614,7 +609,7 @@ local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
             or event.type ~= 'doc.type.string'
             or eventMap[event[1]] then
                 local farg = getFuncArg(n, myIndex)
-                for fn in nodeMgr.eachObject(m.compileNode(farg)) do
+                for fn in nodeMgr.eachObject(vm.compileNode(farg)) do
                     if isValidCallArgNode(arg, fn) then
                         nodeMgr.setNode(arg, fn)
                     end
@@ -627,7 +622,7 @@ end
 ---@param arg parser.object
 ---@param call parser.position
 ---@param index? integer
-function m.compileCallArg(arg, call, index)
+function vm.compileCallArg(arg, call, index)
     if not index then
         for i, carg in ipairs(call.args) do
             if carg == arg then
@@ -637,13 +632,13 @@ function m.compileCallArg(arg, call, index)
         end
     end
 
-    local callNode = m.compileNode(call.node)
+    local callNode = vm.compileNode(call.node)
     compileCallArgNode(arg, call, callNode, 0, index)
 
     if call.node.special == 'pcall'
     or call.node.special == 'xpcall' then
         local fixIndex = call.node.special == 'pcall' and 1 or 2
-        callNode = m.compileNode(call.args[1])
+        callNode = vm.compileNode(call.args[1])
         compileCallArgNode(arg, call, callNode, fixIndex, index - fixIndex)
     end
     return nodeMgr.getNode(arg)
@@ -667,7 +662,7 @@ local compilerSwitch = util.switch()
 
         if source.parent.type == 'callargs' then
             local call = source.parent.parent
-            m.compileCallArg(source, call)
+            vm.compileCallArg(source, call)
         end
 
         if source.parent.type == 'setglobal'
@@ -677,7 +672,7 @@ local compilerSwitch = util.switch()
         or source.parent.type == 'tableindex'
         or source.parent.type == 'setfield'
         or source.parent.type == 'setindex' then
-            nodeMgr.setNode(source, m.compileNode(source.parent))
+            nodeMgr.setNode(source, vm.compileNode(source.parent))
         end
     end)
     : case 'function'
@@ -687,7 +682,7 @@ local compilerSwitch = util.switch()
         if source.bindDocs then
             for _, doc in ipairs(source.bindDocs) do
                 if doc.type == 'doc.overload' then
-                    nodeMgr.setNode(source, m.compileNode(doc))
+                    nodeMgr.setNode(source, vm.compileNode(doc))
                 end
             end
         end
@@ -695,12 +690,12 @@ local compilerSwitch = util.switch()
         -- table.sort(string[], function (<?x?>) end)
         if source.parent.type == 'callargs' then
             local call = source.parent.parent
-            m.compileCallArg(source, call)
+            vm.compileCallArg(source, call)
         end
     end)
     : case 'paren'
     : call(function (source)
-        nodeMgr.setNode(source, m.compileNode(source.exp))
+        nodeMgr.setNode(source, vm.compileNode(source.exp))
     end)
     : case 'local'
     : call(function (source)
@@ -713,31 +708,31 @@ local compilerSwitch = util.switch()
         local hasMarkParam
         if source.dummy and not hasMarkDoc then
             hasMarkParam = true
-            nodeMgr.setNode(source, m.compileNode(source.method.node))
+            nodeMgr.setNode(source, vm.compileNode(source.method.node))
         end
         if source.value then
             if not hasMarkDoc or guide.isLiteral(source.value) then
                 if source.value and source.value.type == 'table' then
                     nodeMgr.setNode(source, source.value)
                 else
-                    nodeMgr.setNode(source, m.compileNode(source.value))
+                    nodeMgr.setNode(source, vm.compileNode(source.value))
                 end
             end
         end
         if  not source.value
         and source.ref
         and not hasMarkDoc then
-            m.pauseCache()
+            vm.pauseCache()
             for _, ref in ipairs(source.ref) do
                 if ref.type == 'setlocal' then
                     if ref.value and ref.value.type == 'table' then
                         nodeMgr.setNode(source, ref.value)
                     else
-                        nodeMgr.setNode(source, m.compileNode(ref.value))
+                        nodeMgr.setNode(source, vm.compileNode(ref.value))
                     end
                 end
             end
-            m.resumeCache()
+            vm.resumeCache()
         end
         -- function x.y(self, ...) --> function x:y(...)
         if  source[1] == 'self'
@@ -747,18 +742,18 @@ local compilerSwitch = util.switch()
             local setfield = source.parent.parent.parent
             if setfield.type == 'setfield' then
                 hasMarkParam = true
-                nodeMgr.setNode(source, m.compileNode(setfield.node))
+                nodeMgr.setNode(source, vm.compileNode(setfield.node))
             end
         end
         if source.parent.type == 'funcargs' and not hasMarkDoc and not hasMarkParam then
             local func = source.parent.parent
-            local funcNode = m.compileNode(func)
+            local funcNode = vm.compileNode(func)
             local hasDocArg
             for n in nodeMgr.eachObject(funcNode) do
                 if n.type == 'doc.type.function' then
                     for index, arg in ipairs(n.args) do
                         if func.args[index] == source then
-                            nodeMgr.setNode(source, m.compileNode(arg))
+                            nodeMgr.setNode(source, vm.compileNode(arg))
                             hasDocArg = true
                         end
                     end
@@ -770,7 +765,7 @@ local compilerSwitch = util.switch()
         end
         -- for x in ... do
         if source.parent.type == 'in' then
-            m.compileNode(source.parent)
+            vm.compileNode(source.parent)
         end
 
         -- for x = ... do
@@ -781,7 +776,7 @@ local compilerSwitch = util.switch()
     : case 'setlocal'
     : case 'getlocal'
     : call(function (source)
-        nodeMgr.setNode(source, m.compileNode(source.node), true)
+        nodeMgr.setNode(source, vm.compileNode(source.node), true)
     end)
     : case 'setfield'
     : case 'setmethod'
@@ -792,10 +787,10 @@ local compilerSwitch = util.switch()
         if key == nil then
             return
         end
-        m.compileByParentNode(source.node, key, function (src)
+        vm.compileByParentNode(source.node, key, function (src)
             if src.type == 'doc.type.field'
             or src.type == 'doc.field' then
-                nodeMgr.setNode(source, m.compileNode(src))
+                nodeMgr.setNode(source, vm.compileNode(src))
             end
         end)
     end)
@@ -806,18 +801,18 @@ local compilerSwitch = util.switch()
         compileByLocalID(source)
         local key = guide.getKeyName(source)
         if key == nil and source.index then
-            key = m.compileNode(source.index)
+            key = vm.compileNode(source.index)
         end
         if key == nil then
             return
         end
         if type(key) == 'table' then
             local uri = guide.getUri(source)
-            local value = vm.getTableValue(uri, m.compileNode(source.node), key)
+            local value = vm.getTableValue(uri, vm.compileNode(source.node), key)
             nodeMgr.setNode(source, value)
         else
-            m.compileByParentNode(source.node, key, function (src)
-                nodeMgr.setNode(source, m.compileNode(src))
+            vm.compileByParentNode(source.node, key, function (src)
+                nodeMgr.setNode(source, vm.compileNode(src))
             end)
         end
     end)
@@ -827,10 +822,10 @@ local compilerSwitch = util.switch()
             return
         end
         local key = guide.getKeyName(source)
-        m.compileByParentNode(source.node, key, function (src)
+        vm.compileByParentNode(source.node, key, function (src)
             if src.type == 'doc.type.field'
             or src.type == 'doc.field' then
-                nodeMgr.setNode(source, m.compileNode(src))
+                nodeMgr.setNode(source, vm.compileNode(src))
             end
         end)
     end)
@@ -840,8 +835,8 @@ local compilerSwitch = util.switch()
             return
         end
         local key = guide.getKeyName(source)
-        m.compileByParentNode(source.node, key, function (src)
-            nodeMgr.setNode(source, m.compileNode(src))
+        vm.compileByParentNode(source.node, key, function (src)
+            nodeMgr.setNode(source, vm.compileNode(src))
         end)
     end)
     : case 'tablefield'
@@ -857,25 +852,25 @@ local compilerSwitch = util.switch()
                 if source.value and source.value.type == 'table' then
                     nodeMgr.setNode(source, source.value)
                 else
-                    nodeMgr.setNode(source, m.compileNode(source.value))
+                    nodeMgr.setNode(source, vm.compileNode(source.value))
                 end
             end
         end
 
         if not hasMarkDoc then
-            m.compileByParentNode(source.parent, guide.getKeyName(source), function (src)
-                nodeMgr.setNode(source, m.compileNode(src))
+            vm.compileByParentNode(source.parent, guide.getKeyName(source), function (src)
+                nodeMgr.setNode(source, vm.compileNode(src))
             end)
         end
     end)
     : case 'field'
     : case 'method'
     : call(function (source)
-        nodeMgr.setNode(source, m.compileNode(source.parent))
+        nodeMgr.setNode(source, vm.compileNode(source.parent))
     end)
     : case 'tableexp'
     : call(function (source)
-        nodeMgr.setNode(source, m.compileNode(source.value))
+        nodeMgr.setNode(source, vm.compileNode(source.value))
     end)
     : case 'function.return'
     : call(function (source)
@@ -898,7 +893,7 @@ local compilerSwitch = util.switch()
                             if hasGeneric then
                                 nodeMgr.setNode(source, genericMgr(rtn, sign))
                             else
-                                nodeMgr.setNode(source, m.compileNode(rtn))
+                                nodeMgr.setNode(source, vm.compileNode(rtn))
                             end
                         end
                     end
@@ -915,7 +910,7 @@ local compilerSwitch = util.switch()
     : call(function (source)
         if source.returns then
             for _, rtn in ipairs(source.returns) do
-                nodeMgr.setNode(source, m.compileNode(rtn[1]))
+                nodeMgr.setNode(source, vm.compileNode(rtn[1]))
             end
         end
     end)
@@ -937,12 +932,12 @@ local compilerSwitch = util.switch()
             nodeMgr.setNode(source, node)
         end
         if vararg.type == 'varargs' then
-            nodeMgr.setNode(source, m.compileNode(vararg))
+            nodeMgr.setNode(source, vm.compileNode(vararg))
         end
     end)
     : case 'varargs'
     : call(function (source)
-        nodeMgr.setNode(source, m.compileNode(source.node))
+        nodeMgr.setNode(source, vm.compileNode(source.node))
     end)
     : case 'call'
     : call(function (source)
@@ -984,7 +979,7 @@ local compilerSwitch = util.switch()
     : case 'doc.type'
     : call(function (source)
         for _, typeUnit in ipairs(source.types) do
-            nodeMgr.setNode(source, m.compileNode(typeUnit))
+            nodeMgr.setNode(source, vm.compileNode(typeUnit))
         end
     end)
     : case 'doc.type.integer'
@@ -1027,23 +1022,23 @@ local compilerSwitch = util.switch()
     end)
     : case 'doc.class.name'
     : call(function (source)
-        nodeMgr.setNode(source, m.compileNode(source.parent))
+        nodeMgr.setNode(source, vm.compileNode(source.parent))
     end)
     : case 'doc.field'
     : call(function (source)
-        nodeMgr.setNode(source, m.compileNode(source.extends))
+        nodeMgr.setNode(source, vm.compileNode(source.extends))
     end)
     : case 'doc.type.field'
     : call(function (source)
-        nodeMgr.setNode(source, m.compileNode(source.extends))
+        nodeMgr.setNode(source, vm.compileNode(source.extends))
     end)
     : case 'doc.param'
     : call(function (source)
-        nodeMgr.setNode(source, m.compileNode(source.extends))
+        nodeMgr.setNode(source, vm.compileNode(source.extends))
     end)
     : case 'doc.vararg'
     : call(function (source)
-        nodeMgr.setNode(source, m.compileNode(source.vararg))
+        nodeMgr.setNode(source, vm.compileNode(source.vararg))
     end)
     : case '...'
     : call(function (source)
@@ -1056,28 +1051,28 @@ local compilerSwitch = util.switch()
         end
         for _, doc in ipairs(func.bindDocs) do
             if doc.type == 'doc.vararg' then
-                nodeMgr.setNode(source, m.compileNode(doc))
+                nodeMgr.setNode(source, vm.compileNode(doc))
             end
             if doc.type == 'doc.param' and doc.param[1] == '...' then
-                nodeMgr.setNode(source, m.compileNode(doc))
+                nodeMgr.setNode(source, vm.compileNode(doc))
             end
         end
     end)
     : case 'doc.overload'
     : call(function (source)
-        nodeMgr.setNode(source, m.compileNode(source.overload))
+        nodeMgr.setNode(source, vm.compileNode(source.overload))
     end)
     : case 'doc.see.name'
     : call(function (source)
         local type = globalMgr.getGlobal('type', source[1])
         if type then
-            nodeMgr.setNode(source, m.compileNode(type))
+            nodeMgr.setNode(source, vm.compileNode(type))
         end
     end)
     : case 'doc.type.arg'
     : call(function (source)
         if source.extends then
-            nodeMgr.setNode(source, m.compileNode(source.extends))
+            nodeMgr.setNode(source, vm.compileNode(source.extends))
         else
             nodeMgr.setNode(source, globalMgr.getGlobal('type', 'any'))
         end
@@ -1088,9 +1083,8 @@ local compilerSwitch = util.switch()
     end)
     : case 'unary'
     : call(function (source)
-        local valueMgr = require 'vm.value'
         if source.op.type == 'not' then
-            local result = valueMgr.test(source[1])
+            local result = vm.test(source[1])
             if result == nil then
                 nodeMgr.setNode(source, globalMgr.getGlobal('type', 'boolean'))
                 return
@@ -1110,7 +1104,7 @@ local compilerSwitch = util.switch()
             return
         end
         if source.op.type == '-' then
-            local v = valueMgr.getNumber(source[1])
+            local v = vm.getNumber(source[1])
             if v == nil then
                 nodeMgr.setNode(source, globalMgr.getGlobal('type', 'number'))
                 return
@@ -1126,7 +1120,7 @@ local compilerSwitch = util.switch()
             end
         end
         if source.op.type == '~' then
-            local v = valueMgr.getInteger(source[1])
+            local v = vm.getInteger(source[1])
             if v == nil then
                 nodeMgr.setNode(source, globalMgr.getGlobal('type', 'integer'))
                 return
@@ -1144,33 +1138,32 @@ local compilerSwitch = util.switch()
     end)
     : case 'binary'
     : call(function (source)
-        local valueMgr = require 'vm.value'
         if source.op.type == 'and' then
-            local r1 = valueMgr.test(source[1])
+            local r1 = vm.test(source[1])
             if r1 == true then
-                nodeMgr.setNode(source, m.compileNode(source[2]))
+                nodeMgr.setNode(source, vm.compileNode(source[2]))
                 return
             end
             if r1 == false then
-                nodeMgr.setNode(source, m.compileNode(source[1]))
+                nodeMgr.setNode(source, vm.compileNode(source[1]))
                 return
             end
             return
         end
         if source.op.type == 'or' then
-            local r1 = valueMgr.test(source[1])
+            local r1 = vm.test(source[1])
             if r1 == true then
-                nodeMgr.setNode(source, m.compileNode(source[1]))
+                nodeMgr.setNode(source, vm.compileNode(source[1]))
                 return
             end
             if r1 == false then
-                nodeMgr.setNode(source, m.compileNode(source[2]))
+                nodeMgr.setNode(source, vm.compileNode(source[2]))
                 return
             end
             return
         end
         if source.op.type == '==' then
-            local result = valueMgr.equal(source[1], source[2])
+            local result = vm.equal(source[1], source[2])
             if result == nil then
                 nodeMgr.setNode(source, globalMgr.getGlobal('type', 'boolean'))
                 return
@@ -1186,7 +1179,7 @@ local compilerSwitch = util.switch()
             end
         end
         if source.op.type == '~=' then
-            local result = valueMgr.equal(source[1], source[2])
+            local result = vm.equal(source[1], source[2])
             if result == nil then
                 nodeMgr.setNode(source, globalMgr.getGlobal('type', 'boolean'))
                 return
@@ -1202,8 +1195,8 @@ local compilerSwitch = util.switch()
             end
         end
         if source.op.type == '<<' then
-            local a = valueMgr.getInteger(source[1])
-            local b = valueMgr.getInteger(source[2])
+            local a = vm.getInteger(source[1])
+            local b = vm.getInteger(source[2])
             if a and b then
                 nodeMgr.setNode(source, {
                     type   = 'integer',
@@ -1219,8 +1212,8 @@ local compilerSwitch = util.switch()
             end
         end
         if source.op.type == '>>' then
-            local a = valueMgr.getInteger(source[1])
-            local b = valueMgr.getInteger(source[2])
+            local a = vm.getInteger(source[1])
+            local b = vm.getInteger(source[2])
             if a and b then
                 nodeMgr.setNode(source, {
                     type   = 'integer',
@@ -1236,8 +1229,8 @@ local compilerSwitch = util.switch()
             end
         end
         if source.op.type == '&' then
-            local a = valueMgr.getInteger(source[1])
-            local b = valueMgr.getInteger(source[2])
+            local a = vm.getInteger(source[1])
+            local b = vm.getInteger(source[2])
             if a and b then
                 nodeMgr.setNode(source, {
                     type   = 'integer',
@@ -1253,8 +1246,8 @@ local compilerSwitch = util.switch()
             end
         end
         if source.op.type == '|' then
-            local a = valueMgr.getInteger(source[1])
-            local b = valueMgr.getInteger(source[2])
+            local a = vm.getInteger(source[1])
+            local b = vm.getInteger(source[2])
             if a and b then
                 nodeMgr.setNode(source, {
                     type   = 'integer',
@@ -1270,8 +1263,8 @@ local compilerSwitch = util.switch()
             end
         end
         if source.op.type == '~' then
-            local a = valueMgr.getInteger(source[1])
-            local b = valueMgr.getInteger(source[2])
+            local a = vm.getInteger(source[1])
+            local b = vm.getInteger(source[2])
             if a and b then
                 nodeMgr.setNode(source, {
                     type   = 'integer',
@@ -1287,8 +1280,8 @@ local compilerSwitch = util.switch()
             end
         end
         if source.op.type == '+' then
-            local a = valueMgr.getNumber(source[1])
-            local b = valueMgr.getNumber(source[2])
+            local a = vm.getNumber(source[1])
+            local b = vm.getNumber(source[2])
             if a and b then
                 local result = a + b
                 nodeMgr.setNode(source, {
@@ -1305,8 +1298,8 @@ local compilerSwitch = util.switch()
             end
         end
         if source.op.type == '-' then
-            local a = valueMgr.getNumber(source[1])
-            local b = valueMgr.getNumber(source[2])
+            local a = vm.getNumber(source[1])
+            local b = vm.getNumber(source[2])
             if a and b then
                 local result = a - b
                 nodeMgr.setNode(source, {
@@ -1323,8 +1316,8 @@ local compilerSwitch = util.switch()
             end
         end
         if source.op.type == '*' then
-            local a = valueMgr.getNumber(source[1])
-            local b = valueMgr.getNumber(source[2])
+            local a = vm.getNumber(source[1])
+            local b = vm.getNumber(source[2])
             if a and b then
                 local result = a * b
                 nodeMgr.setNode(source, {
@@ -1341,8 +1334,8 @@ local compilerSwitch = util.switch()
             end
         end
         if source.op.type == '/' then
-            local a = valueMgr.getNumber(source[1])
-            local b = valueMgr.getNumber(source[2])
+            local a = vm.getNumber(source[1])
+            local b = vm.getNumber(source[2])
             if a and b then
                 nodeMgr.setNode(source, {
                     type   = 'number',
@@ -1358,8 +1351,8 @@ local compilerSwitch = util.switch()
             end
         end
         if source.op.type == '%' then
-            local a = valueMgr.getNumber(source[1])
-            local b = valueMgr.getNumber(source[2])
+            local a = vm.getNumber(source[1])
+            local b = vm.getNumber(source[2])
             if a and b then
                 local result = a % b
                 nodeMgr.setNode(source, {
@@ -1376,8 +1369,8 @@ local compilerSwitch = util.switch()
             end
         end
         if source.op.type == '^' then
-            local a = valueMgr.getNumber(source[1])
-            local b = valueMgr.getNumber(source[2])
+            local a = vm.getNumber(source[1])
+            local b = vm.getNumber(source[2])
             if a and b then
                 nodeMgr.setNode(source, {
                     type   = 'number',
@@ -1393,8 +1386,8 @@ local compilerSwitch = util.switch()
             end
         end
         if source.op.type == '//' then
-            local a = valueMgr.getNumber(source[1])
-            local b = valueMgr.getNumber(source[2])
+            local a = vm.getNumber(source[1])
+            local b = vm.getNumber(source[2])
             if a and b and b ~= 0 then
                 local result = a // b
                 nodeMgr.setNode(source, {
@@ -1411,10 +1404,10 @@ local compilerSwitch = util.switch()
             end
         end
         if source.op.type == '..' then
-            local a = valueMgr.getString(source[1])
-                   or valueMgr.getNumber(source[1])
-            local b = valueMgr.getString(source[2])
-                   or valueMgr.getNumber(source[2])
+            local a = vm.getString(source[1])
+                   or vm.getNumber(source[1])
+            local b = vm.getString(source[2])
+                   or vm.getNumber(source[2])
             if a and b then
                 if type(a) == 'number' or type(b) == 'number' then
                     local uri     = guide.getUri(source)
@@ -1464,7 +1457,7 @@ local function compileByGlobal(uri, source)
             for _, set in ipairs(source:getSets(uri)) do
                 if set.bindDocs then
                     if bindDocs(set) then
-                        nodeMgr.setNode(source, m.compileNode(set))
+                        nodeMgr.setNode(source, vm.compileNode(set))
                         hasMarkDoc = true
                     end
                 end
@@ -1472,7 +1465,7 @@ local function compileByGlobal(uri, source)
             for _, set in ipairs(source:getSets(uri)) do
                 if set.value then
                     if not hasMarkDoc or guide.isLiteral(set.value) then
-                        nodeMgr.setNode(source, m.compileNode(set.value))
+                        nodeMgr.setNode(source, vm.compileNode(set.value))
                     end
                 end
             end
@@ -1484,7 +1477,7 @@ local function compileByGlobal(uri, source)
                         for _, ext in ipairs(set.extends) do
                             if ext.type == 'doc.type.table' then
                                 if not ext._generic then
-                                    nodeMgr.setNode(source, m.compileNode(ext))
+                                    nodeMgr.setNode(source, vm.compileNode(ext))
                                 end
                             end
                         end
@@ -1492,7 +1485,7 @@ local function compileByGlobal(uri, source)
                 end
                 if set.type == 'doc.alias' then
                     if not set.extends._generic then
-                        nodeMgr.setNode(source, m.compileNode(set.extends))
+                        nodeMgr.setNode(source, vm.compileNode(set.extends))
                     end
                 end
             end
@@ -1500,7 +1493,7 @@ local function compileByGlobal(uri, source)
         return
     end
     if source._globalNode then
-        nodeMgr.setNode(source, m.compileNode(source._globalNode, uri))
+        nodeMgr.setNode(source, vm.compileNode(source._globalNode, uri))
         return
     end
 end
@@ -1508,11 +1501,11 @@ end
 local pauseCacheCount   = 0
 local originCacheKeys   = {}
 local originCacheValues = {}
-function m.pauseCache()
+function vm.pauseCache()
     pauseCacheCount = pauseCacheCount + 1
 end
 
-function m.resumeCache()
+function vm.resumeCache()
     pauseCacheCount = pauseCacheCount - 1
     if pauseCacheCount == 0 then
         for source in pairs(originCacheKeys) do
@@ -1526,7 +1519,7 @@ end
 ---@param source vm.object
 ---@param uri? uri
 ---@return vm.node
-function m.compileNode(source, uri)
+function vm.compileNode(source, uri)
     if not source then
         return false
     end
@@ -1548,5 +1541,3 @@ function m.compileNode(source, uri)
 
     return nodeMgr.nodeCache[source]
 end
-
-return m

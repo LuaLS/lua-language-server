@@ -1,5 +1,4 @@
 local nodeMgr   = require 'vm.node'
-local compiler  = require 'vm.compiler'
 local globalMgr = require 'vm.global-manager'
 local union     = require 'vm.union'
 ---@class vm
@@ -80,27 +79,27 @@ function vm.getTableValue(uri, tnode, knode)
     for tn in nodeMgr.eachObject(tnode) do
         if tn.type == 'doc.type.table' then
             for _, field in ipairs(tn.fields) do
-                if vm.isSubType(uri, compiler.compileNode(field.name), knode) then
-                    result:merge(compiler.compileNode(field.extends))
+                if vm.isSubType(uri, vm.compileNode(field.name), knode) then
+                    result:merge(vm.compileNode(field.extends))
                 end
             end
         end
         if tn.type == 'doc.type.array' then
-            result:merge(compiler.compileNode(tn.node))
+            result:merge(vm.compileNode(tn.node))
         end
         if tn.type == 'table' then
             for _, field in ipairs(tn) do
                 if field.type == 'tableindex' then
-                    result:merge(compiler.compileNode(field.value))
+                    result:merge(vm.compileNode(field.value))
                 end
                 if field.type == 'tablefield' then
                     if vm.isSubType(uri, knode, 'string') then
-                        result:merge(compiler.compileNode(field.value))
+                        result:merge(vm.compileNode(field.value))
                     end
                 end
                 if field.type == 'tableexp' then
                     if vm.isSubType(uri, knode, 'integer') and field.tindex == 1 then
-                        result:merge(compiler.compileNode(field.value))
+                        result:merge(vm.compileNode(field.value))
                     end
                 end
             end
@@ -121,8 +120,8 @@ function vm.getTableKey(uri, tnode, vnode)
     for tn in nodeMgr.eachObject(tnode) do
         if tn.type == 'doc.type.table' then
             for _, field in ipairs(tn.fields) do
-                if vm.isSubType(uri, compiler.compileNode(field.extends), vnode) then
-                    result:merge(compiler.compileNode(field.name))
+                if vm.isSubType(uri, vm.compileNode(field.extends), vnode) then
+                    result:merge(vm.compileNode(field.name))
                 end
             end
         end
@@ -132,7 +131,7 @@ function vm.getTableKey(uri, tnode, vnode)
         if tn.type == 'table' then
             for _, field in ipairs(tn) do
                 if field.type == 'tableindex' then
-                    result:merge(compiler.compileNode(field.index))
+                    result:merge(vm.compileNode(field.index))
                 end
                 if field.type == 'tablefield' then
                     result:merge(globalMgr.getGlobal('type', 'string'))

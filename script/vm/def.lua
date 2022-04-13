@@ -1,7 +1,6 @@
 ---@class vm
 local vm        = require 'vm.vm'
 local util      = require 'utility'
-local compiler  = require 'vm.compiler'
 local guide     = require 'parser.guide'
 local localID   = require 'vm.local-id'
 local globalMgr = require 'vm.global-manager'
@@ -100,7 +99,7 @@ local searchFieldSwitch = util.switch()
             end
         end
         if obj.cate == 'type' then
-            compiler.getClassFields(suri, obj, key, pushResult)
+            vm.getClassFields(suri, obj, key, pushResult)
         end
     end)
     : case 'local'
@@ -140,7 +139,7 @@ local nodeSwitch = util.switch()
     : case 'getindex'
     : case 'setindex'
     : call(function (source, pushResult)
-        local parentNode = compiler.compileNode(source.node)
+        local parentNode = vm.compileNode(source.node)
         if not parentNode then
             return
         end
@@ -159,7 +158,7 @@ local nodeSwitch = util.switch()
     end)
     : case 'doc.see.field'
     : call(function (source, pushResult)
-        local parentNode = compiler.compileNode(source.parent.name)
+        local parentNode = vm.compileNode(source.parent.name)
         if not parentNode then
             return
         end
@@ -196,7 +195,7 @@ function searchByParentNode(source, pushResult)
 end
 
 local function searchByNode(source, pushResult)
-    local node = compiler.compileNode(source)
+    local node = vm.compileNode(source)
     if not node then
         return
     end

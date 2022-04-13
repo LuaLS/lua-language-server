@@ -102,7 +102,7 @@ local viewNodeSwitch = util.switch()
     end)
     : case 'generic'
     : call(function (source, infer)
-        return ('<%s>'):format(source.proto[1])
+        return m.getInfer(source.proto):view()
     end)
     : case 'doc.generic.name'
     : call(function (source, infer)

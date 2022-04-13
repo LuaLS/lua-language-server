@@ -56,7 +56,7 @@ function mt:resolve(uri, args)
             for _, ufield in ipairs(typeUnit.fields) do
                 local ufieldNode = compiler.compileNode(ufield.name)
                 local uvalueNode = compiler.compileNode(ufield.extends)
-                if ufieldNode[1].type == 'doc.generic.name' and uvalueNode.type[1] == 'doc.generic.name' then
+                if ufieldNode[1].type == 'doc.generic.name' and uvalueNode[1].type == 'doc.generic.name' then
                     -- { [number]: number} -> { [K]: V }
                     local tfieldNode = vm.getTableKey(uri, node, 'any')
                     local tvalueNode = vm.getTableValue(uri, node, 'any')

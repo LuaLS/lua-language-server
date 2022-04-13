@@ -6,7 +6,7 @@ local union   = require 'vm.union'
 
 ---@class vm.generic
 ---@field sign  vm.sign
----@field proto vm.node
+---@field proto vm.object
 local mt = {}
 mt.__index = mt
 mt.type = 'generic'
@@ -97,17 +97,13 @@ local function cloneObject(source, resolved)
         }
         for i, arg in ipairs(source.args) do
             local newObj = cloneObject(arg, resolved)
-            if arg.optional and newObj.type == 'vm.union' then
-                newObj:addOptional()
-            end
+            newObj.optional    = arg.optional
             newDocFunc.args[i] = newObj
         end
         for i, ret in ipairs(source.returns) do
             local newObj  = cloneObject(ret, resolved)
-            newObj.parent = newDocFunc
-            if ret.optional and newObj.type == 'vm.union' then
-                newObj:addOptional()
-            end
+            newObj.parent   = newDocFunc
+            newObj.optional = ret.optional
             newDocFunc.returns[i] = cloneObject(ret, resolved)
         end
         return newDocFunc
@@ -119,18 +115,20 @@ end
 ---@param args parser.object
 ---@return parser.object
 function mt:resolve(uri, args)
-    local compiler = require 'vm.compiler'
-    local resolved = self.sign:resolve(uri, args)
+    local compiler  = require 'vm.compiler'
+    local resolved  = self.sign:resolve(uri, args)
+    local protoNode = compiler.compileNode(self.proto)
     local result = union()
-    for nd in nodeMgr.eachObject(self.proto) do
+    for nd in nodeMgr.eachObject(protoNode) do
         local clonedNode = compiler.compileNode(cloneObject(nd, resolved))
         result:merge(clonedNode)
     end
     return result
 end
 
----@param proto vm.node
+---@param proto vm.object
 ---@param sign  vm.sign
+---@return vm.generic
 return function (proto, sign)
     local generic = setmetatable({
         sign  = sign,

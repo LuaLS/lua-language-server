@@ -25,7 +25,7 @@ function m.mergeNode(a, b)
 end
 
 ---@param source vm.object
----@param node vm.node
+---@param node vm.node | vm.object
 ---@param cover? boolean
 function m.setNode(source, node, cover)
     if cover then

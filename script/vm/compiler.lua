@@ -269,6 +269,9 @@ local function getObjectSign(source)
     return source._sign
 end
 
+---@param func  parser.object
+---@param index integer
+---@return vm.object?
 function m.getReturnOfFunction(func, index)
     if func.type == 'function' then
         if not func._returns then
@@ -281,19 +284,18 @@ function m.getReturnOfFunction(func, index)
                 index  = index,
             }
         end
-        return m.compileNode(func._returns[index])
+        return func._returns[index]
     end
     if func.type == 'doc.type.function' then
         local rtn = func.returns[index]
         if not rtn then
             return nil
         end
-        local rtnNode = m.compileNode(rtn)
         local sign = getObjectSign(func)
         if not sign then
-            return rtnNode
+            return rtn
         end
-        return genericMgr(rtnNode, sign)
+        return genericMgr(rtn, sign)
     end
 end
 
@@ -376,7 +378,8 @@ local function getReturn(func, index, args)
         for cnode in nodeMgr.eachObject(node) do
             if cnode.type == 'function'
             or cnode.type == 'doc.type.function' then
-                local returnNode = m.getReturnOfFunction(cnode, index)
+                local returnObject = m.getReturnOfFunction(cnode, index)
+                local returnNode   = m.compileNode(returnObject)
                 if returnNode then
                     for rnode in nodeMgr.eachObject(returnNode) do
                         if rnode.type == 'generic' then
@@ -580,14 +583,6 @@ end
 ---@param myIndex  integer
 local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
     local valueMgr = require 'vm.value'
-    if not myIndex then
-        for i, carg in ipairs(call.args) do
-            if carg == arg then
-                myIndex = i - fixIndex
-                break
-            end
-        end
-    end
 
     local eventIndex, eventMap
     if call.args then
@@ -611,9 +606,11 @@ local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
             end
         end
         if n.type == 'doc.type.function' then
-            local event = m.compileNode(n.args[eventIndex])
+            local argNode = m.compileNode(n.args[eventIndex])
+            local event = argNode and argNode[1]
             if not event
             or not eventMap
+            or myIndex <= eventIndex
             or event.type ~= 'doc.type.string'
             or eventMap[event[1]] then
                 local farg = getFuncArg(n, myIndex)
@@ -629,8 +626,17 @@ end
 
 ---@param arg parser.object
 ---@param call parser.position
----@param index integer
+---@param index? integer
 function m.compileCallArg(arg, call, index)
+    if not index then
+        for i, carg in ipairs(call.args) do
+            if carg == arg then
+                index = i
+                break
+            end
+        end
+    end
+
     local callNode = m.compileNode(call.node)
     compileCallArgNode(arg, call, callNode, 0, index)
 
@@ -638,7 +644,7 @@ function m.compileCallArg(arg, call, index)
     or call.node.special == 'xpcall' then
         local fixIndex = call.node.special == 'pcall' and 1 or 2
         callNode = m.compileNode(call.args[1])
-        compileCallArgNode(arg, call, callNode, fixIndex, index)
+        compileCallArgNode(arg, call, callNode, fixIndex, index - fixIndex)
     end
     return nodeMgr.getNode(arg)
 end
@@ -889,11 +895,10 @@ local compilerSwitch = util.switch()
                                     hasGeneric = true
                                 end)
                             end
-                            local rtnNode = m.compileNode(rtn)
                             if hasGeneric then
-                                nodeMgr.setNode(source, genericMgr(rtnNode, sign))
+                                nodeMgr.setNode(source, genericMgr(rtn, sign))
                             else
-                                nodeMgr.setNode(source, rtnNode)
+                                nodeMgr.setNode(source, m.compileNode(rtn))
                             end
                         end
                     end

@@ -139,9 +139,6 @@ local nodeSwitch = util.switch()
     : case 'setindex'
     : call(function (source, pushResult)
         local parentNode = vm.compileNode(source.node)
-        if not parentNode then
-            return
-        end
         local uri = guide.getUri(source)
         local key = guide.getKeyName(source)
         for pn in parentNode:eachObject() do
@@ -158,9 +155,6 @@ local nodeSwitch = util.switch()
     : case 'doc.see.field'
     : call(function (source, pushResult)
         local parentNode = vm.compileNode(source.parent.name)
-        if not parentNode then
-            return
-        end
         local uri = guide.getUri(source)
         for pn in parentNode:eachObject() do
             searchFieldSwitch(pn.type, uri, pn, source[1], pushResult)
@@ -195,9 +189,6 @@ end
 
 local function searchByNode(source, pushResult)
     local node = vm.compileNode(source)
-    if not node then
-        return
-    end
     local suri = guide.getUri(source)
     for n in node:eachObject() do
         if n.type == 'global' then

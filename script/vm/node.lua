@@ -46,48 +46,26 @@ function mt:isEmpty()
     return #self == 0
 end
 
----@param source parser.object
-function mt:subscribeLocal(source)
-    -- TODO: need delete
-    for _, c in ipairs(self) do
-        localMgr.subscribeLocal(source, c)
-    end
-end
-
----@return vm.node
 function mt:addOptional()
     if self:isOptional() then
         return self
     end
     self.optional = true
-    return self
 end
 
----@return vm.node
 function mt:removeOptional()
-    self.optional = nil
     if not self:isOptional() then
         return self
     end
-    local newNode = vm.createNode()
-    for _, n in ipairs(self) do
-        if n.type == 'nil' then
-            goto CONTINUE
+    for i = #self, 1, -1 do
+        local n = self[i]
+        if n.type == 'nil'
+        or (n.type == 'boolean' and n[1] == false)
+        or (n.type == 'doc.type.boolean' and n[1] == false) then
+            self[i] = self[#self]
+            self[#self] = nil
         end
-        if n.type == 'boolean' and n[1] == false then
-            goto CONTINUE
-        end
-        if n.type == 'doc.type.boolean' and n[1] == false then
-            goto CONTINUE
-        end
-        if n.type == 'false' then
-            goto CONTINUE
-        end
-        newNode[#newNode+1] = n
-        ::CONTINUE::
     end
-    newNode.optional = false
-    return newNode
 end
 
 ---@return boolean
@@ -96,17 +74,9 @@ function mt:isOptional()
         return self.optional
     end
     for _, c in ipairs(self) do
-        if c.type == 'nil' then
-            self.optional = true
-            return true
-        end
-        if c.type == 'boolean' then
-            if c[1] == false then
-                self.optional = true
-                return true
-            end
-        end
-        if c.type == 'false' then
+        if c.type == 'nil'
+        or (c.type == 'boolean' and c[1] == false)
+        or (c.type == 'doc.type.boolean' and c[1] == false) then
             self.optional = true
             return true
         end

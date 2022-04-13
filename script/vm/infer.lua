@@ -158,9 +158,6 @@ local viewNodeSwitch = util.switch()
 ---@return vm.infer
 function m.getInfer(source)
     local node = vm.compileNode(source)
-    if not node then
-        return m.NULL
-    end
     if node.lastInfer then
         return node.lastInfer
     end
@@ -378,6 +375,12 @@ function mt:viewClass()
     end
     table.sort(class)
     return table.concat(class, '|')
+end
+
+---@param source parser.object
+---@return string?
+function m.viewObject(source)
+    return viewNodeSwitch(source.type, source, {})
 end
 
 return m

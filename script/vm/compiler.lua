@@ -242,7 +242,8 @@ local function getObjectSign(source)
         end
     end
     if source.type == 'doc.type.function'
-    or source.type == 'doc.type.table' then
+    or source.type == 'doc.type.table'
+    or source.type == 'doc.type.array' then
         local hasGeneric
         guide.eachSourceType(source, 'doc.generic.name', function ()
             hasGeneric = true
@@ -375,21 +376,21 @@ local function getReturn(func, index, args)
         if cnode.type == 'function'
         or cnode.type == 'doc.type.function' then
             local returnObject = vm.getReturnOfFunction(cnode, index)
-            local returnNode   = vm.compileNode(returnObject)
-            if returnNode then
+            if returnObject then
+                local returnNode = vm.compileNode(returnObject)
                 for rnode in returnNode:eachObject() do
                     if rnode.type == 'generic' then
                         returnNode = rnode:resolve(guide.getUri(func), args)
                         break
                     end
                 end
-            end
-            if returnNode then
-                for rnode in returnNode:eachObject() do
-                    -- TODO: narrow type
-                    if rnode.type ~= 'doc.generic.name' then
-                        result = result or vm.createNode()
-                        result:merge(rnode)
+                if returnNode then
+                    for rnode in returnNode:eachObject() do
+                        -- TODO: narrow type
+                        if rnode.type ~= 'doc.generic.name' then
+                            result = result or vm.createNode()
+                            result:merge(rnode)
+                        end
                     end
                 end
             end
@@ -471,9 +472,6 @@ end
 ---@param pushResult fun(source: parser.object)
 function vm.compileByParentNode(source, key, pushResult)
     local parentNode = vm.compileNode(source)
-    if not parentNode then
-        return
-    end
     local suri = guide.getUri(source)
     for node in parentNode:eachObject() do
         searchFieldSwitch(node.type, suri, node, key, pushResult)
@@ -508,7 +506,8 @@ local function selectNode(source, list, index)
     if exp.type == 'call' then
         result = getReturn(exp.node, index, exp.args)
         if not result then
-            return nil
+            vm.setNode(source, globalMgr.getGlobal('type', 'unknown'))
+            return vm.getNode(source)
         end
     else
         result = vm.compileNode(exp)
@@ -601,22 +600,27 @@ local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
     for n in callNode:eachObject() do
         if n.type == 'function' then
             local farg = getFuncArg(n, myIndex)
-            for fn in vm.compileNode(farg):eachObject() do
-                if isValidCallArgNode(arg, fn) then
-                    vm.setNode(arg, fn)
+            if farg then
+                for fn in vm.compileNode(farg):eachObject() do
+                    if isValidCallArgNode(arg, fn) then
+                        vm.setNode(arg, fn)
+                    end
                 end
             end
         end
         if n.type == 'doc.type.function' then
+            local myEvent
             if n.args[eventIndex] then
                 local argNode = vm.compileNode(n.args[eventIndex])
-                local event = argNode and argNode[1]
-                if not event
-                or not eventMap
-                or myIndex <= eventIndex
-                or event.type ~= 'doc.type.string'
-                or eventMap[event[1]] then
-                    local farg = getFuncArg(n, myIndex)
+                myEvent = argNode[1]
+            end
+            if not myEvent
+            or not eventMap
+            or myIndex <= eventIndex
+            or myEvent.type ~= 'doc.type.string'
+            or eventMap[myEvent[1]] then
+                local farg = getFuncArg(n, myIndex)
+                if farg then
                     for fn in vm.compileNode(farg):eachObject() do
                         if isValidCallArgNode(arg, fn) then
                             vm.setNode(arg, fn)
@@ -704,7 +708,9 @@ local compilerSwitch = util.switch()
     end)
     : case 'paren'
     : call(function (source)
-        vm.setNode(source, vm.compileNode(source.exp))
+        if source.exp then
+            vm.setNode(source, vm.compileNode(source.exp))
+        end
     end)
     : case 'local'
     : call(function (source)
@@ -720,10 +726,12 @@ local compilerSwitch = util.switch()
         end
         if source.value then
             if not hasMarkDoc or guide.isLiteral(source.value) then
-                if source.value and source.value.type == 'table' then
-                    vm.setNode(source, source.value)
-                else
-                    vm.setNode(source, vm.compileNode(source.value))
+                if source.value then
+                    if source.value.type == 'table' then
+                        vm.setNode(source, source.value)
+                    else
+                        vm.setNode(source, vm.compileNode(source.value))
+                    end
                 end
             end
         end
@@ -732,8 +740,8 @@ local compilerSwitch = util.switch()
         and not hasMarkDoc then
             vm.pauseCache()
             for _, ref in ipairs(source.ref) do
-                if ref.type == 'setlocal' then
-                    if ref.value and ref.value.type == 'table' then
+                if ref.type == 'setlocal' and ref.value then
+                    if ref.value.type == 'table' then
                         vm.setNode(source, ref.value)
                     else
                         vm.setNode(source, vm.compileNode(ref.value))
@@ -859,10 +867,12 @@ local compilerSwitch = util.switch()
 
         if source.value then
             if not hasMarkDoc or guide.isLiteral(source.value) then
-                if source.value and source.value.type == 'table' then
-                    vm.setNode(source, source.value)
-                else
-                    vm.setNode(source, vm.compileNode(source.value))
+                if source.value then
+                    if source.value.type == 'table' then
+                        vm.setNode(source, source.value)
+                    else
+                        vm.setNode(source, vm.compileNode(source.value))
+                    end
                 end
             end
         end
@@ -947,7 +957,9 @@ local compilerSwitch = util.switch()
     end)
     : case 'varargs'
     : call(function (source)
-        vm.setNode(source, vm.compileNode(source.node))
+        if source.node then
+            vm.setNode(source, vm.compileNode(source.node))
+        end
     end)
     : case 'call'
     : call(function (source)

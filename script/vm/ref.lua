@@ -218,11 +218,6 @@ local nodeSwitch = util.switch()
             return
         end
 
-        local parentNode = vm.compileNode(source.node)
-        if not parentNode then
-            return
-        end
-
         searchField(source, pushResult, defMap, fileNotify)
     end)
     : case 'tablefield'

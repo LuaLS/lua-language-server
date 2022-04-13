@@ -1382,8 +1382,8 @@ TEST [[
 return ('1'):gsub()
 ]]
 
-TEST [[
-local value
-value = '1'
-value = value:gsub()
-]]
+--TEST [[
+--local value
+--value = '1'
+--value = value:gsub()
+--]]

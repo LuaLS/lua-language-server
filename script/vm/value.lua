@@ -8,7 +8,8 @@ function vm.test(source)
     local node = vm.compileNode(source)
     local hasTrue, hasFalse
     for n in node:eachObject() do
-        if n.type == 'boolean' then
+        if n.type == 'boolean'
+        or n.type == 'doc.type.boolean' then
             if n[1] == true then
                 hasTrue = true
             end
@@ -35,6 +36,19 @@ function vm.test(source)
     else
         return false
     end
+end
+
+---@param source parser.object
+---@return boolean
+function vm.isFalsy(source)
+    if source.type == 'nil' then
+        return true
+    end
+    if source.type == 'boolean'
+    or source.type == 'doc.type.boolean' then
+        return source[1] == false
+    end
+    return false
 end
 
 ---@param v vm.object
@@ -77,6 +91,9 @@ end
 ---@param b vm.node
 ---@return boolean|nil
 function vm.equal(a, b)
+    if not a or not b then
+        return false
+    end
     local nodeA = vm.compileNode(a)
     local nodeB = vm.compileNode(b)
     local mapA = {}

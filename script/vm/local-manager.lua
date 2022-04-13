@@ -23,23 +23,6 @@ function m.declareLocal(source)
     locals[#locals+1] = source
 end
 
----@param source parser.object
----@param node   vm.node
-function m.subscribeLocal(source, node)
-    -- TODO: need delete
-    if not node then
-        return
-    end
-    if node.type == 'vm.node' then
-        node:subscribeLocal(source)
-        return
-    end
-    if not m.allLocals[node] then
-        return
-    end
-    m.localSubs[node][source] = true
-end
-
 ---@param uri uri
 function m.dropUri(uri)
     local locals = m.locals[uri]

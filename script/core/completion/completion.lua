@@ -1403,6 +1403,9 @@ local function tryCallArg(state, position, results)
         return
     end
     local node = vm.compileCallArg({ type = 'dummyarg' }, call, argIndex)
+    if not node then
+        return
+    end
     local enums = {}
     for src in node:eachObject() do
         if src.type == 'doc.type.string'

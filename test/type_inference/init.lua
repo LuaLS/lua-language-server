@@ -567,6 +567,14 @@ local f
 local <?n?> = f(nil)
 ]]
 
+TEST 'unknown' [[
+---@generic K
+---@type fun(a: K|integer):K
+local f
+
+local <?n?> = f(1)
+]]
+
 TEST 'integer' [[
 ---@class integer
 

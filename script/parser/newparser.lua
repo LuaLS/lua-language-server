@@ -1752,7 +1752,6 @@ local function addDummySelf(node, call)
     local self = createLocal {
         start  = node.colon.start,
         finish = node.colon.finish,
-        method = node,
         parent = call.args,
         [1]    = 'self',
     }
@@ -2301,7 +2300,6 @@ local function parseFunction(isLocal, isAction)
             params[1] = createLocal {
                 start  = funcRight,
                 finish = funcRight,
-                method = func.name,
                 parent = params,
                 [1]    = 'self',
             }

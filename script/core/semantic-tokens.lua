@@ -92,6 +92,7 @@ local Care = util.switch()
         }
     end)
     : case 'local'
+    : case 'self'
     : case 'getlocal'
     : case 'setlocal'
     : call(function (source, options, results)

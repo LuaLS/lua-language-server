@@ -731,7 +731,13 @@ local function compileLocalBase(source)
     local hasMarkParam
     if source.type == 'self' and not hasMarkDoc then
         hasMarkParam = true
-        vm.setNode(source, vm.compileNode(source.method.node))
+        if source.parent.parent.type == 'call' then
+            -- obj:func(...)
+            vm.setNode(source, vm.compileNode(source.parent.parent.node.node))
+        else
+            -- function obj:func(...)
+            vm.setNode(source, vm.compileNode(source.parent.parent.parent.node))
+        end
     end
     local hasMarkValue
     if source.value then

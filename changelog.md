@@ -2,6 +2,7 @@
 
 ## 3.0.2
 * `FIX` `table<string, boolean>[string] -> boolean`
+* `FIX` [#1050](https://github.com/sumneko/lua-language-server/issues/1050)
 
 ## 3.0.1
 `2022-4-11`

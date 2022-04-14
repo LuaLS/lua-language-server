@@ -214,6 +214,16 @@ function vm.getClassFields(suri, node, key, pushResult)
                                 pushResult(field)
                             end
                         end)
+                        if src.value and src.value.type == 'table' then
+                            searchFieldSwitch('table', suri, src.value, key, function (field)
+                                local fieldKey = guide.getKeyName(field)
+                                if  not searchedFields[fieldKey]
+                                and guide.isSet(field) then
+                                    hasFounded[fieldKey] = true
+                                    pushResult(field)
+                                end
+                            end)
+                        end
                     end
                 end
                 -- look into extends(if field not found)

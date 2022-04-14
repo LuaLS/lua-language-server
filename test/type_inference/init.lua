@@ -1471,3 +1471,14 @@ TEST 'A' [[
 ---@type A
 local <?x?> = nil
 ]]
+
+TEST 'A' [[
+---@class A
+---@field b B
+local mt
+
+function mt:f()
+    self.b:x()
+    print(<?self?>)
+end
+]]

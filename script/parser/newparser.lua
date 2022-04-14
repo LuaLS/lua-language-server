@@ -1749,13 +1749,13 @@ local function addDummySelf(node, call)
             parent = call,
         }
     end
-    local self = createLocal {
+    local self = {
+        type   = 'self',
         start  = node.colon.start,
         finish = node.colon.finish,
         parent = call.args,
         [1]    = 'self',
     }
-    self.type = 'self'
     tinsert(call.args, 1, self)
 end
 

@@ -1003,7 +1003,9 @@ local compilerSwitch = util.switch()
     : call(function (source)
         if source.returns then
             for _, rtn in ipairs(source.returns) do
-                vm.setNode(source, vm.compileNode(rtn[1]))
+                if rtn[1] then
+                    vm.setNode(source, vm.compileNode(rtn[1]))
+                end
             end
         end
     end)

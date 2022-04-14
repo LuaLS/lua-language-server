@@ -3,6 +3,8 @@ local platform = require 'bee.platform'
 local exe      = platform.OS == 'Windows' and ".exe" or ""
 
 lm.bindir = "bin"
+lm.c = lm.compiler == 'msvc' and 'c89' or 'c11'
+lm.cxx = 'c++17'
 
 ---@diagnostic disable-next-line: codestyle-check
 lm.EXE_DIR = ""

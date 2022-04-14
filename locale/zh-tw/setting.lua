@@ -12,7 +12,7 @@ config.runtime.path =
 config.runtime.pathStrict =
 '啟用後`runtime.path` 將只搜尋第一層目錄，見`runtime.path` 的說明。 '
 config.runtime.special =
-[[將自定義全域變數視為一些特殊的內置變數，語言服務將提供特殊的支持。
+[[將自定義全域變數視為一些特殊的內置變數，語言服務將提供特殊的支援。
 下面這個例子表示將`include` 視為`require` 。
 ```json
 "Lua.runtime.special" : {
@@ -23,7 +23,7 @@ config.runtime.special =
 config.runtime.unicodeName =
 "允許在名字中使用Unicode 字元。"
 config.runtime.nonstandardSymbol =
-"支持非標準的符號。請務必確認你的執行環境支持這些符號。"
+"支援非標準的符號。請務必確認你的執行環境支援這些符號。"
 config.runtime.plugin =
 "延伸模組路徑，請查閱[文件](https://github.com/sumneko/lua-language-server/wiki/Plugin)了解用法。"
 config.runtime.fileEncoding =
@@ -75,10 +75,10 @@ config.workspace.maxPreload =
 config.workspace.preloadFileSize =
 "預載入時跳過大小大於該值（KB）的檔案。 "
 config.workspace.library =
-"除了目前工作區以外，還會從哪些目錄中載入檔案。這些目錄中的檔案將被視作外部提供的程式碼庫，部分操作（如重命名字段）不會修改這些檔案。 "
+"除了目前工作區以外，還會從哪些目錄中載入檔案。這些目錄中的檔案將被視作外部提供的程式碼庫，部分操作（如重命名欄位）不會修改這些檔案。 "
 config.workspace.checkThirdParty =
 [[
-自動檢測與適配第三方庫，目前支持的庫為：
+自動檢測與適配第三方庫，目前支援的庫為：
 
 * OpenResty
 * Cocos4.0
@@ -138,7 +138,7 @@ config.color.mode.Grammar =
 config.semantic.enable =
 "啟用語義著色。你可能需要同時將`editor.semanticHighlighting.enabled` 設定為`true` 才能生效。 "
 config.semantic.variable =
-"對變數/字段/參數進行語義著色。 "
+"對變數/欄位/參數進行語義著色。 "
 config.semantic.annotation =
 "對類型註解進行語義著色。 "
 config.semantic.keyword =
@@ -154,21 +154,21 @@ config.hover.viewStringMax =
 config.hover.viewNumber =
 "懸浮提示查看數字內容（僅當字面常數不是十進制時）。 "
 config.hover.fieldInfer =
-"懸浮提示查看表時，會對錶的每個字段進行類型推測，當類型推測的用時累計達到該設定值（毫秒）時，將跳過後續字段的類型推測。 "
+"懸浮提示查看表時，會對錶的每個欄位進行類型推測，當類型推測的用時累計達到該設定值（毫秒）時，將跳過後續欄位的類型推測。 "
 config.hover.previewFields =
-"懸浮提示查看表時，限製表內字段的最大預覽數量。 "
+"懸浮提示查看表時，限製表內欄位的最大預覽數量。 "
 config.hover.enumsLimit =
 "當值對應多個類型時，限制類型的顯示數量。 "
 config.develop.enable =
-'開發者模式。請勿開啟，會影響性能。'
+'開發者模式。請勿開啟，會影響效能。'
 config.develop.debuggerPort =
 '除錯器監聽埠。'
 config.develop.debuggerWait =
 '除錯器連接之前掛起。'
 config.intelliSense.searchDepth =
-'設定智慧感知的搜尋深度。增大該值可以增加準確度，但會降低性能。不同的項目對該設定的容忍度差異較大，請自己調整為合適的值。'
+'設定智慧感知的搜尋深度。增大該值可以增加準確度，但會降低效能。不同的項目對該設定的容忍度差異較大，請自己調整為合適的值。'
 config.intelliSense.fastGlobal =
-'在對全域變數進行補全，及查看`_G` 的懸浮提示時進行最佳化。這會略微降低類型推測的準確度，但是對於大量使用全域變數的項目會有大幅的性能提升。'
+'在對全域變數進行補全，及查看`_G` 的懸浮提示時進行最佳化。這會略微降低類型推測的準確度，但是對於大量使用全域變數的項目會有大幅的效能提升。'
 config.window.statusBar =
 '在狀態欄顯示延伸模組狀態。'
 config.window.progressBar =

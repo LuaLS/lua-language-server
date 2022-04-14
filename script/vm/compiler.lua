@@ -499,7 +499,9 @@ local function compileByLocalID(source)
     for _, src in ipairs(sources) do
         if src.value then
             if not hasMarkDoc or guide.isLiteral(src.value) then
-                vm.setNode(source, vm.compileNode(src.value))
+                if src.value.type ~= 'nil' then
+                    vm.setNode(source, vm.compileNode(src.value))
+                end
             end
         end
     end
@@ -727,7 +729,7 @@ local function compileLocalBase(source)
             hasMarkValue = true
             if source.value.type == 'table' then
                 vm.setNode(source, source.value)
-            else
+            elseif source.value.type ~= 'nil' then
                 vm.setNode(source, vm.compileNode(source.value))
             end
         end
@@ -940,12 +942,10 @@ local compilerSwitch = util.switch()
 
         if source.value then
             if not hasMarkDoc or guide.isLiteral(source.value) then
-                if source.value then
-                    if source.value.type == 'table' then
-                        vm.setNode(source, source.value)
-                    else
-                        vm.setNode(source, vm.compileNode(source.value))
-                    end
+                if source.value.type == 'table' then
+                    vm.setNode(source, source.value)
+                elseif source.value.type ~= 'nil' then
+                    vm.setNode(source, vm.compileNode(source.value))
                 end
             end
         end
@@ -1598,7 +1598,9 @@ local function compileByGlobal(source)
         for _, set in ipairs(global:getSets(uri)) do
             if set.value then
                 if not hasMarkDoc or guide.isLiteral(set.value) then
-                    globalNode:merge(vm.compileNode(set.value))
+                    if set.value.type ~= 'nil' then
+                        globalNode:merge(vm.compileNode(set.value))
+                    end
                 end
             end
         end

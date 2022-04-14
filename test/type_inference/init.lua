@@ -1466,3 +1466,8 @@ G = {}
 
 <?G?>:A()
 ]]
+
+TEST 'A' [[
+---@type A
+local <?x?> = nil
+]]

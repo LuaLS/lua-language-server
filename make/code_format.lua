@@ -29,6 +29,7 @@ lm:source_set 'code_format' {
     },
     macos = {
         flags = "-Wall -Werror",
+        defines = "NOT_SUPPORT_FILE_SYSTEM"
     },
     linux = {
         defines = (function()

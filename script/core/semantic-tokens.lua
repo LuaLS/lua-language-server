@@ -165,7 +165,11 @@ local Care = util.switch()
         -- 5. Class declaration
             -- only search this local
         if loc.bindDocs then
-            for i, doc in ipairs(loc.bindDocs) do
+            for i = #loc.bindDocs, 1, -1 do
+                local doc = loc.bindDocs[i]
+                if doc.type == 'doc.type' then
+                    break
+                end
                 if doc.type == "doc.class" and doc.bindSources then
                     for _, src in ipairs(doc.bindSources) do
                         if src == loc then

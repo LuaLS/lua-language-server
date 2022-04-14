@@ -1459,3 +1459,10 @@ local uri
 
 local <?v?> = t[uri]
 ]]
+
+TEST 'A' [[
+---@class A
+G = {}
+
+<?G?>:A()
+]]

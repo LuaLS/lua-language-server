@@ -191,9 +191,7 @@ local compilerGlobalSwitch = util.switch()
         local name = source[1]
         local type = m.declareGlobal('type', name, uri)
         type:addGet(uri, source)
-        if source.signs then
-            source._globalNode = source
-        else
+        if not source.signs then
             source._globalNode = type
         end
     end)

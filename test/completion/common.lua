@@ -630,7 +630,7 @@ self.results.list[#self.re<??>]
     },
     {
         label = 'results',
-        kind = define.CompletionItemKind.Text,
+        kind = define.CompletionItemKind.Field,
     },
 }
 

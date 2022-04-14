@@ -14,6 +14,7 @@ local vm         = require 'vm.vm'
 ---@field _compiledNodes  boolean
 ---@field _node           vm.node
 ---@field _localBase      table
+---@field _globalBase     table
 
 local searchFieldSwitch = util.switch()
     : case 'table'
@@ -117,12 +118,22 @@ local searchFieldSwitch = util.switch()
                 end
                 local global = globalMgr.getGlobal('variable', node.name, key)
                 if global then
-                    pushResult(global)
+                    for _, set in ipairs(global:getSets(suri)) do
+                        pushResult(set)
+                    end
+                    for _, get in ipairs(global:getGets(suri)) do
+                        pushResult(get)
+                    end
                 end
             else
                 local globals = globalMgr.getFields('variable', node.name)
                 for _, global in ipairs(globals) do
-                    pushResult(global)
+                    for _, set in ipairs(global:getSets(suri)) do
+                        pushResult(set)
+                    end
+                    for _, get in ipairs(global:getGets(suri)) do
+                        pushResult(get)
+                    end
                 end
             end
         end
@@ -1545,38 +1556,57 @@ end
 
 ---@param source vm.object
 local function compileByGlobal(source)
-    local globalNode = source._globalNode
-    if not globalNode then
+    local global = source._globalNode
+    if not global then
         return
     end
+    local root = guide.getRoot(source)
     local uri = guide.getUri(source)
-    vm.setNode(source, globalNode)
-    if globalNode.cate == 'variable' then
+    if not root._globalBase then
+        root._globalBase = {}
+    end
+    local name = global:asKeyName()
+    if not root._globalBase[name] then
+        root._globalBase[name] = {
+            type   = 'globalbase',
+            parent = root,
+        }
+    end
+    local globalNode = vm.getNode(root._globalBase[name])
+    if globalNode then
+        vm.setNode(source, globalNode, true)
+        return
+    end
+    globalNode = vm.createNode(global)
+    vm.setNode(root._globalBase[name], globalNode, true)
+    vm.setNode(source, globalNode, true)
+
+    if global.cate == 'variable' then
         local hasMarkDoc
-        for _, set in ipairs(globalNode:getSets(uri)) do
+        for _, set in ipairs(global:getSets(uri)) do
             if set.bindDocs then
                 if bindDocs(set) then
-                    vm.setNode(source, vm.compileNode(set))
+                    globalNode:merge(vm.compileNode(set))
                     hasMarkDoc = true
                 end
             end
         end
-        for _, set in ipairs(globalNode:getSets(uri)) do
+        for _, set in ipairs(global:getSets(uri)) do
             if set.value then
                 if not hasMarkDoc or guide.isLiteral(set.value) then
-                    vm.setNode(source, vm.compileNode(set.value))
+                    globalNode:merge(vm.compileNode(set.value))
                 end
             end
         end
     end
-    if globalNode.cate == 'type' then
-        for _, set in ipairs(globalNode:getSets(uri)) do
+    if global.cate == 'type' then
+        for _, set in ipairs(global:getSets(uri)) do
             if set.type == 'doc.class' then
                 if set.extends then
                     for _, ext in ipairs(set.extends) do
                         if ext.type == 'doc.type.table' then
                             if not ext._generic then
-                                vm.setNode(source, vm.compileNode(ext))
+                                globalNode:merge(vm.compileNode(ext))
                             end
                         end
                     end
@@ -1584,7 +1614,7 @@ local function compileByGlobal(source)
             end
             if set.type == 'doc.alias' then
                 if not set.extends._generic then
-                    vm.setNode(source, vm.compileNode(set.extends))
+                    globalNode:merge(vm.compileNode(set.extends))
                 end
             end
         end

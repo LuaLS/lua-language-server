@@ -100,6 +100,11 @@ function mt:getName()
 end
 
 ---@return string
+function mt:asKeyName()
+    return self.cate .. '|' .. self.name
+end
+
+---@return string
 function mt:getKeyName()
     return self.name:match('[^' .. ID_SPLITE .. ']+$')
 end

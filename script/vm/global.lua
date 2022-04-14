@@ -1,12 +1,12 @@
 local util = require 'utility'
 local scope= require 'workspace.scope'
 
----@class vm.node.global.link
+---@class vm.global.link
 ---@field gets   parser.object[]
 ---@field sets   parser.object[]
 
----@class vm.node.global
----@field links table<uri, vm.node.global.link>
+---@class vm.global
+---@field links table<uri, vm.global.link>
 ---@field setsCache table<uri, parser.object[]>
 ---@field getsCache table<uri, parser.object[]>
 ---@field cate vm.global.cate
@@ -110,7 +110,7 @@ function mt:isAlive()
 end
 
 ---@param cate vm.global.cate
----@return vm.node.global
+---@return vm.global
 return function (name, cate)
     return setmetatable({
         name  = name,

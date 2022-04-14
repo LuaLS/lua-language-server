@@ -1,11 +1,9 @@
 ---@class vm
 local vm        = require 'vm.vm'
 local util      = require 'utility'
-local compiler  = require 'vm.compiler'
 local guide     = require 'parser.guide'
 local localID   = require 'vm.local-id'
 local globalMgr = require 'vm.global-manager'
-local nodeMgr   = require 'vm.node'
 
 local simpleSwitch
 
@@ -77,8 +75,8 @@ simpleSwitch = util.switch()
 
 local searchFieldSwitch = util.switch()
     : case 'table'
-    : call(function (suri, node, key, pushResult)
-        for _, field in ipairs(node) do
+    : call(function (suri, obj, key, pushResult)
+        for _, field in ipairs(obj) do
             if field.type == 'tablefield'
             or field.type == 'tableindex' then
                 if guide.getKeyName(field) == key then
@@ -88,24 +86,24 @@ local searchFieldSwitch = util.switch()
         end
     end)
     : case 'global'
-    ---@param node vm.node
+    ---@param obj vm.object
     ---@param key string
-    : call(function (suri, node, key, pushResult)
-        if node.cate == 'variable' then
-            local newGlobal = globalMgr.getGlobal('variable', node.name, key)
+    : call(function (suri, obj, key, pushResult)
+        if obj.cate == 'variable' then
+            local newGlobal = globalMgr.getGlobal('variable', obj.name, key)
             if newGlobal then
                 for _, set in ipairs(newGlobal:getSets(suri)) do
                     pushResult(set)
                 end
             end
         end
-        if node.cate == 'type' then
-            compiler.getClassFields(suri, node, key, pushResult)
+        if obj.cate == 'type' then
+            vm.getClassFields(suri, obj, key, pushResult)
         end
     end)
     : case 'local'
-    : call(function (suri, node, key, pushResult)
-        local sources = localID.getSources(node, key)
+    : call(function (suri, obj, key, pushResult)
+        local sources = localID.getSources(obj, key)
         if sources then
             for _, src in ipairs(sources) do
                 if guide.isSet(src) then
@@ -115,8 +113,8 @@ local searchFieldSwitch = util.switch()
         end
     end)
     : case 'doc.type.table'
-    : call(function (suri, node, key, pushResult)
-        for _, field in ipairs(node.fields) do
+    : call(function (suri, obj, key, pushResult)
+        for _, field in ipairs(obj.fields) do
             local fieldKey = field.name
             if fieldKey.type == 'doc.field.name' then
                 if fieldKey[1] == key then
@@ -140,13 +138,10 @@ local nodeSwitch = util.switch()
     : case 'getindex'
     : case 'setindex'
     : call(function (source, pushResult)
-        local parentNode = compiler.compileNode(source.node)
-        if not parentNode then
-            return
-        end
+        local parentNode = vm.compileNode(source.node)
         local uri = guide.getUri(source)
         local key = guide.getKeyName(source)
-        for pn in nodeMgr.eachNode(parentNode) do
+        for pn in parentNode:eachObject() do
             searchFieldSwitch(pn.type, uri, pn, key, pushResult)
         end
     end)
@@ -159,12 +154,9 @@ local nodeSwitch = util.switch()
     end)
     : case 'doc.see.field'
     : call(function (source, pushResult)
-        local parentNode = compiler.compileNode(source.parent.name)
-        if not parentNode then
-            return
-        end
+        local parentNode = vm.compileNode(source.parent.name)
         local uri = guide.getUri(source)
-        for pn in nodeMgr.eachNode(parentNode) do
+        for pn in parentNode:eachObject() do
             searchFieldSwitch(pn.type, uri, pn, source[1], pushResult)
         end
     end)
@@ -196,12 +188,9 @@ function searchByParentNode(source, pushResult)
 end
 
 local function searchByNode(source, pushResult)
-    local node = compiler.compileNode(source)
-    if not node then
-        return
-    end
+    local node = vm.compileNode(source)
     local suri = guide.getUri(source)
-    for n in nodeMgr.eachNode(node) do
+    for n in node:eachObject() do
         if n.type == 'global' then
             for _, set in ipairs(n:getSets(suri)) do
                 pushResult(set)

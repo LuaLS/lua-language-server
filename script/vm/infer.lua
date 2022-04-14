@@ -1,9 +1,7 @@
 local util     = require 'utility'
-local nodeMgr  = require 'vm.node'
 local config   = require 'config'
 local guide    = require 'parser.guide'
-local compiler = require 'vm.compiler'
-local union    = require 'vm.union'
+local vm       = require 'vm.vm'
 
 ---@class vm.infer-manager
 local m = {}
@@ -102,7 +100,7 @@ local viewNodeSwitch = util.switch()
     end)
     : case 'generic'
     : call(function (source, infer)
-        return ('<%s>'):format(source.proto[1])
+        return m.getInfer(source.proto):view()
     end)
     : case 'doc.generic.name'
     : call(function (source, infer)
@@ -159,21 +157,15 @@ local viewNodeSwitch = util.switch()
 ---@param source parser.object
 ---@return vm.infer
 function m.getInfer(source)
-    local node = compiler.compileNode(source)
-    if not node then
-        return m.NULL
-    end
-    -- TODO: more cache?
-    if node.type == 'union' and node.lastInfer then
+    local node = vm.compileNode(source)
+    if node.lastInfer then
         return node.lastInfer
     end
     local infer = setmetatable({
         node  = node,
         uri   = guide.getUri(source),
     }, mt)
-    if node.type == 'union' then
-        node.lastInfer = infer
-    end
+    node.lastInfer = infer
 
     return infer
 end
@@ -203,7 +195,7 @@ end
 
 function mt:_eraseAlias()
     local expandAlias = config.get(self.uri, 'Lua.hover.expandAlias')
-    for n in nodeMgr.eachNode(self.node) do
+    for n in self.node:eachObject() do
         if n.type == 'global' and n.cate == 'type' then
             for _, set in ipairs(n:getSets(self.uri)) do
                 if set.type == 'doc.alias' then
@@ -250,7 +242,7 @@ function mt:_computeViews()
 
     self.views = {}
 
-    for n in nodeMgr.eachNode(self.node) do
+    for n in self.node:eachObject() do
         local view = viewNodeSwitch(n.type, n, self)
         if view then
             self.views[view] = true
@@ -329,7 +321,7 @@ function mt:merge(other)
     end
 
     local infer = setmetatable({
-        node  = union(self.node, other.node),
+        node  = vm.createNode(self.node, other.node),
         uri   = self.uri,
     }, mt)
 
@@ -343,7 +335,7 @@ function mt:viewLiterals()
     end
     local mark     = {}
     local literals = {}
-    for n in nodeMgr.eachNode(self.node) do
+    for n in self.node:eachObject() do
         if n.type == 'string'
         or n.type == 'number'
         or n.type == 'integer'
@@ -369,7 +361,7 @@ function mt:viewClass()
     end
     local mark  = {}
     local class = {}
-    for n in nodeMgr.eachNode(self.node) do
+    for n in self.node:eachObject() do
         if n.type == 'global' and n.cate == 'type' then
             local name = n.name
             if not mark[name] then
@@ -383,6 +375,12 @@ function mt:viewClass()
     end
     table.sort(class)
     return table.concat(class, '|')
+end
+
+---@param source parser.object
+---@return string?
+function m.viewObject(source)
+    return viewNodeSwitch(source.type, source, {})
 end
 
 return m

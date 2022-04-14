@@ -22,7 +22,7 @@ local globalLibraryNames = {
     'setmetatable', 'tonumber', 'tostring', 'type', '_VERSION',
     'warn', 'xpcall', 'require', 'unpack', 'bit32', 'coroutine',
     'debug', 'io', 'math', 'os', 'package', 'string', 'table',
-    'utf8',
+    'utf8', 'newproxy',
 }
 local globalLibraryNamesMap
 function vm.isGlobalLibraryName(name)

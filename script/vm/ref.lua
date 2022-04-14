@@ -1,11 +1,9 @@
 ---@class vm
 local vm        = require 'vm.vm'
 local util      = require 'utility'
-local compiler  = require 'vm.compiler'
 local guide     = require 'parser.guide'
 local localID   = require 'vm.local-id'
 local globalMgr = require 'vm.global-manager'
-local nodeMgr   = require 'vm.node'
 local files     = require 'files'
 local await     = require 'await'
 local progress  = require 'progress'
@@ -220,11 +218,6 @@ local nodeSwitch = util.switch()
             return
         end
 
-        local parentNode = compiler.compileNode(source.node)
-        if not parentNode then
-            return
-        end
-
         searchField(source, pushResult, defMap, fileNotify)
     end)
     : case 'tablefield'
@@ -267,12 +260,12 @@ function searchByParentNode(source, pushResult, defMap, fileNotify)
 end
 
 local function searchByNode(source, pushResult)
-    local node = compiler.compileNode(source)
+    local node = vm.compileNode(source)
     if not node then
         return
     end
     local uri = guide.getUri(source)
-    for n in nodeMgr.eachNode(node) do
+    for n in node:eachObject() do
         if n.type == 'global' then
             for _, get in ipairs(n:getGets(uri)) do
                 pushResult(get)

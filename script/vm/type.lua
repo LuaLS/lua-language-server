@@ -1,5 +1,3 @@
-local nodeMgr   = require 'vm.node'
-local compiler  = require 'vm.compiler'
 local globalMgr = require 'vm.global-manager'
 ---@class vm
 local vm        = require 'vm.vm'
@@ -11,10 +9,10 @@ local vm        = require 'vm.vm'
 ---@return boolean
 function vm.isSubType(uri, child, parent, mark)
     if type(parent) == 'string' then
-        parent = globalMgr.getGlobal('type', parent)
+        parent = vm.createNode(globalMgr.getGlobal('type', parent))
     end
     if type(child) == 'string' then
-        child = globalMgr.getGlobal('type', child)
+        child = vm.createNode(globalMgr.getGlobal('type', child))
     end
 
     if not child or not parent then
@@ -22,33 +20,33 @@ function vm.isSubType(uri, child, parent, mark)
     end
 
     mark = mark or {}
-    for childNode in nodeMgr.eachNode(child) do
-        if childNode.type ~= 'global'
-        or childNode.cate ~= 'type' then
+    for obj in child:eachObject() do
+        if obj.type ~= 'global'
+        or obj.cate ~= 'type' then
             goto CONTINUE_CHILD
         end
-        if mark[childNode.name] then
+        if mark[obj.name] then
             return false
         end
-        mark[childNode.name] = true
-        for parentNode in nodeMgr.eachNode(parent) do
+        mark[obj.name] = true
+        for parentNode in parent:eachObject() do
             if parentNode.type ~= 'global'
             or parentNode.cate ~= 'type' then
                 goto CONTINUE_PARENT
             end
-            if parentNode.name == 'any' or childNode.name == 'any' then
+            if parentNode.name == 'any' or obj.name == 'any' then
                 return true
             end
 
-            if parentNode.name == childNode.name then
+            if parentNode.name == obj.name then
                 return true
             end
 
-            for _, set in ipairs(childNode:getSets(uri)) do
+            for _, set in ipairs(obj:getSets(uri)) do
                 if set.type == 'doc.class' and set.extends then
                     for _, ext in ipairs(set.extends) do
                         if  ext.type == 'doc.extends.name'
-                        and vm.isSubType(uri, ext[1], parentNode, mark) then
+                        and vm.isSubType(uri, ext[1], parentNode.name, mark) then
                             return true
                         end
                     end
@@ -56,7 +54,7 @@ function vm.isSubType(uri, child, parent, mark)
                 if set.type == 'doc.alias' and set.extends then
                     for _, ext in ipairs(set.extends.types) do
                         if  ext.type == 'doc.type.name'
-                        and vm.isSubType(uri, ext[1], parentNode, mark) then
+                        and vm.isSubType(uri, ext[1], parentNode.name, mark) then
                             return true
                         end
                     end
@@ -73,36 +71,40 @@ end
 ---@param uri uri
 ---@param tnode vm.node
 ---@param knode vm.node
+---@return vm.node?
 function vm.getTableValue(uri, tnode, knode)
-    local result
-    for tn in nodeMgr.eachNode(tnode) do
+    local result = vm.createNode()
+    for tn in tnode:eachObject() do
         if tn.type == 'doc.type.table' then
             for _, field in ipairs(tn.fields) do
-                if vm.isSubType(uri, compiler.compileNode(field.name), knode) then
-                    result = nodeMgr.mergeNode(result, compiler.compileNode(field.extends))
+                if vm.isSubType(uri, vm.compileNode(field.name), knode) then
+                    result:merge(vm.compileNode(field.extends))
                 end
             end
         end
         if tn.type == 'doc.type.array' then
-            result = nodeMgr.mergeNode(result, compiler.compileNode(tn.node))
+            result:merge(vm.compileNode(tn.node))
         end
         if tn.type == 'table' then
             for _, field in ipairs(tn) do
                 if field.type == 'tableindex' then
-                    result = nodeMgr.mergeNode(result, compiler.compileNode(field.value))
+                    result:merge(vm.compileNode(field.value))
                 end
                 if field.type == 'tablefield' then
                     if vm.isSubType(uri, knode, 'string') then
-                        result = nodeMgr.mergeNode(result, compiler.compileNode(field.value))
+                        result:merge(vm.compileNode(field.value))
                     end
                 end
                 if field.type == 'tableexp' then
                     if vm.isSubType(uri, knode, 'integer') and field.tindex == 1 then
-                        result = nodeMgr.mergeNode(result, compiler.compileNode(field.value))
+                        result:merge(vm.compileNode(field.value))
                     end
                 end
             end
         end
+    end
+    if result:isEmpty() then
+        return nil
     end
     return result
 end
@@ -110,32 +112,36 @@ end
 ---@param uri uri
 ---@param tnode vm.node
 ---@param vnode vm.node
+---@return vm.node?
 function vm.getTableKey(uri, tnode, vnode)
-    local result
-    for tn in nodeMgr.eachNode(tnode) do
+    local result = vm.createNode()
+    for tn in tnode:eachObject() do
         if tn.type == 'doc.type.table' then
             for _, field in ipairs(tn.fields) do
-                if vm.isSubType(uri, compiler.compileNode(field.extends), vnode) then
-                    result = nodeMgr.mergeNode(result, compiler.compileNode(field.name))
+                if vm.isSubType(uri, vm.compileNode(field.extends), vnode) then
+                    result:merge(vm.compileNode(field.name))
                 end
             end
         end
         if tn.type == 'doc.type.array' then
-            result = nodeMgr.mergeNode(result, globalMgr.getGlobal('type', 'integer'))
+            result:merge(globalMgr.getGlobal('type', 'integer'))
         end
         if tn.type == 'table' then
             for _, field in ipairs(tn) do
                 if field.type == 'tableindex' then
-                    result = nodeMgr.mergeNode(result, compiler.compileNode(field.index))
+                    result:merge(vm.compileNode(field.index))
                 end
                 if field.type == 'tablefield' then
-                    result = nodeMgr.mergeNode(result, globalMgr.getGlobal('type', 'string'))
+                    result:merge(globalMgr.getGlobal('type', 'string'))
                 end
                 if field.type == 'tableexp' then
-                    result = nodeMgr.mergeNode(result, globalMgr.getGlobal('type', 'integer'))
+                    result:merge(globalMgr.getGlobal('type', 'integer'))
                 end
             end
         end
+    end
+    if result:isEmpty() then
+        return nil
     end
     return result
 end

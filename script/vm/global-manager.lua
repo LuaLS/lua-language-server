@@ -3,13 +3,15 @@ local guide         = require 'parser.guide'
 local globalBuilder = require 'vm.global'
 local signMgr       = require 'vm.sign'
 local genericMgr    = require 'vm.generic'
+---@class vm
+local vm            = require 'vm.vm'
 
 ---@class parser.object
----@field _globalNode vm.node.global
+---@field _globalNode vm.global
 
 ---@class vm.global-manager
 local m = {}
----@type table<string, vm.node.global>
+---@type table<string, vm.global>
 m.globals = {}
 ---@type table<uri, table<string, boolean>>
 m.globalSubs = util.multiTable(2)
@@ -145,6 +147,7 @@ local compilerGlobalSwitch = util.switch()
         end
     end)
     : case 'doc.class'
+    ---@param source parser.object
     : call(function (source)
         local uri  = guide.getUri(source)
         local name = guide.getKeyName(source)
@@ -155,7 +158,7 @@ local compilerGlobalSwitch = util.switch()
         if source.signs then
             source._sign = signMgr()
             for _, sign in ipairs(source.signs) do
-                source._sign:addSign(sign)
+                source._sign:addSign(vm.compileNode(sign))
             end
             if source.extends then
                 for _, ext in ipairs(source.extends) do
@@ -177,7 +180,7 @@ local compilerGlobalSwitch = util.switch()
         if source.signs then
             source._sign = signMgr()
             for _, sign in ipairs(source.signs) do
-                source._sign:addSign(sign)
+                source._sign:addSign(vm.compileNode(sign))
             end
             source.extends._generic = genericMgr(source.extends, source._sign)
         end
@@ -209,7 +212,7 @@ local compilerGlobalSwitch = util.switch()
 ---@param cate vm.global.cate
 ---@param name string
 ---@param uri  uri
----@return vm.node.global
+---@return vm.global
 function m.declareGlobal(cate, name, uri)
     local key = cate .. '|' .. name
     m.globalSubs[uri][key] = true
@@ -222,7 +225,7 @@ end
 ---@param cate   vm.global.cate
 ---@param name   string
 ---@param field? string
----@return vm.node.global?
+---@return vm.global?
 function m.getGlobal(cate, name, field)
     local key = cate .. '|' .. name
     if field then
@@ -233,7 +236,7 @@ end
 
 ---@param cate   vm.global.cate
 ---@param name   string
----@return vm.node.global[]
+---@return vm.global[]
 function m.getFields(cate, name)
     local globals = {}
     local key = cate .. '|' .. name
@@ -252,7 +255,7 @@ function m.getFields(cate, name)
 end
 
 ---@param cate   vm.global.cate
----@return vm.node.global[]
+---@return vm.global[]
 function m.getGlobals(cate)
     local globals = {}
 
@@ -327,7 +330,7 @@ function m.compileAst(source)
     end)
 end
 
----@return vm.node.global
+---@return vm.global
 function m.getNode(source)
     if source.type == 'field'
     or source.type == 'method' then

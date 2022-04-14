@@ -196,12 +196,15 @@ function mt:eachObject()
     end
 end
 
----@param source vm.object
+---@param source parser.object | vm.generic
 ---@param node vm.node | vm.object
 ---@param cover? boolean
 function vm.setNode(source, node, cover)
     if not node then
         error('Can not set nil node')
+    end
+    if source.type == 'global' then
+        error('Can not set node to global')
     end
     if cover then
         vm.nodeCache[source] = node

@@ -35,14 +35,11 @@ end
 
 m.reset()
 
-local fixedUri = {}
---- 获取文件的真实uri(真实大小写)
+local uriMap = {}
+-- 获取文件的真实uri，但不穿透软链接
 ---@param uri uri
 ---@return uri
 function m.getRealUri(uri)
-    if platform.OS ~= 'Windows' then
-        return uri
-    end
     local filename = furi.decode(uri)
     local path = fs.path(filename)
     local suc, res = pcall(fs.exists, path)
@@ -50,16 +47,19 @@ function m.getRealUri(uri)
         return uri
     end
     suc, res = pcall(fs.canonical, path)
-    if not suc or res:string():gsub('/', '\\') == filename then
+    if not suc then
         return uri
     end
     filename = res:string()
     local ruri = furi.encode(filename)
-    if not fixedUri[ruri] then
-        fixedUri[ruri] = true
+    if uri == ruri then
+        return ruri
+    end
+    if not uriMap[ruri] then
+        uriMap[ruri] = uri
         log.warn(('Fix real file uri: %s -> %s'):format(uri, ruri))
     end
-    return ruri
+    return uriMap[ruri]
 end
 
 --- 打开文件
@@ -80,8 +80,10 @@ function m.close(uri)
         file.trusted = false
     end
     m.onWatch('close', uri)
-    if (file._ref or 0) <= 0 and not m.isOpen(uri) then
-        m.remove(uri)
+    if file then
+        if (file._ref or 0) <= 0 and not m.isOpen(uri) then
+            m.remove(uri)
+        end
     end
 end
 
@@ -478,7 +480,7 @@ function m.compileState(uri, text)
         end
         return nil
     end
-    local prog <close> = progress.create(scope.getScope(uri), lang.script.WINDOW_COMPILING, 0.5)
+    local prog <close> = progress.create(uri, lang.script.WINDOW_COMPILING, 0.5)
     prog:setMessage(ws.getRelativePath(uri))
     local clock = os.clock()
     local state, err = parser.compile(text

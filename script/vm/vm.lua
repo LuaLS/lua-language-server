@@ -1,11 +1,8 @@
 local guide     = require 'parser.guide'
-local util      = require 'utility'
 local files     = require 'files'
 local timer     = require 'timer'
 
 local setmetatable   = setmetatable
-local running        = coroutine.running
-local ipairs         = ipairs
 local log            = log
 local xpcall         = xpcall
 local mathHuge       = math.huge
@@ -16,23 +13,6 @@ _ENV = nil
 
 ---@class vm
 local m = {}
-
-function m.getArgInfo(source)
-    local callargs = source.parent
-    if not callargs or callargs.type ~= 'callargs' then
-        return nil
-    end
-    local call = callargs.parent
-    if not call or call.type ~= 'call' then
-        return nil
-    end
-    for i = 1, #callargs do
-        if callargs[i] == source then
-            return call.node, i
-        end
-    end
-    return nil
-end
 
 function m.getSpecial(source)
     if not source then
@@ -67,6 +47,18 @@ function m.getKeyType(source)
         end
     end
     return guide.getKeyType(source)
+end
+
+---@param source parser.object
+---@return parser.object?
+function m.getObjectValue(source)
+    if source.value then
+        return source.value
+    end
+    if source.special == 'rawset' then
+        return source.args and source.args[3]
+    end
+    return nil
 end
 
 m.cacheTracker = setmetatable({}, weakMT)

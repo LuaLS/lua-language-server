@@ -51,9 +51,9 @@ end
 
 local function testAll()
     test 'basic'
-    test 'references'
     test 'definition'
     test 'type_inference'
+    test 'references'
     test 'hover'
     test 'completion'
     test 'crossfile'

@@ -2,8 +2,8 @@ local files   = require 'files'
 local vm      = require 'vm'
 local lang    = require 'language'
 local guide   = require 'parser.guide'
-local noder   = require 'core.noder'
 local await   = require 'await'
+local infer   = require 'vm.infer'
 
 local skipCheckClass = {
     ['unknown']       = true,
@@ -25,37 +25,23 @@ return function (uri, callback)
         return
     end
 
-    local cache = {}
-
     ---@async
     local function checkUndefinedField(src)
-        local id = noder.getID(src)
-        if not id then
-            return
-        end
-        if cache[id] then
-            return
-        end
-
         await.delay()
 
         if #vm.getDefs(src) > 0 then
-            cache[id] = true
             return
         end
         local node = src.node
         if node then
-            local defs = vm.getDefs(node)
             local ok
-            for _, def in ipairs(defs) do
-                if  def.type == 'doc.class.name'
-                and not skipCheckClass[def[1]] then
+            for view in infer.getInfer(node):eachView() do
+                if not skipCheckClass[view] then
                     ok = true
                     break
                 end
             end
             if not ok then
-                cache[id] = true
                 return
             end
         end

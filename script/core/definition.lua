@@ -1,4 +1,3 @@
-local searcher   = require 'core.searcher'
 local workspace  = require 'workspace'
 local files      = require 'files'
 local vm         = require 'vm'
@@ -131,24 +130,14 @@ return function (uri, offset)
         end
     end
 
-    local defs = vm.getAllDefs(source)
-    local values = {}
-    for _, src in ipairs(defs) do
-        local value = searcher.getObjectValue(src)
-        if value and value ~= src and guide.isLiteral(value) then
-            values[value] = true
-        end
-    end
+    local defs = vm.getDefs(source)
 
     for _, src in ipairs(defs) do
-        if src.dummy then
-            goto CONTINUE
-        end
-        if values[src] then
-            goto CONTINUE
-        end
         local root = guide.getRoot(src)
         if not root then
+            goto CONTINUE
+        end
+        if src.type == 'self' then
             goto CONTINUE
         end
         src = src.field or src.method or src
@@ -162,6 +151,19 @@ return function (uri, offset)
             if not guide.isLiteral(src) then
                 goto CONTINUE
             end
+        else
+            if  guide.isLiteral(src)
+            and src.type ~= 'function'
+            and src.type ~= 'doc.type.function'
+            and src.type ~= 'doc.type.table' then
+                goto CONTINUE
+            end
+        end
+        if src.type == 'doc.class' then
+            src = src.class
+        end
+        if src.type == 'doc.alias' then
+            src = src.alias
         end
         if src.type == 'doc.class.name'
         or src.type == 'doc.alias.name' then
@@ -171,10 +173,8 @@ return function (uri, offset)
                 goto CONTINUE
             end
         end
-        if src.type == 'doc.type.name' then
-            if src.typeGeneric then
-                goto CONTINUE
-            end
+        if src.type == 'doc.generic.name' then
+            goto CONTINUE
         end
         if src.type == 'doc.param' then
             goto CONTINUE

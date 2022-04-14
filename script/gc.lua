@@ -5,6 +5,7 @@ local util = require 'utility'
 local mt = {}
 mt.__index = mt
 mt.type = 'gc'
+mt._removed = false
 
 mt._max = 10
 

@@ -1,7 +1,7 @@
 local files   = require 'files'
 local guide   = require 'parser.guide'
 local lang    = require 'language'
-local infer   = require 'core.infer'
+local infer   = require 'vm.infer'
 
 return function (uri, callback)
     local ast = files.getState(uri)
@@ -20,11 +20,11 @@ return function (uri, callback)
         and source.type ~= 'tableindex' then
             return
         end
-        if infer.searchAndViewInfers(source) == 'any' then
+        if infer.getInfer(source):view() == 'unknown' then
             callback {
                 start   = source.start,
                 finish  = source.finish,
-                message = lang.script('DIAG_IMPLICIT_ANY'),
+                message = lang.script('DIAG_UNKNOWN'),
             }
         end
     end)

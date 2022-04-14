@@ -80,7 +80,7 @@ DIAG_COSE_NON_OBJECT    =
 '无法 close 此类型的值。（除非给此类型设置 `__close` 元方法）'
 DIAG_COUNT_DOWN_LOOP    =
 '你的意思是 `{}` 吗？'
-DIAG_IMPLICIT_ANY       =
+DIAG_UNKNOWN            =
 '无法推测出类型。'
 DIAG_DEPRECATED         =
 '已废弃。'
@@ -489,6 +489,8 @@ WINDOW_APPLY_WHITOUT_SETTING     =
 '应用但不修改设置'
 WINDOW_ASK_APPLY_LIBRARY         =
 '是否需要将你的工作环境配置为 `{}` ？'
+WINDOW_SEARCHING_IN_FILES        =
+'正在文件中搜索...'
 
 CONFIG_LOAD_FAILED               =
 '无法读取设置文件：{}'

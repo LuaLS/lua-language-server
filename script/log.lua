@@ -18,6 +18,14 @@ m.file = nil
 m.startTime = time.time() - monotonic()
 m.size = 0
 m.maxSize = 100 * 1024 * 1024
+m.level = 'info'
+m.levelMap = {
+    ['trace'] = 1,
+    ['debug'] = 2,
+    ['info']  = 3,
+    ['warn']  = 4,
+    ['error'] = 5,
+}
 
 local function trimSrc(src)
     if src:sub(1, 1) == '@' then
@@ -64,16 +72,16 @@ local function pushLog(level, ...)
     return text
 end
 
-function m.info(...)
-    pushLog('info', ...)
+function m.trace(...)
+    pushLog('trace', ...)
 end
 
 function m.debug(...)
     pushLog('debug', ...)
 end
 
-function m.trace(...)
-    pushLog('trace', ...)
+function m.info(...)
+    pushLog('info', ...)
 end
 
 function m.warn(...)
@@ -85,6 +93,9 @@ function m.error(...)
 end
 
 function m.raw(thd, level, msg, source, currentline, clock)
+    if m.levelMap[level] < (m.levelMap[m.level] or m.levelMap['info']) then
+        return msg
+    end
     if level == 'error' then
         ioStdErr:write(msg .. '\n')
         if not m.firstError then
@@ -92,7 +103,7 @@ function m.raw(thd, level, msg, source, currentline, clock)
         end
     end
     if m.size > m.maxSize then
-        return
+        return msg
     end
     init_log_file()
     local sec, ms = mathModf((m.startTime + clock) / 1000)

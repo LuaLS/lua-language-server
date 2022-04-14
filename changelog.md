@@ -1,8 +1,49 @@
 # changelog
 
+## 3.0.2
+* `FIX` `table<string, boolean>[string] -> boolean`
+* `FIX` goto `type definition`
+* `FIX` [#1050](https://github.com/sumneko/lua-language-server/issues/1050)
+
+## 3.0.1
+`2022-4-11`
+* `FIX` [#1033](https://github.com/sumneko/lua-language-server/issues/1033)
+* `FIX` [#1034](https://github.com/sumneko/lua-language-server/issues/1034)
+* `FIX` [#1035](https://github.com/sumneko/lua-language-server/issues/1035)
+* `FIX` [#1036](https://github.com/sumneko/lua-language-server/issues/1036)
+* `FIX` runtime errors reported by telemetry, see [#1037](https://github.com/sumneko/lua-language-server/issues/1037)
+
+## 3.0.0
+`2022-4-10`
+* `CHG` [break changes](https://github.com/sumneko/lua-language-server/issues/980)
+* `CHG` diagnostic:
+  + `type-check`: removed for now
+  + `no-implicit-any`: renamed to `no-unknown`
+* `CHG` formatter: no longer need` --preview`
+* `CHG` `LuaDoc`: supports `---@type (string|integer)[]`
+* `FIX` semantic: color of `function`
+* `FIX` [#1027](https://github.com/sumneko/lua-language-server/issues/1027)
+* `FIX` [#1028](https://github.com/sumneko/lua-language-server/issues/1028)
+
+## 2.6.8
+`2022-4-9`
+* `CHG` completion: call snippet shown as `Function` instead of `Snippet` when `Lua.completion.callSnippet` is `Replace`
+* `FIX` [#976](https://github.com/sumneko/lua-language-server/issues/976)
+* `FIX` [#995](https://github.com/sumneko/lua-language-server/issues/995)
+* `FIX` [#1004](https://github.com/sumneko/lua-language-server/issues/1004)
+* `FIX` [#1008](https://github.com/sumneko/lua-language-server/issues/1008)
+* `FIX` [#1009](https://github.com/sumneko/lua-language-server/issues/1009)
+* `FIX` [#1011](https://github.com/sumneko/lua-language-server/issues/1011)
+* `FIX` [#1014](https://github.com/sumneko/lua-language-server/issues/1014)
+* `FIX` [#1016](https://github.com/sumneko/lua-language-server/issues/1016)
+* `FIX` [#1017](https://github.com/sumneko/lua-language-server/issues/1017)
+* `FIX` runtime errors reported by telemetry
+
 ## 2.6.7
+`2022-3-9`
 * `NEW` offline diagnostic, [read more](https://github.com/sumneko/lua-language-server/wiki/Offline-Diagnostic)
 * `CHG` `VSCode`: 1.65 has built in new `Lua` syntax files, so this extension no longer provides syntax files, which means you can install other syntax extensions in the marketplace. If you have any suggestions or issues, please [open issues here](https://github.com/sumneko/lua.tmbundle).
+* `CHG` telemetry: the prompt will only appear in VSCode to avoid repeated prompts in other platforms due to the inability to automatically modify the settings.
 * `FIX` [#965](https://github.com/sumneko/lua-language-server/issues/965)
 * `FIX` [#975](https://github.com/sumneko/lua-language-server/issues/975)
 

@@ -1,5 +1,4 @@
 local files    = require 'files'
-local searcher = require 'core.searcher'
 local lang     = require 'language'
 local vm       = require 'vm'
 local guide    = require 'parser.guide'
@@ -19,11 +18,11 @@ return function (uri, callback)
         if doc.type == 'doc.alias' then
             local name = guide.getKeyName(doc)
             if not cache[name] then
-                local docs = vm.getDocDefines(uri, name)
+                local docs = vm.getDocSets(uri, name)
                 cache[name] = {}
                 for _, otherDoc in ipairs(docs) do
-                    if otherDoc.type == 'doc.class.name'
-                    or otherDoc.type == 'doc.alias.name' then
+                    if otherDoc.type == 'doc.alias'
+                    or otherDoc.type == 'doc.class' then
                         cache[name][#cache[name]+1] = {
                             start  = otherDoc.start,
                             finish = otherDoc.finish,
@@ -34,8 +33,8 @@ return function (uri, callback)
             end
             if #cache[name] > 1 then
                 callback {
-                    start   = doc.start,
-                    finish  = doc.finish,
+                    start   = doc.alias.start,
+                    finish  = doc.alias.finish,
                     related = cache,
                     message = lang.script('DIAG_DUPLICATE_DOC_CLASS', name)
                 }

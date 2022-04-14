@@ -35,7 +35,7 @@ return function (uri, callback)
         if name == '...' then
             return
         end
-        if vm.isDocDefined(uri, name)
+        if #vm.getDocSets(uri, name) > 0
         or hasNameOfGeneric(name, source) then
             return
         end

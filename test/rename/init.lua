@@ -1,3 +1,4 @@
+---@diagnostic disable: await-in-sync
 local core   = require 'core.rename'
 local files  = require 'files'
 local catch  = require 'catch'
@@ -90,7 +91,6 @@ local function f(b)
 end
 ]]
 
---config.set('Lua.IntelliSense.traceBeSetted', true)
 TEST ('a', '!!!') [[
 t = {
     a = 0

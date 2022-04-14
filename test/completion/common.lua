@@ -76,6 +76,29 @@ zac<??>
     },
 }
 
+config.set(nil, 'Lua.completion.callSnippet',    'Disable')
+TEST [[
+ass<??>
+]]
+{
+    {
+        label = 'assert(v, message)',
+        kind  = define.CompletionItemKind.Function,
+    },
+}
+
+config.set(nil, 'Lua.completion.callSnippet',    'Replace')
+TEST [[
+ass<??>
+]]
+{
+    {
+        label = 'assert(v, message)',
+        kind  = define.CompletionItemKind.Function,
+    },
+}
+
+config.set(nil, 'Lua.completion.callSnippet',    'Both')
 TEST [[
 ass<??>
 ]]
@@ -1169,10 +1192,51 @@ TEST [[
 }
 
 TEST [[
+---@class ZBBC
+---@class ZBBC : Z<??>
+]]
+(nil)
+
+TEST [[
 ---@class ZABC
 ---@class ZBBC : <??>
 ]]
-(EXISTS)
+(function (results)
+    local ok
+    for _, res in ipairs(results) do
+        if res.label == 'ZABC' then
+            ok = true
+        end
+        if res.label == 'ZBBC' then
+            error('ZBBC should not be here')
+        end
+    end
+    assert(ok, 'ZABC should be here')
+end)
+
+TEST [[
+---@class ZBBC
+---@class ZBBC : <??>
+]]
+(function (results)
+    for _, res in ipairs(results) do
+        if res.label == 'ZBBC' then
+            error('ZBBC should not be here')
+        end
+    end
+end)
+
+TEST [[
+---@class ZABC
+---@class ZABC
+---@class ZBBC : Z<??>
+]]
+{
+    {
+        label = 'ZABC',
+        kind = define.CompletionItemKind.Class,
+    },
+}
 
 TEST [[
 ---@class zabc
@@ -1462,7 +1526,7 @@ mt.<??>
 }
 
 TEST [[
----@param x string | "'AAA'" | "'BBB'" | "'CCC'"
+---@param x string | "AAA" | "BBB" | "CCC"
 function f(y, x)
 end
 
@@ -1470,21 +1534,21 @@ f(1, <??>)
 ]]
 {
     {
-        label = "'AAA'",
+        label = '"AAA"',
         kind = define.CompletionItemKind.EnumMember,
     },
     {
-        label = "'BBB'",
+        label = '"BBB"',
         kind = define.CompletionItemKind.EnumMember,
     },
     {
-        label = "'CCC'",
+        label = '"CCC"',
         kind = define.CompletionItemKind.EnumMember,
     }
 }
 
 TEST [[
----@param x string | "'AAA'" | "'BBB'" | "'CCC'"
+---@param x string | "AAA" | "BBB" | "CCC"
 function f(y, x)
 end
 
@@ -1492,21 +1556,21 @@ f(1,<??>)
 ]]
 {
     {
-        label = "'AAA'",
+        label = '"AAA"',
         kind = define.CompletionItemKind.EnumMember,
     },
     {
-        label = "'BBB'",
+        label = '"BBB"',
         kind = define.CompletionItemKind.EnumMember,
     },
     {
-        label = "'CCC'",
+        label = '"CCC"',
         kind = define.CompletionItemKind.EnumMember,
     }
 }
 
 TEST [[
----@param x string | "'AAA'" | "'BBB'" | "'CCC'"
+---@param x string | "AAA" | "BBB" | "CCC"
 function f(x)
 end
 
@@ -1514,21 +1578,21 @@ f(<??>)
 ]]
 {
     {
-        label = "'AAA'",
+        label = '"AAA"',
         kind = define.CompletionItemKind.EnumMember,
     },
     {
-        label = "'BBB'",
+        label = '"BBB"',
         kind = define.CompletionItemKind.EnumMember,
     },
     {
-        label = "'CCC'",
+        label = '"CCC"',
         kind = define.CompletionItemKind.EnumMember,
     }
 }
 
 TEST [[
----@alias Option string | "'AAA'" | "'BBB'" | "'CCC'"
+---@alias Option string | "AAA" | "BBB" | "CCC"
 ---@param x Option
 function f(x)
 end
@@ -1537,21 +1601,21 @@ f(<??>)
 ]]
 {
     {
-        label = "'AAA'",
+        label = '"AAA"',
         kind = define.CompletionItemKind.EnumMember,
     },
     {
-        label = "'BBB'",
+        label = '"BBB"',
         kind = define.CompletionItemKind.EnumMember,
     },
     {
-        label = "'CCC'",
+        label = '"CCC"',
         kind = define.CompletionItemKind.EnumMember,
     }
 }
 
 TEST [[
----@param x string | "'AAA'" | "'BBB'" | "'CCC'"
+---@param x string | "AAA" | "BBB" | "CCC"
 function f(x)
 end
 
@@ -1582,10 +1646,10 @@ TEST [[
 ---@alias XXXX
 ---comment 1
 ---comment 1
----| '1'
+---| 1
 ---comment 2
 ---comment 2
----| '2'
+---| 2
 
 ---@param x XXXX
 local function f(x)
@@ -1611,10 +1675,10 @@ TEST [[
 ---@alias XXXX
 ---comment 1
 ---comment 1
----| '1'
+---| 1
 ---comment 2
 ---comment 2
----| '2'
+---| 2
 ---@param x XXXX
 local function f(x)
 end
@@ -1622,7 +1686,7 @@ end
 
 ---comment 3
 ---comment 3
----| '3'
+---| 3
 
 f(<??>)
 ]]
@@ -1696,20 +1760,20 @@ global zzz: integer = 1
 
 TEST [[
 ---@param x string
----| "'选项1'" # 注释1
----| "'选项2'" # 注释2
+---| "选项1" # 注释1
+---| "选项2" # 注释2
 function f(x) end
 
 f(<??>)
 ]]
 {
     {
-        label = "'选项1'",
+        label = '"选项1"',
         kind = define.CompletionItemKind.EnumMember,
         description = '注释1',
     },
     {
-        label = "'选项2'",
+        label = '"选项2"',
         kind = define.CompletionItemKind.EnumMember,
         description = '注释2',
     },
@@ -1728,49 +1792,49 @@ utf8.charpatter<??>
 }
 
 TEST [[
----@type "'a'"|"'b'"|"'c'"
+---@type "a"|"b"|"c"
 local x
 
 print(x == <??>)
 ]]
 {
     {
-        label  = "'a'",
+        label  = '"a"',
         kind   = define.CompletionItemKind.EnumMember,
     },
     {
-        label  = "'b'",
+        label  = '"b"',
         kind   = define.CompletionItemKind.EnumMember,
     },
     {
-        label  = "'c'",
+        label  = '"c"',
         kind   = define.CompletionItemKind.EnumMember,
     },
 }
 
 TEST [[
----@type "'a'"|"'b'"|"'c'"
+---@type "a"|"b"|"c"
 local x
 
 x = <??>
 ]]
 {
     {
-        label  = "'a'",
+        label  = '"a"',
         kind   = define.CompletionItemKind.EnumMember,
     },
     {
-        label  = "'b'",
+        label  = '"b"',
         kind   = define.CompletionItemKind.EnumMember,
     },
     {
-        label  = "'c'",
+        label  = '"c"',
         kind   = define.CompletionItemKind.EnumMember,
     },
 }
 
 TEST [[
----@type "'a'"|"'b'"|"'c'"
+---@type "a"|"b"|"c"
 local x
 
 print(x == '<??>')
@@ -1794,7 +1858,7 @@ print(x == '<??>')
 }
 
 TEST [[
----@type "'a'"|"'b'"|"'c'"
+---@type "a"|"b"|"c"
 local x
 
 x = '<??>'
@@ -1872,6 +1936,12 @@ f(<??>)
 function (${1:x}, ${2:y})\
 \t$0\
 end",
+        description = "\z
+```lua\
+function (x, y)\
+\t\
+end\
+```"
     },
 }
 
@@ -2031,85 +2101,85 @@ field cc.aaa: number
 Cared['description'] = nil
 
 TEST [[
----@type table<string, "'a'"|"'b'"|"'c'">
+---@type table<string, "a"|"b"|"c">
 local x
 
 x.a = <??>
 ]]
 {
     {
-        label  = "'a'",
+        label  = '"a"',
         kind   = define.CompletionItemKind.EnumMember,
     },
     {
-        label  = "'b'",
+        label  = '"b"',
         kind   = define.CompletionItemKind.EnumMember,
     },
     {
-        label  = "'c'",
+        label  = '"c"',
         kind   = define.CompletionItemKind.EnumMember,
     },
 }
 
 TEST [[
----@type table<string, "'a'"|"'b'"|"'c'">
+---@type table<string, "a"|"b"|"c">
 local x
 
 x['a'] = <??>
 ]]
 {
     {
-        label  = "'a'",
+        label  = '"a"',
         kind   = define.CompletionItemKind.EnumMember,
     },
     {
-        label  = "'b'",
+        label  = '"b"',
         kind   = define.CompletionItemKind.EnumMember,
     },
     {
-        label  = "'c'",
+        label  = '"c"',
         kind   = define.CompletionItemKind.EnumMember,
     },
 }
 
 TEST [[
----@type table<string, "'a'"|"'b'"|"'c'">
+---@type table<string, "a"|"b"|"c">
 local x = {
     a = <??>
 }
 ]]
 {
     {
-        label  = "'a'",
+        label  = '"a"',
         kind   = define.CompletionItemKind.EnumMember,
     },
     {
-        label  = "'b'",
+        label  = '"b"',
         kind   = define.CompletionItemKind.EnumMember,
     },
     {
-        label  = "'c'",
+        label  = '"c"',
         kind   = define.CompletionItemKind.EnumMember,
     },
 }
 
 TEST [[
----@type table<string, "'a'"|"'b'"|"'c'">
+---@type table<string, "a"|"b"|"c">
 local x = {
     ['a'] = <??>
 }
 ]]
 {
     {
-        label  = "'a'",
+        label  = '"a"',
         kind   = define.CompletionItemKind.EnumMember,
     },
     {
-        label  = "'b'",
+        label  = '"b"',
         kind   = define.CompletionItemKind.EnumMember,
     },
     {
-        label  = "'c'",
+        label  = '"c"',
         kind   = define.CompletionItemKind.EnumMember,
     },
 }
@@ -2371,6 +2441,108 @@ zzzz<??>
         label = 'zzzz(a, b)',
         kind  = define.CompletionItemKind.Snippet,
         insertText = 'zzzz(${1:a: any}, ${2:b: any})',
+    },
+}
+
+TEST [[
+---@param a any
+---@param b? any
+---@param c? any
+---@vararg any
+local function foo(a, b, c, ...) end
+foo<??>
+]]
+{
+    {
+        label = 'foo(a, b, c, ...)',
+        kind  = define.CompletionItemKind.Function,
+        insertText = 'foo',
+    },
+    {
+        label = 'foo(a, b, c, ...)',
+        kind  = define.CompletionItemKind.Snippet,
+        insertText = 'foo(${1:a: any})',
+    },
+}
+
+TEST [[
+---@param a any
+---@param b? any
+---@param c? any
+---@vararg any
+local function foo(a, b, c, ...) end
+foo<??>
+]]
+{
+    {
+        label = 'foo(a, b, c, ...)',
+        kind  = define.CompletionItemKind.Function,
+        insertText = 'foo',
+    },
+    {
+        label = 'foo(a, b, c, ...)',
+        kind  = define.CompletionItemKind.Snippet,
+        insertText = 'foo(${1:a: any})',
+    },
+}
+
+TEST [[
+---@param a? any
+---@param b? any
+---@param c? any
+---@vararg any
+local function foo(a, b, c, ...) end
+foo<??>
+]]
+{
+    {
+        label = 'foo(a, b, c, ...)',
+        kind  = define.CompletionItemKind.Function,
+        insertText = 'foo',
+    },
+    {
+        label = 'foo(a, b, c, ...)',
+        kind  = define.CompletionItemKind.Snippet,
+        insertText = 'foo($1)',
+    },
+}
+
+TEST [[
+---@param a? any
+---@param b any
+---@param c? any
+---@vararg any
+local function foo(a, b, c, ...) end
+foo<??>
+]]
+{
+    {
+        label = 'foo(a, b, c, ...)',
+        kind  = define.CompletionItemKind.Function,
+        insertText = 'foo',
+    },
+    {
+        label = 'foo(a, b, c, ...)',
+        kind  = define.CompletionItemKind.Snippet,
+        insertText = 'foo(${1:a?: any}, ${2:b: any})',
+    },
+}
+
+TEST [[
+---@param f fun(a: any, b: any)
+local function foo(f) end
+foo<??>
+]]
+{
+    {
+        label = 'foo(f)',
+        kind  = define.CompletionItemKind.Function,
+        insertText = 'foo',
+    },
+    {
+        label = 'foo(f)',
+        kind  = define.CompletionItemKind.Snippet,
+        insertText = 'foo(${1:f: fun(a: any, b: any)})',
     },
 }
 Cared['insertText'] = false
@@ -2640,9 +2812,9 @@ class2:<??>
 
 TEST [[
 --- @class Emit
---- @field on fun(eventName: string, cb: function)
---- @field on fun(eventName: '"died"', cb: fun(i: integer))
---- @field on fun(eventName: '"won"', cb: fun(s: string))
+--- @field on fun(self: Emit, eventName: string, cb: function)
+--- @field on fun(self: Emit, eventName: '"died"', cb: fun(i: integer))
+--- @field on fun(self: Emit, eventName: '"won"', cb: fun(s: string))
 local emit = {}
 
 emit:on('<??>')
@@ -2656,7 +2828,39 @@ TEST [[
 --- @field on fun(eventName: '"won"', cb: fun(s: string))
 local emit = {}
 
+emit.on('died', <??>)
+]]
+{
+    [1] = {
+        label    = 'fun(i: integer)',
+        kind     = define.CompletionItemKind.Function,
+    }
+}
+
+TEST [[
+--- @class Emit
+--- @field on fun(self: Emit, eventName: string, cb: function)
+--- @field on fun(self: Emit, eventName: '"died"', cb: fun(i: integer))
+--- @field on fun(self: Emit, eventName: '"won"', cb: fun(s: string))
+local emit = {}
+
 emit:on('won', <??>)
+]]
+{
+    [1] = {
+        label    = 'fun(s: string)',
+        kind     = define.CompletionItemKind.Function,
+    }
+}
+
+TEST [[
+--- @class Emit
+--- @field on fun(self: Emit, eventName: string, cb: function)
+--- @field on fun(self: Emit, eventName: '"died"', cb: fun(i: integer))
+--- @field on fun(self: Emit, eventName: '"won"', cb: fun(s: string))
+local emit = {}
+
+emit.on(emit, 'won', <??>)
 ]]
 {
     [1] = {
@@ -3087,4 +3291,23 @@ local t = x[<??>]
     for _, res in ipairs(results) do
         assert(res.label ~= 'do')
     end
+end)
+
+TEST [[
+---@class ZZZZZ.XXXX
+---@class ZZZZZ.XXXX
+---@class ZZZZZ.XXXX
+---@class ZZZZZ.XXXX
+---@class ZZZZZ.XXXX
+
+---@type <??>
+]]
+(function (results)
+    local count = 0
+    for _, res in ipairs(results) do
+        if res.label == 'ZZZZZ.XXXX' then
+            count = count + 1
+        end
+    end
+    assert(count == 1)
 end)

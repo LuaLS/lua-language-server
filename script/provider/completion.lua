@@ -7,7 +7,7 @@ local ws     = require 'workspace'
 local isEnable = false
 
 local function allWords()
-    local str = '\t\n.:(\'"[,#*@|=-{/\\ +?'
+    local str = '\t\n.:(\'"[,#*@|=-{ +?'
     local mark = {}
     local list = {}
     for c in str:gmatch '.' do
@@ -19,6 +19,11 @@ local function allWords()
         if postfix ~= '' and not mark[postfix] then
             list[#list+1] = postfix
             mark[postfix] = true
+        end
+        local separator = config.get(scp.uri, 'Lua.completion.requireSeparator')
+        if not mark[separator] then
+            list[#list+1] = separator
+            mark[separator] = true
         end
     end
     return list
@@ -35,7 +40,7 @@ local function enable(uri)
     end
     nonil.disable()
     isEnable = true
-    log.debug('Enable completion.')
+    log.info('Enable completion.')
     proto.request('client/registerCapability', {
         registrations = {
             {
@@ -61,7 +66,7 @@ local function disable(uri)
     end
     nonil.disable()
     isEnable = false
-    log.debug('Disable completion.')
+    log.info('Disable completion.')
     proto.request('client/unregisterCapability', {
         unregisterations = {
             {

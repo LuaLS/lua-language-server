@@ -3,9 +3,13 @@ local platform = require 'bee.platform'
 local exe      = platform.OS == 'Windows' and ".exe" or ""
 
 lm.bindir = "bin"
+lm.c = lm.compiler == 'msvc' and 'c89' or 'c11'
+lm.cxx = 'c++17'
 
 ---@diagnostic disable-next-line: codestyle-check
 lm.EXE_DIR = ""
+
+local includeCodeFormat = true
 
 if     platform.OS == 'macOS' then
     if     lm.platform == nil then
@@ -29,9 +33,7 @@ elseif platform.OS == 'Linux' then
     if     lm.platform == nil then
     elseif lm.platform == "linux-x64" then
     elseif lm.platform == "linux-arm64" then
-        -- TODO: not implement
-        lm.compiler = "clang"
-        lm.target   = "arm64-pc-linux-gnu"
+        lm.cc = 'aarch64-linux-gnu-gcc'
     else
         error "unknown platform"
     end
@@ -50,7 +52,11 @@ lm:source_set 'lpeglabel' {
 }
 
 lm:executable "lua-language-server" {
-    deps = { "lpeglabel", "source_bootstrap", "code_format" },
+    deps = {
+        "lpeglabel",
+        "source_bootstrap",
+        includeCodeFormat and "code_format" or nil,
+    },
     includes = {
         "3rd/bee.lua",
         "3rd/bee.lua/3rd/lua",
@@ -60,6 +66,9 @@ lm:executable "lua-language-server" {
         sources = {
             "make/lua-language-server.rc",
         }
+    },
+    defines = {
+        includeCodeFormat and 'CODE_FORMAT' or nil,
     },
     linux = {
         crt = "static",
@@ -116,7 +125,7 @@ local function targetPlatformArch()
     return lm.platform:match "^[^-]*-(.*)$"
 end
 
-local notest = platform.OS == 'macOS'
+local notest = (platform.OS == 'macOS' or platform.OS == 'Linux')
     and targetPlatformArch() == "arm64"
     and detectArch() == "x86_64"
 

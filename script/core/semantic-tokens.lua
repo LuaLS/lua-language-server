@@ -1,12 +1,11 @@
 local files          = require 'files'
-local searcher       = require 'core.searcher'
 local await          = require 'await'
 local define         = require 'proto.define'
 local vm             = require 'vm'
 local util           = require 'utility'
 local guide          = require 'parser.guide'
 local converter      = require 'proto.converter'
-local infer          = require 'core.infer'
+local infer          = require 'vm.infer'
 local config         = require 'config'
 local linkedTable    = require 'linked-table'
 
@@ -18,7 +17,7 @@ local Care = util.switch()
             return
         end
         local isLib = vm.isGlobalLibraryName(source[1])
-        local isFunc = infer.hasType(source, 'function')
+        local isFunc = infer.getInfer(source):hasFunction()
 
         local type = isFunc and define.TokenTypes['function'] or define.TokenTypes.variable
         local modifier = isLib and define.TokenModifiers.defaultLibrary or define.TokenModifiers.static
@@ -67,7 +66,7 @@ local Care = util.switch()
                 return
             end
         end
-        if infer.hasType(source, 'function') then
+        if infer.getInfer(source):hasFunction() then
             results[#results+1] = {
                 start      = source.start,
                 finish     = source.finish,
@@ -93,6 +92,7 @@ local Care = util.switch()
         }
     end)
     : case 'local'
+    : case 'self'
     : case 'getlocal'
     : case 'setlocal'
     : call(function (source, options, results)
@@ -120,13 +120,14 @@ local Care = util.switch()
         end
         local loc = source.node or source
         -- 1. 值为函数的局部变量 | Local variable whose value is a function
-        if loc.refs then
-            for _, ref in ipairs(loc.refs) do
+        if loc.ref then
+            for _, ref in ipairs(loc.ref) do
                 if ref.value and ref.value.type == 'function' then
                     results[#results+1] = {
                         start      = source.start,
                         finish     = source.finish,
                         type       = define.TokenTypes['function'],
+                        modifieres = define.TokenModifiers.declaration,
                     }
                     return
                 end
@@ -161,20 +162,14 @@ local Care = util.switch()
             }
             return
         end
-        -- 5. References to other functions
-        if infer.hasType(loc, 'function') then
-            results[#results+1] = {
-                start      = source.start,
-                finish     = source.finish,
-                type       = define.TokenTypes['function'],
-                modifieres = source.type == 'setlocal' and define.TokenModifiers.declaration or nil,
-            }
-            return
-        end
-        -- 6. Class declaration
+        -- 5. Class declaration
             -- only search this local
         if loc.bindDocs then
-            for i, doc in ipairs(loc.bindDocs) do
+            for i = #loc.bindDocs, 1, -1 do
+                local doc = loc.bindDocs[i]
+                if doc.type == 'doc.type' then
+                    break
+                end
                 if doc.type == "doc.class" and doc.bindSources then
                     for _, src in ipairs(doc.bindSources) do
                         if src == loc then
@@ -189,7 +184,17 @@ local Care = util.switch()
                 end
             end
         end
-        -- 6. const 变量 | Const variable
+        -- 6. References to other functions
+        if infer.getInfer(loc):hasFunction() then
+            results[#results+1] = {
+                start      = source.start,
+                finish     = source.finish,
+                type       = define.TokenTypes['function'],
+                modifieres = guide.isSet(source) and define.TokenModifiers.declaration or nil,
+            }
+            return
+        end
+        -- 7. const 变量 | Const variable
         if loc.attrs then
             for _, attr in ipairs(loc.attrs) do
                 local name = attr[1]
@@ -502,7 +507,7 @@ local Care = util.switch()
             modifieres = define.TokenModifiers.modification,
         }
     end)
-    : case 'doc.type.enum'
+    : case 'doc.type.string'
     : call(function (source, options, results)
         if not options.annotation then
             return
@@ -512,24 +517,6 @@ local Care = util.switch()
             finish     = source.finish,
             type       = define.TokenTypes.string,
             modifieres = define.TokenModifiers.static,
-        }
-    end)
-    : case 'doc.resume'
-    : call(function (source, options, results)
-        if not options.annotation then
-            return
-        end
-        results[#results+1] = {
-            start      = source.start,
-            finish     = source.finish,
-            type       = define.TokenTypes.string,
-            modifieres = define.TokenModifiers.static,
-        }
-        local row = guide.rowColOf(source.start)
-        results[#results+1] = {
-            start      = source.finish,
-            finish     = guide.positionOf(row, guide.getLineRange(options.state, row)),
-            type       = define.TokenTypes.comment,
         }
     end)
     : case 'doc.type.function'
@@ -669,7 +656,6 @@ local Care = util.switch()
             type   = define.TokenTypes.keyword,
         }
     end)
-    : getMap()
 
 local function buildTokens(uri, results)
     local tokens = {}
@@ -806,11 +792,7 @@ return function (uri, start, finish)
 
     local results = {}
     guide.eachSourceBetween(state.ast, start, finish, function (source) ---@async
-        local method = Care[source.type]
-        if not method then
-            return
-        end
-        method(source, options, results)
+        Care(source.type, source, options, results)
         await.delay()
     end)
 

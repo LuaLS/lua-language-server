@@ -1,11 +1,9 @@
 local files      = require 'files'
 local vm         = require 'vm'
-local proto      = require 'proto'
-local define     = require 'proto.define'
 local util       = require 'utility'
 local findSource = require 'core.find-source'
 local guide      = require 'parser.guide'
-local noder      = require 'core.noder'
+local globalMgr  = require 'vm.global-manager'
 
 local Forcing
 
@@ -181,42 +179,64 @@ local function ofFieldThen(key, src, newname, callback)
     end
 end
 
+---@async
 local function ofField(source, newname, callback)
-    local key = guide.getKeyName(source)
-    for _, src in ipairs(vm.getAllRefs(source)) do
-        ofFieldThen(key, src, newname, callback)
+    local key  = guide.getKeyName(source)
+    local refs = vm.getRefs(source)
+    for _, ref in ipairs(refs) do
+            ofFieldThen(key, ref, newname, callback)
     end
 end
 
+---@async
 local function ofGlobal(source, newname, callback)
     local key = guide.getKeyName(source)
-    for _, src in ipairs(vm.getAllRefs(source)) do
-        ofFieldThen(key, src, newname, callback)
+    local global = globalMgr.getGlobal('variable', key)
+    if not global then
+        return
+    end
+    local uri = guide.getUri(source)
+    for _, set in ipairs(global:getSets(uri)) do
+        ofFieldThen(key, set, newname, callback)
+    end
+    for _, get in ipairs(global:getGets(uri)) do
+        ofFieldThen(key, get, newname, callback)
     end
 end
 
+---@async
 local function ofLabel(source, newname, callback)
-    for _, src in ipairs(vm.getAllRefs(source)) do
+    for _, src in ipairs(vm.getRefs(source)) do
         callback(src, src.start, src.finish, newname)
     end
 end
 
+---@async
 local function ofDocTypeName(source, newname, callback)
     local oldname = source[1]
-    for _, doc in ipairs(vm.getAllRefs(source)) do
-        if doc.type == 'doc.class.name'
-        or doc.type == 'doc.type.name'
-        or doc.type == 'doc.alias.name' then
-            if oldname == doc[1] then
-                callback(doc, doc.start, doc.finish, newname)
-            end
+    local global = globalMgr.getGlobal('type', oldname)
+    if not global then
+        return
+    end
+    local uri = guide.getUri(source)
+    for _, doc in ipairs(global:getSets(uri)) do
+        if doc.type == 'doc.class' then
+            callback(doc, doc.class.start, doc.class.finish, newname)
+        end
+        if doc.type == 'doc.alias' then
+            callback(doc, doc.alias.start, doc.alias.finish, newname)
+        end
+    end
+    for _, doc in ipairs(global:getGets(uri)) do
+        if doc.type == 'doc.type.name' then
+            callback(doc, doc.start, doc.finish, newname)
         end
     end
 end
 
 local function ofDocParamName(source, newname, callback)
     callback(source, source.start, source.finish, newname)
-    local doc = noder.getDocState(source)
+    local doc = source.parent
     if doc.bindSources then
         for _, src in ipairs(doc.bindSources) do
             if src.type == 'local'
@@ -233,6 +253,7 @@ local function ofDocParamName(source, newname, callback)
     end
 end
 
+---@async
 local function rename(source, newname, callback)
     if source.type == 'label'
     or source.type == 'goto' then
@@ -329,6 +350,7 @@ local accept = {
 
 local m = {}
 
+---@async
 function m.rename(uri, pos, newname)
     if not newname then
         return nil

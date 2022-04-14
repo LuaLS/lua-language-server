@@ -1,3 +1,4 @@
+---@diagnostic disable: await-in-sync
 local core  = require 'core.reference'
 local files = require 'files'
 local catch = require 'catch'
@@ -23,7 +24,7 @@ function TEST(script)
     files.setText('', newScript)
 
     local input  = catched['?'] + catched['~']
-    local expect = catched['!'] + catched['?']
+    local expect = catched['!'] + catched['~']
     local results = core('', input[1][1])
     if results then
         local positions = {}

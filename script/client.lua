@@ -8,6 +8,7 @@ local converter = require 'proto.converter'
 local json      = require 'json-beautify'
 local await     = require 'await'
 local scope     = require 'workspace.scope'
+local inspect   = require 'inspect'
 
 local m = {}
 
@@ -210,7 +211,13 @@ local function applyConfig(cfg, uri, changes)
     for _, change in ipairs(changes) do
         if scp:isChildUri(change.uri)
         or scp:isLinkedUri(change.uri) then
-            cfg[change.key] = config.getRaw(change.uri, change.key)
+            local value = config.getRaw(change.uri, change.key)
+            local key = change.key:match('^Lua%.(.+)$')
+            if cfg[key] then
+                cfg[key] = value
+            else
+                cfg[change.key] = value
+            end
             ok = true
         end
     end
@@ -398,7 +405,7 @@ local function hookPrint()
 end
 
 function m.init(t)
-    log.debug('Client init', util.dump(t))
+    log.debug('Client init', inspect(t))
     m.info = t
     nonil.enable()
     m.client(t.clientInfo.name)

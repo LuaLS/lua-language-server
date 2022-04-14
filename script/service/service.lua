@@ -128,7 +128,7 @@ function m.reportProto()
 end
 
 function m.report()
-    local t = timer.loop(60.0, function ()
+    local t = timer.loop(600.0, function ()
         local lines = {}
         lines[#lines+1] = ''
         lines[#lines+1] = '========= Medical Examination Report ========='
@@ -138,7 +138,7 @@ function m.report()
         lines[#lines+1] = m.reportProto()
         lines[#lines+1] = '=============================================='
 
-        log.debug(table.concat(lines, '\n'))
+        log.info(table.concat(lines, '\n'))
     end)
     t:onTimer()
 end

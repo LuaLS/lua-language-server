@@ -85,7 +85,7 @@ function mt:loadFile(uri, libraryUri)
                     files.addRef(uri)
                 end
                 self._cache[uri] = true
-                log.info(('Skip loaded file: %s'):format(uri))
+                log.debug(('Skip loaded file: %s'):format(uri))
             else
                 local content = pub.awaitTask('loadFile', furi.decode(uri))
                 self.read = self.read + 1
@@ -93,7 +93,7 @@ function mt:loadFile(uri, libraryUri)
                 if not content then
                     return
                 end
-                log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
+                log.debug(('Preload file at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
                 files.setText(uri, content, false)
                 if not self._cache[uri] then
                     files.addRef(uri)
@@ -101,7 +101,7 @@ function mt:loadFile(uri, libraryUri)
                 self._cache[uri] = true
             end
             if libraryUri then
-                log.info('++++As library of:', libraryUri)
+                log.debug('++++As library of:', libraryUri)
             end
         end
     elseif files.isDll(uri) then
@@ -116,7 +116,7 @@ function mt:loadFile(uri, libraryUri)
                     files.addRef(uri)
                 end
                 self._cache[uri] = true
-                log.info(('Skip loaded file: %s'):format(uri))
+                log.debug(('Skip loaded file: %s'):format(uri))
             else
                 local content = pub.awaitTask('loadFile', furi.decode(uri))
                 self.read = self.read + 1
@@ -124,7 +124,7 @@ function mt:loadFile(uri, libraryUri)
                 if not content then
                     return
                 end
-                log.info(('Preload dll at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
+                log.debug(('Preload dll at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
                 files.saveDll(uri, content)
                 if not self._cache[uri] then
                     files.addRef(uri)
@@ -132,7 +132,7 @@ function mt:loadFile(uri, libraryUri)
                 self._cache[uri] = true
             end
             if libraryUri then
-                log.info('++++As library of:', libraryUri)
+                log.debug('++++As library of:', libraryUri)
             end
         end
     end
@@ -142,7 +142,6 @@ end
 ---@async
 function mt:loadAll()
     while self.read < self.max do
-        log.info(('Loaded %d/%d files'):format(self.read, self.max))
         self:update()
         local loader = table.remove(self._stash)
         if loader then
@@ -177,7 +176,7 @@ m._loadings = setmetatable({}, { __mode = 'k' })
 function m.create(scp)
     local loading = setmetatable({
         scp    = scp,
-        _bar   = progress.create(scp, lang.script('WORKSPACE_LOADING', scp.uri), 0.5),
+        _bar   = progress.create(scp.uri, lang.script('WORKSPACE_LOADING', scp.uri), 0.5),
         _stash = {},
         _cache = {},
     }, mt)

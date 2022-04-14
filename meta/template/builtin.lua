@@ -5,14 +5,10 @@
 ---@class nil
 ---@class boolean
 ---@class number
----#if VERSION >= 5.3 then
----@class integer
----#else
----@alias integer number
----#end
+---@class integer: number
 ---@class thread
----@class table
----@class string
+---@class table<K, V>: { [K]: V }
+---@class string: stringlib
 ---@class userdata
 ---@class lightuserdata
 ---@class function

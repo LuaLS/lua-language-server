@@ -1,3 +1,4 @@
+---@diagnostic disable: await-in-sync
 local files = require 'files'
 local furi  = require 'file-uri'
 local core  = require 'core.reference'
@@ -68,7 +69,7 @@ function TEST(datas)
                 }
             end
         end
-        if catched['?'] or catched['~'] then
+        if #catched['?'] > 0 or #catched['~'] > 0 then
             sourceList = catched['?'] + catched['~']
             sourceUri = uri
         end
@@ -100,22 +101,6 @@ end
 
 TEST {
     {
-        path = 'lib.lua',
-        content = [[
-            return <!function ()
-            end!>
-        ]],
-    },
-    {
-        path = 'a.lua',
-        content = [[
-            local <~f~> = require 'lib'
-        ]],
-    },
-}
-
-TEST {
-    {
         path = 'a.lua',
         content = [[
             <!ROOT!> = 1
@@ -140,24 +125,6 @@ TEST {
         path = 'b.lua',
         content = [[
             print(<!ROOT!>)
-        ]],
-    },
-}
-
-TEST {
-    {
-        path = 'a.lua',
-        content = [[
-            local f = require 'lib'
-            local <~o~> = f()
-        ]],
-    },
-    {
-        path = 'lib.lua',
-        content = [[
-            return function ()
-                return <!{}!>
-            end
         ]],
     },
 }
@@ -201,4 +168,208 @@ TEST {
             print(t.<!x!>)
         ]]
     }
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            local f = require 'lib'
+            <!f!>()
+        ]],
+    },
+    {
+        path = 'lib.lua',
+        content = [[
+            return <?function?> ()
+            end
+        ]],
+    },
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            local m = {}
+            function m.<~func~>()
+            end
+            return m
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local t = require 'a'
+            t.<!func!>()
+        ]],
+    },
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            return <?function?> () end
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local t = require 'a'
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local t = require 'a'
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local t = require 'a'
+        ]],
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local t = require 'a'
+            <!t!>()
+        ]],
+    },
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            local function <~f~>()
+            end
+
+            return {
+                f = <!f!>,
+            }
+        ]]
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local t = require 'a'
+            local f = t.f
+
+            f()
+
+            return {
+                f = f,
+            }
+        ]]
+    }
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            local <?function?> f()
+            end
+
+            return {
+                f = f,
+            }
+        ]]
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local t = require 'a'
+            local f = t.f
+
+            <!f!>()
+
+            return {
+                f = f,
+            }
+        ]]
+    }
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            local <?function?> f()
+            end
+
+            return {
+                f = f,
+            }
+        ]]
+    },
+    {
+        path = 'b1.lua',
+        content = [[
+            local t = require 'a'
+            t.<!f!>()
+        ]]
+    },
+    {
+        path = 'b2.lua',
+        content = [[
+            local t = require 'a'
+            t.<!f!>()
+        ]]
+    },
+    {
+        path = 'b3.lua',
+        content = [[
+            local t = require 'a'
+            t.<!f!>()
+        ]]
+    },
+    {
+        path = 'b4.lua',
+        content = [[
+            local t = require 'a'
+            t.<!f!>()
+        ]]
+    },
+    {
+        path = 'b5.lua',
+        content = [[
+            local t = require 'a'
+            t.<!f!>()
+        ]]
+    },
+    {
+        path = 'b6.lua',
+        content = [[
+            local t = require 'a'
+            t.<!f!>()
+        ]]
+    },
+    {
+        path = 'b7.lua',
+        content = [[
+            local t = require 'a'
+            t.<!f!>()
+        ]]
+    },
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            local <~t~> = require 'b'
+            return <!t!>
+        ]]
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            local t = require 'a'
+            return t
+        ]]
+    },
 }

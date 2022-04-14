@@ -1,66 +1,62 @@
 local error        = error
 local type         = type
 
----@class parser.guide.object
----@field bindDocs              parser.guide.object[]
----@field bindGroup             parser.guide.object[]
----@field bindSources           parser.guide.object[]
----@field value                 parser.guide.object
----@field parent                parser.guide.object
+---@class parser.object
+---@field bindDocs              parser.object[]
+---@field bindGroup             parser.object[]
+---@field bindSources           parser.object[]
+---@field value                 parser.object
+---@field parent                parser.object
 ---@field type                  string
 ---@field special               string
 ---@field tag                   string
----@field args                  parser.guide.object[]
----@field locals                parser.guide.object[]
----@field returns               parser.guide.object[]
+---@field args                  parser.object[]
+---@field locals                parser.object[]
+---@field returns               parser.object[]
 ---@field uri                   uri
 ---@field start                 integer
 ---@field finish                integer
 ---@field effect                integer
 ---@field attrs                 string[]
----@field specials              parser.guide.object[]
----@field labels                parser.guide.object[]
----@field node                  parser.guide.object
----@field dummy                 boolean
----@field field                 parser.guide.object
----@field method                parser.guide.object
----@field index                 parser.guide.object
----@field extends               parser.guide.object[]
----@field types                 parser.guide.object[]
----@field fields                parser.guide.object[]
----@field typeGeneric           table<integer, parser.guide.object[]>
----@field tkey                  parser.guide.object
----@field tvalue                parser.guide.object
+---@field specials              parser.object[]
+---@field labels                parser.object[]
+---@field node                  parser.object
+---@field field                 parser.object
+---@field method                parser.object
+---@field index                 parser.object
+---@field extends               parser.object[]|parser.object
+---@field types                 parser.object[]
+---@field fields                parser.object[]
+---@field tkey                  parser.object
+---@field tvalue                parser.object
 ---@field tindex                integer
----@field op                    parser.guide.object
----@field next                  parser.guide.object
----@field docParam              parser.guide.object
+---@field op                    parser.object
+---@field next                  parser.object
+---@field docParam              parser.object
 ---@field sindex                integer
----@field name                  parser.guide.object
----@field call                  parser.guide.object
----@field closure               parser.guide.object
----@field proto                 parser.guide.object
----@field exp                   parser.guide.object
----@field isGeneric             boolean
----@field alias                 parser.guide.object
----@field class                 parser.guide.object
----@field vararg                parser.guide.object
----@field param                 parser.guide.object
----@field overload              parser.guide.object
+---@field name                  parser.object
+---@field call                  parser.object
+---@field closure               parser.object
+---@field proto                 parser.object
+---@field exp                   parser.object
+---@field alias                 parser.object
+---@field class                 parser.object
+---@field vararg                parser.object
+---@field param                 parser.object
+---@field overload              parser.object
 ---@field docParamMap           table<string, integer>
 ---@field upvalues              table<string, string[]>
----@field ref                   parser.guide.object[]
+---@field ref                   parser.object[]
 ---@field returnIndex           integer
----@field docs                  parser.guide.object[]
+---@field docs                  parser.object[]
 ---@field state                 table
 ---@field comment               table
 ---@field optional              boolean
----@field _root                 parser.guide.object
----@field _noders               noders
----@field _mnode                parser.guide.object
----@field _noded                boolean
----@field _initedNoders         boolean
----@field _compiledGlobals      boolean
+---@field max                   parser.object
+---@field init                  parser.object
+---@field step                  parser.object
+---@field redundant             { max: integer, passed: integer }
+---@field _root                 parser.object
 
 ---@class guide
 ---@field debugMode boolean
@@ -125,8 +121,9 @@ local childMap = {
     ['unary']       = {1},
 
     ['doc']                = {'#'},
-    ['doc.class']          = {'class', '#extends', 'comment'},
+    ['doc.class']          = {'class', '#extends', '#signs', 'comment'},
     ['doc.type']           = {'#types', 'name', 'comment'},
+    ['doc.type.name']      = {'#signs'},
     ['doc.alias']          = {'alias', 'extends', 'comment'},
     ['doc.param']          = {'param', 'extends', 'comment'},
     ['doc.return']         = {'#returns', 'comment'},
@@ -135,19 +132,18 @@ local childMap = {
     ['doc.generic.object'] = {'generic', 'extends', 'comment'},
     ['doc.vararg']         = {'vararg', 'comment'},
     ['doc.type.array']     = {'node'},
-    ['doc.type.table']     = {'tkey', 'tvalue', 'comment'},
     ['doc.type.function']  = {'#args', '#returns', 'comment'},
-    ['doc.type.ltable']    = {'#fields', 'comment'},
+    ['doc.type.table']     = {'#fields', 'comment'},
     ['doc.type.literal']   = {'node'},
     ['doc.type.arg']       = {'name', 'extends'},
-    ['doc.type.field']     = {'extends'},
+    ['doc.type.field']     = {'name', 'extends'},
     ['doc.overload']       = {'overload', 'comment'},
     ['doc.see']            = {'name', 'field'},
     ['doc.version']        = {'#versions'},
     ['doc.diagnostic']     = {'#names'},
 }
 
----@type table<string, fun(obj: parser.guide.object, list: parser.guide.object[])>
+---@type table<string, fun(obj: parser.object, list: parser.object[])>
 local compiledChildMap = setmetatable({}, {__index = function (self, name)
     local defs = childMap[name]
     if not defs then
@@ -227,7 +223,7 @@ local function formatNumber(n)
 end
 
 --- 是否是字面量
----@param obj parser.guide.object
+---@param obj parser.object
 ---@return boolean
 function m.isLiteral(obj)
     local tp = obj.type
@@ -238,10 +234,15 @@ function m.isLiteral(obj)
         or tp == 'integer'
         or tp == 'table'
         or tp == 'function'
+        or tp == 'doc.type.function'
+        or tp == 'doc.type.table'
+        or tp == 'doc.type.string'
+        or tp == 'doc.type.integer'
+        or tp == 'doc.type.boolean'
 end
 
 --- 获取字面量
----@param obj parser.guide.object
+---@param obj parser.object
 ---@return any
 function m.getLiteral(obj)
     local tp = obj.type
@@ -258,8 +259,8 @@ function m.getLiteral(obj)
 end
 
 --- 寻找父函数
----@param obj parser.guide.object
----@return parser.guide.object
+---@param obj parser.object
+---@return parser.object
 function m.getParentFunction(obj)
     for _ = 1, 10000 do
         obj = obj.parent
@@ -275,8 +276,8 @@ function m.getParentFunction(obj)
 end
 
 --- 寻找所在区块
----@param obj parser.guide.object
----@return parser.guide.object
+---@param obj parser.object
+---@return parser.object
 function m.getBlock(obj)
     for _ = 1, 10000 do
         if not obj then
@@ -304,8 +305,8 @@ function m.getBlock(obj)
 end
 
 --- 寻找所在父区块
----@param obj parser.guide.object
----@return parser.guide.object
+---@param obj parser.object
+---@return parser.object
 function m.getParentBlock(obj)
     for _ = 1, 10000 do
         obj = obj.parent
@@ -321,8 +322,8 @@ function m.getParentBlock(obj)
 end
 
 --- 寻找所在可break的父区块
----@param obj parser.guide.object
----@return parser.guide.object
+---@param obj parser.object
+---@return parser.object
 function m.getBreakBlock(obj)
     for _ = 1, 10000 do
         obj = obj.parent
@@ -341,8 +342,8 @@ function m.getBreakBlock(obj)
 end
 
 --- 寻找doc的主体
----@param obj parser.guide.object
----@return parser.guide.object
+---@param obj parser.object
+---@return parser.object
 function m.getDocState(obj)
     for _ = 1, 10000 do
         local parent = obj.parent
@@ -358,8 +359,8 @@ function m.getDocState(obj)
 end
 
 --- 寻找所在父类型
----@param obj parser.guide.object
----@return parser.guide.object
+---@param obj parser.object
+---@return parser.object
 function m.getParentType(obj, want)
     for _ = 1, 10000 do
         obj = obj.parent
@@ -374,8 +375,8 @@ function m.getParentType(obj, want)
 end
 
 --- 寻找根区块
----@param obj parser.guide.object
----@return parser.guide.object
+---@param obj parser.object
+---@return parser.object
 function m.getRoot(obj)
     local source = obj
     if source._root then
@@ -399,7 +400,7 @@ function m.getRoot(obj)
     error('guide.getRoot overstack')
 end
 
----@param obj parser.guide.object
+---@param obj parser.object
 ---@return uri
 function m.getUri(obj)
     if obj.uri then
@@ -653,10 +654,10 @@ function m.eachSourceBetween(ast, start, finish, callback)
 end
 
 local function getSourceTypeCache(ast)
-    local cache = ast.typeCache
+    local cache = ast._typeCache
     if not cache then
         cache = {}
-        ast.typeCache = cache
+        ast._typeCache = cache
         m.eachSource(ast, function (source)
             local tp = source.type
             if not tp then
@@ -674,6 +675,10 @@ local function getSourceTypeCache(ast)
 end
 
 --- 遍历所有指定类型的source
+---@param ast parser.object
+---@param type string
+---@param callback fun(src: parser.object)
+---@return any
 function m.eachSourceType(ast, type, callback)
     local cache = getSourceTypeCache(ast)
     local myCache = cache[type]
@@ -681,10 +686,16 @@ function m.eachSourceType(ast, type, callback)
         return
     end
     for i = 1, #myCache do
-        callback(myCache[i])
+        local res = callback(myCache[i])
+        if res ~= nil then
+            return res
+        end
     end
 end
 
+---@param ast parser.object
+---@param tps string[]
+---@param callback fun(src: parser.object)
 function m.eachSourceTypes(ast, tps, callback)
     local cache = getSourceTypeCache(ast)
     for x = 1, #tps do
@@ -698,11 +709,13 @@ function m.eachSourceTypes(ast, tps, callback)
 end
 
 --- 遍历所有的source
+---@param ast parser.object
+---@param callback fun(src: parser.object)
 function m.eachSource(ast, callback)
-    local cache = ast.eachCache
+    local cache = ast._eachCache
     if not cache then
         cache = { ast }
-        ast.eachCache = cache
+        ast._eachCache = cache
         local mark = {}
         local index = 1
         while true do
@@ -803,6 +816,9 @@ function m.offsetToPosition(state, offset)
 end
 
 function m.getLineRange(state, row)
+    if not state.lines[row] then
+        return 0
+    end
     local nextLineStart = state.lines[row + 1] or #state.lua
     for i = nextLineStart - 1, state.lines[row], -1 do
         local w = state.lua:sub(i, i)
@@ -814,20 +830,24 @@ function m.getLineRange(state, row)
 end
 
 local isSetMap = {
-    ['setglobal']      = true,
-    ['local']          = true,
-    ['setlocal']       = true,
-    ['setfield']       = true,
-    ['setmethod']      = true,
-    ['setindex']       = true,
-    ['tablefield']     = true,
-    ['tableindex']     = true,
-    ['tableexp']       = true,
-    ['doc.class.name'] = true,
-    ['doc.alias.name'] = true,
-    ['doc.field.name'] = true,
-    ['doc.field']      = true,
-    ['doc.type.field'] = true,
+    ['setglobal']         = true,
+    ['local']             = true,
+    ['self']              = true,
+    ['setlocal']          = true,
+    ['setfield']          = true,
+    ['setmethod']         = true,
+    ['setindex']          = true,
+    ['tablefield']        = true,
+    ['tableindex']        = true,
+    ['tableexp']          = true,
+    ['label']             = true,
+    ['doc.class']         = true,
+    ['doc.alias']         = true,
+    ['doc.field']         = true,
+    ['doc.class.name']    = true,
+    ['doc.alias.name']    = true,
+    ['doc.field.name']    = true,
+    ['doc.type.field']    = true,
 }
 function m.isSet(source)
     local tp = source.type
@@ -887,17 +907,17 @@ function m.getKeyNameOfLiteral(obj)
     elseif tp == 'number' then
         local n = obj[1]
         if n then
-            return formatNumber(obj[1])
+            return obj[1]
         end
     elseif tp == 'integer' then
         local n = obj[1]
         if n then
-            return formatNumber(obj[1])
+            return obj[1]
         end
     elseif tp == 'boolean' then
         local b = obj[1]
         if b then
-            return tostring(b)
+            return b
         end
     end
 end
@@ -911,6 +931,7 @@ function m.getKeyName(obj)
     or tp == 'setglobal' then
         return obj[1]
     elseif tp == 'local'
+    or     tp == 'self'
     or     tp == 'getlocal'
     or     tp == 'setlocal' then
         return obj[1]
@@ -930,7 +951,7 @@ function m.getKeyName(obj)
     or     tp == 'tableindex' then
         return m.getKeyNameOfLiteral(obj.index)
     elseif tp == 'tableexp' then
-        return tostring(obj.tindex)
+        return obj.tindex
     elseif tp == 'field'
     or     tp == 'method'
     or     tp == 'doc.see.field' then
@@ -940,11 +961,11 @@ function m.getKeyName(obj)
     elseif tp == 'doc.alias' then
         return obj.alias[1]
     elseif tp == 'doc.field' then
-        return tostring(obj.field[1])
+        return obj.field[1]
     elseif tp == 'doc.field.name' then
-        return tostring(obj[1])
+        return obj[1]
     elseif tp == 'doc.type.field' then
-        return tostring(obj.name[1])
+        return obj.name[1]
     elseif tp == 'dummy' then
         return obj[1]
     end
@@ -979,6 +1000,7 @@ function m.getKeyType(obj)
     or tp == 'setglobal' then
         return 'string'
     elseif tp == 'local'
+    or     tp == 'self'
     or     tp == 'getlocal'
     or     tp == 'setlocal' then
         return 'local'
@@ -1106,7 +1128,7 @@ function m.getPath(a, b, sameFunction)
 end
 
 ---是否是全局变量（包括 _G.XXX 形式）
----@param source parser.guide.object
+---@param source parser.object
 ---@return boolean
 function m.isGlobal(source)
     if source._isGlobal ~= nil then
@@ -1182,6 +1204,27 @@ function m.isOOP(source)
         return m.isOOP(source.parent)
     end
     return false
+end
+
+local basicTypeMap = {
+    ['unknown']  = true,
+    ['any']      = true,
+    ['true']     = true,
+    ['false']    = true,
+    ['nil']      = true,
+    ['boolean']  = true,
+    ['number']   = true,
+    ['string']   = true,
+    ['table']    = true,
+    ['function'] = true,
+    ['thread']   = true,
+    ['userdata'] = true,
+}
+
+---@param str string
+---@return boolean
+function m.isBasicType(str)
+    return basicTypeMap[str] == true
 end
 
 return m

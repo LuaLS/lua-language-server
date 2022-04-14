@@ -11,7 +11,7 @@ arg = {}
 ---@return T
 function assert(v, message) end
 
----@alias cgopt
+---@alias gcoptions
 ---|>'"collect"'      # ---#DESTAIL 'cgopt.collect'
 ---| '"stop"'         # ---#DESTAIL 'cgopt.stop'
 ---| '"restart"'      # ---#DESTAIL 'cgopt.restart'
@@ -28,12 +28,12 @@ function assert(v, message) end
 
 ---#if VERSION >= 5.4 then
 ---#DES 'collectgarbage'
----@param opt? cgopt
+---@param opt? gcoptions
 ---@return any
 function collectgarbage(opt, ...) end
 ---#else
 ---#DES 'collectgarbage'
----@param opt? cgopt
+---@param opt? gcoptions
 ---@param arg? integer
 ---@return any
 function collectgarbage(opt, arg) end
@@ -125,6 +125,12 @@ function loadfile(filename, mode, env) end
 ---@return string error_message
 ---@nodiscard
 function loadstring(text, chunkname) end
+
+---@version 5.1
+---@param proxy boolean|table
+---@return userdata
+---@nodiscard
+function newproxy(proxy) end
 
 ---@version 5.1
 ---#DES 'module'
@@ -274,8 +280,10 @@ function xpcall(f, msgh, arg1, ...) end
 
 ---@version 5.1
 ---#DES 'unpack'
----@param list table
+---@generic T
+---@param list T[]
 ---@param i?   integer
 ---@param j?   integer
+---@return T
 ---@nodiscard
 function unpack(list, i, j) end

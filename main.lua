@@ -58,11 +58,15 @@ collectgarbage('incremental', 120, 120, 0)
 ---@diagnostic disable-next-line: lowercase-global
 log = require 'log'
 log.init(ROOT, fs.path(LOGPATH) / 'service.log')
+if LOGLEVEL then
+    log.level = tostring(LOGLEVEL):lower()
+end
+
 log.info('Lua Lsp startup, root: ', ROOT)
-log.debug('ROOT:', ROOT:string())
-log.debug('LOGPATH:', LOGPATH)
-log.debug('METAPATH:', METAPATH)
-log.debug('VERSION:', version.getVersion())
+log.info('ROOT:', ROOT:string())
+log.info('LOGPATH:', LOGPATH)
+log.info('METAPATH:', METAPATH)
+log.info('VERSION:', version.getVersion())
 
 require 'tracy'
 require 'cli'

@@ -1,8 +1,8 @@
 local files    = require 'files'
-local searcher = require 'core.searcher'
 local lang     = require 'language'
 local define   = require 'proto.define'
-local guide    = require "parser.guide"
+local guide    = require 'parser.guide'
+local vm       = require 'vm'
 
 return function (uri, callback)
     local ast = files.getState(uri)
@@ -30,7 +30,7 @@ return function (uri, callback)
                 if not name then
                     goto CONTINUE
                 end
-                local value = searcher.getObjectValue(nxt)
+                local value = vm.getObjectValue(nxt)
                 if not value or value.type ~= 'function' then
                     goto CONTINUE
                 end

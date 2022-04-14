@@ -13,6 +13,7 @@ local timer   = require 'timer'
 local encoder = require 'encoder'
 local ws      = require 'workspace.workspace'
 local scope   = require 'workspace.scope'
+local inspect = require 'inspect'
 
 local m = {}
 
@@ -108,7 +109,7 @@ local function compileSingleMetaDoc(uri, script, metaLang, status)
         version = 5.1
         jit = true
     else
-        version = tonumber(config.get(uri, 'Lua.runtime.version'):sub(-3))
+        version = tonumber(config.get(uri, 'Lua.runtime.version'):sub(-3)) or 5.4
         jit = false
     end
 
@@ -220,7 +221,7 @@ local function initBuiltIn(uri)
     end
 
     if scp:get('metaPath') == metaPath:string() then
-        log.info('Has meta path, skip:', metaPath:string())
+        log.debug('Has meta path, skip:', metaPath:string())
         return
     end
     scp:set('metaPath', metaPath:string())
@@ -230,14 +231,14 @@ local function initBuiltIn(uri)
         end
     end, log.error)
     if not suc then
-        log.info('Init builtin failed.')
+        log.warn('Init builtin failed.')
         return
     end
     local out = fsu.dummyFS()
     local templateDir = ROOT / 'meta' / 'template'
     for libName, status in pairs(define.BuiltIn) do
         status = config.get(uri, 'Lua.runtime.builtin')[libName] or status
-        log.info('Builtin status:', libName, status)
+        log.debug('Builtin status:', libName, status)
         if status == 'disable' then
             goto CONTINUE
         end
@@ -249,13 +250,13 @@ local function initBuiltIn(uri)
             out:saveFile(libName, metaDoc)
             local outputPath = metaPath / libName
             m.metaPaths[outputPath:string()] = true
-            log.info('Meta path:', outputPath:string())
+            log.debug('Meta path:', outputPath:string())
         end
         ::CONTINUE::
     end
     local result = fsu.fileSync(out, metaPath)
     if #result.err > 0 then
-        log.warn('File sync error:', util.dump(result))
+        log.warn('File sync error:', inspect(result))
     end
 end
 

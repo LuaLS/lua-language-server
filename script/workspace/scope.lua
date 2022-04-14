@@ -1,5 +1,8 @@
 local gc = require 'gc'
 
+---@class scope.manager
+local m = {}
+
 ---@alias scope.type '"override"'|'"folder"'|'"fallback"'
 
 ---@class scope
@@ -57,6 +60,14 @@ function mt:isLinkedUri(uri)
         end
     end
     return false
+end
+
+---@param uri uri
+---@return boolean
+function mt:isVisible(uri)
+    return self:isChildUri(uri)
+        or self:isLinkedUri(uri)
+        or self == m.getScope(uri)
 end
 
 ---@param uri uri
@@ -121,9 +132,6 @@ local function createScope(scopeType)
 
     return scope
 end
-
----@class scope.manager
-local m = {}
 
 function m.reset()
     ---@type scope[]

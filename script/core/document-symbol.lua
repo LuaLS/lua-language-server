@@ -33,7 +33,7 @@ local function buildFunctionParams(func)
     end
     local params = {}
     for _, arg in ipairs(func.args) do
-        if arg.dummy then
+        if arg.type == 'self' then
             goto CONTINUE
         end
         if arg.type == '...' then
@@ -183,9 +183,6 @@ local function buildValue(source, text, symbols)
 end
 
 local function buildSet(source, text, used, symbols)
-    if source.dummy then
-        return
-    end
     local value = source.value
     if value and value.type == 'function' then
         used[value] = true

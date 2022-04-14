@@ -34,9 +34,9 @@ function TEST(script)
                 positions[i] = { result.target.start, result.target.finish }
             end
         end
-        assert(founded(catched['!'] or {}, positions))
+        assert(founded(catched['!'], positions))
     else
-        assert(catched['!'] == nil)
+        assert(#catched['!'] == 0)
     end
 
     files.remove('')
@@ -44,12 +44,12 @@ end
 
 require 'definition.local'
 require 'definition.set'
+require 'definition.field'
 require 'definition.arg'
 require 'definition.function'
 require 'definition.table'
 require 'definition.method'
 require 'definition.label'
-require 'definition.call'
 require 'definition.special'
 require 'definition.bug'
 require 'definition.luadoc'

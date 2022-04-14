@@ -141,7 +141,7 @@ function m.clear(uri)
         uri = uri,
         diagnostics = {},
     })
-    log.debug('clearDiagnostics', uri)
+    log.info('clearDiagnostics', uri)
 end
 
 function m.clearCache(uri)
@@ -221,9 +221,8 @@ function m.doDiagnostic(uri, isScopeDiag)
     end
 
     local version = files.getVersion(uri)
-    local scp = scope.getScope(uri)
 
-    local prog <close> = progress.create(scp, lang.script.WINDOW_DIAGNOSING, 0.5)
+    local prog <close> = progress.create(uri, lang.script.WINDOW_DIAGNOSING, 0.5)
     prog:setMessage(ws.getRelativePath(uri))
 
     --log.debug('Diagnostic file:', uri)
@@ -367,10 +366,10 @@ function m.awaitDiagnosticsScope(suri)
         await.sleep(1.0)
     end
     local clock = os.clock()
-    local bar <close> = progress.create(scope.getScope(suri), lang.script.WORKSPACE_DIAGNOSTIC, 1)
+    local bar <close> = progress.create(suri, lang.script.WORKSPACE_DIAGNOSTIC, 1)
     local cancelled
     bar:onCancel(function ()
-        log.debug('Cancel workspace diagnostics')
+        log.info('Cancel workspace diagnostics')
         cancelled = true
         ---@async
         await.call(function ()
@@ -398,12 +397,12 @@ function m.awaitDiagnosticsScope(suri)
         xpcall(m.doDiagnostic, log.error, uri, true)
         await.delay()
         if cancelled then
-            log.debug('Break workspace diagnostics')
+            log.info('Break workspace diagnostics')
             break
         end
     end
     bar:remove()
-    log.debug(('Diagnostics scope [%s] finished, takes [%.3f] sec.'):format(scp:getName(), os.clock() - clock))
+    log.info(('Diagnostics scope [%s] finished, takes [%.3f] sec.'):format(scp:getName(), os.clock() - clock))
 end
 
 function m.diagnosticsScope(uri, force)

@@ -3,9 +3,8 @@ local vm        = require 'vm'
 local lang      = require 'language'
 local config    = require 'config'
 local guide     = require 'parser.guide'
-local noder     = require 'core.noder'
-local collector = require 'core.collector' 'searcher'
 local await     = require 'await'
+local globalMgr = require 'vm.global-manager'
 
 local requireLike = {
     ['include'] = true,
@@ -21,35 +20,40 @@ return function (uri, callback)
         return
     end
 
+    local dglobals = config.get(uri, 'Lua.diagnostics.globals')
+    local rspecial = config.get(uri, 'Lua.runtime.special')
+    local cache    = {}
+
     -- 遍历全局变量，检查所有没有 set 模式的全局变量
     guide.eachSourceType(ast.ast, 'getglobal', function (src) ---@async
         local key = src[1]
         if not key then
             return
         end
-        if config.get(uri, 'Lua.diagnostics.globals')[key] then
+        if dglobals[key] then
             return
         end
-        if config.get(uri, 'Lua.runtime.special')[key] then
+        if rspecial[key] then
             return
         end
         local node = src.node
         if node.tag ~= '_ENV' then
             return
         end
-        await.delay()
-        local id = 'def:' .. noder.getID(src)
-        if not collector:has(uri, id) then
-            local message = lang.script('DIAG_UNDEF_GLOBAL', key)
-            if requireLike[key:lower()] then
-                message = ('%s(%s)'):format(message, lang.script('DIAG_REQUIRE_LIKE', key))
-            end
-            callback {
-                start   = src.start,
-                finish  = src.finish,
-                message = message,
-            }
+        if cache[key] == nil then
+            cache[key] = globalMgr.hasGlobalSets(uri, 'variable', key)
+        end
+        if cache[key] then
             return
         end
+        local message = lang.script('DIAG_UNDEF_GLOBAL', key)
+        if requireLike[key:lower()] then
+            message = ('%s(%s)'):format(message, lang.script('DIAG_REQUIRE_LIKE', key))
+        end
+        callback {
+            start   = src.start,
+            finish  = src.finish,
+            message = message,
+        }
     end)
 end

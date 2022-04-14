@@ -1,5 +1,5 @@
 local files    = require 'files'
-local infer    = require 'core.infer'
+local infer    = require 'vm.infer'
 local vm       = require 'vm'
 local config   = require 'config'
 local guide    = require 'parser.guide'
@@ -22,9 +22,6 @@ local function typeHint(uri, results, start, finish)
         and source.type ~= 'setindex' then
             return
         end
-        if source.dummy then
-            return
-        end
         if source[1] == '_' then
             return
         end
@@ -41,8 +38,9 @@ local function typeHint(uri, results, start, finish)
             end
         end
         await.delay()
-        local view = infer.searchAndViewInfers(source)
+        local view = infer.getInfer(source):view()
         if view == 'any'
+        or view == 'unknown'
         or view == 'nil' then
             return
         end

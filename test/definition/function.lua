@@ -24,6 +24,6 @@ end
 ]]
 
 TEST [[
-local <!f!> = function () end
+local <!f!> = <!function () end!>
 <?f?>()
 ]]

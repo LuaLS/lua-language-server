@@ -1,5 +1,4 @@
 local files      = require 'files'
-local searcher   = require 'core.searcher'
 local vm         = require 'vm'
 local hoverLabel = require 'core.hover.label'
 local hoverDesc  = require 'core.hover.description'
@@ -88,7 +87,7 @@ local function makeSignatures(text, call, pos)
     if call.args then
         local args = {}
         for _, arg in ipairs(call.args) do
-            if not arg.dummy then
+            if arg.type ~= 'self' then
                 args[#args+1] = arg
             end
         end
@@ -126,7 +125,6 @@ local function makeSignatures(text, call, pos)
     local defs = vm.getDefs(node)
     local mark = {}
     for _, src in ipairs(defs) do
-        src = searcher.getObjectValue(src) or src
         if src.type == 'function'
         or src.type == 'doc.type.function' then
             if not mark[src] then

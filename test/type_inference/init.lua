@@ -1,6 +1,6 @@
 local files  = require 'files'
 local guide  = require 'parser.guide'
-local infer  = require 'core.infer'
+local infer  = require 'vm.infer'
 local config = require 'config'
 local catch  = require 'catch'
 
@@ -8,17 +8,21 @@ rawset(_G, 'TEST', true)
 
 local function getSource(pos)
     local ast = files.getState('')
-    return guide.eachSourceContain(ast.ast, pos, function (source)
+    local result
+    guide.eachSourceContain(ast.ast, pos, function (source)
         if source.type == 'local'
         or source.type == 'getlocal'
         or source.type == 'setlocal'
         or source.type == 'setglobal'
         or source.type == 'getglobal'
         or source.type == 'field'
-        or source.type == 'method' then
-            return source
+        or source.type == 'method'
+        or source.type == 'function'
+        or source.type == 'table' then
+            result = source
         end
     end)
+    return result
 end
 
 function TEST(wanted)
@@ -27,9 +31,9 @@ function TEST(wanted)
         files.setText('', newScript)
         local source = getSource(catched['?'][1][1])
         assert(source)
-        local result = infer.searchAndViewInfers(source)
+        local result = infer.getInfer(source):view()
         if wanted ~= result then
-            infer.searchAndViewInfers(source)
+            infer.getInfer(source):view()
         end
         assert(wanted == result)
         files.remove('')
@@ -52,12 +56,38 @@ TEST 'number' [[
 local <?var?> = 1.0
 ]]
 
+TEST 'unknown' [[
+local <?var?>
+]]
+
+TEST 'unknown' [[
+local <?var?>
+var = y
+]]
+
+TEST 'any' [[
+function f(<?x?>)
+    
+end
+]]
+
+TEST 'any' [[
+function f(<?x?>)
+    x = 1
+end
+]]
+
+TEST 'number' [[
+local <?var?>
+var = 1
+var = 1.0
+]]
+
 TEST 'string' [[
 local var = '111'
 t.<?x?> = var
 ]]
 
-config.set(nil, 'Lua.IntelliSense.traceLocalSet', true)
 TEST 'string' [[
 local <?var?>
 var = '111'
@@ -68,7 +98,6 @@ local var
 var = '111'
 print(<?var?>)
 ]]
-config.set(nil, 'Lua.IntelliSense.traceLocalSet', false)
 
 TEST 'function' [[
 function <?xx?>()
@@ -80,19 +109,17 @@ local function <?xx?>()
 end
 ]]
 
-config.set(nil, 'Lua.IntelliSense.traceLocalSet', true)
 TEST 'function' [[
 local xx
 <?xx?> = function ()
 end
 ]]
-config.set(nil, 'Lua.IntelliSense.traceLocalSet', false)
 
 TEST 'table' [[
 local <?t?> = {}
 ]]
 
-TEST 'any' [[
+TEST 'unknown' [[
 <?x?>()
 ]]
 
@@ -100,7 +127,7 @@ TEST 'boolean' [[
 <?x?> = not y
 ]]
 
-TEST 'any' [[
+TEST 'integer' [[
 <?x?> = #y
 ]]
 
@@ -112,7 +139,7 @@ TEST 'integer' [[
 <?x?> = #{}
 ]]
 
-TEST 'any' [[
+TEST 'number' [[
 <?x?> = - y
 ]]
 
@@ -120,7 +147,7 @@ TEST 'number' [[
 <?x?> = - 1.0
 ]]
 
-TEST 'any' [[
+TEST 'integer' [[
 <?x?> = ~ y
 ]]
 
@@ -144,7 +171,7 @@ TEST 'boolean' [[
 <?x?> = a == b
 ]]
 
-TEST 'any' [[
+TEST 'integer' [[
 <?x?> = a << b
 ]]
 
@@ -152,7 +179,7 @@ TEST 'integer' [[
 <?x?> = 1 << 2
 ]]
 
-TEST 'any' [[
+TEST 'string' [[
 <?x?> = a .. b
 ]]
 
@@ -160,12 +187,24 @@ TEST 'string' [[
 <?x?> = 'a' .. 'b'
 ]]
 
-TEST 'any' [[
+TEST 'string' [[
+<?x?> = 'a' .. 1
+]]
+
+TEST 'string' [[
+<?x?> = 'a' .. 1.0
+]]
+
+TEST 'number' [[
 <?x?> = a + b
 ]]
 
 TEST 'number' [[
 <?x?> = 1 + 2.0
+]]
+
+TEST 'integer' [[
+<?x?> = 1 + 2
 ]]
 
 TEST 'tablelib' [[
@@ -185,29 +224,38 @@ TEST 'function' [[
 ---@class stringlib
 local string
 
-string.sub = function () end
+string.xxx = function () end
 
-return ('x').<?sub?>
+return ('x').<?xxx?>
+]]
+
+TEST 'function' [[
+---@class stringlib
+String = {}
+
+String.xxx = function () end
+
+return ('x').<?xxx?>
 ]]
 
 TEST 'function' [[
 ---@class stringlib
 local string
 
-string.sub = function () end
+string.xxx = function () end
 
-<?x?> = ('x').sub
+<?x?> = ('x').xxx
 ]]
 
 TEST 'function' [[
 ---@class stringlib
 local string
 
-string.sub = function () end
+string.xxx = function () end
 
 _VERSION = 'Lua 5.4'
 
-<?x?> = _VERSION.sub
+<?x?> = _VERSION.xxx
 ]]
 
 TEST 'table' [[
@@ -221,7 +269,7 @@ end
 <?y?> = x()
 ]]
 
-TEST 'integer' [[
+TEST 'integer|nil' [[
 local function x()
     return 1
     return nil
@@ -229,7 +277,7 @@ end
 <?y?> = x()
 ]]
 
-TEST 'any' [[
+TEST 'unknown|nil' [[
 local function x()
     return a
     return nil
@@ -237,12 +285,20 @@ end
 <?y?> = x()
 ]]
 
-TEST 'any' [[
+TEST 'unknown|nil' [[
 local function x()
     return nil
     return f()
 end
 <?y?> = x()
+]]
+
+TEST 'unknown' [[
+local function x()
+    return nil
+    return f()
+end
+_, <?y?> = x()
 ]]
 
 TEST 'integer' [[
@@ -292,7 +348,7 @@ local <?x?> = f()
 --]]
 
 -- 不根据对方函数内的使用情况来推测
-TEST 'any' [[
+TEST 'unknown' [[
 local function x(a)
     _ = a + 1
 end
@@ -300,7 +356,7 @@ local b
 x(<?b?>)
 ]]
 
-TEST 'any' [[
+TEST 'unknown' [[
 local function x(a, ...)
     local _, <?b?>, _ = ...
 end
@@ -308,18 +364,18 @@ x(nil, 'xx', 1, true)
 ]]
 
 -- 引用不跨越参数
-TEST 'any' [[
+TEST 'unknown' [[
 local function x(a, ...)
     return true, 'ss', ...
 end
 local _, _, _, <?b?>, _ = x(nil, true, 1, 'yy')
 ]]
 
-TEST 'any' [[
+TEST 'unknown' [[
 local <?x?> = next()
 ]]
 
-TEST 'any' [[
+TEST 'unknown' [[
 local a, b
 function a()
     return b()
@@ -342,6 +398,11 @@ TEST 'string' [[
 local <?x?>
 ]]
 
+TEST '1' [[
+---@type 1
+local <?v?>
+]]
+
 TEST 'string[]' [[
 ---@class string
 
@@ -358,12 +419,82 @@ local <?x?>
 ]]
 
 TEST '"enum1"|"enum2"' [[
----@type '"enum1"' | '"enum2"'
+---@type 'enum1' | 'enum2'
+local <?x?>
+]]
+
+TEST '"enum1"|"enum2"' [[
+---@type 'enum1' | 'enum2'
+local <?x?>
+]]
+
+config.set(nil, 'Lua.hover.expandAlias', false)
+TEST 'A' [[
+---@alias A 'enum1' | 'enum2'
+
+---@type A
+local <?x?>
+]]
+
+TEST 'A' [[
+---@alias A 'enum1' | 'enum2' | A
+
+---@type A
+local <?x?>
+]]
+
+TEST 'A' [[
+---@alias A 'enum1' | 'enum2' | B
+
+---@type A
+local <?x?>
+]]
+config.set(nil, 'Lua.hover.expandAlias', true)
+TEST '"enum1"|"enum2"' [[
+---@alias A 'enum1' | 'enum2'
+
+---@type A
+local <?x?>
+]]
+
+TEST '"enum1"|"enum2"' [[
+---@alias A 'enum1' | 'enum2' | A
+
+---@type A
+local <?x?>
+]]
+
+TEST '"enum1"|"enum2"|B' [[
+---@alias A 'enum1' | 'enum2' | B
+
+---@type A
+local <?x?>
+]]
+
+TEST '1|true' [[
+---@alias A 1 | true
+
+---@type A
 local <?x?>
 ]]
 
 TEST 'fun()' [[
 ---@type fun()
+local <?x?>
+]]
+
+TEST 'fun(a: string, b: any, ...: any)' [[
+---@type fun(a: string, b, ...)
+local <?x?>
+]]
+
+TEST 'fun(a: string, b: any, c?: boolean, ...: any):c, d?, ...' [[
+---@type fun(a: string, b, c?: boolean, ...):c, d?, ...
+local <?x?>
+]]
+
+TEST 'table' [[
+---@type { [string]: string }
 local <?x?>
 ]]
 
@@ -414,10 +545,34 @@ print(t.<?a?>)
 ]]
 
 TEST '"aaa"|"bbb"' [[
----@type table<string, '"aaa"'|'"bbb"'>
+---@type table<string, 'aaa'|'bbb'>
 local t = {}
 
 print(t.<?a?>)
+]]
+
+TEST 'integer' [[
+---@generic K
+---@type fun(a?: K):K
+local f
+
+local <?n?> = f(1)
+]]
+
+TEST 'unknown' [[
+---@generic K
+---@type fun(a?: K):K
+local f
+
+local <?n?> = f(nil)
+]]
+
+TEST 'unknown' [[
+---@generic K
+---@type fun(a: K|integer):K
+local f
+
+local <?n?> = f(1)
 ]]
 
 TEST 'integer' [[
@@ -537,22 +692,120 @@ local t
 local <?k?>, v = f2(t)
 ]]
 
-TEST 'string' [[
----@class string
+TEST 'fun(a: <V>):integer, <V>' [[
+---@generic K, V
+---@param a K
+---@return fun(a: V):K, V
+local function f(a) end
 
+local <?f2?> = f(1)
+]]
+
+TEST 'integer' [[
+---@generic K, V
+---@param a K
+---@return fun(a: V):K, V
+local function f(a) end
+
+local f2 = f(1)
+local <?i?>, v = f2(true)
+]]
+
+TEST 'boolean' [[
+---@generic K, V
+---@param a K
+---@return fun(a: V):K, V
+local function f(a) end
+
+local f2 = f(1)
+local i, <?v?> = f2(true)
+]]
+
+TEST 'fun(table: table<<K>, <V>>, index?: <K>):<K>, <V>' [[
 ---@generic T: table, K, V
 ---@param t T
----@return fun(table: table<K, V>, index: K):K, V
+---@return fun(table: table<K, V>, index?: K):K, V
 ---@return T
 ---@return nil
 local function pairs(t) end
 
-local f = pairs(t)
+local <?next?> = pairs(dummy)
+]]
+
+TEST 'string' [[
+---@generic T: table, K, V
+---@param t T
+---@return fun(table: table<K, V>, index?: K):K, V
+---@return T
+---@return nil
+local function pairs(t) end
+
+local next = pairs(dummy)
+
+---@type table<string, boolean>
+local t
+local <?k?>, v = next(t)
+]]
+
+TEST 'boolean' [[
+---@generic T: table, K, V
+---@param t T
+---@return fun(table: table<K, V>, index?: K):K, V
+---@return T
+---@return nil
+local function pairs(t) end
+
+local next = pairs(dummy)
+
+---@type table<string, boolean>
+local t
+local k, <?v?> = next(t)
+]]
+
+TEST 'string' [[
+---@generic T: table, K, V
+---@param t T
+---@return fun(table: table<K, V>, index?: K):K, V
+---@return T
+---@return nil
+local function pairs(t) end
+
+local next = pairs(dummy)
+
+---@type table<string, boolean>
+local t
+local <?k?>, v = next(t, nil)
+]]
+
+TEST 'boolean' [[
+---@generic T: table, K, V
+---@param t T
+---@return fun(table: table<K, V>, index?: K):K, V
+---@return T
+---@return nil
+local function pairs(t) end
+
+local next = pairs(dummy)
+
+---@type table<string, boolean>
+local t
+local k, <?v?> = next(t, nil)
+]]
+
+TEST 'string' [[
+---@generic T: table, K, V
+---@param t T
+---@return fun(table: table<K, V>, index?: K):K, V
+---@return T
+---@return nil
+local function pairs(t) end
+
+local next = pairs(dummy)
 
 ---@type table<string, boolean>
 local t
 
-for <?k?>, v in f, t do
+for <?k?>, v in next, t do
 end
 ]]
 
@@ -575,8 +828,6 @@ end
 ]]
 
 TEST 'string' [[
----@class string
-
 ---@generic T: table, K, V
 ---@param t T
 ---@return fun(table: table<K, V>, index?: K):K, V
@@ -591,8 +842,6 @@ end
 ]]
 
 TEST 'boolean' [[
----@class boolean
-
 ---@generic T: table, K, V
 ---@param t T
 ---@return fun(table: table<K, V>, index: K):K, V
@@ -608,8 +857,6 @@ end
 ]]
 
 TEST 'boolean' [[
----@class boolean
-
 ---@generic T: table, V
 ---@param t T
 ---@return fun(table: V[], i?: integer):integer, V
@@ -625,8 +872,6 @@ end
 ]]
 
 TEST 'boolean' [[
----@class boolean
-
 ---@generic T: table, K, V
 ---@param t T
 ---@return fun(table: table<K, V>, index: K):K, V
@@ -642,8 +887,6 @@ end
 ]]
 
 TEST 'integer' [[
----@class integer
-
 ---@generic T: table, K, V
 ---@param t T
 ---@return fun(table: table<K, V>, index?: K):K, V
@@ -749,13 +992,13 @@ string.gsub():gsub():<?gsub?>()
 ]]
 
 config.set(nil, 'Lua.hover.enumsLimit', 5)
-TEST 'a|b|c|d|e...(+5)' [[
+TEST '"a"|"b"|"c"|"d"|"e"...(+5)' [[
 ---@type 'a'|'b'|'c'|'d'|'e'|'f'|'g'|'h'|'i'|'j'
 local <?t?>
 ]]
 
 config.set(nil, 'Lua.hover.enumsLimit', 1)
-TEST 'a...(+9)' [[
+TEST '"a"...(+9)' [[
 ---@type 'a'|'b'|'c'|'d'|'e'|'f'|'g'|'h'|'i'|'j'
 local <?t?>
 ]]
@@ -828,13 +1071,18 @@ TEST 'fun():number, boolean' [[
 local <?t?>
 ]]
 
---[[
-l:value
-l:work|&1|&1
-f:|&1|&1
-dfun:|&1
-dn:Class
+
+TEST 'fun(value: Class)' [[
+---@class Class
+
+---@param callback fun(value: Class)
+function work(callback)
+end
+
+work(<?function?> (value)
+end)
 ]]
+
 TEST 'Class' [[
 ---@class Class
 
@@ -846,14 +1094,14 @@ work(function (<?value?>)
 end)
 ]]
 
-TEST 'Class' [[
+TEST 'fun(value: Class)' [[
 ---@class Class
 
 ---@param callback fun(value: Class)
 function work(callback)
 end
 
-pcall(work, function (<?value?>)
+pcall(work, <?function?> (value)
 end)
 ]]
 
@@ -919,14 +1167,36 @@ end
 --f = function (<?x?>) end
 --]]
 
+TEST 'fun(i: integer)' [[
+--- @class Emit
+--- @field on fun(eventName: string, cb: function)
+--- @field on fun(eventName: 'died', cb: fun(i: integer))
+--- @field on fun(eventName: 'won', cb: fun(s: string))
+local emit = {}
+
+emit.on("died", <?function?> (i)
+end)
+]]
+
 TEST 'integer' [[
 --- @class Emit
 --- @field on fun(eventName: string, cb: function)
---- @field on fun(eventName: '"died"', cb: fun(i: integer))
---- @field on fun(eventName: '"won"', cb: fun(s: string))
+--- @field on fun(eventName: 'died', cb: fun(i: integer))
+--- @field on fun(eventName: 'won', cb: fun(s: string))
 local emit = {}
 
 emit.on("died", function (<?i?>)
+end)
+]]
+
+TEST 'integer' [[
+--- @class Emit
+--- @field on fun(self: Emit, eventName: string, cb: function)
+--- @field on fun(self: Emit, eventName: 'died', cb: fun(i: integer))
+--- @field on fun(self: Emit, eventName: 'won', cb: fun(s: string))
+local emit = {}
+
+emit:on("died", function (<?i?>)
 end)
 ]]
 
@@ -937,7 +1207,7 @@ TEST 'integer' [[
 --- @field on fun(self: Emit, eventName: '"won"', cb: fun(s: string))
 local emit = {}
 
-emit:on("died", function (<?i?>)
+emit.on(self, "died", function (<?i?>)
 end)
 ]]
 
@@ -960,14 +1230,14 @@ local x
 <?x?> = 1
 ]]
 
-TEST 'any' [[
+TEST 'unknown' [[
 ---@return number
 local function f(x)
     local <?y?> = x()
 end
 ]]
 
-TEST 'any' [[
+TEST 'unknown' [[
 local mt
 
 ---@return number
@@ -976,7 +1246,7 @@ function mt:f() end
 local <?v?> = mt()
 ]]
 
-TEST 'any' [[
+TEST 'unknown' [[
 local <?mt?>
 
 ---@class X
@@ -990,7 +1260,7 @@ local mt
 function mt:f(<?x?>) end
 ]]
 
-TEST 'any' [[
+TEST 'unknown' [[
 local <?mt?>
 
 ---@type number
@@ -1018,6 +1288,22 @@ function mt:loop(callback) end
 mt:loop(function (<?i?>)
     
 end)
+]]
+
+TEST 'C' [[
+---@class D
+---@field y integer # D comment
+
+---@class C
+---@field x integer # C comment
+---@field d D
+
+---@param c C
+local function f(c) end
+
+f <?{?>
+    x = ,
+}
 ]]
 
 TEST 'integer' [[
@@ -1064,4 +1350,135 @@ function F(<?x?>) end
 
 ---@param x boolean
 function F(x) end
+]]
+
+TEST 'B' [[
+---@class A
+local A
+
+---@return A
+function A:x() end
+
+---@class B: A
+local B
+
+---@return B
+function B:x() end
+
+---@type B
+local t
+
+local <?v?> = t.x()
+]]
+
+TEST 'function' [[
+---@overload fun()
+function <?f?>() end
+]]
+
+TEST 'integer' [[
+---@type table<string, integer>
+local t
+
+t.<?a?>
+]]
+
+TEST '"a"|"b"|"c"' [[
+---@type table<string, "a"|"b"|"c">
+local t
+
+t.<?a?>
+]]
+
+TEST 'integer' [[
+---@class A
+---@field x integer
+
+---@type A
+local t
+t.<?x?>
+]]
+
+TEST 'boolean' [[
+local <?var?> = true
+var = 1
+var = 1.0
+]]
+
+TEST 'unknown' [[
+---@return ...
+local function f() end
+
+local <?x?> = f()
+]]
+
+TEST 'unknown' [[
+---@return ...
+local function f() end
+
+local _, <?x?> = f()
+]]
+
+TEST 'unknown' [[
+local t = {
+    x = 1,
+    y = 2,
+}
+
+local <?x?> = t[#t]
+]]
+
+TEST 'string' [[
+local t = {
+    x   = 1,
+    [1] = 'x',
+}
+
+local <?x?> = t[#t]
+]]
+
+TEST 'string' [[
+local t = { 'x' }
+
+local <?x?> = t[#t]
+]]
+
+TEST '(string|integer)[]' [[
+---@type (string|integer)[]
+local <?x?>
+]]
+
+TEST 'boolean' [[
+---@type table<string, boolean>
+local t
+
+---@alias uri string
+
+---@type string
+local uri
+
+local <?v?> = t[uri]
+]]
+
+TEST 'A' [[
+---@class A
+G = {}
+
+<?G?>:A()
+]]
+
+TEST 'A' [[
+---@type A
+local <?x?> = nil
+]]
+
+TEST 'A' [[
+---@class A
+---@field b B
+local mt
+
+function mt:f()
+    self.b:x()
+    print(<?self?>)
+end
 ]]

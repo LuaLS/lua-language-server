@@ -1,6 +1,33 @@
 local files   = require 'files'
 local lang    = require 'language'
-local noder   = require 'core.noder'
+local infer   = require 'vm.infer'
+
+local function getFieldEventName(doc)
+    if not doc.extends then
+        return nil
+    end
+    if #doc.extends.types ~= 1 then
+        return nil
+    end
+    local docFunc = doc.extends.types[1]
+    if docFunc.type ~= 'doc.type.function' then
+        return nil
+    end
+    for i = 1, 2 do
+        local arg = docFunc.args[i]
+        if  arg
+        and arg.extends
+        and #arg.extends.types == 1 then
+            local literal = arg.extends.types[1]
+            if literal.type == 'doc.type.boolean'
+            or literal.type == 'doc.type.string'
+            or literal.type == 'doc.type.integer' then
+                return ('%q'):format(literal[1])
+            end
+        end
+    end
+    return nil
+end
 
 return function (uri, callback)
     local state = files.getState(uri)
@@ -19,8 +46,8 @@ return function (uri, callback)
                 mark = {}
             elseif doc.type == 'doc.field' then
                 if mark then
-                    local name = doc.field[1]
-                    local eventName = noder.getFieldEventName(doc)
+                    local name = ('%q'):format(doc.field[1])
+                    local eventName = getFieldEventName(doc)
                     if eventName then
                         name = name .. '|' .. eventName
                     end

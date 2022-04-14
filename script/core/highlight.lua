@@ -1,4 +1,3 @@
-local searcher   = require 'core.searcher'
 local files      = require 'files'
 local vm         = require 'vm'
 local define     = require 'proto.define'
@@ -6,10 +5,13 @@ local findSource = require 'core.find-source'
 local util       = require 'utility'
 local guide      = require 'parser.guide'
 
+---@async
 local function eachRef(source, callback)
-    local results = vm.getRefs(source)
-    for i = 1, #results do
-        callback(results[i])
+    local refs = vm.getRefs(source, function ()
+        return false
+    end)
+    for _, ref in ipairs(refs) do
+        callback(ref)
     end
 end
 
@@ -22,6 +24,7 @@ local function eachLocal(source, callback)
     end
 end
 
+---@async
 local function find(source, uri, callback)
     if     source.type == 'local' then
         eachLocal(source, callback)
@@ -237,6 +240,7 @@ local function isLiteralValue(source)
     return true
 end
 
+---@async
 return function (uri, offset)
     local state = files.getState(uri)
     if not state then
@@ -252,9 +256,6 @@ return function (uri, offset)
         local isLiteral = isLiteralValue(source)
         find(source, uri, function (target)
             if not target then
-                return
-            end
-            if target.dummy then
                 return
             end
             if mark[target] then

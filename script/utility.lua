@@ -21,9 +21,8 @@ local getupvalue   = debug.getupvalue
 local mathHuge     = math.huge
 local inf          = 1 / 0
 local nan          = 0 / 0
-local utf8         = utf8
 local error        = error
-local upvalueid    = debug.upvalueid
+local assert       = assert
 
 _ENV = nil
 
@@ -674,29 +673,67 @@ function m.arrayToHash(l)
     return t
 end
 
-function m.switch()
-    local map = {}
-    local cachedCases = {}
-    local obj = {
-        case = function (self, name)
-            cachedCases[#cachedCases+1] = name
-            return self
-        end,
-        call = function (self, callback)
-            for i = 1, #cachedCases do
-                local name = cachedCases[i]
-                cachedCases[i] = nil
-                if map[name] then
-                    error('Repeated fields:' .. tostring(name))
-                end
-                map[name] = callback
-            end
-            return self
-        end,
-        getMap = function (self)
-            return map
+---@class switch
+---@field cachedCases string[]
+---@field map table<string, function>
+---@field _default fun(...):...
+local switchMT = {}
+switchMT.__index = switchMT
+
+---@param name string
+---@return switch
+function switchMT:case(name)
+    self.cachedCases[#self.cachedCases+1] = name
+    return self
+end
+
+---@param callback async fun(...):...
+---@return switch
+function switchMT:call(callback)
+    for i = 1, #self.cachedCases do
+        local name = self.cachedCases[i]
+        self.cachedCases[i] = nil
+        if self.map[name] then
+            error('Repeated fields:' .. tostring(name))
         end
-    }
+        self.map[name] = callback
+    end
+    return self
+end
+
+---@param callback fun(...):...
+---@return switch
+function switchMT:default(callback)
+    self._default = callback
+    return self
+end
+
+function switchMT:getMap()
+    return self.map
+end
+
+---@param name string
+---@return boolean
+function switchMT:has(name)
+    return self.map[name] ~= nil
+end
+
+---@param name string
+---@return ...
+function switchMT:__call(name, ...)
+    local callback = self.map[name] or self._default
+    if not callback then
+        return
+    end
+    return callback(...)
+end
+
+---@return switch
+function m.switch()
+    local obj = setmetatable({
+        map = {},
+        cachedCases = {},
+    }, switchMT)
     return obj
 end
 
@@ -729,5 +766,33 @@ function m.defaultTable(default)
         return v
     end })
 end
+
+function m.multiTable(count, default)
+    local current
+    if default then
+        current = setmetatable({}, { __index = function (t, k)
+            local v = default(k)
+            t[k] = v
+            return v
+        end })
+    else
+        current = setmetatable({}, { __index = function (t, k)
+            local v = {}
+            t[k] = v
+            return v
+        end })
+    end
+    for _ = 3, count do
+        current = setmetatable({}, { __index = function (t, k)
+            t[k] = current
+            return current
+        end })
+    end
+    return current
+end
+
+m.MODE_K  = { __mode = 'k' }
+m.MODE_V  = { __mode = 'v' }
+m.MODE_KV = { __mode = 'kv' }
 
 return m

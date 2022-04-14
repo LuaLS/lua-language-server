@@ -1,13 +1,12 @@
 local vm       = require 'vm'
 local ws       = require 'workspace'
-local searcher = require 'core.searcher'
 local markdown = require 'provider.markdown'
 local config   = require 'config'
 local lang     = require 'language'
 local util     = require 'utility'
 local guide    = require 'parser.guide'
-local noder    = require 'core.noder'
 local rpath    = require 'workspace.require-path'
+local infer    = require 'vm.infer'
 
 local function collectRequire(mode, literal, uri)
     local result, searchers
@@ -57,6 +56,9 @@ end
 
 local function asStringView(source, literal)
     -- 内部包含转义符？
+    if not source[2] then
+        return
+    end
     local rawLen = source.finish - source.start - 2 * #source[2]
     if  config.get(guide.getUri(source), 'Lua.hover.viewString')
     and (source[2] == '"' or source[2] == "'")
@@ -126,20 +128,10 @@ end
 
 local function tryDocClassComment(source)
     for _, def in ipairs(vm.getDefs(source)) do
-        if def.type == 'doc.class.name'
-        or def.type == 'doc.alias.name' then
-            local class = noder.getDocState(def)
-            local comment = getBindComment(class, class.bindGroup, class)
+        if def.type == 'doc.class'
+        or def.type == 'doc.alias' then
+            local comment = getBindComment(def, def.bindGroup, def)
             if comment then
-                return comment
-            end
-        end
-    end
-    if source.bindDocs then
-        for _, doc in ipairs(source.bindDocs) do
-            if doc.type == 'doc.class'
-            or doc.type == 'doc.alias' then
-                local comment = getBindComment(doc, source.bindDocs, doc)
                 return comment
             end
         end
@@ -154,29 +146,32 @@ local function tryDocModule(source)
 end
 
 local function buildEnumChunk(docType, name)
-    local enums = vm.getDocEnums(docType)
-    if not enums or #enums == 0 then
-        return
+    if not docType then
+        return nil
     end
+    local enums = {}
     local types = {}
-    for _, tp in ipairs(docType.types) do
-        if  tp.type ~= 'doc.enum'
-        and tp.type ~= 'doc.resume' then
-            types[#types+1] = tp[1]
-        end
-    end
     local lines = {}
-    for _, typeUnit in ipairs(docType.types) do
-        local comment = tryDocClassComment(typeUnit)
+    for _, tp in ipairs(vm.getDefs(docType)) do
+        types[#types+1] = infer.getInfer(tp):view()
+        if tp.type == 'doc.type.string'
+        or tp.type == 'doc.type.integer'
+        or tp.type == 'doc.type.boolean' then
+            enums[#enums+1] = tp
+        end
+        local comment = tryDocClassComment(tp)
         if comment then
             for line in util.eachLine(comment) do
                 lines[#lines+1] = ('-- %s'):format(line)
             end
         end
     end
-    lines[#lines+1] = ('%s: %s'):format(name, table.concat(types, '|'))
+    if #enums == 0 then
+        return nil
+    end
+    lines[#lines+1] = ('%s:'):format(name)
     for _, enum in ipairs(enums) do
-        local enumDes = ('   %s %s'):format(
+        local enumDes = ('   %s %q'):format(
                 (enum.default    and '->')
             or  (enum.additional and '+>')
             or  ' |',
@@ -199,19 +194,8 @@ local function buildEnumChunk(docType, name)
     return table.concat(lines, '\n')
 end
 
-local function isFunction(source)
-    if source.type == 'function' then
-        return true
-    end
-    local value = searcher.getObjectValue(source)
-    if not value then
-        return false
-    end
-    return value.type == 'function'
-end
-
 local function getBindEnums(source, docGroup)
-    if not isFunction(source) then
+    if source.type ~= 'function' then
         return
     end
 
@@ -319,7 +303,7 @@ local function tryDocComment(source)
     if not source.bindDocs then
         return
     end
-    if not isFunction(source) then
+    if source.type ~= 'function' then
         local comment = getBindComment(source, source.bindDocs)
         return comment
     end
@@ -354,11 +338,15 @@ local function tyrDocParamComment(source)
     if source.parent.type ~= 'funcargs' then
         return
     end
-    for _, def in ipairs(vm.getDefs(source)) do
-        if def.type == 'doc.param' then
-            if def.comment then
-                return def.comment.text
-            end
+    if not source.bindDocs then
+        return
+    end
+    for i = #source.bindDocs, 1, -1 do
+        local doc = source.bindDocs[i]
+        if  doc.type == 'doc.param'
+        and doc.param[1] == source[1]
+        and doc.comment then
+            return doc.comment.text
         end
     end
 end

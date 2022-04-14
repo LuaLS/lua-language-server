@@ -34,7 +34,7 @@ DIAG_PREFIELD_CALL      =
 'Will be interpreted as `{}{}`. It may be necessary to add a `,` or `;`.'
 DIAG_OVER_MAX_ARGS      =
 'The function takes only {:d} parameters, but you passed {:d}.'
-DIAG_OVER_MAX_ARGS      =
+DIAG_OVER_MAX_VALUES    =
 'Only has {} variables, but you set {} values.'
 DIAG_AMBIGUITY_1        =
 'Compute `{}` first. You may need to add brackets.'
@@ -80,7 +80,7 @@ DIAG_COSE_NON_OBJECT    =
 'Cannot close a value of this type. (Unless set `__close` meta method)'
 DIAG_COUNT_DOWN_LOOP    =
 'Do you mean `{}` ?'
-DIAG_IMPLICIT_ANY       =
+DIAG_UNKNOWN            =
 'Can not infer type.'
 DIAG_DEPRECATED         =
 'Deprecated.'
@@ -464,6 +464,10 @@ This icon is a cat,
 Not a dog nor a fox!
              ↓↓↓
 ]]
+WINDOW_LUA_STATUS_DIAGNOSIS_TITLE=
+'Perform workspace diagnosis'
+WINDOW_LUA_STATUS_DIAGNOSIS_MSG  =
+'Do you want to perform workspace diagnosis?'
 WINDOW_APPLY_SETTING             =
 'Apply setting'
 WINDOW_CHECK_SEMANTIC            =
@@ -490,6 +494,8 @@ WINDOW_APPLY_WHITOUT_SETTING     =
 'Apply but do not modify settings'
 WINDOW_ASK_APPLY_LIBRARY         =
 'Do you need to configure your work environment as `{}`?'
+WINDOW_SEARCHING_IN_FILES        =
+'Searching in files...'
 
 CONFIG_LOAD_FAILED               =
 'Unable to read the settings file: {}'
@@ -531,3 +537,4 @@ CLI_CHECK_SUCCESS =
 'Diagnosis completed, no problems found'
 CLI_CHECK_RESULTS =
 'Diagnosis complete, {} problems found, see {}'
+

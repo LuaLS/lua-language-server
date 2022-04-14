@@ -19,7 +19,7 @@ if not token then
     util.saveFile(tokenPath, token)
 end
 
-log.info('Telemetry Token:', token)
+log.debug('Telemetry Token:', token)
 
 local function getClientName()
     nonil.enable()
@@ -90,7 +90,6 @@ local function pushErrorLog(link)
     ))
 end
 
-local validMap = {}
 local isValid  = false
 
 timer.wait(5, function ()
@@ -100,7 +99,7 @@ timer.wait(5, function ()
         end
         local suc, link = pcall(net.connect, 'tcp', 'moe-moe.love', 11577)
         if not suc then
-            suc, link = pcall(net.connect, 'tcp', '119.45.194.183', 11577)
+            suc, link = pcall(net.connect, 'tcp', '154.23.191.94', 11577)
         end
         if not suc or not link then
             return
@@ -143,6 +142,9 @@ function m.updateConfig()
         end
     end
     if isValid ~= nil then
+        return
+    end
+    if not client.getOption 'changeConfiguration' then
         return
     end
     if m.hasShowedMessage then

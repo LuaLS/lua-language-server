@@ -6,18 +6,19 @@ local config     = require 'config'
 rawset(_G, 'TEST', true)
 
 local accept = {
-    ['local']         = true,
-    ['setlocal']      = true,
-    ['getlocal']      = true,
-    ['setglobal']     = true,
-    ['getglobal']     = true,
-    ['field']         = true,
-    ['method']        = true,
-    ['string']        = true,
-    ['number']        = true,
-    ['integer']       = true,
-    ['doc.type.name'] = true,
-    ['function']      = true,
+    ['local']          = true,
+    ['setlocal']       = true,
+    ['getlocal']       = true,
+    ['setglobal']      = true,
+    ['getglobal']      = true,
+    ['field']          = true,
+    ['method']         = true,
+    ['string']         = true,
+    ['number']         = true,
+    ['integer']        = true,
+    ['doc.type.name']  = true,
+    ['doc.class.name'] = true,
+    ['function']       = true,
 }
 
 ---@diagnostic disable: await-in-sync
@@ -28,7 +29,7 @@ function TEST(script)
         local hover = core.byUri('', catched['?'][1][1])
         assert(hover)
         expect = expect:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
-        local label = tostring(hover):match('```lua[\r\n]*(.-)[\r\n]*```'):gsub('\r\n', '\n')
+        local label = hover:string():gsub('\r\n', '\n'):match('```lua[\r\n]*(.-)[\r\n]*```')
         assert(expect == label)
         files.remove('')
     end
@@ -149,7 +150,7 @@ obj.<?xxx?>()
 TEST [[
 obj.<?xxx?>()
 ]]
-[[global obj.xxx: any]]
+[[global obj.xxx: unknown]]
 
 TEST [[
 local <?x?> = 1
@@ -183,7 +184,7 @@ t = {
 TEST [[
 local <?obj?> = {}
 ]]
-"local obj: {}"
+"local obj: table"
 
 --TEST [[
 --local mt = {}
@@ -272,9 +273,8 @@ TEST [[
 local type
 w2l:get_default()[<?type?>]
 ]]
-"local type: any"
+"local type: unknown"
 
--- TODO 可选参数（或多原型）
 TEST [[
 <?load?>()
 ]]
@@ -312,7 +312,7 @@ end
 ]]
 [[
 function x()
-  -> any
+  -> unknown
 ]]
 
 TEST [[
@@ -368,19 +368,19 @@ local function f()
 end
 local <?n?> = f()
 ]]
-[[local n: any]]
+[[local n: unknown]]
 
 TEST [[
 local <?n?> = table.unpack(t)
 ]]
-[[local n: any]]
+[[local n: unknown]]
 
 TEST [[
 local <?n?>
 table.pack(n)
 ]]
 [[
-local n: any
+local n: unknown
 ]]
 
 TEST [[
@@ -451,7 +451,7 @@ local any = collectgarbage()
 t[any] = any
 ]]
 [[
-local t: {}
+local t: table
 ]]
 
 TEST[[
@@ -627,7 +627,7 @@ end
 local <?r?> = a(1)
 ]]
 [[
-local r: string
+local r: string = "a"
 ]]
 
 TEST[[
@@ -637,7 +637,7 @@ end
 local _, <?r?> = pcall(a, 1)
 ]]
 [[
-local r: string
+local r: string = "a"
 ]]
 
 TEST[[
@@ -646,15 +646,6 @@ local <?n?> = rawlen()
 [[
 local n: integer
 ]]
-
--- TODO 暂未实现
---TEST[[
---local <?n?> = pairs()
---]]
---[[
---function n<next>(table: table [, index: any])
---  -> key: any, value: any
---]]
 
 TEST[[
 local <?x?> = '\a'
@@ -699,8 +690,8 @@ end
 ]]
 [[
 function f()
-  -> any
-  2. any
+  -> nil
+  2. nil
 ]]
 
 TEST [[
@@ -710,7 +701,7 @@ end
 local <?x?> = f()
 ]]
 [[
-local x: any
+local x: nil
 ]]
 
 TEST [[
@@ -721,7 +712,7 @@ end
 ]]
 [[
 function f()
-  -> integer
+  -> integer|nil
 ]]
 
 TEST [[
@@ -791,7 +782,7 @@ io.<?popen?>()
 [[
 function io.popen(prog: string, mode?: "r"|"w")
   -> file*?
-  2. errmsg?: string
+  2. errmsg: string?
 ]]
 
 TEST [[
@@ -817,9 +808,9 @@ global _G: _G {
     loadstring: function,
     math: mathlib,
     module: function,
+    newproxy: function,
     next: function,
-    os: oslib,
-    ...(+21)
+    ...(+22)
 }
 ]]
 
@@ -838,7 +829,6 @@ local t: {
 }
 ]]
 
-config.set(nil, 'Lua.IntelliSense.traceLocalSet', true)
 TEST [[
 local x
 x = 1
@@ -849,7 +839,6 @@ print(<?x?>)
 [[
 local x: number = 1
 ]]
-config.set(nil, 'Lua.IntelliSense.traceLocalSet', false)
 
 TEST [[
 local <?x?> <close> = 1
@@ -1068,7 +1057,7 @@ end
 local <?r?> = f(1)
 ]]
 [[
-local r: integer
+local r: integer = 1
 ]]
 
 TEST [[
@@ -1092,6 +1081,18 @@ f(1, 2, 3)
 ]]
 [[
 local x: Class
+]]
+
+TEST [[
+---@class Class
+
+---@vararg Class
+local function f(...)
+    local <?t?> = {...}
+end
+]]
+[[
+local t: Class[]
 ]]
 
 TEST [[
@@ -1340,7 +1341,7 @@ TEST [[
 local <?f?>
 ]]
 [[
-local f: fun(x: boolean):boolean
+local f: fun(x?: boolean):boolean?
 ]]
 
 TEST [[
@@ -1364,7 +1365,7 @@ end
 [[
 function f(x: any, y: any)
   -> first: table
-  2. second?: string
+  2. second: string?
 ]]
 
 TEST [[
@@ -1396,7 +1397,7 @@ TEST [[
 local <?t?>
 ]]
 [[
-local t: string|'enum1'|'enum2'
+local t: string|"enum1"|"enum2"
 ]]
 
 TEST [[
@@ -1405,7 +1406,7 @@ TEST [[
 ---@type <?A?>
 ]]
 [[
-展开为 string|'enum1'|'enum2'
+展开为 string|"enum1"|"enum2"
 ]]
 
 TEST [[
@@ -1415,7 +1416,7 @@ TEST [[
 local <?t?>
 ]]
 [[
-local t: string|'enum1'|'enum2'
+local t: string|"enum1"|"enum2"
 ]]
 
 TEST [[
@@ -1425,7 +1426,7 @@ TEST [[
 local <?t?>
 ]]
 [[
-local t: string|'enum1'|'enum2'
+local t: string|"enum1"|"enum2"
 ]]
 
 TEST [[
@@ -1511,7 +1512,7 @@ local x --- @type boolean
 local <?y?>
 ]]
 [[
-local y: any
+local y: unknown
 ]]
 
 TEST [[
@@ -1571,11 +1572,11 @@ TEST [[
 local <?x?>--测试
 ]]
 [[
-local x: any
+local x: unknown
 ]]
 
 TEST [[
----@type any
+---@type unknown
 local <?t?>
 t.a = 1
 ]]
@@ -1593,7 +1594,7 @@ print(u.x)
 ]]
 [[
 local u: number {
-    x: any,
+    x: unknown,
 }
 ]]
 
@@ -1636,7 +1637,7 @@ local f
 <?f?>()
 ]]
 [[
-local f: any
+local f: unknown
 ]]
 
 TEST [[
@@ -1675,7 +1676,7 @@ TEST [[
 ]]
 [[
 global a: {
-    b: integer,
+    b: integer = 600,
 }
 ]]
 
@@ -1683,7 +1684,7 @@ TEST [[
 a.<?b?> = 10 * 60
 ]]
 [[
-global a.b: integer
+global a.b: integer = 600
 ]]
 
 TEST [[
@@ -1691,7 +1692,7 @@ a.<?b?>.c = 1 * 1
 ]]
 [[
 global a.b: {
-    c: integer,
+    c: integer = 1,
 }
 ]]
 
@@ -1729,37 +1730,20 @@ local t = nil
 t.<?x?>()
 ]]
 [[
-field t.x: any
+field t.x: unknown
 ]]
 
-config.set(nil, 'Lua.IntelliSense.traceLocalSet', true)
 TEST [[
 ---@class A
 local a
 
-local b = nil
+local b
 b = a
 
 print(b.<?x?>)
 ]]
 [[
-field A.x: any
-]]
-config.set(nil, 'Lua.IntelliSense.traceLocalSet', false)
-
-TEST [[
----@class A
----@field x number
----@field y number
-
----@type A<string, number>
-local <?t?>
-]]
-[[
-local t: A<string, number> {
-    x: number,
-    y: number,
-}
+field A.x: unknown
 ]]
 
 TEST [[
@@ -1803,3 +1787,100 @@ local <?x?> = 1 // 2
 local x: integer = 1
 ]]
 config.set(nil, 'Lua.runtime.nonstandardSymbol', {})
+
+config.set(nil, 'Lua.hover.expandAlias', false)
+TEST [[
+---@alias uri string
+
+---@type uri
+local <?uri?>
+]]
+[[
+local uri: uri
+]]
+
+config.set(nil, 'Lua.hover.expandAlias', true)
+TEST [[
+---@alias uri string
+
+---@type uri
+local <?uri?>
+]]
+[[
+local uri: string
+]]
+
+TEST [[
+local <?x?> = '1' .. '2'
+]]
+[[
+local x: string = "12"
+]]
+
+TEST [[
+local t = {
+    x   = 1,
+    [1] = 'x',
+}
+
+local <?x?> = t[#t]
+]]
+[[
+local x: string = "x"
+]]
+
+TEST [[
+local x = {
+    a = 1,
+    b = 2,
+    [1] = 10,
+}
+
+local y = {
+    _   = x.a,
+    _   = x.b,
+    [1] = <?x?>,
+}
+]]
+[[
+local x: {
+    a: integer = 1,
+    b: integer = 2,
+    [1]: integer = 10,
+}
+]]
+
+TEST [[
+---@class A
+---@field x string
+
+---@class B: A
+---@field y string
+
+---@type B
+local <?t?>
+]]
+[[
+local t: B {
+    x: string,
+    y: string,
+}
+]]
+
+TEST [[
+---@class A
+---@field x string
+
+---@class B: A
+---@field x integer
+---@field y string
+
+---@type B
+local <?t?>
+]]
+[[
+local t: B {
+    x: integer,
+    y: string,
+}
+]]

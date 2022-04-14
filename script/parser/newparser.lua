@@ -628,10 +628,13 @@ local function parseLocalAttrs()
             break
         end
         if not attrs then
-            attrs = {}
+            attrs = {
+                type = 'localattrs',
+            }
         end
         local attr = {
             type   = 'localattr',
+            parent = attrs,
             start  = getPosition(Tokens[Index], 'left'),
             finish = getPosition(Tokens[Index], 'right'),
         }
@@ -694,10 +697,7 @@ local function createLocal(obj, attrs)
 
     if attrs then
         obj.attrs = attrs
-        for i = 1, #attrs do
-            local attr = attrs[i]
-            attr.parent = obj
-        end
+        attrs.parent = obj
     end
 
     local chunk = Chunk[#Chunk]
@@ -1405,7 +1405,7 @@ local function parseName(asAction)
     }
 end
 
-local function parseNameOrList()
+local function parseNameOrList(parent)
     local first = parseName()
     if not first then
         return nil
@@ -1428,6 +1428,7 @@ local function parseNameOrList()
                 type   = 'list',
                 start  = first.start,
                 finish = first.finish,
+                parent = parent,
                 [1]    = first
             }
         end
@@ -1748,15 +1749,14 @@ local function addDummySelf(node, call)
             parent = call,
         }
     end
-    local newNode = {}
-    for k, v in next, call.node.node do
-        newNode[k] = v
-    end
-    newNode.mirror = call.node.node
-    newNode.dummy  = true
-    newNode.parent = call.args
-    call.node.node.mirror = newNode
-    tinsert(call.args, 1, newNode)
+    local self = {
+        type   = 'self',
+        start  = node.colon.start,
+        finish = node.colon.finish,
+        parent = call.args,
+        [1]    = 'self',
+    }
+    tinsert(call.args, 1, self)
 end
 
 local function parseSimple(node, funcName)
@@ -2300,12 +2300,10 @@ local function parseFunction(isLocal, isAction)
             params[1] = createLocal {
                 start  = funcRight,
                 finish = funcRight,
-                method = func.name,
                 parent = params,
-                tag    = 'self',
-                dummy  = true,
                 [1]    = 'self',
             }
+            params[1].type = 'self'
         end
     end
     if hasLeftParen then
@@ -2588,9 +2586,9 @@ local function skipSeps()
     end
 end
 
----@return parser.guide.object   first
----@return parser.guide.object   second
----@return parser.guide.object[] rest
+---@return parser.object   first
+---@return parser.object   second
+---@return parser.object[] rest
 local function parseSetValues()
     skipSpace()
     local first = parseExp()
@@ -2645,8 +2643,8 @@ local function pushActionIntoCurrentChunk(action)
     end
 end
 
----@return parser.guide.object   second
----@return parser.guide.object[] rest
+---@return parser.object   second
+---@return parser.object[] rest
 local function parseVarTails(parser, isLocal)
     if Tokens[Index + 1] ~= ',' then
         return
@@ -3266,7 +3264,7 @@ local function parseFor()
     pushActionIntoCurrentChunk(action)
     pushChunk(action)
     skipSpace()
-    local nameOrList = parseNameOrList()
+    local nameOrList = parseNameOrList(action)
     if not nameOrList then
         missName()
     end
@@ -3292,15 +3290,16 @@ local function parseFor()
             action.loc    = loc
         end
         if expList then
+            expList.parent = action
             local value = expList[1]
             if value then
-                value.parent  = action
+                value.parent  = expList
                 action.init   = value
                 action.finish = expList[#expList].finish
             end
             local max = expList[2]
             if max then
-                max.parent    = action
+                max.parent    = expList
                 action.max    = max
                 action.finish = max.finish
             else
@@ -3312,7 +3311,7 @@ local function parseFor()
             end
             local step = expList[3]
             if step then
-                step.parent   = action
+                step.parent   = expList
                 action.step   = step
                 action.finish = step.finish
             end
@@ -3346,6 +3345,7 @@ local function parseFor()
                 type   = 'list',
                 start  = nameOrList.start,
                 finish = nameOrList.finish,
+                parent = action,
                 [1]    = nameOrList,
             }
         else
@@ -3359,9 +3359,10 @@ local function parseFor()
             end
 
             action.exps = exps
+            exps.parent = action
             for i = 1, #exps do
                 local exp = exps[i]
-                exp.parent = action
+                exp.parent = exps
             end
         else
             missExp()

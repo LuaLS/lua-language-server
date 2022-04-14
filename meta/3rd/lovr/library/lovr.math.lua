@@ -644,6 +644,20 @@ local Vec2 = {}
 function Vec2:add(u) end
 
 ---
+---Returns the angle between vectors.
+---
+---
+---### NOTE:
+---If any of the two vectors have a length of zero, the angle between them is not well defined.
+---
+---In this case the function returns `math.pi / 2`.
+---
+---@overload fun(self: lovr.Vec2, x: number, y: number):number
+---@param u lovr.Vec2 # The other vector.
+---@return number angle # The angle to the other vector, in radians.
+function Vec2:angle(u) end
+
+---
 ---Returns the distance to another vector.
 ---
 ---@overload fun(self: lovr.Vec2, x: number, y: number):number
@@ -747,6 +761,20 @@ local Vec3 = {}
 ---@param u lovr.Vec3 # The other vector.
 ---@return lovr.Vec3 v # The original vector.
 function Vec3:add(u) end
+
+---
+---Returns the angle between vectors.
+---
+---
+---### NOTE:
+---If any of the two vectors have a length of zero, the angle between them is not well defined.
+---
+---In this case the function returns `math.pi / 2`.
+---
+---@overload fun(self: lovr.Vec3, x: number, y: number, z: number):number
+---@param u lovr.Vec3 # The other vector.
+---@return number angle # The angle to the other vector, in radians.
+function Vec3:angle(u) end
 
 ---
 ---Sets this vector to be equal to the cross product between this vector and another one.
@@ -871,6 +899,20 @@ local Vec4 = {}
 ---@param u lovr.Vec4 # The other vector.
 ---@return lovr.Vec4 v # The original vector.
 function Vec4:add(u) end
+
+---
+---Returns the angle between vectors.
+---
+---
+---### NOTE:
+---If any of the two vectors have a length of zero, the angle between them is not well defined.
+---
+---In this case the function returns `math.pi / 2`.
+---
+---@overload fun(self: lovr.Vec4, x: number, y: number, z: number, w: number):number
+---@param u lovr.Vec4 # The other vector.
+---@return number angle # The angle to other vector, in radians.
+function Vec4:angle(u) end
 
 ---
 ---Returns the distance to another vector.

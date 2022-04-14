@@ -1,4 +1,8 @@
-local codeFormat  = require 'code_format'
+local suc, codeFormat = pcall(require, 'code_format')
+if not suc then
+    return
+end
+
 local ws          = require 'workspace'
 local furi        = require 'file-uri'
 local fs          = require 'bee.filesystem'

@@ -15,13 +15,14 @@
 			"luaVersion": "5.4",
 			"consoleCoding": "utf8",
 			"sourceCoding": "utf8",
+			"console": "internalConsole",
 			"outputCapture": [
 				"print",
 				"stderr",
 			],
 		},
 		{
-			"name": "🪡attach",
+			"name": "🍄attach",
 			"type": "lua",
 			"request": "attach",
 			"stopOnEntry": false,

@@ -12,6 +12,7 @@ local util       = require 'utility'
 local fw         = require 'filewatch'
 local scope      = require 'workspace.scope'
 local loading    = require 'workspace.loading'
+local inspect    = require 'inspect'
 
 ---@class workspace
 local m = {}
@@ -100,7 +101,7 @@ function m.getNativeMatcher(scp)
     local pattern = {}
     for path, ignore in pairs(config.get(scp.uri, 'files.exclude')) do
         if ignore then
-            log.info('Ignore by exclude:', path)
+            log.debug('Ignore by exclude:', path)
             pattern[#pattern+1] = path
         end
     end
@@ -109,7 +110,7 @@ function m.getNativeMatcher(scp)
         if buf then
             for line in buf:gmatch '[^\r\n]+' do
                 if line:sub(1, 1) ~= '#' then
-                    log.info('Ignore by .gitignore:', line)
+                    log.debug('Ignore by .gitignore:', line)
                     pattern[#pattern+1] = line
                 end
             end
@@ -118,7 +119,7 @@ function m.getNativeMatcher(scp)
         if buf then
             for line in buf:gmatch '[^\r\n]+' do
                 if line:sub(1, 1) ~= '#' then
-                    log.info('Ignore by .git/info/exclude:', line)
+                    log.debug('Ignore by .git/info/exclude:', line)
                     pattern[#pattern+1] = line
                 end
             end
@@ -128,7 +129,7 @@ function m.getNativeMatcher(scp)
         local buf = util.loadFile(furi.decode(scp.uri) .. '/.gitmodules')
         if buf then
             for path in buf:gmatch('path = ([^\r\n]+)') do
-                log.info('Ignore by .gitmodules:', path)
+                log.debug('Ignore by .gitmodules:', path)
                 pattern[#pattern+1] = path
             end
         end
@@ -136,12 +137,12 @@ function m.getNativeMatcher(scp)
     for path in pairs(config.get(scp.uri, 'Lua.workspace.library')) do
         path = m.getAbsolutePath(scp.uri, path)
         if path then
-            log.info('Ignore by library:', path)
-            pattern[#pattern+1] = path
+            log.debug('Ignore by library:', path)
+            debug[#pattern+1] = path
         end
     end
     for _, path in ipairs(config.get(scp.uri, 'Lua.workspace.ignoreDir')) do
-        log.info('Ignore directory:', path)
+        log.debug('Ignore directory:', path)
         pattern[#pattern+1] = path
     end
 
@@ -160,17 +161,17 @@ function m.getLibraryMatchers(scp)
     if scp:get 'libraryMatcher' then
         return scp:get 'libraryMatcher'
     end
-    log.info('Build library matchers:', scp)
+    log.debug('Build library matchers:', scp)
 
     local pattern = {}
     for path, ignore in pairs(config.get(scp.uri, 'files.exclude')) do
         if ignore then
-            log.info('Ignore by exclude:', path)
+            log.debug('Ignore by exclude:', path)
             pattern[#pattern+1] = path
         end
     end
     for _, path in ipairs(config.get(scp.uri, 'Lua.workspace.ignoreDir')) do
-        log.info('Ignore directory:', path)
+        log.debug('Ignore directory:', path)
         pattern[#pattern+1] = path
     end
 
@@ -181,7 +182,7 @@ function m.getLibraryMatchers(scp)
             librarys[m.normalize(path)] = true
         end
     end
-    log.info('meta path:', scp:get 'metaPath')
+    log.debug('meta path:', scp:get 'metaPath')
     if scp:get 'metaPath' then
         librarys[m.normalize(scp:get 'metaPath')] = true
     end
@@ -202,7 +203,7 @@ function m.getLibraryMatchers(scp)
     end
 
     scp:set('libraryMatcher', matchers)
-    log.debug('library matcher:', util.dump(matchers))
+    log.debug('library matcher:', inspect(matchers))
 
     return matchers
 end
@@ -241,8 +242,9 @@ function m.awaitLoadFile(uri)
     log.info('Scan files at:', uri)
     ---@async
     native:scan(furi.decode(uri), function (path)
-        scp:get('cachedUris')[furi.encode(path)] = true
-        ld:loadFile(furi.encode(path))
+        local uri = files.getRealUri(furi.encode(path))
+        scp:get('cachedUris')[uri] = true
+        ld:loadFile(uri)
     end)
     ld:loadAll()
 end
@@ -282,8 +284,9 @@ function m.awaitPreload(scp)
         log.info('Scan files at:', scp:getName())
         ---@async
         native:scan(furi.decode(scp.uri), function (path)
-            scp:get('cachedUris')[furi.encode(path)] = true
-            ld:loadFile(furi.encode(path))
+            local uri = files.getRealUri(furi.encode(path))
+            scp:get('cachedUris')[uri] = true
+            ld:loadFile(uri)
         end)
     end
 
@@ -292,8 +295,9 @@ function m.awaitPreload(scp)
         scp:addLink(libMatcher.uri)
         ---@async
         libMatcher.matcher:scan(furi.decode(libMatcher.uri), function (path)
-            scp:get('cachedUris')[furi.encode(path)] = true
-            ld:loadFile(furi.encode(path), libMatcher.uri)
+            local uri = files.getRealUri(furi.encode(path))
+            scp:get('cachedUris')[uri] = true
+            ld:loadFile(uri, libMatcher.uri)
         end)
         scp:gc(fw.watch(furi.decode(libMatcher.uri)))
     end

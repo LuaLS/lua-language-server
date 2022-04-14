@@ -44,7 +44,7 @@ function TEST(expect)
         local script, list = catch(file.content, '?')
         local uri          = furi.encode(file.path)
         files.setText(uri, script)
-        if list['?'] then
+        if #list['?'] > 0 then
             sourceUri = uri
             sourcePos = (list['?'][1][1] + list['?'][1][2]) // 2
         end
@@ -362,22 +362,22 @@ TEST {
         path = 'b.lua',
         content = [[
             ---@param x string
-            ---|   "'选项1'" # 注释1
-            ---| > "'选项2'" # 注释2
+            ---|   "选项1" # 注释1
+            ---| > "选项2" # 注释2
             function <?f?>(x) end
         ]]
     },
     hover = [[
 ```lua
-function f(x: string|'选项1'|'选项2')
+function f(x: string|"选项1"|"选项2")
 ```
 
 ---
 
 ```lua
-x: string
-    | '选项1' -- 注释1
-   -> '选项2' -- 注释2
+x:
+    | "选项1" -- 注释1
+   -> "选项2" -- 注释2
 ```]]
 }
 
@@ -390,23 +390,23 @@ TEST {
         path = 'b.lua',
         content = [[
             ---@alias option
-            ---|   "'选项1'" # 注释1
-            ---| > "'选项2'" # 注释2
+            ---|   "选项1" # 注释1
+            ---| > "选项2" # 注释2
             ---@param x option
             function <?f?>(x) end
         ]]
     },
     hover = [[
 ```lua
-function f(x: '选项1'|'选项2')
+function f(x: "选项1"|"选项2")
 ```
 
 ---
 
 ```lua
-x: option
-    | '选项1' -- 注释1
-   -> '选项2' -- 注释2
+x:
+    | "选项1" -- 注释1
+   -> "选项2" -- 注释2
 ```]]
 }
 
@@ -419,8 +419,8 @@ TEST {
         path = 'b.lua',
         content = [[
             ---@alias option
-            ---|   "'选项1'" # 注释1
-            ---| > "'选项2'" # 注释2
+            ---|   "选项1" # 注释1
+            ---| > "选项2" # 注释2
             ---@return option x
             function <?f?>() end
         ]]
@@ -428,15 +428,15 @@ TEST {
     hover = [[
 ```lua
 function f()
-  -> x: '选项1'|'选项2'
+  -> x: "选项1"|"选项2"
 ```
 
 ---
 
 ```lua
-x: option
-    | '选项1' -- 注释1
-   -> '选项2' -- 注释2
+x:
+    | "选项1" -- 注释1
+   -> "选项2" -- 注释2
 ```]]
 }
 
@@ -449,8 +449,8 @@ TEST {
         path = 'b.lua',
         content = [[
             ---@alias option
-            ---|   "'选项1'" # 注释1
-            ---| > "'选项2'" # 注释2
+            ---|   "选项1" # 注释1
+            ---| > "选项2" # 注释2
             ---@return option
             function <?f?>() end
         ]]
@@ -458,15 +458,15 @@ TEST {
     hover = [[
 ```lua
 function f()
-  -> '选项1'|'选项2'
+  -> "选项1"|"选项2"
 ```
 
 ---
 
 ```lua
-return #1: option
-    | '选项1' -- 注释1
-   -> '选项2' -- 注释2
+return #1:
+    | "选项1" -- 注释1
+   -> "选项2" -- 注释2
 ```]]
 }
 
@@ -673,8 +673,8 @@ TEST {{ path = 'a.lua', content = '', }, {
     path = 'b.lua',
     content = [[
         ---@param a boolean # xxx
-        ---| 'true'  # ttt
-        ---| 'false' # fff
+        ---| true  # ttt
+        ---| false # fff
         local function <?f?>(a)
         end
     ]]
@@ -689,7 +689,7 @@ function f(a: boolean|true|false)
 @*param* `a` —  xxx
 
 ```lua
-a: boolean
+a:
     | true -- ttt
     | false -- fff
 ```]]}
@@ -825,7 +825,7 @@ local <?food?>
 },
 hover = [[
 ```lua
-local food: any
+local food: unknown
 ```
 
 ---
@@ -976,17 +976,17 @@ end
 },
 hover = [[
 ```lua
-function f(p: a|b)
+function f(p: "a"|"b")
 ```
 
 ---
 
 ```lua
-p: T
-    | a -- comment 1
-        -- comment 2
-    | b -- comment 3
-        -- comment 4
+p:
+    | "a" -- comment 1
+          -- comment 2
+    | "b" -- comment 3
+          -- comment 4
 ```]]}
 
 --TEST {{ path = 'a.lua', content = '', }, {
@@ -1044,13 +1044,13 @@ end
 
 
 for _, x in ipairs({} and {}) do
-    print(<?x?>) -- `x` is infered as `string`
+    print(<?x?>) -- `x` is infered as `string` (fixed bug)
 end
 ]],
     },
     hover = [[
 ```lua
-local x: any
+local x: unknown
 ```]]
 }
 

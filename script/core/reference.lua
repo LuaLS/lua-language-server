@@ -1,4 +1,3 @@
-local searcher   = require 'core.searcher'
 local guide      = require 'parser.guide'
 local files      = require 'files'
 local vm         = require 'vm'
@@ -52,6 +51,7 @@ local accept = {
     ['doc.alias.name']   = true,
 }
 
+---@async
 return function (uri, position)
     local ast = files.getState(uri)
     if not ast then
@@ -65,23 +65,10 @@ return function (uri, position)
 
     local metaSource = vm.isMetaFile(uri)
 
-    local refs = vm.getAllRefs(source)
-    local values = {}
-    for _, src in ipairs(refs) do
-        local value = searcher.getObjectValue(src)
-        if value and value ~= src and guide.isLiteral(value) then
-            values[value] = true
-        end
-    end
+    local refs = vm.getRefs(source)
 
     local results = {}
     for _, src in ipairs(refs) do
-        if src.dummy then
-            goto CONTINUE
-        end
-        if values[src] then
-            goto CONTINUE
-        end
         local root = guide.getRoot(src)
         if not root then
             goto CONTINUE
@@ -89,34 +76,53 @@ return function (uri, position)
         if not metaSource and vm.isMetaFile(root.uri) then
             goto CONTINUE
         end
-        if  (   src.type == 'doc.class.name'
-            or  src.type == 'doc.type.name'
-            or  src.type == 'doc.extends.name'
-            )
-        and source.type ~= 'doc.type.name'
-        and source.type ~= 'doc.class.name' then
+        if src.type == 'self' then
             goto CONTINUE
         end
-        if     src.type == 'setfield'
-        or     src.type == 'getfield'
-        or     src.type == 'tablefield' then
-            src = src.field
-        elseif src.type == 'setindex'
-        or     src.type == 'getindex'
-        or     src.type == 'tableindex' then
+        src = src.field or src.method or src
+        if src.type == 'getindex'
+        or src.type == 'setindex'
+        or src.type == 'tableindex' then
             src = src.index
-        elseif src.type == 'getmethod'
-        or     src.type == 'setmethod' then
-            src = src.method
-        elseif src.type == 'table' and src.parent.type ~= 'return' then
+            if not src then
+                goto CONTINUE
+            end
+            if not guide.isLiteral(src) then
+                goto CONTINUE
+            end
+        else
+            if guide.isLiteral(src) and src.type ~= 'function' then
+                goto CONTINUE
+            end
+        end
+        if src.type == 'doc.class' then
+            src = src.class
+        end
+        if src.type == 'doc.alias' then
+            src = src.alias
+        end
+        if src.type == 'doc.class.name'
+        or src.type == 'doc.alias.name'
+        or src.type == 'doc.type.name'
+        or src.type == 'doc.extends.name' then
+            if  source.type ~= 'doc.type.name'
+            and source.type ~= 'doc.class.name'
+            and source.type ~= 'doc.extends.name'
+            and source.type ~= 'doc.see.name' then
+                goto CONTINUE
+            end
+        end
+        if src.type == 'doc.generic.name' then
             goto CONTINUE
         end
-        if not src then
+        if src.type == 'doc.param' then
             goto CONTINUE
         end
+
         results[#results+1] = {
             target = src,
             uri    = root.uri,
+            source = source,
         }
         ::CONTINUE::
     end

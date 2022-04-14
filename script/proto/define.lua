@@ -41,7 +41,7 @@ m.DiagnosticDefaultSeverity = {
     ['unbalanced-assignments']  = 'Warning',
     ['close-non-object']        = 'Warning',
     ['count-down-loop']         = 'Warning',
-    ['no-implicit-any']         = 'Information',
+    ['no-unknown']              = 'Information',
     ['deprecated']              = 'Warning',
     ['different-requires']      = 'Warning',
     ['await-in-sync']           = 'Warning',
@@ -49,7 +49,7 @@ m.DiagnosticDefaultSeverity = {
     ['discard-returns']         = 'Warning',
     ['type-check']              = 'Warning',
 
-    ['duplicate-doc-class']     = 'Warning',
+    ['duplicate-doc-alias']     = 'Warning',
     ['undefined-doc-class']     = 'Warning',
     ['undefined-doc-name']      = 'Warning',
     ['circle-doc-class']        = 'Warning',
@@ -100,7 +100,7 @@ m.DiagnosticDefaultNeededFileStatus = {
     ['unbalanced-assignments']  = 'Any',
     ['close-non-object']        = 'Any',
     ['count-down-loop']         = 'Any',
-    ['no-implicit-any']         = 'None',
+    ['no-unknown']              = 'None',
     ['deprecated']              = 'Opened',
     ['different-requires']      = 'Any',
     ['await-in-sync']           = 'None',
@@ -108,7 +108,7 @@ m.DiagnosticDefaultNeededFileStatus = {
     ['discard-returns']         = 'Opened',
     ['type-check']              = 'None',
 
-    ['duplicate-doc-class']     = 'Any',
+    ['duplicate-doc-alias']     = 'Any',
     ['undefined-doc-class']     = 'Any',
     ['undefined-doc-name']      = 'Any',
     ['circle-doc-class']        = 'Any',
@@ -274,21 +274,6 @@ m.BuiltIn = {
     ['string']    = 'default',
     ['table']     = 'default',
     ['utf8']      = 'default',
-}
-
-m.BuiltinType = {
-    ['unknown']       = true,
-    ['any']           = true,
-    ['nil']           = true,
-    ['boolean']       = true,
-    ['number']        = true,
-    ['integer']       = true,
-    ['thread']        = true,
-    ['table']         = true,
-    ['string']        = true,
-    ['userdata']      = true,
-    ['lightuserdata'] = true,
-    ['function']      = true,
 }
 
 m.InlayHintKind = {

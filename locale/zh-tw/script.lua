@@ -7,7 +7,7 @@ DIAG_UNUSED_LOCAL =
 DIAG_UNDEF_GLOBAL =
 '未定義的全域變數`{}`。 '
 DIAG_UNDEF_FIELD =
-'未定義的屬性/字段`{}`。 '
+'未定義的屬性/欄位`{}`。 '
 DIAG_UNDEF_ENV_CHILD =
 '未定義的變數`{}`（重載了`_ENV` ）。 '
 DIAG_UNDEF_FENV_CHILD =
@@ -65,7 +65,7 @@ DIAG_DUPLICATE_PARAM =
 DIAG_NEED_CLASS =
 '需要先定義Class 。 '
 DIAG_DUPLICATE_SET_FIELD=
-'重複定義的字段`{}`。 '
+'重複定義的欄位`{}`。 '
 DIAG_SET_CONST =
 '不能對常數賦值。 '
 DIAG_SET_FOR_STATE =
@@ -98,24 +98,24 @@ DIAG_DISCARD_RETURNS =
 DIAG_CIRCLE_DOC_CLASS =
 '循環繼承的類。 '
 DIAG_DOC_FIELD_NO_CLASS =
-'字段必須定義在類之後。 '
+'欄位必須定義在類別之後。 '
 DIAG_DUPLICATE_DOC_CLASS =
-'重複定義的類`{}`。 '
+'重複定義的類別`{}`。 '
 DIAG_DUPLICATE_DOC_FIELD =
-'重複定義的字段`{}`。 '
+'重複定義的欄位`{}`。 '
 DIAG_DUPLICATE_DOC_PARAM =
 '重複指向的參數`{}`。 '
 DIAG_UNDEFINED_DOC_CLASS =
-'未定義的類`{}`。 '
+'未定義的類別`{}`。 '
 DIAG_UNDEFINED_DOC_NAME =
 '未定義的類型或別名`{}`。 '
 DIAG_UNDEFINED_DOC_PARAM =
 '指向了未定義的參數`{}`。 '
 DIAG_UNKNOWN_DIAG_CODE =
-'未知的診斷代號`{}`。 '
+'未知的診斷代碼`{}`。 '
 
 MWS_NOT_SUPPORT =
-'{} 目前還不支持多工作目錄，我可能需要重啟才能支持新的工作目錄...'
+'{} 目前還不支援多工作目錄，我可能需要重啟才能支援新的工作目錄...'
 MWS_RESTART =
 '重啟'
 MWS_NOT_COMPLETE =
@@ -138,7 +138,7 @@ WORKSPACE_LOADING =
 WORKSPACE_DIAGNOSTIC =
 '正在對工作目錄進行診斷'
 WORKSPACE_SKIP_HUGE_FILE =
-'出於性能考慮，已停止對此檔案解析：{}'
+'出於效能考慮，已停止對此檔案解析：{}'
 
 PARSER_CRASH =
 '語法解析崩潰了！遺言：{}'
@@ -151,7 +151,7 @@ PARSER_UNKNOWN_SYMBOL =
 PARSER_MISS_SYMBOL =
 '缺少符號`{symbol}`。 '
 PARSER_MISS_ESC_X =
-'必須是2個16進製字元。 '
+'必須是2個16進制字元。 '
 PARSER_UTF8_SMALL =
 '至少有1個字元。 '
 PARSER_UTF8_MAX =
@@ -159,13 +159,13 @@ PARSER_UTF8_MAX =
 PARSER_ERR_ESC =
 '錯誤的轉義符。 '
 PARSER_MUST_X16 =
-'必須是16進製字元。 '
+'必須是16進制字元。 '
 PARSER_MISS_EXPONENT =
 '缺少指數部分。 '
 PARSER_MISS_EXP =
 '缺少表達式。 '
 PARSER_MISS_FIELD =
-'缺少字段/屬性名。 '
+'缺少欄位/屬性名。 '
 PARSER_MISS_METHOD =
 '缺少方法名。 '
 PARSER_ARGS_AFTER_DOTS =
@@ -187,17 +187,17 @@ PARSER_NO_VISIBLE_LABEL =
 PARSER_REDEFINE_LABEL =
 '標籤`{label}`重複定義。 '
 PARSER_UNSUPPORT_SYMBOL =
-'{version} 不支持該符號。 '
+'{version} 不支援該符號。 '
 PARSER_UNEXPECT_DOTS =
 '`...`只能在不定參函式中使用。 '
 PARSER_UNEXPECT_SYMBOL =
 '未知的符號`{symbol}` 。 '
 PARSER_UNKNOWN_TAG =
-'不支持的屬性。 '
+'不支援的屬性。 '
 PARSER_MULTI_TAG =
 '只能設定一個屬性。 '
 PARSER_UNEXPECT_LFUNC_NAME =
-'局部函式只能使用標識符作為名稱。 '
+'區域函式只能使用標識符作為名稱。 '
 PARSER_UNEXPECT_EFUNC_NAME =
 '函式作為表達式時不能命名。 '
 PARSER_ERR_LCOMMENT_END =
@@ -236,7 +236,7 @@ PARSER_UNKNOWN_ATTRIBUTE =
 '區域變數屬性應該是`const` 或`close`'
 
 PARSER_LUADOC_MISS_CLASS_NAME =
-'缺少類名稱。 '
+'缺少類別名稱。 '
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL =
 '缺少符號`:`。 '
 PARSER_LUADOC_MISS_CLASS_EXTENDS_NAME =
@@ -256,13 +256,13 @@ PARSER_LUADOC_MISS_PARAM_NAME =
 PARSER_LUADOC_MISS_PARAM_EXTENDS =
 '缺少參數的類型定義。 '
 PARSER_LUADOC_MISS_FIELD_NAME =
-'缺少字段名稱。 '
+'缺少欄位名稱。 '
 PARSER_LUADOC_MISS_FIELD_EXTENDS =
-'缺少字段的類型定義。 '
+'缺少欄位的類型定義。 '
 PARSER_LUADOC_MISS_GENERIC_NAME =
 '缺少泛型名稱。 '
 PARSER_LUADOC_MISS_GENERIC_EXTENDS_NAME =
-'缺少泛型要繼承的類名稱。 '
+'缺少泛型要繼承的類別名稱。 '
 PARSER_LUADOC_MISS_VARARG_TYPE =
 '缺少不定參的類型定義。 '
 PARSER_LUADOC_MISS_FUN_AFTER_OVERLOAD =
@@ -318,7 +318,7 @@ HOVER_USE_LUA_PATH =
 HOVER_EXTENDS =
 '展開為{}'
 HOVER_TABLE_TIME_UP =
-'出於性能考慮，已禁用了部分類型推斷。 '
+'出於效能考慮，已禁用了部分類型推斷。 '
 HOVER_WS_LOADING =
 '正在載入工作目錄：{} / {}'
 
@@ -464,9 +464,9 @@ WINDOW_LUA_STATUS_TIP =
              ↓↓↓
 ]]
 WINDOW_APPLY_SETTING =
-'應用設定'
+'套用設定'
 WINDOW_CHECK_SEMANTIC =
-'如果你正在使用市場中的顏色主題，你可能需要同時修改`editor.semanticHighlighting.enabled` 選項為`true` 才會使語義著色生效。 '
+'如果你正在使用商城中的顏色主題，你可能需要同時修改`editor.semanticHighlighting.enabled` 選項為`true` 才會使語義著色生效。 '
 WINDOW_TELEMETRY_HINT =
 '請允許發送匿名的使用資料與錯誤報告，幫助我們進一步完善此延伸模組。在[此處](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%90%E7%A7%81%E5%A3%B0%E6%98%8E)閱讀我們的隱私聲明。 '
 WINDOW_TELEMETRY_ENABLE =
@@ -474,9 +474,9 @@ WINDOW_TELEMETRY_ENABLE =
 WINDOW_TELEMETRY_DISABLE =
 '禁止'
 WINDOW_CLIENT_NOT_SUPPORT_CONFIG =
-'你的客戶端不支持從服務側修改設定，請手動修改如下設定：'
+'你的客戶端不支援從服務側修改設定，請手動修改如下設定：'
 WINDOW_LCONFIG_NOT_SUPPORT_CONFIG=
-'暫不支持自動修改本地設定，請手動修改如下設定：'
+'暫不支援自動修改本地設定，請手動修改如下設定：'
 WINDOW_MANUAL_CONFIG_ADD =
 '為`{key}` 添加值`{value:q}`;'
 WINDOW_MANUAL_CONFIG_SET =
@@ -484,20 +484,20 @@ WINDOW_MANUAL_CONFIG_SET =
 WINDOW_MANUAL_CONFIG_PROP =
 '將`{key}` 的屬性`{prop}` 設定為`{value:q}`;'
 WINDOW_APPLY_WHIT_SETTING =
-'應用並修改設定'
+'套用並修改設定'
 WINDOW_APPLY_WHITOUT_SETTING =
-'應用但不修改設定'
+'套用但不修改設定'
 WINDOW_ASK_APPLY_LIBRARY =
 '是否需要將你的工作環境配置為`{}` ？ '
 WINDOW_SEARCHING_IN_FILES =
 '正在檔案中搜尋...'
 
 CONFIG_LOAD_FAILED =
-'無法讀取設定檔案：{}'
+'無法讀取設定檔：{}'
 CONFIG_LOAD_ERROR =
-'設定檔案載入錯誤：{}'
+'設定檔載入錯誤：{}'
 CONFIG_TYPE_ERROR =
-'設定檔案必須是lua或json格式：{}'
+'設定檔必須是lua或json格式：{}'
 
 PLUGIN_RUNTIME_ERROR =
 [[

@@ -258,9 +258,6 @@ return function (uri, offset)
             if not target then
                 return
             end
-            if target.dummy then
-                return
-            end
             if mark[target] then
                 return
             end

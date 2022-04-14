@@ -26,7 +26,7 @@ local function asFunction(source)
     if source.args then
         for i = 1, #source.args do
             local arg = source.args[i]
-            if arg.dummy then
+            if arg.type == 'self' then
                 goto CONTINUE
             end
             local name = arg.name or guide.getKeyName(arg)

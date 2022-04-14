@@ -1749,15 +1749,15 @@ local function addDummySelf(node, call)
             parent = call,
         }
     end
-    local newNode = {}
-    for k, v in next, call.node.node do
-        newNode[k] = v
-    end
-    newNode.mirror = call.node.node
-    newNode.dummy  = true
-    newNode.parent = call.args
-    call.node.node.mirror = newNode
-    tinsert(call.args, 1, newNode)
+    local self = createLocal {
+        start  = node.colon.start,
+        finish = node.colon.finish,
+        method = node,
+        parent = call.args,
+        [1]    = 'self',
+    }
+    self.type = 'self'
+    tinsert(call.args, 1, self)
 end
 
 local function parseSimple(node, funcName)
@@ -2303,10 +2303,9 @@ local function parseFunction(isLocal, isAction)
                 finish = funcRight,
                 method = func.name,
                 parent = params,
-                tag    = 'self',
-                dummy  = true,
                 [1]    = 'self',
             }
+            params[1].type = 'self'
         end
     end
     if hasLeftParen then

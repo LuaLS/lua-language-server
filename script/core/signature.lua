@@ -87,7 +87,7 @@ local function makeSignatures(text, call, pos)
     if call.args then
         local args = {}
         for _, arg in ipairs(call.args) do
-            if not arg.dummy then
+            if arg.type ~= 'self' then
                 args[#args+1] = arg
             end
         end

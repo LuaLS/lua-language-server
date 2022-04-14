@@ -60,6 +60,7 @@ local searchFieldSwitch = util.switch()
         end
     end)
     : case 'local'
+    : case 'self'
     : call(function (suri, node, key, pushResult)
         local fields
         if key then
@@ -716,7 +717,7 @@ local function compileLocalBase(source)
         hasMarkDoc = bindDocs(source)
     end
     local hasMarkParam
-    if source.dummy and not hasMarkDoc then
+    if source.type == 'self' and not hasMarkDoc then
         hasMarkParam = true
         vm.setNode(source, vm.compileNode(source.method.node))
     end
@@ -834,6 +835,7 @@ local compilerSwitch = util.switch()
         end
     end)
     : case 'local'
+    : case 'self'
     : call(function (source)
         local baseNode = compileLocalBase(source)
         vm.setNode(source, baseNode, true)

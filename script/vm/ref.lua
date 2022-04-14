@@ -298,7 +298,7 @@ function vm.getRefs(source, fileNotify)
 
     local hasLocal
     local function pushResult(src)
-        if src.type == 'local' and not src.dummy then
+        if src.type == 'local' then
             if hasLocal then
                 return
             end

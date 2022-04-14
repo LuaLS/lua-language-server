@@ -133,11 +133,11 @@ return function (uri, offset)
     local defs = vm.getDefs(source)
 
     for _, src in ipairs(defs) do
-        if src.dummy then
-            goto CONTINUE
-        end
         local root = guide.getRoot(src)
         if not root then
+            goto CONTINUE
+        end
+        if src.type == 'self' then
             goto CONTINUE
         end
         src = src.field or src.method or src

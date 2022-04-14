@@ -30,11 +30,18 @@ simpleSwitch = util.switch()
                 end
             end
         end
-
-        if source.dummy then
-            for _, res in ipairs(vm.getDefs(source.method.node)) do
-                pushResult(res)
+    end)
+    : case 'sellf'
+    : call(function (source, pushResult)
+        if source.ref then
+            for _, ref in ipairs(source.ref) do
+                if ref.type == 'setlocal' then
+                    pushResult(ref)
+                end
             end
+        end
+        for _, res in ipairs(vm.getDefs(source.method.node)) do
+            pushResult(res)
         end
     end)
     : case 'getlocal'
@@ -209,7 +216,7 @@ function vm.getDefs(source)
 
     local hasLocal
     local function pushResult(src)
-        if src.type == 'local' and not src.dummy then
+        if src.type == 'local' then
             if hasLocal then
                 return
             end

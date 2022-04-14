@@ -1724,7 +1724,7 @@ local function tryluaDocByErr(state, position, err, docState, results)
         local label = {}
         local insertText = {}
         for i, arg in ipairs(func.args) do
-            if arg[1] and not arg.dummy then
+            if arg[1] and arg.type ~= 'self' then
                 label[#label+1] = arg[1]
                 if #label == 1 then
                     insertText[#insertText+1] = ('%s ${%d:any}'):format(arg[1], #label)
@@ -1788,7 +1788,7 @@ local function buildluaDocOfFunction(func)
     end
     for n, arg in ipairs(args) do
         local funcArg = func.args[n]
-        if funcArg[1] and not funcArg.dummy then
+        if funcArg[1] and funcArg.type ~= 'self' then
             index = index + 1
             buf[#buf+1] = ('---@param %s ${%d:%s}'):format(
                 funcArg[1],

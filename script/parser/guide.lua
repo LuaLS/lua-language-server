@@ -21,7 +21,6 @@ local type         = type
 ---@field specials              parser.object[]
 ---@field labels                parser.object[]
 ---@field node                  parser.object
----@field dummy                 boolean
 ---@field field                 parser.object
 ---@field method                parser.object
 ---@field index                 parser.object
@@ -833,6 +832,7 @@ end
 local isSetMap = {
     ['setglobal']         = true,
     ['local']             = true,
+    ['self']              = true,
     ['setlocal']          = true,
     ['setfield']          = true,
     ['setmethod']         = true,
@@ -931,6 +931,7 @@ function m.getKeyName(obj)
     or tp == 'setglobal' then
         return obj[1]
     elseif tp == 'local'
+    or     tp == 'self'
     or     tp == 'getlocal'
     or     tp == 'setlocal' then
         return obj[1]
@@ -999,6 +1000,7 @@ function m.getKeyType(obj)
     or tp == 'setglobal' then
         return 'string'
     elseif tp == 'local'
+    or     tp == 'self'
     or     tp == 'getlocal'
     or     tp == 'setlocal' then
         return 'local'

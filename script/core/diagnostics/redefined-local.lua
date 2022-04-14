@@ -13,9 +13,6 @@ return function (uri, callback)
         or name == ast.ENVMode then
             return
         end
-        if source.tag == 'self' then
-            return
-        end
         local exist = guide.getLocal(source, name, source.start-1)
         if exist then
             callback {

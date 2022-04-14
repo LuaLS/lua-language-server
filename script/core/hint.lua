@@ -22,9 +22,6 @@ local function typeHint(uri, results, start, finish)
         and source.type ~= 'setindex' then
             return
         end
-        if source.dummy then
-            return
-        end
         if source[1] == '_' then
             return
         end

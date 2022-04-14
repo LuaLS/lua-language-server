@@ -12,6 +12,7 @@ m.ID_SPLITE = '\x1F'
 
 local compileSwitch = util.switch()
     : case 'local'
+    : case 'self'
     : call(function (source)
         source._localID = ('%d'):format(source.start)
         if not source.ref then

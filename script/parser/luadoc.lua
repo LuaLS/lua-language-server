@@ -1367,6 +1367,7 @@ local function bindDocsBetween(sources, binded, bindSources, start, finish)
             end
             if src.start >= start then
                 if src.type == 'local'
+                or src.type == 'self'
                 or src.type == 'setglobal'
                 or src.type == 'tablefield'
                 or src.type == 'tableindex'
@@ -1437,7 +1438,7 @@ end
 local bindDocAccept = {
     'local'     , 'setlocal'  , 'setglobal',
     'setfield'  , 'setmethod' , 'setindex' ,
-    'tablefield', 'tableindex',
+    'tablefield', 'tableindex', 'self'     ,
     'function'  , 'table'     , '...'      ,
 }
 

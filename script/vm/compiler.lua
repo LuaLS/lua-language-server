@@ -13,7 +13,7 @@ local vm         = require 'vm.vm'
 ---@class parser.object
 ---@field _compiledNodes  boolean
 ---@field _node           vm.node
----@field _localBaseNode  vm.node?
+---@field _localBase      table
 
 local searchFieldSwitch = util.switch()
     : case 'table'
@@ -686,10 +686,19 @@ end
 ---@param source parser.object
 ---@return vm.node
 local function compileLocalBase(source)
-    if source._localBaseNode then
-        return source._localBaseNode
+    if not source._localBase then
+        source._localBase = {
+            type = 'localbase',
+            parent = source,
+        }
     end
-    source._localBaseNode = vm.createNode()
+    local baseNode = vm.getNode(source._localBase)
+    if baseNode then
+        return baseNode
+    end
+    baseNode = vm.createNode()
+    vm.setNode(source._localBase, baseNode, true)
+
     vm.setNode(source, source)
     local hasMarkDoc
     if source.bindDocs then
@@ -750,12 +759,12 @@ local function compileLocalBase(source)
         vm.setNode(source, globalMgr.getGlobal('type', 'integer'))
     end
 
-    source._localBaseNode:merge(vm.getNode(source))
+    baseNode:merge(vm.getNode(source))
     vm.removeNode(source)
 
-    source._localBaseNode:setData('hasDefined', hasMarkDoc or hasMarkParam or hasMarkValue)
+    baseNode:setData('hasDefined', hasMarkDoc or hasMarkParam or hasMarkValue)
 
-    return source._localBaseNode
+    return baseNode
 end
 
 local compilerSwitch = util.switch()

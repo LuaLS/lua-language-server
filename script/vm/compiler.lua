@@ -13,6 +13,7 @@ local vm         = require 'vm.vm'
 ---@class parser.object
 ---@field _compiledNodes  boolean
 ---@field _node           vm.node
+---@field _localBaseNode  vm.node?
 
 local searchFieldSwitch = util.switch()
     : case 'table'
@@ -657,6 +658,81 @@ function vm.compileCallArg(arg, call, index)
     return vm.getNode(arg)
 end
 
+---@param source parser.object
+---@return vm.node
+local function compileLocalBase(source)
+    if source._localBaseNode then
+        return source._localBaseNode
+    end
+    source._localBaseNode = vm.createNode()
+    vm.setNode(source, source)
+    local hasMarkDoc
+    if source.bindDocs then
+        hasMarkDoc = bindDocs(source)
+    end
+    local hasMarkParam
+    if source.dummy and not hasMarkDoc then
+        hasMarkParam = true
+        vm.setNode(source, vm.compileNode(source.method.node))
+    end
+    local hasMarkValue
+    if source.value then
+        if not hasMarkDoc or guide.isLiteral(source.value) then
+            hasMarkValue = true
+            if source.value.type == 'table' then
+                vm.setNode(source, source.value)
+            else
+                vm.setNode(source, vm.compileNode(source.value))
+            end
+        end
+    end
+    -- function x.y(self, ...) --> function x:y(...)
+    if  source[1] == 'self'
+    and not hasMarkDoc
+    and source.parent.type == 'funcargs'
+    and source.parent[1] == source then
+        local setfield = source.parent.parent.parent
+        if setfield.type == 'setfield' then
+            hasMarkParam = true
+            vm.setNode(source, vm.compileNode(setfield.node))
+        end
+    end
+    if source.parent.type == 'funcargs' and not hasMarkDoc and not hasMarkParam then
+        local func = source.parent.parent
+        local funcNode = vm.compileNode(func)
+        local hasDocArg
+        for n in funcNode:eachObject() do
+            if n.type == 'doc.type.function' then
+                for index, arg in ipairs(n.args) do
+                    if func.args[index] == source then
+                        vm.setNode(source, vm.compileNode(arg))
+                        hasDocArg = true
+                    end
+                end
+            end
+        end
+        if not hasDocArg then
+            vm.setNode(source, globalMgr.getGlobal('type', 'any'))
+        end
+    end
+    -- for x in ... do
+    if source.parent.type == 'in' then
+        vm.compileNode(source.parent)
+    end
+
+    -- for x = ... do
+    if source.parent.type == 'loop' then
+        vm.setNode(source, globalMgr.getGlobal('type', 'integer'))
+    end
+
+    source._localBaseNode:merge(vm.getNode(source))
+    vm.removeNode(source)
+
+    source._localBaseNode:setData('hasDefined', hasMarkDoc or hasMarkParam or hasMarkValue)
+
+    return source._localBaseNode
+end
+
 local compilerSwitch = util.switch()
     : case 'nil'
     : case 'boolean'
@@ -714,80 +790,28 @@ local compilerSwitch = util.switch()
     end)
     : case 'local'
     : call(function (source)
-        vm.setNode(source, source)
-        local hasMarkDoc
-        if source.bindDocs then
-            hasMarkDoc = bindDocs(source)
-        end
-        local hasMarkParam
-        if source.dummy and not hasMarkDoc then
-            hasMarkParam = true
-            vm.setNode(source, vm.compileNode(source.method.node))
-        end
-        if source.value then
-            if not hasMarkDoc or guide.isLiteral(source.value) then
-                if source.value then
-                    if source.value.type == 'table' then
-                        vm.setNode(source, source.value)
-                    else
-                        vm.setNode(source, vm.compileNode(source.value))
-                    end
-                end
-            end
-        end
-        if  not source.value
-        and source.ref
-        and not hasMarkDoc then
+        local baseNode = compileLocalBase(source)
+        vm.setNode(source, baseNode)
+        if not baseNode:getData 'hasDefined' and source.ref then
             for _, ref in ipairs(source.ref) do
-                if ref.type == 'setlocal' and ref.value then
-                    if ref.value.type == 'table' then
-                        vm.setNode(source, ref.value)
-                    else
-                        vm.setNode(source, vm.compileNode(ref.value))
-                    end
+                if ref.type == 'setlocal' then
+                    vm.setNode(source, vm.compileNode(ref))
                 end
             end
-        end
-        -- function x.y(self, ...) --> function x:y(...)
-        if  source[1] == 'self'
-        and not hasMarkDoc
-        and source.parent.type == 'funcargs'
-        and source.parent[1] == source then
-            local setfield = source.parent.parent.parent
-            if setfield.type == 'setfield' then
-                hasMarkParam = true
-                vm.setNode(source, vm.compileNode(setfield.node))
-            end
-        end
-        if source.parent.type == 'funcargs' and not hasMarkDoc and not hasMarkParam then
-            local func = source.parent.parent
-            local funcNode = vm.compileNode(func)
-            local hasDocArg
-            for n in funcNode:eachObject() do
-                if n.type == 'doc.type.function' then
-                    for index, arg in ipairs(n.args) do
-                        if func.args[index] == source then
-                            vm.setNode(source, vm.compileNode(arg))
-                            hasDocArg = true
-                        end
-                    end
-                end
-            end
-            if not hasDocArg then
-                vm.setNode(source, globalMgr.getGlobal('type', 'any'))
-            end
-        end
-        -- for x in ... do
-        if source.parent.type == 'in' then
-            vm.compileNode(source.parent)
-        end
-
-        -- for x = ... do
-        if source.parent.type == 'loop' then
-            vm.setNode(source, globalMgr.getGlobal('type', 'integer'))
         end
     end)
     : case 'setlocal'
+    : call(function (source)
+        local baseNode = compileLocalBase(source.node)
+        if not baseNode:getData 'hasDefined' and source.value then
+            if source.value.type == 'table' then
+                vm.setNode(source, source.value)
+            else
+                vm.setNode(source, vm.compileNode(source.value))
+            end
+        end
+        vm.setNode(source, vm.compileNode(source.node))
+    end)
     : case 'getlocal'
     : call(function (source)
         vm.setNode(source, vm.compileNode(source.node))

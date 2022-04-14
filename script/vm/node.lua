@@ -12,6 +12,7 @@ mt.__index    = mt
 mt.type       = 'vm.node'
 mt.optional   = nil
 mt.lastInfer  = nil
+mt.data       = nil
 ---@type vm.node[]
 mt._childs    = nil
 mt._locked    = false
@@ -130,6 +131,20 @@ function mt:isLocked()
     return self._locked == true
 end
 
+function mt:setData(k, v)
+    if not self.data then
+        self.data = {}
+    end
+    self.data[k] = v
+end
+
+function mt:getData(k)
+    if not self.data then
+        return nil
+    end
+    return self.data[k]
+end
+
 function mt:addOptional()
     if self:isOptional() then
         return self
@@ -207,6 +222,11 @@ end
 ---@return vm.node?
 function vm.getNode(source)
     return vm.nodeCache[source]
+end
+
+---@param source vm.object
+function vm.removeNode(source)
+    vm.nodeCache[source] = nil
 end
 
 function vm.clearNodeCache()

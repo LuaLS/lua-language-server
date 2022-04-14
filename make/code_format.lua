@@ -1,5 +1,8 @@
 local lm = require 'luamake'
 
+lm.c = lm.compiler == 'msvc' and 'c89' or 'c11'
+lm.cxx = 'c++17'
+
 lm:source_set 'code_format' {
     rootdir = '../3rd/EmmyLuaCodeStyle',
     includes = {
@@ -31,6 +34,4 @@ lm:source_set 'code_format' {
             end
         end)()
     },
-    c = 'c89',
-    cxx = 'c++17',
 }

@@ -1076,18 +1076,30 @@ local compilerSwitch = util.switch()
     end)
     : case 'doc.field'
     : call(function (source)
+        if not source.extends then
+            return
+        end
         vm.setNode(source, vm.compileNode(source.extends))
     end)
     : case 'doc.type.field'
     : call(function (source)
+        if not source.extends then
+            return
+        end
         vm.setNode(source, vm.compileNode(source.extends))
     end)
     : case 'doc.param'
     : call(function (source)
+        if not source.extends then
+            return
+        end
         vm.setNode(source, vm.compileNode(source.extends))
     end)
     : case 'doc.vararg'
     : call(function (source)
+        if not source.vararg then
+            return
+        end
         vm.setNode(source, vm.compileNode(source.vararg))
     end)
     : case '...'

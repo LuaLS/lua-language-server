@@ -15,7 +15,7 @@
 			"luaVersion": "5.4",
 			"consoleCoding": "utf8",
 			"sourceCoding": "utf8",
-			"console": "integratedTerminal",
+			"console": "internalConsole",
 			"outputCapture": [
 				"print",
 				"stderr",

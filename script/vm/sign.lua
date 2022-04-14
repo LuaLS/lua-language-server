@@ -54,21 +54,21 @@ function mt:resolve(uri, args)
             for _, ufield in ipairs(object.fields) do
                 local ufieldNode = vm.compileNode(ufield.name)
                 local uvalueNode = vm.compileNode(ufield.extends)
-                if ufieldNode[1].type == 'doc.generic.name' and uvalueNode[1].type == 'doc.generic.name' then
+                if ufieldNode:get(1).type == 'doc.generic.name' and uvalueNode:get(1).type == 'doc.generic.name' then
                     -- { [number]: number} -> { [K]: V }
                     local tfieldNode = vm.getTableKey(uri, node, 'any')
                     local tvalueNode = vm.getTableValue(uri, node, 'any')
-                    resolve(ufieldNode[1], tfieldNode)
-                    resolve(uvalueNode[1], tvalueNode)
+                    resolve(ufieldNode:get(1), tfieldNode)
+                    resolve(uvalueNode:get(1), tvalueNode)
                 else
-                    if ufieldNode[1].type == 'doc.generic.name' then
+                    if ufieldNode:get(1).type == 'doc.generic.name' then
                         -- { [number]: number}|number[] -> { [K]: number }
                         local tnode = vm.getTableKey(uri, node, uvalueNode)
-                        resolve(ufieldNode[1], tnode)
-                    elseif uvalueNode[1].type == 'doc.generic.name' then
+                        resolve(ufieldNode:get(1), tnode)
+                    elseif uvalueNode:get(1).type == 'doc.generic.name' then
                         -- { [number]: number}|number[] -> { [number]: V }
                         local tnode = vm.getTableValue(uri, node, ufieldNode)
-                        resolve(uvalueNode[1], tnode)
+                        resolve(uvalueNode:get(1), tnode)
                     end
                 end
             end

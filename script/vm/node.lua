@@ -8,10 +8,13 @@ vm.nodeCache = {}
 
 ---@class vm.node
 local mt = {}
-mt.__index   = mt
-mt.type      = 'vm.node'
-mt.optional  = nil
-mt.lastInfer = nil
+mt.__index    = mt
+mt.type       = 'vm.node'
+mt.optional   = nil
+mt.lastInfer  = nil
+---@type vm.node[]
+mt._childs    = nil
+mt._locked    = false
 
 ---@param node vm.node | vm.object
 function mt:merge(node)
@@ -19,14 +22,27 @@ function mt:merge(node)
         return
     end
     if node.type == 'vm.node' then
-        for _, c in ipairs(node) do
-            if not self[c] then
-                self[c]       = true
-                self[#self+1] = c
-            end
+        if node == self then
+            return
         end
         if node:isOptional() then
             self.optional = true
+        end
+        if node._locked then
+            if not self._childs then
+                self._childs = {}
+            end
+            if not self._childs[node] then
+                self._childs[#self._childs+1] = node
+                self._childs[node] = true
+            end
+        else
+            for _, obj in ipairs(node) do
+                if not self[obj] then
+                    self[obj]     = true
+                    self[#self+1] = obj
+                end
+            end
         end
     else
         if not self[node] then
@@ -36,14 +52,82 @@ function mt:merge(node)
     end
 end
 
----@return vm.node
-function mt:copy()
-    return vm.createNode(self)
+function mt:_each(mark, callback)
+    if mark[self] then
+        return
+    end
+    mark[self] = true
+    for i = 1, #self do
+        callback(self[i])
+    end
+    local childs = self._childs
+    if not childs then
+        return
+    end
+    for i = 1, #childs do
+        local child = childs[i]
+        if not child:isLocked() then
+            child:_each(mark, callback)
+        end
+    end
+end
+
+function mt:_expand()
+    local childs = self._childs
+    if not childs then
+        return
+    end
+    self._childs = nil
+
+    local mark = {}
+    mark[self] = true
+
+    local function insert(obj)
+        if not self[obj] then
+            self[obj]     = true
+            self[#self+1] = obj
+        end
+    end
+
+    for i = 1, #childs do
+        local child = childs[i]
+        if child:isLocked() then
+            if not self._childs then
+                self._childs = {}
+            end
+            if not self._childs[child] then
+                self._childs[#self._childs+1] = child
+                self._childs[child] = true
+            end
+        else
+            child:_each(mark, insert)
+        end
+    end
 end
 
 ---@return boolean
 function mt:isEmpty()
+    self:_expand()
     return #self == 0
+end
+
+---@param n integer
+---@return vm.object?
+function mt:get(n)
+    self:_expand()
+    return self[n]
+end
+
+function mt:lock()
+    self._locked = true
+end
+
+function mt:unlock()
+    self._locked = false
+end
+
+function mt:isLocked()
+    return self._locked == true
 end
 
 function mt:addOptional()
@@ -57,6 +141,7 @@ function mt:removeOptional()
     if not self:isOptional() then
         return self
     end
+    self:_expand()
     for i = #self, 1, -1 do
         local n = self[i]
         if n.type == 'nil'
@@ -73,6 +158,7 @@ function mt:isOptional()
     if self.optional ~= nil then
         return self.optional
     end
+    self:_expand()
     for _, c in ipairs(self) do
         if c.type == 'nil'
         or (c.type == 'boolean' and c[1] == false)
@@ -87,6 +173,7 @@ end
 
 ---@return fun():vm.object
 function mt:eachObject()
+    self:_expand()
     local i = 0
     return function ()
         i = i + 1
@@ -106,15 +193,15 @@ function vm.setNode(source, node, cover)
         return
     end
     local me = vm.nodeCache[source]
-    if not me then
+    if me then
+        me:merge(node)
+    else
         if node.type == 'vm.node' then
             vm.nodeCache[source] = node
         else
             vm.nodeCache[source] = vm.createNode(node)
         end
-        return
     end
-    vm.nodeCache[source] = vm.createNode(me, node)
 end
 
 ---@return vm.node?

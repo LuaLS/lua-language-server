@@ -612,7 +612,7 @@ local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
             local myEvent
             if n.args[eventIndex] then
                 local argNode = vm.compileNode(n.args[eventIndex])
-                myEvent = argNode[1]
+                myEvent = argNode:get(1)
             end
             if not myEvent
             or not eventMap
@@ -633,7 +633,7 @@ local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
 end
 
 ---@param arg parser.object
----@param call parser.position
+---@param call parser.object
 ---@param index? integer
 function vm.compileCallArg(arg, call, index)
     if not index then
@@ -738,7 +738,6 @@ local compilerSwitch = util.switch()
         if  not source.value
         and source.ref
         and not hasMarkDoc then
-            vm.pauseCache()
             for _, ref in ipairs(source.ref) do
                 if ref.type == 'setlocal' and ref.value then
                     if ref.value.type == 'table' then
@@ -748,7 +747,6 @@ local compilerSwitch = util.switch()
                     end
                 end
             end
-            vm.resumeCache()
         end
         -- function x.y(self, ...) --> function x:y(...)
         if  source[1] == 'self'
@@ -792,7 +790,7 @@ local compilerSwitch = util.switch()
     : case 'setlocal'
     : case 'getlocal'
     : call(function (source)
-        vm.setNode(source, vm.compileNode(source.node), true)
+        vm.setNode(source, vm.compileNode(source.node))
     end)
     : case 'setfield'
     : case 'setmethod'
@@ -1522,26 +1520,6 @@ local function compileByGlobal(uri, source)
     end
 end
 
-local pauseCacheCount   = 0
-local originCacheKeys   = {}
-local originCacheValues = {}
-function vm.pauseCache()
-    pauseCacheCount = pauseCacheCount + 1
-end
-
-function vm.resumeCache()
-    pauseCacheCount = pauseCacheCount - 1
-    if pauseCacheCount == 0 then
-        for source in pairs(originCacheKeys) do
-            if originCacheValues[source] then
-                vm.setNode(source, originCacheValues[source], true)
-            end
-            originCacheKeys[source]   = nil
-            originCacheValues[source] = nil
-        end
-    end
-end
-
 ---@param source vm.object
 ---@param uri? uri
 ---@return vm.node
@@ -1554,15 +1532,12 @@ function vm.compileNode(source, uri)
         return cache
     end
 
-    local pauseCache = pauseCacheCount > 0
-    if pauseCache and not originCacheKeys[source] then
-        originCacheKeys[source]   = true
-        originCacheValues[source] = cache
-    end
-
-    vm.setNode(source, vm.createNode(), true)
+    local node = vm.createNode()
+    vm.setNode(source, node, true)
     compileByGlobal(uri, source)
     compileByNode(source)
 
-    return vm.getNode(source)
+    node = vm.getNode(source)
+
+    return node
 end

@@ -791,7 +791,7 @@ local compilerSwitch = util.switch()
     : case 'local'
     : call(function (source)
         local baseNode = compileLocalBase(source)
-        vm.setNode(source, baseNode)
+        vm.setNode(source, baseNode, true)
         if not baseNode:getData 'hasDefined' and source.ref then
             for _, ref in ipairs(source.ref) do
                 if ref.type == 'setlocal' then
@@ -810,11 +810,15 @@ local compilerSwitch = util.switch()
                 vm.setNode(source, vm.compileNode(source.value))
             end
         end
-        vm.setNode(source, vm.compileNode(source.node))
+        baseNode:merge(vm.getNode(source))
+        vm.setNode(source, baseNode, true)
+        vm.compileNode(source.node)
     end)
     : case 'getlocal'
     : call(function (source)
-        vm.setNode(source, vm.compileNode(source.node))
+        local baseNode = compileLocalBase(source.node)
+        vm.setNode(source, baseNode, true)
+        vm.compileNode(source.node)
     end)
     : case 'setfield'
     : case 'setmethod'

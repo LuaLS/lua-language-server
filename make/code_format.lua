@@ -30,5 +30,7 @@ lm:source_set 'code_format' {
                 return "NOT_SUPPORT_FILE_SYSTEM"
             end
         end)()
-    }
+    },
+    c = 'c89',
+    cxx = 'c++17',
 }

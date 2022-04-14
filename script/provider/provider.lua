@@ -998,7 +998,6 @@ m.register '$/didChangeVisibleRanges' {
 m.register '$/status/click' {
     ---@async
     function ()
-        -- TODO: translate
         local titleDiagnostic = lang.script.WINDOW_LUA_STATUS_DIAGNOSIS_TITLE
         local result = client.awaitRequestMessage('Info', lang.script.WINDOW_LUA_STATUS_DIAGNOSIS_MSG, {
             titleDiagnostic,

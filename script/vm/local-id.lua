@@ -177,6 +177,7 @@ function m.getFields(source)
         return nil
     end
     -- TODO：optimize
+    local clock = os.clock()
     local fields = {}
     for lid, sources in pairs(root._localIDs) do
         if  lid ~= id
@@ -188,6 +189,10 @@ function m.getFields(source)
                 fields[#fields+1] = src
             end
         end
+    end
+    local cost = os.clock() - clock
+    if cost > 1.0 then
+        log.warn('local-id getFields takes %.3f seconds', cost)
     end
     return fields
 end

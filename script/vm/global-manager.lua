@@ -240,6 +240,7 @@ function m.getFields(cate, name)
     local key = cate .. '|' .. name
 
     -- TODO: optimize
+    local clock = os.clock()
     for gid, global in pairs(m.globals) do
         if  gid ~= key
         and util.stringStartWith(gid, key)
@@ -247,6 +248,10 @@ function m.getFields(cate, name)
         and not gid:find(m.ID_SPLITE, #key + 2) then
             globals[#globals+1] = global
         end
+    end
+    local cost = os.clock() - clock
+    if cost > 0.1 then
+        log.warn('global-manager getFields cost %.3f', cost)
     end
 
     return globals
@@ -258,11 +263,16 @@ function m.getGlobals(cate)
     local globals = {}
 
     -- TODO: optimize
+    local clock = os.clock()
     for gid, global in pairs(m.globals) do
         if  util.stringStartWith(gid, cate)
         and not gid:find(m.ID_SPLITE) then
             globals[#globals+1] = global
         end
+    end
+    local cost = os.clock() - clock
+    if cost > 0.1 then
+        log.warn('global-manager getGlobals cost %.3f', cost)
     end
 
     return globals

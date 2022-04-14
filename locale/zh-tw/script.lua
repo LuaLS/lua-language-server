@@ -306,7 +306,7 @@ HOVER_MULTI_PROTOTYPE =
 '({} 個原型)'
 HOVER_STRING_BYTES =
 '{} 個位元組'
-HOVER_S TRING_CHARACTERS =
+HOVER_STRING_CHARACTERS =
 '{} 個位元組，{} 個字元'
 HOVER_MULTI_DEF_PROTO =
 '({} 個定義，{} 個原型)'

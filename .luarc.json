@@ -36,8 +36,5 @@
             "script/meta",
             "bin"
         ]
-    },
-    "hint": {
-        "enable": true
     }
 }

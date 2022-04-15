@@ -966,8 +966,6 @@ function m.getKeyName(obj)
         return obj[1]
     elseif tp == 'doc.type.field' then
         return obj.name[1]
-    elseif tp == 'dummy' then
-        return obj[1]
     end
     return m.getKeyNameOfLiteral(obj)
 end

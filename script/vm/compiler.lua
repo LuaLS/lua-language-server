@@ -246,9 +246,18 @@ function vm.getClassFields(suri, node, key, pushResult)
 
     local function searchGlobal(class)
         if class.cate == 'type' and class.name == '_G' then
-            local sets = globalMgr.getGlobalSets(suri, 'variable')
-            for _, set in ipairs(sets) do
-                pushResult(set)
+            if key == nil then
+                local sets = globalMgr.getGlobalSets(suri, 'variable')
+                for _, set in ipairs(sets) do
+                    pushResult(set)
+                end
+            else
+                local global = globalMgr.getGlobal('variable', key)
+                if global then
+                    for _, set in ipairs(global:getSets(suri)) do
+                        pushResult(set)
+                    end
+                end
             end
         end
     end
@@ -1599,7 +1608,15 @@ local function compileByGlobal(source)
     end
     globalNode = vm.createNode(global)
     vm.setNode(root._globalBase[name], globalNode, true)
-    vm.setNode(source, globalNode, true)
+
+    local sets = global.links[uri].sets or {}
+    local gets = global.links[uri].gets or {}
+    for _, set in ipairs(sets) do
+        vm.setNode(set, globalNode, true)
+    end
+    for _, get in ipairs(gets) do
+        vm.setNode(get, globalNode, true)
+    end
 
     if global.cate == 'variable' then
         local hasMarkDoc

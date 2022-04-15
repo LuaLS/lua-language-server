@@ -222,3 +222,9 @@ fooC(function (x, s)
 end,<??>)
 ]]
 'function fooC(callback: fun(x: number, s: string):nil, <!par: number!>)'
+
+TEST [[
+(function (a, b)
+end)(<??>)
+]]
+'function (<!a: any!>, b: any)'

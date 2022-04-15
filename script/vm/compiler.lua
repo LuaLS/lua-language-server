@@ -1122,30 +1122,28 @@ local compilerSwitch = util.switch()
     : call(function (source)
         vm.setNode(source, source)
     end)
-    : case 'doc.type.name'
+    : case 'doc.type.sign'
     : call(function (source)
-        if source.signs then
-            local uri = guide.getUri(source)
-            vm.setNode(source, source)
-            local global = globalMgr.getGlobal('type', source[1])
-            for _, set in ipairs(global:getSets(uri)) do
-                if set.type == 'doc.class' then
-                    if set.extends then
-                        for _, ext in ipairs(set.extends) do
-                            if ext.type == 'doc.type.table' then
-                                if ext._generic then
-                                    local resolved = ext._generic:resolve(uri, source.signs)
-                                    vm.setNode(source, resolved)
-                                end
+        local uri = guide.getUri(source)
+        vm.setNode(source, source)
+        local global = globalMgr.getGlobal('type', source.node[1])
+        for _, set in ipairs(global:getSets(uri)) do
+            if set.type == 'doc.class' then
+                if set.extends then
+                    for _, ext in ipairs(set.extends) do
+                        if ext.type == 'doc.type.table' then
+                            if ext._generic then
+                                local resolved = ext._generic:resolve(uri, source.signs)
+                                vm.setNode(source, resolved)
                             end
                         end
                     end
                 end
-                if set.type == 'doc.alias' then
-                    if set.extends._generic then
-                        local resolved = set.extends._generic:resolve(uri, source.signs)
-                        vm.setNode(source, resolved)
-                    end
+            end
+            if set.type == 'doc.alias' then
+                if set.extends._generic then
+                    local resolved = set.extends._generic:resolve(uri, source.signs)
+                    vm.setNode(source, resolved)
                 end
             end
         end

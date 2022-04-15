@@ -189,9 +189,7 @@ local compilerGlobalSwitch = util.switch()
         local name = source[1]
         local type = m.declareGlobal('type', name, uri)
         type:addGet(uri, source)
-        if not source.signs then
-            source._globalNode = type
-        end
+        source._globalNode = type
     end)
     : case 'doc.extends.name'
     : call(function (source)

@@ -881,3 +881,15 @@ G = {
 local f
 f.<?x?>
 ]]
+
+TEST [[
+---@class <!XXX!><K, V>: {}
+
+---@type <?XXX?><>
+]]
+
+TEST [[
+---@class <!YYY!>
+
+---@type XXX<<?YYY?>>
+]]

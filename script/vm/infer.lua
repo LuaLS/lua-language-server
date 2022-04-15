@@ -87,7 +87,6 @@ local viewNodeSwitch = util.switch()
     end)
     : case 'doc.type.name'
     : call(function (source, infer)
-        infer._hasClass = true
         if source.signs then
             local buf = {}
             for i, sign in ipairs(source.signs) do
@@ -114,6 +113,15 @@ local viewNodeSwitch = util.switch()
             view = '(' .. view .. ')'
         end
         return view .. '[]'
+    end)
+    : case 'doc.type.sign'
+    : call(function (source, infer)
+        infer._hasClass = true
+        local buf = {}
+        for i, sign in ipairs(source.signs) do
+            buf[i] = m.getInfer(sign):view()
+        end
+        return ('%s<%s>'):format(source.node[1], table.concat(buf, ', '))
     end)
     : case 'doc.type.table'
     : call(function (source, infer)

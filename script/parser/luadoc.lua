@@ -309,34 +309,21 @@ local function parseTable(parent)
     return typeUnit
 end
 
-local function parseSigns(parent, mode)
+local function parseSigns(parent)
     if not checkToken('symbol', '<', 1) then
         return nil
     end
     nextToken()
     local signs = {}
     while true do
-        local sign
-        if mode == 'name' then
-            sign = parseName('doc.generic.name', parent)
-            if not sign then
-                pushWarning {
-                    type   = 'LUADOC_MISS_SIGN_NAME',
-                    start  = getFinish(),
-                    finish = getFinish(),
-                }
-                break
-            end
-        elseif mode == 'type' then
-            sign = parseType(parent)
-            if not sign then
-                pushWarning {
-                    type   = 'LUADOC_MISS_TYPE_NAME',
-                    start  = getFinish(),
-                    finish = getFinish(),
-                }
-                break
-            end
+        local sign = parseName('doc.generic.name', parent)
+        if not sign then
+            pushWarning {
+                type   = 'LUADOC_MISS_SIGN_NAME',
+                start  = getFinish(),
+                finish = getFinish(),
+            }
+            break
         end
         signs[#signs+1] = sign
         if checkToken('symbol', ',', 1) then
@@ -345,17 +332,7 @@ local function parseSigns(parent, mode)
             break
         end
     end
-    if not checkToken('symbol', '>', 1) then
-        pushWarning {
-            type   = 'LUADOC_MISS_SYMBOL',
-            start  = getFinish(),
-            finish = getFinish(),
-            symbol = {
-                symbol = '>',
-            }
-        }
-    end
-    nextToken()
+    nextSymbolOrError '>'
     return signs
 end
 
@@ -376,7 +353,7 @@ local function parseClass(parent)
     end
     result.start  = getStart()
     result.finish = getFinish()
-    result.signs  = parseSigns(result, 'name')
+    result.signs  = parseSigns(result)
     if not checkToken('symbol', ':', 1) then
         return result
     end
@@ -418,6 +395,42 @@ local function parseTypeUnitArray(parent, node)
         parent = parent,
     }
     node.parent = result
+    return result
+end
+
+local function parseTypeUnitSign(parent, node)
+    if not checkToken('symbol', '<', 1) then
+        return nil
+    end
+    nextToken()
+    local result = {
+        type   = 'doc.type.sign',
+        start  = node.start,
+        finish = getFinish(),
+        node   = node,
+        parent = parent,
+        signs  = {},
+    }
+    node.parent = result
+    while true do
+        local sign = parseType(result)
+        if not sign then
+            pushWarning {
+                type   = 'LUA_DOC_MISS_SIGN',
+                start  = getFinish(),
+                finish = getFinish(),
+            }
+            break
+        end
+        result.signs[#result.signs+1] = sign
+        if checkToken('symbol', ',', 1) then
+            nextToken()
+        else
+            break
+        end
+    end
+    nextSymbolOrError '>'
+    result.finish = getFinish()
     return result
 end
 
@@ -629,7 +642,13 @@ function parseTypeUnit(parent)
             result.literal = true
             nextSymbolOrError '`'
         end
-        result.signs = parseSigns(result, 'type')
+    end
+    while true do
+        local newResult = parseTypeUnitSign(parent, result)
+        if not newResult then
+            break
+        end
+        result = newResult
     end
     while true do
         local newResult = parseTypeUnitArray(parent, result)
@@ -777,7 +796,7 @@ local function parseAlias()
         return nil
     end
     result.start  = getStart()
-    result.signs  = parseSigns(result, 'name')
+    result.signs  = parseSigns(result)
     result.extends = parseType(result)
     if not result.extends then
         pushWarning {

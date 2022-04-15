@@ -1,7 +1,7 @@
 # changelog
 
 ## 3.1.0
-* `CHG` inlay-hint: move to LSP. Its format is now controlled by the client.
+* `CHG` inlay-hint: move to LSP and enable by default. Its format is now controlled by the client.
 
 ## 3.0.2
 `2022-4-15`

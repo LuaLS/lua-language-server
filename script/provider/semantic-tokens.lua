@@ -3,12 +3,11 @@ local client         = require 'client'
 local json           = require "json"
 local config         = require 'config'
 
-if not client.getAbility 'workspace.semanticTokens.refreshSupport' then
-    return
-end
-
 local function refresh()
     if not client.isReady() then
+        return
+    end
+    if not client.getAbility 'workspace.semanticTokens.refreshSupport' then
         return
     end
     log.debug('Refresh semantic tokens.')

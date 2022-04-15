@@ -5,6 +5,7 @@ local config   = require 'config'
 local guide    = require 'parser.guide'
 local await    = require 'await'
 local define   = require 'proto.define'
+local lang     = require 'language'
 
 ---@async
 local function typeHint(uri, results, start, finish)
@@ -62,25 +63,26 @@ local function typeHint(uri, results, start, finish)
             offset = src.finish,
             kind   = define.InlayHintKind.Type,
             where  = 'right',
+            source = source,
         }
     end)
 end
 
-local function getArgNames(func)
+local function getParams(func)
     if not func.args or #func.args == 0 then
         return nil
     end
-    local names = {}
+    local params = {}
     for _, arg in ipairs(func.args) do
         if arg.type == '...' then
             break
         end
-        names[#names+1] = arg[1] or ''
+        params[#params+1] = arg
     end
-    if #names == 0 then
+    if #params == 0 then
         return nil
     end
-    return names
+    return params
 end
 
 local function hasLiteralArgInCall(call)
@@ -121,19 +123,16 @@ local function paramName(uri, results, start, finish)
         if not defs then
             return
         end
-        local args
+        local params
         for _, def in ipairs(defs) do
-            if def.value then
-                def = def.value
-            end
             if def.type == 'function' then
-                args = getArgNames(def)
-                if args then
+                params = getParams(def)
+                if params then
                     break
                 end
             end
         end
-        if not args then
+        if not params then
             return
         end
         local firstIndex = 1
@@ -145,12 +144,14 @@ local function paramName(uri, results, start, finish)
             if  not mark[arg]
             and (paramConfig ~= 'Literal' or guide.isLiteral(arg)) then
                 mark[arg] = true
-                if args[i] and args[i] ~= '' then
+                local param = params[i]
+                if param and param[1] then
                     results[#results+1] = {
-                        text   = args[i] .. ':',
-                        offset = arg.start,
-                        kind   = define.InlayHintKind.Parameter,
-                        where  = 'left',
+                        text    = param[1] .. ':',
+                        offset  = arg.start,
+                        kind    = define.InlayHintKind.Parameter,
+                        where   = 'left',
+                        source  = param,
                     }
                 end
             end
@@ -204,6 +205,7 @@ local function arrayIndex(uri, results, start, finish)
             offset = source.start,
             kind   = define.InlayHintKind.Other,
             where  = 'left',
+            source = source.parent,
         }
     end)
 end
@@ -228,10 +230,11 @@ local function awaitHint(uri, results, start, finish)
             return
         end
         results[#results+1] = {
-            text   = 'await ',
-            offset = node.start,
-            kind   = define.InlayHintKind.Other,
-            where  = 'left',
+            text    = 'await ',
+            offset  = node.start,
+            kind    = define.InlayHintKind.Other,
+            where   = 'left',
+            tooltip = lang.script.HOVER_AWAIT_TOOLTIP,
         }
     end)
 end

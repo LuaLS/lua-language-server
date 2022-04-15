@@ -321,6 +321,8 @@ HOVER_TABLE_TIME_UP     =
 '出于性能考虑，已禁用了部分类型推断。'
 HOVER_WS_LOADING        =
 '正在加载工作目录：{} / {}'
+HOVER_AWAIT_TOOLTIP     =
+'正在调用异步函数，可能会让出当前协程'
 
 ACTION_DISABLE_DIAG     =
 '在工作区禁用诊断 ({})。'

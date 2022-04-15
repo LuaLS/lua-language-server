@@ -19,6 +19,8 @@ local json       = require 'json'
 local scope      = require 'workspace.scope'
 local furi       = require 'file-uri'
 local inspect    = require 'inspect'
+local markdown   = require 'provider.markdown'
+local guide      = require 'parser.guide'
 
 ---@async
 local function updateConfig(uri)
@@ -1174,7 +1176,20 @@ m.register 'textDocument/inlayHint' {
         local hintResults = {}
         for i, res in ipairs(results) do
             hintResults[i] = {
-                label        = res.text,
+                label        = {
+                    {
+                        value    = res.text,
+                        tooltip  = res.tooltip,
+                        location = res.source and converter.location(
+                                    guide.getUri(res.source),
+                                    converter.packRange(
+                                        guide.getUri(res.source),
+                                        res.source.start,
+                                        res.source.finish
+                                    )
+                                ),
+                    },
+                },
                 position     = converter.packPosition(uri, res.offset),
                 kind         = res.kind,
                 paddingLeft  = true,

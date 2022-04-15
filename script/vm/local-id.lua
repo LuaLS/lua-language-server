@@ -1,5 +1,6 @@
 local util  = require 'utility'
 local guide = require 'parser.guide'
+local vm    = require 'vm.vm'
 
 ---@class parser.object
 ---@field _localID string
@@ -7,8 +8,6 @@ local guide = require 'parser.guide'
 
 ---@class vm.local-id
 local m = {}
-
-m.ID_SPLITE = '\x1F'
 
 local compileSwitch = util.switch()
     : case 'local'
@@ -38,7 +37,7 @@ local compileSwitch = util.switch()
         if type(key) ~= 'string' then
             return
         end
-        source._localID = parentID .. m.ID_SPLITE .. key
+        source._localID = parentID .. vm.ID_SPLITE .. key
         source.field._localID = source._localID
         if source.type == 'getfield' then
             m.compileLocalID(source.next)
@@ -55,7 +54,7 @@ local compileSwitch = util.switch()
         if type(key) ~= 'string' then
             return
         end
-        source._localID = parentID .. m.ID_SPLITE .. key
+        source._localID = parentID .. vm.ID_SPLITE .. key
         source.method._localID = source._localID
         if source.type == 'getmethod' then
             m.compileLocalID(source.next)
@@ -72,7 +71,7 @@ local compileSwitch = util.switch()
         if type(key) ~= 'string' then
             return
         end
-        source._localID = parentID .. m.ID_SPLITE .. key
+        source._localID = parentID .. vm.ID_SPLITE .. key
         source.index._localID = source._localID
         if source.type == 'setindex' then
             m.compileLocalID(source.next)
@@ -160,7 +159,7 @@ function m.getSources(source, key)
         if type(key) ~= 'string' then
             return nil
         end
-        id = id .. m.ID_SPLITE .. key
+        id = id .. vm.ID_SPLITE .. key
     end
     return root._localIDs[id]
 end
@@ -182,9 +181,9 @@ function m.getFields(source)
     for lid, sources in pairs(root._localIDs) do
         if  lid ~= id
         and util.stringStartWith(lid, id)
-        and lid:sub(#id + 1, #id + 1) == m.ID_SPLITE
+        and lid:sub(#id + 1, #id + 1) == vm.ID_SPLITE
         -- only one field
-        and not lid:find(m.ID_SPLITE, #id + 2) then
+        and not lid:find(vm.ID_SPLITE, #id + 2) then
             for _, src in ipairs(sources) do
                 fields[#fields+1] = src
             end

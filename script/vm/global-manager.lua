@@ -16,8 +16,6 @@ m.globals = {}
 ---@type table<uri, table<string, boolean>>
 m.globalSubs = util.multiTable(2)
 
-m.ID_SPLITE = '\x1F'
-
 local compilerGlobalSwitch = util.switch()
     : case 'local'
     : call(function (source)
@@ -76,7 +74,7 @@ local compilerGlobalSwitch = util.switch()
             if parentName == '_G' then
                 name = keyName
             else
-                name = ('%s%s%s'):format(parentName, m.ID_SPLITE, keyName)
+                name = ('%s%s%s'):format(parentName, vm.ID_SPLITE, keyName)
             end
         elseif source.node.special == '_G' then
             name = keyName
@@ -104,7 +102,7 @@ local compilerGlobalSwitch = util.switch()
             if parentName == '_G' then
                 name = keyName
             else
-                name = ('%s%s%s'):format(parentName, m.ID_SPLITE, keyName)
+                name = ('%s%s%s'):format(parentName, vm.ID_SPLITE, keyName)
             end
         elseif source.node.special == '_G' then
             name = keyName
@@ -227,7 +225,7 @@ end
 function m.getGlobal(cate, name, field)
     local key = cate .. '|' .. name
     if field then
-        key = key .. m.ID_SPLITE .. field
+        key = key .. vm.ID_SPLITE .. field
     end
     return m.globals[key]
 end
@@ -244,8 +242,8 @@ function m.getFields(cate, name)
     for gid, global in pairs(m.globals) do
         if  gid ~= key
         and util.stringStartWith(gid, key)
-        and gid:sub(#key + 1, #key + 1) == m.ID_SPLITE
-        and not gid:find(m.ID_SPLITE, #key + 2) then
+        and gid:sub(#key + 1, #key + 1) == vm.ID_SPLITE
+        and not gid:find(vm.ID_SPLITE, #key + 2) then
             globals[#globals+1] = global
         end
     end
@@ -266,7 +264,7 @@ function m.getGlobals(cate)
     local clock = os.clock()
     for gid, global in pairs(m.globals) do
         if  util.stringStartWith(gid, cate)
-        and not gid:find(m.ID_SPLITE) then
+        and not gid:find(vm.ID_SPLITE) then
             globals[#globals+1] = global
         end
     end

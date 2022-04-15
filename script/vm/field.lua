@@ -17,7 +17,7 @@ local searchByNodeSwitch = util.switch()
 
 local function searchByNode(source, pushResult)
     local uri = guide.getUri(source)
-    vm.compileByParentNode(source, nil, function (field)
+    vm.compileByParentNode(source, nil, true, function (field)
         searchByNodeSwitch(field.type, uri, field, pushResult)
     end)
 end

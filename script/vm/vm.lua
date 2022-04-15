@@ -14,6 +14,8 @@ _ENV = nil
 ---@class vm
 local m = {}
 
+m.ID_SPLITE = '\x1F'
+
 function m.getSpecial(source)
     if not source then
         return nil

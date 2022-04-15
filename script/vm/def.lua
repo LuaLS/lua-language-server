@@ -105,7 +105,7 @@ local searchFieldSwitch = util.switch()
             end
         end
         if obj.cate == 'type' then
-            vm.getClassFields(suri, obj, key, pushResult)
+            vm.getClassFields(suri, obj, key, false, pushResult)
         end
     end)
     : case 'local'
@@ -131,12 +131,11 @@ local searchFieldSwitch = util.switch()
         end
     end)
 
-local searchByParentNode
-local nodeSwitch = util.switch()
+local nodeSwitch;nodeSwitch = util.switch()
     : case 'field'
     : case 'method'
-    : call(function (source, pushResult)
-        searchByParentNode(source.parent, pushResult)
+    : call(function (source, lastKey, pushResult)
+        return nodeSwitch(source.parent.type, source.parent, lastKey, pushResult)
     end)
     : case 'getfield'
     : case 'setfield'
@@ -144,23 +143,36 @@ local nodeSwitch = util.switch()
     : case 'setmethod'
     : case 'getindex'
     : case 'setindex'
-    : call(function (source, pushResult)
+    : call(function (source, lastKey, pushResult)
         local parentNode = vm.compileNode(source.node)
         local uri = guide.getUri(source)
         local key = guide.getKeyName(source)
+        if not key then
+            return
+        end
+        if lastKey then
+            key = key .. vm.ID_SPLITE .. lastKey
+        end
         for pn in parentNode:eachObject() do
             searchFieldSwitch(pn.type, uri, pn, key, pushResult)
         end
+        return key, source.node
     end)
     : case 'tableindex'
     : case 'tablefield'
-    : call(function (source, pushResult)
+    : call(function (source, lastKey, pushResult)
+        if lastKey then
+            return
+        end
         local tbl = source.parent
         local uri = guide.getUri(source)
         searchFieldSwitch(tbl.type, uri, tbl, guide.getKeyName(source), pushResult)
     end)
     : case 'doc.see.field'
-    : call(function (source, pushResult)
+    : call(function (source, lastKey, pushResult)
+        if lastKey then
+            return
+        end
         local parentNode = vm.compileNode(source.parent.name)
         local uri = guide.getUri(source)
         for pn in parentNode:eachObject() do
@@ -190,8 +202,21 @@ end
 
 ---@param source  parser.object
 ---@param pushResult fun(src: parser.object)
-function searchByParentNode(source, pushResult)
-    nodeSwitch(source.type, source, pushResult)
+local function searchByParentNode(source, pushResult)
+    local lastKey
+    local src = source
+    while true do
+        local key, node = nodeSwitch(src.type, src, lastKey, pushResult)
+        if not key then
+            break
+        end
+        src = node
+        if lastKey then
+            lastKey = key .. vm.ID_SPLITE .. lastKey
+        else
+            lastKey = key
+        end
+    end
 end
 
 local function searchByNode(source, pushResult)

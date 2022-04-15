@@ -34,41 +34,7 @@ https://github.com/sumneko/lua-language-server/wiki
 - [x] EmmyLua Annotation
 - [x] Multi Workspace
 - [x] Semantic Tokens
-- [ ] Type Format
-
-## Preview
-
-### Goto Definition
-
-![avatar](https://github.com/sumneko/vscode-lua/raw/master/images//Goto%20Definition.gif)
-
-### Find All References
-
-![avatar](https://github.com/sumneko/vscode-lua/raw/master/images//Find%20All%20References.gif)
-
-### Hover
-
-![avatar](https://github.com/sumneko/vscode-lua/raw/master/images/Hover.gif)
-
-### Diagnostics
-
-![avatar](https://github.com/sumneko/vscode-lua/raw/master/images/Diagnostics.gif)
-
-### Rename
-
-![avatar](https://github.com/sumneko/vscode-lua/raw/master/images/Rename.gif)
-
-### Auto Completion
-
-![avatar](https://github.com/sumneko/vscode-lua/raw/master/images/Auto%20Completion.gif)
-
-### Signature Help
-
-![avatar](https://github.com/sumneko/vscode-lua/raw/master/images/Signature%20Help.gif)
-
-### Emmy Annotation
-
-![avatar](https://github.com/sumneko/vscode-lua/raw/master/images/Emmy%20Annotation.gif)
+- [x] Formatter
 
 ## Version
 
@@ -89,6 +55,7 @@ If you find any mistakes, please [tell me][issues] or use [Pull Requests][@meta]
 
 - [x] en-us
 - [x] zh-cn
+- [x] zh-tw (thanks [AlexCai2019](https://github.com/AlexCai2019))
 - [x] pt-br (thanks [Jeferson Ferreira](https://github.com/jefersonf))
 
 Please [help me][en-US] improve the quality of `en-US`.

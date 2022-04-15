@@ -1750,7 +1750,7 @@ zz<??>
         detail = 'integer = 1',
         description = [[
 ```lua
-global zzz: integer = 1
+(global) zzz: integer = 1
 ```
 
 ---
@@ -2094,7 +2094,7 @@ print(t.aa<??>)
         kind  = define.CompletionItemKind.Field,
         description = [[
 ```lua
-field cc.aaa: number
+(field) cc.aaa: number
 ```]]
     },
 }

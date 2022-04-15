@@ -2,6 +2,8 @@
 
 ## 3.1.0
 * `CHG` inlay-hint: move to LSP and enable by default. Its font is now controlled by the client.
+* `CHG` hover: split `local` into `local` / `parameter` / `upvalue` / `self`.
+* `CHG` hover: added parentheses to some words, such as `global` / `field` / `class`.
 
 ## 3.0.2
 `2022-4-15`

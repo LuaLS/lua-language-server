@@ -67,7 +67,7 @@ local obj = setmetatable({}, mt)
 obj:<?init?>(1, '测试')
 ]]
 [[
-method mt:init(a: any, b: any, c: any)
+(method) mt:init(a: any, b: any, c: any)
 ]]
 
 --TEST [[
@@ -117,7 +117,7 @@ local obj = setmetatable({}, mt)
 obj:<?init?>(1, '测试')
 ]]
 [[
-method mt:init(a: any, b: any, c: any)
+(method) mt:init(a: any, b: any, c: any)
   -> table
 ]]
 
@@ -135,7 +135,7 @@ obj:init(1, '测试')
 obj.<?init?>(obj, 1, '测试')
 ]]
 [[
-method mt:init(a: any, b: any, c: any)
+(method) mt:init(a: any, b: any, c: any)
   -> table
 ]]
 
@@ -150,7 +150,7 @@ obj.<?xxx?>()
 TEST [[
 obj.<?xxx?>()
 ]]
-[[global obj.xxx: unknown]]
+[[(global) obj.xxx: unknown]]
 
 TEST [[
 local <?x?> = 1
@@ -160,26 +160,26 @@ local <?x?> = 1
 TEST [[
 <?x?> = 1
 ]]
-"global x: integer = 1"
+"(global) x: integer = 1"
 
 TEST [[
 local t = {}
 t.<?x?> = 1
 ]]
-"field t.x: integer = 1"
+"(field) t.x: integer = 1"
 
 TEST [[
 t = {}
 t.<?x?> = 1
 ]]
-"global t.x: integer = 1"
+"(global) t.x: integer = 1"
 
 TEST [[
 t = {
     <?x?> = 1
 }
 ]]
-"field x: integer = 1"
+"(field) x: integer = 1"
 
 TEST [[
 local <?obj?> = {}
@@ -329,7 +329,7 @@ local t = init()
 t:<?add?>()
 ]]
 [[
-method mt:add(a: any, b: any)
+(method) mt:add(a: any, b: any)
 ]]
 
 TEST [[
@@ -347,7 +347,7 @@ local t = init()
 t:<?add?>()
 ]]
 [[
-method mt:add(a: any, b: any)
+(method) mt:add(a: any, b: any)
 ]]
 
 TEST [[
@@ -487,7 +487,7 @@ function mt:test(a, b)
 end
 ]]
 [[
-method mt:test(a: any, b: any)
+(method) mt:test(a: any, b: any)
 ]]
 
 TEST[[
@@ -515,7 +515,7 @@ TEST [[
 print(<?utf8?>)
 ]]
 [[
-global utf8: utf8lib {
+(global) utf8: utf8lib {
     char: function,
     charpattern: string,
     codepoint: function,
@@ -529,7 +529,7 @@ TEST [[
 print(io.<?stderr?>)
 ]]
 [[
-global io.stderr: file* {
+(global) io.stderr: file* {
     close: function,
     flush: function,
     lines: function,
@@ -544,7 +544,7 @@ TEST [[
 print(<?io?>)
 ]]
 [[
-global io: iolib {
+(global) io: iolib {
     close: function,
     flush: function,
     input: function,
@@ -758,7 +758,7 @@ local t = {
 print(t.<?v?>)
 ]]
 [[
-field t.v: {
+(field) t.v: {
     b: integer = 1,
     c: integer = 2,
     d: integer = 3,
@@ -789,7 +789,7 @@ TEST [[
 <?_G?>
 ]]
 [[
-global _G: _G {
+(global) _G: _G {
     _G: _G,
     _VERSION: string = "Lua 5.4",
     arg: string[],
@@ -908,7 +908,7 @@ TEST[[
 <?x?> = class()
 ]]
 [[
-global x: Class
+(global) x: Class
 ]]
 
 TEST[[
@@ -918,7 +918,7 @@ local t = {
 }
 ]]
 [[
-field x: Class
+(field) x: Class
 ]]
 
 TEST[[
@@ -934,7 +934,7 @@ TEST[[
 <?x?> = class()
 ]]
 [[
-global x: Class
+(global) x: Class
 ]]
 
 TEST[[
@@ -970,7 +970,7 @@ function f(<?t?>)
 end
 ]]
 [[
-local t: Class
+(parameter) t: Class
 ]]
 
 TEST [[
@@ -983,7 +983,7 @@ function f(t)
 end
 ]]
 [[
-local t: Class
+(parameter) t: Class
 ]]
 
 TEST [[
@@ -1274,7 +1274,7 @@ TEST [[
 function t(<?f?>) end
 ]]
 [[
-local f: fun():void
+(parameter) f: fun():void
 ]]
 
 TEST [[
@@ -1284,7 +1284,7 @@ local t = {f = f}
 t:<?f?>()
 ]]
 [[
-field t.f: fun(a: any, b: any)
+(field) t.f: fun(a: any, b: any)
 ]]
 
 TEST [[
@@ -1293,7 +1293,7 @@ local function f(<?names?>)
 end
 ]]
 [[
-local names: string[]
+(parameter) names: string[]
 ]]
 
 TEST [[
@@ -1389,7 +1389,7 @@ TEST [[
 ---@type <?A?>
 ]]
 [[
-class A
+(class) A
 ]]
 
 TEST [[
@@ -1406,7 +1406,7 @@ TEST [[
 ---@type <?A?>
 ]]
 [[
-展开为 string|"enum1"|"enum2"
+(alias) A 展开为 string|"enum1"|"enum2"
 ]]
 
 TEST [[
@@ -1437,7 +1437,7 @@ t = {}
 function <?t?>.f() end
 ]]
 [[
-global t: c {
+(global) t: c {
     f: function,
 }
 ]]
@@ -1497,7 +1497,7 @@ TEST [[
 local function f(<?callback?>) end
 ]]
 [[
-local callback: fun(x: integer, ...: any)
+(parameter) callback: fun(x: integer, ...: any)
 ]]
 
 TEST [[
@@ -1626,7 +1626,7 @@ function m:f()
 end
 ]]
 [[
-local self: E {
+(self) self: E {
     f: function,
 }
 ]]
@@ -1675,7 +1675,7 @@ TEST [[
 <?a?>.b = 10 * 60
 ]]
 [[
-global a: {
+(global) a: {
     b: integer = 600,
 }
 ]]
@@ -1684,14 +1684,14 @@ TEST [[
 a.<?b?> = 10 * 60
 ]]
 [[
-global a.b: integer = 600
+(global) a.b: integer = 600
 ]]
 
 TEST [[
 a.<?b?>.c = 1 * 1
 ]]
 [[
-global a.b: {
+(global) a.b: {
     c: integer = 1,
 }
 ]]
@@ -1730,7 +1730,7 @@ local t = nil
 t.<?x?>()
 ]]
 [[
-field t.x: unknown
+(field) t.x: unknown
 ]]
 
 TEST [[
@@ -1743,7 +1743,7 @@ b = a
 print(b.<?x?>)
 ]]
 [[
-field A.x: unknown
+(field) A.x: unknown
 ]]
 
 TEST [[
@@ -1760,7 +1760,7 @@ TEST [[
 local function <?f?>() end
 ]]
 [[
-async function f()
+(async) function f()
 ]]
 
 TEST [[
@@ -1883,4 +1883,24 @@ local t: B {
     x: integer,
     y: string,
 }
+]]
+
+TEST [[
+local <?x?>
+local function f()
+    x
+end
+]]
+[[
+local x: unknown
+]]
+
+TEST [[
+local x
+local function f()
+    <?x?>
+end
+]]
+[[
+(upvalue) x: unknown
 ]]

@@ -45,7 +45,7 @@ local function makeOneSignature(source, oop, index)
     label = label:gsub('%s*->.+', '')
     local params = {}
     local i = 0
-    local argStart, argLabel = label:match '()(%b())'
+    local argStart, argLabel = label:match '%S()(%b())'
     local converted = argLabel
         : sub(2, -2)
         : gsub('%b<>', function (str)

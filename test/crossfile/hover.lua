@@ -235,7 +235,7 @@ TEST {
     },
     hover = [[
 ```lua
-method mt:add(a: any, b: any)
+(method) mt:add(a: any, b: any)
 ```]]
 }
 
@@ -256,7 +256,7 @@ TEST {
     },
     hover = [[
 ```lua
-global t: {
+(global) t: {
     [1]: integer = 1|2,
 }
 ```]],
@@ -279,7 +279,7 @@ TEST {
     },
     hover = [[
 ```lua
-global t: {
+(global) t: {
     [1]: integer = 2,
 }
 ```]],
@@ -346,7 +346,7 @@ TEST {
     },
     hover = [[
 ```lua
-global x: integer = 1
+(global) x: integer = 1
 ```
 
 ---
@@ -484,7 +484,7 @@ function f(<?x?>) end
     },
     hover = [[
 ```lua
-local x: string
+(parameter) x: string
 ```
 
 ---
@@ -535,7 +535,7 @@ function f(<?x?>) end
 },
 hover = [[
 ```lua
-local x: string
+(parameter) x: string
 ```]]}
 
 
@@ -766,7 +766,7 @@ G.A = 1
 },
 hover = [[
 ```lua
-global G.A: integer = 1
+(global) G.A: integer = 1
 ```
 
 ---
@@ -787,7 +787,7 @@ G.<?A?> = 1
 },
 hover = [[
 ```lua
-global G.A: integer = 1
+(global) G.A: integer = 1
 ```
 
 ---
@@ -811,7 +811,7 @@ food.secondField = 2
 },
 hover = [[
 ```lua
-field Food.firstField: number = 0
+(field) Food.firstField: number = 0
 ```]]}
 
 TEST {{ path = 'a.lua', content = '', }, {
@@ -1071,7 +1071,7 @@ G = {}
     },
     hover = [[
 ```lua
-global G: A {
+(global) G: A {
     x: number,
 }
 ```]]
@@ -1087,13 +1087,13 @@ TEST {
     },
     hover = [[
 ```lua
-method C:f(a: any, b: any)
+(method) C:f(a: any, b: any)
 ```
 
 ---
 
 ```lua
-method C:f(a: any)
+(method) C:f(a: any)
 ```]]
 }
 
@@ -1128,12 +1128,12 @@ TEST {
     },
     hover = [[
 ```lua
-async method C:f(a: any, b: any)
+(async) (method) C:f(a: any, b: any)
 ```
 
 ---
 
 ```lua
-async method C:f(a: any)
+(async) (method) C:f(a: any)
 ```]]
 }

@@ -232,7 +232,26 @@ function vm.removeNode(source)
     vm.nodeCache[source] = nil
 end
 
+local lockCount = 0
+local needClearCache = false
+function vm.lockCache()
+    lockCount = lockCount + 1
+end
+
+function vm.unlockCache()
+    lockCount = lockCount - 1
+    if needClearCache then
+        needClearCache = false
+        vm.clearNodeCache()
+    end
+end
+
 function vm.clearNodeCache()
+    if lockCount > 0 then
+        needClearCache = true
+        return
+    end
+    log.debug('clearNodeCache')
     vm.nodeCache = {}
 end
 

@@ -78,7 +78,9 @@ function vm.getTableValue(uri, tnode, knode)
         if tn.type == 'doc.type.table' then
             for _, field in ipairs(tn.fields) do
                 if vm.isSubType(uri, vm.compileNode(field.name), knode) then
-                    result:merge(vm.compileNode(field.extends))
+                    if field.extends then
+                        result:merge(vm.compileNode(field.extends))
+                    end
                 end
             end
         end
@@ -88,16 +90,22 @@ function vm.getTableValue(uri, tnode, knode)
         if tn.type == 'table' then
             for _, field in ipairs(tn) do
                 if field.type == 'tableindex' then
-                    result:merge(vm.compileNode(field.value))
+                    if field.value then
+                        result:merge(vm.compileNode(field.value))
+                    end
                 end
                 if field.type == 'tablefield' then
                     if vm.isSubType(uri, knode, 'string') then
-                        result:merge(vm.compileNode(field.value))
+                        if field.value then
+                            result:merge(vm.compileNode(field.value))
+                        end
                     end
                 end
                 if field.type == 'tableexp' then
                     if vm.isSubType(uri, knode, 'integer') and field.tindex == 1 then
-                        result:merge(vm.compileNode(field.value))
+                        if field.value then
+                            result:merge(vm.compileNode(field.value))
+                        end
                     end
                 end
             end
@@ -118,8 +126,10 @@ function vm.getTableKey(uri, tnode, vnode)
     for tn in tnode:eachObject() do
         if tn.type == 'doc.type.table' then
             for _, field in ipairs(tn.fields) do
-                if vm.isSubType(uri, vm.compileNode(field.extends), vnode) then
-                    result:merge(vm.compileNode(field.name))
+                if field.extends then
+                    if vm.isSubType(uri, vm.compileNode(field.extends), vnode) then
+                        result:merge(vm.compileNode(field.name))
+                    end
                 end
             end
         end
@@ -129,7 +139,9 @@ function vm.getTableKey(uri, tnode, vnode)
         if tn.type == 'table' then
             for _, field in ipairs(tn) do
                 if field.type == 'tableindex' then
-                    result:merge(vm.compileNode(field.index))
+                    if field.index then
+                        result:merge(vm.compileNode(field.index))
+                    end
                 end
                 if field.type == 'tablefield' then
                     result:merge(globalMgr.getGlobal('type', 'string'))

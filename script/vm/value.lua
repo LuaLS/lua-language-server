@@ -2,9 +2,12 @@ local guide    = require 'parser.guide'
 ---@class vm
 local vm       = require 'vm.vm'
 
----@param source parser.object
+---@param source parser.object?
 ---@return boolean|nil
 function vm.test(source)
+    if not source then
+        return nil
+    end
     local node = vm.compileNode(source)
     local hasTrue, hasFalse
     for n in node:eachObject() do
@@ -87,8 +90,8 @@ local function getUnique(v)
     return false
 end
 
----@param a vm.node
----@param b vm.node
+---@param a vm.object?
+---@param b vm.object?
 ---@return boolean|nil
 function vm.equal(a, b)
     if not a or not b then
@@ -116,9 +119,12 @@ function vm.equal(a, b)
     return true
 end
 
----@param v vm.node
+---@param v vm.object?
 ---@return integer?
 function vm.getInteger(v)
+    if not v then
+        return nil
+    end
     local node = vm.compileNode(v)
     local result
     for n in node:eachObject() do
@@ -144,9 +150,12 @@ function vm.getInteger(v)
     return result
 end
 
----@param v vm.node
+---@param v vm.object?
 ---@return integer?
 function vm.getString(v)
+    if not v then
+        return nil
+    end
     local node = vm.compileNode(v)
     local result
     for n in node:eachObject() do
@@ -164,9 +173,12 @@ function vm.getString(v)
     return result
 end
 
----@param v vm.node
+---@param v vm.object?
 ---@return number?
 function vm.getNumber(v)
+    if not v then
+        return nil
+    end
     local node = vm.compileNode(v)
     local result
     for n in node:eachObject() do
@@ -185,9 +197,12 @@ function vm.getNumber(v)
     return result
 end
 
----@param v vm.node
+---@param v vm.object
 ---@return boolean|nil
 function vm.getBoolean(v)
+    if not v then
+        return nil
+    end
     local node = vm.compileNode(v)
     local result
     for n in node:eachObject() do
@@ -205,9 +220,12 @@ function vm.getBoolean(v)
     return result
 end
 
----@param v vm.node
+---@param v vm.object
 ---@return table<any, boolean>?
 function vm.getLiterals(v)
+    if not v then
+        return nil
+    end
     local map
     local node = vm.compileNode(v)
     for n in node:eachObject() do

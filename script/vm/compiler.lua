@@ -748,10 +748,14 @@ local function compileLocalBase(source)
         hasMarkParam = true
         if source.parent.type == 'callargs' then
             -- obj:func(...)
-            vm.setNode(source, vm.compileNode(source.parent.parent.node.node))
+            if source.parent.parent and source.parent.parent.node and source.parent.parent.node.node then
+                vm.setNode(source, vm.compileNode(source.parent.parent.node.node))
+            end
         else
             -- function obj:func(...)
-            vm.setNode(source, vm.compileNode(source.parent.parent.parent.node))
+            if source.parent.parent and source.parent.parent.parent and source.parent.parent.parent.node then
+                vm.setNode(source, vm.compileNode(source.parent.parent.parent.node))
+            end
         end
     end
     local hasMarkValue

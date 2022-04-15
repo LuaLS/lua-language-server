@@ -121,6 +121,9 @@ local compilerGlobalSwitch = util.switch()
     : call(function (source)
         if source.node.special == 'rawset'
         or source.node.special == 'rawget' then
+            if not source.args then
+                return
+            end
             local g     = source.args[1]
             local key   = source.args[2]
             if g and key and g.special == '_G' then

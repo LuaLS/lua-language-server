@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.0.2
+`2022-4-15`
 * `FIX` `table<string, boolean>[string] -> boolean`
 * `FIX` goto `type definition`
 * `FIX` [#1050](https://github.com/sumneko/lua-language-server/issues/1050)

@@ -1155,6 +1155,48 @@ m.register '$/requestHint' {
     end
 }
 
+m.register 'textDocument/inlayHint' {
+    capability = {
+        inlayHintProvider = {
+            resolveProvider = true,
+        },
+    },
+    ---@async
+    function (params)
+        local uri  = files.getRealUri(params.textDocument.uri)
+        if not config.get(uri, 'Lua.hint.enable') then
+            return
+        end
+        workspace.awaitReady(uri)
+        local core = require 'core.hint'
+        local start, finish = converter.unpackRange(uri, params.range)
+        local results = core(uri, start, finish)
+        local hintResults = {}
+        for i, res in ipairs(results) do
+            hintResults[i] = {
+                label        = res.text,
+                position     = converter.packPosition(uri, res.offset),
+                kind         = res.kind,
+                paddingLeft  = true,
+                paddingRight = true,
+            }
+        end
+        return hintResults
+    end
+}
+
+m.register 'inlayHint/resolve' {
+    capability = {
+        inlayHintProvider = {
+            resolveProvider = true,
+        },
+    },
+    ---@async
+    function (hint)
+        return hint
+    end
+}
+
 -- Hint
 do
     ---@async

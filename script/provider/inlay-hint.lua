@@ -3,7 +3,7 @@ local client         = require 'client'
 local json           = require "json"
 local config         = require 'config'
 
-if not client.getAbility 'workspace.semanticTokens.refreshSupport' then
+if not client.getAbility 'workspace.inlayHint.refreshSupport' then
     return
 end
 
@@ -11,8 +11,8 @@ local function refresh()
     if not client.isReady() then
         return
     end
-    log.debug('Refresh semantic tokens.')
-    proto.request('workspace/semanticTokens/refresh', json.null)
+    log.debug('Refresh inlay hints.')
+    proto.request('workspace/inlayHint/refresh', json.null)
 end
 
 config.watch(function (uri, key, value, oldValue)
@@ -21,7 +21,7 @@ config.watch(function (uri, key, value, oldValue)
     end
     if key:find '^Lua.runtime'
     or key:find '^Lua.workspace'
-    or key:find '^Lua.semantic'
+    or key:find '^Lua.hint'
     or key:find '^files' then
         refresh()
     end

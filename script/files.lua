@@ -210,7 +210,7 @@ function m.setText(uri, text, isTrust, callback)
     file.cache = {}
     file.cacheActiveTime = math.huge
     m.globalVersion = m.globalVersion + 1
-    m.onWatch('version')
+    m.onWatch('version', uri)
     if create then
         m.onWatch('create', uri)
         m.onWatch('update', uri)
@@ -391,7 +391,6 @@ end
 --- 移除文件
 ---@param uri uri
 function m.remove(uri)
-    local originUri = uri
     local file = m.fileMap[uri]
     if not file then
         return
@@ -403,8 +402,8 @@ function m.remove(uri)
     m.fileCount     = m.fileCount - 1
     m.globalVersion = m.globalVersion + 1
 
-    m.onWatch('version')
-    m.onWatch('remove', originUri)
+    m.onWatch('version', uri)
+    m.onWatch('remove', uri)
 end
 
 --- 获取一个包含所有文件uri的数组

@@ -2,6 +2,7 @@ local files    = require 'files'
 local localMgr = require 'vm.local-manager'
 ---@class vm
 local vm       = require 'vm.vm'
+local ws       = require 'workspace.workspace'
 
 ---@type table<vm.object, vm.node>
 vm.nodeCache = {}
@@ -271,6 +272,8 @@ end
 
 files.watch(function (ev, uri)
     if ev == 'version' then
-        vm.clearNodeCache()
+        if ws.isReady(uri) then
+            vm.clearNodeCache()
+        end
     end
 end)

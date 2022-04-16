@@ -380,7 +380,7 @@ local function checkModule(state, word, position, results)
                 goto CONTINUE
             end
             if  targetSource.type == 'getlocal'
-            and vm.isDeprecated(targetSource.node) then
+            and vm.getDeprecated(targetSource.node) then
                 goto CONTINUE
             end
             results[#results+1] = {
@@ -495,7 +495,7 @@ local function checkFieldThen(state, name, src, word, startPos, position, parent
             kind       = kind,
             match      = name:match '^[^(]+',
             insertText = name:match '^[^(]+',
-            deprecated = vm.isDeprecated(src) or nil,
+            deprecated = vm.getDeprecated(src) and true or nil,
             id         = stack(function () ---@async
                 return {
                     detail      = buildDetail(src),
@@ -526,7 +526,7 @@ local function checkFieldThen(state, name, src, word, startPos, position, parent
     results[#results+1] = {
         label      = name,
         kind       = kind,
-        deprecated = vm.isDeprecated(src) or nil,
+        deprecated = vm.getDeprecated(src) and true or nil,
         textEdit   = textEdit,
         id         = stack(function () ---@async
             return {
@@ -588,7 +588,7 @@ local function checkFieldOfRefs(refs, state, word, startPos, position, parent, o
             count = count + 1
             goto CONTINUE
         end
-        if vm.isDeprecated(src) then
+        if vm.getDeprecated(src) then
             goto CONTINUE
         end
         if guide.isSet(src) then

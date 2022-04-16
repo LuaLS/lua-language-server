@@ -1387,3 +1387,11 @@ local value
 value = '1'
 value = value:gsub()
 ]]
+
+TEST [[
+T = {}
+---@deprecated # comment
+T.x = 1
+
+print(<!T.x!>)
+]]

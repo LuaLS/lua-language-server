@@ -5,6 +5,7 @@ local guide    = require 'parser.guide'
 local config   = require 'config'
 local define   = require 'proto.define'
 local await    = require 'await'
+local util     = require 'utility'
 
 local types = {'getglobal', 'getfield', 'getindex', 'getmethod'}
 ---@async
@@ -16,7 +17,6 @@ return function (uri, callback)
 
     local dglobals = config.get(uri, 'Lua.diagnostics.globals')
     local rspecial = config.get(uri, 'Lua.runtime.special')
-    local cache    = {}
 
     guide.eachSourceTypes(ast.ast, types, function (src) ---@async
         if src.type == 'getglobal' then
@@ -34,28 +34,17 @@ return function (uri, callback)
 
         await.delay()
 
-        if not vm.isDeprecated(src, true) then
+        local deprecated = vm.getDeprecated(src, true)
+        if not deprecated then
             return
         end
 
         await.delay()
 
-        local defs = vm.getDefs(src)
-        local validVersions
-        for _, def in ipairs(defs) do
-            if def.bindDocs then
-                for _, doc in ipairs(def.bindDocs) do
-                    if doc.type == 'doc.version' then
-                        validVersions = vm.getValidVersions(doc)
-                        break
-                    end
-                end
-            end
-        end
-
         local message = lang.script.DIAG_DEPRECATED
         local versions
-        if validVersions then
+        if deprecated.type == 'doc.version' then
+            local validVersions = vm.getValidVersions(deprecated)
             versions = {}
             for version, valid in pairs(validVersions) do
                 if valid then
@@ -69,6 +58,11 @@ return function (uri, callback)
                     , table.concat(versions, '/')
                     , config.get(uri, 'Lua.runtime.version'))
                 )
+            end
+        end
+        if deprecated.type == 'doc.deprecated' then
+            if deprecated.comment then
+                message = ('%s(%s)'):format(message, util.trim(deprecated.comment.text))
             end
         end
 

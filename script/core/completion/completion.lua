@@ -186,9 +186,6 @@ local function buildFunctionSnip(source, value, oop)
 end
 
 local function buildDetail(source)
-    if source.type == 'dummy' then
-        return
-    end
     local types = infer.getInfer(source):view()
     local literals = infer.getInfer(source):viewLiterals()
     if literals then
@@ -228,9 +225,6 @@ end
 
 ---@async
 local function buildDesc(source)
-    if source.type == 'dummy' then
-        return
-    end
     local desc = markdown()
     local hover = getHover.get(source)
     desc:add('md', hover)

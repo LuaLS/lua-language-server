@@ -1027,8 +1027,6 @@ function m.getKeyType(obj)
         return type(obj.field[1])
     elseif tp == 'doc.type.field' then
         return type(obj.name[1])
-    elseif tp == 'dummy' then
-        return 'string'
     end
     if tp == 'doc.field.name' then
         return type(obj[1])

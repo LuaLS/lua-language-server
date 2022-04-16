@@ -128,6 +128,9 @@ local viewNodeSwitch = util.switch()
         infer._hasTable = true
     end)
     : case 'doc.type.string'
+    : call(function (source, infer)
+        return util.viewString(source[1], source[2])
+    end)
     : case 'doc.type.integer'
     : case 'doc.type.boolean'
     : call(function (source, infer)

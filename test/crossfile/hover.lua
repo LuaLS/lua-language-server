@@ -976,16 +976,16 @@ end
 },
 hover = [[
 ```lua
-function f(p: "a"|"b")
+function f(p: 'a'|'b')
 ```
 
 ---
 
 ```lua
 p:
-    | "a" -- comment 1
+    | 'a' -- comment 1
           -- comment 2
-    | "b" -- comment 3
+    | 'b' -- comment 3
           -- comment 4
 ```]]}
 

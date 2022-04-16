@@ -1397,7 +1397,7 @@ TEST [[
 local <?t?>
 ]]
 [[
-local t: string|"enum1"|"enum2"
+local t: string|'enum1'|'enum2'
 ]]
 
 TEST [[
@@ -1406,7 +1406,7 @@ TEST [[
 ---@type <?A?>
 ]]
 [[
-(alias) A 展开为 string|"enum1"|"enum2"
+(alias) A 展开为 string|'enum1'|'enum2'
 ]]
 
 TEST [[
@@ -1416,7 +1416,7 @@ TEST [[
 local <?t?>
 ]]
 [[
-local t: string|"enum1"|"enum2"
+local t: string|'enum1'|'enum2'
 ]]
 
 TEST [[
@@ -1426,7 +1426,7 @@ TEST [[
 local <?t?>
 ]]
 [[
-local t: string|"enum1"|"enum2"
+local t: string|'enum1'|'enum2'
 ]]
 
 TEST [[

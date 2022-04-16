@@ -558,10 +558,12 @@ local function parseString(parent)
     end
 
     nextToken()
+    local mark = getMark()
     -- compatibility
     if content:sub(1, 1) == '"'
     or content:sub(1, 1) == "'" then
         if content:sub(1, 1) == content:sub(-1, -1) then
+            mark = content:sub(1, 1)
             content = content:sub(2, -2)
         end
     end
@@ -571,6 +573,7 @@ local function parseString(parent)
         finish = getFinish(),
         parent = parent,
         [1]    = content,
+        [2]    = mark,
     }
     return str
 end

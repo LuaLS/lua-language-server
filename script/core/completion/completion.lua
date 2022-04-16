@@ -1121,9 +1121,10 @@ local function checkTypingEnum(state, position, defs, str, results)
     local enums = {}
     for _, def in ipairs(defs) do
         if def.type == 'doc.type.string'
-        or def.type == 'doc.type.integer' then
+        or def.type == 'doc.type.integer'
+        or def.type == 'doc.type.boolean' then
             enums[#enums+1] = {
-                label       = util.viewLiteral(def[1]),
+                label       = infer.viewObject(def),
                 description = def.comment and def.comment.text,
                 kind        = define.CompletionItemKind.EnumMember,
             }
@@ -1412,7 +1413,7 @@ local function tryCallArg(state, position, results)
         or src.type == 'doc.type.integer'
         or src.type == 'doc.type.boolean' then
             enums[#enums+1] = {
-                label       = util.viewLiteral(src[1]),
+                label       = infer.viewObject(src),
                 description = src.comment,
                 kind        = define.CompletionItemKind.EnumMember,
             }

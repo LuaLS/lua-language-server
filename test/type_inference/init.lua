@@ -418,13 +418,13 @@ TEST 'string|table' [[
 local <?x?>
 ]]
 
-TEST '"enum1"|"enum2"' [[
+TEST [['enum1'|'enum2']] [[
 ---@type 'enum1' | 'enum2'
 local <?x?>
 ]]
 
-TEST '"enum1"|"enum2"' [[
----@type 'enum1' | 'enum2'
+TEST [["enum1"|"enum2"]] [[
+---@type "enum1" | "enum2"
 local <?x?>
 ]]
 
@@ -450,21 +450,21 @@ TEST 'A' [[
 local <?x?>
 ]]
 config.set(nil, 'Lua.hover.expandAlias', true)
-TEST '"enum1"|"enum2"' [[
+TEST [['enum1'|'enum2']] [[
 ---@alias A 'enum1' | 'enum2'
 
 ---@type A
 local <?x?>
 ]]
 
-TEST '"enum1"|"enum2"' [[
+TEST [['enum1'|'enum2']] [[
 ---@alias A 'enum1' | 'enum2' | A
 
 ---@type A
 local <?x?>
 ]]
 
-TEST '"enum1"|"enum2"|B' [[
+TEST [['enum1'|'enum2'|B]] [[
 ---@alias A 'enum1' | 'enum2' | B
 
 ---@type A
@@ -544,7 +544,7 @@ local t = {}
 print(t.<?a?>)
 ]]
 
-TEST '"aaa"|"bbb"' [[
+TEST [['aaa'|'bbb']] [[
 ---@type table<string, 'aaa'|'bbb'>
 local t = {}
 
@@ -992,13 +992,13 @@ string.gsub():gsub():<?gsub?>()
 ]]
 
 config.set(nil, 'Lua.hover.enumsLimit', 5)
-TEST '"a"|"b"|"c"|"d"|"e"...(+5)' [[
+TEST [['a'|'b'|'c'|'d'|'e'...(+5)]] [[
 ---@type 'a'|'b'|'c'|'d'|'e'|'f'|'g'|'h'|'i'|'j'
 local <?t?>
 ]]
 
 config.set(nil, 'Lua.hover.enumsLimit', 1)
-TEST '"a"...(+9)' [[
+TEST [['a'...(+9)]] [[
 ---@type 'a'|'b'|'c'|'d'|'e'|'f'|'g'|'h'|'i'|'j'
 local <?t?>
 ]]

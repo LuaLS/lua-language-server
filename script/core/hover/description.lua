@@ -171,11 +171,11 @@ local function buildEnumChunk(docType, name)
     end
     lines[#lines+1] = ('%s:'):format(name)
     for _, enum in ipairs(enums) do
-        local enumDes = ('   %s %q'):format(
+        local enumDes = ('   %s %s'):format(
                 (enum.default    and '->')
             or  (enum.additional and '+>')
             or  ' |',
-            enum[1]
+            infer.viewObject(enum)
         )
         if enum.comment then
             local first = true

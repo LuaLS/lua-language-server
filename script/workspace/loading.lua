@@ -95,9 +95,9 @@ function mt:loadFile(uri, libraryUri)
                     return
                 end
                 log.debug(('Preload file at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
-                await.wait(function (waker)
-                    self._sets[#self._sets+1] = waker
-                end)
+                --await.wait(function (waker)
+                --    self._sets[#self._sets+1] = waker
+                --end)
                 files.setText(uri, content, false)
                 if not self._cache[uri] then
                     files.addRef(uri)
@@ -129,9 +129,9 @@ function mt:loadFile(uri, libraryUri)
                     return
                 end
                 log.debug(('Preload dll at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
-                await.wait(function (waker)
-                    self._sets[#self._sets+1] = waker
-                end)
+                --await.wait(function (waker)
+                --    self._sets[#self._sets+1] = waker
+                --end)
                 files.saveDll(uri, content)
                 if not self._cache[uri] then
                     files.addRef(uri)

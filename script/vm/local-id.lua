@@ -137,7 +137,7 @@ function m.compileLocalID(source)
 end
 
 ---@param source parser.object
----@return string|boolean
+---@return string?
 function m.getID(source)
     if source._localID ~= nil then
         return source._localID

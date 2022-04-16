@@ -1313,7 +1313,8 @@ local function isNextLine(binded, doc)
         return false
     end
     local lastDoc = binded[#binded]
-    if lastDoc.type == 'doc.type' then
+    if lastDoc.type == 'doc.type'
+    or lastDoc.type == 'doc.module' then
         return false
     end
     if lastDoc.type == 'doc.class'

@@ -455,6 +455,9 @@ local function getReturn(func, index, args)
                             result:merge(rnode)
                         end
                     end
+                    if result and returnNode:isOptional() then
+                        result:addOptional()
+                    end
                 end
             end
         end
@@ -1115,6 +1118,9 @@ local compilerSwitch = util.switch()
         for _, typeUnit in ipairs(source.types) do
             vm.setNode(source, vm.compileNode(typeUnit))
         end
+        if source.optional then
+            vm.getNode(source):addOptional()
+        end
     end)
     : case 'doc.type.integer'
     : case 'doc.type.string'
@@ -1219,6 +1225,9 @@ local compilerSwitch = util.switch()
             vm.setNode(source, vm.compileNode(source.extends))
         else
             vm.setNode(source, globalMgr.getGlobal('type', 'any'))
+        end
+        if source.optional then
+            vm.getNode(source):addOptional()
         end
     end)
     : case 'generic'

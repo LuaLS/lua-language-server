@@ -114,7 +114,7 @@ function mt:resolve(uri, args)
     local function buildArgNode(argNode, knownTypes)
         local newArgNode = vm.createNode()
         for n in argNode:eachObject() do
-            if argNode:isOptional() and vm.isFalsy(n) then
+            if argNode:isFalsy() then
                 goto CONTINUE
             end
             local view = infer.viewObject(n)

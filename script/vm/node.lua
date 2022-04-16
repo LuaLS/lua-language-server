@@ -146,43 +146,30 @@ function mt:getData(k)
 end
 
 function mt:addOptional()
-    if self:isOptional() then
-        return self
-    end
     self.optional = true
 end
 
 function mt:removeOptional()
-    if not self:isOptional() then
-        return self
-    end
-    self:_expand()
-    for i = #self, 1, -1 do
-        local n = self[i]
-        if n.type == 'nil'
-        or (n.type == 'boolean' and n[1] == false)
-        or (n.type == 'doc.type.boolean' and n[1] == false) then
-            self[i] = self[#self]
-            self[#self] = nil
-        end
-    end
+    self.optional = false
 end
 
 ---@return boolean
 function mt:isOptional()
-    if self.optional ~= nil then
-        return self.optional
+    return self.optional == true
+end
+
+---@return boolean
+function mt:isFalsy()
+    if self.optional then
+        return true
     end
-    self:_expand()
     for _, c in ipairs(self) do
         if c.type == 'nil'
         or (c.type == 'boolean' and c[1] == false)
         or (c.type == 'doc.type.boolean' and c[1] == false) then
-            self.optional = true
             return true
         end
     end
-    self.optional = false
     return false
 end
 
@@ -194,6 +181,11 @@ function mt:eachObject()
         i = i + 1
         return self[i]
     end
+end
+
+---@return vm.node
+function mt:copy()
+    return vm.createNode(self)
 end
 
 ---@param source parser.object | vm.generic

@@ -1482,3 +1482,10 @@ function mt:f()
     print(<?self?>)
 end
 ]]
+
+TEST 'string?' [[
+---@return string?
+local function f() end
+
+local <?x?> = f()
+]]

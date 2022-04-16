@@ -41,28 +41,9 @@ function vm.test(source)
     end
 end
 
----@param source parser.object
----@return boolean
-function vm.isFalsy(source)
-    if source.type == 'nil' then
-        return true
-    end
-    if source.type == 'boolean'
-    or source.type == 'doc.type.boolean' then
-        return source[1] == false
-    end
-    return false
-end
-
 ---@param v vm.object
 ---@return string?
 local function getUnique(v)
-    if v.type == 'local' then
-        return ('loc:%s@%d'):format(guide.getUri(v), v.start)
-    end
-    if v.type == 'global' then
-        return ('%s:%s'):format(v.cate, v.name)
-    end
     if v.type == 'boolean' then
         if v[1] == nil then
             return false

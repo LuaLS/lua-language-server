@@ -7,6 +7,12 @@ local localManager = require 'vm.local-manager'
 
 ---@class vm.state
 local m = {}
+for uri in files.eachFile() do
+    local state = files.getState(uri)
+    if state then
+        globalManager.compileAst(state.ast)
+    end
+end
 
 files.watch(function (ev, uri)
     if ev == 'update' then

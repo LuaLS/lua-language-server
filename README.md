@@ -78,7 +78,6 @@ If you need to compile by yourself, please refer to [here](https://github.com/su
 
 * [bee.lua](https://github.com/actboy168/bee.lua)
 * [luamake](https://github.com/actboy168/luamake)
-* [lni](https://github.com/actboy168/lni)
 * [LPegLabel](https://github.com/sqmedeiros/lpeglabel)
 * [LuaParser](https://github.com/sumneko/LuaParser)
 * [ScreenToGif](https://github.com/NickeManarin/ScreenToGif)

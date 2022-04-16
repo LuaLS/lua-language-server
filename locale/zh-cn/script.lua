@@ -94,7 +94,6 @@ DIAG_NOT_YIELDABLE      =
 '此函数的第 {} 个参数没有被标记为可让出，但是传入了异步函数。（使用 `---@param name async fun()` 来标记为可让出）'
 DIAG_DISCARD_RETURNS    =
 '不能丢弃此函数的返回值。'
-
 DIAG_CIRCLE_DOC_CLASS                 =
 '循环继承的类。'
 DIAG_DOC_FIELD_NO_CLASS               =
@@ -234,7 +233,6 @@ PARSER_INDEX_IN_FUNC_NAME =
 '命名函数的名称中不能使用 `[name]` 形式。'
 PARSER_UNKNOWN_ATTRIBUTE  =
 '局部变量属性应该是 `const` 或 `close`'
-
 PARSER_LUADOC_MISS_CLASS_NAME           =
 '缺少类名称。'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =
@@ -279,7 +277,6 @@ SYMBOL_ANONYMOUS        =
 
 HOVER_VIEW_DOCUMENTS    =
 '查看文档'
-
 HOVER_DOCUMENT_LUA51    =
 'http://www.lua.org/manual/5.1/manual.html#{}'
 HOVER_DOCUMENT_LUA52    =
@@ -290,7 +287,6 @@ HOVER_DOCUMENT_LUA54    =
 'http://www.lua.org/manual/5.4/manual.html#{}'
 HOVER_DOCUMENT_LUAJIT   =
 'http://www.lua.org/manual/5.1/manual.html#{}'
-
 HOVER_NATIVE_DOCUMENT_LUA51     =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUA52     =
@@ -301,7 +297,6 @@ HOVER_NATIVE_DOCUMENT_LUA54     =
 'command:extension.lua.doc?["en-us/54/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUAJIT    =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
-
 HOVER_MULTI_PROTOTYPE      =
 '({} 个原型)'
 HOVER_STRING_BYTES         =
@@ -312,7 +307,6 @@ HOVER_MULTI_DEF_PROTO      =
 '({} 个定义，{} 个原型)'
 HOVER_MULTI_PROTO_NOT_FUNC =
 '({} 个非函数定义)'
-
 HOVER_USE_LUA_PATH      =
 '（搜索路径： `{}`）'
 HOVER_EXTENDS           =

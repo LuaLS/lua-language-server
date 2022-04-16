@@ -1,0 +1,2 @@
+---@diagnostic disable: undefined-global
+

@@ -211,8 +211,6 @@ config.IntelliSense.traceBeSetted =
 '請查閱[文件](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)了解用法。 '
 config.IntelliSense.traceFieldInject =
 '請查閱[文件](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)了解用法。 '
-
-
 config.diagnostics['unused-local'] =
 '未使用的區域變數'
 config.diagnostics['unused-function'] =

@@ -94,7 +94,6 @@ DIAG_NOT_YIELDABLE =
 '此函式的第{} 個參數沒有被標記為可讓出，但是傳入了異步函式。 （使用`---@param name async fun()` 來標記為可讓出）'
 DIAG_DISCARD_RETURNS =
 '不能丟棄此函式的回傳值。 '
-
 DIAG_CIRCLE_DOC_CLASS =
 '循環繼承的類。 '
 DIAG_DOC_FIELD_NO_CLASS =
@@ -234,7 +233,6 @@ PARSER_INDEX_IN_FUNC_NAME =
 '命名函式的名稱中不能使用`[name]` 形式。 '
 PARSER_UNKNOWN_ATTRIBUTE =
 '區域變數屬性應該是`const` 或`close`'
-
 PARSER_LUADOC_MISS_CLASS_NAME =
 '缺少類別名稱。 '
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL =
@@ -279,7 +277,6 @@ SYMBOL_ANONYMOUS =
 
 HOVER_VIEW_DOCUMENTS =
 '查看文件'
-
 HOVER_DOCUMENT_LUA51 =
 'http://www.lua.org/manual/5.1/manual.html#{}'
 HOVER_DOCUMENT_LUA52 =
@@ -290,7 +287,6 @@ HOVER_DOCUMENT_LUA54 =
 'http://www.lua.org/manual/5.4/manual.html#{}'
 HOVER_DOCUMENT_LUAJIT =
 'http://www.lua.org/manual/5.1/manual.html#{}'
-
 HOVER_NATIVE_DOCUMENT_LUA51 =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUA52 =
@@ -301,7 +297,6 @@ HOVER_NATIVE_DOCUMENT_LUA54 =
 'command:extension.lua.doc?["en-us/54/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUAJIT =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
-
 HOVER_MULTI_PROTOTYPE =
 '({} 個原型)'
 HOVER_STRING_BYTES =
@@ -312,7 +307,6 @@ HOVER_MULTI_DEF_PROTO =
 '({} 個定義，{} 個原型)'
 HOVER_MULTI_PROTO_NOT_FUNC =
 '({} 個非函式定義)'
-
 HOVER_USE_LUA_PATH =
 '（搜尋路徑： `{}`）'
 HOVER_EXTENDS =

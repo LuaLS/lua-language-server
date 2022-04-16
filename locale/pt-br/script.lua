@@ -34,8 +34,6 @@ DIAG_PREFIELD_CALL      =
 'Será interpretado como `{}{}`. Pode ser necessário adicionar uma `,` ou `;`.'
 DIAG_OVER_MAX_ARGS      =
 'A função aceita apenas os parâmetros {:d}, mas você passou {:d}.'
-DIAG_OVER_MAX_ARGS      =
-'Recebe apenas {} variáveis, mas você definiu {}.'
 DIAG_AMBIGUITY_1        =
 'Calcule primeiro `{}`. Você pode precisar adicionar colchetes.'
 DIAG_LOWERCASE_GLOBAL   =
@@ -88,7 +86,6 @@ DIAG_DIFFERENT_REQUIRES =
 'O mesmo arquivo é necessário com nomes diferentes.'
 DIAG_REDUNDANT_RETURN   =
 'Retorno redundante.'
-
 DIAG_CIRCLE_DOC_CLASS                 =
 'Classes com herança cíclica.'
 DIAG_DOC_FIELD_NO_CLASS               =
@@ -228,7 +225,6 @@ PARSER_INDEX_IN_FUNC_NAME =
 'A forma `[name]` não pode ser usada em nome de uma função nomeada.'
 PARSER_UNKNOWN_ATTRIBUTE  =
 'Atributo local deve ser `const` ou `close`'
-
 PARSER_LUADOC_MISS_CLASS_NAME           =
 'Esperado <class name>.'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =
@@ -273,7 +269,6 @@ SYMBOL_ANONYMOUS        =
 
 HOVER_VIEW_DOCUMENTS    =
 'Visualizar documentos'
-
 HOVER_DOCUMENT_LUA51    =
 'http://www.lua.org/manual/5.1/manual.html#{}'
 HOVER_DOCUMENT_LUA52    =
@@ -284,8 +279,6 @@ HOVER_DOCUMENT_LUA54    =
 'http://www.lua.org/manual/5.4/manual.html#{}'
 HOVER_DOCUMENT_LUAJIT   =
 'http://www.lua.org/manual/5.1/manual.html#{}'
-
-
 HOVER_NATIVE_DOCUMENT_LUA51     =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUA52     =
@@ -296,7 +289,6 @@ HOVER_NATIVE_DOCUMENT_LUA54     =
 'command:extension.lua.doc?["en-us/54/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUAJIT    =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
-
 HOVER_MULTI_PROTOTYPE      =
 '({} protótipos)'
 HOVER_STRING_BYTES         =
@@ -307,7 +299,6 @@ HOVER_MULTI_DEF_PROTO      =
 '({} definições., {} protótipos)'
 HOVER_MULTI_PROTO_NOT_FUNC =
 '({} definição não funcional)'
-
 HOVER_USE_LUA_PATH      =
 '(Caminho de busca: `{}`)'
 HOVER_EXTENDS           =
@@ -503,3 +494,4 @@ PLUGIN_TRUST_NO                  =
 [[
 Não carregue este plugin
 ]]
+

@@ -94,7 +94,6 @@ DIAG_NOT_YIELDABLE      =
 'The {}th parameter of this function was not marked as yieldable, but an async function was passed in. (Use `---@param name async fun()` to mark as yieldable)'
 DIAG_DISCARD_RETURNS    =
 'The return values of this function cannot be discarded.'
-
 DIAG_CIRCLE_DOC_CLASS                 =
 'Circularly inherited classes.'
 DIAG_DOC_FIELD_NO_CLASS               =
@@ -234,7 +233,6 @@ PARSER_INDEX_IN_FUNC_NAME =
 'The `[name]` form cannot be used in the name of a named function.'
 PARSER_UNKNOWN_ATTRIBUTE  =
 'Local attribute should be `const` or `close`'
-
 PARSER_LUADOC_MISS_CLASS_NAME           =
 '<class name> expected.'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =
@@ -279,7 +277,6 @@ SYMBOL_ANONYMOUS        =
 
 HOVER_VIEW_DOCUMENTS    =
 'View documents'
-
 HOVER_DOCUMENT_LUA51    =
 'http://www.lua.org/manual/5.1/manual.html#{}'
 HOVER_DOCUMENT_LUA52    =
@@ -290,8 +287,6 @@ HOVER_DOCUMENT_LUA54    =
 'http://www.lua.org/manual/5.4/manual.html#{}'
 HOVER_DOCUMENT_LUAJIT   =
 'http://www.lua.org/manual/5.1/manual.html#{}'
-
-
 HOVER_NATIVE_DOCUMENT_LUA51     =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUA52     =
@@ -302,7 +297,6 @@ HOVER_NATIVE_DOCUMENT_LUA54     =
 'command:extension.lua.doc?["en-us/54/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUAJIT    =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
-
 HOVER_MULTI_PROTOTYPE      =
 '({} prototypes)'
 HOVER_STRING_BYTES         =
@@ -313,7 +307,6 @@ HOVER_MULTI_DEF_PROTO      =
 '({} definitions, {} prototypes)'
 HOVER_MULTI_PROTO_NOT_FUNC =
 '({} non functional definition)'
-
 HOVER_USE_LUA_PATH      =
 '(Search path: `{}`)'
 HOVER_EXTENDS           =
@@ -537,4 +530,3 @@ CLI_CHECK_SUCCESS =
 'Diagnosis completed, no problems found'
 CLI_CHECK_RESULTS =
 'Diagnosis complete, {} problems found, see {}'
-

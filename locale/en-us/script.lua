@@ -315,6 +315,8 @@ HOVER_TABLE_TIME_UP     =
 'Partial type inference has been disabled for performance reasons.'
 HOVER_WS_LOADING        =
 'Workspace loading: {} / {}'
+HOVER_AWAIT_TOOLTIP     = -- TODO: need translate!
+'正在调用异步函数，可能会让出当前协程'
 
 ACTION_DISABLE_DIAG     =
 'Disable diagnostics in the workspace ({}).'
@@ -430,6 +432,8 @@ WINDOW_PROCESSING_SEMANTIC_FULL  =
 'Processing full semantic tokens...'
 WINDOW_PROCESSING_SEMANTIC_RANGE =
 'Processing incremental semantic tokens...'
+WINDOW_PROCESSING_HINT           = -- TODO: need translate!
+'正在处理内联提示...'
 WINDOW_PROCESSING_TYPE_HINT      =
 'Processing inline hint...'
 WINDOW_INCREASE_UPPER_LIMIT      =

@@ -333,19 +333,19 @@ infowhat.n                  =
 '`name` e `namewhat`'
 infowhat.S                  =
 '`source`, `short_src`, `linedefined`, `lastlinedefined` e `what`'
-infowhat.l                  =
+infowhat.l                  = -- TODO: need translate!
 '`currentline`'
-infowhat.t                  =
+infowhat.t                  = -- TODO: need translate!
 '`istailcall`'
-infowhat.u['<5.1']          =
+infowhat.u['<5.1']          = -- TODO: need translate!
 '`nups`'
 infowhat.u['>5.2']          =
 '`nups`, `nparams` e `isvararg`'
-infowhat.f                  =
+infowhat.f                  = -- TODO: need translate!
 '`func`'
 infowhat.r                  =
 '`ftransfer` e `ntransfer`'
-infowhat.L                  =
+infowhat.L                  = -- TODO: need translate!
 '`activelines`'
 
 hookmask.c                  =
@@ -361,7 +361,7 @@ file[':close']              =
 'Fecha o arquivo `file`.'
 file[':flush']              =
 'Salva qualquer dado de entrada no arquivo `file`.'
-file[':lines']              =
+file[':lines']              = -- TODO: need translate!
 [[
 ------
 ```lua
@@ -416,7 +416,7 @@ io.flush                    =
 'Salva todos os dados gravados no arquivo de saída padrão.'
 io.input                    =
 'Define o arquivo de entrada padrão.'
-io.lines                    =
+io.lines                    = -- TODO: need translate!
 [[
 ------
 ```lua
@@ -593,15 +593,15 @@ os.tmpname                  =
 
 osdate.year                 =
 'Quatro dígitos.'
-osdate.month                =
+osdate.month                = -- TODO: need translate!
 '1-12'
-osdate.day                  =
+osdate.day                  = -- TODO: need translate!
 '1-31'
-osdate.hour                 =
+osdate.hour                 = -- TODO: need translate!
 '0-23'
-osdate.min                  =
+osdate.min                  = -- TODO: need translate!
 '0-59'
-osdate.sec                  =
+osdate.sec                  = -- TODO: need translate!
 '0-61'
 osdate.wday                 =
 'Dia da semana, 1–7, Domingo é 1'
@@ -720,6 +720,12 @@ Retorna os elementos da lista fornecida. Esta função é equivalente a
 ```
 Por padrão, `i` é `1` e `j` é `#list`.
 ]]
+table.foreach               = -- TODO: need translate!
+'Executes the given f over all elements of table. For each element, f is called with the index and respective value as arguments. If f returns a non-nil value, then the loop is broken, and this value is returned as the final value of foreach.'
+table.foreachi              = -- TODO: need translate!
+'Executes the given f over the numerical indices of table. For each index, f is called with the index and respective value as arguments. Indices are visited in sequential order, from 1 to n, where n is the size of the table. If f returns a non-nil value, then the loop is broken and this value is returned as the result of foreachi.'
+table.getn                  = -- TODO: need translate!
+'Returns the number of elements in the table. This function is equivalent to `#list`.'
 
 utf8                        =
 ''

@@ -311,19 +311,19 @@ infowhat.n                =
 '`name` 和 `namewhat`'
 infowhat.S                =
 '`source`，`short_src`，`linedefined`，`lalinedefined`，和 `what`'
-infowhat.l                =
+infowhat.l                = -- TODO: need translate!
 '`currentline`'
-infowhat.t                =
+infowhat.t                = -- TODO: need translate!
 '`istailcall`'
-infowhat.u['<5.1']        =
+infowhat.u['<5.1']        = -- TODO: need translate!
 '`nups`'
 infowhat.u['>5.2']        =
 '`nups`、`nparams` 和 `isvararg`'
-infowhat.f                =
+infowhat.f                = -- TODO: need translate!
 '`func`'
 infowhat.r                =
 '`ftransfer` 和 `ntransfer`'
-infowhat.L                =
+infowhat.L                = -- TODO: need translate!
 '`activelines`'
 
 hookmask.c                =
@@ -339,7 +339,7 @@ file[':close']              =
 '关闭 `file`。'
 file[':flush']              =
 '将写入的数据保存到 `file` 中。'
-file[':lines']              =
+file[':lines']              = -- TODO: need translate!
 [[
 ------
 ```lua
@@ -394,7 +394,7 @@ io.flush                    =
 '将写入的数据保存到默认输出文件中。'
 io.input                    =
 '设置 `file` 为默认输入文件。'
-io.lines                    =
+io.lines                    = -- TODO: need translate!
 [[
 ------
 ```lua
@@ -571,15 +571,15 @@ os.tmpname                  =
 
 osdate.year                 =
 '四位数字'
-osdate.month                =
+osdate.month                = -- TODO: need translate!
 '1-12'
-osdate.day                  =
+osdate.day                  = -- TODO: need translate!
 '1-31'
-osdate.hour                 =
+osdate.hour                 = -- TODO: need translate!
 '0-23'
-osdate.min                  =
+osdate.min                  = -- TODO: need translate!
 '0-59'
-osdate.sec                  =
+osdate.sec                  = -- TODO: need translate!
 '0-61'
 osdate.wday                 =
 '星期几，1-7，星期天为 1'
@@ -684,7 +684,36 @@ a1[f],···,a1[e]
 return a2
 ```
 ]]
+string.rep['>5.2']          = -- TODO: need translate!
+'Returns a string that is the concatenation of `n` copies of the string `s` separated by the string `sep`.'
+string.rep['<5.1']          = -- TODO: need translate!
+'Returns a string that is the concatenation of `n` copies of the string `s` .'
+string.reverse              = -- TODO: need translate!
+'Returns a string that is the string `s` reversed.'
+string.sub                  = -- TODO: need translate!
+'Returns the substring of the string that starts at `i` and continues until `j`.'
+string.unpack               = -- TODO: need translate!
+'Returns the values packed in string according to the format string `fmt` (see §6.4.2) .'
+string.upper                = -- TODO: need translate!
+'Returns a copy of this string with all lowercase letters changed to uppercase.'
 
+table                       = -- TODO: need translate!
+''
+table.concat                = -- TODO: need translate!
+'Given a list where all elements are strings or numbers, returns the string `list[i]..sep..list[i+1] ··· sep..list[j]`.'
+table.insert                = -- TODO: need translate!
+'Inserts element `value` at position `pos` in `list`.'
+table.maxn                  = -- TODO: need translate!
+'Returns the largest positive numerical index of the given table, or zero if the table has no positive numerical indices.'
+table.move                  = -- TODO: need translate!
+[[
+Moves elements from table `a1` to table `a2`.
+```lua
+a2[t],··· =
+a1[f],···,a1[e]
+return a2
+```
+]]
 table.pack                  =
 '返回用所有参数以键 `1`,`2`, 等填充的新表， 并将 `"n"` 这个域设为参数的总数。'
 table.remove                =

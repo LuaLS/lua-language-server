@@ -567,25 +567,25 @@ end
 ---遍历文本的每一行
 ---@param text string
 ---@param keepNL boolean # 保留换行符
----@return fun(text:string):string
+---@return fun(text:string):string, integer
 function m.eachLine(text, keepNL)
     local offset = 1
     local lineCount = 0
     local lastLine
     return function ()
+        lineCount = lineCount + 1
         if offset > #text then
             if not lastLine then
                 lastLine = ''
-                return ''
+                return '', lineCount
             end
             return nil
         end
-        lineCount = lineCount + 1
         local nl = text:find('[\r\n]', offset)
         if not nl then
             lastLine = text:sub(offset)
             offset = #text + 1
-            return lastLine
+            return lastLine, lineCount
         end
         local line
         if text:sub(nl, nl + 1) == '\r\n' then
@@ -603,7 +603,7 @@ function m.eachLine(text, keepNL)
             end
             offset = nl + 1
         end
-        return line
+        return line, lineCount
     end
 end
 

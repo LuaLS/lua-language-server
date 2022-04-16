@@ -74,5 +74,23 @@
 				"stderr",
 			],
 		},
+		{
+			"name": "📝locale",
+			"type": "lua",
+			"request": "launch",
+			"stopOnEntry": false,
+			"luaexe": "${workspaceFolder}/bin/lua-language-server",
+			"program": "${workspaceRoot}/tools/locale.lua",
+			"cpath": "${workspaceFolder}/bin/?.dll",
+			"arg": [
+			],
+			"luaVersion": "latest",
+			"consoleCoding": "utf8",
+			"sourceCoding": "utf8",
+			"outputCapture": [
+				"print",
+				"stderr",
+			],
+		},
 	]
 }

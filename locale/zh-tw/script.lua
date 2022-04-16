@@ -277,25 +277,25 @@ SYMBOL_ANONYMOUS =
 
 HOVER_VIEW_DOCUMENTS =
 '查看文件'
-HOVER_DOCUMENT_LUA51 =
+HOVER_DOCUMENT_LUA51 = -- TODO: need translate!
 'http://www.lua.org/manual/5.1/manual.html#{}'
-HOVER_DOCUMENT_LUA52 =
+HOVER_DOCUMENT_LUA52 = -- TODO: need translate!
 'http://www.lua.org/manual/5.2/manual.html#{}'
 HOVER_DOCUMENT_LUA53 =
 'http://cloudwu.github.io/lua53doc/manual.html#{}'
-HOVER_DOCUMENT_LUA54 =
+HOVER_DOCUMENT_LUA54 = -- TODO: need translate!
 'http://www.lua.org/manual/5.4/manual.html#{}'
-HOVER_DOCUMENT_LUAJIT =
+HOVER_DOCUMENT_LUAJIT = -- TODO: need translate!
 'http://www.lua.org/manual/5.1/manual.html#{}'
-HOVER_NATIVE_DOCUMENT_LUA51 =
+HOVER_NATIVE_DOCUMENT_LUA51 = -- TODO: need translate!
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
-HOVER_NATIVE_DOCUMENT_LUA52 =
+HOVER_NATIVE_DOCUMENT_LUA52 = -- TODO: need translate!
 'command:extension.lua.doc?["en-us/52/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUA53 =
 'command:extension.lua.doc?["zh-cn/53/manual.html/{}"]'
-HOVER_NATIVE_DOCUMENT_LUA54 =
+HOVER_NATIVE_DOCUMENT_LUA54 = -- TODO: need translate!
 'command:extension.lua.doc?["en-us/54/manual.html/{}"]'
-HOVER_NATIVE_DOCUMENT_LUAJIT =
+HOVER_NATIVE_DOCUMENT_LUAJIT = -- TODO: need translate!
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 HOVER_MULTI_PROTOTYPE =
 '({} 個原型)'
@@ -315,6 +315,8 @@ HOVER_TABLE_TIME_UP =
 '出於效能考慮，已禁用了部分類型推斷。 '
 HOVER_WS_LOADING =
 '正在載入工作目錄：{} / {}'
+HOVER_AWAIT_TOOLTIP     = -- TODO: need translate!
+'正在调用异步函数，可能会让出当前协程'
 
 ACTION_DISABLE_DIAG =
 '在工作區禁用診斷({})。 '
@@ -432,6 +434,8 @@ WINDOW_PROCESSING_SEMANTIC_RANGE =
 '正在處理差量語義著色...'
 WINDOW_PROCESSING_HINT =
 '正在處理內嵌提示...'
+WINDOW_PROCESSING_TYPE_HINT      = -- TODO: need translate!
+'Processing inline hint...'
 WINDOW_INCREASE_UPPER_LIMIT =
 '增加上限'
 WINDOW_CLOSE =
@@ -457,6 +461,10 @@ WINDOW_LUA_STATUS_TIP =
 不是狗也不是狐狸！
              ↓↓↓
 ]]
+WINDOW_LUA_STATUS_DIAGNOSIS_TITLE= -- TODO: need translate!
+'Perform workspace diagnosis'
+WINDOW_LUA_STATUS_DIAGNOSIS_MSG  = -- TODO: need translate!
+'Do you want to perform workspace diagnosis?'
 WINDOW_APPLY_SETTING =
 '套用設定'
 WINDOW_CHECK_SEMANTIC =

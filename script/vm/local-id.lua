@@ -98,6 +98,7 @@ local leftSwitch = util.switch()
         return source.node
     end)
     : case 'local'
+    : case 'self'
     : call(function (source)
         return source
     end)
@@ -106,6 +107,17 @@ local leftSwitch = util.switch()
 ---@return parser.object?
 function m.getLocal(source)
     return leftSwitch(source.type, source)
+end
+
+---@param id string
+---@param source parser.object
+function m.insertLocalID(id, source)
+    local root = guide.getRoot(source)
+    if not root._localIDs then
+        root._localIDs = util.multiTable(2)
+    end
+    local sources = root._localIDs[id]
+    sources[#sources+1] = source
 end
 
 function m.compileLocalID(source)
@@ -117,15 +129,11 @@ function m.compileLocalID(source)
         return
     end
     compileSwitch(source.type, source)
-    if not source._localID then
+    local id = source._localID
+    if not id then
         return
     end
-    local root = guide.getRoot(source)
-    if not root._localIDs then
-        root._localIDs = util.multiTable(2)
-    end
-    local sources = root._localIDs[source._localID]
-    sources[#sources+1] = source
+    m.insertLocalID(id, source)
 end
 
 ---@param source parser.object

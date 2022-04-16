@@ -3,6 +3,7 @@ local guide         = require 'parser.guide'
 local globalBuilder = require 'vm.global'
 local signMgr       = require 'vm.sign'
 local genericMgr    = require 'vm.generic'
+local localID       = require 'vm.local-id'
 ---@class vm
 local vm            = require 'vm.vm'
 
@@ -318,6 +319,43 @@ function m.compileObject(source)
 end
 
 ---@param source parser.object
+function m.compileSelf(source)
+    if source.parent.type ~= 'funcargs' then
+        return
+    end
+    ---@type parser.object
+    local node = source.parent.parent and source.parent.parent.parent and source.parent.parent.parent.node
+    if not node then
+        return
+    end
+    local fields = localID.getFields(source)
+    if not fields then
+        return
+    end
+    local nodeLocalID = localID.getID(node)
+    local globalNode  = node._globalNode
+    if not nodeLocalID and not globalNode then
+        return
+    end
+    for _, field in ipairs(fields) do
+        if field.type == 'setfield' then
+            local key = guide.getKeyName(field)
+            if key then
+                if nodeLocalID then
+                    local myID = nodeLocalID .. vm.ID_SPLITE .. key
+                    localID.insertLocalID(myID, field)
+                end
+                if globalNode then
+                    local myID = globalNode:getName() .. vm.ID_SPLITE .. key
+                    local myGlobal = m.declareGlobal('variable', myID, guide.getUri(node))
+                    myGlobal:addSet(guide.getUri(node), field)
+                end
+            end
+        end
+    end
+end
+
+---@param source parser.object
 function m.compileAst(source)
     local env = guide.getENV(source)
     m.compileObject(env)
@@ -334,6 +372,18 @@ function m.compileAst(source)
         'doc.extends.name',
     }, function (src)
         m.compileObject(src)
+    end)
+
+    --[[
+    local mt
+    function mt:xxx()
+        self.a = 1
+    end
+
+    mt.a --> find this definition
+    ]]
+    guide.eachSourceType(source, 'self', function (src)
+        m.compileSelf(src)
     end)
 end
 

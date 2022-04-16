@@ -1,5 +1,4 @@
 local files    = require 'files'
-local localMgr = require 'vm.local-manager'
 ---@class vm
 local vm       = require 'vm.vm'
 local ws       = require 'workspace.workspace'

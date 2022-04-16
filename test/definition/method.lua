@@ -29,3 +29,29 @@ end
 function mt:<!m4!>()
 end
 ]]
+
+TEST [[
+local mt
+
+function mt:f()
+    self.<!x!> = 1
+end
+
+mt.<?x?>
+]]
+
+TEST [[
+function G:f()
+    self.<!x!> = 1
+end
+
+G.<?x?>
+]]
+
+TEST [[
+function G.H:f()
+    self.<!x!> = 1
+end
+
+G.H.<?x?>
+]]

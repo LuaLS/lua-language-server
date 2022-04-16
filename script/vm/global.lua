@@ -1,5 +1,6 @@
-local util = require 'utility'
-local scope= require 'workspace.scope'
+local util  = require 'utility'
+local scope = require 'workspace.scope'
+local vm    = require 'vm.vm'
 
 ---@class vm.global.link
 ---@field gets   parser.object[]
@@ -14,8 +15,6 @@ local mt = {}
 mt.__index = mt
 mt.type = 'global'
 mt.name = ''
-
-local ID_SPLITE = '\x1F'
 
 ---@param uri    uri
 ---@param source parser.object
@@ -106,7 +105,7 @@ end
 
 ---@return string
 function mt:getKeyName()
-    return self.name:match('[^' .. ID_SPLITE .. ']+$')
+    return self.name:match('[^' .. vm.ID_SPLITE .. ']+$')
 end
 
 ---@return boolean

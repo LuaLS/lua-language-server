@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.1.0
+* `NEW` support find definition in method
 * `CHG` hint: move to LSP. Its font is now controlled by the client.
 * `CHG` hover: split `local` into `local` / `parameter` / `upvalue` / `self`.
 * `CHG` hover: added parentheses to some words, such as `global` / `field` / `class`.

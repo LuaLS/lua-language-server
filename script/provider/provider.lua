@@ -986,17 +986,6 @@ m.register 'window/workDoneProgress/cancel' {
     end
 }
 
-m.register '$/didChangeVisibleRanges' {
-    ---@async
-    function (params)
-        local uri = files.getRealUri(params.uri)
-        await.close('visible:' .. uri)
-        await.setID('visible:' .. uri)
-        await.delay()
-        files.setVisibles(uri, params.ranges)
-    end
-}
-
 m.register '$/status/click' {
     ---@async
     function ()
@@ -1211,56 +1200,6 @@ m.register 'inlayHint/resolve' {
         return hint
     end
 }
-
--- Hint
-do
-    ---@async
-    local function updateHint(uri)
-        if not config.get(uri, 'Lua.hint.enable') then
-            return
-        end
-        local id = 'updateHint' .. uri
-        await.close(id)
-        await.setID(id)
-        workspace.awaitReady(uri)
-        local visibles = files.getVisibles(uri)
-        if not visibles then
-            return
-        end
-        await.close(id)
-        await.setID(id)
-        await.delay()
-        workspace.awaitReady(uri)
-        local edits = {}
-        local hint = require 'core.hint'
-        local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_HINT, 0.5)
-        for _, visible in ipairs(visibles) do
-            local piece = hint(uri, visible.start, visible.finish)
-            if piece then
-                for _, edit in ipairs(piece) do
-                    edits[#edits+1] = {
-                        text = edit.text,
-                        pos  = converter.packPosition(uri, edit.offset),
-                    }
-                end
-            end
-        end
-
-        proto.notify('$/hint', {
-            uri   = uri,
-            edits = edits,
-        })
-    end
-
-    files.watch(function (ev, uri)
-        if ev == 'update'
-        or ev == 'updateVisible' then
-            await.call(function () ---@async
-                updateHint(uri)
-            end)
-        end
-    end)
-end
 
 local function refreshStatusBar()
     local valid = config.get(nil, 'Lua.window.statusBar')

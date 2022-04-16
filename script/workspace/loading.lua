@@ -165,6 +165,7 @@ function mt:loadAll()
     self._bar:remove()
     self._bar = progress.create(self.scp.uri, lang.script('WORKSPACE_LOADING', self.scp.uri), 0)
     for i, set in ipairs(self._sets) do
+        await.delay()
         set()
         self.read = i
         self:update()

@@ -550,38 +550,6 @@ function m.getLastState(uri)
     return file.ast
 end
 
----设置文件的当前可见范围
----@param uri    uri
----@param ranges range[]
-function m.setVisibles(uri, ranges)
-    m.visible[uri] = ranges
-    m.onWatch('updateVisible', uri)
-end
-
----获取文件的当前可见范围
----@param uri uri
----@return table[]
-function m.getVisibles(uri)
-    local file = m.fileMap[uri]
-    if not file then
-        return nil
-    end
-    local ranges = m.visible[uri]
-    if not ranges or #ranges == 0 then
-        return nil
-    end
-    local visibles = {}
-    for i, range in ipairs(ranges) do
-        local startRow  = range.start.line
-        local finishRow = range['end'].line
-        visibles[i] = {
-            start  = guide.positionOf(startRow, 0),
-            finish = guide.positionOf(finishRow, 0),
-        }
-    end
-    return visibles
-end
-
 function m.getFile(uri)
     return m.fileMap[uri]
         or m.dllMap[uri]

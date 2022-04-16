@@ -277,25 +277,25 @@ SYMBOL_ANONYMOUS        =
 
 HOVER_VIEW_DOCUMENTS    =
 '查看文档'
-HOVER_DOCUMENT_LUA51    = -- TODO: need translate!
+HOVER_DOCUMENT_LUA51    =
 'http://www.lua.org/manual/5.1/manual.html#{}'
-HOVER_DOCUMENT_LUA52    = -- TODO: need translate!
+HOVER_DOCUMENT_LUA52    =
 'http://www.lua.org/manual/5.2/manual.html#{}'
 HOVER_DOCUMENT_LUA53    =
 'http://cloudwu.github.io/lua53doc/manual.html#{}'
-HOVER_DOCUMENT_LUA54    = -- TODO: need translate!
+HOVER_DOCUMENT_LUA54    =
 'http://www.lua.org/manual/5.4/manual.html#{}'
-HOVER_DOCUMENT_LUAJIT   = -- TODO: need translate!
+HOVER_DOCUMENT_LUAJIT   =
 'http://www.lua.org/manual/5.1/manual.html#{}'
-HOVER_NATIVE_DOCUMENT_LUA51     = -- TODO: need translate!
+HOVER_NATIVE_DOCUMENT_LUA51     =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
-HOVER_NATIVE_DOCUMENT_LUA52     = -- TODO: need translate!
+HOVER_NATIVE_DOCUMENT_LUA52     =
 'command:extension.lua.doc?["en-us/52/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUA53     =
 'command:extension.lua.doc?["zh-cn/53/manual.html/{}"]'
-HOVER_NATIVE_DOCUMENT_LUA54     = -- TODO: need translate!
+HOVER_NATIVE_DOCUMENT_LUA54     =
 'command:extension.lua.doc?["en-us/54/manual.html/{}"]'
-HOVER_NATIVE_DOCUMENT_LUAJIT    = -- TODO: need translate!
+HOVER_NATIVE_DOCUMENT_LUAJIT    =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 HOVER_MULTI_PROTOTYPE      =
 '({} 个原型)'
@@ -434,8 +434,6 @@ WINDOW_PROCESSING_SEMANTIC_RANGE =
 '正在处理差量语义着色...'
 WINDOW_PROCESSING_HINT           =
 '正在处理内联提示...'
-WINDOW_PROCESSING_TYPE_HINT      = -- TODO: need translate!
-'Processing inline hint...'
 WINDOW_INCREASE_UPPER_LIMIT      =
 '增加上限'
 WINDOW_CLOSE                     =
@@ -461,10 +459,10 @@ WINDOW_LUA_STATUS_TIP            =
 不是狗也不是狐狸！
              ↓↓↓
 ]]
-WINDOW_LUA_STATUS_DIAGNOSIS_TITLE= -- TODO: need translate!
-'Perform workspace diagnosis'
-WINDOW_LUA_STATUS_DIAGNOSIS_MSG  = -- TODO: need translate!
-'Do you want to perform workspace diagnosis?'
+WINDOW_LUA_STATUS_DIAGNOSIS_TITLE=
+'进行工作区诊断'
+WINDOW_LUA_STATUS_DIAGNOSIS_MSG  =
+'是否进行工作区诊断？'
 WINDOW_APPLY_SETTING             =
 '应用设置'
 WINDOW_CHECK_SEMANTIC            =

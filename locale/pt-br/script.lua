@@ -277,25 +277,25 @@ SYMBOL_ANONYMOUS        = -- TODO: need translate!
 
 HOVER_VIEW_DOCUMENTS    =
 'Visualizar documentos'
-HOVER_DOCUMENT_LUA51    = -- TODO: need translate!
+HOVER_DOCUMENT_LUA51    =
 'http://www.lua.org/manual/5.1/manual.html#{}'
-HOVER_DOCUMENT_LUA52    = -- TODO: need translate!
+HOVER_DOCUMENT_LUA52    =
 'http://www.lua.org/manual/5.2/manual.html#{}'
-HOVER_DOCUMENT_LUA53    = -- TODO: need translate!
+HOVER_DOCUMENT_LUA53    =
 'http://www.lua.org/manual/5.3/manual.html#{}'
-HOVER_DOCUMENT_LUA54    = -- TODO: need translate!
+HOVER_DOCUMENT_LUA54    =
 'http://www.lua.org/manual/5.4/manual.html#{}'
-HOVER_DOCUMENT_LUAJIT   = -- TODO: need translate!
+HOVER_DOCUMENT_LUAJIT   =
 'http://www.lua.org/manual/5.1/manual.html#{}'
-HOVER_NATIVE_DOCUMENT_LUA51     = -- TODO: need translate!
+HOVER_NATIVE_DOCUMENT_LUA51     =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
-HOVER_NATIVE_DOCUMENT_LUA52     = -- TODO: need translate!
+HOVER_NATIVE_DOCUMENT_LUA52     =
 'command:extension.lua.doc?["en-us/52/manual.html/{}"]'
-HOVER_NATIVE_DOCUMENT_LUA53     = -- TODO: need translate!
+HOVER_NATIVE_DOCUMENT_LUA53     =
 'command:extension.lua.doc?["en-us/53/manual.html/{}"]'
-HOVER_NATIVE_DOCUMENT_LUA54     = -- TODO: need translate!
+HOVER_NATIVE_DOCUMENT_LUA54     =
 'command:extension.lua.doc?["en-us/54/manual.html/{}"]'
-HOVER_NATIVE_DOCUMENT_LUAJIT    = -- TODO: need translate!
+HOVER_NATIVE_DOCUMENT_LUAJIT    =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 HOVER_MULTI_PROTOTYPE      =
 '({} protótipos)'
@@ -316,7 +316,7 @@ HOVER_TABLE_TIME_UP     =
 HOVER_WS_LOADING        =
 'Carregando espaço de trabalho: {} / {}'
 HOVER_AWAIT_TOOLTIP     = -- TODO: need translate!
-'正在调用异步函数，可能会让出当前协程'
+'Calling async function, current thread may be yielded.'
 
 ACTION_DISABLE_DIAG     =
 'Desativar diagnósticos no espaço de trabalho ({}).'
@@ -432,9 +432,7 @@ WINDOW_PROCESSING_SEMANTIC_FULL  =
 'Processando tokens semânticas completos...'
 WINDOW_PROCESSING_SEMANTIC_RANGE =
 'Processando tokens semânticas incrementais...'
-WINDOW_PROCESSING_HINT           = -- TODO: need translate!
-'正在处理内联提示...'
-WINDOW_PROCESSING_TYPE_HINT      =
+WINDOW_PROCESSING_HINT           =
 'Processando dicas de lina...'
 WINDOW_INCREASE_UPPER_LIMIT      =
 'Aumente o limite superior'

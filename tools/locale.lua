@@ -145,17 +145,17 @@ local function buildLocaleFile(localeName, allKeys, localeMap, fileName)
                         needTranslate = true
                     end
                 else
-                    if #data.content > 1 or #data.content[1] > 2 then
-                        local enContent = localeMap['en-us'].map[key] and localeMap['en-us'].map[key].content
-                        if enContent then
-                            needTranslate = #data.content == #enContent
-                            for i, line in ipairs(data.content) do
-                                if line ~= enContent[i] then
-                                    needTranslate = false
-                                end
-                            end
-                        end
-                    end
+                    --if #data.content > 1 or #data.content[1] > 2 then
+                    --    local enContent = localeMap['en-us'].map[key] and localeMap['en-us'].map[key].content
+                    --    if enContent then
+                    --        needTranslate = #data.content == #enContent
+                    --        for i, line in ipairs(data.content) do
+                    --            if line ~= enContent[i] then
+                    --                needTranslate = false
+                    --            end
+                    --        end
+                    --    end
+                    --end
                 end
                 if needTranslate then
                     comment = ' -- TODO: need translate!'

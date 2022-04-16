@@ -311,19 +311,19 @@ infowhat.n                =
 '`name` 和 `namewhat`'
 infowhat.S                =
 '`source`，`short_src`，`linedefined`，`lalinedefined`，和 `what`'
-infowhat.l                = -- TODO: need translate!
+infowhat.l                =
 '`currentline`'
-infowhat.t                = -- TODO: need translate!
+infowhat.t                =
 '`istailcall`'
-infowhat.u['<5.1']        = -- TODO: need translate!
+infowhat.u['<5.1']        =
 '`nups`'
 infowhat.u['>5.2']        =
 '`nups`、`nparams` 和 `isvararg`'
-infowhat.f                = -- TODO: need translate!
+infowhat.f                =
 '`func`'
 infowhat.r                =
 '`ftransfer` 和 `ntransfer`'
-infowhat.L                = -- TODO: need translate!
+infowhat.L                =
 '`activelines`'
 
 hookmask.c                =
@@ -339,7 +339,7 @@ file[':close']              =
 '关闭 `file`。'
 file[':flush']              =
 '将写入的数据保存到 `file` 中。'
-file[':lines']              = -- TODO: need translate!
+file[':lines']              =
 [[
 ------
 ```lua
@@ -394,7 +394,7 @@ io.flush                    =
 '将写入的数据保存到默认输出文件中。'
 io.input                    =
 '设置 `file` 为默认输入文件。'
-io.lines                    = -- TODO: need translate!
+io.lines                    =
 [[
 ------
 ```lua
@@ -571,15 +571,15 @@ os.tmpname                  =
 
 osdate.year                 =
 '四位数字'
-osdate.month                = -- TODO: need translate!
+osdate.month                =
 '1-12'
-osdate.day                  = -- TODO: need translate!
+osdate.day                  =
 '1-31'
-osdate.hour                 = -- TODO: need translate!
+osdate.hour                 =
 '0-23'
-osdate.min                  = -- TODO: need translate!
+osdate.min                  =
 '0-59'
-osdate.sec                  = -- TODO: need translate!
+osdate.sec                  =
 '0-61'
 osdate.wday                 =
 '星期几，1-7，星期天为 1'

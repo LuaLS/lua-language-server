@@ -22,7 +22,7 @@ local function loadLocaleFile(filePath)
             end
             goto CONTINUE
         end
-        local comment = line:match '%-%- TODO.+$'
+        local comment = line:match '%s*%-%- TODO.+$'
         if comment then
             line = line:sub(1, - #comment - 1)
         end

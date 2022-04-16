@@ -1310,6 +1310,16 @@ local function isNextLine(binded, doc)
         return false
     end
     local lastDoc = binded[#binded]
+    if lastDoc.type == 'doc.type' then
+        return false
+    end
+    if lastDoc.type == 'doc.class'
+    or lastDoc.type == 'doc.field' then
+        if  doc.type ~= 'doc.field'
+        and doc.type ~= 'doc.comment' then
+            return false
+        end
+    end
     local lastRow = guide.rowColOf(lastDoc.finish)
     local newRow  = guide.rowColOf(doc.start)
     return newRow - lastRow == 1

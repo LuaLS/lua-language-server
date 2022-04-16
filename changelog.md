@@ -1,7 +1,7 @@
 # changelog
 
 ## 3.1.0
-* `CHG` hint: move to LSP and enable by default. Its font is now controlled by the client.
+* `CHG` hint: move to LSP. Its font is now controlled by the client.
 * `CHG` hover: split `local` into `local` / `parameter` / `upvalue` / `self`.
 * `CHG` hover: added parentheses to some words, such as `global` / `field` / `class`.
 * `FIX` definition of `table<k, v>`

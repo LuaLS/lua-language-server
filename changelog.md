@@ -6,7 +6,6 @@
 * `CHG` hover: added parentheses to some words, such as `global` / `field` / `class`.
 * `FIX` definition of `table<k, v>`
 * `FIX` [#1057](https://github.com/sumneko/lua-language-server/issues/1057)
-* `FIX` [#1061](https://github.com/sumneko/lua-language-server/issues/1061)
 * `FIX` runtime errors reported by telemetry, see [#1058](https://github.com/sumneko/lua-language-server/issues/1058)
 
 ## 3.0.2

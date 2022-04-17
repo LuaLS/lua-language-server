@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.1.0
+`2022-4-17`
 * `NEW` support find definition in method
 * `CHG` hint: move to LSP. Its font is now controlled by the client.
 * `CHG` hover: split `local` into `local` / `parameter` / `upvalue` / `self`.

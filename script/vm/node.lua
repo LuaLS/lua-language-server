@@ -107,7 +107,7 @@ function mt:copy()
     return vm.createNode(self)
 end
 
----@param source parser.object | vm.generic
+---@param source vm.object
 ---@param node vm.node | vm.object
 ---@param cover? boolean
 function vm.setNode(source, node, cover)

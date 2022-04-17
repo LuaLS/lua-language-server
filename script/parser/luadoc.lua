@@ -1406,6 +1406,7 @@ local function bindDocsBetween(sources, binded, bindSources, start, finish)
                 or src.type == 'tableindex'
                 or src.type == 'setfield'
                 or src.type == 'setindex'
+                or src.type == 'setmethod'
                 or src.type == 'function' then
                     src.bindDocs = binded
                     bindSources[#bindSources+1] = src

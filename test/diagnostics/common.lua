@@ -1395,3 +1395,13 @@ T.x = 1
 
 print(<!T.x!>)
 ]]
+
+TEST [[
+T = {}
+
+---@deprecated
+function T:ff()
+end
+
+<!T:ff!>()
+]]

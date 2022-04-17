@@ -1625,6 +1625,7 @@ local function compileByGlobal(source)
     end
     globalNode = vm.createNode(global)
     vm.setNode(root._globalBase[name], globalNode, true)
+    vm.setNode(source, globalNode, true)
 
     local sets = global.links[uri].sets or {}
     local gets = global.links[uri].gets or {}

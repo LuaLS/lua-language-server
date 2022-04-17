@@ -521,7 +521,8 @@ m.register 'textDocument/completion' {
             local count, max = workspace.getLoadingProcess(uri)
             return {
                 {
-                    label = lang.script('HOVER_WS_LOADING', count, max),textEdit         = {
+                    label = lang.script('HOVER_WS_LOADING', count, max),
+                    textEdit    = {
                         range   = {
                             start   = params.position,
                             ['end'] = params.position,

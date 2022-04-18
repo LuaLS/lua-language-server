@@ -15,6 +15,7 @@ local vm         = require 'vm.vm'
 ---@field _node           vm.node
 ---@field _localBase      table
 ---@field _globalBase     table
+---@field _hasSorted      boolean
 
 local searchFieldSwitch = util.switch()
     : case 'table'
@@ -859,6 +860,7 @@ local compilerSwitch = util.switch()
     end)
     : case 'local'
     : case 'self'
+    ---@param source parser.object
     : call(function (source)
         compileLocal(source)
         if not source.ref then
@@ -867,6 +869,12 @@ local compilerSwitch = util.switch()
 
         local hasMark = vm.getNode(source):getData 'hasDefined'
 
+        if not source._hasSorted then
+            source._hasSorted = true
+            table.sort(source.ref, function (a, b)
+                return (a.range or a.start) < (b.range or b.start)
+            end)
+        end
         local lastLoc = source
         for _, ref in ipairs(source.ref) do
             if ref.type == 'setlocal' then
@@ -881,6 +889,8 @@ local compilerSwitch = util.switch()
                     vm.setNode(ref, vm.getNode(lastLoc))
                 end
                 lastLoc = ref
+            elseif ref.type == 'getlocal' then
+                vm.setNode(ref, vm.getNode(lastLoc), true)
             end
         end
 
@@ -899,16 +909,6 @@ local compilerSwitch = util.switch()
     : case 'getlocal'
     : call(function (source)
         vm.compileNode(source.node)
-
-        local lastLoc = source.node
-        for _, ref in ipairs(source.node.ref) do
-            if  ref.type == 'setlocal'
-            and (ref.range or ref.start) < source.start then
-                lastLoc = ref
-            end
-        end
-
-        vm.setNode(source, vm.getNode(lastLoc))
     end)
     : case 'setfield'
     : case 'setmethod'

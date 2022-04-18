@@ -93,6 +93,10 @@ function mt:isFalsy()
     return false
 end
 
+function mt:removeFalsy()
+    
+end
+
 ---@return fun():vm.object
 function mt:eachObject()
     local i = 0
@@ -133,6 +137,7 @@ function vm.setNode(source, node, cover)
     end
 end
 
+---@param source vm.object
 ---@return vm.node?
 function vm.getNode(source)
     return vm.nodeCache[source]

@@ -24,10 +24,10 @@ local function sortRefs(source)
     end)
 end
 
----@param loc         parser.object
+---@param node        vm.node
 ---@param currentFunc parser.object
----@param callback    fun(src: parser.object, loc: parser.object)
-function mt:_runFunction(loc, currentFunc, callback)
+---@param callback    fun(src: parser.object, node: vm.node)
+function mt:_runFunction(node, currentFunc, callback)
     while true do
         local ref = self.loc.ref[self.index]
         if not ref then
@@ -38,20 +38,20 @@ function mt:_runFunction(loc, currentFunc, callback)
         end
         local func = guide.getParentFunction(ref)
         if func == currentFunc then
-            callback(ref, loc)
+            callback(ref, node)
             self.index = self.index + 1
             if ref.type == 'setlocal' then
-                loc = ref
+                node = vm.getNode(ref)
             end
         else
-            self:_runFunction(loc, func, callback)
+            self:_runFunction(node, func, callback)
         end
     end
 end
 
----@param callback fun(src: parser.object, loc: parser.object)
+---@param callback    fun(src: parser.object, node: vm.node)
 function mt:launch(callback)
-    self:_runFunction(self.loc, self.mainFunc, callback)
+    self:_runFunction(vm.getNode(self.loc), self.mainFunc, callback)
 end
 
 ---@param loc parser.object

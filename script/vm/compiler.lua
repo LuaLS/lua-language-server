@@ -870,7 +870,7 @@ local compilerSwitch = util.switch()
         local hasMark = vm.getNode(source):getData 'hasDefined'
 
         local runner = vm.createRunner(source)
-        runner:launch(function (src, loc)
+        runner:launch(function (src, node)
             if src.type == 'setlocal' then
                 if src.value and not hasMark then
                     if src.value.type == 'table' then
@@ -879,11 +879,10 @@ local compilerSwitch = util.switch()
                         vm.setNode(src, vm.compileNode(src.value))
                     end
                 else
-                    vm.setNode(src, vm.getNode(loc))
+                    vm.setNode(src, node)
                 end
-                loc = src
             elseif src.type == 'getlocal' then
-                vm.setNode(src, vm.getNode(loc), true)
+                vm.setNode(src, node, true)
             end
         end)
 

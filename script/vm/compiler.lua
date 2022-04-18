@@ -15,7 +15,6 @@ local vm         = require 'vm.vm'
 ---@field _node           vm.node
 ---@field _localBase      table
 ---@field _globalBase     table
----@field _hasSorted      boolean
 
 local searchFieldSwitch = util.switch()
     : case 'table'
@@ -870,51 +869,26 @@ local compilerSwitch = util.switch()
 
         local hasMark = vm.getNode(source):getData 'hasDefined'
 
-        if not source._hasSorted then
-            source._hasSorted = true
-            table.sort(refs, function (a, b)
-                return (a.range or a.start) < (b.range or b.start)
-            end)
-        end
-
-        local parentFunc = guide.getParentFunction(source)
-
-        local index = 1
-        local function runFunction(loc, currentFunc)
-            while true do
-                local ref = refs[index]
-                if not ref then
-                    break
-                end
-                if ref.start > currentFunc.finish then
-                    break
-                end
-                local func = guide.getParentFunction(ref)
-                if func == currentFunc then
-                    index = index + 1
-                    if ref.type == 'setlocal' then
-                        if ref.value and not hasMark then
-                            if ref.value.type == 'table' then
-                                vm.setNode(ref, ref.value)
-                            else
-                                vm.setNode(ref, vm.compileNode(ref.value))
-                            end
-                        else
-                            vm.setNode(ref, vm.getNode(loc))
-                        end
-                        loc = ref
-                    elseif ref.type == 'getlocal' then
-                        vm.setNode(ref, vm.getNode(loc), true)
+        local runner = vm.createRunner(source)
+        runner:launch(function (src, loc)
+            if src.type == 'setlocal' then
+                if src.value and not hasMark then
+                    if src.value.type == 'table' then
+                        vm.setNode(src, src.value)
+                    else
+                        vm.setNode(src, vm.compileNode(src.value))
                     end
                 else
-                    runFunction(loc, func)
+                    vm.setNode(src, vm.getNode(loc))
                 end
+                loc = src
+            elseif src.type == 'getlocal' then
+                vm.setNode(src, vm.getNode(loc), true)
             end
-        end
-
-        runFunction(source, parentFunc)
+        end)
 
         if not hasMark then
+            local parentFunc = guide.getParentFunction(source)
             for _, ref in ipairs(source.ref) do
                 if  ref.type == 'setlocal'
                 and guide.getParentFunction(ref) == parentFunc then

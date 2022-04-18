@@ -1501,7 +1501,7 @@ local x
 x = 1
 ]]
 
-TEST 'string|integer' [[
+TEST 'integer' [[
 local x
 x = '1'
 <?x?> = 1
@@ -1521,9 +1521,138 @@ print(<?x?>)
 x = 1
 ]]
 
-TEST 'string|integer' [[
+TEST 'integer' [[
 local x
 x = '1'
 x = 1
 print(<?x?>)
+]]
+
+TEST 'unknown' [[
+local x
+
+function A()
+    print(<?x?>)
+end
+]]
+
+TEST 'string|integer' [[
+local x
+
+function A()
+    print(<?x?>)
+end
+
+x = '1'
+x = 1
+]]
+
+TEST 'string' [[
+local x
+
+x = '1'
+
+function A()
+    print(<?x?>)
+end
+
+x = 1
+]]
+
+TEST 'integer' [[
+local x
+
+x = '1'
+x = 1
+
+function A()
+    print(<?x?>)
+end
+
+]]
+
+TEST 'boolean' [[
+local x
+
+function A()
+    x = true
+    print(<?x?>)
+end
+
+x = '1'
+x = 1
+]]
+
+TEST 'string|integer' [[
+local x
+
+function A()
+    x = true
+end
+
+print(<?x?>)
+x = '1'
+x = 1
+]]
+
+TEST 'boolean' [[
+local x
+
+function A()
+    x = true
+    function B()
+        print(<?x?>)
+    end
+end
+
+x = '1'
+x = 1
+]]
+
+TEST 'table' [[
+local x
+
+function A()
+    x = true
+    function B()
+        x = {}
+        print(<?x?>)
+    end
+end
+
+x = '1'
+x = 1
+]]
+
+TEST 'boolean' [[
+local x
+
+function A()
+    x = true
+    function B()
+        x = {}
+    end
+    print(<?x?>)
+end
+
+x = '1'
+x = 1
+]]
+
+TEST 'string|integer' [[
+local x
+
+function A()
+    x = true
+    function B()
+        x = {}
+    end
+end
+
+function C()
+    print(<?x?>)
+end
+
+x = '1'
+x = 1
 ]]

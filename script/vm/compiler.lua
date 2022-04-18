@@ -1627,6 +1627,7 @@ local function compileByGlobal(source)
     vm.setNode(root._globalBase[name], globalNode, true)
     vm.setNode(source, globalNode, true)
 
+    -- TODO:don't mix
     local sets = global.links[uri].sets or {}
     local gets = global.links[uri].gets or {}
     for _, set in ipairs(sets) do

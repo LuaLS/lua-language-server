@@ -1,8 +1,5 @@
 # changelog
 
-## 3.1.1
-* `FIX` [#1051](https://github.com/sumneko/lua-language-server/issues/1051)
-
 ## 3.1.0
 `2022-4-17`
 * `NEW` support find definition in method

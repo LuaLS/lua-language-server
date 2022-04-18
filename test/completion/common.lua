@@ -3311,16 +3311,3 @@ TEST [[
     end
     assert(count == 1)
 end)
-
-TEST [[
-local x
-x.y.z = xxx
-
-x.y.<??>
-]]
-{
-    {
-        label = 'z',
-        kind  = define.CompletionItemKind.Field,
-    }
-}

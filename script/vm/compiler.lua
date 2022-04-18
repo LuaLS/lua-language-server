@@ -898,14 +898,17 @@ local compilerSwitch = util.switch()
     end)
     : case 'getlocal'
     : call(function (source)
+        vm.compileNode(source.node)
+
         local lastLoc = source.node
         for _, ref in ipairs(source.node.ref) do
-            if ref.type == 'setlocal' then
-                
+            if  ref.type == 'setlocal'
+            and (ref.range or ref.start) < source.start then
+                lastLoc = ref
             end
         end
 
-        vm.setNode(source, vm.compileNode(lastLoc))
+        vm.setNode(source, vm.getNode(lastLoc))
     end)
     : case 'setfield'
     : case 'setmethod'

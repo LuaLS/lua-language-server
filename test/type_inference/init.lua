@@ -77,12 +77,6 @@ function f(<?x?>)
 end
 ]]
 
-TEST 'number' [[
-local <?var?>
-var = 1
-var = 1.0
-]]
-
 TEST 'string' [[
 local var = '111'
 t.<?x?> = var
@@ -91,6 +85,11 @@ t.<?x?> = var
 TEST 'string' [[
 local <?var?>
 var = '111'
+]]
+
+TEST 'string' [[
+local var
+<?var?> = '111'
 ]]
 
 TEST 'string' [[
@@ -1488,4 +1487,43 @@ TEST 'string?' [[
 local function f() end
 
 local <?x?> = f()
+]]
+
+TEST 'string|integer' [[
+local <?x?>
+x = '1'
+x = 1
+]]
+
+TEST 'string' [[
+local x
+<?x?> = '1'
+x = 1
+]]
+
+TEST 'string|integer' [[
+local x
+x = '1'
+<?x?> = 1
+]]
+
+TEST 'string|integer' [[
+local x
+print(<?x?>)
+x = '1'
+x = 1
+]]
+
+TEST 'string' [[
+local x
+x = '1'
+print(<?x?>)
+x = 1
+]]
+
+TEST 'string|integer' [[
+local x
+x = '1'
+x = 1
+print(<?x?>)
 ]]

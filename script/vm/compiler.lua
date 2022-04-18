@@ -727,21 +727,9 @@ end
 
 ---@param source parser.object
 ---@return vm.node
-local function compileLocalBase(source)
-    if not source._localBase then
-        source._localBase = {
-            type = 'localbase',
-            parent = source,
-        }
-    end
-    local baseNode = vm.getNode(source._localBase)
-    if baseNode then
-        return baseNode
-    end
-    baseNode = vm.createNode()
-    vm.setNode(source._localBase, baseNode, true)
-
+local function compileLocal(source)
     vm.setNode(source, source)
+
     local hasMarkDoc
     if source.bindDocs then
         hasMarkDoc = bindDocs(source)
@@ -811,12 +799,7 @@ local function compileLocalBase(source)
         vm.setNode(source, globalMgr.getGlobal('type', 'integer'))
     end
 
-    baseNode:merge(vm.getNode(source))
-    vm.removeNode(source)
-
-    baseNode:setData('hasDefined', hasMarkDoc or hasMarkParam or hasMarkValue)
-
-    return baseNode
+    vm.getNode(source):setData('hasDefined', hasMarkDoc or hasMarkParam or hasMarkValue)
 end
 
 local compilerSwitch = util.switch()
@@ -877,35 +860,52 @@ local compilerSwitch = util.switch()
     : case 'local'
     : case 'self'
     : call(function (source)
-        local baseNode = compileLocalBase(source)
-        vm.setNode(source, baseNode, true)
-        if not baseNode:getData 'hasDefined' and source.ref then
+        compileLocal(source)
+        if not source.ref then
+            return
+        end
+
+        local hasMark = vm.getNode(source):getData 'hasDefined'
+
+        local lastLoc = source
+        for _, ref in ipairs(source.ref) do
+            if ref.type == 'setlocal' then
+                if ref.value and not hasMark then
+                    vm.setNode(ref, vm.getNode(lastLoc):copy())
+                    if ref.value.type == 'table' then
+                        vm.setNode(ref, ref.value)
+                    else
+                        vm.setNode(ref, vm.compileNode(ref.value))
+                    end
+                else
+                    vm.setNode(ref, vm.getNode(lastLoc))
+                end
+                lastLoc = ref
+            end
+        end
+
+        if not hasMark then
             for _, ref in ipairs(source.ref) do
                 if ref.type == 'setlocal' then
-                    vm.setNode(source, vm.compileNode(ref))
+                    vm.setNode(source, vm.getNode(ref))
                 end
             end
         end
     end)
     : case 'setlocal'
     : call(function (source)
-        local baseNode = compileLocalBase(source.node)
-        if not baseNode:getData 'hasDefined' and source.value then
-            if source.value.type == 'table' then
-                vm.setNode(source, source.value)
-            else
-                vm.setNode(source, vm.compileNode(source.value))
-            end
-        end
-        baseNode:merge(vm.getNode(source))
-        vm.setNode(source, baseNode, true)
         vm.compileNode(source.node)
     end)
     : case 'getlocal'
     : call(function (source)
-        local baseNode = compileLocalBase(source.node)
-        vm.setNode(source, baseNode, true)
-        vm.compileNode(source.node)
+        local lastLoc = source.node
+        for _, ref in ipairs(source.node.ref) do
+            if ref.type == 'setlocal' then
+                
+            end
+        end
+
+        vm.setNode(source, vm.compileNode(lastLoc))
     end)
     : case 'setfield'
     : case 'setmethod'

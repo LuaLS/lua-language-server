@@ -256,12 +256,12 @@ function m.doDiagnostic(uri, isScopeDiag)
         end
     end
 
+    pushResult()
+
     -- always re-sent diagnostics of current file
     if not isScopeDiag then
         m.cache[uri] = nil
     end
-
-    pushResult()
 
     local lastPushClock = time.time()
     ---@async

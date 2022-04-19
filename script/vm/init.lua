@@ -8,6 +8,6 @@ require 'vm.field'
 require 'vm.doc'
 require 'vm.type'
 require 'vm.library'
-require 'vm.local-compiler'
+require 'vm.runner'
 require 'vm.manager'
 return vm

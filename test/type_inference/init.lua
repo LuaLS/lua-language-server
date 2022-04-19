@@ -1656,3 +1656,37 @@ end
 x = '1'
 x = 1
 ]]
+
+TEST 'integer?' [[
+---@type integer?
+local <?x?>
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+if <?x?> then
+    print(x)
+end
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+if x then
+    print(<?x?>)
+end
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+if x then
+    print(x)
+end
+
+print(<?x?>)
+]]

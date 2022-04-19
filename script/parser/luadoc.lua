@@ -709,6 +709,10 @@ function parseType(parent)
     if not result.start then
         result.start = getFinish()
     end
+    if checkToken('symbol', '?', 1) then
+        nextToken()
+        result.optional = true
+    end
     result.finish = getFinish()
     result.firstFinish = result.finish
 

@@ -2,6 +2,7 @@
 
 ## 3.1.1
 * `FIX` [#1051](https://github.com/sumneko/lua-language-server/issues/1051)
+* `FIX` [#1072](https://github.com/sumneko/lua-language-server/issues/1072)
 
 ## 3.1.0
 `2022-4-17`

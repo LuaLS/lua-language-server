@@ -1506,7 +1506,7 @@ local compilerSwitch = util.switch()
         if source.op.type == '%' then
             local a = vm.getNumber(source[1])
             local b = vm.getNumber(source[2])
-            if a and b then
+            if a and b and b ~= 0 then
                 local result = a % b
                 vm.setNode(source, {
                     type   = math.type(result) == 'integer' and 'integer' or 'number',

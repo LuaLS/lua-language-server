@@ -114,7 +114,7 @@ end
 
 ---@param uri uri
 ---@param args parser.object
----@return parser.object
+---@return vm.node
 function mt:resolve(uri, args)
     local resolved  = self.sign:resolve(uri, args)
     local protoNode = vm.compileNode(self.proto)

@@ -289,6 +289,9 @@ local function getObjectSign(source)
     end
     source._sign = false
     if source.type == 'function' then
+        if not source.bindDocs then
+            return false
+        end
         for _, doc in ipairs(source.bindDocs) do
             if doc.type == 'doc.generic' then
                 if not source._sign then
@@ -323,11 +326,15 @@ local function getObjectSign(source)
         source._sign = signMgr()
         if source.type == 'doc.type.function' then
             for _, arg in ipairs(source.args) do
-                local argNode = vm.compileNode(arg.extends)
-                if arg.optional then
-                    argNode:addOptional()
+                if arg.extends then
+                    local argNode = vm.compileNode(arg.extends)
+                    if arg.optional then
+                        argNode:addOptional()
+                    end
+                    source._sign:addSign(argNode)
+                else
+                    source._sign:addSign(vm.createNode())
                 end
-                source._sign:addSign(argNode)
             end
         end
     end
@@ -673,10 +680,21 @@ local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
 
     for n in callNode:eachObject() do
         if n.type == 'function' then
+            local sign = getObjectSign(n)
             local farg = getFuncArg(n, myIndex)
             if farg then
                 for fn in vm.compileNode(farg):eachObject() do
                     if isValidCallArgNode(arg, fn) then
+                        if fn.type == 'doc.type.function' then
+                            if sign then
+                                local generic = genericMgr(fn, sign)
+                                local args    = {}
+                                for i = fixIndex + 1, myIndex - 1 do
+                                    args[#args+1] = call.args[i]
+                                end
+                                fn = generic:resolve(guide.getUri(call), args)
+                            end
+                        end
                         vm.setNode(arg, fn)
                     end
                 end
@@ -797,7 +815,12 @@ local function compileLocalBase(source)
             if n.type == 'doc.type.function' then
                 for index, arg in ipairs(n.args) do
                     if func.args[index] == source then
-                        vm.setNode(source, vm.compileNode(arg))
+                        local argNode = vm.compileNode(arg)
+                        for an in argNode:eachObject() do
+                            if an.type ~= 'doc.generic.name' then
+                                vm.setNode(source, an)
+                            end
+                        end
                         hasDocArg = true
                     end
                 end

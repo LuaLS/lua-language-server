@@ -50,8 +50,9 @@ function table.pack(...) end
 function table.remove(list, pos) end
 
 ---#DES 'table.sort'
----@param list table
----@param comp fun(a: any, b: any):boolean
+---@generic T
+---@param list T[]
+---@param comp fun(a: T, b: T):boolean
 function table.sort(list, comp) end
 
 ---@version >5.2, JIT

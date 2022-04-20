@@ -1,6 +1,15 @@
 # changelog
 
 ## 3.1.1
+* `NEW` supports infer of callback parameter
+  ```lua
+  ---@type string[]
+  local t
+
+  table.sort(t, function (a, b)
+      -- `a` and `b` is `string` here
+  end)
+  ```
 * `FIX` [#1051](https://github.com/sumneko/lua-language-server/issues/1051)
 * `FIX` [#1072](https://github.com/sumneko/lua-language-server/issues/1072)
 * `FIX` runtime errors

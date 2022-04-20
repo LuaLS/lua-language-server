@@ -16,8 +16,9 @@ end
 
 ---@param uri uri
 ---@param args parser.object
+---@param removeGeneric true?
 ---@return table<string, vm.node>
-function mt:resolve(uri, args)
+function mt:resolve(uri, args, removeGeneric)
     if not args then
         return nil
     end

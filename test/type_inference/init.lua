@@ -1127,6 +1127,29 @@ local t = f('')
 print(t.<?x?>)
 ]]
 
+TEST 'string' [[
+---@generic T
+---@param t T[]
+---@param callback fun(v: T)
+local function f(t, callback) end
+
+---@type string[]
+local t
+
+f(t, function (<?v?>) end)
+]]
+
+TEST 'unknown' [[
+---@generic T
+---@param t T[]
+---@param callback fun(v: T)
+local function f(t, callback) end
+
+local t = {}
+
+f(t, function (<?v?>) end)
+]]
+
 TEST 'table' [[
 local <?t?> = setmetatable({}, { __index = function () end })
 ]]

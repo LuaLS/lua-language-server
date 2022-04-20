@@ -1,6 +1,7 @@
 ---@class vm
-local vm    = require 'vm.vm'
-local guide = require 'parser.guide'
+local vm        = require 'vm.vm'
+local guide     = require 'parser.guide'
+local globalMgr = require 'vm.global-manager'
 
 ---@class vm.runner
 ---@field loc       parser.object
@@ -15,11 +16,12 @@ mt.index = 1
 ---@field _hasSorted boolean
 
 ---@class vm.runner.step
----@field type    'truly' | 'as' | 'object' | 'save' | 'load'
+---@field type    'truly' | 'optional' | 'add' | 'remove' | 'object' | 'save' | 'load'
 ---@field pos     integer
 ---@field node?   vm.node
 ---@field object? parser.object
 ---@field ref?    vm.runner.step
+---@field name?   string
 
 ---@param filter parser.object
 ---@param pos    integer
@@ -62,7 +64,8 @@ function mt:_compileBlock(block)
     local parentBlock = guide.getParentBlock(block)
     self:_compileBlock(parentBlock)
 
-    if block.type == 'ifblock' then
+    if block.type == 'ifblock'
+    or block.type == 'elseif' then
         if block[1] then
             self:_compileNarrowByFilter(block.filter, block[1].start)
         end
@@ -98,7 +101,12 @@ function mt:launch(callback)
     for _, step in ipairs(self.steps) do
         if     step.type == 'truly' then
             node = node:copyTruly()
-        elseif step.type == 'as' then
+        elseif step.type == 'optional' then
+            node = node:copy():addOptional()
+        elseif step.type == 'add' then
+            node = node:copy():merge(globalMgr.getGlobal('type', step.name))
+        elseif step.type == 'remove' then
+            node = node:copyWithout(step.name)
         elseif step.type == 'object' then
             node = callback(step.object, node) or node
         elseif step.type == 'save' then

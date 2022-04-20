@@ -123,6 +123,29 @@ function mt:copyTruly()
     return newNode
 end
 
+---@param name string
+---@return vm.node
+function mt:copyWithout(name)
+    local newNode = vm.createNode()
+    if self:isOptional() then
+        newNode:addOptional()
+    end
+    for _, c in ipairs(self) do
+        if (c.type == 'global' and c.cate == 'type' and c.name == name)
+        or (c.type == name)
+        or (c.type == 'doc.type.integer'  and (name == 'number' or name == 'integer'))
+        or (c.type == 'doc.type.boolean'  and name == 'boolean')
+        or (c.type == 'doc.type.table'    and name == 'table')
+        or (c.type == 'doc.type.array'    and name == 'table')
+        or (c.type == 'doc.type.function' and name == 'function') then
+            goto CONTINUE
+        end
+        newNode:merge(c)
+        ::CONTINUE::
+    end
+    return newNode
+end
+
 ---@return fun():vm.object
 function mt:eachObject()
     local i = 0

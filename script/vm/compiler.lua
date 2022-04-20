@@ -201,11 +201,13 @@ function vm.getClassFields(suri, node, key, ref, pushResult)
                 local hasFounded = {}
                 for _, field in ipairs(set.fields) do
                     local fieldKey = guide.getKeyName(field)
-                    if key == nil
-                    or fieldKey == key then
-                        if not searchedFields[fieldKey] then
-                            pushResult(field)
-                            hasFounded[fieldKey] = true
+                    if fieldKey then
+                        if key == nil
+                        or fieldKey == key then
+                            if not searchedFields[fieldKey] then
+                                pushResult(field)
+                                hasFounded[fieldKey] = true
+                            end
                         end
                     end
                 end
@@ -214,19 +216,23 @@ function vm.getClassFields(suri, node, key, ref, pushResult)
                     for _, src in ipairs(set.bindSources) do
                         searchFieldSwitch(src.type, suri, src, key, ref, function (field)
                             local fieldKey = guide.getKeyName(field)
-                            if  not searchedFields[fieldKey]
-                            and guide.isSet(field) then
-                                hasFounded[fieldKey] = true
-                                pushResult(field)
+                            if fieldKey then
+                                if  not searchedFields[fieldKey]
+                                and guide.isSet(field) then
+                                    hasFounded[fieldKey] = true
+                                    pushResult(field)
+                                end
                             end
                         end)
                         if src.value and src.value.type == 'table' then
                             searchFieldSwitch('table', suri, src.value, key, ref, function (field)
                                 local fieldKey = guide.getKeyName(field)
-                                if  not searchedFields[fieldKey]
-                                and guide.isSet(field) then
-                                    hasFounded[fieldKey] = true
-                                    pushResult(field)
+                                if fieldKey then
+                                    if  not searchedFields[fieldKey]
+                                    and guide.isSet(field) then
+                                        hasFounded[fieldKey] = true
+                                        pushResult(field)
+                                    end
                                 end
                             end)
                         end

@@ -34,6 +34,8 @@ DIAG_PREFIELD_CALL      =
 '會被直譯為 `{}{}`。你可能需要加一個`,`或`;`。'
 DIAG_OVER_MAX_ARGS      =
 '函式只接收 {:d} 個參數，但你傳了 {:d} 個。'
+DIAG_MISS_ARGS          = -- TODO: need translate!
+'the function received at least {:d} arguments, but got {:d}.'
 DIAG_OVER_MAX_VALUES    =
 '只有 {} 個變數，但你設定了 {} 個值。'
 DIAG_AMBIGUITY_1        =

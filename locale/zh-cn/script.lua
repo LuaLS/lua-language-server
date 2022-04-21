@@ -33,7 +33,9 @@ DIAG_PREVIOUS_CALL      =
 DIAG_PREFIELD_CALL      =
 '会被解释为 `{}{}`。你可能需要加一个`,`或`;`。'
 DIAG_OVER_MAX_ARGS      =
-'函数只接收 {:d} 个参数，但你传了 {:d} 个。'
+'函数最多接收 {:d} 个参数，但获得了 {:d} 个。'
+DIAG_MISS_ARGS          =
+'函数最少接收 {:d} 个参数，但获得了 {:d} 个。'
 DIAG_OVER_MAX_VALUES    =
 '只有 {} 个变量，但你设置了 {} 个值。'
 DIAG_AMBIGUITY_1        =

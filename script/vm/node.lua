@@ -7,6 +7,7 @@ local ws       = require 'workspace.workspace'
 vm.nodeCache = {}
 
 ---@class vm.node
+---@field [integer] vm.object
 local mt = {}
 mt.__index    = mt
 mt.type       = 'vm.node'
@@ -85,8 +86,23 @@ function mt:isFalsy()
     end
     for _, c in ipairs(self) do
         if c.type == 'nil'
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'nil')
         or (c.type == 'boolean' and c[1] == false)
         or (c.type == 'doc.type.boolean' and c[1] == false) then
+            return true
+        end
+    end
+    return false
+end
+
+---@return boolean
+function mt:isNullable()
+    if self.optional then
+        return true
+    end
+    for _, c in ipairs(self) do
+        if c.type == 'nil'
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'nil') then
             return true
         end
     end

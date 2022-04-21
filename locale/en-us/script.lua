@@ -33,7 +33,9 @@ DIAG_PREVIOUS_CALL      =
 DIAG_PREFIELD_CALL      =
 'Will be interpreted as `{}{}`. It may be necessary to add a `,` or `;`.'
 DIAG_OVER_MAX_ARGS      =
-'The function takes only {:d} parameters, but you passed {:d}.'
+'The function received a maximum of {:d} arguments, but got {:d}.'
+DIAG_MISS_ARGS          =
+'the function received at least {:d} arguments, but got {:d}.'
 DIAG_OVER_MAX_VALUES    =
 'Only has {} variables, but you set {} values.'
 DIAG_AMBIGUITY_1        =

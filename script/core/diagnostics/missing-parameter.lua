@@ -12,15 +12,20 @@ local function countCallArgs(source)
     return result
 end
 
+---@return integer
 local function countFuncArgs(source)
     if not source.args or #source.args == 0 then
         return 0
     end
-    if source.args[#source.args].type == '...' then
-        return math.maxinteger
-    else
-        return #source.args
+    local count = 0
+    for i = #source.args, 1, -1 do
+        local arg = source.args[i]
+        if  arg.type ~= '...'
+        and not vm.compileNode(arg):isNullable() then
+            return i
+        end
     end
+    return count
 end
 
 local function getFuncArgs(func)
@@ -30,7 +35,7 @@ local function getFuncArgs(func)
         if def.type == 'function'
         or def.type == 'doc.type.function' then
             local args = countFuncArgs(def)
-            if not funcArgs or args > funcArgs then
+            if not funcArgs or args < funcArgs then
                 funcArgs = args
             end
         end
@@ -58,19 +63,20 @@ return function (uri, callback)
         end
 
         local delta = callArgs - funcArgs
-        if delta <= 0 then
+        if delta >= 0 then
             return
         end
-        if callArgs == 1 and source.node.type == 'getmethod' then
-            return
-        end
+        callback {
+            start  = source.start,
+            finish = source.finish,
+        }
         for i = #source.args - delta + 1, #source.args do
             local arg = source.args[i]
             if arg then
                 callback {
                     start   = arg.start,
                     finish  = arg.finish,
-                    message = lang.script('DIAG_OVER_MAX_ARGS', funcArgs, callArgs)
+                    message = lang.script('DIAG_MISS_ARGS', funcArgs, callArgs)
                 }
             end
         end

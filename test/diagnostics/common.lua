@@ -163,7 +163,7 @@ print()
 ]]
 
 TEST [[
-pairs
+print
 {}
 {}
 ]]
@@ -239,6 +239,44 @@ function m.x(a, b)
     return a, b
 end
 m:x(1, <!2!>, <!3!>, <!4!>)
+]]
+
+TEST [[
+local function x(a, b)
+    return a, b
+end
+<!x(1)!>
+]]
+
+TEST [[
+local function x(a, b, ...)
+    return a, b, ...
+end
+x(1, 2)
+]]
+
+TEST [[
+---@param b? integer
+local function x(a, b)
+    return a, b
+end
+x(1)
+]]
+
+TEST [[
+---@param b integer?
+local function x(a, b)
+    return a, b
+end
+x(1)
+]]
+
+TEST [[
+---@param b integer|nil
+local function x(a, b)
+    return a, b
+end
+x(1)
 ]]
 
 TEST [[
@@ -1383,13 +1421,13 @@ TEST [[
 ]]
 
 TEST [[
-return ('1'):gsub()
+return ('1'):upper()
 ]]
 
 TEST [[
 local value
 value = '1'
-value = value:gsub()
+value = value:upper()
 ]]
 
 TEST [[

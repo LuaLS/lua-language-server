@@ -34,6 +34,8 @@ DIAG_PREFIELD_CALL      =
 'Será interpretado como `{}{}`. Pode ser necessário adicionar uma `,` ou `;`.'
 DIAG_OVER_MAX_ARGS      =
 'A função aceita apenas os parâmetros {:d}, mas você passou {:d}.'
+DIAG_MISS_ARGS          = -- TODO: need translate!
+'the function received at least {:d} arguments, but got {:d}.'
 DIAG_OVER_MAX_VALUES    = -- TODO: need translate!
 'Only has {} variables, but you set {} values.'
 DIAG_AMBIGUITY_1        =

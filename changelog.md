@@ -23,6 +23,7 @@
   local x = true
   local y = x--[[@as integer]] -- y is `integer` here
   ```
+* `NEW` diagnostic: `missing-parameter`
 * `CHG` diagnostic: no longer mark `redundant-parameter` as `Unnecessary`
 * `FIX` diagnostic: `unused-function` does not recognize recursion
 * `FIX` [#1051](https://github.com/sumneko/lua-language-server/issues/1051)

@@ -245,4 +245,3 @@ config.diagnostics['empty-block']           =
 '空程式碼區塊'
 config.diagnostics['redundant-value']       =
 '賦值操作時，值的數量比被賦值的對象多'
-

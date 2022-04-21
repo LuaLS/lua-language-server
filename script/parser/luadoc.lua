@@ -126,7 +126,7 @@ Symbol              <-  ({} {
 ---@field literal boolean
 ---@field signs parser.object[]
 ---@field originalComment parser.object
----@field as parser.object
+---@field as? parser.object
 
 local function trim(str)
     return str:match '^%s*(%S+)%s*$'

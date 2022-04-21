@@ -497,7 +497,9 @@ local function bindAs(source)
     end
     for _, doc in ipairs(docs) do
         if doc.type == 'doc.as' and doc.originalComment.start == source.finish + 2 then
-            vm.setNode(source, vm.compileNode(doc.as), true)
+            if doc.as then
+                vm.setNode(source, vm.compileNode(doc.as), true)
+            end
             return true
         end
     end

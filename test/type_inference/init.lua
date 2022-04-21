@@ -1759,3 +1759,8 @@ local function f(<?x?>)
 
 end
 ]]
+
+TEST 'integer' [[
+local x = 1
+x = <?x?>
+]]

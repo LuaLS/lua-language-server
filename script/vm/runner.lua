@@ -85,7 +85,7 @@ function mt:_preCompile()
         self.steps[#self.steps+1] = {
             type   = 'object',
             object = ref,
-            pos  = ref.start,
+            pos    = ref.range or ref.start,
         }
         local block = guide.getParentBlock(ref)
         self:_compileBlock(block)

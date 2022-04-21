@@ -56,6 +56,7 @@ local type         = type
 ---@field init                  parser.object
 ---@field step                  parser.object
 ---@field redundant             { max: integer, passed: integer }
+---@field filter                parser.object
 ---@field _root                 parser.object
 
 ---@class guide
@@ -71,6 +72,7 @@ local blockTypes = {
     ['repeat']      = true,
     ['do']          = true,
     ['function']    = true,
+    ['if']          = true,
     ['ifblock']     = true,
     ['elseblock']   = true,
     ['elseifblock'] = true,

@@ -77,12 +77,6 @@ function f(<?x?>)
 end
 ]]
 
-TEST 'number' [[
-local <?var?>
-var = 1
-var = 1.0
-]]
-
 TEST 'string' [[
 local var = '111'
 t.<?x?> = var
@@ -91,6 +85,11 @@ t.<?x?> = var
 TEST 'string' [[
 local <?var?>
 var = '111'
+]]
+
+TEST 'string' [[
+local var
+<?var?> = '111'
 ]]
 
 TEST 'string' [[
@@ -1520,4 +1519,206 @@ local AAA
 
 
 local <?x?> = AAA()
+]]
+
+TEST 'string|integer' [[
+local <?x?>
+x = '1'
+x = 1
+]]
+
+TEST 'string' [[
+local x
+<?x?> = '1'
+x = 1
+]]
+
+TEST 'integer' [[
+local x
+x = '1'
+<?x?> = 1
+]]
+
+TEST 'string|integer' [[
+local x
+print(<?x?>)
+x = '1'
+x = 1
+]]
+
+TEST 'string' [[
+local x
+x = '1'
+print(<?x?>)
+x = 1
+]]
+
+TEST 'integer' [[
+local x
+x = '1'
+x = 1
+print(<?x?>)
+]]
+
+TEST 'unknown' [[
+local x
+
+function A()
+    print(<?x?>)
+end
+]]
+
+TEST 'string|integer' [[
+local x
+
+function A()
+    print(<?x?>)
+end
+
+x = '1'
+x = 1
+]]
+
+TEST 'string' [[
+local x
+
+x = '1'
+
+function A()
+    print(<?x?>)
+end
+
+x = 1
+]]
+
+TEST 'integer' [[
+local x
+
+x = '1'
+x = 1
+
+function A()
+    print(<?x?>)
+end
+
+]]
+
+TEST 'boolean' [[
+local x
+
+function A()
+    x = true
+    print(<?x?>)
+end
+
+x = '1'
+x = 1
+]]
+
+TEST 'string|integer' [[
+local x
+
+function A()
+    x = true
+end
+
+print(<?x?>)
+x = '1'
+x = 1
+]]
+
+TEST 'boolean' [[
+local x
+
+function A()
+    x = true
+    function B()
+        print(<?x?>)
+    end
+end
+
+x = '1'
+x = 1
+]]
+
+TEST 'table' [[
+local x
+
+function A()
+    x = true
+    function B()
+        x = {}
+        print(<?x?>)
+    end
+end
+
+x = '1'
+x = 1
+]]
+
+TEST 'boolean' [[
+local x
+
+function A()
+    x = true
+    function B()
+        x = {}
+    end
+    print(<?x?>)
+end
+
+x = '1'
+x = 1
+]]
+
+TEST 'string|integer' [[
+local x
+
+function A()
+    x = true
+    function B()
+        x = {}
+    end
+end
+
+function C()
+    print(<?x?>)
+end
+
+x = '1'
+x = 1
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local <?x?>
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+if <?x?> then
+    print(x)
+end
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+if x then
+    print(<?x?>)
+end
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+if x then
+    print(x)
+end
+
+print(<?x?>)
 ]]

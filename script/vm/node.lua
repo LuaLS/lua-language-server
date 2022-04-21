@@ -93,6 +93,59 @@ function mt:isFalsy()
     return false
 end
 
+---@return vm.node
+function mt:copyTruly()
+    local newNode = vm.createNode()
+    newNode.optional = false
+    local hasBoolean, hasTrue
+    for _, c in ipairs(self) do
+        if c.type == 'nil'
+        or (c.type == 'boolean' and c[1] == false)
+        or (c.type == 'doc.type.boolean' and c[1] == false) then
+            goto CONTINUE
+        end
+        if c.type == 'global' and c.cate == 'type' and c.name == 'boolean' then
+            hasBoolean = true
+            goto CONTINUE
+        end
+        if c.type == 'boolean' or c.type == 'doc.type.boolean' then
+            hasTrue = true
+        end
+        newNode:merge(c)
+        ::CONTINUE::
+    end
+    if hasBoolean and not hasTrue then
+        newNode:merge {
+            type = 'doc.type.boolean',
+            [1]  = true,
+        }
+    end
+    return newNode
+end
+
+---@param name string
+---@return vm.node
+function mt:copyWithout(name)
+    local newNode = vm.createNode()
+    if self:isOptional() then
+        newNode:addOptional()
+    end
+    for _, c in ipairs(self) do
+        if (c.type == 'global' and c.cate == 'type' and c.name == name)
+        or (c.type == name)
+        or (c.type == 'doc.type.integer'  and (name == 'number' or name == 'integer'))
+        or (c.type == 'doc.type.boolean'  and name == 'boolean')
+        or (c.type == 'doc.type.table'    and name == 'table')
+        or (c.type == 'doc.type.array'    and name == 'table')
+        or (c.type == 'doc.type.function' and name == 'function') then
+            goto CONTINUE
+        end
+        newNode:merge(c)
+        ::CONTINUE::
+    end
+    return newNode
+end
+
 ---@return fun():vm.object
 function mt:eachObject()
     local i = 0
@@ -126,13 +179,14 @@ function vm.setNode(source, node, cover)
         me:merge(node)
     else
         if node.type == 'vm.node' then
-            vm.nodeCache[source] = node
+            vm.nodeCache[source] = node:copy()
         else
             vm.nodeCache[source] = vm.createNode(node)
         end
     end
 end
 
+---@param source vm.object
 ---@return vm.node?
 function vm.getNode(source)
     return vm.nodeCache[source]

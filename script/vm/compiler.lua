@@ -517,7 +517,11 @@ local function bindDocs(source)
         end
         if doc.type == 'doc.param' then
             if isParam and source[1] == doc.param[1] then
-                vm.setNode(source, vm.compileNode(doc))
+                local node = vm.compileNode(doc)
+                if doc.optional then
+                    node:addOptional()
+                end
+                vm.setNode(source, node)
                 return true
             end
         end

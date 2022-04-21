@@ -207,24 +207,24 @@ function mt:_trim()
     if self._hasTable and not self._hasClass then
         self.views['table'] = true
     end
-    if self._hasClass then
-        self:_eraseAlias()
-    end
 end
 
-function mt:_eraseAlias()
-    local expandAlias = config.get(self.uri, 'Lua.hover.expandAlias')
+---@param uri uri
+---@return table<string, true>
+function mt:_eraseAlias(uri)
+    local drop = {}
+    local expandAlias = config.get(uri, 'Lua.hover.expandAlias')
     for n in self.node:eachObject() do
         if n.type == 'global' and n.cate == 'type' then
-            for _, set in ipairs(n:getSets(self.uri)) do
+            for _, set in ipairs(n:getSets(uri)) do
                 if set.type == 'doc.alias' then
                     if expandAlias then
-                        self.views[n.name] = nil
+                        drop[n.name] = true
                     else
                         for _, ext in ipairs(set.extends.types) do
                             local view = viewNodeSwitch(ext.type, ext, {})
                             if view and view ~= n.name then
-                                self.views[view] = nil
+                                drop[view] = true
                             end
                         end
                     end
@@ -232,6 +232,7 @@ function mt:_eraseAlias()
             end
         end
     end
+    return drop
 end
 
 ---@param tp string
@@ -281,17 +282,20 @@ function mt:view(default, uri)
         return 'any'
     end
 
-    if not next(self.views) then
-        return default or 'unknown'
-    end
-
-    if self.cachedView then
-        return self.cachedView
+    local drop
+    if self._hasClass then
+        drop = self:_eraseAlias(uri or self.uri)
     end
 
     local array = {}
     for view in pairs(self.views) do
-        array[#array+1] = view
+        if not drop or not drop[view] then
+            array[#array+1] = view
+        end
+    end
+
+    if #array == 0 then
+        return default or 'unknown'
     end
 
     table.sort(array, function (a, b)
@@ -323,7 +327,6 @@ function mt:view(default, uri)
             view = view .. '?'
         end
     end
-    self.cachedView = view
 
     return view
 end

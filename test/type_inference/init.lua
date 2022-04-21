@@ -1752,3 +1752,10 @@ local <?x?> = not 1--[[@as integer]])
 TEST 'integer' [=[
 local <?x?> = ()--[[@as integer]])
 ]=]
+
+TEST 'integer?' [[
+---@param x? integer
+local function f(<?x?>)
+
+end
+]]

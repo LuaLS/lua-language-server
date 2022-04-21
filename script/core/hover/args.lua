@@ -1,17 +1,6 @@
 local guide = require 'parser.guide'
 local infer = require 'vm.infer'
-
-local function optionalArg(arg)
-    if not arg.bindDocs then
-        return false
-    end
-    local name = arg[1]
-    for _, doc in ipairs(arg.bindDocs) do
-        if doc.type == 'doc.param' and doc.param[1] == name then
-            return doc.optional
-        end
-    end
-end
+local vm    = require 'vm'
 
 local function asFunction(source)
     local args = {}
@@ -31,10 +20,17 @@ local function asFunction(source)
             end
             local name = arg.name or guide.getKeyName(arg)
             if name then
+                local argNode = vm.compileNode(arg)
+                local optional
+                if argNode:isOptional() then
+                    optional = true
+                    argNode = argNode:copy()
+                    argNode:removeOptional()
+                end
                 args[#args+1] = ('%s%s: %s'):format(
                     name,
-                    optionalArg(arg) and '?' or '',
-                    infer.getInfer(arg):view 'any'
+                    optional and '?' or '',
+                    infer.getInfer(argNode):view('any', guide.getUri(source))
                 )
             elseif arg.type == '...' then
                 args[#args+1] = ('%s: %s'):format(

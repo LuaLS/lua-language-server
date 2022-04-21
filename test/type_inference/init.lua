@@ -1722,3 +1722,21 @@ end
 
 print(<?x?>)
 ]]
+
+--TEST 'integer' [=[
+--local x
+--
+--print(<?x?>--[[@as integer]])
+--]=]
+--
+--TEST 'integer' [=[
+--print(<?io?>--[[@as integer]])
+--]=]
+--
+--TEST 'integer' [=[
+--print(io.<?open?>--[[@as integer]])
+--]=]
+--
+--TEST 'integer' [=[
+--print(io<?['open']?>--[[@as integer]])
+--]=]

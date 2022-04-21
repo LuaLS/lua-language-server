@@ -1320,7 +1320,8 @@ local function isNextLine(binded, doc)
     if lastDoc.type == 'doc.class'
     or lastDoc.type == 'doc.field' then
         if  doc.type ~= 'doc.field'
-        and doc.type ~= 'doc.comment' then
+        and doc.type ~= 'doc.comment'
+        and doc.type ~= 'doc.overload' then
             return false
         end
     end

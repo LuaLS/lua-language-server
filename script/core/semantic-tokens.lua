@@ -165,21 +165,17 @@ local Care = util.switch()
         -- 5. Class declaration
             -- only search this local
         if loc.bindDocs then
-            for i = #loc.bindDocs, 1, -1 do
-                local doc = loc.bindDocs[i]
-                if doc.type == 'doc.type' then
-                    break
-                end
-                if doc.type == "doc.class" and doc.bindSources then
-                    for _, src in ipairs(doc.bindSources) do
-                        if src == loc then
-                            results[#results+1] = {
-                                start      = source.start,
-                                finish     = source.finish,
-                                type       = define.TokenTypes.class,
-                            }
-                            return
-                        end
+            local isParam = source.parent.type == 'funcargs'
+                         or source.parent.type == 'in'
+            if not isParam then
+                for _, doc in ipairs(loc.bindDocs) do
+                    if doc.type == 'doc.class' then
+                        results[#results+1] = {
+                            start      = source.start,
+                            finish     = source.finish,
+                            type       = define.TokenTypes.class,
+                        }
+                        return
                     end
                 end
             end

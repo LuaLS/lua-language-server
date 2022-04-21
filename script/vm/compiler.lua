@@ -840,6 +840,18 @@ local function compileLocalBase(source)
         vm.setNode(source, globalMgr.getGlobal('type', 'integer'))
     end
 
+    if source.bindDocs then
+        local isParam = source.parent.type == 'funcargs'
+                     or source.parent.type == 'in'
+        for _, doc in ipairs(source.bindDocs) do
+            if doc.type == 'doc.overload' then
+                if not isParam then
+                    vm.setNode(source, vm.compileNode(doc))
+                end
+            end
+        end
+    end
+
     baseNode:merge(vm.getNode(source))
     vm.removeNode(source)
 

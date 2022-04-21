@@ -10,6 +10,14 @@
       -- `a` and `b` is `string` here
   end)
   ```
+* `NEW` using `---@overload` as class constructor
+  ```lua
+  ---@class Class
+  ---@overload fun():Class
+  local mt
+
+  local x = mt() --> x is `Class` here
+  ```
 * `FIX` [#1051](https://github.com/sumneko/lua-language-server/issues/1051)
 * `FIX` [#1072](https://github.com/sumneko/lua-language-server/issues/1072)
 * `FIX` [#1077](https://github.com/sumneko/lua-language-server/issues/1077)

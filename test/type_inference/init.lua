@@ -1512,3 +1512,12 @@ local function f() end
 
 local <?x?> = f()
 ]]
+
+TEST 'AA' [[
+---@class AA
+---@overload fun():AA
+local AAA
+
+
+local <?x?> = AAA()
+]]

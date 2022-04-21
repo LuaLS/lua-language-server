@@ -125,6 +125,8 @@ Symbol              <-  ({} {
 ---@class parser.object
 ---@field literal boolean
 ---@field signs parser.object[]
+---@field originalComment parser.object
+---@field as parser.object
 
 local function trim(str)
     return str:match '^%s*(%S+)%s*$'
@@ -1192,7 +1194,17 @@ local docSwitch = util.switch()
             finish = getFinish(),
         }
     end)
-
+    : case 'as'
+    : call(function ()
+        local result = {
+            type   = 'doc.as',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+        result.as     = parseType(result)
+        result.finish = getFinish()
+        return result
+    end)
 
 local function convertTokens()
     local tp, text = nextToken()

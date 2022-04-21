@@ -537,6 +537,7 @@ local function skipComment(isAction)
         if longComment then
             longComment.type = 'comment.long'
             longComment.text = longComment[1]
+            longComment.mark = longComment[2]
             longComment[1]   = nil
             longComment[2]   = nil
             State.comms[#State.comms+1] = longComment

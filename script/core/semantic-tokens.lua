@@ -794,27 +794,26 @@ return function (uri, start, finish)
 
     for _, comm in ipairs(state.comms) do
         if start <= comm.start and comm.finish <= finish then
-            if comm.type == 'comment.short' then
-                local head = comm.text:match '^%-%s*[@|]'
-                if head then
-                    results[#results+1] = {
-                        start  = comm.start,
-                        finish = comm.start + #head + 1,
-                        type   = define.TokenTypes.comment,
-                    }
-                    results[#results+1] = {
-                        start      = comm.start + #head + 1,
-                        finish     = comm.start + #head + 2 + #comm.text:match('%S*', #head + 1),
-                        type       = define.TokenTypes.keyword,
-                        modifieres = define.TokenModifiers.documentation,
-                    }
+            local headPos = (comm.type == 'comment.short' and comm.text:match '^%-%s*[@|]()')
+                         or (comm.type == 'comment.long'  and comm.text:match '^@()')
+            if headPos then
+                local atPos
+                if comm.type == 'comment.short' then
+                    atPos = headPos + 2
                 else
-                    results[#results+1] = {
-                        start  = comm.start,
-                        finish = comm.finish,
-                        type   = define.TokenTypes.comment,
-                    }
+                    atPos = headPos + #comm.mark
                 end
+                results[#results+1] = {
+                    start  = comm.start,
+                    finish = comm.start + atPos - 2,
+                    type   = define.TokenTypes.comment,
+                }
+                results[#results+1] = {
+                    start      = comm.start + atPos - 2,
+                    finish     = comm.start + atPos - 1 + #comm.text:match('%S*', headPos),
+                    type       = define.TokenTypes.keyword,
+                    modifieres = define.TokenModifiers.documentation,
+                }
             else
                 results[#results+1] = {
                     start  = comm.start,

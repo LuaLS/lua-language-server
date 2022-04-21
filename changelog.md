@@ -18,6 +18,11 @@
 
   local x = mt() --> x is `Class` here
   ```
+* `NEW` add `--[[@as type]]`
+  ```lua
+  local x = true
+  local y = x--[[@as integer]] -- y is `integer` here
+  ```
 * `FIX` [#1051](https://github.com/sumneko/lua-language-server/issues/1051)
 * `FIX` [#1072](https://github.com/sumneko/lua-language-server/issues/1072)
 * `FIX` [#1077](https://github.com/sumneko/lua-language-server/issues/1077)

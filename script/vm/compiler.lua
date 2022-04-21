@@ -478,6 +478,23 @@ local function getReturn(func, index, args)
     return result
 end
 
+---@param source parser.object
+---@return boolean
+local function bindAs(source)
+    local root = guide.getRoot(source)
+    local docs = root.docs
+    if not docs then
+        return
+    end
+    for _, doc in ipairs(docs) do
+        if doc.type == 'doc.as' and doc.originalComment.start == source.finish + 2 then
+            vm.setNode(source, vm.compileNode(doc.as), true)
+            return true
+        end
+    end
+    return false
+end
+
 local function bindDocs(source)
     local isParam = source.parent.type == 'funcargs'
                  or source.parent.type == 'in'
@@ -894,6 +911,9 @@ local compilerSwitch = util.switch()
     end)
     : case 'paren'
     : call(function (source)
+        if bindAs(source) then
+            return
+        end
         if source.exp then
             vm.setNode(source, vm.compileNode(source.exp))
         end
@@ -924,6 +944,9 @@ local compilerSwitch = util.switch()
                 end
                 return vm.getNode(src)
             elseif src.type == 'getlocal' then
+                if bindAs(src) then
+                    return
+                end
                 vm.setNode(src, node, true)
             end
         end)
@@ -944,6 +967,9 @@ local compilerSwitch = util.switch()
     end)
     : case 'getlocal'
     : call(function (source)
+        if bindAs(source) then
+            return
+        end
         vm.compileNode(source.node)
     end)
     : case 'setfield'
@@ -966,6 +992,9 @@ local compilerSwitch = util.switch()
     : case 'getmethod'
     : case 'getindex'
     : call(function (source)
+        if bindAs(source) then
+            return
+        end
         compileByLocalID(source)
         local key = guide.getKeyName(source)
         if key == nil and source.index then
@@ -1001,6 +1030,9 @@ local compilerSwitch = util.switch()
     end)
     : case 'getglobal'
     : call(function (source)
+        if bindAs(source) then
+            return
+        end
         if source.node[1] ~= '_ENV' then
             return
         end
@@ -1275,6 +1307,9 @@ local compilerSwitch = util.switch()
     end)
     : case 'unary'
     : call(function (source)
+        if bindAs(source) then
+            return
+        end
         if source.op.type == 'not' then
             local result = vm.test(source[1])
             if result == nil then
@@ -1330,6 +1365,9 @@ local compilerSwitch = util.switch()
     end)
     : case 'binary'
     : call(function (source)
+        if bindAs(source) then
+            return
+        end
         if source.op.type == 'and' then
             local r1 = vm.test(source[1])
             if r1 == true then

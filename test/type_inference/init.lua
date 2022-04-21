@@ -1723,20 +1723,32 @@ end
 print(<?x?>)
 ]]
 
---TEST 'integer' [=[
---local x
---
---print(<?x?>--[[@as integer]])
---]=]
---
---TEST 'integer' [=[
---print(<?io?>--[[@as integer]])
---]=]
---
---TEST 'integer' [=[
---print(io.<?open?>--[[@as integer]])
---]=]
---
---TEST 'integer' [=[
---print(io<?['open']?>--[[@as integer]])
---]=]
+TEST 'integer' [=[
+local x
+
+print(<?x?>--[[@as integer]])
+]=]
+
+TEST 'integer' [=[
+print(<?io?>--[[@as integer]])
+]=]
+
+TEST 'integer' [=[
+print(io.<?open?>--[[@as integer]])
+]=]
+
+TEST 'integer' [=[
+local <?x?> = io['open']--[[@as integer]])
+]=]
+
+TEST 'integer' [=[
+local <?x?> = 1 + 1--[[@as integer]])
+]=]
+
+TEST 'integer' [=[
+local <?x?> = not 1--[[@as integer]])
+]=]
+
+TEST 'integer' [=[
+local <?x?> = ()--[[@as integer]])
+]=]

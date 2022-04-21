@@ -143,6 +143,7 @@ local childMap = {
     ['doc.see']            = {'name', 'field'},
     ['doc.version']        = {'#versions'},
     ['doc.diagnostic']     = {'#names'},
+    ['doc.as']             = {'as'},
 }
 
 ---@type table<string, fun(obj: parser.object, list: parser.object[])>

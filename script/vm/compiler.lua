@@ -13,7 +13,6 @@ local vm         = require 'vm.vm'
 ---@class parser.object
 ---@field _compiledNodes  boolean
 ---@field _node           vm.node
----@field _localBase      table
 ---@field _globalBase     table
 
 local searchFieldSwitch = util.switch()
@@ -933,7 +932,7 @@ local compilerSwitch = util.switch()
         local runner = vm.createRunner(source)
         runner:launch(function (src, node)
             if src.type == 'setlocal' then
-                if src.value and not hasMark then
+                if src.value then
                     if src.value.type == 'table' then
                         vm.setNode(src, src.value)
                     else

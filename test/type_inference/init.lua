@@ -1238,14 +1238,14 @@ TEST '👍' [[
 local <?x?>
 ]]
 
-TEST 'boolean' [[
+TEST 'integer' [[
 ---@type boolean
 local x
 
 <?x?> = 1
 ]]
 
-TEST 'Class' [[
+TEST 'integer' [[
 ---@class Class
 local x
 

@@ -49,6 +49,19 @@ function mt:resolve(uri, args, removeGeneric)
                     -- number[] -> T[]
                     resolve(object.node, vm.compileNode(n.node))
                 end
+                if n.type == 'doc.type.table' then
+                    -- { [integer]: number } -> T[]
+                    local tvalueNode = vm.getTableValue(uri, node, 'integer')
+                    if tvalueNode then
+                        resolve(object.node, tvalueNode)
+                    end
+                end
+                if n.type == 'global' and n.cate == 'type' then
+                    -- ---@field [integer]: number -> T[]
+                    vm.getClassFields(uri, n, globalMgr.getGlobal('type', 'integer'), false, function (field)
+                        resolve(object.node, vm.compileNode(field.extends))
+                    end)
+                end
             end
         end
         if object.type == 'doc.type.table' then

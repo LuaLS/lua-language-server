@@ -1,6 +1,6 @@
 # changelog
 
-## 3.1.1
+## 3.2.0
 * `NEW` supports infer of callback parameter
   ```lua
   ---@type string[]
@@ -23,6 +23,7 @@
   local x = true
   local y = x--[[@as integer]] -- y is `integer` here
   ```
+* `NEW` generic: resolve `T[]` by `table<integer, type>` or `---@field [integer] type`
 * `NEW` diagnostic: `missing-parameter`
 * `CHG` diagnostic: no longer mark `redundant-parameter` as `Unnecessary`
 * `FIX` diagnostic: `unused-function` does not recognize recursion

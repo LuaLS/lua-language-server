@@ -871,6 +871,37 @@ end
 ]]
 
 TEST 'boolean' [[
+---@generic T: table, V
+---@param t T
+---@return fun(table: V[], i?: integer):integer, V
+---@return T
+---@return integer i
+local function ipairs(t) end
+
+---@type table<integer, boolean>
+local t
+
+for _, <?v?> in ipairs(t) do
+end
+]]
+
+TEST 'boolean' [[
+---@generic T: table, V
+---@param t T
+---@return fun(table: V[], i?: integer):integer, V
+---@return T
+---@return integer i
+local function ipairs(t) end
+
+---@class MyClass
+---@field [integer] boolean
+local t
+
+for _, <?v?> in ipairs(t) do
+end
+]]
+
+TEST 'boolean' [[
 ---@generic T: table, K, V
 ---@param t T
 ---@return fun(table: table<K, V>, index: K):K, V

@@ -184,7 +184,7 @@ local searchFieldSwitch = util.switch()
     end)
 
 
-function vm.getClassFields(suri, node, key, ref, pushResult)
+function vm.getClassFields(suri, object, key, ref, pushResult)
     local mark = {}
 
     local function searchClass(class, searchedFields)
@@ -199,13 +199,23 @@ function vm.getClassFields(suri, node, key, ref, pushResult)
                 -- check ---@field
                 local hasFounded = {}
                 for _, field in ipairs(set.fields) do
-                    local fieldKey = guide.getKeyName(field)
-                    if fieldKey then
-                        if key == nil
-                        or fieldKey == key then
-                            if not searchedFields[fieldKey] then
+                    if type(key) == 'table' then
+                        local fieldNode = vm.compileNode(field.field)
+                        if vm.isSubType(suri, key.name, fieldNode) then
+                            if not searchedFields[key] then
                                 pushResult(field)
-                                hasFounded[fieldKey] = true
+                                hasFounded[key] = true
+                            end
+                        end
+                    else
+                        local fieldKey = guide.getKeyName(field)
+                        if fieldKey then
+                            if key == nil
+                            or fieldKey == key then
+                                if not searchedFields[fieldKey] then
+                                    pushResult(field)
+                                    hasFounded[fieldKey] = true
+                                end
                             end
                         end
                     end
@@ -273,8 +283,8 @@ function vm.getClassFields(suri, node, key, ref, pushResult)
         end
     end
 
-    searchClass(node)
-    searchGlobal(node)
+    searchClass(object)
+    searchGlobal(object)
 end
 
 ---@class parser.object

@@ -165,7 +165,11 @@ end
 ---@param cover? boolean
 function vm.setNode(source, node, cover)
     if not node then
-        error('Can not set nil node')
+        if TEST then
+            error('Can not set nil node')
+        else
+            log.error('Can not set nil node')
+        end
     end
     if source.type == 'global' then
         error('Can not set node to global')

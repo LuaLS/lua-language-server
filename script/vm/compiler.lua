@@ -1760,7 +1760,11 @@ end
 ---@return vm.node
 function vm.compileNode(source)
     if not source then
-        error('Can not compile nil node')
+        if TEST then
+            error('Can not compile nil source')
+        else
+            log.error('Can not compile nil source')
+        end
     end
 
     if source.type == 'global' then

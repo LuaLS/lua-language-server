@@ -286,6 +286,12 @@ TEST [[
 local <!function f() end!>
 ]]
 
+TEST [[
+local <!function f()
+    f()
+end!>
+]]
+
 config.get(nil, 'Lua.diagnostics.disable')['unused-local'] = nil
 TEST [[
 local mt, x
@@ -494,11 +500,10 @@ _ = 1, <!2!>
 ]]
 
 TEST [[
-local function x()
+function X()
     do
         local k
         print(k)
-        x()
     end
     local k = 1
     print(k)
@@ -506,9 +511,8 @@ end
 ]]
 
 TEST [[
-local function x()
+function X()
     local loc
-    x()
     print(loc)
 end
 ]]

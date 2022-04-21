@@ -8,7 +8,7 @@ local localID       = require 'vm.local-id'
 local vm            = require 'vm.vm'
 
 ---@class parser.object
----@field _globalNode vm.global
+---@field _globalNode? vm.global
 
 ---@class vm.global-manager
 local m = {}

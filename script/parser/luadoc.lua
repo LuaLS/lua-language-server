@@ -452,6 +452,296 @@ local function parseFunction(parent)
     end
 end
 
+local function parseTypeUnitArray(parent, node)
+    if not checkToken('symbol', '[]', 1) then
+        return nil
+    end
+    nextToken()
+    local result = {
+        type   = 'doc.type.array',
+        start  = node.start,
+        finish = getFinish(),
+        node   = node,
+        parent = parent,
+    }
+    node.parent = result
+    return result
+end
+
+local function parseTypeUnitSign(parent, node)
+    if not checkToken('symbol', '<', 1) then
+        return nil
+    end
+    nextToken()
+    local result = {
+        type   = 'doc.type.sign',
+        start  = node.start,
+        finish = getFinish(),
+        node   = node,
+        parent = parent,
+        signs  = {},
+    }
+    node.parent = result
+    while true do
+        local sign = parseType(result)
+        if not sign then
+            pushWarning {
+                type   = 'LUA_DOC_MISS_SIGN',
+                start  = getFinish(),
+                finish = getFinish(),
+            }
+            break
+        end
+        result.signs[#result.signs+1] = sign
+        if checkToken('symbol', ',', 1) then
+            nextToken()
+        else
+            break
+        end
+    end
+    nextSymbolOrError '>'
+    result.finish = getFinish()
+    return result
+end
+
+local function parseString(parent)
+    local tp, content = peekToken()
+    if not tp or tp ~= 'string' then
+        return nil
+    end
+
+    nextToken()
+    local mark = getMark()
+    -- compatibility
+    if content:sub(1, 1) == '"'
+    or content:sub(1, 1) == "'" then
+        if content:sub(1, 1) == content:sub(-1, -1) then
+            mark = content:sub(1, 1)
+            content = content:sub(2, -2)
+        end
+    end
+    local str = {
+        type   = 'doc.type.string',
+        start  = getStart(),
+        finish = getFinish(),
+        parent = parent,
+        [1]    = content,
+        [2]    = mark,
+    }
+    return str
+end
+
+local function parseInteger(parent)
+    local tp, content = peekToken()
+    if not tp or tp ~= 'integer' then
+        return nil
+    end
+
+    nextToken()
+    local integer = {
+        type   = 'doc.type.integer',
+        start  = getStart(),
+        finish = getFinish(),
+        parent = parent,
+        [1]    = content,
+    }
+    return integer
+end
+
+local function parseBoolean(parent)
+    local tp, content = peekToken()
+    if not tp
+    or tp ~= 'name'
+    or (content ~= 'true' and content ~= 'false') then
+        return nil
+    end
+
+    nextToken()
+    local boolean = {
+        type   = 'doc.type.boolean',
+        start  = getStart(),
+        finish = getFinish(),
+        parent = parent,
+        [1]    = content == 'true' and true or false,
+    }
+    return boolean
+end
+
+local function parseParen(parent)
+    if not checkToken('symbol', '(', 1) then
+        return
+    end
+    nextToken()
+    local tp = parseType(parent)
+    nextSymbolOrError(')')
+    return tp
+end
+
+function parseTypeUnit(parent)
+    local result = parseFunction(parent)
+                or parseTable(parent)
+                or parseString(parent)
+                or parseInteger(parent)
+                or parseBoolean(parent)
+                or parseDots('doc.type.name', parent)
+                or parseParen(parent)
+    if not result then
+        local literal = checkToken('symbol', '`', 1)
+        if literal then
+            nextToken()
+        end
+        result = parseName('doc.type.name', parent)
+        if not result then
+            return nil
+        end
+        if literal then
+            result.literal = true
+            nextSymbolOrError '`'
+        end
+    end
+    while true do
+        local newResult = parseTypeUnitSign(parent, result)
+        if not newResult then
+            break
+        end
+        result = newResult
+    end
+    while true do
+        local newResult = parseTypeUnitArray(parent, result)
+        if not newResult then
+            break
+        end
+        result = newResult
+    end
+    return result
+end
+
+local function parseResume(parent)
+    local default, additional
+    if checkToken('symbol', '>', 1) then
+        nextToken()
+        default = true
+    end
+
+    if checkToken('symbol', '+', 1) then
+        nextToken()
+        additional = true
+    end
+
+    local result = parseTypeUnit(parent)
+    if result then
+        result.default    = default
+        result.additional = additional
+    end
+
+    return result
+end
+
+function parseType(parent)
+    local result = {
+        type    = 'doc.type',
+        parent  = parent,
+        types   = {},
+    }
+    while true do
+        local typeUnit = parseTypeUnit(result)
+        if not typeUnit then
+            break
+        end
+
+        result.types[#result.types+1] = typeUnit
+        if not result.start then
+            result.start = typeUnit.start
+        end
+
+        if not checkToken('symbol', '|', 1) then
+            break
+        end
+        nextToken()
+    end
+    if not result.start then
+        result.start = getFinish()
+    end
+    if checkToken('symbol', '?', 1) then
+        nextToken()
+        result.optional = true
+    end
+    result.finish = getFinish()
+    result.firstFinish = result.finish
+
+    local row = guide.rowColOf(result.finish)
+
+    local function pushResume()
+        local comments
+        for i = 0, 100 do
+            local nextComm = NextComment(i,'peek')
+            if not nextComm then
+                return false
+            end
+            local nextCommRow = guide.rowColOf(nextComm.start)
+            local currentRow = row + i + 1
+            if currentRow < nextCommRow then
+                return false
+            end
+            if nextComm.text:match '^%-%s*%@' then
+                return false
+            else
+                local resumeHead = nextComm.text:match '^%-%s*%|'
+                if resumeHead then
+                    NextComment(i)
+                    row = row + i + 1
+                    local finishPos = nextComm.text:find('#', #resumeHead + 1) or #nextComm.text
+                    parseTokens(nextComm.text:sub(#resumeHead + 1, finishPos), nextComm.start + #resumeHead + 1)
+                    local resume = parseResume(result)
+                    if resume then
+                        if comments then
+                            resume.comment = table.concat(comments, '\n')
+                        else
+                            resume.comment = nextComm.text:match('#%s*(.+)', #resumeHead + 1)
+                        end
+                        result.types[#result.types+1] = resume
+                        result.finish = resume.finish
+                    end
+                    comments = nil
+                    return true
+                else
+                    if not comments then
+                        comments = {}
+                    end
+                    comments[#comments+1] = nextComm.text:sub(2)
+                end
+            end
+        end
+        return false
+    end
+
+    local checkResume = true
+    local nsymbol, ncontent = peekToken()
+    if nsymbol == 'symbol' then
+        if ncontent == ','
+        or ncontent == ':'
+        or ncontent == '|'
+        or ncontent == ')'
+        or ncontent == '}' then
+            checkResume = false
+        end
+    end
+
+    if checkResume then
+        while pushResume() do end
+    end
+
+    if #result.types == 0 then
+        pushWarning {
+            type   = 'LUADOC_MISS_TYPE_NAME',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+        return nil
+    end
+    return result
+end
+
 local docSwitch = util.switch()
     : case 'class'
     : call(function ()
@@ -903,295 +1193,6 @@ local docSwitch = util.switch()
         }
     end)
 
-local function parseTypeUnitArray(parent, node)
-    if not checkToken('symbol', '[]', 1) then
-        return nil
-    end
-    nextToken()
-    local result = {
-        type   = 'doc.type.array',
-        start  = node.start,
-        finish = getFinish(),
-        node   = node,
-        parent = parent,
-    }
-    node.parent = result
-    return result
-end
-
-local function parseTypeUnitSign(parent, node)
-    if not checkToken('symbol', '<', 1) then
-        return nil
-    end
-    nextToken()
-    local result = {
-        type   = 'doc.type.sign',
-        start  = node.start,
-        finish = getFinish(),
-        node   = node,
-        parent = parent,
-        signs  = {},
-    }
-    node.parent = result
-    while true do
-        local sign = parseType(result)
-        if not sign then
-            pushWarning {
-                type   = 'LUA_DOC_MISS_SIGN',
-                start  = getFinish(),
-                finish = getFinish(),
-            }
-            break
-        end
-        result.signs[#result.signs+1] = sign
-        if checkToken('symbol', ',', 1) then
-            nextToken()
-        else
-            break
-        end
-    end
-    nextSymbolOrError '>'
-    result.finish = getFinish()
-    return result
-end
-
-local function parseString(parent)
-    local tp, content = peekToken()
-    if not tp or tp ~= 'string' then
-        return nil
-    end
-
-    nextToken()
-    local mark = getMark()
-    -- compatibility
-    if content:sub(1, 1) == '"'
-    or content:sub(1, 1) == "'" then
-        if content:sub(1, 1) == content:sub(-1, -1) then
-            mark = content:sub(1, 1)
-            content = content:sub(2, -2)
-        end
-    end
-    local str = {
-        type   = 'doc.type.string',
-        start  = getStart(),
-        finish = getFinish(),
-        parent = parent,
-        [1]    = content,
-        [2]    = mark,
-    }
-    return str
-end
-
-local function parseInteger(parent)
-    local tp, content = peekToken()
-    if not tp or tp ~= 'integer' then
-        return nil
-    end
-
-    nextToken()
-    local integer = {
-        type   = 'doc.type.integer',
-        start  = getStart(),
-        finish = getFinish(),
-        parent = parent,
-        [1]    = content,
-    }
-    return integer
-end
-
-local function parseBoolean(parent)
-    local tp, content = peekToken()
-    if not tp
-    or tp ~= 'name'
-    or (content ~= 'true' and content ~= 'false') then
-        return nil
-    end
-
-    nextToken()
-    local boolean = {
-        type   = 'doc.type.boolean',
-        start  = getStart(),
-        finish = getFinish(),
-        parent = parent,
-        [1]    = content == 'true' and true or false,
-    }
-    return boolean
-end
-
-local function parseParen(parent)
-    if not checkToken('symbol', '(', 1) then
-        return
-    end
-    nextToken()
-    local tp = parseType(parent)
-    nextSymbolOrError(')')
-    return tp
-end
-
-function parseTypeUnit(parent)
-    local result = parseFunction(parent)
-                or parseTable(parent)
-                or parseString(parent)
-                or parseInteger(parent)
-                or parseBoolean(parent)
-                or parseDots('doc.type.name', parent)
-                or parseParen(parent)
-    if not result then
-        local literal = checkToken('symbol', '`', 1)
-        if literal then
-            nextToken()
-        end
-        result = parseName('doc.type.name', parent)
-        if not result then
-            return nil
-        end
-        if literal then
-            result.literal = true
-            nextSymbolOrError '`'
-        end
-    end
-    while true do
-        local newResult = parseTypeUnitSign(parent, result)
-        if not newResult then
-            break
-        end
-        result = newResult
-    end
-    while true do
-        local newResult = parseTypeUnitArray(parent, result)
-        if not newResult then
-            break
-        end
-        result = newResult
-    end
-    return result
-end
-
-local function parseResume(parent)
-    local default, additional
-    if checkToken('symbol', '>', 1) then
-        nextToken()
-        default = true
-    end
-
-    if checkToken('symbol', '+', 1) then
-        nextToken()
-        additional = true
-    end
-
-    local result = parseTypeUnit(parent)
-    if result then
-        result.default    = default
-        result.additional = additional
-    end
-
-    return result
-end
-
-function parseType(parent)
-    local result = {
-        type    = 'doc.type',
-        parent  = parent,
-        types   = {},
-    }
-    while true do
-        local typeUnit = parseTypeUnit(result)
-        if not typeUnit then
-            break
-        end
-
-        result.types[#result.types+1] = typeUnit
-        if not result.start then
-            result.start = typeUnit.start
-        end
-
-        if not checkToken('symbol', '|', 1) then
-            break
-        end
-        nextToken()
-    end
-    if not result.start then
-        result.start = getFinish()
-    end
-    if checkToken('symbol', '?', 1) then
-        nextToken()
-        result.optional = true
-    end
-    result.finish = getFinish()
-    result.firstFinish = result.finish
-
-    local row = guide.rowColOf(result.finish)
-
-    local function pushResume()
-        local comments
-        for i = 0, 100 do
-            local nextComm = NextComment(i,'peek')
-            if not nextComm then
-                return false
-            end
-            local nextCommRow = guide.rowColOf(nextComm.start)
-            local currentRow = row + i + 1
-            if currentRow < nextCommRow then
-                return false
-            end
-            if nextComm.text:match '^%-%s*%@' then
-                return false
-            else
-                local resumeHead = nextComm.text:match '^%-%s*%|'
-                if resumeHead then
-                    NextComment(i)
-                    row = row + i + 1
-                    local finishPos = nextComm.text:find('#', #resumeHead + 1) or #nextComm.text
-                    parseTokens(nextComm.text:sub(#resumeHead + 1, finishPos), nextComm.start + #resumeHead + 1)
-                    local resume = parseResume(result)
-                    if resume then
-                        if comments then
-                            resume.comment = table.concat(comments, '\n')
-                        else
-                            resume.comment = nextComm.text:match('#%s*(.+)', #resumeHead + 1)
-                        end
-                        result.types[#result.types+1] = resume
-                        result.finish = resume.finish
-                    end
-                    comments = nil
-                    return true
-                else
-                    if not comments then
-                        comments = {}
-                    end
-                    comments[#comments+1] = nextComm.text:sub(2)
-                end
-            end
-        end
-        return false
-    end
-
-    local checkResume = true
-    local nsymbol, ncontent = peekToken()
-    if nsymbol == 'symbol' then
-        if ncontent == ','
-        or ncontent == ':'
-        or ncontent == '|'
-        or ncontent == ')'
-        or ncontent == '}' then
-            checkResume = false
-        end
-    end
-
-    if checkResume then
-        while pushResume() do end
-    end
-
-    if #result.types == 0 then
-        pushWarning {
-            type   = 'LUADOC_MISS_TYPE_NAME',
-            start  = getFinish(),
-            finish = getFinish(),
-        }
-        return nil
-    end
-    return result
-end
 
 local function convertTokens()
     local tp, text = nextToken()

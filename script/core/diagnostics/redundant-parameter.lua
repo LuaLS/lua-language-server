@@ -97,7 +97,6 @@ return function (uri, callback)
                 callback {
                     start   = arg.start,
                     finish  = arg.finish,
-                    tags    = { define.DiagnosticTag.Unnecessary },
                     message = lang.script('DIAG_OVER_MAX_ARGS', funcArgs, callArgs)
                 }
             end

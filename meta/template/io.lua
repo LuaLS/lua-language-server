@@ -47,7 +47,7 @@ function io.lines(filename, ...) end
 
 ---#DES 'io.open'
 ---@param filename string
----@param mode     openmode
+---@param mode?    openmode
 ---@return file*?
 ---@return string? errmsg
 ---@nodiscard

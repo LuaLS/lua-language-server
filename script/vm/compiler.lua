@@ -199,22 +199,50 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                 -- check ---@field
                 local hasFounded = {}
                 for _, field in ipairs(set.fields) do
-                    if type(key) == 'table' then
-                        local fieldNode = vm.compileNode(field.field)
-                        if vm.isSubType(suri, key.name, fieldNode) then
-                            if not searchedFields[key] then
+                    local fieldKey = guide.getKeyName(field)
+                    if fieldKey then
+                        -- ---@field x boolean -> class.x
+                        if key == nil
+                        or fieldKey == key then
+                            if not searchedFields[fieldKey] then
                                 pushResult(field)
-                                hasFounded[key] = true
+                                hasFounded[fieldKey] = true
                             end
                         end
-                    else
-                        local fieldKey = guide.getKeyName(field)
-                        if fieldKey then
-                            if key == nil
-                            or fieldKey == key then
-                                if not searchedFields[fieldKey] then
+                    end
+                    if not hasFounded[fieldKey] then
+                        local keyType = type(key)
+                        if keyType == 'table' then
+                            -- ---@field [integer] boolean -> class[integer]
+                            local fieldNode = vm.compileNode(field.field)
+                            if vm.isSubType(suri, key.name, fieldNode) then
+                                local nkey = '|' .. key.name
+                                if not searchedFields[nkey] then
                                     pushResult(field)
-                                    hasFounded[fieldKey] = true
+                                    hasFounded[nkey] = true
+                                end
+                            end
+                        else
+                            local typeName
+                            if keyType == 'number' then
+                                if math.tointeger(key) then
+                                    typeName = 'integer'
+                                else
+                                    typeName = 'number'
+                                end
+                            elseif keyType == 'boolean'
+                            or     keyType == 'string' then
+                                typeName = keyType
+                            end
+                            if typeName then
+                                -- ---@field [integer] boolean -> class[1]
+                                local fieldNode = vm.compileNode(field.field)
+                                if vm.isSubType(suri, typeName, fieldNode) then
+                                    local nkey = '|' .. typeName
+                                    if not searchedFields[nkey] then
+                                        pushResult(field)
+                                        hasFounded[nkey] = true
+                                    end
                                 end
                             end
                         end

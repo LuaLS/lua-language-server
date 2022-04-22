@@ -1810,3 +1810,11 @@ local t
 
 t.<?x?>
 ]]
+
+TEST 'boolean' [[
+---@class A
+---@field [integer] boolean
+local t
+
+local <?x?> = t[1]
+]]

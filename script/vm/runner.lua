@@ -26,6 +26,9 @@ mt.index = 1
 ---@param filter parser.object
 ---@param pos    integer
 function mt:_compileNarrowByFilter(filter, pos)
+    if not filter then
+        return
+    end
     if filter.type == 'unary' then
     elseif filter.type == 'binary' then
     else

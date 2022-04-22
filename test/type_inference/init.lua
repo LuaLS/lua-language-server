@@ -1795,3 +1795,18 @@ TEST 'integer' [[
 local x = 1
 x = <?x?>
 ]]
+
+TEST 'integer?' [[
+---@class A
+---@field x? integer
+local t
+
+t.<?x?>
+]]
+
+TEST 'integer?' [[
+---@type { x?: integer }
+local t
+
+t.<?x?>
+]]

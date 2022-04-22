@@ -23,6 +23,7 @@ function m.getSpecial(source)
     return source.special
 end
 
+---@return string?
 function m.getKeyName(source)
     if not source then
         return nil

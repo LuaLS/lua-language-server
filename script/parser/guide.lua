@@ -925,6 +925,7 @@ function m.getKeyNameOfLiteral(obj)
     end
 end
 
+---@return string?
 function m.getKeyName(obj)
     if not obj then
         return nil

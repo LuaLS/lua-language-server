@@ -1253,14 +1253,22 @@ local compilerSwitch = util.switch()
         if not source.extends then
             return
         end
-        vm.setNode(source, vm.compileNode(source.extends))
+        local fieldNode = vm.compileNode(source.extends)
+        if source.optional then
+            fieldNode:addOptional()
+        end
+        vm.setNode(source, fieldNode)
     end)
     : case 'doc.type.field'
     : call(function (source)
         if not source.extends then
             return
         end
-        vm.setNode(source, vm.compileNode(source.extends))
+        local fieldNode = vm.compileNode(source.extends)
+        if source.optional then
+            fieldNode:addOptional()
+        end
+        vm.setNode(source, fieldNode)
     end)
     : case 'doc.param'
     : call(function (source)

@@ -65,7 +65,7 @@ function mt:checkMaxPreload(uri)
 end
 
 ---@param uri uri
----@param libraryUri uri
+---@param libraryUri? uri
 ---@async
 function mt:loadFile(uri, libraryUri)
     if files.isLua(uri) then

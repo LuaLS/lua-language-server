@@ -318,7 +318,7 @@ local function tryModifyClientGlobal(finalChanges)
 end
 
 ---@param changes config.change[]
----@param onlyMemory boolean
+---@param onlyMemory? boolean
 function m.setConfig(changes, onlyMemory)
     local finalChanges = {}
     for _, change in ipairs(changes) do

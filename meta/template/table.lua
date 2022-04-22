@@ -52,7 +52,7 @@ function table.remove(list, pos) end
 ---#DES 'table.sort'
 ---@generic T
 ---@param list T[]
----@param comp fun(a: T, b: T):boolean
+---@param comp? fun(a: T, b: T):boolean
 function table.sort(list, comp) end
 
 ---@version >5.2, JIT

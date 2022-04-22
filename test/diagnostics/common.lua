@@ -245,10 +245,22 @@ TEST [[
 local function x(a, b)
     return a, b
 end
+x(1)
+]]
+
+TEST [[
+---@param a integer
+---@param b integer
+local function x(a, b)
+    return a, b
+end
 <!x(1)!>
 ]]
 
 TEST [[
+---@param a integer
+---@param b integer
+---@param ... integer
 local function x(a, b, ...)
     return a, b, ...
 end
@@ -256,6 +268,7 @@ x(1, 2)
 ]]
 
 TEST [[
+---@param a integer
 ---@param b? integer
 local function x(a, b)
     return a, b

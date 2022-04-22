@@ -105,7 +105,7 @@ end
 ---@param uri uri
 ---@param isScopeDiag boolean
 ---@param response async fun(result: any)
----@param checked  async fun(name: string)
+---@param checked? async fun(name: string)
 return function (uri, isScopeDiag, response, checked)
     local ast = files.getState(uri)
     if not ast then

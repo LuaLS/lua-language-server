@@ -100,9 +100,13 @@ function mt:isNullable()
     if self.optional then
         return true
     end
+    if #self == 0 then
+        return true
+    end
     for _, c in ipairs(self) do
         if c.type == 'nil'
-        or (c.type == 'global' and c.cate == 'type' and c.name == 'nil') then
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'nil')
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'any') then
             return true
         end
     end

@@ -83,7 +83,7 @@ local m = {}
 
 --- 打印表的结构
 ---@param tbl table
----@param option table {optional = 'self'}
+---@param option? table
 ---@return string
 function m.dump(tbl, option)
     if not option then
@@ -346,8 +346,8 @@ function m.sortPairs(t, sorter)
 end
 
 --- 深拷贝（不处理元表）
----@param source table
----@param target table {optional = 'self'}
+---@param source  table
+---@param target? table
 function m.deepCopy(source, target)
     local mark = {}
     local function copy(a, b)
@@ -566,7 +566,7 @@ end
 
 ---遍历文本的每一行
 ---@param text string
----@param keepNL boolean # 保留换行符
+---@param keepNL? boolean # 保留换行符
 ---@return fun(text:string):string, integer
 function m.eachLine(text, keepNL)
     local offset = 1

@@ -165,8 +165,8 @@ end
 --- 设置文件文本
 ---@param uri uri
 ---@param text string
----@param isTrust boolean
----@param callback function
+---@param isTrust? boolean
+---@param callback? function
 function m.setText(uri, text, isTrust, callback)
     if not text then
         return

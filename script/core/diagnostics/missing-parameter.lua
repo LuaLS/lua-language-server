@@ -69,16 +69,7 @@ return function (uri, callback)
         callback {
             start  = source.start,
             finish = source.finish,
+            message = lang.script('DIAG_MISS_ARGS', funcArgs, callArgs),
         }
-        for i = #source.args - delta + 1, #source.args do
-            local arg = source.args[i]
-            if arg then
-                callback {
-                    start   = arg.start,
-                    finish  = arg.finish,
-                    message = lang.script('DIAG_MISS_ARGS', funcArgs, callArgs)
-                }
-            end
-        end
     end)
 end

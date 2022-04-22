@@ -1570,7 +1570,7 @@ x = '1'
 <?x?> = 1
 ]]
 
-TEST 'string|integer' [[
+TEST 'unknown' [[
 local x
 print(<?x?>)
 x = '1'
@@ -1599,7 +1599,7 @@ function A()
 end
 ]]
 
-TEST 'string|integer' [[
+TEST 'unknown' [[
 local x
 
 function A()
@@ -1646,7 +1646,7 @@ x = '1'
 x = 1
 ]]
 
-TEST 'string|integer' [[
+TEST 'unknown' [[
 local x
 
 function A()
@@ -1702,7 +1702,7 @@ x = '1'
 x = 1
 ]]
 
-TEST 'string|integer' [[
+TEST 'unknown' [[
 local x
 
 function A()
@@ -1742,6 +1742,21 @@ if x then
     print(<?x?>)
 end
 ]]
+--[[
+#0 integer?
+save 1 #1 integer? --ifblock --block中的初始状态
+save 2 #2 integer? --ifblock --block外的状态
+save 3 #3 integer? --ifblock --filter的状态
+object get #3 integer? --if x then
+load 2 #2 integer? --ifblock
+falsy 2 #2 ? --ifblock
+load 1 #1 integer? --ifblock
+truly #1 integer --ifblock
+object get #1 integer --print(x)
+save 4 #?(1) integer --block中的最终状态
+load 2 #2 ? --ifblock -- block
+merge 4 #2 --if 最终状态
+]]
 
 TEST 'integer?' [[
 ---@type integer?
@@ -1749,6 +1764,17 @@ local x
 
 if x then
     print(x)
+end
+
+print(<?x?>)
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+if not x then
+    x = 1
 end
 
 print(<?x?>)

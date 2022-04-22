@@ -978,12 +978,12 @@ local compilerSwitch = util.switch()
             if src.type == 'setlocal' then
                 if src.value and guide.isLiteral(src.value) then
                     if src.value.type == 'table' then
-                        vm.setNode(src, src.value)
+                        vm.setNode(src, vm.createNode(src.value), true)
                     else
-                        vm.setNode(src, vm.compileNode(src.value))
+                        vm.setNode(src, vm.compileNode(src.value), true)
                     end
                 else
-                    vm.setNode(src, node)
+                    vm.setNode(src, node, true)
                 end
                 return vm.getNode(src)
             elseif src.type == 'getlocal' then

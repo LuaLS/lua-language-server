@@ -114,43 +114,86 @@ function mt:isNullable()
 end
 
 ---@return vm.node
-function mt:copyTruly()
-    local newNode = vm.createNode()
-    newNode.optional = false
-    local hasBoolean, hasTrue
-    for _, c in ipairs(self) do
+function mt:setTruly()
+    if self.optional == true then
+        self.optional = nil
+    end
+    local hasBoolean
+    local index = 0
+    while true do
+        index = index + 1
+        local c = self[index]
+        if not c then
+            break
+        end
         if c.type == 'nil'
         or (c.type == 'boolean' and c[1] == false)
         or (c.type == 'doc.type.boolean' and c[1] == false) then
-            goto CONTINUE
+            table.remove(self, index)
+            self[c] = nil
+            index = index - 1
         end
-        if c.type == 'global' and c.cate == 'type' and c.name == 'boolean' then
+        if (c.type == 'global' and c.cate == 'type' and c.name == 'boolean')
+        or (c.type == 'boolean' or c.type == 'doc.type.boolean') then
             hasBoolean = true
-            goto CONTINUE
+            table.remove(self, index)
+            self[c] = nil
+            index = index - 1
         end
-        if c.type == 'boolean' or c.type == 'doc.type.boolean' then
-            hasTrue = true
-        end
-        newNode:merge(c)
-        ::CONTINUE::
     end
-    if hasBoolean and not hasTrue then
-        newNode:merge {
+    if hasBoolean then
+        self[#self+1] = {
             type = 'doc.type.boolean',
             [1]  = true,
         }
     end
-    return newNode
+end
+
+---@return vm.node
+function mt:setFalsy()
+    if self.optional == false then
+        self.optional = nil
+    end
+    local hasBoolean
+    local index = 0
+    while true do
+        index = index + 1
+        local c = self[index]
+        if not c then
+            break
+        end
+        if c.type == 'nil'
+        or (c.type == 'boolean' and c[1] == true)
+        or (c.type == 'doc.type.boolean' and c[1] == true) then
+            goto CONTINUE
+        end
+        if (c.type == 'global' and c.cate == 'type' and c.name == 'boolean')
+        or (c.type == 'boolean' or c.type == 'doc.type.boolean') then
+            hasBoolean = true
+            goto CONTINUE
+        end
+        table.remove(self, index)
+        self[c] = nil
+        index = index - 1
+        ::CONTINUE::
+    end
+    if hasBoolean then
+        self[#self+1] = {
+            type = 'doc.type.boolean',
+            [1]  = false,
+        }
+    end
 end
 
 ---@param name string
----@return vm.node
-function mt:copyWithout(name)
-    local newNode = vm.createNode()
-    if self:isOptional() then
-        newNode:addOptional()
-    end
-    for _, c in ipairs(self) do
+function mt:remove(name)
+    local index = 0
+    while true do
+        index = index + 1
+        local c = self[index]
+        if not c then
+            break
+        end
         if (c.type == 'global' and c.cate == 'type' and c.name == name)
         or (c.type == name)
         or (c.type == 'doc.type.integer'  and (name == 'number' or name == 'integer'))
@@ -158,12 +201,11 @@ function mt:copyWithout(name)
         or (c.type == 'doc.type.table'    and name == 'table')
         or (c.type == 'doc.type.array'    and name == 'table')
         or (c.type == 'doc.type.function' and name == 'function') then
-            goto CONTINUE
+            table.remove(self, index)
+            self[c] = nil
+            index = index - 1
         end
-        newNode:merge(c)
-        ::CONTINUE::
     end
-    return newNode
 end
 
 ---@return fun():vm.object

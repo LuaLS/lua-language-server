@@ -1733,18 +1733,18 @@ t.<?x?>()
 (field) t.x: unknown
 ]]
 
-TEST [[
----@class A
-local a
-
-local b
-b = a
-
-print(b.<?x?>)
-]]
-[[
-(field) A.x: unknown
-]]
+--TEST [[
+-----@class A
+--local a
+--
+--local b
+--b = a
+--
+--print(b.<?x?>)
+--]]
+--[[
+--(field) A.x: unknown
+--]]
 
 TEST [[
 ---@return nil

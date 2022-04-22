@@ -976,7 +976,7 @@ local compilerSwitch = util.switch()
         local runner = vm.createRunner(source)
         runner:launch(function (src, node)
             if src.type == 'setlocal' then
-                if src.value then
+                if src.value and guide.isLiteral(src.value) then
                     if src.value.type == 'table' then
                         vm.setNode(src, src.value)
                     else

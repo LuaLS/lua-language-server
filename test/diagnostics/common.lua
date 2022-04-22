@@ -930,8 +930,8 @@ local v
 ---@type Bar
 local v2
 v2 = v -- TODO 这里应该给警告
-v2:method1()
-v2:<!method2!>()
+v2:<!method1!>()
+v2:method2()
 ]]
 
 TEST [[

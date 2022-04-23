@@ -81,17 +81,17 @@ function mt:_compileNarrowByFilter(filter, pos)
             if not loc or not exp then
                 return
             end
-            if exp.type == 'nil' then
+            if guide.isLiteral(exp) then
                 if filter.op.type == '==' then
                     self.steps[#self.steps+1] = {
                         type  = 'remove',
-                        name  = 'nil',
+                        name  = exp.type,
                         pos   = pos,
                         order = 2,
                     }
                     self.steps[#self.steps+1] = {
                         type  = 'as',
-                        name  = 'nil',
+                        name  = exp.type,
                         pos   = pos,
                         order = 4,
                     }
@@ -99,13 +99,13 @@ function mt:_compileNarrowByFilter(filter, pos)
                 if filter.op.type == '~=' then
                     self.steps[#self.steps+1] = {
                         type  = 'as',
-                        name  = 'nil',
+                        name  = exp.type,
                         pos   = pos,
                         order = 2,
                     }
                     self.steps[#self.steps+1] = {
                         type  = 'remove',
-                        name  = 'nil',
+                        name  = exp.type,
                         pos   = pos,
                         order = 4,
                     }
@@ -248,6 +248,42 @@ function mt:_preCompile()
     end)
 end
 
+---@param loc  parser.object
+---@param node vm.node
+---@return vm.node
+local function checkAssert(loc, node)
+    local parent = loc.parent
+    if parent.type == 'binary' then
+        if parent.op and (parent.op.type == '~=' or parent.op.type == '==') then
+            local exp
+            for i = 1, 2 do
+                if parent[i] == loc then
+                    exp = parent[i % 2 + 1]
+                end
+            end
+            if exp and guide.isLiteral(exp) then
+                local callargs = parent.parent
+                if  callargs.type == 'callargs'
+                and callargs.parent.node.special == 'assert'
+                and callargs[1] == parent then
+                    if parent.op.type == '~=' then
+                        node:remove(exp.type)
+                    end
+                    if parent.op.type == '==' then
+                        node = vm.compileNode(exp)
+                    end
+                end
+            end
+        end
+    end
+    if  parent.type == 'callargs'
+    and parent.parent.node.special == 'assert'
+    and parent[1] == loc then
+        node:setTruly()
+    end
+    return node
+end
+
 ---@param callback    fun(src: parser.object, node: vm.node)
 function mt:launch(callback)
     local node = vm.getNode(self.loc):copy()
@@ -267,6 +303,9 @@ function mt:launch(callback)
             node:remove(step.name)
         elseif step.type == 'object' then
             node = callback(step.object, node) or node
+            if step.object.type == 'getlocal' then
+                node = checkAssert(step.object, node)
+            end
         elseif step.type == 'save' then
             -- nothing to do
         elseif step.type == 'load' then

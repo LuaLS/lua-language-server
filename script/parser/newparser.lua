@@ -117,6 +117,7 @@ local Specials = {
     ['xpcall']       = true,
     ['pairs']        = true,
     ['ipairs']       = true,
+    ['assert']       = true,
 }
 
 local UnarySymbol = {

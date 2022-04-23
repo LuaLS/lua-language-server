@@ -1919,3 +1919,29 @@ local <?x?> = t[1]
 TEST 'unknown' [[
 local <?x?> = y and z
 ]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+assert(x)
+
+print(<?x?>)
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+assert(x ~= nil)
+
+print(<?x?>)
+]]
+
+TEST 'integer' [[
+local x
+
+assert(x == 1)
+
+print(<?x?>)
+]]

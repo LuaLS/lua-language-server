@@ -156,7 +156,6 @@ function mt:_compileBlock(block)
                 tag   = 'out',
                 copy  = true,
                 pos   = block.start,
-                order = 1,
             }
             self.steps[#self.steps+1] = outStep
             local blockStep = {
@@ -165,7 +164,6 @@ function mt:_compileBlock(block)
                 copy  = true,
                 ref   = outStep,
                 pos   = childBlock.start,
-                order = 2,
             }
             self.steps[#self.steps+1] = blockStep
             self:_compileNarrowByFilter(childBlock.filter, outStep, blockStep)
@@ -177,7 +175,6 @@ function mt:_compileBlock(block)
                 tag    = 'final',
                 ref1   = outStep,
                 pos    = childBlock.finish,
-                order  = 1,
             }
         end
         for i, final in ipairs(finals) do
@@ -185,7 +182,6 @@ function mt:_compileBlock(block)
                 type  = 'merge',
                 ref2  = final,
                 pos   = block.finish,
-                order = i,
             }
         end
     end
@@ -194,13 +190,11 @@ function mt:_compileBlock(block)
         self.steps[#self.steps+1] = {
             type  = 'load',
             pos   = block.start,
-            order = 1,
         }
         local savePoint = {
             type  = 'save',
             copy  = true,
             pos   = block.start,
-            order = 2,
         }
         self.steps[#self.steps+1] = savePoint
         self.steps[#self.steps+1] = {
@@ -220,6 +214,11 @@ function mt:_preCompile()
         }
         local block = guide.getParentBlock(ref)
         self:_compileBlock(block)
+    end
+    for i, step in ipairs(self.steps) do
+        if step.type ~= 'object' then
+            step.order = i
+        end
     end
     table.sort(self.steps, function (a, b)
         if a.pos == b.pos then

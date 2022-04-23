@@ -3606,6 +3606,15 @@ local function parseBreak()
             break
         end
     end
+    for i = #Chunk, 1, -1 do
+        local chunk = Chunk[i]
+        if chunk.type == 'ifblock'
+        or chunk.type == 'elseifblock'
+        or chunk.type == 'elseblock' then
+            chunk.hasBreak = true
+            break
+        end
+    end
     if not ok and Mode == 'Lua' then
         pushError {
             type   = 'BREAK_OUTSIDE',

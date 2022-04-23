@@ -2023,3 +2023,28 @@ end
 
 print(<?x?>)
 ]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+while true do
+    if not x then
+        break
+    end
+    print(<?x?>)
+end
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+while true do
+    if not x then
+        break
+    end
+end
+
+print(<?x?>)
+]]

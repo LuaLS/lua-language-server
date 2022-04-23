@@ -193,7 +193,8 @@ function mt:_compileBlock(block)
             self.steps[#self.steps+1] = blockStep
             self:_compileNarrowByFilter(childBlock.filter, outStep, blockStep)
             if  not childBlock.hasReturn
-            and not childBlock.hasGoTo then
+            and not childBlock.hasGoTo
+            and not childBlock.hasBreak then
                 finals[#finals+1] = blockStep
             end
             self.steps[#self.steps+1] = {
@@ -212,7 +213,12 @@ function mt:_compileBlock(block)
         end
     end
 
-    if block.type == 'function' then
+    if block.type == 'function'
+    or block.type == 'while'
+    or block.type == 'loop'
+    or block.type == 'in'
+    or block.type == 'repeat'
+    or block.type == 'for' then
         self.steps[#self.steps+1] = {
             type  = 'load',
             pos   = block.start,

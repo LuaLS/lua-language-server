@@ -59,6 +59,7 @@ local type         = type
 ---@field filter                parser.object
 ---@field hasGoTo?              true
 ---@field hasReturn?            true
+---@field hasBreak?             true
 ---@field _root                 parser.object
 
 ---@class guide

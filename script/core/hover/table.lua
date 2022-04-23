@@ -128,6 +128,19 @@ local function getKeyMap(fields)
             if ta == 'boolean' then
                 return a == true
             end
+            if ta == 'string' then
+                if a:sub(1, 1) == '_' then
+                    if b:sub(1, 1) == '_' then
+                        return a < b
+                    else
+                        return false
+                    end
+                elseif b:sub(1, 1) == '_' then
+                    return true
+                else
+                    return a < b
+                end
+            end
             return a < b
         else
             return tsa < tsb

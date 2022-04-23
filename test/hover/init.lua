@@ -504,10 +504,10 @@ local <?self?> = setmetatable({
 ]]
 [[
 local self: {
-    __index: table,
-    __name: string = "obj",
     id: integer = 1,
     remove: function,
+    __index: table,
+    __name: string = "obj",
 }
 ]]
 
@@ -790,8 +790,6 @@ TEST [[
 ]]
 [[
 (global) _G: _G {
-    _G: _G,
-    _VERSION: string = "Lua 5.4",
     arg: string[],
     assert: function,
     collectgarbage: function,
@@ -810,6 +808,8 @@ TEST [[
     module: function,
     newproxy: function,
     next: function,
+    os: oslib,
+    package: packagelib,
     ...(+22)
 }
 ]]
@@ -1847,6 +1847,23 @@ local x: {
     a: integer = 1,
     b: integer = 2,
     [1]: integer = 10,
+}
+]]
+
+TEST [[
+local <?x?> = {
+    _x = '',
+    _y = '',
+    x  = '',
+    y  = '',
+}
+]]
+[[
+local x: {
+    x: string = "",
+    y: string = "",
+    _x: string = "",
+    _y: string = "",
 }
 ]]
 

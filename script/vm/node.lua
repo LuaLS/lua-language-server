@@ -71,7 +71,7 @@ function mt:addOptional()
 end
 
 function mt:removeOptional()
-    self.optional = false
+    self:remove 'nil'
 end
 
 ---@return boolean
@@ -187,6 +187,9 @@ end
 
 ---@param name string
 function mt:remove(name)
+    if name == 'nil' and self.optional == true then
+        self.optional = nil
+    end
     local index = 0
     while true do
         index = index + 1

@@ -16,7 +16,7 @@ mt.index = 1
 ---@field _hasSorted boolean
 
 ---@class vm.runner.step
----@field type    'truly' | 'falsy' | 'add' | 'remove' | 'object' | 'save' | 'load' | 'merge'
+---@field type    'truly' | 'falsy' | 'as' | 'add' | 'remove' | 'object' | 'save' | 'load' | 'merge'
 ---@field pos     integer
 ---@field order?  integer
 ---@field node?   vm.node
@@ -39,9 +39,13 @@ function mt:_compileNarrowByFilter(filter, pos)
         return
     end
     if filter.type == 'unary' then
-        if filter.op and filter.op.type == 'not' then
+        if not filter.op
+        or not filter[1] then
+            return
+        end
+        if filter.op.type == 'not' then
             local exp = filter[1]
-            if exp and exp.type == 'getlocal' and exp.node == self.loc then
+            if exp.type == 'getlocal' and exp.node == self.loc then
                 self.steps[#self.steps+1] = {
                     type  = 'truly',
                     pos   = pos,
@@ -55,6 +59,59 @@ function mt:_compileNarrowByFilter(filter, pos)
             end
         end
     elseif filter.type == 'binary' then
+        if not filter.op
+        or not filter[1]
+        or not filter[2] then
+            return
+        end
+        if filter.op.type == 'and' then
+            self:_compileNarrowByFilter(filter[1], pos)
+            self:_compileNarrowByFilter(filter[2], pos)
+        end
+        if filter.op.type == '=='
+        or filter.op.type == '~=' then
+            local loc, exp
+            for i = 1, 2 do
+                loc = filter[i]
+                if loc.type == 'getlocal' and loc.node == self.loc then
+                    exp = filter[i % 2 + 1]
+                    break
+                end
+            end
+            if not loc then
+                return
+            end
+            if exp.type == 'nil' then
+                if filter.op.type == '==' then
+                    self.steps[#self.steps+1] = {
+                        type  = 'remove',
+                        name  = 'nil',
+                        pos   = pos,
+                        order = 2,
+                    }
+                    self.steps[#self.steps+1] = {
+                        type  = 'as',
+                        name  = 'nil',
+                        pos   = pos,
+                        order = 4,
+                    }
+                end
+                if filter.op.type == '~=' then
+                    self.steps[#self.steps+1] = {
+                        type  = 'as',
+                        name  = 'nil',
+                        pos   = pos,
+                        order = 2,
+                    }
+                    self.steps[#self.steps+1] = {
+                        type  = 'remove',
+                        name  = 'nil',
+                        pos   = pos,
+                        order = 4,
+                    }
+                end
+            end
+        end
     else
         if filter.type == 'getlocal' and filter.node == self.loc then
             self.steps[#self.steps+1] = {
@@ -193,6 +250,8 @@ function mt:launch(callback)
             node:setTruly()
         elseif step.type == 'falsy' then
             node:setFalsy()
+        elseif step.type == 'as' then
+            node = vm.createNode(globalMgr.getGlobal('type', step.name))
         elseif step.type == 'add' then
             node:merge(globalMgr.getGlobal('type', step.name))
         elseif step.type == 'remove' then

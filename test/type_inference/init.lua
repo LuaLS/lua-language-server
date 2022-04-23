@@ -1780,6 +1780,59 @@ end
 print(<?x?>)
 ]]
 
+TEST 'integer' [[
+---@type integer?
+local x
+
+if xxx and x then
+    print(<?x?>)
+end
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+if x ~= nil then
+    print(<?x?>)
+end
+
+print(x)
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+if x ~= nil then
+    print(x)
+end
+
+print(<?x?>)
+]]
+
+TEST 'nil' [[
+---@type integer?
+local x
+
+if x == nil then
+    print(<?x?>)
+end
+
+print(x)
+]]
+
+TEST 'integer|nil' [[
+---@type integer?
+local x
+
+if x == nil then
+    print(x)
+end
+
+print(<?x?>)
+]]
+
 TEST 'integer' [=[
 local x
 

@@ -10,6 +10,7 @@ vm.nodeCache = {}
 ---@field [integer] vm.object
 local mt = {}
 mt.__index    = mt
+mt.id         = 0
 mt.type       = 'vm.node'
 mt.optional   = nil
 mt.lastInfer  = nil
@@ -273,11 +274,16 @@ function vm.clearNodeCache()
     vm.nodeCache = {}
 end
 
+local ID = 0
+
 ---@param a? vm.node | vm.object
 ---@param b? vm.node | vm.object
 ---@return vm.node
 function vm.createNode(a, b)
-    local node = setmetatable({}, mt)
+    ID = ID + 1
+    local node = setmetatable({
+        id = ID,
+    }, mt)
     if a then
         node:merge(a)
     end

@@ -1965,3 +1965,50 @@ local x
 if not x or <?x?> then
 end
 ]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+if not x or XXX then
+    print(<?x?>)
+end
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+if x or XXX then
+    print(<?x?>)
+end
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+if XXX or x then
+    print(<?x?>)
+end
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+if XXX or not x then
+    print(<?x?>)
+end
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+if not x or XXX then
+    return
+end
+
+print(<?x?>)
+]]

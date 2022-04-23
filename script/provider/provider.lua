@@ -260,6 +260,10 @@ m.register 'textDocument/didChange' {
     ---@async
     function (params)
         local doc     = params.textDocument
+        local scheme = furi.split(doc.uri)
+        if scheme ~= 'file' then
+            return
+        end
         local changes = params.contentChanges
         local uri     = files.getRealUri(doc.uri)
         workspace.awaitReady(uri)

@@ -1855,6 +1855,17 @@ end
 print(<?x?>)
 ]]
 
+TEST 'integer' [[
+---@type integer?
+local x
+
+if not x then
+    goto ANYWHERE
+end
+
+print(<?x?>)
+]]
+
 TEST 'integer' [=[
 local x
 

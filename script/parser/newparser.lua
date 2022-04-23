@@ -2963,10 +2963,7 @@ local function parseReturn()
         if block.type == 'ifblock'
         or block.type == 'elseifblock'
         or block.type == 'else' then
-            if not block.returns then
-                block.returns = {}
-            end
-            block.returns[#block.returns+1] = rtn
+            block.hasReturn = true
             break
         end
     end
@@ -3063,6 +3060,15 @@ local function parseGoTo()
                 chunk.gotos = {}
             end
             chunk.gotos[#chunk.gotos+1] = action
+            break
+        end
+    end
+    for i = #Chunk, 1, -1 do
+        local chunk = Chunk[i]
+        if chunk.type == 'ifblock'
+        or chunk.type == 'elseifblock'
+        or chunk.type == 'elseblock' then
+            chunk.hasGoTo = true
             break
         end
     end

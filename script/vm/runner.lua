@@ -192,7 +192,8 @@ function mt:_compileBlock(block)
             }
             self.steps[#self.steps+1] = blockStep
             self:_compileNarrowByFilter(childBlock.filter, outStep, blockStep)
-            if not childBlock.returns then
+            if  not childBlock.hasReturn
+            and not childBlock.hasGoTo then
                 finals[#finals+1] = blockStep
             end
             self.steps[#self.steps+1] = {

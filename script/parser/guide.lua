@@ -57,6 +57,8 @@ local type         = type
 ---@field step                  parser.object
 ---@field redundant             { max: integer, passed: integer }
 ---@field filter                parser.object
+---@field hasGoTo?              true
+---@field hasReturn?            true
 ---@field _root                 parser.object
 
 ---@class guide
@@ -416,6 +418,7 @@ function m.getUri(obj)
     return ''
 end
 
+---@return parser.object
 function m.getENV(source, start)
     if not start then
         start = 1

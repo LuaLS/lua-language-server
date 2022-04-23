@@ -1228,6 +1228,9 @@ local compilerSwitch = util.switch()
             for i, loc in ipairs(source.keys) do
                 local node = getReturn(source._iterator, i, source._iterArgs)
                 if node then
+                    if i == 1 then
+                        node:removeOptional()
+                    end
                     vm.setNode(loc, node)
                 end
             end

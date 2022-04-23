@@ -2048,3 +2048,11 @@ end
 
 print(<?x?>)
 ]]
+
+TEST 'integer' [[
+---@type fun():integer?
+local iter
+
+for <?x?> in iter do
+end
+]]

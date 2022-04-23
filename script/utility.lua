@@ -315,8 +315,8 @@ function m.saveFile(path, content)
 end
 
 --- 计数器
----@param init integer {optional = 'after'}
----@param step integer {optional = 'after'}
+---@param init? integer
+---@param step? integer
 ---@return fun():integer
 function m.counter(init, step)
     if not step then

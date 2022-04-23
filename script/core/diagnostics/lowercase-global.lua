@@ -30,7 +30,7 @@ return function (uri, callback)
 
     guide.eachSourceType(ast.ast, 'setglobal', function (source)
         local name = guide.getKeyName(source)
-        if definedGlobal[name] then
+        if not name or definedGlobal[name] then
             return
         end
         local first = name:match '%w'

@@ -41,6 +41,9 @@ end
 ---@async
 local function makeOneSignature(source, oop, index)
     local label = hoverLabel(source, oop)
+    if not label then
+        return nil
+    end
     -- 去掉返回值
     label = label:gsub('%s*->.+', '')
     local params = {}

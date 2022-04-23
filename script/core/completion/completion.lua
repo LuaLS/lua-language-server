@@ -1876,6 +1876,9 @@ local function tryComment(state, position, results)
     local doc  = getluaDoc(state, position)
     if not word then
         local comment = getComment(state, position)
+        if not comment then
+            return
+        end
         if comment.type == 'comment.short'
         or comment.type == 'comment.cshort' then
             if comment.text == '' then

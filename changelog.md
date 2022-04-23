@@ -26,6 +26,7 @@
 * `NEW` generic: resolve `T[]` by `table<integer, type>` or `---@field [integer] type`
 * `NEW` resolve `class[1]` by `---@field [integer] type`
 * `NEW` diagnostic: `missing-parameter`
+* `NEW` diagnostic: `need-check-nil`
 * `CHG` diagnostic: no longer mark `redundant-parameter` as `Unnecessary`
 * `FIX` diagnostic: `unused-function` does not recognize recursion
 * `FIX` [#1051](https://github.com/sumneko/lua-language-server/issues/1051)

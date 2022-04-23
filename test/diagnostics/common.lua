@@ -1460,3 +1460,37 @@ end
 
 <!T:ff!>()
 ]]
+
+TEST [[
+---@type string?
+local x
+
+S = <!x!>:upper()
+]]
+
+TEST [[
+---@type string?
+local x
+
+if x then
+    S = x:upper()
+end
+]]
+
+TEST [[
+---@type string?
+local x
+
+if not x then
+    x = ''
+end
+
+S = x:upper()
+]]
+
+TEST [[
+---@type fun()?
+local x
+
+S = <!x!>()
+]]

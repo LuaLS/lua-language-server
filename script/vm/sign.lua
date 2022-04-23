@@ -128,7 +128,7 @@ function mt:resolve(uri, args, removeGeneric)
     local function buildArgNode(argNode, knownTypes)
         local newArgNode = vm.createNode()
         for n in argNode:eachObject() do
-            if argNode:isFalsy() then
+            if argNode:hasFalsy() then
                 goto CONTINUE
             end
             local view = infer.viewObject(n)

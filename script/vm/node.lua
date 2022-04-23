@@ -80,7 +80,7 @@ function mt:isOptional()
 end
 
 ---@return boolean
-function mt:isFalsy()
+function mt:hasFalsy()
     if self.optional then
         return true
     end

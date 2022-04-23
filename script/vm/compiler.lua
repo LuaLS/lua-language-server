@@ -1435,9 +1435,8 @@ local compilerSwitch = util.switch()
             elseif r1 == false then
                 vm.setNode(source, node1)
             else
-                vm.getNode(source):merge(node1)
-                vm.getNode(source):setTruly()
                 vm.getNode(source):merge(node2)
+                vm.getNode(source):addOptional()
             end
         end
         if source.op.type == 'or' then

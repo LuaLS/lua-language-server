@@ -9,10 +9,10 @@ m.DiagnosticSeverity = {
 }
 
 ---@alias DiagnosticDefaultSeverity
----| '"Hint"'
----| '"Information"'
----| '"Warning"'
----| '"Error"'
+---| 'Hint'
+---| 'Information'
+---| 'Warning'
+---| 'Error'
 
 --- 诊断类型与默认等级
 ---@type table<string, DiagnosticDefaultSeverity>
@@ -48,6 +48,7 @@ m.DiagnosticDefaultSeverity = {
     ['await-in-sync']           = 'Warning',
     ['not-yieldable']           = 'Warning',
     ['discard-returns']         = 'Warning',
+    ['need-check-nil']          = 'Warning',
     ['type-check']              = 'Warning',
 
     ['duplicate-doc-alias']     = 'Warning',
@@ -64,9 +65,9 @@ m.DiagnosticDefaultSeverity = {
 }
 
 ---@alias DiagnosticDefaultNeededFileStatus
----| '"Any"'
----| '"Opened"'
----| '"None"'
+---| 'Any'
+---| 'Opened'
+---| 'None'
 
 -- 文件状态
 m.FileStatus = {
@@ -108,6 +109,7 @@ m.DiagnosticDefaultNeededFileStatus = {
     ['await-in-sync']           = 'None',
     ['not-yieldable']           = 'None',
     ['discard-returns']         = 'Opened',
+    ['need-check-nil']          = 'Opened',
     ['type-check']              = 'None',
 
     ['duplicate-doc-alias']     = 'Any',

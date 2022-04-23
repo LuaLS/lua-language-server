@@ -976,6 +976,14 @@ local compilerSwitch = util.switch()
         local runner = vm.createRunner(source)
         runner:launch(function (src, node)
             if src.type == 'setlocal' then
+                if src.bindDocs then
+                    for _, doc in ipairs(src.bindDocs) do
+                        if doc.type == 'doc.type' then
+                            vm.setNode(src, vm.compileNode(doc), true)
+                            return
+                        end
+                    end
+                end
                 if src.value and guide.isLiteral(src.value) then
                     if src.value.type == 'table' then
                         vm.setNode(src, vm.createNode(src.value), true)
@@ -1260,6 +1268,9 @@ local compilerSwitch = util.switch()
         local uri = guide.getUri(source)
         vm.setNode(source, source)
         local global = globalMgr.getGlobal('type', source.node[1])
+        if not global then
+            return
+        end
         for _, set in ipairs(global:getSets(uri)) do
             if set.type == 'doc.class' then
                 if set.extends then

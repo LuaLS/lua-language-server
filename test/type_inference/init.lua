@@ -2056,3 +2056,10 @@ local iter
 for <?x?> in iter do
 end
 ]]
+
+TEST 'integer' [[
+local x
+
+---@type integer
+<?x?> = XXX
+]]

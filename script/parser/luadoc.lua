@@ -1390,6 +1390,7 @@ local function bindDocsBetween(sources, binded, bindSources, start, finish)
             if src.start >= start then
                 if src.type == 'local'
                 or src.type == 'self'
+                or src.type == 'setlocal'
                 or src.type == 'setglobal'
                 or src.type == 'tablefield'
                 or src.type == 'tableindex'

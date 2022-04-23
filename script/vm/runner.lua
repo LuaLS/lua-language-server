@@ -78,7 +78,7 @@ function mt:_compileNarrowByFilter(filter, pos)
                     break
                 end
             end
-            if not loc then
+            if not loc or not exp then
                 return
             end
             if exp.type == 'nil' then

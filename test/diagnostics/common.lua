@@ -260,6 +260,15 @@ end
 TEST [[
 ---@param a integer
 ---@param b integer
+local function x(a, b)
+    return a, b
+end
+<!x()!>
+]]
+
+TEST [[
+---@param a integer
+---@param b integer
 ---@param ... integer
 local function x(a, b, ...)
     return a, b, ...
@@ -468,7 +477,7 @@ f(1, 2, 3)
 ]]
 
 TEST [[
-local _ = <!unpack!>()
+local _ = <!unpack!>
 ]]
 
 TEST [[
@@ -763,7 +772,9 @@ TEST [[
 local function f(x, y)
     return x, y
 end
-f()
+
+local _
+f(_, _)
 ]]
 
 TEST [[
@@ -796,7 +807,7 @@ TEST [[
 TEST [[
 ---@type fun(a: integer)
 local f
-f()
+f(1)
 ]]
 
 TEST [[
@@ -923,7 +934,7 @@ TEST [[
 local mt
 function mt:method1()
     mt.<!method2!>() -- doc.class
-    self.method1()
+    self:method1()
     return self.<!method2!>() -- doc.class.name
 end
 ]]
@@ -1033,7 +1044,7 @@ return m
 TEST [[
 local m = {}
 
-m.x = io.open()
+m.x = io.open('')
 m.x = nil
 
 return m

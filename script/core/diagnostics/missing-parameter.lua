@@ -51,9 +51,6 @@ return function (uri, callback)
 
     guide.eachSourceType(state.ast, 'call', function (source)
         local callArgs = countCallArgs(source)
-        if callArgs == 0 then
-            return
-        end
 
         local func = source.node
         local funcArgs = getFuncArgs(func)

@@ -27,6 +27,9 @@ function vm.isMetaFile(uri)
         return false
     end
     local cache = files.getCache(uri)
+    if not cache then
+        return false
+    end
     if cache.isMeta ~= nil then
         return cache.isMeta
     end
@@ -332,6 +335,9 @@ function vm.isDiagDisabledAt(uri, position, name)
         return false
     end
     local cache = files.getCache(uri)
+    if not cache then
+        return false
+    end
     if not cache.diagnosticRanges then
         cache.diagnosticRanges = {}
         for _, doc in ipairs(status.ast.docs) do

@@ -3,7 +3,7 @@ local files       = require 'files'
 local autoRequire = require 'core.command.autoRequire'
 local client      = require 'client'
 
-local findInsertRow = util.getUpvalue(autoRequire, 'findInsertRow')
+local findInsertRow    = util.getUpvalue(autoRequire, 'findInsertRow')
 local applyAutoRequire = util.getUpvalue(autoRequire, 'applyAutoRequire')
 
 local originEditText = client.editText

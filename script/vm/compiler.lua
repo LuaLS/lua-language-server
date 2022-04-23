@@ -980,7 +980,7 @@ local compilerSwitch = util.switch()
                     for _, doc in ipairs(src.bindDocs) do
                         if doc.type == 'doc.type' then
                             vm.setNode(src, vm.compileNode(doc), true)
-                            return
+                            return vm.getNode(src)
                         end
                     end
                 end
@@ -1773,6 +1773,7 @@ local function compileByGlobal(source)
         vm.setNode(source, globalNode, true)
         return
     end
+    ---@type vm.node
     globalNode = vm.createNode(global)
     vm.setNode(root._globalBase[name], globalNode, true)
     vm.setNode(source, globalNode, true)

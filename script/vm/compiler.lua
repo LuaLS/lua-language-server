@@ -985,8 +985,7 @@ local compilerSwitch = util.switch()
                 elseif src.value
                 and    src.value.type == 'binary'
                 and    src.value.op and src.value.op.type == 'or'
-                and    src.value[1] and src.value[1].type == 'getlocal' and src.value[1].node == source
-                and    src.value[2] and guide.isLiteral(src.value[2]) then
+                and    src.value[1] and src.value[1].type == 'getlocal' and src.value[1].node == source then
                     -- x = x or 1
                     vm.setNode(src, vm.compileNode(src.value))
                 else

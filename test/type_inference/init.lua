@@ -1841,6 +1841,13 @@ TEST 'integer' [[
 ---@type integer?
 local x
 
+<?x?> = x or y
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
 if not x then
     return
 end
@@ -1947,6 +1954,6 @@ TEST 'integer' [[
 ---@type integer?
 local x
 
-if x and <?x?>.y then
+if x and <?x?> then
 end
 ]]

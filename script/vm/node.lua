@@ -114,7 +114,7 @@ function mt:isNullable()
 end
 
 ---@return vm.node
-function mt:setTruly()
+function mt:setTruthy()
     if self.optional == true then
         self.optional = nil
     end

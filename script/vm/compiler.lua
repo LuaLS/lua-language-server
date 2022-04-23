@@ -1447,7 +1447,7 @@ local compilerSwitch = util.switch()
                 vm.setNode(source, node2)
             else
                 vm.getNode(source):merge(node1)
-                vm.getNode(source):setTruly()
+                vm.getNode(source):setTruthy()
                 vm.getNode(source):merge(node2)
             end
         end

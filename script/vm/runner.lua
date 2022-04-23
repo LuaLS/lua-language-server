@@ -16,7 +16,7 @@ mt.index = 1
 ---@field _hasSorted boolean
 
 ---@class vm.runner.step
----@field type    'truly' | 'falsy' | 'as' | 'add' | 'remove' | 'object' | 'save' | 'load' | 'merge'
+---@field type    'truthy' | 'falsy' | 'as' | 'add' | 'remove' | 'object' | 'save' | 'load' | 'merge'
 ---@field pos     integer
 ---@field order?  integer
 ---@field node?   vm.node
@@ -49,7 +49,7 @@ function mt:_compileNarrowByFilter(filter, outStep, blockStep)
             local exp = filter[1]
             if exp.type == 'getlocal' and exp.node == self.loc then
                 self.steps[#self.steps+1] = {
-                    type  = 'truly',
+                    type  = 'truthy',
                     pos   = filter.finish,
                     ref1  = outStep,
                 }
@@ -125,7 +125,7 @@ function mt:_compileNarrowByFilter(filter, outStep, blockStep)
                 ref1  = outStep,
             }
             self.steps[#self.steps+1] = {
-                type  = 'truly',
+                type  = 'truthy',
                 copy  = true,
                 pos   = filter.finish,
                 ref1  = blockStep,
@@ -261,7 +261,7 @@ local function checkAssert(loc, node)
     if  parent.type == 'callargs'
     and parent.parent.node.special == 'assert'
     and parent[1] == loc then
-        node:setTruly()
+        node:setTruthy()
     end
     return node
 end
@@ -281,8 +281,8 @@ function mt:launch(callback)
                 context.node = node
             end
         end
-        if     step.type == 'truly' then
-            node:setTruly()
+        if     step.type == 'truthy' then
+            node:setTruthy()
         elseif step.type == 'falsy' then
             node:setFalsy()
         elseif step.type == 'as' then

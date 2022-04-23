@@ -1744,18 +1744,15 @@ end
 ]]
 --[[
 #0 integer?
-save 1 #1 integer? --ifblock --block中的初始状态
-save 2 #2 integer? --ifblock --block外的状态
-save 3 #3 integer? --ifblock --filter的状态
-object get #3 integer? --if x then
-load 2 #2 integer? --ifblock
-falsy 2 #2 ? --ifblock
-load 1 #1 integer? --ifblock
-truly #1 integer --ifblock
-object get #1 integer --print(x)
-save 4 #?(1) integer --block中的最终状态
-load 2 #2 ? --ifblock -- block
-merge 4 #2 --if 最终状态
+save 1 #1 integer? --ifblock --block外的状态
+load 2 #2 integer? --ifblock --block中的初始状态
+object get #2 integer? --if x then
+truly 2 #2 integer --ifblock
+falsy 1 #1 ?
+object get #2 integer --print(x)
+save 3 #?(2) integer --block中的最终状态
+load 1 #2 ? --ifblock -- block
+merge 3 #2 --if 最终状态
 ]]
 
 TEST 'integer?' [[
@@ -1800,7 +1797,7 @@ end
 print(x)
 ]]
 
-TEST 'integer?' [[
+TEST 'integer|nil' [[
 ---@type integer?
 local x
 
@@ -1944,4 +1941,12 @@ local x
 assert(x == 1)
 
 print(<?x?>)
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+if x and <?x?>.y then
+end
 ]]

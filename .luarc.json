@@ -10,6 +10,7 @@
             "discard-returns": "Any",
             "redundant-parameter": "Any",
             "missing-parameter": "Any",
+            "need-check-nil": "Any",
             "redundant-value": "Any",
             "deprecated": "Any"
         },

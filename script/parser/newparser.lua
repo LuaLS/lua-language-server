@@ -2947,13 +2947,25 @@ local function parseReturn()
     end
     pushActionIntoCurrentChunk(rtn)
     for i = #Chunk, 1, -1 do
-        local func = Chunk[i]
-        if func.type == 'function'
-        or func.type == 'main' then
-            if not func.returns then
-                func.returns = {}
+        local block = Chunk[i]
+        if block.type == 'function'
+        or block.type == 'main' then
+            if not block.returns then
+                block.returns = {}
             end
-            func.returns[#func.returns+1] = rtn
+            block.returns[#block.returns+1] = rtn
+            break
+        end
+    end
+    for i = #Chunk, 1, -1 do
+        local block = Chunk[i]
+        if block.type == 'ifblock'
+        or block.type == 'elseifblock'
+        or block.type == 'else' then
+            if not block.returns then
+                block.returns = {}
+            end
+            block.returns[#block.returns+1] = rtn
             break
         end
     end

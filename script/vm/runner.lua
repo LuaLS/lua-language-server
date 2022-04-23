@@ -180,19 +180,28 @@ function mt:_compileBlock(block)
                     order = 3,
                 }
                 self:_compileNarrowByFilter(childBlock.filter, childBlock[1].start - 1)
-                local finalState = {
-                    type  = 'save',
-                    pos   = childBlock.finish,
-                    order = 1,
-                }
-                finals[#finals+1] = finalState
-                self.steps[#self.steps+1] = finalState
-                self.steps[#self.steps+1] = {
-                    type   = 'load',
-                    ref1   = outState,
-                    pos    = childBlock.finish,
-                    order  = 2,
-                }
+                if childBlock.returns then
+                    self.steps[#self.steps+1] = {
+                        type   = 'load',
+                        ref1   = outState,
+                        pos    = childBlock.finish,
+                        order  = 1,
+                    }
+                else
+                    local finalState = {
+                        type  = 'save',
+                        pos   = childBlock.finish,
+                        order = 1,
+                    }
+                    finals[#finals+1] = finalState
+                    self.steps[#self.steps+1] = finalState
+                    self.steps[#self.steps+1] = {
+                        type   = 'load',
+                        ref1   = outState,
+                        pos    = childBlock.finish,
+                        order  = 2,
+                    }
+                end
             end
         end
         for i, final in ipairs(finals) do

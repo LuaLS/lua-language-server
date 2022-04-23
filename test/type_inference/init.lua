@@ -1957,3 +1957,11 @@ local x
 if x and <?x?> then
 end
 ]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+if not x or <?x?> then
+end
+]]

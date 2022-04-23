@@ -71,6 +71,38 @@ function mt:_compileNarrowByFilter(filter, outStep, blockStep)
             self:_compileNarrowByFilter(filter[1], outStep, blockStep)
             self:_compileNarrowByFilter(filter[2], outStep, blockStep)
         end
+        if filter.op.type == 'or' then
+            local orRightStep = {
+                type  = 'load',
+                tag   = 'orRight',
+                copy  = true,
+                ref1  = outStep,
+                pos   = filter.start - 1,
+            }
+            local orLeftStep = {
+                type  = 'load',
+                tag   = 'orLeft',
+                copy  = true,
+                ref1  = outStep,
+                pos   = filter.start - 1,
+            }
+            self.steps[#self.steps+1] = orRightStep
+            self.steps[#self.steps+1] = orLeftStep
+            self:_compileNarrowByFilter(filter[1], orRightStep, orLeftStep)
+            self.steps[#self.steps+1] = {
+                type  = 'load',
+                tag   = 'orReset',
+                ref1  = orRightStep,
+                pos   = filter.op.start
+            }
+            self:_compileNarrowByFilter(filter[2], orLeftStep, orRightStep)
+            self.steps[#self.steps+1] = {
+                type  = 'load',
+                tag   = 'reset',
+                ref1  = blockStep,
+                pos   = filter.finish
+            }
+        end
         if filter.op.type == '=='
         or filter.op.type == '~=' then
             local loc, exp
@@ -162,7 +194,6 @@ function mt:_compileBlock(block)
                 type  = 'load',
                 tag   = 'block',
                 copy  = true,
-                ref   = outStep,
                 pos   = childBlock.start,
             }
             self.steps[#self.steps+1] = blockStep
@@ -308,8 +339,12 @@ function mt:launch(callback)
         elseif step.type == 'save' then
             step.node = node
         elseif step.type == 'load' then
+            if step.ref1 then
+                step.node = step.ref1.node
+            else
+                step.node = node
+            end
             context = step
-            context.node = node
         elseif step.type == 'merge' then
             node:merge(step.ref2.node)
         end

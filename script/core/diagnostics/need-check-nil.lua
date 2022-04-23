@@ -32,7 +32,7 @@ return function (uri, callback)
             callback {
                 start   = src.start,
                 finish  = src.finish,
-                message = lang.script('DIAG_MISS_NEED_CHECK_NIL'),
+                message = lang.script('DIAG_NEED_CHECK_NIL'),
             }
         end
     end)

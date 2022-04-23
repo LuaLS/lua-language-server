@@ -1915,3 +1915,7 @@ local t
 
 local <?x?> = t[1]
 ]]
+
+TEST 'unknown' [[
+local <?x?> = y and z
+]]

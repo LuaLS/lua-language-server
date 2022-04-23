@@ -294,10 +294,6 @@ function mt:view(default, uri)
         end
     end
 
-    if #array == 0 then
-        return default or 'unknown'
-    end
-
     table.sort(array, function (a, b)
         local sa = inferSorted[a] or 0
         local sb = inferSorted[b] or 0
@@ -311,13 +307,17 @@ function mt:view(default, uri)
     local limit = config.get(uri or self.uri, 'Lua.hover.enumsLimit')
 
     local view
-    if max > limit then
-        view = string.format('%s...(+%d)'
-            , table.concat(array, '|', 1, limit)
-            , max - limit
-        )
+    if #array == 0 then
+        view = default or 'unknown'
     else
-        view = table.concat(array, '|')
+        if max > limit then
+            view = string.format('%s...(+%d)'
+                , table.concat(array, '|', 1, limit)
+                , max - limit
+            )
+        else
+            view = table.concat(array, '|')
+        end
     end
 
     if self.node:isOptional() then

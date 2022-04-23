@@ -1494,3 +1494,10 @@ local x
 
 S = <!x!>()
 ]]
+
+TEST [[
+local x, y
+local z = x and y
+
+print(z.y)
+]]

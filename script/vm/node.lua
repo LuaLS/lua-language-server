@@ -119,27 +119,23 @@ function mt:setTruly()
         self.optional = nil
     end
     local hasBoolean
-    local index = 0
-    while true do
-        index = index + 1
+    for index = #self, 1, -1 do
         local c = self[index]
-        if not c then
-            break
-        end
         if c.type == 'nil'
         or (c.type == 'boolean' and c[1] == false)
         or (c.type == 'doc.type.boolean' and c[1] == false) then
             table.remove(self, index)
             self[c] = nil
-            index = index - 1
+            goto CONTINUE
         end
         if (c.type == 'global' and c.cate == 'type' and c.name == 'boolean')
         or (c.type == 'boolean' or c.type == 'doc.type.boolean') then
             hasBoolean = true
             table.remove(self, index)
             self[c] = nil
-            index = index - 1
+            goto CONTINUE
         end
+        ::CONTINUE::
     end
     if hasBoolean then
         self[#self+1] = {
@@ -155,13 +151,8 @@ function mt:setFalsy()
         self.optional = nil
     end
     local hasBoolean
-    local index = 0
-    while true do
-        index = index + 1
+    for index = #self, 1, -1 do
         local c = self[index]
-        if not c then
-            break
-        end
         if c.type == 'nil'
         or (c.type == 'boolean' and c[1] == true)
         or (c.type == 'doc.type.boolean' and c[1] == true) then
@@ -174,7 +165,6 @@ function mt:setFalsy()
         end
         table.remove(self, index)
         self[c] = nil
-        index = index - 1
         ::CONTINUE::
     end
     if hasBoolean then
@@ -190,13 +180,8 @@ function mt:remove(name)
     if name == 'nil' and self.optional == true then
         self.optional = nil
     end
-    local index = 0
-    while true do
-        index = index + 1
+    for index = #self, 1, -1 do
         local c = self[index]
-        if not c then
-            break
-        end
         if (c.type == 'global' and c.cate == 'type' and c.name == name)
         or (c.type == name)
         or (c.type == 'doc.type.integer'  and (name == 'number' or name == 'integer'))
@@ -206,7 +191,6 @@ function mt:remove(name)
         or (c.type == 'doc.type.function' and name == 'function') then
             table.remove(self, index)
             self[c] = nil
-            index = index - 1
         end
     end
 end

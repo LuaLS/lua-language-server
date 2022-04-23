@@ -982,6 +982,13 @@ local compilerSwitch = util.switch()
                     else
                         vm.setNode(src, vm.compileNode(src.value), true)
                     end
+                elseif src.value
+                and    src.value.type == 'binary'
+                and    src.value.op and src.value.op.type == 'or'
+                and    src.value[1] and src.value[1].type == 'getlocal' and src.value[1].node == source
+                and    src.value[2] and guide.isLiteral(src.value[2]) then
+                    -- x = x or 1
+                    vm.setNode(src, vm.compileNode(src.value))
                 else
                     vm.setNode(src, node, true)
                 end
@@ -1420,28 +1427,32 @@ local compilerSwitch = util.switch()
             return
         end
         if source.op.type == 'and' then
+            local node1 = vm.compileNode(source[1])
+            local node2 = vm.compileNode(source[2])
             local r1 = vm.test(source[1])
             if r1 == true then
-                vm.setNode(source, vm.compileNode(source[2]))
-                return
+                vm.setNode(source, node2)
+            elseif r1 == false then
+                vm.setNode(source, node1)
+            else
+                vm.getNode(source):merge(node1)
+                vm.getNode(source):setTruly()
+                vm.getNode(source):merge(node2)
             end
-            if r1 == false then
-                vm.setNode(source, vm.compileNode(source[1]))
-                return
-            end
-            return
         end
         if source.op.type == 'or' then
+            local node1 = vm.compileNode(source[1])
+            local node2 = vm.compileNode(source[2])
             local r1 = vm.test(source[1])
             if r1 == true then
-                vm.setNode(source, vm.compileNode(source[1]))
-                return
+                vm.setNode(source, node1)
+            elseif r1 == false then
+                vm.setNode(source, node2)
+            else
+                vm.getNode(source):merge(node1)
+                vm.getNode(source):setTruly()
+                vm.getNode(source):merge(node2)
             end
-            if r1 == false then
-                vm.setNode(source, vm.compileNode(source[2]))
-                return
-            end
-            return
         end
         if source.op.type == '==' then
             local result = vm.equal(source[1], source[2])

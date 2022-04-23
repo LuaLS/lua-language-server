@@ -17,7 +17,7 @@ function vm.test(source)
                 hasTrue = true
             end
             if n[1] == false then
-                hasTrue = false
+                hasFalse = true
             end
         end
         if n.type == 'nil' then

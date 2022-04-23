@@ -1833,6 +1833,13 @@ end
 print(<?x?>)
 ]]
 
+TEST 'integer' [[
+---@type integer?
+local x
+
+<?x?> = x or 1
+]]
+
 TEST 'integer' [=[
 local x
 

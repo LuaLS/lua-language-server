@@ -691,9 +691,6 @@ local function parseLocalAttrs()
 end
 
 local function createLocal(obj, attrs)
-    if not obj then
-        return nil
-    end
     obj.type   = 'local'
     obj.effect = obj.finish
 
@@ -2893,7 +2890,11 @@ local function parseLocal()
     pushActionIntoCurrentChunk(loc)
     skipSpace()
     parseMultiVars(loc, parseName, true)
-    loc.effect = lastRightPosition()
+    if loc.value then
+        loc.effect = loc.value.finish
+    else
+        loc.effect = loc.finish
+    end
 
     return loc
 end

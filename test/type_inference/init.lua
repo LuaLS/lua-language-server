@@ -2127,3 +2127,67 @@ for _ = 1, 999 do
     local <?x?>
 end
 ]]
+
+TEST 'integer' [[
+local x
+
+---@cast x integer
+
+print(<?x?>)
+]]
+
+TEST 'unknown' [[
+local x
+
+---@cast x integer
+
+local x
+print(<?x?>)
+]]
+
+TEST 'unknown' [[
+local x
+
+if true then
+    local x
+    ---@cast x integer
+    print(x)
+end
+
+print(<?x?>)
+]]
+
+TEST 'boolean|integer' [[
+local x = 1
+
+---@cast x +boolean
+
+print(<?x?>)
+]]
+
+TEST 'boolean' [[
+---@type integer|boolean
+local x
+
+---@cast x -integer
+
+print(<?x?>)
+]]
+
+TEST 'boolean?' [[
+---@type boolean
+local x
+
+---@cast x +?
+
+print(<?x?>)
+]]
+
+TEST 'boolean' [[
+---@type boolean?
+local x
+
+---@cast x -?
+
+print(<?x?>)
+]]

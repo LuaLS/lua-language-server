@@ -358,6 +358,9 @@ end
 ---@param source parser.object
 function m.compileAst(source)
     local env = guide.getENV(source)
+    if not env then
+        return
+    end
     m.compileObject(env)
     guide.eachSpecialOf(source, 'rawset', function (src)
         m.compileObject(src.parent)

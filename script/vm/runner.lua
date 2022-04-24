@@ -13,15 +13,16 @@ mt.__index = mt
 mt.index = 1
 
 ---@class parser.object
----@field _hasSorted boolean
+---@field _casts parser.object[]
 
 ---@class vm.runner.step
----@field type    'truthy' | 'falsy' | 'as' | 'add' | 'remove' | 'object' | 'save' | 'push' | 'merge'
+---@field type    'truthy' | 'falsy' | 'as' | 'add' | 'remove' | 'object' | 'save' | 'push' | 'merge' | 'cast'
 ---@field pos     integer
 ---@field order?  integer
 ---@field node?   vm.node
 ---@field object? parser.object
 ---@field name?   string
+---@field cast?   parser.object
 ---@field tag?    string
 ---@field copy?   boolean
 ---@field new?    boolean
@@ -250,21 +251,58 @@ function mt:_compileBlock(block)
     end
 end
 
+---@return parser.object[]
+function mt:_getCasts()
+    local root = guide.getRoot(self.loc)
+    if not root._casts then
+        root._casts = {}
+        local docs = root.docs
+        for _, doc in ipairs(docs) do
+            if doc.type == 'doc.cast' and doc.loc then
+                root._casts[#root._casts+1] = doc
+            end
+        end
+    end
+    return root._casts
+end
+
 function mt:_preCompile()
+    local startPos  = self.loc.start
+    local finishPos = 0
+
     for _, ref in ipairs(self.loc.ref) do
         self.steps[#self.steps+1] = {
             type   = 'object',
             object = ref,
             pos    = ref.range or ref.start,
         }
+        if ref.start > finishPos then
+            finishPos = ref.start
+        end
         local block = guide.getParentBlock(ref)
         self:_compileBlock(block)
     end
+
     for i, step in ipairs(self.steps) do
         if step.type ~= 'object' then
             step.order = i
         end
     end
+
+    local casts = self:_getCasts()
+    for _, cast in ipairs(casts) do
+        if  cast.loc[1] == self.loc[1]
+        and cast.start > startPos
+        and cast.finish < finishPos
+        and guide.getLocal(self.loc, self.loc[1], cast.start) == self.loc then
+            self.steps[#self.steps+1] = {
+                type  = 'cast',
+                cast  = cast,
+                pos   = cast.start,
+            }
+        end
+    end
+
     table.sort(self.steps, function (a, b)
         if a.pos == b.pos then
             return (a.order or 0) < (b.order or 0)
@@ -363,6 +401,30 @@ function mt:launch(callback)
             topNode = node
         elseif step.type == 'merge' then
             node:merge(step.ref2.node)
+        elseif step.type == 'cast' then
+            topNode = node:copy()
+            for _, cast in ipairs(step.cast.casts) do
+                if     cast.mode == '+' then
+                    if cast.optional then
+                        topNode:addOptional()
+                    end
+                    if cast.extends then
+                        topNode:merge(vm.compileNode(cast.extends))
+                    end
+                elseif cast.mode == '-' then
+                    if cast.optional then
+                        topNode:removeOptional()
+                    end
+                    if cast.extends then
+                        topNode:removeNode(vm.compileNode(cast.extends))
+                    end
+                else
+                    if cast.extends then
+                        topNode:clear()
+                        topNode:merge(vm.compileNode(cast.extends))
+                    end
+                end
+            end
         end
     end
 end

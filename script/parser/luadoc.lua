@@ -53,6 +53,7 @@ Symbol              <-  ({} {
                         /   '...'
                         /   '['
                         /   ']'
+                        /   '-' !'-'
                         } {})
                     ->  Symbol
 ]], {
@@ -1205,6 +1206,70 @@ local docSwitch = util.switch()
         result.finish = getFinish()
         return result
     end)
+    : case 'cast'
+    : call(function ()
+        local result = {
+            type   = 'doc.cast',
+            start  = getFinish(),
+            finish = getFinish(),
+            casts  = {},
+        }
+
+        local loc = parseName('doc.cast.name', result)
+        if not loc then
+            pushWarning {
+                type   = 'LUADOC_MISS_LOCAL_NAME',
+                start  = getFinish(),
+                finish = getFinish(),
+            }
+            return result
+        end
+
+        result.loc    = loc
+        result.finish = loc.finish
+
+        while true do
+            local block = {
+                type   = 'doc.cast.block',
+                parent = result,
+                start  = getFinish(),
+                finish = getFinish(),
+            }
+            result.casts[#result.casts+1] = block
+            if     checkToken('symbol', '+', 1) then
+                block.mode = '+'
+                nextToken()
+                block.start  = getStart()
+                block.finish = getFinish()
+            elseif checkToken('symbol', '-', 1) then
+                block.mode = '-'
+                nextToken()
+                block.start  = getStart()
+                block.finish = getFinish()
+            end
+
+            if checkToken('symbol', '?', 1) then
+                block.optional = true
+                nextToken()
+                block.start  = block.start or getStart()
+                block.finish = block.finish
+            else
+                block.extends = parseType(block)
+                if block.extends then
+                    block.start  = block.start or block.extends.start
+                    block.finish = block.extends.finish
+                end
+            end
+
+            if checkToken('symbol', ',', 1) then
+                nextToken()
+            else
+                break
+            end
+        end
+
+        return result
+    end)
 
 local function convertTokens()
     local tp, text = nextToken()
@@ -1312,6 +1377,9 @@ local function isNextLine(binded, doc)
         and doc.type ~= 'doc.overload' then
             return false
         end
+    end
+    if doc.type == 'doc.cast' then
+        return false
     end
     local lastRow = guide.rowColOf(lastDoc.finish)
     local newRow  = guide.rowColOf(doc.start)

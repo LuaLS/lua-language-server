@@ -23,6 +23,12 @@
   local x = true
   local y = x--[[@as integer]] -- y is `integer` here
   ```
+* `NEW` add `---@cast`
+  * `---@cast localname type`
+  * `---@cast localname +type`
+  * `---@cast localname -type`
+  * `---@cast localname +?`
+  * `---@cast localname -?`
 * `NEW` generic: resolve `T[]` by `table<integer, type>` or `---@field [integer] type`
 * `NEW` resolve `class[1]` by `---@field [integer] type`
 * `NEW` diagnostic: `missing-parameter`

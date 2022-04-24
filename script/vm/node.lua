@@ -204,6 +204,15 @@ function mt:remove(name)
     end
 end
 
+---@param node vm.node
+function mt:removeNode(node)
+    for _, c in ipairs(node) do
+        if c.type == 'global' and c.cate == 'type' then
+            self:remove(c.name)
+        end
+    end
+end
+
 ---@return fun():vm.object
 function mt:eachObject()
     local i = 0

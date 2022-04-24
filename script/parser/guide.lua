@@ -58,6 +58,10 @@ local type         = type
 ---@field step                  parser.object
 ---@field redundant             { max: integer, passed: integer }
 ---@field filter                parser.object
+---@field loc                   string
+---@field keyword               integer[]
+---@field casts                 parser.object[]
+---@field mode?                 '+' | '-'
 ---@field hasGoTo?              true
 ---@field hasReturn?            true
 ---@field hasBreak?             true
@@ -148,6 +152,8 @@ local childMap = {
     ['doc.version']        = {'#versions'},
     ['doc.diagnostic']     = {'#names'},
     ['doc.as']             = {'as'},
+    ['doc.cast']           = {'loc', '#casts'},
+    ['doc.cast.block']     = {'extends'},
 }
 
 ---@type table<string, fun(obj: parser.object, list: parser.object[])>
@@ -420,7 +426,7 @@ function m.getUri(obj)
     return ''
 end
 
----@return parser.object
+---@return parser.object?
 function m.getENV(source, start)
     if not start then
         start = 1
@@ -454,19 +460,17 @@ function m.getFunctionVarArgs(func)
 end
 
 --- 获取指定区块中可见的局部变量
----@param block table
----@param name string {comment = '变量名'}
----@param pos integer {comment = '可见位置'}
-function m.getLocal(block, name, pos)
-    block = m.getBlock(block)
-    for _ = 1, 10000 do
-        if not block then
-            return nil
-        end
-        local locals = block.locals
-        local res
+---@param source parser.object
+---@param name string # 变量名
+---@param pos integer # 可见位置
+---@return parser.object?
+function m.getLocal(source, name, pos)
+    local root = m.getRoot(source)
+    local res
+    m.eachSourceContain(root, pos, function (src)
+        local locals = src.locals
         if not locals then
-            goto CONTINUE
+            return
         end
         for i = 1, #locals do
             local loc = locals[i]
@@ -479,13 +483,8 @@ function m.getLocal(block, name, pos)
                 end
             end
         end
-        if res then
-            return res, res
-        end
-        ::CONTINUE::
-        block = m.getParentBlock(block)
-    end
-    error('guide.getLocal overstack')
+    end)
+    return res
 end
 
 --- 获取指定区块中所有的可见局部变量名称
@@ -610,6 +609,9 @@ local function addChilds(list, obj)
 end
 
 --- 遍历所有包含position的source
+---@param ast parser.object
+---@param position integer
+---@param callback fun(src: parser.object)
 function m.eachSourceContain(ast, position, callback)
     local list = { ast }
     local mark = {}

@@ -275,6 +275,8 @@ PARSER_LUADOC_MISS_DIAG_MODE            =
 '缺少診斷模式'
 PARSER_LUADOC_ERROR_DIAG_MODE           =
 '診斷模式不正確'
+PARSER_LUADOC_MISS_LOCAL_NAME           = -- TODO: need translate!
+'<local name> expected.'
 
 SYMBOL_ANONYMOUS        =
 '<匿名函式>'

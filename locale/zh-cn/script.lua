@@ -272,9 +272,11 @@ PARSER_LUADOC_MISS_FUN_AFTER_OVERLOAD   =
 PARSER_LUADOC_MISS_CATE_NAME            =
 '缺少文档类型名称。'
 PARSER_LUADOC_MISS_DIAG_MODE            =
-'缺少诊断模式'
+'缺少诊断模式。'
 PARSER_LUADOC_ERROR_DIAG_MODE           =
-'诊断模式不正确'
+'诊断模式不正确。'
+PARSER_LUADOC_MISS_LOCAL_NAME           =
+'缺少变量名。'
 
 SYMBOL_ANONYMOUS        =
 '<匿名函数>'

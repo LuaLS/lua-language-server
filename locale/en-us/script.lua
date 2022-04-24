@@ -275,6 +275,8 @@ PARSER_LUADOC_MISS_DIAG_MODE            =
 '<diagnostic mode> expected.'
 PARSER_LUADOC_ERROR_DIAG_MODE           =
 '<diagnostic mode> incorrect.'
+PARSER_LUADOC_MISS_LOCAL_NAME           =
+'<local name> expected.'
 
 SYMBOL_ANONYMOUS        =
 '<Anonymous>'

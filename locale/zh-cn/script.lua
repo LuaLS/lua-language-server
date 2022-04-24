@@ -96,6 +96,8 @@ DIAG_NOT_YIELDABLE      =
 '此函数的第 {} 个参数没有被标记为可让出，但是传入了异步函数。（使用 `---@param name async fun()` 来标记为可让出）'
 DIAG_DISCARD_RETURNS    =
 '不能丢弃此函数的返回值。'
+DIAG_NEED_CHECK_NIL     =
+'需要判空。'
 DIAG_CIRCLE_DOC_CLASS                 =
 '循环继承的类。'
 DIAG_DOC_FIELD_NO_CLASS               =

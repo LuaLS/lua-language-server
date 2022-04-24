@@ -96,6 +96,8 @@ DIAG_NOT_YIELDABLE      =
 '此函式的第 {} 個參數沒有被標記為可讓出，但是傳入了異步函式。（使用 `---@param name async fun()` 來標記為可讓出）'
 DIAG_DISCARD_RETURNS    =
 '不能丟棄此函式的回傳值。'
+DIAG_NEED_CHECK_NIL     = -- TODO: need translate!
+'Need check nil.'
 DIAG_CIRCLE_DOC_CLASS                 =
 '循環繼承的類別。'
 DIAG_DOC_FIELD_NO_CLASS               =

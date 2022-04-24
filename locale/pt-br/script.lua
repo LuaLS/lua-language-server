@@ -96,6 +96,8 @@ DIAG_NOT_YIELDABLE      = -- TODO: need translate!
 'The {}th parameter of this function was not marked as yieldable, but an async function was passed in. (Use `---@param name async fun()` to mark as yieldable)'
 DIAG_DISCARD_RETURNS    = -- TODO: need translate!
 'The return values of this function cannot be discarded.'
+DIAG_NEED_CHECK_NIL     = -- TODO: need translate!
+'Need check nil.'
 DIAG_CIRCLE_DOC_CLASS                 =
 'Classes com herança cíclica.'
 DIAG_DOC_FIELD_NO_CLASS               =

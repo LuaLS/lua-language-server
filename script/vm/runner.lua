@@ -82,20 +82,14 @@ function mt:_compileNarrowByFilter(filter, outStep, blockStep)
             self:_compileNarrowByFilter(filter[2], dummyStep, blockStep)
         end
         if filter.op.type == 'or' then
+            self:_compileNarrowByFilter(filter[1], outStep, blockStep)
             local dummyStep = {
-                type  = 'save',
-                tag   = 'dummy out',
+                type  = 'push',
                 copy  = true,
                 ref1  = outStep,
-                pos   = filter.start - 1,
-            }
-            self.steps[#self.steps+1] = dummyStep
-            self:_compileNarrowByFilter(filter[1], dummyStep, blockStep)
-            self.steps[#self.steps+1] = {
-                type  = 'push',
-                ref1  = dummyStep,
                 pos   = filter.op.finish,
             }
+            self.steps[#self.steps+1] = dummyStep
             self:_compileNarrowByFilter(filter[2], outStep, dummyStep)
             self.steps[#self.steps+1] = {
                 type  = 'push',

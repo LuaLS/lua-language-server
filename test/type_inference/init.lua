@@ -2060,11 +2060,22 @@ if x.y or not x then
 end
 ]]
 
-TEST 'integer?' [[
+TEST 'integer' [[
 ---@type integer?
 local x
 
-if not x or x.y then
+if not x or not y then
+    return
+end
+
+print(<?x?>)
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+if not y or not x then
     return
 end
 

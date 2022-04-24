@@ -16,7 +16,7 @@ mt.index = 1
 ---@field _hasSorted boolean
 
 ---@class vm.runner.step
----@field type    'truthy' | 'falsy' | 'as' | 'add' | 'remove' | 'object' | 'save' | 'load' | 'merge'
+---@field type    'truthy' | 'falsy' | 'as' | 'add' | 'remove' | 'object' | 'save' | 'push' | 'merge'
 ---@field pos     integer
 ---@field order?  integer
 ---@field node?   vm.node
@@ -49,15 +49,18 @@ function mt:_compileNarrowByFilter(filter, outStep, blockStep)
             local exp = filter[1]
             if exp.type == 'getlocal' and exp.node == self.loc then
                 self.steps[#self.steps+1] = {
-                    type  = 'truthy',
+                    type  = 'push',
+                    copy  = true,
                     pos   = filter.finish,
-                    ref1  = outStep,
                 }
                 self.steps[#self.steps+1] = {
                     type  = 'falsy',
-                    copy  = true,
                     pos   = filter.finish,
-                    ref1  = blockStep,
+                }
+                self.steps[#self.steps+1] = {
+                    type  = 'truthy',
+                    pos   = filter.finish,
+                    ref1  = outStep,
                 }
             end
         end
@@ -68,31 +71,35 @@ function mt:_compileNarrowByFilter(filter, outStep, blockStep)
             return
         end
         if filter.op.type == 'and' then
-            self:_compileNarrowByFilter(filter[1], outStep, blockStep)
-            self:_compileNarrowByFilter(filter[2], outStep, blockStep)
-        end
-        if filter.op.type == 'or' then
             local dummyStep = {
-                type  = 'load',
-                tag   = 'dummy',
+                type  = 'save',
                 copy  = true,
                 ref1  = outStep,
                 pos   = filter.start - 1,
             }
             self.steps[#self.steps+1] = dummyStep
-            self:_compileNarrowByFilter(filter[1], outStep, dummyStep)
-            dummyStep = {
-                type  = 'load',
-                tag   = 'dummy',
+            self:_compileNarrowByFilter(filter[1], dummyStep, blockStep)
+            self:_compileNarrowByFilter(filter[2], dummyStep, blockStep)
+        end
+        if filter.op.type == 'or' then
+            local dummyStep = {
+                type  = 'save',
+                tag   = 'dummy out',
                 copy  = true,
                 ref1  = outStep,
-                pos   = filter.op.finish,
+                pos   = filter.start - 1,
             }
             self.steps[#self.steps+1] = dummyStep
+            self:_compileNarrowByFilter(filter[1], dummyStep, blockStep)
+            self.steps[#self.steps+1] = {
+                type  = 'push',
+                ref1  = dummyStep,
+                pos   = filter.op.finish,
+            }
             self:_compileNarrowByFilter(filter[2], outStep, dummyStep)
             self.steps[#self.steps+1] = {
-                type  = 'load',
-                tag   = 'reset',
+                type  = 'push',
+                tag   = 'or reset',
                 ref1  = blockStep,
                 pos   = filter.finish,
             }
@@ -113,6 +120,11 @@ function mt:_compileNarrowByFilter(filter, outStep, blockStep)
             if guide.isLiteral(exp) then
                 if filter.op.type == '==' then
                     self.steps[#self.steps+1] = {
+                        type  = 'push',
+                        copy  = true,
+                        pos   = filter.finish,
+                    }
+                    self.steps[#self.steps+1] = {
                         type  = 'remove',
                         name  = exp.type,
                         pos   = filter.finish,
@@ -121,13 +133,16 @@ function mt:_compileNarrowByFilter(filter, outStep, blockStep)
                     self.steps[#self.steps+1] = {
                         type  = 'as',
                         name  = exp.type,
-                        copy  = true,
                         pos   = filter.finish,
-                        ref1  = blockStep,
                     }
                 end
                 if filter.op.type == '~=' then
                     self.steps[#self.steps+1] = {
+                        type  = 'push',
+                        copy  = true,
+                        pos   = filter.finish,
+                    }
+                    self.steps[#self.steps+1] = {
                         type  = 'as',
                         name  = exp.type,
                         pos   = filter.finish,
@@ -136,9 +151,7 @@ function mt:_compileNarrowByFilter(filter, outStep, blockStep)
                     self.steps[#self.steps+1] = {
                         type  = 'remove',
                         name  = exp.type,
-                        copy  = true,
                         pos   = filter.finish,
-                        ref1  = blockStep,
                     }
                 end
             end
@@ -146,15 +159,18 @@ function mt:_compileNarrowByFilter(filter, outStep, blockStep)
     else
         if filter.type == 'getlocal' and filter.node == self.loc then
             self.steps[#self.steps+1] = {
-                type  = 'falsy',
+                type  = 'push',
+                copy  = true,
                 pos   = filter.finish,
-                ref1  = outStep,
             }
             self.steps[#self.steps+1] = {
                 type  = 'truthy',
-                copy  = true,
                 pos   = filter.finish,
-                ref1  = blockStep,
+            }
+            self.steps[#self.steps+1] = {
+                type  = 'falsy',
+                pos   = filter.finish,
+                ref1  = outStep,
             }
         end
     end
@@ -176,39 +192,56 @@ function mt:_compileBlock(block)
     if block.type == 'if' then
         ---@type vm.runner.step[]
         local finals = {}
-        for _, childBlock in ipairs(block) do
+        for i, childBlock in ipairs(block) do
+            local blockStep = {
+                type  = 'save',
+                tag   = 'block',
+                copy  = true,
+                pos   = block.start,
+            }
             local outStep = {
                 type  = 'save',
                 tag   = 'out',
                 copy  = true,
-                pos   = block.start,
-            }
-            self.steps[#self.steps+1] = outStep
-            local blockStep = {
-                type  = 'load',
-                tag   = 'block',
-                copy  = true,
                 pos   = childBlock.start,
             }
             self.steps[#self.steps+1] = blockStep
+            self.steps[#self.steps+1] = outStep
+            self.steps[#self.steps+1] = {
+                type  = 'push',
+                ref1  = blockStep,
+                pos   = childBlock.start,
+            }
             self:_compileNarrowByFilter(childBlock.filter, outStep, blockStep)
             if  not childBlock.hasReturn
             and not childBlock.hasGoTo
             and not childBlock.hasBreak then
-                finals[#finals+1] = blockStep
+                local finalStep = {
+                    type = 'save',
+                    pos  = childBlock.finish,
+                    tag  = 'final #' .. i,
+                }
+                finals[#finals+1] = finalStep
+                self.steps[#self.steps+1] = finalStep
             end
             self.steps[#self.steps+1] = {
-                type   = 'load',
-                tag    = 'final',
+                type   = 'push',
+                tag    = 'reset child',
                 ref1   = outStep,
                 pos    = childBlock.finish,
             }
         end
-        for i, final in ipairs(finals) do
+        self.steps[#self.steps+1] = {
+            type = 'push',
+            tag  = 'reset if',
+            pos  = block.finish,
+            copy = true,
+        }
+        for _, final in ipairs(finals) do
             self.steps[#self.steps+1] = {
-                type  = 'merge',
-                ref2  = final,
-                pos   = block.finish,
+                type = 'merge',
+                ref2 = final,
+                pos  = block.finish,
             }
         end
     end
@@ -219,18 +252,19 @@ function mt:_compileBlock(block)
     or block.type == 'in'
     or block.type == 'repeat'
     or block.type == 'for' then
-        self.steps[#self.steps+1] = {
-            type  = 'load',
-            pos   = block.start,
-        }
         local savePoint = {
-            type  = 'save',
+            type = 'save',
+            copy = true,
+            pos  = block.start,
+        }
+        self.steps[#self.steps+1] = {
+            type  = 'push',
             copy  = true,
             pos   = block.start,
         }
         self.steps[#self.steps+1] = savePoint
         self.steps[#self.steps+1] = {
-            type = 'load',
+            type = 'push',
             pos  = block.finish,
             ref1 = savePoint,
         }
@@ -300,29 +334,15 @@ end
 ---@param callback    fun(src: parser.object, node: vm.node)
 function mt:launch(callback)
     local topNode = vm.getNode(self.loc):copy()
-    ---@type vm.runner.step
-    local context
     for _, step in ipairs(self.steps) do
-        local node = (step.ref1 and step.ref1.node)
-                or (context and context.node)
-                or topNode
-        if step.copy then
-            node = node:copy()
-            if context then
-                context.node = node
-            end
-        end
+        local node = step.ref1 and step.ref1.node or topNode
         if     step.type == 'truthy' then
             node:setTruthy()
         elseif step.type == 'falsy' then
             node:setFalsy()
         elseif step.type == 'as' then
-            topNode = vm.createNode(globalMgr.getGlobal('type', step.name))
-            if step.ref1 then
-                step.ref1.node = topNode
-            elseif context then
-                context.node = topNode
-            end
+            node:clear()
+            node:merge(globalMgr.getGlobal('type', step.name))
         elseif step.type == 'add' then
             node:merge(globalMgr.getGlobal('type', step.name))
         elseif step.type == 'remove' then
@@ -332,16 +352,16 @@ function mt:launch(callback)
             if step.object.type == 'getlocal' then
                 topNode = checkAssert(step.object, node)
             end
-            if step.ref1 then
-                step.ref1.node = topNode
-            elseif context then
-                context.node = topNode
-            end
         elseif step.type == 'save' then
+            if step.copy then
+                node = node:copy()
+            end
             step.node = node
-        elseif step.type == 'load' then
-            step.node = node
-            context = step
+        elseif step.type == 'push' then
+            if step.copy then
+                node = node:copy()
+            end
+            topNode = node
         elseif step.type == 'merge' then
             node:merge(step.ref2.node)
         end

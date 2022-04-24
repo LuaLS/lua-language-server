@@ -1733,6 +1733,23 @@ if <?x?> then
     print(x)
 end
 ]]
+--[[
+context 0 integer?
+
+save copy 'block'
+save copy 'out'
+push 'block'
+get
+push copy
+truthy
+falsy ref 'out'
+get
+save HEAD 'final'
+push 'out'
+
+push copy HEAD
+merge 'final'
+]]
 
 TEST 'integer' [[
 ---@type integer?
@@ -1741,18 +1758,6 @@ local x
 if x then
     print(<?x?>)
 end
-]]
---[[
-#0 integer?
-save 1 #1 integer? --ifblock --block外的状态
-load 2 #2 integer? --ifblock --block中的初始状态
-object get #2 integer? --if x then
-truly 2 #2 integer --ifblock
-falsy 1 #1 ?
-object get #2 integer --print(x)
-save 3 #?(2) integer --block中的最终状态
-load 1 #2 ? --ifblock -- block
-merge 3 #2 --if 最终状态
 ]]
 
 TEST 'integer?' [[
@@ -1784,6 +1789,27 @@ local x
 if xxx and x then
     print(<?x?>)
 end
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+if xxx and x then
+end
+
+print(<?x?>)
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+if xxx and x then
+    return
+end
+
+print(<?x?>)
 ]]
 
 TEST 'integer' [[
@@ -1965,15 +1991,36 @@ TEST 'integer' [[
 ---@type integer?
 local x
 
-if x and <?x?> then
+if x and <?x?>.y then
 end
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+if x and x.y then
+end
+
+print(<?x?>)
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+if x and x.y then
+    return
+end
+
+print(<?x?>)
 ]]
 
 TEST 'integer' [[
 ---@type integer?
 local x
 
-if not x or <?x?> then
+if not x or <?x?>.y then
 end
 ]]
 
@@ -1981,7 +2028,7 @@ TEST 'integer?' [[
 ---@type integer?
 local x
 
-if not x or XXX then
+if not x or x.y then
     print(<?x?>)
 end
 ]]
@@ -1990,7 +2037,7 @@ TEST 'integer?' [[
 ---@type integer?
 local x
 
-if x or XXX then
+if x or x.y then
     print(<?x?>)
 end
 ]]
@@ -1999,7 +2046,7 @@ TEST 'integer?' [[
 ---@type integer?
 local x
 
-if XXX or x then
+if x.y or x then
     print(<?x?>)
 end
 ]]
@@ -2008,16 +2055,16 @@ TEST 'integer?' [[
 ---@type integer?
 local x
 
-if XXX or not x then
+if x.y or not x then
     print(<?x?>)
 end
 ]]
 
-TEST 'integer' [[
+TEST 'integer?' [[
 ---@type integer?
 local x
 
-if not x or XXX then
+if not x or x.y then
     return
 end
 

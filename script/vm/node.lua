@@ -47,6 +47,14 @@ function mt:isEmpty()
     return #self == 0
 end
 
+function mt:clear()
+    self.optional = nil
+    for i, c in ipairs(self) do
+        self[i] = nil
+        self[c] = nil
+    end
+end
+
 ---@param n integer
 ---@return vm.object?
 function mt:get(n)

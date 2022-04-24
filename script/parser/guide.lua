@@ -16,6 +16,7 @@ local type         = type
 ---@field uri                   uri
 ---@field start                 integer
 ---@field finish                integer
+---@field range                 integer
 ---@field effect                integer
 ---@field attrs                 string[]
 ---@field specials              parser.object[]

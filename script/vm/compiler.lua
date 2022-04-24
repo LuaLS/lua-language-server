@@ -803,8 +803,10 @@ function vm.compileCallArg(arg, call, index)
     if call.node.special == 'pcall'
     or call.node.special == 'xpcall' then
         local fixIndex = call.node.special == 'pcall' and 1 or 2
-        callNode = vm.compileNode(call.args[1])
-        compileCallArgNode(arg, call, callNode, fixIndex, index - fixIndex)
+        if call.args and call.args[1] then
+            callNode = vm.compileNode(call.args[1])
+            compileCallArgNode(arg, call, callNode, fixIndex, index - fixIndex)
+        end
     end
     return vm.getNode(arg)
 end

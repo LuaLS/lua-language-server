@@ -887,7 +887,7 @@ local function compileLocal(source)
 
     -- for x = ... do
     if source.parent.type == 'loop' then
-        vm.setNode(source, globalMgr.getGlobal('type', 'integer'))
+        vm.compileNode(source.parent)
     end
 
     if source.bindDocs then
@@ -1244,6 +1244,12 @@ local compilerSwitch = util.switch()
                     vm.setNode(loc, node)
                 end
             end
+        end
+    end)
+    : case 'loop'
+    : call(function (source)
+        if source.loc then
+            vm.setNode(source.loc, globalMgr.getGlobal('type', 'integer'))
         end
     end)
     : case 'doc.type'

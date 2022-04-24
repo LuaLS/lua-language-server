@@ -2121,3 +2121,9 @@ local x
 ---@type integer
 <?x?> = XXX
 ]]
+
+TEST 'unknown' [[
+for _ = 1, 999 do
+    local <?x?>
+end
+]]

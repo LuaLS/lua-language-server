@@ -3324,3 +3324,27 @@ x.y.<??>
         kind  = define.CompletionItemKind.Field,
     }
 }
+
+TEST [[
+local xyz
+
+---@cast <??>
+]]
+{
+    {
+        label = 'xyz',
+        kind  = define.CompletionItemKind.Variable,
+    },
+}
+
+TEST [[
+local xyz
+
+---@cast x<??>
+]]
+{
+    {
+        label = 'xyz',
+        kind  = define.CompletionItemKind.Variable,
+    }
+}

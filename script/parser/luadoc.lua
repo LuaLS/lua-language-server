@@ -1235,7 +1235,6 @@ local docSwitch = util.switch()
                 start  = getFinish(),
                 finish = getFinish(),
             }
-            result.casts[#result.casts+1] = block
             if     checkToken('symbol', '+', 1) then
                 block.mode = '+'
                 nextToken()
@@ -1259,6 +1258,10 @@ local docSwitch = util.switch()
                     block.start  = block.start or block.extends.start
                     block.finish = block.extends.finish
                 end
+            end
+
+            if block.optional or block.extends then
+                result.casts[#result.casts+1] = block
             end
 
             if checkToken('symbol', ',', 1) then

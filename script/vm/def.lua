@@ -79,6 +79,13 @@ simpleSwitch = util.switch()
             pushResult(source.node)
         end
     end)
+    : case 'doc.cast.name'
+    : call(function (source, pushResult)
+        local loc = guide.getLocal(source, source[1], source.start)
+        if loc then
+            pushResult(loc)
+        end
+    end)
 
 local searchFieldSwitch = util.switch()
     : case 'table'

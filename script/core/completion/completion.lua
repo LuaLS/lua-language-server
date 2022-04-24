@@ -1514,6 +1514,7 @@ local function tryluaDocCate(word, results)
         'module',
         'async',
         'nodiscard',
+        'cast',
     } do
         if matchKey(word, docType) then
             results[#results+1] = {
@@ -1662,8 +1663,27 @@ local function tryluaDocBySource(state, position, source, results)
                 }
             end
         end
+        return true
     elseif source.type == 'doc.module' then
         collectRequireNames('require', state.uri, source.module or '', source, source.smark, position, results)
+        return true
+    elseif source.type == 'doc.cast.name' then
+        local locals = guide.getVisibleLocals(state.ast, position)
+        for name, loc in util.sortPairs(locals) do
+            if matchKey(source[1], name) then
+                results[#results+1] = {
+                    label = name,
+                    kind   = define.CompletionItemKind.Variable,
+                    id     = stack(function () ---@async
+                        return {
+                            detail      = buildDetail(loc),
+                            description = buildDesc(loc),
+                        }
+                    end),
+                }
+            end
+        end
+        return true
     end
     return false
 end
@@ -1758,6 +1778,22 @@ local function tryluaDocByErr(state, position, err, docState, results)
         end
     elseif err.type == 'LUADOC_MISS_MODULE_NAME' then
         collectRequireNames('require', state.uri, '', docState, nil, position, results)
+    elseif err.type == 'LUADOC_MISS_LOCAL_NAME' then
+        local locals = guide.getVisibleLocals(state.ast, position)
+        for name, loc in util.sortPairs(locals) do
+            if name ~= '_ENV' then
+                results[#results+1] = {
+                    label = name,
+                    kind   = define.CompletionItemKind.Variable,
+                    id     = stack(function () ---@async
+                        return {
+                            detail      = buildDetail(loc),
+                            description = buildDesc(loc),
+                        }
+                    end),
+                }
+            end
+        end
     end
 end
 

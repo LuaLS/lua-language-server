@@ -53,6 +53,7 @@ local accept = {
     ['doc.alias.name']   = true,
     ['doc.see.name']     = true,
     ['doc.see.field']    = true,
+    ['doc.cast.name']    = true,
 }
 
 local function checkRequire(source, offset)

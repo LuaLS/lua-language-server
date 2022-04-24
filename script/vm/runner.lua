@@ -24,6 +24,7 @@ mt.index = 1
 ---@field name?   string
 ---@field tag?    string
 ---@field copy?   boolean
+---@field new?    boolean
 ---@field ref1?   vm.runner.step
 ---@field ref2?   vm.runner.step
 
@@ -49,13 +50,9 @@ function mt:_compileNarrowByFilter(filter, outStep, blockStep)
             local exp = filter[1]
             if exp.type == 'getlocal' and exp.node == self.loc then
                 self.steps[#self.steps+1] = {
-                    type  = 'push',
-                    copy  = true,
-                    pos   = filter.finish,
-                }
-                self.steps[#self.steps+1] = {
                     type  = 'falsy',
                     pos   = filter.finish,
+                    new   = true,
                 }
                 self.steps[#self.steps+1] = {
                     type  = 'truthy',
@@ -114,11 +111,6 @@ function mt:_compileNarrowByFilter(filter, outStep, blockStep)
             if guide.isLiteral(exp) then
                 if filter.op.type == '==' then
                     self.steps[#self.steps+1] = {
-                        type  = 'push',
-                        copy  = true,
-                        pos   = filter.finish,
-                    }
-                    self.steps[#self.steps+1] = {
                         type  = 'remove',
                         name  = exp.type,
                         pos   = filter.finish,
@@ -128,15 +120,11 @@ function mt:_compileNarrowByFilter(filter, outStep, blockStep)
                         type  = 'as',
                         name  = exp.type,
                         pos   = filter.finish,
+                        new   = true,
                     }
                 end
                 if filter.op.type == '~=' then
                     self.steps[#self.steps+1] = {
-                        type  = 'push',
-                        copy  = true,
-                        pos   = filter.finish,
-                    }
-                    self.steps[#self.steps+1] = {
                         type  = 'as',
                         name  = exp.type,
                         pos   = filter.finish,
@@ -146,6 +134,7 @@ function mt:_compileNarrowByFilter(filter, outStep, blockStep)
                         type  = 'remove',
                         name  = exp.type,
                         pos   = filter.finish,
+                        new   = true,
                     }
                 end
             end
@@ -153,13 +142,9 @@ function mt:_compileNarrowByFilter(filter, outStep, blockStep)
     else
         if filter.type == 'getlocal' and filter.node == self.loc then
             self.steps[#self.steps+1] = {
-                type  = 'push',
-                copy  = true,
-                pos   = filter.finish,
-            }
-            self.steps[#self.steps+1] = {
                 type  = 'truthy',
                 pos   = filter.finish,
+                new   = true,
             }
             self.steps[#self.steps+1] = {
                 type  = 'falsy',
@@ -331,15 +316,35 @@ function mt:launch(callback)
     for _, step in ipairs(self.steps) do
         local node = step.ref1 and step.ref1.node or topNode
         if     step.type == 'truthy' then
+            if step.new then
+                node = node:copy()
+                topNode = node
+            end
             node:setTruthy()
         elseif step.type == 'falsy' then
+            if step.new then
+                node = node:copy()
+                topNode = node
+            end
             node:setFalsy()
         elseif step.type == 'as' then
-            node:clear()
-            node:merge(globalMgr.getGlobal('type', step.name))
+            if step.new then
+                topNode = vm.createNode(globalMgr.getGlobal('type', step.name))
+            else
+                node:clear()
+                node:merge(globalMgr.getGlobal('type', step.name))
+            end
         elseif step.type == 'add' then
+            if step.new then
+                node = node:copy()
+                topNode = node
+            end
             node:merge(globalMgr.getGlobal('type', step.name))
         elseif step.type == 'remove' then
+            if step.new then
+                node = node:copy()
+                topNode = node
+            end
             node:remove(step.name)
         elseif step.type == 'object' then
             topNode = callback(step.object, node) or node

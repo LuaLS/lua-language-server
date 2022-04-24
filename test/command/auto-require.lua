@@ -6,6 +6,9 @@ local client      = require 'client'
 local findInsertRow    = util.getUpvalue(autoRequire, 'findInsertRow')
 local applyAutoRequire = util.getUpvalue(autoRequire, 'applyAutoRequire')
 
+assert(findInsertRow)
+assert(applyAutoRequire)
+
 local originEditText = client.editText
 local EditResult
 

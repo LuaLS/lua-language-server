@@ -1225,8 +1225,11 @@ local compilerSwitch = util.switch()
             --  for k, v in pairs(t) do
             --> for k, v in iterator, status, initValue do
             --> local k, v = iterator(status, initValue)
-            source._iterator = {}
-            source._iterArgs = {{}, {}}
+            source._iterator = {
+                type = 'dummyfunc',
+                parent = source,
+            }
+            source._iterArgs = {{},{}}
             -- iterator
             selectNode(source._iterator,    source.exps, 1)
             -- status
@@ -1787,14 +1790,14 @@ local function compileByGlobal(source)
     vm.setNode(source, globalNode, true)
 
     -- TODO:don't mix
-    local sets = global.links[uri].sets or {}
-    local gets = global.links[uri].gets or {}
-    for _, set in ipairs(sets) do
-        vm.setNode(set, globalNode, true)
-    end
-    for _, get in ipairs(gets) do
-        vm.setNode(get, globalNode, true)
-    end
+    --local sets = global.links[uri].sets or {}
+    --local gets = global.links[uri].gets or {}
+    --for _, set in ipairs(sets) do
+    --    vm.setNode(set, globalNode, true)
+    --end
+    --for _, get in ipairs(gets) do
+    --    vm.setNode(get, globalNode, true)
+    --end
 
     if global.cate == 'variable' then
         local hasMarkDoc

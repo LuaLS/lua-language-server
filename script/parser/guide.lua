@@ -58,7 +58,7 @@ local type         = type
 ---@field step                  parser.object
 ---@field redundant             { max: integer, passed: integer }
 ---@field filter                parser.object
----@field loc                   string
+---@field loc                   parser.object
 ---@field keyword               integer[]
 ---@field casts                 parser.object[]
 ---@field mode?                 '+' | '-'

@@ -2235,3 +2235,14 @@ end
 
 print(<?x?>)
 ]]
+
+TEST 'true' [[
+---@type boolean | nil
+local x
+
+if not x then
+    return
+end
+
+print(<?x?>)
+]]

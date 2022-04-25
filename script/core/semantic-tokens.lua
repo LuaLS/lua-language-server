@@ -8,6 +8,7 @@ local converter      = require 'proto.converter'
 local infer          = require 'vm.infer'
 local config         = require 'config'
 local linkedTable    = require 'linked-table'
+local globalMgr      = require 'vm.global-manager'
 
 local Care = util.switch()
     : case 'getglobal'
@@ -16,7 +17,23 @@ local Care = util.switch()
         if not options.variable then
             return
         end
-        local isLib = vm.isGlobalLibraryName(source[1])
+
+        local name = source[1]
+        local isLib = options.libGlobals[name]
+        if isLib == nil then
+            isLib = false
+            local global = globalMgr.getGlobal('variable', name)
+            if global then
+                local uri = guide.getUri(source)
+                for _, set in ipairs(global:getSets(uri)) do
+                    if vm.isMetaFile(guide.getUri(set)) then
+                        isLib = true
+                        break
+                    end
+                end
+            end
+            options.libGlobals[name] = isLib
+        end
         local isFunc = infer.getInfer(source):hasFunction()
 
         local type = isFunc and define.TokenTypes['function'] or define.TokenTypes.variable
@@ -789,6 +806,7 @@ return function (uri, start, finish)
         uri        = uri,
         state      = state,
         text       = files.getText(uri),
+        libGlobals = {},
         variable   = config.get(uri, 'Lua.semantic.variable'),
         annotation = config.get(uri, 'Lua.semantic.annotation'),
         keyword    = config.get(uri, 'Lua.semantic.keyword'),

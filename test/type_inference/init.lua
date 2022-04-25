@@ -1980,6 +1980,24 @@ print(<?x?>)
 ]]
 
 TEST 'integer' [[
+---@type integer | nil
+local x
+
+assert(x)
+
+print(<?x?>)
+]]
+
+TEST 'integer' [[
+---@type integer | nil
+local x
+
+assert(x ~= nil)
+
+print(<?x?>)
+]]
+
+TEST 'integer' [[
 local x
 
 assert(x == 1)

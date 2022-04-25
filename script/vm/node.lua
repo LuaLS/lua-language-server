@@ -131,6 +131,7 @@ function mt:setTruthy()
     for index = #self, 1, -1 do
         local c = self[index]
         if c.type == 'nil'
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'nil')
         or (c.type == 'boolean' and c[1] == false)
         or (c.type == 'doc.type.boolean' and c[1] == false) then
             table.remove(self, index)
@@ -163,6 +164,7 @@ function mt:setFalsy()
     for index = #self, 1, -1 do
         local c = self[index]
         if c.type == 'nil'
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'nil')
         or (c.type == 'boolean' and c[1] == true)
         or (c.type == 'doc.type.boolean' and c[1] == true) then
             goto CONTINUE

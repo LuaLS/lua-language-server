@@ -134,7 +134,7 @@ function vm.getTableKey(uri, tnode, vnode)
             end
         end
         if tn.type == 'doc.type.array' then
-            result:merge(globalMgr.getGlobal('type', 'integer'))
+            result:merge(globalMgr.declareGlobal('type', 'integer'))
         end
         if tn.type == 'table' then
             for _, field in ipairs(tn) do
@@ -144,10 +144,10 @@ function vm.getTableKey(uri, tnode, vnode)
                     end
                 end
                 if field.type == 'tablefield' then
-                    result:merge(globalMgr.getGlobal('type', 'string'))
+                    result:merge(globalMgr.declareGlobal('type', 'string'))
                 end
                 if field.type == 'tableexp' then
-                    result:merge(globalMgr.getGlobal('type', 'integer'))
+                    result:merge(globalMgr.declareGlobal('type', 'integer'))
                 end
             end
         end

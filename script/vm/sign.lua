@@ -58,7 +58,7 @@ function mt:resolve(uri, args, removeGeneric)
                 end
                 if n.type == 'global' and n.cate == 'type' then
                     -- ---@field [integer]: number -> T[]
-                    vm.getClassFields(uri, n, globalMgr.getGlobal('type', 'integer'), false, function (field)
+                    vm.getClassFields(uri, n, globalMgr.declareGlobal('type', 'integer'), false, function (field)
                         resolve(object.node, vm.compileNode(field.extends))
                     end)
                 end

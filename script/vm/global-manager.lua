@@ -209,11 +209,13 @@ local compilerGlobalSwitch = util.switch()
 
 ---@param cate vm.global.cate
 ---@param name string
----@param uri  uri
+---@param uri? uri
 ---@return vm.global
 function m.declareGlobal(cate, name, uri)
     local key = cate .. '|' .. name
-    m.globalSubs[uri][key] = true
+    if uri then
+        m.globalSubs[uri][key] = true
+    end
     if not m.globals[key] then
         m.globals[key] = globalBuilder(name, cate)
     end

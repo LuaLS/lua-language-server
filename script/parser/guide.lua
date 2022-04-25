@@ -406,6 +406,7 @@ function m.getRoot(obj)
         end
         local parent = obj.parent
         if not parent then
+            log.error('Can not find out root:', obj.type)
             return nil
         end
         obj = parent

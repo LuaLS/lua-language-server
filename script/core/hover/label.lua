@@ -180,7 +180,7 @@ local function asNumber(source)
     if not text then
         return nil
     end
-    local raw = text:sub(source.start, source.finish)
+    local raw = text:sub(source.start + 1, source.finish)
     if not raw or not raw:find '[^%-%d%.]' then
         return nil
     end

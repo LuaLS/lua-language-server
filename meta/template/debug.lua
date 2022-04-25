@@ -112,8 +112,8 @@ function debug.getupvalue(f, up) end
 
 ---#if VERSION >= 5.4 then
 ---#DES 'debug.getuservalue>5.4'
----@param u userdata
----@param n integer
+---@param u  userdata
+---@param n? integer
 ---@return any
 ---@return boolean
 ---@nodiscard
@@ -180,7 +180,7 @@ function debug.setupvalue(f, up, value) end
 ---#DES 'debug.setuservalue>5.4'
 ---@param udata userdata
 ---@param value any
----@param n     integer
+---@param n?    integer
 ---@return userdata udata
 function debug.setuservalue(udata, value, n) end
 ---#elseif VERSION >= 5.2 or JIT then

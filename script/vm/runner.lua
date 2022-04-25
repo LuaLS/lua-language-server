@@ -177,7 +177,7 @@ function mt:_compileBlock(block)
                 type  = 'save',
                 tag   = 'block',
                 copy  = true,
-                pos   = block.start,
+                pos   = childBlock.start,
             }
             local outStep = {
                 type  = 'save',

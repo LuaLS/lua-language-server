@@ -2191,3 +2191,29 @@ local x
 
 print(<?x?>)
 ]]
+
+TEST 'string' [[
+---@type string?
+local x
+
+if not x then
+    return
+else
+    print(<?x?>)
+end
+
+print(x)
+]]
+
+TEST 'string' [[
+---@type string?
+local x
+
+if not x then
+    return
+else
+    print(x)
+end
+
+print(<?x?>)
+]]

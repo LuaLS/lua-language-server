@@ -1,5 +1,9 @@
 # changelog
 
+## 3.2.1
+`2022-4-25`
+* `FIX` broken in VSCode
+
 ## 3.2.0
 `2022-4-25`
 * `NEW` supports infer of callback parameter

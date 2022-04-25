@@ -146,7 +146,9 @@ function debug.setfenv(object, env) end
 ---|+'"l"' # ---#DESTAIL 'hookmask.l'
 
 ---#DES 'debug.sethook'
----@overload fun(hook: function, mask: hookmask, count?: integer)
+---@overload fun(hook: async fun(), mask: hookmask, count?: integer)
+---@overload fun(thread: thread)
+---@overload fun()
 ---@param thread thread
 ---@param hook   async fun()
 ---@param mask   hookmask

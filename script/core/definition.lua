@@ -134,6 +134,9 @@ return function (uri, offset)
     local defs = vm.getDefs(source)
 
     for _, src in ipairs(defs) do
+        if src.type == 'global' then
+            goto CONTINUE
+        end
         local root = guide.getRoot(src)
         if not root then
             goto CONTINUE

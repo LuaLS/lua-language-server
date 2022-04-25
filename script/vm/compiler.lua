@@ -1230,13 +1230,13 @@ local compilerSwitch = util.switch()
                 parent = source,
             }
             source._iterArgs = {{},{}}
-            -- iterator
-            selectNode(source._iterator,    source.exps, 1)
-            -- status
-            selectNode(source._iterArgs[1], source.exps, 2)
-            -- initValue
-            selectNode(source._iterArgs[2], source.exps, 3)
         end
+        -- iterator
+        selectNode(source._iterator,    source.exps, 1)
+        -- status
+        selectNode(source._iterArgs[1], source.exps, 2)
+        -- initValue
+        selectNode(source._iterArgs[2], source.exps, 3)
         if source.keys then
             for i, loc in ipairs(source.keys) do
                 local node = getReturn(source._iterator, i, source._iterArgs)

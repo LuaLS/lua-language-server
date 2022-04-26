@@ -40,8 +40,11 @@ local function isValidFunction(source)
     return true
 end
 
+---@async
 local function collect(ast, white, roots, links)
+    ---@async
     guide.eachSourceType(ast, 'function', function (src)
+        await.delay()
         if not isValidFunction(src) then
             return
         end
@@ -95,10 +98,8 @@ return function (uri, callback)
     local roots = {}
     local links = {}
 
-    -- collect
     collect(state.ast, white, roots, links)
 
-    -- turn black
     for source in pairs(roots) do
         turnBlack(source, black, white, links)
     end

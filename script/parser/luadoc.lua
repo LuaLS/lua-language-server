@@ -1313,7 +1313,7 @@ end
 local function buildLuaDoc(comment)
     local text = comment.text
     local startPos = (comment.type == 'comment.short' and text:match '^%-%s*@()')
-                  or (comment.type == 'comment.long'  and text:match '@()')
+                  or (comment.type == 'comment.long'  and text:match '^@()')
     if not startPos then
         return {
             type    = 'doc.comment',

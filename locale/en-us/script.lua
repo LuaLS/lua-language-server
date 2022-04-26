@@ -33,7 +33,9 @@ DIAG_PREVIOUS_CALL      =
 DIAG_PREFIELD_CALL      =
 'Will be interpreted as `{}{}`. It may be necessary to add a `,` or `;`.'
 DIAG_OVER_MAX_ARGS      =
-'The function takes only {:d} parameters, but you passed {:d}.'
+'The function received a maximum of {:d} arguments, but got {:d}.'
+DIAG_MISS_ARGS          =
+'the function received at least {:d} arguments, but got {:d}.'
 DIAG_OVER_MAX_VALUES    =
 'Only has {} variables, but you set {} values.'
 DIAG_AMBIGUITY_1        =
@@ -94,7 +96,8 @@ DIAG_NOT_YIELDABLE      =
 'The {}th parameter of this function was not marked as yieldable, but an async function was passed in. (Use `---@param name async fun()` to mark as yieldable)'
 DIAG_DISCARD_RETURNS    =
 'The return values of this function cannot be discarded.'
-
+DIAG_NEED_CHECK_NIL     =
+'Need check nil.'
 DIAG_CIRCLE_DOC_CLASS                 =
 'Circularly inherited classes.'
 DIAG_DOC_FIELD_NO_CLASS               =
@@ -234,7 +237,6 @@ PARSER_INDEX_IN_FUNC_NAME =
 'The `[name]` form cannot be used in the name of a named function.'
 PARSER_UNKNOWN_ATTRIBUTE  =
 'Local attribute should be `const` or `close`'
-
 PARSER_LUADOC_MISS_CLASS_NAME           =
 '<class name> expected.'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =
@@ -273,13 +275,14 @@ PARSER_LUADOC_MISS_DIAG_MODE            =
 '<diagnostic mode> expected.'
 PARSER_LUADOC_ERROR_DIAG_MODE           =
 '<diagnostic mode> incorrect.'
+PARSER_LUADOC_MISS_LOCAL_NAME           =
+'<local name> expected.'
 
 SYMBOL_ANONYMOUS        =
 '<Anonymous>'
 
 HOVER_VIEW_DOCUMENTS    =
 'View documents'
-
 HOVER_DOCUMENT_LUA51    =
 'http://www.lua.org/manual/5.1/manual.html#{}'
 HOVER_DOCUMENT_LUA52    =
@@ -290,8 +293,6 @@ HOVER_DOCUMENT_LUA54    =
 'http://www.lua.org/manual/5.4/manual.html#{}'
 HOVER_DOCUMENT_LUAJIT   =
 'http://www.lua.org/manual/5.1/manual.html#{}'
-
-
 HOVER_NATIVE_DOCUMENT_LUA51     =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUA52     =
@@ -302,7 +303,6 @@ HOVER_NATIVE_DOCUMENT_LUA54     =
 'command:extension.lua.doc?["en-us/54/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUAJIT    =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
-
 HOVER_MULTI_PROTOTYPE      =
 '({} prototypes)'
 HOVER_STRING_BYTES         =
@@ -313,7 +313,6 @@ HOVER_MULTI_DEF_PROTO      =
 '({} definitions, {} prototypes)'
 HOVER_MULTI_PROTO_NOT_FUNC =
 '({} non functional definition)'
-
 HOVER_USE_LUA_PATH      =
 '(Search path: `{}`)'
 HOVER_EXTENDS           =
@@ -322,6 +321,8 @@ HOVER_TABLE_TIME_UP     =
 'Partial type inference has been disabled for performance reasons.'
 HOVER_WS_LOADING        =
 'Workspace loading: {} / {}'
+HOVER_AWAIT_TOOLTIP     =
+'Calling async function, current thread may be yielded.'
 
 ACTION_DISABLE_DIAG     =
 'Disable diagnostics in the workspace ({}).'
@@ -437,7 +438,7 @@ WINDOW_PROCESSING_SEMANTIC_FULL  =
 'Processing full semantic tokens...'
 WINDOW_PROCESSING_SEMANTIC_RANGE =
 'Processing incremental semantic tokens...'
-WINDOW_PROCESSING_TYPE_HINT      =
+WINDOW_PROCESSING_HINT           =
 'Processing inline hint...'
 WINDOW_INCREASE_UPPER_LIMIT      =
 'Increase upper limit'
@@ -464,6 +465,10 @@ This icon is a cat,
 Not a dog nor a fox!
              ↓↓↓
 ]]
+WINDOW_LUA_STATUS_DIAGNOSIS_TITLE=
+'Perform workspace diagnosis'
+WINDOW_LUA_STATUS_DIAGNOSIS_MSG  =
+'Do you want to perform workspace diagnosis?'
 WINDOW_APPLY_SETTING             =
 'Apply setting'
 WINDOW_CHECK_SEMANTIC            =
@@ -490,6 +495,8 @@ WINDOW_APPLY_WHITOUT_SETTING     =
 'Apply but do not modify settings'
 WINDOW_ASK_APPLY_LIBRARY         =
 'Do you need to configure your work environment as `{}`?'
+WINDOW_SEARCHING_IN_FILES        =
+'Searching in files...'
 
 CONFIG_LOAD_FAILED               =
 'Unable to read the settings file: {}'

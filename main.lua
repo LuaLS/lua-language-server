@@ -52,8 +52,8 @@ METAPATH = METAPATH and util.expandPath(METAPATH) or (ROOT:string() .. '/meta')
 
 ---@diagnostic disable-next-line: deprecated
 debug.setcstacklimit(200)
---collectgarbage('generational', 5, 25)
-collectgarbage('incremental', 120, 120, 0)
+collectgarbage('generational', 10, 50)
+--collectgarbage('incremental', 120, 120, 0)
 
 ---@diagnostic disable-next-line: lowercase-global
 log = require 'log'
@@ -67,11 +67,6 @@ log.info('ROOT:', ROOT:string())
 log.info('LOGPATH:', LOGPATH)
 log.info('METAPATH:', METAPATH)
 log.info('VERSION:', version.getVersion())
-
-local stdRequire = require
-require = function (name)
-    return stdRequire(name)
-end
 
 require 'tracy'
 require 'cli'

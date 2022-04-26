@@ -859,3 +859,43 @@ end
 
 <?t?>
 ]]
+
+TEST [[
+---@class A
+local t = {
+    <!x!> = nil,
+}
+
+---@type A
+local f
+f.<?x?>
+]]
+
+TEST [[
+---@class A
+G = {
+    <!x!> = nil,
+}
+
+---@type A
+local f
+f.<?x?>
+]]
+
+TEST [[
+---@class <!XXX!><K, V>: {}
+
+---@type <?XXX?><>
+]]
+
+TEST [[
+---@class <!YYY!>
+
+---@type XXX<<?YYY?>>
+]]
+
+TEST [[
+local <!x!>
+
+---@cast <?x?> integer
+]]

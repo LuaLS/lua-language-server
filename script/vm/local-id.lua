@@ -1,5 +1,6 @@
 local util  = require 'utility'
 local guide = require 'parser.guide'
+local vm    = require 'vm.vm'
 
 ---@class parser.object
 ---@field _localID string
@@ -8,10 +9,9 @@ local guide = require 'parser.guide'
 ---@class vm.local-id
 local m = {}
 
-m.ID_SPLITE = '\x1F'
-
 local compileSwitch = util.switch()
     : case 'local'
+    : case 'self'
     : call(function (source)
         source._localID = ('%d'):format(source.start)
         if not source.ref then
@@ -37,7 +37,7 @@ local compileSwitch = util.switch()
         if type(key) ~= 'string' then
             return
         end
-        source._localID = parentID .. m.ID_SPLITE .. key
+        source._localID = parentID .. vm.ID_SPLITE .. key
         source.field._localID = source._localID
         if source.type == 'getfield' then
             m.compileLocalID(source.next)
@@ -54,7 +54,7 @@ local compileSwitch = util.switch()
         if type(key) ~= 'string' then
             return
         end
-        source._localID = parentID .. m.ID_SPLITE .. key
+        source._localID = parentID .. vm.ID_SPLITE .. key
         source.method._localID = source._localID
         if source.type == 'getmethod' then
             m.compileLocalID(source.next)
@@ -71,7 +71,7 @@ local compileSwitch = util.switch()
         if type(key) ~= 'string' then
             return
         end
-        source._localID = parentID .. m.ID_SPLITE .. key
+        source._localID = parentID .. vm.ID_SPLITE .. key
         source.index._localID = source._localID
         if source.type == 'setindex' then
             m.compileLocalID(source.next)
@@ -98,6 +98,7 @@ local leftSwitch = util.switch()
         return source.node
     end)
     : case 'local'
+    : case 'self'
     : call(function (source)
         return source
     end)
@@ -106,6 +107,17 @@ local leftSwitch = util.switch()
 ---@return parser.object?
 function m.getLocal(source)
     return leftSwitch(source.type, source)
+end
+
+---@param id string
+---@param source parser.object
+function m.insertLocalID(id, source)
+    local root = guide.getRoot(source)
+    if not root._localIDs then
+        root._localIDs = util.multiTable(2)
+    end
+    local sources = root._localIDs[id]
+    sources[#sources+1] = source
 end
 
 function m.compileLocalID(source)
@@ -117,19 +129,15 @@ function m.compileLocalID(source)
         return
     end
     compileSwitch(source.type, source)
-    if not source._localID then
+    local id = source._localID
+    if not id then
         return
     end
-    local root = guide.getRoot(source)
-    if not root._localIDs then
-        root._localIDs = util.multiTable(2)
-    end
-    local sources = root._localIDs[source._localID]
-    sources[#sources+1] = source
+    m.insertLocalID(id, source)
 end
 
 ---@param source parser.object
----@return string|boolean
+---@return string?
 function m.getID(source)
     if source._localID ~= nil then
         return source._localID
@@ -159,7 +167,7 @@ function m.getSources(source, key)
         if type(key) ~= 'string' then
             return nil
         end
-        id = id .. m.ID_SPLITE .. key
+        id = id .. vm.ID_SPLITE .. key
     end
     return root._localIDs[id]
 end
@@ -176,17 +184,22 @@ function m.getFields(source)
         return nil
     end
     -- TODO：optimize
+    local clock = os.clock()
     local fields = {}
     for lid, sources in pairs(root._localIDs) do
         if  lid ~= id
         and util.stringStartWith(lid, id)
-        and lid:sub(#id + 1, #id + 1) == m.ID_SPLITE
+        and lid:sub(#id + 1, #id + 1) == vm.ID_SPLITE
         -- only one field
-        and not lid:find(m.ID_SPLITE, #id + 2) then
+        and not lid:find(vm.ID_SPLITE, #id + 2) then
             for _, src in ipairs(sources) do
                 fields[#fields+1] = src
             end
         end
+    end
+    local cost = os.clock() - clock
+    if cost > 1.0 then
+        log.warn('local-id getFields takes %.3f seconds', cost)
     end
     return fields
 end

@@ -332,6 +332,8 @@ function m.findUrisByFilePath(path)
     return results
 end
 
+---@param path string
+---@return string
 function m.normalize(path)
     if not path then
         return nil

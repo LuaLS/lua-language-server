@@ -123,12 +123,14 @@ function m.findUrisByRequirePath(suri, path)
     local clt = scope.getScope(suri):get('requireName')
     if clt then
         for _, uri in clt:each(suri, fspath) do
-            local infos = m.getVisiblePath(suri, furi.decode(uri))
-            for _, info in ipairs(infos) do
-                local fsexpect = info.expect:gsub('%' .. separator, '/')
-                if fsexpect == fspath then
-                    results[#results+1] = uri
-                    searchers[uri] = info.searcher
+            if uri ~= suri then
+                local infos = m.getVisiblePath(suri, furi.decode(uri))
+                for _, info in ipairs(infos) do
+                    local fsexpect = info.expect:gsub('%' .. separator, '/')
+                    if fsexpect == fspath then
+                        results[#results+1] = uri
+                        searchers[uri] = info.searcher
+                    end
                 end
             end
         end
@@ -152,14 +154,18 @@ local function removeVisiblePath(uri)
         return
     end
     for _, scp in ipairs(workspace.folders) do
-        scp:get('visiblePath')[path] = nil
+        if scp:get('visiblePath') then
+            scp:get('visiblePath')[path] = nil
+        end
         ---@type collector
         local clt = scp:get('requireName')
         if clt then
             clt:dropUri(uri)
         end
     end
-    scope.fallback:get('visiblePath')[path] = nil
+    if scope.fallback:get('visiblePath') then
+        scope.fallback:get('visiblePath')[path] = nil
+    end
     ---@type collector
     local clt = scope.fallback:get('requireName')
     if clt then

@@ -33,7 +33,9 @@ DIAG_PREVIOUS_CALL      =
 DIAG_PREFIELD_CALL      =
 '会被解释为 `{}{}`。你可能需要加一个`,`或`;`。'
 DIAG_OVER_MAX_ARGS      =
-'函数只接收 {:d} 个参数，但你传了 {:d} 个。'
+'函数最多接收 {:d} 个参数，但获得了 {:d} 个。'
+DIAG_MISS_ARGS          =
+'函数最少接收 {:d} 个参数，但获得了 {:d} 个。'
 DIAG_OVER_MAX_VALUES    =
 '只有 {} 个变量，但你设置了 {} 个值。'
 DIAG_AMBIGUITY_1        =
@@ -94,7 +96,8 @@ DIAG_NOT_YIELDABLE      =
 '此函数的第 {} 个参数没有被标记为可让出，但是传入了异步函数。（使用 `---@param name async fun()` 来标记为可让出）'
 DIAG_DISCARD_RETURNS    =
 '不能丢弃此函数的返回值。'
-
+DIAG_NEED_CHECK_NIL     =
+'需要判空。'
 DIAG_CIRCLE_DOC_CLASS                 =
 '循环继承的类。'
 DIAG_DOC_FIELD_NO_CLASS               =
@@ -234,7 +237,6 @@ PARSER_INDEX_IN_FUNC_NAME =
 '命名函数的名称中不能使用 `[name]` 形式。'
 PARSER_UNKNOWN_ATTRIBUTE  =
 '局部变量属性应该是 `const` 或 `close`'
-
 PARSER_LUADOC_MISS_CLASS_NAME           =
 '缺少类名称。'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =
@@ -270,16 +272,17 @@ PARSER_LUADOC_MISS_FUN_AFTER_OVERLOAD   =
 PARSER_LUADOC_MISS_CATE_NAME            =
 '缺少文档类型名称。'
 PARSER_LUADOC_MISS_DIAG_MODE            =
-'缺少诊断模式'
+'缺少诊断模式。'
 PARSER_LUADOC_ERROR_DIAG_MODE           =
-'诊断模式不正确'
+'诊断模式不正确。'
+PARSER_LUADOC_MISS_LOCAL_NAME           =
+'缺少变量名。'
 
 SYMBOL_ANONYMOUS        =
 '<匿名函数>'
 
 HOVER_VIEW_DOCUMENTS    =
 '查看文档'
-
 HOVER_DOCUMENT_LUA51    =
 'http://www.lua.org/manual/5.1/manual.html#{}'
 HOVER_DOCUMENT_LUA52    =
@@ -290,7 +293,6 @@ HOVER_DOCUMENT_LUA54    =
 'http://www.lua.org/manual/5.4/manual.html#{}'
 HOVER_DOCUMENT_LUAJIT   =
 'http://www.lua.org/manual/5.1/manual.html#{}'
-
 HOVER_NATIVE_DOCUMENT_LUA51     =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUA52     =
@@ -301,7 +303,6 @@ HOVER_NATIVE_DOCUMENT_LUA54     =
 'command:extension.lua.doc?["en-us/54/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUAJIT    =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
-
 HOVER_MULTI_PROTOTYPE      =
 '({} 个原型)'
 HOVER_STRING_BYTES         =
@@ -312,7 +313,6 @@ HOVER_MULTI_DEF_PROTO      =
 '({} 个定义，{} 个原型)'
 HOVER_MULTI_PROTO_NOT_FUNC =
 '({} 个非函数定义)'
-
 HOVER_USE_LUA_PATH      =
 '（搜索路径： `{}`）'
 HOVER_EXTENDS           =
@@ -321,6 +321,8 @@ HOVER_TABLE_TIME_UP     =
 '出于性能考虑，已禁用了部分类型推断。'
 HOVER_WS_LOADING        =
 '正在加载工作目录：{} / {}'
+HOVER_AWAIT_TOOLTIP     =
+'正在调用异步函数，可能会让出当前协程'
 
 ACTION_DISABLE_DIAG     =
 '在工作区禁用诊断 ({})。'
@@ -463,6 +465,10 @@ WINDOW_LUA_STATUS_TIP            =
 不是狗也不是狐狸！
              ↓↓↓
 ]]
+WINDOW_LUA_STATUS_DIAGNOSIS_TITLE=
+'进行工作区诊断'
+WINDOW_LUA_STATUS_DIAGNOSIS_MSG  =
+'是否进行工作区诊断？'
 WINDOW_APPLY_SETTING             =
 '应用设置'
 WINDOW_CHECK_SEMANTIC            =
@@ -489,6 +495,8 @@ WINDOW_APPLY_WHITOUT_SETTING     =
 '应用但不修改设置'
 WINDOW_ASK_APPLY_LIBRARY         =
 '是否需要将你的工作环境配置为 `{}` ？'
+WINDOW_SEARCHING_IN_FILES        =
+'正在文件中搜索...'
 
 CONFIG_LOAD_FAILED               =
 '无法读取设置文件：{}'

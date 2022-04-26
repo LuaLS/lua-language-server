@@ -4,7 +4,7 @@ local log = require("log")
 local converter = require("proto.converter")
 
 return function(uri, range, options)
-    local text = files.getText(uri)
+    local text = files.getOriginText(uri)
     local status, formattedText, startLine, endLine = codeFormat.range_format(
         uri, text, range.start.line, range["end"].line, options)
 

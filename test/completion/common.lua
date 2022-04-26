@@ -630,7 +630,7 @@ self.results.list[#self.re<??>]
     },
     {
         label = 'results',
-        kind = define.CompletionItemKind.Text,
+        kind = define.CompletionItemKind.Field,
     },
 }
 
@@ -1750,7 +1750,7 @@ zz<??>
         detail = 'integer = 1',
         description = [[
 ```lua
-global zzz: integer = 1
+(global) zzz: integer = 1
 ```
 
 ---
@@ -2094,7 +2094,7 @@ print(t.aa<??>)
         kind  = define.CompletionItemKind.Field,
         description = [[
 ```lua
-field cc.aaa: number
+(field) cc.aaa: number
 ```]]
     },
 }
@@ -3292,3 +3292,59 @@ local t = x[<??>]
         assert(res.label ~= 'do')
     end
 end)
+
+TEST [[
+---@class ZZZZZ.XXXX
+---@class ZZZZZ.XXXX
+---@class ZZZZZ.XXXX
+---@class ZZZZZ.XXXX
+---@class ZZZZZ.XXXX
+
+---@type <??>
+]]
+(function (results)
+    local count = 0
+    for _, res in ipairs(results) do
+        if res.label == 'ZZZZZ.XXXX' then
+            count = count + 1
+        end
+    end
+    assert(count == 1)
+end)
+
+TEST [[
+local x
+x.y.z = xxx
+
+x.y.<??>
+]]
+{
+    {
+        label = 'z',
+        kind  = define.CompletionItemKind.Field,
+    }
+}
+
+TEST [[
+local xyz
+
+---@cast <??>
+]]
+{
+    {
+        label = 'xyz',
+        kind  = define.CompletionItemKind.Variable,
+    },
+}
+
+TEST [[
+local xyz
+
+---@cast x<??>
+]]
+{
+    {
+        label = 'xyz',
+        kind  = define.CompletionItemKind.Variable,
+    }
+}

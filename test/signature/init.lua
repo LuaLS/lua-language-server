@@ -65,7 +65,7 @@ end
 
 mt:f(<??>
 ]]
-'method mt:f(<!a: any!>)'
+'(method) mt:f(<!a: any!>)'
 
 TEST [[
 local function x(a, b)
@@ -88,7 +88,7 @@ x(1, 2, 3, <??>
 TEST [[
 (''):sub(<??>
 ]]
-'method string:sub(<!i: integer!>, j?: integer)'
+'(method) string:sub(<!i: integer!>, j?: integer)'
 
 TEST [[
 (''):sub(1)<??>
@@ -222,3 +222,9 @@ fooC(function (x, s)
 end,<??>)
 ]]
 'function fooC(callback: fun(x: number, s: string):nil, <!par: number!>)'
+
+TEST [[
+(function (a, b)
+end)(<??>)
+]]
+'function (<!a: any!>, b: any)'

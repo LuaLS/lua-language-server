@@ -20,8 +20,6 @@ local infer        = require 'vm.infer'
 local await        = require 'await'
 local postfix      = require 'core.completion.postfix'
 local globalMgr    = require 'vm.global-manager'
-local compiler     = require 'vm.compiler'
-local nodeMgr      = require 'vm.node'
 
 local diagnosticModes = {
     'disable-next-line',
@@ -188,9 +186,6 @@ local function buildFunctionSnip(source, value, oop)
 end
 
 local function buildDetail(source)
-    if source.type == 'dummy' then
-        return
-    end
     local types = infer.getInfer(source):view()
     local literals = infer.getInfer(source):viewLiterals()
     if literals then
@@ -230,9 +225,6 @@ end
 
 ---@async
 local function buildDesc(source)
-    if source.type == 'dummy' then
-        return
-    end
     local desc = markdown()
     local hover = getHover.get(source)
     desc:add('md', hover)
@@ -382,7 +374,7 @@ local function checkModule(state, word, position, results)
                 goto CONTINUE
             end
             if  targetSource.type == 'getlocal'
-            and vm.isDeprecated(targetSource.node) then
+            and vm.getDeprecated(targetSource.node) then
                 goto CONTINUE
             end
             results[#results+1] = {
@@ -420,7 +412,7 @@ local function checkModule(state, word, position, results)
 end
 
 local function checkFieldFromFieldToIndex(state, name, src, parent, word, startPos, position)
-    if type(name) == 'string' and name:match '^[%a_][%w_]*$' then
+    if name:match '^[%a_][%w_]*$' then
         return nil
     end
     local textEdit, additionalTextEdits
@@ -493,11 +485,11 @@ local function checkFieldThen(state, name, src, word, startPos, position, parent
             kind = define.CompletionItemKind.Function
         end
         buildFunction(results, src, value, oop, {
-            label      = tostring(name),
+            label      = name,
             kind       = kind,
             match      = name:match '^[^(]+',
             insertText = name:match '^[^(]+',
-            deprecated = vm.isDeprecated(src) or nil,
+            deprecated = vm.getDeprecated(src) and true or nil,
             id         = stack(function () ---@async
                 return {
                     detail      = buildDetail(src),
@@ -526,9 +518,9 @@ local function checkFieldThen(state, name, src, word, startPos, position, parent
         textEdit, additionalTextEdits = checkFieldFromFieldToIndex(state, name, src, parent, word, startPos, position)
     end
     results[#results+1] = {
-        label      = tostring(name),
+        label      = name,
         kind       = kind,
-        deprecated = vm.isDeprecated(src) or nil,
+        deprecated = vm.getDeprecated(src) and true or nil,
         textEdit   = textEdit,
         id         = stack(function () ---@async
             return {
@@ -554,6 +546,7 @@ local function checkFieldOfRefs(refs, state, word, startPos, position, parent, o
         if isSameSource(state, src, startPos) then
             goto CONTINUE
         end
+        name = tostring(name)
         if isGlobal and locals and locals[name] then
             goto CONTINUE
         end
@@ -589,7 +582,7 @@ local function checkFieldOfRefs(refs, state, word, startPos, position, parent, o
             count = count + 1
             goto CONTINUE
         end
-        if vm.isDeprecated(src) then
+        if vm.getDeprecated(src) then
             goto CONTINUE
         end
         if guide.isSet(src) then
@@ -1122,9 +1115,10 @@ local function checkTypingEnum(state, position, defs, str, results)
     local enums = {}
     for _, def in ipairs(defs) do
         if def.type == 'doc.type.string'
-        or def.type == 'doc.type.integer' then
+        or def.type == 'doc.type.integer'
+        or def.type == 'doc.type.boolean' then
             enums[#enums+1] = {
-                label       = util.viewLiteral(def[1]),
+                label       = infer.viewObject(def),
                 description = def.comment and def.comment.text,
                 kind        = define.CompletionItemKind.EnumMember,
             }
@@ -1376,7 +1370,9 @@ local function checkTableLiteralField(state, position, tbl, fields, results)
     if left then
         for _, field in ipairs(fields) do
             local name = guide.getKeyName(field)
-            if not mark[name] and matchKey(left, guide.getKeyName(field)) then
+            if  name
+            and not mark[name]
+            and matchKey(left, tostring(name)) then
                 results[#results+1] = {
                     label      = guide.getKeyName(field),
                     kind       = define.CompletionItemKind.Property,
@@ -1401,14 +1397,17 @@ local function tryCallArg(state, position, results)
     if arg and arg.type == 'function' then
         return
     end
-    local node = compiler.compileCallArg({ type = 'dummyarg' }, call, argIndex)
+    local node = vm.compileCallArg({ type = 'dummyarg' }, call, argIndex)
+    if not node then
+        return
+    end
     local enums = {}
-    for src in nodeMgr.eachNode(node) do
+    for src in node:eachObject() do
         if src.type == 'doc.type.string'
         or src.type == 'doc.type.integer'
         or src.type == 'doc.type.boolean' then
             enums[#enums+1] = {
-                label       = util.viewLiteral(src[1]),
+                label       = infer.viewObject(src),
                 description = src.comment,
                 kind        = define.CompletionItemKind.EnumMember,
             }
@@ -1515,6 +1514,7 @@ local function tryluaDocCate(word, results)
         'module',
         'async',
         'nodiscard',
+        'cast',
     } do
         if matchKey(word, docType) then
             results[#results+1] = {
@@ -1663,17 +1663,39 @@ local function tryluaDocBySource(state, position, source, results)
                 }
             end
         end
+        return true
     elseif source.type == 'doc.module' then
         collectRequireNames('require', state.uri, source.module or '', source, source.smark, position, results)
+        return true
+    elseif source.type == 'doc.cast.name' then
+        local locals = guide.getVisibleLocals(state.ast, position)
+        for name, loc in util.sortPairs(locals) do
+            if matchKey(source[1], name) then
+                results[#results+1] = {
+                    label = name,
+                    kind   = define.CompletionItemKind.Variable,
+                    id     = stack(function () ---@async
+                        return {
+                            detail      = buildDetail(loc),
+                            description = buildDesc(loc),
+                        }
+                    end),
+                }
+            end
+        end
+        return true
     end
     return false
 end
 
 local function tryluaDocByErr(state, position, err, docState, results)
     if     err.type == 'LUADOC_MISS_CLASS_EXTENDS_NAME' then
+        local used = {}
         for _, doc in ipairs(vm.getDocSets(state.uri)) do
             if  doc.type == 'doc.class'
+            and not used[doc.class[1]]
             and doc.class[1] ~= docState.class[1] then
+                used[doc.class[1]] = true
                 results[#results+1] = {
                     label       = doc.class[1],
                     kind        = define.CompletionItemKind.Class,
@@ -1681,14 +1703,19 @@ local function tryluaDocByErr(state, position, err, docState, results)
             end
         end
     elseif err.type == 'LUADOC_MISS_TYPE_NAME' then
+        local used = {}
         for _, doc in ipairs(vm.getDocSets(state.uri)) do
-            if doc.type == 'doc.class' then
+            if  doc.type == 'doc.class'
+            and not used[doc.class[1]] then
+                used[doc.class[1]] = true
                 results[#results+1] = {
                     label       = doc.class[1],
                     kind        = define.CompletionItemKind.Class,
                 }
             end
-            if doc.type == 'doc.alias' then
+            if  doc.type == 'doc.alias'
+            and not used[doc.alias[1]] then
+                used[doc.alias[1]] = true
                 results[#results+1] = {
                     label       = doc.alias[1],
                     kind        = define.CompletionItemKind.Class,
@@ -1712,7 +1739,7 @@ local function tryluaDocByErr(state, position, err, docState, results)
         local label = {}
         local insertText = {}
         for i, arg in ipairs(func.args) do
-            if arg[1] and not arg.dummy then
+            if arg[1] and arg.type ~= 'self' then
                 label[#label+1] = arg[1]
                 if #label == 1 then
                     insertText[#insertText+1] = ('%s ${%d:any}'):format(arg[1], #label)
@@ -1751,6 +1778,22 @@ local function tryluaDocByErr(state, position, err, docState, results)
         end
     elseif err.type == 'LUADOC_MISS_MODULE_NAME' then
         collectRequireNames('require', state.uri, '', docState, nil, position, results)
+    elseif err.type == 'LUADOC_MISS_LOCAL_NAME' then
+        local locals = guide.getVisibleLocals(state.ast, position)
+        for name, loc in util.sortPairs(locals) do
+            if name ~= '_ENV' then
+                results[#results+1] = {
+                    label = name,
+                    kind   = define.CompletionItemKind.Variable,
+                    id     = stack(function () ---@async
+                        return {
+                            detail      = buildDetail(loc),
+                            description = buildDesc(loc),
+                        }
+                    end),
+                }
+            end
+        end
     end
 end
 
@@ -1776,7 +1819,7 @@ local function buildluaDocOfFunction(func)
     end
     for n, arg in ipairs(args) do
         local funcArg = func.args[n]
-        if funcArg[1] and not funcArg.dummy then
+        if funcArg[1] and funcArg.type ~= 'self' then
             index = index + 1
             buf[#buf+1] = ('---@param %s ${%d:%s}'):format(
                 funcArg[1],
@@ -1869,6 +1912,9 @@ local function tryComment(state, position, results)
     local doc  = getluaDoc(state, position)
     if not word then
         local comment = getComment(state, position)
+        if not comment then
+            return
+        end
         if comment.type == 'comment.short'
         or comment.type == 'comment.cshort' then
             if comment.text == '' then
@@ -1924,6 +1970,8 @@ local function completion(uri, position, triggerCharacter)
         return nil
     end
     clearStack()
+    vm.lockCache()
+    local _ <close> = vm.unlockCache
     local results = {}
     tracy.ZoneBeginN 'completion #2'
     tryCompletions(state, position, triggerCharacter, results)

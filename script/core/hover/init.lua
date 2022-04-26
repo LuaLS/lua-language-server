@@ -58,6 +58,9 @@ local function getHover(source)
     else
         addHover(source, true, oop)
         for _, def in ipairs(vm.getDefs(source)) do
+            if def.type == 'global' then
+                goto CONTINUE
+            end
             if guide.isOOP(def) then
                 oop = true
             end
@@ -67,6 +70,7 @@ local function getHover(source)
                 isFunction = true
             end
             addHover(def, isFunction, oop)
+            ::CONTINUE::
         end
     end
 

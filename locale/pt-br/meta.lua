@@ -1,10 +1,11 @@
 ---@diagnostic disable: undefined-global, lowercase-global
 
--- basic
 arg                 =
 'Argumentos de inicialização para a versão standalone da linguagem Lua.'
+
 assert              =
 'Emite um erro se o valor de seu argumento v for falso (i.e., `nil` ou `false`); caso contrário, devolve todos os seus argumentos. Em caso de erro, `message` é o objeto de erro que, quando ausente, por padrão é `"assertion failed!"`'
+
 cgopt.collect       =
 'Realiza um ciclo completo de coleta de lixo (i.e., garbage-collection cycle).'
 cgopt.stop          =
@@ -25,22 +26,29 @@ cgopt.generational  =
 'Altera o modo do coletor para geracional.'
 cgopt.isrunning     =
 'Retorna um valor booleano indicando se o coletor de lixo (i.e., garbage-collection) está em execução.'
+
 collectgarbage      =
 'Esta função é uma interface genérica para o coletor de lixo (i.e., garbage-collection). Ela executa diferentes funções de acordo com seu primeiro argumento, `opt`.'
+
 dofile              =
 'Abre o arquivo fornecido por argumento e executa seu conteúdo como código Lua. Quando chamado sem argumentos, `dofile` executa o conteúdo da entrada padrão (`stdin`). Retorna todos os valores retornados pelo trecho de código contido no arquivo. Em caso de erros, o `dofile` propaga o erro para seu chamador. Ou seja, o `dofile` não funciona em modo protegido.'
+
 error               =
 [[
 Termina a última chamada de função protegida e retorna `message` como objeto de `erro`.
 
 Normalmente, o 'erro' adiciona algumas informações sobre a localização do erro no início da mensagem, quando a mensagem for uma string.
 ]]
+
 _G                  =
 'Uma variável global (não uma função) que detém o ambiente global (ver §2.2). Lua em si não usa esta variável; mudar seu valor não afeta nenhum ambiente e vice-versa.'
+
 getfenv             =
 'Retorna o ambiente atual em uso pela função. O `f` pode ser uma função Lua ou um número que especifica a função naquele nível de pilha.'
+
 getmetatable        =
 'Se o objeto não tiver uma metatable, o retorno é `nil`. Mas caso a metatable do objeto tenha um campo `__metatable`, é retornado o valor associado. Caso contrário, retorna a metatable do objeto dado.'
+
 ipairs              =
 [[
 Retorna três valores (uma função iteradora, a tabela `t`, e `0`) para que a seguinte construção
@@ -49,12 +57,14 @@ Retorna três valores (uma função iteradora, a tabela `t`, e `0`) para que a s
 ```
 possa iterar sobre os pares de valor-chave `(1,t[1]), (2,t[2]), ...`, até o primeiro índice ausente.
 ]]
+
 loadmode.b          =
 'Somente blocos binários.'
 loadmode.t          =
 'Somente blocos de texto.'
 loadmode.bt         =
 'Tanto binário quanto texto.'
+
 load['<5.1']        =
 'Carrega um bloco utilizando a função `func` para obter suas partes. Cada chamada para o `func` deve retornar uma string que é concatenada com os resultados anteriores.'
 load['>5.2']        =
@@ -63,12 +73,16 @@ Carrega um bloco.
 
 Se o bloco (i.e., `chunk`) é uma string, o bloco é essa string. Se o bloco é uma função, a função "load" é chamada repetidamente para obter suas partes. Cada chamada para o bloco deve retornar uma string que é concatenada com os resultados anteriores. O fim do bloco é sinalizado com o retorno de uma string vazia ou `nil`.
 ]]
+
 loadfile            =
 'Carrega um bloco de arquivo `filename` ou da entrada padrão, se nenhum nome de arquivo for dado.'
+
 loadstring          =
 'Carrega um bloco a partir de uma string dada.'
+
 module              =
 'Cria um módulo.'
+
 next                =
 [[
 Permite que um programa percorra todos os campos de uma tabela. Seu primeiro argumento é uma tabela e seu segundo argumento é um índice nesta tabela. Uma chamada `next` retorna o próximo índice da tabela e seu valor associado. Quando chamado usando `nil` como segundo argumento, `next` retorna um índice inicial e seu valor associado. Quando chamado com o último índice, ou com `nil` em uma tabela vazia, o `next` retorna o `nil`. Se o segundo argumento estiver ausente, então é interpretado como `nil`. Portanto, pode-se utilizar o `next(t)` para verificar se uma tabela está vazia.
@@ -77,6 +91,7 @@ A ordem na qual os índices são enumerados não é especificada, *mesmo para í
 
 O comportamento do `next` é indefinido se, durante a iteração/travessia, você atribuir qualquer valor a um campo inexistente na tabela. Você pode, entretanto, modificar os campos existentes e pode, inclusive, os definir como nulos.
 ]]
+
 pairs               =
 [[
 Se `t` tem um "meta" método (i.e., metamethod) `__pairs`, a chamada é feita usando t como argumento e retorna os três primeiros resultados.
@@ -89,30 +104,39 @@ possa iterar sobre todos os pares de valor-chave da tabela 't'.
 
 Veja a função $next para saber as ressalvas em modificar uma tabela durante sua iteração.
 ]]
+
 pcall               =
 [[
 Chama a função `f` com os argumentos dados em modo *protegido*. Isto significa que qualquer erro dentro de `f` não é propagado; em vez disso, o `pcall` captura o erro e retorna um código de status. Seu primeiro resultado é o código de status (booleano), que é verdadeiro se a chamada for bem sucedida sem erros. Neste caso, `pcall' também retorna todos os resultados da chamada, após este primeiro resultado. Em caso de qualquer erro, `pcall` retorna `false` mais o objeto de erro.
 ]]
+
 print               =
 [[
 Recebe qualquer número de argumentos e imprime seus valores na saída padrão `stdout`, convertendo cada argumento em uma string seguindo as mesmas regras do $tostring.
 A função `print` não é destinada à saída formatada, mas apenas como uma forma rápida de mostrar um valor, por exemplo, para debugging. Para controle completo sobre a saída, use $string.format e $io.write.
 ]]
+
 rawequal            =
 'Verifica se v1 é igual a v2, sem invocar a metatable `__eq`.'
+
 rawget              =
 'Obtém o valor real de `table[index]`, sem invocar a metatable `__index`.'
+
 rawlen              =
 'Retorna o comprimento do objeto `v`, sem invocar a metatable `__len`.'
+
 rawset              =
 [[
 Define o valor real de `table[index]` para `value`, sem utilizar o metavalue `__newindex`. `table` deve ser uma tabela, `index` qualquer valor diferente de `nil` e `NaN`, e `value` qualquer valor de tipos do Lua.
 Esta função retorna uma `table`.
 ]]
+
 select              =
 'Se `index` é um número, retorna todos os argumentos após o número do argumento `index`; um número negativo de índices do final (`-1` é o último argumento). Caso contrário, `index` deve ser a string `"#"`, e `select` retorna o número total de argumentos extras dados.'
+
 setfenv             =
 'Define o ambiente a ser utilizado pela função em questão.'
+
 setmetatable        =
 [[
 Define a metatable para a tabela dada. Se `metatabela` for `nil`, remove a metatable da tabela em questão. Se a metatable original tiver um campo `__metatable', um erro é lançado.
@@ -121,12 +145,14 @@ Esta função retorna uma `table`.
 
 Para alterar a metatable de outros tipos do código Lua, você deve utilizar a biblioteca de debugging (§6.10).
 ]]
+
 tonumber            =
 [[
 Quando chamado sem a base, `tonumber` tenta converter seu argumento para um número. Se o argumento já for um número ou uma string numérica, então `tonumber` retorna este número; caso contrário, retorna `fail`.
 
 A conversão de strings pode resultar em números inteiros ou de ponto flutuante, de acordo com as convenções lexicais de Lua (ver §3.1). A string pode ter espaços antes e depois e um sinal.
 ]]
+
 tostring            =
 [[
 Recebe um valor de qualquer tipo e o converte em uma string em formato legível por humanos.
@@ -135,18 +161,23 @@ Se a metatable de `v` tem um campo `__tostring', então `tostring' chama o valor
 
 Para controle completo de como os números são convertidos, utilize $string.format.
 ]]
+
 type                =
 [[
 Retorna o tipo de seu único argumento, codificado como uma string. Os resultados possíveis desta função são `"nil"` (uma string, não o valor `nil`), `"number"`, `"string"`, `"boolean"`, `"table"`, `"function"`, `"thread"`, e `"userdata"`.
 ]]
+
 _VERSION            =
 'Uma variável global (não uma função) que contém uma string contendo a versão Lua em execução.'
+
 warn                =
 'Emite um aviso com uma mensagem composta pela concatenação de todos os seus argumentos (que devem ser strings).'
+
 xpcall['=5.1']      =
 'Faz chamada a função `f` com os argumentos dados e em modo protegido, usando um manipulador de mensagens dado.'
 xpcall['>5.2']      =
 'Faz chamada a função `f` com os argumentos dados e em modo protegido, usando um manipulador de mensagens dado.'
+
 unpack              =
 [[
 Retorna os elementos da lista dada. Esta função é equivalente a
@@ -227,6 +258,7 @@ coroutine.wrap              =
 'Cria uma nova `coroutine`, a partir de uma função `f` e retorna uma função que retorna a coroutine cada vez que ele é chamado.'
 coroutine.yield             =
 'Suspende a execução da coroutine chamada.'
+
 costatus.running            =
 'Está em execução.'
 costatus.suspended          =
@@ -296,6 +328,7 @@ debug.upvalueid             =
 'Retorna um identificador único (como um dado de usuário leve) para o valor antecedente de numero `n` da função dada.'
 debug.upvaluejoin           =
 'Faz o `n1`-ésimo valor da função `f1` (i.e., closure Lua) referir-se ao `n2`-ésimo valor da função `f2`.'
+
 infowhat.n                  =
 '`name` e `namewhat`'
 infowhat.S                  =
@@ -314,6 +347,7 @@ infowhat.r                  =
 '`ftransfer` e `ntransfer`'
 infowhat.L                  =
 '`activelines`'
+
 hookmask.c                  =
 'Faz chamada a um `hook` quando o Lua chama uma função.'
 hookmask.r                  =
@@ -344,6 +378,7 @@ file[':setvbuf']            =
 'Define o modo de `buffer` para um arquivo de saída.'
 file[':write']              =
 'Escreve o valor de cada um de seus argumentos no arquivo.'
+
 readmode.n                  =
 'Lê um numeral e o devolve como número.'
 readmode.a                  =
@@ -352,12 +387,14 @@ readmode.l                  =
 'Lê a próxima linha pulando o final da linha.'
 readmode.L                  =
 'Lê a próxima linha mantendo o final da linha.'
+
 seekwhence.set              =
 'O cursor base é o início do arquivo.'
 seekwhence.cur              =
 'O cursor base é a posição atual.'
 seekwhence['.end']          =
 'O cursor base é o final do arquivo.'
+
 vbuf.no                     =
 'A saída da operação aparece imediatamente.'
 vbuf.full                   =
@@ -402,6 +439,7 @@ io.type                     =
 'Verifica se `obj` é um identificador de arquivo válido.'
 io.write                    =
 'Escreve o valor de cada um dos seus argumentos para o arquivo de saída padrão.'
+
 openmode.r                  =
 'Modo de leitura.'
 openmode.w                  =
@@ -426,10 +464,12 @@ openmode['.w+b']            =
 'Modo de atualização, todos os dados anteriores são apagados. (em modo binário)'
 openmode['.a+b']            =
 'Modo de anexação e atualização, todos os dados anteriores são preservados, a escrita só é permitida no final do arquivo. (em modo binário)'
+
 popenmode.r                 =
 'Leia dados deste programa pelo arquivo.'
 popenmode.w                 =
 'Escreva dados neste programa pelo arquivo.'
+
 filetype.file               =
 '`handler` para arquivo aberto.'
 filetype['.closed file']    =
@@ -550,6 +590,7 @@ os.time                     =
 'Retorna a hora atual quando chamada sem argumentos, ou um valor representando a data e a hora local especificados pela tabela fornecida.'
 os.tmpname                  =
 'Retorna uma string com um nome de arquivo que pode ser usado como arquivo temporário.'
+
 osdate.year                 =
 'Quatro dígitos.'
 osdate.month                =
@@ -571,10 +612,12 @@ osdate.isdst                =
 
 package                     =
 ''
+
 require['<5.3']             =
 'Carrega o módulo fornecido e retorna qualquer valor retornado pelo módulo (`true` quando `nil`).'
 require['>5.4']             =
 'Carrega o módulo fornecido e retorna qualquer valor retornado pelo pesquisador (`true` quando `nil`). Além desse valor, também retorna como segundo resultado um carregador de dados retornados pelo pesquisador, o que indica como `require` encontrou o módulo. (Por exemplo, se o módulo vier de um arquivo, este carregador de dados é o caminho do arquivo.)'
+
 package.config              =
 'string descrevendo configurações a serem utilizadas durante a compilação de pacotes.'
 package.cpath               =
@@ -677,6 +720,12 @@ Retorna os elementos da lista fornecida. Esta função é equivalente a
 ```
 Por padrão, `i` é `1` e `j` é `#list`.
 ]]
+table.foreach               = -- TODO: need translate!
+'Executes the given f over all elements of table. For each element, f is called with the index and respective value as arguments. If f returns a non-nil value, then the loop is broken, and this value is returned as the final value of foreach.'
+table.foreachi              = -- TODO: need translate!
+'Executes the given f over the numerical indices of table. For each index, f is called with the index and respective value as arguments. Indices are visited in sequential order, from 1 to n, where n is the size of the table. If f returns a non-nil value, then the loop is broken and this value is returned as the result of foreachi.'
+table.getn                  = -- TODO: need translate!
+'Returns the number of elements in the table. This function is equivalent to `#list`.'
 
 utf8                        =
 ''
@@ -698,7 +747,5 @@ utf8.codepoint              =
 'Retorna os *codepoints* (em inteiros) de todos os caracteres em `s` que iniciam entre as posições do byte `i` e `j` (ambos inclusos).'
 utf8.len                    =
 'Retorna o número de caracteres UTF-8 na string `s` que começa entre as posições `i` e `j` (ambos inclusos).'
-utf8.offset                 =
-'Returns the position (in bytes) where the encoding of the `n`-th character of `s` (counting from position `i`) starts.'
 utf8.offset                 =
 'Retorna a posição (em bytes) onde a codificação do `n`-ésimo caractere de `s` inícia (contando a partir da posição `i`).'

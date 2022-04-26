@@ -175,6 +175,9 @@ m.snapshot = private(function ()
             exclude[o] = true
         end
     end
+    ---@generic T
+    ---@param o T
+    ---@return T
     local function private(o)
         if not o then
             return nil

@@ -3,18 +3,19 @@ local guide         = require 'parser.guide'
 local globalBuilder = require 'vm.global'
 local signMgr       = require 'vm.sign'
 local genericMgr    = require 'vm.generic'
+local localID       = require 'vm.local-id'
+---@class vm
+local vm            = require 'vm.vm'
 
 ---@class parser.object
----@field _globalNode vm.node.global
+---@field _globalNode? vm.global
 
 ---@class vm.global-manager
 local m = {}
----@type table<string, vm.node.global>
+---@type table<string, vm.global>
 m.globals = {}
 ---@type table<uri, table<string, boolean>>
 m.globalSubs = util.multiTable(2)
-
-m.ID_SPLITE = '\x1F'
 
 local compilerGlobalSwitch = util.switch()
     : case 'local'
@@ -74,7 +75,7 @@ local compilerGlobalSwitch = util.switch()
             if parentName == '_G' then
                 name = keyName
             else
-                name = parentName .. m.ID_SPLITE .. keyName
+                name = ('%s%s%s'):format(parentName, vm.ID_SPLITE, keyName)
             end
         elseif source.node.special == '_G' then
             name = keyName
@@ -82,7 +83,7 @@ local compilerGlobalSwitch = util.switch()
         if not name then
             return
         end
-        local uri  = guide.getUri(source)
+        local uri    = guide.getUri(source)
         local global = m.declareGlobal('variable', name, uri)
         global:addSet(uri, source)
         source._globalNode = global
@@ -92,17 +93,22 @@ local compilerGlobalSwitch = util.switch()
     : case 'getindex'
     ---@param source parser.object
     : call(function (source)
-        local name = guide.getKeyName(source)
-        if not name then
+        local name
+        local keyName = guide.getKeyName(source)
+        if not keyName then
             return
         end
         if source.node._globalNode then
             local parentName = source.node._globalNode:getName()
-            if parentName ~= '_G' then
-                name = parentName .. m.ID_SPLITE .. name
+            if parentName == '_G' then
+                name = keyName
+            else
+                name = ('%s%s%s'):format(parentName, vm.ID_SPLITE, keyName)
             end
+        elseif source.node.special == '_G' then
+            name = keyName
         end
-        local uri  = guide.getUri(source)
+        local uri    = guide.getUri(source)
         local global = m.declareGlobal('variable', name, uri)
         global:addGet(uri, source)
         source._globalNode = global
@@ -116,6 +122,9 @@ local compilerGlobalSwitch = util.switch()
     : call(function (source)
         if source.node.special == 'rawset'
         or source.node.special == 'rawget' then
+            if not source.args then
+                return
+            end
             local g     = source.args[1]
             local key   = source.args[2]
             if g and key and g.special == '_G' then
@@ -140,6 +149,7 @@ local compilerGlobalSwitch = util.switch()
         end
     end)
     : case 'doc.class'
+    ---@param source parser.object
     : call(function (source)
         local uri  = guide.getUri(source)
         local name = guide.getKeyName(source)
@@ -150,7 +160,7 @@ local compilerGlobalSwitch = util.switch()
         if source.signs then
             source._sign = signMgr()
             for _, sign in ipairs(source.signs) do
-                source._sign:addSign(sign)
+                source._sign:addSign(vm.compileNode(sign))
             end
             if source.extends then
                 for _, ext in ipairs(source.extends) do
@@ -172,7 +182,7 @@ local compilerGlobalSwitch = util.switch()
         if source.signs then
             source._sign = signMgr()
             for _, sign in ipairs(source.signs) do
-                source._sign:addSign(sign)
+                source._sign:addSign(vm.compileNode(sign))
             end
             source.extends._generic = genericMgr(source.extends, source._sign)
         end
@@ -183,11 +193,7 @@ local compilerGlobalSwitch = util.switch()
         local name = source[1]
         local type = m.declareGlobal('type', name, uri)
         type:addGet(uri, source)
-        if source.signs then
-            source._globalNode = source
-        else
-            source._globalNode = type
-        end
+        source._globalNode = type
     end)
     : case 'doc.extends.name'
     : call(function (source)
@@ -203,11 +209,13 @@ local compilerGlobalSwitch = util.switch()
 
 ---@param cate vm.global.cate
 ---@param name string
----@param uri  uri
----@return vm.node.global
+---@param uri? uri
+---@return vm.global
 function m.declareGlobal(cate, name, uri)
     local key = cate .. '|' .. name
-    m.globalSubs[uri][key] = true
+    if uri then
+        m.globalSubs[uri][key] = true
+    end
     if not m.globals[key] then
         m.globals[key] = globalBuilder(name, cate)
     end
@@ -217,46 +225,56 @@ end
 ---@param cate   vm.global.cate
 ---@param name   string
 ---@param field? string
----@return vm.node.global?
+---@return vm.global?
 function m.getGlobal(cate, name, field)
     local key = cate .. '|' .. name
     if field then
-        key = key .. m.ID_SPLITE .. field
+        key = key .. vm.ID_SPLITE .. field
     end
     return m.globals[key]
 end
 
 ---@param cate   vm.global.cate
 ---@param name   string
----@return vm.node.global[]
+---@return vm.global[]
 function m.getFields(cate, name)
     local globals = {}
     local key = cate .. '|' .. name
 
     -- TODO: optimize
+    local clock = os.clock()
     for gid, global in pairs(m.globals) do
         if  gid ~= key
         and util.stringStartWith(gid, key)
-        and gid:sub(#key + 1, #key + 1) == m.ID_SPLITE
-        and not gid:find(m.ID_SPLITE, #key + 2) then
+        and gid:sub(#key + 1, #key + 1) == vm.ID_SPLITE
+        and not gid:find(vm.ID_SPLITE, #key + 2) then
             globals[#globals+1] = global
         end
+    end
+    local cost = os.clock() - clock
+    if cost > 0.1 then
+        log.warn('global-manager getFields cost %.3f', cost)
     end
 
     return globals
 end
 
 ---@param cate   vm.global.cate
----@return vm.node.global[]
+---@return vm.global[]
 function m.getGlobals(cate)
     local globals = {}
 
     -- TODO: optimize
+    local clock = os.clock()
     for gid, global in pairs(m.globals) do
         if  util.stringStartWith(gid, cate)
-        and not gid:find(m.ID_SPLITE) then
+        and not gid:find(vm.ID_SPLITE) then
             globals[#globals+1] = global
         end
+    end
+    local cost = os.clock() - clock
+    if cost > 0.1 then
+        log.warn('global-manager getGlobals cost %.3f', cost)
     end
 
     return globals
@@ -303,8 +321,48 @@ function m.compileObject(source)
 end
 
 ---@param source parser.object
+function m.compileSelf(source)
+    if source.parent.type ~= 'funcargs' then
+        return
+    end
+    ---@type parser.object
+    local node = source.parent.parent and source.parent.parent.parent and source.parent.parent.parent.node
+    if not node then
+        return
+    end
+    local fields = localID.getFields(source)
+    if not fields then
+        return
+    end
+    local nodeLocalID = localID.getID(node)
+    local globalNode  = node._globalNode
+    if not nodeLocalID and not globalNode then
+        return
+    end
+    for _, field in ipairs(fields) do
+        if field.type == 'setfield' then
+            local key = guide.getKeyName(field)
+            if key then
+                if nodeLocalID then
+                    local myID = nodeLocalID .. vm.ID_SPLITE .. key
+                    localID.insertLocalID(myID, field)
+                end
+                if globalNode then
+                    local myID = globalNode:getName() .. vm.ID_SPLITE .. key
+                    local myGlobal = m.declareGlobal('variable', myID, guide.getUri(node))
+                    myGlobal:addSet(guide.getUri(node), field)
+                end
+            end
+        end
+    end
+end
+
+---@param source parser.object
 function m.compileAst(source)
     local env = guide.getENV(source)
+    if not env then
+        return
+    end
     m.compileObject(env)
     guide.eachSpecialOf(source, 'rawset', function (src)
         m.compileObject(src.parent)
@@ -320,9 +378,21 @@ function m.compileAst(source)
     }, function (src)
         m.compileObject(src)
     end)
+
+    --[[
+    local mt
+    function mt:xxx()
+        self.a = 1
+    end
+
+    mt.a --> find this definition
+    ]]
+    guide.eachSourceType(source, 'self', function (src)
+        m.compileSelf(src)
+    end)
 end
 
----@return vm.node.global
+---@return vm.global
 function m.getNode(source)
     if source.type == 'field'
     or source.type == 'method' then
@@ -337,9 +407,11 @@ function m.dropUri(uri)
     m.globalSubs[uri] = nil
     for key in pairs(globalSub) do
         local global = m.globals[key]
-        global:dropUri(uri)
-        if not global:isAlive() then
-            m.globals[key] = nil
+        if global then
+            global:dropUri(uri)
+            if not global:isAlive() then
+                m.globals[key] = nil
+            end
         end
     end
 end

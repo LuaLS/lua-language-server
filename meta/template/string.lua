@@ -65,7 +65,7 @@ function string.gmatch(s, pattern, init) end
 ---@param s       string
 ---@param pattern string
 ---@param repl    string|table|function
----@param n       integer
+---@param n?      integer
 ---@return string
 ---@return integer count
 ---@nodiscard

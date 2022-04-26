@@ -16,12 +16,12 @@ local type         = type
 ---@field uri                   uri
 ---@field start                 integer
 ---@field finish                integer
+---@field range                 integer
 ---@field effect                integer
 ---@field attrs                 string[]
 ---@field specials              parser.object[]
 ---@field labels                parser.object[]
 ---@field node                  parser.object
----@field dummy                 boolean
 ---@field field                 parser.object
 ---@field method                parser.object
 ---@field index                 parser.object
@@ -53,6 +53,18 @@ local type         = type
 ---@field state                 table
 ---@field comment               table
 ---@field optional              boolean
+---@field max                   parser.object
+---@field init                  parser.object
+---@field step                  parser.object
+---@field redundant             { max: integer, passed: integer }
+---@field filter                parser.object
+---@field loc                   parser.object
+---@field keyword               integer[]
+---@field casts                 parser.object[]
+---@field mode?                 '+' | '-'
+---@field hasGoTo?              true
+---@field hasReturn?            true
+---@field hasBreak?             true
 ---@field _root                 parser.object
 
 ---@class guide
@@ -68,6 +80,7 @@ local blockTypes = {
     ['repeat']      = true,
     ['do']          = true,
     ['function']    = true,
+    ['if']          = true,
     ['ifblock']     = true,
     ['elseblock']   = true,
     ['elseifblock'] = true,
@@ -120,7 +133,6 @@ local childMap = {
     ['doc']                = {'#'},
     ['doc.class']          = {'class', '#extends', '#signs', 'comment'},
     ['doc.type']           = {'#types', 'name', 'comment'},
-    ['doc.type.name']      = {'#signs'},
     ['doc.alias']          = {'alias', 'extends', 'comment'},
     ['doc.param']          = {'param', 'extends', 'comment'},
     ['doc.return']         = {'#returns', 'comment'},
@@ -134,10 +146,14 @@ local childMap = {
     ['doc.type.literal']   = {'node'},
     ['doc.type.arg']       = {'name', 'extends'},
     ['doc.type.field']     = {'name', 'extends'},
+    ['doc.type.sign']      = {'node', '#signs'},
     ['doc.overload']       = {'overload', 'comment'},
     ['doc.see']            = {'name', 'field'},
     ['doc.version']        = {'#versions'},
     ['doc.diagnostic']     = {'#names'},
+    ['doc.as']             = {'as'},
+    ['doc.cast']           = {'loc', '#casts'},
+    ['doc.cast.block']     = {'extends'},
 }
 
 ---@type table<string, fun(obj: parser.object, list: parser.object[])>
@@ -390,6 +406,7 @@ function m.getRoot(obj)
         end
         local parent = obj.parent
         if not parent then
+            log.error('Can not find out root:', obj.type)
             return nil
         end
         obj = parent
@@ -410,6 +427,7 @@ function m.getUri(obj)
     return ''
 end
 
+---@return parser.object?
 function m.getENV(source, start)
     if not start then
         start = 1
@@ -443,19 +461,17 @@ function m.getFunctionVarArgs(func)
 end
 
 --- 获取指定区块中可见的局部变量
----@param block table
----@param name string {comment = '变量名'}
----@param pos integer {comment = '可见位置'}
-function m.getLocal(block, name, pos)
-    block = m.getBlock(block)
-    for _ = 1, 10000 do
-        if not block then
-            return nil
-        end
-        local locals = block.locals
-        local res
+---@param source parser.object
+---@param name string # 变量名
+---@param pos integer # 可见位置
+---@return parser.object?
+function m.getLocal(source, name, pos)
+    local root = m.getRoot(source)
+    local res
+    m.eachSourceContain(root, pos, function (src)
+        local locals = src.locals
         if not locals then
-            goto CONTINUE
+            return
         end
         for i = 1, #locals do
             local loc = locals[i]
@@ -468,13 +484,8 @@ function m.getLocal(block, name, pos)
                 end
             end
         end
-        if res then
-            return res, res
-        end
-        ::CONTINUE::
-        block = m.getParentBlock(block)
-    end
-    error('guide.getLocal overstack')
+    end)
+    return res
 end
 
 --- 获取指定区块中所有的可见局部变量名称
@@ -599,6 +610,9 @@ local function addChilds(list, obj)
 end
 
 --- 遍历所有包含position的source
+---@param ast parser.object
+---@param position integer
+---@param callback fun(src: parser.object)
 function m.eachSourceContain(ast, position, callback)
     local list = { ast }
     local mark = {}
@@ -672,6 +686,10 @@ local function getSourceTypeCache(ast)
 end
 
 --- 遍历所有指定类型的source
+---@param ast parser.object
+---@param type string
+---@param callback fun(src: parser.object)
+---@return any
 function m.eachSourceType(ast, type, callback)
     local cache = getSourceTypeCache(ast)
     local myCache = cache[type]
@@ -679,10 +697,16 @@ function m.eachSourceType(ast, type, callback)
         return
     end
     for i = 1, #myCache do
-        callback(myCache[i])
+        local res = callback(myCache[i])
+        if res ~= nil then
+            return res
+        end
     end
 end
 
+---@param ast parser.object
+---@param tps string[]
+---@param callback fun(src: parser.object)
 function m.eachSourceTypes(ast, tps, callback)
     local cache = getSourceTypeCache(ast)
     for x = 1, #tps do
@@ -696,6 +720,8 @@ function m.eachSourceTypes(ast, tps, callback)
 end
 
 --- 遍历所有的source
+---@param ast parser.object
+---@param callback fun(src: parser.object)
 function m.eachSource(ast, callback)
     local cache = ast._eachCache
     if not cache then
@@ -817,6 +843,7 @@ end
 local isSetMap = {
     ['setglobal']         = true,
     ['local']             = true,
+    ['self']              = true,
     ['setlocal']          = true,
     ['setfield']          = true,
     ['setmethod']         = true,
@@ -906,6 +933,7 @@ function m.getKeyNameOfLiteral(obj)
     end
 end
 
+---@return string?
 function m.getKeyName(obj)
     if not obj then
         return nil
@@ -915,6 +943,7 @@ function m.getKeyName(obj)
     or tp == 'setglobal' then
         return obj[1]
     elseif tp == 'local'
+    or     tp == 'self'
     or     tp == 'getlocal'
     or     tp == 'setlocal' then
         return obj[1]
@@ -949,8 +978,6 @@ function m.getKeyName(obj)
         return obj[1]
     elseif tp == 'doc.type.field' then
         return obj.name[1]
-    elseif tp == 'dummy' then
-        return obj[1]
     end
     return m.getKeyNameOfLiteral(obj)
 end
@@ -983,6 +1010,7 @@ function m.getKeyType(obj)
     or tp == 'setglobal' then
         return 'string'
     elseif tp == 'local'
+    or     tp == 'self'
     or     tp == 'getlocal'
     or     tp == 'setlocal' then
         return 'local'
@@ -1011,8 +1039,6 @@ function m.getKeyType(obj)
         return type(obj.field[1])
     elseif tp == 'doc.type.field' then
         return type(obj.name[1])
-    elseif tp == 'dummy' then
-        return 'string'
     end
     if tp == 'doc.field.name' then
         return type(obj[1])

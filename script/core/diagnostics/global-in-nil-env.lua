@@ -16,7 +16,7 @@ return function (uri, callback)
     local env  = guide.getENV(root)
 
     local nilDefs = {}
-    if not env.ref then
+    if not env or not env.ref then
         return
     end
     for _, ref in ipairs(env.ref) do

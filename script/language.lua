@@ -6,7 +6,9 @@ local function supportLanguage()
     local list = {}
     for path in fs.pairs(ROOT / 'locale') do
         if fs.is_directory(path) then
-            list[#list+1] = path:filename():string():lower()
+            local id = path:filename():string():lower()
+            list[#list+1] = id
+            list[id] = true
         end
     end
     return list

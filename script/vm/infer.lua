@@ -1,9 +1,7 @@
 local util     = require 'utility'
-local nodeMgr  = require 'vm.node'
 local config   = require 'config'
 local guide    = require 'parser.guide'
-local compiler = require 'vm.compiler'
-local union    = require 'vm.union'
+local vm       = require 'vm.vm'
 
 ---@class vm.infer-manager
 local m = {}
@@ -89,7 +87,6 @@ local viewNodeSwitch = util.switch()
     end)
     : case 'doc.type.name'
     : call(function (source, infer)
-        infer._hasClass = true
         if source.signs then
             local buf = {}
             for i, sign in ipairs(source.signs) do
@@ -102,7 +99,7 @@ local viewNodeSwitch = util.switch()
     end)
     : case 'generic'
     : call(function (source, infer)
-        return ('<%s>'):format(source.proto[1])
+        return m.getInfer(source.proto):view()
     end)
     : case 'doc.generic.name'
     : call(function (source, infer)
@@ -111,13 +108,29 @@ local viewNodeSwitch = util.switch()
     : case 'doc.type.array'
     : call(function (source, infer)
         infer._hasClass = true
-        return m.getInfer(source.node):view() .. '[]'
+        local view = m.getInfer(source.node):view()
+        if source.node.type == 'doc.type' then
+            view = '(' .. view .. ')'
+        end
+        return view .. '[]'
+    end)
+    : case 'doc.type.sign'
+    : call(function (source, infer)
+        infer._hasClass = true
+        local buf = {}
+        for i, sign in ipairs(source.signs) do
+            buf[i] = m.getInfer(sign):view()
+        end
+        return ('%s<%s>'):format(source.node[1], table.concat(buf, ', '))
     end)
     : case 'doc.type.table'
     : call(function (source, infer)
         infer._hasTable = true
     end)
     : case 'doc.type.string'
+    : call(function (source, infer)
+        return util.viewString(source[1], source[2])
+    end)
     : case 'doc.type.integer'
     : case 'doc.type.boolean'
     : call(function (source, infer)
@@ -131,20 +144,23 @@ local viewNodeSwitch = util.switch()
         local argView = ''
         local regView = ''
         for i, arg in ipairs(source.args) do
+            local argNode = vm.compileNode(arg)
+            local isOptional = argNode:isOptional()
+            if isOptional then
+                argNode = argNode:copy()
+                argNode:removeOptional()
+            end
             args[i] = string.format('%s%s: %s'
                 , arg.name[1]
-                , arg.optional and '?' or ''
-                , m.getInfer(arg):view()
+                , isOptional and '?' or ''
+                , m.getInfer(argNode):view()
             )
         end
         if #args > 0 then
             argView = table.concat(args, ', ')
         end
         for i, ret in ipairs(source.returns) do
-            rets[i] = string.format('%s%s'
-                , m.getInfer(ret):view()
-                , ret.optional and '?' or ''
-            )
+            rets[i] = m.getInfer(ret):view()
         end
         if #rets > 0 then
             regView = ':' .. table.concat(rets, ', ')
@@ -152,24 +168,23 @@ local viewNodeSwitch = util.switch()
         return ('fun(%s)%s'):format(argView, regView)
     end)
 
----@param source parser.object
+---@param source parser.object | vm.node
 ---@return vm.infer
 function m.getInfer(source)
-    local node = compiler.compileNode(source)
-    if not node then
-        return m.NULL
+    local node
+    if source.type == 'vm.node' then
+        node = source
+    else
+        node = vm.compileNode(source)
     end
-    -- TODO: more cache?
-    if node.type == 'union' and node.lastInfer then
+    if node.lastInfer then
         return node.lastInfer
     end
     local infer = setmetatable({
         node  = node,
-        uri   = guide.getUri(source),
+        uri   = source.type ~= 'vm.node' and guide.getUri(source),
     }, mt)
-    if node.type == 'union' then
-        node.lastInfer = infer
-    end
+    node.lastInfer = infer
 
     return infer
 end
@@ -192,24 +207,24 @@ function mt:_trim()
     if self._hasTable and not self._hasClass then
         self.views['table'] = true
     end
-    if self._hasClass then
-        self:_eraseAlias()
-    end
 end
 
-function mt:_eraseAlias()
-    local expandAlias = config.get(self.uri, 'Lua.hover.expandAlias')
-    for n in nodeMgr.eachNode(self.node) do
+---@param uri uri
+---@return table<string, true>
+function mt:_eraseAlias(uri)
+    local drop = {}
+    local expandAlias = config.get(uri, 'Lua.hover.expandAlias')
+    for n in self.node:eachObject() do
         if n.type == 'global' and n.cate == 'type' then
-            for _, set in ipairs(n:getSets(self.uri)) do
+            for _, set in ipairs(n:getSets(uri)) do
                 if set.type == 'doc.alias' then
                     if expandAlias then
-                        self.views[n.name] = nil
+                        drop[n.name] = true
                     else
                         for _, ext in ipairs(set.extends.types) do
                             local view = viewNodeSwitch(ext.type, ext, {})
                             if view and view ~= n.name then
-                                self.views[view] = nil
+                                drop[view] = true
                             end
                         end
                     end
@@ -217,6 +232,7 @@ function mt:_eraseAlias()
             end
         end
     end
+    return drop
 end
 
 ---@param tp string
@@ -246,7 +262,7 @@ function mt:_computeViews()
 
     self.views = {}
 
-    for n in nodeMgr.eachNode(self.node) do
+    for n in self.node:eachObject() do
         local view = viewNodeSwitch(n.type, n, self)
         if view then
             self.views[view] = true
@@ -266,17 +282,16 @@ function mt:view(default, uri)
         return 'any'
     end
 
-    if not next(self.views) then
-        return default or 'unknown'
-    end
-
-    if self.cachedView then
-        return self.cachedView
+    local drop
+    if self._hasClass then
+        drop = self:_eraseAlias(uri or self.uri)
     end
 
     local array = {}
     for view in pairs(self.views) do
-        array[#array+1] = view
+        if not drop or not drop[view] then
+            array[#array+1] = view
+        end
     end
 
     table.sort(array, function (a, b)
@@ -291,22 +306,29 @@ function mt:view(default, uri)
     local max   = #array
     local limit = config.get(uri or self.uri, 'Lua.hover.enumsLimit')
 
-    if max > limit then
-        local view = string.format('%s...(+%d)'
-            , table.concat(array, '|', 1, limit)
-            , max - limit
-        )
-
-        self.cachedView = view
-
-        return view
+    local view
+    if #array == 0 then
+        view = default or 'unknown'
     else
-        local view = table.concat(array, '|')
-
-        self.cachedView = view
-
-        return view
+        if max > limit then
+            view = string.format('%s...(+%d)'
+                , table.concat(array, '|', 1, limit)
+                , max - limit
+            )
+        else
+            view = table.concat(array, '|')
+        end
     end
+
+    if self.node:isOptional() then
+        if max > 1 then
+            view = '(' .. view .. ')?'
+        else
+            view = view .. '?'
+        end
+    end
+
+    return view
 end
 
 function mt:eachView()
@@ -325,7 +347,7 @@ function mt:merge(other)
     end
 
     local infer = setmetatable({
-        node  = union(self.node, other.node),
+        node  = vm.createNode(self.node, other.node),
         uri   = self.uri,
     }, mt)
 
@@ -339,7 +361,7 @@ function mt:viewLiterals()
     end
     local mark     = {}
     local literals = {}
-    for n in nodeMgr.eachNode(self.node) do
+    for n in self.node:eachObject() do
         if n.type == 'string'
         or n.type == 'number'
         or n.type == 'integer'
@@ -365,7 +387,7 @@ function mt:viewClass()
     end
     local mark  = {}
     local class = {}
-    for n in nodeMgr.eachNode(self.node) do
+    for n in self.node:eachObject() do
         if n.type == 'global' and n.cate == 'type' then
             local name = n.name
             if not mark[name] then
@@ -379,6 +401,12 @@ function mt:viewClass()
     end
     table.sort(class)
     return table.concat(class, '|')
+end
+
+---@param source parser.object
+---@return string?
+function m.viewObject(source)
+    return viewNodeSwitch(source.type, source, {})
 end
 
 return m

@@ -2,7 +2,8 @@
 local m = {}
 
 --- 是否是空白符
----@param inline boolean # 必须在同一行中（排除换行符）
+---@param char    string
+---@param inline? boolean # 必须在同一行中（排除换行符）
 function m.isSpace(char, inline)
     if inline then
         if char == ' '
@@ -21,7 +22,9 @@ function m.isSpace(char, inline)
 end
 
 --- 跳过空白符
----@param inline boolean # 必须在同一行中（排除换行符）
+---@param text    string
+---@param offset  integer
+---@param inline? boolean # 必须在同一行中（排除换行符）
 function m.skipSpace(text, offset, inline)
     for i = offset, 1, -1 do
         local char = text:sub(i, i)

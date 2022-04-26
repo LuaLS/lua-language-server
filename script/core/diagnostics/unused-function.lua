@@ -53,6 +53,7 @@ return function (uri, callback)
         local refs = parent.ref
         local hasGet
         if refs then
+            cache[source] = true
             for _, src in ipairs(refs) do
                 if guide.isGet(src) then
                     local func = guide.getParentFunction(src)
@@ -62,6 +63,7 @@ return function (uri, callback)
                     end
                 end
             end
+            cache[source] = not hasGet
         end
         if not hasGet then
             if client.isVSCode() then
@@ -79,14 +81,11 @@ return function (uri, callback)
                     message = lang.script.DIAG_UNUSED_FUNCTION,
                 }
             end
-            cache[source] = true
             return true
         end
         return false
     end
 
     -- 只检查局部函数
-    guide.eachSourceType(ast.ast, 'function', function (source) ---@async
-        checkFunction(source)
-    end)
+    guide.eachSourceType(ast.ast, 'function', checkFunction)
 end

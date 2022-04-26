@@ -1,10 +1,11 @@
 ---@diagnostic disable: undefined-global, lowercase-global
 
--- basic
 arg                 =
 '独立版Lua的启动参数。'
+
 assert              =
 '如果其参数 `v` 的值为假（`nil` 或 `false`）， 它就调用 $error； 否则，返回所有的参数。 在错误情况时， `message` 指那个错误对象； 如果不提供这个参数，参数默认为 `"assertion failed!"` 。'
+
 cgopt.collect       =
 '做一次完整的垃圾收集循环。'
 cgopt.stop          =
@@ -25,22 +26,29 @@ cgopt.generational  =
 '改变收集器模式为分代模式。'
 cgopt.isrunning     =
 '返回表示收集器是否在工作的布尔值。'
+
 collectgarbage      =
 '这个函数是垃圾收集器的通用接口。 通过参数 opt 它提供了一组不同的功能。'
+
 dofile              =
 '打开该名字的文件，并执行文件中的 Lua 代码块。 不带参数调用时， `dofile` 执行标准输入的内容（`stdin`）。 返回该代码块的所有返回值。 对于有错误的情况，`dofile` 将错误反馈给调用者 （即，`dofile` 没有运行在保护模式下）。'
+
 error               =
 [[
 中止上一次保护函数调用， 将错误对象 `message` 返回。 函数 `error` 永远不会返回。
 
 当 `message` 是一个字符串时，通常 `error` 会把一些有关出错位置的信息附加在消息的前头。 level 参数指明了怎样获得出错位置。
 ]]
+
 _G                  =
 '一个全局变量（非函数）， 内部储存有全局环境（参见 §2.2）。 Lua 自己不使用这个变量； 改变这个变量的值不会对任何环境造成影响，反之亦然。'
+
 getfenv             =
 '返回给定函数的环境。`f` 可以是一个Lua函数，也可是一个表示调用栈层级的数字。'
+
 getmetatable        =
 '如果 `object` 不包含元表，返回 `nil` 。 否则，如果在该对象的元表中有 `"__metatable"` 域时返回其关联值， 没有时返回该对象的元表。'
+
 ipairs              =
 [[
 返回三个值（迭代函数、表 `t` 以及 `0` ）， 如此，以下代码
@@ -49,12 +57,14 @@ ipairs              =
 ```
 将迭代键值对 `（1,t[1]) ，(2,t[2])， ...` ，直到第一个空值。
 ]]
+
 loadmode.b        =
 '只能是二进制代码块。'
 loadmode.t        =
 '只能是文本代码块。'
 loadmode.bt       =
 '可以是二进制也可以是文本。'
+
 load['<5.1']      =
 '使用 `func` 分段加载代码块。 每次调用 `func` 必须返回一个字符串用于连接前文。'
 load['>5.2']      =
@@ -63,12 +73,16 @@ load['>5.2']      =
 
 如果 `chunk` 是一个字符串，代码块指这个字符串。 如果 `chunk` 是一个函数， `load` 不断地调用它获取代码块的片断。 每次对 `chunk` 的调用都必须返回一个字符串紧紧连接在上次调用的返回串之后。 当返回空串、`nil`、或是不返回值时，都表示代码块结束。
 ]]
+
 loadfile            =
 '从文件 `filename` 或标准输入（如果文件名未提供）中获取代码块。'
+
 loadstring          =
 '使用给定字符串加载代码块。'
+
 module              =
 '创建一个模块。'
+
 next                =
 [[
 运行程序来遍历表中的所有域。 第一个参数是要遍历的表，第二个参数是表中的某个键。 `next` 返回该键的下一个键及其关联的值。 如果用 `nil` 作为第二个参数调用 `next` 将返回初始键及其关联值。 当以最后一个键去调用，或是以 `nil` 调用一张空表时， `next` 返回 `nil`。 如果不提供第二个参数，将认为它就是 `nil`。 特别指出，你可以用 `next(t)` 来判断一张表是否是空的。
@@ -77,6 +91,7 @@ next                =
 
 当在遍历过程中你给表中并不存在的域赋值， `next` 的行为是未定义的。 然而你可以去修改那些已存在的域。 特别指出，你可以清除一些已存在的域。
 ]]
+
 pairs               =
 [[
 如果 `t` 有元方法 `__pairs`， 以 `t` 为参数调用它，并返回其返回的前三个值。
@@ -89,52 +104,68 @@ pairs               =
 
 参见函数 $next 中关于迭代过程中修改表的风险。
 ]]
+
 pcall               =
 '传入参数，以 *保护模式* 调用函数 `f` 。 这意味着 `f` 中的任何错误不会抛出； 取而代之的是，`pcall` 会将错误捕获到，并返回一个状态码。 第一个返回值是状态码（一个布尔量）， 当没有错误时，其为真。 此时，`pcall` 同样会在状态码后返回所有调用的结果。 在有错误时，`pcall` 返回 `false` 加错误消息。'
+
 print               =
 '接收任意数量的参数，并将它们的值打印到 `stdout`。 它用 `tostring` 函数将每个参数都转换为字符串。 `print` 不用于做格式化输出。仅作为看一下某个值的快捷方式。 多用于调试。 完整的对输出的控制，请使用 $string.format 以及 $io.write。'
+
 rawequal            =
 '在不触发任何元方法的情况下 检查 `v1` 是否和 `v2` 相等。 返回一个布尔量。'
+
 rawget              =
 '在不触发任何元方法的情况下 获取 `table[index]` 的值。 `table` 必须是一张表； `index` 可以是任何值。'
+
 rawlen              =
 '在不触发任何元方法的情况下 返回对象 `v` 的长度。 `v` 可以是表或字符串。 它返回一个整数。'
+
 rawset              =
 [[
 在不触发任何元方法的情况下 将 `table[index]` 设为 `value。` `table` 必须是一张表， `index` 可以是 `nil` 与 `NaN` 之外的任何值。 `value` 可以是任何 Lua 值。
 这个函数返回 `table`。
 ]]
+
 select              =
 '如果 `index` 是个数字， 那么返回参数中第 `index` 个之后的部分； 负的数字会从后向前索引（`-1` 指最后一个参数）。 否则，`index` 必须是字符串 `"#"`， 此时 `select` 返回参数的个数。'
+
 setfenv             =
 '设置给定函数的环境。'
+
 setmetatable        =
 [[
 给指定表设置元表。 （你不能在 Lua 中改变其它类型值的元表，那些只能在 C 里做。） 如果 `metatable` 是 `nil`， 将指定表的元表移除。 如果原来那张元表有 `"__metatable"` 域，抛出一个错误。
 ]]
+
 tonumber            =
 [[
 如果调用的时候没有 `base`， `tonumber` 尝试把参数转换为一个数字。 如果参数已经是一个数字，或是一个可以转换为数字的字符串， `tonumber` 就返回这个数字； 否则返回 `nil`。
 
 字符串的转换结果可能是整数也可能是浮点数， 这取决于 Lua 的转换文法（参见 §3.1）。 （字符串可以有前置和后置的空格，可以带符号。）
 ]]
+
 tostring            =
 [[
 可以接收任何类型，它将其转换为人可阅读的字符串形式。 浮点数总被转换为浮点数的表现形式（小数点形式或是指数形式）。 （如果想完全控制数字如何被转换，可以使用 $string.format。）
 如果 `v` 有 `"__tostring"` 域的元表， `tostring` 会以 `v` 为参数调用它。 并用它的结果作为返回值。
 ]]
+
 type                =
 [[
 将参数的类型编码为一个字符串返回。 函数可能的返回值有 `"nil"` （一个字符串，而不是 `nil` 值）， `"number"`， `"string"`， `"boolean"`， `"table"`， `"function"`， `"thread"`， `"userdata"`。
 ]]
+
 _VERSION            =
 '一个包含有当前解释器版本号的全局变量（并非函数）。'
+
 warn                =
 '使用所有参数组成的字符串消息来发送警告。'
+
 xpcall['=5.1']      =
 '传入参数，以 *保护模式* 调用函数 `f` 。这个函数和 `pcall` 类似。 不过它可以额外设置一个消息处理器 `err`。'
 xpcall['>5.2']      =
 '传入参数，以 *保护模式* 调用函数 `f` 。这个函数和 `pcall` 类似。 不过它可以额外设置一个消息处理器 `msgh`。'
+
 unpack              =
 [[
 返回给定 `list` 中的所有元素。 改函数等价于
@@ -213,6 +244,7 @@ coroutine.wrap                =
 '创建一个主体函数为 `f` 的新协程。 f 必须是一个 Lua 的函数。 返回一个函数， 每次调用该函数都会延续该协程。'
 coroutine.yield               =
 '挂起正在调用的协程的执行。'
+
 costatus.running              =
 '正在运行。'
 costatus.suspended            =
@@ -274,6 +306,7 @@ debug.upvalueid           =
 '返回指定函数第 `n` 个上值的唯一标识符（一个轻量用户数据）。'
 debug.upvaluejoin         =
 '让 Lua 闭包 `f1` 的第 `n1` 个上值 引用 `Lua` 闭包 `f2` 的第 `n2` 个上值。'
+
 infowhat.n                =
 '`name` 和 `namewhat`'
 infowhat.S                =
@@ -292,6 +325,7 @@ infowhat.r                =
 '`ftransfer` 和 `ntransfer`'
 infowhat.L                =
 '`activelines`'
+
 hookmask.c                =
 '每当 Lua 调用一个函数时，调用钩子。'
 hookmask.r                =
@@ -322,6 +356,7 @@ file[':setvbuf']             =
 '设置输出文件的缓冲模式。'
 file[':write']               =
 '将参数的值逐个写入 `file`。'
+
 readmode.n                  =
 '读取一个数字，根据 Lua 的转换文法返回浮点数或整数。'
 readmode.a                  =
@@ -330,12 +365,14 @@ readmode.l                  =
 '读取一行并忽略行结束标记。'
 readmode.L                  =
 '读取一行并保留行结束标记。'
+
 seekwhence.set              =
 '基点为 0 （文件开头）。'
 seekwhence.cur              =
 '基点为当前位置。'
 seekwhence['.end']          =
 '基点为文件尾。'
+
 vbuf.no                     =
 '不缓冲；输出操作立刻生效。'
 vbuf.full                   =
@@ -380,6 +417,7 @@ io.type                    =
 '检查 `obj` 是否是合法的文件句柄。'
 io.write                   =
 '将参数的值逐个写入默认输出文件。'
+
 openmode.r                 =
 '读模式。'
 openmode.w                 =
@@ -404,10 +442,12 @@ openmode['.w+b']           =
 '更新模式，所有之前的数据都删除。（二进制方式）'
 openmode['.a+b']           =
 '追加更新模式，所有之前的数据都保留，只允许在文件尾部做写入。（二进制方式）'
+
 popenmode.r                =
 '从这个程序中读取数据。（二进制方式）'
 popenmode.w                =
 '向这个程序写入输入。（二进制方式）'
+
 filetype.file              =
 '是一个打开的文件句柄。'
 filetype['.closed file']   =
@@ -528,6 +568,7 @@ os.time                     =
 '当不传参数时，返回当前时刻。 如果传入一张表，就返回由这张表表示的时刻。'
 os.tmpname                  =
 '返回一个可用于临时文件的文件名字符串。'
+
 osdate.year                 =
 '四位数字'
 osdate.month                =
@@ -549,10 +590,12 @@ osdate.isdst                =
 
 package                     =
 ''
+
 require['<5.3']             =
 '加载一个模块，返回该模块的返回值（`nil`时为`true`）。'
 require['>5.4']             =
 '加载一个模块，返回该模块的返回值（`nil`时为`true`）与搜索器返回的加载数据。默认搜索器的加载数据指示了加载位置，对于文件来说就是文件路径。'
+
 package.config              =
 '一个描述有一些为包管理准备的编译期配置信息的串。'
 package.cpath               =
@@ -635,6 +678,36 @@ table.maxn                  =
 table.move                  =
 [[
 将元素从表 `a1` 移到表 `a2`。
+```lua
+a2[t],··· =
+a1[f],···,a1[e]
+return a2
+```
+]]
+string.rep['>5.2']          = -- TODO: need translate!
+'Returns a string that is the concatenation of `n` copies of the string `s` separated by the string `sep`.'
+string.rep['<5.1']          = -- TODO: need translate!
+'Returns a string that is the concatenation of `n` copies of the string `s` .'
+string.reverse              = -- TODO: need translate!
+'Returns a string that is the string `s` reversed.'
+string.sub                  = -- TODO: need translate!
+'Returns the substring of the string that starts at `i` and continues until `j`.'
+string.unpack               = -- TODO: need translate!
+'Returns the values packed in string according to the format string `fmt` (see §6.4.2) .'
+string.upper                = -- TODO: need translate!
+'Returns a copy of this string with all lowercase letters changed to uppercase.'
+
+table                       = -- TODO: need translate!
+''
+table.concat                = -- TODO: need translate!
+'Given a list where all elements are strings or numbers, returns the string `list[i]..sep..list[i+1] ··· sep..list[j]`.'
+table.insert                = -- TODO: need translate!
+'Inserts element `value` at position `pos` in `list`.'
+table.maxn                  = -- TODO: need translate!
+'Returns the largest positive numerical index of the given table, or zero if the table has no positive numerical indices.'
+table.move                  = -- TODO: need translate!
+[[
+Moves elements from table `a1` to table `a2`.
 ```lua
 a2[t],··· =
 a1[f],···,a1[e]

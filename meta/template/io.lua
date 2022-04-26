@@ -47,7 +47,7 @@ function io.lines(filename, ...) end
 
 ---#DES 'io.open'
 ---@param filename string
----@param mode     openmode
+---@param mode?    openmode
 ---@return file*?
 ---@return string? errmsg
 ---@nodiscard
@@ -157,7 +157,7 @@ function file:seek(whence, offset) end
 
 ---#DES 'file:setvbuf'
 ---@param mode vbuf
----@param size integer
+---@param size? integer
 function file:setvbuf(mode, size) end
 
 ---#DES 'file:write'

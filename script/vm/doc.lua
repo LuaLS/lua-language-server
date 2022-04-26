@@ -27,6 +27,9 @@ function vm.isMetaFile(uri)
         return false
     end
     local cache = files.getCache(uri)
+    if not cache then
+        return false
+    end
     if cache.isMeta ~= nil then
         return cache.isMeta
     end
@@ -85,7 +88,8 @@ function vm.getValidVersions(doc)
     return valids
 end
 
-local function isDeprecated(value)
+---@return parser.object?
+local function getDeprecated(value)
     if not value.bindDocs then
         return false
     end
@@ -94,13 +98,13 @@ local function isDeprecated(value)
     end
     for _, doc in ipairs(value.bindDocs) do
         if doc.type == 'doc.deprecated' then
-            value._deprecated = true
-            return true
+            value._deprecated = doc
+            return doc
         elseif doc.type == 'doc.version' then
             local valids = vm.getValidVersions(doc)
             if not valids[config.get(guide.getUri(value), 'Lua.runtime.version')] then
-                value._deprecated = true
-                return true
+                value._deprecated = doc
+                return doc
             end
         end
     end
@@ -108,20 +112,30 @@ local function isDeprecated(value)
     return false
 end
 
-function vm.isDeprecated(value, deep)
+---@return parser.object?
+function vm.getDeprecated(value, deep)
     if deep then
         local defs = vm.getDefs(value)
         if #defs == 0 then
             return false
         end
+        local deprecated = false
         for _, def in ipairs(defs) do
-            if not isDeprecated(def) then
-                return false
+            if def.type == 'setglobal'
+            or def.type == 'setfield'
+            or def.type == 'setmethod'
+            or def.type == 'setindex'
+            or def.type == 'tablefield'
+            or def.type == 'tableindex' then
+                deprecated = getDeprecated(def)
+                if not deprecated then
+                    return false
+                end
             end
         end
-        return true
+        return deprecated
     else
-        return isDeprecated(value)
+        return getDeprecated(value)
     end
 end
 
@@ -321,6 +335,9 @@ function vm.isDiagDisabledAt(uri, position, name)
         return false
     end
     local cache = files.getCache(uri)
+    if not cache then
+        return false
+    end
     if not cache.diagnosticRanges then
         cache.diagnosticRanges = {}
         for _, doc in ipairs(status.ast.docs) do

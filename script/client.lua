@@ -211,7 +211,13 @@ local function applyConfig(cfg, uri, changes)
     for _, change in ipairs(changes) do
         if scp:isChildUri(change.uri)
         or scp:isLinkedUri(change.uri) then
-            cfg[change.key] = config.getRaw(change.uri, change.key)
+            local value = config.getRaw(change.uri, change.key)
+            local key = change.key:match('^Lua%.(.+)$')
+            if cfg[key] then
+                cfg[key] = value
+            else
+                cfg[change.key] = value
+            end
             ok = true
         end
     end
@@ -312,7 +318,7 @@ local function tryModifyClientGlobal(finalChanges)
 end
 
 ---@param changes config.change[]
----@param onlyMemory boolean
+---@param onlyMemory? boolean
 function m.setConfig(changes, onlyMemory)
     local finalChanges = {}
     for _, change in ipairs(changes) do

@@ -1,10 +1,11 @@
 ---@diagnostic disable: undefined-global, lowercase-global
 
--- basic
 arg                 =
 'Command-line arguments of Lua Standalone.'
+
 assert              =
 'Raises an error if the value of its argument v is false (i.e., `nil` or `false`); otherwise, returns all its arguments. In case of error, `message` is the error object; when absent, it defaults to `"assertion failed!"`'
+
 cgopt.collect       =
 'Performs a full garbage-collection cycle.'
 cgopt.stop          =
@@ -25,22 +26,29 @@ cgopt.generational  =
 'Change the collector mode to generational.'
 cgopt.isrunning     =
 'Returns whether the collector is running.'
+
 collectgarbage      =
 'This function is a generic interface to the garbage collector. It performs different functions according to its first argument, `opt`.'
+
 dofile              =
 'Opens the named file and executes its content as a Lua chunk. When called without arguments, `dofile` executes the content of the standard input (`stdin`). Returns all values returned by the chunk. In case of errors, `dofile` propagates the error to its caller. (That is, `dofile` does not run in protected mode.)'
+
 error               =
 [[
 Terminates the last protected function called and returns message as the error object.
 
 Usually, `error` adds some information about the error position at the beginning of the message, if the message is a string.
 ]]
+
 _G                  =
 'A global variable (not a function) that holds the global environment (see §2.2). Lua itself does not use this variable; changing its value does not affect any environment, nor vice versa.'
+
 getfenv             =
 'Returns the current environment in use by the function. `f` can be a Lua function or a number that specifies the function at that stack level.'
+
 getmetatable        =
 'If object does not have a metatable, returns nil. Otherwise, if the object\'s metatable has a __metatable field, returns the associated value. Otherwise, returns the metatable of the given object.'
+
 ipairs              =
 [[
 Returns three values (an iterator function, the table `t`, and `0`) so that the construction
@@ -49,12 +57,14 @@ Returns three values (an iterator function, the table `t`, and `0`) so that the 
 ```
 will iterate over the key–value pairs `(1,t[1]), (2,t[2]), ...`, up to the first absent index.
 ]]
+
 loadmode.b          =
 'Only binary chunks.'
 loadmode.t          =
 'Only text chunks.'
 loadmode.bt         =
 'Both binary and text.'
+
 load['<5.1']        =
 'Loads a chunk using function `func` to get its pieces. Each call to `func` must return a string that concatenates with previous results.'
 load['>5.2']        =
@@ -63,12 +73,16 @@ Loads a chunk.
 
 If `chunk` is a string, the chunk is this string. If `chunk` is a function, `load` calls it repeatedly to get the chunk pieces. Each call to `chunk` must return a string that concatenates with previous results. A return of an empty string, `nil`, or no value signals the end of the chunk.
 ]]
+
 loadfile            =
 'Loads a chunk from file `filename` or from the standard input, if no file name is given.'
+
 loadstring          =
 'Loads a chunk from the given string.'
+
 module              =
 'Creates a module.'
+
 next                =
 [[
 Allows a program to traverse all fields of a table. Its first argument is a table and its second argument is an index in this table. A call to `next` returns the next index of the table and its associated value. When called with `nil` as its second argument, `next` returns an initial index and its associated value. When called with the last index, or with `nil` in an empty table, `next` returns `nil`. If the second argument is absent, then it is interpreted as `nil`. In particular, you can use `next(t)` to check whether a table is empty.
@@ -77,6 +91,7 @@ The order in which the indices are enumerated is not specified, *even for numeri
 
 The behavior of `next` is undefined if, during the traversal, you assign any value to a non-existent field in the table. You may however modify existing fields. In particular, you may set existing fields to nil.
 ]]
+
 pairs               =
 [[
 If `t` has a metamethod `__pairs`, calls it with t as argument and returns the first three results from the call.
@@ -89,30 +104,39 @@ will iterate over all key–value pairs of table `t`.
 
 See function $next for the caveats of modifying the table during its traversal.
 ]]
+
 pcall               =
 [[
 Calls the function `f` with the given arguments in *protected mode*. This means that any error inside `f` is not propagated; instead, `pcall` catches the error and returns a status code. Its first result is the status code (a boolean), which is true if the call succeeds without errors. In such case, `pcall` also returns all results from the call, after this first result. In case of any error, `pcall` returns `false` plus the error object.
 ]]
+
 print               =
 [[
 Receives any number of arguments and prints their values to `stdout`, converting each argument to a string following the same rules of $tostring.
 The function print is not intended for formatted output, but only as a quick way to show a value, for instance for debugging. For complete control over the output, use $string.format and $io.write.
 ]]
+
 rawequal            =
 'Checks whether v1 is equal to v2, without invoking the `__eq` metamethod.'
+
 rawget              =
 'Gets the real value of `table[index]`, without invoking the `__index` metamethod.'
+
 rawlen              =
 'Returns the length of the object `v`, without invoking the `__len` metamethod.'
+
 rawset              =
 [[
 Sets the real value of `table[index]` to `value`, without using the `__newindex` metavalue. `table` must be a table, `index` any value different from `nil` and `NaN`, and `value` any Lua value.
 This function returns `table`.
 ]]
+
 select              =
 'If `index` is a number, returns all arguments after argument number `index`; a negative number indexes from the end (`-1` is the last argument). Otherwise, `index` must be the string `"#"`, and `select` returns the total number of extra arguments it received.'
+
 setfenv             =
 'Sets the environment to be used by the given function. '
+
 setmetatable        =
 [[
 Sets the metatable for the given table. If `metatable` is `nil`, removes the metatable of the given table. If the original metatable has a `__metatable` field, raises an error.
@@ -121,12 +145,14 @@ This function returns `table`.
 
 To change the metatable of other types from Lua code, you must use the debug library (§6.10).
 ]]
+
 tonumber            =
 [[
 When called with no `base`, `tonumber` tries to convert its argument to a number. If the argument is already a number or a string convertible to a number, then `tonumber` returns this number; otherwise, it returns `fail`.
 
 The conversion of strings can result in integers or floats, according to the lexical conventions of Lua (see §3.1). The string may have leading and trailing spaces and a sign.
 ]]
+
 tostring            =
 [[
 Receives a value of any type and converts it to a string in a human-readable format.
@@ -135,18 +161,23 @@ If the metatable of `v` has a `__tostring` field, then `tostring` calls the corr
 
 For complete control of how numbers are converted, use $string.format.
 ]]
+
 type                =
 [[
 Returns the type of its only argument, coded as a string. The possible results of this function are `"nil"` (a string, not the value `nil`), `"number"`, `"string"`, `"boolean"`, `"table"`, `"function"`, `"thread"`, and `"userdata"`.
 ]]
+
 _VERSION            =
 'A global variable (not a function) that holds a string containing the running Lua version.'
+
 warn                =
 'Emits a warning with a message composed by the concatenation of all its arguments (which should be strings).'
+
 xpcall['=5.1']      =
 'Calls function `f` with the given arguments in protected mode with a new message handler.'
 xpcall['>5.2']      =
 'Calls function `f` with the given arguments in protected mode with a new message handler.'
+
 unpack              =
 [[
 Returns the elements from the given `list`. This function is equivalent to
@@ -227,6 +258,7 @@ coroutine.wrap              =
 'Creates a new coroutine, with body `f`; `f` must be a function. Returns a function that resumes the coroutine each time it is called.'
 coroutine.yield             =
 'Suspends the execution of the calling coroutine.'
+
 costatus.running            =
 'Is running.'
 costatus.suspended          =
@@ -296,6 +328,7 @@ debug.upvalueid             =
 'Returns a unique identifier (as a light userdata) for the upvalue numbered `n` from the given function.'
 debug.upvaluejoin           =
 'Make the `n1`-th upvalue of the Lua closure `f1` refer to the `n2`-th upvalue of the Lua closure `f2`.'
+
 infowhat.n                  =
 '`name` and `namewhat`'
 infowhat.S                  =
@@ -314,6 +347,7 @@ infowhat.r                  =
 '`ftransfer` and `ntransfer`'
 infowhat.L                  =
 '`activelines`'
+
 hookmask.c                  =
 'Calls hook when Lua calls a function.'
 hookmask.r                  =
@@ -344,6 +378,7 @@ file[':setvbuf']            =
 'Sets the buffering mode for an output file.'
 file[':write']              =
 'Writes the value of each of its arguments to `file`.'
+
 readmode.n                  =
 'Reads a numeral and returns it as number.'
 readmode.a                  =
@@ -352,12 +387,14 @@ readmode.l                  =
 'Reads the next line skipping the end of line.'
 readmode.L                  =
 'Reads the next line keeping the end of line.'
+
 seekwhence.set              =
 'Base is beginning of the file.'
 seekwhence.cur              =
 'Base is current position.'
 seekwhence['.end']          =
 'Base is end of file.'
+
 vbuf.no                     =
 'Output operation appears immediately.'
 vbuf.full                   =
@@ -402,6 +439,7 @@ io.type                     =
 'Checks whether `obj` is a valid file handle.'
 io.write                    =
 'Writes the value of each of its arguments to default output file.'
+
 openmode.r                  =
 'Read mode.'
 openmode.w                  =
@@ -426,10 +464,12 @@ openmode['.w+b']            =
 'Update mode, all previous data is erased. (in binary mode.)'
 openmode['.a+b']            =
 'Append update mode, previous data is preserved, writing is only allowed at the end of file. (in binary mode.)'
+
 popenmode.r                 =
 'Read data from this program by `file`.'
 popenmode.w                 =
 'Write data to this program by `file`.'
+
 filetype.file               =
 'Is an open file handle.'
 filetype['.closed file']    =
@@ -550,6 +590,7 @@ os.time                     =
 'Returns the current time when called without arguments, or a time representing the local date and time specified by the given table.'
 os.tmpname                  =
 'Returns a string with a file name that can be used for a temporary file.'
+
 osdate.year                 =
 'four digits'
 osdate.month                =
@@ -571,10 +612,12 @@ osdate.isdst                =
 
 package                     =
 ''
+
 require['<5.3']             =
 'Loads the given module, returns any value returned by the given module(`true` when `nil`).'
 require['>5.4']             =
 'Loads the given module, returns any value returned by the searcher(`true` when `nil`). Besides that value, also returns as a second result the loader data returned by the searcher, which indicates how `require` found the module. (For instance, if the module came from a file, this loader data is the file path.)'
+
 package.config              =
 'A string describing some compile-time configurations for packages.'
 package.cpath               =

@@ -35,8 +35,8 @@ end
 
 m.reset()
 
-local fixedUri = {}
---- 获取文件的真实uri
+local uriMap = {}
+-- 获取文件的真实uri，但不穿透软链接
 ---@param uri uri
 ---@return uri
 function m.getRealUri(uri)
@@ -47,16 +47,19 @@ function m.getRealUri(uri)
         return uri
     end
     suc, res = pcall(fs.canonical, path)
-    if not suc or res:string():gsub('/', '\\') == filename then
+    if not suc then
         return uri
     end
     filename = res:string()
     local ruri = furi.encode(filename)
-    if uri ~= ruri and not fixedUri[ruri] then
-        fixedUri[ruri] = true
+    if uri == ruri then
+        return ruri
+    end
+    if not uriMap[ruri] then
+        uriMap[ruri] = uri
         log.warn(('Fix real file uri: %s -> %s'):format(uri, ruri))
     end
-    return ruri
+    return uriMap[ruri]
 end
 
 --- 打开文件
@@ -162,8 +165,8 @@ end
 --- 设置文件文本
 ---@param uri uri
 ---@param text string
----@param isTrust boolean
----@param callback function
+---@param isTrust? boolean
+---@param callback? function
 function m.setText(uri, text, isTrust, callback)
     if not text then
         return
@@ -207,7 +210,7 @@ function m.setText(uri, text, isTrust, callback)
     file.cache = {}
     file.cacheActiveTime = math.huge
     m.globalVersion = m.globalVersion + 1
-    m.onWatch('version')
+    m.onWatch('version', uri)
     if create then
         m.onWatch('create', uri)
         m.onWatch('update', uri)
@@ -388,7 +391,6 @@ end
 --- 移除文件
 ---@param uri uri
 function m.remove(uri)
-    local originUri = uri
     local file = m.fileMap[uri]
     if not file then
         return
@@ -400,8 +402,8 @@ function m.remove(uri)
     m.fileCount     = m.fileCount - 1
     m.globalVersion = m.globalVersion + 1
 
-    m.onWatch('version')
-    m.onWatch('remove', originUri)
+    m.onWatch('version', uri)
+    m.onWatch('remove', uri)
 end
 
 --- 获取一个包含所有文件uri的数组
@@ -477,7 +479,7 @@ function m.compileState(uri, text)
         end
         return nil
     end
-    local prog <close> = progress.create(scope.getScope(uri), lang.script.WINDOW_COMPILING, 0.5)
+    local prog <close> = progress.create(uri, lang.script.WINDOW_COMPILING, 0.5)
     prog:setMessage(ws.getRelativePath(uri))
     local clock = os.clock()
     local state, err = parser.compile(text
@@ -545,38 +547,6 @@ function m.getLastState(uri)
         return nil
     end
     return file.ast
-end
-
----设置文件的当前可见范围
----@param uri    uri
----@param ranges range[]
-function m.setVisibles(uri, ranges)
-    m.visible[uri] = ranges
-    m.onWatch('updateVisible', uri)
-end
-
----获取文件的当前可见范围
----@param uri uri
----@return table[]
-function m.getVisibles(uri)
-    local file = m.fileMap[uri]
-    if not file then
-        return nil
-    end
-    local ranges = m.visible[uri]
-    if not ranges or #ranges == 0 then
-        return nil
-    end
-    local visibles = {}
-    for i, range in ipairs(ranges) do
-        local startRow  = range.start.line
-        local finishRow = range['end'].line
-        visibles[i] = {
-            start  = guide.positionOf(startRow, 0),
-            finish = guide.positionOf(finishRow, 0),
-        }
-    end
-    return visibles
 end
 
 function m.getFile(uri)

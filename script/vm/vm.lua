@@ -14,6 +14,8 @@ _ENV = nil
 ---@class vm
 local m = {}
 
+m.ID_SPLITE = '\x1F'
+
 function m.getSpecial(source)
     if not source then
         return nil
@@ -21,6 +23,7 @@ function m.getSpecial(source)
     return source.special
 end
 
+---@return string?
 function m.getKeyName(source)
     if not source then
         return nil

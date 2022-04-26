@@ -146,6 +146,9 @@ local function tryDocModule(source)
 end
 
 local function buildEnumChunk(docType, name)
+    if not docType then
+        return nil
+    end
     local enums = {}
     local types = {}
     local lines = {}
@@ -164,15 +167,15 @@ local function buildEnumChunk(docType, name)
         end
     end
     if #enums == 0 then
-        return
+        return nil
     end
     lines[#lines+1] = ('%s:'):format(name)
     for _, enum in ipairs(enums) do
-        local enumDes = ('   %s %q'):format(
+        local enumDes = ('   %s %s'):format(
                 (enum.default    and '->')
             or  (enum.additional and '+>')
             or  ' |',
-            enum[1]
+            infer.viewObject(enum)
         )
         if enum.comment then
             local first = true

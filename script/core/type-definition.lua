@@ -134,20 +134,23 @@ return function (uri, offset)
     local defs = vm.getDefs(source)
 
     for _, src in ipairs(defs) do
-        if src.dummy then
-            goto CONTINUE
-        end
         local root = guide.getRoot(src)
         if not root then
             goto CONTINUE
         end
         src = src.field or src.method or src.index or src
+        if src.type == 'doc.class' then
+            src = src.class
+        end
+        if src.type == 'doc.alias' then
+            src = src.alias
+        end
         if src.type == 'doc.class.name'
         or src.type == 'doc.alias.name'
         or src.type == 'doc.type.function'
         or src.type == 'doc.type.array'
         or src.type == 'doc.type.table'
-        or src.type == 'doc.type.ltable' then
+        or src.type == 'function' then
             results[#results+1] = {
                 target = src,
                 uri    = root.uri,

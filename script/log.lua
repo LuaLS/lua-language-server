@@ -65,10 +65,6 @@ local function pushLog(level, ...)
     local info = debugGetInfo(3, 'Sl')
     local text = m.raw(0, level, str, info.source, info.currentline, monotonic())
 
-    if log.print then
-        print(text)
-    end
-
     return text
 end
 
@@ -89,7 +85,10 @@ function m.warn(...)
 end
 
 function m.error(...)
-    return pushLog('error', ...)
+    -- Don't use tail calls,
+    -- Otherwise, the count of `debug.getinfo` will be wrong
+    local msg = pushLog('error', ...)
+    return msg
 end
 
 function m.raw(thd, level, msg, source, currentline, clock)
@@ -127,6 +126,11 @@ function m.raw(thd, level, msg, source, currentline, clock)
             m.file:write(buf)
         end
     end
+
+    if log.print then
+        print(buf)
+    end
+
     return buf
 end
 

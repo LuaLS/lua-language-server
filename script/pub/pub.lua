@@ -124,7 +124,7 @@ end
 --- 通过 jumpQueue 可以插队
 ---@param name string
 ---@param params any
----@param callback function
+---@param callback? function
 function m.task(name, params, callback)
     local info = {
         id       = counter(),

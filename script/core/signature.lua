@@ -41,11 +41,14 @@ end
 ---@async
 local function makeOneSignature(source, oop, index)
     local label = hoverLabel(source, oop)
+    if not label then
+        return nil
+    end
     -- 去掉返回值
     label = label:gsub('%s*->.+', '')
     local params = {}
     local i = 0
-    local argStart, argLabel = label:match '()(%b())'
+    local argStart, argLabel = label:match '()(%b())$'
     local converted = argLabel
         : sub(2, -2)
         : gsub('%b<>', function (str)
@@ -87,7 +90,7 @@ local function makeSignatures(text, call, pos)
     if call.args then
         local args = {}
         for _, arg in ipairs(call.args) do
-            if not arg.dummy then
+            if arg.type ~= 'self' then
                 args[#args+1] = arg
             end
         end

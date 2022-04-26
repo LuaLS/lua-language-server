@@ -69,14 +69,14 @@ return function (uri, position)
 
     local results = {}
     for _, src in ipairs(refs) do
-        if src.dummy then
-            goto CONTINUE
-        end
         local root = guide.getRoot(src)
         if not root then
             goto CONTINUE
         end
         if not metaSource and vm.isMetaFile(root.uri) then
+            goto CONTINUE
+        end
+        if src.type == 'self' then
             goto CONTINUE
         end
         src = src.field or src.method or src

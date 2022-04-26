@@ -88,9 +88,6 @@ return function (uri, callback)
         or name == ast.ENVMode then
             return
         end
-        if source.tag == 'self' then
-            return
-        end
         if isToBeClosed(source) then
             return
         end

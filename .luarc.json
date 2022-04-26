@@ -1,8 +1,4 @@
 {
-    "$schema": "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",
-    "color": {
-        "mode": "SemanticEnhanced"
-    },
     "diagnostics": {
         "disable": [
             "close-non-object"
@@ -11,7 +7,12 @@
             "undefined-field": "Any",
             "await-in-sync": "Any",
             "not-yieldable": "Any",
-            "discard-returns": "Any"
+            "discard-returns": "Any",
+            "redundant-parameter": "Any",
+            "missing-parameter": "Any",
+            "need-check-nil": "Any",
+            "redundant-value": "Any",
+            "deprecated": "Any"
         },
         "ignoredFiles": "Opened",
         "libraryFiles": "Opened"
@@ -40,8 +41,5 @@
             "script/meta",
             "bin"
         ]
-    },
-    "hint": {
-        "enable": true
     }
 }

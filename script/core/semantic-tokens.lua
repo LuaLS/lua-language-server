@@ -8,6 +8,7 @@ local converter      = require 'proto.converter'
 local infer          = require 'vm.infer'
 local config         = require 'config'
 local linkedTable    = require 'linked-table'
+local globalMgr      = require 'vm.global-manager'
 
 local Care = util.switch()
     : case 'getglobal'
@@ -16,7 +17,23 @@ local Care = util.switch()
         if not options.variable then
             return
         end
-        local isLib = vm.isGlobalLibraryName(source[1])
+
+        local name = source[1]
+        local isLib = options.libGlobals[name]
+        if isLib == nil then
+            isLib = false
+            local global = globalMgr.getGlobal('variable', name)
+            if global then
+                local uri = guide.getUri(source)
+                for _, set in ipairs(global:getSets(uri)) do
+                    if vm.isMetaFile(guide.getUri(set)) then
+                        isLib = true
+                        break
+                    end
+                end
+            end
+            options.libGlobals[name] = isLib
+        end
         local isFunc = infer.getInfer(source):hasFunction()
 
         local type = isFunc and define.TokenTypes['function'] or define.TokenTypes.variable
@@ -92,6 +109,7 @@ local Care = util.switch()
         }
     end)
     : case 'local'
+    : case 'self'
     : case 'getlocal'
     : case 'setlocal'
     : call(function (source, options, results)
@@ -119,13 +137,14 @@ local Care = util.switch()
         end
         local loc = source.node or source
         -- 1. 值为函数的局部变量 | Local variable whose value is a function
-        if loc.refs then
-            for _, ref in ipairs(loc.refs) do
+        if loc.ref then
+            for _, ref in ipairs(loc.ref) do
                 if ref.value and ref.value.type == 'function' then
                     results[#results+1] = {
                         start      = source.start,
                         finish     = source.finish,
                         type       = define.TokenTypes['function'],
+                        modifieres = define.TokenModifiers.declaration,
                     }
                     return
                 end
@@ -163,17 +182,17 @@ local Care = util.switch()
         -- 5. Class declaration
             -- only search this local
         if loc.bindDocs then
-            for i, doc in ipairs(loc.bindDocs) do
-                if doc.type == "doc.class" and doc.bindSources then
-                    for _, src in ipairs(doc.bindSources) do
-                        if src == loc then
-                            results[#results+1] = {
-                                start      = source.start,
-                                finish     = source.finish,
-                                type       = define.TokenTypes.class,
-                            }
-                            return
-                        end
+            local isParam = source.parent.type == 'funcargs'
+                         or source.parent.type == 'in'
+            if not isParam then
+                for _, doc in ipairs(loc.bindDocs) do
+                    if doc.type == 'doc.class' then
+                        results[#results+1] = {
+                            start      = source.start,
+                            finish     = source.finish,
+                            type       = define.TokenTypes.class,
+                        }
+                        return
                     end
                 end
             end
@@ -184,7 +203,7 @@ local Care = util.switch()
                 start      = source.start,
                 finish     = source.finish,
                 type       = define.TokenTypes['function'],
-                modifieres = source.type == 'setlocal' and define.TokenModifiers.declaration or nil,
+                modifieres = guide.isSet(source) and define.TokenModifiers.declaration or nil,
             }
             return
         end
@@ -650,6 +669,14 @@ local Care = util.switch()
             type   = define.TokenTypes.keyword,
         }
     end)
+    : case 'doc.cast.name'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.variable,
+        }
+    end)
 
 local function buildTokens(uri, results)
     local tokens = {}
@@ -779,6 +806,7 @@ return function (uri, start, finish)
         uri        = uri,
         state      = state,
         text       = files.getText(uri),
+        libGlobals = {},
         variable   = config.get(uri, 'Lua.semantic.variable'),
         annotation = config.get(uri, 'Lua.semantic.annotation'),
         keyword    = config.get(uri, 'Lua.semantic.keyword'),
@@ -792,27 +820,26 @@ return function (uri, start, finish)
 
     for _, comm in ipairs(state.comms) do
         if start <= comm.start and comm.finish <= finish then
-            if comm.type == 'comment.short' then
-                local head = comm.text:match '^%-%s*[@|]'
-                if head then
-                    results[#results+1] = {
-                        start  = comm.start,
-                        finish = comm.start + #head + 1,
-                        type   = define.TokenTypes.comment,
-                    }
-                    results[#results+1] = {
-                        start      = comm.start + #head + 1,
-                        finish     = comm.start + #head + 2 + #comm.text:match('%S*', #head + 1),
-                        type       = define.TokenTypes.keyword,
-                        modifieres = define.TokenModifiers.documentation,
-                    }
+            local headPos = (comm.type == 'comment.short' and comm.text:match '^%-%s*[@|]()')
+                         or (comm.type == 'comment.long'  and comm.text:match '^@()')
+            if headPos then
+                local atPos
+                if comm.type == 'comment.short' then
+                    atPos = headPos + 2
                 else
-                    results[#results+1] = {
-                        start  = comm.start,
-                        finish = comm.finish,
-                        type   = define.TokenTypes.comment,
-                    }
+                    atPos = headPos + #comm.mark
                 end
+                results[#results+1] = {
+                    start  = comm.start,
+                    finish = comm.start + atPos - 2,
+                    type   = define.TokenTypes.comment,
+                }
+                results[#results+1] = {
+                    start      = comm.start + atPos - 2,
+                    finish     = comm.start + atPos - 1 + #comm.text:match('%S*', headPos),
+                    type       = define.TokenTypes.keyword,
+                    modifieres = define.TokenModifiers.documentation,
+                }
             else
                 results[#results+1] = {
                     start  = comm.start,

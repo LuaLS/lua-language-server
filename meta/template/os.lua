@@ -45,11 +45,11 @@ function os.difftime(t2, t1) end
 
 ---#DES 'os.execute'
 ---#if VERSION <= 5.1 then
----@param command  string
+---@param command? string
 ---@return integer code
 function os.execute(command) end
 ---#else
----@param command string
+---@param command? string
 ---@return boolean?  suc
 ---@return exitcode? exitcode
 ---@return integer?  code

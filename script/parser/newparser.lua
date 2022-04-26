@@ -117,6 +117,7 @@ local Specials = {
     ['xpcall']       = true,
     ['pairs']        = true,
     ['ipairs']       = true,
+    ['assert']       = true,
 }
 
 local UnarySymbol = {
@@ -537,6 +538,7 @@ local function skipComment(isAction)
         if longComment then
             longComment.type = 'comment.long'
             longComment.text = longComment[1]
+            longComment.mark = longComment[2]
             longComment[1]   = nil
             longComment[2]   = nil
             State.comms[#State.comms+1] = longComment
@@ -628,10 +630,13 @@ local function parseLocalAttrs()
             break
         end
         if not attrs then
-            attrs = {}
+            attrs = {
+                type = 'localattrs',
+            }
         end
         local attr = {
             type   = 'localattr',
+            parent = attrs,
             start  = getPosition(Tokens[Index], 'left'),
             finish = getPosition(Tokens[Index], 'right'),
         }
@@ -686,18 +691,12 @@ local function parseLocalAttrs()
 end
 
 local function createLocal(obj, attrs)
-    if not obj then
-        return nil
-    end
     obj.type   = 'local'
     obj.effect = obj.finish
 
     if attrs then
         obj.attrs = attrs
-        for i = 1, #attrs do
-            local attr = attrs[i]
-            attr.parent = obj
-        end
+        attrs.parent = obj
     end
 
     local chunk = Chunk[#Chunk]
@@ -1405,7 +1404,7 @@ local function parseName(asAction)
     }
 end
 
-local function parseNameOrList()
+local function parseNameOrList(parent)
     local first = parseName()
     if not first then
         return nil
@@ -1428,6 +1427,7 @@ local function parseNameOrList()
                 type   = 'list',
                 start  = first.start,
                 finish = first.finish,
+                parent = parent,
                 [1]    = first
             }
         end
@@ -1748,15 +1748,14 @@ local function addDummySelf(node, call)
             parent = call,
         }
     end
-    local newNode = {}
-    for k, v in next, call.node.node do
-        newNode[k] = v
-    end
-    newNode.mirror = call.node.node
-    newNode.dummy  = true
-    newNode.parent = call.args
-    call.node.node.mirror = newNode
-    tinsert(call.args, 1, newNode)
+    local self = {
+        type   = 'self',
+        start  = node.colon.start,
+        finish = node.colon.finish,
+        parent = call.args,
+        [1]    = 'self',
+    }
+    tinsert(call.args, 1, self)
 end
 
 local function parseSimple(node, funcName)
@@ -2300,12 +2299,10 @@ local function parseFunction(isLocal, isAction)
             params[1] = createLocal {
                 start  = funcRight,
                 finish = funcRight,
-                method = func.name,
                 parent = params,
-                tag    = 'self',
-                dummy  = true,
                 [1]    = 'self',
             }
+            params[1].type = 'self'
         end
     end
     if hasLeftParen then
@@ -2893,7 +2890,11 @@ local function parseLocal()
     pushActionIntoCurrentChunk(loc)
     skipSpace()
     parseMultiVars(loc, parseName, true)
-    loc.effect = lastRightPosition()
+    if loc.value then
+        loc.effect = loc.value.finish
+    else
+        loc.effect = loc.finish
+    end
 
     return loc
 end
@@ -2948,13 +2949,22 @@ local function parseReturn()
     end
     pushActionIntoCurrentChunk(rtn)
     for i = #Chunk, 1, -1 do
-        local func = Chunk[i]
-        if func.type == 'function'
-        or func.type == 'main' then
-            if not func.returns then
-                func.returns = {}
+        local block = Chunk[i]
+        if block.type == 'function'
+        or block.type == 'main' then
+            if not block.returns then
+                block.returns = {}
             end
-            func.returns[#func.returns+1] = rtn
+            block.returns[#block.returns+1] = rtn
+            break
+        end
+    end
+    for i = #Chunk, 1, -1 do
+        local block = Chunk[i]
+        if block.type == 'ifblock'
+        or block.type == 'elseifblock'
+        or block.type == 'else' then
+            block.hasReturn = true
             break
         end
     end
@@ -3051,6 +3061,15 @@ local function parseGoTo()
                 chunk.gotos = {}
             end
             chunk.gotos[#chunk.gotos+1] = action
+            break
+        end
+    end
+    for i = #Chunk, 1, -1 do
+        local chunk = Chunk[i]
+        if chunk.type == 'ifblock'
+        or chunk.type == 'elseifblock'
+        or chunk.type == 'elseblock' then
+            chunk.hasGoTo = true
             break
         end
     end
@@ -3266,7 +3285,7 @@ local function parseFor()
     pushActionIntoCurrentChunk(action)
     pushChunk(action)
     skipSpace()
-    local nameOrList = parseNameOrList()
+    local nameOrList = parseNameOrList(action)
     if not nameOrList then
         missName()
     end
@@ -3292,15 +3311,16 @@ local function parseFor()
             action.loc    = loc
         end
         if expList then
+            expList.parent = action
             local value = expList[1]
             if value then
-                value.parent  = action
+                value.parent  = expList
                 action.init   = value
                 action.finish = expList[#expList].finish
             end
             local max = expList[2]
             if max then
-                max.parent    = action
+                max.parent    = expList
                 action.max    = max
                 action.finish = max.finish
             else
@@ -3312,7 +3332,7 @@ local function parseFor()
             end
             local step = expList[3]
             if step then
-                step.parent   = action
+                step.parent   = expList
                 action.step   = step
                 action.finish = step.finish
             end
@@ -3346,6 +3366,7 @@ local function parseFor()
                 type   = 'list',
                 start  = nameOrList.start,
                 finish = nameOrList.finish,
+                parent = action,
                 [1]    = nameOrList,
             }
         else
@@ -3359,9 +3380,10 @@ local function parseFor()
             end
 
             action.exps = exps
+            exps.parent = action
             for i = 1, #exps do
                 local exp = exps[i]
-                exp.parent = action
+                exp.parent = exps
             end
         else
             missExp()
@@ -3582,6 +3604,15 @@ local function parseBreak()
             end
             chunk.breaks[#chunk.breaks+1] = action
             ok = true
+            break
+        end
+    end
+    for i = #Chunk, 1, -1 do
+        local chunk = Chunk[i]
+        if chunk.type == 'ifblock'
+        or chunk.type == 'elseifblock'
+        or chunk.type == 'elseblock' then
+            chunk.hasBreak = true
             break
         end
     end

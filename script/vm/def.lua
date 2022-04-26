@@ -1,11 +1,9 @@
 ---@class vm
 local vm        = require 'vm.vm'
 local util      = require 'utility'
-local compiler  = require 'vm.compiler'
 local guide     = require 'parser.guide'
 local localID   = require 'vm.local-id'
 local globalMgr = require 'vm.global-manager'
-local nodeMgr   = require 'vm.node'
 
 local simpleSwitch
 
@@ -32,11 +30,18 @@ simpleSwitch = util.switch()
                 end
             end
         end
-
-        if source.dummy then
-            for _, res in ipairs(vm.getDefs(source.method.node)) do
-                pushResult(res)
+    end)
+    : case 'sellf'
+    : call(function (source, pushResult)
+        if source.ref then
+            for _, ref in ipairs(source.ref) do
+                if ref.type == 'setlocal' then
+                    pushResult(ref)
+                end
             end
+        end
+        for _, res in ipairs(vm.getDefs(source.method.node)) do
+            pushResult(res)
         end
     end)
     : case 'getlocal'
@@ -74,11 +79,18 @@ simpleSwitch = util.switch()
             pushResult(source.node)
         end
     end)
+    : case 'doc.cast.name'
+    : call(function (source, pushResult)
+        local loc = guide.getLocal(source, source[1], source.start)
+        if loc then
+            pushResult(loc)
+        end
+    end)
 
 local searchFieldSwitch = util.switch()
     : case 'table'
-    : call(function (suri, node, key, pushResult)
-        for _, field in ipairs(node) do
+    : call(function (suri, obj, key, pushResult)
+        for _, field in ipairs(obj) do
             if field.type == 'tablefield'
             or field.type == 'tableindex' then
                 if guide.getKeyName(field) == key then
@@ -88,24 +100,24 @@ local searchFieldSwitch = util.switch()
         end
     end)
     : case 'global'
-    ---@param node vm.node
+    ---@param obj vm.object
     ---@param key string
-    : call(function (suri, node, key, pushResult)
-        if node.cate == 'variable' then
-            local newGlobal = globalMgr.getGlobal('variable', node.name, key)
+    : call(function (suri, obj, key, pushResult)
+        if obj.cate == 'variable' then
+            local newGlobal = globalMgr.getGlobal('variable', obj.name, key)
             if newGlobal then
                 for _, set in ipairs(newGlobal:getSets(suri)) do
                     pushResult(set)
                 end
             end
         end
-        if node.cate == 'type' then
-            compiler.getClassFields(suri, node, key, pushResult)
+        if obj.cate == 'type' then
+            vm.getClassFields(suri, obj, key, false, pushResult)
         end
     end)
     : case 'local'
-    : call(function (suri, node, key, pushResult)
-        local sources = localID.getSources(node, key)
+    : call(function (suri, obj, key, pushResult)
+        local sources = localID.getSources(obj, key)
         if sources then
             for _, src in ipairs(sources) do
                 if guide.isSet(src) then
@@ -115,8 +127,8 @@ local searchFieldSwitch = util.switch()
         end
     end)
     : case 'doc.type.table'
-    : call(function (suri, node, key, pushResult)
-        for _, field in ipairs(node.fields) do
+    : call(function (suri, obj, key, pushResult)
+        for _, field in ipairs(obj.fields) do
             local fieldKey = field.name
             if fieldKey.type == 'doc.field.name' then
                 if fieldKey[1] == key then
@@ -126,12 +138,11 @@ local searchFieldSwitch = util.switch()
         end
     end)
 
-local searchByParentNode
-local nodeSwitch = util.switch()
+local nodeSwitch;nodeSwitch = util.switch()
     : case 'field'
     : case 'method'
-    : call(function (source, pushResult)
-        searchByParentNode(source.parent, pushResult)
+    : call(function (source, lastKey, pushResult)
+        return nodeSwitch(source.parent.type, source.parent, lastKey, pushResult)
     end)
     : case 'getfield'
     : case 'setfield'
@@ -139,32 +150,39 @@ local nodeSwitch = util.switch()
     : case 'setmethod'
     : case 'getindex'
     : case 'setindex'
-    : call(function (source, pushResult)
-        local parentNode = compiler.compileNode(source.node)
-        if not parentNode then
-            return
-        end
+    : call(function (source, lastKey, pushResult)
+        local parentNode = vm.compileNode(source.node)
         local uri = guide.getUri(source)
         local key = guide.getKeyName(source)
-        for pn in nodeMgr.eachNode(parentNode) do
+        if not key then
+            return
+        end
+        if lastKey then
+            key = key .. vm.ID_SPLITE .. lastKey
+        end
+        for pn in parentNode:eachObject() do
             searchFieldSwitch(pn.type, uri, pn, key, pushResult)
         end
+        return key, source.node
     end)
     : case 'tableindex'
     : case 'tablefield'
-    : call(function (source, pushResult)
+    : call(function (source, lastKey, pushResult)
+        if lastKey then
+            return
+        end
         local tbl = source.parent
         local uri = guide.getUri(source)
         searchFieldSwitch(tbl.type, uri, tbl, guide.getKeyName(source), pushResult)
     end)
     : case 'doc.see.field'
-    : call(function (source, pushResult)
-        local parentNode = compiler.compileNode(source.parent.name)
-        if not parentNode then
+    : call(function (source, lastKey, pushResult)
+        if lastKey then
             return
         end
+        local parentNode = vm.compileNode(source.parent.name)
         local uri = guide.getUri(source)
-        for pn in nodeMgr.eachNode(parentNode) do
+        for pn in parentNode:eachObject() do
             searchFieldSwitch(pn.type, uri, pn, source[1], pushResult)
         end
     end)
@@ -191,17 +209,27 @@ end
 
 ---@param source  parser.object
 ---@param pushResult fun(src: parser.object)
-function searchByParentNode(source, pushResult)
-    nodeSwitch(source.type, source, pushResult)
+local function searchByParentNode(source, pushResult)
+    local lastKey
+    local src = source
+    while true do
+        local key, node = nodeSwitch(src.type, src, lastKey, pushResult)
+        if not key then
+            break
+        end
+        src = node
+        if lastKey then
+            lastKey = key .. vm.ID_SPLITE .. lastKey
+        else
+            lastKey = key
+        end
+    end
 end
 
 local function searchByNode(source, pushResult)
-    local node = compiler.compileNode(source)
-    if not node then
-        return
-    end
+    local node = vm.compileNode(source)
     local suri = guide.getUri(source)
-    for n in nodeMgr.eachNode(node) do
+    for n in node:eachObject() do
         if n.type == 'global' then
             for _, set in ipairs(n:getSets(suri)) do
                 pushResult(set)
@@ -220,7 +248,7 @@ function vm.getDefs(source)
 
     local hasLocal
     local function pushResult(src)
-        if src.type == 'local' and not src.dummy then
+        if src.type == 'local' then
             if hasLocal then
                 return
             end

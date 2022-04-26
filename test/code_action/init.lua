@@ -113,6 +113,36 @@ return function(<?a?>, b, c) end
     },
 }
 
+TEST [[
+f = function (<?a?>, b) end
+]]
+{
+    {
+        title = lang.script('ACTION_SWAP_PARAMS', {
+            node  = 'f',
+            index = 2,
+        }),
+        kind  = 'refactor.rewrite',
+        edit  = EXISTS,
+    },
+}
+
+TEST [[
+local t = {
+    f = function (<?a?>, b) end
+}
+]]
+{
+    {
+        title = lang.script('ACTION_SWAP_PARAMS', {
+            node  = 'f',
+            index = 2,
+        }),
+        kind  = 'refactor.rewrite',
+        edit  = EXISTS,
+    },
+}
+
 --TEST [[
 --<?print(1)
 --print(2)?>

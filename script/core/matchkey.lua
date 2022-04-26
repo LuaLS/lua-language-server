@@ -59,7 +59,7 @@ end
 
 ---@param input string
 ---@param other string
----@param fast  boolean
+---@param fast? boolean
 ---@return boolean isMatch
 ---@return number  deviation
 return function (input, other, fast)

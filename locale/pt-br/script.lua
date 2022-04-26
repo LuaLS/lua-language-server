@@ -34,8 +34,10 @@ DIAG_PREFIELD_CALL      =
 'Será interpretado como `{}{}`. Pode ser necessário adicionar uma `,` ou `;`.'
 DIAG_OVER_MAX_ARGS      =
 'A função aceita apenas os parâmetros {:d}, mas você passou {:d}.'
-DIAG_OVER_MAX_ARGS      =
-'Recebe apenas {} variáveis, mas você definiu {}.'
+DIAG_MISS_ARGS          = -- TODO: need translate!
+'the function received at least {:d} arguments, but got {:d}.'
+DIAG_OVER_MAX_VALUES    = -- TODO: need translate!
+'Only has {} variables, but you set {} values.'
 DIAG_AMBIGUITY_1        =
 'Calcule primeiro `{}`. Você pode precisar adicionar colchetes.'
 DIAG_LOWERCASE_GLOBAL   =
@@ -88,7 +90,14 @@ DIAG_DIFFERENT_REQUIRES =
 'O mesmo arquivo é necessário com nomes diferentes.'
 DIAG_REDUNDANT_RETURN   =
 'Retorno redundante.'
-
+DIAG_AWAIT_IN_SYNC      = -- TODO: need translate!
+'Async function can only be called in async function.'
+DIAG_NOT_YIELDABLE      = -- TODO: need translate!
+'The {}th parameter of this function was not marked as yieldable, but an async function was passed in. (Use `---@param name async fun()` to mark as yieldable)'
+DIAG_DISCARD_RETURNS    = -- TODO: need translate!
+'The return values of this function cannot be discarded.'
+DIAG_NEED_CHECK_NIL     = -- TODO: need translate!
+'Need check nil.'
 DIAG_CIRCLE_DOC_CLASS                 =
 'Classes com herança cíclica.'
 DIAG_DOC_FIELD_NO_CLASS               =
@@ -228,7 +237,6 @@ PARSER_INDEX_IN_FUNC_NAME =
 'A forma `[name]` não pode ser usada em nome de uma função nomeada.'
 PARSER_UNKNOWN_ATTRIBUTE  =
 'Atributo local deve ser `const` ou `close`'
-
 PARSER_LUADOC_MISS_CLASS_NAME           =
 'Esperado <class name>.'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =
@@ -267,13 +275,14 @@ PARSER_LUADOC_MISS_DIAG_MODE            =
 'Esperado <diagnostic mode>.'
 PARSER_LUADOC_ERROR_DIAG_MODE           =
 '<diagnostic mode> incorreto.'
+PARSER_LUADOC_MISS_LOCAL_NAME           = -- TODO: need translate!
+'<local name> expected.'
 
-SYMBOL_ANONYMOUS        =
+SYMBOL_ANONYMOUS        = -- TODO: need translate!
 '<Anonymous>'
 
 HOVER_VIEW_DOCUMENTS    =
 'Visualizar documentos'
-
 HOVER_DOCUMENT_LUA51    =
 'http://www.lua.org/manual/5.1/manual.html#{}'
 HOVER_DOCUMENT_LUA52    =
@@ -284,8 +293,6 @@ HOVER_DOCUMENT_LUA54    =
 'http://www.lua.org/manual/5.4/manual.html#{}'
 HOVER_DOCUMENT_LUAJIT   =
 'http://www.lua.org/manual/5.1/manual.html#{}'
-
-
 HOVER_NATIVE_DOCUMENT_LUA51     =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUA52     =
@@ -296,10 +303,9 @@ HOVER_NATIVE_DOCUMENT_LUA54     =
 'command:extension.lua.doc?["en-us/54/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUAJIT    =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
-
 HOVER_MULTI_PROTOTYPE      =
 '({} protótipos)'
-HOVER_STRING_BYTES         =
+HOVER_STRING_BYTES         = -- TODO: need translate!
 '{} bytes'
 HOVER_STRING_CHARACTERS    =
 '{} bytes, {} caracteres'
@@ -307,7 +313,6 @@ HOVER_MULTI_DEF_PROTO      =
 '({} definições., {} protótipos)'
 HOVER_MULTI_PROTO_NOT_FUNC =
 '({} definição não funcional)'
-
 HOVER_USE_LUA_PATH      =
 '(Caminho de busca: `{}`)'
 HOVER_EXTENDS           =
@@ -316,6 +321,8 @@ HOVER_TABLE_TIME_UP     =
 'Inferência de tipo parcial foi desativada por motivos de desempenho.'
 HOVER_WS_LOADING        =
 'Carregando espaço de trabalho: {} / {}'
+HOVER_AWAIT_TOOLTIP     = -- TODO: need translate!
+'Calling async function, current thread may be yielded.'
 
 ACTION_DISABLE_DIAG     =
 'Desativar diagnósticos no espaço de trabalho ({}).'
@@ -371,6 +378,8 @@ ACTION_DISABLE_DIAG_LINE=
 'Desativa diagnósticos nesta linha ({}).'
 ACTION_DISABLE_DIAG_FILE=
 'Desativa diagnósticos nesta linha ({}).'
+ACTION_MARK_ASYNC       = -- TODO: need translate!
+'Mark current function as async.'
 
 COMMAND_DISABLE_DIAG       =
 'Desativar diagnósticos.'
@@ -429,7 +438,7 @@ WINDOW_PROCESSING_SEMANTIC_FULL  =
 'Processando tokens semânticas completos...'
 WINDOW_PROCESSING_SEMANTIC_RANGE =
 'Processando tokens semânticas incrementais...'
-WINDOW_PROCESSING_TYPE_HINT      =
+WINDOW_PROCESSING_HINT           =
 'Processando dicas de lina...'
 WINDOW_INCREASE_UPPER_LIMIT      =
 'Aumente o limite superior'
@@ -449,6 +458,17 @@ WINDOW_LUA_STATUS_CACHED_FILES   =
 'Arquivos em cache: {ast}/{max}'
 WINDOW_LUA_STATUS_MEMORY_COUNT   =
 'Uso de memória   : {mem:.f}M'
+WINDOW_LUA_STATUS_TIP            = -- TODO: need translate!
+[[
+
+This icon is a cat,
+Not a dog nor a fox!
+             ↓↓↓
+]]
+WINDOW_LUA_STATUS_DIAGNOSIS_TITLE= -- TODO: need translate!
+'Perform workspace diagnosis'
+WINDOW_LUA_STATUS_DIAGNOSIS_MSG  = -- TODO: need translate!
+'Do you want to perform workspace diagnosis?'
 WINDOW_APPLY_SETTING             =
 'Aplicar configuração'
 WINDOW_CHECK_SEMANTIC            =
@@ -475,6 +495,8 @@ WINDOW_APPLY_WHITOUT_SETTING     =
 'Aplicar mas não modificar configurações'
 WINDOW_ASK_APPLY_LIBRARY         =
 'Você precisa configurar seu ambiente de trabalho como `{}`?'
+WINDOW_SEARCHING_IN_FILES        = -- TODO: need translate!
+'Searching in files...'
 
 CONFIG_LOAD_FAILED               =
 'Não é possível ler o arquivo de configurações: {}'
@@ -503,3 +525,16 @@ PLUGIN_TRUST_NO                  =
 [[
 Não carregue este plugin
 ]]
+
+CLI_CHECK_ERROR_TYPE = -- TODO: need translate!
+'The argument of CHECK must be a string, but got {}'
+CLI_CHECK_ERROR_URI = -- TODO: need translate!
+'The argument of CHECK must be a valid uri, but got {}'
+CLI_CHECK_ERROR_LEVEL = -- TODO: need translate!
+'Checklevel must be one of: {}'
+CLI_CHECK_INITING = -- TODO: need translate!
+'Initializing ...'
+CLI_CHECK_SUCCESS = -- TODO: need translate!
+'Diagnosis completed, no problems found'
+CLI_CHECK_RESULTS = -- TODO: need translate!
+'Diagnosis complete, {} problems found, see {}'

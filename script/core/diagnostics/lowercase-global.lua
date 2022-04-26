@@ -1,8 +1,9 @@
-local files   = require 'files'
-local guide   = require 'parser.guide'
-local lang    = require 'language'
-local config  = require 'config'
-local vm      = require 'vm'
+local files     = require 'files'
+local guide     = require 'parser.guide'
+local lang      = require 'language'
+local config    = require 'config'
+local vm        = require 'vm'
+local globalMgr = require 'vm.global-manager'
 
 local function isDocClass(source)
     if not source.bindDocs then
@@ -30,7 +31,7 @@ return function (uri, callback)
 
     guide.eachSourceType(ast.ast, 'setglobal', function (source)
         local name = guide.getKeyName(source)
-        if definedGlobal[name] then
+        if not name or definedGlobal[name] then
             return
         end
         local first = name:match '%w'
@@ -44,8 +45,17 @@ return function (uri, callback)
         if isDocClass(source) then
             return
         end
-        if vm.isGlobalLibraryName(name) then
-            return
+        if definedGlobal[name] == nil then
+            definedGlobal[name] = false
+            local global = globalMgr.getGlobal('variable', name)
+            if global then
+                for _, set in ipairs(global:getSets(uri)) do
+                    if vm.isMetaFile(guide.getUri(set)) then
+                        definedGlobal[name] = true
+                        return
+                    end
+                end
+            end
         end
         callback {
             start   = source.start,

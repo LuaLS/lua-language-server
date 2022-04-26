@@ -5,9 +5,6 @@ local define   = require 'proto.define'
 local await    = require 'await'
 
 local function buildSource(uri, source, key, results)
-    if source.dummy then
-        return
-    end
     if     source.type == 'local'
     or     source.type == 'setlocal'
     or     source.type == 'setglobal' then

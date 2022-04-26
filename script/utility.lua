@@ -83,7 +83,7 @@ local m = {}
 
 --- 打印表的结构
 ---@param tbl table
----@param option table {optional = 'self'}
+---@param option? table
 ---@return string
 function m.dump(tbl, option)
     if not option then
@@ -315,8 +315,8 @@ function m.saveFile(path, content)
 end
 
 --- 计数器
----@param init integer {optional = 'after'}
----@param step integer {optional = 'after'}
+---@param init? integer
+---@param step? integer
 ---@return fun():integer
 function m.counter(init, step)
     if not step then
@@ -346,8 +346,8 @@ function m.sortPairs(t, sorter)
 end
 
 --- 深拷贝（不处理元表）
----@param source table
----@param target table {optional = 'self'}
+---@param source  table
+---@param target? table
 function m.deepCopy(source, target)
     local mark = {}
     local function copy(a, b)
@@ -566,26 +566,26 @@ end
 
 ---遍历文本的每一行
 ---@param text string
----@param keepNL boolean # 保留换行符
----@return fun(text:string):string
+---@param keepNL? boolean # 保留换行符
+---@return fun(text:string):string, integer
 function m.eachLine(text, keepNL)
     local offset = 1
     local lineCount = 0
     local lastLine
     return function ()
+        lineCount = lineCount + 1
         if offset > #text then
             if not lastLine then
                 lastLine = ''
-                return ''
+                return '', lineCount
             end
             return nil
         end
-        lineCount = lineCount + 1
         local nl = text:find('[\r\n]', offset)
         if not nl then
             lastLine = text:sub(offset)
             offset = #text + 1
-            return lastLine
+            return lastLine, lineCount
         end
         local line
         if text:sub(nl, nl + 1) == '\r\n' then
@@ -603,7 +603,7 @@ function m.eachLine(text, keepNL)
             end
             offset = nl + 1
         end
-        return line
+        return line, lineCount
     end
 end
 
@@ -640,12 +640,12 @@ end
 ---@return string
 function m.trim(str, mode)
     if mode == "left" then
-        return str:gsub('^%s+', '')
+        return (str:gsub('^%s+', ''))
     end
     if mode == "right" then
-        return str:gsub('%s+$', '')
+        return (str:gsub('%s+$', ''))
     end
-    return str:match '^%s*(%S+)%s*$'
+    return (str:match '^%s*(.-)%s*$')
 end
 
 function m.expandPath(path)

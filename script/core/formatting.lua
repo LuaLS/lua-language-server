@@ -3,7 +3,7 @@ local files      = require("files")
 local log        = require("log")
 
 return function(uri, options)
-    local text = files.getText(uri)
+    local text = files.getOriginText(uri)
     local ast = files.getState(uri)
     local status, formattedText = codeFormat.format(uri, text, options)
 

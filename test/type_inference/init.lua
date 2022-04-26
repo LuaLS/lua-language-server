@@ -77,12 +77,6 @@ function f(<?x?>)
 end
 ]]
 
-TEST 'number' [[
-local <?var?>
-var = 1
-var = 1.0
-]]
-
 TEST 'string' [[
 local var = '111'
 t.<?x?> = var
@@ -91,6 +85,11 @@ t.<?x?> = var
 TEST 'string' [[
 local <?var?>
 var = '111'
+]]
+
+TEST 'string' [[
+local var
+<?var?> = '111'
 ]]
 
 TEST 'string' [[
@@ -418,13 +417,13 @@ TEST 'string|table' [[
 local <?x?>
 ]]
 
-TEST '"enum1"|"enum2"' [[
+TEST [['enum1'|'enum2']] [[
 ---@type 'enum1' | 'enum2'
 local <?x?>
 ]]
 
-TEST '"enum1"|"enum2"' [[
----@type 'enum1' | 'enum2'
+TEST [["enum1"|"enum2"]] [[
+---@type "enum1" | "enum2"
 local <?x?>
 ]]
 
@@ -450,21 +449,21 @@ TEST 'A' [[
 local <?x?>
 ]]
 config.set(nil, 'Lua.hover.expandAlias', true)
-TEST '"enum1"|"enum2"' [[
+TEST [['enum1'|'enum2']] [[
 ---@alias A 'enum1' | 'enum2'
 
 ---@type A
 local <?x?>
 ]]
 
-TEST '"enum1"|"enum2"' [[
+TEST [['enum1'|'enum2']] [[
 ---@alias A 'enum1' | 'enum2' | A
 
 ---@type A
 local <?x?>
 ]]
 
-TEST '"enum1"|"enum2"|B' [[
+TEST [['enum1'|'enum2'|B]] [[
 ---@alias A 'enum1' | 'enum2' | B
 
 ---@type A
@@ -544,7 +543,7 @@ local t = {}
 print(t.<?a?>)
 ]]
 
-TEST '"aaa"|"bbb"' [[
+TEST [['aaa'|'bbb']] [[
 ---@type table<string, 'aaa'|'bbb'>
 local t = {}
 
@@ -565,6 +564,14 @@ TEST 'unknown' [[
 local f
 
 local <?n?> = f(nil)
+]]
+
+TEST 'unknown' [[
+---@generic K
+---@type fun(a: K|integer):K
+local f
+
+local <?n?> = f(1)
 ]]
 
 TEST 'integer' [[
@@ -864,6 +871,37 @@ end
 ]]
 
 TEST 'boolean' [[
+---@generic T: table, V
+---@param t T
+---@return fun(table: V[], i?: integer):integer, V
+---@return T
+---@return integer i
+local function ipairs(t) end
+
+---@type table<integer, boolean>
+local t
+
+for _, <?v?> in ipairs(t) do
+end
+]]
+
+TEST 'boolean' [[
+---@generic T: table, V
+---@param t T
+---@return fun(table: V[], i?: integer):integer, V
+---@return T
+---@return integer i
+local function ipairs(t) end
+
+---@class MyClass
+---@field [integer] boolean
+local t
+
+for _, <?v?> in ipairs(t) do
+end
+]]
+
+TEST 'boolean' [[
 ---@generic T: table, K, V
 ---@param t T
 ---@return fun(table: table<K, V>, index: K):K, V
@@ -984,13 +1022,13 @@ string.gsub():gsub():<?gsub?>()
 ]]
 
 config.set(nil, 'Lua.hover.enumsLimit', 5)
-TEST '"a"|"b"|"c"|"d"|"e"...(+5)' [[
+TEST [['a'|'b'|'c'|'d'|'e'...(+5)]] [[
 ---@type 'a'|'b'|'c'|'d'|'e'|'f'|'g'|'h'|'i'|'j'
 local <?t?>
 ]]
 
 config.set(nil, 'Lua.hover.enumsLimit', 1)
-TEST '"a"...(+9)' [[
+TEST [['a'...(+9)]] [[
 ---@type 'a'|'b'|'c'|'d'|'e'|'f'|'g'|'h'|'i'|'j'
 local <?t?>
 ]]
@@ -1119,6 +1157,29 @@ local t = f('')
 print(t.<?x?>)
 ]]
 
+TEST 'string' [[
+---@generic T
+---@param t T[]
+---@param callback fun(v: T)
+local function f(t, callback) end
+
+---@type string[]
+local t
+
+f(t, function (<?v?>) end)
+]]
+
+TEST 'unknown' [[
+---@generic T
+---@param t T[]
+---@param callback fun(v: T)
+local function f(t, callback) end
+
+local t = {}
+
+f(t, function (<?v?>) end)
+]]
+
 TEST 'table' [[
 local <?t?> = setmetatable({}, { __index = function () end })
 ]]
@@ -1208,14 +1269,14 @@ TEST '👍' [[
 local <?x?>
 ]]
 
-TEST 'boolean' [[
+TEST 'integer' [[
 ---@type boolean
 local x
 
 <?x?> = 1
 ]]
 
-TEST 'Class' [[
+TEST 'integer' [[
 ---@class Class
 local x
 
@@ -1433,4 +1494,755 @@ TEST 'string' [[
 local t = { 'x' }
 
 local <?x?> = t[#t]
+]]
+
+TEST '(string|integer)[]' [[
+---@type (string|integer)[]
+local <?x?>
+]]
+
+TEST 'boolean' [[
+---@type table<string, boolean>
+local t
+
+---@alias uri string
+
+---@type string
+local uri
+
+local <?v?> = t[uri]
+]]
+
+TEST 'A' [[
+---@class A
+G = {}
+
+<?G?>:A()
+]]
+
+TEST 'A' [[
+---@type A
+local <?x?> = nil
+]]
+
+TEST 'A' [[
+---@class A
+---@field b B
+local mt
+
+function mt:f()
+    self.b:x()
+    print(<?self?>)
+end
+]]
+
+TEST 'string?' [[
+---@return string?
+local function f() end
+
+local <?x?> = f()
+]]
+
+TEST 'AA' [[
+---@class AA
+---@overload fun():AA
+local AAA
+
+
+local <?x?> = AAA()
+]]
+
+TEST 'string|integer' [[
+local <?x?>
+x = '1'
+x = 1
+]]
+
+TEST 'string' [[
+local x
+<?x?> = '1'
+x = 1
+]]
+
+TEST 'integer' [[
+local x
+x = '1'
+<?x?> = 1
+]]
+
+TEST 'unknown' [[
+local x
+print(<?x?>)
+x = '1'
+x = 1
+]]
+
+TEST 'string' [[
+local x
+x = '1'
+print(<?x?>)
+x = 1
+]]
+
+TEST 'integer' [[
+local x
+x = '1'
+x = 1
+print(<?x?>)
+]]
+
+TEST 'unknown' [[
+local x
+
+function A()
+    print(<?x?>)
+end
+]]
+
+TEST 'unknown' [[
+local x
+
+function A()
+    print(<?x?>)
+end
+
+x = '1'
+x = 1
+]]
+
+TEST 'string' [[
+local x
+
+x = '1'
+
+function A()
+    print(<?x?>)
+end
+
+x = 1
+]]
+
+TEST 'integer' [[
+local x
+
+x = '1'
+x = 1
+
+function A()
+    print(<?x?>)
+end
+
+]]
+
+TEST 'boolean' [[
+local x
+
+function A()
+    x = true
+    print(<?x?>)
+end
+
+x = '1'
+x = 1
+]]
+
+TEST 'unknown' [[
+local x
+
+function A()
+    x = true
+end
+
+print(<?x?>)
+x = '1'
+x = 1
+]]
+
+TEST 'boolean' [[
+local x
+
+function A()
+    x = true
+    function B()
+        print(<?x?>)
+    end
+end
+
+x = '1'
+x = 1
+]]
+
+TEST 'table' [[
+local x
+
+function A()
+    x = true
+    function B()
+        x = {}
+        print(<?x?>)
+    end
+end
+
+x = '1'
+x = 1
+]]
+
+TEST 'boolean' [[
+local x
+
+function A()
+    x = true
+    function B()
+        x = {}
+    end
+    print(<?x?>)
+end
+
+x = '1'
+x = 1
+]]
+
+TEST 'unknown' [[
+local x
+
+function A()
+    x = true
+    function B()
+        x = {}
+    end
+end
+
+function C()
+    print(<?x?>)
+end
+
+x = '1'
+x = 1
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local <?x?>
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+if <?x?> then
+    print(x)
+end
+]]
+--[[
+context 0 integer?
+
+save copy 'block'
+save copy 'out'
+push 'block'
+get
+push copy
+truthy
+falsy ref 'out'
+get
+save HEAD 'final'
+push 'out'
+
+push copy HEAD
+merge 'final'
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+if x then
+    print(<?x?>)
+end
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+if x then
+    print(x)
+end
+
+print(<?x?>)
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+if not x then
+    x = 1
+end
+
+print(<?x?>)
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+if xxx and x then
+    print(<?x?>)
+end
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+if xxx and x then
+end
+
+print(<?x?>)
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+if xxx and x then
+    return
+end
+
+print(<?x?>)
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+if x ~= nil then
+    print(<?x?>)
+end
+
+print(x)
+]]
+
+TEST 'integer|nil' [[
+---@type integer?
+local x
+
+if x ~= nil then
+    print(x)
+end
+
+print(<?x?>)
+]]
+
+TEST 'nil' [[
+---@type integer?
+local x
+
+if x == nil then
+    print(<?x?>)
+end
+
+print(x)
+]]
+
+TEST 'integer|nil' [[
+---@type integer?
+local x
+
+if x == nil then
+    print(x)
+end
+
+print(<?x?>)
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+<?x?> = x or 1
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+<?x?> = x or y
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+if not x then
+    return
+end
+
+print(<?x?>)
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+if not x then
+    goto ANYWHERE
+end
+
+print(<?x?>)
+]]
+
+TEST 'integer' [=[
+local x
+
+print(<?x?>--[[@as integer]])
+]=]
+
+TEST 'integer' [=[
+print(<?io?>--[[@as integer]])
+]=]
+
+TEST 'integer' [=[
+print(io.<?open?>--[[@as integer]])
+]=]
+
+TEST 'integer' [=[
+local <?x?> = io['open']--[[@as integer]])
+]=]
+
+TEST 'integer' [=[
+local <?x?> = 1 + 1--[[@as integer]])
+]=]
+
+TEST 'integer' [=[
+local <?x?> = not 1--[[@as integer]])
+]=]
+
+TEST 'integer' [=[
+local <?x?> = ()--[[@as integer]])
+]=]
+
+TEST 'integer?' [[
+---@param x? integer
+local function f(<?x?>)
+
+end
+]]
+
+TEST 'integer' [[
+local x = 1
+x = <?x?>
+]]
+
+TEST 'integer?' [[
+---@class A
+---@field x? integer
+local t
+
+t.<?x?>
+]]
+
+TEST 'integer?' [[
+---@type { x?: integer }
+local t
+
+t.<?x?>
+]]
+
+TEST 'boolean' [[
+---@class A
+---@field [integer] boolean
+local t
+
+local <?x?> = t[1]
+]]
+
+TEST 'unknown' [[
+local <?x?> = y and z
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+assert(x)
+
+print(<?x?>)
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+assert(x ~= nil)
+
+print(<?x?>)
+]]
+
+TEST 'integer' [[
+---@type integer | nil
+local x
+
+assert(x)
+
+print(<?x?>)
+]]
+
+TEST 'integer' [[
+---@type integer | nil
+local x
+
+assert(x ~= nil)
+
+print(<?x?>)
+]]
+
+TEST 'integer' [[
+local x
+
+assert(x == 1)
+
+print(<?x?>)
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+if x and <?x?>.y then
+end
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+if x and x.y then
+end
+
+print(<?x?>)
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+if x and x.y then
+    return
+end
+
+print(<?x?>)
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+if not x or <?x?>.y then
+end
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+if not x or x.y then
+    print(<?x?>)
+end
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+if x or x.y then
+    print(<?x?>)
+end
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+if x.y or x then
+    print(<?x?>)
+end
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+if x.y or not x then
+    print(<?x?>)
+end
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+if not x or not y then
+    return
+end
+
+print(<?x?>)
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+if not y or not x then
+    return
+end
+
+print(<?x?>)
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+while true do
+    if not x then
+        break
+    end
+    print(<?x?>)
+end
+]]
+
+TEST 'integer?' [[
+---@type integer?
+local x
+
+while true do
+    if not x then
+        break
+    end
+end
+
+print(<?x?>)
+]]
+
+TEST 'integer' [[
+---@type fun():integer?
+local iter
+
+for <?x?> in iter do
+end
+]]
+
+TEST 'integer' [[
+local x
+
+---@type integer
+<?x?> = XXX
+]]
+
+TEST 'unknown' [[
+for _ = 1, 999 do
+    local <?x?>
+end
+]]
+
+TEST 'integer' [[
+local x
+
+---@cast x integer
+
+print(<?x?>)
+]]
+
+TEST 'unknown' [[
+local x
+
+---@cast x integer
+
+local x
+print(<?x?>)
+]]
+
+TEST 'unknown' [[
+local x
+
+if true then
+    local x
+    ---@cast x integer
+    print(x)
+end
+
+print(<?x?>)
+]]
+
+TEST 'boolean|integer' [[
+local x = 1
+
+---@cast x +boolean
+
+print(<?x?>)
+]]
+
+TEST 'boolean' [[
+---@type integer|boolean
+local x
+
+---@cast x -integer
+
+print(<?x?>)
+]]
+
+TEST 'boolean?' [[
+---@type boolean
+local x
+
+---@cast x +?
+
+print(<?x?>)
+]]
+
+TEST 'boolean' [[
+---@type boolean?
+local x
+
+---@cast x -?
+
+print(<?x?>)
+]]
+
+TEST 'string' [[
+---@type string?
+local x
+
+if not x then
+    return
+else
+    print(<?x?>)
+end
+
+print(x)
+]]
+
+TEST 'string' [[
+---@type string?
+local x
+
+if not x then
+    return
+else
+    print(x)
+end
+
+print(<?x?>)
+]]
+
+TEST 'true' [[
+---@type boolean | nil
+local x
+
+if not x then
+    return
+end
+
+print(<?x?>)
 ]]

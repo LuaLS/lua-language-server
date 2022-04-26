@@ -1,5 +1,3 @@
-local nodeMgr   = require 'vm.node'
-local compiler  = require 'vm.compiler'
 local globalMgr = require 'vm.global-manager'
 ---@class vm
 local vm        = require 'vm.vm'
@@ -11,60 +9,44 @@ local vm        = require 'vm.vm'
 ---@return boolean
 function vm.isSubType(uri, child, parent, mark)
     if type(parent) == 'string' then
-        parent = globalMgr.getGlobal('type', parent)
+        parent = vm.createNode(globalMgr.getGlobal('type', parent))
     end
     if type(child) == 'string' then
-        child = globalMgr.getGlobal('type', child)
+        child = vm.createNode(globalMgr.getGlobal('type', child))
     end
 
     if not child or not parent then
         return false
     end
 
-    if parent.type == 'global' and parent.cate == 'type' and parent.name == 'any' then
-        return true
-    end
-
-    if child.type == 'doc.type' then
-        for _, typeUnit in ipairs(child.types) do
-            if not vm.isSubType(uri, typeUnit, parent) then
-                return false
+    mark = mark or {}
+    for obj in child:eachObject() do
+        if obj.type ~= 'global'
+        or obj.cate ~= 'type' then
+            goto CONTINUE_CHILD
+        end
+        if mark[obj.name] then
+            return false
+        end
+        mark[obj.name] = true
+        for parentNode in parent:eachObject() do
+            if parentNode.type ~= 'global'
+            or parentNode.cate ~= 'type' then
+                goto CONTINUE_PARENT
             end
-        end
-        return true
-    end
-
-    if child.type == 'doc.type.name' then
-        child = globalMgr.getGlobal('type', child[1])
-    end
-
-    if child.type == 'global' and child.cate == 'type' then
-        if parent.type == 'doc.type' then
-            for _, typeUnit in ipairs(parent.types) do
-                if vm.isSubType(uri, child, typeUnit) then
-                    return true
-                end
-            end
-        end
-
-        if parent.type == 'doc.type.name' then
-            parent = globalMgr.getGlobal('type', parent[1])
-        end
-
-        if parent.type == 'global' and parent.cate == 'type' then
-            if parent.name == child.name then
+            if parentNode.name == 'any' or obj.name == 'any' then
                 return true
             end
-            mark = mark or {}
-            if mark[child.name] then
-                return false
+
+            if parentNode.name == obj.name then
+                return true
             end
-            mark[child.name] = true
-            for _, set in ipairs(child:getSets(uri)) do
+
+            for _, set in ipairs(obj:getSets(uri)) do
                 if set.type == 'doc.class' and set.extends then
                     for _, ext in ipairs(set.extends) do
                         if  ext.type == 'doc.extends.name'
-                        and vm.isSubType(uri, globalMgr.getGlobal('type', ext[1]), parent, mark) then
+                        and vm.isSubType(uri, ext[1], parentNode.name, mark) then
                             return true
                         end
                     end
@@ -72,13 +54,15 @@ function vm.isSubType(uri, child, parent, mark)
                 if set.type == 'doc.alias' and set.extends then
                     for _, ext in ipairs(set.extends.types) do
                         if  ext.type == 'doc.type.name'
-                        and vm.isSubType(uri, globalMgr.getGlobal('type', ext[1]), parent, mark) then
+                        and vm.isSubType(uri, ext[1], parentNode.name, mark) then
                             return true
                         end
                     end
                 end
             end
+            ::CONTINUE_PARENT::
         end
+        ::CONTINUE_CHILD::
     end
 
     return false
@@ -87,34 +71,48 @@ end
 ---@param uri uri
 ---@param tnode vm.node
 ---@param knode vm.node
+---@return vm.node?
 function vm.getTableValue(uri, tnode, knode)
-    local result
-    for tn in nodeMgr.eachNode(tnode) do
+    local result = vm.createNode()
+    for tn in tnode:eachObject() do
         if tn.type == 'doc.type.table' then
             for _, field in ipairs(tn.fields) do
-                if vm.isSubType(uri, field.name, knode) then
-                    result = nodeMgr.mergeNode(result, compiler.compileNode(field.extends))
+                if vm.isSubType(uri, vm.compileNode(field.name), knode) then
+                    if field.extends then
+                        result:merge(vm.compileNode(field.extends))
+                    end
                 end
             end
         end
         if tn.type == 'doc.type.array' then
-            if vm.isSubType(uri, globalMgr.getGlobal('type', 'integer'), knode) then
-                result = nodeMgr.mergeNode(result, compiler.compileNode(tn.node))
-            end
+            result:merge(vm.compileNode(tn.node))
         end
         if tn.type == 'table' then
             for _, field in ipairs(tn) do
                 if field.type == 'tableindex' then
-                    result = nodeMgr.mergeNode(result, compiler.compileNode(field.value))
+                    if field.value then
+                        result:merge(vm.compileNode(field.value))
+                    end
                 end
                 if field.type == 'tablefield' then
-                    result = nodeMgr.mergeNode(result, compiler.compileNode(field.value))
+                    if vm.isSubType(uri, knode, 'string') then
+                        if field.value then
+                            result:merge(vm.compileNode(field.value))
+                        end
+                    end
                 end
                 if field.type == 'tableexp' then
-                    result = nodeMgr.mergeNode(result, compiler.compileNode(field.value))
+                    if vm.isSubType(uri, knode, 'integer') and field.tindex == 1 then
+                        if field.value then
+                            result:merge(vm.compileNode(field.value))
+                        end
+                    end
                 end
             end
         end
+    end
+    if result:isEmpty() then
+        return nil
     end
     return result
 end
@@ -122,34 +120,40 @@ end
 ---@param uri uri
 ---@param tnode vm.node
 ---@param vnode vm.node
+---@return vm.node?
 function vm.getTableKey(uri, tnode, vnode)
-    local result
-    for tn in nodeMgr.eachNode(tnode) do
+    local result = vm.createNode()
+    for tn in tnode:eachObject() do
         if tn.type == 'doc.type.table' then
             for _, field in ipairs(tn.fields) do
-                if vm.isSubType(uri, field.extends, vnode) then
-                    result = nodeMgr.mergeNode(result, compiler.compileNode(field.name))
+                if field.extends then
+                    if vm.isSubType(uri, vm.compileNode(field.extends), vnode) then
+                        result:merge(vm.compileNode(field.name))
+                    end
                 end
             end
         end
         if tn.type == 'doc.type.array' then
-            if vm.isSubType(uri, tn.node, vnode) then
-                result = nodeMgr.mergeNode(result, globalMgr.getGlobal('type', 'integer'))
-            end
+            result:merge(globalMgr.declareGlobal('type', 'integer'))
         end
         if tn.type == 'table' then
             for _, field in ipairs(tn) do
                 if field.type == 'tableindex' then
-                    result = nodeMgr.mergeNode(result, compiler.compileNode(field.index))
+                    if field.index then
+                        result:merge(vm.compileNode(field.index))
+                    end
                 end
                 if field.type == 'tablefield' then
-                    result = nodeMgr.mergeNode(result, globalMgr.getGlobal('type', 'string'))
+                    result:merge(globalMgr.declareGlobal('type', 'string'))
                 end
                 if field.type == 'tableexp' then
-                    result = nodeMgr.mergeNode(result, globalMgr.getGlobal('type', 'integer'))
+                    result:merge(globalMgr.declareGlobal('type', 'integer'))
                 end
             end
         end
+    end
+    if result:isEmpty() then
+        return nil
     end
     return result
 end

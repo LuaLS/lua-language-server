@@ -16,22 +16,34 @@ local function formatKey(key)
     return ('[%s]'):format(key)
 end
 
-local function buildAsHash(keys, typeMap, literalMap, optMap, reachMax)
+---@param uri uri
+---@param keys string[]
+---@param nodeMap table<string, vm.node>
+---@param reachMax integer
+local function buildAsHash(uri, keys, nodeMap, reachMax)
     local lines = {}
     lines[#lines+1] = '{'
     for _, key in ipairs(keys) do
-        local typeView    = typeMap[key]
-        local literalView = literalMap[key]
+        local node        = nodeMap[key]
+        local isOptional  = node:isOptional()
+        if isOptional then
+            node = node:copy()
+            node:removeOptional()
+        end
+        local ifr         = infer.getInfer(node)
+        local typeView    = ifr:view('unknown', uri)
+        local literalView = ifr:viewLiterals()
         if literalView then
             lines[#lines+1] = ('    %s%s: %s = %s,'):format(
                 formatKey(key),
-                optMap[key] and '?' or '',
+                isOptional and '?' or '',
                 typeView,
-                literalView)
+                literalView
+            )
         else
             lines[#lines+1] = ('    %s%s: %s,'):format(
                 formatKey(key),
-                optMap[key] and '?' or '',
+                isOptional and '?' or '',
                 typeView
             )
         end
@@ -43,26 +55,40 @@ local function buildAsHash(keys, typeMap, literalMap, optMap, reachMax)
     return table.concat(lines, '\n')
 end
 
-local function buildAsConst(keys, typeMap, literalMap, optMap, reachMax)
+---@param uri uri
+---@param keys string[]
+---@param nodeMap table<string, vm.node>
+---@param reachMax integer
+local function buildAsConst(uri, keys, nodeMap, reachMax)
+    local literalMap = {}
+    for _, key in ipairs(keys) do
+        literalMap[key] = infer.getInfer(nodeMap[key]):viewLiterals()
+    end
     table.sort(keys, function (a, b)
         return tonumber(literalMap[a]) < tonumber(literalMap[b])
     end)
     local lines = {}
     lines[#lines+1] = '{'
     for _, key in ipairs(keys) do
-        local typeView    = typeMap[key]
+        local node        = nodeMap[key]
+        local isOptional    = node:isOptional()
+        if isOptional then
+            node = node:copy()
+            node:removeOptional()
+        end
+        local typeView    = infer.getInfer(node):view('unknown', uri)
         local literalView = literalMap[key]
         if literalView then
             lines[#lines+1] = ('    %s%s: %s = %s,'):format(
                 formatKey(key),
-                optMap[key] and '?' or '',
+                isOptional and '?' or '',
                 typeView,
                 literalView
             )
         else
             lines[#lines+1] = ('    %s%s: %s,'):format(
                 formatKey(key),
-                optMap[key] and '?' or '',
+                isOptional and '?' or '',
                 typeView
             )
         end
@@ -102,6 +128,19 @@ local function getKeyMap(fields)
             if ta == 'boolean' then
                 return a == true
             end
+            if ta == 'string' then
+                if a:sub(1, 1) == '_' then
+                    if b:sub(1, 1) == '_' then
+                        return a < b
+                    else
+                        return false
+                    end
+                elseif b:sub(1, 1) == '_' then
+                    return true
+                else
+                    return a < b
+                end
+            end
             return a < b
         else
             return tsa < tsb
@@ -110,48 +149,25 @@ local function getKeyMap(fields)
     return keys, map
 end
 
-local function getOptMap(fields, keyMap)
-    local optMap = {}
-    for _, field in ipairs(fields) do
-        if field.type == 'doc.field' then
-            if field.optional then
-                local key = vm.getKeyName(field)
-                if keyMap[key] then
-                    optMap[key] = true
-                end
-            end
-        end
-        if field.type == 'doc.type.field' then
-            if field.optional then
-                local key = vm.getKeyName(field)
-                if keyMap[key] then
-                    optMap[key] = true
-                end
-            end
-        end
-    end
-    return optMap
-end
-
 ---@async
-local function getInferMap(fields, keyMap)
-    ---@type table<string, vm.infer>
-    local inferMap = {}
+local function getNodeMap(fields, keyMap)
+    ---@type table<string, vm.node>
+    local nodeMap = {}
     for _, field in ipairs(fields) do
         local key = vm.getKeyName(field)
         if not keyMap[key] then
             goto CONTINUE
         end
         await.delay()
-        local ifr = infer.getInfer(field)
-        if inferMap[key] then
-            inferMap[key] = inferMap[key]:merge(ifr)
+        local node = vm.compileNode(field)
+        if nodeMap[key] then
+            nodeMap[key]:merge(node)
         else
-            inferMap[key] = ifr
+            nodeMap[key] = node:copy()
         end
         ::CONTINUE::
     end
-    return inferMap
+    return nodeMap
 end
 
 ---@async
@@ -184,19 +200,14 @@ return function (source)
         end
     end
 
-    local optMap   = getOptMap(fields, map)
-    local inferMap = getInferMap(fields, map)
+    local nodeMap = getNodeMap(fields, map)
 
-    local typeMap    = {}
-    local literalMap = {}
     local isConsts = true
     for i = 1, #keys do
         await.delay()
         local key = keys[i]
-
-        typeMap[key]    = inferMap[key]:view('unknown', uri)
-        literalMap[key] = inferMap[key]:viewLiterals()
-        if not tonumber(literalMap[key]) then
+        local literal = infer.getInfer(nodeMap[key]):viewLiterals()
+        if not tonumber(literal) then
             isConsts = false
         end
     end
@@ -204,9 +215,9 @@ return function (source)
     local result
 
     if isConsts then
-        result = buildAsConst(keys, typeMap, literalMap, optMap, reachMax)
+        result = buildAsConst(uri, keys, nodeMap, reachMax)
     else
-        result = buildAsHash(keys, typeMap, literalMap, optMap, reachMax)
+        result = buildAsHash(uri, keys, nodeMap, reachMax)
     end
 
     --if timeUp then

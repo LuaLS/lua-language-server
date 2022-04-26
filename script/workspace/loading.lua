@@ -14,6 +14,7 @@ local pub      = require 'pub'
 ---@field _stash function[]
 ---@field _refs uri[]
 ---@field _cache table<uri, boolean>
+---@field _sets function[]
 ---@field _removed boolean
 local mt = {}
 mt.__index = mt
@@ -64,7 +65,7 @@ function mt:checkMaxPreload(uri)
 end
 
 ---@param uri uri
----@param libraryUri boolean
+---@param libraryUri? uri
 ---@async
 function mt:loadFile(uri, libraryUri)
     if files.isLua(uri) then
@@ -94,6 +95,9 @@ function mt:loadFile(uri, libraryUri)
                     return
                 end
                 log.debug(('Preload file at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
+                --await.wait(function (waker)
+                --    self._sets[#self._sets+1] = waker
+                --end)
                 files.setText(uri, content, false)
                 if not self._cache[uri] then
                     files.addRef(uri)
@@ -125,6 +129,9 @@ function mt:loadFile(uri, libraryUri)
                     return
                 end
                 log.debug(('Preload dll at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
+                --await.wait(function (waker)
+                --    self._sets[#self._sets+1] = waker
+                --end)
                 files.saveDll(uri, content)
                 if not self._cache[uri] then
                     files.addRef(uri)
@@ -141,6 +148,8 @@ end
 
 ---@async
 function mt:loadAll()
+    local startClock = os.clock()
+    log.info('Load files from disk:', self.scp:getName())
     while self.read < self.max do
         self:update()
         local loader = table.remove(self._stash)
@@ -151,7 +160,18 @@ function mt:loadAll()
             await.sleep(0.1)
         end
     end
-    log.info('Loaded finish.')
+    local loadedClock = os.clock()
+    log.info(('Loaded files takes [%.3f] sec: %s'):format(loadedClock - startClock, self.scp:getName()))
+    self._bar:remove()
+    self._bar = progress.create(self.scp.uri, lang.script('WORKSPACE_LOADING', self.scp.uri), 0)
+    for i, set in ipairs(self._sets) do
+        await.delay()
+        set()
+        self.read = i
+        self:update()
+    end
+    log.info(('Compile files takes [%.3f] sec: %s'):format(os.clock() - loadedClock, self.scp:getName()))
+    log.info('Loaded finish:', self.scp:getName())
 end
 
 function mt:remove()
@@ -176,9 +196,10 @@ m._loadings = setmetatable({}, { __mode = 'k' })
 function m.create(scp)
     local loading = setmetatable({
         scp    = scp,
-        _bar   = progress.create(scp, lang.script('WORKSPACE_LOADING', scp.uri), 0.5),
+        _bar   = progress.create(scp.uri, lang.script('WORKSPACE_LOADING', scp.uri), 0.5),
         _stash = {},
         _cache = {},
+        _sets  = {},
     }, mt)
     m._loadings[loading] = true
     return loading

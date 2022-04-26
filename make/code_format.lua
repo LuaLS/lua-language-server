@@ -1,5 +1,8 @@
 local lm = require 'luamake'
 
+lm.c = lm.compiler == 'msvc' and 'c89' or 'c11'
+lm.cxx = 'c++17'
+
 lm:source_set 'code_format' {
     rootdir = '../3rd/EmmyLuaCodeStyle',
     includes = {
@@ -20,15 +23,20 @@ lm:source_set 'code_format' {
         "CodeService/src/FormatElement/*.cpp",
         "CodeService/src/NameStyle/*.cpp"
     },
+    windows = {
+        -- 不要开哦
+        -- flasg = "/W3 /WX"
+    },
     macos = {
-        -- macosx10.12不支持完整的std filesystem，只好砍功能
-        defines = "NOT_SUPPORT_FILE_SYSTEM",
+        flags = "-Wall -Werror",
+        defines = "NOT_SUPPORT_FILE_SYSTEM"
     },
     linux = {
-        defines = (function ()
+        defines = (function()
             if lm.platform == "linux-arm64" then
                 return "NOT_SUPPORT_FILE_SYSTEM"
             end
-        end)()
+        end)(),
+        flags = "-Wall -Werror"
     }
 }

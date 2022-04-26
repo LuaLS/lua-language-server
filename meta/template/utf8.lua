@@ -18,12 +18,12 @@ function utf8.char(code, ...) end
 ---#DES 'utf8.codes'
 ---#if VERSION <= 5.3 then
 ---@param s    string
----@return fun():integer, integer
+---@return fun(s: string, p: integer):integer, integer
 function utf8.codes(s) end
 ---#else
 ---@param s    string
 ---@param lax? boolean
----@return fun():integer, integer
+---@return fun(s: string, p: integer):integer, integer
 function utf8.codes(s, lax) end
 ---#end
 

@@ -1,13 +1,13 @@
 ---@class vm
 local vm        = require 'vm.vm'
 local util      = require 'utility'
-local compiler  = require 'vm.compiler'
 local guide     = require 'parser.guide'
 local localID   = require 'vm.local-id'
 local globalMgr = require 'vm.global-manager'
-local nodeMgr   = require 'vm.node'
 local files     = require 'files'
 local await     = require 'await'
+local progress  = require 'progress'
+local lang      = require 'language'
 
 local simpleSwitch
 
@@ -92,14 +92,24 @@ local function searchInAllFiles(suri, searcher, notify)
         end
     end
 
-    for _, uri in ipairs(uris) do
+    local loading <close> = progress.create(suri, lang.script.WINDOW_SEARCHING_IN_FILES, 1)
+    local cancelled
+    loading:onCancel(function ()
+        cancelled = true
+    end)
+    for i, uri in ipairs(uris) do
         if notify then
             local continue = notify(uri)
             if continue == false then
                 break
             end
         end
+        loading:setMessage(('%03d/%03d'):format(i, #uris))
+        loading:setPercentage(i / #uris * 100)
         await.delay()
+        if cancelled then
+            break
+        end
         searcher(uri)
     end
 end
@@ -208,11 +218,6 @@ local nodeSwitch = util.switch()
             return
         end
 
-        local parentNode = compiler.compileNode(source.node)
-        if not parentNode then
-            return
-        end
-
         searchField(source, pushResult, defMap, fileNotify)
     end)
     : case 'tablefield'
@@ -255,12 +260,12 @@ function searchByParentNode(source, pushResult, defMap, fileNotify)
 end
 
 local function searchByNode(source, pushResult)
-    local node = compiler.compileNode(source)
+    local node = vm.compileNode(source)
     if not node then
         return
     end
     local uri = guide.getUri(source)
-    for n in nodeMgr.eachNode(node) do
+    for n in node:eachObject() do
         if n.type == 'global' then
             for _, get in ipairs(n:getGets(uri)) do
                 pushResult(get)
@@ -286,14 +291,14 @@ end
 
 ---@async
 ---@param source parser.object
----@param fileNotify fun(uri: uri): boolean
+---@param fileNotify? fun(uri: uri): boolean
 function vm.getRefs(source, fileNotify)
     local results = {}
     local mark    = {}
 
     local hasLocal
     local function pushResult(src)
-        if src.type == 'local' and not src.dummy then
+        if src.type == 'local' then
             if hasLocal then
                 return
             end

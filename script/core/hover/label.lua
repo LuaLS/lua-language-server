@@ -17,8 +17,8 @@ local function asFunction(source, oop)
     local lines = {}
 
     lines[1] = string.format('%s%s %s(%s)'
-        , vm.isAsync(source) and 'async ' or ''
-        , oop and 'method' or 'function'
+        , vm.isAsync(source) and '(async) ' or ''
+        , oop and '(method)' or 'function'
         , name or ''
         , oop and table.concat(args, ', ', 2) or table.concat(args, ', ')
     )
@@ -31,10 +31,10 @@ local function asDocTypeName(source)
     local defs = vm.getDefs(source)
     for _, doc in ipairs(defs) do
         if doc.type == 'doc.class' then
-            return 'class ' .. doc.class[1]
+            return '(class) ' .. doc.class[1]
         end
         if doc.type == 'doc.alias' then
-            return lang.script('HOVER_EXTENDS', infer.getInfer(doc.extends):view())
+            return '(alias) ' .. doc.alias[1] .. ' ' .. lang.script('HOVER_EXTENDS', infer.getInfer(doc.extends):view())
         end
     end
 end
@@ -72,12 +72,28 @@ end
 
 ---@async
 local function asLocal(source)
-    return asValue(source, 'local')
+    local node
+    if source.type == 'local'
+    or source.type == 'self' then
+        node = source
+    else
+        node = source.node
+    end
+    if node.type == 'self' then
+        return asValue(source, '(self)')
+    end
+    if node.parent.type == 'funcargs' then
+        return asValue(source, '(parameter)')
+    elseif guide.getParentFunction(source) ~= guide.getParentFunction(node) then
+        return asValue(source, '(upvalue)')
+    else
+        return asValue(source, 'local')
+    end
 end
 
 ---@async
 local function asGlobal(source)
-    return asValue(source, 'global')
+    return asValue(source, '(global)')
 end
 
 local function isGlobalField(source)
@@ -112,7 +128,7 @@ local function asField(source)
     if isGlobalField(source) then
         return asGlobal(source)
     end
-    return asValue(source, 'field')
+    return asValue(source, '(field)')
 end
 
 local function asDocFieldName(source)
@@ -126,9 +142,9 @@ local function asDocFieldName(source)
     end
     local view = infer.getInfer(source.extends):view()
     if not class then
-        return ('field ?.%s: %s'):format(name, view)
+        return ('(field) ?.%s: %s'):format(name, view)
     end
-    return ('field %s.%s: %s'):format(class.class[1], name, view)
+    return ('(field) %s.%s: %s'):format(class.class[1], name, view)
 end
 
 local function asString(source)
@@ -164,7 +180,7 @@ local function asNumber(source)
     if not text then
         return nil
     end
-    local raw = text:sub(source.start, source.finish)
+    local raw = text:sub(source.start + 1, source.finish)
     if not raw or not raw:find '[^%-%d%.]' then
         return nil
     end
@@ -177,6 +193,7 @@ return function (source, oop)
     or     source.type == 'doc.type.function' then
         return asFunction(source, oop)
     elseif source.type == 'local'
+    or     source.type == 'self'
     or     source.type == 'getlocal'
     or     source.type == 'setlocal' then
         return asLocal(source)

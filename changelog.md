@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.2.2
+* `FIX` [#1093](https://github.com/sumneko/lua-language-server/issues/1093)
 * `FIX` runtime errors reported by telemetry, see [#1091](https://github.com/sumneko/lua-language-server/issues/1091)
 
 ## 3.2.1

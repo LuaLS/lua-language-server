@@ -352,6 +352,15 @@ local <!function f()
 end!>
 ]]
 
+
+TEST [[
+local <!function test()
+end!>
+
+local <!function foo ()
+end!>
+]]
+
 config.get(nil, 'Lua.diagnostics.disable')['unused-local'] = nil
 TEST [[
 local mt, x

@@ -87,5 +87,8 @@ return function (uri, callback)
     end
 
     -- 只检查局部函数
-    guide.eachSourceType(ast.ast, 'function', checkFunction)
+    ---@async
+    guide.eachSourceType(ast.ast, 'function', function (src)
+        checkFunction(src)
+    end)
 end

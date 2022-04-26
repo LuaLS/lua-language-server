@@ -2,9 +2,6 @@ local util  = require 'utility'
 local scope = require 'workspace.scope'
 local guide = require 'parser.guide'
 local files = require 'files'
-local signMgr       = require 'vm.sign'
-local genericMgr    = require 'vm.generic'
-local localID       = require 'vm.local-id'
 ---@class vm
 local vm    = require 'vm.vm'
 
@@ -279,14 +276,14 @@ local compilerGlobalSwitch = util.switch()
         source._globalNode = class
 
         if source.signs then
-            source._sign = signMgr()
+            source._sign = vm.createSign()
             for _, sign in ipairs(source.signs) do
                 source._sign:addSign(vm.compileNode(sign))
             end
             if source.extends then
                 for _, ext in ipairs(source.extends) do
                     if ext.type == 'doc.type.table' then
-                        ext._generic = genericMgr(ext, source._sign)
+                        ext._generic = vm.createGeneric(ext, source._sign)
                     end
                 end
             end
@@ -301,11 +298,11 @@ local compilerGlobalSwitch = util.switch()
         source._globalNode = alias
 
         if source.signs then
-            source._sign = signMgr()
+            source._sign = vm.createSign()
             for _, sign in ipairs(source.signs) do
                 source._sign:addSign(vm.compileNode(sign))
             end
-            source.extends._generic = genericMgr(source.extends, source._sign)
+            source.extends._generic = vm.createGeneric(source.extends, source._sign)
         end
     end)
     : case 'doc.type.name'
@@ -449,11 +446,11 @@ local function compileSelf(source)
     if not node then
         return
     end
-    local fields = localID.getFields(source)
+    local fields = vm.getLocalFields(source)
     if not fields then
         return
     end
-    local nodeLocalID = localID.getID(node)
+    local nodeLocalID = vm.getLocalID(node)
     local globalNode  = node._globalNode
     if not nodeLocalID and not globalNode then
         return
@@ -464,7 +461,7 @@ local function compileSelf(source)
             if key then
                 if nodeLocalID then
                     local myID = nodeLocalID .. vm.ID_SPLITE .. key
-                    localID.insertLocalID(myID, field)
+                    vm.insertLocalID(myID, field)
                 end
                 if globalNode then
                     local myID = globalNode:getName() .. vm.ID_SPLITE .. key

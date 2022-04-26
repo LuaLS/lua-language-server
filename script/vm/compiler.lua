@@ -1,9 +1,6 @@
 local guide      = require 'parser.guide'
 local util       = require 'utility'
-local localID    = require 'vm.local-id'
-local signMgr    = require 'vm.sign'
 local config     = require 'config'
-local genericMgr = require 'vm.generic'
 local rpath      = require 'workspace.require-path'
 local files      = require 'files'
 ---@class vm
@@ -62,9 +59,9 @@ local searchFieldSwitch = util.switch()
     : call(function (suri, node, key, ref, pushResult)
         local fields
         if key then
-            fields = localID.getSources(node, key)
+            fields = vm.getLocalSources(node, key)
         else
-            fields = localID.getFields(node)
+            fields = vm.getLocalFields(node)
         end
         if fields then
             for _, src in ipairs(fields) do
@@ -331,7 +328,7 @@ local function getObjectSign(source)
         for _, doc in ipairs(source.bindDocs) do
             if doc.type == 'doc.generic' then
                 if not source._sign then
-                    source._sign = signMgr()
+                    source._sign = vm.createSign()
                     break
                 end
             end
@@ -359,7 +356,7 @@ local function getObjectSign(source)
         if not hasGeneric then
             return false
         end
-        source._sign = signMgr()
+        source._sign = vm.createSign()
         if source.type == 'doc.type.function' then
             for _, arg in ipairs(source.args) do
                 if arg.extends then
@@ -403,7 +400,7 @@ function vm.getReturnOfFunction(func, index)
         if not sign then
             return rtn
         end
-        return genericMgr(rtn, sign)
+        return vm.createGeneric(rtn, sign)
     end
 end
 
@@ -583,7 +580,7 @@ local function bindDocs(source)
 end
 
 local function compileByLocalID(source)
-    local sources = localID.getSources(source)
+    local sources = vm.getLocalSources(source)
     if not sources then
         return
     end
@@ -746,7 +743,7 @@ local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
                     if isValidCallArgNode(arg, fn) then
                         if fn.type == 'doc.type.function' then
                             if sign then
-                                local generic = genericMgr(fn, sign)
+                                local generic = vm.createGeneric(fn, sign)
                                 local args    = {}
                                 for i = fixIndex + 1, myIndex - 1 do
                                     args[#args+1] = call.args[i]
@@ -1151,7 +1148,7 @@ local compilerSwitch = util.switch()
                                 end)
                             end
                             if hasGeneric then
-                                vm.setNode(source, genericMgr(rtn, sign))
+                                vm.setNode(source, vm.createGeneric(rtn, sign))
                             else
                                 vm.setNode(source, vm.compileNode(rtn))
                             end

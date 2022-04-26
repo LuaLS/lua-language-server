@@ -1,13 +1,13 @@
 local util  = require 'utility'
 local guide = require 'parser.guide'
+---@class vm
 local vm    = require 'vm.vm'
 
 ---@class parser.object
 ---@field _localID string
 ---@field _localIDs table<string, parser.object[]>
 
----@class vm.local-id
-local m = {}
+local compileLocalID, getLocal
 
 local compileSwitch = util.switch()
     : case 'local'
@@ -18,13 +18,13 @@ local compileSwitch = util.switch()
             return
         end
         for _, ref in ipairs(source.ref) do
-            m.compileLocalID(ref)
+            compileLocalID(ref)
         end
     end)
     : case 'getlocal'
     : call(function (source)
         source._localID = ('%d'):format(source.node.start)
-        m.compileLocalID(source.next)
+        compileLocalID(source.next)
     end)
     : case 'getfield'
     : case 'setfield'
@@ -40,7 +40,7 @@ local compileSwitch = util.switch()
         source._localID = parentID .. vm.ID_SPLITE .. key
         source.field._localID = source._localID
         if source.type == 'getfield' then
-            m.compileLocalID(source.next)
+            compileLocalID(source.next)
         end
     end)
     : case 'getmethod'
@@ -57,7 +57,7 @@ local compileSwitch = util.switch()
         source._localID = parentID .. vm.ID_SPLITE .. key
         source.method._localID = source._localID
         if source.type == 'getmethod' then
-            m.compileLocalID(source.next)
+            compileLocalID(source.next)
         end
     end)
     : case 'getindex'
@@ -74,7 +74,7 @@ local compileSwitch = util.switch()
         source._localID = parentID .. vm.ID_SPLITE .. key
         source.index._localID = source._localID
         if source.type == 'setindex' then
-            m.compileLocalID(source.next)
+            compileLocalID(source.next)
         end
     end)
 
@@ -82,7 +82,7 @@ local leftSwitch = util.switch()
     : case 'field'
     : case 'method'
     : call(function (source)
-        return m.getLocal(source.parent)
+        return getLocal(source.parent)
     end)
     : case 'getfield'
     : case 'setfield'
@@ -91,7 +91,7 @@ local leftSwitch = util.switch()
     : case 'getindex'
     : case 'setindex'
     : call(function (source)
-        return m.getLocal(source.node)
+        return getLocal(source.node)
     end)
     : case 'getlocal'
     : call(function (source)
@@ -105,13 +105,13 @@ local leftSwitch = util.switch()
 
 ---@param source parser.object
 ---@return parser.object?
-function m.getLocal(source)
+function getLocal(source)
     return leftSwitch(source.type, source)
 end
 
 ---@param id string
 ---@param source parser.object
-function m.insertLocalID(id, source)
+function vm.insertLocalID(id, source)
     local root = guide.getRoot(source)
     if not root._localIDs then
         root._localIDs = util.multiTable(2)
@@ -120,7 +120,7 @@ function m.insertLocalID(id, source)
     sources[#sources+1] = source
 end
 
-function m.compileLocalID(source)
+function compileLocalID(source)
     if not source then
         return
     end
@@ -133,29 +133,29 @@ function m.compileLocalID(source)
     if not id then
         return
     end
-    m.insertLocalID(id, source)
+    vm.insertLocalID(id, source)
 end
 
 ---@param source parser.object
 ---@return string?
-function m.getID(source)
+function vm.getLocalID(source)
     if source._localID ~= nil then
         return source._localID
     end
     source._localID = false
-    local loc = m.getLocal(source)
+    local loc = getLocal(source)
     if not loc then
         return source._localID
     end
-    m.compileLocalID(loc)
+    compileLocalID(loc)
     return source._localID
 end
 
 ---@param source parser.object
 ---@param key?   string
 ---@return parser.object[]?
-function m.getSources(source, key)
-    local id = m.getID(source)
+function vm.getLocalSources(source, key)
+    local id = vm.getLocalID(source)
     if not id then
         return nil
     end
@@ -174,8 +174,8 @@ end
 
 ---@param source parser.object
 ---@return parser.object[]
-function m.getFields(source)
-    local id = m.getID(source)
+function vm.getLocalFields(source)
+    local id = vm.getLocalID(source)
     if not id then
         return nil
     end
@@ -203,5 +203,3 @@ function m.getFields(source)
     end
     return fields
 end
-
-return m

@@ -13,5 +13,8 @@ require 'vm.type'
 require 'vm.library'
 require 'vm.runner'
 require 'vm.infer'
+require 'vm.generic'
+require 'vm.sign'
+require 'vm.local-id'
 require 'vm.global'
 return vm

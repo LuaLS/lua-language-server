@@ -1,4 +1,5 @@
 local guide         = require 'parser.guide'
+---@class vm
 local vm            = require 'vm.vm'
 
 ---@class vm.sign
@@ -168,7 +169,7 @@ function mt:resolve(uri, args, removeGeneric)
 end
 
 ---@return vm.sign
-return function ()
+function vm.createSign()
     local genericMgr = setmetatable({
         signList = {},
     }, mt)

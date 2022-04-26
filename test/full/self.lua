@@ -53,6 +53,7 @@ print('基准全量诊断用时：', passed)
 
 vm.clearNodeCache()
 
+local clock = os.clock()
 local compileDatas = {}
 
 for uri in files.eachFile() do

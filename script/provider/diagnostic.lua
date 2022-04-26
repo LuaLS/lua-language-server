@@ -128,6 +128,10 @@ local function mergeDiags(a, b, c)
     merge(b)
     merge(c)
 
+    if #t == 0 then
+        return nil
+    end
+
     return t
 end
 
@@ -253,9 +257,7 @@ function m.doDiagnostic(uri, isScopeDiag)
             version = version,
             diagnostics = full,
         })
-        if #full > 0 then
-            log.debug('publishDiagnostics', uri, #full)
-        end
+        log.debug('publishDiagnostics', uri, #full)
     end
 
     pushResult()

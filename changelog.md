@@ -1,5 +1,8 @@
 # changelog
 
+## 3.2.3
+* `FIX` diagnostic: send empty results to every file after startup
+
 ## 3.2.2
 `2022-4-26`
 * `FIX` diagnostic: `unused-function` cannot handle recursion correctly

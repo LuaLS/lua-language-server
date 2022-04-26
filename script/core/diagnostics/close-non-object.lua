@@ -27,6 +27,7 @@ return function (uri, callback)
         local infer = vm.getInfer(source.value)
         if  not infer:hasClass()
         and not infer:hasType 'nil'
+        and not infer:hasType 'table'
         and infer:view('any', uri) ~= 'any'  then
             callback {
                 start   = source.value.start,

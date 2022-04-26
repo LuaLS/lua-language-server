@@ -1552,6 +1552,33 @@ local AAA
 local <?x?> = AAA()
 ]]
 
+TEST 'AA' [[
+---@class AA
+---@overload fun():AA
+AAA = {}
+
+
+local <?x?> = AAA()
+]]
+
+TEST 'AA' [[
+---@overload fun():AA
+AAA.BBB = {}
+
+
+local <?x?> = AAA.BBB()
+]]
+
+TEST 'AA' [[
+local AAA
+
+---@overload fun():AA
+AAA.BBB = {}
+
+
+local <?x?> = AAA.BBB()
+]]
+
 TEST 'string|integer' [[
 local <?x?>
 x = '1'

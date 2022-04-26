@@ -303,7 +303,22 @@ local function checkLocal(state, word, position, results)
             goto CONTINUE
         end
         if vm.getInfer(source):hasFunction() then
-            for _, def in ipairs(vm.getDefs(source)) do
+            local defs = vm.getDefs(source)
+            -- make sure `function` is before `doc.type.function`
+            local orders = {}
+            for i, def in ipairs(defs) do
+                if def.type == 'function' then
+                    orders[def] = i - 20000
+                elseif def.type == 'doc.type.function' then
+                    orders[def] = i - 10000
+                else
+                    orders[def] = i
+                end
+            end
+            table.sort(defs, function (a, b)
+                return orders[a] < orders[b]
+            end)
+            for _, def in ipairs(defs) do
                 if def.type == 'function'
                 or def.type == 'doc.type.function' then
                     local funcLabel = name .. getParams(def, false)

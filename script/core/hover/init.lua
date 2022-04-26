@@ -40,8 +40,23 @@ local function getHover(source)
 
     local oop
     if vm.getInfer(source):view() == 'function' then
+        local defs = vm.getDefs(source)
+        -- make sure `function` is before `doc.type.function`
+        local orders = {}
+        for i, def in ipairs(defs) do
+            if def.type == 'function' then
+                orders[def] = i - 20000
+            elseif def.type == 'doc.type.function' then
+                orders[def] = i - 10000
+            else
+                orders[def] = i
+            end
+        end
+        table.sort(defs, function (a, b)
+            return orders[a] < orders[b]
+        end)
         local hasFunc
-        for _, def in ipairs(vm.getDefs(source)) do
+        for _, def in ipairs(defs) do
             if guide.isOOP(def) then
                 oop = true
             end

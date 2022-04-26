@@ -575,6 +575,11 @@ local function bindDocs(source)
             vm.setNode(source, vm.compileNode(ast))
             return true
         end
+        if doc.type == 'doc.overload' then
+            if not isParam then
+                vm.setNode(source, vm.compileNode(doc))
+            end
+        end
     end
     return false
 end
@@ -884,18 +889,6 @@ local function compileLocal(source)
     -- for x = ... do
     if source.parent.type == 'loop' then
         vm.compileNode(source.parent)
-    end
-
-    if source.bindDocs then
-        local isParam = source.parent.type == 'funcargs'
-                     or source.parent.type == 'in'
-        for _, doc in ipairs(source.bindDocs) do
-            if doc.type == 'doc.overload' then
-                if not isParam then
-                    vm.setNode(source, vm.compileNode(doc))
-                end
-            end
-        end
     end
 
     vm.getNode(source):setData('hasDefined', hasMarkDoc or hasMarkParam or hasMarkValue)

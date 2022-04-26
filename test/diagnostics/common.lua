@@ -1529,3 +1529,16 @@ local z = x and y
 
 print(z.y)
 ]]
+
+TEST [[
+local x, y
+function x()
+    y()
+end
+
+function y()
+    x()
+end
+
+x()
+]]

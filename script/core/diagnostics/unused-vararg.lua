@@ -2,10 +2,15 @@ local files  = require 'files'
 local guide  = require 'parser.guide'
 local define = require 'proto.define'
 local lang   = require 'language'
+local vm     = require 'vm'
 
 return function (uri, callback)
     local ast = files.getState(uri)
     if not ast then
+        return
+    end
+
+    if vm.isMetaFile(uri) then
         return
     end
 

@@ -18,77 +18,106 @@ local function isToBeClosed(source)
     return false
 end
 
+---@param source parser.object
+local function isValidFunction(source)
+    if not source then
+        return false
+    end
+    if source.type == 'main' then
+        return false
+    end
+    local parent = source.parent
+    if not parent then
+        return false
+    end
+    if  parent.type ~= 'local'
+    and parent.type ~= 'setlocal' then
+        return false
+    end
+    if isToBeClosed(parent) then
+        return false
+    end
+    return true
+end
+
+local function collect(ast, white, roots, links)
+    guide.eachSourceType(ast, 'function', function (src)
+        if not isValidFunction(src) then
+            return
+        end
+        local loc = src.parent
+        if loc.type == 'setlocal' then
+            loc = loc.node
+        end
+        for _, ref in ipairs(loc.ref or {}) do
+            if ref.type == 'getlocal' then
+                local func = guide.getParentFunction(ref)
+                if not isValidFunction(func) or roots[func] then
+                    roots[src] = true
+                    return
+                end
+                if not links[func] then
+                    links[func] = {}
+                end
+                links[func][#links[func]+1] = src
+            end
+        end
+        white[src] = true
+    end)
+
+    return white, roots, links
+end
+
+local function turnBlack(source, black, white, links)
+    if black[source] then
+        return
+    end
+    black[source] = true
+    white[source] = nil
+    for _, link in ipairs(links[source] or {}) do
+        turnBlack(link, black, white, links)
+    end
+end
+
 ---@async
 return function (uri, callback)
-    local ast = files.getState(uri)
-    if not ast then
+    local state = files.getState(uri)
+    if not state then
         return
     end
 
-    local cache = {}
-    ---@async
-    local function checkFunction(source)
-        if not source then
-            return
-        end
-        if cache[source] ~= nil then
-            return cache[source]
-        end
-        cache[source] = false
-        local parent = source.parent
-        if not parent then
-            return false
-        end
-        if  parent.type ~= 'local'
-        and parent.type ~= 'setlocal' then
-            return false
-        end
-        if isToBeClosed(parent) then
-            return false
-        end
-        await.delay()
-        if parent.type == 'setlocal' then
-            parent = parent.node
-        end
-        local refs = parent.ref
-        local hasGet
-        if refs then
-            cache[source] = true
-            for _, src in ipairs(refs) do
-                if guide.isGet(src) then
-                    local func = guide.getParentFunction(src)
-                    if not checkFunction(func) then
-                        hasGet = true
-                        break
-                    end
-                end
-            end
-            cache[source] = not hasGet
-        end
-        if not hasGet then
-            if client.isVSCode() then
-                callback {
-                    start   = source.start,
-                    finish  = source.finish,
-                    tags    = { define.DiagnosticTag.Unnecessary },
-                    message = lang.script.DIAG_UNUSED_FUNCTION,
-                }
-            else
-                callback {
-                    start   = source.keyword[1],
-                    finish  = source.keyword[2],
-                    tags    = { define.DiagnosticTag.Unnecessary },
-                    message = lang.script.DIAG_UNUSED_FUNCTION,
-                }
-            end
-            return true
-        end
-        return false
+    if vm.isMetaFile(uri) then
+        return
     end
 
-    -- 只检查局部函数
-    ---@async
-    guide.eachSourceType(ast.ast, 'function', function (src)
-        checkFunction(src)
-    end)
+    local black = {}
+    local white = {}
+    local roots = {}
+    local links = {}
+
+    -- collect
+    collect(state.ast, white, roots, links)
+
+    -- turn black
+    for source in pairs(roots) do
+        turnBlack(source, black, white, links)
+    end
+
+    for source in pairs(white) do
+        if client.isVSCode() then
+            callback {
+                start   = source.start,
+                finish  = source.finish,
+                tags    = { define.DiagnosticTag.Unnecessary },
+                message = lang.script.DIAG_UNUSED_FUNCTION,
+            }
+        else
+            callback {
+                start   = source.keyword[1],
+                finish  = source.keyword[2],
+                tags    = { define.DiagnosticTag.Unnecessary },
+                message = lang.script.DIAG_UNUSED_FUNCTION,
+            }
+        end
+    end
 end

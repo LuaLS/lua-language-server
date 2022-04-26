@@ -27,8 +27,17 @@ require 'full.dirty'
 require 'full.projects'
 require 'full.self'
 
+local times = {}
 for name, time in util.sortPairs(DIAGTIMES, function (k1, k2)
-    return DIAGTIMES[k1] < DIAGTIMES[k2]
+    return DIAGTIMES[k1] > DIAGTIMES[k2]
 end) do
-    print('诊断任务耗时：', name, time)
+    times[#times+1] = ('诊断任务耗时：%05.3f [%s]'):format(time, name)
+    if #times >= 10 then
+        break
+    end
+end
+
+util.revertTable(times)
+for _, time in ipairs(times) do
+    print(time)
 end

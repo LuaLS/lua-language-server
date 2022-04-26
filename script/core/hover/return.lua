@@ -1,5 +1,3 @@
-local infer    = require 'vm.infer'
-local guide    = require 'parser.guide'
 local vm       = require 'vm.vm'
 
 ---@param source parser.object
@@ -67,7 +65,7 @@ local function asFunction(source)
         local name = doc and doc.name and doc.name[1] and (doc.name[1] .. ': ')
         local text = ('%s%s'):format(
             name or '',
-            infer.getInfer(rtn):view()
+            vm.getInfer(rtn):view()
         )
         if i == 1 then
             returns[i] = ('  -> %s'):format(text)
@@ -85,7 +83,7 @@ local function asDocFunction(source)
     end
     local returns = {}
     for i, rtn in ipairs(source.returns) do
-        local rtnText = infer.getInfer(rtn):view()
+        local rtnText = vm.getInfer(rtn):view()
         if i == 1 then
             returns[#returns+1] = ('  -> %s'):format(rtnText)
         else

@@ -1,5 +1,4 @@
 local guide = require 'parser.guide'
-local infer = require 'vm.infer'
 local vm    = require 'vm'
 
 local function asFunction(source)
@@ -10,7 +9,7 @@ local function asFunction(source)
         methodDef = true
     end
     if methodDef then
-        args[#args+1] = ('self: %s'):format(infer.getInfer(parent.node):view 'any')
+        args[#args+1] = ('self: %s'):format(vm.getInfer(parent.node):view 'any')
     end
     if source.args then
         for i = 1, #source.args do
@@ -30,15 +29,15 @@ local function asFunction(source)
                 args[#args+1] = ('%s%s: %s'):format(
                     name,
                     optional and '?' or '',
-                    infer.getInfer(argNode):view('any', guide.getUri(source))
+                    vm.getInfer(argNode):view('any', guide.getUri(source))
                 )
             elseif arg.type == '...' then
                 args[#args+1] = ('%s: %s'):format(
                     '...',
-                    infer.getInfer(arg):view 'any'
+                    vm.getInfer(arg):view 'any'
                 )
             else
-                args[#args+1] = ('%s'):format(infer.getInfer(arg):view 'any')
+                args[#args+1] = ('%s'):format(vm.getInfer(arg):view 'any')
             end
             ::CONTINUE::
         end
@@ -57,7 +56,7 @@ local function asDocFunction(source)
         args[i] = ('%s%s: %s'):format(
             name,
             arg.optional and '?' or '',
-            arg.extends and infer.getInfer(arg.extends):view 'any' or 'any'
+            arg.extends and vm.getInfer(arg.extends):view 'any' or 'any'
         )
     end
     return args

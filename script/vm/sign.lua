@@ -1,6 +1,5 @@
 local guide         = require 'parser.guide'
 local vm            = require 'vm.vm'
-local infer         = require 'vm.infer'
 
 ---@class vm.sign
 ---@field parent   parser.object
@@ -112,7 +111,7 @@ function mt:resolve(uri, args, removeGeneric)
                     goto CONTINUE
                 end
             end
-            local view = infer.viewObject(obj)
+            local view = vm.viewObject(obj)
             if view then
                 knownTypes[view] = true
             end
@@ -131,7 +130,7 @@ function mt:resolve(uri, args, removeGeneric)
             if argNode:hasFalsy() then
                 goto CONTINUE
             end
-            local view = infer.viewObject(n)
+            local view = vm.viewObject(n)
             if knownTypes[view] then
                 goto CONTINUE
             end

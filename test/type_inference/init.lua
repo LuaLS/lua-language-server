@@ -1,8 +1,8 @@
 local files  = require 'files'
 local guide  = require 'parser.guide'
-local infer  = require 'vm.infer'
 local config = require 'config'
 local catch  = require 'catch'
+local vm     = require 'vm'
 
 rawset(_G, 'TEST', true)
 
@@ -31,9 +31,9 @@ function TEST(wanted)
         files.setText('', newScript)
         local source = getSource(catched['?'][1][1])
         assert(source)
-        local result = infer.getInfer(source):view()
+        local result = vm.getInfer(source):view()
         if wanted ~= result then
-            infer.getInfer(source):view()
+            vm.getInfer(source):view()
         end
         assert(wanted == result)
         files.remove('')

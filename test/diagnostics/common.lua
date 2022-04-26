@@ -333,6 +333,14 @@ TEST [[
 local _ <close> = <!1!>
 ]]
 
+--TEST [[
+--local _ <close> = <!''!>
+--]]
+--
+--TEST [[
+--local c <close> = <!(function () return 1 end)()!>
+--]]
+
 config.get(nil, 'Lua.diagnostics.disable')['unused-local'] = true
 TEST [[
 local f = <!function () end!>

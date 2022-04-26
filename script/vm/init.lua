@@ -10,4 +10,5 @@ require 'vm.type'
 require 'vm.library'
 require 'vm.runner'
 require 'vm.manager'
+require 'vm.infer'
 return vm

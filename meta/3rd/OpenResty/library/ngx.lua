@@ -2228,8 +2228,8 @@ function ngx.req.get_uri_args(max_args) end
 ---     in "\x00foo" (maybe you want to set the 'binary' argument?)
 ---
 ---@param uri string
----@param jump boolean
----@param binary boolean
+---@param jump? boolean
+---@param binary? boolean
 function ngx.req.set_uri(uri, jump, binary) end
 
 --- Append new data chunk specified by the `data_chunk` argument onto the existing request body created by the `ngx.req.init_body` call.

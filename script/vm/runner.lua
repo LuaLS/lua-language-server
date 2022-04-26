@@ -1,7 +1,6 @@
 ---@class vm
 local vm        = require 'vm.vm'
 local guide     = require 'parser.guide'
-local globalMgr = require 'vm.global-manager'
 
 ---@class vm.runner
 ---@field loc       parser.object
@@ -367,17 +366,17 @@ function mt:launch(callback)
             node:setFalsy()
         elseif step.type == 'as' then
             if step.new then
-                topNode = vm.createNode(globalMgr.getGlobal('type', step.name))
+                topNode = vm.createNode(vm.getGlobal('type', step.name))
             else
                 node:clear()
-                node:merge(globalMgr.getGlobal('type', step.name))
+                node:merge(vm.getGlobal('type', step.name))
             end
         elseif step.type == 'add' then
             if step.new then
                 node = node:copy()
                 topNode = node
             end
-            node:merge(globalMgr.getGlobal('type', step.name))
+            node:merge(vm.getGlobal('type', step.name))
         elseif step.type == 'remove' then
             if step.new then
                 node = node:copy()

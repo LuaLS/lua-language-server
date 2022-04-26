@@ -7,7 +7,6 @@ local guide          = require 'parser.guide'
 local converter      = require 'proto.converter'
 local config         = require 'config'
 local linkedTable    = require 'linked-table'
-local globalMgr      = require 'vm.global-manager'
 
 local Care = util.switch()
     : case 'getglobal'
@@ -21,7 +20,7 @@ local Care = util.switch()
         local isLib = options.libGlobals[name]
         if isLib == nil then
             isLib = false
-            local global = globalMgr.getGlobal('variable', name)
+            local global = vm.getGlobal('variable', name)
             if global then
                 local uri = guide.getUri(source)
                 for _, set in ipairs(global:getSets(uri)) do

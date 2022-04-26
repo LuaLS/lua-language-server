@@ -21,7 +21,6 @@ function mt:resolve(uri, args, removeGeneric)
     if not args then
         return nil
     end
-    local globalMgr = require 'vm.global-manager'
     local resolved = {}
 
     ---@param object parser.object
@@ -33,7 +32,7 @@ function mt:resolve(uri, args, removeGeneric)
                 -- 'number' -> `T`
                 for n in node:eachObject() do
                     if n.type == 'string' then
-                        local type = globalMgr.declareGlobal('type', n[1], guide.getUri(n))
+                        local type = vm.declareGlobal('type', n[1], guide.getUri(n))
                         resolved[key] = vm.createNode(type, resolved[key])
                     end
                 end
@@ -57,7 +56,7 @@ function mt:resolve(uri, args, removeGeneric)
                 end
                 if n.type == 'global' and n.cate == 'type' then
                     -- ---@field [integer]: number -> T[]
-                    vm.getClassFields(uri, n, globalMgr.declareGlobal('type', 'integer'), false, function (field)
+                    vm.getClassFields(uri, n, vm.declareGlobal('type', 'integer'), false, function (field)
                         resolve(object.node, vm.compileNode(field.extends))
                     end)
                 end

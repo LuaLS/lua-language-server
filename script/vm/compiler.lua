@@ -1,7 +1,6 @@
 local guide      = require 'parser.guide'
 local util       = require 'utility'
 local localID    = require 'vm.local-id'
-local globalMgr  = require 'vm.global-manager'
 local signMgr    = require 'vm.sign'
 local config     = require 'config'
 local genericMgr = require 'vm.generic'
@@ -53,7 +52,7 @@ local searchFieldSwitch = util.switch()
     : case 'string'
     : call(function (suri, source, key, ref, pushResult)
         -- change to `string: stringlib` ?
-        local stringlib = globalMgr.getGlobal('type', 'stringlib')
+        local stringlib = vm.getGlobal('type', 'stringlib')
         if stringlib then
             vm.getClassFields(suri, stringlib, key, ref, pushResult)
         end
@@ -118,7 +117,7 @@ local searchFieldSwitch = util.switch()
                 if type(key) ~= 'string' then
                     return
                 end
-                local global = globalMgr.getGlobal('variable', node.name, key)
+                local global = vm.getGlobal('variable', node.name, key)
                 if global then
                     for _, set in ipairs(global:getSets(suri)) do
                         pushResult(set)
@@ -130,7 +129,7 @@ local searchFieldSwitch = util.switch()
                     end
                 end
             else
-                local globals = globalMgr.getFields('variable', node.name)
+                local globals = vm.getGlobalFields('variable', node.name)
                 for _, global in ipairs(globals) do
                     for _, set in ipairs(global:getSets(suri)) do
                         pushResult(set)
@@ -157,7 +156,7 @@ local searchFieldSwitch = util.switch()
                 if type(key) ~= 'string' then
                     return
                 end
-                local global = globalMgr.getGlobal('variable', node.name, key)
+                local global = vm.getGlobal('variable', node.name, key)
                 if global then
                     for _, set in ipairs(global:getSets(suri)) do
                         pushResult(set)
@@ -167,7 +166,7 @@ local searchFieldSwitch = util.switch()
                     end
                 end
             else
-                local globals = globalMgr.getFields('variable', node.name)
+                local globals = vm.getGlobalFields('variable', node.name)
                 for _, global in ipairs(globals) do
                     for _, set in ipairs(global:getSets(suri)) do
                         pushResult(set)
@@ -282,7 +281,7 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                     end
                     for _, extend in ipairs(set.extends) do
                         if extend.type == 'doc.extends.name' then
-                            local extendType = globalMgr.getGlobal('type', extend[1])
+                            local extendType = vm.getGlobal('type', extend[1])
                             if extendType then
                                 searchClass(extendType, searchedFields)
                             end
@@ -296,12 +295,12 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
     local function searchGlobal(class)
         if class.cate == 'type' and class.name == '_G' then
             if key == nil then
-                local sets = globalMgr.getGlobalSets(suri, 'variable')
+                local sets = vm.getGlobalSets(suri, 'variable')
                 for _, set in ipairs(sets) do
                     pushResult(set)
                 end
             else
-                local global = globalMgr.getGlobal('variable', key)
+                local global = vm.getGlobal('variable', key)
                 if global then
                     for _, set in ipairs(global:getSets(suri)) do
                         pushResult(set)
@@ -647,7 +646,7 @@ local function selectNode(source, list, index)
     if exp.type == 'call' then
         result = getReturn(exp.node, index, exp.args)
         if not result then
-            vm.setNode(source, globalMgr.declareGlobal('type', 'unknown'))
+            vm.setNode(source, vm.declareGlobal('type', 'unknown'))
             return vm.getNode(source)
         end
     else
@@ -673,7 +672,7 @@ local function selectNode(source, list, index)
             end
         end
         if not hasKnownType then
-            rtnNode:merge(globalMgr.declareGlobal('type', 'unknown'))
+            rtnNode:merge(vm.declareGlobal('type', 'unknown'))
         end
         vm.setNode(source, rtnNode)
         return rtnNode
@@ -877,7 +876,7 @@ local function compileLocal(source)
             end
         end
         if not hasDocArg then
-            vm.setNode(source, globalMgr.declareGlobal('type', 'any'))
+            vm.setNode(source, vm.declareGlobal('type', 'any'))
         end
     end
     -- for x in ... do
@@ -1252,7 +1251,7 @@ local compilerSwitch = util.switch()
     : case 'loop'
     : call(function (source)
         if source.loc then
-            vm.setNode(source.loc, globalMgr.declareGlobal('type', 'integer'))
+            vm.setNode(source.loc, vm.declareGlobal('type', 'integer'))
         end
     end)
     : case 'doc.type'
@@ -1281,7 +1280,7 @@ local compilerSwitch = util.switch()
         if not source.node[1] then
             return
         end
-        local global = globalMgr.getGlobal('type', source.node[1])
+        local global = vm.getGlobal('type', source.node[1])
         if not global then
             return
         end
@@ -1370,7 +1369,7 @@ local compilerSwitch = util.switch()
     end)
     : case 'doc.see.name'
     : call(function (source)
-        local type = globalMgr.getGlobal('type', source[1])
+        local type = vm.getGlobal('type', source[1])
         if type then
             vm.setNode(source, vm.compileNode(type))
         end
@@ -1380,7 +1379,7 @@ local compilerSwitch = util.switch()
         if source.extends then
             vm.setNode(source, vm.compileNode(source.extends))
         else
-            vm.setNode(source, globalMgr.declareGlobal('type', 'any'))
+            vm.setNode(source, vm.declareGlobal('type', 'any'))
         end
         if source.optional then
             vm.getNode(source):addOptional()
@@ -1401,7 +1400,7 @@ local compilerSwitch = util.switch()
         if source.op.type == 'not' then
             local result = vm.test(source[1])
             if result == nil then
-                vm.setNode(source, globalMgr.declareGlobal('type', 'boolean'))
+                vm.setNode(source, vm.declareGlobal('type', 'boolean'))
                 return
             else
                 vm.setNode(source, {
@@ -1415,13 +1414,13 @@ local compilerSwitch = util.switch()
             end
         end
         if source.op.type == '#' then
-            vm.setNode(source, globalMgr.declareGlobal('type', 'integer'))
+            vm.setNode(source, vm.declareGlobal('type', 'integer'))
             return
         end
         if source.op.type == '-' then
             local v = vm.getNumber(source[1])
             if v == nil then
-                vm.setNode(source, globalMgr.declareGlobal('type', 'number'))
+                vm.setNode(source, vm.declareGlobal('type', 'number'))
                 return
             else
                 vm.setNode(source, {
@@ -1437,7 +1436,7 @@ local compilerSwitch = util.switch()
         if source.op.type == '~' then
             local v = vm.getInteger(source[1])
             if v == nil then
-                vm.setNode(source, globalMgr.declareGlobal('type', 'integer'))
+                vm.setNode(source, vm.declareGlobal('type', 'integer'))
                 return
             else
                 vm.setNode(source, {
@@ -1488,7 +1487,7 @@ local compilerSwitch = util.switch()
         if source.op.type == '==' then
             local result = vm.equal(source[1], source[2])
             if result == nil then
-                vm.setNode(source, globalMgr.declareGlobal('type', 'boolean'))
+                vm.setNode(source, vm.declareGlobal('type', 'boolean'))
                 return
             else
                 vm.setNode(source, {
@@ -1504,7 +1503,7 @@ local compilerSwitch = util.switch()
         if source.op.type == '~=' then
             local result = vm.equal(source[1], source[2])
             if result == nil then
-                vm.setNode(source, globalMgr.declareGlobal('type', 'boolean'))
+                vm.setNode(source, vm.declareGlobal('type', 'boolean'))
                 return
             else
                 vm.setNode(source, {
@@ -1530,7 +1529,7 @@ local compilerSwitch = util.switch()
                 })
                 return
             else
-                vm.setNode(source, globalMgr.declareGlobal('type', 'integer'))
+                vm.setNode(source, vm.declareGlobal('type', 'integer'))
                 return
             end
         end
@@ -1547,7 +1546,7 @@ local compilerSwitch = util.switch()
                 })
                 return
             else
-                vm.setNode(source, globalMgr.declareGlobal('type', 'integer'))
+                vm.setNode(source, vm.declareGlobal('type', 'integer'))
                 return
             end
         end
@@ -1564,7 +1563,7 @@ local compilerSwitch = util.switch()
                 })
                 return
             else
-                vm.setNode(source, globalMgr.declareGlobal('type', 'integer'))
+                vm.setNode(source, vm.declareGlobal('type', 'integer'))
                 return
             end
         end
@@ -1581,7 +1580,7 @@ local compilerSwitch = util.switch()
                 })
                 return
             else
-                vm.setNode(source, globalMgr.declareGlobal('type', 'integer'))
+                vm.setNode(source, vm.declareGlobal('type', 'integer'))
                 return
             end
         end
@@ -1598,7 +1597,7 @@ local compilerSwitch = util.switch()
                 })
                 return
             else
-                vm.setNode(source, globalMgr.declareGlobal('type', 'integer'))
+                vm.setNode(source, vm.declareGlobal('type', 'integer'))
                 return
             end
         end
@@ -1616,7 +1615,7 @@ local compilerSwitch = util.switch()
                 })
                 return
             else
-                vm.setNode(source, globalMgr.declareGlobal('type', 'number'))
+                vm.setNode(source, vm.declareGlobal('type', 'number'))
                 return
             end
         end
@@ -1634,7 +1633,7 @@ local compilerSwitch = util.switch()
                 })
                 return
             else
-                vm.setNode(source, globalMgr.declareGlobal('type', 'number'))
+                vm.setNode(source, vm.declareGlobal('type', 'number'))
                 return
             end
         end
@@ -1652,7 +1651,7 @@ local compilerSwitch = util.switch()
                 })
                 return
             else
-                vm.setNode(source, globalMgr.declareGlobal('type', 'number'))
+                vm.setNode(source, vm.declareGlobal('type', 'number'))
                 return
             end
         end
@@ -1669,7 +1668,7 @@ local compilerSwitch = util.switch()
                 })
                 return
             else
-                vm.setNode(source, globalMgr.declareGlobal('type', 'number'))
+                vm.setNode(source, vm.declareGlobal('type', 'number'))
                 return
             end
         end
@@ -1687,7 +1686,7 @@ local compilerSwitch = util.switch()
                 })
                 return
             else
-                vm.setNode(source, globalMgr.declareGlobal('type', 'number'))
+                vm.setNode(source, vm.declareGlobal('type', 'number'))
                 return
             end
         end
@@ -1704,7 +1703,7 @@ local compilerSwitch = util.switch()
                 })
                 return
             else
-                vm.setNode(source, globalMgr.declareGlobal('type', 'number'))
+                vm.setNode(source, vm.declareGlobal('type', 'number'))
                 return
             end
         end
@@ -1722,7 +1721,7 @@ local compilerSwitch = util.switch()
                 })
                 return
             else
-                vm.setNode(source, globalMgr.declareGlobal('type', 'number'))
+                vm.setNode(source, vm.declareGlobal('type', 'number'))
                 return
             end
         end
@@ -1759,7 +1758,7 @@ local compilerSwitch = util.switch()
                 })
                 return
             else
-                vm.setNode(source, globalMgr.declareGlobal('type', 'string'))
+                vm.setNode(source, vm.declareGlobal('type', 'string'))
                 return
             end
         end

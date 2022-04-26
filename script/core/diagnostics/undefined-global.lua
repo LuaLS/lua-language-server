@@ -4,7 +4,6 @@ local lang      = require 'language'
 local config    = require 'config'
 local guide     = require 'parser.guide'
 local await     = require 'await'
-local globalMgr = require 'vm.global-manager'
 
 local requireLike = {
     ['include'] = true,
@@ -41,7 +40,7 @@ return function (uri, callback)
             return
         end
         if cache[key] == nil then
-            cache[key] = globalMgr.hasGlobalSets(uri, 'variable', key)
+            cache[key] = vm.hasGlobalSets(uri, 'variable', key)
         end
         if cache[key] then
             return

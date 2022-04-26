@@ -3,7 +3,6 @@ local vm        = require 'vm.vm'
 local util      = require 'utility'
 local guide     = require 'parser.guide'
 local localID   = require 'vm.local-id'
-local globalMgr = require 'vm.global-manager'
 
 local simpleSwitch
 
@@ -104,7 +103,7 @@ local searchFieldSwitch = util.switch()
     ---@param key string
     : call(function (suri, obj, key, pushResult)
         if obj.cate == 'variable' then
-            local newGlobal = globalMgr.getGlobal('variable', obj.name, key)
+            local newGlobal = vm.getGlobal('variable', obj.name, key)
             if newGlobal then
                 for _, set in ipairs(newGlobal:getSets(suri)) do
                     pushResult(set)

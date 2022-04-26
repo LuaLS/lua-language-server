@@ -18,7 +18,6 @@ local lookBackward = require 'core.look-backward'
 local guide        = require 'parser.guide'
 local await        = require 'await'
 local postfix      = require 'core.completion.postfix'
-local globalMgr    = require 'vm.global-manager'
 
 local diagnosticModes = {
     'disable-next-line',
@@ -351,7 +350,7 @@ local function checkModule(state, word, position, results)
         local fileName = path:match '[^/\\]*$'
         local stemName = fileName:gsub('%..+', '')
         if  not locals[stemName]
-        and not globalMgr.hasGlobalSets(state.uri, 'variable', stemName)
+        and not vm.hasGlobalSets(state.uri, 'variable', stemName)
         and not config.get(state.uri, 'Lua.diagnostics.globals')[stemName]
         and stemName:match '^[%a_][%w_]*$'
         and matchKey(word, stemName) then
@@ -601,14 +600,14 @@ end
 ---@async
 local function checkGlobal(state, word, startPos, position, parent, oop, results)
     local locals = guide.getVisibleLocals(state.ast, position)
-    local globals = globalMgr.getGlobalSets(state.uri, 'variable')
+    local globals = vm.getGlobalSets(state.uri, 'variable')
     checkFieldOfRefs(globals, state, word, startPos, position, parent, oop, results, locals, 'global')
 end
 
 ---@async
 local function checkField(state, word, start, position, parent, oop, results)
     if parent.tag == '_ENV' or parent.special == '_G' then
-        local globals = globalMgr.getGlobalSets(state.uri, 'variable')
+        local globals = vm.getGlobalSets(state.uri, 'variable')
         checkFieldOfRefs(globals, state, word, start, position, parent, oop, results)
     else
         local refs = vm.getFields(parent)

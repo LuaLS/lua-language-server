@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.2.2
+`2022-4-26`
 * `FIX` diagnostic: `unused-function` cannot handle recursion correctly
 * `FIX` [#1092](https://github.com/sumneko/lua-language-server/issues/1092)
 * `FIX` [#1093](https://github.com/sumneko/lua-language-server/issues/1093)

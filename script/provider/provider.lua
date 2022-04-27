@@ -226,7 +226,6 @@ m.register 'workspace/didRenameFiles' {
 }
 
 m.register 'textDocument/didOpen' {
-    ---@async
     function (params)
         local doc    = params.textDocument
         local scheme = furi.split(doc.uri)
@@ -235,7 +234,6 @@ m.register 'textDocument/didOpen' {
         end
         local uri    = files.getRealUri(doc.uri)
         log.debug('didOpen', uri)
-        workspace.awaitReady(uri)
         local text  = doc.text
         files.setText(uri, text, true, function (file)
             file.version = doc.version
@@ -257,7 +255,6 @@ m.register 'textDocument/didClose' {
 }
 
 m.register 'textDocument/didChange' {
-    ---@async
     function (params)
         local doc     = params.textDocument
         local scheme = furi.split(doc.uri)
@@ -266,8 +263,6 @@ m.register 'textDocument/didChange' {
         end
         local changes = params.contentChanges
         local uri     = files.getRealUri(doc.uri)
-        workspace.awaitReady(uri)
-        --log.debug('changes', util.dump(changes))
         local text = files.getOriginText(uri) or ''
         local rows = files.getCachedRows(uri)
         text, rows = tm(text, rows, changes)

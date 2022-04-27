@@ -280,8 +280,8 @@ TEST [[
 ]]
 [=[
 function load(chunk: string|function, chunkname?: string, mode?: "b"|"bt"|"t", env?: table)
-  -> function
-  2. error_message: string
+  -> function?
+  2. error_message: string?
 ]=]
 
 TEST [[

@@ -490,7 +490,9 @@ _G.bb = 1
 
 TEST [[
 local f = load('')
-f(1, 2, 3)
+if f then
+    f(1, 2, 3)
+end
 ]]
 
 TEST [[

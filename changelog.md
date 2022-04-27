@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.2.3
+* `CHG` dose not load files in symbol links
 * `FIX` diagnostic: send empty results to every file after startup
 
 ## 3.2.2

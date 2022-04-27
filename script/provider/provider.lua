@@ -42,8 +42,9 @@ local function updateConfig(uri)
         end
 
         local rc = cfgLoader.loadRCConfig(folder.uri, '.luarc.json')
+                or cfgLoader.loadRCConfig(folder.uri, '.luarc.jsonc')
         if rc then
-            log.info('Load config from luarc.json', folder.uri)
+            log.info('Load config from .luarc.json/.luarc.jsonc', folder.uri)
             log.debug(inspect(rc))
         end
 
@@ -86,6 +87,14 @@ filewatch.event(function (ev, path) ---@async
     if util.stringEndWith(path, '.luarc.json') then
         for _, scp in ipairs(workspace.folders) do
             local rcPath     = workspace.getAbsolutePath(scp.uri, '.luarc.json')
+            if path == rcPath then
+                updateConfig(scp.uri)
+            end
+        end
+    end
+    if util.stringEndWith(path, '.luarc.jsonc') then
+        for _, scp in ipairs(workspace.folders) do
+            local rcPath     = workspace.getAbsolutePath(scp.uri, '.luarc.jsonc')
             if path == rcPath then
                 updateConfig(scp.uri)
             end

@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.2.3
+* `CHG` parse `.luarc.json` as jsonc. In order to please the editor, it also supports `.luarc.jsonc` as the file name.
 * `CHG` dose not load files in symbol links
 * `FIX` diagnostic: send empty results to every file after startup
 

@@ -248,6 +248,7 @@ local function tryModifyRC(uri, finalChanges, create)
     end
     local workspace = require 'workspace'
     local path = workspace.getAbsolutePath(uri, '.luarc.json')
+              or workspace.getAbsolutePath(uri, '.luarc.jsonc')
     if not path then
         return false
     end

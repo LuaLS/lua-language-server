@@ -135,7 +135,7 @@ select              =
 'If `index` is a number, returns all arguments after argument number `index`; a negative number indexes from the end (`-1` is the last argument). Otherwise, `index` must be the string `"#"`, and `select` returns the total number of extra arguments it received.'
 
 setfenv             =
-'Sets the environment to be used by the given function. '
+'Sets the environment to be used by the given function.'
 
 setmetatable        =
 [[
@@ -653,7 +653,7 @@ string.format               =
 'Returns a formatted version of its variable number of arguments following the description given in its first argument.'
 string.gmatch               =
 [[
-Returns an iterator function that, each time it is called, returns the next captures from `pattern` (see §6.4.1) over the string s. 
+Returns an iterator function that, each time it is called, returns the next captures from `pattern` (see §6.4.1) over the string s.
 
 As an example, the following loop will iterate over all the words from string s, printing one per line:
 ```lua

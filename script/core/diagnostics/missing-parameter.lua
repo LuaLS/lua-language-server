@@ -21,6 +21,7 @@ local function countFuncArgs(source)
     for i = #source.args, 1, -1 do
         local arg = source.args[i]
         if  arg.type ~= '...'
+        and not (arg.name and arg.name[1] =='...')
         and not vm.compileNode(arg):isNullable() then
             return i
         end

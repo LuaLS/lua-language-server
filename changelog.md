@@ -4,6 +4,7 @@
 * `CHG` parse `.luarc.json` as jsonc. In order to please the editor, it also supports `.luarc.jsonc` as the file name.
 * `CHG` dose not load files in symbol links
 * `FIX` diagnostic: send empty results to every file after startup
+* `FIX` [#1103](https://github.com/sumneko/lua-language-server/issues/1103)
 
 ## 3.2.2
 `2022-4-26`

@@ -218,6 +218,12 @@ x(1, 2, 3, 4, 5)
 ]]
 
 TEST [[
+---@type fun(a, b, ...)
+local x
+x(1, 2, 3, 4, 5)
+]]
+
+TEST [[
 local m = {}
 function m:x(a, b)
     return a, b

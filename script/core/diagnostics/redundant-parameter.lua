@@ -16,7 +16,9 @@ local function countFuncArgs(source)
     if not source.args or #source.args == 0 then
         return 0
     end
-    if source.args[#source.args].type == '...' then
+    local lastArg = source.args[#source.args]
+    if lastArg.type == '...'
+    or (lastArg.name and lastArg.name[1] == '...') then
         return math.maxinteger
     else
         return #source.args

@@ -20,6 +20,15 @@ function vm.test(source)
                 hasFalse = true
             end
         end
+        if n.type == 'global' and n.cate == 'type' then
+            if n.name == 'true' then
+                hasTrue = true
+            end
+            if n.name == 'false'
+            or n.name == 'nil' then
+                hasFalse = true
+            end
+        end
         if n.type == 'nil' then
             hasFalse = true
         end

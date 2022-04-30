@@ -2273,3 +2273,27 @@ end
 
 print(<?x?>)
 ]]
+
+TEST 'true' [[
+---@type boolean
+local t
+
+if t then
+    print(<?t?>)
+    return
+end
+
+print(t)
+]]
+
+TEST 'false' [[
+---@type boolean
+local t
+
+if t then
+    print(t)
+    return
+end
+
+print(<?t?>)
+]]

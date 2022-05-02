@@ -792,12 +792,13 @@ end
 
 ---@async
 return function (uri, start, finish)
+    local results = {}
     if not config.get(uri, 'Lua.semantic.enable') then
-        return nil
+        return results
     end
     local state = files.getState(uri)
     if not state then
-        return nil
+        return results
     end
 
     local options = {
@@ -810,7 +811,6 @@ return function (uri, start, finish)
         keyword    = config.get(uri, 'Lua.semantic.keyword'),
     }
 
-    local results = {}
     guide.eachSourceBetween(state.ast, start, finish, function (source) ---@async
         Care(source.type, source, options, results)
         await.delay()
@@ -849,7 +849,7 @@ return function (uri, start, finish)
     end
 
     if #results == 0 then
-        return {}
+        return results
     end
 
     results = solveMultilineAndOverlapping(state, results)

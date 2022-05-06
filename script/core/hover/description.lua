@@ -6,7 +6,6 @@ local lang     = require 'language'
 local util     = require 'utility'
 local guide    = require 'parser.guide'
 local rpath    = require 'workspace.require-path'
-local infer    = require 'vm.infer'
 
 local function collectRequire(mode, literal, uri)
     local result, searchers
@@ -153,7 +152,7 @@ local function buildEnumChunk(docType, name)
     local types = {}
     local lines = {}
     for _, tp in ipairs(vm.getDefs(docType)) do
-        types[#types+1] = infer.getInfer(tp):view()
+        types[#types+1] = vm.getInfer(tp):view()
         if tp.type == 'doc.type.string'
         or tp.type == 'doc.type.integer'
         or tp.type == 'doc.type.boolean' then
@@ -175,7 +174,7 @@ local function buildEnumChunk(docType, name)
                 (enum.default    and '->')
             or  (enum.additional and '+>')
             or  ' |',
-            infer.viewObject(enum)
+            vm.viewObject(enum)
         )
         if enum.comment then
             local first = true

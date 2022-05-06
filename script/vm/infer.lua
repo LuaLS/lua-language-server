@@ -1,10 +1,8 @@
 local util     = require 'utility'
 local config   = require 'config'
 local guide    = require 'parser.guide'
+---@class vm
 local vm       = require 'vm.vm'
-
----@class vm.infer-manager
-local m = {}
 
 ---@class vm.infer
 ---@field views table<string, boolean>
@@ -21,7 +19,7 @@ mt._hasDocFunction = false
 mt._isParam        = false
 mt._isLocal        = false
 
-m.NULL = setmetatable({}, mt)
+vm.NULL = setmetatable({}, mt)
 
 local inferSorted = {
     ['boolean']  = - 100,
@@ -52,7 +50,7 @@ local viewNodeSwitch = util.switch()
     : call(function (source, infer)
         if source.type == 'table' then
             if #source == 1 and source[1].type == 'varargs' then
-                local node = m.getInfer(source[1]):view()
+                local node = vm.getInfer(source[1]):view()
                 return ('%s[]'):format(node)
             end
         end
@@ -90,7 +88,7 @@ local viewNodeSwitch = util.switch()
         if source.signs then
             local buf = {}
             for i, sign in ipairs(source.signs) do
-                buf[i] = m.getInfer(sign):view()
+                buf[i] = vm.getInfer(sign):view()
             end
             return ('%s<%s>'):format(source[1], table.concat(buf, ', '))
         else
@@ -99,7 +97,7 @@ local viewNodeSwitch = util.switch()
     end)
     : case 'generic'
     : call(function (source, infer)
-        return m.getInfer(source.proto):view()
+        return vm.getInfer(source.proto):view()
     end)
     : case 'doc.generic.name'
     : call(function (source, infer)
@@ -108,7 +106,7 @@ local viewNodeSwitch = util.switch()
     : case 'doc.type.array'
     : call(function (source, infer)
         infer._hasClass = true
-        local view = m.getInfer(source.node):view()
+        local view = vm.getInfer(source.node):view()
         if source.node.type == 'doc.type' then
             view = '(' .. view .. ')'
         end
@@ -119,7 +117,7 @@ local viewNodeSwitch = util.switch()
         infer._hasClass = true
         local buf = {}
         for i, sign in ipairs(source.signs) do
-            buf[i] = m.getInfer(sign):view()
+            buf[i] = vm.getInfer(sign):view()
         end
         return ('%s<%s>'):format(source.node[1], table.concat(buf, ', '))
     end)
@@ -153,14 +151,14 @@ local viewNodeSwitch = util.switch()
             args[i] = string.format('%s%s: %s'
                 , arg.name[1]
                 , isOptional and '?' or ''
-                , m.getInfer(argNode):view()
+                , vm.getInfer(argNode):view()
             )
         end
         if #args > 0 then
             argView = table.concat(args, ', ')
         end
         for i, ret in ipairs(source.returns) do
-            rets[i] = m.getInfer(ret):view()
+            rets[i] = vm.getInfer(ret):view()
         end
         if #rets > 0 then
             regView = ':' .. table.concat(rets, ', ')
@@ -170,7 +168,7 @@ local viewNodeSwitch = util.switch()
 
 ---@param source parser.object | vm.node
 ---@return vm.infer
-function m.getInfer(source)
+function vm.getInfer(source)
     local node
     if source.type == 'vm.node' then
         node = source
@@ -339,10 +337,10 @@ end
 ---@param other vm.infer
 ---@return vm.infer
 function mt:merge(other)
-    if self == m.NULL then
+    if self == vm.NULL then
         return other
     end
-    if other == m.NULL then
+    if other == vm.NULL then
         return self
     end
 
@@ -405,8 +403,6 @@ end
 
 ---@param source parser.object
 ---@return string?
-function m.viewObject(source)
+function vm.viewObject(source)
     return viewNodeSwitch(source.type, source, {})
 end
-
-return m

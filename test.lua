@@ -77,7 +77,7 @@ local function main()
     local lclient = require 'lclient'
     local ws      = require 'workspace'
 
-    log.print = true
+    --log.print = true
 
     ---@async
     lclient():start(function (client)

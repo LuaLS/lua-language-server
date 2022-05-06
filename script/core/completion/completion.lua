@@ -16,10 +16,8 @@ local rpath        = require 'workspace.require-path'
 local lang         = require 'language'
 local lookBackward = require 'core.look-backward'
 local guide        = require 'parser.guide'
-local infer        = require 'vm.infer'
 local await        = require 'await'
 local postfix      = require 'core.completion.postfix'
-local globalMgr    = require 'vm.global-manager'
 
 local diagnosticModes = {
     'disable-next-line',
@@ -186,8 +184,8 @@ local function buildFunctionSnip(source, value, oop)
 end
 
 local function buildDetail(source)
-    local types = infer.getInfer(source):view()
-    local literals = infer.getInfer(source):viewLiterals()
+    local types = vm.getInfer(source):view()
+    local literals = vm.getInfer(source):viewLiterals()
     if literals then
         return types .. ' = ' .. literals
     else
@@ -304,8 +302,23 @@ local function checkLocal(state, word, position, results)
         if name:sub(1, 1) == '@' then
             goto CONTINUE
         end
-        if infer.getInfer(source):hasFunction() then
-            for _, def in ipairs(vm.getDefs(source)) do
+        if vm.getInfer(source):hasFunction() then
+            local defs = vm.getDefs(source)
+            -- make sure `function` is before `doc.type.function`
+            local orders = {}
+            for i, def in ipairs(defs) do
+                if def.type == 'function' then
+                    orders[def] = i - 20000
+                elseif def.type == 'doc.type.function' then
+                    orders[def] = i - 10000
+                else
+                    orders[def] = i
+                end
+            end
+            table.sort(defs, function (a, b)
+                return orders[a] < orders[b]
+            end)
+            for _, def in ipairs(defs) do
                 if def.type == 'function'
                 or def.type == 'doc.type.function' then
                     local funcLabel = name .. getParams(def, false)
@@ -352,7 +365,7 @@ local function checkModule(state, word, position, results)
         local fileName = path:match '[^/\\]*$'
         local stemName = fileName:gsub('%..+', '')
         if  not locals[stemName]
-        and not globalMgr.hasGlobalSets(state.uri, 'variable', stemName)
+        and not vm.hasGlobalSets(state.uri, 'variable', stemName)
         and not config.get(state.uri, 'Lua.diagnostics.globals')[stemName]
         and stemName:match '^[%a_][%w_]*$'
         and matchKey(word, stemName) then
@@ -499,7 +512,7 @@ local function checkFieldThen(state, name, src, word, startPos, position, parent
         })
         return
     end
-    if oop and not infer.getInfer(src):hasFunction() then
+    if oop and not vm.getInfer(src):hasFunction() then
         return
     end
     local literal = guide.getLiteral(value)
@@ -602,14 +615,14 @@ end
 ---@async
 local function checkGlobal(state, word, startPos, position, parent, oop, results)
     local locals = guide.getVisibleLocals(state.ast, position)
-    local globals = globalMgr.getGlobalSets(state.uri, 'variable')
+    local globals = vm.getGlobalSets(state.uri, 'variable')
     checkFieldOfRefs(globals, state, word, startPos, position, parent, oop, results, locals, 'global')
 end
 
 ---@async
 local function checkField(state, word, start, position, parent, oop, results)
     if parent.tag == '_ENV' or parent.special == '_G' then
-        local globals = globalMgr.getGlobalSets(state.uri, 'variable')
+        local globals = vm.getGlobalSets(state.uri, 'variable')
         checkFieldOfRefs(globals, state, word, start, position, parent, oop, results)
     else
         local refs = vm.getFields(parent)
@@ -1118,7 +1131,7 @@ local function checkTypingEnum(state, position, defs, str, results)
         or def.type == 'doc.type.integer'
         or def.type == 'doc.type.boolean' then
             enums[#enums+1] = {
-                label       = infer.viewObject(def),
+                label       = vm.viewObject(def),
                 description = def.comment and def.comment.text,
                 kind        = define.CompletionItemKind.EnumMember,
             }
@@ -1407,7 +1420,7 @@ local function tryCallArg(state, position, results)
         or src.type == 'doc.type.integer'
         or src.type == 'doc.type.boolean' then
             enums[#enums+1] = {
-                label       = infer.viewObject(src),
+                label       = vm.viewObject(src),
                 description = src.comment,
                 kind        = define.CompletionItemKind.EnumMember,
             }
@@ -1426,7 +1439,7 @@ local function tryCallArg(state, position, results)
                     : string()
             end
             enums[#enums+1] = {
-                label       = infer.getInfer(src):view(),
+                label       = vm.getInfer(src):view(),
                 description = description,
                 kind        = define.CompletionItemKind.Function,
                 insertText  = insertText,
@@ -1805,14 +1818,14 @@ local function buildluaDocOfFunction(func)
     local returns = {}
     if func.args then
         for _, arg in ipairs(func.args) do
-            args[#args+1] = infer.getInfer(arg):view()
+            args[#args+1] = vm.getInfer(arg):view()
         end
     end
     if func.returns then
         for _, rtns in ipairs(func.returns) do
             for n = 1, #rtns do
                 if not returns[n] then
-                    returns[n] = infer.getInfer(rtns[n]):view()
+                    returns[n] = vm.getInfer(rtns[n]):view()
                 end
             end
         end

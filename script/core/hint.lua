@@ -1,5 +1,4 @@
 local files    = require 'files'
-local infer    = require 'vm.infer'
 local vm       = require 'vm'
 local config   = require 'config'
 local guide    = require 'parser.guide'
@@ -39,7 +38,7 @@ local function typeHint(uri, results, start, finish)
             end
         end
         await.delay()
-        local view = infer.getInfer(source):view()
+        local view = vm.getInfer(source):view()
         if view == 'any'
         or view == 'unknown'
         or view == 'nil' then

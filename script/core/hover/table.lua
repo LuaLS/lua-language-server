@@ -1,7 +1,6 @@
 local vm       = require 'vm'
 local util     = require 'utility'
 local config   = require 'config'
-local infer    = require 'vm.infer'
 local await    = require 'await'
 local guide    = require 'parser.guide'
 
@@ -30,7 +29,7 @@ local function buildAsHash(uri, keys, nodeMap, reachMax)
             node = node:copy()
             node:removeOptional()
         end
-        local ifr         = infer.getInfer(node)
+        local ifr         = vm.getInfer(node)
         local typeView    = ifr:view('unknown', uri)
         local literalView = ifr:viewLiterals()
         if literalView then
@@ -62,7 +61,7 @@ end
 local function buildAsConst(uri, keys, nodeMap, reachMax)
     local literalMap = {}
     for _, key in ipairs(keys) do
-        literalMap[key] = infer.getInfer(nodeMap[key]):viewLiterals()
+        literalMap[key] = vm.getInfer(nodeMap[key]):viewLiterals()
     end
     table.sort(keys, function (a, b)
         return tonumber(literalMap[a]) < tonumber(literalMap[b])
@@ -76,7 +75,7 @@ local function buildAsConst(uri, keys, nodeMap, reachMax)
             node = node:copy()
             node:removeOptional()
         end
-        local typeView    = infer.getInfer(node):view('unknown', uri)
+        local typeView    = vm.getInfer(node):view('unknown', uri)
         local literalView = literalMap[key]
         if literalView then
             lines[#lines+1] = ('    %s%s: %s = %s,'):format(
@@ -179,7 +178,7 @@ return function (source)
         return nil
     end
 
-    for view in infer.getInfer(source):eachView() do
+    for view in vm.getInfer(source):eachView() do
         if view == 'string'
         or vm.isSubType(uri, view, 'string') then
             return nil
@@ -206,7 +205,7 @@ return function (source)
     for i = 1, #keys do
         await.delay()
         local key = keys[i]
-        local literal = infer.getInfer(nodeMap[key]):viewLiterals()
+        local literal = vm.getInfer(nodeMap[key]):viewLiterals()
         if not tonumber(literal) then
             isConsts = false
         end

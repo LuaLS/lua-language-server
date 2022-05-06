@@ -2,7 +2,6 @@
 local vm        = require 'vm.vm'
 local util      = require 'utility'
 local guide     = require 'parser.guide'
-local localID   = require 'vm.local-id'
 
 local searchByNodeSwitch = util.switch()
     : case 'global'
@@ -17,7 +16,7 @@ local searchByNodeSwitch = util.switch()
     end)
 
 local function searchByLocalID(source, pushResult)
-    local fields = localID.getFields(source)
+    local fields = vm.getLocalFields(source)
     if fields then
         for _, field in ipairs(fields) do
             pushResult(field)

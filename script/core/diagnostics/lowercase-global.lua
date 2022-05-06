@@ -3,7 +3,6 @@ local guide     = require 'parser.guide'
 local lang      = require 'language'
 local config    = require 'config'
 local vm        = require 'vm'
-local globalMgr = require 'vm.global-manager'
 
 local function isDocClass(source)
     if not source.bindDocs then
@@ -47,7 +46,7 @@ return function (uri, callback)
         end
         if definedGlobal[name] == nil then
             definedGlobal[name] = false
-            local global = globalMgr.getGlobal('variable', name)
+            local global = vm.getGlobal('variable', name)
             if global then
                 for _, set in ipairs(global:getSets(uri)) do
                     if vm.isMetaFile(guide.getUri(set)) then

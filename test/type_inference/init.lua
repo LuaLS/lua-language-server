@@ -1,8 +1,8 @@
 local files  = require 'files'
 local guide  = require 'parser.guide'
-local infer  = require 'vm.infer'
 local config = require 'config'
 local catch  = require 'catch'
+local vm     = require 'vm'
 
 rawset(_G, 'TEST', true)
 
@@ -31,9 +31,9 @@ function TEST(wanted)
         files.setText('', newScript)
         local source = getSource(catched['?'][1][1])
         assert(source)
-        local result = infer.getInfer(source):view()
+        local result = vm.getInfer(source):view()
         if wanted ~= result then
-            infer.getInfer(source):view()
+            vm.getInfer(source):view()
         end
         assert(wanted == result)
         files.remove('')
@@ -1552,6 +1552,33 @@ local AAA
 local <?x?> = AAA()
 ]]
 
+TEST 'AA' [[
+---@class AA
+---@overload fun():AA
+AAA = {}
+
+
+local <?x?> = AAA()
+]]
+
+TEST 'AA' [[
+---@overload fun():AA
+AAA.BBB = {}
+
+
+local <?x?> = AAA.BBB()
+]]
+
+TEST 'AA' [[
+local AAA
+
+---@overload fun():AA
+AAA.BBB = {}
+
+
+local <?x?> = AAA.BBB()
+]]
+
 TEST 'string|integer' [[
 local <?x?>
 x = '1'
@@ -2245,4 +2272,28 @@ if not x then
 end
 
 print(<?x?>)
+]]
+
+TEST 'true' [[
+---@type boolean
+local t
+
+if t then
+    print(<?t?>)
+    return
+end
+
+print(t)
+]]
+
+TEST 'false' [[
+---@type boolean
+local t
+
+if t then
+    print(t)
+    return
+end
+
+print(<?t?>)
 ]]

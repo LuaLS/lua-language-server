@@ -27,7 +27,7 @@ if #luaDebugs == 0 then
 end
 
 local function getVer(filename)
-    local a, b, c = filename:match('(%d+)%.(%d+)%.(%d+)$')
+    local a, b, c = filename:match('actboy168%.lua%-debug%-(%d+)%.(%d+)%.(%d+)')
     if not a then
         return 0
     end

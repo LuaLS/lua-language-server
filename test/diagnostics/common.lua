@@ -218,6 +218,12 @@ x(1, 2, 3, 4, 5)
 ]]
 
 TEST [[
+---@type fun(a, b, ...)
+local x
+x(1, 2, 3, 4, 5)
+]]
+
+TEST [[
 local m = {}
 function m:x(a, b)
     return a, b
@@ -333,6 +339,14 @@ TEST [[
 local _ <close> = <!1!>
 ]]
 
+TEST [[
+local _ <close> = <!''!>
+]]
+
+TEST [[
+local c <close> = <!(function () return 1 end)()!>
+]]
+
 config.get(nil, 'Lua.diagnostics.disable')['unused-local'] = true
 TEST [[
 local f = <!function () end!>
@@ -349,6 +363,15 @@ local <!function f() end!>
 TEST [[
 local <!function f()
     f()
+end!>
+]]
+
+
+TEST [[
+local <!function test()
+end!>
+
+local <!function foo ()
 end!>
 ]]
 
@@ -473,7 +496,9 @@ _G.bb = 1
 
 TEST [[
 local f = load('')
-f(1, 2, 3)
+if f then
+    f(1, 2, 3)
+end
 ]]
 
 TEST [[
@@ -1511,4 +1536,17 @@ local x, y
 local z = x and y
 
 print(z.y)
+]]
+
+TEST [[
+local x, y
+function x()
+    y()
+end
+
+function y()
+    x()
+end
+
+x()
 ]]

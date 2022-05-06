@@ -2,8 +2,6 @@
 local vm        = require 'vm.vm'
 local util      = require 'utility'
 local guide     = require 'parser.guide'
-local localID   = require 'vm.local-id'
-local globalMgr = require 'vm.global-manager'
 
 local simpleSwitch
 
@@ -104,7 +102,7 @@ local searchFieldSwitch = util.switch()
     ---@param key string
     : call(function (suri, obj, key, pushResult)
         if obj.cate == 'variable' then
-            local newGlobal = globalMgr.getGlobal('variable', obj.name, key)
+            local newGlobal = vm.getGlobal('variable', obj.name, key)
             if newGlobal then
                 for _, set in ipairs(newGlobal:getSets(suri)) do
                     pushResult(set)
@@ -117,7 +115,7 @@ local searchFieldSwitch = util.switch()
     end)
     : case 'local'
     : call(function (suri, obj, key, pushResult)
-        local sources = localID.getSources(obj, key)
+        local sources = vm.getLocalSources(obj, key)
         if sources then
             for _, src in ipairs(sources) do
                 if guide.isSet(src) then
@@ -196,7 +194,7 @@ end
 ---@param source  parser.object
 ---@param pushResult fun(src: parser.object)
 local function searchByLocalID(source, pushResult)
-    local idSources = localID.getSources(source)
+    local idSources = vm.getLocalSources(source)
     if not idSources then
         return
     end

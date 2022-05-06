@@ -1,3 +1,4 @@
+---@class vm
 local vm      = require 'vm.vm'
 
 ---@class parser.object
@@ -129,7 +130,7 @@ end
 ---@param proto vm.object
 ---@param sign  vm.sign
 ---@return vm.generic
-return function (proto, sign)
+function vm.createGeneric(proto, sign)
     local generic = setmetatable({
         sign  = sign,
         proto = proto,

@@ -69,7 +69,7 @@ function os.exit(code, close) end
 
 ---#DES 'os.getenv'
 ---@param varname string
----@return string
+---@return string?
 ---@nodiscard
 function os.getenv(varname) end
 

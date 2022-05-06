@@ -42,8 +42,9 @@ local function updateConfig(uri)
         end
 
         local rc = cfgLoader.loadRCConfig(folder.uri, '.luarc.json')
+                or cfgLoader.loadRCConfig(folder.uri, '.luarc.jsonc')
         if rc then
-            log.info('Load config from luarc.json', folder.uri)
+            log.info('Load config from .luarc.json/.luarc.jsonc', folder.uri)
             log.debug(inspect(rc))
         end
 
@@ -86,6 +87,14 @@ filewatch.event(function (ev, path) ---@async
     if util.stringEndWith(path, '.luarc.json') then
         for _, scp in ipairs(workspace.folders) do
             local rcPath     = workspace.getAbsolutePath(scp.uri, '.luarc.json')
+            if path == rcPath then
+                updateConfig(scp.uri)
+            end
+        end
+    end
+    if util.stringEndWith(path, '.luarc.jsonc') then
+        for _, scp in ipairs(workspace.folders) do
+            local rcPath     = workspace.getAbsolutePath(scp.uri, '.luarc.jsonc')
             if path == rcPath then
                 updateConfig(scp.uri)
             end
@@ -226,7 +235,6 @@ m.register 'workspace/didRenameFiles' {
 }
 
 m.register 'textDocument/didOpen' {
-    ---@async
     function (params)
         local doc    = params.textDocument
         local scheme = furi.split(doc.uri)
@@ -235,7 +243,6 @@ m.register 'textDocument/didOpen' {
         end
         local uri    = files.getRealUri(doc.uri)
         log.debug('didOpen', uri)
-        workspace.awaitReady(uri)
         local text  = doc.text
         files.setText(uri, text, true, function (file)
             file.version = doc.version
@@ -257,7 +264,6 @@ m.register 'textDocument/didClose' {
 }
 
 m.register 'textDocument/didChange' {
-    ---@async
     function (params)
         local doc     = params.textDocument
         local scheme = furi.split(doc.uri)
@@ -266,8 +272,6 @@ m.register 'textDocument/didChange' {
         end
         local changes = params.contentChanges
         local uri     = files.getRealUri(doc.uri)
-        workspace.awaitReady(uri)
-        --log.debug('changes', util.dump(changes))
         local text = files.getOriginText(uri) or ''
         local rows = files.getCachedRows(uri)
         text, rows = tm(text, rows, changes)

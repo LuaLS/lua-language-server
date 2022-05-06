@@ -3,7 +3,6 @@ local vm         = require 'vm'
 local util       = require 'utility'
 local findSource = require 'core.find-source'
 local guide      = require 'parser.guide'
-local globalMgr  = require 'vm.global-manager'
 
 local Forcing
 
@@ -191,7 +190,7 @@ end
 ---@async
 local function ofGlobal(source, newname, callback)
     local key = guide.getKeyName(source)
-    local global = globalMgr.getGlobal('variable', key)
+    local global = vm.getGlobal('variable', key)
     if not global then
         return
     end
@@ -214,7 +213,7 @@ end
 ---@async
 local function ofDocTypeName(source, newname, callback)
     local oldname = source[1]
-    local global = globalMgr.getGlobal('type', oldname)
+    local global = vm.getGlobal('type', oldname)
     if not global then
         return
     end

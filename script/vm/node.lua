@@ -96,6 +96,7 @@ function mt:hasFalsy()
     for _, c in ipairs(self) do
         if c.type == 'nil'
         or (c.type == 'global' and c.cate == 'type' and c.name == 'nil')
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'false')
         or (c.type == 'boolean' and c[1] == false)
         or (c.type == 'doc.type.boolean' and c[1] == false) then
             return true
@@ -132,6 +133,7 @@ function mt:setTruthy()
         local c = self[index]
         if c.type == 'nil'
         or (c.type == 'global' and c.cate == 'type' and c.name == 'nil')
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'false')
         or (c.type == 'boolean' and c[1] == false)
         or (c.type == 'doc.type.boolean' and c[1] == false) then
             table.remove(self, index)
@@ -148,10 +150,7 @@ function mt:setTruthy()
         ::CONTINUE::
     end
     if hasBoolean then
-        self[#self+1] = {
-            type = 'doc.type.boolean',
-            [1]  = true,
-        }
+        self[#self+1] = vm.declareGlobal('type', 'true')
     end
 end
 
@@ -165,6 +164,7 @@ function mt:setFalsy()
         local c = self[index]
         if c.type == 'nil'
         or (c.type == 'global' and c.cate == 'type' and c.name == 'nil')
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'false')
         or (c.type == 'boolean' and c[1] == true)
         or (c.type == 'doc.type.boolean' and c[1] == true) then
             goto CONTINUE
@@ -172,17 +172,13 @@ function mt:setFalsy()
         if (c.type == 'global' and c.cate == 'type' and c.name == 'boolean')
         or (c.type == 'boolean' or c.type == 'doc.type.boolean') then
             hasBoolean = true
-            goto CONTINUE
+            table.remove(self, index)
+            self[c] = nil
         end
-        table.remove(self, index)
-        self[c] = nil
         ::CONTINUE::
     end
     if hasBoolean then
-        self[#self+1] = {
-            type = 'doc.type.boolean',
-            [1]  = false,
-        }
+        self[#self+1] = vm.declareGlobal('type', 'false')
     end
 end
 

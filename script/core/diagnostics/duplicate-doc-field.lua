@@ -1,6 +1,5 @@
 local files   = require 'files'
 local lang    = require 'language'
-local infer   = require 'vm.infer'
 
 local function getFieldEventName(doc)
     if not doc.extends then

@@ -1,5 +1,5 @@
-local infer    = require 'vm.infer'
 local guide    = require 'parser.guide'
+local vm       = require 'vm'
 
 local buildName
 
@@ -19,7 +19,7 @@ end
 local function asField(source, oop)
     local class
     if source.node.type ~= 'getglobal' then
-        class = infer.getInfer(source.node):viewClass()
+        class = vm.getInfer(source.node):viewClass()
     end
     local node = class
         or buildName(source.node, false)

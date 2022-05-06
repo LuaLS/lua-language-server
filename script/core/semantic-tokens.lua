@@ -5,10 +5,8 @@ local vm             = require 'vm'
 local util           = require 'utility'
 local guide          = require 'parser.guide'
 local converter      = require 'proto.converter'
-local infer          = require 'vm.infer'
 local config         = require 'config'
 local linkedTable    = require 'linked-table'
-local globalMgr      = require 'vm.global-manager'
 
 local Care = util.switch()
     : case 'getglobal'
@@ -22,7 +20,7 @@ local Care = util.switch()
         local isLib = options.libGlobals[name]
         if isLib == nil then
             isLib = false
-            local global = globalMgr.getGlobal('variable', name)
+            local global = vm.getGlobal('variable', name)
             if global then
                 local uri = guide.getUri(source)
                 for _, set in ipairs(global:getSets(uri)) do
@@ -34,7 +32,7 @@ local Care = util.switch()
             end
             options.libGlobals[name] = isLib
         end
-        local isFunc = infer.getInfer(source):hasFunction()
+        local isFunc = vm.getInfer(source):hasFunction()
 
         local type = isFunc and define.TokenTypes['function'] or define.TokenTypes.variable
         local modifier = isLib and define.TokenModifiers.defaultLibrary or define.TokenModifiers.static
@@ -83,7 +81,7 @@ local Care = util.switch()
                 return
             end
         end
-        if infer.getInfer(source):hasFunction() then
+        if vm.getInfer(source):hasFunction() then
             results[#results+1] = {
                 start      = source.start,
                 finish     = source.finish,
@@ -198,7 +196,7 @@ local Care = util.switch()
             end
         end
         -- 6. References to other functions
-        if infer.getInfer(loc):hasFunction() then
+        if vm.getInfer(loc):hasFunction() then
             results[#results+1] = {
                 start      = source.start,
                 finish     = source.finish,
@@ -794,12 +792,13 @@ end
 
 ---@async
 return function (uri, start, finish)
+    local results = {}
     if not config.get(uri, 'Lua.semantic.enable') then
-        return nil
+        return results
     end
     local state = files.getState(uri)
     if not state then
-        return nil
+        return results
     end
 
     local options = {
@@ -812,7 +811,6 @@ return function (uri, start, finish)
         keyword    = config.get(uri, 'Lua.semantic.keyword'),
     }
 
-    local results = {}
     guide.eachSourceBetween(state.ast, start, finish, function (source) ---@async
         Care(source.type, source, options, results)
         await.delay()
@@ -851,7 +849,7 @@ return function (uri, start, finish)
     end
 
     if #results == 0 then
-        return {}
+        return results
     end
 
     results = solveMultilineAndOverlapping(state, results)

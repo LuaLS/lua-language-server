@@ -2920,6 +2920,18 @@ function tcpsock:connect(host, port, opts) end
 ---@return string? error
 function tcpsock:sslhandshake(reused_session, server_name, ssl_verify, send_status_req) end
 
+--- Set client certificate chain and corresponding private key to the TCP socket object.
+---
+--- The certificate chain and private key provided will be used later by the `tcpsock:sslhandshake` method.
+---
+--- If both of `cert` and `pkey` are `nil`, this method will clear any existing client certificate and private key that was previously set on the cosocket object
+---
+---@param cert ffi.cdata*|nil # a client certificate chain cdata object that will be used while handshaking with remote server. These objects can be created using ngx.ssl.parse_pem_cert function provided by lua-resty-core. Note that specifying the cert option requires corresponding pkey be provided too.
+---@param key ffi.cdata*|nil  # a private key corresponds to the cert option above. These objects can be created using ngx.ssl.parse_pem_priv_key function provided by lua-resty-core.
+---@return boolean ok
+---@return string? error
+function tcpsock:setclientcert(cert, key) end
+
 
 --- Sends data without blocking on the current TCP or Unix Domain Socket connection.
 ---

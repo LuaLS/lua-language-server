@@ -30,16 +30,16 @@ config.runtime.fileEncoding       =
 "檔案編碼，`ansi` 選項只在 `Windows` 平台下有效。"
 config.runtime.builtin            =
 [[
-調整內建庫的啟用狀態，你可以根據實際執行環境禁用掉不存在的庫（或重新定義）。
+調整內建庫的啟用狀態，你可以根據實際執行環境停用不存在的庫（或重新定義）。
 
-* `default`: 表示庫會根據執行版本啟用或禁用
+* `default`: 表示庫會根據執行版本啟用或停用
 * `enable`: 總是啟用
-* `disable`: 總是禁用
+* `disable`: 總是停用
 ]]
 config.diagnostics.enable         =
 "啟用診斷。"
 config.diagnostics.disable        =
-"禁用的診斷（使用浮框括號內的程式碼）。"
+"停用的診斷（使用浮框括號內的程式碼）。"
 config.diagnostics.globals        =
 "已定義的全域變數。"
 config.diagnostics.severity       =
@@ -48,14 +48,14 @@ config.diagnostics.neededFileStatus =
 [[
 * Opened:  只診斷打開的檔案
 * Any:     診斷任何檔案
-* Disable: 禁用此診斷
+* Disable: 停用此診斷
 ]]
 config.diagnostics.workspaceDelay =
-"進行工作區診斷的延遲（毫秒）。當你啟動工作區，或編輯了任意檔案後，將會在後台對整個工作區進行重新診斷。設定為負數可以禁用工作區診斷。"
+"進行工作區診斷的延遲（毫秒）。當你啟動工作區，或編輯了任意檔案後，將會在後台對整個工作區進行重新診斷。設定為負數可以停用工作區診斷。"
 config.diagnostics.workspaceRate  =
 "工作區診斷的執行速率（百分比）。降低該值會減少CPU佔用，但是也會降低工作區診斷的速度。你目前正在編輯的檔案的診斷總是全速完成，不受該選項影響。"
 config.diagnostics.libraryFiles   =
-"如何診斷通過 `Lua.workspace.library` 載入的檔案。"
+"如何診斷透過 `Lua.workspace.library` 載入的檔案。"
 config.diagnostics.ignoredFiles   =
 "如何診斷被忽略的檔案。"
 config.diagnostics.files.Enable   =
@@ -108,7 +108,7 @@ config.completion.keywordSnippet.Both    =
 config.completion.keywordSnippet.Replace =
 "只顯示 `語法片段`。"
 config.completion.displayContext         =
-"預覽建議的相關程式碼片段，可能可以幫助你瞭解這項建議的用法。設定的數字表示程式碼片段的截取行數，設定為`0`可以禁用此功能。"
+"預覽建議的相關程式碼片段，可能可以幫助你瞭解這項建議的用法。設定的數字表示程式碼片段的擷取行數，設定為`0`可以停用此功能。"
 config.completion.workspaceWord          =
 "顯示的上下文單詞是否包含工作區中其他檔案的內容。"
 config.completion.showWord               =
@@ -122,7 +122,7 @@ config.completion.showWord.Disable       =
 config.completion.autoRequire            =
 "輸入內容看起來是個檔名時，自動 `require` 此檔案。"
 config.completion.showParams             =
-"在建議列表中顯示函式的參數訊息，函式擁有多個定義時會分開顯示。"
+"在建議列表中顯示函式的參數資訊，函式擁有多個定義時會分開顯示。"
 config.completion.requireSeparator       =
 "`require` 時使用的分隔符。"
 config.completion.postfix                =
@@ -142,7 +142,7 @@ config.semantic.variable                 =
 config.semantic.annotation               =
 "對類型註解進行語義著色。"
 config.semantic.keyword                  =
-"對關鍵字/字面常數/運算符進行語義著色。只有當你的編輯器無法進行語法著色時才需要啟用此功能。"
+"對關鍵字/字面常數/運算子進行語義著色。只有當你的編輯器無法進行語法著色時才需要啟用此功能。"
 config.signatureHelp.enable              =
 "啟用參數提示。"
 config.hover.enable                      =
@@ -166,9 +166,9 @@ config.develop.debuggerPort              =
 config.develop.debuggerWait              =
 '除錯器連接之前懸置。'
 config.intelliSense.searchDepth          =
-'設定智能感知的搜尋深度。增大該值可以增加準確度，但會降低效能。不同的項目對該設定的容忍度差異較大，請自己調整為合適的值。'
+'設定智慧感知的搜尋深度。增大該值可以增加準確度，但會降低效能。不同的工作區對該設定的容忍度差異較大，請自己調整為合適的值。'
 config.intelliSense.fastGlobal           =
-'在對全域變數進行補全，及查看 `_G` 的懸浮提示時進行最佳化。這會略微降低類型推測的準確度，但是對於大量使用全域變數的項目會有大幅的效能提升。'
+'在對全域變數進行補全，及查看 `_G` 的懸浮提示時進行最佳化。這會略微降低類型推測的準確度，但是對於大量使用全域變數的專案會有大幅的效能提升。'
 config.window.statusBar                  =
 '在狀態欄顯示延伸模組狀態。'
 config.window.progressBar                =
@@ -186,20 +186,20 @@ config.hint.paramName.All                =
 config.hint.paramName.Literal            =
 '只有字面常數類型的參數進行提示。'
 config.hint.paramName.Disable            =
-'禁用參數提示。'
+'停用參數提示。'
 config.hint.arrayIndex                   =
-'在構造表時提示陣列索引。'
+'在建構表時提示陣列索引。'
 config.hint.arrayIndex.Enable            =
 '所有的表中都提示陣列索引。'
 config.hint.arrayIndex.Auto              =
 '只有表大於3項，或者表是混合類型時才進行提示。'
 config.hint.arrayIndex.Disable           =
-'禁用陣列索引提示。'
+'停用陣列索引提示。'
 config.format.enable                     =
 '啟用程式碼格式化程式。'
 config.telemetry.enable                  =
 [[
-啟用遙測，通過網路發送你的編輯器訊息與錯誤日誌。在[此處](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%90%E7%A7%81%E5%A3%B0%E6%98%8E)閲讀我們的隱私聲明。
+啟用遙測，透過網路發送你的編輯器資訊與錯誤日誌。在[此處](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%B1%E7%A7%81%E8%81%B2%E6%98%8E)閲讀我們的隱私聲明。
 ]]
 config.misc.parameters                   =
 'VSCode中啟動語言服務時的[命令列參數](https://github.com/sumneko/lua-language-server/wiki/Command-line)。'
@@ -212,7 +212,7 @@ config.IntelliSense.traceBeSetted        =
 config.IntelliSense.traceFieldInject     =
 '請查閲[文件](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
 config.diagnostics['unused-local']          =
-'未使用的局部變數'
+'未使用的區域變數'
 config.diagnostics['unused-function']       =
 '未使用的函式'
 config.diagnostics['undefined-global']      =
@@ -226,7 +226,7 @@ config.diagnostics['unused-vararg']         =
 config.diagnostics['trailing-space']        =
 '後置空格'
 config.diagnostics['redefined-local']       =
-'重複定義的局部變數'
+'重複定義的區域變數'
 config.diagnostics['newline-call']          =
 '以 `(` 開始的新行，在語法上被解析為了上一行的函式呼叫'
 config.diagnostics['newfield-call']         =

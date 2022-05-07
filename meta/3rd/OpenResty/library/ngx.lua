@@ -2503,7 +2503,7 @@ function ngx.req.discard_body() end
 --- ```
 ---
 ---@param header_name string
----@param header_value string|string[]
+---@param header_value string|string[]|nil
 function ngx.req.set_header(header_name, header_value) end
 
 --- Retrieves in-memory request body data. It returns a Lua string rather than a Lua table holding all the parsed query arguments. Use the `ngx.req.get_post_args` function instead if a Lua table is required.
@@ -3009,7 +3009,7 @@ function tcpsock:receive(pattern) end
 ---
 --- This method doesn't automatically close the current connection when the read timeout error occurs. For other connection errors, this method always automatically closes the connection.
 ---
----@param max string
+---@param max integer
 ---@return string? data
 ---@return string? error
 function tcpsock:receiveany(max) end
@@ -3138,9 +3138,9 @@ function tcpsock:settimeout(time) end
 ---
 --- Note that this method does *not* affect the `lua_socket_keepalive_timeout` setting; the `timeout` argument to the `setkeepalive` method should be used for this purpose instead.
 ---
----@param connect_timeout number
----@param send_timeout number
----@param read_timeout number
+---@param connect_timeout number|nil
+---@param send_timeout number|nil
+---@param read_timeout number|nil
 function tcpsock:settimeouts(connect_timeout, send_timeout, read_timeout) end
 
 
@@ -3294,7 +3294,7 @@ function tcpsock:getreusedtimes() end
 ---@param port? number
 ---@return tcpsock? socket
 ---@return string? error
-function ngx.socket.connect(host,port) end
+function ngx.socket.connect(host, port) end
 
 --- Creates and returns a UDP or datagram-oriented unix domain socket object (also known as one type of the "cosocket" objects). The following methods are supported on this object:
 ---
@@ -4007,7 +4007,7 @@ function ngx.location.capture_multi(args) end
 ---
 --- For reading *request* headers, use the `ngx.req.get_headers` function instead.
 ---
----@type table<string, any>
+---@type table<string, string|string[]|nil>
 ngx.header = {}
 
 
@@ -4101,7 +4101,7 @@ function ngx.time() end
 --- There is a hard coded `2048` byte limitation on error message lengths in the NGINX core. This limit includes trailing newlines and leading time stamps. If the message size exceeds this limit, NGINX will truncate the message text accordingly. This limit can be manually modified by editing the `NGX_MAX_ERROR_STR` macro definition in the `src/core/ngx_log.h` file in the NGINX source tree.
 ---
 ---@param level ngx.log.level
----@param ... string|number|'nil'|'ngx.null'
+---@param ... any
 function ngx.log(level, ...) end
 
 

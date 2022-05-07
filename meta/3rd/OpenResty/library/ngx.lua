@@ -1255,6 +1255,13 @@ ngx.shared = {}
 ---@class ngx.shared.DICT
 local DICT = {}
 
+--- Valid values for ngx.shared.DICT
+---@alias ngx.shared.DICT.value
+---| string
+---| number
+---| boolean
+---| nil
+
 --- Retrieve a value. If the key does not exist or has expired, then `nil` will be returned.
 ---
 --- In case of errors, `nil` and a string describing the error will be returned.
@@ -1269,7 +1276,7 @@ local DICT = {}
 --- If the user flags is `0` (the default), then no flags value will be returned.
 ---
 ---@param key string
----@return any?
+---@return ngx.shared.DICT.value? value
 ---@return ngx.shared.DICT.flags?|string? flags_or_error
 function DICT:get(key) end
 
@@ -1281,7 +1288,7 @@ function DICT:get(key) end
 --- Note that the value of an expired key is not guaranteed to be available so one should never rely on the availability of expired items.
 ---
 ---@param  key              string
----@return any?             value
+---@return ngx.shared.DICT.value? value
 ---@return ngx.shared.DICT.flags|string flags_or_error
 ---@return boolean          stale
 function DICT:get_stale(key) end
@@ -1320,7 +1327,7 @@ function DICT:get_stale(key) end
 --- Please note that while internally the key-value pair is set atomically, the atomicity does not go across the method call boundary.
 ---
 ---@param  key      string
----@param  value    any
+---@param  value    ngx.shared.DICT.value
 ---@param  exptime? ngx.shared.DICT.exptime
 ---@param  flags?   ngx.shared.DICT.flags
 ---@return boolean  ok       # whether the key-value pair is stored or not
@@ -1331,7 +1338,7 @@ function DICT:set(key, value, exptime, flags) end
 --- Similar to the `set` method, but never overrides the (least recently used) unexpired items in the store when running out of storage in the shared memory zone. In this case, it will immediately return `nil` and the string "no memory".
 ---
 ---@param  key      string
----@param  value    any
+---@param  value    ngx.shared.DICT.value
 ---@param  exptime? ngx.shared.DICT.exptime
 ---@param  flags?   ngx.shared.DICT.flags
 ---@return boolean  ok       # whether the key-value pair is stored or not
@@ -1344,7 +1351,7 @@ function DICT:safe_set(key, value, exptime, flags) end
 --- If the `key` argument already exists in the dictionary (and not expired for sure), the `success` return value will be `false` and the `err` return value will be `"exists"`.
 ---
 ---@param  key      string
----@param  value    any
+---@param  value    ngx.shared.DICT.value
 ---@param  exptime? ngx.shared.DICT.exptime
 ---@param  flags?   ngx.shared.DICT.flags
 ---@return boolean  ok       # whether the key-value pair is stored or not
@@ -1355,7 +1362,7 @@ function DICT:add(key, value, exptime, flags) end
 --- Similar to the `add` method, but never overrides the (least recently used) unexpired items in the store when running out of storage in the shared memory zone. In this case, it will immediately return `nil` and the string "no memory".
 ---
 ---@param  key      string
----@param  value    any
+---@param  value    ngx.shared.DICT.value
 ---@param  exptime? ngx.shared.DICT.exptime
 ---@param  flags?   ngx.shared.DICT.flags
 ---@return boolean  ok       # whether the key-value pair is stored or not
@@ -1369,7 +1376,7 @@ function DICT:safe_add(key, value, exptime, flags) end
 --- If the `key` argument does *not* exist in the dictionary (or expired already), the `success` return value will be `false` and the `err` return value will be `"not found"`.
 ---
 ---@param  key      string
----@param  value    any
+---@param  value    ngx.shared.DICT.value
 ---@param  exptime? ngx.shared.DICT.exptime
 ---@param  flags?   ngx.shared.DICT.flags
 ---@return boolean  ok       # whether the key-value pair is stored or not
@@ -1417,15 +1424,19 @@ function DICT:delete(key) end
 --- The `value` argument and `init` argument can be any valid Lua numbers, like negative numbers or floating-point numbers.
 ---
 ---
----@param  key      string
----@param  value    number
----@param  init     number
----@param  init_ttl ngx.shared.DICT.exptime
+---@param  key       string
+---@param  value     number
+---@param  init?     number
+---@param  init_ttl? ngx.shared.DICT.exptime
 ---@return integer? new
 ---@return ngx.shared.DICT.error? error
 ---@return boolean  forcible
 function DICT:incr(key, value, init, init_ttl) end
 
+--- Valid ngx.shared.DICT value for lists
+---@alias ngx.shared.DICT.list_value
+---| string
+---| number
 
 --- Inserts the specified (numerical or string) `value` at the head of the list named `key`.
 ---
@@ -1434,16 +1445,16 @@ function DICT:incr(key, value, init, init_ttl) end
 --- It never overrides the (least recently used) unexpired items in the store when running out of storage in the shared memory zone. In this case, it will immediately return `nil` and the string "no memory".
 ---
 ---@param  key     string
----@param  value   any
+---@param  value   ngx.shared.DICT.list_value
 ---@return number? len    # number of elements in the list after the push operation
 ---@return ngx.shared.DICT.error? error
-function DICT:lpush(key,value) end
+function DICT:lpush(key, value) end
 
 
 --- Similar to the `lpush` method, but inserts the specified (numerical or string) `value` at the tail of the list named `key`.
 ---
 ---@param  key     string
----@param  value   any
+---@param  value   ngx.shared.DICT.list_value
 ---@return number? len    # number of elements in the list after the push operation
 ---@return ngx.shared.DICT.error? error
 function DICT:rpush(key, value) end
@@ -1454,7 +1465,7 @@ function DICT:rpush(key, value) end
 --- If `key` does not exist, it will return `nil`. When the `key` already takes a value that is not a list, it will return `nil` and `"value not a list"`.
 ---
 ---@param  key     string
----@return any?    value
+---@return ngx.shared.DICT.list_value? item
 ---@return ngx.shared.DICT.error? error
 function DICT:lpop(key) end
 
@@ -1464,7 +1475,7 @@ function DICT:lpop(key) end
 --- If `key` does not exist, it will return `nil`. When the `key` already takes a value that is not a list, it will return `nil` and `"value not a list"`.
 ---
 ---@param  key     string
----@return any?    value
+---@return ngx.shared.DICT.list_value? item
 ---@return ngx.shared.DICT.error? error
 function DICT:rpop(key) end
 

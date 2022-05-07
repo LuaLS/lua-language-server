@@ -1,10 +1,10 @@
-local json      = require 'json'
 local proto     = require 'proto'
 local lang      = require 'language'
 local util      = require 'utility'
 local workspace = require 'workspace'
 local scope     = require 'workspace.scope'
 local inspect   = require 'inspect'
+local jsonc     = require 'jsonc'
 
 local function errorMessage(msg)
     proto.notify('window/showMessage', {
@@ -29,7 +29,7 @@ function m.loadRCConfig(uri, filename)
         scp:set('lastRCConfig', nil)
         return nil
     end
-    local suc, res = pcall(json.decode, buf)
+    local suc, res = pcall(jsonc.decode, buf)
     if not suc then
         errorMessage(lang.script('CONFIG_LOAD_ERROR', res))
         return scp:get('lastRCConfig')
@@ -55,7 +55,7 @@ function m.loadLocalConfig(uri, filename)
     end
     local firstChar = buf:match '%S'
     if firstChar == '{' then
-        local suc, res = pcall(json.decode, buf)
+        local suc, res = pcall(jsonc.decode, buf)
         if not suc then
             errorMessage(lang.script('CONFIG_LOAD_ERROR', res))
             return scp:get('lastLocalConfig')

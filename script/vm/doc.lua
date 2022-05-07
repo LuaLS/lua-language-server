@@ -3,7 +3,6 @@ local guide     = require 'parser.guide'
 ---@class vm
 local vm        = require 'vm.vm'
 local config    = require 'config'
-local globalMgr = require 'vm.global-manager'
 
 ---获取class与alias
 ---@param suri uri
@@ -11,13 +10,13 @@ local globalMgr = require 'vm.global-manager'
 ---@return parser.object[]
 function vm.getDocSets(suri, name)
     if name then
-        local global = globalMgr.getGlobal('type', name)
+        local global = vm.getGlobal('type', name)
         if not global then
             return {}
         end
         return global:getSets(suri)
     else
-        return globalMgr.getGlobalSets(suri, 'type')
+        return vm.getGlobalSets(suri, 'type')
     end
 end
 
@@ -27,6 +26,9 @@ function vm.isMetaFile(uri)
         return false
     end
     local cache = files.getCache(uri)
+    if not cache then
+        return false
+    end
     if cache.isMeta ~= nil then
         return cache.isMeta
     end
@@ -332,6 +334,9 @@ function vm.isDiagDisabledAt(uri, position, name)
         return false
     end
     local cache = files.getCache(uri)
+    if not cache then
+        return false
+    end
     if not cache.diagnosticRanges then
         cache.diagnosticRanges = {}
         for _, doc in ipairs(status.ast.docs) do

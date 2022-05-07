@@ -248,6 +248,7 @@ local function tryModifyRC(uri, finalChanges, create)
     end
     local workspace = require 'workspace'
     local path = workspace.getAbsolutePath(uri, '.luarc.json')
+              or workspace.getAbsolutePath(uri, '.luarc.jsonc')
     if not path then
         return false
     end
@@ -318,7 +319,7 @@ local function tryModifyClientGlobal(finalChanges)
 end
 
 ---@param changes config.change[]
----@param onlyMemory boolean
+---@param onlyMemory? boolean
 function m.setConfig(changes, onlyMemory)
     local finalChanges = {}
     for _, change in ipairs(changes) do

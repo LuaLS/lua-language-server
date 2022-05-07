@@ -1,4 +1,3 @@
-local globalMgr = require 'vm.global-manager'
 ---@class vm
 local vm        = require 'vm.vm'
 
@@ -9,10 +8,10 @@ local vm        = require 'vm.vm'
 ---@return boolean
 function vm.isSubType(uri, child, parent, mark)
     if type(parent) == 'string' then
-        parent = vm.createNode(globalMgr.getGlobal('type', parent))
+        parent = vm.createNode(vm.getGlobal('type', parent))
     end
     if type(child) == 'string' then
-        child = vm.createNode(globalMgr.getGlobal('type', child))
+        child = vm.createNode(vm.getGlobal('type', child))
     end
 
     if not child or not parent then
@@ -134,7 +133,7 @@ function vm.getTableKey(uri, tnode, vnode)
             end
         end
         if tn.type == 'doc.type.array' then
-            result:merge(globalMgr.getGlobal('type', 'integer'))
+            result:merge(vm.declareGlobal('type', 'integer'))
         end
         if tn.type == 'table' then
             for _, field in ipairs(tn) do
@@ -144,10 +143,10 @@ function vm.getTableKey(uri, tnode, vnode)
                     end
                 end
                 if field.type == 'tablefield' then
-                    result:merge(globalMgr.getGlobal('type', 'string'))
+                    result:merge(vm.declareGlobal('type', 'string'))
                 end
                 if field.type == 'tableexp' then
-                    result:merge(globalMgr.getGlobal('type', 'integer'))
+                    result:merge(vm.declareGlobal('type', 'integer'))
                 end
             end
         end

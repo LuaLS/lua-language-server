@@ -1,7 +1,7 @@
 local files   = require 'files'
 local guide   = require 'parser.guide'
 local lang    = require 'language'
-local infer   = require 'vm.infer'
+local vm      = require 'vm'
 
 return function (uri, callback)
     local ast = files.getState(uri)
@@ -20,7 +20,7 @@ return function (uri, callback)
         and source.type ~= 'tableindex' then
             return
         end
-        if infer.getInfer(source):view() == 'unknown' then
+        if vm.getInfer(source):view() == 'unknown' then
             callback {
                 start   = source.start,
                 finish  = source.finish,

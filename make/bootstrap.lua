@@ -69,6 +69,9 @@ package.searchers[2] = function (name)
         return err
     end
     local f = io.open(filename)
+    if not f then
+        return 'cannot open file:' .. filename
+    end
     local buf = f:read '*a'
     f:close()
     local relative = filename:sub(1, #root) == root and filename:sub(#root + 2) or filename

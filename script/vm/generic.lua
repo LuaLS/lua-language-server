@@ -1,3 +1,4 @@
+---@class vm
 local vm      = require 'vm.vm'
 
 ---@class parser.object
@@ -114,7 +115,7 @@ end
 
 ---@param uri uri
 ---@param args parser.object
----@return parser.object
+---@return vm.node
 function mt:resolve(uri, args)
     local resolved  = self.sign:resolve(uri, args)
     local protoNode = vm.compileNode(self.proto)
@@ -129,7 +130,7 @@ end
 ---@param proto vm.object
 ---@param sign  vm.sign
 ---@return vm.generic
-return function (proto, sign)
+function vm.createGeneric(proto, sign)
     local generic = setmetatable({
         sign  = sign,
         proto = proto,

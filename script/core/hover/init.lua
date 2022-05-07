@@ -5,7 +5,6 @@ local getDesc    = require 'core.hover.description'
 local util       = require 'utility'
 local findSource = require 'core.find-source'
 local markdown   = require 'provider.markdown'
-local infer      = require 'vm.infer'
 local guide      = require 'parser.guide'
 
 ---@async
@@ -40,9 +39,24 @@ local function getHover(source)
     end
 
     local oop
-    if infer.getInfer(source):view() == 'function' then
+    if vm.getInfer(source):view() == 'function' then
+        local defs = vm.getDefs(source)
+        -- make sure `function` is before `doc.type.function`
+        local orders = {}
+        for i, def in ipairs(defs) do
+            if def.type == 'function' then
+                orders[def] = i - 20000
+            elseif def.type == 'doc.type.function' then
+                orders[def] = i - 10000
+            else
+                orders[def] = i
+            end
+        end
+        table.sort(defs, function (a, b)
+            return orders[a] < orders[b]
+        end)
         local hasFunc
-        for _, def in ipairs(vm.getDefs(source)) do
+        for _, def in ipairs(defs) do
             if guide.isOOP(def) then
                 oop = true
             end
@@ -58,6 +72,9 @@ local function getHover(source)
     else
         addHover(source, true, oop)
         for _, def in ipairs(vm.getDefs(source)) do
+            if def.type == 'global' then
+                goto CONTINUE
+            end
             if guide.isOOP(def) then
                 oop = true
             end
@@ -67,6 +84,7 @@ local function getHover(source)
                 isFunction = true
             end
             addHover(def, isFunction, oop)
+            ::CONTINUE::
         end
     end
 

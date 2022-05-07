@@ -68,9 +68,10 @@ local globInteferFace = {
     type = function (path)
         local result
         pcall(function ()
-            if fs.is_directory(fs.path(path)) then
+            local status = fs.symlink_status(path):type()
+            if status == 'directory' then
                 result = 'directory'
-            else
+            elseif status == 'regular' then
                 result = 'file'
             end
         end)
@@ -78,7 +79,7 @@ local globInteferFace = {
     end,
     list = function (path)
         local fullPath = fs.path(path)
-        if not fs.exists(fullPath) then
+        if fs.symlink_status(fullPath):type() ~= 'directory' then
             return nil
         end
         local paths = {}
@@ -332,6 +333,8 @@ function m.findUrisByFilePath(path)
     return results
 end
 
+---@param path string
+---@return string
 function m.normalize(path)
     if not path then
         return nil

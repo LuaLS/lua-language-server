@@ -128,12 +128,17 @@ local function mergeDiags(a, b, c)
     merge(b)
     merge(c)
 
+    if #t == 0 then
+        return nil
+    end
+
     return t
 end
 
+-- enable `push`, disable `clear`
 function m.clear(uri)
     await.close('diag:' .. uri)
-    if not m.cache[uri] then
+    if m.cache[uri] == nil then
         return
     end
     m.cache[uri] = nil
@@ -144,6 +149,7 @@ function m.clear(uri)
     log.info('clearDiagnostics', uri)
 end
 
+-- enable `push` and `send`
 function m.clearCache(uri)
     m.cache[uri] = false
 end
@@ -251,14 +257,7 @@ function m.doDiagnostic(uri, isScopeDiag)
             version = version,
             diagnostics = full,
         })
-        if #full > 0 then
-            log.debug('publishDiagnostics', uri, #full)
-        end
-    end
-
-    -- always re-sent diagnostics of current file
-    if not isScopeDiag then
-        m.cache[uri] = nil
+        log.debug('publishDiagnostics', uri, #full)
     end
 
     pushResult()
@@ -435,6 +434,7 @@ files.watch(function (ev, uri) ---@async
         m.refresh(uri)
     elseif ev == 'open' then
         if ws.isReady(uri) then
+            m.clearCache(uri)
             xpcall(m.doDiagnostic, log.error, uri)
         end
     elseif ev == 'close' then

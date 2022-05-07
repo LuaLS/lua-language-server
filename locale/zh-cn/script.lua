@@ -33,7 +33,9 @@ DIAG_PREVIOUS_CALL      =
 DIAG_PREFIELD_CALL      =
 '会被解释为 `{}{}`。你可能需要加一个`,`或`;`。'
 DIAG_OVER_MAX_ARGS      =
-'函数只接收 {:d} 个参数，但你传了 {:d} 个。'
+'函数最多接收 {:d} 个参数，但获得了 {:d} 个。'
+DIAG_MISS_ARGS          =
+'函数最少接收 {:d} 个参数，但获得了 {:d} 个。'
 DIAG_OVER_MAX_VALUES    =
 '只有 {} 个变量，但你设置了 {} 个值。'
 DIAG_AMBIGUITY_1        =
@@ -94,6 +96,8 @@ DIAG_NOT_YIELDABLE      =
 '此函数的第 {} 个参数没有被标记为可让出，但是传入了异步函数。（使用 `---@param name async fun()` 来标记为可让出）'
 DIAG_DISCARD_RETURNS    =
 '不能丢弃此函数的返回值。'
+DIAG_NEED_CHECK_NIL     =
+'需要判空。'
 DIAG_CIRCLE_DOC_CLASS                 =
 '循环继承的类。'
 DIAG_DOC_FIELD_NO_CLASS               =
@@ -268,9 +272,11 @@ PARSER_LUADOC_MISS_FUN_AFTER_OVERLOAD   =
 PARSER_LUADOC_MISS_CATE_NAME            =
 '缺少文档类型名称。'
 PARSER_LUADOC_MISS_DIAG_MODE            =
-'缺少诊断模式'
+'缺少诊断模式。'
 PARSER_LUADOC_ERROR_DIAG_MODE           =
-'诊断模式不正确'
+'诊断模式不正确。'
+PARSER_LUADOC_MISS_LOCAL_NAME           =
+'缺少变量名。'
 
 SYMBOL_ANONYMOUS        =
 '<匿名函数>'

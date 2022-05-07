@@ -33,7 +33,9 @@ DIAG_PREVIOUS_CALL      =
 DIAG_PREFIELD_CALL      =
 'Will be interpreted as `{}{}`. It may be necessary to add a `,` or `;`.'
 DIAG_OVER_MAX_ARGS      =
-'The function takes only {:d} parameters, but you passed {:d}.'
+'The function received a maximum of {:d} arguments, but got {:d}.'
+DIAG_MISS_ARGS          =
+'the function received at least {:d} arguments, but got {:d}.'
 DIAG_OVER_MAX_VALUES    =
 'Only has {} variables, but you set {} values.'
 DIAG_AMBIGUITY_1        =
@@ -94,6 +96,8 @@ DIAG_NOT_YIELDABLE      =
 'The {}th parameter of this function was not marked as yieldable, but an async function was passed in. (Use `---@param name async fun()` to mark as yieldable)'
 DIAG_DISCARD_RETURNS    =
 'The return values of this function cannot be discarded.'
+DIAG_NEED_CHECK_NIL     =
+'Need check nil.'
 DIAG_CIRCLE_DOC_CLASS                 =
 'Circularly inherited classes.'
 DIAG_DOC_FIELD_NO_CLASS               =
@@ -271,6 +275,8 @@ PARSER_LUADOC_MISS_DIAG_MODE            =
 '<diagnostic mode> expected.'
 PARSER_LUADOC_ERROR_DIAG_MODE           =
 '<diagnostic mode> incorrect.'
+PARSER_LUADOC_MISS_LOCAL_NAME           =
+'<local name> expected.'
 
 SYMBOL_ANONYMOUS        =
 '<Anonymous>'

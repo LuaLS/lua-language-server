@@ -10,9 +10,9 @@ local utf16be = utf16('be', utf8.codepoint '�')
 local m = {}
 
 ---@param encoding encoder.encoding
----@param s string
----@param i integer
----@param j integer
+---@param s        string
+---@param i?       integer
+---@param j?       integer
 function m.len(encoding, s, i, j)
     i = i or 1
     j = j or #s
@@ -33,9 +33,9 @@ function m.len(encoding, s, i, j)
 end
 
 ---@param encoding encoder.encoding
----@param s string
----@param n integer
----@param i integer
+---@param s        string
+---@param n        integer
+---@param i?       integer
 function m.offset(encoding, s, n, i)
     i = i or 1
     if encoding == 'utf16'

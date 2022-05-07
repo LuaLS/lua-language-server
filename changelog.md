@@ -1,10 +1,73 @@
 # changelog
 
+## 3.2.3
+* `CHG` parse `.luarc.json` as jsonc. In order to please the editor, it also supports `.luarc.jsonc` as the file name.
+* `CHG` dose not load files in symbol links
+* `FIX` diagnostic: send empty results to every file after startup
+* `FIX` [#1103](https://github.com/sumneko/lua-language-server/issues/1103)
+* `FIX` [#1107](https://github.com/sumneko/lua-language-server/issues/1107)
+
+## 3.2.2
+`2022-4-26`
+* `FIX` diagnostic: `unused-function` cannot handle recursion correctly
+* `FIX` [#1092](https://github.com/sumneko/lua-language-server/issues/1092)
+* `FIX` [#1093](https://github.com/sumneko/lua-language-server/issues/1093)
+* `FIX` runtime errors reported by telemetry, see [#1091](https://github.com/sumneko/lua-language-server/issues/1091)
+
+## 3.2.1
+`2022-4-25`
+* `FIX` broken in VSCode
+
+## 3.2.0
+`2022-4-25`
+* `NEW` supports infer of callback parameter
+  ```lua
+  ---@type string[]
+  local t
+
+  table.sort(t, function (a, b)
+      -- `a` and `b` is `string` here
+  end)
+  ```
+* `NEW` using `---@overload` as class constructor
+  ```lua
+  ---@class Class
+  ---@overload fun():Class
+  local mt
+
+  local x = mt() --> x is `Class` here
+  ```
+* `NEW` add `--[[@as type]]`
+  ```lua
+  local x = true
+  local y = x--[[@as integer]] -- y is `integer` here
+  ```
+* `NEW` add `---@cast`
+  * `---@cast localname type`
+  * `---@cast localname +type`
+  * `---@cast localname -type`
+  * `---@cast localname +?`
+  * `---@cast localname -?`
+* `NEW` generic: resolve `T[]` by `table<integer, type>` or `---@field [integer] type`
+* `NEW` resolve `class[1]` by `---@field [integer] type`
+* `NEW` diagnostic: `missing-parameter`
+* `NEW` diagnostic: `need-check-nil`
+* `CHG` diagnostic: no longer mark `redundant-parameter` as `Unnecessary`
+* `FIX` diagnostic: `unused-function` does not recognize recursion
+* `FIX` [#1051](https://github.com/sumneko/lua-language-server/issues/1051)
+* `FIX` [#1072](https://github.com/sumneko/lua-language-server/issues/1072)
+* `FIX` [#1077](https://github.com/sumneko/lua-language-server/issues/1077)
+* `FIX` [#1088](https://github.com/sumneko/lua-language-server/issues/1088)
+* `FIX` runtime errors
+
 ## 3.1.0
+`2022-4-17`
+* `NEW` support find definition in method
 * `CHG` hint: move to LSP. Its font is now controlled by the client.
 * `CHG` hover: split `local` into `local` / `parameter` / `upvalue` / `self`.
 * `CHG` hover: added parentheses to some words, such as `global` / `field` / `class`.
 * `FIX` definition of `table<k, v>`
+* `FIX` [#994](https://github.com/sumneko/lua-language-server/issues/994)
 * `FIX` [#1057](https://github.com/sumneko/lua-language-server/issues/1057)
 * `FIX` runtime errors reported by telemetry, see [#1058](https://github.com/sumneko/lua-language-server/issues/1058)
 

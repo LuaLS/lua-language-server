@@ -1,5 +1,4 @@
 local files    = require 'files'
-local localMgr = require 'vm.local-manager'
 ---@class vm
 local vm       = require 'vm.vm'
 local ws       = require 'workspace.workspace'
@@ -8,15 +7,14 @@ local ws       = require 'workspace.workspace'
 vm.nodeCache = {}
 
 ---@class vm.node
+---@field [integer] vm.object
 local mt = {}
 mt.__index    = mt
+mt.id         = 0
 mt.type       = 'vm.node'
 mt.optional   = nil
 mt.lastInfer  = nil
 mt.data       = nil
----@type vm.node[]
-mt._childs    = nil
-mt._locked    = false
 
 ---@param node vm.node | vm.object
 function mt:merge(node)
@@ -30,20 +28,10 @@ function mt:merge(node)
         if node:isOptional() then
             self.optional = true
         end
-        if node._locked then
-            if not self._childs then
-                self._childs = {}
-            end
-            if not self._childs[node] then
-                self._childs[#self._childs+1] = node
-                self._childs[node] = true
-            end
-        else
-            for _, obj in ipairs(node) do
-                if not self[obj] then
-                    self[obj]     = true
-                    self[#self+1] = obj
-                end
+        for _, obj in ipairs(node) do
+            if not self[obj] then
+                self[obj]     = true
+                self[#self+1] = obj
             end
         end
     else
@@ -54,82 +42,23 @@ function mt:merge(node)
     end
 end
 
-function mt:_each(mark, callback)
-    if mark[self] then
-        return
-    end
-    mark[self] = true
-    for i = 1, #self do
-        callback(self[i])
-    end
-    local childs = self._childs
-    if not childs then
-        return
-    end
-    for i = 1, #childs do
-        local child = childs[i]
-        if not child:isLocked() then
-            child:_each(mark, callback)
-        end
-    end
-end
-
-function mt:_expand()
-    local childs = self._childs
-    if not childs then
-        return
-    end
-    self._childs = nil
-
-    local mark = {}
-    mark[self] = true
-
-    local function insert(obj)
-        if not self[obj] then
-            self[obj]     = true
-            self[#self+1] = obj
-        end
-    end
-
-    for i = 1, #childs do
-        local child = childs[i]
-        if child:isLocked() then
-            if not self._childs then
-                self._childs = {}
-            end
-            if not self._childs[child] then
-                self._childs[#self._childs+1] = child
-                self._childs[child] = true
-            end
-        else
-            child:_each(mark, insert)
-        end
-    end
-end
-
 ---@return boolean
 function mt:isEmpty()
-    self:_expand()
     return #self == 0
+end
+
+function mt:clear()
+    self.optional = nil
+    for i, c in ipairs(self) do
+        self[i] = nil
+        self[c] = nil
+    end
 end
 
 ---@param n integer
 ---@return vm.object?
 function mt:get(n)
-    self:_expand()
     return self[n]
-end
-
-function mt:lock()
-    self._locked = true
-end
-
-function mt:unlock()
-    self._locked = false
-end
-
-function mt:isLocked()
-    return self._locked == true
 end
 
 function mt:setData(k, v)
@@ -147,49 +76,143 @@ function mt:getData(k)
 end
 
 function mt:addOptional()
-    if self:isOptional() then
-        return self
-    end
     self.optional = true
 end
 
 function mt:removeOptional()
-    if not self:isOptional() then
-        return self
-    end
-    self:_expand()
-    for i = #self, 1, -1 do
-        local n = self[i]
-        if n.type == 'nil'
-        or (n.type == 'boolean' and n[1] == false)
-        or (n.type == 'doc.type.boolean' and n[1] == false) then
-            self[i] = self[#self]
-            self[#self] = nil
-        end
-    end
+    self:remove 'nil'
 end
 
 ---@return boolean
 function mt:isOptional()
-    if self.optional ~= nil then
-        return self.optional
+    return self.optional == true
+end
+
+---@return boolean
+function mt:hasFalsy()
+    if self.optional then
+        return true
     end
-    self:_expand()
     for _, c in ipairs(self) do
         if c.type == 'nil'
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'nil')
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'false')
         or (c.type == 'boolean' and c[1] == false)
         or (c.type == 'doc.type.boolean' and c[1] == false) then
-            self.optional = true
             return true
         end
     end
-    self.optional = false
     return false
+end
+
+---@return boolean
+function mt:isNullable()
+    if self.optional then
+        return true
+    end
+    if #self == 0 then
+        return true
+    end
+    for _, c in ipairs(self) do
+        if c.type == 'nil'
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'nil')
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'any') then
+            return true
+        end
+    end
+    return false
+end
+
+---@return vm.node
+function mt:setTruthy()
+    if self.optional == true then
+        self.optional = nil
+    end
+    local hasBoolean
+    for index = #self, 1, -1 do
+        local c = self[index]
+        if c.type == 'nil'
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'nil')
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'false')
+        or (c.type == 'boolean' and c[1] == false)
+        or (c.type == 'doc.type.boolean' and c[1] == false) then
+            table.remove(self, index)
+            self[c] = nil
+            goto CONTINUE
+        end
+        if (c.type == 'global' and c.cate == 'type' and c.name == 'boolean')
+        or (c.type == 'boolean' or c.type == 'doc.type.boolean') then
+            hasBoolean = true
+            table.remove(self, index)
+            self[c] = nil
+            goto CONTINUE
+        end
+        ::CONTINUE::
+    end
+    if hasBoolean then
+        self[#self+1] = vm.declareGlobal('type', 'true')
+    end
+end
+
+---@return vm.node
+function mt:setFalsy()
+    if self.optional == false then
+        self.optional = nil
+    end
+    local hasBoolean
+    for index = #self, 1, -1 do
+        local c = self[index]
+        if c.type == 'nil'
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'nil')
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'false')
+        or (c.type == 'boolean' and c[1] == true)
+        or (c.type == 'doc.type.boolean' and c[1] == true) then
+            goto CONTINUE
+        end
+        if (c.type == 'global' and c.cate == 'type' and c.name == 'boolean')
+        or (c.type == 'boolean' or c.type == 'doc.type.boolean') then
+            hasBoolean = true
+            table.remove(self, index)
+            self[c] = nil
+        end
+        ::CONTINUE::
+    end
+    if hasBoolean then
+        self[#self+1] = vm.declareGlobal('type', 'false')
+    end
+end
+
+---@param name string
+function mt:remove(name)
+    if name == 'nil' and self.optional == true then
+        self.optional = nil
+    end
+    for index = #self, 1, -1 do
+        local c = self[index]
+        if (c.type == 'global' and c.cate == 'type' and c.name == name)
+        or (c.type == name)
+        or (c.type == 'doc.type.integer'  and (name == 'number' or name == 'integer'))
+        or (c.type == 'doc.type.boolean'  and name == 'boolean')
+        or (c.type == 'doc.type.table'    and name == 'table')
+        or (c.type == 'doc.type.array'    and name == 'table')
+        or (c.type == 'doc.type.function' and name == 'function') then
+            table.remove(self, index)
+            self[c] = nil
+        end
+    end
+end
+
+---@param node vm.node
+function mt:removeNode(node)
+    for _, c in ipairs(node) do
+        if c.type == 'global' and c.cate == 'type' then
+            self:remove(c.name)
+        end
+    end
 end
 
 ---@return fun():vm.object
 function mt:eachObject()
-    self:_expand()
     local i = 0
     return function ()
         i = i + 1
@@ -197,12 +220,21 @@ function mt:eachObject()
     end
 end
 
----@param source parser.object | vm.generic
+---@return vm.node
+function mt:copy()
+    return vm.createNode(self)
+end
+
+---@param source vm.object
 ---@param node vm.node | vm.object
 ---@param cover? boolean
 function vm.setNode(source, node, cover)
     if not node then
-        error('Can not set nil node')
+        if TEST then
+            error('Can not set nil node')
+        else
+            log.error('Can not set nil node')
+        end
     end
     if source.type == 'global' then
         error('Can not set node to global')
@@ -216,13 +248,14 @@ function vm.setNode(source, node, cover)
         me:merge(node)
     else
         if node.type == 'vm.node' then
-            vm.nodeCache[source] = node
+            vm.nodeCache[source] = node:copy()
         else
             vm.nodeCache[source] = vm.createNode(node)
         end
     end
 end
 
+---@param source vm.object
 ---@return vm.node?
 function vm.getNode(source)
     return vm.nodeCache[source]
@@ -256,11 +289,16 @@ function vm.clearNodeCache()
     vm.nodeCache = {}
 end
 
+local ID = 0
+
 ---@param a? vm.node | vm.object
 ---@param b? vm.node | vm.object
 ---@return vm.node
 function vm.createNode(a, b)
-    local node = setmetatable({}, mt)
+    ID = ID + 1
+    local node = setmetatable({
+        id = ID,
+    }, mt)
     if a then
         node:merge(a)
     end

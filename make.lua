@@ -1,6 +1,4 @@
-local lm       = require 'luamake'
-local platform = require 'bee.platform'
-local exe      = platform.OS == 'Windows' and ".exe" or ""
+local lm = require 'luamake'
 
 lm.bindir = "bin"
 lm.c = lm.compiler == 'msvc' and 'c89' or 'c11'
@@ -11,35 +9,9 @@ lm.EXE_DIR = ""
 
 local includeCodeFormat = true
 
-if     platform.OS == 'macOS' then
-    if     lm.platform == nil then
-    elseif lm.platform == "darwin-arm64" then
-        lm.target = "arm64-apple-macos11"
-    elseif lm.platform == "darwin-x64" then
-        lm.target = "x86_64-apple-macos10.12"
-    else
-        error "unknown platform"
-    end
-elseif platform.OS == 'Windows' then
-    if     lm.platform == nil then
-    elseif lm.platform == "win32-ia32" then
-        lm.arch = "x86"
-    elseif lm.platform == "win32-x64" then
-        lm.arch = "x86_64"
-    else
-        error "unknown platform"
-    end
-elseif platform.OS == 'Linux' then
-    if     lm.platform == nil then
-    elseif lm.platform == "linux-x64" then
-    elseif lm.platform == "linux-arm64" then
-        lm.cc = 'aarch64-linux-gnu-gcc'
-    else
-        error "unknown platform"
-    end
-end
+require "make.detect_platform"
 
-lm:import "3rd/bee.lua/make.lua"
+lm:import "3rd/bee.lua"
 lm:import "make/code_format.lua"
 
 lm:source_set 'lpeglabel' {
@@ -80,8 +52,8 @@ lm:copy "copy_bootstrap" {
     output = lm.bindir .. "/main.lua",
 }
 
-lm:build 'copy_vcrt' {
-    '$luamake', 'lua', 'make/copy_vcrt.lua', lm.bindir, lm.arch,
+lm:msvc_copy_vcrt 'copy_vcrt' {
+    output = lm.bindir,
 }
 
 lm:phony "all" {
@@ -96,45 +68,15 @@ lm:phony "all" {
     }
 }
 
-local function detectWindowsArch()
-    if os.getenv "PROCESSOR_ARCHITECTURE" == "ARM64" then
-        return "arm64"
-    end
-    if os.getenv "PROCESSOR_ARCHITECTURE" == "AMD64" or os.getenv "PROCESSOR_ARCHITEW6432" == "AMD64" then
-        return "x64"
-    end
-    return "ia32"
-end
-
-local function detectPosixArch()
-    local f <close> = assert(io.popen("uname -m", 'r'))
-    return f:read 'l':lower()
-end
-
-local function detectArch()
-    if platform.OS == 'Windows' then
-        return detectWindowsArch()
-    end
-    return detectPosixArch()
-end
-
-local function targetPlatformArch()
-    if lm.platform == nil then
-        return detectArch()
-    end
-    return lm.platform:match "^[^-]*-(.*)$"
-end
-
-local notest = (platform.OS == 'macOS' or platform.OS == 'Linux')
-    and targetPlatformArch() == "arm64"
-    and detectArch() == "x86_64"
-
-if notest then
+if lm.notest then
     lm:default {
         "all",
     }
     return
 end
+
+local platform = require 'bee.platform'
+local exe      = platform.OS == 'Windows' and ".exe" or ""
 
 lm:build "bee-test" {
     lm.bindir .. "/lua-language-server" .. exe, "3rd/bee.lua/test/test.lua",

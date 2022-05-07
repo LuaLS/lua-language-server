@@ -893,3 +893,9 @@ TEST [[
 
 ---@type XXX<<?YYY?>>
 ]]
+
+TEST [[
+local <!x!>
+
+---@cast <?x?> integer
+]]

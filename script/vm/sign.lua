@@ -1,6 +1,6 @@
 local guide         = require 'parser.guide'
+---@class vm
 local vm            = require 'vm.vm'
-local infer         = require 'vm.infer'
 
 ---@class vm.sign
 ---@field parent   parser.object
@@ -16,12 +16,12 @@ end
 
 ---@param uri uri
 ---@param args parser.object
+---@param removeGeneric true?
 ---@return table<string, vm.node>
-function mt:resolve(uri, args)
+function mt:resolve(uri, args, removeGeneric)
     if not args then
         return nil
     end
-    local globalMgr = require 'vm.global-manager'
     local resolved = {}
 
     ---@param object parser.object
@@ -33,7 +33,7 @@ function mt:resolve(uri, args)
                 -- 'number' -> `T`
                 for n in node:eachObject() do
                     if n.type == 'string' then
-                        local type = globalMgr.declareGlobal('type', n[1], guide.getUri(n))
+                        local type = vm.declareGlobal('type', n[1], guide.getUri(n))
                         resolved[key] = vm.createNode(type, resolved[key])
                     end
                 end
@@ -47,6 +47,19 @@ function mt:resolve(uri, args)
                 if n.type == 'doc.type.array' then
                     -- number[] -> T[]
                     resolve(object.node, vm.compileNode(n.node))
+                end
+                if n.type == 'doc.type.table' then
+                    -- { [integer]: number } -> T[]
+                    local tvalueNode = vm.getTableValue(uri, node, 'integer')
+                    if tvalueNode then
+                        resolve(object.node, tvalueNode)
+                    end
+                end
+                if n.type == 'global' and n.cate == 'type' then
+                    -- ---@field [integer]: number -> T[]
+                    vm.getClassFields(uri, n, vm.declareGlobal('type', 'integer'), false, function (field)
+                        resolve(object.node, vm.compileNode(field.extends))
+                    end)
                 end
             end
         end
@@ -98,7 +111,7 @@ function mt:resolve(uri, args)
                     goto CONTINUE
                 end
             end
-            local view = infer.viewObject(obj)
+            local view = vm.viewObject(obj)
             if view then
                 knownTypes[view] = true
             end
@@ -114,10 +127,10 @@ function mt:resolve(uri, args)
     local function buildArgNode(argNode, knownTypes)
         local newArgNode = vm.createNode()
         for n in argNode:eachObject() do
-            if argNode:isOptional() and vm.isFalsy(n) then
+            if argNode:hasFalsy() then
                 goto CONTINUE
             end
-            local view = infer.viewObject(n)
+            local view = vm.viewObject(n)
             if knownTypes[view] then
                 goto CONTINUE
             end
@@ -156,7 +169,7 @@ function mt:resolve(uri, args)
 end
 
 ---@return vm.sign
-return function ()
+function vm.createSign()
     local genericMgr = setmetatable({
         signList = {},
     }, mt)

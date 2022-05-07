@@ -280,8 +280,8 @@ TEST [[
 ]]
 [=[
 function load(chunk: string|function, chunkname?: string, mode?: "b"|"bt"|"t", env?: table)
-  -> function
-  2. error_message: string
+  -> function?
+  2. error_message: string?
 ]=]
 
 TEST [[
@@ -504,10 +504,10 @@ local <?self?> = setmetatable({
 ]]
 [[
 local self: {
-    __index: table,
-    __name: string = "obj",
     id: integer = 1,
     remove: function,
+    __index: table,
+    __name: string = "obj",
 }
 ]]
 
@@ -772,7 +772,7 @@ local <?t?> = {
 ]]
 [[
 local t: {
-    f: file*,
+    f?: file*,
 }
 ]]
 
@@ -790,8 +790,6 @@ TEST [[
 ]]
 [[
 (global) _G: _G {
-    _G: _G,
-    _VERSION: string = "Lua 5.4",
     arg: string[],
     assert: function,
     collectgarbage: function,
@@ -810,6 +808,8 @@ TEST [[
     module: function,
     newproxy: function,
     next: function,
+    os: oslib,
+    package: packagelib,
     ...(+22)
 }
 ]]
@@ -1733,18 +1733,18 @@ t.<?x?>()
 (field) t.x: unknown
 ]]
 
-TEST [[
----@class A
-local a
-
-local b
-b = a
-
-print(b.<?x?>)
-]]
-[[
-(field) A.x: unknown
-]]
+--TEST [[
+-----@class A
+--local a
+--
+--local b
+--b = a
+--
+--print(b.<?x?>)
+--]]
+--[[
+--(field) A.x: unknown
+--]]
 
 TEST [[
 ---@return nil
@@ -1847,6 +1847,23 @@ local x: {
     a: integer = 1,
     b: integer = 2,
     [1]: integer = 10,
+}
+]]
+
+TEST [[
+local <?x?> = {
+    _x = '',
+    _y = '',
+    x  = '',
+    y  = '',
+}
+]]
+[[
+local x: {
+    x: string = "",
+    y: string = "",
+    _x: string = "",
+    _y: string = "",
 }
 ]]
 

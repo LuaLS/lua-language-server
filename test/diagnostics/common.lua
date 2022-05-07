@@ -163,7 +163,7 @@ print()
 ]]
 
 TEST [[
-pairs
+print
 {}
 {}
 ]]
@@ -218,6 +218,12 @@ x(1, 2, 3, 4, 5)
 ]]
 
 TEST [[
+---@type fun(a, b, ...)
+local x
+x(1, 2, 3, 4, 5)
+]]
+
+TEST [[
 local m = {}
 function m:x(a, b)
     return a, b
@@ -239,6 +245,66 @@ function m.x(a, b)
     return a, b
 end
 m:x(1, <!2!>, <!3!>, <!4!>)
+]]
+
+TEST [[
+local function x(a, b)
+    return a, b
+end
+x(1)
+]]
+
+TEST [[
+---@param a integer
+---@param b integer
+local function x(a, b)
+    return a, b
+end
+<!x(1)!>
+]]
+
+TEST [[
+---@param a integer
+---@param b integer
+local function x(a, b)
+    return a, b
+end
+<!x()!>
+]]
+
+TEST [[
+---@param a integer
+---@param b integer
+---@param ... integer
+local function x(a, b, ...)
+    return a, b, ...
+end
+x(1, 2)
+]]
+
+TEST [[
+---@param a integer
+---@param b? integer
+local function x(a, b)
+    return a, b
+end
+x(1)
+]]
+
+TEST [[
+---@param b integer?
+local function x(a, b)
+    return a, b
+end
+x(1)
+]]
+
+TEST [[
+---@param b integer|nil
+local function x(a, b)
+    return a, b
+end
+x(1)
 ]]
 
 TEST [[
@@ -273,6 +339,14 @@ TEST [[
 local _ <close> = <!1!>
 ]]
 
+TEST [[
+local _ <close> = <!''!>
+]]
+
+TEST [[
+local c <close> = <!(function () return 1 end)()!>
+]]
+
 config.get(nil, 'Lua.diagnostics.disable')['unused-local'] = true
 TEST [[
 local f = <!function () end!>
@@ -284,6 +358,21 @@ local f;f = <!function () end!>
 
 TEST [[
 local <!function f() end!>
+]]
+
+TEST [[
+local <!function f()
+    f()
+end!>
+]]
+
+
+TEST [[
+local <!function test()
+end!>
+
+local <!function foo ()
+end!>
 ]]
 
 config.get(nil, 'Lua.diagnostics.disable')['unused-local'] = nil
@@ -407,11 +496,13 @@ _G.bb = 1
 
 TEST [[
 local f = load('')
-f(1, 2, 3)
+if f then
+    f(1, 2, 3)
+end
 ]]
 
 TEST [[
-local _ = <!unpack!>()
+local _ = <!unpack!>
 ]]
 
 TEST [[
@@ -494,11 +585,10 @@ _ = 1, <!2!>
 ]]
 
 TEST [[
-local function x()
+function X()
     do
         local k
         print(k)
-        x()
     end
     local k = 1
     print(k)
@@ -506,9 +596,8 @@ end
 ]]
 
 TEST [[
-local function x()
+function X()
     local loc
-    x()
     print(loc)
 end
 ]]
@@ -708,7 +797,9 @@ TEST [[
 local function f(x, y)
     return x, y
 end
-f()
+
+local _
+f(_, _)
 ]]
 
 TEST [[
@@ -741,7 +832,7 @@ TEST [[
 TEST [[
 ---@type fun(a: integer)
 local f
-f()
+f(1)
 ]]
 
 TEST [[
@@ -792,7 +883,7 @@ local mt2 = {}
 ---@type Foo
 local v
 print(v.field1 + 1)
-print(v.<!field2!> + 1)
+print(v.field2 + 1)
 print(v.<!field3!> + 1)
 print(v:method1())
 print(v.method2())
@@ -801,7 +892,7 @@ print(v:<!method3!>())
 ---@type Bar
 local v2
 print(v2.field1 + 1)
-print(v2.<!field2!> + 1)
+print(v2.field2 + 1)
 print(v2.<!field3!> + 1)
 print(v2.field4 + 1)
 print(v2:method1())
@@ -868,7 +959,7 @@ TEST [[
 local mt
 function mt:method1()
     mt.<!method2!>() -- doc.class
-    self.method1()
+    self:method1()
     return self.<!method2!>() -- doc.class.name
 end
 ]]
@@ -978,7 +1069,7 @@ return m
 TEST [[
 local m = {}
 
-m.x = io.open()
+m.x = io.open('')
 m.x = nil
 
 return m
@@ -1379,13 +1470,13 @@ TEST [[
 ]]
 
 TEST [[
-return ('1'):gsub()
+return ('1'):upper()
 ]]
 
 TEST [[
 local value
 value = '1'
-value = value:gsub()
+value = value:upper()
 ]]
 
 TEST [[
@@ -1394,4 +1485,68 @@ T = {}
 T.x = 1
 
 print(<!T.x!>)
+]]
+
+TEST [[
+T = {}
+
+---@deprecated
+function T:ff()
+end
+
+<!T:ff!>()
+]]
+
+TEST [[
+---@type string?
+local x
+
+S = <!x!>:upper()
+]]
+
+TEST [[
+---@type string?
+local x
+
+if x then
+    S = x:upper()
+end
+]]
+
+TEST [[
+---@type string?
+local x
+
+if not x then
+    x = ''
+end
+
+S = x:upper()
+]]
+
+TEST [[
+---@type fun()?
+local x
+
+S = <!x!>()
+]]
+
+TEST [[
+local x, y
+local z = x and y
+
+print(z.y)
+]]
+
+TEST [[
+local x, y
+function x()
+    y()
+end
+
+function y()
+    x()
+end
+
+x()
 ]]

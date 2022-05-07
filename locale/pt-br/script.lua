@@ -34,6 +34,8 @@ DIAG_PREFIELD_CALL      =
 'Será interpretado como `{}{}`. Pode ser necessário adicionar uma `,` ou `;`.'
 DIAG_OVER_MAX_ARGS      =
 'A função aceita apenas os parâmetros {:d}, mas você passou {:d}.'
+DIAG_MISS_ARGS          = -- TODO: need translate!
+'the function received at least {:d} arguments, but got {:d}.'
 DIAG_OVER_MAX_VALUES    = -- TODO: need translate!
 'Only has {} variables, but you set {} values.'
 DIAG_AMBIGUITY_1        =
@@ -94,6 +96,8 @@ DIAG_NOT_YIELDABLE      = -- TODO: need translate!
 'The {}th parameter of this function was not marked as yieldable, but an async function was passed in. (Use `---@param name async fun()` to mark as yieldable)'
 DIAG_DISCARD_RETURNS    = -- TODO: need translate!
 'The return values of this function cannot be discarded.'
+DIAG_NEED_CHECK_NIL     = -- TODO: need translate!
+'Need check nil.'
 DIAG_CIRCLE_DOC_CLASS                 =
 'Classes com herança cíclica.'
 DIAG_DOC_FIELD_NO_CLASS               =
@@ -271,6 +275,8 @@ PARSER_LUADOC_MISS_DIAG_MODE            =
 'Esperado <diagnostic mode>.'
 PARSER_LUADOC_ERROR_DIAG_MODE           =
 '<diagnostic mode> incorreto.'
+PARSER_LUADOC_MISS_LOCAL_NAME           = -- TODO: need translate!
+'<local name> expected.'
 
 SYMBOL_ANONYMOUS        = -- TODO: need translate!
 '<Anonymous>'

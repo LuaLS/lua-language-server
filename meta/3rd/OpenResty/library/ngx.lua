@@ -2134,7 +2134,7 @@ function ngx.req.get_post_args(max_args) end
 ---
 --- Removing the `max_args` cap is strongly discouraged.
 ---
----@param max_args number
+---@param max_args? number
 ---@return table args
 ---@return string|'"truncated"' error
 function ngx.req.get_uri_args(max_args) end
@@ -2228,8 +2228,8 @@ function ngx.req.get_uri_args(max_args) end
 ---     in "\x00foo" (maybe you want to set the 'binary' argument?)
 ---
 ---@param uri string
----@param jump boolean
----@param binary boolean
+---@param jump? boolean
+---@param binary? boolean
 function ngx.req.set_uri(uri, jump, binary) end
 
 --- Append new data chunk specified by the `data_chunk` argument onto the existing request body created by the `ngx.req.init_body` call.
@@ -2438,8 +2438,8 @@ function ngx.req.clear_header(header_name) end
 ---
 --- The `__index` metamethod will not be added when the `raw` argument is set to `true`.
 ---
----@param max_headers number
----@param raw boolean
+---@param max_headers? number
+---@param raw? boolean
 ---@return table<string, string|string[]> headers
 ---@return string|'"truncated"' error
 function ngx.req.get_headers(max_headers, raw) end
@@ -4211,8 +4211,8 @@ ngx.resp = {}
 ---
 --- Note that a maximum of 100 response headers are parsed by default (including those with the same name) and that additional response headers are silently discarded to guard against potential denial of service attacks. When the limit is exceeded, it will return a second value which is the string `"truncated"`.
 ---
----@param max_headers number
----@param raw boolean
+---@param max_headers? number
+---@param raw? boolean
 ---@return table<string, string|string[]>
 ---@return string|'"truncated"' error
 function ngx.resp.get_headers(max_headers, raw) end

@@ -281,12 +281,8 @@ local function fsIsDirectory(path, option)
     if path.type == 'dummy' then
         return path:isDirectory()
     end
-    local suc, res = pcall(fs.is_directory, path)
-    if not suc then
-        option.err[#option.err+1] = res
-        return false
-    end
-    return res
+    local status = fs.symlink_status(path):type()
+    return status == 'directory'
 end
 
 local function fsPairs(path, option)
@@ -616,9 +612,10 @@ end
 
 function m.scanDirectory(dir, callback)
     for fullpath in fs.pairs(dir) do
-        if fs.is_directory(fullpath) then
+        local status = fs.symlink_status(fullpath):type()
+        if status == 'directory' then
             m.scanDirectory(fullpath, callback)
-        else
+        elseif status == 'regular' then
             callback(fullpath)
         end
     end

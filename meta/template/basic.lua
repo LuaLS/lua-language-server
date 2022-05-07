@@ -7,7 +7,7 @@ arg = {}
 ---#DES 'assert'
 ---@generic T
 ---@param v T
----@param message any
+---@param message? any
 ---@return T
 function assert(v, message) end
 
@@ -83,8 +83,8 @@ function ipairs(t) end
 ---#DES 'load<5.1'
 ---@param func       function
 ---@param chunkname? string
----@return function
----@return string   error_message
+---@return function?
+---@return string?   error_message
 ---@nodiscard
 function load(func, chunkname) end
 ---#else
@@ -93,8 +93,8 @@ function load(func, chunkname) end
 ---@param chunkname? string
 ---@param mode?      loadmode
 ---@param env?       table
----@return function
----@return string   error_message
+---@return function?
+---@return string?   error_message
 ---@nodiscard
 function load(chunk, chunkname, mode, env) end
 ---#end
@@ -102,8 +102,8 @@ function load(chunk, chunkname, mode, env) end
 ---#if VERSION <= 5.1 and not JIT then
 ---#DES 'loadfile'
 ---@param filename? string
----@return function
----@return string   error_message
+---@return function?
+---@return string?  error_message
 ---@nodiscard
 function loadfile(filename) end
 ---#else
@@ -111,8 +111,8 @@ function loadfile(filename) end
 ---@param filename? string
 ---@param mode?     loadmode
 ---@param env?      table
----@return function
----@return string   error_message
+---@return function?
+---@return string?  error_message
 ---@nodiscard
 function loadfile(filename, mode, env) end
 ---#end
@@ -121,8 +121,8 @@ function loadfile(filename, mode, env) end
 ---#DES 'loadstring'
 ---@param text       string
 ---@param chunkname? string
----@return function
----@return string error_message
+---@return function?
+---@return string?   error_message
 ---@nodiscard
 function loadstring(text, chunkname) end
 

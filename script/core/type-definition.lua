@@ -3,7 +3,6 @@ local files      = require 'files'
 local vm         = require 'vm'
 local findSource = require 'core.find-source'
 local guide      = require 'parser.guide'
-local infer      = require 'vm.infer'
 local rpath      = require 'workspace.require-path'
 
 local function sortResults(results)

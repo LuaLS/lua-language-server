@@ -1237,7 +1237,7 @@ function ngx.decode_base64(str) end
 --- An optional boolean-typed `no_padding` argument can be specified to control whether the base64 padding should be appended to the resulting digest (default to `false`, i.e., with padding enabled).
 ---
 ---@param str string
----@param no_padding boolean
+---@param no_padding? boolean
 ---@return string
 function ngx.encode_base64(str, no_padding) end
 
@@ -1537,7 +1537,7 @@ function DICT:flush_all() end
 ---
 --- Unlike the `flush_all` method, this method actually frees up the memory used by the expired items.
 ---
----@param max_count number
+---@param max_count? number
 ---@return number flushed
 function DICT:flush_expired(max_count) end
 
@@ -1548,7 +1548,7 @@ function DICT:flush_expired(max_count) end
 ---
 --- **CAUTION** Avoid calling this method on dictionaries with a very large number of keys as it may lock the dictionary for significant amount of time and block NGINX worker processes trying to access the dictionary.
 ---
----@param  max_count number
+---@param  max_count? number
 ---@return string[]  keys
 function DICT:get_keys(max_count) end
 
@@ -2042,7 +2042,7 @@ function ngx.req.set_body_data(data) end
 ---
 --- Removing the `max_args` cap is strongly discouraged.
 ---
----@param max_args number
+---@param max_args? number
 ---@return table args
 ---@return string|'"truncated"' error
 function ngx.req.get_post_args(max_args) end
@@ -2272,7 +2272,7 @@ function ngx.req.get_method() end
 ---
 --- You can use the "raw request socket" returned by `ngx.req.socket(true)` to implement fancy protocols like `WebSocket`, or just emit your own raw HTTP response header or body data. You can refer to the `lua-resty-websocket library` for a real world example.
 ---
----@param raw boolean
+---@param raw? boolean
 ---@return tcpsock? socket
 ---@return string? error
 function ngx.req.socket(raw) end
@@ -2313,7 +2313,7 @@ function ngx.req.finish_body() end
 ---
 --- This method does not work in HTTP/2 requests yet.
 ---
----@param no_request_line boolean
+---@param no_request_line? boolean
 ---@return string
 function ngx.req.raw_header(no_request_line) end
 
@@ -2348,7 +2348,7 @@ function ngx.req.start_time() end
 ---
 --- This function can be used with `ngx.req.append_body`, `ngx.req.finish_body`, and `ngx.req.socket` to implement efficient input filters in pure Lua (in the context of `rewrite_by_lua*` or `access_by_lua*`), which can be used with other NGINX content handler or upstream modules like `ngx_http_proxy_module` and `ngx_http_fastcgi_module`.
 ---
----@param buffer_size  number
+---@param buffer_size?  number
 function ngx.req.init_body(buffer_size) end
 
 --- Set the current request's request body using the in-file data specified by the `file_name` argument.
@@ -2362,7 +2362,7 @@ function ngx.req.init_body(buffer_size) end
 --- Whether the previous request body has been read into memory or buffered into a disk file, it will be freed or the disk file will be cleaned up immediately, respectively.
 ---
 ---@param file_name string
----@param auto_clean boolean
+---@param auto_clean? boolean
 function ngx.req.set_body_file(file_name, auto_clean) end
 
 --- Clears the current request's request header named `header_name`. None of the current request's existing subrequests will be affected but subsequently initiated subrequests will inherit the change by default.
@@ -2628,7 +2628,7 @@ function ngx.encode_args(args) end
 --- Removing the `max_args` cap is strongly discouraged.
 ---
 ---@param  str                  string
----@param  max_args             number
+---@param  max_args?            number
 ---@return table                args
 ---@return string|'"truncated"' error
 function ngx.decode_args(str, max_args) end
@@ -2684,8 +2684,8 @@ local udpsock = {}
 ---
 --- Calling this method on an already connected socket object will cause the original connection to be closed first.
 ---
----@param host string
----@param port number
+---@param host  string
+---@param port? number
 ---@return boolean ok
 ---@return string? error
 function udpsock:setpeername(host, port) end
@@ -2845,8 +2845,8 @@ local tcpsock = {}
 --- Calling this method on an already connected socket object will cause the original connection to be closed first.
 ---
 ---@param host string
----@param port number
----@param opts tcpsock.connect.opts
+---@param port? number
+---@param opts? tcpsock.connect.opts
 ---@return boolean ok
 ---@return string? error
 function tcpsock:connect(host, port, opts) end
@@ -2900,11 +2900,12 @@ function tcpsock:connect(host, port, opts) end
 --- For connections that have already done SSL/TLS handshake, this method returns
 --- immediately.
 ---
----@param reused_session? userdata|boolean
----@param server_name     string
----@param ssl_verify      boolean
----@param send_status_req boolean
+---@param reused_session?  userdata|boolean
+---@param server_name?     string
+---@param ssl_verify?      boolean
+---@param send_status_req? boolean
 ---@return userdata|boolean session_or_ok
+---@return string? error
 function tcpsock:sslhandshake(reused_session, server_name, ssl_verify, send_status_req) end
 
 
@@ -2967,7 +2968,7 @@ function tcpsock:send(data) end
 ---
 ---@overload fun(self:tcpsock, size:number):string,string,string
 ---
----@param  pattern '"*a"'|'"*l"'
+---@param  pattern? '"*a"'|'"*l"'
 ---@return string? data
 ---@return string? error
 ---@return string? partial
@@ -3090,7 +3091,7 @@ function tcpsock:receiveany(max) end
 ---@overload fun(self:tcpsock, size:number, options:table):ngx.socket.tcpsock.iterator
 ---
 ---@param pattern string
----@param options table
+---@param options? table
 ---@return ngx.socket.tcpsock.iterator
 function tcpsock:receiveuntil(pattern, options) end
 
@@ -3249,8 +3250,8 @@ function tcpsock:setoption(option, value) end
 ---
 --- This method also makes the current cosocket object enter the "closed" state, so there is no need to manually call the `close` method on it afterwards.
 ---
----@param timeout number
----@param size number
+---@param timeout? number
+---@param size? number
 ---@return boolean ok
 ---@return string? error
 function tcpsock:setkeepalive(timeout, size) end
@@ -3278,7 +3279,7 @@ function tcpsock:getreusedtimes() end
 --- There is no way to use the `settimeout` method to specify connecting timeout for this method and the `lua_socket_connect_timeout` directive must be set at configure time instead.
 ---
 ---@param host string
----@param port number
+---@param port? number
 ---@return tcpsock? socket
 ---@return string? error
 function ngx.socket.connect(host,port) end
@@ -3478,8 +3479,9 @@ function ngx.exit(status) end
 --- It is recommended that a coding style that combines this method call with the `return` statement, i.e., `return ngx.redirect(...)` be adopted when this method call is used in contexts other than `header_filter_by_lua*` to reinforce the fact that the request processing is being terminated.
 ---
 ---@param uri string
----@param status number
+---@param status? 301|302|303|307|308
 function ngx.redirect(uri, status) end
+
 
 --- Registers a user Lua function as the callback which gets called automatically when the client closes the (downstream) connection prematurely.
 ---
@@ -3570,7 +3572,7 @@ function ngx.on_abort(callback) end
 --- It is recommended that a coding style that combines this method call with the `return` statement, i.e., `return ngx.exec(...)` be adopted when this method call is used in contexts other than `header_filter_by_lua*` to reinforce the fact that the request processing is being terminated.
 ---
 ---@param uri string
----@param args string|table<string,any>
+---@param args? string|table<string,any>
 function ngx.exec(uri, args) end
 
 ngx.location = {}
@@ -3832,7 +3834,7 @@ ngx.location = {}
 --- Please also refer to restrictions on capturing locations configured by subrequest directives of other modules.
 ---
 ---@param uri ngx.location.capture.uri
----@param options ngx.location.capture.options
+---@param options? ngx.location.capture.options
 ---@return ngx.location.capture.response
 function ngx.location.capture(uri, options) end
 
@@ -4185,7 +4187,7 @@ function ngx.send_headers() end
 ---
 --- Returns `1` on success, or returns `nil` and a string describing the error otherwise.
 ---
----@param wait boolean
+---@param wait? boolean
 ---@return boolean ok
 ---@return string? error
 function ngx.flush(wait) end

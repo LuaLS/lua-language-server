@@ -1012,7 +1012,7 @@ ngx.re = {}
 ---
 ---@param  subject  string
 ---@param  regex    string
----@param  options  ngx.re.options
+---@param  options? ngx.re.options
 ---@param  ctx?     ngx.re.ctx
 ---@param  nth?     integer
 ---@return integer? from
@@ -1087,7 +1087,7 @@ function ngx.re.find(subject, regex, options, ctx, nth) end
 ---
 ---@param  subject                 string
 ---@param  regex                   string
----@param  options                 ngx.re.options
+---@param  options?                ngx.re.options
 ---@return ngx.re.gmatch.iterator? iterator
 ---@return string?                 error
 function ngx.re.gmatch(subject, regex, options) end
@@ -1121,7 +1121,7 @@ function ngx.re.gmatch(subject, regex, options) end
 ---
 ---@param  subject          string
 ---@param  regex            string
----@param  options          ngx.re.options
+---@param  options?         ngx.re.options
 ---@param  ctx?             ngx.re.ctx
 ---@param  res?             ngx.re.captures
 ---@return ngx.re.captures? captures
@@ -1155,7 +1155,7 @@ function ngx.re.match(subject, regex, options, ctx, res) end
 ---@param  subject  string
 ---@param  regex    string
 ---@param  replace  ngx.re.replace
----@param  options  ngx.re.options
+---@param  options? ngx.re.options
 ---@return string?  new
 ---@return integer? n
 ---@return string?  error
@@ -1219,7 +1219,7 @@ function ngx.re.gsub(subject, regex, replace, options) end
 ---@param  subject  string
 ---@param  regex    string
 ---@param  replace  ngx.re.replace
----@param  options  ngx.re.options
+---@param  options? ngx.re.options
 ---@return string?  new
 ---@return integer? n
 ---@return string?  error

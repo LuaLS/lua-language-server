@@ -2058,7 +2058,7 @@ function ngx.req.set_body_data(data) end
 ---@return string|'"truncated"' error
 function ngx.req.get_post_args(max_args) end
 
---- Returns a Lua table holding all the current request URL query arguments.
+--- Returns a Lua table holding all the current request URL query arguments. An optional `tab` argument can be used to reuse the table returned by this method.
 ---
 --- ```nginx
 ---  location = /test {
@@ -2146,9 +2146,10 @@ function ngx.req.get_post_args(max_args) end
 --- Removing the `max_args` cap is strongly discouraged.
 ---
 ---@param max_args? number
+---@param tab? table
 ---@return table args
 ---@return string|'"truncated"' error
-function ngx.req.get_uri_args(max_args) end
+function ngx.req.get_uri_args(max_args, tab) end
 
 --- Rewrite the current request's (parsed) URI by the `uri` argument. The `uri` argument must be a Lua string and cannot be of zero length, or a Lua exception will be thrown.
 ---

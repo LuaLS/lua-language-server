@@ -2697,9 +2697,10 @@ local udpsock = {}
 --- Calling this method on an already connected socket object will cause the original connection to be closed first.
 ---
 ---@param host  string
----@param port? number
+---@param port number
 ---@return boolean ok
 ---@return string? error
+---@overload fun(self:udpsock, unix_socket:string):boolean, string?
 function udpsock:setpeername(host, port) end
 
 --- Sends data on the current UDP or datagram unix domain socket object.
@@ -2857,10 +2858,11 @@ local tcpsock = {}
 --- Calling this method on an already connected socket object will cause the original connection to be closed first.
 ---
 ---@param host string
----@param port? number
+---@param port number
 ---@param opts? tcpsock.connect.opts
 ---@return boolean ok
 ---@return string? error
+---@overload fun(self:tcpsock, unix_socket:string, opts?:tcpsock.connect.opts):boolean, string?
 function tcpsock:connect(host, port, opts) end
 
 --- An optional Lua table can be specified as the last argument to `tcpsock:connect()`

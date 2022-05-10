@@ -91,7 +91,7 @@ function re.opt(option, value) end
 ---
 ---@param  subj      string
 ---@param  regex     string
----@param  opts      ngx.re.options
+---@param  opts?     ngx.re.options
 ---@param  ctx?      ngx.re.ctx
 ---@param  max?      number
 ---@param  res?      string[]

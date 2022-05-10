@@ -1012,7 +1012,7 @@ ngx.re = {}
 ---
 ---@param  subject  string
 ---@param  regex    string
----@param  options  ngx.re.options
+---@param  options? ngx.re.options
 ---@param  ctx?     ngx.re.ctx
 ---@param  nth?     integer
 ---@return integer? from
@@ -1087,7 +1087,7 @@ function ngx.re.find(subject, regex, options, ctx, nth) end
 ---
 ---@param  subject                 string
 ---@param  regex                   string
----@param  options                 ngx.re.options
+---@param  options?                ngx.re.options
 ---@return ngx.re.gmatch.iterator? iterator
 ---@return string?                 error
 function ngx.re.gmatch(subject, regex, options) end
@@ -1121,7 +1121,7 @@ function ngx.re.gmatch(subject, regex, options) end
 ---
 ---@param  subject          string
 ---@param  regex            string
----@param  options          ngx.re.options
+---@param  options?         ngx.re.options
 ---@param  ctx?             ngx.re.ctx
 ---@param  res?             ngx.re.captures
 ---@return ngx.re.captures? captures
@@ -1155,7 +1155,7 @@ function ngx.re.match(subject, regex, options, ctx, res) end
 ---@param  subject  string
 ---@param  regex    string
 ---@param  replace  ngx.re.replace
----@param  options  ngx.re.options
+---@param  options? ngx.re.options
 ---@return string?  new
 ---@return integer? n
 ---@return string?  error
@@ -1219,7 +1219,7 @@ function ngx.re.gsub(subject, regex, replace, options) end
 ---@param  subject  string
 ---@param  regex    string
 ---@param  replace  ngx.re.replace
----@param  options  ngx.re.options
+---@param  options? ngx.re.options
 ---@return string?  new
 ---@return integer? n
 ---@return string?  error
@@ -1237,7 +1237,7 @@ function ngx.decode_base64(str) end
 --- An optional boolean-typed `no_padding` argument can be specified to control whether the base64 padding should be appended to the resulting digest (default to `false`, i.e., with padding enabled).
 ---
 ---@param str string
----@param no_padding boolean
+---@param no_padding? boolean
 ---@return string
 function ngx.encode_base64(str, no_padding) end
 
@@ -1255,6 +1255,13 @@ ngx.shared = {}
 ---@class ngx.shared.DICT
 local DICT = {}
 
+--- Valid values for ngx.shared.DICT
+---@alias ngx.shared.DICT.value
+---| string
+---| number
+---| boolean
+---| nil
+
 --- Retrieve a value. If the key does not exist or has expired, then `nil` will be returned.
 ---
 --- In case of errors, `nil` and a string describing the error will be returned.
@@ -1269,7 +1276,7 @@ local DICT = {}
 --- If the user flags is `0` (the default), then no flags value will be returned.
 ---
 ---@param key string
----@return any?
+---@return ngx.shared.DICT.value? value
 ---@return ngx.shared.DICT.flags?|string? flags_or_error
 function DICT:get(key) end
 
@@ -1281,7 +1288,7 @@ function DICT:get(key) end
 --- Note that the value of an expired key is not guaranteed to be available so one should never rely on the availability of expired items.
 ---
 ---@param  key              string
----@return any?             value
+---@return ngx.shared.DICT.value? value
 ---@return ngx.shared.DICT.flags|string flags_or_error
 ---@return boolean          stale
 function DICT:get_stale(key) end
@@ -1320,7 +1327,7 @@ function DICT:get_stale(key) end
 --- Please note that while internally the key-value pair is set atomically, the atomicity does not go across the method call boundary.
 ---
 ---@param  key      string
----@param  value    any
+---@param  value    ngx.shared.DICT.value
 ---@param  exptime? ngx.shared.DICT.exptime
 ---@param  flags?   ngx.shared.DICT.flags
 ---@return boolean  ok       # whether the key-value pair is stored or not
@@ -1331,7 +1338,7 @@ function DICT:set(key, value, exptime, flags) end
 --- Similar to the `set` method, but never overrides the (least recently used) unexpired items in the store when running out of storage in the shared memory zone. In this case, it will immediately return `nil` and the string "no memory".
 ---
 ---@param  key      string
----@param  value    any
+---@param  value    ngx.shared.DICT.value
 ---@param  exptime? ngx.shared.DICT.exptime
 ---@param  flags?   ngx.shared.DICT.flags
 ---@return boolean  ok       # whether the key-value pair is stored or not
@@ -1344,7 +1351,7 @@ function DICT:safe_set(key, value, exptime, flags) end
 --- If the `key` argument already exists in the dictionary (and not expired for sure), the `success` return value will be `false` and the `err` return value will be `"exists"`.
 ---
 ---@param  key      string
----@param  value    any
+---@param  value    ngx.shared.DICT.value
 ---@param  exptime? ngx.shared.DICT.exptime
 ---@param  flags?   ngx.shared.DICT.flags
 ---@return boolean  ok       # whether the key-value pair is stored or not
@@ -1355,7 +1362,7 @@ function DICT:add(key, value, exptime, flags) end
 --- Similar to the `add` method, but never overrides the (least recently used) unexpired items in the store when running out of storage in the shared memory zone. In this case, it will immediately return `nil` and the string "no memory".
 ---
 ---@param  key      string
----@param  value    any
+---@param  value    ngx.shared.DICT.value
 ---@param  exptime? ngx.shared.DICT.exptime
 ---@param  flags?   ngx.shared.DICT.flags
 ---@return boolean  ok       # whether the key-value pair is stored or not
@@ -1369,7 +1376,7 @@ function DICT:safe_add(key, value, exptime, flags) end
 --- If the `key` argument does *not* exist in the dictionary (or expired already), the `success` return value will be `false` and the `err` return value will be `"not found"`.
 ---
 ---@param  key      string
----@param  value    any
+---@param  value    ngx.shared.DICT.value
 ---@param  exptime? ngx.shared.DICT.exptime
 ---@param  flags?   ngx.shared.DICT.flags
 ---@return boolean  ok       # whether the key-value pair is stored or not
@@ -1417,15 +1424,19 @@ function DICT:delete(key) end
 --- The `value` argument and `init` argument can be any valid Lua numbers, like negative numbers or floating-point numbers.
 ---
 ---
----@param  key      string
----@param  value    number
----@param  init     number
----@param  init_ttl ngx.shared.DICT.exptime
+---@param  key       string
+---@param  value     number
+---@param  init?     number
+---@param  init_ttl? ngx.shared.DICT.exptime
 ---@return integer? new
 ---@return ngx.shared.DICT.error? error
 ---@return boolean  forcible
 function DICT:incr(key, value, init, init_ttl) end
 
+--- Valid ngx.shared.DICT value for lists
+---@alias ngx.shared.DICT.list_value
+---| string
+---| number
 
 --- Inserts the specified (numerical or string) `value` at the head of the list named `key`.
 ---
@@ -1434,16 +1445,16 @@ function DICT:incr(key, value, init, init_ttl) end
 --- It never overrides the (least recently used) unexpired items in the store when running out of storage in the shared memory zone. In this case, it will immediately return `nil` and the string "no memory".
 ---
 ---@param  key     string
----@param  value   any
+---@param  value   ngx.shared.DICT.list_value
 ---@return number? len    # number of elements in the list after the push operation
 ---@return ngx.shared.DICT.error? error
-function DICT:lpush(key,value) end
+function DICT:lpush(key, value) end
 
 
 --- Similar to the `lpush` method, but inserts the specified (numerical or string) `value` at the tail of the list named `key`.
 ---
 ---@param  key     string
----@param  value   any
+---@param  value   ngx.shared.DICT.list_value
 ---@return number? len    # number of elements in the list after the push operation
 ---@return ngx.shared.DICT.error? error
 function DICT:rpush(key, value) end
@@ -1454,7 +1465,7 @@ function DICT:rpush(key, value) end
 --- If `key` does not exist, it will return `nil`. When the `key` already takes a value that is not a list, it will return `nil` and `"value not a list"`.
 ---
 ---@param  key     string
----@return any?    value
+---@return ngx.shared.DICT.list_value? item
 ---@return ngx.shared.DICT.error? error
 function DICT:lpop(key) end
 
@@ -1464,7 +1475,7 @@ function DICT:lpop(key) end
 --- If `key` does not exist, it will return `nil`. When the `key` already takes a value that is not a list, it will return `nil` and `"value not a list"`.
 ---
 ---@param  key     string
----@return any?    value
+---@return ngx.shared.DICT.list_value? item
 ---@return ngx.shared.DICT.error? error
 function DICT:rpop(key) end
 
@@ -1537,7 +1548,7 @@ function DICT:flush_all() end
 ---
 --- Unlike the `flush_all` method, this method actually frees up the memory used by the expired items.
 ---
----@param max_count number
+---@param max_count? number
 ---@return number flushed
 function DICT:flush_expired(max_count) end
 
@@ -1548,7 +1559,7 @@ function DICT:flush_expired(max_count) end
 ---
 --- **CAUTION** Avoid calling this method on dictionaries with a very large number of keys as it may lock the dictionary for significant amount of time and block NGINX worker processes trying to access the dictionary.
 ---
----@param  max_count number
+---@param  max_count? number
 ---@return string[]  keys
 function DICT:get_keys(max_count) end
 
@@ -2042,12 +2053,12 @@ function ngx.req.set_body_data(data) end
 ---
 --- Removing the `max_args` cap is strongly discouraged.
 ---
----@param max_args number
+---@param max_args? number
 ---@return table args
 ---@return string|'"truncated"' error
 function ngx.req.get_post_args(max_args) end
 
---- Returns a Lua table holding all the current request URL query arguments.
+--- Returns a Lua table holding all the current request URL query arguments. An optional `tab` argument can be used to reuse the table returned by this method.
 ---
 --- ```nginx
 ---  location = /test {
@@ -2135,9 +2146,10 @@ function ngx.req.get_post_args(max_args) end
 --- Removing the `max_args` cap is strongly discouraged.
 ---
 ---@param max_args? number
+---@param tab? table
 ---@return table args
 ---@return string|'"truncated"' error
-function ngx.req.get_uri_args(max_args) end
+function ngx.req.get_uri_args(max_args, tab) end
 
 --- Rewrite the current request's (parsed) URI by the `uri` argument. The `uri` argument must be a Lua string and cannot be of zero length, or a Lua exception will be thrown.
 ---
@@ -2272,7 +2284,7 @@ function ngx.req.get_method() end
 ---
 --- You can use the "raw request socket" returned by `ngx.req.socket(true)` to implement fancy protocols like `WebSocket`, or just emit your own raw HTTP response header or body data. You can refer to the `lua-resty-websocket library` for a real world example.
 ---
----@param raw boolean
+---@param raw? boolean
 ---@return tcpsock? socket
 ---@return string? error
 function ngx.req.socket(raw) end
@@ -2313,7 +2325,7 @@ function ngx.req.finish_body() end
 ---
 --- This method does not work in HTTP/2 requests yet.
 ---
----@param no_request_line boolean
+---@param no_request_line? boolean
 ---@return string
 function ngx.req.raw_header(no_request_line) end
 
@@ -2348,7 +2360,7 @@ function ngx.req.start_time() end
 ---
 --- This function can be used with `ngx.req.append_body`, `ngx.req.finish_body`, and `ngx.req.socket` to implement efficient input filters in pure Lua (in the context of `rewrite_by_lua*` or `access_by_lua*`), which can be used with other NGINX content handler or upstream modules like `ngx_http_proxy_module` and `ngx_http_fastcgi_module`.
 ---
----@param buffer_size  number
+---@param buffer_size?  number
 function ngx.req.init_body(buffer_size) end
 
 --- Set the current request's request body using the in-file data specified by the `file_name` argument.
@@ -2362,7 +2374,7 @@ function ngx.req.init_body(buffer_size) end
 --- Whether the previous request body has been read into memory or buffered into a disk file, it will be freed or the disk file will be cleaned up immediately, respectively.
 ---
 ---@param file_name string
----@param auto_clean boolean
+---@param auto_clean? boolean
 function ngx.req.set_body_file(file_name, auto_clean) end
 
 --- Clears the current request's request header named `header_name`. None of the current request's existing subrequests will be affected but subsequently initiated subrequests will inherit the change by default.
@@ -2491,7 +2503,7 @@ function ngx.req.discard_body() end
 --- ```
 ---
 ---@param header_name string
----@param header_value string|string[]
+---@param header_value string|string[]|nil
 function ngx.req.set_header(header_name, header_value) end
 
 --- Retrieves in-memory request body data. It returns a Lua string rather than a Lua table holding all the parsed query arguments. Use the `ngx.req.get_post_args` function instead if a Lua table is required.
@@ -2628,7 +2640,7 @@ function ngx.encode_args(args) end
 --- Removing the `max_args` cap is strongly discouraged.
 ---
 ---@param  str                  string
----@param  max_args             number
+---@param  max_args?            number
 ---@return table                args
 ---@return string|'"truncated"' error
 function ngx.decode_args(str, max_args) end
@@ -2684,10 +2696,11 @@ local udpsock = {}
 ---
 --- Calling this method on an already connected socket object will cause the original connection to be closed first.
 ---
----@param host string
+---@param host  string
 ---@param port number
 ---@return boolean ok
 ---@return string? error
+---@overload fun(self:udpsock, unix_socket:string):boolean, string?
 function udpsock:setpeername(host, port) end
 
 --- Sends data on the current UDP or datagram unix domain socket object.
@@ -2846,9 +2859,10 @@ local tcpsock = {}
 ---
 ---@param host string
 ---@param port number
----@param opts tcpsock.connect.opts
+---@param opts? tcpsock.connect.opts
 ---@return boolean ok
 ---@return string? error
+---@overload fun(self:tcpsock, unix_socket:string, opts?:tcpsock.connect.opts):boolean, string?
 function tcpsock:connect(host, port, opts) end
 
 --- An optional Lua table can be specified as the last argument to `tcpsock:connect()`
@@ -2900,12 +2914,25 @@ function tcpsock:connect(host, port, opts) end
 --- For connections that have already done SSL/TLS handshake, this method returns
 --- immediately.
 ---
----@param reused_session? userdata|boolean
----@param server_name     string
----@param ssl_verify      boolean
----@param send_status_req boolean
+---@param reused_session?  userdata|boolean
+---@param server_name?     string
+---@param ssl_verify?      boolean
+---@param send_status_req? boolean
 ---@return userdata|boolean session_or_ok
+---@return string? error
 function tcpsock:sslhandshake(reused_session, server_name, ssl_verify, send_status_req) end
+
+--- Set client certificate chain and corresponding private key to the TCP socket object.
+---
+--- The certificate chain and private key provided will be used later by the `tcpsock:sslhandshake` method.
+---
+--- If both of `cert` and `pkey` are `nil`, this method will clear any existing client certificate and private key that was previously set on the cosocket object
+---
+---@param cert ffi.cdata*|nil # a client certificate chain cdata object that will be used while handshaking with remote server. These objects can be created using ngx.ssl.parse_pem_cert function provided by lua-resty-core. Note that specifying the cert option requires corresponding pkey be provided too.
+---@param key ffi.cdata*|nil  # a private key corresponds to the cert option above. These objects can be created using ngx.ssl.parse_pem_priv_key function provided by lua-resty-core.
+---@return boolean ok
+---@return string? error
+function tcpsock:setclientcert(cert, key) end
 
 
 --- Sends data without blocking on the current TCP or Unix Domain Socket connection.
@@ -2967,7 +2994,7 @@ function tcpsock:send(data) end
 ---
 ---@overload fun(self:tcpsock, size:number):string,string,string
 ---
----@param  pattern '"*a"'|'"*l"'
+---@param  pattern? '"*a"'|'"*l"'
 ---@return string? data
 ---@return string? error
 ---@return string? partial
@@ -2996,7 +3023,7 @@ function tcpsock:receive(pattern) end
 ---
 --- This method doesn't automatically close the current connection when the read timeout error occurs. For other connection errors, this method always automatically closes the connection.
 ---
----@param max string
+---@param max integer
 ---@return string? data
 ---@return string? error
 function tcpsock:receiveany(max) end
@@ -3090,7 +3117,7 @@ function tcpsock:receiveany(max) end
 ---@overload fun(self:tcpsock, size:number, options:table):ngx.socket.tcpsock.iterator
 ---
 ---@param pattern string
----@param options table
+---@param options? table
 ---@return ngx.socket.tcpsock.iterator
 function tcpsock:receiveuntil(pattern, options) end
 
@@ -3125,9 +3152,9 @@ function tcpsock:settimeout(time) end
 ---
 --- Note that this method does *not* affect the `lua_socket_keepalive_timeout` setting; the `timeout` argument to the `setkeepalive` method should be used for this purpose instead.
 ---
----@param connect_timeout number
----@param send_timeout number
----@param read_timeout number
+---@param connect_timeout number|nil
+---@param send_timeout number|nil
+---@param read_timeout number|nil
 function tcpsock:settimeouts(connect_timeout, send_timeout, read_timeout) end
 
 
@@ -3249,8 +3276,8 @@ function tcpsock:setoption(option, value) end
 ---
 --- This method also makes the current cosocket object enter the "closed" state, so there is no need to manually call the `close` method on it afterwards.
 ---
----@param timeout number
----@param size number
+---@param timeout? number
+---@param size? number
 ---@return boolean ok
 ---@return string? error
 function tcpsock:setkeepalive(timeout, size) end
@@ -3278,10 +3305,10 @@ function tcpsock:getreusedtimes() end
 --- There is no way to use the `settimeout` method to specify connecting timeout for this method and the `lua_socket_connect_timeout` directive must be set at configure time instead.
 ---
 ---@param host string
----@param port number
+---@param port? number
 ---@return tcpsock? socket
 ---@return string? error
-function ngx.socket.connect(host,port) end
+function ngx.socket.connect(host, port) end
 
 --- Creates and returns a UDP or datagram-oriented unix domain socket object (also known as one type of the "cosocket" objects). The following methods are supported on this object:
 ---
@@ -3478,8 +3505,9 @@ function ngx.exit(status) end
 --- It is recommended that a coding style that combines this method call with the `return` statement, i.e., `return ngx.redirect(...)` be adopted when this method call is used in contexts other than `header_filter_by_lua*` to reinforce the fact that the request processing is being terminated.
 ---
 ---@param uri string
----@param status number
+---@param status? 301|302|303|307|308
 function ngx.redirect(uri, status) end
+
 
 --- Registers a user Lua function as the callback which gets called automatically when the client closes the (downstream) connection prematurely.
 ---
@@ -3570,7 +3598,7 @@ function ngx.on_abort(callback) end
 --- It is recommended that a coding style that combines this method call with the `return` statement, i.e., `return ngx.exec(...)` be adopted when this method call is used in contexts other than `header_filter_by_lua*` to reinforce the fact that the request processing is being terminated.
 ---
 ---@param uri string
----@param args string|table<string,any>
+---@param args? string|table<string,any>
 function ngx.exec(uri, args) end
 
 ngx.location = {}
@@ -3832,7 +3860,7 @@ ngx.location = {}
 --- Please also refer to restrictions on capturing locations configured by subrequest directives of other modules.
 ---
 ---@param uri ngx.location.capture.uri
----@param options ngx.location.capture.options
+---@param options? ngx.location.capture.options
 ---@return ngx.location.capture.response
 function ngx.location.capture(uri, options) end
 
@@ -3993,7 +4021,7 @@ function ngx.location.capture_multi(args) end
 ---
 --- For reading *request* headers, use the `ngx.req.get_headers` function instead.
 ---
----@type table<string, any>
+---@type table<string, string|string[]|nil>
 ngx.header = {}
 
 
@@ -4087,7 +4115,7 @@ function ngx.time() end
 --- There is a hard coded `2048` byte limitation on error message lengths in the NGINX core. This limit includes trailing newlines and leading time stamps. If the message size exceeds this limit, NGINX will truncate the message text accordingly. This limit can be manually modified by editing the `NGX_MAX_ERROR_STR` macro definition in the `src/core/ngx_log.h` file in the NGINX source tree.
 ---
 ---@param level ngx.log.level
----@param ... string|number|'nil'|'ngx.null'
+---@param ... any
 function ngx.log(level, ...) end
 
 
@@ -4185,7 +4213,7 @@ function ngx.send_headers() end
 ---
 --- Returns `1` on success, or returns `nil` and a string describing the error otherwise.
 ---
----@param wait boolean
+---@param wait? boolean
 ---@return boolean ok
 ---@return string? error
 function ngx.flush(wait) end

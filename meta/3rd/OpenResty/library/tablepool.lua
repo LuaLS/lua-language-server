@@ -1,5 +1,5 @@
 ---@meta
-local tablepool={}
+local tablepool = {}
 
 --- Releases the already used Lua table, `tb`, into the table pool named `pool_name`. If the specified table pool does not exist, create it right away.
 ---
@@ -13,7 +13,7 @@ local tablepool={}
 ---
 ---@param pool_name string
 ---@param tb        table
----@param no_clear  boolean
+---@param no_clear? boolean
 function tablepool.release(pool_name, tb, no_clear) end
 
 --- Fetches a (free) Lua table from the table pool of the specified name `pool_name`.

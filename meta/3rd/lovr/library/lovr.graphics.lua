@@ -1578,6 +1578,7 @@ function Font:getRasterizer() end
 ---@param wrap? number # The width at which to wrap lines, or 0 for no wrap.
 ---@return number width # The maximum width of any line in the text.
 ---@return number lines # The number of lines in the wrapped text.
+---@return number lastwidth # The width of the last line of text (to assist in text layout).
 function Font:getWidth(text, wrap) end
 
 ---
@@ -1701,6 +1702,10 @@ function Material:setScalar(scalarType, x) end
 ---Several predefined `MaterialTexture`s are supported.
 ---
 ---Any texture that is `nil` will use a single white pixel as a fallback.
+---
+---
+---### NOTE:
+---Textures must have a `TextureType` of `2d` to be used with Materials.
 ---
 ---@overload fun(self: lovr.Material, texture: lovr.Texture)
 ---@param textureType? lovr.MaterialTexture # The type of texture to set.
@@ -2528,7 +2533,7 @@ function ShaderBlock:read(name) end
 ---
 ---`Blob`s can also be used to pass arbitrary binary data to individual variables.
 ---
----@overload fun(self: lovr.ShaderBlock, blob: lovr.Blob, offset: number, extent: number):number
+---@overload fun(self: lovr.ShaderBlock, blob: lovr.Blob, srcOffset: number, dstOffset: number, extent: number):number
 ---@param variable string # The name of the variable to update.
 ---@param value any # The new value of the uniform.
 function ShaderBlock:send(variable, value) end

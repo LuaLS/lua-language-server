@@ -315,6 +315,13 @@ function Curve:slice(t1, t2) end
 local Mat4 = {}
 
 ---
+---Returns whether a matrix is approximately equal to another matrix.
+---
+---@param n lovr.Mat4 # The other matrix.
+---@return boolean equal # Whether the 2 matrices approximately equal each other.
+function Mat4:equals(n) end
+
+---
 ---Sets a projection matrix using raw projection angles and clipping planes.
 ---
 ---This can be used for asymmetric or oblique projections.
@@ -477,6 +484,13 @@ function Quat:conjugate() end
 ---
 ---@return lovr.Vec3 v # The direction vector.
 function Quat:direction() end
+
+---
+---Returns whether a quaternion is approximately equal to another quaternion.
+---
+---@param r lovr.Quat # The other quaternion.
+---@return boolean equal # Whether the 2 quaternions approximately equal each other.
+function Quat:equals(r) end
 
 ---
 ---Returns the length of the quaternion.
@@ -690,6 +704,18 @@ function Vec2:div(u) end
 function Vec2:dot(u) end
 
 ---
+---Returns whether a vector is approximately equal to another vector.
+---
+---
+---### NOTE:
+---To handle floating point precision issues, this function returns true as long as the squared distance between the vectors is below `1e-10`.
+---
+---@overload fun(self: lovr.Vec2, x: number, y: number):boolean
+---@param u lovr.Vec2 # The other vector.
+---@return boolean equal # Whether the 2 vectors approximately equal each other.
+function Vec2:equals(u) end
+
+---
 ---Returns the length of the vector.
 ---
 ---
@@ -823,6 +849,18 @@ function Vec3:div(u) end
 function Vec3:dot(u) end
 
 ---
+---Returns whether a vector is approximately equal to another vector.
+---
+---
+---### NOTE:
+---To handle floating point precision issues, this function returns true as long as the squared distance between the vectors is below `1e-10`.
+---
+---@overload fun(self: lovr.Vec3, x: number, y: number, z: number):boolean
+---@param u lovr.Vec3 # The other vector.
+---@return boolean equal # Whether the 2 vectors approximately equal each other.
+function Vec3:equals(u) end
+
+---
 ---Returns the length of the vector.
 ---
 ---
@@ -945,6 +983,18 @@ function Vec4:div(u) end
 ---@param u lovr.Vec4 # The vector to compute the dot product with.
 ---@return number dot # The dot product between `v` and `u`.
 function Vec4:dot(u) end
+
+---
+---Returns whether a vector is approximately equal to another vector.
+---
+---
+---### NOTE:
+---To handle floating point precision issues, this function returns true as long as the squared distance between the vectors is below `1e-10`.
+---
+---@overload fun(self: lovr.Vec4, x: number, y: number, z: number, w: number):boolean
+---@param u lovr.Vec4 # The other vector.
+---@return boolean equal # Whether the 2 vectors approximately equal each other.
+function Vec4:equals(u) end
 
 ---
 ---Returns the length of the vector.

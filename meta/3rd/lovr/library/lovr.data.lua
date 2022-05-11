@@ -415,6 +415,16 @@ local Sound = {}
 function Sound:getBlob() end
 
 ---
+---Returns the number of frames that can be written to the Sound.
+---
+---For stream sounds, this is the number of frames that can be written without overwriting existing data.
+---
+---For normal sounds, this returns the same value as `Sound:getFrameCount`.
+---
+---@return number capacity # The number of frames that can be written to the Sound.
+function Sound:getCapacity() end
+
+---
 ---Returns the number of channels in the Sound.
 ---
 ---Mono sounds have 1 channel, stereo sounds have 2 channels, and ambisonic sounds have 4 channels.

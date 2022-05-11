@@ -966,6 +966,14 @@ function CircleShape:setRadius(radius) end
 local Contact = {}
 
 ---
+---Gets the child indices of the shapes of the two colliding fixtures. For ChainShapes, an index of 1 is the first edge in the chain.
+---Used together with Fixture:rayCast or ChainShape:getChildEdge.
+---
+---@return number indexA # The child index of the first fixture's shape.
+---@return number indexB # The child index of the second fixture's shape.
+function Contact:getChildren() end
+
+---
 ---Gets the two Fixtures that hold the shapes that are in contact.
 ---
 ---@return love.Fixture fixtureA # The first Fixture.
@@ -1657,6 +1665,12 @@ function PrismaticJoint:getMotorForce(invdt) end
 function PrismaticJoint:getMotorSpeed() end
 
 ---
+---Gets the reference angle.
+---
+---@return number angle # The reference angle in radians.
+function PrismaticJoint:getReferenceAngle() end
+
+---
 ---Gets the upper limit.
 ---
 ---@return number upper # The upper limit, usually in meters.
@@ -1834,6 +1848,12 @@ function RevoluteJoint:getMotorSpeed() end
 ---
 ---@return number f # The current motor force, in Nm.
 function RevoluteJoint:getMotorTorque() end
+
+---
+---Gets the reference angle.
+---
+---@return number angle # The reference angle in radians.
+function RevoluteJoint:getReferenceAngle() end
 
 ---
 ---Gets the upper limit.
@@ -2022,6 +2042,12 @@ function WeldJoint:getDampingRatio() end
 function WeldJoint:getFrequency() end
 
 ---
+---Gets the reference angle.
+---
+---@return number angle # The reference angle in radians.
+function WeldJoint:getReferenceAngle() end
+
+---
 ---Sets a new damping ratio.
 ---
 ---@param ratio number # The new damping ratio.
@@ -2088,6 +2114,12 @@ function WheelJoint:getSpringDampingRatio() end
 ---
 ---@return number freq # The frequency in hertz.
 function WheelJoint:getSpringFrequency() end
+
+---
+---Checks if the joint motor is running.
+---
+---@return boolean on # The status of the joint motor.
+function WheelJoint:isMotorEnabled() end
 
 ---
 ---Sets a new maximum motor torque.

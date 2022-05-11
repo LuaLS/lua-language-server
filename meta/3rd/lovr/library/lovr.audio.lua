@@ -73,6 +73,14 @@ function lovr.audio.getPose() end
 function lovr.audio.getPosition() end
 
 ---
+---Returns the sample rate used by the playback device.
+---
+---This can be changed using `lovr.conf`.
+---
+---@return number rate # The sample rate of the playback device, in Hz.
+function lovr.audio.getSampleRate() end
+
+---
 ---Returns the name of the active spatializer (`simple`, `oculus`, or `phonon`).
 ---
 ---The `t.audio.spatializer` setting in `lovr.conf` can be used to express a preference for a particular spatializer.
@@ -103,7 +111,7 @@ function lovr.audio.getPosition() end
 ---      <td>Effect: Attenuation</td>
 ---      <td>x</td>
 ---      <td>x</td>
----      <td></td>
+---      <td>x</td>
 ---    </tr>
 ---    <tr>
 ---      <td>Effect: Absorption</td>

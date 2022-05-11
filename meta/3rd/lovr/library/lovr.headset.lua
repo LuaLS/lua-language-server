@@ -56,6 +56,8 @@ function lovr.headset.getAngularVelocity(device) end
 ---### NOTE:
 ---The axis values will be between 0 and 1 for 1D axes, and between -1 and 1 for each component of a multidimensional axis.
 ---
+---When hand tracking is active, pinch strength will be mapped to the `trigger` axis.
+---
 ---@param device lovr.Device # The device.
 ---@param axis lovr.DeviceAxis # The axis.
 function lovr.headset.getAxis(device, axis) end
@@ -491,6 +493,10 @@ function lovr.headset.getViewPose(view) end
 ---
 ---Returns whether a button on a device is pressed.
 ---
+---
+---### NOTE:
+---When hand tracking is active, pinching will be mapped to the `trigger` button.
+---
 ---@param device lovr.Device # The device.
 ---@param button lovr.DeviceButton # The button.
 ---@return boolean down # Whether the button on the device is currently pressed, or `nil` if the device does not have the specified button.
@@ -679,7 +685,7 @@ function lovr.headset.wasReleased(device, button) end
 ---
 ---| '"foot/right"'
 ---
----A device used as a camera in the scene.
+---A camera device, often used for recording "mixed reality" footage.
 ---
 ---| '"camera"'
 ---

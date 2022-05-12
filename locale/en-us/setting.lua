@@ -211,37 +211,37 @@ config.IntelliSense.traceBeSetted        =
 'Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
 config.IntelliSense.traceFieldInject     =
 'Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
-config.diagnostics['unused-local']          = -- TODO: need translate!
-'未使用的局部变量'
-config.diagnostics['unused-function']       = -- TODO: need translate!
-'未使用的函数'
-config.diagnostics['undefined-global']      = -- TODO: need translate!
-'未定义的全局变量'
-config.diagnostics['global-in-nil-env']     = -- TODO: need translate!
-'不能使用全局变量（ `_ENV` 被设置为了 `nil`）'
-config.diagnostics['unused-label']          = -- TODO: need translate!
-'未使用的标签'
-config.diagnostics['unused-vararg']         = -- TODO: need translate!
-'未使用的不定参数'
-config.diagnostics['trailing-space']        = -- TODO: need translate!
-'后置空格'
-config.diagnostics['redefined-local']       = -- TODO: need translate!
-'重复定义的局部变量'
-config.diagnostics['newline-call']          = -- TODO: need translate!
-'以 `(` 开始的新行，在语法上被解析为了上一行的函数调用'
+config.diagnostics['unused-local']          =
+'Enable unused local variable diagnostics.'
+config.diagnostics['unused-function']       =
+'Enable unused function diagnostics.'
+config.diagnostics['undefined-global']      =
+'Enable undefined global variable diagnostics.'
+config.diagnostics['global-in-nil-env']     =
+'Enable cannot use global variables （ `_ENV` is set to `nil`） diagnostics.'
+config.diagnostics['unused-label']          =
+'Enable unused label diagnostics.'
+config.diagnostics['unused-vararg']         =
+'Enable unused vararg diagnostics.'
+config.diagnostics['trailing-space']        =
+'Enable trailing space diagnostics.'
+config.diagnostics['redefined-local']       =
+'Enable redefined local variable diagnostics.'
+config.diagnostics['newline-call']          =
+'Enable newline call diagnostics. Is\'s raised when a line starting with `(` is encountered, which is syntactically parsed as a function call on the previous line.'
 config.diagnostics['newfield-call']         = -- TODO: need translate!
 '在字面量表中，2行代码之间缺少分隔符，在语法上被解析为了一次索引操作'
-config.diagnostics['redundant-parameter']   = -- TODO: need translate!
-'函数调用时，传入了多余的参数'
-config.diagnostics['ambiguity-1']           = -- TODO: need translate!
-'优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1` '
-config.diagnostics['lowercase-global']      = -- TODO: need translate!
-'首字母小写的全局变量定义'
-config.diagnostics['undefined-env-child']   = -- TODO: need translate!
-'`_ENV` 被设置为了新的字面量表，但是试图获取的全局变量不再这张表中'
-config.diagnostics['duplicate-index']       = -- TODO: need translate!
-'在字面量表中重复定义了索引'
-config.diagnostics['empty-block']           = -- TODO: need translate!
-'空代码块'
-config.diagnostics['redundant-value']       = -- TODO: need translate!
-'赋值操作时，值的数量比被赋值的对象多'
+config.diagnostics['redundant-parameter']   =
+'Enable redundant function parameter diagnostics.'
+config.diagnostics['ambiguity-1']           =
+'Enable ambiguous operator precedence diagnostics. For example, the `num or 0 + 1` expression will be suggested `(num or 0) + 1` instead.'
+config.diagnostics['lowercase-global']      =
+'Enable lowercase global variable definition diagnostics.'
+config.diagnostics['undefined-env-child']   =
+'Enable undefined environment variable diagnostics. It\'s raised when `_ENV` table is set to a new literal table, but the used global variable is no longer present in the global environment.'
+config.diagnostics['duplicate-index']       =
+'Enable duplicate table index diagnostics.'
+config.diagnostics['empty-block']           =
+'Enable empty code block diagnostics.'
+config.diagnostics['redundant-value']       =
+'Enable the redundant values assigned diagnostics. It\'s raised during assignment operation, when the number of values is higher than the number of objects being assigned.'

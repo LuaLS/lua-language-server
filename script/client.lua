@@ -1,3 +1,4 @@
+local fs        = require 'bee.filesystem'
 local nonil     = require 'without-check-nil'
 local util      = require 'utility'
 local lang      = require 'language'
@@ -247,11 +248,11 @@ local function tryModifyRC(uri, finalChanges, create)
         return false
     end
     local workspace = require 'workspace'
-    local path = workspace.getAbsolutePath(uri, '.luarc.json')
-              or workspace.getAbsolutePath(uri, '.luarc.jsonc')
+    local path = workspace.getAbsolutePath(uri, '.luarc.jsonc')
     if not path then
         return false
     end
+    path = fs.exists(path) and path or workspace.getAbsolutePath(uri, '.luarc.json')
     local buf = util.loadFile(path)
     if not buf and not create then
         return false

@@ -1,0 +1,56 @@
+---@meta
+---@class GarrisonAbilityEffect
+---@field name string
+---@field description string
+---@field icon number
+---@field factor number
+
+---@class GarrisonFollowerAbilityInfo
+---@field id number
+---@field name string
+---@field description string
+---@field icon number
+---@field isTrait boolean
+---@field isSpecialization boolean
+---@field temporary boolean
+---@field category string|nil
+---@field counters GarrisonAbilityEffect[]
+---@field isEmptySlot boolean
+
+---@class GarrisonTalentCurrencyCostInfo
+---@field currencyType number
+---@field currencyQuantity number
+
+---@class GarrisonTalentInfo
+---@field id number
+---@field ability GarrisonFollowerAbilityInfo
+---@field name string
+---@field icon number
+---@field tier number
+---@field uiOrder number
+---@field type number
+---@field prerequisiteTalentID number|nil
+---@field selected boolean
+---@field researched boolean
+---@field ignoreTalent boolean
+---@field researchDuration number
+---@field startTime number
+---@field timeRemaining number
+---@field researchGoldCost number
+---@field researchCurrencyCosts GarrisonTalentCurrencyCostInfo[]
+---@field talentAvailability GarrisonTalentAvailability
+---@field talentRank number
+---@field talentMaxRank number
+---@field isBeingResearched boolean
+---@field description string
+---@field perkSpellID number
+---@field researchDescription string|nil
+---@field playerConditionReason string|nil
+---@field socketInfo GarrisonTalentSocketInfo
+---@field treeID number
+
+---@class GarrisonTalentSocketInfo
+---@field socketType number
+---@field socketSubtype number
+---@field misc0 number
+---@field misc1 number

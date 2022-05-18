@@ -1,0 +1,17 @@
+---@meta
+---@class CharCustomizationChoice
+---@field id number
+---@field name string
+---@field ineligibleChoice boolean
+---@field isNew boolean
+---@field swatchColor1 ColorMixin|nil
+---@field swatchColor2 ColorMixin|nil
+
+---@class CharCustomizationOption
+---@field id number
+---@field name string
+---@field orderIndex number
+---@field optionType ChrCustomizationOptionType
+---@field choices CharCustomizationChoice[]
+---@field currentChoiceIndex number
+---@field hasNewChoices boolean

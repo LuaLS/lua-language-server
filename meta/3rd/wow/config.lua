@@ -1,9 +1,6 @@
 name    = 'World of Warcraft'
 words   = {'wow.api'}
-files   = {
-    '.*%.toc',
-    '.*%.lua',
-}
+files   = {'.*%.toc'}
 configs = {
     {
         key    = 'Lua.runtime.version',

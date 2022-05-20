@@ -21,3 +21,42 @@ function love.video.newVideoStream(filename) end
 ---
 ---@class love.VideoStream: love.Object
 local VideoStream = {}
+
+---
+---Gets the filename of the VideoStream.
+---
+---@return string filename # The filename of the VideoStream
+function VideoStream:getFilename() end
+
+---
+---Gets whether the VideoStream is playing.
+---
+---@return boolean playing # Whether the VideoStream is playing.
+function VideoStream:isPlaying() end
+
+---
+---Pauses the VideoStream.
+---
+function VideoStream:pause() end
+
+---
+---Plays the VideoStream.
+---
+function VideoStream:play() end
+
+---
+---Rewinds the VideoStream. Synonym to VideoStream:seek(0).
+---
+function VideoStream:rewind() end
+
+---
+---Sets the current playback position of the VideoStream.
+---
+---@param offset number # The time in seconds since the beginning of the VideoStream.
+function VideoStream:seek(offset) end
+
+---
+---Gets the current playback position of the VideoStream.
+---
+---@return number seconds # The number of seconds sionce the beginning of the VideoStream.
+function VideoStream:tell() end

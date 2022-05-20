@@ -186,6 +186,12 @@ function ImageData:paste(source, dx, dy, sx, sy, sw, sh) end
 function ImageData:setPixel(x, y, r, g, b, a) end
 
 ---
+---Gets the pixel format of the ImageData.
+---
+---@return love.PixelFormat format # The pixel format the ImageData was created with.
+function ImageData:getFormat() end
+
+---
 ---Compressed image data formats. Here and here are a couple overviews of many of the formats.
 ---
 ---Unlike traditional PNG or jpeg, these formats stay compressed in RAM and in the graphics card's VRAM. This is good for saving memory space as well as improving performance, since the graphics card will be able to keep more of the image's pixels in its fast-access cache when drawing it.

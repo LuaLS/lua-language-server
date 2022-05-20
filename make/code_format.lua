@@ -7,7 +7,8 @@ lm:source_set 'code_format' {
     rootdir = '../3rd/EmmyLuaCodeStyle',
     includes = {
         "include",
-        "../bee.lua/3rd/lua"
+        "../bee.lua/3rd/lua",
+        "3rd/wildcards/include"
     },
     sources = {
         -- codeFormatLib

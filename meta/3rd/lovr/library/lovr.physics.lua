@@ -1397,6 +1397,18 @@ function World:getLinearDamping() end
 function World:getResponseTime() end
 
 ---
+---Returns the step count of the World.
+---
+---The step count influences how many steps are taken during a call to `World:update`.
+---
+---A higher number of steps will be slower, but more accurate.
+---
+---The default step count is 20.
+---
+---@param steps number # The step count.
+function World:getStepCount(steps) end
+
+---
 ---Returns the tightness of the joint.
 ---
 ---See `World:setTightness` for how this affects the joint.
@@ -1602,6 +1614,18 @@ function World:setResponseTime(responseTime) end
 ---
 ---@param allowed boolean # Whether colliders can sleep.
 function World:setSleepingAllowed(allowed) end
+
+---
+---Sets the step count of the World.
+---
+---The step count influences how many steps are taken during a call to `World:update`.
+---
+---A higher number of steps will be slower, but more accurate.
+---
+---The default step count is 20.
+---
+---@param steps number # The new step count.
+function World:setStepCount(steps) end
 
 ---
 ---Sets the tightness of joints in the World.

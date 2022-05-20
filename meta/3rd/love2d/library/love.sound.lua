@@ -42,6 +42,12 @@ local Decoder = {}
 function Decoder:clone() end
 
 ---
+---Decodes the audio and returns a SoundData object containing the decoded audio data.
+---
+---@return love.SoundData soundData # Decoded audio data.
+function Decoder:decode() end
+
+---
 ---Returns the number of bits per sample.
 ---
 ---@return number bitDepth # Either 8, or 16.
@@ -64,6 +70,12 @@ function Decoder:getDuration() end
 ---
 ---@return number rate # Number of samples per second.
 function Decoder:getSampleRate() end
+
+---
+---Sets the currently playing position of the Decoder.
+---
+---@param offset number # The position to seek to, in seconds.
+function Decoder:seek(offset) end
 
 ---
 ---Contains raw audio samples.

@@ -3,7 +3,7 @@ DIAG_LINE_ONLY_SPACE    =
 DIAG_LINE_POST_SPACE    =
 '後置空格。'
 DIAG_UNUSED_LOCAL       =
-'未使用的局部變數 `{}`。'
+'未使用的區域變數 `{}`。'
 DIAG_UNDEF_GLOBAL       =
 '未定義的全域變數 `{}`。'
 DIAG_UNDEF_FIELD        =
@@ -13,9 +13,9 @@ DIAG_UNDEF_ENV_CHILD    =
 DIAG_UNDEF_FENV_CHILD   =
 '未定義的變數 `{}`（處於模組中）。'
 DIAG_GLOBAL_IN_NIL_ENV  =
-'不能使用全域變數（`_ENV`被置為了`nil`）。'
+'不能使用全域變數（`_ENV`被設為了`nil`）。'
 DIAG_GLOBAL_IN_NIL_FENV =
-'不能使用全域變數（模組被置為了`nil`）。'
+'不能使用全域變數（模組被設為了`nil`）。'
 DIAG_UNUSED_LABEL       =
 '未使用的標籤 `{}`。'
 DIAG_UNUSED_FUNCTION    =
@@ -23,7 +23,7 @@ DIAG_UNUSED_FUNCTION    =
 DIAG_UNUSED_VARARG      =
 '未使用的不定參數。'
 DIAG_REDEFINED_LOCAL    =
-'重定義局部變數 `{}`。'
+'重複定義區域變數 `{}`。'
 DIAG_DUPLICATE_INDEX    =
 '重複的索引 `{}`。'
 DIAG_DUPLICATE_METHOD   =
@@ -33,9 +33,9 @@ DIAG_PREVIOUS_CALL      =
 DIAG_PREFIELD_CALL      =
 '會被直譯為 `{}{}`。你可能需要加一個`,`或`;`。'
 DIAG_OVER_MAX_ARGS      =
-'函式只接收 {:d} 個參數，但你傳了 {:d} 個。'
-DIAG_MISS_ARGS          = -- TODO: need translate!
-'the function received at least {:d} arguments, but got {:d}.'
+'函式最多接收 {:d} 個參數，但獲得了 {:d} 個。'
+DIAG_MISS_ARGS          =
+'函式最少接收 {:d} 個參數，但獲得了 {:d} 個。'
 DIAG_OVER_MAX_VALUES    =
 '只有 {} 個變數，但你設定了 {} 個值。'
 DIAG_AMBIGUITY_1        =
@@ -96,8 +96,8 @@ DIAG_NOT_YIELDABLE      =
 '此函式的第 {} 個參數沒有被標記為可讓出，但是傳入了異步函式。（使用 `---@param name async fun()` 來標記為可讓出）'
 DIAG_DISCARD_RETURNS    =
 '不能丟棄此函式的回傳值。'
-DIAG_NEED_CHECK_NIL     = -- TODO: need translate!
-'Need check nil.'
+DIAG_NEED_CHECK_NIL     =
+'需要判空'
 DIAG_CIRCLE_DOC_CLASS                 =
 '循環繼承的類別。'
 DIAG_DOC_FIELD_NO_CLASS               =
@@ -118,9 +118,9 @@ DIAG_UNKNOWN_DIAG_CODE                =
 '未知的診斷代碼 `{}`。'
 
 MWS_NOT_SUPPORT         =
-'{} 目前還不支援多工作目錄，我可能需要重啟才能支援新的工作目錄...'
+'{} 目前還不支援多工作目錄，我可能需要重新啟動才能支援新的工作目錄...'
 MWS_RESTART             =
-'重啟'
+'重新啟動'
 MWS_NOT_COMPLETE        =
 '工作目錄還沒有準備好，你可以稍後再試一下...'
 MWS_COMPLETE            =
@@ -188,7 +188,7 @@ PARSER_ACTION_AFTER_BREAK =
 PARSER_NO_VISIBLE_LABEL =
 '標籤`{label}`不可見。'
 PARSER_REDEFINE_LABEL   =
-'標籤`{label}`重複定義。'
+'標籤`{label}`重定義。'
 PARSER_UNSUPPORT_SYMBOL =
 '{version} 不支援該符號。'
 PARSER_UNEXPECT_DOTS    =
@@ -200,7 +200,7 @@ PARSER_UNKNOWN_TAG      =
 PARSER_MULTI_TAG        =
 '只能設定一個屬性。'
 PARSER_UNEXPECT_LFUNC_NAME =
-'局部函式只能使用識別符作為名稱。'
+'區域函式只能使用識別符作為名稱。'
 PARSER_UNEXPECT_EFUNC_NAME =
 '函式作為表達式時不能命名。'
 PARSER_ERR_LCOMMENT_END =
@@ -236,7 +236,7 @@ PARSER_MISS_SPACE_BETWEEN =
 PARSER_INDEX_IN_FUNC_NAME =
 '命名函式的名稱中不能使用 `[name]` 形式。'
 PARSER_UNKNOWN_ATTRIBUTE  =
-'局部變數屬性應該是 `const` 或 `close`'
+'區域變數屬性應該是 `const` 或 `close`'
 PARSER_LUADOC_MISS_CLASS_NAME           =
 '缺少類別名稱。'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =
@@ -266,17 +266,17 @@ PARSER_LUADOC_MISS_GENERIC_NAME         =
 PARSER_LUADOC_MISS_GENERIC_EXTENDS_NAME =
 '缺少泛型要繼承的類別名稱。'
 PARSER_LUADOC_MISS_VARARG_TYPE          =
-'缺少不定參的類型定義。'
+'缺少可變參數的類型定義。'
 PARSER_LUADOC_MISS_FUN_AFTER_OVERLOAD   =
 '缺少關鍵字 `fun`。'
 PARSER_LUADOC_MISS_CATE_NAME            =
 '缺少文件類型名稱。'
 PARSER_LUADOC_MISS_DIAG_MODE            =
-'缺少診斷模式'
+'缺少診斷模式。'
 PARSER_LUADOC_ERROR_DIAG_MODE           =
-'診斷模式不正確'
-PARSER_LUADOC_MISS_LOCAL_NAME           = -- TODO: need translate!
-'<local name> expected.'
+'診斷模式不正確。'
+PARSER_LUADOC_MISS_LOCAL_NAME           =
+'缺少變數名。'
 
 SYMBOL_ANONYMOUS        =
 '<匿名函式>'
@@ -284,15 +284,15 @@ SYMBOL_ANONYMOUS        =
 HOVER_VIEW_DOCUMENTS    =
 '查看文件'
 HOVER_DOCUMENT_LUA51    =
-'http://www.lua.org/manual/5.1/manual.html#{}'
+'https://www.lua.org/manual/5.1/manual.html#{}'
 HOVER_DOCUMENT_LUA52    =
-'http://www.lua.org/manual/5.2/manual.html#{}'
+'https://www.lua.org/manual/5.2/manual.html#{}'
 HOVER_DOCUMENT_LUA53    =
 'http://cloudwu.github.io/lua53doc/manual.html#{}'
 HOVER_DOCUMENT_LUA54    =
-'http://www.lua.org/manual/5.4/manual.html#{}'
+'https://www.lua.org/manual/5.4/manual.html#{}'
 HOVER_DOCUMENT_LUAJIT   =
-'http://www.lua.org/manual/5.1/manual.html#{}'
+'https://www.lua.org/manual/5.1/manual.html#{}'
 HOVER_NATIVE_DOCUMENT_LUA51     =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 HOVER_NATIVE_DOCUMENT_LUA52     =
@@ -318,14 +318,14 @@ HOVER_USE_LUA_PATH      =
 HOVER_EXTENDS           =
 '展開為 {}'
 HOVER_TABLE_TIME_UP     =
-'出於效能考慮，已禁用了部分類型推斷。'
+'出於效能考慮，已停用了部分類型推斷。'
 HOVER_WS_LOADING        =
 '正在載入工作目錄：{} / {}'
 HOVER_AWAIT_TOOLTIP     =
 '正在呼叫異步函式，可能會讓出目前共常式'
 
 ACTION_DISABLE_DIAG     =
-'在工作區禁用診斷 ({})。'
+'在工作區停用診斷 ({})。'
 ACTION_MARK_GLOBAL      =
 '標記 `{}` 為已定義的全域變數。'
 ACTION_REMOVE_SPACE     =
@@ -375,14 +375,14 @@ ACTION_FIX_INSERT_SPACE =
 ACTION_JSON_TO_LUA      =
 '把 JSON 轉成 Lua'
 ACTION_DISABLE_DIAG_LINE=
-'在此行禁用診斷 ({})。'
+'在此行停用診斷 ({})。'
 ACTION_DISABLE_DIAG_FILE=
-'在此檔案禁用診斷 ({})。'
+'在此檔案停用診斷 ({})。'
 ACTION_MARK_ASYNC       =
 '將目前函式標記為異步。'
 
 COMMAND_DISABLE_DIAG       =
-'禁用診斷'
+'停用診斷'
 COMMAND_MARK_GLOBAL        =
 '標記全域變數'
 COMMAND_REMOVE_SPACE       =
@@ -403,14 +403,14 @@ COMMAND_JSON_TO_LUA_FAILED =
 COMPLETION_IMPORT_FROM           =
 '從 {} 中導入'
 COMPLETION_DISABLE_AUTO_REQUIRE  =
-'禁用自動require'
+'停用自動require'
 COMPLETION_ASK_AUTO_REQUIRE      =
 '在檔案頂部添加程式碼 require 此檔案？'
 
 DEBUG_MEMORY_LEAK       =
-'{} 很抱歉發生了嚴重的記憶體漏失，語言服務即將重啟。'
+'{} 很抱歉發生了嚴重的記憶體漏失，語言服務即將重新啟動。'
 DEBUG_RESTART_NOW       =
-'立即重啟'
+'立即重新啟動'
 
 WINDOW_COMPILING                 =
 '正在編譯'
@@ -425,7 +425,7 @@ WINDOW_PROCESSING_DEFINITION     =
 WINDOW_PROCESSING_REFERENCE      =
 '正在處理轉到引用...'
 WINDOW_PROCESSING_RENAME         =
-'正在處理重命名...'
+'正在處理重新命名...'
 WINDOW_PROCESSING_COMPLETION     =
 '正在處理自動完成...'
 WINDOW_PROCESSING_SIGNATURE      =
@@ -445,13 +445,13 @@ WINDOW_INCREASE_UPPER_LIMIT      =
 WINDOW_CLOSE                     =
 '關閉'
 WINDOW_SETTING_WS_DIAGNOSTIC     =
-'你可以在設定中延遲或禁用工作目錄診斷'
+'你可以在設定中延遲或停用工作目錄診斷'
 WINDOW_DONT_SHOW_AGAIN           =
 '不再提示'
 WINDOW_DELAY_WS_DIAGNOSTIC       =
 '空閒時診斷（延遲{}秒）'
 WINDOW_DISABLE_DIAGNOSTIC        =
-'禁用工作區診斷'
+'停用工作區診斷'
 WINDOW_LUA_STATUS_WORKSPACE      =
 '工作區：{}'
 WINDOW_LUA_STATUS_CACHED_FILES   =
@@ -474,13 +474,13 @@ WINDOW_APPLY_SETTING             =
 WINDOW_CHECK_SEMANTIC            =
 '如果你正在使用市場中的顏色主題，你可能需要同時修改 `editor.semanticHighlighting.enabled` 選項為 `true` 才會使語義著色生效。'
 WINDOW_TELEMETRY_HINT            =
-'請允許發送匿名的使用資料與錯誤報告，幫助我們進一步完善此延伸模組。在[此處](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%90%E7%A7%81%E5%A3%B0%E6%98%8E)閲讀我們的隱私聲明。'
+'請允許發送匿名的使用資料與錯誤報告，幫助我們進一步完善此延伸模組。在[此處](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%B1%E7%A7%81%E8%81%B2%E6%98%8E)閲讀我們的隱私聲明。'
 WINDOW_TELEMETRY_ENABLE          =
 '允許'
 WINDOW_TELEMETRY_DISABLE         =
 '禁止'
 WINDOW_CLIENT_NOT_SUPPORT_CONFIG =
-'你的客戶端不支援從伺服端修改設定，請手動修改如下設定：'
+'你的使用者端不支援從伺服端修改設定，請手動修改如下設定：'
 WINDOW_LCONFIG_NOT_SUPPORT_CONFIG=
 '暫不支援自動修改本地設定，請手動修改如下設定：'
 WINDOW_MANUAL_CONFIG_ADD         =
@@ -508,7 +508,7 @@ CONFIG_TYPE_ERROR                =
 PLUGIN_RUNTIME_ERROR             =
 [[
 延伸模組發生錯誤，請彙報給延伸模組作者。
-請在輸出或日誌中查看詳細訊息。
+請在輸出或日誌中查看詳細資訊。
 延伸模組路徑：{}
 ]]
 PLUGIN_TRUST_LOAD                =

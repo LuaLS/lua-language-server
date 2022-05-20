@@ -22,7 +22,7 @@ function ssl.set_der_priv_key(der_priv_key) end
 --- This function can be called in any context.
 ---
 ---@param pem_priv_key string
----@return string? priv_key
+---@return ffi.cdata*? priv_key
 ---@return string? error
 function ssl.parse_pem_priv_key(pem_priv_key) end
 
@@ -49,7 +49,7 @@ function ssl.get_tls1_version() end
 ---
 --- Note that this set_cert function will run slightly faster, in terms of CPU cycles wasted, than the set_der_cert variant, since the first function uses opaque cdata pointers which do not require any additional conversion needed to be performed by the SSL library during the SSL handshake.
 ---
----@param cert_chain string
+---@param cert_chain ffi.cdata*
 ---@return boolean ok
 ---@return string? error
 function ssl.set_cert(cert_chain) end
@@ -63,7 +63,7 @@ ssl.TLS1_VERSION=769
 ---
 --- Note that this set_priv_key function will run slightly faster, in terms of CPU cycles wasted, than the set_der_priv_key variant, since the first function uses opaque cdata pointers which do not require any additional conversion needed to be performed by the SSL library during the SSL handshake.
 ---
----@param priv_key string
+---@param priv_key ffi.cdata*
 ---@return boolean ok
 ---@return string? error
 function ssl.set_priv_key(priv_key) end
@@ -174,7 +174,8 @@ function ssl.raw_client_addr() end
 ---
 --- This function can be called in any context.
 ---
----@return string? cert_chain
+---@param pem_cert_chain string
+---@return ffi.cdata*? cert_chain
 ---@return string? error
 function ssl.parse_pem_cert(pem_cert_chain) end
 
@@ -276,7 +277,7 @@ function ssl.cert_pem_to_der(pem_cert_chain) end
 ---
 --- This function was first added in version 0.1.20.
 ---
----@param  ca_certs? any # the CA certificate chain opaque pointer returned by the parse_pem_cert function for the current SSL connection. The list of certificates will be sent to clients. Also, they will be added to trusted store. If omitted, will not send any CA certificate to clients.
+---@param  ca_certs? ffi.cdata* # the CA certificate chain opaque pointer returned by the parse_pem_cert function for the current SSL connection. The list of certificates will be sent to clients. Also, they will be added to trusted store. If omitted, will not send any CA certificate to clients.
 ---@param  depth?  number verification depth in the client certificates chain. If omitted, will use the value specified by ssl_verify_depth.
 ---@return boolean ok
 ---@return string? error

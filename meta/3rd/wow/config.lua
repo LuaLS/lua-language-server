@@ -1,6 +1,10 @@
 name    = 'World of Warcraft'
-words   = {'wow.api'}
-files   = {'.*%.toc'}
+words   = {
+    'wow.api',
+    'hooksecurefunc',
+    'CreateFrame',
+    'LibStub',
+}
 configs = {
     {
         key    = 'Lua.runtime.version',

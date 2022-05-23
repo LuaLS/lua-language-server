@@ -44,7 +44,7 @@ local function loadLocaleFile(filePath)
                 current = nil
             else
                 current.content[#current.content+1] = line
-                if line:sub(1, 2) == '[[' then
+                if line:sub(1, 2) == '[[' and line:sub(-2) ~= ']]' then
                     inLongString = true
                 end
             end

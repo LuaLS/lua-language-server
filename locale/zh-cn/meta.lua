@@ -654,6 +654,8 @@ string.pack                 =
 '返回一个打包了（即以二进制形式序列化） v1, v2 等值的二进制字符串。 字符串 fmt 为打包格式（参见 §6.4.2）。'
 string.packsize             =
 [[返回以指定格式用 $string.pack 打包的字符串的长度。 格式化字符串中不可以有变长选项 's' 或 'z' （参见 §6.4.2）。]]
+string.rep['>5.2']          =
+'返回 `n` 个字符串 `s` 以字符串 `sep` 为分割符连在一起的字符串。 默认的 `sep` 值为空字符串（即没有分割符）。 如果 `n` 不是正数则返回空串。'
 string.rep['<5.1']          =
 '返回 `n` 个字符串 `s` 连在一起的字符串。 如果 `n` 不是正数则返回空串。'
 string.rep['>5.2']          =
@@ -678,36 +680,6 @@ table.maxn                  =
 table.move                  =
 [[
 将元素从表 `a1` 移到表 `a2`。
-```lua
-a2[t],··· =
-a1[f],···,a1[e]
-return a2
-```
-]]
-string.rep['>5.2']          = -- TODO: need translate!
-'Returns a string that is the concatenation of `n` copies of the string `s` separated by the string `sep`.'
-string.rep['<5.1']          = -- TODO: need translate!
-'Returns a string that is the concatenation of `n` copies of the string `s` .'
-string.reverse              = -- TODO: need translate!
-'Returns a string that is the string `s` reversed.'
-string.sub                  = -- TODO: need translate!
-'Returns the substring of the string that starts at `i` and continues until `j`.'
-string.unpack               = -- TODO: need translate!
-'Returns the values packed in string according to the format string `fmt` (see §6.4.2) .'
-string.upper                = -- TODO: need translate!
-'Returns a copy of this string with all lowercase letters changed to uppercase.'
-
-table                       = -- TODO: need translate!
-''
-table.concat                = -- TODO: need translate!
-'Given a list where all elements are strings or numbers, returns the string `list[i]..sep..list[i+1] ··· sep..list[j]`.'
-table.insert                = -- TODO: need translate!
-'Inserts element `value` at position `pos` in `list`.'
-table.maxn                  = -- TODO: need translate!
-'Returns the largest positive numerical index of the given table, or zero if the table has no positive numerical indices.'
-table.move                  = -- TODO: need translate!
-[[
-Moves elements from table `a1` to table `a2`.
 ```lua
 a2[t],··· =
 a1[f],···,a1[e]

@@ -283,6 +283,32 @@ x(1, 2)
 ]]
 
 TEST [[
+---@diagnostic disable: unused-local
+
+---@param a integer
+---@param b integer
+local function f(a, b)
+end
+
+f(...)
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@param a integer
+---@param b integer
+local function f(a, b)
+end
+
+local function return2Numbers()
+    return 1, 2
+end
+
+f(return2Numbers())
+]]
+
+TEST [[
 ---@param a integer
 ---@param b? integer
 local function x(a, b)

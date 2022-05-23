@@ -3,6 +3,7 @@
 ## 3.2.4
 * `FIX` hover: can not union `table` with other basic types
 * `FIX` [#1125](https://github.com/sumneko/lua-language-server/issues/1125)
+* `FIX` [#1131](https://github.com/sumneko/lua-language-server/issues/1131)
 
 ## 3.2.3
 `2022-5-16`

@@ -2308,3 +2308,18 @@ end
 
 local <?z?> = f()
 ]]
+
+TEST 'number|table' [[
+local function returnI()
+    return a + 1
+end
+
+local function f()
+    if x then
+        return returnI()
+    end
+    return {}
+end
+
+local <?z?> = f()
+]]

@@ -1,7 +1,7 @@
 # changelog
 
 ## 3.2.4
-* `FIX` hover: can not union `unknown` with other types
+* `FIX` hover: can not union `table` with other basic types
 
 ## 3.2.3
 `2022-5-16`

@@ -530,6 +530,7 @@ local function bindAs(source)
     return false
 end
 
+-- 该函数有副作用，会给source绑定node！
 local function bindDocs(source)
     local isParam = source.parent.type == 'funcargs'
                  or source.parent.type == 'in'
@@ -565,12 +566,12 @@ local function bindDocs(source)
             local name = doc.module
             local uri = rpath.findUrisByRequirePath(guide.getUri(source), name)[1]
             if not uri then
-                return nil
+                return true
             end
             local state = files.getState(uri)
             local ast   = state and state.ast
             if not ast then
-                return nil
+                return true
             end
             vm.setNode(source, vm.compileNode(ast))
             return true
@@ -1815,6 +1816,7 @@ local function compileByGlobal(source)
                     end
                 end
             end
+            vm.setNode(set, globalNode)
         end
     end
     if global.cate == 'type' then

@@ -2297,3 +2297,14 @@ end
 
 print(<?t?>)
 ]]
+
+TEST 'table|unknown' [[
+local function f()
+    if x then
+        return y
+    end
+    return {}
+end
+
+local <?z?> = f()
+]]

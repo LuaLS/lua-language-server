@@ -76,7 +76,9 @@ local viewNodeSwitch = util.switch()
     : case 'global'
     : call(function (source, infer)
         if source.cate == 'type' then
-            infer._hasClass = true
+            if source.name ~= 'unknown' then
+                infer._hasClass = true
+            end
             if source.name == 'number' then
                 infer._hasNumber = true
             end

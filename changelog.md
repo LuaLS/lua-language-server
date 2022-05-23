@@ -1,5 +1,8 @@
 # changelog
 
+## 3.2.4
+* `FIX` hover: can not union `unknown` with other types
+
 ## 3.2.3
 `2022-5-16`
 * `CHG` parse `.luarc.json` as jsonc. In order to please the editor, it also supports `.luarc.jsonc` as the file name.

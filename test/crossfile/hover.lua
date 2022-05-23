@@ -1137,3 +1137,24 @@ TEST {
 (async) (method) C:f(a: any)
 ```]]
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@class Apple
+            ---The color of your awesome apple!
+            ---@field color string
+            local Apple = {}
+
+            Apple.<?color?>
+        ]]
+    },
+    hover = [[
+```lua
+(field) Apple.color: string
+```
+
+---
+The color of your awesome apple!]]
+}

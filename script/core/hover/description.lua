@@ -229,14 +229,13 @@ local function getBindEnums(source, docGroup)
 end
 
 local function tryDocFieldUpComment(source)
-    if source.type ~= 'doc.field.name' then
+    if source.type ~= 'doc.field' then
         return
     end
-    local docField = source.parent
-    if not docField.bindGroup then
+    if not source.bindGroup then
         return
     end
-    local comment = getBindComment(docField, docField.bindGroup, docField)
+    local comment = getBindComment(source, source.bindGroup, source)
     return comment
 end
 

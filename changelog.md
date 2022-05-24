@@ -4,6 +4,7 @@
 * `NEW` settings:
   + `workspace.supportScheme`: `["file", "untitled", "git"]`
   + `diagnostics.disableScheme`: `["git"]`
+* `NEW` folding: support folding `---@alias`
 * `FIX` hover: can not union `table` with other basic types
 * `FIX` [#1125](https://github.com/sumneko/lua-language-server/issues/1125)
 * `FIX` [#1131](https://github.com/sumneko/lua-language-server/issues/1131)

@@ -143,6 +143,15 @@ local care = {
         }
         results[#results+1] = folding
     end,
+    ['doc.alias'] = function (source, text, results)
+        local folding = {
+            start        = source.start,
+            finish       = source.bindGroup[#source.bindGroup].finish,
+            kind         = 'comment',
+            hideLastLine = true,
+        }
+        results[#results+1] = folding
+    end
 }
 
 ---@async

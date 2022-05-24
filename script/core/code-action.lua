@@ -333,6 +333,8 @@ local function solveAwaitInSync(uri, diag, results)
     end
     local row = guide.rowColOf(parentFunction.start)
     local pos = guide.positionOf(row, 0)
+    local offset = guide.positionToOffset(state, pos + 1)
+    local space = state.lua:match('[ \t]*', offset)
     results[#results+1] = {
         title = lang.script.ACTION_MARK_ASYNC,
         kind = 'quickfix',
@@ -342,7 +344,7 @@ local function solveAwaitInSync(uri, diag, results)
                     {
                         start   = pos,
                         finish  = pos,
-                        newText = '---@async\n',
+                        newText = space .. '---@async\n',
                     }
                 }
             }

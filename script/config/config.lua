@@ -434,7 +434,7 @@ function m.update(scp, ...)
 
     local news = table.pack(...)
     for i = 1, news.n do
-        if news[i] then
+        if type(news[i]) == 'table' then
             expand(news[i])
         end
     end

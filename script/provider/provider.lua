@@ -238,7 +238,7 @@ m.register 'textDocument/didOpen' {
     function (params)
         local doc    = params.textDocument
         local scheme = furi.split(doc.uri)
-        if scheme ~= 'file' then
+        if scheme ~= 'file' and scheme ~= 'untitled' then
             return
         end
         local uri    = files.getRealUri(doc.uri)
@@ -267,7 +267,7 @@ m.register 'textDocument/didChange' {
     function (params)
         local doc     = params.textDocument
         local scheme = furi.split(doc.uri)
-        if scheme ~= 'file' then
+        if scheme ~= 'file' and scheme ~= 'untitled' then
             return
         end
         local changes = params.contentChanges

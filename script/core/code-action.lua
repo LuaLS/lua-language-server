@@ -350,6 +350,51 @@ local function solveAwaitInSync(uri, diag, results)
     }
 end
 
+local function solveSpell(uri, diag, results)
+    local spell = require 'provider.spell'
+    local word = diag.data
+    if word == nil then
+        return
+    end
+
+    results[#results+1] = {
+        title   = lang.script('ACTION_ADD_DICT', word),
+        kind    = 'quickfix',
+        command = {
+            title     = lang.script.COMMAND_ADD_DICT,
+            command   = 'lua.setConfig',
+            arguments = {
+                {
+                    key    = 'Lua.spell.dict',
+                    action = 'add',
+                    value  = word,
+                    uri    = uri,
+                }
+            }
+        }
+    }
+
+    local suggests = spell.getSpellSuggest(word)
+    for _, suggest in ipairs(suggests) do
+        results[#results+1] = {
+            title = suggest,
+            kind = 'quickfix',
+            edit = {
+                changes = {
+                    [uri] = {
+                        {
+                            start   = converter.unpackPosition(uri, diag.range.start),
+                            finish  = converter.unpackPosition(uri, diag.range["end"]),
+                            newText = suggest
+                        }
+                    }
+                }
+            }
+        }
+    end
+
+end
+
 local function solveDiagnostic(uri, diag, start, results)
     if diag.source == lang.script.DIAG_SYNTAX_CHECK then
         solveSyntax(uri, diag, results)
@@ -370,6 +415,8 @@ local function solveDiagnostic(uri, diag, start, results)
         solveTrailingSpace(uri, diag, results)
     elseif diag.code == 'await-in-sync' then
         solveAwaitInSync(uri, diag, results)
+    elseif diag.code == 'spell-check' then
+        solveSpell(uri, diag, results)
     end
     disableDiagnostic(uri, diag.code, start, results)
 end

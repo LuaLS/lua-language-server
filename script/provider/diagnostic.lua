@@ -14,6 +14,7 @@ local loading   = require 'workspace.loading'
 local scope     = require 'workspace.scope'
 local time      = require 'bee.time'
 local ltable    = require 'linked-table'
+local furi      = require 'file-uri'
 
 ---@class diagnosticProvider
 local m = {}
@@ -216,6 +217,11 @@ function m.doDiagnostic(uri, isScopeDiag)
                 return
             end
         end
+    end
+    local scheme = furi.split(uri)
+    local disableScheme = config.get(uri, 'Lua.diagnostics.disableScheme')
+    if disableScheme[scheme] then
+        return
     end
 
     await.delay()

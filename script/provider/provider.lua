@@ -236,9 +236,10 @@ m.register 'workspace/didRenameFiles' {
 
 m.register 'textDocument/didOpen' {
     function (params)
-        local doc    = params.textDocument
-        local scheme = furi.split(doc.uri)
-        if scheme ~= 'file' and scheme ~= 'untitled' then
+        local doc      = params.textDocument
+        local scheme   = furi.split(doc.uri)
+        local supports = config.get(doc.uri, 'Lua.workspace.supportScheme')
+        if not supports[scheme] then
             return
         end
         local uri    = files.getRealUri(doc.uri)
@@ -265,9 +266,10 @@ m.register 'textDocument/didClose' {
 
 m.register 'textDocument/didChange' {
     function (params)
-        local doc     = params.textDocument
-        local scheme = furi.split(doc.uri)
-        if scheme ~= 'file' and scheme ~= 'untitled' then
+        local doc      = params.textDocument
+        local scheme   = furi.split(doc.uri)
+        local supports = config.get(doc.uri, 'Lua.workspace.supportScheme')
+        if not supports[scheme] then
             return
         end
         local changes = params.contentChanges

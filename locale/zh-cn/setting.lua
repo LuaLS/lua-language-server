@@ -64,6 +64,8 @@ config.diagnostics.files.Opened   =
 "只有打开这些文件时才会诊断。"
 config.diagnostics.files.Disable  =
 "不诊断这些文件。"
+config.diagnostics.disableScheme  =
+'不诊断使用以下 scheme 的lua文件。'
 config.workspace.ignoreDir        =
 "忽略的文件与目录（使用 `.gitignore` 语法）。"
 config.workspace.ignoreSubmodules =
@@ -89,6 +91,8 @@ config.workspace.checkThirdParty  =
 ]]
 config.workspace.userThirdParty          =
 '在这里添加私有的第三方库适配文件路径，请参考内置的[配置文件路径](https://github.com/sumneko/lua-language-server/tree/master/meta/3rd)'
+config.workspace.supportScheme           =
+'为以下 scheme 的lua文件提供语言服务。'
 config.completion.enable                 =
 '启用自动完成。'
 config.completion.callSnippet            =

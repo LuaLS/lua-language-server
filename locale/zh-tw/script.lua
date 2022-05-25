@@ -142,6 +142,10 @@ WORKSPACE_DIAGNOSTIC      =
 '正在對工作目錄進行診斷'
 WORKSPACE_SKIP_HUGE_FILE  =
 '出於效能考慮，已停止對此檔案解析：{}'
+WORKSPACE_NOT_ALLOWED     = -- TODO: need translate!
+'Your workspace is set to `{}`. Lua language server refused to load this directory. Please check your configuration.[learn more here](https://github.com/sumneko/lua-language-server/wiki/Why-scanning-home-folder)'
+WORKSPACE_SCAN_TOO_MUCH   = -- TODO: need translate!
+'More than {} files have been scanned. The current scanned directory is `{}`. Please confirm whether the configuration is correct.'
 
 PARSER_CRASH            =
 '語法解析崩潰了！遺言：{}'

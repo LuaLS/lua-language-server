@@ -164,8 +164,9 @@ function mt:getRelativePath(path)
 end
 
 ---@param callback async fun(path: string)
+---@param hook? async fun(ev: string, ...)
 ---@async
-function mt:scan(path, callback)
+function mt:scan(path, callback, hook)
     local files = {}
     if type(callback) ~= 'function' then
         callback = nil
@@ -203,6 +204,9 @@ function mt:scan(path, callback)
             break
         end
         list[#list] = nil
+        if hook then
+            hook('scan', current)
+        end
         if not self:simpleMatch(current) then
             check(current)
         end

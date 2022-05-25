@@ -142,6 +142,10 @@ WORKSPACE_DIAGNOSTIC      =
 'Diagnosing workspace'
 WORKSPACE_SKIP_HUGE_FILE  =
 'For performance reasons, the parsing of this file has been stopped: {}'
+WORKSPACE_NOT_ALLOWED     =
+'Your workspace is set to `{}`. Lua language server refused to load this directory. Please check your configuration.[learn more here](https://github.com/sumneko/lua-language-server/wiki/Why-scanning-home-folder)'
+WORKSPACE_SCAN_TOO_MUCH   =
+'More than {} files have been scanned. The current scanned directory is `{}`. Please confirm whether the configuration is correct.'
 
 PARSER_CRASH            =
 'Parser crashed! Last words:{}'

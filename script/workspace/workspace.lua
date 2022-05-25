@@ -13,6 +13,7 @@ local fw         = require 'filewatch'
 local scope      = require 'workspace.scope'
 local loading    = require 'workspace.loading'
 local inspect    = require 'inspect'
+local lang       = require 'language'
 
 ---@class workspace
 local m = {}
@@ -46,6 +47,11 @@ end
 --- 初始化工作区
 function m.create(uri)
     log.info('Workspace create: ', uri)
+    if uri == furi.encode '/'
+    or uri == furi.encode(os.getenv 'HOME') then
+        client.showMessage('Error', lang.script('WORKSPACE_NOT_ALLOWED', furi.decode(uri)))
+        return
+    end
     local path = m.normalize(furi.decode(uri))
     fw.watch(path)
     local scp = scope.createFolder(uri)
@@ -283,22 +289,34 @@ function m.awaitPreload(scp)
 
     if scp.uri then
         log.info('Scan files at:', scp:getName())
+        local count = 0
         ---@async
         native:scan(furi.decode(scp.uri), function (path)
             local uri = files.getRealUri(furi.encode(path))
             scp:get('cachedUris')[uri] = true
             ld:loadFile(uri)
+        end, function () ---@async
+            count = count + 1
+            if count == 100000 then
+                client.showMessage('Warning', lang.script('WORKSPACE_SCAN_TOO_MUCH', count, furi.decode(scp.uri)))
+            end
         end)
     end
 
     for _, libMatcher in ipairs(librarys) do
         log.info('Scan library at:', libMatcher.uri)
+        local count = 0
         scp:addLink(libMatcher.uri)
         ---@async
         libMatcher.matcher:scan(furi.decode(libMatcher.uri), function (path)
             local uri = files.getRealUri(furi.encode(path))
             scp:get('cachedUris')[uri] = true
             ld:loadFile(uri, libMatcher.uri)
+        end, function () ---@async
+            count = count + 1
+            if count == 100000 then
+                client.showMessage('Warning', lang.script('WORKSPACE_SCAN_TOO_MUCH', count, furi.decode(libMatcher.uri)))
+            end
         end)
         scp:gc(fw.watch(furi.decode(libMatcher.uri)))
     end
@@ -353,6 +371,7 @@ function m.normalize(path)
     if platform.OS == 'Windows' then
         path = path:gsub('[/\\]+', '\\')
                    :gsub('[/\\]+$', '')
+                   :gsub('^(%a:)$', '%1\\')
     else
         path = path:gsub('[/\\]+', '/')
                    :gsub('[/\\]+$', '')

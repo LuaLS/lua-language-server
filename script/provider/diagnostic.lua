@@ -16,6 +16,7 @@ local time      = require 'bee.time'
 local ltable    = require 'linked-table'
 local furi      = require 'file-uri'
 local json      = require 'json'
+local fw        = require 'filewatch'
 
 ---@class diagnosticProvider
 local m = {}
@@ -154,6 +155,18 @@ end
 -- enable `push` and `send`
 function m.clearCache(uri)
     m.cache[uri] = false
+end
+
+function m.clearCacheExcept(uris)
+    local excepts = {}
+    for _, uri in ipairs(uris) do
+        excepts[uri] = true
+    end
+    for uri in pairs(m.cache) do
+        if not excepts[uri] then
+            m.cache[uri] = false
+        end
+    end
 end
 
 function m.clearAll()
@@ -309,14 +322,14 @@ end
 ---@return boolean? unchanged
 function m.pullDiagnostic(uri, isScopeDiag)
     if not isValid(uri) then
-        return nil
+        return nil, util.equal(m.cache[uri], nil)
     end
 
     await.delay()
 
     local state = files.getState(uri)
     if not state then
-        return nil
+        return nil, util.equal(m.cache[uri], nil)
     end
 
     local prog <close> = progress.create(uri, lang.script.WINDOW_DIAGNOSING, 0.5)
@@ -330,6 +343,7 @@ function m.pullDiagnostic(uri, isScopeDiag)
     end)
 
     local full = mergeDiags(syntax, diags)
+
     if util.equal(m.cache[uri], full) then
         return full, true
     end
@@ -411,7 +425,7 @@ local function askForDisable(uri)
 end
 
 ---@async
-function m.awaitDiagnosticsScope(suri)
+function m.awaitDiagnosticsScope(suri, callback)
     local scp = scope.getScope(suri)
     while loading.count() > 0 do
         await.sleep(1.0)
@@ -445,7 +459,7 @@ function m.awaitDiagnosticsScope(suri)
         i = i + 1
         bar:setMessage(('%d/%d'):format(i, #uris))
         bar:setPercentage(i / #uris * 100)
-        xpcall(m.doDiagnostic, log.error, uri, true)
+        callback(uri)
         await.delay()
         if cancelled then
             log.info('Break workspace diagnostics')
@@ -468,8 +482,56 @@ function m.diagnosticsScope(uri, force)
     local id = 'diagnosticsScope:' .. scp:getName()
     await.close(id)
     await.call(function () ---@async
-        m.awaitDiagnosticsScope(uri)
+        m.awaitDiagnosticsScope(uri, function (fileUri)
+            xpcall(m.doDiagnostic, log.error, fileUri, true)
+        end)
     end, id)
+end
+
+---@async
+function m.pullDiagnosticScope()
+    local results = {}
+    local processing = 0
+
+    for _, scp in ipairs(scope.folders) do
+        if  ws.isReady(scp.uri)
+        and config.get(scp.uri, 'Lua.diagnostics.enable') then
+            local id = 'diagnosticsScope:' .. scp:getName()
+            await.close(id)
+            await.call(function () ---@async
+                processing = processing + 1
+                local _ <close> = util.defer(function ()
+                    processing = processing - 1
+                end)
+
+                local delay = config.get(scp.uri, 'Lua.diagnostics.workspaceDelay') / 1000
+                if delay < 0 then
+                    return
+                end
+                print(delay)
+                await.sleep(math.max(delay, 0.2))
+                print('start')
+
+                m.awaitDiagnosticsScope(scp.uri, function (fileUri)
+                    local suc, result, unchanged = xpcall(m.pullDiagnostic, log.error, fileUri, true)
+                    if suc then
+                        results[#results+1] = {
+                            uri       = fileUri,
+                            result    = result,
+                            unchanged = unchanged,
+                            version   = files.getVersion(fileUri),
+                        }
+                    end
+                end)
+            end, id)
+        end
+    end
+
+    while processing > 0 do
+        await.sleep(0.1)
+    end
+
+    return results
 end
 
 ---@param uri uri
@@ -479,12 +541,17 @@ function m.getOwner(uri)
     return 'client'
 end
 
+function m.refreshClient()
+    log.debug('Refresh client diagnostics')
+    proto.request('workspace/diagnostic/refresh', json.null)
+end
+
 ws.watch(function (ev, uri)
     if ev == 'reload' then
         if m.getOwner(uri) == 'server' then
             m.diagnosticsScope(uri)
         else
-            proto.request('workspace/diagnostic/refresh', json.null)
+            m.refreshClient()
         end
     end
 end)
@@ -517,7 +584,19 @@ config.watch(function (uri, key, value, oldValue)
             if m.getOwner(uri) == 'server' then
                 m.diagnosticsScope(uri)
             else
-                proto.request('workspace/diagnostic/refresh', json.null)
+                m.refreshClient()
+            end
+        end
+    end
+end)
+
+fw.event(function (ev, path)
+    if util.stringEndWith(path, '.editorconfig') then
+        for _, scp in ipairs(ws.folders) do
+            if m.getOwner(scp.uri) == 'server' then
+                m.diagnosticsScope(scp.uri)
+            else
+                m.refreshClient()
             end
         end
     end

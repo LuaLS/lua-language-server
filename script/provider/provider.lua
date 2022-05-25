@@ -1244,6 +1244,46 @@ m.register 'textDocument/diagnostic' {
     end
 }
 
+m.register 'workspace/diagnostic' {
+    capability = {
+        diagnosticProvider = {
+            workspaceDiagnostics  = true,
+        }
+    },
+    ---@async
+    function (params)
+        local core = require 'provider.diagnostic'
+        local excepts = {}
+        for _, id in ipairs(params.previousResultIds) do
+            excepts[#excepts+1] = id.value
+        end
+        core.clearCacheExcept(excepts)
+        local results = core.pullDiagnosticScope()
+        local items = {}
+        for i, result in ipairs(results) do
+            if result.unchanged then
+                items[i] = {
+                    kind     = 'unchanged',
+                    resultId = result.uri,
+                    uri      = result.uri,
+                    version  = result.version,
+                }
+            else
+                items[i] = {
+                    kind     = 'full',
+                    resultId = result.uri,
+                    items    = result.result or {},
+                    uri      = result.uri,
+                    version  = result.version,
+                }
+            end
+        end
+        return {
+            items = items,
+        }
+    end
+}
+
 local function refreshStatusBar()
     local valid = config.get(nil, 'Lua.window.statusBar')
     for _, scp in ipairs(workspace.folders) do

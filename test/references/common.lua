@@ -184,3 +184,13 @@ local <~t~>
 --b.<~x~> = 1
 --c.<!x!> = 1
 --]]
+
+TEST [[
+---@class a
+local a = { }
+---@class b
+local b = { }
+
+a.color = { 1, 1, 1 }
+b.<~color~> = a.color
+]]

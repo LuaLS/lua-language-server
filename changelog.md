@@ -1,12 +1,14 @@
 # changelog
 
 ## 3.2.4
+`2022-5-25`
 * `NEW` settings:
   + `workspace.supportScheme`: `["file", "untitled", "git"]`
   + `diagnostics.disableScheme`: `["git"]`
 * `NEW` folding: support folding `---@alias`
 * `CHG` if `rootUri` or `workspaceFolder` is set to `ROOT` or `HOME`, this extension will refuse to load these directories and show an error message.
 * `CHG` show warning message when scanning more than 100,000 files.
+* `CHG` upgrade [LSP](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/) to `3.17`
 * `FIX` hover: can not union `table` with other basic types
 * `FIX` [#1125](https://github.com/sumneko/lua-language-server/issues/1125)
 * `FIX` [#1131](https://github.com/sumneko/lua-language-server/issues/1131)

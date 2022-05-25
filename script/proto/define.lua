@@ -260,6 +260,7 @@ m.TokenTypes = {
     ["number"]        = 19,
     ["regexp"]        = 20,
     ["operator"]      = 21,
+    ["decorator"]     = 22,
 }
 
 m.BuiltIn = {

@@ -15,6 +15,7 @@ local scope     = require 'workspace.scope'
 local time      = require 'bee.time'
 local ltable    = require 'linked-table'
 local furi      = require 'file-uri'
+local json      = require 'json'
 
 ---@class diagnosticProvider
 local m = {}
@@ -194,33 +195,43 @@ local function copyDiagsWithoutSyntax(diags)
 end
 
 ---@async
-function m.doDiagnostic(uri, isScopeDiag)
+---@param uri uri
+---@return boolean
+local function isValid(uri)
     if not config.get(uri, 'Lua.diagnostics.enable') then
-        return
+        return false
     end
     if files.isLibrary(uri, true) then
         local status = config.get(uri, 'Lua.diagnostics.libraryFiles')
         if status == 'Disable' then
-            return
+            return false
         elseif status == 'Opened' then
             if not files.isOpen(uri) then
-                return
+                return false
             end
         end
     end
     if ws.isIgnored(uri) then
         local status = config.get(uri, 'Lua.diagnostics.ignoredFiles')
         if status == 'Disable' then
-            return
+            return false
         elseif status == 'Opened' then
             if not files.isOpen(uri) then
-                return
+                return false
             end
         end
     end
     local scheme = furi.split(uri)
     local disableScheme = config.get(uri, 'Lua.diagnostics.disableScheme')
     if disableScheme[scheme] then
+        return false
+    end
+    return true
+end
+
+---@async
+function m.doDiagnostic(uri, isScopeDiag)
+    if not isValid(uri) then
         return
     end
 
@@ -291,6 +302,41 @@ function m.doDiagnostic(uri, isScopeDiag)
 
     lastDiag = nil
     pushResult()
+end
+
+---@async
+---@return table|nil result
+---@return boolean? unchanged
+function m.pullDiagnostic(uri, isScopeDiag)
+    if not isValid(uri) then
+        return nil
+    end
+
+    await.delay()
+
+    local state = files.getState(uri)
+    if not state then
+        return nil
+    end
+
+    local prog <close> = progress.create(uri, lang.script.WINDOW_DIAGNOSING, 0.5)
+    prog:setMessage(ws.getRelativePath(uri))
+
+    local syntax = m.syntaxErrors(uri, state)
+    local diags = {}
+
+    xpcall(core, log.error, uri, isScopeDiag, function (result)
+        diags[#diags+1] = buildDiagnostic(uri, result)
+    end)
+
+    local full = mergeDiags(syntax, diags)
+    if util.equal(m.cache[uri], full) then
+        return full, true
+    end
+
+    m.cache[uri] = full
+
+    return full
 end
 
 function m.refresh(uri)
@@ -426,13 +472,27 @@ function m.diagnosticsScope(uri, force)
     end, id)
 end
 
+---@param uri uri
+---@return 'server' | 'client'
+function m.getOwner(uri)
+    --TODO
+    return 'client'
+end
+
 ws.watch(function (ev, uri)
     if ev == 'reload' then
-        m.diagnosticsScope(uri)
+        if m.getOwner(uri) == 'server' then
+            m.diagnosticsScope(uri)
+        else
+            proto.request('workspace/diagnostic/refresh', json.null)
+        end
     end
 end)
 
 files.watch(function (ev, uri) ---@async
+    if m.getOwner(uri) == 'client' then
+        return
+    end
     if ev == 'remove' then
         m.clear(uri)
         m.refresh(uri)
@@ -454,7 +514,11 @@ end)
 config.watch(function (uri, key, value, oldValue)
     if key:find 'Lua.diagnostics' then
         if value ~= oldValue then
-            m.diagnosticsScope(uri)
+            if m.getOwner(uri) == 'server' then
+                m.diagnosticsScope(uri)
+            else
+                proto.request('workspace/diagnostic/refresh', json.null)
+            end
         end
     end
 end)

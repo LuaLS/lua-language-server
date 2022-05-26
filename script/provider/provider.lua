@@ -1213,6 +1213,7 @@ m.register 'inlayHint/resolve' {
 }
 
 m.register 'textDocument/diagnostic' {
+    preview = true,
     capability = {
         diagnosticProvider = {
             identifier            = 'identifier',
@@ -1245,9 +1246,10 @@ m.register 'textDocument/diagnostic' {
 }
 
 m.register 'workspace/diagnostic' {
+    preview = true,
     capability = {
         diagnosticProvider = {
-            workspaceDiagnostics  = true,
+            workspaceDiagnostics  = false,
         }
     },
     ---@async
@@ -1258,18 +1260,16 @@ m.register 'workspace/diagnostic' {
             excepts[#excepts+1] = id.value
         end
         core.clearCacheExcept(excepts)
-        local results = core.pullDiagnosticScope()
-        local items = {}
-        for i, result in ipairs(results) do
+        local function convertItem(result)
             if result.unchanged then
-                items[i] = {
+                return {
                     kind     = 'unchanged',
                     resultId = result.uri,
                     uri      = result.uri,
                     version  = result.version,
                 }
             else
-                items[i] = {
+                return {
                     kind     = 'full',
                     resultId = result.uri,
                     items    = result.result or {},
@@ -1278,9 +1278,17 @@ m.register 'workspace/diagnostic' {
                 }
             end
         end
-        return {
-            items = items,
-        }
+        core.pullDiagnosticScope(function (result)
+            proto.notify('$/progress', {
+                token = params.partialResultToken,
+                value = {
+                    items = {
+                        convertItem(result)
+                    }
+                }
+            })
+        end)
+        return { items = {} }
     end
 }
 

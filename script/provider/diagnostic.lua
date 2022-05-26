@@ -489,8 +489,7 @@ function m.diagnosticsScope(uri, force)
 end
 
 ---@async
-function m.pullDiagnosticScope()
-    local results = {}
+function m.pullDiagnosticScope(callback)
     local processing = 0
 
     for _, scp in ipairs(scope.folders) do
@@ -515,7 +514,7 @@ function m.pullDiagnosticScope()
                 m.awaitDiagnosticsScope(scp.uri, function (fileUri)
                     local suc, result, unchanged = xpcall(m.pullDiagnostic, log.error, fileUri, true)
                     if suc then
-                        results[#results+1] = {
+                        callback {
                             uri       = fileUri,
                             result    = result,
                             unchanged = unchanged,
@@ -527,18 +526,21 @@ function m.pullDiagnosticScope()
         end
     end
 
-    while processing > 0 do
-        await.sleep(0.1)
+    -- sleep for ever
+    while true do
+        await.sleep(1.0)
     end
-
-    return results
 end
 
 ---@param uri uri
 ---@return 'server' | 'client'
 function m.getOwner(uri)
-    --TODO
-    return 'client'
+    -- TODO
+    if PREVIEW then
+        return 'client'
+    else
+        return 'server'
+    end
 end
 
 function m.refreshClient()

@@ -532,18 +532,6 @@ function m.pullDiagnosticScope(callback)
     end
 end
 
----@param uri uri
----@return 'server' | 'client'
-function m.getOwner(uri)
-    -- TODO
-    do return 'server' end
-    if PREVIEW then
-        return 'client'
-    else
-        return 'server'
-    end
-end
-
 function m.refreshClient()
     log.debug('Refresh client diagnostics')
     proto.request('workspace/diagnostic/refresh', json.null)
@@ -551,18 +539,12 @@ end
 
 ws.watch(function (ev, uri)
     if ev == 'reload' then
-        if m.getOwner(uri) == 'server' then
-            m.diagnosticsScope(uri)
-        else
-            m.refreshClient()
-        end
+        m.diagnosticsScope(uri)
+        m.refreshClient()
     end
 end)
 
 files.watch(function (ev, uri) ---@async
-    if m.getOwner(uri) == 'client' then
-        return
-    end
     if ev == 'remove' then
         m.clear(uri)
         m.refresh(uri)
@@ -584,11 +566,8 @@ end)
 config.watch(function (uri, key, value, oldValue)
     if key:find 'Lua.diagnostics' then
         if value ~= oldValue then
-            if m.getOwner(uri) == 'server' then
-                m.diagnosticsScope(uri)
-            else
-                m.refreshClient()
-            end
+            m.diagnosticsScope(uri)
+            m.refreshClient()
         end
     end
 end)
@@ -596,11 +575,8 @@ end)
 fw.event(function (ev, path)
     if util.stringEndWith(path, '.editorconfig') then
         for _, scp in ipairs(ws.folders) do
-            if m.getOwner(scp.uri) == 'server' then
-                m.diagnosticsScope(scp.uri)
-            else
-                m.refreshClient()
-            end
+            m.diagnosticsScope(scp.uri)
+            m.refreshClient()
         end
     end
 end)

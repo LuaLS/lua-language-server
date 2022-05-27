@@ -1213,35 +1213,43 @@ m.register 'inlayHint/resolve' {
 }
 
 m.register 'textDocument/diagnostic' {
-    --preview = true,
-    --capability = {
-    --    diagnosticProvider = {
-    --        identifier            = 'identifier',
-    --        interFileDependencies = true,
-    --        workspaceDiagnostics  = false,
-    --    }
-    --},
+    preview = true,
+    capability = {
+        diagnosticProvider = {
+            identifier            = 'identifier',
+            interFileDependencies = true,
+            workspaceDiagnostics  = false,
+        }
+    },
     ---@async
     function (params)
         local uri = files.getRealUri(params.textDocument.uri)
         workspace.awaitReady(uri)
         local core = require 'provider.diagnostic'
-        if not params.previousResultId then
-            core.clearCache(uri)
-        end
-        local results, unchanged = core.pullDiagnostic(uri, false)
-        if unchanged then
-            return {
-                kind = 'unchanged',
-                resultId = uri,
-            }
-        else
-            return {
-                kind = 'full',
-                resultId = uri,
-                items = results or {},
-            }
-        end
+        -- TODO: do some trick
+        core.refresh(uri)
+
+        return {
+            kind = 'unchanged',
+            resultId = uri,
+        }
+
+        --if not params.previousResultId then
+        --    core.clearCache(uri)
+        --end
+        --local results, unchanged = core.pullDiagnostic(uri, false)
+        --if unchanged then
+        --    return {
+        --        kind = 'unchanged',
+        --        resultId = uri,
+        --    }
+        --else
+        --    return {
+        --        kind = 'full',
+        --        resultId = uri,
+        --        items = results or {},
+        --    }
+        --end
     end
 }
 

@@ -384,6 +384,8 @@ ACTION_DISABLE_DIAG_FILE=
 'Disable diagnostics in this file ({}).'
 ACTION_MARK_ASYNC       =
 'Mark current function as async.'
+ACTION_ADD_DICT         = 
+'Add \'{}\' to workspace dict'
 
 COMMAND_DISABLE_DIAG       =
 'Disable diagnostics'
@@ -403,7 +405,8 @@ COMMAND_JSON_TO_LUA        =
 'Convert JSON to Lua'
 COMMAND_JSON_TO_LUA_FAILED =
 'Convert JSON to Lua failed: {}'
-
+COMMAND_ADD_DICT           =
+'Add Word to dictionary'
 COMPLETION_IMPORT_FROM           =
 'Import from {}'
 COMPLETION_DISABLE_AUTO_REQUIRE  =

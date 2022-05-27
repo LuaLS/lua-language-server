@@ -1213,14 +1213,14 @@ m.register 'inlayHint/resolve' {
 }
 
 m.register 'textDocument/diagnostic' {
-    preview = true,
-    capability = {
-        diagnosticProvider = {
-            identifier            = 'identifier',
-            interFileDependencies = true,
-            workspaceDiagnostics  = false,
-        }
-    },
+    --preview = true,
+    --capability = {
+    --    diagnosticProvider = {
+    --        identifier            = 'identifier',
+    --        interFileDependencies = true,
+    --        workspaceDiagnostics  = false,
+    --    }
+    --},
     ---@async
     function (params)
         local uri = files.getRealUri(params.textDocument.uri)
@@ -1246,12 +1246,12 @@ m.register 'textDocument/diagnostic' {
 }
 
 m.register 'workspace/diagnostic' {
-    preview = true,
-    capability = {
-        diagnosticProvider = {
-            workspaceDiagnostics  = false,
-        }
-    },
+    --preview = true,
+    --capability = {
+    --    diagnosticProvider = {
+    --        workspaceDiagnostics  = false,
+    --    }
+    --},
     ---@async
     function (params)
         local core = require 'provider.diagnostic'

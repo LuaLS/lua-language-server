@@ -536,6 +536,7 @@ end
 ---@return 'server' | 'client'
 function m.getOwner(uri)
     -- TODO
+    do return 'server' end
     if PREVIEW then
         return 'client'
     else

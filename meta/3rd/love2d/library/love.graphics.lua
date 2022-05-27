@@ -86,7 +86,7 @@ function love.graphics.discard(discardcolor, discardstencil) end
 ---
 ---Objects are drawn relative to their local coordinate system. The origin is by default located at the top left corner of Image and Canvas. All scaling, shearing, and rotation arguments transform the object relative to that point. Also, the position of the origin can be specified on the screen coordinate system.
 ---
----It's possible to rotate an object about its center by offsetting the origin to the center. Angles must be given in radians for rotation. One can also use a negative scaling factor to flip about its centerline. 
+---It's possible to rotate an object about its center by offsetting the origin to the center. Angles must be given in radians for rotation. One can also use a negative scaling factor to flip about its centerline.
 ---
 ---Note that the offsets are applied before rotation, scaling, or shearing; scaling and shearing are applied before rotation.
 ---
@@ -350,7 +350,7 @@ function love.graphics.getPointSize() end
 ---
 ---@return string name # The name of the renderer, e.g. 'OpenGL' or 'OpenGL ES'.
 ---@return string version # The version of the renderer with some extra driver-dependent version info, e.g. '2.1 INTEL-8.10.44'.
----@return string vendor # The name of the graphics card vendor, e.g. 'Intel Inc'. 
+---@return string vendor # The name of the graphics card vendor, e.g. 'Intel Inc'.
 ---@return string device # The name of the graphics card, e.g. 'Intel HD Graphics 3000 OpenGL Engine'.
 function love.graphics.getRendererInfo() end
 
@@ -376,7 +376,7 @@ function love.graphics.getShader() end
 function love.graphics.getStackDepth() end
 
 ---
----Gets performance-related rendering statistics. 
+---Gets performance-related rendering statistics.
 ---
 ---@overload fun(stats: table):table
 ---@return {drawcalls: number, canvasswitches: number, texturememory: number, images: number, canvases: number, fonts: number, shaderswitches: number, drawcallsbatched: number} stats # A table with the following fields:
@@ -565,13 +565,13 @@ function love.graphics.newFont(filename) end
 ---
 ---Creates a new Image from a filepath, FileData, an ImageData, or a CompressedImageData, and optionally generates or specifies mipmaps for the image.
 ---
----@overload fun(fileData: love.FileData, flags: table):love.Image
----@overload fun(imageData: love.ImageData, flags: table):love.Image
----@overload fun(compressedImageData: love.CompressedImageData, flags: table):love.Image
+---@overload fun(fileData: love.FileData, settings?: table):love.Image
+---@overload fun(imageData: love.ImageData, settings?: table):love.Image
+---@overload fun(compressedImageData: love.CompressedImageData, settings?: table):love.Image
 ---@param filename string # The filepath to the image file.
----@param flags {dpiscale: number, linear: boolean, mipmaps: boolean} # A table containing the following fields:
+---@param settings? {dpiscale: number, linear: boolean, mipmaps: boolean} # A table containing the following fields:
 ---@return love.Image image # A new Image object which can be drawn on screen.
-function love.graphics.newImage(filename, flags) end
+function love.graphics.newImage(filename, settings) end
 
 ---
 ---Creates a new specifically formatted image.
@@ -967,7 +967,7 @@ function love.graphics.setPointSize(size) end
 ---
 ---Sets or disables scissor.
 ---
----The scissor limits the drawing area to a specified rectangle. This affects all graphics calls, including love.graphics.clear. 
+---The scissor limits the drawing area to a specified rectangle. This affects all graphics calls, including love.graphics.clear.
 ---
 ---The dimensions of the scissor is unaffected by graphical transformations (translate, scale, ...).
 ---
@@ -1035,7 +1035,7 @@ function love.graphics.transformPoint(globalX, globalY) end
 ---
 ---Translates the coordinate system in two dimensions.
 ---
----When this function is called with two numbers, dx, and dy, all the following drawing operations take effect as if their x and y coordinates were x+dx and y+dy. 
+---When this function is called with two numbers, dx, and dy, all the following drawing operations take effect as if their x and y coordinates were x+dx and y+dy.
 ---
 ---Scale and translate are not commutative operations, therefore, calling them in different orders will change the outcome.
 ---
@@ -2910,7 +2910,7 @@ function Video:tell() end
 ---
 ---@alias love.SpriteBatchUsage
 ---
----The object's data will change occasionally during its lifetime. 
+---The object's data will change occasionally during its lifetime.
 ---
 ---| '"dynamic"'
 ---

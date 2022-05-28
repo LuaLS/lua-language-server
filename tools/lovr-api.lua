@@ -128,10 +128,11 @@ local function buildDocFunc(variant, overload)
         if param.name == '...' then
             params[#params+1] = '...'
         else
+			local optional = (param.type == 'table' and isTableOptional(param.table) or (param.default ~= nil)) and '?' or ''
             if param.name:find '^[\'"]' then
-                params[#params+1] = ('%s: %s|%q'):format(param.name:sub(2, -2), getTypeName(param.type), param.name)
+                params[#params+1] = ('%s%s: %s|%q'):format(param.name:sub(2, -2), optional, getTypeName(param.type), param.name)
             else
-                params[#params+1] = ('%s: %s'):format(param.name, getTypeName(param.type))
+                params[#params+1] = ('%s%s: %s'):format(param.name, optional, getTypeName(param.type))
             end
         end
     end

@@ -129,7 +129,7 @@ function lovr.graphics.compute(shader, x, y, z) end
 ---
 ---The window must be created before any `lovr.graphics` functions can be used.
 ---
----@param flags {width: number, height: number, fullscreen: boolean, resizable: boolean, msaa: number, title: string, icon: string, vsync: number} # Flags to customize the window's appearance and behavior.
+---@param flags? {width: number, height: number, fullscreen: boolean, resizable: boolean, msaa: number, title: string, icon: string, vsync: number} # Flags to customize the window's appearance and behavior.
 function lovr.graphics.createWindow(flags) end
 
 ---

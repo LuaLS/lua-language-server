@@ -229,7 +229,7 @@ function love.window.setIcon(imagedata) end
 ---
 ---@param width number # Display width.
 ---@param height number # Display height.
----@param flags {fullscreen: boolean, fullscreentype: love.FullscreenType, vsync: boolean, msaa: number, stencil: boolean, depth: number, resizable: boolean, borderless: boolean, centered: boolean, display: number, minwidth: number, minheight: number, highdpi: boolean, x: number, y: number, usedpiscale: boolean, srgb: boolean} # The flags table with the options:
+---@param flags? {fullscreen: boolean, fullscreentype: love.FullscreenType, vsync: boolean, msaa: number, stencil: boolean, depth: number, resizable: boolean, borderless: boolean, centered: boolean, display: number, minwidth: number, minheight: number, highdpi: boolean, x: number, y: number, usedpiscale: boolean, srgb: boolean} # The flags table with the options:
 ---@return boolean success # True if successful, false otherwise.
 function love.window.setMode(width, height, flags) end
 

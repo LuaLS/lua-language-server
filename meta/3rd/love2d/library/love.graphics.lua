@@ -569,7 +569,7 @@ function love.graphics.newFont(filename) end
 ---@overload fun(imageData: love.ImageData, flags: table):love.Image
 ---@overload fun(compressedImageData: love.CompressedImageData, flags: table):love.Image
 ---@param filename string # The filepath to the image file.
----@param flags {dpiscale: number, linear: boolean, mipmaps: boolean} # A table containing the following fields:
+---@param flags? {dpiscale: number, linear: boolean, mipmaps: boolean} # A table containing the following fields:
 ---@return love.Image image # A new Image object which can be drawn on screen.
 function love.graphics.newImage(filename, flags) end
 

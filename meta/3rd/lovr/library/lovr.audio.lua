@@ -186,7 +186,7 @@ function lovr.audio.isStarted(type) end
 ---@overload fun(blob: lovr.Blob, options: table):lovr.Source
 ---@overload fun(sound: lovr.Sound, options: table):lovr.Source
 ---@param filename string # The filename of the sound to load.
----@param options {decode: boolean, effects: table} # Optional options.
+---@param options? {decode: boolean, effects: table} # Optional options.
 ---@return lovr.Source source # The new Source.
 function lovr.audio.newSource(filename, options) end
 

@@ -50,6 +50,16 @@ local function formatIndex(key)
     return ('[%q]'):format(key)
 end
 
+local function isTableOptional(tbl)
+	local optional = true
+	for _, field in ipairs(tbl) do
+		if field.default == nil then
+			optional = nil
+		end
+	end
+	return optional
+end
+
 local buildType
 
 local function buildDocTable(tbl)
@@ -146,6 +156,9 @@ local function buildFunction(func, node, typeName)
     for _, param in ipairs(func.variants[1].arguments or {}) do
         for paramName in param.name:gmatch '[%a_][%w_]*' do
             params[#params+1] = paramName
+			if param.type == 'table' then
+				param.default = isTableOptional(param.table)
+			end
             text[#text+1] = ('---@param %s%s %s # %s'):format(
                 paramName,
                 param.default == nil and '' or '?',

@@ -156,12 +156,9 @@ local function buildFunction(func, node, typeName)
     for _, param in ipairs(func.variants[1].arguments or {}) do
         for paramName in param.name:gmatch '[%a_][%w_]*' do
             params[#params+1] = paramName
-			if param.type == 'table' then
-				param.default = isTableOptional(param.table)
-			end
             text[#text+1] = ('---@param %s%s %s # %s'):format(
                 paramName,
-                param.default == nil and '' or '?',
+                (param.type == 'table' and isTableOptional(param.table) or param.default) == nil and '' or '?',
                 buildType(param),
                 param.description
             )

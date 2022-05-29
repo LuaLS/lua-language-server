@@ -94,8 +94,9 @@ function love.data.newDataView(data, offset, size) end
 ---@param container love.ContainerType # What type to return the encoded data as.
 ---@param format string # A string determining how the values are packed. Follows the rules of Lua 5.3's string.pack format strings.
 ---@param v1 number|boolean|string # The first value (number, boolean, or string) to serialize.
+---@vararg number|boolean|string # Additional values to serialize.
 ---@return love.Data|string data # Data/string which contains the serialized data.
-function love.data.pack(container, format, v1) end
+function love.data.pack(container, format, v1, ...) end
 
 ---
 ---Unpacks (deserializes) a byte-string or Data into simple Lua values.

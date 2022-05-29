@@ -177,8 +177,9 @@ function Rasterizer:getLineHeight() end
 ---
 ---@param glyph1 string|number # Glyph
 ---@param glyph2 string|number # Glyph
+---@vararg string|number # Additional glyphs
 ---@return boolean hasGlyphs # Whatever font contains specified glyphs.
-function Rasterizer:hasGlyphs(glyph1, glyph2) end
+function Rasterizer:hasGlyphs(glyph1, glyph2, ...) end
 
 ---
 ---True Type hinting mode.

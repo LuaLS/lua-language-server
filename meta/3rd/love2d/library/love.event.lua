@@ -40,7 +40,8 @@ function love.event.pump() end
 ---@param d? any # Fourth event argument.
 ---@param e? any # Fifth event argument.
 ---@param f? any # Sixth event argument.
-function love.event.push(n, a, b, c, d, e, f) end
+---@vararg any # Further event arguments may follow.
+function love.event.push(n, a, b, c, d, e, f, ...) end
 
 ---
 ---Adds the quit event to the queue.

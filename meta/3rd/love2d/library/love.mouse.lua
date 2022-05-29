@@ -64,8 +64,9 @@ function love.mouse.isCursorSupported() end
 ---This function does not detect mouse wheel scrolling; you must use the love.wheelmoved (or love.mousepressed in version 0.9.2 and older) callback for that. 
 ---
 ---@param button number # The index of a button to check. 1 is the primary mouse button, 2 is the secondary mouse button and 3 is the middle button. Further buttons are mouse dependant.
+---@vararg number # Additional button numbers to check.
 ---@return boolean down # True if any specified button is down.
-function love.mouse.isDown(button) end
+function love.mouse.isDown(button, ...) end
 
 ---
 ---Checks if the mouse is grabbed.

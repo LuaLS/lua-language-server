@@ -60,8 +60,9 @@ function love.keyboard.isDown(key) end
 ---Unlike regular KeyConstants, Scancodes are keyboard layout-independent. The scancode 'w' is used if the key in the same place as the 'w' key on an American keyboard is pressed, no matter what the key is labelled or what the user's operating system settings are.
 ---
 ---@param scancode love.Scancode # A Scancode to check.
+---@vararg love.Scancode # Additional Scancodes to check.
 ---@return boolean down # True if any supplied Scancode is down, false if not.
-function love.keyboard.isScancodeDown(scancode) end
+function love.keyboard.isScancodeDown(scancode, ...) end
 
 ---
 ---Enables or disables key repeat for love.keypressed. It is disabled by default.

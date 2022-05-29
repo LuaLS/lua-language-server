@@ -169,6 +169,14 @@ local function buildFunction(func, node, typeName)
                 param.description
             )
         end
+
+        if param.name == "..." then
+            params[#params+1] = param.name
+            text[#text+1] = ('---@vararg %s # %s'):format(
+                buildType(param),
+                param.description
+            )
+        end
     end
     for _, rtn in ipairs(func.variants[1].returns or {}) do
         for returnName in rtn.name:gmatch '[%a_][%w_]*' do

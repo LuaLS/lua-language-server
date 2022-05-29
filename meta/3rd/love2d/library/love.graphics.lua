@@ -474,7 +474,8 @@ function love.graphics.isWireframe() end
 ---@param y1 number # The position of first point on the y-axis.
 ---@param x2 number # The position of second point on the x-axis.
 ---@param y2 number # The position of second point on the y-axis.
-function love.graphics.line(x1, y1, x2, y2) end
+---@vararg number # You can continue passing point positions to draw a polyline.
+function love.graphics.line(x1, y1, x2, y2, ...) end
 
 ---
 ---Creates a new array Image.
@@ -694,7 +695,8 @@ function love.graphics.origin() end
 ---@overload fun(points: table)
 ---@param x number # The position of the first point on the x-axis.
 ---@param y number # The position of the first point on the y-axis.
-function love.graphics.points(x, y) end
+---@vararg number # The x and y coordinates of additional points.
+function love.graphics.points(x, y, ...) end
 
 ---
 ---Draw a polygon.
@@ -703,7 +705,8 @@ function love.graphics.points(x, y) end
 ---
 ---@overload fun(mode: love.DrawMode, vertices: table)
 ---@param mode love.DrawMode # How to draw the polygon.
-function love.graphics.polygon(mode) end
+---@vararg number # The vertices of the polygon.
+function love.graphics.polygon(mode, ...) end
 
 ---
 ---Pops the current coordinate transformation from the transformation stack.
@@ -1227,7 +1230,8 @@ function Font:hasGlyphs(text) end
 ---Sets the fallback fonts. When the Font doesn't contain a glyph, it will substitute the glyph from the next subsequent fallback Fonts. This is akin to setting a 'font stack' in Cascading Style Sheets (CSS).
 ---
 ---@param fallbackfont1 love.Font # The first fallback Font to use.
-function Font:setFallbacks(fallbackfont1) end
+---@vararg love.Font # Additional fallback Fonts.
+function Font:setFallbacks(fallbackfont1, ...) end
 
 ---
 ---Sets the filter mode for a font.
@@ -1402,7 +1406,8 @@ function Mesh:setTexture(texture) end
 ---@overload fun(self: love.Mesh, index: number, vertex: table)
 ---@param index number # The index of the the vertex you want to modify (one-based).
 ---@param attributecomponent number # The first component of the first vertex attribute in the specified vertex.
-function Mesh:setVertex(index, attributecomponent) end
+---@vararg number # Additional components of all vertex attributes in the specified vertex.
+function Mesh:setVertex(index, attributecomponent, ...) end
 
 ---
 ---Sets the properties of a specific attribute within a vertex in the Mesh.
@@ -1413,7 +1418,8 @@ function Mesh:setVertex(index, attributecomponent) end
 ---@param attributeindex number # The index of the attribute within the vertex to be modified (one-based).
 ---@param value1 number # The new value for the first component of the attribute.
 ---@param value2 number # The new value for the second component of the attribute.
-function Mesh:setVertexAttribute(vertexindex, attributeindex, value1, value2) end
+---@vararg number # Any additional vertex attribute components.
+function Mesh:setVertexAttribute(vertexindex, attributeindex, value1, value2, ...) end
 
 ---
 ---Sets the vertex map for the Mesh. The vertex map describes the order in which the vertices are used when the Mesh is drawn. The vertices, vertex map, and mesh draw mode work together to determine what exactly is displayed on the screen.
@@ -1965,7 +1971,8 @@ function Shader:hasUniform(name) end
 ---@overload fun(self: love.Shader, name: string, matrixlayout: love.MatrixLayout, data: love.Data, offset: number, size: number)
 ---@param name string # Name of the number to send to the shader.
 ---@param number number # Number to send to store in the uniform variable.
-function Shader:send(name, number) end
+---@vararg number # Additional numbers to send if the uniform variable is an array.
+function Shader:send(name, number, ...) end
 
 ---
 ---Sends one or more colors to a special (''extern'' / ''uniform'') vec3 or vec4 variable inside the shader. The color components must be in the range of 1. The colors are gamma-corrected if global gamma-correction is enabled.
@@ -1984,7 +1991,8 @@ function Shader:send(name, number) end
 ---
 ---@param name string # The name of the color extern variable to send to in the shader.
 ---@param color table # A table with red, green, blue, and optional alpha color components in the range of 1 to send to the extern as a vector.
-function Shader:sendColor(name, color) end
+---@vararg table # Additional colors to send in case the extern is an array. All colors need to be of the same size (e.g. only vec3's).
+function Shader:sendColor(name, color, ...) end
 
 ---
 ---Using a single image, draw any number of identical copies of the image using a single call to love.graphics.draw(). This can be used, for example, to draw repeating copies of a single background image with high performance.

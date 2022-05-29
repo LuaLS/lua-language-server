@@ -50,17 +50,20 @@ local function formatIndex(key)
     return ('[%q]'):format(key)
 end
 
-local function isTableOptional(tbl)
-    if not tbl then
-        return false
-    end
-    local optional = true
-    for _, field in ipairs(tbl) do
-        if field.default == nil then
-            optional = nil
-        end
-    end
-    return optional
+local function getOptional(param)
+	if param.type == 'table' then
+		if not param.table then
+			return ''
+		end
+		for _, field in ipairs(param.table) do
+			if field.default == nil then
+				return ''
+			end
+		end
+		return '?'
+	else
+		return (param.default ~= nil) and '?' or ''
+	end
 end
 
 local buildType
@@ -125,9 +128,9 @@ local function buildDocFunc(variant, overload)
             params[#params+1] = '...'
         else
             if param.name:find '^[\'"]' then
-                params[#params+1] = ('%s: %s|%q'):format(param.name:sub(2, -2), getTypeName(param.type), param.name)
+                params[#params+1] = ('%s%s: %s|%q'):format(param.name:sub(2, -2), getOptional(param), getTypeName(param.type), param.name)
             else
-                params[#params+1] = ('%s: %s'):format(param.name, getTypeName(param.type))
+                params[#params+1] = ('%s%s: %s'):format(param.name, getOptional(param), getTypeName(param.type))
             end
         end
     end
@@ -159,10 +162,9 @@ local function buildFunction(func, node, typeName)
     for _, param in ipairs(func.variants[1].arguments or {}) do
         for paramName in param.name:gmatch '[%a_][%w_]*' do
             params[#params+1] = paramName
-            local optional = param.type == 'table' and isTableOptional(param.table) or (param.default ~= nil)
             text[#text+1] = ('---@param %s%s %s # %s'):format(
                 paramName,
-                optional and '?' or '',
+                getOptional(param),
                 buildType(param),
                 param.description
             )

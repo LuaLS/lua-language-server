@@ -9,7 +9,7 @@ love.font = {}
 ---
 ---Creates a new BMFont Rasterizer.
 ---
----@overload fun(fileName: string, glyphs: string, dpiscale: number):love.Rasterizer
+---@overload fun(fileName: string, glyphs: string, dpiscale?: number):love.Rasterizer
 ---@param imageData love.ImageData # The image data containing the drawable pictures of font glyphs.
 ---@param glyphs string # The sequence of glyphs in the ImageData.
 ---@param dpiscale? number # DPI scale.
@@ -37,11 +37,11 @@ function love.font.newImageRasterizer(imageData, glyphs, extraSpacing, dpiscale)
 ---Creates a new Rasterizer.
 ---
 ---@overload fun(data: love.FileData):love.Rasterizer
----@overload fun(size: number, hinting: love.HintingMode, dpiscale: number):love.Rasterizer
----@overload fun(fileName: string, size: number, hinting: love.HintingMode, dpiscale: number):love.Rasterizer
----@overload fun(fileData: love.FileData, size: number, hinting: love.HintingMode, dpiscale: number):love.Rasterizer
----@overload fun(imageData: love.ImageData, glyphs: string, dpiscale: number):love.Rasterizer
----@overload fun(fileName: string, glyphs: string, dpiscale: number):love.Rasterizer
+---@overload fun(size?: number, hinting?: love.HintingMode, dpiscale?: number):love.Rasterizer
+---@overload fun(fileName: string, size?: number, hinting?: love.HintingMode, dpiscale?: number):love.Rasterizer
+---@overload fun(fileData: love.FileData, size?: number, hinting?: love.HintingMode, dpiscale?: number):love.Rasterizer
+---@overload fun(imageData: love.ImageData, glyphs: string, dpiscale?: number):love.Rasterizer
+---@overload fun(fileName: string, glyphs: string, dpiscale?: number):love.Rasterizer
 ---@param filename string # The font file.
 ---@return love.Rasterizer rasterizer # The rasterizer.
 function love.font.newRasterizer(filename) end
@@ -49,8 +49,8 @@ function love.font.newRasterizer(filename) end
 ---
 ---Creates a new TrueType Rasterizer.
 ---
----@overload fun(fileName: string, size: number, hinting: love.HintingMode, dpiscale: number):love.Rasterizer
----@overload fun(fileData: love.FileData, size: number, hinting: love.HintingMode, dpiscale: number):love.Rasterizer
+---@overload fun(fileName: string, size?: number, hinting?: love.HintingMode, dpiscale?: number):love.Rasterizer
+---@overload fun(fileData: love.FileData, size?: number, hinting?: love.HintingMode, dpiscale?: number):love.Rasterizer
 ---@param size? number # The font size.
 ---@param hinting? love.HintingMode # True Type hinting mode.
 ---@param dpiscale? number # The font DPI scale.
@@ -188,16 +188,16 @@ function Rasterizer:hasGlyphs(glyph1, glyph2, ...) end
 ---
 ---Default hinting. Should be preferred for typical antialiased fonts.
 ---
----| '"normal"'
+---| "normal"
 ---
 ---Results in fuzzier text but can sometimes preserve the original glyph shapes of the text better than normal hinting.
 ---
----| '"light"'
+---| "light"
 ---
 ---Results in aliased / unsmoothed text with either full opacity or completely transparent pixels. Should be used when antialiasing is not desired for the font.
 ---
----| '"mono"'
+---| "mono"
 ---
 ---Disables hinting for the font. Results in fuzzier text.
 ---
----| '"none"'
+---| "none"

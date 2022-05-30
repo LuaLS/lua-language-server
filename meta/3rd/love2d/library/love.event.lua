@@ -48,7 +48,7 @@ function love.event.push(n, a, b, c, d, e, f, ...) end
 ---
 ---The quit event is a signal for the event handler to close LÖVE. It's possible to abort the exit process with the love.quit callback.
 ---
----@overload fun(restart: string|"'restart'")
+---@overload fun('restart': string|'restart')
 ---@param exitstatus? number # The program exit status to use when closing the application.
 function love.event.quit(exitstatus) end
 
@@ -73,148 +73,148 @@ function love.event.wait() end
 ---
 ---Window focus gained or lost
 ---
----| '"focus"'
+---| "focus"
 ---
 ---Joystick pressed
 ---
----| '"joystickpressed"'
+---| "joystickpressed"
 ---
 ---Joystick released
 ---
----| '"joystickreleased"'
+---| "joystickreleased"
 ---
 ---Key pressed
 ---
----| '"keypressed"'
+---| "keypressed"
 ---
 ---Key released
 ---
----| '"keyreleased"'
+---| "keyreleased"
 ---
 ---Mouse pressed
 ---
----| '"mousepressed"'
+---| "mousepressed"
 ---
 ---Mouse released
 ---
----| '"mousereleased"'
+---| "mousereleased"
 ---
 ---Quit
 ---
----| '"quit"'
+---| "quit"
 ---
 ---Window size changed by the user
 ---
----| '"resize"'
+---| "resize"
 ---
 ---Window is minimized or un-minimized by the user
 ---
----| '"visible"'
+---| "visible"
 ---
 ---Window mouse focus gained or lost
 ---
----| '"mousefocus"'
+---| "mousefocus"
 ---
 ---A Lua error has occurred in a thread
 ---
----| '"threaderror"'
+---| "threaderror"
 ---
 ---Joystick connected
 ---
----| '"joystickadded"'
+---| "joystickadded"
 ---
 ---Joystick disconnected
 ---
----| '"joystickremoved"'
+---| "joystickremoved"
 ---
 ---Joystick axis motion
 ---
----| '"joystickaxis"'
+---| "joystickaxis"
 ---
 ---Joystick hat pressed
 ---
----| '"joystickhat"'
+---| "joystickhat"
 ---
 ---Joystick's virtual gamepad button pressed
 ---
----| '"gamepadpressed"'
+---| "gamepadpressed"
 ---
 ---Joystick's virtual gamepad button released
 ---
----| '"gamepadreleased"'
+---| "gamepadreleased"
 ---
 ---Joystick's virtual gamepad axis moved
 ---
----| '"gamepadaxis"'
+---| "gamepadaxis"
 ---
 ---User entered text
 ---
----| '"textinput"'
+---| "textinput"
 ---
 ---Mouse position changed
 ---
----| '"mousemoved"'
+---| "mousemoved"
 ---
 ---Running out of memory on mobile devices system
 ---
----| '"lowmemory"'
+---| "lowmemory"
 ---
 ---Candidate text for an IME changed
 ---
----| '"textedited"'
+---| "textedited"
 ---
 ---Mouse wheel moved
 ---
----| '"wheelmoved"'
+---| "wheelmoved"
 ---
 ---Touch screen touched
 ---
----| '"touchpressed"'
+---| "touchpressed"
 ---
 ---Touch screen stop touching
 ---
----| '"touchreleased"'
+---| "touchreleased"
 ---
 ---Touch press moved inside touch screen
 ---
----| '"touchmoved"'
+---| "touchmoved"
 ---
 ---Directory is dragged and dropped onto the window
 ---
----| '"directorydropped"'
+---| "directorydropped"
 ---
 ---File is dragged and dropped onto the window.
 ---
----| '"filedropped"'
+---| "filedropped"
 ---
 ---Joystick pressed
 ---
----| '"jp"'
+---| "jp"
 ---
 ---Joystick released
 ---
----| '"jr"'
+---| "jr"
 ---
 ---Key pressed
 ---
----| '"kp"'
+---| "kp"
 ---
 ---Key released
 ---
----| '"kr"'
+---| "kr"
 ---
 ---Mouse pressed
 ---
----| '"mp"'
+---| "mp"
 ---
 ---Mouse released
 ---
----| '"mr"'
+---| "mr"
 ---
 ---Quit
 ---
----| '"q"'
+---| "q"
 ---
 ---Window focus gained or lost
 ---
----| '"f"'
+---| "f"

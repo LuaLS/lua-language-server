@@ -48,7 +48,8 @@ function lovr.event.pump() end
 ---Only nil, booleans, numbers, strings, and LÖVR objects are supported types for event data.
 ---
 ---@param name string # The name of the event.
-function lovr.event.push(name) end
+---@vararg any # The arguments for the event.  Currently, up to 4 are supported.
+function lovr.event.push(name, ...) end
 
 ---
 ---Pushes an event to quit.
@@ -90,340 +91,340 @@ function lovr.event.restart() end
 ---
 ---The A key.
 ---
----| '"a"'
+---| "a"
 ---
 ---The B key.
 ---
----| '"b"'
+---| "b"
 ---
 ---The C key.
 ---
----| '"c"'
+---| "c"
 ---
 ---The D key.
 ---
----| '"d"'
+---| "d"
 ---
 ---The E key.
 ---
----| '"e"'
+---| "e"
 ---
 ---The F key.
 ---
----| '"f"'
+---| "f"
 ---
 ---The G key.
 ---
----| '"g"'
+---| "g"
 ---
 ---The H key.
 ---
----| '"h"'
+---| "h"
 ---
 ---The I key.
 ---
----| '"i"'
+---| "i"
 ---
 ---The J key.
 ---
----| '"j"'
+---| "j"
 ---
 ---The K key.
 ---
----| '"k"'
+---| "k"
 ---
 ---The L key.
 ---
----| '"l"'
+---| "l"
 ---
 ---The M key.
 ---
----| '"m"'
+---| "m"
 ---
 ---The N key.
 ---
----| '"n"'
+---| "n"
 ---
 ---The O key.
 ---
----| '"o"'
+---| "o"
 ---
 ---The P key.
 ---
----| '"p"'
+---| "p"
 ---
 ---The Q key.
 ---
----| '"q"'
+---| "q"
 ---
 ---The R key.
 ---
----| '"r"'
+---| "r"
 ---
 ---The S key.
 ---
----| '"s"'
+---| "s"
 ---
 ---The T key.
 ---
----| '"t"'
+---| "t"
 ---
 ---The U key.
 ---
----| '"u"'
+---| "u"
 ---
 ---The V key.
 ---
----| '"v"'
+---| "v"
 ---
 ---The W key.
 ---
----| '"w"'
+---| "w"
 ---
 ---The X key.
 ---
----| '"x"'
+---| "x"
 ---
 ---The Y key.
 ---
----| '"y"'
+---| "y"
 ---
 ---The Z key.
 ---
----| '"z"'
+---| "z"
 ---
 ---The 0 key.
 ---
----| '"0"'
+---| "0"
 ---
 ---The 1 key.
 ---
----| '"1"'
+---| "1"
 ---
 ---The 2 key.
 ---
----| '"2"'
+---| "2"
 ---
 ---The 3 key.
 ---
----| '"3"'
+---| "3"
 ---
 ---The 4 key.
 ---
----| '"4"'
+---| "4"
 ---
 ---The 5 key.
 ---
----| '"5"'
+---| "5"
 ---
 ---The 6 key.
 ---
----| '"6"'
+---| "6"
 ---
 ---The 7 key.
 ---
----| '"7"'
+---| "7"
 ---
 ---The 8 key.
 ---
----| '"8"'
+---| "8"
 ---
 ---The 9 key.
 ---
----| '"9"'
+---| "9"
 ---
 ---The space bar.
 ---
----| '"space"'
+---| "space"
 ---
 ---The enter key.
 ---
----| '"return"'
+---| "return"
 ---
 ---The tab key.
 ---
----| '"tab"'
+---| "tab"
 ---
 ---The escape key.
 ---
----| '"escape"'
+---| "escape"
 ---
 ---The backspace key.
 ---
----| '"backspace"'
+---| "backspace"
 ---
 ---The up arrow key.
 ---
----| '"up"'
+---| "up"
 ---
 ---The down arrow key.
 ---
----| '"down"'
+---| "down"
 ---
 ---The left arrow key.
 ---
----| '"left"'
+---| "left"
 ---
 ---The right arrow key.
 ---
----| '"right"'
+---| "right"
 ---
 ---The home key.
 ---
----| '"home"'
+---| "home"
 ---
 ---The end key.
 ---
----| '"end"'
+---| "end"
 ---
 ---The page up key.
 ---
----| '"pageup"'
+---| "pageup"
 ---
 ---The page down key.
 ---
----| '"pagedown"'
+---| "pagedown"
 ---
 ---The insert key.
 ---
----| '"insert"'
+---| "insert"
 ---
 ---The delete key.
 ---
----| '"delete"'
+---| "delete"
 ---
 ---The F1 key.
 ---
----| '"f1"'
+---| "f1"
 ---
 ---The F2 key.
 ---
----| '"f2"'
+---| "f2"
 ---
 ---The F3 key.
 ---
----| '"f3"'
+---| "f3"
 ---
 ---The F4 key.
 ---
----| '"f4"'
+---| "f4"
 ---
 ---The F5 key.
 ---
----| '"f5"'
+---| "f5"
 ---
 ---The F6 key.
 ---
----| '"f6"'
+---| "f6"
 ---
 ---The F7 key.
 ---
----| '"f7"'
+---| "f7"
 ---
 ---The F8 key.
 ---
----| '"f8"'
+---| "f8"
 ---
 ---The F9 key.
 ---
----| '"f9"'
+---| "f9"
 ---
 ---The F10 key.
 ---
----| '"f10"'
+---| "f10"
 ---
 ---The F11 key.
 ---
----| '"f11"'
+---| "f11"
 ---
 ---The F12 key.
 ---
----| '"f12"'
+---| "f12"
 ---
 ---The backtick/backquote/grave accent key.
 ---
----| '"`"'
+---| "`"
 ---
 ---The dash/hyphen/minus key.
 ---
----| '"-"'
+---| "-"
 ---
 ---The equal sign key.
 ---
----| '"="'
+---| "="
 ---
 ---The left bracket key.
 ---
----| '"["'
+---| "["
 ---
 ---The right bracket key.
 ---
----| '"]"'
+---| "]"
 ---
 ---The backslash key.
 ---
----| '"\\"'
+---| "\\"
 ---
 ---The semicolon key.
 ---
----| '";"'
+---| ";"
 ---
 ---The single quote key.
 ---
----| '"\'"'
+---| "'"
 ---
 ---The comma key.
 ---
----| '","'
+---| ","
 ---
 ---The period key.
 ---
----| '"."'
+---| "."
 ---
 ---The slash key.
 ---
----| '"/"'
+---| "/"
 ---
 ---The left control key.
 ---
----| '"lctrl"'
+---| "lctrl"
 ---
 ---The left shift key.
 ---
----| '"lshift"'
+---| "lshift"
 ---
 ---The left alt key.
 ---
----| '"lalt"'
+---| "lalt"
 ---
 ---The left OS key (windows, command, super).
 ---
----| '"lgui"'
+---| "lgui"
 ---
 ---The right control key.
 ---
----| '"rctrl"'
+---| "rctrl"
 ---
 ---The right shift key.
 ---
----| '"rshift"'
+---| "rshift"
 ---
 ---The right alt key.
 ---
----| '"ralt"'
+---| "ralt"
 ---
 ---The right OS key (windows, command, super).
 ---
----| '"rgui"'
+---| "rgui"
 ---
 ---The caps lock key.
 ---
----| '"capslock"'
+---| "capslock"
 ---
 ---The scroll lock key.
 ---
----| '"scrolllock"'
+---| "scrolllock"
 ---
 ---The numlock key.
 ---
----| '"numlock"'
+---| "numlock"

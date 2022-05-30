@@ -9,7 +9,7 @@ love.data = {}
 ---
 ---Compresses a string or data using a specific compression algorithm.
 ---
----@overload fun(container: love.ContainerType, format: love.CompressedDataFormat, data: love.Data, level: number):love.CompressedData|string
+---@overload fun(container: love.ContainerType, format: love.CompressedDataFormat, data: love.Data, level?: number):love.CompressedData|string
 ---@param container love.ContainerType # What type to return the compressed data as.
 ---@param format love.CompressedDataFormat # The format to use when compressing the string.
 ---@param rawstring string # The raw (un-compressed) string to compress.
@@ -40,7 +40,7 @@ function love.data.decompress(container, compressedData) end
 ---
 ---Encode Data or a string to a Data or string in one of the EncodeFormats.
 ---
----@overload fun(container: love.ContainerType, format: love.EncodeFormat, sourceData: love.Data, linelength: number):love.ByteData|string
+---@overload fun(container: love.ContainerType, format: love.EncodeFormat, sourceData: love.Data, linelength?: number):love.ByteData|string
 ---@param container love.ContainerType # What type to return the encoded data as.
 ---@param format love.EncodeFormat # The format of the output data.
 ---@param sourceString string # The raw data to encode.
@@ -71,7 +71,7 @@ function love.data.hash(hashFunction, string) end
 ---
 ---Data:getPointer along with LuaJIT's FFI can be used to manipulate the contents of the ByteData object after it has been created.
 ---
----@overload fun(Data: love.Data, offset: number, size: number):love.ByteData
+---@overload fun(Data: love.Data, offset?: number, size?: number):love.ByteData
 ---@overload fun(size: number):love.ByteData
 ---@param datastring string # The byte string to copy.
 ---@return love.ByteData bytedata # The new Data object.
@@ -103,7 +103,7 @@ function love.data.pack(container, format, v1, ...) end
 ---
 ---This function behaves the same as Lua 5.3's string.unpack.
 ---
----@overload fun(format: string, data: love.Data, pos: number):number|boolean|string, number|boolean|string, number
+---@overload fun(format: string, data: love.Data, pos?: number):number|boolean|string, number|boolean|string, number
 ---@param format string # A string determining how the values were packed. Follows the rules of Lua 5.3's string.pack format strings.
 ---@param datastring string # A string containing the packed (serialized) data.
 ---@param pos? number # Where to start reading in the string. Negative values can be used to read relative from the end of the string.
@@ -140,19 +140,19 @@ function CompressedData:getFormat() end
 ---
 ---The LZ4 compression format. Compresses and decompresses very quickly, but the compression ratio is not the best. LZ4-HC is used when compression level 9 is specified. Some benchmarks are available here.
 ---
----| '"lz4"'
+---| "lz4"
 ---
 ---The zlib format is DEFLATE-compressed data with a small bit of header data. Compresses relatively slowly and decompresses moderately quickly, and has a decent compression ratio.
 ---
----| '"zlib"'
+---| "zlib"
 ---
 ---The gzip format is DEFLATE-compressed data with a slightly larger header than zlib. Since it uses DEFLATE it has the same compression characteristics as the zlib format.
 ---
----| '"gzip"'
+---| "gzip"
 ---
 ---Raw DEFLATE-compressed data (no header).
 ---
----| '"deflate"'
+---| "deflate"
 
 ---
 ---Return type of various data-returning functions.
@@ -161,11 +161,11 @@ function CompressedData:getFormat() end
 ---
 ---Return type is ByteData.
 ---
----| '"data"'
+---| "data"
 ---
 ---Return type is string.
 ---
----| '"string"'
+---| "string"
 
 ---
 ---Encoding format used to encode or decode data.
@@ -174,11 +174,11 @@ function CompressedData:getFormat() end
 ---
 ---Encode/decode data as base64 binary-to-text encoding.
 ---
----| '"base64"'
+---| "base64"
 ---
 ---Encode/decode data as hexadecimal string.
 ---
----| '"hex"'
+---| "hex"
 
 ---
 ---Hash algorithm of love.data.hash.
@@ -187,24 +187,24 @@ function CompressedData:getFormat() end
 ---
 ---MD5 hash algorithm (16 bytes).
 ---
----| '"md5"'
+---| "md5"
 ---
 ---SHA1 hash algorithm (20 bytes).
 ---
----| '"sha1"'
+---| "sha1"
 ---
 ---SHA2 hash algorithm with message digest size of 224 bits (28 bytes).
 ---
----| '"sha224"'
+---| "sha224"
 ---
 ---SHA2 hash algorithm with message digest size of 256 bits (32 bytes).
 ---
----| '"sha256"'
+---| "sha256"
 ---
 ---SHA2 hash algorithm with message digest size of 384 bits (48 bytes).
 ---
----| '"sha384"'
+---| "sha384"
 ---
 ---SHA2 hash algorithm with message digest size of 512 bits (64 bytes).
 ---
----| '"sha512"'
+---| "sha512"

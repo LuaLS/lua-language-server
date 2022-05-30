@@ -132,7 +132,7 @@ local function buildDocFunc(variant, overload)
             params[#params+1] = '...'
         else
             if param.name:find '^[\'"]' then
-                params[#params+1] = ('%s%s: %s|%q'):format(param.name:sub(2, -2), getOptional(param), getTypeName(param.type), param.name)
+                params[#params+1] = ('%s%s: %s|%s'):format(param.name, getOptional(param), getTypeName(param.type), param.name)
             else
                 params[#params+1] = ('%s%s: %s'):format(param.name, getOptional(param), getTypeName(param.type))
             end
@@ -169,6 +169,14 @@ local function buildFunction(func, typeName)
             text[#text+1] = ('---@param %s%s %s # %s'):format(
                 paramName,
                 getOptional(param),
+                buildType(param),
+                param.description
+            )
+        end
+
+        if param.name == "..." then
+            params[#params+1] = param.name
+            text[#text+1] = ('---@vararg %s # %s'):format(
                 buildType(param),
                 param.description
             )
@@ -227,7 +235,7 @@ local function buildFile(defs)
         text[#text+1] = ('---@alias %s'):format(getTypeName(enum.name))
         for _, constant in ipairs(enum.values) do
             text[#text+1] = buildDescription(constant.description, constant.notes)
-            text[#text+1] = ([[---| '%s']]):format(('%q'):format(constant.name):gsub("'", "\\'"))
+            text[#text+1] = ([[---| %q]]):format(constant.name)
         end
     end
 

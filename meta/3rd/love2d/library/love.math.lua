@@ -35,7 +35,7 @@ function love.math.colorToBytes(r, g, b, a) end
 ---
 ---Compresses a string or data using a specific compression algorithm.
 ---
----@overload fun(data: love.Data, format: love.CompressedDataFormat, level: number):love.CompressedData
+---@overload fun(data: love.Data, format?: love.CompressedDataFormat, level?: number):love.CompressedData
 ---@param rawstring string # The raw (un-compressed) string to compress.
 ---@param format? love.CompressedDataFormat # The format to use when compressing the string.
 ---@param level? number # The level of compression to use, between 0 and 9. -1 indicates the default level. The meaning of this argument depends on the compression format being used.
@@ -135,7 +135,7 @@ function love.math.newRandomGenerator() end
 ---
 ---Creates a new Transform object.
 ---
----@overload fun(x: number, y: number, angle: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number):love.Transform
+---@overload fun(x: number, y: number, angle?: number, sx?: number, sy?: number, ox?: number, oy?: number, kx?: number, ky?: number):love.Transform
 ---@return love.Transform transform # The new Transform object.
 function love.math.newTransform() end
 
@@ -508,8 +508,8 @@ function Transform:translate(dx, dy) end
 ---
 ---The matrix is row-major:
 ---
----| '"row"'
+---| "row"
 ---
 ---The matrix is column-major:
 ---
----| '"column"'
+---| "column"

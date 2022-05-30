@@ -87,8 +87,8 @@ function love.mouse.isVisible() end
 ---
 ---The hot spot is the point the operating system uses to determine what was clicked and at what position the mouse cursor is. For example, the normal arrow pointer normally has its hot spot at the top left of the image, but a crosshair cursor might have it in the middle.
 ---
----@overload fun(filename: string, hotx: number, hoty: number):love.Cursor
----@overload fun(fileData: love.FileData, hotx: number, hoty: number):love.Cursor
+---@overload fun(filename: string, hotx?: number, hoty?: number):love.Cursor
+---@overload fun(fileData: love.FileData, hotx?: number, hoty?: number):love.Cursor
 ---@param imageData love.ImageData # The ImageData to use for the new Cursor.
 ---@param hotx? number # The x-coordinate in the ImageData of the cursor's hot spot.
 ---@param hoty? number # The y-coordinate in the ImageData of the cursor's hot spot.
@@ -166,52 +166,52 @@ function Cursor:getType() end
 ---
 ---The cursor is using a custom image.
 ---
----| '"image"'
+---| "image"
 ---
 ---An arrow pointer.
 ---
----| '"arrow"'
+---| "arrow"
 ---
 ---An I-beam, normally used when mousing over editable or selectable text.
 ---
----| '"ibeam"'
+---| "ibeam"
 ---
 ---Wait graphic.
 ---
----| '"wait"'
+---| "wait"
 ---
 ---Small wait cursor with an arrow pointer.
 ---
----| '"waitarrow"'
+---| "waitarrow"
 ---
 ---Crosshair symbol.
 ---
----| '"crosshair"'
+---| "crosshair"
 ---
 ---Double arrow pointing to the top-left and bottom-right.
 ---
----| '"sizenwse"'
+---| "sizenwse"
 ---
 ---Double arrow pointing to the top-right and bottom-left.
 ---
----| '"sizenesw"'
+---| "sizenesw"
 ---
 ---Double arrow pointing left and right.
 ---
----| '"sizewe"'
+---| "sizewe"
 ---
 ---Double arrow pointing up and down.
 ---
----| '"sizens"'
+---| "sizens"
 ---
 ---Four-pointed arrow pointing up, down, left, and right.
 ---
----| '"sizeall"'
+---| "sizeall"
 ---
 ---Slashed circle or crossbones.
 ---
----| '"no"'
+---| "no"
 ---
 ---Hand symbol.
 ---
----| '"hand"'
+---| "hand"

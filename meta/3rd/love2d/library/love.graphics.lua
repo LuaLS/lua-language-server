@@ -23,7 +23,7 @@ function love.graphics.applyTransform(transform) end
 ---
 ---Draws a filled or unfilled arc at position (x, y). The arc is drawn from angle1 to angle2 in radians. The segments parameter determines how many segments are used to draw the arc. The more segments, the smoother the edge.
 ---
----@overload fun(drawmode: love.DrawMode, arctype: love.ArcType, x: number, y: number, radius: number, angle1: number, angle2: number, segments: number)
+---@overload fun(drawmode: love.DrawMode, arctype: love.ArcType, x: number, y: number, radius: number, angle1: number, angle2: number, segments?: number)
 ---@param drawmode love.DrawMode # How to draw the arc.
 ---@param x number # The position of the center along x-axis.
 ---@param y number # The position of the center along y-axis.
@@ -64,8 +64,8 @@ function love.graphics.circle(mode, x, y, radius) end
 ---
 ---In versions prior to background color instead.
 ---
----@overload fun(r: number, g: number, b: number, a: number, clearstencil: boolean, cleardepth: boolean)
----@overload fun(color: table, ..., clearstencil: boolean, cleardepth: boolean)
+---@overload fun(r: number, g: number, b: number, a?: number, clearstencil?: boolean, cleardepth?: boolean)
+---@overload fun(color: table, ..., clearstencil?: boolean, cleardepth?: boolean)
 ---@overload fun(clearcolor: boolean, clearstencil: boolean, cleardepth: boolean)
 function love.graphics.clear() end
 
@@ -76,7 +76,7 @@ function love.graphics.clear() end
 ---
 ---On some desktop systems this function may do nothing.
 ---
----@overload fun(discardcolors: table, discardstencil: boolean)
+---@overload fun(discardcolors: table, discardstencil?: boolean)
 ---@param discardcolor? boolean # Whether to discard the texture(s) of the active Canvas(es) (the contents of the screen if no Canvas is active.)
 ---@param discardstencil? boolean # Whether to discard the contents of the stencil buffer of the screen / active Canvas.
 function love.graphics.discard(discardcolor, discardstencil) end
@@ -96,7 +96,7 @@ function love.graphics.discard(discardcolor, discardstencil) end
 ---
 ---Set it to pure white to preserve the object's original colors.
 ---
----@overload fun(texture: love.Texture, quad: love.Quad, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number)
+---@overload fun(texture: love.Texture, quad: love.Quad, x: number, y: number, r?: number, sx?: number, sy?: number, ox?: number, oy?: number, kx?: number, ky?: number)
 ---@overload fun(drawable: love.Drawable, transform: love.Transform)
 ---@overload fun(texture: love.Texture, quad: love.Quad, transform: love.Transform)
 ---@param drawable love.Drawable # A drawable object.
@@ -135,7 +135,7 @@ function love.graphics.drawInstanced(mesh, instancecount, x, y, r, sx, sy, ox, o
 ---
 ---Draws a layer of an Array Texture.
 ---
----@overload fun(texture: love.Texture, layerindex: number, quad: love.Quad, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number)
+---@overload fun(texture: love.Texture, layerindex: number, quad: love.Quad, x?: number, y?: number, r?: number, sx?: number, sy?: number, ox?: number, oy?: number, kx?: number, ky?: number)
 ---@overload fun(texture: love.Texture, layerindex: number, transform: love.Transform)
 ---@overload fun(texture: love.Texture, layerindex: number, quad: love.Quad, transform: love.Transform)
 ---@param texture love.Texture # The Array Texture to draw.
@@ -545,7 +545,7 @@ function love.graphics.newCanvas() end
 ---
 ---+x -x +y -y +z -z
 ---
----@overload fun(faces: table, settings: table):love.Image
+---@overload fun(faces: table, settings?: table):love.Image
 ---@param filename string # The filepath to a cubemap image file (or a File, FileData, or ImageData).
 ---@param settings? {mipmaps: boolean, linear: boolean} # Optional table of settings to configure the cubemap image, containing the following fields:
 ---@return love.Image image # An cubemap Image object.
@@ -556,9 +556,9 @@ function love.graphics.newCubeImage(filename, settings) end
 ---
 ---All variants which accept a filename can also accept a Data object instead.
 ---
----@overload fun(filename: string, size: number, hinting: love.HintingMode, dpiscale: number):love.Font
+---@overload fun(filename: string, size: number, hinting?: love.HintingMode, dpiscale?: number):love.Font
 ---@overload fun(filename: string, imagefilename: string):love.Font
----@overload fun(size: number, hinting: love.HintingMode, dpiscale: number):love.Font
+---@overload fun(size?: number, hinting?: love.HintingMode, dpiscale?: number):love.Font
 ---@param filename string # The filepath to the BMFont or TrueType font file.
 ---@return love.Font font # A Font object which can be used to draw text on screen.
 function love.graphics.newFont(filename) end
@@ -566,9 +566,9 @@ function love.graphics.newFont(filename) end
 ---
 ---Creates a new Image from a filepath, FileData, an ImageData, or a CompressedImageData, and optionally generates or specifies mipmaps for the image.
 ---
----@overload fun(fileData: love.FileData, flags: table):love.Image
----@overload fun(imageData: love.ImageData, flags: table):love.Image
----@overload fun(compressedImageData: love.CompressedImageData, flags: table):love.Image
+---@overload fun(fileData: love.FileData, flags?: table):love.Image
+---@overload fun(imageData: love.ImageData, flags?: table):love.Image
+---@overload fun(compressedImageData: love.CompressedImageData, flags?: table):love.Image
 ---@param filename string # The filepath to the image file.
 ---@param flags? {dpiscale: number, linear: boolean, mipmaps: boolean} # A table containing the following fields:
 ---@return love.Image image # A new Image object which can be drawn on screen.
@@ -593,10 +593,10 @@ function love.graphics.newImageFont(filename, glyphs) end
 ---
 ---In versions prior to 11.0, color and byte component values were within the range of 0 to 255 instead of 0 to 1.
 ---
----@overload fun(vertexcount: number, mode: love.MeshDrawMode, usage: love.SpriteBatchUsage):love.Mesh
----@overload fun(vertexformat: table, vertices: table, mode: love.MeshDrawMode, usage: love.SpriteBatchUsage):love.Mesh
----@overload fun(vertexformat: table, vertexcount: number, mode: love.MeshDrawMode, usage: love.SpriteBatchUsage):love.Mesh
----@overload fun(vertexcount: number, texture: love.Texture, mode: love.MeshDrawMode):love.Mesh
+---@overload fun(vertexcount: number, mode?: love.MeshDrawMode, usage?: love.SpriteBatchUsage):love.Mesh
+---@overload fun(vertexformat: table, vertices: table, mode?: love.MeshDrawMode, usage?: love.SpriteBatchUsage):love.Mesh
+---@overload fun(vertexformat: table, vertexcount: number, mode?: love.MeshDrawMode, usage?: love.SpriteBatchUsage):love.Mesh
+---@overload fun(vertexcount: number, texture?: love.Texture, mode?: love.MeshDrawMode):love.Mesh
 ---@param vertices {["1"]: number, ["2"]: number, ["3"]: number, ["4"]: number, ["5"]: number, ["6"]: number, ["7"]: number, ["8"]: number} # The table filled with vertex information tables for each vertex as follows:
 ---@param mode? love.MeshDrawMode # How the vertices are used when drawing. The default mode 'fan' is sufficient for simple convex polygons.
 ---@param usage? love.SpriteBatchUsage # The expected usage of the Mesh. The specified usage mode affects the Mesh's memory usage and performance.
@@ -606,7 +606,7 @@ function love.graphics.newMesh(vertices, mode, usage) end
 ---
 ---Creates a new ParticleSystem.
 ---
----@overload fun(texture: love.Texture, buffer: number):love.ParticleSystem
+---@overload fun(texture: love.Texture, buffer?: number):love.ParticleSystem
 ---@param image love.Image # The image to use.
 ---@param buffer? number # The max number of particles at the same time.
 ---@return love.ParticleSystem system # A new ParticleSystem.
@@ -639,8 +639,8 @@ function love.graphics.newShader(code) end
 ---
 ---Creates a new SpriteBatch object.
 ---
----@overload fun(image: love.Image, maxsprites: number, usage: love.SpriteBatchUsage):love.SpriteBatch
----@overload fun(texture: love.Texture, maxsprites: number, usage: love.SpriteBatchUsage):love.SpriteBatch
+---@overload fun(image: love.Image, maxsprites?: number, usage?: love.SpriteBatchUsage):love.SpriteBatch
+---@overload fun(texture: love.Texture, maxsprites?: number, usage?: love.SpriteBatchUsage):love.SpriteBatch
 ---@param image love.Image # The Image to use for the sprites.
 ---@param maxsprites? number # The maximum number of sprites that the SpriteBatch can contain at any given time. Since version 11.0, additional sprites added past this number will automatically grow the spritebatch.
 ---@return love.SpriteBatch spriteBatch # The new SpriteBatch.
@@ -658,9 +658,9 @@ function love.graphics.newText(font, textstring) end
 ---Creates a new drawable Video. Currently only Ogg Theora video files are supported.
 ---
 ---@overload fun(videostream: love.VideoStream):love.Video
----@overload fun(filename: string, settings: table):love.Video
----@overload fun(filename: string, loadaudio: boolean):love.Video
----@overload fun(videostream: love.VideoStream, loadaudio: boolean):love.Video
+---@overload fun(filename: string, settings?: table):love.Video
+---@overload fun(filename: string, loadaudio?: boolean):love.Video
+---@overload fun(videostream: love.VideoStream, loadaudio?: boolean):love.Video
 ---@param filename string # The file path to the Ogg Theora video file.
 ---@return love.Video video # A new Video.
 function love.graphics.newVideo(filename) end
@@ -733,7 +733,7 @@ function love.graphics.present() end
 ---
 ---In versions prior to 11.0, color and byte component values were within the range of 0 to 255 instead of 0 to 1.
 ---
----@overload fun(coloredtext: table, x: number, y: number, angle: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number)
+---@overload fun(coloredtext: table, x?: number, y?: number, angle?: number, sx?: number, sy?: number, ox?: number, oy?: number, kx?: number, ky?: number)
 ---@overload fun(text: string, transform: love.Transform)
 ---@overload fun(coloredtext: table, transform: love.Transform)
 ---@overload fun(text: string, font: love.Font, transform: love.Transform)
@@ -761,13 +761,13 @@ function love.graphics.print(text, x, y, r, sx, sy, ox, oy, kx, ky) end
 ---
 ---In versions prior to 11.0, color and byte component values were within the range of 0 to 255 instead of 0 to 1.
 ---
----@overload fun(text: string, font: love.Font, x: number, y: number, limit: number, align: love.AlignMode, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number)
----@overload fun(text: string, transform: love.Transform, limit: number, align: love.AlignMode)
----@overload fun(text: string, font: love.Font, transform: love.Transform, limit: number, align: love.AlignMode)
----@overload fun(coloredtext: table, x: number, y: number, limit: number, align: love.AlignMode, angle: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number)
----@overload fun(coloredtext: table, font: love.Font, x: number, y: number, limit: number, align: love.AlignMode, angle: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number)
----@overload fun(coloredtext: table, transform: love.Transform, limit: number, align: love.AlignMode)
----@overload fun(coloredtext: table, font: love.Font, transform: love.Transform, limit: number, align: love.AlignMode)
+---@overload fun(text: string, font: love.Font, x: number, y: number, limit: number, align?: love.AlignMode, r?: number, sx?: number, sy?: number, ox?: number, oy?: number, kx?: number, ky?: number)
+---@overload fun(text: string, transform: love.Transform, limit: number, align?: love.AlignMode)
+---@overload fun(text: string, font: love.Font, transform: love.Transform, limit: number, align?: love.AlignMode)
+---@overload fun(coloredtext: table, x: number, y: number, limit: number, align: love.AlignMode, angle?: number, sx?: number, sy?: number, ox?: number, oy?: number, kx?: number, ky?: number)
+---@overload fun(coloredtext: table, font: love.Font, x: number, y: number, limit: number, align?: love.AlignMode, angle?: number, sx?: number, sy?: number, ox?: number, oy?: number, kx?: number, ky?: number)
+---@overload fun(coloredtext: table, transform: love.Transform, limit: number, align?: love.AlignMode)
+---@overload fun(coloredtext: table, font: love.Font, transform: love.Transform, limit: number, align?: love.AlignMode)
 ---@param text string # A text string.
 ---@param x number # The position on the x-axis.
 ---@param y number # The position on the y-axis.
@@ -793,7 +793,7 @@ function love.graphics.push() end
 ---
 ---Draws a rectangle.
 ---
----@overload fun(mode: love.DrawMode, x: number, y: number, width: number, height: number, rx: number, ry: number, segments: number)
+---@overload fun(mode: love.DrawMode, x: number, y: number, width: number, height: number, rx: number, ry?: number, segments?: number)
 ---@param mode love.DrawMode # How to draw the rectangle.
 ---@param x number # The position of top-left corner along the x-axis.
 ---@param y number # The position of top-left corner along the y-axis.
@@ -851,7 +851,7 @@ function love.graphics.setBackgroundColor(red, green, blue, alpha) end
 ---
 ---Sets the blending mode.
 ---
----@overload fun(mode: love.BlendMode, alphamode: love.BlendAlphaMode)
+---@overload fun(mode: love.BlendMode, alphamode?: love.BlendAlphaMode)
 ---@param mode love.BlendMode # The blend mode to use.
 function love.graphics.setBlendMode(mode) end
 
@@ -860,7 +860,7 @@ function love.graphics.setBlendMode(mode) end
 ---
 ---@overload fun()
 ---@overload fun(canvas1: love.Canvas, canvas2: love.Canvas, ...)
----@overload fun(canvas: love.Canvas, slice: number, mipmap: number)
+---@overload fun(canvas: love.Canvas, slice: number, mipmap?: number)
 ---@overload fun(setup: table)
 ---@param canvas love.Canvas # The new target.
 ---@param mipmap? number # The mipmap level to render to, for Canvases with mipmaps.
@@ -953,9 +953,9 @@ function love.graphics.setMeshCullMode(mode) end
 ---
 ---Creates and sets a new Font.
 ---
----@overload fun(filename: string, size: number):love.Font
----@overload fun(file: love.File, size: number):love.Font
----@overload fun(data: love.Data, size: number):love.Font
+---@overload fun(filename: string, size?: number):love.Font
+---@overload fun(file: love.File, size?: number):love.Font
+---@overload fun(data: love.Data, size?: number):love.Font
 ---@overload fun(rasterizer: love.Rasterizer):love.Font
 ---@param size? number # The size of the font.
 ---@return love.Font font # The new font.
@@ -1096,7 +1096,7 @@ function Canvas:getMipmapMode() end
 ---
 ---Generates ImageData from the contents of the Canvas.
 ---
----@overload fun(self: love.Canvas, slice: number, mipmap: number, x: number, y: number, width: number, height: number):love.ImageData
+---@overload fun(self: love.Canvas, slice: number, mipmap?: number, x: number, y: number, width: number, height: number):love.ImageData
 ---@return love.ImageData data # The new ImageData made from the Canvas' contents.
 function Canvas:newImageData() end
 
@@ -1289,7 +1289,7 @@ local Mesh = {}
 ---
 ---Attaches a vertex attribute from a different Mesh onto this Mesh, for use when drawing. This can be used to share vertex attribute data between several different Meshes.
 ---
----@overload fun(self: love.Mesh, name: string, mesh: love.Mesh, step: love.VertexAttributeStep, attachname: string)
+---@overload fun(self: love.Mesh, name: string, mesh: love.Mesh, step?: love.VertexAttributeStep, attachname?: string)
 ---@param name string # The name of the vertex attribute to attach.
 ---@param mesh love.Mesh # The Mesh to get the vertex attribute from.
 function Mesh:attachAttribute(name, mesh) end
@@ -1402,7 +1402,7 @@ function Mesh:setTexture(texture) end
 ---In versions prior to 11.0, color and byte component values were within the range of 0 to 255 instead of 0 to 1.
 ---
 ---@overload fun(self: love.Mesh, index: number, vertex: table)
----@overload fun(self: love.Mesh, index: number, x: number, y: number, u: number, v: number, r: number, g: number, b: number, a: number)
+---@overload fun(self: love.Mesh, index: number, x: number, y: number, u: number, v: number, r?: number, g?: number, b?: number, a?: number)
 ---@overload fun(self: love.Mesh, index: number, vertex: table)
 ---@param index number # The index of the the vertex you want to modify (one-based).
 ---@param attributecomponent number # The first component of the first vertex attribute in the specified vertex.
@@ -1434,7 +1434,7 @@ function Mesh:setVertexMap(map) end
 ---
 ---Replaces a range of vertices in the Mesh with new ones. The total number of vertices in a Mesh cannot be changed after it has been created. This is often more efficient than calling Mesh:setVertex in a loop.
 ---
----@overload fun(self: love.Mesh, data: love.Data, startvertex: number)
+---@overload fun(self: love.Mesh, data: love.Data, startvertex?: number)
 ---@overload fun(self: love.Mesh, vertices: table)
 ---@param vertices {attributecomponent: number} # The table filled with vertex information tables for each vertex, in the form of {vertex, ...} where each vertex is a table in the form of {attributecomponent, ...}.
 ---@param startvertex? number # The index of the first vertex to replace.
@@ -1966,9 +1966,9 @@ function Shader:hasUniform(name) end
 ---@overload fun(self: love.Shader, name: string, texture: love.Texture)
 ---@overload fun(self: love.Shader, name: string, boolean: boolean, ...)
 ---@overload fun(self: love.Shader, name: string, matrixlayout: love.MatrixLayout, matrix: table, ...)
----@overload fun(self: love.Shader, name: string, data: love.Data, offset: number, size: number)
----@overload fun(self: love.Shader, name: string, data: love.Data, matrixlayout: love.MatrixLayout, offset: number, size: number)
----@overload fun(self: love.Shader, name: string, matrixlayout: love.MatrixLayout, data: love.Data, offset: number, size: number)
+---@overload fun(self: love.Shader, name: string, data: love.Data, offset?: number, size?: number)
+---@overload fun(self: love.Shader, name: string, data: love.Data, matrixlayout: love.MatrixLayout, offset?: number, size?: number)
+---@overload fun(self: love.Shader, name: string, matrixlayout: love.MatrixLayout, data: love.Data, offset?: number, size?: number)
 ---@param name string # Name of the number to send to the shader.
 ---@param number number # Number to send to store in the uniform variable.
 ---@vararg number # Additional numbers to send if the uniform variable is an array.
@@ -2005,7 +2005,7 @@ local SpriteBatch = {}
 ---
 ---Adds a sprite to the batch. Sprites are drawn in the order they are added.
 ---
----@overload fun(self: love.SpriteBatch, quad: love.Quad, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number):number
+---@overload fun(self: love.SpriteBatch, quad: love.Quad, x: number, y: number, r?: number, sx?: number, sy?: number, ox?: number, oy?: number, kx?: number, ky?: number):number
 ---@param x number # The position to draw the object (x-axis).
 ---@param y number # The position to draw the object (y-axis).
 ---@param r? number # Orientation (radians).
@@ -2021,7 +2021,7 @@ function SpriteBatch:add(x, y, r, sx, sy, ox, oy, kx, ky) end
 ---
 ---Adds a sprite to a batch created with an Array Texture.
 ---
----@overload fun(self: love.SpriteBatch, layerindex: number, quad: love.Quad, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number):number
+---@overload fun(self: love.SpriteBatch, layerindex: number, quad: love.Quad, x?: number, y?: number, r?: number, sx?: number, sy?: number, ox?: number, oy?: number, kx?: number, ky?: number):number
 ---@overload fun(self: love.SpriteBatch, layerindex: number, transform: love.Transform):number
 ---@overload fun(self: love.SpriteBatch, layerindex: number, quad: love.Quad, transform: love.Transform):number
 ---@param layerindex number # The index of the layer to use for this sprite.
@@ -2094,7 +2094,7 @@ function SpriteBatch:getTexture() end
 ---
 ---Changes a sprite in the batch. This requires the sprite index returned by SpriteBatch:add or SpriteBatch:addLayer.
 ---
----@overload fun(self: love.SpriteBatch, spriteindex: number, quad: love.Quad, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number)
+---@overload fun(self: love.SpriteBatch, spriteindex: number, quad: love.Quad, x: number, y: number, r?: number, sx?: number, sy?: number, ox?: number, oy?: number, kx?: number, ky?: number)
 ---@param spriteindex number # The index of the sprite that will be changed.
 ---@param x number # The position to draw the object (x-axis).
 ---@param y number # The position to draw the object (y-axis).
@@ -2132,7 +2132,7 @@ function SpriteBatch:setDrawRange(start, count) end
 ---
 ---Changes a sprite previously added with add or addLayer, in a batch created with an Array Texture.
 ---
----@overload fun(self: love.SpriteBatch, spriteindex: number, layerindex: number, quad: love.Quad, x: number, y: number, r: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number)
+---@overload fun(self: love.SpriteBatch, spriteindex: number, layerindex: number, quad: love.Quad, x?: number, y?: number, r?: number, sx?: number, sy?: number, ox?: number, oy?: number, kx?: number, ky?: number)
 ---@overload fun(self: love.SpriteBatch, spriteindex: number, layerindex: number, transform: love.Transform)
 ---@overload fun(self: love.SpriteBatch, spriteindex: number, layerindex: number, quad: love.Quad, transform: love.Transform)
 ---@param spriteindex number # The index of the existing sprite to replace.
@@ -2163,7 +2163,7 @@ local Text = {}
 ---
 ---Adds additional colored text to the Text object at the specified position.
 ---
----@overload fun(self: love.Text, coloredtext: table, x: number, y: number, angle: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number):number
+---@overload fun(self: love.Text, coloredtext: table, x?: number, y?: number, angle?: number, sx?: number, sy?: number, ox?: number, oy?: number, kx?: number, ky?: number):number
 ---@param textstring string # The text to add to the object.
 ---@param x? number # The position of the new text on the x-axis.
 ---@param y? number # The position of the new text on the y-axis.
@@ -2182,7 +2182,7 @@ function Text:add(textstring, x, y, angle, sx, sy, ox, oy, kx, ky) end
 ---
 ---The word wrap limit is applied before any scaling, rotation, and other coordinate transformations. Therefore the amount of text per line stays constant given the same wrap limit, even if the scale arguments change.
 ---
----@overload fun(self: love.Text, coloredtext: table, wraplimit: number, align: love.AlignMode, x: number, y: number, angle: number, sx: number, sy: number, ox: number, oy: number, kx: number, ky: number):number
+---@overload fun(self: love.Text, coloredtext: table, wraplimit: number, align: love.AlignMode, x: number, y: number, angle?: number, sx?: number, sy?: number, ox?: number, oy?: number, kx?: number, ky?: number):number
 ---@param textstring string # The text to add to the object.
 ---@param wraplimit number # The maximum width in pixels of the text before it gets automatically wrapped to a new line.
 ---@param align love.AlignMode # The alignment of the text.
@@ -2529,19 +2529,19 @@ function Video:tell() end
 ---
 ---Align text center.
 ---
----| '"center"'
+---| "center"
 ---
 ---Align text left.
 ---
----| '"left"'
+---| "left"
 ---
 ---Align text right.
 ---
----| '"right"'
+---| "right"
 ---
 ---Align text both left and right.
 ---
----| '"justify"'
+---| "justify"
 
 ---
 ---Different types of arcs that can be drawn.
@@ -2550,15 +2550,15 @@ function Video:tell() end
 ---
 ---The arc is drawn like a slice of pie, with the arc circle connected to the center at its end-points.
 ---
----| '"pie"'
+---| "pie"
 ---
 ---The arc circle's two end-points are unconnected when the arc is drawn as a line. Behaves like the "closed" arc type when the arc is drawn in filled mode.
 ---
----| '"open"'
+---| "open"
 ---
 ---The arc circle's two end-points are connected to each other.
 ---
----| '"closed"'
+---| "closed"
 
 ---
 ---Types of particle area spread distribution.
@@ -2567,27 +2567,27 @@ function Video:tell() end
 ---
 ---Uniform distribution.
 ---
----| '"uniform"'
+---| "uniform"
 ---
 ---Normal (gaussian) distribution.
 ---
----| '"normal"'
+---| "normal"
 ---
 ---Uniform distribution in an ellipse.
 ---
----| '"ellipse"'
+---| "ellipse"
 ---
 ---Distribution in an ellipse with particles spawning at the edges of the ellipse.
 ---
----| '"borderellipse"'
+---| "borderellipse"
 ---
 ---Distribution in a rectangle with particles spawning at the edges of the rectangle.
 ---
----| '"borderrectangle"'
+---| "borderrectangle"
 ---
 ---No distribution - area spread is disabled.
 ---
----| '"none"'
+---| "none"
 
 ---
 ---Different ways alpha affects color blending. See BlendMode and the BlendMode Formulas for additional notes.
@@ -2596,11 +2596,11 @@ function Video:tell() end
 ---
 ---The RGB values of what's drawn are multiplied by the alpha values of those colors during blending. This is the default alpha mode.
 ---
----| '"alphamultiply"'
+---| "alphamultiply"
 ---
 ---The RGB values of what's drawn are '''not''' multiplied by the alpha values of those colors during blending. For most blend modes to work correctly with this alpha mode, the colors of a drawn object need to have had their RGB values multiplied by their alpha values at some point previously ("premultiplied alpha").
 ---
----| '"premultiplied"'
+---| "premultiplied"
 
 ---
 ---Different ways to do color blending. See BlendAlphaMode and the BlendMode Formulas for additional notes.
@@ -2609,51 +2609,51 @@ function Video:tell() end
 ---
 ---Alpha blending (normal). The alpha of what's drawn determines its opacity.
 ---
----| '"alpha"'
+---| "alpha"
 ---
 ---The colors of what's drawn completely replace what was on the screen, with no additional blending. The BlendAlphaMode specified in love.graphics.setBlendMode still affects what happens.
 ---
----| '"replace"'
+---| "replace"
 ---
 ---'Screen' blending.
 ---
----| '"screen"'
+---| "screen"
 ---
 ---The pixel colors of what's drawn are added to the pixel colors already on the screen. The alpha of the screen is not modified.
 ---
----| '"add"'
+---| "add"
 ---
 ---The pixel colors of what's drawn are subtracted from the pixel colors already on the screen. The alpha of the screen is not modified.
 ---
----| '"subtract"'
+---| "subtract"
 ---
 ---The pixel colors of what's drawn are multiplied with the pixel colors already on the screen (darkening them). The alpha of drawn objects is multiplied with the alpha of the screen rather than determining how much the colors on the screen are affected, even when the "alphamultiply" BlendAlphaMode is used.
 ---
----| '"multiply"'
+---| "multiply"
 ---
 ---The pixel colors of what's drawn are compared to the existing pixel colors, and the larger of the two values for each color component is used. Only works when the "premultiplied" BlendAlphaMode is used in love.graphics.setBlendMode.
 ---
----| '"lighten"'
+---| "lighten"
 ---
 ---The pixel colors of what's drawn are compared to the existing pixel colors, and the smaller of the two values for each color component is used. Only works when the "premultiplied" BlendAlphaMode is used in love.graphics.setBlendMode.
 ---
----| '"darken"'
+---| "darken"
 ---
 ---Additive blend mode.
 ---
----| '"additive"'
+---| "additive"
 ---
 ---Subtractive blend mode.
 ---
----| '"subtractive"'
+---| "subtractive"
 ---
 ---Multiply blend mode.
 ---
----| '"multiplicative"'
+---| "multiplicative"
 ---
 ---Premultiplied alpha blend mode.
 ---
----| '"premultiplied"'
+---| "premultiplied"
 
 ---
 ---Different types of per-pixel stencil test and depth test comparisons. The pixels of an object will be drawn if the comparison succeeds, for each pixel that the object touches.
@@ -2663,40 +2663,40 @@ function Video:tell() end
 ---* stencil tests: the stencil value of the pixel must be equal to the supplied value.
 ---* depth tests: the depth value of the drawn object at that pixel must be equal to the existing depth value of that pixel.
 ---
----| '"equal"'
+---| "equal"
 ---
 ---* stencil tests: the stencil value of the pixel must not be equal to the supplied value.
 ---* depth tests: the depth value of the drawn object at that pixel must not be equal to the existing depth value of that pixel.
 ---
----| '"notequal"'
+---| "notequal"
 ---
 ---* stencil tests: the stencil value of the pixel must be less than the supplied value.
 ---* depth tests: the depth value of the drawn object at that pixel must be less than the existing depth value of that pixel.
 ---
----| '"less"'
+---| "less"
 ---
 ---* stencil tests: the stencil value of the pixel must be less than or equal to the supplied value.
 ---* depth tests: the depth value of the drawn object at that pixel must be less than or equal to the existing depth value of that pixel.
 ---
----| '"lequal"'
+---| "lequal"
 ---
 ---* stencil tests: the stencil value of the pixel must be greater than or equal to the supplied value.
 ---* depth tests: the depth value of the drawn object at that pixel must be greater than or equal to the existing depth value of that pixel.
 ---
----| '"gequal"'
+---| "gequal"
 ---
 ---* stencil tests: the stencil value of the pixel must be greater than the supplied value.
 ---* depth tests: the depth value of the drawn object at that pixel must be greater than the existing depth value of that pixel.
 ---
----| '"greater"'
+---| "greater"
 ---
 ---Objects will never be drawn.
 ---
----| '"never"'
+---| "never"
 ---
 ---Objects will always be drawn. Effectively disables the depth or stencil test.
 ---
----| '"always"'
+---| "always"
 
 ---
 ---How Mesh geometry is culled when rendering.
@@ -2705,15 +2705,15 @@ function Video:tell() end
 ---
 ---Back-facing triangles in Meshes are culled (not rendered). The vertex order of a triangle determines whether it is back- or front-facing.
 ---
----| '"back"'
+---| "back"
 ---
 ---Front-facing triangles in Meshes are culled.
 ---
----| '"front"'
+---| "front"
 ---
 ---Both back- and front-facing triangles in Meshes are rendered.
 ---
----| '"none"'
+---| "none"
 
 ---
 ---Controls whether shapes are drawn as an outline, or filled.
@@ -2722,11 +2722,11 @@ function Video:tell() end
 ---
 ---Draw filled shape.
 ---
----| '"fill"'
+---| "fill"
 ---
 ---Draw outlined shape.
 ---
----| '"line"'
+---| "line"
 
 ---
 ---How the image is filtered when scaling.
@@ -2735,11 +2735,11 @@ function Video:tell() end
 ---
 ---Scale image with linear interpolation.
 ---
----| '"linear"'
+---| "linear"
 ---
 ---Scale image with nearest neighbor interpolation.
 ---
----| '"nearest"'
+---| "nearest"
 
 ---
 ---Graphics features that can be checked for with love.graphics.getSupported.
@@ -2748,35 +2748,35 @@ function Video:tell() end
 ---
 ---Whether the "clampzero" WrapMode is supported.
 ---
----| '"clampzero"'
+---| "clampzero"
 ---
 ---Whether the "lighten" and "darken" BlendModes are supported.
 ---
----| '"lighten"'
+---| "lighten"
 ---
 ---Whether multiple formats can be used in the same love.graphics.setCanvas call.
 ---
----| '"multicanvasformats"'
+---| "multicanvasformats"
 ---
 ---Whether GLSL 3 Shaders can be used.
 ---
----| '"glsl3"'
+---| "glsl3"
 ---
 ---Whether mesh instancing is supported.
 ---
----| '"instancing"'
+---| "instancing"
 ---
 ---Whether textures with non-power-of-two dimensions can use mipmapping and the 'repeat' WrapMode.
 ---
----| '"fullnpot"'
+---| "fullnpot"
 ---
 ---Whether pixel shaders can use "highp" 32 bit floating point numbers (as opposed to just 16 bit or lower precision).
 ---
----| '"pixelshaderhighp"'
+---| "pixelshaderhighp"
 ---
 ---Whether shaders can use the dFdx, dFdy, and fwidth functions for computing derivatives.
 ---
----| '"shaderderivatives"'
+---| "shaderderivatives"
 
 ---
 ---Types of system-dependent graphics limits checked for using love.graphics.getSystemLimits.
@@ -2785,35 +2785,35 @@ function Video:tell() end
 ---
 ---The maximum size of points.
 ---
----| '"pointsize"'
+---| "pointsize"
 ---
 ---The maximum width or height of Images and Canvases.
 ---
----| '"texturesize"'
+---| "texturesize"
 ---
 ---The maximum number of simultaneously active canvases (via love.graphics.setCanvas.)
 ---
----| '"multicanvas"'
+---| "multicanvas"
 ---
 ---The maximum number of antialiasing samples for a Canvas.
 ---
----| '"canvasmsaa"'
+---| "canvasmsaa"
 ---
 ---The maximum number of layers in an Array texture.
 ---
----| '"texturelayers"'
+---| "texturelayers"
 ---
 ---The maximum width, height, or depth of a Volume texture.
 ---
----| '"volumetexturesize"'
+---| "volumetexturesize"
 ---
 ---The maximum width or height of a Cubemap texture.
 ---
----| '"cubetexturesize"'
+---| "cubetexturesize"
 ---
 ---The maximum amount of anisotropic filtering. Texture:setMipmapFilter internally clamps the given anisotropy value to the system's limit.
 ---
----| '"anisotropy"'
+---| "anisotropy"
 
 ---
 ---Vertex map datatype for Data variant of Mesh:setVertexMap.
@@ -2822,11 +2822,11 @@ function Video:tell() end
 ---
 ---The vertex map is array of unsigned word (16-bit).
 ---
----| '"uint16"'
+---| "uint16"
 ---
 ---The vertex map is array of unsigned dword (32-bit).
 ---
----| '"uint32"'
+---| "uint32"
 
 ---
 ---Line join style.
@@ -2835,15 +2835,15 @@ function Video:tell() end
 ---
 ---The ends of the line segments beveled in an angle so that they join seamlessly.
 ---
----| '"miter"'
+---| "miter"
 ---
 ---No cap applied to the ends of the line segments.
 ---
----| '"none"'
+---| "none"
 ---
 ---Flattens the point where line segments join together.
 ---
----| '"bevel"'
+---| "bevel"
 
 ---
 ---The styles in which lines are drawn.
@@ -2852,11 +2852,11 @@ function Video:tell() end
 ---
 ---Draw rough lines.
 ---
----| '"rough"'
+---| "rough"
 ---
 ---Draw smooth lines.
 ---
----| '"smooth"'
+---| "smooth"
 
 ---
 ---How a Mesh's vertices are used when drawing.
@@ -2865,19 +2865,19 @@ function Video:tell() end
 ---
 ---The vertices create a "fan" shape with the first vertex acting as the hub point. Can be easily used to draw simple convex polygons.
 ---
----| '"fan"'
+---| "fan"
 ---
 ---The vertices create a series of connected triangles using vertices 1, 2, 3, then 3, 2, 4 (note the order), then 3, 4, 5, and so on.
 ---
----| '"strip"'
+---| "strip"
 ---
 ---The vertices create unconnected triangles.
 ---
----| '"triangles"'
+---| "triangles"
 ---
 ---The vertices are drawn as unconnected points (see love.graphics.setPointSize.)
 ---
----| '"points"'
+---| "points"
 
 ---
 ---Controls whether a Canvas has mipmaps, and its behaviour when it does.
@@ -2886,15 +2886,15 @@ function Video:tell() end
 ---
 ---The Canvas has no mipmaps.
 ---
----| '"none"'
+---| "none"
 ---
 ---The Canvas has mipmaps. love.graphics.setCanvas can be used to render to a specific mipmap level, or Canvas:generateMipmaps can (re-)compute all mipmap levels based on the base level.
 ---
----| '"auto"'
+---| "auto"
 ---
 ---The Canvas has mipmaps, and all mipmap levels will automatically be recomputed when switching away from the Canvas with love.graphics.setCanvas.
 ---
----| '"manual"'
+---| "manual"
 
 ---
 ---How newly created particles are added to the ParticleSystem.
@@ -2903,15 +2903,15 @@ function Video:tell() end
 ---
 ---Particles are inserted at the top of the ParticleSystem's list of particles.
 ---
----| '"top"'
+---| "top"
 ---
 ---Particles are inserted at the bottom of the ParticleSystem's list of particles.
 ---
----| '"bottom"'
+---| "bottom"
 ---
 ---Particles are inserted at random positions in the ParticleSystem's list of particles.
 ---
----| '"random"'
+---| "random"
 
 ---
 ---Usage hints for SpriteBatches and Meshes to optimize data storage and access.
@@ -2920,15 +2920,15 @@ function Video:tell() end
 ---
 ---The object's data will change occasionally during its lifetime. 
 ---
----| '"dynamic"'
+---| "dynamic"
 ---
 ---The object will not be modified after initial sprites or vertices are added.
 ---
----| '"static"'
+---| "static"
 ---
 ---The object data will always change between draws.
 ---
----| '"stream"'
+---| "stream"
 
 ---
 ---Graphics state stack types used with love.graphics.push.
@@ -2937,11 +2937,11 @@ function Video:tell() end
 ---
 ---The transformation stack (love.graphics.translate, love.graphics.rotate, etc.)
 ---
----| '"transform"'
+---| "transform"
 ---
 ---All love.graphics state, including transform state.
 ---
----| '"all"'
+---| "all"
 
 ---
 ---How a stencil function modifies the stencil values of pixels it touches.
@@ -2950,27 +2950,27 @@ function Video:tell() end
 ---
 ---The stencil value of a pixel will be replaced by the value specified in love.graphics.stencil, if any object touches the pixel.
 ---
----| '"replace"'
+---| "replace"
 ---
 ---The stencil value of a pixel will be incremented by 1 for each object that touches the pixel. If the stencil value reaches 255 it will stay at 255.
 ---
----| '"increment"'
+---| "increment"
 ---
 ---The stencil value of a pixel will be decremented by 1 for each object that touches the pixel. If the stencil value reaches 0 it will stay at 0.
 ---
----| '"decrement"'
+---| "decrement"
 ---
 ---The stencil value of a pixel will be incremented by 1 for each object that touches the pixel. If a stencil value of 255 is incremented it will be set to 0.
 ---
----| '"incrementwrap"'
+---| "incrementwrap"
 ---
 ---The stencil value of a pixel will be decremented by 1 for each object that touches the pixel. If the stencil value of 0 is decremented it will be set to 255.
 ---
----| '"decrementwrap"'
+---| "decrementwrap"
 ---
 ---The stencil value of a pixel will be bitwise-inverted for each object that touches the pixel. If a stencil value of 0 is inverted it will become 255.
 ---
----| '"invert"'
+---| "invert"
 
 ---
 ---Types of textures (2D, cubemap, etc.)
@@ -2979,19 +2979,19 @@ function Video:tell() end
 ---
 ---Regular 2D texture with width and height.
 ---
----| '"2d"'
+---| "2d"
 ---
 ---Several same-size 2D textures organized into a single object. Similar to a texture atlas / sprite sheet, but avoids sprite bleeding and other issues.
 ---
----| '"array"'
+---| "array"
 ---
 ---Cubemap texture with 6 faces. Requires a custom shader (and Shader:send) to use. Sampling from a cube texture in a shader takes a 3D direction vector instead of a texture coordinate.
 ---
----| '"cube"'
+---| "cube"
 ---
 ---3D texture with width, height, and depth. Requires a custom shader to use. Volume textures can have texture filtering applied along the 3rd axis.
 ---
----| '"volume"'
+---| "volume"
 
 ---
 ---The frequency at which a vertex shader fetches the vertex attribute's data from the Mesh when it's drawn.
@@ -3002,11 +3002,11 @@ function Video:tell() end
 ---
 ---The vertex attribute will have a unique value for each vertex in the Mesh.
 ---
----| '"pervertex"'
+---| "pervertex"
 ---
 ---The vertex attribute will have a unique value for each instance of the Mesh.
 ---
----| '"perinstance"'
+---| "perinstance"
 
 ---
 ---How Mesh geometry vertices are ordered.
@@ -3015,11 +3015,11 @@ function Video:tell() end
 ---
 ---Clockwise.
 ---
----| '"cw"'
+---| "cw"
 ---
 ---Counter-clockwise.
 ---
----| '"ccw"'
+---| "ccw"
 
 ---
 ---How the image wraps inside a Quad with a larger quad size than image size. This also affects how Meshes with texture coordinates which are outside the range of 1 are drawn, and the color returned by the Texel Shader function when using it to sample from texture coordinates outside of the range of 1.
@@ -3028,16 +3028,16 @@ function Video:tell() end
 ---
 ---Clamp the texture. Appears only once. The area outside the texture's normal range is colored based on the edge pixels of the texture.
 ---
----| '"clamp"'
+---| "clamp"
 ---
 ---Repeat the texture. Fills the whole available extent.
 ---
----| '"repeat"'
+---| "repeat"
 ---
 ---Repeat the texture, flipping it each time it repeats. May produce better visual results than the repeat mode when the texture doesn't seamlessly tile.
 ---
----| '"mirroredrepeat"'
+---| "mirroredrepeat"
 ---
 ---Clamp the texture. Fills the area outside the texture's normal range with transparent black (or opaque black for textures with no alpha channel.)
 ---
----| '"clampzero"'
+---| "clampzero"

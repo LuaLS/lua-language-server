@@ -139,7 +139,7 @@ function lovr.physics.newSphereShape(radius) end
 ---@param yg? number # The y component of the gravity force.
 ---@param zg? number # The z component of the gravity force.
 ---@param allowSleep? boolean # Whether or not colliders will automatically be put to sleep.
----@param tags? table # A list of collision tags colliders can be assigned to.
+---@param tags table # A list of collision tags colliders can be assigned to.
 ---@return lovr.World world # A whole new World.
 function lovr.physics.newWorld(xg, yg, zg, allowSleep, tags) end
 
@@ -1676,19 +1676,19 @@ function World:update(dt, resolver) end
 ---
 ---A BallJoint.
 ---
----| '"ball"'
+---| "ball"
 ---
 ---A DistanceJoint.
 ---
----| '"distance"'
+---| "distance"
 ---
 ---A HingeJoint.
 ---
----| '"hinge"'
+---| "hinge"
 ---
 ---A SliderJoint.
 ---
----| '"slider"'
+---| "slider"
 
 ---
 ---Represents the different types of physics Shapes available.
@@ -1697,16 +1697,16 @@ function World:update(dt, resolver) end
 ---
 ---A BoxShape.
 ---
----| '"box"'
+---| "box"
 ---
 ---A CapsuleShape.
 ---
----| '"capsule"'
+---| "capsule"
 ---
 ---A CylinderShape.
 ---
----| '"cylinder"'
+---| "cylinder"
 ---
 ---A SphereShape.
 ---
----| '"sphere"'
+---| "sphere"

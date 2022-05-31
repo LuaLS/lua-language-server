@@ -4,7 +4,7 @@ config.runtime.version            =
 "Lua執行版本。"
 config.runtime.path               =
 [[
-當使用 `require` 時，如何根據輸入的名字來查找檔案。
+當使用 `require` 時，如何根據輸入的名字來尋找檔案。
 此選項設定為 `?/init.lua` 意味著當你輸入 `require 'myfile'` 時，會從已載入的檔案中搜尋 `{workspace}/myfile/init.lua`。
 當 `runtime.pathStrict` 設定為 `false` 時，還會嘗試搜尋 `${workspace}/**/myfile/init.lua`。
 如果你想要載入工作區以外的檔案，你需要先設定 `Lua.workspace.library`。
@@ -12,7 +12,7 @@ config.runtime.path               =
 config.runtime.pathStrict         =
 '啟用後 `runtime.path` 將只搜尋第一層目錄，見 `runtime.path` 的説明。'
 config.runtime.special            =
-[[將自定義全域變數視為一些特殊的內建變數，語言服務將提供特殊的支援。
+[[將自訂全域變數視為一些特殊的內建變數，語言服務將提供特殊的支援。
 下面這個例子表示將 `include` 視為 `require` 。
 ```json
 "Lua.runtime.special" : {
@@ -51,7 +51,7 @@ config.diagnostics.neededFileStatus =
 * Disable: 停用此診斷
 ]]
 config.diagnostics.workspaceDelay =
-"進行工作區診斷的延遲（毫秒）。當你啟動工作區，或編輯了任意檔案後，將會在後台對整個工作區進行重新診斷。設定為負數可以停用工作區診斷。"
+"進行工作區診斷的延遲（毫秒）。當你啟動工作區，或編輯了任意檔案後，將會在背景對整個工作區進行重新診斷。設定為負數可以停用工作區診斷。"
 config.diagnostics.workspaceRate  =
 "工作區診斷的執行速率（百分比）。降低該值會減少CPU佔用，但是也會降低工作區診斷的速度。你目前正在編輯的檔案的診斷總是全速完成，不受該選項影響。"
 config.diagnostics.libraryFiles   =
@@ -64,8 +64,8 @@ config.diagnostics.files.Opened   =
 "只有打開這些檔案時才會診斷。"
 config.diagnostics.files.Disable  =
 "不診斷這些檔案。"
-config.diagnostics.disableScheme  = -- TODO: need translate!
-'不诊断使用以下 scheme 的lua文件。'
+config.diagnostics.disableScheme  =
+'不診斷使用以下 scheme 的lua檔案。'
 config.workspace.ignoreDir        =
 "忽略的檔案與目錄（使用 `.gitignore` 語法）。"
 config.workspace.ignoreSubmodules =
@@ -77,10 +77,10 @@ config.workspace.maxPreload       =
 config.workspace.preloadFileSize  =
 "預載入時跳過大小大於該值（KB）的檔案。"
 config.workspace.library          =
-"除了目前工作區以外，還會從哪些目錄中載入檔案。這些目錄中的檔案將被視作外部提供的程式碼庫，部分操作（如重命名欄位）不會修改這些檔案。"
+"除了目前工作區以外，還會從哪些目錄中載入檔案。這些目錄中的檔案將被視作外部提供的程式碼庫，部分操作（如重新命名欄位）不會修改這些檔案。"
 config.workspace.checkThirdParty  =
 [[
-自動檢測與適應第三方庫，目前支援的庫為：
+自動偵測與適應第三方庫，目前支援的庫為：
 
 * OpenResty
 * Cocos4.0
@@ -91,8 +91,8 @@ config.workspace.checkThirdParty  =
 ]]
 config.workspace.userThirdParty          =
 '在這裡添加私有的第三方庫適應檔案路徑，請參考內建的[組態檔案路徑](https://github.com/sumneko/lua-language-server/tree/master/meta/3rd)'
-config.workspace.supportScheme           = -- TODO: need translate!
-'为以下 scheme 的lua文件提供语言服务。'
+config.workspace.supportScheme           =
+'為以下 `scheme` 的lua檔案提供語言服務。'
 config.completion.enable                 =
 '啟用自動完成。'
 config.completion.callSnippet            =
@@ -104,7 +104,7 @@ config.completion.callSnippet.Both       =
 config.completion.callSnippet.Replace    =
 "只顯示 `呼叫片段`。"
 config.completion.keywordSnippet         =
-'顯示關鍵字語法片段'
+'顯示關鍵字語法片段。'
 config.completion.keywordSnippet.Disable =
 "只顯示 `關鍵字`。"
 config.completion.keywordSnippet.Both    =
@@ -112,7 +112,7 @@ config.completion.keywordSnippet.Both    =
 config.completion.keywordSnippet.Replace =
 "只顯示 `語法片段`。"
 config.completion.displayContext         =
-"預覽建議的相關程式碼片段，可能可以幫助你瞭解這項建議的用法。設定的數字表示程式碼片段的擷取行數，設定為`0`可以停用此功能。"
+"預覽建議的相關程式碼片段，可能可以幫助你瞭解這項建議的用法。設定的數字表示程式碼片段的擷取行數，設定為 `0` 可以停用此功能。"
 config.completion.workspaceWord          =
 "顯示的上下文單詞是否包含工作區中其他檔案的內容。"
 config.completion.showWord               =
@@ -136,7 +136,7 @@ config.color.mode                        =
 config.color.mode.Semantic               =
 "語義著色。你可能需要同時將 `editor.semanticHighlighting.enabled` 設定為 `true` 才能生效。"
 config.color.mode.SemanticEnhanced       =
-"增強的語義顏色。 類似於`Semantic`，但會進行額外的分析（也會帶來額外的開銷）。"
+"增強的語義顏色。類似於`Semantic`，但會進行額外的分析（也會帶來額外的開銷）。"
 config.color.mode.Grammar                =
 "語法著色。"
 config.semantic.enable                   =
@@ -144,7 +144,7 @@ config.semantic.enable                   =
 config.semantic.variable                 =
 "對變數/欄位/參數進行語義著色。"
 config.semantic.annotation               =
-"對類型註解進行語義著色。"
+"對型別註解進行語義著色。"
 config.semantic.keyword                  =
 "對關鍵字/字面常數/運算子進行語義著色。只有當你的編輯器無法進行語法著色時才需要啟用此功能。"
 config.signatureHelp.enable              =
@@ -152,17 +152,17 @@ config.signatureHelp.enable              =
 config.hover.enable                      =
 "啟用懸浮提示。"
 config.hover.viewString                  =
-"懸浮提示查看字串內容（僅當字面常數包含跳脫字元時）。"
+"懸浮提示檢視字串內容（僅當字面常數包含跳脫字元時）。"
 config.hover.viewStringMax               =
-"懸浮提示查看字串內容時的最大長度。"
+"懸浮提示檢視字串內容時的最大長度。"
 config.hover.viewNumber                  =
-"懸浮提示查看數字內容（僅當字面常數不是十進制時）。"
+"懸浮提示檢視數字內容（僅當字面常數不是十進制時）。"
 config.hover.fieldInfer                  =
-"懸浮提示查看表時，會對表的每個欄位進行類型推測，當類型推測的用時累計達到該設定值（毫秒）時，將跳過後續欄位的類型推測。"
+"懸浮提示檢視表時，會對表的每個欄位進行型別推測，當型別推測的用時累計達到該設定值（毫秒）時，將跳過後續欄位的型別推測。"
 config.hover.previewFields               =
-"懸浮提示查看表時，限制表內欄位的最大預覽數量。"
+"懸浮提示檢視表時，限制表內欄位的最大預覽數量。"
 config.hover.enumsLimit                  =
-"當值對應多個類型時，限制類型的顯示數量。"
+"當值對應多個型別時，限制型別的顯示數量。"
 config.develop.enable                    =
 '開發者模式。請勿開啟，會影響效能。'
 config.develop.debuggerPort              =
@@ -172,7 +172,7 @@ config.develop.debuggerWait              =
 config.intelliSense.searchDepth          =
 '設定智慧感知的搜尋深度。增大該值可以增加準確度，但會降低效能。不同的工作區對該設定的容忍度差異較大，請自己調整為合適的值。'
 config.intelliSense.fastGlobal           =
-'在對全域變數進行補全，及查看 `_G` 的懸浮提示時進行最佳化。這會略微降低類型推測的準確度，但是對於大量使用全域變數的專案會有大幅的效能提升。'
+'在對全域變數進行補全，及檢視 `_G` 的懸浮提示時進行最佳化。這會略微降低型別推測的準確度，但是對於大量使用全域變數的專案會有大幅的效能提升。'
 config.window.statusBar                  =
 '在狀態欄顯示延伸模組狀態。'
 config.window.progressBar                =
@@ -180,15 +180,15 @@ config.window.progressBar                =
 config.hint.enable                       =
 '啟用內嵌提示。'
 config.hint.paramType                    =
-'在函式的參數位置提示類型。'
+'在函式的參數位置提示型別。'
 config.hint.setType                      =
-'在賦值操作位置提示類型。'
+'在賦值操作位置提示型別。'
 config.hint.paramName                    =
 '在函式呼叫處提示參數名。'
 config.hint.paramName.All                =
-'所有類型的參數均進行提示。'
+'所有型別的參數均進行提示。'
 config.hint.paramName.Literal            =
-'只有字面常數類型的參數進行提示。'
+'只有字面常數型別的參數進行提示。'
 config.hint.paramName.Disable            =
 '停用參數提示。'
 config.hint.arrayIndex                   =
@@ -196,7 +196,7 @@ config.hint.arrayIndex                   =
 config.hint.arrayIndex.Enable            =
 '所有的表中都提示陣列索引。'
 config.hint.arrayIndex.Auto              =
-'只有表大於3項，或者表是混合類型時才進行提示。'
+'只有表大於3項，或者表是混合型別時才進行提示。'
 config.hint.arrayIndex.Disable           =
 '停用陣列索引提示。'
 config.format.enable                     =
@@ -226,7 +226,7 @@ config.diagnostics['global-in-nil-env']     =
 config.diagnostics['unused-label']          =
 '未使用的標籤'
 config.diagnostics['unused-vararg']         =
-'未使用的不定參數'
+'未使用的不定引數'
 config.diagnostics['trailing-space']        =
 '後置空格'
 config.diagnostics['redefined-local']       =
@@ -236,9 +236,9 @@ config.diagnostics['newline-call']          =
 config.diagnostics['newfield-call']         =
 '在字面常數表中，2行程式碼之間缺少分隔符，在語法上被解析為了一次索引操作'
 config.diagnostics['redundant-parameter']   =
-'函式呼叫時，傳入了多餘的參數'
+'函式呼叫時，傳入了多餘的引數'
 config.diagnostics['ambiguity-1']           =
-'優先級歧義，如：`num or 0 + 1`，推測使用者的實際期望為 `(num or 0) + 1` '
+'優先級歧義，如： `num or 0 + 1` ，推測使用者的實際期望為 `(num or 0) + 1`'
 config.diagnostics['lowercase-global']      =
 '首字母小寫的全域變數定義'
 config.diagnostics['undefined-env-child']   =

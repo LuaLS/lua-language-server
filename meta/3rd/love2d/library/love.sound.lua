@@ -9,7 +9,7 @@ love.sound = {}
 ---
 ---Attempts to find a decoder for the encoded sound data in the specified file.
 ---
----@overload fun(filename: string, buffer: number):love.Decoder
+---@overload fun(filename: string, buffer?: number):love.Decoder
 ---@param file love.File # The file with encoded sound data.
 ---@param buffer? number # The size of each decoded chunk, in bytes.
 ---@return love.Decoder decoder # A new Decoder object.
@@ -22,7 +22,7 @@ function love.sound.newDecoder(file, buffer) end
 ---
 ---@overload fun(file: love.File):love.SoundData
 ---@overload fun(decoder: love.Decoder):love.SoundData
----@overload fun(samples: number, rate: number, bits: number, channels: number):love.SoundData
+---@overload fun(samples: number, rate?: number, bits?: number, channels?: number):love.SoundData
 ---@param filename string # The file name of the file to load.
 ---@return love.SoundData soundData # A new SoundData object.
 function love.sound.newSoundData(filename) end

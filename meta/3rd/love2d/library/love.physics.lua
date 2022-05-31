@@ -57,8 +57,9 @@ function love.physics.newBody(world, x, y, type) end
 ---@param y1 number # The y position of the first point.
 ---@param x2 number # The x position of the second point.
 ---@param y2 number # The y position of the second point.
+---@vararg number # Additional point positions.
 ---@return love.ChainShape shape # The new shape.
-function love.physics.newChainShape(loop, x1, y1, x2, y2) end
+function love.physics.newChainShape(loop, x1, y1, x2, y2, ...) end
 
 ---
 ---Creates a new CircleShape.
@@ -107,7 +108,7 @@ function love.physics.newFixture(body, shape, density) end
 ---
 ---Create a friction joint between two bodies. A FrictionJoint applies friction to a body.
 ---
----@overload fun(body1: love.Body, body2: love.Body, x1: number, y1: number, x2: number, y2: number, collideConnected: boolean):love.FrictionJoint
+---@overload fun(body1: love.Body, body2: love.Body, x1: number, y1: number, x2: number, y2: number, collideConnected?: boolean):love.FrictionJoint
 ---@param body1 love.Body # The first body to attach to the joint.
 ---@param body2 love.Body # The second body to attach to the joint.
 ---@param x number # The x position of the anchor point.
@@ -135,7 +136,7 @@ function love.physics.newGearJoint(joint1, joint2, ratio, collideConnected) end
 ---
 ---Position and rotation offsets can be specified once the MotorJoint has been created, as well as the maximum motor force and torque that will be be applied to reach the target offsets.
 ---
----@overload fun(body1: love.Body, body2: love.Body, correctionFactor: number, collideConnected: boolean):love.MotorJoint
+---@overload fun(body1: love.Body, body2: love.Body, correctionFactor?: number, collideConnected?: boolean):love.MotorJoint
 ---@param body1 love.Body # The first body to attach to the joint.
 ---@param body2 love.Body # The second body to attach to the joint.
 ---@param correctionFactor? number # The joint's initial position correction factor, in the range of 1.
@@ -167,16 +168,17 @@ function love.physics.newMouseJoint(body, x, y) end
 ---@param y2 number # The y position of the second point.
 ---@param x3 number # The x position of the third point.
 ---@param y3 number # The y position of the third point.
+---@vararg number # You can continue passing more point positions to create the PolygonShape.
 ---@return love.PolygonShape shape # A new PolygonShape.
-function love.physics.newPolygonShape(x1, y1, x2, y2, x3, y3) end
+function love.physics.newPolygonShape(x1, y1, x2, y2, x3, y3, ...) end
 
 ---
 ---Creates a PrismaticJoint between two bodies.
 ---
 ---A prismatic joint constrains two bodies to move relatively to each other on a specified axis. It does not allow for relative rotation. Its definition and operation are similar to a  revolute joint, but with translation and force substituted for angle and torque.
 ---
----@overload fun(body1: love.Body, body2: love.Body, x1: number, y1: number, x2: number, y2: number, ax: number, ay: number, collideConnected: boolean):love.PrismaticJoint
----@overload fun(body1: love.Body, body2: love.Body, x1: number, y1: number, x2: number, y2: number, ax: number, ay: number, collideConnected: boolean, referenceAngle: number):love.PrismaticJoint
+---@overload fun(body1: love.Body, body2: love.Body, x1: number, y1: number, x2: number, y2: number, ax: number, ay: number, collideConnected?: boolean):love.PrismaticJoint
+---@overload fun(body1: love.Body, body2: love.Body, x1: number, y1: number, x2: number, y2: number, ax: number, ay: number, collideConnected?: boolean, referenceAngle?: number):love.PrismaticJoint
 ---@param body1 love.Body # The first body to connect with a prismatic joint.
 ---@param body2 love.Body # The second body to connect with a prismatic joint.
 ---@param x number # The x coordinate of the anchor point.
@@ -214,7 +216,7 @@ function love.physics.newPulleyJoint(body1, body2, gx1, gy1, gx2, gy2, x1, y1, x
 ---
 ---By default, the local origin is located at the '''center''' of the rectangle as opposed to the top left for graphics.
 ---
----@overload fun(x: number, y: number, width: number, height: number, angle: number):love.PolygonShape
+---@overload fun(x: number, y: number, width: number, height: number, angle?: number):love.PolygonShape
 ---@param width number # The width of the rectangle.
 ---@param height number # The height of the rectangle.
 ---@return love.PolygonShape shape # A new PolygonShape.
@@ -225,7 +227,7 @@ function love.physics.newRectangleShape(width, height) end
 ---
 ---This joint connects two bodies to a point around which they can pivot.
 ---
----@overload fun(body1: love.Body, body2: love.Body, x1: number, y1: number, x2: number, y2: number, collideConnected: boolean, referenceAngle: number):love.RevoluteJoint
+---@overload fun(body1: love.Body, body2: love.Body, x1: number, y1: number, x2: number, y2: number, collideConnected?: boolean, referenceAngle?: number):love.RevoluteJoint
 ---@param body1 love.Body # The first body.
 ---@param body2 love.Body # The second body.
 ---@param x number # The x position of the connecting point.
@@ -251,8 +253,8 @@ function love.physics.newRopeJoint(body1, body2, x1, y1, x2, y2, maxLength, coll
 ---
 ---Creates a constraint joint between two bodies. A WeldJoint essentially glues two bodies together. The constraint is a bit soft, however, due to Box2D's iterative solver.
 ---
----@overload fun(body1: love.Body, body2: love.Body, x1: number, y1: number, x2: number, y2: number, collideConnected: boolean):love.WeldJoint
----@overload fun(body1: love.Body, body2: love.Body, x1: number, y1: number, x2: number, y2: number, collideConnected: boolean, referenceAngle: number):love.WeldJoint
+---@overload fun(body1: love.Body, body2: love.Body, x1: number, y1: number, x2: number, y2: number, collideConnected?: boolean):love.WeldJoint
+---@overload fun(body1: love.Body, body2: love.Body, x1: number, y1: number, x2: number, y2: number, collideConnected?: boolean, referenceAngle?: number):love.WeldJoint
 ---@param body1 love.Body # The first body to attach to the joint.
 ---@param body2 love.Body # The second body to attach to the joint.
 ---@param x number # The x position of the anchor point (world space).
@@ -264,7 +266,7 @@ function love.physics.newWeldJoint(body1, body2, x, y, collideConnected) end
 ---
 ---Creates a wheel joint.
 ---
----@overload fun(body1: love.Body, body2: love.Body, x1: number, y1: number, x2: number, y2: number, ax: number, ay: number, collideConnected: boolean):love.WheelJoint
+---@overload fun(body1: love.Body, body2: love.Body, x1: number, y1: number, x2: number, y2: number, ax: number, ay: number, collideConnected?: boolean):love.WheelJoint
 ---@param body1 love.Body # The first body.
 ---@param body2 love.Body # The second body.
 ---@param x number # The x position of the anchor point.
@@ -499,11 +501,12 @@ function Body:getLocalPoint(worldX, worldY) end
 ---@param y1 number # (Argument) The y position of the first point.
 ---@param x2 number # (Argument) The x position of the second point.
 ---@param y2 number # (Argument) The y position of the second point.
+---@vararg number # (Argument) You can continue passing x and y position of the points.
 ---@return number x1 # (Result) The transformed x position of the first point.
 ---@return number y1 # (Result) The transformed y position of the first point.
 ---@return number x2 # (Result) The transformed x position of the second point.
 ---@return number y2 # (Result) The transformed y position of the second point.
-function Body:getLocalPoints(x1, y1, x2, y2) end
+function Body:getLocalPoints(x1, y1, x2, y2, ...) end
 
 ---
 ---Transform a vector from world coordinates to local coordinates.
@@ -2322,15 +2325,15 @@ function World:update(dt, velocityiterations, positioniterations) end
 ---
 ---Static bodies do not move.
 ---
----| '"static"'
+---| "static"
 ---
 ---Dynamic bodies collide with all bodies.
 ---
----| '"dynamic"'
+---| "dynamic"
 ---
 ---Kinematic bodies only collide with dynamic bodies.
 ---
----| '"kinematic"'
+---| "kinematic"
 
 ---
 ---Different types of joints.
@@ -2339,39 +2342,39 @@ function World:update(dt, velocityiterations, positioniterations) end
 ---
 ---A DistanceJoint.
 ---
----| '"distance"'
+---| "distance"
 ---
 ---A FrictionJoint.
 ---
----| '"friction"'
+---| "friction"
 ---
 ---A GearJoint.
 ---
----| '"gear"'
+---| "gear"
 ---
 ---A MouseJoint.
 ---
----| '"mouse"'
+---| "mouse"
 ---
 ---A PrismaticJoint.
 ---
----| '"prismatic"'
+---| "prismatic"
 ---
 ---A PulleyJoint.
 ---
----| '"pulley"'
+---| "pulley"
 ---
 ---A RevoluteJoint.
 ---
----| '"revolute"'
+---| "revolute"
 ---
 ---A RopeJoint.
 ---
----| '"rope"'
+---| "rope"
 ---
 ---A WeldJoint.
 ---
----| '"weld"'
+---| "weld"
 
 ---
 ---The different types of Shapes, as returned by Shape:getType.
@@ -2380,16 +2383,16 @@ function World:update(dt, velocityiterations, positioniterations) end
 ---
 ---The Shape is a CircleShape.
 ---
----| '"circle"'
+---| "circle"
 ---
 ---The Shape is a PolygonShape.
 ---
----| '"polygon"'
+---| "polygon"
 ---
 ---The Shape is a EdgeShape.
 ---
----| '"edge"'
+---| "edge"
 ---
 ---The Shape is a ChainShape.
 ---
----| '"chain"'
+---| "chain"

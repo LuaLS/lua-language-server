@@ -161,7 +161,7 @@ function love.audio.setDopplerScale(scale) end
 ---
 ---Not all system supports audio effects. Use love.audio.isEffectsSupported to check.
 ---
----@overload fun(name: string, enabled: boolean):boolean
+---@overload fun(name: string, enabled?: boolean):boolean
 ---@param name string # The name of the effect.
 ---@param settings {type: love.EffectType, volume: number} # The settings to use for this effect, with the following fields:
 ---@return boolean success # Whether the effect was successfully created.
@@ -355,7 +355,7 @@ function Source:getDuration(unit) end
 ---This function returns nil if the effect was applied with no filter settings associated to it.
 ---
 ---@param name string # The name of the effect.
----@param filtersettings? table # An optional empty table that will be filled with the filter settings.
+---@param filtersettings table # An optional empty table that will be filled with the filter settings.
 ---@return {volume: number, highgain: number, lowgain: number} filtersettings # The settings for the filter associated to this effect, or nil if the effect is not present in this Source or has no filter associated. The table has the following fields:
 function Source:getEffect(name, filtersettings) end
 
@@ -597,31 +597,31 @@ function Source:tell(unit) end
 ---
 ---Sources do not get attenuated.
 ---
----| '"none"'
+---| "none"
 ---
 ---Inverse distance attenuation.
 ---
----| '"inverse"'
+---| "inverse"
 ---
 ---Inverse distance attenuation. Gain is clamped. In version 0.9.2 and older this is named '''inverse clamped'''.
 ---
----| '"inverseclamped"'
+---| "inverseclamped"
 ---
 ---Linear attenuation.
 ---
----| '"linear"'
+---| "linear"
 ---
 ---Linear attenuation. Gain is clamped. In version 0.9.2 and older this is named '''linear clamped'''.
 ---
----| '"linearclamped"'
+---| "linearclamped"
 ---
 ---Exponential attenuation.
 ---
----| '"exponent"'
+---| "exponent"
 ---
 ---Exponential attenuation. Gain is clamped. In version 0.9.2 and older this is named '''exponent clamped'''.
 ---
----| '"exponentclamped"'
+---| "exponentclamped"
 
 ---
 ---The different types of effects supported by love.audio.setEffect.
@@ -630,35 +630,35 @@ function Source:tell(unit) end
 ---
 ---Plays multiple copies of the sound with slight pitch and time variation. Used to make sounds sound "fuller" or "thicker".
 ---
----| '"chorus"'
+---| "chorus"
 ---
 ---Decreases the dynamic range of the sound, making the loud and quiet parts closer in volume, producing a more uniform amplitude throughout time.
 ---
----| '"compressor"'
+---| "compressor"
 ---
 ---Alters the sound by amplifying it until it clips, shearing off parts of the signal, leading to a compressed and distorted sound.
 ---
----| '"distortion"'
+---| "distortion"
 ---
 ---Decaying feedback based effect, on the order of seconds. Also known as delay; causes the sound to repeat at regular intervals at a decreasing volume.
 ---
----| '"echo"'
+---| "echo"
 ---
 ---Adjust the frequency components of the sound using a 4-band (low-shelf, two band-pass and a high-shelf) equalizer.
 ---
----| '"equalizer"'
+---| "equalizer"
 ---
 ---Plays two copies of the sound; while varying the phase, or equivalently delaying one of them, by amounts on the order of milliseconds, resulting in phasing sounds.
 ---
----| '"flanger"'
+---| "flanger"
 ---
 ---Decaying feedback based effect, on the order of milliseconds. Used to simulate the reflection off of the surroundings.
 ---
----| '"reverb"'
+---| "reverb"
 ---
 ---An implementation of amplitude modulation; multiplies the source signal with a simple waveform, to produce either volume changes, or inharmonic overtones.
 ---
----| '"ringmodulator"'
+---| "ringmodulator"
 
 ---
 ---The different types of waveforms that can be used with the '''ringmodulator''' EffectType.
@@ -667,19 +667,19 @@ function Source:tell(unit) end
 ---
 ---A sawtooth wave, also known as a ramp wave. Named for its linear rise, and (near-)instantaneous fall along time.
 ---
----| '"sawtooth"'
+---| "sawtooth"
 ---
 ---A sine wave. Follows a trigonometric sine function.
 ---
----| '"sine"'
+---| "sine"
 ---
 ---A square wave. Switches between high and low states (near-)instantaneously.
 ---
----| '"square"'
+---| "square"
 ---
 ---A triangle wave. Follows a linear rise and fall that repeats periodically.
 ---
----| '"triangle"'
+---| "triangle"
 
 ---
 ---Types of filters for Sources.
@@ -688,15 +688,15 @@ function Source:tell(unit) end
 ---
 ---Low-pass filter. High frequency sounds are attenuated.
 ---
----| '"lowpass"'
+---| "lowpass"
 ---
 ---High-pass filter. Low frequency sounds are attenuated.
 ---
----| '"highpass"'
+---| "highpass"
 ---
 ---Band-pass filter. Both high and low frequency sounds are attenuated based on the given parameters.
 ---
----| '"bandpass"'
+---| "bandpass"
 
 ---
 ---Types of audio sources.
@@ -707,15 +707,15 @@ function Source:tell(unit) end
 ---
 ---The whole audio is decoded.
 ---
----| '"static"'
+---| "static"
 ---
 ---The audio is decoded in chunks when needed.
 ---
----| '"stream"'
+---| "stream"
 ---
 ---The audio must be manually queued by the user.
 ---
----| '"queue"'
+---| "queue"
 
 ---
 ---Units that represent time.
@@ -724,8 +724,8 @@ function Source:tell(unit) end
 ---
 ---Regular seconds.
 ---
----| '"seconds"'
+---| "seconds"
 ---
 ---Audio samples.
 ---
----| '"samples"'
+---| "samples"

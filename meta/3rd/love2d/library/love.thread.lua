@@ -86,8 +86,9 @@ function Channel:peek() end
 ---
 ---@param func function # The function to call, the form of function(channel, arg1, arg2, ...) end. The Channel is passed as the first argument to the function when it is called.
 ---@param arg1 any # Additional arguments that the given function will receive when it is called.
+---@vararg any # Additional arguments that the given function will receive when it is called.
 ---@return any ret1 # The first return value of the given function (if any.)
-function Channel:performAtomic(func, arg1) end
+function Channel:performAtomic(func, arg1, ...) end
 
 ---
 ---Retrieves the value of a Channel message and removes it from the message queue.

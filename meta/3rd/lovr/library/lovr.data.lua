@@ -9,8 +9,8 @@ lovr.data = {}
 ---
 ---Creates a new Blob.
 ---
----@overload fun(contents: string, name: string):lovr.Blob
----@overload fun(source: lovr.Blob, name: string):lovr.Blob
+---@overload fun(contents: string, name?: string):lovr.Blob
+---@overload fun(source: lovr.Blob, name?: string):lovr.Blob
 ---@param size number # The amount of data to allocate for the Blob, in bytes.  All of the bytes will be filled with zeroes.
 ---@param name? string # A name for the Blob (used in error messages)
 ---@return lovr.Blob blob # The new Blob.
@@ -29,9 +29,9 @@ function lovr.data.newBlob(size, name) end
 ---
 ---Currently textures loaded as KTX need to be in DXT/ASTC formats.
 ---
----@overload fun(width: number, height: number, format: lovr.TextureFormat, data: lovr.Blob):lovr.Image
+---@overload fun(width: number, height: number, format?: lovr.TextureFormat, data?: lovr.Blob):lovr.Image
 ---@overload fun(source: lovr.Image):lovr.Image
----@overload fun(blob: lovr.Blob, flip: boolean):lovr.Image
+---@overload fun(blob: lovr.Blob, flip?: boolean):lovr.Image
 ---@param filename string # The filename of the image to load.
 ---@param flip? boolean # Whether to vertically flip the image on load.  This should be true for normal textures, and false for textures that are going to be used in a cubemap.
 ---@return lovr.Image image # The new Image.
@@ -50,8 +50,8 @@ function lovr.data.newModelData(filename) end
 ---
 ---Creates a new Rasterizer from a TTF file.
 ---
----@overload fun(filename: string, size: number):lovr.Rasterizer
----@overload fun(blob: lovr.Blob, size: number):lovr.Rasterizer
+---@overload fun(filename: string, size?: number):lovr.Rasterizer
+---@overload fun(blob: lovr.Blob, size?: number):lovr.Rasterizer
 ---@param size? number # The resolution to render the fonts at, in pixels.  Higher resolutions use more memory and processing power but may provide better quality results for some fonts/situations.
 ---@return lovr.Rasterizer rasterizer # The new Rasterizer.
 function lovr.data.newRasterizer(size) end
@@ -325,8 +325,9 @@ function Rasterizer:getLineHeight() end
 ---
 ---Check if the Rasterizer can rasterize a set of glyphs.
 ---
+---@vararg any # Strings (sets of characters) or numbers (character codes) to check for.
 ---@return boolean hasGlyphs # true if the Rasterizer can rasterize all of the supplied characters, false otherwise.
-function Rasterizer:hasGlyphs() end
+function Rasterizer:hasGlyphs(...) end
 
 ---
 ---A Sound stores the data for a sound.
@@ -469,9 +470,9 @@ function Sound:getFrameCount() end
 ---
 ---Reads frames from the Sound into a table, Blob, or another Sound.
 ---
----@overload fun(self: lovr.Sound, t: table, count: number, srcOffset: number, dstOffset: number):table, number
----@overload fun(self: lovr.Sound, blob: lovr.Blob, count: number, srcOffset: number, dstOffset: number):number
----@overload fun(self: lovr.Sound, sound: lovr.Sound, count: number, srcOffset: number, dstOffset: number):number
+---@overload fun(self: lovr.Sound, t: table, count?: number, srcOffset?: number, dstOffset?: number):table, number
+---@overload fun(self: lovr.Sound, blob: lovr.Blob, count?: number, srcOffset?: number, dstOffset?: number):number
+---@overload fun(self: lovr.Sound, sound: lovr.Sound, count?: number, srcOffset?: number, dstOffset?: number):number
 ---@param count? number # The number of frames to read.  If nil, reads as many frames as possible.
 
 Compressed sounds will automatically be decoded.
@@ -523,8 +524,8 @@ function Sound:isStream() end
 ---
 ---Writes frames to the Sound.
 ---
----@overload fun(self: lovr.Sound, blob: lovr.Blob, count: number, dstOffset: number, srcOffset: number):number
----@overload fun(self: lovr.Sound, sound: lovr.Sound, count: number, dstOffset: number, srcOffset: number):number
+---@overload fun(self: lovr.Sound, blob: lovr.Blob, count?: number, dstOffset?: number, srcOffset?: number):number
+---@overload fun(self: lovr.Sound, sound: lovr.Sound, count?: number, dstOffset?: number, srcOffset?: number):number
 ---@param t table # A table containing frames to write.
 ---@param count? number # How many frames to write.  If nil, writes as many as possible.
 ---@param dstOffset? number # A frame offset to apply when writing the frames.
@@ -539,13 +540,13 @@ function Sound:setFrames(t, count, dstOffset, srcOffset) end
 ---
 ---1 channel.
 ---
----| '"mono"'
+---| "mono"
 ---
 ---2 channels.
 ---
 ---The first channel is for the left speaker and the second is for the right.
 ---
----| '"stereo"'
+---| "stereo"
 ---
 ---4 channels.
 ---
@@ -553,7 +554,7 @@ function Sound:setFrames(t, count, dstOffset, srcOffset) end
 ---
 ---Currently, ambisonic sounds can only be loaded, not played.
 ---
----| '"ambisonic"'
+---| "ambisonic"
 
 ---
 ---Sounds can store audio samples as 16 bit integers or 32 bit floats.
@@ -562,8 +563,8 @@ function Sound:setFrames(t, count, dstOffset, srcOffset) end
 ---
 ---32 bit floating point samples (between -1.0 and 1.0).
 ---
----| '"f32"'
+---| "f32"
 ---
 ---16 bit integer samples (between -32768 and 32767).
 ---
----| '"i16"'
+---| "i16"

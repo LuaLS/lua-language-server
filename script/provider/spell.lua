@@ -6,6 +6,7 @@ end
 local fs = require 'bee.filesystem'
 local config = require 'config'
 local diagnostics = require 'provider.diagnostic'
+local pformatting = require 'provider.formatting'
 
 local m = {}
 
@@ -45,6 +46,7 @@ function m.initDictionary()
 
     m.loadDictionaryFromFile(basicDictionary:string())
     m.loadDictionaryFromFile(luaDictionary:string())
+    pformatting.updateNonStandardSymbols(config.get(nil, "Lua.runtime.nonstandardSymbol"))
 end
 
 config.watch(function (uri, key, value, oldValue)

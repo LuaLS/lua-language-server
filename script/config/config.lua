@@ -167,6 +167,9 @@ local Template = {
                                             >> util.deepCopy(define.DiagnosticDefaultSeverity),
     ['Lua.diagnostics.neededFileStatus']    = Type.Hash(Type.String, Type.String)
                                             >> util.deepCopy(define.DiagnosticDefaultNeededFileStatus),
+    ['Lua.diagnostics.disableScheme']       = Type.Hash(Type.String, Type.Boolean, ';') >> {
+                                                ['git']      = true,
+                                            },
     ['Lua.diagnostics.workspaceDelay']      = Type.Integer >> 5,
     ['Lua.diagnostics.workspaceRate']       = Type.Integer >> 100,
     ['Lua.diagnostics.libraryFiles']        = Type.String  >> 'Opened',
@@ -179,6 +182,11 @@ local Template = {
     ['Lua.workspace.library']               = Type.Hash(Type.String, Type.Boolean, ';'),
     ['Lua.workspace.checkThirdParty']       = Type.Boolean >> true,
     ['Lua.workspace.userThirdParty']        = Type.Array(Type.String),
+    ['Lua.workspace.supportScheme']         = Type.Hash(Type.String, Type.Boolean, ';') >> {
+                                                ['file']     = true,
+                                                ['untitled'] = true,
+                                                ['git']      = true,
+                                            },
     ['Lua.completion.enable']               = Type.Boolean >> true,
     ['Lua.completion.callSnippet']          = Type.String  >> 'Disable',
     ['Lua.completion.keywordSnippet']       = Type.String  >> 'Replace',
@@ -214,6 +222,8 @@ local Template = {
                                             >> {},
     ['Lua.spell.dict']                      = Type.Array(Type.String),
     ['Lua.telemetry.enable']                = Type.Or(Type.Boolean >> false, Type.Nil) >> nil,
+
+    -- VSCode
     ['files.associations']                  = Type.Hash(Type.String, Type.String),
     ['files.exclude']                       = Type.Hash(Type.String, Type.Boolean),
     ['editor.semanticHighlighting.enabled'] = Type.Or(Type.Boolean, Type.String),
@@ -425,7 +435,7 @@ function m.update(scp, ...)
 
     local news = table.pack(...)
     for i = 1, news.n do
-        if news[i] then
+        if type(news[i]) == 'table' then
             expand(news[i])
         end
     end

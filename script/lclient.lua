@@ -208,6 +208,7 @@ function mt:registerFakers()
         'textDocument/publishDiagnostics',
         'workspace/configuration',
         'workspace/semanticTokens/refresh',
+        'workspace/diagnostic/refresh',
         'window/workDoneProgress/create',
         'window/showMessage',
         'window/logMessage',

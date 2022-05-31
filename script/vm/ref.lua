@@ -279,10 +279,22 @@ local function searchByDef(source, pushResult)
         defMap[source] = true
         return defMap
     end
-    local defs = vm.getDefs(source)
-    for _, def in ipairs(defs) do
-        pushResult(def)
-        defMap[def] = true
+    if source.type == 'field'
+    or source.type == 'method' then
+        source = source.parent
+    end
+    defMap[source] = true
+    if guide.isSet(source) then
+        local defs = vm.getDefs(source)
+        for _, def in ipairs(defs) do
+            pushResult(def)
+        end
+    else
+        local defs = vm.getDefs(source)
+        for _, def in ipairs(defs) do
+            pushResult(def)
+            defMap[def] = true
+        end
     end
     return defMap
 end

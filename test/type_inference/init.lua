@@ -2323,3 +2323,29 @@ end
 
 local <?z?> = f()
 ]]
+
+TEST 'number' [[
+for _ in _ do
+    ---@type number
+    local <?x?>
+end
+]]
+
+TEST 'unknown' [[
+for _ in _ do
+    ---@param x number
+    local <?x?>
+end
+]]
+
+TEST 'unknown' [[
+---@type number
+for <?x?> in _ do
+end
+]]
+
+TEST 'number' [[
+---@param x number
+for <?x?> in _ do
+end
+]]

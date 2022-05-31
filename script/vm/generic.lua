@@ -15,6 +15,9 @@ mt.type = 'generic'
 ---@param resolved? table<string, vm.node>
 ---@return parser.object | vm.node
 local function cloneObject(source, resolved)
+    if not source then
+        return nil
+    end
     if not resolved then
         return source
     end

@@ -60,8 +60,9 @@ function lovr.math.mat4() end
 ---@param x number # The x coordinate of the first control point.
 ---@param y number # The y coordinate of the first control point.
 ---@param z number # The z coordinate of the first control point.
+---@vararg any # Additional control points.
 ---@return lovr.Curve curve # The new Curve.
-function lovr.math.newCurve(x, y, z) end
+function lovr.math.newCurve(x, y, z, ...) end
 
 ---
 ---Creates a new 4D matrix.
@@ -406,7 +407,7 @@ function Mat4:perspective(near, far, fov, aspect) end
 ---
 ---Rotates the matrix using a quaternion or an angle/axis rotation.
 ---
----@overload fun(self: lovr.Mat4, angle: number, ax: number, ay: number, az: number):lovr.Mat4
+---@overload fun(self: lovr.Mat4, angle: number, ax?: number, ay?: number, az?: number):lovr.Mat4
 ---@param q lovr.Quat # The rotation to apply to the matrix.
 ---@return lovr.Mat4 m # The original matrix.
 function Mat4:rotate(q) end
@@ -414,7 +415,7 @@ function Mat4:rotate(q) end
 ---
 ---Scales the matrix.
 ---
----@overload fun(self: lovr.Mat4, sx: number, sy: number, sz: number):lovr.Mat4
+---@overload fun(self: lovr.Mat4, sx: number, sy?: number, sz?: number):lovr.Mat4
 ---@param scale lovr.Vec3 # The 3D scale to apply.
 ---@return lovr.Mat4 m # The original matrix.
 function Mat4:scale(scale) end
@@ -423,8 +424,8 @@ function Mat4:scale(scale) end
 ---Sets the components of the matrix from separate position, rotation, and scale arguments or an existing matrix.
 ---
 ---@overload fun(self: lovr.Mat4, n: lovr.mat4):lovr.Mat4
----@overload fun(self: lovr.Mat4, position: lovr.Vec3, scale: lovr.Vec3, rotation: lovr.Quat):lovr.Mat4
----@overload fun(self: lovr.Mat4, position: lovr.Vec3, rotation: lovr.Quat):lovr.Mat4
+---@overload fun(self: lovr.Mat4, position?: lovr.Vec3, scale?: lovr.Vec3, rotation?: lovr.Quat):lovr.Mat4
+---@overload fun(self: lovr.Mat4, position?: lovr.Vec3, rotation?: lovr.Quat):lovr.Mat4
 ---@overload fun(self: lovr.Mat4, ...):lovr.Mat4
 ---@overload fun(self: lovr.Mat4, d: number):lovr.Mat4
 ---@return lovr.Mat4 m # The input matrix.
@@ -652,7 +653,7 @@ local Vec2 = {}
 ---
 ---Adds a vector or a number to the vector.
 ---
----@overload fun(self: lovr.Vec2, x: number, y: number):lovr.Vec2
+---@overload fun(self: lovr.Vec2, x: number, y?: number):lovr.Vec2
 ---@param u lovr.Vec2 # The other vector.
 ---@return lovr.Vec2 v # The original vector.
 function Vec2:add(u) end
@@ -682,7 +683,7 @@ function Vec2:distance(u) end
 ---
 ---Divides the vector by a vector or a number.
 ---
----@overload fun(self: lovr.Vec2, x: number, y: number):lovr.Vec2
+---@overload fun(self: lovr.Vec2, x: number, y?: number):lovr.Vec2
 ---@param u lovr.Vec2 # The other vector to divide the components by.
 ---@return lovr.Vec2 v # The original vector.
 function Vec2:div(u) end
@@ -739,7 +740,7 @@ function Vec2:lerp() end
 ---
 ---Multiplies the vector by a vector or a number.
 ---
----@overload fun(self: lovr.Vec2, x: number, y: number):lovr.Vec2
+---@overload fun(self: lovr.Vec2, x: number, y?: number):lovr.Vec2
 ---@param u lovr.Vec2 # The other vector to multiply the components by.
 ---@return lovr.Vec2 v # The original vector.
 function Vec2:mul(u) end
@@ -762,7 +763,7 @@ function Vec2:set(x, y) end
 ---
 ---Subtracts a vector or a number from the vector.
 ---
----@overload fun(self: lovr.Vec2, x: number, y: number):lovr.Vec2
+---@overload fun(self: lovr.Vec2, x: number, y?: number):lovr.Vec2
 ---@param u lovr.Vec2 # The other vector.
 ---@return lovr.Vec2 v # The original vector.
 function Vec2:sub(u) end
@@ -783,7 +784,7 @@ local Vec3 = {}
 ---
 ---Adds a vector or a number to the vector.
 ---
----@overload fun(self: lovr.Vec3, x: number, y: number, z: number):lovr.Vec3
+---@overload fun(self: lovr.Vec3, x: number, y?: number, z?: number):lovr.Vec3
 ---@param u lovr.Vec3 # The other vector.
 ---@return lovr.Vec3 v # The original vector.
 function Vec3:add(u) end
@@ -827,7 +828,7 @@ function Vec3:distance(u) end
 ---
 ---Divides the vector by a vector or a number.
 ---
----@overload fun(self: lovr.Vec3, x: number, y: number, z: number):lovr.Vec3
+---@overload fun(self: lovr.Vec3, x: number, y?: number, z?: number):lovr.Vec3
 ---@param u lovr.Vec3 # The other vector to divide the components by.
 ---@return lovr.Vec3 v # The original vector.
 function Vec3:div(u) end
@@ -886,7 +887,7 @@ function Vec3:lerp(u, t) end
 ---
 ---Multiplies the vector by a vector or a number.
 ---
----@overload fun(self: lovr.Vec3, x: number, y: number, z: number):lovr.Vec3
+---@overload fun(self: lovr.Vec3, x: number, y?: number, z?: number):lovr.Vec3
 ---@param u lovr.Vec3 # The other vector to multiply the components by.
 ---@return lovr.Vec3 v # The original vector.
 function Vec3:mul(u) end
@@ -911,7 +912,7 @@ function Vec3:set(x, y, z) end
 ---
 ---Subtracts a vector or a number from the vector.
 ---
----@overload fun(self: lovr.Vec3, x: number, y: number, z: number):lovr.Vec3
+---@overload fun(self: lovr.Vec3, x: number, y?: number, z?: number):lovr.Vec3
 ---@param u lovr.Vec3 # The other vector.
 ---@return lovr.Vec3 v # The original vector.
 function Vec3:sub(u) end
@@ -933,7 +934,7 @@ local Vec4 = {}
 ---
 ---Adds a vector or a number to the vector.
 ---
----@overload fun(self: lovr.Vec4, x: number, y: number, z: number, w: number):lovr.Vec4
+---@overload fun(self: lovr.Vec4, x: number, y?: number, z?: number, w?: number):lovr.Vec4
 ---@param u lovr.Vec4 # The other vector.
 ---@return lovr.Vec4 v # The original vector.
 function Vec4:add(u) end
@@ -963,7 +964,7 @@ function Vec4:distance(u) end
 ---
 ---Divides the vector by a vector or a number.
 ---
----@overload fun(self: lovr.Vec4, x: number, y: number, z: number, w: number):lovr.Vec4
+---@overload fun(self: lovr.Vec4, x: number, y?: number, z?: number, w?: number):lovr.Vec4
 ---@param u lovr.Vec4 # The other vector to divide the components by.
 ---@return lovr.Vec4 v # The original vector.
 function Vec4:div(u) end
@@ -1022,7 +1023,7 @@ function Vec4:lerp(u, t) end
 ---
 ---Multiplies the vector by a vector or a number.
 ---
----@overload fun(self: lovr.Vec4, x: number, y: number, z: number, w: number):lovr.Vec4
+---@overload fun(self: lovr.Vec4, x: number, y?: number, z?: number, w?: number):lovr.Vec4
 ---@param u lovr.Vec4 # The other vector to multiply the components by.
 ---@return lovr.Vec4 v # The original vector.
 function Vec4:mul(u) end
@@ -1047,7 +1048,7 @@ function Vec4:set(x, y, z, w) end
 ---
 ---Subtracts a vector or a number from the vector.
 ---
----@overload fun(self: lovr.Vec4, x: number, y: number, z: number, w: number):lovr.Vec4
+---@overload fun(self: lovr.Vec4, x: number, y?: number, z?: number, w?: number):lovr.Vec4
 ---@param u lovr.Vec4 # The other vector.
 ---@return lovr.Vec4 v # The original vector.
 function Vec4:sub(u) end

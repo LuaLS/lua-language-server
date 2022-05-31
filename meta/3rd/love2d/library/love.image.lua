@@ -25,7 +25,7 @@ function love.image.newCompressedData(filename) end
 ---
 ---Creates a new ImageData object.
 ---
----@overload fun(width: number, height: number, format: love.PixelFormat, data: string):love.ImageData
+---@overload fun(width: number, height: number, format?: love.PixelFormat, data?: string):love.ImageData
 ---@overload fun(width: number, height: number, data: string):love.ImageData
 ---@overload fun(filename: string):love.ImageData
 ---@overload fun(filedata: love.FileData):love.ImageData
@@ -200,147 +200,147 @@ function ImageData:getFormat() end
 ---
 ---The DXT1 format. RGB data at 4 bits per pixel (compared to 32 bits for ImageData and regular Images.) Suitable for fully opaque images on desktop systems.
 ---
----| '"DXT1"'
+---| "DXT1"
 ---
 ---The DXT3 format. RGBA data at 8 bits per pixel. Smooth variations in opacity do not mix well with this format.
 ---
----| '"DXT3"'
+---| "DXT3"
 ---
 ---The DXT5 format. RGBA data at 8 bits per pixel. Recommended for images with varying opacity on desktop systems.
 ---
----| '"DXT5"'
+---| "DXT5"
 ---
 ---The BC4 format (also known as 3Dc+ or ATI1.) Stores just the red channel, at 4 bits per pixel.
 ---
----| '"BC4"'
+---| "BC4"
 ---
 ---The signed variant of the BC4 format. Same as above but pixel values in the texture are in the range of 1 instead of 1 in shaders.
 ---
----| '"BC4s"'
+---| "BC4s"
 ---
 ---The BC5 format (also known as 3Dc or ATI2.) Stores red and green channels at 8 bits per pixel.
 ---
----| '"BC5"'
+---| "BC5"
 ---
 ---The signed variant of the BC5 format.
 ---
----| '"BC5s"'
+---| "BC5s"
 ---
 ---The BC6H format. Stores half-precision floating-point RGB data in the range of 65504 at 8 bits per pixel. Suitable for HDR images on desktop systems.
 ---
----| '"BC6h"'
+---| "BC6h"
 ---
 ---The signed variant of the BC6H format. Stores RGB data in the range of +65504.
 ---
----| '"BC6hs"'
+---| "BC6hs"
 ---
 ---The BC7 format (also known as BPTC.) Stores RGB or RGBA data at 8 bits per pixel.
 ---
----| '"BC7"'
+---| "BC7"
 ---
 ---The ETC1 format. RGB data at 4 bits per pixel. Suitable for fully opaque images on older Android devices.
 ---
----| '"ETC1"'
+---| "ETC1"
 ---
 ---The RGB variant of the ETC2 format. RGB data at 4 bits per pixel. Suitable for fully opaque images on newer mobile devices.
 ---
----| '"ETC2rgb"'
+---| "ETC2rgb"
 ---
 ---The RGBA variant of the ETC2 format. RGBA data at 8 bits per pixel. Recommended for images with varying opacity on newer mobile devices.
 ---
----| '"ETC2rgba"'
+---| "ETC2rgba"
 ---
 ---The RGBA variant of the ETC2 format where pixels are either fully transparent or fully opaque. RGBA data at 4 bits per pixel.
 ---
----| '"ETC2rgba1"'
+---| "ETC2rgba1"
 ---
 ---The single-channel variant of the EAC format. Stores just the red channel, at 4 bits per pixel.
 ---
----| '"EACr"'
+---| "EACr"
 ---
 ---The signed single-channel variant of the EAC format. Same as above but pixel values in the texture are in the range of 1 instead of 1 in shaders.
 ---
----| '"EACrs"'
+---| "EACrs"
 ---
 ---The two-channel variant of the EAC format. Stores red and green channels at 8 bits per pixel.
 ---
----| '"EACrg"'
+---| "EACrg"
 ---
 ---The signed two-channel variant of the EAC format.
 ---
----| '"EACrgs"'
+---| "EACrgs"
 ---
 ---The 2 bit per pixel RGB variant of the PVRTC1 format. Stores RGB data at 2 bits per pixel. Textures compressed with PVRTC1 formats must be square and power-of-two sized.
 ---
----| '"PVR1rgb2"'
+---| "PVR1rgb2"
 ---
 ---The 4 bit per pixel RGB variant of the PVRTC1 format. Stores RGB data at 4 bits per pixel.
 ---
----| '"PVR1rgb4"'
+---| "PVR1rgb4"
 ---
 ---The 2 bit per pixel RGBA variant of the PVRTC1 format.
 ---
----| '"PVR1rgba2"'
+---| "PVR1rgba2"
 ---
 ---The 4 bit per pixel RGBA variant of the PVRTC1 format.
 ---
----| '"PVR1rgba4"'
+---| "PVR1rgba4"
 ---
 ---The 4x4 pixels per block variant of the ASTC format. RGBA data at 8 bits per pixel.
 ---
----| '"ASTC4x4"'
+---| "ASTC4x4"
 ---
 ---The 5x4 pixels per block variant of the ASTC format. RGBA data at 6.4 bits per pixel.
 ---
----| '"ASTC5x4"'
+---| "ASTC5x4"
 ---
 ---The 5x5 pixels per block variant of the ASTC format. RGBA data at 5.12 bits per pixel.
 ---
----| '"ASTC5x5"'
+---| "ASTC5x5"
 ---
 ---The 6x5 pixels per block variant of the ASTC format. RGBA data at 4.27 bits per pixel.
 ---
----| '"ASTC6x5"'
+---| "ASTC6x5"
 ---
 ---The 6x6 pixels per block variant of the ASTC format. RGBA data at 3.56 bits per pixel.
 ---
----| '"ASTC6x6"'
+---| "ASTC6x6"
 ---
 ---The 8x5 pixels per block variant of the ASTC format. RGBA data at 3.2 bits per pixel.
 ---
----| '"ASTC8x5"'
+---| "ASTC8x5"
 ---
 ---The 8x6 pixels per block variant of the ASTC format. RGBA data at 2.67 bits per pixel.
 ---
----| '"ASTC8x6"'
+---| "ASTC8x6"
 ---
 ---The 8x8 pixels per block variant of the ASTC format. RGBA data at 2 bits per pixel.
 ---
----| '"ASTC8x8"'
+---| "ASTC8x8"
 ---
 ---The 10x5 pixels per block variant of the ASTC format. RGBA data at 2.56 bits per pixel.
 ---
----| '"ASTC10x5"'
+---| "ASTC10x5"
 ---
 ---The 10x6 pixels per block variant of the ASTC format. RGBA data at 2.13 bits per pixel.
 ---
----| '"ASTC10x6"'
+---| "ASTC10x6"
 ---
 ---The 10x8 pixels per block variant of the ASTC format. RGBA data at 1.6 bits per pixel.
 ---
----| '"ASTC10x8"'
+---| "ASTC10x8"
 ---
 ---The 10x10 pixels per block variant of the ASTC format. RGBA data at 1.28 bits per pixel.
 ---
----| '"ASTC10x10"'
+---| "ASTC10x10"
 ---
 ---The 12x10 pixels per block variant of the ASTC format. RGBA data at 1.07 bits per pixel.
 ---
----| '"ASTC12x10"'
+---| "ASTC12x10"
 ---
 ---The 12x12 pixels per block variant of the ASTC format. RGBA data at 0.89 bits per pixel.
 ---
----| '"ASTC12x12"'
+---| "ASTC12x12"
 
 ---
 ---Encoded image formats.
@@ -349,19 +349,19 @@ function ImageData:getFormat() end
 ---
 ---Targa image format.
 ---
----| '"tga"'
+---| "tga"
 ---
 ---PNG image format.
 ---
----| '"png"'
+---| "png"
 ---
 ---JPG image format.
 ---
----| '"jpg"'
+---| "jpg"
 ---
 ---BMP image format.
 ---
----| '"bmp"'
+---| "bmp"
 
 ---
 ---Pixel formats for Textures, ImageData, and CompressedImageData.
@@ -370,256 +370,256 @@ function ImageData:getFormat() end
 ---
 ---Indicates unknown pixel format, used internally.
 ---
----| '"unknown"'
+---| "unknown"
 ---
 ---Alias for rgba8, or srgba8 if gamma-correct rendering is enabled.
 ---
----| '"normal"'
+---| "normal"
 ---
 ---A format suitable for high dynamic range content - an alias for the rgba16f format, normally.
 ---
----| '"hdr"'
+---| "hdr"
 ---
 ---Single-channel (red component) format (8 bpp).
 ---
----| '"r8"'
+---| "r8"
 ---
 ---Two channels (red and green components) with 8 bits per channel (16 bpp).
 ---
----| '"rg8"'
+---| "rg8"
 ---
 ---8 bits per channel (32 bpp) RGBA. Color channel values range from 0-255 (0-1 in shaders).
 ---
----| '"rgba8"'
+---| "rgba8"
 ---
 ---gamma-correct version of rgba8.
 ---
----| '"srgba8"'
+---| "srgba8"
 ---
 ---Single-channel (red component) format (16 bpp).
 ---
----| '"r16"'
+---| "r16"
 ---
 ---Two channels (red and green components) with 16 bits per channel (32 bpp).
 ---
----| '"rg16"'
+---| "rg16"
 ---
 ---16 bits per channel (64 bpp) RGBA. Color channel values range from 0-65535 (0-1 in shaders).
 ---
----| '"rgba16"'
+---| "rgba16"
 ---
 ---Floating point single-channel format (16 bpp). Color values can range from [-65504, +65504].
 ---
----| '"r16f"'
+---| "r16f"
 ---
 ---Floating point two-channel format with 16 bits per channel (32 bpp). Color values can range from [-65504, +65504].
 ---
----| '"rg16f"'
+---| "rg16f"
 ---
 ---Floating point RGBA with 16 bits per channel (64 bpp). Color values can range from [-65504, +65504].
 ---
----| '"rgba16f"'
+---| "rgba16f"
 ---
 ---Floating point single-channel format (32 bpp).
 ---
----| '"r32f"'
+---| "r32f"
 ---
 ---Floating point two-channel format with 32 bits per channel (64 bpp).
 ---
----| '"rg32f"'
+---| "rg32f"
 ---
 ---Floating point RGBA with 32 bits per channel (128 bpp).
 ---
----| '"rgba32f"'
+---| "rgba32f"
 ---
 ---Same as rg8, but accessed as (L, L, L, A)
 ---
----| '"la8"'
+---| "la8"
 ---
 ---4 bits per channel (16 bpp) RGBA.
 ---
----| '"rgba4"'
+---| "rgba4"
 ---
 ---RGB with 5 bits each, and a 1-bit alpha channel (16 bpp).
 ---
----| '"rgb5a1"'
+---| "rgb5a1"
 ---
 ---RGB with 5, 6, and 5 bits each, respectively (16 bpp). There is no alpha channel in this format.
 ---
----| '"rgb565"'
+---| "rgb565"
 ---
 ---RGB with 10 bits per channel, and a 2-bit alpha channel (32 bpp).
 ---
----| '"rgb10a2"'
+---| "rgb10a2"
 ---
 ---Floating point RGB with 11 bits in the red and green channels, and 10 bits in the blue channel (32 bpp). There is no alpha channel. Color values can range from [0, +65024].
 ---
----| '"rg11b10f"'
+---| "rg11b10f"
 ---
 ---No depth buffer and 8-bit stencil buffer.
 ---
----| '"stencil8"'
+---| "stencil8"
 ---
 ---16-bit depth buffer and no stencil buffer.
 ---
----| '"depth16"'
+---| "depth16"
 ---
 ---24-bit depth buffer and no stencil buffer.
 ---
----| '"depth24"'
+---| "depth24"
 ---
 ---32-bit float depth buffer and no stencil buffer.
 ---
----| '"depth32f"'
+---| "depth32f"
 ---
 ---24-bit depth buffer and 8-bit stencil buffer.
 ---
----| '"depth24stencil8"'
+---| "depth24stencil8"
 ---
 ---32-bit float depth buffer and 8-bit stencil buffer.
 ---
----| '"depth32fstencil8"'
+---| "depth32fstencil8"
 ---
 ---The DXT1 format. RGB data at 4 bits per pixel (compared to 32 bits for ImageData and regular Images.) Suitable for fully opaque images on desktop systems.
 ---
----| '"DXT1"'
+---| "DXT1"
 ---
 ---The DXT3 format. RGBA data at 8 bits per pixel. Smooth variations in opacity do not mix well with this format.
 ---
----| '"DXT3"'
+---| "DXT3"
 ---
 ---The DXT5 format. RGBA data at 8 bits per pixel. Recommended for images with varying opacity on desktop systems.
 ---
----| '"DXT5"'
+---| "DXT5"
 ---
 ---The BC4 format (also known as 3Dc+ or ATI1.) Stores just the red channel, at 4 bits per pixel.
 ---
----| '"BC4"'
+---| "BC4"
 ---
 ---The signed variant of the BC4 format. Same as above but pixel values in the texture are in the range of 1 instead of 1 in shaders.
 ---
----| '"BC4s"'
+---| "BC4s"
 ---
 ---The BC5 format (also known as 3Dc or ATI2.) Stores red and green channels at 8 bits per pixel.
 ---
----| '"BC5"'
+---| "BC5"
 ---
 ---The signed variant of the BC5 format.
 ---
----| '"BC5s"'
+---| "BC5s"
 ---
 ---The BC6H format. Stores half-precision floating-point RGB data in the range of 65504 at 8 bits per pixel. Suitable for HDR images on desktop systems.
 ---
----| '"BC6h"'
+---| "BC6h"
 ---
 ---The signed variant of the BC6H format. Stores RGB data in the range of +65504.
 ---
----| '"BC6hs"'
+---| "BC6hs"
 ---
 ---The BC7 format (also known as BPTC.) Stores RGB or RGBA data at 8 bits per pixel.
 ---
----| '"BC7"'
+---| "BC7"
 ---
 ---The ETC1 format. RGB data at 4 bits per pixel. Suitable for fully opaque images on older Android devices.
 ---
----| '"ETC1"'
+---| "ETC1"
 ---
 ---The RGB variant of the ETC2 format. RGB data at 4 bits per pixel. Suitable for fully opaque images on newer mobile devices.
 ---
----| '"ETC2rgb"'
+---| "ETC2rgb"
 ---
 ---The RGBA variant of the ETC2 format. RGBA data at 8 bits per pixel. Recommended for images with varying opacity on newer mobile devices.
 ---
----| '"ETC2rgba"'
+---| "ETC2rgba"
 ---
 ---The RGBA variant of the ETC2 format where pixels are either fully transparent or fully opaque. RGBA data at 4 bits per pixel.
 ---
----| '"ETC2rgba1"'
+---| "ETC2rgba1"
 ---
 ---The single-channel variant of the EAC format. Stores just the red channel, at 4 bits per pixel.
 ---
----| '"EACr"'
+---| "EACr"
 ---
 ---The signed single-channel variant of the EAC format. Same as above but pixel values in the texture are in the range of 1 instead of 1 in shaders.
 ---
----| '"EACrs"'
+---| "EACrs"
 ---
 ---The two-channel variant of the EAC format. Stores red and green channels at 8 bits per pixel.
 ---
----| '"EACrg"'
+---| "EACrg"
 ---
 ---The signed two-channel variant of the EAC format.
 ---
----| '"EACrgs"'
+---| "EACrgs"
 ---
 ---The 2 bit per pixel RGB variant of the PVRTC1 format. Stores RGB data at 2 bits per pixel. Textures compressed with PVRTC1 formats must be square and power-of-two sized.
 ---
----| '"PVR1rgb2"'
+---| "PVR1rgb2"
 ---
 ---The 4 bit per pixel RGB variant of the PVRTC1 format. Stores RGB data at 4 bits per pixel.
 ---
----| '"PVR1rgb4"'
+---| "PVR1rgb4"
 ---
 ---The 2 bit per pixel RGBA variant of the PVRTC1 format.
 ---
----| '"PVR1rgba2"'
+---| "PVR1rgba2"
 ---
 ---The 4 bit per pixel RGBA variant of the PVRTC1 format.
 ---
----| '"PVR1rgba4"'
+---| "PVR1rgba4"
 ---
 ---The 4x4 pixels per block variant of the ASTC format. RGBA data at 8 bits per pixel.
 ---
----| '"ASTC4x4"'
+---| "ASTC4x4"
 ---
 ---The 5x4 pixels per block variant of the ASTC format. RGBA data at 6.4 bits per pixel.
 ---
----| '"ASTC5x4"'
+---| "ASTC5x4"
 ---
 ---The 5x5 pixels per block variant of the ASTC format. RGBA data at 5.12 bits per pixel.
 ---
----| '"ASTC5x5"'
+---| "ASTC5x5"
 ---
 ---The 6x5 pixels per block variant of the ASTC format. RGBA data at 4.27 bits per pixel.
 ---
----| '"ASTC6x5"'
+---| "ASTC6x5"
 ---
 ---The 6x6 pixels per block variant of the ASTC format. RGBA data at 3.56 bits per pixel.
 ---
----| '"ASTC6x6"'
+---| "ASTC6x6"
 ---
 ---The 8x5 pixels per block variant of the ASTC format. RGBA data at 3.2 bits per pixel.
 ---
----| '"ASTC8x5"'
+---| "ASTC8x5"
 ---
 ---The 8x6 pixels per block variant of the ASTC format. RGBA data at 2.67 bits per pixel.
 ---
----| '"ASTC8x6"'
+---| "ASTC8x6"
 ---
 ---The 8x8 pixels per block variant of the ASTC format. RGBA data at 2 bits per pixel.
 ---
----| '"ASTC8x8"'
+---| "ASTC8x8"
 ---
 ---The 10x5 pixels per block variant of the ASTC format. RGBA data at 2.56 bits per pixel.
 ---
----| '"ASTC10x5"'
+---| "ASTC10x5"
 ---
 ---The 10x6 pixels per block variant of the ASTC format. RGBA data at 2.13 bits per pixel.
 ---
----| '"ASTC10x6"'
+---| "ASTC10x6"
 ---
 ---The 10x8 pixels per block variant of the ASTC format. RGBA data at 1.6 bits per pixel.
 ---
----| '"ASTC10x8"'
+---| "ASTC10x8"
 ---
 ---The 10x10 pixels per block variant of the ASTC format. RGBA data at 1.28 bits per pixel.
 ---
----| '"ASTC10x10"'
+---| "ASTC10x10"
 ---
 ---The 12x10 pixels per block variant of the ASTC format. RGBA data at 1.07 bits per pixel.
 ---
----| '"ASTC12x10"'
+---| "ASTC12x10"
 ---
 ---The 12x12 pixels per block variant of the ASTC format. RGBA data at 0.89 bits per pixel.
 ---
----| '"ASTC12x12"'
+---| "ASTC12x12"

@@ -64,6 +64,8 @@ config.diagnostics.files.Opened   =
 "Only when these files are opened will it be diagnosed."
 config.diagnostics.files.Disable  =
 "These files are not diagnosed."
+config.diagnostics.disableScheme  =
+'Do not diagnose Lua files that use the following scheme.'
 config.workspace.ignoreDir        =
 "Ignored files and directories (Use `.gitignore` grammar)."-- .. example.ignoreDir,
 config.workspace.ignoreSubmodules =
@@ -89,6 +91,8 @@ Automatic detection and adaptation of third-party libraries, currently supported
 ]]
 config.workspace.userThirdParty          =
 'Add private third-party library configuration file paths here, please refer to the built-in [configuration file path](https://github.com/sumneko/lua-language-server/tree/master/meta/3rd)'
+config.workspace.supportScheme           =
+'Provide language server for the Lua files of the following scheme.'
 config.completion.enable                 =
 'Enable completion.'
 config.completion.callSnippet            =

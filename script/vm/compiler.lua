@@ -533,7 +533,7 @@ end
 -- 该函数有副作用，会给source绑定node！
 local function bindDocs(source)
     local isParam = source.parent.type == 'funcargs'
-                 or source.parent.type == 'in'
+                 or (source.parent.type == 'in' and source.finish <= source.parent.keys.finish)
     local docs = source.bindDocs
     for i = #docs, 1, -1 do
         local doc = docs[i]

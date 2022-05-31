@@ -66,20 +66,20 @@ function love.system.vibrate(seconds) end
 ---
 ---Cannot determine power status.
 ---
----| '"unknown"'
+---| "unknown"
 ---
 ---Not plugged in, running on a battery.
 ---
----| '"battery"'
+---| "battery"
 ---
 ---Plugged in, no battery available.
 ---
----| '"nobattery"'
+---| "nobattery"
 ---
 ---Plugged in, charging battery.
 ---
----| '"charging"'
+---| "charging"
 ---
 ---Plugged in, battery is fully charged.
 ---
----| '"charged"'
+---| "charged"

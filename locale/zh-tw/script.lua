@@ -13,15 +13,15 @@ DIAG_UNDEF_ENV_CHILD    =
 DIAG_UNDEF_FENV_CHILD   =
 '未定義的變數 `{}`（處於模組中）。'
 DIAG_GLOBAL_IN_NIL_ENV  =
-'不能使用全域變數（`_ENV`被設為了`nil`）。'
+'不能使用全域變數（ `_ENV` 被設為了 `nil` ）。'
 DIAG_GLOBAL_IN_NIL_FENV =
-'不能使用全域變數（模組被設為了`nil`）。'
+'不能使用全域變數（模組被設為了 `nil` ）。'
 DIAG_UNUSED_LABEL       =
 '未使用的標籤 `{}`。'
 DIAG_UNUSED_FUNCTION    =
 '未使用的函式。'
 DIAG_UNUSED_VARARG      =
-'未使用的不定參數。'
+'未使用的不定引數。'
 DIAG_REDEFINED_LOCAL    =
 '重複定義區域變數 `{}`。'
 DIAG_DUPLICATE_INDEX    =
@@ -29,17 +29,17 @@ DIAG_DUPLICATE_INDEX    =
 DIAG_DUPLICATE_METHOD   =
 '重複的方法 `{}`。'
 DIAG_PREVIOUS_CALL      =
-'會被直譯為 `{}{}`。你可能需要加一個 `;`。'
+'會被直譯為 `{}{}` 。你可能需要加一個 `;`。'
 DIAG_PREFIELD_CALL      =
-'會被直譯為 `{}{}`。你可能需要加一個`,`或`;`。'
+'會被直譯為 `{}{}` 。你可能需要加一個 `,` 或 `;` 。'
 DIAG_OVER_MAX_ARGS      =
-'函式最多接收 {:d} 個參數，但獲得了 {:d} 個。'
+'函式最多接收 {:d} 個引數，但獲得了 {:d} 個。'
 DIAG_MISS_ARGS          =
-'函式最少接收 {:d} 個參數，但獲得了 {:d} 個。'
+'函式最少接收 {:d} 個引數，但獲得了 {:d} 個。'
 DIAG_OVER_MAX_VALUES    =
 '只有 {} 個變數，但你設定了 {} 個值。'
 DIAG_AMBIGUITY_1        =
-'會優先運算 `{}`，你可能需要加個括號。'
+'會優先運算 `{}` ，你可能需要加個括號。'
 DIAG_LOWERCASE_GLOBAL   =
 '首字母小寫的全域變數，你是否漏了 `local` 或是有拼寫錯誤？'
 DIAG_EMPTY_BLOCK        =
@@ -79,21 +79,21 @@ DIAG_UNBALANCED_ASSIGNMENTS =
 DIAG_REQUIRE_LIKE       =
 '你可以在設定中將 `{}` 視為 `require`。'
 DIAG_COSE_NON_OBJECT    =
-'無法 close 此類型的值。（除非給此類型設定 `__close` 元方法）'
+'無法 close 此型別的值。（除非給此型別設定 `__close` 元方法）'
 DIAG_COUNT_DOWN_LOOP    =
 '你的意思是 `{}` 嗎？'
 DIAG_UNKNOWN            =
-'無法推測出類型。'
+'無法推測出型別。'
 DIAG_DEPRECATED         =
 '已廢棄。'
 DIAG_DIFFERENT_REQUIRES =
-'使用了不同的名字 require 了同一個檔案。'
+'使用了不同的名字 `require` 了同一個檔案。'
 DIAG_REDUNDANT_RETURN   =
 '冗餘回傳。'
 DIAG_AWAIT_IN_SYNC      =
-'只能在標記為異步的函式中呼叫異步函式。'
+'只能在標記為非同步的函式中呼叫非同步函式。'
 DIAG_NOT_YIELDABLE      =
-'此函式的第 {} 個參數沒有被標記為可讓出，但是傳入了異步函式。（使用 `---@param name async fun()` 來標記為可讓出）'
+'此函式的第 {} 個參數沒有被標記為可讓出，但是傳入了非同步函式。（使用 `---@param name async fun()` 來標記為可讓出）'
 DIAG_DISCARD_RETURNS    =
 '不能丟棄此函式的回傳值。'
 DIAG_NEED_CHECK_NIL     =
@@ -111,7 +111,7 @@ DIAG_DUPLICATE_DOC_PARAM              =
 DIAG_UNDEFINED_DOC_CLASS              =
 '未定義的類別 `{}`。'
 DIAG_UNDEFINED_DOC_NAME               =
-'未定義的類型或別名 `{}`。'
+'未定義的型別或別名 `{}`。'
 DIAG_UNDEFINED_DOC_PARAM              =
 '指向了未定義的參數 `{}`。'
 DIAG_UNKNOWN_DIAG_CODE                =
@@ -142,6 +142,10 @@ WORKSPACE_DIAGNOSTIC      =
 '正在對工作目錄進行診斷'
 WORKSPACE_SKIP_HUGE_FILE  =
 '出於效能考慮，已停止對此檔案解析：{}'
+WORKSPACE_NOT_ALLOWED     =
+'你的工作目錄被設定為了 `{}` ，Lua語言服務拒絕載入此目錄，請檢查你的設定檔。[了解更多](https://github.com/sumneko/lua-language-server/wiki/Why-scanning-home-folder)'
+WORKSPACE_SCAN_TOO_MUCH   =
+'已掃描了超過 {} 個檔案，目前掃描的目錄為 `{}`，請確認設定檔是否正確。'
 
 PARSER_CRASH            =
 '語法解析崩潰了！遺言：{}'
@@ -172,11 +176,11 @@ PARSER_MISS_FIELD       =
 PARSER_MISS_METHOD      =
 '缺少方法名。'
 PARSER_ARGS_AFTER_DOTS  =
-'`...`必須是最後一個參數。'
+'`...`必須是最後一個引數。'
 PARSER_KEYWORD          =
 '關鍵字無法作為名稱。'
 PARSER_EXP_IN_ACTION    =
-'該表達式不能作為語句。'
+'該表達式不能作為敘述。'
 PARSER_BREAK_OUTSIDE    =
 '`break`必須在循環內部。'
 PARSER_MALFORMED_NUMBER =
@@ -200,47 +204,47 @@ PARSER_UNKNOWN_TAG      =
 PARSER_MULTI_TAG        =
 '只能設定一個屬性。'
 PARSER_UNEXPECT_LFUNC_NAME =
-'區域函式只能使用識別符作為名稱。'
+'區域函式只能使用識別字作為名稱。'
 PARSER_UNEXPECT_EFUNC_NAME =
 '函式作為表達式時不能命名。'
 PARSER_ERR_LCOMMENT_END =
-'應使用`{symbol}`來關閉多行註解。'
+'應使用 `{symbol}` 來關閉多行註解。'
 PARSER_ERR_C_LONG_COMMENT =
-'Lua應使用`--[[ ]]`來進行多行註解。'
+'Lua應使用 `--[[ ]]` 來進行多行註解。'
 PARSER_ERR_LSTRING_END  =
-'應使用`{symbol}`來關閉長字串。'
+'應使用 `{symbol}` 來關閉長字串。'
 PARSER_ERR_ASSIGN_AS_EQ =
-'應使用`=`來進行賦值操作。'
+'應使用 `=` 來進行賦值操作。'
 PARSER_ERR_EQ_AS_ASSIGN =
-'應使用`==`來進行等於判斷。'
+'應使用 `==` 來進行等於判斷。'
 PARSER_ERR_UEQ          =
-'應使用`~=`來進行不等於判斷。'
+'應使用 `~=` 來進行不等於判斷。'
 PARSER_ERR_THEN_AS_DO   =
-'應使用`then`。'
+'應使用 `then` 。'
 PARSER_ERR_DO_AS_THEN   =
-'應使用`do`。'
+'應使用 `do` 。'
 PARSER_MISS_END         =
-'缺少對應的`end`。'
+'缺少對應的 `end` 。'
 PARSER_ERR_COMMENT_PREFIX =
-'Lua應使用`--`來進行註解。'
+'Lua應使用 `--` 來進行註解。'
 PARSER_MISS_SEP_IN_TABLE =
-'需要用`,`或`;`進行分割。'
+'需要用 `,` 或 `;` 進行分割。'
 PARSER_SET_CONST         =
 '不能對常數賦值。'
 PARSER_UNICODE_NAME      =
 '包含了 Unicode 字元。'
 PARSER_ERR_NONSTANDARD_SYMBOL =
-'Lua中應使用符號 `{symbol}`。'
+'Lua中應使用符號 `{symbol}` 。'
 PARSER_MISS_SPACE_BETWEEN =
-'符號之間必須保留空格'
+'符號之間必須保留空格。'
 PARSER_INDEX_IN_FUNC_NAME =
 '命名函式的名稱中不能使用 `[name]` 形式。'
 PARSER_UNKNOWN_ATTRIBUTE  =
-'區域變數屬性應該是 `const` 或 `close`'
+'區域變數屬性應該是 `const` 或 `close` 。'
 PARSER_LUADOC_MISS_CLASS_NAME           =
 '缺少類別名稱。'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =
-'缺少符號 `:`。'
+'缺少符號 `:` 。'
 PARSER_LUADOC_MISS_CLASS_EXTENDS_NAME   =
 '缺少要繼承的類別名稱。'
 PARSER_LUADOC_MISS_SYMBOL               =
@@ -248,7 +252,7 @@ PARSER_LUADOC_MISS_SYMBOL               =
 PARSER_LUADOC_MISS_ARG_NAME             =
 '缺少參數名稱。'
 PARSER_LUADOC_MISS_TYPE_NAME            =
-'缺少類型名。'
+'缺少型別名。'
 PARSER_LUADOC_MISS_ALIAS_NAME           =
 '缺少別名。'
 PARSER_LUADOC_MISS_ALIAS_EXTENDS        =
@@ -256,21 +260,21 @@ PARSER_LUADOC_MISS_ALIAS_EXTENDS        =
 PARSER_LUADOC_MISS_PARAM_NAME           =
 '缺少要指向的參數名稱。'
 PARSER_LUADOC_MISS_PARAM_EXTENDS        =
-'缺少參數的類型定義。'
+'缺少參數的型別定義。'
 PARSER_LUADOC_MISS_FIELD_NAME           =
 '缺少欄位名稱。'
 PARSER_LUADOC_MISS_FIELD_EXTENDS        =
-'缺少欄位的類型定義。'
+'缺少欄位的型別定義。'
 PARSER_LUADOC_MISS_GENERIC_NAME         =
 '缺少泛型名稱。'
 PARSER_LUADOC_MISS_GENERIC_EXTENDS_NAME =
 '缺少泛型要繼承的類別名稱。'
 PARSER_LUADOC_MISS_VARARG_TYPE          =
-'缺少可變參數的類型定義。'
+'缺少可變引數的型別定義。'
 PARSER_LUADOC_MISS_FUN_AFTER_OVERLOAD   =
-'缺少關鍵字 `fun`。'
+'缺少關鍵字 `fun` 。'
 PARSER_LUADOC_MISS_CATE_NAME            =
-'缺少文件類型名稱。'
+'缺少文件型別名稱。'
 PARSER_LUADOC_MISS_DIAG_MODE            =
 '缺少診斷模式。'
 PARSER_LUADOC_ERROR_DIAG_MODE           =
@@ -282,7 +286,7 @@ SYMBOL_ANONYMOUS        =
 '<匿名函式>'
 
 HOVER_VIEW_DOCUMENTS    =
-'查看文件'
+'檢視文件'
 HOVER_DOCUMENT_LUA51    =
 'https://www.lua.org/manual/5.1/manual.html#{}'
 HOVER_DOCUMENT_LUA52    =
@@ -304,25 +308,25 @@ HOVER_NATIVE_DOCUMENT_LUA54     =
 HOVER_NATIVE_DOCUMENT_LUAJIT    =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 HOVER_MULTI_PROTOTYPE      =
-'({} 個原型)'
+'（{} 個原型）'
 HOVER_STRING_BYTES         =
 '{} 個位元組'
 HOVER_STRING_CHARACTERS    =
 '{} 個位元組，{} 個字元'
 HOVER_MULTI_DEF_PROTO      =
-'({} 個定義，{} 個原型)'
+'（{} 個定義，{} 個原型）'
 HOVER_MULTI_PROTO_NOT_FUNC =
-'({} 個非函式定義)'
+'（{} 個非函式定義）'
 HOVER_USE_LUA_PATH      =
-'（搜尋路徑： `{}`）'
+'（搜尋路徑： `{}` ）'
 HOVER_EXTENDS           =
 '展開為 {}'
 HOVER_TABLE_TIME_UP     =
-'出於效能考慮，已停用了部分類型推斷。'
+'出於效能考慮，已停用了部分型別推斷。'
 HOVER_WS_LOADING        =
 '正在載入工作目錄：{} / {}'
 HOVER_AWAIT_TOOLTIP     =
-'正在呼叫異步函式，可能會讓出目前共常式'
+'正在呼叫非同步函式，可能會讓出目前共常式'
 
 ACTION_DISABLE_DIAG     =
 '在工作區停用診斷 ({})。'
@@ -379,7 +383,7 @@ ACTION_DISABLE_DIAG_LINE=
 ACTION_DISABLE_DIAG_FILE=
 '在此檔案停用診斷 ({})。'
 ACTION_MARK_ASYNC       =
-'將目前函式標記為異步。'
+'將目前函式標記為非同步。'
 
 COMMAND_DISABLE_DIAG       =
 '停用診斷'
@@ -401,7 +405,7 @@ COMMAND_JSON_TO_LUA_FAILED =
 'JSON 轉 Lua 失敗：{}'
 
 COMPLETION_IMPORT_FROM           =
-'從 {} 中導入'
+'從 {} 中匯入'
 COMPLETION_DISABLE_AUTO_REQUIRE  =
 '停用自動require'
 COMPLETION_ASK_AUTO_REQUIRE      =
@@ -470,7 +474,7 @@ WINDOW_LUA_STATUS_DIAGNOSIS_TITLE=
 WINDOW_LUA_STATUS_DIAGNOSIS_MSG  =
 '是否進行工作區診斷？'
 WINDOW_APPLY_SETTING             =
-'應用設定'
+'套用設定'
 WINDOW_CHECK_SEMANTIC            =
 '如果你正在使用市場中的顏色主題，你可能需要同時修改 `editor.semanticHighlighting.enabled` 選項為 `true` 才會使語義著色生效。'
 WINDOW_TELEMETRY_HINT            =
@@ -480,9 +484,9 @@ WINDOW_TELEMETRY_ENABLE          =
 WINDOW_TELEMETRY_DISABLE         =
 '禁止'
 WINDOW_CLIENT_NOT_SUPPORT_CONFIG =
-'你的使用者端不支援從伺服端修改設定，請手動修改如下設定：'
+'你的用戶端不支援從伺服端修改設定，請手動修改以下設定：'
 WINDOW_LCONFIG_NOT_SUPPORT_CONFIG=
-'暫不支援自動修改本地設定，請手動修改如下設定：'
+'暫時不支援自動修改本地設定，請手動修改以下設定：'
 WINDOW_MANUAL_CONFIG_ADD         =
 '為 `{key}` 添加值 `{value:q}`;'
 WINDOW_MANUAL_CONFIG_SET         =
@@ -490,9 +494,9 @@ WINDOW_MANUAL_CONFIG_SET         =
 WINDOW_MANUAL_CONFIG_PROP        =
 '將 `{key}` 的屬性 `{prop}` 設定為 `{value:q}`;'
 WINDOW_APPLY_WHIT_SETTING        =
-'應用並修改設定'
+'套用並修改設定'
 WINDOW_APPLY_WHITOUT_SETTING     =
-'應用但不修改設定'
+'套用但不修改設定'
 WINDOW_ASK_APPLY_LIBRARY         =
 '是否需要將你的工作環境配置為 `{}` ？'
 WINDOW_SEARCHING_IN_FILES        =

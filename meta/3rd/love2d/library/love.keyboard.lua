@@ -60,8 +60,9 @@ function love.keyboard.isDown(key) end
 ---Unlike regular KeyConstants, Scancodes are keyboard layout-independent. The scancode 'w' is used if the key in the same place as the 'w' key on an American keyboard is pressed, no matter what the key is labelled or what the user's operating system settings are.
 ---
 ---@param scancode love.Scancode # A Scancode to check.
+---@vararg love.Scancode # Additional Scancodes to check.
 ---@return boolean down # True if any supplied Scancode is down, false if not.
-function love.keyboard.isScancodeDown(scancode) end
+function love.keyboard.isScancodeDown(scancode, ...) end
 
 ---
 ---Enables or disables key repeat for love.keypressed. It is disabled by default.
@@ -85,579 +86,579 @@ function love.keyboard.setTextInput(enable) end
 ---
 ---The A key
 ---
----| '"a"'
+---| "a"
 ---
 ---The B key
 ---
----| '"b"'
+---| "b"
 ---
 ---The C key
 ---
----| '"c"'
+---| "c"
 ---
 ---The D key
 ---
----| '"d"'
+---| "d"
 ---
 ---The E key
 ---
----| '"e"'
+---| "e"
 ---
 ---The F key
 ---
----| '"f"'
+---| "f"
 ---
 ---The G key
 ---
----| '"g"'
+---| "g"
 ---
 ---The H key
 ---
----| '"h"'
+---| "h"
 ---
 ---The I key
 ---
----| '"i"'
+---| "i"
 ---
 ---The J key
 ---
----| '"j"'
+---| "j"
 ---
 ---The K key
 ---
----| '"k"'
+---| "k"
 ---
 ---The L key
 ---
----| '"l"'
+---| "l"
 ---
 ---The M key
 ---
----| '"m"'
+---| "m"
 ---
 ---The N key
 ---
----| '"n"'
+---| "n"
 ---
 ---The O key
 ---
----| '"o"'
+---| "o"
 ---
 ---The P key
 ---
----| '"p"'
+---| "p"
 ---
 ---The Q key
 ---
----| '"q"'
+---| "q"
 ---
 ---The R key
 ---
----| '"r"'
+---| "r"
 ---
 ---The S key
 ---
----| '"s"'
+---| "s"
 ---
 ---The T key
 ---
----| '"t"'
+---| "t"
 ---
 ---The U key
 ---
----| '"u"'
+---| "u"
 ---
 ---The V key
 ---
----| '"v"'
+---| "v"
 ---
 ---The W key
 ---
----| '"w"'
+---| "w"
 ---
 ---The X key
 ---
----| '"x"'
+---| "x"
 ---
 ---The Y key
 ---
----| '"y"'
+---| "y"
 ---
 ---The Z key
 ---
----| '"z"'
+---| "z"
 ---
 ---The zero key
 ---
----| '"0"'
+---| "0"
 ---
 ---The one key
 ---
----| '"1"'
+---| "1"
 ---
 ---The two key
 ---
----| '"2"'
+---| "2"
 ---
 ---The three key
 ---
----| '"3"'
+---| "3"
 ---
 ---The four key
 ---
----| '"4"'
+---| "4"
 ---
 ---The five key
 ---
----| '"5"'
+---| "5"
 ---
 ---The six key
 ---
----| '"6"'
+---| "6"
 ---
 ---The seven key
 ---
----| '"7"'
+---| "7"
 ---
 ---The eight key
 ---
----| '"8"'
+---| "8"
 ---
 ---The nine key
 ---
----| '"9"'
+---| "9"
 ---
 ---Space key
 ---
----| '"space"'
+---| "space"
 ---
 ---Exclamation mark key
 ---
----| '"!"'
+---| "!"
 ---
 ---Double quote key
 ---
----| '"\""'
+---| "\""
 ---
 ---Hash key
 ---
----| '"#"'
+---| "#"
 ---
 ---Dollar key
 ---
----| '"$"'
+---| "$"
 ---
 ---Ampersand key
 ---
----| '"&"'
+---| "&"
 ---
 ---Single quote key
 ---
----| '"\'"'
+---| "'"
 ---
 ---Left parenthesis key
 ---
----| '"("'
+---| "("
 ---
 ---Right parenthesis key
 ---
----| '")"'
+---| ")"
 ---
 ---Asterisk key
 ---
----| '"*"'
+---| "*"
 ---
 ---Plus key
 ---
----| '"+"'
+---| "+"
 ---
 ---Comma key
 ---
----| '","'
+---| ","
 ---
 ---Hyphen-minus key
 ---
----| '"-"'
+---| "-"
 ---
 ---Full stop key
 ---
----| '"."'
+---| "."
 ---
 ---Slash key
 ---
----| '"/"'
+---| "/"
 ---
 ---Colon key
 ---
----| '":"'
+---| ":"
 ---
 ---Semicolon key
 ---
----| '";"'
+---| ";"
 ---
 ---Less-than key
 ---
----| '"<"'
+---| "<"
 ---
 ---Equal key
 ---
----| '"="'
+---| "="
 ---
 ---Greater-than key
 ---
----| '">"'
+---| ">"
 ---
 ---Question mark key
 ---
----| '"?"'
+---| "?"
 ---
 ---At sign key
 ---
----| '"@"'
+---| "@"
 ---
 ---Left square bracket key
 ---
----| '"["'
+---| "["
 ---
 ---Backslash key
 ---
----| '"\\"'
+---| "\\"
 ---
 ---Right square bracket key
 ---
----| '"]"'
+---| "]"
 ---
 ---Caret key
 ---
----| '"^"'
+---| "^"
 ---
 ---Underscore key
 ---
----| '"_"'
+---| "_"
 ---
 ---Grave accent key
 ---
----| '"`"'
+---| "`"
 ---
 ---The numpad zero key
 ---
----| '"kp0"'
+---| "kp0"
 ---
 ---The numpad one key
 ---
----| '"kp1"'
+---| "kp1"
 ---
 ---The numpad two key
 ---
----| '"kp2"'
+---| "kp2"
 ---
 ---The numpad three key
 ---
----| '"kp3"'
+---| "kp3"
 ---
 ---The numpad four key
 ---
----| '"kp4"'
+---| "kp4"
 ---
 ---The numpad five key
 ---
----| '"kp5"'
+---| "kp5"
 ---
 ---The numpad six key
 ---
----| '"kp6"'
+---| "kp6"
 ---
 ---The numpad seven key
 ---
----| '"kp7"'
+---| "kp7"
 ---
 ---The numpad eight key
 ---
----| '"kp8"'
+---| "kp8"
 ---
 ---The numpad nine key
 ---
----| '"kp9"'
+---| "kp9"
 ---
 ---The numpad decimal point key
 ---
----| '"kp."'
+---| "kp."
 ---
 ---The numpad division key
 ---
----| '"kp/"'
+---| "kp/"
 ---
 ---The numpad multiplication key
 ---
----| '"kp*"'
+---| "kp*"
 ---
 ---The numpad substraction key
 ---
----| '"kp-"'
+---| "kp-"
 ---
 ---The numpad addition key
 ---
----| '"kp+"'
+---| "kp+"
 ---
 ---The numpad enter key
 ---
----| '"kpenter"'
+---| "kpenter"
 ---
 ---The numpad equals key
 ---
----| '"kp="'
+---| "kp="
 ---
 ---Up cursor key
 ---
----| '"up"'
+---| "up"
 ---
 ---Down cursor key
 ---
----| '"down"'
+---| "down"
 ---
 ---Right cursor key
 ---
----| '"right"'
+---| "right"
 ---
 ---Left cursor key
 ---
----| '"left"'
+---| "left"
 ---
 ---Home key
 ---
----| '"home"'
+---| "home"
 ---
 ---End key
 ---
----| '"end"'
+---| "end"
 ---
 ---Page up key
 ---
----| '"pageup"'
+---| "pageup"
 ---
 ---Page down key
 ---
----| '"pagedown"'
+---| "pagedown"
 ---
 ---Insert key
 ---
----| '"insert"'
+---| "insert"
 ---
 ---Backspace key
 ---
----| '"backspace"'
+---| "backspace"
 ---
 ---Tab key
 ---
----| '"tab"'
+---| "tab"
 ---
 ---Clear key
 ---
----| '"clear"'
+---| "clear"
 ---
 ---Return key
 ---
----| '"return"'
+---| "return"
 ---
 ---Delete key
 ---
----| '"delete"'
+---| "delete"
 ---
 ---The 1st function key
 ---
----| '"f1"'
+---| "f1"
 ---
 ---The 2nd function key
 ---
----| '"f2"'
+---| "f2"
 ---
 ---The 3rd function key
 ---
----| '"f3"'
+---| "f3"
 ---
 ---The 4th function key
 ---
----| '"f4"'
+---| "f4"
 ---
 ---The 5th function key
 ---
----| '"f5"'
+---| "f5"
 ---
 ---The 6th function key
 ---
----| '"f6"'
+---| "f6"
 ---
 ---The 7th function key
 ---
----| '"f7"'
+---| "f7"
 ---
 ---The 8th function key
 ---
----| '"f8"'
+---| "f8"
 ---
 ---The 9th function key
 ---
----| '"f9"'
+---| "f9"
 ---
 ---The 10th function key
 ---
----| '"f10"'
+---| "f10"
 ---
 ---The 11th function key
 ---
----| '"f11"'
+---| "f11"
 ---
 ---The 12th function key
 ---
----| '"f12"'
+---| "f12"
 ---
 ---The 13th function key
 ---
----| '"f13"'
+---| "f13"
 ---
 ---The 14th function key
 ---
----| '"f14"'
+---| "f14"
 ---
 ---The 15th function key
 ---
----| '"f15"'
+---| "f15"
 ---
 ---Num-lock key
 ---
----| '"numlock"'
+---| "numlock"
 ---
 ---Caps-lock key
 ---
----| '"capslock"'
+---| "capslock"
 ---
 ---Scroll-lock key
 ---
----| '"scrollock"'
+---| "scrollock"
 ---
 ---Right shift key
 ---
----| '"rshift"'
+---| "rshift"
 ---
 ---Left shift key
 ---
----| '"lshift"'
+---| "lshift"
 ---
 ---Right control key
 ---
----| '"rctrl"'
+---| "rctrl"
 ---
 ---Left control key
 ---
----| '"lctrl"'
+---| "lctrl"
 ---
 ---Right alt key
 ---
----| '"ralt"'
+---| "ralt"
 ---
 ---Left alt key
 ---
----| '"lalt"'
+---| "lalt"
 ---
 ---Right meta key
 ---
----| '"rmeta"'
+---| "rmeta"
 ---
 ---Left meta key
 ---
----| '"lmeta"'
+---| "lmeta"
 ---
 ---Left super key
 ---
----| '"lsuper"'
+---| "lsuper"
 ---
 ---Right super key
 ---
----| '"rsuper"'
+---| "rsuper"
 ---
 ---Mode key
 ---
----| '"mode"'
+---| "mode"
 ---
 ---Compose key
 ---
----| '"compose"'
+---| "compose"
 ---
 ---Pause key
 ---
----| '"pause"'
+---| "pause"
 ---
 ---Escape key
 ---
----| '"escape"'
+---| "escape"
 ---
 ---Help key
 ---
----| '"help"'
+---| "help"
 ---
 ---Print key
 ---
----| '"print"'
+---| "print"
 ---
 ---System request key
 ---
----| '"sysreq"'
+---| "sysreq"
 ---
 ---Break key
 ---
----| '"break"'
+---| "break"
 ---
 ---Menu key
 ---
----| '"menu"'
+---| "menu"
 ---
 ---Power key
 ---
----| '"power"'
+---| "power"
 ---
 ---Euro (&euro;) key
 ---
----| '"euro"'
+---| "euro"
 ---
 ---Undo key
 ---
----| '"undo"'
+---| "undo"
 ---
 ---WWW key
 ---
----| '"www"'
+---| "www"
 ---
 ---Mail key
 ---
----| '"mail"'
+---| "mail"
 ---
 ---Calculator key
 ---
----| '"calculator"'
+---| "calculator"
 ---
 ---Application search key
 ---
----| '"appsearch"'
+---| "appsearch"
 ---
 ---Application home key
 ---
----| '"apphome"'
+---| "apphome"
 ---
 ---Application back key
 ---
----| '"appback"'
+---| "appback"
 ---
 ---Application forward key
 ---
----| '"appforward"'
+---| "appforward"
 ---
 ---Application refresh key
 ---
----| '"apprefresh"'
+---| "apprefresh"
 ---
 ---Application bookmarks key
 ---
----| '"appbookmarks"'
+---| "appbookmarks"
 
 ---
 ---Keyboard scancodes.
@@ -672,776 +673,776 @@ function love.keyboard.setTextInput(enable) end
 ---
 ---The 'A' key on an American layout.
 ---
----| '"a"'
+---| "a"
 ---
 ---The 'B' key on an American layout.
 ---
----| '"b"'
+---| "b"
 ---
 ---The 'C' key on an American layout.
 ---
----| '"c"'
+---| "c"
 ---
 ---The 'D' key on an American layout.
 ---
----| '"d"'
+---| "d"
 ---
 ---The 'E' key on an American layout.
 ---
----| '"e"'
+---| "e"
 ---
 ---The 'F' key on an American layout.
 ---
----| '"f"'
+---| "f"
 ---
 ---The 'G' key on an American layout.
 ---
----| '"g"'
+---| "g"
 ---
 ---The 'H' key on an American layout.
 ---
----| '"h"'
+---| "h"
 ---
 ---The 'I' key on an American layout.
 ---
----| '"i"'
+---| "i"
 ---
 ---The 'J' key on an American layout.
 ---
----| '"j"'
+---| "j"
 ---
 ---The 'K' key on an American layout.
 ---
----| '"k"'
+---| "k"
 ---
 ---The 'L' key on an American layout.
 ---
----| '"l"'
+---| "l"
 ---
 ---The 'M' key on an American layout.
 ---
----| '"m"'
+---| "m"
 ---
 ---The 'N' key on an American layout.
 ---
----| '"n"'
+---| "n"
 ---
 ---The 'O' key on an American layout.
 ---
----| '"o"'
+---| "o"
 ---
 ---The 'P' key on an American layout.
 ---
----| '"p"'
+---| "p"
 ---
 ---The 'Q' key on an American layout.
 ---
----| '"q"'
+---| "q"
 ---
 ---The 'R' key on an American layout.
 ---
----| '"r"'
+---| "r"
 ---
 ---The 'S' key on an American layout.
 ---
----| '"s"'
+---| "s"
 ---
 ---The 'T' key on an American layout.
 ---
----| '"t"'
+---| "t"
 ---
 ---The 'U' key on an American layout.
 ---
----| '"u"'
+---| "u"
 ---
 ---The 'V' key on an American layout.
 ---
----| '"v"'
+---| "v"
 ---
 ---The 'W' key on an American layout.
 ---
----| '"w"'
+---| "w"
 ---
 ---The 'X' key on an American layout.
 ---
----| '"x"'
+---| "x"
 ---
 ---The 'Y' key on an American layout.
 ---
----| '"y"'
+---| "y"
 ---
 ---The 'Z' key on an American layout.
 ---
----| '"z"'
+---| "z"
 ---
 ---The '1' key on an American layout.
 ---
----| '"1"'
+---| "1"
 ---
 ---The '2' key on an American layout.
 ---
----| '"2"'
+---| "2"
 ---
 ---The '3' key on an American layout.
 ---
----| '"3"'
+---| "3"
 ---
 ---The '4' key on an American layout.
 ---
----| '"4"'
+---| "4"
 ---
 ---The '5' key on an American layout.
 ---
----| '"5"'
+---| "5"
 ---
 ---The '6' key on an American layout.
 ---
----| '"6"'
+---| "6"
 ---
 ---The '7' key on an American layout.
 ---
----| '"7"'
+---| "7"
 ---
 ---The '8' key on an American layout.
 ---
----| '"8"'
+---| "8"
 ---
 ---The '9' key on an American layout.
 ---
----| '"9"'
+---| "9"
 ---
 ---The '0' key on an American layout.
 ---
----| '"0"'
+---| "0"
 ---
 ---The 'return' / 'enter' key on an American layout.
 ---
----| '"return"'
+---| "return"
 ---
 ---The 'escape' key on an American layout.
 ---
----| '"escape"'
+---| "escape"
 ---
 ---The 'backspace' key on an American layout.
 ---
----| '"backspace"'
+---| "backspace"
 ---
 ---The 'tab' key on an American layout.
 ---
----| '"tab"'
+---| "tab"
 ---
 ---The spacebar on an American layout.
 ---
----| '"space"'
+---| "space"
 ---
 ---The minus key on an American layout.
 ---
----| '"-"'
+---| "-"
 ---
 ---The equals key on an American layout.
 ---
----| '"="'
+---| "="
 ---
 ---The left-bracket key on an American layout.
 ---
----| '"["'
+---| "["
 ---
 ---The right-bracket key on an American layout.
 ---
----| '"]"'
+---| "]"
 ---
 ---The backslash key on an American layout.
 ---
----| '"\\"'
+---| "\\"
 ---
 ---The non-U.S. hash scancode.
 ---
----| '"nonus#"'
+---| "nonus#"
 ---
 ---The semicolon key on an American layout.
 ---
----| '";"'
+---| ";"
 ---
 ---The apostrophe key on an American layout.
 ---
----| '"\'"'
+---| "'"
 ---
 ---The back-tick / grave key on an American layout.
 ---
----| '"`"'
+---| "`"
 ---
 ---The comma key on an American layout.
 ---
----| '","'
+---| ","
 ---
 ---The period key on an American layout.
 ---
----| '"."'
+---| "."
 ---
 ---The forward-slash key on an American layout.
 ---
----| '"/"'
+---| "/"
 ---
 ---The capslock key on an American layout.
 ---
----| '"capslock"'
+---| "capslock"
 ---
 ---The F1 key on an American layout.
 ---
----| '"f1"'
+---| "f1"
 ---
 ---The F2 key on an American layout.
 ---
----| '"f2"'
+---| "f2"
 ---
 ---The F3 key on an American layout.
 ---
----| '"f3"'
+---| "f3"
 ---
 ---The F4 key on an American layout.
 ---
----| '"f4"'
+---| "f4"
 ---
 ---The F5 key on an American layout.
 ---
----| '"f5"'
+---| "f5"
 ---
 ---The F6 key on an American layout.
 ---
----| '"f6"'
+---| "f6"
 ---
 ---The F7 key on an American layout.
 ---
----| '"f7"'
+---| "f7"
 ---
 ---The F8 key on an American layout.
 ---
----| '"f8"'
+---| "f8"
 ---
 ---The F9 key on an American layout.
 ---
----| '"f9"'
+---| "f9"
 ---
 ---The F10 key on an American layout.
 ---
----| '"f10"'
+---| "f10"
 ---
 ---The F11 key on an American layout.
 ---
----| '"f11"'
+---| "f11"
 ---
 ---The F12 key on an American layout.
 ---
----| '"f12"'
+---| "f12"
 ---
 ---The F13 key on an American layout.
 ---
----| '"f13"'
+---| "f13"
 ---
 ---The F14 key on an American layout.
 ---
----| '"f14"'
+---| "f14"
 ---
 ---The F15 key on an American layout.
 ---
----| '"f15"'
+---| "f15"
 ---
 ---The F16 key on an American layout.
 ---
----| '"f16"'
+---| "f16"
 ---
 ---The F17 key on an American layout.
 ---
----| '"f17"'
+---| "f17"
 ---
 ---The F18 key on an American layout.
 ---
----| '"f18"'
+---| "f18"
 ---
 ---The F19 key on an American layout.
 ---
----| '"f19"'
+---| "f19"
 ---
 ---The F20 key on an American layout.
 ---
----| '"f20"'
+---| "f20"
 ---
 ---The F21 key on an American layout.
 ---
----| '"f21"'
+---| "f21"
 ---
 ---The F22 key on an American layout.
 ---
----| '"f22"'
+---| "f22"
 ---
 ---The F23 key on an American layout.
 ---
----| '"f23"'
+---| "f23"
 ---
 ---The F24 key on an American layout.
 ---
----| '"f24"'
+---| "f24"
 ---
 ---The left control key on an American layout.
 ---
----| '"lctrl"'
+---| "lctrl"
 ---
 ---The left shift key on an American layout.
 ---
----| '"lshift"'
+---| "lshift"
 ---
 ---The left alt / option key on an American layout.
 ---
----| '"lalt"'
+---| "lalt"
 ---
 ---The left GUI (command / windows / super) key on an American layout.
 ---
----| '"lgui"'
+---| "lgui"
 ---
 ---The right control key on an American layout.
 ---
----| '"rctrl"'
+---| "rctrl"
 ---
 ---The right shift key on an American layout.
 ---
----| '"rshift"'
+---| "rshift"
 ---
 ---The right alt / option key on an American layout.
 ---
----| '"ralt"'
+---| "ralt"
 ---
 ---The right GUI (command / windows / super) key on an American layout.
 ---
----| '"rgui"'
+---| "rgui"
 ---
 ---The printscreen key on an American layout.
 ---
----| '"printscreen"'
+---| "printscreen"
 ---
 ---The scroll-lock key on an American layout.
 ---
----| '"scrolllock"'
+---| "scrolllock"
 ---
 ---The pause key on an American layout.
 ---
----| '"pause"'
+---| "pause"
 ---
 ---The insert key on an American layout.
 ---
----| '"insert"'
+---| "insert"
 ---
 ---The home key on an American layout.
 ---
----| '"home"'
+---| "home"
 ---
 ---The numlock / clear key on an American layout.
 ---
----| '"numlock"'
+---| "numlock"
 ---
 ---The page-up key on an American layout.
 ---
----| '"pageup"'
+---| "pageup"
 ---
 ---The forward-delete key on an American layout.
 ---
----| '"delete"'
+---| "delete"
 ---
 ---The end key on an American layout.
 ---
----| '"end"'
+---| "end"
 ---
 ---The page-down key on an American layout.
 ---
----| '"pagedown"'
+---| "pagedown"
 ---
 ---The right-arrow key on an American layout.
 ---
----| '"right"'
+---| "right"
 ---
 ---The left-arrow key on an American layout.
 ---
----| '"left"'
+---| "left"
 ---
 ---The down-arrow key on an American layout.
 ---
----| '"down"'
+---| "down"
 ---
 ---The up-arrow key on an American layout.
 ---
----| '"up"'
+---| "up"
 ---
 ---The non-U.S. backslash scancode.
 ---
----| '"nonusbackslash"'
+---| "nonusbackslash"
 ---
 ---The application key on an American layout. Windows contextual menu, compose key.
 ---
----| '"application"'
+---| "application"
 ---
 ---The 'execute' key on an American layout.
 ---
----| '"execute"'
+---| "execute"
 ---
 ---The 'help' key on an American layout.
 ---
----| '"help"'
+---| "help"
 ---
 ---The 'menu' key on an American layout.
 ---
----| '"menu"'
+---| "menu"
 ---
 ---The 'select' key on an American layout.
 ---
----| '"select"'
+---| "select"
 ---
 ---The 'stop' key on an American layout.
 ---
----| '"stop"'
+---| "stop"
 ---
 ---The 'again' key on an American layout.
 ---
----| '"again"'
+---| "again"
 ---
 ---The 'undo' key on an American layout.
 ---
----| '"undo"'
+---| "undo"
 ---
 ---The 'cut' key on an American layout.
 ---
----| '"cut"'
+---| "cut"
 ---
 ---The 'copy' key on an American layout.
 ---
----| '"copy"'
+---| "copy"
 ---
 ---The 'paste' key on an American layout.
 ---
----| '"paste"'
+---| "paste"
 ---
 ---The 'find' key on an American layout.
 ---
----| '"find"'
+---| "find"
 ---
 ---The keypad forward-slash key on an American layout.
 ---
----| '"kp/"'
+---| "kp/"
 ---
 ---The keypad '*' key on an American layout.
 ---
----| '"kp*"'
+---| "kp*"
 ---
 ---The keypad minus key on an American layout.
 ---
----| '"kp-"'
+---| "kp-"
 ---
 ---The keypad plus key on an American layout.
 ---
----| '"kp+"'
+---| "kp+"
 ---
 ---The keypad equals key on an American layout.
 ---
----| '"kp="'
+---| "kp="
 ---
 ---The keypad enter key on an American layout.
 ---
----| '"kpenter"'
+---| "kpenter"
 ---
 ---The keypad '1' key on an American layout.
 ---
----| '"kp1"'
+---| "kp1"
 ---
 ---The keypad '2' key on an American layout.
 ---
----| '"kp2"'
+---| "kp2"
 ---
 ---The keypad '3' key on an American layout.
 ---
----| '"kp3"'
+---| "kp3"
 ---
 ---The keypad '4' key on an American layout.
 ---
----| '"kp4"'
+---| "kp4"
 ---
 ---The keypad '5' key on an American layout.
 ---
----| '"kp5"'
+---| "kp5"
 ---
 ---The keypad '6' key on an American layout.
 ---
----| '"kp6"'
+---| "kp6"
 ---
 ---The keypad '7' key on an American layout.
 ---
----| '"kp7"'
+---| "kp7"
 ---
 ---The keypad '8' key on an American layout.
 ---
----| '"kp8"'
+---| "kp8"
 ---
 ---The keypad '9' key on an American layout.
 ---
----| '"kp9"'
+---| "kp9"
 ---
 ---The keypad '0' key on an American layout.
 ---
----| '"kp0"'
+---| "kp0"
 ---
 ---The keypad period key on an American layout.
 ---
----| '"kp."'
+---| "kp."
 ---
 ---The 1st international key on an American layout. Used on Asian keyboards.
 ---
----| '"international1"'
+---| "international1"
 ---
 ---The 2nd international key on an American layout.
 ---
----| '"international2"'
+---| "international2"
 ---
 ---The 3rd international  key on an American layout. Yen.
 ---
----| '"international3"'
+---| "international3"
 ---
 ---The 4th international key on an American layout.
 ---
----| '"international4"'
+---| "international4"
 ---
 ---The 5th international key on an American layout.
 ---
----| '"international5"'
+---| "international5"
 ---
 ---The 6th international key on an American layout.
 ---
----| '"international6"'
+---| "international6"
 ---
 ---The 7th international key on an American layout.
 ---
----| '"international7"'
+---| "international7"
 ---
 ---The 8th international key on an American layout.
 ---
----| '"international8"'
+---| "international8"
 ---
 ---The 9th international key on an American layout.
 ---
----| '"international9"'
+---| "international9"
 ---
 ---Hangul/English toggle scancode.
 ---
----| '"lang1"'
+---| "lang1"
 ---
 ---Hanja conversion scancode.
 ---
----| '"lang2"'
+---| "lang2"
 ---
 ---Katakana scancode.
 ---
----| '"lang3"'
+---| "lang3"
 ---
 ---Hiragana scancode.
 ---
----| '"lang4"'
+---| "lang4"
 ---
 ---Zenkaku/Hankaku scancode.
 ---
----| '"lang5"'
+---| "lang5"
 ---
 ---The mute key on an American layout.
 ---
----| '"mute"'
+---| "mute"
 ---
 ---The volume up key on an American layout.
 ---
----| '"volumeup"'
+---| "volumeup"
 ---
 ---The volume down key on an American layout.
 ---
----| '"volumedown"'
+---| "volumedown"
 ---
 ---The audio next track key on an American layout.
 ---
----| '"audionext"'
+---| "audionext"
 ---
 ---The audio previous track key on an American layout.
 ---
----| '"audioprev"'
+---| "audioprev"
 ---
 ---The audio stop key on an American layout.
 ---
----| '"audiostop"'
+---| "audiostop"
 ---
 ---The audio play key on an American layout.
 ---
----| '"audioplay"'
+---| "audioplay"
 ---
 ---The audio mute key on an American layout.
 ---
----| '"audiomute"'
+---| "audiomute"
 ---
 ---The media select key on an American layout.
 ---
----| '"mediaselect"'
+---| "mediaselect"
 ---
 ---The 'WWW' key on an American layout.
 ---
----| '"www"'
+---| "www"
 ---
 ---The Mail key on an American layout.
 ---
----| '"mail"'
+---| "mail"
 ---
 ---The calculator key on an American layout.
 ---
----| '"calculator"'
+---| "calculator"
 ---
 ---The 'computer' key on an American layout.
 ---
----| '"computer"'
+---| "computer"
 ---
 ---The AC Search key on an American layout.
 ---
----| '"acsearch"'
+---| "acsearch"
 ---
 ---The AC Home key on an American layout.
 ---
----| '"achome"'
+---| "achome"
 ---
 ---The AC Back key on an American layout.
 ---
----| '"acback"'
+---| "acback"
 ---
 ---The AC Forward key on an American layout.
 ---
----| '"acforward"'
+---| "acforward"
 ---
 ---Th AC Stop key on an American layout.
 ---
----| '"acstop"'
+---| "acstop"
 ---
 ---The AC Refresh key on an American layout.
 ---
----| '"acrefresh"'
+---| "acrefresh"
 ---
 ---The AC Bookmarks key on an American layout.
 ---
----| '"acbookmarks"'
+---| "acbookmarks"
 ---
 ---The system power scancode.
 ---
----| '"power"'
+---| "power"
 ---
 ---The brightness-down scancode.
 ---
----| '"brightnessdown"'
+---| "brightnessdown"
 ---
 ---The brightness-up scancode.
 ---
----| '"brightnessup"'
+---| "brightnessup"
 ---
 ---The display switch scancode.
 ---
----| '"displayswitch"'
+---| "displayswitch"
 ---
 ---The keyboard illumination toggle scancode.
 ---
----| '"kbdillumtoggle"'
+---| "kbdillumtoggle"
 ---
 ---The keyboard illumination down scancode.
 ---
----| '"kbdillumdown"'
+---| "kbdillumdown"
 ---
 ---The keyboard illumination up scancode.
 ---
----| '"kbdillumup"'
+---| "kbdillumup"
 ---
 ---The eject scancode.
 ---
----| '"eject"'
+---| "eject"
 ---
 ---The system sleep scancode.
 ---
----| '"sleep"'
+---| "sleep"
 ---
 ---The alt-erase key on an American layout.
 ---
----| '"alterase"'
+---| "alterase"
 ---
 ---The sysreq key on an American layout.
 ---
----| '"sysreq"'
+---| "sysreq"
 ---
 ---The 'cancel' key on an American layout.
 ---
----| '"cancel"'
+---| "cancel"
 ---
 ---The 'clear' key on an American layout.
 ---
----| '"clear"'
+---| "clear"
 ---
 ---The 'prior' key on an American layout.
 ---
----| '"prior"'
+---| "prior"
 ---
 ---The 'return2' key on an American layout.
 ---
----| '"return2"'
+---| "return2"
 ---
 ---The 'separator' key on an American layout.
 ---
----| '"separator"'
+---| "separator"
 ---
 ---The 'out' key on an American layout.
 ---
----| '"out"'
+---| "out"
 ---
 ---The 'oper' key on an American layout.
 ---
----| '"oper"'
+---| "oper"
 ---
 ---The 'clearagain' key on an American layout.
 ---
----| '"clearagain"'
+---| "clearagain"
 ---
 ---The 'crsel' key on an American layout.
 ---
----| '"crsel"'
+---| "crsel"
 ---
 ---The 'exsel' key on an American layout.
 ---
----| '"exsel"'
+---| "exsel"
 ---
 ---The keypad 00 key on an American layout.
 ---
----| '"kp00"'
+---| "kp00"
 ---
 ---The keypad 000 key on an American layout.
 ---
----| '"kp000"'
+---| "kp000"
 ---
 ---The thousands-separator key on an American layout.
 ---
----| '"thsousandsseparator"'
+---| "thsousandsseparator"
 ---
 ---The decimal separator key on an American layout.
 ---
----| '"decimalseparator"'
+---| "decimalseparator"
 ---
 ---The currency unit key on an American layout.
 ---
----| '"currencyunit"'
+---| "currencyunit"
 ---
 ---The currency sub-unit key on an American layout.
 ---
----| '"currencysubunit"'
+---| "currencysubunit"
 ---
 ---The 'app1' scancode.
 ---
----| '"app1"'
+---| "app1"
 ---
 ---The 'app2' scancode.
 ---
----| '"app2"'
+---| "app2"
 ---
 ---An unknown key.
 ---
----| '"unknown"'
+---| "unknown"

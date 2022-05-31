@@ -14,6 +14,9 @@ local loading   = require 'workspace.loading'
 local scope     = require 'workspace.scope'
 local time      = require 'bee.time'
 local ltable    = require 'linked-table'
+local furi      = require 'file-uri'
+local json      = require 'json'
+local fw        = require 'filewatch'
 
 ---@class diagnosticProvider
 local m = {}
@@ -154,6 +157,18 @@ function m.clearCache(uri)
     m.cache[uri] = false
 end
 
+function m.clearCacheExcept(uris)
+    local excepts = {}
+    for _, uri in ipairs(uris) do
+        excepts[uri] = true
+    end
+    for uri in pairs(m.cache) do
+        if not excepts[uri] then
+            m.cache[uri] = false
+        end
+    end
+end
+
 function m.clearAll()
     for luri in pairs(m.cache) do
         m.clear(luri)
@@ -193,29 +208,44 @@ local function copyDiagsWithoutSyntax(diags)
 end
 
 ---@async
-function m.doDiagnostic(uri, isScopeDiag)
+---@param uri uri
+---@return boolean
+local function isValid(uri)
     if not config.get(uri, 'Lua.diagnostics.enable') then
-        return
+        return false
     end
     if files.isLibrary(uri, true) then
         local status = config.get(uri, 'Lua.diagnostics.libraryFiles')
         if status == 'Disable' then
-            return
+            return false
         elseif status == 'Opened' then
             if not files.isOpen(uri) then
-                return
+                return false
             end
         end
     end
     if ws.isIgnored(uri) then
         local status = config.get(uri, 'Lua.diagnostics.ignoredFiles')
         if status == 'Disable' then
-            return
+            return false
         elseif status == 'Opened' then
             if not files.isOpen(uri) then
-                return
+                return false
             end
         end
+    end
+    local scheme = furi.split(uri)
+    local disableScheme = config.get(uri, 'Lua.diagnostics.disableScheme')
+    if disableScheme[scheme] then
+        return false
+    end
+    return true
+end
+
+---@async
+function m.doDiagnostic(uri, isScopeDiag)
+    if not isValid(uri) then
+        return
     end
 
     await.delay()
@@ -285,6 +315,42 @@ function m.doDiagnostic(uri, isScopeDiag)
 
     lastDiag = nil
     pushResult()
+end
+
+---@async
+---@return table|nil result
+---@return boolean? unchanged
+function m.pullDiagnostic(uri, isScopeDiag)
+    if not isValid(uri) then
+        return nil, util.equal(m.cache[uri], nil)
+    end
+
+    await.delay()
+
+    local state = files.getState(uri)
+    if not state then
+        return nil, util.equal(m.cache[uri], nil)
+    end
+
+    local prog <close> = progress.create(uri, lang.script.WINDOW_DIAGNOSING, 0.5)
+    prog:setMessage(ws.getRelativePath(uri))
+
+    local syntax = m.syntaxErrors(uri, state)
+    local diags = {}
+
+    xpcall(core, log.error, uri, isScopeDiag, function (result)
+        diags[#diags+1] = buildDiagnostic(uri, result)
+    end)
+
+    local full = mergeDiags(syntax, diags)
+
+    if util.equal(m.cache[uri], full) then
+        return full, true
+    end
+
+    m.cache[uri] = full
+
+    return full
 end
 
 function m.refresh(uri)
@@ -359,7 +425,7 @@ local function askForDisable(uri)
 end
 
 ---@async
-function m.awaitDiagnosticsScope(suri)
+function m.awaitDiagnosticsScope(suri, callback)
     local scp = scope.getScope(suri)
     while loading.count() > 0 do
         await.sleep(1.0)
@@ -393,7 +459,7 @@ function m.awaitDiagnosticsScope(suri)
         i = i + 1
         bar:setMessage(('%d/%d'):format(i, #uris))
         bar:setPercentage(i / #uris * 100)
-        xpcall(m.doDiagnostic, log.error, uri, true)
+        callback(uri)
         await.delay()
         if cancelled then
             log.info('Break workspace diagnostics')
@@ -416,13 +482,65 @@ function m.diagnosticsScope(uri, force)
     local id = 'diagnosticsScope:' .. scp:getName()
     await.close(id)
     await.call(function () ---@async
-        m.awaitDiagnosticsScope(uri)
+        m.awaitDiagnosticsScope(uri, function (fileUri)
+            xpcall(m.doDiagnostic, log.error, fileUri, true)
+        end)
     end, id)
+end
+
+---@async
+function m.pullDiagnosticScope(callback)
+    local processing = 0
+
+    for _, scp in ipairs(scope.folders) do
+        if  ws.isReady(scp.uri)
+        and config.get(scp.uri, 'Lua.diagnostics.enable') then
+            local id = 'diagnosticsScope:' .. scp:getName()
+            await.close(id)
+            await.call(function () ---@async
+                processing = processing + 1
+                local _ <close> = util.defer(function ()
+                    processing = processing - 1
+                end)
+
+                local delay = config.get(scp.uri, 'Lua.diagnostics.workspaceDelay') / 1000
+                if delay < 0 then
+                    return
+                end
+                print(delay)
+                await.sleep(math.max(delay, 0.2))
+                print('start')
+
+                m.awaitDiagnosticsScope(scp.uri, function (fileUri)
+                    local suc, result, unchanged = xpcall(m.pullDiagnostic, log.error, fileUri, true)
+                    if suc then
+                        callback {
+                            uri       = fileUri,
+                            result    = result,
+                            unchanged = unchanged,
+                            version   = files.getVersion(fileUri),
+                        }
+                    end
+                end)
+            end, id)
+        end
+    end
+
+    -- sleep for ever
+    while true do
+        await.sleep(1.0)
+    end
+end
+
+function m.refreshClient()
+    log.debug('Refresh client diagnostics')
+    proto.request('workspace/diagnostic/refresh', json.null)
 end
 
 ws.watch(function (ev, uri)
     if ev == 'reload' then
         m.diagnosticsScope(uri)
+        m.refreshClient()
     end
 end)
 
@@ -449,6 +567,16 @@ config.watch(function (uri, key, value, oldValue)
     if key:find 'Lua.diagnostics' then
         if value ~= oldValue then
             m.diagnosticsScope(uri)
+            m.refreshClient()
+        end
+    end
+end)
+
+fw.event(function (ev, path)
+    if util.stringEndWith(path, '.editorconfig') then
+        for _, scp in ipairs(ws.folders) do
+            m.diagnosticsScope(scp.uri)
+            m.refreshClient()
         end
     end
 end)

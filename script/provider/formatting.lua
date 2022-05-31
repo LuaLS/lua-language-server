@@ -30,9 +30,6 @@ fw.event(function(ev, path)
                 end
             end
         end
-        for _, scp in ipairs(ws.folders) do
-            diagnostics.diagnosticsScope(scp.uri)
-        end
     end
 end)
 

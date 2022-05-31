@@ -90,8 +90,7 @@ function m.updateNonStandardSymbols(symbols)
     end
 
     if #eqTokens ~= 0 then
-        local result = codeFormat.set_nonstandard_symbol('=', eqTokens)
-        log.info(result)
+        codeFormat.set_nonstandard_symbol('=', eqTokens)
     end
 end
 

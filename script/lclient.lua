@@ -211,6 +211,7 @@ function mt:registerFakers()
         'workspace/diagnostic/refresh',
         'window/workDoneProgress/create',
         'window/showMessage',
+        'window/showMessageRequest',
         'window/logMessage',
     } do
         self:register(method, function ()

@@ -466,26 +466,38 @@ end
 ---@param pos integer # 可见位置
 ---@return parser.object?
 function m.getLocal(source, name, pos)
-    local root = m.getRoot(source)
-    local res
-    m.eachSourceContain(root, pos, function (src)
-        local locals = src.locals
-        if not locals then
-            return
+    local block = source
+    -- find nearest source
+    while block.start > pos or block.finish < pos do
+        block = block.parent
+        if not block then
+            return nil
         end
-        for i = 1, #locals do
-            local loc = locals[i]
-            if loc.effect > pos then
-                break
-            end
-            if loc[1] == name then
-                if not res or res.effect < loc.effect then
-                    res = loc
+    end
+    m.eachSourceContain(block, pos, function (src)
+        if  blockTypes[src.type]
+        and (src.finish - src.start) < (block.finish - src.start) then
+            block = src
+        end
+    end)
+    while block do
+        local res
+        if block.locals then
+            for _, loc in ipairs(block.locals) do
+                if  loc[1] == name
+                and loc.effect <= pos then
+                    if not res or res.effect < loc.effect then
+                        res = loc
+                    end
                 end
             end
         end
-    end)
-    return res
+        if res then
+            return res
+        end
+        block = block.parent
+    end
+    return nil
 end
 
 --- 获取指定区块中所有的可见局部变量名称

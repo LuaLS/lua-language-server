@@ -3,6 +3,7 @@ local define = require 'proto.define'
 
 ---@class config.unit
 ---@field caller function
+---@field _checker fun(self: config.unit, value: any): boolean
 local mt = {}
 mt.__index = mt
 
@@ -16,12 +17,33 @@ function mt:__shr(default)
     return self
 end
 
+function mt:__shl(enums)
+    self.enums = enums
+    return self
+end
+
+function mt:checker(v)
+    if self.enums then
+        local ok
+        for _, enum in ipairs(self.enums) do
+            if util.equal(enum, v) then
+                ok = true
+                break
+            end
+        end
+        if not ok then
+            return false
+        end
+    end
+    return self:_checker(v)
+end
+
 local units = {}
 
 local function register(name, default, checker, loader, caller)
     units[name] = {
         default = default,
-        checker = checker,
+        _checker = checker,
         loader  = loader,
         caller  = caller,
     }
@@ -143,18 +165,43 @@ end, function (self, ...)
 end)
 
 local template = {
-    ['Lua.runtime.version']                 = Type.String >> 'Lua 5.4',
+    ['Lua.runtime.version']                 = Type.String >> 'Lua 5.4' << {
+                                                'Lua 5.1',
+                                                'Lua 5.2',
+                                                'Lua 5.3',
+                                                'Lua 5.4',
+                                                'LuaJIT',
+                                            },
     ['Lua.runtime.path']                    = Type.Array(Type.String) >> {
                                                 "?.lua",
                                                 "?/init.lua",
                                             },
     ['Lua.runtime.pathStrict']              = Type.Boolean >> false,
-    ['Lua.runtime.special']                 = Type.Hash(Type.String, Type.String),
+    ['Lua.runtime.special']                 = Type.Hash(
+                                                Type.String,
+                                                Type.String >> 'require' << {
+                                                    '_G',
+                                                    'rawset',
+                                                    'rawget',
+                                                    'setmetatable',
+                                                    'require',
+                                                    'dofile',
+                                                    'loadfile',
+                                                    'pcall',
+                                                    'xpcall',
+                                                    'assert',
+                                                }
+                                            ),
     ['Lua.runtime.meta']                    = Type.String >> '${version} ${language} ${encoding}',
     ['Lua.runtime.unicodeName']             = Type.Boolean,
     ['Lua.runtime.nonstandardSymbol']       = Type.Hash(Type.String, Type.Boolean, ';'),
     ['Lua.runtime.plugin']                  = Type.String,
-    ['Lua.runtime.fileEncoding']            = Type.String >> 'utf8',
+    ['Lua.runtime.fileEncoding']            = Type.String >> 'utf8' << {
+                                                'utf8',
+                                                'ansi',
+                                                'utf16le',
+                                                'utf16be',
+                                            },
     ['Lua.runtime.builtin']                 = Type.Hash(Type.String, Type.String),
     ['Lua.diagnostics.enable']              = Type.Boolean >> true,
     ['Lua.diagnostics.globals']             = Type.Hash(Type.String, Type.Boolean, ';'),
@@ -168,8 +215,16 @@ local template = {
                                             },
     ['Lua.diagnostics.workspaceDelay']      = Type.Integer >> 5,
     ['Lua.diagnostics.workspaceRate']       = Type.Integer >> 100,
-    ['Lua.diagnostics.libraryFiles']        = Type.String  >> 'Opened',
-    ['Lua.diagnostics.ignoredFiles']        = Type.String  >> 'Opened',
+    ['Lua.diagnostics.libraryFiles']        = Type.String  >> 'Opened' << {
+                                                'Enable',
+                                                'Opened',
+                                                'Disable',
+                                            },
+    ['Lua.diagnostics.ignoredFiles']        = Type.String  >> 'Opened' << {
+                                                'Enable',
+                                                'Opened',
+                                                'Disable',
+                                            },
     ['Lua.workspace.ignoreDir']             = Type.Array(Type.String),
     ['Lua.workspace.ignoreSubmodules']      = Type.Boolean >> true,
     ['Lua.workspace.useGitIgnore']          = Type.Boolean >> true,
@@ -184,11 +239,23 @@ local template = {
                                                 ['git']      = true,
                                             },
     ['Lua.completion.enable']               = Type.Boolean >> true,
-    ['Lua.completion.callSnippet']          = Type.String  >> 'Disable',
-    ['Lua.completion.keywordSnippet']       = Type.String  >> 'Replace',
+    ['Lua.completion.callSnippet']          = Type.String  >> 'Disable' << {
+                                                'Disable',
+                                                'Both',
+                                                'Replace',
+                                            },
+    ['Lua.completion.keywordSnippet']       = Type.String  >> 'Replace' << {
+                                                'Disable',
+                                                'Both',
+                                                'Replace',
+                                            },
     ['Lua.completion.displayContext']       = Type.Integer >> 0,
     ['Lua.completion.workspaceWord']        = Type.Boolean >> true,
-    ['Lua.completion.showWord']             = Type.String  >> 'Fallback',
+    ['Lua.completion.showWord']             = Type.String  >> 'Fallback' << {
+                                                'Enable',
+                                                'Fallback',
+                                                'Disable',
+                                            },
     ['Lua.completion.autoRequire']          = Type.Boolean >> true,
     ['Lua.completion.showParams']           = Type.Boolean >> true,
     ['Lua.completion.requireSeparator']     = Type.String  >> '.',
@@ -208,9 +275,17 @@ local template = {
     ['Lua.hint.enable']                     = Type.Boolean >> false,
     ['Lua.hint.paramType']                  = Type.Boolean >> true,
     ['Lua.hint.setType']                    = Type.Boolean >> false,
-    ['Lua.hint.paramName']                  = Type.String  >> 'All',
+    ['Lua.hint.paramName']                  = Type.String  >> 'All' << {
+                                                'All',
+                                                'Literal',
+                                                'Disable',
+                                            },
     ['Lua.hint.await']                      = Type.Boolean >> true,
-    ['Lua.hint.arrayIndex']                 = Type.Boolean >> 'Auto',
+    ['Lua.hint.arrayIndex']                 = Type.String >> 'Auto' << {
+                                                'Enable',
+                                                'Auto',
+                                                'Disable',
+                                            },
     ['Lua.window.statusBar']                = Type.Boolean >> true,
     ['Lua.window.progressBar']              = Type.Boolean >> true,
     ['Lua.format.enable']                   = Type.Boolean >> true,

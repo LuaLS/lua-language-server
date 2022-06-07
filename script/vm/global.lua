@@ -446,7 +446,7 @@ local function compileSelf(source)
     if not node then
         return
     end
-    local fields = vm.getLocalFields(source)
+    local fields = vm.getLocalFields(source, false)
     if not fields then
         return
     end

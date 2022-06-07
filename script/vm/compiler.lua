@@ -59,9 +59,9 @@ local searchFieldSwitch = util.switch()
     : call(function (suri, node, key, ref, pushResult)
         local fields
         if key then
-            fields = vm.getLocalSources(node, key)
+            fields = vm.getLocalSourcesSets(node, key)
         else
-            fields = vm.getLocalFields(node)
+            fields = vm.getLocalFields(node, false)
         end
         if fields then
             for _, src in ipairs(fields) do
@@ -586,7 +586,7 @@ local function bindDocs(source)
 end
 
 local function compileByLocalID(source)
-    local sources = vm.getLocalSources(source)
+    local sources = vm.getLocalSourcesSets(source)
     if not sources then
         return
     end

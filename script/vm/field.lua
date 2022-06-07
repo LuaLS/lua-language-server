@@ -16,7 +16,7 @@ local searchByNodeSwitch = util.switch()
     end)
 
 local function searchByLocalID(source, pushResult)
-    local fields = vm.getLocalFields(source)
+    local fields = vm.getLocalFields(source, true)
     if fields then
         for _, field in ipairs(fields) do
             pushResult(field)

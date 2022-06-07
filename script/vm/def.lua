@@ -115,12 +115,10 @@ local searchFieldSwitch = util.switch()
     end)
     : case 'local'
     : call(function (suri, obj, key, pushResult)
-        local sources = vm.getLocalSources(obj, key)
+        local sources = vm.getLocalSourcesSets(obj, key)
         if sources then
             for _, src in ipairs(sources) do
-                if guide.isSet(src) then
-                    pushResult(src)
-                end
+                pushResult(src)
             end
         end
     end)
@@ -194,14 +192,12 @@ end
 ---@param source  parser.object
 ---@param pushResult fun(src: parser.object)
 local function searchByLocalID(source, pushResult)
-    local idSources = vm.getLocalSources(source)
+    local idSources = vm.getLocalSourcesSets(source)
     if not idSources then
         return
     end
     for _, src in ipairs(idSources) do
-        if guide.isSet(src) then
-            pushResult(src)
-        end
+        pushResult(src)
     end
 end
 

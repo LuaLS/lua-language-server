@@ -240,12 +240,17 @@ end
 ---@param source  parser.object
 ---@param pushResult fun(src: parser.object)
 local function searchByLocalID(source, pushResult)
-    local idSources = vm.getLocalSources(source)
-    if not idSources then
-        return
+    local sourceSets = vm.getLocalSourcesSets(source)
+    if sourceSets then
+        for _, src in ipairs(sourceSets) do
+            pushResult(src)
+        end
     end
-    for _, src in ipairs(idSources) do
-        pushResult(src)
+    local sourceGets = vm.getLocalSourcesGets(source)
+    if sourceGets then
+        for _, src in ipairs(sourceGets) do
+            pushResult(src)
+        end
     end
 end
 

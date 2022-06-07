@@ -67,4 +67,5 @@ end
 testIfExit(ROOT / 'test' / 'example' / 'vm.txt')
 testIfExit(ROOT / 'test' / 'example' / 'largeGlobal.txt')
 testIfExit(ROOT / 'test' / 'example' / 'guide.txt')
+testIfExit(ROOT / 'test' / 'example' / 'jass-common.txt')
 testIfExit(fs.path [[D:\github\test\ECObject.lua]])

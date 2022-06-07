@@ -292,7 +292,7 @@ function Collider:applyForce(x, y, z) end
 ---
 ---
 ---### NOTE:
----If the Collider is asleep, it will need to be woken up with `Collider:setAwake` for this function to have any affect.
+---If the Collider is asleep, it will need to be woken up with `Collider:setAwake` for this function to have any effect.
 ---
 ---@param x number # The x component of the torque.
 ---@param y number # The y component of the torque.
@@ -1253,13 +1253,13 @@ local SphereShape = {}
 ---Returns the radius of the SphereShape.
 ---
 ---@return number radius # The radius of the sphere, in meters.
-function SphereShape:getDimensions() end
+function SphereShape:getRadius() end
 
 ---
 ---Sets the radius of the SphereShape.
 ---
 ---@param radius number # The radius of the sphere, in meters.
-function SphereShape:setDimensions(radius) end
+function SphereShape:setRadius(radius) end
 
 ---
 ---A World is an object that holds the colliders, joints, and shapes in a physics simulation.
@@ -1524,7 +1524,7 @@ function World:newSphereCollider(x, y, z, radius) end
 ---
 ---Returns an iterator that can be used to iterate over "overlaps", or potential collisions between pairs of shapes in the World.
 ---
----This should be called after using `World:detectOverlaps` to compute the list of overlaps. Usually this is called automatically by `World:update`.
+---This should be called after using `World:computeOverlaps` to compute the list of overlaps. Usually this is called automatically by `World:update`.
 ---
 ---@return function iterator # A Lua iterator, usable in a for loop.
 function World:overlaps() end

@@ -7,7 +7,7 @@
 ---
 ---Note that all units are reported in meters.
 ---
----Position `(0, 0, 0)` is the center of the play area.
+---Position `(0, 0, 0)` is on the floor in the center of the play area.
 ---
 ---@class lovr.headset
 lovr.headset = {}
@@ -121,6 +121,12 @@ function lovr.headset.getClipDistance() end
 ---@return number width # The width of the display.
 ---@return number height # The height of the display.
 function lovr.headset.getDisplayDimensions() end
+
+---
+---Returns a table with all the refresh rates supported by the headset display, in Hz.
+---
+---@return table frequencies # A flat table of the refresh rates supported by the headset display, nil if not supported.
+function lovr.headset.getDisplayFrequencies() end
 
 ---
 ---Returns the refresh rate of the headset display, in Hz.
@@ -567,6 +573,17 @@ function lovr.headset.renderTo(callback) end
 ---@param near number # The distance to the near clipping plane, in meters.
 ---@param far number # The distance to the far clipping plane, in meters.
 function lovr.headset.setClipDistance(near, far) end
+
+---
+---Sets the display refresh rate, in Hz.
+---
+---
+---### NOTE:
+---Changing the display refresh-rate also changes the frequency of lovr.update() and lovr.draw() as they depend on the display frequency.
+---
+---@param frequency number # The new refresh rate, in Hz.
+---@return boolean success # Whether the display refresh rate was successfully set.
+function lovr.headset.setDisplayFrequency(frequency) end
 
 ---
 ---Causes the device to vibrate with a custom strength, duration, and frequency, if possible.

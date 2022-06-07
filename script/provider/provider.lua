@@ -239,7 +239,7 @@ m.register 'textDocument/didOpen' {
         local doc      = params.textDocument
         local scheme   = furi.split(doc.uri)
         local supports = config.get(doc.uri, 'Lua.workspace.supportScheme')
-        if not supports[scheme] then
+        if not util.arrayHas(supports, scheme) then
             return
         end
         local uri    = files.getRealUri(doc.uri)
@@ -269,7 +269,7 @@ m.register 'textDocument/didChange' {
         local doc      = params.textDocument
         local scheme   = furi.split(doc.uri)
         local supports = config.get(doc.uri, 'Lua.workspace.supportScheme')
-        if not supports[scheme] then
+        if not util.arrayHas(supports, scheme) then
             return
         end
         local changes = params.contentChanges

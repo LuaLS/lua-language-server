@@ -236,7 +236,7 @@ local function isValid(uri)
     end
     local scheme = furi.split(uri)
     local disableScheme = config.get(uri, 'Lua.diagnostics.disableScheme')
-    if disableScheme[scheme] then
+    if util.arrayHas(disableScheme, scheme) then
         return false
     end
     return true

@@ -141,7 +141,7 @@ function m.getNativeMatcher(scp)
             end
         end
     end
-    for path in pairs(config.get(scp.uri, 'Lua.workspace.library')) do
+    for _, path in ipairs(config.get(scp.uri, 'Lua.workspace.library')) do
         path = m.getAbsolutePath(scp.uri, path)
         if path then
             log.debug('Ignore by library:', path)
@@ -183,7 +183,7 @@ function m.getLibraryMatchers(scp)
     end
 
     local librarys = {}
-    for path in pairs(config.get(scp.uri, 'Lua.workspace.library')) do
+    for _, path in ipairs(config.get(scp.uri, 'Lua.workspace.library')) do
         path = m.getAbsolutePath(scp.uri, path)
         if path then
             librarys[m.normalize(path)] = true

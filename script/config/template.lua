@@ -218,9 +218,7 @@ local template = {
                                             >> util.deepCopy(define.DiagnosticDefaultSeverity),
     ['Lua.diagnostics.neededFileStatus']    = Type.Hash(Type.String, Type.String)
                                             >> util.deepCopy(define.DiagnosticDefaultNeededFileStatus),
-    ['Lua.diagnostics.disableScheme']       = Type.Hash(Type.String, Type.Boolean, ';') >> {
-                                                ['git']      = true,
-                                            },
+    ['Lua.diagnostics.disableScheme']       = Type.Array(Type.String) >> { 'git' },
     ['Lua.diagnostics.workspaceDelay']      = Type.Integer >> 5,
     ['Lua.diagnostics.workspaceRate']       = Type.Integer >> 100,
     ['Lua.diagnostics.libraryFiles']        = Type.String  >> 'Opened' << {
@@ -238,14 +236,10 @@ local template = {
     ['Lua.workspace.useGitIgnore']          = Type.Boolean >> true,
     ['Lua.workspace.maxPreload']            = Type.Integer >> 3000,
     ['Lua.workspace.preloadFileSize']       = Type.Integer >> 500,
-    ['Lua.workspace.library']               = Type.Hash(Type.String, Type.Boolean, ';'),
+    ['Lua.workspace.library']               = Type.Array(Type.String),
     ['Lua.workspace.checkThirdParty']       = Type.Boolean >> true,
     ['Lua.workspace.userThirdParty']        = Type.Array(Type.String),
-    ['Lua.workspace.supportScheme']         = Type.Hash(Type.String, Type.Boolean, ';') >> {
-                                                ['file']     = true,
-                                                ['untitled'] = true,
-                                                ['git']      = true,
-                                            },
+    ['Lua.workspace.supportScheme']         = Type.Array(Type.String) >> { 'file', 'untitled', 'git' },
     ['Lua.completion.enable']               = Type.Boolean >> true,
     ['Lua.completion.callSnippet']          = Type.String  >> 'Disable' << {
                                                 'Disable',

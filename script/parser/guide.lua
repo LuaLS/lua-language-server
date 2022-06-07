@@ -468,19 +468,27 @@ end
 function m.getLocal(source, name, pos)
     local block = source
     -- find nearest source
-    while block.start > pos or block.finish < pos do
-        block = block.parent
+    for _ = 1, 10000 do
         if not block then
             return nil
         end
+        if block.start <= pos and block.finish >= pos then
+            break
+        end
+        block = block.parent
     end
+
     m.eachSourceContain(block, pos, function (src)
         if  blockTypes[src.type]
         and (src.finish - src.start) < (block.finish - src.start) then
             block = src
         end
     end)
-    while block do
+
+    for _ = 1, 10000 do
+        if not block then
+            break
+        end
         local res
         if block.locals then
             for _, loc in ipairs(block.locals) do

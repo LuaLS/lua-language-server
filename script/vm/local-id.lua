@@ -21,6 +21,7 @@ local compileSwitch = util.switch()
             compileLocalID(ref)
         end
     end)
+    : case 'setlocal'
     : case 'getlocal'
     : call(function (source)
         source._localID = ('%d'):format(source.node.start)

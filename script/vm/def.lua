@@ -5,72 +5,7 @@ local guide     = require 'parser.guide'
 
 local simpleSwitch
 
-local function searchGetLocal(source, node, pushResult)
-    local key = guide.getKeyName(source)
-    for _, ref in ipairs(node.node.ref) do
-        if  ref.type == 'getlocal'
-        and ref.next
-        and guide.isSet(ref.next)
-        and guide.getKeyName(ref.next) == key then
-            pushResult(ref.next)
-        end
-    end
-end
-
 simpleSwitch = util.switch()
-    : case 'local'
-    : call(function (source, pushResult)
-        pushResult(source)
-        if source.ref then
-            for _, ref in ipairs(source.ref) do
-                if ref.type == 'setlocal' then
-                    pushResult(ref)
-                end
-            end
-        end
-    end)
-    : case 'sellf'
-    : call(function (source, pushResult)
-        if source.ref then
-            for _, ref in ipairs(source.ref) do
-                if ref.type == 'setlocal' then
-                    pushResult(ref)
-                end
-            end
-        end
-        for _, res in ipairs(vm.getDefs(source.method.node)) do
-            pushResult(res)
-        end
-    end)
-    : case 'getlocal'
-    : case 'setlocal'
-    : call(function (source, pushResult)
-        simpleSwitch('local', source.node, pushResult)
-    end)
-    : case 'field'
-    : call(function (source, pushResult)
-        local parent = source.parent
-        if parent.type ~= 'tablefield' then
-            simpleSwitch(parent.type, parent, pushResult)
-        end
-    end)
-    : case 'setfield'
-    : case 'getfield'
-    : call(function (source, pushResult)
-        local node = source.node
-        if node.type == 'getlocal' then
-            searchGetLocal(source, node, pushResult)
-            return
-        end
-    end)
-    : case 'getindex'
-    : case 'setindex'
-    : call(function (source, pushResult)
-        local node = source.node
-        if node.type == 'getlocal' then
-            searchGetLocal(source, node, pushResult)
-        end
-    end)
     : case 'goto'
     : call(function (source, pushResult)
         if source.node then

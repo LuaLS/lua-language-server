@@ -519,14 +519,47 @@ local function bindAs(source)
     if not docs then
         return
     end
-    for _, doc in ipairs(docs) do
-        if doc.type == 'doc.as' and doc.originalComment.start == source.finish + 2 then
-            if doc.as then
-                vm.setNode(source, vm.compileNode(doc.as), true)
+    local ases = docs._asCache
+    if not ases then
+        ases = {}
+        docs._asCache = ases
+        for _, doc in ipairs(docs) do
+            if doc.type == 'doc.as' and doc.as then
+                ases[#ases+1] = doc
             end
-            return true
+        end
+        table.sort(ases, function (a, b)
+            return a.start < b.start
+        end)
+    end
+
+    local max = #ases
+    local index
+    local left  = 1
+    local right = max
+    for _ = 1, 1000 do
+        index = left + (right - left) // 2
+        if index <= left then
+            index = left
+            break
+        elseif index >= right then
+            index = right
+            break
+        end
+        local doc = ases[index]
+        if doc.originalComment.start < source.finish + 2 then
+            left = index + 1
+        else
+            right = index
         end
     end
+
+    local doc = ases[index]
+    if doc and doc.originalComment.start == source.finish + 2 then
+        vm.setNode(source, vm.compileNode(doc.as), true)
+        return true
+    end
+
     return false
 end
 

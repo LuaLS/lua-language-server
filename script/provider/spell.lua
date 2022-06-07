@@ -7,6 +7,7 @@ local fs = require 'bee.filesystem'
 local config = require 'config'
 local diagnostics = require 'provider.diagnostic'
 local pformatting = require 'provider.formatting'
+local util = require 'utility'
 
 local m = {}
 

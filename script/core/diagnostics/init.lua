@@ -3,6 +3,7 @@ local define = require 'proto.define'
 local config = require 'config'
 local await  = require 'await'
 local vm     = require "vm.vm"
+local util   = require 'utility'
 
 -- 把耗时最长的诊断放到最后面
 local diagSort = {
@@ -52,7 +53,8 @@ end
 ---@param isScopeDiag boolean
 ---@param response async fun(result: any)
 local function check(uri, name, isScopeDiag, response)
-    if config.get(uri, 'Lua.diagnostics.disable')[name] then
+    local disables = config.get(uri, 'Lua.diagnostics.disable')
+    if util.arrayHas(disables, name) then
         return
     end
     local level =  config.get(uri, 'Lua.diagnostics.severity')[name]

@@ -15,7 +15,7 @@ return function (uri, callback)
         return
     end
 
-    local dglobals = config.get(uri, 'Lua.diagnostics.globals')
+    local dglobals = util.arrayToHash(config.get(uri, 'Lua.diagnostics.globals'))
     local rspecial = config.get(uri, 'Lua.runtime.special')
 
     guide.eachSourceTypes(ast.ast, types, function (src) ---@async

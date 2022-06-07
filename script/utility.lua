@@ -8,6 +8,7 @@ local ipairs       = ipairs
 local next         = next
 local rawset       = rawset
 local move         = table.move
+local tableRemove  = table.remove
 local setmetatable = debug.setmetatable
 local mathType     = math.type
 local mathCeil     = math.ceil
@@ -789,6 +790,43 @@ function m.multiTable(count, default)
         end })
     end
     return current
+end
+
+function m.getTableKeys(t, sorter)
+    local keys = {}
+    for k in pairs(t) do
+        keys[#keys+1] = k
+    end
+    if sorter == true then
+        tableSort(keys)
+    elseif sorter then
+        tableSort(keys, sorter)
+    end
+    return keys
+end
+
+function m.arrayHas(array, value)
+    for i = 1, #array do
+        if array[i] == value then
+            return true
+        end
+    end
+    return false
+end
+
+function m.arrayInsert(array, value)
+    if not m.arrayHas(array, value) then
+        array[#array+1] = value
+    end
+end
+
+function m.arrayRemove(array, value)
+    for i = 1, #array do
+        if array[i] == value then
+            tableRemove(array, i)
+            return
+        end
+    end
 end
 
 m.MODE_K  = { __mode = 'k' }

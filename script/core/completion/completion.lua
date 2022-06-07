@@ -356,6 +356,7 @@ local function checkModule(state, word, position, results)
     if not config.get(state.uri, 'Lua.completion.autoRequire') then
         return
     end
+    local globals = util.arrayToHash(config.get(state.uri, 'Lua.diagnostics.globals'))
     local locals = guide.getVisibleLocals(state.ast, position)
     for uri in files.eachFile(state.uri) do
         if uri == guide.getUri(state.ast) then
@@ -366,7 +367,7 @@ local function checkModule(state, word, position, results)
         local stemName = fileName:gsub('%..+', '')
         if  not locals[stemName]
         and not vm.hasGlobalSets(state.uri, 'variable', stemName)
-        and not config.get(state.uri, 'Lua.diagnostics.globals')[stemName]
+        and not globals[stemName]
         and stemName:match '^[%a_][%w_]*$'
         and matchKey(word, stemName) then
             local targetState = files.getState(uri)

@@ -4,6 +4,7 @@ local lang      = require 'language'
 local config    = require 'config'
 local guide     = require 'parser.guide'
 local await     = require 'await'
+local util      = require 'utility'
 
 local requireLike = {
     ['include'] = true,
@@ -19,7 +20,7 @@ return function (uri, callback)
         return
     end
 
-    local dglobals = config.get(uri, 'Lua.diagnostics.globals')
+    local dglobals = util.arrayToHash(config.get(uri, 'Lua.diagnostics.globals'))
     local rspecial = config.get(uri, 'Lua.runtime.special')
     local cache    = {}
 

@@ -42,10 +42,11 @@ local units = {}
 
 local function register(name, default, checker, loader, caller)
     units[name] = {
-        default = default,
+        name     = name,
+        default  = default,
         _checker = checker,
-        loader  = loader,
-        caller  = caller,
+        loader   = loader,
+        caller   = caller,
     }
 end
 
@@ -194,7 +195,7 @@ local template = {
                                             ),
     ['Lua.runtime.meta']                    = Type.String >> '${version} ${language} ${encoding}',
     ['Lua.runtime.unicodeName']             = Type.Boolean,
-    ['Lua.runtime.nonstandardSymbol']       = Type.Hash(Type.String, Type.Boolean, ';'),
+    ['Lua.runtime.nonstandardSymbol']       = Type.Array(Type.String),
     ['Lua.runtime.plugin']                  = Type.String,
     ['Lua.runtime.fileEncoding']            = Type.String >> 'utf8' << {
                                                 'utf8',
@@ -202,10 +203,17 @@ local template = {
                                                 'utf16le',
                                                 'utf16be',
                                             },
-    ['Lua.runtime.builtin']                 = Type.Hash(Type.String, Type.String),
+    ['Lua.runtime.builtin']                 = Type.Hash(
+                                                Type.String << util.getTableKeys(define.BuiltIn, true),
+                                                Type.String >> 'default' << {
+                                                    'default',
+                                                    'enable',
+                                                    'disable',
+                                                }
+                                            ),
     ['Lua.diagnostics.enable']              = Type.Boolean >> true,
-    ['Lua.diagnostics.globals']             = Type.Hash(Type.String, Type.Boolean, ';'),
-    ['Lua.diagnostics.disable']             = Type.Hash(Type.String, Type.Boolean, ';'),
+    ['Lua.diagnostics.globals']             = Type.Array(Type.String),
+    ['Lua.diagnostics.disable']             = Type.Array(Type.String),
     ['Lua.diagnostics.severity']            = Type.Hash(Type.String, Type.String)
                                             >> util.deepCopy(define.DiagnosticDefaultSeverity),
     ['Lua.diagnostics.neededFileStatus']    = Type.Hash(Type.String, Type.String)

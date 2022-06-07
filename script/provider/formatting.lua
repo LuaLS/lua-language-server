@@ -83,7 +83,7 @@ function m.updateNonStandardSymbols(symbols)
     end
 
     local eqTokens = {}
-    for token in pairs(symbols) do
+    for _, token in ipairs(symbols) do
         if token:find("=") and token ~= "!=" then
             table.insert(eqTokens, token)
         end

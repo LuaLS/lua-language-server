@@ -183,7 +183,7 @@ function m.syntaxErrors(uri, ast)
     local results = {}
 
     pcall(function ()
-        local disables = config.get(uri, 'Lua.diagnostics.disable')
+        local disables = util.arrayToHash(config.get(uri, 'Lua.diagnostics.disable'))
         for _, err in ipairs(ast.errs) do
             if not disables[err.type:lower():gsub('_', '-')] then
                 results[#results+1] = buildSyntaxError(uri, err)

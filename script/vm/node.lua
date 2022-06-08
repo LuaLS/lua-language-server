@@ -315,3 +315,9 @@ files.watch(function (ev, uri)
         end
     end
 end)
+
+ws.watch(function (ev, uri)
+    if ev == 'reload' then
+        vm.clearNodeCache()
+    end
+end)

@@ -126,7 +126,7 @@ local function buildEnum(md, lang, conf)
 end
 
 local function buildMarkdown(lang)
-    local dir = fs.path 'doc' / lang / 'config'
+    local dir = fs.path 'doc' / lang
     fs.create_directories(dir)
     local configDoc = markdown()
 

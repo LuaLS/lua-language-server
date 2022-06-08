@@ -1,5 +1,6 @@
 local json     = require 'json'
 local template = require 'config.template'
+local util     = require 'utility'
 
 local function getType(temp)
     if temp.name == 'Boolean' then
@@ -76,6 +77,9 @@ end
 local config = {}
 
 for name, temp in pairs(template) do
+    if not util.stringStartWith(name, 'Lua.') then
+        goto CONTINUE
+    end
     config[name] = {
         scope   = 'resource',
         type    = getType(temp),
@@ -93,6 +97,8 @@ for name, temp in pairs(template) do
     if temp.name == 'Hash' then
         insertHash(config[name], temp)
     end
+
+    ::CONTINUE::
 end
 
 config['Lua.telemetry.enable'].tags = { 'telemetry' }

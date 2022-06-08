@@ -304,6 +304,7 @@ local template = {
                                             >> {},
     ['Lua.spell.dict']                      = Type.Array(Type.String),
     ['Lua.telemetry.enable']                = Type.Or(Type.Boolean >> false, Type.Nil) >> nil,
+    ['Lua.misc.parameters']                 = Type.Array(Type.String),
 
     -- VSCode
     ['files.associations']                  = Type.Hash(Type.String, Type.String),

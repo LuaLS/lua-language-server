@@ -15,7 +15,6 @@ function mt:add(language, text)
     if not text then
         return self
     end
-    assert(type(text) == 'string')
     self._cacheResult = nil
     if type(text) == 'table' then
         self[#self+1] = {

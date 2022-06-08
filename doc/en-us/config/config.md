@@ -3,206 +3,281 @@
 When the input looks like a file name, automatically `require` this file.
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
 
 ## default
 
-`true`
+```json
+true
+```
 
 # completion.callSnippet
 
 Shows function call snippets.
 
 ## type
-`string`
 
-## default
-
-`"Disable"`
+```ts
+string
+```
 
 ## enum
 
 * `"Disable"`: Only shows `function name`.
 * `"Both"`: Shows `function name` and `call snippet`.
 * `"Replace"`: Only shows `call snippet.`
+## default
+
+```json
+"Disable"
+```
 
 # completion.displayContext
 
 Previewing the relevant code snippet of the suggestion may help you understand the usage of the suggestion. The number set indicates the number of intercepted lines in the code fragment. If it is set to `0`, this feature can be disabled.
 
 ## type
-`integer`
+
+```ts
+integer
+```
 
 ## default
 
-`0`
+```json
+0
+```
 
 # completion.enable
 
 Enable completion.
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
 
 ## default
 
-`true`
+```json
+true
+```
 
 # completion.keywordSnippet
 
 Shows keyword syntax snippets.
 
 ## type
-`string`
 
-## default
-
-`"Replace"`
+```ts
+string
+```
 
 ## enum
 
 * `"Disable"`: Only shows `keyword`.
 * `"Both"`: Shows `keyword` and `syntax snippet`.
 * `"Replace"`: Only shows `syntax snippet`.
+## default
+
+```json
+"Replace"
+```
 
 # completion.postfix
 
 The symbol used to trigger the postfix suggestion.
 
 ## type
-`string`
+
+```ts
+string
+```
 
 ## default
 
-`"@"`
+```json
+"@"
+```
 
 # completion.requireSeparator
 
 The separator used when `require`.
 
 ## type
-`string`
+
+```ts
+string
+```
 
 ## default
 
-`"."`
+```json
+"."
+```
 
 # completion.showParams
 
 Display parameters in completion list. When the function has multiple definitions, they will be displayed separately.
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
 
 ## default
 
-`true`
+```json
+true
+```
 
 # completion.showWord
 
 Show contextual words in suggestions.
 
 ## type
-`string`
 
-## default
-
-`"Fallback"`
+```ts
+string
+```
 
 ## enum
 
 * `"Enable"`: Always show context words in suggestions.
 * `"Fallback"`: Contextual words are only displayed when suggestions based on semantics cannot be provided.
 * `"Disable"`: Do not display context words.
+## default
+
+```json
+"Fallback"
+```
 
 # completion.workspaceWord
 
 Whether the displayed context word contains the content of other files in the workspace.
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
 
 ## default
 
-`true`
+```json
+true
+```
 
 # diagnostics.disable
 
 Disabled diagnostic (Use code in hover brackets).
 
 ## type
-`array<string>`
+
+```ts
+Array<string>
+```
 
 ## default
 
-`[]`
+```json
+[]
+```
 
 # diagnostics.disableScheme
 
 Do not diagnose Lua files that use the following scheme.
 
 ## type
-`array<string>`
+
+```ts
+Array<string>
+```
 
 ## default
 
-`[ "git" ]`
+```json
+["git"]
+```
 
 # diagnostics.enable
 
 Enable diagnostics.
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
 
 ## default
 
-`true`
+```json
+true
+```
 
 # diagnostics.globals
 
 Defined global variables.
 
 ## type
-`array<string>`
+
+```ts
+Array<string>
+```
 
 ## default
 
-`[]`
+```json
+[]
+```
 
 # diagnostics.ignoredFiles
 
 How to diagnose ignored files.
 
 ## type
-`string`
 
-## default
-
-`"Opened"`
+```ts
+string
+```
 
 ## enum
 
 * `"Enable"`: Always diagnose these files.
 * `"Opened"`: Only when these files are opened will it be diagnosed.
 * `"Disable"`: These files are not diagnosed.
+## default
+
+```json
+"Opened"
+```
 
 # diagnostics.libraryFiles
 
 How to diagnose files loaded via `Lua.workspace.library`.
 
 ## type
-`string`
 
-## default
-
-`"Opened"`
+```ts
+string
+```
 
 ## enum
 
 * `"Enable"`: Always diagnose these files.
 * `"Opened"`: Only when these files are opened will it be diagnosed.
 * `"Disable"`: These files are not diagnosed.
+## default
+
+```json
+"Opened"
+```
 
 # diagnostics.neededFileStatus
 
@@ -212,216 +287,431 @@ How to diagnose files loaded via `Lua.workspace.library`.
 
 
 ## type
-`object`
+
+```ts
+object<string, string>
+```
+
+## enum
+
+* `"Any"`
+* `"Opened"`
+* `"None"`
+## default
+
+```json
+{
+    "ambiguity-1": "Any",
+    "await-in-sync": "None",
+    "circle-doc-class": "Any",
+    "close-non-object": "Any",
+    "code-after-break": "Opened",
+    "codestyle-check": "None",
+    "count-down-loop": "Any",
+    "deprecated": "Opened",
+    "different-requires": "Any",
+    "discard-returns": "Opened",
+    "doc-field-no-class": "Any",
+    "duplicate-doc-alias": "Any",
+    "duplicate-doc-field": "Any",
+    "duplicate-doc-param": "Any",
+    "duplicate-index": "Any",
+    "duplicate-set-field": "Any",
+    "empty-block": "Opened",
+    "global-in-nil-env": "Any",
+    "lowercase-global": "Any",
+    "missing-parameter": "Opened",
+    "need-check-nil": "Opened",
+    "newfield-call": "Any",
+    "newline-call": "Any",
+    "no-unknown": "None",
+    "not-yieldable": "None",
+    "redefined-local": "Opened",
+    "redundant-parameter": "Opened",
+    "redundant-return": "Opened",
+    "redundant-value": "Opened",
+    "spell-check": "None",
+    "trailing-space": "Opened",
+    "type-check": "None",
+    "unbalanced-assignments": "Any",
+    "undefined-doc-class": "Any",
+    "undefined-doc-name": "Any",
+    "undefined-doc-param": "Any",
+    "undefined-env-child": "Any",
+    "undefined-field": "Opened",
+    "undefined-global": "Any",
+    "unknown-diag-code": "Any",
+    "unused-function": "Opened",
+    "unused-label": "Opened",
+    "unused-local": "Opened",
+    "unused-vararg": "Opened"
+}
+```
 
 # diagnostics.severity
 
 Modified diagnostic severity.
 
 ## type
-`object`
+
+```ts
+object<string, string>
+```
+
+## enum
+
+* `"Error"`
+* `"Warning"`
+* `"Information"`
+* `"Hint"`
+## default
+
+```json
+{
+    "ambiguity-1": "Warning",
+    "await-in-sync": "Warning",
+    "circle-doc-class": "Warning",
+    "close-non-object": "Warning",
+    "code-after-break": "Hint",
+    "codestyle-check": "Warning",
+    "count-down-loop": "Warning",
+    "deprecated": "Warning",
+    "different-requires": "Warning",
+    "discard-returns": "Warning",
+    "doc-field-no-class": "Warning",
+    "duplicate-doc-alias": "Warning",
+    "duplicate-doc-field": "Warning",
+    "duplicate-doc-param": "Warning",
+    "duplicate-index": "Warning",
+    "duplicate-set-field": "Warning",
+    "empty-block": "Hint",
+    "global-in-nil-env": "Warning",
+    "lowercase-global": "Information",
+    "missing-parameter": "Warning",
+    "need-check-nil": "Warning",
+    "newfield-call": "Warning",
+    "newline-call": "Information",
+    "no-unknown": "Information",
+    "not-yieldable": "Warning",
+    "redefined-local": "Hint",
+    "redundant-parameter": "Warning",
+    "redundant-return": "Warning",
+    "redundant-value": "Warning",
+    "spell-check": "Information",
+    "trailing-space": "Hint",
+    "type-check": "Warning",
+    "unbalanced-assignments": "Warning",
+    "undefined-doc-class": "Warning",
+    "undefined-doc-name": "Warning",
+    "undefined-doc-param": "Warning",
+    "undefined-env-child": "Information",
+    "undefined-field": "Warning",
+    "undefined-global": "Warning",
+    "unknown-diag-code": "Warning",
+    "unused-function": "Hint",
+    "unused-label": "Hint",
+    "unused-local": "Hint",
+    "unused-vararg": "Hint"
+}
+```
 
 # diagnostics.workspaceDelay
 
 Latency (milliseconds) for workspace diagnostics. When you start the workspace, or edit any file, the entire workspace will be re-diagnosed in the background. Set to negative to disable workspace diagnostics.
 
 ## type
-`integer`
+
+```ts
+integer
+```
 
 ## default
 
-`3000`
+```json
+3000
+```
 
 # diagnostics.workspaceRate
 
 Workspace diagnostics run rate (%). Decreasing this value reduces CPU usage, but also reduces the speed of workspace diagnostics. The diagnosis of the file you are currently editing is always done at full speed and is not affected by this setting.
 
 ## type
-`integer`
+
+```ts
+integer
+```
 
 ## default
 
-`100`
+```json
+100
+```
 
 # format.defaultConfig
 
 **Missing description!!**
 
 ## type
-`object`
+
+```ts
+Object<string, string>
+```
 
 ## default
 
-`{}`
+```json
+{}
+```
 
 # format.enable
 
 Enable code formatter.
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
 
 ## default
 
-`true`
+```json
+true
+```
 
 # hint.arrayIndex
 
 Show hints of array index when constructing a table.
 
 ## type
-`string`
 
-## default
-
-`"Auto"`
+```ts
+string
+```
 
 ## enum
 
 * `"Enable"`: Show hints in all tables.
 * `"Auto"`: Show hints only when the table is greater than 3 items, or the table is a mixed table.
 * `"Disable"`: Disable hints of array index.
+## default
+
+```json
+"Auto"
+```
 
 # hint.await
 
 **Missing description!!**
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
 
 ## default
 
-`true`
+```json
+true
+```
 
 # hint.enable
 
 Enable inlay hint.
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
+
+## default
+
+```json
+false
+```
 
 # hint.paramName
 
 Show hints of parameter name at the function call.
 
 ## type
-`string`
 
-## default
-
-`"All"`
+```ts
+string
+```
 
 ## enum
 
 * `"All"`: All types of parameters are shown.
 * `"Literal"`: Only literal type parameters are shown.
 * `"Disable"`: Disable parameter hints.
+## default
+
+```json
+"All"
+```
 
 # hint.paramType
 
 Show type hints at the parameter of the function.
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
 
 ## default
 
-`true`
+```json
+true
+```
 
 # hint.setType
 
 Show hints of type at assignment operation.
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
+
+## default
+
+```json
+false
+```
 
 # hover.enable
 
 Enable hover.
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
 
 ## default
 
-`true`
+```json
+true
+```
 
 # hover.enumsLimit
 
 When the value corresponds to multiple types, limit the number of types displaying.
 
 ## type
-`integer`
+
+```ts
+integer
+```
 
 ## default
 
-`5`
+```json
+5
+```
 
 # hover.expandAlias
 
 **Missing description!!**
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
 
 ## default
 
-`true`
+```json
+true
+```
 
 # hover.previewFields
 
 When hovering to view a table, limits the maximum number of previews for fields.
 
 ## type
-`integer`
+
+```ts
+integer
+```
 
 ## default
 
-`20`
+```json
+20
+```
 
 # hover.viewNumber
 
 Hover to view numeric content (only if literal is not decimal).
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
 
 ## default
 
-`true`
+```json
+true
+```
 
 # hover.viewString
 
 Hover to view the contents of a string (only if the literal contains an escape character).
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
 
 ## default
 
-`true`
+```json
+true
+```
 
 # hover.viewStringMax
 
 The maximum length of a hover to view the contents of a string.
 
 ## type
-`integer`
+
+```ts
+integer
+```
 
 ## default
 
-`1000`
+```json
+1000
+```
 
 # misc.parameters
 
 [Command line parameters](https://github.com/sumneko/lua-telemetry-server/tree/master/method) when starting the language service in VSCode.
 
 ## type
-`array<string>`
+
+```ts
+Array<string>
+```
 
 ## default
 
-`[]`
+```json
+[]
+```
 
 # runtime.builtin
 
@@ -433,18 +723,47 @@ Adjust the enabled state of the built-in library. You can disable (or redefine) 
 
 
 ## type
-`object`
+
+```ts
+object<string, string>
+```
+
+## enum
+
+* `"default"`
+* `"enable"`
+* `"disable"`
+## default
+
+```json
+{
+    "basic": "default",
+    "bit": "default",
+    "bit32": "default",
+    "builtin": "default",
+    "coroutine": "default",
+    "debug": "default",
+    "ffi": "default",
+    "io": "default",
+    "jit": "default",
+    "math": "default",
+    "os": "default",
+    "package": "default",
+    "string": "default",
+    "table": "default",
+    "utf8": "default"
+}
+```
 
 # runtime.fileEncoding
 
 File encoding. The `ansi` option is only available under the `Windows` platform.
 
 ## type
-`string`
 
-## default
-
-`"utf8"`
+```ts
+string
+```
 
 ## enum
 
@@ -452,28 +771,43 @@ File encoding. The `ansi` option is only available under the `Windows` platform.
 * `"ansi"`
 * `"utf16le"`
 * `"utf16be"`
+## default
+
+```json
+"utf8"
+```
 
 # runtime.meta
 
 **Missing description!!**
 
 ## type
-`string`
+
+```ts
+string
+```
 
 ## default
 
-`"${version} ${language} ${encoding}"`
+```json
+"${version} ${language} ${encoding}"
+```
 
 # runtime.nonstandardSymbol
 
 Supports non-standard symbols. Make sure that your runtime environment supports these symbols.
 
 ## type
-`array<string>`
+
+```ts
+Array<string>
+```
 
 ## default
 
-`[]`
+```json
+[]
+```
 
 # runtime.path
 
@@ -484,29 +818,48 @@ If you want to load files outside the workspace, you need to set `Lua.workspace.
 
 
 ## type
-`array<string>`
+
+```ts
+Array<string>
+```
 
 ## default
 
-`[ "?.lua", "?/init.lua" ]`
+```json
+["?.lua","?/init.lua"]
+```
 
 # runtime.pathStrict
 
 When enabled, `runtime.path` will only search the first level of directories, see the description of `runtime.path`.
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
+
+## default
+
+```json
+false
+```
 
 # runtime.plugin
 
 Plugin path. Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/Plugin) to learn more.
 
 ## type
-`string`
+
+```ts
+string
+```
 
 ## default
 
-`""`
+```json
+""
+```
 
 # runtime.special
 
@@ -520,29 +873,42 @@ The following example shows that 'include' is treated as' require '.
 
 
 ## type
-`object`
+
+```ts
+Object<string, string>
+```
 
 ## default
 
-`{}`
+```json
+{}
+```
 
 # runtime.unicodeName
 
 Allows Unicode characters in name.
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
+
+## default
+
+```json
+false
+```
 
 # runtime.version
 
 Lua runtime version.
 
 ## type
-`string`
 
-## default
-
-`"Lua 5.4"`
+```ts
+string
+```
 
 ## enum
 
@@ -551,68 +917,107 @@ Lua runtime version.
 * `"Lua 5.3"`
 * `"Lua 5.4"`
 * `"LuaJIT"`
+## default
+
+```json
+"Lua 5.4"
+```
 
 # semantic.annotation
 
 Semantic coloring of type annotations.
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
 
 ## default
 
-`true`
+```json
+true
+```
 
 # semantic.enable
 
 Enable semantic color. You may need to set `editor.semanticHighlighting.enabled` to `true` to take effect.
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
 
 ## default
 
-`true`
+```json
+true
+```
 
 # semantic.keyword
 
 Semantic coloring of keywords/literals/operators. You only need to enable this feature if your editor cannot do syntax coloring.
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
+
+## default
+
+```json
+false
+```
 
 # semantic.variable
 
 Semantic coloring of variables/fields/parameters.
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
 
 ## default
 
-`true`
+```json
+true
+```
 
 # signatureHelp.enable
 
 Enable signature help.
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
 
 ## default
 
-`true`
+```json
+true
+```
 
 # spell.dict
 
 **Missing description!!**
 
 ## type
-`array<string>`
+
+```ts
+Array<string>
+```
 
 ## default
 
-`[]`
+```json
+[]
+```
 
 # telemetry.enable
 
@@ -620,33 +1025,48 @@ Enable telemetry to send your editor information and error logs over the network
 
 
 ## type
-`boolean | null`
+
+```ts
+boolean | null
+```
 
 ## default
 
-`nil`
+```json
+null
+```
 
 # window.progressBar
 
 Show progress bar in status bar.
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
 
 ## default
 
-`true`
+```json
+true
+```
 
 # window.statusBar
 
 Show extension status in status bar.
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
 
 ## default
 
-`true`
+```json
+true
+```
 
 # workspace.checkThirdParty
 
@@ -661,96 +1081,141 @@ Automatic detection and adaptation of third-party libraries, currently supported
 
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
 
 ## default
 
-`true`
+```json
+true
+```
 
 # workspace.ignoreDir
 
 Ignored files and directories (Use `.gitignore` grammar).
 
 ## type
-`array<string>`
+
+```ts
+Array<string>
+```
 
 ## default
 
-`[ ".vscode" ]`
+```json
+[".vscode"]
+```
 
 # workspace.ignoreSubmodules
 
 Ignore submodules.
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
 
 ## default
 
-`true`
+```json
+true
+```
 
 # workspace.library
 
 In addition to the current workspace, which directories will load files from. The files in these directories will be treated as externally provided code libraries, and some features (such as renaming fields) will not modify these files.
 
 ## type
-`array<string>`
+
+```ts
+Array<string>
+```
 
 ## default
 
-`[]`
+```json
+[]
+```
 
 # workspace.maxPreload
 
 Max preloaded files.
 
 ## type
-`integer`
+
+```ts
+integer
+```
 
 ## default
 
-`5000`
+```json
+5000
+```
 
 # workspace.preloadFileSize
 
 Skip files larger than this value (KB) when preloading.
 
 ## type
-`integer`
+
+```ts
+integer
+```
 
 ## default
 
-`500`
+```json
+500
+```
 
 # workspace.supportScheme
 
 Provide language server for the Lua files of the following scheme.
 
 ## type
-`array<string>`
+
+```ts
+Array<string>
+```
 
 ## default
 
-`[ "file", "untitled", "git" ]`
+```json
+["file","untitled","git"]
+```
 
 # workspace.useGitIgnore
 
 Ignore files list in `.gitignore` .
 
 ## type
-`boolean`
+
+```ts
+boolean
+```
 
 ## default
 
-`true`
+```json
+true
+```
 
 # workspace.userThirdParty
 
 Add private third-party library configuration file paths here, please refer to the built-in [configuration file path](https://github.com/sumneko/lua-language-server/tree/master/meta/3rd)
 
 ## type
-`array<string>`
+
+```ts
+Array<string>
+```
 
 ## default
 
-`[]`
+```json
+[]
+```

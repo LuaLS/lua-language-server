@@ -61,9 +61,9 @@ end
 
 local function insertHash(name, conf, temp)
     conf.title = name:match '[^%.]+$'
+    conf.additionalProperties = false
 
     if type(conf.default) == 'table' and next(conf.default) then
-        conf.additionalProperties = false
         local default = conf.default
         conf.default = nil
         conf.properties = {}
@@ -80,16 +80,13 @@ local function insertHash(name, conf, temp)
             }
         end
     else
-        if temp.subvalue.enums then
-            conf.additionalProperties = false
-            conf.patternProperties = {
-                ['.*'] = {
-                    type    = getType( temp.subvalue),
-                    default = getDefault( temp.subvalue),
-                    enum    = getEnum( temp.subvalue),
-                }
+        conf.patternProperties = {
+            ['.*'] = {
+                type    = getType( temp.subvalue),
+                default = getDefault( temp.subvalue),
+                enum    = getEnum( temp.subvalue),
             }
-        end
+        }
     end
 end
 

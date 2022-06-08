@@ -5,8 +5,7 @@ local config   = require 'configuration'
 local markdown = require 'provider.markdown'
 local util     = require 'utility'
 local lloader  = require 'locale-loader'
-local inspect  = require 'inspect'
-local json     = require 'json'
+local json     = require 'json-beautify'
 
 local function getLocale()
     local locale = {}
@@ -42,13 +41,24 @@ end
 local function buildType(md, lang, conf)
     md:add('md', '## type')
     if type(conf.type) == 'table' then
-        md:add('md', ('`%s | %s`'):format(conf.type[1], conf.type[2]))
+        md:add('ts', ('%s | %s'):format(conf.type[1], conf.type[2]))
     elseif conf.type == 'array' then
-        md:add('md', ('`%s<%s>`'):format(conf.type, conf.items.type))
+        md:add('ts', ('Array<%s>'):format(conf.items.type))
+    elseif conf.type == 'object' then
+        if conf.properties then
+            local _, first = next(conf.properties)
+            assert(first)
+            md:add('ts', ('object<string, %s>'):format(first.type))
+        elseif conf.patternProperties then
+            local _, first = next(conf.patternProperties)
+            assert(first)
+            md:add('ts', ('Object<string, %s>'):format(first.type))
+        else
+            md:add('ts', '**Unknown object type!!**')
+        end
     else
-        md:add('md', ('`%s`'):format(conf.type))
+        md:add('ts', ('%s'):format(conf.type))
     end
-    md:emptyLine()
 end
 
 local function buildDesc(md, lang, conf)
@@ -63,35 +73,54 @@ local function buildDesc(md, lang, conf)
 end
 
 local function buildDefault(md, lang, conf)
-    if not conf.default then
-        return
-    end
     local default = conf.default
     if default == json.null then
         default = nil
     end
     md:add('md', '## default')
-    md:emptyLine()
-    if type(default) == 'table' and conf.type == 'array' then
-        md:add('md', ('`[%s]`'):format(inspect(default):sub(2, -2)))
+    if conf.type == 'object' then
+        if not default then
+            default = {}
+            for k, v in pairs(conf.properties) do
+                default[k] = v.default
+            end
+        end
+        setmetatable(default, json.object)
+        md:add('json', ('%s'):format(json.beautify(default, { indent = '    ' })))
     else
-        md:add('md', ('`%s`'):format(inspect(default)))
+        md:add('json', ('%s'):format(json.encode(default)))
     end
-    md:emptyLine()
 end
 
 local function buildEnum(md, lang, conf)
-    if not conf.enum then
-        return nil
+    if conf.enum then
+        md:add('md', '## enum')
+        md:emptyLine()
+        for i, enum in ipairs(conf.enum) do
+            local desc = getDesc(lang, conf.markdownEnumDescriptions and conf.markdownEnumDescriptions[i])
+            if desc then
+                md:add('md', ('* `%s`: %s'):format(json.encode(enum), desc))
+            else
+                md:add('md', ('* `%s`'):format(json.encode(enum)))
+            end
+        end
+        return
     end
-    md:add('md', '## enum')
-    md:emptyLine()
-    for i, enum in ipairs(conf.enum) do
-        local desc = getDesc(lang, conf.markdownEnumDescriptions and conf.markdownEnumDescriptions[i])
-        if desc then
-            md:add('md', ('* `%s`: %s'):format(inspect(enum), desc))
-        else
-            md:add('md', ('* `%s`'):format(inspect(enum)))
+
+    if conf.type == 'object' and conf.properties then
+        local _, first = next(conf.properties)
+        if first and first.enum then
+            md:add('md', '## enum')
+            md:emptyLine()
+            for i, enum in ipairs(first.enum) do
+                local desc = getDesc(lang, conf.markdownEnumDescriptions and conf.markdownEnumDescriptions[i])
+                if desc then
+                    md:add('md', ('* `%s`: %s'):format(json.encode(enum), desc))
+                else
+                    md:add('md', ('* `%s`'):format(json.encode(enum)))
+                end
+            end
+            return
         end
     end
 end
@@ -106,9 +135,8 @@ local function buildMarkdown(lang)
         configDoc:emptyLine()
         buildDesc(configDoc, lang, conf)
         buildType(configDoc, lang, conf)
-        buildDefault(configDoc, lang, conf)
         buildEnum(configDoc, lang, conf)
-        configDoc:emptyLine()
+        buildDefault(configDoc, lang, conf)
     end
 
     util.saveFile((dir / 'config.md'):string(), configDoc:string())

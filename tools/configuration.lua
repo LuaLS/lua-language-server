@@ -59,10 +59,29 @@ local function insertArray(conf, temp)
     }
 end
 
-local function insertHash(conf, temp)
-    conf.additionalProperties = false
-    if not temp.subkey.enums then
-        if  temp.subvalue.enums then
+local function insertHash(name, conf, temp)
+    conf.title = name:match '[^%.]+$'
+
+    if type(conf.default) == 'table' and next(conf.default) then
+        conf.additionalProperties = false
+        local default = conf.default
+        conf.default = nil
+        conf.properties = {}
+        local descHead = name:gsub('^Lua', '%%config')
+        if util.stringStartWith(descHead, '%config.diagnostics') then
+            descHead = '%config.diagnostics'
+        end
+        for key, value in pairs(default) do
+            conf.properties[key] = {
+                type    = getType( temp.subvalue),
+                default = value,
+                enum    = getEnum( temp.subvalue),
+                description = descHead .. '.' .. key .. '%',
+            }
+        end
+    else
+        if temp.subvalue.enums then
+            conf.additionalProperties = false
             conf.patternProperties = {
                 ['.*'] = {
                     type    = getType( temp.subvalue),
@@ -95,7 +114,7 @@ for name, temp in pairs(template) do
     end
 
     if temp.name == 'Hash' then
-        insertHash(config[name], temp)
+        insertHash(name, config[name], temp)
     end
 
     ::CONTINUE::

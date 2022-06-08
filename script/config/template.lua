@@ -217,16 +217,28 @@ local template = {
                                                     'enable',
                                                     'disable',
                                                 }
-                                            ),
+                                            )
+                                            >> util.deepCopy(define.BuiltIn),
     ['Lua.diagnostics.enable']              = Type.Boolean >> true,
     ['Lua.diagnostics.globals']             = Type.Array(Type.String),
     ['Lua.diagnostics.disable']             = Type.Array(Type.String),
-    ['Lua.diagnostics.severity']            = Type.Hash(Type.String, Type.String)
+    ['Lua.diagnostics.severity']            = Type.Hash(
+                                                Type.String << util.getTableKeys(define.DiagnosticDefaultNeededFileStatus, true),
+                                                Type.String << {
+                                                    'Error',
+                                                    'Warning',
+                                                    'Information',
+                                                    'Hint',
+                                                }
+                                            )
                                             >> util.deepCopy(define.DiagnosticDefaultSeverity),
-    ['Lua.diagnostics.neededFileStatus']    = Type.Hash(Type.String, Type.String)
+    ['Lua.diagnostics.neededFileStatus']    = Type.Hash(
+                                                Type.String << util.getTableKeys(define.DiagnosticDefaultNeededFileStatus, true),
+                                                Type.String << { 'Any', 'Opened', 'None' }
+                                            )
                                             >> util.deepCopy(define.DiagnosticDefaultNeededFileStatus),
     ['Lua.diagnostics.disableScheme']       = Type.Array(Type.String) >> { 'git' },
-    ['Lua.diagnostics.workspaceDelay']      = Type.Integer >> 5,
+    ['Lua.diagnostics.workspaceDelay']      = Type.Integer >> 3000,
     ['Lua.diagnostics.workspaceRate']       = Type.Integer >> 100,
     ['Lua.diagnostics.libraryFiles']        = Type.String  >> 'Opened' << {
                                                 'Enable',

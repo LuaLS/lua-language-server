@@ -56,13 +56,19 @@ config.diagnostics.workspaceRate  =
 "Workspace diagnostics run rate (%). Decreasing this value reduces CPU usage, but also reduces the speed of workspace diagnostics. The diagnosis of the file you are currently editing is always done at full speed and is not affected by this setting."
 config.diagnostics.libraryFiles   =
 "How to diagnose files loaded via `Lua.workspace.library`."
+config.diagnostics.libraryFiles.Enable   =
+"Always diagnose these files."
+config.diagnostics.libraryFiles.Opened   =
+"Only when these files are opened will it be diagnosed."
+config.diagnostics.libraryFiles.Disable  =
+"These files are not diagnosed."
 config.diagnostics.ignoredFiles   =
 "How to diagnose ignored files."
-config.diagnostics.files.Enable   =
+config.diagnostics.ignoredFiles.Enable   =
 "Always diagnose these files."
-config.diagnostics.files.Opened   =
+config.diagnostics.ignoredFiles.Opened   =
 "Only when these files are opened will it be diagnosed."
-config.diagnostics.files.Disable  =
+config.diagnostics.ignoredFiles.Disable  =
 "These files are not diagnosed."
 config.diagnostics.disableScheme  =
 'Do not diagnose Lua files that use the following scheme.'

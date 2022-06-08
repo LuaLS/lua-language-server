@@ -384,6 +384,8 @@ ACTION_DISABLE_DIAG_FILE=
 '在此檔案停用診斷 ({})。'
 ACTION_MARK_ASYNC       =
 '將目前函式標記為非同步。'
+ACTION_ADD_DICT         = -- TODO: need translate!
+'Add \'{}\' to workspace dict'
 
 COMMAND_DISABLE_DIAG       =
 '停用診斷'
@@ -403,6 +405,8 @@ COMMAND_JSON_TO_LUA        =
 'JSON 轉 Lua'
 COMMAND_JSON_TO_LUA_FAILED =
 'JSON 轉 Lua 失敗：{}'
+COMMAND_ADD_DICT           = -- TODO: need translate!
+'Add Word to dictionary'
 
 COMPLETION_IMPORT_FROM           =
 '從 {} 中匯入'

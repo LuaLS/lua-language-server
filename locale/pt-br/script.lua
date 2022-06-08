@@ -384,6 +384,8 @@ ACTION_DISABLE_DIAG_FILE=
 'Desativa diagnósticos nesta linha ({}).'
 ACTION_MARK_ASYNC       = -- TODO: need translate!
 'Mark current function as async.'
+ACTION_ADD_DICT         = -- TODO: need translate!
+'Add \'{}\' to workspace dict'
 
 COMMAND_DISABLE_DIAG       =
 'Desativar diagnósticos.'
@@ -403,6 +405,8 @@ COMMAND_JSON_TO_LUA        =
 'Converte de JSON para Lua.'
 COMMAND_JSON_TO_LUA_FAILED =
 'Converção de JSON para Lua falhou: {}.'
+COMMAND_ADD_DICT           = -- TODO: need translate!
+'Add Word to dictionary'
 
 COMPLETION_IMPORT_FROM           =
 'Importa de {}.'

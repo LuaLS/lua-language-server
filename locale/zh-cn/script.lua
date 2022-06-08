@@ -384,6 +384,8 @@ ACTION_DISABLE_DIAG_FILE=
 '在此文件禁用诊断 ({})。'
 ACTION_MARK_ASYNC       =
 '将当前函数标记为异步。'
+ACTION_ADD_DICT         = -- TODO: need translate!
+'Add \'{}\' to workspace dict'
 
 COMMAND_DISABLE_DIAG       =
 '禁用诊断'
@@ -403,6 +405,8 @@ COMMAND_JSON_TO_LUA        =
 'JSON 转 Lua'
 COMMAND_JSON_TO_LUA_FAILED =
 'JSON 转 Lua 失败：{}'
+COMMAND_ADD_DICT           = -- TODO: need translate!
+'Add Word to dictionary'
 
 COMPLETION_IMPORT_FROM           =
 '从 {} 中导入'

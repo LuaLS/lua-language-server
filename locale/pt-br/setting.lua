@@ -56,13 +56,19 @@ config.diagnostics.workspaceRate  = -- TODO: need translate!
 "Workspace diagnostics run rate (%). Decreasing this value reduces CPU usage, but also reduces the speed of workspace diagnostics. The diagnosis of the file you are currently editing is always done at full speed and is not affected by this setting."
 config.diagnostics.libraryFiles   = -- TODO: need translate!
 "How to diagnose files loaded via `Lua.workspace.library`."
+config.diagnostics.libraryFiles.Enable   = -- TODO: need translate!
+"Always diagnose these files."
+config.diagnostics.libraryFiles.Opened   = -- TODO: need translate!
+"Only when these files are opened will it be diagnosed."
+config.diagnostics.libraryFiles.Disable  = -- TODO: need translate!
+"These files are not diagnosed."
 config.diagnostics.ignoredFiles   = -- TODO: need translate!
 "How to diagnose ignored files."
-config.diagnostics.files.Enable   = -- TODO: need translate!
+config.diagnostics.ignoredFiles.Enable   = -- TODO: need translate!
 "Always diagnose these files."
-config.diagnostics.files.Opened   = -- TODO: need translate!
+config.diagnostics.ignoredFiles.Opened   = -- TODO: need translate!
 "Only when these files are opened will it be diagnosed."
-config.diagnostics.files.Disable  = -- TODO: need translate!
+config.diagnostics.ignoredFiles.Disable  = -- TODO: need translate!
 "These files are not diagnosed."
 config.diagnostics.disableScheme  = -- TODO: need translate!
 'Do not diagnose Lua files that use the following scheme.'

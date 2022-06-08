@@ -56,13 +56,19 @@ config.diagnostics.workspaceRate  =
 "工作区诊断的运行速率（百分比）。降低该值会减少CPU占用，但是也会降低工作区诊断的速度。你当前正在编辑的文件的诊断总是全速完成，不受该选项影响。"
 config.diagnostics.libraryFiles   =
 "如何诊断通过 `Lua.workspace.library` 加载的文件。"
+config.diagnostics.libraryFiles.Enable   =
+"总是诊断这些文件。"
+config.diagnostics.libraryFiles.Opened   =
+"只有打开这些文件时才会诊断。"
+config.diagnostics.libraryFiles.Disable  =
+"不诊断这些文件。"
 config.diagnostics.ignoredFiles   =
 "如何诊断被忽略的文件。"
-config.diagnostics.files.Enable   =
+config.diagnostics.ignoredFiles.Enable   =
 "总是诊断这些文件。"
-config.diagnostics.files.Opened   =
+config.diagnostics.ignoredFiles.Opened   =
 "只有打开这些文件时才会诊断。"
-config.diagnostics.files.Disable  =
+config.diagnostics.ignoredFiles.Disable  =
 "不诊断这些文件。"
 config.diagnostics.disableScheme  =
 '不诊断使用以下 scheme 的lua文件。'

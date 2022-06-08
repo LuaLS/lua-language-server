@@ -54,6 +54,7 @@ end
 local function insertArray(conf, temp)
     conf.items = {
         type = getType(temp.sub),
+        enum = getEnum(temp.sub),
     }
 end
 

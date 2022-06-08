@@ -14,6 +14,7 @@ end
 
 function mt:__shr(default)
     self.default = default
+    self.hasDefault = true
     return self
 end
 

@@ -39,14 +39,27 @@ local function getDesc(lang, desc)
     return locale[id]
 end
 
+local function buildType(md, lang, conf)
+    md:add('md', '## type')
+    if type(conf.type) == 'table' then
+        md:add('md', ('`%s | %s`'):format(conf.type[1], conf.type[2]))
+    elseif conf.type == 'array' then
+        md:add('md', ('`%s<%s>`'):format(conf.type, conf.items.type))
+    else
+        md:add('md', ('`%s`'):format(conf.type))
+    end
+    md:emptyLine()
+end
+
 local function buildDesc(md, lang, conf)
     local desc = conf.markdownDescription or conf.description
     desc = getDesc(lang, desc)
     if desc then
-        md:add('md',  desc .. '\n')
+        md:add('md', desc)
     else
         md:add('md', '**Missing description!!**')
     end
+    md:emptyLine()
 end
 
 local function buildDefault(md, lang, conf)
@@ -58,7 +71,13 @@ local function buildDefault(md, lang, conf)
         default = nil
     end
     md:add('md', '## default')
-    md:add('md', ('`%s`'):format(inspect(default)))
+    md:emptyLine()
+    if type(default) == 'table' and conf.type == 'array' then
+        md:add('md', ('`[%s]`'):format(inspect(default):sub(2, -2)))
+    else
+        md:add('md', ('`%s`'):format(inspect(default)))
+    end
+    md:emptyLine()
 end
 
 local function buildEnum(md, lang, conf)
@@ -66,6 +85,7 @@ local function buildEnum(md, lang, conf)
         return nil
     end
     md:add('md', '## enum')
+    md:emptyLine()
     for i, enum in ipairs(conf.enum) do
         local desc = getDesc(lang, conf.markdownEnumDescriptions and conf.markdownEnumDescriptions[i])
         if desc then
@@ -82,11 +102,13 @@ local function buildMarkdown(lang)
     local configDoc = markdown()
 
     for name, conf in util.sortPairs(config) do
-        configDoc:add('md', '# ' .. name:gsub('^Lua%.', '') .. '\n')
+        configDoc:add('md', '# ' .. name:gsub('^Lua%.', ''))
+        configDoc:emptyLine()
         buildDesc(configDoc, lang, conf)
+        buildType(configDoc, lang, conf)
         buildDefault(configDoc, lang, conf)
         buildEnum(configDoc, lang, conf)
-        configDoc:add('md', '')
+        configDoc:emptyLine()
     end
 
     util.saveFile((dir / 'config.md'):string(), configDoc:string())

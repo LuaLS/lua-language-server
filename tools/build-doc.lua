@@ -99,11 +99,12 @@ local function buildEnum(md, lang, conf)
         for i, enum in ipairs(conf.enum) do
             local desc = getDesc(lang, conf.markdownEnumDescriptions and conf.markdownEnumDescriptions[i])
             if desc then
-                md:add('md', ('* `%s`: %s'):format(json.encode(enum), desc))
+                md:add('md', ('* ``%s``: %s'):format(json.encode(enum), desc))
             else
-                md:add('md', ('* `%s`'):format(json.encode(enum)))
+                md:add('md', ('* ``%s``'):format(json.encode(enum)))
             end
         end
+        md:emptyLine()
         return
     end
 
@@ -115,13 +116,29 @@ local function buildEnum(md, lang, conf)
             for i, enum in ipairs(first.enum) do
                 local desc = getDesc(lang, conf.markdownEnumDescriptions and conf.markdownEnumDescriptions[i])
                 if desc then
-                    md:add('md', ('* `%s`: %s'):format(json.encode(enum), desc))
+                    md:add('md', ('* ``%s``: %s'):format(json.encode(enum), desc))
                 else
-                    md:add('md', ('* `%s`'):format(json.encode(enum)))
+                    md:add('md', ('* ``%s``'):format(json.encode(enum)))
                 end
             end
+            md:emptyLine()
             return
         end
+    end
+
+    if conf.type == 'array' and conf.items.enum then
+        md:add('md', '## enum')
+        md:emptyLine()
+        for i, enum in ipairs(conf.items.enum) do
+            local desc = getDesc(lang, conf.markdownEnumDescriptions and conf.markdownEnumDescriptions[i])
+            if desc then
+                md:add('md', ('* ``%s``: %s'):format(json.encode(enum), desc))
+            else
+                md:add('md', ('* ``%s``'):format(json.encode(enum)))
+            end
+        end
+        md:emptyLine()
+        return
     end
 end
 

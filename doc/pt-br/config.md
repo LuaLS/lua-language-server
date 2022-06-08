@@ -26,9 +26,10 @@ string
 
 ## enum
 
-* `"Disable"`: Only shows `function name`.
-* `"Both"`: Shows `function name` and `call snippet`.
-* `"Replace"`: Only shows `call snippet.`
+* ``"Disable"``: Only shows `function name`.
+* ``"Both"``: Shows `function name` and `call snippet`.
+* ``"Replace"``: Only shows `call snippet.`
+
 ## default
 
 ```json
@@ -79,9 +80,10 @@ string
 
 ## enum
 
-* `"Disable"`: Only shows `keyword`.
-* `"Both"`: Shows `keyword` and `syntax snippet`.
-* `"Replace"`: Only shows `syntax snippet`.
+* ``"Disable"``: Only shows `keyword`.
+* ``"Both"``: Shows `keyword` and `syntax snippet`.
+* ``"Replace"``: Only shows `syntax snippet`.
+
 ## default
 
 ```json
@@ -148,9 +150,10 @@ string
 
 ## enum
 
-* `"Enable"`: Always show context words in suggestions.
-* `"Fallback"`: Contextual words are only displayed when suggestions based on semantics cannot be provided.
-* `"Disable"`: Do not display context words.
+* ``"Enable"``: Always show context words in suggestions.
+* ``"Fallback"``: Contextual words are only displayed when suggestions based on semantics cannot be provided.
+* ``"Disable"``: Do not display context words.
+
 ## default
 
 ```json
@@ -249,9 +252,10 @@ string
 
 ## enum
 
-* `"Enable"`: Always diagnose these files.
-* `"Opened"`: Only when these files are opened will it be diagnosed.
-* `"Disable"`: These files are not diagnosed.
+* ``"Enable"``: Always diagnose these files.
+* ``"Opened"``: Only when these files are opened will it be diagnosed.
+* ``"Disable"``: These files are not diagnosed.
+
 ## default
 
 ```json
@@ -270,9 +274,10 @@ string
 
 ## enum
 
-* `"Enable"`: Always diagnose these files.
-* `"Opened"`: Only when these files are opened will it be diagnosed.
-* `"Disable"`: These files are not diagnosed.
+* ``"Enable"``: Always diagnose these files.
+* ``"Opened"``: Only when these files are opened will it be diagnosed.
+* ``"Disable"``: These files are not diagnosed.
+
 ## default
 
 ```json
@@ -294,9 +299,10 @@ object<string, string>
 
 ## enum
 
-* `"Any"`
-* `"Opened"`
-* `"None"`
+* ``"Any"``
+* ``"Opened"``
+* ``"None"``
+
 ## default
 
 ```json
@@ -360,10 +366,11 @@ object<string, string>
 
 ## enum
 
-* `"Error"`
-* `"Warning"`
-* `"Information"`
-* `"Hint"`
+* ``"Error"``
+* ``"Warning"``
+* ``"Information"``
+* ``"Hint"``
+
 ## default
 
 ```json
@@ -491,9 +498,10 @@ string
 
 ## enum
 
-* `"Enable"`: Show hints in all tables.
-* `"Auto"`: Show hints only when the table is greater than 3 items, or the table is a mixed table.
-* `"Disable"`: Disable hints of array index.
+* ``"Enable"``: Show hints in all tables.
+* ``"Auto"``: Show hints only when the table is greater than 3 items, or the table is a mixed table.
+* ``"Disable"``: Disable hints of array index.
+
 ## default
 
 ```json
@@ -544,9 +552,10 @@ string
 
 ## enum
 
-* `"All"`: All types of parameters are shown.
-* `"Literal"`: Only literal type parameters are shown.
-* `"Disable"`: Disable parameter hints.
+* ``"All"``: All types of parameters are shown.
+* ``"Literal"``: Only literal type parameters are shown.
+* ``"Disable"``: Disable parameter hints.
+
 ## default
 
 ```json
@@ -730,9 +739,10 @@ object<string, string>
 
 ## enum
 
-* `"default"`
-* `"enable"`
-* `"disable"`
+* ``"default"``
+* ``"enable"``
+* ``"disable"``
+
 ## default
 
 ```json
@@ -767,10 +777,11 @@ string
 
 ## enum
 
-* `"utf8"`
-* `"ansi"`
-* `"utf16le"`
-* `"utf16be"`
+* ``"utf8"``
+* ``"ansi"``
+* ``"utf16le"``
+* ``"utf16be"``
+
 ## default
 
 ```json
@@ -802,6 +813,21 @@ Supports non-standard symbols. Make sure that your runtime environment supports 
 ```ts
 Array<string>
 ```
+
+## enum
+
+* ``"//"``
+* ``"/**/"``
+* ``"`"``
+* ``"+="``
+* ``"-="``
+* ``"*="``
+* ``"/="``
+* ``"||"``
+* ``"&&"``
+* ``"!"``
+* ``"!="``
+* ``"continue"``
 
 ## default
 
@@ -912,11 +938,12 @@ string
 
 ## enum
 
-* `"Lua 5.1"`
-* `"Lua 5.2"`
-* `"Lua 5.3"`
-* `"Lua 5.4"`
-* `"LuaJIT"`
+* ``"Lua 5.1"``
+* ``"Lua 5.2"``
+* ``"Lua 5.3"``
+* ``"Lua 5.4"``
+* ``"LuaJIT"``
+
 ## default
 
 ```json

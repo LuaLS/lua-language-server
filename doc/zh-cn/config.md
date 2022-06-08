@@ -26,9 +26,10 @@ string
 
 ## enum
 
-* `"Disable"`: 只显示 `函数名`。
-* `"Both"`: 显示 `函数名` 与 `调用片段`。
-* `"Replace"`: 只显示 `调用片段`。
+* ``"Disable"``: 只显示 `函数名`。
+* ``"Both"``: 显示 `函数名` 与 `调用片段`。
+* ``"Replace"``: 只显示 `调用片段`。
+
 ## default
 
 ```json
@@ -79,9 +80,10 @@ string
 
 ## enum
 
-* `"Disable"`: 只显示 `关键字`。
-* `"Both"`: 显示 `关键字` 与 `语法片段`。
-* `"Replace"`: 只显示 `语法片段`。
+* ``"Disable"``: 只显示 `关键字`。
+* ``"Both"``: 显示 `关键字` 与 `语法片段`。
+* ``"Replace"``: 只显示 `语法片段`。
+
 ## default
 
 ```json
@@ -148,9 +150,10 @@ string
 
 ## enum
 
-* `"Enable"`: 总是在建议中显示上下文单词。
-* `"Fallback"`: 无法根据语义提供建议时才显示上下文单词。
-* `"Disable"`: 不显示上下文单词。
+* ``"Enable"``: 总是在建议中显示上下文单词。
+* ``"Fallback"``: 无法根据语义提供建议时才显示上下文单词。
+* ``"Disable"``: 不显示上下文单词。
+
 ## default
 
 ```json
@@ -249,9 +252,10 @@ string
 
 ## enum
 
-* `"Enable"`: 总是诊断这些文件。
-* `"Opened"`: 只有打开这些文件时才会诊断。
-* `"Disable"`: 不诊断这些文件。
+* ``"Enable"``: 总是诊断这些文件。
+* ``"Opened"``: 只有打开这些文件时才会诊断。
+* ``"Disable"``: 不诊断这些文件。
+
 ## default
 
 ```json
@@ -270,9 +274,10 @@ string
 
 ## enum
 
-* `"Enable"`: 总是诊断这些文件。
-* `"Opened"`: 只有打开这些文件时才会诊断。
-* `"Disable"`: 不诊断这些文件。
+* ``"Enable"``: 总是诊断这些文件。
+* ``"Opened"``: 只有打开这些文件时才会诊断。
+* ``"Disable"``: 不诊断这些文件。
+
 ## default
 
 ```json
@@ -294,9 +299,10 @@ object<string, string>
 
 ## enum
 
-* `"Any"`
-* `"Opened"`
-* `"None"`
+* ``"Any"``
+* ``"Opened"``
+* ``"None"``
+
 ## default
 
 ```json
@@ -360,10 +366,11 @@ object<string, string>
 
 ## enum
 
-* `"Error"`
-* `"Warning"`
-* `"Information"`
-* `"Hint"`
+* ``"Error"``
+* ``"Warning"``
+* ``"Information"``
+* ``"Hint"``
+
 ## default
 
 ```json
@@ -491,9 +498,10 @@ string
 
 ## enum
 
-* `"Enable"`: 所有的表中都提示数组索引。
-* `"Auto"`: 只有表大于3项，或者表是混合类型时才进行提示。
-* `"Disable"`: 禁用数组索引提示。
+* ``"Enable"``: 所有的表中都提示数组索引。
+* ``"Auto"``: 只有表大于3项，或者表是混合类型时才进行提示。
+* ``"Disable"``: 禁用数组索引提示。
+
 ## default
 
 ```json
@@ -544,9 +552,10 @@ string
 
 ## enum
 
-* `"All"`: 所有类型的参数均进行提示。
-* `"Literal"`: 只有字面量类型的参数进行提示。
-* `"Disable"`: 禁用参数提示。
+* ``"All"``: 所有类型的参数均进行提示。
+* ``"Literal"``: 只有字面量类型的参数进行提示。
+* ``"Disable"``: 禁用参数提示。
+
 ## default
 
 ```json
@@ -730,9 +739,10 @@ object<string, string>
 
 ## enum
 
-* `"default"`
-* `"enable"`
-* `"disable"`
+* ``"default"``
+* ``"enable"``
+* ``"disable"``
+
 ## default
 
 ```json
@@ -767,10 +777,11 @@ string
 
 ## enum
 
-* `"utf8"`
-* `"ansi"`
-* `"utf16le"`
-* `"utf16be"`
+* ``"utf8"``
+* ``"ansi"``
+* ``"utf16le"``
+* ``"utf16be"``
+
 ## default
 
 ```json
@@ -802,6 +813,21 @@ string
 ```ts
 Array<string>
 ```
+
+## enum
+
+* ``"//"``
+* ``"/**/"``
+* ``"`"``
+* ``"+="``
+* ``"-="``
+* ``"*="``
+* ``"/="``
+* ``"||"``
+* ``"&&"``
+* ``"!"``
+* ``"!="``
+* ``"continue"``
 
 ## default
 
@@ -912,11 +938,12 @@ string
 
 ## enum
 
-* `"Lua 5.1"`
-* `"Lua 5.2"`
-* `"Lua 5.3"`
-* `"Lua 5.4"`
-* `"LuaJIT"`
+* ``"Lua 5.1"``
+* ``"Lua 5.2"``
+* ``"Lua 5.3"``
+* ``"Lua 5.4"``
+* ``"LuaJIT"``
+
 ## default
 
 ```json

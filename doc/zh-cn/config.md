@@ -510,7 +510,7 @@ string
 
 # hint.await
 
-**Missing description!!**
+如果调用的函数被标记为了 `---@async` ，则在调用处提示 `await` 。
 
 ## type
 
@@ -628,7 +628,8 @@ integer
 
 # hover.expandAlias
 
-**Missing description!!**
+是否展开别名。例如 `---@alias myType boolean|number` 展开后显示为 `boolean|number`，否则显示为 `myType`。
+
 
 ## type
 

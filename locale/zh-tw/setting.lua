@@ -169,6 +169,10 @@ config.hover.previewFields               =
 "懸浮提示檢視表時，限制表內欄位的最大預覽數量。"
 config.hover.enumsLimit                  =
 "當值對應多個型別時，限制型別的顯示數量。"
+config.hover.expandAlias                 = -- TODO: need translate!
+[[
+Whether to expand the alias. For example, expands `---@alias myType boolean|number` appears as `boolean|number`, otherwise it appears as `myType'.
+]]
 config.develop.enable                    =
 '開發者模式。請勿開啟，會影響效能。'
 config.develop.debuggerPort              =
@@ -205,6 +209,8 @@ config.hint.arrayIndex.Auto              =
 '只有表大於3項，或者表是混合型別時才進行提示。'
 config.hint.arrayIndex.Disable           =
 '停用陣列索引提示。'
+config.hint.await                        = -- TODO: need translate!
+'If the called function is marked `---@async`, prompt `await` at the call.'
 config.format.enable                     =
 '啟用程式碼格式化程式。'
 config.telemetry.enable                  =

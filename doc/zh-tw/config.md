@@ -510,7 +510,7 @@ string
 
 # hint.await
 
-**Missing description!!**
+If the called function is marked `---@async`, prompt `await` at the call.
 
 ## type
 
@@ -628,7 +628,8 @@ integer
 
 # hover.expandAlias
 
-**Missing description!!**
+Whether to expand the alias. For example, expands `---@alias myType boolean|number` appears as `boolean|number`, otherwise it appears as `myType'.
+
 
 ## type
 

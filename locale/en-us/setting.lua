@@ -169,6 +169,10 @@ config.hover.previewFields               =
 "When hovering to view a table, limits the maximum number of previews for fields."
 config.hover.enumsLimit                  =
 "When the value corresponds to multiple types, limit the number of types displaying."
+config.hover.expandAlias                 =
+[[
+Whether to expand the alias. For example, expands `---@alias myType boolean|number` appears as `boolean|number`, otherwise it appears as `myType'.
+]]
 config.develop.enable                    =
 'Developer mode. Do not enable, performance will be affected.'
 config.develop.debuggerPort              =
@@ -205,6 +209,8 @@ config.hint.arrayIndex.Auto              =
 'Show hints only when the table is greater than 3 items, or the table is a mixed table.'
 config.hint.arrayIndex.Disable           =
 'Disable hints of array index.'
+config.hint.await                        =
+'If the called function is marked `---@async`, prompt `await` at the call.'
 config.format.enable                     =
 'Enable code formatter.'
 config.telemetry.enable                  =

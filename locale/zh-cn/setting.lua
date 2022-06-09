@@ -169,6 +169,10 @@ config.hover.previewFields               =
 "悬停提示查看表时，限制表内字段的最大预览数量。"
 config.hover.enumsLimit                  =
 "当值对应多个类型时，限制类型的显示数量。"
+config.hover.expandAlias                 =
+[[
+是否展开别名。例如 `---@alias myType boolean|number` 展开后显示为 `boolean|number`，否则显示为 `myType`。
+]]
 config.develop.enable                    =
 '开发者模式。请勿开启，会影响性能。'
 config.develop.debuggerPort              =
@@ -205,6 +209,8 @@ config.hint.arrayIndex.Auto              =
 '只有表大于3项，或者表是混合类型时才进行提示。'
 config.hint.arrayIndex.Disable           =
 '禁用数组索引提示。'
+config.hint.await                        =
+'如果调用的函数被标记为了 `---@async` ，则在调用处提示 `await` 。'
 config.format.enable                     =
 '启用代码格式化程序。'
 config.telemetry.enable                  =

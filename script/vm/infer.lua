@@ -220,6 +220,13 @@ function mt:_eraseAlias(uri)
                 if set.type == 'doc.alias' then
                     if expandAlias then
                         drop[n.name] = true
+                        local newInfer = {}
+                        for _, ext in ipairs(set.extends.types) do
+                            viewNodeSwitch(ext.type, ext, newInfer)
+                        end
+                        if newInfer._hasTable then
+                            self.views['table'] = true
+                        end
                     else
                         for _, ext in ipairs(set.extends.types) do
                             local view = viewNodeSwitch(ext.type, ext, {})

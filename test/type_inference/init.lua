@@ -2349,3 +2349,24 @@ TEST 'number' [[
 for <?x?> in _ do
 end
 ]]
+
+TEST 'table' [[
+---@alias tp table
+
+---@type tp
+local <?x?>
+]]
+
+TEST 'table' [[
+---@alias tp {name: boolean}
+
+---@type tp
+local <?x?>
+]]
+
+TEST 'boolean|table' [[
+---@alias tp boolean | {name: boolean}
+
+---@type tp
+local <?x?>
+]]

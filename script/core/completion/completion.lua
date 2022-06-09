@@ -1136,6 +1136,12 @@ local function checkTypingEnum(state, position, defs, str, results)
                 description = def.comment and def.comment.text,
                 kind        = define.CompletionItemKind.EnumMember,
             }
+        elseif def.type == 'doc.type.code' then
+            enums[#enums+1] = {
+                label       = def[1],
+                description = def.comment and def.comment.text,
+                kind        = define.CompletionItemKind.EnumMember,
+            }
         end
     end
     cleanEnums(enums, str)
@@ -1422,6 +1428,12 @@ local function tryCallArg(state, position, results)
         or src.type == 'doc.type.boolean' then
             enums[#enums+1] = {
                 label       = vm.viewObject(src),
+                description = src.comment,
+                kind        = define.CompletionItemKind.EnumMember,
+            }
+        elseif src.type == 'doc.type.code' then
+            enums[#enums+1] = {
+                label       = src[1],
                 description = src.comment,
                 kind        = define.CompletionItemKind.EnumMember,
             }

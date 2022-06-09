@@ -155,7 +155,8 @@ local function buildEnumChunk(docType, name)
         types[#types+1] = vm.getInfer(tp):view(guide.getUri(docType))
         if tp.type == 'doc.type.string'
         or tp.type == 'doc.type.integer'
-        or tp.type == 'doc.type.boolean' then
+        or tp.type == 'doc.type.boolean'
+        or tp.type == 'doc.type.code' then
             enums[#enums+1] = tp
         end
         local comment = tryDocClassComment(tp)

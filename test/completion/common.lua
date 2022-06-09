@@ -3348,3 +3348,37 @@ local xyz
         kind  = define.CompletionItemKind.Variable,
     }
 }
+
+TEST [[
+---@type `CONST.X` | `CONST.Y`
+local x
+
+if x == <??>
+]]
+{
+    {
+        label = 'CONST.X',
+        kind  = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label = 'CONST.Y',
+        kind  = define.CompletionItemKind.EnumMember,
+    },
+}
+
+TEST [[
+---@param x `CONST.X` | `CONST.Y`
+local function f(x) end
+
+f(<??>)
+]]
+{
+    {
+        label = 'CONST.X',
+        kind  = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label = 'CONST.Y',
+        kind  = define.CompletionItemKind.EnumMember,
+    },
+}

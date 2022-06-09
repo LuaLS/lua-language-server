@@ -1,5 +1,14 @@
 # changelog
 
+## 3.3.0
+* `NEW` `LuaDoc` supports `` `CODE` ``
+  ```lua
+  ---@type `CONST.X` | `CONST.Y`
+  local x
+
+  if x == -- suggest `CONST.X` and `CONST.Y` here
+  ```
+
 ## 3.2.5
 `2022-6-9`
 * `NEW` provide config docs in `LUA_LANGUAGE_SERVER/doc/`

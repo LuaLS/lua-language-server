@@ -2370,3 +2370,8 @@ TEST 'boolean|table' [[
 ---@type tp
 local <?x?>
 ]]
+
+TEST '`1`|`true`' [[
+---@type `1` | `true`
+local <?x?>
+]]

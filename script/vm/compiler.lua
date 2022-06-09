@@ -1290,6 +1290,7 @@ local compilerSwitch = util.switch()
     : case 'doc.type.integer'
     : case 'doc.type.string'
     : case 'doc.type.boolean'
+    : case 'doc.type.code'
     : call(function (source)
         vm.setNode(source, source)
     end)

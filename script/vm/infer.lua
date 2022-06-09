@@ -135,6 +135,10 @@ local viewNodeSwitch = util.switch()
     : call(function (source, infer)
         return ('%q'):format(source[1])
     end)
+    : case 'doc.type.code'
+    : call(function (source, infer)
+        return ('`%s`'):format(source[1])
+    end)
     : case 'doc.type.function'
     : call(function (source, infer, uri)
         infer._hasDocFunction = true

@@ -32,7 +32,7 @@ local Care = util.switch()
             end
             options.libGlobals[name] = isLib
         end
-        local isFunc = vm.getInfer(source):hasFunction()
+        local isFunc = vm.getInfer(source):hasFunction(guide.getUri(source))
 
         local type = isFunc and define.TokenTypes['function'] or define.TokenTypes.variable
         local modifier = isLib and define.TokenModifiers.defaultLibrary or define.TokenModifiers.static
@@ -81,7 +81,7 @@ local Care = util.switch()
                 return
             end
         end
-        if vm.getInfer(source):hasFunction() then
+        if vm.getInfer(source):hasFunction(guide.getUri(source)) then
             results[#results+1] = {
                 start      = source.start,
                 finish     = source.finish,
@@ -196,7 +196,7 @@ local Care = util.switch()
             end
         end
         -- 6. References to other functions
-        if vm.getInfer(loc):hasFunction() then
+        if vm.getInfer(loc):hasFunction(guide.getUri(source)) then
             results[#results+1] = {
                 start      = source.start,
                 finish     = source.finish,

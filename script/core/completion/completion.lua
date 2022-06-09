@@ -184,7 +184,7 @@ local function buildFunctionSnip(source, value, oop)
 end
 
 local function buildDetail(source)
-    local types = vm.getInfer(source):view()
+    local types = vm.getInfer(source):view(guide.getUri(source))
     local literals = vm.getInfer(source):viewLiterals()
     if literals then
         return types .. ' = ' .. literals
@@ -302,7 +302,7 @@ local function checkLocal(state, word, position, results)
         if name:sub(1, 1) == '@' then
             goto CONTINUE
         end
-        if vm.getInfer(source):hasFunction() then
+        if vm.getInfer(source):hasFunction(state.uri) then
             local defs = vm.getDefs(source)
             -- make sure `function` is before `doc.type.function`
             local orders = {}
@@ -513,7 +513,7 @@ local function checkFieldThen(state, name, src, word, startPos, position, parent
         })
         return
     end
-    if oop and not vm.getInfer(src):hasFunction() then
+    if oop and not vm.getInfer(src):hasFunction(state.uri) then
         return
     end
     local literal = guide.getLiteral(value)
@@ -1440,7 +1440,7 @@ local function tryCallArg(state, position, results)
                     : string()
             end
             enums[#enums+1] = {
-                label       = vm.getInfer(src):view(),
+                label       = vm.getInfer(src):view(state.uri),
                 description = description,
                 kind        = define.CompletionItemKind.Function,
                 insertText  = insertText,
@@ -1819,14 +1819,14 @@ local function buildluaDocOfFunction(func)
     local returns = {}
     if func.args then
         for _, arg in ipairs(func.args) do
-            args[#args+1] = vm.getInfer(arg):view()
+            args[#args+1] = vm.getInfer(arg):view(guide.getUri(func))
         end
     end
     if func.returns then
         for _, rtns in ipairs(func.returns) do
             for n = 1, #rtns do
                 if not returns[n] then
-                    returns[n] = vm.getInfer(rtns[n]):view()
+                    returns[n] = vm.getInfer(rtns[n]):view(guide.getUri(func))
                 end
             end
         end

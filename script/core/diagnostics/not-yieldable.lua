@@ -11,7 +11,7 @@ local function isYieldAble(defs, i)
             local arg = def.args and def.args[i]
             if arg then
                 hasFuncDef = true
-                if vm.getInfer(arg):hasType 'any'
+                if vm.getInfer(arg):hasType(guide.getUri(def), 'any')
                 or vm.isAsync(arg, true)
                 or arg.type == '...' then
                     return true
@@ -22,7 +22,7 @@ local function isYieldAble(defs, i)
             local arg = def.args and def.args[i]
             if arg then
                 hasFuncDef = true
-                if vm.getInfer(arg.extends):hasType 'any'
+                if vm.getInfer(arg.extends):hasType(guide.getUri(def), 'any')
                 or vm.isAsync(arg.extends, true) then
                     return true
                 end

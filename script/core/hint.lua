@@ -38,7 +38,7 @@ local function typeHint(uri, results, start, finish)
             end
         end
         await.delay()
-        local view = vm.getInfer(source):view()
+        local view = vm.getInfer(source):view(uri)
         if view == 'any'
         or view == 'unknown'
         or view == 'nil' then

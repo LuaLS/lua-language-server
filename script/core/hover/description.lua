@@ -152,7 +152,7 @@ local function buildEnumChunk(docType, name)
     local types = {}
     local lines = {}
     for _, tp in ipairs(vm.getDefs(docType)) do
-        types[#types+1] = vm.getInfer(tp):view()
+        types[#types+1] = vm.getInfer(tp):view(guide.getUri(docType))
         if tp.type == 'doc.type.string'
         or tp.type == 'doc.type.integer'
         or tp.type == 'doc.type.boolean' then

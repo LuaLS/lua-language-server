@@ -33,7 +33,7 @@ local function asDocTypeName(source)
             return '(class) ' .. doc.class[1]
         end
         if doc.type == 'doc.alias' then
-            return '(alias) ' .. doc.alias[1] .. ' ' .. lang.script('HOVER_EXTENDS', vm.getInfer(doc.extends):view())
+            return '(alias) ' .. doc.alias[1] .. ' ' .. lang.script('HOVER_EXTENDS', vm.getInfer(doc.extends):view(guide.getUri(source)))
         end
     end
 end
@@ -42,7 +42,7 @@ end
 local function asValue(source, title)
     local name    = buildName(source, false) or ''
     local ifr     = vm.getInfer(source)
-    local type    = ifr:view()
+    local type    = ifr:view(guide.getUri(source))
     local literal = ifr:viewLiterals()
     local cont    = buildTable(source)
     local pack = {}
@@ -139,7 +139,7 @@ local function asDocFieldName(source)
             break
         end
     end
-    local view = vm.getInfer(source.extends):view()
+    local view = vm.getInfer(source.extends):view(guide.getUri(source))
     if not class then
         return ('(field) ?.%s: %s'):format(name, view)
     end

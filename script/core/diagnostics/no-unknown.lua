@@ -20,7 +20,7 @@ return function (uri, callback)
         and source.type ~= 'tableindex' then
             return
         end
-        if vm.getInfer(source):view() == 'unknown' then
+        if vm.getInfer(source):view(uri) == 'unknown' then
             callback {
                 start   = source.start,
                 finish  = source.finish,

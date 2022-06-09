@@ -9,7 +9,7 @@ local function asFunction(source)
         methodDef = true
     end
     if methodDef then
-        args[#args+1] = ('self: %s'):format(vm.getInfer(parent.node):view 'any')
+        args[#args+1] = ('self: %s'):format(vm.getInfer(parent.node):view(guide.getUri(source), 'any'))
     end
     if source.args then
         for i = 1, #source.args do
@@ -29,15 +29,15 @@ local function asFunction(source)
                 args[#args+1] = ('%s%s: %s'):format(
                     name,
                     optional and '?' or '',
-                    vm.getInfer(argNode):view('any', guide.getUri(source))
+                    vm.getInfer(argNode):view(guide.getUri(source), 'any')
                 )
             elseif arg.type == '...' then
                 args[#args+1] = ('%s: %s'):format(
                     '...',
-                    vm.getInfer(arg):view 'any'
+                    vm.getInfer(arg):view(guide.getUri(source), 'any')
                 )
             else
-                args[#args+1] = ('%s'):format(vm.getInfer(arg):view 'any')
+                args[#args+1] = ('%s'):format(vm.getInfer(arg):view(guide.getUri(source), 'any'))
             end
             ::CONTINUE::
         end
@@ -56,7 +56,7 @@ local function asDocFunction(source)
         args[i] = ('%s%s: %s'):format(
             name,
             arg.optional and '?' or '',
-            arg.extends and vm.getInfer(arg.extends):view 'any' or 'any'
+            arg.extends and vm.getInfer(arg.extends):view(guide.getUri(source), 'any') or 'any'
         )
     end
     return args

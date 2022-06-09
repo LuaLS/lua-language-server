@@ -2,6 +2,7 @@
 
 ## 3.2.5
 * `NEW` provide config docs in `LUA_LANGUAGE_SERVER/doc/`
+* `FIX` [#1148](https://github.com/sumneko/lua-language-server/issues/1148)
 * `FIX` [#1149](https://github.com/sumneko/lua-language-server/issues/1149)
 * `FIX` [#1192](https://github.com/sumneko/lua-language-server/issues/1192)
 

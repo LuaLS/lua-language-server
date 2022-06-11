@@ -117,6 +117,73 @@ local function searchField(source, pushResult, defMap, fileNotify)
 end
 
 ---@async
+local function searchArgs(source, pushResult, defMap, fileNotify)
+
+    ---@param src parser.object
+    local function checkDef(src)
+        for _, def in ipairs(vm.getDefs(src)) do
+            if defMap[def] then
+                pushResult(src)
+                return
+            end
+        end
+    end
+
+    local pat = '%b""'
+    ---@async
+    local function findGenericArg(uri)
+
+        local text = files.getText(uri)
+        if not text then
+            return
+        end
+        if not text:match(pat) then
+            return
+        end
+        local state = files.getState(uri)
+        if not state then
+            return
+        end
+
+        ---@async
+        guide.eachSourceType(state.ast, 'callargs', function (src)
+            local defs = vm.getDefs(src.parent.node)
+            local args
+            for _, def in ipairs(defs) do
+                if def.type == 'function' then
+                    args = def.args
+                end
+            end
+
+            local bindIndex = 0
+            for i, arg in ipairs(args) do
+                local param
+                repeat
+                    bindIndex = bindIndex + 1
+                    param = arg.bindDocs[bindIndex]
+                    if param and param.type == 'doc.param' then
+                        break
+                    end
+                until not param
+
+                if param then
+                    for _, tp in ipairs(param.extends.types) do
+                        if tp.type == 'doc.generic.name' then
+                            src[i].genArg = true
+                            pushResult(src[i])
+                        end
+                    end
+                end
+            end
+
+            await.delay()
+        end)
+    end
+
+    searchInAllFiles(guide.getUri(source), findGenericArg, fileNotify)
+end
+
+---@async
 local function searchFunction(source, pushResult, defMap, fileNotify)
     ---@param src parser.object
     local function checkDef(src)
@@ -179,6 +246,14 @@ local nodeSwitch = util.switch()
     : call(function (source, pushResult, defMap, fileNotify)
         searchFunction(source, pushResult, defMap, fileNotify)
     end)
+    : case 'string'
+    : case 'doc.type.name'
+    : case 'doc.alias.name'
+    : case 'doc.class.name'
+    ---@async
+    : call (function (source, pushResult, defMap, fileNotify)
+        searchArgs(source, pushResult, defMap, fileNotify)
+    end)
 
 ---@param source  parser.object
 ---@param pushResult fun(src: parser.object)
@@ -220,6 +295,10 @@ local function searchByNode(source, pushResult)
     for n in node:eachObject() do
         if n.type == 'global' then
             for _, get in ipairs(n:getGets(uri)) do
+                pushResult(get)
+            end
+        elseif n.type == 'string' then
+            for _, get in ipairs(vm.getDocSets(uri, n[1])) do
                 pushResult(get)
             end
         end

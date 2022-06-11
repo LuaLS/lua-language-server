@@ -49,6 +49,7 @@ local accept = {
     ['doc.class.name']   = true,
     ['doc.extends.name'] = true,
     ['doc.alias.name']   = true,
+    ['string']           = true
 }
 
 ---@async
@@ -91,7 +92,7 @@ return function (uri, position)
                 goto CONTINUE
             end
         else
-            if guide.isLiteral(src) and src.type ~= 'function' then
+            if guide.isLiteral(src) and src.type ~= 'function' and not src.genArg then
                 goto CONTINUE
             end
         end
@@ -108,7 +109,8 @@ return function (uri, position)
             if  source.type ~= 'doc.type.name'
             and source.type ~= 'doc.class.name'
             and source.type ~= 'doc.extends.name'
-            and source.type ~= 'doc.see.name' then
+            and source.type ~= 'doc.see.name'
+            and source.type ~= 'string' then
                 goto CONTINUE
             end
         end

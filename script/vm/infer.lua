@@ -419,5 +419,5 @@ end
 ---@param source parser.object
 ---@return string?
 function vm.viewObject(source)
-    return viewNodeSwitch(source.type, source, {})
+    return viewNodeSwitch(source.type, source, {}, guide.getUri(source))
 end

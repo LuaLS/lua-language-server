@@ -72,12 +72,25 @@ function mt:_fastWard(pos, node)
             self._index = i
             return obj, node
         end
-        if obj.type == 'getlocal'
-        or obj.type == 'setlocal' then
-            node = self._callback(obj, node) or node
+        if obj.type == 'getlocal' then
+            self._callback(obj, node)
+        elseif obj.type == 'setlocal' then
+            local newNode = self._callback(obj, node)
+            if newNode then
+                node = newNode:copy()
+            end
         else
             error('unexpected type: ' .. obj.type)
         end
+    end
+end
+
+---@param action  parser.object
+---@param topNode vm.node
+function mt:_lookInto(action, topNode)
+    action = vm.getObjectValue(action) or action
+    if action.type == 'function' then
+        self:_launchBlock(action, topNode:copy())
     end
 end
 
@@ -89,16 +102,18 @@ function mt:_launchBlock(block, node)
         return
     end
     for _, action in ipairs(block) do
-        if action.finish < top.start then
+        local finish = action.range or action.finish
+        if finish < top.start then
             goto CONTINUE
         end
+        self:_lookInto(action, topNode)
         top, topNode = self:_fastWard(action.finish, topNode)
         if not top then
             return
         end
         ::CONTINUE::
     end
-    self:_fastWard(math.huge, topNode)
+    self:_fastWard(block.finish, topNode)
 end
 
 ---@param loc parser.object
@@ -116,5 +131,5 @@ function vm.launchRunner(loc, callback)
         return
     end
 
-    self:_launchBlock(guide.getParentBlock(loc), vm.getNode(loc))
+    self:_launchBlock(guide.getParentBlock(loc), vm.getNode(loc):copy())
 end

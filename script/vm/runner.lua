@@ -63,14 +63,14 @@ end
 
 ---@param pos  integer
 ---@param node vm.node
----@return parser.object
 ---@return vm.node
+---@return parser.object?
 function mt:_fastWard(pos, node)
     for i = self._index, #self._objs do
         local obj = self._objs[i]
         if obj.start > pos then
             self._index = i
-            return obj, node
+            return node, obj
         end
         if obj.type == 'getlocal' then
             self._callback(obj, node)
@@ -83,37 +83,66 @@ function mt:_fastWard(pos, node)
             error('unexpected type: ' .. obj.type)
         end
     end
+    self._index = math.huge
+    return node, nil
 end
 
----@param action  parser.object
----@param topNode vm.node
-function mt:_lookInto(action, topNode)
+---@param action   parser.object
+---@param topNode  vm.node
+---@param outNode? vm.node
+---@return vm.node
+function mt:_lookInto(action, topNode, outNode)
     action = vm.getObjectValue(action) or action
     if action.type == 'function' then
         self:_launchBlock(action, topNode:copy())
+    elseif action.type == 'if' then
+        local mainNode  = topNode:copy()
+        local blockNode = topNode:copy()
+        for _, subBlock in ipairs(action) do
+            if subBlock.type == 'ifblock' then
+                blockNode, mainNode = self:_lookInto(subBlock.filter, blockNode, mainNode)
+                blockNode = self:_launchBlock(subBlock, blockNode)
+                mainNode:merge(blockNode)
+            end
+        end
+    elseif action.type == 'getlocal' then
+        if action.node == self._loc then
+            topNode = self:_fastWard(action.finish, topNode)
+            topNode = topNode:copy():setTruthy()
+            if outNode then
+                outNode:setFalsy()
+            end
+        end
+    elseif action.type == 'unary' then
+        if action.op.type == 'not' then
+            outNode, topNode = self:_lookInto(action[1], topNode, outNode)
+        end
     end
+    return topNode, outNode
 end
 
 ---@param block parser.object
 ---@param node  vm.node
+---@return vm.node
 function mt:_launchBlock(block, node)
-    local top, topNode = self:_fastWard(block.start, node)
+    local topNode, top = self:_fastWard(block.start, node)
     if not top then
-        return
+        return topNode
     end
     for _, action in ipairs(block) do
         local finish = action.range or action.finish
         if finish < top.start then
             goto CONTINUE
         end
-        self:_lookInto(action, topNode)
-        top, topNode = self:_fastWard(action.finish, topNode)
+        topNode = self:_lookInto(action, topNode)
+        topNode, top = self:_fastWard(action.finish, topNode)
         if not top then
-            return
+            return topNode
         end
         ::CONTINUE::
     end
-    self:_fastWard(block.finish, topNode)
+    topNode = self:_fastWard(block.finish, topNode)
+    return topNode
 end
 
 ---@param loc parser.object

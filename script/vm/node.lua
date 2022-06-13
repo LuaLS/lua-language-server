@@ -152,6 +152,7 @@ function mt:setTruthy()
     if hasBoolean then
         self[#self+1] = vm.declareGlobal('type', 'true')
     end
+    return self
 end
 
 ---@return vm.node
@@ -180,6 +181,7 @@ function mt:setFalsy()
     if hasBoolean then
         self[#self+1] = vm.declareGlobal('type', 'false')
     end
+    return self
 end
 
 ---@param name string
@@ -200,6 +202,7 @@ function mt:remove(name)
             self[c] = nil
         end
     end
+    return self
 end
 
 ---@param node vm.node

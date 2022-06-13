@@ -34,10 +34,10 @@ DIAG_PREFIELD_CALL      =
 'Será interpretado como `{}{}`. Pode ser necessário adicionar uma `,` ou `;`.'
 DIAG_OVER_MAX_ARGS      =
 'A função aceita apenas os parâmetros {:d}, mas você passou {:d}.'
-DIAG_MISS_ARGS          = -- TODO: need translate!
-'the function received at least {:d} arguments, but got {:d}.'
-DIAG_OVER_MAX_VALUES    = -- TODO: need translate!
-'Only has {} variables, but you set {} values.'
+DIAG_MISS_ARGS          =
+'A função recebe pelo menos {:d} argumentos, mas há {:d}.'
+DIAG_OVER_MAX_VALUES    =
+'Apenas há {} variáveis, mas você declarou {} valores.'
 DIAG_AMBIGUITY_1        =
 'Calcule primeiro `{}`. Você pode precisar adicionar colchetes.'
 DIAG_LOWERCASE_GLOBAL   =
@@ -90,14 +90,14 @@ DIAG_DIFFERENT_REQUIRES =
 'O mesmo arquivo é necessário com nomes diferentes.'
 DIAG_REDUNDANT_RETURN   =
 'Retorno redundante.'
-DIAG_AWAIT_IN_SYNC      = -- TODO: need translate!
-'Async function can only be called in async function.'
-DIAG_NOT_YIELDABLE      = -- TODO: need translate!
-'The {}th parameter of this function was not marked as yieldable, but an async function was passed in. (Use `---@param name async fun()` to mark as yieldable)'
-DIAG_DISCARD_RETURNS    = -- TODO: need translate!
-'The return values of this function cannot be discarded.'
-DIAG_NEED_CHECK_NIL     = -- TODO: need translate!
-'Need check nil.'
+DIAG_AWAIT_IN_SYNC      =
+'Funções assíncronas apenas podem ser chamada em funções assíncronas.'
+DIAG_NOT_YIELDABLE      =
+'O {}-ésimo parâmetro desta função não foi marcada como produzível, mas uma função assíncrona foi passada. (Use `---@param name async fun()` para marcar como produzível)'
+DIAG_DISCARD_RETURNS    =
+'Os valores retornados desta função não podem ser descartáveis.'
+DIAG_NEED_CHECK_NIL     =
+'Necessário checar o nil.'
 DIAG_CIRCLE_DOC_CLASS                 =
 'Classes com herança cíclica.'
 DIAG_DOC_FIELD_NO_CLASS               =
@@ -133,7 +133,6 @@ MWS_UCONFIG_UPDATED     =
 'Configuração do usuário atualizada.'
 MWS_WCONFIG_UPDATED     =
 'Configuração do espaço de trabalho atualizado.'
-
 WORKSPACE_SKIP_LARGE_FILE =
 'Arquivo muito grande: {} ignorada. O limite de tamanho atualmente definido é: {} KB, e o tamanho do arquivo é: {} KB.'
 WORKSPACE_LOADING         =
@@ -142,11 +141,10 @@ WORKSPACE_DIAGNOSTIC      =
 'Diagnóstico de espaço de trabalho.'
 WORKSPACE_SKIP_HUGE_FILE  =
 'Por motivos de desempenho, a análise deste arquivo foi interrompida: {}'
-WORKSPACE_NOT_ALLOWED     = -- TODO: need translate!
-'Your workspace is set to `{}`. Lua language server refused to load this directory. Please check your configuration.[learn more here](https://github.com/sumneko/lua-language-server/wiki/Why-scanning-home-folder)'
+WORKSPACE_NOT_ALLOWED     =
+'Seu espaço de trabalho foi definido para `{}`. Servidor da linguagem Lua recusou o carregamneto neste diretório. Por favor, cheque sua configuração. [aprenda mais aqui](https://github.com/sumneko/lua-language-server/wiki/Why-scanning-home-folder)'
 WORKSPACE_SCAN_TOO_MUCH   = -- TODO: need translate!
-'More than {} files have been scanned. The current scanned directory is `{}`. Please confirm whether the configuration is correct.'
-
+'Mais do que {} arquivos foram escaneados. O diretório atual escaneado é `{}`. Por favor, confirmar se a configuração está correta'
 PARSER_CRASH            =
 'Parser quebrou! Últimas palavras: {}'
 PARSER_UNKNOWN          =
@@ -279,12 +277,10 @@ PARSER_LUADOC_MISS_DIAG_MODE            =
 'Esperado <diagnostic mode>.'
 PARSER_LUADOC_ERROR_DIAG_MODE           =
 '<diagnostic mode> incorreto.'
-PARSER_LUADOC_MISS_LOCAL_NAME           = -- TODO: need translate!
-'<local name> expected.'
-
-SYMBOL_ANONYMOUS        = -- TODO: need translate!
+PARSER_LUADOC_MISS_LOCAL_NAME           =
+'<local name> esperado.'
+SYMBOL_ANONYMOUS        =
 '<Anonymous>'
-
 HOVER_VIEW_DOCUMENTS    =
 'Visualizar documentos'
 HOVER_DOCUMENT_LUA51    =
@@ -309,7 +305,7 @@ HOVER_NATIVE_DOCUMENT_LUAJIT    =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 HOVER_MULTI_PROTOTYPE      =
 '({} protótipos)'
-HOVER_STRING_BYTES         = -- TODO: need translate!
+HOVER_STRING_BYTES         =
 '{} bytes'
 HOVER_STRING_CHARACTERS    =
 '{} bytes, {} caracteres'
@@ -325,9 +321,8 @@ HOVER_TABLE_TIME_UP     =
 'Inferência de tipo parcial foi desativada por motivos de desempenho.'
 HOVER_WS_LOADING        =
 'Carregando espaço de trabalho: {} / {}'
-HOVER_AWAIT_TOOLTIP     = -- TODO: need translate!
-'Calling async function, current thread may be yielded.'
-
+HOVER_AWAIT_TOOLTIP     =
+'Chamando a função assíncrona, a thread atual deve ser produzível'
 ACTION_DISABLE_DIAG     =
 'Desativar diagnósticos no espaço de trabalho ({}).'
 ACTION_MARK_GLOBAL      =
@@ -382,11 +377,10 @@ ACTION_DISABLE_DIAG_LINE=
 'Desativa diagnósticos nesta linha ({}).'
 ACTION_DISABLE_DIAG_FILE=
 'Desativa diagnósticos nesta linha ({}).'
-ACTION_MARK_ASYNC       = -- TODO: need translate!
-'Mark current function as async.'
-ACTION_ADD_DICT         = -- TODO: need translate!
-'Add \'{}\' to workspace dict'
-
+ACTION_MARK_ASYNC       =
+'Marque a função atual como assíncrona'
+ACTION_ADD_DICT         =
+'Adicione \'{}\' ao seu espaço de trabalho no '
 COMMAND_DISABLE_DIAG       =
 'Desativar diagnósticos.'
 COMMAND_MARK_GLOBAL        =
@@ -405,9 +399,8 @@ COMMAND_JSON_TO_LUA        =
 'Converte de JSON para Lua.'
 COMMAND_JSON_TO_LUA_FAILED =
 'Converção de JSON para Lua falhou: {}.'
-COMMAND_ADD_DICT           = -- TODO: need translate!
-'Add Word to dictionary'
-
+COMMAND_ADD_DICT           =
+'Adicione uma palavra ao dicionário'
 COMPLETION_IMPORT_FROM           =
 'Importa de {}.'
 COMPLETION_DISABLE_AUTO_REQUIRE  =
@@ -466,17 +459,17 @@ WINDOW_LUA_STATUS_CACHED_FILES   =
 'Arquivos em cache: {ast}/{max}'
 WINDOW_LUA_STATUS_MEMORY_COUNT   =
 'Uso de memória   : {mem:.f}M'
-WINDOW_LUA_STATUS_TIP            = -- TODO: need translate!
+WINDOW_LUA_STATUS_TIP            =
 [[
 
-This icon is a cat,
-Not a dog nor a fox!
+Este ícone é um gato,
+não é um cachorro nem uma raposa!
              ↓↓↓
 ]]
-WINDOW_LUA_STATUS_DIAGNOSIS_TITLE= -- TODO: need translate!
-'Perform workspace diagnosis'
-WINDOW_LUA_STATUS_DIAGNOSIS_MSG  = -- TODO: need translate!
-'Do you want to perform workspace diagnosis?'
+WINDOW_LUA_STATUS_DIAGNOSIS_TITLE=
+'Execute seu diagnóstico do espaço de trabalho'
+WINDOW_LUA_STATUS_DIAGNOSIS_MSG  =
+'Você quer executar um diagnóstico do espaço de trabalho?'
 WINDOW_APPLY_SETTING             =
 'Aplicar configuração'
 WINDOW_CHECK_SEMANTIC            =
@@ -504,15 +497,13 @@ WINDOW_APPLY_WHITOUT_SETTING     =
 WINDOW_ASK_APPLY_LIBRARY         =
 'Você precisa configurar seu ambiente de trabalho como `{}`?'
 WINDOW_SEARCHING_IN_FILES        = -- TODO: need translate!
-'Searching in files...'
-
+'Procurando nos arquivos...'
 CONFIG_LOAD_FAILED               =
 'Não é possível ler o arquivo de configurações: {}'
 CONFIG_LOAD_ERROR                =
 'Configurando o erro de carregamento do arquivo: {}'
 CONFIG_TYPE_ERROR                =
 'O arquivo de configuração deve estar no formato LUA ou JSON: {}'
-
 PLUGIN_RUNTIME_ERROR             =
 [[
 Ocorreu um erro no plugin, envie o erro ao autor do plugin.
@@ -533,16 +524,15 @@ PLUGIN_TRUST_NO                  =
 [[
 Não carregue este plugin
 ]]
-
-CLI_CHECK_ERROR_TYPE = -- TODO: need translate!
-'The argument of CHECK must be a string, but got {}'
-CLI_CHECK_ERROR_URI = -- TODO: need translate!
-'The argument of CHECK must be a valid uri, but got {}'
-CLI_CHECK_ERROR_LEVEL = -- TODO: need translate!
-'Checklevel must be one of: {}'
-CLI_CHECK_INITING = -- TODO: need translate!
-'Initializing ...'
-CLI_CHECK_SUCCESS = -- TODO: need translate!
-'Diagnosis completed, no problems found'
-CLI_CHECK_RESULTS = -- TODO: need translate!
-'Diagnosis complete, {} problems found, see {}'
+CLI_CHECK_ERROR_TYPE =
+'O argumento do CHECK deve ser uma string, mas é {}'
+CLI_CHECK_ERROR_URI =
+'O argumento do CHECK deve ser uma uri válida, mas é {}'
+CLI_CHECK_ERROR_LEVEL =
+'Checklevel deve ser um de: {}'
+CLI_CHECK_INITING =
+'Inicializando ...'
+CLI_CHECK_SUCCESS =
+'Diagnóstico completo, nenhum problema encontrado'
+CLI_CHECK_RESULTS =
+'Diagnóstico completo, {} problemas encontrados, veja {}'

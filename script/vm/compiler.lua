@@ -998,8 +998,7 @@ local compilerSwitch = util.switch()
 
         local hasMark = vm.getNode(source):getData 'hasDefined'
 
-        local runner = vm.createRunner(source)
-        runner:launch(function (src, node)
+        vm.launchRunner(source, function (src, node)
             if src.type == 'setlocal' then
                 if src.bindDocs then
                     for _, doc in ipairs(src.bindDocs) do

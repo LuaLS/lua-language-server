@@ -417,7 +417,8 @@ function mt:viewClass()
 end
 
 ---@param source parser.object
+---@param uri uri
 ---@return string?
-function vm.viewObject(source)
-    return viewNodeSwitch(source.type, source, {}, guide.getUri(source))
+function vm.viewObject(source, uri)
+    return viewNodeSwitch(source.type, source, {}, uri)
 end

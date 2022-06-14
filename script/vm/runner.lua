@@ -101,10 +101,14 @@ function mt:_lookInto(action, topNode, outNode)
         for _, subBlock in ipairs(action) do
             if subBlock.type == 'ifblock' then
                 blockNode, mainNode = self:_lookInto(subBlock.filter, blockNode, mainNode)
-                blockNode = self:_launchBlock(subBlock, blockNode)
-                mainNode:merge(blockNode)
+                local neverReturn
+                blockNode, neverReturn = self:_launchBlock(subBlock, blockNode)
+                if not neverReturn then
+                    mainNode:merge(blockNode)
+                end
             end
         end
+        topNode = mainNode
     elseif action.type == 'getlocal' then
         if action.node == self._loc then
             topNode = self:_fastWard(action.finish, topNode)
@@ -117,6 +121,11 @@ function mt:_lookInto(action, topNode, outNode)
         if action.op.type == 'not' then
             outNode, topNode = self:_lookInto(action[1], topNode, outNode)
         end
+    elseif action.type == 'binary' then
+        if action.op.type == 'and' then
+            topNode = self:_lookInto(action[1], topNode)
+            topNode = self:_lookInto(action[2], topNode)
+        end
     end
     return topNode, outNode
 end
@@ -124,12 +133,17 @@ end
 ---@param block parser.object
 ---@param node  vm.node
 ---@return vm.node
+---@return boolean neverReturn
 function mt:_launchBlock(block, node)
+    local neverReturn = false
     local topNode, top = self:_fastWard(block.start, node)
     if not top then
-        return topNode
+        return topNode, neverReturn
     end
     for _, action in ipairs(block) do
+        if action.type == 'return' then
+            neverReturn = true
+        end
         local finish = action.range or action.finish
         if finish < top.start then
             goto CONTINUE
@@ -137,12 +151,12 @@ function mt:_launchBlock(block, node)
         topNode = self:_lookInto(action, topNode)
         topNode, top = self:_fastWard(action.finish, topNode)
         if not top then
-            return topNode
+            return topNode, neverReturn
         end
         ::CONTINUE::
     end
     topNode = self:_fastWard(block.finish, topNode)
-    return topNode
+    return topNode, neverReturn
 end
 
 ---@param loc parser.object

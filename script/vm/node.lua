@@ -175,6 +175,12 @@ function mt:setFalsy()
             hasBoolean = true
             table.remove(self, index)
             self[c] = nil
+            goto CONTINUE
+        end
+        if (c.type == 'global' and c.cate == 'type') then
+            table.remove(self, index)
+            self[c] = nil
+            goto CONTINUE
         end
         ::CONTINUE::
     end

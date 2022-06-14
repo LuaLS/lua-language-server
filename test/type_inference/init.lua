@@ -1813,6 +1813,17 @@ TEST 'integer' [[
 ---@type integer?
 local x
 
+if not x then
+    return
+end
+
+print(<?x?>)
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
 if xxx and x then
     print(<?x?>)
 end

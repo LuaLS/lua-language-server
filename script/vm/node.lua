@@ -216,6 +216,14 @@ function mt:removeNode(node)
     for _, c in ipairs(node) do
         if c.type == 'global' and c.cate == 'type' then
             self:remove(c.name)
+        elseif c.type == 'nil' then
+            self:remove 'nil'
+        elseif c.type == 'boolean' then
+            if c[1] == true then
+                self:remove 'true'
+            else
+                self:remove 'false'
+            end
         end
     end
 end

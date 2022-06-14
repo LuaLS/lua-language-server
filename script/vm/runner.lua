@@ -118,13 +118,47 @@ function mt:_lookInto(action, topNode, outNode)
             end
         end
     elseif action.type == 'unary' then
+        if not action[1] then
+            return topNode, outNode
+        end
         if action.op.type == 'not' then
             outNode, topNode = self:_lookInto(action[1], topNode, outNode)
         end
     elseif action.type == 'binary' then
+        if not action[1] or not action[2] then
+            return topNode, outNode
+        end
         if action.op.type == 'and' then
             topNode = self:_lookInto(action[1], topNode)
             topNode = self:_lookInto(action[2], topNode)
+        elseif action.op.type == '=='
+        or     action.op.type == '~=' then
+            local loc, checker
+            for i = 1, 2 do
+                if action[i].type == 'getlocal' and action[i].node == self._loc then
+                    loc = action[i]
+                    checker = action[3-i] -- Copilot tells me use `3-i` instead of `i%2+1`
+                else
+                    loc = action[3-i]
+                    checker = action[i]
+                end
+            end
+            if loc then
+                if guide.isLiteral(checker) then
+                    local checkerNode = vm.compileNode(checker)
+                    if action.op.type == '==' then
+                        topNode = checkerNode
+                        if outNode then
+                            outNode:removeNode(topNode)
+                        end
+                    else
+                        topNode:removeNode(checkerNode)
+                        if outNode then
+                            outNode = checkerNode
+                        end
+                    end
+                end
+            end
         end
     end
     return topNode, outNode
@@ -141,7 +175,8 @@ function mt:_launchBlock(block, node)
         return topNode, neverReturn
     end
     for _, action in ipairs(block) do
-        if action.type == 'return' then
+        if action.type == 'return'
+        or action.type == 'goto' then
             neverReturn = true
         end
         local finish = action.range or action.finish

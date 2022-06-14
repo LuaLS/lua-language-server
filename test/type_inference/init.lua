@@ -2428,3 +2428,57 @@ function x() end
 
 print(<?x?>)
 ]]
+
+TEST 'unknown' [[
+local x
+
+if x.field == 'haha' then
+    print(<?x?>)
+end
+]]
+
+TEST 'string' [[
+---@type string?
+local t
+
+if not t or xxx then
+    return
+end
+
+print(<?t?>)
+]]
+
+TEST 'table' [[
+---@type table|nil
+local t
+
+return function ()
+    if not t then
+        return
+    end
+    
+    print(<?t?>)
+end
+]]
+
+TEST 'table' [[
+---@type table|nil
+local t
+
+f(function ()
+    if not t then
+        return
+    end
+    
+    print(<?t?>)
+end)
+]]
+
+TEST 'table' [[
+---@type table?
+local t
+
+t = t or {}
+
+print(<?t?>)
+]]

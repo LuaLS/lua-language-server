@@ -192,6 +192,8 @@ local template = {
                                                     'pcall',
                                                     'xpcall',
                                                     'assert',
+                                                    'error',
+                                                    'type',
                                                 }
                                             ),
     ['Lua.runtime.meta']                    = Type.String >> '${version} ${language} ${encoding}',

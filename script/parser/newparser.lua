@@ -118,6 +118,8 @@ local Specials = {
     ['pairs']        = true,
     ['ipairs']       = true,
     ['assert']       = true,
+    ['error']        = true,
+    ['type']         = true,
 }
 
 local UnarySymbol = {

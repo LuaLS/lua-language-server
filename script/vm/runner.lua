@@ -79,8 +79,30 @@ function mt:_fastWard(pos, node)
             if newNode then
                 node = newNode:copy()
             end
-        else
-            error('unexpected type: ' .. obj.type)
+        elseif obj.type == 'doc.cast' then
+            node = node:copy()
+            for _, cast in ipairs(obj.casts) do
+                if     cast.mode == '+' then
+                    if cast.optional then
+                        node:addOptional()
+                    end
+                    if cast.extends then
+                        node:merge(vm.compileNode(cast.extends))
+                    end
+                elseif cast.mode == '-' then
+                    if cast.optional then
+                        node:removeOptional()
+                    end
+                    if cast.extends then
+                        node:removeNode(vm.compileNode(cast.extends))
+                    end
+                else
+                    if cast.extends then
+                        node:clear()
+                        node:merge(vm.compileNode(cast.extends))
+                    end
+                end
+            end
         end
     end
     self._index = math.huge

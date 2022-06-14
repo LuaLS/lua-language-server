@@ -85,7 +85,7 @@ local nodeSwitch;nodeSwitch = util.switch()
         local parentNode = vm.compileNode(source.node)
         local uri = guide.getUri(source)
         local key = guide.getKeyName(source)
-        if not key then
+        if type(key) ~= 'string' then
             return
         end
         if lastKey then

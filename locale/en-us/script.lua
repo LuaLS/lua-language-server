@@ -546,3 +546,10 @@ CLI_CHECK_SUCCESS =
 'Diagnosis completed, no problems found'
 CLI_CHECK_RESULTS =
 'Diagnosis complete, {} problems found, see {}'
+
+LUADOC_DESC_CLASS =
+[=[
+```lua
+---@class <name> [: <parent>[, <parent2>, ...]]
+```
+]=]

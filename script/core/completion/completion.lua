@@ -1546,6 +1546,7 @@ local function tryluaDocCate(word, results)
             results[#results+1] = {
                 label       = docType,
                 kind        = define.CompletionItemKind.Event,
+                description = lang.script('LUADOC_DESC_' .. docType:upper())
             }
         end
     end

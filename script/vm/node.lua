@@ -2,6 +2,7 @@ local files    = require 'files'
 ---@class vm
 local vm       = require 'vm.vm'
 local ws       = require 'workspace.workspace'
+local guide    = require 'parser.guide'
 
 ---@type table<vm.object, vm.node>
 vm.nodeCache = {}
@@ -99,6 +100,18 @@ function mt:hasFalsy()
         or (c.type == 'global' and c.cate == 'type' and c.name == 'false')
         or (c.type == 'boolean' and c[1] == false)
         or (c.type == 'doc.type.boolean' and c[1] == false) then
+            return true
+        end
+    end
+    return false
+end
+
+function mt:hasKnownType()
+    for _, c in ipairs(self) do
+        if c.type == 'global' and c.cate == 'type' then
+            return true
+        end
+        if guide.isLiteral(c) then
             return true
         end
     end

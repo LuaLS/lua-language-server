@@ -2482,3 +2482,12 @@ t = t or {}
 
 print(<?t?>)
 ]]
+
+TEST 'unknown|nil' [[
+local x
+
+if x == nil then
+end
+
+print(<?x?>)
+]]

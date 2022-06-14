@@ -132,6 +132,7 @@ function mt:_lookInto(action, topNode, outNode)
         self:_launchBlock(action, blockNode:copy())
         topNode = mainNode
     elseif action.type == 'if' then
+        local hasElse
         local mainNode = topNode:copy()
         local blockNodes = {}
         for _, subBlock in ipairs(action) do
@@ -140,6 +141,7 @@ function mt:_lookInto(action, topNode, outNode)
                 blockNode, mainNode = self:_lookInto(subBlock.filter, blockNode, mainNode)
                 self:_fastWard(subBlock.filter.finish, blockNode)
             else
+                hasElse = true
                 mainNode:clear()
             end
             blockNode = self:_launchBlock(subBlock, blockNode:copy())
@@ -149,6 +151,9 @@ function mt:_lookInto(action, topNode, outNode)
             if not neverReturn then
                 blockNodes[#blockNodes+1] = blockNode
             end
+        end
+        if not hasElse and not topNode:hasKnownType() then
+            mainNode:merge(vm.declareGlobal('type', 'unknown'))
         end
         for _, blockNode in ipairs(blockNodes) do
             mainNode:merge(blockNode)

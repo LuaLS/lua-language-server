@@ -2164,6 +2164,15 @@ print(<?x?>)
 ]]
 
 TEST 'integer' [[
+---@type integer?
+local x
+
+while x do
+    print(<?x?>)
+end
+]]
+
+TEST 'integer' [[
 ---@type fun():integer?
 local iter
 

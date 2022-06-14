@@ -93,8 +93,17 @@ end
 ---@return vm.node
 function mt:_lookInto(action, topNode, outNode)
     action = vm.getObjectValue(action) or action
-    if action.type == 'function' then
+    if     action.type == 'function'
+    or     action.type == 'loop'
+    or     action.type == 'in'
+    or     action.type == 'repeat'
+    or     action.type == 'for' then
         self:_launchBlock(action, topNode:copy())
+    elseif action.type == 'while' then
+        local blockNode, mainNode = self:_lookInto(action.filter, topNode:copy(), topNode:copy())
+        self:_fastWard(action.filter.finish, blockNode)
+        self:_launchBlock(action, blockNode:copy())
+        topNode = mainNode
     elseif action.type == 'if' then
         local mainNode  = topNode:copy()
         local blockNode = topNode:copy()
@@ -102,8 +111,10 @@ function mt:_lookInto(action, topNode, outNode)
             if subBlock.type == 'ifblock' then
                 blockNode, mainNode = self:_lookInto(subBlock.filter, blockNode, mainNode)
                 self:_fastWard(subBlock.filter.finish, blockNode)
-                local neverReturn
-                blockNode, neverReturn = self:_launchBlock(subBlock, blockNode)
+                blockNode = self:_launchBlock(subBlock, blockNode:copy())
+                local neverReturn = subBlock.hasReturn
+                                or  subBlock.hasGoTo
+                                or  subBlock.hasBreak
                 if not neverReturn then
                     mainNode:merge(blockNode)
                 end
@@ -180,18 +191,12 @@ end
 ---@param block parser.object
 ---@param node  vm.node
 ---@return vm.node
----@return boolean neverReturn
 function mt:_launchBlock(block, node)
-    local neverReturn = false
     local topNode, top = self:_fastWard(block.start, node)
     if not top then
-        return topNode, neverReturn
+        return topNode
     end
     for _, action in ipairs(block) do
-        if action.type == 'return'
-        or action.type == 'goto' then
-            neverReturn = true
-        end
         local finish = action.range or action.finish
         if finish < top.start then
             goto CONTINUE
@@ -199,12 +204,12 @@ function mt:_launchBlock(block, node)
         topNode = self:_lookInto(action, topNode)
         topNode, top = self:_fastWard(action.finish, topNode)
         if not top then
-            return topNode, neverReturn
+            return topNode
         end
         ::CONTINUE::
     end
     topNode = self:_fastWard(block.finish, topNode)
-    return topNode, neverReturn
+    return topNode
 end
 
 ---@param loc parser.object

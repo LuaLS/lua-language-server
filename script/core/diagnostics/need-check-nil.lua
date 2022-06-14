@@ -28,7 +28,7 @@ return function (uri, callback)
             return
         end
         local node = vm.compileNode(src)
-        if node:hasFalsy() then
+        if node:hasFalsy() and not vm.getInfer(src):hasType(uri, 'any') then
             callback {
                 start   = src.start,
                 finish  = src.finish,

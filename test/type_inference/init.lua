@@ -2491,3 +2491,24 @@ end
 
 print(<?x?>)
 ]]
+
+TEST 'table<unknown, true>' [[
+---@alias xxx table<xxx, true>
+
+---@type xxx
+local <?t?>
+]]
+
+TEST 'unknown[][]' [[
+---@alias xxx xxx[]
+
+---@type xxx
+local <?t?>
+]]
+
+TEST 'fun(x: fun(x: unknown))' [[
+---@alias xxx fun(x: xxx)
+
+---@type xxx
+local <?t?>
+]]

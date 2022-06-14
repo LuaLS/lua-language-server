@@ -20,6 +20,8 @@ mt._isLocal        = false
 
 vm.NULL = setmetatable({}, mt)
 
+local LOCK = {}
+
 local inferSorted = {
     ['boolean']  = - 100,
     ['string']   = - 99,
@@ -218,6 +220,10 @@ function mt:_eraseAlias(uri)
     local expandAlias = config.get(uri, 'Lua.hover.expandAlias')
     for n in self.node:eachObject() do
         if n.type == 'global' and n.cate == 'type' then
+            if LOCK[n.name] then
+                goto CONTINUE
+            end
+            LOCK[n.name] = true
             for _, set in ipairs(n:getSets(uri)) do
                 if set.type == 'doc.alias' then
                     if expandAlias then
@@ -239,6 +245,8 @@ function mt:_eraseAlias(uri)
                     end
                 end
             end
+            LOCK[n.name] = nil
+            ::CONTINUE::
         end
     end
     return drop

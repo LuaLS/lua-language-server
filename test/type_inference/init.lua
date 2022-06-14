@@ -1813,6 +1813,17 @@ TEST 'integer' [[
 ---@type integer?
 local x
 
+if not x then
+    return
+end
+
+print(<?x?>)
+]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
 if xxx and x then
     print(<?x?>)
 end
@@ -2153,6 +2164,15 @@ print(<?x?>)
 ]]
 
 TEST 'integer' [[
+---@type integer?
+local x
+
+while x do
+    print(<?x?>)
+end
+]]
+
+TEST 'integer' [[
 ---@type fun():integer?
 local iter
 
@@ -2237,6 +2257,19 @@ local x
 print(<?x?>)
 ]]
 
+TEST 'unknown?' [[
+---@type string?
+local x
+
+if x then
+    return
+else
+    print(<?x?>)
+end
+
+print(x)
+]]
+
 TEST 'string' [[
 ---@type string?
 local x
@@ -2296,6 +2329,18 @@ if t then
 end
 
 print(<?t?>)
+]]
+
+TEST 'unknown?' [[
+---@type integer?
+local t
+
+if t then
+else
+    print(<?t?>)
+end
+
+print(t)
 ]]
 
 TEST 'table|unknown' [[
@@ -2374,4 +2419,75 @@ local <?x?>
 TEST '`1`|`true`' [[
 ---@type `1` | `true`
 local <?x?>
+]]
+
+TEST 'function' [[
+local x
+
+function x() end
+
+print(<?x?>)
+]]
+
+TEST 'unknown' [[
+local x
+
+if x.field == 'haha' then
+    print(<?x?>)
+end
+]]
+
+TEST 'string' [[
+---@type string?
+local t
+
+if not t or xxx then
+    return
+end
+
+print(<?t?>)
+]]
+
+TEST 'table' [[
+---@type table|nil
+local t
+
+return function ()
+    if not t then
+        return
+    end
+    
+    print(<?t?>)
+end
+]]
+
+TEST 'table' [[
+---@type table|nil
+local t
+
+f(function ()
+    if not t then
+        return
+    end
+    
+    print(<?t?>)
+end)
+]]
+
+TEST 'table' [[
+---@type table?
+local t
+
+t = t or {}
+
+print(<?t?>)
+]]
+
+TEST 'unknown|nil' [[
+local x
+
+if x == nil then
+end
+
+print(<?x?>)
 ]]

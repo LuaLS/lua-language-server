@@ -111,7 +111,7 @@ function mt:resolve(uri, args, removeGeneric)
                     goto CONTINUE
                 end
             end
-            local view = vm.viewObject(obj)
+            local view = vm.viewObject(obj, uri)
             if view then
                 knownTypes[view] = true
             end
@@ -130,7 +130,7 @@ function mt:resolve(uri, args, removeGeneric)
             if argNode:hasFalsy() then
                 goto CONTINUE
             end
-            local view = vm.viewObject(n)
+            local view = vm.viewObject(n, uri)
             if knownTypes[view] then
                 goto CONTINUE
             end

@@ -1132,7 +1132,7 @@ local function checkTypingEnum(state, position, defs, str, results)
         or def.type == 'doc.type.integer'
         or def.type == 'doc.type.boolean' then
             enums[#enums+1] = {
-                label       = vm.viewObject(def),
+                label       = vm.viewObject(def, state.uri),
                 description = def.comment and def.comment.text,
                 kind        = define.CompletionItemKind.EnumMember,
             }
@@ -1427,7 +1427,7 @@ local function tryCallArg(state, position, results)
         or src.type == 'doc.type.integer'
         or src.type == 'doc.type.boolean' then
             enums[#enums+1] = {
-                label       = vm.viewObject(src),
+                label       = vm.viewObject(src, state.uri),
                 description = src.comment,
                 kind        = define.CompletionItemKind.EnumMember,
             }

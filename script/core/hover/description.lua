@@ -144,7 +144,7 @@ local function tryDocModule(source)
     return collectRequire('require', source.module, guide.getUri(source))
 end
 
-local function buildEnumChunk(docType, name)
+local function buildEnumChunk(docType, name, uri)
     if not docType then
         return nil
     end
@@ -175,7 +175,7 @@ local function buildEnumChunk(docType, name)
                 (enum.default    and '->')
             or  (enum.additional and '+>')
             or  ' |',
-            vm.viewObject(enum)
+            vm.viewObject(enum, uri)
         )
         if enum.comment then
             local first = true
@@ -199,6 +199,7 @@ local function getBindEnums(source, docGroup)
         return
     end
 
+    local uri = guide.getUri(source)
     local mark = {}
     local chunks = {}
     local returnIndex = 0
@@ -209,7 +210,7 @@ local function getBindEnums(source, docGroup)
                 goto CONTINUE
             end
             mark[name] = true
-            chunks[#chunks+1] = buildEnumChunk(doc.extends, name)
+            chunks[#chunks+1] = buildEnumChunk(doc.extends, name, uri)
         elseif doc.type == 'doc.return' then
             for _, rtn in ipairs(doc.returns) do
                 returnIndex = returnIndex + 1
@@ -218,7 +219,7 @@ local function getBindEnums(source, docGroup)
                     goto CONTINUE
                 end
                 mark[name] = true
-                chunks[#chunks+1] = buildEnumChunk(rtn, name)
+                chunks[#chunks+1] = buildEnumChunk(rtn, name, uri)
             end
         end
         ::CONTINUE::

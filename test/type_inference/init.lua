@@ -2420,3 +2420,11 @@ TEST '`1`|`true`' [[
 ---@type `1` | `true`
 local <?x?>
 ]]
+
+TEST 'function' [[
+local x
+
+function x() end
+
+print(<?x?>)
+]]

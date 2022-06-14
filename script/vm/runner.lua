@@ -114,6 +114,9 @@ end
 ---@param outNode? vm.node
 ---@return vm.node
 function mt:_lookInto(action, topNode, outNode)
+    if action.type == 'setlocal' then
+        topNode = self:_fastWard(action.finish, topNode)
+    end
     action = vm.getObjectValue(action) or action
     if     action.type == 'function'
     or     action.type == 'loop'
@@ -162,6 +165,7 @@ function mt:_lookInto(action, topNode, outNode)
             goto RETURN
         end
         if action.op.type == 'not' then
+            outNode = outNode or topNode:copy()
             outNode, topNode = self:_lookInto(action[1], topNode, outNode)
         end
     elseif action.type == 'binary' then

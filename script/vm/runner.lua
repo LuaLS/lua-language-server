@@ -127,20 +127,26 @@ function mt:_lookInto(action, topNode, outNode)
         self:_launchBlock(action, blockNode:copy())
         topNode = mainNode
     elseif action.type == 'if' then
-        local mainNode  = topNode:copy()
-        local blockNode = topNode:copy()
+        local mainNode = topNode:copy()
+        local blockNodes = {}
         for _, subBlock in ipairs(action) do
-            if subBlock.type == 'ifblock' then
+            local blockNode = mainNode:copy()
+            if subBlock.filter then
                 blockNode, mainNode = self:_lookInto(subBlock.filter, blockNode, mainNode)
                 self:_fastWard(subBlock.filter.finish, blockNode)
-                blockNode = self:_launchBlock(subBlock, blockNode:copy())
-                local neverReturn = subBlock.hasReturn
-                                or  subBlock.hasGoTo
-                                or  subBlock.hasBreak
-                if not neverReturn then
-                    mainNode:merge(blockNode)
-                end
+            else
+                mainNode:clear()
             end
+            blockNode = self:_launchBlock(subBlock, blockNode:copy())
+            local neverReturn = subBlock.hasReturn
+                            or  subBlock.hasGoTo
+                            or  subBlock.hasBreak
+            if not neverReturn then
+                blockNodes[#blockNodes+1] = blockNode
+            end
+        end
+        for _, blockNode in ipairs(blockNodes) do
+            mainNode:merge(blockNode)
         end
         topNode = mainNode
     elseif action.type == 'getlocal' then
@@ -184,6 +190,7 @@ function mt:_lookInto(action, topNode, outNode)
                 end
             end
             if loc then
+                self:_fastWard(loc.finish, topNode)
                 if guide.isLiteral(checker) then
                     local checkerNode = vm.compileNode(checker)
                     if action.op.type == '==' then

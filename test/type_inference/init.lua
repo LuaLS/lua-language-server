@@ -2257,6 +2257,19 @@ local x
 print(<?x?>)
 ]]
 
+TEST 'unknown?' [[
+---@type string?
+local x
+
+if x then
+    return
+else
+    print(<?x?>)
+end
+
+print(x)
+]]
+
 TEST 'string' [[
 ---@type string?
 local x
@@ -2316,6 +2329,18 @@ if t then
 end
 
 print(<?t?>)
+]]
+
+TEST 'unknown?' [[
+---@type integer?
+local t
+
+if t then
+else
+    print(<?t?>)
+end
+
+print(t)
 ]]
 
 TEST 'table|unknown' [[

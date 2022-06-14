@@ -101,6 +101,7 @@ function mt:_lookInto(action, topNode, outNode)
         for _, subBlock in ipairs(action) do
             if subBlock.type == 'ifblock' then
                 blockNode, mainNode = self:_lookInto(subBlock.filter, blockNode, mainNode)
+                self:_fastWard(subBlock.filter.finish, blockNode)
                 local neverReturn
                 blockNode, neverReturn = self:_launchBlock(subBlock, blockNode)
                 if not neverReturn then
@@ -119,18 +120,24 @@ function mt:_lookInto(action, topNode, outNode)
         end
     elseif action.type == 'unary' then
         if not action[1] then
-            return topNode, outNode
+            goto RETURN
         end
         if action.op.type == 'not' then
             outNode, topNode = self:_lookInto(action[1], topNode, outNode)
         end
     elseif action.type == 'binary' then
         if not action[1] or not action[2] then
-            return topNode, outNode
+            goto RETURN
         end
-        if action.op.type == 'and' then
+        if     action.op.type == 'and' then
             topNode = self:_lookInto(action[1], topNode)
             topNode = self:_lookInto(action[2], topNode)
+        elseif action.op.type == 'or' then
+            outNode = outNode or topNode:copy()
+            local topNode1, outNode1 = self:_lookInto(action[1], topNode, outNode)
+            local topNode2, outNode2 = self:_lookInto(action[2], outNode1, outNode)
+            topNode = vm.createNode(topNode1, topNode2)
+            outNode = outNode2
         elseif action.op.type == '=='
         or     action.op.type == '~=' then
             local loc, checker
@@ -160,7 +167,13 @@ function mt:_lookInto(action, topNode, outNode)
                 end
             end
         end
+    elseif action.type == 'call' then
+        if action.node.special == 'assert' and action.args and action.args[1] then
+            topNode = self:_lookInto(action.args[1], topNode)
+        end
     end
+    ::RETURN::
+    topNode = self:_fastWard(action.finish, topNode)
     return topNode, outNode
 end
 

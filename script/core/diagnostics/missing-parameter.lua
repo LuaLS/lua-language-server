@@ -64,7 +64,7 @@ local function countCallArgs(source)
         return math.huge
     end
     if lastArg.type == 'call' then
-        result = result + countMaxReturns(lastArg) - 1
+        result = result + countMaxReturns(lastArg.node) - 1
     end
     result = result + #source.args
     return result

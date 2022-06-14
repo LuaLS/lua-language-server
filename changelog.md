@@ -9,8 +9,9 @@
   if x == -- suggest `CONST.X` and `CONST.Y` here
   ```
 * `FIX` with clients that support LSP 3.17 (VSCode), workspace diagnostics are triggered every time when opening a file.
+* `FIX` [#1204](https://github.com/sumneko/lua-language-server/issues/1204)
 
-## 3.2.5
+## 3.2.51204
 `2022-6-9`
 * `NEW` provide config docs in `LUA_LANGUAGE_SERVER/doc/`
 * `FIX` [#1148](https://github.com/sumneko/lua-language-server/issues/1148)

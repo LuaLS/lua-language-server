@@ -1579,3 +1579,17 @@ end
 
 x()
 ]]
+
+TEST [[
+---@meta
+
+---@param x fun()
+local function f1(x)
+end
+
+---@return fun()
+local function f2()
+end
+
+f1(f2())
+]]

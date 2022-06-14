@@ -1227,7 +1227,7 @@ m.register 'textDocument/diagnostic' {
         workspace.awaitReady(uri)
         local core = require 'provider.diagnostic'
         -- TODO: do some trick
-        core.refresh(uri)
+        core.doDiagnostic(uri)
 
         return {
             kind = 'unchanged',

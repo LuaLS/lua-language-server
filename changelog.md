@@ -8,6 +8,7 @@
 
   if x == -- suggest `CONST.X` and `CONST.Y` here
   ```
+* `FIX` with clients that support LSP 3.17 (VSCode), workspace diagnostics are triggered every time when opening a file.
 
 ## 3.2.5
 `2022-6-9`

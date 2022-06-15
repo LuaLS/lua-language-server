@@ -119,14 +119,16 @@ function mt:_lookInto(action, topNode, outNode)
         return topNode, outNode
     end
     if self._mark[action] then
-        return
+        return topNode, outNode
     end
     self._mark[action] = true
     local top = self._objs[self._index]
     if not top then
         return topNode, outNode
     end
-    if not guide.isInRange(action, top.finish) then
+    if  not guide.isInRange(action, top.finish)
+    -- trick for `local tp = type(x);if tp == 'string' then`
+    and action.type ~= 'binary' then
         return topNode, outNode
     end
     local set
@@ -220,6 +222,7 @@ function mt:_lookInto(action, topNode, outNode)
             end
             if  exp.type == 'getlocal'
             and exp.node == self._loc then
+                -- if x == y then
                 self:_fastWard(exp.finish, topNode:copy())
                 local checkerNode = vm.compileNode(checker)
                 if action.op.type == '==' then
@@ -240,6 +243,7 @@ function mt:_lookInto(action, topNode, outNode)
             and    exp.args[1]
             and    exp.args[1].type == 'getlocal'
             and    exp.args[1].node == self._loc then
+                -- if type(x) == 'string' then
                 self:_fastWard(exp.finish, topNode:copy())
                 if action.op.type == '==' then
                     topNode:narrow(checker[1])
@@ -250,6 +254,34 @@ function mt:_lookInto(action, topNode, outNode)
                     topNode:remove(checker[1])
                     if outNode then
                         outNode:narrow(checker[1])
+                    end
+                end
+            elseif exp.type == 'getlocal'
+            and    checker.type == 'string' then
+                local nodeValue = vm.getObjectValue(exp.node)
+                if  nodeValue
+                and nodeValue.type == 'select'
+                and nodeValue.sindex == 1 then
+                    local call = nodeValue.vararg
+                    if  call
+                    and call.type == 'call'
+                    and call.node.special == 'type'
+                    and call.args
+                    and call.args[1]
+                    and call.args[1].type == 'getlocal'
+                    and call.args[1].node == self._loc then
+                        -- `local tp = type(x);if tp == 'string' then`
+                        if action.op.type == '==' then
+                            topNode:narrow(checker[1])
+                            if outNode then
+                                outNode:remove(checker[1])
+                            end
+                        else
+                            topNode:remove(checker[1])
+                            if outNode then
+                                outNode:narrow(checker[1])
+                            end
+                        end
                     end
                 end
             end

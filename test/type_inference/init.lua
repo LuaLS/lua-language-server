@@ -2618,3 +2618,12 @@ if type(x) == 'function' then
     print(<?x?>)
 end
 ]]
+
+TEST 'integer' [[
+local x
+local tp = type(x)
+
+if tp == 'integer' then
+    print(<?x?>)
+end
+]]

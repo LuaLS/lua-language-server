@@ -33,6 +33,12 @@
   if type(x) == 'string' then
       print(x) -- `x` is `string` here
   end
+
+  local tp = type(x)
+
+  if tp == 'boolean' then
+      print(x) -- `x` is `boolean` here
+  end
   ```
 * `CHG` infer type by `>`/`<`/`>=`/`<=`
 * `FIX` with clients that support LSP 3.17 (VSCode), workspace diagnostics are triggered every time when opening a file.

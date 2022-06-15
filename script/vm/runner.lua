@@ -246,7 +246,7 @@ function mt:_lookInto(action, topNode, outNode)
         end
     else
         guide.eachSourceContain(action, top.finish, function(source)
-             self:_lookInto(source, topNode)
+            self:_lookInto(source, topNode)
         end)
     end
     ::RETURN::

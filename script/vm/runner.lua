@@ -153,6 +153,7 @@ function mt:_lookInto(action, topNode, outNode)
             local neverReturn = subBlock.hasReturn
                             or  subBlock.hasGoTo
                             or  subBlock.hasBreak
+                            or  subBlock.hasError
             if not neverReturn then
                 blockNodes[#blockNodes+1] = blockNode
             end

@@ -2548,3 +2548,14 @@ while <?t?> ~= nil do
     print(t)
 end
 ]]
+
+TEST 'integer' [[
+---@type integer?
+local n
+
+if not n then
+    error('n is nil')
+end
+
+print(<?n?>)
+]]

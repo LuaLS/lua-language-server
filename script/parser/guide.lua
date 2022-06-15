@@ -65,6 +65,7 @@ local type         = type
 ---@field hasGoTo?              true
 ---@field hasReturn?            true
 ---@field hasBreak?             true
+---@field hasError?             true
 ---@field _root                 parser.object
 
 ---@class guide

@@ -2818,6 +2818,17 @@ local function compileExpAsAction(exp)
     end
 
     if exp.type == 'call' then
+        if exp.node.special == 'error' then
+            for i = #Chunk, 1, -1 do
+                local block = Chunk[i]
+                if block.type == 'ifblock'
+                or block.type == 'elseifblock'
+                or block.type == 'else' then
+                    block.hasError = true
+                    break
+                end
+            end
+        end
         return exp
     end
 

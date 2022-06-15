@@ -8,6 +8,17 @@
 
   if x == -- suggest `CONST.X` and `CONST.Y` here
   ```
+* `CHG` infer type by `error`
+  ```lua
+  ---@type integer?
+  local n
+
+  if not n then
+      error('n is nil')
+  end
+
+  print(n) -- `n` is `integer` here
+  ```
 * `FIX` with clients that support LSP 3.17 (VSCode), workspace diagnostics are triggered every time when opening a file.
 * `FIX` [#1204](https://github.com/sumneko/lua-language-server/issues/1204)
 * `FIX` [#1208](https://github.com/sumneko/lua-language-server/issues/1208)

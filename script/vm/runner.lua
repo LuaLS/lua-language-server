@@ -8,6 +8,7 @@ local guide     = require 'parser.guide'
 ---@field _loc      parser.object
 ---@field _objs     parser.object[]
 ---@field _callback vm.runner.callback
+---@field _mark     table
 local mt = {}
 mt.__index = mt
 mt._index = 1
@@ -115,6 +116,17 @@ end
 ---@return vm.node
 function mt:_lookInto(action, topNode, outNode)
     if not action then
+        return topNode, outNode
+    end
+    if self._mark[action] then
+        return
+    end
+    self._mark[action] = true
+    local top = self._objs[self._index]
+    if not top then
+        return topNode, outNode
+    end
+    if not guide.isInRange(action, top.finish) then
         return topNode, outNode
     end
     local set
@@ -232,10 +244,10 @@ function mt:_lookInto(action, topNode, outNode)
                 self:_lookInto(arg, topNode)
             end
         end
-    elseif action.type == 'return' then
-        for _, rtn in ipairs(action) do
-            self:_lookInto(rtn, topNode)
-        end
+    else
+        guide.eachSourceContain(action, top.finish, function(source)
+             self:_lookInto(source, topNode)
+        end)
     end
     ::RETURN::
     topNode = self:_fastWard(action.finish, topNode)
@@ -275,6 +287,7 @@ function vm.launchRunner(loc, callback)
     local self = setmetatable({
         _loc      = loc,
         _objs     = {},
+        _mark     = {},
         _callback = callback,
     }, mt)
 

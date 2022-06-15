@@ -2559,3 +2559,24 @@ end
 
 print(<?n?>)
 ]]
+
+TEST 'table' [[
+---@type table?
+local n
+
+print((n and <?n?>.x))
+]]
+
+TEST 'table' [[
+---@type table?
+local n
+
+n = n and <?n?>.x or 1
+]]
+
+TEST 'table' [[
+---@type table?
+local n
+
+n = ff[n and <?n?>.x]
+]]

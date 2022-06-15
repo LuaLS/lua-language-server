@@ -10,7 +10,7 @@
   ```
 * `CHG` infer type by `error`
   ```lua
-  ---@type integer?
+  ---@type integer|nil
   local n
 
   if not n then
@@ -18,6 +18,13 @@
   end
 
   print(n) -- `n` is `integer` here
+  ```
+* `CHG` infer type by `t and t.x`
+  ```lua
+  ---@type table|nil
+  local t
+
+  local s = t and t.x or 1 -- `t` in `t.x` is `table`
   ```
 * `FIX` with clients that support LSP 3.17 (VSCode), workspace diagnostics are triggered every time when opening a file.
 * `FIX` [#1204](https://github.com/sumneko/lua-language-server/issues/1204)

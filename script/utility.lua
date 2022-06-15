@@ -158,8 +158,10 @@ function m.dump(tbl, option)
             local tp = type(value)
             local format = option['format'] and option['format'][key]
             if format then
-                lines[#lines+1] = ('%s%s%s,'):format(TAB[deep+1], keyWord, format(value, unpack, deep+1, stack))
-            elseif tp == 'table' then
+                value = format(value, unpack, deep+1, stack)
+                tp    = type(value)
+            end
+            if tp == 'table' then
                 if mark[value] and mark[value] > 0 then
                     lines[#lines+1] = ('%s%s%s,'):format(TAB[deep+1], keyWord, option['loop'] or '"<Loop>"')
                 elseif deep >= (option['deep'] or mathHuge) then

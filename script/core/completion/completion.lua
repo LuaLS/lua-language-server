@@ -1099,7 +1099,7 @@ local function tryLabelInString(label, source)
     if not source or source.type ~= 'string' then
         return label
     end
-    local state = parser.parse(label, 'String')
+    local state = parser.compile(label, 'String')
     if not state or not state.ast then
         return label
     end

@@ -1,7 +1,7 @@
 local m          = require 'lpeglabel'
 local re         = require 'parser.relabel'
 local guide      = require 'parser.guide'
-local parser     = require 'parser.newparser'
+local compile    = require 'parser.compile'
 local util       = require 'utility'
 
 local TokenTypes, TokenStarts, TokenFinishs, TokenContents, TokenMarks
@@ -1320,7 +1320,7 @@ local function trimTailComment(text)
         comment = text:sub(3)
     end
     if comment:find '^%s*[\'"[]' then
-        local state = parser(comment:gsub('^%s+', ''), 'String')
+        local state = compile(comment:gsub('^%s+', ''), 'String')
         if state and state.ast then
             comment = state.ast[1]
         end

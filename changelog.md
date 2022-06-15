@@ -10,6 +10,7 @@
   ```
 * `FIX` with clients that support LSP 3.17 (VSCode), workspace diagnostics are triggered every time when opening a file.
 * `FIX` [#1204](https://github.com/sumneko/lua-language-server/issues/1204)
+* `FIX` [#1208](https://github.com/sumneko/lua-language-server/issues/1208)
 
 ## 3.2.5
 `2022-6-9`

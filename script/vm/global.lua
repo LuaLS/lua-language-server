@@ -2,6 +2,7 @@ local util  = require 'utility'
 local scope = require 'workspace.scope'
 local guide = require 'parser.guide'
 local files = require 'files'
+local ws    = require 'workspace'
 ---@class vm
 local vm    = require 'vm.vm'
 
@@ -530,9 +531,11 @@ for uri in files.eachFile() do
     end
 end
 
+---@async
 files.watch(function (ev, uri)
     if ev == 'update' then
         dropUri(uri)
+        ws.awaitReady(uri)
         local state = files.getState(uri)
         if state then
             compileAst(state.ast)

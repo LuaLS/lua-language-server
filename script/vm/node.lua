@@ -224,6 +224,32 @@ function mt:remove(name)
     return self
 end
 
+---@param name string
+function mt:narrow(name)
+    if name ~= 'nil' and self.optional == true then
+        self.optional = nil
+    end
+    for index = #self, 1, -1 do
+        local c = self[index]
+        if (c.type == 'global' and c.cate == 'type' and c.name == name)
+        or (c.type == name)
+        or (c.type == 'doc.type.integer'  and (name == 'number' or name == 'integer'))
+        or (c.type == 'doc.type.boolean'  and name == 'boolean')
+        or (c.type == 'doc.type.table'    and name == 'table')
+        or (c.type == 'doc.type.array'    and name == 'table')
+        or (c.type == 'doc.type.function' and name == 'function') then
+            goto CONTINUE
+        end
+        table.remove(self, index)
+        self[c] = nil
+        ::CONTINUE::
+    end
+    if #self == 0 then
+        self[#self+1] = vm.getGlobal('type', name)
+    end
+    return self
+end
+
 ---@param node vm.node
 function mt:removeNode(node)
     for _, c in ipairs(node) do

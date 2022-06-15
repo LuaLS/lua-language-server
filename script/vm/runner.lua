@@ -208,30 +208,48 @@ function mt:_lookInto(action, topNode, outNode)
             outNode = outNode2
         elseif action.op.type == '=='
         or     action.op.type == '~=' then
-            local loc, checker
+            local exp, checker
             for i = 1, 2 do
-                if action[i].type == 'getlocal' and action[i].node == self._loc then
-                    loc = action[i]
-                    checker = action[3-i] -- Copilot tells me use `3-i` instead of `i%2+1`
-                elseif action[2].type == 'getlocal' and action[2].node == self._loc then
-                    loc = action[3-i]
+                if guide.isLiteral(action[i]) then
                     checker = action[i]
+                    exp     = action[3-i] -- Copilot tells me use `3-i` instead of `i%2+1`
                 end
             end
-            if loc then
-                self:_fastWard(loc.finish, topNode:copy())
-                if guide.isLiteral(checker) then
-                    local checkerNode = vm.compileNode(checker)
-                    if action.op.type == '==' then
-                        topNode = checkerNode
-                        if outNode then
-                            outNode:removeNode(topNode)
-                        end
-                    else
-                        topNode:removeNode(checkerNode)
-                        if outNode then
-                            outNode = checkerNode
-                        end
+            if not exp then
+                goto RETURN
+            end
+            if  exp.type == 'getlocal'
+            and exp.node == self._loc then
+                self:_fastWard(exp.finish, topNode:copy())
+                local checkerNode = vm.compileNode(checker)
+                if action.op.type == '==' then
+                    topNode = checkerNode
+                    if outNode then
+                        outNode:removeNode(topNode)
+                    end
+                else
+                    topNode:removeNode(checkerNode)
+                    if outNode then
+                        outNode = checkerNode
+                    end
+                end
+            elseif exp.type == 'call'
+            and    checker.type == 'string'
+            and    exp.node.special == 'type'
+            and    exp.args
+            and    exp.args[1]
+            and    exp.args[1].type == 'getlocal'
+            and    exp.args[1].node == self._loc then
+                self:_fastWard(exp.finish, topNode:copy())
+                if action.op.type == '==' then
+                    topNode:narrow(checker[1])
+                    if outNode then
+                        outNode:remove(checker[1])
+                    end
+                else
+                    topNode:remove(checker[1])
+                    if outNode then
+                        outNode:narrow(checker[1])
                     end
                 end
             end

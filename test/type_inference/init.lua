@@ -2580,3 +2580,37 @@ local n
 
 n = ff[n and <?n?>.x]
 ]]
+
+TEST 'integer' [[
+local x
+
+if type(x) == 'integer' then
+    print(<?x?>)
+end
+]]
+
+TEST 'boolean|integer' [[
+local x
+
+if type(x) == 'integer'
+or type(x) == 'boolean' then
+    print(<?x?>)
+end
+]]
+
+TEST 'fun()' [[
+---@type fun()?
+local x
+
+if type(x) == 'function' then
+    print(<?x?>)
+end
+]]
+
+TEST 'function' [[
+local x
+
+if type(x) == 'function' then
+    print(<?x?>)
+end
+]]

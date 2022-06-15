@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.3.0
+`2022-6-15`
 * `NEW` `LuaDoc` supports `` `CODE` ``
   ```lua
   ---@type `CONST.X` | `CONST.Y`

@@ -114,6 +114,9 @@ end
 ---@param outNode? vm.node
 ---@return vm.node
 function mt:_lookInto(action, topNode, outNode)
+    if not action then
+        return topNode, outNode
+    end
     local set
     local value = vm.getObjectValue(action)
     if value then
@@ -128,7 +131,9 @@ function mt:_lookInto(action, topNode, outNode)
         self:_launchBlock(action, topNode:copy())
     elseif action.type == 'while' then
         local blockNode, mainNode = self:_lookInto(action.filter, topNode:copy(), topNode:copy())
-        self:_fastWard(action.filter.finish, blockNode)
+        if action.filter then
+            self:_fastWard(action.filter.finish, blockNode)
+        end
         self:_launchBlock(action, blockNode:copy())
         topNode = mainNode
     elseif action.type == 'if' then
@@ -201,7 +206,7 @@ function mt:_lookInto(action, topNode, outNode)
                 end
             end
             if loc then
-                self:_fastWard(loc.finish, topNode)
+                self:_fastWard(loc.finish, topNode:copy())
                 if guide.isLiteral(checker) then
                     local checkerNode = vm.compileNode(checker)
                     if action.op.type == '==' then

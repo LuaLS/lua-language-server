@@ -2512,3 +2512,39 @@ TEST 'fun(x: fun(x: unknown))' [[
 ---@type xxx
 local <?t?>
 ]]
+
+TEST 'table' [[
+---@type table|nil
+local t
+
+while t do
+    print(<?t?>)
+end
+]]
+
+TEST 'table|nil' [[
+---@type table|nil
+local t
+
+while <?t?> do
+    print(t)
+end
+]]
+
+TEST 'table' [[
+---@type table|nil
+local t
+
+while t ~= nil do
+    print(<?t?>)
+end
+]]
+
+TEST 'table|nil' [[
+---@type table|nil
+local t
+
+while <?t?> ~= nil do
+    print(t)
+end
+]]

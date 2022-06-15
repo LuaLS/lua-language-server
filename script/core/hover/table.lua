@@ -154,7 +154,7 @@ local function getNodeMap(fields, keyMap)
     local nodeMap = {}
     for _, field in ipairs(fields) do
         local key = vm.getKeyName(field)
-        if not keyMap[key] then
+        if not key or not keyMap[key] then
             goto CONTINUE
         end
         await.delay()

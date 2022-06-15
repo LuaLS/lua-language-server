@@ -1786,6 +1786,36 @@ local compilerSwitch = util.switch()
                 return
             end
         end
+        if source.op.type == '>'
+        or source.op.type == '<'
+        or source.op.type == '>='
+        or source.op.type == '<=' then
+            local a = vm.getNumber(source[1])
+            local b = vm.getNumber(source[2])
+            if a and b then
+                local result
+                if source.op.type == '>' then
+                    result = a > b
+                elseif source.op.type == '<' then
+                    result = a < b
+                elseif source.op.type == '>=' then
+                    result = a >= b
+                elseif source.op.type == '<=' then
+                    result = a <= b
+                end
+                vm.setNode(source, {
+                    type   = 'boolean',
+                    start  = source.start,
+                    finish = source.finish,
+                    parent = source,
+                    [1]    = result,
+                })
+                return
+            else
+                vm.setNode(source, vm.declareGlobal('type', 'boolean'))
+                return
+            end
+        end
     end)
 
 ---@param source vm.object

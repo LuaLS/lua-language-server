@@ -154,6 +154,10 @@ TEST 'integer' [[
 <?x?> = ~ 1
 ]]
 
+TEST 'boolean' [[
+<?x?> = 1 < 2
+]]
+
 TEST 'integer' [[
 local a = true
 local b = 1

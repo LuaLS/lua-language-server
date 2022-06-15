@@ -133,6 +133,7 @@ MWS_UCONFIG_UPDATED     =
 'Configuração do usuário atualizada.'
 MWS_WCONFIG_UPDATED     =
 'Configuração do espaço de trabalho atualizado.'
+
 WORKSPACE_SKIP_LARGE_FILE =
 'Arquivo muito grande: {} ignorada. O limite de tamanho atualmente definido é: {} KB, e o tamanho do arquivo é: {} KB.'
 WORKSPACE_LOADING         =
@@ -145,6 +146,7 @@ WORKSPACE_NOT_ALLOWED     =
 'Seu espaço de trabalho foi definido para `{}`. Servidor da linguagem Lua recusou o carregamneto neste diretório. Por favor, cheque sua configuração. [aprenda mais aqui](https://github.com/sumneko/lua-language-server/wiki/Why-scanning-home-folder)'
 WORKSPACE_SCAN_TOO_MUCH   = -- TODO: need translate!
 'Mais do que {} arquivos foram escaneados. O diretório atual escaneado é `{}`. Por favor, confirmar se a configuração está correta'
+
 PARSER_CRASH            =
 'Parser quebrou! Últimas palavras: {}'
 PARSER_UNKNOWN          =
@@ -279,8 +281,10 @@ PARSER_LUADOC_ERROR_DIAG_MODE           =
 '<diagnostic mode> incorreto.'
 PARSER_LUADOC_MISS_LOCAL_NAME           =
 '<local name> esperado.'
+
 SYMBOL_ANONYMOUS        =
 '<Anonymous>'
+
 HOVER_VIEW_DOCUMENTS    =
 'Visualizar documentos'
 HOVER_DOCUMENT_LUA51    =
@@ -323,6 +327,7 @@ HOVER_WS_LOADING        =
 'Carregando espaço de trabalho: {} / {}'
 HOVER_AWAIT_TOOLTIP     =
 'Chamando a função assíncrona, a thread atual deve ser produzível'
+
 ACTION_DISABLE_DIAG     =
 'Desativar diagnósticos no espaço de trabalho ({}).'
 ACTION_MARK_GLOBAL      =
@@ -381,6 +386,7 @@ ACTION_MARK_ASYNC       =
 'Marque a função atual como assíncrona'
 ACTION_ADD_DICT         =
 'Adicione \'{}\' ao seu espaço de trabalho no '
+
 COMMAND_DISABLE_DIAG       =
 'Desativar diagnósticos.'
 COMMAND_MARK_GLOBAL        =
@@ -401,6 +407,7 @@ COMMAND_JSON_TO_LUA_FAILED =
 'Converção de JSON para Lua falhou: {}.'
 COMMAND_ADD_DICT           =
 'Adicione uma palavra ao dicionário'
+
 COMPLETION_IMPORT_FROM           =
 'Importa de {}.'
 COMPLETION_DISABLE_AUTO_REQUIRE  =
@@ -498,12 +505,14 @@ WINDOW_ASK_APPLY_LIBRARY         =
 'Você precisa configurar seu ambiente de trabalho como `{}`?'
 WINDOW_SEARCHING_IN_FILES        = -- TODO: need translate!
 'Procurando nos arquivos...'
+
 CONFIG_LOAD_FAILED               =
 'Não é possível ler o arquivo de configurações: {}'
 CONFIG_LOAD_ERROR                =
 'Configurando o erro de carregamento do arquivo: {}'
 CONFIG_TYPE_ERROR                =
 'O arquivo de configuração deve estar no formato LUA ou JSON: {}'
+
 PLUGIN_RUNTIME_ERROR             =
 [[
 Ocorreu um erro no plugin, envie o erro ao autor do plugin.
@@ -524,6 +533,7 @@ PLUGIN_TRUST_NO                  =
 [[
 Não carregue este plugin
 ]]
+
 CLI_CHECK_ERROR_TYPE =
 'O argumento do CHECK deve ser uma string, mas é {}'
 CLI_CHECK_ERROR_URI =
@@ -536,3 +546,451 @@ CLI_CHECK_SUCCESS =
 'Diagnóstico completo, nenhum problema encontrado'
 CLI_CHECK_RESULTS =
 'Diagnóstico completo, {} problemas encontrados, veja {}'
+
+LUADOC_DESC_CLASS = -- TODO: need translate!
+[=[
+Defines a class/table structure
+## Syntax
+`---@class <name> [: <parent>[, <parent>]...]`
+## Usage
+```
+---@class Manager: Person, Human
+Manager = {}
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#class)
+]=]
+LUADOC_DESC_TYPE = -- TODO: need translate!
+[=[
+Specify the type of a certain variable
+
+Default types: `nil`, `any`, `boolean`, `string`, `number`, `integer`,
+`function`, `table`, `thread`, `userdata`, `lightuserdata`
+
+(Custom types can be provided using `@alias`)
+
+## Syntax
+`---@type <type>[| [type]...`
+
+## Usage
+### General
+```
+---@type nil|table|myClass
+local Example = nil
+```
+
+### Arrays
+```
+---@type number[]
+local phoneNumbers = {}
+```
+
+### Enums
+```
+---@type "red"|"green"|"blue"
+local color = ""
+```
+
+### Tables
+```
+---@type table<string, boolean>
+local settings = {
+    disableLogging = true,
+    preventShutdown = false,
+}
+
+---@type { [string]: true }
+local x --x[""] is true
+```
+
+### Functions
+```
+---@type fun(mode?: "r"|"w"): string
+local myFunction
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#types-and-type)
+]=]
+LUADOC_DESC_ALIAS = -- TODO: need translate!
+[=[
+Create your own custom type that can be used with `@param`, `@type`, etc.
+
+## Syntax
+`---@alias <name> <type> [description]`\
+or
+```
+---@alias <name>
+---| 'value' [# comment]
+---| 'value2' [# comment]
+...
+```
+
+## Usage
+### Expand to other type
+```
+---@alias filepath string Path to a file
+
+---@param path filepath Path to the file to search in
+function find(path, pattern) end
+```
+
+### Enums
+```
+---@alias font-style
+---| '"underlined"' # Underline the text
+---| '"bold"' # Bolden the text
+---| '"italic"' # Make the text italicized
+
+---@param style font-style Style to apply
+function setFontStyle(style) end
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#alias)
+]=]
+LUADOC_DESC_PARAM = -- TODO: need translate!
+[=[
+Declare a function parameter
+
+## Syntax
+`@param <name>[?] <type> [comment]`
+
+## Usage
+### General
+```
+---@param url string The url to request
+---@param headers? table<string, string> HTTP headers to send
+---@param timeout? number Timeout in seconds
+function get(url, headers, timeout) end
+```
+
+### Variable Arguments
+```
+---@param base string The base to concat to
+---@param ... string The values to concat
+function concat(base, ...) end
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#param)
+]=]
+LUADOC_DESC_RETURN = -- TODO: need translate!
+[=[
+Declare a return value
+
+## Syntax
+`@return <type> [name] [description]`\
+or\
+`@return <type> [# description]`
+
+## Usage
+### General
+```
+---@return number
+---@return number # The green component
+---@return number b The blue component
+function hexToRGB(hex) end
+```
+
+### Type & name only
+```
+---@return number x, number y
+function getCoords() end
+```
+
+### Type only
+```
+---@return string, string
+function getFirstLast() end
+```
+
+### Return variable values
+```
+---@return string ... The tags of the item
+function getTags(item) end
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#return)
+]=]
+LUADOC_DESC_FIELD = -- TODO: need translate!
+[=[
+Decalare a field in a class/table. This allows you to provide more in-depth
+documentation for a table.
+
+## Syntax
+`---@field <name> <type> [description]`
+
+## Usage
+```
+---@class HTTP_RESPONSE
+---@field status HTTP_STATUS
+---@field headers table<string, string> The headers of the response
+
+---@class HTTP_STATUS
+---@field code number The status code of the response
+---@field message string A message reporting the status
+
+---@return HTTP_RESPONSE response The response from the server
+function get(url) end
+
+--This response variable has all of the fields defined above
+response = get("localhost")
+
+--Extension provided intellisense for the below assignment
+statusCode = response.status.code
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#field)
+]=]
+LUADOC_DESC_GENERIC = -- TODO: need translate!
+[=[
+Simulates generics. Generics can allow types to be re-used as they help define
+a "generic shape" that can be used with different types.
+
+## Syntax
+`---@generic <name> [:parent_type] [, <name> [:parent_type]]`
+
+## Usage
+### General
+```
+---@generic T
+---@param value T The value to return
+---@return T value The exact same value
+function echo(value)
+    return value
+end
+
+-- Type is string
+s = echo("e")
+
+-- Type is number
+n = echo(10)
+
+-- Type is boolean
+b = echo(true)
+
+-- We got all of this info from just using
+-- @generic rather than manually specifying
+-- each allowed type
+```
+
+### Capture name of generic type
+```
+---@class Foo
+local Foo = {}
+function Foo:Bar() end
+
+---@generic T
+---@param name `T` # the name generic type is captured here
+---@return T       # generic type is returned
+function Generic(name) end
+
+local v = Generic("Foo") -- v is an object of Foo
+```
+
+### How Lua tables use generics
+```
+---@class table<K, V>: { [K]: V }
+
+-- This is what allows us to create a table
+-- and intellisense keeps track of any type
+-- we give for key (K) or value (V)
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#generics-and-generic)
+]=]
+LUADOC_DESC_VARARG = -- TODO: need translate!
+[=[
+Primarily for legacy support for EmmyLua annotations. `@vararg` does not
+provide typing or allow descriptions.
+
+**You should instead use `@param` when documenting parameters (variable or not).**
+
+## Syntax
+`@vararg <type>`
+
+## Usage
+```
+---Concat strings together
+---@vararg string
+function concat(...) end
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#vararg)
+]=]
+LUADOC_DESC_OVERLOAD = -- TODO: need translate!
+[=[
+Allows defining of multiple function signatures.
+
+## Syntax
+`---@overload fun(<name>[: <type>] [, <name>[: <type>]]...)[: <type>[, <type>]...]`
+
+## Usage
+```
+---@overload fun(t: table, value: any): number
+function table.insert(t, position, value) end
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#overload)
+]=]
+LUADOC_DESC_DEPRECATED = -- TODO: need translate!
+[=[
+Marks a function as deprecated. This results in any deprecated function calls
+being ~~struck through~~.
+
+## Syntax
+`---@deprecated`
+
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#deprecated)
+]=]
+LUADOC_DESC_META = -- TODO: need translate!
+[=[
+Indicates that this is a meta file and should be used for definitions and intellisense only.
+
+There are 3 main distinctions to note with meta files:
+1. There won't be any context-based intellisense in a meta file
+2. Hovering a `require` filepath in a meta file shows `[meta]` instead of an absolute path
+3. The `Find Reference` function will ignore meta files
+
+## Syntax
+`---@meta`
+
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#meta)
+]=]
+LUADOC_DESC_VERSION = -- TODO: need translate!
+[=[
+Specifies Lua versions that this function is exclusive to.
+
+Lua versions: `5.1`, `5.2`, `5.3`, `5.4`, `JIT`.
+
+Requires configuring the `Diagnostics: Needed File Status` setting.
+
+## Syntax
+`---@version <version>[, <version>]...`
+
+## Usage
+### General
+```
+---@version JIT
+function onlyWorksInJIT() end
+```
+### Specify multiple versions
+```
+---@version <5.2,JIT
+function oldLuaOnly() end
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#version)
+]=]
+LUADOC_DESC_SEE = -- TODO: need translate!
+[=[
+Define something that can be viewed for more information
+
+## Syntax
+`---@see <text>`
+
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#see)
+]=]
+LUADOC_DESC_DIAGNOSTIC = -- TODO: need translate!
+[=[
+Enable/disable diagnostics for error/warnings/etc.
+
+Actions: `disable`, `enable`, `disable-line`, `disable-next-line`
+
+[Names](https://github.com/sumneko/lua-language-server/blob/cbb6e6224094c4eb874ea192c5f85a6cba099588/script/proto/define.lua#L54)
+
+## Syntax
+`---@diagnostic <action>[: <name>]`
+
+## Usage
+### Disable next line
+```
+---@diagnostic disable-next-line: undefined-global
+```
+
+### Manually toggle
+```
+---@diagnostic disable: unused-local
+local unused = "hello world"
+---@diagnostic enable: unused-local
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#diagnostic)
+]=]
+LUADOC_DESC_MODULE = -- TODO: need translate!
+[=[
+Provides the semantics of `reqire`.
+
+## Syntax
+`---@module <'module_name'>`
+
+## Usage
+```
+---@module 'string.utils'
+local stringUtils
+-- This is functionally the same as:
+local module = require('string.utils')
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#module)
+]=]
+LUADOC_DESC_ASYNC = -- TODO: need translate!
+[=[
+Marks a function as asynchronous.
+
+## Syntax
+`---@async`
+
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#async)
+]=]
+LUADOC_DESC_NODISCARD = -- TODO: need translate!
+[=[
+Prevents this function's return values from being discarded/ignored.
+This will raise the `discard-returns` warning should the return values
+be ignored.
+
+## Syntax
+`---@nodiscard`
+
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#nodiscard)
+]=]
+LUADOC_DESC_CAST = -- TODO: need translate!
+[=[
+Allows type casting (type conversion).
+
+⚠️ **Not Finalized**
+
+## Syntax
+`@cast <variable> <[+|-]type>[, <[+|-]type>]...`
+
+## Usage
+### Overwrite type
+```
+---@type integer
+local x --> integer
+
+---@cast x string
+print(x) --> string
+```
+### Add Type
+```
+---@type string
+local x --> string
+
+---@cast x +boolean, +number
+print(x) --> string|boolean|number
+```
+### Remove Type
+```
+---@type string|table
+local x --> string|table
+
+---@cast x -string
+print(x) --> table
+```
+---
+[View Proposal](https://github.com/sumneko/lua-language-server/issues/1030)
+]=]

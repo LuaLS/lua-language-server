@@ -31,7 +31,7 @@
   local x
 
   if type(x) == 'string' then
-    print(x) -- `x` is `string` here
+      print(x) -- `x` is `string` here
   end
   ```
 * `FIX` with clients that support LSP 3.17 (VSCode), workspace diagnostics are triggered every time when opening a file.

@@ -24,6 +24,10 @@ return function (uri, callback)
         if call and call.type == 'call' and call.node == src then
             checkNil = true
         end
+        local setIndex = src.parent
+        if setIndex and setIndex.type == 'setindex' and setIndex.index == src then
+            checkNil = true
+        end
         if not checkNil then
             return
         end

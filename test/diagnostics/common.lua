@@ -1561,6 +1561,14 @@ S = <!x!>()
 ]]
 
 TEST [[
+---@type integer?
+local x
+
+T = {}
+T[<!x!>] = 1
+]]
+
+TEST [[
 local x, y
 local z = x and y
 

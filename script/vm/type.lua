@@ -39,7 +39,7 @@ function vm.isSubNode(child, parent, mark)
     mark = mark or {}
     local childName  = getNodeName(child)
     local parentName = getNodeName(parent)
-    if childName == 'any'
+    if childName  == 'any'
     or parentName == 'any' then
         return true
     end

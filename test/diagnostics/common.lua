@@ -1617,3 +1617,30 @@ local x
 
 <!x!> = true
 ]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@type unknown
+local x
+
+x = nil
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@type unknown
+local x
+
+x = 1
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@type unknown|nil
+local x
+
+x = 1
+]]

@@ -16,8 +16,12 @@ return function (uri, callback)
         if not loc.ref then
             return
         end
+        await.delay()
         local locNode = vm.compileNode(loc)
         if not locNode:getData 'hasDefined' then
+            return
+        end
+        if vm.getInfer(loc):hasUnknown(uri) then
             return
         end
         for _, ref in ipairs(loc.ref) do

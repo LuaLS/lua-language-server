@@ -49,7 +49,8 @@ m.DiagnosticDefaultSeverity = {
     ['not-yieldable']           = 'Warning',
     ['discard-returns']         = 'Warning',
     ['need-check-nil']          = 'Warning',
-    ['type-check']              = 'Warning',
+    ['cast-local-type']         = 'Warning',
+    ['type-check-assign']       = 'Warning',
 
     ['duplicate-doc-alias']     = 'Warning',
     ['undefined-doc-class']     = 'Warning',
@@ -111,7 +112,8 @@ m.DiagnosticDefaultNeededFileStatus = {
     ['not-yieldable']           = 'None',
     ['discard-returns']         = 'Opened',
     ['need-check-nil']          = 'Opened',
-    ['type-check']              = 'None',
+    ['cast-local-type']         = 'Any',
+    ['type-check-assign']       = 'Any',
 
     ['duplicate-doc-alias']     = 'Any',
     ['undefined-doc-class']     = 'Any',

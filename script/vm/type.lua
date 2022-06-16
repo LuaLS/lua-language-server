@@ -1,6 +1,55 @@
 ---@class vm
 local vm        = require 'vm.vm'
 
+---@param object vm.object
+---@return string?
+local function getNodeName(object)
+    if object.type == 'global' and object.cate == 'type' then
+        return object.name
+    end
+    if object.type == 'nil'
+    or object.type == 'boolean'
+    or object.type == 'number'
+    or object.type == 'string'
+    or object.type == 'table'
+    or object.type == 'function'
+    or object.type == 'integer' then
+        return object.type
+    end
+    if object.type == 'doc.type.boolean' then
+        return 'boolean'
+    end
+    if object.type == 'doc.type.integer' then
+        return 'integer'
+    end
+    if object.type == 'doc.type.function' then
+        return 'function'
+    end
+    if object.type == 'doc.type.table' then
+        return 'table'
+    end
+    return nil
+end
+
+---@param child  vm.object
+---@param parent vm.object
+---@param mark?  table
+---@return boolean
+function vm.isSubNode(child, parent, mark)
+    mark = mark or {}
+    local childName  = getNodeName(child)
+    local parentName = getNodeName(parent)
+    if childName == 'any' or parentName == 'any' then
+        return true
+    end
+
+    if childName == parentName then
+        return true
+    end
+
+    return false
+end
+
 ---@param uri uri
 ---@param child  vm.node|string
 ---@param parent vm.node|string
@@ -19,49 +68,36 @@ function vm.isSubType(uri, child, parent, mark)
     end
 
     mark = mark or {}
-    for obj in child:eachObject() do
-        if obj.type ~= 'global'
-        or obj.cate ~= 'type' then
-            goto CONTINUE_CHILD
-        end
-        if mark[obj.name] then
-            return false
-        end
-        mark[obj.name] = true
-        for parentNode in parent:eachObject() do
-            if parentNode.type ~= 'global'
-            or parentNode.cate ~= 'type' then
-                goto CONTINUE_PARENT
-            end
-            if parentNode.name == 'any' or obj.name == 'any' then
-                return true
+    for childNode in child:eachObject() do
+        if not mark[childNode] then
+            mark[childNode] = true
+            for parentNode in parent:eachObject() do
+                if vm.isSubNode(childNode, parentNode, mark) then
+                    return true
+                end
             end
 
-            if parentNode.name == obj.name then
-                return true
-            end
-
-            for _, set in ipairs(obj:getSets(uri)) do
-                if set.type == 'doc.class' and set.extends then
-                    for _, ext in ipairs(set.extends) do
-                        if  ext.type == 'doc.extends.name'
-                        and vm.isSubType(uri, ext[1], parentNode.name, mark) then
-                            return true
+            if childNode.type == 'global' and childNode.cate == 'type' then
+                for _, set in ipairs(childNode:getSets(uri)) do
+                    if set.type == 'doc.class' and set.extends then
+                        for _, ext in ipairs(set.extends) do
+                            if  ext.type == 'doc.extends.name'
+                            and vm.isSubType(uri, ext[1], parent, mark) then
+                                return true
+                            end
                         end
                     end
-                end
-                if set.type == 'doc.alias' and set.extends then
-                    for _, ext in ipairs(set.extends.types) do
-                        if  ext.type == 'doc.type.name'
-                        and vm.isSubType(uri, ext[1], parentNode.name, mark) then
-                            return true
+                    if set.type == 'doc.alias' and set.extends then
+                        for _, ext in ipairs(set.extends.types) do
+                            if  ext.type == 'doc.type.name'
+                            and vm.isSubType(uri, ext[1], parent, mark) then
+                                return true
+                            end
                         end
                     end
                 end
             end
-            ::CONTINUE_PARENT::
         end
-        ::CONTINUE_CHILD::
     end
 
     return false

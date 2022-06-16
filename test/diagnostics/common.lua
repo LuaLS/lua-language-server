@@ -1601,3 +1601,10 @@ end
 
 f1(f2())
 ]]
+
+TEST [[
+---@diagnostic disable: unused-local
+local x = 0
+
+<!x!> = true
+]]

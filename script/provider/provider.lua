@@ -265,6 +265,7 @@ m.register 'textDocument/didClose' {
 }
 
 m.register 'textDocument/didChange' {
+    ---@async
     function (params)
         local doc      = params.textDocument
         local scheme   = furi.split(doc.uri)
@@ -274,7 +275,11 @@ m.register 'textDocument/didChange' {
         end
         local changes = params.contentChanges
         local uri     = files.getRealUri(doc.uri)
-        local text = files.getOriginText(uri) or ''
+        local text = files.getOriginText(uri)
+        if not text then
+            files.setText(uri, pub.awaitTask('loadFile', furi.decode(uri)), false)
+            return
+        end
         local rows = files.getCachedRows(uri)
         text, rows = tm(text, rows, changes)
         files.setText(uri, text, true, function (file)

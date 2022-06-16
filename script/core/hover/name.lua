@@ -20,7 +20,7 @@ local function asField(source, oop)
     local class
     if source.node.type ~= 'getglobal' then
         class = vm.getInfer(source.node):viewClass()
-        if class == 'any' then
+        if class == 'any' or class == 'unknown' then
             class = nil
         end
     end

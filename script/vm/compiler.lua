@@ -667,7 +667,7 @@ local function selectNode(source, list, index)
             if list[i] then
                 local last = list[i]
                 if last.type == 'call'
-                or last.type == '...' then
+                or last.type == 'varargs' then
                     index = index - i + 1
                     exp = last
                 end
@@ -1376,9 +1376,11 @@ local compilerSwitch = util.switch()
         local hasMarkDoc
         if func.bindDocs then
             local sign = getObjectSign(func)
+            local lastReturn
             for _, doc in ipairs(func.bindDocs) do
                 if doc.type == 'doc.return' then
                     for _, rtn in ipairs(doc.returns) do
+                        lastReturn = rtn
                         if rtn.returnIndex == index then
                             hasMarkDoc = true
                             local hasGeneric
@@ -1396,11 +1398,17 @@ local compilerSwitch = util.switch()
                     end
                 end
             end
+            if lastReturn and not hasMarkDoc and lastReturn.types[1][1] == '...' then
+                vm.setNode(source, vm.getGlobal('type', 'unknown'))
+            end
         end
         if func.returns and not hasMarkDoc then
             for _, rtn in ipairs(func.returns) do
                 selectNode(source, rtn, index)
             end
+        end
+        if vm.getNode(source):isEmpty() then
+            vm.setNode(source, vm.getGlobal('type', 'nil'))
         end
     end)
     : case 'main'

@@ -1608,3 +1608,12 @@ local x = 0
 
 <!x!> = true
 ]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@type integer
+local x
+
+<!x!> = true
+]]

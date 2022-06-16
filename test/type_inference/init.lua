@@ -2650,3 +2650,10 @@ x = call(x)
 
 print(<?x?>)
 ]]
+
+TEST 'nil' [[
+local function f()
+end
+
+local <?x?> = f()
+]]

@@ -1644,3 +1644,22 @@ local x
 
 x = 1
 ]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+local x = {}
+
+x = nil
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@class A
+
+---@type A
+local x
+
+x = nil
+]]

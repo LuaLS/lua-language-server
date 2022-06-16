@@ -168,9 +168,6 @@ end
 ---@async
 function mt:scan(path, callback, hook)
     local files = {}
-    if type(callback) ~= 'function' then
-        callback = nil
-    end
     local list = {}
 
     ---@async

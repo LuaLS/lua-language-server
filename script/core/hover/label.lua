@@ -56,9 +56,9 @@ local function asValue(source, title)
         or type == 'any'
         or type == 'unknown'
         or type == 'nil') then
-        type = nil
+    else
+        pack[#pack+1] = type
     end
-    pack[#pack+1] = type
     if literal then
         pack[#pack+1] = '='
         pack[#pack+1] = literal

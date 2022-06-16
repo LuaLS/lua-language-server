@@ -24,21 +24,28 @@ return function (uri, callback)
         if vm.getInfer(loc):hasUnknown(uri) then
             return
         end
+        local canSetNil =  vm.getInfer(loc):hasClass(uri)
+                        or vm.getInfer(loc):hasType(uri, 'table')
         for _, ref in ipairs(loc.ref) do
             if ref.type == 'setlocal' then
                 await.delay()
                 local refNode = vm.compileNode(ref)
-                if not vm.isSubType(uri, refNode, locNode) then
-                    callback {
-                        start   = ref.start,
-                        finish  = ref.finish,
-                        message = lang.script('DIAG_CAST_LOCAL_TYPE', {
-                            loc = vm.getInfer(locNode):view(uri),
-                            ref = vm.getInfer(refNode):view(uri),
-                        }),
-                    }
+                if canSetNil and vm.getInfer(ref):view(uri) == 'nil' then
+                    goto CONTINUE
                 end
+                if vm.isSubType(uri, refNode, locNode) then
+                    goto CONTINUE
+                end
+                callback {
+                    start   = ref.start,
+                    finish  = ref.finish,
+                    message = lang.script('DIAG_CAST_LOCAL_TYPE', {
+                        loc = vm.getInfer(locNode):view(uri),
+                        ref = vm.getInfer(refNode):view(uri),
+                    }),
+                }
             end
+            ::CONTINUE::
         end
     end)
 end

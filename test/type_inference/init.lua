@@ -2637,3 +2637,16 @@ else
     print(<?x?>)
 end
 ]]
+
+TEST 'B' [[
+---@class A
+---@class B
+
+---@type A
+local x
+
+---@type B
+x = call(x)
+
+print(<?x?>)
+]]

@@ -296,10 +296,12 @@ function mt:_lookInto(action, topNode, outNode)
         end
     elseif action.type == 'paren' then
         topNode, outNode = self:_lookInto(action.exp, topNode, outNode)
-    else
-        guide.eachSourceContain(action, top.finish, function(source)
-            self:_lookInto(source, topNode)
-        end)
+    elseif action.type == 'return' then
+        for _, rtn in ipairs(action) do
+            self:_lookInto(rtn, topNode)
+        end
+    elseif action.type == 'getindex' then
+        self:_lookInto(action.index, topNode)
     end
     ::RETURN::
     topNode = self:_fastWard(action.finish, topNode)

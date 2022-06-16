@@ -294,6 +294,8 @@ function mt:_lookInto(action, topNode, outNode)
                 self:_lookInto(arg, topNode)
             end
         end
+    elseif action.type == 'paren' then
+        topNode, outNode = self:_lookInto(action.exp, topNode, outNode)
     else
         guide.eachSourceContain(action, top.finish, function(source)
             self:_lookInto(source, topNode)

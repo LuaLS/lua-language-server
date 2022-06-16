@@ -1,5 +1,8 @@
 # changelog
 
+## 3.3.1
+* `FIX` [#1215](https://github.com/sumneko/lua-language-server/issues/1215)
+
 ## 3.3.0
 `2022-6-15`
 * `NEW` `LuaDoc` supports `` `CODE` ``

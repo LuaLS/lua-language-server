@@ -2627,3 +2627,13 @@ if tp == 'integer' then
     print(<?x?>)
 end
 ]]
+
+TEST 'integer' [[
+---@type integer?
+local x
+
+if (x == nil) then
+else
+    print(<?x?>)
+end
+]]

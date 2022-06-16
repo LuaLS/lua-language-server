@@ -256,6 +256,7 @@ function m.isLiteral(obj)
         or tp == 'doc.type.integer'
         or tp == 'doc.type.boolean'
         or tp == 'doc.type.code'
+        or tp == 'doc.type.array'
 end
 
 --- 获取字面量

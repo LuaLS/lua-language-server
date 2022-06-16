@@ -2657,3 +2657,13 @@ end
 
 local <?x?> = f()
 ]]
+
+TEST 'integer[]' [[
+---@type integer[]
+local x
+if not x then
+    return
+end
+
+print(<?x?>)
+]]

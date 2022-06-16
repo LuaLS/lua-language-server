@@ -846,6 +846,44 @@ function vm.compileCallArg(arg, call, index)
     return vm.getNode(arg)
 end
 
+---@class parser.object
+---@field _iterator? table
+---@field _iterArgs? table
+---@field _iterVars? table<parser.object, vm.node>
+
+---@param source parser.object
+local function compileForVars(source)
+    if source._iterator then
+        return
+    end
+        --  for k, v in pairs(t) do
+        --> for k, v in iterator, status, initValue do
+        --> local k, v = iterator(status, initValue)
+    source._iterator = {
+        type = 'dummyfunc',
+        parent = source,
+    }
+    source._iterArgs = {{},{}}
+    source._iterVars = {}
+    -- iterator
+    selectNode(source._iterator,    source.exps, 1)
+    -- status
+    selectNode(source._iterArgs[1], source.exps, 2)
+    -- initValue
+    selectNode(source._iterArgs[2], source.exps, 3)
+    if source.keys then
+        for i, loc in ipairs(source.keys) do
+            local node = getReturn(source._iterator, i, source._iterArgs)
+            if node then
+                if i == 1 then
+                    node:removeOptional()
+                end
+                source._iterVars[loc] = node
+            end
+        end
+    end
+end
+
 ---@param source parser.object
 ---@return vm.node
 local function compileLocal(source)
@@ -917,12 +955,18 @@ local function compileLocal(source)
     end
     -- for x in ... do
     if source.parent.type == 'in' then
-        vm.compileNode(source.parent)
+        compileForVars(source.parent)
+        local keyNode = source.parent._iterVars[source]
+        if keyNode then
+            vm.setNode(source, keyNode)
+        end
     end
 
     -- for x = ... do
     if source.parent.type == 'loop' then
-        vm.compileNode(source.parent)
+        if source.parent.loc == source then
+            vm.setNode(source, vm.declareGlobal('type', 'integer'))
+        end
     end
 
     vm.getNode(source):setData('hasDefined', hasMarkDoc or hasMarkParam or hasMarkValue)
@@ -1410,42 +1454,6 @@ local compilerSwitch = util.switch()
             end
         end
         vm.setNode(source, node)
-    end)
-    : case 'in'
-    : call(function (source)
-        if not source._iterator then
-            --  for k, v in pairs(t) do
-            --> for k, v in iterator, status, initValue do
-            --> local k, v = iterator(status, initValue)
-            source._iterator = {
-                type = 'dummyfunc',
-                parent = source,
-            }
-            source._iterArgs = {{},{}}
-        end
-        -- iterator
-        selectNode(source._iterator,    source.exps, 1)
-        -- status
-        selectNode(source._iterArgs[1], source.exps, 2)
-        -- initValue
-        selectNode(source._iterArgs[2], source.exps, 3)
-        if source.keys then
-            for i, loc in ipairs(source.keys) do
-                local node = getReturn(source._iterator, i, source._iterArgs)
-                if node then
-                    if i == 1 then
-                        node:removeOptional()
-                    end
-                    vm.setNode(loc, node)
-                end
-            end
-        end
-    end)
-    : case 'loop'
-    : call(function (source)
-        if source.loc then
-            vm.setNode(source.loc, vm.declareGlobal('type', 'integer'))
-        end
     end)
     : case 'doc.type'
     : call(function (source)

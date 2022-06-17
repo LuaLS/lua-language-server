@@ -1684,6 +1684,23 @@ x = nil
 ]]
 
 TEST [[
+---@diagnostic disable: unused-local
+
+---@type table
+local x
+
+<!x!> = nil
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+local x
+
+x = nil
+]]
+
+TEST [[
 ---@diagnostic disable: unused-local, undefined-global
 
 ---@type integer
@@ -1775,6 +1792,23 @@ local t = {}
 
 local x = 0
 x = x + #t
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+local x = 0
+
+x = 1.0
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@type integer
+local x = 0
+
+<!x!> = 1.0
 ]]
 
 TEST [[

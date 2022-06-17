@@ -106,6 +106,7 @@ function mt:hasFalsy()
     return false
 end
 
+---@return boolean
 function mt:hasKnownType()
     for _, c in ipairs(self) do
         if c.type == 'global' and c.cate == 'type' then

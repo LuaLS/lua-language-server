@@ -24,13 +24,25 @@ return function (uri, callback)
         if vm.getInfer(loc):hasUnknown(uri) then
             return
         end
-        local canSetNil =  vm.getInfer(loc):hasClass(uri)
-                        or vm.getInfer(loc):hasType(uri, 'table')
+
+        -- allow `local x = {};x = nil`,
+        -- but not allow `local x ---@type table;x = nil`
+        local allowNil = vm.getInfer(loc):hasType(uri, 'table')
+                     and not locNode:hasType 'table'
+
+        -- allow `local x = 0;x = 1.0`,
+        -- but not allow `local x ---@type integer;x = 1.0`
+        local allowNumber = vm.getInfer(loc):hasType(uri, 'integer')
+                        and not locNode:hasType 'integer'
+
         for _, ref in ipairs(loc.ref) do
             if ref.type == 'setlocal' then
                 await.delay()
                 local refNode = vm.compileNode(ref)
-                if canSetNil and vm.getInfer(ref):view(uri) == 'nil' then
+                if allowNil and vm.isSubType(uri, refNode, 'nil') then
+                    goto CONTINUE
+                end
+                if allowNumber and vm.isSubType(uri, refNode, 'number') then
                     goto CONTINUE
                 end
                 if vm.isSubType(uri, refNode, locNode) then

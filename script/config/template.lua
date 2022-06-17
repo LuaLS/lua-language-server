@@ -87,9 +87,17 @@ register('Array', {}, function (self, value)
     return type(value) == 'table'
 end, function (self, value)
     local t = {}
-    for _, v in ipairs(value) do
-        if self.sub:checker(v) then
-            t[#t+1] = self.sub:loader(v)
+    if #value == 0 then
+        for k in pairs(value) do
+            if self.sub:checker(k) then
+                t[#t+1] = self.sub:loader(k)
+            end
+        end
+    else
+        for _, v in ipairs(value) do
+            if self.sub:checker(v) then
+                t[#t+1] = self.sub:loader(v)
+            end
         end
     end
     return t

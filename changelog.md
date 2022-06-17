@@ -8,10 +8,13 @@
   ```
 
 ## 3.3.1
+`2022-6-17`
 * `FIX` [#1213](https://github.com/sumneko/lua-language-server/issues/1213)
 * `FIX` [#1215](https://github.com/sumneko/lua-language-server/issues/1215)
 * `FIX` [#1217](https://github.com/sumneko/lua-language-server/issues/1217)
 * `FIX` [#1218](https://github.com/sumneko/lua-language-server/issues/1218)
+* `FIX` [#1220](https://github.com/sumneko/lua-language-server/issues/1220)
+* `FIX` [#1223](https://github.com/sumneko/lua-language-server/issues/1223)
 
 ## 3.3.0
 `2022-6-15`

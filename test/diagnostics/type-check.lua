@@ -1,164 +1,199 @@
 local config = require 'config'
 
-config.get(nil, 'Lua.diagnostics.neededFileStatus')['unused-local'] = 'None'
-TEST [[
----@param table     table
----@param metatable table
----@return table
-function Setmetatable(table, metatable) end
+config.add(nil, 'Lua.diagnostics.disable', 'unused-local')
+config.add(nil, 'Lua.diagnostics.disable', 'undefined-global')
 
-Setmetatable(<!1!>, {})
+TEST [[
+local x = 0
+
+<!x!> = true
 ]]
 
 TEST [[
----@param table     table
----@param metatable table
----@return table
-function Setmetatable(table, metatable) end
+---@type integer
+local x
 
-Setmetatable(<!'name'!>, {})
-
+<!x!> = true
 ]]
 
 TEST [[
----@param table     table
----@param metatable table
----@return table
-function Setmetatable(table, metatable) end
+---@type unknown
+local x
 
+x = nil
+]]
+
+TEST [[
+---@type unknown
+local x
+
+x = 1
+]]
+
+TEST [[
+---@type unknown|nil
+local x
+
+x = 1
+]]
+
+TEST [[
+local x = {}
+
+x = nil
+]]
+
+TEST [[
+---@type string
+local x
+
+<?x?> = nil
+]]
+
+TEST [[
+---@type string?
+local x
+
+x = nil
+]]
+
+TEST [[
 ---@type table
-local name
----@type function
-local mt
----err
-Setmetatable(name, <!mt!>)
+local x
+
+<!x!> = nil
 ]]
 
 TEST [[
----@param p1 string
----@param p2 number
----@return table
-local function func1(p1, p2) end
+local x
+
+x = nil
+]]
+
+TEST [[
+---@type integer
+local x
+
+---@type number
+<!x!> = f()
+]]
+
+TEST [[
+---@type number
+local x
+
+---@type integer
+x = f()
+]]
+
+TEST [[
+---@type number|boolean
+local x
 
 ---@type string
-local s
----@type table
+<!x!> = f()
+]]
+
+TEST [[
+---@type number|boolean
+local x
+
+---@type boolean
+x = f()
+]]
+
+TEST [[
+---@type number|boolean
+local x
+
+---@type boolean|string
+<!x!> = f()
+]]
+
+TEST [[
+---@type boolean
+local x
+
+if not x then
+    return
+end
+
+x = f()
+]]
+
+TEST [[
+---@type boolean
+local x
+
+---@type integer
+local y
+
+<!x!> = y
+]]
+
+TEST [[
+local y = true
+
+local x
+x = 1
+x = y
+]]
+
+TEST [[
+local t = {}
+
+local x = 0
+x = x + #t
+]]
+
+TEST [[
+local x = 0
+
+x = 1.0
+]]
+
+TEST [[
+---@type integer
+local x = 0
+
+<!x!> = 1.0
+]]
+
+do return end
+TEST [[
+---@diagnostic disable: unused-local
+
+---@class A
+---@field x integer
 local t
----err
-func1(s, <!t!>)
+
+<!t.x!> = true
 ]]
 
 TEST [[
----@class bird
----@field wing string
+---@diagnostic disable: unused-local
 
----@class eagle
----@field family bird
+---@class A
+---@field x integer
+local t
 
----@class chicken
----@field family bird
+---@type boolean
+local y
 
----@param bd eagle
-local function fly(bd) end
-
----@type chicken
-local h
-fly(<!h!>)
+<!t.x!> = y
 ]]
 
 TEST [[
----@overload fun(x: number, y: number)
----@param x boolean
----@param y boolean
-local function f(x, y) end
+---@diagnostic disable: unused-local
 
-f(true, true) -- OK
-f(0, 0) -- OK
+---@class A
+---@field x integer
+local t
 
+t = {
+    <!x!> = true
+}
 ]]
 
-TEST [[
----@class bird
-local m = {}
-setmetatable(m, {}) -- OK
-]]
-
-TEST [[
----@class childString: string
-local s
----@param name string
-local function f(name) end
-f(s)
-]]
-
-TEST [[
----@class childString: string
-
----@type string
-local s
----@param name childString
-local function f(name) end
-f(<!s!>)
-]]
-
-TEST [[
----@alias searchmode '"ref"'|'"def"'|'"field"'|'"allref"'|'"alldef"'|'"allfield"'
-
----@param mode   searchmode
-local function searchRefs(mode)end
-searchRefs('ref')
-]]
-
-TEST [[
----@class markdown
-local mt = {}
----@param language string
----@param text string|markdown
-function mt:add(language, text)
-    if not text then
-        return
-    end
-end
----@type markdown
-local desc
-
-desc:add('md', 'hover')
-]]
-
----可选参数和枚举
-TEST [[
----@param str string
----@param mode? '"left"'|'"right"'
----@return string
-local function trim(str, mode)
-    if mode == "left" then
-        print(1)
-    end
-end
-trim('str', 'left')
-trim('str', nil)
-]]
-
-config.get(nil, 'Lua.diagnostics.neededFileStatus')['unused-local'] = 'Any'
-
----不完整的函数参数定义，会跳过检查
-TEST [[
----@param mode string
-local function status(source, field, mode)
-    print(source, field, mode)
-end
-status(1, 2, 'name')
-]]
-
-
-TEST [[
----@alias range {start: number, end: number}
----@param uri string
----@param range range
-local function location(uri, range)
-    print(uri, range)
-end
----@type range
-local val = {}
-location('uri', val)
-]]
+config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
+config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

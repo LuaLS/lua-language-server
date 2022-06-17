@@ -112,6 +112,31 @@ function m.add(uri, key, value)
     return false
 end
 
+function m.remove(uri, key, value)
+    local unit = template[key]
+    if not unit then
+        return false
+    end
+    local list = m.getRaw(uri, key)
+    if type(list) ~= 'table' then
+        return false
+    end
+    local copyed = {}
+    for i, v in ipairs(list) do
+        if not util.equal(v, value) then
+            copyed[i] = v
+        end
+    end
+    local oldValue = m.get(uri, key)
+    m.set(uri, key, copyed)
+    local newValue = m.get(uri, key)
+    if not util.equal(oldValue, newValue) then
+        m.event(uri, key, newValue, oldValue)
+        return true
+    end
+    return false
+end
+
 function m.prop(uri, key, prop, value)
     local unit = template[key]
     if not unit then

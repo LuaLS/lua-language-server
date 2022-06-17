@@ -1418,11 +1418,12 @@ local compilerSwitch = util.switch()
                 end
             end
             if lastReturn and not hasMarkDoc and lastReturn.types[1][1] == '...' then
+                hasMarkDoc = true
                 vm.setNode(source, vm.getGlobal('type', 'unknown'))
             end
         end
+        local hasReturn
         if func.returns and not hasMarkDoc then
-            local hasReturn
             for _, rtn in ipairs(func.returns) do
                 if selectNode(source, rtn, index) then
                     hasReturn = true
@@ -1454,7 +1455,7 @@ local compilerSwitch = util.switch()
                 end
             end
         end
-        if vm.getNode(source):isEmpty() then
+        if not hasMarkDoc and not hasReturn then
             vm.setNode(source, vm.getGlobal('type', 'nil'))
         end
     end)

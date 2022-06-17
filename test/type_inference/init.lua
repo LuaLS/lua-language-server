@@ -2699,3 +2699,11 @@ end
 
 local <?n?> = f()
 ]]
+
+TEST 'unknown' [[
+local function f()
+    return t[k]
+end
+
+local <?n?> = f()
+]]

@@ -7,12 +7,13 @@ local util   = require 'utility'
 
 -- 把耗时最长的诊断放到最后面
 local diagSort = {
-    ['redundant-value']     = 100,
-    ['not-yieldable']       = 101,
-    ['deprecated']          = 102,
-    ['undefined-field']     = 103,
-    ['redundant-parameter'] = 104,
-    ['cast-local-type']     = 105,
+    ['redundant-value']      = 100,
+    ['not-yieldable']        = 101,
+    ['deprecated']           = 102,
+    ['undefined-field']      = 103,
+    ['redundant-parameter']  = 104,
+    ['cast-local-type']      = 105,
+    ['assign-type-mismatch'] = 106,
 }
 
 local diagList = {}

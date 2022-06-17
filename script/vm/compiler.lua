@@ -637,16 +637,14 @@ local function compileByLocalID(source)
             end
         end
     end
-    for _, src in ipairs(sources) do
-        if src.value then
-            if not hasMarkDoc or guide.isLiteral(src.value) then
-                if src.value.type ~= 'nil' then
-                    local valueNode = vm.compileNode(src.value)
-                    if valueNode:hasType 'unknown' then
-                        vm.setNode(source, valueNode:copy():remove 'unknown')
-                    else
-                        vm.setNode(source, valueNode)
-                    end
+    if not hasMarkDoc then
+        for _, src in ipairs(sources) do
+            if src.value and src.value.type ~= 'nil'  then
+                local valueNode = vm.compileNode(src.value)
+                if valueNode:hasType 'unknown' then
+                    vm.setNode(source, valueNode:copy():remove 'unknown')
+                else
+                    vm.setNode(source, valueNode)
                 end
             end
         end

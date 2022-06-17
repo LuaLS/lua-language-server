@@ -1007,7 +1007,7 @@ function mt2:method2() end
 local v
 ---@type Bar
 local v2
-v2 = v -- TODO 这里应该给警告
+<!v2!> = v
 v2:<!method1!>()
 v2:method2()
 ]]
@@ -1677,6 +1677,15 @@ x = nil
 ]]
 
 TEST [[
+---@diagnostic disable: unused-local
+
+---@type string?
+local x
+
+x = nil
+]]
+
+TEST [[
 ---@diagnostic disable: unused-local, undefined-global
 
 ---@type integer
@@ -1737,4 +1746,52 @@ if not x then
 end
 
 x = f()
+]]
+
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@type boolean
+local x
+
+---@type integer
+local y
+
+<!x!> = y
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@class A
+---@field x integer
+local t
+
+<!t.x!> = true
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@class A
+---@field x integer
+local t
+
+---@type boolean
+local y
+
+<!t.x!> = y
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@class A
+---@field x integer
+local t
+
+t = {
+    <!x!> = true
+}
 ]]

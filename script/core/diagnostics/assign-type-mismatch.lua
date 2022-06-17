@@ -5,6 +5,7 @@ local vm    = require 'vm'
 local await = require 'await'
 
 local checkTypes = {
+    'setlocal',
     'setglobal',
     'setfield',
     'setindex',
@@ -27,6 +28,12 @@ return function (uri, callback)
             return
         end
         await.delay()
+        if source.type == 'setlocal' then
+            local locNode = vm.compileNode(source.node)
+            if not locNode:getData 'hasDefined' then
+                return
+            end
+        end
         local varNode   = vm.compileNode(source)
         local valueNode = vm.compileNode(value)
         if vm.getInfer(varNode):hasUnknown(uri) then

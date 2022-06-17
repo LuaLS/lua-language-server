@@ -1086,6 +1086,18 @@ local binarySwich = util.switch()
                 [1]    =result,
             })
         else
+            if op == '+'
+            or op == '-'
+            or op == '*'
+            or op == '//'
+            or op == '%' then
+                local uri = guide.getUri(source)
+                if  vm.getInfer(source[1]):view(uri) == 'integer'
+                and vm.getInfer(source[2]):view(uri) == 'integer' then
+                    vm.setNode(source, vm.declareGlobal('type', 'integer'))
+                    return
+                end
+            end
             vm.setNode(source, vm.declareGlobal('type', 'number'))
         end
     end)

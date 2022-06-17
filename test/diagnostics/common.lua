@@ -1007,7 +1007,7 @@ function mt2:method2() end
 local v
 ---@type Bar
 local v2
-v2 = v
+<!v2!> = v
 v2:<!method1!>()
 v2:method2()
 ]]
@@ -1756,6 +1756,25 @@ local x
 local y
 
 <!x!> = y
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+local y = true
+
+local x
+x = 1
+x = y
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+local t = {}
+
+local x = 0
+x = x + #t
 ]]
 
 TEST [[

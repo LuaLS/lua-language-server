@@ -1601,3 +1601,15 @@ end
 
 f1(f2())
 ]]
+
+TEST [[
+---@meta
+
+---@type fun():integer
+local f
+
+---@param x integer
+local function foo(x) end
+
+foo(f())
+]]

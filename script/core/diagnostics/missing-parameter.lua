@@ -5,7 +5,7 @@ local lang   = require 'language'
 
 ---@param source parser.object
 ---@return integer
-local function countReturns(source)
+local function countReturnsOfFunction(source)
     local n = 0
 
     local docs = source.bindDocs
@@ -33,14 +33,25 @@ local function countReturns(source)
     return n
 end
 
+---@param source parser.object
+---@return integer
+local function countReturnsOfDocFunction(source)
+    return #source.returns
+end
+
 local function countMaxReturns(source)
     local hasFounded
     local n = 0
     for _, def in ipairs(vm.getDefs(source)) do
-        if def.type == 'doc.type.function'
-        or def.type == 'function' then
+        if def.type == 'function' then
             hasFounded = true
-            local rets = countReturns(def)
+            local rets = countReturnsOfFunction(def)
+            if rets > n then
+                n = rets
+            end
+        elseif def.type == 'doc.type.function' then
+            hasFounded = true
+            local rets = countReturnsOfDocFunction(def)
             if rets > n then
                 n = rets
             end

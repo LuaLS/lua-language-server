@@ -269,6 +269,17 @@ function mt:removeNode(node)
     end
 end
 
+---@param name string
+---@return boolean
+function mt:hasType(name)
+    for _, c in ipairs(self) do
+        if c.type == 'global' and c.cate == 'type' and c.name == name then
+            return true
+        end
+    end
+    return false
+end
+
 ---@return fun():vm.object
 function mt:eachObject()
     local i = 0

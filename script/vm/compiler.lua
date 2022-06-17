@@ -641,7 +641,12 @@ local function compileByLocalID(source)
         if src.value then
             if not hasMarkDoc or guide.isLiteral(src.value) then
                 if src.value.type ~= 'nil' then
-                    vm.setNode(source, vm.compileNode(src.value))
+                    local valueNode = vm.compileNode(src.value)
+                    if valueNode:hasType 'unknown' then
+                        vm.setNode(source, valueNode:copy():remove 'unknown')
+                    else
+                        vm.setNode(source, valueNode)
+                    end
                 end
             end
         end
@@ -1296,6 +1301,7 @@ local compilerSwitch = util.switch()
             return
         end
         compileByLocalID(source)
+        ---@type string|vm.node
         local key = guide.getKeyName(source)
         if key == nil and source.index then
             key = vm.compileNode(source.index)

@@ -2674,3 +2674,16 @@ local t
 
 local <?x?> = t.x
 ]]
+
+TEST 'integer' [[
+local function f()
+    return GG
+end
+
+local t
+
+t.x = 1
+t.x = f()
+
+print(t.<?x?>)
+]]

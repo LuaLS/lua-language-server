@@ -2667,3 +2667,10 @@ end
 
 print(<?x?>)
 ]]
+
+TEST 'unknown' [[
+---@type string[]
+local t
+
+local <?x?> = t.x
+]]

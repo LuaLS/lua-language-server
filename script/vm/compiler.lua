@@ -78,8 +78,13 @@ local searchFieldSwitch = util.switch()
             or not math.tointeger(key) then
                 return
             end
+            pushResult(source.node)
         end
-        pushResult(source.node)
+        if type(key) == 'table' then
+            if vm.isSubType(suri, key, 'integer') then
+                pushResult(source.node)
+            end
+        end
     end)
     : case 'doc.type.table'
     : call(function (suri, source, key, ref, pushResult)

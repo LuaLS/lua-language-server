@@ -1811,6 +1811,7 @@ local x = 0
 <!x!> = 1.0
 ]]
 
+do return end
 TEST [[
 ---@diagnostic disable: unused-local
 

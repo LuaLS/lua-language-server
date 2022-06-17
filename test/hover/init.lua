@@ -1939,3 +1939,11 @@ print(x.<?y?>)
 [[
 (field) x.y: unknown
 ]]
+
+TEST [[
+---@async
+x({}, <?function?> () end)
+]]
+[[
+(async) function ()
+]]

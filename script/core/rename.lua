@@ -183,7 +183,7 @@ local function ofField(source, newname, callback)
     local key  = guide.getKeyName(source)
     local refs = vm.getRefs(source)
     for _, ref in ipairs(refs) do
-            ofFieldThen(key, ref, newname, callback)
+        ofFieldThen(key, ref, newname, callback)
     end
 end
 

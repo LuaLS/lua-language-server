@@ -1471,17 +1471,26 @@ local function bindDocsBetween(sources, binded, bindSources, start, finish)
     end
 
     -- 从前往后进行绑定
+    local skipUntil
     for i = index, max do
         local src = sources[i]
         if src and src.start >= start then
             if src.start >= finish then
                 break
             end
+            if skipUntil then
+                if skipUntil > src.start then
+                    goto CONTINUE
+                else
+                    skipUntil = nil
+                end
+            end
             -- 遇到table后中断，处理以下情况：
             -- ---@type AAA
             -- local t = {x = 1, y = 2}
             if src.type == 'table' then
-                break
+                skipUntil = skipUntil or src.finish
+                goto CONTINUE
             end
             if src.start >= start then
                 if src.type == 'local'
@@ -1498,6 +1507,7 @@ local function bindDocsBetween(sources, binded, bindSources, start, finish)
                     bindSources[#bindSources+1] = src
                 end
             end
+            ::CONTINUE::
         end
     end
 end

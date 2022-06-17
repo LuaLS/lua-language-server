@@ -55,6 +55,13 @@ print(t.<!a!>)
 ]]
 
 TEST [[
+local t = {
+    <~a~> = 1
+}
+t.<!a!> = 1
+]]
+
+TEST [[
 t[<~'a'~>] = 1
 print(t.<!a!>)
 ]]

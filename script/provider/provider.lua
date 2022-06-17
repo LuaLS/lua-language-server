@@ -1018,7 +1018,7 @@ m.register '$/status/click' {
             for _, scp in ipairs(workspace.folders) do
                 diagnostic.diagnosticsScope(scp.uri, true)
             end
-        elseif result == 'Restart server' then
+        elseif result == 'Restart Server' then
             os.exit(0, true)
         end
     end

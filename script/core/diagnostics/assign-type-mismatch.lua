@@ -36,18 +36,16 @@ return function (uri, callback)
         end
         local varNode   = vm.compileNode(source)
         local valueNode = vm.compileNode(value)
-        if vm.getInfer(varNode):hasUnknown(uri) then
+        if vm.canCastType(uri, varNode, valueNode) then
             return
         end
-        if not vm.isSubType(uri, valueNode, varNode) then
-            callback {
-                start   = source.start,
-                finish  = source.finish,
-                message = lang.script('DIAG_ASSIGN_TYPE_MISMATCH', {
-                    loc = vm.getInfer(varNode):view(uri),
-                    ref = vm.getInfer(valueNode):view(uri),
-                }),
-            }
-        end
+        callback {
+            start   = source.start,
+            finish  = source.finish,
+            message = lang.script('DIAG_ASSIGN_TYPE_MISMATCH', {
+                loc = vm.getInfer(varNode):view(uri),
+                ref = vm.getInfer(valueNode):view(uri),
+            }),
+        }
     end)
 end

@@ -202,3 +202,37 @@ function vm.getTableKey(uri, tnode, vnode)
     end
     return result
 end
+
+---@param uri uri
+---@param defNode vm.node
+---@param refNode vm.node
+---@return boolean
+function vm.canCastType(uri, defNode, refNode)
+    local defInfer = vm.getInfer(defNode)
+
+    if defInfer:hasUnknown(uri) then
+        return true
+    end
+
+    -- allow `local x = {};x = nil`,
+    -- but not allow `local x ---@type table;x = nil`
+    local allowNil = defInfer:hasType(uri, 'table')
+                 and not defNode:hasType 'table'
+
+    -- allow `local x = 0;x = 1.0`,
+    -- but not allow `local x ---@type integer;x = 1.0`
+    local allowNumber = defInfer:hasType(uri, 'integer')
+                    and not defNode:hasType 'integer'
+
+    if allowNil and vm.isSubType(uri, refNode, 'nil') then
+        return true
+    end
+    if allowNumber and vm.isSubType(uri, refNode, 'number') then
+        return true
+    end
+    if vm.isSubType(uri, refNode, defNode) then
+        return true
+    end
+
+    return false
+end

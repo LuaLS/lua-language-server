@@ -5,7 +5,7 @@ local vm    = require 'vm.vm'
 
 ---@class parser.object
 ---@field _localID string
----@field _localIDs table<string, { sets: parser.object[], gets: parser.object[] }[]>
+---@field _localIDs table<string, { sets: parser.object[], gets: parser.object[] }>
 
 local compileLocalID, getLocal
 

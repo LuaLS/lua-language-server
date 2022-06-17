@@ -1675,3 +1675,66 @@ local x
 
 x = nil
 ]]
+
+TEST [[
+---@diagnostic disable: unused-local, undefined-global
+
+---@type integer
+local x
+
+---@type number
+<!x!> = f()
+]]
+
+TEST [[
+---@diagnostic disable: unused-local, undefined-global
+
+---@type number
+local x
+
+---@type integer
+x = f()
+]]
+
+TEST [[
+---@diagnostic disable: unused-local, undefined-global
+
+---@type number|boolean
+local x
+
+---@type string
+<!x!> = f()
+]]
+
+TEST [[
+---@diagnostic disable: unused-local, undefined-global
+
+---@type number|boolean
+local x
+
+---@type boolean
+x = f()
+]]
+
+TEST [[
+---@diagnostic disable: unused-local, undefined-global
+
+---@type number|boolean
+local x
+
+---@type boolean|string
+<!x!> = f()
+]]
+
+TEST [[
+---@diagnostic disable: unused-local, undefined-global
+
+---@type boolean
+local x
+
+if not x then
+    return
+end
+
+x = f()
+]]

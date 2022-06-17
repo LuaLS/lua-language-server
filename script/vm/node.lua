@@ -214,6 +214,8 @@ function mt:remove(name)
         or (c.type == name)
         or (c.type == 'doc.type.integer'  and (name == 'number' or name == 'integer'))
         or (c.type == 'doc.type.boolean'  and name == 'boolean')
+        or (c.type == 'doc.type.boolean'  and name == 'true'  and c[1] == true)
+        or (c.type == 'doc.type.boolean'  and name == 'false' and c[1] == false)
         or (c.type == 'doc.type.table'    and name == 'table')
         or (c.type == 'doc.type.array'    and name == 'table')
         or (c.type == 'doc.type.function' and name == 'function') then

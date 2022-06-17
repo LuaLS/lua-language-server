@@ -60,11 +60,11 @@ function vm.isSubType(uri, child, parent, mark)
         end
     elseif parent.type == 'vm.node' then
         for n in parent:eachObject() do
-            if getNodeName(n) and not vm.isSubType(uri, child, n, mark) then
-                return false
+            if getNodeName(n) and vm.isSubType(uri, child, n, mark) then
+                return true
             end
         end
-        return true
+        return false
     end
 
     local childName  = getNodeName(child)
@@ -75,6 +75,11 @@ function vm.isSubType(uri, child, parent, mark)
     end
 
     if childName == parentName then
+        return true
+    end
+
+    if (childName == 'true' or childName == 'false')
+    and parentName == 'boolean' then
         return true
     end
 

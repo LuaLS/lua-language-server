@@ -139,9 +139,9 @@ local function mergeDiags(a, b, c)
 end
 
 -- enable `push`, disable `clear`
-function m.clear(uri)
+function m.clear(uri, force)
     await.close('diag:' .. uri)
-    if m.cache[uri] == nil then
+    if m.cache[uri] == nil and not force then
         return
     end
     m.cache[uri] = nil
@@ -169,9 +169,15 @@ function m.clearCacheExcept(uris)
     end
 end
 
-function m.clearAll()
-    for luri in pairs(m.cache) do
-        m.clear(luri)
+function m.clearAll(force)
+    if force then
+        for luri in files.eachFile() do
+            m.clear(luri, force)
+        end
+    else
+        for luri in pairs(m.cache) do
+            m.clear(luri)
+        end
     end
 end
 

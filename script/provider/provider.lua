@@ -1019,6 +1019,8 @@ m.register '$/status/click' {
                 diagnostic.diagnosticsScope(scp.uri, true)
             end
         elseif result == 'Restart Server' then
+            local diag = require 'provider.diagnostic'
+            diag.clearAll(true)
             os.exit(0, true)
         end
     end

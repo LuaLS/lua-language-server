@@ -1007,7 +1007,7 @@ function mt2:method2() end
 local v
 ---@type Bar
 local v2
-<!v2!> = v
+v2 = v
 v2:<!method1!>()
 v2:method2()
 ]]
@@ -1668,12 +1668,10 @@ x = nil
 TEST [[
 ---@diagnostic disable: unused-local
 
----@class A
-
----@type A
+---@type string
 local x
 
-x = nil
+<?x?> = nil
 ]]
 
 TEST [[
@@ -1747,7 +1745,6 @@ end
 
 x = f()
 ]]
-
 
 TEST [[
 ---@diagnostic disable: unused-local

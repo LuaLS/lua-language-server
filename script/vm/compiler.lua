@@ -686,6 +686,7 @@ local function selectNode(source, list, index)
     if not exp then
         return nil
     end
+    ---@type vm.node?
     local result
     if exp.type == 'call' then
         result = getReturn(exp.node, index, exp.args)
@@ -694,29 +695,26 @@ local function selectNode(source, list, index)
             return vm.getNode(source)
         end
     else
+        ---@type vm.node
         result = vm.compileNode(exp)
+        if result and exp.type == 'varargs' and result:isEmpty() then
+            result:merge(vm.declareGlobal('type', 'unknown'))
+        end
     end
     if source.type == 'function.return' then
         -- remove any for returns
         local rtnNode = vm.createNode()
-        local hasKnownType
         for n in result:eachObject() do
             if guide.isLiteral(n) then
-                hasKnownType = true
                 rtnNode:merge(n)
             end
             if n.type == 'global' and n.cate == 'type' then
-                if  n.name ~= 'any'
-                and n.name ~= 'unknown' then
-                    hasKnownType = true
+                if  n.name ~= 'any' then
                     rtnNode:merge(n)
                 end
             else
                 rtnNode:merge(n)
             end
-        end
-        if not hasKnownType then
-            rtnNode:merge(vm.declareGlobal('type', 'unknown'))
         end
         vm.setNode(source, rtnNode)
         return rtnNode
@@ -1424,8 +1422,36 @@ local compilerSwitch = util.switch()
             end
         end
         if func.returns and not hasMarkDoc then
+            local hasReturn
             for _, rtn in ipairs(func.returns) do
-                selectNode(source, rtn, index)
+                if selectNode(source, rtn, index) then
+                    hasReturn = true
+                end
+            end
+            if hasReturn then
+                local hasKnownType
+                local hasUnknownType
+                for n in vm.getNode(source):eachObject() do
+                    if guide.isLiteral(n) then
+                        if n.type ~= 'nil' then
+                            hasKnownType = true
+                            break
+                        end
+                        goto CONTINUE
+                    end
+                    if n.type == 'global' and n.cate == 'type' then
+                        if n.name ~= 'nil' then
+                            hasKnownType = true
+                            break
+                        end
+                        goto CONTINUE
+                    end
+                    hasUnknownType = true
+                    ::CONTINUE::
+                end
+                if not hasKnownType and hasUnknownType then
+                    vm.setNode(source, vm.getGlobal('type', 'unknown'))
+                end
             end
         end
         if vm.getNode(source):isEmpty() then

@@ -1008,6 +1008,7 @@ m.register '$/status/click' {
         local titleDiagnostic = lang.script.WINDOW_LUA_STATUS_DIAGNOSIS_TITLE
         local result = client.awaitRequestMessage('Info', lang.script.WINDOW_LUA_STATUS_DIAGNOSIS_MSG, {
             titleDiagnostic,
+            DEVELOP and 'Restart Server',
         })
         if not result then
             return
@@ -1017,6 +1018,8 @@ m.register '$/status/click' {
             for _, scp in ipairs(workspace.folders) do
                 diagnostic.diagnosticsScope(scp.uri, true)
             end
+        elseif result == 'Restart server' then
+            os.exit(0, true)
         end
     end
 }

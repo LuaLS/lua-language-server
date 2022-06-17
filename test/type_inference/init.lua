@@ -2347,7 +2347,7 @@ end
 print(t)
 ]]
 
-TEST 'table|unknown' [[
+TEST 'table' [[
 local function f()
     if x then
         return y
@@ -2686,4 +2686,16 @@ t.x = 1
 t.x = f()
 
 print(t.<?x?>)
+]]
+
+TEST 'integer' [[
+local function f()
+    if X then
+        return X
+    else
+        return 1
+    end
+end
+
+local <?n?> = f()
 ]]

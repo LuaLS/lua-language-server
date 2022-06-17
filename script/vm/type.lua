@@ -31,12 +31,42 @@ local function getNodeName(object)
     return nil
 end
 
----@param child  vm.object
----@param parent vm.object
+---@param uri uri
+---@param child  vm.node|string|vm.object
+---@param parent vm.node|string|vm.object
 ---@param mark?  table
 ---@return boolean
-function vm.isSubNode(child, parent, mark)
+function vm.isSubType(uri, child, parent, mark)
     mark = mark or {}
+
+    if type(child) == 'string' then
+        child = vm.getGlobal('type', child)
+        if not child then
+            return false
+        end
+    elseif child.type == 'vm.node' then
+        for n in child:eachObject() do
+            if getNodeName(n) and not vm.isSubType(uri, n, parent, mark) then
+                return false
+            end
+        end
+        return true
+    end
+
+    if type(parent) == 'string' then
+        parent = vm.getGlobal('type', parent)
+        if not parent then
+            return false
+        end
+    elseif parent.type == 'vm.node' then
+        for n in parent:eachObject() do
+            if getNodeName(n) and not vm.isSubType(uri, child, n, mark) then
+                return false
+            end
+        end
+        return true
+    end
+
     local childName  = getNodeName(child)
     local parentName = getNodeName(parent)
     if childName  == 'any'
@@ -48,52 +78,16 @@ function vm.isSubNode(child, parent, mark)
         return true
     end
 
-    return false
-end
-
----@param uri uri
----@param child  vm.node|string
----@param parent vm.node|string
----@param mark?  table
----@return boolean
-function vm.isSubType(uri, child, parent, mark)
-    if type(parent) == 'string' then
-        parent = vm.createNode(vm.getGlobal('type', parent))
-    end
-    if type(child) == 'string' then
-        child = vm.createNode(vm.getGlobal('type', child))
-    end
-
-    if not child or not parent then
-        return false
-    end
-
-    mark = mark or {}
-    for childNode in child:eachObject() do
-        if not mark[childNode] then
-            mark[childNode] = true
-            for parentNode in parent:eachObject() do
-                if vm.isSubNode(childNode, parentNode, mark) then
-                    return true
-                end
-            end
-
-            if childNode.type == 'global' and childNode.cate == 'type' then
-                for _, set in ipairs(childNode:getSets(uri)) do
-                    if set.type == 'doc.class' and set.extends then
-                        for _, ext in ipairs(set.extends) do
-                            if  ext.type == 'doc.extends.name'
-                            and vm.isSubType(uri, ext[1], parent, mark) then
-                                return true
-                            end
-                        end
-                    end
-                    if set.type == 'doc.alias' and set.extends then
-                        for _, ext in ipairs(set.extends.types) do
-                            if  ext.type == 'doc.type.name'
-                            and vm.isSubType(uri, ext[1], parent, mark) then
-                                return true
-                            end
+    -- check class parent
+    if not mark[child] then
+        mark[child] = true
+        if child.type == 'global' and child.cate == 'type' then
+            for _, set in ipairs(child:getSets(uri)) do
+                if set.type == 'doc.class' and set.extends then
+                    for _, ext in ipairs(set.extends) do
+                        if  ext.type == 'doc.extends.name'
+                        and vm.isSubType(uri, ext[1], parent, mark) then
+                            return true
                         end
                     end
                 end

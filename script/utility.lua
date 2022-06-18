@@ -652,9 +652,6 @@ function m.trim(str, mode)
 end
 
 function m.expandPath(path)
-    if type(path) ~= 'string' then
-        return nil
-    end
     if path:sub(1, 1) == '~' then
         local home = getenv('HOME')
         if not home then -- has to be Windows

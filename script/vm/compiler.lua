@@ -1240,7 +1240,7 @@ local compilerSwitch = util.switch()
                         end
                     end
                 end
-                if src.value and guide.isLiteral(src.value) then
+                if src.value then
                     if src.value.type == 'table' then
                         vm.setNode(src, vm.createNode(src.value), true)
                     else

@@ -1008,8 +1008,8 @@ local v
 ---@type Bar
 local v2
 <!v2!> = v
-v2:<!method1!>()
-v2:method2()
+v2:method1()
+v2:<!method2!>()
 ]]
 
 TEST [[
@@ -1612,4 +1612,11 @@ local f
 local function foo(x) end
 
 foo(f())
+]]
+
+TEST [[
+---@type string|table
+local n
+
+print(n.x)
 ]]

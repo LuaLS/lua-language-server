@@ -57,7 +57,7 @@ function mt:_collect()
     end
 
     table.sort(self._objs, function (a, b)
-        return (a.range or a.finish) < (b.range or b.start)
+        return (a.range or a.start) < (b.range or b.start)
     end)
 end
 

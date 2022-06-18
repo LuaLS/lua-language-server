@@ -159,6 +159,17 @@ local x = 0
 <!x!> = 1.0
 ]]
 
+TEST [[
+---@class A
+
+local t = {}
+
+---@type A
+local a
+
+t = a
+]]
+
 do return end
 TEST [[
 ---@diagnostic disable: unused-local

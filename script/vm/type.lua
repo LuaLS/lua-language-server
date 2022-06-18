@@ -1,5 +1,6 @@
 ---@class vm
 local vm        = require 'vm.vm'
+local guide     = require 'parser.guide'
 
 ---@param object vm.object
 ---@return string?
@@ -50,11 +51,6 @@ function vm.isSubType(uri, child, parent, mark)
                 return false
             end
         end
-        if child:isOptional() then
-            if not vm.isSubType(uri, 'nil', parent, mark) then
-                return false
-            end
-        end
         return true
     end
 
@@ -90,6 +86,10 @@ function vm.isSubType(uri, child, parent, mark)
 
     if (childName == 'true' or childName == 'false')
     and parentName == 'boolean' then
+        return true
+    end
+
+    if parentName == 'table' and not guide.isBasicType(childName) then
         return true
     end
 

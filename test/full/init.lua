@@ -6,7 +6,7 @@ rawset(_G, 'TEST', true)
 
 function TEST(script)
     local clock = os.clock()
-    local state = parser.compile(script, 'Lua', 'Lua 5.3')
+    local state = parser.compile(script, 'Lua', 'Lua 5.4')
     state.compileClock = os.clock() - clock
     return state
 end

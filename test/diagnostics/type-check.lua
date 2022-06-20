@@ -274,5 +274,14 @@ local t = { true }
 t[1] = nil
 ]]
 
+TEST [[
+---@class A
+local t = {
+    x = 1
+}
+
+<!t.x!> = true
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

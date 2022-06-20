@@ -306,7 +306,7 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                                 if vm.isSubType(suri, typeName, fieldNode) then
                                     local nkey = '|' .. typeName
                                     if not searchedFields[nkey] then
-                                        pushResult(field)
+                                        pushResult(field, true)
                                         hasFounded[nkey] = true
                                     end
                                 end
@@ -317,16 +317,7 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                 -- check local field and global field
                 if not hasFounded[key] and set.bindSources then
                     for _, src in ipairs(set.bindSources) do
-                        searchFieldSwitch(src.type, suri, src, key, ref, function (field)
-                            local fieldKey = guide.getKeyName(field)
-                            if fieldKey then
-                                if  not searchedFields[fieldKey]
-                                and guide.isSet(field) then
-                                    hasFounded[fieldKey] = true
-                                    pushResult(field)
-                                end
-                            end
-                        end)
+                        local skipSetLocal
                         if src.value and src.value.type == 'table' then
                             searchFieldSwitch('table', suri, src.value, key, ref, function (field)
                                 local fieldKey = guide.getKeyName(field)
@@ -334,7 +325,22 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                                     if  not searchedFields[fieldKey]
                                     and guide.isSet(field) then
                                         hasFounded[fieldKey] = true
-                                        pushResult(field)
+                                        pushResult(field, true)
+                                        if src.type == 'local' then
+                                            skipSetLocal = true
+                                        end
+                                    end
+                                end
+                            end)
+                        end
+                        if not skipSetLocal then
+                            searchFieldSwitch(src.type, suri, src, key, ref, function (field)
+                                local fieldKey = guide.getKeyName(field)
+                                if fieldKey then
+                                    if  not searchedFields[fieldKey]
+                                    and guide.isSet(field) then
+                                        hasFounded[fieldKey] = true
+                                        pushResult(field, true)
                                     end
                                 end
                             end)
@@ -647,6 +653,7 @@ function vm.compileByParentNode(source, key, ref, pushResult)
         and node.cate == 'type'
         and not guide.isBasicType(node.name) then
             hasClass = true
+            break
         end
     end
     for node in parentNode:eachObject() do

@@ -141,7 +141,7 @@ function vm.getInteger(v)
 end
 
 ---@param v vm.object?
----@return integer?
+---@return string?
 function vm.getString(v)
     if not v then
         return nil

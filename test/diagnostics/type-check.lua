@@ -170,10 +170,15 @@ local a
 t = a
 ]]
 
+TEST [[
+local m = {}
+
+---@type integer[]
+m.ints = {}
+]]
+
 do return end
 TEST [[
----@diagnostic disable: unused-local
-
 ---@class A
 ---@field x integer
 local t
@@ -182,8 +187,6 @@ local t
 ]]
 
 TEST [[
----@diagnostic disable: unused-local
-
 ---@class A
 ---@field x integer
 local t
@@ -195,8 +198,6 @@ local y
 ]]
 
 TEST [[
----@diagnostic disable: unused-local
-
 ---@class A
 ---@field x integer
 local t

@@ -87,7 +87,6 @@ function string.lower(s) end
 ---@param s       string
 ---@param pattern string
 ---@param init?   integer
----@return string | number captured
 ---@return ... captured
 ---@nodiscard
 function string.match(s, pattern, init) end

@@ -58,8 +58,8 @@ function TEST(expect)
 
     local hover = core.byUri(sourceUri, sourcePos)
     assert(hover)
-    hover = tostring(hover):gsub('\r\n', '\n')
-    assert(eq(hover, expect.hover))
+    local content = tostring(hover):gsub('\r\n', '\n')
+    assert(eq(content, expect.hover))
 end
 
 TEST {

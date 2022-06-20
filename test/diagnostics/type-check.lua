@@ -260,5 +260,19 @@ local t = {}
 
 t[5] = nil
 ]]
+
+TEST [[
+---@type table<string, true>
+local t = {}
+
+t['x'] = nil
+]]
+
+TEST [[
+local t = { true }
+
+t[1] = nil
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

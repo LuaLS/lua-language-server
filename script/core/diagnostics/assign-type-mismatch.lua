@@ -43,7 +43,9 @@ return function (uri, callback)
             -- boolean[1] = nil
             local tnode = vm.compileNode(source.node)
             for n in tnode:eachObject() do
-                if n.type == 'doc.type.array' then
+                if n.type == 'doc.type.array'
+                or n.type == 'doc.type.table'
+                or n.type == 'table' then
                     return
                 end
             end

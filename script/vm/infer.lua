@@ -173,6 +173,9 @@ local viewNodeSwitch = util.switch()
         return ('fun(%s)%s'):format(argView, regView)
     end)
 
+---@class vm.node
+---@field lastInfer? vm.infer
+
 ---@param source parser.object | vm.node
 ---@return vm.infer
 function vm.getInfer(source)

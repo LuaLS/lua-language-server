@@ -14,7 +14,6 @@ mt.__index    = mt
 mt.id         = 0
 mt.type       = 'vm.node'
 mt.optional   = nil
-mt.lastInfer  = nil
 mt.data       = nil
 
 ---@param node vm.node | vm.object
@@ -310,6 +309,7 @@ function vm.setNode(source, node, cover)
         error('Can not set node to global')
     end
     if cover then
+        ---@cast node vm.node
         vm.nodeCache[source] = node
         return
     end

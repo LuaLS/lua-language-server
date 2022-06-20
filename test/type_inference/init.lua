@@ -296,7 +296,7 @@ end
 <?y?> = x()
 ]]
 
-TEST 'unknown' [[
+TEST 'unknown|nil' [[
 local function x()
     return nil
     return f()
@@ -2703,6 +2703,18 @@ local <?n?> = f()
 TEST 'unknown' [[
 local function f()
     return t[k]
+end
+
+local <?n?> = f()
+]]
+
+TEST 'integer|nil' [[
+local function f()
+    if x then
+        return
+    else
+        return 1
+    end
 end
 
 local <?n?> = f()

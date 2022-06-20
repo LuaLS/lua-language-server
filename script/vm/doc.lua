@@ -101,7 +101,7 @@ local function getDeprecated(value)
             return doc
         elseif doc.type == 'doc.version' then
             local valids = vm.getValidVersions(doc)
-            if not valids[config.get(guide.getUri(value), 'Lua.runtime.version')] then
+            if valids and not valids[config.get(guide.getUri(value), 'Lua.runtime.version')] then
                 value._deprecated = doc
                 return doc
             end

@@ -20,7 +20,6 @@ local m = {}
 m.watchList      = {}
 m.notifyCache    = {}
 m.assocVersion   = -1
-m.assocMatcher   = nil
 
 function m.reset()
     m.openMap        = {}

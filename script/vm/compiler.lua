@@ -639,7 +639,7 @@ local function compileByLocalID(source)
     end
     if not hasMarkDoc then
         for _, src in ipairs(sources) do
-            if src.value and src.value.type ~= 'nil'  then
+            if src.value then
                 local valueNode = vm.compileNode(src.value)
                 if valueNode:hasType 'unknown' then
                     vm.setNode(source, valueNode:copy():remove 'unknown')
@@ -684,21 +684,22 @@ local function selectNode(source, list, index)
         end
     end
     if not exp then
-        return nil
+        vm.setNode(source, vm.getGlobal('type', 'nil'))
+        return vm.getNode(source)
     end
     ---@type vm.node?
     local result
     if exp.type == 'call' then
         result = getReturn(exp.node, index, exp.args)
         if not result then
-            vm.setNode(source, vm.declareGlobal('type', 'unknown'))
+            vm.setNode(source, vm.getGlobal('type', 'unknown'))
             return vm.getNode(source)
         end
     else
         ---@type vm.node
         result = vm.compileNode(exp)
         if result and exp.type == 'varargs' and result:isEmpty() then
-            result:merge(vm.declareGlobal('type', 'unknown'))
+            result:merge(vm.getGlobal('type', 'unknown'))
         end
     end
     if source.type == 'function.return' then
@@ -1367,7 +1368,7 @@ local compilerSwitch = util.switch()
             if not hasMarkDoc or guide.isLiteral(source.value) then
                 if source.value.type == 'table' then
                     vm.setNode(source, source.value)
-                elseif source.value.type ~= 'nil' then
+                else
                     vm.setNode(source, vm.compileNode(source.value))
                 end
             end
@@ -1778,9 +1779,7 @@ local function compileByGlobal(source)
         for _, set in ipairs(global:getSets(uri)) do
             if set.value then
                 if not hasMarkDoc or guide.isLiteral(set.value) then
-                    if set.value.type ~= 'nil' then
-                        globalNode:merge(vm.compileNode(set.value))
-                    end
+                    globalNode:merge(vm.compileNode(set.value))
                 end
             end
             vm.setNode(set, globalNode)

@@ -317,7 +317,7 @@ m.register 'textDocument/hover' {
         end
         local pos = converter.unpackPosition(uri, params.position)
         local hover, source = core.byUri(uri, pos)
-        if not hover then
+        if not hover or not source then
             return nil
         end
         return {

@@ -48,7 +48,7 @@ local function checkSplitOneLine(results, uri, position, ch)
     end
 
     local fPosition, fSymbol = findForward(uri, position, 'end', '}')
-    if not fPosition then
+    if not fPosition or not fSymbol then
         return
     end
     local bPosition = findBackward(uri, position, 'then', 'do', ')', '{')

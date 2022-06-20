@@ -61,7 +61,7 @@ return function (uri, callback)
         callback {
             start   = ref.start,
             finish  = ref.finish,
-            message = lang.script('DIAG_CAST_LOCAL_TYPE', {
+            message = lang.script('DIAG_CAST_FIELD_TYPE', {
                 def = vm.getInfer(fieldNode):view(uri),
                 ref = vm.getInfer(ref.value):view(uri),
             }),

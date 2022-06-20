@@ -116,6 +116,12 @@ DIAG_UNDEFINED_DOC_PARAM              =
 '指向了未定义的参数 `{}`。'
 DIAG_UNKNOWN_DIAG_CODE                =
 '未知的诊断代号 `{}`。'
+DIAG_CAST_LOCAL_TYPE                  =
+'已显式定义变量的类型为 `{def}` ，不能再将其类型转换为 `{ref}`。'
+DIAG_CAST_FIELD_TYPE                  =
+'已显式定义字段的类型为 `{def}` ，不能再将其类型转换为 `{ref}`。'
+DIAG_ASSIGN_TYPE_MISMATCH             =
+'不能将类型 `{ref}` 赋值给类型 `{def}`。'
 
 MWS_NOT_SUPPORT         =
 '{} 目前还不支持多工作目录，我可能需要重启才能支持新的工作目录...'

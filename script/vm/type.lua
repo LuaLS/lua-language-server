@@ -87,12 +87,11 @@ function vm.isSubType(uri, child, parent, mark)
         return true
     end
 
-    if (childName == 'true' or childName == 'false')
-    and parentName == 'boolean' then
+    -- TODO: check duck
+    if parentName == 'table' and not guide.isBasicType(childName) then
         return true
     end
-
-    if parentName == 'table' and not guide.isBasicType(childName) then
+    if childName == 'table' and not guide.isBasicType(parentName) then
         return true
     end
 

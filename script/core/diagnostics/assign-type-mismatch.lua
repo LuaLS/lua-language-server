@@ -46,7 +46,7 @@ return function (uri, callback)
             start   = source.start,
             finish  = source.finish,
             message = lang.script('DIAG_ASSIGN_TYPE_MISMATCH', {
-                loc = vm.getInfer(varNode):view(uri),
+                def = vm.getInfer(varNode):view(uri),
                 ref = vm.getInfer(valueNode):view(uri),
             }),
         }

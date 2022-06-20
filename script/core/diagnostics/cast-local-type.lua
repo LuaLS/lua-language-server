@@ -34,7 +34,7 @@ return function (uri, callback)
                         start   = ref.start,
                         finish  = ref.finish,
                         message = lang.script('DIAG_CAST_LOCAL_TYPE', {
-                            loc = vm.getInfer(locNode):view(uri),
+                            def = vm.getInfer(locNode):view(uri),
                             ref = vm.getInfer(refNode):view(uri),
                         }),
                     }

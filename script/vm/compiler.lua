@@ -317,7 +317,7 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
 end
 
 ---@class parser.object
----@field _sign? vm.sign
+---@field _sign vm.sign|false
 
 ---@param source parser.object
 ---@return vm.sign?

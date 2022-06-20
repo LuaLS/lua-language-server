@@ -12,8 +12,8 @@ local vm    = require 'vm.vm'
 
 ---@class vm.global
 ---@field links table<uri, vm.global.link>
----@field setsCache table<uri, parser.object[]>
----@field getsCache table<uri, parser.object[]>
+---@field setsCache? table<uri, parser.object[]>
+---@field getsCache? table<uri, parser.object[]>
 ---@field cate vm.global.cate
 local mt = {}
 mt.__index = mt
@@ -128,7 +128,7 @@ local function createGlobal(name, cate)
 end
 
 ---@class parser.object
----@field _globalNode vm.global
+---@field _globalNode vm.global|false
 
 ---@type table<string, vm.global>
 local allGlobals = {}

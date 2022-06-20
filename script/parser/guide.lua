@@ -68,6 +68,7 @@ local type         = type
 ---@field hasReturn?            true
 ---@field hasBreak?             true
 ---@field hasError?             true
+---@field [integer]             parser.object|any
 ---@field _root                 parser.object
 
 ---@class guide

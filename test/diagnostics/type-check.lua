@@ -179,6 +179,16 @@ m.ints = {}
 
 TEST [[
 ---@class A
+---@field x A
+
+---@type A
+local t
+
+t.x = {}
+]]
+
+TEST [[
+---@class A
 ---@field x integer
 
 ---@type A

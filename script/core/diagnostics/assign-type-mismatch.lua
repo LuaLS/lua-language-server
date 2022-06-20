@@ -37,8 +37,18 @@ return function (uri, callback)
                 return
             end
         end
-        local varNode   = vm.compileNode(source)
         local valueNode = vm.compileNode(value)
+        if  source.type == 'setindex'
+        and vm.isSubType(uri, valueNode, 'nil') then
+            -- boolean[1] = nil
+            local tnode = vm.compileNode(source.node)
+            for n in tnode:eachObject() do
+                if n.type == 'doc.type.array' then
+                    return
+                end
+            end
+        end
+        local varNode   = vm.compileNode(source)
         if vm.canCastType(uri, varNode, valueNode) then
             return
         end

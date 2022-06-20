@@ -223,21 +223,21 @@ function vm.canCastType(uri, defNode, refNode)
         return true
     end
 
-    -- allow `local x = {};x = nil`,
-    -- but not allow `local x ---@type table;x = nil`
-    local allowNil = defInfer:hasType(uri, 'table')
-                 and not defNode:hasType 'table'
-
-    -- allow `local x = 0;x = 1.0`,
-    -- but not allow `local x ---@type integer;x = 1.0`
-    local allowNumber = defInfer:hasType(uri, 'integer')
-                    and not defNode:hasType 'integer'
-
-    if allowNil and vm.isSubType(uri, refNode, 'nil') then
-        return true
+    if vm.isSubType(uri, refNode, 'nil') then
+        -- allow `local x = {};x = nil`,
+        -- but not allow `local x ---@type table;x = nil`
+        if  defInfer:hasType(uri, 'table')
+        and not defNode:hasType 'table' then
+            return true
+        end
     end
-    if allowNumber and vm.isSubType(uri, refNode, 'number') then
-        return true
+    if vm.isSubType(uri, refNode, 'number') then
+        -- allow `local x = 0;x = 1.0`,
+        -- but not allow `local x ---@type integer;x = 1.0`
+        if  defInfer:hasType(uri, 'integer')
+        and not defNode:hasType 'integer' then
+            return true
+        end
     end
     if vm.isSubType(uri, refNode, defNode) then
         return true

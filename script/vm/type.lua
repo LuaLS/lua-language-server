@@ -32,6 +32,9 @@ local function getNodeName(object)
     if object.type == 'doc.type.array' then
         return 'table'
     end
+    if object.type == 'doc.type.string' then
+        return 'string'
+    end
     return nil
 end
 

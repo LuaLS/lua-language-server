@@ -254,5 +254,11 @@ local t = {
 }
 ]]
 
+TEST [[
+---@type boolean[]
+local t = {}
+
+t[5] = nil
+]]
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

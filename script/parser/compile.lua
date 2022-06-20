@@ -1641,13 +1641,14 @@ local function parseTable()
                         }
                     end
                     wantSep = true
-                    local eqRight = lastRightPosition()
                     skipSpace()
                     local fvalue = parseExp()
                     local tfield = {
                         type   = 'tablefield',
                         start  = name.start,
-                        finish = fvalue and fvalue.finish or eqRight,
+                        finish = name.finish,
+                        range  = fvalue and fvalue.finish,
+                        node   = tbl,
                         parent = tbl,
                         field  = name,
                         value  = fvalue,
@@ -1710,6 +1711,7 @@ local function parseTable()
             local tindex = parseIndex()
             skipSpace()
             tindex.type   = 'tableindex'
+            tindex.node   = tbl
             tindex.parent = tbl
             index = index + 1
             tbl[index] = tindex
@@ -1718,7 +1720,7 @@ local function parseTable()
                 local ivalue = parseExp()
                 if ivalue then
                     ivalue.parent = tindex
-                    tindex.finish = ivalue.finish
+                    tindex.range  = ivalue.finish
                     tindex.value  = ivalue
                 else
                     missExp()

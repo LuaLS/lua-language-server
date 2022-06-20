@@ -50,6 +50,7 @@ m.DiagnosticDefaultSeverity = {
     ['discard-returns']         = 'Warning',
     ['need-check-nil']          = 'Warning',
     ['cast-local-type']         = 'Warning',
+    ['cast-field-type']         = 'Warning',
     ['assign-type-mismatch']    = 'Warning',
 
     ['duplicate-doc-alias']     = 'Warning',
@@ -113,6 +114,7 @@ m.DiagnosticDefaultNeededFileStatus = {
     ['discard-returns']         = 'Opened',
     ['need-check-nil']          = 'Opened',
     ['cast-local-type']         = 'Any',
+    ['cast-field-type']         = 'Any',
     ['assign-type-mismatch']    = 'Any',
 
     ['duplicate-doc-alias']     = 'Any',

@@ -16,7 +16,7 @@ local checkTypes = {
 
 ---@async
 return function (uri, callback)
-    if not PREVIEW then
+    if not PREVIEW and not TEST then
         return
     end
     local state = files.getState(uri)

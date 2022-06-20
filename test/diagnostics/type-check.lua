@@ -177,10 +177,11 @@ local m = {}
 m.ints = {}
 ]]
 
-do return end
 TEST [[
 ---@class A
 ---@field x integer
+
+---@type A
 local t
 
 <!t.x!> = true
@@ -189,6 +190,8 @@ local t
 TEST [[
 ---@class A
 ---@field x integer
+
+---@type A
 local t
 
 ---@type boolean
@@ -200,9 +203,9 @@ local y
 TEST [[
 ---@class A
 ---@field x integer
-local t
 
-t = {
+---@type A
+local t = {
     <!x!> = true
 }
 ]]

@@ -6,6 +6,9 @@ local await = require 'await'
 
 ---@async
 return function (uri, callback)
+    if not PREVIEW then
+        return
+    end
     local state = files.getState(uri)
     if not state then
         return

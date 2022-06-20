@@ -1368,24 +1368,20 @@ local compilerSwitch = util.switch()
             hasMarkDoc = bindDocs(source)
         end
 
-        if source.value then
-            if not hasMarkDoc or guide.isLiteral(source.value) then
-                if source.value.type == 'table' then
-                    vm.setNode(source, source.value)
-                else
-                    vm.setNode(source, vm.compileNode(source.value))
-                end
-            end
-        end
-
         if not hasMarkDoc then
             vm.compileByParentNode(source.node, guide.getKeyName(source), false, function (src)
                 if src.type == 'doc.field'
                 or src.type == 'doc.type.field' then
+                    hasMarkDoc = true
                     vm.setNode(source, vm.compileNode(src))
                 end
             end)
         end
+
+        if not hasMarkDoc and source.value then
+            vm.setNode(source, vm.compileNode(source.value))
+        end
+
     end)
     : case 'field'
     : case 'method'

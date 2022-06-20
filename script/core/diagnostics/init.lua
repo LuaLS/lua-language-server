@@ -13,7 +13,6 @@ local diagSort = {
     ['undefined-field']      = 110,
     ['redundant-parameter']  = 110,
     ['cast-local-type']      = 120,
-    ['cast-field-type']      = 120,
     ['assign-type-mismatch'] = 120,
 }
 

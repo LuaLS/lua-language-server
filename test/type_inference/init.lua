@@ -2675,7 +2675,7 @@ local t
 local <?x?> = t.x
 ]]
 
-TEST 'integer' [[
+TEST 'integer|unknown' [[
 local function f()
     return GG
 end
@@ -2718,4 +2718,24 @@ local function f()
 end
 
 local <?n?> = f()
+]]
+
+TEST 'integer' [[
+---@class A
+---@field x integer
+local m
+
+m.<?x?> = true
+
+print(m.x)
+]]
+
+TEST 'integer' [[
+---@class A
+---@field x integer
+local m
+
+m.x = true
+
+print(m.<?x?>)
 ]]

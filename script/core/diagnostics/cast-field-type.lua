@@ -6,6 +6,7 @@ local await = require 'await'
 
 ---@async
 return function (uri, callback)
+    do return end
     if not PREVIEW and not TEST then
         return
     end
@@ -31,7 +32,10 @@ return function (uri, callback)
         for _, class in ipairs(vm.getDefs(parent)) do
             if class.type == 'doc.class' then
                 vm.getClassFields(uri, vm.getGlobal('type', class.class[1]), key, false, function (def)
-                    if def.type == 'doc.field' then
+                    if def.type == 'doc.field'
+                    or def.type == 'setfield'
+                    or def.type == 'setmethod'
+                    or def.type == 'setindex' then
                         fieldNode:merge(vm.compileNode(def))
                     end
                 end)
@@ -49,6 +53,9 @@ return function (uri, callback)
         local key = guide.getKeyName(ref)
         if not key then
             return nil
+        end
+        if not vm.canCastType(uri, vm.compileNode(ref), vm.compileNode(ref.value)) then
+            return
         end
         local parent = ref.node
         local fieldNode = getParentField(parent, key)

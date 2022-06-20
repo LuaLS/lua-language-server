@@ -811,7 +811,7 @@ food.secondField = 2
 },
 hover = [[
 ```lua
-(field) Food.firstField: number = 0
+(field) Food.firstField: number
 ```]]}
 
 TEST {{ path = 'a.lua', content = '', }, {

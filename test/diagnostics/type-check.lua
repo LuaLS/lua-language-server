@@ -212,6 +212,40 @@ local y
 
 TEST [[
 ---@class A
+local m
+
+m.x = 1
+
+---@type A
+local t
+
+<!t.x!> = true
+]]
+
+TEST [[
+---@class A
+local m
+
+---@type integer
+m.x = 1
+
+<!m.x!> = true
+]]
+
+TEST [[
+---@class A
+local mt
+
+---@type integer
+mt.x = 1
+
+function mt:init()
+    <!self.x!> = true
+end
+]]
+
+TEST [[
+---@class A
 ---@field x integer
 
 ---@type A

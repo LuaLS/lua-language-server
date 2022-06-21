@@ -1211,7 +1211,17 @@ local compilerSwitch = util.switch()
         or source.parent.type == 'tableindex'
         or source.parent.type == 'setfield'
         or source.parent.type == 'setindex' then
-            vm.setNode(source, vm.compileNode(source.parent))
+            local parentNode = vm.compileNode(source.parent)
+            for _, pn in ipairs(parentNode) do
+                if  pn.type == 'global'
+                and pn.cate == 'type' then
+                    if not guide.isBasicType(pn.name) then
+                        vm.setNode(source, pn)
+                    end
+                elseif pn.type == 'doc.type.table' then
+                    vm.setNode(source, pn)
+                end
+            end
         end
     end)
     : case 'function'

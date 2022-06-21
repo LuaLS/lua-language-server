@@ -50,7 +50,7 @@ return function (uri, callback)
                 end
             end
         end
-        local varNode   = vm.compileNode(source)
+        local varNode = vm.compileNode(source)
         if vm.canCastType(uri, varNode, valueNode) then
             return
         end

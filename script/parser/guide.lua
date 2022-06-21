@@ -1247,6 +1247,7 @@ local basicTypeMap = {
     ['false']    = true,
     ['nil']      = true,
     ['boolean']  = true,
+    ['integer']  = true,
     ['number']   = true,
     ['string']   = true,
     ['table']    = true,

@@ -300,5 +300,15 @@ local y
 t = y
 ]]
 
+TEST [[
+---@class A
+local m
+
+---@type number
+m.x = 1
+
+<!m.x!> = {}
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

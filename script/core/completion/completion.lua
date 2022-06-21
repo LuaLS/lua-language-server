@@ -1241,7 +1241,7 @@ local function tryIndex(state, position, results)
     if not parent then
         return
     end
-    local word = parent.next.index[1]
+    local word = parent.next and parent.next.index and parent.next.index[1]
     checkField(state, word, position, position, parent, oop, results)
 end
 

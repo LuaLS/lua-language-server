@@ -894,6 +894,7 @@ local docSwitch = util.switch()
                 docType.optional = true
             end
             docType.name = parseName('doc.return.name', docType)
+                        or parseDots('doc.return.name', docType)
             result.returns[#result.returns+1] = docType
             if not checkToken('symbol', ',', 1) then
                 break

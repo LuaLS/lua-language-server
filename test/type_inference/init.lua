@@ -2799,3 +2799,39 @@ m.x = {} --> 4th
 
 print(m.<?x?>)
 ]]
+
+TEST 'boolean?' [[
+---@generic T
+---@param x T
+---@return T
+local function echo(x) end
+
+---@type boolean?
+local b
+
+local <?x?> = echo(b)
+]]
+
+TEST 'boolean' [[
+---@generic T
+---@param x T?
+---@return T
+local function echo(x) end
+
+---@type boolean?
+local b
+
+local <?x?> = echo(b)
+]]
+
+TEST 'boolean' [[
+---@generic T
+---@param x? T
+---@return T
+local function echo(x) end
+
+---@type boolean?
+local b
+
+local <?x?> = echo(b)
+]]

@@ -122,13 +122,20 @@ function mt:resolve(uri, args, removeGeneric)
 
     -- remove un-generic type
     ---@param argNode vm.node
+    ---@param sign vm.node
     ---@param knownTypes table<string, true>
     ---@return vm.node
-    local function buildArgNode(argNode, knownTypes)
+    local function buildArgNode(argNode, sign, knownTypes)
         local newArgNode = vm.createNode()
+        local needRemoveNil = sign:hasFalsy()
         for n in argNode:eachObject() do
-            if argNode:hasFalsy() then
-                goto CONTINUE
+            if needRemoveNil then
+                if n.type == 'nil' then
+                    goto CONTINUE
+                end
+                if n.type == 'global' and n.cate == 'type' and n.name == 'nil' then
+                    goto CONTINUE
+                end
             end
             local view = vm.viewObject(n, uri)
             if knownTypes[view] then
@@ -136,6 +143,9 @@ function mt:resolve(uri, args, removeGeneric)
             end
             newArgNode:merge(n)
             ::CONTINUE::
+        end
+        if not needRemoveNil and argNode:isOptional() then
+            newArgNode:addOptional()
         end
         return newArgNode
     end
@@ -158,7 +168,7 @@ function mt:resolve(uri, args, removeGeneric)
         local argNode = vm.compileNode(arg)
         local knownTypes, genericNames = getSignInfo(sign)
         if not isAllResolved(genericNames) then
-            local newArgNode = buildArgNode(argNode, knownTypes)
+            local newArgNode = buildArgNode(argNode,sign, knownTypes)
             for n in sign:eachObject() do
                 resolve(n, newArgNode)
             end

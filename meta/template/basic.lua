@@ -6,7 +6,7 @@ arg = {}
 
 ---#DES 'assert'
 ---@generic T
----@param v T
+---@param v? T
 ---@param message? any
 ---@return T
 function assert(v, message) end

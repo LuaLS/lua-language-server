@@ -351,5 +351,6 @@ function vm.launchRunner(loc, callback)
         return
     end
 
-    self:_launchBlock(guide.getParentBlock(loc), vm.getNode(loc):copy())
+    local topNode = self:_launchBlock(guide.getParentBlock(loc), vm.getNode(loc):copy())
+    self:_fastWard(math.maxinteger, topNode)
 end

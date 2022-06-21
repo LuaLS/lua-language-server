@@ -1290,10 +1290,8 @@ local compilerSwitch = util.switch()
                 end
                 return vm.getNode(src)
             elseif src.type == 'getlocal' then
-                if bindAs(src) then
-                    return
-                end
-                vm.setNode(src, node, true)
+                src._runnerNode = node
+                vm.removeNode(src)
             end
         end)
 
@@ -1316,7 +1314,12 @@ local compilerSwitch = util.switch()
         if bindAs(source) then
             return
         end
-        vm.compileNode(source.node)
+        if not source._runnerNode then
+            vm.compileNode(source.node)
+        end
+        if source._runnerNode then
+            vm.setNode(source, source._runnerNode)
+        end
     end)
     : case 'setfield'
     : case 'setmethod'
@@ -1850,7 +1853,9 @@ local function compileByCall(source)
         end
     end
     if needRemove then
-        myNode:removeNode(needRemove)
+        local newNode = myNode:copy()
+        newNode:removeNode(needRemove)
+        vm.setNode(source, newNode, true)
     end
 end
 

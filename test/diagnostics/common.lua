@@ -1631,3 +1631,27 @@ function F(x) end
 
 F(k())
 ]]
+
+TEST [[
+local function f()
+    return 1, 2, 3
+end
+
+local function k()
+end
+
+k(<!f()!>)
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+local function f()
+    return 1, 2, 3
+end
+
+---@param x integer
+local function k(x)
+end
+
+k(f())
+]]

@@ -26,6 +26,12 @@ return function (uri, callback)
         end
         if funcArgs + 1 > #source.args then
             local lastArg = source.args[#source.args]
+            if lastArg.type == 'call' and funcArgs > 0 then
+                -- 如果函数接收至少一个参数，那么调用方最后一个参数是函数调用
+                -- 导致的参数数量太多可以忽略。
+                -- 如果函数不接收任何参数，那么任何参数都是错误的。
+                return
+            end
             callback {
                 start   = lastArg.start,
                 finish  = lastArg.finish,

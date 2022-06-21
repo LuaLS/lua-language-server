@@ -17,4 +17,5 @@ require 'vm.generic'
 require 'vm.sign'
 require 'vm.local-id'
 require 'vm.global'
+require 'vm.function'
 return vm

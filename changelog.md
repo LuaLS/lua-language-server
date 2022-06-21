@@ -6,6 +6,17 @@
   local function f() end
   local x = f() -- `x` is `nil` instead of `unknown`
   ```
+* `CHG` infer called function by params num
+  ```lua
+  ---@overload fun(number, number):string
+  ---@overload fun(number):number
+  ---@return boolean
+  local function f() end
+
+  local n1 = f()     -- `n1` is `boolean`
+  local n2 = f(0)    -- `n2` is `number`
+  local n3 = f(0, 0) -- `n3` is `string`
+  ```
 
 ## 3.3.1
 `2022-6-17`

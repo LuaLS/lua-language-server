@@ -554,32 +554,29 @@ local function getReturn(func, index, args)
         end
         return vm.compileNode(ast)
     end
-    local node = vm.compileNode(func)
+    local funcs = vm.getMatchedFunctions(func, args)
     ---@type vm.node?
     local result
-    for cnode in node:eachObject() do
-        if cnode.type == 'function'
-        or cnode.type == 'doc.type.function' then
-            local returnObject = vm.getReturnOfFunction(cnode, index)
-            if returnObject then
-                local returnNode = vm.compileNode(returnObject)
+    for _, mfunc in ipairs(funcs) do
+        local returnObject = vm.getReturnOfFunction(mfunc, index)
+        if returnObject then
+            local returnNode = vm.compileNode(returnObject)
+            for rnode in returnNode:eachObject() do
+                if rnode.type == 'generic' then
+                    returnNode = rnode:resolve(guide.getUri(func), args)
+                    break
+                end
+            end
+            if returnNode then
                 for rnode in returnNode:eachObject() do
-                    if rnode.type == 'generic' then
-                        returnNode = rnode:resolve(guide.getUri(func), args)
-                        break
+                    -- TODO: narrow type
+                    if rnode.type ~= 'doc.generic.name' then
+                        result = result or vm.createNode()
+                        result:merge(rnode)
                     end
                 end
-                if returnNode then
-                    for rnode in returnNode:eachObject() do
-                        -- TODO: narrow type
-                        if rnode.type ~= 'doc.generic.name' then
-                            result = result or vm.createNode()
-                            result:merge(rnode)
-                        end
-                    end
-                    if result and returnNode:isOptional() then
-                        result:addOptional()
-                    end
+                if result and returnNode:isOptional() then
+                    result:addOptional()
                 end
             end
         end

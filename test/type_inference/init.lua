@@ -2739,3 +2739,63 @@ m.x = true
 
 print(m.<?x?>)
 ]]
+
+TEST 'integer' [[
+---@class A
+---@field x integer --> 1st
+local m = {
+    x = '' --> 2nd
+}
+
+---@type boolean
+m.x = true --> 3rd (with ---@type above)
+
+m.x = {} --> 4th
+
+print(m.<?x?>)
+]]
+
+TEST 'string' [[
+---@class A
+----@field x integer --> 1st
+local m = {
+    x = '' --> 2nd
+}
+
+---@type boolean
+m.x = true --> 3rd (with ---@type above)
+
+m.x = {} --> 4th
+
+print(m.<?x?>)
+]]
+
+TEST 'boolean' [[
+---@class A
+----@field x integer --> 1st
+local m = {
+    --x = '' --> 2nd
+}
+
+---@type boolean
+m.x = true --> 3rd (with ---@type above)
+
+m.x = {} --> 4th
+
+print(m.<?x?>)
+]]
+
+TEST 'table' [[
+---@class A
+----@field x integer --> 1st
+local m = {
+    --x = '' --> 2nd
+}
+
+---@type boolean
+--m.x = true --> 3rd (with ---@type above)
+
+m.x = {} --> 4th
+
+print(m.<?x?>)
+]]

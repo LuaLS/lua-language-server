@@ -503,6 +503,38 @@ local function getReturnOfSetMetaTable(args)
     return node
 end
 
+---@param source parser.object
+local function matchCall(source)
+    local call = source.parent
+    if not call
+    or call.type ~= 'call'
+    or call.node ~= source then
+        return
+    end
+    local funcs = vm.getMatchedFunctions(source, call.args)
+    local myNode = vm.getNode(source)
+    if not myNode then
+        return
+    end
+    local needRemove
+    for n in myNode:eachObject() do
+        if n.type == 'function'
+        or n.type == 'doc.type.function' then
+            if not util.arrayHas(funcs, n) then
+                if not needRemove then
+                    needRemove = vm.createNode()
+                end
+                needRemove:merge(n)
+            end
+        end
+    end
+    if needRemove then
+        local newNode = myNode:copy()
+        newNode:removeNode(needRemove)
+        vm.setNode(source, newNode, true)
+    end
+end
+
 ---@return vm.node?
 local function getReturn(func, index, args)
     if func.special == 'setmetatable' then
@@ -1290,8 +1322,11 @@ local compilerSwitch = util.switch()
                 end
                 return vm.getNode(src)
             elseif src.type == 'getlocal' then
-                src._runnerNode = node
-                vm.removeNode(src)
+                if bindAs(src) then
+                    return
+                end
+                vm.setNode(src, node, true)
+                matchCall(src)
             end
         end)
 
@@ -1314,12 +1349,7 @@ local compilerSwitch = util.switch()
         if bindAs(source) then
             return
         end
-        if not source._runnerNode then
-            vm.compileNode(source.node)
-        end
-        if source._runnerNode then
-            vm.setNode(source, source._runnerNode)
-        end
+        vm.compileNode(source.node)
     end)
     : case 'setfield'
     : case 'setmethod'
@@ -1827,38 +1857,6 @@ local function compileByGlobal(source)
     end
 end
 
----@param source parser.object
-local function compileByCall(source)
-    local call = source.parent
-    if not call
-    or call.type ~= 'call'
-    or call.node ~= source then
-        return
-    end
-    local funcs = vm.getMatchedFunctions(source, call.args)
-    local myNode = vm.getNode(source)
-    if not myNode then
-        return
-    end
-    local needRemove
-    for n in myNode:eachObject() do
-        if n.type == 'function'
-        or n.type == 'doc.type.function' then
-            if not util.arrayHas(funcs, n) then
-                if not needRemove then
-                    needRemove = vm.createNode()
-                end
-                needRemove:merge(n)
-            end
-        end
-    end
-    if needRemove then
-        local newNode = myNode:copy()
-        newNode:removeNode(needRemove)
-        vm.setNode(source, newNode, true)
-    end
-end
-
 ---@param source vm.object
 ---@return vm.node
 function vm.compileNode(source)
@@ -1883,7 +1881,7 @@ function vm.compileNode(source)
     vm.setNode(source, node, true)
     compileByGlobal(source)
     compileByNode(source)
-    compileByCall(source)
+    matchCall(source)
 
     node = vm.getNode(source)
 

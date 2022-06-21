@@ -283,5 +283,22 @@ local t = {
 <!t.x!> = true
 ]]
 
+TEST [[
+---@type number
+local t
+
+t = 1
+]]
+
+TEST [[
+---@type number
+local t
+
+---@type integer
+local y
+
+t = y
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

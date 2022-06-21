@@ -53,7 +53,8 @@ function vm.isSubType(uri, child, parent, mark)
         end
     elseif child.type == 'vm.node' then
         for n in child:eachObject() do
-            if getNodeName(n) and not vm.isSubType(uri, n, parent, mark) then
+            if  getNodeName(n)
+            and not vm.isSubType(uri, n, parent, mark) then
                 return false
             end
         end
@@ -67,7 +68,8 @@ function vm.isSubType(uri, child, parent, mark)
         end
     elseif parent.type == 'vm.node' then
         for n in parent:eachObject() do
-            if getNodeName(n) and vm.isSubType(uri, child, n, mark) then
+            if  getNodeName(n)
+            and vm.isSubType(uri, child, n, mark) then
                 return true
             end
         end
@@ -99,10 +101,11 @@ function vm.isSubType(uri, child, parent, mark)
     end
 
     -- check class parent
-    if not mark[child] then
-        mark[child] = true
-        if child.type == 'global' and child.cate == 'type' then
-            for _, set in ipairs(child:getSets(uri)) do
+    if childName and not mark[childName] then
+        mark[childName] = true
+        local childClass = vm.getGlobal('type', childName)
+        if childClass then
+            for _, set in ipairs(childClass:getSets(uri)) do
                 if set.type == 'doc.class' and set.extends then
                     for _, ext in ipairs(set.extends) do
                         if  ext.type == 'doc.extends.name'

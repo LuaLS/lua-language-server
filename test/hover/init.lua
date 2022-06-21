@@ -1949,8 +1949,8 @@ x({}, <?function?> () end)
 ]]
 
 TEST [[
----@overload fun(x, y):string
----@overload fun(x):number
+---@overload fun(x: number, y: number):string
+---@overload fun(x: number):number
 ---@return boolean
 local function f() end
 
@@ -1964,8 +1964,8 @@ function f()
 ]]
 
 TEST [[
----@overload fun(x, y):string
----@overload fun(x):number
+---@overload fun(x: number, y: number):string
+---@overload fun(x: number):number
 ---@return boolean
 local function f() end
 
@@ -1974,12 +1974,12 @@ local n2 = <?f?>(0)
 local n3 = f(0, 0)
 ]]
 [[
-local f: fun(x: any):number
+local f: fun(x: number):number
 ]]
 
 TEST [[
----@overload fun(x, y):string
----@overload fun(x):number
+---@overload fun(x: number, y: number):string
+---@overload fun(x: number):number
 ---@return boolean
 local function f() end
 
@@ -1988,5 +1988,5 @@ local n2 = f(0)
 local n3 = <?f?>(0, 0)
 ]]
 [[
-local f: fun(x: any, y: any):string
+local f: fun(x: number, y: number):string
 ]]

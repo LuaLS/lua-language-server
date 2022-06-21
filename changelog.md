@@ -8,8 +8,8 @@
   ```
 * `CHG` infer called function by params num
   ```lua
-  ---@overload fun(x, y):string
-  ---@overload fun(x):number
+  ---@overload fun(x: number, y: number):string
+  ---@overload fun(x: number):number
   ---@return boolean
   local function f() end
 

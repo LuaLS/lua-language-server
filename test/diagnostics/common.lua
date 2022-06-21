@@ -1620,3 +1620,14 @@ local n
 
 print(n.x)
 ]]
+
+TEST [[
+---@diagnostic disable: unused-local, unused-function, undefined-global
+
+function F() end
+
+---@param x boolean
+function F(x) end
+
+F(k())
+]]

@@ -2929,8 +2929,8 @@ local <?x?> = f(r1())
 ]]
 
 TEST 'boolean' [[
----@overload fun(x, y):string
----@overload fun(x):number
+---@overload fun(x: number, y: number):string
+---@overload fun(x: number):number
 ---@return boolean
 local function f() end
 
@@ -2940,8 +2940,8 @@ local n3 = f(0, 0)
 ]]
 
 TEST 'number' [[
----@overload fun(x, y):string
----@overload fun(x):number
+---@overload fun(x: number, y: number):string
+---@overload fun(x: number):number
 ---@return boolean
 local function f() end
 
@@ -2951,8 +2951,8 @@ local n3 = f(0, 0)
 ]]
 
 TEST 'string' [[
----@overload fun(x, y):string
----@overload fun(x):number
+---@overload fun(x: number, y: number):string
+---@overload fun(x: number):number
 ---@return boolean
 local function f() end
 

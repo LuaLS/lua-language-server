@@ -252,6 +252,17 @@ function mt:narrow(name)
     return self
 end
 
+---@param obj vm.object
+function mt:removeObject(obj)
+    for index, c in ipairs(self) do
+        if c == obj then
+            table.remove(self, index)
+            self[c] = nil
+            return
+        end
+    end
+end
+
 ---@param node vm.node
 function mt:removeNode(node)
     for _, c in ipairs(node) do
@@ -265,6 +276,8 @@ function mt:removeNode(node)
             else
                 self:remove 'false'
             end
+        else
+            self:removeObject(c)
         end
     end
 end

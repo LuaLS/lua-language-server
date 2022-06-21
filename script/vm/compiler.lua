@@ -554,29 +554,32 @@ local function getReturn(func, index, args)
         end
         return vm.compileNode(ast)
     end
-    local funcs = vm.getMatchedFunctions(func, args)
+    local funcNode = vm.compileNode(func)
     ---@type vm.node?
     local result
-    for _, mfunc in ipairs(funcs) do
-        local returnObject = vm.getReturnOfFunction(mfunc, index)
-        if returnObject then
-            local returnNode = vm.compileNode(returnObject)
-            for rnode in returnNode:eachObject() do
-                if rnode.type == 'generic' then
-                    returnNode = rnode:resolve(guide.getUri(func), args)
-                    break
-                end
-            end
-            if returnNode then
+    for mfunc in funcNode:eachObject() do
+        if mfunc.type == 'function'
+        or mfunc.type == 'doc.type.function' then
+            local returnObject = vm.getReturnOfFunction(mfunc, index)
+            if returnObject then
+                local returnNode = vm.compileNode(returnObject)
                 for rnode in returnNode:eachObject() do
-                    -- TODO: narrow type
-                    if rnode.type ~= 'doc.generic.name' then
-                        result = result or vm.createNode()
-                        result:merge(rnode)
+                    if rnode.type == 'generic' then
+                        returnNode = rnode:resolve(guide.getUri(func), args)
+                        break
                     end
                 end
-                if result and returnNode:isOptional() then
-                    result:addOptional()
+                if returnNode then
+                    for rnode in returnNode:eachObject() do
+                        -- TODO: narrow type
+                        if rnode.type ~= 'doc.generic.name' then
+                            result = result or vm.createNode()
+                            result:merge(rnode)
+                        end
+                    end
+                    if result and returnNode:isOptional() then
+                        result:addOptional()
+                    end
                 end
             end
         end
@@ -1821,6 +1824,36 @@ local function compileByGlobal(source)
     end
 end
 
+---@param source parser.object
+local function compileByCall(source)
+    local call = source.parent
+    if not call
+    or call.type ~= 'call'
+    or call.node ~= source then
+        return
+    end
+    local funcs = vm.getMatchedFunctions(source, call.args)
+    local myNode = vm.getNode(source)
+    if not myNode then
+        return
+    end
+    local needRemove
+    for n in myNode:eachObject() do
+        if n.type == 'function'
+        or n.type == 'doc.type.function' then
+            if not util.arrayHas(funcs, n) then
+                if not needRemove then
+                    needRemove = vm.createNode()
+                end
+                needRemove:merge(n)
+            end
+        end
+    end
+    if needRemove then
+        myNode:removeNode(needRemove)
+    end
+end
+
 ---@param source vm.object
 ---@return vm.node
 function vm.compileNode(source)
@@ -1845,6 +1878,7 @@ function vm.compileNode(source)
     vm.setNode(source, node, true)
     compileByGlobal(source)
     compileByNode(source)
+    compileByCall(source)
 
     node = vm.getNode(source)
 

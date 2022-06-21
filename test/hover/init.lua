@@ -1947,3 +1947,46 @@ x({}, <?function?> () end)
 [[
 (async) function ()
 ]]
+
+TEST [[
+---@overload fun(x, y):string
+---@overload fun(x):number
+---@return boolean
+local function f() end
+
+local n1 = <?f?>()
+local n2 = f(0)
+local n3 = f(0, 0)
+]]
+[[
+function f()
+  -> boolean
+]]
+
+TEST [[
+---@overload fun(x, y):string
+---@overload fun(x):number
+---@return boolean
+local function f() end
+
+local n1 = f()
+local n2 = <?f?>(0)
+local n3 = f(0, 0)
+]]
+[[
+local f: fun(x: any):number
+]]
+
+TEST [[
+---@overload fun(x, y):string
+---@overload fun(x):number
+---@return boolean
+local function f() end
+
+local n1 = f()
+local n2 = f(0)
+local n3 = <?f?>(0, 0)
+]]
+[[
+local f: fun(x: any, y: any):string
+]]

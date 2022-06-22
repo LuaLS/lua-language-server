@@ -1103,7 +1103,7 @@ local function tryLabelInString(label, source)
     if not state or not state.ast then
         return label
     end
-    if not matchKey(source[1], state.ast[1]) then
+    if not matchKey(source[1], state.ast[1]--[[@as string]]) then
         return nil
     end
     return util.viewString(state.ast[1], source[2])
@@ -1242,6 +1242,9 @@ local function tryIndex(state, position, results)
         return
     end
     local word = parent.next and parent.next.index and parent.next.index[1]
+    if not word then
+        return
+    end
     checkField(state, word, position, position, parent, oop, results)
 end
 
@@ -1426,6 +1429,7 @@ local function tryCallArg(state, position, results)
         if src.type == 'doc.type.string'
         or src.type == 'doc.type.integer'
         or src.type == 'doc.type.boolean' then
+            ---@cast src parser.object
             enums[#enums+1] = {
                 label       = vm.viewObject(src, state.uri),
                 description = src.comment,
@@ -1439,6 +1443,7 @@ local function tryCallArg(state, position, results)
             }
         end
         if src.type == 'doc.type.function' then
+            ---@cast src parser.object
             local insertText = buildInsertDocFunction(src)
             local description
             if src.comment then

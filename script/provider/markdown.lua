@@ -10,7 +10,7 @@ function mt:__tostring()
 end
 
 ---@param language string
----@param text string|markdown
+---@param text? string|markdown
 function mt:add(language, text)
     if not text then
         return self

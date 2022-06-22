@@ -124,6 +124,10 @@ DIAG_ASSIGN_TYPE_MISMATCH             =
 '类型不匹配，不能将 `{ref}` 赋值给 `{def}`。'
 DIAG_PARAM_TYPE_MISMATCH              =
 '参数类型不匹配，不能将 `{ref}` 赋值给 `{def}`。'
+DIAG_UNKNOWN_CAST_VARIABLE            =
+'未知的类型转换变量 `{}`。'
+DIAG_CAST_TYPE_MISMATCH               =
+'类型不匹配，不能将 `{ref}` 转换为 `{def}`。'
 
 MWS_NOT_SUPPORT         =
 '{} 目前还不支持多工作目录，我可能需要重启才能支持新的工作目录...'

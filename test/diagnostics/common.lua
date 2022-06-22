@@ -1655,3 +1655,7 @@ end
 
 k(f())
 ]]
+
+TEST [[
+---@cast <!x!> integer
+]]

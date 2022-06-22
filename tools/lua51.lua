@@ -374,7 +374,7 @@ lua51.os.difftime = os.difftime
 lua51.os.execute = os.execute
 function lua51.os.exit(code)
     code = tonumber(code) or 0
-    osExit(code)
+    osExit(code--[[@as integer]])
 end
 lua51.os.getenv = os.getenv
 lua51.os.remove = os.remove

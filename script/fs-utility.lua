@@ -40,7 +40,7 @@ function m.loadFile(path, keepBom)
 end
 
 --- 写入文件
----@param path string
+---@param path any
 ---@param content string
 function m.saveFile(path, content)
     if type(path) ~= 'string' then

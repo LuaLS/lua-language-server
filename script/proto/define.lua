@@ -62,6 +62,8 @@ m.DiagnosticDefaultSeverity = {
     ['doc-field-no-class']      = 'Warning',
     ['duplicate-doc-field']     = 'Warning',
     ['unknown-diag-code']       = 'Warning',
+    ['unknown-cast-variable']   = 'Warning',
+    ['cast-type-mismatch']      = 'Warning',
 
     ['codestyle-check']         = 'Warning',
     ['spell-check']             = 'Information',
@@ -126,6 +128,8 @@ m.DiagnosticDefaultNeededFileStatus = {
     ['doc-field-no-class']      = 'Any',
     ['duplicate-doc-field']     = 'Any',
     ['unknown-diag-code']       = 'Any',
+    ['unknown-cast-variable']   = 'Any',
+    ['cast-type-mismatch']      = 'Any',
 
     ['codestyle-check']         = 'None',
     ['spell-check']             = 'None',

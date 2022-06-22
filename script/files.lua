@@ -14,6 +14,9 @@ local progress = require "progress"
 local encoder  = require 'encoder'
 local scope    = require 'workspace.scope'
 
+---@class file
+---@field content string
+
 ---@class files
 local m = {}
 
@@ -23,6 +26,7 @@ m.assocVersion   = -1
 
 function m.reset()
     m.openMap        = {}
+    ---@type table<string, file>
     m.fileMap        = {}
     m.dllMap         = {}
     m.visible        = {}

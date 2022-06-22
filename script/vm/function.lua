@@ -75,14 +75,15 @@ function vm.countParamsOfNode(node)
 end
 
 ---@param func parser.object
+---@param mark? table
 ---@return integer min
 ---@return integer max
-function vm.countReturnsOfFunction(func)
+function vm.countReturnsOfFunction(func, mark)
     if func.type == 'function' then
         local min, max
         if func.returns then
             for _, ret in ipairs(func.returns) do
-                local rmin, rmax = vm.countList(ret)
+                local rmin, rmax = vm.countList(ret, mark)
                 if not min or rmin < min then
                     min = rmin
                 end
@@ -126,14 +127,15 @@ function vm.countReturnsOfFunction(func)
 end
 
 ---@param func parser.object
+---@param mark? table
 ---@return integer min
 ---@return integer max
-function vm.countReturnsOfCall(func, args)
+function vm.countReturnsOfCall(func, args, mark)
     local funcs = vm.getMatchedFunctions(func, args)
     local min
     local max
     for _, f in ipairs(funcs) do
-        local rmin, rmax = vm.countReturnsOfFunction(f)
+        local rmin, rmax = vm.countReturnsOfFunction(f, mark)
         if not min or rmin < min then
             min = rmin
         end
@@ -145,9 +147,10 @@ function vm.countReturnsOfCall(func, args)
 end
 
 ---@param list parser.object[]?
+---@param mark? table
 ---@return integer min
 ---@return integer max
-function vm.countList(list)
+function vm.countList(list, mark)
     if not list then
         return 0, 0
     end
@@ -160,7 +163,14 @@ function vm.countList(list)
         return #list - 1, math.huge
     end
     if lastArg.type == 'call' then
-        local rmin, rmax = vm.countReturnsOfCall(lastArg.node, lastArg.args)
+        if not mark then
+            mark = {}
+        end
+        if mark[lastArg] then
+            return #list - 1, math.huge
+        end
+        mark[lastArg] = true
+        local rmin, rmax = vm.countReturnsOfCall(lastArg.node, lastArg.args, mark)
         return #list - 1 + rmin, #list - 1 + rmax
     end
     return #list, #list

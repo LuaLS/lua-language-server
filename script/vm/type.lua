@@ -130,6 +130,11 @@ function vm.isSubType(uri, child, parent, mark)
                         end
                     end
                 end
+                if set.type == 'doc.alias' and set.extends then
+                    if vm.isSubType(uri, vm.compileNode(set.extends), parent, mark) then
+                        return true
+                    end
+                end
             end
         end
     end

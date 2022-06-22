@@ -478,7 +478,9 @@ function m.getLocal(source, name, pos)
         if not block then
             return nil
         end
-        if block.start <= pos and block.finish >= pos then
+        if  block.start <= pos
+        and block.finish >= pos
+        and blockTypes[block.type] then
             break
         end
         block = block.parent

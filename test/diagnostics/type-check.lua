@@ -340,5 +340,31 @@ local x
 x = 1 + G
 ]]
 
+TEST [[
+---@alias A integer
+
+---@type A
+local a
+
+---@type integer
+local b
+
+b = a
+]]
+
+TEST [[
+---@type string|boolean
+local t
+
+---@cast t string
+]]
+
+TEST [[
+---@type string|boolean
+local t
+
+---@cast t <!number!>
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

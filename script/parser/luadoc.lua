@@ -1661,6 +1661,9 @@ return function (state)
         end
     end
 
+    ast.docs.start  = ast.start
+    ast.docs.finish = ast.finish
+
     if #ast.docs == 0 then
         return
     end

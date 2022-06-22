@@ -271,6 +271,12 @@ function mt:hasUnknown(uri)
 end
 
 ---@param uri uri
+function mt:hasAny(uri)
+    self:_computeViews(uri)
+    return self.views['any'] == true
+end
+
+---@param uri uri
 ---@return boolean
 function mt:hasClass(uri)
     self:_computeViews(uri)

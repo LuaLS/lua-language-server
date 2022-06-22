@@ -332,5 +332,13 @@ local x
 x = 1 + G
 ]]
 
+TEST [[
+---@diagnostic disable:undefined-global
+---@type integer
+local x
+
+x = 1 + G
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

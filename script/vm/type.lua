@@ -235,10 +235,12 @@ function vm.canCastType(uri, defNode, refNode)
     local defInfer = vm.getInfer(defNode)
     local refInfer = vm.getInfer(refNode)
 
-    if defInfer:hasUnknown(uri) then
+    if defInfer:hasUnknown(uri)
+    or defInfer:hasAny(uri) then
         return true
     end
-    if refInfer:hasUnknown(uri) then
+    if refInfer:hasUnknown(uri)
+    or refInfer:hasAny(uri) then
         return true
     end
 

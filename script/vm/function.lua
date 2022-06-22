@@ -117,7 +117,7 @@ function vm.countReturnsOfFunction(func)
                 max = dmax
             end
         end
-        return min, max
+        return min or 0, max or math.huge
     end
     if func.type == 'doc.type.function' then
         return vm.countList(func.returns)

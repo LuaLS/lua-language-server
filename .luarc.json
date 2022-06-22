@@ -41,5 +41,8 @@
             "script/meta",
             "bin"
         ]
+    },
+    "hover": {
+        "previewFields": 50
     }
 }

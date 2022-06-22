@@ -95,6 +95,19 @@ function vm.isSubType(uri, child, parent, mark)
         return true
     end
 
+    if parentName == 'integer' and childName == 'number' then
+        if  child.type == 'number'
+        and child[1]
+        and not math.tointeger(child[1]) then
+            return false
+        end
+        if  child.type == 'global'
+        and child.cate == 'type' then
+            return false
+        end
+        return true
+    end
+
     -- TODO: check duck
     if parentName == 'table' and not guide.isBasicType(childName) then
         return true
@@ -234,14 +247,6 @@ function vm.canCastType(uri, defNode, refNode)
         -- but not allow `local x ---@type table;x = nil`
         if  defInfer:hasType(uri, 'table')
         and not defNode:hasType 'table' then
-            return true
-        end
-    end
-    if vm.isSubType(uri, refNode, 'number') then
-        -- allow `local x = 0;x = 1.0`,
-        -- but not allow `local x ---@type integer;x = 1.0`
-        if  defInfer:hasType(uri, 'integer')
-        and not defNode:hasType 'integer' then
             return true
         end
     end

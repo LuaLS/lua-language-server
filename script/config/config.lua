@@ -27,7 +27,7 @@ local function update(scp, key, nowValue, rawValue)
     raw[key] = rawValue
 end
 
----@param uri uri
+---@param uri? uri
 ---@param key? string
 ---@return scope
 local function getScope(uri, key)
@@ -70,7 +70,7 @@ function m.setByScope(scp, key, value)
     return true
 end
 
----@param uri   uri
+---@param uri?   uri
 ---@param key   string
 ---@param value any
 function m.set(uri, key, value)

@@ -112,7 +112,7 @@ end
 ---@param type message.type
 ---@param message string
 ---@param titles  string[]
----@param callback fun(action: string, index: integer)
+---@param callback fun(action?: string, index?: integer)
 function m.requestMessage(type, message, titles, callback)
     proto.notify('window/logMessage', {
         type = define.MessageType[type] or 3,

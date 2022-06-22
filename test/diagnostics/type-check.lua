@@ -153,13 +153,6 @@ x = 1.0
 ]]
 
 TEST [[
----@type integer
-local x = 0
-
-<!x!> = 1.0
-]]
-
-TEST [[
 ---@class A
 
 local t = {}
@@ -315,6 +308,20 @@ TEST [[
 local function f(x) end
 
 f(<!true!>)
+]]
+
+TEST [[
+---@type integer
+local x
+
+x = 1.0
+]]
+
+TEST [[
+---@type integer
+local x
+
+<!x!> = 1.5
 ]]
 
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')

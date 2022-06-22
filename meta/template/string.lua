@@ -40,8 +40,8 @@ function string.dump(f, strip) end
 function string.find(s, pattern, init, plain) end
 
 ---#DES 'string.format'
----@param s string
----@param ... string
+---@param s any
+---@param ... any
 ---@return string
 ---@nodiscard
 function string.format(s, ...) end

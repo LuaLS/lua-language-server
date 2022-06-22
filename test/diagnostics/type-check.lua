@@ -310,5 +310,12 @@ m.x = 1
 <!m.x!> = {}
 ]]
 
+TEST [[
+---@param x number
+local function f(x) end
+
+f(<!true!>)
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

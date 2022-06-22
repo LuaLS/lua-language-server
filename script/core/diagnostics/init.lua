@@ -14,6 +14,7 @@ local diagSort = {
     ['redundant-parameter']  = 110,
     ['cast-local-type']      = 120,
     ['assign-type-mismatch'] = 120,
+    ['param-type-mismatch']  = 120,
 }
 
 local diagList = {}

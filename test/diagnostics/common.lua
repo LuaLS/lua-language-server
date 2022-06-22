@@ -239,7 +239,7 @@ local m = {}
 function m:x(a, b)
     return a, b
 end
-m.x(1, 2, 3, <!4!>)
+m.x(m, 2, 3, <!4!>)
 ]]
 
 TEST [[
@@ -469,7 +469,7 @@ local mt = {}
 function mt:f(a, b)
     return a, b
 end
-mt.f(1, 2, 3, <!4!>)
+mt.f(mt, 2, 3, <!4!>)
 ]]
 
 
@@ -569,7 +569,7 @@ local m = {}
 function m:open()
 end
 
-m.open('ok')
+m.open(m)
 ]]
 
 TEST [[

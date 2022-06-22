@@ -153,7 +153,8 @@ function vm.getTableValue(uri, tnode, knode)
     for tn in tnode:eachObject() do
         if tn.type == 'doc.type.table' then
             for _, field in ipairs(tn.fields) do
-                if vm.isSubType(uri, vm.compileNode(field.name), knode) then
+                if  field.name.type ~= 'doc.field.name'
+                and vm.isSubType(uri, vm.compileNode(field.name), knode) then
                     if field.extends then
                         result:merge(vm.compileNode(field.extends))
                     end
@@ -202,7 +203,8 @@ function vm.getTableKey(uri, tnode, vnode)
     for tn in tnode:eachObject() do
         if tn.type == 'doc.type.table' then
             for _, field in ipairs(tn.fields) do
-                if field.extends then
+                if  field.name.type ~= 'doc.field.name'
+                and field.extends then
                     if vm.isSubType(uri, vm.compileNode(field.extends), vnode) then
                         result:merge(vm.compileNode(field.name))
                     end

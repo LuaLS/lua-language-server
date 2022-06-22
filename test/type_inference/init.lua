@@ -2981,3 +2981,20 @@ local n1 = f()
 local n2 = f(0)
 local <?n3?> = f(0, 0)
 ]]
+
+TEST 'boolean' [[
+---@type {[integer]: boolean, xx: integer}
+local t
+
+local <?n?> = t[1]
+]]
+
+TEST 'boolean' [[
+---@type integer
+local i
+
+---@type {[integer]: boolean, xx: integer}
+local t
+
+local <?n?> = t[i]
+]]

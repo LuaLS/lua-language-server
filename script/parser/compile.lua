@@ -2349,6 +2349,7 @@ local function parseFunction(isLocal, isAction)
         func.finish     = endRight
         Index = Index + 2
     else
+        func.finish = lastRightPosition()
         missEnd(funcLeft, funcRight)
     end
     LocalCount = LastLocalCount

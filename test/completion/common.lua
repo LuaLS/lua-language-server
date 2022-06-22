@@ -3382,3 +3382,17 @@ f(<??>)
         kind  = define.CompletionItemKind.EnumMember,
     },
 }
+
+TEST [[
+return function ()
+    local function fff(xxx)
+        for f in xx<??>
+    end
+end
+]]
+{
+    {
+        label = 'xxx',
+        kind  = define.CompletionItemKind.Variable,
+    },
+}

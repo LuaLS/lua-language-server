@@ -1,6 +1,12 @@
 # changelog
 
 ## 3.4.0
+* `NEW` diagnostics:
+  * `cast-local-type`
+  * `assign-type-mismatch`
+  * `param-type-mismatch`
+  * `unknown-cast-variable`
+  * `cast-type-mismatch`
 * `CHG` infer `nil` as redundant return value
   ```lua
   local function f() end

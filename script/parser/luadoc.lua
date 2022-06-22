@@ -69,6 +69,7 @@ Symbol              <-  ({} {
     ev = '\v',
     name = (m.R('az', 'AZ', '09', '\x80\xff') + m.S('_')) * (m.R('az', 'AZ', '__', '09', '\x80\xff') + m.S('_.*-'))^0,
     Char10 = function (char)
+        ---@type integer?
         char = tonumber(char)
         if not char or char < 0 or char > 255 then
             return ''

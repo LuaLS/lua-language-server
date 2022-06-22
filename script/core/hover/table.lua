@@ -180,7 +180,7 @@ return function (source)
 
     for view in vm.getInfer(source):eachView(uri) do
         if view == 'string'
-        or vm.isSubType(uri, view, 'string') then
+        or (view ~= 'unknown' and view ~= 'any' and vm.isSubType(uri, view, 'string')) then
             return nil
         end
     end

@@ -87,7 +87,9 @@ function vm.isSubType(uri, child, parent, mark)
     local childName  = getNodeName(child)
     local parentName = getNodeName(parent)
     if childName  == 'any'
-    or parentName == 'any' then
+    or parentName == 'any'
+    or childName  == 'unknown'
+    or parentName == 'unknown' then
         return true
     end
 
@@ -240,12 +242,13 @@ function vm.canCastType(uri, defNode, refNode)
     local defInfer = vm.getInfer(defNode)
     local refInfer = vm.getInfer(refNode)
 
-    if defInfer:hasUnknown(uri)
-    or defInfer:hasAny(uri) then
+    if defInfer:hasAny(uri) then
         return true
     end
-    if refInfer:hasUnknown(uri)
-    or refInfer:hasAny(uri) then
+    if refInfer:hasAny(uri) then
+        return true
+    end
+    if defInfer:view(uri) == 'unknown' then
         return true
     end
 

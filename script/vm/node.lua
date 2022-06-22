@@ -310,6 +310,7 @@ end
 ---@param source vm.object
 ---@param node vm.node | vm.object
 ---@param cover? boolean
+---@return vm.node
 function vm.setNode(source, node, cover)
     if not node then
         if TEST then
@@ -324,18 +325,20 @@ function vm.setNode(source, node, cover)
     if cover then
         ---@cast node vm.node
         vm.nodeCache[source] = node
-        return
+        return node
     end
     local me = vm.nodeCache[source]
     if me then
         me:merge(node)
     else
         if node.type == 'vm.node' then
-            vm.nodeCache[source] = node:copy()
+            me = node:copy()
         else
-            vm.nodeCache[source] = vm.createNode(node)
+            me = vm.createNode(node)
         end
+        vm.nodeCache[source] = me
     end
+    return me
 end
 
 ---@param source vm.object

@@ -210,6 +210,27 @@ TEST 'integer' [[
 <?x?> = 1 + 2
 ]]
 
+TEST 'integer' [[
+---@type integer
+local a
+
+<?x?> = - a
+]]
+
+TEST 'number' [[
+local a
+
+<?x?> = - a
+]]
+
+TEST 'integer' [[
+<?x?> = 1 + X
+]]
+
+TEST 'number' [[
+<?x?> = 1.0 + X
+]]
+
 TEST 'tablelib' [[
 ---@class tablelib
 table = {}
@@ -2358,7 +2379,7 @@ end
 local <?z?> = f()
 ]]
 
-TEST 'number|table' [[
+TEST 'integer|table' [[
 local function returnI()
     return a + 1
 end

@@ -1105,7 +1105,7 @@ local binarySwich = util.switch()
                 start  = source.start,
                 finish = source.finish,
                 parent = source,
-                [1]    =result,
+                [1]    = result,
             })
         else
             vm.setNode(source, vm.declareGlobal('type', 'integer'))
@@ -1140,7 +1140,7 @@ local binarySwich = util.switch()
                 start  = source.start,
                 finish = source.finish,
                 parent = source,
-                [1]    =result,
+                [1]    = result,
             })
         else
             if op == '+'
@@ -1149,10 +1149,15 @@ local binarySwich = util.switch()
             or op == '//'
             or op == '%' then
                 local uri = guide.getUri(source)
-                if  vm.getInfer(source[1]):view(uri) == 'integer'
-                and vm.getInfer(source[2]):view(uri) == 'integer' then
-                    vm.setNode(source, vm.declareGlobal('type', 'integer'))
-                    return
+                local infer1 = vm.getInfer(source[1])
+                local infer2 = vm.getInfer(source[2])
+                if infer1:hasType(uri, 'integer')
+                or infer2:hasType(uri, 'integer') then
+                    if  not infer1:hasType(uri, 'number')
+                    and not infer2:hasType(uri, 'number') then
+                        vm.setNode(source, vm.declareGlobal('type', 'integer'))
+                        return
+                    end
                 end
             end
             vm.setNode(source, vm.declareGlobal('type', 'number'))
@@ -1736,7 +1741,12 @@ local compilerSwitch = util.switch()
         if source.op.type == '-' then
             local v = vm.getNumber(source[1])
             if v == nil then
-                vm.setNode(source, vm.declareGlobal('type', 'number'))
+                local infer = vm.getInfer(source[1])
+                if infer:hasType(guide.getUri(source), 'integer') then
+                    vm.setNode(source, vm.declareGlobal('type', 'integer'))
+                else
+                    vm.setNode(source, vm.declareGlobal('type', 'number'))
+                end
                 return
             else
                 vm.setNode(source, {

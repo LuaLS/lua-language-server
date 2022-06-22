@@ -5,6 +5,10 @@ local sp        = require 'bee.subprocess'
 local guide     = require "parser.guide"
 local converter = require 'proto.converter'
 
+---@param uri  uri
+---@param row  integer
+---@param mode string
+---@param code string
 local function checkDisableByLuaDocExits(uri, row, mode, code)
     if row < 0 then
         return nil

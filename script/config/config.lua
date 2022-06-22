@@ -164,7 +164,7 @@ function m.prop(uri, key, prop, value)
     return false
 end
 
----@param uri uri
+---@param uri? uri
 ---@param key string
 ---@return any
 function m.get(uri, key)

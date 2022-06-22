@@ -48,6 +48,7 @@ function mt:emptyLine()
     return self
 end
 
+---@return string
 function mt:string(nl)
     if self._cacheResult then
         return self._cacheResult

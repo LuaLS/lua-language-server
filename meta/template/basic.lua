@@ -209,8 +209,8 @@ function select(index, ...) end
 function setfenv(f, table) end
 
 ---#DES 'setmetatable'
----@param table     table
----@param metatable table
+---@param table      table
+---@param metatable? table
 ---@return table
 function setmetatable(table, metatable) end
 

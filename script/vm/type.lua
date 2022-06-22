@@ -250,6 +250,16 @@ function vm.canCastType(uri, defNode, refNode)
             return true
         end
     end
+
+    if vm.isSubType(uri, refNode, 'number') then
+        -- allow `local x = 0;x = 1.0`,
+        -- but not allow `local x ---@type integer;x = 1.0`
+        if  defInfer:hasType(uri, 'integer')
+        and not defNode:hasType 'integer' then
+            return true
+        end
+    end
+
     if vm.isSubType(uri, refNode, defNode) then
         return true
     end

@@ -9,6 +9,7 @@ vm.nodeCache = {}
 
 ---@class vm.node
 ---@field [integer] vm.object
+---@field [vm.object] true
 local mt = {}
 mt.__index    = mt
 mt.id         = 0
@@ -234,14 +235,19 @@ function mt:narrow(name)
     end
     for index = #self, 1, -1 do
         local c = self[index]
-        if (c.type == 'global' and c.cate == 'type' and c.name == name)
-        or (c.type == name)
+        if (c.type == name)
         or (c.type == 'doc.type.integer'  and (name == 'number' or name == 'integer'))
         or (c.type == 'doc.type.boolean'  and name == 'boolean')
         or (c.type == 'doc.type.table'    and name == 'table')
         or (c.type == 'doc.type.array'    and name == 'table')
         or (c.type == 'doc.type.function' and name == 'function') then
             goto CONTINUE
+        end
+        if c.type == 'global' and c.cate == 'type' then
+            if (c.name == name)
+            or (c.name == 'integer' and name == 'number') then
+                goto CONTINUE
+            end
         end
         table.remove(self, index)
         self[c] = nil
@@ -268,6 +274,7 @@ end
 function mt:removeNode(node)
     for _, c in ipairs(node) do
         if c.type == 'global' and c.cate == 'type' then
+            ---@cast c vm.global
             self:remove(c.name)
         elseif c.type == 'nil' then
             self:remove 'nil'

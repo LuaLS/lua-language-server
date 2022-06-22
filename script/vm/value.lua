@@ -72,9 +72,11 @@ local function getUnique(v)
         return ('num:%s'):format(v[1])
     end
     if v.type == 'table' then
+        ---@cast v parser.object
         return ('table:%s@%d'):format(guide.getUri(v), v.start)
     end
     if v.type == 'function' then
+        ---@cast v parser.object
         return ('func:%s@%d'):format(guide.getUri(v), v.start)
     end
     return false

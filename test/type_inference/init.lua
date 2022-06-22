@@ -3016,3 +3016,30 @@ if type(x) == 'number' then
     print(<?x?>)
 end
 ]]
+
+TEST 'boolean' [[
+---@class A
+---@field [integer] boolean
+local mt
+
+function mt:f()
+    ---@type integer
+    local index
+    local <?x?> = self[index]
+end
+]]
+
+TEST 'boolean' [[
+---@class A
+---@field [B] boolean
+
+---@class B
+
+---@type A
+local a
+
+---@type B
+local b
+
+local <?x?> = a[b]
+]]

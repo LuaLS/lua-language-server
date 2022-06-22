@@ -71,6 +71,8 @@ local DUMMY_FUNCTION = function () end
 local function eachOfFolder(nameCollect, scp)
     local curi, value
 
+    ---@return any
+    ---@return uri
     local function getNext()
         curi, value = next(nameCollect, curi)
         if not curi then
@@ -90,6 +92,8 @@ end
 local function eachOfLinked(nameCollect, scp)
     local curi, value
 
+    ---@return any
+    ---@return uri
     local function getNext()
         curi, value = next(nameCollect, curi)
         if not curi then
@@ -120,6 +124,8 @@ end
 local function eachOfFallback(nameCollect, scp)
     local curi, value
 
+    ---@return any
+    ---@return uri
     local function getNext()
         curi, value = next(nameCollect, curi)
         if not curi then
@@ -146,6 +152,7 @@ end
 --- 迭代某个名字的订阅
 ---@param uri  uri
 ---@param name string
+---@return fun():any, uri
 function mt:each(uri, name)
     uri = uri or '<fallback>'
     local nameCollect = self.collect[name]

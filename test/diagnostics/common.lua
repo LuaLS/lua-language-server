@@ -1659,3 +1659,19 @@ k(f())
 TEST [[
 ---@cast <!x!> integer
 ]]
+
+TEST [[
+---@class A
+
+---@class B
+---@field [integer] A
+---@field [A] true
+]]
+
+TEST [[
+---@class A
+
+---@class B
+---@field [A] A
+---@field [<!A!>] true
+]]

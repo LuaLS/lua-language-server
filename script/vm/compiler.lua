@@ -253,7 +253,11 @@ local searchFieldSwitch = util.switch()
         end
     end)
 
-
+---@param suri uri
+---@param object vm.global
+---@param key string|vm.global
+---@param ref boolean
+---@param pushResult fun(field: vm.object, isMark?: boolean)
 function vm.getClassFields(suri, object, key, ref, pushResult)
     local mark = {}
 
@@ -376,7 +380,7 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                 for _, set in ipairs(sets) do
                     pushResult(set)
                 end
-            else
+            elseif type(key) == 'string' then
                 local global = vm.getGlobal('variable', key)
                 if global then
                     for _, set in ipairs(global:getSets(suri)) do
@@ -677,7 +681,7 @@ local function bindAs(source)
 end
 
 ---@param source vm.node
----@param key? any
+---@param key? string|vm.global
 ---@param pushResult fun(source: parser.object)
 function vm.compileByParentNode(source, key, ref, pushResult)
     local parentNode = vm.compileNode(source)
@@ -1380,12 +1384,25 @@ local compilerSwitch = util.switch()
             return
         end
         if type(key) == 'table' then
+            ---@cast key vm.node
             local uri = guide.getUri(source)
             local value = vm.getTableValue(uri, vm.compileNode(source.node), key)
             if value then
                 vm.setNode(source, value):removeOptional()
             end
+            for k in key:eachObject() do
+                if k.type == 'global' and k.cate == 'type' then
+                    ---@cast k vm.global
+                    vm.compileByParentNode(source.node, k, false, function (src)
+                        vm.setNode(source, vm.compileNode(src))
+                        if src.value then
+                            vm.setNode(source, vm.compileNode(src.value)):removeOptional()
+                        end
+                    end)
+                end
+            end
         else
+            ---@cast key string
             vm.compileByParentNode(source.node, key, false, function (src)
                 vm.setNode(source, vm.compileNode(src))
                 if src.value then

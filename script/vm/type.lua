@@ -84,6 +84,9 @@ function vm.isSubType(uri, child, parent, mark)
         return false
     end
 
+    ---@cast child  vm.object
+    ---@cast parent vm.object
+
     local childName  = getNodeName(child)
     local parentName = getNodeName(parent)
     if childName  == 'any'
@@ -146,7 +149,7 @@ end
 
 ---@param uri uri
 ---@param tnode vm.node
----@param knode vm.node
+---@param knode vm.node|string
 ---@return vm.node?
 function vm.getTableValue(uri, tnode, knode)
     local result = vm.createNode()

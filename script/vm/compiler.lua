@@ -1383,13 +1383,13 @@ local compilerSwitch = util.switch()
             local uri = guide.getUri(source)
             local value = vm.getTableValue(uri, vm.compileNode(source.node), key)
             if value then
-                vm.setNode(source, value)
+                vm.setNode(source, value):removeOptional()
             end
         else
             vm.compileByParentNode(source.node, key, false, function (src)
                 vm.setNode(source, vm.compileNode(src))
                 if src.value then
-                    vm.setNode(source, vm.compileNode(src.value))
+                    vm.setNode(source, vm.compileNode(src.value)):removeOptional()
                 end
             end)
         end
@@ -1403,7 +1403,7 @@ local compilerSwitch = util.switch()
         vm.compileByParentNode(source.node, key, false, function (src)
             if src.type == 'doc.type.field'
             or src.type == 'doc.field' then
-                vm.setNode(source, vm.compileNode(src))
+                vm.setNode(source, vm.compileNode(src)):removeOptional()
             end
         end)
     end)
@@ -1433,13 +1433,13 @@ local compilerSwitch = util.switch()
                 if src.type == 'doc.field'
                 or src.type == 'doc.type.field' then
                     hasMarkDoc = true
-                    vm.setNode(source, vm.compileNode(src))
+                    vm.setNode(source, vm.compileNode(src)):removeOptional()
                 end
             end)
         end
 
         if not hasMarkDoc and source.value then
-            vm.setNode(source, vm.compileNode(source.value))
+            vm.setNode(source, vm.compileNode(source.value)):removeOptional()
         end
 
     end)

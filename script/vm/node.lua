@@ -81,6 +81,7 @@ end
 
 function mt:removeOptional()
     self:remove 'nil'
+    return self
 end
 
 ---@return boolean
@@ -289,6 +290,24 @@ function mt:hasType(name)
         if c.type == 'global' and c.cate == 'type' and c.name == name then
             return true
         end
+    end
+    return false
+end
+
+---@param name string
+---@return boolean
+function mt:hasName(name)
+    if name == 'nil' and self.optional == true then
+        return true
+    end
+    for _, c in ipairs(self) do
+        if c.type == 'global' and c.cate == 'type' and c.name == name then
+            return true
+        end
+        if c.type == name then
+            return true
+        end
+        -- TODO
     end
     return false
 end

@@ -38,14 +38,13 @@ return function (uri, callback)
             end
         end
         local valueNode = vm.compileNode(value)
-        if  source.type == 'setindex'
-        and vm.isSubType(uri, valueNode, 'nil') then
-            -- boolean[1] = nil
-            local tnode = vm.compileNode(source.node)
-            for n in tnode:eachObject() do
-                if n.type == 'doc.type.array'
-                or n.type == 'doc.type.table'
-                or n.type == 'table' then
+        if source.type == 'setindex'
+        or source.type == 'setfield'
+        or source.type == 'tablefield'
+        or source.type == 'tableindex' then
+            if valueNode:hasName 'nil' then
+                valueNode = valueNode:copy():removeOptional()
+                if valueNode:isEmpty() then
                     return
                 end
             end

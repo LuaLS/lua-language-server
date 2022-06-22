@@ -366,5 +366,19 @@ local t
 ---@cast t <!number!>
 ]]
 
+TEST [[
+local n
+
+if G then
+    n = {}
+else
+    n = nil
+end
+
+local t = {
+    x = n,
+}
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

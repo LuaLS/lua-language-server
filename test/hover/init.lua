@@ -810,7 +810,28 @@ TEST [[
     next: function,
     os: oslib,
     package: packagelib,
-    ...(+22)
+    pairs: function,
+    pcall: function,
+    print: function,
+    rawequal: function,
+    rawget: function,
+    rawlen: function,
+    rawset: function,
+    require: function,
+    select: function,
+    setfenv: function,
+    setmetatable: function,
+    string: stringlib,
+    table: tablelib,
+    tonumber: function,
+    tostring: function,
+    type: function,
+    unpack: function,
+    utf8: utf8lib,
+    warn: function,
+    xpcall: function,
+    _G: _G,
+    _VERSION: string = "Lua 5.4",
 }
 ]]
 
@@ -1989,4 +2010,23 @@ local n3 = <?f?>(0, 0)
 ]]
 [[
 local f: fun(x: number, y: number):string
+]]
+
+TEST [[
+---@class A
+local mt
+
+---@type integer
+mt.x = 1
+
+mt.y = true
+
+---@type A
+local <?t?>
+]]
+[[
+local t: A {
+    x: integer,
+    y: boolean = true,
+}
 ]]

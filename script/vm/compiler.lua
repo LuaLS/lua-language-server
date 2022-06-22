@@ -121,17 +121,21 @@ local searchFieldSwitch = util.switch()
         if not fields then
             return
         end
-        local hasMarkDoc
+        local hasMarkDoc = {}
         for _, src in ipairs(fields) do
             if src.bindDocs then
                 if bindDocs(src) then
-                    hasMarkDoc = true
-                    pushResult(src, hasMarkDoc)
+                    local skey = guide.getKeyName(src)
+                    if skey then
+                        hasMarkDoc[skey] = true
+                    end
+                    pushResult(src, true)
                 end
             end
         end
-        if not hasMarkDoc then
-            for _, src in ipairs(fields) do
+        for _, src in ipairs(fields) do
+            local skey = guide.getKeyName(src)
+            if not hasMarkDoc[skey] then
                 pushResult(src)
             end
         end

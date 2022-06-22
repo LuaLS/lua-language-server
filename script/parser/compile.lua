@@ -3792,6 +3792,7 @@ local function initState(lua, version, options)
     Chunk               = {}
     Tokens              = tokens(lua)
     Index               = 1
+    ---@class parser.state
     local state = {
         version = version,
         lua     = lua,

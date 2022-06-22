@@ -6,6 +6,9 @@ local function insertIndentation(uri, position, edits)
     local text   = files.getText(uri)
     local state  = files.getState(uri)
     local row    = guide.rowColOf(position)
+    if not state then
+        return
+    end
     local offset = state.lines[row]
     local indent = text:match('^%s*', offset)
     for _, edit in ipairs(edits) do

@@ -176,13 +176,16 @@ local viewNodeSwitch = util.switch()
 ---@class vm.node
 ---@field lastInfer? vm.infer
 
----@param source parser.object | vm.node
+---@param source vm.object | vm.node
 ---@return vm.infer
 function vm.getInfer(source)
+    ---@type vm.node
     local node
     if source.type == 'vm.node' then
+        ---@cast source vm.node
         node = source
     else
+        ---@cast source vm.object
         node = vm.compileNode(source)
     end
     if node.lastInfer then

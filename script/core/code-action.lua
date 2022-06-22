@@ -14,6 +14,9 @@ local function checkDisableByLuaDocExits(uri, row, mode, code)
         return nil
     end
     local state = files.getState(uri)
+    if not state then
+        return nil
+    end
     local lines = state.lines
     if state.ast.docs and lines then
         return guide.eachSourceBetween(
@@ -128,9 +131,12 @@ local function changeVersion(uri, version, results)
 end
 
 local function solveUndefinedGlobal(uri, diag, results)
-    local ast    = files.getState(uri)
-    local start  = converter.unpackRange(uri, diag.range)
-    guide.eachSourceContain(ast.ast, start, function (source)
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
+    local start = converter.unpackRange(uri, diag.range)
+    guide.eachSourceContain(state.ast, start, function (source)
         if source.type ~= 'getglobal' then
             return
         end
@@ -147,9 +153,12 @@ local function solveUndefinedGlobal(uri, diag, results)
 end
 
 local function solveLowercaseGlobal(uri, diag, results)
-    local ast    = files.getState(uri)
-    local start  = converter.unpackRange(uri, diag.range)
-    guide.eachSourceContain(ast.ast, start, function (source)
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
+    local start = converter.unpackRange(uri, diag.range)
+    guide.eachSourceContain(state.ast, start, function (source)
         if source.type ~= 'setglobal' then
             return
         end
@@ -160,8 +169,11 @@ local function solveLowercaseGlobal(uri, diag, results)
 end
 
 local function findSyntax(uri, diag)
-    local ast = files.getState(uri)
-    for _, err in ipairs(ast.errs) do
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
+    for _, err in ipairs(state.errs) do
         if err.type:lower():gsub('_', '-') == diag.code then
             local range = converter.packRange(uri, err.start, err.finish)
             if util.equal(range, diag.range) then

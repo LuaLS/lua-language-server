@@ -204,6 +204,9 @@ local function getSnip(source)
             local uri = guide.getUri(def)
             local text = files.getText(uri)
             local state = files.getState(uri)
+            if not state then
+                goto CONTINUE
+            end
             local lines = state.lines
             if not text then
                 goto CONTINUE

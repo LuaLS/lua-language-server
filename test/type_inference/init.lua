@@ -7,9 +7,12 @@ local vm     = require 'vm'
 rawset(_G, 'TEST', true)
 
 local function getSource(pos)
-    local ast = files.getState('')
+    local state = files.getState('')
+    if not state then
+        return
+    end
     local result
-    guide.eachSourceContain(ast.ast, pos, function (source)
+    guide.eachSourceContain(state.ast, pos, function (source)
         if source.type == 'local'
         or source.type == 'getlocal'
         or source.type == 'setlocal'

@@ -13,9 +13,13 @@ local tableSort    = table.sort
 
 _ENV = nil
 
+---@class fspath
+---@field string fun(self):string
+
+---@class fs-utility
 local m = {}
 --- 读取文件
----@param path string
+---@param path string|fspath
 function m.loadFile(path, keepBom)
     if type(path) ~= 'string' then
         ---@diagnostic disable-next-line: undefined-field
@@ -255,6 +259,9 @@ function dfs:saveFile(path, text)
     dir[filename] = text
 end
 
+---@param path   string|fspath
+---@param option table
+---@return fspath
 local function fsAbsolute(path, option)
     if type(path) == 'string' then
         local suc, res = pcall(fs.path, path)
@@ -583,8 +590,8 @@ function m.fileRemove(path, option)
 end
 
 --- 复制文件（夹）
----@param source string
----@param target string
+---@param source string|fspath
+---@param target string|fspath
 ---@return table
 function m.fileCopy(source, target, option)
     option = buildOption(option)
@@ -597,8 +604,8 @@ function m.fileCopy(source, target, option)
 end
 
 --- 同步文件（夹）
----@param source string
----@param target string
+---@param source string|fspath
+---@param target string|fspath
 ---@return table
 function m.fileSync(source, target, option)
     option = buildOption(option)

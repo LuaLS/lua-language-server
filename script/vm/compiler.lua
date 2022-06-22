@@ -629,7 +629,7 @@ local function bindAs(source)
     local root = guide.getRoot(source)
     local docs = root.docs
     if not docs then
-        return
+        return false
     end
     local ases = docs._asCache
     if not ases then
@@ -645,19 +645,20 @@ local function bindAs(source)
         end)
     end
 
+    if #ases == 0 then
+        return false
+    end
+
     local max = #ases
     local index
     local left  = 1
     local right = max
     for _ = 1, 1000 do
-        index = left + (right - left) // 2
-        if index <= left then
+        if left == right then
             index = left
             break
-        elseif index >= right then
-            index = right
-            break
         end
+        index = left + (right - left) // 2
         local doc = ases[index]
         if doc.originalComment.start < source.finish + 2 then
             left = index + 1

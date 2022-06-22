@@ -159,6 +159,8 @@ local function peekToken()
     return TokenTypes[Ci+1], TokenContents[Ci+1]
 end
 
+---@return string tokenType
+---@return string tokenContent
 local function nextToken()
     Ci = Ci + 1
     if not TokenTypes[Ci] then
@@ -181,6 +183,7 @@ local function getStart()
     return TokenStarts[Ci] + Offset
 end
 
+---@return integer
 local function getFinish()
     if Ci == 0 then
         return Offset

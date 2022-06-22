@@ -17,7 +17,7 @@ return function (data)
     local uri   = data.uri
     local text  = files.getText(uri)
     local state = files.getState(uri)
-    if not state then
+    if not state or not text then
         return
     end
 

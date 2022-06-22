@@ -825,6 +825,8 @@ function m.positionToOffset(state, position)
     return m.positionToOffsetByLines(state.lines, position)
 end
 
+---@param lines integer[]
+---@param offset integer
 function m.offsetToPositionByLines(lines, offset)
     local left  = 0
     local right = #lines

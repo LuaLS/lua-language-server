@@ -451,7 +451,7 @@ end
 local function checkSwapParams(results, uri, start, finish)
     local state = files.getState(uri)
     local text  = files.getText(uri)
-    if not state then
+    if not state or not text then
         return
     end
     local args = {}
@@ -619,6 +619,9 @@ end
 local function checkJsonToLua(results, uri, start, finish)
     local text         = files.getText(uri)
     local state        = files.getState(uri)
+    if not state or not text then
+        return
+    end
     local startOffset  = guide.positionToOffset(state, start)
     local finishOffset = guide.positionToOffset(state, finish)
     local jsonStart    = text:match('()[%{%[]', startOffset + 1)

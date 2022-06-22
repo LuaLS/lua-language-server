@@ -5,7 +5,7 @@ local lang  = require 'language'
 return function (uri, callback)
     local state = files.getState(uri)
     local text  = files.getText(uri)
-    if not state then
+    if not state or not text then
         return
     end
 

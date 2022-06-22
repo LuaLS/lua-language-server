@@ -32,6 +32,9 @@ end
 
 local function buildSyntaxError(uri, err)
     local text    = files.getText(uri)
+    if not text then
+        return
+    end
     local message = lang.script('PARSER_' .. err.type, err.info)
 
     if err.version then
@@ -83,10 +86,14 @@ local function buildDiagnostic(uri, diag)
         relatedInformation = {}
         for _, rel in ipairs(diag.related) do
             local rtext = files.getText(rel.uri)
+            if not rtext then
+                goto CONTINUE
+            end
             relatedInformation[#relatedInformation+1] = {
                 message  = rel.message or rtext:sub(rel.start, rel.finish),
                 location = converter.location(rel.uri, converter.packRange(rel.uri, rel.start, rel.finish))
             }
+            ::CONTINUE::
         end
     end
 

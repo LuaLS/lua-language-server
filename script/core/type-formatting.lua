@@ -6,7 +6,7 @@ local function insertIndentation(uri, position, edits)
     local text   = files.getText(uri)
     local state  = files.getState(uri)
     local row    = guide.rowColOf(position)
-    if not state then
+    if not state or not text then
         return
     end
     local offset = state.lines[row]
@@ -19,6 +19,9 @@ end
 local function findForward(uri, position, ...)
     local text        = files.getText(uri)
     local state       = files.getState(uri)
+    if not state or not text then
+        return nil
+    end
     local offset      = guide.positionToOffset(state, position)
     local firstOffset = text:match('^[ \t]*()', offset + 1)
     if not firstOffset then
@@ -35,6 +38,9 @@ end
 local function findBackward(uri, position, ...)
     local text       = files.getText(uri)
     local state      = files.getState(uri)
+    if not state or not text then
+        return nil
+    end
     local offset     = guide.positionToOffset(state, position)
     local lastOffset = lookBackward.findAnyOffset(text, offset)
     for _, symbol in ipairs { ... } do

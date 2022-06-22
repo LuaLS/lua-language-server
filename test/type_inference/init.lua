@@ -3007,3 +3007,12 @@ local x = true
 local y = x--[[@as integer]] --is `integer` here
 local z = <?x?>--[[@as string]] --is `true` here
 ]=]
+
+TEST 'integer' [[
+---@type integer
+local x
+
+if type(x) == 'number' then
+    print(<?x?>)
+end
+]]

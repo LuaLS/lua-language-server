@@ -21,7 +21,7 @@ end
 local function findInsertRow(uri)
     local text  = files.getText(uri)
     local state = files.getState(uri)
-    if not state then
+    if not state or not text then
         return
     end
     local lines = state.lines

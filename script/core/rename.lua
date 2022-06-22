@@ -81,6 +81,9 @@ local function renameField(source, newname, callback)
         local uri   = guide.getUri(source)
         local text  = files.getText(uri)
         local state = files.getState(uri)
+        if not state or not text then
+            return false
+        end
         local func = parent.value
         -- function mt:name () end --> mt['newname'] = function (self) end
         local startOffset  = guide.positionToOffset(state, parent.start) + 1

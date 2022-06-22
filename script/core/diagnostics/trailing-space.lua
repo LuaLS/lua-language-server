@@ -14,10 +14,10 @@ end
 
 return function (uri, callback)
     local state = files.getState(uri)
-    if not state then
+    local text  = files.getText(uri)
+    if not state or not text then
         return
     end
-    local text  = files.getText(uri)
     local lines = state.lines
     for i = 0, #lines do
         local startOffset  = lines[i]

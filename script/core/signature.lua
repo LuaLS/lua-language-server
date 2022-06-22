@@ -8,6 +8,9 @@ local lookback   = require 'core.look-backward'
 local function findNearCall(uri, ast, pos)
     local text  = files.getText(uri)
     local state = files.getState(uri)
+    if not state or not text then
+        return nil
+    end
     local nearCall
     guide.eachSourceContain(ast.ast, pos, function (src)
         if src.type == 'call'

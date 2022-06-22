@@ -177,7 +177,7 @@ end
 
 --- 设置文件文本
 ---@param uri uri
----@param text string
+---@param text? string
 ---@param isTrust? boolean
 ---@param callback? function
 function m.setText(uri, text, isTrust, callback)
@@ -333,7 +333,7 @@ end
 
 --- 获取文件文本
 ---@param uri uri
----@return string text
+---@return string? text
 function m.getText(uri)
     local file = m.fileMap[uri]
     if not file then

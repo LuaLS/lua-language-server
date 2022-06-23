@@ -58,6 +58,11 @@ function vm.isSubType(uri, child, parent, mark)
                 return false
             end
         end
+        if child:isOptional() then
+            if not vm.isSubType(uri, 'nil', parent, mark) then
+                return false
+            end
+        end
         return true
     end
 

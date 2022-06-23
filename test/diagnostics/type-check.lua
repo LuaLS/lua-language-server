@@ -380,5 +380,21 @@ local t = {
 }
 ]]
 
+TEST [[
+---@class A
+
+---@param n A
+local function f(n)
+end
+
+---@class B
+local a = {}
+
+---@type A?
+a.x = XX
+
+f(a.x)
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

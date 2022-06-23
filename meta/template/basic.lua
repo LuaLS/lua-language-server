@@ -215,8 +215,8 @@ function setfenv(f, table) end
 function setmetatable(table, metatable) end
 
 ---#DES 'tonumber'
----@overload fun(e: string|number, base: integer):integer?
----@param e     string|number
+---@overload fun(e: string, base: integer):integer
+---@param e any
 ---@return number?
 ---@nodiscard
 function tonumber(e) end

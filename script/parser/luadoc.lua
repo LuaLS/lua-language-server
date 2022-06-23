@@ -1273,8 +1273,7 @@ local docSwitch = util.switch()
             if checkToken('symbol', '?', 1) then
                 block.optional = true
                 nextToken()
-                block.start  = block.start or getStart()
-                block.finish = block.finish
+                block.finish = getFinish()
             else
                 block.extends = parseType(block)
                 if block.extends then
@@ -1286,6 +1285,7 @@ local docSwitch = util.switch()
             if block.optional or block.extends then
                 result.casts[#result.casts+1] = block
             end
+            result.finish = block.finish
 
             if checkToken('symbol', ',', 1) then
                 nextToken()

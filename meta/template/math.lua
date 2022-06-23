@@ -227,7 +227,7 @@ function math.tanh(x) end
 
 ---@version >5.3
 ---#DES 'math.tointeger'
----@param x number|string
+---@param x any
 ---@return integer?
 ---@nodiscard
 function math.tointeger(x) end

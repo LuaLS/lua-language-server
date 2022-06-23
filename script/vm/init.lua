@@ -1,6 +1,6 @@
 local vm = require 'vm.vm'
 
----@alias vm.object parser.object | vm.global | vm.generic
+---@alias vm.object parser.object | vm.generic
 
 require 'vm.compiler'
 require 'vm.value'

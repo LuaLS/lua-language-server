@@ -460,7 +460,7 @@ end
 
 ---@param func  parser.object
 ---@param index integer
----@return vm.object?
+---@return (parser.object|vm.generic)?
 function vm.getReturnOfFunction(func, index)
     if func.type == 'function' then
         if not func._returns then
@@ -600,6 +600,7 @@ local function getReturn(func, index, args)
     for mfunc in funcNode:eachObject() do
         if mfunc.type == 'function'
         or mfunc.type == 'doc.type.function' then
+            ---@cast mfunc parser.object
             local returnObject = vm.getReturnOfFunction(mfunc, index)
             if returnObject then
                 local returnNode = vm.compileNode(returnObject)
@@ -680,7 +681,7 @@ local function bindAs(source)
     return false
 end
 
----@param source vm.node
+---@param source parser.object
 ---@param key? string|vm.global
 ---@param pushResult fun(source: parser.object)
 function vm.compileByParentNode(source, key, ref, pushResult)
@@ -692,6 +693,7 @@ function vm.compileByParentNode(source, key, ref, pushResult)
     for node in parentNode:eachObject() do
         if  node.type == 'global'
         and node.cate == 'type'
+        ---@cast node vm.global
         and not guide.isBasicType(node.name) then
             hasClass = true
             break
@@ -702,6 +704,7 @@ function vm.compileByParentNode(source, key, ref, pushResult)
         or (
                 node.type == 'global'
             and node.cate == 'type'
+            ---@cast node vm.global
             and not guide.isBasicType(node.name)
         ) then
             searchFieldSwitch(node.type, suri, node, key, ref, function (res, markDoc)
@@ -747,7 +750,7 @@ local function selectNode(source, list, index)
         end
     end
     if not exp then
-        vm.setNode(source, vm.getGlobal('type', 'nil'))
+        vm.setNode(source, vm.declareGlobal('type', 'nil'))
         return vm.getNode(source)
     end
     ---@type vm.node?
@@ -755,14 +758,14 @@ local function selectNode(source, list, index)
     if exp.type == 'call' then
         result = getReturn(exp.node, index, exp.args)
         if not result then
-            vm.setNode(source, vm.getGlobal('type', 'unknown'))
+            vm.setNode(source, vm.declareGlobal('type', 'unknown'))
             return vm.getNode(source)
         end
     else
         ---@type vm.node
         result = vm.compileNode(exp)
         if result and exp.type == 'varargs' and result:isEmpty() then
-            result:merge(vm.getGlobal('type', 'unknown'))
+            result:merge(vm.declareGlobal('type', 'unknown'))
         end
     end
     if source.type == 'function.return' then
@@ -788,7 +791,7 @@ local function selectNode(source, list, index)
 end
 
 ---@param source parser.object
----@param node   vm.object
+---@param node   vm.node.object
 ---@return boolean
 local function isValidCallArgNode(source, node)
     if source.type == 'function' then
@@ -796,7 +799,11 @@ local function isValidCallArgNode(source, node)
     end
     if source.type == 'table' then
         return node.type == 'doc.type.table'
-            or (node.type == 'global' and node.cate == 'type' and not guide.isBasicType(node.name))
+            or (    node.type == 'global'
+                and node.cate == 'type'
+                ---@cast node vm.global
+                and not guide.isBasicType(node.name)
+            )
     end
     if source.type == 'dummyarg' then
         return true
@@ -845,12 +852,14 @@ local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
 
     for n in callNode:eachObject() do
         if n.type == 'function' then
+            ---@cast n parser.object
             local sign = getObjectSign(n)
             local farg = getFuncArg(n, myIndex)
             if farg then
                 for fn in vm.compileNode(farg):eachObject() do
                     if isValidCallArgNode(arg, fn) then
                         if fn.type == 'doc.type.function' then
+                            ---@cast fn parser.object
                             if sign then
                                 local generic = vm.createGeneric(fn, sign)
                                 local args    = {}
@@ -866,6 +875,7 @@ local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
             end
         end
         if n.type == 'doc.type.function' then
+            ---@cast n parser.object
             local myEvent
             if n.args[eventIndex] then
                 local argNode = vm.compileNode(n.args[eventIndex])
@@ -892,6 +902,7 @@ end
 ---@param arg parser.object
 ---@param call parser.object
 ---@param index? integer
+---@return vm.node?
 function vm.compileCallArg(arg, call, index)
     if not index then
         for i, carg in ipairs(call.args) do
@@ -899,6 +910,9 @@ function vm.compileCallArg(arg, call, index)
                 index = i
                 break
             end
+        end
+        if not index then
+            return nil
         end
     end
 
@@ -1261,6 +1275,7 @@ local compilerSwitch = util.switch()
             for _, pn in ipairs(parentNode) do
                 if  pn.type == 'global'
                 and pn.cate == 'type' then
+                    ---@cast pn vm.global
                     if not guide.isBasicType(pn.name) then
                         vm.setNode(source, pn)
                     end
@@ -1349,7 +1364,10 @@ local compilerSwitch = util.switch()
             for _, ref in ipairs(source.ref) do
                 if  ref.type == 'setlocal'
                 and guide.getParentFunction(ref) == parentFunc then
-                    vm.setNode(source, vm.getNode(ref))
+                    local refNode = vm.getNode(ref)
+                    if refNode then
+                        vm.setNode(source, refNode)
+                    end
                 end
             end
         end
@@ -1490,6 +1508,7 @@ local compilerSwitch = util.switch()
                                 end)
                             end
                             if hasGeneric then
+                                ---@cast sign -?
                                 vm.setNode(source, vm.createGeneric(rtn, sign))
                             else
                                 vm.setNode(source, vm.compileNode(rtn))
@@ -1500,7 +1519,7 @@ local compilerSwitch = util.switch()
             end
             if lastReturn and not hasMarkDoc and lastReturn.types[1][1] == '...' then
                 hasMarkDoc = true
-                vm.setNode(source, vm.getGlobal('type', 'unknown'))
+                vm.setNode(source, vm.declareGlobal('type', 'unknown'))
             end
         end
         local hasReturn
@@ -1532,12 +1551,12 @@ local compilerSwitch = util.switch()
                     ::CONTINUE::
                 end
                 if not hasKnownType and hasUnknownType then
-                    vm.setNode(source, vm.getGlobal('type', 'unknown'))
+                    vm.setNode(source, vm.declareGlobal('type', 'unknown'))
                 end
             end
         end
         if not hasMarkDoc and not hasReturn then
-            vm.setNode(source, vm.getGlobal('type', 'nil'))
+            vm.setNode(source, vm.declareGlobal('type', 'nil'))
         end
     end)
     : case 'main'
@@ -1710,7 +1729,7 @@ local compilerSwitch = util.switch()
     : call(function (source)
         local type = vm.getGlobal('type', source[1])
         if type then
-            vm.setNode(source, vm.compileNode(type))
+            vm.setNode(source, type)
         end
     end)
     : case 'doc.type.arg'
@@ -1723,10 +1742,6 @@ local compilerSwitch = util.switch()
         if source.optional then
             vm.getNode(source):addOptional()
         end
-    end)
-    : case 'generic'
-    : call(function (source)
-        vm.setNode(source, source)
     end)
     : case 'unary'
     : call(function (source)
@@ -1805,17 +1820,18 @@ local compilerSwitch = util.switch()
         binarySwich(source.op.type, source)
     end)
 
----@param source vm.object
+---@param source parser.object
 local function compileByNode(source)
     compilerSwitch(source.type, source)
 end
 
----@param source vm.object
+---@param source parser.object
 local function compileByGlobal(source)
     local global = source._globalNode
     if not global then
         return
     end
+    ---@cast source parser.object
     local root = guide.getRoot(source)
     local uri = guide.getUri(source)
     if not root._globalBase then
@@ -1900,22 +1916,23 @@ function vm.compileNode(source)
         end
     end
 
-    if source.type == 'global' then
-        return source
-    end
-
     local cache = vm.getNode(source)
     if cache ~= nil then
         return cache
     end
 
-    local node = vm.createNode()
-    vm.setNode(source, node, true)
+    if source.type == 'generic' then
+        vm.setNode(source, source)
+        return vm.getNode(source)
+    end
+
+    ---@cast source parser.object
+    vm.setNode(source, vm.createNode(), true)
     compileByGlobal(source)
     compileByNode(source)
     matchCall(source)
 
-    node = vm.getNode(source)
+    local node = vm.getNode(source)
 
     return node
 end

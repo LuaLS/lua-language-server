@@ -275,7 +275,12 @@ function m.doDiagnostic(uri, isScopeDiag)
 
     local diags = {}
     local lastDiag = copyDiagsWithoutSyntax(m.cache[uri])
-    local function pushResult()
+    local function pushResult(isComplete)
+        -- Disable incremental diagnosis.
+        -- The current diagnosis speed is good.
+        if not isComplete then
+            return
+        end
         tracy.ZoneBeginN 'mergeSyntaxAndDiags'
         local _ <close> = tracy.ZoneEnd
         local full = mergeDiags(syntax, lastDiag, diags)
@@ -322,7 +327,7 @@ function m.doDiagnostic(uri, isScopeDiag)
     end)
 
     lastDiag = nil
-    pushResult()
+    pushResult(true)
 end
 
 ---@param uri uri

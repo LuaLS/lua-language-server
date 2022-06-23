@@ -1024,7 +1024,7 @@ local function parseShortString()
                 fastForwardToken(currentOffset)
                 local right = getPosition(currentOffset - 1, 'right')
                 local byte = tointeger(numbers)
-                if byte <= 255 then
+                if byte and byte <= 255 then
                     stringIndex = stringIndex + 1
                     stringPool[stringIndex] = schar(byte)
                 else

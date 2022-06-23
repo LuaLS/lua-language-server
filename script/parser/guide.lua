@@ -240,7 +240,7 @@ local function formatNumber(n)
 end
 
 --- 是否是字面量
----@param obj parser.object
+---@param obj table
 ---@return boolean
 function m.isLiteral(obj)
     local tp = obj.type

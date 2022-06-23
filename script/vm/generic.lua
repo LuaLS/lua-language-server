@@ -11,13 +11,10 @@ local mt = {}
 mt.__index = mt
 mt.type = 'generic'
 
----@param source    parser.object
+---@param source    vm.object
 ---@param resolved? table<string, vm.node>
 ---@return parser.object
 local function cloneObject(source, resolved)
-    if not source then
-        return nil
-    end
     if not resolved then
         return source
     end
@@ -124,8 +121,14 @@ function mt:resolve(uri, args)
     local protoNode = vm.compileNode(self.proto)
     local result = vm.createNode()
     for nd in protoNode:eachObject() do
-        local clonedNode = vm.compileNode(cloneObject(nd, resolved))
-        result:merge(clonedNode)
+        if nd.type == 'global' then
+            ---@cast nd vm.global
+            result:merge(nd)
+        else
+            ---@cast nd -vm.global
+            local clonedNode = vm.compileNode(cloneObject(nd, resolved))
+            result:merge(clonedNode)
+        end
     end
     return result
 end

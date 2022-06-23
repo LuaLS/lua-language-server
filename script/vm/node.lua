@@ -7,8 +7,10 @@ local guide    = require 'parser.guide'
 ---@type table<vm.object, vm.node>
 vm.nodeCache = {}
 
+---@alias vm.node.object vm.object | vm.global
+
 ---@class vm.node
----@field [integer] vm.object
+---@field [integer] vm.node.object
 ---@field [vm.object] true
 local mt = {}
 mt.__index    = mt
@@ -17,7 +19,7 @@ mt.type       = 'vm.node'
 mt.optional   = nil
 mt.data       = nil
 
----@param node vm.node | vm.object
+---@param node vm.node | vm.node.object
 function mt:merge(node)
     if not node then
         return
@@ -319,7 +321,7 @@ function mt:hasName(name)
     return false
 end
 
----@return fun():vm.object
+---@return fun():vm.node.object
 function mt:eachObject()
     local i = 0
     return function ()
@@ -334,7 +336,7 @@ function mt:copy()
 end
 
 ---@param source vm.object
----@param node vm.node | vm.object
+---@param node vm.node | vm.node.object
 ---@param cover? boolean
 ---@return vm.node
 function vm.setNode(source, node, cover)
@@ -344,9 +346,6 @@ function vm.setNode(source, node, cover)
         else
             log.error('Can not set nil node')
         end
-    end
-    if source.type == 'global' then
-        error('Can not set node to global')
     end
     if cover then
         ---@cast node vm.node
@@ -403,8 +402,8 @@ end
 
 local ID = 0
 
----@param a? vm.node | vm.object
----@param b? vm.node | vm.object
+---@param a? vm.node | vm.node.object
+---@param b? vm.node | vm.node.object
 ---@return vm.node
 function vm.createNode(a, b)
     ID = ID + 1

@@ -1219,6 +1219,10 @@ local function checkEqualEnumInString(state, position, results)
     or parent.type == 'setindex' then
         checkEqualEnumLeft(state, position, parent.node, results)
     end
+    if parent.type == 'tablefield'
+    or parent.type == 'tableindex' then
+        checkEqualEnumLeft(state, position, parent, results)
+    end
 end
 
 local function isFuncArg(state, position)

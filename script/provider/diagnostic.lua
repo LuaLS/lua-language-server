@@ -159,11 +159,6 @@ function m.clear(uri, force)
     log.info('clearDiagnostics', uri)
 end
 
--- enable `push` and `send`
-function m.clearCache(uri)
-    m.cache[uri] = false
-end
-
 function m.clearCacheExcept(uris)
     local excepts = {}
     for _, uri in ipairs(uris) do
@@ -328,6 +323,23 @@ function m.doDiagnostic(uri, isScopeDiag)
 
     lastDiag = nil
     pushResult()
+end
+
+---@param uri uri
+function m.resendDiagnostic(uri)
+    local full = m.cache[uri]
+    if not full then
+        return
+    end
+
+    local version = files.getVersion(uri)
+
+    proto.notify('textDocument/publishDiagnostics', {
+        uri = uri,
+        version = version,
+        diagnostics = full,
+    })
+    log.debug('publishDiagnostics', uri, #full)
 end
 
 ---@async
@@ -565,7 +577,7 @@ files.watch(function (ev, uri) ---@async
         m.refresh(uri)
     elseif ev == 'open' then
         if ws.isReady(uri) then
-            m.clearCache(uri)
+            m.resendDiagnostic(uri)
             xpcall(m.doDiagnostic, log.error, uri)
         end
     elseif ev == 'close' then

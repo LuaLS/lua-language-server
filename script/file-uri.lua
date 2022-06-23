@@ -24,9 +24,6 @@ local m = {}
 ---@param path string
 ---@return uri uri
 function m.encode(path)
-    if not path then
-        return nil
-    end
     local authority = ''
     if platform.OS == 'Windows' then
         path = path:gsub('\\', '/')

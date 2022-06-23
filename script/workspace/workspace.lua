@@ -48,7 +48,7 @@ end
 function m.create(uri)
     log.info('Workspace create: ', uri)
     if uri == furi.encode '/'
-    or uri == furi.encode(os.getenv 'HOME') then
+    or uri == furi.encode(os.getenv 'HOME' or '') then
         client.showMessage('Error', lang.script('WORKSPACE_NOT_ALLOWED', furi.decode(uri)))
         return
     end

@@ -33,7 +33,7 @@ local searchFieldSwitch = util.switch()
         end
     end)
     : case 'global'
-    ---@param obj vm.object
+    ---@param obj vm.global
     ---@param key string
     : call(function (suri, obj, key, pushResult)
         if obj.cate == 'variable' then

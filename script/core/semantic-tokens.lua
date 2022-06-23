@@ -828,9 +828,13 @@ return function (uri, start, finish)
         keyword    = config.get(uri, 'Lua.semantic.keyword'),
     }
 
+    local n = 0
     guide.eachSourceBetween(state.ast, start, finish, function (source) ---@async
         Care(source.type, source, options, results)
-        await.delay()
+        n = n + 1
+        if n % 100 == 0 then
+            await.delay()
+        end
     end)
 
     for _, comm in ipairs(state.comms) do

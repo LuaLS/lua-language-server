@@ -50,7 +50,7 @@ function vm.test(source)
     end
 end
 
----@param v vm.object
+---@param v vm.node.object
 ---@return string?
 local function getUnique(v)
     if v.type == 'boolean' then
@@ -79,11 +79,11 @@ local function getUnique(v)
         ---@cast v parser.object
         return ('func:%s@%d'):format(guide.getUri(v), v.start)
     end
-    return false
+    return nil
 end
 
----@param a vm.object?
----@param b vm.object?
+---@param a parser.object?
+---@param b parser.object?
 ---@return boolean|nil
 function vm.equal(a, b)
     if not a or not b then

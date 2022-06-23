@@ -396,5 +396,46 @@ a.x = XX
 f(a.x)
 ]]
 
+TEST [[
+---@type string?
+local x
+
+local s = <!x!>:upper()
+]]
+
+TEST [[
+---@alias A string|boolean
+
+---@param x string|boolean
+local function f(x) end
+
+---@type A
+local x
+
+f(x)
+]]
+
+TEST [[
+---@alias A string|boolean
+
+---@param x A
+local function f(x) end
+
+---@type string|boolean
+local x
+
+f(x)
+]]
+
+TEST [[
+---@type boolean[]
+local t = {}
+
+---@type boolean?
+local x
+
+t[#t+1] = x
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

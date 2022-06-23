@@ -11,7 +11,7 @@ vm.nodeCache = {}
 
 ---@class vm.node
 ---@field [integer] vm.node.object
----@field [vm.object] true
+---@field [vm.node.object] true
 local mt = {}
 mt.__index    = mt
 mt.id         = 0
@@ -38,6 +38,7 @@ function mt:merge(node)
             end
         end
     else
+        ---@cast node -vm.node
         if not self[node] then
             self[node]    = true
             self[#self+1] = node
@@ -287,6 +288,7 @@ function mt:removeNode(node)
                 self:remove 'false'
             end
         else
+            ---@cast c -vm.global
             self:removeObject(c)
         end
     end

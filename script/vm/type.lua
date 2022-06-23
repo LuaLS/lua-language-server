@@ -2,7 +2,7 @@
 local vm        = require 'vm.vm'
 local guide     = require 'parser.guide'
 
----@param object vm.object
+---@param object vm.node.object
 ---@return string?
 local function getNodeName(object)
     if object.type == 'global' and object.cate == 'type' then
@@ -39,18 +39,19 @@ local function getNodeName(object)
 end
 
 ---@param uri uri
----@param child  vm.node|string|vm.object
----@param parent vm.node|string|vm.object
+---@param child  vm.node|string|vm.node.object
+---@param parent vm.node|string|vm.node.object
 ---@param mark?  table
 ---@return boolean
 function vm.isSubType(uri, child, parent, mark)
     mark = mark or {}
 
     if type(child) == 'string' then
-        child = vm.getGlobal('type', child)
-        if not child then
+        local global = vm.getGlobal('type', child)
+        if not global then
             return false
         end
+        child = global
     elseif child.type == 'vm.node' then
         for n in child:eachObject() do
             if  getNodeName(n)
@@ -67,10 +68,11 @@ function vm.isSubType(uri, child, parent, mark)
     end
 
     if type(parent) == 'string' then
-        parent = vm.getGlobal('type', parent)
-        if not parent then
+        local global = vm.getGlobal('type', parent)
+        if not global then
             return false
         end
+        parent = global
     elseif parent.type == 'vm.node' then
         for n in parent:eachObject() do
             if  getNodeName(n)
@@ -89,15 +91,17 @@ function vm.isSubType(uri, child, parent, mark)
         return false
     end
 
-    ---@cast child  vm.object
-    ---@cast parent vm.object
+    ---@cast child  vm.node.object
+    ---@cast parent vm.node.object
 
     local childName  = getNodeName(child)
     local parentName = getNodeName(parent)
     if childName  == 'any'
     or parentName == 'any'
     or childName  == 'unknown'
-    or parentName == 'unknown' then
+    or parentName == 'unknown'
+    or not childName
+    or not parentName then
         return true
     end
 
@@ -140,13 +144,12 @@ function vm.isSubType(uri, child, parent, mark)
                         end
                     end
                 end
-                if set.type == 'doc.alias' and set.extends then
-                    if vm.isSubType(uri, vm.compileNode(set.extends), parent, mark) then
-                        return true
-                    end
+                if set.type == 'doc.alias' then
+                    return true
                 end
             end
         end
+        mark[childName] = nil
     end
 
     return false
@@ -204,7 +207,7 @@ end
 
 ---@param uri uri
 ---@param tnode vm.node
----@param vnode vm.node
+---@param vnode vm.node|string|vm.object
 ---@return vm.node?
 function vm.getTableKey(uri, tnode, vnode)
     local result = vm.createNode()

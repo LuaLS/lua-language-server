@@ -443,7 +443,7 @@ function mt:viewClass()
     return table.concat(class, '|')
 end
 
----@param source parser.object
+---@param source vm.node.object
 ---@param uri uri
 ---@return string?
 function vm.viewObject(source, uri)

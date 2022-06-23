@@ -38,17 +38,9 @@ return function (uri, callback)
             end
         end
         local valueNode = vm.compileNode(value)
-        if  source.type == 'setindex'
-        and vm.isSubType(uri, valueNode, 'nil') then
+        if  source.type == 'setindex' then
             -- boolean[1] = nil
-            local tnode = vm.compileNode(source.node)
-            for n in tnode:eachObject() do
-                if n.type == 'doc.type.array'
-                or n.type == 'doc.type.table'
-                or n.type == 'table' then
-                    return
-                end
-            end
+            valueNode = valueNode:copy():removeOptional()
         end
         local varNode = vm.compileNode(source)
         if vm.canCastType(uri, varNode, valueNode) then

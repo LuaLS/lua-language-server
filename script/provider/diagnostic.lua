@@ -275,12 +275,7 @@ function m.doDiagnostic(uri, isScopeDiag)
 
     local diags = {}
     local lastDiag = copyDiagsWithoutSyntax(m.cache[uri])
-    local function pushResult(isComplete)
-        -- Disable incremental diagnosis.
-        -- The current diagnosis speed is good.
-        if not isComplete then
-            return
-        end
+    local function pushResult()
         tracy.ZoneBeginN 'mergeSyntaxAndDiags'
         local _ <close> = tracy.ZoneEnd
         local full = mergeDiags(syntax, lastDiag, diags)
@@ -310,7 +305,7 @@ function m.doDiagnostic(uri, isScopeDiag)
     xpcall(core, log.error, uri, isScopeDiag, function (result)
         diags[#diags+1] = buildDiagnostic(uri, result)
 
-        if not isScopeDiag and time.time() - lastPushClock >= 200 then
+        if not isScopeDiag and time.time() - lastPushClock >= 1000 then
             lastPushClock = time.time()
             pushResult()
         end
@@ -327,7 +322,7 @@ function m.doDiagnostic(uri, isScopeDiag)
     end)
 
     lastDiag = nil
-    pushResult(true)
+    pushResult()
 end
 
 ---@param uri uri

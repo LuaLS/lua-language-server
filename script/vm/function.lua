@@ -62,6 +62,7 @@ function vm.countParamsOfNode(node)
     for n in node:eachObject() do
         if n.type == 'function'
         or n.type == 'doc.type.function' then
+            ---@cast n parser.object
             local fmin, fmax = vm.countParamsOfFunction(n)
             if not min or fmin < min then
                 min = fmin

@@ -308,15 +308,18 @@ object<string, string>
 ```json
 {
     "ambiguity-1": "Any",
+    "assign-type-mismatch": "Opened",
     "await-in-sync": "None",
+    "cast-local-type": "Opened",
+    "cast-type-mismatch": "Any",
     "circle-doc-class": "Any",
     "close-non-object": "Any",
     "code-after-break": "Opened",
     "codestyle-check": "None",
     "count-down-loop": "Any",
-    "deprecated": "Opened",
+    "deprecated": "Any",
     "different-requires": "Any",
-    "discard-returns": "Opened",
+    "discard-returns": "Any",
     "doc-field-no-class": "Any",
     "duplicate-doc-alias": "Any",
     "duplicate-doc-field": "Any",
@@ -326,19 +329,19 @@ object<string, string>
     "empty-block": "Opened",
     "global-in-nil-env": "Any",
     "lowercase-global": "Any",
-    "missing-parameter": "Opened",
+    "missing-parameter": "Any",
     "need-check-nil": "Opened",
     "newfield-call": "Any",
     "newline-call": "Any",
     "no-unknown": "None",
     "not-yieldable": "None",
+    "param-type-mismatch": "Opened",
     "redefined-local": "Opened",
-    "redundant-parameter": "Opened",
+    "redundant-parameter": "Any",
     "redundant-return": "Opened",
-    "redundant-value": "Opened",
+    "redundant-value": "Any",
     "spell-check": "None",
     "trailing-space": "Opened",
-    "type-check": "None",
     "unbalanced-assignments": "Any",
     "undefined-doc-class": "Any",
     "undefined-doc-name": "Any",
@@ -346,6 +349,7 @@ object<string, string>
     "undefined-env-child": "Any",
     "undefined-field": "Opened",
     "undefined-global": "Any",
+    "unknown-cast-variable": "Any",
     "unknown-diag-code": "Any",
     "unused-function": "Opened",
     "unused-label": "Opened",
@@ -376,7 +380,10 @@ object<string, string>
 ```json
 {
     "ambiguity-1": "Warning",
+    "assign-type-mismatch": "Warning",
     "await-in-sync": "Warning",
+    "cast-local-type": "Warning",
+    "cast-type-mismatch": "Warning",
     "circle-doc-class": "Warning",
     "close-non-object": "Warning",
     "code-after-break": "Hint",
@@ -397,16 +404,16 @@ object<string, string>
     "missing-parameter": "Warning",
     "need-check-nil": "Warning",
     "newfield-call": "Warning",
-    "newline-call": "Information",
-    "no-unknown": "Information",
+    "newline-call": "Warning",
+    "no-unknown": "Warning",
     "not-yieldable": "Warning",
+    "param-type-mismatch": "Warning",
     "redefined-local": "Hint",
     "redundant-parameter": "Warning",
-    "redundant-return": "Warning",
+    "redundant-return": "Hint",
     "redundant-value": "Warning",
     "spell-check": "Information",
     "trailing-space": "Hint",
-    "type-check": "Warning",
     "unbalanced-assignments": "Warning",
     "undefined-doc-class": "Warning",
     "undefined-doc-name": "Warning",
@@ -414,6 +421,7 @@ object<string, string>
     "undefined-env-child": "Information",
     "undefined-field": "Warning",
     "undefined-global": "Warning",
+    "unknown-cast-variable": "Warning",
     "unknown-diag-code": "Warning",
     "unused-function": "Hint",
     "unused-label": "Hint",
@@ -656,7 +664,7 @@ integer
 ## default
 
 ```json
-20
+50
 ```
 
 # hover.viewNumber
@@ -1062,6 +1070,22 @@ boolean | null
 
 ```json
 null
+```
+
+# typeCheck.enable
+
+**Missing description!!**
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```json
+true
 ```
 
 # window.progressBar

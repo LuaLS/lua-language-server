@@ -909,29 +909,35 @@ local function toArray(map)
     return array
 end
 
-m.register 'textDocument/semanticTokens/full' {
-    capability = {
-        semanticTokensProvider = {
-            legend = {
-                tokenTypes     = toArray(define.TokenTypes),
-                tokenModifiers = toArray(define.TokenModifiers),
-            },
-            full  = true,
-        },
-    },
-    ---@async
-    function (params)
-        log.debug('textDocument/semanticTokens/full')
-        local uri = files.getRealUri(params.textDocument.uri)
-        workspace.awaitReady(uri)
-        local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
-        local core = require 'core.semantic-tokens'
-        local results = core(uri, 0, math.huge)
-        return {
-            data = results
-        }
+client.event(function (ev)
+    if ev == 'init' then
+        if not client.isVSCode() then
+            m.register 'textDocument/semanticTokens/full' {
+                capability = {
+                    semanticTokensProvider = {
+                        legend = {
+                            tokenTypes     = toArray(define.TokenTypes),
+                            tokenModifiers = toArray(define.TokenModifiers),
+                        },
+                        full  = true,
+                    },
+                },
+                ---@async
+                function (params)
+                    log.debug('textDocument/semanticTokens/full')
+                    local uri = files.getRealUri(params.textDocument.uri)
+                    workspace.awaitReady(uri)
+                    local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
+                    local core = require 'core.semantic-tokens'
+                    local results = core(uri, 0, math.huge)
+                    return {
+                        data = results
+                    }
+                end
+            }
+        end
     end
-}
+end)
 
 m.register 'textDocument/semanticTokens/range' {
     capability = {

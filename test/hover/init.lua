@@ -772,7 +772,7 @@ local <?t?> = {
 ]]
 [[
 local t: {
-    f: file*,
+    f?: file*,
 }
 ]]
 

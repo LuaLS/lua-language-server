@@ -1388,7 +1388,7 @@ local compilerSwitch = util.switch()
             local uri = guide.getUri(source)
             local value = vm.getTableValue(uri, vm.compileNode(source.node), key)
             if value then
-                vm.setNode(source, value):removeOptional()
+                vm.setNode(source, value)
             end
             for k in key:eachObject() do
                 if k.type == 'global' and k.cate == 'type' then
@@ -1396,7 +1396,7 @@ local compilerSwitch = util.switch()
                     vm.compileByParentNode(source.node, k, false, function (src)
                         vm.setNode(source, vm.compileNode(src))
                         if src.value then
-                            vm.setNode(source, vm.compileNode(src.value)):removeOptional()
+                            vm.setNode(source, vm.compileNode(src.value))
                         end
                     end)
                 end
@@ -1406,7 +1406,7 @@ local compilerSwitch = util.switch()
             vm.compileByParentNode(source.node, key, false, function (src)
                 vm.setNode(source, vm.compileNode(src))
                 if src.value then
-                    vm.setNode(source, vm.compileNode(src.value)):removeOptional()
+                    vm.setNode(source, vm.compileNode(src.value))
                 end
             end)
         end
@@ -1420,7 +1420,7 @@ local compilerSwitch = util.switch()
         vm.compileByParentNode(source.node, key, false, function (src)
             if src.type == 'doc.type.field'
             or src.type == 'doc.field' then
-                vm.setNode(source, vm.compileNode(src)):removeOptional()
+                vm.setNode(source, vm.compileNode(src))
             end
         end)
     end)
@@ -1450,13 +1450,13 @@ local compilerSwitch = util.switch()
                 if src.type == 'doc.field'
                 or src.type == 'doc.type.field' then
                     hasMarkDoc = true
-                    vm.setNode(source, vm.compileNode(src)):removeOptional()
+                    vm.setNode(source, vm.compileNode(src))
                 end
             end)
         end
 
         if not hasMarkDoc and source.value then
-            vm.setNode(source, vm.compileNode(source.value)):removeOptional()
+            vm.setNode(source, vm.compileNode(source.value))
         end
 
     end)

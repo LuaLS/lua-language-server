@@ -201,4 +201,20 @@ function m.getDefaultStatus()
     return status
 end
 
+function m.getGroupSeverity()
+    local group = {}
+    for name in pairs(m.diagnosticGroups) do
+        group[name] = 'Fallback'
+    end
+    return group
+end
+
+function m.getGroupStatus()
+    local group = {}
+    for name in pairs(m.diagnosticGroups) do
+        group[name] = 'Fallback'
+    end
+    return group
+end
+
 return m

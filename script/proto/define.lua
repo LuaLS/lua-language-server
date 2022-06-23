@@ -16,6 +16,10 @@ m.DiagnosticDefaultSeverity = diag.getDefaultSeverity()
 --- 诊断类型与需要的文件状态(可以控制只分析打开的文件、还是所有文件)
 m.DiagnosticDefaultNeededFileStatus = diag.getDefaultStatus()
 
+m.DiagnosticDefaultGroupSeverity = diag.getGroupSeverity()
+
+m.DiagnosticDefaultGroupFileStatus = diag.getGroupStatus()
+
 --- 诊断报告标签
 m.DiagnosticTag = {
     Unnecessary = 1,

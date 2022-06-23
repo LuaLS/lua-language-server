@@ -244,9 +244,34 @@ local template = {
                                             >> util.deepCopy(define.DiagnosticDefaultSeverity),
     ['Lua.diagnostics.neededFileStatus']    = Type.Hash(
                                                 Type.String << util.getTableKeys(define.DiagnosticDefaultNeededFileStatus, true),
-                                                Type.String << { 'Any', 'Opened', 'None' }
+                                                Type.String << {
+                                                    'Any',
+                                                    'Opened',
+                                                    'None',
+                                                }
                                             )
                                             >> util.deepCopy(define.DiagnosticDefaultNeededFileStatus),
+    ['Lua.diagnostics.groupSeverity']       = Type.Hash(
+                                                Type.String << util.getTableKeys(define.DiagnosticDefaultGroupSeverity, true),
+                                                Type.String << {
+                                                    'Error',
+                                                    'Warning',
+                                                    'Information',
+                                                    'Hint',
+                                                    'Fallback',
+                                                }
+                                            )
+                                            >> util.deepCopy(define.DiagnosticDefaultGroupSeverity),
+    ['Lua.diagnostics.groupFileStatus']     = Type.Hash(
+                                                Type.String << util.getTableKeys(define.DiagnosticDefaultGroupFileStatus, true),
+                                                Type.String << {
+                                                    'Any',
+                                                    'Opened',
+                                                    'None',
+                                                    'Fallback',
+                                                }
+                                            )
+                                            >> util.deepCopy(define.DiagnosticDefaultGroupFileStatus),
     ['Lua.diagnostics.disableScheme']       = Type.Array(Type.String) >> { 'git' },
     ['Lua.diagnostics.workspaceDelay']      = Type.Integer >> 3000,
     ['Lua.diagnostics.workspaceRate']       = Type.Integer >> 100,

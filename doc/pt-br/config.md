@@ -240,6 +240,79 @@ Array<string>
 []
 ```
 
+# diagnostics.groupFileStatus
+
+**Missing description!!**
+
+## type
+
+```ts
+object<string, string>
+```
+
+## enum
+
+* ``"Any"``
+* ``"Opened"``
+* ``"None"``
+* ``"Fallback"``
+
+## default
+
+```json
+{
+    "ambiguity": "Fallback",
+    "await": "Fallback",
+    "codestyle": "Fallback",
+    "duplicate": "Fallback",
+    "global": "Fallback",
+    "luadoc": "Fallback",
+    "no-unknown": "Fallback",
+    "redefined": "Fallback",
+    "strict": "Fallback",
+    "type-check": "Fallback",
+    "unbalanced": "Fallback",
+    "unused": "Fallback"
+}
+```
+
+# diagnostics.groupSeverity
+
+**Missing description!!**
+
+## type
+
+```ts
+object<string, string>
+```
+
+## enum
+
+* ``"Error"``
+* ``"Warning"``
+* ``"Information"``
+* ``"Hint"``
+* ``"Fallback"``
+
+## default
+
+```json
+{
+    "ambiguity": "Fallback",
+    "await": "Fallback",
+    "codestyle": "Fallback",
+    "duplicate": "Fallback",
+    "global": "Fallback",
+    "luadoc": "Fallback",
+    "no-unknown": "Fallback",
+    "redefined": "Fallback",
+    "strict": "Fallback",
+    "type-check": "Fallback",
+    "unbalanced": "Fallback",
+    "unused": "Fallback"
+}
+```
+
 # diagnostics.ignoredFiles
 
 How to diagnose ignored files.

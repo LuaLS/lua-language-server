@@ -23,6 +23,7 @@
   local n2 = f(0)    -- `n2` is `number`
   local n3 = f(0, 0) -- `n3` is `string`
   ```
+* `FIX` diagnostics flash when opening a file
 * `FIX` [#1228](https://github.com/sumneko/lua-language-server/issues/1228)
 
 ## 3.3.1

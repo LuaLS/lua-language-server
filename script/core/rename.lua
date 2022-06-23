@@ -193,6 +193,9 @@ end
 ---@async
 local function ofGlobal(source, newname, callback)
     local key = guide.getKeyName(source)
+    if not key then
+        return
+    end
     local global = vm.getGlobal('variable', key)
     if not global then
         return

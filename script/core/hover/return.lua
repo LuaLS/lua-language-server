@@ -64,10 +64,10 @@ local function asFunction(source)
         local rtn  = vm.getReturnOfFunction(source, i)
         local doc  = docs[i]
         local name = doc and doc.name and doc.name[1] and (doc.name[1] .. ': ')
-        local text = ('%s%s'):format(
+        local text = rtn and ('%s%s'):format(
             name or '',
             vm.getInfer(rtn):view(guide.getUri(source))
-        )
+        ) or 'unknown'
         if i == 1 then
             returns[i] = ('  -> %s'):format(text)
         else

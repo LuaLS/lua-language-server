@@ -145,10 +145,10 @@ end
 ---@async
 return function (uri, pos)
     local state = files.getState(uri)
-    if not state then
+    local text  = files.getText(uri)
+    if not state or not text then
         return nil
     end
-    local text = files.getText(uri)
     local offset = guide.positionToOffset(state, pos)
     pos = guide.offsetToPosition(state, lookback.skipSpace(text, offset))
     local call = findNearCall(uri, state, pos)

@@ -378,20 +378,25 @@ function m.pullDiagnostic(uri, isScopeDiag)
     return full
 end
 
+---@param uri uri
 function m.refresh(uri)
     if not ws.isReady(uri) then
         return
     end
+
+    await.close('diag:' .. uri)
+    ---@async
+    await.call(function ()
+        await.setID('diag:' .. uri)
+        await.sleep(0.1)
+        xpcall(m.doDiagnostic, log.error, uri)
+    end)
+
     local scp     = scope.getScope(uri)
     local scopeID = 'diagnosticsScope:' .. scp:getName()
-    await.close('diag:' .. uri)
     await.close(scopeID)
-    await.call(function () ---@async
-        if uri then
-            await.setID('diag:' .. uri)
-            await.sleep(0.1)
-            xpcall(m.doDiagnostic, log.error, uri)
-        end
+    ---@async
+    await.call(function ()
         local delay = config.get(uri, 'Lua.diagnostics.workspaceDelay') / 1000
         if delay < 0 then
             return

@@ -24,6 +24,7 @@
   local n3 = f(0, 0) -- `n3` is `string`
   ```
 * `FIX` diagnostics flash when opening a file
+* `FIX` sometimes workspace diagnostics are not triggered
 * `FIX` [#1228](https://github.com/sumneko/lua-language-server/issues/1228)
 
 ## 3.3.1

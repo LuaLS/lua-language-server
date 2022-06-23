@@ -805,7 +805,7 @@ local function isValidCallArgNode(source, node)
         return node.type == 'doc.type.function'
     end
     if source.type == 'table' then
-        return node.type == 'doc.type.table'
+        return node.type == 'doc.type.table' or node.type == 'doc.type.array'
             or (    node.type == 'global'
                 and node.cate == 'type'
                 ---@cast node vm.global
@@ -1274,6 +1274,7 @@ local compilerSwitch = util.switch()
         or source.parent.type == 'setlocal'
         or source.parent.type == 'tablefield'
         or source.parent.type == 'tableindex'
+        or source.parent.type == 'tableexp'
         or source.parent.type == 'setfield'
         or source.parent.type == 'setindex' then
             local parentNode = vm.compileNode(source.parent)
@@ -1490,6 +1491,18 @@ local compilerSwitch = util.switch()
     end)
     : case 'tableexp'
     : call(function (source)
+        if (source.parent.type == 'table') then
+            local node = vm.compileNode(source.parent)
+            for n in node:eachObject() do
+                if  (n.type == 'global'
+                and n.cate == 'type') then
+                    vm.setNode(source, vm.compileNode(n))
+                elseif n.type == 'doc.type.array' then
+                    vm.setNode(source, vm.compileNode(n.node))
+                end
+            end
+            return
+        end
         vm.setNode(source, vm.compileNode(source.value))
     end)
     : case 'function.return'

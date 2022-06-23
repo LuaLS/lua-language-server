@@ -889,6 +889,7 @@ local isSetMap = {
     ['doc.alias.name']    = true,
     ['doc.field.name']    = true,
     ['doc.type.field']    = true,
+    ['doc.type.array']    = true,
 }
 function m.isSet(source)
     local tp = source.type

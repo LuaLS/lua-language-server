@@ -242,7 +242,15 @@ Array<string>
 
 # diagnostics.groupFileStatus
 
-**Missing description!!**
+批量修改一个组中的文件状态。
+
+* Opened:  只诊断打开的文件
+* Any:     诊断任何文件
+* None:    禁用此诊断
+
+设置为 `Fallback` 意味着组中的诊断由 `diagnostics.neededFileStatus` 单独设置。
+其他设置将覆盖单独设置，但是不会覆盖以 `!` 结尾的设置。
+
 
 ## type
 
@@ -278,7 +286,10 @@ object<string, string>
 
 # diagnostics.groupSeverity
 
-**Missing description!!**
+批量修改一个组中的诊断等级。
+设置为 `Fallback` 意味着组中的诊断由 `diagnostics.severity` 单独设置。
+其他设置将覆盖单独设置，但是不会覆盖以 `!` 结尾的设置。
+
 
 ## type
 
@@ -361,7 +372,9 @@ string
 
 * Opened:  只诊断打开的文件
 * Any:     诊断任何文件
-* Disable: 禁用此诊断
+* None:    禁用此诊断
+
+以 `!` 结尾的设置优先级高于组设置 `diagnostics.groupFileStatus`。
 
 
 ## type
@@ -375,6 +388,9 @@ object<string, string>
 * ``"Any"``
 * ``"Opened"``
 * ``"None"``
+* ``"Any!"``
+* ``"Opened!"``
+* ``"None!"``
 
 ## default
 
@@ -434,6 +450,8 @@ object<string, string>
 # diagnostics.severity
 
 修改诊断等级。
+以 `!` 结尾的设置优先级高于组设置 `diagnostics.groupSeverity`。
+
 
 ## type
 
@@ -447,6 +465,10 @@ object<string, string>
 * ``"Warning"``
 * ``"Information"``
 * ``"Hint"``
+* ``"Error!"``
+* ``"Warning!"``
+* ``"Information!"``
+* ``"Hint!"``
 
 ## default
 
@@ -537,7 +559,9 @@ integer
 
 # format.defaultConfig
 
-**Missing description!!**
+默认的格式化配置，优先级低于工作区内的 `.editorconfig` 文件。
+请查阅[格式化文档](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs)了解用法。
+
 
 ## type
 
@@ -872,7 +896,7 @@ string
 
 # runtime.meta
 
-**Missing description!!**
+meta文件的目录名称格式。
 
 ## type
 
@@ -1114,7 +1138,7 @@ true
 
 # spell.dict
 
-**Missing description!!**
+拼写检查的自定义单词。
 
 ## type
 
@@ -1143,22 +1167,6 @@ boolean | null
 
 ```json
 null
-```
-
-# typeCheck.enable
-
-**Missing description!!**
-
-## type
-
-```ts
-boolean
-```
-
-## default
-
-```json
-true
 ```
 
 # window.progressBar

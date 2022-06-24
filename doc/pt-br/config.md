@@ -242,7 +242,15 @@ Array<string>
 
 # diagnostics.groupFileStatus
 
-**Missing description!!**
+Modify the diagnostic needed file status in a group.
+
+* Opened:  only diagnose opened files
+* Any:     diagnose all files
+* None:    disable this diagnostic
+
+`Fallback` means that diagnostics in this group are controlled by `diagnostics.neededFileStatus` separately.
+Other settings will override individual settings without end of `!`.
+
 
 ## type
 
@@ -278,7 +286,10 @@ object<string, string>
 
 # diagnostics.groupSeverity
 
-**Missing description!!**
+Modify the diagnostic severity in a group.
+`Fallback` means that diagnostics in this group are controlled by `diagnostics.severity` separately.
+Other settings will override individual settings without end of `!`.
+
 
 ## type
 
@@ -361,7 +372,9 @@ string
 
 * Opened:  only diagnose opened files
 * Any:     diagnose all files
-* Disable: disable this diagnostic
+* None:    disable this diagnostic
+
+End with `!` means override the group setting `diagnostics.groupFileStatus`.
 
 
 ## type
@@ -375,6 +388,9 @@ object<string, string>
 * ``"Any"``
 * ``"Opened"``
 * ``"None"``
+* ``"Any!"``
+* ``"Opened!"``
+* ``"None!"``
 
 ## default
 
@@ -433,7 +449,10 @@ object<string, string>
 
 # diagnostics.severity
 
-Modified diagnostic severity.
+Modify the diagnostic severity.
+
+End with `!` means override the group setting `diagnostics.groupSeverity`.
+
 
 ## type
 
@@ -447,6 +466,10 @@ object<string, string>
 * ``"Warning"``
 * ``"Information"``
 * ``"Hint"``
+* ``"Error!"``
+* ``"Warning!"``
+* ``"Information!"``
+* ``"Hint!"``
 
 ## default
 
@@ -537,7 +560,9 @@ integer
 
 # format.defaultConfig
 
-**Missing description!!**
+The default format configuration. Has a lower priority than `.editorconfig` file in the workspace.
+Read [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) to learn usage.
+
 
 ## type
 
@@ -872,7 +897,7 @@ string
 
 # runtime.meta
 
-**Missing description!!**
+Format of the directory name of the meta files.
 
 ## type
 
@@ -1114,7 +1139,7 @@ true
 
 # spell.dict
 
-**Missing description!!**
+Custom words for spell checking.
 
 ## type
 
@@ -1143,22 +1168,6 @@ boolean | null
 
 ```json
 null
-```
-
-# typeCheck.enable
-
-**Missing description!!**
-
-## type
-
-```ts
-boolean
-```
-
-## default
-
-```json
-true
 ```
 
 # window.progressBar

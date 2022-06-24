@@ -1417,6 +1417,41 @@ boolean | null
 null
 ```
 
+# type.castNumberToInteger
+
+允许将 `number` 类型赋给 `integer` 类型。
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+false
+```
+
+# type.weakUnionCheck
+
+联合类型中只要有一个子类型满足条件，则联合类型也满足条件。
+
+此设置为 `false` 时，`number|boolean` 类型无法赋给 `number` 类型；为 `true` 时则可以。
+
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+false
+```
+
 # window.progressBar
 
 在状态栏显示进度条。

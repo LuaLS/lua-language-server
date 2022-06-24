@@ -1418,6 +1418,41 @@ boolean | null
 null
 ```
 
+# type.castNumberToInteger
+
+Allowed to assign the `number` type to the `integer` type.
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+false
+```
+
+# type.weakUnionCheck
+
+Once one subtype of a union type meets the condition, the union type also meets the condition.
+
+When this setting is `false`, the `number|boolean` type cannot be assigned to the `number` type. It can be with `true`.
+
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+false
+```
+
 # window.progressBar
 
 Show progress bar in status bar.

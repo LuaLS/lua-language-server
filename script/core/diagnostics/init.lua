@@ -65,7 +65,7 @@ local function getSeverity(uri, name)
     local groupLevel = 999
     for _, groupName in ipairs(groups) do
         local gseverity = groupSeverity[groupName]
-        if gseverity ~= 'Fallback' then
+        if gseverity and gseverity ~= 'Fallback' then
             groupLevel = math.min(groupLevel, define.DiagnosticSeverity[gseverity])
         end
     end
@@ -94,7 +94,7 @@ local function getStatus(uri, name)
     local groupLevel = 0
     for _, groupName in ipairs(groups) do
         local gstatus = groupStatus[groupName]
-        if gstatus ~= 'Fallback' then
+        if gstatus and gstatus ~= 'Fallback' then
             groupLevel = math.max(groupLevel, define.DiagnosticFileStatus[gstatus])
         end
     end

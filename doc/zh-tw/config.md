@@ -242,14 +242,14 @@ Array<string>
 
 # diagnostics.groupFileStatus
 
-Modify the diagnostic needed file status in a group.
+批量修改一個組中的檔案狀態。
 
-* Opened:  only diagnose opened files
-* Any:     diagnose all files
-* None:    disable this diagnostic
+* Opened:  只診斷打開的檔案
+* Any:     診斷所有檔案
+* None:    停用此診斷
 
-`Fallback` means that diagnostics in this group are controlled by `diagnostics.neededFileStatus` separately.
-Other settings will override individual settings without end of `!`.
+設定為 `Fallback` 意味著組中的診斷由 `diagnostics.neededFileStatus` 單獨設定。
+其他設定將覆蓋單獨設定，但是不會覆蓋以 `!` 結尾的設定。
 
 
 ## type
@@ -286,9 +286,9 @@ object<string, string>
 
 # diagnostics.groupSeverity
 
-Modify the diagnostic severity in a group.
-`Fallback` means that diagnostics in this group are controlled by `diagnostics.severity` separately.
-Other settings will override individual settings without end of `!`.
+批量修改一個組中的診斷等級。
+設定為 `Fallback` 意味著組中的診斷由 `diagnostics.severity` 單獨設定。
+其他設定將覆蓋單獨設定，但是不會覆蓋以 `!` 結尾的設定。
 
 
 ## type
@@ -370,11 +370,11 @@ string
 
 # diagnostics.neededFileStatus
 
-* Opened:  only diagnose opened files
-* Any:     diagnose all files
-* None:    disable this diagnostic
+* Opened:  只診斷打開的檔案
+* Any:     診斷所有檔案
+* None:    停用此診斷
 
-End with `!` means override the group setting `diagnostics.groupFileStatus`.
+以 `!` 結尾的設定優先順序高於組設定 `diagnostics.groupFileStatus`。
 
 
 ## type
@@ -449,9 +449,8 @@ object<string, string>
 
 # diagnostics.severity
 
-Modify the diagnostic severity.
-
-End with `!` means override the group setting `diagnostics.groupSeverity`.
+修改診斷等級。
+以 `!` 結尾的設定優先順序高於組設定 `diagnostics.groupSeverity`。
 
 
 ## type
@@ -544,7 +543,7 @@ integer
 
 # diagnostics.workspaceRate
 
-工作區診斷的執行速率（百分比）。降低該值會減少CPU佔用，但是也會降低工作區診斷的速度。你目前正在編輯的檔案的診斷總是全速完成，不受該選項影響。
+工作區診斷的執行速率（百分比）。降低該值會減少CPU使用率，但是也會降低工作區診斷的速度。你目前正在編輯的檔案的診斷總是全速完成，不受該選項影響。
 
 ## type
 
@@ -560,8 +559,8 @@ integer
 
 # format.defaultConfig
 
-The default format configuration. Has a lower priority than `.editorconfig` file in the workspace.
-Read [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) to learn usage.
+預設的格式化組態，優先順序低於工作區內的 `.editorconfig` 檔案。
+請查閱[格式化文件](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs)了解用法。
 
 
 ## type
@@ -605,7 +604,7 @@ string
 ## enum
 
 * ``"Enable"``: 所有的表中都提示陣列索引。
-* ``"Auto"``: 只有表大於3項，或者表是混合型別時才進行提示。
+* ``"Auto"``: 只有表大於3項，或者表是混合類型時才進行提示。
 * ``"Disable"``: 停用陣列索引提示。
 
 ## default
@@ -616,7 +615,7 @@ string
 
 # hint.await
 
-If the called function is marked `---@async`, prompt `await` at the call.
+如果呼叫的函數被標記為了 `---@async`，則在呼叫處提示 `await`。
 
 ## type
 
@@ -658,8 +657,8 @@ string
 
 ## enum
 
-* ``"All"``: 所有型別的參數均進行提示。
-* ``"Literal"``: 只有字面常數型別的參數進行提示。
+* ``"All"``: 所有類型的參數均進行提示。
+* ``"Literal"``: 只有字面常數類型的參數進行提示。
 * ``"Disable"``: 停用參數提示。
 
 ## default
@@ -670,7 +669,7 @@ string
 
 # hint.paramType
 
-在函式的參數位置提示型別。
+在函式的參數位置提示類型。
 
 ## type
 
@@ -686,7 +685,7 @@ true
 
 # hint.setType
 
-在賦值操作位置提示型別。
+在賦值操作位置提示類型。
 
 ## type
 
@@ -718,7 +717,7 @@ true
 
 # hover.enumsLimit
 
-當值對應多個型別時，限制型別的顯示數量。
+當值對應多個類型時，限制類型的顯示數量。
 
 ## type
 
@@ -734,7 +733,7 @@ integer
 
 # hover.expandAlias
 
-Whether to expand the alias. For example, expands `---@alias myType boolean|number` appears as `boolean|number`, otherwise it appears as `myType'.
+是否展開別名。例如 `---@alias myType boolean|number` 展開後顯示為 `boolean|number`，否則顯示為 `myType'。
 
 
 ## type
@@ -815,7 +814,7 @@ integer
 
 # misc.parameters
 
-VSCode中啟動語言服務時的[命令列參數](https://github.com/sumneko/lua-language-server/wiki/Command-line)。
+VSCode中啟動語言伺服時的[命令列參數](https://github.com/sumneko/lua-language-server/wiki/Command-line)。
 
 ## type
 
@@ -897,7 +896,7 @@ string
 
 # runtime.meta
 
-Format of the directory name of the meta files.
+meta檔案的目錄名稱格式
 
 ## type
 
@@ -980,7 +979,7 @@ false
 
 # runtime.plugin
 
-延伸模組路徑，請查閲[文件](https://github.com/sumneko/lua-language-server/wiki/Plugin)瞭解用法。
+延伸模組路徑，請查閱[文件](https://github.com/sumneko/lua-language-server/wiki/Plugin)瞭解用法。
 
 ## type
 
@@ -1059,7 +1058,7 @@ string
 
 # semantic.annotation
 
-對型別註解進行語義著色。
+對類型註解進行語義著色。
 
 ## type
 
@@ -1139,7 +1138,7 @@ true
 
 # spell.dict
 
-Custom words for spell checking.
+拼寫檢查的自訂單詞。
 
 ## type
 
@@ -1155,7 +1154,7 @@ Array<string>
 
 # telemetry.enable
 
-啟用遙測，透過網路發送你的編輯器資訊與錯誤日誌。在[此處](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%B1%E7%A7%81%E8%81%B2%E6%98%8E)閲讀我們的隱私聲明。
+啟用遙測，透過網路發送你的編輯器資訊與錯誤日誌。在[此處](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%B1%E7%A7%81%E8%81%B2%E6%98%8E)閱讀我們的隱私聲明。
 
 
 ## type
@@ -1308,7 +1307,7 @@ integer
 
 # workspace.supportScheme
 
-為以下 `scheme` 的lua檔案提供語言服務。
+為以下 `scheme` 的lua檔案提供語言伺服。
 
 ## type
 

@@ -724,7 +724,7 @@ function getTags(item) end
 ]=]
 LUADOC_DESC_FIELD =
 [=[
-Decalare a field in a class/table. This allows you to provide more in-depth
+Declare a field in a class/table. This allows you to provide more in-depth
 documentation for a table.
 
 ## Syntax
@@ -932,7 +932,7 @@ local unused = "hello world"
 ]=]
 LUADOC_DESC_MODULE =
 [=[
-Provides the semantics of `reqire`.
+Provides the semantics of `require`.
 
 ## Syntax
 `---@module <'module_name'>`

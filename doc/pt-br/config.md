@@ -10,7 +10,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -32,7 +32,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "Disable"
 ```
 
@@ -48,7 +48,7 @@ integer
 
 ## default
 
-```json
+```jsonc
 0
 ```
 
@@ -64,7 +64,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -86,7 +86,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "Replace"
 ```
 
@@ -102,7 +102,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "@"
 ```
 
@@ -118,7 +118,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "."
 ```
 
@@ -134,7 +134,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -156,7 +156,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "Fallback"
 ```
 
@@ -172,7 +172,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -188,7 +188,7 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 []
 ```
 
@@ -204,7 +204,7 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 ["git"]
 ```
 
@@ -220,7 +220,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -236,7 +236,7 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 []
 ```
 
@@ -267,19 +267,92 @@ object<string, string>
 
 ## default
 
-```json
+```jsonc
 {
+    /*
+    * ambiguity-1
+    * count-down-loop
+    * different-requires
+    * newfield-call
+    * newline-call
+    */
     "ambiguity": "Fallback",
+    /*
+    * await-in-sync
+    * not-yieldable
+    */
     "await": "Fallback",
+    /*
+    * codestyle-check
+    * spell-check
+    */
     "codestyle": "Fallback",
+    /*
+    * duplicate-index
+    * duplicate-set-field
+    */
     "duplicate": "Fallback",
+    /*
+    * global-in-nil-env
+    * lowercase-global
+    * undefined-env-child
+    * undefined-global
+    */
     "global": "Fallback",
+    /*
+    * cast-type-mismatch
+    * circle-doc-class
+    * doc-field-no-class
+    * duplicate-doc-alias
+    * duplicate-doc-field
+    * duplicate-doc-param
+    * undefined-doc-class
+    * undefined-doc-name
+    * undefined-doc-param
+    * unknown-cast-variable
+    * unknown-diag-code
+    */
     "luadoc": "Fallback",
-    "no-unknown": "Fallback",
+    /*
+    * redefined-local
+    */
     "redefined": "Fallback",
+    /*
+    * close-non-object
+    * deprecated
+    * discard-returns
+    */
     "strict": "Fallback",
+    /*
+    * no-unknown
+    */
+    "strong": "Fallback",
+    /*
+    * assign-type-mismatch
+    * cast-local-type
+    * cast-type-mismatch
+    * need-check-nil
+    * param-type-mismatch
+    * undefined-field
+    */
     "type-check": "Fallback",
+    /*
+    * missing-parameter
+    * redundant-parameter
+    * redundant-value
+    * unbalanced-assignments
+    */
     "unbalanced": "Fallback",
+    /*
+    * code-after-break
+    * empty-block
+    * redundant-return
+    * trailing-space
+    * unused-function
+    * unused-label
+    * unused-local
+    * unused-vararg
+    */
     "unused": "Fallback"
 }
 ```
@@ -307,19 +380,92 @@ object<string, string>
 
 ## default
 
-```json
+```jsonc
 {
+    /*
+    * ambiguity-1
+    * count-down-loop
+    * different-requires
+    * newfield-call
+    * newline-call
+    */
     "ambiguity": "Fallback",
+    /*
+    * await-in-sync
+    * not-yieldable
+    */
     "await": "Fallback",
+    /*
+    * codestyle-check
+    * spell-check
+    */
     "codestyle": "Fallback",
+    /*
+    * duplicate-index
+    * duplicate-set-field
+    */
     "duplicate": "Fallback",
+    /*
+    * global-in-nil-env
+    * lowercase-global
+    * undefined-env-child
+    * undefined-global
+    */
     "global": "Fallback",
+    /*
+    * cast-type-mismatch
+    * circle-doc-class
+    * doc-field-no-class
+    * duplicate-doc-alias
+    * duplicate-doc-field
+    * duplicate-doc-param
+    * undefined-doc-class
+    * undefined-doc-name
+    * undefined-doc-param
+    * unknown-cast-variable
+    * unknown-diag-code
+    */
     "luadoc": "Fallback",
-    "no-unknown": "Fallback",
+    /*
+    * redefined-local
+    */
     "redefined": "Fallback",
+    /*
+    * close-non-object
+    * deprecated
+    * discard-returns
+    */
     "strict": "Fallback",
+    /*
+    * no-unknown
+    */
+    "strong": "Fallback",
+    /*
+    * assign-type-mismatch
+    * cast-local-type
+    * cast-type-mismatch
+    * need-check-nil
+    * param-type-mismatch
+    * undefined-field
+    */
     "type-check": "Fallback",
+    /*
+    * missing-parameter
+    * redundant-parameter
+    * redundant-value
+    * unbalanced-assignments
+    */
     "unbalanced": "Fallback",
+    /*
+    * code-after-break
+    * empty-block
+    * redundant-return
+    * trailing-space
+    * unused-function
+    * unused-label
+    * unused-local
+    * unused-vararg
+    */
     "unused": "Fallback"
 }
 ```
@@ -342,7 +488,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "Opened"
 ```
 
@@ -364,7 +510,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "Opened"
 ```
 
@@ -394,8 +540,11 @@ object<string, string>
 
 ## default
 
-```json
+```jsonc
 {
+    /*
+    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1` 
+    */
     "ambiguity-1": "Any",
     "assign-type-mismatch": "Opened",
     "await-in-sync": "None",
@@ -413,36 +562,84 @@ object<string, string>
     "duplicate-doc-alias": "Any",
     "duplicate-doc-field": "Any",
     "duplicate-doc-param": "Any",
+    /*
+    在字面量表中重复定义了索引
+    */
     "duplicate-index": "Any",
     "duplicate-set-field": "Any",
+    /*
+    空代码块
+    */
     "empty-block": "Opened",
+    /*
+    不能使用全局变量（ `_ENV` 被设置为了 `nil`）
+    */
     "global-in-nil-env": "Any",
+    /*
+    首字母小写的全局变量定义
+    */
     "lowercase-global": "Any",
     "missing-parameter": "Any",
     "need-check-nil": "Opened",
+    /*
+    在字面量表中，2行代码之间缺少分隔符，在语法上被解析为了一次索引操作
+    */
     "newfield-call": "Any",
+    /*
+    以 `(` 开始的新行，在语法上被解析为了上一行的函数调用
+    */
     "newline-call": "Any",
     "no-unknown": "None",
     "not-yieldable": "None",
     "param-type-mismatch": "Opened",
+    /*
+    重复定义的局部变量
+    */
     "redefined-local": "Opened",
+    /*
+    函数调用时，传入了多余的参数
+    */
     "redundant-parameter": "Any",
     "redundant-return": "Opened",
+    /*
+    赋值操作时，值的数量比被赋值的对象多
+    */
     "redundant-value": "Any",
     "spell-check": "None",
+    /*
+    后置空格
+    */
     "trailing-space": "Opened",
     "unbalanced-assignments": "Any",
     "undefined-doc-class": "Any",
     "undefined-doc-name": "Any",
     "undefined-doc-param": "Any",
+    /*
+    `_ENV` 被设置为了新的字面量表，但是试图获取的全局变量不再这张表中
+    */
     "undefined-env-child": "Any",
     "undefined-field": "Opened",
+    /*
+    未定义的全局变量
+    */
     "undefined-global": "Any",
     "unknown-cast-variable": "Any",
     "unknown-diag-code": "Any",
+    /*
+    未使用的函数
+    */
     "unused-function": "Opened",
+    /*
+    未使用的标签
+    */
     "unused-label": "Opened",
+    /*
+    未使用的局部变量
+    */
     "unused-local": "Opened",
+    /*
+    未使用的不定参数
+    */
     "unused-vararg": "Opened"
 }
 ```
@@ -473,8 +670,11 @@ object<string, string>
 
 ## default
 
-```json
+```jsonc
 {
+    /*
+    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1` 
+    */
     "ambiguity-1": "Warning",
     "assign-type-mismatch": "Warning",
     "await-in-sync": "Warning",
@@ -492,36 +692,84 @@ object<string, string>
     "duplicate-doc-alias": "Warning",
     "duplicate-doc-field": "Warning",
     "duplicate-doc-param": "Warning",
+    /*
+    在字面量表中重复定义了索引
+    */
     "duplicate-index": "Warning",
     "duplicate-set-field": "Warning",
+    /*
+    空代码块
+    */
     "empty-block": "Hint",
+    /*
+    不能使用全局变量（ `_ENV` 被设置为了 `nil`）
+    */
     "global-in-nil-env": "Warning",
+    /*
+    首字母小写的全局变量定义
+    */
     "lowercase-global": "Information",
     "missing-parameter": "Warning",
     "need-check-nil": "Warning",
+    /*
+    在字面量表中，2行代码之间缺少分隔符，在语法上被解析为了一次索引操作
+    */
     "newfield-call": "Warning",
+    /*
+    以 `(` 开始的新行，在语法上被解析为了上一行的函数调用
+    */
     "newline-call": "Warning",
     "no-unknown": "Warning",
     "not-yieldable": "Warning",
     "param-type-mismatch": "Warning",
+    /*
+    重复定义的局部变量
+    */
     "redefined-local": "Hint",
+    /*
+    函数调用时，传入了多余的参数
+    */
     "redundant-parameter": "Warning",
     "redundant-return": "Hint",
+    /*
+    赋值操作时，值的数量比被赋值的对象多
+    */
     "redundant-value": "Warning",
     "spell-check": "Information",
+    /*
+    后置空格
+    */
     "trailing-space": "Hint",
     "unbalanced-assignments": "Warning",
     "undefined-doc-class": "Warning",
     "undefined-doc-name": "Warning",
     "undefined-doc-param": "Warning",
+    /*
+    `_ENV` 被设置为了新的字面量表，但是试图获取的全局变量不再这张表中
+    */
     "undefined-env-child": "Information",
     "undefined-field": "Warning",
+    /*
+    未定义的全局变量
+    */
     "undefined-global": "Warning",
     "unknown-cast-variable": "Warning",
     "unknown-diag-code": "Warning",
+    /*
+    未使用的函数
+    */
     "unused-function": "Hint",
+    /*
+    未使用的标签
+    */
     "unused-label": "Hint",
+    /*
+    未使用的局部变量
+    */
     "unused-local": "Hint",
+    /*
+    未使用的不定参数
+    */
     "unused-vararg": "Hint"
 }
 ```
@@ -538,7 +786,7 @@ integer
 
 ## default
 
-```json
+```jsonc
 3000
 ```
 
@@ -554,7 +802,7 @@ integer
 
 ## default
 
-```json
+```jsonc
 100
 ```
 
@@ -572,7 +820,7 @@ Object<string, string>
 
 ## default
 
-```json
+```jsonc
 {}
 ```
 
@@ -588,7 +836,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -610,7 +858,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "Auto"
 ```
 
@@ -626,7 +874,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -642,7 +890,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 false
 ```
 
@@ -664,7 +912,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "All"
 ```
 
@@ -680,7 +928,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -696,7 +944,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 false
 ```
 
@@ -712,7 +960,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -728,7 +976,7 @@ integer
 
 ## default
 
-```json
+```jsonc
 5
 ```
 
@@ -745,7 +993,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -761,7 +1009,7 @@ integer
 
 ## default
 
-```json
+```jsonc
 50
 ```
 
@@ -777,7 +1025,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -793,7 +1041,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -809,7 +1057,7 @@ integer
 
 ## default
 
-```json
+```jsonc
 1000
 ```
 
@@ -825,7 +1073,7 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 []
 ```
 
@@ -852,7 +1100,7 @@ object<string, string>
 
 ## default
 
-```json
+```jsonc
 {
     "basic": "default",
     "bit": "default",
@@ -891,7 +1139,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "utf8"
 ```
 
@@ -907,7 +1155,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "${version} ${language} ${encoding}"
 ```
 
@@ -938,7 +1186,7 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 []
 ```
 
@@ -958,7 +1206,7 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 ["?.lua","?/init.lua"]
 ```
 
@@ -974,7 +1222,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 false
 ```
 
@@ -990,7 +1238,7 @@ string
 
 ## default
 
-```json
+```jsonc
 ""
 ```
 
@@ -1013,7 +1261,7 @@ Object<string, string>
 
 ## default
 
-```json
+```jsonc
 {}
 ```
 
@@ -1029,7 +1277,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 false
 ```
 
@@ -1053,7 +1301,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "Lua 5.4"
 ```
 
@@ -1069,7 +1317,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -1085,7 +1333,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -1101,7 +1349,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 false
 ```
 
@@ -1117,7 +1365,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -1133,7 +1381,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -1149,7 +1397,7 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 []
 ```
 
@@ -1166,7 +1414,7 @@ boolean | null
 
 ## default
 
-```json
+```jsonc
 null
 ```
 
@@ -1182,7 +1430,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -1198,7 +1446,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -1222,7 +1470,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -1238,7 +1486,7 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 [".vscode"]
 ```
 
@@ -1254,7 +1502,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -1270,7 +1518,7 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 []
 ```
 
@@ -1286,7 +1534,7 @@ integer
 
 ## default
 
-```json
+```jsonc
 5000
 ```
 
@@ -1302,7 +1550,7 @@ integer
 
 ## default
 
-```json
+```jsonc
 500
 ```
 
@@ -1318,7 +1566,7 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 ["file","untitled","git"]
 ```
 
@@ -1334,7 +1582,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -1350,6 +1598,6 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 []
 ```

@@ -135,7 +135,7 @@ m.register {
 m.register {
     'no-unknown',
 } {
-    group    = 'no-unknown',
+    group    = 'strong',
     severity = 'Warning',
     status   = 'None',
 }

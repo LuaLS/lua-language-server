@@ -330,7 +330,7 @@ local template = {
     ['Lua.hover.viewString']                = Type.Boolean >> true,
     ['Lua.hover.viewStringMax']             = Type.Integer >> 1000,
     ['Lua.hover.viewNumber']                = Type.Boolean >> true,
-    ['Lua.hover.previewFields']             = Type.Integer >> 30,
+    ['Lua.hover.previewFields']             = Type.Integer >> 50,
     ['Lua.hover.enumsLimit']                = Type.Integer >> 5,
     ['Lua.hover.expandAlias']               = Type.Boolean >> true,
     ['Lua.semantic.enable']                 = Type.Boolean >> true,
@@ -359,6 +359,8 @@ local template = {
     ['Lua.spell.dict']                      = Type.Array(Type.String),
     ['Lua.telemetry.enable']                = Type.Or(Type.Boolean >> false, Type.Nil) >> nil,
     ['Lua.misc.parameters']                 = Type.Array(Type.String),
+    ['Lua.type.castNumberToInteger']        = Type.Boolean >> false,
+    ['Lua.type.weakUnionCheck']             = Type.Boolean >> false,
 
     -- VSCode
     ['files.associations']                  = Type.Hash(Type.String, Type.String),

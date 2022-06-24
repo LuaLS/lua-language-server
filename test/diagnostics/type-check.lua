@@ -437,5 +437,47 @@ local x
 t[#t+1] = x
 ]]
 
+TEST [[
+---@type number
+local n
+---@type integer
+local i
+
+<?i?> = n
+]]
+
+config.set(nil, 'Lua.type.castNumberToInteger', true)
+TEST [[
+---@type number
+local n
+---@type integer
+local i
+
+i = n
+]]
+config.set(nil, 'Lua.type.castNumberToInteger', false)
+
+TEST [[
+---@type number|boolean
+local nb
+
+---@type number
+local n
+
+<?n?> = nb
+]]
+
+config.set(nil, 'Lua.type.weakUnionCheck', true)
+TEST [[
+---@type number|boolean
+local nb
+
+---@type number
+local n
+
+n = nb
+]]
+config.set(nil, 'Lua.type.weakUnionCheck', false)
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

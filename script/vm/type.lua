@@ -1,6 +1,7 @@
 ---@class vm
 local vm        = require 'vm.vm'
 local guide     = require 'parser.guide'
+local config    = require 'config.config'
 
 ---@param object vm.node.object
 ---@return string?
@@ -53,18 +54,33 @@ function vm.isSubType(uri, child, parent, mark)
         end
         child = global
     elseif child.type == 'vm.node' then
-        for n in child:eachObject() do
-            if  getNodeName(n)
-            and not vm.isSubType(uri, n, parent, mark) then
-                return false
+        if config.get(uri, 'Lua.type.weakUnionCheck') then
+            for n in child:eachObject() do
+                if  getNodeName(n)
+                and vm.isSubType(uri, n, parent, mark) then
+                    return true
+                end
             end
-        end
-        if child:isOptional() then
-            if not vm.isSubType(uri, 'nil', parent, mark) then
-                return false
+            if child:isOptional() then
+                if vm.isSubType(uri, 'nil', parent, mark) then
+                    return true
+                end
             end
+            return false
+        else
+            for n in child:eachObject() do
+                if  getNodeName(n)
+                and not vm.isSubType(uri, n, parent, mark) then
+                    return false
+                end
+            end
+            if child:isOptional() then
+                if not vm.isSubType(uri, 'nil', parent, mark) then
+                    return false
+                end
+            end
+            return true
         end
-        return true
     end
 
     if type(parent) == 'string' then
@@ -110,6 +126,9 @@ function vm.isSubType(uri, child, parent, mark)
     end
 
     if parentName == 'integer' and childName == 'number' then
+        if config.get(uri, 'Lua.type.castNumberToInteger') then
+            return true
+        end
         if  child.type == 'number'
         and child[1]
         and not math.tointeger(child[1]) then

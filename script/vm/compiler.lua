@@ -102,6 +102,7 @@ local searchFieldSwitch = util.switch()
         end
     end)
     : case 'string'
+    : case 'doc.type.string'
     : call(function (suri, source, key, ref, pushResult)
         -- change to `string: stringlib` ?
         local stringlib = vm.getGlobal('type', 'stringlib')
@@ -706,7 +707,8 @@ function vm.compileByParentNode(source, key, ref, pushResult)
             and node.cate == 'type'
             ---@cast node vm.global
             and not guide.isBasicType(node.name)
-        ) then
+        )
+        or node.type == 'doc.type.string' then
             searchFieldSwitch(node.type, suri, node, key, ref, function (res, markDoc)
                 if markDoc then
                     docedResults[#docedResults+1] = res

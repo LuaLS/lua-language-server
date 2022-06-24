@@ -1675,3 +1675,23 @@ TEST [[
 ---@field [A] A
 ---@field [<!A!>] true
 ]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@type 'x'
+local t
+
+local n = t:upper()
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@alias A 'x'
+
+---@type A
+local t
+
+local n = t:upper()
+]]

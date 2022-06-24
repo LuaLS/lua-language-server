@@ -259,6 +259,14 @@ config.IntelliSense.traceBeSetted        =
 'Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
 config.IntelliSense.traceFieldInject     =
 'Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
+config.type.castNumberToInteger          =
+'Allowed to assign the `number` type to the `integer` type.'
+config.type.weakUnionCheck               =
+[[
+Once one subtype of a union type meets the condition, the union type also meets the condition.
+
+When this setting is `false`, the `number|boolean` type cannot be assigned to the `number` type. It can be with `true`.
+]]
 config.diagnostics['unused-local']          =
 'Enable unused local variable diagnostics.'
 config.diagnostics['unused-function']       =

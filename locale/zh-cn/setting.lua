@@ -258,6 +258,14 @@ config.IntelliSense.traceBeSetted        =
 '请查阅[文档](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)了解用法。'
 config.IntelliSense.traceFieldInject     =
 '请查阅[文档](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)了解用法。'
+config.type.castNumberToInteger          =
+'允许将 `number` 类型赋给 `integer` 类型。'
+config.type.weakUnionCheck               =
+[[
+联合类型中只要有一个子类型满足条件，则联合类型也满足条件。
+
+此设置为 `false` 时，`number|boolean` 类型无法赋给 `number` 类型；为 `true` 时则可以。
+]]
 config.diagnostics['unused-local']          =
 '未使用的局部变量'
 config.diagnostics['unused-function']       =

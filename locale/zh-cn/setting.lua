@@ -66,6 +66,11 @@ config.diagnostics.groupSeverity  =
 config.diagnostics.groupFileStatus =
 [[
 批量修改一个组中的文件状态。
+
+* Opened:  只诊断打开的文件
+* Any:     诊断任何文件
+* None:    禁用此诊断
+
 设置为 `Fallback` 意味着组中的诊断由 `diagnostics.neededFileStatus` 单独设置。
 其他设置将覆盖单独设置，但是不会覆盖以 `!` 结尾的设置。
 ]]

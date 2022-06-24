@@ -116,6 +116,18 @@ DIAG_UNDEFINED_DOC_PARAM              =
 '指向了未定義的參數 `{}`。'
 DIAG_UNKNOWN_DIAG_CODE                =
 '未知的診斷代碼 `{}`。'
+DIAG_CAST_LOCAL_TYPE                  = -- TODO: need translate!
+'This variable has explicitly defined as `{def}`. Cannot convert its type to `{ref}`.'
+DIAG_CAST_FIELD_TYPE                  = -- TODO: need translate!
+'This field has explicitly defined as `{def}`. Cannot convert its type to `{ref}`.'
+DIAG_ASSIGN_TYPE_MISMATCH             = -- TODO: need translate!
+'Cannot assign `{ref}` to `{def}`.'
+DIAG_PARAM_TYPE_MISMATCH              = -- TODO: need translate!
+'Cannot assign `{ref}` to parameter `{def}`.'
+DIAG_UNKNOWN_CAST_VARIABLE            = -- TODO: need translate!
+'Unknown type conversion variable `{}`.'
+DIAG_CAST_TYPE_MISMATCH               = -- TODO: need translate!
+'Cannot convert `{ref}` to `{def}`。'
 
 MWS_NOT_SUPPORT         =
 '{} 目前還不支援多工作目錄，我可能需要重新啟動才能支援新的工作目錄...'

@@ -36,19 +36,44 @@ config.runtime.builtin            =
 * `enable`: 總是啟用
 * `disable`: 總是停用
 ]]
+config.runtime.meta               = -- TODO: need translate!
+'Format of the directory name of the meta files.'
 config.diagnostics.enable         =
 "啟用診斷。"
 config.diagnostics.disable        =
 "停用的診斷（使用浮框括號內的程式碼）。"
 config.diagnostics.globals        =
 "已定義的全域變數。"
-config.diagnostics.severity       =
-"修改診斷等級。"
-config.diagnostics.neededFileStatus =
+config.diagnostics.severity       = -- TODO: need translate!
 [[
-* Opened:  只診斷打開的檔案
-* Any:     診斷任何檔案
-* Disable: 停用此診斷
+Modify the diagnostic severity.
+
+End with `!` means override the group setting `diagnostics.groupSeverity`.
+]]
+config.diagnostics.neededFileStatus = -- TODO: need translate!
+[[
+* Opened:  only diagnose opened files
+* Any:     diagnose all files
+* None:    disable this diagnostic
+
+End with `!` means override the group setting `diagnostics.groupFileStatus`.
+]]
+config.diagnostics.groupSeverity  = -- TODO: need translate!
+[[
+Modify the diagnostic severity in a group.
+`Fallback` means that diagnostics in this group are controlled by `diagnostics.severity` separately.
+Other settings will override individual settings without end of `!`.
+]]
+config.diagnostics.groupFileStatus = -- TODO: need translate!
+[[
+Modify the diagnostic needed file status in a group.
+
+* Opened:  only diagnose opened files
+* Any:     diagnose all files
+* None:    disable this diagnostic
+
+`Fallback` means that diagnostics in this group are controlled by `diagnostics.neededFileStatus` separately.
+Other settings will override individual settings without end of `!`.
 ]]
 config.diagnostics.workspaceDelay =
 "進行工作區診斷的延遲（毫秒）。當你啟動工作區，或編輯了任意檔案後，將會在背景對整個工作區進行重新診斷。設定為負數可以停用工作區診斷。"
@@ -213,6 +238,13 @@ config.hint.await                        = -- TODO: need translate!
 'If the called function is marked `---@async`, prompt `await` at the call.'
 config.format.enable                     =
 '啟用程式碼格式化程式。'
+config.format.defaultConfig              = -- TODO: need translate!
+[[
+The default format configuration. Has a lower priority than `.editorconfig` file in the workspace.
+Read [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) to learn usage.
+]]
+config.spell.dict                        = -- TODO: need translate!
+'Custom words for spell checking.'
 config.telemetry.enable                  =
 [[
 啟用遙測，透過網路發送你的編輯器資訊與錯誤日誌。在[此處](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%B1%E7%A7%81%E8%81%B2%E6%98%8E)閲讀我們的隱私聲明。

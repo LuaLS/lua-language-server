@@ -61,13 +61,18 @@ End with `!` means override the group setting `diagnostics.groupFileStatus`.
 config.diagnostics.groupSeverity  =
 [[
 Modify the diagnostic severity in a group.
-'Fallback' means that diagnostics in this group are controlled by `diagnostics.severity` separately.
+`Fallback` means that diagnostics in this group are controlled by `diagnostics.severity` separately.
 Other settings will override individual settings without end of `!`.
 ]]
 config.diagnostics.groupFileStatus =
 [[
 Modify the diagnostic needed file status in a group.
-'Fallback' means that diagnostics in this group are controlled by `diagnostics.neededFileStatus` separately.
+
+* Opened:  only diagnose opened files
+* Any:     diagnose all files
+* None:    disable this diagnostic
+
+`Fallback` means that diagnostics in this group are controlled by `diagnostics.neededFileStatus` separately.
 Other settings will override individual settings without end of `!`.
 ]]
 config.diagnostics.workspaceDelay =

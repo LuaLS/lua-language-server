@@ -116,6 +116,18 @@ DIAG_UNDEFINED_DOC_PARAM              =
 'Parâmetro indefinido `{}`.'
 DIAG_UNKNOWN_DIAG_CODE                =
 'Código de diagnóstico desconhecido `{}`.'
+DIAG_CAST_LOCAL_TYPE                  = -- TODO: need translate!
+'This variable has explicitly defined as `{def}`. Cannot convert its type to `{ref}`.'
+DIAG_CAST_FIELD_TYPE                  = -- TODO: need translate!
+'This field has explicitly defined as `{def}`. Cannot convert its type to `{ref}`.'
+DIAG_ASSIGN_TYPE_MISMATCH             = -- TODO: need translate!
+'Cannot assign `{ref}` to `{def}`.'
+DIAG_PARAM_TYPE_MISMATCH              = -- TODO: need translate!
+'Cannot assign `{ref}` to parameter `{def}`.'
+DIAG_UNKNOWN_CAST_VARIABLE            = -- TODO: need translate!
+'Unknown type conversion variable `{}`.'
+DIAG_CAST_TYPE_MISMATCH               = -- TODO: need translate!
+'Cannot convert `{ref}` to `{def}`。'
 
 MWS_NOT_SUPPORT         =
 '{} não é suportado múltiplos espaços de trabalho por enquanto, posso precisar reiniciar para estabelecer um novo espaço de trabalho ...'

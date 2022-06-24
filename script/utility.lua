@@ -832,4 +832,17 @@ m.MODE_K  = { __mode = 'k' }
 m.MODE_V  = { __mode = 'v' }
 m.MODE_KV = { __mode = 'kv' }
 
+---@generic T: fun(param: any):any
+---@param func T
+---@return T
+function m.catchReturn(func)
+    local cache = {}
+    return function (param)
+        if cache[param] == nil then
+            cache[param] = func(param)
+        end
+        return cache[param]
+    end
+end
+
 return m

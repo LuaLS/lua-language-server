@@ -10,6 +10,12 @@ m.DiagnosticSeverity = {
     Hint        = 4,
 }
 
+m.DiagnosticFileStatus = {
+    Any        = 1,
+    Opened     = 2,
+    None       = 3,
+}
+
 --- 诊断类型与默认等级
 m.DiagnosticDefaultSeverity = diag.getDefaultSeverity()
 

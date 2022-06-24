@@ -1,3 +1,5 @@
+local util = require 'utility'
+
 ---@class proto.diagnostic
 local m = {}
 
@@ -216,5 +218,18 @@ function m.getGroupStatus()
     end
     return group
 end
+
+---@param name string
+---@return string[]
+m.getGroups = util.catchReturn(function (name)
+    local groups = {}
+    for groupName, nameMap in pairs(m.diagnosticGroups) do
+        if nameMap[name] then
+            groups[#groups+1] = groupName
+        end
+    end
+    table.sort(groups)
+    return groups
+end)
 
 return m

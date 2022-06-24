@@ -239,6 +239,10 @@ local template = {
                                                     'Warning',
                                                     'Information',
                                                     'Hint',
+                                                    'Error!',
+                                                    'Warning!',
+                                                    'Information!',
+                                                    'Hint!',
                                                 }
                                             )
                                             >> util.deepCopy(define.DiagnosticDefaultSeverity),
@@ -248,6 +252,9 @@ local template = {
                                                     'Any',
                                                     'Opened',
                                                     'None',
+                                                    'Any!',
+                                                    'Opened!',
+                                                    'None!',
                                                 }
                                             )
                                             >> util.deepCopy(define.DiagnosticDefaultNeededFileStatus),
@@ -285,7 +292,6 @@ local template = {
                                                 'Opened',
                                                 'Disable',
                                             },
-    ['Lua.typeCheck.enable']                = Type.Boolean >> true,
     ['Lua.workspace.ignoreDir']             = Type.Array(Type.String) >> {
                                                 '.vscode',
                                             },

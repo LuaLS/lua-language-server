@@ -29,6 +29,10 @@ function vm.countParamsOfFunction(func)
                 local arg = func.args[i]
                 if arg.type == '...' then
                     max = math.huge
+                elseif arg.type == 'self'
+                and    i == 1 then
+                    min = i
+                    break
                 elseif getDocParam(arg)
                 and    not vm.compileNode(arg):isNullable() then
                     min = i

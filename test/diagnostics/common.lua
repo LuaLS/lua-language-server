@@ -1695,3 +1695,11 @@ local t
 
 local n = t:upper()
 ]]
+
+TEST [[
+local t = {}
+
+function t:init() end
+
+<!t.init()!>
+]]

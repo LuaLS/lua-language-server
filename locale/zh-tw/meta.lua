@@ -31,13 +31,13 @@ collectgarbage      =
 '這個函式是垃圾回收器的一般介面。透過引數 opt 它提供了一組不同的功能。'
 
 dofile              =
-'打開該名字的檔案，並執行檔案中的 Lua 程式碼區塊。不帶引數呼叫時， `dofile` 執行標準輸入的內容（`stdin` ）。回傳該程式碼區塊的所有回傳值。對於有錯誤的情況， `dofile` 將錯誤回饋給呼叫者（即 `dofile` 沒有執行在保護模式下）。'
+'打開該名字的檔案，並執行檔案中的 Lua 程式碼區塊。不帶引數呼叫時， `dofile` 執行標準輸入的內容（`stdin`）。回傳該程式碼區塊的所有回傳值。對於有錯誤的情況， `dofile` 將錯誤回饋給呼叫者（即 `dofile` 沒有執行在保護模式下）。'
 
 error               =
 [[
 中止上一次保護函式呼叫，將錯誤對象 `message` 回傳。函式 `error` 永遠不會回傳。
 
-當 `message` 是一個字串時，通常 `error` 會把一些有關出錯位置的資訊附加在訊息的前頭。 `level` 引數指明了怎樣獲得出錯位置。
+當 `message` 是一個字串時，通常 `error` 會把一些有關出錯位置的資訊附加在訊息的開頭。 `level` 引數指明了怎樣獲得出錯位置。
 ]]
 
 _G                  =
@@ -47,7 +47,7 @@ getfenv             =
 '回傳給定函式的環境。 `f` 可以是一個Lua函式，也可是一個表示呼叫堆疊層級的數字。'
 
 getmetatable        =
-'如果 `object` 不包含元表，回傳 `nil` 。否則，如果在該物件的元表中有 `"__metatable"` 域時回傳其關聯值，沒有時回傳該對象的元表。'
+'如果 `object` 不包含中繼資料表，回傳 `nil` 。否則，如果在該物件的中繼資料表中有 `"__metatable"` 域時回傳其關聯值，沒有時回傳該對象的中繼資料表。'
 
 ipairs              =
 [[
@@ -134,25 +134,26 @@ setfenv             =
 
 setmetatable        =
 [[
-給指定表設定元表。（你不能在 Lua 中改變其它型別值的元表，那些只能在 C 裡做。）如果 `metatable` 是 `nil`，將指定表的元表移除。如果原來那張元表有 `"__metatable"` 域，擲回一個錯誤。
+為指定的表設定中繼資料表。（你不能在 Lua 中改變其它類型值的中繼資料表，那些只能在 C 裡做。）如果 `metatable` 是 `nil`，將指定的表的中繼資料表移除。如果原來那張中繼資料表有 `"__metatable"` 域，擲回一個錯誤。
 ]]
 
 tonumber            =
 [[
-如果呼叫的時候沒有 `base` ， `tonumber` 嘗試把引數轉換為一個數字。如果引數已經是一個數字，或是一個可以轉換為數字的字串， `tonumber` 就回傳這個數字，否則回傳 `nil`。
+如果呼叫的時候沒有 `base` ， `tonumber` 嘗試把引數轉換為一個數字。如果引數已經是一個數字，或是一個可以轉換為數字的字串， `tonumber` 就回傳這個數字，否則回傳 `fail`。
 
 字串的轉換結果可能是整數也可能是浮點數，這取決於 Lua 的轉換文法（參見 §3.1）。（字串可以有前置和後置的空格，可以帶符號。）
 ]]
 
 tostring            =
 [[
-可以接收任何型別，它將其轉換為人可閲讀的字串形式。浮點數總被轉換為浮點數的表現形式（小數點形式或是指數形式）。（如果想完全控制數字如何被轉換，可以使用 $string.format 。）
-如果 `v` 有 `"__tostring"` 域的元表， `tostring` 會以 `v` 為引數呼叫它。並用它的結果作為回傳值。
+可以接收任何類型，它將其轉換為人可閱讀的字串形式。浮點數總被轉換為浮點數的表現形式（小數點形式或是指數形式）。
+如果 `v` 有 `"__tostring"` 域的中繼資料表， `tostring` 會以 `v` 為引數呼叫它。並用它的結果作為回傳值。
+如果想完全控制數字如何被轉換，可以使用 $string.format 。
 ]]
 
 type                =
 [[
-將引數的型別編碼為一個字串回傳。 函式可能的回傳值有 `"nil"` （一個字串，而不是 `nil` 值）、 `"number"` 、 `"string"` 、 `"boolean"` 、 `"table"` 、 `"function"` 、 `"thread"` 和 `"userdata"`。
+將引數的類型編碼為一個字串回傳。 函式可能的回傳值有 `"nil"` （一個字串，而不是 `nil` 值）、 `"number"` 、 `"string"` 、 `"boolean"` 、 `"table"` 、 `"function"` 、 `"thread"` 和 `"userdata"`。
 ]]
 
 _VERSION            =
@@ -194,7 +195,7 @@ assert(bit32.bnot(x) ==
 bit32.bor           =
 '回傳參數按位元或的結果。'
 bit32.btest         =
-'參數按位元與的結果不為0時，回傳 `true` 。'
+'參數按位元與的結果不為 `0` 時，回傳 `true` 。'
 bit32.bxor          =
 '回傳參數按位元互斥或的結果。'
 bit32.extract       =
@@ -227,7 +228,7 @@ assert(bit32.lshift(b, disp) ==
 coroutine                     =
 ''
 coroutine.create              =
-'建立一個主體函式為 `f` 的新共常式。 f 必須是一個 Lua 的函式。回傳這個新共常式，它是一個型別為 `"thread"` 的物件。'
+'建立一個主體函式為 `f` 的新共常式。 f 必須是一個 Lua 的函式。回傳這個新共常式，它是一個類型為 `"thread"` 的物件。'
 coroutine.isyieldable         =
 '如果正在執行的共常式可以讓出，則回傳真。'
 coroutine.isyieldable['>5.4'] =
@@ -261,7 +262,7 @@ debug.debug               =
 debug.getfenv             =
 '回傳物件 `o` 的環境。'
 debug.gethook             =
-'回傳三個表示執行緒攔截設定的值：目前攔截函式，目前鉤子遮罩，目前鉤子計數。'
+'回傳三個表示執行緒攔截設定的值：目前攔截函式，目前攔截遮罩，目前攔截計數。'
 debug.getinfo             =
 '回傳關於一個函式資訊的表。'
 debug.getlocal['<5.1']    =
@@ -269,7 +270,7 @@ debug.getlocal['<5.1']    =
 debug.getlocal['>5.2']    =
 '回傳在堆疊的 `f` 層處函式的索引為 `index` 的區域變數的名字和值。'
 debug.getmetatable        =
-'回傳給定 `value` 的元表。'
+'回傳給定 `value` 的中繼資料表。'
 debug.getregistry         =
 '回傳註冊表。'
 debug.getupvalue          =
@@ -289,11 +290,11 @@ debug.setcstacklimit      =
 debug.setfenv             =
 '將 `table` 設定為 `object` 的環境。'
 debug.sethook             =
-'將一個函式作為攔截函式設入。'
+'將一個函式設定為攔截函式。'
 debug.setlocal            =
 '將 `value` 賦給 堆疊上第 `level` 層函式的第 `local` 個區域變數。'
 debug.setmetatable        =
-'將 `value` 的元表設為 `table` （可以是 `nil` ）。'
+'將 `value` 的中繼資料表設為 `table` （可以是 `nil` ）。'
 debug.setupvalue          =
 '將 `value` 設為函式 `f` 的第 `up` 個上值。'
 debug.setuservalue['<5.3']=
@@ -327,11 +328,11 @@ infowhat.L                =
 '`activelines`'
 
 hookmask.c                =
-'每當 Lua 呼叫一個函式時，呼叫鉤子。'
+'每當 Lua 呼叫一個函式時，呼叫攔截。'
 hookmask.r                =
-'每當 Lua 從一個函式內回傳時，呼叫鉤子。'
+'每當 Lua 從一個函式內回傳時，呼叫攔截。'
 hookmask.l                =
-'每當 Lua 進入新的一行時，呼叫鉤子。'
+'每當 Lua 進入新的一行時，呼叫攔截。'
 
 file                        =
 ''
@@ -362,9 +363,9 @@ readmode.n                  =
 readmode.a                  =
 '從目前位置開始讀取整個檔案。'
 readmode.l                  =
-'讀取一行並忽略行結束標記。'
+'讀取一行並忽略行尾標記。'
 readmode.L                  =
-'讀取一行並保留行結束標記。'
+'讀取一行並保留行尾標記。'
 
 seekwhence.set              =
 '基點為 0 （檔案開頭）。'
@@ -408,7 +409,7 @@ io.open                    =
 io.output                  =
 '設定 `file` 為預設輸出檔案。'
 io.popen                   =
-'用一個分離程序開啟程式 `prog` 。'
+'用一個分離處理程序開啟程式 `prog` 。'
 io.read                    =
 '讀取檔案 `file` ，指定的格式決定了要讀取什麼。'
 io.tmpfile                 =
@@ -545,13 +546,13 @@ math.ult                    =
 os                          =
 ''
 os.clock                    =
-'回傳程式使用的按秒計 CPU 時間的近似值。'
+'回傳程式使用的 CPU 時間的近似值，單位為秒。'
 os.date                     =
 '回傳一個包含日期及時刻的字串或表。格式化方法取決於所給字串 `format` 。'
 os.difftime                 =
 '回傳以秒計算的時刻 `t1` 到 `t2` 的差值。'
 os.execute                  =
-'呼叫系統直譯器執行 `command` 。'
+'呼叫作業系統殼層執行 `command` 。'
 os.exit['<5.1']             =
 '呼叫 C 函式 `exit` 終止宿主程式。'
 os.exit['>5.2']             =
@@ -586,7 +587,7 @@ osdate.wday                 =
 osdate.yday                 =
 '該年的第幾天，範圍為1-366'
 osdate.isdst                =
-'夏令時間，一個布林值'
+'是否為夏令時間，一個布林值'
 
 package                     =
 ''
@@ -597,7 +598,7 @@ require['>5.4']             =
 '載入一個模組，回傳該模組的回傳值（ `nil` 時為 `true` ）與搜尋器回傳的載入資料。預設搜尋器的載入資料指示了載入位置，對於檔案來説就是檔案路徑。'
 
 package.config              =
-'一個描述有一些為包管理準備的編譯時期組態訊息的串。'
+'一個描述一些為包管理準備的編譯時期組態的字串。'
 package.cpath               =
 '這個路徑被 `require` 在 C 載入器中做搜尋時用到。'
 package.loaded              =
@@ -615,7 +616,7 @@ package.searchers           =
 package.searchpath          =
 '在指定 `path` 中搜尋指定的 `name` 。'
 package.seeall              =
-'給 `module` 設定一個元表，該元表的 `__index` 域為全域環境，這樣模組便會繼承全域環境的值。可作為 `module` 函式的選項。'
+'給 `module` 設定一個中繼資料表，該中繼資料表的 `__index` 域為全域環境，這樣模組便會繼承全域環境的值。可作為 `module` 函式的選項。'
 
 string                      =
 ''
@@ -715,7 +716,7 @@ table.clear                 =
 ```lua
     require("table.clear")
 ```
-請注意，此函式適用於非常特殊的情況。在大多數情況下，最好用新表替換（通常是單個）連結，並讓垃圾回收完成工作。
+請注意，此函式適用於非常特殊的情況。在大多數情況下，最好用新表替換（通常是單個）連結，並讓垃圾回收自行處理。
 ]]
 
 utf8                        =

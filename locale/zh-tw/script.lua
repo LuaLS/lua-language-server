@@ -79,11 +79,11 @@ DIAG_UNBALANCED_ASSIGNMENTS =
 DIAG_REQUIRE_LIKE       =
 '你可以在設定中將 `{}` 視為 `require`。'
 DIAG_COSE_NON_OBJECT    =
-'無法 close 此型別的值。（除非給此型別設定 `__close` 元方法）'
+'無法 close 此類型的值。（除非給此類型設定 `__close` 元方法）'
 DIAG_COUNT_DOWN_LOOP    =
 '你的意思是 `{}` 嗎？'
 DIAG_UNKNOWN            =
-'無法推測出型別。'
+'無法推測出類型。'
 DIAG_DEPRECATED         =
 '已廢棄。'
 DIAG_DIFFERENT_REQUIRES =
@@ -111,23 +111,23 @@ DIAG_DUPLICATE_DOC_PARAM              =
 DIAG_UNDEFINED_DOC_CLASS              =
 '未定義的類別 `{}`。'
 DIAG_UNDEFINED_DOC_NAME               =
-'未定義的型別或別名 `{}`。'
+'未定義的類型或別名 `{}`。'
 DIAG_UNDEFINED_DOC_PARAM              =
 '指向了未定義的參數 `{}`。'
 DIAG_UNKNOWN_DIAG_CODE                =
 '未知的診斷代碼 `{}`。'
-DIAG_CAST_LOCAL_TYPE                  = -- TODO: need translate!
-'This variable has explicitly defined as `{def}`. Cannot convert its type to `{ref}`.'
-DIAG_CAST_FIELD_TYPE                  = -- TODO: need translate!
-'This field has explicitly defined as `{def}`. Cannot convert its type to `{ref}`.'
-DIAG_ASSIGN_TYPE_MISMATCH             = -- TODO: need translate!
-'Cannot assign `{ref}` to `{def}`.'
-DIAG_PARAM_TYPE_MISMATCH              = -- TODO: need translate!
-'Cannot assign `{ref}` to parameter `{def}`.'
-DIAG_UNKNOWN_CAST_VARIABLE            = -- TODO: need translate!
-'Unknown type conversion variable `{}`.'
-DIAG_CAST_TYPE_MISMATCH               = -- TODO: need translate!
-'Cannot convert `{ref}` to `{def}`。'
+DIAG_CAST_LOCAL_TYPE                  =
+'已顯式定義變數的類型為 `{def}`，不能再將其類型轉換為 `{ref}`。'
+DIAG_CAST_FIELD_TYPE                  =
+'已顯式定義欄位的類型為 `{def}`，不能再將其類型轉換為 `{ref}`。'
+DIAG_ASSIGN_TYPE_MISMATCH             =
+'不能將 `{ref}` 賦值給 `{def}`。'
+DIAG_PARAM_TYPE_MISMATCH              =
+'不能將 `{ref}` 賦值給參數 `{def}`.'
+DIAG_UNKNOWN_CAST_VARIABLE            =
+'未知的類型轉換變數 `{}`.'
+DIAG_CAST_TYPE_MISMATCH               =
+'不能將 `{ref}` 轉換為 `{def}`。'
 
 MWS_NOT_SUPPORT         =
 '{} 目前還不支援多工作目錄，我可能需要重新啟動才能支援新的工作目錄...'
@@ -155,7 +155,7 @@ WORKSPACE_DIAGNOSTIC      =
 WORKSPACE_SKIP_HUGE_FILE  =
 '出於效能考慮，已停止對此檔案解析：{}'
 WORKSPACE_NOT_ALLOWED     =
-'你的工作目錄被設定為了 `{}` ，Lua語言服務拒絕載入此目錄，請檢查你的設定檔。[了解更多](https://github.com/sumneko/lua-language-server/wiki/Why-scanning-home-folder)'
+'你的工作目錄被設定為了 `{}` ，Lua語言伺服拒絕載入此目錄，請檢查你的設定檔。[了解更多](https://github.com/sumneko/lua-language-server/wiki/Why-scanning-home-folder)'
 WORKSPACE_SCAN_TOO_MUCH   =
 '已掃描了超過 {} 個檔案，目前掃描的目錄為 `{}`，請確認設定檔是否正確。'
 
@@ -264,7 +264,7 @@ PARSER_LUADOC_MISS_SYMBOL               =
 PARSER_LUADOC_MISS_ARG_NAME             =
 '缺少參數名稱。'
 PARSER_LUADOC_MISS_TYPE_NAME            =
-'缺少型別名。'
+'缺少類型名。'
 PARSER_LUADOC_MISS_ALIAS_NAME           =
 '缺少別名。'
 PARSER_LUADOC_MISS_ALIAS_EXTENDS        =
@@ -272,21 +272,21 @@ PARSER_LUADOC_MISS_ALIAS_EXTENDS        =
 PARSER_LUADOC_MISS_PARAM_NAME           =
 '缺少要指向的參數名稱。'
 PARSER_LUADOC_MISS_PARAM_EXTENDS        =
-'缺少參數的型別定義。'
+'缺少參數的類型定義。'
 PARSER_LUADOC_MISS_FIELD_NAME           =
 '缺少欄位名稱。'
 PARSER_LUADOC_MISS_FIELD_EXTENDS        =
-'缺少欄位的型別定義。'
+'缺少欄位的類型定義。'
 PARSER_LUADOC_MISS_GENERIC_NAME         =
 '缺少泛型名稱。'
 PARSER_LUADOC_MISS_GENERIC_EXTENDS_NAME =
 '缺少泛型要繼承的類別名稱。'
 PARSER_LUADOC_MISS_VARARG_TYPE          =
-'缺少可變引數的型別定義。'
+'缺少可變引數的類型定義。'
 PARSER_LUADOC_MISS_FUN_AFTER_OVERLOAD   =
 '缺少關鍵字 `fun` 。'
 PARSER_LUADOC_MISS_CATE_NAME            =
-'缺少文件型別名稱。'
+'缺少文件類型名稱。'
 PARSER_LUADOC_MISS_DIAG_MODE            =
 '缺少診斷模式。'
 PARSER_LUADOC_ERROR_DIAG_MODE           =
@@ -334,7 +334,7 @@ HOVER_USE_LUA_PATH      =
 HOVER_EXTENDS           =
 '展開為 {}'
 HOVER_TABLE_TIME_UP     =
-'出於效能考慮，已停用了部分型別推斷。'
+'出於效能考慮，已停用了部分類型推斷。'
 HOVER_WS_LOADING        =
 '正在載入工作目錄：{} / {}'
 HOVER_AWAIT_TOOLTIP     =
@@ -381,7 +381,7 @@ ACTION_ADD_END          =
 ACTION_FIX_COMMENT_PREFIX =
 '改為 `--` 。'
 ACTION_FIX_NONSTANDARD_SYMBOL =
-'改為 `{symbol}`'
+'改為 `{symbol}`。'
 ACTION_RUNTIME_UNICODE_NAME =
 '允許使用 Unicode 字元。'
 ACTION_SWAP_PARAMS      =
@@ -396,8 +396,8 @@ ACTION_DISABLE_DIAG_FILE=
 '在此檔案停用診斷 ({})。'
 ACTION_MARK_ASYNC       =
 '將目前函式標記為非同步。'
-ACTION_ADD_DICT         = -- TODO: need translate!
-'Add \'{}\' to workspace dict'
+ACTION_ADD_DICT         =
+'添加 \'{}\' 到工作區字典'
 
 COMMAND_DISABLE_DIAG       =
 '停用診斷'
@@ -417,8 +417,8 @@ COMMAND_JSON_TO_LUA        =
 'JSON 轉 Lua'
 COMMAND_JSON_TO_LUA_FAILED =
 'JSON 轉 Lua 失敗：{}'
-COMMAND_ADD_DICT           = -- TODO: need translate!
-'Add Word to dictionary'
+COMMAND_ADD_DICT           =
+'添加單字到字典裡'
 
 COMPLETION_IMPORT_FROM           =
 '從 {} 中匯入'
@@ -428,7 +428,7 @@ COMPLETION_ASK_AUTO_REQUIRE      =
 '在檔案頂部添加程式碼 require 此檔案？'
 
 DEBUG_MEMORY_LEAK       =
-'{} 很抱歉發生了嚴重的記憶體漏失，語言服務即將重新啟動。'
+'{} 很抱歉發生了嚴重的記憶體漏失，語言伺服即將重新啟動。'
 DEBUG_RESTART_NOW       =
 '立即重新啟動'
 
@@ -494,7 +494,7 @@ WINDOW_APPLY_SETTING             =
 WINDOW_CHECK_SEMANTIC            =
 '如果你正在使用市場中的顏色主題，你可能需要同時修改 `editor.semanticHighlighting.enabled` 選項為 `true` 才會使語義著色生效。'
 WINDOW_TELEMETRY_HINT            =
-'請允許發送匿名的使用資料與錯誤報告，幫助我們進一步完善此延伸模組。在[此處](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%B1%E7%A7%81%E8%81%B2%E6%98%8E)閲讀我們的隱私聲明。'
+'請允許發送匿名的使用資料與錯誤報告，幫助我們進一步完善此延伸模組。在[此處](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%B1%E7%A7%81%E8%81%B2%E6%98%8E)閱讀我們的隱私聲明。'
 WINDOW_TELEMETRY_ENABLE          =
 '允許'
 WINDOW_TELEMETRY_DISABLE         =
@@ -559,51 +559,51 @@ CLI_CHECK_SUCCESS =
 CLI_CHECK_RESULTS =
 '診斷完成，共有 {} 個問題，請查看 {}'
 
-LUADOC_DESC_CLASS = -- TODO: need translate!
+LUADOC_DESC_CLASS =
 [=[
-Defines a class/table structure
-## Syntax
+定義一個類別/表結構
+## 語法
 `---@class <name> [: <parent>[, <parent>]...]`
-## Usage
+## 用法
 ```
 ---@class Manager: Person, Human
 Manager = {}
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#class)
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#class)
 ]=]
-LUADOC_DESC_TYPE = -- TODO: need translate!
+LUADOC_DESC_TYPE =
 [=[
-Specify the type of a certain variable
+指定一個變數的類型
 
-Default types: `nil`, `any`, `boolean`, `string`, `number`, `integer`,
-`function`, `table`, `thread`, `userdata`, `lightuserdata`
+預設類型： `nil` 、 `any` 、 `boolean` 、 `string` 、 `number` 、 `integer`、
+`function` 、 `table` 、 `thread` 、 `userdata` 、 `lightuserdata`
 
-(Custom types can be provided using `@alias`)
+（可以使用 `@alias` 提供自訂類型）
 
-## Syntax
+## 語法
 `---@type <type>[| [type]...`
 
-## Usage
-### General
+## 用法
+### 一般
 ```
 ---@type nil|table|myClass
 local Example = nil
 ```
 
-### Arrays
+### 陣列
 ```
 ---@type number[]
 local phoneNumbers = {}
 ```
 
-### Enums
+### 列舉
 ```
 ---@type "red"|"green"|"blue"
 local color = ""
 ```
 
-### Tables
+### 表
 ```
 ---@type table<string, boolean>
 local settings = {
@@ -615,21 +615,21 @@ local settings = {
 local x --x[""] is true
 ```
 
-### Functions
+### 函式
 ```
 ---@type fun(mode?: "r"|"w"): string
 local myFunction
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#types-and-type)
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#types-and-type)
 ]=]
-LUADOC_DESC_ALIAS = -- TODO: need translate!
+LUADOC_DESC_ALIAS =
 [=[
-Create your own custom type that can be used with `@param`, `@type`, etc.
+新增你的自訂類型，可以與 `@param`、`@type` 等一起使用。
 
-## Syntax
+## 語法
 `---@alias <name> <type> [description]`\
-or
+或
 ```
 ---@alias <name>
 ---| 'value' [# comment]
@@ -637,7 +637,7 @@ or
 ...
 ```
 
-## Usage
+## 用法
 ### Expand to other type
 ```
 ---@alias filepath string Path to a file
@@ -646,7 +646,7 @@ or
 function find(path, pattern) end
 ```
 
-### Enums
+### 列舉
 ```
 ---@alias font-style
 ---| '"underlined"' # Underline the text
@@ -657,17 +657,17 @@ function find(path, pattern) end
 function setFontStyle(style) end
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#alias)
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#alias)
 ]=]
-LUADOC_DESC_PARAM = -- TODO: need translate!
+LUADOC_DESC_PARAM =
 [=[
-Declare a function parameter
+宣告一個函式參數
 
-## Syntax
+## 語法
 `@param <name>[?] <type> [comment]`
 
-## Usage
-### General
+## 用法
+### 一般
 ```
 ---@param url string The url to request
 ---@param headers? table<string, string> HTTP headers to send
@@ -675,26 +675,26 @@ Declare a function parameter
 function get(url, headers, timeout) end
 ```
 
-### Variable Arguments
+### 可變引數
 ```
 ---@param base string The base to concat to
 ---@param ... string The values to concat
 function concat(base, ...) end
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#param)
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#param)
 ]=]
-LUADOC_DESC_RETURN = -- TODO: need translate!
+LUADOC_DESC_RETURN =
 [=[
-Declare a return value
+宣告一個回傳值
 
-## Syntax
+## 語法
 `@return <type> [name] [description]`\
-or\
+或\
 `@return <type> [# description]`
 
-## Usage
-### General
+## 用法
+### 一般
 ```
 ---@return number
 ---@return number # The green component
@@ -702,35 +702,34 @@ or\
 function hexToRGB(hex) end
 ```
 
-### Type & name only
+### 僅限類型和名稱
 ```
 ---@return number x, number y
 function getCoords() end
 ```
 
-### Type only
+### 僅限類型
 ```
 ---@return string, string
 function getFirstLast() end
 ```
 
-### Return variable values
+### 回傳變數值
 ```
 ---@return string ... The tags of the item
 function getTags(item) end
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#return)
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#return)
 ]=]
-LUADOC_DESC_FIELD = -- TODO: need translate!
+LUADOC_DESC_FIELD =
 [=[
-Decalare a field in a class/table. This allows you to provide more in-depth
-documentation for a table.
+在類別/表中宣告一個欄位。 這使你可以為表提供更深入詳細的文件。
 
-## Syntax
+## 語法
 `---@field <name> <type> [description]`
 
-## Usage
+## 用法
 ```
 ---@class HTTP_RESPONSE
 ---@field status HTTP_STATUS
@@ -750,18 +749,17 @@ response = get("localhost")
 statusCode = response.status.code
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#field)
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#field)
 ]=]
-LUADOC_DESC_GENERIC = -- TODO: need translate!
+LUADOC_DESC_GENERIC =
 [=[
-Simulates generics. Generics can allow types to be re-used as they help define
-a "generic shape" that can be used with different types.
+模擬泛型。 泛型可以允許類型被重用，因為它們有助於定義可用於不同類型的"通用形狀"。
 
-## Syntax
+## 語法
 `---@generic <name> [:parent_type] [, <name> [:parent_type]]`
 
-## Usage
-### General
+## 用法
+### 一般
 ```
 ---@generic T
 ---@param value T The value to return
@@ -784,7 +782,7 @@ b = echo(true)
 -- each allowed type
 ```
 
-### Capture name of generic type
+### 捕獲泛型類型的名稱
 ```
 ---@class Foo
 local Foo = {}
@@ -798,7 +796,7 @@ function Generic(name) end
 local v = Generic("Foo") -- v is an object of Foo
 ```
 
-### How Lua tables use generics
+### Lua 表如何使用泛型
 ```
 ---@class table<K, V>: { [K]: V }
 
@@ -807,137 +805,135 @@ local v = Generic("Foo") -- v is an object of Foo
 -- we give for key (K) or value (V)
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#generics-and-generic)
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#generics-and-generic)
 ]=]
-LUADOC_DESC_VARARG = -- TODO: need translate!
+LUADOC_DESC_VARARG =
 [=[
-Primarily for legacy support for EmmyLua annotations. `@vararg` does not
-provide typing or allow descriptions.
+主要用於對 EmmyLua 註解的向下支援。 `@vararg` 不提供輸入或允許描述。
 
-**You should instead use `@param` when documenting parameters (variable or not).**
+**在記錄參數（變數或非變數）時，您應該改用 `@param`。**
 
-## Syntax
+## 語法
 `@vararg <type>`
 
-## Usage
+## 用法
 ```
 ---Concat strings together
 ---@vararg string
 function concat(...) end
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#vararg)
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#vararg)
 ]=]
-LUADOC_DESC_OVERLOAD = -- TODO: need translate!
+LUADOC_DESC_OVERLOAD =
 [=[
-Allows defining of multiple function signatures.
+允許定義多個函數簽章。
 
-## Syntax
+## 語法
 `---@overload fun(<name>[: <type>] [, <name>[: <type>]]...)[: <type>[, <type>]...]`
 
-## Usage
+## 用法
 ```
 ---@overload fun(t: table, value: any): number
 function table.insert(t, position, value) end
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#overload)
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#overload)
 ]=]
-LUADOC_DESC_DEPRECATED = -- TODO: need translate!
+LUADOC_DESC_DEPRECATED =
 [=[
-Marks a function as deprecated. This results in any deprecated function calls
-being ~~struck through~~.
+將函式標記為已棄用。 這會導致任何不推薦使用的函式呼叫被 ~~擊穿~~。
 
-## Syntax
+## 語法
 `---@deprecated`
 
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#deprecated)
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#deprecated)
 ]=]
-LUADOC_DESC_META = -- TODO: need translate!
+LUADOC_DESC_META =
 [=[
-Indicates that this is a meta file and should be used for definitions and intellisense only.
+表示這是一個中繼檔案，應僅用於定義和智慧感知。
 
-There are 3 main distinctions to note with meta files:
-1. There won't be any context-based intellisense in a meta file
-2. Hovering a `require` filepath in a meta file shows `[meta]` instead of an absolute path
-3. The `Find Reference` function will ignore meta files
+中繼檔案有 3 個主要區別需要注意：
+1. 中繼檔案中不會有任何基於上下文的智慧感知
+2. 將 `require` 檔案路徑懸停在中繼檔案中會顯示 `[meta]` 而不是絕對路徑
+3. `Find Reference` 功能會忽略中繼檔案
 
-## Syntax
+## 語法
 `---@meta`
 
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#meta)
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#meta)
 ]=]
-LUADOC_DESC_VERSION = -- TODO: need translate!
+LUADOC_DESC_VERSION =
 [=[
-Specifies Lua versions that this function is exclusive to.
+指定此函式獨有的 Lua 版本。
 
-Lua versions: `5.1`, `5.2`, `5.3`, `5.4`, `JIT`.
+Lua 版本：`5.1` 、 `5.2` 、 `5.3` 、 `5.4` 、 `JIT`。
 
-Requires configuring the `Diagnostics: Needed File Status` setting.
+需要 `Diagnostics: Needed File Status` 設定。
 
-## Syntax
+## 語法
 `---@version <version>[, <version>]...`
 
-## Usage
-### General
+## 用法
+### 一般
 ```
 ---@version JIT
 function onlyWorksInJIT() end
 ```
-### Specify multiple versions
+### 指定多個版本
 ```
 ---@version <5.2,JIT
 function oldLuaOnly() end
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#version)
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#version)
 ]=]
-LUADOC_DESC_SEE = -- TODO: need translate!
+LUADOC_DESC_SEE =
 [=[
-Define something that can be viewed for more information
+定義可以檢視以獲取更多資訊的內容
 
 ## Syntax
 `---@see <text>`
 
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#see)
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#see)
 ]=]
-LUADOC_DESC_DIAGNOSTIC = -- TODO: need translate!
+LUADOC_DESC_DIAGNOSTIC =
 [=[
-Enable/disable diagnostics for error/warnings/etc.
+啟用/停用診斷錯誤與警告等。
 
-Actions: `disable`, `enable`, `disable-line`, `disable-next-line`
+操作：`disable` 、 `enable` 、 `disable-line` 、 `disable-next-line`
 
-[Names](https://github.com/sumneko/lua-language-server/blob/cbb6e6224094c4eb874ea192c5f85a6cba099588/script/proto/define.lua#L54)
+[名稱](https://github.com/sumneko/lua-language-server/blob/cbb6e6224094c4eb874ea192c5f85a6cba099588/script/proto/define.lua#L54)
 
-## Syntax
+## 語法
 `---@diagnostic <action>[: <name>]`
 
-## Usage
-### Disable next line
+## 用法
+### 停用下一行
 ```
 ---@diagnostic disable-next-line: undefined-global
 ```
 
-### Manually toggle
+### 手動切換
 ```
 ---@diagnostic disable: unused-local
 local unused = "hello world"
 ---@diagnostic enable: unused-local
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#diagnostic)
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#diagnostic)
 ]=]
-LUADOC_DESC_MODULE = -- TODO: need translate!
+LUADOC_DESC_MODULE =
 [=[
-Provides the semantics of `reqire`.
+提供 `require` 的語義。
 
-## Syntax
+## 語法
 `---@module <'module_name'>`
 
-## Usage
+## 用法
 ```
 ---@module 'string.utils'
 local stringUtils
@@ -945,41 +941,40 @@ local stringUtils
 local module = require('string.utils')
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#module)
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#module)
 ]=]
-LUADOC_DESC_ASYNC = -- TODO: need translate!
+LUADOC_DESC_ASYNC =
 [=[
-Marks a function as asynchronous.
+將函式標記為非同步
 
-## Syntax
+## 語法
 `---@async`
 
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#async)
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#async)
 ]=]
-LUADOC_DESC_NODISCARD = -- TODO: need translate!
+LUADOC_DESC_NODISCARD =
 [=[
-Prevents this function's return values from being discarded/ignored.
-This will raise the `discard-returns` warning should the return values
-be ignored.
+防止此函式的回傳值被丟棄/忽略。
+如果忽略回傳值，這將引發 `discard-returns` 警告。
 
-## Syntax
+## 語法
 `---@nodiscard`
 
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#nodiscard)
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#nodiscard)
 ]=]
-LUADOC_DESC_CAST = -- TODO: need translate!
+LUADOC_DESC_CAST =
 [=[
-Allows type casting (type conversion).
+允許類型轉換。
 
-⚠️ **Not Finalized**
+⚠️ **不是最終定案**
 
-## Syntax
+## 語法
 `@cast <variable> <[+|-]type>[, <[+|-]type>]...`
 
-## Usage
-### Overwrite type
+## 用法
+### 覆蓋類型
 ```
 ---@type integer
 local x --> integer
@@ -987,7 +982,7 @@ local x --> integer
 ---@cast x string
 print(x) --> string
 ```
-### Add Type
+### 增加類型
 ```
 ---@type string
 local x --> string
@@ -995,7 +990,7 @@ local x --> string
 ---@cast x +boolean, +number
 print(x) --> string|boolean|number
 ```
-### Remove Type
+### 移除類型
 ```
 ---@type string|table
 local x --> string|table
@@ -1004,5 +999,5 @@ local x --> string|table
 print(x) --> table
 ```
 ---
-[View Proposal](https://github.com/sumneko/lua-language-server/issues/1030)
+[檢視提議](https://github.com/sumneko/lua-language-server/issues/1030)
 ]=]

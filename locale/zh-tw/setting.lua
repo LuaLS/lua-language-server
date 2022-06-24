@@ -12,7 +12,7 @@ config.runtime.path               =
 config.runtime.pathStrict         =
 '啟用後 `runtime.path` 將只搜尋第一層目錄，見 `runtime.path` 的説明。'
 config.runtime.special            =
-[[將自訂全域變數視為一些特殊的內建變數，語言服務將提供特殊的支援。
+[[將自訂全域變數視為一些特殊的內建變數，語言伺服將提供特殊的支援。
 下面這個例子表示將 `include` 視為 `require` 。
 ```json
 "Lua.runtime.special" : {
@@ -25,60 +25,59 @@ config.runtime.unicodeName        =
 config.runtime.nonstandardSymbol  =
 "支援非標準的符號。請務必確認你的執行環境支援這些符號。"
 config.runtime.plugin             =
-"延伸模組路徑，請查閲[文件](https://github.com/sumneko/lua-language-server/wiki/Plugin)瞭解用法。"
+"延伸模組路徑，請查閱[文件](https://github.com/sumneko/lua-language-server/wiki/Plugin)瞭解用法。"
 config.runtime.fileEncoding       =
-"檔案編碼，`ansi` 選項只在 `Windows` 平台下有效。"
+"檔案編碼，選項 `ansi` 只在 `Windows` 平台下有效。"
 config.runtime.builtin            =
 [[
-調整內建庫的啟用狀態，你可以根據實際執行環境停用不存在的庫（或重新定義）。
+調整內建庫的啟用狀態，你可以根據實際執行環境停用（或重新定義）不存在的庫。
 
 * `default`: 表示庫會根據執行版本啟用或停用
 * `enable`: 總是啟用
 * `disable`: 總是停用
 ]]
-config.runtime.meta               = -- TODO: need translate!
-'Format of the directory name of the meta files.'
+config.runtime.meta               =
+'meta檔案的目錄名稱格式'
 config.diagnostics.enable         =
 "啟用診斷。"
 config.diagnostics.disable        =
 "停用的診斷（使用浮框括號內的程式碼）。"
 config.diagnostics.globals        =
 "已定義的全域變數。"
-config.diagnostics.severity       = -- TODO: need translate!
+config.diagnostics.severity       =
 [[
-Modify the diagnostic severity.
-
-End with `!` means override the group setting `diagnostics.groupSeverity`.
+修改診斷等級。
+以 `!` 結尾的設定優先順序高於組設定 `diagnostics.groupSeverity`。
 ]]
-config.diagnostics.neededFileStatus = -- TODO: need translate!
+config.diagnostics.neededFileStatus =
 [[
-* Opened:  only diagnose opened files
-* Any:     diagnose all files
-* None:    disable this diagnostic
+* Opened:  只診斷打開的檔案
+* Any:     診斷所有檔案
+* None:    停用此診斷
 
-End with `!` means override the group setting `diagnostics.groupFileStatus`.
+以 `!` 結尾的設定優先順序高於組設定 `diagnostics.groupFileStatus`。
 ]]
-config.diagnostics.groupSeverity  = -- TODO: need translate!
+config.diagnostics.groupSeverity  =
 [[
-Modify the diagnostic severity in a group.
-`Fallback` means that diagnostics in this group are controlled by `diagnostics.severity` separately.
-Other settings will override individual settings without end of `!`.
+批量修改一個組中的診斷等級。
+設定為 `Fallback` 意味著組中的診斷由 `diagnostics.severity` 單獨設定。
+其他設定將覆蓋單獨設定，但是不會覆蓋以 `!` 結尾的設定。
 ]]
-config.diagnostics.groupFileStatus = -- TODO: need translate!
+config.diagnostics.groupFileStatus =
 [[
-Modify the diagnostic needed file status in a group.
+批量修改一個組中的檔案狀態。
 
-* Opened:  only diagnose opened files
-* Any:     diagnose all files
-* None:    disable this diagnostic
+* Opened:  只診斷打開的檔案
+* Any:     診斷所有檔案
+* None:    停用此診斷
 
-`Fallback` means that diagnostics in this group are controlled by `diagnostics.neededFileStatus` separately.
-Other settings will override individual settings without end of `!`.
+設定為 `Fallback` 意味著組中的診斷由 `diagnostics.neededFileStatus` 單獨設定。
+其他設定將覆蓋單獨設定，但是不會覆蓋以 `!` 結尾的設定。
 ]]
 config.diagnostics.workspaceDelay =
-"進行工作區診斷的延遲（毫秒）。當你啟動工作區，或編輯了任意檔案後，將會在背景對整個工作區進行重新診斷。設定為負數可以停用工作區診斷。"
+"進行工作區診斷的延遲（毫秒）。當你啟動工作區，或編輯了任何檔案後，將會在背景對整個工作區進行重新診斷。設定為負數可以停用工作區診斷。"
 config.diagnostics.workspaceRate  =
-"工作區診斷的執行速率（百分比）。降低該值會減少CPU佔用，但是也會降低工作區診斷的速度。你目前正在編輯的檔案的診斷總是全速完成，不受該選項影響。"
+"工作區診斷的執行速率（百分比）。降低該值會減少CPU使用率，但是也會降低工作區診斷的速度。你目前正在編輯的檔案的診斷總是全速完成，不受該選項影響。"
 config.diagnostics.libraryFiles   =
 "如何診斷透過 `Lua.workspace.library` 載入的檔案。"
 config.diagnostics.libraryFiles.Enable   =
@@ -123,7 +122,7 @@ config.workspace.checkThirdParty  =
 config.workspace.userThirdParty          =
 '在這裡添加私有的第三方庫適應檔案路徑，請參考內建的[組態檔案路徑](https://github.com/sumneko/lua-language-server/tree/master/meta/3rd)'
 config.workspace.supportScheme           =
-'為以下 `scheme` 的lua檔案提供語言服務。'
+'為以下 `scheme` 的lua檔案提供語言伺服。'
 config.completion.enable                 =
 '啟用自動完成。'
 config.completion.callSnippet            =
@@ -175,7 +174,7 @@ config.semantic.enable                   =
 config.semantic.variable                 =
 "對變數/欄位/參數進行語義著色。"
 config.semantic.annotation               =
-"對型別註解進行語義著色。"
+"對類型註解進行語義著色。"
 config.semantic.keyword                  =
 "對關鍵字/字面常數/運算子進行語義著色。只有當你的編輯器無法進行語法著色時才需要啟用此功能。"
 config.signatureHelp.enable              =
@@ -189,14 +188,14 @@ config.hover.viewStringMax               =
 config.hover.viewNumber                  =
 "懸浮提示檢視數字內容（僅當字面常數不是十進制時）。"
 config.hover.fieldInfer                  =
-"懸浮提示檢視表時，會對表的每個欄位進行型別推測，當型別推測的用時累計達到該設定值（毫秒）時，將跳過後續欄位的型別推測。"
+"懸浮提示檢視表時，會對表的每個欄位進行類型推測，當類型推測的用時累計達到該設定值（毫秒）時，將跳過後續欄位的類型推測。"
 config.hover.previewFields               =
 "懸浮提示檢視表時，限制表內欄位的最大預覽數量。"
 config.hover.enumsLimit                  =
-"當值對應多個型別時，限制型別的顯示數量。"
-config.hover.expandAlias                 = -- TODO: need translate!
+"當值對應多個類型時，限制類型的顯示數量。"
+config.hover.expandAlias                 =
 [[
-Whether to expand the alias. For example, expands `---@alias myType boolean|number` appears as `boolean|number`, otherwise it appears as `myType'.
+是否展開別名。例如 `---@alias myType boolean|number` 展開後顯示為 `boolean|number`，否則顯示為 `myType'。
 ]]
 config.develop.enable                    =
 '開發者模式。請勿開啟，會影響效能。'
@@ -207,7 +206,7 @@ config.develop.debuggerWait              =
 config.intelliSense.searchDepth          =
 '設定智慧感知的搜尋深度。增大該值可以增加準確度，但會降低效能。不同的工作區對該設定的容忍度差異較大，請自己調整為合適的值。'
 config.intelliSense.fastGlobal           =
-'在對全域變數進行補全，及檢視 `_G` 的懸浮提示時進行最佳化。這會略微降低型別推測的準確度，但是對於大量使用全域變數的專案會有大幅的效能提升。'
+'在對全域變數進行補全，及檢視 `_G` 的懸浮提示時進行最佳化。這會略微降低類型推測的準確度，但是對於大量使用全域變數的專案會有大幅的效能提升。'
 config.window.statusBar                  =
 '在狀態欄顯示延伸模組狀態。'
 config.window.progressBar                =
@@ -215,15 +214,15 @@ config.window.progressBar                =
 config.hint.enable                       =
 '啟用內嵌提示。'
 config.hint.paramType                    =
-'在函式的參數位置提示型別。'
+'在函式的參數位置提示類型。'
 config.hint.setType                      =
-'在賦值操作位置提示型別。'
+'在賦值操作位置提示類型。'
 config.hint.paramName                    =
 '在函式呼叫處提示參數名。'
 config.hint.paramName.All                =
-'所有型別的參數均進行提示。'
+'所有類型的參數均進行提示。'
 config.hint.paramName.Literal            =
-'只有字面常數型別的參數進行提示。'
+'只有字面常數類型的參數進行提示。'
 config.hint.paramName.Disable            =
 '停用參數提示。'
 config.hint.arrayIndex                   =
@@ -231,34 +230,34 @@ config.hint.arrayIndex                   =
 config.hint.arrayIndex.Enable            =
 '所有的表中都提示陣列索引。'
 config.hint.arrayIndex.Auto              =
-'只有表大於3項，或者表是混合型別時才進行提示。'
+'只有表大於3項，或者表是混合類型時才進行提示。'
 config.hint.arrayIndex.Disable           =
 '停用陣列索引提示。'
-config.hint.await                        = -- TODO: need translate!
-'If the called function is marked `---@async`, prompt `await` at the call.'
+config.hint.await                        =
+'如果呼叫的函數被標記為了 `---@async`，則在呼叫處提示 `await`。'
 config.format.enable                     =
 '啟用程式碼格式化程式。'
-config.format.defaultConfig              = -- TODO: need translate!
+config.format.defaultConfig              =
 [[
-The default format configuration. Has a lower priority than `.editorconfig` file in the workspace.
-Read [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) to learn usage.
+預設的格式化組態，優先順序低於工作區內的 `.editorconfig` 檔案。
+請查閱[格式化文件](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs)了解用法。
 ]]
-config.spell.dict                        = -- TODO: need translate!
-'Custom words for spell checking.'
+config.spell.dict                        =
+'拼寫檢查的自訂單詞。'
 config.telemetry.enable                  =
 [[
-啟用遙測，透過網路發送你的編輯器資訊與錯誤日誌。在[此處](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%B1%E7%A7%81%E8%81%B2%E6%98%8E)閲讀我們的隱私聲明。
+啟用遙測，透過網路發送你的編輯器資訊與錯誤日誌。在[此處](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%B1%E7%A7%81%E8%81%B2%E6%98%8E)閱讀我們的隱私聲明。
 ]]
 config.misc.parameters                   =
-'VSCode中啟動語言服務時的[命令列參數](https://github.com/sumneko/lua-language-server/wiki/Command-line)。'
+'VSCode中啟動語言伺服時的[命令列參數](https://github.com/sumneko/lua-language-server/wiki/Command-line)。'
 config.IntelliSense.traceLocalSet        =
-'請查閲[文件](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
+'請查閱[文件](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
 config.IntelliSense.traceReturn          =
-'請查閲[文件](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
+'請查閱[文件](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
 config.IntelliSense.traceBeSetted        =
-'請查閲[文件](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
+'請查閱[文件](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
 config.IntelliSense.traceFieldInject     =
-'請查閲[文件](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
+'請查閱[文件](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
 config.diagnostics['unused-local']          =
 '未使用的區域變數'
 config.diagnostics['unused-function']       =
@@ -266,7 +265,7 @@ config.diagnostics['unused-function']       =
 config.diagnostics['undefined-global']      =
 '未定義的全域變數'
 config.diagnostics['global-in-nil-env']     =
-'不能使用全域變數（ `_ENV` 被設定為了 `nil`）'
+'不能使用全域變數（ `_ENV` 被設定為 `nil`）'
 config.diagnostics['unused-label']          =
 '未使用的標籤'
 config.diagnostics['unused-vararg']         =
@@ -282,7 +281,7 @@ config.diagnostics['newfield-call']         =
 config.diagnostics['redundant-parameter']   =
 '函式呼叫時，傳入了多餘的引數'
 config.diagnostics['ambiguity-1']           =
-'優先級歧義，如： `num or 0 + 1` ，推測使用者的實際期望為 `(num or 0) + 1`'
+'優先順序歧義，如： `num or 0 + 1` ，推測使用者的實際期望為 `(num or 0) + 1`'
 config.diagnostics['lowercase-global']      =
 '首字母小寫的全域變數定義'
 config.diagnostics['undefined-env-child']   =

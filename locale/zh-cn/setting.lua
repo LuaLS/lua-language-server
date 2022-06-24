@@ -36,6 +36,8 @@ config.runtime.builtin            =
 * `enable`: 总是启用
 * `disable`: 总是禁用
 ]]
+config.runtime.meta               =
+'meta文件的目录名称格式。'
 config.diagnostics.enable         =
 "启用诊断。"
 config.diagnostics.disable        =
@@ -43,12 +45,29 @@ config.diagnostics.disable        =
 config.diagnostics.globals        =
 "已定义的全局变量。"
 config.diagnostics.severity       =
-"修改诊断等级。"
+[[
+修改诊断等级。
+以 `!` 结尾的设置优先级高于组设置 `diagnostics.groupSeverity`。
+]]
 config.diagnostics.neededFileStatus =
 [[
 * Opened:  只诊断打开的文件
 * Any:     诊断任何文件
-* Disable: 禁用此诊断
+* None:    禁用此诊断
+
+以 `!` 结尾的设置优先级高于组设置 `diagnostics.groupFileStatus`。
+]]
+config.diagnostics.groupSeverity  =
+[[
+批量修改一个组中的诊断等级。
+设置为 `Fallback` 意味着组中的诊断由 `diagnostics.severity` 单独设置。
+其他设置将覆盖单独设置，但是不会覆盖以 `!` 结尾的设置。
+]]
+config.diagnostics.groupFileStatus =
+[[
+批量修改一个组中的文件状态。
+设置为 `Fallback` 意味着组中的诊断由 `diagnostics.neededFileStatus` 单独设置。
+其他设置将覆盖单独设置，但是不会覆盖以 `!` 结尾的设置。
 ]]
 config.diagnostics.workspaceDelay =
 "进行工作区诊断的延迟（毫秒）。当你启动工作区，或编辑了任意文件后，将会在后台对整个工作区进行重新诊断。设置为负数可以禁用工作区诊断。"
@@ -213,6 +232,13 @@ config.hint.await                        =
 '如果调用的函数被标记为了 `---@async` ，则在调用处提示 `await` 。'
 config.format.enable                     =
 '启用代码格式化程序。'
+config.format.defaultConfig              =
+[[
+默认的格式化配置，优先级低于工作区内的 `.editorconfig` 文件。
+请查阅[格式化文档](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs)了解用法。
+]]
+config.spell.dict                        =
+'拼写检查的自定义单词。'
 config.telemetry.enable                  =
 [[
 启用遥测，通过网络发送你的编辑器信息与错误日志。在[此处](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%90%E7%A7%81%E5%A3%B0%E6%98%8E)阅读我们的隐私声明。

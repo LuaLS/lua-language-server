@@ -116,6 +116,18 @@ DIAG_UNDEFINED_DOC_PARAM              =
 'Undefined param `{}`.'
 DIAG_UNKNOWN_DIAG_CODE                =
 'Unknown diagnostic code `{}`.'
+DIAG_CAST_LOCAL_TYPE                  =
+'This variable has explicitly defined as `{def}`. Cannot convert its type to `{ref}`.'
+DIAG_CAST_FIELD_TYPE                  =
+'This field has explicitly defined as `{def}`. Cannot convert its type to `{ref}`.'
+DIAG_ASSIGN_TYPE_MISMATCH             =
+'Cannot assign `{ref}` to `{def}`.'
+DIAG_PARAM_TYPE_MISMATCH              =
+'Cannot assign `{ref}` to parameter `{def}`.'
+DIAG_UNKNOWN_CAST_VARIABLE            =
+'Unknown type conversion variable `{}`.'
+DIAG_CAST_TYPE_MISMATCH               =
+'Cannot convert `{ref}` to `{def}`。'
 
 MWS_NOT_SUPPORT         =
 '{} does not support multi workspace for now, I may need to restart to support the new workspace ...'

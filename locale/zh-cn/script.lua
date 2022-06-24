@@ -121,13 +121,13 @@ DIAG_CAST_LOCAL_TYPE                  =
 DIAG_CAST_FIELD_TYPE                  =
 '已显式定义字段的类型为 `{def}` ，不能再将其类型转换为 `{ref}`。'
 DIAG_ASSIGN_TYPE_MISMATCH             =
-'类型不匹配，不能将 `{ref}` 赋值给 `{def}`。'
+'不能将 `{ref}` 赋值给 `{def}`。'
 DIAG_PARAM_TYPE_MISMATCH              =
-'参数类型不匹配，不能将 `{ref}` 赋值给 `{def}`。'
+'不能将 `{ref}` 赋给参数 `{def}`。'
 DIAG_UNKNOWN_CAST_VARIABLE            =
 '未知的类型转换变量 `{}`。'
 DIAG_CAST_TYPE_MISMATCH               =
-'类型不匹配，不能将 `{ref}` 转换为 `{def}`。'
+'不能将 `{ref}` 转换为 `{def}`。'
 
 MWS_NOT_SUPPORT         =
 '{} 目前还不支持多工作目录，我可能需要重启才能支持新的工作目录...'

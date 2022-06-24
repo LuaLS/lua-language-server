@@ -36,6 +36,8 @@ Adjust the enabled state of the built-in library. You can disable (or redefine) 
 * `enable`: always enable
 * `disable`: always disable
 ]]
+config.runtime.meta               =
+'Format of the directory name of the meta files.'
 config.diagnostics.enable         =
 "Enable diagnostics."
 config.diagnostics.disable        =
@@ -43,12 +45,30 @@ config.diagnostics.disable        =
 config.diagnostics.globals        =
 "Defined global variables."
 config.diagnostics.severity       =
-"Modified diagnostic severity."
+[[
+Modify the diagnostic severity.
+
+End with `!` means override the group setting `diagnostics.groupSeverity`.
+]]
 config.diagnostics.neededFileStatus =
 [[
 * Opened:  only diagnose opened files
 * Any:     diagnose all files
-* Disable: disable this diagnostic
+* None:    disable this diagnostic
+
+End with `!` means override the group setting `diagnostics.groupFileStatus`.
+]]
+config.diagnostics.groupSeverity  =
+[[
+Modify the diagnostic severity in a group.
+'Fallback' means that diagnostics in this group are controlled by `diagnostics.severity` separately.
+Other settings will override individual settings without end of `!`.
+]]
+config.diagnostics.groupFileStatus =
+[[
+Modify the diagnostic needed file status in a group.
+'Fallback' means that diagnostics in this group are controlled by `diagnostics.neededFileStatus` separately.
+Other settings will override individual settings without end of `!`.
 ]]
 config.diagnostics.workspaceDelay =
 "Latency (milliseconds) for workspace diagnostics. When you start the workspace, or edit any file, the entire workspace will be re-diagnosed in the background. Set to negative to disable workspace diagnostics."
@@ -213,6 +233,13 @@ config.hint.await                        =
 'If the called function is marked `---@async`, prompt `await` at the call.'
 config.format.enable                     =
 'Enable code formatter.'
+config.format.defaultConfig              =
+[[
+The default format configuration. Has a lower priority than `.editorconfig` file in the workspace.
+Read [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) to learn usage.
+]]
+config.spell.dict                        = -- TODO: need translate!
+'Custom words for spell checking.'
 config.telemetry.enable                  =
 [[
 Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://github.com/sumneko/lua-language-server/wiki/Privacy-Policy).

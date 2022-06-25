@@ -964,17 +964,15 @@ LUADOC_DESC_NODISCARD =
 ---
 [檢視文件](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#nodiscard)
 ]=]
-LUADOC_DESC_CAST =
+LUADOC_DESC_CAST = -- TODO: need translate!
 [=[
-允許類型轉換。
+Allows type casting (type conversion).
 
-⚠️ **不是最終定案**
-
-## 語法
+## Syntax
 `@cast <variable> <[+|-]type>[, <[+|-]type>]...`
 
-## 用法
-### 覆蓋類型
+## Usage
+### Overwrite type
 ```
 ---@type integer
 local x --> integer
@@ -982,7 +980,7 @@ local x --> integer
 ---@cast x string
 print(x) --> string
 ```
-### 增加類型
+### Add Type
 ```
 ---@type string
 local x --> string
@@ -990,7 +988,7 @@ local x --> string
 ---@cast x +boolean, +number
 print(x) --> string|boolean|number
 ```
-### 移除類型
+### Remove Type
 ```
 ---@type string|table
 local x --> string|table
@@ -999,5 +997,5 @@ local x --> string|table
 print(x) --> table
 ```
 ---
-[檢視提議](https://github.com/sumneko/lua-language-server/issues/1030)
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#cast)
 ]=]

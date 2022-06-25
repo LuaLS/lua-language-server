@@ -973,8 +973,6 @@ LUADOC_DESC_CAST =
 [=[
 Allows type casting (type conversion).
 
-⚠️ **Not Finalized**
-
 ## Syntax
 `@cast <variable> <[+|-]type>[, <[+|-]type>]...`
 
@@ -1004,5 +1002,5 @@ local x --> string|table
 print(x) --> table
 ```
 ---
-[View Proposal](https://github.com/sumneko/lua-language-server/issues/1030)
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#cast)
 ]=]

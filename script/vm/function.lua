@@ -113,7 +113,7 @@ function vm.countReturnsOfFunction(func, mark)
                     end
                 end
             end
-            if  lastReturn then
+            if lastReturn then
                 if lastReturn.types[1][1] == '...' then
                     dmax = math.huge
                 end

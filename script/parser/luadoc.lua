@@ -434,11 +434,31 @@ local function  parseTypeUnitFunction(parent)
     end
     if checkToken('symbol', ':', 1) then
         nextToken()
+        local needCloseParen
+        if checkToken('symbol', '(', 1) then
+            nextToken()
+            needCloseParen = true
+        end
         while true do
+            local name
+            try(function ()
+                local returnName = parseName('doc.return.name', typeUnit)
+                                or parseDots('doc.return.name', typeUnit)
+                if not returnName then
+                    return false
+                end
+                if checkToken('symbol', ':', 1) then
+                    nextToken()
+                    name = returnName
+                    return true
+                end
+                return false
+            end)
             local rtn = parseType(typeUnit)
             if not rtn then
                 break
             end
+            rtn.name = name
             if checkToken('symbol', '?', 1) then
                 nextToken()
                 rtn.optional = true
@@ -449,6 +469,9 @@ local function  parseTypeUnitFunction(parent)
             else
                 break
             end
+        end
+        if needCloseParen then
+            nextSymbolOrError ')'
         end
     end
     typeUnit.finish = getFinish()

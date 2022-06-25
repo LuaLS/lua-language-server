@@ -247,7 +247,7 @@ TEST [[
 <?print?>()
 ]]
 [[
-function print(...: any)
+function print(...any)
 ]]
 
 TEST [[
@@ -300,7 +300,7 @@ end
 <?x?>(1, 2, 3, 4, 5, 6, 7)
 ]]
 [[
-function x(a: any, ...: any)
+function x(a: any, ...any)
 ]]
 
 TEST [[
@@ -1518,7 +1518,7 @@ TEST [[
 local function f(<?callback?>) end
 ]]
 [[
-(parameter) callback: fun(x: integer, ...: any)
+(parameter) callback: fun(x: integer, ...any)
 ]]
 
 TEST [[
@@ -2029,4 +2029,38 @@ local t: A {
     x: integer,
     y: boolean = true,
 }
+]]
+
+TEST [[
+---@param ... boolean
+---@return number ...
+local function <?f?>(...) end
+]]
+[[
+function f(...boolean)
+  -> ...number
+]]
+
+TEST [[
+---@type fun():x: number
+local <?f?>
+]]
+[[
+local f: fun():(x: number)
+]]
+
+TEST [[
+---@type fun(...: boolean):...: number
+local <?f?>
+]]
+[[
+local f: fun(...boolean):...number
+]]
+
+TEST [[
+---@type fun():x: number, y: boolean
+local <?f?>
+]]
+[[
+local f: fun():(x: number, y: boolean)
 ]]

@@ -155,20 +155,36 @@ local viewNodeSwitch = util.switch()
                 argNode = argNode:copy()
                 argNode:removeOptional()
             end
-            args[i] = string.format('%s%s: %s'
+            args[i] = string.format('%s%s%s%s'
                 , arg.name[1]
                 , isOptional and '?' or ''
+                , arg.name[1] == '...' and '' or ': '
                 , vm.getInfer(argNode):view(uri)
             )
         end
         if #args > 0 then
             argView = table.concat(args, ', ')
         end
+        local needReturnParen
         for i, ret in ipairs(source.returns) do
-            rets[i] = vm.getInfer(ret):view(uri)
+            local retType = vm.getInfer(ret):view(uri)
+            if ret.name then
+                if ret.name[1] == '...' then
+                    rets[i] = ('%s%s'):format(ret.name[1], retType)
+                else
+                    needReturnParen = true
+                    rets[i] = ('%s: %s'):format(ret.name[1], retType)
+                end
+            else
+                rets[i] = retType
+            end
         end
         if #rets > 0 then
-            regView = ':' .. table.concat(rets, ', ')
+            if needReturnParen then
+                regView = (':(%s)'):format(table.concat(rets, ', '))
+            else
+                regView = (':%s'):format(table.concat(rets, ', '))
+            end
         end
         return ('fun(%s)%s'):format(argView, regView)
     end)

@@ -30,8 +30,11 @@
   ```
 * `CHG` semicolons and parentheses can be used in `DocTable`
   ```lua
-  ---@type { x: fun():boolean; y: boolean }
-  ---@type { (x: fun():boolean), y: boolean }
+  ---@type { (x: number); (y: boolean) }
+  ```
+* `CHG` return names and parentheses can be used in `DocFunction`
+  ```lua
+  ---@type fun():(x: number, y: number, ...: number)
   ```
 * `CHG` supports `---@return boolean ...`
 * `CHG` improve experience for diagnostics and semantic-tokens

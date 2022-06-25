@@ -165,7 +165,8 @@ local function buildFunctionSnip(source, value, oop)
         truncated = true
     end
     for i = #args, 1, -1 do
-        if args[i]:match('^%s*[^?]+%?:') then
+        if args[i]:match('^%s*[^?]+%?:')
+        or args[i]:match('^%.%.%.') then
             table.remove(args)
             truncated = true
         else

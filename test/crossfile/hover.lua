@@ -1158,3 +1158,26 @@ TEST {
 ---
 The color of your awesome apple!]]
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@type fun(x: number, y: number, ...: number):(x: number, y: number, ...: number)
+            local <?f?>
+        ]]
+    },
+    hover = [[
+```lua
+local f: fun(x: number, y: number, ...number):(x: number, y: number, ...number)
+```
+
+---
+
+```lua
+function f(x: number, y: number, ...: number)
+  -> x: number
+  2. y: number
+  3. ...number
+```]]
+}

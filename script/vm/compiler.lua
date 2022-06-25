@@ -479,7 +479,12 @@ function vm.getReturnOfFunction(func, index)
     if func.type == 'doc.type.function' then
         local rtn = func.returns[index]
         if not rtn then
-            return nil
+            local lastReturn = func.returns[#func.returns]
+            if lastReturn and lastReturn.name and lastReturn.name[1] == '...' then
+                rtn = lastReturn
+            else
+                return nil
+            end
         end
         local sign = getObjectSign(func)
         if not sign then

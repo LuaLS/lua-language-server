@@ -32,7 +32,7 @@ local function asFunction(source)
                     vm.getInfer(argNode):view(guide.getUri(source), 'any')
                 )
             elseif arg.type == '...' then
-                args[#args+1] = ('%s: %s'):format(
+                args[#args+1] = ('%s%s'):format(
                     '...',
                     vm.getInfer(arg):view(guide.getUri(source), 'any')
                 )

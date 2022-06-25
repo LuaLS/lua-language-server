@@ -510,12 +510,12 @@ TEST 'fun()' [[
 local <?x?>
 ]]
 
-TEST 'fun(a: string, b: any, ...: any)' [[
+TEST 'fun(a: string, b: any, ...any)' [[
 ---@type fun(a: string, b, ...)
 local <?x?>
 ]]
 
-TEST 'fun(a: string, b: any, c?: boolean, ...: any):c, d?, ...' [[
+TEST 'fun(a: string, b: any, c?: boolean, ...any):c, d?, ...' [[
 ---@type fun(a: string, b, c?: boolean, ...):c, d?, ...
 local <?x?>
 ]]
@@ -3089,6 +3089,40 @@ local <?n?> = f()
 TEST 'boolean' [[
 ---@return boolean ...
 local function f() end
+
+local _, <?n?> = f()
+]]
+
+TEST 'boolean' [[
+---@type fun():name1: boolean, name2:number
+local f
+
+local <?n?> = f()
+]]
+
+TEST 'number' [[
+---@type fun():name1: boolean, name2:number
+local f
+
+local _, <?n?> = f()
+]]
+TEST 'boolean' [[
+---@type fun():(name1: boolean, name2:number)
+local f
+
+local <?n?> = f()
+]]
+
+TEST 'number' [[
+---@type fun():(name1: boolean, name2:number)
+local f
+
+local _, <?n?> = f()
+]]
+
+TEST 'boolean' [[
+---@type fun():...: boolean
+local f
 
 local _, <?n?> = f()
 ]]

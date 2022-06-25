@@ -206,6 +206,9 @@ local function getBindEnums(source, docGroup)
     for _, doc in ipairs(docGroup) do
         if     doc.type == 'doc.param' then
             local name = doc.param[1]
+            if name == '...' then
+                name = '...(param)'
+            end
             if mark[name] then
                 goto CONTINUE
             end
@@ -215,6 +218,9 @@ local function getBindEnums(source, docGroup)
             for _, rtn in ipairs(doc.returns) do
                 returnIndex = returnIndex + 1
                 local name = rtn.name and rtn.name[1] or ('return #%d'):format(returnIndex)
+                if name == '...' then
+                    name = '...(return)'
+                end
                 if mark[name] then
                     goto CONTINUE
                 end

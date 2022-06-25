@@ -1181,3 +1181,42 @@ function f(x: number, y: number, ...: number)
   3. ...number
 ```]]
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@param p   'a1' | 'a2'
+            ---@param ... 'a3' | 'a4'
+            ---@return 'r1' | 'r2' ret1
+            ---@return 'r3' | 'r4' ...
+            local function <?f?>(p, ...) end
+        ]]
+    },
+    hover = [[
+```lua
+function f(p: 'a1'|'a2', ...'a3'|'a4')
+  -> ret1: 'r1'|'r2'
+  2. ...'r3'|'r4'
+```
+
+---
+
+```lua
+p:
+    | 'a1'
+    | 'a2'
+
+...(param):
+    | 'a3'
+    | 'a4'
+
+ret1:
+    | 'r1'
+    | 'r2'
+
+...(return):
+    | 'r3'
+    | 'r4'
+```]]
+}

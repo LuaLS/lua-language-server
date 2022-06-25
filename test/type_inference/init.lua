@@ -3043,3 +3043,24 @@ local b
 
 local <?x?> = a[b]
 ]]
+
+TEST 'number' [[
+---@type {x: string ; y: boolean; z: number}
+local t
+
+local <?z?> = t.z
+]]
+
+TEST 'fun():number, boolean' [[
+---@type {f: fun():number, boolean}
+local t
+
+local <?f?> = t.f
+]]
+
+TEST 'fun():number' [[
+---@type {(f: fun():number), x: boolean}
+local t
+
+local <?f?> = t.f
+]]

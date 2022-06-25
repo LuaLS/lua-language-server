@@ -50,7 +50,7 @@ EChar               <-  'a' -> ea
                     /   ([0-9] [0-9]? [0-9]?) -> Char10
                     /   ('u{' {X16*} '}')    -> CharUtf8
 Symbol              <-  ({} {
-                            [:|,<>()?+#{}]
+                            [:|,;<>()?+#{}]
                         /   '[]'
                         /   '...'
                         /   '['
@@ -286,6 +286,11 @@ local function parseTable(parent)
         }
 
         do
+            local needCloseParen
+            if checkToken('symbol', '(', 1) then
+                nextToken()
+                needCloseParen = true
+            end
             field.name = parseName('doc.field.name', field)
                     or   parseIndexField('doc.field.name', field)
             if not field.name then
@@ -312,10 +317,14 @@ local function parseTable(parent)
                 break
             end
             field.finish = getFinish()
+            if needCloseParen then
+                nextSymbolOrError ')'
+            end
         end
 
         typeUnit.fields[#typeUnit.fields+1] = field
-        if checkToken('symbol', ',', 1) then
+        if checkToken('symbol', ',', 1)
+        or checkToken('symbol', ';', 1) then
             nextToken()
         else
             nextSymbolOrError('}')

@@ -28,6 +28,11 @@
   local n2 = f(0)    -- `n2` is `number`
   local n3 = f(0, 0) -- `n3` is `string`
   ```
+* `CHG` semicolons and parentheses can be used in `DocTable`
+  ```lua
+  ---@type { x: fun():boolean; y: boolean }
+  ---@type { (x: fun():boolean), y: boolean }
+  ```
 * `CHG` improve experience for diagnostics and semantic-tokens
 * `FIX` diagnostics flash when opening a file
 * `FIX` sometimes workspace diagnostics are not triggered

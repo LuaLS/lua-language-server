@@ -3064,3 +3064,31 @@ local t
 
 local <?f?> = t.f
 ]]
+
+TEST 'boolean' [[
+---@param ... boolean
+local function f(...)
+    local <?n?> = ...
+end
+]]
+
+TEST 'boolean' [[
+---@param ... boolean
+local function f(...)
+    local _, <?n?> = ...
+end
+]]
+
+TEST 'boolean' [[
+---@return boolean ...
+local function f() end
+
+local <?n?> = f()
+]]
+
+TEST 'boolean' [[
+---@return boolean ...
+local function f() end
+
+local _, <?n?> = f()
+]]

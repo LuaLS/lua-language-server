@@ -113,8 +113,13 @@ function vm.countReturnsOfFunction(func, mark)
                     end
                 end
             end
-            if lastReturn and lastReturn.types[1][1] == '...' then
-                dmax = math.huge
+            if  lastReturn then
+                if lastReturn.types[1][1] == '...' then
+                    dmax = math.huge
+                end
+                if lastReturn.name and lastReturn.name[1] == '...' then
+                    dmax = math.huge
+                end
             end
             if dmin and (not min or (dmin < min)) then
                 min = dmin

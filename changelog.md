@@ -33,6 +33,7 @@
   ---@type { x: fun():boolean; y: boolean }
   ---@type { (x: fun():boolean), y: boolean }
   ```
+* `CHG` supports `---@return boolean ...`
 * `CHG` improve experience for diagnostics and semantic-tokens
 * `FIX` diagnostics flash when opening a file
 * `FIX` sometimes workspace diagnostics are not triggered

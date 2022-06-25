@@ -284,6 +284,6 @@ function xpcall(f, msgh, arg1, ...) end
 ---@param list T[]
 ---@param i?   integer
 ---@param j?   integer
----@return T
+---@return T   ...
 ---@nodiscard
 function unpack(list, i, j) end

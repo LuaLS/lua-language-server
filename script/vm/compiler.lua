@@ -1519,9 +1519,16 @@ local compilerSwitch = util.switch()
                     end
                 end
             end
-            if lastReturn and not hasMarkDoc and lastReturn.types[1][1] == '...' then
-                hasMarkDoc = true
-                vm.setNode(source, vm.declareGlobal('type', 'unknown'))
+            if  lastReturn
+            and not hasMarkDoc then
+                if lastReturn.types[1][1] == '...' then
+                    hasMarkDoc = true
+                    vm.setNode(source, vm.declareGlobal('type', 'unknown'))
+                end
+                if lastReturn.name and lastReturn.name[1] == '...' then
+                    hasMarkDoc = true
+                    vm.setNode(source, vm.compileNode(lastReturn))
+                end
             end
         end
         local hasReturn

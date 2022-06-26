@@ -5,6 +5,7 @@ local vm    = require 'vm'
 local await = require 'await'
 
 local checkTypes = {
+    'local',
     'setlocal',
     'setglobal',
     'setfield',

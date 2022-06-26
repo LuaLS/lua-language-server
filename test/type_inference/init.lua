@@ -3142,3 +3142,10 @@ for _ in _ do
 end
 print(<?s?>)
 ]]
+
+TEST 'A' [[
+---@class A: string
+
+---@type A
+local <?s?> = ''
+]]

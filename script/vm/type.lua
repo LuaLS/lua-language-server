@@ -171,6 +171,18 @@ function vm.isSubType(uri, child, parent, mark)
         mark[childName] = nil
     end
 
+    --[[
+    ---@class A: string
+
+    ---@type A
+    local x = '' --> `string` set to `A`
+    ]]
+    if  guide.isBasicType(childName)
+    and guide.isLiteral(child)
+    and vm.isSubType(uri, parentName, childName) then
+        return true
+    end
+
     return false
 end
 

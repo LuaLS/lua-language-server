@@ -1000,14 +1000,12 @@ local function compileLocal(source)
         end
     end
     local hasMarkValue
-    if source.value then
-        if not hasMarkDoc or guide.isLiteral(source.value) then
-            hasMarkValue = true
-            if source.value.type == 'table' then
-                vm.setNode(source, source.value)
-            elseif source.value.type ~= 'nil' then
-                vm.setNode(source, vm.compileNode(source.value))
-            end
+    if not hasMarkDoc and source.value then
+        hasMarkValue = true
+        if source.value.type == 'table' then
+            vm.setNode(source, source.value)
+        elseif source.value.type ~= 'nil' then
+            vm.setNode(source, vm.compileNode(source.value))
         end
     end
     -- function x.y(self, ...) --> function x:y(...)

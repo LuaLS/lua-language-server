@@ -479,5 +479,22 @@ n = nb
 ]]
 config.set(nil, 'Lua.type.weakUnionCheck', false)
 
+TEST [[
+---@class Option: string
+
+---@param x Option
+local function f(x) end
+
+---@type Option
+local x = 'aaa'
+
+f(x)
+]]
+
+TEST [[
+---@type number
+local <!x!> = 'aaa'
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

@@ -439,12 +439,14 @@ local <!x!> = {}
 
 TEST [[
 local function f(<!self!>)
+    return 'something'
 end
 f()
 ]]
 
 TEST [[
 local function f(<!...!>)
+    return 'something'
 end
 f()
 ]]
@@ -1043,20 +1045,6 @@ end
 TEST [[
 for i = 1, 1 do
     print(i)
-end
-]]
-
-TEST [[
----@param a number
-return function (<!a!>)
-end
-]]
-
-TEST [[
----@meta
-
----@param a number
-return function (a)
 end
 ]]
 
@@ -1702,4 +1690,8 @@ local t = {}
 function t:init() end
 
 <!t.init()!>
+]]
+
+TEST [[
+return function f(x, y, z) end
 ]]

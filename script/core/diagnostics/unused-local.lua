@@ -63,18 +63,16 @@ local function isDocClass(source)
     return false
 end
 
-local function isDocParam(source)
-    if not source.bindDocs then
+---@param source parser.object
+local function isDeclareFunctionParam(source)
+    if source.parent.type ~= 'funcargs' then
         return false
     end
-    for _, doc in ipairs(source.bindDocs) do
-        if doc.type == 'doc.param' then
-            if doc.param[1] == source[1] then
-                return true
-            end
-        end
+    local func = source.parent.parent
+    if #func > 0 then
+        return false
     end
-    return false
+    return true
 end
 
 return function (uri, callback)
@@ -94,7 +92,7 @@ return function (uri, callback)
         if isDocClass(source) then
             return
         end
-        if vm.isMetaFile(uri) and isDocParam(source) then
+        if isDeclareFunctionParam(source) then
             return
         end
         local data = hasGet(source)

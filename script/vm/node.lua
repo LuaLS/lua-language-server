@@ -20,13 +20,14 @@ mt.optional   = nil
 mt.data       = nil
 
 ---@param node vm.node | vm.node.object
+---@return vm.node
 function mt:merge(node)
     if not node then
-        return
+        return self
     end
     if node.type == 'vm.node' then
         if node == self then
-            return
+            return self
         end
         if node:isOptional() then
             self.optional = true
@@ -44,6 +45,7 @@ function mt:merge(node)
             self[#self+1] = node
         end
     end
+    return self
 end
 
 ---@return boolean

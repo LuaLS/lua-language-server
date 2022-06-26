@@ -137,19 +137,20 @@ function mt:_lookInto(action, topNode, outNode)
         set = action
         action = value
     end
-    if     action.type == 'function'
-    or     action.type == 'loop'
+    if     action.type == 'function' then
+        self:_launchBlock(action, topNode:copy())
+    elseif action.type == 'loop'
     or     action.type == 'in'
     or     action.type == 'repeat'
     or     action.type == 'for' then
-        self:_launchBlock(action, topNode:copy())
+        topNode = self:_launchBlock(action, topNode:copy())
     elseif action.type == 'while' then
         local blockNode, mainNode = self:_lookInto(action.filter, topNode:copy(), topNode:copy())
         if action.filter then
             self:_fastWard(action.filter.finish, blockNode)
         end
-        self:_launchBlock(action, blockNode:copy())
-        topNode = mainNode
+        blockNode = self:_launchBlock(action, blockNode:copy())
+        topNode = mainNode:merge(blockNode)
     elseif action.type == 'if' then
         local hasElse
         local mainNode = topNode:copy()

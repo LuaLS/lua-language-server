@@ -3126,3 +3126,19 @@ local f
 
 local _, <?n?> = f()
 ]]
+
+TEST 'string' [[
+local s
+while true do
+    s = ''
+end
+print(<?s?>)
+]]
+
+TEST 'string' [[
+local s
+for _ in _ do
+    s = ''
+end
+print(<?s?>)
+]]

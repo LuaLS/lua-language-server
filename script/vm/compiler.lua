@@ -1886,6 +1886,10 @@ local function compileByGlobal(source)
                 end
             end
         end
+        -- Set all globals node first to avoid recursive
+        for _, set in ipairs(global:getSets(uri)) do
+            vm.setNode(set, globalNode)
+        end
         for _, set in ipairs(global:getSets(uri)) do
             if set.value then
                 if not hasMarkDoc or guide.isLiteral(set.value) then

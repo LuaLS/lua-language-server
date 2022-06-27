@@ -136,7 +136,8 @@ function mt:isNullable()
     for _, c in ipairs(self) do
         if c.type == 'nil'
         or (c.type == 'global' and c.cate == 'type' and c.name == 'nil')
-        or (c.type == 'global' and c.cate == 'type' and c.name == 'any') then
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'any')
+        or (c.type == 'global' and c.cate == 'type' and c.name == '...') then
             return true
         end
     end

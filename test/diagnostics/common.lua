@@ -1727,6 +1727,13 @@ function F()
 end
 ]]
 
+TEST [[
+---@return ...
+function F()
+    return
+end
+]]
+
 do return end
 TEST [[
 ---@return number

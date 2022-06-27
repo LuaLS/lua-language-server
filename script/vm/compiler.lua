@@ -1893,11 +1893,14 @@ local function compileByGlobal(source)
                     globalNode:merge(vm.compileNode(set))
                     hasMarkDoc = true
                 end
+                if vm.getNode(set) then
+                    globalNode:merge(vm.compileNode(set))
+                end
             end
         end
         -- Set all globals node first to avoid recursive
         for _, set in ipairs(global:getSets(uri)) do
-            vm.setNode(set, globalNode)
+            vm.setNode(set, globalNode, true)
         end
         for _, set in ipairs(global:getSets(uri)) do
             if set.value then
@@ -1905,7 +1908,9 @@ local function compileByGlobal(source)
                     globalNode:merge(vm.compileNode(set.value))
                 end
             end
-            vm.setNode(set, globalNode)
+        end
+        for _, set in ipairs(global:getSets(uri)) do
+            vm.setNode(set, globalNode, true)
         end
     end
     if global.cate == 'type' then

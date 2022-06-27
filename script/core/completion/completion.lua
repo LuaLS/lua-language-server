@@ -56,6 +56,7 @@ local function trim(str)
 end
 
 local function findNearestSource(state, position)
+    ---@type parser.object
     local source
     guide.eachSourceContain(state.ast, position, function (src)
         source = src
@@ -1132,24 +1133,34 @@ local function cleanEnums(enums, source)
     return enums
 end
 
-local function checkTypingEnum(state, position, defs, str, results)
+---@return boolean
+local function insertEnum(state, src, enums, isInArray)
+    if src.type == 'doc.type.string'
+    or src.type == 'doc.type.integer'
+    or src.type == 'doc.type.boolean' then
+        ---@cast src parser.object
+        enums[#enums+1] = {
+            label       = vm.viewObject(src, state.uri),
+            description = src.comment,
+            kind        = define.CompletionItemKind.EnumMember,
+        }
+    elseif src.type == 'doc.type.code' then
+        enums[#enums+1] = {
+            label       = src[1],
+            description = src.comment,
+            kind        = define.CompletionItemKind.EnumMember,
+        }
+    elseif isInArray and src.type == 'doc.type.array' then
+        for i, d in ipairs(vm.getDefs(src.node)) do
+            insertEnum(state, d, enums, isInArray)
+        end
+    end
+end
+
+local function checkTypingEnum(state, position, defs, str, results, isInArray)
     local enums = {}
     for _, def in ipairs(defs) do
-        if def.type == 'doc.type.string'
-        or def.type == 'doc.type.integer'
-        or def.type == 'doc.type.boolean' then
-            enums[#enums+1] = {
-                label       = vm.viewObject(def, state.uri),
-                description = def.comment and def.comment.text,
-                kind        = define.CompletionItemKind.EnumMember,
-            }
-        elseif def.type == 'doc.type.code' then
-            enums[#enums+1] = {
-                label       = def[1],
-                description = def.comment and def.comment.text,
-                kind        = define.CompletionItemKind.EnumMember,
-            }
-        end
+        insertEnum(state, def, enums, isInArray)
     end
     cleanEnums(enums, str)
     for _, res in ipairs(enums) do
@@ -1157,7 +1168,7 @@ local function checkTypingEnum(state, position, defs, str, results)
     end
 end
 
-local function checkEqualEnumLeft(state, position, source, results)
+local function checkEqualEnumLeft(state, position, source, results, isInArray)
     if not source then
         return
     end
@@ -1167,7 +1178,7 @@ local function checkEqualEnumLeft(state, position, source, results)
         end
     end)
     local defs = vm.getDefs(source)
-    checkTypingEnum(state, position, defs, str, results)
+    checkTypingEnum(state, position, defs, str, results, isInArray)
 end
 
 local function checkEqualEnum(state, position, results)
@@ -1211,9 +1222,14 @@ local function checkEqualEnumInString(state, position, results)
         end
         checkEqualEnumLeft(state, position, parent[1], results)
     end
+    if (parent.type == 'tableexp') then
+        checkEqualEnumLeft(state, position, parent.parent.parent, results, true)
+        return
+    end
     if parent.type == 'local' then
         checkEqualEnumLeft(state, position, parent, results)
     end
+
     if parent.type == 'setlocal'
     or parent.type == 'setglobal'
     or parent.type == 'setfield'
@@ -1435,24 +1451,10 @@ local function tryCallArg(state, position, results)
     if not node then
         return
     end
+
     local enums = {}
     for src in node:eachObject() do
-        if src.type == 'doc.type.string'
-        or src.type == 'doc.type.integer'
-        or src.type == 'doc.type.boolean' then
-            ---@cast src parser.object
-            enums[#enums+1] = {
-                label       = vm.viewObject(src, state.uri),
-                description = src.comment,
-                kind        = define.CompletionItemKind.EnumMember,
-            }
-        elseif src.type == 'doc.type.code' then
-            enums[#enums+1] = {
-                label       = src[1],
-                description = src.comment,
-                kind        = define.CompletionItemKind.EnumMember,
-            }
-        end
+        insertEnum(state, src, enums, arg and arg.type == 'table')
         if src.type == 'doc.type.function' then
             ---@cast src parser.object
             local insertText = buildInsertDocFunction(src)
@@ -1496,6 +1498,7 @@ local function tryTable(state, position, results)
     if source.type ~= 'table' then
         tbl = source.parent
     end
+
     local defs = vm.getFields(tbl)
     for _, field in ipairs(defs) do
         local name = guide.getKeyName(field)
@@ -1505,6 +1508,25 @@ local function tryTable(state, position, results)
         end
     end
     checkTableLiteralField(state, position, tbl, fields, results)
+end
+
+local function tryArray(state, position, results)
+    local source = findNearestSource(state, position)
+    if not source then
+        return
+    end
+    if source.type ~= 'table' and (not source.parent or source.parent.type ~= 'table') then
+        return
+    end
+    local tbl = source
+    if source.type ~= 'table' then
+        tbl = source.parent
+    end
+    if source.parent.type == 'callargs' and source.parent.parent.type == 'call' then
+        return
+    end
+    -- {  } inside when enum
+    checkEqualEnumLeft(state, position, tbl, results, true)
 end
 
 local function getComment(state, position)
@@ -2001,6 +2023,7 @@ local function tryCompletions(state, position, triggerCharacter, results)
     trySpecial(state, position, results)
     tryCallArg(state, position, results)
     tryTable(state, position, results)
+    tryArray(state, position, results)
     tryWord(state, position, triggerCharacter, results)
     tryIndex(state, position, results)
     trySymbol(state, position, results)

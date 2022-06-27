@@ -49,7 +49,7 @@ return function (uri, callback)
                     callback {
                         start   = ret.start,
                         finish  = ret.start + #'return',
-                        message = lang.script('DIAG_MISSING_RETURN_VALUE', {
+                        message = lang.script('DIAG_MISSING_RETURN_VALUE_RANGE', {
                             min  = min,
                             rmin = rmin,
                             rmax = rmax,

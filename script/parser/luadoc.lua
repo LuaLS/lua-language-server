@@ -165,7 +165,7 @@ local function nextToken()
     Ci = Ci + 1
     if not TokenTypes[Ci] then
         Ci = Ci - 1
-        return nil
+        return nil, nil
     end
     return TokenTypes[Ci], TokenContents[Ci]
 end

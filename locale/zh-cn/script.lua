@@ -130,7 +130,7 @@ DIAG_CAST_TYPE_MISMATCH               =
 '不能将 `{ref}` 转换为 `{def}`。'
 DIAG_MISSING_RETURN_VALUE             =
 '至少需要 {min} 个返回值，但此处只返回 {rmax} 个值。'
-DIAG_MISSING_RETURN_VALUE             =
+DIAG_MISSING_RETURN_VALUE_RANGE       =
 '至少需要 {min} 个返回值，但此处只返回 {rmin} 到 {rmax} 个值。'
 
 MWS_NOT_SUPPORT         =

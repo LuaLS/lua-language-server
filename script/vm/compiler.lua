@@ -1398,7 +1398,7 @@ local compilerSwitch = util.switch()
         if guide.isGet(source) and bindAs(source) then
             return
         end
-        ---@type string|vm.node
+        ---@type (string|vm.node)?
         local key = guide.getKeyName(source)
         if key == nil and source.index then
             key = vm.compileNode(source.index)

@@ -86,24 +86,15 @@ end
 function vm.countReturnsOfFunction(func, mark)
     if func.type == 'function' then
         local min, max
-        if func.returns then
-            for _, ret in ipairs(func.returns) do
-                local rmin, rmax = vm.countList(ret, mark)
-                if not min or rmin < min then
-                    min = rmin
-                end
-                if not max or rmax > max then
-                    max = rmax
-                end
-            end
-        end
+        local hasDocReturn
         if func.bindDocs then
             local lastReturn
             local n = 0
             local dmin, dmax
             for _, doc in ipairs(func.bindDocs) do
                 if doc.type == 'doc.return' then
-                    for _, ret in ipairs(doc) do
+                    hasDocReturn = true
+                    for _, ret in ipairs(doc.returns) do
                         n = n + 1
                         lastReturn = ret
                         dmax = n
@@ -126,6 +117,17 @@ function vm.countReturnsOfFunction(func, mark)
             end
             if dmax and (not max or (dmax > max)) then
                 max = dmax
+            end
+        end
+        if not hasDocReturn and func.returns then
+            for _, ret in ipairs(func.returns) do
+                local rmin, rmax = vm.countList(ret, mark)
+                if not min or rmin < min then
+                    min = rmin
+                end
+                if not max or rmax > max then
+                    max = rmax
+                end
             end
         end
         return min or 0, max or math.huge

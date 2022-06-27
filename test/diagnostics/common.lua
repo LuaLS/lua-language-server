@@ -1704,3 +1704,41 @@ function t:init() end
 TEST [[
 return function f(x, y, z) end
 ]]
+
+util.arrayInsert(disables, 'redundant-return')
+TEST [[
+---@return number
+function F()
+    <!return!>
+end
+]]
+
+TEST [[
+---@return number, number
+function F()
+    <!return!> 1
+end
+]]
+
+TEST [[
+---@return number, number?
+function F()
+    return 1
+end
+]]
+
+do return end
+TEST [[
+---@return number
+function F()
+    X = 1<!!>
+end
+]]
+
+TEST [[
+---@return number, number?
+function F()
+    return 1, 1, <!1!>
+end
+]]
+util.arrayRemove(disables, 'redundant-return')

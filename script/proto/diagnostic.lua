@@ -58,6 +58,7 @@ m.register {
     'unbalanced-assignments',
     'redundant-parameter',
     'missing-parameter',
+    'missing-return-value',
 } {
     group    = 'unbalanced',
     severity = 'Warning',

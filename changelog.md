@@ -7,6 +7,7 @@
   * `param-type-mismatch`
   * `unknown-cast-variable`
   * `cast-type-mismatch`
+  * `missing-return-value`
 * `NEW` settings:
   * `diagnostics.groupSeverity`
   * `diagnostics.groupFileStatus`

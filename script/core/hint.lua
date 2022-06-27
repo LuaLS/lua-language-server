@@ -291,6 +291,9 @@ local function semicolonHint(uri, results, start, finish)
             local next    = src[i+1]
             local left    = current.range or current.finish
             local right   = next.start
+            if left > right then
+                goto CONTINUE
+            end
             local text    = subber(left, right)
             if mode == 'All' then
                 if not text:find(';', 1, true) then
@@ -311,6 +314,7 @@ local function semicolonHint(uri, results, start, finish)
                     }
                 end
             end
+            ::CONTINUE::
         end
         if mode == 'All' then
             local last = src[#src]

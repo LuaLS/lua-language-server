@@ -286,17 +286,15 @@ local function semicolonHint(uri, results, start, finish)
     local subber = substr(state)
     ---@async
     guide.eachSourceTypes(state.ast, blockTypes, function (src)
+        await.delay()
         for i = 1, #src - 1 do
             local current = src[i]
             local next    = src[i+1]
-            local left    = current.range or current.finish
+            local left    = current.finish
             local right   = next.start
-            if left > right then
-                goto CONTINUE
-            end
             local text    = subber(left, right)
             if mode == 'All' then
-                if not text:find(';', 1, true) then
+                if not text:find '[,;]' then
                     results[#results+1] = {
                         text    = ';',
                         offset  = left,
@@ -305,7 +303,7 @@ local function semicolonHint(uri, results, start, finish)
                     }
                 end
             elseif mode == 'SameLine' then
-                if not text:find('[;\r\n]') then
+                if not text:find '[,;\r\n]' then
                     results[#results+1] = {
                         text    = ';',
                         offset  = left,
@@ -314,7 +312,6 @@ local function semicolonHint(uri, results, start, finish)
                     }
                 end
             end
-            ::CONTINUE::
         end
         if mode == 'All' then
             local last = src[#src]

@@ -87,6 +87,15 @@ X = [=[
 ]]
 
 TEST [[
+-- xxxx  
+]]
+
+TEST [[
+-- [=[  
+   ]=]
+]]
+
+TEST [[
 local x
 print(x)
 local <!x!>

@@ -3,13 +3,20 @@ local lang  = require 'language'
 local guide = require 'parser.guide'
 
 local function isInString(ast, offset)
-    local result = false
-    guide.eachSourceType(ast, 'string', function (source)
+    return guide.eachSourceType(ast, 'string', function (source)
         if offset >= source.start and offset <= source.finish then
-            result = true
+            return true
         end
     end)
-    return result
+end
+
+local function isInComment(ast, offset)
+    for _, com in ipairs(ast.state.comms) do
+        if offset >= com.start and offset <= com.finish then
+            return true
+        end
+    end
+    return false
 end
 
 return function (uri, callback)
@@ -28,7 +35,8 @@ return function (uri, callback)
             goto NEXT_LINE
         end
         local lastPos = guide.offsetToPosition(state, lastOffset)
-        if isInString(state.ast, lastPos) then
+        if isInString(state.ast, lastPos)
+        or isInComment(state.ast, lastPos) then
             goto NEXT_LINE
         end
         local firstOffset = startOffset

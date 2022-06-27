@@ -102,8 +102,8 @@ DIAG_CIRCLE_DOC_CLASS                 =
 'Classes com herança cíclica.'
 DIAG_DOC_FIELD_NO_CLASS               =
 'O campo deve ser definido após a classe.'
-DIAG_DUPLICATE_DOC_CLASS              =
-'Classe definida duplicada `{}`.'
+DIAG_DUPLICATE_DOC_ALIAS              = -- TODO: need translate!
+'Duplicate defined alias `{}`.'
 DIAG_DUPLICATE_DOC_FIELD              =
 'Campos definidos duplicados `{}`.'
 DIAG_DUPLICATE_DOC_PARAM              =

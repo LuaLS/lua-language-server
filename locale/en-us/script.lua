@@ -102,8 +102,8 @@ DIAG_CIRCLE_DOC_CLASS                 =
 'Circularly inherited classes.'
 DIAG_DOC_FIELD_NO_CLASS               =
 'The field must be defined after the class.'
-DIAG_DUPLICATE_DOC_CLASS              =
-'Duplicate defined class `{}`.'
+DIAG_DUPLICATE_DOC_ALIAS              =
+'Duplicate defined alias `{}`.'
 DIAG_DUPLICATE_DOC_FIELD              =
 'Duplicate defined fields `{}`.'
 DIAG_DUPLICATE_DOC_PARAM              =

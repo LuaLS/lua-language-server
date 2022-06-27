@@ -102,8 +102,8 @@ DIAG_CIRCLE_DOC_CLASS                 =
 '循环继承的类。'
 DIAG_DOC_FIELD_NO_CLASS               =
 '字段必须定义在类之后。'
-DIAG_DUPLICATE_DOC_CLASS              =
-'重复定义的类 `{}`。'
+DIAG_DUPLICATE_DOC_ALIAS              =
+'重复定义的别名 `{}`。'
 DIAG_DUPLICATE_DOC_FIELD              =
 '重复定义的字段 `{}`。'
 DIAG_DUPLICATE_DOC_PARAM              =

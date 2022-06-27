@@ -39,7 +39,7 @@ return function (uri, callback)
                     start   = doc.alias.start,
                     finish  = doc.alias.finish,
                     related = cache,
-                    message = lang.script('DIAG_DUPLICATE_DOC_CLASS', name)
+                    message = lang.script('DIAG_DUPLICATE_DOC_ALIAS', name)
                 }
             end
         end

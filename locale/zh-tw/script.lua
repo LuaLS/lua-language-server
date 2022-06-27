@@ -102,8 +102,8 @@ DIAG_CIRCLE_DOC_CLASS                 =
 '循環繼承的類別。'
 DIAG_DOC_FIELD_NO_CLASS               =
 '欄位必須定義在類別之後。'
-DIAG_DUPLICATE_DOC_CLASS              =
-'重複定義的類別 `{}`。'
+DIAG_DUPLICATE_DOC_ALIAS              = -- TODO: need translate!
+'Duplicate defined alias `{}`.'
 DIAG_DUPLICATE_DOC_FIELD              =
 '重複定義的欄位 `{}`。'
 DIAG_DUPLICATE_DOC_PARAM              =

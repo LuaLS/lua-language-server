@@ -351,6 +351,11 @@ local template = {
                                                 'Auto',
                                                 'Disable',
                                             },
+    ['Lua.hint.semicolon']                  = Type.String >> 'SameLine' << {
+                                                'All',
+                                                'SameLine',
+                                                'Disable',
+                                            },
     ['Lua.window.statusBar']                = Type.Boolean >> true,
     ['Lua.window.progressBar']              = Type.Boolean >> true,
     ['Lua.format.enable']                   = Type.Boolean >> true,

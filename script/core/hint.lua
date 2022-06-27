@@ -5,6 +5,7 @@ local guide    = require 'parser.guide'
 local await    = require 'await'
 local define   = require 'proto.define'
 local lang     = require 'language'
+local substr   = require 'core.substring'
 
 ---@async
 local function typeHint(uri, results, start, finish)
@@ -188,6 +189,8 @@ local function arrayIndex(uri, results, start, finish)
         return false
     end
 
+    local list = {}
+    local max  = 0
     ---@async
     guide.eachSourceBetween(state.ast, start, finish, function (source)
         if source.type ~= 'tableexp' then
@@ -199,14 +202,25 @@ local function arrayIndex(uri, results, start, finish)
                 return
             end
         end
-        results[#results+1] = {
-            text   = ('[%d]'):format(source.tindex),
-            offset = source.start,
-            kind   = define.InlayHintKind.Other,
-            where  = 'left',
-            source = source.parent,
-        }
+        list[#list+1] = source
+        if source.tindex > max then
+            max = source.tindex
+        end
     end)
+
+    if #list > 0 then
+        local length = #tostring(max)
+        local fmt    = '[%0' .. length .. 'd]'
+        for _, source in ipairs(list) do
+            results[#results+1] = {
+                text   = fmt:format(source.tindex),
+                offset = source.start,
+                kind   = define.InlayHintKind.Other,
+                where  = 'left',
+                source = source.parent,
+            }
+        end
+    end
 end
 
 ---@async
@@ -238,6 +252,71 @@ local function awaitHint(uri, results, start, finish)
     end)
 end
 
+local blockTypes = {
+    'main',
+    'function',
+    'for',
+    'loop',
+    'in',
+    'do',
+    'repeat',
+    'while',
+    'ifblock',
+    'elseifblock',
+    'elseblock',
+}
+
+---@async
+local function semicolonHint(uri, results, start, finish)
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
+    local mode = config.get(uri, 'Lua.hint.semicolon')
+    if mode == 'Disable' then
+        return
+    end
+    local subber = substr(state)
+    ---@async
+    guide.eachSourceTypes(state.ast, blockTypes, function (src)
+        for i = 1, #src - 1 do
+            local current = src[i]
+            local next    = src[i+1]
+            local left    = current.range or current.finish
+            local right   = next.start
+            local text    = subber(left, right)
+            if mode == 'All' then
+                if not text:find(';', 1, true) then
+                    results[#results+1] = {
+                        text    = ';',
+                        offset  = left,
+                        kind    = define.InlayHintKind.Other,
+                        where   = 'right',
+                    }
+                end
+            elseif mode == 'SameLine' then
+                if not text:find('[;\r\n]') then
+                    results[#results+1] = {
+                        text    = ';',
+                        offset  = left,
+                        kind    = define.InlayHintKind.Other,
+                        where   = 'right',
+                    }
+                end
+            end
+        end
+        if mode == 'All' then
+            local last = src[#src]
+            results[#results+1] = {
+                text    = ';',
+                offset  = last.range or last.finish,
+                kind    = define.InlayHintKind.Other,
+                where   = 'right',
+            }
+        end
+    end)
+end
+
 ---@async
 return function (uri, start, finish)
     local results = {}
@@ -245,5 +324,6 @@ return function (uri, start, finish)
     paramName(uri, results, start, finish)
     awaitHint(uri, results, start, finish)
     arrayIndex(uri, results, start, finish)
+    semicolonHint(uri, results, start, finish)
     return results
 end

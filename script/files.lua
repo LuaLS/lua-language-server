@@ -457,7 +457,6 @@ function m.eachFile(suri)
 end
 
 --- Pairs dll files
----@return function
 function m.eachDll()
     local map = {}
     for uri, file in pairs(m.dllMap) do

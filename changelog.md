@@ -8,6 +8,7 @@
   * `unknown-cast-variable`
   * `cast-type-mismatch`
   * `missing-return-value`
+  * `redundant-return-value`
 * `NEW` settings:
   * `diagnostics.groupSeverity`
   * `diagnostics.groupFileStatus`

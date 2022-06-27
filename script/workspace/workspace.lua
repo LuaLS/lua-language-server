@@ -397,6 +397,7 @@ end
 
 ---@param uriOrPath uri|string
 ---@return string
+---@return boolean suc
 function m.getRelativePath(uriOrPath)
     local path, uri
     if uriOrPath:sub(1, 5) == 'file:' then

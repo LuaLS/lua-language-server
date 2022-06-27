@@ -59,6 +59,7 @@ m.register {
     'redundant-parameter',
     'missing-parameter',
     'missing-return-value',
+    'redundant-return-value',
 } {
     group    = 'unbalanced',
     severity = 'Warning',

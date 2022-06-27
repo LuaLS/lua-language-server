@@ -113,7 +113,8 @@ end
 ---@param action   parser.object
 ---@param topNode  vm.node
 ---@param outNode? vm.node
----@return vm.node
+---@return vm.node topNode
+---@return vm.node outNode
 function mt:_lookInto(action, topNode, outNode)
     if not action then
         return topNode, outNode

@@ -132,6 +132,10 @@ DIAG_MISSING_RETURN_VALUE             =
 '至少需要 {min} 个返回值，但此处只返回 {rmax} 个值。'
 DIAG_MISSING_RETURN_VALUE_RANGE       =
 '至少需要 {min} 个返回值，但此处只返回 {rmin} 到 {rmax} 个值。'
+DIAG_REDUNDANT_RETURN_VALUE           =
+'最多只有 {max} 个返回值，但此处返回了第 {rmax} 个值。'
+DIAG_REDUNDANT_RETURN_VALUE_RANGE     =
+'最多只有 {max} 个返回值，但此处返回了第 {rmin} 到第 {rmax} 个值。'
 
 MWS_NOT_SUPPORT         =
 '{} 目前还不支持多工作目录，我可能需要重启才能支持新的工作目录...'

@@ -885,6 +885,7 @@ TEST [[
 ---@param v T
 ---@param message any
 ---@return T
+---@return any message
 function assert(v, message)
     return v, message
 end
@@ -1734,7 +1735,6 @@ function F()
 end
 ]]
 
-do return end
 TEST [[
 ---@return number, number?
 function F()
@@ -1742,6 +1742,24 @@ function F()
 end
 ]]
 
+TEST [[
+---@return number, number?
+function F()
+    return 1, 1, <!1!>, <!2!>, <!3!>
+end
+]]
+
+TEST [[
+---@return number, number
+local function r2() end
+
+---@return number, number?
+function F()
+    return 1, <!r2()!>
+end
+]]
+
+do return end
 TEST [[
 ---@return number
 function F()

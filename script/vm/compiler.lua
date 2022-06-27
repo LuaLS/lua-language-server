@@ -1285,7 +1285,7 @@ local compilerSwitch = util.switch()
                     if not guide.isBasicType(pn.name) then
                         vm.setNode(source, pn)
                     end
-                elseif pn.type == 'doc.type.table' then
+                elseif pn.type == 'doc.type.table' or pn.type == 'doc.type.array' then
                     vm.setNode(source, pn)
                 end
             end

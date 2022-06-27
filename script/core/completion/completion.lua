@@ -1518,8 +1518,6 @@ local function tryArray(state, position, results)
     if source.type ~= 'table' and (not source.parent or source.parent.type ~= 'table') then
         return
     end
-    local mark = {}
-    local fields = {}
     local tbl = source
     if source.type ~= 'table' then
         tbl = source.parent

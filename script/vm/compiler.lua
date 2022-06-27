@@ -1494,14 +1494,10 @@ local compilerSwitch = util.switch()
         if (source.parent.type == 'table') then
             local node = vm.compileNode(source.parent)
             for n in node:eachObject() do
-                if  (n.type == 'global'
-                and n.cate == 'type') then
-                    vm.setNode(source, vm.compileNode(n))
-                elseif n.type == 'doc.type.array' then
+                if n.type == 'doc.type.array' then
                     vm.setNode(source, vm.compileNode(n.node))
                 end
             end
-            return
         end
         vm.setNode(source, vm.compileNode(source.value))
     end)

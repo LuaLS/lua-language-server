@@ -1524,6 +1524,9 @@ local function tryArray(state, position, results)
     if source.type ~= 'table' then
         tbl = source.parent
     end
+    if source.parent.type == 'callargs' and source.parent.parent.type == 'call' then
+        return
+    end
     -- {  } inside when enum
     checkEqualEnumLeft(state, position, tbl, results, true)
 end

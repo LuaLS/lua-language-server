@@ -4,14 +4,6 @@ local proto     = require 'proto'
 local lang      = require 'language'
 local converter = require 'proto.converter'
 
-local function isInString(ast, offset)
-    return guide.eachSourceContain(ast.ast, offset, function (source)
-        if source.type == 'string' then
-            return true
-        end
-    end) or false
-end
-
 ---@async
 return function (data)
     local uri   = data.uri
@@ -32,7 +24,8 @@ return function (data)
             goto NEXT_LINE
         end
         local lastPos = guide.offsetToPosition(state, lastOffset)
-        if isInString(state.ast, lastPos) then
+        if guide.isInString(state.ast, lastPos)
+        or guide.isInComment(state.ast, lastPos) then
             goto NEXT_LINE
         end
         local firstOffset = startOffset

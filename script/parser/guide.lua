@@ -1231,6 +1231,15 @@ function m.isInString(ast, position)
     end)
 end
 
+function m.isInComment(ast, offset)
+    for _, com in ipairs(ast.state.comms) do
+        if offset >= com.start and offset <= com.finish then
+            return true
+        end
+    end
+    return false
+end
+
 function m.isOOP(source)
     if source.type == 'setmethod'
     or source.type == 'getmethod' then

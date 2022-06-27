@@ -189,38 +189,45 @@ local function arrayIndex(uri, results, start, finish)
         return false
     end
 
-    local list = {}
-    local max  = 0
     ---@async
-    guide.eachSourceBetween(state.ast, start, finish, function (source)
-        if source.type ~= 'tableexp' then
+    guide.eachSourceType(state.ast, 'table', function (source)
+        if source.finish < start or source.start > finish then
             return
         end
         await.delay()
         if option == 'Auto' then
-            if not isMixedOrLargeTable(source.parent) then
+            if not isMixedOrLargeTable(source) then
                 return
             end
         end
-        list[#list+1] = source
-        if source.tindex > max then
-            max = source.tindex
+        local list = {}
+        local max  = 0
+        for _, field in ipairs(source) do
+            if  field.type == 'tableexp'
+            and field.start < finish
+            and field.finish > start then
+                list[#list+1] = field
+                if field.tindex > max then
+                    max = field.tindex
+                end
+            end
+        end
+
+        if #list > 0 then
+            local length = #tostring(max)
+            local fmt    = '[%0' .. length .. 'd]'
+            for _, field in ipairs(list) do
+                results[#results+1] = {
+                    text   = fmt:format(field.tindex),
+                    offset = field.start,
+                    kind   = define.InlayHintKind.Other,
+                    where  = 'left',
+                    source = field.parent,
+                }
+            end
         end
     end)
 
-    if #list > 0 then
-        local length = #tostring(max)
-        local fmt    = '[%0' .. length .. 'd]'
-        for _, source in ipairs(list) do
-            results[#results+1] = {
-                text   = fmt:format(source.tindex),
-                offset = source.start,
-                kind   = define.InlayHintKind.Other,
-                where  = 'left',
-                source = source.parent,
-            }
-        end
-    end
 end
 
 ---@async

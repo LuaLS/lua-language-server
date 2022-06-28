@@ -235,14 +235,14 @@ config.hint.arrayIndex.Disable           =
 '停用陣列索引提示。'
 config.hint.await                        =
 '如果呼叫的函數被標記為了 `---@async`，則在呼叫處提示 `await`。'
-config.hint.semicolon                    = -- TODO: need translate!
-'If there is no semicolon at the end of the statement, display a virtual semicolon.'
-config.hint.semicolon.All                = -- TODO: need translate!
-'All statements display virtual semicolons.'
-config.hint.semicolon.SameLine            = -- TODO: need translate!
-'When two statements are on the same line, display a semicolon between them.'
-config.hint.semicolon.Disable            = -- TODO: need translate!
-'Disable virtual semicolons.'
+config.hint.semicolon                    =
+'若陳述式尾部沒有分號，則顯示虛擬分號。'
+config.hint.semicolon.All                =
+'所有陳述式都顯示虛擬分號。'
+config.hint.semicolon.SameLine            =
+'兩個陳述式在同一行時，在它們之間顯示分號。'
+config.hint.semicolon.Disable            =
+'停用虛擬分號。'
 config.format.enable                     =
 '啟用程式碼格式化程式。'
 config.format.defaultConfig              =
@@ -266,13 +266,13 @@ config.IntelliSense.traceBeSetted        =
 '請查閱[文件](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
 config.IntelliSense.traceFieldInject     =
 '請查閱[文件](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
-config.type.castNumberToInteger          = -- TODO: need translate!
-'Allowed to assign the `number` type to the `integer` type.'
-config.type.weakUnionCheck               = -- TODO: need translate!
+config.type.castNumberToInteger          =
+'允許將 `number` 類型賦值給 `integer` 類型。'
+config.type.weakUnionCheck               =
 [[
-Once one subtype of a union type meets the condition, the union type also meets the condition.
+同位類型中只要有一個子類型滿足條件，則同位類型也滿足條件。
 
-When this setting is `false`, the `number|boolean` type cannot be assigned to the `number` type. It can be with `true`.
+此設定為 `false` 時，`number|boolean` 類型無法賦給 `number` 類型；為 `true` 時則可以。
 ]]
 config.diagnostics['unused-local']          =
 '未使用的區域變數'

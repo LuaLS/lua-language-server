@@ -45,6 +45,7 @@
 * `FIX` sometimes workspace diagnostics are not triggered
 * `FIX` [#1228](https://github.com/sumneko/lua-language-server/issues/1228)
 * `FIX` [#1229](https://github.com/sumneko/lua-language-server/issues/1229)
+* `FIX` [#1242](https://github.com/sumneko/lua-language-server/issues/1242)
 
 ## 3.3.1
 `2022-6-17`

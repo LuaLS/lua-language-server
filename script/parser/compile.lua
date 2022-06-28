@@ -2767,11 +2767,15 @@ local function parseMultiVars(n1, parser, isLocal)
             missExp()
         end
     end
-    bindValue(n1, v1, 1, nil, isLocal, isSet)
+    local index = 1
+    bindValue(n1, v1, index, nil, isLocal, isSet)
     local lastValue = v1
     if n2 then
         max = 2
-        bindValue(n2, v2, 2, lastValue, isLocal, isSet)
+        if not v2 then
+            index = 2
+        end
+        bindValue(n2, v2, index, lastValue, isLocal, isSet)
         lastValue = v2 or lastValue
         pushActionIntoCurrentChunk(n2)
     end
@@ -2780,7 +2784,10 @@ local function parseMultiVars(n1, parser, isLocal)
             local n = nrest[i]
             local v = vrest and vrest[i]
             max = i + 2
-            bindValue(n, v, max, lastValue, isLocal, isSet)
+            if not v then
+                index = index + 1
+            end
+            bindValue(n, v, index, lastValue, isLocal, isSet)
             lastValue = v or lastValue
             pushActionIntoCurrentChunk(n)
         end

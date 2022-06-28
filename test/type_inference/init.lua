@@ -3149,3 +3149,21 @@ TEST 'A' [[
 ---@type A
 local <?s?> = ''
 ]]
+
+TEST 'number' [[
+---@return number
+local function f() end
+local x, <?y?> = 1, f()
+]]
+
+TEST 'boolean' [[
+---@return number, boolean
+local function f() end
+local x, y, <?z?> = 1, f()
+]]
+
+TEST 'number' [[
+---@return number, boolean
+local function f() end
+local x, y, <?z?> = 1, 2, f()
+]]

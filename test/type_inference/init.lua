@@ -3175,3 +3175,12 @@ print(<?f?>)
 
 function f() end
 ]]
+
+TEST 'number' [[
+---@type number|nil
+local n
+
+local t = {
+    x = n and <?n?>,
+}
+]]

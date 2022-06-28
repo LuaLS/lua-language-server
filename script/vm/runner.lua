@@ -304,6 +304,10 @@ function mt:_lookInto(action, topNode, outNode)
         end
     elseif action.type == 'getindex' then
         self:_lookInto(action.index, topNode)
+    elseif action.type == 'table' then
+        for _, field in ipairs(action) do
+            self:_lookInto(field, topNode)
+        end
     end
     ::RETURN::
     topNode = self:_fastWard(action.finish, topNode)

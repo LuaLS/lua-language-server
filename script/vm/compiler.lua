@@ -1553,10 +1553,6 @@ local compilerSwitch = util.switch()
             end
             if  lastReturn
             and not hasMarkDoc then
-                if lastReturn.types[1][1] == '...' then
-                    hasMarkDoc = true
-                    vm.setNode(source, vm.declareGlobal('type', 'unknown'))
-                end
                 if lastReturn.name and lastReturn.name[1] == '...' then
                     hasMarkDoc = true
                     vm.setNode(source, vm.compileNode(lastReturn))
@@ -1618,13 +1614,6 @@ local compilerSwitch = util.switch()
             if not node then
                 return
             end
-            for n in node:eachObject() do
-                if  n.type == 'global'
-                and n.cate == 'type'
-                and n.name == '...' then
-                    return
-                end
-            end
             vm.setNode(source, node)
         end
         if vararg.type == 'varargs' then
@@ -1642,13 +1631,6 @@ local compilerSwitch = util.switch()
         local node = getReturn(source.node, 1, source.args)
         if not node then
             return
-        end
-        for n in node:eachObject() do
-            if  n.type == 'global'
-            and n.cate == 'type'
-            and n.name == '...' then
-                return
-            end
         end
         vm.setNode(source, node)
     end)

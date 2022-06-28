@@ -98,16 +98,14 @@ function vm.countReturnsOfFunction(func, mark)
                         n = n + 1
                         lastReturn = ret
                         dmax = n
-                        if not vm.compileNode(ret):isNullable() then
+                        if  (not ret.name or ret.name[1] ~= '...')
+                        and not vm.compileNode(ret):isNullable() then
                             dmin = n
                         end
                     end
                 end
             end
             if lastReturn then
-                if lastReturn.types[1][1] == '...' then
-                    dmax = math.huge
-                end
                 if lastReturn.name and lastReturn.name[1] == '...' then
                     dmax = math.huge
                 end

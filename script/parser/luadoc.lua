@@ -452,6 +452,10 @@ local function  parseTypeUnitFunction(parent)
                     name = returnName
                     return true
                 end
+                if returnName[1] == '...' then
+                    name = returnName
+                    return false
+                end
                 return false
             end)
             local rtn = parseType(typeUnit)
@@ -648,12 +652,15 @@ function parseTypeUnit(parent)
                 or parseCode(parent)
                 or parseInteger(parent)
                 or parseBoolean(parent)
-                or parseDots('doc.type.name', parent)
                 or parseParen(parent)
     if not result then
         result = parseName('doc.type.name', parent)
+              or parseDots('doc.type.name', parent)
         if not result then
             return nil
+        end
+        if result[1] == '...' then
+            result[1] = 'unknown'
         end
     end
     while true do
@@ -918,6 +925,10 @@ local docSwitch = util.switch()
             returns = {},
         }
         while true do
+            local dots = parseDots('doc.return.name')
+            if dots then
+                Ci = Ci - 1
+            end
             local docType = parseType(result)
             if not docType then
                 break
@@ -929,7 +940,8 @@ local docSwitch = util.switch()
                 nextToken()
                 docType.optional = true
             end
-            docType.name = parseName('doc.return.name', docType)
+            docType.name = dots
+                        or parseName('doc.return.name', docType)
                         or parseDots('doc.return.name', docType)
             result.returns[#result.returns+1] = docType
             if not checkToken('symbol', ',', 1) then

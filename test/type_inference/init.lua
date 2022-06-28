@@ -515,7 +515,7 @@ TEST 'fun(a: string, b: any, ...any)' [[
 local <?x?>
 ]]
 
-TEST 'fun(a: string, b: any, c?: boolean, ...any):c, d?, ...' [[
+TEST 'fun(a: string, b: any, c?: boolean, ...any):c, d?, ...unknown' [[
 ---@type fun(a: string, b, c?: boolean, ...):c, d?, ...
 local <?x?>
 ]]

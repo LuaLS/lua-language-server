@@ -2042,6 +2042,16 @@ function f(...boolean)
 ]]
 
 TEST [[
+---@param ... boolean
+---@return ...
+local function <?f?>(...) end
+]]
+[[
+function f(...boolean)
+  -> ...unknown
+]]
+
+TEST [[
 ---@type fun():x: number
 local <?f?>
 ]]

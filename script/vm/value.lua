@@ -9,6 +9,9 @@ function vm.testCondition(source)
         return nil
     end
     local node = vm.compileNode(source)
+    if node.optional then
+        return nil
+    end
     local hasTrue, hasFalse
     for n in node:eachObject() do
         if n.type == 'boolean'

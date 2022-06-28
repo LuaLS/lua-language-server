@@ -3209,3 +3209,12 @@ local n
 
 print(<?n?>)
 ]]
+
+TEST 'integer' [[
+---@type integer?
+local n
+if true then
+    n = 0
+end
+local <?x?> = n or 0
+]]

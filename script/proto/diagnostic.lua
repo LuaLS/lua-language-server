@@ -224,7 +224,7 @@ end
 
 ---@param name string
 ---@return string[]
-m.getGroups = util.catchReturn(function (name)
+m.getGroups = util.cacheReturn(function (name)
     local groups = {}
     for groupName, nameMap in pairs(m.diagnosticGroups) do
         if nameMap[name] then

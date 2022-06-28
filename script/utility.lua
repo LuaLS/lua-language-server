@@ -835,7 +835,7 @@ m.MODE_KV = { __mode = 'kv' }
 ---@generic T: fun(param: any):any
 ---@param func T
 ---@return T
-function m.catchReturn(func)
+function m.cacheReturn(func)
     local cache = {}
     return function (param)
         if cache[param] == nil then

@@ -492,6 +492,7 @@ function vm.getReturnOfFunction(func, index)
         end
         return vm.createGeneric(rtn, sign)
     end
+    return nil
 end
 
 ---@return vm.node
@@ -976,7 +977,6 @@ local function compileForVars(source)
 end
 
 ---@param source parser.object
----@return vm.node
 local function compileLocal(source)
     vm.setNode(source, source)
 
@@ -1077,7 +1077,7 @@ local binarySwich = util.switch()
     : call(function (source)
         local node1 = vm.compileNode(source[1])
         local node2 = vm.compileNode(source[2])
-        local r1 = vm.test(source[1])
+        local r1 = vm.testCondition(source[1])
         if r1 == true then
             vm.setNode(source, node2)
         elseif r1 == false then
@@ -1090,7 +1090,7 @@ local binarySwich = util.switch()
     : call(function (source)
         local node1 = vm.compileNode(source[1])
         local node2 = vm.compileNode(source[2])
-        local r1 = vm.test(source[1])
+        local r1 = vm.testCondition(source[1])
         if r1 == true then
             vm.setNode(source, node1)
         elseif r1 == false then
@@ -1784,7 +1784,7 @@ local compilerSwitch = util.switch()
             return
         end
         if source.op.type == 'not' then
-            local result = vm.test(source[1])
+            local result = vm.testCondition(source[1])
             if result == nil then
                 vm.setNode(source, vm.declareGlobal('type', 'boolean'))
                 return

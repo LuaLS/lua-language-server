@@ -2833,7 +2833,8 @@ local function compileExpAsAction(exp)
                 local block = Chunk[i]
                 if block.type == 'ifblock'
                 or block.type == 'elseifblock'
-                or block.type == 'else' then
+                or block.type == 'elseblock'
+                or block.type == 'function' then
                     block.hasError = true
                     break
                 end
@@ -2986,7 +2987,8 @@ local function parseReturn()
         local block = Chunk[i]
         if block.type == 'ifblock'
         or block.type == 'elseifblock'
-        or block.type == 'else' then
+        or block.type == 'elseblock'
+        or block.type == 'function' then
             block.hasReturn = true
             break
         end

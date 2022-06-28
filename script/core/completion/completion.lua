@@ -1133,7 +1133,6 @@ local function cleanEnums(enums, source)
     return enums
 end
 
----@return boolean
 local function insertEnum(state, src, enums, isInArray)
     if src.type == 'doc.type.string'
     or src.type == 'doc.type.integer'

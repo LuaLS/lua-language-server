@@ -1276,4 +1276,10 @@ function m.isBasicType(str)
     return basicTypeMap[str] == true
 end
 
+---@param source parser.object
+---@return boolean
+function m.isBlockType(source)
+    return blockTypes[source.type] == true
+end
+
 return m

@@ -38,7 +38,7 @@ local function getScope(uri, key)
         end
     end
     if uri then
-        ---@type scope
+        ---@type scope?
         local scp = scope.getFolder(uri) or scope.getLinkedScope(uri)
         if scp then
             if not key

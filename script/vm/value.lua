@@ -4,7 +4,7 @@ local vm       = require 'vm.vm'
 
 ---@param source parser.object?
 ---@return boolean|nil
-function vm.test(source)
+function vm.testCondition(source)
     if not source then
         return nil
     end

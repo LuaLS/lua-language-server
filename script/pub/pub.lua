@@ -136,8 +136,6 @@ function m.task(name, params, callback)
 end
 
 --- 接收反馈
---- 返回接收到的反馈数量
----@return integer
 function m.recieve(block)
     if block then
         local id, name, result = waiter:bpop()

@@ -9,6 +9,7 @@
   * `cast-type-mismatch`
   * `missing-return-value`
   * `redundant-return-value`
+  * `missing-return`
 * `NEW` settings:
   * `diagnostics.groupSeverity`
   * `diagnostics.groupFileStatus`

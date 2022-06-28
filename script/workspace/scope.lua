@@ -164,7 +164,7 @@ function m.createFolder(uri)
 end
 
 ---@param uri uri
----@return scope
+---@return scope?
 function m.getFolder(uri)
     for _, scope in ipairs(m.folders) do
         if scope:isChildUri(uri) then
@@ -175,7 +175,7 @@ function m.getFolder(uri)
 end
 
 ---@param uri uri
----@return scope
+---@return scope?
 function m.getLinkedScope(uri)
     if m.override and m.override:isLinkedUri(uri) then
         return m.override
@@ -188,6 +188,7 @@ function m.getLinkedScope(uri)
     if m.fallback:isLinkedUri(uri) then
         return m.fallback
     end
+    return nil
 end
 
 ---@param uri uri

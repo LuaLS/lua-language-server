@@ -496,5 +496,66 @@ TEST [[
 local <!x!> = 'aaa'
 ]]
 
+TEST [[
+---@return number
+function F()
+    return <!true!>
+end
+]]
+
+TEST [[
+---@return number?
+function F()
+    return 1
+end
+]]
+
+TEST [[
+---@return number?
+function F()
+    return nil
+end
+]]
+
+TEST [[
+---@return number, number
+local function f() end
+
+---@return number, boolean
+function F()
+    return <!f()!>
+end
+]]
+
+TEST [[
+---@return boolean, number
+local function f() end
+
+---@return number, boolean
+function F()
+    return <!f()!>
+end
+]]
+
+TEST [[
+---@return boolean, number?
+local function f() end
+
+---@return number, boolean
+function F()
+    return 1, f()
+end
+]]
+
+TEST [[
+---@return number, number?
+local function f() end
+
+---@return number, boolean, number
+function F()
+    return 1, <!f()!>
+end
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

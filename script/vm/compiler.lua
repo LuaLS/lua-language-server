@@ -469,9 +469,9 @@ function vm.getReturnOfFunction(func, index)
         end
         if not func._returns[index] then
             func._returns[index] = {
-                type   = 'function.return',
-                parent = func,
-                index  = index,
+                type        = 'function.return',
+                parent      = func,
+                returnIndex = index,
             }
         end
         return func._returns[index]
@@ -736,14 +736,15 @@ function vm.compileByParentNode(source, key, ref, pushResult)
     end
 end
 
----@return vm.node?
-local function selectNode(source, list, index)
-    if not list then
-        return nil
-    end
+---@param list  parser.object[]
+---@param index integer
+---@return vm.node
+---@return parser.object?
+function vm.selectNode(list, index)
     local exp
     if list[index] then
         exp = list[index]
+        index = 1
     else
         for i = index, 1, -1 do
             if list[i] then
@@ -758,16 +759,14 @@ local function selectNode(source, list, index)
         end
     end
     if not exp then
-        vm.setNode(source, vm.declareGlobal('type', 'nil'))
-        return vm.getNode(source)
+        return vm.createNode(vm.declareGlobal('type', 'nil')), nil
     end
     ---@type vm.node?
     local result
     if exp.type == 'call' then
         result = getReturn(exp.node, index, exp.args)
         if not result then
-            vm.setNode(source, vm.declareGlobal('type', 'unknown'))
-            return vm.getNode(source)
+            return vm.createNode(vm.declareGlobal('type', 'unknown')), exp
         end
     else
         ---@type vm.node
@@ -776,6 +775,15 @@ local function selectNode(source, list, index)
             result:merge(vm.declareGlobal('type', 'unknown'))
         end
     end
+    return result, exp
+end
+
+---@param source parser.object
+---@param list   parser.object[]
+---@param index  integer
+---@return vm.node
+local function selectNode(source, list, index)
+    local result = vm.selectNode(list, index)
     if source.type == 'function.return' then
         -- remove any for returns
         local rtnNode = vm.createNode()
@@ -1513,9 +1521,10 @@ local compilerSwitch = util.switch()
         vm.setNode(source, vm.compileNode(source.value))
     end)
     : case 'function.return'
+    ---@param source parser.object
     : call(function (source)
         local func  = source.parent
-        local index = source.index
+        local index = source.returnIndex
         local hasMarkDoc
         if func.bindDocs then
             local sign = getObjectSign(func)

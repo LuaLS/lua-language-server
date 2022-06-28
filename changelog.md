@@ -10,6 +10,7 @@
   * `missing-return-value`
   * `redundant-return-value`
   * `missing-return`
+  * `return-type-mismatch`
 * `NEW` settings:
   * `diagnostics.groupSeverity`
   * `diagnostics.groupFileStatus`

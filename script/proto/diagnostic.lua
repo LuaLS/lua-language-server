@@ -74,6 +74,7 @@ m.register {
     'assign-type-mismatch',
     'param-type-mismatch',
     'cast-type-mismatch',
+    'return-type-mismatch',
 } {
     group    = 'type-check',
     severity = 'Warning',

@@ -1090,12 +1090,12 @@ end
 ---@param a table
 ---@param b table
 ---@return string|false mode
----@return table pathA?
----@return table pathB?
+---@return table? pathA
+---@return table? pathB
 function m.getPath(a, b, sameFunction)
     --- 首先测试双方在同一个函数内
     if sameFunction and m.getParentFunction(a) ~= m.getParentFunction(b) then
-        return false, nil, nil
+        return false
     end
     local mode
     local objA
@@ -1139,7 +1139,7 @@ function m.getPath(a, b, sameFunction)
         end
     end
     if not start then
-        return false, nil, nil
+        return false
     end
     -- pathA: {   1, 2, 3}
     -- pathB: {5, 6, 2, 3}

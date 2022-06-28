@@ -17,7 +17,7 @@ end
 ---@class config.loader
 local m = {}
 
----@return table
+---@return table?
 function m.loadRCConfig(uri, filename)
     local scp  = scope.getScope(uri)
     local path = workspace.getAbsolutePath(uri, filename)
@@ -35,6 +35,7 @@ function m.loadRCConfig(uri, filename)
         errorMessage(lang.script('CONFIG_LOAD_ERROR', res))
         return scp:get('lastRCConfig')
     end
+    ---@cast res table
     scp:set('lastRCConfig', res)
     return res
 end
@@ -62,6 +63,7 @@ function m.loadLocalConfig(uri, filename)
             errorMessage(lang.script('CONFIG_LOAD_ERROR', res))
             return scp:get('lastLocalConfig')
         end
+        ---@cast res table
         scp:set('lastLocalConfig', res)
         scp:set('lastLocalType', 'json')
         return res
@@ -81,7 +83,7 @@ end
 
 ---@async
 ---@param uri? uri
----@return table
+---@return table?
 function m.loadClientConfig(uri)
     local configs = proto.awaitRequest('workspace/configuration', {
         items = {

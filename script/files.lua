@@ -344,7 +344,7 @@ end
 
 --- 获取文件原始文本
 ---@param uri uri
----@return string text
+---@return string? text
 function m.getOriginText(uri)
     local file = m.fileMap[uri]
     if not file then
@@ -358,9 +358,7 @@ end
 ---@return integer[]
 function m.getOriginLines(uri)
     local file = m.fileMap[uri]
-    if not file then
-        return nil
-    end
+    assert(file, 'file not exists:' .. uri)
     return file.originLines
 end
 

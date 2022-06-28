@@ -5,7 +5,11 @@ local compile    = require 'parser.compile'
 local util       = require 'utility'
 
 local TokenTypes, TokenStarts, TokenFinishs, TokenContents, TokenMarks
-local Ci, Offset, pushWarning, NextComment, Lines
+---@type integer
+local Ci
+---@type integer
+local Offset
+local pushWarning, NextComment, Lines
 local parseType, parseTypeUnit
 ---@type any
 local Parser = re.compile([[
@@ -159,8 +163,8 @@ local function peekToken()
     return TokenTypes[Ci+1], TokenContents[Ci+1]
 end
 
----@return string tokenType
----@return string tokenContent
+---@return string? tokenType
+---@return string? tokenContent
 local function nextToken()
     Ci = Ci + 1
     if not TokenTypes[Ci] then

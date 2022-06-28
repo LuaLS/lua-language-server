@@ -38,6 +38,12 @@ return function (uri, callback)
             if not exp then
                 break
             end
+            if retNode:hasName 'nil' then
+                if exp.type == 'getfield'
+                or exp.type == 'getindex' then
+                    retNode = retNode:copy():removeOptional()
+                end
+            end
             if not vm.canCastType(uri, docRet, retNode) then
                 callback {
                     start   = exp.start,

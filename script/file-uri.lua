@@ -67,9 +67,6 @@ end
 ---@param uri uri
 ---@return string path
 function m.decode(uri)
-    if not uri then
-        return nil
-    end
     local scheme, authority, path = uri:match('([^:]*):?/?/?([^/]*)(.*)')
     if not scheme then
         return ''

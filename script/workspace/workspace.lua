@@ -354,9 +354,6 @@ end
 ---@param path string
 ---@return string
 function m.normalize(path)
-    if not path then
-        return nil
-    end
     path = path:gsub('%$%{(.-)%}', function (key)
         if key == '3rd' then
             return (ROOT / 'meta' / '3rd'):string()
@@ -379,7 +376,7 @@ function m.normalize(path)
     return path
 end
 
----@return string
+---@return string?
 function m.getAbsolutePath(folderUri, path)
     if not path or path == '' then
         return nil

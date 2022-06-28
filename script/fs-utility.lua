@@ -261,7 +261,7 @@ end
 
 ---@param path   string|fspath
 ---@param option table
----@return fspath
+---@return fspath?
 local function fsAbsolute(path, option)
     if type(path) == 'string' then
         local suc, res = pcall(fs.path, path)
@@ -451,6 +451,9 @@ local function fileRemove(path, option)
     end
 end
 
+---@param source fspath?
+---@param target fspath?
+---@param option table
 local function fileCopy(source, target, option)
     if not source or not target then
         return
@@ -462,7 +465,7 @@ local function fileCopy(source, target, option)
         if isDir2 or fsCreateDirectories(target, option) then
             for filePath in fsPairs(source) do
                 local name = filePath:filename():string()
-                fileCopy(filePath, target / name, option)
+                fileCopy(filePath, target / name--[[@as fspath]], option)
             end
         end
     else
@@ -513,7 +516,7 @@ local function fileSync(source, target, option)
             if fsCreateDirectories(target) then
                 for filePath in fsPairs(source) do
                     local name = filePath:filename():string()
-                    fileCopy(filePath, target / name, option)
+                    fileCopy(filePath, target / name--[[@as fspath]], option)
                 end
             end
         end
@@ -595,10 +598,10 @@ end
 ---@return table
 function m.fileCopy(source, target, option)
     option = buildOption(option)
-    source = fsAbsolute(source, option)
-    target = fsAbsolute(target, option)
+    local fsSource = fsAbsolute(source, option)
+    local fsTarget = fsAbsolute(target, option)
 
-    fileCopy(source, target, option)
+    fileCopy(fsSource, fsTarget, option)
 
     return option
 end
@@ -609,10 +612,10 @@ end
 ---@return table
 function m.fileSync(source, target, option)
     option = buildOption(option)
-    source = fsAbsolute(source, option)
-    target = fsAbsolute(target, option)
+    local fsSource = fsAbsolute(source, option)
+    local fsTarget = fsAbsolute(target, option)
 
-    fileSync(source, target, option)
+    fileSync(fsSource, fsTarget, option)
 
     return option
 end

@@ -240,6 +240,9 @@ local function tryModifySpecifiedConfig(uri, finalChanges)
         return false
     end
     local path = workspace.getAbsolutePath(uri, CONFIGPATH)
+    if not path then
+        return false
+    end
     util.saveFile(path, json.beautify(scp:get('lastLocalConfig'), { indent = '    ' }))
     return true
 end
@@ -254,6 +257,9 @@ local function tryModifyRC(uri, finalChanges, create)
         return false
     end
     path = fs.exists(path) and path or workspace.getAbsolutePath(uri, '.luarc.json')
+    if not path then
+        return false
+    end
     local buf = util.loadFile(path)
     if not buf and not create then
         return false

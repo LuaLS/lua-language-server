@@ -36,7 +36,7 @@ return function (uri, callback)
             end
         end
         local valueNode = vm.compileNode(value)
-        if  source.type == 'setindex' then
+        if source.type == 'setindex' then
             -- boolean[1] = nil
             valueNode = valueNode:copy():removeOptional()
         end

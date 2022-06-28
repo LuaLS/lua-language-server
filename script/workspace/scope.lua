@@ -85,7 +85,7 @@ function mt:getLinkedUri(uri)
 end
 
 ---@param uri uri
----@return uri
+---@return uri?
 function mt:getRootUri(uri)
     if self:isChildUri(uri) then
         return self.uri

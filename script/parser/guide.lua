@@ -279,7 +279,7 @@ end
 
 --- 寻找父函数
 ---@param obj parser.object
----@return parser.object
+---@return parser.object?
 function m.getParentFunction(obj)
     for _ = 1, 10000 do
         obj = obj.parent
@@ -296,7 +296,7 @@ end
 
 --- 寻找所在区块
 ---@param obj parser.object
----@return parser.object
+---@return parser.object?
 function m.getBlock(obj)
     for _ = 1, 10000 do
         if not obj then
@@ -325,7 +325,7 @@ end
 
 --- 寻找所在父区块
 ---@param obj parser.object
----@return parser.object
+---@return parser.object?
 function m.getParentBlock(obj)
     for _ = 1, 10000 do
         obj = obj.parent
@@ -342,7 +342,7 @@ end
 
 --- 寻找所在可break的父区块
 ---@param obj parser.object
----@return parser.object
+---@return parser.object?
 function m.getBreakBlock(obj)
     for _ = 1, 10000 do
         obj = obj.parent
@@ -379,7 +379,7 @@ end
 
 --- 寻找所在父类型
 ---@param obj parser.object
----@return parser.object
+---@return parser.object?
 function m.getParentType(obj, want)
     for _ = 1, 10000 do
         obj = obj.parent
@@ -412,8 +412,7 @@ function m.getRoot(obj)
         end
         local parent = obj.parent
         if not parent then
-            log.error('Can not find out root:', obj.type)
-            return nil
+            error('Can not find out root:' .. tostring(obj.type))
         end
         obj = parent
     end
@@ -440,30 +439,6 @@ function m.getENV(source, start)
     end
     return m.getLocal(source, '_ENV', start)
         or m.getLocal(source, '@fenv', start)
-end
-
---- 寻找函数的不定参数，返回不定参在第几个参数上，以及该参数对象。
---- 如果函数是主函数，则返回`0, nil`。
----@return table
----@return integer
-function m.getFunctionVarArgs(func)
-    if func.type == 'main' then
-        return 0, nil
-    end
-    if func.type ~= 'function' then
-        return nil, nil
-    end
-    local args = func.args
-    if not args then
-        return nil, nil
-    end
-    for i = 1, #args do
-        local arg = args[i]
-        if arg.type == '...' then
-            return i, arg
-        end
-    end
-    return nil, nil
 end
 
 --- 获取指定区块中可见的局部变量
@@ -535,25 +510,25 @@ function m.getVisibleLocals(block, pos)
 end
 
 --- 获取指定区块中可见的标签
----@param block table
----@param name string {comment = '标签名'}
+---@param block parser.object
+---@param name string
 function m.getLabel(block, name)
-    block = m.getBlock(block)
+    local current = m.getBlock(block)
     for _ = 1, 10000 do
-        if not block then
+        if not current then
             return nil
         end
-        local labels = block.labels
+        local labels = current.labels
         if labels then
             local label = labels[name]
             if label then
                 return label
             end
         end
-        if block.type == 'function' then
+        if current.type == 'function' then
             return nil
         end
-        block = m.getParentBlock(block)
+        current = m.getParentBlock(current)
     end
     error('guide.getLocal overstack')
 end

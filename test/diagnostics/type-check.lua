@@ -557,5 +557,28 @@ function F()
 end
 ]]
 
+TEST [[
+---@class A
+---@field x number?
+
+---@return number
+function F()
+    ---@type A
+    local t
+    return t.x
+end
+]]
+
+TEST [[
+local t = {}
+t.x = 1
+t.x = nil
+
+---@return number
+function F()
+    return t.x
+end
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

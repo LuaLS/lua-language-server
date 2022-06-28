@@ -48,10 +48,12 @@ return function (uri, callback)
             local blocks = {}
             for _, value in ipairs(values) do
                 local block = guide.getBlock(value)
-                if not blocks[block] then
-                    blocks[block] = {}
+                if block then
+                    if not blocks[block] then
+                        blocks[block] = {}
+                    end
+                    blocks[block][#blocks[block]+1] = value
                 end
-                blocks[block][#blocks[block]+1] = value
             end
             for _, defs in pairs(blocks) do
                 if #defs <= 1 then

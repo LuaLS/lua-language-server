@@ -1419,7 +1419,7 @@ null
 
 # type.castNumberToInteger
 
-Allowed to assign the `number` type to the `integer` type.
+允許將 `number` 類型賦值給 `integer` 類型。
 
 ## type
 
@@ -1435,9 +1435,9 @@ false
 
 # type.weakUnionCheck
 
-Once one subtype of a union type meets the condition, the union type also meets the condition.
+同位類型中只要有一個子類型滿足條件，則同位類型也滿足條件。
 
-When this setting is `false`, the `number|boolean` type cannot be assigned to the `number` type. It can be with `true`.
+此設定為 `false` 時，`number|boolean` 類型無法賦給 `number` 類型；為 `true` 時則可以。
 
 
 ## type

@@ -85,7 +85,7 @@ DIAG_COUNT_DOWN_LOOP    =
 DIAG_UNKNOWN            =
 '無法推測出類型。'
 DIAG_DEPRECATED         =
-'已廢棄。'
+'已棄用。'
 DIAG_DIFFERENT_REQUIRES =
 '使用了不同的名字 `require` 了同一個檔案。'
 DIAG_REDUNDANT_RETURN   =
@@ -102,8 +102,8 @@ DIAG_CIRCLE_DOC_CLASS                 =
 '循環繼承的類別。'
 DIAG_DOC_FIELD_NO_CLASS               =
 '欄位必須定義在類別之後。'
-DIAG_DUPLICATE_DOC_ALIAS              = -- TODO: need translate!
-'Duplicate defined alias `{}`.'
+DIAG_DUPLICATE_DOC_ALIAS              =
+'重複定義的別名 `{}`.'
 DIAG_DUPLICATE_DOC_FIELD              =
 '重複定義的欄位 `{}`。'
 DIAG_DUPLICATE_DOC_PARAM              =
@@ -128,18 +128,18 @@ DIAG_UNKNOWN_CAST_VARIABLE            =
 '未知的類型轉換變數 `{}`.'
 DIAG_CAST_TYPE_MISMATCH               =
 '不能將 `{ref}` 轉換為 `{def}`。'
-DIAG_MISSING_RETURN_VALUE             = -- TODO: need translate!
-'At least {min} return values are required, but here only {rmax} values are returned.'
-DIAG_MISSING_RETURN_VALUE_RANGE       = -- TODO: need translate!
-'At least {min} return values are required, but here only {rmin} to {rmax} values are returned.'
-DIAG_REDUNDANT_RETURN_VALUE           = -- TODO: need translate!
-'At most {max} values returned, but the {rmax}th value was returned here.'
-DIAG_REDUNDANT_RETURN_VALUE_RANGE     = -- TODO: need translate!
-'At most {max} values returned, but {rmin}th to {rmax}th values were returned here.'
-DIAG_MISSING_RETURN                   = -- TODO: need translate!
-'Return value is required here.'
-DIAG_RETURN_TYPE_MISMATCH             = -- TODO: need translate!
-'The type of the {index} return value is `{def}`, but the actual return is `{ref}`.'
+DIAG_MISSING_RETURN_VALUE             =
+'至少需要 {min} 個回傳值，但此處只回傳 {rmax} 個值。'
+DIAG_MISSING_RETURN_VALUE_RANGE       =
+'至少需要 {min} 個回傳值，但此處只回傳 {rmin} 到 {rmax} 個值。'
+DIAG_REDUNDANT_RETURN_VALUE           =
+'最多只有 {max} 個回傳值，但此處回傳了第 {rmax} 個值。'
+DIAG_REDUNDANT_RETURN_VALUE_RANGE     =
+'最多只有 {max} 個回傳值，但此處回傳了第 {rmin} 到第 {rmax} 個值。'
+DIAG_MISSING_RETURN                   =
+'此處需要回傳值。'
+DIAG_RETURN_TYPE_MISMATCH             =
+'第 {index} 個回傳值的類型為 `{def}` ，但實際回傳的是 `{ref}`。'
 
 MWS_NOT_SUPPORT         =
 '{} 目前還不支援多工作目錄，我可能需要重新啟動才能支援新的工作目錄...'
@@ -957,7 +957,7 @@ local module = require('string.utils')
 ]=]
 LUADOC_DESC_ASYNC =
 [=[
-將函式標記為非同步
+將函式標記為非同步。
 
 ## 語法
 `---@async`
@@ -976,15 +976,15 @@ LUADOC_DESC_NODISCARD =
 ---
 [檢視文件](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#nodiscard)
 ]=]
-LUADOC_DESC_CAST = -- TODO: need translate!
+LUADOC_DESC_CAST =
 [=[
-Allows type casting (type conversion).
+允許轉型（類型轉換）。
 
-## Syntax
+## 語法
 `@cast <variable> <[+|-]type>[, <[+|-]type>]...`
 
-## Usage
-### Overwrite type
+## 用法
+### 覆蓋類型
 ```
 ---@type integer
 local x --> integer
@@ -992,7 +992,7 @@ local x --> integer
 ---@cast x string
 print(x) --> string
 ```
-### Add Type
+### 增加類型
 ```
 ---@type string
 local x --> string
@@ -1000,7 +1000,7 @@ local x --> string
 ---@cast x +boolean, +number
 print(x) --> string|boolean|number
 ```
-### Remove Type
+### 移除類型
 ```
 ---@type string|table
 local x --> string|table
@@ -1009,5 +1009,5 @@ local x --> string|table
 print(x) --> table
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#cast)
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#cast)
 ]=]

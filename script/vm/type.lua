@@ -125,6 +125,10 @@ function vm.isSubType(uri, child, parent, mark)
         return true
     end
 
+    if parentName == 'number' and childName == 'integer' then
+        return true
+    end
+
     if parentName == 'integer' and childName == 'number' then
         if config.get(uri, 'Lua.type.castNumberToInteger') then
             return true

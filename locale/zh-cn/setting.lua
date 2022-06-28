@@ -235,6 +235,14 @@ config.hint.arrayIndex.Disable           =
 '禁用数组索引提示。'
 config.hint.await                        =
 '如果调用的函数被标记为了 `---@async` ，则在调用处提示 `await` 。'
+config.hint.semicolon                    =
+'若语句尾部没有分号，则显示虚拟分号。'
+config.hint.semicolon.All                =
+'所有语句都显示虚拟分号。'
+config.hint.semicolon.SameLine            =
+'2个语句在同一行时，在它们之间显示分号。'
+config.hint.semicolon.Disable            =
+'禁用虚拟分号。'
 config.format.enable                     =
 '启用代码格式化程序。'
 config.format.defaultConfig              =

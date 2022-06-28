@@ -128,6 +128,18 @@ DIAG_UNKNOWN_CAST_VARIABLE            =
 '未知的類型轉換變數 `{}`.'
 DIAG_CAST_TYPE_MISMATCH               =
 '不能將 `{ref}` 轉換為 `{def}`。'
+DIAG_MISSING_RETURN_VALUE             = -- TODO: need translate!
+'At least {min} return values are required, but here only {rmax} values are returned.'
+DIAG_MISSING_RETURN_VALUE_RANGE       = -- TODO: need translate!
+'At least {min} return values are required, but here only {rmin} to {rmax} values are returned.'
+DIAG_REDUNDANT_RETURN_VALUE           = -- TODO: need translate!
+'At most {max} values returned, but the {rmax}th value was returned here.'
+DIAG_REDUNDANT_RETURN_VALUE_RANGE     = -- TODO: need translate!
+'At most {max} values returned, but {rmin}th to {rmax}th values were returned here.'
+DIAG_MISSING_RETURN                   = -- TODO: need translate!
+'Return value is required here.'
+DIAG_RETURN_TYPE_MISMATCH             = -- TODO: need translate!
+'The type of the {index} return value is `{def}`, but the actual return is `{ref}`.'
 
 MWS_NOT_SUPPORT         =
 '{} 目前還不支援多工作目錄，我可能需要重新啟動才能支援新的工作目錄...'

@@ -128,6 +128,18 @@ DIAG_UNKNOWN_CAST_VARIABLE            = -- TODO: need translate!
 'Unknown type conversion variable `{}`.'
 DIAG_CAST_TYPE_MISMATCH               = -- TODO: need translate!
 'Cannot convert `{ref}` to `{def}`。'
+DIAG_MISSING_RETURN_VALUE             = -- TODO: need translate!
+'At least {min} return values are required, but here only {rmax} values are returned.'
+DIAG_MISSING_RETURN_VALUE_RANGE       = -- TODO: need translate!
+'At least {min} return values are required, but here only {rmin} to {rmax} values are returned.'
+DIAG_REDUNDANT_RETURN_VALUE           = -- TODO: need translate!
+'At most {max} values returned, but the {rmax}th value was returned here.'
+DIAG_REDUNDANT_RETURN_VALUE_RANGE     = -- TODO: need translate!
+'At most {max} values returned, but {rmin}th to {rmax}th values were returned here.'
+DIAG_MISSING_RETURN                   = -- TODO: need translate!
+'Return value is required here.'
+DIAG_RETURN_TYPE_MISMATCH             = -- TODO: need translate!
+'The type of the {index} return value is `{def}`, but the actual return is `{ref}`.'
 
 MWS_NOT_SUPPORT         =
 '{} não é suportado múltiplos espaços de trabalho por enquanto, posso precisar reiniciar para estabelecer um novo espaço de trabalho ...'

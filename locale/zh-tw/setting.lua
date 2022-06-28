@@ -235,6 +235,14 @@ config.hint.arrayIndex.Disable           =
 '停用陣列索引提示。'
 config.hint.await                        =
 '如果呼叫的函數被標記為了 `---@async`，則在呼叫處提示 `await`。'
+config.hint.semicolon                    = -- TODO: need translate!
+'If there is no semicolon at the end of the statement, display a virtual semicolon.'
+config.hint.semicolon.All                = -- TODO: need translate!
+'All statements display virtual semicolons.'
+config.hint.semicolon.SameLine            = -- TODO: need translate!
+'When two statements are on the same line, display a semicolon between them.'
+config.hint.semicolon.Disable            = -- TODO: need translate!
+'Disable virtual semicolons.'
 config.format.enable                     =
 '啟用程式碼格式化程式。'
 config.format.defaultConfig              =

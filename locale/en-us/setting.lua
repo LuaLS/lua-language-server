@@ -236,6 +236,14 @@ config.hint.arrayIndex.Disable           =
 'Disable hints of array index.'
 config.hint.await                        =
 'If the called function is marked `---@async`, prompt `await` at the call.'
+config.hint.semicolon                    =
+'If there is no semicolon at the end of the statement, display a virtual semicolon.'
+config.hint.semicolon.All                =
+'All statements display virtual semicolons.'
+config.hint.semicolon.SameLine            =
+'When two statements are on the same line, display a semicolon between them.'
+config.hint.semicolon.Disable            =
+'Disable virtual semicolons.'
 config.format.enable                     =
 'Enable code formatter.'
 config.format.defaultConfig              =

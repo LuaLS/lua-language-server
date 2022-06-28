@@ -127,7 +127,19 @@ DIAG_PARAM_TYPE_MISMATCH              =
 DIAG_UNKNOWN_CAST_VARIABLE            =
 'Unknown type conversion variable `{}`.'
 DIAG_CAST_TYPE_MISMATCH               =
-'Cannot convert `{ref}` to `{def}`。'
+'Cannot convert `{def}` to `{ref}`。'
+DIAG_MISSING_RETURN_VALUE             =
+'At least {min} return values are required, but here only {rmax} values are returned.'
+DIAG_MISSING_RETURN_VALUE_RANGE       =
+'At least {min} return values are required, but here only {rmin} to {rmax} values are returned.'
+DIAG_REDUNDANT_RETURN_VALUE           =
+'At most {max} values returned, but the {rmax}th value was returned here.'
+DIAG_REDUNDANT_RETURN_VALUE_RANGE     =
+'At most {max} values returned, but {rmin}th to {rmax}th values were returned here.'
+DIAG_MISSING_RETURN                   =
+'Return value is required here.'
+DIAG_RETURN_TYPE_MISMATCH             =
+'The type of the {index} return value is `{def}`, but the actual return is `{ref}`.'
 
 MWS_NOT_SUPPORT         =
 '{} does not support multi workspace for now, I may need to restart to support the new workspace ...'

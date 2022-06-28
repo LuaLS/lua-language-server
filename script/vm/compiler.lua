@@ -1008,6 +1008,17 @@ local function compileLocal(source)
             vm.setNode(source, vm.compileNode(source.value))
         end
     end
+    if not hasMarkValue and not hasMarkValue then
+        if source.ref then
+            for _, ref in ipairs(source.ref) do
+                if  ref.type == 'setlocal'
+                and ref.value
+                and ref.value.type == 'function' then
+                    vm.setNode(source, vm.compileNode(ref.value))
+                end
+            end
+        end
+    end
     -- function x.y(self, ...) --> function x:y(...)
     if  source[1] == 'self'
     and not hasMarkDoc

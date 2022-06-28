@@ -3167,3 +3167,11 @@ TEST 'number' [[
 local function f() end
 local x, y, <?z?> = 1, 2, f()
 ]]
+
+TEST 'function' [[
+local f
+
+print(<?f?>)
+
+function f() end
+]]

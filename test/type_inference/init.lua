@@ -3184,3 +3184,19 @@ local t = {
     x = n and <?n?>,
 }
 ]]
+
+TEST 'table' [[
+---@type table?
+local n
+
+if not n or not <?n?>.x then
+end
+]]
+
+TEST 'table' [[
+---@type table?
+local n
+
+if not n or not <?n?>[1] then
+end
+]]

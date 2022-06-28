@@ -22,6 +22,9 @@ return function (uri, callback)
                 local param = f.args and f.args[i]
                 if param then
                     defNode:merge(vm.compileNode(param))
+                    if param[1] == '...' then
+                        defNode:addOptional()
+                    end
                 end
             end
         end

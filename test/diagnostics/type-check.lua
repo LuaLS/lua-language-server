@@ -580,5 +580,13 @@ function F()
 end
 ]]
 
+TEST [[
+---@param ... number
+local function f(...)
+end
+
+f(nil)
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

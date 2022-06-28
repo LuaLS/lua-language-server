@@ -209,7 +209,7 @@ function mt:_lookInto(action, topNode, outNode)
             local topNode1, outNode1 = self:_lookInto(action[1], topNode, outNode)
             local topNode2, outNode2 = self:_lookInto(action[2], outNode1, outNode1:copy())
             topNode = vm.createNode(topNode1, topNode2)
-            outNode = outNode2
+            outNode = outNode2:copy()
         elseif action.op.type == '=='
         or     action.op.type == '~=' then
             local exp, checker

@@ -51,7 +51,7 @@ function vm.testCondition(source)
 end
 
 ---@param v vm.node.object
----@return string?
+---@return string|false
 local function getUnique(v)
     if v.type == 'boolean' then
         if v[1] == nil then
@@ -79,7 +79,7 @@ local function getUnique(v)
         ---@cast v parser.object
         return ('func:%s@%d'):format(guide.getUri(v), v.start)
     end
-    return nil
+    return false
 end
 
 ---@param a parser.object?

@@ -117,20 +117,20 @@ end
 ---@return vm.node outNode
 function mt:_lookInto(action, topNode, outNode)
     if not action then
-        return topNode, outNode
+        return topNode, outNode or topNode
     end
     if self._mark[action] then
-        return topNode, outNode
+        return topNode, outNode or topNode
     end
     self._mark[action] = true
     local top = self._objs[self._index]
     if not top then
-        return topNode, outNode
+        return topNode, outNode or topNode
     end
     if  not guide.isInRange(action, top.finish)
     -- trick for `local tp = type(x);if tp == 'string' then`
     and action.type ~= 'binary' then
-        return topNode, outNode
+        return topNode, outNode or topNode
     end
     local set
     local value = vm.getObjectValue(action)
@@ -151,7 +151,9 @@ function mt:_lookInto(action, topNode, outNode)
             self:_fastWard(action.filter.finish, blockNode)
         end
         blockNode = self:_launchBlock(action, blockNode:copy())
-        topNode = mainNode:merge(blockNode)
+        if mainNode then
+            topNode = mainNode:merge(blockNode)
+        end
     elseif action.type == 'if' then
         local hasElse
         local mainNode = topNode:copy()
@@ -314,7 +316,7 @@ function mt:_lookInto(action, topNode, outNode)
     if set then
         topNode = self:_fastWard(set.range or set.finish, topNode)
     end
-    return topNode, outNode
+    return topNode, outNode or topNode
 end
 
 ---@param block parser.object
@@ -356,7 +358,10 @@ function vm.launchRunner(loc, callback)
     if #self._objs == 0 then
         return
     end
-
-    local topNode = self:_launchBlock(guide.getParentBlock(loc), vm.getNode(loc):copy())
+    local main = guide.getParentBlock(loc)
+    if not main then
+        return
+    end
+    local topNode = self:_launchBlock(main, vm.getNode(loc):copy())
     self:_fastWard(math.maxinteger, topNode)
 end

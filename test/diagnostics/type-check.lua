@@ -588,5 +588,16 @@ end
 f(nil)
 ]]
 
+TEST [[
+---@return number
+function F()
+    local n = 0
+    if true then
+        n = 1
+    end
+    return n
+end
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

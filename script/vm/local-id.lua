@@ -147,7 +147,7 @@ function compileLocalID(source)
 end
 
 ---@param source parser.object
----@return string?
+---@return string|false
 function vm.getLocalID(source)
     if source._localID ~= nil then
         return source._localID
@@ -205,7 +205,7 @@ end
 
 ---@param source parser.object
 ---@param includeGets boolean
----@return parser.object[]
+---@return parser.object[]?
 function vm.getLocalFields(source, includeGets)
     local id = vm.getLocalID(source)
     if not id then

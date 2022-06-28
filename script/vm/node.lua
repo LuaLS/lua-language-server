@@ -62,7 +62,7 @@ function mt:clear()
 end
 
 ---@param n integer
----@return vm.object?
+---@return vm.node.object?
 function mt:get(n)
     return self[n]
 end
@@ -284,7 +284,8 @@ function mt:removeNode(node)
             self:remove(c.name)
         elseif c.type == 'nil' then
             self:remove 'nil'
-        elseif c.type == 'boolean' then
+        elseif c.type == 'boolean'
+        or     c.type == 'doc.type.boolean' then
             if c[1] == true then
                 self:remove 'true'
             else

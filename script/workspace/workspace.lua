@@ -154,7 +154,7 @@ function m.getNativeMatcher(scp)
     end
 
     local matcher = glob.gitignore(pattern, {
-        root       = furi.decode(scp.uri),
+        root       = scp.uri and furi.decode(scp.uri),
         ignoreCase = platform.OS == 'Windows',
     }, globInteferFace)
 

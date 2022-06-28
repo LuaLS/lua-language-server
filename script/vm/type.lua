@@ -7,6 +7,7 @@ local config    = require 'config.config'
 ---@return string?
 local function getNodeName(object)
     if object.type == 'global' and object.cate == 'type' then
+        ---@cast object vm.global
         return object.name
     end
     if object.type == 'nil'

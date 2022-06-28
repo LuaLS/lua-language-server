@@ -30,7 +30,7 @@ return function (uri, callback)
                                 callback {
                                     start   = cast.extends.start,
                                     finish  = cast.extends.finish,
-                                    message = lang.script('DIAG_UNKNOWN_CAST_VARIABLE', {
+                                    message = lang.script('DIAG_CAST_TYPE_MISMATCH', {
                                         def = vm.getInfer(defNode):view(uri),
                                         ref = vm.getInfer(refNode):view(uri),
                                     })

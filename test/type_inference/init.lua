@@ -3200,3 +3200,12 @@ local n
 if not n or not <?n?>[1] then
 end
 ]]
+
+TEST 'number' [[
+---@type number|false
+local n
+
+---@cast n -false
+
+print(<?n?>)
+]]

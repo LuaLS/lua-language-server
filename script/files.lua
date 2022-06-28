@@ -136,6 +136,7 @@ function m.isLibrary(uri, excludeFolder)
 end
 
 --- 获取库文件的根目录
+---@return uri?
 function m.getLibraryUri(suri, uri)
     local scp = scope.getScope(suri)
     return scp:getLinkedUri(uri)

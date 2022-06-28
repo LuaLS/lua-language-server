@@ -18,7 +18,7 @@ end
 
 ---@param func parser.object
 ---@return integer min
----@return integer max
+---@return number  max
 function vm.countParamsOfFunction(func)
     local min = 0
     local max = 0
@@ -60,7 +60,7 @@ end
 
 ---@param node vm.node
 ---@return integer min
----@return integer max
+---@return number  max
 function vm.countParamsOfNode(node)
     local min, max
     for n in node:eachObject() do
@@ -82,15 +82,21 @@ end
 ---@param func parser.object
 ---@param mark? table
 ---@return integer min
----@return integer max
+---@return number  max
 function vm.countReturnsOfFunction(func, mark)
     if func.type == 'function' then
-        local min, max
+        ---@type integer?
+        local min
+        ---@type number?
+        local max
         local hasDocReturn
         if func.bindDocs then
             local lastReturn
             local n = 0
-            local dmin, dmax
+            ---@type integer?
+            local dmin
+            ---@type number?
+            local dmax
             for _, doc in ipairs(func.bindDocs) do
                 if doc.type == 'doc.return' then
                     hasDocReturn = true
@@ -139,10 +145,12 @@ end
 ---@param func parser.object
 ---@param mark? table
 ---@return integer min
----@return integer max
+---@return number  max
 function vm.countReturnsOfCall(func, args, mark)
     local funcs = vm.getMatchedFunctions(func, args)
+    ---@type integer?
     local min
+    ---@type number?
     local max
     for _, f in ipairs(funcs) do
         local rmin, rmax = vm.countReturnsOfFunction(f, mark)
@@ -159,7 +167,7 @@ end
 ---@param list parser.object[]?
 ---@param mark? table
 ---@return integer min
----@return integer max
+---@return number  max
 function vm.countList(list, mark)
     if not list then
         return 0, 0

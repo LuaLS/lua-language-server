@@ -127,7 +127,7 @@ DIAG_PARAM_TYPE_MISMATCH              =
 DIAG_UNKNOWN_CAST_VARIABLE            =
 '未知的类型转换变量 `{}`。'
 DIAG_CAST_TYPE_MISMATCH               =
-'不能将 `{ref}` 转换为 `{def}`。'
+'不能将 `{def}` 转换为 `{ref}`。'
 DIAG_MISSING_RETURN_VALUE             =
 '至少需要 {min} 个返回值，但此处只返回 {rmax} 个值。'
 DIAG_MISSING_RETURN_VALUE_RANGE       =

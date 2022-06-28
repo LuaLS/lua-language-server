@@ -400,7 +400,7 @@ end
 ---@field _sign vm.sign|false
 
 ---@param source parser.object
----@return vm.sign?
+---@return vm.sign|false
 local function getObjectSign(source)
     if source._sign ~= nil then
         return source._sign
@@ -1542,7 +1542,7 @@ local compilerSwitch = util.switch()
                                 end)
                             end
                             if hasGeneric then
-                                ---@cast sign -?
+                                ---@cast sign -false
                                 vm.setNode(source, vm.createGeneric(rtn, sign))
                             else
                                 vm.setNode(source, vm.compileNode(rtn))
@@ -1955,7 +1955,9 @@ function vm.compileNode(source)
 
     if source.type == 'generic' then
         vm.setNode(source, source)
-        return vm.getNode(source)
+        local node = vm.getNode(source)
+        ---@cast node -?
+        return node
     end
 
     ---@cast source parser.object
@@ -1965,6 +1967,6 @@ function vm.compileNode(source)
     matchCall(source)
 
     local node = vm.getNode(source)
-
+    ---@cast node -?
     return node
 end

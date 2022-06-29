@@ -7,7 +7,7 @@ local pformatting = require 'provider.formatting'
 
 ---@async
 return function(uri, callback)
-    local text = files.getText(uri)
+    local text = files.getOriginText(uri)
     if not text then
         return
     end

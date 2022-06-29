@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.4.0
+`2022-6-29`
 * `NEW` diagnostics:
   * `cast-local-type`
   * `assign-type-mismatch`

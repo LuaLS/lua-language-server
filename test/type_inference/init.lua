@@ -3234,3 +3234,19 @@ local <?x?> = f()
 TEST 'number' [=[
 local <?x?> = X --[[@as number]]
 ]=]
+
+TEST 'number' [[
+---@return number?, number?
+local function f() end
+
+for <?x?>, y in f do
+end
+]]
+
+TEST 'number' [[
+---@return number?, number?
+local function f() end
+
+for x, <?y?> in f do
+end
+]]

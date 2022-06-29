@@ -911,12 +911,8 @@ local function compileForVars(source)
     if source.keys then
         for i, loc in ipairs(source.keys) do
             local node = getReturn(source._iterator, i, source._iterArgs)
-            if node then
-                if i == 1 then
-                    node:removeOptional()
-                end
-                source._iterVars[loc] = node
-            end
+            node:removeOptional()
+            source._iterVars[loc] = node
         end
     end
 end

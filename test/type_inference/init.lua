@@ -3219,14 +3219,14 @@ end
 local <?x?> = n or 0
 ]]
 
---TEST 'number' [=[
---local <?x?> = F()--[[@as number]]
---]=]
---
---TEST 'number' [=[
---local function f()
---    return F()--[[@as number]]
---end
---
---local <?x?> = f()
---]=]
+TEST 'number' [=[
+local <?x?> = F()--[[@as number]]
+]=]
+
+TEST 'number' [=[
+local function f()
+    return F()--[[@as number]]
+end
+
+local <?x?> = f()
+]=]

@@ -11,6 +11,7 @@ local vm         = require 'vm.vm'
 ---@field _node           vm.node
 ---@field _globalBase     table
 ---@field cindex          integer
+---@field func            parser.object
 
 -- 该函数有副作用，会给source绑定node！
 local function bindDocs(source)
@@ -557,11 +558,15 @@ local function getReturn(func, index, args)
         func._callReturns = {}
     end
     if not func._callReturns[index] then
+        local call = func.parent
         func._callReturns[index] = {
             type   = 'call.return',
-            parent = func,
+            parent = call,
+            func   = func,
             cindex = index,
             args   = args,
+            start  = call.start,
+            finish = call.finish,
         }
     end
     return vm.compileNode(func._callReturns[index])
@@ -1531,7 +1536,10 @@ local compilerSwitch = util.switch()
     : case 'call.return'
     ---@param source parser.object
     : call(function (source)
-        local func  = source.parent
+        if bindAs(source) then
+            return
+        end
+        local func  = source.func
         local args  = source.args
         local index = source.cindex
         if func.special == 'setmetatable' then

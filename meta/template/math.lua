@@ -63,6 +63,7 @@ function math.ceil(x) end
 
 ---#DES 'math.cos'
 ---@param x number
+---@return number
 ---@nodiscard
 function math.cos(x) end
 

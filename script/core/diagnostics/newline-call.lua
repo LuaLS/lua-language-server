@@ -1,7 +1,9 @@
 local files = require 'files'
 local guide = require 'parser.guide'
 local lang  = require 'language'
+local await = require 'await'
 
+---@async
 return function (uri, callback)
     local state = files.getState(uri)
     local text  = files.getText(uri)
@@ -9,6 +11,7 @@ return function (uri, callback)
         return
     end
 
+    ---@async
     guide.eachSourceType(state.ast, 'call', function (source)
         local node = source.node
         local args = source.args
@@ -20,6 +23,9 @@ return function (uri, callback)
         if not source.next then
             return
         end
+
+        await.delay()
+
         local startOffset  = guide.positionToOffset(state, args.start) + 1
         local finishOffset = guide.positionToOffset(state, args.finish)
         if text:sub(startOffset,  startOffset)  ~= '('

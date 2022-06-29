@@ -63,11 +63,11 @@ return function (uri, callback)
         if not source.returns then
             return
         end
+        await.delay()
         local docReturns = getDocReturns(source)
         if not docReturns then
             return
         end
-        await.delay()
         for _, ret in ipairs(source.returns) do
             checkReturn(docReturns, ret)
             await.delay()

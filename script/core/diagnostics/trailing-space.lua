@@ -1,7 +1,9 @@
 local files = require 'files'
 local lang  = require 'language'
 local guide = require 'parser.guide'
+local await = require 'await'
 
+---@async
 return function (uri, callback)
     local state = files.getState(uri)
     local text  = files.getText(uri)
@@ -10,6 +12,7 @@ return function (uri, callback)
     end
     local lines = state.lines
     for i = 0, #lines do
+        await.delay()
         local startOffset  = lines[i]
         local finishOffset = text:find('[\r\n]', startOffset) or (#text + 1)
         local lastOffset   = finishOffset - 1

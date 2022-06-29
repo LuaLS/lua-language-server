@@ -14,7 +14,7 @@ local type         = type
 ---@field locals                parser.object[]
 ---@field returns?              parser.object[]
 ---@field exps                  parser.object[]
----@field keys                  parser.object[]
+---@field keys                  parser.object
 ---@field uri                   uri
 ---@field start                 integer
 ---@field finish                integer

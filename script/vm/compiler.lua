@@ -14,10 +14,15 @@ local vm         = require 'vm.vm'
 ---@field func            parser.object
 
 -- 该函数有副作用，会给source绑定node！
+---@param source parser.object
+---@return boolean
 local function bindDocs(source)
+    local docs = source.bindDocs
+    if not docs then
+        return false
+    end
     local isParam = source.parent.type == 'funcargs'
                  or (source.parent.type == 'in' and source.finish <= source.parent.keys.finish)
-    local docs = source.bindDocs
     for i = #docs, 1, -1 do
         local doc = docs[i]
         if doc.type == 'doc.type' then
@@ -47,6 +52,9 @@ local function bindDocs(source)
         end
         if doc.type == 'doc.module' then
             local name = doc.module
+            if not name then
+                return true
+            end
             local uri = rpath.findUrisByRequirePath(guide.getUri(source), name)[1]
             if not uri then
                 return true
@@ -1380,9 +1388,18 @@ local compilerSwitch = util.switch()
         else
             ---@cast key string
             vm.compileByParentNode(source.node, key, false, function (src)
-                vm.setNode(source, vm.compileNode(src))
                 if src.value then
-                    vm.setNode(source, vm.compileNode(src.value))
+                    if bindDocs(src) then
+                        vm.setNode(source, vm.compileNode(src))
+                    else
+                        vm.setNode(source, vm.compileNode(src.value))
+                        local node = vm.getNode(src)
+                        if node then
+                            vm.setNode(source, node)
+                        end
+                    end
+                else
+                    vm.setNode(source, vm.compileNode(src))
                 end
             end)
         end

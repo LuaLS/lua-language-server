@@ -143,6 +143,7 @@ Symbol              <-  ({} {
 ---@field originalComment parser.object
 ---@field as? parser.object
 ---@field touch? integer
+---@field module? string
 
 local function trim(str)
     return str:match '^%s*(%S+)%s*$'

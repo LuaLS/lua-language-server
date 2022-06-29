@@ -599,5 +599,15 @@ function F()
 end
 ]]
 
+TEST [[
+---@class X
+
+---@class A
+local mt = G
+
+---@type X
+mt._x = nil
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

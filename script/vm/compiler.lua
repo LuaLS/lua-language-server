@@ -10,6 +10,7 @@ local vm         = require 'vm.vm'
 ---@field _compiledNodes  boolean
 ---@field _node           vm.node
 ---@field _globalBase     table
+---@field cindex          integer
 
 -- 该函数有副作用，会给source绑定node！
 local function bindDocs(source)
@@ -550,89 +551,20 @@ local function matchCall(source)
     end
 end
 
----@return vm.node?
+---@return vm.node
 local function getReturn(func, index, args)
-    if func.special == 'setmetatable' then
-        if not args then
-            return nil
-        end
-        return getReturnOfSetMetaTable(args)
+    if not func._callReturns then
+        func._callReturns = {}
     end
-    if func.special == 'pcall' and index > 1 then
-        if not args then
-            return nil
-        end
-        local newArgs = {}
-        for i = 2, #args do
-            newArgs[#newArgs+1] = args[i]
-        end
-        return getReturn(args[1], index - 1, newArgs)
+    if not func._callReturns[index] then
+        func._callReturns[index] = {
+            type   = 'call.return',
+            parent = func,
+            cindex = index,
+            args   = args,
+        }
     end
-    if func.special == 'xpcall' and index > 1 then
-        if not args then
-            return nil
-        end
-        local newArgs = {}
-        for i = 3, #args do
-            newArgs[#newArgs+1] = args[i]
-        end
-        return getReturn(args[1], index - 1, newArgs)
-    end
-    if func.special == 'require' then
-        if not args then
-            return nil
-        end
-        local nameArg = args[1]
-        if not nameArg or nameArg.type ~= 'string' then
-            return nil
-        end
-        local name = nameArg[1]
-        if not name or type(name) ~= 'string' then
-            return nil
-        end
-        local uri = rpath.findUrisByRequirePath(guide.getUri(func), name)[1]
-        if not uri then
-            return nil
-        end
-        local state = files.getState(uri)
-        local ast   = state and state.ast
-        if not ast then
-            return nil
-        end
-        return vm.compileNode(ast)
-    end
-    local funcNode = vm.compileNode(func)
-    ---@type vm.node?
-    local result
-    for mfunc in funcNode:eachObject() do
-        if mfunc.type == 'function'
-        or mfunc.type == 'doc.type.function' then
-            ---@cast mfunc parser.object
-            local returnObject = vm.getReturnOfFunction(mfunc, index)
-            if returnObject then
-                local returnNode = vm.compileNode(returnObject)
-                for rnode in returnNode:eachObject() do
-                    if rnode.type == 'generic' then
-                        returnNode = rnode:resolve(guide.getUri(func), args)
-                        break
-                    end
-                end
-                if returnNode then
-                    for rnode in returnNode:eachObject() do
-                        -- TODO: narrow type
-                        if rnode.type ~= 'doc.generic.name' then
-                            result = result or vm.createNode()
-                            result:merge(rnode)
-                        end
-                    end
-                    if result and returnNode:isOptional() then
-                        result:addOptional()
-                    end
-                end
-            end
-        end
-    end
-    return result
+    return vm.compileNode(func._callReturns[index])
 end
 
 ---@param source parser.object
@@ -765,13 +697,13 @@ function vm.selectNode(list, index)
     local result
     if exp.type == 'call' then
         result = getReturn(exp.node, index, exp.args)
-        if not result then
-            return vm.createNode(vm.declareGlobal('type', 'unknown')), exp
+        if result:isEmpty() then
+            result:merge(vm.declareGlobal('type', 'unknown'))
         end
     else
         ---@type vm.node
         result = vm.compileNode(exp)
-        if result and exp.type == 'varargs' and result:isEmpty() then
+        if exp.type == 'varargs' and result:isEmpty() then
             result:merge(vm.declareGlobal('type', 'unknown'))
         end
     end
@@ -1594,6 +1526,101 @@ local compilerSwitch = util.switch()
         end
         if not hasMarkDoc and not hasReturn then
             vm.setNode(source, vm.declareGlobal('type', 'nil'))
+        end
+    end)
+    : case 'call.return'
+    ---@param source parser.object
+    : call(function (source)
+        local func  = source.parent
+        local args  = source.args
+        local index = source.cindex
+        if func.special == 'setmetatable' then
+            if not args then
+                return
+            end
+            vm.setNode(source, getReturnOfSetMetaTable(args))
+            return
+        end
+        if func.special == 'pcall' and index > 1 then
+            if not args then
+                return
+            end
+            local newArgs = {}
+            for i = 2, #args do
+                newArgs[#newArgs+1] = args[i]
+            end
+            local node = getReturn(args[1], index - 1, newArgs)
+            if node then
+                vm.setNode(source, node)
+            end
+            return
+        end
+        if func.special == 'xpcall' and index > 1 then
+            if not args then
+                return
+            end
+            local newArgs = {}
+            for i = 3, #args do
+                newArgs[#newArgs+1] = args[i]
+            end
+            local node = getReturn(args[1], index - 1, newArgs)
+            if node then
+                vm.setNode(source, node)
+            end
+            return
+        end
+        if func.special == 'require' then
+            if not args then
+                return
+            end
+            local nameArg = args[1]
+            if not nameArg or nameArg.type ~= 'string' then
+                return
+            end
+            local name = nameArg[1]
+            if not name or type(name) ~= 'string' then
+                return
+            end
+            local uri = rpath.findUrisByRequirePath(guide.getUri(func), name)[1]
+            if not uri then
+                return
+            end
+            local state = files.getState(uri)
+            local ast   = state and state.ast
+            if not ast then
+                return
+            end
+            vm.setNode(source, vm.compileNode(ast))
+            return
+        end
+        local funcNode = vm.compileNode(func)
+        ---@type vm.node?
+        for mfunc in funcNode:eachObject() do
+            if mfunc.type == 'function'
+            or mfunc.type == 'doc.type.function' then
+                ---@cast mfunc parser.object
+                local returnObject = vm.getReturnOfFunction(mfunc, index)
+                if returnObject then
+                    local returnNode = vm.compileNode(returnObject)
+                    for rnode in returnNode:eachObject() do
+                        if rnode.type == 'generic' then
+                            returnNode = rnode:resolve(guide.getUri(func), args)
+                            break
+                        end
+                    end
+                    if returnNode then
+                        for rnode in returnNode:eachObject() do
+                            -- TODO: narrow type
+                            if rnode.type ~= 'doc.generic.name' then
+                                vm.setNode(source, rnode)
+                            end
+                        end
+                        if returnNode:isOptional() then
+                            vm.getNode(source):addOptional()
+                        end
+                    end
+                end
+            end
         end
     end)
     : case 'main'

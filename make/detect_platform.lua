@@ -45,11 +45,18 @@ local function detectPosixArch()
     return f:read 'l':lower()
 end
 
+local ARCH <const> = {
+    x86_64 = 'x64',
+    i686 = 'ia32',
+    arm64 = 'arm64',
+}
+
 local function detectArch()
     if platform.OS == 'Windows' then
         return detectWindowsArch()
     end
-    return detectPosixArch()
+    local posixArch = detectPosixArch()
+    return ARCH[posixArch]
 end
 
 local function targetPlatformArch()

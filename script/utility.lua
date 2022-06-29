@@ -8,6 +8,7 @@ local ipairs       = ipairs
 local next         = next
 local rawset       = rawset
 local move         = table.move
+local tableRemove  = table.remove
 local setmetatable = debug.setmetatable
 local mathType     = math.type
 local mathCeil     = math.ceil
@@ -157,8 +158,10 @@ function m.dump(tbl, option)
             local tp = type(value)
             local format = option['format'] and option['format'][key]
             if format then
-                lines[#lines+1] = ('%s%s%s,'):format(TAB[deep+1], keyWord, format(value, unpack, deep+1, stack))
-            elseif tp == 'table' then
+                value = format(value, unpack, deep+1, stack)
+                tp    = type(value)
+            end
+            if tp == 'table' then
                 if mark[value] and mark[value] > 0 then
                     lines[#lines+1] = ('%s%s%s,'):format(TAB[deep+1], keyWord, option['loop'] or '"<Loop>"')
                 elseif deep >= (option['deep'] or mathHuge) then
@@ -649,9 +652,6 @@ function m.trim(str, mode)
 end
 
 function m.expandPath(path)
-    if type(path) ~= 'string' then
-        return nil
-    end
     if path:sub(1, 1) == '~' then
         local home = getenv('HOME')
         if not home then -- has to be Windows
@@ -791,8 +791,58 @@ function m.multiTable(count, default)
     return current
 end
 
+function m.getTableKeys(t, sorter)
+    local keys = {}
+    for k in pairs(t) do
+        keys[#keys+1] = k
+    end
+    if sorter == true then
+        tableSort(keys)
+    elseif sorter then
+        tableSort(keys, sorter)
+    end
+    return keys
+end
+
+function m.arrayHas(array, value)
+    for i = 1, #array do
+        if array[i] == value then
+            return true
+        end
+    end
+    return false
+end
+
+function m.arrayInsert(array, value)
+    if not m.arrayHas(array, value) then
+        array[#array+1] = value
+    end
+end
+
+function m.arrayRemove(array, value)
+    for i = 1, #array do
+        if array[i] == value then
+            tableRemove(array, i)
+            return
+        end
+    end
+end
+
 m.MODE_K  = { __mode = 'k' }
 m.MODE_V  = { __mode = 'v' }
 m.MODE_KV = { __mode = 'kv' }
+
+---@generic T: fun(param: any):any
+---@param func T
+---@return T
+function m.cacheReturn(func)
+    local cache = {}
+    return function (param)
+        if cache[param] == nil then
+            cache[param] = func(param)
+        end
+        return cache[param]
+    end
+end
 
 return m

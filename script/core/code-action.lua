@@ -5,11 +5,18 @@ local sp        = require 'bee.subprocess'
 local guide     = require "parser.guide"
 local converter = require 'proto.converter'
 
+---@param uri  uri
+---@param row  integer
+---@param mode string
+---@param code string
 local function checkDisableByLuaDocExits(uri, row, mode, code)
     if row < 0 then
         return nil
     end
     local state = files.getState(uri)
+    if not state then
+        return nil
+    end
     local lines = state.lines
     if state.ast.docs and lines then
         return guide.eachSourceBetween(
@@ -124,9 +131,12 @@ local function changeVersion(uri, version, results)
 end
 
 local function solveUndefinedGlobal(uri, diag, results)
-    local ast    = files.getState(uri)
-    local start  = converter.unpackRange(uri, diag.range)
-    guide.eachSourceContain(ast.ast, start, function (source)
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
+    local start = converter.unpackRange(uri, diag.range)
+    guide.eachSourceContain(state.ast, start, function (source)
         if source.type ~= 'getglobal' then
             return
         end
@@ -143,9 +153,12 @@ local function solveUndefinedGlobal(uri, diag, results)
 end
 
 local function solveLowercaseGlobal(uri, diag, results)
-    local ast    = files.getState(uri)
-    local start  = converter.unpackRange(uri, diag.range)
-    guide.eachSourceContain(ast.ast, start, function (source)
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
+    local start = converter.unpackRange(uri, diag.range)
+    guide.eachSourceContain(state.ast, start, function (source)
         if source.type ~= 'setglobal' then
             return
         end
@@ -156,8 +169,11 @@ local function solveLowercaseGlobal(uri, diag, results)
 end
 
 local function findSyntax(uri, diag)
-    local ast = files.getState(uri)
-    for _, err in ipairs(ast.errs) do
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
+    for _, err in ipairs(state.errs) do
         if err.type:lower():gsub('_', '-') == diag.code then
             local range = converter.packRange(uri, err.start, err.finish)
             if util.equal(range, diag.range) then
@@ -333,6 +349,8 @@ local function solveAwaitInSync(uri, diag, results)
     end
     local row = guide.rowColOf(parentFunction.start)
     local pos = guide.positionOf(row, 0)
+    local offset = guide.positionToOffset(state, pos + 1)
+    local space = state.lua:match('[ \t]*', offset)
     results[#results+1] = {
         title = lang.script.ACTION_MARK_ASYNC,
         kind = 'quickfix',
@@ -342,12 +360,57 @@ local function solveAwaitInSync(uri, diag, results)
                     {
                         start   = pos,
                         finish  = pos,
-                        newText = '---@async\n',
+                        newText = space .. '---@async\n',
                     }
                 }
             }
         },
     }
+end
+
+local function solveSpell(uri, diag, results)
+    local spell = require 'provider.spell'
+    local word = diag.data
+    if word == nil then
+        return
+    end
+
+    results[#results+1] = {
+        title   = lang.script('ACTION_ADD_DICT', word),
+        kind    = 'quickfix',
+        command = {
+            title     = lang.script.COMMAND_ADD_DICT,
+            command   = 'lua.setConfig',
+            arguments = {
+                {
+                    key    = 'Lua.spell.dict',
+                    action = 'add',
+                    value  = word,
+                    uri    = uri,
+                }
+            }
+        }
+    }
+
+    local suggests = spell.getSpellSuggest(word)
+    for _, suggest in ipairs(suggests) do
+        results[#results+1] = {
+            title = suggest,
+            kind = 'quickfix',
+            edit = {
+                changes = {
+                    [uri] = {
+                        {
+                            start   = converter.unpackPosition(uri, diag.range.start),
+                            finish  = converter.unpackPosition(uri, diag.range["end"]),
+                            newText = suggest
+                        }
+                    }
+                }
+            }
+        }
+    end
+
 end
 
 local function solveDiagnostic(uri, diag, start, results)
@@ -370,6 +433,8 @@ local function solveDiagnostic(uri, diag, start, results)
         solveTrailingSpace(uri, diag, results)
     elseif diag.code == 'await-in-sync' then
         solveAwaitInSync(uri, diag, results)
+    elseif diag.code == 'spell-check' then
+        solveSpell(uri, diag, results)
     end
     disableDiagnostic(uri, diag.code, start, results)
 end
@@ -386,7 +451,7 @@ end
 local function checkSwapParams(results, uri, start, finish)
     local state = files.getState(uri)
     local text  = files.getText(uri)
-    if not state then
+    if not state or not text then
         return
     end
     local args = {}
@@ -554,6 +619,9 @@ end
 local function checkJsonToLua(results, uri, start, finish)
     local text         = files.getText(uri)
     local state        = files.getState(uri)
+    if not state or not text then
+        return
+    end
     local startOffset  = guide.positionToOffset(state, start)
     local finishOffset = guide.positionToOffset(state, finish)
     local jsonStart    = text:match('()[%{%[]', startOffset + 1)

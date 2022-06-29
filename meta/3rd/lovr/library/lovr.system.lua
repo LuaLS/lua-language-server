@@ -37,4 +37,4 @@ function lovr.system.requestPermission(permission) end
 ---
 ---Requests microphone access.
 ---
----| '"audiocapture"'
+---| "audiocapture"

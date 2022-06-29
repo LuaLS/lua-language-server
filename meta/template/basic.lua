@@ -6,7 +6,7 @@ arg = {}
 
 ---#DES 'assert'
 ---@generic T
----@param v T
+---@param v? T
 ---@param message? any
 ---@return T
 function assert(v, message) end
@@ -209,17 +209,17 @@ function select(index, ...) end
 function setfenv(f, table) end
 
 ---#DES 'setmetatable'
----@param table     table
----@param metatable table
+---@param table      table
+---@param metatable? table
 ---@return table
 function setmetatable(table, metatable) end
 
 ---#DES 'tonumber'
----@param e     string|number
----@param base? integer
+---@overload fun(e: string, base: integer):integer
+---@param e any
 ---@return number?
 ---@nodiscard
-function tonumber(e, base) end
+function tonumber(e) end
 
 ---#DES 'tostring'
 ---@param v any
@@ -284,6 +284,6 @@ function xpcall(f, msgh, arg1, ...) end
 ---@param list T[]
 ---@param i?   integer
 ---@param j?   integer
----@return T
+---@return T   ...
 ---@nodiscard
 function unpack(list, i, j) end

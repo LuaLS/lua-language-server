@@ -13,7 +13,6 @@
 			"arg": [
 			],
 			"luaVersion": "5.4",
-			"consoleCoding": "utf8",
 			"sourceCoding": "utf8",
 			"console": "internalConsole",
 			"outputCapture": [
@@ -47,7 +46,6 @@
 			"arg": [
 			],
 			"luaVersion": "latest",
-			"consoleCoding": "utf8",
 			"sourceCoding": "utf8",
 			"outputCapture": [
 				"print",
@@ -67,7 +65,6 @@
 				"${workspaceRoot}",
 			],
 			"luaVersion": "5.4",
-			"consoleCoding": "utf8",
 			"sourceCoding": "utf8",
 			"outputCapture": [
 				"print",
@@ -85,7 +82,23 @@
 			"arg": [
 			],
 			"luaVersion": "latest",
-			"consoleCoding": "utf8",
+			"sourceCoding": "utf8",
+			"outputCapture": [
+				"print",
+				"stderr",
+			],
+		},
+		{
+			"name": "🀄build-doc",
+			"type": "lua",
+			"request": "launch",
+			"stopOnEntry": false,
+			"luaexe": "${workspaceFolder}/bin/lua-language-server",
+			"program": "${workspaceRoot}/tools/build-doc.lua",
+			"cpath": "${workspaceFolder}/bin/?.dll",
+			"arg": [
+			],
+			"luaVersion": "latest",
 			"sourceCoding": "utf8",
 			"outputCapture": [
 				"print",

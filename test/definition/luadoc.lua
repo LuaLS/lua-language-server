@@ -899,3 +899,11 @@ local <!x!>
 
 ---@cast <?x?> integer
 ]]
+
+TEST [[
+local function f()
+    local <!x!>
+
+    ---@cast <?x?> integer
+end
+]]

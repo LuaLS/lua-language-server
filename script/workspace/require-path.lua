@@ -51,7 +51,8 @@ function m.getVisiblePath(suri, path)
     and not scp:isLinkedUri(uri) then
         return {}
     end
-    local libraryPath = furi.decode(files.getLibraryUri(suri, uri))
+    local libUri = files.getLibraryUri(suri, uri)
+    local libraryPath = libUri and furi.decode(libUri)
     local cache = scp:get('visiblePath') or scp:set('visiblePath', {})
     local result = cache[path]
     if not result then

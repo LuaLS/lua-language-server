@@ -144,7 +144,7 @@ local function tryDocModule(source)
     return collectRequire('require', source.module, guide.getUri(source))
 end
 
-local function buildEnumChunk(docType, name)
+local function buildEnumChunk(docType, name, uri)
     if not docType then
         return nil
     end
@@ -152,10 +152,11 @@ local function buildEnumChunk(docType, name)
     local types = {}
     local lines = {}
     for _, tp in ipairs(vm.getDefs(docType)) do
-        types[#types+1] = vm.getInfer(tp):view()
+        types[#types+1] = vm.getInfer(tp):view(guide.getUri(docType))
         if tp.type == 'doc.type.string'
         or tp.type == 'doc.type.integer'
-        or tp.type == 'doc.type.boolean' then
+        or tp.type == 'doc.type.boolean'
+        or tp.type == 'doc.type.code' then
             enums[#enums+1] = tp
         end
         local comment = tryDocClassComment(tp)
@@ -174,7 +175,7 @@ local function buildEnumChunk(docType, name)
                 (enum.default    and '->')
             or  (enum.additional and '+>')
             or  ' |',
-            vm.viewObject(enum)
+            vm.viewObject(enum, uri)
         )
         if enum.comment then
             local first = true
@@ -198,26 +199,33 @@ local function getBindEnums(source, docGroup)
         return
     end
 
+    local uri = guide.getUri(source)
     local mark = {}
     local chunks = {}
     local returnIndex = 0
     for _, doc in ipairs(docGroup) do
         if     doc.type == 'doc.param' then
             local name = doc.param[1]
+            if name == '...' then
+                name = '...(param)'
+            end
             if mark[name] then
                 goto CONTINUE
             end
             mark[name] = true
-            chunks[#chunks+1] = buildEnumChunk(doc.extends, name)
+            chunks[#chunks+1] = buildEnumChunk(doc.extends, name, uri)
         elseif doc.type == 'doc.return' then
             for _, rtn in ipairs(doc.returns) do
                 returnIndex = returnIndex + 1
                 local name = rtn.name and rtn.name[1] or ('return #%d'):format(returnIndex)
+                if name == '...' then
+                    name = '...(return)'
+                end
                 if mark[name] then
                     goto CONTINUE
                 end
                 mark[name] = true
-                chunks[#chunks+1] = buildEnumChunk(rtn, name)
+                chunks[#chunks+1] = buildEnumChunk(rtn, name, uri)
             end
         end
         ::CONTINUE::
@@ -229,14 +237,13 @@ local function getBindEnums(source, docGroup)
 end
 
 local function tryDocFieldUpComment(source)
-    if source.type ~= 'doc.field.name' then
+    if source.type ~= 'doc.field' then
         return
     end
-    local docField = source.parent
-    if not docField.bindGroup then
+    if not source.bindGroup then
         return
     end
-    local comment = getBindComment(docField, docField.bindGroup, docField)
+    local comment = getBindComment(source, source.bindGroup, source)
     return comment
 end
 

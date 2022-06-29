@@ -36,6 +36,8 @@ Adjust the enabled state of the built-in library. You can disable (or redefine) 
 * `enable`: always enable
 * `disable`: always disable
 ]]
+config.runtime.meta               =
+'Format of the directory name of the meta files.'
 config.diagnostics.enable         =
 "Enable diagnostics."
 config.diagnostics.disable        =
@@ -43,12 +45,35 @@ config.diagnostics.disable        =
 config.diagnostics.globals        =
 "Defined global variables."
 config.diagnostics.severity       =
-"Modified diagnostic severity."
+[[
+Modify the diagnostic severity.
+
+End with `!` means override the group setting `diagnostics.groupSeverity`.
+]]
 config.diagnostics.neededFileStatus =
 [[
 * Opened:  only diagnose opened files
 * Any:     diagnose all files
-* Disable: disable this diagnostic
+* None:    disable this diagnostic
+
+End with `!` means override the group setting `diagnostics.groupFileStatus`.
+]]
+config.diagnostics.groupSeverity  =
+[[
+Modify the diagnostic severity in a group.
+`Fallback` means that diagnostics in this group are controlled by `diagnostics.severity` separately.
+Other settings will override individual settings without end of `!`.
+]]
+config.diagnostics.groupFileStatus =
+[[
+Modify the diagnostic needed file status in a group.
+
+* Opened:  only diagnose opened files
+* Any:     diagnose all files
+* None:    disable this diagnostic
+
+`Fallback` means that diagnostics in this group are controlled by `diagnostics.neededFileStatus` separately.
+Other settings will override individual settings without end of `!`.
 ]]
 config.diagnostics.workspaceDelay =
 "Latency (milliseconds) for workspace diagnostics. When you start the workspace, or edit any file, the entire workspace will be re-diagnosed in the background. Set to negative to disable workspace diagnostics."
@@ -56,14 +81,22 @@ config.diagnostics.workspaceRate  =
 "Workspace diagnostics run rate (%). Decreasing this value reduces CPU usage, but also reduces the speed of workspace diagnostics. The diagnosis of the file you are currently editing is always done at full speed and is not affected by this setting."
 config.diagnostics.libraryFiles   =
 "How to diagnose files loaded via `Lua.workspace.library`."
+config.diagnostics.libraryFiles.Enable   =
+"Always diagnose these files."
+config.diagnostics.libraryFiles.Opened   =
+"Only when these files are opened will it be diagnosed."
+config.diagnostics.libraryFiles.Disable  =
+"These files are not diagnosed."
 config.diagnostics.ignoredFiles   =
 "How to diagnose ignored files."
-config.diagnostics.files.Enable   =
+config.diagnostics.ignoredFiles.Enable   =
 "Always diagnose these files."
-config.diagnostics.files.Opened   =
+config.diagnostics.ignoredFiles.Opened   =
 "Only when these files are opened will it be diagnosed."
-config.diagnostics.files.Disable  =
+config.diagnostics.ignoredFiles.Disable  =
 "These files are not diagnosed."
+config.diagnostics.disableScheme  =
+'Do not diagnose Lua files that use the following scheme.'
 config.workspace.ignoreDir        =
 "Ignored files and directories (Use `.gitignore` grammar)."-- .. example.ignoreDir,
 config.workspace.ignoreSubmodules =
@@ -89,6 +122,8 @@ Automatic detection and adaptation of third-party libraries, currently supported
 ]]
 config.workspace.userThirdParty          =
 'Add private third-party library configuration file paths here, please refer to the built-in [configuration file path](https://github.com/sumneko/lua-language-server/tree/master/meta/3rd)'
+config.workspace.supportScheme           =
+'Provide language server for the Lua files of the following scheme.'
 config.completion.enable                 =
 'Enable completion.'
 config.completion.callSnippet            =
@@ -159,6 +194,10 @@ config.hover.previewFields               =
 "When hovering to view a table, limits the maximum number of previews for fields."
 config.hover.enumsLimit                  =
 "When the value corresponds to multiple types, limit the number of types displaying."
+config.hover.expandAlias                 =
+[[
+Whether to expand the alias. For example, expands `---@alias myType boolean|number` appears as `boolean|number`, otherwise it appears as `myType'.
+]]
 config.develop.enable                    =
 'Developer mode. Do not enable, performance will be affected.'
 config.develop.debuggerPort              =
@@ -195,8 +234,25 @@ config.hint.arrayIndex.Auto              =
 'Show hints only when the table is greater than 3 items, or the table is a mixed table.'
 config.hint.arrayIndex.Disable           =
 'Disable hints of array index.'
+config.hint.await                        =
+'If the called function is marked `---@async`, prompt `await` at the call.'
+config.hint.semicolon                    =
+'If there is no semicolon at the end of the statement, display a virtual semicolon.'
+config.hint.semicolon.All                =
+'All statements display virtual semicolons.'
+config.hint.semicolon.SameLine            =
+'When two statements are on the same line, display a semicolon between them.'
+config.hint.semicolon.Disable            =
+'Disable virtual semicolons.'
 config.format.enable                     =
 'Enable code formatter.'
+config.format.defaultConfig              =
+[[
+The default format configuration. Has a lower priority than `.editorconfig` file in the workspace.
+Read [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) to learn usage.
+]]
+config.spell.dict                        = -- TODO: need translate!
+'Custom words for spell checking.'
 config.telemetry.enable                  =
 [[
 Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://github.com/sumneko/lua-language-server/wiki/Privacy-Policy).
@@ -211,6 +267,14 @@ config.IntelliSense.traceBeSetted        =
 'Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
 config.IntelliSense.traceFieldInject     =
 'Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
+config.type.castNumberToInteger          =
+'Allowed to assign the `number` type to the `integer` type.'
+config.type.weakUnionCheck               =
+[[
+Once one subtype of a union type meets the condition, the union type also meets the condition.
+
+When this setting is `false`, the `number|boolean` type cannot be assigned to the `number` type. It can be with `true`.
+]]
 config.diagnostics['unused-local']          =
 'Enable unused local variable diagnostics.'
 config.diagnostics['unused-function']       =

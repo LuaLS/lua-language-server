@@ -81,6 +81,9 @@ local function renameField(source, newname, callback)
         local uri   = guide.getUri(source)
         local text  = files.getText(uri)
         local state = files.getState(uri)
+        if not state or not text then
+            return false
+        end
         local func = parent.value
         -- function mt:name () end --> mt['newname'] = function (self) end
         local startOffset  = guide.positionToOffset(state, parent.start) + 1
@@ -183,13 +186,16 @@ local function ofField(source, newname, callback)
     local key  = guide.getKeyName(source)
     local refs = vm.getRefs(source)
     for _, ref in ipairs(refs) do
-            ofFieldThen(key, ref, newname, callback)
+        ofFieldThen(key, ref, newname, callback)
     end
 end
 
 ---@async
 local function ofGlobal(source, newname, callback)
     local key = guide.getKeyName(source)
+    if not key then
+        return
+    end
     local global = vm.getGlobal('variable', key)
     if not global then
         return

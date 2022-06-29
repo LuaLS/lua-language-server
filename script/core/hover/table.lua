@@ -30,7 +30,7 @@ local function buildAsHash(uri, keys, nodeMap, reachMax)
             node:removeOptional()
         end
         local ifr         = vm.getInfer(node)
-        local typeView    = ifr:view('unknown', uri)
+        local typeView    = ifr:view(uri, 'unknown')
         local literalView = ifr:viewLiterals()
         if literalView then
             lines[#lines+1] = ('    %s%s: %s = %s,'):format(
@@ -75,7 +75,7 @@ local function buildAsConst(uri, keys, nodeMap, reachMax)
             node = node:copy()
             node:removeOptional()
         end
-        local typeView    = vm.getInfer(node):view('unknown', uri)
+        local typeView    = vm.getInfer(node):view(uri, 'unknown')
         local literalView = literalMap[key]
         if literalView then
             lines[#lines+1] = ('    %s%s: %s = %s,'):format(
@@ -154,7 +154,7 @@ local function getNodeMap(fields, keyMap)
     local nodeMap = {}
     for _, field in ipairs(fields) do
         local key = vm.getKeyName(field)
-        if not keyMap[key] then
+        if not key or not keyMap[key] then
             goto CONTINUE
         end
         await.delay()
@@ -178,9 +178,9 @@ return function (source)
         return nil
     end
 
-    for view in vm.getInfer(source):eachView() do
+    for view in vm.getInfer(source):eachView(uri) do
         if view == 'string'
-        or vm.isSubType(uri, view, 'string') then
+        or (view ~= 'unknown' and view ~= 'any' and vm.isSubType(uri, view, 'string')) then
             return nil
         end
     end

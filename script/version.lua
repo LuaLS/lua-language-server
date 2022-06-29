@@ -1,7 +1,7 @@
 local fsu = require 'fs-utility'
 
 local function loadVersion()
-    local changelog = fsu.loadFile(ROOT / 'changelog.md')
+    local changelog = fsu.loadFile(ROOT / 'changelog.md'--[[@as fspath]])
     if not changelog then
         return
     end

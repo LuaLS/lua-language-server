@@ -1,4 +1,7 @@
 local config = require 'config'
+local util   = require 'utility'
+
+local disables = config.get(nil, 'Lua.diagnostics.disable')
 
 TEST [[
 local <!x!>
@@ -84,6 +87,15 @@ X = [=[
 ]]
 
 TEST [[
+-- xxxx  
+]]
+
+TEST [[
+-- [=[  
+   ]=]
+]]
+
+TEST [[
 local x
 print(x)
 local <!x!>
@@ -125,7 +137,7 @@ local _ENV = { print = print }
 print(1)
 ]]
 
-config.get(nil, 'Lua.diagnostics.disable')['undefined-env-child'] = true
+util.arrayInsert(disables, 'undefined-env-child')
 TEST [[
 _ENV = nil
 <!GLOBAL!> = 1 --> _ENV.GLOBAL = 1
@@ -151,7 +163,7 @@ GLOBAL = 1
 _ENV = nil
 ]]
 
-config.get(nil, 'Lua.diagnostics.disable')['undefined-env-child'] = nil
+util.arrayRemove(disables, 'undefined-env-child')
 TEST [[
 <!print()
 ('string')!>:sub(1, 1)
@@ -236,7 +248,7 @@ local m = {}
 function m:x(a, b)
     return a, b
 end
-m.x(1, 2, 3, <!4!>)
+m.x(m, 2, 3, <!4!>)
 ]]
 
 TEST [[
@@ -280,6 +292,32 @@ local function x(a, b, ...)
     return a, b, ...
 end
 x(1, 2)
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@param a integer
+---@param b integer
+local function f(a, b)
+end
+
+f(...)
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@param a integer
+---@param b integer
+local function f(a, b)
+end
+
+local function return2Numbers()
+    return 1, 2
+end
+
+f(return2Numbers())
 ]]
 
 TEST [[
@@ -329,12 +367,12 @@ return [[
 ]]
 ]=]
 
-config.get(nil, 'Lua.diagnostics.disable')['close-non-object'] = true
+util.arrayInsert(disables, 'close-non-object')
 TEST [[
 local _ <close> = function () end
 ]]
+util.arrayRemove(disables, 'close-non-object')
 
-config.get(nil, 'Lua.diagnostics.disable')['close-non-object'] = nil
 TEST [[
 local _ <close> = <!1!>
 ]]
@@ -347,7 +385,7 @@ TEST [[
 local c <close> = <!(function () return 1 end)()!>
 ]]
 
-config.get(nil, 'Lua.diagnostics.disable')['unused-local'] = true
+util.arrayInsert(disables, 'unused-local')
 TEST [[
 local f = <!function () end!>
 ]]
@@ -375,7 +413,7 @@ local <!function foo ()
 end!>
 ]]
 
-config.get(nil, 'Lua.diagnostics.disable')['unused-local'] = nil
+util.arrayRemove(disables, 'unused-local')
 TEST [[
 local mt, x
 function mt:m()
@@ -410,12 +448,14 @@ local <!x!> = {}
 
 TEST [[
 local function f(<!self!>)
+    return 'something'
 end
 f()
 ]]
 
 TEST [[
 local function f(<!...!>)
+    return 'something'
 end
 f()
 ]]
@@ -440,7 +480,7 @@ local mt = {}
 function mt:f(a, b)
     return a, b
 end
-mt.f(1, 2, 3, <!4!>)
+mt.f(mt, 2, 3, <!4!>)
 ]]
 
 
@@ -540,7 +580,7 @@ local m = {}
 function m:open()
 end
 
-m.open('ok')
+m.open(m)
 ]]
 
 TEST [[
@@ -845,6 +885,7 @@ TEST [[
 ---@param v T
 ---@param message any
 ---@return T
+---@return any message
 function assert(v, message)
     return v, message
 end
@@ -978,9 +1019,9 @@ function mt2:method2() end
 local v
 ---@type Bar
 local v2
-v2 = v -- TODO 这里应该给警告
-v2:<!method1!>()
-v2:method2()
+<!v2!> = v
+v2:method1()
+v2:<!method2!>()
 ]]
 
 TEST [[
@@ -1014,20 +1055,6 @@ end
 TEST [[
 for i = 1, 1 do
     print(i)
-end
-]]
-
-TEST [[
----@param a number
-return function (<!a!>)
-end
-]]
-
-TEST [[
----@meta
-
----@param a number
-return function (a)
 end
 ]]
 
@@ -1532,6 +1559,14 @@ S = <!x!>()
 ]]
 
 TEST [[
+---@type integer?
+local x
+
+T = {}
+T[<!x!>] = 1
+]]
+
+TEST [[
 local x, y
 local z = x and y
 
@@ -1550,3 +1585,313 @@ end
 
 x()
 ]]
+
+TEST [[
+---@meta
+
+---@param x fun()
+local function f1(x)
+end
+
+---@return fun()
+local function f2()
+end
+
+f1(f2())
+]]
+
+TEST [[
+---@meta
+
+---@type fun():integer
+local f
+
+---@param x integer
+local function foo(x) end
+
+foo(f())
+]]
+
+TEST [[
+---@type string|table
+local n
+
+print(n.x)
+]]
+
+TEST [[
+---@diagnostic disable: unused-local, unused-function, undefined-global
+
+function F() end
+
+---@param x boolean
+function F(x) end
+
+F(k())
+]]
+
+TEST [[
+local function f()
+    return 1, 2, 3
+end
+
+local function k()
+end
+
+k(<!f()!>)
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+local function f()
+    return 1, 2, 3
+end
+
+---@param x integer
+local function k(x)
+end
+
+k(f())
+]]
+
+TEST [[
+---@cast <!x!> integer
+]]
+
+TEST [[
+---@class A
+
+---@class B
+---@field [integer] A
+---@field [A] true
+]]
+
+TEST [[
+---@class A
+
+---@class B
+---@field [A] A
+---@field [<!A!>] true
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@type 'x'
+local t
+
+local n = t:upper()
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@alias A 'x'
+
+---@type A
+local t
+
+local n = t:upper()
+]]
+
+TEST [[
+local t = {}
+
+function t:init() end
+
+<!t.init()!>
+]]
+
+TEST [[
+return function f(x, y, z) end
+]]
+
+util.arrayInsert(disables, 'redundant-return')
+TEST [[
+---@return number
+function F()
+    <!return!>
+end
+]]
+
+TEST [[
+---@return number, number
+function F()
+    <!return!> 1
+end
+]]
+
+TEST [[
+---@return number, number?
+function F()
+    return 1
+end
+]]
+
+TEST [[
+---@return ...
+function F()
+    return
+end
+]]
+
+TEST [[
+---@return number, number?
+function F()
+    return 1, 1, <!1!>
+end
+]]
+
+TEST [[
+---@return number, number?
+function F()
+    return 1, 1, <!1!>, <!2!>, <!3!>
+end
+]]
+
+TEST [[
+---@return number, number
+local function r2() end
+
+---@return number, number?
+function F()
+    return 1, <!r2()!>
+end
+]]
+
+TEST [[
+---@return number
+function F()
+    X = 1<!!>
+end
+]]
+
+TEST [[
+local A
+---@return number
+function F()
+    if A then
+        return 1
+    end<!!>
+end
+]]
+
+TEST [[
+local A, B
+---@return number
+function F()
+    if A then
+        return 1
+    elseif B then
+        return 2
+    end<!!>
+end
+]]
+
+TEST [[
+local A, B
+---@return number
+function F()
+    if A then
+        return 1
+    elseif B then
+        return 2
+    else
+        return 3
+    end
+end
+]]
+
+TEST [[
+local A, B
+---@return number
+function F()
+    if A then
+    elseif B then
+        return 2
+    else
+        return 3
+    end<!!>
+end
+]]
+
+TEST [[
+---@return any
+function F()
+    X = 1
+end
+]]
+
+TEST [[
+---@return any, number
+function F()
+    X = 1<!!>
+end
+]]
+
+TEST [[
+---@return number, any
+function F()
+    X = 1<!!>
+end
+]]
+
+TEST [[
+---@return any, any
+function F()
+    X = 1<!!>
+end
+]]
+
+TEST [[
+local A
+---@return number
+function F()
+    for _ = 1, 10 do
+        if A then
+            return 1
+        end
+    end
+    error('should not be here')
+end
+]]
+
+TEST [[
+local A
+---@return number
+function F()
+    while true do
+        if A then
+            return 1
+        end
+    end
+end
+]]
+
+TEST [[
+local A
+---@return number
+function F()
+    while A do
+        if A then
+            return 1
+        end
+    end<!!>
+end
+]]
+
+TEST [[
+local A
+---@return number
+function F()
+    while A do
+        if A then
+            return 1
+        else
+            return 2
+        end
+    end
+end
+]]
+
+util.arrayRemove(disables, 'redundant-return')

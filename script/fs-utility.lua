@@ -13,9 +13,13 @@ local tableSort    = table.sort
 
 _ENV = nil
 
+---@class fspath
+---@field string fun(self):string
+
+---@class fs-utility
 local m = {}
 --- 读取文件
----@param path string
+---@param path string|fspath
 function m.loadFile(path, keepBom)
     if type(path) ~= 'string' then
         ---@diagnostic disable-next-line: undefined-field
@@ -40,7 +44,7 @@ function m.loadFile(path, keepBom)
 end
 
 --- 写入文件
----@param path string
+---@param path any
 ---@param content string
 function m.saveFile(path, content)
     if type(path) ~= 'string' then
@@ -255,6 +259,9 @@ function dfs:saveFile(path, text)
     dir[filename] = text
 end
 
+---@param path   string|fspath
+---@param option table
+---@return fspath?
 local function fsAbsolute(path, option)
     if type(path) == 'string' then
         local suc, res = pcall(fs.path, path)
@@ -444,6 +451,9 @@ local function fileRemove(path, option)
     end
 end
 
+---@param source fspath?
+---@param target fspath?
+---@param option table
 local function fileCopy(source, target, option)
     if not source or not target then
         return
@@ -455,7 +465,7 @@ local function fileCopy(source, target, option)
         if isDir2 or fsCreateDirectories(target, option) then
             for filePath in fsPairs(source) do
                 local name = filePath:filename():string()
-                fileCopy(filePath, target / name, option)
+                fileCopy(filePath, target / name--[[@as fspath]], option)
             end
         end
     else
@@ -506,7 +516,7 @@ local function fileSync(source, target, option)
             if fsCreateDirectories(target) then
                 for filePath in fsPairs(source) do
                     local name = filePath:filename():string()
-                    fileCopy(filePath, target / name, option)
+                    fileCopy(filePath, target / name--[[@as fspath]], option)
                 end
             end
         end
@@ -583,29 +593,29 @@ function m.fileRemove(path, option)
 end
 
 --- 复制文件（夹）
----@param source string
----@param target string
+---@param source string|fspath
+---@param target string|fspath
 ---@return table
 function m.fileCopy(source, target, option)
     option = buildOption(option)
-    source = fsAbsolute(source, option)
-    target = fsAbsolute(target, option)
+    local fsSource = fsAbsolute(source, option)
+    local fsTarget = fsAbsolute(target, option)
 
-    fileCopy(source, target, option)
+    fileCopy(fsSource, fsTarget, option)
 
     return option
 end
 
 --- 同步文件（夹）
----@param source string
----@param target string
+---@param source string|fspath
+---@param target string|fspath
 ---@return table
 function m.fileSync(source, target, option)
     option = buildOption(option)
-    source = fsAbsolute(source, option)
-    target = fsAbsolute(target, option)
+    local fsSource = fsAbsolute(source, option)
+    local fsTarget = fsAbsolute(target, option)
 
-    fileSync(source, target, option)
+    fileSync(fsSource, fsTarget, option)
 
     return option
 end

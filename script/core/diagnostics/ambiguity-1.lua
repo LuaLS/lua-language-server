@@ -27,10 +27,10 @@ local literalMap = {
 
 return function (uri, callback)
     local state = files.getState(uri)
-    if not state then
+    local text = files.getText(uri)
+    if not state or not text then
         return
     end
-    local text = files.getText(uri)
     guide.eachSourceType(state.ast, 'binary', function (source)
         if source.op.type ~= 'or' then
             return

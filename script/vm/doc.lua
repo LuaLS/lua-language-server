@@ -90,10 +90,10 @@ end
 ---@return parser.object?
 local function getDeprecated(value)
     if not value.bindDocs then
-        return false
+        return nil
     end
     if value._deprecated ~= nil then
-        return value._deprecated
+        return value._deprecated or nil
     end
     for _, doc in ipairs(value.bindDocs) do
         if doc.type == 'doc.deprecated' then
@@ -101,14 +101,14 @@ local function getDeprecated(value)
             return doc
         elseif doc.type == 'doc.version' then
             local valids = vm.getValidVersions(doc)
-            if not valids[config.get(guide.getUri(value), 'Lua.runtime.version')] then
+            if valids and not valids[config.get(guide.getUri(value), 'Lua.runtime.version')] then
                 value._deprecated = doc
                 return doc
             end
         end
     end
     value._deprecated = false
-    return false
+    return nil
 end
 
 ---@return parser.object?
@@ -116,9 +116,9 @@ function vm.getDeprecated(value, deep)
     if deep then
         local defs = vm.getDefs(value)
         if #defs == 0 then
-            return false
+            return nil
         end
-        local deprecated = false
+        local deprecated
         for _, def in ipairs(defs) do
             if def.type == 'setglobal'
             or def.type == 'setfield'
@@ -128,7 +128,7 @@ function vm.getDeprecated(value, deep)
             or def.type == 'tableindex' then
                 deprecated = getDeprecated(def)
                 if not deprecated then
-                    return false
+                    return nil
                 end
             end
         end

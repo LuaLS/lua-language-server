@@ -4,7 +4,10 @@ local log        = require("log")
 
 return function(uri, options)
     local text = files.getOriginText(uri)
-    local ast = files.getState(uri)
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
     local status, formattedText = codeFormat.format(uri, text, options)
 
     if not status then
@@ -17,8 +20,8 @@ return function(uri, options)
 
     return {
         {
-            start = ast.ast.start,
-            finish = ast.ast.finish,
+            start = state.ast.start,
+            finish = state.ast.finish,
             text = formattedText,
         }
     }

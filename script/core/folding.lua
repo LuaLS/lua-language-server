@@ -66,7 +66,8 @@ local care = {
     ['repeat'] = function (source, text, results)
         local start  = source.start
         local finish = source.keyword[#source.keyword]
-        if text:sub(finish - #'until' + 1, finish) ~= 'until' then
+        -- must end with 'until'
+        if #source.keyword ~= 4 then
             return
         end
         local folding = {
@@ -143,6 +144,15 @@ local care = {
         }
         results[#results+1] = folding
     end,
+    ['doc.alias'] = function (source, text, results)
+        local folding = {
+            start        = source.start,
+            finish       = source.bindGroup[#source.bindGroup].finish,
+            kind         = 'comment',
+            hideLastLine = true,
+        }
+        results[#results+1] = folding
+    end
 }
 
 ---@async

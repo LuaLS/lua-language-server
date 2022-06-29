@@ -4,11 +4,14 @@ local vm       = require 'vm.vm'
 
 ---@param source parser.object?
 ---@return boolean|nil
-function vm.test(source)
+function vm.testCondition(source)
     if not source then
         return nil
     end
     local node = vm.compileNode(source)
+    if node.optional then
+        return nil
+    end
     local hasTrue, hasFalse
     for n in node:eachObject() do
         if n.type == 'boolean'
@@ -50,8 +53,8 @@ function vm.test(source)
     end
 end
 
----@param v vm.object
----@return string?
+---@param v vm.node.object
+---@return string|false
 local function getUnique(v)
     if v.type == 'boolean' then
         if v[1] == nil then
@@ -72,16 +75,18 @@ local function getUnique(v)
         return ('num:%s'):format(v[1])
     end
     if v.type == 'table' then
+        ---@cast v parser.object
         return ('table:%s@%d'):format(guide.getUri(v), v.start)
     end
     if v.type == 'function' then
+        ---@cast v parser.object
         return ('func:%s@%d'):format(guide.getUri(v), v.start)
     end
     return false
 end
 
----@param a vm.object?
----@param b vm.object?
+---@param a parser.object?
+---@param b parser.object?
 ---@return boolean|nil
 function vm.equal(a, b)
     if not a or not b then
@@ -141,7 +146,7 @@ function vm.getInteger(v)
 end
 
 ---@param v vm.object?
----@return integer?
+---@return string?
 function vm.getString(v)
     if not v then
         return nil

@@ -53,21 +53,21 @@ ngx.HTTP_PATCH     = 16384
 ngx.HTTP_TRACE     = 32768
 
 ---@alias ngx.http.method
----| 'ngx.HTTP_GET'
----| 'ngx.HTTP_HEAD'
----| 'ngx.HTTP_POST'
----| 'ngx.HTTP_PUT'
----| 'ngx.HTTP_DELETE'
----| 'ngx.HTTP_MKCOL'
----| 'ngx.HTTP_COPY'
----| 'ngx.HTTP_MOVE'
----| 'ngx.HTTP_OPTIONS'
----| 'ngx.HTTP_PROPFIND'
----| 'ngx.HTTP_PROPPATCH'
----| 'ngx.HTTP_LOCK'
----| 'ngx.HTTP_UNLOCK'
----| 'ngx.HTTP_PATCH'
----| 'ngx.HTTP_TRACE'
+---| `ngx.HTTP_GET`
+---| `ngx.HTTP_HEAD`
+---| `ngx.HTTP_POST`
+---| `ngx.HTTP_PUT`
+---| `ngx.HTTP_DELETE`
+---| `ngx.HTTP_MKCOL`
+---| `ngx.HTTP_COPY`
+---| `ngx.HTTP_MOVE`
+---| `ngx.HTTP_OPTIONS`
+---| `ngx.HTTP_PROPFIND`
+---| `ngx.HTTP_PROPPATCH`
+---| `ngx.HTTP_LOCK`
+---| `ngx.HTTP_UNLOCK`
+---| `ngx.HTTP_PATCH`
+---| `ngx.HTTP_TRACE`
 
 ngx.HTTP_CONTINUE               = 100
 ngx.HTTP_SWITCHING_PROTOCOLS    = 101
@@ -106,41 +106,41 @@ ngx.HTTP_VERSION_NOT_SUPPORTED  = 505
 ngx.HTTP_INSUFFICIENT_STORAGE   = 507
 
 ---@alias ngx.http.status_code
----| 'ngx.HTTP_CONTINUE'
----| 'ngx.HTTP_SWITCHING_PROTOCOLS'
----| 'ngx.HTTP_OK'
----| 'ngx.HTTP_CREATED'
----| 'ngx.HTTP_ACCEPTED'
----| 'ngx.HTTP_NO_CONTENT'
----| 'ngx.HTTP_PARTIAL_CONTENT'
----| 'ngx.HTTP_SPECIAL_RESPONSE'
----| 'ngx.HTTP_MOVED_PERMANENTLY'
----| 'ngx.HTTP_MOVED_TEMPORARILY'
----| 'ngx.HTTP_SEE_OTHER'
----| 'ngx.HTTP_NOT_MODIFIED'
----| 'ngx.HTTP_TEMPORARY_REDIRECT'
----| 'ngx.HTTP_PERMANENT_REDIRECT'
----| 'ngx.HTTP_BAD_REQUEST'
----| 'ngx.HTTP_UNAUTHORIZED'
----| 'ngx.HTTP_PAYMENT_REQUIRED'
----| 'ngx.HTTP_FORBIDDEN'
----| 'ngx.HTTP_NOT_FOUND'
----| 'ngx.HTTP_NOT_ALLOWED'
----| 'ngx.HTTP_NOT_ACCEPTABLE'
----| 'ngx.HTTP_REQUEST_TIMEOUT'
----| 'ngx.HTTP_CONFLICT'
----| 'ngx.HTTP_GONE'
----| 'ngx.HTTP_UPGRADE_REQUIRED'
----| 'ngx.HTTP_TOO_MANY_REQUESTS'
----| 'ngx.HTTP_CLOSE'
----| 'ngx.HTTP_ILLEGAL'
----| 'ngx.HTTP_INTERNAL_SERVER_ERROR'
----| 'ngx.HTTP_METHOD_NOT_IMPLEMENTED'
----| 'ngx.HTTP_BAD_GATEWAY'
----| 'ngx.HTTP_SERVICE_UNAVAILABLE'
----| 'ngx.HTTP_GATEWAY_TIMEOUT'
----| 'ngx.HTTP_VERSION_NOT_SUPPORTED'
----| 'ngx.HTTP_INSUFFICIENT_STORAGE'
+---| `ngx.HTTP_CONTINUE`
+---| `ngx.HTTP_SWITCHING_PROTOCOLS`
+---| `ngx.HTTP_OK`
+---| `ngx.HTTP_CREATED`
+---| `ngx.HTTP_ACCEPTED`
+---| `ngx.HTTP_NO_CONTENT`
+---| `ngx.HTTP_PARTIAL_CONTENT`
+---| `ngx.HTTP_SPECIAL_RESPONSE`
+---| `ngx.HTTP_MOVED_PERMANENTLY`
+---| `ngx.HTTP_MOVED_TEMPORARILY`
+---| `ngx.HTTP_SEE_OTHER`
+---| `ngx.HTTP_NOT_MODIFIED`
+---| `ngx.HTTP_TEMPORARY_REDIRECT`
+---| `ngx.HTTP_PERMANENT_REDIRECT`
+---| `ngx.HTTP_BAD_REQUEST`
+---| `ngx.HTTP_UNAUTHORIZED`
+---| `ngx.HTTP_PAYMENT_REQUIRED`
+---| `ngx.HTTP_FORBIDDEN`
+---| `ngx.HTTP_NOT_FOUND`
+---| `ngx.HTTP_NOT_ALLOWED`
+---| `ngx.HTTP_NOT_ACCEPTABLE`
+---| `ngx.HTTP_REQUEST_TIMEOUT`
+---| `ngx.HTTP_CONFLICT`
+---| `ngx.HTTP_GONE`
+---| `ngx.HTTP_UPGRADE_REQUIRED`
+---| `ngx.HTTP_TOO_MANY_REQUESTS`
+---| `ngx.HTTP_CLOSE`
+---| `ngx.HTTP_ILLEGAL`
+---| `ngx.HTTP_INTERNAL_SERVER_ERROR`
+---| `ngx.HTTP_METHOD_NOT_IMPLEMENTED`
+---| `ngx.HTTP_BAD_GATEWAY`
+---| `ngx.HTTP_SERVICE_UNAVAILABLE`
+---| `ngx.HTTP_GATEWAY_TIMEOUT`
+---| `ngx.HTTP_VERSION_NOT_SUPPORTED`
+---| `ngx.HTTP_INSUFFICIENT_STORAGE`
 
 
 ngx.DEBUG  = 8
@@ -156,15 +156,15 @@ ngx.STDERR = 0
 --- NGINX log level constants
 --- https://github.com/openresty/lua-nginx-module/#nginx-log-level-constants
 ---@alias ngx.log.level
----| 'ngx.DEBUG'  # debug
----| 'ngx.INFO'   # info
----| 'ngx.NOTICE' # notice
----| 'ngx.WARN'   # warning
----| 'ngx.ERR'    # error
----| 'ngx.ALERT'  # alert
----| 'ngx.CRIT'   # critical
----| 'ngx.EMERG'  # emergency
----| 'ngx.STDERR' # standard error
+---| `ngx.DEBUG`  # debug
+---| `ngx.INFO`   # info
+---| `ngx.NOTICE` # notice
+---| `ngx.WARN`   # warning
+---| `ngx.ERR`    # error
+---| `ngx.ALERT`  # alert
+---| `ngx.CRIT`   # critical
+---| `ngx.EMERG`  # emergency
+---| `ngx.STDERR` # standard error
 
 
 --- ngx.ctx table

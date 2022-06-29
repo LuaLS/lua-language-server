@@ -3,16 +3,17 @@
         "disable": [
             "close-non-object"
         ],
-        "neededFileStatus": {
-            "undefined-field": "Any",
-            "await-in-sync": "Any",
-            "not-yieldable": "Any",
-            "discard-returns": "Any",
-            "redundant-parameter": "Any",
-            "missing-parameter": "Any",
-            "need-check-nil": "Any",
-            "redundant-value": "Any",
-            "deprecated": "Any"
+        "groupFileStatus": {
+            "ambiguity": "Any",
+            "await": "Any",
+            "duplicate": "Any",
+            "global": "Any",
+            "luadoc": "Any",
+            "redefined": "Any",
+            "strict": "Any",
+            "type-check": "Any",
+            "unbalanced": "Any",
+            "unused": "Any"
         },
         "ignoredFiles": "Opened",
         "libraryFiles": "Opened"
@@ -36,10 +37,6 @@
             "3rd",
             ".vscode",
             "meta"
-        ],
-        "library": [
-            "script/meta",
-            "bin"
         ]
     }
 }

@@ -209,11 +209,12 @@ local function initBuiltIn(uri)
     local langID   = lang.id
     local version  = config.get(uri, 'Lua.runtime.version')
     local encoding = config.get(uri, 'Lua.runtime.fileEncoding')
+    ---@type fspath
     local metaPath = fs.path(METAPATH) / config.get(uri, 'Lua.runtime.meta'):gsub('%$%{(.-)%}', {
         version  = version,
         language = langID,
         encoding = encoding,
-    })
+    })--[[@as fspath]]
 
     local metaLang = loadMetaLocale('en-US')
     if langID ~= 'en-US' then
@@ -243,7 +244,8 @@ local function initBuiltIn(uri)
             goto CONTINUE
         end
         libName = libName .. '.lua'
-        local libPath = templateDir / libName
+        ---@type fspath
+        local libPath = templateDir / libName--[[@as fspath]]
         local metaDoc = compileSingleMetaDoc(uri, fsu.loadFile(libPath), metaLang, status)
         if metaDoc then
             metaDoc = encoder.encode(encoding, metaDoc, 'auto')
@@ -261,7 +263,7 @@ local function initBuiltIn(uri)
 end
 
 local function loadSingle3rdConfig(libraryDir)
-    local configText = fsu.loadFile(libraryDir / 'config.lua')
+    local configText = fsu.loadFile(libraryDir / 'config.lua'--[[@as fspath]])
     if not configText then
         return nil
     end
@@ -475,6 +477,9 @@ end
 local thirdConfigs
 local function check3rd(uri)
     if hasAsked then
+        return
+    end
+    if not ws.isReady(uri) then
         return
     end
     if not config.get(uri, 'Lua.workspace.checkThirdParty') then

@@ -1640,6 +1640,264 @@ f('<??>')
 }
 
 TEST [[
+---@alias Option string | "AAA" | "BBB" | "CCC"
+---@param x Option[]
+function f(x)
+end
+
+f({<??>})
+]]
+{
+    {
+        label = '"AAA"',
+        kind = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS
+    },
+    {
+        label = '"BBB"',
+        kind = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS
+    },
+    {
+        label = '"CCC"',
+        kind = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS
+    }
+}
+
+TEST [[
+---@alias Option string | "AAA" | "BBB" | "CCC"
+---@param x Option[]
+function f(x)
+end
+
+f({"<??>"})
+]]
+{
+    {
+        label = '"AAA"',
+        kind = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS
+    },
+    {
+        label = '"BBB"',
+        kind = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS
+    },
+    {
+        label = '"CCC"',
+        kind = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS
+    }
+}
+
+TEST [[
+---@alias Option string | "AAA" | "BBB" | "CCC"
+---@param x Option[]
+function f(x)
+end
+
+f(<??>)
+]]
+    (nil)
+
+TEST [[
+---@alias Option "AAA" | "BBB" | "CCC"
+
+---@type Option[]
+local l = {<??>}
+]]
+{
+    {
+        label = '"AAA"',
+        kind = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label = '"BBB"',
+        kind = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label = '"CCC"',
+        kind = define.CompletionItemKind.EnumMember,
+    }
+}
+
+TEST [[
+---@alias Option "AAA" | "BBB" | "CCC"
+
+---@type Option[]
+local l = {"<??>"}
+]]
+{
+    {
+        label = '"AAA"',
+        kind = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS
+    },
+    {
+        label = '"BBB"',
+        kind = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS
+    },
+    {
+        label = '"CCC"',
+        kind = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS
+    }
+}
+
+TEST [[
+---@alias Option "AAA" | "BBB" | "CCC"
+
+---@type Option[]
+local l = <??>
+]]
+    (nil)
+
+TEST [[
+---@class OptionObj
+---@field a boolean
+---@field b boolean
+
+---@type OptionObj[]
+local l = { {<??>} }
+]]
+{
+    {
+        label = 'a',
+        kind = define.CompletionItemKind.Property,
+    },
+    {
+        label = 'b',
+        kind = define.CompletionItemKind.Property,
+    }
+}
+
+TEST [[
+---@class OptionObj
+---@field a boolean
+---@field b boolean
+
+---@type OptionObj[]
+local l = { <??> }
+]]
+    (nil)
+
+TEST [[
+---@class OptionObj
+---@field a boolean
+---@field b boolean
+
+---@type OptionObj[]
+local l = <??>
+]]
+    (nil)
+
+TEST [[
+---@class OptionObj
+---@field a boolean
+---@field b boolean
+---@field children OptionObj[]
+
+---@type OptionObj[]
+local l = { 
+    { 
+        a = true,
+        children = { {<??>} }
+    }
+}
+]]
+{
+    {
+        label = 'a',
+        kind = define.CompletionItemKind.Property,
+    },
+    {
+        label = 'b',
+        kind = define.CompletionItemKind.Property,
+    },
+    {
+        label = 'children',
+        kind = define.CompletionItemKind.Property,
+    }
+}
+
+TEST [[
+---@class OptionObj
+---@field a boolean
+---@field b boolean
+---@field children OptionObj[]
+
+---@type OptionObj[]
+local l = { 
+    { 
+        children = {<??>}
+    }
+}
+]]
+(nil)
+
+TEST [[
+---@class OptionObj
+---@field a boolean
+---@field b boolean
+---@field children OptionObj[]
+
+---@type OptionObj[]
+local l = { 
+    { 
+        children = <??>
+    }
+}
+]]
+(nil)
+
+TEST [[
+---@class OptionObj
+---@field a boolean
+---@field b boolean
+---@param x OptionObj[]
+function f(x)
+end
+
+f({ {<??>} })
+]]
+{
+    {
+        label = 'a',
+        kind = define.CompletionItemKind.Property,
+    },
+    {
+        label = 'b',
+        kind = define.CompletionItemKind.Property,
+    }
+}
+
+TEST [[
+---@class OptionObj
+---@field a boolean
+---@field b boolean
+---@param x OptionObj[]
+function f(x)
+end
+
+f({<??>})
+]]
+    (nil)
+
+TEST [[
+---@class OptionObj
+---@field a boolean
+---@field b boolean
+---@param x OptionObj[]
+function f(x)
+end
+
+f(<??>)
+]]
+    (nil)
+
+TEST [[
 ---this is
 ---a multi line
 ---comment
@@ -3347,4 +3605,74 @@ local xyz
         label = 'xyz',
         kind  = define.CompletionItemKind.Variable,
     }
+}
+
+TEST [[
+---@type `CONST.X` | `CONST.Y`
+local x
+
+if x == <??>
+]]
+{
+    {
+        label = 'CONST.X',
+        kind  = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label = 'CONST.Y',
+        kind  = define.CompletionItemKind.EnumMember,
+    },
+}
+
+TEST [[
+---@param x `CONST.X` | `CONST.Y`
+local function f(x) end
+
+f(<??>)
+]]
+{
+    {
+        label = 'CONST.X',
+        kind  = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label = 'CONST.Y',
+        kind  = define.CompletionItemKind.EnumMember,
+    },
+}
+
+TEST [[
+return function ()
+    local function fff(xxx)
+        for f in xx<??>
+    end
+end
+]]
+{
+    {
+        label = 'xxx',
+        kind  = define.CompletionItemKind.Variable,
+    },
+}
+
+TEST [[
+---@class A
+---@field xxx 'aaa'|'bbb'
+
+---@type A
+local t = {
+    xxx = '<??>
+}
+]]
+{
+    {
+        label    = "'aaa'",
+        kind     = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS,
+    },
+    {
+        label    = "'bbb'",
+        kind     = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS,
+    },
 }

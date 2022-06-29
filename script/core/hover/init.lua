@@ -39,7 +39,7 @@ local function getHover(source)
     end
 
     local oop
-    if vm.getInfer(source):view() == 'function' then
+    if vm.getInfer(source):view(guide.getUri(source)) == 'function' then
         local defs = vm.getDefs(source)
         -- make sure `function` is before `doc.type.function`
         local orders = {}

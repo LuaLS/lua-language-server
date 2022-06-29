@@ -34,11 +34,11 @@ return function (uri, callback)
         local node = src.node
         if node then
             local ok
-            for view in vm.getInfer(node):eachView() do
-                if not skipCheckClass[view] then
-                    ok = true
-                    break
+            for view in vm.getInfer(node):eachView(uri) do
+                if skipCheckClass[view] then
+                    return
                 end
+                ok = true
             end
             if not ok then
                 return

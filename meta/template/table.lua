@@ -61,7 +61,7 @@ function table.sort(list, comp) end
 ---@param list T[]
 ---@param i?   integer
 ---@param j?   integer
----@return T
+---@return T   ...
 ---@nodiscard
 function table.unpack(list, i, j) end
 

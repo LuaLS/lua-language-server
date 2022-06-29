@@ -1,5 +1,6 @@
 local files   = require 'files'
 local lang    = require 'language'
+local vm      = require 'vm.vm'
 
 local function getFieldEventName(doc)
     if not doc.extends then
@@ -45,7 +46,12 @@ return function (uri, callback)
                 mark = {}
             elseif doc.type == 'doc.field' then
                 if mark then
-                    local name = ('%q'):format(doc.field[1])
+                    local name
+                    if doc.field.type == 'doc.type' then
+                        name = ('[%s]'):format(vm.getInfer(doc.field):view(uri))
+                    else
+                        name = ('%q'):format(doc.field[1])
+                    end
                     local eventName = getFieldEventName(doc)
                     if eventName then
                         name = name .. '|' .. eventName

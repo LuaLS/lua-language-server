@@ -53,7 +53,7 @@ function love.joystick.saveGamepadMappings(filename) end
 ---
 ---The virtual gamepad buttons and axes are designed around the Xbox 360 controller layout.
 ---
----@overload fun(guid: string, axis: love.GamepadAxis, inputtype: love.JoystickInputType, inputindex: number, hatdir: love.JoystickHat):boolean
+---@overload fun(guid: string, axis: love.GamepadAxis, inputtype: love.JoystickInputType, inputindex: number, hatdir?: love.JoystickHat):boolean
 ---@param guid string # The OS-dependent GUID for the type of Joystick the binding will affect.
 ---@param button love.GamepadButton # The virtual gamepad button to bind.
 ---@param inputtype love.JoystickInputType # The type of input to bind the virtual gamepad button to.
@@ -209,7 +209,7 @@ function Joystick:isVibrationSupported() end
 ---Sets the vibration motor speeds on a Joystick with rumble support. Most common gamepads have this functionality, although not all drivers give proper support. Use Joystick:isVibrationSupported to check.
 ---
 ---@overload fun(self: love.Joystick):boolean
----@overload fun(self: love.Joystick, left: number, right: number, duration: number):boolean
+---@overload fun(self: love.Joystick, left: number, right: number, duration?: number):boolean
 ---@param left number # Strength of the left vibration motor on the Joystick. Must be in the range of 1.
 ---@param right number # Strength of the right vibration motor on the Joystick. Must be in the range of 1.
 ---@return boolean success # True if the vibration was successfully applied, false if not.
@@ -222,27 +222,27 @@ function Joystick:setVibration(left, right) end
 ---
 ---The x-axis of the left thumbstick.
 ---
----| '"leftx"'
+---| "leftx"
 ---
 ---The y-axis of the left thumbstick.
 ---
----| '"lefty"'
+---| "lefty"
 ---
 ---The x-axis of the right thumbstick.
 ---
----| '"rightx"'
+---| "rightx"
 ---
 ---The y-axis of the right thumbstick.
 ---
----| '"righty"'
+---| "righty"
 ---
 ---Left analog trigger.
 ---
----| '"triggerleft"'
+---| "triggerleft"
 ---
 ---Right analog trigger.
 ---
----| '"triggerright"'
+---| "triggerright"
 
 ---
 ---Virtual gamepad buttons.
@@ -251,63 +251,63 @@ function Joystick:setVibration(left, right) end
 ---
 ---Bottom face button (A).
 ---
----| '"a"'
+---| "a"
 ---
 ---Right face button (B).
 ---
----| '"b"'
+---| "b"
 ---
 ---Left face button (X).
 ---
----| '"x"'
+---| "x"
 ---
 ---Top face button (Y).
 ---
----| '"y"'
+---| "y"
 ---
 ---Back button.
 ---
----| '"back"'
+---| "back"
 ---
 ---Guide button.
 ---
----| '"guide"'
+---| "guide"
 ---
 ---Start button.
 ---
----| '"start"'
+---| "start"
 ---
 ---Left stick click button.
 ---
----| '"leftstick"'
+---| "leftstick"
 ---
 ---Right stick click button.
 ---
----| '"rightstick"'
+---| "rightstick"
 ---
 ---Left bumper.
 ---
----| '"leftshoulder"'
+---| "leftshoulder"
 ---
 ---Right bumper.
 ---
----| '"rightshoulder"'
+---| "rightshoulder"
 ---
 ---D-pad up.
 ---
----| '"dpup"'
+---| "dpup"
 ---
 ---D-pad down.
 ---
----| '"dpdown"'
+---| "dpdown"
 ---
 ---D-pad left.
 ---
----| '"dpleft"'
+---| "dpleft"
 ---
 ---D-pad right.
 ---
----| '"dpright"'
+---| "dpright"
 
 ---
 ---Joystick hat positions.
@@ -316,39 +316,39 @@ function Joystick:setVibration(left, right) end
 ---
 ---Centered
 ---
----| '"c"'
+---| "c"
 ---
 ---Down
 ---
----| '"d"'
+---| "d"
 ---
 ---Left
 ---
----| '"l"'
+---| "l"
 ---
 ---Left+Down
 ---
----| '"ld"'
+---| "ld"
 ---
 ---Left+Up
 ---
----| '"lu"'
+---| "lu"
 ---
 ---Right
 ---
----| '"r"'
+---| "r"
 ---
 ---Right+Down
 ---
----| '"rd"'
+---| "rd"
 ---
 ---Right+Up
 ---
----| '"ru"'
+---| "ru"
 ---
 ---Up
 ---
----| '"u"'
+---| "u"
 
 ---
 ---Types of Joystick inputs.
@@ -357,12 +357,12 @@ function Joystick:setVibration(left, right) end
 ---
 ---Analog axis.
 ---
----| '"axis"'
+---| "axis"
 ---
 ---Button.
 ---
----| '"button"'
+---| "button"
 ---
 ---8-direction hat value.
 ---
----| '"hat"'
+---| "hat"

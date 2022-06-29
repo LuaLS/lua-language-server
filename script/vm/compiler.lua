@@ -11,6 +11,61 @@ local vm         = require 'vm.vm'
 ---@field _node           vm.node
 ---@field _globalBase     table
 
+-- 该函数有副作用，会给source绑定node！
+local function bindDocs(source)
+    local isParam = source.parent.type == 'funcargs'
+                 or (source.parent.type == 'in' and source.finish <= source.parent.keys.finish)
+    local docs = source.bindDocs
+    for i = #docs, 1, -1 do
+        local doc = docs[i]
+        if doc.type == 'doc.type' then
+            if not isParam then
+                vm.setNode(source, vm.compileNode(doc))
+                return true
+            end
+        end
+        if doc.type == 'doc.class' then
+            if (source.type == 'local' and not isParam)
+            or (source._globalNode and guide.isSet(source))
+            or source.type == 'tablefield'
+            or source.type == 'tableindex' then
+                vm.setNode(source, vm.compileNode(doc))
+                return true
+            end
+        end
+        if doc.type == 'doc.param' then
+            if isParam and source[1] == doc.param[1] then
+                local node = vm.compileNode(doc)
+                if doc.optional then
+                    node:addOptional()
+                end
+                vm.setNode(source, node)
+                return true
+            end
+        end
+        if doc.type == 'doc.module' then
+            local name = doc.module
+            local uri = rpath.findUrisByRequirePath(guide.getUri(source), name)[1]
+            if not uri then
+                return true
+            end
+            local state = files.getState(uri)
+            local ast   = state and state.ast
+            if not ast then
+                return true
+            end
+            vm.setNode(source, vm.compileNode(ast))
+            return true
+        end
+        if doc.type == 'doc.overload' then
+            if not isParam then
+                vm.setNode(source, vm.compileNode(doc))
+            end
+        end
+    end
+    return false
+end
+
 local searchFieldSwitch = util.switch()
     : case 'table'
     : call(function (suri, source, key, ref, pushResult)
@@ -47,6 +102,7 @@ local searchFieldSwitch = util.switch()
         end
     end)
     : case 'string'
+    : case 'doc.type.string'
     : call(function (suri, source, key, ref, pushResult)
         -- change to `string: stringlib` ?
         local stringlib = vm.getGlobal('type', 'stringlib')
@@ -59,15 +115,29 @@ local searchFieldSwitch = util.switch()
     : call(function (suri, node, key, ref, pushResult)
         local fields
         if key then
-            fields = vm.getLocalSources(node, key)
+            fields = vm.getLocalSourcesSets(node, key)
         else
-            fields = vm.getLocalFields(node)
+            fields = vm.getLocalFields(node, false)
         end
-        if fields then
-            for _, src in ipairs(fields) do
-                if ref or guide.isSet(src) then
-                    pushResult(src)
+        if not fields then
+            return
+        end
+        local hasMarkDoc = {}
+        for _, src in ipairs(fields) do
+            if src.bindDocs then
+                if bindDocs(src) then
+                    local skey = guide.getKeyName(src)
+                    if skey then
+                        hasMarkDoc[skey] = true
+                    end
+                    pushResult(src, true)
                 end
+            end
+        end
+        for _, src in ipairs(fields) do
+            local skey = guide.getKeyName(src)
+            if not hasMarkDoc[skey] then
+                pushResult(src)
             end
         end
     end)
@@ -78,8 +148,13 @@ local searchFieldSwitch = util.switch()
             or not math.tointeger(key) then
                 return
             end
+            pushResult(source.node)
         end
-        pushResult(source.node)
+        if type(key) == 'table' then
+            if vm.isSubType(suri, key, 'integer') then
+                pushResult(source.node)
+            end
+        end
     end)
     : case 'doc.type.table'
     : call(function (suri, source, key, ref, pushResult)
@@ -179,7 +254,11 @@ local searchFieldSwitch = util.switch()
         end
     end)
 
-
+---@param suri uri
+---@param object vm.global
+---@param key string|vm.global
+---@param ref boolean
+---@param pushResult fun(field: vm.object, isMark?: boolean)
 function vm.getClassFields(suri, object, key, ref, pushResult)
     local mark = {}
 
@@ -201,7 +280,7 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                         if key == nil
                         or fieldKey == key then
                             if not searchedFields[fieldKey] then
-                                pushResult(field)
+                                pushResult(field, true)
                                 hasFounded[fieldKey] = true
                             end
                         end
@@ -214,7 +293,7 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                             if vm.isSubType(suri, key.name, fieldNode) then
                                 local nkey = '|' .. key.name
                                 if not searchedFields[nkey] then
-                                    pushResult(field)
+                                    pushResult(field, true)
                                     hasFounded[nkey] = true
                                 end
                             end
@@ -230,13 +309,13 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                             or     keyType == 'string' then
                                 typeName = keyType
                             end
-                            if typeName then
+                            if typeName and field.field.type ~= 'doc.field.name' then
                                 -- ---@field [integer] boolean -> class[1]
                                 local fieldNode = vm.compileNode(field.field)
                                 if vm.isSubType(suri, typeName, fieldNode) then
                                     local nkey = '|' .. typeName
                                     if not searchedFields[nkey] then
-                                        pushResult(field)
+                                        pushResult(field, true)
                                         hasFounded[nkey] = true
                                     end
                                 end
@@ -245,18 +324,9 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                     end
                 end
                 -- check local field and global field
-                if set.bindSources then
+                if not hasFounded[key] and set.bindSources then
                     for _, src in ipairs(set.bindSources) do
-                        searchFieldSwitch(src.type, suri, src, key, ref, function (field)
-                            local fieldKey = guide.getKeyName(field)
-                            if fieldKey then
-                                if  not searchedFields[fieldKey]
-                                and guide.isSet(field) then
-                                    hasFounded[fieldKey] = true
-                                    pushResult(field)
-                                end
-                            end
-                        end)
+                        local skipSetLocal
                         if src.value and src.value.type == 'table' then
                             searchFieldSwitch('table', suri, src.value, key, ref, function (field)
                                 local fieldKey = guide.getKeyName(field)
@@ -264,7 +334,22 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                                     if  not searchedFields[fieldKey]
                                     and guide.isSet(field) then
                                         hasFounded[fieldKey] = true
-                                        pushResult(field)
+                                        pushResult(field, true)
+                                        if src.type == 'local' then
+                                            skipSetLocal = true
+                                        end
+                                    end
+                                end
+                            end)
+                        end
+                        if not skipSetLocal then
+                            searchFieldSwitch(src.type, suri, src, key, ref, function (field)
+                                local fieldKey = guide.getKeyName(field)
+                                if fieldKey then
+                                    if  not searchedFields[fieldKey]
+                                    and guide.isSet(field) then
+                                        hasFounded[fieldKey] = true
+                                        pushResult(field, true)
                                     end
                                 end
                             end)
@@ -296,7 +381,7 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                 for _, set in ipairs(sets) do
                     pushResult(set)
                 end
-            else
+            elseif type(key) == 'string' then
                 local global = vm.getGlobal('variable', key)
                 if global then
                     for _, set in ipairs(global:getSets(suri)) do
@@ -312,10 +397,10 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
 end
 
 ---@class parser.object
----@field _sign? vm.sign
+---@field _sign vm.sign|false
 
 ---@param source parser.object
----@return vm.sign?
+---@return vm.sign|false
 local function getObjectSign(source)
     if source._sign ~= nil then
         return source._sign
@@ -376,7 +461,7 @@ end
 
 ---@param func  parser.object
 ---@param index integer
----@return vm.object?
+---@return (parser.object|vm.generic)?
 function vm.getReturnOfFunction(func, index)
     if func.type == 'function' then
         if not func._returns then
@@ -384,9 +469,9 @@ function vm.getReturnOfFunction(func, index)
         end
         if not func._returns[index] then
             func._returns[index] = {
-                type   = 'function.return',
-                parent = func,
-                index  = index,
+                type        = 'function.return',
+                parent      = func,
+                returnIndex = index,
             }
         end
         return func._returns[index]
@@ -394,7 +479,12 @@ function vm.getReturnOfFunction(func, index)
     if func.type == 'doc.type.function' then
         local rtn = func.returns[index]
         if not rtn then
-            return nil
+            local lastReturn = func.returns[#func.returns]
+            if lastReturn and lastReturn.name and lastReturn.name[1] == '...' then
+                rtn = lastReturn
+            else
+                return nil
+            end
         end
         local sign = getObjectSign(func)
         if not sign then
@@ -402,6 +492,7 @@ function vm.getReturnOfFunction(func, index)
         end
         return vm.createGeneric(rtn, sign)
     end
+    return nil
 end
 
 ---@return vm.node
@@ -425,6 +516,38 @@ local function getReturnOfSetMetaTable(args)
         end)
     end
     return node
+end
+
+---@param source parser.object
+local function matchCall(source)
+    local call = source.parent
+    if not call
+    or call.type ~= 'call'
+    or call.node ~= source then
+        return
+    end
+    local funcs = vm.getMatchedFunctions(source, call.args)
+    local myNode = vm.getNode(source)
+    if not myNode then
+        return
+    end
+    local needRemove
+    for n in myNode:eachObject() do
+        if n.type == 'function'
+        or n.type == 'doc.type.function' then
+            if not util.arrayHas(funcs, n) then
+                if not needRemove then
+                    needRemove = vm.createNode()
+                end
+                needRemove:merge(n)
+            end
+        end
+    end
+    if needRemove then
+        local newNode = myNode:copy()
+        newNode:removeNode(needRemove)
+        vm.setNode(source, newNode, true)
+    end
 end
 
 ---@return vm.node?
@@ -478,13 +601,14 @@ local function getReturn(func, index, args)
         end
         return vm.compileNode(ast)
     end
-    local node = vm.compileNode(func)
+    local funcNode = vm.compileNode(func)
     ---@type vm.node?
     local result
-    for cnode in node:eachObject() do
-        if cnode.type == 'function'
-        or cnode.type == 'doc.type.function' then
-            local returnObject = vm.getReturnOfFunction(cnode, index)
+    for mfunc in funcNode:eachObject() do
+        if mfunc.type == 'function'
+        or mfunc.type == 'doc.type.function' then
+            ---@cast mfunc parser.object
+            local returnObject = vm.getReturnOfFunction(mfunc, index)
             if returnObject then
                 local returnNode = vm.compileNode(returnObject)
                 for rnode in returnNode:eachObject() do
@@ -517,123 +641,116 @@ local function bindAs(source)
     local root = guide.getRoot(source)
     local docs = root.docs
     if not docs then
-        return
+        return false
     end
-    for _, doc in ipairs(docs) do
-        if doc.type == 'doc.as' and doc.originalComment.start == source.finish + 2 then
-            if doc.as then
-                vm.setNode(source, vm.compileNode(doc.as), true)
+    local ases = docs._asCache
+    if not ases then
+        ases = {}
+        docs._asCache = ases
+        for _, doc in ipairs(docs) do
+            if doc.type == 'doc.as' and doc.as then
+                ases[#ases+1] = doc
             end
-            return true
+        end
+        table.sort(ases, function (a, b)
+            return a.start < b.start
+        end)
+    end
+
+    if #ases == 0 then
+        return false
+    end
+
+    local max = #ases
+    local index
+    local left  = 1
+    local right = max
+    for _ = 1, 1000 do
+        if left == right then
+            index = left
+            break
+        end
+        index = left + (right - left) // 2
+        local doc = ases[index]
+        if doc.originalComment.start < source.finish + 2 then
+            left = index + 1
+        else
+            right = index
         end
     end
+
+    local doc = ases[index]
+    if doc and doc.originalComment.start == source.finish + 2 then
+        vm.setNode(source, vm.compileNode(doc.as), true)
+        return true
+    end
+
     return false
 end
 
-local function bindDocs(source)
-    local isParam = source.parent.type == 'funcargs'
-                 or source.parent.type == 'in'
-    local docs = source.bindDocs
-    for i = #docs, 1, -1 do
-        local doc = docs[i]
-        if doc.type == 'doc.type' then
-            if not isParam then
-                vm.setNode(source, vm.compileNode(doc))
-                return true
-            end
-        end
-        if doc.type == 'doc.class' then
-            if (source.type == 'local' and not isParam)
-            or (source._globalNode and guide.isSet(source))
-            or source.type == 'tablefield'
-            or source.type == 'tableindex' then
-                vm.setNode(source, vm.compileNode(doc))
-                return true
-            end
-        end
-        if doc.type == 'doc.param' then
-            if isParam and source[1] == doc.param[1] then
-                local node = vm.compileNode(doc)
-                if doc.optional then
-                    node:addOptional()
-                end
-                vm.setNode(source, node)
-                return true
-            end
-        end
-        if doc.type == 'doc.module' then
-            local name = doc.module
-            local uri = rpath.findUrisByRequirePath(guide.getUri(source), name)[1]
-            if not uri then
-                return nil
-            end
-            local state = files.getState(uri)
-            local ast   = state and state.ast
-            if not ast then
-                return nil
-            end
-            vm.setNode(source, vm.compileNode(ast))
-            return true
-        end
-        if doc.type == 'doc.overload' then
-            if not isParam then
-                vm.setNode(source, vm.compileNode(doc))
-            end
-        end
-    end
-    return false
-end
-
-local function compileByLocalID(source)
-    local sources = vm.getLocalSources(source)
-    if not sources then
-        return
-    end
-    local hasMarkDoc
-    for _, src in ipairs(sources) do
-        if src.bindDocs then
-            if bindDocs(src) then
-                hasMarkDoc = true
-                vm.setNode(source, vm.compileNode(src))
-            end
-        end
-    end
-    for _, src in ipairs(sources) do
-        if src.value then
-            if not hasMarkDoc or guide.isLiteral(src.value) then
-                if src.value.type ~= 'nil' then
-                    vm.setNode(source, vm.compileNode(src.value))
-                end
-            end
-        end
-    end
-end
-
----@param source vm.node
----@param key? any
+---@param source parser.object
+---@param key? string|vm.global
 ---@param pushResult fun(source: parser.object)
 function vm.compileByParentNode(source, key, ref, pushResult)
     local parentNode = vm.compileNode(source)
+    local docedResults = {}
+    local commonResults = {}
     local suri = guide.getUri(source)
+    local hasClass
     for node in parentNode:eachObject() do
-        searchFieldSwitch(node.type, suri, node, key, ref, pushResult)
+        if  node.type == 'global'
+        and node.cate == 'type'
+        ---@cast node vm.global
+        and not guide.isBasicType(node.name) then
+            hasClass = true
+            break
+        end
+    end
+    for node in parentNode:eachObject() do
+        if not hasClass
+        or (
+                node.type == 'global'
+            and node.cate == 'type'
+            ---@cast node vm.global
+            and not guide.isBasicType(node.name)
+        )
+        or node.type == 'doc.type.string' then
+            searchFieldSwitch(node.type, suri, node, key, ref, function (res, markDoc)
+                if markDoc then
+                    docedResults[#docedResults+1] = res
+                else
+                    commonResults[#commonResults+1] = res
+                end
+            end)
+        end
+    end
+    if #docedResults > 0 then
+        for _, res in ipairs(docedResults) do
+            pushResult(res)
+        end
+    end
+    if #docedResults == 0 or key == nil then
+        for _, res in ipairs(commonResults) do
+            pushResult(res)
+        end
     end
 end
 
----@return vm.node?
-local function selectNode(source, list, index)
-    if not list then
-        return nil
-    end
+---@param list  parser.object[]
+---@param index integer
+---@return vm.node
+---@return parser.object?
+function vm.selectNode(list, index)
     local exp
     if list[index] then
         exp = list[index]
+        index = 1
     else
         for i = index, 1, -1 do
             if list[i] then
                 local last = list[i]
                 if last.type == 'call'
-                or last.type == '...' then
+                or last.type == 'varargs' then
                     index = index - i + 1
                     exp = last
                 end
@@ -642,39 +759,45 @@ local function selectNode(source, list, index)
         end
     end
     if not exp then
-        return nil
+        return vm.createNode(vm.declareGlobal('type', 'nil')), nil
     end
+    ---@type vm.node?
     local result
     if exp.type == 'call' then
         result = getReturn(exp.node, index, exp.args)
         if not result then
-            vm.setNode(source, vm.declareGlobal('type', 'unknown'))
-            return vm.getNode(source)
+            return vm.createNode(vm.declareGlobal('type', 'unknown')), exp
         end
     else
+        ---@type vm.node
         result = vm.compileNode(exp)
+        if result and exp.type == 'varargs' and result:isEmpty() then
+            result:merge(vm.declareGlobal('type', 'unknown'))
+        end
     end
+    return result, exp
+end
+
+---@param source parser.object
+---@param list   parser.object[]
+---@param index  integer
+---@return vm.node
+local function selectNode(source, list, index)
+    local result = vm.selectNode(list, index)
     if source.type == 'function.return' then
         -- remove any for returns
         local rtnNode = vm.createNode()
-        local hasKnownType
         for n in result:eachObject() do
             if guide.isLiteral(n) then
-                hasKnownType = true
                 rtnNode:merge(n)
             end
             if n.type == 'global' and n.cate == 'type' then
-                if  n.name ~= 'any'
-                and n.name ~= 'unknown' then
-                    hasKnownType = true
+                if  n.name ~= 'any' then
                     rtnNode:merge(n)
                 end
             else
                 rtnNode:merge(n)
             end
-        end
-        if not hasKnownType then
-            rtnNode:merge(vm.declareGlobal('type', 'unknown'))
         end
         vm.setNode(source, rtnNode)
         return rtnNode
@@ -684,15 +807,19 @@ local function selectNode(source, list, index)
 end
 
 ---@param source parser.object
----@param node   vm.object
+---@param node   vm.node.object
 ---@return boolean
 local function isValidCallArgNode(source, node)
     if source.type == 'function' then
         return node.type == 'doc.type.function'
     end
     if source.type == 'table' then
-        return node.type == 'doc.type.table'
-            or (node.type == 'global' and node.cate == 'type' and not guide.isBasicType(node.name))
+        return node.type == 'doc.type.table' or node.type == 'doc.type.array'
+            or (    node.type == 'global'
+                and node.cate == 'type'
+                ---@cast node vm.global
+                and not guide.isBasicType(node.name)
+            )
     end
     if source.type == 'dummyarg' then
         return true
@@ -741,12 +868,14 @@ local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
 
     for n in callNode:eachObject() do
         if n.type == 'function' then
+            ---@cast n parser.object
             local sign = getObjectSign(n)
             local farg = getFuncArg(n, myIndex)
             if farg then
                 for fn in vm.compileNode(farg):eachObject() do
                     if isValidCallArgNode(arg, fn) then
                         if fn.type == 'doc.type.function' then
+                            ---@cast fn parser.object
                             if sign then
                                 local generic = vm.createGeneric(fn, sign)
                                 local args    = {}
@@ -762,6 +891,7 @@ local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
             end
         end
         if n.type == 'doc.type.function' then
+            ---@cast n parser.object
             local myEvent
             if n.args[eventIndex] then
                 local argNode = vm.compileNode(n.args[eventIndex])
@@ -788,6 +918,7 @@ end
 ---@param arg parser.object
 ---@param call parser.object
 ---@param index? integer
+---@return vm.node?
 function vm.compileCallArg(arg, call, index)
     if not index then
         for i, carg in ipairs(call.args) do
@@ -795,6 +926,9 @@ function vm.compileCallArg(arg, call, index)
                 index = i
                 break
             end
+        end
+        if not index then
+            return nil
         end
     end
 
@@ -812,8 +946,45 @@ function vm.compileCallArg(arg, call, index)
     return vm.getNode(arg)
 end
 
+---@class parser.object
+---@field _iterator? table
+---@field _iterArgs? table
+---@field _iterVars? table<parser.object, vm.node>
+
 ---@param source parser.object
----@return vm.node
+local function compileForVars(source)
+    if source._iterator then
+        return
+    end
+        --  for k, v in pairs(t) do
+        --> for k, v in iterator, status, initValue do
+        --> local k, v = iterator(status, initValue)
+    source._iterator = {
+        type = 'dummyfunc',
+        parent = source,
+    }
+    source._iterArgs = {{},{}}
+    source._iterVars = {}
+    -- iterator
+    selectNode(source._iterator,    source.exps, 1)
+    -- status
+    selectNode(source._iterArgs[1], source.exps, 2)
+    -- initValue
+    selectNode(source._iterArgs[2], source.exps, 3)
+    if source.keys then
+        for i, loc in ipairs(source.keys) do
+            local node = getReturn(source._iterator, i, source._iterArgs)
+            if node then
+                if i == 1 then
+                    node:removeOptional()
+                end
+                source._iterVars[loc] = node
+            end
+        end
+    end
+end
+
+---@param source parser.object
 local function compileLocal(source)
     vm.setNode(source, source)
 
@@ -837,13 +1008,22 @@ local function compileLocal(source)
         end
     end
     local hasMarkValue
-    if source.value then
-        if not hasMarkDoc or guide.isLiteral(source.value) then
-            hasMarkValue = true
-            if source.value.type == 'table' then
-                vm.setNode(source, source.value)
-            elseif source.value.type ~= 'nil' then
-                vm.setNode(source, vm.compileNode(source.value))
+    if not hasMarkDoc and source.value then
+        hasMarkValue = true
+        if source.value.type == 'table' then
+            vm.setNode(source, source.value)
+        elseif source.value.type ~= 'nil' then
+            vm.setNode(source, vm.compileNode(source.value))
+        end
+    end
+    if not hasMarkValue and not hasMarkValue then
+        if source.ref then
+            for _, ref in ipairs(source.ref) do
+                if  ref.type == 'setlocal'
+                and ref.value
+                and ref.value.type == 'function' then
+                    vm.setNode(source, vm.compileNode(ref.value))
+                end
             end
         end
     end
@@ -883,16 +1063,209 @@ local function compileLocal(source)
     end
     -- for x in ... do
     if source.parent.type == 'in' then
-        vm.compileNode(source.parent)
+        compileForVars(source.parent)
+        local keyNode = source.parent._iterVars[source]
+        if keyNode then
+            vm.setNode(source, keyNode)
+        end
     end
 
     -- for x = ... do
     if source.parent.type == 'loop' then
-        vm.compileNode(source.parent)
+        if source.parent.loc == source then
+            vm.setNode(source, vm.declareGlobal('type', 'integer'))
+        end
     end
 
     vm.getNode(source):setData('hasDefined', hasMarkDoc or hasMarkParam or hasMarkValue)
 end
+
+local binarySwich = util.switch()
+    : case 'and'
+    : call(function (source)
+        local node1 = vm.compileNode(source[1])
+        local node2 = vm.compileNode(source[2])
+        local r1 = vm.testCondition(source[1])
+        if r1 == true then
+            vm.setNode(source, node2)
+        elseif r1 == false then
+            vm.setNode(source, node1)
+        else
+            vm.setNode(source, node2)
+        end
+    end)
+    : case 'or'
+    : call(function (source)
+        local node1 = vm.compileNode(source[1])
+        local node2 = vm.compileNode(source[2])
+        local r1 = vm.testCondition(source[1])
+        if r1 == true then
+            vm.setNode(source, node1)
+        elseif r1 == false then
+            vm.setNode(source, node2)
+        else
+            vm.getNode(source):merge(node1)
+            vm.getNode(source):setTruthy()
+            vm.getNode(source):merge(node2)
+        end
+    end)
+    : case '=='
+    : case '~='
+    : call(function (source)
+        local result = vm.equal(source[1], source[2])
+        if result == nil then
+            vm.setNode(source, vm.declareGlobal('type', 'boolean'))
+        else
+            if source.op.type == '~=' then
+                result = not result
+            end
+            vm.setNode(source, {
+                type   = 'boolean',
+                start  = source.start,
+                finish = source.finish,
+                parent = source,
+                [1]    = result,
+            })
+        end
+    end)
+    : case '<<'
+    : case '>>'
+    : case '&'
+    : case '|'
+    : case '~'
+    : call(function (source)
+        local a = vm.getInteger(source[1])
+        local b = vm.getInteger(source[2])
+        if a and b then
+            local op = source.op.type
+            local result = op.type == '<<' and a << b
+                        or op.type == '>>' and a >> b
+                        or op.type == '&'  and a &  b
+                        or op.type == '|'  and a |  b
+                        or op.type == '~'  and a ~  b
+            vm.setNode(source, {
+                type   = 'integer',
+                start  = source.start,
+                finish = source.finish,
+                parent = source,
+                [1]    = result,
+            })
+        else
+            vm.setNode(source, vm.declareGlobal('type', 'integer'))
+        end
+    end)
+    : case '+'
+    : case '-'
+    : case '*'
+    : case '/'
+    : case '%'
+    : case '//'
+    : case '^'
+    : call(function (source)
+        local a = vm.getNumber(source[1])
+        local b = vm.getNumber(source[2])
+        local op = source.op.type
+        local zero = b == 0
+                and (  op == '%'
+                    or op == '/'
+                    or op == '//'
+                )
+        if a and b and not zero then
+            local result = op == '+'  and a +  b
+                        or op == '-'  and a -  b
+                        or op == '*'  and a *  b
+                        or op == '/'  and a /  b
+                        or op == '%'  and a %  b
+                        or op == '//' and a // b
+                        or op == '^'  and a ^  b
+            vm.setNode(source, {
+                type   = math.type(result) == 'integer' and 'integer' or 'number',
+                start  = source.start,
+                finish = source.finish,
+                parent = source,
+                [1]    = result,
+            })
+        else
+            if op == '+'
+            or op == '-'
+            or op == '*'
+            or op == '//'
+            or op == '%' then
+                local uri = guide.getUri(source)
+                local infer1 = vm.getInfer(source[1])
+                local infer2 = vm.getInfer(source[2])
+                if infer1:hasType(uri, 'integer')
+                or infer2:hasType(uri, 'integer') then
+                    if  not infer1:hasType(uri, 'number')
+                    and not infer2:hasType(uri, 'number') then
+                        vm.setNode(source, vm.declareGlobal('type', 'integer'))
+                        return
+                    end
+                end
+            end
+            vm.setNode(source, vm.declareGlobal('type', 'number'))
+        end
+    end)
+    : case '..'
+    : call(function (source)
+        local a =  vm.getString(source[1])
+                or vm.getNumber(source[1])
+        local b =  vm.getString(source[2])
+                or vm.getNumber(source[2])
+        if a and b then
+            if type(a) == 'number' or type(b) == 'number' then
+                local uri     = guide.getUri(source)
+                local version = config.get(uri, 'Lua.runtime.version')
+                if math.tointeger(a) and math.type(a) == 'float' then
+                    if version == 'Lua 5.3' or version == 'Lua 5.4' then
+                        a = ('%.1f'):format(a)
+                    else
+                        a = ('%.0f'):format(a)
+                    end
+                end
+                if math.tointeger(b) and math.type(b) == 'float' then
+                    if version == 'Lua 5.3' or version == 'Lua 5.4' then
+                        b = ('%.1f'):format(b)
+                    else
+                        b = ('%.0f'):format(b)
+                    end
+                end
+            end
+            vm.setNode(source, {
+                type   = 'string',
+                start  = source.start,
+                finish = source.finish,
+                parent = source,
+                [1]    = a .. b,
+            })
+        else
+            vm.setNode(source, vm.declareGlobal('type', 'string'))
+        end
+    end)
+    : case '>'
+    : case '<'
+    : case '>='
+    : case '<='
+    : call(function (source)
+        local a = vm.getNumber(source[1])
+        local b = vm.getNumber(source[2])
+        if a and b then
+            local op = source.op.type
+            local result = op.type == '>'  and a >  b
+                        or op.type == '<'  and a <  b
+                        or op.type == '>=' and a >= b
+                        or op.type == '<=' and a <= b
+            vm.setNode(source, {
+                type   = 'boolean',
+                start  = source.start,
+                finish = source.finish,
+                parent = source,
+                [1]    =result,
+            })
+        else
+            vm.setNode(source, vm.declareGlobal('type', 'boolean'))
+        end
+    end)
 
 local compilerSwitch = util.switch()
     : case 'nil'
@@ -920,9 +1293,21 @@ local compilerSwitch = util.switch()
         or source.parent.type == 'setlocal'
         or source.parent.type == 'tablefield'
         or source.parent.type == 'tableindex'
+        or source.parent.type == 'tableexp'
         or source.parent.type == 'setfield'
         or source.parent.type == 'setindex' then
-            vm.setNode(source, vm.compileNode(source.parent))
+            local parentNode = vm.compileNode(source.parent)
+            for _, pn in ipairs(parentNode) do
+                if  pn.type == 'global'
+                and pn.cate == 'type' then
+                    ---@cast pn vm.global
+                    if not guide.isBasicType(pn.name) then
+                        vm.setNode(source, pn)
+                    end
+                elseif pn.type == 'doc.type.table' or pn.type == 'doc.type.array' then
+                    vm.setNode(source, pn)
+                end
+            end
         end
     end)
     : case 'function'
@@ -964,8 +1349,7 @@ local compilerSwitch = util.switch()
 
         local hasMark = vm.getNode(source):getData 'hasDefined'
 
-        local runner = vm.createRunner(source)
-        runner:launch(function (src, node)
+        vm.launchRunner(source, function (src, node)
             if src.type == 'setlocal' then
                 if src.bindDocs then
                     for _, doc in ipairs(src.bindDocs) do
@@ -975,7 +1359,7 @@ local compilerSwitch = util.switch()
                         end
                     end
                 end
-                if src.value and guide.isLiteral(src.value) then
+                if src.value then
                     if src.value.type == 'table' then
                         vm.setNode(src, vm.createNode(src.value), true)
                     else
@@ -996,6 +1380,7 @@ local compilerSwitch = util.switch()
                     return
                 end
                 vm.setNode(src, node, true)
+                matchCall(src)
             end
         end)
 
@@ -1004,7 +1389,10 @@ local compilerSwitch = util.switch()
             for _, ref in ipairs(source.ref) do
                 if  ref.type == 'setlocal'
                 and guide.getParentFunction(ref) == parentFunc then
-                    vm.setNode(source, vm.getNode(ref))
+                    local refNode = vm.getNode(ref)
+                    if refNode then
+                        vm.setNode(source, refNode)
+                    end
                 end
             end
         end
@@ -1023,27 +1411,14 @@ local compilerSwitch = util.switch()
     : case 'setfield'
     : case 'setmethod'
     : case 'setindex'
-    : call(function (source)
-        compileByLocalID(source)
-        local key = guide.getKeyName(source)
-        if key == nil then
-            return
-        end
-        vm.compileByParentNode(source.node, key, false, function (src)
-            if src.type == 'doc.type.field'
-            or src.type == 'doc.field' then
-                vm.setNode(source, vm.compileNode(src))
-            end
-        end)
-    end)
     : case 'getfield'
     : case 'getmethod'
     : case 'getindex'
     : call(function (source)
-        if bindAs(source) then
+        if guide.isGet(source) and bindAs(source) then
             return
         end
-        compileByLocalID(source)
+        ---@type (string|vm.node)?
         local key = guide.getKeyName(source)
         if key == nil and source.index then
             key = vm.compileNode(source.index)
@@ -1052,14 +1427,30 @@ local compilerSwitch = util.switch()
             return
         end
         if type(key) == 'table' then
+            ---@cast key vm.node
             local uri = guide.getUri(source)
             local value = vm.getTableValue(uri, vm.compileNode(source.node), key)
             if value then
                 vm.setNode(source, value)
             end
+            for k in key:eachObject() do
+                if k.type == 'global' and k.cate == 'type' then
+                    ---@cast k vm.global
+                    vm.compileByParentNode(source.node, k, false, function (src)
+                        vm.setNode(source, vm.compileNode(src))
+                        if src.value then
+                            vm.setNode(source, vm.compileNode(src.value))
+                        end
+                    end)
+                end
+            end
         else
+            ---@cast key string
             vm.compileByParentNode(source.node, key, false, function (src)
                 vm.setNode(source, vm.compileNode(src))
+                if src.value then
+                    vm.setNode(source, vm.compileNode(src.value))
+                end
             end)
         end
     end)
@@ -1097,21 +1488,20 @@ local compilerSwitch = util.switch()
             hasMarkDoc = bindDocs(source)
         end
 
-        if source.value then
-            if not hasMarkDoc or guide.isLiteral(source.value) then
-                if source.value.type == 'table' then
-                    vm.setNode(source, source.value)
-                elseif source.value.type ~= 'nil' then
-                    vm.setNode(source, vm.compileNode(source.value))
-                end
-            end
-        end
-
         if not hasMarkDoc then
-            vm.compileByParentNode(source.parent, guide.getKeyName(source), false, function (src)
-                vm.setNode(source, vm.compileNode(src))
+            vm.compileByParentNode(source.node, guide.getKeyName(source), false, function (src)
+                if src.type == 'doc.field'
+                or src.type == 'doc.type.field' then
+                    hasMarkDoc = true
+                    vm.setNode(source, vm.compileNode(src))
+                end
             end)
         end
+
+        if not hasMarkDoc and source.value then
+            vm.setNode(source, vm.compileNode(source.value))
+        end
+
     end)
     : case 'field'
     : case 'method'
@@ -1120,18 +1510,29 @@ local compilerSwitch = util.switch()
     end)
     : case 'tableexp'
     : call(function (source)
+        if (source.parent.type == 'table') then
+            local node = vm.compileNode(source.parent)
+            for n in node:eachObject() do
+                if n.type == 'doc.type.array' then
+                    vm.setNode(source, vm.compileNode(n.node))
+                end
+            end
+        end
         vm.setNode(source, vm.compileNode(source.value))
     end)
     : case 'function.return'
+    ---@param source parser.object
     : call(function (source)
         local func  = source.parent
-        local index = source.index
+        local index = source.returnIndex
         local hasMarkDoc
         if func.bindDocs then
             local sign = getObjectSign(func)
+            local lastReturn
             for _, doc in ipairs(func.bindDocs) do
                 if doc.type == 'doc.return' then
                     for _, rtn in ipairs(doc.returns) do
+                        lastReturn = rtn
                         if rtn.returnIndex == index then
                             hasMarkDoc = true
                             local hasGeneric
@@ -1141,6 +1542,7 @@ local compilerSwitch = util.switch()
                                 end)
                             end
                             if hasGeneric then
+                                ---@cast sign -false
                                 vm.setNode(source, vm.createGeneric(rtn, sign))
                             else
                                 vm.setNode(source, vm.compileNode(rtn))
@@ -1149,11 +1551,49 @@ local compilerSwitch = util.switch()
                     end
                 end
             end
+            if  lastReturn
+            and not hasMarkDoc then
+                if lastReturn.name and lastReturn.name[1] == '...' then
+                    hasMarkDoc = true
+                    vm.setNode(source, vm.compileNode(lastReturn))
+                end
+            end
         end
+        local hasReturn
         if func.returns and not hasMarkDoc then
             for _, rtn in ipairs(func.returns) do
-                selectNode(source, rtn, index)
+                if selectNode(source, rtn, index) then
+                    hasReturn = true
+                end
             end
+            if hasReturn then
+                local hasKnownType
+                local hasUnknownType
+                for n in vm.getNode(source):eachObject() do
+                    if guide.isLiteral(n) then
+                        if n.type ~= 'nil' then
+                            hasKnownType = true
+                            break
+                        end
+                        goto CONTINUE
+                    end
+                    if n.type == 'global' and n.cate == 'type' then
+                        if n.name ~= 'nil' then
+                            hasKnownType = true
+                            break
+                        end
+                        goto CONTINUE
+                    end
+                    hasUnknownType = true
+                    ::CONTINUE::
+                end
+                if not hasKnownType and hasUnknownType then
+                    vm.setNode(source, vm.declareGlobal('type', 'unknown'))
+                end
+            end
+        end
+        if not hasMarkDoc and not hasReturn then
+            vm.setNode(source, vm.declareGlobal('type', 'nil'))
         end
     end)
     : case 'main'
@@ -1174,13 +1614,6 @@ local compilerSwitch = util.switch()
             if not node then
                 return
             end
-            for n in node:eachObject() do
-                if  n.type == 'global'
-                and n.cate == 'type'
-                and n.name == '...' then
-                    return
-                end
-            end
             vm.setNode(source, node)
         end
         if vararg.type == 'varargs' then
@@ -1199,50 +1632,7 @@ local compilerSwitch = util.switch()
         if not node then
             return
         end
-        for n in node:eachObject() do
-            if  n.type == 'global'
-            and n.cate == 'type'
-            and n.name == '...' then
-                return
-            end
-        end
         vm.setNode(source, node)
-    end)
-    : case 'in'
-    : call(function (source)
-        if not source._iterator then
-            --  for k, v in pairs(t) do
-            --> for k, v in iterator, status, initValue do
-            --> local k, v = iterator(status, initValue)
-            source._iterator = {
-                type = 'dummyfunc',
-                parent = source,
-            }
-            source._iterArgs = {{},{}}
-        end
-        -- iterator
-        selectNode(source._iterator,    source.exps, 1)
-        -- status
-        selectNode(source._iterArgs[1], source.exps, 2)
-        -- initValue
-        selectNode(source._iterArgs[2], source.exps, 3)
-        if source.keys then
-            for i, loc in ipairs(source.keys) do
-                local node = getReturn(source._iterator, i, source._iterArgs)
-                if node then
-                    if i == 1 then
-                        node:removeOptional()
-                    end
-                    vm.setNode(loc, node)
-                end
-            end
-        end
-    end)
-    : case 'loop'
-    : call(function (source)
-        if source.loc then
-            vm.setNode(source.loc, vm.declareGlobal('type', 'integer'))
-        end
     end)
     : case 'doc.type'
     : call(function (source)
@@ -1256,6 +1646,7 @@ local compilerSwitch = util.switch()
     : case 'doc.type.integer'
     : case 'doc.type.string'
     : case 'doc.type.boolean'
+    : case 'doc.type.code'
     : call(function (source)
         vm.setNode(source, source)
     end)
@@ -1361,7 +1752,7 @@ local compilerSwitch = util.switch()
     : call(function (source)
         local type = vm.getGlobal('type', source[1])
         if type then
-            vm.setNode(source, vm.compileNode(type))
+            vm.setNode(source, type)
         end
     end)
     : case 'doc.type.arg'
@@ -1375,10 +1766,6 @@ local compilerSwitch = util.switch()
             vm.getNode(source):addOptional()
         end
     end)
-    : case 'generic'
-    : call(function (source)
-        vm.setNode(source, source)
-    end)
     : case 'unary'
     : call(function (source)
         if bindAs(source) then
@@ -1388,7 +1775,7 @@ local compilerSwitch = util.switch()
             return
         end
         if source.op.type == 'not' then
-            local result = vm.test(source[1])
+            local result = vm.testCondition(source[1])
             if result == nil then
                 vm.setNode(source, vm.declareGlobal('type', 'boolean'))
                 return
@@ -1410,7 +1797,12 @@ local compilerSwitch = util.switch()
         if source.op.type == '-' then
             local v = vm.getNumber(source[1])
             if v == nil then
-                vm.setNode(source, vm.declareGlobal('type', 'number'))
+                local infer = vm.getInfer(source[1])
+                if infer:hasType(guide.getUri(source), 'integer') then
+                    vm.setNode(source, vm.declareGlobal('type', 'integer'))
+                else
+                    vm.setNode(source, vm.declareGlobal('type', 'number'))
+                end
                 return
             else
                 vm.setNode(source, {
@@ -1448,323 +1840,21 @@ local compilerSwitch = util.switch()
         if not source[1] or not source[2] then
             return
         end
-        if source.op.type == 'and' then
-            local node1 = vm.compileNode(source[1])
-            local node2 = vm.compileNode(source[2])
-            local r1 = vm.test(source[1])
-            if r1 == true then
-                vm.setNode(source, node2)
-            elseif r1 == false then
-                vm.setNode(source, node1)
-            else
-                vm.setNode(source, node2)
-            end
-        end
-        if source.op.type == 'or' then
-            local node1 = vm.compileNode(source[1])
-            local node2 = vm.compileNode(source[2])
-            local r1 = vm.test(source[1])
-            if r1 == true then
-                vm.setNode(source, node1)
-            elseif r1 == false then
-                vm.setNode(source, node2)
-            else
-                vm.getNode(source):merge(node1)
-                vm.getNode(source):setTruthy()
-                vm.getNode(source):merge(node2)
-            end
-        end
-        if source.op.type == '==' then
-            local result = vm.equal(source[1], source[2])
-            if result == nil then
-                vm.setNode(source, vm.declareGlobal('type', 'boolean'))
-                return
-            else
-                vm.setNode(source, {
-                    type   = 'boolean',
-                    start  = source.start,
-                    finish = source.finish,
-                    parent = source,
-                    [1]    = result,
-                })
-                return
-            end
-        end
-        if source.op.type == '~=' then
-            local result = vm.equal(source[1], source[2])
-            if result == nil then
-                vm.setNode(source, vm.declareGlobal('type', 'boolean'))
-                return
-            else
-                vm.setNode(source, {
-                    type   = 'boolean',
-                    start  = source.start,
-                    finish = source.finish,
-                    parent = source,
-                    [1]    = not result,
-                })
-                return
-            end
-        end
-        if source.op.type == '<<' then
-            local a = vm.getInteger(source[1])
-            local b = vm.getInteger(source[2])
-            if a and b then
-                vm.setNode(source, {
-                    type   = 'integer',
-                    start  = source.start,
-                    finish = source.finish,
-                    parent = source,
-                    [1]    = a << b,
-                })
-                return
-            else
-                vm.setNode(source, vm.declareGlobal('type', 'integer'))
-                return
-            end
-        end
-        if source.op.type == '>>' then
-            local a = vm.getInteger(source[1])
-            local b = vm.getInteger(source[2])
-            if a and b then
-                vm.setNode(source, {
-                    type   = 'integer',
-                    start  = source.start,
-                    finish = source.finish,
-                    parent = source,
-                    [1]    = a >> b,
-                })
-                return
-            else
-                vm.setNode(source, vm.declareGlobal('type', 'integer'))
-                return
-            end
-        end
-        if source.op.type == '&' then
-            local a = vm.getInteger(source[1])
-            local b = vm.getInteger(source[2])
-            if a and b then
-                vm.setNode(source, {
-                    type   = 'integer',
-                    start  = source.start,
-                    finish = source.finish,
-                    parent = source,
-                    [1]    = a & b,
-                })
-                return
-            else
-                vm.setNode(source, vm.declareGlobal('type', 'integer'))
-                return
-            end
-        end
-        if source.op.type == '|' then
-            local a = vm.getInteger(source[1])
-            local b = vm.getInteger(source[2])
-            if a and b then
-                vm.setNode(source, {
-                    type   = 'integer',
-                    start  = source.start,
-                    finish = source.finish,
-                    parent = source,
-                    [1]    = a | b,
-                })
-                return
-            else
-                vm.setNode(source, vm.declareGlobal('type', 'integer'))
-                return
-            end
-        end
-        if source.op.type == '~' then
-            local a = vm.getInteger(source[1])
-            local b = vm.getInteger(source[2])
-            if a and b then
-                vm.setNode(source, {
-                    type   = 'integer',
-                    start  = source.start,
-                    finish = source.finish,
-                    parent = source,
-                    [1]    = a ~ b,
-                })
-                return
-            else
-                vm.setNode(source, vm.declareGlobal('type', 'integer'))
-                return
-            end
-        end
-        if source.op.type == '+' then
-            local a = vm.getNumber(source[1])
-            local b = vm.getNumber(source[2])
-            if a and b then
-                local result = a + b
-                vm.setNode(source, {
-                    type   = math.type(result) == 'integer' and 'integer' or 'number',
-                    start  = source.start,
-                    finish = source.finish,
-                    parent = source,
-                    [1]    = result,
-                })
-                return
-            else
-                vm.setNode(source, vm.declareGlobal('type', 'number'))
-                return
-            end
-        end
-        if source.op.type == '-' then
-            local a = vm.getNumber(source[1])
-            local b = vm.getNumber(source[2])
-            if a and b then
-                local result = a - b
-                vm.setNode(source, {
-                    type   = math.type(result) == 'integer' and 'integer' or 'number',
-                    start  = source.start,
-                    finish = source.finish,
-                    parent = source,
-                    [1]    = result,
-                })
-                return
-            else
-                vm.setNode(source, vm.declareGlobal('type', 'number'))
-                return
-            end
-        end
-        if source.op.type == '*' then
-            local a = vm.getNumber(source[1])
-            local b = vm.getNumber(source[2])
-            if a and b then
-                local result = a * b
-                vm.setNode(source, {
-                    type   = math.type(result) == 'integer' and 'integer' or 'number',
-                    start  = source.start,
-                    finish = source.finish,
-                    parent = source,
-                    [1]    = result,
-                })
-                return
-            else
-                vm.setNode(source, vm.declareGlobal('type', 'number'))
-                return
-            end
-        end
-        if source.op.type == '/' then
-            local a = vm.getNumber(source[1])
-            local b = vm.getNumber(source[2])
-            if a and b then
-                vm.setNode(source, {
-                    type   = 'number',
-                    start  = source.start,
-                    finish = source.finish,
-                    parent = source,
-                    [1]    = a / b,
-                })
-                return
-            else
-                vm.setNode(source, vm.declareGlobal('type', 'number'))
-                return
-            end
-        end
-        if source.op.type == '%' then
-            local a = vm.getNumber(source[1])
-            local b = vm.getNumber(source[2])
-            if a and b and b ~= 0 then
-                local result = a % b
-                vm.setNode(source, {
-                    type   = math.type(result) == 'integer' and 'integer' or 'number',
-                    start  = source.start,
-                    finish = source.finish,
-                    parent = source,
-                    [1]    = result,
-                })
-                return
-            else
-                vm.setNode(source, vm.declareGlobal('type', 'number'))
-                return
-            end
-        end
-        if source.op.type == '^' then
-            local a = vm.getNumber(source[1])
-            local b = vm.getNumber(source[2])
-            if a and b then
-                vm.setNode(source, {
-                    type   = 'number',
-                    start  = source.start,
-                    finish = source.finish,
-                    parent = source,
-                    [1]    = a ^ b,
-                })
-                return
-            else
-                vm.setNode(source, vm.declareGlobal('type', 'number'))
-                return
-            end
-        end
-        if source.op.type == '//' then
-            local a = vm.getNumber(source[1])
-            local b = vm.getNumber(source[2])
-            if a and b and b ~= 0 then
-                local result = a // b
-                vm.setNode(source, {
-                    type   = math.type(result) == 'integer' and 'integer' or 'number',
-                    start  = source.start,
-                    finish = source.finish,
-                    parent = source,
-                    [1]    = result,
-                })
-                return
-            else
-                vm.setNode(source, vm.declareGlobal('type', 'number'))
-                return
-            end
-        end
-        if source.op.type == '..' then
-            local a = vm.getString(source[1])
-                   or vm.getNumber(source[1])
-            local b = vm.getString(source[2])
-                   or vm.getNumber(source[2])
-            if a and b then
-                if type(a) == 'number' or type(b) == 'number' then
-                    local uri     = guide.getUri(source)
-                    local version = config.get(uri, 'Lua.runtime.version')
-                    if math.tointeger(a) and math.type(a) == 'float' then
-                        if version == 'Lua 5.3' or version == 'Lua 5.4' then
-                            a = ('%.1f'):format(a)
-                        else
-                            a = ('%.0f'):format(a)
-                        end
-                    end
-                    if math.tointeger(b) and math.type(b) == 'float' then
-                        if version == 'Lua 5.3' or version == 'Lua 5.4' then
-                            b = ('%.1f'):format(b)
-                        else
-                            b = ('%.0f'):format(b)
-                        end
-                    end
-                end
-                vm.setNode(source, {
-                    type   = 'string',
-                    start  = source.start,
-                    finish = source.finish,
-                    parent = source,
-                    [1]    = a .. b,
-                })
-                return
-            else
-                vm.setNode(source, vm.declareGlobal('type', 'string'))
-                return
-            end
-        end
+        binarySwich(source.op.type, source)
     end)
 
----@param source vm.object
+---@param source parser.object
 local function compileByNode(source)
     compilerSwitch(source.type, source)
 end
 
----@param source vm.object
+---@param source parser.object
 local function compileByGlobal(source)
     local global = source._globalNode
     if not global then
         return
     end
+    ---@cast source parser.object
     local root = guide.getRoot(source)
     local uri = guide.getUri(source)
     if not root._globalBase then
@@ -1805,16 +1895,24 @@ local function compileByGlobal(source)
                     globalNode:merge(vm.compileNode(set))
                     hasMarkDoc = true
                 end
+                if vm.getNode(set) then
+                    globalNode:merge(vm.compileNode(set))
+                end
             end
+        end
+        -- Set all globals node first to avoid recursive
+        for _, set in ipairs(global:getSets(uri)) do
+            vm.setNode(set, globalNode, true)
         end
         for _, set in ipairs(global:getSets(uri)) do
             if set.value then
                 if not hasMarkDoc or guide.isLiteral(set.value) then
-                    if set.value.type ~= 'nil' then
-                        globalNode:merge(vm.compileNode(set.value))
-                    end
+                    globalNode:merge(vm.compileNode(set.value))
                 end
             end
+        end
+        for _, set in ipairs(global:getSets(uri)) do
+            vm.setNode(set, globalNode, true)
         end
     end
     if global.cate == 'type' then
@@ -1850,21 +1948,25 @@ function vm.compileNode(source)
         end
     end
 
-    if source.type == 'global' then
-        return source
-    end
-
     local cache = vm.getNode(source)
     if cache ~= nil then
         return cache
     end
 
-    local node = vm.createNode()
-    vm.setNode(source, node, true)
+    if source.type == 'generic' then
+        vm.setNode(source, source)
+        local node = vm.getNode(source)
+        ---@cast node -?
+        return node
+    end
+
+    ---@cast source parser.object
+    vm.setNode(source, vm.createNode(), true)
     compileByGlobal(source)
     compileByNode(source)
+    matchCall(source)
 
-    node = vm.getNode(source)
-
+    local node = vm.getNode(source)
+    ---@cast node -?
     return node
 end

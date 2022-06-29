@@ -183,10 +183,10 @@ function lovr.audio.isStarted(type) end
 ---
 ---Creates a new Source from an ogg, wav, or mp3 file.
 ---
----@overload fun(blob: lovr.Blob, options: table):lovr.Source
----@overload fun(sound: lovr.Sound, options: table):lovr.Source
+---@overload fun(blob: lovr.Blob, options?: table):lovr.Source
+---@overload fun(sound: lovr.Sound, options?: table):lovr.Source
 ---@param filename string # The filename of the sound to load.
----@param options {decode: boolean, effects: table} # Optional options.
+---@param options? {decode: boolean, effects: table} # Optional options.
 ---@return lovr.Source source # The new Source.
 function lovr.audio.newSource(filename, options) end
 
@@ -263,7 +263,7 @@ function lovr.audio.setDevice(type, id, sink, mode) end
 ---
 ---The triangles must use counterclockwise winding.
 ---
----@overload fun(model: lovr.Model, material: lovr.AudioMaterial):boolean
+---@overload fun(model: lovr.Model, material?: lovr.AudioMaterial):boolean
 ---@param vertices table # A flat table of vertices.  Each vertex is 3 numbers representing its x, y, and z position. The units used for audio coordinates are up to you, but meters are recommended.
 ---@param indices table # A list of indices, indicating how the vertices are connected into triangles.  Indices are 1-indexed and are 32 bits (they can be bigger than 65535).
 ---@param material? lovr.AudioMaterial # The acoustic material to use.
@@ -672,35 +672,35 @@ function Source:tell(unit) end
 ---
 ---Generic default audio material.
 ---
----| '"generic"'
+---| "generic"
 ---
 ---Brick.
 ---
----| '"brick"'
+---| "brick"
 ---
 ---Carpet.
 ---
----| '"carpet"'
+---| "carpet"
 ---
 ---Ceramic.
 ---
----| '"ceramic"'
+---| "ceramic"
 ---
 ---Concrete.
 ---
----| '"concrete"'
+---| "concrete"
 
----| '"glass"'
+---| "glass"
 
----| '"gravel"'
+---| "gravel"
 
----| '"metal"'
+---| "metal"
 
----| '"plaster"'
+---| "plaster"
 
----| '"rock"'
+---| "rock"
 
----| '"wood"'
+---| "wood"
 
 ---
 ---Audio devices can be created in shared mode or exclusive mode.
@@ -711,11 +711,11 @@ function Source:tell(unit) end
 ---
 ---Shared mode.
 ---
----| '"shared"'
+---| "shared"
 ---
 ---Exclusive mode.
 ---
----| '"exclusive"'
+---| "exclusive"
 
 ---
 ---When referencing audio devices, this indicates whether it's the playback or capture device.
@@ -724,11 +724,11 @@ function Source:tell(unit) end
 ---
 ---The playback device (speakers, headphones).
 ---
----| '"playback"'
+---| "playback"
 ---
 ---The capture device (microphone).
 ---
----| '"capture"'
+---| "capture"
 
 ---
 ---Different types of effects that can be applied with `Source:setEffectEnabled`.
@@ -747,27 +747,27 @@ function Source:tell(unit) end
 ---
 ---Models absorption as sound travels through the air, water, etc.
 ---
----| '"absorption"'
+---| "absorption"
 ---
 ---Decreases audio volume with distance (1 / max(distance, 1)).
 ---
----| '"falloff"'
+---| "falloff"
 ---
 ---Causes audio to drop off when the Source is occluded by geometry.
 ---
----| '"occlusion"'
+---| "occlusion"
 ---
 ---Models reverb caused by audio bouncing off of geometry.
 ---
----| '"reverb"'
+---| "reverb"
 ---
 ---Spatializes the Source using either simple panning or an HRTF.
 ---
----| '"spatialization"'
+---| "spatialization"
 ---
 ---Causes audio to be heard through walls when occluded, based on audio materials.
 ---
----| '"transmission"'
+---| "transmission"
 
 ---
 ---When figuring out how long a Source is or seeking to a specific position in the sound file, units can be expressed in terms of seconds or in terms of frames.
@@ -778,11 +778,11 @@ function Source:tell(unit) end
 ---
 ---Seconds.
 ---
----| '"seconds"'
+---| "seconds"
 ---
 ---Frames.
 ---
----| '"frames"'
+---| "frames"
 
 ---
 ---When accessing the volume of Sources or the audio listener, this can be done in linear units with a 0 to 1 range, or in decibels with a range of -∞ to 0.
@@ -791,8 +791,8 @@ function Source:tell(unit) end
 ---
 ---Linear volume range.
 ---
----| '"linear"'
+---| "linear"
 ---
 ---Decibels.
 ---
----| '"db"'
+---| "db"

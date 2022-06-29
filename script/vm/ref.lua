@@ -9,58 +9,7 @@ local lang      = require 'language'
 
 local simpleSwitch
 
-local function searchGetLocal(source, node, pushResult)
-    local key = guide.getKeyName(source)
-    for _, ref in ipairs(node.node.ref) do
-        if  ref.type == 'getlocal'
-        and ref.next
-        and guide.getKeyName(ref.next) == key then
-            pushResult(ref.next)
-        end
-    end
-end
-
 simpleSwitch = util.switch()
-    : case 'local'
-    : call(function (source, pushResult)
-        if source.ref then
-            for _, ref in ipairs(source.ref) do
-                if ref.type == 'setlocal'
-                or ref.type == 'getlocal' then
-                    pushResult(ref)
-                end
-            end
-        end
-    end)
-    : case 'getlocal'
-    : case 'setlocal'
-    : call(function (source, pushResult)
-        simpleSwitch('local', source.node, pushResult)
-    end)
-    : case 'field'
-    : call(function (source, pushResult)
-        local parent = source.parent
-        if parent.type ~= 'tablefield' then
-            simpleSwitch(parent.type, parent, pushResult)
-        end
-    end)
-    : case 'setfield'
-    : case 'getfield'
-    : call(function (source, pushResult)
-        local node = source.node
-        if node.type == 'getlocal' then
-            searchGetLocal(source, node, pushResult)
-            return
-        end
-    end)
-    : case 'getindex'
-    : case 'setindex'
-    : call(function (source, pushResult)
-        local node = source.node
-        if node.type == 'getlocal' then
-            searchGetLocal(source, node, pushResult)
-        end
-    end)
     : case 'goto'
     : call(function (source, pushResult)
         if source.node then
@@ -142,21 +91,21 @@ local function searchField(source, pushResult, defMap, fileNotify)
             return
         end
         ---@async
-        guide.eachSourceType(state.ast, 'getfield', function (src)
+        guide.eachSourceTypes(state.ast, {'getfield', 'setfield'}, function (src)
             if src.field and src.field[1] == key then
                 checkDef(src)
                 await.delay()
             end
         end)
         ---@async
-        guide.eachSourceType(state.ast, 'getmethod', function (src)
+        guide.eachSourceTypes(state.ast, {'getmethod', 'setmethod'}, function (src)
             if src.method and src.method[1] == key then
                 checkDef(src)
                 await.delay()
             end
         end)
         ---@async
-        guide.eachSourceType(state.ast, 'getindex', function (src)
+        guide.eachSourceTypes(state.ast, {'getindex', 'setindex'}, function (src)
             if src.index and src.index.type == 'string' and src.index[1] == key then
                 checkDef(src)
                 await.delay()
@@ -240,19 +189,24 @@ end
 ---@param source  parser.object
 ---@param pushResult fun(src: parser.object)
 local function searchByLocalID(source, pushResult)
-    local idSources = vm.getLocalSources(source)
-    if not idSources then
-        return
+    local sourceSets = vm.getLocalSourcesSets(source)
+    if sourceSets then
+        for _, src in ipairs(sourceSets) do
+            pushResult(src)
+        end
     end
-    for _, src in ipairs(idSources) do
-        pushResult(src)
+    local sourceGets = vm.getLocalSourcesGets(source)
+    if sourceGets then
+        for _, src in ipairs(sourceGets) do
+            pushResult(src)
+        end
     end
 end
 
 ---@async
 ---@param source  parser.object
 ---@param pushResult fun(src: parser.object)
----@param fileNotify fun(uri: uri): boolean
+---@param fileNotify? fun(uri: uri): boolean
 function searchByParentNode(source, pushResult, defMap, fileNotify)
     nodeSwitch(source.type, source, pushResult, defMap, fileNotify)
 end
@@ -279,10 +233,22 @@ local function searchByDef(source, pushResult)
         defMap[source] = true
         return defMap
     end
-    local defs = vm.getDefs(source)
-    for _, def in ipairs(defs) do
-        pushResult(def)
-        defMap[def] = true
+    if source.type == 'field'
+    or source.type == 'method' then
+        source = source.parent
+    end
+    defMap[source] = true
+    if guide.isSet(source) then
+        local defs = vm.getDefs(source)
+        for _, def in ipairs(defs) do
+            pushResult(def)
+        end
+    else
+        local defs = vm.getDefs(source)
+        for _, def in ipairs(defs) do
+            pushResult(def)
+            defMap[def] = true
+        end
     end
     return defMap
 end

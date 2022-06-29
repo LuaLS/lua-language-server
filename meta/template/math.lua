@@ -137,16 +137,18 @@ function math.log(x, base) end
 function math.log10(x) end
 
 ---#DES 'math.max'
----@param x number
----@param ... number
----@return number
+---@generic Number: number
+---@param x Number
+---@param ... Number
+---@return Number
 ---@nodiscard
 function math.max(x, ...) end
 
 ---#DES 'math.min'
----@param x number
----@param ... number
----@return number
+---@generic Number: number
+---@param x Number
+---@param ... Number
+---@return Number
 ---@nodiscard
 function math.min(x, ...) end
 
@@ -225,7 +227,7 @@ function math.tanh(x) end
 
 ---@version >5.3
 ---#DES 'math.tointeger'
----@param x number
+---@param x any
 ---@return integer?
 ---@nodiscard
 function math.tointeger(x) end

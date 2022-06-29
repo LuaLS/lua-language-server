@@ -39,13 +39,17 @@ local clock = os.clock()
 
 ---@diagnostic disable: await-in-sync
 for uri in files.eachFile() do
-    local status = files.getState(uri)
-    guide.eachSource(status.ast, function (src)
+    local state = files.getState(uri)
+    if not state then
+        goto CONTINUE
+    end
+    guide.eachSource(state.ast, function (src)
         assert(src.parent ~= nil or src.type == 'main')
     end)
     local fileClock = os.clock()
     diag.doDiagnostic(uri, true)
     print('诊断文件耗时：', os.clock() - fileClock, uri)
+    ::CONTINUE::
 end
 
 local passed = os.clock() - clock
@@ -58,6 +62,9 @@ local compileDatas = {}
 
 for uri in files.eachFile() do
     local state = files.getState(uri)
+    if not state then
+        goto CONTINUE
+    end
     local clock = os.clock()
     guide.eachSource(state.ast, function (src)
         vm.compileNode(src)
@@ -66,6 +73,7 @@ for uri in files.eachFile() do
         passed = os.clock() - clock,
         uri    = uri,
     }
+    ::CONTINUE::
 end
 
 local printTexts = {}

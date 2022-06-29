@@ -7,7 +7,7 @@
 ---
 ---Note that all units are reported in meters.
 ---
----Position `(0, 0, 0)` is the center of the play area.
+---Position `(0, 0, 0)` is on the floor in the center of the play area.
 ---
 ---@class lovr.headset
 lovr.headset = {}
@@ -86,7 +86,7 @@ function lovr.headset.getBoundsDimensions() end
 ---
 ---Returns a list of points representing the boundaries of the play area, or `nil` if the current headset driver does not expose this information.
 ---
----@param t? table # A table to fill with the points.  If `nil`, a new table will be created.
+---@param t table # A table to fill with the points.  If `nil`, a new table will be created.
 ---@return table points # A flat table of 3D points representing the play area boundaries.
 function lovr.headset.getBoundsGeometry(t) end
 
@@ -121,6 +121,12 @@ function lovr.headset.getClipDistance() end
 ---@return number width # The width of the display.
 ---@return number height # The height of the display.
 function lovr.headset.getDisplayDimensions() end
+
+---
+---Returns a table with all the refresh rates supported by the headset display, in Hz.
+---
+---@return table frequencies # A flat table of the refresh rates supported by the headset display, nil if not supported.
+function lovr.headset.getDisplayFrequencies() end
 
 ---
 ---Returns the refresh rate of the headset display, in Hz.
@@ -569,6 +575,17 @@ function lovr.headset.renderTo(callback) end
 function lovr.headset.setClipDistance(near, far) end
 
 ---
+---Sets the display refresh rate, in Hz.
+---
+---
+---### NOTE:
+---Changing the display refresh-rate also changes the frequency of lovr.update() and lovr.draw() as they depend on the display frequency.
+---
+---@param frequency number # The new refresh rate, in Hz.
+---@return boolean success # Whether the display refresh rate was successfully set.
+function lovr.headset.setDisplayFrequency(frequency) end
+
+---
 ---Causes the device to vibrate with a custom strength, duration, and frequency, if possible.
 ---
 ---
@@ -627,95 +644,95 @@ function lovr.headset.wasReleased(device, button) end
 ---
 ---The headset.
 ---
----| '"head"'
+---| "head"
 ---
 ---The left controller.
 ---
----| '"hand/left"'
+---| "hand/left"
 ---
 ---The right controller.
 ---
----| '"hand/right"'
+---| "hand/right"
 ---
 ---A shorthand for hand/left.
 ---
----| '"left"'
+---| "left"
 ---
 ---A shorthand for hand/right.
 ---
----| '"right"'
+---| "right"
 ---
 ---A device tracking the left elbow.
 ---
----| '"elbow/left"'
+---| "elbow/left"
 ---
 ---A device tracking the right elbow.
 ---
----| '"elbow/right"'
+---| "elbow/right"
 ---
 ---A device tracking the left shoulder.
 ---
----| '"shoulder/left"'
+---| "shoulder/left"
 ---
 ---A device tracking the right shoulder.
 ---
----| '"shoulder/right"'
+---| "shoulder/right"
 ---
 ---A device tracking the chest.
 ---
----| '"chest"'
+---| "chest"
 ---
 ---A device tracking the waist.
 ---
----| '"waist"'
+---| "waist"
 ---
 ---A device tracking the left knee.
 ---
----| '"knee/left"'
+---| "knee/left"
 ---
 ---A device tracking the right knee.
 ---
----| '"knee/right"'
+---| "knee/right"
 ---
 ---A device tracking the left foot or ankle.
 ---
----| '"foot/left"'
+---| "foot/left"
 ---
 ---A device tracking the right foot or ankle.
 ---
----| '"foot/right"'
+---| "foot/right"
 ---
 ---A camera device, often used for recording "mixed reality" footage.
 ---
----| '"camera"'
+---| "camera"
 ---
 ---A tracked keyboard.
 ---
----| '"keyboard"'
+---| "keyboard"
 ---
 ---The left eye.
 ---
----| '"eye/left"'
+---| "eye/left"
 ---
 ---The right eye.
 ---
----| '"eye/right"'
+---| "eye/right"
 ---
 ---The first tracking device (i.e. lighthouse).
 ---
----| '"beacon/1"'
+---| "beacon/1"
 ---
 ---The second tracking device (i.e. lighthouse).
 ---
----| '"beacon/2"'
+---| "beacon/2"
 ---
 ---The third tracking device (i.e. lighthouse).
 ---
----| '"beacon/3"'
+---| "beacon/3"
 ---
 ---The fourth tracking device (i.e. lighthouse).
 ---
----| '"beacon/4"'
+---| "beacon/4"
 
 ---
 ---Axes on an input device.
@@ -724,19 +741,19 @@ function lovr.headset.wasReleased(device, button) end
 ---
 ---A trigger (1D).
 ---
----| '"trigger"'
+---| "trigger"
 ---
 ---A thumbstick (2D).
 ---
----| '"thumbstick"'
+---| "thumbstick"
 ---
 ---A touchpad (2D).
 ---
----| '"touchpad"'
+---| "touchpad"
 ---
 ---A grip button or grab gesture (1D).
 ---
----| '"grip"'
+---| "grip"
 
 ---
 ---Buttons on an input device.
@@ -745,43 +762,43 @@ function lovr.headset.wasReleased(device, button) end
 ---
 ---The trigger button.
 ---
----| '"trigger"'
+---| "trigger"
 ---
 ---The thumbstick.
 ---
----| '"thumbstick"'
+---| "thumbstick"
 ---
 ---The touchpad.
 ---
----| '"touchpad"'
+---| "touchpad"
 ---
 ---The grip button.
 ---
----| '"grip"'
+---| "grip"
 ---
 ---The menu button.
 ---
----| '"menu"'
+---| "menu"
 ---
 ---The A button.
 ---
----| '"a"'
+---| "a"
 ---
 ---The B button.
 ---
----| '"b"'
+---| "b"
 ---
 ---The X button.
 ---
----| '"x"'
+---| "x"
 ---
 ---The Y button.
 ---
----| '"y"'
+---| "y"
 ---
 ---The proximity sensor on a headset.
 ---
----| '"proximity"'
+---| "proximity"
 
 ---
 ---These are all of the supported VR APIs that LÖVR can use to power the lovr.headset module.
@@ -800,31 +817,31 @@ function lovr.headset.wasReleased(device, button) end
 ---
 ---A VR simulator using keyboard/mouse.
 ---
----| '"desktop"'
+---| "desktop"
 ---
 ---Oculus Desktop SDK.
 ---
----| '"oculus"'
+---| "oculus"
 ---
 ---OpenVR.
 ---
----| '"openvr"'
+---| "openvr"
 ---
 ---OpenXR.
 ---
----| '"openxr"'
+---| "openxr"
 ---
 ---Oculus Mobile SDK.
 ---
----| '"vrapi"'
+---| "vrapi"
 ---
 ---Pico.
 ---
----| '"pico"'
+---| "pico"
 ---
 ---WebXR.
 ---
----| '"webxr"'
+---| "webxr"
 
 ---
 ---Represents the different types of origins for coordinate spaces.
@@ -837,8 +854,8 @@ function lovr.headset.wasReleased(device, button) end
 ---
 ---The origin is at the head.
 ---
----| '"head"'
+---| "head"
 ---
 ---The origin is on the floor.
 ---
----| '"floor"'
+---| "floor"

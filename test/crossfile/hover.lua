@@ -58,8 +58,8 @@ function TEST(expect)
 
     local hover = core.byUri(sourceUri, sourcePos)
     assert(hover)
-    hover = tostring(hover):gsub('\r\n', '\n')
-    assert(eq(hover, expect.hover))
+    local content = tostring(hover):gsub('\r\n', '\n')
+    assert(eq(content, expect.hover))
 end
 
 TEST {
@@ -811,7 +811,7 @@ food.secondField = 2
 },
 hover = [[
 ```lua
-(field) Food.firstField: number = 0
+(field) Food.firstField: number
 ```]]}
 
 TEST {{ path = 'a.lua', content = '', }, {
@@ -1135,5 +1135,88 @@ TEST {
 
 ```lua
 (async) (method) C:f(a: any)
+```]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@class Apple
+            ---The color of your awesome apple!
+            ---@field color string
+            local Apple = {}
+
+            Apple.<?color?>
+        ]]
+    },
+    hover = [[
+```lua
+(field) Apple.color: string
+```
+
+---
+The color of your awesome apple!]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@type fun(x: number, y: number, ...: number):(x: number, y: number, ...: number)
+            local <?f?>
+        ]]
+    },
+    hover = [[
+```lua
+local f: fun(x: number, y: number, ...number):(x: number, y: number, ...number)
+```
+
+---
+
+```lua
+function f(x: number, y: number, ...: number)
+  -> x: number
+  2. y: number
+  3. ...number
+```]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@param p   'a1' | 'a2'
+            ---@param ... 'a3' | 'a4'
+            ---@return 'r1' | 'r2' ret1
+            ---@return 'r3' | 'r4' ...
+            local function <?f?>(p, ...) end
+        ]]
+    },
+    hover = [[
+```lua
+function f(p: 'a1'|'a2', ...'a3'|'a4')
+  -> ret1: 'r1'|'r2'
+  2. ...'r3'|'r4'
+```
+
+---
+
+```lua
+p:
+    | 'a1'
+    | 'a2'
+
+...(param):
+    | 'a3'
+    | 'a4'
+
+ret1:
+    | 'r1'
+    | 'r2'
+
+...(return):
+    | 'r3'
+    | 'r4'
 ```]]
 }

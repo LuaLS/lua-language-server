@@ -18,7 +18,8 @@ local function isToBeClosed(source)
     return false
 end
 
----@param source parser.object
+---@param source parser.object?
+---@return boolean
 local function isValidFunction(source)
     if not source then
         return false
@@ -55,7 +56,7 @@ local function collect(ast, white, roots, links)
         for _, ref in ipairs(loc.ref or {}) do
             if ref.type == 'getlocal' then
                 local func = guide.getParentFunction(ref)
-                if not isValidFunction(func) or roots[func] then
+                if not func or not isValidFunction(func) or roots[func] then
                     roots[src] = true
                     return
                 end

@@ -83,7 +83,7 @@ end
 
 x(1, 2, 3, <??>
 ]]
-'function x(a: any, <!...: any!>)'
+'function x(a: any, <!...any!>)'
 
 TEST [[
 (''):sub(<??>

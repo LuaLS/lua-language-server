@@ -80,7 +80,6 @@ function mt:reportHangs()
 end
 
 ---@param callback async fun(client: languageClient)
----@return languageClient
 function mt:start(callback)
     CLI = true
 
@@ -208,8 +207,10 @@ function mt:registerFakers()
         'textDocument/publishDiagnostics',
         'workspace/configuration',
         'workspace/semanticTokens/refresh',
+        'workspace/diagnostic/refresh',
         'window/workDoneProgress/create',
         'window/showMessage',
+        'window/showMessageRequest',
         'window/logMessage',
     } do
         self:register(method, function ()

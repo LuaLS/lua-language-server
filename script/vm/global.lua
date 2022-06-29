@@ -2,6 +2,7 @@ local util  = require 'utility'
 local scope = require 'workspace.scope'
 local guide = require 'parser.guide'
 local files = require 'files'
+local ws    = require 'workspace'
 ---@class vm
 local vm    = require 'vm.vm'
 
@@ -11,8 +12,8 @@ local vm    = require 'vm.vm'
 
 ---@class vm.global
 ---@field links table<uri, vm.global.link>
----@field setsCache table<uri, parser.object[]>
----@field getsCache table<uri, parser.object[]>
+---@field setsCache? table<uri, parser.object[]>
+---@field getsCache? table<uri, parser.object[]>
 ---@field cate vm.global.cate
 local mt = {}
 mt.__index = mt
@@ -127,7 +128,7 @@ local function createGlobal(name, cate)
 end
 
 ---@class parser.object
----@field _globalNode vm.global
+---@field _globalNode vm.global|false
 
 ---@type table<string, vm.global>
 local allGlobals = {}
@@ -161,6 +162,9 @@ local compilerGlobalSwitch = util.switch()
     : call(function (source)
         local uri    = guide.getUri(source)
         local name   = guide.getKeyName(source)
+        if not name then
+            return
+        end
         local global = vm.declareGlobal('variable', name, uri)
         global:addSet(uri, source)
         source._globalNode = global
@@ -169,6 +173,9 @@ local compilerGlobalSwitch = util.switch()
     : call(function (source)
         local uri    = guide.getUri(source)
         local name   = guide.getKeyName(source)
+        if not name then
+            return
+        end
         local global = vm.declareGlobal('variable', name, uri)
         global:addGet(uri, source)
         source._globalNode = global
@@ -271,6 +278,9 @@ local compilerGlobalSwitch = util.switch()
     : call(function (source)
         local uri  = guide.getUri(source)
         local name = guide.getKeyName(source)
+        if not name then
+            return
+        end
         local class = vm.declareGlobal('type', name, uri)
         class:addSet(uri, source)
         source._globalNode = class
@@ -293,6 +303,9 @@ local compilerGlobalSwitch = util.switch()
     : call(function (source)
         local uri  = guide.getUri(source)
         local name = guide.getKeyName(source)
+        if not name then
+            return
+        end
         local alias = vm.declareGlobal('type', name, uri)
         alias:addSet(uri, source)
         source._globalNode = alias
@@ -446,7 +459,7 @@ local function compileSelf(source)
     if not node then
         return
     end
-    local fields = vm.getLocalFields(source)
+    local fields = vm.getLocalFields(source, false)
     if not fields then
         return
     end
@@ -530,9 +543,11 @@ for uri in files.eachFile() do
     end
 end
 
+---@async
 files.watch(function (ev, uri)
     if ev == 'update' then
         dropUri(uri)
+        ws.awaitReady(uri)
         local state = files.getState(uri)
         if state then
             compileAst(state.ast)

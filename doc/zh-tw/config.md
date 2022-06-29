@@ -333,12 +333,16 @@ object<string, string>
     * cast-type-mismatch
     * need-check-nil
     * param-type-mismatch
+    * return-type-mismatch
     * undefined-field
     */
     "type-check": "Fallback",
     /*
     * missing-parameter
+    * missing-return
+    * missing-return-value
     * redundant-parameter
+    * redundant-return-value
     * redundant-value
     * unbalanced-assignments
     */
@@ -446,12 +450,16 @@ object<string, string>
     * cast-type-mismatch
     * need-check-nil
     * param-type-mismatch
+    * return-type-mismatch
     * undefined-field
     */
     "type-check": "Fallback",
     /*
     * missing-parameter
+    * missing-return
+    * missing-return-value
     * redundant-parameter
+    * redundant-return-value
     * redundant-value
     * unbalanced-assignments
     */
@@ -580,6 +588,8 @@ object<string, string>
     */
     "lowercase-global": "Any",
     "missing-parameter": "Any",
+    "missing-return": "Any",
+    "missing-return-value": "Any",
     "need-check-nil": "Opened",
     /*
     在字面常數表中，2行程式碼之間缺少分隔符，在語法上被解析為了一次索引操作
@@ -601,10 +611,12 @@ object<string, string>
     */
     "redundant-parameter": "Any",
     "redundant-return": "Opened",
+    "redundant-return-value": "Any",
     /*
     賦值操作時，值的數量比被賦值的對象多
     */
     "redundant-value": "Any",
+    "return-type-mismatch": "Opened",
     "spell-check": "None",
     /*
     後置空格
@@ -709,6 +721,8 @@ object<string, string>
     */
     "lowercase-global": "Information",
     "missing-parameter": "Warning",
+    "missing-return": "Warning",
+    "missing-return-value": "Warning",
     "need-check-nil": "Warning",
     /*
     在字面常數表中，2行程式碼之間缺少分隔符，在語法上被解析為了一次索引操作
@@ -730,10 +744,12 @@ object<string, string>
     */
     "redundant-parameter": "Warning",
     "redundant-return": "Hint",
+    "redundant-return-value": "Warning",
     /*
     賦值操作時，值的數量比被賦值的對象多
     */
     "redundant-value": "Warning",
+    "return-type-mismatch": "Warning",
     "spell-check": "Information",
     /*
     後置空格
@@ -929,6 +945,28 @@ boolean
 
 ```jsonc
 true
+```
+
+# hint.semicolon
+
+若陳述式尾部沒有分號，則顯示虛擬分號。
+
+## type
+
+```ts
+string
+```
+
+## enum
+
+* ``"All"``: 所有陳述式都顯示虛擬分號。
+* ``"SameLine"``: 兩個陳述式在同一行時，在它們之間顯示分號。
+* ``"Disable"``: 停用虛擬分號。
+
+## default
+
+```jsonc
+"SameLine"
 ```
 
 # hint.setType

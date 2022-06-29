@@ -74,6 +74,7 @@ function mt:setData(k, v)
     self.data[k] = v
 end
 
+---@return any
 function mt:getData(k)
     if not self.data then
         return nil

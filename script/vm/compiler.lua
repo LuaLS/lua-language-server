@@ -505,6 +505,7 @@ function vm.getReturnOfFunction(func, index)
     return nil
 end
 
+---@param args parser.object[]
 ---@return vm.node
 local function getReturnOfSetMetaTable(args)
     local tbl  = args[1]
@@ -560,6 +561,9 @@ local function matchCall(source)
     end
 end
 
+---@param func  parser.object
+---@param index integer
+---@param args  parser.object[]
 ---@return vm.node
 local function getReturn(func, index, args)
     if not func._callReturns then

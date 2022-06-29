@@ -144,6 +144,9 @@ Symbol              <-  ({} {
 ---@field as? parser.object
 ---@field touch? integer
 ---@field module? string
+---@field async? boolean
+---@field versions? table[]
+---@field names? parser.object[]
 
 local function trim(str)
     return str:match '^%s*(%S+)%s*$'

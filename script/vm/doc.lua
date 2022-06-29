@@ -20,6 +20,8 @@ function vm.getDocSets(suri, name)
     end
 end
 
+---@param uri uri
+---@return boolean
 function vm.isMetaFile(uri)
     local status = files.getState(uri)
     if not status then
@@ -45,6 +47,8 @@ function vm.isMetaFile(uri)
     return false
 end
 
+---@param doc parser.object
+---@return table<string, boolean>?
 function vm.getValidVersions(doc)
     if doc.type ~= 'doc.version' then
         return
@@ -87,6 +91,7 @@ function vm.getValidVersions(doc)
     return valids
 end
 
+---@param value parser.object
 ---@return parser.object?
 local function getDeprecated(value)
     if not value.bindDocs then
@@ -111,6 +116,8 @@ local function getDeprecated(value)
     return nil
 end
 
+---@param value parser.object
+---@param deep boolean?
 ---@return parser.object?
 function vm.getDeprecated(value, deep)
     if deep then
@@ -138,6 +145,8 @@ function vm.getDeprecated(value, deep)
     end
 end
 
+---@param  value parser.object
+---@return boolean
 local function isAsync(value)
     if value.type == 'function' then
         if not value.bindDocs then
@@ -158,6 +167,9 @@ local function isAsync(value)
     return value.async == true
 end
 
+---@param value parser.object
+---@param deep  boolean?
+---@return boolean
 function vm.isAsync(value, deep)
     if isAsync(value) then
         return true
@@ -176,6 +188,8 @@ function vm.isAsync(value, deep)
     return false
 end
 
+---@param value parser.object
+---@return boolean
 local function isNoDiscard(value)
     if value.type == 'function' then
         if not value.bindDocs then
@@ -196,6 +210,9 @@ local function isNoDiscard(value)
     return false
 end
 
+---@param value parser.object
+---@param deep boolean?
+---@return boolean
 function vm.isNoDiscard(value, deep)
     if isNoDiscard(value) then
         return true
@@ -214,6 +231,8 @@ function vm.isNoDiscard(value, deep)
     return false
 end
 
+---@param param parser.object
+---@return boolean
 local function isCalledInFunction(param)
     if not param.ref then
         return false
@@ -238,6 +257,9 @@ local function isCalledInFunction(param)
     return false
 end
 
+---@param node parser.object
+---@param index integer
+---@return boolean
 local function isLinkedCall(node, index)
     for _, def in ipairs(vm.getDefs(node)) do
         if def.type == 'function' then
@@ -252,16 +274,21 @@ local function isLinkedCall(node, index)
     return false
 end
 
+---@param node parser.object
+---@param index integer
+---@return boolean
 function vm.isLinkedCall(node, index)
     return isLinkedCall(node, index)
 end
 
+---@param call parser.object
+---@return boolean
 function vm.isAsyncCall(call)
     if vm.isAsync(call.node, true) then
         return true
     end
     if not call.args then
-        return
+        return false
     end
     for i, arg in ipairs(call.args) do
         if  vm.isAsync(arg, true)
@@ -272,6 +299,9 @@ function vm.isAsyncCall(call)
     return false
 end
 
+---@param uri uri
+---@param doc parser.object
+---@param results table[]
 local function makeDiagRange(uri, doc, results)
     local names
     if doc.names then
@@ -325,6 +355,10 @@ local function makeDiagRange(uri, doc, results)
     end
 end
 
+---@param uri uri
+---@param position integer
+---@param name string
+---@return boolean
 function vm.isDiagDisabledAt(uri, position, name)
     local status = files.getState(uri)
     if not status then

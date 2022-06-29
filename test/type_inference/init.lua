@@ -3230,3 +3230,7 @@ end
 
 local <?x?> = f()
 ]=]
+
+TEST 'number' [=[
+local <?x?> = X --[[@as number]]
+]=]

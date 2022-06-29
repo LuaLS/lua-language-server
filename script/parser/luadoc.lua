@@ -142,6 +142,7 @@ Symbol              <-  ({} {
 ---@field signs parser.object[]
 ---@field originalComment parser.object
 ---@field as? parser.object
+---@field touch? integer
 
 local function trim(str)
     return str:match '^%s*(%S+)%s*$'
@@ -1671,6 +1672,22 @@ local function bindDocs(state)
     end
 end
 
+local function findTouch(state, doc)
+    local text = state.lua
+    local pos  = guide.positionToOffset(state, doc.originalComment.start)
+    for i = pos - 2, 1, -1 do
+        local c = text:sub(i, i)
+        if c == '\r'
+        or c == '\n' then
+            break
+        elseif c ~= ' '
+        and    c ~= '\t' then
+            doc.touch = guide.offsetToPosition(state, i)
+            break
+        end
+    end
+end
+
 return function (state)
     local ast = state.ast
     local comments = state.comms
@@ -1714,6 +1731,9 @@ return function (state)
                 ast.finish = doc.finish
             end
             doc.originalComment = comment
+            if comment.type == 'comment.long' then
+                findTouch(state, doc)
+            end
         end
     end
 

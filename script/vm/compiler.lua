@@ -585,12 +585,12 @@ local function bindAs(source)
         ases = {}
         docs._asCache = ases
         for _, doc in ipairs(docs) do
-            if doc.type == 'doc.as' and doc.as then
+            if doc.type == 'doc.as' and doc.as and doc.touch then
                 ases[#ases+1] = doc
             end
         end
         table.sort(ases, function (a, b)
-            return a.start < b.start
+            return a.touch < b.touch
         end)
     end
 
@@ -609,7 +609,7 @@ local function bindAs(source)
         end
         index = left + (right - left) // 2
         local doc = ases[index]
-        if doc.originalComment.start < source.finish + 2 then
+        if doc.touch < source.finish then
             left = index + 1
         else
             right = index
@@ -617,7 +617,7 @@ local function bindAs(source)
     end
 
     local doc = ases[index]
-    if doc and doc.originalComment.start == source.finish + 2 then
+    if doc and doc.touch == source.finish then
         vm.setNode(source, vm.compileNode(doc.as), true)
         return true
     end

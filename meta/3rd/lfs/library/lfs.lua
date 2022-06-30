@@ -160,3 +160,5 @@ Returns true if the operation was successful; in case of error, it returns nil p
 ---@return boolean, string
 function lfs.unlock(filehandle, start, length)
 end
+
+return lfs

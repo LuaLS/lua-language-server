@@ -1,5 +1,5 @@
 name = 'luafilesystem'
-words = { 'lfs.%w+' }
+words = { 'lfs%.%w+' }
 configs = {
     {
         key    = 'Lua.diagnostics.globals',

@@ -41,7 +41,7 @@ function collectgarbage(opt, arg) end
 
 ---#DES 'dofile'
 ---@param filename? string
----@return any
+---@return any ...
 function dofile(filename) end
 
 ---#DES 'error'

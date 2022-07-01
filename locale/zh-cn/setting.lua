@@ -274,6 +274,12 @@ config.type.weakUnionCheck               =
 
 此设置为 `false` 时，`number|boolean` 类型无法赋给 `number` 类型；为 `true` 时则可以。
 ]]
+config.type.weakNilCheck                 =
+[[
+对联合类型进行类型检查时，忽略其中的 `nil`。
+
+此设置为 `false` 时，`numer|nil` 类型无法赋给 `number` 类型；为 `true` 是则可以。
+]]
 config.diagnostics['unused-local']          =
 '未使用的局部变量'
 config.diagnostics['unused-function']       =

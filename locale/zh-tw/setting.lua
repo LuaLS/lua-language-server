@@ -274,6 +274,12 @@ config.type.weakUnionCheck               =
 
 此設定為 `false` 時，`number|boolean` 類型無法賦給 `number` 類型；為 `true` 時則可以。
 ]]
+config.type.weakNilCheck                 = -- TODO: need translate!
+[[
+When checking the type of union type, ignore the `nil` in it.
+
+When this setting is `false`, the `number|nil` type cannot be assigned to the `number` type. It can be with `true`.
+]]
 config.diagnostics['unused-local']          =
 '未使用的區域變數'
 config.diagnostics['unused-function']       =

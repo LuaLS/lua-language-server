@@ -62,20 +62,18 @@ function vm.isSubType(uri, child, parent, mark)
                     return true
                 end
             end
-            if child:isOptional() then
-                if vm.isSubType(uri, 'nil', parent, mark) then
-                    return true
-                end
-            end
             return false
         else
+            local weakNil   = config.get(uri, 'Lua.type.weakNilCheck')
             for n in child:eachObject() do
-                if  getNodeName(n)
+                local nodeName = getNodeName(n)
+                if  nodeName
+                and not (nodeName == 'nil' and weakNil)
                 and not vm.isSubType(uri, n, parent, mark) then
                     return false
                 end
             end
-            if child:isOptional() then
+            if not weakNil and child:isOptional() then
                 if not vm.isSubType(uri, 'nil', parent, mark) then
                     return false
                 end

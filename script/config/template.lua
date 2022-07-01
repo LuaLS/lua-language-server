@@ -366,6 +366,7 @@ local template = {
     ['Lua.misc.parameters']                 = Type.Array(Type.String),
     ['Lua.type.castNumberToInteger']        = Type.Boolean >> false,
     ['Lua.type.weakUnionCheck']             = Type.Boolean >> false,
+    ['Lua.type.weakNilCheck']               = Type.Boolean >> false,
 
     -- VSCode
     ['files.associations']                  = Type.Hash(Type.String, Type.String),

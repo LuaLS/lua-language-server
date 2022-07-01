@@ -1471,6 +1471,25 @@ boolean
 false
 ```
 
+# type.weakNilCheck
+
+对联合类型进行类型检查时，忽略其中的 `nil`。
+
+此设置为 `false` 时，`numer|nil` 类型无法赋给 `number` 类型；为 `true` 是则可以。
+
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+false
+```
+
 # type.weakUnionCheck
 
 联合类型中只要有一个子类型满足条件，则联合类型也满足条件。

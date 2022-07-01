@@ -1472,6 +1472,25 @@ boolean
 false
 ```
 
+# type.weakNilCheck
+
+When checking the type of union type, ignore the `nil` in it.
+
+When this setting is `false`, the `number|nil` type cannot be assigned to the `number` type. It can be with `true`.
+
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+false
+```
+
 # type.weakUnionCheck
 
 Once one subtype of a union type meets the condition, the union type also meets the condition.

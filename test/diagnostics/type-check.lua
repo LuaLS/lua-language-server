@@ -609,5 +609,27 @@ local mt = G
 mt._x = nil
 ]]
 
+config.set(nil, 'Lua.type.weakNilCheck', true)
+TEST [[
+---@type number?
+local nb
+
+---@type number
+local n
+
+n = nb
+]]
+
+TEST [[
+---@type number|nil
+local nb
+
+---@type number
+local n
+
+n = nb
+]]
+config.set(nil, 'Lua.type.weakNilCheck', false)
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

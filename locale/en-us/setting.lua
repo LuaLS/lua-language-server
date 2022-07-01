@@ -275,6 +275,12 @@ Once one subtype of a union type meets the condition, the union type also meets 
 
 When this setting is `false`, the `number|boolean` type cannot be assigned to the `number` type. It can be with `true`.
 ]]
+config.type.weakNilCheck                 =
+[[
+When checking the type of union type, ignore the `nil` in it.
+
+When this setting is `false`, the `number|nil` type cannot be assigned to the `number` type. It can be with `true`.
+]]
 config.diagnostics['unused-local']          =
 'Enable unused local variable diagnostics.'
 config.diagnostics['unused-function']       =

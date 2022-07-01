@@ -1,5 +1,9 @@
 # changelog
 
+## 3.4.1
+* `NEW` settings:
+  * `type.weakNilCheck`
+
 ## 3.4.0
 `2022-6-29`
 * `NEW` diagnostics:

@@ -3112,7 +3112,7 @@ function tcpsock:receiveany(max) end
 ---
 --- This method does not automatically closes the current connection when the read timeout error happens. For other connection errors, this method always automatically closes the connection.
 ---
----@alias ngx.socket.tcpsock.iterator fun(size:number):string,string,any
+---@alias ngx.socket.tcpsock.iterator fun(size:number|nil):string,string,any
 ---
 ---@overload fun(self:tcpsock, size:number, options:table):ngx.socket.tcpsock.iterator
 ---

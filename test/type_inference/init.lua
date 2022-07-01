@@ -3250,3 +3250,23 @@ local function f() end
 for x, <?y?> in f do
 end
 ]]
+
+TEST 'number|nil' [[
+---@type table|nil
+local a
+
+---@type number|nil
+local b
+
+local <?c?> = a and b
+]]
+
+TEST 'number|table|nil' [[
+---@type table|nil
+local a
+
+---@type number|nil
+local b
+
+local <?c?> = a or b
+]]

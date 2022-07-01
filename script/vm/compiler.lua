@@ -1033,13 +1033,14 @@ local binarySwich = util.switch()
     : call(function (source)
         local node1 = vm.compileNode(source[1])
         local node2 = vm.compileNode(source[2])
-        local r1 = vm.testCondition(source[1])
+        local r1    = vm.testCondition(source[1])
         if r1 == true then
             vm.setNode(source, node2)
         elseif r1 == false then
             vm.setNode(source, node1)
         else
-            vm.setNode(source, node2)
+            local node = node1:copy():setFalsy():merge(node2)
+            vm.setNode(source, node)
         end
     end)
     : case 'or'
@@ -1052,9 +1053,8 @@ local binarySwich = util.switch()
         elseif r1 == false then
             vm.setNode(source, node2)
         else
-            vm.getNode(source):merge(node1)
-            vm.getNode(source):setTruthy()
-            vm.getNode(source):merge(node2)
+            local node = node1:copy():setTruthy():merge(node2)
+            vm.setNode(source, node)
         end
     end)
     : case '=='

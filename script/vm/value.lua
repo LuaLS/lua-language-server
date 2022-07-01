@@ -22,24 +22,16 @@ function vm.testCondition(source)
             if n[1] == false then
                 hasFalse = true
             end
-        end
-        if n.type == 'global' and n.cate == 'type' then
-            if n.name == 'true' then
-                hasTrue = true
-            end
+        elseif n.type == 'global' and n.cate == 'type' then
             if n.name == 'false'
             or n.name == 'nil' then
                 hasFalse = true
+            else
+                hasTrue = true
             end
-        end
-        if n.type == 'nil' then
+        elseif n.type == 'nil' then
             hasFalse = true
-        end
-        if n.type == 'string'
-        or n.type == 'number'
-        or n.type == 'integer'
-        or n.type == 'table'
-        or n.type == 'function' then
+        elseif guide.isLiteral(n) then
             hasTrue = true
         end
     end

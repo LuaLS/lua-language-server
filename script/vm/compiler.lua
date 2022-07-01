@@ -905,6 +905,9 @@ local function compileForVars(source)
     if source._iterator then
         return
     end
+    if not source.exps then
+        return
+    end
         --  for k, v in pairs(t) do
         --> for k, v in iterator, status, initValue do
         --> local k, v = iterator(status, initValue)

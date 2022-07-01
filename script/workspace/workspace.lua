@@ -518,6 +518,7 @@ end
 config.watch(function (uri, key, value, oldValue)
     if key:find '^Lua.runtime'
     or key:find '^Lua.workspace'
+    or key:find '^Lua.type'
     or key:find '^files' then
         if value ~= oldValue then
             m.reload(scope.getScope(uri))

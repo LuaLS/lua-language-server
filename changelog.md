@@ -3,6 +3,7 @@
 ## 3.4.1
 * `NEW` settings:
   * `type.weakNilCheck`
+* `FIX` [#1257](https://github.com/sumneko/lua-language-server/issues/1257)
 
 ## 3.4.0
 `2022-6-29`

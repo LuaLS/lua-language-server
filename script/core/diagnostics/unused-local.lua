@@ -63,16 +63,24 @@ local function isDocClass(source)
     return false
 end
 
+---@param func parser.object
+---@return boolean
+local function isEmptyFunction(func)
+    if #func > 0 then
+        return false
+    end
+    local startRow  = guide.rowColOf(func.start)
+    local finishRow = guide.rowColOf(func.finish)
+    return finishRow - startRow <= 1
+end
+
 ---@param source parser.object
 local function isDeclareFunctionParam(source)
     if source.parent.type ~= 'funcargs' then
         return false
     end
     local func = source.parent.parent
-    if #func > 0 then
-        return false
-    end
-    return true
+    return isEmptyFunction(func)
 end
 
 return function (uri, callback)

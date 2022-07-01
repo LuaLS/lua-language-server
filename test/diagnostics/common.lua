@@ -1839,7 +1839,7 @@ end
 TEST [[
 ---@return any, any
 function F()
-    X = 1<!!>
+    X = 1
 end
 ]]
 
@@ -1891,6 +1891,13 @@ function F()
             return 2
         end
     end
+end
+]]
+
+TEST [[
+---@return number?
+function F()
+
 end
 ]]
 

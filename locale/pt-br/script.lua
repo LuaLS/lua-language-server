@@ -117,9 +117,9 @@ DIAG_UNDEFINED_DOC_PARAM              =
 DIAG_UNKNOWN_DIAG_CODE                =
 'Código de diagnóstico desconhecido `{}`.'
 DIAG_CAST_LOCAL_TYPE                  = -- TODO: need translate!
-'This variable has explicitly defined as `{def}`. Cannot convert its type to `{ref}`.'
+'This variable is defined as type `{def}`. Cannot convert its type to `{ref}`.'
 DIAG_CAST_FIELD_TYPE                  = -- TODO: need translate!
-'This field has explicitly defined as `{def}`. Cannot convert its type to `{ref}`.'
+'This field is defined as type `{def}`. Cannot convert its type to `{ref}`.'
 DIAG_ASSIGN_TYPE_MISMATCH             = -- TODO: need translate!
 'Cannot assign `{ref}` to `{def}`.'
 DIAG_PARAM_TYPE_MISMATCH              = -- TODO: need translate!

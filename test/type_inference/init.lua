@@ -3270,3 +3270,14 @@ local b
 
 local <?c?> = a or b
 ]]
+
+TEST 'number|table|nil' [[
+---@type table|nil
+local a
+
+---@type number|nil
+local b
+
+local c = a and b
+local <?d?> = a or b
+]]

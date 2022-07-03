@@ -270,9 +270,11 @@ function mt:_lookIntoAction(action, topNode)
         self:_lookIntoExp(value, topNode:copy())
     end
     if action.type == 'setlocal' then
-        local newTopNode = self._callback(action, topNode)
-        if newTopNode then
-            topNode = newTopNode
+        if action.node == self._loc then
+            local newTopNode = self._callback(action, topNode)
+            if newTopNode then
+                topNode = newTopNode
+            end
         end
     elseif action.type == 'function' then
         self:_launchBlock(action, topNode:copy())

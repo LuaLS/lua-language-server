@@ -1090,16 +1090,20 @@ function m.getPath(a, b, sameFunction)
     local pathB = {}
     for _ = 1, 1000 do
         objA = m.getParentBlock(objA)
-        pathA[#pathA+1] = objA
-        if (not sameFunction and objA.type == 'function') or objA.type == 'main' then
-            break
+        if objA then
+            pathA[#pathA+1] = objA
+            if (not sameFunction and objA.type == 'function') or objA.type == 'main' then
+                break
+            end
         end
     end
     for _ = 1, 1000 do
         objB = m.getParentBlock(objB)
-        pathB[#pathB+1] = objB
-        if (not sameFunction and objA.type == 'function') or objB.type == 'main' then
-            break
+        if objB then
+            pathB[#pathB+1] = objB
+            if (not sameFunction and objB.type == 'function') or objB.type == 'main' then
+                break
+            end
         end
     end
     -- pathA: {1, 2, 3, 4, 5}

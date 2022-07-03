@@ -3281,3 +3281,27 @@ local b
 local c = a and b
 local <?d?> = a or b
 ]]
+
+TEST 'number' [[
+local x
+
+---@return number
+local function f()
+end
+
+x = f()
+
+print(<?x?>)
+]]
+
+TEST 'number' [[
+local x
+
+---@return number
+local function f()
+end
+
+_, x = pcall(f)
+
+print(<?x?>)
+]]

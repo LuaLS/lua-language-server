@@ -15,6 +15,7 @@ local encoder  = require 'encoder'
 local scope    = require 'workspace.scope'
 
 ---@class file
+---@field uri          uri
 ---@field content      string
 ---@field _ref?        integer
 ---@field trusted?     boolean
@@ -148,6 +149,9 @@ function m.exists(uri)
     return m.fileMap[uri] ~= nil
 end
 
+---@param file file
+---@param text string
+---@return string
 local function pluginOnSetText(file, text)
     local plugin   = require 'plugin'
     file._diffInfo = nil

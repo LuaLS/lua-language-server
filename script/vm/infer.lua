@@ -433,7 +433,7 @@ function mt:viewLiterals()
         or n.type == 'integer'
         or n.type == 'boolean' then
             local literal = util.viewLiteral(n[1])
-            if not mark[literal] then
+            if literal and not mark[literal] then
                 literals[#literals+1] = literal
                 mark[literal] = true
             end

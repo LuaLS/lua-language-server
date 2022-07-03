@@ -57,7 +57,7 @@ function mt:_collect()
     end
 
     table.sort(self._objs, function (a, b)
-        return (a.range or a.start) < (b.range or b.start)
+        return a.start < b.start
     end)
 end
 
@@ -69,17 +69,12 @@ end
 function mt:_fastWard(pos, node)
     for i = self._index, #self._objs do
         local obj = self._objs[i]
-        if (obj.range or obj.finish) > pos then
+        if obj.finish > pos then
             self._index = i
             return node, obj
         end
         if obj.type == 'getlocal' then
             self._callback(obj, node)
-        elseif obj.type == 'setlocal' then
-            local newNode = self._callback(obj, node)
-            if newNode then
-                node = newNode:copy()
-            end
         elseif obj.type == 'doc.cast' then
             node = node:copy()
             for _, cast in ipairs(obj.casts) do
@@ -178,13 +173,13 @@ function mt:_lookIntoExp(exp, topNode, outNode)
                         outNode = checkerNode
                     end
                 end
-            elseif exp.type == 'call'
+            elseif handler.type == 'call'
             and    checker.type == 'string'
-            and    exp.node.special == 'type'
-            and    exp.args
-            and    exp.args[1]
-            and    exp.args[1].type == 'getlocal'
-            and    exp.args[1].node == self._loc then
+            and    handler.node.special == 'type'
+            and    handler.args
+            and    handler.args[1]
+            and    handler.args[1].type == 'getlocal'
+            and    handler.args[1].node == self._loc then
                 -- if type(x) == 'string' then
                 self:_fastWard(exp.finish, topNode:copy())
                 if exp.op.type == '==' then
@@ -198,9 +193,9 @@ function mt:_lookIntoExp(exp, topNode, outNode)
                         outNode:narrow(checker[1])
                     end
                 end
-            elseif exp.type == 'getlocal'
+            elseif handler.type == 'getlocal'
             and    checker.type == 'string' then
-                local nodeValue = vm.getObjectValue(exp.node)
+                local nodeValue = vm.getObjectValue(handler.node)
                 if  nodeValue
                 and nodeValue.type == 'select'
                 and nodeValue.sindex == 1 then
@@ -242,7 +237,7 @@ function mt:_lookIntoExp(exp, topNode, outNode)
         self:_lookIntoExp(exp.index, topNode)
     elseif exp.type == 'table' then
         for _, field in ipairs(exp) do
-            self:_lookIntoExp(field, topNode)
+            self:_lookIntoAction(field, topNode)
         end
     end
     ::RETURN::
@@ -272,9 +267,14 @@ function mt:_lookIntoAction(action, topNode)
     end
     local value = vm.getObjectValue(action)
     if value then
-        topNode = self:_lookIntoExp(value, topNode:copy())
+        self:_lookIntoExp(value, topNode:copy())
     end
-    if     action.type == 'function' then
+    if action.type == 'setlocal' then
+        local newTopNode = self._callback(action, topNode)
+        if newTopNode then
+            topNode = newTopNode
+        end
+    elseif action.type == 'function' then
         self:_launchBlock(action, topNode:copy())
     elseif action.type == 'loop'
     or     action.type == 'in'
@@ -345,18 +345,17 @@ function mt:_launchBlock(block, node)
         return topNode
     end
     for _, action in ipairs(block) do
-        if (action.range or action.finish) < (top.range or top.finish) then
+        if (action.range or action.finish) < top.finish then
             goto CONTINUE
         end
         topNode = self:_lookIntoAction(action, topNode)
-        topNode, top = self:_fastWard(action.range or action.finish, topNode)
+        topNode, top = self:_fastWard(action.finish, topNode)
         if not top then
             return topNode
         end
         ::CONTINUE::
     end
-    -- `x = function () end`: don't touch `x` in the end of function
-    topNode = self:_fastWard(block.finish - 1, topNode)
+    topNode = self:_fastWard(block.finish, topNode)
     return topNode
 end
 

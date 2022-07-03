@@ -80,10 +80,11 @@ function vm.countParamsOfNode(node)
 end
 
 ---@param func parser.object
+---@param onlyDoc? boolean
 ---@param mark? table
 ---@return integer min
 ---@return number  max
-function vm.countReturnsOfFunction(func, mark)
+function vm.countReturnsOfFunction(func, onlyDoc, mark)
     if func.type == 'function' then
         ---@type integer?
         local min
@@ -123,7 +124,7 @@ function vm.countReturnsOfFunction(func, mark)
                 max = dmax
             end
         end
-        if not hasDocReturn and func.returns then
+        if not onlyDoc and not hasDocReturn and func.returns then
             for _, ret in ipairs(func.returns) do
                 local rmin, rmax = vm.countList(ret, mark)
                 if not min or rmin < min then
@@ -153,7 +154,7 @@ function vm.countReturnsOfCall(func, args, mark)
     ---@type number?
     local max
     for _, f in ipairs(funcs) do
-        local rmin, rmax = vm.countReturnsOfFunction(f, mark)
+        local rmin, rmax = vm.countReturnsOfFunction(f, false, mark)
         if not min or rmin < min then
             min = rmin
         end

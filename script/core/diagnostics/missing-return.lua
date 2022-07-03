@@ -63,7 +63,7 @@ return function (uri, callback)
             return
         end
         await.delay()
-        if vm.countReturnsOfFunction(source) == 0 then
+        if vm.countReturnsOfFunction(source, true) == 0 then
             return
         end
         if hasReturn(source) then

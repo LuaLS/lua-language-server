@@ -117,6 +117,7 @@ function mt:_lookIntoChild(action, topNode, outNode)
         return topNode, topNode or outNode
     end
     self._mark[action] = true
+    topNode = self:_fastWardCasts(action.start, topNode)
     if     action.type == 'getlocal' then
         if action.node == self._loc then
             self._callback(action, topNode)
@@ -323,7 +324,6 @@ function mt:_lookIntoBlock(block, topNode)
     end
     for _, action in ipairs(block) do
         if self._has[action] then
-            topNode = self:_fastWardCasts(action.start, topNode)
             topNode = self:_lookIntoChild(action, topNode)
         end
     end

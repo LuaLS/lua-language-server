@@ -3219,6 +3219,16 @@ local n
 print(<?n?>)
 ]]
 
+TEST 'table' [[
+---@type number|table
+local n
+
+if  n
+---@cast n table
+and <?n?>.type == 'xxx' then
+end
+]]
+
 TEST 'integer' [[
 ---@type integer?
 local n

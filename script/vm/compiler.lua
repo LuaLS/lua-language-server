@@ -1313,6 +1313,8 @@ local compilerSwitch = util.switch()
                     else
                         vm.setNode(src, vm.compileNode(src.value), true)
                     end
+                else
+                    vm.setNode(src, node, true)
                 end
                 return vm.getNode(src)
             elseif src.type == 'getlocal' then

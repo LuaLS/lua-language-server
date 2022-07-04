@@ -65,7 +65,6 @@ function mt:_collect()
         and cast.finish < finishPos
         and guide.getLocal(self._loc, self._loc[1], cast.start) == self._loc then
             self._casts[#self._casts+1] = cast
-            self:_markHas(cast)
         end
     end
 end
@@ -284,7 +283,7 @@ function mt:_lookIntoChild(action, topNode, outNode)
             if action.value then
                 self:_lookIntoChild(action.value, topNode)
             end
-            topNode = self._callback(action)
+            topNode = self._callback(action, topNode)
         end
     elseif action.type == 'local' then
         if  action.value
@@ -307,12 +306,12 @@ function mt:_lookIntoChild(action, topNode, outNode)
             end
         end
     end
+    ::RETURN::
     guide.eachChild(action, function (src)
         if self._has[src] then
             self:_lookIntoChild(src, topNode)
         end
     end)
-    ::RETURN::
     return topNode, outNode or topNode
 end
 

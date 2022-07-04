@@ -51,7 +51,7 @@ function mt:resolve(uri, args, removeGeneric)
                 end
                 if n.type == 'doc.type.table' then
                     -- { [integer]: number } -> T[]
-                    local tvalueNode = vm.getTableValue(uri, node, 'integer')
+                    local tvalueNode = vm.getTableValue(uri, node, 'integer', true)
                     if tvalueNode then
                         resolve(object.node, tvalueNode)
                     end
@@ -76,8 +76,8 @@ function mt:resolve(uri, args, removeGeneric)
                 end
                 if firstField.type == 'doc.generic.name' and firstValue.type == 'doc.generic.name' then
                     -- { [number]: number} -> { [K]: V }
-                    local tfieldNode = vm.getTableKey(uri, node, 'any')
-                    local tvalueNode = vm.getTableValue(uri, node, 'any')
+                    local tfieldNode = vm.getTableKey(uri, node, 'any', true)
+                    local tvalueNode = vm.getTableValue(uri, node, 'any', true)
                     if tfieldNode then
                         resolve(firstField, tfieldNode)
                     end
@@ -87,13 +87,13 @@ function mt:resolve(uri, args, removeGeneric)
                 else
                     if ufieldNode:get(1).type == 'doc.generic.name' then
                         -- { [number]: number}|number[] -> { [K]: number }
-                        local tnode = vm.getTableKey(uri, node, uvalueNode)
+                        local tnode = vm.getTableKey(uri, node, uvalueNode, true)
                         if tnode then
                             resolve(firstField, tnode)
                         end
                     elseif uvalueNode:get(1).type == 'doc.generic.name' then
                         -- { [number]: number}|number[] -> { [number]: V }
-                        local tnode = vm.getTableValue(uri, node, ufieldNode)
+                        local tnode = vm.getTableValue(uri, node, ufieldNode, true)
                         if tnode then
                             resolve(firstValue, tnode)
                         end

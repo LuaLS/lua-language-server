@@ -192,16 +192,23 @@ end
 ---@param uri uri
 ---@param tnode vm.node
 ---@param knode vm.node|string
+---@param inversion? boolean
 ---@return vm.node?
-function vm.getTableValue(uri, tnode, knode)
+function vm.getTableValue(uri, tnode, knode, inversion)
     local result = vm.createNode()
     for tn in tnode:eachObject() do
         if tn.type == 'doc.type.table' then
             for _, field in ipairs(tn.fields) do
                 if  field.name.type ~= 'doc.field.name'
-                and vm.isSubType(uri, vm.compileNode(field.name), knode) then
-                    if field.extends then
-                        result:merge(vm.compileNode(field.extends))
+                and field.extends then
+                    if inversion then
+                        if vm.isSubType(uri, vm.compileNode(field.name), knode) then
+                            result:merge(vm.compileNode(field.extends))
+                        end
+                    else
+                        if vm.isSubType(uri, knode, vm.compileNode(field.name)) then
+                            result:merge(vm.compileNode(field.extends))
+                        end
                     end
                 end
             end
@@ -211,21 +218,31 @@ function vm.getTableValue(uri, tnode, knode)
         end
         if tn.type == 'table' then
             for _, field in ipairs(tn) do
-                if field.type == 'tableindex' then
-                    if field.value then
-                        result:merge(vm.compileNode(field.value))
-                    end
+                if  field.type == 'tableindex'
+                and field.value then
+                    result:merge(vm.compileNode(field.value))
                 end
-                if field.type == 'tablefield' then
-                    if vm.isSubType(uri, knode, 'string') then
-                        if field.value then
+                if  field.type == 'tablefield'
+                and field.value then
+                    if inversion then
+                        if vm.isSubType(uri, 'string', knode) then
+                            result:merge(vm.compileNode(field.value))
+                        end
+                    else
+                        if vm.isSubType(uri, knode, 'string') then
                             result:merge(vm.compileNode(field.value))
                         end
                     end
                 end
-                if field.type == 'tableexp' then
-                    if vm.isSubType(uri, knode, 'integer') and field.tindex == 1 then
-                        if field.value then
+                if  field.type == 'tableexp'
+                and field.value
+                and field.tindex == 1 then
+                    if inversion then
+                        if vm.isSubType(uri, 'integer', knode)  then
+                            result:merge(vm.compileNode(field.value))
+                        end
+                    else
+                        if vm.isSubType(uri, knode, 'integer')  then
                             result:merge(vm.compileNode(field.value))
                         end
                     end
@@ -242,16 +259,23 @@ end
 ---@param uri uri
 ---@param tnode vm.node
 ---@param vnode vm.node|string|vm.object
+---@param inversion? boolean
 ---@return vm.node?
-function vm.getTableKey(uri, tnode, vnode)
+function vm.getTableKey(uri, tnode, vnode, inversion)
     local result = vm.createNode()
     for tn in tnode:eachObject() do
         if tn.type == 'doc.type.table' then
             for _, field in ipairs(tn.fields) do
                 if  field.name.type ~= 'doc.field.name'
                 and field.extends then
-                    if vm.isSubType(uri, vm.compileNode(field.extends), vnode) then
-                        result:merge(vm.compileNode(field.name))
+                    if inversion then
+                        if vm.isSubType(uri, vm.compileNode(field.extends), vnode) then
+                            result:merge(vm.compileNode(field.name))
+                        end
+                    else
+                        if vm.isSubType(uri, vnode, vm.compileNode(field.extends)) then
+                            result:merge(vm.compileNode(field.name))
+                        end
                     end
                 end
             end

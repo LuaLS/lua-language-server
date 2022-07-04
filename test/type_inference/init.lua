@@ -3324,3 +3324,29 @@ _, x = pcall(f)
 
 print(<?x?>)
 ]]
+
+TEST 'string' [[
+---@type table<string|number, string>
+local t
+
+---@type number
+local n
+---@type string
+local s
+
+local <?test?>  = t[n] 
+local test2 = t[s] --test and test2 are unknow
+]]
+
+TEST 'string' [[
+---@type table<string|number, string>
+local t
+
+---@type number
+local n
+---@type string
+local s
+
+local test  = t[n] 
+local <?test2?> = t[s] --test and test2 are unknow
+]]

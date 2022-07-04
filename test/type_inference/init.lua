@@ -1857,6 +1857,15 @@ if xxx and x then
 end
 ]]
 
+TEST 'integer' [[
+---@type integer?
+local x
+
+if x and not mark[x] then
+    print(<?x?>)
+end
+]]
+
 TEST 'integer?' [[
 ---@type integer?
 local x

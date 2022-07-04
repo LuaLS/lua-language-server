@@ -140,9 +140,8 @@ function mt:_lookIntoChild(action, topNode, outNode)
             goto RETURN
         end
         if     action.op.type == 'and' then
-            local dummyNode = topNode:copy()
-            topNode = self:_lookIntoChild(action[1], topNode, dummyNode)
-            topNode = self:_lookIntoChild(action[2], topNode, dummyNode)
+            topNode = self:_lookIntoChild(action[1], topNode, topNode:copy())
+            topNode = self:_lookIntoChild(action[2], topNode, topNode:copy())
         elseif action.op.type == 'or' then
             outNode = outNode or topNode:copy()
             local topNode1, outNode1 = self:_lookIntoChild(action[1], topNode, outNode)

@@ -1012,7 +1012,7 @@ local function compileLocal(source)
     -- for x in ... do
     if source.parent.type == 'in' then
         compileForVars(source.parent)
-        local keyNode = source.parent._iterVars[source]
+        local keyNode = source.parent._iterVars and source.parent._iterVars[source]
         if keyNode then
             vm.setNode(source, keyNode)
         end

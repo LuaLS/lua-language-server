@@ -198,6 +198,43 @@ end
     return f
 end})
 
+local eachChildMap = setmetatable({}, {__index = function (self, name)
+    local defs = childMap[name]
+    if not defs then
+        self[name] = false
+        return false
+    end
+    local text = {}
+    text[#text+1] = 'local obj, callback = ...'
+    for _, def in ipairs(defs) do
+        if def == '#' then
+            text[#text+1] = [[
+for i = 1, #obj do
+    callback(obj[i])
+end
+]]
+        elseif type(def) == 'string' and def:sub(1, 1) == '#' then
+            local key = def:sub(2)
+            text[#text+1] = ([[
+local childs = obj.%s
+if childs then
+    for i = 1, #childs do
+        callback(childs[i])
+    end
+end
+]]):format(key)
+        elseif type(def) == 'string' then
+            text[#text+1] = ('callback(obj.%s)'):format(def)
+        else
+            text[#text+1] = ('callback(obj[%q])'):format(def)
+        end
+    end
+    local buf = table.concat(text, '\n')
+    local f = load(buf, buf, 't')
+    self[name] = f
+    return f
+end})
+
 m.actionMap = {
     ['main']        = {'#'},
     ['repeat']      = {'#'},
@@ -750,6 +787,16 @@ function m.eachSource(ast, callback)
             return
         end
     end
+end
+
+---@param source   parser.object
+---@param callback fun(src: parser.object)
+function m.eachChild(source, callback)
+    local f = eachChildMap[source.type]
+    if not f then
+        return
+    end
+    f(source, callback)
 end
 
 --- 获取指定的 special

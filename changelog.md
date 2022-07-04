@@ -5,6 +5,7 @@
   * `type.weakNilCheck`
 * `FIX` [#1256](https://github.com/sumneko/lua-language-server/issues/1256)
 * `FIX` [#1257](https://github.com/sumneko/lua-language-server/issues/1257)
+* `FIX` [#1269](https://github.com/sumneko/lua-language-server/issues/1269)
 * `FIX` [#1275](https://github.com/sumneko/lua-language-server/issues/1275)
 
 ## 3.4.0

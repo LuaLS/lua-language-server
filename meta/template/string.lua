@@ -94,9 +94,8 @@ function string.match(s, pattern, init) end
 ---@version >5.3
 ---#DES 'string.pack'
 ---@param fmt string
----@param v1  string
----@param v2? string
----@param ... string
+---@param v1  string|number
+---@param ... string|number
 ---@return string binary
 ---@nodiscard
 function string.pack(fmt, v1, v2, ...) end

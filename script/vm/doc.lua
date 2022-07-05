@@ -358,8 +358,9 @@ end
 ---@param uri uri
 ---@param position integer
 ---@param name string
+---@param err? boolean
 ---@return boolean
-function vm.isDiagDisabledAt(uri, position, name)
+function vm.isDiagDisabledAt(uri, position, name, err)
     local status = files.getState(uri)
     if not status then
         return false
@@ -389,7 +390,8 @@ function vm.isDiagDisabledAt(uri, position, name)
     local count = 0
     for _, range in ipairs(cache.diagnosticRanges) do
         if range.row <= myRow then
-            if not range.names or range.names[name] then
+            if (range.names and range.names[name])
+            or (not range.names and not err) then
                 if range.mode == 'disable' then
                     count = count + 1
                 elseif range.mode == 'enable' then

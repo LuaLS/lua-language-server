@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.5.0
+* `CHG` `---@diagnostic disable: <ERR_NAME>` can suppress syntax errors
 * `FIX` [#1278](https://github.com/sumneko/lua-language-server/issues/1278)
 
 ## 3.4.1

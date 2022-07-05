@@ -18,6 +18,7 @@ local lookBackward = require 'core.look-backward'
 local guide        = require 'parser.guide'
 local await        = require 'await'
 local postfix      = require 'core.completion.postfix'
+local diag         = require 'proto.diagnostic'
 
 local diagnosticModes = {
     'disable-next-line',
@@ -1834,7 +1835,7 @@ local function tryluaDocByErr(state, position, err, docState, results)
             }
         end
     elseif err.type == 'LUADOC_MISS_DIAG_NAME' then
-        for name in util.sortPairs(define.DiagnosticDefaultSeverity) do
+        for name in util.sortPairs(diag.getDiagAndErrNameMap()) do
             results[#results+1] = {
                 label = name,
                 kind  = define.CompletionItemKind.Value,

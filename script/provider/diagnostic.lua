@@ -17,6 +17,7 @@ local ltable    = require 'linked-table'
 local furi      = require 'file-uri'
 local json      = require 'json'
 local fw        = require 'filewatch'
+local vm        = require 'vm.vm'
 
 ---@class diagnosticProvider
 local m = {}
@@ -193,7 +194,9 @@ function m.syntaxErrors(uri, ast)
     pcall(function ()
         local disables = util.arrayToHash(config.get(uri, 'Lua.diagnostics.disable'))
         for _, err in ipairs(ast.errs) do
-            if not disables[err.type:lower():gsub('_', '-')] then
+            local id = err.type:lower():gsub('_', '-')
+            if  not disables[id]
+            and not vm.isDiagDisabledAt(uri, err.start, id, true) then
                 results[#results+1] = buildSyntaxError(uri, err)
             end
         end

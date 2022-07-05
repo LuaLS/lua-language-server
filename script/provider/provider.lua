@@ -28,7 +28,7 @@ local function updateConfig(uri)
     local specified = cfgLoader.loadLocalConfig(uri, CONFIGPATH)
     if specified then
         log.info('Load config from specified', CONFIGPATH)
-        log.debug(inspect(specified))
+        log.info(inspect(specified))
         -- watch directory
         filewatch.watch(workspace.getAbsolutePath(uri, CONFIGPATH):gsub('[^/\\]+$', ''))
         config.update(scope.override, specified)
@@ -38,14 +38,14 @@ local function updateConfig(uri)
         local clientConfig = cfgLoader.loadClientConfig(folder.uri)
         if clientConfig then
             log.info('Load config from client', folder.uri)
-            log.debug(inspect(clientConfig))
+            log.info(inspect(clientConfig))
         end
 
         local rc = cfgLoader.loadRCConfig(folder.uri, '.luarc.json')
                 or cfgLoader.loadRCConfig(folder.uri, '.luarc.jsonc')
         if rc then
             log.info('Load config from .luarc.json/.luarc.jsonc', folder.uri)
-            log.debug(inspect(rc))
+            log.info(inspect(rc))
         end
 
         config.update(folder, clientConfig, rc)
@@ -53,7 +53,7 @@ local function updateConfig(uri)
 
     local global = cfgLoader.loadClientConfig()
     log.info('Load config from client', 'fallback')
-    log.debug(inspect(global))
+    log.info(inspect(global))
     config.update(scope.fallback, global)
 end
 

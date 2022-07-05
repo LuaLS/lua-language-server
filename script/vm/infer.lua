@@ -8,6 +8,7 @@ local vm       = require 'vm.vm'
 ---@field views table<string, boolean>
 ---@field cachedView? string
 ---@field node? vm.node
+---@field _drop table
 local mt = {}
 mt.__index = mt
 mt._hasNumber      = false
@@ -122,11 +123,45 @@ local viewNodeSwitch = util.switch()
         for i, sign in ipairs(source.signs) do
             buf[i] = vm.getInfer(sign):view(uri)
         end
+        if infer._drop then
+            local node = vm.compileNode(source)
+            for c in node:eachObject() do
+                if guide.isLiteral(c) then
+                    infer._drop[c] = true
+                end
+            end
+        end
         return ('%s<%s>'):format(source.node[1], table.concat(buf, ', '))
     end)
     : case 'doc.type.table'
-    : call(function (source, infer)
-        infer._hasTable = true
+    : call(function (source, infer, uri)
+        if #source.fields == 0 then
+            infer._hasTable = true
+            return
+        end
+        if infer._drop and infer._drop[source] then
+            infer._hasTable = true
+            return
+        end
+        infer._hasClass = true
+        local buf = {}
+        buf[#buf+1] = '{ '
+        for i, field in ipairs(source.fields) do
+            if i > 1 then
+                buf[#buf+1] = ', '
+            end
+            local key = field.name
+            if key.type == 'doc.type' then
+                buf[#buf+1] = ('[%s]: '):format(vm.getInfer(key):view(uri))
+            elseif type(key[1]) == 'string' then
+                buf[#buf+1] = key[1] .. ': '
+            else
+                buf[#buf+1] = ('[%q]: '):format(key[1])
+            end
+            buf[#buf+1] = vm.getInfer(field.extends):view(uri)
+        end
+        buf[#buf+1] = ' }'
+        return table.concat(buf)
     end)
     : case 'doc.type.string'
     : call(function (source, infer)
@@ -209,6 +244,7 @@ function vm.getInfer(source)
     end
     local infer = setmetatable({
         node  = node,
+        _drop = {},
     }, mt)
     node.lastInfer = infer
 

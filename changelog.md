@@ -1,8 +1,9 @@
 # changelog
 
 ## 3.5.0
-* `CHG` `---@diagnostic disable: <ERR_NAME>` can suppress syntax errors
-* `CHG` `completion.callSnippet` no longer generate parameter types
+* `CHG` diagnostic: `---@diagnostic disable: <ERR_NAME>` can suppress syntax errors
+* `CHG` completion: `completion.callSnippet` no longer generate parameter types
+* `CHG` hover: show `---@type {x: number, y: number}` as detail instead of `table`
 * `FIX` [#1278](https://github.com/sumneko/lua-language-server/issues/1278)
 
 ## 3.4.1

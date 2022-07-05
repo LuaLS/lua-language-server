@@ -520,7 +520,7 @@ TEST 'fun(a: string, b: any, c?: boolean, ...any):c, d?, ...unknown' [[
 local <?x?>
 ]]
 
-TEST 'table' [[
+TEST '{ [string]: string }' [[
 ---@type { [string]: string }
 local <?x?>
 ]]
@@ -2439,14 +2439,14 @@ TEST 'table' [[
 local <?x?>
 ]]
 
-TEST 'table' [[
+TEST '{ name: boolean }' [[
 ---@alias tp {name: boolean}
 
 ---@type tp
 local <?x?>
 ]]
 
-TEST 'boolean|table' [[
+TEST 'boolean|{ name: boolean }' [[
 ---@alias tp boolean | {name: boolean}
 
 ---@type tp
@@ -3374,5 +3374,10 @@ local <?t?>
 TEST 'A' [[
 ---@class A
 ---@diagnostic disable
+local <?t?>
+]]
+
+TEST '{ [string]: number, [true]: string, [1]: boolean, tag: integer }' [[
+---@type {[string]: number, [true]: string, [1]: boolean, tag: integer}
 local <?t?>
 ]]

@@ -1,5 +1,8 @@
 # changelog
 
+## 3.5.0
+* `FIX` [#1278](https://github.com/sumneko/lua-language-server/issues/1278)
+
 ## 3.4.1
 `2022-7-5`
 * `NEW` settings:

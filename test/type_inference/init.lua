@@ -3364,3 +3364,15 @@ local t
 
 local <?x?> = t[1]
 ]]
+
+TEST 'integer' [[
+---@type integer
+---@diagnostic disable
+local <?t?>
+]]
+
+TEST 'A' [[
+---@class A
+---@diagnostic disable
+local <?t?>
+]]

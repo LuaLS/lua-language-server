@@ -1450,6 +1450,9 @@ local function isContinuedDoc(lastDoc, nextDoc)
     if not nextDoc then
         return false
     end
+    if nextDoc.type == 'doc.diagnostic' then
+        return true
+    end
     if lastDoc.type == 'doc.type'
     or lastDoc.type == 'doc.module' then
         return false

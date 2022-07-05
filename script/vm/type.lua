@@ -259,16 +259,16 @@ end
 ---@param uri uri
 ---@param tnode vm.node
 ---@param vnode vm.node|string|vm.object
----@param inversion? boolean
+---@param reverse? boolean
 ---@return vm.node?
-function vm.getTableKey(uri, tnode, vnode, inversion)
+function vm.getTableKey(uri, tnode, vnode, reverse)
     local result = vm.createNode()
     for tn in tnode:eachObject() do
         if tn.type == 'doc.type.table' then
             for _, field in ipairs(tn.fields) do
                 if  field.name.type ~= 'doc.field.name'
                 and field.extends then
-                    if inversion then
+                    if reverse then
                         if vm.isSubType(uri, vm.compileNode(field.extends), vnode) then
                             result:merge(vm.compileNode(field.name))
                         end

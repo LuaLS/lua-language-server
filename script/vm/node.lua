@@ -227,7 +227,7 @@ function mt:remove(name)
         or (c.type == 'doc.type.boolean'  and name == 'false' and c[1] == false)
         or (c.type == 'doc.type.table'    and name == 'table')
         or (c.type == 'doc.type.array'    and name == 'table')
-        or (c.type == 'doc.type.sign'     and name == 'table')
+        or (c.type == 'doc.type.sign'     and name == c.node[1])
         or (c.type == 'doc.type.function' and name == 'function') then
             table.remove(self, index)
             self[c] = nil
@@ -248,7 +248,7 @@ function mt:narrow(name)
         or (c.type == 'doc.type.boolean'  and name == 'boolean')
         or (c.type == 'doc.type.table'    and name == 'table')
         or (c.type == 'doc.type.array'    and name == 'table')
-        or (c.type == 'doc.type.sign'    and name == 'table')
+        or (c.type == 'doc.type.sign'     and name == c.node[1])
         or (c.type == 'doc.type.function' and name == 'function') then
             goto CONTINUE
         end
@@ -337,9 +337,14 @@ function mt:asTable()
         local c = self[index]
         if c.type == 'table'
         or c.type == 'doc.type.table'
-        or c.type == 'doc.type.array'
-        or c.type == 'doc.type.sign' then
+        or c.type == 'doc.type.array' then
             goto CONTINUE
+        end
+        if c.type == 'doc.type.sign' then
+            if c.node[1] == 'table'
+            or not guide.isBasicType(c.node[1]) then
+                goto CONTINUE
+            end
         end
         if c.type == 'global' and c.cate == 'type' then
             ---@cast c vm.global

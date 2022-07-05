@@ -1309,7 +1309,8 @@ local compilerSwitch = util.switch()
                 end
                 if src.value then
                     if src.value.type == 'table' then
-                        vm.setNode(src, vm.createNode(src.value), true)
+                        vm.setNode(src, vm.createNode(src.value))
+                        vm.setNode(src, node:copy():asTable())
                     else
                         vm.setNode(src, vm.compileNode(src.value), true)
                     end

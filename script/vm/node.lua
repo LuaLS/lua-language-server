@@ -227,6 +227,7 @@ function mt:remove(name)
         or (c.type == 'doc.type.boolean'  and name == 'false' and c[1] == false)
         or (c.type == 'doc.type.table'    and name == 'table')
         or (c.type == 'doc.type.array'    and name == 'table')
+        or (c.type == 'doc.type.sign'    and name == 'table')
         or (c.type == 'doc.type.function' and name == 'function') then
             table.remove(self, index)
             self[c] = nil
@@ -247,6 +248,7 @@ function mt:narrow(name)
         or (c.type == 'doc.type.boolean'  and name == 'boolean')
         or (c.type == 'doc.type.table'    and name == 'table')
         or (c.type == 'doc.type.array'    and name == 'table')
+        or (c.type == 'doc.type.sign'    and name == 'table')
         or (c.type == 'doc.type.function' and name == 'function') then
             goto CONTINUE
         end
@@ -326,6 +328,31 @@ function mt:hasName(name)
         -- TODO
     end
     return false
+end
+
+---@return vm.node
+function mt:asTable()
+    self.optional = nil
+    for index = #self, 1, -1 do
+        local c = self[index]
+        if c.type == 'table'
+        or c.type == 'doc.type.table'
+        or c.type == 'doc.type.array'
+        or c.type == 'doc.type.sign' then
+            goto CONTINUE
+        end
+        if c.type == 'global' and c.cate == 'type' then
+            ---@cast c vm.global
+            if c.name == 'table'
+            or not guide.isBasicType(c.name) then
+                goto CONTINUE
+            end
+        end
+        table.remove(self, index)
+        self[c] = nil
+        ::CONTINUE::
+    end
+    return self
 end
 
 ---@return fun():vm.node.object

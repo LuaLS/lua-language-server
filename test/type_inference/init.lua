@@ -3350,3 +3350,10 @@ local s
 local test  = t[n] 
 local <?test2?> = t[s] --test and test2 are unknow
 ]]
+
+TEST 'table<number, boolean>' [[
+---@type table<number, boolean>
+local t
+
+<?t?> = {}
+]]

@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.4.1
+`2022-7-5`
 * `NEW` settings:
   * `type.weakNilCheck`
 * `CHG` allow type contravariance for `setmetatable` when initializing a class

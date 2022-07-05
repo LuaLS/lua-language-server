@@ -227,7 +227,7 @@ function mt:remove(name)
         or (c.type == 'doc.type.boolean'  and name == 'false' and c[1] == false)
         or (c.type == 'doc.type.table'    and name == 'table')
         or (c.type == 'doc.type.array'    and name == 'table')
-        or (c.type == 'doc.type.sign'    and name == 'table')
+        or (c.type == 'doc.type.sign'     and name == 'table')
         or (c.type == 'doc.type.function' and name == 'function') then
             table.remove(self, index)
             self[c] = nil

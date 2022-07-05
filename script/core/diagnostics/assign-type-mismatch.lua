@@ -30,6 +30,20 @@ local function hasMarkType(source)
     return false
 end
 
+---@param source parser.object
+---@return boolean
+local function hasMarkClass(source)
+    if not source.bindDocs then
+        return false
+    end
+    for _, doc in ipairs(source.bindDocs) do
+        if doc.type == 'doc.class' then
+            return true
+        end
+    end
+    return false
+end
+
 ---@async
 return function (uri, callback)
     local state = files.getState(uri)
@@ -72,6 +86,18 @@ return function (uri, callback)
         if vm.canCastType(uri, varNode, valueNode) then
             return
         end
+
+        if  value.type == 'select'
+        and value.sindex == 1
+        and value.vararg
+        and value.vararg.type == 'call'
+        and value.vararg.node.special == 'setmetatable'
+        and hasMarkClass(source) then
+            if vm.canCastType(uri, valueNode:copy():remove 'table', varNode) then
+                return
+            end
+        end
+
         callback {
             start   = source.start,
             finish  = source.finish,

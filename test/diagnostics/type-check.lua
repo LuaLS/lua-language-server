@@ -631,5 +631,38 @@ n = nb
 ]]
 config.set(nil, 'Lua.type.weakNilCheck', false)
 
+TEST [[
+---@class A
+local a = {}
+
+---@class B: A
+local <!b!> = a
+]]
+
+TEST [[
+---@class A
+local a = {}
+a.__index = a
+
+---@class B: A
+local b = setmetatable({}, a)
+]]
+
+TEST [[
+---@class A
+local a = {}
+
+---@class B: A
+local b = setmetatable({}, {__index = a})
+]]
+
+TEST [[
+---@class A
+local a = {}
+
+---@class B
+local <!b!> = setmetatable({}, {__index = a})
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

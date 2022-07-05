@@ -3,6 +3,14 @@
 ## 3.4.1
 * `NEW` settings:
   * `type.weakNilCheck`
+* `CHG` allow type contravariance for `setmetatable` when initializing a class
+  ```lua
+  ---@class A
+  local a = {}
+
+  ---@class B: A
+  local b = setmetatable({}, { __index = a }) -- OK!
+  ```
 * `FIX` [#1256](https://github.com/sumneko/lua-language-server/issues/1256)
 * `FIX` [#1257](https://github.com/sumneko/lua-language-server/issues/1257)
 * `FIX` [#1267](https://github.com/sumneko/lua-language-server/issues/1267)

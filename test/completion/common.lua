@@ -934,7 +934,7 @@ mt:f<??>
     {
         label = 'f(a, b, c)',
         kind = define.CompletionItemKind.Snippet,
-        insertText = 'f(${1:a: any}, ${2:b: any}, ${3:c: any})',
+        insertText = 'f(${1:a}, ${2:b}, ${3:c})',
     },
 }
 
@@ -2688,7 +2688,7 @@ zzzz<??>
     {
         label = 'zzzz(a)',
         kind  = define.CompletionItemKind.Snippet,
-        insertText = 'zzzz(${1:a: any})',
+        insertText = 'zzzz(${1:a})',
     },
     {
         label = 'zzzz(a, b)',
@@ -2698,7 +2698,7 @@ zzzz<??>
     {
         label = 'zzzz(a, b)',
         kind  = define.CompletionItemKind.Snippet,
-        insertText = 'zzzz(${1:a: any}, ${2:b: any})',
+        insertText = 'zzzz(${1:a}, ${2:b})',
     },
 }
 
@@ -2719,28 +2719,7 @@ foo<??>
     {
         label = 'foo(a, b, c, ...)',
         kind  = define.CompletionItemKind.Snippet,
-        insertText = 'foo(${1:a: any})',
-    },
-}
-
-TEST [[
----@param a any
----@param b? any
----@param c? any
----@vararg any
-local function foo(a, b, c, ...) end
-foo<??>
-]]
-{
-    {
-        label = 'foo(a, b, c, ...)',
-        kind  = define.CompletionItemKind.Function,
-        insertText = 'foo',
-    },
-    {
-        label = 'foo(a, b, c, ...)',
-        kind  = define.CompletionItemKind.Snippet,
-        insertText = 'foo(${1:a: any})',
+        insertText = 'foo(${1:a}, ${2:b?}, ${3:c?}, ${4:...})',
     },
 }
 
@@ -2761,28 +2740,7 @@ foo<??>
     {
         label = 'foo(a, b, c, ...)',
         kind  = define.CompletionItemKind.Snippet,
-        insertText = 'foo($1)',
-    },
-}
-
-TEST [[
----@param a? any
----@param b any
----@param c? any
----@vararg any
-local function foo(a, b, c, ...) end
-foo<??>
-]]
-{
-    {
-        label = 'foo(a, b, c, ...)',
-        kind  = define.CompletionItemKind.Function,
-        insertText = 'foo',
-    },
-    {
-        label = 'foo(a, b, c, ...)',
-        kind  = define.CompletionItemKind.Snippet,
-        insertText = 'foo(${1:a?: any}, ${2:b: any})',
+        insertText = 'foo(${1:a?}, ${2:b?}, ${3:c?}, ${4:...})',
     },
 }
 
@@ -2800,7 +2758,7 @@ foo<??>
     {
         label = 'foo(f)',
         kind  = define.CompletionItemKind.Snippet,
-        insertText = 'foo(${1:f: fun(a: any, b: any)})',
+        insertText = 'foo(${1:f})',
     },
 }
 Cared['insertText'] = false

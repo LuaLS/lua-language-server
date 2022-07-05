@@ -160,31 +160,18 @@ local function buildFunctionSnip(source, value, oop)
     if oop then
         table.remove(args, 1)
     end
-    local len = #args
-    local truncated = false
-    if len > 0 and args[len]:match('^%s*%.%.%.:')  then
-        table.remove(args)
-        truncated = true
-    end
-    for i = #args, 1, -1 do
-        if args[i]:match('^%s*[^?]+%?:')
-        or args[i]:match('^%.%.%.') then
-            table.remove(args)
-            truncated = true
-        else
-            break
-        end
-    end
 
     local snipArgs = {}
     for id, arg in ipairs(args) do
-        local str =  arg:gsub('^(%s*)(.+)', function (sp, word)
+        local str, count = arg:gsub('^(%s*)(%.%.%.)(.+)', function (sp, word)
             return ('%s${%d:%s}'):format(sp, id, word)
         end)
+        if count == 0 then
+            str = arg:gsub('^(%s*)([^:]+)(.+)', function (sp, word)
+                return ('%s${%d:%s}'):format(sp, id, word)
+            end)
+        end
         table.insert(snipArgs, str)
-    end
-    if truncated and #snipArgs == 0 then
-        snipArgs = {'$1'}
     end
     return ('%s(%s)'):format(name, table.concat(snipArgs, ', '))
 end

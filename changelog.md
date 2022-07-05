@@ -2,6 +2,7 @@
 
 ## 3.5.0
 * `CHG` `---@diagnostic disable: <ERR_NAME>` can suppress syntax errors
+* `CHG` `completion.callSnippet` no longer generate parameter types
 * `FIX` [#1278](https://github.com/sumneko/lua-language-server/issues/1278)
 
 ## 3.4.1

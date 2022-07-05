@@ -612,7 +612,14 @@ local function expectAssign(isAction)
         if token == '+='
         or token == '-='
         or token == '*='
-        or token == '/=' then
+        or token == '/='
+        or token == '%='
+        or token == '^='
+        or token == '//='
+        or token == '|='
+        or token == '&='
+        or token == '>>='
+        or token == '<<=' then
             if not State.options.nonstandardSymbol[token] then
                 unknownSymbol()
             end

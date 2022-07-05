@@ -209,7 +209,8 @@ local template = {
     ['Lua.runtime.nonstandardSymbol']       = Type.Array(Type.String << {
                                                 '//', '/**/',
                                                 '`',
-                                                '+=', '-=', '*=', '/=',
+                                                '+=', '-=', '*=', '/=', '%=', '^=', '//=',
+                                                '|=', '&=', '<<=', '>>=',
                                                 '||', '&&', '!', '!=',
                                                 'continue',
                                             }),

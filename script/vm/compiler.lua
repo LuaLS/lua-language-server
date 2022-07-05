@@ -663,7 +663,7 @@ function vm.compileByParentNode(source, key, ref, pushResult)
             ---@cast node vm.global
             and not guide.isBasicType(node.name)
         )
-        or node.type == 'doc.type.string' then
+        or guide.isLiteral(node) then
             searchFieldSwitch(node.type, suri, node, key, ref, function (res, markDoc)
                 if markDoc then
                     docedResults[#docedResults+1] = res

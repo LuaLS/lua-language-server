@@ -3357,3 +3357,10 @@ local t
 
 <?t?> = {}
 ]]
+
+TEST 'integer' [[
+---@type integer[]|A
+local t
+
+local <?x?> = t[1]
+]]

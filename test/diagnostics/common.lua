@@ -1902,3 +1902,8 @@ end
 ]]
 
 util.arrayRemove(disables, 'redundant-return')
+
+TEST [[
+---@class A
+---@operator <!xxx!>: A
+]]

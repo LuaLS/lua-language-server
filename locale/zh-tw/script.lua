@@ -140,6 +140,8 @@ DIAG_MISSING_RETURN                   =
 '此處需要回傳值。'
 DIAG_RETURN_TYPE_MISMATCH             =
 '第 {index} 個回傳值的類型為 `{def}` ，但實際回傳的是 `{ref}`。'
+DIAG_UNKNOWN_OPERATOR                 = -- TODO: need translate!
+'Unknown operator `{}`.'
 
 MWS_NOT_SUPPORT         =
 '{} 目前還不支援多工作目錄，我可能需要重新啟動才能支援新的工作目錄...'

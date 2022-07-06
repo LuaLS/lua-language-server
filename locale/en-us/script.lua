@@ -140,6 +140,8 @@ DIAG_MISSING_RETURN                   =
 'Return value is required here.'
 DIAG_RETURN_TYPE_MISMATCH             =
 'The type of the {index} return value is `{def}`, but the actual return is `{ref}`.'
+DIAG_UNKNOWN_OPERATOR                 =
+'Unknown operator `{}`.'
 
 MWS_NOT_SUPPORT         =
 '{} does not support multi workspace for now, I may need to restart to support the new workspace ...'

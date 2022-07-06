@@ -148,10 +148,6 @@ Symbol              <-  ({} {
 ---@field versions? table[]
 ---@field names? parser.object[]
 
-local function trim(str)
-    return str:match '^%s*(%S+)%s*$'
-end
-
 local function parseTokens(text, offset)
     Ci = 0
     Offset = offset

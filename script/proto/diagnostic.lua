@@ -93,6 +93,7 @@ m.register {
     'unknown-diag-code',
     'unknown-cast-variable',
     'cast-type-mismatch',
+    'unknown-operator',
 } {
     group    = 'luadoc',
     severity = 'Warning',

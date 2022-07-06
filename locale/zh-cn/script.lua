@@ -140,6 +140,8 @@ DIAG_MISSING_RETURN                   =
 '此处需要返回值。'
 DIAG_RETURN_TYPE_MISMATCH             =
 '第 {index} 个返回值的类型为 `{def}` ，但实际返回的是 `{ref}`。'
+DIAG_UNKNOWN_OPERATOR                 =
+'未知的运算符 `{}`。'
 
 MWS_NOT_SUPPORT         =
 '{} 目前还不支持多工作目录，我可能需要重启才能支持新的工作目录...'

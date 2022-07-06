@@ -1736,6 +1736,23 @@ local function tryluaDocBySource(state, position, source, results)
             end
         end
         return true
+    elseif source.type == 'doc.operator.name' then
+        for _, name in ipairs(vm.UNARY_OP) do
+            if matchKey(source[1], name) then
+                results[#results+1] = {
+                    label = name,
+                    kind   = define.CompletionItemKind.Operator,
+                }
+            end
+        end
+        for _, name in ipairs(vm.BINARY_OP) do
+            if matchKey(source[1], name) then
+                results[#results+1] = {
+                    label = name,
+                    kind   = define.CompletionItemKind.Operator,
+                }
+            end
+        end
     end
     return false
 end
@@ -1845,6 +1862,19 @@ local function tryluaDocByErr(state, position, err, docState, results)
                     end),
                 }
             end
+        end
+    elseif err.type == 'LUADOC_MISS_OPERATOR_NAME' then
+        for _, name in ipairs(vm.UNARY_OP) do
+            results[#results+1] = {
+                label = name,
+                kind  = define.CompletionItemKind.Operator,
+            }
+        end
+        for _, name in ipairs(vm.BINARY_OP) do
+            results[#results+1] = {
+                label = name,
+                kind  = define.CompletionItemKind.Operator,
+            }
         end
     end
 end

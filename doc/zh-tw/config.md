@@ -207,10 +207,10 @@ Array<string>
 * ``"undefined-doc-param"``
 * ``"param-type-mismatch"``
 * ``"global-in-nil-env"``
-* ``"missing-parameter"``
+* ``"unused-vararg"``
 * ``"miss-sep-in-table"``
 * ``"unknown-cast-variable"``
-* ``"miss-loop-min"``
+* ``"unknown-operator"``
 * ``"malformed-number"``
 * ``"err-do-as-then"``
 * ``"spell-check"``
@@ -223,6 +223,7 @@ Array<string>
 * ``"duplicate-doc-alias"``
 * ``"doc-field-no-class"``
 * ``"no-visible-label"``
+* ``"miss-loop-min"``
 * ``"miss-exp"``
 * ``"miss-loop-max"``
 * ``"miss-name"``
@@ -239,43 +240,43 @@ Array<string>
 * ``"unused-label"``
 * ``"action-after-return"``
 * ``"unexpect-dots"``
-* ``"newline-call"``
+* ``"redundant-return-value"``
 * ``"jump-local-scope"``
 * ``"close-non-object"``
 * ``"miss-field"``
 * ``"count-down-loop"``
 * ``"cast-type-mismatch"``
-* ``"duplicate-index"``
+* ``"newline-call"``
 * ``"unexpect-symbol"``
 * ``"block-after-else"``
 * ``"unicode-name"``
 * ``"miss-exponent"``
 * ``"err-esc"``
-* ``"redundant-return-value"``
-* ``"unbalanced-assignments"``
+* ``"local-limit"``
+* ``"trailing-space"``
 * ``"err-c-long-comment"``
+* ``"undefined-global"``
 * ``"undefined-doc-name"``
 * ``"ambiguity-1"``
-* ``"trailing-space"``
 * ``"deprecated"``
 * ``"codestyle-check"``
 * ``"missing-return"``
-* ``"undefined-global"``
+* ``"missing-parameter"``
 * ``"unused-function"``
-* ``"code-after-break"``
-* ``"assign-type-mismatch"``
-* ``"local-limit"``
 * ``"cast-local-type"``
+* ``"assign-type-mismatch"``
+* ``"duplicate-set-field"``
+* ``"no-unknown"``
 * ``"need-check-nil"``
 * ``"keyword"``
 * ``"unknown-diag-code"``
-* ``"unused-vararg"``
+* ``"return-type-mismatch"``
 * ``"err-comment-prefix"``
 * ``"lowercase-global"``
-* ``"return-type-mismatch"``
-* ``"duplicate-set-field"``
+* ``"unbalanced-assignments"``
 * ``"redefined-local"``
-* ``"no-unknown"``
+* ``"code-after-break"``
+* ``"duplicate-index"``
 * ``"duplicate-doc-param"``
 * ``"index-in-func-name"``
 * ``"miss-symbol"``
@@ -407,6 +408,7 @@ object<string, string>
     * undefined-doc-param
     * unknown-cast-variable
     * unknown-diag-code
+    * unknown-operator
     */
     "luadoc": "Fallback",
     /*
@@ -524,6 +526,7 @@ object<string, string>
     * undefined-doc-param
     * unknown-cast-variable
     * unknown-diag-code
+    * unknown-operator
     */
     "luadoc": "Fallback",
     /*
@@ -733,6 +736,7 @@ object<string, string>
     "undefined-global": "Any",
     "unknown-cast-variable": "Any",
     "unknown-diag-code": "Any",
+    "unknown-operator": "Any",
     /*
     未使用的函式
     */
@@ -866,6 +870,7 @@ object<string, string>
     "undefined-global": "Warning",
     "unknown-cast-variable": "Warning",
     "unknown-diag-code": "Warning",
+    "unknown-operator": "Warning",
     /*
     未使用的函式
     */

@@ -7,11 +7,11 @@ local RENAME = 1 << 1
 
 local function exists(filename)
     local path = fs.path(filename)
-    local suc, res = pcall(fs.exists, path)
-    if not suc or not res then
+    local suc, exsits = pcall(fs.exists, path)
+    if not suc or not exsits then
         return false
     end
-    suc, res = pcall(fs.canonical, path)
+    local suc, res = pcall(fs.canonical, path)
     if not suc or res:string() ~= path:string() then
         return false
     end

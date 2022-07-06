@@ -16,7 +16,7 @@ _ENV = nil
 ---@class fs-utility
 local m = {}
 --- 读取文件
----@param path string|fspath
+---@param path string|fs.path
 function m.loadFile(path, keepBom)
     if type(path) ~= 'string' then
         ---@diagnostic disable-next-line: undefined-field
@@ -256,9 +256,9 @@ function dfs:saveFile(path, text)
     dir[filename] = text
 end
 
----@param path   string|fspath
+---@param path   string|fs.path
 ---@param option table
----@return fspath?
+---@return fs.path?
 local function fsAbsolute(path, option)
     if type(path) == 'string' then
         local suc, res = pcall(fs.path, path)
@@ -448,8 +448,8 @@ local function fileRemove(path, option)
     end
 end
 
----@param source fspath?
----@param target fspath?
+---@param source fs.path?
+---@param target fs.path?
 ---@param option table
 local function fileCopy(source, target, option)
     if not source or not target then
@@ -484,8 +484,8 @@ local function fileCopy(source, target, option)
     end
 end
 
----@param source fspath?
----@param target fspath?
+---@param source fs.path?
+---@param target fs.path?
 ---@param option table
 local function fileSync(source, target, option)
     if not source or not target then
@@ -593,8 +593,8 @@ function m.fileRemove(path, option)
 end
 
 --- 复制文件（夹）
----@param source string|fspath
----@param target string|fspath
+---@param source string|fs.path
+---@param target string|fs.path
 ---@return table
 function m.fileCopy(source, target, option)
     option = buildOption(option)
@@ -607,8 +607,8 @@ function m.fileCopy(source, target, option)
 end
 
 --- 同步文件（夹）
----@param source string|fspath
----@param target string|fspath
+---@param source string|fs.path
+---@param target string|fs.path
 ---@return table
 function m.fileSync(source, target, option)
     option = buildOption(option)

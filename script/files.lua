@@ -56,11 +56,11 @@ local uriMap = {}
 function m.getRealUri(uri)
     local filename = furi.decode(uri)
     local path = fs.path(filename)
-    local suc, res = pcall(fs.exists, path)
-    if not suc or not res then
+    local suc, exsits = pcall(fs.exists, path)
+    if not suc or not exsits then
         return uri
     end
-    suc, res = pcall(fs.canonical, path)
+    local suc, res = pcall(fs.canonical, path)
     if not suc then
         return uri
     end

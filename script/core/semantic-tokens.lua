@@ -692,6 +692,14 @@ local Care = util.switch()
             modifieres = define.TokenModifiers.abstract,
         }
     end)
+    : case 'doc.operator.name'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.operator,
+        }
+    end)
 
 local function buildTokens(uri, results)
     local tokens = {}

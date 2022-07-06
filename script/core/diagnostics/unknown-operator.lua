@@ -20,12 +20,13 @@ return function (uri, callback)
         if doc.type == 'doc.operator' then
             local op = doc.op
             if op then
-                if  not util.arrayHas(vm.UNARY_OP, op[1])
-                and not util.arrayHas(vm.BINARY_OP, op[1]) then
+                local opName = op[1]
+                if  not vm.BINARY_MAP[opName]
+                and not vm.UNARY_MAP[opName] then
                     callback {
                         start   = doc.op.start,
                         finish  = doc.op.finish,
-                        message = lang.script('DIAG_UNKNOWN_OPERATOR', op[1])
+                        message = lang.script('DIAG_UNKNOWN_OPERATOR', opName)
                     }
                 end
             end

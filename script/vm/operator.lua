@@ -25,6 +25,12 @@ vm.BINARY_OP = {
     'concat',
 }
 
+local unaryMap = {
+    ['-'] = 'unm',
+    ['~'] = 'bnot',
+    ['#'] = 'len',
+}
+
 local binaryMap = {
     ['+']  = 'add',
     ['-']  = 'sub',
@@ -40,6 +46,9 @@ local binaryMap = {
     ['>>'] = 'shr',
     ['..'] = 'concat',
 }
+
+vm.UNARY_MAP  = util.revertMap(unaryMap)
+vm.BINARY_MAP = util.revertMap(binaryMap)
 
 ---@param operators parser.object[]
 ---@param op string

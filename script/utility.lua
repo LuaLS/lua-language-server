@@ -524,6 +524,14 @@ function m.revertTable(t)
     return t
 end
 
+function m.revertMap(t)
+    local nt = {}
+    for k, v in pairs(t) do
+        nt[v] = k
+    end
+    return nt
+end
+
 function m.randomSortTable(t, max)
     local len = #t
     if len <= 1 then

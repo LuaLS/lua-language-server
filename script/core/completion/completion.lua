@@ -1566,6 +1566,7 @@ local function tryluaDocCate(word, results)
         'async',
         'nodiscard',
         'cast',
+        'operator',
     } do
         if matchKey(word, docType) then
             results[#results+1] = {
@@ -1740,16 +1741,18 @@ local function tryluaDocBySource(state, position, source, results)
         for _, name in ipairs(vm.UNARY_OP) do
             if matchKey(source[1], name) then
                 results[#results+1] = {
-                    label = name,
-                    kind   = define.CompletionItemKind.Operator,
+                    label       = name,
+                    kind        = define.CompletionItemKind.Operator,
+                    description = ('```lua\n%s\n```'):format(vm.UNARY_MAP[name]),
                 }
             end
         end
         for _, name in ipairs(vm.BINARY_OP) do
             if matchKey(source[1], name) then
                 results[#results+1] = {
-                    label = name,
-                    kind   = define.CompletionItemKind.Operator,
+                    label       = name,
+                    kind        = define.CompletionItemKind.Operator,
+                    description = ('```lua\n%s\n```'):format(vm.BINARY_MAP[name]),
                 }
             end
         end
@@ -1866,14 +1869,16 @@ local function tryluaDocByErr(state, position, err, docState, results)
     elseif err.type == 'LUADOC_MISS_OPERATOR_NAME' then
         for _, name in ipairs(vm.UNARY_OP) do
             results[#results+1] = {
-                label = name,
-                kind  = define.CompletionItemKind.Operator,
+                label       = name,
+                kind        = define.CompletionItemKind.Operator,
+                description = ('```lua\n%s\n```'):format(vm.UNARY_MAP[name]),
             }
         end
         for _, name in ipairs(vm.BINARY_OP) do
             results[#results+1] = {
-                label = name,
-                kind  = define.CompletionItemKind.Operator,
+                label       = name,
+                kind        = define.CompletionItemKind.Operator,
+                description = ('```lua\n%s\n```'):format(vm.BINARY_MAP[name]),
             }
         end
     end

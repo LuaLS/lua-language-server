@@ -1,6 +1,7 @@
 # changelog
 
-## 3.5.0
+## 3.4.2
+`2022-7-6`
 * `CHG` diagnostic: `type-check` ignores `nil` in `getfield`
 * `CHG` diagnostic: `---@diagnostic disable: <ERR_NAME>` can suppress syntax errors
 * `CHG` completion: `completion.callSnippet` no longer generate parameter types

@@ -1371,6 +1371,7 @@ local docSwitch = util.switch()
         result.finish = op.finish
 
         if checkToken('symbol', '(', 1) then
+            nextToken()
             local exp = parseType(result)
             if exp then
                 result.exp = exp

@@ -82,11 +82,19 @@ return function (uri, callback)
             valueNode = valueNode:copy():removeOptional()
         end
 
+        if value.type == 'getfield'
+        or value.type == 'getindex' then
+            -- 由于无法对字段进行类型收窄，
+            -- 因此将假值移除再进行检查
+            valueNode = valueNode:copy():setTruthy()
+        end
+
         local varNode = vm.compileNode(source)
         if vm.canCastType(uri, varNode, valueNode) then
             return
         end
 
+        -- local Cat = setmetatable({}, {__index = Animal}) 允许逆变
         if  value.type == 'select'
         and value.sindex == 1
         and value.vararg

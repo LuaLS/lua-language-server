@@ -664,5 +664,29 @@ local a = {}
 local <!b!> = setmetatable({}, {__index = a})
 ]]
 
+TEST [[
+---@class A
+---@field x number?
+local a
+
+---@class B
+---@field x number
+local b
+
+b.x = a.x
+]]
+
+TEST [[
+
+---@class A
+---@field x number?
+local a
+
+---@type number
+local t
+
+t = a.x
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

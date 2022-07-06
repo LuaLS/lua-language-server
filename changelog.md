@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.5.0
+* `CHG` diagnostic: `type-check` ignores `nil` in `getfield`
 * `CHG` diagnostic: `---@diagnostic disable: <ERR_NAME>` can suppress syntax errors
 * `CHG` completion: `completion.callSnippet` no longer generate parameter types
 * `CHG` hover: show `---@type {x: number, y: number}` as detail instead of `table`

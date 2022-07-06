@@ -42,6 +42,7 @@ function mt:addGet(uri, source)
     self.getsCache = nil
 end
 
+---@param suri  uri
 ---@return parser.object[]
 function mt:getSets(suri)
     if not self.setsCache then

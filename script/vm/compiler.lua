@@ -12,6 +12,7 @@ local vm         = require 'vm.vm'
 ---@field _globalBase     table
 ---@field cindex          integer
 ---@field func            parser.object
+---@field operators?      parser.object[]
 
 -- 该函数有副作用，会给source绑定node！
 ---@param source parser.object

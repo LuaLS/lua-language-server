@@ -819,8 +819,9 @@ local docSwitch = util.switch()
     : case 'class'
     : call(function ()
         local result = {
-            type   = 'doc.class',
-            fields = {},
+            type      = 'doc.class',
+            fields    = {},
+            operators = {},
         }
         result.class = parseName('doc.class.name', result)
         if not result.class then
@@ -1386,8 +1387,8 @@ local docSwitch = util.switch()
 
         local ret = parseType(result)
         if ret then
-            result.ret = ret
-            result.finish = ret.finish
+            result.extends = ret
+            result.finish  = ret.finish
         end
 
         return result
@@ -1497,8 +1498,10 @@ local function isContinuedDoc(lastDoc, nextDoc)
         return false
     end
     if lastDoc.type == 'doc.class'
-    or lastDoc.type == 'doc.field' then
+    or lastDoc.type == 'doc.field'
+    or lastDoc.type == 'doc.operator' then
         if  nextDoc.type ~= 'doc.field'
+        and nextDoc.type ~= 'doc.operator'
         and nextDoc.type ~= 'doc.comment'
         and nextDoc.type ~= 'doc.overload' then
             return false
@@ -1648,6 +1651,11 @@ local function bindClassAndFields(binded)
         elseif doc.type == 'doc.field' then
             if class then
                 class.fields[#class.fields+1] = doc
+                doc.class = class
+            end
+        elseif doc.type == 'doc.operator' then
+            if class then
+                class.operators[#class.operators+1] = doc
                 doc.class = class
             end
         end

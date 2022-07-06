@@ -158,6 +158,7 @@ local childMap = {
     ['doc.as']             = {'as'},
     ['doc.cast']           = {'loc', '#casts'},
     ['doc.cast.block']     = {'extends'},
+    ['doc.operator']       = {'op', 'exp', 'extends'}
 }
 
 ---@type table<string, fun(obj: parser.object, list: parser.object[])>
@@ -249,32 +250,6 @@ m.actionMap = {
     ['function']    = {'#'},
     ['funcargs']    = {'#'},
 }
-
-local inf          = 1 / 0
-local nan          = 0 / 0
-
-local function isInteger(n)
-    if math.type then
-        return math.type(n) == 'integer'
-    else
-        return type(n) == 'number' and n % 1 == 0
-    end
-end
-
-local function formatNumber(n)
-    if n == inf
-    or n == -inf
-    or n == nan
-    or n ~= n then -- IEEE 标准中，NAN 不等于自己。但是某些实现中没有遵守这个规则
-        return ('%q'):format(n)
-    end
-    if isInteger(n) then
-        return tostring(n)
-    end
-    local str = ('%.10f'):format(n)
-    str = str:gsub('%.?0*$', '')
-    return str
-end
 
 --- 是否是字面量
 ---@param obj table

@@ -3391,3 +3391,30 @@ TEST 'unknown' [[
 mt = {}
 mt.<?x?> = nil
 ]]
+
+TEST 'A' [[
+---@class A
+---@operator unm: A
+
+---@type A
+local a
+local <?b?> = -a
+]]
+
+TEST 'A' [[
+---@class A
+---@operator bnot: A
+
+---@type A
+local a
+local <?b?> = ~a
+]]
+
+TEST 'A' [[
+---@class A
+---@operator len: A
+
+---@type A
+local a
+local <?b?> = #a
+]]

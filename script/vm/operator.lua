@@ -25,6 +25,47 @@ vm.BINARY_OP = {
     'concat',
 }
 
+---@param operators parser.object[]
+---@param op string
+---@param value? parser.object
+---@param result? vm.node
+---@return vm.node?
+local function checkOperators(operators, op, value, result)
+    for _, operator in ipairs(operators) do
+        if operator.op[1] ~= op
+        or not operator.extends then
+            goto CONTINUE
+        end
+        if not result then
+            result = vm.createNode()
+        end
+        result:merge(vm.compileNode(operator.extends))
+        ::CONTINUE::
+    end
+    return result
+end
+
+---@param op string
+---@param exp parser.object
+---@param value? parser.object
+---@return vm.node?
+function vm.runOperator(op, exp, value)
+    local uri = guide.getUri(exp)
+    local node = vm.compileNode(exp)
+    local result
+    for c in node:eachObject() do
+        if c.type == 'global' and c.cate == 'type' then
+            ---@cast c vm.global
+            for _, set in ipairs(c:getSets(uri)) do
+                if set.operators and #set.operators > 0 then
+                    result = checkOperators(set.operators, op, value, result)
+                end
+            end
+        end
+    end
+    return result
+end
+
 vm.unarySwich = util.switch()
     : case 'not'
     : call(function (source)
@@ -43,17 +84,22 @@ vm.unarySwich = util.switch()
     end)
     : case '#'
     : call(function (source)
-        vm.setNode(source, vm.declareGlobal('type', 'integer'))
+        local node = vm.runOperator('len', source[1])
+        vm.setNode(source, node or vm.declareGlobal('type', 'integer'))
     end)
     : case '-'
     : call(function (source)
         local v = vm.getNumber(source[1])
         if v == nil then
+            local uri = guide.getUri(source)
             local infer = vm.getInfer(source[1])
-            if infer:hasType(guide.getUri(source), 'integer') then
+            if infer:hasType(uri, 'integer') then
                 vm.setNode(source, vm.declareGlobal('type', 'integer'))
-            else
+            elseif infer:hasType(uri, 'number') then
                 vm.setNode(source, vm.declareGlobal('type', 'number'))
+            else
+                local node = vm.runOperator('unm', source[1])
+                vm.setNode(source, node or vm.declareGlobal('type', 'number'))
             end
         else
             vm.setNode(source, {
@@ -69,7 +115,8 @@ vm.unarySwich = util.switch()
     : call(function (source)
         local v = vm.getInteger(source[1])
         if v == nil then
-            vm.setNode(source, vm.declareGlobal('type', 'integer'))
+            local node = vm.runOperator('bnot', source[1])
+            vm.setNode(source, node or vm.declareGlobal('type', 'integer'))
         else
             vm.setNode(source, {
                 type   = 'integer',

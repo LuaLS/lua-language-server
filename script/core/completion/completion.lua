@@ -1743,7 +1743,7 @@ local function tryluaDocBySource(state, position, source, results)
                 results[#results+1] = {
                     label       = name,
                     kind        = define.CompletionItemKind.Operator,
-                    description = ('```lua\n%s\n```'):format(vm.UNARY_MAP[name]),
+                    description = ('```lua\n%s\n```'):format(vm.OP_UNARY_MAP[name]),
                 }
             end
         end
@@ -1752,10 +1752,20 @@ local function tryluaDocBySource(state, position, source, results)
                 results[#results+1] = {
                     label       = name,
                     kind        = define.CompletionItemKind.Operator,
-                    description = ('```lua\n%s\n```'):format(vm.BINARY_MAP[name]),
+                    description = ('```lua\n%s\n```'):format(vm.OP_BINARY_MAP[name]),
                 }
             end
         end
+        for _, name in ipairs(vm.OTHER_OP) do
+            if matchKey(source[1], name) then
+                results[#results+1] = {
+                    label       = name,
+                    kind        = define.CompletionItemKind.Operator,
+                    description = ('```lua\n%s\n```'):format(vm.OP_OTHER_MAP[name]),
+                }
+            end
+        end
+        return true
     end
     return false
 end
@@ -1871,14 +1881,21 @@ local function tryluaDocByErr(state, position, err, docState, results)
             results[#results+1] = {
                 label       = name,
                 kind        = define.CompletionItemKind.Operator,
-                description = ('```lua\n%s\n```'):format(vm.UNARY_MAP[name]),
+                description = ('```lua\n%s\n```'):format(vm.OP_UNARY_MAP[name]),
             }
         end
         for _, name in ipairs(vm.BINARY_OP) do
             results[#results+1] = {
                 label       = name,
                 kind        = define.CompletionItemKind.Operator,
-                description = ('```lua\n%s\n```'):format(vm.BINARY_MAP[name]),
+                description = ('```lua\n%s\n```'):format(vm.OP_BINARY_MAP[name]),
+            }
+        end
+        for _, name in ipairs(vm.OTHER_OP) do
+            results[#results+1] = {
+                label       = name,
+                kind        = define.CompletionItemKind.Operator,
+                description = ('```lua\n%s\n```'):format(vm.OP_OTHER_MAP[name]),
             }
         end
     end

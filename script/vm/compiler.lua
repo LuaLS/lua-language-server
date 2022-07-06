@@ -1472,6 +1472,9 @@ local compilerSwitch = util.switch()
             if not node then
                 return
             end
+            if node:isEmpty() then
+                node = vm.runOperator('call', vararg.node) or node
+            end
             vm.setNode(source, node)
         end
         if vararg.type == 'varargs' then
@@ -1489,6 +1492,9 @@ local compilerSwitch = util.switch()
         local node = getReturn(source.node, 1, source.args)
         if not node then
             return
+        end
+        if node:isEmpty() then
+            node = vm.runOperator('call', source.node) or node
         end
         vm.setNode(source, node)
     end)

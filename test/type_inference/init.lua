@@ -3555,3 +3555,24 @@ TEST 'boolean' [[
 local a
 local <?b?> = a + true
 ]]
+
+TEST 'A' [[
+---@class A
+---@operator call: A
+
+---@type A
+local a
+local <?b?> = a()
+]]
+
+TEST 'A' [[
+---@class A
+---@operator call: A
+
+---@type A
+local a
+
+local t = {
+    <?x?> = a(),
+}
+]]

@@ -54,8 +54,9 @@ end
 
 ---@class config.template
 ---@field [string] config.template
----@operator shl: config.template
----@operator shr: config.template
+---@operator shl:  config.template
+---@operator shr:  config.template
+---@operator call: config.template
 local Type = setmetatable({}, { __index = function (_, name)
     local unit = {}
     for k, v in pairs(units[name]) do

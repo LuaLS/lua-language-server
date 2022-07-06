@@ -21,8 +21,9 @@ return function (uri, callback)
             local op = doc.op
             if op then
                 local opName = op[1]
-                if  not vm.BINARY_MAP[opName]
-                and not vm.UNARY_MAP[opName] then
+                if  not vm.OP_BINARY_MAP[opName]
+                and not vm.OP_UNARY_MAP[opName]
+                and not vm.OP_OTHER_MAP[opName] then
                     callback {
                         start   = doc.op.start,
                         finish  = doc.op.finish,

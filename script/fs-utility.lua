@@ -13,9 +13,6 @@ local tableSort    = table.sort
 
 _ENV = nil
 
----@class fspath
----@field string fun(self):string
-
 ---@class fs-utility
 local m = {}
 --- 读取文件
@@ -465,7 +462,7 @@ local function fileCopy(source, target, option)
         if isDir2 or fsCreateDirectories(target, option) then
             for filePath in fsPairs(source) do
                 local name = filePath:filename():string()
-                fileCopy(filePath, target / name--[[@as fspath]], option)
+                fileCopy(filePath, target / name, option)
             end
         end
     else
@@ -487,6 +484,9 @@ local function fileCopy(source, target, option)
     end
 end
 
+---@param source fspath?
+---@param target fspath?
+---@param option table
 local function fileSync(source, target, option)
     if not source or not target then
         return
@@ -516,7 +516,7 @@ local function fileSync(source, target, option)
             if fsCreateDirectories(target) then
                 for filePath in fsPairs(source) do
                     local name = filePath:filename():string()
-                    fileCopy(filePath, target / name--[[@as fspath]], option)
+                    fileCopy(filePath, target / name, option)
                 end
             end
         end

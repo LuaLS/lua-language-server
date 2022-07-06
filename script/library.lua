@@ -214,7 +214,7 @@ local function initBuiltIn(uri)
         version  = version,
         language = langID,
         encoding = encoding,
-    })--[[@as fspath]]
+    })
 
     local metaLang = loadMetaLocale('en-US')
     if langID ~= 'en-US' then
@@ -245,7 +245,7 @@ local function initBuiltIn(uri)
         end
         libName = libName .. '.lua'
         ---@type fspath
-        local libPath = templateDir / libName--[[@as fspath]]
+        local libPath = templateDir / libName
         local metaDoc = compileSingleMetaDoc(uri, fsu.loadFile(libPath), metaLang, status)
         if metaDoc then
             metaDoc = encoder.encode(encoding, metaDoc, 'auto')
@@ -262,8 +262,9 @@ local function initBuiltIn(uri)
     end
 end
 
+---@param libraryDir fspath
 local function loadSingle3rdConfig(libraryDir)
-    local configText = fsu.loadFile(libraryDir / 'config.lua'--[[@as fspath]])
+    local configText = fsu.loadFile(libraryDir / 'config.lua')
     if not configText then
         return nil
     end

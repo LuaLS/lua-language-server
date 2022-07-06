@@ -1,5 +1,19 @@
 # changelog
 
+## 3.5.0
+* `NEW` `LuaDoc`: `---@operator`:
+  ```lua
+  ---@class fspath
+  ---@operator div(string|fspath): fspath
+
+  ---@type fspath
+  local root
+
+  local fileName = root / 'script' / 'main.lua' -- `fileName` is `fspath` here
+  ```
+* `NEW` diagnostics:
+  * `unknown-operator`
+
 ## 3.4.2
 `2022-7-6`
 * `CHG` diagnostic: `type-check` ignores `nil` in `getfield`

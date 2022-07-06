@@ -5,6 +5,11 @@ local diag   = require 'proto.diagnostic'
 ---@class config.unit
 ---@field caller function
 ---@field _checker fun(self: config.unit, value: any): boolean
+---@field name     string
+---@field [string] config.unit
+---@operator shl:  config.unit
+---@operator shr:  config.unit
+---@operator call: config.unit
 local mt = {}
 mt.__index = mt
 
@@ -52,11 +57,7 @@ local function register(name, default, checker, loader, caller)
     }
 end
 
----@class config.template
----@field [string] config.template
----@operator shl:  config.template
----@operator shr:  config.template
----@operator call: config.template
+---@type config.unit
 local Type = setmetatable({}, { __index = function (_, name)
     local unit = {}
     for k, v in pairs(units[name]) do

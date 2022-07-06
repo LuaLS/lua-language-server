@@ -295,8 +295,7 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                                 hasFounded[fieldKey] = true
                             end
                         end
-                    end
-                    if not hasFounded[fieldKey] then
+                    elseif key and not hasFounded[key] then
                         local keyType = type(key)
                         if keyType == 'table' then
                             -- ---@field [integer] boolean -> class[integer]

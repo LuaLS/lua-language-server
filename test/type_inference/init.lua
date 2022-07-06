@@ -3576,3 +3576,21 @@ local t = {
     <?x?> = a(),
 }
 ]]
+
+TEST 'boolean' [[
+---@class A
+---@field n number
+---@field [string] boolean
+local t
+
+local <?x?> = t.xx
+]]
+
+TEST 'number' [[
+---@class A
+---@field n number
+---@field [string] boolean
+local t
+
+local <?x?> = t.n
+]]

@@ -3535,3 +3535,23 @@ TEST 'A' [[
 local a
 local <?b?> = a .. 1
 ]]
+
+TEST 'A' [[
+---@class A
+---@operator add(boolean): boolean
+---@operator add(integer): A
+
+---@type A
+local a
+local <?b?> = a + 1
+]]
+
+TEST 'boolean' [[
+---@class A
+---@operator add(boolean): boolean
+---@operator add(integer): A
+
+---@type A
+local a
+local <?b?> = a + true
+]]

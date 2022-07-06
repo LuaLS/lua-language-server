@@ -52,6 +52,14 @@ local function checkOperators(operators, op, value, result)
         or not operator.extends then
             goto CONTINUE
         end
+        if value and operator.exp then
+            local valueNode = vm.compileNode(value)
+            local expNode   = vm.compileNode(operator.exp)
+            local uri       = guide.getUri(operator)
+            if not vm.isSubType(uri, valueNode, expNode) then
+                goto CONTINUE
+            end
+        end
         if not result then
             result = vm.createNode()
         end

@@ -3418,3 +3418,120 @@ TEST 'A' [[
 local a
 local <?b?> = #a
 ]]
+
+TEST 'A' [[
+---@class A
+---@operator add: A
+
+---@type A
+local a
+local <?b?> = a + 1
+]]
+
+TEST 'A' [[
+---@class A
+---@operator sub: A
+
+---@type A
+local a
+local <?b?> = a - 1
+]]
+
+TEST 'A' [[
+---@class A
+---@operator mul: A
+
+---@type A
+local a
+local <?b?> = a * 1
+]]
+
+TEST 'A' [[
+---@class A
+---@operator div: A
+
+---@type A
+local a
+local <?b?> = a / 1
+]]
+
+TEST 'A' [[
+---@class A
+---@operator mod: A
+
+---@type A
+local a
+local <?b?> = a % 1
+]]
+
+TEST 'A' [[
+---@class A
+---@operator pow: A
+
+---@type A
+local a
+local <?b?> = a ^ 1
+]]
+
+TEST 'A' [[
+---@class A
+---@operator idiv: A
+
+---@type A
+local a
+local <?b?> = a // 1
+]]
+
+TEST 'A' [[
+---@class A
+---@operator band: A
+
+---@type A
+local a
+local <?b?> = a & 1
+]]
+
+TEST 'A' [[
+---@class A
+---@operator bor: A
+
+---@type A
+local a
+local <?b?> = a | 1
+]]
+
+TEST 'A' [[
+---@class A
+---@operator bxor: A
+
+---@type A
+local a
+local <?b?> = a ~ 1
+]]
+
+TEST 'A' [[
+---@class A
+---@operator shl: A
+
+---@type A
+local a
+local <?b?> = a << 1
+]]
+
+TEST 'A' [[
+---@class A
+---@operator shr: A
+
+---@type A
+local a
+local <?b?> = a >> 1
+]]
+
+TEST 'A' [[
+---@class A
+---@operator concat: A
+
+---@type A
+local a
+local <?b?> = a .. 1
+]]

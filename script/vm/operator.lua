@@ -25,6 +25,22 @@ vm.BINARY_OP = {
     'concat',
 }
 
+local binaryMap = {
+    ['+']  = 'add',
+    ['-']  = 'sub',
+    ['*']  = 'mul',
+    ['/']  = 'div',
+    ['%']  = 'mod',
+    ['^']  = 'pow',
+    ['//'] = 'idiv',
+    ['&']  = 'band',
+    ['|']  = 'bor',
+    ['~']  = 'bxor',
+    ['<<'] = 'shl',
+    ['>>'] = 'shr',
+    ['..'] = 'concat',
+}
+
 ---@param operators parser.object[]
 ---@param op string
 ---@param value? parser.object
@@ -184,8 +200,8 @@ vm.binarySwitch = util.switch()
     : call(function (source)
         local a = vm.getInteger(source[1])
         local b = vm.getInteger(source[2])
+        local op = source.op.type
         if a and b then
-            local op = source.op.type
             local result = op.type == '<<' and a << b
                         or op.type == '>>' and a >> b
                         or op.type == '&'  and a &  b
@@ -199,7 +215,8 @@ vm.binarySwitch = util.switch()
                 [1]    = result,
             })
         else
-            vm.setNode(source, vm.declareGlobal('type', 'integer'))
+            local node = vm.runOperator(binaryMap[op], source[1], source[2])
+            vm.setNode(source, node or vm.declareGlobal('type', 'integer'))
         end
     end)
     : case '+'
@@ -234,6 +251,11 @@ vm.binarySwitch = util.switch()
                 [1]    = result,
             })
         else
+            local node = vm.runOperator(binaryMap[op], source[1], source[2])
+            if node then
+                vm.setNode(source, node)
+                return
+            end
             if op == '+'
             or op == '-'
             or op == '*'
@@ -251,7 +273,7 @@ vm.binarySwitch = util.switch()
                     end
                 end
             end
-            vm.setNode(source, vm.declareGlobal('type', 'number'))
+            vm.setNode(source, node or vm.declareGlobal('type', 'number'))
         end
     end)
     : case '..'
@@ -287,7 +309,8 @@ vm.binarySwitch = util.switch()
                 [1]    = a .. b,
             })
         else
-            vm.setNode(source, vm.declareGlobal('type', 'string'))
+            local node = vm.runOperator(binaryMap[source.op.type], source[1], source[2])
+            vm.setNode(source, node or vm.declareGlobal('type', 'string'))
         end
     end)
     : case '>'

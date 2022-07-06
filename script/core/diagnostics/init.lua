@@ -8,14 +8,17 @@ local diagd  = require 'proto.diagnostic'
 
 -- 把耗时最长的诊断放到最后面
 local diagSort = {
-    ['redundant-value']      = 100,
-    ['not-yieldable']        = 100,
-    ['deprecated']           = 100,
-    ['undefined-field']      = 110,
-    ['redundant-parameter']  = 110,
-    ['cast-local-type']      = 120,
-    ['assign-type-mismatch'] = 120,
-    ['param-type-mismatch']  = 120,
+    ['redundant-value']        = 100,
+    ['not-yieldable']          = 100,
+    ['deprecated']             = 100,
+    ['undefined-field']        = 110,
+    ['redundant-parameter']    = 110,
+    ['cast-local-type']        = 120,
+    ['assign-type-mismatch']   = 120,
+    ['param-type-mismatch']    = 120,
+    ['missing-return']         = 120,
+    ['missing-return-value']   = 120,
+    ['redundant-return-value'] = 120,
 }
 
 local diagList = {}

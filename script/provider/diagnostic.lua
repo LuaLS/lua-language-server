@@ -308,7 +308,7 @@ function m.doDiagnostic(uri, isScopeDiag)
     xpcall(core, log.error, uri, isScopeDiag, function (result)
         diags[#diags+1] = buildDiagnostic(uri, result)
 
-        if not isScopeDiag and time.time() - lastPushClock >= 1000 then
+        if not isScopeDiag and time.time() - lastPushClock >= 500 then
             lastPushClock = time.time()
             pushResult()
         end

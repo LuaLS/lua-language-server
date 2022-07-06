@@ -336,7 +336,6 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                 -- check local field and global field
                 if not hasFounded[key] and set.bindSources then
                     for _, src in ipairs(set.bindSources) do
-                        local skipSetLocal
                         if src.value and src.value.type == 'table' then
                             searchFieldSwitch('table', suri, src.value, key, ref, function (field)
                                 local fieldKey = guide.getKeyName(field)
@@ -345,25 +344,20 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                                     and guide.isSet(field) then
                                         hasFounded[fieldKey] = true
                                         pushResult(field, true)
-                                        if src.type == 'local' then
-                                            skipSetLocal = true
-                                        end
                                     end
                                 end
                             end)
                         end
-                        if not skipSetLocal then
-                            searchFieldSwitch(src.type, suri, src, key, ref, function (field)
-                                local fieldKey = guide.getKeyName(field)
-                                if fieldKey then
-                                    if  not searchedFields[fieldKey]
-                                    and guide.isSet(field) then
-                                        hasFounded[fieldKey] = true
-                                        pushResult(field, true)
-                                    end
+                        searchFieldSwitch(src.type, suri, src, key, ref, function (field)
+                            local fieldKey = guide.getKeyName(field)
+                            if fieldKey and not hasFounded[fieldKey] then
+                                if  not searchedFields[fieldKey]
+                                and guide.isSet(field) then
+                                    hasFounded[fieldKey] = true
+                                    pushResult(field, true)
                                 end
-                            end)
-                        end
+                            end
+                        end)
                     end
                 end
                 -- look into extends(if field not found)

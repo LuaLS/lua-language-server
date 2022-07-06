@@ -5,6 +5,7 @@
 * `CHG` completion: `completion.callSnippet` no longer generate parameter types
 * `CHG` hover: show `---@type {x: number, y: number}` as detail instead of `table`
 * `FIX` [#1278](https://github.com/sumneko/lua-language-server/issues/1278)
+* `FIX` [#1288](https://github.com/sumneko/lua-language-server/issues/1288)
 
 ## 3.4.1
 `2022-7-5`

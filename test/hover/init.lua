@@ -2074,3 +2074,20 @@ local <?f?>
 [[
 local f: fun():(x: number, y: boolean)
 ]]
+
+TEST [[
+---@class MyClass
+local MyClass = {
+    a = 1
+}
+
+function MyClass:Test()
+    <?self?>
+end
+]]
+[[
+(self) self: MyClass {
+    Test: function,
+    a: integer = 1,
+}
+]]

@@ -1353,6 +1353,45 @@ local docSwitch = util.switch()
 
         return result
     end)
+    : case 'operator'
+    : call(function ()
+        local result = {
+            type   = 'doc.operator',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+
+        local op = parseName('doc.operator.name', result)
+        if not op then
+            pushWarning {
+                type   = 'LUADOC_MISS_OPERATOR_NAME',
+                start  = getFinish(),
+                finish = getFinish(),
+            }
+            return nil
+        end
+        result.op = op
+        result.finish = op.finish
+
+        if checkToken('symbol', '(', 1) then
+            local exp = parseType(result)
+            if exp then
+                result.exp = exp
+                result.finish = exp.finish
+            end
+            nextSymbolOrError ')'
+        end
+
+        nextSymbolOrError ':'
+
+        local ret = parseType(result)
+        if ret then
+            result.ret = ret
+            result.finish = ret.finish
+        end
+
+        return result
+    end)
 
 local function convertTokens()
     local tp, text = nextToken()

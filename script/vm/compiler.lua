@@ -1387,7 +1387,7 @@ local compilerSwitch = util.switch()
                 if src.value then
                     if bindDocs(src) then
                         vm.setNode(source, vm.compileNode(src))
-                    else
+                    elseif src.value.type ~= 'nil' then
                         vm.setNode(source, vm.compileNode(src.value))
                         local node = vm.getNode(src)
                         if node then
@@ -1949,7 +1949,7 @@ local function compileByGlobal(source)
             vm.setNode(set, globalNode, true)
         end
         for _, set in ipairs(global:getSets(uri)) do
-            if set.value then
+            if set.value and set.value.type ~= 'nil' then
                 if not hasMarkDoc or guide.isLiteral(set.value) then
                     globalNode:merge(vm.compileNode(set.value))
                 end

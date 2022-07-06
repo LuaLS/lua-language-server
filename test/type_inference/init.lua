@@ -3381,3 +3381,13 @@ TEST '{ [string]: number, [true]: string, [1]: boolean, tag: integer }' [[
 ---@type {[string]: number, [true]: string, [1]: boolean, tag: integer}
 local <?t?>
 ]]
+
+TEST 'unknown' [[
+local mt = {}
+mt.<?x?> = nil
+]]
+
+TEST 'unknown' [[
+mt = {}
+mt.<?x?> = nil
+]]

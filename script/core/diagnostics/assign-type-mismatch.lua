@@ -64,14 +64,18 @@ return function (uri, callback)
                 return
             end
         end
-        --[[
-        ---@class A
-        local mt
-        ---@type X
-        mt._x = nil -- don't warn this
-        ]]
         if value.type == 'nil' then
+            --[[
+            ---@class A
+            local mt
+            ---@type X
+            mt._x = nil -- don't warn this
+            ]]
             if hasMarkType(source) then
+                return
+            end
+            if source.type == 'setfield'
+            or source.type == 'setindex' then
                 return
             end
         end

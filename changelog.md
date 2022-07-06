@@ -5,6 +5,7 @@
 * `CHG` diagnostic: `---@diagnostic disable: <ERR_NAME>` can suppress syntax errors
 * `CHG` completion: `completion.callSnippet` no longer generate parameter types
 * `CHG` hover: show `---@type {x: number, y: number}` as detail instead of `table`
+* `CHG` dose not infer as `nil` by `t.field = nil`
 * `FIX` [#1278](https://github.com/sumneko/lua-language-server/issues/1278)
 * `FIX` [#1288](https://github.com/sumneko/lua-language-server/issues/1288)
 

@@ -570,9 +570,9 @@ end
 ]]
 
 TEST [[
+---@class A
+---@field x number?
 local t = {}
-t.x = 1
-t.x = nil
 
 ---@return number
 function F()
@@ -686,6 +686,12 @@ local a
 local t
 
 t = a.x
+]]
+
+TEST [[
+local mt = {}
+mt.x = 1
+mt.x = nil
 ]]
 
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')

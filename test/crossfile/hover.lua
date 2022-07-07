@@ -1220,3 +1220,20 @@ ret1:
     | 'r4'
 ```]]
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@type integer @ comments
+            local <?n?>
+        ]]
+    },
+    hover = [[
+```lua
+local n: integer
+```
+
+---
+ comments]]
+}

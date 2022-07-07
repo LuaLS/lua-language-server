@@ -103,6 +103,14 @@ local function getBindComment(source, docGroup, base)
             else
                 lines[#lines+1] = doc.comment.text
             end
+        elseif doc.type == 'doc.type' then
+            if doc.comment then
+                if not continue then
+                    continue = true
+                    lines = {}
+                end
+                lines[#lines+1] = doc.comment.text
+            end
         elseif doc == base then
             break
         else

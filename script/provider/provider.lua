@@ -149,7 +149,6 @@ m.register 'initialized'{
             })
         end
         client.setReady()
-        library.init()
         workspace.init()
         return true
     end
@@ -230,6 +229,29 @@ m.register 'workspace/didRenameFiles' {
                     end
                 end
             end
+        end
+    end
+}
+
+m.register 'workspace/didChangeWorkspaceFolders' {
+    capability = {
+        workspace = {
+            workspaceFolders = {
+                supported = true,
+                changeNotifications = true,
+            },
+        },
+    },
+    ---@async
+    function (params)
+        log.debug('workspace/didChangeWorkspaceFolders', inspect(params))
+        for _, folder in ipairs(params.event.added) do
+            workspace.create(folder.uri)
+            updateConfig()
+            workspace.reload(scope.getScope(folder.uri))
+        end
+        for _, folder in ipairs(params.event.removed) do
+            workspace.remove(folder.uri)
         end
     end
 }

@@ -4,6 +4,7 @@ local client = require 'client'
 local lang   = require 'language'
 local await  = require 'await'
 local scope  = require 'workspace.scope'
+local ws     = require 'workspace'
 
 ---@class plugin
 local m = {}
@@ -69,10 +70,10 @@ local function checkTrustLoad(scp)
     return true
 end
 
----@param scp scope
-function m.init(scp)
+---@param uri uri
+local function initPlugin(uri)
     await.call(function () ---@async
-        local ws    = require 'workspace'
+        local scp = scope.getScope(uri)
         local interface = {}
         scp:set('pluginInterface', interface)
 
@@ -107,5 +108,11 @@ function m.init(scp)
         ws.resetFiles(scp)
     end)
 end
+
+ws.watch(function (ev, uri)
+    if ev == 'startReload' then
+        initPlugin(uri)
+    end
+end)
 
 return m

@@ -11,6 +11,7 @@ local m = {}
 ---@field _links table<uri, boolean>
 ---@field _data  table<string, any>
 ---@field _gc    gc
+---@field _removed? true
 local mt = {}
 mt.__index = mt
 
@@ -117,7 +118,28 @@ end
 
 function mt:flushGC()
     self._gc:remove()
+    if self._removed then
+        return
+    end
     self._gc = gc()
+end
+
+function mt:remove()
+    if self._removed then
+        return
+    end
+    self._removed = true
+    for i, scp in ipairs(m.folders) do
+        if scp == self then
+            table.remove(m.folders, i)
+            break
+        end
+    end
+    self:flushGC()
+end
+
+function mt:isRemoved()
+    return self._removed == true
 end
 
 ---@param scopeType scope.type

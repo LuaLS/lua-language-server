@@ -7,7 +7,6 @@ local glob       = require 'glob'
 local platform   = require 'bee.platform'
 local await      = require 'await'
 local client     = require 'client'
-local plugin     = require 'plugin'
 local util       = require 'utility'
 local fw         = require 'filewatch'
 local scope      = require 'workspace.scope'
@@ -52,10 +51,24 @@ function m.create(uri)
         client.showMessage('Error', lang.script('WORKSPACE_NOT_ALLOWED', furi.decode(uri)))
         return
     end
-    local path = m.normalize(furi.decode(uri))
-    fw.watch(path)
     local scp = scope.createFolder(uri)
     m.folders[#m.folders+1] = scp
+end
+
+function m.remove(uri)
+    log.info('Workspace remove: ', uri)
+    for i, scp in ipairs(m.folders) do
+        if scp.uri == uri then
+            scp:remove()
+            table.remove(m.folders, i)
+            scp:set('ready', false)
+            scp:set('nativeMatcher', nil)
+            scp:set('libraryMatcher', nil)
+            scp:removeAllLinks()
+            m.flushFiles(scp)
+            return
+        end
+    end
 end
 
 function m.reset()
@@ -279,6 +292,10 @@ function m.awaitPreload(scp)
 
     scp:flushGC()
 
+    if scp:isRemoved() then
+        return
+    end
+
     local ld <close> = loading.create(scp)
     scp:set('loading', ld)
 
@@ -301,6 +318,7 @@ function m.awaitPreload(scp)
                 client.showMessage('Warning', lang.script('WORKSPACE_SCAN_TOO_MUCH', count, furi.decode(scp.uri)))
             end
         end)
+        scp:gc(fw.watch(m.normalize(furi.decode(scp.uri))))
     end
 
     for _, libMatcher in ipairs(librarys) do
@@ -465,7 +483,7 @@ function m.awaitReload(scp)
     scp:set('libraryMatcher', nil)
     scp:removeAllLinks()
     m.flushFiles(scp)
-    plugin.init(scp)
+    m.onWatch('startReload', scp.uri)
     m.awaitPreload(scp)
     scp:set('ready', true)
     local waiting = scp:get('waitingReady')

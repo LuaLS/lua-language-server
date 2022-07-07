@@ -542,11 +542,10 @@ files.watch(function (ev, uri)
     end
 end)
 
-function m.init()
-    initBuiltIn(nil)
-    for _, scp in ipairs(ws.folders) do
-        initBuiltIn(scp.uri)
+ws.watch(function (ev, uri)
+    if ev == 'startReload' then
+        initBuiltIn(uri)
     end
-end
+end)
 
 return m

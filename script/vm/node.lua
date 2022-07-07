@@ -188,8 +188,8 @@ function mt:setFalsy()
         if c.type == 'nil'
         or (c.type == 'global' and c.cate == 'type' and c.name == 'nil')
         or (c.type == 'global' and c.cate == 'type' and c.name == 'false')
-        or (c.type == 'boolean' and c[1] == true)
-        or (c.type == 'doc.type.boolean' and c[1] == true) then
+        or (c.type == 'boolean' and c[1] == false)
+        or (c.type == 'doc.type.boolean' and c[1] == false) then
             goto CONTINUE
         end
         if (c.type == 'global' and c.cate == 'type' and c.name == 'boolean')

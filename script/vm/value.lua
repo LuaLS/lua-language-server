@@ -26,7 +26,7 @@ function vm.testCondition(source)
             if n.name == 'false'
             or n.name == 'nil' then
                 hasFalse = true
-            else
+            elseif n.name ~= 'boolean' then
                 hasTrue = true
             end
         elseif n.type == 'nil' then

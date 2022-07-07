@@ -3601,3 +3601,22 @@ TEST 'string' [[
 
 local <?b?> = '' % 1
 ]]
+
+TEST 'string|integer' [[
+---@type boolean
+local bool
+
+local <?x?> = bool and '' or 0
+]]
+
+TEST 'string|integer' [[
+local bool
+
+if X then
+    bool = true
+else
+    bool = false
+end
+
+local <?x?> = bool and '' or 0
+]]

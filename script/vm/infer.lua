@@ -477,7 +477,14 @@ function mt:viewLiterals()
     if #literals == 0 then
         return nil
     end
-    table.sort(literals)
+    table.sort(literals, function (a, b)
+        local sa = inferSorted[a] or 0
+        local sb = inferSorted[b] or 0
+        if sa == sb then
+            return a < b
+        end
+        return sa < sb
+    end)
     return table.concat(literals, '|')
 end
 

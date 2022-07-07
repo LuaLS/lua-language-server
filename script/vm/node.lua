@@ -162,17 +162,23 @@ function mt:setTruthy()
             self[c] = nil
             goto CONTINUE
         end
-        if (c.type == 'global' and c.cate == 'type' and c.name == 'boolean')
-        or (c.type == 'boolean' or c.type == 'doc.type.boolean') then
+        if c.type == 'global' and c.cate == 'type' and c.name == 'boolean' then
             hasBoolean = true
             table.remove(self, index)
             self[c] = nil
             goto CONTINUE
         end
+        if c.type == 'boolean' or c.type == 'doc.type.boolean' then
+            if c[1] == false then
+                table.remove(self, index)
+                self[c] = nil
+                goto CONTINUE
+            end
+        end
         ::CONTINUE::
     end
     if hasBoolean then
-        self[#self+1] = vm.declareGlobal('type', 'true')
+        self:merge(vm.declareGlobal('type', 'true'))
     end
     return self
 end
@@ -192,12 +198,18 @@ function mt:setFalsy()
         or (c.type == 'doc.type.boolean' and c[1] == false) then
             goto CONTINUE
         end
-        if (c.type == 'global' and c.cate == 'type' and c.name == 'boolean')
-        or (c.type == 'boolean' or c.type == 'doc.type.boolean') then
+        if c.type == 'global' and c.cate == 'type' and c.name == 'boolean' then
             hasBoolean = true
             table.remove(self, index)
             self[c] = nil
             goto CONTINUE
+        end
+        if c.type == 'boolean' or c.type == 'doc.type.boolean' then
+            if c[1] == true then
+                table.remove(self, index)
+                self[c] = nil
+                goto CONTINUE
+            end
         end
         if (c.type == 'global' and c.cate == 'type') then
             table.remove(self, index)
@@ -207,7 +219,7 @@ function mt:setFalsy()
         ::CONTINUE::
     end
     if hasBoolean then
-        self[#self+1] = vm.declareGlobal('type', 'false')
+        self:merge(vm.declareGlobal('type', 'false'))
     end
     return self
 end

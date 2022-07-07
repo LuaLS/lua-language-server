@@ -13,6 +13,7 @@
   ```
 * `NEW` diagnostics:
   * `unknown-operator`
+* `FIX` [#1294](https://github.com/sumneko/lua-language-server/issues/1294)
 
 ## 3.4.2
 `2022-7-6`

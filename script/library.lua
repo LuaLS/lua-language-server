@@ -423,11 +423,21 @@ local function wholeMatch(a, b)
     return true
 end
 
-local function check3rdByWords(uri, text, configs)
+local function check3rdByWords(uri, configs)
     if hasAsked then
         return
     end
+    if not files.isLua(uri) then
+        return
+    end
+    local id = 'check3rdByWords:' .. uri
+    await.close(id)
     await.call(function () ---@async
+        await.sleep(0.1)
+        local text = files.getText(uri)
+        if not text then
+            return
+        end
         for _, cfg in ipairs(configs) do
             if cfg.words then
                 for _, word in ipairs(cfg.words) do
@@ -439,7 +449,7 @@ local function check3rdByWords(uri, text, configs)
                 end
             end
         end
-    end)
+    end, id)
 end
 
 local function check3rdByFileName(uri, configs)
@@ -450,7 +460,10 @@ local function check3rdByFileName(uri, configs)
     if not path then
         return
     end
+    local id = 'check3rdByFileName:' .. uri
+    await.close(id)
     await.call(function () ---@async
+        await.sleep(0.1)
         for _, cfg in ipairs(configs) do
             if cfg.files then
                 for _, filename in ipairs(cfg.files) do
@@ -462,25 +475,12 @@ local function check3rdByFileName(uri, configs)
                 end
             end
         end
-    end)
-end
-
-local lastCheckedUri = {}
-local function checkedUri(uri)
-    if  lastCheckedUri[uri]
-    and timer.clock() - lastCheckedUri[uri] < 5 then
-        return false
-    end
-    lastCheckedUri[uri] = timer.clock()
-    return true
+    end, id)
 end
 
 local thirdConfigs
 local function check3rd(uri)
     if hasAsked then
-        return
-    end
-    if not ws.isReady(uri) then
         return
     end
     if not config.get(uri, 'Lua.workspace.checkThirdParty') then
@@ -492,20 +492,26 @@ local function check3rd(uri)
     if not thirdConfigs then
         return
     end
-    if checkedUri(uri) then
-        if files.isLua(uri) then
-            local text = files.getText(uri)
-            if text then
-                check3rdByWords(uri, text, thirdConfigs)
-            end
-        end
-        check3rdByFileName(uri, thirdConfigs)
+    check3rdByWords(uri, thirdConfigs)
+    check3rdByFileName(uri, thirdConfigs)
+end
+
+local function check3rdOfWorkspace(suri)
+    for uri in files.eachFile(suri) do
+        check3rd(uri)
+    end
+    for uri in files.eachDll() do
+        check3rd(uri)
     end
 end
 
 config.watch(function (uri, key, value, oldValue)
     if key:find '^Lua.runtime' then
         initBuiltIn(uri)
+    end
+    if key == 'Lua.workspace.checkThirdParty'
+    or key == 'Lua.workspace.userThirdParty' then
+        check3rdOfWorkspace(uri)
     end
 end)
 

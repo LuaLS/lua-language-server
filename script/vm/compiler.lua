@@ -714,7 +714,7 @@ function vm.selectNode(list, index)
     else
         ---@type vm.node
         result = vm.compileNode(exp)
-        if exp.type == 'varargs' and result:isEmpty() then
+        if result:isEmpty() then
             result:merge(vm.declareGlobal('type', 'unknown'))
         end
     end

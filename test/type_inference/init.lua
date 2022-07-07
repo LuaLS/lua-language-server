@@ -3629,3 +3629,14 @@ local <?b?>
 TEST 'integer|false' [[
 local <?b?> = X == 1 and X == 1 and 1
 ]]
+
+TEST 'unknown|nil' [[
+local function f()
+    if X then
+        return ({})[1]
+    end
+    return nil
+end
+
+local <?n?> = f()
+]]

@@ -403,6 +403,15 @@ local function askFor3rd(uri, cfg)
                 uri    = uri,
             },
         }, true)
+    else
+        client.setConfig({
+            {
+                key    = 'Lua.workspace.checkThirdParty',
+                action = 'set',
+                value  = false,
+                uri    = uri,
+            },
+        }, false)
     end
 end
 
@@ -479,8 +488,12 @@ local function check3rdByFileName(uri, configs)
 end
 
 local thirdConfigs
+---@async
 local function check3rd(uri)
     if hasAsked then
+        return
+    end
+    if ws.isIgnored(uri) then
         return
     end
     if not config.get(uri, 'Lua.workspace.checkThirdParty') then
@@ -497,12 +510,18 @@ local function check3rd(uri)
 end
 
 local function check3rdOfWorkspace(suri)
-    for uri in files.eachFile(suri) do
-        check3rd(uri)
-    end
-    for uri in files.eachDll() do
-        check3rd(uri)
-    end
+    local id = 'check3rdOfWorkspace:' .. suri
+    await.close(id)
+    ---@async
+    await.call(function ()
+        ws.awaitReady(suri)
+        for uri in files.eachFile(suri) do
+            check3rd(uri)
+        end
+        for uri in files.eachDll() do
+            check3rd(uri)
+        end
+    end, id)
 end
 
 config.watch(function (uri, key, value, oldValue)
@@ -515,6 +534,7 @@ config.watch(function (uri, key, value, oldValue)
     end
 end)
 
+---@async
 files.watch(function (ev, uri)
     if ev == 'update'
     or ev == 'dll' then

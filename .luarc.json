@@ -38,6 +38,7 @@
             "/3rd",
             "/.vscode",
             "/meta"
-        ]
+        ],
+        "checkThirdParty": false
     }
 }

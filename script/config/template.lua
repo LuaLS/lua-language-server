@@ -300,6 +300,7 @@ local template = {
                                                 'Opened',
                                                 'Disable',
                                             },
+    ['Lua.diagnostics.unusedLocalExclude']   = Type.Array(Type.String),
     ['Lua.workspace.ignoreDir']             = Type.Array(Type.String) >> {
                                                 '.vscode',
                                             },

@@ -891,6 +891,22 @@ object<string, string>
 }
 ```
 
+# diagnostics.unusedLocalExclude
+
+Do not diagnose `unused-local` when the variable name matches the following pattern.
+
+## type
+
+```ts
+Array<string>
+```
+
+## default
+
+```jsonc
+[]
+```
+
 # diagnostics.workspaceDelay
 
 Latency (milliseconds) for workspace diagnostics. When you start the workspace, or edit any file, the entire workspace will be re-diagnosed in the background. Set to negative to disable workspace diagnostics.

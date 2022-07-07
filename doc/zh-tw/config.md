@@ -890,6 +890,22 @@ object<string, string>
 }
 ```
 
+# diagnostics.unusedLocalExclude
+
+Do not diagnose `unused-local` when the variable name matches the following pattern.
+
+## type
+
+```ts
+Array<string>
+```
+
+## default
+
+```jsonc
+[]
+```
+
 # diagnostics.workspaceDelay
 
 進行工作區診斷的延遲（毫秒）。當你啟動工作區，或編輯了任何檔案後，將會在背景對整個工作區進行重新診斷。設定為負數可以停用工作區診斷。

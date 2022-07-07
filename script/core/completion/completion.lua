@@ -2075,8 +2075,6 @@ local function completion(uri, position, triggerCharacter)
         return nil
     end
     clearStack()
-    vm.lockCache()
-    local _ <close> = vm.unlockCache
     local results = {}
     tracy.ZoneBeginN 'completion #2'
     tryCompletions(state, position, triggerCharacter, results)

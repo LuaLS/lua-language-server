@@ -96,6 +96,8 @@ config.diagnostics.ignoredFiles.Disable  =
 "不诊断这些文件。"
 config.diagnostics.disableScheme  =
 '不诊断使用以下 scheme 的lua文件。'
+config.diagnostics.unusedLocalExclude =
+'如果变量名匹配以下规则，则不对其进行 `unused-local` 诊断。'
 config.workspace.ignoreDir        =
 "忽略的文件与目录（使用 `.gitignore` 语法）。"
 config.workspace.ignoreSubmodules =

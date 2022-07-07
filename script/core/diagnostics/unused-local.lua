@@ -3,6 +3,8 @@ local guide  = require 'parser.guide'
 local define = require 'proto.define'
 local lang   = require 'language'
 local vm     = require 'vm.vm'
+local config = require 'config.config'
+local glob   = require 'glob'
 
 local function hasGet(loc)
     if not loc.ref then
@@ -88,10 +90,15 @@ return function (uri, callback)
     if not ast then
         return
     end
+    local ignorePatterns = config.get(uri, 'Lua.diagnostics.unusedLocalExclude')
+    local ignore = glob.glob(ignorePatterns)
     guide.eachSourceType(ast.ast, 'local', function (source)
         local name = source[1]
         if name == '_'
         or name == ast.ENVMode then
+            return
+        end
+        if ignore(name) then
             return
         end
         if isToBeClosed(source) then

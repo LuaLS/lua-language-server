@@ -1907,3 +1907,14 @@ TEST [[
 ---@class A
 ---@operator <!xxx!>: A
 ]]
+
+config.add(nil, 'Lua.diagnostics.unusedLocalIgnore', 'll_*')
+
+TEST [[
+local <!xx!>
+local ll_1
+local ll_2
+local <!ll!>
+]]
+
+config.remove(nil, 'Lua.diagnostics.unusedLocalIgnore', 'll_*')

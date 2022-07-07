@@ -890,6 +890,22 @@ object<string, string>
 }
 ```
 
+# diagnostics.unusedLocalExclude
+
+如果变量名匹配以下规则，则不对其进行 `unused-local` 诊断。
+
+## type
+
+```ts
+Array<string>
+```
+
+## default
+
+```jsonc
+[]
+```
+
 # diagnostics.workspaceDelay
 
 进行工作区诊断的延迟（毫秒）。当你启动工作区，或编辑了任意文件后，将会在后台对整个工作区进行重新诊断。设置为负数可以禁用工作区诊断。

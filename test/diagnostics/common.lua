@@ -1908,7 +1908,7 @@ TEST [[
 ---@operator <!xxx!>: A
 ]]
 
-config.add(nil, 'Lua.diagnostics.unusedLocalIgnore', 'll_*')
+config.add(nil, 'Lua.diagnostics.unusedLocalExclude', 'll_*')
 
 TEST [[
 local <!xx!>
@@ -1917,4 +1917,4 @@ local ll_2
 local <!ll!>
 ]]
 
-config.remove(nil, 'Lua.diagnostics.unusedLocalIgnore', 'll_*')
+config.remove(nil, 'Lua.diagnostics.unusedLocalExclude', 'll_*')

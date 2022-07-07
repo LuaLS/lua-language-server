@@ -1538,6 +1538,7 @@ local function bindGeneric(binded)
             end
         end
         if doc.type == 'doc.param'
+        or doc.type == 'doc.vararg'
         or doc.type == 'doc.return'
         or doc.type == 'doc.type'
         or doc.type == 'doc.class'

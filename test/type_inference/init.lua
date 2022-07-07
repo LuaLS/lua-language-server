@@ -3640,3 +3640,14 @@ end
 
 local <?n?> = f()
 ]]
+
+TEST 'integer' [[
+---@generic T
+---@vararg T # ERROR
+---@return T
+local function test(...)
+    return ...
+end
+
+local <?n?> = test(1)
+]]

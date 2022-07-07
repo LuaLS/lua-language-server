@@ -95,6 +95,10 @@ function vm.runOperator(op, exp, value)
     local node = vm.compileNode(exp)
     local result
     for c in node:eachObject() do
+        if c.type == 'string'
+        or c.type == 'doc.type.string' then
+            c = vm.declareGlobal('type', 'string')
+        end
         if c.type == 'global' and c.cate == 'type' then
             ---@cast c vm.global
             for _, set in ipairs(c:getSets(uri)) do

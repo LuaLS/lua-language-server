@@ -3594,3 +3594,10 @@ local t
 
 local <?x?> = t.n
 ]]
+
+TEST 'string' [[
+---@class string
+---@operator mod: string
+
+local <?b?> = '' % 1
+]]

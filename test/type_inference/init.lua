@@ -3620,3 +3620,8 @@ end
 
 local <?x?> = bool and '' or 0
 ]]
+
+TEST 'boolean' [[
+---@type boolean|true|false
+local <?b?>
+]]

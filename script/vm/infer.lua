@@ -11,7 +11,6 @@ local vm       = require 'vm.vm'
 ---@field _drop table
 local mt = {}
 mt.__index = mt
-mt._hasNumber      = false
 mt._hasTable       = false
 mt._hasClass       = false
 mt._hasFunctionDef = false
@@ -45,7 +44,6 @@ local viewNodeSwitch = util.switch()
     end)
     : case 'number'
     : call(function (source, infer)
-        infer._hasNumber = true
         return source.type
     end)
     : case 'table'
@@ -80,9 +78,6 @@ local viewNodeSwitch = util.switch()
         if source.cate == 'type' then
             if not guide.isBasicType(source.name) then
                 infer._hasClass = true
-            end
-            if source.name == 'number' then
-                infer._hasNumber = true
             end
             return source.name
         end
@@ -252,9 +247,6 @@ function vm.getInfer(source)
 end
 
 function mt:_trim()
-    if self._hasNumber then
-        self.views['integer'] = nil
-    end
     if self._hasDocFunction then
         if self._hasFunctionDef then
             for view in pairs(self.views) do
@@ -268,6 +260,13 @@ function mt:_trim()
     end
     if self._hasTable and not self._hasClass then
         self.views['table'] = true
+    end
+    if self.views['number'] then
+        self.views['integer'] = nil
+    end
+    if self.views['boolean'] then
+        self.views['true'] = nil
+        self.views['false'] = nil
     end
 end
 

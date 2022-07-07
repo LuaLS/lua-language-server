@@ -681,7 +681,7 @@ TEST {{ path = 'a.lua', content = '', }, {
 },
 hover = [[
 ```lua
-function f(a: boolean|true|false)
+function f(a: boolean)
 ```
 
 ---

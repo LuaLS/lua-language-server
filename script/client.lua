@@ -256,7 +256,7 @@ local function tryModifyRC(uri, finalChanges, create)
     if not path then
         return false
     end
-    path = fs.exists(path) and path or workspace.getAbsolutePath(uri, '.luarc.json')
+    path = fs.exists(fs.path(path)) and path or workspace.getAbsolutePath(uri, '.luarc.json')
     if not path then
         return false
     end

@@ -209,7 +209,7 @@ local function initBuiltIn(uri)
     local langID   = lang.id
     local version  = config.get(uri, 'Lua.runtime.version')
     local encoding = config.get(uri, 'Lua.runtime.fileEncoding')
-    ---@type fspath
+    ---@type fs.path
     local metaPath = fs.path(METAPATH) / config.get(uri, 'Lua.runtime.meta'):gsub('%$%{(.-)%}', {
         version  = version,
         language = langID,
@@ -244,7 +244,7 @@ local function initBuiltIn(uri)
             goto CONTINUE
         end
         libName = libName .. '.lua'
-        ---@type fspath
+        ---@type fs.path
         local libPath = templateDir / libName
         local metaDoc = compileSingleMetaDoc(uri, fsu.loadFile(libPath), metaLang, status)
         if metaDoc then
@@ -262,7 +262,7 @@ local function initBuiltIn(uri)
     end
 end
 
----@param libraryDir fspath
+---@param libraryDir fs.path
 local function loadSingle3rdConfig(libraryDir)
     local configText = fsu.loadFile(libraryDir / 'config.lua')
     if not configText then

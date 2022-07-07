@@ -33,11 +33,11 @@
         "maxPreload": 1600,
         "preloadFileSize": 1000,
         "ignoreDir": [
-            "locale/",
-            "libs/",
-            "3rd",
-            ".vscode",
-            "meta"
+            "/locale/",
+            "/libs/",
+            "/3rd",
+            "/.vscode",
+            "/meta"
         ]
     }
 }

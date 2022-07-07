@@ -3625,3 +3625,7 @@ TEST 'boolean' [[
 ---@type boolean|true|false
 local <?b?>
 ]]
+
+TEST 'integer|false' [[
+local <?b?> = X == 1 and X == 1 and 1
+]]

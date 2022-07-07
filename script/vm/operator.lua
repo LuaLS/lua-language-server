@@ -98,6 +98,12 @@ function vm.runOperator(op, exp, value)
         if c.type == 'string'
         or c.type == 'doc.type.string' then
             c = vm.declareGlobal('type', 'string')
+        elseif c.type == 'number'
+        or c.type == 'doc.type.number' then
+            c = vm.declareGlobal('type', 'number')
+        elseif c.type == 'integer'
+        or c.type == 'doc.type.integer' then
+            c = vm.declareGlobal('type', 'integer')
         end
         if c.type == 'global' and c.cate == 'type' then
             ---@cast c vm.global

@@ -5,10 +5,10 @@ local await = require 'await'
 local MODIFY = 1 << 0
 local RENAME = 1 << 1
 
-local function exists(filename)
+local function isExists(filename)
     local path = fs.path(filename)
-    local suc, exsits = pcall(fs.exists, path)
-    if not suc or not exsits then
+    local suc, exists = pcall(fs.exists, path)
+    if not suc or not exists then
         return false
     end
     local suc, res = pcall(fs.canonical, path)
@@ -85,7 +85,7 @@ function m.update()
 
     for path, flag in pairs(collect) do
         if flag & RENAME ~= 0 then
-            if exists(path) then
+            if isExists(path) then
                 m._callEvent('create', path)
             else
                 m._callEvent('delete', path)

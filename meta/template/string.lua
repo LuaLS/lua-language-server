@@ -64,7 +64,7 @@ function string.gmatch(s, pattern, init) end
 ---#DES 'string.gsub'
 ---@param s       string
 ---@param pattern string
----@param repl    string|table|function
+---@param repl    string|number|table|function
 ---@param n?      integer
 ---@return string
 ---@return integer count

@@ -4245,5 +4245,145 @@ ngx.resp = {}
 ---@return string|'"truncated"' error
 function ngx.resp.get_headers(max_headers, raw) end
 
+---@alias ngx.thread.arg boolean|number|integer|string|lightuserdata|table
+
+---**syntax:** *ok, res1, res2, ... = ngx.run_worker_thread(threadpool, module_name, func_name, arg1, arg2, ...)*
+---
+---**context:** *rewrite_by_lua&#42;, access_by_lua&#42;, content_by_lua&#42;*
+---
+---**This API is still experimental and may change in the future without notice.**
+---
+---**This API is available only for Linux.**
+---
+---Wrap the [nginx worker thread](http://nginx.org/en/docs/dev/development_guide.html#threads) to execute lua function. The caller coroutine would yield until the function returns.
+---
+---Only the following ngx_lua APIs could be used in `function_name` function of the `module` module:
+---
+---* `ngx.encode_base64`
+---* `ngx.decode_base64`
+---
+---* `ngx.hmac_sha1`
+---* `ngx.encode_args`
+---* `ngx.decode_args`
+---* `ngx.quote_sql_str`
+---
+---* `ngx.re.match`
+---* `ngx.re.find`
+---* `ngx.re.gmatch`
+---* `ngx.re.sub`
+---* `ngx.re.gsub`
+---
+---* `ngx.crc32_short`
+---* `ngx.crc32_long`
+---* `ngx.hmac_sha1`
+---* `ngx.md5_bin`
+---* `ngx.md5`
+---
+---* `ngx.config.subsystem`
+---* `ngx.config.debug`
+---* `ngx.config.prefix`
+---* `ngx.config.nginx_version`
+---* `ngx.config.nginx_configure`
+---* `ngx.config.ngx_lua_version`
+---
+---
+---The first argument `threadpool` specifies the Nginx thread pool name defined by [thread_pool](https://nginx.org/en/docs/ngx_core_module.html#thread_pool).
+---
+---The second argument `module_name` specifies the lua module name to execute in the worker thread, which would return a lua table. The module must be inside the package path, e.g.
+---
+---```nginx
+---
+---lua_package_path '/opt/openresty/?.lua;;';
+---```
+---
+---The third argument `func_name` specifies the function field in the module table as the second argument.
+---
+---The type of `arg`s must be one of type below:
+---
+---* boolean
+---* number
+---* string
+---* nil
+---* table (the table may be recursive, and contains members of types above.)
+---
+---The `ok` is in boolean type, which indicate the C land error (failed to get thread from thread pool, pcall the module function failed, .etc). If `ok` is `false`, the `res1` is the error string.
+---
+---The return values (res1, ...) are returned by invocation of the module function. Normally, the `res1` should be in boolean type, so that the caller could inspect the error.
+---
+---This API is useful when you need to execute the below types of tasks:
+---
+---* CPU bound task, e.g. do md5 calculation
+---* File I/O task
+---* Call `os.execute()` or blocking C API via `ffi`
+---* Call external Lua library not based on cosocket or nginx
+---
+---Example1: do md5 calculation.
+---
+---```nginx
+---
+---location /calc_md5 {
+---     default_type 'text/plain';
+---
+---     content_by_lua_block {
+---         local ok, md5_or_err = ngx.run_worker_thread("testpool", "md5", "md5")
+---         ngx.say(ok, " : ", md5_or_err)
+---     }
+--- }
+---```
+---
+---`md5.lua`
+---
+---```lua
+---local function md5()
+---    return ngx.md5("hello")
+---end
+---```
+---
+---Example2: write logs into the log file.
+---
+---```nginx
+---
+---location /write_log_file {
+---     default_type 'text/plain';
+---
+---     content_by_lua_block {
+---         local ok, err = ngx.run_worker_thread("testpool", "write_log_file", "log", ngx.var.arg_str)
+---         if not ok then
+---             ngx.say(ok, " : ", err)
+---             return
+---         end
+---         ngx.say(ok)
+---     }
+--- }
+---```
+---
+---`write_log_file.lua`
+---
+---```lua
+---
+--- local function log(str)
+---     local file, err = io.open("/tmp/tmp.log", "a")
+---     if not file then
+---         return false, err
+---     end
+---     file:write(str)
+---     file:flush()
+---     file:close()
+---     return true
+--- end
+--- return {log=log}
+---```
+---
+---@param threadpool string
+---@param module_name string
+---@param func_name string
+---@param arg1? ngx.thread.arg
+---@param arg2? ngx.thread.arg
+---@param ... ngx.thread.arg
+---@return boolean ok
+---@return ngx.thread.arg? result_or_error
+---@return ...
+function ngx.run_worker_thread(threadpool, module_name, func_name, arg1, arg2, ...)
+end
 
 return ngx

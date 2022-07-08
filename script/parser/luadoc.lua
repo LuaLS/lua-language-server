@@ -1588,6 +1588,13 @@ local function bindGeneric(binded)
 end
 
 local function bindDoc(source, binded)
+    local isParam = source.type == 'self'
+                or  source.type == 'local'
+                and (source.parent.type == 'funcargs'
+                        or (    source.parent.type == 'in'
+                            and source.finish <= source.parent.keys.finish
+                        )
+                    )
     local ok = false
     for _, doc in ipairs(binded) do
         if doc.bindSource then
@@ -1599,7 +1606,7 @@ local function bindDoc(source, binded)
         or doc.type == 'doc.version'
         or doc.type == 'doc.module' then
             if source.type == 'function'
-            or source.type == 'self' then
+            or isParam then
                 goto CONTINUE
             end
         elseif doc.type == 'doc.overload' then
@@ -1612,13 +1619,8 @@ local function bindDoc(source, binded)
             end
         elseif doc.type == 'doc.param' then
             local suc
-            if  source.type == 'local'
-            and doc.param[1] == source[1]
-            and (  source.parent.type == 'funcargs'
-                or (    source.parent.type == 'in'
-                    and source.finish <= source.parent.keys.finish
-                )
-            ) then
+            if  isParam
+            and doc.param[1] == source[1] then
                 suc = true
             elseif source.type == '...'
             and    doc.param[1] == '...' then

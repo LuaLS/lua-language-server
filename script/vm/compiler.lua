@@ -22,24 +22,15 @@ local function bindDocs(source)
     if not docs then
         return false
     end
-    local isParam = source.parent.type == 'funcargs'
-                 or (source.parent.type == 'in' and source.finish <= source.parent.keys.finish)
     for i = #docs, 1, -1 do
         local doc = docs[i]
         if doc.type == 'doc.type' then
-            if not isParam then
-                vm.setNode(source, vm.compileNode(doc))
-                return true
-            end
+            vm.setNode(source, vm.compileNode(doc))
+            return true
         end
         if doc.type == 'doc.class' then
-            if (source.type == 'local' and not isParam)
-            or (source._globalNode and guide.isSet(source))
-            or source.type == 'tablefield'
-            or source.type == 'tableindex' then
-                vm.setNode(source, vm.compileNode(doc))
-                return true
-            end
+            vm.setNode(source, vm.compileNode(doc))
+            return true
         end
         if doc.type == 'doc.param' then
             local node = vm.compileNode(doc)
@@ -67,9 +58,7 @@ local function bindDocs(source)
             return true
         end
         if doc.type == 'doc.overload' then
-            if not isParam then
-                vm.setNode(source, vm.compileNode(doc))
-            end
+            vm.setNode(source, vm.compileNode(doc))
         end
     end
     return false

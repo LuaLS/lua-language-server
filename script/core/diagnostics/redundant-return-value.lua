@@ -2,6 +2,7 @@ local files  = require 'files'
 local guide  = require 'parser.guide'
 local vm     = require 'vm'
 local lang   = require 'language'
+local await  = require 'await'
 
 local function hasDocReturn(func)
     if not func.bindDocs then
@@ -15,13 +16,16 @@ local function hasDocReturn(func)
     return false
 end
 
+---@async
 return function (uri, callback)
     local state = files.getState(uri)
     if not state then
         return
     end
 
+    ---@async
     guide.eachSourceType(state.ast, 'function', function (source)
+        await.delay()
         if not hasDocReturn(source) then
             return
         end

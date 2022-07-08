@@ -50,6 +50,7 @@ function m.decode(reader)
     if not content then
         return nil, 'Proto read error'
     end
+    ---@type any
     local null = json.null
     json.null = nil
     local suc, res = pcall(json.decode, content)

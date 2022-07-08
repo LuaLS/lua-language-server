@@ -41,6 +41,7 @@ return function (uri, callback)
             return
         end
         if cache[key] == nil then
+            await.delay()
             cache[key] = vm.hasGlobalSets(uri, 'variable', key)
         end
         if cache[key] then

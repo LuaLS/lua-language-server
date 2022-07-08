@@ -1,7 +1,9 @@
 local files = require 'files'
 local guide = require 'parser.guide'
 local lang  = require 'language'
+local await = require 'await'
 
+---@async
 return function (uri, callback)
     local state = files.getState(uri)
     local text  = files.getText(uri)
@@ -9,8 +11,9 @@ return function (uri, callback)
         return
     end
 
-
+    ---@async
     guide.eachSourceType(state.ast, 'table', function (source)
+        await.delay()
         for i = 1, #source do
             local field = source[i]
             if field.type ~= 'tableexp' then

@@ -333,12 +333,16 @@ object<string, string>
     * cast-type-mismatch
     * need-check-nil
     * param-type-mismatch
+    * return-type-mismatch
     * undefined-field
     */
     "type-check": "Fallback",
     /*
     * missing-parameter
+    * missing-return
+    * missing-return-value
     * redundant-parameter
+    * redundant-return-value
     * redundant-value
     * unbalanced-assignments
     */
@@ -446,12 +450,16 @@ object<string, string>
     * cast-type-mismatch
     * need-check-nil
     * param-type-mismatch
+    * return-type-mismatch
     * undefined-field
     */
     "type-check": "Fallback",
     /*
     * missing-parameter
+    * missing-return
+    * missing-return-value
     * redundant-parameter
+    * redundant-return-value
     * redundant-value
     * unbalanced-assignments
     */
@@ -580,6 +588,8 @@ object<string, string>
     */
     "lowercase-global": "Any",
     "missing-parameter": "Any",
+    "missing-return": "Any",
+    "missing-return-value": "Any",
     "need-check-nil": "Opened",
     /*
     在字面量表中，2行代码之间缺少分隔符，在语法上被解析为了一次索引操作
@@ -601,10 +611,12 @@ object<string, string>
     */
     "redundant-parameter": "Any",
     "redundant-return": "Opened",
+    "redundant-return-value": "Any",
     /*
     赋值操作时，值的数量比被赋值的对象多
     */
     "redundant-value": "Any",
+    "return-type-mismatch": "Opened",
     "spell-check": "None",
     /*
     后置空格
@@ -709,6 +721,8 @@ object<string, string>
     */
     "lowercase-global": "Information",
     "missing-parameter": "Warning",
+    "missing-return": "Warning",
+    "missing-return-value": "Warning",
     "need-check-nil": "Warning",
     /*
     在字面量表中，2行代码之间缺少分隔符，在语法上被解析为了一次索引操作
@@ -730,10 +744,12 @@ object<string, string>
     */
     "redundant-parameter": "Warning",
     "redundant-return": "Hint",
+    "redundant-return-value": "Warning",
     /*
     赋值操作时，值的数量比被赋值的对象多
     */
     "redundant-value": "Warning",
+    "return-type-mismatch": "Warning",
     "spell-check": "Information",
     /*
     后置空格
@@ -929,6 +945,28 @@ boolean
 
 ```jsonc
 true
+```
+
+# hint.semicolon
+
+若语句尾部没有分号，则显示虚拟分号。
+
+## type
+
+```ts
+string
+```
+
+## enum
+
+* ``"All"``: 所有语句都显示虚拟分号。
+* ``"SameLine"``: 2个语句在同一行时，在它们之间显示分号。
+* ``"Disable"``: 禁用虚拟分号。
+
+## default
+
+```jsonc
+"SameLine"
 ```
 
 # hint.setType

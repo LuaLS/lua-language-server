@@ -2,14 +2,18 @@ local files  = require 'files'
 local guide  = require 'parser.guide'
 local vm     = require 'vm'
 local lang   = require 'language'
+local await  = require 'await'
 
+---@async
 return function (uri, callback)
     local state = files.getState(uri)
     if not state then
         return
     end
 
+    ---@async
     guide.eachSourceType(state.ast, 'call', function (source)
+        await.delay()
         local callArgs = vm.countList(source.args)
         if callArgs == 0 then
             return

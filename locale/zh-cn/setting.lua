@@ -239,7 +239,7 @@ config.hint.semicolon                    =
 '若语句尾部没有分号，则显示虚拟分号。'
 config.hint.semicolon.All                =
 '所有语句都显示虚拟分号。'
-config.hint.semicolon.SameLine            =
+config.hint.semicolon.SameLine           =
 '2个语句在同一行时，在它们之间显示分号。'
 config.hint.semicolon.Disable            =
 '禁用虚拟分号。'

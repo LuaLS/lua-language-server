@@ -2,7 +2,9 @@ local files    = require 'files'
 local guide    = require 'parser.guide'
 local lang     = require 'language'
 local define   = require 'proto.define'
+local await    = require 'await'
 
+---@async
 return function (uri, callback)
     local state = files.getState(uri)
     if not state then
@@ -10,12 +12,14 @@ return function (uri, callback)
     end
 
     local mark = {}
+    ---@async
     guide.eachSourceType(state.ast, 'break', function (source)
         local list = source.parent
         if mark[list] then
             return
         end
         mark[list] = true
+        await.delay()
         for i = #list, 1, -1 do
             local src = list[i]
             if src == source then

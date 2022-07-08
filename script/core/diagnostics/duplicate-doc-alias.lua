@@ -2,7 +2,9 @@ local files    = require 'files'
 local lang     = require 'language'
 local vm       = require 'vm'
 local guide    = require 'parser.guide'
+local await    = require 'await'
 
+---@async
 return function (uri, callback)
     local state = files.getState(uri)
     if not state then
@@ -20,6 +22,7 @@ return function (uri, callback)
             if not name then
                 return
             end
+            await.delay()
             if not cache[name] then
                 local docs = vm.getDocSets(uri, name)
                 cache[name] = {}

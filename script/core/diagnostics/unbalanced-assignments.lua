@@ -2,7 +2,17 @@ local files  = require 'files'
 local define = require 'proto.define'
 local lang   = require 'language'
 local guide  = require 'parser.guide'
+local await  = require 'await'
 
+local types = {
+    'local',
+    'setlocal',
+    'setglobal',
+    'setfield',
+    'setindex' ,
+}
+
+---@async
 return function (uri, callback, code)
     local ast = files.getState(uri)
     if not ast then
@@ -31,13 +41,9 @@ return function (uri, callback, code)
         end
     end
 
-    guide.eachSource(ast.ast, function (source)
-        if source.type == 'local'
-        or source.type == 'setlocal'
-        or source.type == 'setglobal'
-        or source.type == 'setfield'
-        or source.type == 'setindex' then
-            checkSet(source)
-        end
+    ---@async
+    guide.eachSourceTypes(ast.ast, types, function (source)
+        await.delay()
+        checkSet(source)
     end)
 end

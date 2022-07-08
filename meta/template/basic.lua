@@ -141,8 +141,8 @@ function module(name, ...) end
 ---@generic K, V
 ---@param table table<K, V>
 ---@param index? K
----@return K
----@return V
+---@return K?
+---@return V?
 ---@nodiscard
 function next(table, index) end
 

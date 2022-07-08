@@ -3218,3 +3218,35 @@ if true then
 end
 local <?x?> = n or 0
 ]]
+
+TEST 'number' [=[
+local <?x?> = F()--[[@as number]]
+]=]
+
+TEST 'number' [=[
+local function f()
+    return F()--[[@as number]]
+end
+
+local <?x?> = f()
+]=]
+
+TEST 'number' [=[
+local <?x?> = X --[[@as number]]
+]=]
+
+TEST 'number' [[
+---@return number?, number?
+local function f() end
+
+for <?x?>, y in f do
+end
+]]
+
+TEST 'number' [[
+---@return number?, number?
+local function f() end
+
+for x, <?y?> in f do
+end
+]]

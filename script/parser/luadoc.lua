@@ -864,7 +864,6 @@ local docSwitch = util.switch()
         if not first then
             return nil
         end
-        first.docIndex = 1
         local rests
         while checkToken('symbol', ',', 1) do
             nextToken()
@@ -873,7 +872,6 @@ local docSwitch = util.switch()
                 rests = {}
             end
             rests[#rests+1] = rest
-            rest.docIndex = #rests + 1
         end
         return first, rests
     end)
@@ -1601,7 +1599,6 @@ local function bindDoc(source, binded)
             goto CONTINUE
         end
         if doc.type == 'doc.class'
-        or doc.type == 'doc.type'
         or doc.type == 'doc.deprecated'
         or doc.type == 'doc.version'
         or doc.type == 'doc.module' then
@@ -1609,6 +1606,13 @@ local function bindDoc(source, binded)
             or isParam then
                 goto CONTINUE
             end
+        elseif doc.type == 'doc.type' then
+            if source.type == 'function'
+            or isParam
+            or source._bindedDocType then
+                goto CONTINUE
+            end
+            source._bindedDocType = true
         elseif doc.type == 'doc.overload' then
             if not source.bindDocs then
                 source.bindDocs = {}

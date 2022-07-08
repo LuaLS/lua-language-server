@@ -15,6 +15,11 @@
   * `unknown-operator`
 * `NEW` settings:
   * `diagnostics.unusedLocalExclude`
+* `CHG` support multi-type:
+  ```lua
+  ---@type number, _, boolean
+  local a, b, c -- `a` is `number`, `b` is `unknown`, `c` is `boolean`
+  ```
 * `FIX` [#880](https://github.com/sumneko/lua-language-server/issues/880)
 * `FIX` [#1284](https://github.com/sumneko/lua-language-server/issues/1284)
 * `FIX` [#1292](https://github.com/sumneko/lua-language-server/issues/1292)

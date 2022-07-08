@@ -323,6 +323,9 @@ local compilerGlobalSwitch = util.switch()
     : call(function (source)
         local uri  = guide.getUri(source)
         local name = source[1]
+        if name == '_' then
+            return
+        end
         local type = vm.declareGlobal('type', name, uri)
         type:addGet(uri, source)
         source._globalNode = type

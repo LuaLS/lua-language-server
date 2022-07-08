@@ -1277,7 +1277,7 @@ local DICT = {}
 ---
 ---@param key string
 ---@return ngx.shared.DICT.value? value
----@return ngx.shared.DICT.flags?|string? flags_or_error
+---@return ngx.shared.DICT.flags|string|nil flags_or_error
 function DICT:get(key) end
 
 

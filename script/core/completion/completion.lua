@@ -1944,23 +1944,23 @@ local function buildluaDocOfFunction(func)
 end
 
 local function tryluaDocOfFunction(doc, results)
-    if not doc.bindSources then
+    if not doc.bindSource then
         return
     end
-    local func
-    for _, source in ipairs(doc.bindSources) do
-        if source.type == 'function' then
-            func = source
-            break
-        end
-    end
+    local func = doc.bindSource.type == 'function' and doc.bindSource or nil
     if not func then
         return
     end
     for _, otherDoc in ipairs(doc.bindGroup) do
-        if otherDoc.type == 'doc.param'
-        or otherDoc.type == 'doc.return' then
+        if otherDoc.type == 'doc.return' then
             return
+        end
+    end
+    if func.args then
+        for _, param in ipairs(func.args) do
+            if param.bindDocs then
+                return
+            end
         end
     end
     local insertText = buildluaDocOfFunction(func)

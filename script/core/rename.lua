@@ -242,16 +242,15 @@ end
 local function ofDocParamName(source, newname, callback)
     callback(source, source.start, source.finish, newname)
     local doc = source.parent
-    if doc.bindSources then
-        for _, src in ipairs(doc.bindSources) do
-            if src.type == 'local'
-            and src.parent.type == 'funcargs'
-            and src[1] == source[1] then
-                renameLocal(src, newname, callback)
-                if src.ref then
-                    for _, ref in ipairs(src.ref) do
-                        renameLocal(ref, newname, callback)
-                    end
+    local src = doc.bindSource
+    if src then
+        if src.type == 'local'
+        and src.parent.type == 'funcargs'
+        and src[1] == source[1] then
+            renameLocal(src, newname, callback)
+            if src.ref then
+                for _, ref in ipairs(src.ref) do
+                    renameLocal(ref, newname, callback)
                 end
             end
         end

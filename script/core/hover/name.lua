@@ -50,14 +50,12 @@ end
 local function asDocFunction(source, oop)
     local doc = guide.getParentType(source, 'doc.type')
             or  guide.getParentType(source, 'doc.overload')
-    if not doc or not doc.bindSources then
+    if not doc or not doc.bindSource then
         return ''
     end
-    for _, src in ipairs(doc.bindSources) do
-        local name = buildName(src, oop)
-        if name ~= '' then
-            return name
-        end
+    local name = buildName(doc.bindSource, oop)
+    if name ~= '' then
+        return name
     end
     return ''
 end

@@ -4,7 +4,7 @@ local type         = type
 ---@class parser.object
 ---@field bindDocs              parser.object[]
 ---@field bindGroup             parser.object[]
----@field bindSources           parser.object[]
+---@field bindSource            parser.object[]
 ---@field value                 parser.object
 ---@field parent                parser.object
 ---@field type                  string
@@ -51,6 +51,8 @@ local type         = type
 ---@field upvalues              table<string, string[]>
 ---@field ref                   parser.object[]
 ---@field returnIndex           integer
+---@field assignIndex           integer
+---@field docIndex              integer
 ---@field docs                  parser.object[]
 ---@field state                 table
 ---@field comment               table

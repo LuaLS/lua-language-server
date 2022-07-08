@@ -82,7 +82,22 @@ local function asString(source)
         or asStringView(source, literal)
 end
 
-local function getBindComment(source, docGroup, base)
+local function getBindComment(source)
+    local lines = {}
+    for _, docComment in ipairs(source.bindComments) do
+        if docComment.comment.text:sub(1, 1) == '-' then
+            lines[#lines+1] = docComment.comment.text:sub(2)
+        else
+            lines[#lines+1] = docComment.comment.text
+        end
+    end
+    if not lines or #lines == 0 then
+        return nil
+    end
+    return table.concat(lines, '\n')
+end
+
+local function lookUpDocComments(source, docGroup)
     if source.type == 'setlocal'
     or source.type == 'getlocal' then
         source = source.node
@@ -90,14 +105,9 @@ local function getBindComment(source, docGroup, base)
     if source.parent.type == 'funcargs' then
         return
     end
-    local continue
-    local lines
+    local lines = {}
     for _, doc in ipairs(docGroup) do
         if doc.type == 'doc.comment' then
-            if not continue then
-                continue = true
-                lines = {}
-            end
             if doc.comment.text:sub(1, 1) == '-' then
                 lines[#lines+1] = doc.comment.text:sub(2)
             else
@@ -105,26 +115,19 @@ local function getBindComment(source, docGroup, base)
             end
         elseif doc.type == 'doc.type' then
             if doc.comment then
-                if not continue then
-                    continue = true
-                    lines = {}
-                end
                 lines[#lines+1] = doc.comment.text
             end
-        elseif doc == base then
-            break
-        else
-            continue = false
-            if doc.type == 'doc.field'
-            or doc.type == 'doc.class' then
-                lines = nil
+        elseif doc.type == 'doc.class' then
+            for _, docComment in ipairs(doc.bindComments) do
+                if docComment.comment.text:sub(1, 1) == '-' then
+                    lines[#lines+1] = docComment.comment.text:sub(2)
+                else
+                    lines[#lines+1] = docComment.comment.text
+                end
             end
         end
     end
     if source.comment then
-        if not lines then
-            lines = {}
-        end
         lines[#lines+1] = source.comment.text
     end
     if not lines or #lines == 0 then
@@ -137,7 +140,7 @@ local function tryDocClassComment(source)
     for _, def in ipairs(vm.getDefs(source)) do
         if def.type == 'doc.class'
         or def.type == 'doc.alias' then
-            local comment = getBindComment(def, def.bindGroup, def)
+            local comment = getBindComment(def)
             if comment then
                 return comment
             end
@@ -251,7 +254,7 @@ local function tryDocFieldUpComment(source)
     if not source.bindGroup then
         return
     end
-    local comment = getBindComment(source, source.bindGroup, source)
+    local comment = getBindComment(source)
     return comment
 end
 
@@ -259,7 +262,7 @@ local function getFunctionComment(source)
     local docGroup = source.bindDocs
 
     local hasReturnComment = false
-    for _, doc in ipairs(docGroup) do
+    for _, doc in ipairs(source.bindDocs) do
         if doc.type == 'doc.return' and doc.comment then
             hasReturnComment = true
             break
@@ -318,7 +321,7 @@ local function tryDocComment(source)
         return
     end
     if source.type ~= 'function' then
-        local comment = getBindComment(source, source.bindDocs)
+        local comment = lookUpDocComments(source, source.bindDocs)
         return comment
     end
     return getFunctionComment(source)
@@ -330,14 +333,12 @@ local function tryDocOverloadToComment(source)
     end
     local doc = source.parent
     if doc.type ~= 'doc.overload'
-    or not doc.bindSources then
+    or not doc.bindSource then
         return
     end
-    for _, src in ipairs(doc.bindSources) do
-        local md = tryDocComment(src)
-        if md then
-            return md
-        end
+    local md = tryDocComment(doc.bindSource)
+    if md then
+        return md
     end
 end
 

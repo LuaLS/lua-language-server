@@ -808,7 +808,7 @@ TEST [[
 ]]
 
 TEST [[
----@param x <!Class!>
+---@param <!x!> <!Class!>
 ]]
 
 TEST [[

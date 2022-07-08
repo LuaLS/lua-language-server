@@ -42,14 +42,12 @@ local function bindDocs(source)
             end
         end
         if doc.type == 'doc.param' then
-            if isParam and source[1] == doc.param[1] then
-                local node = vm.compileNode(doc)
-                if doc.optional then
-                    node:addOptional()
-                end
-                vm.setNode(source, node)
-                return true
+            local node = vm.compileNode(doc)
+            if doc.optional then
+                node:addOptional()
             end
+            vm.setNode(source, node)
+            return true
         end
         if doc.type == 'doc.module' then
             local name = doc.module
@@ -334,23 +332,12 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                     end
                 end
                 -- check local field and global field
-                if not hasFounded[key] and set.bindSources then
-                    for _, src in ipairs(set.bindSources) do
-                        if src.value and src.value.type == 'table' then
-                            searchFieldSwitch('table', suri, src.value, key, ref, function (field)
-                                local fieldKey = guide.getKeyName(field)
-                                if fieldKey then
-                                    if  not searchedFields[fieldKey]
-                                    and guide.isSet(field) then
-                                        hasFounded[fieldKey] = true
-                                        pushResult(field, true)
-                                    end
-                                end
-                            end)
-                        end
-                        searchFieldSwitch(src.type, suri, src, key, ref, function (field)
+                if not hasFounded[key] and set.bindSource then
+                    local src = set.bindSource
+                    if src.value and src.value.type == 'table' then
+                        searchFieldSwitch('table', suri, src.value, key, ref, function (field)
                             local fieldKey = guide.getKeyName(field)
-                            if fieldKey and not hasFounded[fieldKey] then
+                            if fieldKey then
                                 if  not searchedFields[fieldKey]
                                 and guide.isSet(field) then
                                     hasFounded[fieldKey] = true
@@ -359,6 +346,16 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                             end
                         end)
                     end
+                    searchFieldSwitch(src.type, suri, src, key, ref, function (field)
+                        local fieldKey = guide.getKeyName(field)
+                        if fieldKey and not hasFounded[fieldKey] then
+                            if  not searchedFields[fieldKey]
+                            and guide.isSet(field) then
+                                hasFounded[fieldKey] = true
+                                pushResult(field, true)
+                            end
+                        end
+                    end)
                 end
                 -- look into extends(if field not found)
                 if not hasFounded[key] and set.extends then
@@ -1591,18 +1588,14 @@ local compilerSwitch = util.switch()
     end)
     : case '...'
     : call(function (source)
-        local func = source.parent.parent
-        if func.type ~= 'function' then
+        if not source.bindDocs then
             return
         end
-        if not func.bindDocs then
-            return
-        end
-        for _, doc in ipairs(func.bindDocs) do
+        for _, doc in ipairs(source.bindDocs) do
             if doc.type == 'doc.vararg' then
                 vm.setNode(source, vm.compileNode(doc))
             end
-            if doc.type == 'doc.param' and doc.param[1] == '...' then
+            if doc.type == 'doc.param' then
                 vm.setNode(source, vm.compileNode(doc))
             end
         end

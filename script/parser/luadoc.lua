@@ -860,7 +860,22 @@ local docSwitch = util.switch()
     end)
     : case 'type'
     : call(function ()
-        return parseType()
+        local first = parseType()
+        if not first then
+            return nil
+        end
+        first.docIndex = 1
+        local rests
+        while checkToken('symbol', ',', 1) do
+            nextToken()
+            local rest = parseType()
+            if not rests then
+                rests = {}
+            end
+            rests[#rests+1] = rest
+            rest.docIndex = #rests + 1
+        end
+        return first, rests
     end)
     : case 'alias'
     : call(function ()
@@ -1444,10 +1459,17 @@ local function buildLuaDoc(comment)
     local doc = text:sub(startPos)
 
     parseTokens(doc, comment.start + startPos)
-    local result = convertTokens()
+    local result, rests = convertTokens()
     if result then
         result.range = comment.finish
-        local cstart = text:find('%S', (result.firstFinish or result.finish) - comment.start)
+        local finish = result.firstFinish or result.finish
+        if rests then
+            for _, rest in ipairs(rests) do
+                rest.range = comment.finish
+                finish = rest.firstFinish or result.finish
+            end
+        end
+        local cstart = text:find('%S', finish - comment.start)
         if cstart and cstart < comment.finish then
             result.comment = {
                 type   = 'doc.tailcomment',
@@ -1456,11 +1478,16 @@ local function buildLuaDoc(comment)
                 parent = result,
                 text   = trimTailComment(text:sub(cstart)),
             }
+            if rests then
+                for _, rest in ipairs(rests) do
+                    rest.comment = result.comment
+                end
+            end
         end
     end
 
     if result then
-        return result
+        return result, rests
     end
 
     return {
@@ -1560,7 +1587,82 @@ local function bindGeneric(binded)
     end
 end
 
-local function bindDocsBetween(sources, binded, bindSources, start, finish)
+local function bindDoc(source, binded)
+    local ok = false
+    for _, doc in ipairs(binded) do
+        if doc.bindSource then
+            goto CONTINUE
+        end
+        if doc.type == 'doc.class'
+        or doc.type == 'doc.type'
+        or doc.type == 'doc.deprecated'
+        or doc.type == 'doc.version'
+        or doc.type == 'doc.module' then
+            if source.type == 'function'
+            or source.type == 'self' then
+                goto CONTINUE
+            end
+        elseif doc.type == 'doc.overload' then
+            if not source.bindDocs then
+                source.bindDocs = {}
+            end
+            source.bindDocs[#source.bindDocs+1] = doc
+            if source.type ~= 'function' then
+                doc.bindSource = source
+            end
+        elseif doc.type == 'doc.param' then
+            local suc
+            if  source.type == 'local'
+            and doc.param[1] == source[1]
+            and (  source.parent.type == 'funcargs'
+                or (    source.parent.type == 'in'
+                    and source.finish <= source.parent.keys.finish
+                )
+            ) then
+                suc = true
+            elseif source.type == '...'
+            and    doc.param[1] == '...' then
+                suc = true
+            elseif source.type == 'self'
+            and    doc.param[1] == 'self' then
+                suc = true
+            end
+            if source.type == 'function' then
+                if not source.bindDocs then
+                    source.bindDocs = {}
+                end
+                source.bindDocs[#source.bindDocs+1] = doc
+            end
+
+            if not suc then
+                goto CONTINUE
+            end
+        elseif doc.type == 'doc.vararg' then
+            if source.type ~= '...' then
+                goto CONTINUE
+            end
+        elseif doc.type == 'doc.return'
+        or     doc.type == 'doc.generic'
+        or     doc.type == 'doc.async'
+        or     doc.type == 'doc.nodiscard' then
+            if source.type ~= 'function' then
+                goto CONTINUE
+            end
+        elseif doc.type ~= 'doc.comment' then
+            goto CONTINUE
+        end
+        if not source.bindDocs then
+            source.bindDocs = {}
+        end
+        source.bindDocs[#source.bindDocs+1] = doc
+        doc.bindSource = source
+        ok = true
+        ::CONTINUE::
+    end
+    return ok
+end
+
+local function bindDocsBetween(sources, binded, start, finish)
     -- 用二分法找到第一个
     local max = #sources
     local index
@@ -1583,27 +1685,13 @@ local function bindDocsBetween(sources, binded, bindSources, start, finish)
         end
     end
 
+    local ok = false
     -- 从前往后进行绑定
-    local skipUntil
     for i = index, max do
         local src = sources[i]
         if src and src.start >= start then
             if src.start >= finish then
                 break
-            end
-            if skipUntil then
-                if skipUntil > src.start then
-                    goto CONTINUE
-                else
-                    skipUntil = nil
-                end
-            end
-            -- 遇到table后中断，处理以下情况：
-            -- ---@type AAA
-            -- local t = {x = 1, y = 2}
-            if src.type == 'table' then
-                skipUntil = skipUntil or src.finish
-                goto CONTINUE
             end
             if src.start >= start then
                 if src.type == 'local'
@@ -1615,14 +1703,17 @@ local function bindDocsBetween(sources, binded, bindSources, start, finish)
                 or src.type == 'setfield'
                 or src.type == 'setindex'
                 or src.type == 'setmethod'
-                or src.type == 'function' then
-                    src.bindDocs = binded
-                    bindSources[#bindSources+1] = src
+                or src.type == 'function'
+                or src.type == '...' then
+                    if bindDoc(src, binded) then
+                        ok = true
+                    end
                 end
             end
-            ::CONTINUE::
         end
     end
+
+    return ok
 end
 
 local function bindReturnIndex(binded)
@@ -1637,30 +1728,49 @@ local function bindReturnIndex(binded)
     end
 end
 
-local function bindClassAndFields(binded)
+local function bindCommentsToDoc(doc, comments)
+    doc.bindComments = comments
+    for _, comment in ipairs(comments) do
+        comment.bindSource = doc
+    end
+end
+
+local function bindCommentsAndFields(binded)
     local class
+    local comments = {}
     for _, doc in ipairs(binded) do
         if doc.type == 'doc.class' then
             -- 多个class连续写在一起，只有最后一个class可以绑定source
             if class then
-                class.bindSources = nil
+                class.bindSource = nil
             end
             class = doc
+            bindCommentsToDoc(doc, comments)
+            comments = {}
         elseif doc.type == 'doc.field' then
             if class then
                 class.fields[#class.fields+1] = doc
                 doc.class = class
             end
+            bindCommentsToDoc(doc, comments)
+            comments = {}
         elseif doc.type == 'doc.operator' then
             if class then
                 class.operators[#class.operators+1] = doc
                 doc.class = class
             end
+            bindCommentsToDoc(doc, comments)
+            comments = {}
+        elseif doc.type == 'doc.alias' then
+            bindCommentsToDoc(doc, comments)
+            comments = {}
+        elseif doc.type == 'doc.comment' then
+            comments[#comments+1] = doc
         end
     end
 end
 
-local function bindDoc(sources, binded)
+local function bindDocWithSources(sources, binded)
     if not binded then
         return
     end
@@ -1668,19 +1778,17 @@ local function bindDoc(sources, binded)
     if not lastDoc then
         return
     end
-    local bindSources = {}
     for _, doc in ipairs(binded) do
         doc.bindGroup = binded
-        doc.bindSources = bindSources
     end
     bindGeneric(binded)
-    local row = guide.rowColOf(lastDoc.finish)
-    bindDocsBetween(sources, binded, bindSources, guide.positionOf(row, 0), lastDoc.start)
-    if #bindSources == 0 then
-        bindDocsBetween(sources, binded, bindSources, guide.positionOf(row + 1, 0), guide.positionOf(row + 2, 0))
-    end
+    bindCommentsAndFields(binded)
     bindReturnIndex(binded)
-    bindClassAndFields(binded)
+    local row = guide.rowColOf(lastDoc.finish)
+    local suc = bindDocsBetween(sources, binded, guide.positionOf(row, 0), lastDoc.start)
+    if not suc then
+        bindDocsBetween(sources, binded, guide.positionOf(row + 1, 0), guide.positionOf(row + 2, 0))
+    end
 end
 
 local bindDocAccept = {
@@ -1707,17 +1815,17 @@ local function bindDocs(state)
         end
         binded[#binded+1] = doc
         if isTailComment(text, doc) then
-            bindDoc(sources, binded)
+            bindDocWithSources(sources, binded)
             binded = nil
         else
             local nextDoc = state.ast.docs[i+1]
             if not isNextLine(doc, nextDoc) then
-                bindDoc(sources, binded)
+                bindDocWithSources(sources, binded)
                 binded = nil
             end
             if  not isContinuedDoc(doc, nextDoc)
             and not isTailComment(text, nextDoc) then
-                bindDoc(sources, binded)
+                bindDocWithSources(sources, binded)
                 binded = nil
             end
         end
@@ -1767,24 +1875,33 @@ return function (state)
         return comment
     end
 
+    local function insertDoc(doc, comment)
+        ast.docs[#ast.docs+1] = doc
+        doc.parent = ast.docs
+        if ast.start > doc.start then
+            ast.start = doc.start
+        end
+        if ast.finish < doc.finish then
+            ast.finish = doc.finish
+        end
+        doc.originalComment = comment
+        if comment.type == 'comment.long' then
+            findTouch(state, doc)
+        end
+    end
+
     while true do
         local comment = NextComment()
         if not comment then
             break
         end
-        local doc = buildLuaDoc(comment)
+        local doc, rests = buildLuaDoc(comment)
         if doc then
-            ast.docs[#ast.docs+1] = doc
-            doc.parent = ast.docs
-            if ast.start > doc.start then
-                ast.start = doc.start
-            end
-            if ast.finish < doc.finish then
-                ast.finish = doc.finish
-            end
-            doc.originalComment = comment
-            if comment.type == 'comment.long' then
-                findTouch(state, doc)
+            insertDoc(doc, comment)
+            if rests then
+                for _, rest in ipairs(rests) do
+                    insertDoc(rest, comment)
+                end
             end
         end
     end

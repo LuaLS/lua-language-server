@@ -3651,3 +3651,18 @@ end
 
 local <?n?> = test(1)
 ]]
+
+--TEST 'boolean' [[
+-----@type boolean, number
+--local <?x?>, y
+--]]
+--
+--TEST 'number' [[
+-----@type boolean, number
+--local x, <?y?>
+--]]
+--
+--TEST 'unknown' [[
+-----@type _, number
+--local <?x?>, y
+--]]

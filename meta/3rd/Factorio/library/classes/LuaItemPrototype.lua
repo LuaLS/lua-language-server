@@ -1,0 +1,115 @@
+---@meta
+
+---Prototype of an item.
+---
+---```lua
+---game.item_prototypes["iron-plate"]
+---```
+---@class LuaItemPrototype
+---@field alt_entity_filter_mode string @The alt entity filter mode used by this selection tool.`[R]`
+---@field alt_entity_filters table<string, LuaEntityPrototype> @The alt entity filters used by this selection tool indexed by entity name.`[R]`
+---The alt entity type filters used by this selection tool indexed by entity type.`[R]`
+---
+---The boolean value is meaningless and is used to allow easy lookup if a type exists in the dictionary.
+---@field alt_entity_type_filters table<string, boolean>
+---@field alt_selection_border_color Color @The color used when doing alt selection with this selection tool prototype.`[R]`
+---@field alt_selection_cursor_box_type string @`[R]`
+---@field alt_selection_mode_flags SelectionModeFlags @Flags that affect which entities will be selected during alternate selection.`[R]`
+---@field alt_tile_filter_mode string @The alt tile filter mode used by this selection tool.`[R]`
+---@field alt_tile_filters table<string, LuaTilePrototype> @The alt tile filters used by this selection tool indexed by tile name.`[R]`
+---@field always_include_tiles boolean @If tiles area always included when doing selection with this selection tool prototype.`[R]`
+---@field attack_parameters AttackParameters @The gun attack parameters or `nil` if not a gun item prototype.`[R]`
+---@field burnt_result LuaItemPrototype @The result of burning this item as fuel or `nil`.`[R]`
+---@field can_be_mod_opened boolean @If this item can be mod-opened.`[R]`
+---@field capsule_action CapsuleAction @The capsule action for this capsule item prototype or `nil` if this isn't a capsule item prototype.`[R]`
+---@field category string @The name of a [LuaModuleCategoryPrototype](LuaModuleCategoryPrototype). Used when upgrading modules: Ctrl + click modules into an entity and it will replace lower tier modules of the same category with higher tier modules.`[R]`
+---@field curved_rail LuaEntityPrototype @The curved rail prototype used for this rail planner prototype, or `nil` if this isn't a rail planner prototype.`[R]`
+---@field default_label_color Color @The default label color used for this item with label. `nil` if not defined or if this isn't an item with label.`[R]`
+---@field default_request_amount uint @The default request value.`[R]`
+---@field draw_label_for_cursor_render boolean @If true, and this item with label has a label it is drawn in place of the normal number when held in the cursor.`[R]`
+---@field durability double @The durability of this tool item or `nil` if not a tool item.`[R]`
+---@field durability_description_key string @The durability message key used when displaying the durability of this tool.`[R]`
+---@field entity_filter_mode string @The entity filter mode used by this selection tool.`[R]`
+---@field entity_filter_slots uint @The number of entity filters this deconstruction item has or `nil` if this isn't a deconstruction item prototype.`[R]`
+---@field entity_filters table<string, LuaEntityPrototype> @The entity filters used by this selection tool indexed by entity name.`[R]`
+---The entity type filters used by this selection tool indexed by entity type.`[R]`
+---
+---The boolean value is meaningless and is used to allow easy lookup if a type exists in the dictionary.
+---@field entity_type_filters table<string, boolean>
+---@field equipment_grid LuaEquipmentGridPrototype @The prototype of this armor equipment grid or `nil` if none or this is not an armor item.`[R]`
+---@field extend_inventory_by_default boolean @If this item with inventory extends the inventory it resides in by default.`[R]`
+---@field filter_mode string @The filter mode used by this item with inventory.`[R]`
+---@field flags ItemPrototypeFlags @The flags for this item prototype.`[R]`
+---@field fuel_acceleration_multiplier double @The acceleration multiplier when this item is used as fuel in a vehicle.`[R]`
+---@field fuel_category string @The fuel category or `nil`.`[R]`
+---@field fuel_emissions_multiplier double @The emissions multiplier if this is used as fuel.`[R]`
+---@field fuel_top_speed_multiplier double @The fuel top speed multiplier when this item is used as fuel in a vehicle.`[R]`
+---@field fuel_value float @Fuel value when burned.`[R]`
+---@field group LuaGroup @The group this prototype belongs to.`[R]`
+---@field infinite boolean @If this tool item has infinite durability. `nil` if not a tool type item.`[R]`
+---@field insertion_priority_mode string @The insertion priority mode used by this item with inventory.`[R]`
+---@field inventory_size uint @The main inventory size for item-with-inventory-prototype. `nil` if not an item-with-inventory-prototype.`[R]`
+---@field inventory_size_bonus uint @The inventory size bonus for this armor prototype. `nil` if this isn't an armor prototype.`[R]`
+---@field item_filters table<string, LuaItemPrototype> @`[R]`
+---@field item_group_filters table<string, LuaGroup> @`[R]`
+---@field item_subgroup_filters table<string, LuaGroup> @`[R]`
+---@field limitation_message_key string @The limitation message key used when the player attempts to use this modules in some place it's not allowed.`[R]`
+---@field limitations string[] @An array of recipe names this module is allowed to work with. Empty when all recipes are allowed.`[R]`
+---@field localised_description LocalisedString @`[R]`
+---@field localised_filter_message LocalisedString @The localised string used when the player attempts to put items into this item with inventory that aren't allowed.`[R]`
+---@field localised_name LocalisedString @`[R]`
+---@field magazine_size float @Size of full magazine; `nil` if this is not an ammo item.`[R]`
+---@field mapper_count uint @How many filters an upgrade item has. `nil` if not a upgrade item.`[R]`
+---@field module_effects ModuleEffects @Effects of this module.`[R]`
+---@field name string @Name of this prototype.`[R]`
+---@field object_name string @The class name of this object. Available even when `valid` is false. For LuaStruct objects it may also be suffixed with a dotted path to a member of the struct.`[R]`
+---@field order string @The string used to alphabetically sort these prototypes. It is a simple string that has no additional semantic meaning.`[R]`
+---@field place_as_equipment_result LuaEquipmentPrototype @Prototype of the equipment that will be created by placing this item in an equipment grid or `nil` if there is no equipment defined.`[R]`
+---@field place_as_tile_result PlaceAsTileResult @The place-as-tile result if one is defined, else `nil`.`[R]`
+---@field place_result LuaEntityPrototype @Prototype of the entity that will be created by placing this item, or `nil` if there is no such entity.`[R]`
+---@field reload_time float @Amount of extra time (in ticks) it takes to reload the weapon after depleting the magazine or `nil` if this is not an ammo item.`[R]`
+---@field repair_result TriggerItem[] @The repair result of this repair tool prototype or `nil` if this isn't a repair tool prototype.`[R]`
+---@field resistances table<string, Resistance> @Resistances of this armour item, indexed by damage type name. `nil` if not an armor or the armor has no resistances.`[R]`
+---@field reverse_alt_entity_filter_mode string @The reverse entity filter mode used by this selection tool.`[R]`
+---@field reverse_entity_filters table<string, LuaEntityPrototype> @The reverse entity filters used by this selection tool indexed by entity name.`[R]`
+---The reverse entity type filters used by this selection tool indexed by entity type.`[R]`
+---
+---The boolean value is meaningless and is used to allow easy lookup if a type exists in the dictionary.
+---@field reverse_entity_type_filters table<string, boolean>
+---@field reverse_selection_border_color Color @The color used when doing reverse selection with this selection tool prototype.`[R]`
+---@field reverse_selection_cursor_box_type string @`[R]`
+---@field reverse_selection_mode_flags SelectionModeFlags @Flags that affect which entities will be selected during reverse selection.`[R]`
+---@field reverse_tile_filter_mode string @The reverse tile filter mode used by this selection tool.`[R]`
+---@field reverse_tile_filters table<string, LuaTilePrototype> @The reverse tile filters used by this selection tool indexed by tile name.`[R]`
+---@field rocket_launch_products Product[] @The results from launching this item in a rocket.`[R]`
+---@field selection_border_color Color @The color used when doing normal selection with this selection tool prototype.`[R]`
+---@field selection_cursor_box_type string @`[R]`
+---@field selection_mode_flags SelectionModeFlags @Flags that affect which entities will be selected.`[R]`
+---@field speed float @The repairing speed if this is a repairing tool; otherwise `nil`.`[R]`
+---@field stack_size uint @Maximum stack size of the item specified by this prototype.`[R]`
+---@field stackable boolean @Is this item allowed to stack at all?`[R]`
+---@field straight_rail LuaEntityPrototype @The straight rail prototype used for this rail planner prototype, or `nil` if this isn't a rail planner prototype.`[R]`
+---@field subgroup LuaGroup @The subgroup this prototype belongs to.`[R]`
+---@field tier uint @Tier of the module inside its category. Used when upgrading modules: Ctrl + click modules into an entity and it will replace lower tier modules with higher tier modules if they have the same category.`[R]`
+---@field tile_filter_mode string @The tile filter mode used by this selection tool.`[R]`
+---@field tile_filter_slots uint @The number of tile filters this deconstruction item has or `nil` if this isn't a deconstruction item prototype.`[R]`
+---@field tile_filters table<string, LuaTilePrototype> @The tile filters used by this selection tool indexed by tile name.`[R]`
+---@field type string @Type of this prototype. E.g. `"gun"` or `"mining-tool"`.`[R]`
+---@field valid boolean @Is this object valid? This Lua object holds a reference to an object within the game engine. It is possible that the game-engine object is removed whilst a mod still holds the corresponding Lua object. If that happens, the object becomes invalid, i.e. this attribute will be `false`. Mods are advised to check for object validity if any change to the game state might have occurred between the creation of the Lua object and its access.`[R]`
+---@field wire_count uint @The number of items needed to connect 2 entities with this as wire.`[R]`
+local LuaItemPrototype = {}
+
+---Type of this ammo prototype or `nil` if this is not an ammo prototype.
+---@param _ammo_source_type? string @"default", "player", "turret", or "vehicle"
+---@return AmmoType
+function LuaItemPrototype.get_ammo_type(_ammo_source_type) end
+
+---Does this prototype have a flag enabled?
+---@param _flag string @The flag to check. Can be one of [ItemPrototypeFlags](ItemPrototypeFlags). Any other value will cause an error.
+---@return boolean
+function LuaItemPrototype.has_flag(_flag) end
+
+---All methods and properties that this object supports.
+---@return string
+function LuaItemPrototype.help() end
+

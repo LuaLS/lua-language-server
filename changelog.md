@@ -20,10 +20,6 @@
   ---@type number, _, boolean
   local a, b, c -- `a` is `number`, `b` is `unknown`, `c` is `boolean`
   ```
-* `CHG` treat `_ENV = XXX` as `local _ENV = XXX`
-  * `_ENV = nil`: disable all globals
-  * `_ENV = {}`: allow all globals
-  * `_ENV = {} ---@type mathlib`: only allow globals in `mathlib`
 * `FIX` [#880](https://github.com/sumneko/lua-language-server/issues/880)
 * `FIX` [#1284](https://github.com/sumneko/lua-language-server/issues/1284)
 * `FIX` [#1292](https://github.com/sumneko/lua-language-server/issues/1292)

@@ -15,8 +15,8 @@ local requireLike = {
 
 ---@async
 return function (uri, callback)
-    local state = files.getState(uri)
-    if not state then
+    local ast = files.getState(uri)
+    if not ast then
         return
     end
 
@@ -25,7 +25,7 @@ return function (uri, callback)
     local cache    = {}
 
     -- 遍历全局变量，检查所有没有 set 模式的全局变量
-    guide.eachSourceType(state.ast, 'getglobal', function (src) ---@async
+    guide.eachSourceType(ast.ast, 'getglobal', function (src) ---@async
         local key = src[1]
         if not key then
             return

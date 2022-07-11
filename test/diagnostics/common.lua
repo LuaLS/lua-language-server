@@ -133,40 +133,6 @@ _ENV = nil
 ]]
 
 TEST [[
----@diagnostic disable: undefined-global
-_ENV = nil
-<!print!>(<!A!>) -- `print` and `A` should warning 
-]]
-
-TEST [[
----@diagnostic disable: undefined-global
-local _ENV = nil
-<!print!>(<!A!>) -- `print` and `A` should warning 
-]]
-
-TEST [[
-_ENV = {}
-print(A) -- no warning
-]]
-
-TEST [[
-local _ENV = {}
-print(A) -- no warning
-]]
-
-TEST [[
----@type iolib
-_ENV = {}
-<!print!>(stderr) -- `print` is warning but `stderr` is not
-]]
-
-TEST [[
----@type iolib
-local _ENV = {}
-<!print!>(stderr) -- `print` is warning but `stderr` is not
-]]
-
-TEST [[
 local _ENV = { print = print }
 print(1)
 ]]

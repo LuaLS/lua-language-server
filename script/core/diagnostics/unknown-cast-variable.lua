@@ -24,7 +24,7 @@ return function (uri, callback)
                 callback {
                     start   = doc.loc.start,
                     finish  = doc.loc.finish,
-                    message = lang.script('DIAG_UNKNOWN_CAST_VARIABLE', doc[1])
+                    message = lang.script('DIAG_UNKNOWN_CAST_VARIABLE', doc.loc[1])
                 }
             end
         end

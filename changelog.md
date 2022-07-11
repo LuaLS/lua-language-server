@@ -24,6 +24,7 @@
   * `_ENV = nil`: disable all globals
   * `_ENV = {}`: allow all globals
   * `_ENV = {} ---@type mathlib`: only allow globals in `mathlib`
+* `CHG` hover: dose not show unknown `---@XXX` as description
 * `FIX` [#880](https://github.com/sumneko/lua-language-server/issues/880)
 * `FIX` [#1284](https://github.com/sumneko/lua-language-server/issues/1284)
 * `FIX` [#1292](https://github.com/sumneko/lua-language-server/issues/1292)

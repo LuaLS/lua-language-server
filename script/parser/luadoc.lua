@@ -1517,7 +1517,9 @@ local function isContinuedDoc(lastDoc, nextDoc)
     end
     if lastDoc.type == 'doc.type'
     or lastDoc.type == 'doc.module' then
-        return false
+        if nextDoc.type ~= 'doc.comment' then
+            return false
+        end
     end
     if lastDoc.type == 'doc.class'
     or lastDoc.type == 'doc.field'

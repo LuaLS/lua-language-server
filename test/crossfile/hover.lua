@@ -1237,3 +1237,75 @@ local n: integer
 ---
  comments]]
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            --- comments
+            ---@type integer
+            local <?n?>
+        ]]
+    },
+    hover = [[
+```lua
+local n: integer
+```
+
+---
+ comments]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@type integer
+            --- comments
+            local <?n?>
+        ]]
+    },
+    hover = [[
+```lua
+local n: integer
+```
+
+---
+ comments]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@TODO XXXX
+            ---@type integer @ comments
+            local <?n?>
+        ]]
+    },
+    hover = [[
+```lua
+local n: integer
+```
+
+---
+ comments]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@type integer @ comments
+            ---@TODO XXXX
+            local <?n?>
+        ]]
+    },
+    hover = [[
+```lua
+local n: integer
+```
+
+---
+ comments]]
+}

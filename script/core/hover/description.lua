@@ -108,11 +108,14 @@ local function lookUpDocComments(source, docGroup)
     local lines = {}
     for _, doc in ipairs(docGroup) do
         if doc.type == 'doc.comment' then
-            if doc.comment.text:sub(1, 1) == '-' then
-                lines[#lines+1] = doc.comment.text:sub(2)
-            else
-                lines[#lines+1] = doc.comment.text
+            local comment = doc.comment.text
+            if comment:sub(1, 1) == '-' then
+                comment = comment:sub(2)
             end
+            if comment:sub(1, 1) == '@' then
+                goto CONTINUE
+            end
+            lines[#lines+1] = comment
         elseif doc.type == 'doc.type' then
             if doc.comment then
                 lines[#lines+1] = doc.comment.text
@@ -126,6 +129,7 @@ local function lookUpDocComments(source, docGroup)
                 end
             end
         end
+        ::CONTINUE::
     end
     if source.comment then
         lines[#lines+1] = source.comment.text
@@ -272,11 +276,14 @@ local function getFunctionComment(source)
     local md = markdown()
     for _, doc in ipairs(docGroup) do
         if     doc.type == 'doc.comment' then
-            if doc.comment.text:sub(1, 1) == '-' then
-                md:add('md', doc.comment.text:sub(2))
-            else
-                md:add('md', doc.comment.text)
+            local comment = doc.comment.text
+            if comment:sub(1, 1) == '-' then
+                comment = comment:sub(2)
             end
+            if comment:sub(1, 1) == '@' then
+                goto CONTINUE
+            end
+            md:add('md', comment)
         elseif doc.type == 'doc.param' then
             if doc.comment then
                 md:add('md', ('@*param* `%s` — %s'):format(
@@ -309,6 +316,7 @@ local function getFunctionComment(source)
         elseif doc.type == 'doc.overload' then
             md:splitLine()
         end
+        ::CONTINUE::
     end
 
     local enums = getBindEnums(source, docGroup)

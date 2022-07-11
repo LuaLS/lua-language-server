@@ -3703,3 +3703,14 @@ end
 
 print(<?x?>)
 ]]
+
+TEST 'integer' [[
+local A = {
+    ---@class XXX
+    B = {}
+}
+
+A.B.C = 1
+
+print(A.B.<?C?>)
+]]

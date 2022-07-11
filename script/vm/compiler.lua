@@ -64,6 +64,90 @@ local function bindDocs(source)
     return false
 end
 
+---@param source parser.object
+---@param key any
+---@param ref boolean
+---@param pushResult fun(res: parser.object, markDoc?: boolean)
+local function searchFieldByLocalID(source, key, ref, pushResult)
+    local fields
+    if key then
+        fields = vm.getLocalSourcesSets(source, key)
+        if ref then
+            local gets = vm.getLocalSourcesGets(source, key)
+            if gets then
+                fields = fields or {}
+                for _, src in ipairs(gets) do
+                    fields[#fields+1] = src
+                end
+            end
+        end
+    else
+        fields = vm.getLocalFields(source, false)
+    end
+    if not fields then
+        return
+    end
+    local hasMarkDoc = {}
+    for _, src in ipairs(fields) do
+        if src.bindDocs then
+            if bindDocs(src) then
+                local skey = guide.getKeyName(src)
+                if skey then
+                    hasMarkDoc[skey] = true
+                end
+                pushResult(src, true)
+            end
+        end
+    end
+    for _, src in ipairs(fields) do
+        local skey = guide.getKeyName(src)
+        if not hasMarkDoc[skey] then
+            pushResult(src)
+        end
+    end
+end
+
+---@param suri uri
+---@param source parser.object
+---@param key any
+---@param ref boolean
+---@param pushResult fun(res: parser.object, markDoc?: boolean)
+local function searchFieldByGlobalID(suri, source, key, ref, pushResult)
+    local node = source._globalNode
+    if not node then
+        return
+    end
+    if node.cate == 'variable' then
+        if key then
+            if type(key) ~= 'string' then
+                return
+            end
+            local global = vm.getGlobal('variable', node.name, key)
+            if global then
+                for _, set in ipairs(global:getSets(suri)) do
+                    pushResult(set)
+                end
+                for _, get in ipairs(global:getGets(suri)) do
+                    pushResult(get)
+                end
+            end
+        else
+            local globals = vm.getGlobalFields('variable', node.name)
+            for _, global in ipairs(globals) do
+                for _, set in ipairs(global:getSets(suri)) do
+                    pushResult(set)
+                end
+                for _, get in ipairs(global:getGets(suri)) do
+                    pushResult(get)
+                end
+            end
+        end
+    end
+    if node.cate == 'type' then
+        vm.getClassFields(suri, node, key, ref, pushResult)
+    end
+end
+
 local searchFieldSwitch = util.switch()
     : case 'table'
     : call(function (suri, source, key, ref, pushResult)
@@ -106,37 +190,6 @@ local searchFieldSwitch = util.switch()
         local stringlib = vm.getGlobal('type', 'stringlib')
         if stringlib then
             vm.getClassFields(suri, stringlib, key, ref, pushResult)
-        end
-    end)
-    : case 'local'
-    : case 'self'
-    : call(function (suri, node, key, ref, pushResult)
-        local fields
-        if key then
-            fields = vm.getLocalSourcesSets(node, key)
-        else
-            fields = vm.getLocalFields(node, false)
-        end
-        if not fields then
-            return
-        end
-        local hasMarkDoc = {}
-        for _, src in ipairs(fields) do
-            if src.bindDocs then
-                if bindDocs(src) then
-                    local skey = guide.getKeyName(src)
-                    if skey then
-                        hasMarkDoc[skey] = true
-                    end
-                    pushResult(src, true)
-                end
-            end
-        end
-        for _, src in ipairs(fields) do
-            local skey = guide.getKeyName(src)
-            if not hasMarkDoc[skey] then
-                pushResult(src)
-            end
         end
     end)
     : case 'doc.type.array'
@@ -217,39 +270,8 @@ local searchFieldSwitch = util.switch()
         end
     end)
     : default(function (suri, source, key, ref, pushResult)
-        local node = source._globalNode
-        if not node then
-            return
-        end
-        if node.cate == 'variable' then
-            if key then
-                if type(key) ~= 'string' then
-                    return
-                end
-                local global = vm.getGlobal('variable', node.name, key)
-                if global then
-                    for _, set in ipairs(global:getSets(suri)) do
-                        pushResult(set)
-                    end
-                    for _, get in ipairs(global:getGets(suri)) do
-                        pushResult(get)
-                    end
-                end
-            else
-                local globals = vm.getGlobalFields('variable', node.name)
-                for _, global in ipairs(globals) do
-                    for _, set in ipairs(global:getSets(suri)) do
-                        pushResult(set)
-                    end
-                    for _, get in ipairs(global:getGets(suri)) do
-                        pushResult(get)
-                    end
-                end
-            end
-        end
-        if node.cate == 'type' then
-            vm.getClassFields(suri, node, key, ref, pushResult)
-        end
+        searchFieldByLocalID(source, key, ref, pushResult)
+        searchFieldByGlobalID(suri, source, key, ref, pushResult)
     end)
 
 ---@param suri uri
@@ -624,6 +646,7 @@ function vm.compileByParentNode(source, key, ref, pushResult)
     local parentNode = vm.compileNode(source)
     local docedResults = {}
     local commonResults = {}
+    local mark = {}
     local suri = guide.getUri(source)
     local hasClass
     for node in parentNode:eachObject() do
@@ -645,6 +668,10 @@ function vm.compileByParentNode(source, key, ref, pushResult)
         )
         or guide.isLiteral(node) then
             searchFieldSwitch(node.type, suri, node, key, ref, function (res, markDoc)
+                if mark[res] then
+                    return
+                end
+                mark[res] = true
                 if markDoc then
                     docedResults[#docedResults+1] = res
                 else
@@ -653,6 +680,21 @@ function vm.compileByParentNode(source, key, ref, pushResult)
             end)
         end
     end
+
+    if not next(mark) then
+        searchFieldByLocalID(source, key, ref, function (res, markDoc)
+            if mark[res] then
+                return
+            end
+            mark[res] = true
+            if markDoc then
+                docedResults[#docedResults+1] = res
+            else
+                commonResults[#commonResults+1] = res
+            end
+        end)
+    end
+
     if #docedResults > 0 then
         for _, res in ipairs(docedResults) do
             pushResult(res)

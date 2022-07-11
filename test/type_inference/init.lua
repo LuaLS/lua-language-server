@@ -3680,3 +3680,26 @@ local t
 
 local <?x?> = t and t[i]
 ]]
+
+TEST 'number' [[
+---@type number
+local x
+
+if not <?x?>.y then
+    x = nil
+end
+]]
+
+TEST 'number' [[
+---@type number|nil
+local x
+while x == nil do
+    if x == nil then
+        return
+    end
+
+    x = nil
+end
+
+print(<?x?>)
+]]

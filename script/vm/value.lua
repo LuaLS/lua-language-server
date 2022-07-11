@@ -23,7 +23,8 @@ function vm.testCondition(source)
                 hasFalse = true
             end
         elseif n.type == 'global' and n.cate == 'type' then
-            if n.name == 'boolean' then
+            if n.name == 'boolean'
+            or n.name == 'unknown' then
                 return nil
             end
             if n.name == 'false'

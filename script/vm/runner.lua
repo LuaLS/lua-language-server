@@ -136,6 +136,7 @@ function mt:_lookIntoChild(action, topNode, outNode)
         if action.op.type == 'not' then
             outNode = outNode or topNode:copy()
             outNode, topNode = self:_lookIntoChild(action[1], topNode, outNode)
+            outNode = outNode:copy()
         end
     elseif action.type == 'binary' then
         if not action[1] or not action[2] then
@@ -242,8 +243,13 @@ function mt:_lookIntoChild(action, topNode, outNode)
             mainNode  = topNode:copy()
         end
         blockNode = self:_lookIntoBlock(action, blockNode:copy())
-        if mainNode then
-            topNode = mainNode:merge(blockNode)
+        topNode = mainNode:merge(blockNode)
+        if action.filter then
+            -- look into filter again
+            guide.eachSource(action.filter, function (src)
+                self._mark[src] = nil
+            end)
+            blockNode, topNode = self:_lookIntoChild(action.filter, topNode:copy(), topNode:copy())
         end
     elseif action.type == 'if' then
         local hasElse

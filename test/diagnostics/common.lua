@@ -1659,6 +1659,12 @@ TEST [[
 ]]
 
 TEST [[
+---@diagnostic disable: unused-local
+local x, y
+---@cast y number
+]]
+
+TEST [[
 ---@class A
 
 ---@class B

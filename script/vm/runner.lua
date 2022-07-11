@@ -103,6 +103,7 @@ function mt:_fastWardCasts(pos, topNode)
             end
         end
     end
+    self._index = self._index + 1
     return topNode
 end
 

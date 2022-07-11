@@ -216,6 +216,11 @@ function mt:setFalsy()
             self[c] = nil
             goto CONTINUE
         end
+        if guide.isLiteral(c) then
+            table.remove(self, index)
+            self[c] = nil
+            goto CONTINUE
+        end
         ::CONTINUE::
     end
     if hasBoolean then

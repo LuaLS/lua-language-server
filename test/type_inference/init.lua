@@ -3666,3 +3666,17 @@ TEST 'unknown' [[
 ---@type _, number
 local <?x?>, y
 ]]
+
+TEST 'number[]' [[
+local t
+---@cast t number[]?
+
+local x = t and <?t?>[i]
+]]
+
+TEST 'number?' [[
+---@type number[]?
+local t
+
+local <?x?> = t and t[i]
+]]

@@ -92,16 +92,4 @@ function table.foreachi(list, callback) end
 ---@deprecated
 function table.getn(list) end
 
----@version JIT
----#DES 'table.new'
----@param narray integer
----@param nhash integer
----@return table
-function table.new(narray, nhash) end
-
----@version JIT
----#DES 'table.clear'
----@param tab table
-function table.clear(tab) end
-
 return table

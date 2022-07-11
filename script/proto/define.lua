@@ -165,21 +165,23 @@ m.TokenTypes = {
 }
 
 m.BuiltIn = {
-    ['basic']     = 'default',
-    ['bit']       = 'default',
-    ['bit32']     = 'default',
-    ['builtin']   = 'default',
-    ['coroutine'] = 'default',
-    ['debug']     = 'default',
-    ['ffi']       = 'default',
-    ['io']        = 'default',
-    ['jit']       = 'default',
-    ['math']      = 'default',
-    ['os']        = 'default',
-    ['package']   = 'default',
-    ['string']    = 'default',
-    ['table']     = 'default',
-    ['utf8']      = 'default',
+    ['basic']       = 'default',
+    ['bit']         = 'default',
+    ['bit32']       = 'default',
+    ['builtin']     = 'default',
+    ['coroutine']   = 'default',
+    ['debug']       = 'default',
+    ['ffi']         = 'default',
+    ['io']          = 'default',
+    ['jit']         = 'default',
+    ['math']        = 'default',
+    ['os']          = 'default',
+    ['package']     = 'default',
+    ['string']      = 'default',
+    ['table']       = 'default',
+    ['table.new']   = 'default',
+    ['table.clear'] = 'default',
+    ['utf8']        = 'default',
 }
 
 m.InlayHintKind = {

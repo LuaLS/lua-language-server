@@ -2834,7 +2834,16 @@ local function compileExpAsAction(exp)
     pushActionIntoCurrentChunk(exp)
     if GetToSetMap[exp.type] then
         skipSpace()
-        local action, isSet = parseMultiVars(exp, parseExp)
+        local isLocal
+        if exp.type == 'getlocal' and exp[1] == State.ENVMode then
+            exp.special = nil
+            local loc = createLocal(exp, parseLocalAttrs())
+            loc.locPos = exp.start
+            loc.effect = maxinteger
+            isLocal = true
+            skipSpace()
+        end
+        local action, isSet = parseMultiVars(exp, parseExp, isLocal)
         if isSet
         or action.type == 'getmethod' then
             return action

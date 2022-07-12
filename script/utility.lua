@@ -799,6 +799,8 @@ function m.multiTable(count, default)
     return current
 end
 
+---@param t table
+---@param sorter boolean|function
 function m.getTableKeys(t, sorter)
     local keys = {}
     for k in pairs(t) do
@@ -806,7 +808,7 @@ function m.getTableKeys(t, sorter)
     end
     if sorter == true then
         tableSort(keys)
-    elseif sorter then
+    elseif type(sorter) == 'function' then
         tableSort(keys, sorter)
     end
     return keys

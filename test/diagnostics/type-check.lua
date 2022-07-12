@@ -694,5 +694,12 @@ mt.x = 1
 mt.x = nil
 ]]
 
+TEST [[
+---@type string[]
+local t
+
+<!t!> = 'xxx'
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

@@ -153,7 +153,7 @@ function vm.isSubType(uri, child, parent, mark)
     end
 
     -- check class parent
-    if childName and not mark[childName] then
+    if childName and not mark[childName] and not guide.isBasicType(childName) then
         mark[childName] = true
         local childClass = vm.getGlobal('type', childName)
         if childClass then

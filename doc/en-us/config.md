@@ -205,9 +205,9 @@ Array<string>
 * ``"newfield-call"``
 * ``"err-assign-as-eq"``
 * ``"undefined-doc-param"``
-* ``"param-type-mismatch"``
+* ``"undefined-global"``
 * ``"global-in-nil-env"``
-* ``"unused-vararg"``
+* ``"redundant-return-value"``
 * ``"miss-sep-in-table"``
 * ``"unknown-cast-variable"``
 * ``"unknown-operator"``
@@ -222,66 +222,67 @@ Array<string>
 * ``"redundant-value"``
 * ``"duplicate-doc-alias"``
 * ``"doc-field-no-class"``
-* ``"no-visible-label"``
 * ``"miss-loop-min"``
-* ``"miss-exp"``
+* ``"no-visible-label"``
 * ``"miss-loop-max"``
+* ``"miss-exp"``
+* ``"unicode-name"``
 * ``"miss-name"``
 * ``"empty-block"``
-* ``"unused-local"``
 * ``"err-then-as-do"``
-* ``"duplicate-doc-field"``
 * ``"redefined-label"``
+* ``"duplicate-doc-field"``
 * ``"exp-in-action"``
 * ``"set-const"``
-* ``"circle-doc-class"``
 * ``"unexpect-lfunc-name"``
-* ``"unsupport-symbol"``
-* ``"unused-label"``
+* ``"circle-doc-class"``
 * ``"action-after-return"``
+* ``"miss-space-between"``
+* ``"unused-label"``
 * ``"unexpect-dots"``
-* ``"redundant-return-value"``
+* ``"duplicate-index"``
+* ``"miss-field"``
 * ``"jump-local-scope"``
 * ``"close-non-object"``
-* ``"miss-field"``
+* ``"unexpect-symbol"``
 * ``"count-down-loop"``
 * ``"cast-type-mismatch"``
 * ``"newline-call"``
-* ``"unexpect-symbol"``
+* ``"missing-parameter"``
 * ``"block-after-else"``
-* ``"unicode-name"``
 * ``"miss-exponent"``
 * ``"err-esc"``
 * ``"local-limit"``
+* ``"unsupport-symbol"``
 * ``"trailing-space"``
 * ``"err-c-long-comment"``
-* ``"undefined-global"``
-* ``"undefined-doc-name"``
+* ``"unbalanced-assignments"``
+* ``"duplicate-doc-param"``
 * ``"ambiguity-1"``
 * ``"deprecated"``
 * ``"codestyle-check"``
 * ``"missing-return"``
-* ``"missing-parameter"``
+* ``"code-after-break"``
 * ``"unused-function"``
 * ``"cast-local-type"``
 * ``"assign-type-mismatch"``
 * ``"duplicate-set-field"``
-* ``"no-unknown"``
+* ``"unused-vararg"``
 * ``"need-check-nil"``
 * ``"keyword"``
+* ``"unused-local"``
 * ``"unknown-diag-code"``
-* ``"return-type-mismatch"``
 * ``"err-comment-prefix"``
 * ``"lowercase-global"``
-* ``"unbalanced-assignments"``
 * ``"redefined-local"``
-* ``"code-after-break"``
-* ``"duplicate-index"``
-* ``"duplicate-doc-param"``
+* ``"undefined-doc-name"``
+* ``"no-unknown"``
+* ``"unreachable-code"``
+* ``"param-type-mismatch"``
 * ``"index-in-func-name"``
 * ``"miss-symbol"``
 * ``"undefined-field"``
-* ``"miss-space-between"``
+* ``"return-type-mismatch"``
 
 ## default
 
@@ -450,6 +451,7 @@ object<string, string>
     * empty-block
     * redundant-return
     * trailing-space
+    * unreachable-code
     * unused-function
     * unused-label
     * unused-local
@@ -568,6 +570,7 @@ object<string, string>
     * empty-block
     * redundant-return
     * trailing-space
+    * unreachable-code
     * unused-function
     * unused-label
     * unused-local
@@ -737,6 +740,7 @@ object<string, string>
     "unknown-cast-variable": "Any",
     "unknown-diag-code": "Any",
     "unknown-operator": "Any",
+    "unreachable-code": "Opened",
     /*
     Enable unused function diagnostics.
     */
@@ -872,6 +876,7 @@ object<string, string>
     "unknown-cast-variable": "Warning",
     "unknown-diag-code": "Warning",
     "unknown-operator": "Warning",
+    "unreachable-code": "Hint",
     /*
     Enable unused function diagnostics.
     */
@@ -1271,6 +1276,8 @@ object<string, string>
     "package": "default",
     "string": "default",
     "table": "default",
+    "table.clear": "default",
+    "table.new": "default",
     "utf8": "default"
 }
 ```

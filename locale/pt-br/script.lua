@@ -142,6 +142,8 @@ DIAG_RETURN_TYPE_MISMATCH             = -- TODO: need translate!
 'The type of the {index} return value is `{def}`, but the actual return is `{ref}`.'
 DIAG_UNKNOWN_OPERATOR                 = -- TODO: need translate!
 'Unknown operator `{}`.'
+DIAG_UNREACHABLE_CODE                 = -- TODO: need translate!
+'Unreachable code.'
 
 MWS_NOT_SUPPORT         =
 '{} não é suportado múltiplos espaços de trabalho por enquanto, posso precisar reiniciar para estabelecer um novo espaço de trabalho ...'

@@ -1958,3 +1958,31 @@ local <!ll!>
 ]]
 
 config.remove(nil, 'Lua.diagnostics.unusedLocalExclude', 'll_*')
+
+TEST [[
+---@diagnostic disable: undefined-global
+
+if X then
+    return false
+elseif X then
+    return false
+else
+    return false
+end
+<!return true!>
+]]
+
+TEST [[
+---@diagnostic disable: undefined-global
+
+function X()
+    if X then
+        return false
+    elseif X then
+        return false
+    else
+        return false
+    end
+    <!return true!>
+end
+]]

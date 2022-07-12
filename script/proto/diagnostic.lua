@@ -47,6 +47,7 @@ m.register {
     'redundant-return',
     'empty-block',
     'code-after-break',
+    'unreachable-code',
 } {
     group    = 'unused',
     severity = 'Hint',

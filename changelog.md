@@ -13,6 +13,7 @@
   ```
 * `NEW` diagnostics:
   * `unknown-operator`
+  * `unreachable-code`
 * `NEW` settings:
   * `diagnostics.unusedLocalExclude`
 * `CHG` support multi-type:

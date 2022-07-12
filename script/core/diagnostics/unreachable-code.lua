@@ -3,6 +3,7 @@ local guide  = require 'parser.guide'
 local vm     = require 'vm'
 local lang   = require 'language'
 local await  = require 'await'
+local define = require 'proto.define'
 
 ---@param block parser.object
 ---@return boolean
@@ -56,8 +57,9 @@ return function (uri, callback)
             and hasReturn(action) then
                 if i < #source then
                     callback {
-                        start = source[i+1].start,
-                        finish = source[#source].finish,
+                        start   = source[i+1].start,
+                        finish  = source[#source].finish,
+                        tags    = { define.DiagnosticTag.Unnecessary },
                         message = lang.script('DIAG_UNREACHABLE_CODE'),
                     }
                 end

@@ -1309,3 +1309,37 @@ local n: integer
 ---
  comments]]
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            --[here](x.lua)
+            local <?n?>
+        ]]
+    },
+    hover = [[
+```lua
+local n: unknown
+```
+
+---
+[here](file:///x.lua)]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            --[here](D:/x.lua)
+            local <?n?>
+        ]]
+    },
+    hover = [[
+```lua
+local n: unknown
+```
+
+---
+[here](file:///d%3A/x.lua)]]
+}

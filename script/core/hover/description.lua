@@ -6,6 +6,7 @@ local lang     = require 'language'
 local util     = require 'utility'
 local guide    = require 'parser.guide'
 local rpath    = require 'workspace.require-path'
+local furi     = require 'file-uri'
 
 local function collectRequire(mode, literal, uri)
     local result, searchers
@@ -97,6 +98,30 @@ local function getBindComment(source)
     return table.concat(lines, '\n')
 end
 
+---@param comment string
+---@param suri uri
+---@return string?
+local function normalizeComment(comment, suri)
+    if comment:sub(1, 1) == '-' then
+        comment = comment:sub(2)
+    end
+    if comment:sub(1, 1) == '@' then
+        return nil
+    end
+    comment = comment:gsub('(%[.-%]%()(.-)(%))', function (left, path, right)
+        if path:match '^file:/' then
+            return
+        end
+        local absPath = ws.getAbsolutePath(suri:gsub('/[^/]+$', ''), path)
+        if not absPath then
+            return
+        end
+        local uri     = furi.encode(absPath)
+        return left .. uri .. right
+    end)
+    return comment
+end
+
 local function lookUpDocComments(source, docGroup)
     if source.type == 'setlocal'
     or source.type == 'getlocal' then
@@ -105,16 +130,11 @@ local function lookUpDocComments(source, docGroup)
     if source.parent.type == 'funcargs' then
         return
     end
+    local uri = guide.getUri(source)
     local lines = {}
     for _, doc in ipairs(docGroup) do
         if doc.type == 'doc.comment' then
-            local comment = doc.comment.text
-            if comment:sub(1, 1) == '-' then
-                comment = comment:sub(2)
-            end
-            if comment:sub(1, 1) == '@' then
-                goto CONTINUE
-            end
+            local comment = normalizeComment(doc.comment.text, uri)
             lines[#lines+1] = comment
         elseif doc.type == 'doc.type' then
             if doc.comment then
@@ -273,16 +293,11 @@ local function getFunctionComment(source)
         end
     end
 
+    local uri = guide.getUri(source)
     local md = markdown()
     for _, doc in ipairs(docGroup) do
         if     doc.type == 'doc.comment' then
-            local comment = doc.comment.text
-            if comment:sub(1, 1) == '-' then
-                comment = comment:sub(2)
-            end
-            if comment:sub(1, 1) == '@' then
-                goto CONTINUE
-            end
+            local comment = normalizeComment(doc.comment.text, uri)
             md:add('md', comment)
         elseif doc.type == 'doc.param' then
             if doc.comment then

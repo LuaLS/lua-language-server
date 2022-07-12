@@ -34,6 +34,11 @@
   ---@class MyClass: BaseClass
   local MyClass = BaseClass -- OK!
   ```
+* `CHG` hover: supports path in link
+  ```lua
+  --![](image.png) --> will convert to `--![](file:///xxxx/image.png)`
+  local x
+  ```
 * `FIX` [#880](https://github.com/sumneko/lua-language-server/issues/880)
 * `FIX` [#1284](https://github.com/sumneko/lua-language-server/issues/1284)
 * `FIX` [#1292](https://github.com/sumneko/lua-language-server/issues/1292)

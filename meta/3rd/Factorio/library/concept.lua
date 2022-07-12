@@ -1,7 +1,7 @@
 ---@meta
 
 ---@class AchievementPrototypeFilter
----@field filter "type" @The condition to filter on. One of `"allowed-without-fight"`, `"type"`.
+---@field filter string|"type" @The condition to filter on. One of `"allowed-without-fight"`, `"type"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field type? string|string[]
@@ -417,7 +417,7 @@
 ---@field position TilePosition
 
 ---@class DecorativePrototypeFilter
----@field filter "collision-mask" @The condition to filter on. One of `"decal"`, `"autoplace"`, `"collision-mask"`.
+---@field filter string|"collision-mask" @The condition to filter on. One of `"decal"`, `"autoplace"`, `"collision-mask"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field mask_mode? string
@@ -481,7 +481,7 @@
 ---@field settler_group_min_size uint @The minimum size of a biter group that goes to build a new base. This is multiplied by the evolution factor. Defaults to `5`.
 
 ---@class EntityPrototypeFilter
----@field filter "name"|"type"|"collision-mask"|"flag"|"build-base-evolution-requirement"|"selection-priority"|"emissions"|"crafting-category" @The condition to filter on. One of `"flying-robot"`, `"robot-with-logistics-interface"`, `"rail"`, `"ghost"`, `"explosion"`, `"vehicle"`, `"crafting-machine"`, `"rolling-stock"`, `"turret"`, `"transport-belt-connectable"`, `"wall-connectable"`, `"buildable"`, `"placable-in-editor"`, `"clonable"`, `"selectable"`, `"hidden"`, `"entity-with-health"`, `"building"`, `"fast-replaceable"`, `"uses-direction"`, `"minable"`, `"circuit-connectable"`, `"autoplace"`, `"blueprintable"`, `"item-to-place"`, `"name"`, `"type"`, `"collision-mask"`, `"flag"`, `"build-base-evolution-requirement"`, `"selection-priority"`, `"emissions"`, `"crafting-category"`.
+---@field filter string|"name"|"type"|"collision-mask"|"flag"|"build-base-evolution-requirement"|"selection-priority"|"emissions"|"crafting-category" @The condition to filter on. One of `"flying-robot"`, `"robot-with-logistics-interface"`, `"rail"`, `"ghost"`, `"explosion"`, `"vehicle"`, `"crafting-machine"`, `"rolling-stock"`, `"turret"`, `"transport-belt-connectable"`, `"wall-connectable"`, `"buildable"`, `"placable-in-editor"`, `"clonable"`, `"selectable"`, `"hidden"`, `"entity-with-health"`, `"building"`, `"fast-replaceable"`, `"uses-direction"`, `"minable"`, `"circuit-connectable"`, `"autoplace"`, `"blueprintable"`, `"item-to-place"`, `"name"`, `"type"`, `"collision-mask"`, `"flag"`, `"build-base-evolution-requirement"`, `"selection-priority"`, `"emissions"`, `"crafting-category"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field crafting_category? string
@@ -549,7 +549,7 @@
 ---@field [2] int
 
 ---@class EquipmentPrototypeFilter
----@field filter "type" @The condition to filter on. One of `"item-to-place"`, `"type"`.
+---@field filter string|"type" @The condition to filter on. One of `"item-to-place"`, `"type"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field type? string|string[]
@@ -612,7 +612,7 @@
 ---@alias FluidIdentification string|LuaFluidPrototype|Fluid
 
 ---@class FluidPrototypeFilter
----@field filter "name"|"subgroup"|"default-temperature"|"max-temperature"|"heat-capacity"|"fuel-value"|"emissions-multiplier"|"gas-temperature" @The condition to filter on. One of `"hidden"`, `"name"`, `"subgroup"`, `"default-temperature"`, `"max-temperature"`, `"heat-capacity"`, `"fuel-value"`, `"emissions-multiplier"`, `"gas-temperature"`.
+---@field filter string|"name"|"subgroup"|"default-temperature"|"max-temperature"|"heat-capacity"|"fuel-value"|"emissions-multiplier"|"gas-temperature" @The condition to filter on. One of `"hidden"`, `"name"`, `"subgroup"`, `"default-temperature"`, `"max-temperature"`, `"heat-capacity"`, `"fuel-value"`, `"emissions-multiplier"`, `"gas-temperature"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field value? double
@@ -701,7 +701,7 @@
 ---@field name string @Item prototype name of the item to filter.
 
 ---@class ItemPrototypeFilter
----@field filter "place-result"|"burnt-result"|"place-as-tile"|"placed-as-equipment-result"|"name"|"type"|"flag"|"subgroup"|"fuel-category"|"stack-size"|"default-request-amount"|"wire-count"|"fuel-value"|"fuel-acceleration-multiplier"|"fuel-top-speed-multiplier"|"fuel-emissions-multiplier" @The condition to filter on. One of `"tool"`, `"mergeable"`, `"item-with-inventory"`, `"selection-tool"`, `"item-with-label"`, `"has-rocket-launch-products"`, `"fuel"`, `"place-result"`, `"burnt-result"`, `"place-as-tile"`, `"placed-as-equipment-result"`, `"name"`, `"type"`, `"flag"`, `"subgroup"`, `"fuel-category"`, `"stack-size"`, `"default-request-amount"`, `"wire-count"`, `"fuel-value"`, `"fuel-acceleration-multiplier"`, `"fuel-top-speed-multiplier"`, `"fuel-emissions-multiplier"`.
+---@field filter string|"place-result"|"burnt-result"|"place-as-tile"|"placed-as-equipment-result"|"name"|"type"|"flag"|"subgroup"|"fuel-category"|"stack-size"|"default-request-amount"|"wire-count"|"fuel-value"|"fuel-acceleration-multiplier"|"fuel-top-speed-multiplier"|"fuel-emissions-multiplier" @The condition to filter on. One of `"tool"`, `"mergeable"`, `"item-with-inventory"`, `"selection-tool"`, `"item-with-label"`, `"has-rocket-launch-products"`, `"fuel"`, `"place-result"`, `"burnt-result"`, `"place-as-tile"`, `"placed-as-equipment-result"`, `"name"`, `"type"`, `"flag"`, `"subgroup"`, `"fuel-category"`, `"stack-size"`, `"default-request-amount"`, `"wire-count"`, `"fuel-value"`, `"fuel-acceleration-multiplier"`, `"fuel-top-speed-multiplier"`, `"fuel-emissions-multiplier"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field value? uint|double
@@ -795,14 +795,14 @@
 ---@field probability double @Probability that any loot at all will drop, as a number in range [0, 1].
 
 ---@class LuaEntityClonedEventFilter
----@field filter "type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
+---@field filter string|"type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field name? string
 ---@field type? string
 
 ---@class LuaEntityDamagedEventFilter
----@field filter "type"|"name"|"ghost_type"|"ghost_name"|"original-damage-amount"|"final-damage-amount"|"damage-type"|"final-health" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`, `"original-damage-amount"`, `"final-damage-amount"`, `"damage-type"`, `"final-health"`.
+---@field filter string|"type"|"name"|"ghost_type"|"ghost_name"|"original-damage-amount"|"final-damage-amount"|"damage-type"|"final-health" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`, `"original-damage-amount"`, `"final-damage-amount"`, `"damage-type"`, `"final-health"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field value? float
@@ -811,35 +811,35 @@
 ---@field comparison? ComparatorString
 
 ---@class LuaEntityDeconstructionCancelledEventFilter
----@field filter "type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
+---@field filter string|"type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field name? string
 ---@field type? string
 
 ---@class LuaEntityDiedEventFilter
----@field filter "type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
+---@field filter string|"type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field name? string
 ---@field type? string
 
 ---@class LuaEntityMarkedForDeconstructionEventFilter
----@field filter "type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
+---@field filter string|"type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field name? string
 ---@field type? string
 
 ---@class LuaEntityMarkedForUpgradeEventFilter
----@field filter "type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
+---@field filter string|"type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field name? string
 ---@field type? string
 
 ---@class LuaPlayerBuiltEntityEventFilter
----@field filter "type"|"name"|"ghost_type"|"ghost_name"|"force" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`, `"force"`.
+---@field filter string|"type"|"name"|"ghost_type"|"ghost_name"|"force" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`, `"force"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field type? string
@@ -847,48 +847,48 @@
 ---@field force? string
 
 ---@class LuaPlayerMinedEntityEventFilter
----@field filter "type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
+---@field filter string|"type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field name? string
 ---@field type? string
 
 ---@class LuaPlayerRepairedEntityEventFilter
----@field filter "type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
+---@field filter string|"type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field name? string
 ---@field type? string
 
 ---@class LuaPostEntityDiedEventFilter
----@field filter "type" @The condition to filter on. Can only be `"type"`.
+---@field filter string|"type" @The condition to filter on. Can only be `"type"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field type? string
 
 ---@class LuaPreGhostDeconstructedEventFilter
----@field filter "type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
+---@field filter string|"type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field name? string
 ---@field type? string
 
 ---@class LuaPrePlayerMinedEntityEventFilter
----@field filter "type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
+---@field filter string|"type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field name? string
 ---@field type? string
 
 ---@class LuaPreRobotMinedEntityEventFilter
----@field filter "type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
+---@field filter string|"type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field name? string
 ---@field type? string
 
 ---@class LuaRobotBuiltEntityEventFilter
----@field filter "type"|"name"|"ghost_type"|"ghost_name"|"force" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`, `"force"`.
+---@field filter string|"type"|"name"|"ghost_type"|"ghost_name"|"force" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`, `"force"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field type? string
@@ -896,42 +896,42 @@
 ---@field force? string
 
 ---@class LuaRobotMinedEntityEventFilter
----@field filter "type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
+---@field filter string|"type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field name? string
 ---@field type? string
 
 ---@class LuaScriptRaisedBuiltEventFilter
----@field filter "type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
+---@field filter string|"type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field name? string
 ---@field type? string
 
 ---@class LuaScriptRaisedDestroyEventFilter
----@field filter "type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
+---@field filter string|"type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field name? string
 ---@field type? string
 
 ---@class LuaScriptRaisedReviveEventFilter
----@field filter "type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
+---@field filter string|"type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field name? string
 ---@field type? string
 
 ---@class LuaSectorScannedEventFilter
----@field filter "type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
+---@field filter string|"type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field name? string
 ---@field type? string
 
 ---@class LuaUpgradeCancelledEventFilter
----@field filter "type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
+---@field filter string|"type"|"name"|"ghost_type"|"ghost_name" @The condition to filter on. One of `"ghost"`, `"rail"`, `"rail-signal"`, `"rolling-stock"`, `"robot-with-logistics-interface"`, `"vehicle"`, `"turret"`, `"crafting-machine"`, `"wall-connectable"`, `"transport-belt-connectable"`, `"circuit-network-connectable"`, `"type"`, `"name"`, `"ghost_type"`, `"ghost_name"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field name? string
@@ -1076,7 +1076,7 @@
 ---@field value uint|double|boolean|string @The value of the mod setting. The type depends on the setting.
 
 ---@class ModSettingPrototypeFilter
----@field filter "type"|"mod"|"setting-type" @The condition to filter on. One of `"type"`, `"mod"`, `"setting-type"`.
+---@field filter string|"type"|"mod"|"setting-type" @The condition to filter on. One of `"type"`, `"mod"`, `"setting-type"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field mod? string
@@ -1271,7 +1271,7 @@
 ---@alias RealOrientation  any
 
 ---@class RecipePrototypeFilter
----@field filter "has-ingredient-item"|"has-ingredient-fluid"|"has-product-item"|"has-product-fluid"|"subgroup"|"category"|"energy"|"emissions-multiplier"|"request-paste-multiplier"|"overload-multiplier" @The condition to filter on. One of `"enabled"`, `"hidden"`, `"hidden-from-flow-stats"`, `"hidden-from-player-crafting"`, `"allow-as-intermediate"`, `"allow-intermediates"`, `"allow-decomposition"`, `"always-show-made-in"`, `"always-show-products"`, `"show-amount-in-title"`, `"has-ingredients"`, `"has-products"`, `"has-ingredient-item"`, `"has-ingredient-fluid"`, `"has-product-item"`, `"has-product-fluid"`, `"subgroup"`, `"category"`, `"energy"`, `"emissions-multiplier"`, `"request-paste-multiplier"`, `"overload-multiplier"`.
+---@field filter string|"has-ingredient-item"|"has-ingredient-fluid"|"has-product-item"|"has-product-fluid"|"subgroup"|"category"|"energy"|"emissions-multiplier"|"request-paste-multiplier"|"overload-multiplier" @The condition to filter on. One of `"enabled"`, `"hidden"`, `"hidden-from-flow-stats"`, `"hidden-from-player-crafting"`, `"allow-as-intermediate"`, `"allow-intermediates"`, `"allow-decomposition"`, `"always-show-made-in"`, `"always-show-products"`, `"show-amount-in-title"`, `"has-ingredients"`, `"has-products"`, `"has-ingredient-item"`, `"has-ingredient-fluid"`, `"has-product-item"`, `"has-product-fluid"`, `"subgroup"`, `"category"`, `"energy"`, `"emissions-multiplier"`, `"request-paste-multiplier"`, `"overload-multiplier"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field comparison? ComparatorString
@@ -1533,7 +1533,7 @@
 ---@field type string @Modifier type. Specifies which of the other fields will be available. Possible values are: `"inserter-stack-size-bonus"`, `"stack-inserter-capacity-bonus"`, `"laboratory-speed"`, `"character-logistic-trash-slots"`, `"maximum-following-robots-count"`, `"worker-robot-speed"`, `"worker-robot-storage"`, `"ghost-time-to-live"`, `"turret-attack"`, `"ammo-damage"`, `"give-item"`, `"gun-speed"`, `"unlock-recipe"`, `"character-crafting-speed"`, `"character-mining-speed"`, `"character-running-speed"`, `"character-build-distance"`, `"character-item-drop-distance"`, `"character-reach-distance"`, `"character-resource-reach-distance"`, `"character-item-pickup-distance"`, `"character-loot-pickup-distance"`, `"character-inventory-slots-bonus"`, `"deconstruction-time-to-live"`, `"max-failed-attempts-per-tick-per-construction-queue"`, `"max-successful-attempts-per-tick-per-construction-queue"`, `"character-health-bonus"`, `"mining-drill-productivity-bonus"`, `"train-braking-force-bonus"`, `"zoom-to-world-enabled"`, `"zoom-to-world-ghost-building-enabled"`, `"zoom-to-world-blueprint-enabled"`, `"zoom-to-world-deconstruction-planner-enabled"`, `"zoom-to-world-upgrade-planner-enabled"`, `"zoom-to-world-selection-tool-enabled"`, `"worker-robot-battery"`, `"laboratory-productivity"`, `"follower-robot-lifetime"`, `"artillery-range"`, `"nothing"`, `"character-additional-mining-categories"`, `"character-logistic-requests"`.
 
 ---@class TechnologyPrototypeFilter
----@field filter "research-unit-ingredient"|"level"|"max-level"|"time" @The condition to filter on. One of `"enabled"`, `"hidden"`, `"upgrade"`, `"visible-when-disabled"`, `"has-effects"`, `"has-prerequisites"`, `"research-unit-ingredient"`, `"level"`, `"max-level"`, `"time"`.
+---@field filter string|"research-unit-ingredient"|"level"|"max-level"|"time" @The condition to filter on. One of `"enabled"`, `"hidden"`, `"upgrade"`, `"visible-when-disabled"`, `"has-effects"`, `"has-prerequisites"`, `"research-unit-ingredient"`, `"level"`, `"max-level"`, `"time"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field value? uint
@@ -1552,7 +1552,7 @@
 ---@field [2] int
 
 ---@class TilePrototypeFilter
----@field filter "collision-mask"|"walking-speed-modifier"|"vehicle-friction-modifier"|"decorative-removal-probability"|"emissions" @The condition to filter on. One of `"minable"`, `"autoplace"`, `"blueprintable"`, `"item-to-place"`, `"collision-mask"`, `"walking-speed-modifier"`, `"vehicle-friction-modifier"`, `"decorative-removal-probability"`, `"emissions"`.
+---@field filter string|"collision-mask"|"walking-speed-modifier"|"vehicle-friction-modifier"|"decorative-removal-probability"|"emissions" @The condition to filter on. One of `"minable"`, `"autoplace"`, `"blueprintable"`, `"item-to-place"`, `"collision-mask"`, `"walking-speed-modifier"`, `"vehicle-friction-modifier"`, `"decorative-removal-probability"`, `"emissions"`.
 ---@field mode? "or"|"and" @How to combine this with the previous filter. Must be `"or"` or `"and"`. Defaults to `"or"`. When evaluating the filters, `"and"` has higher precedence than `"or"`.
 ---@field invert? boolean @Inverts the condition. Default is `false`.
 ---@field value? double|float

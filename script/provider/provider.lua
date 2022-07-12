@@ -21,6 +21,7 @@ local furi       = require 'file-uri'
 local inspect    = require 'inspect'
 local markdown   = require 'provider.markdown'
 local guide      = require 'parser.guide'
+local vm         = require 'vm.vm'
 
 ---@async
 local function updateConfig(uri)
@@ -1335,6 +1336,13 @@ m.register 'workspace/diagnostic' {
             })
         end)
         return { items = {} }
+    end
+}
+
+m.register '$/api/report' {
+    ---@async
+    function (params)
+        vm.saveMemoryAPI(params)
     end
 }
 

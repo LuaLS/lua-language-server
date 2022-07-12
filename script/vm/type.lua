@@ -153,14 +153,16 @@ function vm.isSubType(uri, child, parent, mark)
     end
 
     -- check class parent
-    if childName and not mark[childName] and not guide.isBasicType(childName) then
+    if childName and not mark[childName] then
         mark[childName] = true
+        local isBasicType = guide.isBasicType(childName)
         local childClass = vm.getGlobal('type', childName)
         if childClass then
             for _, set in ipairs(childClass:getSets(uri)) do
                 if set.type == 'doc.class' and set.extends then
                     for _, ext in ipairs(set.extends) do
                         if  ext.type == 'doc.extends.name'
+                        and (not isBasicType or guide.isBasicType(ext[1]))
                         and vm.isSubType(uri, ext[1], parent, mark) then
                             return true
                         end

@@ -538,7 +538,7 @@ m.exclude = private(function (...)
 end)
 
 --- 比较2个报告
----@return string
+---@return table
 m.compare = private(function (old, new)
     local newHash = {}
     local ret = {}

@@ -46,10 +46,10 @@ local function asFunction(source)
 end
 
 local function asDocFunction(source)
-    if not source.args then
-        return ''
-    end
     local args = {}
+    if not source.args then
+        return args
+    end
     for i = 1, #source.args do
         local arg = source.args[i]
         local name = arg.name[1]

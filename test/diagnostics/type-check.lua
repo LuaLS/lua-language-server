@@ -701,5 +701,18 @@ local t
 <!t!> = 'xxx'
 ]]
 
+TEST [[
+---@param b boolean
+local function f(b)
+end
+
+---@type boolean
+local t
+
+if t then
+    f(t)
+end
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

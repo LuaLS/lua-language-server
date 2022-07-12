@@ -99,12 +99,7 @@ return function (uri, callback)
         end
 
         -- local Cat = setmetatable({}, {__index = Animal}) 允许逆变
-        if  value.type == 'select'
-        and value.sindex == 1
-        and value.vararg
-        and value.vararg.type == 'call'
-        and value.vararg.node.special == 'setmetatable'
-        and hasMarkClass(source) then
+        if hasMarkClass(source) then
             if vm.canCastType(uri, valueNode:copy():remove 'table', varNode) then
                 return
             end

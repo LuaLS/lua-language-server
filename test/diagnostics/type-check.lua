@@ -635,8 +635,16 @@ TEST [[
 ---@class A
 local a = {}
 
----@class B: A
+---@class B
 local <!b!> = a
+]]
+
+TEST [[
+---@class A
+local a = {}
+
+---@class B: A
+local b = a
 ]]
 
 TEST [[

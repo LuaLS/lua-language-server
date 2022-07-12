@@ -26,6 +26,14 @@
   * `_ENV = {}`: allow all globals
   * `_ENV = {} ---@type mathlib`: only allow globals in `mathlib`
 * `CHG` hover: dose not show unknown `---@XXX` as description
+* `CHG` contravariance is allowed at the class declaration
+  ```lua
+  ---@class BaseClass
+  local BaseClass
+
+  ---@class MyClass: BaseClass
+  local MyClass = BaseClass -- OK!
+  ```
 * `FIX` [#880](https://github.com/sumneko/lua-language-server/issues/880)
 * `FIX` [#1284](https://github.com/sumneko/lua-language-server/issues/1284)
 * `FIX` [#1292](https://github.com/sumneko/lua-language-server/issues/1292)

@@ -1341,7 +1341,7 @@ m.register 'workspace/diagnostic' {
 m.register '$/api/report' {
     ---@async
     function (params)
-        require 'provider.build-meta'.build('reported', params)
+        require 'provider.build-meta'.build('default', params)
     end
 }
 

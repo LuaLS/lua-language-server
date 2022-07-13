@@ -1341,7 +1341,15 @@ m.register 'workspace/diagnostic' {
 m.register '$/api/report' {
     ---@async
     function (params)
-        require 'provider.build-meta'.build('default', params)
+        local buildMeta = require 'provider.build-meta'
+        local dir = buildMeta.build('default', params)
+        client.setConfig {
+            {
+                key    = 'Lua.runtime.library',
+                action = 'add',
+                value  = dir,
+            }
+        }
     end
 }
 

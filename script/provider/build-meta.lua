@@ -1,6 +1,7 @@
 local fs     = require 'bee.filesystem'
 local config = require 'config'
 local util   = require 'utility'
+local await  = require 'await'
 
 local m = {}
 
@@ -120,8 +121,10 @@ local function buildRootText(api)
     return table.concat(lines, '\n')
 end
 
+---@async
 ---@param name string
 ---@param api meta
+---@return string
 function m.build(name, api)
     local encoding = config.get(nil, 'Lua.runtime.fileEncoding')
     local fileDir = fs.path(METAPATH) / (name .. ' ' .. encoding)
@@ -137,12 +140,14 @@ function m.build(name, api)
         local space = class.namespace ~= '' and class.namespace or api.root
         local text = buildText(api.root, class)
         files[space][#files[space]+1] = text
+        await.delay()
     end
 
     for space, texts in pairs(files) do
         util.saveFile((fileDir / (space .. '.lua')):string(), table.concat(texts, '\n\n'))
     end
 
+    return fileDir:string()
 end
 
 return m

@@ -476,6 +476,8 @@ WINDOW_PROCESSING_SEMANTIC_RANGE =
 '正在处理差量语义着色...'
 WINDOW_PROCESSING_HINT           =
 '正在处理内联提示...'
+WINDOW_PROCESSING_BUILD_META     =
+'正在处理编译器元数据...'
 WINDOW_INCREASE_UPPER_LIMIT      =
 '增加上限'
 WINDOW_CLOSE                     =

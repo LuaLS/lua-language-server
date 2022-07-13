@@ -476,6 +476,8 @@ WINDOW_PROCESSING_SEMANTIC_RANGE =
 'Processando tokens semânticas incrementais...'
 WINDOW_PROCESSING_HINT           =
 'Processando dicas de lina...'
+WINDOW_PROCESSING_BUILD_META     = -- TODO: need translate!
+'Processing build meta...'
 WINDOW_INCREASE_UPPER_LIMIT      =
 'Aumente o limite superior'
 WINDOW_CLOSE                     =

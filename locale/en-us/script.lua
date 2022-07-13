@@ -476,6 +476,8 @@ WINDOW_PROCESSING_SEMANTIC_RANGE =
 'Processing incremental semantic tokens...'
 WINDOW_PROCESSING_HINT           =
 'Processing inline hint...'
+WINDOW_PROCESSING_BUILD_META     =
+'Processing build meta...'
 WINDOW_INCREASE_UPPER_LIMIT      =
 'Increase upper limit'
 WINDOW_CLOSE                     =

@@ -1342,6 +1342,8 @@ m.register '$/api/report' {
     ---@async
     function (params)
         local buildMeta = require 'provider.build-meta'
+        await.close 'api/report'
+        await.setID 'api/report'
         local dir = buildMeta.build('default', params)
         client.setConfig {
             {

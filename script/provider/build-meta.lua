@@ -1,7 +1,9 @@
-local fs     = require 'bee.filesystem'
-local config = require 'config'
-local util   = require 'utility'
-local await  = require 'await'
+local fs       = require 'bee.filesystem'
+local config   = require 'config'
+local util     = require 'utility'
+local await    = require 'await'
+local progress = require 'progress'
+local lang     = require 'language'
 
 local m = {}
 
@@ -136,8 +138,11 @@ function m.build(name, api)
 
     files[api.root][#files[api.root]+1] = buildRootText(api)
 
-    for _, class in ipairs(api.classes) do
+    local proc <close> = progress.create(nil, lang.script.WINDOW_PROCESSING_BUILD_META, 0.5)
+    for i, class in ipairs(api.classes) do
         local space = class.namespace ~= '' and class.namespace or api.root
+        proc:setMessage(space)
+        proc:setPercentage(i / #api.classes * 100)
         local text = buildText(api.root, class)
         files[space][#files[space]+1] = text
         await.delay()

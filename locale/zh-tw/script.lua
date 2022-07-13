@@ -476,6 +476,8 @@ WINDOW_PROCESSING_SEMANTIC_RANGE =
 '正在處理差量語義著色...'
 WINDOW_PROCESSING_HINT           =
 '正在處理內嵌提示...'
+WINDOW_PROCESSING_BUILD_META     = -- TODO: need translate!
+'Processing build meta...'
 WINDOW_INCREASE_UPPER_LIMIT      =
 '增加上限'
 WINDOW_CLOSE                     =

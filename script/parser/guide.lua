@@ -13,6 +13,7 @@ local type         = type
 ---@field args                  { [integer]: parser.object, start: integer, finish: integer }
 ---@field locals                parser.object[]
 ---@field returns?              parser.object[]
+---@field breaks?               parser.object[]
 ---@field exps                  parser.object[]
 ---@field keys                  parser.object
 ---@field uri                   uri

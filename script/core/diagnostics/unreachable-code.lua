@@ -24,7 +24,8 @@ local function hasReturn(block)
         return hasElse == true
     else
         if block.type == 'while' then
-            if vm.testCondition(block.filter) then
+            if  vm.testCondition(block.filter)
+            and not block.breaks then
                 return true
             end
         end

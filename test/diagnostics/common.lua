@@ -1986,3 +1986,17 @@ function X()
     <!return true!>
 end
 ]]
+
+TEST [[
+---@diagnostic disable: undefined-global
+
+while true do
+    if not X then
+        break
+    end
+end
+
+print(1)
+
+do return end
+]]

@@ -11,21 +11,21 @@ function os.clock() end
 
 ---@class osdate
 ---#DES 'osdate.year'
----@field year  integer
+---@field year  integer|string
 ---#DES 'osdate.month'
----@field month integer
+---@field month integer|string
 ---#DES 'osdate.day'
----@field day   integer
+---@field day   integer|string
 ---#DES 'osdate.hour'
----@field hour  integer
+---@field hour  integer|string
 ---#DES 'osdate.min'
----@field min   integer
+---@field min   integer|string
 ---#DES 'osdate.sec'
----@field sec   integer
+---@field sec   integer|string
 ---#DES 'osdate.wday'
----@field wday  integer
+---@field wday  integer|string
 ---#DES 'osdate.yday'
----@field yday  integer
+---@field yday  integer|string
 ---#DES 'osdate.isdst'
 ---@field isdst boolean
 

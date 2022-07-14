@@ -21,6 +21,7 @@
   * `unreachable-code`
 * `NEW` settings:
   * `diagnostics.unusedLocalExclude`
+* `NEW` VSCode: add support for [EmmyLuaUnity](https://marketplace.visualstudio.com/items?itemName=CppCXY.emmylua-unity)
 * `CHG` support multi-type:
   ```lua
   ---@type number, _, boolean

@@ -74,6 +74,8 @@ end
 ---@param key   string
 ---@param value any
 function m.set(uri, key, value)
+    local unit = template[key]
+    assert(unit, 'unknown key: ' .. key)
     local scp = getScope(uri)
     local oldValue = m.get(uri, key)
     m.setByScope(scp, key, value)
@@ -87,13 +89,9 @@ end
 
 function m.add(uri, key, value)
     local unit = template[key]
-    if not unit then
-        return false
-    end
+    assert(unit, 'unknown key: ' .. key)
     local list = m.getRaw(uri, key)
-    if type(list) ~= 'table' then
-        return false
-    end
+    assert(type(list) == 'table', 'not a list: ' .. key)
     local copyed = {}
     for i, v in ipairs(list) do
         if util.equal(v, value) then
@@ -114,13 +112,9 @@ end
 
 function m.remove(uri, key, value)
     local unit = template[key]
-    if not unit then
-        return false
-    end
+    assert(unit, 'unknown key: ' .. key)
     local list = m.getRaw(uri, key)
-    if type(list) ~= 'table' then
-        return false
-    end
+    assert(type(list) == 'table', 'not a list: ' .. key)
     local copyed = {}
     for i, v in ipairs(list) do
         if not util.equal(v, value) then
@@ -139,13 +133,9 @@ end
 
 function m.prop(uri, key, prop, value)
     local unit = template[key]
-    if not unit then
-        return false
-    end
+    assert(unit, 'unknown key: ' .. key)
     local map = m.getRaw(uri, key)
-    if type(map) ~= 'table' then
-        return false
-    end
+    assert(type(map) == 'table', 'not a map: ' .. key)
     if util.equal(map[prop], value) then
         return false
     end

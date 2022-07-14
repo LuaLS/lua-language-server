@@ -124,13 +124,9 @@ local function buildRootText(api)
 end
 
 ---@async
----@param name string
+---@param path string
 ---@param api meta
----@return string
-function m.build(name, api)
-    local encoding = config.get(nil, 'Lua.runtime.fileEncoding')
-    local fileDir = fs.path(METAPATH) / (name .. ' ' .. encoding)
-    fs.create_directories(fileDir)
+function m.build(path, api)
 
     local files = util.multiTable(2, function ()
         return { '---@meta' }
@@ -149,10 +145,8 @@ function m.build(name, api)
     end
 
     for space, texts in pairs(files) do
-        util.saveFile((fileDir / (space .. '.lua')):string(), table.concat(texts, '\n\n'))
+        util.saveFile(path .. '/' .. space .. '.lua', table.concat(texts, '\n\n'))
     end
-
-    return fileDir:string()
 end
 
 return m

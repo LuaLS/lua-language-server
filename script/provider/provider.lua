@@ -21,6 +21,7 @@ local furi       = require 'file-uri'
 local inspect    = require 'inspect'
 local markdown   = require 'provider.markdown'
 local guide      = require 'parser.guide'
+local fs         = require 'bee.filesystem'
 
 ---@async
 local function updateConfig(uri)
@@ -1342,14 +1343,25 @@ m.register '$/api/report' {
     ---@async
     function (params)
         local buildMeta = require 'provider.build-meta'
+        local SDBMHash  = require 'SDBMHash'
         await.close 'api/report'
         await.setID 'api/report'
-        local dir = buildMeta.build('default', params)
+        local name = params.name or 'default'
+        local uri  = workspace.getFirstScope().uri
+        local hash = uri and ('%08x'):format(SDBMHash():hash(uri))
+        local encoding = config.get(nil, 'Lua.runtime.fileEncoding')
+        local nameBuf = {}
+        nameBuf[#nameBuf+1] = name
+        nameBuf[#nameBuf+1] = hash
+        nameBuf[#nameBuf+1] = encoding
+        local fileDir = METAPATH .. '/' ..  table.concat(nameBuf, ' ')
+        fs.create_directories(fs.path(fileDir))
+        buildMeta.build(fileDir, params)
         client.setConfig {
             {
-                key    = 'Lua.runtime.library',
+                key    = 'Lua.workspace.library',
                 action = 'add',
-                value  = dir,
+                value  = fileDir,
             }
         }
     end

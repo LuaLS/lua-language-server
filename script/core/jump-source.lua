@@ -3,7 +3,8 @@ local guide = require 'parser.guide'
 ---@param results table
 return function (results)
     for _, result in ipairs(results) do
-        if result.target.type == 'doc.field.name' then
+        if result.target.type == 'doc.field.name'
+        or result.target.type == 'doc.class.name' then
             local doc = result.target.parent.source
             if doc then
                 result.uri           = doc.source

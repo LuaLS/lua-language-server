@@ -31,6 +31,11 @@ XX = 1
 
 ---@source file:///lib.c:30:20
 YY = 1
+
+---@source file:///lib.c
+---@class BBB
+---@source file:///lib.c
+BBB = {}
 ]]
         }
     })
@@ -48,6 +53,8 @@ print(a.x)
 print(a.ff)
 print(XX)
 print(YY)
+---@type BBB
+print(BBB)
 ]]
         }
     })
@@ -108,6 +115,36 @@ print(YY)
             range = {
                 start   = { line = 29, character = 20 },
                 ['end'] = { line = 29, character = 20 },
+            }
+        }
+    }))
+
+    local locations = client:awaitRequest('textDocument/definition', {
+        textDocument = { uri = furi.encode('main.lua') },
+        position = { line = 7, character = 10 },
+    })
+
+    assert(util.equal(locations, {
+        {
+            uri = 'file:///lib.c',
+            range = {
+                start   = { line = 0, character = 0 },
+                ['end'] = { line = 0, character = 0 },
+            }
+        }
+    }))
+
+    local locations = client:awaitRequest('textDocument/definition', {
+        textDocument = { uri = furi.encode('main.lua') },
+        position = { line = 8, character = 7 },
+    })
+
+    assert(util.equal(locations, {
+        {
+            uri = 'file:///lib.c',
+            range = {
+                start   = { line = 0, character = 0 },
+                ['end'] = { line = 0, character = 0 },
             }
         }
     }))

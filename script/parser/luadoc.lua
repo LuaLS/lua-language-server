@@ -1787,6 +1787,10 @@ local function bindCommentsAndFields(binded)
             if class then
                 class.bindSource = nil
             end
+            if source then
+                doc.source = source
+                source.bindSource = doc
+            end
             class = doc
             bindCommentsToDoc(doc, comments)
             comments = {}

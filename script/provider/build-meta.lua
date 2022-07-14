@@ -105,6 +105,7 @@ local function buildText(root, class)
         lines[#lines+1] = ('---@field %s %s'):format(field.name, field.typeName)
     end
 
+    lines[#lines+1] = ('---@source %s'):format(class.location:gsub('#', ':'))
     local name = mergeString(root, class.namespace, class.name)
     lines[#lines+1] = ('%s = {}'):format(name)
     lines[#lines+1] = ''

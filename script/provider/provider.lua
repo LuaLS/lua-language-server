@@ -1359,6 +1359,7 @@ m.register '$/api/report' {
                 key    = 'Lua.workspace.library',
                 action = 'add',
                 value  = fileDir,
+                uri    = uri,
             }
         }
     end

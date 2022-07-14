@@ -19,7 +19,7 @@ X16                 <-  [a-fA-F0-9]
 Token               <-  Integer / Name / String / Code / Symbol
 Name                <-  ({} {%name} {})
                     ->  Name
-Integer             <-  ({} {[0-9]+} !'.' {})
+Integer             <-  ({} {'-'? [0-9]+} !'.' {})
                     ->  Integer
 Code                <-  ({} '`' { (!'`' .)*} '`' {})
                     ->  Code

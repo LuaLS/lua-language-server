@@ -11,6 +11,11 @@
 
   local fileName = root / 'script' / 'main.lua' -- `fileName` is `fspath` here
   ```
+* `NEW` `LuaDoc`: `---@source`:
+  ```lua
+  ---@source file:///xxx.c:50:20
+  XXX = 1 -- when finding definitions of `XXX`, returns `file:///xxx.c:50:20` instead here
+  ```
 * `NEW` diagnostics:
   * `unknown-operator`
   * `unreachable-code`

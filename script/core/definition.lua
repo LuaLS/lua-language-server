@@ -4,6 +4,7 @@ local vm         = require 'vm'
 local findSource = require 'core.find-source'
 local guide      = require 'parser.guide'
 local rpath      = require 'workspace.require-path'
+local jumpSource = require 'core.jump-source'
 
 local function sortResults(results)
     -- 先按照顺序排序
@@ -197,6 +198,7 @@ return function (uri, offset)
     end
 
     sortResults(results)
+    jumpSource(results)
 
     return results
 end

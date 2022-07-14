@@ -22,6 +22,7 @@ local inspect    = require 'inspect'
 local markdown   = require 'provider.markdown'
 local guide      = require 'parser.guide'
 local fs         = require 'bee.filesystem'
+local jumpSource = require 'core.jump-source'
 
 ---@async
 local function updateConfig(uri)
@@ -376,18 +377,16 @@ m.register 'textDocument/definition' {
         for i, info in ipairs(result) do
             local targetUri = info.uri
             if targetUri then
-                if files.exists(targetUri) then
-                    if client.getAbility 'textDocument.definition.linkSupport' then
-                        response[i] = converter.locationLink(targetUri
-                            , converter.packRange(targetUri, info.target.start, info.target.finish)
-                            , converter.packRange(targetUri, info.target.start, info.target.finish)
-                            , converter.packRange(uri,       info.source.start, info.source.finish)
-                        )
-                    else
-                        response[i] = converter.location(targetUri
-                            , converter.packRange(targetUri, info.target.start, info.target.finish)
-                        )
-                    end
+                if client.getAbility 'textDocument.definition.linkSupport' then
+                    response[i] = converter.locationLink(targetUri
+                        , converter.packRange(targetUri, info.target.start, info.target.finish)
+                        , converter.packRange(targetUri, info.target.start, info.target.finish)
+                        , converter.packRange(uri,       info.source.start, info.source.finish)
+                    )
+                else
+                    response[i] = converter.location(targetUri
+                        , converter.packRange(targetUri, info.target.start, info.target.finish)
+                    )
                 end
             end
         end
@@ -418,18 +417,16 @@ m.register 'textDocument/typeDefinition' {
         for i, info in ipairs(result) do
             local targetUri = info.uri
             if targetUri then
-                if files.exists(targetUri) then
-                    if client.getAbility 'textDocument.typeDefinition.linkSupport' then
-                        response[i] = converter.locationLink(targetUri
-                            , converter.packRange(targetUri, info.target.start, info.target.finish)
-                            , converter.packRange(targetUri, info.target.start, info.target.finish)
-                            , converter.packRange(uri,       info.source.start, info.source.finish)
-                        )
-                    else
-                        response[i] = converter.location(targetUri
-                            , converter.packRange(targetUri, info.target.start, info.target.finish)
-                        )
-                    end
+                if client.getAbility 'textDocument.typeDefinition.linkSupport' then
+                    response[i] = converter.locationLink(targetUri
+                        , converter.packRange(targetUri, info.target.start, info.target.finish)
+                        , converter.packRange(targetUri, info.target.start, info.target.finish)
+                        , converter.packRange(uri,       info.source.start, info.source.finish)
+                    )
+                else
+                    response[i] = converter.location(targetUri
+                        , converter.packRange(targetUri, info.target.start, info.target.finish)
+                    )
                 end
             end
         end

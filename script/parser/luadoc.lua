@@ -3,6 +3,7 @@ local re         = require 'parser.relabel'
 local guide      = require 'parser.guide'
 local compile    = require 'parser.compile'
 local util       = require 'utility'
+local furi       = require 'file-uri'
 
 local TokenTypes, TokenStarts, TokenFinishs, TokenContents, TokenMarks
 ---@type integer
@@ -147,6 +148,7 @@ Symbol              <-  ({} {
 ---@field async? boolean
 ---@field versions? table[]
 ---@field names? parser.object[]
+---@field source? parser.object
 
 local function parseTokens(text, offset)
     Ci = 0
@@ -1403,8 +1405,36 @@ local docSwitch = util.switch()
 
         return result
     end)
+    : case 'source'
+    : call(function (doc)
+        local fullSource = doc:sub(#'source' + 1)
+        if not fullSource or fullSource == '' then
+            return
+        end
+        fullSource = util.trim(fullSource)
+        if fullSource == '' then
+            return
+        end
+        local source, line = fullSource:match('^(.-):(%d+)$')
+        source = source or fullSource
+        line   = tonumber(line) or 1
+        local uri
+        if furi.split(source) then
+            uri = source
+        else
+            uri = furi.decode(source)
+        end
+        local result = {
+            type   = 'doc.source',
+            start  = getFinish(),
+            finish = getFinish(),
+            source = uri,
+            line   = line,
+        }
+        return result
+    end)
 
-local function convertTokens()
+local function convertTokens(doc)
     local tp, text = nextToken()
     if not tp then
         return
@@ -1417,7 +1447,7 @@ local function convertTokens()
         }
         return nil
     end
-    return docSwitch(text)
+    return docSwitch(text, doc)
 end
 
 local function trimTailComment(text)
@@ -1457,7 +1487,7 @@ local function buildLuaDoc(comment)
     local doc = text:sub(startPos)
 
     parseTokens(doc, comment.start + startPos)
-    local result, rests = convertTokens()
+    local result, rests = convertTokens(doc)
     if result then
         result.range = comment.finish
         local finish = result.firstFinish or result.finish
@@ -1527,7 +1557,8 @@ local function isContinuedDoc(lastDoc, nextDoc)
         if  nextDoc.type ~= 'doc.field'
         and nextDoc.type ~= 'doc.operator'
         and nextDoc.type ~= 'doc.comment'
-        and nextDoc.type ~= 'doc.overload' then
+        and nextDoc.type ~= 'doc.overload'
+        and nextDoc.type ~= 'doc.source' then
             return false
         end
     end
@@ -1603,7 +1634,8 @@ local function bindDoc(source, binded)
         if doc.type == 'doc.class'
         or doc.type == 'doc.deprecated'
         or doc.type == 'doc.version'
-        or doc.type == 'doc.module' then
+        or doc.type == 'doc.module'
+        or doc.type == 'doc.source' then
             if source.type == 'function'
             or isParam then
                 goto CONTINUE
@@ -1746,6 +1778,7 @@ end
 local function bindCommentsAndFields(binded)
     local class
     local comments = {}
+    local source
     for _, doc in ipairs(binded) do
         if doc.type == 'doc.class' then
             -- 多个class连续写在一起，只有最后一个class可以绑定source
@@ -1759,6 +1792,10 @@ local function bindCommentsAndFields(binded)
             if class then
                 class.fields[#class.fields+1] = doc
                 doc.class = class
+            end
+            if source then
+                doc.source = source
+                source.bindSource = doc
             end
             bindCommentsToDoc(doc, comments)
             comments = {}
@@ -1774,7 +1811,12 @@ local function bindCommentsAndFields(binded)
             comments = {}
         elseif doc.type == 'doc.comment' then
             comments[#comments+1] = doc
+        elseif doc.type == 'doc.source' then
+            source = doc
+            goto CONTINUE
         end
+        source = nil
+        ::CONTINUE::
     end
 end
 

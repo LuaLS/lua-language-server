@@ -25,6 +25,12 @@ local mt = {}
 
 ---@source file:///yyy.lua:30
 function mt:ff() end
+
+---@source file:///lib.c
+XX = 1
+
+---@source file:///lib.c:30:20
+YY = 1
 ]]
         }
     })
@@ -40,6 +46,8 @@ local a
 
 print(a.x)
 print(a.ff)
+print(XX)
+print(YY)
 ]]
         }
     })
@@ -70,6 +78,36 @@ print(a.ff)
             range = {
                 start   = { line = 29, character = 0 },
                 ['end'] = { line = 29, character = 0 },
+            }
+        }
+    }))
+
+    local locations = client:awaitRequest('textDocument/definition', {
+        textDocument = { uri = furi.encode('main.lua') },
+        position = { line = 5, character = 7 },
+    })
+
+    assert(util.equal(locations, {
+        {
+            uri = 'file:///lib.c',
+            range = {
+                start   = { line = 0, character = 0 },
+                ['end'] = { line = 0, character = 0 },
+            }
+        }
+    }))
+
+    local locations = client:awaitRequest('textDocument/definition', {
+        textDocument = { uri = furi.encode('main.lua') },
+        position = { line = 6, character = 7 },
+    })
+
+    assert(util.equal(locations, {
+        {
+            uri = 'file:///lib.c',
+            range = {
+                start   = { line = 29, character = 20 },
+                ['end'] = { line = 29, character = 20 },
             }
         }
     }))

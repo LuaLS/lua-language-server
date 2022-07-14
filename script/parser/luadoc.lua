@@ -1415,9 +1415,10 @@ local docSwitch = util.switch()
         if fullSource == '' then
             return
         end
-        local source, line = fullSource:match('^(.-):(%d+)$')
+        local source, line, char = fullSource:match('^(.-):?(%d*):?(%d*)$')
         source = source or fullSource
         line   = tonumber(line) or 1
+        char   = tonumber(char) or 0
         local uri
         if furi.split(source) then
             uri = source
@@ -1430,6 +1431,7 @@ local docSwitch = util.switch()
             finish = getFinish(),
             source = uri,
             line   = line,
+            char   = char,
         }
         return result
     end)

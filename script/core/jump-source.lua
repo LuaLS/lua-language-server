@@ -8,8 +8,8 @@ return function (results)
             if doc then
                 result.uri           = doc.source
                 result.target.uri    = doc.source
-                result.target.start  = guide.positionOf(doc.line - 1, 0)
-                result.target.finish = guide.positionOf(doc.line - 1, 0)
+                result.target.start  = guide.positionOf(doc.line - 1, doc.char)
+                result.target.finish = guide.positionOf(doc.line - 1, doc.char)
             end
         else
             local target = result.target
@@ -23,8 +23,8 @@ return function (results)
                     and doc.bindSource == target then
                         result.uri           = doc.source
                         result.target.uri    = doc.source
-                        result.target.start  = guide.positionOf(doc.line - 1, 0)
-                        result.target.finish = guide.positionOf(doc.line - 1, 0)
+                        result.target.start  = guide.positionOf(doc.line - 1, doc.char)
+                        result.target.finish = guide.positionOf(doc.line - 1, doc.char)
                     end
                 end
             end

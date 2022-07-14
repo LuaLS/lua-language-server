@@ -45,6 +45,7 @@
   --![](image.png) --> will convert to `--![](file:///xxxx/image.png)`
   local x
   ```
+* `CHG` signature: only show signatures matching the entered parameters
 * `FIX` [#880](https://github.com/sumneko/lua-language-server/issues/880)
 * `FIX` [#1284](https://github.com/sumneko/lua-language-server/issues/1284)
 * `FIX` [#1292](https://github.com/sumneko/lua-language-server/issues/1292)

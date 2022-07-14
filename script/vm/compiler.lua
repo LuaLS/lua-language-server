@@ -559,6 +559,7 @@ local function matchCall(source)
     if needRemove then
         local newNode = myNode:copy()
         newNode:removeNode(needRemove)
+        newNode:setData('originNode', myNode)
         vm.setNode(source, newNode, true)
     end
 end

@@ -92,6 +92,7 @@ local function buildText(root, class)
     local lines = {}
 
     addComments(lines, class.comment)
+    lines[#lines+1] = ('---@source %s'):format(class.location:gsub('#', ':'))
     if class.baseClass == '' then
         lines[#lines+1] = ('---@class %s'):format(mergeString(class.namespace, class.name))
     else

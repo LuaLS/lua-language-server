@@ -66,6 +66,7 @@ local function addMethod(lines, name, method)
         return
     end
     addComments(lines, method.comment)
+    lines[#lines+1] = ('---@source %s'):format(method.location:gsub('#', ':'))
     local params = {}
     for _, param in ipairs(method.params) do
         lines[#lines+1] = ('---@param %s %s'):format(param.name, param.typeName)

@@ -462,6 +462,8 @@ function m.flushFiles(scp)
     for uri in pairs(cachedUris) do
         files.delRef(uri)
     end
+    collectgarbage()
+    collectgarbage()
 end
 
 ---@param scp scope

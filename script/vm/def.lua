@@ -102,9 +102,15 @@ local nodeSwitch;nodeSwitch = util.switch()
         if lastKey then
             return
         end
-        local tbl = source.parent
+        local key = guide.getKeyName(source)
+        if type(key) ~= 'string' then
+            return
+        end
         local uri = guide.getUri(source)
-        searchFieldSwitch(tbl.type, uri, tbl, guide.getKeyName(source), pushResult)
+        local parentNode = vm.compileNode(source.node)
+        for pn in parentNode:eachObject() do
+            searchFieldSwitch(pn.type, uri, pn, key, pushResult)
+        end
     end)
     : case 'doc.see.field'
     : call(function (source, lastKey, pushResult)

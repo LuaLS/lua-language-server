@@ -94,6 +94,10 @@ function mt:string(nl)
                         if lines[#lines] ~= '' then
                             lines[#lines+1] = ''
                         end
+                    elseif last == '---' then
+                        if lines[#lines] ~= '' then
+                            lines[#lines+1] = ''
+                        end
                     end
                 end
                 lines[#lines+1] = obj.text

@@ -125,7 +125,11 @@ local function getBindComment(source)
     return table.concat(lines, '\n')
 end
 
-local function lookUpDocComments(source, docGroup)
+local function lookUpDocComments(source)
+    local docGroup = source.bindDocs
+    if not docGroup then
+        return
+    end
     if source.type == 'setlocal'
     or source.type == 'getlocal' then
         source = source.node
@@ -282,6 +286,9 @@ end
 
 local function getFunctionComment(source)
     local docGroup = source.bindDocs
+    if not docGroup then
+        return
+    end
 
     local hasReturnComment = false
     for _, doc in ipairs(source.bindDocs) do
@@ -329,23 +336,28 @@ local function getFunctionComment(source)
         elseif doc.type == 'doc.overload' then
             md:splitLine()
         end
-        ::CONTINUE::
     end
 
     local enums = getBindEnums(source, docGroup)
     md:add('lua', enums)
-    return md
+
+    local comment = md:string()
+    if comment == '' then
+        return nil
+    end
+    return comment
 end
 
 local function tryDocComment(source)
-    if not source.bindDocs then
-        return
+    if source.type == 'function' then
+        local comment = getFunctionComment(source)
+        if comment then
+            return comment
+        end
+        source = source.parent
     end
-    if source.type ~= 'function' then
-        local comment = lookUpDocComments(source, source.bindDocs)
-        return comment
-    end
-    return getFunctionComment(source)
+    local comment = lookUpDocComments(source)
+    return comment
 end
 
 local function tryDocOverloadToComment(source)

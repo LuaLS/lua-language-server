@@ -907,3 +907,15 @@ local function f()
     ---@cast <?x?> integer
 end
 ]]
+
+TEST [[
+---@class A
+---@field <!x!> number
+
+---@param a A
+local function f(a) end
+
+f {
+    <!<?x?>!> = 1,
+}
+]]

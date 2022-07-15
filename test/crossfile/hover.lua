@@ -77,6 +77,7 @@ TEST {
 ```
 
 ---
+
 * [a.lua](file:///a.lua) （搜索路径： `?.lua`）]],
 }
 
@@ -109,6 +110,7 @@ TEST {
 ```
 
 ---
+
 * [Folder\a.lua](file:///Folder/a.lua) （搜索路径： `Folder\?.lua`）]],
 }
 
@@ -127,6 +129,7 @@ TEST {
 ```
 
 ---
+
 * [Folder\a.lua](file:///Folder/a.lua) （搜索路径： `?.lua`）]],
 }
 
@@ -145,6 +148,7 @@ TEST {
 ```
 
 ---
+
 * [Folder\a.lua](file:///Folder/a.lua) （搜索路径： `?.lua`）]],
 }
 else
@@ -163,6 +167,7 @@ TEST {
 ```
 
 ---
+
 * [Folder/a.lua](file:///Folder/a.lua) （搜索路径： `Folder/?.lua`）]],
 }
 end
@@ -329,6 +334,7 @@ function f(x: number)
 ```
 
 ---
+
  abc]]
 }
 
@@ -350,6 +356,7 @@ TEST {
 ```
 
 ---
+
  abc]]
 }
 
@@ -488,6 +495,7 @@ function f(<?x?>) end
 ```
 
 ---
+
 this is comment]]
 }
 
@@ -557,6 +565,7 @@ function f(arg1: integer, arg2: integer)
 ```
 
 ---
+
 comment1
 
 @*param* `arg2` — comment2
@@ -666,6 +675,7 @@ function f()
 ```
 
 ---
+
 comment1
 comment2]]}
 
@@ -710,6 +720,7 @@ local x: A
 ```
 
 ---
+
 AAA]]}
 
 TEST {{ path = 'a.lua', content = '', }, {
@@ -730,6 +741,7 @@ local x: A {
 ```
 
 ---
+
 AAA]]}
 
 TEST {{ path = 'a.lua', content = '', }, {
@@ -749,9 +761,11 @@ local x: A
 ```
 
 ---
+
 BBB
 
 ---
+
 AAA]]}
 
 TEST {{ path = 'a.lua', content = '', }, {
@@ -770,9 +784,11 @@ hover = [[
 ```
 
 ---
+
 AAA
 
 ---
+
 BBB]]}
 
 TEST {{ path = 'a.lua', content = '', }, {
@@ -791,9 +807,11 @@ hover = [[
 ```
 
 ---
+
 BBB
 
 ---
+
 AAA]]}
 
 TEST {{ path = 'a.lua', content = '', }, {
@@ -829,6 +847,7 @@ local food: unknown
 ```
 
 ---
+
 I'm a multiline comment
 ]]}
 
@@ -937,6 +956,7 @@ function bthci.rawhci(hcibytes: any, callback: any)
 ```
 
 ---
+
  Sends a raw HCI command to the BlueTooth controller.]]}
 
 TEST {{ path = 'a.lua', content = '', }, {
@@ -1021,6 +1041,7 @@ function fn()
 ```
 
 ---
+
 line1
 
 line2]]}
@@ -1156,6 +1177,7 @@ TEST {
 ```
 
 ---
+
 The color of your awesome apple!]]
 }
 
@@ -1235,6 +1257,7 @@ local n: integer
 ```
 
 ---
+
  comments]]
 }
 
@@ -1253,6 +1276,7 @@ local n: integer
 ```
 
 ---
+
  comments]]
 }
 
@@ -1271,6 +1295,7 @@ local n: integer
 ```
 
 ---
+
  comments]]
 }
 
@@ -1289,6 +1314,7 @@ local n: integer
 ```
 
 ---
+
  comments]]
 }
 
@@ -1307,6 +1333,7 @@ local n: integer
 ```
 
 ---
+
  comments]]
 }
 
@@ -1324,6 +1351,7 @@ local n: unknown
 ```
 
 ---
+
 [here](file:///x.lua)]]
 }
 
@@ -1341,6 +1369,7 @@ local n: unknown
 ```
 
 ---
+
 [here](file:///d%3A/x.lua)]]
 }
 
@@ -1358,6 +1387,7 @@ local n: unknown
 ```
 
 ---
+
 [here](command:xxxxx)]]
 }
 
@@ -1380,5 +1410,64 @@ TEST {
 ```
 
 ---
+
+ comments]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            -- comments
+            <?A?> = function () end
+        ]]
+    },
+    hover = [[
+```lua
+function A()
+```
+
+---
+
+ comments]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            local t = {
+                -- comments
+                <?A?> = function () end
+            }
+        ]]
+    },
+    hover = [[
+```lua
+function A()
+```
+
+---
+
+ comments]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            -- comments
+            ---@return number
+            <?A?> = function () end
+        ]]
+    },
+    hover = [[
+```lua
+function A()
+  -> number
+```
+
+---
+
  comments]]
 }

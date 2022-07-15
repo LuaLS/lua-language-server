@@ -178,9 +178,15 @@ return function (source)
         return nil
     end
 
-    for view in vm.getInfer(source):eachView(uri) do
-        if view == 'string'
-        or (view ~= 'unknown' and view ~= 'any' and vm.isSubType(uri, view, 'string')) then
+    local node = vm.compileNode(source)
+    for n in node:eachObject() do
+        if n.type == 'global' and n.cate == 'type' then
+            if n.name == 'string'
+            or (n.name ~= 'unknown' and n.name ~= 'any' and vm.isSubType(uri, n.name, 'string')) then
+                return nil
+            end
+        elseif n.type == 'doc.type.string'
+        or     n.type == 'string' then
             return nil
         end
     end

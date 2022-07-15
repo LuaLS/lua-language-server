@@ -1360,3 +1360,25 @@ local n: unknown
 ---
 [here](command:xxxxx)]]
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@class A
+            ---@field x number # comments
+
+            ---@type A
+            local t
+
+            print(t.<?x?>)
+        ]]
+    },
+    hover = [[
+```lua
+(field) A.x: number
+```
+
+---
+ comments]]
+}

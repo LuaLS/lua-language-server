@@ -2112,3 +2112,11 @@ print(<?bool?>)
 [[
 local bool: boolean = true|false
 ]]
+
+TEST [[
+---@type 'a'
+local <?s?>
+]]
+[[
+local s: 'a'
+]]

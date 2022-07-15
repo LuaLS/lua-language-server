@@ -268,15 +268,16 @@ local function getBindEnums(source, docGroup)
     return table.concat(chunks, '\n\n')
 end
 
-local function tryDocFieldUpComment(source)
+local function tryDocFieldComment(source)
     if source.type ~= 'doc.field' then
         return
     end
-    if not source.bindGroup then
-        return
+    if source.comment then
+        return normalizeComment(source.comment.text, guide.getUri(source))
     end
-    local comment = getBindComment(source)
-    return comment
+    if source.bindGroup then
+        return getBindComment(source)
+    end
 end
 
 local function getFunctionComment(source)
@@ -394,7 +395,7 @@ return function (source)
         source = source.parent
     end
     return tryDocOverloadToComment(source)
-        or tryDocFieldUpComment(source)
+        or tryDocFieldComment(source)
         or tyrDocParamComment(source)
         or tryDocComment(source)
         or tryDocClassComment(source)

@@ -1343,3 +1343,20 @@ local n: unknown
 ---
 [here](file:///d%3A/x.lua)]]
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            --[here](command:xxxxx)
+            local <?n?>
+        ]]
+    },
+    hover = [[
+```lua
+local n: unknown
+```
+
+---
+[here](command:xxxxx)]]
+}

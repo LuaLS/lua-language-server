@@ -97,7 +97,10 @@ local function normalizeComment(comment, suri)
         return nil
     end
     comment = comment:gsub('(%[.-%]%()(.-)(%))', function (left, path, right)
-        if furi.split(path) then
+        local scheme = furi.split(path)
+        if scheme
+        -- strange way to check `C:/xxx.lua`
+        and #scheme > 1 then
             return
         end
         local absPath = ws.getAbsolutePath(suri:gsub('/[^/]+$', ''), path)

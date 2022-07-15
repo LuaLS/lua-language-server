@@ -349,15 +349,23 @@ local function getFunctionComment(source)
 end
 
 local function tryDocComment(source)
+    local md = markdown()
     if source.type == 'function' then
         local comment = getFunctionComment(source)
-        if comment then
-            return comment
-        end
+        md:add('md', comment)
         source = source.parent
     end
     local comment = lookUpDocComments(source)
-    return comment
+    md:add('md', comment)
+    if source.type == 'doc.alias' then
+        local enums = buildEnumChunk(source, source.alias[1], guide.getUri(source))
+        md:add('lua', enums)
+    end
+    local result = md:string()
+    if result == '' then
+        return nil
+    end
+    return result
 end
 
 local function tryDocOverloadToComment(source)

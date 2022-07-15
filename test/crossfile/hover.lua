@@ -1471,3 +1471,29 @@ function A()
 
  comments]]
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@alias A
+            ---| 1 # comment1
+            ---| 2 # comment2
+
+            ---@type A
+            local <?x?>
+        ]]
+    },
+    hover = [[
+```lua
+local x: 1|2
+```
+
+---
+
+```lua
+A:
+    | 1 -- comment1
+    | 2 -- comment2
+```]]
+}

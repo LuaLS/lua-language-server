@@ -464,6 +464,8 @@ function m.flushFiles(scp)
     end
     collectgarbage()
     collectgarbage()
+    -- TODO: wait maillist
+    collectgarbage 'restart'
 end
 
 ---@param scp scope

@@ -722,5 +722,12 @@ if t then
 end
 ]]
 
+config.set(nil, 'Lua.type.weakUnionCheck', true)
+TEST [[
+---@type number
+local x = G
+]]
+config.set(nil, 'Lua.type.weakUnionCheck', false)
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

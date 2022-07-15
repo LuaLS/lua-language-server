@@ -83,25 +83,13 @@ local function asString(source)
         or asStringView(source, literal)
 end
 
-local function getBindComment(source)
-    local lines = {}
-    for _, docComment in ipairs(source.bindComments) do
-        if docComment.comment.text:sub(1, 1) == '-' then
-            lines[#lines+1] = docComment.comment.text:sub(2)
-        else
-            lines[#lines+1] = docComment.comment.text
-        end
-    end
-    if not lines or #lines == 0 then
-        return nil
-    end
-    return table.concat(lines, '\n')
-end
-
 ---@param comment string
 ---@param suri uri
 ---@return string?
 local function normalizeComment(comment, suri)
+    if not comment then
+        return nil
+    end
     if comment:sub(1, 1) == '-' then
         comment = comment:sub(2)
     end
@@ -109,7 +97,7 @@ local function normalizeComment(comment, suri)
         return nil
     end
     comment = comment:gsub('(%[.-%]%()(.-)(%))', function (left, path, right)
-        if path:match '^file:/' then
+        if furi.split(path) then
             return
         end
         local absPath = ws.getAbsolutePath(suri:gsub('/[^/]+$', ''), path)
@@ -120,6 +108,18 @@ local function normalizeComment(comment, suri)
         return left .. uri .. right
     end)
     return comment
+end
+
+local function getBindComment(source)
+    local uri = guide.getUri(source)
+    local lines = {}
+    for _, docComment in ipairs(source.bindComments) do
+        lines[#lines+1] = normalizeComment(docComment.comment.text, uri)
+    end
+    if not lines or #lines == 0 then
+        return nil
+    end
+    return table.concat(lines, '\n')
 end
 
 local function lookUpDocComments(source, docGroup)
@@ -134,25 +134,19 @@ local function lookUpDocComments(source, docGroup)
     local lines = {}
     for _, doc in ipairs(docGroup) do
         if doc.type == 'doc.comment' then
-            local comment = normalizeComment(doc.comment.text, uri)
-            lines[#lines+1] = comment
+            lines[#lines+1] = normalizeComment(doc.comment.text, uri)
         elseif doc.type == 'doc.type' then
             if doc.comment then
-                lines[#lines+1] = doc.comment.text
+                lines[#lines+1] = normalizeComment(doc.comment.text, uri)
             end
         elseif doc.type == 'doc.class' then
             for _, docComment in ipairs(doc.bindComments) do
-                if docComment.comment.text:sub(1, 1) == '-' then
-                    lines[#lines+1] = docComment.comment.text:sub(2)
-                else
-                    lines[#lines+1] = docComment.comment.text
-                end
+                lines[#lines+1] = normalizeComment(docComment.comment.text, uri)
             end
         end
-        ::CONTINUE::
     end
     if source.comment then
-        lines[#lines+1] = source.comment.text
+        lines[#lines+1] = normalizeComment(source.comment.text, uri)
     end
     if not lines or #lines == 0 then
         return nil

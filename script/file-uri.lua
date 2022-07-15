@@ -89,7 +89,7 @@ function m.decode(uri)
 end
 
 function m.split(uri)
-    return uri:match('([^:]*):?/?/?([^/]*)(.*)')
+    return uri:match('([^:]*):/?/?([^/]*)(.*)')
 end
 
 return m

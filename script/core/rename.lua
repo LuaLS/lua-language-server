@@ -231,6 +231,9 @@ local function ofDocTypeName(source, newname, callback)
         if doc.type == 'doc.alias' then
             callback(doc, doc.alias.start, doc.alias.finish, newname)
         end
+        if doc.type == 'doc.enum' then
+            callback(doc, doc.enum.start, doc.enum.finish, newname)
+        end
     end
     for _, doc in ipairs(global:getGets(uri)) do
         if doc.type == 'doc.type.name' then
@@ -276,7 +279,8 @@ local function rename(source, newname, callback)
         return ofGlobal(source, newname, callback)
     elseif source.type == 'doc.class.name'
     or     source.type == 'doc.type.name'
-    or     source.type == 'doc.alias.name' then
+    or     source.type == 'doc.alias.name'
+    or     source.type == 'doc.enum.name' then
         return ofDocTypeName(source, newname, callback)
     elseif source.type == 'doc.param.name' then
         return ofDocParamName(source, newname, callback)
@@ -310,6 +314,7 @@ local function prepareRename(source)
     or source.type == 'doc.class.name'
     or source.type == 'doc.type.name'
     or source.type == 'doc.alias.name'
+    or source.type == 'doc.enum.name'
     or source.type == 'doc.param.name' then
         return source, source[1]
     elseif source.type == 'string'
@@ -350,6 +355,7 @@ local accept = {
     ['doc.type.name']  = true,
     ['doc.alias.name'] = true,
     ['doc.param.name'] = true,
+    ['doc.enum.name']  = true,
 }
 
 local m = {}

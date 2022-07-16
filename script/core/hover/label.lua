@@ -35,6 +35,9 @@ local function asDocTypeName(source)
         if doc.type == 'doc.alias' then
             return '(alias) ' .. doc.alias[1] .. ' ' .. lang.script('HOVER_EXTENDS', vm.getInfer(doc.extends):view(guide.getUri(source)))
         end
+        if doc.type == 'doc.enum' then
+            return '(enum) ' .. doc.enum[1] .. ' ' .. lang.script('HOVER_EXTENDS', vm.getInfer(doc.extends):view(guide.getUri(source)))
+        end
     end
 end
 

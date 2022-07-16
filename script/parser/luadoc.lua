@@ -1427,12 +1427,27 @@ local docSwitch = util.switch()
         end
         local result = {
             type   = 'doc.source',
-            start  = getFinish(),
+            start  = getStart(),
             finish = getFinish(),
             source = uri,
             line   = line,
             char   = char,
         }
+        return result
+    end)
+    : case 'enum'
+    : call(function ()
+        local name = parseName('doc.enum.name')
+        if not name then
+            return nil
+        end
+        local result = {
+            type   = 'doc.enum',
+            start  = name.start,
+            finish = name.finish,
+            enum   = name,
+        }
+        name.parent = result
         return result
     end)
 
@@ -1548,7 +1563,8 @@ local function isContinuedDoc(lastDoc, nextDoc)
         return true
     end
     if lastDoc.type == 'doc.type'
-    or lastDoc.type == 'doc.module' then
+    or lastDoc.type == 'doc.module'
+    or lastDoc.type == 'doc.enum' then
         if nextDoc.type ~= 'doc.comment' then
             return false
         end
@@ -1637,6 +1653,7 @@ local function bindDoc(source, binded)
         or doc.type == 'doc.deprecated'
         or doc.type == 'doc.version'
         or doc.type == 'doc.module'
+        or doc.type == 'doc.enum'
         or doc.type == 'doc.source' then
             if source.type == 'function'
             or isParam then

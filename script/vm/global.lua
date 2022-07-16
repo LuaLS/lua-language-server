@@ -319,6 +319,17 @@ local compilerGlobalSwitch = util.switch()
             source.extends._generic = vm.createGeneric(source.extends, source._sign)
         end
     end)
+    : case 'doc.enum'
+    : call(function (source)
+        local uri  = guide.getUri(source)
+        local name = guide.getKeyName(source)
+        if not name then
+            return
+        end
+        local enum = vm.declareGlobal('type', name, uri)
+        enum:addSet(uri, source)
+        source._globalNode = enum
+    end)
     : case 'doc.type.name'
     : call(function (source)
         local uri  = guide.getUri(source)
@@ -508,6 +519,7 @@ local function compileAst(source)
         'doc.alias',
         'doc.type.name',
         'doc.extends.name',
+        'doc.enum',
     }, function (src)
         compileObject(src)
     end)

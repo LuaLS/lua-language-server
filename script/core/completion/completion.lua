@@ -1648,6 +1648,7 @@ local function tryluaDocBySource(state, position, source, results)
         for _, doc in ipairs(vm.getDocSets(state.uri)) do
             local name = (doc.type == 'doc.class' and doc.class[1])
                     or   (doc.type == 'doc.alias' and doc.alias[1])
+                    or   (doc.type == 'doc.enum'  and doc.enum[1])
             if  name
             and not used[name]
             and matchKey(source[1], name) then
@@ -1801,6 +1802,14 @@ local function tryluaDocByErr(state, position, err, docState, results)
                 results[#results+1] = {
                     label       = doc.alias[1],
                     kind        = define.CompletionItemKind.Class,
+                }
+            end
+            if  doc.type == 'doc.enum'
+            and not used[doc.enum[1]] then
+                used[doc.enum[1]] = true
+                results[#results+1] = {
+                    label       = doc.enum[1],
+                    kind        = define.CompletionItemKind.Enum,
                 }
             end
         end

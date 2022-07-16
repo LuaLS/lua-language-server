@@ -449,6 +449,7 @@ local Care = util.switch()
         end
     end)
     : case 'doc.alias.name'
+    : case 'doc.enum.name'
     : call(function (source, options, results)
         if not options.annotation then
             return

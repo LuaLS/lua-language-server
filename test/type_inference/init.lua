@@ -3719,3 +3719,10 @@ TEST '-2|-3|1' [[
 ---@type 1|-2|-3
 local <?n?>
 ]]
+
+TEST 'A' [[
+---@enum A
+local m = {}
+
+print(<?m?>)
+]]

@@ -50,6 +50,7 @@ local accept = {
     ['doc.class.name']   = true,
     ['doc.extends.name'] = true,
     ['doc.alias.name']   = true,
+    ['doc.enum.name']    = true,
 }
 
 ---@async
@@ -102,12 +103,17 @@ return function (uri, position)
         if src.type == 'doc.alias' then
             src = src.alias
         end
+        if src.type == 'doc.enum' then
+            src = src.enum
+        end
         if src.type == 'doc.class.name'
         or src.type == 'doc.alias.name'
+        or src.type == 'doc.enum.name'
         or src.type == 'doc.type.name'
         or src.type == 'doc.extends.name' then
             if  source.type ~= 'doc.type.name'
             and source.type ~= 'doc.class.name'
+            and source.type ~= 'doc.enum.name'
             and source.type ~= 'doc.extends.name'
             and source.type ~= 'doc.see.name' then
                 goto CONTINUE

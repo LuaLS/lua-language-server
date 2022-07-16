@@ -164,7 +164,8 @@ end
 local function tryDocClassComment(source)
     for _, def in ipairs(vm.getDefs(source)) do
         if def.type == 'doc.class'
-        or def.type == 'doc.alias' then
+        or def.type == 'doc.alias'
+        or def.type == 'doc.enum' then
             local comment = getBindComment(def)
             if comment then
                 return comment
@@ -359,6 +360,10 @@ local function tryDocComment(source)
     md:add('md', comment)
     if source.type == 'doc.alias' then
         local enums = buildEnumChunk(source, source.alias[1], guide.getUri(source))
+        md:add('lua', enums)
+    end
+    if source.type == 'doc.enum' then
+        local enums = buildEnumChunk(source, source.enum[1], guide.getUri(source))
         md:add('lua', enums)
     end
     local result = md:string()

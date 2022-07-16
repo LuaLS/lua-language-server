@@ -168,7 +168,8 @@ function vm.isSubType(uri, child, parent, mark)
                         end
                     end
                 end
-                if set.type == 'doc.alias' then
+                if set.type == 'doc.alias'
+                or set.type == 'doc.enum' then
                     return true
                 end
             end

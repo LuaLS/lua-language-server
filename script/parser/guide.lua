@@ -45,6 +45,7 @@ local type         = type
 ---@field exp                   parser.object
 ---@field alias                 parser.object
 ---@field class                 parser.object
+---@field enum                  parser.object
 ---@field vararg                parser.object
 ---@field param                 parser.object
 ---@field overload              parser.object
@@ -141,6 +142,7 @@ local childMap = {
     ['doc.class']          = {'class', '#extends', '#signs', 'comment'},
     ['doc.type']           = {'#types', 'name', 'comment'},
     ['doc.alias']          = {'alias', 'extends', 'comment'},
+    ['doc.enum']           = {'enum', 'extends', 'comment'},
     ['doc.param']          = {'param', 'extends', 'comment'},
     ['doc.return']         = {'#returns', 'comment'},
     ['doc.field']          = {'field', 'extends', 'comment'},
@@ -884,9 +886,11 @@ local isSetMap = {
     ['label']             = true,
     ['doc.class']         = true,
     ['doc.alias']         = true,
+    ['doc.enum']          = true,
     ['doc.field']         = true,
     ['doc.class.name']    = true,
     ['doc.alias.name']    = true,
+    ['doc.enum.name']     = true,
     ['doc.field.name']    = true,
     ['doc.type.field']    = true,
     ['doc.type.array']    = true,
@@ -1003,6 +1007,8 @@ function m.getKeyName(obj)
         return obj.class[1]
     elseif tp == 'doc.alias' then
         return obj.alias[1]
+    elseif tp == 'doc.enum' then
+        return obj.enum[1]
     elseif tp == 'doc.field' then
         return obj.field[1]
     elseif tp == 'doc.field.name' then
@@ -1065,6 +1071,8 @@ function m.getKeyType(obj)
     elseif tp == 'doc.class' then
         return 'string'
     elseif tp == 'doc.alias' then
+        return 'string'
+    elseif tp == 'doc.enum' then
         return 'string'
     elseif tp == 'doc.field' then
         return type(obj.field[1])

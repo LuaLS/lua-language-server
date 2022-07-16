@@ -55,6 +55,7 @@ local accept = {
     ['doc.see.name']     = true,
     ['doc.see.field']    = true,
     ['doc.cast.name']    = true,
+    ['doc.enum.name']    = true,
 }
 
 local function checkRequire(source, offset)
@@ -170,8 +171,12 @@ return function (uri, offset)
         if src.type == 'doc.alias' then
             src = src.alias
         end
+        if src.type == 'doc.enum' then
+            src = src.enum
+        end
         if src.type == 'doc.class.name'
-        or src.type == 'doc.alias.name' then
+        or src.type == 'doc.alias.name'
+        or src.type == 'doc.enum.name' then
             if  source.type ~= 'doc.type.name'
             and source.type ~= 'doc.extends.name'
             and source.type ~= 'doc.see.name' then

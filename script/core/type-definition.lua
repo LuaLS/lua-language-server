@@ -52,6 +52,7 @@ local accept = {
     ['doc.class.name']   = true,
     ['doc.extends.name'] = true,
     ['doc.alias.name']   = true,
+    ['doc.enum.name']    = true,
     ['doc.see.name']     = true,
     ['doc.see.field']    = true,
 }
@@ -144,6 +145,9 @@ return function (uri, offset)
         end
         if src.type == 'doc.alias' then
             src = src.alias
+        end
+        if src.type == 'doc.enum' then
+            src = src.enum
         end
         if src.type == 'doc.class.name'
         or src.type == 'doc.alias.name'

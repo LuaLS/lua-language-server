@@ -17,7 +17,8 @@ return function (uri, callback)
 
     local cache = {}
     for _, doc in ipairs(state.ast.docs) do
-        if doc.type == 'doc.alias' then
+        if doc.type == 'doc.alias'
+        or doc.type == 'doc.enum' then
             local name = guide.getKeyName(doc)
             if not name then
                 return
@@ -28,7 +29,8 @@ return function (uri, callback)
                 cache[name] = {}
                 for _, otherDoc in ipairs(docs) do
                     if otherDoc.type == 'doc.alias'
-                    or otherDoc.type == 'doc.class' then
+                    or otherDoc.type == 'doc.class'
+                    or otherDoc.type == 'doc.enum' then
                         cache[name][#cache[name]+1] = {
                             start  = otherDoc.start,
                             finish = otherDoc.finish,

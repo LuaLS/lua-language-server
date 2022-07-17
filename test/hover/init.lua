@@ -2120,3 +2120,13 @@ local <?s?>
 [[
 local s: 'a'
 ]]
+
+TEST [[
+---@enum <?A?>
+local m = {
+    x = 1,
+}
+]]
+[[
+(enum) A
+]]

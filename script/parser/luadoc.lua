@@ -1829,7 +1829,8 @@ local function bindCommentsAndFields(binded)
             end
             bindCommentsToDoc(doc, comments)
             comments = {}
-        elseif doc.type == 'doc.alias' then
+        elseif doc.type == 'doc.alias'
+        or     doc.type == 'doc.enum' then
             bindCommentsToDoc(doc, comments)
             comments = {}
         elseif doc.type == 'doc.comment' then

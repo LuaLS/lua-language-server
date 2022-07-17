@@ -2,6 +2,7 @@
 local vm        = require 'vm.vm'
 local guide     = require 'parser.guide'
 local config    = require 'config.config'
+local util      = require 'utility'
 
 ---@param object vm.node.object
 ---@return string?
@@ -38,6 +39,51 @@ local function getNodeName(object)
         return 'string'
     end
     return nil
+end
+
+---@param parentName string
+---@param child      vm.node.object
+---@param uri        uri
+---@return boolean?
+local function checkEnum(parentName, child, uri)
+    local parentClass = vm.getGlobal('type', parentName)
+    if not parentClass then
+        return nil
+    end
+    for _, set in ipairs(parentClass:getSets(uri)) do
+        if set.type == 'doc.enum' then
+            if  child.type ~= 'string'
+            and child.type ~= 'doc.type.string'
+            and child.type ~= 'integer'
+            and child.type ~= 'number'
+            and child.type ~= 'doc.type.integer' then
+                return false
+            end
+            return util.arrayHas(set._enums, child[1])
+        end
+    end
+
+    return nil
+end
+
+---@param parent vm.node.object
+---@param child  vm.node.object
+---@return boolean
+local function checkValue(parent, child)
+    if parent.type == 'doc.type.integer' then
+        if child.type == 'integer'
+        or child.type == 'doc.type.integer'
+        or child.type == 'number' then
+            return parent[1] == child[1]
+        end
+    elseif parent.type == 'doc.type.string' then
+        if child.type == 'string'
+        or child.type == 'doc.type.string' then
+            return parent[1] == child[1]
+        end
+    end
+
+    return true
 end
 
 ---@param uri uri
@@ -121,6 +167,9 @@ function vm.isSubType(uri, child, parent, mark)
     end
 
     if childName == parentName then
+        if not checkValue(parent, child) then
+            return false
+        end
         return true
     end
 
@@ -142,6 +191,11 @@ function vm.isSubType(uri, child, parent, mark)
             return false
         end
         return true
+    end
+
+    local isEnum = checkEnum(parentName, child, uri)
+    if isEnum ~= nil then
+        return isEnum
     end
 
     -- TODO: check duck

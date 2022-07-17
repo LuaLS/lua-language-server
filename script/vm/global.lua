@@ -130,6 +130,7 @@ end
 
 ---@class parser.object
 ---@field _globalNode vm.global|false
+---@field _enums?     (string|integer)[]
 
 ---@type table<string, vm.global>
 local allGlobals = {}
@@ -329,6 +330,29 @@ local compilerGlobalSwitch = util.switch()
         local enum = vm.declareGlobal('type', name, uri)
         enum:addSet(uri, source)
         source._globalNode = enum
+
+        local tbl = source.bindSource and source.bindSource.value
+        if not tbl or tbl.type ~= 'table' then
+            return
+        end
+        source._enums = {}
+        for _, field in ipairs(tbl) do
+            if field.type == 'tablefield'
+            or field.type == 'tableindex' then
+                if not field.value then
+                    goto CONTINUE
+                end
+                local key = guide.getKeyName(field)
+                if not key then
+                    goto CONTINUE
+                end
+                if field.value.type == 'integer'
+                or field.value.type == 'string' then
+                    source._enums[#source._enums+1] = field.value[1]
+                end
+                ::CONTINUE::
+            end
+        end
     end)
     : case 'doc.type.name'
     : call(function (source)

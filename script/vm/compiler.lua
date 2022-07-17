@@ -32,10 +32,6 @@ local function bindDocs(source)
             vm.setNode(source, vm.compileNode(doc))
             return true
         end
-        if doc.type == 'doc.enum' then
-            vm.setNode(source, vm.compileNode(doc))
-            return true
-        end
         if doc.type == 'doc.param' then
             local node = vm.compileNode(doc)
             if doc.optional then
@@ -1583,6 +1579,10 @@ local compilerSwitch = util.switch()
         end
     end)
     : case 'doc.class.name'
+    : call(function (source)
+        vm.setNode(source, vm.compileNode(source.parent))
+    end)
+    : case 'doc.enum.name'
     : call(function (source)
         vm.setNode(source, vm.compileNode(source.parent))
     end)

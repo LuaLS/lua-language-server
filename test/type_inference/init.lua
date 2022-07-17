@@ -3720,7 +3720,7 @@ TEST '-2|-3|1' [[
 local <?n?>
 ]]
 
-TEST 'A' [[
+TEST 'table' [[
 ---@enum A
 local m = {}
 

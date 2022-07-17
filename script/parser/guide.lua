@@ -4,7 +4,7 @@ local type         = type
 ---@class parser.object
 ---@field bindDocs              parser.object[]
 ---@field bindGroup             parser.object[]
----@field bindSource            parser.object[]
+---@field bindSource            parser.object
 ---@field value                 parser.object
 ---@field parent                parser.object
 ---@field type                  string

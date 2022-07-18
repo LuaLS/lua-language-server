@@ -13,8 +13,22 @@
   ```
 * `NEW` `LuaDoc`: `---@source`:
   ```lua
+  -- Also supports absolute path or relative path (based on current file path)
   ---@source file:///xxx.c:50:20
-  XXX = 1 -- when finding definitions of `XXX`, returns `file:///xxx.c:50:20` instead here
+  XXX = 1 -- when finding definitions of `XXX`, returns `file:///xxx.c:50:20` instead here.
+  ```
+* `NEW` `LuaDoc`: `---@enum`:
+  ```lua
+  ---@enum animal
+  Animal = {
+    Cat = 1,
+    Dog = 2,
+  }
+
+  ---@param x animal
+  local function f(x) end
+
+  f() -- suggests `Animal.Cat`, `Animal.Dog`, `1`, `2` as the first parameter
   ```
 * `NEW` diagnostics:
   * `unknown-operator`

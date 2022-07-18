@@ -30,10 +30,12 @@ return function (results)
             local doc = result.target.parent.source
             if doc then
                 local uri = parseUri(doc)
-                result.uri           = uri
-                result.target.uri    = uri
-                result.target.start  = guide.positionOf(doc.line - 1, doc.char)
-                result.target.finish = guide.positionOf(doc.line - 1, doc.char)
+                result.uri    = uri
+                result.target = {
+                    uri    = uri,
+                    start  = guide.positionOf(doc.line - 1, doc.char),
+                    finish = guide.positionOf(doc.line - 1, doc.char),
+                }
             end
         else
             local target = result.target
@@ -46,10 +48,12 @@ return function (results)
                     if  doc.type == 'doc.source'
                     and doc.bindSource == target then
                         local uri = parseUri(doc)
-                        result.uri           = uri
-                        result.target.uri    = uri
-                        result.target.start  = guide.positionOf(doc.line - 1, doc.char)
-                        result.target.finish = guide.positionOf(doc.line - 1, doc.char)
+                        result.uri    = uri
+                        result.target = {
+                            uri    = uri,
+                            start  = guide.positionOf(doc.line - 1, doc.char),
+                            finish = guide.positionOf(doc.line - 1, doc.char),
+                        }
                     end
                 end
             end

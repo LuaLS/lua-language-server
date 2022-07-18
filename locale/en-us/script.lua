@@ -1052,3 +1052,30 @@ pB = -pA
 ```
 [View Request](https://github.com/sumneko/lua-language-server/issues/599)
 ]=]
+LUADOC_DESC_ENUM =
+[=[
+Mark a table as an enum. If you want an enum but can't define it as a Lua
+table, take a look at the [`@alias`](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#alias)
+tag.
+
+## Syntax
+`@enum <name>`
+
+## Usage
+```
+---@enum colors
+local colors = {
+	white = 0,
+	orange = 2,
+	yellow = 4,
+	green = 8,
+	black = 16,
+}
+
+---@param color colors
+local function setColor(color) end
+
+-- Completion and hover is provided for the below param
+setColor(colors.green)
+```
+]=]

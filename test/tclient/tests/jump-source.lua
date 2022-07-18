@@ -1,9 +1,10 @@
-local lclient = require 'lclient'
-local util    = require 'utility'
-local ws      = require 'workspace'
-local files   = require 'files'
-local furi    = require 'file-uri'
-local fs      = require 'bee.filesystem'
+local lclient  = require 'lclient'
+local util     = require 'utility'
+local ws       = require 'workspace'
+local files    = require 'files'
+local furi     = require 'file-uri'
+local fs       = require 'bee.filesystem'
+local platform = require 'bee.platform'
 
 ---@async
 lclient():start(function (client)
@@ -162,28 +163,30 @@ print(D3)
         position = { line = 9, character = 7 },
     })
 
-    assert(util.equal(locations, {
-        {
-            uri = 'file:///d%3A/xxx/2.lua',
-            range = {
-                start   = { line = 0, character = 0 },
-                ['end'] = { line = 0, character = 0 },
+    if platform.OS == 'Windows' then
+        assert(util.equal(locations, {
+            {
+                uri = 'file:///d%3A/xxx/2.lua',
+                range = {
+                    start   = { line = 0, character = 0 },
+                    ['end'] = { line = 0, character = 0 },
+                }
             }
-        }
-    }))
+        }))
 
-    local locations = client:awaitRequest('textDocument/definition', {
-        textDocument = { uri = furi.encode('main.lua') },
-        position = { line = 10, character = 7 },
-    })
+        local locations = client:awaitRequest('textDocument/definition', {
+            textDocument = { uri = furi.encode('main.lua') },
+            position = { line = 10, character = 7 },
+        })
 
-    assert(util.equal(locations, {
-        {
-            uri = 'file:///d%3A/test/2.lua',
-            range = {
-                start   = { line = 0, character = 0 },
-                ['end'] = { line = 0, character = 0 },
+        assert(util.equal(locations, {
+            {
+                uri = 'file:///d%3A/test/2.lua',
+                range = {
+                    start   = { line = 0, character = 0 },
+                    ['end'] = { line = 0, character = 0 },
+                }
             }
-        }
-    }))
+        }))
+    end
 end)

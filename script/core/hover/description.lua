@@ -412,6 +412,38 @@ local function tyrDocParamComment(source)
     end
 end
 
+---@param source parser.object
+local function tryDocEnum(source)
+    if source.type ~= 'doc.enum' then
+        return
+    end
+    local tbl = source.bindSource
+    if not tbl then
+        return
+    end
+    local md = markdown()
+    md:add('lua', '{')
+    for _, field in ipairs(tbl) do
+        if field.type == 'tablefield'
+        or field.type == 'tableindex' then
+            if not field.value then
+                goto CONTINUE
+            end
+            local key = guide.getKeyName(field)
+            if not key then
+                goto CONTINUE
+            end
+            if field.value.type == 'integer'
+            or field.value.type == 'string' then
+                md:add('lua', ('    %s: %s = %s,'):format(key, field.value.type, field.value[1]))
+            end
+            ::CONTINUE::
+        end
+    end
+    md:add('lua', '}')
+    return md:string()
+end
+
 return function (source)
     if source.type == 'string' then
         return asString(source)
@@ -425,4 +457,5 @@ return function (source)
         or tryDocComment(source)
         or tryDocClassComment(source)
         or tryDocModule(source)
+        or tryDocEnum(source)
 end

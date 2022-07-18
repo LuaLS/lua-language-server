@@ -1497,3 +1497,31 @@ A:
     | 2 -- comment2
 ```]]
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@enum <?A?>
+            local t = {
+                x = 1,
+                y = 2,
+                z = 3,
+            }
+        ]]
+    },
+    hover = [[
+```lua
+(enum) A
+```
+
+---
+
+```lua
+{
+    x: integer = 1,
+    y: integer = 2,
+    z: integer = 3,
+}
+```]]
+}

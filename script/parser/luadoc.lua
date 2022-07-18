@@ -1646,7 +1646,6 @@ local function bindDoc(source, binded)
         or doc.type == 'doc.deprecated'
         or doc.type == 'doc.version'
         or doc.type == 'doc.module'
-        or doc.type == 'doc.enum'
         or doc.type == 'doc.source' then
             if source.type == 'function'
             or isParam then
@@ -1698,6 +1697,10 @@ local function bindDoc(source, binded)
         or     doc.type == 'doc.async'
         or     doc.type == 'doc.nodiscard' then
             if source.type ~= 'function' then
+                goto CONTINUE
+            end
+        elseif doc.type == 'doc.enum' then
+            if source.type ~= 'table' then
                 goto CONTINUE
             end
         elseif doc.type ~= 'doc.comment' then
@@ -1756,6 +1759,7 @@ local function bindDocsBetween(sources, binded, start, finish)
                 or src.type == 'setindex'
                 or src.type == 'setmethod'
                 or src.type == 'function'
+                or src.type == 'table'
                 or src.type == '...' then
                     if bindDoc(src, binded) then
                         ok = true

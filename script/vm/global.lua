@@ -331,8 +331,8 @@ local compilerGlobalSwitch = util.switch()
         enum:addSet(uri, source)
         source._globalNode = enum
 
-        local tbl = source.bindSource and source.bindSource.value
-        if not tbl or tbl.type ~= 'table' then
+        local tbl = source.bindSource
+        if not tbl then
             return
         end
         source._enums = {}

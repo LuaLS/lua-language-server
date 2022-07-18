@@ -1022,3 +1022,33 @@ print(x) --> table
 ---
 [View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#cast)
 ]=]
+LUADOC_DESC_OPERATOR =
+[=[
+Provide type declaration for [operator metamethods](http://lua-users.org/wiki/MetatableEvents).
+
+## Syntax
+`@operator <operation>[(input_type)]:<resulting_type>`
+
+## Usage
+### Vector Add Metamethod
+```
+---@class Vector
+---@operation add(Vector):Vector
+
+vA = Vector.new(1, 2, 3)
+vB = Vector.new(10, 20, 30)
+
+vC = vA + vB
+--> Vector
+```
+### Unary Minus
+```
+---@class Passcode
+---@operation unm:integer
+
+pA = Passcode.new(1234)
+pB = -pA
+--> integer
+```
+[View Request](https://github.com/sumneko/lua-language-server/issues/599)
+]=]

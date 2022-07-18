@@ -1121,7 +1121,80 @@ local function cleanEnums(enums, source)
     return enums
 end
 
-local function insertEnum(state, src, enums, isInArray)
+---@param state     parser.state
+---@param pos       integer
+---@param doc       vm.node.object
+---@param enums     table[]
+---@return table[]?
+local function insertDocEnum(state, pos, doc, enums)
+    local tbl = doc.bindSource
+    if not tbl then
+        return nil
+    end
+    local parent = tbl.parent
+    local parentName
+    if parent._globalNode then
+        parentName = parent._globalNode:getName()
+    else
+        local locals = guide.getVisibleLocals(state.ast, pos)
+        for _, loc in pairs(locals) do
+            if util.arrayHas(vm.getDefs(loc), tbl) then
+                parentName = loc[1]
+                break
+            end
+        end
+    end
+    local valueEnums = {}
+    for _, field in ipairs(tbl) do
+        if field.type == 'tablefield'
+        or field.type == 'tableindex' then
+            if not field.value then
+                goto CONTINUE
+            end
+            local key = guide.getKeyName(field)
+            if not key then
+                goto CONTINUE
+            end
+            if field.value.type == 'integer'
+            or field.value.type == 'string' then
+                if parentName then
+                    enums[#enums+1] = {
+                        label  = parentName .. '.' .. key,
+                        kind   = define.CompletionItemKind.EnumMember,
+                        id     = stack(function () ---@async
+                            return {
+                                detail      = buildDetail(field),
+                                description = buildDesc(field),
+                            }
+                        end),
+                    }
+                end
+                valueEnums[#valueEnums+1] = {
+                    label  = util.viewLiteral(field.value[1]),
+                    kind   = define.CompletionItemKind.EnumMember,
+                    id     = stack(function () ---@async
+                        return {
+                            detail      = buildDetail(field),
+                            description = buildDesc(field),
+                        }
+                    end),
+                }
+            end
+            ::CONTINUE::
+        end
+    end
+    for _, enum in ipairs(valueEnums) do
+        enums[#enums+1] = enum
+    end
+    return enums
+end
+
+---@param state     parser.state
+---@param pos       integer
+---@param src       vm.node.object
+---@param enums     table[]
+---@param isInArray boolean?
+local function insertEnum(state, pos, src, enums, isInArray)
     if src.type == 'doc.type.string'
     or src.type == 'doc.type.integer'
     or src.type == 'doc.type.boolean' then
@@ -1139,7 +1212,13 @@ local function insertEnum(state, src, enums, isInArray)
         }
     elseif isInArray and src.type == 'doc.type.array' then
         for i, d in ipairs(vm.getDefs(src.node)) do
-            insertEnum(state, d, enums, isInArray)
+            insertEnum(state, pos, d, enums, isInArray)
+        end
+    elseif src.type == 'global' and src.cate == 'type' then
+        for _, set in ipairs(src:getSets(state.uri)) do
+            if set.type == 'doc.enum' then
+                insertDocEnum(state, pos, set, enums)
+            end
         end
     end
 end
@@ -1147,7 +1226,7 @@ end
 local function checkTypingEnum(state, position, defs, str, results, isInArray)
     local enums = {}
     for _, def in ipairs(defs) do
-        insertEnum(state, def, enums, isInArray)
+        insertEnum(state, position, def, enums, isInArray)
     end
     cleanEnums(enums, str)
     for _, res in ipairs(enums) do
@@ -1441,7 +1520,7 @@ local function tryCallArg(state, position, results)
 
     local enums = {}
     for src in node:eachObject() do
-        insertEnum(state, src, enums, arg and arg.type == 'table')
+        insertEnum(state, position, src, enums, arg and arg.type == 'table')
         if src.type == 'doc.type.function' then
             ---@cast src parser.object
             local insertText = buildInsertDocFunction(src)

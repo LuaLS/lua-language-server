@@ -3820,6 +3820,7 @@ local function initState(lua, version, options)
     Tokens              = tokens(lua)
     Index               = 1
     ---@class parser.state
+    ---@field uri uri
     local state = {
         version = version,
         lua     = lua,

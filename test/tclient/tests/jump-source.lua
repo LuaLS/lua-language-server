@@ -14,7 +14,7 @@ lclient():start(function (client)
 
     client:notify('textDocument/didOpen', {
         textDocument = {
-            uri = furi.encode('1.lua'),
+            uri = furi.encode('D:/test/1.lua'),
             languageId = 'lua',
             version = 0,
             text = [[
@@ -36,6 +36,12 @@ YY = 1
 ---@class BBB
 ---@source file:///lib.c
 BBB = {}
+
+---@source D:/xxx/2.lua
+D2 = 1
+
+---@source 2.lua
+D3 = 1
 ]]
         }
     })
@@ -55,6 +61,8 @@ print(XX)
 print(YY)
 ---@type BBB
 print(BBB)
+print(D2)
+print(D3)
 ]]
         }
     })
@@ -142,6 +150,36 @@ print(BBB)
     assert(util.equal(locations, {
         {
             uri = 'file:///lib.c',
+            range = {
+                start   = { line = 0, character = 0 },
+                ['end'] = { line = 0, character = 0 },
+            }
+        }
+    }))
+
+    local locations = client:awaitRequest('textDocument/definition', {
+        textDocument = { uri = furi.encode('main.lua') },
+        position = { line = 9, character = 7 },
+    })
+
+    assert(util.equal(locations, {
+        {
+            uri = 'file:///d%3A/xxx/2.lua',
+            range = {
+                start   = { line = 0, character = 0 },
+                ['end'] = { line = 0, character = 0 },
+            }
+        }
+    }))
+
+    local locations = client:awaitRequest('textDocument/definition', {
+        textDocument = { uri = furi.encode('main.lua') },
+        position = { line = 10, character = 7 },
+    })
+
+    assert(util.equal(locations, {
+        {
+            uri = 'file:///d%3A/test/2.lua',
             range = {
                 start   = { line = 0, character = 0 },
                 ['end'] = { line = 0, character = 0 },

@@ -1,4 +1,26 @@
 local guide = require 'parser.guide'
+local furi  = require 'file-uri'
+local ws    = require 'workspace'
+
+---@param doc parser.object
+---@return uri
+local function parseUri(doc)
+    local uri
+    local scheme = furi.split(doc.path)
+    if scheme and #scheme >= 2 then
+        uri = doc.path
+    else
+        local suri = guide.getUri(doc):gsub('[/\\][^/\\]*$', '')
+        local path = ws.getAbsolutePath(suri, doc.path)
+        if path then
+            uri = furi.encode(path)
+        else
+            uri = doc.path
+        end
+    end
+    ---@cast uri uri
+    return uri
+end
 
 ---@param results table
 return function (results)
@@ -7,8 +29,9 @@ return function (results)
         or result.target.type == 'doc.class.name' then
             local doc = result.target.parent.source
             if doc then
-                result.uri           = doc.source
-                result.target.uri    = doc.source
+                local uri = parseUri(doc)
+                result.uri           = uri
+                result.target.uri    = uri
                 result.target.start  = guide.positionOf(doc.line - 1, doc.char)
                 result.target.finish = guide.positionOf(doc.line - 1, doc.char)
             end
@@ -22,8 +45,9 @@ return function (results)
                 for _, doc in ipairs(target.bindDocs) do
                     if  doc.type == 'doc.source'
                     and doc.bindSource == target then
-                        result.uri           = doc.source
-                        result.target.uri    = doc.source
+                        local uri = parseUri(doc)
+                        result.uri           = uri
+                        result.target.uri    = uri
                         result.target.start  = guide.positionOf(doc.line - 1, doc.char)
                         result.target.finish = guide.positionOf(doc.line - 1, doc.char)
                     end

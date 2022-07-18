@@ -3,7 +3,6 @@ local re         = require 'parser.relabel'
 local guide      = require 'parser.guide'
 local compile    = require 'parser.compile'
 local util       = require 'utility'
-local furi       = require 'file-uri'
 
 local TokenTypes, TokenStarts, TokenFinishs, TokenContents, TokenMarks
 ---@type integer
@@ -148,7 +147,7 @@ Symbol              <-  ({} {
 ---@field async? boolean
 ---@field versions? table[]
 ---@field names? parser.object[]
----@field source? parser.object
+---@field path? string
 
 local function parseTokens(text, offset)
     Ci = 0
@@ -1419,17 +1418,11 @@ local docSwitch = util.switch()
         source = source or fullSource
         line   = tonumber(line) or 1
         char   = tonumber(char) or 0
-        local uri
-        if furi.split(source) then
-            uri = source
-        else
-            uri = furi.decode(source)
-        end
         local result = {
             type   = 'doc.source',
             start  = getStart(),
             finish = getFinish(),
-            source = uri,
+            path   = source,
             line   = line,
             char   = char,
         }

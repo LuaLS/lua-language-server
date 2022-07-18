@@ -105,13 +105,16 @@ function vm.isSubType(uri, child, parent, mark)
         child = global
     elseif child.type == 'vm.node' then
         if config.get(uri, 'Lua.type.weakUnionCheck') then
+            local hasKnownType
             for n in child:eachObject() do
-                if  getNodeName(n)
-                and vm.isSubType(uri, n, parent, mark) then
-                    return true
+                if getNodeName(n) then
+                    hasKnownType = true
+                    if vm.isSubType(uri, n, parent, mark) then
+                        return true
+                    end
                 end
             end
-            return false
+            return not hasKnownType
         else
             local weakNil   = config.get(uri, 'Lua.type.weakNilCheck')
             for n in child:eachObject() do

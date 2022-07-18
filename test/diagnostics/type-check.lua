@@ -1,6 +1,7 @@
 local config = require 'config'
 
 config.add(nil, 'Lua.diagnostics.disable', 'unused-local')
+config.add(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.add(nil, 'Lua.diagnostics.disable', 'undefined-global')
 
 TEST [[
@@ -727,6 +728,15 @@ TEST [[
 ---@type number
 local x = G
 ]]
+
+TEST [[
+---@generic T
+---@param x T
+---@return T
+local function f(x)
+    return x
+end
+]]
 config.set(nil, 'Lua.type.weakUnionCheck', false)
 
 TEST [[
@@ -765,4 +775,5 @@ f(<!3!>)
 ]]
 
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
+config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

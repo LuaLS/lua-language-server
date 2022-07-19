@@ -977,6 +977,7 @@ local function compileLocal(source)
                 vm.setNode(source, vm.compileNode(source.parent.parent.parent.node))
             end
         end
+        vm.getNode(source):remove 'function'
     end
     local hasMarkValue
     if not hasMarkDoc and source.value then

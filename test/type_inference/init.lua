@@ -3726,3 +3726,14 @@ local m = {}
 
 print(<?m?>)
 ]]
+
+TEST 'A' [[
+---@class A
+---@overload fun():A
+local m = {}
+
+---@return A
+function m:init()
+    return <?self?>
+end
+]]

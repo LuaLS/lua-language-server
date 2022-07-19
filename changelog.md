@@ -70,6 +70,7 @@
 * `FIX` [#1320](https://github.com/sumneko/lua-language-server/issues/1320)
 * `FIX` [#1330](https://github.com/sumneko/lua-language-server/issues/1330)
 * `FIX` [#1346](https://github.com/sumneko/lua-language-server/issues/1346)
+* `FIX` [#1348](https://github.com/sumneko/lua-language-server/issues/1348)
 
 ## 3.4.2
 `2022-7-6`

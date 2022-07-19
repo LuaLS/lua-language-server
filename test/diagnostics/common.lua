@@ -2000,3 +2000,10 @@ print(1)
 
 do return end
 ]]
+
+TEST [[
+---@type unknown
+local t
+
+local _ <close> = t
+]]

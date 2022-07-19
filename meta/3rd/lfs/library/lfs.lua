@@ -62,7 +62,7 @@ In case of any errors it returns nil and the error message. In particular, if th
 function lfs.lock_dir(path, seconds_stale)
 end
 
----comment Returns a string with the current working directory or nil plus an error string.
+---Returns a string with the current working directory or nil plus an error string.
 ---@return string
 function lfs.currentdir()
 end
@@ -101,11 +101,6 @@ end
 --[[
     Creates a new directory. The argument is the name of the new directory.
     Returns true in case of success or nil, an error message and a system-dependent error code in case of error.
-    lfs.rmdir (dirname)
-    Removes an existing directory. The argument is the name of the directory.
-    Returns true in case of success or nil, an error message and a system-dependent error code in case of error.
-    lfs.setmode (file, mode)
-    Sets the writing mode for a file. The mode string can be either "binary" or "text". Returns true followed the previous mode string for the file, or nil followed by an error string in case of errors. On non-Windows platforms, where the two modes are identical, setting the mode has no effect, and the mode is always returned as binary.
 ]]
 ---@param dirname string
 ---@return boolean, string

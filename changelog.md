@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.5.0
+`2022-7-19`
 * `NEW` `LuaDoc`: `---@operator`:
   ```lua
   ---@class fspath

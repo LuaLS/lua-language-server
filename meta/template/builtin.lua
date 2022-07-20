@@ -7,7 +7,7 @@
 ---@class true: boolean
 ---@class false: boolean
 ---@class number
----@class integer: number
+---@alias integer number
 ---@class thread
 ---@class table<K, V>: { [K]: V }
 ---@class string: stringlib

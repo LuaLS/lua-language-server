@@ -1,6 +1,6 @@
-local guide    = require 'parser.guide'
+local guide = require 'parser.guide'
 ---@class vm
-local vm       = require 'vm.vm'
+local vm    = require 'vm.vm'
 
 ---@param source parser.object?
 ---@return boolean|nil
@@ -14,8 +14,9 @@ function vm.testCondition(source)
     end
     local hasTrue, hasFalse
     for n in node:eachObject() do
-        if n.type == 'boolean'
-        or n.type == 'doc.type.boolean' then
+        if  n.type == 'boolean'
+        or  n.type == 'doc.type.boolean'
+        or  n.type == 'true|false' then
             if n[1] == true then
                 hasTrue = true
             end
@@ -119,14 +120,14 @@ function vm.getInteger(v)
     local node = vm.compileNode(v)
     local result
     for n in node:eachObject() do
-        if n.type == 'integer' then
+        if  n.type == 'integer' then
             if result then
                 return nil
             else
                 result = n[1]
             end
         elseif n.type == 'number' then
-            if result then
+            if  result then
                 return nil
             elseif not math.tointeger(n[1]) then
                 return nil
@@ -150,7 +151,7 @@ function vm.getString(v)
     local node = vm.compileNode(v)
     local result
     for n in node:eachObject() do
-        if n.type == 'string' then
+        if  n.type == 'string' then
             if result then
                 return nil
             else
@@ -173,8 +174,8 @@ function vm.getNumber(v)
     local node = vm.compileNode(v)
     local result
     for n in node:eachObject() do
-        if n.type == 'number'
-        or n.type == 'integer' then
+        if  n.type == 'number'
+        or  n.type == 'integer' then
             if result then
                 return nil
             else
@@ -197,7 +198,7 @@ function vm.getBoolean(v)
     local node = vm.compileNode(v)
     local result
     for n in node:eachObject() do
-        if n.type == 'boolean' then
+        if  n.type == 'boolean' then
             if result then
                 return nil
             else

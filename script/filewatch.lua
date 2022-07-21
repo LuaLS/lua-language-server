@@ -69,6 +69,7 @@ function m.update()
         if not ev then
             break
         end
+        log.debug('filewatch:', ev, path)
         if not collect then
             collect = {}
         end

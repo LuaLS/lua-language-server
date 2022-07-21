@@ -293,6 +293,14 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
             if set.type == 'doc.class' then
                 -- check ---@field
                 local hasFounded = {}
+
+                local function copyToSearched()
+                    for fieldKey in pairs(hasFounded) do
+                        searchedFields[fieldKey] = true
+                        hasFounded[fieldKey] = nil
+                    end
+                end
+
                 for _, field in ipairs(set.fields) do
                     local fieldKey = guide.getKeyName(field)
                     if fieldKey then
@@ -342,8 +350,9 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                         end
                     end
                 end
+                copyToSearched()
                 -- check local field and global field
-                if not hasFounded[key] and set.bindSource then
+                if not searchedFields[key] and set.bindSource then
                     local src = set.bindSource
                     if src.value and src.value.type == 'table' then
                         searchFieldSwitch('table', suri, src.value, key, ref, function (field)
@@ -357,9 +366,10 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                             end
                         end)
                     end
+                    copyToSearched()
                     searchFieldSwitch(src.type, suri, src, key, ref, function (field)
                         local fieldKey = guide.getKeyName(field)
-                        if fieldKey and not hasFounded[fieldKey] then
+                        if fieldKey and not searchedFields[fieldKey] then
                             if  not searchedFields[fieldKey]
                             and guide.isSet(field) then
                                 hasFounded[fieldKey] = true
@@ -367,12 +377,10 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                             end
                         end
                     end)
+                    copyToSearched()
                 end
                 -- look into extends(if field not found)
-                if not hasFounded[key] and set.extends then
-                    for fieldKey in pairs(hasFounded) do
-                        searchedFields[fieldKey] = true
-                    end
+                if not searchedFields[key] and set.extends then
                     for _, extend in ipairs(set.extends) do
                         if extend.type == 'doc.extends.name' then
                             local extendType = vm.getGlobal('type', extend[1])
@@ -381,6 +389,7 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                             end
                         end
                     end
+                    copyToSearched()
                 end
             end
         end

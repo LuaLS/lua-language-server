@@ -2007,3 +2007,15 @@ local t
 
 local _ <close> = t
 ]]
+
+TEST [[
+---@diagnostic disable: duplicate-set-field
+---@class A
+local m = {}
+
+function m.ff() end
+
+function m.ff(x) end
+
+m.ff(1)
+]]

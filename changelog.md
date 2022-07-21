@@ -1,5 +1,8 @@
 # changelog
 
+## 3.5.1
+* `FIX` [#1354](https://github.com/sumneko/lua-language-server/issues/1354)
+
 ## 3.5.0
 `2022-7-19`
 * `NEW` `LuaDoc`: `---@operator`:

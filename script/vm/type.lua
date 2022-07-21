@@ -310,6 +310,9 @@ function vm.getTableValue(uri, tnode, knode, inversion)
                         end
                     end
                 end
+                if field.type == 'varargs' then
+                    result:merge(vm.compileNode(field))
+                end
             end
         end
     end

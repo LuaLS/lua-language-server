@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.5.1
+* `CHG` setting `type.castNumberToInteger` default by `true`
 * `FIX` [#1335](https://github.com/sumneko/lua-language-server/issues/1335)
 * `FIX` [#1354](https://github.com/sumneko/lua-language-server/issues/1354)
 

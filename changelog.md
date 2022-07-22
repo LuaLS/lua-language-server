@@ -3,8 +3,8 @@
 ## 3.5.1
 * `CHG` setting `type.castNumberToInteger` default by `true`
 * `CHG` improve supports for multi-workspace
-* `FIX` [#1335](https://github.com/sumneko/lua-language-server/issues/1335)
 * `FIX` [#1354](https://github.com/sumneko/lua-language-server/issues/1354)
+* `FIX` [#1355](https://github.com/sumneko/lua-language-server/issues/1355)
 
 ## 3.5.0
 `2022-7-19`

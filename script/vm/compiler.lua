@@ -1736,7 +1736,7 @@ local function compileByGlobal(source)
     if global.cate == 'variable' then
         local hasMarkDoc
         for _, set in ipairs(global:getSets(uri)) do
-            if set.bindDocs then
+            if set.bindDocs and set.parent.type == 'main' then
                 if bindDocs(set) then
                     globalNode:merge(vm.compileNode(set))
                     hasMarkDoc = true
@@ -1751,7 +1751,7 @@ local function compileByGlobal(source)
             vm.setNode(set, globalNode, true)
         end
         for _, set in ipairs(global:getSets(uri)) do
-            if set.value and set.value.type ~= 'nil' then
+            if set.value and set.value.type ~= 'nil' and set.parent.type == 'main' then
                 if not hasMarkDoc or guide.isLiteral(set.value) then
                     globalNode:merge(vm.compileNode(set.value))
                 end

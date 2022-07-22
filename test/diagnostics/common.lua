@@ -1988,6 +1988,28 @@ end
 ]]
 
 TEST [[
+while true do
+end
+
+<!print(1)!>
+]]
+
+TEST [[
+while true do
+end
+
+<!print(1)!>
+]]
+
+TEST [[
+while X do
+    X = 1
+end
+
+print(1)
+]]
+
+TEST [[
 ---@diagnostic disable: undefined-global
 
 while true do

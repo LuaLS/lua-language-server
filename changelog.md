@@ -5,6 +5,7 @@
 * `CHG` improve supports for multi-workspace
 * `FIX` [#1354](https://github.com/sumneko/lua-language-server/issues/1354)
 * `FIX` [#1355](https://github.com/sumneko/lua-language-server/issues/1355)
+* `FIX` [#1363](https://github.com/sumneko/lua-language-server/issues/1363)
 * `FIX` [#1368](https://github.com/sumneko/lua-language-server/issues/1368)
 
 ## 3.5.0

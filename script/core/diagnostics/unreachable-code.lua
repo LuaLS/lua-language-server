@@ -50,9 +50,6 @@ return function (uri, callback)
     ---@async
     guide.eachSourceTypes(state.ast, {'main', 'function'}, function (source)
         await.delay()
-        if not source.returns then
-            return
-        end
         for i, action in ipairs(source) do
             if  guide.isBlockType(action)
             and hasReturn(action) then

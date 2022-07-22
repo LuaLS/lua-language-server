@@ -11,11 +11,11 @@ local mt = {}
 mt.__index = mt
 mt.type = 'generic'
 
----@param source    vm.object
+---@param source    vm.object?
 ---@param resolved? table<string, vm.node>
----@return vm.object
+---@return vm.object?
 local function cloneObject(source, resolved)
-    if not resolved then
+    if not resolved or not source then
         return source
     end
     if source.type == 'doc.generic.name' then
@@ -126,8 +126,11 @@ function mt:resolve(uri, args)
             result:merge(nd)
         else
             ---@cast nd -vm.global
-            local clonedNode = vm.compileNode(cloneObject(nd, resolved))
-            result:merge(clonedNode)
+            local clonedObject = cloneObject(nd, resolved)
+            if clonedObject then
+                local clonedNode   = vm.compileNode(clonedObject)
+                result:merge(clonedNode)
+            end
         end
     end
     return result

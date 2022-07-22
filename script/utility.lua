@@ -290,6 +290,9 @@ function m.loadFile(path, keepBom)
     end
     local text = f:read 'a'
     f:close()
+    if not text then
+        return nil
+    end
     if not keepBom then
         if text:sub(1, 3) == '\xEF\xBB\xBF' then
             return text:sub(4)

@@ -77,6 +77,10 @@ local function initPlugin(uri)
         local interface = {}
         scp:set('pluginInterface', interface)
 
+        if not scp.uri then
+            return
+        end
+
         local pluginPath = ws.getAbsolutePath(scp.uri, config.get(scp.uri, 'Lua.runtime.plugin'))
         log.info('plugin path:', pluginPath)
         if not pluginPath then

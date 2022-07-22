@@ -916,21 +916,21 @@ local function collectRequireNames(mode, myUri, literal, source, smark, position
             local infos = rpath.getVisiblePath(uri, path)
             local relative = workspace.getRelativePath(path)
             for _, info in ipairs(infos) do
-                if matchKey(literal, info.expect) then
-                    if not collect[info.expect] then
-                        collect[info.expect] = {
+                if matchKey(literal, info.name) then
+                    if not collect[info.name] then
+                        collect[info.name] = {
                             textEdit = {
                                 start   = smark and (source.start + #smark) or position,
                                 finish  = smark and (source.finish - #smark) or position,
-                                newText = smark and info.expect or util.viewString(info.expect),
+                                newText = smark and info.name or util.viewString(info.name),
                             },
                             path = relative,
                         }
                     end
                     if vm.isMetaFile(uri) then
-                        collect[info.expect][#collect[info.expect]+1] = ('* [[meta]](%s)'):format(uri)
+                        collect[info.name][#collect[info.name]+1] = ('* [[meta]](%s)'):format(uri)
                     else
-                        collect[info.expect][#collect[info.expect]+1] = ([=[* [%s](%s) %s]=]):format(
+                        collect[info.name][#collect[info.name]+1] = ([=[* [%s](%s) %s]=]):format(
                             relative,
                             uri,
                             lang.script('HOVER_USE_LUA_PATH', info.searcher)

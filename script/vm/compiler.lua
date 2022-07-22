@@ -45,7 +45,7 @@ local function bindDocs(source)
             if not name then
                 return true
             end
-            local uri = rpath.findUrisByRequirePath(guide.getUri(source), name)[1]
+            local uri = rpath.findUrisByRequireName(guide.getUri(source), name)[1]
             if not uri then
                 return true
             end
@@ -1450,7 +1450,7 @@ local compilerSwitch = util.switch()
             if not name or type(name) ~= 'string' then
                 return
             end
-            local uri = rpath.findUrisByRequirePath(guide.getUri(func), name)[1]
+            local uri = rpath.findUrisByRequireName(guide.getUri(func), name)[1]
             if not uri then
                 return
             end

@@ -11,7 +11,7 @@ local furi     = require 'file-uri'
 local function collectRequire(mode, literal, uri)
     local result, searchers
     if     mode == 'require' then
-        result, searchers = rpath.findUrisByRequirePath(uri, literal)
+        result, searchers = rpath.findUrisByRequireName(uri, literal)
     elseif mode == 'dofile'
     or     mode == 'loadfile' then
         result = ws.findUrisByFilePath(literal)

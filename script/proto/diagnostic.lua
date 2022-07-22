@@ -93,7 +93,6 @@ m.register {
     'duplicate-doc-field',
     'unknown-diag-code',
     'unknown-cast-variable',
-    'cast-type-mismatch',
     'unknown-operator',
 } {
     group    = 'luadoc',

@@ -383,6 +383,13 @@ function m.normalize(path)
     end)
     path = util.expandPath(path)
     path = path:gsub('^%.[/\\]+', '')
+    for _ = 1, 1000 do
+        local count
+        path, count = path:gsub('[^/\\]+[/\\]%.%.', '')
+        if count == 0 then
+            break
+        end
+    end
     if platform.OS == 'Windows' then
         path = path:gsub('[/\\]+', '\\')
                    :gsub('[/\\]+$', '')

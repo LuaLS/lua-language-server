@@ -39,7 +39,7 @@ function mt:getRequireNameByPath(path, searcher)
                         : gsub('[/\\%.]+', separator)
     local stemSearcher = searcher
                         : gsub('%.[^%.]+$', '')
-                        : gsub('[/\\%.]+', separator)
+                        : gsub('[/\\]+', separator)
     local start        = stemSearcher:match '()%?' or 1
     if stemPath:sub(1, start - 1) ~= stemSearcher:sub(1, start - 1) then
         return nil
@@ -58,15 +58,18 @@ end
 ---@return require-manager.visibleResult[]
 function mt:getRequireResultByPath(path)
     local uri = furi.encode(path)
-    local searchers = config.get(self.scp.uri, 'Lua.runtime.path')
-    local strict    = config.get(self.scp.uri, 'Lua.runtime.pathStrict')
-    local libUri = files.getLibraryUri(self.scp.uri, uri)
+    local searchers   = config.get(self.scp.uri, 'Lua.runtime.path')
+    local strict      = config.get(self.scp.uri, 'Lua.runtime.pathStrict')
+    local libUri      = files.getLibraryUri(self.scp.uri, uri)
     local libraryPath = libUri and furi.decode(libUri)
     local result = {}
     for _, searcher in ipairs(searchers) do
         local isAbsolute = searcher:match '^[/\\]'
                         or searcher:match '^%a+%:'
         searcher = workspace.normalize(searcher)
+        if searcher:sub(1, 1) == '.' then
+            strict = true
+        end
         local cutedPath = path
         local currentPath = path
         local head
@@ -78,6 +81,29 @@ function mt:getRequireResultByPath(path)
                 currentPath = workspace.getRelativePath(uri)
             end
         end
+
+        -- handle `../?.lua`
+        local parentCount = 0
+        for _ = 1, 1000 do
+            if searcher:match '^%.%.[/\\]' then
+                parentCount = parentCount + 1
+                searcher = searcher:sub(4)
+            else
+                break
+            end
+        end
+        if parentCount > 0 then
+            local parentPath = libraryPath
+                            or (self.scp.uri and furi.decode(self.scp.uri))
+            if parentPath then
+                local tail
+                for _ = 1, parentCount do
+                    parentPath, tail = parentPath:match '^(.+)[/\\]([^/\\]*)$'
+                    currentPath = tail .. '/' .. currentPath
+                end
+            end
+        end
+
         repeat
             cutedPath = currentPath:sub(pos)
             head = currentPath:sub(1, pos - 1)

@@ -46,6 +46,7 @@ local accept = {
     ['number']      = true,
     ['integer']     = true,
     ['...']         = true,
+    ['callargs']    = true,
 
     ['doc.type.name']    = true,
     ['doc.class.name']   = true,
@@ -55,6 +56,8 @@ local accept = {
     ['doc.see.field']    = true,
     ['doc.cast.name']    = true,
 }
+
+local acceptGenArg = setmetatable({ ['string'] = true, ['callargs'] = false }, { __index = accept })
 
 local function checkRequire(source, offset)
     if source.type ~= 'string' then
@@ -113,6 +116,11 @@ return function (uri, offset)
     local source = convertIndex(findSource(ast, offset, accept))
     if not source then
         return nil
+    elseif source.type == 'callargs' then
+        source = findSource(ast, offset, acceptGenArg)
+        if not source then
+            return
+        end
     end
 
     local results = {}

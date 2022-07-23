@@ -144,6 +144,17 @@ local function searchFunction(source, pushResult, defMap, fileNotify)
     searchInAllFiles(guide.getUri(source), findCall, fileNotify)
 end
 
+---@async
+local function searchGenericArgumentReference(source, pushResult, defMap, fileNotify)
+    searchInAllFiles(guide.getUri(source),  function(suri) ---@async
+        guide.eachSourceType(files.getState(suri).ast, 'string', function(ref)
+            if vm.isGenericLiteralArgument(ref) and ref[1] == source[1] then
+                pushResult(ref)
+            end
+        end)
+    end, fileNotify)
+end
+
 local searchByParentNode
 local nodeSwitch = util.switch()
     : case 'field'
@@ -179,6 +190,12 @@ local nodeSwitch = util.switch()
     : call(function (source, pushResult, defMap, fileNotify)
         searchFunction(source, pushResult, defMap, fileNotify)
     end)
+    : case 'doc.class.name'
+    ---@async
+    : call(function(source, pushResult, defMap, fileNotify)
+        searchGenericArgumentReference(source, pushResult, defMap, fileNotify)
+    end)
+
 
 ---@param source  parser.object
 ---@param pushResult fun(src: parser.object)

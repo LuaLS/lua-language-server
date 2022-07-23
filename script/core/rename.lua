@@ -214,6 +214,8 @@ end
 local function ofDocTypeName(source, newname, callback)
     local oldname = source[1]
     local global = vm.getGlobal('type', oldname)
+    local refs = vm.getRefs(source)
+
     if not global then
         return
     end
@@ -229,6 +231,12 @@ local function ofDocTypeName(source, newname, callback)
     for _, doc in ipairs(global:getGets(uri)) do
         if doc.type == 'doc.type.name' then
             callback(doc, doc.start, doc.finish, newname)
+        end
+    end
+    for _, ref in ipairs(refs) do
+        if vm.isGenericLiteralArgument(ref) then
+            local stringLiteralDesignatorOffset = #ref[2]
+            callback(ref, ref.start+stringLiteralDesignatorOffset, ref.finish-stringLiteralDesignatorOffset, newname)
         end
     end
 end

@@ -1,5 +1,6 @@
 ---@class vm
 local vm      = require 'vm.vm'
+local util    = require 'utility'
 
 ---@class parser.object
 ---@field _generic vm.generic
@@ -139,4 +140,23 @@ function vm.createGeneric(proto, sign)
         proto = proto,
     }, mt)
     return generic
+end
+
+function vm.isGenericLiteralArgument(source)
+    if not (source.type == 'string' and source.parent.type == 'callargs') then return false end
+
+    local argIndex = util.indexOf(source.parent, source)
+    local functionDef = util.findIf(vm.getDefs(source.parent.parent.node), function(item) return item.type == 'function' end)
+    if not functionDef then return false end
+
+    local argDefinition = functionDef.args[argIndex]
+    if not argDefinition or not argDefinition.bindDocs then
+        return false
+    end
+    local paramDoc = util.findIf(argDefinition.bindDocs, function(item) return item.type == 'doc.param' end)
+    if not paramDoc then
+        return false
+    end
+    local doesExtendLiteralGeneric = util.findIf(paramDoc.extends.types, function(item) return item.type == 'doc.generic.name' and item.literal end)
+    return not not doesExtendLiteralGeneric
 end

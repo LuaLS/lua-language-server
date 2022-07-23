@@ -829,6 +829,27 @@ function m.arrayRemove(array, value)
     end
 end
 
+function m.indexOf(array, value)
+    for i = 1, #array do
+        if array[i] == value then
+            return i
+        end
+    end
+    return nil
+end
+
+function m.indexOfIf(array, condition)
+    for i = 1, #array do
+        if condition(array[i]) then
+            return i
+        end
+    end
+end
+
+function m.findIf(array, condition)
+    return array[m.indexOfIf(array, condition)]
+end
+
 m.MODE_K  = { __mode = 'k' }
 m.MODE_V  = { __mode = 'v' }
 m.MODE_KV = { __mode = 'kv' }

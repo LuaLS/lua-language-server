@@ -212,3 +212,23 @@ function f(arg2)
     print(arg2)
 end
 ]]
+
+-- Testing generic argument renaming
+
+TEST ("MyClass", "OtherClass") [[
+---@class MyClass
+
+---@generic T
+---@param className `T`
+function new(className) end
+
+new "MyClass"
+]] [[
+---@class OtherClass
+
+---@generic T
+---@param className `T`
+function new(className) end
+
+new "OtherClass"
+]]

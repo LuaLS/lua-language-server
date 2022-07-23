@@ -2,6 +2,44 @@
 local vm        = require 'vm.vm'
 local util      = require 'utility'
 local guide     = require 'parser.guide'
+local files     = require 'files'
+local progress  = require 'progress'
+local lang      = require 'language'
+local await     = require 'await'
+
+---@async
+local function searchInAllFiles(suri, searcher, notify)
+    searcher(suri)
+
+    local uris = {}
+    for uri in files.eachFile(suri) do
+        if  not vm.isMetaFile(uri)
+        and suri ~= uri then
+            uris[#uris+1] = uri
+        end
+    end
+
+    local loading <close> = progress.create(suri, lang.script.WINDOW_SEARCHING_IN_FILES, 1)
+    local cancelled
+    loading:onCancel(function ()
+        cancelled = true
+    end)
+    for i, uri in ipairs(uris) do
+        if notify then
+            local continue = notify(uri)
+            if continue == false then
+                break
+            end
+        end
+        loading:setMessage(('%03d/%03d'):format(i, #uris))
+        loading:setPercentage(i / #uris * 100)
+        await.delay()
+        if cancelled then
+            break
+        end
+        searcher(uri)
+    end
+end
 
 local simpleSwitch
 
@@ -116,6 +154,20 @@ local nodeSwitch;nodeSwitch = util.switch()
         for pn in parentNode:eachObject() do
             searchFieldSwitch(pn.type, uri, pn, source[1], pushResult)
         end
+    end)
+    : case 'string'
+    ---@async
+    : call(function(source, lastKey, pushResult)
+        if not vm.isGenericLiteralArgument(source) then
+            return
+        end
+        local function findClass(suri)
+            for _, class in ipairs(vm.getDocSets(suri, source[1])) do
+                pushResult(class)
+            end
+        end
+
+        searchInAllFiles(guide.getUri(source), findClass)
     end)
 
 ---@param source  parser.object

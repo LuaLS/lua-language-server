@@ -1410,6 +1410,22 @@ string
 ""
 ```
 
+# runtime.pluginArgs
+
+Arguments to pass to to the runtime plug.
+
+## type
+
+```ts
+array<string>
+```
+
+ ## default
+
+```json
+[]
+```
+
 # runtime.special
 
 將自訂全域變數視為一些特殊的內建變數，語言伺服將提供特殊的支援。

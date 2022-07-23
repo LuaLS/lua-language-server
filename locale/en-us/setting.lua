@@ -26,6 +26,8 @@ config.runtime.nonstandardSymbol  =
 "Supports non-standard symbols. Make sure that your runtime environment supports these symbols."
 config.runtime.plugin             =
 "Plugin path. Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/Plugin) to learn more."
+config.runtime.pluginArgs         =
+"Additional arguments for the plugin."
 config.runtime.fileEncoding       =
 "File encoding. The `ansi` option is only available under the `Windows` platform."
 config.runtime.builtin            =

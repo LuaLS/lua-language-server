@@ -26,6 +26,8 @@ config.runtime.nonstandardSymbol  = -- TODO: need translate!
 "Supports non-standard symbols. Make sure that your runtime environment supports these symbols."
 config.runtime.plugin             = -- TODO: need translate!
 "Plugin path. Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/Plugin) to learn more."
+config.runtime.pluginArgs         = -- TODO: need translate!
+"Additional arguments for the plugin."
 config.runtime.fileEncoding       = -- TODO: need translate!
 "File encoding. The `ansi` option is only available under the `Windows` platform."
 config.runtime.builtin            = -- TODO: need translate!

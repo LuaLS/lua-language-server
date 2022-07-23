@@ -26,6 +26,8 @@ config.runtime.nonstandardSymbol  =
 "支援非標準的符號。請務必確認你的執行環境支援這些符號。"
 config.runtime.plugin             =
 "延伸模組路徑，請查閱[文件](https://github.com/sumneko/lua-language-server/wiki/Plugin)瞭解用法。"
+config.runtime.pluginArgs         = -- TODO: need translate!
+"Additional arguments for the plugin."
 config.runtime.fileEncoding       =
 "檔案編碼，選項 `ansi` 只在 `Windows` 平台下有效。"
 config.runtime.builtin            =

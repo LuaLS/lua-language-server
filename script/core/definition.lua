@@ -173,8 +173,7 @@ return function (uri, offset)
         or src.type == 'doc.alias.name' then
             if  source.type ~= 'doc.type.name'
             and source.type ~= 'doc.extends.name'
-            and source.type ~= 'doc.see.name'
-            and source.type ~= 'string' then
+            and source.type ~= 'doc.see.name' then
                 goto CONTINUE
             end
         end

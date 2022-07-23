@@ -11,10 +11,10 @@ local m = {}
 m.map = {}
 
 ---@class progress
----@field _uri  uri
+---@field _uri   uri
+---@field _token integer
 local mt = {}
 mt.__index     = mt
-mt._token      = nil
 mt._title      = nil
 mt._message    = nil
 mt._removed    = false

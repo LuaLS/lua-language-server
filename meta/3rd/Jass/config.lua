@@ -1,4 +1,4 @@
-words   = {'jass.common'}
+words   = {'jass%.common'}
 configs = {
     {
         name  = 'Lua.runtime.version',

@@ -71,7 +71,7 @@ local searchFieldSwitch = util.switch()
         end
     end)
     : case 'global'
-    ---@param obj vm.object
+    ---@param obj vm.global
     ---@param key string
     : call(function (suri, obj, key, pushResult)
         if obj.cate == 'variable' then
@@ -123,7 +123,7 @@ local nodeSwitch;nodeSwitch = util.switch()
         local parentNode = vm.compileNode(source.node)
         local uri = guide.getUri(source)
         local key = guide.getKeyName(source)
-        if not key then
+        if type(key) ~= 'string' then
             return
         end
         if lastKey then
@@ -140,9 +140,15 @@ local nodeSwitch;nodeSwitch = util.switch()
         if lastKey then
             return
         end
-        local tbl = source.parent
+        local key = guide.getKeyName(source)
+        if type(key) ~= 'string' then
+            return
+        end
         local uri = guide.getUri(source)
-        searchFieldSwitch(tbl.type, uri, tbl, guide.getKeyName(source), pushResult)
+        local parentNode = vm.compileNode(source.node)
+        for pn in parentNode:eachObject() do
+            searchFieldSwitch(pn.type, uri, pn, key, pushResult)
+        end
     end)
     : case 'doc.see.field'
     : call(function (source, lastKey, pushResult)

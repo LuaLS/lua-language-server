@@ -50,10 +50,4 @@ function m.initDictionary()
     pformatting.updateNonStandardSymbols(config.get(nil, "Lua.runtime.nonstandardSymbol"))
 end
 
-config.watch(function (uri, key, value, oldValue)
-    if key == 'Lua.spell.dict' and uri ~= nil then
-        diagnostics.refresh(uri)
-    end
-end)
-
 return m

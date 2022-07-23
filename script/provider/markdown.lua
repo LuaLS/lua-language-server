@@ -10,7 +10,7 @@ function mt:__tostring()
 end
 
 ---@param language string
----@param text string|markdown
+---@param text? string|markdown
 function mt:add(language, text)
     if not text then
         return self
@@ -48,6 +48,7 @@ function mt:emptyLine()
     return self
 end
 
+---@return string
 function mt:string(nl)
     if self._cacheResult then
         return self._cacheResult
@@ -90,6 +91,10 @@ function mt:string(nl)
                     local last = lines[#lines]
                     if obj.text:sub(1, 1) == '@'
                     or last:sub(1, 1) == '@' then
+                        if lines[#lines] ~= '' then
+                            lines[#lines+1] = ''
+                        end
+                    elseif last == '---' then
                         if lines[#lines] ~= '' then
                             lines[#lines+1] = ''
                         end

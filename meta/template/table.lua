@@ -61,7 +61,7 @@ function table.sort(list, comp) end
 ---@param list T[]
 ---@param i?   integer
 ---@param j?   integer
----@return T
+---@return T   ...
 ---@nodiscard
 function table.unpack(list, i, j) end
 
@@ -91,17 +91,5 @@ function table.foreachi(list, callback) end
 ---@nodiscard
 ---@deprecated
 function table.getn(list) end
-
----@version JIT
----#DES 'table.new'
----@param narray integer
----@param nhash integer
----@return table
-function table.new(narray, nhash) end
-
----@version JIT
----#DES 'table.clear'
----@param tab table
-function table.clear(tab) end
 
 return table

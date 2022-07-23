@@ -80,7 +80,6 @@ function mt:reportHangs()
 end
 
 ---@param callback async fun(client: languageClient)
----@return languageClient
 function mt:start(callback)
     CLI = true
 

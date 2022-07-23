@@ -28,7 +28,8 @@ return function (uri, callback)
         if  not infer:hasClass(uri)
         and not infer:hasType(uri, 'nil')
         and not infer:hasType(uri, 'table')
-        and infer:view(uri, 'any') ~= 'any'  then
+        and not infer:hasUnknown(uri)
+        and not infer:hasAny(uri) then
             callback {
                 start   = source.value.start,
                 finish  = source.value.finish,

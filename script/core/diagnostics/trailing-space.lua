@@ -1,25 +1,18 @@
 local files = require 'files'
 local lang  = require 'language'
 local guide = require 'parser.guide'
+local await = require 'await'
 
-local function isInString(ast, offset)
-    local result = false
-    guide.eachSourceType(ast, 'string', function (source)
-        if offset >= source.start and offset <= source.finish then
-            result = true
-        end
-    end)
-    return result
-end
-
+---@async
 return function (uri, callback)
     local state = files.getState(uri)
-    if not state then
+    local text  = files.getText(uri)
+    if not state or not text then
         return
     end
-    local text  = files.getText(uri)
     local lines = state.lines
     for i = 0, #lines do
+        await.delay()
         local startOffset  = lines[i]
         local finishOffset = text:find('[\r\n]', startOffset) or (#text + 1)
         local lastOffset   = finishOffset - 1
@@ -28,7 +21,8 @@ return function (uri, callback)
             goto NEXT_LINE
         end
         local lastPos = guide.offsetToPosition(state, lastOffset)
-        if isInString(state.ast, lastPos) then
+        if guide.isInString(state.ast, lastPos)
+        or guide.isInComment(state.ast, lastPos) then
             goto NEXT_LINE
         end
         local firstOffset = startOffset

@@ -32,7 +32,7 @@ local function asFunction(source)
                     vm.getInfer(argNode):view(guide.getUri(source), 'any')
                 )
             elseif arg.type == '...' then
-                args[#args+1] = ('%s: %s'):format(
+                args[#args+1] = ('%s%s'):format(
                     '...',
                     vm.getInfer(arg):view(guide.getUri(source), 'any')
                 )
@@ -46,10 +46,10 @@ local function asFunction(source)
 end
 
 local function asDocFunction(source)
-    if not source.args then
-        return ''
-    end
     local args = {}
+    if not source.args then
+        return args
+    end
     for i = 1, #source.args do
         local arg = source.args[i]
         local name = arg.name[1]

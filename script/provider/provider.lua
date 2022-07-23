@@ -21,6 +21,8 @@ local furi       = require 'file-uri'
 local inspect    = require 'inspect'
 local markdown   = require 'provider.markdown'
 local guide      = require 'parser.guide'
+local fs         = require 'bee.filesystem'
+local jumpSource = require 'core.jump-source'
 
 ---@async
 local function updateConfig(uri)
@@ -28,7 +30,7 @@ local function updateConfig(uri)
     local specified = cfgLoader.loadLocalConfig(uri, CONFIGPATH)
     if specified then
         log.info('Load config from specified', CONFIGPATH)
-        log.debug(inspect(specified))
+        log.info(inspect(specified))
         -- watch directory
         filewatch.watch(workspace.getAbsolutePath(uri, CONFIGPATH):gsub('[^/\\]+$', ''))
         config.update(scope.override, specified)
@@ -38,14 +40,14 @@ local function updateConfig(uri)
         local clientConfig = cfgLoader.loadClientConfig(folder.uri)
         if clientConfig then
             log.info('Load config from client', folder.uri)
-            log.debug(inspect(clientConfig))
+            log.info(inspect(clientConfig))
         end
 
         local rc = cfgLoader.loadRCConfig(folder.uri, '.luarc.json')
                 or cfgLoader.loadRCConfig(folder.uri, '.luarc.jsonc')
         if rc then
             log.info('Load config from .luarc.json/.luarc.jsonc', folder.uri)
-            log.debug(inspect(rc))
+            log.info(inspect(rc))
         end
 
         config.update(folder, clientConfig, rc)
@@ -53,7 +55,7 @@ local function updateConfig(uri)
 
     local global = cfgLoader.loadClientConfig()
     log.info('Load config from client', 'fallback')
-    log.debug(inspect(global))
+    log.info(inspect(global))
     config.update(scope.fallback, global)
 end
 
@@ -149,7 +151,6 @@ m.register 'initialized'{
             })
         end
         client.setReady()
-        library.init()
         workspace.init()
         return true
     end
@@ -234,6 +235,29 @@ m.register 'workspace/didRenameFiles' {
     end
 }
 
+m.register 'workspace/didChangeWorkspaceFolders' {
+    capability = {
+        workspace = {
+            workspaceFolders = {
+                supported = true,
+                changeNotifications = true,
+            },
+        },
+    },
+    ---@async
+    function (params)
+        log.debug('workspace/didChangeWorkspaceFolders', inspect(params))
+        for _, folder in ipairs(params.event.added) do
+            workspace.create(folder.uri)
+            updateConfig()
+            workspace.reload(scope.getScope(folder.uri))
+        end
+        for _, folder in ipairs(params.event.removed) do
+            workspace.remove(folder.uri)
+        end
+    end
+}
+
 m.register 'textDocument/didOpen' {
     function (params)
         local doc      = params.textDocument
@@ -265,6 +289,7 @@ m.register 'textDocument/didClose' {
 }
 
 m.register 'textDocument/didChange' {
+    ---@async
     function (params)
         local doc      = params.textDocument
         local scheme   = furi.split(doc.uri)
@@ -274,7 +299,11 @@ m.register 'textDocument/didChange' {
         end
         local changes = params.contentChanges
         local uri     = files.getRealUri(doc.uri)
-        local text = files.getOriginText(uri) or ''
+        local text = files.getOriginText(uri)
+        if not text then
+            files.setText(uri, pub.awaitTask('loadFile', furi.decode(uri)), false)
+            return
+        end
         local rows = files.getCachedRows(uri)
         text, rows = tm(text, rows, changes)
         files.setText(uri, text, true, function (file)
@@ -312,7 +341,7 @@ m.register 'textDocument/hover' {
         end
         local pos = converter.unpackPosition(uri, params.position)
         local hover, source = core.byUri(uri, pos)
-        if not hover then
+        if not hover or not source then
             return nil
         end
         return {
@@ -348,18 +377,16 @@ m.register 'textDocument/definition' {
         for i, info in ipairs(result) do
             local targetUri = info.uri
             if targetUri then
-                if files.exists(targetUri) then
-                    if client.getAbility 'textDocument.definition.linkSupport' then
-                        response[i] = converter.locationLink(targetUri
-                            , converter.packRange(targetUri, info.target.start, info.target.finish)
-                            , converter.packRange(targetUri, info.target.start, info.target.finish)
-                            , converter.packRange(uri,       info.source.start, info.source.finish)
-                        )
-                    else
-                        response[i] = converter.location(targetUri
-                            , converter.packRange(targetUri, info.target.start, info.target.finish)
-                        )
-                    end
+                if client.getAbility 'textDocument.definition.linkSupport' then
+                    response[i] = converter.locationLink(targetUri
+                        , converter.packRange(targetUri, info.target.start, info.target.finish)
+                        , converter.packRange(targetUri, info.target.start, info.target.finish)
+                        , converter.packRange(uri,       info.source.start, info.source.finish)
+                    )
+                else
+                    response[i] = converter.location(targetUri
+                        , converter.packRange(targetUri, info.target.start, info.target.finish)
+                    )
                 end
             end
         end
@@ -390,18 +417,16 @@ m.register 'textDocument/typeDefinition' {
         for i, info in ipairs(result) do
             local targetUri = info.uri
             if targetUri then
-                if files.exists(targetUri) then
-                    if client.getAbility 'textDocument.typeDefinition.linkSupport' then
-                        response[i] = converter.locationLink(targetUri
-                            , converter.packRange(targetUri, info.target.start, info.target.finish)
-                            , converter.packRange(targetUri, info.target.start, info.target.finish)
-                            , converter.packRange(uri,       info.source.start, info.source.finish)
-                        )
-                    else
-                        response[i] = converter.location(targetUri
-                            , converter.packRange(targetUri, info.target.start, info.target.finish)
-                        )
-                    end
+                if client.getAbility 'textDocument.typeDefinition.linkSupport' then
+                    response[i] = converter.locationLink(targetUri
+                        , converter.packRange(targetUri, info.target.start, info.target.finish)
+                        , converter.packRange(targetUri, info.target.start, info.target.finish)
+                        , converter.packRange(uri,       info.source.start, info.source.finish)
+                    )
+                else
+                    response[i] = converter.location(targetUri
+                        , converter.packRange(targetUri, info.target.start, info.target.finish)
+                    )
                 end
             end
         end
@@ -904,29 +929,35 @@ local function toArray(map)
     return array
 end
 
-m.register 'textDocument/semanticTokens/full' {
-    capability = {
-        semanticTokensProvider = {
-            legend = {
-                tokenTypes     = toArray(define.TokenTypes),
-                tokenModifiers = toArray(define.TokenModifiers),
-            },
-            full  = true,
-        },
-    },
-    ---@async
-    function (params)
-        log.debug('textDocument/semanticTokens/full')
-        local uri = files.getRealUri(params.textDocument.uri)
-        workspace.awaitReady(uri)
-        local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
-        local core = require 'core.semantic-tokens'
-        local results = core(uri, 0, math.huge)
-        return {
-            data = results
-        }
+client.event(function (ev)
+    if ev == 'init' then
+        if not client.isVSCode() then
+            m.register 'textDocument/semanticTokens/full' {
+                capability = {
+                    semanticTokensProvider = {
+                        legend = {
+                            tokenTypes     = toArray(define.TokenTypes),
+                            tokenModifiers = toArray(define.TokenModifiers),
+                        },
+                        full  = true,
+                    },
+                },
+                ---@async
+                function (params)
+                    log.debug('textDocument/semanticTokens/full')
+                    local uri = files.getRealUri(params.textDocument.uri)
+                    workspace.awaitReady(uri)
+                    local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
+                    local core = require 'core.semantic-tokens'
+                    local results = core(uri, 0, math.huge)
+                    return {
+                        data = results
+                    }
+                end
+            }
+        end
     end
-}
+end)
 
 m.register 'textDocument/semanticTokens/range' {
     capability = {
@@ -1003,6 +1034,7 @@ m.register '$/status/click' {
         local titleDiagnostic = lang.script.WINDOW_LUA_STATUS_DIAGNOSIS_TITLE
         local result = client.awaitRequestMessage('Info', lang.script.WINDOW_LUA_STATUS_DIAGNOSIS_MSG, {
             titleDiagnostic,
+            DEVELOP and 'Restart Server',
         })
         if not result then
             return
@@ -1012,6 +1044,10 @@ m.register '$/status/click' {
             for _, scp in ipairs(workspace.folders) do
                 diagnostic.diagnosticsScope(scp.uri, true)
             end
+        elseif result == 'Restart Server' then
+            local diag = require 'provider.diagnostic'
+            diag.clearAll(true)
+            os.exit(0, true)
         end
     end
 }
@@ -1227,7 +1263,7 @@ m.register 'textDocument/diagnostic' {
         workspace.awaitReady(uri)
         local core = require 'provider.diagnostic'
         -- TODO: do some trick
-        core.refresh(uri)
+        core.doDiagnostic(uri)
 
         return {
             kind = 'unchanged',
@@ -1297,6 +1333,35 @@ m.register 'workspace/diagnostic' {
             })
         end)
         return { items = {} }
+    end
+}
+
+m.register '$/api/report' {
+    ---@async
+    function (params)
+        local buildMeta = require 'provider.build-meta'
+        local SDBMHash  = require 'SDBMHash'
+        await.close 'api/report'
+        await.setID 'api/report'
+        local name = params.name or 'default'
+        local uri  = workspace.getFirstScope().uri
+        local hash = uri and ('%08x'):format(SDBMHash():hash(uri))
+        local encoding = config.get(nil, 'Lua.runtime.fileEncoding')
+        local nameBuf = {}
+        nameBuf[#nameBuf+1] = name
+        nameBuf[#nameBuf+1] = hash
+        nameBuf[#nameBuf+1] = encoding
+        local fileDir = METAPATH .. '/' ..  table.concat(nameBuf, ' ')
+        fs.create_directories(fs.path(fileDir))
+        buildMeta.build(fileDir, params)
+        client.setConfig {
+            {
+                key    = 'Lua.workspace.library',
+                action = 'add',
+                value  = fileDir,
+                uri    = uri,
+            }
+        }
     end
 }
 

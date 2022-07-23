@@ -6,11 +6,12 @@ local lang     = require 'language'
 local util     = require 'utility'
 local guide    = require 'parser.guide'
 local rpath    = require 'workspace.require-path'
+local furi     = require 'file-uri'
 
 local function collectRequire(mode, literal, uri)
     local result, searchers
     if     mode == 'require' then
-        result, searchers = rpath.findUrisByRequirePath(uri, literal)
+        result, searchers = rpath.findUrisByRequireName(uri, literal)
     elseif mode == 'dofile'
     or     mode == 'loadfile' then
         result = ws.findUrisByFilePath(literal)
@@ -82,7 +83,53 @@ local function asString(source)
         or asStringView(source, literal)
 end
 
-local function getBindComment(source, docGroup, base)
+---@param comment string
+---@param suri uri
+---@return string?
+local function normalizeComment(comment, suri)
+    if not comment then
+        return nil
+    end
+    if comment:sub(1, 1) == '-' then
+        comment = comment:sub(2)
+    end
+    if comment:sub(1, 1) == '@' then
+        return nil
+    end
+    comment = comment:gsub('(%[.-%]%()(.-)(%))', function (left, path, right)
+        local scheme = furi.split(path)
+        if scheme
+        -- strange way to check `C:/xxx.lua`
+        and #scheme > 1 then
+            return
+        end
+        local absPath = ws.getAbsolutePath(suri:gsub('/[^/]+$', ''), path)
+        if not absPath then
+            return
+        end
+        local uri     = furi.encode(absPath)
+        return left .. uri .. right
+    end)
+    return comment
+end
+
+local function getBindComment(source)
+    local uri = guide.getUri(source)
+    local lines = {}
+    for _, docComment in ipairs(source.bindComments) do
+        lines[#lines+1] = normalizeComment(docComment.comment.text, uri)
+    end
+    if not lines or #lines == 0 then
+        return nil
+    end
+    return table.concat(lines, '\n')
+end
+
+local function lookUpDocComments(source)
+    local docGroup = source.bindDocs
+    if not docGroup then
+        return
+    end
     if source.type == 'setlocal'
     or source.type == 'getlocal' then
         source = source.node
@@ -90,34 +137,23 @@ local function getBindComment(source, docGroup, base)
     if source.parent.type == 'funcargs' then
         return
     end
-    local continue
-    local lines
+    local uri = guide.getUri(source)
+    local lines = {}
     for _, doc in ipairs(docGroup) do
         if doc.type == 'doc.comment' then
-            if not continue then
-                continue = true
-                lines = {}
+            lines[#lines+1] = normalizeComment(doc.comment.text, uri)
+        elseif doc.type == 'doc.type' then
+            if doc.comment then
+                lines[#lines+1] = normalizeComment(doc.comment.text, uri)
             end
-            if doc.comment.text:sub(1, 1) == '-' then
-                lines[#lines+1] = doc.comment.text:sub(2)
-            else
-                lines[#lines+1] = doc.comment.text
-            end
-        elseif doc == base then
-            break
-        else
-            continue = false
-            if doc.type == 'doc.field'
-            or doc.type == 'doc.class' then
-                lines = nil
+        elseif doc.type == 'doc.class' then
+            for _, docComment in ipairs(doc.bindComments) do
+                lines[#lines+1] = normalizeComment(docComment.comment.text, uri)
             end
         end
     end
     if source.comment then
-        if not lines then
-            lines = {}
-        end
-        lines[#lines+1] = source.comment.text
+        lines[#lines+1] = normalizeComment(source.comment.text, uri)
     end
     if not lines or #lines == 0 then
         return nil
@@ -128,8 +164,9 @@ end
 local function tryDocClassComment(source)
     for _, def in ipairs(vm.getDefs(source)) do
         if def.type == 'doc.class'
-        or def.type == 'doc.alias' then
-            local comment = getBindComment(def, def.bindGroup, def)
+        or def.type == 'doc.alias'
+        or def.type == 'doc.enum' then
+            local comment = getBindComment(def)
             if comment then
                 return comment
             end
@@ -144,7 +181,7 @@ local function tryDocModule(source)
     return collectRequire('require', source.module, guide.getUri(source))
 end
 
-local function buildEnumChunk(docType, name)
+local function buildEnumChunk(docType, name, uri)
     if not docType then
         return nil
     end
@@ -155,7 +192,8 @@ local function buildEnumChunk(docType, name)
         types[#types+1] = vm.getInfer(tp):view(guide.getUri(docType))
         if tp.type == 'doc.type.string'
         or tp.type == 'doc.type.integer'
-        or tp.type == 'doc.type.boolean' then
+        or tp.type == 'doc.type.boolean'
+        or tp.type == 'doc.type.code' then
             enums[#enums+1] = tp
         end
         local comment = tryDocClassComment(tp)
@@ -174,7 +212,7 @@ local function buildEnumChunk(docType, name)
                 (enum.default    and '->')
             or  (enum.additional and '+>')
             or  ' |',
-            vm.viewObject(enum)
+            vm.viewObject(enum, uri)
         )
         if enum.comment then
             local first = true
@@ -198,26 +236,33 @@ local function getBindEnums(source, docGroup)
         return
     end
 
+    local uri = guide.getUri(source)
     local mark = {}
     local chunks = {}
     local returnIndex = 0
     for _, doc in ipairs(docGroup) do
         if     doc.type == 'doc.param' then
             local name = doc.param[1]
+            if name == '...' then
+                name = '...(param)'
+            end
             if mark[name] then
                 goto CONTINUE
             end
             mark[name] = true
-            chunks[#chunks+1] = buildEnumChunk(doc.extends, name)
+            chunks[#chunks+1] = buildEnumChunk(doc.extends, name, uri)
         elseif doc.type == 'doc.return' then
             for _, rtn in ipairs(doc.returns) do
                 returnIndex = returnIndex + 1
                 local name = rtn.name and rtn.name[1] or ('return #%d'):format(returnIndex)
+                if name == '...' then
+                    name = '...(return)'
+                end
                 if mark[name] then
                     goto CONTINUE
                 end
                 mark[name] = true
-                chunks[#chunks+1] = buildEnumChunk(rtn, name)
+                chunks[#chunks+1] = buildEnumChunk(rtn, name, uri)
             end
         end
         ::CONTINUE::
@@ -228,36 +273,38 @@ local function getBindEnums(source, docGroup)
     return table.concat(chunks, '\n\n')
 end
 
-local function tryDocFieldUpComment(source)
+local function tryDocFieldComment(source)
     if source.type ~= 'doc.field' then
         return
     end
-    if not source.bindGroup then
-        return
+    if source.comment then
+        return normalizeComment(source.comment.text, guide.getUri(source))
     end
-    local comment = getBindComment(source, source.bindGroup, source)
-    return comment
+    if source.bindGroup then
+        return getBindComment(source)
+    end
 end
 
 local function getFunctionComment(source)
     local docGroup = source.bindDocs
+    if not docGroup then
+        return
+    end
 
     local hasReturnComment = false
-    for _, doc in ipairs(docGroup) do
+    for _, doc in ipairs(source.bindDocs) do
         if doc.type == 'doc.return' and doc.comment then
             hasReturnComment = true
             break
         end
     end
 
+    local uri = guide.getUri(source)
     local md = markdown()
     for _, doc in ipairs(docGroup) do
         if     doc.type == 'doc.comment' then
-            if doc.comment.text:sub(1, 1) == '-' then
-                md:add('md', doc.comment.text:sub(2))
-            else
-                md:add('md', doc.comment.text)
-            end
+            local comment = normalizeComment(doc.comment.text, uri)
+            md:add('md', comment)
         elseif doc.type == 'doc.param' then
             if doc.comment then
                 md:add('md', ('@*param* `%s` — %s'):format(
@@ -294,18 +341,36 @@ local function getFunctionComment(source)
 
     local enums = getBindEnums(source, docGroup)
     md:add('lua', enums)
-    return md
+
+    local comment = md:string()
+    if comment == '' then
+        return nil
+    end
+    return comment
 end
 
 local function tryDocComment(source)
-    if not source.bindDocs then
-        return
+    local md = markdown()
+    if source.type == 'function' then
+        local comment = getFunctionComment(source)
+        md:add('md', comment)
+        source = source.parent
     end
-    if source.type ~= 'function' then
-        local comment = getBindComment(source, source.bindDocs)
-        return comment
+    local comment = lookUpDocComments(source)
+    md:add('md', comment)
+    if source.type == 'doc.alias' then
+        local enums = buildEnumChunk(source, source.alias[1], guide.getUri(source))
+        md:add('lua', enums)
     end
-    return getFunctionComment(source)
+    if source.type == 'doc.enum' then
+        local enums = buildEnumChunk(source, source.enum[1], guide.getUri(source))
+        md:add('lua', enums)
+    end
+    local result = md:string()
+    if result == '' then
+        return nil
+    end
+    return result
 end
 
 local function tryDocOverloadToComment(source)
@@ -314,14 +379,12 @@ local function tryDocOverloadToComment(source)
     end
     local doc = source.parent
     if doc.type ~= 'doc.overload'
-    or not doc.bindSources then
+    or not doc.bindSource then
         return
     end
-    for _, src in ipairs(doc.bindSources) do
-        local md = tryDocComment(src)
-        if md then
-            return md
-        end
+    local md = tryDocComment(doc.bindSource)
+    if md then
+        return md
     end
 end
 
@@ -349,6 +412,38 @@ local function tyrDocParamComment(source)
     end
 end
 
+---@param source parser.object
+local function tryDocEnum(source)
+    if source.type ~= 'doc.enum' then
+        return
+    end
+    local tbl = source.bindSource
+    if not tbl then
+        return
+    end
+    local md = markdown()
+    md:add('lua', '{')
+    for _, field in ipairs(tbl) do
+        if field.type == 'tablefield'
+        or field.type == 'tableindex' then
+            if not field.value then
+                goto CONTINUE
+            end
+            local key = guide.getKeyName(field)
+            if not key then
+                goto CONTINUE
+            end
+            if field.value.type == 'integer'
+            or field.value.type == 'string' then
+                md:add('lua', ('    %s: %s = %s,'):format(key, field.value.type, field.value[1]))
+            end
+            ::CONTINUE::
+        end
+    end
+    md:add('lua', '}')
+    return md:string()
+end
+
 return function (source)
     if source.type == 'string' then
         return asString(source)
@@ -357,9 +452,10 @@ return function (source)
         source = source.parent
     end
     return tryDocOverloadToComment(source)
-        or tryDocFieldUpComment(source)
+        or tryDocFieldComment(source)
         or tyrDocParamComment(source)
         or tryDocComment(source)
         or tryDocClassComment(source)
         or tryDocModule(source)
+        or tryDocEnum(source)
 end

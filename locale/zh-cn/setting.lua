@@ -26,6 +26,8 @@ config.runtime.nonstandardSymbol  =
 "支持非标准的符号。请务必确认你的运行环境支持这些符号。"
 config.runtime.plugin             =
 "插件路径，请查阅[文档](https://github.com/sumneko/lua-language-server/wiki/Plugin)了解用法。"
+config.runtime.pluginArgs         = -- TODO: need translate!
+"Additional arguments for the plugin."
 config.runtime.fileEncoding       =
 "文件编码，`ansi` 选项只在 `Windows` 平台下有效。"
 config.runtime.builtin            =
@@ -36,6 +38,8 @@ config.runtime.builtin            =
 * `enable`: 总是启用
 * `disable`: 总是禁用
 ]]
+config.runtime.meta               =
+'meta文件的目录名称格式。'
 config.diagnostics.enable         =
 "启用诊断。"
 config.diagnostics.disable        =
@@ -43,12 +47,34 @@ config.diagnostics.disable        =
 config.diagnostics.globals        =
 "已定义的全局变量。"
 config.diagnostics.severity       =
-"修改诊断等级。"
+[[
+修改诊断等级。
+以 `!` 结尾的设置优先级高于组设置 `diagnostics.groupSeverity`。
+]]
 config.diagnostics.neededFileStatus =
 [[
 * Opened:  只诊断打开的文件
 * Any:     诊断任何文件
-* Disable: 禁用此诊断
+* None:    禁用此诊断
+
+以 `!` 结尾的设置优先级高于组设置 `diagnostics.groupFileStatus`。
+]]
+config.diagnostics.groupSeverity  =
+[[
+批量修改一个组中的诊断等级。
+设置为 `Fallback` 意味着组中的诊断由 `diagnostics.severity` 单独设置。
+其他设置将覆盖单独设置，但是不会覆盖以 `!` 结尾的设置。
+]]
+config.diagnostics.groupFileStatus =
+[[
+批量修改一个组中的文件状态。
+
+* Opened:  只诊断打开的文件
+* Any:     诊断任何文件
+* None:    禁用此诊断
+
+设置为 `Fallback` 意味着组中的诊断由 `diagnostics.neededFileStatus` 单独设置。
+其他设置将覆盖单独设置，但是不会覆盖以 `!` 结尾的设置。
 ]]
 config.diagnostics.workspaceDelay =
 "进行工作区诊断的延迟（毫秒）。当你启动工作区，或编辑了任意文件后，将会在后台对整个工作区进行重新诊断。设置为负数可以禁用工作区诊断。"
@@ -72,6 +98,8 @@ config.diagnostics.ignoredFiles.Disable  =
 "不诊断这些文件。"
 config.diagnostics.disableScheme  =
 '不诊断使用以下 scheme 的lua文件。'
+config.diagnostics.unusedLocalExclude =
+'如果变量名匹配以下规则，则不对其进行 `unused-local` 诊断。'
 config.workspace.ignoreDir        =
 "忽略的文件与目录（使用 `.gitignore` 语法）。"
 config.workspace.ignoreSubmodules =
@@ -211,8 +239,23 @@ config.hint.arrayIndex.Disable           =
 '禁用数组索引提示。'
 config.hint.await                        =
 '如果调用的函数被标记为了 `---@async` ，则在调用处提示 `await` 。'
+config.hint.semicolon                    =
+'若语句尾部没有分号，则显示虚拟分号。'
+config.hint.semicolon.All                =
+'所有语句都显示虚拟分号。'
+config.hint.semicolon.SameLine           =
+'2个语句在同一行时，在它们之间显示分号。'
+config.hint.semicolon.Disable            =
+'禁用虚拟分号。'
 config.format.enable                     =
 '启用代码格式化程序。'
+config.format.defaultConfig              =
+[[
+默认的格式化配置，优先级低于工作区内的 `.editorconfig` 文件。
+请查阅[格式化文档](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs)了解用法。
+]]
+config.spell.dict                        =
+'拼写检查的自定义单词。'
 config.telemetry.enable                  =
 [[
 启用遥测，通过网络发送你的编辑器信息与错误日志。在[此处](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%90%E7%A7%81%E5%A3%B0%E6%98%8E)阅读我们的隐私声明。
@@ -227,6 +270,20 @@ config.IntelliSense.traceBeSetted        =
 '请查阅[文档](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)了解用法。'
 config.IntelliSense.traceFieldInject     =
 '请查阅[文档](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)了解用法。'
+config.type.castNumberToInteger          =
+'允许将 `number` 类型赋给 `integer` 类型。'
+config.type.weakUnionCheck               =
+[[
+联合类型中只要有一个子类型满足条件，则联合类型也满足条件。
+
+此设置为 `false` 时，`number|boolean` 类型无法赋给 `number` 类型；为 `true` 时则可以。
+]]
+config.type.weakNilCheck                 =
+[[
+对联合类型进行类型检查时，忽略其中的 `nil`。
+
+此设置为 `false` 时，`numer|nil` 类型无法赋给 `number` 类型；为 `true` 是则可以。
+]]
 config.diagnostics['unused-local']          =
 '未使用的局部变量'
 config.diagnostics['unused-function']       =

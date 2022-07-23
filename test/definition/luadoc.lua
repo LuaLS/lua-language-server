@@ -1,3 +1,5 @@
+local config = require "config.config"
+config.set(nil, 'Lua.type.castNumberToInteger', false)
 TEST [[
 ---@class <!A!>
 ---@class B : <?A?>
@@ -899,3 +901,25 @@ local <!x!>
 
 ---@cast <?x?> integer
 ]]
+
+TEST [[
+local function f()
+    local <!x!>
+
+    ---@cast <?x?> integer
+end
+]]
+
+TEST [[
+---@class A
+---@field <!x!> number
+
+---@param a A
+local function f(a) end
+
+f {
+    <!<?x?>!> = 1,
+}
+]]
+
+config.set(nil, 'Lua.type.castNumberToInteger', true)

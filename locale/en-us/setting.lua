@@ -26,6 +26,8 @@ config.runtime.nonstandardSymbol  =
 "Supports non-standard symbols. Make sure that your runtime environment supports these symbols."
 config.runtime.plugin             =
 "Plugin path. Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/Plugin) to learn more."
+config.runtime.pluginArgs         =
+"Additional arguments for the plugin."
 config.runtime.fileEncoding       =
 "File encoding. The `ansi` option is only available under the `Windows` platform."
 config.runtime.builtin            =
@@ -36,6 +38,8 @@ Adjust the enabled state of the built-in library. You can disable (or redefine) 
 * `enable`: always enable
 * `disable`: always disable
 ]]
+config.runtime.meta               =
+'Format of the directory name of the meta files.'
 config.diagnostics.enable         =
 "Enable diagnostics."
 config.diagnostics.disable        =
@@ -43,12 +47,35 @@ config.diagnostics.disable        =
 config.diagnostics.globals        =
 "Defined global variables."
 config.diagnostics.severity       =
-"Modified diagnostic severity."
+[[
+Modify the diagnostic severity.
+
+End with `!` means override the group setting `diagnostics.groupSeverity`.
+]]
 config.diagnostics.neededFileStatus =
 [[
 * Opened:  only diagnose opened files
 * Any:     diagnose all files
-* Disable: disable this diagnostic
+* None:    disable this diagnostic
+
+End with `!` means override the group setting `diagnostics.groupFileStatus`.
+]]
+config.diagnostics.groupSeverity  =
+[[
+Modify the diagnostic severity in a group.
+`Fallback` means that diagnostics in this group are controlled by `diagnostics.severity` separately.
+Other settings will override individual settings without end of `!`.
+]]
+config.diagnostics.groupFileStatus =
+[[
+Modify the diagnostic needed file status in a group.
+
+* Opened:  only diagnose opened files
+* Any:     diagnose all files
+* None:    disable this diagnostic
+
+`Fallback` means that diagnostics in this group are controlled by `diagnostics.neededFileStatus` separately.
+Other settings will override individual settings without end of `!`.
 ]]
 config.diagnostics.workspaceDelay =
 "Latency (milliseconds) for workspace diagnostics. When you start the workspace, or edit any file, the entire workspace will be re-diagnosed in the background. Set to negative to disable workspace diagnostics."
@@ -72,6 +99,8 @@ config.diagnostics.ignoredFiles.Disable  =
 "These files are not diagnosed."
 config.diagnostics.disableScheme  =
 'Do not diagnose Lua files that use the following scheme.'
+config.diagnostics.unusedLocalExclude =
+'Do not diagnose `unused-local` when the variable name matches the following pattern.'
 config.workspace.ignoreDir        =
 "Ignored files and directories (Use `.gitignore` grammar)."-- .. example.ignoreDir,
 config.workspace.ignoreSubmodules =
@@ -211,8 +240,23 @@ config.hint.arrayIndex.Disable           =
 'Disable hints of array index.'
 config.hint.await                        =
 'If the called function is marked `---@async`, prompt `await` at the call.'
+config.hint.semicolon                    =
+'If there is no semicolon at the end of the statement, display a virtual semicolon.'
+config.hint.semicolon.All                =
+'All statements display virtual semicolons.'
+config.hint.semicolon.SameLine            =
+'When two statements are on the same line, display a semicolon between them.'
+config.hint.semicolon.Disable            =
+'Disable virtual semicolons.'
 config.format.enable                     =
 'Enable code formatter.'
+config.format.defaultConfig              =
+[[
+The default format configuration. Has a lower priority than `.editorconfig` file in the workspace.
+Read [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) to learn usage.
+]]
+config.spell.dict                        = -- TODO: need translate!
+'Custom words for spell checking.'
 config.telemetry.enable                  =
 [[
 Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://github.com/sumneko/lua-language-server/wiki/Privacy-Policy).
@@ -227,6 +271,20 @@ config.IntelliSense.traceBeSetted        =
 'Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
 config.IntelliSense.traceFieldInject     =
 'Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
+config.type.castNumberToInteger          =
+'Allowed to assign the `number` type to the `integer` type.'
+config.type.weakUnionCheck               =
+[[
+Once one subtype of a union type meets the condition, the union type also meets the condition.
+
+When this setting is `false`, the `number|boolean` type cannot be assigned to the `number` type. It can be with `true`.
+]]
+config.type.weakNilCheck                 =
+[[
+When checking the type of union type, ignore the `nil` in it.
+
+When this setting is `false`, the `number|nil` type cannot be assigned to the `number` type. It can be with `true`.
+]]
 config.diagnostics['unused-local']          =
 'Enable unused local variable diagnostics.'
 config.diagnostics['unused-function']       =

@@ -22,6 +22,7 @@ local function testIfExit(path)
         local noderClock = 0
         local total
         for i = 1, max do
+            ---@type table
             state = TEST(buf)
             local luadocStart = os.clock()
             luadoc(state)

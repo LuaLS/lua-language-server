@@ -247,7 +247,7 @@ TEST [[
 <?print?>()
 ]]
 [[
-function print(...: any)
+function print(...any)
 ]]
 
 TEST [[
@@ -300,7 +300,7 @@ end
 <?x?>(1, 2, 3, 4, 5, 6, 7)
 ]]
 [[
-function x(a: any, ...: any)
+function x(a: any, ...any)
 ]]
 
 TEST [[
@@ -810,7 +810,28 @@ TEST [[
     next: function,
     os: oslib,
     package: packagelib,
-    ...(+22)
+    pairs: function,
+    pcall: function,
+    print: function,
+    rawequal: function,
+    rawget: function,
+    rawlen: function,
+    rawset: function,
+    require: function,
+    select: function,
+    setfenv: function,
+    setmetatable: function,
+    string: stringlib,
+    table: tablelib,
+    tonumber: function,
+    tostring: function,
+    type: function,
+    unpack: function,
+    utf8: utf8lib,
+    warn: function,
+    xpcall: function,
+    _G: _G,
+    _VERSION: string = "Lua 5.4",
 }
 ]]
 
@@ -1497,7 +1518,7 @@ TEST [[
 local function f(<?callback?>) end
 ]]
 [[
-(parameter) callback: fun(x: integer, ...: any)
+(parameter) callback: fun(x: integer, ...any)
 ]]
 
 TEST [[
@@ -1920,4 +1941,192 @@ end
 ]]
 [[
 (upvalue) x: unknown
+]]
+
+TEST [[
+---@type `123 ????` | ` x | y `
+local <?x?>
+]]
+[[
+local x: ` x | y `|`123 ????`
+]]
+
+TEST [[
+---@type any
+local x
+
+print(x.<?y?>)
+]]
+[[
+(field) x.y: unknown
+]]
+
+TEST [[
+---@async
+x({}, <?function?> () end)
+]]
+[[
+(async) function ()
+]]
+
+TEST [[
+---@overload fun(x: number, y: number):string
+---@overload fun(x: number):number
+---@return boolean
+local function f() end
+
+local n1 = <?f?>()
+local n2 = f(0)
+local n3 = f(0, 0)
+]]
+[[
+function f()
+  -> boolean
+]]
+
+TEST [[
+---@overload fun(x: number, y: number):string
+---@overload fun(x: number):number
+---@return boolean
+local function f() end
+
+local n1 = f()
+local n2 = <?f?>(0)
+local n3 = f(0, 0)
+]]
+[[
+local f: fun(x: number):number
+]]
+
+TEST [[
+---@overload fun(x: number, y: number):string
+---@overload fun(x: number):number
+---@return boolean
+local function f() end
+
+local n1 = f()
+local n2 = f(0)
+local n3 = <?f?>(0, 0)
+]]
+[[
+local f: fun(x: number, y: number):string
+]]
+
+TEST [[
+---@class A
+local mt
+
+---@type integer
+mt.x = 1
+
+mt.y = true
+
+---@type A
+local <?t?>
+]]
+[[
+local t: A {
+    x: integer,
+    y: boolean = true,
+}
+]]
+
+TEST [[
+---@param ... boolean
+---@return number ...
+local function <?f?>(...) end
+]]
+[[
+function f(...boolean)
+  -> ...number
+]]
+
+TEST [[
+---@param ... boolean
+---@return ...
+local function <?f?>(...) end
+]]
+[[
+function f(...boolean)
+  -> ...unknown
+]]
+
+TEST [[
+---@type fun():x: number
+local <?f?>
+]]
+[[
+local f: fun():(x: number)
+]]
+
+TEST [[
+---@type fun(...: boolean):...: number
+local <?f?>
+]]
+[[
+local f: fun(...boolean):...number
+]]
+
+TEST [[
+---@type fun():x: number, y: boolean
+local <?f?>
+]]
+[[
+local f: fun():(x: number, y: boolean)
+]]
+
+TEST [[
+---@class MyClass
+local MyClass = {
+    a = 1
+}
+
+function MyClass:Test()
+    <?self?>
+end
+]]
+[[
+(self) self: MyClass {
+    Test: function,
+    a: integer = 1,
+}
+]]
+
+TEST [[
+local y
+if X then
+    y = true
+else
+    y = false
+end
+
+local bool = y
+
+bool = bool and y
+
+if bool then
+end
+
+print(<?bool?>)
+]]
+[[
+local bool: boolean = true|false
+]]
+
+TEST [[
+---@type 'a'
+local <?s?>
+]]
+[[
+local s: 'a'
+]]
+
+TEST [[
+---@enum <?A?>
+local m = {
+    x = 1,
+}
+]]
+[[
+(enum) A
 ]]

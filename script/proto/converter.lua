@@ -13,7 +13,7 @@ local function rawPackPosition(uri, pos)
     if col > 0 then
         local state = files.getState(uri)
         local text  = files.getText(uri)
-        if text then
+        if state and text then
             local lineOffset = state.lines[row]
             if lineOffset then
                 local start = lineOffset

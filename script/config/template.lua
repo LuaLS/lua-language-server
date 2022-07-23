@@ -1,9 +1,15 @@
 local util   = require 'utility'
 local define = require 'proto.define'
+local diag   = require 'proto.diagnostic'
 
 ---@class config.unit
 ---@field caller function
 ---@field _checker fun(self: config.unit, value: any): boolean
+---@field name     string
+---@field [string] config.unit
+---@operator shl:  config.unit
+---@operator shr:  config.unit
+---@operator call: config.unit
 local mt = {}
 mt.__index = mt
 
@@ -51,6 +57,7 @@ local function register(name, default, checker, loader, caller)
     }
 end
 
+---@type config.unit
 local Type = setmetatable({}, { __index = function (_, name)
     local unit = {}
     for k, v in pairs(units[name]) do
@@ -87,9 +94,17 @@ register('Array', {}, function (self, value)
     return type(value) == 'table'
 end, function (self, value)
     local t = {}
-    for _, v in ipairs(value) do
-        if self.sub:checker(v) then
-            t[#t+1] = self.sub:loader(v)
+    if #value == 0 then
+        for k in pairs(value) do
+            if self.sub:checker(k) then
+                t[#t+1] = self.sub:loader(k)
+            end
+        end
+    else
+        for _, v in ipairs(value) do
+            if self.sub:checker(v) then
+                t[#t+1] = self.sub:loader(v)
+            end
         end
     end
     return t
@@ -192,6 +207,8 @@ local template = {
                                                     'pcall',
                                                     'xpcall',
                                                     'assert',
+                                                    'error',
+                                                    'type',
                                                 }
                                             ),
     ['Lua.runtime.meta']                    = Type.String >> '${version} ${language} ${encoding}',
@@ -199,11 +216,13 @@ local template = {
     ['Lua.runtime.nonstandardSymbol']       = Type.Array(Type.String << {
                                                 '//', '/**/',
                                                 '`',
-                                                '+=', '-=', '*=', '/=',
+                                                '+=', '-=', '*=', '/=', '%=', '^=', '//=',
+                                                '|=', '&=', '<<=', '>>=',
                                                 '||', '&&', '!', '!=',
                                                 'continue',
                                             }),
     ['Lua.runtime.plugin']                  = Type.String,
+    ['Lua.runtime.pluginArgs']              = Type.Array(Type.String),
     ['Lua.runtime.fileEncoding']            = Type.String >> 'utf8' << {
                                                 'utf8',
                                                 'ansi',
@@ -221,7 +240,7 @@ local template = {
                                             >> util.deepCopy(define.BuiltIn),
     ['Lua.diagnostics.enable']              = Type.Boolean >> true,
     ['Lua.diagnostics.globals']             = Type.Array(Type.String),
-    ['Lua.diagnostics.disable']             = Type.Array(Type.String),
+    ['Lua.diagnostics.disable']             = Type.Array(Type.String << util.getTableKeys(diag.getDiagAndErrNameMap(), true)),
     ['Lua.diagnostics.severity']            = Type.Hash(
                                                 Type.String << util.getTableKeys(define.DiagnosticDefaultNeededFileStatus, true),
                                                 Type.String << {
@@ -229,14 +248,46 @@ local template = {
                                                     'Warning',
                                                     'Information',
                                                     'Hint',
+                                                    'Error!',
+                                                    'Warning!',
+                                                    'Information!',
+                                                    'Hint!',
                                                 }
                                             )
                                             >> util.deepCopy(define.DiagnosticDefaultSeverity),
     ['Lua.diagnostics.neededFileStatus']    = Type.Hash(
                                                 Type.String << util.getTableKeys(define.DiagnosticDefaultNeededFileStatus, true),
-                                                Type.String << { 'Any', 'Opened', 'None' }
+                                                Type.String << {
+                                                    'Any',
+                                                    'Opened',
+                                                    'None',
+                                                    'Any!',
+                                                    'Opened!',
+                                                    'None!',
+                                                }
                                             )
                                             >> util.deepCopy(define.DiagnosticDefaultNeededFileStatus),
+    ['Lua.diagnostics.groupSeverity']       = Type.Hash(
+                                                Type.String << util.getTableKeys(define.DiagnosticDefaultGroupSeverity, true),
+                                                Type.String << {
+                                                    'Error',
+                                                    'Warning',
+                                                    'Information',
+                                                    'Hint',
+                                                    'Fallback',
+                                                }
+                                            )
+                                            >> util.deepCopy(define.DiagnosticDefaultGroupSeverity),
+    ['Lua.diagnostics.groupFileStatus']     = Type.Hash(
+                                                Type.String << util.getTableKeys(define.DiagnosticDefaultGroupFileStatus, true),
+                                                Type.String << {
+                                                    'Any',
+                                                    'Opened',
+                                                    'None',
+                                                    'Fallback',
+                                                }
+                                            )
+                                            >> util.deepCopy(define.DiagnosticDefaultGroupFileStatus),
     ['Lua.diagnostics.disableScheme']       = Type.Array(Type.String) >> { 'git' },
     ['Lua.diagnostics.workspaceDelay']      = Type.Integer >> 3000,
     ['Lua.diagnostics.workspaceRate']       = Type.Integer >> 100,
@@ -250,6 +301,7 @@ local template = {
                                                 'Opened',
                                                 'Disable',
                                             },
+    ['Lua.diagnostics.unusedLocalExclude']   = Type.Array(Type.String),
     ['Lua.workspace.ignoreDir']             = Type.Array(Type.String) >> {
                                                 '.vscode',
                                             },
@@ -288,7 +340,7 @@ local template = {
     ['Lua.hover.viewString']                = Type.Boolean >> true,
     ['Lua.hover.viewStringMax']             = Type.Integer >> 1000,
     ['Lua.hover.viewNumber']                = Type.Boolean >> true,
-    ['Lua.hover.previewFields']             = Type.Integer >> 20,
+    ['Lua.hover.previewFields']             = Type.Integer >> 50,
     ['Lua.hover.enumsLimit']                = Type.Integer >> 5,
     ['Lua.hover.expandAlias']               = Type.Boolean >> true,
     ['Lua.semantic.enable']                 = Type.Boolean >> true,
@@ -309,6 +361,11 @@ local template = {
                                                 'Auto',
                                                 'Disable',
                                             },
+    ['Lua.hint.semicolon']                  = Type.String >> 'SameLine' << {
+                                                'All',
+                                                'SameLine',
+                                                'Disable',
+                                            },
     ['Lua.window.statusBar']                = Type.Boolean >> true,
     ['Lua.window.progressBar']              = Type.Boolean >> true,
     ['Lua.format.enable']                   = Type.Boolean >> true,
@@ -317,6 +374,9 @@ local template = {
     ['Lua.spell.dict']                      = Type.Array(Type.String),
     ['Lua.telemetry.enable']                = Type.Or(Type.Boolean >> false, Type.Nil) >> nil,
     ['Lua.misc.parameters']                 = Type.Array(Type.String),
+    ['Lua.type.castNumberToInteger']        = Type.Boolean >> true,
+    ['Lua.type.weakUnionCheck']             = Type.Boolean >> false,
+    ['Lua.type.weakNilCheck']               = Type.Boolean >> false,
 
     -- VSCode
     ['files.associations']                  = Type.Hash(Type.String, Type.String),

@@ -167,7 +167,7 @@ function debug.setlocal(thread, level, index, value) end
 ---#DES 'debug.setmetatable'
 ---@generic T
 ---@param value T
----@param meta  table
+---@param meta? table
 ---@return T value
 function debug.setmetatable(value, meta) end
 

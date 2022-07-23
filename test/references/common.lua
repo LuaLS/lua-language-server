@@ -194,3 +194,31 @@ local b = { }
 a.color = { 1, 1, 1 }
 b.<~color~> = a.color
 ]]
+
+-- Generic references
+
+TEST [[
+---@class <~MyClass~>
+
+---@generic T
+---@param param `T`
+local function myFunction(param)
+    return param
+end
+
+myFunction <!"MyClass"!>
+
+]]
+
+TEST [[
+---@class <!MyClass!>
+
+---@generic T
+---@param param `T`
+local function myFunction(param)
+    return param
+end
+
+myFunction <~"MyClass"~>
+
+]]

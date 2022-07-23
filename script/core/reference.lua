@@ -43,6 +43,7 @@ local accept = {
     ['setglobal']   = true,
     ['getglobal']   = true,
     ['function']    = true,
+    ['callargs']    = true,
     ['...']         = true,
 
     ['doc.type.name']    = true,
@@ -50,6 +51,8 @@ local accept = {
     ['doc.extends.name'] = true,
     ['doc.alias.name']   = true,
 }
+
+local acceptGenArg = setmetatable({ ['string'] = true, ['callargs'] = false }, { __index = accept })
 
 ---@async
 return function (uri, position)
@@ -61,6 +64,11 @@ return function (uri, position)
     local source = findSource(ast, position, accept)
     if not source then
         return nil
+    elseif source.type == 'callargs' then
+        source = findSource(ast, position, acceptGenArg)
+        if not source then
+            return
+        end
     end
 
     local metaSource = vm.isMetaFile(uri)
@@ -91,7 +99,7 @@ return function (uri, position)
                 goto CONTINUE
             end
         else
-            if guide.isLiteral(src) and src.type ~= 'function' then
+            if guide.isLiteral(src) and src.type ~= 'function' and not vm.isGenericLiteralArgument(src) then
                 goto CONTINUE
             end
         end
@@ -108,7 +116,8 @@ return function (uri, position)
             if  source.type ~= 'doc.type.name'
             and source.type ~= 'doc.class.name'
             and source.type ~= 'doc.extends.name'
-            and source.type ~= 'doc.see.name' then
+            and source.type ~= 'doc.see.name'
+            and not vm.isGenericLiteralArgument(source) then
                 goto CONTINUE
             end
         end

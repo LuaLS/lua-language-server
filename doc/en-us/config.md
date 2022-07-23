@@ -1411,6 +1411,22 @@ string
 ""
 ```
 
+# runtime.pluginArgs
+
+Arguments to pass to to the runtime plug.
+
+## type
+
+```ts
+array<string>
+```
+
+ ## default
+
+```json
+[]
+```
+
 # runtime.special
 
 The custom global variables are regarded as some special built-in variables, and the language server will provide special support

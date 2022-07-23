@@ -222,6 +222,7 @@ local template = {
                                                 'continue',
                                             }),
     ['Lua.runtime.plugin']                  = Type.String,
+    ['Lua.runtime.pluginArgs']              = Type.Array(Type.String),
     ['Lua.runtime.fileEncoding']            = Type.String >> 'utf8' << {
                                                 'utf8',
                                                 'ansi',

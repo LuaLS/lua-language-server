@@ -5,6 +5,7 @@ local lang   = require 'language'
 local await  = require 'await'
 local scope  = require 'workspace.scope'
 local ws     = require 'workspace'
+local fs = require 'bee.filesystem'
 
 ---@class plugin
 local m = {}
@@ -86,8 +87,19 @@ local function initPlugin(uri)
         if not pluginPath then
             return
         end
+
+        --Adding the plugins path to package.path allows for requires in files
+        --to find files relative to itself.
+        local oldPath = package.path
+        local path = fs.path(pluginPath):parent_path() / '?.lua'
+        if not package.path:find(path:string(), 1, true) then
+            package.path = package.path .. ';' .. path:string()
+        end
+
         local pluginLua = util.loadFile(pluginPath)
         if not pluginLua then
+            log.warn('plugin not found:', pluginPath)
+            package.path = oldPath
             return
         end
 
@@ -103,7 +115,7 @@ local function initPlugin(uri)
         if not client.isVSCode() and not checkTrustLoad(scp) then
             return
         end
-        local suc, err = xpcall(f, log.error, f)
+        local suc, err = xpcall(f, log.error, f, config.get(scp.uri, 'Lua.runtime.pluginArgs'))
         if not suc then
             m.showError(scp, err)
             return

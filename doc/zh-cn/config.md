@@ -653,7 +653,7 @@ object<string, string>
 ```jsonc
 {
     /*
-    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1` 
+    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1`
     */
     "ambiguity-1": "Any",
     "assign-type-mismatch": "Opened",
@@ -788,7 +788,7 @@ object<string, string>
 ```jsonc
 {
     /*
-    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1` 
+    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1`
     */
     "ambiguity-1": "Warning",
     "assign-type-mismatch": "Warning",
@@ -1408,6 +1408,22 @@ string
 
 ```jsonc
 ""
+```
+
+# runtime.pluginArgs
+
+Arguments to pass to to the runtime plug.
+
+## type
+
+```ts
+array<string>
+```
+
+ ## default
+
+```json
+[]
 ```
 
 # runtime.special

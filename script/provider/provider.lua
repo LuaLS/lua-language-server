@@ -1021,6 +1021,40 @@ m.register 'textDocument/foldingRange' {
     end
 }
 
+m.register 'textDocument/documentColor' {
+    capability = {
+        colorProvider = true
+    },
+    ---@async
+    function (params)
+        local color = require 'core.color'
+        local uri     = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
+        if not files.exists(uri) then
+            return nil
+        end
+        local colors = color.colors(uri)
+        if not colors then
+            return nil
+        end
+        local results = {}
+        for _, colorValue in ipairs(colors) do
+            results[#results+1] = {
+                range = converter.packRange(uri, colorValue.start, colorValue.finish),
+                color = colorValue.color
+            }
+        end
+        return results
+    end
+}
+
+m.register 'textDocument/colorPresentation' {
+    function (params)
+        local color = (require 'core.color').colorToText(params.color)
+        return {{label = color}}
+    end
+}
+
 m.register 'window/workDoneProgress/cancel' {
     function (params)
         log.debug('close proto(cancel):', params.token)

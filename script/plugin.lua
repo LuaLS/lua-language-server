@@ -115,7 +115,8 @@ local function initPlugin(uri)
         if not client.isVSCode() and not checkTrustLoad(scp) then
             return
         end
-        local suc, err = xpcall(f, log.error, f, config.get(scp.uri, 'Lua.runtime.pluginArgs'))
+        local pluginArgs = config.get(scp.uri, 'Lua.runtime.pluginArgs')
+        local suc, err = xpcall(f, log.error, f, uri, pluginArgs)
         if not suc then
             m.showError(scp, err)
             return

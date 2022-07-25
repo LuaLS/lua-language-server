@@ -474,11 +474,15 @@ end
 ---@param scp scope
 function m.resetFiles(scp)
     local cachedUris = scp:get 'cachedUris'
-    if not cachedUris then
-        return
+    if cachedUris then
+        for uri in pairs(cachedUris) do
+            files.resetText(uri)
+        end
     end
-    for uri in pairs(cachedUris) do
-        files.resetText(uri)
+    for uri in pairs(files.openMap) do
+        if scope.getScope(uri) == scp then
+            files.resetText(uri)
+        end
     end
 end
 

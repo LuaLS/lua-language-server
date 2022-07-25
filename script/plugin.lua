@@ -106,7 +106,7 @@ local function initPlugin(uri)
         scp:set('pluginPath', pluginPath)
 
         local env = setmetatable(interface, { __index = _ENV })
-        local f, err = load(pluginLua, '@'..pluginPath, "t", env)
+        local f, err = load(pluginLua, pluginLua, "t", env)
         if not f then
             log.error(err)
             m.showError(scp, err)

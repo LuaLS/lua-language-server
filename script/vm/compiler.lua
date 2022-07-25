@@ -1054,6 +1054,9 @@ local function compileLocal(source)
     -- for x = ... do
     if source.parent.type == 'loop' then
         if source.parent.loc == source then
+            if bindDocs(source) then
+                return
+            end
             vm.setNode(source, vm.declareGlobal('type', 'integer'))
         end
     end

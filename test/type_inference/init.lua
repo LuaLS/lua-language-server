@@ -3755,3 +3755,9 @@ function F(...)
     end
 end
 ]]
+
+TEST 'integerA' [[
+---@type integerA
+for <?i?> = 1, 10 do
+end
+]]

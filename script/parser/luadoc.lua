@@ -1700,12 +1700,21 @@ local function bindDoc(source, binded)
                 goto CONTINUE
             end
         elseif doc.type == 'doc.enum' then
-            if source.type ~= 'table' then
-                goto CONTINUE
+            if source.type == 'table' then
+                goto OK
             end
+            if source.value and source.value.type == 'table' then
+                if not source.value.bindDocs then
+                    source.value.bindDocs = {}
+                end
+                source.value.bindDocs[#source.value.bindDocs+1] = doc
+                doc.bindSource = source.value
+            end
+            goto CONTINUE
         elseif doc.type ~= 'doc.comment' then
             goto CONTINUE
         end
+        ::OK::
         if not source.bindDocs then
             source.bindDocs = {}
         end

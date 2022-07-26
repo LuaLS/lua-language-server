@@ -18,7 +18,7 @@ return function (uri, callback)
         if minNumber and maxNumber and minNumber <= maxNumber then
             return
         end
-        if not minNumber and maxNumber > 1 then
+        if not minNumber and maxNumber ~= 1 then
             return
         end
         if not source.step then

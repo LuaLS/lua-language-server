@@ -55,6 +55,8 @@ local uriMap = {}
 ---@return uri
 function m.getRealUri(uri)
     local filename = furi.decode(uri)
+    -- normalize uri
+    uri = furi.encode(filename)
     local path = fs.path(filename)
     local suc, exists = pcall(fs.exists, path)
     if not suc or not exists then

@@ -92,4 +92,11 @@ function m.split(uri)
     return uri:match('([^:]*):/?/?([^/]*)(.*)')
 end
 
+function m.normalize(uri)
+    if uri == '' then
+        return uri
+    end
+    return m.encode(m.decode(uri))
+end
+
 return m

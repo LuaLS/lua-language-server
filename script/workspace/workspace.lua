@@ -45,6 +45,7 @@ end
 
 --- 初始化工作区
 function m.create(uri)
+    uri = furi.normalize(uri)
     log.info('Workspace create: ', uri)
     if uri == furi.encode '/'
     or uri == furi.encode(os.getenv 'HOME' or '') then

@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.5.1
+`2022-7-26`
 * `NEW` supports [color](https://github.com/sumneko/lua-language-server/pull/1379)
 * `NEW` setting `Lua.runtime.pluginArgs`
 * `CHG` setting `type.castNumberToInteger` default by `true`

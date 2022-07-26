@@ -504,6 +504,10 @@ local function check3rd(uri)
     if not config.get(uri, 'Lua.workspace.checkThirdParty') then
         return
     end
+    local scp = scope.getScope(uri)
+    if not scp:get 'canCheckThirdParty' then
+        return
+    end
     local thirdConfigs = load3rdConfig(uri) or false
     if not thirdConfigs then
         return
@@ -515,6 +519,7 @@ end
 local function check3rdOfWorkspace(suri)
     local scp = scope.getScope(suri)
     scp:set('thirdConfigsCache', nil)
+    scp:set('canCheckThirdParty', true)
     local id = 'check3rdOfWorkspace:' .. scp:getName()
     await.close(id)
     ---@async

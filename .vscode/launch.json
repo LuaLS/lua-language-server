@@ -25,15 +25,24 @@
 			"type": "lua",
 			"request": "attach",
 			"stopOnEntry": false,
-			"address": "127.0.0.1:11428",
+			"address": "127.0.0.1:11427",
 			"outputCapture": [
 			],
+			"sourceFormat": "string",
 			"sourceMaps": [
 				[
-					"./*",
-					"${workspaceFolder}/*"
+					"script/*",
+					"${workspaceFolder}/script/*"
 				]
-			]
+			],
+			"windows": {
+				"sourceMaps": [
+					[
+						"script\\*",
+						"${workspaceFolder}/script/*"
+					]
+				],
+			},
 		},
 		{
 			"name": "🍉build-3rd-meta",

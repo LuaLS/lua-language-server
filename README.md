@@ -65,14 +65,14 @@ Please [help me][en-US] improve the quality of `en-US`.
 ## Build
 The extensions in the VSCode market already come with pre-compiled binary files, usually you don't need to compile them.
 
-Other clients can first try to download and use [pre-compiled binary files](https://github.com/sumneko/lua-language-server/wiki/PreCompiled-Binaries).
+Other clients can first try to download and use [pre-compiled binary files](https://github.com/sumneko/lua-language-server/wiki/Get-Started#command-line).
 
-If you need to compile by yourself, please refer to [here](https://github.com/sumneko/lua-language-server/wiki/Build-and-Run)
+If you need to compile by yourself, please refer to [here](https://github.com/sumneko/lua-language-server/wiki/Getting-Started#build)
 
 ## Setting
 
 * In VSCode: Just use the setting of VSCode.
-* Standalone: See https://github.com/sumneko/lua-language-server/wiki/Setting
+* Standalone: See https://github.com/sumneko/lua-language-server/wiki/Settings
 
 ## Credit
 
@@ -114,4 +114,4 @@ If you need to compile by yourself, please refer to [here](https://github.com/su
 
 ## Telemetry
 
-This language server collects usage data and sends it to the development team to help improve the extension. Read our [privacy policy](https://github.com/sumneko/lua-language-server/wiki/Privacy-Policy) to learn more and how to disable any telemetry.
+This language server collects usage data and sends it to the development team to help improve the extension. Read our [privacy policy](https://github.com/sumneko/lua-language-server/wiki/Home#privacy) to learn more and how to disable any telemetry.

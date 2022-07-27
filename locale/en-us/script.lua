@@ -171,7 +171,7 @@ WORKSPACE_DIAGNOSTIC      =
 WORKSPACE_SKIP_HUGE_FILE  =
 'For performance reasons, the parsing of this file has been stopped: {}'
 WORKSPACE_NOT_ALLOWED     =
-'Your workspace is set to `{}`. Lua language server refused to load this directory. Please check your configuration.[learn more here](https://github.com/sumneko/lua-language-server/wiki/Why-scanning-home-folder)'
+'Your workspace is set to `{}`. Lua language server refused to load this directory. Please check your configuration.[learn more here](https://github.com/sumneko/lua-language-server/wiki/FAQ#why-is-the-server-scanning-the-wrong-folder)'
 WORKSPACE_SCAN_TOO_MUCH   =
 'More than {} files have been scanned. The current scanned directory is `{}`. Please confirm whether the configuration is correct.'
 
@@ -512,7 +512,7 @@ WINDOW_APPLY_SETTING             =
 WINDOW_CHECK_SEMANTIC            =
 'If you are using the color theme in the market, you may need to modify `editor.semanticHighlighting.enabled` to `true` to make semantic tokens take effect.'
 WINDOW_TELEMETRY_HINT            =
-'Please allow sending anonymous usage data and error reports to help us further improve this extension. Read our privacy policy [here](https://github.com/sumneko/lua-language-server/wiki/Privacy-Policy) .'
+'Please allow sending anonymous usage data and error reports to help us further improve this extension. Read our privacy policy [here](https://github.com/sumneko/lua-language-server/wiki/Home#privacy) .'
 WINDOW_TELEMETRY_ENABLE          =
 'Allow'
 WINDOW_TELEMETRY_DISABLE         =
@@ -588,7 +588,7 @@ Defines a class/table structure
 Manager = {}
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#class)
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#class)
 ]=]
 LUADOC_DESC_TYPE =
 [=[
@@ -639,7 +639,7 @@ local x --x[""] is true
 local myFunction
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#types-and-type)
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#types-and-type)
 ]=]
 LUADOC_DESC_ALIAS =
 [=[
@@ -675,7 +675,7 @@ function find(path, pattern) end
 function setFontStyle(style) end
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#alias)
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#alias)
 ]=]
 LUADOC_DESC_PARAM =
 [=[
@@ -700,7 +700,7 @@ function get(url, headers, timeout) end
 function concat(base, ...) end
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#param)
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#param)
 ]=]
 LUADOC_DESC_RETURN =
 [=[
@@ -738,7 +738,7 @@ function getFirstLast() end
 function getTags(item) end
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#return)
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#return)
 ]=]
 LUADOC_DESC_FIELD =
 [=[
@@ -768,7 +768,7 @@ response = get("localhost")
 statusCode = response.status.code
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#field)
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#field)
 ]=]
 LUADOC_DESC_GENERIC =
 [=[
@@ -825,7 +825,7 @@ local v = Generic("Foo") -- v is an object of Foo
 -- we give for key (K) or value (V)
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#generics-and-generic)
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#generics-and-generic)
 ]=]
 LUADOC_DESC_VARARG =
 [=[
@@ -844,7 +844,7 @@ provide typing or allow descriptions.
 function concat(...) end
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#vararg)
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#vararg)
 ]=]
 LUADOC_DESC_OVERLOAD =
 [=[
@@ -859,7 +859,7 @@ Allows defining of multiple function signatures.
 function table.insert(t, position, value) end
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#overload)
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#overload)
 ]=]
 LUADOC_DESC_DEPRECATED =
 [=[
@@ -870,7 +870,7 @@ being ~~struck through~~.
 `---@deprecated`
 
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#deprecated)
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#deprecated)
 ]=]
 LUADOC_DESC_META =
 [=[
@@ -885,7 +885,7 @@ There are 3 main distinctions to note with meta files:
 `---@meta`
 
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#meta)
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#meta)
 ]=]
 LUADOC_DESC_VERSION =
 [=[
@@ -910,7 +910,7 @@ function onlyWorksInJIT() end
 function oldLuaOnly() end
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#version)
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#version)
 ]=]
 LUADOC_DESC_SEE =
 [=[
@@ -920,7 +920,7 @@ Define something that can be viewed for more information
 `---@see <text>`
 
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#see)
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#see)
 ]=]
 LUADOC_DESC_DIAGNOSTIC =
 [=[
@@ -946,7 +946,7 @@ local unused = "hello world"
 ---@diagnostic enable: unused-local
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#diagnostic)
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#diagnostic)
 ]=]
 LUADOC_DESC_MODULE =
 [=[
@@ -963,7 +963,7 @@ local stringUtils
 local module = require('string.utils')
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#module)
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#module)
 ]=]
 LUADOC_DESC_ASYNC =
 [=[
@@ -973,7 +973,7 @@ Marks a function as asynchronous.
 `---@async`
 
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#async)
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#async)
 ]=]
 LUADOC_DESC_NODISCARD =
 [=[
@@ -985,7 +985,7 @@ be ignored.
 `---@nodiscard`
 
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#nodiscard)
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#nodiscard)
 ]=]
 LUADOC_DESC_CAST =
 [=[
@@ -1020,7 +1020,7 @@ local x --> string|table
 print(x) --> table
 ```
 ---
-[View Wiki](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#cast)
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#cast)
 ]=]
 LUADOC_DESC_OPERATOR =
 [=[
@@ -1055,7 +1055,7 @@ pB = -pA
 LUADOC_DESC_ENUM =
 [=[
 Mark a table as an enum. If you want an enum but can't define it as a Lua
-table, take a look at the [`@alias`](https://github.com/sumneko/lua-language-server/wiki/EmmyLua-Annotations#alias)
+table, take a look at the [`@alias`](https://github.com/sumneko/lua-language-server/wiki/Annotations#alias)
 tag.
 
 ## Syntax

@@ -25,7 +25,7 @@ config.runtime.unicodeName        =
 config.runtime.nonstandardSymbol  =
 "支持非标准的符号。请务必确认你的运行环境支持这些符号。"
 config.runtime.plugin             =
-"插件路径，请查阅[文档](https://github.com/sumneko/lua-language-server/wiki/Plugin)了解用法。"
+"插件路径，请查阅[文档](https://github.com/sumneko/lua-language-server/wiki/Plugins)了解用法。"
 config.runtime.pluginArgs         = -- TODO: need translate!
 "Additional arguments for the plugin."
 config.runtime.fileEncoding       =
@@ -258,10 +258,10 @@ config.spell.dict                        =
 '拼写检查的自定义单词。'
 config.telemetry.enable                  =
 [[
-启用遥测，通过网络发送你的编辑器信息与错误日志。在[此处](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%90%E7%A7%81%E5%A3%B0%E6%98%8E)阅读我们的隐私声明。
+启用遥测，通过网络发送你的编辑器信息与错误日志。在[此处](https://github.com/sumneko/lua-language-server/wiki/Home#privacy)阅读我们的隐私声明。
 ]]
 config.misc.parameters                   =
-'VSCode中启动语言服务时的[命令行参数](https://github.com/sumneko/lua-language-server/wiki/Command-line)。'
+'VSCode中启动语言服务时的[命令行参数](https://github.com/sumneko/lua-language-server/wiki/Getting-Started#arguments)。'
 config.IntelliSense.traceLocalSet        =
 '请查阅[文档](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)了解用法。'
 config.IntelliSense.traceReturn          =

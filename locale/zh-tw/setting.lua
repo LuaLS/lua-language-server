@@ -25,7 +25,7 @@ config.runtime.unicodeName        =
 config.runtime.nonstandardSymbol  =
 "支援非標準的符號。請務必確認你的執行環境支援這些符號。"
 config.runtime.plugin             =
-"延伸模組路徑，請查閱[文件](https://github.com/sumneko/lua-language-server/wiki/Plugin)瞭解用法。"
+"延伸模組路徑，請查閱[文件](https://github.com/sumneko/lua-language-server/wiki/Plugins)瞭解用法。"
 config.runtime.pluginArgs         = -- TODO: need translate!
 "Additional arguments for the plugin."
 config.runtime.fileEncoding       =
@@ -258,10 +258,10 @@ config.spell.dict                        =
 '拼寫檢查的自訂單詞。'
 config.telemetry.enable                  =
 [[
-啟用遙測，透過網路發送你的編輯器資訊與錯誤日誌。在[此處](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%B1%E7%A7%81%E8%81%B2%E6%98%8E)閱讀我們的隱私聲明。
+啟用遙測，透過網路發送你的編輯器資訊與錯誤日誌。在[此處](https://github.com/sumneko/lua-language-server/wiki/Home#privacy)閱讀我們的隱私聲明。
 ]]
 config.misc.parameters                   =
-'VSCode中啟動語言伺服時的[命令列參數](https://github.com/sumneko/lua-language-server/wiki/Command-line)。'
+'VSCode中啟動語言伺服時的[命令列參數](https://github.com/sumneko/lua-language-server/wiki/Getting-Started#arguments)。'
 config.IntelliSense.traceLocalSet        =
 '請查閱[文件](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
 config.IntelliSense.traceReturn          =

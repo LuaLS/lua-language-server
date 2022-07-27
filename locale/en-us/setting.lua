@@ -25,7 +25,7 @@ config.runtime.unicodeName        =
 config.runtime.nonstandardSymbol  =
 "Supports non-standard symbols. Make sure that your runtime environment supports these symbols."
 config.runtime.plugin             =
-"Plugin path. Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/Plugin) to learn more."
+"Plugin path. Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/Plugins) to learn more."
 config.runtime.pluginArgs         =
 "Additional arguments for the plugin."
 config.runtime.fileEncoding       =
@@ -259,7 +259,7 @@ config.spell.dict                        = -- TODO: need translate!
 'Custom words for spell checking.'
 config.telemetry.enable                  =
 [[
-Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://github.com/sumneko/lua-language-server/wiki/Privacy-Policy).
+Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://github.com/sumneko/lua-language-server/wiki/Home#privacy).
 ]]
 config.misc.parameters                   =
 '[Command line parameters](https://github.com/sumneko/lua-telemetry-server/tree/master/method) when starting the language service in VSCode.'

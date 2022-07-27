@@ -92,8 +92,17 @@ function m.split(uri)
     return uri:match('([^:]*):/?/?([^/]*)(.*)')
 end
 
+---@param uri string
+---@return boolean
 function m.isValid(uri)
-    return m.split(uri) ~= nil
+    local scheme, authority, path = m.split(uri)
+    if not scheme or scheme == '' then
+        return false
+    end
+    if path == '' then
+        return false
+    end
+    return true
 end
 
 function m.normalize(uri)

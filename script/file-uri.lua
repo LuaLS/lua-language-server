@@ -92,6 +92,10 @@ function m.split(uri)
     return uri:match('([^:]*):/?/?([^/]*)(.*)')
 end
 
+function m.isValid(uri)
+    return m.split(uri) ~= nil
+end
+
 function m.normalize(uri)
     if uri == '' then
         return uri

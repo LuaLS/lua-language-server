@@ -231,11 +231,11 @@ vm.binarySwitch = util.switch()
         local b = vm.getInteger(source[2])
         local op = source.op.type
         if a and b then
-            local result = op.type == '<<' and a << b
-                        or op.type == '>>' and a >> b
-                        or op.type == '&'  and a &  b
-                        or op.type == '|'  and a |  b
-                        or op.type == '~'  and a ~  b
+            local result = op == '<<' and a << b
+                        or op == '>>' and a >> b
+                        or op == '&'  and a &  b
+                        or op == '|'  and a |  b
+                        or op == '~'  and a ~  b
             vm.setNode(source, {
                 type   = 'integer',
                 start  = source.start,
@@ -351,10 +351,10 @@ vm.binarySwitch = util.switch()
         local b = vm.getNumber(source[2])
         if a and b then
             local op = source.op.type
-            local result = op.type == '>'  and a >  b
-                        or op.type == '<'  and a <  b
-                        or op.type == '>=' and a >= b
-                        or op.type == '<=' and a <= b
+            local result = op == '>'  and a >  b
+                        or op == '<'  and a <  b
+                        or op == '>=' and a >= b
+                        or op == '<=' and a <= b
             vm.setNode(source, {
                 type   = 'boolean',
                 start  = source.start,

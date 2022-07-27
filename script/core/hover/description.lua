@@ -437,6 +437,13 @@ local function tryDocEnum(source)
             or field.value.type == 'string' then
                 md:add('lua', ('    %s: %s = %s,'):format(key, field.value.type, field.value[1]))
             end
+            if field.value.type == 'binary'
+            or field.value.type == 'unary' then
+                local number = vm.getNumber(field.value)
+                if number then
+                    md:add('lua', ('    %s: %s = %s,'):format(key, math.tointeger(number) and 'integer' or 'number', number))
+                end
+            end
             ::CONTINUE::
         end
     end

@@ -32,23 +32,25 @@ The Lua language server provides various language features for Lua to make devel
 The language server can easily be installed for use in VS Code, but it can also be used by other clients using the command line.
 
 ### Visual Studio Code
-[![Install in VS Code](https://img.shields.io/badge/Install-VS%20Code-blue "Install in VS Code")](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
+[![Install in VS Code](https://img.shields.io/badge/Install%20For-VS%20Code-blue?style=for-the-badge&logo=visualstudiocode "Install in VS Code")](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
+
 The language server and Visual Studio Code client can be installed from [the VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=sumneko.lua).
 
 ![](https://github.com/sumneko/vscode-lua/raw/master/images//Install%20In%20VSCode.gif)
 
 ### Command Line
-[![Install for command line](https://img.shields.io/badge/Install-Command%20Line-blue "Install for command line")](https://github.com/sumneko/lua-language-server/wiki/Getting-Started#command-line)
+[![Install for command line](https://img.shields.io/badge/Install%20For-Command%20Line-blue?style=for-the-badge&logo=windowsterminal "Install for command line")](https://github.com/sumneko/lua-language-server/wiki/Getting-Started#command-line)
+
 Check the [wiki for a guide](https://github.com/sumneko/lua-language-server/wiki/Getting-Started#command-line) to install the language server for use on the command line. This allows the language server to be used for NeoVim and other clients that follow the language server protocol.
 
 ## Supported Lua Versions
-| Version | Supported |
-| :-----: | :-------: |
-| Lua 5.1 |     ✅    |
-| Lua 5.2 |     ✅    |
-| Lua 5.3 |     ✅    |
-| Lua 5.4 |     ✅    |
-| LuaJIT  |     ✅    |
+| Version |    Supported   |
+| :-----: | :------------: |
+| Lua 5.1 | ![][checkmark] |
+| Lua 5.2 | ![][checkmark] |
+| Lua 5.3 | ![][checkmark] |
+| Lua 5.4 | ![][checkmark] |
+| LuaJIT  | ![][checkmark] |
 
 ## Links
 - [Changelog](https://github.com/sumneko/lua-language-server/blob/master/changelog.md)
@@ -67,10 +69,10 @@ Check the [wiki for a guide](https://github.com/sumneko/lua-language-server/wiki
 
 ## Available Languages
 
-✅ `en-us`
-✅ `zh-cn`
-✅ `zh-tw`
-✅ `pt-br`
+- `en-us` 🇺🇸
+- `zh-cn` 🇨🇳
+- `zh-tw` 🇹🇼
+- `pt-br` 🇧🇷
 
 
 > ℹ Note: All translations are provided and collaborated on by the community. If you find an inappropriate or harmful translation, [please report it immediately](https://github.com/sumneko/lua-language-server/issues).
@@ -115,3 +117,6 @@ Software that the language server (or the development of it) uses:
 * [json.lua](https://github.com/actboy168/json.lua)
 * [EmmyLuaCodeStyle](https://github.com/CppCXY/EmmyLuaCodeStyle)
 * [inspect.lua](https://github.com/kikito/inspect.lua)
+
+
+[checkmark]: https://gist.githubusercontent.com/carsakiller/362482775731de88cdafeeca9f6a392e/raw/cd3976e92a85aafe1f33e3f9fe3d0e0bd451902c/checkmark.svg

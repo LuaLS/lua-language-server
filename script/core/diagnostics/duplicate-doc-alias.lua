@@ -41,8 +41,8 @@ return function (uri, callback)
             end
             if #cache[name] > 1 then
                 callback {
-                    start   = doc.alias.start,
-                    finish  = doc.alias.finish,
+                    start   = (doc.alias or doc.enum).start,
+                    finish  = (doc.alias or doc.enum).finish,
                     related = cache,
                     message = lang.script('DIAG_DUPLICATE_DOC_ALIAS', name)
                 }

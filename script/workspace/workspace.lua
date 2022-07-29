@@ -387,8 +387,11 @@ function m.normalize(path)
     path = util.expandPath(path)
     path = path:gsub('^%.[/\\]+', '')
     for _ = 1, 1000 do
+        if path:sub(1, 2) == '..' then
+            break
+        end
         local count
-        path, count = path:gsub('[^/\\]+[/\\]%.%.', '')
+        path, count = path:gsub('[^/\\]+[/\\]+%.%.', '', 1)
         if count == 0 then
             break
         end

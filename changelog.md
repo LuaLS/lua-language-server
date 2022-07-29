@@ -3,6 +3,7 @@
 ## 3.5.2
 * `FIX` [#1395](https://github.com/sumneko/lua-language-server/issues/1395)
 * `FIX` [#1403](https://github.com/sumneko/lua-language-server/issues/1403)
+* `FIX` [#1405](https://github.com/sumneko/lua-language-server/issues/1405)
 * `FIX` [#1406](https://github.com/sumneko/lua-language-server/issues/1406)
 
 ## 3.5.1

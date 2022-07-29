@@ -1,5 +1,8 @@
 # changelog
 
+## 3.5.2
+* `FIX` [#1395](https://github.com/sumneko/lua-language-server/issues/1395)
+
 ## 3.5.1
 `2022-7-26`
 * `NEW` supports [color](https://github.com/sumneko/lua-language-server/pull/1379)

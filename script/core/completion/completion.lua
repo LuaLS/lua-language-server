@@ -1597,7 +1597,7 @@ end
 
 local function getComment(state, position)
     local offset = guide.positionToOffset(state, position)
-    local symbolOffset = lookBackward.findAnyOffset(state.lua, offset)
+    local symbolOffset = lookBackward.findAnyOffset(state.lua, offset, true)
     if not symbolOffset then
         return
     end
@@ -1610,9 +1610,9 @@ local function getComment(state, position)
     return nil
 end
 
-local function getluaDoc(state, position)
+local function getLuaDoc(state, position)
     local offset = guide.positionToOffset(state, position)
-    local symbolOffset = lookBackward.findAnyOffset(state.lua, offset)
+    local symbolOffset = lookBackward.findAnyOffset(state.lua, offset, true)
     if not symbolOffset then
         return
     end
@@ -2063,8 +2063,8 @@ local function tryluaDocOfFunction(doc, results)
     }
 end
 
-local function tryluaDoc(state, position, results)
-    local doc = getluaDoc(state, position)
+local function tryLuaDoc(state, position, results)
+    local doc = getLuaDoc(state, position)
     if not doc then
         return
     end
@@ -2103,7 +2103,7 @@ local function tryComment(state, position, results)
         return
     end
     local word = lookBackward.findWord(state.lua, guide.positionToOffset(state, position))
-    local doc  = getluaDoc(state, position)
+    local doc  = getLuaDoc(state, position)
     if not word then
         local comment = getComment(state, position)
         if not comment then
@@ -2142,7 +2142,7 @@ local function tryCompletions(state, position, triggerCharacter, results)
         return
     end
     if getComment(state, position) then
-        tryluaDoc(state, position, results)
+        tryLuaDoc(state, position, results)
         tryComment(state, position, results)
         return
     end

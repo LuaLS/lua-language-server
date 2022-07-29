@@ -2053,3 +2053,17 @@ function m.ff(x) end
 
 m.ff(1)
 ]]
+
+TEST [[
+local done = false
+
+local function set_done()
+    done = true
+end
+
+while not done do
+    set_done()
+end
+
+print(1)
+]]

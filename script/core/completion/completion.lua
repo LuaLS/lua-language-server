@@ -2037,7 +2037,9 @@ local function tryluaDocOfFunction(doc, results)
     if not doc.bindSource then
         return
     end
-    local func = doc.bindSource.type == 'function' and doc.bindSource or nil
+    local func = (doc.bindSource.type == 'function' and doc.bindSource)
+              or (doc.bindSource.value and doc.bindSource.value.type == 'function' and doc.bindSource.value)
+              or nil
     if not func then
         return
     end

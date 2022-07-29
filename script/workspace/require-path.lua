@@ -169,7 +169,7 @@ function mt:findUrisByRequireName(suri, name)
     local searcherMap = {}
 
     for _, searcher in ipairs(searchers) do
-        local fspath = searcher:gsub('%?', path:gsub('%%', '%%%%'))
+        local fspath = searcher:gsub('%?', (path:gsub('%%', '%%%%')))
         local fullPath = workspace.getAbsolutePath(self.scp.uri, fspath)
         if fullPath then
             local fullUri  = furi.encode(fullPath)

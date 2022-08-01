@@ -398,7 +398,6 @@ object<string, string>
     */
     "global": "Fallback",
     /*
-    * cast-type-mismatch
     * circle-doc-class
     * doc-field-no-class
     * duplicate-doc-alias
@@ -517,7 +516,6 @@ object<string, string>
     */
     "global": "Fallback",
     /*
-    * cast-type-mismatch
     * circle-doc-class
     * doc-field-no-class
     * duplicate-doc-alias
@@ -653,13 +651,13 @@ object<string, string>
 ```jsonc
 {
     /*
-    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1`
+    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1` 
     */
     "ambiguity-1": "Any",
     "assign-type-mismatch": "Opened",
     "await-in-sync": "None",
     "cast-local-type": "Opened",
-    "cast-type-mismatch": "Any",
+    "cast-type-mismatch": "Opened",
     "circle-doc-class": "Any",
     "close-non-object": "Any",
     "code-after-break": "Opened",
@@ -789,7 +787,7 @@ object<string, string>
 ```jsonc
 {
     /*
-    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1`
+    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1` 
     */
     "ambiguity-1": "Warning",
     "assign-type-mismatch": "Warning",
@@ -1413,17 +1411,17 @@ string
 
 # runtime.pluginArgs
 
-Arguments to pass to to the runtime plug.
+Additional arguments for the plugin.
 
 ## type
 
 ```ts
-array<string>
+Array<string>
 ```
 
- ## default
+## default
 
-```json
+```jsonc
 []
 ```
 
@@ -1616,7 +1614,7 @@ boolean
 ## default
 
 ```jsonc
-false
+true
 ```
 
 # type.weakNilCheck

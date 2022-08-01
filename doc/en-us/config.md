@@ -398,7 +398,6 @@ object<string, string>
     */
     "global": "Fallback",
     /*
-    * cast-type-mismatch
     * circle-doc-class
     * doc-field-no-class
     * duplicate-doc-alias
@@ -517,7 +516,6 @@ object<string, string>
     */
     "global": "Fallback",
     /*
-    * cast-type-mismatch
     * circle-doc-class
     * doc-field-no-class
     * duplicate-doc-alias
@@ -659,7 +657,7 @@ object<string, string>
     "assign-type-mismatch": "Opened",
     "await-in-sync": "None",
     "cast-local-type": "Opened",
-    "cast-type-mismatch": "Any",
+    "cast-type-mismatch": "Opened",
     "circle-doc-class": "Any",
     "close-non-object": "Any",
     "code-after-break": "Opened",
@@ -694,7 +692,7 @@ object<string, string>
     "missing-return-value": "Any",
     "need-check-nil": "Opened",
     /*
-    在字面量表中，2行代码之间缺少分隔符，在语法上被解析为了一次索引操作
+    Enable newfield call diagnostics. It is raised when the parenthesis of a function call appear on the following line when defining a field in a table.
     */
     "newfield-call": "Any",
     /*
@@ -830,7 +828,7 @@ object<string, string>
     "missing-return-value": "Warning",
     "need-check-nil": "Warning",
     /*
-    在字面量表中，2行代码之间缺少分隔符，在语法上被解析为了一次索引操作
+    Enable newfield call diagnostics. It is raised when the parenthesis of a function call appear on the following line when defining a field in a table.
     */
     "newfield-call": "Warning",
     /*
@@ -1413,17 +1411,17 @@ string
 
 # runtime.pluginArgs
 
-Arguments to pass to to the runtime plug.
+Additional arguments for the plugin.
 
 ## type
 
 ```ts
-array<string>
+Array<string>
 ```
 
- ## default
+## default
 
-```json
+```jsonc
 []
 ```
 
@@ -1616,7 +1614,7 @@ boolean
 ## default
 
 ```jsonc
-false
+true
 ```
 
 # type.weakNilCheck

@@ -398,7 +398,6 @@ object<string, string>
     */
     "global": "Fallback",
     /*
-    * cast-type-mismatch
     * circle-doc-class
     * doc-field-no-class
     * duplicate-doc-alias
@@ -517,7 +516,6 @@ object<string, string>
     */
     "global": "Fallback",
     /*
-    * cast-type-mismatch
     * circle-doc-class
     * doc-field-no-class
     * duplicate-doc-alias
@@ -659,7 +657,7 @@ object<string, string>
     "assign-type-mismatch": "Opened",
     "await-in-sync": "None",
     "cast-local-type": "Opened",
-    "cast-type-mismatch": "Any",
+    "cast-type-mismatch": "Opened",
     "circle-doc-class": "Any",
     "close-non-object": "Any",
     "code-after-break": "Opened",
@@ -1412,17 +1410,17 @@ string
 
 # runtime.pluginArgs
 
-Arguments to pass to to the runtime plug.
+Additional arguments for the plugin.
 
 ## type
 
 ```ts
-array<string>
+Array<string>
 ```
 
- ## default
+## default
 
-```json
+```jsonc
 []
 ```
 
@@ -1587,7 +1585,7 @@ Array<string>
 
 # telemetry.enable
 
-啟用遙測，透過網路發送你的編輯器資訊與錯誤日誌。在[此處](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%B1%E7%A7%81)閱讀我們的隱私聲明。
+啟用遙測，透過網路發送你的編輯器資訊與錯誤日誌。在[此處](https://github.com/sumneko/lua-language-server/wiki/Home#privacy)閱讀我們的隱私聲明。
 
 
 ## type
@@ -1615,7 +1613,7 @@ boolean
 ## default
 
 ```jsonc
-false
+true
 ```
 
 # type.weakNilCheck

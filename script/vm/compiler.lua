@@ -1163,15 +1163,25 @@ local compilerSwitch = util.switch()
                         vm.setNode(src, vm.createNode(src.value))
                         vm.setNode(src, node:copy():asTable())
                     else
-                        guide.eachSource(src.value, function (child)
-                            if  child.type == 'getlocal'
-                            and child.node == source then
+                        local function clearLockedNode(child)
+                            if not child then
                                 return
+                            end
+                            if child.type == 'function' then
+                                return
+                            end
+                            if child.type == 'setlocal'
+                            or child.type == 'getlocal' then
+                                if child.node == source then
+                                    return
+                                end
                             end
                             if LOCK[child] then
                                 vm.removeNode(child)
                             end
-                        end)
+                            guide.eachChild(child, clearLockedNode)
+                        end
+                        clearLockedNode(src.value)
                         vm.setNode(src, vm.compileNode(src.value), true)
                     end
                 else

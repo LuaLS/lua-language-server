@@ -6,6 +6,8 @@ local files      = require 'files'
 ---@class vm
 local vm         = require 'vm.vm'
 
+local LOCK = {}
+
 ---@class parser.object
 ---@field _compiledNodes  boolean
 ---@field _node           vm.node
@@ -1161,6 +1163,15 @@ local compilerSwitch = util.switch()
                         vm.setNode(src, vm.createNode(src.value))
                         vm.setNode(src, node:copy():asTable())
                     else
+                        guide.eachSource(src.value, function (child)
+                            if  child.type == 'getlocal'
+                            and child.node == source then
+                                return
+                            end
+                            if LOCK[child] then
+                                vm.removeNode(child)
+                            end
+                        end)
                         vm.setNode(src, vm.compileNode(src.value), true)
                     end
                 else
@@ -1811,9 +1822,11 @@ function vm.compileNode(source)
 
     ---@cast source parser.object
     vm.setNode(source, vm.createNode(), true)
+    LOCK[source] = true
     compileByGlobal(source)
     compileByNode(source)
     matchCall(source)
+    LOCK[source] = nil
 
     local node = vm.getNode(source)
     ---@cast node -?

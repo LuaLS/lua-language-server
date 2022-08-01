@@ -515,6 +515,7 @@ function m.diagnosticsScope(uri, force)
     local id = 'diagnosticsScope:' .. scp:getName()
     await.close(id)
     await.call(function () ---@async
+        await.sleep(0.0)
         m.awaitDiagnosticsScope(uri, function (fileUri)
             xpcall(m.doDiagnostic, log.error, fileUri, true)
         end)

@@ -398,7 +398,6 @@ object<string, string>
     */
     "global": "Fallback",
     /*
-    * cast-type-mismatch
     * circle-doc-class
     * doc-field-no-class
     * duplicate-doc-alias
@@ -517,7 +516,6 @@ object<string, string>
     */
     "global": "Fallback",
     /*
-    * cast-type-mismatch
     * circle-doc-class
     * doc-field-no-class
     * duplicate-doc-alias
@@ -659,7 +657,7 @@ object<string, string>
     "assign-type-mismatch": "Opened",
     "await-in-sync": "None",
     "cast-local-type": "Opened",
-    "cast-type-mismatch": "Any",
+    "cast-type-mismatch": "Opened",
     "circle-doc-class": "Any",
     "close-non-object": "Any",
     "code-after-break": "Opened",
@@ -1222,7 +1220,7 @@ integer
 
 # misc.parameters
 
-VSCode中启动语言服务时的[命令行参数](https://github.com/sumneko/lua-language-server/wiki/Command-line)。
+VSCode中启动语言服务时的[命令行参数](https://github.com/sumneko/lua-language-server/wiki/Getting-Started#arguments)。
 
 ## type
 
@@ -1396,7 +1394,7 @@ false
 
 # runtime.plugin
 
-插件路径，请查阅[文档](https://github.com/sumneko/lua-language-server/wiki/Plugin)了解用法。
+插件路径，请查阅[文档](https://github.com/sumneko/lua-language-server/wiki/Plugins)了解用法。
 
 ## type
 
@@ -1408,6 +1406,22 @@ string
 
 ```jsonc
 ""
+```
+
+# runtime.pluginArgs
+
+Additional arguments for the plugin.
+
+## type
+
+```ts
+Array<string>
+```
+
+## default
+
+```jsonc
+[]
 ```
 
 # runtime.special
@@ -1571,7 +1585,7 @@ Array<string>
 
 # telemetry.enable
 
-启用遥测，通过网络发送你的编辑器信息与错误日志。在[此处](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%90%E7%A7%81%E5%A3%B0%E6%98%8E)阅读我们的隐私声明。
+启用遥测，通过网络发送你的编辑器信息与错误日志。在[此处](https://github.com/sumneko/lua-language-server/wiki/Home#privacy)阅读我们的隐私声明。
 
 
 ## type
@@ -1599,7 +1613,7 @@ boolean
 ## default
 
 ```jsonc
-false
+true
 ```
 
 # type.weakNilCheck

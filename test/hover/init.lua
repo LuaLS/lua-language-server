@@ -2130,3 +2130,10 @@ local m = {
 [[
 (enum) A
 ]]
+
+TEST [[
+local <?x?> = 1 << 2
+]]
+[[
+local x: integer = 4
+]]

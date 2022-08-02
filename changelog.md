@@ -1,5 +1,29 @@
 # changelog
 
+## 3.5.2
+`2022-8-1`
+* `FIX` [#1395](https://github.com/sumneko/lua-language-server/issues/1395)
+* `FIX` [#1403](https://github.com/sumneko/lua-language-server/issues/1403)
+* `FIX` [#1405](https://github.com/sumneko/lua-language-server/issues/1405)
+* `FIX` [#1406](https://github.com/sumneko/lua-language-server/issues/1406)
+* `FIX` [#1418](https://github.com/sumneko/lua-language-server/issues/1418)
+
+## 3.5.1
+`2022-7-26`
+* `NEW` supports [color](https://github.com/sumneko/lua-language-server/pull/1379)
+* `NEW` setting `Lua.runtime.pluginArgs`
+* `CHG` setting `type.castNumberToInteger` default by `true`
+* `CHG` improve supports for multi-workspace
+* `FIX` [#1354](https://github.com/sumneko/lua-language-server/issues/1354)
+* `FIX` [#1355](https://github.com/sumneko/lua-language-server/issues/1355)
+* `FIX` [#1363](https://github.com/sumneko/lua-language-server/issues/1363)
+* `FIX` [#1365](https://github.com/sumneko/lua-language-server/issues/1365)
+* `FIX` [#1367](https://github.com/sumneko/lua-language-server/issues/1367)
+* `FIX` [#1368](https://github.com/sumneko/lua-language-server/issues/1368)
+* `FIX` [#1370](https://github.com/sumneko/lua-language-server/issues/1370)
+* `FIX` [#1375](https://github.com/sumneko/lua-language-server/issues/1375)
+* `FIX` [#1391](https://github.com/sumneko/lua-language-server/issues/1391)
+
 ## 3.5.0
 `2022-7-19`
 * `NEW` `LuaDoc`: `---@operator`:

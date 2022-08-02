@@ -324,7 +324,13 @@ local function load3rdConfigInDir(dir, configs, inner)
 end
 
 local function load3rdConfig(uri)
-    local configs = {}
+    local scp = scope.getScope(uri)
+    local configs = scp:get 'thirdConfigsCache'
+    if configs then
+        return configs
+    end
+    configs = {}
+    scp:set('thirdConfigsCache', configs)
     load3rdConfigInDir(innerThirdDir, configs, true)
     local thirdDirs = config.get(uri, 'Lua.workspace.userThirdParty')
     for _, thirdDir in ipairs(thirdDirs) do
@@ -487,7 +493,6 @@ local function check3rdByFileName(uri, configs)
     end, id)
 end
 
-local thirdConfigs
 ---@async
 local function check3rd(uri)
     if hasAsked then
@@ -499,9 +504,11 @@ local function check3rd(uri)
     if not config.get(uri, 'Lua.workspace.checkThirdParty') then
         return
     end
-    if thirdConfigs == nil then
-        thirdConfigs = load3rdConfig(uri) or false
+    local scp = scope.getScope(uri)
+    if not scp:get 'canCheckThirdParty' then
+        return
     end
+    local thirdConfigs = load3rdConfig(uri) or false
     if not thirdConfigs then
         return
     end
@@ -510,7 +517,10 @@ local function check3rd(uri)
 end
 
 local function check3rdOfWorkspace(suri)
-    local id = 'check3rdOfWorkspace:' .. suri
+    local scp = scope.getScope(suri)
+    scp:set('thirdConfigsCache', nil)
+    scp:set('canCheckThirdParty', true)
+    local id = 'check3rdOfWorkspace:' .. scp:getName()
     await.close(id)
     ---@async
     await.call(function ()
@@ -529,7 +539,8 @@ config.watch(function (uri, key, value, oldValue)
         initBuiltIn(uri)
     end
     if key == 'Lua.workspace.checkThirdParty'
-    or key == 'Lua.workspace.userThirdParty' then
+    or key == 'Lua.workspace.userThirdParty'
+    or key == '' then
         check3rdOfWorkspace(uri)
     end
 end)

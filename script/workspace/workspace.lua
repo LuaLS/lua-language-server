@@ -45,6 +45,9 @@ end
 
 --- 初始化工作区
 function m.create(uri)
+    if furi.isValid(uri) then
+        uri = furi.normalize(uri)
+    end
     log.info('Workspace create: ', uri)
     if uri == furi.encode '/'
     or uri == furi.encode(os.getenv 'HOME' or '') then
@@ -383,6 +386,16 @@ function m.normalize(path)
     end)
     path = util.expandPath(path)
     path = path:gsub('^%.[/\\]+', '')
+    for _ = 1, 1000 do
+        if path:sub(1, 2) == '..' then
+            break
+        end
+        local count
+        path, count = path:gsub('[^/\\]+[/\\]+%.%.', '', 1)
+        if count == 0 then
+            break
+        end
+    end
     if platform.OS == 'Windows' then
         path = path:gsub('[/\\]+', '\\')
                    :gsub('[/\\]+$', '')
@@ -394,11 +407,10 @@ function m.normalize(path)
     return path
 end
 
+---@param folderUri? uri
+---@param path string
 ---@return string?
 function m.getAbsolutePath(folderUri, path)
-    if not path or path == '' then
-        return nil
-    end
     path = m.normalize(path)
     if fs.path(path):is_relative() then
         if not folderUri then
@@ -471,11 +483,15 @@ end
 ---@param scp scope
 function m.resetFiles(scp)
     local cachedUris = scp:get 'cachedUris'
-    if not cachedUris then
-        return
+    if cachedUris then
+        for uri in pairs(cachedUris) do
+            files.resetText(uri)
+        end
     end
-    for uri in pairs(cachedUris) do
-        files.resetText(uri)
+    for uri in pairs(files.openMap) do
+        if scope.getScope(uri) == scp then
+            files.resetText(uri)
+        end
     end
 end
 

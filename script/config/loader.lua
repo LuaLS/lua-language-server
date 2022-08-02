@@ -42,6 +42,9 @@ end
 
 ---@return table?
 function m.loadLocalConfig(uri, filename)
+    if not filename then
+        return nil
+    end
     local scp  = scope.getScope(uri)
     local path = workspace.getAbsolutePath(uri, filename)
     if not path then

@@ -2,6 +2,7 @@ local files = require 'files'
 local guide = require 'parser.guide'
 local lang  = require 'language'
 local await = require 'await'
+local sub   = require 'core.substring'
 
 ---@async
 return function (uri, callback)
@@ -44,8 +45,8 @@ return function (uri, callback)
                 start   = node.start,
                 finish  = args.finish,
                 message = lang.script('DIAG_PREVIOUS_CALL'
-                    , text:sub(node.start, node.finish)
-                    , text:sub(args.start, args.finish)
+                    , sub(state)(node.start + 1, node.finish)
+                    , sub(state)(args.start + 1, args.finish)
                 ),
             }
         end

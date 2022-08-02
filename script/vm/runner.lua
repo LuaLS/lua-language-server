@@ -294,6 +294,7 @@ function mt:_lookIntoChild(action, topNode, outNode)
         end
     elseif action.type == 'local' then
         if  action.value
+        and action.ref
         and action.value.type == 'select' then
             local index = action.value.sindex
             local call  = action.value.vararg

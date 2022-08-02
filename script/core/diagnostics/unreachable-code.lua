@@ -5,6 +5,21 @@ local lang   = require 'language'
 local await  = require 'await'
 local define = require 'proto.define'
 
+---@param source parser.object
+---@return boolean
+local function allLiteral(source)
+    local result = true
+    guide.eachSource(source, function (src)
+        if  src.type ~= 'unary'
+        and src.type ~= 'binary'
+        and not guide.isLiteral(src) then
+            result = false
+            return false
+        end
+    end)
+    return result
+end
+
 ---@param block parser.object
 ---@return boolean
 local function hasReturn(block)
@@ -25,7 +40,8 @@ local function hasReturn(block)
     else
         if block.type == 'while' then
             if  vm.testCondition(block.filter)
-            and not block.breaks then
+            and not block.breaks
+            and allLiteral(block.filter) then
                 return true
             end
         end
@@ -50,9 +66,6 @@ return function (uri, callback)
     ---@async
     guide.eachSourceTypes(state.ast, {'main', 'function'}, function (source)
         await.delay()
-        if not source.returns then
-            return
-        end
         for i, action in ipairs(source) do
             if  guide.isBlockType(action)
             and hasReturn(action) then

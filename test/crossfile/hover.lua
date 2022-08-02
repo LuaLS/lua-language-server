@@ -1525,3 +1525,60 @@ TEST {
 }
 ```]]
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@enum <?A?>
+            local t =
+            {
+                x = 1,
+                y = 2,
+                z = 3,
+            }
+        ]]
+    },
+    hover = [[
+```lua
+(enum) A
+```
+
+---
+
+```lua
+{
+    x: integer = 1,
+    y: integer = 2,
+    z: integer = 3,
+}
+```]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@enum <?A?>
+            local t = {
+                x = 1 << 0,
+                y = 1 << 1,
+                z = 1 << 2,
+            }
+        ]]
+    },
+    hover = [[
+```lua
+(enum) A
+```
+
+---
+
+```lua
+{
+    x: integer = 1,
+    y: integer = 2,
+    z: integer = 4,
+}
+```]]
+}

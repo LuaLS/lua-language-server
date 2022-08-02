@@ -6,6 +6,8 @@ local files      = require 'files'
 ---@class vm
 local vm         = require 'vm.vm'
 
+local LOCK = {}
+
 ---@class parser.object
 ---@field _compiledNodes  boolean
 ---@field _node           vm.node
@@ -45,7 +47,7 @@ local function bindDocs(source)
             if not name then
                 return true
             end
-            local uri = rpath.findUrisByRequirePath(guide.getUri(source), name)[1]
+            local uri = rpath.findUrisByRequireName(guide.getUri(source), name)[1]
             if not uri then
                 return true
             end
@@ -293,6 +295,14 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
             if set.type == 'doc.class' then
                 -- check ---@field
                 local hasFounded = {}
+
+                local function copyToSearched()
+                    for fieldKey in pairs(hasFounded) do
+                        searchedFields[fieldKey] = true
+                        hasFounded[fieldKey] = nil
+                    end
+                end
+
                 for _, field in ipairs(set.fields) do
                     local fieldKey = guide.getKeyName(field)
                     if fieldKey then
@@ -342,8 +352,9 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                         end
                     end
                 end
+                copyToSearched()
                 -- check local field and global field
-                if not hasFounded[key] and set.bindSource then
+                if not searchedFields[key] and set.bindSource then
                     local src = set.bindSource
                     if src.value and src.value.type == 'table' then
                         searchFieldSwitch('table', suri, src.value, key, ref, function (field)
@@ -357,9 +368,10 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                             end
                         end)
                     end
+                    copyToSearched()
                     searchFieldSwitch(src.type, suri, src, key, ref, function (field)
                         local fieldKey = guide.getKeyName(field)
-                        if fieldKey and not hasFounded[fieldKey] then
+                        if fieldKey and not searchedFields[fieldKey] then
                             if  not searchedFields[fieldKey]
                             and guide.isSet(field) then
                                 hasFounded[fieldKey] = true
@@ -367,12 +379,10 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                             end
                         end
                     end)
+                    copyToSearched()
                 end
                 -- look into extends(if field not found)
-                if not hasFounded[key] and set.extends then
-                    for fieldKey in pairs(hasFounded) do
-                        searchedFields[fieldKey] = true
-                    end
+                if not searchedFields[key] and set.extends then
                     for _, extend in ipairs(set.extends) do
                         if extend.type == 'doc.extends.name' then
                             local extendType = vm.getGlobal('type', extend[1])
@@ -381,6 +391,7 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                             end
                         end
                     end
+                    copyToSearched()
                 end
             end
         end
@@ -1045,6 +1056,9 @@ local function compileLocal(source)
     -- for x = ... do
     if source.parent.type == 'loop' then
         if source.parent.loc == source then
+            if bindDocs(source) then
+                return
+            end
             vm.setNode(source, vm.declareGlobal('type', 'integer'))
         end
     end
@@ -1149,6 +1163,25 @@ local compilerSwitch = util.switch()
                         vm.setNode(src, vm.createNode(src.value))
                         vm.setNode(src, node:copy():asTable())
                     else
+                        local function clearLockedNode(child)
+                            if not child then
+                                return
+                            end
+                            if child.type == 'function' then
+                                return
+                            end
+                            if child.type == 'setlocal'
+                            or child.type == 'getlocal' then
+                                if child.node == source then
+                                    return
+                                end
+                            end
+                            if LOCK[child] then
+                                vm.removeNode(child)
+                            end
+                            guide.eachChild(child, clearLockedNode)
+                        end
+                        clearLockedNode(src.value)
                         vm.setNode(src, vm.compileNode(src.value), true)
                     end
                 else
@@ -1441,7 +1474,7 @@ local compilerSwitch = util.switch()
             if not name or type(name) ~= 'string' then
                 return
             end
-            local uri = rpath.findUrisByRequirePath(guide.getUri(func), name)[1]
+            local uri = rpath.findUrisByRequireName(guide.getUri(func), name)[1]
             if not uri then
                 return
             end
@@ -1727,7 +1760,7 @@ local function compileByGlobal(source)
     if global.cate == 'variable' then
         local hasMarkDoc
         for _, set in ipairs(global:getSets(uri)) do
-            if set.bindDocs then
+            if set.bindDocs and set.parent.type == 'main' then
                 if bindDocs(set) then
                     globalNode:merge(vm.compileNode(set))
                     hasMarkDoc = true
@@ -1742,7 +1775,7 @@ local function compileByGlobal(source)
             vm.setNode(set, globalNode, true)
         end
         for _, set in ipairs(global:getSets(uri)) do
-            if set.value and set.value.type ~= 'nil' then
+            if set.value and set.value.type ~= 'nil' and set.parent.type == 'main' then
                 if not hasMarkDoc or guide.isLiteral(set.value) then
                     globalNode:merge(vm.compileNode(set.value))
                 end
@@ -1799,9 +1832,11 @@ function vm.compileNode(source)
 
     ---@cast source parser.object
     vm.setNode(source, vm.createNode(), true)
+    LOCK[source] = true
     compileByGlobal(source)
     compileByNode(source)
     matchCall(source)
+    LOCK[source] = nil
 
     local node = vm.getNode(source)
     ---@cast node -?

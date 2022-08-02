@@ -11,7 +11,7 @@ local furi     = require 'file-uri'
 local function collectRequire(mode, literal, uri)
     local result, searchers
     if     mode == 'require' then
-        result, searchers = rpath.findUrisByRequirePath(uri, literal)
+        result, searchers = rpath.findUrisByRequireName(uri, literal)
     elseif mode == 'dofile'
     or     mode == 'loadfile' then
         result = ws.findUrisByFilePath(literal)
@@ -436,6 +436,13 @@ local function tryDocEnum(source)
             if field.value.type == 'integer'
             or field.value.type == 'string' then
                 md:add('lua', ('    %s: %s = %s,'):format(key, field.value.type, field.value[1]))
+            end
+            if field.value.type == 'binary'
+            or field.value.type == 'unary' then
+                local number = vm.getNumber(field.value)
+                if number then
+                    md:add('lua', ('    %s: %s = %s,'):format(key, math.tointeger(number) and 'integer' or 'number', number))
+                end
             end
             ::CONTINUE::
         end

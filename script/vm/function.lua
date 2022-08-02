@@ -148,7 +148,7 @@ end
 ---@return integer min
 ---@return number  max
 function vm.countReturnsOfCall(func, args, mark)
-    local funcs = vm.getMatchedFunctions(func, args)
+    local funcs = vm.getMatchedFunctions(func, args, mark)
     ---@type integer?
     local min
     ---@type number?
@@ -197,8 +197,9 @@ end
 
 ---@param func parser.object
 ---@param args parser.object[]?
+---@param mark? table
 ---@return parser.object[]
-function vm.getMatchedFunctions(func, args)
+function vm.getMatchedFunctions(func, args, mark)
     local funcs = {}
     local node = vm.compileNode(func)
     for n in node:eachObject() do
@@ -211,7 +212,7 @@ function vm.getMatchedFunctions(func, args)
         return funcs
     end
 
-    local amin, amax = vm.countList(args)
+    local amin, amax = vm.countList(args, mark)
 
     local matched = {}
     for _, n in ipairs(funcs) do

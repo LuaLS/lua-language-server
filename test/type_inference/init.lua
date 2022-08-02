@@ -3737,3 +3737,27 @@ function m:init()
     return <?self?>
 end
 ]]
+
+TEST 'string' [[
+---@vararg string
+function F(...)
+    local t = {...}
+    for k, <?v?> in pairs(t) do
+    end
+end
+]]
+
+TEST 'string' [[
+---@vararg string
+function F(...)
+    local t = {...}
+    for k, <?v?> in ipairs(t) do
+    end
+end
+]]
+
+TEST 'integerA' [[
+---@type integerA
+for <?i?> = 1, 10 do
+end
+]]

@@ -81,9 +81,19 @@ function m.findTargetSymbol(text, offset, symbol)
     return nil
 end
 
-function m.findAnyOffset(text, offset)
+---@param text string
+---@param offset integer
+---@param inline? boolean # 必须在同一行中（排除换行符）
+function m.findAnyOffset(text, offset, inline)
     for i = offset, 1, -1 do
-        if not m.isSpace(text:sub(i, i)) then
+        local c = text:sub(i, i)
+        if inline then
+            if c == '\r'
+            or c == '\n' then
+                return nil
+            end
+        end
+        if not m.isSpace(c) then
             return i
         end
     end

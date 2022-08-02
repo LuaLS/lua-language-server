@@ -1087,6 +1087,18 @@ end
 ]]
 
 TEST [[
+for i = <!100, 10, 1!> do
+    print(i)
+end
+]]
+
+TEST [[
+for i = <!1, -10!> do
+    print(i)
+end
+]]
+
+TEST [[
 for i = 1, 1 do
     print(i)
 end
@@ -1988,6 +2000,28 @@ end
 ]]
 
 TEST [[
+while true do
+end
+
+<!print(1)!>
+]]
+
+TEST [[
+while true do
+end
+
+<!print(1)!>
+]]
+
+TEST [[
+while X do
+    X = 1
+end
+
+print(1)
+]]
+
+TEST [[
 ---@diagnostic disable: undefined-global
 
 while true do
@@ -1999,4 +2033,37 @@ end
 print(1)
 
 do return end
+]]
+
+TEST [[
+---@type unknown
+local t
+
+local _ <close> = t
+]]
+
+TEST [[
+---@diagnostic disable: duplicate-set-field
+---@class A
+local m = {}
+
+function m.ff() end
+
+function m.ff(x) end
+
+m.ff(1)
+]]
+
+TEST [[
+local done = false
+
+local function set_done()
+    done = true
+end
+
+while not done do
+    set_done()
+end
+
+print(1)
 ]]

@@ -40,5 +40,8 @@
             "/meta"
         ],
         "checkThirdParty": false
+    },
+    "type": {
+        "castNumberToInteger": false
     }
 }

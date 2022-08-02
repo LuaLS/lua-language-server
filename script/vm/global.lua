@@ -350,6 +350,10 @@ local compilerGlobalSwitch = util.switch()
                 or field.value.type == 'string' then
                     source._enums[#source._enums+1] = field.value[1]
                 end
+                if field.value.type == 'binary'
+                or field.value.type == 'unary' then
+                    source._enums[#source._enums+1] = vm.getNumber(field.value)
+                end
                 ::CONTINUE::
             end
         end

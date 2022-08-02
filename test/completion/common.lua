@@ -3697,3 +3697,25 @@ f(<??>)
         kind     = define.CompletionItemKind.EnumMember,
     },
 }
+
+TEST [[
+--
+<??>
+]]
+(function (results)
+    assert(#results > 2)
+end)
+
+TEST [[
+--xxx
+<??>
+]]
+(function (results)
+    assert(#results > 2)
+end)
+
+TEST [[
+---<??>
+local x = function (x, y) end
+]]
+(EXISTS)

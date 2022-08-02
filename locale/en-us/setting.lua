@@ -25,7 +25,9 @@ config.runtime.unicodeName        =
 config.runtime.nonstandardSymbol  =
 "Supports non-standard symbols. Make sure that your runtime environment supports these symbols."
 config.runtime.plugin             =
-"Plugin path. Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/Plugin) to learn more."
+"Plugin path. Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/Plugins) to learn more."
+config.runtime.pluginArgs         =
+"Additional arguments for the plugin."
 config.runtime.fileEncoding       =
 "File encoding. The `ansi` option is only available under the `Windows` platform."
 config.runtime.builtin            =
@@ -253,11 +255,11 @@ config.format.defaultConfig              =
 The default format configuration. Has a lower priority than `.editorconfig` file in the workspace.
 Read [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) to learn usage.
 ]]
-config.spell.dict                        = -- TODO: need translate!
+config.spell.dict                        =
 'Custom words for spell checking.'
 config.telemetry.enable                  =
 [[
-Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://github.com/sumneko/lua-language-server/wiki/Privacy-Policy).
+Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://github.com/sumneko/lua-language-server/wiki/Home#privacy).
 ]]
 config.misc.parameters                   =
 '[Command line parameters](https://github.com/sumneko/lua-telemetry-server/tree/master/method) when starting the language service in VSCode.'
@@ -301,8 +303,8 @@ config.diagnostics['redefined-local']       =
 'Enable redefined local variable diagnostics.'
 config.diagnostics['newline-call']          =
 'Enable newline call diagnostics. Is\'s raised when a line starting with `(` is encountered, which is syntactically parsed as a function call on the previous line.'
-config.diagnostics['newfield-call']         = -- TODO: need translate!
-'在字面量表中，2行代码之间缺少分隔符，在语法上被解析为了一次索引操作'
+config.diagnostics['newfield-call']         =
+'Enable newfield call diagnostics. It is raised when the parenthesis of a function call appear on the following line when defining a field in a table.'
 config.diagnostics['redundant-parameter']   =
 'Enable redundant function parameter diagnostics.'
 config.diagnostics['ambiguity-1']           =

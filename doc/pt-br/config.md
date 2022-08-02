@@ -398,7 +398,6 @@ object<string, string>
     */
     "global": "Fallback",
     /*
-    * cast-type-mismatch
     * circle-doc-class
     * doc-field-no-class
     * duplicate-doc-alias
@@ -517,7 +516,6 @@ object<string, string>
     */
     "global": "Fallback",
     /*
-    * cast-type-mismatch
     * circle-doc-class
     * doc-field-no-class
     * duplicate-doc-alias
@@ -659,7 +657,7 @@ object<string, string>
     "assign-type-mismatch": "Opened",
     "await-in-sync": "None",
     "cast-local-type": "Opened",
-    "cast-type-mismatch": "Any",
+    "cast-type-mismatch": "Opened",
     "circle-doc-class": "Any",
     "close-non-object": "Any",
     "code-after-break": "Opened",
@@ -1397,7 +1395,7 @@ false
 
 # runtime.plugin
 
-Plugin path. Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/Plugin) to learn more.
+Plugin path. Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/Plugins) to learn more.
 
 ## type
 
@@ -1409,6 +1407,22 @@ string
 
 ```jsonc
 ""
+```
+
+# runtime.pluginArgs
+
+Additional arguments for the plugin.
+
+## type
+
+```ts
+Array<string>
+```
+
+## default
+
+```jsonc
+[]
 ```
 
 # runtime.special
@@ -1572,7 +1586,7 @@ Array<string>
 
 # telemetry.enable
 
-Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://github.com/sumneko/lua-language-server/wiki/Privacy-Policy).
+Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://github.com/sumneko/lua-language-server/wiki/Home#privacy).
 
 
 ## type
@@ -1600,7 +1614,7 @@ boolean
 ## default
 
 ```jsonc
-false
+true
 ```
 
 # type.weakNilCheck

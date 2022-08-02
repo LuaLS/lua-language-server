@@ -63,6 +63,10 @@ function mt:resolve(uri, args, removeGeneric)
                         resolve(object.node, vm.compileNode(field.extends))
                     end)
                 end
+                if n.type == 'table' and #n >= 1 then
+                    -- { x } / { ... } -> T[]
+                    resolve(object.node, vm.compileNode(n[1]))
+                end
             end
         end
         if object.type == 'doc.type.table' then

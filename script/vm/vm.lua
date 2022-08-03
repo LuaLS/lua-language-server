@@ -75,7 +75,7 @@ function m.getObjectFunctionValue(source)
     if value.type == 'getlocal' then
         return m.getObjectFunctionValue(value.node)
     end
-    return nil
+    return value
 end
 
 m.cacheTracker = setmetatable({}, weakMT)

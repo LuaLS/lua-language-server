@@ -485,7 +485,7 @@ local function checkFieldFromFieldToIndex(state, name, src, parent, word, startP
 end
 
 local function checkFieldThen(state, name, src, word, startPos, position, parent, oop, results)
-    local value = vm.getObjectValue(src) or src
+    local value = vm.getObjectFunctionValue(src) or src
     local kind = define.CompletionItemKind.Field
     if value.type == 'function'
     or value.type == 'doc.type.function' then
@@ -565,7 +565,8 @@ local function checkFieldOfRefs(refs, state, word, startPos, position, parent, o
         end
         local funcLabel
         if config.get(state.uri, 'Lua.completion.showParams') then
-            local value = vm.getObjectValue(src) or src
+            --- TODO determine if getlocal should be a function here too
+            local value = vm.getObjectFunctionValue(src) or src
             if value.type == 'function'
             or value.type == 'doc.type.function' then
                 funcLabel = name .. getParams(value, oop)

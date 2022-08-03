@@ -182,6 +182,7 @@ m.BuiltIn = {
     ['table.new']   = 'default',
     ['table.clear'] = 'default',
     ['utf8']        = 'default',
+    ['string.buffer'] = 'default',
 }
 
 m.InlayHintKind = {

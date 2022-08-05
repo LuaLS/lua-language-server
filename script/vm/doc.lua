@@ -164,6 +164,9 @@ local function isAsync(value)
         value._async = false
         return false
     end
+    if value.type == 'main' then
+        return true
+    end
     return value.async == true
 end
 

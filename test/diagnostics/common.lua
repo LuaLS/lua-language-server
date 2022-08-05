@@ -1359,9 +1359,11 @@ local function f(cb)
     cb()
 end
 
-<!f!>(function () ---@async
-    return nil
-end)
+return function()
+    <!f>(function () ---@async
+        return nil
+    end)
+end
 ]]
 
 TEST [[
@@ -1369,9 +1371,11 @@ local function f(cb)
     pcall(cb)
 end
 
-<!f!>(function () ---@async
-    return nil
-end)
+return function()
+    <!f!>(function () ---@async
+        return nil
+    end)
+end
 ]]
 
 TEST [[
@@ -1380,9 +1384,11 @@ local function f(c)
     return c
 end
 
-f(function () ---@async
-    return nil
-end)
+return function ()
+    f(function () ---@async
+        return nil
+    end)
+end
 ]]
 
 TEST [[
@@ -1391,9 +1397,11 @@ local function f(...)
     return ...
 end
 
-f(function () ---@async
-    return nil
-end)
+return function ()
+    f(function () ---@async
+        return nil
+    end)
+end
 ]]
 
 TEST [[
@@ -1402,9 +1410,11 @@ local function f(...)
     return ...
 end
 
-f(function () ---@async
-    return nil
-end)
+return function ()
+    f(function () ---@async
+        return nil
+    end)
+end
 ]]
 
 TEST [[
@@ -1412,9 +1422,11 @@ local function f(...)
     return ...
 end
 
-f(function () ---@async
-    return nil
-end)
+return function ()
+    f(function () ---@async
+        return nil
+    end)
+end
 ]]
 
 TEST [[
@@ -1422,9 +1434,11 @@ local function f(...)
     return ...
 end
 
-f(1, function () ---@async
-    return nil
-end)
+return function ()
+    f(function () ---@async
+        return nil
+    end)
+end
 ]]
 
 TEST [[

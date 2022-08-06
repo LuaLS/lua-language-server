@@ -119,4 +119,4 @@ Software that the language server (or the development of it) uses:
 * [inspect.lua](https://github.com/kikito/inspect.lua)
 
 
-[checkmark]: https://gist.githubusercontent.com/carsakiller/362482775731de88cdafeeca9f6a392e/raw/cd3976e92a85aafe1f33e3f9fe3d0e0bd451902c/checkmark.svg
+[checkmark]: https://user-images.githubusercontent.com/61925890/183228083-d3aa4eca-30c7-4b9f-aaab-26ce3d8a14fb.png

@@ -19,6 +19,13 @@ function lovr.system.getCoreCount() end
 function lovr.system.getOS() end
 
 ---
+---Returns whether a key on the keyboard is pressed.
+---
+---@param key lovr.KeyCode # The key.
+---@return boolean down # Whether the key is currently pressed.
+function lovr.system.isKeyDown(key) end
+
+---
 ---Requests permission to use a feature.
 ---
 ---Usually this will pop up a dialog box that the user needs to confirm.

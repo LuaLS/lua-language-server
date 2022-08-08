@@ -5,22 +5,6 @@ local config     = require 'config'
 
 rawset(_G, 'TEST', true)
 
-local accept = {
-    ['local']          = true,
-    ['setlocal']       = true,
-    ['getlocal']       = true,
-    ['setglobal']      = true,
-    ['getglobal']      = true,
-    ['field']          = true,
-    ['method']         = true,
-    ['string']         = true,
-    ['number']         = true,
-    ['integer']        = true,
-    ['doc.type.name']  = true,
-    ['doc.class.name'] = true,
-    ['function']       = true,
-}
-
 ---@diagnostic disable: await-in-sync
 function TEST(script)
     return function (expect)
@@ -312,7 +296,6 @@ end
 ]]
 [[
 function x()
-  -> unknown
 ]]
 
 TEST [[
@@ -2136,4 +2119,20 @@ local <?x?> = 1 << 2
 ]]
 [[
 local x: integer = 4
+]]
+
+TEST [[
+local function test1()
+    return 1, 2, 3
+end
+
+local function <?test2?>()
+    return test1()
+end
+]]
+[[
+function test2()
+  -> integer
+  2. integer
+  3. integer
 ]]

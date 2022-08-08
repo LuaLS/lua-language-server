@@ -1767,6 +1767,23 @@ local function addDummySelf(node, call)
     tinsert(call.args, 1, self)
 end
 
+local function checkAmbiguityCall(call, parenPos)
+    if State.version ~= 'Lua 5.1' then
+        return
+    end
+    local node = call.node
+    local nodeRow = guide.rowColOf(node.finish)
+    local callRow = guide.rowColOf(parenPos)
+    if nodeRow == callRow then
+        return
+    end
+    pushError {
+        type   = 'AMBIGUOUS_SYNTAX',
+        start  = parenPos,
+        finish = call.finish,
+    }
+end
+
 local function parseSimple(node, funcName)
     local lastMethod
     while true do
@@ -1869,6 +1886,7 @@ local function parseSimple(node, funcName)
                 call.args   = args
             end
             addDummySelf(node, call)
+            checkAmbiguityCall(call, startPos)
             node.parent = call
             node = call
         elseif token == '{' then

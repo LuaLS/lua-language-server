@@ -269,6 +269,8 @@ PARSER_INDEX_IN_FUNC_NAME =
 'A forma `[name]` não pode ser usada em nome de uma função nomeada.'
 PARSER_UNKNOWN_ATTRIBUTE  =
 'Atributo local deve ser `const` ou `close`'
+PARSER_AMBIGUOUS_SYNTAX   = -- TODO: need translate!
+'In Lua 5.1, the left brackets called by the function must be in the same line as the function.'
 PARSER_LUADOC_MISS_CLASS_NAME           =
 'Esperado <class name>.'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =

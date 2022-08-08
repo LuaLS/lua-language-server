@@ -269,6 +269,8 @@ PARSER_INDEX_IN_FUNC_NAME =
 '命名函数的名称中不能使用 `[name]` 形式。'
 PARSER_UNKNOWN_ATTRIBUTE  =
 '局部变量属性应该是 `const` 或 `close`'
+PARSER_AMBIGUOUS_SYNTAX   =
+'在 Lua 5.1 中，函数调用的左括号必须与函数在同一行。'
 PARSER_LUADOC_MISS_CLASS_NAME           =
 '缺少类名称。'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =

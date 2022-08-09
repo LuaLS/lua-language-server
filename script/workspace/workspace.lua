@@ -391,7 +391,7 @@ function m.normalize(path)
             break
         end
         local count
-        path, count = path:gsub('[^/\\]+[/\\]+%.%.', '', 1)
+        path, count = path:gsub('[^/\\]+[/\\]+%.%.[/\\]', '/', 1)
         if count == 0 then
             break
         end

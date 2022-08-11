@@ -8,12 +8,11 @@
 			"request": "launch",
 			"stopOnEntry": false,
 			"program": "${workspaceRoot}/test.lua",
-			"luaexe": "${workspaceFolder}/bin/lua-language-server.exe",
+			"luaexe": "${workspaceFolder}/bin/lua-language-server",
 			"cpath": null,
 			"arg": [
 			],
 			"luaVersion": "5.4",
-			"consoleCoding": "utf8",
 			"sourceCoding": "utf8",
 			"console": "internalConsole",
 			"outputCapture": [
@@ -26,15 +25,24 @@
 			"type": "lua",
 			"request": "attach",
 			"stopOnEntry": false,
-			"address": "127.0.0.1:11413",
+			"address": "127.0.0.1:11427",
 			"outputCapture": [
 			],
+			"sourceFormat": "string",
 			"sourceMaps": [
 				[
-					"./*",
-					"${workspaceFolder}/*"
+					"script/*",
+					"${workspaceFolder}/script/*"
 				]
-			]
+			],
+			"windows": {
+				"sourceMaps": [
+					[
+						"script\\*",
+						"${workspaceFolder}/script/*"
+					]
+				],
+			},
 		},
 		{
 			"name": "🍉build-3rd-meta",
@@ -43,11 +51,10 @@
 			"stopOnEntry": false,
 			"luaexe": "${workspaceFolder}/bin/lua-language-server",
 			"program": "${workspaceRoot}/tools/build-3rd-meta.lua",
-			"cpath": "${workspaceFolder}/bin/?.dll",
+			"cpath": "${workspaceFolder}/bin/?.dll;${workspaceFolder}/bin/?.so",
 			"arg": [
 			],
 			"luaVersion": "latest",
-			"consoleCoding": "utf8",
 			"sourceCoding": "utf8",
 			"outputCapture": [
 				"print",
@@ -60,14 +67,13 @@
 			"request": "launch",
 			"stopOnEntry": false,
 			"program": "${workspaceRoot}/main.lua",
-			"luaexe": "${workspaceFolder}/bin/lua-language-server.exe",
+			"luaexe": "${workspaceFolder}/bin/lua-language-server",
 			"cpath": null,
 			"arg": [
 				"--check",
 				"${workspaceRoot}",
 			],
 			"luaVersion": "5.4",
-			"consoleCoding": "utf8",
 			"sourceCoding": "utf8",
 			"outputCapture": [
 				"print",
@@ -81,11 +87,27 @@
 			"stopOnEntry": false,
 			"luaexe": "${workspaceFolder}/bin/lua-language-server",
 			"program": "${workspaceRoot}/tools/locale.lua",
-			"cpath": "${workspaceFolder}/bin/?.dll",
+			"cpath": "${workspaceFolder}/bin/?.dll;${workspaceFolder}/bin/?.so",
 			"arg": [
 			],
 			"luaVersion": "latest",
-			"consoleCoding": "utf8",
+			"sourceCoding": "utf8",
+			"outputCapture": [
+				"print",
+				"stderr",
+			],
+		},
+		{
+			"name": "🀄build-doc",
+			"type": "lua",
+			"request": "launch",
+			"stopOnEntry": false,
+			"luaexe": "${workspaceFolder}/bin/lua-language-server",
+			"program": "${workspaceRoot}/tools/build-doc.lua",
+			"cpath": "${workspaceFolder}/bin/?.dll;${workspaceFolder}/bin/?.so",
+			"arg": [
+			],
+			"luaVersion": "latest",
 			"sourceCoding": "utf8",
 			"outputCapture": [
 				"print",

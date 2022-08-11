@@ -1,0 +1,95 @@
+name: Bug Report
+description: Report a bug with the lua-language-server
+body:
+  - type: markdown
+    attributes:
+      value: >
+        **Please check for similar issues before continuing!**
+  - type: dropdown
+    id: client
+    attributes:
+      label: How are you using the lua-language-server?
+      options:
+        - Visual Studio Code Extension (sumneko.lua)
+        - NeoVim
+        - Kakoune
+        - Command Line
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: OS
+    attributes:
+      label: Which OS are you using?
+      options:
+        - Windows
+        - Linux
+        - MacOS
+        - Windows WSL
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: type
+    attributes:
+      label: What is the issue affecting?
+      description: Please select all of the areas affected by this issue.
+      multiple: true
+      options:
+        - Annotations
+        - Type Checking
+        - Completion
+        - Diagnostics/Syntax Checking
+        - Hover
+        - Libraries
+        - Formatting
+        - Spell Checking
+        - Plugins
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behaviour
+      description: What is the expected behaviour?
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behaviour
+      description: What is actually happening that is an error?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      description: >
+        Please provide steps to reproduce the error. The more detail the better
+        as it helps us fully understand the issue.
+      value: |
+        1. Go to '...'
+        2. Click '...'
+        3. See error '...'
+    validations:
+      required: true
+  - type: textarea
+    id: additional-notes
+    attributes:
+      label: Additional Notes
+      description: >
+        Please provide any additional notes, context,
+        and media you have.
+  - type: textarea
+    id: log-file
+    attributes:
+      label: Log File
+      description: >
+        Please provide your log file. Refer to the wiki to find your log file:
+        https://github.com/sumneko/lua-language-server/wiki/FAQ#where-can-i-find-the-log-file
+  - type: markdown
+    attributes:
+      value: |
+        Thank you very much for helping improve the language server! ❤️

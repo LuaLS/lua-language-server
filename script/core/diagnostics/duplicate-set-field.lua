@@ -3,17 +3,21 @@ local lang     = require 'language'
 local define   = require 'proto.define'
 local guide    = require 'parser.guide'
 local vm       = require 'vm'
+local await    = require 'await'
 
+---@async
 return function (uri, callback)
     local ast = files.getState(uri)
     if not ast then
         return
     end
 
+    ---@async
     guide.eachSourceType(ast.ast, 'local', function (source)
         if not source.ref then
             return
         end
+        await.delay()
         local sets = {}
         for _, ref in ipairs(source.ref) do
             if ref.type ~= 'getlocal' then
@@ -48,10 +52,12 @@ return function (uri, callback)
             local blocks = {}
             for _, value in ipairs(values) do
                 local block = guide.getBlock(value)
-                if not blocks[block] then
-                    blocks[block] = {}
+                if block then
+                    if not blocks[block] then
+                        blocks[block] = {}
+                    end
+                    blocks[block][#blocks[block]+1] = value
                 end
-                blocks[block][#blocks[block]+1] = value
             end
             for _, defs in pairs(blocks) do
                 if #defs <= 1 then

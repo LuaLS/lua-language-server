@@ -5,72 +5,7 @@ local guide     = require 'parser.guide'
 
 local simpleSwitch
 
-local function searchGetLocal(source, node, pushResult)
-    local key = guide.getKeyName(source)
-    for _, ref in ipairs(node.node.ref) do
-        if  ref.type == 'getlocal'
-        and ref.next
-        and guide.isSet(ref.next)
-        and guide.getKeyName(ref.next) == key then
-            pushResult(ref.next)
-        end
-    end
-end
-
 simpleSwitch = util.switch()
-    : case 'local'
-    : call(function (source, pushResult)
-        pushResult(source)
-        if source.ref then
-            for _, ref in ipairs(source.ref) do
-                if ref.type == 'setlocal' then
-                    pushResult(ref)
-                end
-            end
-        end
-    end)
-    : case 'sellf'
-    : call(function (source, pushResult)
-        if source.ref then
-            for _, ref in ipairs(source.ref) do
-                if ref.type == 'setlocal' then
-                    pushResult(ref)
-                end
-            end
-        end
-        for _, res in ipairs(vm.getDefs(source.method.node)) do
-            pushResult(res)
-        end
-    end)
-    : case 'getlocal'
-    : case 'setlocal'
-    : call(function (source, pushResult)
-        simpleSwitch('local', source.node, pushResult)
-    end)
-    : case 'field'
-    : call(function (source, pushResult)
-        local parent = source.parent
-        if parent.type ~= 'tablefield' then
-            simpleSwitch(parent.type, parent, pushResult)
-        end
-    end)
-    : case 'setfield'
-    : case 'getfield'
-    : call(function (source, pushResult)
-        local node = source.node
-        if node.type == 'getlocal' then
-            searchGetLocal(source, node, pushResult)
-            return
-        end
-    end)
-    : case 'getindex'
-    : case 'setindex'
-    : call(function (source, pushResult)
-        local node = source.node
-        if node.type == 'getlocal' then
-            searchGetLocal(source, node, pushResult)
-        end
-    end)
     : case 'goto'
     : call(function (source, pushResult)
         if source.node then
@@ -98,7 +33,7 @@ local searchFieldSwitch = util.switch()
         end
     end)
     : case 'global'
-    ---@param obj vm.object
+    ---@param obj vm.global
     ---@param key string
     : call(function (suri, obj, key, pushResult)
         if obj.cate == 'variable' then
@@ -115,12 +50,10 @@ local searchFieldSwitch = util.switch()
     end)
     : case 'local'
     : call(function (suri, obj, key, pushResult)
-        local sources = vm.getLocalSources(obj, key)
+        local sources = vm.getLocalSourcesSets(obj, key)
         if sources then
             for _, src in ipairs(sources) do
-                if guide.isSet(src) then
-                    pushResult(src)
-                end
+                pushResult(src)
             end
         end
     end)
@@ -152,7 +85,7 @@ local nodeSwitch;nodeSwitch = util.switch()
         local parentNode = vm.compileNode(source.node)
         local uri = guide.getUri(source)
         local key = guide.getKeyName(source)
-        if not key then
+        if type(key) ~= 'string' then
             return
         end
         if lastKey then
@@ -169,9 +102,15 @@ local nodeSwitch;nodeSwitch = util.switch()
         if lastKey then
             return
         end
-        local tbl = source.parent
+        local key = guide.getKeyName(source)
+        if type(key) ~= 'string' then
+            return
+        end
         local uri = guide.getUri(source)
-        searchFieldSwitch(tbl.type, uri, tbl, guide.getKeyName(source), pushResult)
+        local parentNode = vm.compileNode(source.node)
+        for pn in parentNode:eachObject() do
+            searchFieldSwitch(pn.type, uri, pn, key, pushResult)
+        end
     end)
     : case 'doc.see.field'
     : call(function (source, lastKey, pushResult)
@@ -194,14 +133,12 @@ end
 ---@param source  parser.object
 ---@param pushResult fun(src: parser.object)
 local function searchByLocalID(source, pushResult)
-    local idSources = vm.getLocalSources(source)
+    local idSources = vm.getLocalSourcesSets(source)
     if not idSources then
         return
     end
     for _, src in ipairs(idSources) do
-        if guide.isSet(src) then
-            pushResult(src)
-        end
+        pushResult(src)
     end
 end
 

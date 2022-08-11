@@ -209,6 +209,7 @@ local function initBuiltIn(uri)
     local langID   = lang.id
     local version  = config.get(uri, 'Lua.runtime.version')
     local encoding = config.get(uri, 'Lua.runtime.fileEncoding')
+    ---@type fs.path
     local metaPath = fs.path(METAPATH) / config.get(uri, 'Lua.runtime.meta'):gsub('%$%{(.-)%}', {
         version  = version,
         language = langID,
@@ -243,6 +244,7 @@ local function initBuiltIn(uri)
             goto CONTINUE
         end
         libName = libName .. '.lua'
+        ---@type fs.path
         local libPath = templateDir / libName
         local metaDoc = compileSingleMetaDoc(uri, fsu.loadFile(libPath), metaLang, status)
         if metaDoc then
@@ -260,6 +262,7 @@ local function initBuiltIn(uri)
     end
 end
 
+---@param libraryDir fs.path
 local function loadSingle3rdConfig(libraryDir)
     local configText = fsu.loadFile(libraryDir / 'config.lua')
     if not configText then
@@ -321,7 +324,13 @@ local function load3rdConfigInDir(dir, configs, inner)
 end
 
 local function load3rdConfig(uri)
-    local configs = {}
+    local scp = scope.getScope(uri)
+    local configs = scp:get 'thirdConfigsCache'
+    if configs then
+        return configs
+    end
+    configs = {}
+    scp:set('thirdConfigsCache', configs)
     load3rdConfigInDir(innerThirdDir, configs, true)
     local thirdDirs = config.get(uri, 'Lua.workspace.userThirdParty')
     for _, thirdDir in ipairs(thirdDirs) do
@@ -400,6 +409,15 @@ local function askFor3rd(uri, cfg)
                 uri    = uri,
             },
         }, true)
+    else
+        client.setConfig({
+            {
+                key    = 'Lua.workspace.checkThirdParty',
+                action = 'set',
+                value  = false,
+                uri    = uri,
+            },
+        }, false)
     end
 end
 
@@ -420,11 +438,21 @@ local function wholeMatch(a, b)
     return true
 end
 
-local function check3rdByWords(uri, text, configs)
+local function check3rdByWords(uri, configs)
     if hasAsked then
         return
     end
+    if not files.isLua(uri) then
+        return
+    end
+    local id = 'check3rdByWords:' .. uri
+    await.close(id)
     await.call(function () ---@async
+        await.sleep(0.1)
+        local text = files.getText(uri)
+        if not text then
+            return
+        end
         for _, cfg in ipairs(configs) do
             if cfg.words then
                 for _, word in ipairs(cfg.words) do
@@ -436,7 +464,7 @@ local function check3rdByWords(uri, text, configs)
                 end
             end
         end
-    end)
+    end, id)
 end
 
 local function check3rdByFileName(uri, configs)
@@ -447,7 +475,10 @@ local function check3rdByFileName(uri, configs)
     if not path then
         return
     end
+    local id = 'check3rdByFileName:' .. uri
+    await.close(id)
     await.call(function () ---@async
+        await.sleep(0.1)
         for _, cfg in ipairs(configs) do
             if cfg.files then
                 for _, filename in ipairs(cfg.files) do
@@ -459,50 +490,62 @@ local function check3rdByFileName(uri, configs)
                 end
             end
         end
-    end)
+    end, id)
 end
 
-local lastCheckedUri = {}
-local function checkedUri(uri)
-    if  lastCheckedUri[uri]
-    and timer.clock() - lastCheckedUri[uri] < 5 then
-        return false
-    end
-    lastCheckedUri[uri] = timer.clock()
-    return true
-end
-
-local thirdConfigs
+---@async
 local function check3rd(uri)
     if hasAsked then
+        return
+    end
+    if ws.isIgnored(uri) then
         return
     end
     if not config.get(uri, 'Lua.workspace.checkThirdParty') then
         return
     end
-    if thirdConfigs == nil then
-        thirdConfigs = load3rdConfig(uri) or false
+    local scp = scope.getScope(uri)
+    if not scp:get 'canCheckThirdParty' then
+        return
     end
+    local thirdConfigs = load3rdConfig(uri) or false
     if not thirdConfigs then
         return
     end
-    if checkedUri(uri) then
-        if files.isLua(uri) then
-            local text = files.getText(uri)
-            if text then
-                check3rdByWords(uri, text, thirdConfigs)
-            end
+    check3rdByWords(uri, thirdConfigs)
+    check3rdByFileName(uri, thirdConfigs)
+end
+
+local function check3rdOfWorkspace(suri)
+    local scp = scope.getScope(suri)
+    scp:set('thirdConfigsCache', nil)
+    scp:set('canCheckThirdParty', true)
+    local id = 'check3rdOfWorkspace:' .. scp:getName()
+    await.close(id)
+    ---@async
+    await.call(function ()
+        ws.awaitReady(suri)
+        for uri in files.eachFile(suri) do
+            check3rd(uri)
         end
-        check3rdByFileName(uri, thirdConfigs)
-    end
+        for uri in files.eachDll() do
+            check3rd(uri)
+        end
+    end, id)
 end
 
 config.watch(function (uri, key, value, oldValue)
     if key:find '^Lua.runtime' then
         initBuiltIn(uri)
     end
+    if key == 'Lua.workspace.checkThirdParty'
+    or key == 'Lua.workspace.userThirdParty'
+    or key == '' then
+        check3rdOfWorkspace(uri)
+    end
 end)
 
+---@async
 files.watch(function (ev, uri)
     if ev == 'update'
     or ev == 'dll' then
@@ -510,11 +553,10 @@ files.watch(function (ev, uri)
     end
 end)
 
-function m.init()
-    initBuiltIn(nil)
-    for _, scp in ipairs(ws.folders) do
-        initBuiltIn(scp.uri)
+ws.watch(function (ev, uri)
+    if ev == 'startReload' then
+        initBuiltIn(uri)
     end
-end
+end)
 
 return m

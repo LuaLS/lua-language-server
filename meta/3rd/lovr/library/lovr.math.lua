@@ -50,6 +50,12 @@ function lovr.math.linearToGamma(lr, lg, lb) end
 ---
 ---This function takes the same arguments as `Mat4:set`.
 ---
+---@overload fun(n: lovr.mat4):lovr.Mat4
+---@overload fun(position?: lovr.Vec3, scale?: lovr.Vec3, rotation?: lovr.Quat):lovr.Mat4
+---@overload fun(position?: lovr.Vec3, rotation?: lovr.Quat):lovr.Mat4
+---@overload fun(...):lovr.Mat4
+---@overload fun(d: number):lovr.Mat4
+---@return lovr.Mat4 m # The new matrix.
 function lovr.math.mat4() end
 
 ---
@@ -60,14 +66,21 @@ function lovr.math.mat4() end
 ---@param x number # The x coordinate of the first control point.
 ---@param y number # The y coordinate of the first control point.
 ---@param z number # The z coordinate of the first control point.
+---@vararg any # Additional control points.
 ---@return lovr.Curve curve # The new Curve.
-function lovr.math.newCurve(x, y, z) end
+function lovr.math.newCurve(x, y, z, ...) end
 
 ---
 ---Creates a new 4D matrix.
 ---
 ---This function takes the same arguments as `Mat4:set`.
 ---
+---@overload fun(n: lovr.mat4):lovr.Mat4
+---@overload fun(position?: lovr.Vec3, scale?: lovr.Vec3, rotation?: lovr.Quat):lovr.Mat4
+---@overload fun(position?: lovr.Vec3, rotation?: lovr.Quat):lovr.Mat4
+---@overload fun(...):lovr.Mat4
+---@overload fun(d: number):lovr.Mat4
+---@return lovr.Mat4 m # The new matrix.
 function lovr.math.newMat4() end
 
 ---
@@ -75,7 +88,18 @@ function lovr.math.newMat4() end
 ---
 ---This function takes the same arguments as `Quat:set`.
 ---
-function lovr.math.newQuat() end
+---@overload fun(r: lovr.quat):lovr.quat
+---@overload fun(v: lovr.vec3):lovr.quat
+---@overload fun(v: lovr.vec3, u: lovr.vec3):lovr.quat
+---@overload fun(m: lovr.mat4):lovr.quat
+---@overload fun():lovr.quat
+---@param angle? any # An angle to use for the rotation, in radians.
+---@param ax? number # The x component of the axis of rotation.
+---@param ay? number # The y component of the axis of rotation.
+---@param az? number # The z component of the axis of rotation.
+---@param raw? boolean # Whether the components should be interpreted as raw `(x, y, z, w)` components.
+---@return lovr.quat q # The new quaternion.
+function lovr.math.newQuat(angle, ax, ay, az, raw) end
 
 ---
 ---Creates a new `RandomGenerator`, which can be used to generate random numbers. If you just want some random numbers, you can use `lovr.math.random`. Individual RandomGenerator objects are useful if you need more control over the random sequence used or need a random generator isolated from other instances.
@@ -90,21 +114,37 @@ function lovr.math.newRandomGenerator() end
 ---
 ---This function takes the same arguments as `Vec2:set`.
 ---
-function lovr.math.newVec2() end
+---@overload fun(u: lovr.Vec2):lovr.Vec2
+---@param x? number # The x value of the vector.
+---@param y? number # The y value of the vector.
+---@return lovr.Vec2 v # The new vector.
+function lovr.math.newVec2(x, y) end
 
 ---
 ---Creates a new 3D vector.
 ---
 ---This function takes the same arguments as `Vec3:set`.
 ---
-function lovr.math.newVec3() end
+---@overload fun(u: lovr.Vec3):lovr.Vec3
+---@overload fun(m: lovr.Mat4):lovr.Vec3
+---@param x? number # The x value of the vector.
+---@param y? number # The y value of the vector.
+---@param z? number # The z value of the vector.
+---@return lovr.Vec3 v # The new vector.
+function lovr.math.newVec3(x, y, z) end
 
 ---
 ---Creates a new 4D vector.
 ---
 ---This function takes the same arguments as `Vec4:set`.
 ---
-function lovr.math.newVec4() end
+---@overload fun(u: lovr.Vec4):lovr.Vec4
+---@param x? number # The x value of the vector.
+---@param y? number # The y value of the vector.
+---@param z? number # The z value of the vector.
+---@param w? number # The w value of the vector.
+---@return lovr.Vec4 v # The new vector.
+function lovr.math.newVec4(x, y, z, w) end
 
 ---
 ---Returns a 1D, 2D, 3D, or 4D perlin noise value.
@@ -123,7 +163,18 @@ function lovr.math.noise(x) end
 ---
 ---This function takes the same arguments as `Quat:set`.
 ---
-function lovr.math.quat() end
+---@overload fun(r: lovr.quat):lovr.quat
+---@overload fun(v: lovr.vec3):lovr.quat
+---@overload fun(v: lovr.vec3, u: lovr.vec3):lovr.quat
+---@overload fun(m: lovr.mat4):lovr.quat
+---@overload fun():lovr.quat
+---@param angle? any # An angle to use for the rotation, in radians.
+---@param ax? number # The x component of the axis of rotation.
+---@param ay? number # The y component of the axis of rotation.
+---@param az? number # The z component of the axis of rotation.
+---@param raw? boolean # Whether the components should be interpreted as raw `(x, y, z, w)` components.
+---@return lovr.quat q # The new quaternion.
+function lovr.math.quat(angle, ax, ay, az, raw) end
 
 ---
 ---Returns a uniformly distributed pseudo-random number.
@@ -164,21 +215,37 @@ function lovr.math.setRandomSeed(seed) end
 ---
 ---This function takes the same arguments as `Vec2:set`.
 ---
-function lovr.math.vec2() end
+---@overload fun(u: lovr.Vec2):lovr.Vec2
+---@param x? number # The x value of the vector.
+---@param y? number # The y value of the vector.
+---@return lovr.Vec2 v # The new vector.
+function lovr.math.vec2(x, y) end
 
 ---
 ---Creates a temporary 3D vector.
 ---
 ---This function takes the same arguments as `Vec3:set`.
 ---
-function lovr.math.vec3() end
+---@overload fun(u: lovr.Vec3):lovr.Vec3
+---@overload fun(m: lovr.Mat4):lovr.Vec3
+---@param x? number # The x value of the vector.
+---@param y? number # The y value of the vector.
+---@param z? number # The z value of the vector.
+---@return lovr.Vec3 v # The new vector.
+function lovr.math.vec3(x, y, z) end
 
 ---
 ---Creates a temporary 4D vector.
 ---
 ---This function takes the same arguments as `Vec4:set`.
 ---
-function lovr.math.vec4() end
+---@overload fun(u: lovr.Vec4):lovr.Vec4
+---@param x? number # The x value of the vector.
+---@param y? number # The y value of the vector.
+---@param z? number # The z value of the vector.
+---@param w? number # The w value of the vector.
+---@return lovr.Vec4 v # The new vector.
+function lovr.math.vec4(x, y, z, w) end
 
 ---
 ---A Curve is an object that represents a Bézier curve in three dimensions.
@@ -406,7 +473,7 @@ function Mat4:perspective(near, far, fov, aspect) end
 ---
 ---Rotates the matrix using a quaternion or an angle/axis rotation.
 ---
----@overload fun(self: lovr.Mat4, angle: number, ax: number, ay: number, az: number):lovr.Mat4
+---@overload fun(self: lovr.Mat4, angle: number, ax?: number, ay?: number, az?: number):lovr.Mat4
 ---@param q lovr.Quat # The rotation to apply to the matrix.
 ---@return lovr.Mat4 m # The original matrix.
 function Mat4:rotate(q) end
@@ -414,7 +481,7 @@ function Mat4:rotate(q) end
 ---
 ---Scales the matrix.
 ---
----@overload fun(self: lovr.Mat4, sx: number, sy: number, sz: number):lovr.Mat4
+---@overload fun(self: lovr.Mat4, sx: number, sy?: number, sz?: number):lovr.Mat4
 ---@param scale lovr.Vec3 # The 3D scale to apply.
 ---@return lovr.Mat4 m # The original matrix.
 function Mat4:scale(scale) end
@@ -423,8 +490,8 @@ function Mat4:scale(scale) end
 ---Sets the components of the matrix from separate position, rotation, and scale arguments or an existing matrix.
 ---
 ---@overload fun(self: lovr.Mat4, n: lovr.mat4):lovr.Mat4
----@overload fun(self: lovr.Mat4, position: lovr.Vec3, scale: lovr.Vec3, rotation: lovr.Quat):lovr.Mat4
----@overload fun(self: lovr.Mat4, position: lovr.Vec3, rotation: lovr.Quat):lovr.Mat4
+---@overload fun(self: lovr.Mat4, position?: lovr.Vec3, scale?: lovr.Vec3, rotation?: lovr.Quat):lovr.Mat4
+---@overload fun(self: lovr.Mat4, position?: lovr.Vec3, rotation?: lovr.Quat):lovr.Mat4
 ---@overload fun(self: lovr.Mat4, ...):lovr.Mat4
 ---@overload fun(self: lovr.Mat4, d: number):lovr.Mat4
 ---@return lovr.Mat4 m # The input matrix.
@@ -433,7 +500,7 @@ function Mat4:set() end
 ---
 ---Sets a model transform matrix that moves to `from` and orients model towards `to` point.
 ---
----This is used when rendered model should always point torwards a point of interest. The resulting Mat4 object can be used as model pose.
+---This is used when rendered model should always point towards a point of interest. The resulting Mat4 object can be used as model pose.
 ---
 ---The target() function produces same result as lookAt() after matrix inversion.
 ---
@@ -652,7 +719,7 @@ local Vec2 = {}
 ---
 ---Adds a vector or a number to the vector.
 ---
----@overload fun(self: lovr.Vec2, x: number, y: number):lovr.Vec2
+---@overload fun(self: lovr.Vec2, x: number, y?: number):lovr.Vec2
 ---@param u lovr.Vec2 # The other vector.
 ---@return lovr.Vec2 v # The original vector.
 function Vec2:add(u) end
@@ -682,7 +749,7 @@ function Vec2:distance(u) end
 ---
 ---Divides the vector by a vector or a number.
 ---
----@overload fun(self: lovr.Vec2, x: number, y: number):lovr.Vec2
+---@overload fun(self: lovr.Vec2, x: number, y?: number):lovr.Vec2
 ---@param u lovr.Vec2 # The other vector to divide the components by.
 ---@return lovr.Vec2 v # The original vector.
 function Vec2:div(u) end
@@ -739,7 +806,7 @@ function Vec2:lerp() end
 ---
 ---Multiplies the vector by a vector or a number.
 ---
----@overload fun(self: lovr.Vec2, x: number, y: number):lovr.Vec2
+---@overload fun(self: lovr.Vec2, x: number, y?: number):lovr.Vec2
 ---@param u lovr.Vec2 # The other vector to multiply the components by.
 ---@return lovr.Vec2 v # The original vector.
 function Vec2:mul(u) end
@@ -762,7 +829,7 @@ function Vec2:set(x, y) end
 ---
 ---Subtracts a vector or a number from the vector.
 ---
----@overload fun(self: lovr.Vec2, x: number, y: number):lovr.Vec2
+---@overload fun(self: lovr.Vec2, x: number, y?: number):lovr.Vec2
 ---@param u lovr.Vec2 # The other vector.
 ---@return lovr.Vec2 v # The original vector.
 function Vec2:sub(u) end
@@ -783,7 +850,7 @@ local Vec3 = {}
 ---
 ---Adds a vector or a number to the vector.
 ---
----@overload fun(self: lovr.Vec3, x: number, y: number, z: number):lovr.Vec3
+---@overload fun(self: lovr.Vec3, x: number, y?: number, z?: number):lovr.Vec3
 ---@param u lovr.Vec3 # The other vector.
 ---@return lovr.Vec3 v # The original vector.
 function Vec3:add(u) end
@@ -827,7 +894,7 @@ function Vec3:distance(u) end
 ---
 ---Divides the vector by a vector or a number.
 ---
----@overload fun(self: lovr.Vec3, x: number, y: number, z: number):lovr.Vec3
+---@overload fun(self: lovr.Vec3, x: number, y?: number, z?: number):lovr.Vec3
 ---@param u lovr.Vec3 # The other vector to divide the components by.
 ---@return lovr.Vec3 v # The original vector.
 function Vec3:div(u) end
@@ -886,7 +953,7 @@ function Vec3:lerp(u, t) end
 ---
 ---Multiplies the vector by a vector or a number.
 ---
----@overload fun(self: lovr.Vec3, x: number, y: number, z: number):lovr.Vec3
+---@overload fun(self: lovr.Vec3, x: number, y?: number, z?: number):lovr.Vec3
 ---@param u lovr.Vec3 # The other vector to multiply the components by.
 ---@return lovr.Vec3 v # The original vector.
 function Vec3:mul(u) end
@@ -911,7 +978,7 @@ function Vec3:set(x, y, z) end
 ---
 ---Subtracts a vector or a number from the vector.
 ---
----@overload fun(self: lovr.Vec3, x: number, y: number, z: number):lovr.Vec3
+---@overload fun(self: lovr.Vec3, x: number, y?: number, z?: number):lovr.Vec3
 ---@param u lovr.Vec3 # The other vector.
 ---@return lovr.Vec3 v # The original vector.
 function Vec3:sub(u) end
@@ -933,7 +1000,7 @@ local Vec4 = {}
 ---
 ---Adds a vector or a number to the vector.
 ---
----@overload fun(self: lovr.Vec4, x: number, y: number, z: number, w: number):lovr.Vec4
+---@overload fun(self: lovr.Vec4, x: number, y?: number, z?: number, w?: number):lovr.Vec4
 ---@param u lovr.Vec4 # The other vector.
 ---@return lovr.Vec4 v # The original vector.
 function Vec4:add(u) end
@@ -963,7 +1030,7 @@ function Vec4:distance(u) end
 ---
 ---Divides the vector by a vector or a number.
 ---
----@overload fun(self: lovr.Vec4, x: number, y: number, z: number, w: number):lovr.Vec4
+---@overload fun(self: lovr.Vec4, x: number, y?: number, z?: number, w?: number):lovr.Vec4
 ---@param u lovr.Vec4 # The other vector to divide the components by.
 ---@return lovr.Vec4 v # The original vector.
 function Vec4:div(u) end
@@ -1003,7 +1070,7 @@ function Vec4:equals(u) end
 ---### NOTE:
 ---The length is equivalent to this:
 ---
----    math.sqrt(v.x * v.x + v.y * v.y * v.z + v.z + v.w * v.w)
+---    math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z + v.w * v.w)
 ---
 ---@return number length # The length of the vector.
 function Vec4:length() end
@@ -1022,7 +1089,7 @@ function Vec4:lerp(u, t) end
 ---
 ---Multiplies the vector by a vector or a number.
 ---
----@overload fun(self: lovr.Vec4, x: number, y: number, z: number, w: number):lovr.Vec4
+---@overload fun(self: lovr.Vec4, x: number, y?: number, z?: number, w?: number):lovr.Vec4
 ---@param u lovr.Vec4 # The other vector to multiply the components by.
 ---@return lovr.Vec4 v # The original vector.
 function Vec4:mul(u) end
@@ -1047,7 +1114,7 @@ function Vec4:set(x, y, z, w) end
 ---
 ---Subtracts a vector or a number from the vector.
 ---
----@overload fun(self: lovr.Vec4, x: number, y: number, z: number, w: number):lovr.Vec4
+---@overload fun(self: lovr.Vec4, x: number, y?: number, z?: number, w?: number):lovr.Vec4
 ---@param u lovr.Vec4 # The other vector.
 ---@return lovr.Vec4 v # The original vector.
 function Vec4:sub(u) end

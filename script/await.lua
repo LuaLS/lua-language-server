@@ -132,9 +132,6 @@ end
 ---@param callback function
 ---@async
 function m.wait(callback, ...)
-    if not coroutine.isyieldable() then
-        return
-    end
     local co = coroutine.running()
     local resumed
     callback(function (...)

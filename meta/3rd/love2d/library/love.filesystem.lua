@@ -9,7 +9,7 @@ love.filesystem = {}
 ---
 ---Append data to an existing file.
 ---
----@overload fun(name: string, data: love.Data, size: number):boolean, string
+---@overload fun(name: string, data: love.Data, size?: number):boolean, string
 ---@param name string # The name (and path) of the file.
 ---@param data string # The string data to append to the file.
 ---@param size? number # How many bytes to write.
@@ -167,8 +167,8 @@ function love.filesystem.load(name) end
 ---
 ---It is also possible to mount love.filesystem.getSourceBaseDirectory if the game is in fused mode.
 ---
----@overload fun(filedata: love.FileData, mountpoint: string, appendToPath: boolean):boolean
----@overload fun(data: love.Data, archivename: string, mountpoint: string, appendToPath: boolean):boolean
+---@overload fun(filedata: love.FileData, mountpoint: string, appendToPath?: boolean):boolean
+---@overload fun(data: love.Data, archivename: string, mountpoint: string, appendToPath?: boolean):boolean
 ---@param archive string # The folder or zip file in the game's save directory to mount.
 ---@param mountpoint string # The new path the archive will be mounted to.
 ---@param appendToPath? boolean # Whether the archive will be searched when reading a filepath before or after already-mounted archives. This includes the game's source and save directories.
@@ -198,7 +198,7 @@ function love.filesystem.newFileData(contents, name) end
 ---
 ---Read the contents of a file.
 ---
----@overload fun(container: love.ContainerType, name: string, size: number):love.FileData|string, number, nil, string
+---@overload fun(container: love.ContainerType, name: string, size?: number):love.FileData|string, number, nil, string
 ---@param name string # The name (and path) of the file.
 ---@param size? number # How many bytes to read.
 ---@return string contents # The file contents.
@@ -265,7 +265,7 @@ function love.filesystem.unmount(archive) end
 ---
 ---Write data to a file in the save directory. If the file existed already, it will be completely replaced by the new contents.
 ---
----@overload fun(name: string, data: love.Data, size: number):boolean, string
+---@overload fun(name: string, data: love.Data, size?: number):boolean, string
 ---@param name string # The name (and path) of the file.
 ---@param data string # The string data to write to the file.
 ---@param size? number # How many bytes to write.
@@ -354,7 +354,7 @@ function File:open(mode) end
 ---
 ---Read a number of bytes from a file.
 ---
----@overload fun(self: love.File, container: love.ContainerType, bytes: number):love.FileData|string, number
+---@overload fun(self: love.File, container: love.ContainerType, bytes?: number):love.FileData|string, number
 ---@param bytes? number # The number of bytes to read.
 ---@return string contents # The contents of the read bytes.
 ---@return number size # How many bytes have been read.
@@ -387,7 +387,7 @@ function File:tell() end
 ---
 ---Write data to a file.
 ---
----@overload fun(self: love.File, data: love.Data, size: number):boolean, string
+---@overload fun(self: love.File, data: love.Data, size?: number):boolean, string
 ---@param data string # The string data to write.
 ---@param size? number # How many bytes to write.
 ---@return boolean success # Whether the operation was successful.
@@ -419,15 +419,15 @@ function FileData:getFilename() end
 ---
 ---No buffering. The result of write and append operations appears immediately.
 ---
----| '"none"'
+---| "none"
 ---
 ---Line buffering. Write and append operations are buffered until a newline is output or the buffer size limit is reached.
 ---
----| '"line"'
+---| "line"
 ---
 ---Full buffering. Write and append operations are always buffered until the buffer size limit is reached.
 ---
----| '"full"'
+---| "full"
 
 ---
 ---How to decode a given FileData.
@@ -436,11 +436,11 @@ function FileData:getFilename() end
 ---
 ---The data is unencoded.
 ---
----| '"file"'
+---| "file"
 ---
 ---The data is base64-encoded.
 ---
----| '"base64"'
+---| "base64"
 
 ---
 ---The different modes you can open a File in.
@@ -449,19 +449,19 @@ function FileData:getFilename() end
 ---
 ---Open a file for read.
 ---
----| '"r"'
+---| "r"
 ---
 ---Open a file for write.
 ---
----| '"w"'
+---| "w"
 ---
 ---Open a file for append.
 ---
----| '"a"'
+---| "a"
 ---
 ---Do not open a file (represents a closed file.)
 ---
----| '"c"'
+---| "c"
 
 ---
 ---The type of a file.
@@ -470,16 +470,16 @@ function FileData:getFilename() end
 ---
 ---Regular file.
 ---
----| '"file"'
+---| "file"
 ---
 ---Directory.
 ---
----| '"directory"'
+---| "directory"
 ---
 ---Symbolic link.
 ---
----| '"symlink"'
+---| "symlink"
 ---
 ---Something completely different like a device.
 ---
----| '"other"'
+---| "other"

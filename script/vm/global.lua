@@ -2,6 +2,7 @@ local util  = require 'utility'
 local scope = require 'workspace.scope'
 local guide = require 'parser.guide'
 local files = require 'files'
+local ws    = require 'workspace'
 ---@class vm
 local vm    = require 'vm.vm'
 
@@ -11,8 +12,8 @@ local vm    = require 'vm.vm'
 
 ---@class vm.global
 ---@field links table<uri, vm.global.link>
----@field setsCache table<uri, parser.object[]>
----@field getsCache table<uri, parser.object[]>
+---@field setsCache? table<uri, parser.object[]>
+---@field getsCache? table<uri, parser.object[]>
 ---@field cate vm.global.cate
 local mt = {}
 mt.__index = mt
@@ -41,6 +42,7 @@ function mt:addGet(uri, source)
     self.getsCache = nil
 end
 
+---@param suri  uri
 ---@return parser.object[]
 function mt:getSets(suri)
     if not self.setsCache then
@@ -127,7 +129,8 @@ local function createGlobal(name, cate)
 end
 
 ---@class parser.object
----@field _globalNode vm.global
+---@field _globalNode vm.global|false
+---@field _enums?     (string|integer)[]
 
 ---@type table<string, vm.global>
 local allGlobals = {}
@@ -161,6 +164,9 @@ local compilerGlobalSwitch = util.switch()
     : call(function (source)
         local uri    = guide.getUri(source)
         local name   = guide.getKeyName(source)
+        if not name then
+            return
+        end
         local global = vm.declareGlobal('variable', name, uri)
         global:addSet(uri, source)
         source._globalNode = global
@@ -169,6 +175,9 @@ local compilerGlobalSwitch = util.switch()
     : call(function (source)
         local uri    = guide.getUri(source)
         local name   = guide.getKeyName(source)
+        if not name then
+            return
+        end
         local global = vm.declareGlobal('variable', name, uri)
         global:addGet(uri, source)
         source._globalNode = global
@@ -271,6 +280,9 @@ local compilerGlobalSwitch = util.switch()
     : call(function (source)
         local uri  = guide.getUri(source)
         local name = guide.getKeyName(source)
+        if not name then
+            return
+        end
         local class = vm.declareGlobal('type', name, uri)
         class:addSet(uri, source)
         source._globalNode = class
@@ -293,6 +305,9 @@ local compilerGlobalSwitch = util.switch()
     : call(function (source)
         local uri  = guide.getUri(source)
         local name = guide.getKeyName(source)
+        if not name then
+            return
+        end
         local alias = vm.declareGlobal('type', name, uri)
         alias:addSet(uri, source)
         source._globalNode = alias
@@ -305,10 +320,51 @@ local compilerGlobalSwitch = util.switch()
             source.extends._generic = vm.createGeneric(source.extends, source._sign)
         end
     end)
+    : case 'doc.enum'
+    : call(function (source)
+        local uri  = guide.getUri(source)
+        local name = guide.getKeyName(source)
+        if not name then
+            return
+        end
+        local enum = vm.declareGlobal('type', name, uri)
+        enum:addSet(uri, source)
+        source._globalNode = enum
+
+        local tbl = source.bindSource
+        if not tbl then
+            return
+        end
+        source._enums = {}
+        for _, field in ipairs(tbl) do
+            if field.type == 'tablefield'
+            or field.type == 'tableindex' then
+                if not field.value then
+                    goto CONTINUE
+                end
+                local key = guide.getKeyName(field)
+                if not key then
+                    goto CONTINUE
+                end
+                if field.value.type == 'integer'
+                or field.value.type == 'string' then
+                    source._enums[#source._enums+1] = field.value[1]
+                end
+                if field.value.type == 'binary'
+                or field.value.type == 'unary' then
+                    source._enums[#source._enums+1] = vm.getNumber(field.value)
+                end
+                ::CONTINUE::
+            end
+        end
+    end)
     : case 'doc.type.name'
     : call(function (source)
         local uri  = guide.getUri(source)
         local name = source[1]
+        if name == '_' then
+            return
+        end
         local type = vm.declareGlobal('type', name, uri)
         type:addGet(uri, source)
         source._globalNode = type
@@ -446,7 +502,7 @@ local function compileSelf(source)
     if not node then
         return
     end
-    local fields = vm.getLocalFields(source)
+    local fields = vm.getLocalFields(source, false)
     if not fields then
         return
     end
@@ -491,6 +547,7 @@ local function compileAst(source)
         'doc.alias',
         'doc.type.name',
         'doc.extends.name',
+        'doc.enum',
     }, function (src)
         compileObject(src)
     end)
@@ -530,9 +587,11 @@ for uri in files.eachFile() do
     end
 end
 
+---@async
 files.watch(function (ev, uri)
     if ev == 'update' then
         dropUri(uri)
+        ws.awaitReady(uri)
         local state = files.getState(uri)
         if state then
             compileAst(state.ast)

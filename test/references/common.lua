@@ -55,6 +55,13 @@ print(t.<!a!>)
 ]]
 
 TEST [[
+local t = {
+    <~a~> = 1
+}
+t.<!a!> = 1
+]]
+
+TEST [[
 t[<~'a'~>] = 1
 print(t.<!a!>)
 ]]
@@ -184,3 +191,13 @@ local <~t~>
 --b.<~x~> = 1
 --c.<!x!> = 1
 --]]
+
+TEST [[
+---@class a
+local a = { }
+---@class b
+local b = { }
+
+a.color = { 1, 1, 1 }
+b.<~color~> = a.color
+]]

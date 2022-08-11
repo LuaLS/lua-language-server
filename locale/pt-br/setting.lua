@@ -25,7 +25,9 @@ config.runtime.unicodeName        = -- TODO: need translate!
 config.runtime.nonstandardSymbol  = -- TODO: need translate!
 "Supports non-standard symbols. Make sure that your runtime environment supports these symbols."
 config.runtime.plugin             = -- TODO: need translate!
-"Plugin path. Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/Plugin) to learn more."
+"Plugin path. Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/Plugins) to learn more."
+config.runtime.pluginArgs         = -- TODO: need translate!
+"Additional arguments for the plugin."
 config.runtime.fileEncoding       = -- TODO: need translate!
 "File encoding. The `ansi` option is only available under the `Windows` platform."
 config.runtime.builtin            = -- TODO: need translate!
@@ -36,6 +38,8 @@ Adjust the enabled state of the built-in library. You can disable (or redefine) 
 * `enable`: always enable
 * `disable`: always disable
 ]]
+config.runtime.meta               = -- TODO: need translate!
+'Format of the directory name of the meta files.'
 config.diagnostics.enable         = -- TODO: need translate!
 "Enable diagnostics."
 config.diagnostics.disable        = -- TODO: need translate!
@@ -43,12 +47,35 @@ config.diagnostics.disable        = -- TODO: need translate!
 config.diagnostics.globals        = -- TODO: need translate!
 "Defined global variables."
 config.diagnostics.severity       = -- TODO: need translate!
-"Modified diagnostic severity."
+[[
+Modify the diagnostic severity.
+
+End with `!` means override the group setting `diagnostics.groupSeverity`.
+]]
 config.diagnostics.neededFileStatus = -- TODO: need translate!
 [[
 * Opened:  only diagnose opened files
 * Any:     diagnose all files
-* Disable: disable this diagnostic
+* None:    disable this diagnostic
+
+End with `!` means override the group setting `diagnostics.groupFileStatus`.
+]]
+config.diagnostics.groupSeverity  = -- TODO: need translate!
+[[
+Modify the diagnostic severity in a group.
+`Fallback` means that diagnostics in this group are controlled by `diagnostics.severity` separately.
+Other settings will override individual settings without end of `!`.
+]]
+config.diagnostics.groupFileStatus = -- TODO: need translate!
+[[
+Modify the diagnostic needed file status in a group.
+
+* Opened:  only diagnose opened files
+* Any:     diagnose all files
+* None:    disable this diagnostic
+
+`Fallback` means that diagnostics in this group are controlled by `diagnostics.neededFileStatus` separately.
+Other settings will override individual settings without end of `!`.
 ]]
 config.diagnostics.workspaceDelay = -- TODO: need translate!
 "Latency (milliseconds) for workspace diagnostics. When you start the workspace, or edit any file, the entire workspace will be re-diagnosed in the background. Set to negative to disable workspace diagnostics."
@@ -56,14 +83,24 @@ config.diagnostics.workspaceRate  = -- TODO: need translate!
 "Workspace diagnostics run rate (%). Decreasing this value reduces CPU usage, but also reduces the speed of workspace diagnostics. The diagnosis of the file you are currently editing is always done at full speed and is not affected by this setting."
 config.diagnostics.libraryFiles   = -- TODO: need translate!
 "How to diagnose files loaded via `Lua.workspace.library`."
+config.diagnostics.libraryFiles.Enable   = -- TODO: need translate!
+"Always diagnose these files."
+config.diagnostics.libraryFiles.Opened   = -- TODO: need translate!
+"Only when these files are opened will it be diagnosed."
+config.diagnostics.libraryFiles.Disable  = -- TODO: need translate!
+"These files are not diagnosed."
 config.diagnostics.ignoredFiles   = -- TODO: need translate!
 "How to diagnose ignored files."
-config.diagnostics.files.Enable   = -- TODO: need translate!
+config.diagnostics.ignoredFiles.Enable   = -- TODO: need translate!
 "Always diagnose these files."
-config.diagnostics.files.Opened   = -- TODO: need translate!
+config.diagnostics.ignoredFiles.Opened   = -- TODO: need translate!
 "Only when these files are opened will it be diagnosed."
-config.diagnostics.files.Disable  = -- TODO: need translate!
+config.diagnostics.ignoredFiles.Disable  = -- TODO: need translate!
 "These files are not diagnosed."
+config.diagnostics.disableScheme  = -- TODO: need translate!
+'Do not diagnose Lua files that use the following scheme.'
+config.diagnostics.unusedLocalExclude = -- TODO: need translate!
+'Do not diagnose `unused-local` when the variable name matches the following pattern.'
 config.workspace.ignoreDir        = -- TODO: need translate!
 "Ignored files and directories (Use `.gitignore` grammar)."-- .. example.ignoreDir,
 config.workspace.ignoreSubmodules = -- TODO: need translate!
@@ -89,6 +126,8 @@ Automatic detection and adaptation of third-party libraries, currently supported
 ]]
 config.workspace.userThirdParty          = -- TODO: need translate!
 'Add private third-party library configuration file paths here, please refer to the built-in [configuration file path](https://github.com/sumneko/lua-language-server/tree/master/meta/3rd)'
+config.workspace.supportScheme           = -- TODO: need translate!
+'Provide language server for the Lua files of the following scheme.'
 config.completion.enable                 = -- TODO: need translate!
 'Enable completion.'
 config.completion.callSnippet            = -- TODO: need translate!
@@ -159,6 +198,10 @@ config.hover.previewFields               = -- TODO: need translate!
 "When hovering to view a table, limits the maximum number of previews for fields."
 config.hover.enumsLimit                  = -- TODO: need translate!
 "When the value corresponds to multiple types, limit the number of types displaying."
+config.hover.expandAlias                 = -- TODO: need translate!
+[[
+Whether to expand the alias. For example, expands `---@alias myType boolean|number` appears as `boolean|number`, otherwise it appears as `myType'.
+]]
 config.develop.enable                    = -- TODO: need translate!
 'Developer mode. Do not enable, performance will be affected.'
 config.develop.debuggerPort              = -- TODO: need translate!
@@ -195,11 +238,28 @@ config.hint.arrayIndex.Auto              = -- TODO: need translate!
 'Show hints only when the table is greater than 3 items, or the table is a mixed table.'
 config.hint.arrayIndex.Disable           = -- TODO: need translate!
 'Disable hints of array index.'
+config.hint.await                        = -- TODO: need translate!
+'If the called function is marked `---@async`, prompt `await` at the call.'
+config.hint.semicolon                    = -- TODO: need translate!
+'If there is no semicolon at the end of the statement, display a virtual semicolon.'
+config.hint.semicolon.All                = -- TODO: need translate!
+'All statements display virtual semicolons.'
+config.hint.semicolon.SameLine            = -- TODO: need translate!
+'When two statements are on the same line, display a semicolon between them.'
+config.hint.semicolon.Disable            = -- TODO: need translate!
+'Disable virtual semicolons.'
 config.format.enable                     = -- TODO: need translate!
 'Enable code formatter.'
+config.format.defaultConfig              = -- TODO: need translate!
+[[
+The default format configuration. Has a lower priority than `.editorconfig` file in the workspace.
+Read [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) to learn usage.
+]]
+config.spell.dict                        = -- TODO: need translate!
+'Custom words for spell checking.'
 config.telemetry.enable                  = -- TODO: need translate!
 [[
-Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://github.com/sumneko/lua-language-server/wiki/Privacy-Policy).
+Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://github.com/sumneko/lua-language-server/wiki/Home#privacy).
 ]]
 config.misc.parameters                   = -- TODO: need translate!
 '[Command line parameters](https://github.com/sumneko/lua-telemetry-server/tree/master/method) when starting the language service in VSCode.'
@@ -211,6 +271,20 @@ config.IntelliSense.traceBeSetted        = -- TODO: need translate!
 'Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
 config.IntelliSense.traceFieldInject     = -- TODO: need translate!
 'Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
+config.type.castNumberToInteger          = -- TODO: need translate!
+'Allowed to assign the `number` type to the `integer` type.'
+config.type.weakUnionCheck               = -- TODO: need translate!
+[[
+Once one subtype of a union type meets the condition, the union type also meets the condition.
+
+When this setting is `false`, the `number|boolean` type cannot be assigned to the `number` type. It can be with `true`.
+]]
+config.type.weakNilCheck                 = -- TODO: need translate!
+[[
+When checking the type of union type, ignore the `nil` in it.
+
+When this setting is `false`, the `number|nil` type cannot be assigned to the `number` type. It can be with `true`.
+]]
 config.diagnostics['unused-local']          = -- TODO: need translate!
 '未使用的局部变量'
 config.diagnostics['unused-function']       = -- TODO: need translate!

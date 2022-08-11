@@ -52,7 +52,8 @@ lm:copy "copy_bootstrap" {
     output = lm.bindir .. "/main.lua",
 }
 
-lm:msvc_copy_vcrt 'copy_vcrt' {
+lm:msvc_copydll 'copy_vcrt' {
+    type = "vcrt",
     output = lm.bindir,
 }
 

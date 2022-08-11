@@ -15,13 +15,13 @@ lovr.graphics = {}
 ---### NOTE:
 ---The local normal vector of the circle is `(0, 0, 1)`.
 ---
----@overload fun(material: lovr.Material, x: number, y: number, z: number, radius: number, angle: number, ax: number, ay: number, az: number, start: number, end: number, segments: number)
----@overload fun(mode: lovr.DrawStyle, transform: lovr.mat4, start: number, end: number, segments: number)
----@overload fun(material: lovr.Material, transform: lovr.mat4, start: number, end: number, segments: number)
----@overload fun(mode: lovr.DrawStyle, arcmode: lovr.ArcMode, x: number, y: number, z: number, radius: number, angle: number, ax: number, ay: number, az: number, start: number, end: number, segments: number)
----@overload fun(material: lovr.Material, arcmode: lovr.ArcMode, x: number, y: number, z: number, radius: number, angle: number, ax: number, ay: number, az: number, start: number, end: number, segments: number)
----@overload fun(mode: lovr.DrawStyle, arcmode: lovr.ArcMode, transform: lovr.mat4, start: number, end: number, segments: number)
----@overload fun(material: lovr.Material, arcmode: lovr.ArcMode, transform: lovr.mat4, start: number, end: number, segments: number)
+---@overload fun(material: lovr.Material, x?: number, y?: number, z?: number, radius?: number, angle?: number, ax?: number, ay?: number, az?: number, start?: number, end?: number, segments?: number)
+---@overload fun(mode: lovr.DrawStyle, transform: lovr.mat4, start?: number, end?: number, segments?: number)
+---@overload fun(material: lovr.Material, transform: lovr.mat4, start?: number, end?: number, segments?: number)
+---@overload fun(mode: lovr.DrawStyle, arcmode?: lovr.ArcMode, x?: number, y?: number, z?: number, radius?: number, angle?: number, ax?: number, ay?: number, az?: number, start?: number, end?: number, segments?: number)
+---@overload fun(material: lovr.Material, arcmode?: lovr.ArcMode, x?: number, y?: number, z?: number, radius?: number, angle?: number, ax?: number, ay?: number, az?: number, start?: number, end?: number, segments?: number)
+---@overload fun(mode: lovr.DrawStyle, arcmode?: lovr.ArcMode, transform: lovr.mat4, start?: number, end?: number, segments?: number)
+---@overload fun(material: lovr.Material, arcmode?: lovr.ArcMode, transform: lovr.mat4, start?: number, end?: number, segments?: number)
 ---@param mode lovr.DrawStyle # Whether the arc is filled or outlined.
 ---@param x? number # The x coordinate of the center of the arc.
 ---@param y? number # The y coordinate of the center of the arc.
@@ -41,7 +41,7 @@ function lovr.graphics.arc(mode, x, y, z, radius, angle, ax, ay, az, start, end,
 ---
 ---This is similar to `lovr.graphics.cube` except you can have different values for the width, height, and depth of the box.
 ---
----@overload fun(material: lovr.Material, x: number, y: number, z: number, width: number, height: number, depth: number, angle: number, ax: number, ay: number, az: number)
+---@overload fun(material: lovr.Material, x?: number, y?: number, z?: number, width?: number, height?: number, depth?: number, angle?: number, ax?: number, ay?: number, az?: number)
 ---@overload fun(mode: lovr.DrawStyle, transform: lovr.mat4)
 ---@overload fun(material: lovr.Material, transform: lovr.mat4)
 ---@param mode lovr.DrawStyle # How to draw the box.
@@ -64,9 +64,9 @@ function lovr.graphics.box(mode, x, y, z, width, height, depth, angle, ax, ay, a
 ---### NOTE:
 ---The local normal vector of the circle is `(0, 0, 1)`.
 ---
----@overload fun(material: lovr.Material, x: number, y: number, z: number, radius: number, angle: number, ax: number, ay: number, az: number, segments: number)
----@overload fun(mode: lovr.DrawStyle, transform: lovr.mat4, segments: number)
----@overload fun(material: lovr.Material, transform: lovr.mat4, segments: number)
+---@overload fun(material: lovr.Material, x?: number, y?: number, z?: number, radius?: number, angle?: number, ax?: number, ay?: number, az?: number, segments?: number)
+---@overload fun(mode: lovr.DrawStyle, transform: lovr.mat4, segments?: number)
+---@overload fun(material: lovr.Material, transform: lovr.mat4, segments?: number)
 ---@param mode lovr.DrawStyle # Whether the circle is filled or outlined.
 ---@param x? number # The x coordinate of the center of the circle.
 ---@param y? number # The y coordinate of the center of the circle.
@@ -90,7 +90,7 @@ function lovr.graphics.circle(mode, x, y, z, radius, angle, ax, ay, az, segments
 ---
 ---If you are using `lovr.graphics.setStencilTest`, it will not affect how the screen gets cleared. Instead, you can use `lovr.graphics.fill` to draw a fullscreen quad, which will get masked by the active stencil.
 ---
----@overload fun(r: number, g: number, b: number, a: number, z: number, s: number)
+---@overload fun(r: number, g: number, b: number, a: number, z?: number, s?: number)
 ---@overload fun(hex: number)
 ---@param color? boolean # Whether or not to clear color information on the screen.
 ---@param depth? boolean # Whether or not to clear the depth information on the screen.
@@ -129,13 +129,13 @@ function lovr.graphics.compute(shader, x, y, z) end
 ---
 ---The window must be created before any `lovr.graphics` functions can be used.
 ---
----@param flags {width: number, height: number, fullscreen: boolean, resizable: boolean, msaa: number, title: string, icon: string, vsync: number} # Flags to customize the window's appearance and behavior.
+---@param flags? {width: number, height: number, fullscreen: boolean, resizable: boolean, msaa: number, title: string, icon: string, vsync: number} # Flags to customize the window's appearance and behavior.
 function lovr.graphics.createWindow(flags) end
 
 ---
 ---Draws a cube.
 ---
----@overload fun(material: lovr.Material, x: number, y: number, z: number, size: number, angle: number, ax: number, ay: number, az: number)
+---@overload fun(material: lovr.Material, x?: number, y?: number, z?: number, size?: number, angle?: number, ax?: number, ay?: number, az?: number)
 ---@overload fun(mode: lovr.DrawStyle, transform: lovr.mat4)
 ---@overload fun(material: lovr.Material, transform: lovr.mat4)
 ---@param mode lovr.DrawStyle # How to draw the cube.
@@ -156,7 +156,7 @@ function lovr.graphics.cube(mode, x, y, z, size, angle, ax, ay, az) end
 ---### NOTE:
 ---Currently, cylinders don't have UVs.
 ---
----@overload fun(material: lovr.Material, x: number, y: number, z: number, length: number, angle: number, ax: number, ay: number, az: number, r1: number, r2: number, capped: boolean, segments: number)
+---@overload fun(material: lovr.Material, x?: number, y?: number, z?: number, length?: number, angle?: number, ax?: number, ay?: number, az?: number, r1?: number, r2?: number, capped?: boolean, segments?: number)
 ---@param x? number # The x coordinate of the center of the cylinder.
 ---@param y? number # The y coordinate of the center of the cylinder.
 ---@param z? number # The z coordinate of the center of the cylinder.
@@ -533,7 +533,8 @@ function lovr.graphics.isWireframe() end
 ---@param x2 number # The x coordinate of the second point.
 ---@param y2 number # The y coordinate of the second point.
 ---@param z2 number # The z coordinate of the second point.
-function lovr.graphics.line(x1, y1, z1, x2, y2, z2) end
+---@vararg number # More points.
+function lovr.graphics.line(x1, y1, z1, x2, y2, z2, ...) end
 
 ---
 ---Creates a new Canvas.
@@ -548,8 +549,8 @@ function lovr.graphics.line(x1, y1, z1, x2, y2, z2) end
 ---
 ---Stereo Canvases will either have their width doubled or use array textures for their attachments, depending on their implementation.
 ---
----@overload fun(..., flags: table):lovr.Canvas
----@overload fun(attachments: table, flags: table):lovr.Canvas
+---@overload fun(..., flags?: table):lovr.Canvas
+---@overload fun(attachments: table, flags?: table):lovr.Canvas
 ---@param width number # The width of the canvas, in pixels.
 ---@param height number # The height of the canvas, in pixels.
 ---@param flags? {format: lovr.TextureFormat, depth: lovr.TextureFormat, stereo: boolean, msaa: number, mipmaps: boolean} # Optional settings for the Canvas.
@@ -585,8 +586,8 @@ function lovr.graphics.newComputeShader(source, options) end
 ---### NOTE:
 ---Larger font sizes will lead to more detailed curves at the cost of performance.
 ---
----@overload fun(size: number, padding: number, spread: number):lovr.Font
----@overload fun(rasterizer: lovr.Rasterizer, padding: number, spread: number):lovr.Font
+---@overload fun(size?: number, padding?: number, spread?: number):lovr.Font
+---@overload fun(rasterizer: lovr.Rasterizer, padding?: number, spread?: number):lovr.Font
 ---@param filename string # The filename of the font file.
 ---@param size? number # The size of the font, in pixels.
 ---@param padding? number # The number of pixels of padding around each glyph.
@@ -608,10 +609,10 @@ function lovr.graphics.newFont(filename, size, padding, spread) end
 ---  default to `(0.0, 0.0, 0.0, 0.0)`.
 ---- Textures will default to `nil` (a single 1x1 white pixel will be used for them).
 ---
----@overload fun(texture: lovr.Texture, r: number, g: number, b: number, a: number):lovr.Material
----@overload fun(canvas: lovr.Canvas, r: number, g: number, b: number, a: number):lovr.Material
----@overload fun(r: number, g: number, b: number, a: number):lovr.Material
----@overload fun(hex: number, a: number):lovr.Material
+---@overload fun(texture: lovr.Texture, r?: number, g?: number, b?: number, a?: number):lovr.Material
+---@overload fun(canvas: lovr.Canvas, r?: number, g?: number, b?: number, a?: number):lovr.Material
+---@overload fun(r?: number, g?: number, b?: number, a?: number):lovr.Material
+---@overload fun(hex?: number, a?: number):lovr.Material
 ---@return lovr.Material material # The new Material.
 function lovr.graphics.newMaterial() end
 
@@ -638,11 +639,11 @@ function lovr.graphics.newMaterial() end
 ---      { 'lovrTexCoord',    'float', 2 }
 ---    }
 ---
----@overload fun(vertices: table, mode: lovr.DrawMode, usage: lovr.MeshUsage, readable: boolean):lovr.Mesh
----@overload fun(blob: lovr.Blob, mode: lovr.DrawMode, usage: lovr.MeshUsage, readable: boolean):lovr.Mesh
----@overload fun(format: table, size: number, mode: lovr.DrawMode, usage: lovr.MeshUsage, readable: boolean):lovr.Mesh
----@overload fun(format: table, vertices: table, mode: lovr.DrawMode, usage: lovr.MeshUsage, readable: boolean):lovr.Mesh
----@overload fun(format: table, blob: lovr.Blob, mode: lovr.DrawMode, usage: lovr.MeshUsage, readable: boolean):lovr.Mesh
+---@overload fun(vertices: table, mode?: lovr.DrawMode, usage?: lovr.MeshUsage, readable?: boolean):lovr.Mesh
+---@overload fun(blob: lovr.Blob, mode?: lovr.DrawMode, usage?: lovr.MeshUsage, readable?: boolean):lovr.Mesh
+---@overload fun(format: table, size: number, mode?: lovr.DrawMode, usage?: lovr.MeshUsage, readable?: boolean):lovr.Mesh
+---@overload fun(format: table, vertices: table, mode?: lovr.DrawMode, usage?: lovr.MeshUsage, readable?: boolean):lovr.Mesh
+---@overload fun(format: table, blob: lovr.Blob, mode?: lovr.DrawMode, usage?: lovr.MeshUsage, readable?: boolean):lovr.Mesh
 ---@param size number # The maximum number of vertices the Mesh can store.
 ---@param mode? lovr.DrawMode # How the Mesh will connect its vertices into triangles.
 ---@param usage? lovr.MeshUsage # An optimization hint indicating how often the data in the Mesh will be updated.
@@ -758,7 +759,7 @@ function lovr.graphics.newModel(filename) end
 ---
 ---Currently on Android, only stereo shaders can be used with stereo Canvases, and mono Shaders can only be used with mono Canvases.
 ---
----@overload fun(default: lovr.DefaultShader, options: table):lovr.Shader
+---@overload fun(default: lovr.DefaultShader, options?: table):lovr.Shader
 ---@param vertex string # The code or filename of the vertex shader.  If nil, the default vertex shader is used.
 ---@param fragment string # The code or filename of the fragment shader.  If nil, the default fragment shader is used.
 ---@param options? {flags: table, stereo: boolean} # Optional settings for the Shader.
@@ -791,10 +792,10 @@ function lovr.graphics.newShaderBlock(type, uniforms, flags) end
 ---
 ---Right now the supported image file formats are png, jpg, hdr, dds (DXT1, DXT3, DXT5), ktx, and astc.
 ---
----@overload fun(images: table, flags: table):lovr.Texture
----@overload fun(width: number, height: number, depth: number, flags: table):lovr.Texture
----@overload fun(blob: lovr.Blob, flags: table):lovr.Texture
----@overload fun(image: lovr.Image, flags: table):lovr.Texture
+---@overload fun(images: table, flags?: table):lovr.Texture
+---@overload fun(width: number, height: number, depth: number, flags?: table):lovr.Texture
+---@overload fun(blob: lovr.Blob, flags?: table):lovr.Texture
+---@overload fun(image: lovr.Image, flags?: table):lovr.Texture
 ---@param filename string # The filename of the image to load.
 ---@param flags? {linear: boolean, mipmaps: boolean, type: lovr.TextureType, format: lovr.TextureFormat, msaa: number} # Optional settings for the texture.
 ---@return lovr.Texture texture # The new Texture.
@@ -818,7 +819,7 @@ function lovr.graphics.origin() end
 ---
 ---One efficient technique for rendering many planes with different textures is to pack all of the textures into a single image, and then use the uv arguments to select a sub-rectangle to use for each plane.
 ---
----@overload fun(material: lovr.Material, x: number, y: number, z: number, width: number, height: number, angle: number, ax: number, ay: number, az: number, u: number, v: number, w: number, h: number)
+---@overload fun(material: lovr.Material, x?: number, y?: number, z?: number, width?: number, height?: number, angle?: number, ax?: number, ay?: number, az?: number, u?: number, v?: number, w?: number, h?: number)
 ---@param mode lovr.DrawStyle # How to draw the plane.
 ---@param x? number # The x coordinate of the center of the plane.
 ---@param y? number # The y coordinate of the center of the plane.
@@ -842,7 +843,8 @@ function lovr.graphics.plane(mode, x, y, z, width, height, angle, ax, ay, az, u,
 ---@param x number # The x coordinate of the point.
 ---@param y number # The y coordinate of the point.
 ---@param z number # The z coordinate of the point.
-function lovr.graphics.points(x, y, z) end
+---@vararg number # More points.
+function lovr.graphics.points(x, y, z, ...) end
 
 ---
 ---Pops the current transform from the stack, returning to the transformation that was applied before `lovr.graphics.push` was called.
@@ -970,7 +972,7 @@ function lovr.graphics.setAlphaSampling(enabled) end
 ---### NOTE:
 ---The default background color is `(0.0, 0.0, 0.0, 1.0)`.
 ---
----@overload fun(hex: number, a: number)
+---@overload fun(hex: number, a?: number)
 ---@overload fun(color: table)
 ---@param r number # The red component of the background color.
 ---@param g number # The green component of the background color.
@@ -1013,7 +1015,7 @@ function lovr.graphics.setCanvas(canvas) end
 ---### NOTE:
 ---The default color is `(1.0, 1.0, 1.0, 1.0)`.
 ---
----@overload fun(hex: number, a: number)
+---@overload fun(hex: number, a?: number)
 ---@overload fun(color: table)
 ---@param r number # The red component of the color.
 ---@param g number # The green component of the color.
@@ -1259,7 +1261,7 @@ function lovr.graphics.skybox(texture) end
 ---
 ---Draws a sphere.
 ---
----@overload fun(material: lovr.Material, x: number, y: number, z: number, radius: number, angle: number, ax: number, ay: number, az: number)
+---@overload fun(material: lovr.Material, x?: number, y?: number, z?: number, radius?: number, angle?: number, ax?: number, ay?: number, az?: number)
 ---@param x? number # The x coordinate of the center of the sphere.
 ---@param y? number # The y coordinate of the center of the sphere.
 ---@param z? number # The z coordinate of the center of the sphere.
@@ -1277,7 +1279,7 @@ function lovr.graphics.sphere(x, y, z, radius, angle, ax, ay, az) end
 ---### NOTE:
 ---Stencil values are between 0 and 255.
 ---
----@overload fun(callback: function, action: lovr.StencilAction, value: number, initial: number)
+---@overload fun(callback: function, action?: lovr.StencilAction, value?: number, initial?: number)
 ---@param callback function # The function that will be called to render to the stencil buffer.
 ---@param action? lovr.StencilAction # How to modify the stencil value of pixels that are rendered to.
 ---@param value? number # If `action` is "replace", this is the value that pixels are replaced with.
@@ -1474,7 +1476,8 @@ function Canvas:newImage(index) end
 ---If you plan on modifying the transform stack inside your callback it may be a good idea to use `lovr.graphics.push` and `lovr.graphics.pop` so you can revert to the previous transform afterwards.
 ---
 ---@param callback function # The function to use to render to the Canvas.
-function Canvas:renderTo(callback) end
+---@vararg any # Additional arguments to pass to the callback.
+function Canvas:renderTo(callback, ...) end
 
 ---
 ---Attaches one or more Textures to the Canvas.
@@ -1494,7 +1497,8 @@ function Canvas:renderTo(callback) end
 ---
 ---You can also optionally wrap them in a table.
 ---
-function Canvas:setTexture() end
+---@vararg any # One or more Textures to attach to the Canvas.
+function Canvas:setTexture(...) end
 
 ---
 ---A Font is an object created from a TTF file.
@@ -1592,8 +1596,9 @@ function Font:getWidth(text, wrap) end
 ---### NOTE:
 ---It is a good idea to use this function when you're rendering an unknown or user-supplied string to avoid utterly embarrassing crashes.
 ---
+---@vararg any # Strings or numbers to test.
 ---@return boolean has # Whether the Font has the glyphs.
-function Font:hasGlyphs() end
+function Font:hasGlyphs(...) end
 
 ---
 ---Sets the line height of the Font, which controls how far lines apart lines are vertically separated.
@@ -1677,9 +1682,9 @@ function Material:getTransform() end
 ---
 ---Colors default to `(1.0, 1.0, 1.0, 1.0)` and are gamma corrected.
 ---
----@overload fun(self: lovr.Material, r: number, g: number, b: number, a: number)
----@overload fun(self: lovr.Material, colorType: lovr.MaterialColor, hex: number, a: number)
----@overload fun(self: lovr.Material, hex: number, a: number)
+---@overload fun(self: lovr.Material, r: number, g: number, b: number, a?: number)
+---@overload fun(self: lovr.Material, colorType?: lovr.MaterialColor, hex: number, a?: number)
+---@overload fun(self: lovr.Material, hex: number, a?: number)
 ---@param colorType? lovr.MaterialColor # The type of color to set.
 ---@param r number # The red component of the color.
 ---@param g number # The green component of the color.
@@ -1811,8 +1816,8 @@ local Mesh = {}
 ---
 ---To prevent cycles, it is not possible to attach attributes onto a Mesh that already has attributes attached to a different Mesh.
 ---
----@overload fun(self: lovr.Mesh, mesh: lovr.Mesh, divisor: number, ...)
----@overload fun(self: lovr.Mesh, mesh: lovr.Mesh, divisor: number, attributes: table)
+---@overload fun(self: lovr.Mesh, mesh: lovr.Mesh, divisor?: number, ...)
+---@overload fun(self: lovr.Mesh, mesh: lovr.Mesh, divisor?: number, attributes: table)
 ---@param mesh lovr.Mesh # The Mesh to attach attributes from.
 ---@param divisor? number # The attribute divisor for all attached attributes.
 function Mesh:attachAttributes(mesh, divisor) end
@@ -1828,7 +1833,7 @@ function Mesh:detachAttributes(mesh) end
 ---
 ---Draws the contents of the Mesh.
 ---
----@overload fun(self: lovr.Mesh, transform: lovr.mat4, instances: number)
+---@overload fun(self: lovr.Mesh, transform: lovr.mat4, instances?: number)
 ---@param x? number # The x coordinate to draw the Mesh at.
 ---@param y? number # The y coordinate to draw the Mesh at.
 ---@param z? number # The z coordinate to draw the Mesh at.
@@ -1962,7 +1967,8 @@ function Mesh:setMaterial(material) end
 ---Any unspecified components will be set to 0.
 ---
 ---@param index number # The index of the vertex to set.
-function Mesh:setVertex(index) end
+---@vararg number # The attributes of the vertex.
+function Mesh:setVertex(index, ...) end
 
 ---
 ---Set the components of a specific attribute of a vertex in the Mesh.
@@ -1973,7 +1979,8 @@ function Mesh:setVertex(index) end
 ---
 ---@param index number # The index of the vertex to update.
 ---@param attribute number # The index of the attribute to update.
-function Mesh:setVertexAttribute(index, attribute) end
+---@vararg number # The new components for the attribute.
+function Mesh:setVertexAttribute(index, attribute, ...) end
 
 ---
 ---Sets the vertex map.
@@ -1982,7 +1989,7 @@ function Mesh:setVertexAttribute(index, attribute) end
 ---
 ---Often, a vertex map is used to improve performance, since it usually requires less data to specify the index of a vertex than it does to specify all of the data for a vertex.
 ---
----@overload fun(self: lovr.Mesh, blob: lovr.Blob, size: number)
+---@overload fun(self: lovr.Mesh, blob: lovr.Blob, size?: number)
 ---@param map table # The new vertex map.  Each element of the table is an index of a vertex.
 function Mesh:setVertexMap(map) end
 
@@ -1993,7 +2000,7 @@ function Mesh:setVertexMap(map) end
 ---### NOTE:
 ---The start index plus the number of vertices in the table should not exceed the maximum size of the Mesh.
 ---
----@overload fun(self: lovr.Mesh, blob: lovr.Blob, start: number, count: number)
+---@overload fun(self: lovr.Mesh, blob: lovr.Blob, start?: number, count?: number)
 ---@param vertices table # The new set of vertices.
 ---@param start? number # The index of the vertex to start replacing at.
 ---@param count? number # The number of vertices to replace.  If nil, all vertices will be used.
@@ -2022,7 +2029,7 @@ local Model = {}
 ---
 ---To clear the pose of a Model to the default, use `Model:pose(nil)`.
 ---
----@overload fun(self: lovr.Model, index: number, time: number, alpha: number)
+---@overload fun(self: lovr.Model, index: number, time: number, alpha?: number)
 ---@param name string # The name of an animation.
 ---@param time number # The timestamp to evaluate the keyframes at, in seconds.
 ---@param alpha? number # How much of the animation to mix in, from 0 to 1.
@@ -2031,7 +2038,7 @@ function Model:animate(name, time, alpha) end
 ---
 ---Draw the Model.
 ---
----@overload fun(self: lovr.Model, transform: lovr.mat4, instances: number)
+---@overload fun(self: lovr.Model, transform: lovr.mat4, instances?: number)
 ---@param x? number # The x coordinate to draw the Model at.
 ---@param y? number # The y coordinate to draw the Model at.
 ---@param z? number # The z coordinate to draw the Model at.
@@ -2120,7 +2127,7 @@ function Model:getNodeName(index) end
 ---
 ---See `lovr.graphics.newShader` for more.
 ---
----@overload fun(self: lovr.Model, index: number, space: lovr.CoordinateSpace):number, number, number, number, number, number, number
+---@overload fun(self: lovr.Model, index: number, space?: lovr.CoordinateSpace):number, number, number, number, number, number, number
 ---@param name string # The name of the node.
 ---@param space? lovr.CoordinateSpace # Whether the pose should be returned relative to the node's parent or relative to the root node of the Model.
 ---@return number x # The x position of the node.
@@ -2174,7 +2181,7 @@ function Model:hasJoints() end
 ---
 ---See `lovr.graphics.newShader` for more.
 ---
----@overload fun(self: lovr.Model, index: number, x: number, y: number, z: number, angle: number, ax: number, ay: number, az: number, alpha: number)
+---@overload fun(self: lovr.Model, index: number, x: number, y: number, z: number, angle: number, ax: number, ay: number, az: number, alpha?: number)
 ---@overload fun(self: lovr.Model)
 ---@param name string # The name of the node.
 ---@param x number # The x position.
@@ -2436,7 +2443,7 @@ function Shader:sendBlock(name, block, access) end
 ---
 ---The normal `Shader:send` function accepts Textures and should be used most of the time.
 ---
----@overload fun(self: lovr.Shader, name: string, index: number, texture: lovr.Texture, slice: number, mipmap: number, access: lovr.UniformAccess)
+---@overload fun(self: lovr.Shader, name: string, index: number, texture: lovr.Texture, slice?: number, mipmap?: number, access?: lovr.UniformAccess)
 ---@param name string # The name of the image uniform.
 ---@param texture lovr.Texture # The Texture to assign.
 ---@param slice? number # The slice of a cube, array, or volume texture to use, or `nil` for all slices.
@@ -2533,7 +2540,7 @@ function ShaderBlock:read(name) end
 ---
 ---`Blob`s can also be used to pass arbitrary binary data to individual variables.
 ---
----@overload fun(self: lovr.ShaderBlock, blob: lovr.Blob, srcOffset: number, dstOffset: number, extent: number):number
+---@overload fun(self: lovr.ShaderBlock, blob: lovr.Blob, srcOffset?: number, dstOffset?: number, extent?: number):number
 ---@param variable string # The name of the variable to update.
 ---@param value any # The new value of the uniform.
 function ShaderBlock:send(variable, value) end
@@ -2673,15 +2680,15 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---The arc is drawn with the center of its circle included in the list of points (default).
 ---
----| '"pie"'
+---| "pie"
 ---
 ---The curve of the arc is drawn as a single line.
 ---
----| '"open"'
+---| "open"
 ---
 ---The starting and ending points of the arc's curve are connected.
 ---
----| '"closed"'
+---| "closed"
 
 ---
 ---Here are the different data types available for vertex attributes in a Mesh.
@@ -2694,31 +2701,31 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---A signed 8 bit number, from -128 to 127.
 ---
----| '"byte"'
+---| "byte"
 ---
 ---An unsigned 8 bit number, from 0 to 255.
 ---
----| '"ubyte"'
+---| "ubyte"
 ---
 ---A signed 16 bit number, from -32768 to 32767.
 ---
----| '"short"'
+---| "short"
 ---
 ---An unsigned 16 bit number, from 0 to 65535.
 ---
----| '"ushort"'
+---| "ushort"
 ---
 ---A signed 32 bit number, from -2147483648 to 2147483647.
 ---
----| '"int"'
+---| "int"
 ---
 ---An unsigned 32 bit number, from 0 to 4294967295.
 ---
----| '"uint"'
+---| "uint"
 ---
 ---A 32 bit floating-point number (large range, but can start to lose precision).
 ---
----| '"float"'
+---| "float"
 
 ---
 ---Different ways the alpha channel of pixels affects blending.
@@ -2733,13 +2740,13 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---Color channel values are multiplied by the alpha channel during blending.
 ---
----| '"alphamultiply"'
+---| "alphamultiply"
 ---
 ---Color channels are not multiplied by the alpha channel.
 ---
 ---This should be used if the pixels being drawn have already been blended, or "pre-multiplied", by the alpha channel.
 ---
----| '"premultiplied"'
+---| "premultiplied"
 
 ---
 ---Blend modes control how overlapping pixels are blended together, similar to layers in Photoshop.
@@ -2748,31 +2755,31 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---Normal blending where the alpha value controls how the colors are blended.
 ---
----| '"alpha"'
+---| "alpha"
 ---
 ---The incoming pixel color is added to the destination pixel color.
 ---
----| '"add"'
+---| "add"
 ---
 ---The incoming pixel color is subtracted from the destination pixel color.
 ---
----| '"subtract"'
+---| "subtract"
 ---
 ---The color channels from the two pixel values are multiplied together to produce a result.
 ---
----| '"multiply"'
+---| "multiply"
 ---
 ---The maximum value from each color channel is used, resulting in a lightening effect.
 ---
----| '"lighten"'
+---| "lighten"
 ---
 ---The minimum value from each color channel is used, resulting in a darkening effect.
 ---
----| '"darken"'
+---| "darken"
 ---
 ---The opposite of multiply: The pixel values are inverted, multiplied, and inverted again, resulting in a lightening effect.
 ---
----| '"screen"'
+---| "screen"
 
 ---
 ---There are two types of ShaderBlocks that can be used: `uniform` and `compute`.
@@ -2785,11 +2792,11 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---A uniform block.
 ---
----| '"uniform"'
+---| "uniform"
 ---
 ---A compute block.
 ---
----| '"compute"'
+---| "compute"
 
 ---
 ---This acts as a hint to the graphics driver about what kinds of data access should be optimized for.
@@ -2798,15 +2805,15 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---A buffer that you intend to create once and never modify.
 ---
----| '"static"'
+---| "static"
 ---
 ---A buffer which is modified occasionally.
 ---
----| '"dynamic"'
+---| "dynamic"
 ---
 ---A buffer which is entirely replaced on the order of every frame.
 ---
----| '"stream"'
+---| "stream"
 
 ---
 ---The method used to compare z values when deciding how to overlap rendered objects.
@@ -2821,27 +2828,27 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---The depth test passes when the depth values are equal.
 ---
----| '"equal"'
+---| "equal"
 ---
 ---The depth test passes when the depth values are not equal.
 ---
----| '"notequal"'
+---| "notequal"
 ---
 ---The depth test passes when the new depth value is less than the existing one.
 ---
----| '"less"'
+---| "less"
 ---
 ---The depth test passes when the new depth value is less than or equal to the existing one.
 ---
----| '"lequal"'
+---| "lequal"
 ---
 ---The depth test passes when the new depth value is greater than or equal to the existing one.
 ---
----| '"gequal"'
+---| "gequal"
 ---
 ---The depth test passes when the new depth value is greater than the existing one.
 ---
----| '"greater"'
+---| "greater"
 
 ---
 ---Different coordinate spaces for nodes in a Model.
@@ -2850,11 +2857,11 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---The coordinate space relative to the node's parent.
 ---
----| '"local"'
+---| "local"
 ---
 ---The coordinate space relative to the root node of the Model.
 ---
----| '"global"'
+---| "global"
 
 ---
 ---The following shaders are built in to LÖVR, and can be used as an argument to `lovr.graphics.newShader` instead of providing raw GLSL shader code.
@@ -2867,27 +2874,27 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---A simple shader without lighting, using only colors and a diffuse texture.
 ---
----| '"unlit"'
+---| "unlit"
 ---
 ---A physically-based rendering (PBR) shader, using advanced material properties.
 ---
----| '"standard"'
+---| "standard"
 ---
 ---A shader that renders a cubemap texture.
 ---
----| '"cube"'
+---| "cube"
 ---
 ---A shader that renders a 2D equirectangular texture with spherical coordinates.
 ---
----| '"pano"'
+---| "pano"
 ---
 ---A shader that renders font glyphs.
 ---
----| '"font"'
+---| "font"
 ---
 ---A shader that passes its vertex coordinates unmodified to the fragment shader, used to render view-independent fixed geometry like fullscreen quads.
 ---
----| '"fill"'
+---| "fill"
 
 ---
 ---Meshes are lists of arbitrary vertices.
@@ -2898,35 +2905,35 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---Draw each vertex as a single point.
 ---
----| '"points"'
+---| "points"
 ---
 ---The vertices represent a list of line segments. Each pair of vertices will have a line drawn between them.
 ---
----| '"lines"'
+---| "lines"
 ---
 ---The first two vertices have a line drawn between them, and each vertex after that will be connected to the previous vertex with a line.
 ---
----| '"linestrip"'
+---| "linestrip"
 ---
 ---Similar to linestrip, except the last vertex is connected back to the first.
 ---
----| '"lineloop"'
+---| "lineloop"
 ---
 ---The first three vertices define a triangle.
 ---
 ---Each vertex after that creates a triangle using the new vertex and last two vertices.
 ---
----| '"strip"'
+---| "strip"
 ---
 ---Each set of three vertices represents a discrete triangle.
 ---
----| '"triangles"'
+---| "triangles"
 ---
 ---Draws a set of triangles.
 ---
 ---Each one shares the first vertex as a common point, leading to a fan-like shape.
 ---
----| '"fan"'
+---| "fan"
 
 ---
 ---Most graphics primitives can be drawn in one of two modes: a filled mode and a wireframe mode.
@@ -2935,11 +2942,11 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---The shape is drawn as a filled object.
 ---
----| '"fill"'
+---| "fill"
 ---
 ---The shape is drawn as a wireframe object.
 ---
----| '"line"'
+---| "line"
 
 ---
 ---The method used to downsample (or upsample) a texture.
@@ -2954,15 +2961,15 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---Leads to a pixelated style.
 ---
----| '"nearest"'
+---| "nearest"
 ---
 ---Smooth pixel sampling.
 ---
----| '"bilinear"'
+---| "bilinear"
 ---
 ---Smooth pixel sampling, with smooth sampling across mipmap levels.
 ---
----| '"trilinear"'
+---| "trilinear"
 
 ---
 ---Different ways to horizontally align text when using `lovr.graphics.print`.
@@ -2971,15 +2978,15 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---Left aligned lines of text.
 ---
----| '"left"'
+---| "left"
 ---
 ---Centered aligned lines of text.
 ---
----| '"center"'
+---| "center"
 ---
 ---Right aligned lines of text.
 ---
----| '"right"'
+---| "right"
 
 ---
 ---The different types of color parameters `Material`s can hold.
@@ -2988,11 +2995,11 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---The diffuse color.
 ---
----| '"diffuse"'
+---| "diffuse"
 ---
 ---The emissive color.
 ---
----| '"emissive"'
+---| "emissive"
 
 ---
 ---The different types of float parameters `Material`s can hold.
@@ -3001,11 +3008,11 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---The constant metalness factor.
 ---
----| '"metalness"'
+---| "metalness"
 ---
 ---The constant roughness factor.
 ---
----| '"roughness"'
+---| "roughness"
 
 ---
 ---The different types of texture parameters `Material`s can hold.
@@ -3014,31 +3021,31 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---The diffuse texture.
 ---
----| '"diffuse"'
+---| "diffuse"
 ---
 ---The emissive texture.
 ---
----| '"emissive"'
+---| "emissive"
 ---
 ---The metalness texture.
 ---
----| '"metalness"'
+---| "metalness"
 ---
 ---The roughness texture.
 ---
----| '"roughness"'
+---| "roughness"
 ---
 ---The ambient occlusion texture.
 ---
----| '"occlusion"'
+---| "occlusion"
 ---
 ---The normal map.
 ---
----| '"normal"'
+---| "normal"
 ---
 ---The environment map, should be specified as a cubemap texture.
 ---
----| '"environment"'
+---| "environment"
 
 ---
 ---Meshes can have a usage hint, describing how they are planning on being updated.
@@ -3049,15 +3056,15 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---The Mesh contents will rarely change.
 ---
----| '"static"'
+---| "static"
 ---
 ---The Mesh contents will change often.
 ---
----| '"dynamic"'
+---| "dynamic"
 ---
 ---The Mesh contents will change constantly, potentially multiple times each frame.
 ---
----| '"stream"'
+---| "stream"
 
 ---
 ---Shaders can be used for either rendering operations or generic compute tasks.
@@ -3070,11 +3077,11 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---A graphics shader.
 ---
----| '"graphics"'
+---| "graphics"
 ---
 ---A compute shader.
 ---
----| '"compute"'
+---| "compute"
 
 ---
 ---How to modify pixels in the stencil buffer when using `lovr.graphics.stencil`.
@@ -3083,27 +3090,27 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---Stencil values will be replaced with a custom value.
 ---
----| '"replace"'
+---| "replace"
 ---
 ---Stencil values will increment every time they are rendered to.
 ---
----| '"increment"'
+---| "increment"
 ---
 ---Stencil values will decrement every time they are rendered to.
 ---
----| '"decrement"'
+---| "decrement"
 ---
 ---Similar to `increment`, but the stencil value will be set to 0 if it exceeds 255.
 ---
----| '"incrementwrap"'
+---| "incrementwrap"
 ---
 ---Similar to `decrement`, but the stencil value will be set to 255 if it drops below 0.
 ---
----| '"decrementwrap"'
+---| "decrementwrap"
 ---
 ---Stencil values will be bitwise inverted every time they are rendered to.
 ---
----| '"invert"'
+---| "invert"
 
 ---
 ---Textures can store their pixels in different formats.
@@ -3114,63 +3121,63 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---Each pixel is 24 bits, or 8 bits for each channel.
 ---
----| '"rgb"'
+---| "rgb"
 ---
 ---Each pixel is 32 bits, or 8 bits for each channel (including alpha).
 ---
----| '"rgba"'
+---| "rgba"
 ---
 ---An rgba format where the colors occupy 4 bits instead of the usual 8.
 ---
----| '"rgba4"'
+---| "rgba4"
 ---
 ---Each pixel is 64 bits. Each channel is a 16 bit floating point number.
 ---
----| '"rgba16f"'
+---| "rgba16f"
 ---
 ---Each pixel is 128 bits. Each channel is a 32 bit floating point number.
 ---
----| '"rgba32f"'
+---| "rgba32f"
 ---
 ---A 16-bit floating point format with a single color channel.
 ---
----| '"r16f"'
+---| "r16f"
 ---
 ---A 32-bit floating point format with a single color channel.
 ---
----| '"r32f"'
+---| "r32f"
 ---
 ---A 16-bit floating point format with two color channels.
 ---
----| '"rg16f"'
+---| "rg16f"
 ---
 ---A 32-bit floating point format with two color channels.
 ---
----| '"rg32f"'
+---| "rg32f"
 ---
 ---A 16 bit format with 5-bit color channels and a single alpha bit.
 ---
----| '"rgb5a1"'
+---| "rgb5a1"
 ---
 ---A 32 bit format with 10-bit color channels and two alpha bits.
 ---
----| '"rgb10a2"'
+---| "rgb10a2"
 ---
 ---Each pixel is 32 bits, and packs three color channels into 10 or 11 bits each.
 ---
----| '"rg11b10f"'
+---| "rg11b10f"
 ---
 ---A 16 bit depth buffer.
 ---
----| '"d16"'
+---| "d16"
 ---
 ---A 32 bit floating point depth buffer.
 ---
----| '"d32f"'
+---| "d32f"
 ---
 ---A depth buffer with 24 bits for depth and 8 bits for stencil.
 ---
----| '"d24s8"'
+---| "d24s8"
 
 ---
 ---Different types of Textures.
@@ -3179,19 +3186,19 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---A 2D texture.
 ---
----| '"2d"'
+---| "2d"
 ---
 ---A 2D array texture with multiple independent 2D layers.
 ---
----| '"array"'
+---| "array"
 ---
 ---A cubemap texture with 6 2D faces.
 ---
----| '"cube"'
+---| "cube"
 ---
 ---A 3D volumetric texture consisting of multiple 2D layers.
 ---
----| '"volume"'
+---| "volume"
 
 ---
 ---When binding writable resources to shaders using `Shader:sendBlock` and `Shader:sendImage`, an access pattern can be specified as a hint that says whether you plan to read or write to the resource (or both).
@@ -3202,15 +3209,15 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---The Shader will use the resource in a read-only fashion.
 ---
----| '"read"'
+---| "read"
 ---
 ---The Shader will use the resource in a write-only fashion.
 ---
----| '"write"'
+---| "write"
 ---
 ---The resource will be available for reading and writing.
 ---
----| '"readwrite"'
+---| "readwrite"
 
 ---
 ---Different ways to vertically align text when using `lovr.graphics.print`.
@@ -3219,15 +3226,15 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---Align the top of the text to the origin.
 ---
----| '"top"'
+---| "top"
 ---
 ---Vertically center the text.
 ---
----| '"middle"'
+---| "middle"
 ---
 ---Align the bottom of the text to the origin.
 ---
----| '"bottom"'
+---| "bottom"
 
 ---
 ---Whether the points on triangles are specified in a clockwise or counterclockwise order.
@@ -3236,11 +3243,11 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---Triangle vertices are specified in a clockwise order.
 ---
----| '"clockwise"'
+---| "clockwise"
 ---
 ---Triangle vertices are specified in a counterclockwise order.
 ---
----| '"counterclockwise"'
+---| "counterclockwise"
 
 ---
 ---The method used to render textures when texture coordinates are outside of the 0-1 range.
@@ -3249,12 +3256,12 @@ function Texture:setWrap(horizontal, vertical) end
 ---
 ---The texture will be clamped at its edges.
 ---
----| '"clamp"'
+---| "clamp"
 ---
 ---The texture repeats.
 ---
----| '"repeat"'
+---| "repeat"
 ---
 ---The texture will repeat, mirroring its appearance each time it repeats.
 ---
----| '"mirroredrepeat"'
+---| "mirroredrepeat"

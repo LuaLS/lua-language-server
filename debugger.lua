@@ -5,8 +5,13 @@ end
 local fs = require 'bee.filesystem'
 local luaDebugs = {}
 
+local home = os.getenv 'USERPROFILE' or os.getenv 'HOME'
+if not home then
+    log.error('Cannot find home directory')
+    return
+end
 for _, vscodePath in ipairs { '.vscode', '.vscode-insiders', '.vscode-server-insiders' } do
-    local extensionPath = fs.path(os.getenv 'USERPROFILE' or os.getenv 'HOME') / vscodePath / 'extensions'
+    local extensionPath =  fs.path(home) / vscodePath / 'extensions'
     log.debug('Search extensions at:', extensionPath:string())
 
     if fs.exists(extensionPath) then

@@ -32,7 +32,7 @@ return function (uri, callback)
             return
         end
         local name = source[1]
-        if name == '...' then
+        if name == '...' or name == '_' then
             return
         end
         if #vm.getDocSets(uri, name) > 0

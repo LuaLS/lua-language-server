@@ -3,6 +3,7 @@ local guide     = require 'parser.guide'
 local lang      = require 'language'
 local config    = require 'config'
 local vm        = require 'vm'
+local util      = require 'utility'
 
 local function isDocClass(source)
     if not source.bindDocs then
@@ -23,10 +24,7 @@ return function (uri, callback)
         return
     end
 
-    local definedGlobal = {}
-    for name in pairs(config.get(uri, 'Lua.diagnostics.globals')) do
-        definedGlobal[name] = true
-    end
+    local definedGlobal = util.arrayToHash(config.get(uri, 'Lua.diagnostics.globals'))
 
     guide.eachSourceType(ast.ast, 'setglobal', function (source)
         local name = guide.getKeyName(source)

@@ -7,12 +7,12 @@ local glob       = require 'glob'
 local platform   = require 'bee.platform'
 local await      = require 'await'
 local client     = require 'client'
-local plugin     = require 'plugin'
 local util       = require 'utility'
 local fw         = require 'filewatch'
 local scope      = require 'workspace.scope'
 local loading    = require 'workspace.loading'
 local inspect    = require 'inspect'
+local lang       = require 'language'
 
 ---@class workspace
 local m = {}
@@ -45,11 +45,33 @@ end
 
 --- 初始化工作区
 function m.create(uri)
+    if furi.isValid(uri) then
+        uri = furi.normalize(uri)
+    end
     log.info('Workspace create: ', uri)
-    local path = m.normalize(furi.decode(uri))
-    fw.watch(path)
+    if uri == furi.encode '/'
+    or uri == furi.encode(os.getenv 'HOME' or '') then
+        client.showMessage('Error', lang.script('WORKSPACE_NOT_ALLOWED', furi.decode(uri)))
+        return
+    end
     local scp = scope.createFolder(uri)
     m.folders[#m.folders+1] = scp
+end
+
+function m.remove(uri)
+    log.info('Workspace remove: ', uri)
+    for i, scp in ipairs(m.folders) do
+        if scp.uri == uri then
+            scp:remove()
+            table.remove(m.folders, i)
+            scp:set('ready', false)
+            scp:set('nativeMatcher', nil)
+            scp:set('libraryMatcher', nil)
+            scp:removeAllLinks()
+            m.flushFiles(scp)
+            return
+        end
+    end
 end
 
 function m.reset()
@@ -135,7 +157,7 @@ function m.getNativeMatcher(scp)
             end
         end
     end
-    for path in pairs(config.get(scp.uri, 'Lua.workspace.library')) do
+    for _, path in ipairs(config.get(scp.uri, 'Lua.workspace.library')) do
         path = m.getAbsolutePath(scp.uri, path)
         if path then
             log.debug('Ignore by library:', path)
@@ -148,7 +170,7 @@ function m.getNativeMatcher(scp)
     end
 
     local matcher = glob.gitignore(pattern, {
-        root       = furi.decode(scp.uri),
+        root       = scp.uri and furi.decode(scp.uri),
         ignoreCase = platform.OS == 'Windows',
     }, globInteferFace)
 
@@ -177,7 +199,7 @@ function m.getLibraryMatchers(scp)
     end
 
     local librarys = {}
-    for path in pairs(config.get(scp.uri, 'Lua.workspace.library')) do
+    for _, path in ipairs(config.get(scp.uri, 'Lua.workspace.library')) do
         path = m.getAbsolutePath(scp.uri, path)
         if path then
             librarys[m.normalize(path)] = true
@@ -273,6 +295,10 @@ function m.awaitPreload(scp)
 
     scp:flushGC()
 
+    if scp:isRemoved() then
+        return
+    end
+
     local ld <close> = loading.create(scp)
     scp:set('loading', ld)
 
@@ -283,22 +309,35 @@ function m.awaitPreload(scp)
 
     if scp.uri then
         log.info('Scan files at:', scp:getName())
+        local count = 0
         ---@async
         native:scan(furi.decode(scp.uri), function (path)
             local uri = files.getRealUri(furi.encode(path))
             scp:get('cachedUris')[uri] = true
             ld:loadFile(uri)
+        end, function () ---@async
+            count = count + 1
+            if count == 100000 then
+                client.showMessage('Warning', lang.script('WORKSPACE_SCAN_TOO_MUCH', count, furi.decode(scp.uri)))
+            end
         end)
+        scp:gc(fw.watch(m.normalize(furi.decode(scp.uri))))
     end
 
     for _, libMatcher in ipairs(librarys) do
         log.info('Scan library at:', libMatcher.uri)
+        local count = 0
         scp:addLink(libMatcher.uri)
         ---@async
         libMatcher.matcher:scan(furi.decode(libMatcher.uri), function (path)
             local uri = files.getRealUri(furi.encode(path))
             scp:get('cachedUris')[uri] = true
             ld:loadFile(uri, libMatcher.uri)
+        end, function () ---@async
+            count = count + 1
+            if count == 100000 then
+                client.showMessage('Warning', lang.script('WORKSPACE_SCAN_TOO_MUCH', count, furi.decode(libMatcher.uri)))
+            end
         end)
         scp:gc(fw.watch(furi.decode(libMatcher.uri)))
     end
@@ -336,9 +375,6 @@ end
 ---@param path string
 ---@return string
 function m.normalize(path)
-    if not path then
-        return nil
-    end
     path = path:gsub('%$%{(.-)%}', function (key)
         if key == '3rd' then
             return (ROOT / 'meta' / '3rd'):string()
@@ -350,9 +386,20 @@ function m.normalize(path)
     end)
     path = util.expandPath(path)
     path = path:gsub('^%.[/\\]+', '')
+    for _ = 1, 1000 do
+        if path:sub(1, 2) == '..' then
+            break
+        end
+        local count
+        path, count = path:gsub('[^/\\]+[/\\]+%.%.[/\\]', '/', 1)
+        if count == 0 then
+            break
+        end
+    end
     if platform.OS == 'Windows' then
         path = path:gsub('[/\\]+', '\\')
                    :gsub('[/\\]+$', '')
+                   :gsub('^(%a:)$', '%1\\')
     else
         path = path:gsub('[/\\]+', '/')
                    :gsub('[/\\]+$', '')
@@ -360,11 +407,10 @@ function m.normalize(path)
     return path
 end
 
----@return string
+---@param folderUri? uri
+---@param path string
+---@return string?
 function m.getAbsolutePath(folderUri, path)
-    if not path or path == '' then
-        return nil
-    end
     path = m.normalize(path)
     if fs.path(path):is_relative() then
         if not folderUri then
@@ -378,6 +424,7 @@ end
 
 ---@param uriOrPath uri|string
 ---@return string
+---@return boolean suc
 function m.getRelativePath(uriOrPath)
     local path, uri
     if uriOrPath:sub(1, 5) == 'file:' then
@@ -427,16 +474,24 @@ function m.flushFiles(scp)
     for uri in pairs(cachedUris) do
         files.delRef(uri)
     end
+    collectgarbage()
+    collectgarbage()
+    -- TODO: wait maillist
+    collectgarbage 'restart'
 end
 
 ---@param scp scope
 function m.resetFiles(scp)
     local cachedUris = scp:get 'cachedUris'
-    if not cachedUris then
-        return
+    if cachedUris then
+        for uri in pairs(cachedUris) do
+            files.resetText(uri)
+        end
     end
-    for uri in pairs(cachedUris) do
-        files.resetText(uri)
+    for uri in pairs(files.openMap) do
+        if scope.getScope(uri) == scp then
+            files.resetText(uri)
+        end
     end
 end
 
@@ -448,7 +503,7 @@ function m.awaitReload(scp)
     scp:set('libraryMatcher', nil)
     scp:removeAllLinks()
     m.flushFiles(scp)
-    plugin.init(scp)
+    m.onWatch('startReload', scp.uri)
     m.awaitPreload(scp)
     scp:set('ready', true)
     local waiting = scp:get('waitingReady')
@@ -501,6 +556,7 @@ end
 config.watch(function (uri, key, value, oldValue)
     if key:find '^Lua.runtime'
     or key:find '^Lua.workspace'
+    or key:find '^Lua.type'
     or key:find '^files' then
         if value ~= oldValue then
             m.reload(scope.getScope(uri))

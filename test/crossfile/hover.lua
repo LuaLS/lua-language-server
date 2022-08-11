@@ -58,8 +58,8 @@ function TEST(expect)
 
     local hover = core.byUri(sourceUri, sourcePos)
     assert(hover)
-    hover = tostring(hover):gsub('\r\n', '\n')
-    assert(eq(hover, expect.hover))
+    local content = tostring(hover):gsub('\r\n', '\n')
+    assert(eq(content, expect.hover))
 end
 
 TEST {
@@ -77,6 +77,7 @@ TEST {
 ```
 
 ---
+
 * [a.lua](file:///a.lua) （搜索路径： `?.lua`）]],
 }
 
@@ -109,6 +110,7 @@ TEST {
 ```
 
 ---
+
 * [Folder\a.lua](file:///Folder/a.lua) （搜索路径： `Folder\?.lua`）]],
 }
 
@@ -127,6 +129,7 @@ TEST {
 ```
 
 ---
+
 * [Folder\a.lua](file:///Folder/a.lua) （搜索路径： `?.lua`）]],
 }
 
@@ -145,6 +148,7 @@ TEST {
 ```
 
 ---
+
 * [Folder\a.lua](file:///Folder/a.lua) （搜索路径： `?.lua`）]],
 }
 else
@@ -163,6 +167,7 @@ TEST {
 ```
 
 ---
+
 * [Folder/a.lua](file:///Folder/a.lua) （搜索路径： `Folder/?.lua`）]],
 }
 end
@@ -329,6 +334,7 @@ function f(x: number)
 ```
 
 ---
+
  abc]]
 }
 
@@ -350,6 +356,7 @@ TEST {
 ```
 
 ---
+
  abc]]
 }
 
@@ -488,6 +495,7 @@ function f(<?x?>) end
 ```
 
 ---
+
 this is comment]]
 }
 
@@ -557,6 +565,7 @@ function f(arg1: integer, arg2: integer)
 ```
 
 ---
+
 comment1
 
 @*param* `arg2` — comment2
@@ -666,6 +675,7 @@ function f()
 ```
 
 ---
+
 comment1
 comment2]]}
 
@@ -681,7 +691,7 @@ TEST {{ path = 'a.lua', content = '', }, {
 },
 hover = [[
 ```lua
-function f(a: boolean|true|false)
+function f(a: boolean)
 ```
 
 ---
@@ -710,6 +720,7 @@ local x: A
 ```
 
 ---
+
 AAA]]}
 
 TEST {{ path = 'a.lua', content = '', }, {
@@ -730,6 +741,7 @@ local x: A {
 ```
 
 ---
+
 AAA]]}
 
 TEST {{ path = 'a.lua', content = '', }, {
@@ -749,9 +761,11 @@ local x: A
 ```
 
 ---
+
 BBB
 
 ---
+
 AAA]]}
 
 TEST {{ path = 'a.lua', content = '', }, {
@@ -770,9 +784,11 @@ hover = [[
 ```
 
 ---
+
 AAA
 
 ---
+
 BBB]]}
 
 TEST {{ path = 'a.lua', content = '', }, {
@@ -791,9 +807,11 @@ hover = [[
 ```
 
 ---
+
 BBB
 
 ---
+
 AAA]]}
 
 TEST {{ path = 'a.lua', content = '', }, {
@@ -811,7 +829,7 @@ food.secondField = 2
 },
 hover = [[
 ```lua
-(field) Food.firstField: number = 0
+(field) Food.firstField: number
 ```]]}
 
 TEST {{ path = 'a.lua', content = '', }, {
@@ -829,6 +847,7 @@ local food: unknown
 ```
 
 ---
+
 I'm a multiline comment
 ]]}
 
@@ -937,6 +956,7 @@ function bthci.rawhci(hcibytes: any, callback: any)
 ```
 
 ---
+
  Sends a raw HCI command to the BlueTooth controller.]]}
 
 TEST {{ path = 'a.lua', content = '', }, {
@@ -1021,6 +1041,7 @@ function fn()
 ```
 
 ---
+
 line1
 
 line2]]}
@@ -1135,5 +1156,429 @@ TEST {
 
 ```lua
 (async) (method) C:f(a: any)
+```]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@class Apple
+            ---The color of your awesome apple!
+            ---@field color string
+            local Apple = {}
+
+            Apple.<?color?>
+        ]]
+    },
+    hover = [[
+```lua
+(field) Apple.color: string
+```
+
+---
+
+The color of your awesome apple!]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@type fun(x: number, y: number, ...: number):(x: number, y: number, ...: number)
+            local <?f?>
+        ]]
+    },
+    hover = [[
+```lua
+local f: fun(x: number, y: number, ...number):(x: number, y: number, ...number)
+```
+
+---
+
+```lua
+function f(x: number, y: number, ...: number)
+  -> x: number
+  2. y: number
+  3. ...number
+```]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@param p   'a1' | 'a2'
+            ---@param ... 'a3' | 'a4'
+            ---@return 'r1' | 'r2' ret1
+            ---@return 'r3' | 'r4' ...
+            local function <?f?>(p, ...) end
+        ]]
+    },
+    hover = [[
+```lua
+function f(p: 'a1'|'a2', ...'a3'|'a4')
+  -> ret1: 'r1'|'r2'
+  2. ...'r3'|'r4'
+```
+
+---
+
+```lua
+p:
+    | 'a1'
+    | 'a2'
+
+...(param):
+    | 'a3'
+    | 'a4'
+
+ret1:
+    | 'r1'
+    | 'r2'
+
+...(return):
+    | 'r3'
+    | 'r4'
+```]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@type integer @ comments
+            local <?n?>
+        ]]
+    },
+    hover = [[
+```lua
+local n: integer
+```
+
+---
+
+ comments]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            --- comments
+            ---@type integer
+            local <?n?>
+        ]]
+    },
+    hover = [[
+```lua
+local n: integer
+```
+
+---
+
+ comments]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@type integer
+            --- comments
+            local <?n?>
+        ]]
+    },
+    hover = [[
+```lua
+local n: integer
+```
+
+---
+
+ comments]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@TODO XXXX
+            ---@type integer @ comments
+            local <?n?>
+        ]]
+    },
+    hover = [[
+```lua
+local n: integer
+```
+
+---
+
+ comments]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@type integer @ comments
+            ---@TODO XXXX
+            local <?n?>
+        ]]
+    },
+    hover = [[
+```lua
+local n: integer
+```
+
+---
+
+ comments]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            --[here](x.lua)
+            local <?n?>
+        ]]
+    },
+    hover = [[
+```lua
+local n: unknown
+```
+
+---
+
+[here](file:///x.lua)]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            --[here](D:/x.lua)
+            local <?n?>
+        ]]
+    },
+    hover = [[
+```lua
+local n: unknown
+```
+
+---
+
+[here](file:///d%3A/x.lua)]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            --[here](command:xxxxx)
+            local <?n?>
+        ]]
+    },
+    hover = [[
+```lua
+local n: unknown
+```
+
+---
+
+[here](command:xxxxx)]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@class A
+            ---@field x number # comments
+
+            ---@type A
+            local t
+
+            print(t.<?x?>)
+        ]]
+    },
+    hover = [[
+```lua
+(field) A.x: number
+```
+
+---
+
+ comments]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            -- comments
+            <?A?> = function () end
+        ]]
+    },
+    hover = [[
+```lua
+function A()
+```
+
+---
+
+ comments]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            local t = {
+                -- comments
+                <?A?> = function () end
+            }
+        ]]
+    },
+    hover = [[
+```lua
+function A()
+```
+
+---
+
+ comments]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            -- comments
+            ---@return number
+            <?A?> = function () end
+        ]]
+    },
+    hover = [[
+```lua
+function A()
+  -> number
+```
+
+---
+
+ comments]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@alias A
+            ---| 1 # comment1
+            ---| 2 # comment2
+
+            ---@type A
+            local <?x?>
+        ]]
+    },
+    hover = [[
+```lua
+local x: 1|2
+```
+
+---
+
+```lua
+A:
+    | 1 -- comment1
+    | 2 -- comment2
+```]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@enum <?A?>
+            local t = {
+                x = 1,
+                y = 2,
+                z = 3,
+            }
+        ]]
+    },
+    hover = [[
+```lua
+(enum) A
+```
+
+---
+
+```lua
+{
+    x: integer = 1,
+    y: integer = 2,
+    z: integer = 3,
+}
+```]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@enum <?A?>
+            local t =
+            {
+                x = 1,
+                y = 2,
+                z = 3,
+            }
+        ]]
+    },
+    hover = [[
+```lua
+(enum) A
+```
+
+---
+
+```lua
+{
+    x: integer = 1,
+    y: integer = 2,
+    z: integer = 3,
+}
+```]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@enum <?A?>
+            local t = {
+                x = 1 << 0,
+                y = 1 << 1,
+                z = 1 << 2,
+            }
+        ]]
+    },
+    hover = [[
+```lua
+(enum) A
+```
+
+---
+
+```lua
+{
+    x: integer = 1,
+    y: integer = 2,
+    z: integer = 4,
+}
 ```]]
 }

@@ -25,10 +25,11 @@ return function (uri, callback)
             return
         end
         local infer = vm.getInfer(source.value)
-        if  not infer:hasClass()
-        and not infer:hasType 'nil'
-        and not infer:hasType 'table'
-        and infer:view('any', uri) ~= 'any'  then
+        if  not infer:hasClass(uri)
+        and not infer:hasType(uri, 'nil')
+        and not infer:hasType(uri, 'table')
+        and not infer:hasUnknown(uri)
+        and not infer:hasAny(uri) then
             callback {
                 start   = source.value.start,
                 finish  = source.value.finish,

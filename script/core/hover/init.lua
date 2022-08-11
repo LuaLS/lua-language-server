@@ -39,7 +39,7 @@ local function getHover(source)
     end
 
     local oop
-    if vm.getInfer(source):view() == 'function' then
+    if vm.getInfer(source):view(guide.getUri(source)) == 'function' then
         local defs = vm.getDefs(source)
         -- make sure `function` is before `doc.type.function`
         local orders = {}
@@ -92,19 +92,21 @@ local function getHover(source)
 end
 
 local accept = {
-    ['local']         = true,
-    ['setlocal']      = true,
-    ['getlocal']      = true,
-    ['setglobal']     = true,
-    ['getglobal']     = true,
-    ['field']         = true,
-    ['method']        = true,
-    ['string']        = true,
-    ['number']        = true,
-    ['integer']       = true,
-    ['doc.type.name'] = true,
-    ['function']      = true,
-    ['doc.module']    = true,
+    ['local']          = true,
+    ['setlocal']       = true,
+    ['getlocal']       = true,
+    ['setglobal']      = true,
+    ['getglobal']      = true,
+    ['field']          = true,
+    ['method']         = true,
+    ['string']         = true,
+    ['number']         = true,
+    ['integer']        = true,
+    ['doc.type.name']  = true,
+    ['doc.class.name'] = true,
+    ['doc.enum.name']  = true,
+    ['function']       = true,
+    ['doc.module']     = true,
 }
 
 ---@async

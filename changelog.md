@@ -1,5 +1,269 @@
 # changelog
 
+## 3.5.3
+* `FIX` [#1409](https://github.com/sumneko/lua-language-server/issues/1409)
+* `FIX` [#1422](https://github.com/sumneko/lua-language-server/issues/1422)
+
+## 3.5.2
+`2022-8-1`
+* `FIX` [#1395](https://github.com/sumneko/lua-language-server/issues/1395)
+* `FIX` [#1403](https://github.com/sumneko/lua-language-server/issues/1403)
+* `FIX` [#1405](https://github.com/sumneko/lua-language-server/issues/1405)
+* `FIX` [#1406](https://github.com/sumneko/lua-language-server/issues/1406)
+* `FIX` [#1418](https://github.com/sumneko/lua-language-server/issues/1418)
+
+## 3.5.1
+`2022-7-26`
+* `NEW` supports [color](https://github.com/sumneko/lua-language-server/pull/1379)
+* `NEW` setting `Lua.runtime.pluginArgs`
+* `CHG` setting `type.castNumberToInteger` default by `true`
+* `CHG` improve supports for multi-workspace
+* `FIX` [#1354](https://github.com/sumneko/lua-language-server/issues/1354)
+* `FIX` [#1355](https://github.com/sumneko/lua-language-server/issues/1355)
+* `FIX` [#1363](https://github.com/sumneko/lua-language-server/issues/1363)
+* `FIX` [#1365](https://github.com/sumneko/lua-language-server/issues/1365)
+* `FIX` [#1367](https://github.com/sumneko/lua-language-server/issues/1367)
+* `FIX` [#1368](https://github.com/sumneko/lua-language-server/issues/1368)
+* `FIX` [#1370](https://github.com/sumneko/lua-language-server/issues/1370)
+* `FIX` [#1375](https://github.com/sumneko/lua-language-server/issues/1375)
+* `FIX` [#1391](https://github.com/sumneko/lua-language-server/issues/1391)
+
+## 3.5.0
+`2022-7-19`
+* `NEW` `LuaDoc`: `---@operator`:
+  ```lua
+  ---@class fspath
+  ---@operator div(string|fspath): fspath
+
+  ---@type fspath
+  local root
+
+  local fileName = root / 'script' / 'main.lua' -- `fileName` is `fspath` here
+  ```
+* `NEW` `LuaDoc`: `---@source`:
+  ```lua
+  -- Also supports absolute path or relative path (based on current file path)
+  ---@source file:///xxx.c:50:20
+  XXX = 1 -- when finding definitions of `XXX`, returns `file:///xxx.c:50:20` instead here.
+  ```
+* `NEW` `LuaDoc`: `---@enum`:
+  ```lua
+  ---@enum animal
+  Animal = {
+    Cat = 1,
+    Dog = 2,
+  }
+
+  ---@param x animal
+  local function f(x) end
+
+  f() -- suggests `Animal.Cat`, `Animal.Dog`, `1`, `2` as the first parameter
+  ```
+* `NEW` diagnostics:
+  * `unknown-operator`
+  * `unreachable-code`
+* `NEW` settings:
+  * `diagnostics.unusedLocalExclude`
+* `NEW` VSCode: add support for [EmmyLuaUnity](https://marketplace.visualstudio.com/items?itemName=CppCXY.emmylua-unity)
+* `CHG` support multi-type:
+  ```lua
+  ---@type number, _, boolean
+  local a, b, c -- `a` is `number`, `b` is `unknown`, `c` is `boolean`
+  ```
+* `CHG` treat `_ENV = XXX` as `local _ENV = XXX`
+  * `_ENV = nil`: disable all globals
+  * `_ENV = {}`: allow all globals
+  * `_ENV = {} ---@type mathlib`: only allow globals in `mathlib`
+* `CHG` hover: dose not show unknown `---@XXX` as description
+* `CHG` contravariance is allowed at the class declaration
+  ```lua
+  ---@class BaseClass
+  local BaseClass
+
+  ---@class MyClass: BaseClass
+  local MyClass = BaseClass -- OK!
+  ```
+* `CHG` hover: supports path in link
+  ```lua
+  --![](image.png) --> will convert to `--![](file:///xxxx/image.png)`
+  local x
+  ```
+* `CHG` signature: only show signatures matching the entered parameters
+* `FIX` [#880](https://github.com/sumneko/lua-language-server/issues/880)
+* `FIX` [#1284](https://github.com/sumneko/lua-language-server/issues/1284)
+* `FIX` [#1292](https://github.com/sumneko/lua-language-server/issues/1292)
+* `FIX` [#1294](https://github.com/sumneko/lua-language-server/issues/1294)
+* `FIX` [#1306](https://github.com/sumneko/lua-language-server/issues/1306)
+* `FIX` [#1311](https://github.com/sumneko/lua-language-server/issues/1311)
+* `FIX` [#1317](https://github.com/sumneko/lua-language-server/issues/1317)
+* `FIX` [#1320](https://github.com/sumneko/lua-language-server/issues/1320)
+* `FIX` [#1330](https://github.com/sumneko/lua-language-server/issues/1330)
+* `FIX` [#1345](https://github.com/sumneko/lua-language-server/issues/1345)
+* `FIX` [#1346](https://github.com/sumneko/lua-language-server/issues/1346)
+* `FIX` [#1348](https://github.com/sumneko/lua-language-server/issues/1348)
+
+## 3.4.2
+`2022-7-6`
+* `CHG` diagnostic: `type-check` ignores `nil` in `getfield`
+* `CHG` diagnostic: `---@diagnostic disable: <ERR_NAME>` can suppress syntax errors
+* `CHG` completion: `completion.callSnippet` no longer generate parameter types
+* `CHG` hover: show `---@type {x: number, y: number}` as detail instead of `table`
+* `CHG` dose not infer as `nil` by `t.field = nil`
+* `FIX` [#1278](https://github.com/sumneko/lua-language-server/issues/1278)
+* `FIX` [#1288](https://github.com/sumneko/lua-language-server/issues/1288)
+
+## 3.4.1
+`2022-7-5`
+* `NEW` settings:
+  * `type.weakNilCheck`
+* `CHG` allow type contravariance for `setmetatable` when initializing a class
+  ```lua
+  ---@class A
+  local a = {}
+
+  ---@class B: A
+  local b = setmetatable({}, { __index = a }) -- OK!
+  ```
+* `FIX` [#1256](https://github.com/sumneko/lua-language-server/issues/1256)
+* `FIX` [#1257](https://github.com/sumneko/lua-language-server/issues/1257)
+* `FIX` [#1267](https://github.com/sumneko/lua-language-server/issues/1267)
+* `FIX` [#1269](https://github.com/sumneko/lua-language-server/issues/1269)
+* `FIX` [#1273](https://github.com/sumneko/lua-language-server/issues/1273)
+* `FIX` [#1275](https://github.com/sumneko/lua-language-server/issues/1275)
+* `FIX` [#1279](https://github.com/sumneko/lua-language-server/issues/1279)
+
+## 3.4.0
+`2022-6-29`
+* `NEW` diagnostics:
+  * `cast-local-type`
+  * `assign-type-mismatch`
+  * `param-type-mismatch`
+  * `unknown-cast-variable`
+  * `cast-type-mismatch`
+  * `missing-return-value`
+  * `redundant-return-value`
+  * `missing-return`
+  * `return-type-mismatch`
+* `NEW` settings:
+  * `diagnostics.groupSeverity`
+  * `diagnostics.groupFileStatus`
+  * `type.castNumberToInteger`
+  * `type.weakUnionCheck`
+  * `hint.semicolon`
+* `CHG` infer `nil` as redundant return value
+  ```lua
+  local function f() end
+  local x = f() -- `x` is `nil` instead of `unknown`
+  ```
+* `CHG` infer called function by params num
+  ```lua
+  ---@overload fun(x: number, y: number):string
+  ---@overload fun(x: number):number
+  ---@return boolean
+  local function f() end
+
+  local n1 = f()     -- `n1` is `boolean`
+  local n2 = f(0)    -- `n2` is `number`
+  local n3 = f(0, 0) -- `n3` is `string`
+  ```
+* `CHG` semicolons and parentheses can be used in `DocTable`
+  ```lua
+  ---@type { (x: number); (y: boolean) }
+  ```
+* `CHG` return names and parentheses can be used in `DocFunction`
+  ```lua
+  ---@type fun():(x: number, y: number, ...: number)
+  ```
+* `CHG` supports `---@return boolean ...`
+* `CHG` improve experience for diagnostics and semantic-tokens
+* `FIX` diagnostics flash when opening a file
+* `FIX` sometimes workspace diagnostics are not triggered
+* `FIX` [#1228](https://github.com/sumneko/lua-language-server/issues/1228)
+* `FIX` [#1229](https://github.com/sumneko/lua-language-server/issues/1229)
+* `FIX` [#1242](https://github.com/sumneko/lua-language-server/issues/1242)
+* `FIX` [#1243](https://github.com/sumneko/lua-language-server/issues/1243)
+* `FIX` [#1249](https://github.com/sumneko/lua-language-server/issues/1249)
+
+## 3.3.1
+`2022-6-17`
+* `FIX` [#1213](https://github.com/sumneko/lua-language-server/issues/1213)
+* `FIX` [#1215](https://github.com/sumneko/lua-language-server/issues/1215)
+* `FIX` [#1217](https://github.com/sumneko/lua-language-server/issues/1217)
+* `FIX` [#1218](https://github.com/sumneko/lua-language-server/issues/1218)
+* `FIX` [#1220](https://github.com/sumneko/lua-language-server/issues/1220)
+* `FIX` [#1223](https://github.com/sumneko/lua-language-server/issues/1223)
+
+## 3.3.0
+`2022-6-15`
+* `NEW` `LuaDoc` supports `` `CODE` ``
+  ```lua
+  ---@type `CONST.X` | `CONST.Y`
+  local x
+
+  if x == -- suggest `CONST.X` and `CONST.Y` here
+  ```
+* `CHG` infer type by `error`
+  ```lua
+  ---@type integer|nil
+  local n
+
+  if not n then
+      error('n is nil')
+  end
+
+  print(n) -- `n` is `integer` here
+  ```
+* `CHG` infer type by `t and t.x`
+  ```lua
+  ---@type table|nil
+  local t
+
+  local s = t and t.x or 1 -- `t` in `t.x` is `table`
+  ```
+* `CHG` infer type by `type(x)`
+  ```lua
+  local x
+
+  if type(x) == 'string' then
+      print(x) -- `x` is `string` here
+  end
+
+  local tp = type(x)
+
+  if tp == 'boolean' then
+      print(x) -- `x` is `boolean` here
+  end
+  ```
+* `CHG` infer type by `>`/`<`/`>=`/`<=`
+* `FIX` with clients that support LSP 3.17 (VSCode), workspace diagnostics are triggered every time when opening a file.
+* `FIX` [#1204](https://github.com/sumneko/lua-language-server/issues/1204)
+* `FIX` [#1208](https://github.com/sumneko/lua-language-server/issues/1208)
+
+## 3.2.5
+`2022-6-9`
+* `NEW` provide config docs in `LUA_LANGUAGE_SERVER/doc/`
+* `FIX` [#1148](https://github.com/sumneko/lua-language-server/issues/1148)
+* `FIX` [#1149](https://github.com/sumneko/lua-language-server/issues/1149)
+* `FIX` [#1192](https://github.com/sumneko/lua-language-server/issues/1192)
+
+## 3.2.4
+`2022-5-25`
+* `NEW` settings:
+  + `workspace.supportScheme`: `["file", "untitled", "git"]`
+  + `diagnostics.disableScheme`: `["git"]`
+* `NEW` folding: support folding `---@alias`
+* `CHG` if `rootUri` or `workspaceFolder` is set to `ROOT` or `HOME`, this extension will refuse to load these directories and show an error message.
+* `CHG` show warning message when scanning more than 100,000 files.
+* `CHG` upgrade [LSP](https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/) to `3.17`
+* `FIX` hover: can not union `table` with other basic types
+* `FIX` [#1125](https://github.com/sumneko/lua-language-server/issues/1125)
+* `FIX` [#1131](https://github.com/sumneko/lua-language-server/issues/1131)
+* `FIX` [#1134](https://github.com/sumneko/lua-language-server/issues/1134)
+* `FIX` [#1141](https://github.com/sumneko/lua-language-server/issues/1141)
+* `FIX` [#1144](https://github.com/sumneko/lua-language-server/issues/1144)
+* `FIX` [#1150](https://github.com/sumneko/lua-language-server/issues/1150)
+* `FIX` [#1155](https://github.com/sumneko/lua-language-server/issues/1155)
+
 ## 3.2.3
 `2022-5-16`
 * `CHG` parse `.luarc.json` as jsonc. In order to please the editor, it also supports `.luarc.jsonc` as the file name.

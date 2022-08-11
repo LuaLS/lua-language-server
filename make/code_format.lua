@@ -21,6 +21,8 @@ lm:source_set 'code_format' {
         "Util/src/Utf8.cpp",
         --CodeService
         "CodeService/src/*.cpp",
+        "CodeService/src/Spell/*.cpp",
+        "Util/src/SymSpell/*.cpp",
         "CodeService/src/FormatElement/*.cpp",
         "CodeService/src/NameStyle/*.cpp"
     },

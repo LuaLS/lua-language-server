@@ -1,5 +1,7 @@
 local files   = require 'files'
 local lang    = require 'language'
+local vm      = require 'vm.vm'
+local await   = require 'await'
 
 local function getFieldEventName(doc)
     if not doc.extends then
@@ -28,6 +30,7 @@ local function getFieldEventName(doc)
     return nil
 end
 
+---@async
 return function (uri, callback)
     local state = files.getState(uri)
     if not state then
@@ -45,7 +48,13 @@ return function (uri, callback)
                 mark = {}
             elseif doc.type == 'doc.field' then
                 if mark then
-                    local name = ('%q'):format(doc.field[1])
+                    await.delay()
+                    local name
+                    if doc.field.type == 'doc.type' then
+                        name = ('[%s]'):format(vm.getInfer(doc.field):view(uri))
+                    else
+                        name = ('%q'):format(doc.field[1])
+                    end
                     local eventName = getFieldEventName(doc)
                     if eventName then
                         name = name .. '|' .. eventName

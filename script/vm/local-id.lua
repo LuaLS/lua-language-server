@@ -4,8 +4,8 @@ local guide = require 'parser.guide'
 local vm    = require 'vm.vm'
 
 ---@class parser.object
----@field _localID string
----@field _localIDs table<string, parser.object[]>
+---@field _localID string|false
+---@field _localIDs table<string, { sets: parser.object[], gets: parser.object[] }>
 
 local compileLocalID, getLocal
 
@@ -21,6 +21,7 @@ local compileSwitch = util.switch()
             compileLocalID(ref)
         end
     end)
+    : case 'setlocal'
     : case 'getlocal'
     : call(function (source)
         source._localID = ('%d'):format(source.node.start)
@@ -114,10 +115,19 @@ end
 function vm.insertLocalID(id, source)
     local root = guide.getRoot(source)
     if not root._localIDs then
-        root._localIDs = util.multiTable(2)
+        root._localIDs = util.multiTable(2, function ()
+            return {
+                sets = {},
+                gets = {},
+            }
+        end)
     end
     local sources = root._localIDs[id]
-    sources[#sources+1] = source
+    if guide.isSet(source) then
+        sources.sets[#sources.sets+1] = source
+    else
+        sources.gets[#sources.gets+1] = source
+    end
 end
 
 function compileLocalID(source)
@@ -137,7 +147,7 @@ function compileLocalID(source)
 end
 
 ---@param source parser.object
----@return string?
+---@return string|false
 function vm.getLocalID(source)
     if source._localID ~= nil then
         return source._localID
@@ -154,7 +164,7 @@ end
 ---@param source parser.object
 ---@param key?   string
 ---@return parser.object[]?
-function vm.getLocalSources(source, key)
+function vm.getLocalSourcesSets(source, key)
     local id = vm.getLocalID(source)
     if not id then
         return nil
@@ -169,12 +179,34 @@ function vm.getLocalSources(source, key)
         end
         id = id .. vm.ID_SPLITE .. key
     end
-    return root._localIDs[id]
+    return root._localIDs[id].sets
 end
 
 ---@param source parser.object
----@return parser.object[]
-function vm.getLocalFields(source)
+---@param key?   string
+---@return parser.object[]?
+function vm.getLocalSourcesGets(source, key)
+    local id = vm.getLocalID(source)
+    if not id then
+        return nil
+    end
+    local root = guide.getRoot(source)
+    if not root._localIDs then
+        return nil
+    end
+    if key then
+        if type(key) ~= 'string' then
+            return nil
+        end
+        id = id .. vm.ID_SPLITE .. key
+    end
+    return root._localIDs[id].gets
+end
+
+---@param source parser.object
+---@param includeGets boolean
+---@return parser.object[]?
+function vm.getLocalFields(source, includeGets)
     local id = vm.getLocalID(source)
     if not id then
         return nil
@@ -192,8 +224,13 @@ function vm.getLocalFields(source)
         and lid:sub(#id + 1, #id + 1) == vm.ID_SPLITE
         -- only one field
         and not lid:find(vm.ID_SPLITE, #id + 2) then
-            for _, src in ipairs(sources) do
+            for _, src in ipairs(sources.sets) do
                 fields[#fields+1] = src
+            end
+            if includeGets then
+                for _, src in ipairs(sources.gets) do
+                    fields[#fields+1] = src
+                end
             end
         end
     end

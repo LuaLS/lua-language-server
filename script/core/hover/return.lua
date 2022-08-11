@@ -1,34 +1,5 @@
 local vm       = require 'vm.vm'
-
----@param source parser.object
----@return integer
-local function countReturns(source)
-    local n = 0
-
-    local docs = source.bindDocs
-    if docs then
-        for _, doc in ipairs(docs) do
-            if doc.type == 'doc.return' then
-                for _, rtn in ipairs(doc.returns) do
-                    if rtn.returnIndex and rtn.returnIndex > n then
-                        n = rtn.returnIndex
-                    end
-                end
-            end
-        end
-    end
-
-    local returns = source.returns
-    if returns then
-        for _, rtn in ipairs(returns) do
-            if #rtn > n then
-                n = #rtn
-            end
-        end
-    end
-
-    return n
-end
+local guide    = require 'parser.guide'
 
 ---@param source parser.object
 ---@return parser.object[]
@@ -50,7 +21,7 @@ local function getReturnDocs(source)
 end
 
 local function asFunction(source)
-    local num = countReturns(source)
+    local _, _, num = vm.countReturnsOfFunction(source)
     if num == 0 then
         return nil
     end
@@ -62,11 +33,14 @@ local function asFunction(source)
     for i = 1, num do
         local rtn  = vm.getReturnOfFunction(source, i)
         local doc  = docs[i]
-        local name = doc and doc.name and doc.name[1] and (doc.name[1] .. ': ')
-        local text = ('%s%s'):format(
+        local name = doc and doc.name and doc.name[1]
+        if name and name ~= '...' then
+            name = name .. ': '
+        end
+        local text = rtn and ('%s%s'):format(
             name or '',
-            vm.getInfer(rtn):view()
-        )
+            vm.getInfer(rtn):view(guide.getUri(source))
+        ) or 'unknown'
         if i == 1 then
             returns[i] = ('  -> %s'):format(text)
         else
@@ -83,7 +57,14 @@ local function asDocFunction(source)
     end
     local returns = {}
     for i, rtn in ipairs(source.returns) do
-        local rtnText = vm.getInfer(rtn):view()
+        local rtnText = vm.getInfer(rtn):view(guide.getUri(source))
+        if rtn.name then
+            if rtn.name[1] == '...' then
+                rtnText = rtn.name[1] .. rtnText
+            else
+                rtnText = rtn.name[1] .. ': ' .. rtnText
+            end
+        end
         if i == 1 then
             returns[#returns+1] = ('  -> %s'):format(rtnText)
         else

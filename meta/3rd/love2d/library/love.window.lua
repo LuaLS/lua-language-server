@@ -229,7 +229,7 @@ function love.window.setIcon(imagedata) end
 ---
 ---@param width number # Display width.
 ---@param height number # Display height.
----@param flags {fullscreen: boolean, fullscreentype: love.FullscreenType, vsync: boolean, msaa: number, stencil: boolean, depth: number, resizable: boolean, borderless: boolean, centered: boolean, display: number, minwidth: number, minheight: number, highdpi: boolean, x: number, y: number, usedpiscale: boolean, srgb: boolean} # The flags table with the options:
+---@param flags? {fullscreen: boolean, fullscreentype: love.FullscreenType, vsync: boolean, msaa: number, stencil: boolean, depth: number, resizable: boolean, borderless: boolean, centered: boolean, display: number, minwidth: number, minheight: number, highdpi: boolean, x: number, y: number, usedpiscale: boolean, srgb: boolean} # The flags table with the options:
 ---@return boolean success # True if successful, false otherwise.
 function love.window.setMode(width, height, flags) end
 
@@ -258,7 +258,7 @@ function love.window.setVSync(vsync) end
 ---
 ---Displays a message box dialog above the love window. The message box contains a title, optional text, and buttons.
 ---
----@overload fun(title: string, message: string, buttonlist: table, type: love.MessageBoxType, attachtowindow: boolean):number
+---@overload fun(title: string, message: string, buttonlist: table, type?: love.MessageBoxType, attachtowindow?: boolean):number
 ---@param title string # The title of the message box.
 ---@param message string # The text inside the message box.
 ---@param type? love.MessageBoxType # The type of the message box.
@@ -300,23 +300,23 @@ function love.window.updateMode(width, height, settings) end
 ---
 ---Orientation cannot be determined.
 ---
----| '"unknown"'
+---| "unknown"
 ---
 ---Landscape orientation.
 ---
----| '"landscape"'
+---| "landscape"
 ---
 ---Landscape orientation (flipped).
 ---
----| '"landscapeflipped"'
+---| "landscapeflipped"
 ---
 ---Portrait orientation.
 ---
----| '"portrait"'
+---| "portrait"
 ---
 ---Portrait orientation (flipped).
 ---
----| '"portraitflipped"'
+---| "portraitflipped"
 
 ---
 ---Types of fullscreen modes.
@@ -325,15 +325,15 @@ function love.window.updateMode(width, height, settings) end
 ---
 ---Sometimes known as borderless fullscreen windowed mode. A borderless screen-sized window is created which sits on top of all desktop UI elements. The window is automatically resized to match the dimensions of the desktop, and its size cannot be changed.
 ---
----| '"desktop"'
+---| "desktop"
 ---
 ---Standard exclusive-fullscreen mode. Changes the display mode (actual resolution) of the monitor.
 ---
----| '"exclusive"'
+---| "exclusive"
 ---
 ---Standard exclusive-fullscreen mode. Changes the display mode (actual resolution) of the monitor.
 ---
----| '"normal"'
+---| "normal"
 
 ---
 ---Types of message box dialogs. Different types may have slightly different looks.
@@ -342,12 +342,12 @@ function love.window.updateMode(width, height, settings) end
 ---
 ---Informational dialog.
 ---
----| '"info"'
+---| "info"
 ---
 ---Warning dialog.
 ---
----| '"warning"'
+---| "warning"
 ---
 ---Error dialog.
 ---
----| '"error"'
+---| "error"

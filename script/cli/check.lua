@@ -50,14 +50,14 @@ lclient():start(function (client)
 
     ws.awaitReady(rootUri)
 
-    local disables   = config.get(rootUri, 'Lua.diagnostics.disable')
+    local disables = util.arrayToHash(config.get(rootUri, 'Lua.diagnostics.disable'))
     for name, serverity in pairs(define.DiagnosticDefaultSeverity) do
         serverity = config.get(rootUri, 'Lua.diagnostics.severity')[name] or 'Warning'
         if define.DiagnosticSeverity[serverity] > checkLevel then
             disables[name] = true
         end
     end
-    config.set(nil, 'Lua.diagnostics.disable', disables)
+    config.set(nil, 'Lua.diagnostics.disable', util.getTableKeys(disables, true))
 
     local uris = files.getAllUris(rootUri)
     local max  = #uris

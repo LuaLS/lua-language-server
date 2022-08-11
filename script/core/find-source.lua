@@ -21,7 +21,7 @@ return function (ast, position, accept)
             end
         end
         local start, finish = guide.getStartFinish(source)
-        if finish - start < len and accept[source.type] then
+        if finish - start <= len and accept[source.type] then
             result = source
             len = finish - start
         end

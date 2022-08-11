@@ -19,7 +19,7 @@ local updateType = {
     Deleted = 3,
 }
 
-fw.event(function (ev, path)
+fw.event(function(ev, path)
     if util.stringEndWith(path, '.editorconfig') then
         for uri, fsPath in pairs(loadedUris) do
             loadedUris[uri] = nil
@@ -30,17 +30,9 @@ fw.event(function (ev, path)
                 end
             end
         end
-        for _, scp in ipairs(ws.folders) do
-            diagnostics.diagnosticsScope(scp.uri)
-        end
     end
 end)
 
-config.watch(function (uri, key, value)
-    if key == "Lua.format.defaultConfig" then
-        codeFormat.set_default_config(value)
-    end
-end)
 
 local m = {}
 
@@ -51,6 +43,7 @@ function m.updateConfig(uri)
     if not m.loadedDefaultConfig then
         m.loadedDefaultConfig = true
         codeFormat.set_default_config(config.get(uri, 'Lua.format.defaultConfig'))
+        m.updateNonStandardSymbols(config.get(nil, 'Lua.runtime.nonstandardSymbol'))
     end
 
     local currentUri = uri
@@ -64,7 +57,7 @@ function m.updateConfig(uri)
         local currentPath        = furi.decode(currentUri)
         local editorConfigFSPath = fs.path(currentPath) / '.editorconfig'
         if fs.exists(editorConfigFSPath) then
-            loadedUris[uri] = editorConfigFSPath
+            loadedUris[currentUri] = editorConfigFSPath
             local status, err = codeFormat.update_config(updateType.Created, currentUri, editorConfigFSPath:string())
             if not status and err then
                 log.error(err)
@@ -82,5 +75,31 @@ function m.updateConfig(uri)
         end
     end
 end
+
+---@param symbols? string[]
+function m.updateNonStandardSymbols(symbols)
+    if symbols == nil then
+        return
+    end
+
+    local eqTokens = {}
+    for _, token in ipairs(symbols) do
+        if token:find("=") and token ~= "!=" then
+            table.insert(eqTokens, token)
+        end
+    end
+
+    if #eqTokens ~= 0 then
+        codeFormat.set_nonstandard_symbol('=', eqTokens)
+    end
+end
+
+config.watch(function(uri, key, value)
+    if  key == "Lua.format.defaultConfig" then
+        codeFormat.set_default_config(value)
+    elseif key == "Lua.runtime.nonstandardSymbol" then
+        m.updateNonStandardSymbols(value)
+    end
+end)
 
 return m

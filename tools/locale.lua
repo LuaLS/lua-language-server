@@ -3,6 +3,15 @@ package.path = package.path .. ';script/?.lua;tools/?.lua'
 local fs   = require 'bee.filesystem'
 local util = require 'utility'
 
+local function getLongStringMark(text)
+    return text:match '^%[[=]*%['
+end
+
+local function isLongStringFinish(text, mark)
+    local emark = mark:gsub('%[', ']')
+    return util.stringEndWith(text, emark)
+end
+
 local function loadLocaleFile(filePath)
     local fileContent = util.loadFile(filePath:string())
     local data = {
@@ -13,12 +22,12 @@ local function loadLocaleFile(filePath)
         return data
     end
     local current
-    local inLongString = false
+    local inLongString
     for line, lineCount in util.eachLine(fileContent) do
         if inLongString then
             current.content[#current.content+1] = line
-            if line:sub(-2) == ']]' then
-                inLongString = false
+            if isLongStringFinish(line, inLongString) then
+                inLongString = nil
             end
             goto CONTINUE
         end
@@ -44,8 +53,9 @@ local function loadLocaleFile(filePath)
                 current = nil
             else
                 current.content[#current.content+1] = line
-                if line:sub(1, 2) == '[[' then
-                    inLongString = true
+                inLongString = getLongStringMark(line)
+                if inLongString and isLongStringFinish(line, inLongString) then
+                    inLongString = false
                 end
             end
         end

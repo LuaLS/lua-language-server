@@ -5,6 +5,7 @@ local guide    = require 'parser.guide'
 local await    = require 'await'
 local define   = require 'proto.define'
 local lang     = require 'language'
+local substr   = require 'core.substring'
 
 ---@async
 local function typeHint(uri, results, start, finish)
@@ -38,7 +39,7 @@ local function typeHint(uri, results, start, finish)
             end
         end
         await.delay()
-        local view = vm.getInfer(source):view()
+        local view = vm.getInfer(source):view(uri)
         if view == 'any'
         or view == 'unknown'
         or view == 'nil' then
@@ -189,24 +190,44 @@ local function arrayIndex(uri, results, start, finish)
     end
 
     ---@async
-    guide.eachSourceBetween(state.ast, start, finish, function (source)
-        if source.type ~= 'tableexp' then
+    guide.eachSourceType(state.ast, 'table', function (source)
+        if source.finish < start or source.start > finish then
             return
         end
         await.delay()
         if option == 'Auto' then
-            if not isMixedOrLargeTable(source.parent) then
+            if not isMixedOrLargeTable(source) then
                 return
             end
         end
-        results[#results+1] = {
-            text   = ('[%d]'):format(source.tindex),
-            offset = source.start,
-            kind   = define.InlayHintKind.Other,
-            where  = 'left',
-            source = source.parent,
-        }
+        local list = {}
+        local max  = 0
+        for _, field in ipairs(source) do
+            if  field.type == 'tableexp'
+            and field.start < finish
+            and field.finish > start then
+                list[#list+1] = field
+                if field.tindex > max then
+                    max = field.tindex
+                end
+            end
+        end
+
+        if #list > 0 then
+            local length = #tostring(max)
+            local fmt    = '[%0' .. length .. 'd]'
+            for _, field in ipairs(list) do
+                results[#results+1] = {
+                    text   = fmt:format(field.tindex),
+                    offset = field.start,
+                    kind   = define.InlayHintKind.Other,
+                    where  = 'left',
+                    source = field.parent,
+                }
+            end
+        end
     end)
+
 end
 
 ---@async
@@ -238,6 +259,72 @@ local function awaitHint(uri, results, start, finish)
     end)
 end
 
+local blockTypes = {
+    'main',
+    'function',
+    'for',
+    'loop',
+    'in',
+    'do',
+    'repeat',
+    'while',
+    'ifblock',
+    'elseifblock',
+    'elseblock',
+}
+
+---@async
+local function semicolonHint(uri, results, start, finish)
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
+    local mode = config.get(uri, 'Lua.hint.semicolon')
+    if mode == 'Disable' then
+        return
+    end
+    local subber = substr(state)
+    ---@async
+    guide.eachSourceTypes(state.ast, blockTypes, function (src)
+        await.delay()
+        for i = 1, #src - 1 do
+            local current = src[i]
+            local next    = src[i+1]
+            local left    = current.finish
+            local right   = next.start
+            local text    = subber(left, right)
+            if mode == 'All' then
+                if not text:find '[,;]' then
+                    results[#results+1] = {
+                        text    = ';',
+                        offset  = left,
+                        kind    = define.InlayHintKind.Other,
+                        where   = 'right',
+                    }
+                end
+            elseif mode == 'SameLine' then
+                if not text:find '[,;\r\n]' then
+                    results[#results+1] = {
+                        text    = ';',
+                        offset  = left,
+                        kind    = define.InlayHintKind.Other,
+                        where   = 'right',
+                    }
+                end
+            end
+        end
+        if mode == 'All' then
+            local last = src[#src]
+            results[#results+1] = {
+                text    = ';',
+                offset  = last.range or last.finish,
+                kind    = define.InlayHintKind.Other,
+                where   = 'right',
+            }
+        end
+    end)
+end
+
 ---@async
 return function (uri, start, finish)
     local results = {}
@@ -245,5 +332,6 @@ return function (uri, start, finish)
     paramName(uri, results, start, finish)
     awaitHint(uri, results, start, finish)
     arrayIndex(uri, results, start, finish)
+    semicolonHint(uri, results, start, finish)
     return results
 end

@@ -50,6 +50,22 @@ local function formatIndex(key)
     return ('[%q]'):format(key)
 end
 
+local function getOptional(param)
+	if param.type == 'table' then
+		if not param.table then
+			return ''
+		end
+		for _, field in ipairs(param.table) do
+			if field.default == nil then
+				return ''
+			end
+		end
+		return '?'
+	else
+		return (param.default ~= nil) and '?' or ''
+	end
+end
+
 local buildType
 
 local function buildDocTable(tbl)
@@ -112,9 +128,9 @@ local function buildDocFunc(variant, overload)
             params[#params+1] = '...'
         else
             if param.name:find '^[\'"]' then
-                params[#params+1] = ('%s: %s|%q'):format(param.name:sub(2, -2), getTypeName(param.type), param.name)
+                params[#params+1] = ('%s%s: %s|%s'):format(param.name, getOptional(param), getTypeName(param.type), param.name)
             else
-                params[#params+1] = ('%s: %s'):format(param.name, getTypeName(param.type))
+                params[#params+1] = ('%s%s: %s'):format(param.name, getOptional(param), getTypeName(param.type))
             end
         end
     end
@@ -148,7 +164,15 @@ local function buildFunction(func, node, typeName)
             params[#params+1] = paramName
             text[#text+1] = ('---@param %s%s %s # %s'):format(
                 paramName,
-                param.default == nil and '' or '?',
+                getOptional(param),
+                buildType(param),
+                param.description
+            )
+        end
+
+        if param.name == "..." then
+            params[#params+1] = param.name
+            text[#text+1] = ('---@vararg %s # %s'):format(
                 buildType(param),
                 param.description
             )
@@ -216,7 +240,7 @@ local function buildFile(class, defs)
         text[#text+1] = ('---@alias %s'):format(getTypeName(enum.name))
         for _, constant in ipairs(enum.constants) do
             text[#text+1] = buildDescription(constant.description, constant.notes)
-            text[#text+1] = ([[---| '%s']]):format(('%q'):format(constant.name):gsub("'", "\\'"))
+            text[#text+1] = ([[---| %q]]):format(constant.name)
         end
     end
 

@@ -64,6 +64,20 @@ function m.getObjectValue(source)
     return nil
 end
 
+---@param source parser.object
+---@return parser.object?
+function m.getObjectFunctionValue(source)
+    local value = m.getObjectValue(source)
+    if value == nil then return end
+    if value.type == 'function' or value.type == 'doc.type.function' then
+        return value
+    end
+    if value.type == 'getlocal' then
+        return m.getObjectFunctionValue(value.node)
+    end
+    return value
+end
+
 m.cacheTracker = setmetatable({}, weakMT)
 
 function m.flushCache()

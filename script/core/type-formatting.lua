@@ -1,11 +1,15 @@
 local files        = require 'files'
 local lookBackward = require 'core.look-backward'
 local guide        = require "parser.guide"
+local codeFormat   = require "code_format"
 
 local function insertIndentation(uri, position, edits)
     local text   = files.getText(uri)
     local state  = files.getState(uri)
     local row    = guide.rowColOf(position)
+    if not state or not text then
+        return
+    end
     local offset = state.lines[row]
     local indent = text:match('^%s*', offset)
     for _, edit in ipairs(edits) do
@@ -16,6 +20,9 @@ end
 local function findForward(uri, position, ...)
     local text        = files.getText(uri)
     local state       = files.getState(uri)
+    if not state or not text then
+        return nil
+    end
     local offset      = guide.positionToOffset(state, position)
     local firstOffset = text:match('^[ \t]*()', offset + 1)
     if not firstOffset then
@@ -32,6 +39,9 @@ end
 local function findBackward(uri, position, ...)
     local text       = files.getText(uri)
     local state      = files.getState(uri)
+    if not state or not text then
+        return nil
+    end
     local offset     = guide.positionToOffset(state, position)
     local lastOffset = lookBackward.findAnyOffset(text, offset)
     for _, symbol in ipairs { ... } do
@@ -48,7 +58,7 @@ local function checkSplitOneLine(results, uri, position, ch)
     end
 
     local fPosition, fSymbol = findForward(uri, position, 'end', '}')
-    if not fPosition then
+    if not fPosition or not fSymbol then
         return
     end
     local bPosition = findBackward(uri, position, 'then', 'do', ')', '{')
@@ -77,7 +87,29 @@ local function checkSplitOneLine(results, uri, position, ch)
     end
 end
 
-return function (uri, position, ch)
+local function typeFormat(results, uri, position, ch, options)
+    if ch ~= '\n' then
+        return
+    end
+    local text = files.getOriginText(uri)
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
+    local converter = require("proto.converter")
+    local pos = converter.packPosition(uri, position)
+    local success, result = codeFormat.type_format(uri, text, pos.line, pos.character, options)
+    if success then
+        local range = result.range
+        results[#results+1] = {
+            text   = result.newText,
+            start  = converter.unpackPosition(uri, { line = range.start.line, character = range.start.character }),
+            finish = converter.unpackPosition(uri, { line = range["end"].line, character = range["end"].character }),
+        }
+    end
+end
+
+return function (uri, position, ch, options)
     local ast = files.getState(uri)
     if not ast then
         return nil
@@ -86,6 +118,9 @@ return function (uri, position, ch)
     local results = {}
     -- split `function () $ end`
     checkSplitOneLine(results, uri, position, ch)
+    if #results == 0 then
+        typeFormat(results, uri, position, ch, options)
+    end
 
     return results
 end

@@ -1107,7 +1107,7 @@ m.register 'textDocument/onTypeFormatting' {
         end
         local core   = require 'core.type-formatting'
         local pos    = converter.unpackPosition(uri, params.position)
-        local edits  = core(uri, pos, ch)
+        local edits  = core(uri, pos, ch, params.options)
         if not edits or #edits == 0 then
             return nil
         end

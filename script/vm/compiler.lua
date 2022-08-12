@@ -373,7 +373,8 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                         local fieldKey = guide.getKeyName(field)
                         if fieldKey and not searchedFields[fieldKey] then
                             if  not searchedFields[fieldKey]
-                            and guide.isSet(field) then
+                            and guide.isSet(field)
+                            and guide.isLiteral(field.value) then
                                 hasFounded[fieldKey] = true
                                 pushResult(field, true)
                             end

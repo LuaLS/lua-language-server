@@ -3761,3 +3761,15 @@ TEST 'integerA' [[
 for <?i?> = 1, 10 do
 end
 ]]
+
+TEST 'string' [[
+---@class A
+---@field x string
+
+---@class B : A
+local t = {}
+
+t.x = t.x
+
+print(t.<?x?>)
+]]

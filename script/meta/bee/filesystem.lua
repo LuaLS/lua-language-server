@@ -22,6 +22,10 @@ end
 function fsPath:stem()
 end
 
+---@return fs.path
+function fsPath:extension()
+end
+
 ---@class fs.status
 local fsStatus = {}
 

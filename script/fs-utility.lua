@@ -620,6 +620,8 @@ function m.fileSync(source, target, option)
     return option
 end
 
+---@param dir fs.path
+---@param callback fun(fullPath: fs.path)
 function m.scanDirectory(dir, callback)
     for fullpath in fs.pairs(dir) do
         local status = fs.symlink_status(fullpath):type()

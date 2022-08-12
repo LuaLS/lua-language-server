@@ -18,6 +18,10 @@ end
 function fsPath:filename()
 end
 
+---@return fs.path
+function fsPath:stem()
+end
+
 ---@class fs.status
 local fsStatus = {}
 
@@ -86,6 +90,11 @@ end
 ---@param target fs.path
 ---@param options? `fs.copy_options.overwrite_existing`
 function fs.copy_file(source, target, options)
+end
+
+---@param oldPath fs.path
+---@param newPath fs.path
+function fs.rename(oldPath, newPath)
 end
 
 return fs

@@ -190,6 +190,7 @@ Array<string>
 
 * ``"action-after-return"``
 * ``"ambiguity-1"``
+* ``"ambiguous-syntax"``
 * ``"args-after-dots"``
 * ``"assign-type-mismatch"``
 * ``"await-in-sync"``
@@ -654,26 +655,74 @@ object<string, string>
     Enable ambiguous operator precedence diagnostics. For example, the `num or 0 + 1` expression will be suggested `(num or 0) + 1` instead.
     */
     "ambiguity-1": "Any",
+    /*
+    Enable diagnostics for assignments in which the value's type does not match the type of the assigned variable.
+    */
     "assign-type-mismatch": "Opened",
+    /*
+    Enable diagnostics for calls of asynchronous functions within a synchronous function.
+    */
     "await-in-sync": "None",
+    /*
+    Enable diagnostics for casts of local variables where the target type does not match the defined type.
+    */
     "cast-local-type": "Opened",
+    /*
+    Enable diagnostics for casts where the target type does not match the initial type.
+    */
     "cast-type-mismatch": "Opened",
     "circle-doc-class": "Any",
+    /*
+    Enable diagnostics for attempts to close a variable with a non-object.
+    */
     "close-non-object": "Any",
+    /*
+    Enable diagnostics for code placed after a break statement in a loop.
+    */
     "code-after-break": "Opened",
+    /*
+    Enable diagnostics for incorrectly styled lines.
+    */
     "codestyle-check": "None",
+    /*
+    Enable diagnostics for `for` loops which will never reach their max/limit because the loop is incrementing instead of decrementing.
+    */
     "count-down-loop": "Any",
+    /*
+    Enable diagnostics to highlight deprecated API.
+    */
     "deprecated": "Any",
+    /*
+    Enable diagnostics for files which are required by two different paths.
+    */
     "different-requires": "Any",
+    /*
+    Enable diagnostics for calls of functions annotated with `---@nodiscard` where the return values are ignored.
+    */
     "discard-returns": "Any",
+    /*
+    Enable diagnostics to highlight a field annotation without a defining class annotation.
+    */
     "doc-field-no-class": "Any",
+    /*
+    Enable diagnostics for a duplicated alias annotation name.
+    */
     "duplicate-doc-alias": "Any",
+    /*
+    Enable diagnostics for a duplicated field annotation name.
+    */
     "duplicate-doc-field": "Any",
+    /*
+    Enable diagnostics for a duplicated param annotation name.
+    */
     "duplicate-doc-param": "Any",
     /*
     Enable duplicate table index diagnostics.
     */
     "duplicate-index": "Any",
+    /*
+    Enable diagnostics for setting the same field in a class more than once.
+    */
     "duplicate-set-field": "Any",
     /*
     Enable empty code block diagnostics.
@@ -687,9 +736,21 @@ object<string, string>
     Enable lowercase global variable definition diagnostics.
     */
     "lowercase-global": "Any",
+    /*
+    Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.
+    */
     "missing-parameter": "Any",
+    /*
+    Enable diagnostics for functions with return annotations which have no return statement.
+    */
     "missing-return": "Any",
+    /*
+    Enable diagnostics for return statements without values although the containing function declares returns.
+    */
     "missing-return-value": "Any",
+    /*
+    Enable diagnostics for variable usages if `nil` or an optional (potentially `nil`) value was assigned to the variable before.
+    */
     "need-check-nil": "Opened",
     /*
     Enable newfield call diagnostics. It is raised when the parenthesis of a function call appear on the following line when defining a field in a table.
@@ -699,8 +760,17 @@ object<string, string>
     Enable newline call diagnostics. Is's raised when a line starting with `(` is encountered, which is syntactically parsed as a function call on the previous line.
     */
     "newline-call": "Any",
+    /*
+    Enable diagnostics for cases in which the type cannot be inferred.
+    */
     "no-unknown": "None",
+    /*
+    Enable diagnostics for calls to `coroutine.yield()` when it is not permitted.
+    */
     "not-yieldable": "None",
+    /*
+    Enable diagnostics for function calls where the type of a provided parameter does not match the type of the annotated function definition.
+    */
     "param-type-mismatch": "Opened",
     /*
     Enable redefined local variable diagnostics.
@@ -710,34 +780,73 @@ object<string, string>
     Enable redundant function parameter diagnostics.
     */
     "redundant-parameter": "Any",
+    /*
+    Enable diagnostics for return statements which are not needed because the function would exit on its own.
+    */
     "redundant-return": "Opened",
+    /*
+    Enable diagnostics for return statements which return an extra value which is not specified by a return annotation.
+    */
     "redundant-return-value": "Any",
     /*
     Enable the redundant values assigned diagnostics. It's raised during assignment operation, when the number of values is higher than the number of objects being assigned.
     */
     "redundant-value": "Any",
+    /*
+    Enable diagnostics for return values whose type does not match the type declared in the corresponding return annotation.
+    */
     "return-type-mismatch": "Opened",
+    /*
+    Enable diagnostics for typos in strings.
+    */
     "spell-check": "None",
     /*
     Enable trailing space diagnostics.
     */
     "trailing-space": "Opened",
+    /*
+    Enable diagnostics on multiple assignments if not all variables obtain a value (e.g., `local x,y = 1`).
+    */
     "unbalanced-assignments": "Any",
+    /*
+    Enable diagnostics for class annotations in which an undefined class is referenced.
+    */
     "undefined-doc-class": "Any",
+    /*
+    Enable diagnostics for type annotations referencing an undefined type or alias.
+    */
     "undefined-doc-name": "Any",
+    /*
+    Enable diagnostics for cases in which a parameter annotation is given without declaring the parameter in the function definition.
+    */
     "undefined-doc-param": "Any",
     /*
     Enable undefined environment variable diagnostics. It's raised when `_ENV` table is set to a new literal table, but the used global variable is no longer present in the global environment.
     */
     "undefined-env-child": "Any",
+    /*
+    Enable diagnostics for cases in which an undefined field of a variable is read.
+    */
     "undefined-field": "Opened",
     /*
     Enable undefined global variable diagnostics.
     */
     "undefined-global": "Any",
+    /*
+    Enable diagnostics for casts of undefined variables.
+    */
     "unknown-cast-variable": "Any",
+    /*
+    Enable diagnostics in cases in which an unknown diagnostics code is entered.
+    */
     "unknown-diag-code": "Any",
+    /*
+    Enable diagnostics for unknown operators.
+    */
     "unknown-operator": "Any",
+    /*
+    Enable diagnostics for unreachable code.
+    */
     "unreachable-code": "Opened",
     /*
     Enable unused function diagnostics.
@@ -790,26 +899,74 @@ object<string, string>
     Enable ambiguous operator precedence diagnostics. For example, the `num or 0 + 1` expression will be suggested `(num or 0) + 1` instead.
     */
     "ambiguity-1": "Warning",
+    /*
+    Enable diagnostics for assignments in which the value's type does not match the type of the assigned variable.
+    */
     "assign-type-mismatch": "Warning",
+    /*
+    Enable diagnostics for calls of asynchronous functions within a synchronous function.
+    */
     "await-in-sync": "Warning",
+    /*
+    Enable diagnostics for casts of local variables where the target type does not match the defined type.
+    */
     "cast-local-type": "Warning",
+    /*
+    Enable diagnostics for casts where the target type does not match the initial type.
+    */
     "cast-type-mismatch": "Warning",
     "circle-doc-class": "Warning",
+    /*
+    Enable diagnostics for attempts to close a variable with a non-object.
+    */
     "close-non-object": "Warning",
+    /*
+    Enable diagnostics for code placed after a break statement in a loop.
+    */
     "code-after-break": "Hint",
+    /*
+    Enable diagnostics for incorrectly styled lines.
+    */
     "codestyle-check": "Warning",
+    /*
+    Enable diagnostics for `for` loops which will never reach their max/limit because the loop is incrementing instead of decrementing.
+    */
     "count-down-loop": "Warning",
+    /*
+    Enable diagnostics to highlight deprecated API.
+    */
     "deprecated": "Warning",
+    /*
+    Enable diagnostics for files which are required by two different paths.
+    */
     "different-requires": "Warning",
+    /*
+    Enable diagnostics for calls of functions annotated with `---@nodiscard` where the return values are ignored.
+    */
     "discard-returns": "Warning",
+    /*
+    Enable diagnostics to highlight a field annotation without a defining class annotation.
+    */
     "doc-field-no-class": "Warning",
+    /*
+    Enable diagnostics for a duplicated alias annotation name.
+    */
     "duplicate-doc-alias": "Warning",
+    /*
+    Enable diagnostics for a duplicated field annotation name.
+    */
     "duplicate-doc-field": "Warning",
+    /*
+    Enable diagnostics for a duplicated param annotation name.
+    */
     "duplicate-doc-param": "Warning",
     /*
     Enable duplicate table index diagnostics.
     */
     "duplicate-index": "Warning",
+    /*
+    Enable diagnostics for setting the same field in a class more than once.
+    */
     "duplicate-set-field": "Warning",
     /*
     Enable empty code block diagnostics.
@@ -823,9 +980,21 @@ object<string, string>
     Enable lowercase global variable definition diagnostics.
     */
     "lowercase-global": "Information",
+    /*
+    Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.
+    */
     "missing-parameter": "Warning",
+    /*
+    Enable diagnostics for functions with return annotations which have no return statement.
+    */
     "missing-return": "Warning",
+    /*
+    Enable diagnostics for return statements without values although the containing function declares returns.
+    */
     "missing-return-value": "Warning",
+    /*
+    Enable diagnostics for variable usages if `nil` or an optional (potentially `nil`) value was assigned to the variable before.
+    */
     "need-check-nil": "Warning",
     /*
     Enable newfield call diagnostics. It is raised when the parenthesis of a function call appear on the following line when defining a field in a table.
@@ -835,8 +1004,17 @@ object<string, string>
     Enable newline call diagnostics. Is's raised when a line starting with `(` is encountered, which is syntactically parsed as a function call on the previous line.
     */
     "newline-call": "Warning",
+    /*
+    Enable diagnostics for cases in which the type cannot be inferred.
+    */
     "no-unknown": "Warning",
+    /*
+    Enable diagnostics for calls to `coroutine.yield()` when it is not permitted.
+    */
     "not-yieldable": "Warning",
+    /*
+    Enable diagnostics for function calls where the type of a provided parameter does not match the type of the annotated function definition.
+    */
     "param-type-mismatch": "Warning",
     /*
     Enable redefined local variable diagnostics.
@@ -846,34 +1024,73 @@ object<string, string>
     Enable redundant function parameter diagnostics.
     */
     "redundant-parameter": "Warning",
+    /*
+    Enable diagnostics for return statements which are not needed because the function would exit on its own.
+    */
     "redundant-return": "Hint",
+    /*
+    Enable diagnostics for return statements which return an extra value which is not specified by a return annotation.
+    */
     "redundant-return-value": "Warning",
     /*
     Enable the redundant values assigned diagnostics. It's raised during assignment operation, when the number of values is higher than the number of objects being assigned.
     */
     "redundant-value": "Warning",
+    /*
+    Enable diagnostics for return values whose type does not match the type declared in the corresponding return annotation.
+    */
     "return-type-mismatch": "Warning",
+    /*
+    Enable diagnostics for typos in strings.
+    */
     "spell-check": "Information",
     /*
     Enable trailing space diagnostics.
     */
     "trailing-space": "Hint",
+    /*
+    Enable diagnostics on multiple assignments if not all variables obtain a value (e.g., `local x,y = 1`).
+    */
     "unbalanced-assignments": "Warning",
+    /*
+    Enable diagnostics for class annotations in which an undefined class is referenced.
+    */
     "undefined-doc-class": "Warning",
+    /*
+    Enable diagnostics for type annotations referencing an undefined type or alias.
+    */
     "undefined-doc-name": "Warning",
+    /*
+    Enable diagnostics for cases in which a parameter annotation is given without declaring the parameter in the function definition.
+    */
     "undefined-doc-param": "Warning",
     /*
     Enable undefined environment variable diagnostics. It's raised when `_ENV` table is set to a new literal table, but the used global variable is no longer present in the global environment.
     */
     "undefined-env-child": "Information",
+    /*
+    Enable diagnostics for cases in which an undefined field of a variable is read.
+    */
     "undefined-field": "Warning",
     /*
     Enable undefined global variable diagnostics.
     */
     "undefined-global": "Warning",
+    /*
+    Enable diagnostics for casts of undefined variables.
+    */
     "unknown-cast-variable": "Warning",
+    /*
+    Enable diagnostics in cases in which an unknown diagnostics code is entered.
+    */
     "unknown-diag-code": "Warning",
+    /*
+    Enable diagnostics for unknown operators.
+    */
     "unknown-operator": "Warning",
+    /*
+    Enable diagnostics for unreachable code.
+    */
     "unreachable-code": "Hint",
     /*
     Enable unused function diagnostics.

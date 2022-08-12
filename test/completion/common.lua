@@ -3699,6 +3699,37 @@ f(<??>)
 }
 
 TEST [[
+---@enum A
+ppp.fff = {
+    x = 1,
+    y = 'ss',
+}
+
+---@param x A
+local function f(x) end
+
+f(<??>)
+]]
+{
+    {
+        label    = 'ppp.fff.x',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label    = 'ppp.fff.y',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label    = '1',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label    = '"ss"',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+}
+
+TEST [[
 --
 <??>
 ]]

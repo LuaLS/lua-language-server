@@ -104,6 +104,11 @@ function mt:getName()
 end
 
 ---@return string
+function mt:getCodeName()
+    return (self.name:gsub(vm.ID_SPLITE, '.'))
+end
+
+---@return string
 function mt:asKeyName()
     return self.cate .. '|' .. self.name
 end

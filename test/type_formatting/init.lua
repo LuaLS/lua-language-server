@@ -6,7 +6,7 @@ local catch = require 'catch'
 rawset(_G, 'TEST', true)
 
 function TEST(script)
-    return function (expect)
+    return function(expect)
         local newScript, catched = catch(script, '?')
         files.setText('', newScript)
         local edits = core('', catched['?'][1][1], expect.ch)
@@ -123,5 +123,11 @@ end
 ]]
 {
     ch = '\n',
-    edits = {}
+    edits = {
+        {
+            start  = 0,
+            finish = 10000,
+            text   = 'if true then\n',
+        }
+    }
 }

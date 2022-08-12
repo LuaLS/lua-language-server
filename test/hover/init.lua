@@ -2137,7 +2137,6 @@ function test2()
   3. integer
 ]]
 
-do return end
 TEST [[
 ---@param x number
 ---@return boolean

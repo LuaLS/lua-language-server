@@ -1697,7 +1697,15 @@ local function bindDoc(source, binded)
                 if not source.bindDocs then
                     source.bindDocs = {}
                 end
-                source.bindDocs[#source.bindDocs+1] = doc
+                source.bindDocs[#source.bindDocs + 1] = doc
+                if source.args then
+                    for _, arg in ipairs(source.args) do
+                        if arg[1] == doc.param[1] then
+                            bindDocWithSource(doc, arg)
+                            break
+                        end
+                    end
+                end
             end
         elseif doc.type == 'doc.vararg' then
             if source.type == '...' then

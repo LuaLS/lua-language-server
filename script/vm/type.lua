@@ -252,6 +252,17 @@ function vm.isSubType(uri, child, parent, mark)
     return false
 end
 
+---@param node string|vm.node|vm.object
+function vm.isUnknown(node)
+    if type(node) == 'string' then
+        return node == 'unknown'
+    end
+    if node.type == 'vm.node' then
+        return not node:hasKnownType()
+    end
+    return false
+end
+
 ---@param uri uri
 ---@param tnode vm.node
 ---@param knode vm.node|string
@@ -280,6 +291,9 @@ function vm.getTableValue(uri, tnode, knode, inversion)
             result:merge(vm.compileNode(tn.node))
         end
         if tn.type == 'table' then
+            if vm.isUnknown(knode) then
+                goto CONTINUE
+            end
             for _, field in ipairs(tn) do
                 if  field.type == 'tableindex'
                 and field.value then
@@ -315,6 +329,7 @@ function vm.getTableValue(uri, tnode, knode, inversion)
                 end
             end
         end
+        ::CONTINUE::
     end
     if result:isEmpty() then
         return nil
@@ -350,6 +365,9 @@ function vm.getTableKey(uri, tnode, vnode, reverse)
             result:merge(vm.declareGlobal('type', 'integer'))
         end
         if tn.type == 'table' then
+            if vm.isUnknown(tnode) then
+                goto CONTINUE
+            end
             for _, field in ipairs(tn) do
                 if field.type == 'tableindex' then
                     if field.index then
@@ -364,6 +382,7 @@ function vm.getTableKey(uri, tnode, vnode, reverse)
                 end
             end
         end
+        ::CONTINUE::
     end
     if result:isEmpty() then
         return nil

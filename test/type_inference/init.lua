@@ -3773,3 +3773,13 @@ t.x = t.x
 
 print(t.<?x?>)
 ]]
+
+TEST 'unknown' [[
+local t = {
+    x = 1,
+}
+
+local x
+
+local <?v?> = t[x]
+]]

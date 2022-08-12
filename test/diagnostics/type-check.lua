@@ -775,6 +775,15 @@ f(1)
 f(<!3!>)
 ]]
 
+TEST [[
+local t = {
+    x = 1,
+}
+
+local x
+t[x] = true
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

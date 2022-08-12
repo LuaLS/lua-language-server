@@ -244,18 +244,20 @@ function m.getDiagAndErrNameMap()
         for name in pairs(m.getDefaultSeverity()) do
             names[name] = true
         end
-        local path = package.searchpath('parser.compile', package.path)
-        if path then
-            local f = io.open(path)
-            if f then
-                for line in f:lines() do
-                    local name = line:match([=[type%s*=%s*['"](%u[%u_]+%u)['"]]=])
-                    if name then
-                        local id = name:lower():gsub('_', '-')
-                        names[id] = true
+        for _, fileName in ipairs {'parser.compile', 'parser.luadoc'} do
+            local path = package.searchpath(fileName, package.path)
+            if path then
+                local f = io.open(path)
+                if f then
+                    for line in f:lines() do
+                        local name = line:match([=[type%s*=%s*['"](%u[%u_]+%u)['"]]=])
+                        if name then
+                            local id = name:lower():gsub('_', '-')
+                            names[id] = true
+                        end
                     end
+                    f:close()
                 end
-                f:close()
             end
         end
         table.sort(names)

@@ -1629,6 +1629,14 @@ local function bindGeneric(binded)
     end
 end
 
+local function bindDocWithSource(doc, source)
+    if not source.bindDocs then
+        source.bindDocs = {}
+    end
+    source.bindDocs[#source.bindDocs+1] = doc
+    doc.bindSource = source
+end
+
 local function bindDoc(source, binded)
     local isParam = source.type == 'self'
                 or  source.type == 'local'
@@ -1651,6 +1659,8 @@ local function bindDoc(source, binded)
             or isParam then
                 goto CONTINUE
             end
+            bindDocWithSource(doc, source)
+            ok = true
         elseif doc.type == 'doc.type' then
             if source.type == 'function'
             or isParam
@@ -1658,6 +1668,8 @@ local function bindDoc(source, binded)
                 goto CONTINUE
             end
             source._bindedDocType = true
+            bindDocWithSource(doc, source)
+            ok = true
         elseif doc.type == 'doc.overload' then
             if not source.bindDocs then
                 source.bindDocs = {}
@@ -1666,61 +1678,53 @@ local function bindDoc(source, binded)
             if source.type ~= 'function' then
                 doc.bindSource = source
             end
+            bindDocWithSource(doc, source)
+            ok = true
         elseif doc.type == 'doc.param' then
-            local suc
             if  isParam
             and doc.param[1] == source[1] then
-                suc = true
+                bindDocWithSource(doc, source)
+                ok = true
             elseif source.type == '...'
             and    doc.param[1] == '...' then
-                suc = true
+                bindDocWithSource(doc, source)
+                ok = true
             elseif source.type == 'self'
             and    doc.param[1] == 'self' then
-                suc = true
-            end
-            if source.type == 'function' then
+                bindDocWithSource(doc, source)
+                ok = true
+            elseif source.type == 'function' then
                 if not source.bindDocs then
                     source.bindDocs = {}
                 end
                 source.bindDocs[#source.bindDocs+1] = doc
             end
-
-            if not suc then
-                goto CONTINUE
-            end
         elseif doc.type == 'doc.vararg' then
-            if source.type ~= '...' then
-                goto CONTINUE
+            if source.type == '...' then
+                bindDocWithSource(doc, source)
+                ok = true
             end
         elseif doc.type == 'doc.return'
         or     doc.type == 'doc.generic'
         or     doc.type == 'doc.async'
         or     doc.type == 'doc.nodiscard' then
-            if source.type ~= 'function' then
-                goto CONTINUE
+            if source.type == 'function' then
+                bindDocWithSource(doc, source)
+                ok = true
             end
         elseif doc.type == 'doc.enum' then
             if source.type == 'table' then
-                goto OK
+                bindDocWithSource(doc, source)
+                ok = true
             end
             if source.value and source.value.type == 'table' then
-                if not source.value.bindDocs then
-                    source.value.bindDocs = {}
-                end
-                source.value.bindDocs[#source.value.bindDocs+1] = doc
-                doc.bindSource = source.value
+                bindDocWithSource(doc, source.value)
+                goto CONTINUE
             end
-            goto CONTINUE
-        elseif doc.type ~= 'doc.comment' then
-            goto CONTINUE
+        elseif doc.type == 'doc.comment' then
+            bindDocWithSource(doc, source)
+            ok = true
         end
-        ::OK::
-        if not source.bindDocs then
-            source.bindDocs = {}
-        end
-        source.bindDocs[#source.bindDocs+1] = doc
-        doc.bindSource = source
-        ok = true
         ::CONTINUE::
     end
     return ok

@@ -2136,3 +2136,13 @@ function test2()
   2. integer
   3. integer
 ]]
+
+do return end
+TEST [[
+---@param x number
+---@return boolean
+local function <?f?>(
+    x
+)
+end
+]]

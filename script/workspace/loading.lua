@@ -46,7 +46,7 @@ function mt:checkMaxPreload(uri)
     client.requestMessage('Info'
         , lang.script('MWS_MAX_PRELOAD', max)
         , {
-            lang.script
+            lang.script('WINDOW_INCREASE_UPPER_LIMIT'),
         }
         , function (_, index)
             if index == 1 then

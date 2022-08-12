@@ -51,19 +51,19 @@ local function formatIndex(key)
 end
 
 local function getOptional(param)
-	if param.type == 'table' then
-		if not param.table then
-			return ''
-		end
-		for _, field in ipairs(param.table) do
-			if field.default == nil then
-				return ''
-			end
-		end
-		return '?'
-	else
-		return (param.default ~= nil) and '?' or ''
-	end
+    if param.type == 'table' then
+        if not param.table then
+            return ''
+        end
+        for _, field in ipairs(param.table) do
+            if field.default == nil then
+                return ''
+            end
+        end
+        return '?'
+    else
+        return (param.default ~= nil) and '?' or ''
+    end
 end
 
 local buildType
@@ -196,7 +196,7 @@ local function buildFunction(func, node, typeName)
 end
 
 local function buildFile(class, defs)
-    local filePath = libraryPath / (class .. '.lua')
+    local filePath = libraryPath / (class:gsub('%.', '/') .. '.lua')
     local text = {}
 
     text[#text+1] = '---@meta'
@@ -251,6 +251,7 @@ local function buildFile(class, defs)
 
     text[#text+1] = ''
 
+    fs.create_directories(filePath:parent_path())
     fsu.saveFile(filePath, table.concat(text, '\n'))
 end
 

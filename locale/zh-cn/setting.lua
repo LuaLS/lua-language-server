@@ -318,3 +318,77 @@ config.diagnostics['empty-block']           =
 '空代码块'
 config.diagnostics['redundant-value']       =
 '赋值操作时，值的数量比被赋值的对象多'
+config.diagnostics['assign-type-mismatch']  = -- TODO: need translate!
+'Enable diagnostics for assignments in which the value\'s type does not match the type of the assigned variable.'
+config.diagnostics['await-in-sync']         = -- TODO: need translate!
+'Enable diagnostics for calls of asynchronous functions within a synchronous function.'
+config.diagnostics['cast-local-type']    = -- TODO: need translate!
+'Enable diagnostics for casts of local variables where the target type does not match the defined type.'
+config.diagnostics['cast-type-mismatch']    = -- TODO: need translate!
+'Enable diagnostics for casts where the target type does not match the initial type.'
+config.diagnostics['circular-doc-class']    = -- TODO: need translate!
+'Enable diagnostics for two classes inheriting from each other introducing a circular relation.'
+config.diagnostics['close-non-object']      = -- TODO: need translate!
+'Enable diagnostics for attempts to close a variable with a non-object.'
+config.diagnostics['code-after-break']      = -- TODO: need translate!
+'Enable diagnostics for code placed after a break statement in a loop.'
+config.diagnostics['codestyle-check']       = -- TODO: need translate!
+'Enable diagnostics for incorrectly styled lines.'
+config.diagnostics['count-down-loop']       = -- TODO: need translate!
+'Enable diagnostics for `for` loops which will never reach their max/limit because the loop is incrementing instead of decrementing.'
+config.diagnostics['deprecated']            = -- TODO: need translate!
+'Enable diagnostics to highlight deprecated API.'
+config.diagnostics['different-requires']    = -- TODO: need translate!
+'Enable diagnostics for files which are required by two different paths.'
+config.diagnostics['discard-returns']       = -- TODO: need translate!
+'Enable diagnostics for calls of functions annotated with `---@nodiscard` where the return values are ignored.'
+config.diagnostics['doc-field-no-class']    = -- TODO: need translate!
+'Enable diagnostics to highlight a field annotation without a defining class annotation.'
+config.diagnostics['duplicate-doc-alias']   = -- TODO: need translate!
+'Enable diagnostics for a duplicated alias annotation name.'
+config.diagnostics['duplicate-doc-field']   = -- TODO: need translate!
+'Enable diagnostics for a duplicated field annotation name.'
+config.diagnostics['duplicate-doc-param']   = -- TODO: need translate!
+'Enable diagnostics for a duplicated param annotation name.'
+config.diagnostics['duplicate-set-field']   = -- TODO: need translate!
+'Enable diagnostics for setting the same field in a class more than once.'
+config.diagnostics['missing-parameter']     = -- TODO: need translate!
+'Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.'
+config.diagnostics['missing-return']        = -- TODO: need translate!
+'Enable diagnostics for functions with return annotations which have no return statement.'
+config.diagnostics['missing-return-value']  = -- TODO: need translate!
+'Enable diagnostics for return statements without values although the containing function declares returns.'
+config.diagnostics['need-check-nil']        = -- TODO: need translate!
+'Enable diagnostics for variable usages if `nil` or an optional (potentially `nil`) value was assigned to the variable before.'
+config.diagnostics['no-unknown']            = -- TODO: need translate!
+'Enable diagnostics for cases in which the type cannot be inferred.'
+config.diagnostics['not-yieldable']         = -- TODO: need translate!
+'Enable diagnostics for calls to `coroutine.yield()` when it is not permitted.'
+config.diagnostics['param-type-mismatch']   = -- TODO: need translate!
+'Enable diagnostics for function calls where the type of a provided parameter does not match the type of the annotated function definition.'
+config.diagnostics['redundant-return']      = -- TODO: need translate!
+'Enable diagnostics for return statements which are not needed because the function would exit on its own.'
+config.diagnostics['redundant-return-value']= -- TODO: need translate!
+'Enable diagnostics for return statements which return an extra value which is not specified by a return annotation.'
+config.diagnostics['return-type-mismatch']  = -- TODO: need translate!
+'Enable diagnostics for return values whose type does not match the type declared in the corresponding return annotation.'
+config.diagnostics['spell-check']           = -- TODO: need translate!
+'Enable diagnostics for typos in strings.'
+config.diagnostics['unbalanced-assignments']= -- TODO: need translate!
+'Enable diagnostics on multiple assignments if not all variables obtain a value (e.g., `local x,y = 1`).'
+config.diagnostics['undefined-doc-class']   = -- TODO: need translate!
+'Enable diagnostics for class annotations in which an undefined class is referenced.'
+config.diagnostics['undefined-doc-name']    = -- TODO: need translate!
+'Enable diagnostics for type annotations referencing an undefined type or alias.'
+config.diagnostics['undefined-doc-param']   = -- TODO: need translate!
+'Enable diagnostics for cases in which a parameter annotation is given without declaring the parameter in the function definition.'
+config.diagnostics['undefined-field']       = -- TODO: need translate!
+'Enable diagnostics for cases in which an undefined field of a variable is read.'
+config.diagnostics['unknown-cast-variable'] = -- TODO: need translate!
+'Enable diagnostics for casts of undefined variables.'
+config.diagnostics['unknown-diag-code']     = -- TODO: need translate!
+'Enable diagnostics in cases in which an unknown diagnostics code is entered.'
+config.diagnostics['unknown-operator']      = -- TODO: need translate!
+'Enable diagnostics for unknown operators.'
+config.diagnostics['unreachable-code']      = -- TODO: need translate!
+'Enable diagnostics for unreachable code.'

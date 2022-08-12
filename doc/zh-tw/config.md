@@ -190,6 +190,7 @@ Array<string>
 
 * ``"action-after-return"``
 * ``"ambiguity-1"``
+* ``"ambiguous-syntax"``
 * ``"args-after-dots"``
 * ``"assign-type-mismatch"``
 * ``"await-in-sync"``

@@ -319,3 +319,77 @@ config.diagnostics['empty-block']           =
 'Enable empty code block diagnostics.'
 config.diagnostics['redundant-value']       =
 'Enable the redundant values assigned diagnostics. It\'s raised during assignment operation, when the number of values is higher than the number of objects being assigned.'
+config.diagnostics['assign-type-mismatch']  =
+'Enable diagnostics for assignments in which the value\'s type does not match the type of the assigned variable.'
+config.diagnostics['await-in-sync']         =
+'Enable diagnostics for calls of asynchronous functions within a synchronous function.'
+config.diagnostics['cast-local-type']    =
+'Enable diagnostics for casts of local variables where the target type does not match the defined type.'
+config.diagnostics['cast-type-mismatch']    =
+'Enable diagnostics for casts where the target type does not match the initial type.'
+config.diagnostics['circular-doc-class']    =
+'Enable diagnostics for two classes inheriting from each other introducing a circular relation.'
+config.diagnostics['close-non-object']      =
+'Enable diagnostics for attempts to close a variable with a non-object.'
+config.diagnostics['code-after-break']      =
+'Enable diagnostics for code placed after a break statement in a loop.'
+config.diagnostics['codestyle-check']       =
+'Enable diagnostics for incorrectly styled lines.'
+config.diagnostics['count-down-loop']       =
+'Enable diagnostics for `for` loops which will never reach their max/limit because the loop is incrementing instead of decrementing.'
+config.diagnostics['deprecated']            =
+'Enable diagnostics to highlight deprecated API.'
+config.diagnostics['different-requires']    =
+'Enable diagnostics for files which are required by two different paths.'
+config.diagnostics['discard-returns']       =
+'Enable diagnostics for calls of functions annotated with `---@nodiscard` where the return values are ignored.'
+config.diagnostics['doc-field-no-class']    =
+'Enable diagnostics to highlight a field annotation without a defining class annotation.'
+config.diagnostics['duplicate-doc-alias']   =
+'Enable diagnostics for a duplicated alias annotation name.'
+config.diagnostics['duplicate-doc-field']   =
+'Enable diagnostics for a duplicated field annotation name.'
+config.diagnostics['duplicate-doc-param']   =
+'Enable diagnostics for a duplicated param annotation name.'
+config.diagnostics['duplicate-set-field']   =
+'Enable diagnostics for setting the same field in a class more than once.'
+config.diagnostics['missing-parameter']     =
+'Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.'
+config.diagnostics['missing-return']        =
+'Enable diagnostics for functions with return annotations which have no return statement.'
+config.diagnostics['missing-return-value']  =
+'Enable diagnostics for return statements without values although the containing function declares returns.'
+config.diagnostics['need-check-nil']        =
+'Enable diagnostics for variable usages if `nil` or an optional (potentially `nil`) value was assigned to the variable before.'
+config.diagnostics['no-unknown']            =
+'Enable diagnostics for cases in which the type cannot be inferred.'
+config.diagnostics['not-yieldable']         =
+'Enable diagnostics for calls to `coroutine.yield()` when it is not permitted.'
+config.diagnostics['param-type-mismatch']   =
+'Enable diagnostics for function calls where the type of a provided parameter does not match the type of the annotated function definition.'
+config.diagnostics['redundant-return']      =
+'Enable diagnostics for return statements which are not needed because the function would exit on its own.'
+config.diagnostics['redundant-return-value']=
+'Enable diagnostics for return statements which return an extra value which is not specified by a return annotation.'
+config.diagnostics['return-type-mismatch']  =
+'Enable diagnostics for return values whose type does not match the type declared in the corresponding return annotation.'
+config.diagnostics['spell-check']           =
+'Enable diagnostics for typos in strings.'
+config.diagnostics['unbalanced-assignments']=
+'Enable diagnostics on multiple assignments if not all variables obtain a value (e.g., `local x,y = 1`).'
+config.diagnostics['undefined-doc-class']   =
+'Enable diagnostics for class annotations in which an undefined class is referenced.'
+config.diagnostics['undefined-doc-name']    =
+'Enable diagnostics for type annotations referencing an undefined type or alias.'
+config.diagnostics['undefined-doc-param']   =
+'Enable diagnostics for cases in which a parameter annotation is given without declaring the parameter in the function definition.'
+config.diagnostics['undefined-field']       =
+'Enable diagnostics for cases in which an undefined field of a variable is read.'
+config.diagnostics['unknown-cast-variable'] =
+'Enable diagnostics for casts of undefined variables.'
+config.diagnostics['unknown-diag-code']     =
+'Enable diagnostics in cases in which an unknown diagnostics code is entered.'
+config.diagnostics['unknown-operator']      =
+'Enable diagnostics for unknown operators.'
+config.diagnostics['unreachable-code']      =
+'Enable diagnostics for unreachable code.'

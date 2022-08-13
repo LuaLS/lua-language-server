@@ -243,14 +243,25 @@ local function initBuiltIn(uri)
         if status == 'disable' then
             goto CONTINUE
         end
-        libName = libName .. '.lua'
+        
         ---@type fs.path
-        local libPath = templateDir / libName
+        local libPath = templateDir / (libName .. '.lua')
         local metaDoc = compileSingleMetaDoc(uri, fsu.loadFile(libPath), metaLang, status)
         if metaDoc then
             metaDoc = encoder.encode(encoding, metaDoc, 'auto')
-            out:saveFile(libName, metaDoc)
-            local outputPath = metaPath / libName
+
+            local outputLibName = libName:gsub('%.', '/') .. '.lua'
+            if outputLibName ~= libName then
+                out:createDirectories(fs.path(outputLibName):parent_path())
+            end
+
+            local ok, err = out:saveFile(outputLibName, metaDoc)
+            if not ok then
+                log.debug("Save Meta File:", err)
+                goto CONTINUE
+            end
+
+            local outputPath = metaPath / outputLibName
             m.metaPaths[outputPath:string()] = true
             log.debug('Meta path:', outputPath:string())
         end

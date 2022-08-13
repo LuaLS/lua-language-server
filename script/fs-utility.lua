@@ -254,6 +254,7 @@ function dfs:saveFile(path, text)
         return false, '无法打开:' .. path
     end
     dir[filename] = text
+    return true
 end
 
 ---@param path   string|fs.path

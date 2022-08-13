@@ -1,6 +1,7 @@
+---#if not JIT then DISABLE() end
 ---@meta
 
-
+---@version JIT
 --- The string buffer library allows high-performance manipulation of string-like data.
 ---
 --- Unlike Lua strings, which are constants, string buffers are mutable sequences of 8-bit (binary-transparent) characters. Data can be stored, formatted and encoded into a string buffer and later converted, extracted or decoded.
@@ -10,7 +11,7 @@
 --- The string buffer libary also includes a high-performance serializer for Lua objects.
 ---
 ---
----## Streaming Serialization
+--- ## Streaming Serialization
 ---
 --- In some contexts, it's desirable to do piecewise serialization of large datasets, also known as streaming.
 ---
@@ -88,7 +89,7 @@
 ---    0x1fe0..       → 0xff n.I
 --- ```
 ---
----## Error handling
+--- ## Error handling
 ---
 --- Many of the buffer methods can throw an error. Out-of-memory or usage errors are best caught with an outer wrapper for larger parts of code. There's not much one can do after that, anyway.
 ---
@@ -101,7 +102,7 @@
 --- end
 --- ```
 ---
----## FFI caveats
+--- ## FFI caveats
 ---
 --- The string buffer library has been designed to work well together with the FFI library. But due to the low-level nature of the FFI library, some care needs to be taken:
 ---
@@ -126,6 +127,7 @@ local buffer = {}
 ---
 --- The maximum size of a single buffer is the same as the maximum size of a Lua string, which is slightly below two gigabytes. For huge data sizes, neither strings nor buffers are the right data structure — use the FFI library to directly map memory or files up to the virtual memory limit of your OS.
 ---
+---@version JIT
 ---@class string.buffer : table
 local buf = {}
 

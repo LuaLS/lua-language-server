@@ -160,6 +160,8 @@ function m.eventLoop()
     local function idle()
         if m.workingClock then
             m.workingClock = nil
+            collectgarbage()
+            collectgarbage()
             m.reportStatus()
         end
     end
@@ -182,9 +184,6 @@ function m.eventLoop()
             end
         end
         pub.step(true)
-        collectgarbage()
-        collectgarbage()
-        m.reportStatus()
     end
 
     while true do

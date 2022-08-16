@@ -1,9 +1,4 @@
 local brave   = require 'brave.brave'
-local parser  = require 'parser'
-local fs      = require 'bee.filesystem'
-local furi    = require 'file-uri'
-local util    = require 'utility'
-local thread  = require 'bee.thread'
 
 brave.on('loadProto', function ()
     local jsonrpc = require 'jsonrpc'
@@ -19,6 +14,7 @@ brave.on('loadProto', function ()
 end)
 
 brave.on('timer', function (time)
+    local thread = require 'bee.thread'
     while true do
         thread.sleep(time)
         brave.push('wakeup')
@@ -26,5 +22,19 @@ brave.on('timer', function (time)
 end)
 
 brave.on('loadFile', function (path)
+    local util    = require 'utility'
     return util.loadFile(path)
+end)
+
+brave.on('removeCaches', function(path)
+    local fs  = require 'bee.filesystem'
+    local fsu = require 'fs-utility'
+    for dir in fs.pairs(fs.path(path)) do
+        local lockFile = dir / '.lock'
+        local f = io.open(lockFile:string(), 'wb')
+        if f then
+            f:close()
+            fsu.fileRemove(dir)
+        end
+    end
 end)

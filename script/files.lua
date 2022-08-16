@@ -14,6 +14,8 @@ local progress = require "progress"
 local encoder  = require 'encoder'
 local scope    = require 'workspace.scope'
 local lazy     = require 'lazytable'
+local cacher   = require 'lazy-cacher'
+local sp       = require 'bee.subprocess'
 
 ---@class file
 ---@field uri          uri
@@ -28,6 +30,7 @@ local lazy     = require 'lazytable'
 ---@field state?       parser.state
 ---@field _diffInfo?   table[]
 ---@field cache        table
+---@field id           integer
 
 ---@class files
 local m = {}
@@ -49,6 +52,8 @@ function m.reset()
 end
 
 m.reset()
+
+local fileID = util.counter()
 
 local uriMap = {}
 -- 获取文件的真实uri，但不穿透软链接
@@ -202,6 +207,7 @@ function m.setText(uri, text, isTrust, callback)
     if not m.fileMap[uri] then
         m.fileMap[uri] = {
             uri = uri,
+            id  = fileID(),
         }
         m.fileCount = m.fileCount + 1
         create = true
@@ -526,10 +532,21 @@ function m.compileState(uri, text)
             log.warn(('Parse LuaDoc of [%s] takes [%.3f] sec, size [%.3f] kb.'):format(uri, passed, #text / 1000))
         end
 
-        if LAZY and not m.fileMap[uri].trusted then
+        local file = m.fileMap[uri]
+        if LAZY and not file.trusted then
             local clock = os.clock()
-            state.pushError = nil
-            state = lazy.build(state)
+            local myCacheDir = string.format('%s/cache/%d'
+                , LOGPATH
+                , sp.get_id()
+            )
+            local cachePath = string.format('%s/%d'
+                , myCacheDir
+                , file.id
+            )
+            local cache = cacher(cachePath, log.error)
+            if cache then
+                state = lazy.build(state, cache.writter, cache.reader):entry()
+            end
             local passed = os.clock() - clock
             if passed > 0.1 then
                 log.warn(('Convert lazy-table for [%s] takes [%.3f] sec, size [%.3f] kb.'):format(uri, passed, #text / 1000))

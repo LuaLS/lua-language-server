@@ -245,6 +245,23 @@ function m.testVersion()
     end
 end
 
+function m.lockCache()
+    local fs = require 'bee.filesystem'
+    local sp = require 'bee.subprocess'
+    local cacheDir = string.format('%s/cache', LOGPATH)
+    local myCacheDir = string.format('%s/%d'
+        , cacheDir
+        , sp.get_id()
+    )
+    fs.create_directories(fs.path(myCacheDir))
+    local err
+    m.lockFile, err = io.open(myCacheDir .. '/.lock', 'wb')
+    if err then
+        log.error(err)
+    end
+    pub.task('removeCaches', cacheDir)
+end
+
 function m.start()
     util.enableCloseFunction()
     await.setErrorHandle(log.error)
@@ -252,6 +269,7 @@ function m.start()
     proto.listen()
     m.report()
     m.testVersion()
+    m.lockCache()
 
     require 'provider'
 

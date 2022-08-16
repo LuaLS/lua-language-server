@@ -6,7 +6,6 @@ local proto      = require 'proto.proto'
 local define     = require 'proto.define'
 local workspace  = require 'workspace'
 local config     = require 'config'
-local library    = require 'library'
 local client     = require 'client'
 local pub        = require 'pub'
 local lang       = require 'language'
@@ -19,10 +18,8 @@ local json       = require 'json'
 local scope      = require 'workspace.scope'
 local furi       = require 'file-uri'
 local inspect    = require 'inspect'
-local markdown   = require 'provider.markdown'
 local guide      = require 'parser.guide'
 local fs         = require 'bee.filesystem'
-local jumpSource = require 'core.jump-source'
 
 ---@async
 local function updateConfig(uri)
@@ -105,7 +102,7 @@ filewatch.event(function (ev, path) ---@async
 end)
 
 m.register 'initialize' {
-    function (params)
+    function(params)
         client.init(params)
 
         if params.rootUri then
@@ -159,7 +156,7 @@ m.register 'initialized'{
 m.register 'exit' {
     function ()
         log.info('Server exited.')
-        os.exit(true)
+        os.exit(0, true)
     end
 }
 

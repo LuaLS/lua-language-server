@@ -2,30 +2,75 @@
 ---@field source     table
 ---@field codeMap    table<integer, string>
 ---@field dumpMark   table<table, integer>
----@field keyMap     table<integer, string|integer>
----@field keyDual    table<string|integer, integer>
 ---@field excludes   table<table, true>
+---@field refMap     table<any, integer>
+---@field instMap    table<integer, table|function|thread|userdata>
 local mt = {}
 mt.__index = mt
 mt.tableID = 1
 mt.keyID   = 1
 
-local DUMMY = function () end
+local DUMMY = function() end
+
+local RESERVED = {
+    ['and']      = true,
+    ['break']    = true,
+    ['do']       = true,
+    ['else']     = true,
+    ['elseif']   = true,
+    ['end']      = true,
+    ['false']    = true,
+    ['for']      = true,
+    ['function'] = true,
+    ['if']       = true,
+    ['in']       = true,
+    ['local']    = true,
+    ['nil']      = true,
+    ['not']      = true,
+    ['or']       = true,
+    ['repeat']   = true,
+    ['return']   = true,
+    ['then']     = true,
+    ['true']     = true,
+    ['until']    = true,
+    ['while']    = true,
+    ['goto']     = true
+}
 
 ---@param k string|integer
 ---@return string
-function mt:formatKey(k)
-    if not self.keyDual[k] then
-        local id = self.keyID
-        self.keyID = self.keyID + 1
-        self.keyDual[k] = id
-        self.keyMap[id] = k
+local function formatKey(k)
+    if type(k) == 'string' then
+        if not RESERVED[k] and k:match '^[%a_][%w_]*$' then
+            return k
+        else
+            return ('[%q]'):format(k)
+        end
     end
-    return string.format('[%d]', self.keyDual[k])
+    if type(k) == 'number' then
+        if math.type(k) == 'integer' then
+            local n10 = ('%d'):format(k)
+            local n16 = ('0x%X'):format(k)
+            if #n10 <= #n16 then
+                return '[' .. n10 .. ']'
+            else
+                return '[' .. n16 .. ']'
+            end
+        else
+            local n10 = ('%.16f'):format(k):gsub('0+$', '')
+            local n16 = ('%q'):format(k)
+            if #n10 <= #n16 then
+                return '[' .. n10 .. ']'
+            else
+                return '[' .. n16 .. ']'
+            end
+        end
+    end
+    error('invalid key type: ' .. type(k))
 end
 
 ---@param v string|number|boolean
-function mt:formatValue(v)
+local function formatValue(v)
     if type(v) == 'string' then
         return ('%q'):format(v)
     end
@@ -51,69 +96,82 @@ function mt:formatValue(v)
     return ('%q'):format(v)
 end
 
----@param t table|function|userdata|thread
----@return integer
-function mt:dump(t)
-    if self.dumpMark[t] then
-        return self.dumpMark[t]
-    end
-    local id = self.tableID
-    self.tableID = self.tableID + 1
-    self.dumpMark[t] = id
-    if self.excludes[t] or type(t) ~= 'table' then
-        self.excludes[t] = true
-        return id
-    end
-
+---@param info {[1]: table, [2]: integer, [3]: table?}
+---@return string
+local function dump(info)
     local codeBuf = {}
 
-    local hasTable
     codeBuf[#codeBuf + 1] = 'return{{'
     local hasFields
-    for k, v in pairs(t) do
-        local tp = type(v)
-        if tp == 'string' or tp == 'number' or tp == 'boolean' then
+    for k, v in pairs(info[1]) do
+        if hasFields then
+            codeBuf[#codeBuf + 1] = ','
+        else
+            hasFields = true
+        end
+        codeBuf[#codeBuf+1] = string.format('%s=%s'
+            , formatKey(k)
+            , formatValue(v)
+        )
+    end
+    codeBuf[#codeBuf+1] = '}'
+
+    codeBuf[#codeBuf+1] = string.format(',%d', formatValue(info[2]))
+
+    if info[3] then
+        codeBuf[#codeBuf+1] = ',{'
+        hasFields = false
+        for k, v in pairs(info[3]) do
             if hasFields then
-                codeBuf[#codeBuf + 1] = ','
+                codeBuf[#codeBuf+1] = ','
             else
                 hasFields = true
             end
             codeBuf[#codeBuf+1] = string.format('%s=%s'
-                , self:formatKey(k)
-                , self:formatValue(v)
+                , formatKey(k)
+                , formatValue(v)
             )
-        else
-            hasTable = true
-        end
-    end
-    codeBuf[#codeBuf+1] = '},'
-
-    codeBuf[#codeBuf+1] = string.format('%d', self:formatValue(#t))
-
-    if hasTable then
-        codeBuf[#codeBuf + 1] = ',{'
-        hasFields = false
-        for k, v in pairs(t) do
-            local tp = type(v)
-            if tp == 'table' or tp == 'function' or tp == 'thread' or tp == 'userdata' then
-                if hasFields then
-                    codeBuf[#codeBuf + 1] = ','
-                else
-                    hasFields = true
-                end
-                codeBuf[#codeBuf + 1] = string.format('%s=%s'
-                    , self:formatKey(k)
-                    , self:dump(v)
-                )
-            end
         end
         codeBuf[#codeBuf+1] = '}'
     end
 
-    codeBuf[#codeBuf+1] = '}'
+    codeBuf[#codeBuf + 1] = '}'
 
-    self.codeMap[id] = table.concat(codeBuf)
+    return table.concat(codeBuf)
+end
 
+---@param obj table|function|userdata|thread
+---@return integer
+function mt:getObjectID(obj)
+    if self.dumpMark[obj] then
+        return self.dumpMark[obj]
+    end
+    local id = self.tableID
+    self.tableID = self.tableID + 1
+    self.dumpMark[obj] = id
+    if self.excludes[obj] or type(obj) ~= 'table' then
+        self.refMap[obj] = id
+        self.instMap[id] = obj
+        return id
+    end
+
+    local fields = {}
+    local objs
+    for k, v in pairs(obj) do
+        local tp = type(v)
+        if tp == 'string' or tp == 'number' or tp == 'boolean' then
+            fields[k] = v
+        else
+            if not objs then
+                objs = {}
+            end
+            objs[k] = self:getObjectID(v)
+        end
+    end
+
+    local code = dump({fields, #obj, objs})
+
+    self.codeMap[id] = code
     return id
 end
 
@@ -141,21 +199,19 @@ end
 
 ---@return table
 function mt:entry()
-    local entryID = self:dump(self.source)
+    local entryID = self:getObjectID(self.source)
 
     local codeMap = self.codeMap
-    local keyMap  = self.keyMap
-    local keyDual = self.keyDual
+    local refMap  = self.refMap
+    local instMap = self.instMap
     local load    = load
     local setmt   = setmetatable
-    local dump    = string.dump
-    local rawset  = rawset
+    local sdump   = string.dump
+    local type    = type
     local sbyte   = string.byte
+    local tableID = self.tableID
     ---@type table<table, integer>
     local idMap   = {}
-    ---@type table<integer, table>
-    local instMap = {}
-    local refMap  = {}
     ---@type table<table, table[]>
     local infoMap = setmt({}, {
         __mode = 'v',
@@ -170,7 +226,7 @@ function mt:entry()
                 return nil
             end
             if sbyte(code, 1, 1) ~= 27 then
-                codeMap[id] = dump(f, true)
+                codeMap[id] = sdump(f, true)
             end
             local info = f()
             map[t] = info
@@ -179,6 +235,7 @@ function mt:entry()
     })
 
     local lazyload = {
+        ref = refMap,
         __index = function(t, k)
             local info = infoMap[t]
             if not info then
@@ -186,7 +243,7 @@ function mt:entry()
             end
             local fields = info[1]
 
-            local keyID = keyDual[k]
+            local keyID = k
 
             local v = fields[keyID]
             if v ~= nil then
@@ -206,8 +263,39 @@ function mt:entry()
             return instMap[ref]
         end,
         __newindex = function(t, k, v)
-            rawset(t, k, v)
-            refMap[t] = true
+            local info = infoMap[t]
+            if not info then
+                return
+            end
+            local fields = info[1]
+            local objs   = info[3]
+            fields[k]    = nil
+            if objs then
+                objs[k] = nil
+            end
+            if v ~= nil then
+                local tp = type(v)
+                if tp == 'string' or tp == 'number' or tp == 'boolean' then
+                    fields[k] = v
+                else
+                    if not objs then
+                        objs = {}
+                    end
+                    local id = refMap[v]
+                    if not id then
+                        id = tableID
+                        refMap[v] = id -- 新赋值的对象一定会被引用住
+                        instMap[id] = v
+                        tableID = tableID + 1
+                    end
+                    objs[k] = id
+                end
+            end
+            info = { fields, info[2], objs }
+            local id = idMap[t]
+            local code = dump(info)
+            codeMap[id] = code
+            infoMap[id] = nil
         end,
         __len = function (t)
             local info = infoMap[t]
@@ -222,14 +310,14 @@ function mt:entry()
                 return DUMMY
             end
             local fields = info[1]
-            local refs   = info[3]
+            local objs   = info[3]
             local keys   = {}
             for k in pairs(fields) do
-                keys[#keys+1] = keyMap[k]
+                keys[#keys+1] = k
             end
-            if refs then
-                for k in pairs(refs) do
-                    keys[#keys+1] = keyMap[k]
+            if objs then
+                for k in pairs(objs) do
+                    keys[#keys+1] = k
                 end
             end
             local i = 0
@@ -238,7 +326,7 @@ function mt:entry()
                 local k = keys[i]
                 return k, t[k]
             end
-        end
+        end,
     }
 
     setmetatable(idMap, { __mode = 'k' })
@@ -254,13 +342,9 @@ function mt:entry()
         end,
     })
 
-    for t in pairs(self.excludes) do
-        local id = self.dumpMark[t]
-        refMap[t] = true
-        instMap[id] = t
-    end
+    local entry = instMap[entryID] --[[@as table]]
 
-    local entry = instMap[entryID]
+    self.source = nil
 
     return entry
 end
@@ -276,9 +360,9 @@ function m.build(t, writter, reader)
     local builder = setmetatable({
         source     = t,
         codeMap    = {},
+        refMap     = {},
+        instMap    = {},
         dumpMark   = {},
-        keyMap     = {},
-        keyDual    = {},
         excludes   = {},
     }, mt)
 

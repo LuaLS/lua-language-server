@@ -243,7 +243,7 @@ local function initBuiltIn(uri)
         if status == 'disable' then
             goto CONTINUE
         end
-        
+
         ---@type fs.path
         local libPath = templateDir / (libName .. '.lua')
         local metaDoc = compileSingleMetaDoc(uri, fsu.loadFile(libPath), metaLang, status)

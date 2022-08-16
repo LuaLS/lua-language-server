@@ -19,7 +19,9 @@ local scope      = require 'workspace.scope'
 local furi       = require 'file-uri'
 local inspect    = require 'inspect'
 local guide      = require 'parser.guide'
-local fs         = require 'bee.filesystem'
+local fs        = require 'bee.filesystem'
+
+require 'library'
 
 ---@async
 local function updateConfig(uri)

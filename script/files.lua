@@ -13,6 +13,7 @@ local smerger  = require 'string-merger'
 local progress = require "progress"
 local encoder  = require 'encoder'
 local scope    = require 'workspace.scope'
+local lazy     = require 'lazytable'
 
 ---@class file
 ---@field uri          uri
@@ -517,21 +518,34 @@ function m.compileState(uri, text)
         state.uri = uri
         state.lua = text
         state.ast.uri = uri
+
         local clock = os.clock()
         parser.luadoc(state)
         local passed = os.clock() - clock
         if passed > 0.1 then
             log.warn(('Parse LuaDoc of [%s] takes [%.3f] sec, size [%.3f] kb.'):format(uri, passed, #text / 1000))
         end
-        m.astCount = m.astCount + 1
-        local removed
-        setmetatable(state, {__gc = function ()
-            if removed then
-                return
+
+        if LAZY and not m.fileMap[uri].trusted then
+            local clock = os.clock()
+            state.pushError = nil
+            state = lazy.build(state)
+            local passed = os.clock() - clock
+            if passed > 0.1 then
+                log.warn(('Convert lazy-table for [%s] takes [%.3f] sec, size [%.3f] kb.'):format(uri, passed, #text / 1000))
             end
-            removed = true
-            m.astCount = m.astCount - 1
-        end})
+        else
+            m.astCount = m.astCount + 1
+            local removed
+            setmetatable(state, {__gc = function ()
+                if removed then
+                    return
+                end
+                removed = true
+                m.astCount = m.astCount - 1
+            end})
+        end
+
         return state
     else
         log.error('Compile failed:', uri, err)

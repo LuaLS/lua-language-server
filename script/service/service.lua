@@ -182,6 +182,9 @@ function m.eventLoop()
             end
         end
         pub.step(true)
+        collectgarbage()
+        collectgarbage()
+        m.reportStatus()
     end
 
     while true do

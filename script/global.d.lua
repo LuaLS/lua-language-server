@@ -49,3 +49,6 @@ CHECKLEVEL = 'Warning'
 
 ---@type 'trace' | 'debug' | 'info' | 'warn' | 'error'
 LOGLEVEL = 'warn'
+
+---@type boolean
+LAZY = false

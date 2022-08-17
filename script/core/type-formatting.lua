@@ -2,6 +2,7 @@ local files        = require 'files'
 local lookBackward = require 'core.look-backward'
 local guide        = require "parser.guide"
 local codeFormat   = require "code_format"
+local config       = require "config"
 
 local function insertIndentation(uri, position, edits)
     local text   = files.getText(uri)
@@ -98,7 +99,8 @@ local function typeFormat(results, uri, position, ch, options)
     end
     local converter = require("proto.converter")
     local pos = converter.packPosition(uri, position)
-    local success, result = codeFormat.type_format(uri, text, pos.line, pos.character, options)
+    local typeFormatOptions = config.get(uri, 'Lua.typeFormat.config')
+    local success, result = codeFormat.type_format(uri, text, pos.line, pos.character, options, typeFormatOptions)
     if success then
         local range = result.range
         results[#results+1] = {

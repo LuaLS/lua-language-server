@@ -373,7 +373,10 @@ local template = {
     ['Lua.format.defaultConfig']            = Type.Hash(Type.String, Type.String)
                                             >> {},
     ['Lua.typeFormat.config']               = Type.Hash(Type.String, Type.String)
-                                            >> {},
+                                            >> {
+                                                format_line = "true",
+                                                auto_complete_end = "true"
+                                            },
     ['Lua.spell.dict']                      = Type.Array(Type.String),
     ['Lua.telemetry.enable']                = Type.Or(Type.Boolean >> false, Type.Nil) >> nil,
     ['Lua.misc.parameters']                 = Type.Array(Type.String),

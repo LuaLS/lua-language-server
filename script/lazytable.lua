@@ -155,6 +155,11 @@ function mt:getObjectID(obj)
         return id
     end
 
+    if not next(obj) then
+        self.codeMap[id] = nil
+        return id
+    end
+
     local fields = {}
     local objs
     for k, v in pairs(obj) do

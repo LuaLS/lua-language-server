@@ -1,4 +1,4 @@
-local fs    = require 'bee.filesystem'
+local fs = require 'bee.filesystem'
 
 ---@param path string
 ---@param errorHandle? fun(string)
@@ -29,6 +29,13 @@ return function (path, errorHandle)
                 end
                 return false
             end
+            if not code then
+                map[id] = nil
+                return true
+            end
+            if #code > 1000000 then
+                return false
+            end
             local suc, err = f:write(code)
             if not suc then
                 if errorHandle then
@@ -36,13 +43,15 @@ return function (path, errorHandle)
                 end
                 return false
             end
-            map[id * 2]     = offset
-            map[id * 2 + 1] = #code
+            map[id] = offset * 1000000 + #code
             return true
         end,
         reader = function(id)
-            local offset = map[id * 2]
-            local len    = map[id * 2 + 1]
+            if not map[id] then
+                return nil
+            end
+            local offset = map[id] // 1000000
+            local len    = map[id] %  1000000
             local _, err = f:seek('set', offset)
             if err then
                 if errorHandle then
@@ -55,7 +64,7 @@ return function (path, errorHandle)
         end,
         dispose = function ()
             f:close()
-            os.remove(path)
+            fs.remove(fs.path(path))
         end,
     }
 end

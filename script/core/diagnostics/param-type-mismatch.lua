@@ -46,6 +46,9 @@ return function (uri, callback)
                 goto CONTINUE
             end
             local refNode = vm.compileNode(arg)
+            if not refNode then
+                goto CONTINUE
+            end
             local defNode = getDefNode(funcNode, i)
             if not defNode then
                 goto CONTINUE

@@ -1,5 +1,8 @@
 # changelog
 
+## 3.5.4
+* `FIX` [#1476](https://github.com/sumneko/lua-language-server/issues/1476)
+
 ## 3.5.3
 `2022-8-13`
 * `FIX` [#1409](https://github.com/sumneko/lua-language-server/issues/1409)

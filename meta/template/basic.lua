@@ -9,7 +9,8 @@ arg = {}
 ---@param v? T
 ---@param message? any
 ---@return T
-function assert(v, message) end
+---@return ...
+function assert(v, message, ...) end
 
 ---@alias gcoptions
 ---|>'"collect"'      # ---#DESTAIL 'cgopt.collect'

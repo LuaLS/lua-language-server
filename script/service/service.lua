@@ -160,8 +160,6 @@ function m.eventLoop()
     local function idle()
         if m.workingClock then
             m.workingClock = nil
-            collectgarbage()
-            collectgarbage()
             m.reportStatus()
         end
     end

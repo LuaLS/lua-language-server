@@ -82,7 +82,7 @@ ass<??>
 ]]
 {
     {
-        label = 'assert(v, message)',
+        label = 'assert(v, message, ...)',
         kind  = define.CompletionItemKind.Function,
     },
 }
@@ -93,7 +93,7 @@ ass<??>
 ]]
 {
     {
-        label = 'assert(v, message)',
+        label = 'assert(v, message, ...)',
         kind  = define.CompletionItemKind.Function,
     },
 }
@@ -104,11 +104,11 @@ ass<??>
 ]]
 {
     {
-        label = 'assert(v, message)',
+        label = 'assert(v, message, ...)',
         kind  = define.CompletionItemKind.Function,
     },
     {
-        label = 'assert(v, message)',
+        label = 'assert(v, message, ...)',
         kind  = define.CompletionItemKind.Snippet,
     },
 }
@@ -130,11 +130,11 @@ _G.ass<??>
 ]]
 {
     {
-        label = 'assert(v, message)',
+        label = 'assert(v, message, ...)',
         kind  = define.CompletionItemKind.Function,
     },
     {
-        label = 'assert(v, message)',
+        label = 'assert(v, message, ...)',
         kind  = define.CompletionItemKind.Snippet,
     },
 }

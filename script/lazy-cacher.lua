@@ -1,6 +1,13 @@
 local fs          = require 'bee.filesystem'
 local linkedTable = require 'linked-table'
 
+local setmt = setmetatable
+local pairs = pairs
+local iopen = io.open
+local mmax  = math.max
+
+_ENV = nil
+
 ---@class lazy-cacher
 ---@field _opening linked-table
 ---@field _openingMap table<string, file*>
@@ -32,7 +39,7 @@ function mt:_getFile(fileID)
         return self._openingMap[fileID]
     end
     local fullPath = self._dir .. '/' .. fileID
-    local file, err = io.open(fullPath, 'a+b')
+    local file, err = iopen(fullPath, 'a+b')
     if not file then
         return nil, err
     end
@@ -68,7 +75,7 @@ function mt:writterAndReader(fileID)
 
         self:_closeFile(fileID)
         local fullPath = self._dir .. '/' .. fileID
-        local file, err = io.open(fullPath, 'wb')
+        local file, err = iopen(fullPath, 'wb')
         if not file then
             self.errorHandler(err)
             return
@@ -115,7 +122,7 @@ function mt:writterAndReader(fileID)
                 self.errorHandler(err)
                 return false
             end
-            maxFileSize = math.max(maxFileSize, (offset + #code) * 2)
+            maxFileSize = mmax(maxFileSize, (offset + #code) * 2)
         end
         local suc, err = file:write(code)
         if not suc then
@@ -154,7 +161,7 @@ end
 ---@return lazy-cacher?
 return function (dir, errorHandle)
     fs.create_directories(fs.path(dir))
-    local self = setmetatable({
+    local self = setmt({
         _dir         = dir,
         _opening     = linkedTable(),
         _openingMap  = {},

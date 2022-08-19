@@ -1,3 +1,18 @@
+local type    = type
+local pairs   = pairs
+local error   = error
+local next    = next
+local load    = load
+local setmt   = setmetatable
+local rawset  = rawset
+local sdump   = string.dump
+local sbyte   = string.byte
+local smatch  = string.match
+local sformat = string.format
+local tconcat = table.concat
+
+_ENV = nil
+
 ---@class lazytable.builder
 ---@field source     table
 ---@field codeMap    table<integer, string>
@@ -41,59 +56,21 @@ local RESERVED = {
 ---@return string
 local function formatKey(k)
     if type(k) == 'string' then
-        if not RESERVED[k] and k:match '^[%a_][%w_]*$' then
+        if not RESERVED[k] and smatch(k, '^[%a_][%w_]*$') then
             return k
         else
-            return ('[%q]'):format(k)
+            return sformat('[%q]', k)
         end
     end
     if type(k) == 'number' then
-        if math.type(k) == 'integer' then
-            local n10 = ('%d'):format(k)
-            local n16 = ('0x%X'):format(k)
-            if #n10 <= #n16 then
-                return '[' .. n10 .. ']'
-            else
-                return '[' .. n16 .. ']'
-            end
-        else
-            local n10 = ('%.16f'):format(k):gsub('0+$', '')
-            local n16 = ('%q'):format(k)
-            if #n10 <= #n16 then
-                return '[' .. n10 .. ']'
-            else
-                return '[' .. n16 .. ']'
-            end
-        end
+        return sformat('[%q]', k)
     end
     error('invalid key type: ' .. type(k))
 end
 
 ---@param v string|number|boolean
 local function formatValue(v)
-    if type(v) == 'string' then
-        return ('%q'):format(v)
-    end
-    if type(v) == 'number' then
-        if math.type(v) == 'integer' then
-            local n10 = ('%d'):format(v)
-            local n16 = ('0x%X'):format(v)
-            if #n10 <= #n16 then
-                return n10
-            else
-                return n16
-            end
-        else
-            local n10 = ('%.16f'):format(v):gsub('0+$', '')
-            local n16 = ('%q'):format(v)
-            if #n10 <= #n16 then
-                return n10
-            else
-                return n16
-            end
-        end
-    end
-    return ('%q'):format(v)
+    return sformat('%q', v)
 end
 
 ---@param info {[1]: table, [2]: integer, [3]: table?}
@@ -109,14 +86,14 @@ local function dump(info)
         else
             hasFields = true
         end
-        codeBuf[#codeBuf+1] = string.format('%s=%s'
+        codeBuf[#codeBuf+1] = sformat('%s=%s'
             , formatKey(k)
             , formatValue(v)
         )
     end
     codeBuf[#codeBuf+1] = '}'
 
-    codeBuf[#codeBuf+1] = string.format(',%d', formatValue(info[2]))
+    codeBuf[#codeBuf+1] = sformat(',%d', formatValue(info[2]))
 
     if info[3] then
         codeBuf[#codeBuf+1] = ',{'
@@ -127,7 +104,7 @@ local function dump(info)
             else
                 hasFields = true
             end
-            codeBuf[#codeBuf+1] = string.format('%s=%s'
+            codeBuf[#codeBuf+1] = sformat('%s=%s'
                 , formatKey(k)
                 , formatValue(v)
             )
@@ -137,7 +114,7 @@ local function dump(info)
 
     codeBuf[#codeBuf + 1] = '}'
 
-    return table.concat(codeBuf)
+    return tconcat(codeBuf)
 end
 
 ---@param obj table|function|userdata|thread
@@ -183,7 +160,7 @@ end
 ---@param writter fun(id: integer, code: string): boolean
 ---@param reader  fun(id: integer): string?
 function mt:bind(writter, reader)
-    setmetatable(self.codeMap, {
+    setmt(self.codeMap, {
         __newindex = function (t, id, code)
             local suc = writter(id, code)
             if not suc then
@@ -209,11 +186,6 @@ function mt:entry()
     local codeMap = self.codeMap
     local refMap  = self.refMap
     local instMap = self.instMap
-    local load    = load
-    local setmt   = setmetatable
-    local sdump   = string.dump
-    local type    = type
-    local sbyte   = string.byte
     local tableID = self.tableID
     ---@type table<table, integer>
     local idMap   = {}
@@ -230,9 +202,9 @@ function mt:entry()
             if not f then
                 return nil
             end
-            if sbyte(code, 1, 1) ~= 27 then
-                codeMap[id] = sdump(f, true)
-            end
+            --if sbyte(code, 1, 1) ~= 27 then
+            --    codeMap[id] = sdump(f, true)
+            --end
             local info = f()
             map[t] = info
             return info
@@ -333,9 +305,9 @@ function mt:entry()
         end,
     }
 
-    setmetatable(idMap, { __mode = 'k' })
+    setmt(idMap, { __mode = 'k' })
 
-    setmetatable(instMap, {
+    setmt(instMap, {
         __mode  = 'v',
         __index = function (map, id)
             local inst  = {}
@@ -362,7 +334,7 @@ local m = {}
 ---@param reader?  fun(id: integer): string?
 ---@return lazytable.builder
 function m.build(t, writter, reader)
-    local builder = setmetatable({
+    local builder = setmt({
         source     = t,
         codeMap    = {},
         refMap     = {},

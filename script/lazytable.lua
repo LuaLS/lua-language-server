@@ -286,7 +286,7 @@ function mt:entry()
                     if not objs then
                         objs = {}
                     end
-                    local id = refMap[v]
+                    local id = refMap[v] or idMap[v]
                     if not id then
                         id = tableID
                         refMap[v] = id -- 新赋值的对象一定会被引用住
@@ -350,6 +350,7 @@ function mt:entry()
     local entry = instMap[entryID] --[[@as table]]
 
     self.source = nil
+    self.dumpMark = nil
 
     return entry
 end

@@ -268,12 +268,10 @@ function mt:entry()
             return instMap[ref]
         end,
         __newindex = function(t, k, v)
-            local info = infoMap[t]
-            if not info then
-                return
-            end
-            local fields = info[1]
-            local objs   = info[3]
+            local info   = infoMap[t]
+            local fields = info and info[1] or {}
+            local len    = info and info[2] or 0
+            local objs   = info and info[3]
             fields[k]    = nil
             if objs then
                 objs[k] = nil
@@ -296,11 +294,12 @@ function mt:entry()
                     objs[k] = id
                 end
             end
-            info = { fields, info[2], objs }
+            info = { fields, len, objs }
             local id = idMap[t]
             local code = dump(info)
-            codeMap[id] = code
             infoMap[id] = nil
+            codeMap[id] = nil
+            codeMap[id] = code
         end,
         __len = function (t)
             local info = infoMap[t]

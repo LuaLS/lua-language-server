@@ -181,6 +181,7 @@ end, function (self, ...)
     self.subs = { ... }
 end)
 
+---@format disable-next
 local template = {
     ['Lua.runtime.version']                 = Type.String >> 'Lua 5.4' << {
                                                 'Lua 5.1',
@@ -371,6 +372,11 @@ local template = {
     ['Lua.format.enable']                   = Type.Boolean >> true,
     ['Lua.format.defaultConfig']            = Type.Hash(Type.String, Type.String)
                                             >> {},
+    ['Lua.typeFormat.config']               = Type.Hash(Type.String, Type.String)
+                                            >> {
+                                                format_line = "true",
+                                                auto_complete_end = "true"
+                                            },
     ['Lua.spell.dict']                      = Type.Array(Type.String),
     ['Lua.telemetry.enable']                = Type.Or(Type.Boolean >> false, Type.Nil) >> nil,
     ['Lua.misc.parameters']                 = Type.Array(Type.String),

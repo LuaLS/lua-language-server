@@ -33,6 +33,7 @@ local sp       = require 'bee.subprocess'
 ---@field id           integer
 
 ---@class files
+---@field lazyCache?   lazy-cacher
 local m = {}
 
 m.watchList      = {}
@@ -477,6 +478,17 @@ function m.eachDll()
     return pairs(map)
 end
 
+function m.getLazyCache()
+    if not m.lazyCache then
+        local cachePath = string.format('%s/cache/%d'
+            , LOGPATH
+            , sp.get_id()
+        )
+        m.lazyCache = cacher(cachePath, log.error)
+    end
+    return m.lazyCache
+end
+
 function m.compileState(uri, text)
     local ws     = require 'workspace'
     local client = require 'client'
@@ -534,20 +546,12 @@ function m.compileState(uri, text)
 
         local file = m.fileMap[uri]
         if LAZY and not file.trusted then
-            local clock = os.clock()
-            local myCacheDir = string.format('%s/cache/%d'
-                , LOGPATH
-                , sp.get_id()
-            )
-            local cachePath = string.format('%s/%d'
-                , myCacheDir
-                , file.id
-            )
-            local cache = cacher(cachePath, log.error)
-            if cache then
-                state = lazy.build(state, cache.writter, cache.reader):entry()
-            end
-            local passed = os.clock() - clock
+            state.pushError = nil
+            local cache = m.getLazyCache()
+            local id = ('%d'):format(file.id)
+            clock = os.clock()
+            state = lazy.build(state, cache:writterAndReader(id)):entry()
+            passed = os.clock() - clock
             if passed > 0.1 then
                 log.warn(('Convert lazy-table for [%s] takes [%.3f] sec, size [%.3f] kb.'):format(uri, passed, #text / 1000))
             end

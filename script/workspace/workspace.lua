@@ -269,7 +269,7 @@ function m.awaitLoadFile(uri)
         scp:get('cachedUris')[uri] = true
         ld:loadFile(uri)
     end)
-    ld:loadAll()
+    ld:loadAll(uri)
 end
 
 function m.removeFile(uri)
@@ -346,7 +346,7 @@ function m.awaitPreload(scp)
     await.sleep(0.1)
 
     log.info(('Found %d files at:'):format(ld.max), scp:getName())
-    ld:loadAll()
+    ld:loadAll(scp:getName())
     log.info('Preload finish at:', scp:getName())
 end
 

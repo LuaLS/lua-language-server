@@ -511,6 +511,9 @@ function m.diagnosticsScope(uri, force)
         m.clearAll()
         return
     end
+    if not force and config.get(uri, 'Lua.diagnostics.workspaceDelay') < 0 then
+        return
+    end
     local scp = scope.getScope(uri)
     local id = 'diagnosticsScope:' .. scp:getName()
     await.close(id)

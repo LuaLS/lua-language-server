@@ -23,6 +23,12 @@ local function buildName(source, text)
             return text:sub(startOffset + 1, finishOffset)
         end
     end
+    if source.type == 'tableindex' then
+        if source.index then
+            local finishOffset = guide.positionToOffset(state, source.finish)
+            return text:sub(startOffset + 1, finishOffset)
+        end
+    end
     local finishOffset = guide.positionToOffset(state, source.finish)
     return text:sub(startOffset + 1, finishOffset)
 end
@@ -46,39 +52,6 @@ local function buildFunctionParams(func)
     return table.concat(params, ', ')
 end
 
-local function buildFunction(source, text, symbols)
-    local name = buildName(source, text)
-    local func = source.value
-    if source.type == 'tablefield'
-    or source.type == 'setfield' then
-        source = source.field
-        if not source then
-            return
-        end
-    end
-    local range, kind
-    if func.start > source.finish then
-        -- a = function()
-        range = { source.start, func.finish }
-    else
-        -- function f()
-        range = { func.start, func.finish }
-    end
-    if source.type == 'setmethod' then
-        kind = define.SymbolKind.Method
-    else
-        kind = define.SymbolKind.Function
-    end
-    symbols[#symbols+1] = {
-        name           = name,
-        detail         = ('function (%s)'):format(buildFunctionParams(func)),
-        kind           = kind,
-        range          = range,
-        selectionRange = { source.start, source.finish },
-        valueRange     = { func.start, func.finish },
-    }
-end
-
 local function buildTable(tbl)
     local buf = {}
     for i = 1, 3 do
@@ -91,105 +64,108 @@ local function buildTable(tbl)
             buf[#buf+1] = ('%s'):format(field.field[1])
         end
     end
+    if #tbl > 3 then
+        buf[#buf+1] = ('...(+%d)'):format(#tbl - 3)
+    end
     return table.concat(buf, ', ')
 end
 
-local function buildValue(source, text, symbols)
+local function buildValue(source, text, used, symbols)
     local name = buildName(source, text)
     local range, sRange, valueRange, kind
     local details = {}
-    if     source.type == 'local' then
+    if source.type == 'local' then
         if source.parent.type == 'funcargs' then
-            details[1] = 'param'
-            range      = { source.start, source.finish }
-            sRange     = { source.start, source.finish }
-            kind       = define.SymbolKind.Constant
+            kind = define.SymbolKind.Constant
         else
-            details[1] = 'local'
-            range      = { source.start, source.finish }
-            sRange     = { source.start, source.finish }
-            kind       = define.SymbolKind.Variable
+            kind = define.SymbolKind.Variable
         end
+        range      = { source.start, source.finish }
+        sRange     = { source.start, source.finish }
     elseif source.type == 'setlocal' then
-        details[1] = 'setlocal'
         range      = { source.start, source.finish }
         sRange     = { source.start, source.finish }
-        kind       = define.SymbolKind.Variable
     elseif source.type == 'setglobal' then
-        details[1] = 'global'
         range      = { source.start, source.finish }
         sRange     = { source.start, source.finish }
-        kind       = define.SymbolKind.Class
     elseif source.type == 'tablefield' then
         if not source.field then
             return
         end
-        details[1] = 'field'
         range      = { source.field.start, source.field.finish }
         sRange     = { source.field.start, source.field.finish }
-        kind       = define.SymbolKind.Property
+    elseif source.type == 'tableindex' then
+        if not source.index then
+            return
+        end
+        range      = { source.index.start, source.index.finish }
+        sRange     = { source.index.start, source.index.finish }
     elseif source.type == 'setfield' then
         if not source.field then
             return
         end
-        details[1] = 'field'
         range      = { source.field.start, source.field.finish }
         sRange     = { source.field.start, source.field.finish }
-        kind       = define.SymbolKind.Field
+    elseif source.type == 'setmethod' then
+        if not source.method then
+            return
+        end
+        range      = { source.method.start, source.method.finish }
+        sRange     = { source.start, source.finish }
     else
         return
     end
     if source.value then
+        used[source.value] = true
         local literal = source.value[1]
         if     source.value.type == 'boolean' then
-            details[2] = ' boolean'
+            kind = define.SymbolKind.Boolean
             if literal ~= nil then
-                details[3] = ' = '
-                details[4] = util.viewLiteral(source.value[1])
+                details[#details+1] = util.viewLiteral(source.value[1])
             end
         elseif source.value.type == 'string' then
-            details[2] = ' string'
+            kind = define.SymbolKind.String
             if literal ~= nil then
-                details[3] = ' = '
-                details[4] = util.viewLiteral(source.value[1])
+                details[#details+1] = util.viewLiteral(source.value[1])
             end
         elseif source.value.type == 'number'
         or     source.value.type == 'integer' then
-            details[2] = ' number'
+            kind = define.SymbolKind.Number
             if literal ~= nil then
-                details[3] = ' = '
-                details[4] = util.viewLiteral(source.value[1])
+                details[#details+1] = util.viewLiteral(source.value[1])
             end
         elseif source.value.type == 'table' then
-            details[2] = ' {'
-            details[3] = buildTable(source.value)
-            details[4] = '}'
+            kind = define.SymbolKind.Object
+            if #source.value > 0 then
+                details[#details+1] = '{'
+                details[#details+1] = buildTable(source.value)
+                details[#details+1] = '}'
+            end
             valueRange = { source.value.start, source.value.finish }
         elseif source.value.type == 'select' then
             if source.value.vararg and source.value.vararg.type == 'call' then
                 valueRange = { source.value.start, source.value.finish }
             end
+        elseif source.value.type == 'function' then
+            details[#details+1] = ('function (%s)'):format(buildFunctionParams(source.value))
+            if source.type == 'setmethod' then
+                kind = define.SymbolKind.Method
+            else
+                kind = define.SymbolKind.Function
+            end
+            valueRange = { source.value.start, source.value.finish }
+            range[1]   = math.min(source.value.start, source.start)
         end
         range      = { range[1], source.value.finish }
     end
     symbols[#symbols+1] = {
         name           = name,
         detail         = table.concat(details),
-        kind           = kind,
+        kind           = kind or define.SymbolKind.Variable,
         range          = range,
         selectionRange = sRange,
         valueRange     = valueRange,
     }
-end
-
-local function buildSet(source, text, used, symbols)
-    local value = source.value
-    if value and value.type == 'function' then
-        used[value] = true
-        buildFunction(source, text, symbols)
-    else
-        buildValue(source, text, symbols)
-    end
 end
 
 local function buildAnonymousFunction(source, text, used, symbols)
@@ -223,9 +199,11 @@ local function buildSource(source, text, used, symbols)
     or     source.type == 'setglobal'
     or     source.type == 'setfield'
     or     source.type == 'setmethod'
-    or     source.type == 'tablefield' then
+    or     source.type == 'tablefield'
+    or     source.type == 'tableexp'
+    or     source.type == 'tableindex' then
         await.delay()
-        buildSet(source, text, used, symbols)
+        buildValue(source, text, used, symbols)
     elseif source.type == 'function' then
         await.delay()
         buildAnonymousFunction(source, text, used, symbols)

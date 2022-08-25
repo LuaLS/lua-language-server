@@ -340,7 +340,7 @@ function m.build(t, writter, reader)
         refMap     = {},
         instMap    = {},
         dumpMark   = {},
-        excludes   = {},
+        excludes   = setmt({}, { __mode = 'k' }),
     }, mt)
 
     if writter and reader then

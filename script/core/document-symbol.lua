@@ -3,6 +3,7 @@ local files    = require 'files'
 local guide    = require 'parser.guide'
 local define   = require 'proto.define'
 local util     = require 'utility'
+local vm       = require 'vm'
 
 local function buildName(source, text)
     local uri          = guide.getUri(source)
@@ -29,6 +30,9 @@ local function buildName(source, text)
             return text:sub(startOffset + 1, finishOffset)
         end
     end
+    if source.type == 'tableexp' then
+        return ('[%d]'):format(source.tindex)
+    end
     local finishOffset = guide.positionToOffset(state, source.finish)
     return text:sub(startOffset + 1, finishOffset)
 end
@@ -53,8 +57,9 @@ local function buildFunctionParams(func)
 end
 
 local function buildTable(tbl)
+    local uri = guide.getUri(tbl)
     local buf = {}
-    for i = 1, 3 do
+    for i = 1, 5 do
         local field = tbl[i]
         if not field then
             break
@@ -62,10 +67,34 @@ local function buildTable(tbl)
         if  field.type == 'tablefield'
         and field.field then
             buf[#buf+1] = ('%s'):format(field.field[1])
+        elseif field.type == 'tableindex'
+        and    field.index then
+            local view =   vm.getInfer(field.index):viewLiterals()
+                        or vm.getInfer(field.index):view(uri)
+            buf[#buf+1] = ('[%s]'):format(view)
+        elseif field.type == 'tableexp' then
+            buf[#buf+1] = ('[%s]'):format(field.tindex)
         end
     end
-    if #tbl > 3 then
-        buf[#buf+1] = ('...(+%d)'):format(#tbl - 3)
+    if #tbl > 5 then
+        buf[#buf+1] = ('...(+%d)'):format(#tbl - 5)
+    end
+    return table.concat(buf, ', ')
+end
+
+local function buildArray(tbl)
+    local uri = guide.getUri(tbl)
+    local buf = {}
+    for i = 1, 5 do
+        local field = tbl[i]
+        if not field then
+            break
+        end
+        buf[#buf+1] =  vm.getInfer(field):viewLiterals()
+                    or vm.getInfer(field):view(uri)
+    end
+    if #tbl > 5 then
+        buf[#buf+1] = ('...(+%d)'):format(#tbl - 5)
     end
     return table.concat(buf, ', ')
 end
@@ -100,6 +129,9 @@ local function buildValue(source, text, used, symbols)
         end
         range      = { source.index.start, source.index.finish }
         sRange     = { source.index.start, source.index.finish }
+    elseif source.type == 'tableexp' then
+        range      = { source.value.start, source.value.finish }
+        sRange     = { source.value.start, source.value.finish }
     elseif source.type == 'setfield' then
         if not source.field then
             return
@@ -136,10 +168,21 @@ local function buildValue(source, text, used, symbols)
             end
         elseif source.value.type == 'table' then
             kind = define.SymbolKind.Object
+            local lastField = source.value[#source.value]
             if #source.value > 0 then
-                details[#details+1] = '{'
-                details[#details+1] = buildTable(source.value)
-                details[#details+1] = '}'
+                if  lastField.type == 'tableexp'
+                and lastField.tindex == #source.value then
+                    -- Array
+                    kind = define.SymbolKind.Array
+                    details[#details+1] = '['
+                    details[#details+1] = buildArray(source.value)
+                    details[#details+1] = ']'
+                else
+                    -- Object
+                    details[#details+1] = '{'
+                    details[#details+1] = buildTable(source.value)
+                    details[#details+1] = '}'
+                end
             end
             valueRange = { source.value.start, source.value.finish }
         elseif source.value.type == 'select' then
@@ -192,7 +235,6 @@ local function buildAnonymousFunction(source, text, used, symbols)
     }
 end
 
----@async
 local function buildSource(source, text, used, symbols)
     if     source.type == 'local'
     or     source.type == 'setlocal'
@@ -202,10 +244,8 @@ local function buildSource(source, text, used, symbols)
     or     source.type == 'tablefield'
     or     source.type == 'tableexp'
     or     source.type == 'tableindex' then
-        await.delay()
         buildValue(source, text, used, symbols)
     elseif source.type == 'function' then
-        await.delay()
         buildAnonymousFunction(source, text, used, symbols)
     end
 end
@@ -220,8 +260,14 @@ local function makeSymbol(uri)
 
     local symbols = {}
     local used = {}
-    guide.eachSource(ast.ast, function (source) ---@async
+    local i = 0
+    ---@async
+    guide.eachSource(ast.ast, function (source)
         buildSource(source, text, used, symbols)
+        i = i + 1
+        if i % 1000 == 0 then
+            await.delay()
+        end
     end)
 
     return symbols

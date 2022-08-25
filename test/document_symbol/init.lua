@@ -320,46 +320,19 @@ local t = {
     b = 2,
     c = 3,
     d = 4,
+    e = 5,
+    f = 6,
 }
 ]]
 {
     [1] = {
         name = 't',
-        detail = '{a, b, c, ...(+1)}',
+        detail = '{a, b, c, d, e, ...(+1)}',
         kind = define.SymbolKind.Object,
-        range = {6, 50001},
+        range = {6, 70001},
         selectionRange = {6, 7},
-        valueRange = {10, 50001},
-        children = {
-            [1] = {
-                name = 'a',
-                detail = '1',
-                kind = define.SymbolKind.Number,
-                range = {10004, 10009},
-                selectionRange = {10004, 10005},
-            },
-            [2] = {
-                name = 'b',
-                detail = '2',
-                kind = define.SymbolKind.Number,
-                range = {20004, 20009},
-                selectionRange = {20004, 20005},
-            },
-            [3] = {
-                name = 'c',
-                detail = '3',
-                kind = define.SymbolKind.Number,
-                range = {30004, 30009},
-                selectionRange = {30004, 30005},
-            },
-            [4] = {
-                name = 'd',
-                detail = '4',
-                kind = define.SymbolKind.Number,
-                range = {40004, 40009},
-                selectionRange = {40004, 40005},
-            },
-        }
+        valueRange = {10, 70001},
+        children = EXISTS,
     }
 }
 
@@ -723,5 +696,50 @@ local root = {
                 },
             },
         },
+    }
+}
+
+TEST [[
+local t = { 1, 2, 3 }
+]]
+{
+    [1] = {
+        name = 't',
+        detail = '[1, 2, 3]',
+        kind = define.SymbolKind.Array,
+        range = {6, 21},
+        selectionRange = {6, 7},
+        valueRange = {10, 21},
+        children = EXISTS
+    }
+}
+
+TEST [[
+local t = { 1, 2, 3, 4, 5, 6 }
+]]
+{
+    [1] = {
+        name = 't',
+        detail = '[1, 2, 3, 4, 5, ...(+1)]',
+        kind = define.SymbolKind.Array,
+        range = {6, 30},
+        selectionRange = {6, 7},
+        valueRange = {10, 30},
+        children = EXISTS,
+    }
+}
+
+TEST [[
+local t = { 1, 2, [5] = 3, [true] = 4, x = 5 }
+]]
+{
+    [1] = {
+        name = 't',
+        detail = '{[1], [2], [5], [true], x}',
+        kind = define.SymbolKind.Object,
+        range = {6, 46},
+        selectionRange = {6, 7},
+        valueRange = {10, 46},
+        children = EXISTS
     }
 }

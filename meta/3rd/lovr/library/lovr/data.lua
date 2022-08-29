@@ -269,6 +269,492 @@ function Image:setPixel(x, y, r, g, b, a) end
 local ModelData = {}
 
 ---
+---Returns the number of channels in an animation.
+---
+---A channel is a set of keyframes for a single property of a node.
+---
+---@overload fun(self: lovr.ModelData, name: string):number
+---@param index number # The index of an animation.
+---@return number count # The number of channels in the animation.
+function ModelData:getAnimationChannelCount(index) end
+
+---
+---Returns the number of animations in the model.
+---
+---@return number count # The number of animations in the model.
+function ModelData:getAnimationCount() end
+
+---
+---Returns the duration of an animation.
+---
+---
+---### NOTE:
+---The duration of the animation is calculated as the latest timestamp of all of its channels.
+---
+---@overload fun(self: lovr.ModelData, name: string):number
+---@param index number # The index of the animation.
+---@return number duration # The duration of the animation, in seconds.
+function ModelData:getAnimationDuration(index) end
+
+---
+---Returns a single keyframe in a channel of an animation.
+---
+---@overload fun(self: lovr.ModelData, name: string, channel: number, keyframe: number):number, number
+---@param index number # The index of an animation.
+---@param channel number # The index of a channel in the animation.
+---@param keyframe number # The index of a keyframe in the channel.
+---@return number time # The timestamp of the keyframe.
+function ModelData:getAnimationKeyframe(index, channel, keyframe) end
+
+---
+---Returns the number of keyframes in a channel of an animation.
+---
+---@overload fun(self: lovr.ModelData, name: string, channel: number):number
+---@param index number # The index of an animation.
+---@param channel number # The index of a channel in the animation.
+---@return number count # The number of keyframes in the channel.
+function ModelData:getAnimationKeyframeCount(index, channel) end
+
+---
+---Returns the name of an animation.
+---
+---
+---### NOTE:
+---If the animation does not have a name, this function returns `nil`.
+---
+---@param index number # The index of the animation.
+---@return string name # The name of the animation.
+function ModelData:getAnimationName(index) end
+
+---
+---Returns the index of a node targeted by an animation's channel.
+---
+---@overload fun(self: lovr.ModelData, name: string, channel: number):number
+---@param index number # The index of an animation.
+---@param channel number # The index of a channel in the animation.
+---@return number node # The index of the node targeted by the channel.
+function ModelData:getAnimationNode(index, channel) end
+
+---
+---Returns the property targeted by an animation's channel.
+---
+---@overload fun(self: lovr.ModelData, name: string, channel: number):lovr.AnimationProperty
+---@param index number # The index of an animation.
+---@param channel number # The index of a channel in the animation.
+---@return lovr.AnimationProperty property # The property (translation, rotation, scale) affected by the keyframes.
+function ModelData:getAnimationProperty(index, channel) end
+
+---
+---Returns the smooth mode of a channel in an animation.
+---
+---@overload fun(self: lovr.ModelData, name: string, channel: number):lovr.SmoothMode
+---@param index number # The index of an animation.
+---@param channel number # The index of a channel in the animation.
+---@return lovr.SmoothMode smooth # The smooth mode of the keyframes.
+function ModelData:getAnimationSmoothMode(index, channel) end
+
+---
+---Returns one of the Blobs in the model, by index.
+---
+---@param index number # The index of the Blob to get.
+---@return lovr.Blob blob # The Blob object.
+function ModelData:getBlob(index) end
+
+---
+---Returns the number of Blobs in the model.
+---
+---@return number count # The number of Blobs in the model.
+function ModelData:getBlobCount() end
+
+---
+---Returns the 6 values of the model's axis-aligned bounding box.
+---
+---@return number minx # The minimum x coordinate of the vertices in the model.
+---@return number maxx # The maximum x coordinate of the vertices in the model.
+---@return number miny # The minimum y coordinate of the vertices in the model.
+---@return number maxy # The maximum y coordinate of the vertices in the model.
+---@return number minz # The minimum z coordinate of the vertices in the model.
+---@return number maxz # The maximum z coordinate of the vertices in the model.
+function ModelData:getBoundingBox() end
+
+---
+---Returns a sphere approximately enclosing the vertices in the model.
+---
+---@return number x # The x coordinate of the position of the sphere.
+---@return number y # The y coordinate of the position of the sphere.
+---@return number z # The z coordinate of the position of the sphere.
+---@return number radius # The radius of the bounding sphere.
+function ModelData:getBoundingSphere() end
+
+---
+---Returns the center of the model's axis-aligned bounding box, relative to the model's origin.
+---
+---@return number x # The x offset of the center of the bounding box.
+---@return number y # The y offset of the center of the bounding box.
+---@return number z # The z offset of the center of the bounding box.
+function ModelData:getCenter() end
+
+---
+---Returns the depth of the model, computed from its axis-aligned bounding box.
+---
+---@return number depth # The depth of the model.
+function ModelData:getDepth() end
+
+---
+---Returns the width, height, and depth of the model, computed from its axis-aligned bounding box.
+---
+---@return number width # The width of the model.
+---@return number height # The height of the model.
+---@return number depth # The depth of the model.
+function ModelData:getDimensions() end
+
+---
+---Returns the height of the model, computed from its axis-aligned bounding box.
+---
+---@return number height # The height of the model.
+function ModelData:getHeight() end
+
+---
+---Returns one of the Images in the model, by index.
+---
+---@param index number # The index of the Image to get.
+---@return lovr.Image image # The Image object.
+function ModelData:getImage(index) end
+
+---
+---Returns the number of Images in the model.
+---
+---@return number count # The number of Images in the model.
+function ModelData:getImageCount() end
+
+---
+---Returns a table with all of the properties of a material.
+---
+---
+---### NOTE:
+---All images are optional and may be `nil`.
+---
+---@overload fun(self: lovr.ModelData, name: string):table
+---@param index number # The index of a material.
+---@return {color: table, glow: table, uvShift: table, uvScale: table, metalness: number, roughness: number, clearcoat: number, clearcoatRoughness: number, occlusionStrength: number, normalScale: number, alphaCutoff: number, texture: number, glowTexture: number, occlusionTexture: number, metalnessTexture: number, roughnessTexture: number, clearcoatTexture: number, normalTexture: number} properties # The material properties.
+function ModelData:getMaterial(index) end
+
+---
+---Returns the number of materials in the model.
+---
+---@return number count # The number of materials in the model.
+function ModelData:getMaterialCount() end
+
+---
+---Returns the name of a material in the model.
+---
+---@param index number # The index of a material.
+---@return string name # The name of the material, or nil if the material does not have a name.
+function ModelData:getMaterialName(index) end
+
+---
+---Returns the number of meshes in the model.
+---
+---@return number count # The number of meshes in the model.
+function ModelData:getMeshCount() end
+
+---
+---Returns the draw mode of a mesh.
+---
+---This controls how its vertices are connected together (points, lines, or triangles).
+---
+---@param mesh number # The index of a mesh.
+---@return lovr.DrawMode mode # The draw mode of the mesh.
+function ModelData:getMeshDrawMode(mesh) end
+
+---
+---Returns one of the vertex indices in a mesh.
+---
+---If a mesh has vertex indices, they define the order and connectivity of the vertices in the mesh, allowing a vertex to be reused multiple times without duplicating its data.
+---
+---@param mesh number # The index of a mesh to get the vertex from.
+---@param index number # The index of a vertex index in the mesh to retrieve.
+---@return number vertexindex # The vertex index.  Like all indices in Lua, this is 1-indexed.
+function ModelData:getMeshIndex(mesh, index) end
+
+---
+---Returns the number of vertex indices in a mesh.
+---
+---Vertex indices allow for vertices to be reused when defining triangles.
+---
+---
+---### NOTE:
+---This may return zero if the mesh does not use indices.
+---
+---@param mesh number # The index of a mesh.
+---@return number count # The number of vertex indices in the mesh.
+function ModelData:getMeshIndexCount(mesh) end
+
+---
+---Returns the data format of vertex indices in a mesh.
+---
+---If a mesh doesn't use vertex indices, this function returns nil.
+---
+---@param mesh number # The index of a mesh.
+---@return lovr.AttributeType type # The data type of each vertex index (always u16 or u32).
+---@return number blob # The index of a Blob in the mesh where the binary data is stored.
+---@return number offset # A byte offset into the Blob's data where the index data starts.
+---@return number stride # The number of bytes between subsequent vertex indices.  Indices are always tightly packed, so this will always be 2 or 4 depending on the data type.
+function ModelData:getMeshIndexFormat(mesh) end
+
+---
+---Returns the index of the material applied to a mesh.
+---
+---@param mesh number # The index of a mesh.
+---@return number material # The index of the material applied to the mesh, or nil if the mesh does not have a material.
+function ModelData:getMeshMaterial(mesh) end
+
+---
+---Returns the data for a single vertex in a mesh.
+---
+---The data returned depends on the vertex format of a mesh, which is given by `ModelData:getMeshVertexFormat`.
+---
+---@param mesh number # The index of a mesh to get the vertex from.
+---@param vertex number # The index of a vertex in the mesh to retrieve.
+function ModelData:getMeshVertex(mesh, vertex) end
+
+---
+---Returns the number of vertices in a mesh.
+---
+---@param mesh number # The index of a mesh.
+---@return number count # The number of vertices in the mesh.
+function ModelData:getMeshVertexCount(mesh) end
+
+---
+---Returns the vertex format of a mesh.
+---
+---The vertex format defines the properties associated with each vertex (position, color, etc.), including their types and binary data layout.
+---
+---
+---### NOTE:
+---The format is given as a table of vertex attributes.
+---
+---Each attribute is a table containing the following:
+---
+---    { name, type, components, blob, offset, stride }
+---
+---- The `name` will be a `DefaultAttribute`.
+---- The `type` will be an `AttributeType`.
+---- The `component` count will be 1-4.
+---- The `blob` is an index of one of the Blobs in the model (see `ModelData:getBlob`).
+---- The `offset` is a byte offset from the start of the Blob where the attribute's data starts.
+---- The `stride` is the number of bytes between consecutive values.
+---
+---@param mesh number # The index of a mesh.
+---@return table format # The vertex format of the mesh.
+function ModelData:getMeshVertexFormat(mesh) end
+
+---
+---Returns extra information stored in the model file.
+---
+---Currently this is only implemented for glTF models and returns the JSON string from the glTF or glb file.
+---
+---The metadata can be used to get application-specific data or add support for glTF extensions not supported by LÖVR.
+---
+---@return string metadata # The metadata from the model file.
+function ModelData:getMetadata() end
+
+---
+---Given a parent node, this function returns a table with the indices of its children.
+---
+---
+---### NOTE:
+---If the node does not have any children, this function returns an empty table.
+---
+---@overload fun(self: lovr.ModelData, name: string):table
+---@param index number # The index of the parent node.
+---@return table children # A table containing a node index for each child of the node.
+function ModelData:getNodeChildren(index) end
+
+---
+---Returns the number of nodes in the model.
+---
+---@return number count # The number of nodes in the model.
+function ModelData:getNodeCount() end
+
+---
+---Returns a table of mesh indices attached to a node.
+---
+---Meshes define the geometry and materials of a model, as opposed to the nodes which define the transforms and hierarchy.
+---
+---A node can have multiple meshes, and meshes can be reused in multiple nodes.
+---
+---@overload fun(self: lovr.ModelData, name: string):table
+---@param index number # The index of the node.
+---@return table meshes # A table with the node's mesh indices.
+function ModelData:getNodeMeshes(index) end
+
+---
+---Returns the name of a node.
+---
+---
+---### NOTE:
+---If the node does not have a name, this function returns `nil`.
+---
+---@param index number # The index of the node.
+---@return string name # The name of the node.
+function ModelData:getNodeName(index) end
+
+---
+---Returns local orientation of a node, relative to its parent.
+---
+---@overload fun(self: lovr.ModelData, name: string):number, number, number, number
+---@param index number # The index of the node.
+---@return number angle # The number of radians the node is rotated around its axis of rotation.
+---@return number ax # The x component of the axis of rotation.
+---@return number ay # The y component of the axis of rotation.
+---@return number az # The z component of the axis of rotation.
+function ModelData:getNodeOrientation(index) end
+
+---
+---Given a child node, this function returns the index of its parent.
+---
+---@overload fun(self: lovr.ModelData, name: string):number
+---@param index number # The index of the child node.
+---@return number parent # The index of the parent.
+function ModelData:getNodeParent(index) end
+
+---
+---Returns local pose (position and orientation) of a node, relative to its parent.
+---
+---@overload fun(self: lovr.ModelData, name: string):number, number, number, number, number, number, number
+---@param index number # The index of the node.
+---@return number x # The x coordinate.
+---@return number y # The y coordinate.
+---@return number z # The z coordinate.
+---@return number angle # The number of radians the node is rotated around its axis of rotation.
+---@return number ax # The x component of the axis of rotation.
+---@return number ay # The y component of the axis of rotation.
+---@return number az # The z component of the axis of rotation.
+function ModelData:getNodePose(index) end
+
+---
+---Returns local position of a node, relative to its parent.
+---
+---@overload fun(self: lovr.ModelData, name: string):number, number, number
+---@param index number # The index of the node.
+---@return number x # The x coordinate.
+---@return number y # The y coordinate.
+---@return number z # The z coordinate.
+function ModelData:getNodePosition(index) end
+
+---
+---Returns local scale of a node, relative to its parent.
+---
+---@overload fun(self: lovr.ModelData, name: string):number, number, number
+---@param index number # The index of the node.
+---@return number sx # The x scale.
+---@return number sy # The y scale.
+---@return number sz # The z scale.
+function ModelData:getNodeScale(index) end
+
+---
+---Returns the index of the skin used by a node.
+---
+---Skins are collections of joints used for skeletal animation.
+---
+---A model can have multiple skins, and each node can use at most one skin to drive the animation of its meshes.
+---
+---@overload fun(self: lovr.ModelData, name: string):number
+---@param index number # The index of the node.
+---@return number skin # The index of the node's skin, or nil if the node isn't skeletally animated.
+function ModelData:getNodeSkin(index) end
+
+---
+---Returns local transform (position, orientation, and scale) of a node, relative to its parent.
+---
+---@overload fun(self: lovr.ModelData, name: string):number, number, number, number, number, number, number, number, number, number
+---@param index number # The index of the node.
+---@return number x # The x coordinate.
+---@return number y # The y coordinate.
+---@return number z # The z coordinate.
+---@return number sx # The x scale.
+---@return number sy # The y scale.
+---@return number sz # The z scale.
+---@return number angle # The number of radians the node is rotated around its axis of rotation.
+---@return number ax # The x component of the axis of rotation.
+---@return number ay # The y component of the axis of rotation.
+---@return number az # The z component of the axis of rotation.
+function ModelData:getNodeTransform(index) end
+
+---
+---Returns the index of the model's root node.
+---
+---@return number root # The index of the root node.
+function ModelData:getRootNode() end
+
+---
+---Returns the number of skins in the model.
+---
+---A skin is a collection of joints targeted by an animation.
+---
+---
+---### NOTE:
+---There is currently a maximum of 256 skins.
+---
+---@return number count # The number of skins in the model.
+function ModelData:getSkinCount() end
+
+---
+---Returns the inverse bind matrix for a joint in the skin.
+---
+---@param skin number # The index of a skin.
+---@param joint number # The index of a joint in the skin.
+function ModelData:getSkinInverseBindMatrix(skin, joint) end
+
+---
+---Returns a table with the node indices of the joints in a skin.
+---
+---@param skin number # The index of a skin.
+---@return table joints # The joints in the skin.
+function ModelData:getSkinJoints(skin) end
+
+---
+---Returns the total number of triangles in the model.
+---
+---This count includes meshes that are attached to multiple nodes, and the count corresponds to the triangles returned by `ModelData:getTriangles`.
+---
+---@return number count # The total number of triangles in the model.
+function ModelData:getTriangleCount() end
+
+---
+---Returns the data for all triangles in the model.
+---
+---There are a few differences between this and the mesh-specific functions like `ModelData:getMeshVertex` and `ModelData:getMeshIndex`:
+---
+---- Only vertex positions are returned, not other vertex attributes.
+---- Positions are relative to the origin of the whole model, instead of local to a node.
+---- If a mesh is attached to more than one node, its vertices will be in the table multiple times.
+---- Vertex indices will be relative to the whole triangle list instead of a mesh.
+---
+---
+---### NOTE:
+---After this function is called on a ModelData once, the result is cached.
+---
+---@return table vertices # The triangle vertex positions, returned as a flat (non-nested) table of numbers.  The position of each vertex is given as an x, y, and z coordinate.
+---@return table indices # The vertex indices.  Every 3 indices describes a triangle.
+function ModelData:getTriangles() end
+
+---
+---Returns the total vertex count of a model.
+---
+---This count includes meshes that are attached to multiple nodes, and the count corresponds to the vertices returned by `ModelData:getTriangles`.
+---
+---@return number count # The total number of vertices in the model.
+function ModelData:getVertexCount() end
+
+---
+---Returns the width of the model, computed from its axis-aligned bounding box.
+---
+---@return number width # The width of the model.
+function ModelData:getWidth() end
+
+---
 ---A Rasterizer is an object that parses a TTF file, decoding and rendering glyphs from it.
 ---
 ---Usually you can just use `Font` objects.
@@ -534,6 +1020,56 @@ function Sound:isStream() end
 function Sound:setFrames(t, count, dstOffset, srcOffset) end
 
 ---
+---This indicates the different transform properties that can be animated.
+---
+---@alias lovr.AnimationProperty
+---
+---Node translation.
+---
+---| "translation"
+---
+---Node rotation.
+---
+---| "rotation"
+---
+---Node scale.
+---
+---| "scale"
+
+---
+---These are the data types that can be used by vertex data in meshes.
+---
+---@alias lovr.AttributeType
+---
+---Signed 8 bit integers (-128 to 127).
+---
+---| "i8"
+---
+---Unsigned 8 bit integers (0 to 255).
+---
+---| "u8"
+---
+---Signed 16 bit integers (-32768 to 32767).
+---
+---| "i16"
+---
+---Unsigned 16 bit integers (0 to 65535).
+---
+---| "u16"
+---
+---Signed 32 bit integers (-2147483648 to 2147483647).
+---
+---| "i32"
+---
+---Unsigned 32 bit integers (0 to 429467295).
+---
+---| "u32"
+---
+---Floating point numbers.
+---
+---| "f32"
+
+---
 ---Sounds can have different numbers of channels, and those channels can map to various speaker layouts.
 ---
 ---@alias lovr.ChannelLayout
@@ -557,6 +1093,76 @@ function Sound:setFrames(t, count, dstOffset, srcOffset) end
 ---| "ambisonic"
 
 ---
+---These are the different types of attributes that may be present in meshes loaded from models.
+---
+---@alias lovr.DefaultAttribute
+---
+---Vertex positions.
+---
+---| "position"
+---
+---Vertex normal vectors.
+---
+---| "normal"
+---
+---Vertex texture coordinates.
+---
+---| "uv"
+---
+---Vertex colors.
+---
+---| "color"
+---
+---Vertex tangent vectors.
+---
+---| "tangent"
+---
+---Vertex joint indices.
+---
+---| "joints"
+---
+---Vertex joint weights.
+---
+---| "weights"
+
+---
+---The DrawMode of a mesh determines how its vertices are connected together.
+---
+---@alias lovr.DrawMode
+---
+---Each vertex is draw as a single point.
+---
+---| "points"
+---
+---Every pair of vertices is drawn as a line.
+---
+---| "lines"
+---
+---Draws a single line through all of the vertices.
+---
+---| "linestrip"
+---
+---Draws a single line through all of the vertices, then connects back to the first vertex.
+---
+---| "lineloop"
+---
+---Vertices are rendered as triangles.
+---
+---After the first 3 vertices, each subsequent vertex connects to the previous two.
+---
+---| "strip"
+---
+---Every 3 vertices forms a triangle.
+---
+---| "triangles"
+---
+---Vertices are rendered as triangles.
+---
+---After the first 3 vertices, each subsequent vertex is connected to the previous vertex and the first vertex.
+---
+---| "fan"
+
+---
 ---Sounds can store audio samples as 16 bit integers or 32 bit floats.
 ---
 ---@alias lovr.SampleFormat
@@ -568,3 +1174,287 @@ function Sound:setFrames(t, count, dstOffset, srcOffset) end
 ---16 bit integer samples (between -32768 and 32767).
 ---
 ---| "i16"
+
+---
+---Different ways to interpolate between animation keyframes.
+---
+---@alias lovr.SmoothMode
+---
+---The animated property will snap to the nearest keyframe.
+---
+---| "step"
+---
+---The animated property will linearly interpolate between keyframes.
+---
+---| "linear"
+---
+---The animated property will follow a smooth curve between nearby keyframes.
+---
+---| "cubic"
+
+---
+---Different data layouts for pixels in `Image` and `Texture` objects.
+---
+---Formats starting with `d` are depth formats, used for depth/stencil render targets.
+---
+---Formats starting with `bc` and `astc` are compressed formats.
+---
+---Compressed formats have better performance since they stay compressed on the CPU and GPU, reducing the amount of memory bandwidth required to look up all the pixels needed for shading.
+---
+---Formats without the `f` suffix are unsigned normalized formats, which store values in the range `[0,1]`.
+---
+---The `f` suffix indicates a floating point format which can store values outside this range, and is used for HDR rendering or storing data in a texture.
+---
+---@alias lovr.TextureFormat
+---
+---One 8-bit channel.
+---
+---1 byte per pixel.
+---
+---| "r8"
+---
+---Two 8-bit channels.
+---
+---2 bytes per pixel.
+---
+---| "rg8"
+---
+---Four 8-bit channels.
+---
+---4 bytes per pixel.
+---
+---| "rgba8"
+---
+---One 16-bit channel.
+---
+---2 bytes per pixel.
+---
+---| "r16"
+---
+---Two 16-bit channels.
+---
+---4 bytes per pixel.
+---
+---| "rg16"
+---
+---Four 16-bit channels.
+---
+---8 bytes per pixel.
+---
+---| "rgba16"
+---
+---One 16-bit floating point channel.
+---
+---2 bytes per pixel.
+---
+---| "r16f"
+---
+---Two 16-bit floating point channels.
+---
+---4 bytes per pixel.
+---
+---| "rg16f"
+---
+---Four 16-bit floating point channels.
+---
+---8 bytes per pixel.
+---
+---| "rgba16f"
+---
+---One 32-bit floating point channel.
+---
+---4 bytes per pixel.
+---
+---| "r32f"
+---
+---Two 32-bit floating point channels.
+---
+---8 bytes per pixel.
+---
+---| "rg32f"
+---
+---Four 32-bit floating point channels.
+---
+---16 bytes per pixel.
+---
+---| "rgba32f"
+---
+---Packs three channels into 16 bits.
+---
+---2 bytes per pixel.
+---
+---| "rgb565"
+---
+---Packs four channels into 16 bits, with "cutout" alpha.
+---
+---2 bytes per pixel.
+---
+---| "rgb5a1"
+---
+---Packs four channels into 32 bits.
+---
+---4 bytes per pixel.
+---
+---| "rgb10a2"
+---
+---Packs three unsigned floating point channels into 32 bits.
+---
+---4 bytes per pixel.
+---
+---| "rg11b10f"
+---
+---One 16-bit depth channel.
+---
+---2 bytes per pixel.
+---
+---| "d16"
+---
+---One 24-bit depth channel and one 8-bit stencil channel.
+---
+---4 bytes per pixel.
+---
+---| "d24s8"
+---
+---One 32-bit floating point depth channel.
+---
+---4 bytes per pixel.
+---
+---| "d32f"
+---
+---3 channels.
+---
+---8 bytes per 4x4 block, or 0.5 bytes per pixel.
+---
+---Good for opaque images.
+---
+---| "bc1"
+---
+---Four channels.
+---
+---16 bytes per 4x4 block or 1 byte per pixel.
+---
+---Not good for anything, because it only has 16 distinct levels of alpha.
+---
+---| "bc2"
+---
+---Four channels.
+---
+---16 bytes per 4x4 block or 1 byte per pixel.
+---
+---Good for color images with transparency.
+---
+---| "bc3"
+---
+---One unsigned normalized channel.
+---
+---8 bytes per 4x4 block or 0.5 bytes per pixel.
+---
+---Good for grayscale images, like heightmaps.
+---
+---| "bc4u"
+---
+---One signed normalized channel.
+---
+---8 bytes per 4x4 block or 0.5 bytes per pixel.
+---
+---Similar to bc4u but has a range of -1 to 1.
+---
+---| "bc4s"
+---
+---Two unsigned normalized channels.
+---
+---16 bytes per 4x4 block, or 1 byte per pixel.
+---
+---Good for normal maps.
+---
+---| "bc5u"
+---
+---Two signed normalized channels.
+---
+---16 bytes per 4x4 block or 1 byte per pixel.
+---
+---Good for normal maps.
+---
+---| "bc5s"
+---
+---Three unsigned floating point channels.
+---
+---16 bytes per 4x4 block or 1 byte per pixel.
+---
+---Good for HDR images.
+---
+---| "bc6uf"
+---
+---Three floating point channels.
+---
+---16 bytes per 4x4 block or 1 byte per pixel.
+---
+---Good for HDR images.
+---
+---| "bc6sf"
+---
+---Four channels.
+---
+---16 bytes per 4x4 block or 1 byte per pixel.
+---
+---High quality.
+---
+---Good for most color images, including transparency.
+---
+---| "bc7"
+---
+---Four channels, 16 bytes per 4x4 block or 1 byte per pixel.
+---
+---| "astc4x4"
+---
+---Four channels, 16 bytes per 5x4 block or 0.80 bytes per pixel.
+---
+---| "astc5x4"
+---
+---Four channels, 16 bytes per 5x5 block or 0.64 bytes per pixel.
+---
+---| "astc5x5"
+---
+---Four channels, 16 bytes per 6x5 block or 0.53 bytes per pixel.
+---
+---| "astc6x5"
+---
+---Four channels, 16 bytes per 6x6 block or 0.44 bytes per pixel.
+---
+---| "astc6x6"
+---
+---Four channels, 16 bytes per 8x5 block or 0.40 bytes per pixel.
+---
+---| "astc8x5"
+---
+---Four channels, 16 bytes per 8x6 block or 0.33 bytes per pixel.
+---
+---| "astc8x6"
+---
+---Four channels, 16 bytes per 8x8 block or 0.25 bytes per pixel.
+---
+---| "astc8x8"
+---
+---Four channels, 16 bytes per 10x5 block or 0.32 bytes per pixel.
+---
+---| "astc10x5"
+---
+---Four channels, 16 bytes per 10x6 block or 0.27 bytes per pixel.
+---
+---| "astc10x6"
+---
+---Four channels, 16 bytes per 10x8 block or 0.20 bytes per pixel.
+---
+---| "astc10x8"
+---
+---Four channels, 16 bytes per 10x10 block or 0.16 bytes per pixel.
+---
+---| "astc10x10"
+---
+---Four channels, 16 bytes per 12x10 block or 0.13 bytes per pixel.
+---
+---| "astc12x10"
+---
+---Four channels, 16 bytes per 12x12 block or 0.11 bytes per pixel.
+---
+---| "astc12x12"

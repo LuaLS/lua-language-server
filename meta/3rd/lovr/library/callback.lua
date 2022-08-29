@@ -35,7 +35,7 @@ lovr.conf = nil
 ---
 ---The display is cleared to the background color before this function is called.
 ---
----@type fun()
+---@type fun(pass: lovr.Pass):boolean
 lovr.draw = nil
 
 ---

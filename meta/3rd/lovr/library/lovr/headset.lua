@@ -260,6 +260,12 @@ function lovr.headset.getOrientation(device) end
 function lovr.headset.getOriginType() end
 
 ---
+---TODO
+---
+---@return lovr.Pass pass # The Pass.
+function lovr.headset.getPass() end
+
+---
 ---Returns the current position and orientation of a device.
 ---
 ---

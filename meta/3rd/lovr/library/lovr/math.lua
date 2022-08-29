@@ -799,9 +799,11 @@ function Vec2:length() end
 ---
 ---A parameter value of `0` will leave the vector unchanged, a parameter value of `1` will set the vector to be equal to the input vector, and a value of `.5` will set the components to be halfway between the two vectors.
 ---
----@overload fun(self: lovr.Vec2, x: number, y: number):lovr.Vec2
+---@overload fun(self: lovr.Vec2, x: number, y: number, t: number):lovr.Vec2
+---@param u lovr.Vec2 # The vector to lerp towards.
+---@param t number # The lerping parameter.
 ---@return lovr.Vec2 v # The original vector, containing the new lerped values.
-function Vec2:lerp() end
+function Vec2:lerp(u, t) end
 
 ---
 ---Multiplies the vector by a vector or a number.

@@ -3,38 +3,31 @@ local files    = require 'files'
 local guide    = require 'parser.guide'
 local define   = require 'proto.define'
 local util     = require 'utility'
-local vm       = require 'vm'
+local subber   = require 'core.substring'
 
-local function buildName(source, text)
-    local uri          = guide.getUri(source)
-    local state        = files.getState(uri)
-    local startOffset  = guide.positionToOffset(state, source.start)
+local function buildName(source, sub)
     if source.type == 'setmethod'
     or source.type == 'getmethod' then
         if source.method then
-            local finishOffset = guide.positionToOffset(state, source.method.finish)
-            return text:sub(startOffset + 1, finishOffset)
+            return sub(source.start + 1, source.method.finish)
         end
     end
     if source.type == 'setfield'
     or source.type == 'tablefield'
     or source.type == 'getfield' then
         if source.field then
-            local finishOffset = guide.positionToOffset(state, source.field.finish)
-            return text:sub(startOffset + 1, finishOffset)
+            return sub(source.start + 1, source.field.finish)
         end
     end
     if source.type == 'tableindex' then
         if source.index then
-            local finishOffset = guide.positionToOffset(state, source.finish)
-            return text:sub(startOffset + 1, finishOffset)
+            return sub(source.start + 1, source.finish)
         end
     end
     if source.type == 'tableexp' then
         return ('[%d]'):format(source.tindex)
     end
-    local finishOffset = guide.positionToOffset(state, source.finish)
-    return text:sub(startOffset + 1, finishOffset)
+    return sub(source.start + 1, source.finish)
 end
 
 local function buildFunctionParams(func)
@@ -56,8 +49,7 @@ local function buildFunctionParams(func)
     return table.concat(params, ', ')
 end
 
-local function buildTable(tbl)
-    local uri = guide.getUri(tbl)
+local function buildTable(tbl, sub)
     local buf = {}
     for i = 1, 5 do
         local field = tbl[i]
@@ -69,9 +61,7 @@ local function buildTable(tbl)
             buf[#buf+1] = ('%s'):format(field.field[1])
         elseif field.type == 'tableindex'
         and    field.index then
-            local view =   vm.getInfer(field.index):viewLiterals()
-                        or vm.getInfer(field.index):view(uri)
-            buf[#buf+1] = ('[%s]'):format(view)
+            buf[#buf+1] = ('[%s]'):format(sub(field.index.start + 1, field.index.finish))
         elseif field.type == 'tableexp' then
             buf[#buf+1] = ('[%s]'):format(field.tindex)
         end
@@ -82,16 +72,14 @@ local function buildTable(tbl)
     return table.concat(buf, ', ')
 end
 
-local function buildArray(tbl)
-    local uri = guide.getUri(tbl)
+local function buildArray(tbl, sub)
     local buf = {}
     for i = 1, 5 do
         local field = tbl[i]
         if not field then
             break
         end
-        buf[#buf+1] =  vm.getInfer(field):viewLiterals()
-                    or vm.getInfer(field):view(uri)
+        buf[#buf+1] = sub(field.start + 1, field.finish)
     end
     if #tbl > 5 then
         buf[#buf+1] = ('...(+%d)'):format(#tbl - 5)
@@ -99,8 +87,8 @@ local function buildArray(tbl)
     return table.concat(buf, ', ')
 end
 
-local function buildValue(source, text, used, symbols)
-    local name = buildName(source, text)
+local function buildValue(source, sub, used, symbols)
+    local name = buildName(source, sub)
     local range, sRange, valueRange, kind
     local details = {}
     if source.type == 'local' then
@@ -175,12 +163,12 @@ local function buildValue(source, text, used, symbols)
                     -- Array
                     kind = define.SymbolKind.Array
                     details[#details+1] = '['
-                    details[#details+1] = buildArray(source.value)
+                    details[#details+1] = buildArray(source.value, sub)
                     details[#details+1] = ']'
                 else
                     -- Object
                     details[#details+1] = '{'
-                    details[#details+1] = buildTable(source.value)
+                    details[#details+1] = buildTable(source.value, sub)
                     details[#details+1] = '}'
                 end
             end
@@ -211,7 +199,7 @@ local function buildValue(source, text, used, symbols)
     }
 end
 
-local function buildAnonymousFunction(source, text, used, symbols)
+local function buildAnonymousFunction(source, sub, used, symbols)
     if used[source] then
         return
     end
@@ -223,7 +211,7 @@ local function buildAnonymousFunction(source, text, used, symbols)
     elseif parent.type == 'callargs' then
         local call = parent.parent
         local node = call.node
-        head = buildName(node, text) .. ' -> '
+        head = buildName(node, sub) .. ' -> '
     end
     symbols[#symbols+1] = {
         name           = '',
@@ -235,7 +223,54 @@ local function buildAnonymousFunction(source, text, used, symbols)
     }
 end
 
-local function buildSource(source, text, used, symbols)
+local function buildBlock(source, sub, used, symbols)
+    if used[source] then
+        return
+    end
+    used[source] = true
+    if source.type == 'if' then
+        for _, block in ipairs(source) do
+            symbols[#symbols+1] = {
+                name           = block.type:gsub('block$', ''),
+                detail         = sub(block.start + 1, block.keyword[4] or block.keyword[2]),
+                kind           = define.SymbolKind.Package,
+                range          = { block.start, block.finish },
+                valueRange     = { block.start, block.finish },
+                selectionRange = { block.keyword[1], block.keyword[2] },
+            }
+        end
+    elseif source.type == 'while' then
+        symbols[#symbols+1] = {
+            name           = 'while',
+            detail         = sub(source.start + 1, source.keyword[4] or source.keyword[2]),
+            kind           = define.SymbolKind.Package,
+            range          = { source.start, source.finish },
+            valueRange     = { source.start, source.finish },
+            selectionRange = { source.keyword[1], source.keyword[2] },
+        }
+    elseif source.type == 'repeat' then
+        symbols[#symbols+1] = {
+            name           = 'repeat',
+            detail         = source.filter and sub(source.keyword[3] + 1, source.filter.finish) or '',
+            kind           = define.SymbolKind.Package,
+            range          = { source.start, source.finish },
+            valueRange     = { source.start, source.finish },
+            selectionRange = { source.keyword[1], source.keyword[2] },
+        }
+    elseif source.type == 'loop'
+    or     source.type == 'in' then
+        symbols[#symbols+1] = {
+            name           = 'for',
+            detail         = sub(source.start, source.keyword[4] or source.keyword[2]),
+            kind           = define.SymbolKind.Package,
+            range          = { source.start, source.finish },
+            valueRange     = { source.start, source.finish },
+            selectionRange = { source.keyword[1], source.keyword[2] },
+        }
+    end
+end
+
+local function buildSource(source, sub, used, symbols)
     if     source.type == 'local'
     or     source.type == 'setlocal'
     or     source.type == 'setglobal'
@@ -244,26 +279,32 @@ local function buildSource(source, text, used, symbols)
     or     source.type == 'tablefield'
     or     source.type == 'tableexp'
     or     source.type == 'tableindex' then
-        buildValue(source, text, used, symbols)
+        buildValue(source, sub, used, symbols)
     elseif source.type == 'function' then
-        buildAnonymousFunction(source, text, used, symbols)
+        buildAnonymousFunction(source, sub, used, symbols)
+    elseif source.type == 'if'
+    or     source.type == 'while'
+    or     source.type == 'in'
+    or     source.type == 'loop'
+    or     source.type == 'repeat' then
+        buildBlock(source, sub, used, symbols)
     end
 end
 
 ---@async
 local function makeSymbol(uri)
-    local ast = files.getState(uri)
-    local text = files.getText(uri)
-    if not ast or not text then
+    local state = files.getState(uri)
+    if not state then
         return nil
     end
 
+    local sub = subber(state)
     local symbols = {}
     local used = {}
     local i = 0
     ---@async
-    guide.eachSource(ast.ast, function (source)
-        buildSource(source, text, used, symbols)
+    guide.eachSource(state.ast, function (source)
+        buildSource(source, sub, used, symbols)
         i = i + 1
         if i % 1000 == 0 then
             await.delay()

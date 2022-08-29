@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.5.4
+* `CHG` `document-symbol`: redesigned to better support for `Sticky Scroll` feature of VSCode
 * `FIX` `diagnostics.workspaceDelay` can not prevent first workspace diagnostic
 * `FIX` [#1476](https://github.com/sumneko/lua-language-server/issues/1476)
 

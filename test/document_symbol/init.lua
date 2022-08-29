@@ -743,3 +743,98 @@ local t = { 1, 2, [5] = 3, [true] = 4, x = 5 }
         children = EXISTS
     }
 }
+
+TEST [[
+if 1 then
+
+elseif 2 then
+
+elseif 3 then
+
+else
+
+end
+]]
+{
+    {
+        name   = 'if',
+        detail = 'if 1 then',
+        kind = define.SymbolKind.Package,
+        range = {0, 20000},
+        selectionRange = {0, 2},
+        valueRange = {0, 20000},
+    },
+    {
+        name   = 'elseif',
+        detail = 'elseif 2 then',
+        kind = define.SymbolKind.Package,
+        range = {20000, 40000},
+        selectionRange = {20000, 20006},
+        valueRange = {20000, 40000},
+    },
+    {
+        name   = 'elseif',
+        detail = 'elseif 3 then',
+        kind = define.SymbolKind.Package,
+        range = {40000, 60000},
+        selectionRange = {40000, 40006},
+        valueRange = {40000, 60000},
+    },
+    {
+        name   = 'else',
+        detail = 'else',
+        kind = define.SymbolKind.Package,
+        range = {60000, 80000},
+        selectionRange = {60000, 60004},
+        valueRange = {60000, 80000},
+    },
+}
+
+TEST [[
+while true do
+
+end
+]]
+{
+    {
+        name   = 'while',
+        detail = 'while true do',
+        kind = define.SymbolKind.Package,
+        range = {0, 20003},
+        selectionRange = {0, 5},
+        valueRange = {0, 20003},
+    },
+}
+
+TEST [[
+repeat
+
+until true
+]]
+{
+    {
+        name   = 'repeat',
+        detail = 'until true',
+        kind = define.SymbolKind.Package,
+        range = {0, 20010},
+        selectionRange = {0, 6},
+        valueRange = {0, 20010},
+    },
+}
+
+TEST [[
+for i = 1, 10 do
+
+end
+]]
+{
+    {
+        name   = 'for',
+        detail = 'for i = 1, 10 do',
+        kind = define.SymbolKind.Package,
+        range = {0, 20003},
+        selectionRange = {0, 3},
+        valueRange = {0, 20003},
+        children = EXISTS,
+    },
+}

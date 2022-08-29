@@ -41,6 +41,11 @@
         ],
         "checkThirdParty": false
     },
+    "typeFormat": {
+        "config": {
+            "format_line": "false"
+        }
+    },
     "type": {
         "castNumberToInteger": false
     }

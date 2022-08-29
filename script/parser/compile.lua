@@ -3191,7 +3191,7 @@ local function parseIfBlock(parent)
     pushChunk(ifblock)
     parseActions()
     popChunk()
-    ifblock.finish = lastRightPosition()
+    ifblock.finish = getPosition(Tokens[Index], 'left')
     if ifblock.locals then
         LocalCount = LocalCount - #ifblock.locals
     end
@@ -3250,7 +3250,7 @@ local function parseElseIfBlock(parent)
     pushChunk(elseifblock)
     parseActions()
     popChunk()
-    elseifblock.finish = lastRightPosition()
+    elseifblock.finish = getPosition(Tokens[Index], 'left')
     if elseifblock.locals then
         LocalCount = LocalCount - #elseifblock.locals
     end
@@ -3275,7 +3275,7 @@ local function parseElseBlock(parent)
     pushChunk(elseblock)
     parseActions()
     popChunk()
-    elseblock.finish = lastRightPosition()
+    elseblock.finish = getPosition(Tokens[Index], 'left')
     if elseblock.locals then
         LocalCount = LocalCount - #elseblock.locals
     end

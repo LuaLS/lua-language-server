@@ -1,8 +1,11 @@
-local codeFormat = require("code_format")
 local files      = require("files")
 local log        = require("log")
 
 return function(uri, options)
+    local suc, codeFormat = pcall(require, "code_format")
+    if not suc then
+        return
+    end
     local text = files.getOriginText(uri)
     local state = files.getState(uri)
     if not state then

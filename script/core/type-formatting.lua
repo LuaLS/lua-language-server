@@ -1,8 +1,9 @@
 local files        = require 'files'
 local lookBackward = require 'core.look-backward'
-local guide        = require "parser.guide"
-local codeFormat   = require "code_format"
-local config       = require "config"
+local guide        = require 'parser.guide'
+local config       = require 'config'
+local util         = require 'utility'
+
 
 local function insertIndentation(uri, position, edits)
     local text   = files.getText(uri)
@@ -88,8 +89,103 @@ local function checkSplitOneLine(results, uri, position, ch)
     end
 end
 
+local function getIndent(state, row)
+    local offset    = state.lines[row]
+    local indent    = state.lua:match('^[\t ]*', offset)
+    return indent
+end
+
+local function isInBlock(state, position)
+    local block = guide.eachSourceContain(state.ast, position, function(source)
+        if source.type == 'ifblock'
+        or source.type == 'elseifblock' then
+            if source.keyword[4] and source.keyword[4] <= position then
+                return true
+            end
+        end
+        if source.type == 'else' then
+            if source.keyword[2] and source.keyword[2] <= position then
+                return true
+            end
+        end
+        if source.type == 'while' then
+            if source.keyword[4] and source.keyword[4] <= position then
+                return true
+            end
+        end
+        if source.type == 'repeat' then
+            if source.keyword[2] and source.keyword[2] <= position then
+                return true
+            end
+        end
+        if source.type == 'loop' then
+            if source.keyword[4] and source.keyword[4] <= position then
+                return true
+            end
+        end
+        if source.type == 'in' then
+            if source.keyword[6] and source.keyword[6] <= position then
+                return true
+            end
+        end
+        if source.type == 'do' then
+            if source.keyword[2] and source.keyword[2] <= position then
+                return true
+            end
+        end
+        if source.type == 'function' then
+            if source.args and source.args.finish <= position then
+                return true
+            end
+            if not source.keyword[3] or source.keyword[3] >= position then
+                return true
+            end
+        end
+    end)
+    return block ~= nil
+end
+
+local function checkWrongIndentation(results, uri, position, ch)
+    if ch ~= '\n' then
+        return
+    end
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
+    local row = guide.rowColOf(position)
+    if row <= 0 then
+        return
+    end
+    local myIndent   = getIndent(state, row)
+    local lastIndent = getIndent(state, row - 1)
+    if #myIndent <= #lastIndent then
+        return
+    end
+    if not util.stringStartWith(myIndent, lastIndent) then
+        return
+    end
+    local lastOffset = lookBackward.findAnyOffset(state.lua, guide.positionToOffset(state, position) - 1)
+    if not lastOffset then
+        return
+    end
+    local lastPosition = guide.offsetToPosition(state, lastOffset)
+    if isInBlock(state, lastPosition) then
+        return
+    end
+    results[#results+1] = {
+        start  = position - #myIndent + #lastIndent,
+        finish = position,
+        text   = '',
+    }
+end
+
 local function typeFormat(results, uri, position, ch, options)
     if ch ~= '\n' then
+        return
+    end
+    local suc, codeFormat = pcall(require, "code_format")
+    if not suc then
         return
     end
     local text = files.getOriginText(uri)
@@ -120,9 +216,23 @@ return function (uri, position, ch, options)
     local results = {}
     -- split `function () $ end`
     checkSplitOneLine(results, uri, position, ch)
-    if #results == 0 then
-        typeFormat(results, uri, position, ch, options)
+    if #results > 0 then
+        return results
     end
 
-    return results
+    checkWrongIndentation(results, uri, position, ch)
+    if #results > 0 then
+        return results
+    end
+
+    if TEST then
+        return nil
+    end
+
+    typeFormat(results, uri, position, ch, options)
+    if #results > 0 then
+        return results
+    end
+
+    return nil
 end

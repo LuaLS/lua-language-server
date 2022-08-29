@@ -1,5 +1,4 @@
 local files       = require 'files'
-local codeFormat  = require 'code_format'
 local converter   = require 'proto.converter'
 local log         = require 'log'
 local pformatting = require 'provider.formatting'
@@ -9,6 +8,11 @@ local pformatting = require 'provider.formatting'
 return function(uri, callback)
     local text = files.getOriginText(uri)
     if not text then
+        return
+    end
+
+    local suc, codeFormat  = pcall(require, 'code_format')
+    if not suc then
         return
     end
 

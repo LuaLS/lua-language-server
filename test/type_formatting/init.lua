@@ -117,17 +117,93 @@ TEST [[
 }
 
 TEST [[
-if true then
+local x = 1
+<??>
+]]
+{
+    ch = '\n',
+    edits = nil,
+}
+
+TEST [[
+local x = 'if 1 then'
     <??>
-end
 ]]
 {
     ch = '\n',
     edits = {
         {
-            start  = 0,
-            finish = 10000,
-            text   = 'if true then\n',
+            start  = 10000,
+            finish = 10004,
+            text   = '',
         }
     }
+}
+
+TEST [[
+local x = 'do'
+    <??>
+]]
+{
+    ch = '\n',
+    edits = {
+        {
+            start  = 10000,
+            finish = 10004,
+            text   = '',
+        }
+    }
+}
+
+TEST [[
+local x = 'function'
+    <??>
+]]
+{
+    ch = '\n',
+    edits = {
+        {
+            start  = 10000,
+            finish = 10004,
+            text   = '',
+        }
+    }
+}
+
+TEST [[
+do
+    <??>
+]]
+{
+    ch = '\n',
+    edits = nil
+}
+
+TEST [[
+do
+    <??>
+end
+]]
+{
+    ch = '\n',
+    edits = nil
+}
+
+TEST [[
+function ()
+    <??>
+]]
+{
+    ch = '\n',
+    edits = nil
+}
+
+TEST [[
+function ()
+    <??>
+end
+]]
+{
+    ch = '\n',
+    edits = nil
 }

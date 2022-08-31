@@ -141,6 +141,11 @@ local function isInBlock(state, position)
                 return true
             end
         end
+        if source.type == 'table' then
+            if source.start + 1 == position then
+                return true
+            end
+        end
     end)
     return block ~= nil
 end

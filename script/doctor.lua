@@ -20,6 +20,7 @@ local maxinterger    = 10000
 local mathType       = math.type
 local _G             = _G
 local registry       = getregistry()
+local ccreate        = coroutine.create
 
 _ENV = nil
 
@@ -447,6 +448,20 @@ m.snapshot = private(function ()
             type = '_G',
             name = '_G',
             info = find(_G),
+        }
+    end
+    for name, mt in next, private {
+        ['nil']       = getmetatable(nil),
+        ['boolean']   = getmetatable(true),
+        ['number']    = getmetatable(0),
+        ['string']    = getmetatable(''),
+        ['function']  = getmetatable(function () end),
+        ['thread']    = getmetatable(ccreate(function () end)),
+    } do
+        result.info[#result.info+1] = private {
+            type = 'metatable',
+            name = name,
+            info = find(mt),
         }
     end
     if m._cache then

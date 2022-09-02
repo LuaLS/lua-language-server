@@ -3,6 +3,8 @@
 ---
 ---The graphics module renders graphics and performs computation using the GPU.
 ---
+---Most of the graphics functions are on the `Pass` object.
+---
 ---@class lovr.graphics
 lovr.graphics = {}
 
@@ -15,11 +17,21 @@ lovr.graphics = {}
 function lovr.graphics.compileShader(stage, source) end
 
 ---
----TODO
+---Returns the global background color.
+---
+---The textures in a render pass will be cleared to this color at the beginning of the pass if no other clear option is specified.
+---
+---Additionally, the headset and window will be cleared to this color before rendering.
 ---
 ---
 ---### NOTE:
----TODO
+---Setting the background color in `lovr.draw` will apply on the following frame, since the default pass is cleared before `lovr.draw` is called.
+---
+---Internally, this color is applied to the default pass objects when retrieving one of them using `lovr.headset.getPass` or `lovr.graphics.getPass`.
+---
+---Both are called automatically by the default `lovr.run` implementation.
+---
+---Using the background color to clear the display is expected to be more efficient than manually clearing after a render pass begins, especially on mobile GPUs.
 ---
 ---@return number r # The red component of the background color.
 ---@return number g # The green component of the background color.
@@ -41,8 +53,8 @@ function lovr.graphics.getBackgroundColor() end
 ---
 ---Any fields with a `nil` offset will be placed next
 ---  to each other sequentially in memory, subject to any padding required by the Buffer's layout.
----  In practice this means that you probably want to provide an `offset` for either all of the
----  fields or none of them.
+---  In practice this means that an `offset` should be set for either all of the fields or none of
+---  them.
 ---- `location` is the vertex attribute location of each field.
 ---
 ---This is used to match up each
@@ -440,15 +452,50 @@ function lovr.graphics.newShader(vertex, fragment, options) end
 function lovr.graphics.newTally(type, count, views) end
 
 ---
----TODO
+---Creates a new Texture.
+---
+---Image filenames or `Image` objects can be used to provide the initial pixel data and the dimensions, format, and type.
+---
+---Alternatively, dimensions can be provided, which will create an empty texture.
+---
+---
+---### NOTE:
+---If no `type` is provided in the options table, LÖVR will guess the `TextureType` of the Texture based on the number of layers:
+---
+---- If there's 1 layer, the type will be `2d`.
+---- If there are 6 layers, the type will be `cube`.
+---- Otherwise, the type will be `array`.
+---
+---Note that an Image can contain multiple layers and mipmaps.
+---
+---When a single Image is provided, its layer count will be used as the Texture's layer count.
+---
+---If multiple Images are used to initialize the Texture, they must all have a single layer, and their dimensions, format, and mipmap counts must match.
+---
+---When providing cubemap images in a table, they can be in one of the following forms:
+---
+---    { 'px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png' }
+---    { right = 'px.png', left = 'nx.png', top = 'py.png', bottom = 'ny.png', back = 'pz.png', front = 'nz.png' }
+---    { px = 'px.png', nx = 'nx.png', py = 'py.png', ny = 'ny.png', pz = 'pz.png', nz = 'nz.png' }
+---
+---(Where 'p' stands for positive and 'n' stands for negative).
+---
+---If no `usage` is provided in the options table, LÖVR will guess the `TextureUsage` of the Texture.
+---
+---The `sample` usage is always included, but if the texture was created without any images then the texture will have the `render` usage as well.
+---
+---The supported image formats are png, jpg, hdr, dds, ktx1, ktx2, and astc.
+---
+---If image data is provided, mipmaps will be generated for any missing mipmap levels.
 ---
 ---@overload fun(width: number, height: number, options: table):lovr.Texture
----@overload fun(width: number, height: number, depth: number, options: table):lovr.Texture
+---@overload fun(width: number, height: number, layers: number, options: table):lovr.Texture
 ---@overload fun(image: string, options: table):lovr.Texture
 ---@overload fun(images: table, options: table):lovr.Texture
----@param filename string # TODO
----@param options {type: lovr.TextureType, format: lovr.TextureFormat, linear: boolean, samples: number, mipmaps: number, usage: table, label: string} # Texture options.
----@return lovr.Texture texture # TODO
+---@overload fun(blob: lovr.Blob, options: table):lovr.Texture
+---@param filename string # The filename of an image to load.
+---@param options {type: lovr.TextureType, format: lovr.TextureFormat, linear: boolean, samples: number, mipmaps: any, usage: table, label: string} # Texture options.
+---@return lovr.Texture texture # The new Texture.
 function lovr.graphics.newTexture(filename, options) end
 
 ---
@@ -465,14 +512,24 @@ function lovr.graphics.newTexture(filename, options) end
 function lovr.graphics.present() end
 
 ---
----TODO
+---Changes the global background color.
+---
+---The textures in a render pass will be cleared to this color at the beginning of the pass if no other clear option is specified.
+---
+---Additionally, the headset and window will be cleared to this color before rendering.
 ---
 ---
 ---### NOTE:
----TODO
+---Setting the background color in `lovr.draw` will apply on the following frame, since the default pass is cleared before `lovr.draw` is called.
+---
+---Internally, this color is applied to the default pass objects when retrieving one of them using `lovr.headset.getPass` or `lovr.graphics.getPass`.
+---
+---Both are called automatically by the default `lovr.run` implementation.
+---
+---Using the background color to clear the display is expected to be more efficient than manually clearing after a render pass begins, especially on mobile GPUs.
 ---
 ---@overload fun(hex: number, a?: number)
----@overload fun(color: table)
+---@overload fun(table: table)
 ---@param r number # The red component of the background color.
 ---@param g number # The green component of the background color.
 ---@param b number # The blue component of the background color.
@@ -544,17 +601,15 @@ function lovr.graphics.wait() end
 local Buffer = {}
 
 ---
----Clears some or all of the data in the Buffer to zero.
+---Clears some or all of the data in the **temporary** Buffer to zero.
 ---
----This is supported for both temporary and permanent Buffers.
----
----Permanent Buffers can also be cleared in a transfer pass using `Pass:clear`.
+---Permanent Buffers can be cleared in a transfer pass using `Pass:clear`.
 ---
 ---
 ---### NOTE:
 ---Clearing a permanent buffer requires the byte offset and byte count of the cleared range to be a multiple of 4.
 ---
----This will usually be true for most field types.
+---This will usually be true for most data types.
 ---
 ---@param index? number # The index of the first item to clear.
 ---@param count? number # The number of items to clear.  If `nil`, clears as many items as possible.
@@ -577,9 +632,9 @@ function Buffer:getFormat() end
 function Buffer:getLength() end
 
 ---
----Returns a raw pointer to the Buffer's memory as a lightuserdata, intended for use with the LuaJIT ffi or for passing to C libraries.
+---Returns a raw pointer to the Buffer's memory as a lightuserdata, intended for use with the LuaJIT FFI or for passing to C libraries.
 ---
----This is only available for temporary buffers, and as such the pointer is only valid until `lovr.graphics.submit` is called.
+---This is only available for temporary buffers, so the pointer is only valid until `lovr.graphics.submit` is called.
 ---
 ---@return lightuserdata pointer # A pointer to the Buffer's memory.
 function Buffer:getPointer() end
@@ -613,15 +668,9 @@ function Buffer:getStride() end
 function Buffer:isTemporary() end
 
 ---
----Changes data in the Buffer using a table or a Blob.
+---Changes data in a temporary Buffer using a table or a Blob.
 ---
----This is supported for both temporary and permanent buffers.
----
----All passes submitted to the GPU will use the new data.
----
----It is also possible to change the data in permanent buffers inside of a transfer pass using `Pass:copy`.
----
----Using a transfer pass allows the copy to happen after other passes in the frame.
+---Permanent buffers can be changed using `Pass:copy`.
 ---
 ---
 ---### NOTE:
@@ -777,17 +826,53 @@ function Material:getProperties() end
 function Material:setTexture(textureType, texture) end
 
 ---
----TODO
+---Models are 3D model assets loaded from files.
+---
+---Currently, OBJ, glTF, and binary STL files are supported.
+---
+---A model can be drawn using `Pass:draw`.
+---
+---The raw CPU data for a model is held in a `ModelData` object, which can be loaded on threads or reused for multiple Model instances.
+---
+---Models have a hierarchy of nodes which can have their transforms modified.
+---
+---Meshes are attached to these nodes.
+---
+---The same mesh can be attached to multiple nodes, allowing it to be drawn multiple times while only storing a single copy of its data.
+---
+---Models can have animations.
+---
+---Animations have keyframes which affect the transforms of nodes. Right now each model can only be drawn with a single animated pose per frame.
+---
+---Models can have materials, which are collections of properties and textures that define how its surface is affected by lighting.
+---
+---Each mesh in the model can use a single material.
 ---
 ---@class lovr.Model
 local Model = {}
 
 ---
----TODO
+---Animates a Model by setting or blending the transforms of nodes using data stored in the keyframes of an animation.
+---
+---The animation from the model file is evaluated at the timestamp, resulting in a set of node properties.
+---
+---These properties are then applied to the nodes in the model, using an optional blend factor.
+---
+---If the animation doesn't have keyframes that target a given node, the node will remain unchanged.
 ---
 ---
 ---### NOTE:
----TODO What happens if the timestamp is before the first keyframe? TODO Does it loop?
+---If the timestamp is larger than the duration of the animation, it will wrap back around to zero, so looping an animation doesn't require using the modulo operator.
+---
+---To change the speed of the animation, multiply the timestamp by a speed factor.
+---
+---For each animated property in the animation, if the timestamp used for the animation is less than the timestamp of the first keyframe, the data of the first keyframe will be used.
+---
+---This function can be called multiple times to layer and blend animations.
+---
+---The model joints will be drawn in the final resulting pose.
+---
+---`Model:resetNodeTransforms` can be used to reset the model nodes to their initial transforms, which is helpful to ensure animating starts from a clean slate.
 ---
 ---@overload fun(self: lovr.Model, index: number, time: number, blend?: number)
 ---@param name string # The name of an animation in the model file.
@@ -802,21 +887,21 @@ function Model:animate(name, time, blend) end
 function Model:getAnimationCount() end
 
 ---
----TODO
+---Returns the duration of an animation in the Model, in seconds.
 ---
 ---
 ---### NOTE:
----TODO how is duration calculated?
+---The duration of an animation is calculated as the largest timestamp of all of its keyframes.
 ---
 ---@overload fun(self: lovr.Model, name: string):number
 ---@param index number # The animation index.
----@return number duration # TODO
+---@return number duration # The duration of the animation, in seconds.
 function Model:getAnimationDuration(index) end
 
 ---
----TODO
+---Returns the name of an animation in the Model.
 ---
----@param index number # TODO
+---@param index number # The index of an animation.
 ---@return string name # The name of the animation.
 function Model:getAnimationName(index) end
 
@@ -875,13 +960,15 @@ function Model:getDimensions() end
 function Model:getHeight() end
 
 ---
----TODO
+---Returns the index buffer used by the Model.
 ---
----@return lovr.Buffer buffer # TODO
+---The index buffer describes the order used to draw the vertices in each mesh.
+---
+---@return lovr.Buffer buffer # The index buffer.
 function Model:getIndexBuffer() end
 
 ---
----TODO
+---Returns a `Material` loaded from the Model.
 ---
 ---@overload fun(self: lovr.Model, index: number):lovr.Material
 ---@param name string # The name of the Material to return.
@@ -895,9 +982,9 @@ function Model:getMaterial(name) end
 function Model:getMaterialCount() end
 
 ---
----TODO
+---Returns the name of a material in the Model.
 ---
----@param index number # TODO
+---@param index number # The index of a material.
 ---@return string name # The name of the material.
 function Model:getMaterialName(index) end
 
@@ -930,7 +1017,7 @@ function Model:getNodeChildren(index) end
 function Model:getNodeCount() end
 
 ---
----TODO
+---Returns the draw mode, material, and vertex range of a mesh in the model.
 ---
 ---@overload fun(self: lovr.Model, name: string, index: number):lovr.MeshMode, lovr.Material, number, number, number
 ---@param node number # The index of the node.
@@ -943,7 +1030,9 @@ function Model:getNodeCount() end
 function Model:getNodeDraw(node, index) end
 
 ---
----TODO
+---Returns the number of meshes attached to a node.
+---
+---Each mesh is drawn individually.
 ---
 ---@overload fun(self: lovr.Model, name: string):number
 ---@param index number # The index of a node.
@@ -951,14 +1040,14 @@ function Model:getNodeDraw(node, index) end
 function Model:getNodeDrawCount(index) end
 
 ---
----TODO
+---Returns the name of a node.
 ---
----@param index number # TODO
----@return string name # TODO
+---@param index number # The index of the node.
+---@return string name # The name of the node.
 function Model:getNodeName(index) end
 
 ---
----TODO
+---Returns the orientation of a node.
 ---
 ---@overload fun(self: lovr.Model, name: string, origin?: lovr.OriginType):number, number, number, number
 ---@param index number # The index of the node.
@@ -978,7 +1067,7 @@ function Model:getNodeOrientation(index, origin) end
 function Model:getNodeParent(index) end
 
 ---
----TODO
+---Returns the pose (position and orientation) of a node.
 ---
 ---@overload fun(self: lovr.Model, name: string, origin?: lovr.OriginType):number, number, number, number, number, number, number
 ---@param index number # The index of a node.
@@ -993,7 +1082,7 @@ function Model:getNodeParent(index) end
 function Model:getNodePose(index, origin) end
 
 ---
----TODO
+---Returns the position of a node.
 ---
 ---@overload fun(self: lovr.Model, name: string, space?: lovr.OriginType):number, number, number
 ---@param index number # The index of the node.
@@ -1004,7 +1093,11 @@ function Model:getNodePose(index, origin) end
 function Model:getNodePosition(index, space) end
 
 ---
----TODO
+---Returns the scale of a node.
+---
+---
+---### NOTE:
+---For best results when animating, it's recommended to keep the 3 components of the scale the same.
 ---
 ---@overload fun(self: lovr.Model, name: string, origin?: lovr.OriginType):number, number, number
 ---@param index number # The index of the node.
@@ -1015,7 +1108,7 @@ function Model:getNodePosition(index, space) end
 function Model:getNodeScale(index, origin) end
 
 ---
----TODO
+---Returns the transform (position, scale, and rotation) of a node.
 ---
 ---@overload fun(self: lovr.Model, name: string, origin?: lovr.OriginType):number, number, number, number, number, number, number, number, number, number
 ---@param index number # The index of a node.
@@ -1039,10 +1132,11 @@ function Model:getNodeTransform(index, origin) end
 function Model:getRootNode() end
 
 ---
----TODO
+---Returns one of the textures in the Model.
 ---
----@return lovr.Texture texture # TODO
-function Model:getTexture() end
+---@param index number # The index of the texture to get.
+---@return lovr.Texture texture # The texture.
+function Model:getTexture(index) end
 
 ---
 ---Returns the number of textures in the Model.
@@ -1078,9 +1172,9 @@ function Model:getTriangleCount() end
 function Model:getTriangles() end
 
 ---
----TODO
+---Returns a `Buffer` that holds the vertices of all of the meshes in the Model.
 ---
----@return lovr.Buffer buffer # TODO
+---@return lovr.Buffer buffer # The vertex buffer.
 function Model:getVertexBuffer() end
 
 ---
@@ -1100,17 +1194,21 @@ function Model:getVertexCount() end
 function Model:getWidth() end
 
 ---
----TODO
+---Returns whether the Model has any skeletal animations.
 ---
 ---
 ---### NOTE:
----TODO it's computed as skinCount TODO it's different from animationCount
+---This will return when there's at least one skin in the model, as returned by `ModelData:getSkinCount`.
 ---
----@return boolean jointed # Whether the animation uses joints for skeletal animation.
+---Even if this function returns true, the model could still have non-skeletal animations.
+---
+---Right now a model can only be drawn with one skeletal pose per frame.
+---
+---@return boolean jointed # Whether the animation uses joint nodes for skeletal animation.
 function Model:hasJoints() end
 
 ---
----TODO
+---Sets or blends the orientation of a node to a new orientation.
 ---
 ---@overload fun(self: lovr.Model, name: string, orientation: lovr.rotation, blend?: number)
 ---@param index number # The index of the node.
@@ -1119,39 +1217,47 @@ function Model:hasJoints() end
 function Model:setNodeOrientation(index, orientation, blend) end
 
 ---
----TODO
+---Sets or blends the pose (position and orientation) of a node to a new pose.
 ---
----@overload fun(self: lovr.Model, name: string, position: lovr.vector3, orientation: lovr.rotation, blend?: number)
+---@overload fun(self: lovr.Model, name: string, position: lovr.Vec3, orientation: lovr.Quat, blend?: number)
 ---@param index number # The index of the node.
----@param position lovr.vector3 # The target position.
----@param orientation lovr.rotation # The target orientation.
+---@param position lovr.Vec3 # The target position.  Can also be provided as 3 numbers.
+---@param orientation lovr.Quat # The target orientation.  Can also be provided as 4 numbers in angle-axis form.
 ---@param blend? number # A number from 0 to 1 indicating how much of the target pose to blend in.  A value of 0 will not change the node's pose at all, whereas 1 will fully blend to the target pose.
 function Model:setNodePose(index, position, orientation, blend) end
 
 ---
----TODO
+---Sets or blends the position of a node to a new position.
 ---
----@overload fun(self: lovr.Model, name: string, position: lovr.vector3, blend?: number)
+---@overload fun(self: lovr.Model, name: string, position: lovr.Vec3, blend?: number)
 ---@param index number # The index of the node.
----@param position lovr.vector3 # The target position.
+---@param position lovr.Vec3 # The target position.  Can also be provided as 3 numbers.
 ---@param blend? number # A number from 0 to 1 indicating how much of the target position to blend in.  A value of 0 will not change the node's position at all, whereas 1 will fully blend to the target position.
 function Model:setNodePosition(index, position, blend) end
 
 ---
----TODO
+---Sets or blends the scale of a node to a new scale.
 ---
----@overload fun(self: lovr.Model, name: string, scale: lovr.vector3, blend?: number)
+---
+---### NOTE:
+---For best results when animating, it's recommended to keep the 3 components of the scale the same.
+---
+---@overload fun(self: lovr.Model, name: string, scale: lovr.Vec3, blend?: number)
 ---@param index number # The index of the node.
----@param scale lovr.vector3 # The target scale.
+---@param scale lovr.Vec3 # The target scale.  Can also be provided as 3 numbers.
 ---@param blend? number # A number from 0 to 1 indicating how much of the target scale to blend in.  A value of 0 will not change the node's scale at all, whereas 1 will fully blend to the target scale.
 function Model:setNodeScale(index, scale, blend) end
 
 ---
----TODO
+---Sets or blends the transform of a node to a new transform.
 ---
----@overload fun(self: lovr.Model, name: string, transform: lovr.transform, blend?: number)
+---
+---### NOTE:
+---For best results when animating, it's recommended to keep the 3 components of the scale the same.
+---
+---@overload fun(self: lovr.Model, name: string, transform: lovr.Mat4, blend?: number)
 ---@param index number # The index of the node.
----@param transform lovr.transform # The target transform.
+---@param transform lovr.Mat4 # The target transform.  Can also be provided as position, scale, and rotation using a mix of `Vectors` or numbers, with 3 scale components.
 ---@param blend? number # A number from 0 to 1 indicating how much of the target transform to blend in.  A value of 0 will not change the node's transform at all, whereas 1 will fully blend to the target transform.
 function Model:setNodeTransform(index, transform, blend) end
 
@@ -1362,7 +1468,9 @@ function Pass:getSampleCount() end
 function Pass:getTarget() end
 
 ---
----TODO
+---Returns the type of the pass (render, compute, or transfer).
+---
+---The type restricts what kinds of functions can be called on the pass.
 ---
 ---@return lovr.PassType type # The type of the Pass.
 function Pass:getType() end
@@ -1937,44 +2045,74 @@ function Readback:isComplete() end
 function Readback:wait() end
 
 ---
----TODO
+---Samplers are objects that control how pixels are read from a texture.
+---
+---They can control whether the pixels are smoothed, whether the texture wraps at the edge of its UVs, and more.
+---
+---Each has a default sampler that will be used by default, which can be changed using `Pass:setSampler`.
+---
+---Also, samplers can be declared in shaders using the following syntax:
+---
+---    layout(set = 2, binding = X) uniform sampler mySampler;
+---
+---A Sampler can be sent to the variable using `Pass:send('mySampler', sampler)`.
+---
+---The properties of a Sampler are immutable, and can't be changed after it's created.
 ---
 ---@class lovr.Sampler
 local Sampler = {}
 
 ---
----TODO
+---Returns the anisotropy level of the Sampler.
 ---
----@return number anisotropy # TODO
+---Anisotropy smooths out a texture's appearance when viewed at grazing angles.
+---
+---
+---### NOTE:
+---Not all GPUs support anisotropy.
+---
+---The maximum anisotropy level is given by the `anisotropy` limit of `lovr.graphics.getLimits`, which may be zero.
+---
+---It's very common for the maximum to be 16, however.
+---
+---@return number anisotropy # The anisotropy level of the sampler.
 function Sampler:getAnisotropy() end
 
 ---
----TODO
+---Returns the compare mode of the Sampler.
 ---
----@return lovr.CompareMode compare # TODO
+---This is a feature typically only used for shadow mapping.
+---
+---Using a sampler with a compare mode requires it to be declared in a shader as a `samplerShadow` instead of a `sampler` variable, and used with a texture that has a depth format.
+---
+---The result of sampling a depth texture with a shadow sampler is a number between 0 and 1, indicating the percentage of sampled pixels that passed the comparison.
+---
+---@return lovr.CompareMode compare # The compare mode of the sampler.
 function Sampler:getCompareMode() end
 
 ---
----TODO
+---Returns the filter mode of the Sampler.
 ---
----@return lovr.FilterMode min # TODO
----@return lovr.FilterMode mag # TODO
----@return lovr.FilterMode mip # TODO
+---@return lovr.FilterMode min # The filter mode used when the texture is minified.
+---@return lovr.FilterMode mag # The filter mode used when the texture is magnified.
+---@return lovr.FilterMode mip # The filter mode used to select a mipmap level.
 function Sampler:getFilter() end
 
 ---
----TODO
+---Returns the mipmap range of the Sampler.
 ---
----@return number min # TODO
----@return number max # TODO
+---This is used to clamp the range of mipmap levels that can be accessed from a texture.
+---
+---@return number min # The minimum mipmap level that will be sampled (0 is the largest image).
+---@return number max # The maximum mipmap level that will be sampled.
 function Sampler:getMipmapRange() end
 
 ---
----TODO
+---Returns the wrap mode of the sampler, used to wrap or clamp texture coordinates when the extend outside of the 0-1 range.
 ---
----@return lovr.WrapMode x # TODO
----@return lovr.WrapMode y # TODO
----@return lovr.WrapMode z # TODO
+---@return lovr.WrapMode x # The wrap mode used in the horizontal direction.
+---@return lovr.WrapMode y # The wrap mode used in the vertical direction.
+---@return lovr.WrapMode z # The wrap mode used in the "z" direction, for 3D textures only.
 function Sampler:getWrap() end
 
 ---
@@ -2049,27 +2187,9 @@ function Tally:getType() end
 function Tally:getViewCount() end
 
 ---
----Textures are multidimensional blocks of memory on the GPU, contrasted with `Buffer`s which are similar but one-dimensional.
+---Textures are multidimensional blocks of memory on the GPU, contrasted with `Buffer` objects which are one-dimensional.
 ---
----Textures can be used to provide material data to Shaders, and they are also used as the destination for rendering operations.
----
----Textures can be created from image filenames, `Image` objects, or they can be left blank and created with a width, height, and depth.
----
----Each Texture has a type (`TextureType`).
----
----2D Textures are the most common and are often used to store color image data, but there are also cubemaps for skyboxes, 3D textures for volumetric info, and array textures which store a sequence of 2D images.
----
----The format of a Texture (`TextureFormat`) defines the size and number of channels of each pixel.
----
----Textures can have mipmaps, which are a precomputed set of progressively smaller versions of the Texture.
----
----Mipmaps help make the Texture look smoother at smaller sizes, and also improve the performance of reading data from the Texture in a Shader.
----
----When used as a render target, the Texture can store multiple different color samples for each pixel, which can be averaged together after rendering to do antialiasing (this is called multisample antialiasing, or MSAA).
----
----It is possible to create multiple views of a single Texture.
----
----A texture view references a subset of the array layers and mipmap levels of its parent texture, and can be bound to a Shader or used as a render target just like a normal texture.
+---Textures are used as the destination for rendering operations, and textures loaded from images provide surface data to `Material` objects.
 ---
 ---@class lovr.Texture
 local Texture = {}
@@ -2079,13 +2199,11 @@ local Texture = {}
 ---
 ---@return number width # The width of the Texture.
 ---@return number height # The height of the Texture.
----@return number depth # The depth of the Texture.
+---@return number layers # The number of layers in the Texture.
 function Texture:getDimensions() end
 
 ---
 ---Returns the format of the texture.
----
----The default is `rgba8`.
 ---
 ---@return lovr.TextureFormat format # The format of the Texture.
 function Texture:getFormat() end
@@ -2101,21 +2219,13 @@ function Texture:getHeight() end
 ---
 ---2D textures always have 1 layer and cubemaps always have 6 layers.
 ---
----For 3D and array textures, this is the number of images stored in the texture. 3D textures represent a spatial 3D volume, whereas array textures are multiple layers of distinct 2D images.
+---3D and array textures have a variable number of layers.
 ---
 ---@return number layers # The layer count of the Texture.
 function Texture:getLayerCount() end
 
 ---
 ---Returns the number of mipmap levels in the Texture.
----
----This is set when the Texture is created. By default, textures are created with a full set of mipmap levels, and mipmaps are generated if the images used to create the texture do not include mipmaps.
----
----
----### NOTE:
----Each mipmap level will be half the size of the previous (larger) mipmap level, down to a single pixel.
----
----This means the maximum number of mipmap levels is given by `log2(max(width, height))` for non-3D textures and `log2(max(width, height, depth))` for 3D textures.
 ---
 ---@return number mipmaps # The number of mipmap levels in the Texture.
 function Texture:getMipmapCount() end
@@ -2129,15 +2239,11 @@ function Texture:getMipmapCount() end
 function Texture:getParent() end
 
 ---
----Returns the number of multisample antialiasing (MSAA) samples in the Texture.
+---Returns the number of samples in the texture.
 ---
----Multisampling is used for antialiasing when rendering to the Texture.
+---Multiple samples are used for multisample antialiasing when rendering to the texture.
 ---
----Using more samples will cause the Texture to use additional memory but reduce aliasing artifacts.
----
----
----### NOTE:
----Currently, the sample count must be either 1 or 4.
+---Currently, the sample count is either 1 (not antialiased) or 4 (antialiased).
 ---
 ---@return number samples # The number of samples in the Texture.
 function Texture:getSampleCount() end
@@ -2180,7 +2286,7 @@ function Texture:isView() end
 ---
 ---The width, height, format, sample count, and usage flags all match the parent.
 ---
----The view may have a different `TextureType` from the parent, and it may reference a subset of the parent texture's images and mipmap levels.
+---The view may have a different `TextureType` from the parent, and it may reference a subset of the parent texture's layers and mipmap levels.
 ---
 ---Texture views can be used as render targets in a render pass and they can be bound to Shaders. They can not currently be used for transfer operations.
 ---
@@ -2441,6 +2547,13 @@ function Texture:newView(parent, type, layer, layerCount, mipmap, mipmapCount) e
 ---| "mat4"
 
 ---
+---Controls how `Sampler` objects smooth pixels in textures.
+---
+---@alias lovr.FilterMode
+
+---| nil
+
+---
 ---TODO
 ---
 ---@alias lovr.MeshMode
@@ -2458,19 +2571,31 @@ function Texture:newView(parent, type, layer, layerCount, mipmap, mipmapCount) e
 ---| "triangles"
 
 ---
----TODO
+---The three different types of `Pass` objects.
+---
+---Each Pass has a single type, which determines the type of work it does and which functions can be called on it.
 ---
 ---@alias lovr.PassType
 ---
----TODO
+---A render pass renders graphics to a set of up to four color textures and an optional depth texture.
+---
+---The textures all need to have the same dimensions and sample counts.
+---
+---The textures can have multiple layers, and all rendering work will be broadcast to each layer.
+---
+---Each layer can use a different camera pose, which is used for stereo rendering.
 ---
 ---| "render"
 ---
----TODO
+---A compute pass runs compute shaders.
+---
+---Compute passes usually only call `Pass:setShader`, `Pass:send`, and `Pass:compute`.
+---
+---All of the compute work in a single compute pass is run in parallel, so multiple compute passes should be used if one compute pass needs to happen after a different one.
 ---
 ---| "compute"
 ---
----TODO
+---A transfer pass copies data to and from GPU memory in `Buffer` and `Texture` objects. Transfer passes use `Pass:copy`, `Pass:clear`, `Pass:blit`, `Pass:mipmap`, and `Pass:read`. Similar to compute passes, all the work in a transfer pass happens in parallel, so multiple passes should be used if the transfers need to be ordered.
 ---
 ---| "transfer"
 
@@ -2588,11 +2713,11 @@ function Texture:newView(parent, type, layer, layerCount, mipmap, mipmapCount) e
 ---
 ---| "3d"
 ---
----Six 2D images that define the faces of a cubemap, used for skyboxes or other "directional" images.
+---Six square 2D images with the same dimensions that define the faces of a cubemap, used for skyboxes or other "directional" images.
 ---
 ---| "cube"
 ---
----Array textures are sequences of distinct 2D images.
+---Array textures are sequences of distinct 2D images that all have the same dimensions.
 ---
 ---| "array"
 
@@ -2622,3 +2747,10 @@ function Texture:newView(parent, type, layer, layerCount, mipmap, mipmapCount) e
 ---Whether the texture can be used in a transfer pass.
 ---
 ---| "transfer"
+
+---
+---Controls how `Sampler` objects wrap textures.
+---
+---@alias lovr.WrapMode
+
+---| nil

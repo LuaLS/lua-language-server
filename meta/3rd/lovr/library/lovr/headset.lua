@@ -21,11 +21,7 @@ lovr.headset = {}
 ---
 ---
 ---### NOTE:
----Currently this function is supported for OpenVR controller models and Oculus hand models.
----
----This function may animate using node-based animation or skeletal animation.
----
----`Model:hasJoints` can be used on a Model so you know if a Shader with the `animated` ShaderFlag needs to be used to render the results properly.
+---Currently this function is only supported for hand models on the Oculus Quest.
 ---
 ---It's possible to use models that weren't created with `lovr.headset.newModel` but they need to be set up carefully to have the same structure as the models provided by the headset SDK.
 ---
@@ -260,9 +256,23 @@ function lovr.headset.getOrientation(device) end
 function lovr.headset.getOriginType() end
 
 ---
----TODO
+---Returns a `Pass` that renders to the headset display.
 ---
----@return lovr.Pass pass # The Pass.
+---
+---### NOTE:
+---The same Pass will be returned until `lovr.headset.submit` is called.
+---
+---The first time this function is called during a frame, the views of the Pass will be initialized with the headset view poses and view angles.
+---
+---The pass will be cleared to the background color, which can be changed using `lovr.graphics.setBackgroundColor`.
+---
+---The pass will have a depth buffer.
+---
+---If `t.headset.stencil` was set to a truthy value in `lovr.conf`, the depth buffer will use the `d32fs8` format, otherwise `d32f` will be used.
+---
+---If `t.headset.antialias` was set to a truthy value in `lovr.conf`, the pass will be multisampled.
+---
+---@return lovr.Pass pass # The pass.
 function lovr.headset.getPass() end
 
 ---
@@ -538,7 +548,7 @@ function lovr.headset.isTracked(device) end
 ---
 ---
 ---### NOTE:
----This is only supported on the `openvr` and `vrapi` drivers right now.
+---Currently this is only implemented for hand models on the Oculus Quest.
 ---
 ---@param device? lovr.Device # The device to load a model for.
 ---@param options? {animated: boolean} # Options for loading the model.
@@ -723,22 +733,6 @@ function lovr.headset.wasReleased(device, button) end
 ---The right eye.
 ---
 ---| "eye/right"
----
----The first tracking device (i.e. lighthouse).
----
----| "beacon/1"
----
----The second tracking device (i.e. lighthouse).
----
----| "beacon/2"
----
----The third tracking device (i.e. lighthouse).
----
----| "beacon/3"
----
----The fourth tracking device (i.e. lighthouse).
----
----| "beacon/4"
 
 ---
 ---Axes on an input device.

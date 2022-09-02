@@ -741,7 +741,7 @@ function Source:tell(unit) end
 ---
 ---Instead, it will be silently ignored.
 ---
----TODO: expose a table of supported effects for spatializers in docs or from Lua.
+---See `lovr.audio.getSpatializer` for a table of the supported effects for each spatializer.
 ---
 ---@alias lovr.Effect
 ---

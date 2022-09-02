@@ -27,13 +27,22 @@
 lovr.conf = nil
 
 ---
----This callback is called every frame.
+---This callback is called every frame, and receives a `Pass` object as an argument which can be used to render graphics to the display.
 ---
----Use it to render the scene.
+---If a VR headset is connected, this function renders to the headset display, otherwise it will render to the desktop window.
 ---
----If a VR headset is connected, anything rendered by this function will appear in the headset display.
 ---
----The display is cleared to the background color before this function is called.
+---### NOTE:
+---To render to the desktop window when a VR headset is connected, use the `lovr.mirror` callback.
+---
+---The display is cleared to the global background color before this callback is called, which can be changed using `lovr.graphics.setBackgroundColor`.
+---
+---Since the `lovr.graphics.submit` function always returns true, the following idiom can be used to submit graphics work manually and override the default submission:
+---
+---    function lovr.draw(pass)
+---      local passes = getPasses()
+---      return lovr.graphics.submit(passes)
+---    end
 ---
 ---@type fun(pass: lovr.Pass):boolean
 lovr.draw = nil
@@ -79,15 +88,15 @@ lovr.keyreleased = nil
 ---
 ---
 ---### NOTE:
----If the project was loaded from a restart using `lovr.event.restart`, the return value from the previously-run `lovr.restart` callback will be made available to this callback as the `restart` key in the `args` table.
+---If the project was loaded from a restart using `lovr.event.restart`, the return value from the previously-run `lovr.restart` callback will be made available to this callback as the `restart` key in the `arg` table.
 ---
----The `args` table follows the [Lua standard](https://en.wikibooks.org/wiki/Lua_Programming/command_line_parameter).
+---The `arg` table follows the [Lua standard](https://en.wikibooks.org/wiki/Lua_Programming/command_line_parameter).
 ---
 ---The arguments passed in from the shell are put into a global table named `arg` and passed to `lovr.load`, but with indices offset such that the "script" (the project path) is at index 0.
 ---
 ---So all arguments (if any) intended for the project are at successive indices starting with 1, and the executable and its "internal" arguments are in normal order but stored in negative indices.
 ---
----@type fun(args: table)
+---@type fun(arg: table)
 lovr.load = nil
 
 ---
@@ -97,9 +106,9 @@ lovr.load = nil
 ---
 ---The message can have a "tag" that is a short string representing the sender, and a "level" indicating how severe the message is.
 ---
----The `t.graphics.debug` flag in `lovr.conf` can be used to get log messages from the GPU driver (tagged as `GL`).
+---The `t.graphics.debug` flag in `lovr.conf` can be used to get log messages from the GPU driver (tagged as `GPU`).
 ---
----It is also possible to emit your own log messages using `lovr.event.push`.
+---It is also possible to emit customlog messages using `lovr.event.push`, or by calling the callback.
 ---
 ---@type fun(message: string, level: string, tag: string)
 lovr.log = nil
@@ -161,7 +170,22 @@ lovr.restart = nil
 ---
 ---This callback is the main entry point for a LÖVR program.
 ---
----It is responsible for calling `lovr.load` and returning the main loop function.
+---It calls `lovr.load` and returns a function that will be called every frame.
+---
+---
+---### NOTE:
+---The main loop function can return one of the following values:
+---
+---- Returning `nil` will keep the main loop running.
+---- Returning the string 'restart' plus an optional value will restart LÖVR.
+---
+---The value can be
+---  accessed in the `restart` key of the `arg` global.
+---- Returning a number will exit LÖVR using the number as the exit code (0 means success).
+---
+---Care should be taken when overriding this callback.
+---
+---For example, if the main loop does not call `lovr.event.pump` then the OS will think LÖVR is unresponsive, and if the quit event is not handled then closing the window won't work.
 ---
 ---@type fun():function
 lovr.run = nil

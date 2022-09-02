@@ -668,6 +668,10 @@ function ModelData:getNodeSkin(index) end
 ---
 ---Returns local transform (position, orientation, and scale) of a node, relative to its parent.
 ---
+---
+---### NOTE:
+---For best results when animating, it's recommended to keep the 3 components of the scale the same.
+---
 ---@overload fun(self: lovr.ModelData, name: string):number, number, number, number, number, number, number, number, number, number
 ---@param index number # The index of the node.
 ---@return number x # The x coordinate.

@@ -2358,7 +2358,7 @@ local function parseExpUnit()
         if exp ~= table then
             pushErrorNeedParen(table)
         end
-        return table
+        return exp
     end
 
     if CharMapStrSH[token] then

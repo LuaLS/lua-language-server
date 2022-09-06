@@ -271,6 +271,8 @@ PARSER_UNKNOWN_ATTRIBUTE  =
 '區域變數屬性應該是 `const` 或 `close` 。'
 PARSER_AMBIGUOUS_SYNTAX   = -- TODO: need translate!
 '在 Lua 5.1 中，函数调用的左括号必须与函数在同一行。'
+PARSER_NEED_PAREN         = -- TODO: need translate!
+'需要添加一对括号。'
 PARSER_LUADOC_MISS_CLASS_NAME           =
 '缺少類別名稱。'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =
@@ -416,6 +418,8 @@ ACTION_MARK_ASYNC       =
 '將目前函式標記為非同步。'
 ACTION_ADD_DICT         =
 '添加 \'{}\' 到工作區字典'
+ACTION_FIX_ADD_PAREN    = -- TODO: need translate!
+'添加括号。'
 
 COMMAND_DISABLE_DIAG       =
 '停用診斷'

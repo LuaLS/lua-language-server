@@ -1444,68 +1444,6 @@ local function parseNameOrList(parent)
     return list or first
 end
 
-local function dropTail()
-    local token = Tokens[Index + 1]
-    if  token ~= '?'
-    and token ~= ':' then
-        return
-    end
-    local pl, pt, pp = 0, 0, 0
-    while true do
-        local token = Tokens[Index + 1]
-        if not token then
-            break
-        end
-        if NLMap[token] then
-            break
-        end
-        if token == ',' then
-            if pl > 0
-            or pt > 0
-            or pp > 0 then
-                goto CONTINUE
-            else
-                break
-            end
-        end
-        if token == '<' then
-            pl = pl + 1
-            goto CONTINUE
-        end
-        if token == '{' then
-            pt = pt + 1
-            goto CONTINUE
-        end
-        if token == '(' then
-            pp = pp + 1
-            goto CONTINUE
-        end
-        if token == '>' then
-            if pl <= 0 then
-                break
-            end
-            pl = pl - 1
-            goto CONTINUE
-        end
-        if token == '}' then
-            if pt <= 0 then
-                break
-            end
-            pt = pt - 1
-            goto CONTINUE
-        end
-        if token == ')' then
-            if pp <= 0 then
-                break
-            end
-            pp = pp - 1
-            goto CONTINUE
-        end
-        ::CONTINUE::
-        Index = Index + 2
-    end
-end
-
 local function parseExpList(mini)
     local list
     local wantSep = false
@@ -1552,7 +1490,6 @@ local function parseExpList(mini)
             if not exp then
                 break
             end
-            dropTail()
             if wantSep then
                 missSymbol(',', list[#list].finish, exp.start)
             end
@@ -2379,6 +2316,27 @@ local function parseFunction(isLocal, isAction)
     return func
 end
 
+local function pushErrorNeedParen(source)
+    pushError {
+        type   = 'NEED_PAREN',
+        start  = source.start,
+        finish = source.finish,
+        fix = {
+            title = 'FIX_ADD_PAREN',
+            {
+                start  = source.start,
+                finish = source.start,
+                text   = '(',
+            },
+            {
+                start  = source.finish,
+                finish = source.finish,
+                text   = ')',
+            }
+        }
+    }
+end
+
 local function parseExpUnit()
     local token = Tokens[Index + 1]
     if token == '(' then
@@ -2393,17 +2351,38 @@ local function parseExpUnit()
 
     if token == '{' then
         local table = parseTable()
+        if not table then
+            return nil
+        end
+        local exp = parseSimple(table, false)
+        if exp ~= table then
+            pushErrorNeedParen(table)
+        end
         return table
     end
 
     if CharMapStrSH[token] then
         local string = parseShortString()
-        return string
+        if not string then
+            return nil
+        end
+        local exp = parseSimple(string, false)
+        if exp ~= string then
+            pushErrorNeedParen(string)
+        end
+        return exp
     end
 
     if CharMapStrLH[token] then
         local string = parseLongString()
-        return string
+        if not string then
+            return nil
+        end
+        local exp = parseSimple(string, false)
+        if exp ~= string then
+            pushErrorNeedParen(string)
+        end
+        return exp
     end
 
     local number = parseNumber()

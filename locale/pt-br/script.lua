@@ -271,6 +271,8 @@ PARSER_UNKNOWN_ATTRIBUTE  =
 'Atributo local deve ser `const` ou `close`'
 PARSER_AMBIGUOUS_SYNTAX   = -- TODO: need translate!
 'In Lua 5.1, the left brackets called by the function must be in the same line as the function.'
+PARSER_NEED_PAREN         = -- TODO: need translate!
+'需要添加一对括号。'
 PARSER_LUADOC_MISS_CLASS_NAME           =
 'Esperado <class name>.'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =
@@ -416,6 +418,8 @@ ACTION_MARK_ASYNC       =
 'Marque a função atual como assíncrona'
 ACTION_ADD_DICT         =
 'Adicione \'{}\' ao seu espaço de trabalho no '
+ACTION_FIX_ADD_PAREN    = -- TODO: need translate!
+'添加括号。'
 
 COMMAND_DISABLE_DIAG       =
 'Desativar diagnósticos.'

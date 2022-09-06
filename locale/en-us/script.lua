@@ -271,6 +271,8 @@ PARSER_UNKNOWN_ATTRIBUTE  =
 'Local attribute should be `const` or `close`'
 PARSER_AMBIGUOUS_SYNTAX   = -- TODO: need translate!
 'In Lua 5.1, the left brackets called by the function must be in the same line as the function.'
+PARSER_NEED_PAREN         = -- TODO: need translate!
+'Need to add a pair of parentheses.'
 PARSER_LUADOC_MISS_CLASS_NAME           =
 '<class name> expected.'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =
@@ -416,6 +418,8 @@ ACTION_MARK_ASYNC       =
 'Mark current function as async.'
 ACTION_ADD_DICT         =
 'Add \'{}\' to workspace dict'
+ACTION_FIX_ADD_PAREN    = -- TODO: need translate!
+'Add parentheses.'
 
 COMMAND_DISABLE_DIAG       =
 'Disable diagnostics'

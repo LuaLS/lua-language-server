@@ -63,7 +63,7 @@ Symbol              <-  ({} {
                         } {})
                     ->  Symbol
 ]], {
-    s  = m.S' \t',
+    s  = m.S' \t\v\f',
     ea = '\a',
     eb = '\b',
     ef = '\f',

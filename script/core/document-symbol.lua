@@ -199,7 +199,7 @@ local function buildValue(source, sub, used, symbols)
     }
 end
 
-local function buildAnonymousFunction(source, sub, used, symbols)
+local function buildAnonymous(source, sub, used, symbols)
     if used[source] then
         return
     end
@@ -207,20 +207,49 @@ local function buildAnonymousFunction(source, sub, used, symbols)
     local head = ''
     local parent = source.parent
     if     parent.type == 'return' then
-        head = 'return '
+        head = 'return'
     elseif parent.type == 'callargs' then
         local call = parent.parent
         local node = call.node
-        head = buildName(node, sub) .. ' -> '
+        head = buildName(node, sub) .. ' ->'
     end
-    symbols[#symbols+1] = {
-        name           = '',
-        detail         = ('%sfunction (%s)'):format(head, buildFunctionParams(source)),
-        kind           = define.SymbolKind.Function,
-        range          = { source.start, source.finish },
-        selectionRange = { source.keyword[1], source.keyword[2] },
-        valueRange     = { source.start, source.finish },
-    }
+    if source.type == 'function' then
+        symbols[#symbols+1] = {
+            name           = head,
+            detail         = ('function (%s)'):format(buildFunctionParams(source)),
+            kind           = define.SymbolKind.Function,
+            range          = { source.start, source.finish },
+            selectionRange = { source.keyword[1], source.keyword[2] },
+            valueRange     = { source.start, source.finish },
+        }
+    elseif source.type == 'table' then
+        local kind      = define.SymbolKind.Object
+        local details   = {}
+        local lastField = source[#source]
+        if lastField then
+            if  lastField.type == 'tableexp'
+            and lastField.tindex == #source then
+                -- Array
+                kind = define.SymbolKind.Array
+                details[#details+1] = '['
+                details[#details+1] = buildArray(source, sub)
+                details[#details+1] = ']'
+            else
+                -- Object
+                details[#details+1] = '{'
+                details[#details+1] = buildTable(source, sub)
+                details[#details+1] = '}'
+            end
+        end
+        symbols[#symbols+1] = {
+            name           = head,
+            detail         = table.concat(details),
+            kind           = kind,
+            range          = { source.start, source.finish },
+            selectionRange = { source.start, source.finish },
+            valueRange     = { source.start, source.finish },
+        }
+    end
 end
 
 local function buildBlock(source, sub, used, symbols)
@@ -280,8 +309,9 @@ local function buildSource(source, sub, used, symbols)
     or     source.type == 'tableexp'
     or     source.type == 'tableindex' then
         buildValue(source, sub, used, symbols)
-    elseif source.type == 'function' then
-        buildAnonymousFunction(source, sub, used, symbols)
+    elseif source.type == 'function'
+    or     source.type == 'table' then
+        buildAnonymous(source, sub, used, symbols)
     elseif source.type == 'if'
     or     source.type == 'while'
     or     source.type == 'in'

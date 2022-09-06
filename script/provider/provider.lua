@@ -785,7 +785,7 @@ m.register 'textDocument/documentSymbol' {
                 symbol.selectionRange[2]
             )
             if symbol.name == '' then
-                symbol.name = lang.script.SYMBOL_ANONYMOUS
+                symbol.name = ' '
             end
             symbol.valueRange = nil
             if symbol.children then

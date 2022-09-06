@@ -105,8 +105,8 @@ end
 ]]
 {
     [1] = {
-        name = '',
-        detail = 'return function ()',
+        name = 'return',
+        detail = 'function ()',
         kind = define.SymbolKind.Function,
         range = {7, 10003},
         selectionRange = {7, 15},
@@ -565,11 +565,21 @@ local t = f({
         valueRange = {10, 20002},
         children = {
             [1] = {
-                name = 'k',
-                detail = '1',
-                kind = define.SymbolKind.Number,
-                range = {10004, 10009},
-                selectionRange = {10004, 10005},
+                name = 'f ->',
+                detail = '{k}',
+                kind = define.SymbolKind.Object,
+                range = {12, 20001},
+                selectionRange = {12, 20001},
+                valueRange = {12, 20001},
+                children = {
+                    [1] = {
+                        name = 'k',
+                        detail = '1',
+                        kind = define.SymbolKind.Number,
+                        range = {10004, 10009},
+                        selectionRange = {10004, 10005},
+                    }
+                }
             }
         }
     }
@@ -632,12 +642,22 @@ local a = f {
         valueRange = {10, 30001},
         children = {
             [1] = {
-                name = 'x',
-                detail = 'function ()',
-                kind = define.SymbolKind.Function,
-                range = {10004, 20007},
-                selectionRange = {10004, 10005},
-                valueRange = {10008, 20007},
+                name = 'f ->',
+                detail = '{x}',
+                kind = define.SymbolKind.Object,
+                range = {12, 30001},
+                selectionRange = {12, 30001},
+                valueRange = {12, 30001},
+                children = {
+                    [1] = {
+                        name = 'x',
+                        detail = 'function ()',
+                        kind = define.SymbolKind.Function,
+                        range = {10004, 20007},
+                        selectionRange = {10004, 10005},
+                        valueRange = {10008, 20007},
+                    }
+                }
             }
         }
     }
@@ -650,8 +670,8 @@ end)
 ]]
 {
     [1] = {
-        name = '',
-        detail = 'table.sort -> function (a, b)',
+        name = 'table.sort ->',
+        detail = 'function (a, b)',
         kind = define.SymbolKind.Function,
         range = {14, 20003},
         selectionRange = {14, 22},

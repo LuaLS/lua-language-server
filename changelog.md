@@ -6,6 +6,7 @@
 * `FIX` `diagnostics.workspaceDelay` can not prevent first workspace diagnostic
 * `FIX` [#1476](https://github.com/sumneko/lua-language-server/issues/1476)
 * `FIX` [#1493](https://github.com/sumneko/lua-language-server/issues/1493)
+* `FIX` [#1499](https://github.com/sumneko/lua-language-server/issues/1499)
 
 ## 3.5.3
 `2022-8-13`

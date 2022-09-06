@@ -300,3 +300,19 @@ X(1, <?2?>)
 {
 'function X(a: number, <!b: number!>)',
 }
+
+TEST [[
+---@alias A { x:number, y:number, z:number }
+
+---comment
+---@param a A
+---@param b string
+function X(a, b)
+    
+end
+
+X({}, <??>)
+]]
+{
+'function X(a: { x: number, y: number, z: number }, <!b: string!>)'
+}

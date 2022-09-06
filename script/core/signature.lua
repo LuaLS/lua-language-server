@@ -60,6 +60,9 @@ local function makeOneSignature(source, oop, index)
         : gsub('%b()', function (str)
             return ('_'):rep(#str)
         end)
+        : gsub('%b{}', function (str)
+            return ('_'):rep(#str)
+        end)
         : gsub('[%[%]%(%)]', '_')
     for start, finish in converted:gmatch '%s*()[^,]+()' do
         i = i + 1

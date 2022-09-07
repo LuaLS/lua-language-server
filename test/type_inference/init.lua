@@ -3783,3 +3783,11 @@ local x
 
 local <?v?> = t[x]
 ]]
+
+TEST 'A|B' [[
+---@class A
+---@class B: A
+
+---@type A|B
+local <?t?>
+]]

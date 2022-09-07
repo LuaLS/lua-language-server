@@ -301,16 +301,6 @@ function mt:_eraseAlias(uri)
                         end
                     end
                 end
-                if set.type == 'doc.class' then
-                    if set.extends then
-                        for _, ext in ipairs(set.extends) do
-                            if ext.type == 'doc.extends.name' then
-                                local view = ext[1]
-                                drop[view] = true
-                            end
-                        end
-                    end
-                end
             end
             LOCK[n.name] = nil
             ::CONTINUE::

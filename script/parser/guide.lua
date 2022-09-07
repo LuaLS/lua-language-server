@@ -812,12 +812,24 @@ end
 ---@param col integer
 ---@return integer
 function m.positionOf(row, col)
-    return row * 10000 + col
+    return row * 10000 + math.min(col, 10000 - 1)
 end
 
 function m.positionToOffsetByLines(lines, position)
     local row, col = m.rowColOf(position)
-    return (lines[row] or 1) + col - 1
+    if row < 0 then
+        return 0
+    end
+    if row > #lines then
+        return lines.size
+    end
+    local offset = lines[row] + col - 1
+    if lines[row + 1] and offset >= lines[row + 1] then
+        return lines[row + 1] - 1
+    elseif offset > lines.size then
+        return lines.size
+    end
+    return offset
 end
 
 --- 返回全文光标位置

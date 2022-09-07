@@ -3826,6 +3826,7 @@ local function initState(lua, version, options)
         comms   = {},
         lines   = {
             [0] = 1,
+            size = #lua,
         },
         options = options or {},
     }

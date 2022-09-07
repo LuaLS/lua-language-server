@@ -922,4 +922,14 @@ f {
 }
 ]]
 
+TEST [[
+---@class A
+local a
+a.__index = a
+
+---@class B: A
+local <!b!>
+b.<!<?__index?>!> = b
+]]
+
 config.set(nil, 'Lua.type.castNumberToInteger', true)

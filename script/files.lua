@@ -78,11 +78,11 @@ function m.getRealUri(uri)
     if uri == ruri then
         return ruri
     end
-    if not uriMap[ruri] then
-        uriMap[ruri] = uri
+    if not uriMap[uri] then
+        uriMap[uri] = ruri
         log.warn(('Fix real file uri: %s -> %s'):format(uri, ruri))
     end
-    return uriMap[ruri]
+    return uriMap[uri]
 end
 
 --- 打开文件

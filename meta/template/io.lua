@@ -72,7 +72,7 @@ function io.popen(prog, mode) end
 ---#DES 'io.read'
 ---@param ... readmode
 ---@return any
----@return ...
+---@return any ...
 ---@nodiscard
 function io.read(...) end
 
@@ -135,7 +135,7 @@ function file:lines(...) end
 ---#DES 'file:read'
 ---@param ... readmode
 ---@return any
----@return ...
+---@return any ...
 ---@nodiscard
 function file:read(...) end
 

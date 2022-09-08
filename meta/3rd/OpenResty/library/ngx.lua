@@ -4382,7 +4382,7 @@ function ngx.resp.get_headers(max_headers, raw) end
 ---@param ... ngx.thread.arg
 ---@return boolean ok
 ---@return ngx.thread.arg? result_or_error
----@return ...
+---@return any ...
 function ngx.run_worker_thread(threadpool, module_name, func_name, arg1, arg2, ...)
 end
 

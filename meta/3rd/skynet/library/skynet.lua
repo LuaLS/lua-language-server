@@ -159,7 +159,7 @@ end
 ---* 将 C 指针 或字符串转换成 Lua 数据
 ---@param msg lightuserdata | string
 ---@param sz? number
----@return ...
+---@return any ...
 function skynet.unpack(msg, sz)
 end
 

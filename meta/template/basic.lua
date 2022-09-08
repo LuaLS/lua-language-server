@@ -9,7 +9,7 @@ arg = {}
 ---@param v? T
 ---@param message? any
 ---@return T
----@return ...
+---@return any ...
 function assert(v, message, ...) end
 
 ---@alias gcoptions
@@ -163,7 +163,7 @@ function pairs(t) end
 ---@param arg1? any
 ---@return boolean success
 ---@return any result
----@return ...
+---@return any ...
 function pcall(f, arg1, ...) end
 
 ---#DES 'print'
@@ -269,7 +269,7 @@ function warn(message, ...) end
 ---@param err   function
 ---@return boolean success
 ---@return any result
----@return ...
+---@return any ...
 function xpcall(f, err) end
 ---#else
 ---#DES 'xpcall>5.2'
@@ -278,7 +278,7 @@ function xpcall(f, err) end
 ---@param arg1? any
 ---@return boolean success
 ---@return any result
----@return ...
+---@return any ...
 function xpcall(f, msgh, arg1, ...) end
 ---#end
 

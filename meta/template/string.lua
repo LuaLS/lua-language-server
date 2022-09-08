@@ -8,8 +8,7 @@ string = {}
 ---@param s  string
 ---@param i? integer
 ---@param j? integer
----@return integer
----@return ...
+---@return integer ...
 ---@nodiscard
 function string.byte(s, i, j) end
 
@@ -17,7 +16,6 @@ function string.byte(s, i, j) end
 ---@param byte integer
 ---@param ... integer
 ---@return string
----@return ...
 ---@nodiscard
 function string.char(byte, ...) end
 
@@ -35,7 +33,7 @@ function string.dump(f, strip) end
 ---@param plain?  boolean
 ---@return integer start
 ---@return integer end
----@return ... captured
+---@return string|integer ... captured
 ---@nodiscard
 function string.find(s, pattern, init, plain) end
 
@@ -87,7 +85,7 @@ function string.lower(s) end
 ---@param s       string
 ---@param pattern string
 ---@param init?   integer
----@return ... captured
+---@return string|integer|nil ...
 ---@nodiscard
 function string.match(s, pattern, init) end
 
@@ -143,7 +141,7 @@ function string.sub(s, i, j) end
 ---@param fmt  string
 ---@param s    string
 ---@param pos? integer
----@return ...
+---@return any ...
 ---@return integer offset
 ---@nodiscard
 function string.unpack(fmt, s, pos) end

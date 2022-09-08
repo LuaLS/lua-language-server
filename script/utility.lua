@@ -730,7 +730,7 @@ function switchMT:has(name)
 end
 
 ---@param name string
----@return ...
+---@return any ...
 function switchMT:__call(name, ...)
     local callback = self.map[name] or self._default
     if not callback then

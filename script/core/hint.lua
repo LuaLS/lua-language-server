@@ -292,7 +292,7 @@ local function semicolonHint(uri, results, start, finish)
             local next    = src[i+1]
             local left    = current.range or current.finish
             local right   = next.start
-            local text    = subber(left, right)
+            local text    = subber(current.finish, right)
             if mode == 'All' then
                 if not text:find '[,;]' then
                     results[#results+1] = {

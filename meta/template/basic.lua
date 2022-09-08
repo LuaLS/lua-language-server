@@ -237,6 +237,9 @@ function tostring(v) end
 ---| '"function"'
 ---| '"thread"'
 ---| '"userdata"'
+---#if VERSION == JIT then
+---| '"cdata"'
+---#end
 
 ---#DES 'type'
 ---@param v any

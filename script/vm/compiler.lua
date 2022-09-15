@@ -942,33 +942,41 @@ end
 ---@field _iterVars? table<parser.object, vm.node>
 
 ---@param source parser.object
-local function compileForVars(source)
-    if source._iterator then
-        return
-    end
+---@param target parser.object
+local function compileForVars(source, target)
     if not source.exps then
         return
     end
-        --  for k, v in pairs(t) do
-        --> for k, v in iterator, status, initValue do
-        --> local k, v = iterator(status, initValue)
-    source._iterator = {
-        type = 'dummyfunc',
-        parent = source,
-    }
-    source._iterArgs = {{},{}}
-    source._iterVars = {}
+    --  for k, v in pairs(t) do
+    --> for k, v in iterator, status, initValue do
+    --> local k, v = iterator(status, initValue)
+    if not source._iterator then
+        source._iterator = {
+            type = 'dummyfunc',
+            parent = source,
+        }
+        source._iterArgs = {{},{}}
+        source._iterVars = {}
+    end
     -- iterator
-    selectNode(source._iterator,    source.exps, 1)
+    if not vm.getNode(source._iterator) then
+        selectNode(source._iterator,    source.exps, 1)
+    end
     -- status
-    selectNode(source._iterArgs[1], source.exps, 2)
+    if not vm.getNode(source._iterArgs[1]) then
+        selectNode(source._iterArgs[1], source.exps, 2)
+    end
     -- initValue
-    selectNode(source._iterArgs[2], source.exps, 3)
+    if not vm.getNode(source._iterArgs[2]) then
+        selectNode(source._iterArgs[2], source.exps, 3)
+    end
     if source.keys then
         for i, loc in ipairs(source.keys) do
-            local node = getReturn(source._iterator, i, source._iterArgs)
-            node:removeOptional()
-            source._iterVars[loc] = node
+            if loc == target then
+                local node = getReturn(source._iterator, i, source._iterArgs)
+                node:removeOptional()
+                vm.setNode(loc, node)
+            end
         end
     end
 end
@@ -1053,11 +1061,7 @@ local function compileLocal(source)
     end
     -- for x in ... do
     if source.parent.type == 'in' then
-        compileForVars(source.parent)
-        local keyNode = source.parent._iterVars and source.parent._iterVars[source]
-        if keyNode then
-            vm.setNode(source, keyNode)
-        end
+        compileForVars(source.parent, source)
     end
 
     -- for x = ... do

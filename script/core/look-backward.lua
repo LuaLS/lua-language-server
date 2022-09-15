@@ -58,7 +58,8 @@ function m.findSymbol(text, offset)
         or char == '('
         or char == ','
         or char == '['
-        or char == '=' then
+        or char == '='
+        or char == '{' then
             return char, i
         else
             return nil

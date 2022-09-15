@@ -3750,3 +3750,30 @@ TEST [[
 local x = function (x, y) end
 ]]
 (EXISTS)
+
+TEST [[
+local x = {
+<??>
+})
+]]
+(function (results)
+    for _, res in ipairs(results) do
+        assert(res.label ~= 'do')
+    end
+end)
+
+TEST [[
+---@class Options
+---@field page number
+---@field active boolean
+
+---@param opts Options
+local function acceptOptions(opts) end
+
+acceptOptions({
+<??>
+})
+]]
+(function (results)
+    assert(#results == 2)
+end)

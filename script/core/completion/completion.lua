@@ -749,7 +749,7 @@ local function checkKeyWord(state, start, position, word, hasSpace, afterLocal, 
     local text = state.lua
     local snipType = config.get(state.uri, 'Lua.completion.keywordSnippet')
     local symbol = lookBackward.findSymbol(text, guide.positionToOffset(state, start))
-    local isExp = symbol == '(' or symbol == ',' or symbol == '=' or symbol == '['
+    local isExp = symbol == '(' or symbol == ',' or symbol == '=' or symbol == '[' or symbol == '{'
     local info = {
         hasSpace = hasSpace,
         isExp    = isExp,
@@ -1485,11 +1485,13 @@ local function checkTableLiteralField(state, position, tbl, fields, results)
         end
     end
     if left then
+        local hasResult = false
         for _, field in ipairs(fields) do
             local name = guide.getKeyName(field)
             if  name
             and not mark[name]
             and matchKey(left, tostring(name)) then
+                hasResult = true
                 results[#results+1] = {
                     label      = guide.getKeyName(field),
                     kind       = define.CompletionItemKind.Property,
@@ -1502,6 +1504,7 @@ local function checkTableLiteralField(state, position, tbl, fields, results)
                 }
             end
         end
+        return hasResult
     end
 end
 
@@ -1553,7 +1556,7 @@ end
 local function tryTable(state, position, results)
     local source = findNearestTableField(state, position)
     if not source then
-        return
+        return false
     end
     if  source.type ~= 'table'
     and (not source.parent or source.parent.type ~= 'table') then
@@ -1574,7 +1577,10 @@ local function tryTable(state, position, results)
             fields[#fields+1] = field
         end
     end
-    checkTableLiteralField(state, position, tbl, fields, results)
+    if checkTableLiteralField(state, position, tbl, fields, results) then
+        return true
+    end
+    return false
 end
 
 local function tryArray(state, position, results)
@@ -2152,9 +2158,11 @@ local function tryCompletions(state, position, triggerCharacter, results)
     if postfix(state, position, results) then
         return
     end
+    if tryTable(state, position, results) then
+        return
+    end
     trySpecial(state, position, results)
     tryCallArg(state, position, results)
-    tryTable(state, position, results)
     tryArray(state, position, results)
     tryWord(state, position, triggerCharacter, results)
     tryIndex(state, position, results)

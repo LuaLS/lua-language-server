@@ -33,7 +33,7 @@ function string.dump(f, strip) end
 ---@param plain?  boolean
 ---@return integer start
 ---@return integer end
----@return string|integer ... captured
+---@return any ... captured
 ---@nodiscard
 function string.find(s, pattern, init, plain) end
 

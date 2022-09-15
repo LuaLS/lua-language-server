@@ -103,12 +103,10 @@ function lovr.headset.getBoundsWidth() end
 ---
 ---
 ---### NOTE:
----The default near and far clipping planes are 0.1 meters and 100.0 meters.
----
----This is not currently supported by the `vrapi` headset driver.
+---The default near and far clipping planes are 0.01 meters and 0.0 meters.
 ---
 ---@return number near # The distance to the near clipping plane, in meters.
----@return number far # The distance to the far clipping plane, in meters.
+---@return number far # The distance to the far clipping plane, in meters, or 0 for an infinite far clipping plane with a reversed Z range.
 function lovr.headset.getClipDistance() end
 
 ---
@@ -174,13 +172,7 @@ function lovr.headset.getHands() end
 ---
 ---Returns a Texture that contains whatever is currently rendered to the headset.
 ---
----Sometimes this can be `nil` if the current headset driver doesn't have a mirror texture, which can happen if the driver renders directly to the display.
----
----Currently the `desktop`, `webxr`, and `vrapi` drivers do not have a mirror texture.
----
----It also isn't guaranteed that the same Texture will be returned by subsequent calls to this function.
----
----Currently, the `oculus` driver exhibits this behavior.
+---Sometimes this can be `nil` if the current headset driver doesn't have a mirror texture, which can happen if the driver renders directly to the display, like with the `desktop` driver.
 ---
 ---@return lovr.Texture mirror # The mirror texture.
 function lovr.headset.getMirrorTexture() end
@@ -192,43 +184,7 @@ function lovr.headset.getMirrorTexture() end
 ---
 ---
 ---### NOTE:
----<table>
----  <thead>
----    <tr>
----      <td>driver</td>
----      <td>name</td>
----    </tr>
----  </thead>
----  <tbody>
----    <tr>
----      <td>desktop</td>
----      <td><code>Simulator</code></td>
----    </tr>
----    <tr>
----      <td>openvr</td>
----      <td>varies</td>
----    </tr>
----    <tr>
----      <td>openxr</td>
----      <td>varies</td>
----    </tr>
----    <tr>
----      <td>vrapi</td>
----      <td><code>Oculus Quest</code> or <code>Oculus Quest 2</code></td>
----    </tr>
----    <tr>
----      <td>webxr</td>
----      <td>always nil</td>
----    </tr>
----    <tr>
----      <td>oculus</td>
----      <td>varies</td>
----    </tr>
----    <tr>
----      <td>pico</td>
----      <td><code>Pico</code></td>
----    </tr>
----  </tbody> </table>
+---The desktop driver name will always be `Simulator`.
 ---
 ---@return string name # The name of the headset as a string.
 function lovr.headset.getName() end
@@ -308,13 +264,13 @@ function lovr.headset.getPose(device) end
 function lovr.headset.getPosition(device) end
 
 ---
----Returns a list of joint poses tracked by a device.
+---Returns a list of joint transforms tracked by a device.
 ---
 ---Currently, only hand devices are able to track joints.
 ---
 ---
 ---### NOTE:
----If the Device does not support tracking joints or the poses are unavailable, `nil` is returned.
+---If the Device does not support tracking joints or the transforms are unavailable, `nil` is returned.
 ---
 ---The joint orientation is similar to the graphics coordinate system: -Z is the forwards direction, pointing towards the fingertips.
 ---
@@ -445,7 +401,7 @@ function lovr.headset.getPosition(device) end
 ---
 ---@overload fun(device: lovr.Device, t: table):table
 ---@param device lovr.Device # The Device to query.
----@return table poses # A list of joint poses for the device.  Each pose is a table with 3 numbers for the position of the joint followed by 4 numbers for the angle/axis orientation of the joint.
+---@return table transforms # A list of joint transforms for the device.  Each transform is a table with 3 numbers for the position of the joint, 1 number for the joint radius (in meters), and 4 numbers for the angle/axis orientation of the joint.
 function lovr.headset.getSkeleton(device) end
 
 ---
@@ -566,8 +522,6 @@ function lovr.headset.newModel(device, options) end
 ---
 ---
 ---### NOTE:
----When using the `pico` headset driver, headset rendering is asynchronous and the callback passed to `lovr.headset.renderTo` will not be called immediately.
----
 ---At the beginning of the callback, the display is cleared to the background color.
 ---
 ---The background color can be changed using `lovr.graphics.setBackgroundColor`.
@@ -584,10 +538,10 @@ function lovr.headset.renderTo(callback) end
 ---
 ---
 ---### NOTE:
----The default clip distances are 0.1 and 100.0.
+---The default clip distances are 0.01 and 0.0.
 ---
 ---@param near number # The distance to the near clipping plane, in meters.
----@param far number # The distance to the far clipping plane, in meters.
+---@param far number # The distance to the far clipping plane, in meters, or 0 for an infinite far clipping plane with a reversed Z range.
 function lovr.headset.setClipDistance(near, far) end
 
 ---
@@ -603,16 +557,6 @@ function lovr.headset.setDisplayFrequency(frequency) end
 
 ---
 ---Causes the device to vibrate with a custom strength, duration, and frequency, if possible.
----
----
----### NOTE:
----When using the `openvr` headset driver on an HTC Vive, the value for the `duration` currently must be less than .004 seconds.
----
----Call this function several frames in a row for stronger or prolonged vibration patterns.
----
----On the Oculus Quest, devices can only be vibrated once per frame.
----
----Any attempts after the first will return `false`.
 ---
 ---@param device? lovr.Device # The device to vibrate.
 ---@param strength? number # The strength of the vibration (amplitude), between 0 and 1.
@@ -807,41 +751,15 @@ function lovr.headset.wasReleased(device, button) end
 ---
 ---At startup, LÖVR searches through the list of drivers in order.
 ---
----One headset driver will be used for rendering to the VR display, and all supported headset drivers will be used for device input.
----
----The way this works is that when poses or button input is requested, the input drivers are queried (in the order they appear in `conf.lua`) to see if any of them currently have data for the specified device.
----
----The first one that returns data will be used to provide the result. This allows projects to support multiple types of hardware devices.
----
 ---@alias lovr.HeadsetDriver
 ---
 ---A VR simulator using keyboard/mouse.
 ---
 ---| "desktop"
 ---
----Oculus Desktop SDK.
----
----| "oculus"
----
----OpenVR.
----
----| "openvr"
----
 ---OpenXR.
 ---
 ---| "openxr"
----
----Oculus Mobile SDK.
----
----| "vrapi"
----
----Pico.
----
----| "pico"
----
----WebXR.
----
----| "webxr"
 
 ---
 ---Represents the different types of origins for coordinate spaces.

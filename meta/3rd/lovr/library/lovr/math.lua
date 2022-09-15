@@ -93,7 +93,7 @@ function lovr.math.newMat4() end
 ---@overload fun(v: lovr.vec3, u: lovr.vec3):lovr.quat
 ---@overload fun(m: lovr.mat4):lovr.quat
 ---@overload fun():lovr.quat
----@param angle? any # An angle to use for the rotation, in radians.
+---@param angle? number # An angle to use for the rotation, in radians.
 ---@param ax? number # The x component of the axis of rotation.
 ---@param ay? number # The y component of the axis of rotation.
 ---@param az? number # The z component of the axis of rotation.
@@ -147,9 +147,9 @@ function lovr.math.newVec3(x, y, z) end
 function lovr.math.newVec4(x, y, z, w) end
 
 ---
----Returns a 1D, 2D, 3D, or 4D perlin noise value.
+---Returns a 1D, 2D, 3D, or 4D simplex noise value.
 ---
----The number will be between 0 and 1, and it will always be 0.5 when the inputs are integers.
+---The number will be between 0 and 1.
 ---
 ---@overload fun(x: number, y: number):number
 ---@overload fun(x: number, y: number, z: number):number
@@ -168,7 +168,7 @@ function lovr.math.noise(x) end
 ---@overload fun(v: lovr.vec3, u: lovr.vec3):lovr.quat
 ---@overload fun(m: lovr.mat4):lovr.quat
 ---@overload fun():lovr.quat
----@param angle? any # An angle to use for the rotation, in radians.
+---@param angle? number # An angle to use for the rotation, in radians.
 ---@param ax? number # The x component of the axis of rotation.
 ---@param ay? number # The y component of the axis of rotation.
 ---@param az? number # The z component of the axis of rotation.
@@ -447,28 +447,29 @@ function Mat4:mul(n) end
 ---
 ---Sets this matrix to represent an orthographic projection, useful for 2D/isometric rendering.
 ---
----This can be used with `lovr.graphics.setProjection`, or it can be sent to a `Shader` for use in GLSL.
+---This can be used with `Pass:setProjection`, or it can be sent to a `Shader` for use in GLSL.
 ---
+---@overload fun(self: lovr.Mat4, width: number, height: number, near: number, far: number):lovr.Mat4
 ---@param left number # The left edge of the projection.
 ---@param right number # The right edge of the projection.
----@param top number # The top edge of the projection.
 ---@param bottom number # The bottom edge of the projection.
+---@param top number # The top edge of the projection.
 ---@param near number # The position of the near clipping plane.
 ---@param far number # The position of the far clipping plane.
 ---@return lovr.Mat4 m # The original matrix.
-function Mat4:orthographic(left, right, top, bottom, near, far) end
+function Mat4:orthographic(left, right, bottom, top, near, far) end
 
 ---
 ---Sets this matrix to represent a perspective projection.
 ---
----This can be used with `lovr.graphics.setProjection`, or it can be sent to a `Shader` for use in GLSL.
+---This can be used with `Pass:setProjection`, or it can be sent to a `Shader` for use in GLSL.
 ---
----@param near number # The near plane.
----@param far number # The far plane.
 ---@param fov number # The vertical field of view (in radians).
 ---@param aspect number # The horizontal aspect ratio of the projection (width / height).
+---@param near number # The near plane.
+---@param far number # The far plane.
 ---@return lovr.Mat4 m # The original matrix.
-function Mat4:perspective(near, far, fov, aspect) end
+function Mat4:perspective(fov, aspect, near, far) end
 
 ---
 ---Rotates the matrix using a quaternion or an angle/axis rotation.
@@ -608,7 +609,7 @@ function Quat:normalize() end
 ---@overload fun(self: lovr.Quat, v: lovr.vec3, u: lovr.vec3):lovr.quat
 ---@overload fun(self: lovr.Quat, m: lovr.mat4):lovr.quat
 ---@overload fun(self: lovr.Quat):lovr.quat
----@param angle? any # The angle to use for the rotation, in radians.
+---@param angle? number # The angle to use for the rotation, in radians.
 ---@param ax? number # The x component of the axis of rotation.
 ---@param ay? number # The y component of the axis of rotation.
 ---@param az? number # The z component of the axis of rotation.

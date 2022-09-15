@@ -48,7 +48,8 @@ function lovr.event.pump() end
 ---Only nil, booleans, numbers, strings, and LÖVR objects are supported types for event data.
 ---
 ---@param name string # The name of the event.
-function lovr.event.push(name) end
+---@vararg any # The arguments for the event.  Currently, up to 4 are supported.
+function lovr.event.push(name, ...) end
 
 ---
 ---Pushes an event to quit.

@@ -157,6 +157,10 @@ function Thread:isRunning() end
 ---
 ---Starts the Thread.
 ---
+---
+---### NOTE:
+---The arguments can be nil, booleans, numbers, strings, or LÖVR objects.
+---
 ---@param arguments any # Up to 4 arguments to pass to the Thread's function.
 function Thread:start(arguments) end
 

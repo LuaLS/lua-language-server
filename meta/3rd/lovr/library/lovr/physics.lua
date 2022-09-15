@@ -1211,6 +1211,12 @@ function SliderJoint:getLimits() end
 function SliderJoint:getLowerLimit() end
 
 ---
+---Returns how far the slider joint is extended (zero is the position the slider was created at, positive values are further apart).
+---
+---@return number position # The joint position along its axis.
+function SliderJoint:getPosition() end
+
+---
 ---Returns the upper limit of the slider position.
 ---
 ---@return number limit # The upper limit.
@@ -1409,11 +1415,19 @@ function World:getResponseTime() end
 function World:getStepCount(steps) end
 
 ---
----Returns the tightness of the joint.
+---Returns the tightness of joints in the World.
 ---
----See `World:setTightness` for how this affects the joint.
+---The tightness controls how much force is applied to colliders connected by joints.
 ---
----@return number tightness # The tightness of the joint.
+---With a value of 0, no force will be applied and joints won't have any effect.
+---
+---With a tightness of 1, a strong force will be used to try to keep the Colliders constrained.
+---
+---A tightness larger than 1 will overcorrect the joints, which can sometimes be desirable.
+---
+---Negative tightness values are not supported.
+---
+---@return number tightness # The tightness of the World.
 function World:getTightness() end
 
 ---

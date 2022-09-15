@@ -767,14 +767,14 @@ function ModelData:getWidth() end
 local Rasterizer = {}
 
 ---
----Returns the advance metric of the font, in pixels.
+---Returns the advance metric for a glyph, in pixels.
 ---
----The advance is how many pixels the font advances horizontally after each glyph is rendered.
+---The advance is the horizontal distance to advance the cursor after rendering the glyph.
 ---
----This does not include kerning.
----
----@return number advance # The advance of the font, in pixels.
-function Rasterizer:getAdvance() end
+---@overload fun(self: lovr.Rasterizer, codepoint: number):number
+---@param character string # A character.
+---@return number advance # The advance of the glyph, in pixels.
+function Rasterizer:getAdvance(character) end
 
 ---
 ---Returns the ascent metric of the font, in pixels.
@@ -785,6 +785,39 @@ function Rasterizer:getAdvance() end
 function Rasterizer:getAscent() end
 
 ---
+---Returns the bearing metric for a glyph, in pixels.
+---
+---The bearing is the horizontal distance from the cursor to the edge of the glyph.
+---
+---@overload fun(self: lovr.Rasterizer, codepoint: number):number
+---@param character string # A character.
+---@return number bearing # The bearing of the glyph, in pixels.
+function Rasterizer:getBearing(character) end
+
+---
+---Returns the bounding box of a glyph, or the bounding box surrounding all glyphs.
+---
+---Note that font coordinates use a cartesian "y up" coordinate system.
+---
+---@overload fun(self: lovr.Rasterizer, codepoint: number):number, number, number, number
+---@overload fun(self: lovr.Rasterizer):number, number, number, number
+---@param character string # A character.
+---@return number x1 # The left edge of the bounding box, in pixels.
+---@return number y1 # The bottom edge of the bounding box, in pixels.
+---@return number x2 # The right edge of the bounding box, in pixels.
+---@return number y2 # The top edge of the bounding box, in pixels.
+function Rasterizer:getBoundingBox(character) end
+
+---
+---Returns the bezier curve control points defining the shape of a glyph.
+---
+---@overload fun(self: lovr.Rasterizer, codepoint: number, three: boolean):table
+---@param character string # A character.
+---@param three boolean # Whether the control points should be 3D or 2D.
+---@return table curves # A table of curves.  Each curve is a table of numbers representing the control points (2 for a line, 3 for a quadratic curve, etc.).
+function Rasterizer:getCurves(character, three) end
+
+---
 ---Returns the descent metric of the font, in pixels.
 ---
 ---The descent represents how far any glyph of the font descends below the baseline.
@@ -793,31 +826,86 @@ function Rasterizer:getAscent() end
 function Rasterizer:getDescent() end
 
 ---
+---Returns the dimensions of a glyph, or the dimensions of any glyph.
+---
+---@overload fun(self: lovr.Rasterizer, codepoint: number):number, number
+---@overload fun(self: lovr.Rasterizer):number, number
+---@param character string # A character.
+---@return number width # The width, in pixels.
+---@return number height # The height, in pixels.
+function Rasterizer:getDimensions(character) end
+
+---
+---Returns the size of the font, in pixels.
+---
+---This is the size the rasterizer was created with, and defines the size of images it rasterizes.
+---
+---@return number size # The font size, in pixels.
+function Rasterizer:getFontSize() end
+
+---
 ---Returns the number of glyphs stored in the font file.
 ---
 ---@return number count # The number of glyphs stored in the font file.
 function Rasterizer:getGlyphCount() end
 
 ---
----Returns the height metric of the font, in pixels.
+---Returns the height of a glyph, or the maximum height of any glyph.
 ---
----@return number height # The height of the font, in pixels.
-function Rasterizer:getHeight() end
+---@overload fun(self: lovr.Rasterizer, codepoint: number):number
+---@overload fun(self: lovr.Rasterizer):number
+---@param character string # A character.
+---@return number height # The height, in pixels.
+function Rasterizer:getHeight(character) end
 
 ---
----Returns the line height metric of the font, in pixels.
+---Returns the kerning between 2 glyphs, in pixels.
 ---
----This is how far apart lines are.
+---Kerning is a slight horizontal adjustment between 2 glyphs to improve the visual appearance.
 ---
----@return number height # The line height of the font, in pixels.
-function Rasterizer:getLineHeight() end
+---It will often be negative.
+---
+---@overload fun(self: lovr.Rasterizer, firstCodepoint: number, second: string):number
+---@overload fun(self: lovr.Rasterizer, first: string, secondCodepoint: number):number
+---@overload fun(self: lovr.Rasterizer, firstCodepoint: number, secondCodepoint: number):number
+---@param first string # The first character.
+---@param second string # The second character.
+---@return number keming # The kerning between the two glyphs.
+function Rasterizer:getKerning(first, second) end
 
 ---
----Check if the Rasterizer can rasterize a set of glyphs.
+---Returns the leading metric of the font, in pixels.
+---
+---This is the full amount of space between lines.
+---
+---@return number leading # The font leading, in pixels.
+function Rasterizer:getLeading() end
+
+---
+---Returns the width of a glyph, or the maximum width of any glyph.
+---
+---@overload fun(self: lovr.Rasterizer, codepoint: number):number
+---@overload fun(self: lovr.Rasterizer):number
+---@param character string # A character.
+---@return number width # The width, in pixels.
+function Rasterizer:getWidth(character) end
+
+---
+---Returns whether the Rasterizer can rasterize a set of glyphs.
 ---
 ---@vararg any # Strings (sets of characters) or numbers (character codes) to check for.
 ---@return boolean hasGlyphs # true if the Rasterizer can rasterize all of the supplied characters, false otherwise.
 function Rasterizer:hasGlyphs(...) end
+
+---
+---Returns an `Image` containing a rasterized glyph.
+---
+---@overload fun(self: lovr.Rasterizer, codepoint: number, spread?: number, padding?: number):lovr.Image
+---@param character string # A character.
+---@param spread? number # The width of the distance field, for signed distance field rasterization.
+---@param padding? number # The number of pixels of padding to add at the edges of the image.
+---@return lovr.Image image # The glyph image.  It will be in the `rgba32f` format.
+function Rasterizer:newImage(character, spread, padding) end
 
 ---
 ---A Sound stores the data for a sound.
@@ -1324,6 +1412,12 @@ function Sound:setFrames(t, count, dstOffset, srcOffset) end
 ---4 bytes per pixel.
 ---
 ---| "d32f"
+---
+---One 32-bit floating point depth channel and one 8-bit stencil channel.
+---
+---5 bytes per pixel.
+---
+---| "d32fs8"
 ---
 ---3 channels.
 ---

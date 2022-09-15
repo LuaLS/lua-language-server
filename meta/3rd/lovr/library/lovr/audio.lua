@@ -689,17 +689,29 @@ function Source:tell(unit) end
 ---Concrete.
 ---
 ---| "concrete"
-
+---
+---Glass.
+---
 ---| "glass"
-
+---
+---Gravel.
+---
 ---| "gravel"
-
+---
+---Metal.
+---
 ---| "metal"
-
+---
+---Plaster.
+---
 ---| "plaster"
-
+---
+---Rock.
+---
 ---| "rock"
-
+---
+---Wood.
+---
 ---| "wood"
 
 ---

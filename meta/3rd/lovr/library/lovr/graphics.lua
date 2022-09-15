@@ -9,11 +9,22 @@
 lovr.graphics = {}
 
 ---
----TODO
+---Compiles shader code to SPIR-V bytecode.
 ---
----@param stage lovr.ShaderStage # TODO
----@param source lovr.ShaderSource # TODO
----@return lovr.Blob bytecode # TODO
+---The bytecode can be passed to `lovr.graphics.newShader` to create shaders, which will be faster than creating it from GLSL. The bytecode is portable, so bytecode compiled on one platform will work on other platforms. This allows shaders to be precompiled in a build step.
+---
+---
+---### NOTE:
+---The input can be GLSL or SPIR-V.
+---
+---If it's SPIR-V, it will be returned unchanged as a Blob.
+---
+---If the shader fails to compile, an error will be thrown with the error message.
+---
+---@overload fun(stage: lovr.ShaderStage, blob: lovr.Blob):lovr.Blob
+---@param stage lovr.ShaderStage # The type of shader to compile.
+---@param source string # A string or filename with shader code.
+---@return lovr.Blob bytecode # A Blob containing compiled SPIR-V code.
 function lovr.graphics.compileShader(stage, source) end
 
 ---
@@ -315,19 +326,33 @@ function lovr.graphics.getFeatures() end
 function lovr.graphics.getLimits() end
 
 ---
----TODO
+---Creates and returns a temporary Pass object.
+---
+---
+---### NOTE:
+---Fun facts about render passes:
+---
+---- Textures must have the same dimensions, layer counts, and sample counts.
+---- Textures must have been created with the `render` `TextureUsage`.
+---- If `mipmap` is true, then any textures with mipmaps must have the `transfer` `TextureUsage`.
+---- It's okay to have zero color textures, but in this case there must be a depth texture.
+---- Setting `clear` to `false` for textures is usually very slow on mobile GPUs.
+---
+---For `compute` and `transfer` passes, all of the commands in the pass act as though they run in parallel.
+---
+---This means that writing to the same element of a buffer twice, or writing to it and reading from it again is not guaranteed to work properly on all GPUs.
+---
+---LÖVR is not currently able to check for this.
+---
+---If compute or transfers need to be sequenced, multiple passes should be used.
+---
+---It is, however, completely fine to read and write to non-overlapping regions of the same buffer or texture.
 ---
 ---@overload fun(type: lovr.PassType, texture: lovr.Texture):lovr.Pass
 ---@overload fun(type: lovr.PassType, canvas: table):lovr.Pass
----@param type lovr.PassType # TODO
+---@param type lovr.PassType # The type of pass to create.
 ---@return lovr.Pass pass # The new Pass.
 function lovr.graphics.getPass(type) end
-
----
----TODO
----
----@return {memory: {total: number, buffer: number, texture: number}, objects: {buffers: number, textures: number, samplers: number, shaders: number}, frame: {scratchMemory: number, renderPasses: number, computePasses: number, transferPasses: number, pipelineBinds: number, bundleBinds: number, drawCalls: number, dispatches: number, workgroups: number, copies: number}, internal: {blocks: number, canvases: number, pipelines: number, layouts: number, bunches: number}} stats # Graphics statistics.
-function lovr.graphics.getStats() end
 
 ---
 ---Returns the window pass.
@@ -338,20 +363,20 @@ function lovr.graphics.getStats() end
 ---
 ---
 ---### NOTE:
----- TODO is the same pass always returned
----- TODO does the texture change
----- TODO what settings does the Pass use (incl conf.lua)
----- TODO is it reset
+---`lovr.conf` may be used to change the settings for the pass:  `t.graphics.antialias` enables antialiasing, and `t.graphics.stencil` enables the stencil buffer.
+---
+---This pass clears the window texture to the background color, which can be changed using `lovr.graphics.setBackgroundColor`.
 ---
 ---@return lovr.Pass pass # The window pass, or `nil` if there is no window.
 function lovr.graphics.getWindowPass() end
 
 ---
----TODO
+---Returns the type of operations the GPU supports for a texture format, if any.
 ---
----@param format lovr.TextureFormat # TODO
----@return boolean supported # TODO
-function lovr.graphics.isFormatSupported(format) end
+---@param format lovr.TextureFormat # The texture format to query.
+---@param features lovr.TextureFeature # Zero or more features to check.  If no features are given, this function will return whether the GPU supports *any* feature for this format.  Otherwise, this function will only return true if *all* of the input features are supported.
+---@return boolean supported # Whether the GPU supports these operations for textures with this format.
+function lovr.graphics.isFormatSupported(format, features) end
 
 ---
 ---Creates a Buffer.
@@ -396,57 +421,81 @@ function lovr.graphics.isFormatSupported(format) end
 function lovr.graphics.newBuffer(length, type) end
 
 ---
----TODO
+---Creates a new Font.
 ---
 ---@overload fun(blob: lovr.Blob, size?: number, spread?: number):lovr.Font
 ---@overload fun(size?: number, spread?: number):lovr.Font
 ---@overload fun(rasterizer: lovr.Rasterizer, spread?: number):lovr.Font
----@param filename string # TODO
----@param size? number # TODO
----@param spread? number # TODO
+---@param filename string # A path to a TTF file.
+---@param size? number # The size of the Font in pixels.  Larger sizes are slower to initialize and use more memory, but have better quality.
+---@param spread? number # For signed distance field fonts (currently all fonts), the width of the SDF, in pixels.  The greater the distance the font is viewed from, the larger this value needs to be for the font to remain properly antialiased.  Increasing this will have a performance penalty similar to increasing the size of the font.
 ---@return lovr.Font font # The new Font.
 function lovr.graphics.newFont(filename, size, spread) end
 
 ---
----TODO
+---Creates a new Material from a table of properties and textures.
 ---
----@overload fun(options: table):lovr.Material
----@param texture lovr.Texture # TODO
----@return lovr.Material material # TODO
-function lovr.graphics.newMaterial(texture) end
+---All fields are optional.
+---
+---Once a Material is created, its properties can not be changed.
+---
+---Instead, a new Material should be created with the updated properties.
+---
+---
+---### NOTE:
+---The non-texture material properties can be accessed in shaders using `Material.<property>`, where the property is the same as the Lua table key.
+---
+---The textures use capitalized names in shader code, e.g. `ColorTexture`.
+---
+---@param properties {color: lovr.Vec4, glow: lovr.Vec4, uvShift: lovr.Vec2, uvScale: lovr.Vec2, metalness: number, roughness: number, clearcoat: number, clearcoatRoughness: number, occlusionStrength: number, normalScale: number, alphaCutoff: number, texture: lovr.Texture, glowTexture: lovr.Texture, metalnessTexture: lovr.Texture, roughnessTexture: lovr.Texture, clearcoatTexture: lovr.Texture, occlusionTexture: lovr.Texture, normalTexture: lovr.Texture} # Material properties.
+---@return lovr.Material material # The new material.
+function lovr.graphics.newMaterial(properties) end
 
 ---
----TODO
+---Loads a 3D model from a file.
 ---
----@overload fun(blob: lovr.Blob, options: table):lovr.Model
----@overload fun(modelData: lovr.ModelData):lovr.Model
----@param filename string # TODO
----@param options {mipmaps: boolean} # Model options.
+---Currently, OBJ, glTF, and binary STL files are supported.
+---
+---@overload fun(blob: lovr.Blob, options?: table):lovr.Model
+---@overload fun(modelData: lovr.ModelData, options?: table):lovr.Model
+---@param filename string # The path to model file.
+---@param options? {mipmaps: boolean} # Model options.
 ---@return lovr.Model model # The new Model.
 function lovr.graphics.newModel(filename, options) end
 
 ---
----TODO
+---Creates a new Sampler.
 ---
----@param options {filter: table, wrap: table, compare: lovr.CompareMode, anisotropy: number, mipmaprange: table} # TODO
----@return lovr.Sampler sampler # TODO
-function lovr.graphics.newSampler(options) end
+---Samplers are immutable, meaning their parameters can not be changed after the sampler is created.
+---
+---Instead, a new sampler should be created with the updated properties.
+---
+---@param parameters {filter: {["[1]"]: lovr.FilterMode, ["[2]"]: lovr.FilterMode, ["[3]"]: lovr.FilterMode}, wrap: {["[1]"]: lovr.WrapMode, ["[2]"]: lovr.WrapMode, ["[3]"]: lovr.FilterMode}, compare: lovr.CompareMode, anisotropy: number, mipmaprange: table} # Parameters for the sampler.
+---@return lovr.Sampler sampler # The new sampler.
+function lovr.graphics.newSampler(parameters) end
 
 ---
----TODO
+---Creates a Shader, which is a small program that runs on the GPU.
 ---
----@overload fun(compute: lovr.ShaderSource, options: table):lovr.Shader
----@param vertex lovr.ShaderSource # TODO
----@param fragment lovr.ShaderSource # TODO
+---Shader code is usually written in GLSL and compiled to SPIR-V bytecode.
+---
+---SPIR-V is faster to load but requires a build step.
+---
+---Either form can be used to create a shader.
+---
+---@overload fun(compute: string, options: table):lovr.Shader
+---@overload fun(default: lovr.DefaultShader, options: table):lovr.Shader
+---@param vertex string # A string, path to a file, or Blob containing GLSL or SPIR-V code for the vertex stage.  Can also be a `DefaultShader` to use that shader's vertex code.
+---@param fragment string # A string, path to a file, or Blob containing GLSL or SPIR-V code for the fragment stage. Can also be a `DefaultShader` to use that shader's fragment code.
 ---@param options {flags: table, label: string} # Shader options.
----@return lovr.Shader shader # TODO
+---@return lovr.Shader shader # The new shader.
 function lovr.graphics.newShader(vertex, fragment, options) end
 
 ---
----TODO
+---Creates a new Tally.
 ---
 ---@param type lovr.TallyType # The type of the Tally, which controls what "thing" it measures.
----@param count number # The number of slots in the Tally.  Each slot performs one measurement.
+---@param count number # The number of slots in the Tally.  Each slot holds one measurement.
 ---@param views? number # Tally objects with the `time` type can only be used in render passes with a certain number of views.  This is ignored for other types of tallies.
 ---@return lovr.Tally tally # The new Tally.
 function lovr.graphics.newTally(type, count, views) end
@@ -537,7 +586,33 @@ function lovr.graphics.present() end
 function lovr.graphics.setBackgroundColor(r, g, b, a) end
 
 ---
----TODO
+---Submits work to the GPU.
+---
+---
+---### NOTE:
+---The submitted `Pass` objects will run in the order specified.
+---
+---Commands within a single Pass do not have any ordering guarantees.
+---
+---Submitting work to the GPU is not thread safe.
+---
+---No other `lovr.graphics` or `Pass` functions may run at the same time as `lovr.graphics.submit`.
+---
+---Calling this function will invalidate any temporary buffers or passes that were created during the frame.
+---
+---Submitting work to the GPU is a relatively expensive operation.
+---
+---It's a good idea to batch all `Pass` objects into 1 submission if possible, unless there's a good reason not to.
+---
+---One such reason would be that the frame has so much work that some of it needs to be submitted early to prevent the GPU from running out of things to do.
+---
+---Another would be for `Readback` objects.
+---
+---By default, this function is called with the default pass at the end of `lovr.draw` and `lovr.mirror`.
+---
+---It is valid to submit zero passes.
+---
+---This will send an empty batch of work to the GPU.
 ---
 ---@overload fun(t: table):boolean
 ---@vararg lovr.Pass # The pass objects to submit.  Falsy values will be skipped.
@@ -545,7 +620,11 @@ function lovr.graphics.setBackgroundColor(r, g, b, a) end
 function lovr.graphics.submit(...) end
 
 ---
----TODO
+---Waits for all submitted GPU work to finish.
+---
+---A normal application that is trying to render graphics at a high framerate should never use this function, since waiting like this prevents the CPU from doing other useful work.
+---
+---Otherwise, reasons to use this function might be for debugging or to force a `Readback` to finish immediately.
 ---
 function lovr.graphics.wait() end
 
@@ -612,7 +691,7 @@ local Buffer = {}
 ---This will usually be true for most data types.
 ---
 ---@param index? number # The index of the first item to clear.
----@param count? number # The number of items to clear.  If `nil`, clears as many items as possible.
+---@param count? number # The number of items to clear.  If `nil`, clears to the end of the Buffer.
 function Buffer:clear(index, count) end
 
 ---
@@ -700,65 +779,137 @@ function Buffer:isTemporary() end
 function Buffer:setData(data, sourceIndex, destinationIndex, count) end
 
 ---
----TODO
+---Font objects are used to render text with `Pass:text`.
+---
+---The active font can be changed using `Pass:setFont`.
+---
+---The default font is Varela Round, which is used when no font is active, and can be retrieved using `lovr.graphics.getDefaultFont`.
+---
+---Custom fonts can be loaded from TTF files using `lovr.graphics.newFont`.
+---
+---Each Font uses a `Rasterizer` to load the TTF file and create images for each glyph. As text is drawn, the Font uploads images from the Rasterizer to a GPU texture atlas as needed.
+---
+---The Font also performs text layout and mesh generation for strings of text.
+---
+---LÖVR uses a text rendering technique called "multichannel signed distance fields" (MSDF), which makes the font rendering remain crisp when text is viewed up close.
+---
+---
+---### NOTE:
+---MSDF text requires a special shader to work.
+---
+---LÖVR will automatically switch to this shader if no shader is active on the `Pass`.
+---
+---This font shader is also available as a `DefaultShader`.
 ---
 ---@class lovr.Font
 local Font = {}
 
 ---
----TODO
+---Returns the ascent of the font.
 ---
----@return number ascent # TODO
+---The ascent is the maximum amount glyphs ascend above the baseline.
+---
+---The units depend on the font's pixel density.
+---
+---With the default density, the units correspond to meters.
+---
+---@return number ascent # The ascent of the font.
 function Font:getAscent() end
 
 ---
----TODO
+---Returns the descent of the font.
 ---
----@return number descent # TODO
+---The descent is the maximum amount glyphs descend below the baseline.
+---
+---The units depend on the font's pixel density.
+---
+---With the default density, the units correspond to meters.
+---
+---@return number descent # The descent of the font.
 function Font:getDescent() end
 
 ---
----TODO
+---Returns the height of the font, sometimes also called the leading.
 ---
----@return number height # TODO
+---This is the full height of a line of text, including the space between lines.
+---
+---Each line of a multiline string is separated on the y axis by this height, multiplied by the font's line spacing.
+---
+---The units depend on the font's pixel density.
+---
+---With the default density, the units correspond to meters.
+---
+---@return number height # The height of the font.
 function Font:getHeight() end
 
 ---
----TODO
+---Returns the kerning between 2 glyphs.
 ---
----@param first lovr.Codepoint # TODO
----@param second lovr.Codepoint # TODO
----@return number kerning # TODO
+---Kerning is a slight horizontal adjustment between 2 glyphs to improve the visual appearance.
+---
+---It will often be negative.
+---
+---The units depend on the font's pixel density.
+---
+---With the default density, the units correspond to meters.
+---
+---@overload fun(self: lovr.Font, firstCodepoint: number, second: string):number
+---@overload fun(self: lovr.Font, first: string, secondCodepoint: number):number
+---@overload fun(self: lovr.Font, firstCodepoint: number, secondCodepoint: number):number
+---@param first string # The first character.
+---@param second string # The second character.
+---@return number keming # The kerning between the two glyphs.
 function Font:getKerning(first, second) end
 
 ---
----TODO
+---Returns the line spacing of the Font.
 ---
----@return number spacing # TODO
+---When spacing out lines, the height of the font is multiplied the line spacing to get the final spacing value.
+---
+---The default is 1.0.
+---
+---@return number spacing # The line spacing of the font.
 function Font:getLineSpacing() end
 
 ---
----TODO
+---Returns a table of wrapped lines for a piece of text, given a line length limit.
 ---
----@param text lovr.Text # TODO
----@param wrap number # TODO
----@return table lines # TODO
-function Font:getLines(text, wrap) end
+---Newlines are handled correctly.
+---
+---The wrap limit units depend on the pixel density of the font.
+---
+---With the default pixel density, the units correspond to meters when the font is drawn at 1.0 scale.
+---
+---@overload fun(self: lovr.Font, strings: table, wrap: number):table
+---@param string string # The text to wrap.
+---@param wrap number # The line length to wrap at.
+---@return table lines # A table strings, one for each wrapped line (without any color information).
+function Font:getLines(string, wrap) end
 
 ---
----TODO
+---Returns the pixel density of the font.
 ---
----@return number density # TODO
+---The density is a "pixels per world unit" factor that controls how the pixels in the font's texture are mapped to units in the coordinate space.
+---
+---The default pixel density is set to the height of the font.
+---
+---This means that lines of text rendered with a scale of 1.0 come out to 1 unit (meter) tall.
+---
+---However, if this font was drawn to a 2D texture where the units are in pixels, the font would still be drawn 1 unit (pixel) tall!  Scaling the coordinate space or the size of the text by the height of the font would fix this.
+---
+---However, a more convenient option is to set the pixel density of the font to 1.0 when doing 2D rendering to make the font's size match up with the pixels of the canvas.
+---
+---@return number density # The pixel density of the font.
 function Font:getPixelDensity() end
 
 ---
----TODO
+---Returns the Rasterizer object backing the Font.
 ---
 ---@return lovr.Rasterizer rasterizer # The Rasterizer.
 function Font:getRasterizer() end
 
 ---
----Returns a table of vertices for a piece of text, along with a Material to use when rendering it. The Material may change over time if the Font's texture atlas needs to be resized to make room for more glyphs.
+---Returns a table of vertices for a piece of text, along with a Material to use when rendering it. The Material returned by this function may not be the same if the Font's texture atlas needs to be recreated with a bigger size to make room for more glyphs.
 ---
 ---
 ---### NOTE:
@@ -770,35 +921,67 @@ function Font:getRasterizer() end
 ---
 ---    { 'vec2:VertexPosition', 'vec2:VertexUV' }
 ---
----@param text lovr.Text # TODO
----@param wrap number # TODO
----@param halign lovr.HorizontalAlign # TODO
----@param valign lovr.VerticalAlign # TODO
+---@param halign lovr.HorizontalAlign # The horizontal align.
+---@param valign lovr.VerticalAlign # The vertical align.
 ---@return table vertices # The table of vertices.  See below for the format of each vertex.
 ---@return lovr.Material material # A Material to use when rendering the vertices.
-function Font:getVertices(text, wrap, halign, valign) end
+function Font:getVertices(halign, valign) end
 
 ---
----TODO
+---Returns the maximum width of a piece of text.
 ---
----@param text lovr.Text # TODO
----@return number width # TODO
-function Font:getWidth(text) end
+---This function does not perform wrapping but does respect newlines in the text.
+---
+---@overload fun(self: lovr.Font, strings: table):number
+---@param string string # The text to measure.
+---@return number width # The maximum width of the text.
+function Font:getWidth(string) end
 
 ---
----TODO
+---Sets the line spacing of the Font.
 ---
----@param spacing number # TODO
+---When spacing out lines, the height of the font is multiplied the line spacing to get the final spacing value.
+---
+---The default is 1.0.
+---
+---@param spacing number # The new line spacing.
 function Font:setLineSpacing(spacing) end
 
 ---
----TODO
+---Returns the pixel density of the font.
 ---
----@param density number # TODO
+---The density is a "pixels per world unit" factor that controls how the pixels in the font's texture are mapped to units in the coordinate space.
+---
+---The default pixel density is set to the height of the font.
+---
+---This means that lines of text rendered with a scale of 1.0 come out to 1 unit (meter) tall.
+---
+---However, if this font was drawn to a 2D texture where the units are in pixels, the font would still be drawn 1 unit (pixel) tall!  Scaling the coordinate space or the size of the text by the height of the font would fix this.
+---
+---However, a more convenient option is to set the pixel density of the font to 1.0 when doing 2D rendering to make the font's size match up with the pixels of the canvas.
+---
+---@overload fun(self: lovr.Font)
+---@param density number # The new pixel density of the font.
 function Font:setPixelDensity(density) end
 
 ---
----TODO
+---Materials are a set of properties and textures that define the properties of a surface, like what color it is, how bumpy or shiny it is, etc. `Shader` code can use the data from a material to compute lighting.
+---
+---Materials are immutable, and can't be changed after they are created.
+---
+---Instead, a new Material should be created with the updated properties.
+---
+---`Pass:setMaterial` changes the active material, causing it to affect rendering until the active material is changed again.
+---
+---Using material objects is optional.
+---
+---`Pass:setMaterial` can take a `Texture`, and `Pass:setColor` can change the color of objects, so basic tinting and texturing of surfaces does not require a full material to be created.
+---
+---Also, a custom material system could be developed by sending textures and other data to shaders manually.
+---
+---`Model` objects will create materials for all of the materials defined in the model file.
+---
+---In shader code, non-texture material properties can be accessed as `Material.<property>`, and material textures can be accessed as `<Type>Texture`, e.g. `RoughnessTexture`.
 ---
 ---@class lovr.Material
 local Material = {}
@@ -808,22 +991,6 @@ local Material = {}
 ---
 ---@return table properties # The Material properties.
 function Material:getProperties() end
-
----
----Sets a texture for a Material.
----
----Several predefined `MaterialTexture`s are supported.
----
----Any texture that is `nil` will use a single white pixel as a fallback.
----
----
----### NOTE:
----Textures must have a `TextureType` of `2d` to be used with Materials.
----
----@overload fun(self: lovr.Material, texture: lovr.Texture)
----@param textureType? lovr.MaterialTexture # The type of texture to set.
----@param texture lovr.Texture # The texture to apply, or `nil` to use the default.
-function Material:setTexture(textureType, texture) end
 
 ---
 ---Models are 3D model assets loaded from files.
@@ -1208,6 +1375,11 @@ function Model:getWidth() end
 function Model:hasJoints() end
 
 ---
+---Resets node transforms to the original ones defined in the model file.
+---
+function Model:resetNodeTransforms() end
+
+---
 ---Sets or blends the orientation of a node to a new orientation.
 ---
 ---@overload fun(self: lovr.Model, name: string, orientation: lovr.rotation, blend?: number)
@@ -1262,63 +1434,94 @@ function Model:setNodeScale(index, scale, blend) end
 function Model:setNodeTransform(index, transform, blend) end
 
 ---
----TODO
+---Pass objects are used to record commands for the GPU.
+---
+---Commands can be recorded by calling functions on the Pass.
+---
+---After recording a set of passes, they can be submitted for the GPU to process using `lovr.graphics.submit`.
+---
+---Pass objects are **temporary** and only exist for a single frame.
+---
+---Once `lovr.graphics.submit` is called to end the frame, any passes that were created during that frame become **invalid**. Each frame, a new set of passes must be created and recorded.
+---
+---LÖVR tries to detect if you use a pass after it's invalid, but this error checking is not 100% accurate at the moment.
+---
+---There are 3 types of passes.
+---
+---Each type can record a specific type of command:
+---
+---- `render` passes render graphics to textures.
+---- `compute` passes run compute shaders.
+---- `transfer` passes can transfer data to/from GPU objects, like `Buffer` and `Texture`.
 ---
 ---@class lovr.Pass
 local Pass = {}
 
 ---
----TODO
+---Copies data between textures.
 ---
----@param src lovr.Texture # TODO
----@param dst lovr.Texture # TODO
----@param srcx? number # TODO
----@param srcy? number # TODO
----@param srcz? number # TODO
----@param dstx? number # TODO
----@param dsty? number # TODO
----@param dstz? number # TODO
----@param srcw? number # TODO
----@param srch? number # TODO
----@param srcd? number # TODO
----@param dstw? number # TODO
----@param dsth? number # TODO
----@param dstd? number # TODO
----@param srclevel? number # TODO
----@param dstlevel? number # TODO
-function Pass:blit(src, dst, srcx, srcy, srcz, dstx, dsty, dstz, srcw, srch, srcd, dstw, dsth, dstd, srclevel, dstlevel) end
-
+---Similar to `Pass:copy`, except the source and destination sizes can be different.
 ---
----TODO
+---The pixels from the source texture will be scaled to the destination size.
 ---
 ---
 ---### NOTE:
----TODO
+---When blitting between 3D textures, the layer counts do not need to match, and the layers will be treated as a continuous axis (i.e. pixels will be smoothed between layers).
 ---
----@param transform lovr.Transform3 # The transform to apply to the box.
+---When blitting between array textures, the layer counts must match, and the blit occurs as a sequence of distinct 2D blits layer-by-layer.
+---
+---@param src lovr.Texture # The texture to copy from.
+---@param dst lovr.Texture # The texture to copy to.
+---@param srcx? number # The x offset from the left of the source texture to blit from, in pixels.
+---@param srcy? number # The y offset from the top of the source texture to blit from, in pixels.
+---@param srcz? number # The index of the first layer in the source texture to blit from.
+---@param dstx? number # The x offset from the left of the destination texture to blit to, in pixels.
+---@param dsty? number # The y offset from the top of the destination texture to blit to, in pixels.
+---@param dstz? number # The index of the first layer in the destination texture to blit to.
+---@param srcw? number # The width of the region in the source texture to blit.  If nil, the region will extend to the right side of the texture.
+---@param srch? number # The height of the region in the source texture to blit.  If nil, the region will extend to the bottom of the texture.
+---@param srcd? number # The number of layers in the source texture to blit.
+---@param dstw? number # The width of the region in the destination texture to blit to.  If nil, the region will extend to the right side of the texture.
+---@param dsth? number # The height of the region in the destination texture to blit to.  If nil, the region will extend to the bottom of the texture.
+---@param dstd? number # The number of the layers in the destination texture to blit to.
+---@param srclevel? number # The index of the mipmap level in the source texture to blit from.
+---@param dstlevel? number # The index of the mipmap level in the destination texture to blit to.
+---@param filter? lovr.FilterMode # The filtering algorithm used when rescaling.
+function Pass:blit(src, dst, srcx, srcy, srcz, dstx, dsty, dstz, srcw, srch, srcd, dstw, dsth, dstd, srclevel, dstlevel, filter) end
+
+---
+---Draw a box.
+---
+---This is like `Pass:cube`, except it takes 3 separate values for the scale.
+---
+---@param transform lovr.Mat4 # The transform of the box.  Can also be provided as position, 3-component scale, and rotation using a mix of `Vectors` or numbers.
 ---@param style? lovr.DrawStyle # Whether the box should be drawn filled or outlined.
 function Pass:box(transform, style) end
 
 ---
----TODO
+---Draws a capsule.
+---
+---A capsule is shaped like a cylinder with a hemisphere on each end.
 ---
 ---
 ---### NOTE:
----TODO
+---The length of the capsule does not include the end caps.
 ---
----@overload fun(self: lovr.Pass, p1: lovr.Point3, p2: lovr.Point3, segments?: number)
----@param transform lovr.TransformXY2 # The transform to apply to the capsule.  The x and y scale is the radius, the z scale is the length.
+---The local origin of the capsule is in the center, and the local z axis points towards the end caps.
+---
+---@overload fun(self: lovr.Pass, p1: lovr.Vec3, p2: lovr.Vec3, radius?: number, segments?: number)
+---@param transform lovr.Mat4 # The transform of the capsule.  Can also be provided as position, scale, and rotation using a mix of `Vectors` or numbers.  When using numbers for the scale, 2 should be provided: one for the radius and one for the length.  When using a matrix or a vector for the scale, the X and Y components are the radius and the Z component is the length.
 ---@param segments? number # The number of circular segments to render.
 function Pass:capsule(transform, segments) end
 
 ---
----TODO
+---Draws a circle.
 ---
 ---
 ---### NOTE:
----TODO
+---The local origin of the circle is in its center, and the local z axis goes through the center.
 ---
----@param transform lovr.Transform # The transform to apply to the circle.
+---@param transform lovr.Mat4 # The transform of the circle.  Can also be provided as position, radius, and rotation, using a mix of `Vectors` or numbers.
 ---@param style? lovr.DrawStyle # Whether the circle should be filled or outlined.
 ---@param angle1? number # The angle of the beginning of the arc.
 ---@param angle2? number # angle of the end of the arc.
@@ -1326,24 +1529,30 @@ function Pass:capsule(transform, segments) end
 function Pass:circle(transform, style, angle1, angle2, segments) end
 
 ---
----TODO
+---Clears a Buffer or Texture.
 ---
----
----### NOTE:
----TODO
----
----@overload fun(self: lovr.Pass, texture: lovr.Texture, color: lovr.Color, layer?: number, layers?: number, level?: number, levels?: number)
+---@overload fun(self: lovr.Pass, texture: lovr.Texture, color: lovr.Vec4, layer?: number, layers?: number, level?: number, levels?: number)
 ---@param buffer lovr.Buffer # The Buffer to clear.
----@param offset number # TODO
----@param extent number # TODO
-function Pass:clear(buffer, offset, extent) end
+---@param index? number # The index of the first item to clear.
+---@param count? number # The number of items to clear.  If `nil`, clears to the end of the Buffer.
+function Pass:clear(buffer, index, count) end
 
 ---
----TODO
+---Runs a compute shader.
+---
+---Compute shaders are run in 3D grids of workgroups.
+---
+---Each local workgroup is itself a 3D grid of invocations, declared using `local_size_x`, `local_size_y`, and `local_size_z` in the shader code.
 ---
 ---
 ---### NOTE:
----TODO
+---All these 3D grids can get confusing, but the basic idea is to make the local workgroup size a small block of e.g. 8x8 pixels or 4x4x4 voxels, and then dispatch however many global workgroups are needed to cover an image or voxel field.
+---
+---The reason to do it this way is that the GPU runs invocations in bundles called subgroups.
+---
+---Subgroups are usually 32 or 64 invocations (the exact size is given by the `subgroupSize` property of `lovr.graphics.getDevice`).
+---
+---If the local workgroup size was `1x1x1`, then the GPU would only run 1 invocation per subgroup and waste the other 31 or 63.
 ---
 ---@overload fun(self: lovr.Pass, buffer: lovr.Buffer, offset?: number)
 ---@param x? number # How many workgroups to dispatch in the x dimension.
@@ -1352,51 +1561,53 @@ function Pass:clear(buffer, offset, extent) end
 function Pass:compute(x, y, z) end
 
 ---
----TODO
+---Draws a cone.
 ---
 ---
 ---### NOTE:
----TODO
+---The local origin is at the center of the base of the cone, and the negative z axis points towards the tip.
 ---
----@param transform lovr.TransformXY2 # The transform to apply to the cone.  The x and y scale is the radius, the z scale is the length.
----@param segments? number # The number of circular segments to render.
+---@param transform lovr.Mat4 # The transform of the cone.  Can also be provided as position, scale, and rotation using a mix of `Vectors` or numbers.  When using numbers for the scale, 2 should be provided: one for the radius and one for the length.  When using a matrix or a vector for the scale, the X and Y components are the radius and the Z component is the length.
+---@param segments? number # The number of segments in the cone.
 function Pass:cone(transform, segments) end
 
 ---
----TODO
+---Copies data to or between `Buffer` and `Texture` objects.
+---
+---This function must be called on a `transfer` pass.
 ---
 ---@overload fun(self: lovr.Pass, blob: lovr.Blob, bufferdst: lovr.Buffer, srcoffset?: number, dstoffset?: number, size?: number)
 ---@overload fun(self: lovr.Pass, buffersrc: lovr.Buffer, bufferdst: lovr.Buffer, srcoffset?: number, dstoffset?: number, size?: number)
 ---@overload fun(self: lovr.Pass, image: lovr.Image, texturedst: lovr.Texture, srcx?: number, srcy?: number, dstx?: number, dsty?: number, width?: number, height?: number, srclayer?: number, dstlayer?: number, layers?: number, srclevel?: number, dstlevel?: number)
 ---@overload fun(self: lovr.Pass, texturesrc: lovr.Texture, texturedst: lovr.Texture, srcx?: number, srcy?: number, dstx?: number, dsty?: number, width?: number, height?: number, srclayer?: number, dstlayer?: number, layers?: number, srclevel?: number, dstlevel?: number)
----@overload fun(self: lovr.Pass, tally: lovr.Tally, srcindex?: number, dstoffset?: number, count?: number)
----@param table table # TODO
----@param bufferdst lovr.Buffer # TODO
----@param srcindex? number # TODO
----@param dstindex? number # TODO
----@param count? number # TODO
+---@overload fun(self: lovr.Pass, tally: lovr.Tally, bufferdst: lovr.Buffer, srcindex?: number, dstoffset?: number, count?: number)
+---@param table table # A table to copy to the buffer.
+---@param bufferdst lovr.Buffer # The buffer to copy to.
+---@param srcindex? number # The index of the first item to begin copying from.
+---@param dstindex? number # The index of the first item in the buffer to begin copying to.
+---@param count? number # The number of items to copy.  If nil, copies as many items as possible.
 function Pass:copy(table, bufferdst, srcindex, dstindex, count) end
 
 ---
----TODO
+---Draws a cube.
 ---
 ---
 ---### NOTE:
----TODO
+---The local origin is in the center of the cube.
 ---
----@param transform lovr.Transform # The transform to apply to the cube.
+---@param transform lovr.Mat4 # The transform of the cube.  Can also be provided as position, 1-component scale, and rotation using a mix of `Vectors` or numbers.
 ---@param style? lovr.DrawStyle # Whether the cube should be drawn filled or outlined.
 function Pass:cube(transform, style) end
 
 ---
----TODO
+---Draws a cylinder.
 ---
 ---
 ---### NOTE:
----TODO
+---The local origin is in the center of the cylinder, and the length of the cylinder is along the z axis.
 ---
----@overload fun(self: lovr.Pass, p1: lovr.Point3, p2: lovr.Point3, capped?: boolean, angle1?: number, angle2?: number, segments?: number)
----@param transform lovr.TransformXY2 # The transform to apply to the cylinder.  The x and y scale is the radius, the z scale is the length.
+---@overload fun(self: lovr.Pass, p1: lovr.Vec3, p2: lovr.Vec3, radius: number, capped?: boolean, angle1?: number, angle2?: number, segments?: number)
+---@param transform lovr.Mat4 # The transform of the cylinder.  Can also be provided as position, scale, and rotation using a mix of `Vectors` or numbers.  When using numbers for the scale, 2 should be provided: one for the radius and one for the length.  When using a matrix or a vector for the scale, the X and Y components are the radius and the Z component is the length.
 ---@param capped? boolean # Whether the tops and bottoms of the cylinder should be rendered.
 ---@param angle1? number # The angle of the beginning of the arc.
 ---@param angle2? number # angle of the end of the arc.
@@ -1404,44 +1615,60 @@ function Pass:cube(transform, style) end
 function Pass:cylinder(transform, capped, angle1, angle2, segments) end
 
 ---
----TODO
+---Draws a model.
 ---
----@overload fun(self: lovr.Pass, model: lovr.Model, transform: lovr.Transform, nodename: string, children: boolean, instances: number)
+---@overload fun(self: lovr.Pass, model: lovr.Model, transform: lovr.Mat4, nodename?: string, children?: boolean, instances?: number)
 ---@param model lovr.Model # The model to draw.
----@param transform lovr.Transform # The transform of the object.
----@param nodeindex number # TODO
----@param children boolean # TODO
----@param instances number # TODO
+---@param transform lovr.Mat4 # The transform of the model.  Can also be provided as a position, 1-component scale, and rotation using a combination of `Vectors` and numbers.
+---@param nodeindex? number # The index of the node to draw.  If nil, the root node is drawn.
+---@param children? boolean # Whether the children of the node should be drawn.
+---@param instances? number # The number of instances to draw.
 function Pass:draw(model, transform, nodeindex, children, instances) end
 
 ---
----TODO
+---Draws a fullscreen triangle.
 ---
----@overload fun(self: lovr.Pass)
----@param texture lovr.Texture # The texture to fill.
-function Pass:fill(texture) end
-
----
----TODO
+---The `fill` shader is used, which stretches the triangle across the screen.
 ---
 ---
 ---### NOTE:
----TODO
+---This function has some special behavior for array textures:
 ---
----@return table clears # TODO
+---- Filling a single-layer texture to a multi-layer canvas will mirror the texture to all layers,
+---  just like regular drawing.
+---- Filling a 2-layer texture to a mono canvas will render the 2 layers side-by-side.
+---- Filling a multi-layer texture to a multi-layer canvas will do a layer-by-layer fill (the layer
+---  counts must match).
+---
+---@overload fun(self: lovr.Pass)
+---@param texture lovr.Texture # The texture to fill.  If nil, the texture from the active material is used.
+function Pass:fill(texture) end
+
+---
+---Returns the clear values of the pass.
+---
+---@return table clears # The clear values for the pass.  Numeric keys will contain clear values for color textures, either as a table of r, g, b, a values or a boolean.  If the pass has a depth texture, there will also be `depth` and `stencil` keys containing the clear values or booleans.
 function Pass:getClear() end
 
 ---
----TODO
+---Returns the dimensions of the textures attached to the render pass.
 ---
----@return number width # TODO
----@return number height # TODO
+---
+---### NOTE:
+---If the pass is not a render pass, this function returns zeros.
+---
+---@return number width # The texture width.
+---@return number height # The texture height.
 function Pass:getDimensions() end
 
 ---
----TODO
+---Returns the height of the textures attached to the render pass.
 ---
----@return number height # TODO
+---
+---### NOTE:
+---If the pass is not a render pass, this function returns zero.
+---
+---@return number height # The texture height.
 function Pass:getHeight() end
 
 ---
@@ -1456,15 +1683,15 @@ function Pass:getHeight() end
 function Pass:getProjection(view) end
 
 ---
----TODO
+---Returns the antialiasing setting of a render pass.
 ---
----@return number samples # TODO
+---@return number samples # The number of samples used for rendering.  Currently, will be 1 or 4.
 function Pass:getSampleCount() end
 
 ---
----TODO
+---Returns the textures a render pass is rendering to.
 ---
----@return table target # TODO
+---@return table target # A table of the color textures targeted by the pass, with an additional `depth` key if the pass has a depth texture.
 function Pass:getTarget() end
 
 ---
@@ -1472,13 +1699,20 @@ function Pass:getTarget() end
 ---
 ---The type restricts what kinds of functions can be called on the pass.
 ---
----@return lovr.PassType type # The type of the Pass.
 function Pass:getType() end
 
 ---
----TODO
+---Returns the view count of a render pass.
 ---
----@return number views # TODO
+---This is the layer count of the textures it is rendering to.
+---
+---
+---### NOTE:
+---A render pass has one "camera" for each view.
+---
+---Whenever something is drawn, it is broadcast to each view (layer) of each texture, using the corresponding camera.
+---
+---@return number views # The view count.
 function Pass:getViewCount() end
 
 ---
@@ -1496,17 +1730,23 @@ function Pass:getViewCount() end
 function Pass:getViewPose(view) end
 
 ---
----TODO
----
----@return number width # TODO
-function Pass:getWidth() end
-
----
----TODO
+---Returns the width of the textures attached to the render pass.
 ---
 ---
 ---### NOTE:
----TODO
+---If the pass is not a render pass, this function returns zero.
+---
+---@return number width # The texture width.
+function Pass:getWidth() end
+
+---
+---Draws a line between points.
+---
+---`Pass:mesh` can also be used to draw line segments using the `line` `MeshMode`.
+---
+---
+---### NOTE:
+---There is currently no way to increase line thickness.
 ---
 ---@overload fun(self: lovr.Pass, t: table)
 ---@overload fun(self: lovr.Pass, v1: lovr.Vec3, v2: lovr.Vec3, ...)
@@ -1520,53 +1760,62 @@ function Pass:getWidth() end
 function Pass:line(x1, y1, z1, x2, y2, z2, ...) end
 
 ---
----TODO
+---Draws a mesh.
 ---
 ---
 ---### NOTE:
----TODO
+---The index buffer defines the order the vertices are drawn in.
 ---
----@overload fun(self: lovr.Pass, vertices?: lovr.Buffer, indices: lovr.Buffer, transform: lovr.transform, start?: number, count?: number, instances?: number)
+---It can be used to reorder, reuse, or omit vertices from the mesh.
+---
+---The active `MeshMode` controls whether the vertices are drawn as points, lines, or triangles.
+---
+---The active `Material` is applied to the mesh.
+---
+---@overload fun(self: lovr.Pass, vertices?: lovr.Buffer, indices: lovr.Buffer, transform: lovr.Mat4, start?: number, count?: number, instances?: number, base?: number)
 ---@overload fun(self: lovr.Pass, vertices?: lovr.Buffer, indices: lovr.Buffer, draws: lovr.Buffer, drawcount: number, offset: number, stride: number)
----@param vertices? lovr.Buffer # TODO
----@param transform lovr.transform # The transform to apply to the mesh.
+---@overload fun(self: lovr.Pass, vertexcount: number, transform: lovr.Mat4)
+---@overload fun(self: lovr.Pass, vertexcount: number, indices: lovr.Buffer, transform: lovr.Mat4)
+---@param vertices? lovr.Buffer # The buffer containing the vertices to draw.
+---@param transform lovr.Mat4 # The transform to apply to the mesh.  Can also be provided as a position, 1-component scale, and rotation using a combination of `Vectors` and numbers.
 ---@param start? number # The 1-based index of the first vertex to render from the vertex buffer (or the first index, when using an index buffer).
 ---@param count? number # The number of vertices to render (or the number of indices, when using an index buffer). When `nil`, as many vertices or indices as possible will be drawn (based on the length of the Buffers and `start`).
 ---@param instances? number # The number of copies of the mesh to render.
-function Pass:mesh(vertices, transform, start, count, instances) end
+---@param base? number # nil
+function Pass:mesh(vertices, transform, start, count, instances, base) end
 
 ---
----TODO
+---Generates mipmaps for a texture.
 ---
----@param texture lovr.Texture # TODO
----@param base? number # TODO
----@param count? number # TODO
+---@param texture lovr.Texture # The texture to mipmap.
+---@param base? number # The index of the mipmap used to generate the remaining mipmaps.
+---@param count? number # The number of mipmaps to generate.  If nil, generates the remaining mipmaps.
 function Pass:mipmap(texture, base, count) end
 
 ---
----TODO
+---Resets the transform back to the origin.
 ---
 function Pass:origin() end
 
 ---
----TODO
+---Draws a plane.
 ---
----
----### NOTE:
----TODO
----
----@param transform lovr.Transform2 # The transform to apply to the plane.
+---@param transform lovr.Mat4 # The transform of the plane.  Can also be provided as a position, 2-component scale, and rotation using a combination of `Vectors`, and numbers.
 ---@param style? lovr.DrawStyle # Whether the plane should be drawn filled or outlined.
 ---@param columns? number # The number of horizontal segments in the plane.
 ---@param rows? number # The number of vertical segments in the plane.
 function Pass:plane(transform, style, columns, rows) end
 
 ---
----TODO
+---Draws points.
+---
+---`Pass:mesh` can also be used to draw points using a `Buffer`.
 ---
 ---
 ---### NOTE:
----TODO
+---To change the size of points, set the `pointSize` shader flag in `lovr.graphics.newShader` or write to the `PointSize` variable in the vertex shader.
+---
+---Points are always the same size on the screen, regardless of distance, and the units are in pixels.
 ---
 ---@overload fun(self: lovr.Pass, t: table)
 ---@overload fun(self: lovr.Pass, v: lovr.Vec3, ...)
@@ -1577,65 +1826,72 @@ function Pass:plane(transform, style, columns, rows) end
 function Pass:points(x, y, z, ...) end
 
 ---
----TODO
+---Pops the transform or render state stack, restoring it to the state it was in when it was last pushed.
 ---
 ---
 ---### NOTE:
----TODO stack balancing/error
+---If a stack is popped without a corresponding push, the stack "underflows" which causes an error.
 ---
 ---@param stack? lovr.StackType # The type of stack to pop.
 function Pass:pop(stack) end
 
 ---
----TODO
+---Saves a copy of the transform or render states.
+---
+---Further changes can be made to the transform or render states, and afterwards `Pass:pop` can be used to restore the original state.
+---
+---Pushes and pops can be nested, but it's an error to pop without a corresponding push.
 ---
 ---
 ---### NOTE:
----TODO stack balancing/error
+---Each stack has a limit of the number of copies it can store.
+---
+---There can be 16 transforms and 4 render states saved.
+---
+---The `state` stack does not save the camera info or shader variables changed with `Pass:send`.
 ---
 ---@param stack? lovr.StackType # The type of stack to push.
 function Pass:push(stack) end
 
 ---
----TODO
+---Creates a `Readback` object which asynchronously downloads data from a `Buffer`, `Texture`, or `Tally`.
+---
+---The readback can be polled for completion, or, after this transfer pass is completed, `Readback:wait` can be used to block until the download is complete.
 ---
 ---@overload fun(self: lovr.Pass, texture: lovr.Texture, x?: number, y?: number, layer?: number, level?: number, width?: number, height?: number):lovr.Readback
 ---@overload fun(self: lovr.Pass, tally: lovr.Tally, index: number, count: number):lovr.Readback
----@param buffer lovr.Buffer # TODO
----@param index number # TODO
----@param count number # TODO
----@return lovr.Readback readback # TODO
+---@param buffer lovr.Buffer # The Buffer to download data from.
+---@param index number # The index of the first item to download.
+---@param count number # The number of items to download.
+---@return lovr.Readback readback # The new readback.
 function Pass:read(buffer, index, count) end
 
 ---
----TODO
+---Rotates the coordinate system.
+---
+---@param rotation lovr.Quat # A quaternion containing the rotation to apply.  Can also be provided as 4 numbers in angle-axis representation.
+function Pass:rotate(rotation) end
+
+---
+---Scales the coordinate system.
+---
+---@param scale lovr.Vec3 # The scale to apply to the coordinate system.  Can also be provided as 1 or 3 numbers.
+function Pass:scale(scale) end
+
+---
+---Sends a value to a variable in the Pass's active `Shader`.
+---
+---The active shader is changed using using `Pass:setShader`.
 ---
 ---
 ---### NOTE:
----TODO axis does not need to be normalized TODO order matters
+---Shader variables can be in different "sets".
 ---
----@overload fun(self: lovr.Pass, q: lovr.Quat)
----@param angle? number # The number of radians to rotate around the axis of rotation.
----@param ax? number # The x component of the axis of rotation.
----@param ay? number # The y component of the axis of rotation.
----@param az? number # The z component of the axis of rotation.
-function Pass:rotate(angle, ax, ay, az) end
-
+---Variables changed by this function must be in set #2, because LÖVR uses set #0 and set #1 internally.
 ---
----TODO
+---The new value will persist until a new shader is set that uses a different "type" for the binding number of the variable.
 ---
----@overload fun(self: lovr.Pass, v: lovr.Vec3)
----@param x? number # The amount to scale the x axis.
----@param y? number # The amount to scale the y axis.
----@param z? number # The amount to scale the z axis.
-function Pass:scale(x, y, z) end
-
----
----TODO
----
----
----### NOTE:
----TODO
+---See `Pass:setShader` for more details.
 ---
 ---@overload fun(self: lovr.Pass, name: string, texture: lovr.Texture)
 ---@overload fun(self: lovr.Pass, name: string, sampler: lovr.Sampler)
@@ -1648,109 +1904,157 @@ function Pass:scale(x, y, z) end
 function Pass:send(name, buffer) end
 
 ---
----TODO
+---Sets whether alpha to coverage is enabled.
+---
+---Alpha to coverage factors the alpha of a pixel into antialiasing calculations.
+---
+---It can be used to get antialiased edges on textures with transparency.
+---
+---It's often used for foliage.
+---
+---
+---### NOTE:
+---By default, alpha to coverage is disabled.
 ---
 ---@param enable boolean # Whether alpha to coverage should be enabled.
 function Pass:setAlphaToCoverage(enable) end
 
 ---
----TODO
+---Sets the blend mode.
+---
+---When a pixel is drawn, the blend mode controls how it is mixed with the color and alpha of the pixel underneath it.
 ---
 ---
 ---### NOTE:
----TODO
+---The default blend mode is `alpha` with the `alphamultiply` alpha mode.
 ---
 ---@param blend lovr.BlendMode # The blend mode.
----@param alphaBlend lovr.BlendAlphaMode # The alpha blend mode.
+---@param alphaBlend lovr.BlendAlphaMode # The alpha blend mode, used to control premultiplied alpha.
 function Pass:setBlendMode(blend, alphaBlend) end
 
 ---
----TODO
+---Sets the color used for drawing.
 ---
----@param color lovr.Color # The new color.
-function Pass:setColor(color) end
-
----
----TODO
+---Color components are from 0 to 1.
 ---
 ---
 ---### NOTE:
----TODO
+---The default color is `(1, 1, 1, 1)`.
 ---
----@param r boolean # Whether the red component should be affected by drawing.
----@param g boolean # Whether the green component should be affected by drawing.
----@param b boolean # Whether the blue component should be affected by drawing.
----@param a boolean # Whether the alpha component should be affected by drawing.
-function Pass:setColorWrite(r, g, b, a) end
+---@overload fun(self: lovr.Pass, t: table)
+---@overload fun(self: lovr.Pass, hex: number, a?: number)
+---@param r number # The red component of the color.
+---@param g number # The green component of the color.
+---@param b number # The blue component of the color.
+---@param a? number # The alpha component of the color.
+function Pass:setColor(r, g, b, a) end
 
 ---
----TODO
+---Sets the color channels affected by drawing, on a per-channel basis.
+---
+---Disabling color writes is often used to render to the depth or stencil buffer without affecting existing pixel colors.
 ---
 ---
 ---### NOTE:
----TODO
+---By default, color writes are enabled for all channels.
+---
+---@overload fun(self: lovr.Pass, r: boolean, g: boolean, b: boolean, a: boolean)
+---@param enable boolean # Whether all color components should be affected by draws.
+function Pass:setColorWrite(enable) end
+
+---
+---Sets whether the front or back faces of triangles are culled.
+---
+---
+---### NOTE:
+---The default cull mode is `none`.
 ---
 ---@param mode? lovr.CullMode # Whether `front` faces, `back` faces, or `none` of the faces should be culled.
 function Pass:setCullMode(mode) end
 
 ---
----TODO
+---Enables or disables depth clamp.
+---
+---Normally, when pixels fall outside of the clipping planes, they are clipped (not rendered).
+---
+---Depth clamp will instead render these pixels, clamping their depth on to the clipping planes.
 ---
 ---
 ---### NOTE:
----TODO depthClamp feature!
+---This isn\'t supported on all GPUs.
+---
+---Use the `depthClamp` feature of `lovr.graphics.getFeatures` to check for support.
+---
+---If depth clamp is enabled when unsupported, it will silently fall back to depth clipping.
+---
+---Depth clamping is not enabled by default.
 ---
 ---@param enable boolean # Whether depth clamp should be enabled.
 function Pass:setDepthClamp(enable) end
 
 ---
----TODO
+---Set the depth offset.
+---
+---This is a constant offset added to the depth value of pixels.
+---
+---It can be used to fix Z fighting when rendering decals or other nearly-overlapping objects.
 ---
 ---
 ---### NOTE:
----TODO
+---The default depth offset is zero for both values.
 ---
 ---@param offset? number # The depth offset.
 ---@param sloped? number # The sloped depth offset.
 function Pass:setDepthOffset(offset, sloped) end
 
 ---
----TODO
+---Sets the depth test.
 ---
 ---
 ---### NOTE:
----TODO
+---When using LÖVR's default projection (reverse Z with infinite far plane) the default depth test is `gequal`, depth values of 0.0 are on the far plane and depth values of 1.0 are on the near plane, closer to the camera.
+---
+---A depth buffer must be present to use the depth test, but this is enabled by default.
 ---
 ---@overload fun(self: lovr.Pass)
 ---@param test lovr.CompareMode # The new depth test to use.
 function Pass:setDepthTest(test) end
 
 ---
----TODO
+---Sets whether draws write to the depth buffer.
+---
+---When a pixel is drawn, if depth writes are enabled and the pixel passes the depth test, the depth buffer will be updated with the pixel's depth value.
 ---
 ---
 ---### NOTE:
----TODO
+---The default depth write is `true`.
 ---
----@param write boolean # The new depth write setting.
+---@param write boolean # Whether the depth buffer should be affected by draws.
 function Pass:setDepthWrite(write) end
 
 ---
----TODO
+---Sets the font used for `Pass:text`.
 ---
 ---@param font lovr.Font # The Font to use when rendering text.
 function Pass:setFont(font) end
 
 ---
----TODO
+---Sets the material.
 ---
----@param material lovr.Material # TODO
+---This will apply to most drawing, except for text, skyboxes, and models, which use their own materials.
+---
+---@overload fun(self: lovr.Pass)
+---@param material lovr.Material # The material to use for drawing.
 function Pass:setMaterial(material) end
 
 ---
----TODO
+---Changes the way vertices are connected together when drawing using `Pass:mesh`.
 ---
----@param mode lovr.MeshMode # TODO
+---
+---### NOTE:
+---The default mesh mode is `triangles`.
+---
+---@param mode lovr.MeshMode # The mesh mode to use.
 function Pass:setMeshMode(mode) end
 
 ---
@@ -1785,17 +2089,28 @@ function Pass:setMeshMode(mode) end
 function Pass:setProjection(view, left, right, up, down, near, far) end
 
 ---
----TODO
+---Sets the default `Sampler` to use when sampling textures.
 ---
----@param sampler lovr.Sampler # TODO
-function Pass:setSampler(sampler) end
-
----
----TODO
+---It is also possible to send a custom sampler to a shader using `Pass:send` and use that instead, which allows customizing the sampler on a per-texture basis.
 ---
 ---
 ---### NOTE:
----TODO not floating point, negative, limits, not pipeline, initial pass state
+---The `getPixel` shader helper function will use this sampler.
+---
+---@overload fun(self: lovr.Pass, sampler: lovr.Sampler)
+---@param filter? lovr.FilterMode # The default filter mode to use when sampling textures (the `repeat` wrap mode will be used).
+function Pass:setSampler(filter) end
+
+---
+---Sets the scissor rectangle.
+---
+---Any pixels outside the scissor rectangle will not be drawn.
+---
+---
+---### NOTE:
+---`x` and `y` can not be negative.
+---
+---The default scissor rectangle covers the entire dimensions of the render pass textures.
 ---
 ---@param x number # The x coordinate of the upper-left corner of the scissor rectangle.
 ---@param y number # The y coordinate of the upper-left corner of the scissor rectangle.
@@ -1804,19 +2119,49 @@ function Pass:setSampler(sampler) end
 function Pass:setScissor(x, y, w, h) end
 
 ---
----TODO
+---Sets the active shader.
 ---
----@overload fun(self: lovr.Pass, default: lovr.DefaultShader)
----@overload fun(self: lovr.Pass)
----@param shader lovr.Shader # A custom Shader object to use for rendering.
-function Pass:setShader(shader) end
-
+---In a render pass, the Shader will affect all drawing operations until it is changed again.
 ---
----TODO
+---In a compute pass, the Shader will be run when `Pass:compute` is called.
 ---
 ---
 ---### NOTE:
----TODO
+---Changing the shader will preserve resource bindings (the ones set using `Pass:send`) **unless** the new shader declares a resource for a binding number using a different type than the current shader.
+---
+---In this case, the resource "type" means one of the following:
+---
+---- Uniform buffer (`uniform`).
+---- Storage buffer (`buffer`).
+---- Sampled texture, (`uniform texture<type>`).
+---- Storage texture, (`uniform image<type>`).
+---- Sampler (`uniform sampler`).
+---
+---If the new shader doesn't declare a resource in a particular binding number, any resource there will be preserved.
+---
+---If there's a clash in resource types like this, the variable will be "cleared".
+---
+---Using a buffer variable that has been cleared is not well-defined, and may return random data or even crash the GPU.
+---
+---For textures, white pixels will be returned.
+---
+---Samplers will use `linear` filtering and the `repeat` wrap mode.
+---
+---@overload fun(self: lovr.Pass, default: lovr.DefaultShader)
+---@overload fun(self: lovr.Pass)
+---@param shader lovr.Shader # The shader to use.
+function Pass:setShader(shader) end
+
+---
+---Sets the stencil test.
+---
+---Any pixels that fail the stencil test won't be drawn.
+---
+---For example, setting the stencil test to `('equal', 1)` will only draw pixels that have a stencil value of 1. The stencil buffer can be modified by drawing while stencil writes are enabled with `lovr.graphics.setStencilWrite`.
+---
+---
+---### NOTE:
+---The stencil test is disabled by default.
 ---
 ---@overload fun(self: lovr.Pass)
 ---@param test lovr.CompareMode # The new stencil test to use.
@@ -1825,11 +2170,13 @@ function Pass:setShader(shader) end
 function Pass:setStencilTest(test, value, mask) end
 
 ---
----TODO
+---Sets or disables stencil writes.
+---
+---When stencil writes are enabled, any pixels drawn will update the values in the stencil buffer using the `StencilAction` set.
 ---
 ---
 ---### NOTE:
----TODO
+---By default, stencil writes are disabled.
 ---
 ---@overload fun(self: lovr.Pass, actions: table, value?: number, mask?: number)
 ---@overload fun(self: lovr.Pass)
@@ -1861,59 +2208,79 @@ function Pass:setStencilWrite(action, value, mask) end
 function Pass:setViewPose(view, x, y, z, angle, ax, ay, az) end
 
 ---
----TODO
+---Sets the viewport.
+---
+---Everything rendered will get mapped to the rectangle defined by the viewport.
+---
+---More specifically, this defines the transformation from normalized device coordinates to pixel coordinates.
 ---
 ---
 ---### NOTE:
----TODO floating point, negative, flipped depth range, limits, not pipeline, initial pass state, what the hell is depth range
+---The viewport rectangle can use floating point numbers.
+---
+---A negative viewport height (with a y coordinate equal to the bottom of the viewport) can be used to flip the rendering vertically.
+---
+---The default viewport extends from `(0, 0)` to the dimensions of the target textures, with min depth and max depth respectively set to 0 and 1.
 ---
 ---@param x number # The x coordinate of the upper-left corner of the viewport.
 ---@param y number # The y coordinate of the upper-left corner of the viewport.
 ---@param w number # The width of the viewport.
----@param h number # The height of the viewport.
----@param minDepth? number # The min component of the depth range.
----@param maxDepth? number # The max component of the depth range.
-function Pass:setViewport(x, y, w, h, minDepth, maxDepth) end
+---@param h number # The height of the viewport.  May be negative.
+---@param dmin? number # The min component of the depth range.
+---@param dmax? number # The max component of the depth range.
+function Pass:setViewport(x, y, w, h, dmin, dmax) end
 
 ---
----TODO
+---Sets whether vertices in the clockwise or counterclockwise order vertices are considered the "front" face of a triangle.
+---
+---This is used for culling with `Pass:setCullMode`.
 ---
 ---
 ---### NOTE:
----TODO
+---The default winding is counterclockwise.
+---
+---LÖVR's builtin shapes are wound counterclockwise.
 ---
 ---@param winding lovr.Winding # Whether triangle vertices are ordered `clockwise` or `counterclockwise`.
 function Pass:setWinding(winding) end
 
 ---
----TODO
+---Enables or disables wireframe rendering.
+---
+---This will draw all triangles as lines while active. It's intended to be used for debugging, since it usually has a performance cost.
 ---
 ---
 ---### NOTE:
----TODO
+---Wireframe rendering is disabled by default.
+---
+---There is currently no way to change the thickness of the lines.
 ---
 ---@param enable boolean # Whether wireframe rendering should be enabled.
 function Pass:setWireframe(enable) end
 
 ---
----TODO
+---Draws a skybox.
 ---
 ---
 ---### NOTE:
----TODO
+---The skybox will be rotated based on the camera rotation.
+---
+---The skybox is drawn using a fullscreen triangle.
+---
+---The skybox uses a custom shader, so set the shader to `nil` before calling this function (unless explicitly using a custom shader).
 ---
 ---@overload fun(self: lovr.Pass)
 ---@param skybox lovr.Texture # The skybox to render.  Its `TextureType` can be `cube` to render as a cubemap, or `2d` to render as an equirectangular (spherical) 2D image.
 function Pass:skybox(skybox) end
 
 ---
----TODO
+---Draws a sphere
 ---
 ---
 ---### NOTE:
----TODO
+---The local origin of the sphere is in its center.
 ---
----@param transform lovr.transform # The transform to apply to the sphere.
+---@param transform lovr.Mat4 # The transform of the sphere.  Can also be provided as a position, radius, and rotation using a mix of `Vectors and numbers.'
 ---@param longitudes? number # The number of "horizontal" segments.
 ---@param latitudes? number # The number of "vertical" segments.
 function Pass:sphere(transform, longitudes, latitudes) end
@@ -1934,63 +2301,60 @@ function Pass:sphere(transform, longitudes, latitudes) end
 function Pass:text(text, transform, wrap, halign, valign) end
 
 ---
----TODO
+---Starts a GPU measurement.
 ---
----@param tally lovr.Tally # TODO
----@param index number # TODO
-function Pass:tick(tally, index) end
-
+---One of the slots in a `Tally` object will be used to hold the result. Commands on the Pass will continue being measured until `Pass:tock` is called with the same tally and slot combination.
 ---
----TODO
----
----@param tally lovr.Tally # TODO
----@param index number # TODO
-function Pass:tock(tally, index) end
-
----
----TODO
+---Afterwards, `Pass:read` can be used to read back the tally result, or the tally can be copied to a `Buffer.
 ---
 ---
 ---### NOTE:
----TODO
+---`pixel` and `shader` measurements can not be nested, but `time` measurements can be nested.
 ---
----@param transform lovr.TransformXY2 # The transform to apply to the torus.  The x scale is the radius, the z scale is the thickness.
+---For `time` measurements, the view count of the pass (`Pass:getViewCount`) must match the view count of the tally, which defaults to `2`.
+---
+---@param tally lovr.Tally # The tally that will store the measurement.
+---@param slot number # The index of the slot in the tally to store the measurement in.
+function Pass:tick(tally, slot) end
+
+---
+---Stops a GPU measurement.
+---
+---`Pass:tick` must be called to start the measurement before this can be called.
+---
+---Afterwards, `Pass:read` can be used to read back the tally result, or the tally can be copied to a `Buffer.
+---
+---@param tally lovr.Tally # The tally storing the measurement.
+---@param slot number # The index of the slot in the tally storing the measurement.
+function Pass:tock(tally, slot) end
+
+---
+---Draws a torus.
+---
+---
+---### NOTE:
+---The local origin is in the center of the torus, and the torus forms a circle around the local Z axis.
+---
+---@param transform lovr.Mat4 # The transform of the torus.  Can also be provided as position, scale, and rotation using a mix of `Vectors` or numbers.  When using numbers for the scale, 2 should be provided: one for the radius and one for the thickness.  When using a matrix or a vector for the scale, the X and Y components are the radius and the Z component is the thickness.
 ---@param tsegments? number # The number of toroidal (circular) segments to render.
 ---@param psegments? number # The number of poloidal (tubular) segments to render.
 function Pass:torus(transform, tsegments, psegments) end
 
 ---
----TODO
+---Transforms the coordinate system.
 ---
----
----### NOTE:
----TODO you can use combos of numbers/vectors/quats too (or use meta Transform type to explain)
----
----@overload fun(self: lovr.Pass, transform: lovr.Mat4)
----@param x? number # The x component of the translation.
----@param y? number # The y component of the translation.
----@param z? number # The z component of the translation.
----@param sx? number # The x scale factor.
----@param sy? number # The y scale factor.
----@param sz? number # The z scale factor.
----@param angle? number # The number of radians to rotate around the axis of rotation.
----@param ax? number # The x component of the axis of rotation.
----@param ay? number # The y component of the axis of rotation.
----@param az? number # The z component of the axis of rotation.
-function Pass:transform(x, y, z, sx, sy, sz, angle, ax, ay, az) end
+---@param transform lovr.Mat4 # A matrix containing the transformation to apply to the coordinate system.  Can also be provided as a position, 3-component scale, and rotation, using a mix of `Vectors` or numbers.
+function Pass:transform(transform) end
 
 ---
----TODO
+---Translates the coordinate system.
 ---
 ---
 ---### NOTE:
 ---Order matters when scaling, translating, and rotating the coordinate system.
 ---
----@overload fun(self: lovr.Pass, v: lovr.Vec3)
----@param x? number # The amount to translate on the x axis.
----@param y? number # The amount to translate on the y axis.
----@param z? number # The amount to translate on the z axis.
-function Pass:translate(x, y, z) end
+---@param translation lovr.Vec3 # The translation to apply to the coordinate system.  Can also be provided as 3 numbers.
+function Pass:translate(translation) end
 
 ---
 ---TODO
@@ -2049,7 +2413,7 @@ function Readback:wait() end
 ---
 ---They can control whether the pixels are smoothed, whether the texture wraps at the edge of its UVs, and more.
 ---
----Each has a default sampler that will be used by default, which can be changed using `Pass:setSampler`.
+---Each `Pass` has a default sampler that will be used by default, which can be changed using `Pass:setSampler`.
 ---
 ---Also, samplers can be declared in shaders using the following syntax:
 ---
@@ -2122,15 +2486,19 @@ function Sampler:getWrap() end
 local Shader = {}
 
 ---
----TODO
+---Clones a shader.
+---
+---This creates an inexpensive copy of it with different flags.
+---
+---It can be used to create several variants of a shader with different behavior.
 ---
 ---@param source lovr.Shader # The Shader to clone.
----@param flags table # TODO
+---@param flags table # The flags used by the clone.
 ---@return lovr.Shader shader # The new Shader.
 function Shader:clone(source, flags) end
 
 ---
----TODO
+---Returns whether the shader is a graphics or compute shader.
 ---
 ---@return lovr.ShaderType type # The type of the Shader.
 function Shader:getType() end
@@ -2138,7 +2506,11 @@ function Shader:getType() end
 ---
 ---Returns the workgroup size of a compute shader.
 ---
----TODO what is it.
+---The workgroup size defines how many times a compute shader is invoked for each workgroup dispatched by `Pass:compute`.
+---
+---
+---### NOTE:
+---For example, if the workgroup size is `8x8x1` and `16x16x16` workgroups are dispatched, then the compute shader will run `16 * 16 * 16 * (8 * 8 * 1) = 262144` times.
 ---
 ---@return number x # The x size of a workgroup.
 ---@return number y # The y size of a workgroup.
@@ -2146,7 +2518,7 @@ function Shader:getType() end
 function Shader:getWorkgroupSize() end
 
 ---
----TODO
+---Returns whether the Shader has a vertex attribute, by name or location.
 ---
 ---@overload fun(self: lovr.Shader, location: number):boolean
 ---@param name string # The name of an attribute.
@@ -2154,7 +2526,7 @@ function Shader:getWorkgroupSize() end
 function Shader:hasAttribute(name) end
 
 ---
----TODO
+---Returns whether the Shader has a given stage.
 ---
 ---@param stage lovr.ShaderStage # The stage.
 ---@return boolean exists # Whether the Shader has the stage.
@@ -2173,9 +2545,9 @@ local Tally = {}
 function Tally:getCount() end
 
 ---
----TODO
+---Returns the type of the tally, which is the thing it measures between `Pass:tick` and `Pass:tock`.
 ---
----@return lovr.TallyType type # TODO
+---@return lovr.TallyType type # The type of measurement.
 function Tally:getType() end
 
 ---
@@ -2346,6 +2718,19 @@ function Texture:newView(parent, type, layer, layerCount, mipmap, mipmapCount) e
 ---The std430 layout.
 ---
 ---| "std430"
+
+---
+---Whether a shape should be drawn filled or outlined.
+---
+---@alias lovr.DrawStyle
+---
+---The shape will be filled in (the default).
+---
+---| "fill"
+---
+---The shape will be outlined.
+---
+---| "line"
 
 ---
 ---Different types for `Buffer` fields.
@@ -2550,25 +2935,71 @@ function Texture:newView(parent, type, layer, layerCount, mipmap, mipmapCount) e
 ---Controls how `Sampler` objects smooth pixels in textures.
 ---
 ---@alias lovr.FilterMode
-
----| nil
+---
+---A pixelated appearance where the "nearest neighbor" pixel is used.
+---
+---| "nearest"
+---
+---A smooth appearance where neighboring pixels are averaged.
+---
+---| "linear"
 
 ---
----TODO
+---Different ways to horizontally align text with `Pass:text`.
+---
+---@alias lovr.HorizontalAlign
+---
+---Left-aligned text.
+---
+---| "left"
+---
+---Centered text.
+---
+---| "center"
+---
+---Right-aligned text.
+---
+---| "right"
+
+---
+---Different ways vertices in a mesh can be connected together and filled in with pixels.
 ---
 ---@alias lovr.MeshMode
 ---
----TODO
+---Each vertex is rendered as a single point.
+---
+---The size of the point can be controlled using the `pointSize` shader flag, or by writing to the `PointSize` variable in shaders.
+---
+---The maximum point size is given by the `pointSize` limit from `lovr.graphics.getLimits`.
 ---
 ---| "points"
 ---
----TODO
+---Pairs of vertices are connected with line segments.
+---
+---To draw a single line through all of the vertices, an index buffer can be used to repeat vertices.
+---
+---It is not currently possible to change the width of the lines, although cylinders or capsules can be used as an alternative.
 ---
 ---| "lines"
 ---
----TODO
+---Every 3 vertices form a triangle, which is filled in with pixels (unless `Pass:setWireframe` is used).
+---
+---This mode is the most commonly used.
 ---
 ---| "triangles"
+
+---
+---Different coordinate spaces for nodes in a `Model`.
+---
+---@alias lovr.OriginType
+---
+---Transforms are relative to the origin (root) of the Model.
+---
+---| "root"
+---
+---Transforms are relative to the parent of the node.
+---
+---| "parent"
 
 ---
 ---The three different types of `Pass` objects.
@@ -2600,48 +3031,54 @@ function Texture:newView(parent, type, layer, layerCount, mipmap, mipmapCount) e
 ---| "transfer"
 
 ---
----TODO
+---Different shader stages.
+---
+---Graphics shaders have a `vertex` and `fragment` stage, and compute shaders have a single `compute` stage.
 ---
 ---@alias lovr.ShaderStage
 ---
----TODO
+---The vertex stage, which computes transformed vertex positions.
 ---
 ---| "vertex"
 ---
----TODO
+---The fragment stage, which computes pixel colors.
 ---
 ---| "fragment"
 ---
----TODO
+---The compute stage, which performs arbitrary computation.
 ---
 ---| "compute"
 
 ---
----TODO
+---The two types of shaders that can be created.
 ---
 ---@alias lovr.ShaderType
 ---
----TODO
+---A graphics shader with a vertex and pixel stage.
 ---
 ---| "graphics"
 ---
----TODO
+---A compute shader with a single compute stage.
 ---
 ---| "compute"
 
 ---
----TODO
+---Different types of stacks that can be pushed and popped with `Pass:push` and `Pass:pop`.
 ---
 ---@alias lovr.StackType
 ---
----TODO
+---The transform stack (`Pass:transform`, `Pass:translate`, etc.).
 ---
 ---| "transform"
-
+---
+---Graphics state, like `Pass:setColor`, `Pass:setFont`, etc.
+---
+---Notably this does not include camera poses/projections or shader variables changed with `Pass:send`.
+---
 ---| "state"
 
 ---
----TODO
+---These are the different metrics a `Tally` can measure.
 ---
 ---@alias lovr.TallyType
 ---
@@ -2649,13 +3086,13 @@ function Texture:newView(parent, type, layer, layerCount, mipmap, mipmapCount) e
 ---
 ---| "time"
 ---
+---Each slot measures 4 numbers: the total number of vertices processed, the number of times the vertex shader was run, the number of triangles that were visible in the view, and the number of times the fragment shader was run.
+---
+---| "shader"
+---
 ---Each slot measures the approximate number of pixels affected by rendering.
 ---
 ---| "pixel"
----
----Each slot measures the number of times different shader stages are invoked.
----
----| "shader"
 
 ---
 ---These are the different ways `Texture` objects can be used.
@@ -2749,8 +3186,44 @@ function Texture:newView(parent, type, layer, layerCount, mipmap, mipmapCount) e
 ---| "transfer"
 
 ---
+---Different ways to vertically align text with `Pass:text`.
+---
+---@alias lovr.VerticalAlign
+---
+---Top-aligned text.
+---
+---| "top"
+---
+---Centered text.
+---
+---| "middle"
+---
+---Bottom-aligned text.
+---
+---| "bottom"
+
+---
+---Indicates whether the front face of a triangle uses the clockwise or counterclockwise vertex order.
+---
+---@alias lovr.Winding
+---
+---Clockwise winding.
+---
+---| "clockwise"
+---
+---Counterclockwise winding.
+---
+---| "counterclockwise"
+
+---
 ---Controls how `Sampler` objects wrap textures.
 ---
 ---@alias lovr.WrapMode
-
----| nil
+---
+---Pixels will be clamped to the edge, with pixels outside the 0-1 uv range using colors from the nearest edge.
+---
+---| "clamp"
+---
+---Tiles the texture.
+---
+---| "repeat"

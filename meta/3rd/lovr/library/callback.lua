@@ -9,11 +9,11 @@
 ---
 ---
 ---### NOTE:
----Disabling the headset module can improve startup time a lot if you aren't intending to use `lovr.headset`.
+---Disabling unused modules can improve startup time.
 ---
----You can set `t.window` to nil to avoid creating the window. You can do it yourself later by using `lovr.graphics.createWindow`.
+---`t.window` can be set to nil to avoid creating the window.
 ---
----If the `lovr.graphics` module is disabled or the window isn't created, attempting to use any functionality requiring graphics may cause a crash.
+---The window can later be opened manually using `lovr.system.openWindow`.
 ---
 ---Enabling the `t.graphics.debug` flag will add additional error checks and will send messages from the GPU driver to the `lovr.log` callback.
 ---
@@ -118,13 +118,7 @@ lovr.log = nil
 ---
 ---It can be overridden for custom mirroring behavior.
 ---
----For example, you could render a single eye instead of a stereo view, apply postprocessing effects, add 2D UI, or render the scene from an entirely different viewpoint for a third person camera.
----
----
----### NOTE:
----When this callback is called, the camera is located at `(0, 0, 0)` and is looking down the negative-z axis.
----
----Note that the usual graphics state applies while `lovr.mirror` is invoked, so you may need to reset graphics state at the end of `lovr.draw` to get the result you want.
+---For example, a stereo view could be drawn instead of a single eye or a 2D HUD could be rendered.
 ---
 ---@type fun()
 lovr.mirror = nil

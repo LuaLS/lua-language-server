@@ -1,5 +1,7 @@
 ---@meta
 
+---@diagnostic disable: undefined-doc-name
+
 ---@class luassert
 local luassert = {}
 
@@ -292,8 +294,8 @@ function luassert.spy(spy) end
 
 ---Perform an assertion on a stub object. This will allow you to call further
 ---functions to perform an assertion.
----@param stub luassert.stubInstance The stub object to begin asserting
----@return luassert.stubAssert stubAssert A new object that has further assert function options
+---@param stub luassert.spyInstance The stub object to begin asserting
+---@return luassert.spyAssert stubAssert A new object that has further assert function options
 function luassert.stub(stub) end
 
 --#endregion

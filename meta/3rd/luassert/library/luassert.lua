@@ -1,85 +1,301 @@
 ---@meta
 
 ---@class luassert
----@field unique fun(v1,deep?:boolean,failure_message?:string)
----@field is_unique fun(v1,deep?:boolean,failure_message?:string)
----@field not_unique fun(v1,deep?:boolean,failure_message?:string)
----@field near fun(expected:number|string,actual:number|string,tolerance:number|string,failure_message?:string)
----@field is_near fun(expected:number|string,actual:number|string,tolerance:number|string,failure_message?:string)
----@field not_near fun(expected:number|string,actual:number|string,tolerance:number|string,failure_message?:string)
----@field matches fun(pattern:string,actual:string|number,init?:number,plain?:boolean,failure_message?:string)
----@field is_matches fun(pattern:string,actual:string|number,init?:number,plain?:boolean,failure_message?:string)
----@field not_matches fun(pattern:string,actual:string|number,init?:number,plain?:boolean,failure_message?:string)
----@field equal fun(v1,v2,failure_message?:string)
----@field equals fun(v1:table,v2:table,failure_message?:string)
----@field is_equal fun(v1,v2,failure_message?:string)
----@field is_equals fun(v1:table,v2:table,failure_message?:string)
----@field not_equal fun(v1,v2,failure_message?:string)
----@field not_equals fun(v1:table,v2:table,failure_message?:string)
----@field same fun(v1,v2,failure_message?:string)
----@field is_same fun(v1,v2,failure_message?:string)
----@field not_same fun(v1,v2,failure_message?:string)
----@field truthy fun(v1,v2,failure_message?:string)
----@field falsy fun(v1,v2,failure_message?:string)
----@field error fun(func:fun(),err_expected?:string,failure_message?:string)
----@field errors fun(func:fun(),err_expected?:string,failure_message?:string)
----@field has_error fun(func:fun(),err_expected?:string,failure_message?:string)
----@field has_errors fun(func:fun(),err_expected?:string,failure_message?:string)
----@field no_error fun(func:fun(),err_expected?:string,failure_message?:string)
----@field no_errors fun(func:fun(),err_expected?:string,failure_message?:string)
----@field error_matches fun(func:fun(),pattern:string,init?:number,plain?:boolean,failure_message?:string)
----@field is_error_matches fun(func:fun(),pattern:string,init?:number,plain?:boolean,failure_message?:string)
----@field not_error_matches fun(func:fun(),pattern:string,init?:number,plain?:boolean,failure_message?:string)
----@field number fun(v)
----@field string fun(v)
----@field table fun(v)
----@field userdata fun(v)
----@field function fun(v)
----@field thread fun(v)
----@field boolean fun(v)
----@field returned_arguments fun(...,fn:function)
----@field property fun(name:string,obj)
----@field is_number fun(v)
----@field is_string fun(v)
----@field is_table fun(v)
----@field is_nil fun(v)
----@field is_userdata fun(v)
----@field is_function fun(v)
----@field is_thread fun(v)
----@field is_boolean fun(v)
----@field is_true fun(b)
----@field is_returned_arguments fun(...,fn:function)
----@field is_false fun(b)
----@field has_property fun(name:string,obj)
----@field not_number fun(v)
----@field not_string fun(v)
----@field not_table fun(v)
----@field not_nil fun(v)
----@field not_userdata fun(v)
----@field not_function fun(v)
----@field not_thread fun(v)
----@field not_boolean fun(v)
----@field not_true fun(b)
----@field not_false fun(b)
----@field not_returned_arguments fun(...,fn:function)
----@field no_property fun(name:string,obj)
----@field message fun(failure_message:string)
----@module 'luassert'
 local luassert = {}
 
----comment
----@param fn function
----@param failure_message? string
----@return luassert_spy
-function luassert.spy(fn,failure_message)
-end
+local spy = require("luassert.library.spy")
+local stub = require("luassert.library.stub")
+local mock = require("luassert.library.mock")
 
----comment
----@param fn function
----@param failure_message? string
----@return luassert_stub
-function luassert.stub(fn,failure_message)
-end
+--#region
 
+---Assert that `value == true`.
+---@param value any The value to confirm is `true`.
+function luassert.True(value) end
+
+---Assert that `value == false`.
+---@param value any The value to confirm is `false`.
+function luassert.False(value) end
+
+---Assert that `type(value) == "boolean"`.
+---@param value any The value to confirm is of type `boolean`.
+function luassert.Boolean(value) end
+
+---Assert that `type(value) == "number"`.
+---@param value any The value to confirm is of type `number`.
+function luassert.Number(value) end
+
+---Assert that `type(value) == "string"`.
+---@param value any The value to confirm is of type `string`.
+function luassert.String(value) end
+
+---Assert that `type(value) == "table"`.
+---@param value any The value to confirm is of type `table`.
+function luassert.Table(value) end
+
+---Assert that `type(value) == "nil"`.
+---@param value any The value to confirm is of type `nil`.
+function luassert.Nil(value) end
+
+---Assert that `type(value) == "userdata"`.
+---@param value any The value to confirm is of type `userdata`.
+function luassert.Userdata(value) end
+
+---Assert that `type(value) == "function"`.
+---@param value any The value to confirm is of type `function`.
+function luassert.Function(value) end
+
+---Assert that `type(value) == "thread"`.
+---@param value any The value to confirm is of type `thread`.
+function luassert.Thread(value) end
+
+---Assert that a value is truthy.
+---@param value any The value to confirm is truthy.
+function luassert.truthy(value) end
+
+---Assert that a value is falsy.
+---@param value any The value to confirm is falsy.
+function luassert.falsy(value) end
+
+---Assert that a callback throws an error.
+---@param callback function A callback function that should error
+---@param error? string The specific error message that will be asserted
+function luassert.error(callback, error) end
+
+luassert.has_error = luassert.error
+
+---Assert that a callback does not error.
+---@param callback function A callback function that should not error
+function luassert.no_error(callback) end
+
+---Assert that two values are near (equal to within a tolerance).
+---@param expected number The expected value
+---@param actual number The actual value
+---@param tolerance number The tolerable difference between the two values
+function luassert.near(expected, actual, tolerance) end
+
+--#endregion
+
+
+--[[ Are ]]
+
+--#region
+
+---Compare two or more items
+luassert.are = {}
+
+---Check that two or more items are equal.
+---
+---When comparing tables, a reference check will be used.
+---@param expected any The expected value
+---@param ... any Values to check the equality of
+function luassert.are.equal(expected, ...) end
+
+---Check that two or more items have the same value.
+---
+---When comparing tables, a deep compare will be performed.
+---@param expected any The expected value
+---@param ... any Values to check
+function luassert.are.same(expected, ...) end
+
+--#endregion
+
+
+--[[ Are Not ]]
+
+--#region
+
+---Compare two or more items
+luassert.are_not = {}
+
+---Check that two or more items are **NOT** equal.
+---
+---When comparing tables, a reference check will be used.
+---@param expected any The value that is **NOT** expected
+---@param ... any Values to check the equality of
+function luassert.are_not.equal(expected, ...) end
+
+---Check that two or more items **DO NOT** have the same value.
+---
+---When comparing tables, a deep compare will be performed.
+---@param expected any The value that is **NOT** expected
+---@param ... any Values to check
+function luassert.are_not.same(expected, ...) end
+
+--#endregion
+
+
+--[[ Is ]]
+
+--#region
+
+---Assert a single item
+luassert.is = {}
+
+---Assert that `value == true`.
+---@param value any The value to confirm is `true`.
+function luassert.is.True(value) end
+
+---Assert that `value == false`.
+---@param value any The value to confirm is `false`.
+function luassert.is.False(value) end
+
+---Assert that `type(value) == "boolean"`.
+---@param value any The value to confirm is of type `boolean`.
+function luassert.is.Boolean(value) end
+
+---Assert that `type(value) == "number"`.
+---@param value any The value to confirm is of type `number`.
+function luassert.is.Number(value) end
+
+---Assert that `type(value) == "string"`.
+---@param value any The value to confirm is of type `string`.
+function luassert.is.String(value) end
+
+---Assert that `type(value) == "table"`.
+---@param value any The value to confirm is of type `table`.
+function luassert.is.Table(value) end
+
+---Assert that `type(value) == "nil"`.
+---@param value any The value to confirm is of type `nil`.
+function luassert.is.Nil(value) end
+
+---Assert that `type(value) == "userdata"`.
+---@param value any The value to confirm is of type `userdata`.
+function luassert.is.Userdata(value) end
+
+---Assert that `type(value) == "function"`.
+---@param value any The value to confirm is of type `function`.
+function luassert.is.Function(value) end
+
+---Assert that `type(value) == "thread"`.
+---@param value any The value to confirm is of type `thread`.
+function luassert.is.Thread(value) end
+
+---Assert that a value is truthy.
+---@param value any The value to confirm is truthy.
+function luassert.is.truthy(value) end
+
+---Assert that a value is falsy.
+---@param value any The value to confirm is falsy.
+function luassert.is.falsy(value) end
+
+---Assert that a callback throws an error.
+---@param callback function A callback function that should error
+---@param error? string The specific error message that will be asserted
+function luassert.is.error(callback, error) end
+
+---Assert that a callback does not error.
+---@param callback function A callback function that should not error
+function luassert.is.no_error(callback) end
+
+--#endregion
+
+
+--[[ Is Not ]]
+
+--#region
+
+---Assert the boolean opposite of a single item.
+luassert.is_not = {}
+
+---Assert that `value ~= true`.
+---@param value any The value to confirm is **NOT** `true`.
+function luassert.is_not.True(value) end
+
+---Assert that `value ~= false`.
+---@param value any The value to confirm is **NOT** `false`.
+function luassert.is_not.False(value) end
+
+---Assert that `type(value) ~= "boolean"`.
+---@param value any The value to confirm is **NOT** of type `boolean`.
+function luassert.is_not.Boolean(value) end
+
+---Assert that `type(value) ~= "number"`.
+---@param value any The value to confirm is **NOT** of type `number`.
+function luassert.is_not.Number(value) end
+
+---Assert that `type(value) ~= "string"`.
+---@param value any The value to confirm is **NOT** of type `string`.
+function luassert.is_not.String(value) end
+
+---Assert that `type(value) ~= "table"`.
+---@param value any The value to confirm is **NOT** of type `table`.
+function luassert.is_not.Table(value) end
+
+---Assert that `type(value) ~= "nil"`.
+---@param value any The value to confirm is **NOT** of type `nil`.
+function luassert.is_not.Nil(value) end
+
+---Assert that `type(value) ~= "userdata"`.
+---@param value any The value to confirm is **NOT** of type `userdata`.
+function luassert.is_not.Userdata(value) end
+
+---Assert that `type(value) ~= "function"`.
+---@param value any The value to confirm is **NOT** of type `function`.
+function luassert.is_not.Function(value) end
+
+---Assert that `type(value) ~= "thread"`.
+---@param value any The value to confirm is **NOT** of type `thread`.
+function luassert.is_not.Thread(value) end
+
+---Assert that a value is **NOT** truthy.
+---@param value any The value to confirm is **NOT** truthy.
+function luassert.is_not.truthy(value) end
+
+---Assert that a value is **NOT** falsy.
+---@param value any The value to confirm is **NOT** falsy.
+function luassert.is_not.falsy(value) end
+
+---Assert that a callback does not throw an error.
+---@param callback function A callback that should not error
+---@param error? string The specific error that should not be thrown
+function luassert.is_not.error(callback, error) end
+
+---Assert that a callback throws an error.
+---@param callback function A callback that should error
+function luassert.is_not.no_error(callback) end
+
+--#endregion
+
+
+--[[ Helpers ]]
+
+--#region
+
+---Assert that all numbers in two arrays are within a specified tolerance of
+---each other.
+---@param expected number[] The expected values
+---@param actual number[] The actual values
+---@param tolerance number The tolerable difference between the values in the two arrays
+assert.are.all_near = function(expected, actual, tolerance) end
+
+---Assert that all numbers in two arrays are **NOT** within a specified
+---tolerance of each other.
+---@param expected number[] The expected values
+---@param actual number[] The actual values
+---@param tolerance number The tolerable differences between the values in the two arrays
+assert.are_not.all_near = function(expected, actual, tolerance) end
+
+--#endregion
+
+
+--[[ Spies ]]
+
+--#region
+
+---Perform an assertion on a spy object. This will allow you to call further
+---functions to perform an assertion.
+---@param spy luassert.spyInstance The spy object to begin asserting
+---@return luassert.spyAssert spyAssert A new object that has further assert function options
+function luassert.spy(spy) end
+
+---Perform an assertion on a stub object. This will allow you to call further
+---functions to perform an assertion.
+---@param stub luassert.stubInstance The stub object to begin asserting
+---@return luassert.stubAssert stubAssert A new object that has further assert function options
+function luassert.stub(stub) end
+
+--#endregion
 
 return luassert

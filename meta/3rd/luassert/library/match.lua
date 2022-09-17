@@ -3,7 +3,7 @@
 --[[
 Matchers are used to provide flexible argument matching for `called_with` and `returned_with` asserts. Just like with asserts, you can chain a modifier value using `is` or `is_not`, followed by the matcher you wish to use. Extending busted with your own matchers is done similar to asserts as well; just build a matcher with a common signature and [register it](#matcher-extend). Furthermore, matchers can be combined using [composite matchers](#matcher-composite).
 ]]
----@class luassert_match
+---@class luassert.match
 local match = {}
 
 --- this is a `placeholder`, match any thing

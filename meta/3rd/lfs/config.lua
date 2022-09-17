@@ -1,5 +1,5 @@
 name = 'luafilesystem'
-words = { 'lfs%.%w+' }
+words = { 'require[%s%(\"\']+lfs[%)\"\']' }
 configs = {
     {
         key    = 'Lua.diagnostics.globals',

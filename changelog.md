@@ -1,5 +1,8 @@
 # changelog
 
+## 3.6.0
+* `CHG` detect multi libraries [#1558](https://github.com/sumneko/lua-language-server/issues/1558)
+
 ## 3.5.6
 `2022-9-16`
 * `FIX` [#1439](https://github.com/sumneko/lua-language-server/issues/1439)

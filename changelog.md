@@ -1,7 +1,16 @@
 # changelog
 
 ## 3.6.0
-* `CHG` detect multi libraries [#1558](https://github.com/sumneko/lua-language-server/issues/1558)
+* `CHG` [#1558](https://github.com/sumneko/lua-language-server/issues/1558) detect multi libraries 
+* `CHG` [#1558](https://github.com/sumneko/lua-language-server/issues/1558) `semantic-tokens`: global variable is setted to `variable.global`
+  ```jsonc
+  // color global variables to red
+  "editor.semanticTokenColorCustomizations": {
+      "rules": {
+          "variable.global": "#ff0000"
+      }
+  }
+  ```
 
 ## 3.5.6
 `2022-9-16`

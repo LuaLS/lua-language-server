@@ -95,7 +95,6 @@ end
 ---@param symlink? boolean
 ---@return boolean, string
 function lfs.link(old, new, symlink)
-
 end
 
 --[[

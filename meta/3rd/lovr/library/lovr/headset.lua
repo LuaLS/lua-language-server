@@ -135,16 +135,6 @@ function lovr.headset.getDisplayFrequency() end
 function lovr.headset.getDisplayHeight() end
 
 ---
----Returns 2D triangle vertices that represent areas of the headset display that will never be seen by the user (due to the circular lenses).
----
----This area can be masked out by rendering it to the depth buffer or stencil buffer.
----
----Then, further drawing operations can skip rendering those pixels using the depth test (`lovr.graphics.setDepthTest`) or stencil test (`lovr.graphics.setStencilTest`), which improves performance.
----
----@return table points # A table of points.  Each point is a table with two numbers between 0 and 1.
-function lovr.headset.getDisplayMask() end
-
----
 ---Returns the width of the headset display (for one eye), in pixels.
 ---
 ---@return number width # The width of the display.

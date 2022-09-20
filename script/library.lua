@@ -383,13 +383,13 @@ local function apply3rd(uri, cfg, onlyMemory)
     client.setConfig(changes, onlyMemory)
 end
 
-local hasAsked
+local hasAsked = {}
 ---@async
 local function askFor3rd(uri, cfg)
-    if hasAsked then
+    if hasAsked[cfg.name] then
         return nil
     end
-    hasAsked = true
+    hasAsked[cfg.name] = true
     local yes1 = lang.script.WINDOW_APPLY_WHIT_SETTING
     local yes2 = lang.script.WINDOW_APPLY_WHITOUT_SETTING
     local no   = lang.script.WINDOW_DONT_SHOW_AGAIN
@@ -402,24 +402,8 @@ local function askFor3rd(uri, cfg)
     end
     if result == yes1 then
         apply3rd(uri, cfg, false)
-        client.setConfig({
-            {
-                key    = 'Lua.workspace.checkThirdParty',
-                action = 'set',
-                value  = false,
-                uri    = uri,
-            },
-        }, false)
     elseif result == yes2 then
         apply3rd(uri, cfg, true)
-        client.setConfig({
-            {
-                key    = 'Lua.workspace.checkThirdParty',
-                action = 'set',
-                value  = false,
-                uri    = uri,
-            },
-        }, true)
     else
         client.setConfig({
             {
@@ -450,9 +434,6 @@ local function wholeMatch(a, b)
 end
 
 local function check3rdByWords(uri, configs)
-    if hasAsked then
-        return
-    end
     if not files.isLua(uri) then
         return
     end
@@ -465,23 +446,32 @@ local function check3rdByWords(uri, configs)
             return
         end
         for _, cfg in ipairs(configs) do
-            if cfg.words then
-                for _, word in ipairs(cfg.words) do
-                    await.delay()
-                    if wholeMatch(text, word) then
+            if not cfg.words then
+                goto CONTINUE
+            end
+            if hasAsked[cfg.name] then
+                goto CONTINUE
+            end
+            local library = ('%s/library'):format(cfg.dirname)
+            if util.arrayHas(config.get(uri, 'Lua.workspace.library'), library) then
+                goto CONTINUE
+            end
+            for _, word in ipairs(cfg.words) do
+                await.delay()
+                if wholeMatch(text, word) then
+                    ---@async
+                    await.call(function ()
                         askFor3rd(uri, cfg)
-                        return
-                    end
+                    end)
+                    return
                 end
             end
+            ::CONTINUE::
         end
     end, id)
 end
 
 local function check3rdByFileName(uri, configs)
-    if hasAsked then
-        return
-    end
     local path = ws.getRelativePath(uri)
     if not path then
         return
@@ -491,24 +481,29 @@ local function check3rdByFileName(uri, configs)
     await.call(function () ---@async
         await.sleep(0.1)
         for _, cfg in ipairs(configs) do
-            if cfg.files then
-                for _, filename in ipairs(cfg.files) do
-                    await.delay()
-                    if wholeMatch(path, filename) then
+            if not cfg.files then
+                goto CONTINUE
+            end
+            if hasAsked[cfg.name] then
+                goto CONTINUE
+            end
+            for _, filename in ipairs(cfg.files) do
+                await.delay()
+                if wholeMatch(path, filename) then
+                    ---@async
+                    await.call(function ()
                         askFor3rd(uri, cfg)
-                        return
-                    end
+                    end)
+                    return
                 end
             end
+            ::CONTINUE::
         end
     end, id)
 end
 
 ---@async
 local function check3rd(uri)
-    if hasAsked then
-        return
-    end
     if ws.isIgnored(uri) then
         return
     end

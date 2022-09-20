@@ -1140,9 +1140,9 @@ function Vec4:unpack() end
 ---### NOTE:
 ---Most LÖVR functions that accept positions, orientations, transforms, velocities, etc. also accept vector objects, so they can be used interchangeably with numbers:
 ---
----    function lovr.draw()
+---    function lovr.draw(pass)
 ---      -- position and size are vec3's, rotation is a quat
----      lovr.graphics.box('fill', position, size, rotation)
+---      pass:box(position, size, rotation)
 ---    end
 ---
 ---### Temporary vs. Permanent

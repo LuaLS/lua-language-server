@@ -1,8 +1,10 @@
 # changelog
 
 ## 3.6.0
-* `CHG` [#1558](https://github.com/sumneko/lua-language-server/issues/1558) detect multi libraries 
-* `CHG` [#1558](https://github.com/sumneko/lua-language-server/issues/1558) `semantic-tokens`: global variable is setted to `variable.global`
+* `NEW` settings:
+  * `Lua.misc.executablePath`: [#1557] specify the executable path in VSCode
+* `CHG` [#1558] detect multi libraries 
+* `CHG` [#1458] `semantic-tokens`: global variable is setted to `variable.global`
   ```jsonc
   // color global variables to red
   "editor.semanticTokenColorCustomizations": {
@@ -11,6 +13,10 @@
       }
   }
   ```
+
+[#1458]: https://github.com/sumneko/lua-language-server/issues/1458
+[#1557]: https://github.com/sumneko/lua-language-server/issues/1557
+[#1558]: https://github.com/sumneko/lua-language-server/issues/1558
 
 ## 3.5.6
 `2022-9-16`

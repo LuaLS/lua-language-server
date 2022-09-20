@@ -262,6 +262,8 @@ config.telemetry.enable                  =
 ]]
 config.misc.parameters                   =
 'VSCode中啟動語言伺服時的[命令列參數](https://github.com/sumneko/lua-language-server/wiki/Getting-Started#arguments)。'
+config.misc.executablePath               = -- TODO: need translate!
+'Specify the executable path in VSCode.'
 config.IntelliSense.traceLocalSet        =
 '請查閱[文件](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
 config.IntelliSense.traceReturn          =

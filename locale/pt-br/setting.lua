@@ -263,6 +263,8 @@ Enable telemetry to send your editor information and error logs over the network
 ]]
 config.misc.parameters                   = -- TODO: need translate!
 '[Command line parameters](https://github.com/sumneko/lua-telemetry-server/tree/master/method) when starting the language service in VSCode.'
+config.misc.executablePath               = -- TODO: need translate!
+'Specify the executable path in VSCode.'
 config.IntelliSense.traceLocalSet        = -- TODO: need translate!
 'Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
 config.IntelliSense.traceReturn          = -- TODO: need translate!

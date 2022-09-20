@@ -624,24 +624,32 @@ local function checkJsonToLua(results, uri, start, finish)
     end
     local startOffset  = guide.positionToOffset(state, start)
     local finishOffset = guide.positionToOffset(state, finish)
-    local jsonStart    = text:match('()[%{%[]', startOffset + 1)
+    local jsonStart = text:match('()["%{%[]', startOffset + 1)
     if not jsonStart then
         return
     end
-    local jsonFinish
+    local jsonFinish, finishChar
     for i = math.min(finishOffset, #text), jsonStart + 1, -1 do
         local char = text:sub(i, i)
         if char == ']'
         or char == '}' then
             jsonFinish = i
+            finishChar = char
             break
         end
     end
     if not jsonFinish then
         return
     end
-    if not text:sub(jsonStart, jsonFinish):find '"%s*%:' then
-        return
+    if finishChar == '}' then
+        if not text:sub(jsonStart, jsonFinish):find '"%s*%:' then
+            return
+        end
+    end
+    if finishChar == ']' then
+        if not text:sub(jsonStart, jsonFinish):find ',' then
+            return
+        end
     end
     results[#results+1] = {
         title = lang.script.ACTION_JSON_TO_LUA,

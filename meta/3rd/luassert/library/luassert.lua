@@ -294,4 +294,17 @@ function luassert.stub(stub) end
 
 --#endregion
 
+
+--[[ Array ]]
+
+--#region
+
+---Perform an assertion on an array object. This will allow you to call further
+---function to perform an assertion.
+---@param object table<index, any> The array object to begin asserting
+---@return luassert.arrayAssert arrayAssert A new object that has further assert function options
+function luassert.array(object) end
+
+--#endregion
+
 return luassert

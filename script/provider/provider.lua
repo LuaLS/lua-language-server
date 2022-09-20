@@ -946,6 +946,7 @@ client.event(function (ev)
                     log.debug('textDocument/semanticTokens/full')
                     local uri = files.getRealUri(params.textDocument.uri)
                     workspace.awaitReady(uri)
+                    await.sleep(0.0)
                     local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_SEMANTIC_FULL, 0.5)
                     local core = require 'core.semantic-tokens'
                     local results = core(uri, 0, math.huge)
@@ -974,6 +975,7 @@ m.register 'textDocument/semanticTokens/range' {
         local uri = files.getRealUri(params.textDocument.uri)
         workspace.awaitReady(uri)
         local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_SEMANTIC_RANGE, 0.5)
+        await.sleep(0.0)
         local core = require 'core.semantic-tokens'
         local start, finish = converter.unpackRange(uri, params.range)
         local results = core(uri, start, finish)

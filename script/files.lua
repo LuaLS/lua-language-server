@@ -62,7 +62,8 @@ local uriMap = {}
 ---@return fs.path
 local function getRealParent(path)
     local parent = path:parent_path()
-    if parent:string() == path:string() then
+    if parent:string():gsub('^%w+:', string.lower)
+    == path  :string():gsub('^%w+:', string.lower) then
         return path
     end
     local res = fs.fullpath(path)

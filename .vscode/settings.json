@@ -7,11 +7,4 @@
         "--loglevel=trace",
         //"--lazy",
     ],
-    "editor.semanticTokenColorCustomizations": {
-        "rules": {
-            "variable.global": {
-                "foreground": "#ffcc00",
-            }
-        }
-    }
 }

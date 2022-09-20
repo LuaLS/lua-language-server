@@ -3,7 +3,7 @@
 ## 3.6.0
 * `NEW` settings:
   * `Lua.misc.executablePath`: [#1557] specify the executable path in VSCode
-* `CHG` [#1558] detect multi libraries 
+* `CHG` [#1558] detect multi libraries
 * `CHG` [#1458] `semantic-tokens`: global variable is setted to `variable.global`
   ```jsonc
   // color global variables to red
@@ -13,7 +13,9 @@
       }
   }
   ```
+* `CHG` [#1177] re-support for symlinks, users need to maintain the correctness of symlinks themselves
 
+[#1177]: https://github.com/sumneko/lua-language-server/issues/1177
 [#1458]: https://github.com/sumneko/lua-language-server/issues/1458
 [#1557]: https://github.com/sumneko/lua-language-server/issues/1557
 [#1558]: https://github.com/sumneko/lua-language-server/issues/1558

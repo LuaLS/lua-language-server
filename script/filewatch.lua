@@ -11,8 +11,12 @@ local function isExists(filename)
     if not suc or not exists then
         return false
     end
-    local suc, res = pcall(fs.canonical, path)
-    if not suc or res:string() ~= path:string() then
+    local suc, res = pcall(fs.fullpath, path)
+    if not suc then
+        return false
+    end
+    if res :string():gsub('^%w+:', string.lower)
+    ~= path:string():gsub('^%w+:', string.lower) then
         return false
     end
     return true

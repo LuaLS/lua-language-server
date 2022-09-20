@@ -1,6 +1,6 @@
 ## Syntax Tokens
 
-Provide by custom [tmLanguage file](https://github.com/microsoft/vscode/blob/main/extensions/lua/syntaxes/lua.tmLanguage.json), which is included by default in Visual Studio Code.
+Provide by custom [tmLanguage file](https://github.com/sumneko/lua.tmbundle/blob/master/lua.tmLanguage.json), which is included by default in Visual Studio Code.
 
 Preview in `Dark+` of VSCode
 

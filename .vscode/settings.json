@@ -6,5 +6,12 @@
         "--dbgport=11413",
         "--loglevel=trace",
         //"--lazy",
-    ]
+    ],
+    "editor.semanticTokenColorCustomizations": {
+        "rules": {
+            "variable.global": {
+                "foreground": "#ffcc00",
+            }
+        }
+    }
 }

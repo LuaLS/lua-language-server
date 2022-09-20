@@ -136,6 +136,7 @@ m.TokenModifiers = {
     ["modification"]   = 1 << 7,
     ["documentation"]  = 1 << 8,
     ["defaultLibrary"] = 1 << 9,
+    ["global"]         = 1 << 10,
 }
 
 m.TokenTypes = {

@@ -100,6 +100,8 @@ function luassert.are.equal(expected, ...) end
 ---@param ... any Values to check
 function luassert.are.same(expected, ...) end
 
+luassert.are_equal = luassert.are.equal
+luassert.are_same = luassert.are.same
 --#endregion
 
 
@@ -124,6 +126,8 @@ function luassert.are_not.equal(expected, ...) end
 ---@param ... any Values to check
 function luassert.are_not.same(expected, ...) end
 
+luassert.are_not_equal = luassert.are_not.equal
+luassert.are_not_same = luassert.are_not.same
 --#endregion
 
 
@@ -190,6 +194,22 @@ function luassert.is.error(callback, error) end
 ---Assert that a callback does not error.
 ---@param callback function A callback function that should not error
 function luassert.is.no_error(callback) end
+
+luassert.is_true = luassert.is.True
+luassert.is_false = luassert.is.False
+luassert.is_boolean = luassert.is.Boolean
+luassert.is_number = luassert.is.Number
+luassert.is_string = luassert.is.String
+luassert.is_table = luassert.is.Table
+luassert.is_nil = luassert.is.Nil
+luassert.is_userdata = luassert.is.Userdata
+luassert.is_function = luassert.is.Function
+luassert.is_thread = luassert.is.Thread
+luassert.is_truthy = luassert.is.truthy
+luassert.is_falsy = luassert.is.falsy
+luassert.is_falsy = luassert.is.falsy
+luassert.is_error = luassert.is.error
+luassert.is_no_error = luassert.is.no_error
 
 --#endregion
 
@@ -258,6 +278,22 @@ function luassert.is_not.error(callback, error) end
 ---@param callback function A callback that should error
 function luassert.is_not.no_error(callback) end
 
+luassert.is_not_true = luassert.is_not.True
+luassert.is_not_false = luassert.is_not.False
+luassert.is_not_boolean = luassert.is_not.Boolean
+luassert.is_not_number = luassert.is_not.Number
+luassert.is_not_string = luassert.is_not.String
+luassert.is_not_table = luassert.is_not.Table
+luassert.is_not_nil = luassert.is_not.Nil
+luassert.is_not_userdata = luassert.is_not.Userdata
+luassert.is_not_function = luassert.is_not.Function
+luassert.is_not_thread = luassert.is_not.Thread
+luassert.is_not_truthy = luassert.is_not.truthy
+luassert.is_not_falsy = luassert.is_not.falsy
+luassert.is_not_falsy = luassert.is_not.falsy
+luassert.is_not_error = luassert.is_not.error
+luassert.is_not_no_error = luassert.is_not.no_error
+
 --#endregion
 
 
@@ -278,6 +314,9 @@ assert.are.all_near = function(expected, actual, tolerance) end
 ---@param actual number[] The actual values
 ---@param tolerance number The tolerable differences between the values in the two arrays
 assert.are_not.all_near = function(expected, actual, tolerance) end
+
+assert.are_all_near = assert.are.all_near
+assert.are_not_all_near = assert.are_not.all_near
 
 --#endregion
 

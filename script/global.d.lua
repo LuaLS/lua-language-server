@@ -44,6 +44,10 @@ PREVIEW = false
 ---@type string
 CHECK = ''
 
+--make docs path
+---@type string
+DOC = ''
+
 ---@type string | '"Error"' | '"Warning"' | '"Information"' | '"Hint"'
 CHECKLEVEL = 'Warning'
 

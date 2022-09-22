@@ -42,6 +42,7 @@ internal.is_not_number = internal.Number
 ---@param value any The value to confirm is of type `string`.
 function internal.String(value) end
 
+internal.string = internal.String
 internal.is_string = internal.String
 internal.is_not_string = internal.String
 

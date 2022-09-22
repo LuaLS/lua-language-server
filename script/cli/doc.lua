@@ -11,6 +11,7 @@ local await    = require 'await'
 local vm       = require 'vm'
 local guide    = require 'parser.guide'
 local getDesc  = require 'core.hover.description'
+local getLabel = require 'core.hover.label'
 
 lang(LOCALE)
 
@@ -30,6 +31,7 @@ util.enableCloseFunction()
 local lastClock = os.clock()
 local results = {}
 
+---@async
 local function packObject(source, mark)
     if type(source) ~= 'table' then
         return source
@@ -42,34 +44,57 @@ local function packObject(source, mark)
     end
     mark[source] = true
     local new = {}
-    if #source > 0 and next(source, #source) == nil then
+    if (#source > 0 and next(source, #source) == nil)
+    or source.type == 'funcargs' then
         new = {}
         for i = 1, #source do
             new[i] = packObject(source[i], mark)
         end
     else
         for k, v in pairs(source) do
-            if type(k) == 'number' then
-                k = ('[%d]'):format(k)
+            if k == 'type'
+            or k == 'name'
+            or k == 'start'
+            or k == 'finish'
+            or k == 'types' then
+                new[k] = packObject(v, mark)
             end
-            if k == 'parent'
-            or k == 'typeGeneric'
-            or k == 'originalComment'
-            or k == 'node'
-            or k == 'class'
-            or k:find '_'
-            or k:find 'Cache'
-            or k:find 'bind' then
-                goto CONTINUE
-            end
-            new[k] = packObject(v, mark)
-            ::CONTINUE::
         end
+        if source.type == 'function' then
+            new['args'] = packObject(source.args, mark)
+            local _, _, max = vm.countReturnsOfFunction(source)
+            if max > 0 then
+                new.returns = {}
+                for i = 1, max do
+                    local rtn = vm.getReturnOfFunction(source, i)
+                    new.returns[i] = packObject(rtn)
+                end
+            end
+            new['view'] = getLabel(source)
+        end
+        if source.type == 'doc.type.table' then
+            new['fields'] = packObject(source.fields, mark)
+        end
+        if source.type == 'doc.field.name'
+        or source.type == 'doc.type.arg.name' then
+            new['[1]'] = packObject(source[1], mark)
+            new['view'] = source[1]
+        end
+        if source.type == 'doc.type.function' then
+            new['args'] = packObject(source.args, mark)
+            if source.returns then
+                new['returns'] = packObject(source.returns, mark)
+            end
+        end
+        if source.bindDocs then
+            new['desc'] = getDesc(source)
+        end
+        new['view'] = new['view'] or vm.getInfer(source):view(rootUri)
     end
-    new['*view*'] = vm.viewObject(source, rootUri)
     return new
 end
 
+---@async
 local function getExtends(source)
     if source.type == 'doc.class' then
         if not source.extends then
@@ -85,6 +110,7 @@ local function getExtends(source)
     end
 end
 
+---@async
 ---@param global vm.global
 local function collect(global)
     if guide.isBasicType(global.name) then
@@ -92,6 +118,7 @@ local function collect(global)
     end
     local result = {
         name    = global.name,
+        desc    = nil,
         defines = {},
         fields  = {},
     }
@@ -105,22 +132,37 @@ local function collect(global)
             file    = guide.getUri(set),
             start   = set.start,
             finish  = set.finish,
-            desc    = getDesc(set),
             extends = getExtends(set),
         }
+        result.desc = result.desc or getDesc(set)
         ::CONTINUE::
     end
     if #result.defines == 0 then
         return
     end
+    table.sort(result.defines, function (a, b)
+        if a.file ~= b.file then
+            return a.file < b.file
+        end
+        return a.start < b.start
+    end)
     results[#results+1] = result
+    ---@async
+    ---@diagnostic disable-next-line: not-yieldable
     vm.getClassFields(rootUri, global, nil, false, function (source)
-        local field = {}
-        result.fields[#result.fields+1] = field
         if source.type == 'doc.field' then
             ---@cast source parser.object
+            if files.isLibrary(guide.getUri(source)) then
+                return
+            end
+            local field = {}
+            result.fields[#result.fields+1] = field
+            if source.field.type == 'doc.field.name' then
+                field.name = source.field[1]
+            else
+                field.name = ('[%s]'):format(vm.viewObject(source.field, rootUri))
+            end
             field.type    = source.type
-            field.key     = vm.viewObject(source.field, rootUri)
             field.file    = guide.getUri(source)
             field.start   = source.start
             field.finish  = source.finish
@@ -128,7 +170,51 @@ local function collect(global)
             field.extends = packObject(source.extends)
             return
         end
-        print(1)
+        if source.type == 'setfield'
+        or source.type == 'setmethod' then
+            ---@cast source parser.object
+            if files.isLibrary(guide.getUri(source)) then
+                return
+            end
+            local field = {}
+            result.fields[#result.fields+1] = field
+            field.name    = (source.field or source.method)[1]
+            field.type    = source.type
+            field.file    = guide.getUri(source)
+            field.start   = source.start
+            field.finish  = source.finish
+            field.desc    = getDesc(source)
+            field.extends = packObject(source.value)
+            return
+        end
+        if source.type == 'tableindex' then
+            ---@cast source parser.object
+            if source.index.type ~= 'string' then
+                return
+            end
+            if files.isLibrary(guide.getUri(source)) then
+                return
+            end
+            local field = {}
+            result.fields[#result.fields+1] = field
+            field.name    = source.index[1]
+            field.type    = source.type
+            field.file    = guide.getUri(source)
+            field.start   = source.start
+            field.finish  = source.finish
+            field.desc    = getDesc(source)
+            field.extends = packObject(source.value)
+            return
+        end
+    end)
+    table.sort(result.fields, function (a, b)
+        if a.name ~= b.name then
+            return a.name < b.name
+        end
+        if a.file ~= b.file then
+            return a.file < b.file
+        end
+        return a.start < b.start
     end)
 end
 
@@ -143,6 +229,7 @@ lclient():start(function (client)
     io.write(lang.script('CLI_DOC_INITING'))
 
     config.set(nil, 'Lua.diagnostics.enable', false)
+    config.set(nil, 'Lua.hover.expandAlias', false)
 
     ws.awaitReady(rootUri)
     await.sleep(0.1)
@@ -173,3 +260,5 @@ end)
 local outpath = LOGPATH .. '/doc.json'
 json.supportSparseArray = true
 util.saveFile(outpath, json.beautify(results))
+
+require 'cli.doc2md'

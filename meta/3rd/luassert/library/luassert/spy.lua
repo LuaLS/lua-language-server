@@ -3,11 +3,6 @@
 ---Spies allow you to wrap a function in order to track how that function was
 ---called.
 ---@class luassert.spy.factory
-local spy_factory = {}
-
----Register a new function to spy on.
----@param target function The function to spy on
----@return luassert.spy spy A spy object that can be used to perform assertions
 ---
 ---## Example
 ---```
@@ -23,7 +18,8 @@ local spy_factory = {}
 ---        assert.spy(s).was.called_with(1, 2, 3)
 ---   end)
 ---```
-function spy_factory(target) end
+---@overload fun(target:function):luassert.spy
+local spy_factory = {}
 
 --#region
 

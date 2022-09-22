@@ -34,7 +34,7 @@ local inferSorted = {
     ['nil']      = 100,
 }
 
-local viewNodeSwitch = util.switch()
+local viewNodeSwitch;viewNodeSwitch = util.switch()
     : case 'nil'
     : case 'boolean'
     : case 'string'
@@ -81,6 +81,14 @@ local viewNodeSwitch = util.switch()
             end
             return source.name
         end
+    end)
+    : case 'doc.type'
+    : call(function (source, infer, uri)
+        local buf = {}
+        for _, tp in ipairs(source.types) do
+            buf[#buf+1] = viewNodeSwitch(tp.type, tp, infer, uri)
+        end
+        return table.concat(buf, '|')
     end)
     : case 'doc.type.name'
     : call(function (source, infer, uri)

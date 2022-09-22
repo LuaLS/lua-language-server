@@ -262,6 +262,8 @@ config.telemetry.enable                  =
 ]]
 config.misc.parameters                   =
 'VSCode中启动语言服务时的[命令行参数](https://github.com/sumneko/lua-language-server/wiki/Getting-Started#arguments)。'
+config.misc.executablePath               =
+'VSCode中指定可执行文件路径。'
 config.IntelliSense.traceLocalSet        =
 '请查阅[文档](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)了解用法。'
 config.IntelliSense.traceReturn          =

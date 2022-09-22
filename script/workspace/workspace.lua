@@ -90,10 +90,9 @@ local globInteferFace = {
     type = function (path)
         local result
         pcall(function ()
-            local status = fs.symlink_status(path):type()
-            if status == 'directory' then
+            if fs.is_directory(path) then
                 result = 'directory'
-            elseif status == 'regular' then
+            else
                 result = 'file'
             end
         end)
@@ -101,7 +100,7 @@ local globInteferFace = {
     end,
     list = function (path)
         local fullPath = fs.path(path)
-        if fs.symlink_status(fullPath):type() ~= 'directory' then
+        if not fs.is_directory(fullPath) then
             return nil
         end
         local paths = {}

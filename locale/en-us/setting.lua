@@ -262,7 +262,9 @@ config.telemetry.enable                  =
 Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://github.com/sumneko/lua-language-server/wiki/Home#privacy).
 ]]
 config.misc.parameters                   =
-'[Command line parameters](https://github.com/sumneko/lua-telemetry-server/tree/master/method) when starting the language service in VSCode.'
+'[Command line parameters](https://github.com/sumneko/lua-telemetry-server/tree/master/method) when starting the language server in VSCode.'
+config.misc.executablePath               =
+'Specify the executable path in VSCode.'
 config.IntelliSense.traceLocalSet        =
 'Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
 config.IntelliSense.traceReturn          =

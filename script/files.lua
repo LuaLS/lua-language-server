@@ -57,6 +57,19 @@ m.reset()
 local fileID = util.counter()
 
 local uriMap = {}
+
+---@param path fs.path
+---@return fs.path
+local function getRealParent(path)
+    local parent = path:parent_path()
+    if parent:string():gsub('^%w+:', string.lower)
+    == path  :string():gsub('^%w+:', string.lower) then
+        return path
+    end
+    local res = fs.fullpath(path)
+    return getRealParent(parent) / res:filename()
+end
+
 -- 获取文件的真实uri，但不穿透软链接
 ---@param uri uri
 ---@return uri
@@ -78,11 +91,16 @@ function m.getRealUri(uri)
     if uri == ruri then
         return ruri
     end
+    local real = getRealParent(path:parent_path()) / res:filename()
+    ruri = furi.encode(real:string())
+    if uri == ruri then
+        return ruri
+    end
     if not uriMap[uri] then
-        uriMap[uri] = ruri
+        uriMap[uri] = true
         log.warn(('Fix real file uri: %s -> %s'):format(uri, ruri))
     end
-    return uriMap[uri]
+    return ruri
 end
 
 --- 打开文件

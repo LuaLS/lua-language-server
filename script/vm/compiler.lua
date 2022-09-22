@@ -278,7 +278,7 @@ local searchFieldSwitch = util.switch()
 
 ---@param suri uri
 ---@param object vm.global
----@param key string|vm.global
+---@param key? string|vm.global
 ---@param ref boolean
 ---@param pushResult fun(field: vm.object, isMark?: boolean)
 function vm.getClassFields(suri, object, key, ref, pushResult)

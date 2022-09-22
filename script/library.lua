@@ -555,6 +555,7 @@ end)
 files.watch(function (ev, uri)
     if ev == 'update'
     or ev == 'dll' then
+        await.sleep(1)
         check3rd(uri)
     end
 end)

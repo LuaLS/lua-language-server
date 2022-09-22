@@ -148,6 +148,7 @@ Symbol              <-  ({} {
 ---@field versions? table[]
 ---@field names? parser.object[]
 ---@field path? string
+---@field bindComments? parser.object[]
 
 local function parseTokens(text, offset)
     Ci = 0

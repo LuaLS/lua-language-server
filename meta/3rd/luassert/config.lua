@@ -1,0 +1,1 @@
+words = { "assert.%w+" }

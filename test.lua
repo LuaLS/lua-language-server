@@ -86,7 +86,7 @@ local function main()
             rootUri = '',
         }
 
-        ws.awaitReady()
+        ws.awaitReady('')
 
         print('Loaded files in', os)
         for uri in files.eachFile() do

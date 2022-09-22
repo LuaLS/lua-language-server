@@ -1,6 +1,6 @@
 ---@meta
 
----@class luassert.arrayAssert
+---@class luassert.array
 local array = {}
 
 array.has = {}

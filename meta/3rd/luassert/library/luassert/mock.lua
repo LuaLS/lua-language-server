@@ -1,13 +1,10 @@
 ---@meta
 
----@diagnostic disable: undefined-doc-name
----@diagnostic disable: undefined-doc-class
-
----@alias luassert.mockedTable table<string, luassert.mockedTable | luassert.spyInstance>
+---@alias luassert.mockeds table<string, luassert.mockeds | luassert.spy>
 
 ---A mock wraps an entire table's functions in spies or mocks
----@class luassert.mock : luassert.spyInstance
-
+---@class luassert.mock : luassert.spy.factory
+local mock = {}
 ---@generic T
 ---Create a new mock from a table, wrapping all of it's functions in spies or mocks.
 ---@param object T The table to wrap
@@ -15,7 +12,7 @@
 ---@param func? function Callback function used for stubs
 ---@param self? table Table to replace with a spy
 ---@param key? string The key of the method to replace in `self`
----@return luassert.mockedTable
+---@return luassert.mockeds
 function mock(object, doStubs, func, self, key) end
 
 ---@generic T
@@ -25,7 +22,7 @@ function mock(object, doStubs, func, self, key) end
 ---@param func? function Callback function used for stubs
 ---@param self? table Table to replace with a spy
 ---@param key? string The key of the method to replace in `self`
----@return luassert.mockedTable
+---@return luassert.mockeds
 function mock.new(object, doStubs, func, self, key) end
 
 return mock

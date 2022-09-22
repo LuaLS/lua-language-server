@@ -1,10 +1,9 @@
----@diagnostic disable: lowercase-global
 ---@meta
 
-assert = require("luassert.library.luassert")
-spy = require("luassert.library.spy")
-stub = require("luassert.library.stub")
-mock = require("luassert.library.mock")
+assert = require("luassert")
+spy = require("luassert.spy")
+stub = require("luassert.stub")
+mock = require("luassert.mock")
 
 ---Undocumented feature with unknown purpose.
 ---@param filename string

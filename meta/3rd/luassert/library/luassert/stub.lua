@@ -1,15 +1,14 @@
 ---@meta
 
----@diagnostic disable: undefined-doc-name
-
 ---Function similarly to spies, except that stubs do not call the function that they replace.
 ---@class luassert.stub
+local stub = {}
 
 ---Creates a new stub that replaces a method in a table in place.
 ---@param object table The object that the method is in
 ---@param key string The key of the method in the `object` to replace
 ---@param ... any A function that operates on the remaining passed in values and returns more values or just values to return
----@return luassert.spyInstance stub A stub object that can be used to perform assertions
+---@return luassert.spy stub A stub object that can be used to perform assertions
 ---@return any ... Values returned by a passed in function or just the values passed in
 function stub(object, key, ...) end
 
@@ -17,7 +16,7 @@ function stub(object, key, ...) end
 ---@param object table The object that the method is in
 ---@param key string The key of the method in the `object` to replace
 ---@param ... any A function that operates on the remaining passed in values and returns more values or just values to return
----@return luassert.spyInstance stub A stub object that can be used to perform assertions
+---@return luassert.spy stub A stub object that can be used to perform assertions
 ---@return any ... Values returned by a passed in function or just the values passed in
 ---
 ---## Example

@@ -11,6 +11,7 @@ local await    = require 'await'
 local vm       = require 'vm'
 local guide    = require 'parser.guide'
 local getDesc  = require 'core.hover.description'
+local getLabel = require 'core.hover.label'
 
 lang(LOCALE)
 
@@ -30,6 +31,7 @@ util.enableCloseFunction()
 local lastClock = os.clock()
 local results = {}
 
+---@async
 local function packObject(source, mark)
     if type(source) ~= 'table' then
         return source
@@ -68,6 +70,7 @@ local function packObject(source, mark)
                     new.returns[i] = packObject(rtn)
                 end
             end
+            new['view'] = getLabel(source)
         end
         if source.type == 'doc.type.table' then
             new['fields'] = packObject(source.fields, mark)
@@ -91,6 +94,7 @@ local function packObject(source, mark)
     return new
 end
 
+---@async
 local function getExtends(source)
     if source.type == 'doc.class' then
         if not source.extends then
@@ -106,6 +110,7 @@ local function getExtends(source)
     end
 end
 
+---@async
 ---@param global vm.global
 local function collect(global)
     if guide.isBasicType(global.name) then
@@ -113,6 +118,7 @@ local function collect(global)
     end
     local result = {
         name    = global.name,
+        desc    = nil,
         defines = {},
         fields  = {},
     }
@@ -126,24 +132,35 @@ local function collect(global)
             file    = guide.getUri(set),
             start   = set.start,
             finish  = set.finish,
-            desc    = getDesc(set),
             extends = getExtends(set),
         }
+        result.desc = result.desc or getDesc(set)
         ::CONTINUE::
     end
     if #result.defines == 0 then
         return
     end
+    table.sort(result.defines, function (a, b)
+        if a.file ~= b.file then
+            return a.file < b.file
+        end
+        return a.start < b.start
+    end)
     results[#results+1] = result
+    ---@async
+    ---@diagnostic disable-next-line: not-yieldable
     vm.getClassFields(rootUri, global, nil, false, function (source)
         if source.type == 'doc.field' then
             ---@cast source parser.object
+            if files.isLibrary(guide.getUri(source)) then
+                return
+            end
             local field = {}
             result.fields[#result.fields+1] = field
             if source.field.type == 'doc.field.name' then
-                field.field = source.field[1]
+                field.name = source.field[1]
             else
-                field.field = ('[%s]'):format(vm.viewObject(source.field, rootUri))
+                field.name = ('[%s]'):format(vm.viewObject(source.field, rootUri))
             end
             field.type    = source.type
             field.file    = guide.getUri(source)
@@ -156,9 +173,12 @@ local function collect(global)
         if source.type == 'setfield'
         or source.type == 'setmethod' then
             ---@cast source parser.object
+            if files.isLibrary(guide.getUri(source)) then
+                return
+            end
             local field = {}
             result.fields[#result.fields+1] = field
-            field.field   = (source.field or source.method)[1]
+            field.name    = (source.field or source.method)[1]
             field.type    = source.type
             field.file    = guide.getUri(source)
             field.start   = source.start
@@ -168,13 +188,16 @@ local function collect(global)
             return
         end
         if source.type == 'tableindex' then
+            ---@cast source parser.object
             if source.index.type ~= 'string' then
                 return
             end
-            ---@cast source parser.object
+            if files.isLibrary(guide.getUri(source)) then
+                return
+            end
             local field = {}
             result.fields[#result.fields+1] = field
-            field.field   = source.index[1]
+            field.name    = source.index[1]
             field.type    = source.type
             field.file    = guide.getUri(source)
             field.start   = source.start
@@ -183,6 +206,15 @@ local function collect(global)
             field.extends = packObject(source.value)
             return
         end
+    end)
+    table.sort(result.fields, function (a, b)
+        if a.name ~= b.name then
+            return a.name < b.name
+        end
+        if a.file ~= b.file then
+            return a.file < b.file
+        end
+        return a.start < b.start
     end)
 end
 
@@ -228,3 +260,5 @@ end)
 local outpath = LOGPATH .. '/doc.json'
 json.supportSparseArray = true
 util.saveFile(outpath, json.beautify(results))
+
+require 'cli.doc2md'

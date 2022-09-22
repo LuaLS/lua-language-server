@@ -37,7 +37,7 @@ function table.maxn(table) end
 ---@return table a2
 function table.move(a1, f, e, t, a2) end
 
----@version >5.2, JIT
+---@version >5.2
 ---#DES 'table.pack'
 ---@return table
 ---@nodiscard
@@ -55,7 +55,7 @@ function table.remove(list, pos) end
 ---@param comp? fun(a: T, b: T):boolean
 function table.sort(list, comp) end
 
----@version >5.2, JIT
+---@version >5.2
 ---#DES 'table.unpack'
 ---@generic T
 ---@param list T[]

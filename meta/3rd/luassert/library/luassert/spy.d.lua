@@ -29,10 +29,10 @@ function spy:called(times, compare) end
 function spy:called_with(args) end
 
 ---Check that the spy returned the provided values
----@param values any[] An array of values that are expected to have been returned by this spy
+---@pasram ... any An array of values that are expected to have been returned by this spy
 ---@return boolean did If this spy did return the provided values.
 ---@return any[] returns If `did == false`, this will be an array of the values *last* returned by this spy. If `did == true`, this will be an array of the values returned by the matching call of this spy.
-function spy:returned_with(values) end
+function spy:returned_with(...) end
 
 --#endregion
 
@@ -80,14 +80,21 @@ function spy_assert.called_more_than(times) end
 ---@param times integer The number of times that the spied-on function should have been called less than
 function spy_assert.called_less_than(times) end
 
+---Check that the spy returned the provided values
+---@param ... any An array of values that are expected to have been returned by this spy
+---@return boolean did If this spy did return the provided values.
+---@return any[] returns If `did == false`, this will be an array of the values *last* returned by this spy. If `did == true`, this will be an array of the values returned by the matching call of this spy.
+function spy_assert.returned_with(...) end
+
 spy_assert.was = {
-	called = spy_assert.called,
-	called_with = spy_assert.called_with,
-	not_called_with = spy_assert.not_called_with,
-	called_at_least = spy_assert.called_at_least,
-	called_at_most = spy_assert.called_at_most,
-	called_more_than = spy_assert.called_more_than,
-	called_less_than = spy_assert.called_less_than,
+    called = spy_assert.called,
+    called_with = spy_assert.called_with,
+    not_called_with = spy_assert.not_called_with,
+    called_at_least = spy_assert.called_at_least,
+    called_at_most = spy_assert.called_at_most,
+    called_more_than = spy_assert.called_more_than,
+    called_less_than = spy_assert.called_less_than,
+    returned_with = spy_assert.returned_with,
 }
 
 --#endregion

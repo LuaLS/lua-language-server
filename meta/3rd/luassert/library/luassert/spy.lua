@@ -3,7 +3,6 @@
 ---Spies allow you to wrap a function in order to track how that function was
 ---called.
 ---@class luassert.spy.factory
----
 ---## Example
 ---```
 ---describe("New Spy", function()
@@ -45,7 +44,7 @@ function spy_factory.new(target) end
 
 ---Create a new spy that replaces a method in a table in place.
 ---@param table table The table that the method is a part of
----@param methodName function The method to spy on
+---@param methodName string The method to spy on
 ---@return luassert.spy spy A spy object that can be used to perform assertions
 ---
 ---## Example

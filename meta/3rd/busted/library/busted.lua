@@ -77,6 +77,7 @@ context = describe
 ---@param name string
 ---@param block fun()
 function expose(name, block) end
+
 ---Functions like `describe()` except it insulates the test's environment to
 ---only this context.
 ---
@@ -256,6 +257,7 @@ function lazy_setup(block) end
 ---```
 ---@param block fun()
 function teardown(block) end
+
 strict_teardown = teardown
 
 ---Runs last in a context block after all tests.
@@ -294,10 +296,3 @@ function lazy_teardown(block) end
 ---```
 ---@param block fun()
 function finally(block) end
-
-
-
-
---TODO: where does this go??
----@param key 'assertion' | 'matcher'
-function assert:register(key, ...) end

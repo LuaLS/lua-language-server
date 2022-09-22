@@ -42,31 +42,52 @@ local function packObject(source, mark)
     end
     mark[source] = true
     local new = {}
-    if #source > 0 and next(source, #source) == nil then
+    if (#source > 0 and next(source, #source) == nil)
+    or source.type == 'funcargs' then
         new = {}
         for i = 1, #source do
             new[i] = packObject(source[i], mark)
         end
     else
         for k, v in pairs(source) do
-            if type(k) == 'number' then
-                k = ('[%d]'):format(k)
+            if k == 'type'
+            or k == 'name'
+            or k == 'start'
+            or k == 'finish'
+            or k == 'types' then
+                new[k] = packObject(v, mark)
             end
-            if k == 'parent'
-            or k == 'typeGeneric'
-            or k == 'originalComment'
-            or k == 'node'
-            or k == 'class'
-            or k:find '_'
-            or k:find 'Cache'
-            or k:find 'bind' then
-                goto CONTINUE
-            end
-            new[k] = packObject(v, mark)
-            ::CONTINUE::
         end
+        if source.type == 'function' then
+            new['args'] = packObject(source.args, mark)
+            local _, _, max = vm.countReturnsOfFunction(source)
+            if max > 0 then
+                new.returns = {}
+                for i = 1, max do
+                    local rtn = vm.getReturnOfFunction(source, i)
+                    new.returns[i] = packObject(rtn)
+                end
+            end
+        end
+        if source.type == 'doc.type.table' then
+            new['fields'] = packObject(source.fields, mark)
+        end
+        if source.type == 'doc.field.name'
+        or source.type == 'doc.type.arg.name' then
+            new['[1]'] = packObject(source[1], mark)
+            new['view'] = source[1]
+        end
+        if source.type == 'doc.type.function' then
+            new['args'] = packObject(source.args, mark)
+            if source.returns then
+                new['returns'] = packObject(source.returns, mark)
+            end
+        end
+        if source.bindDocs then
+            new['desc'] = getDesc(source)
+        end
+        new['view'] = new['view'] or vm.getInfer(source):view(rootUri)
     end
-    new['*view*'] = vm.viewObject(source, rootUri)
     return new
 end
 
@@ -115,12 +136,16 @@ local function collect(global)
     end
     results[#results+1] = result
     vm.getClassFields(rootUri, global, nil, false, function (source)
-        local field = {}
-        result.fields[#result.fields+1] = field
         if source.type == 'doc.field' then
             ---@cast source parser.object
+            local field = {}
+            result.fields[#result.fields+1] = field
+            if source.field.type == 'doc.field.name' then
+                field.field = source.field[1]
+            else
+                field.field = ('[%s]'):format(vm.viewObject(source.field, rootUri))
+            end
             field.type    = source.type
-            field.key     = vm.viewObject(source.field, rootUri)
             field.file    = guide.getUri(source)
             field.start   = source.start
             field.finish  = source.finish
@@ -128,7 +153,36 @@ local function collect(global)
             field.extends = packObject(source.extends)
             return
         end
-        print(1)
+        if source.type == 'setfield'
+        or source.type == 'setmethod' then
+            ---@cast source parser.object
+            local field = {}
+            result.fields[#result.fields+1] = field
+            field.field   = (source.field or source.method)[1]
+            field.type    = source.type
+            field.file    = guide.getUri(source)
+            field.start   = source.start
+            field.finish  = source.finish
+            field.desc    = getDesc(source)
+            field.extends = packObject(source.value)
+            return
+        end
+        if source.type == 'tableindex' then
+            if source.index.type ~= 'string' then
+                return
+            end
+            ---@cast source parser.object
+            local field = {}
+            result.fields[#result.fields+1] = field
+            field.field   = source.index[1]
+            field.type    = source.type
+            field.file    = guide.getUri(source)
+            field.start   = source.start
+            field.finish  = source.finish
+            field.desc    = getDesc(source)
+            field.extends = packObject(source.value)
+            return
+        end
     end)
 end
 
@@ -143,6 +197,7 @@ lclient():start(function (client)
     io.write(lang.script('CLI_DOC_INITING'))
 
     config.set(nil, 'Lua.diagnostics.enable', false)
+    config.set(nil, 'Lua.hover.expandAlias', false)
 
     ws.awaitReady(rootUri)
     await.sleep(0.1)

@@ -351,6 +351,9 @@ end
 
 local function tryDocComment(source)
     local md = markdown()
+    if source.value and source.value.type == 'function' then
+        source = source.value
+    end
     if source.type == 'function' then
         local comment = getFunctionComment(source)
         md:add('md', comment)

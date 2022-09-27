@@ -179,21 +179,21 @@ function mt:findUrisByRequireName(suri, name)
                 searcherMap[fullUri] = searcher
             end
         end
-        if not strict then
-            local tail = '/' .. furi.encode(fspath):gsub('^file:[/]*', '')
-            for uri in files.eachFile(self.scp.uri) do
-                if  not searcherMap[uri]
-                and suri ~= uri
-                and util.stringEndWith(uri, tail) then
-                    results[#results+1] = uri
-                    local parentUri = files.getLibraryUri(self.scp.uri, uri) or self.scp.uri
-                    if parentUri == nil or parentUri == '' then
-                        parentUri = furi.encode ''
-                    end
-                    local relative  = uri:sub(#parentUri + 1):sub(1, - #tail)
-                    searcherMap[uri] = workspace.normalize(relative .. searcher)
-                end
-            end
+        local tail = '/' .. furi.encode(fspath):gsub('^file:[/]*', '')
+        for uri in files.eachFile(self.scp.uri) do
+          if  not searcherMap[uri]
+            and suri ~= uri
+            and util.stringEndWith(uri, tail) then
+              local parentUri = files.getLibraryUri(self.scp.uri, uri) or self.scp.uri
+              if parentUri == nil or parentUri == '' then
+                parentUri = furi.encode ''
+              end
+              local relative  = uri:sub(#parentUri + 1):sub(1, - #tail)
+              if not strict or relative == "/" then
+                results[#results+1] = uri
+              end
+              searcherMap[uri] = workspace.normalize(relative .. searcher)
+          end
         end
     end
 

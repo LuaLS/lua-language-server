@@ -83,7 +83,7 @@ local RESERVED = {
 local m = {}
 
 --- 打印表的结构
----@param tbl table
+---@param tbl any
 ---@param option? table
 ---@return string
 function m.dump(tbl, option)

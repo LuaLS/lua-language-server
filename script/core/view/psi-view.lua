@@ -1,5 +1,8 @@
 local files = require("files")
 local guide = require("parser.guide")
+local converter = require("proto.converter")
+local subString = require 'core.substring'
+
 
 
 ---@class psi.view.node
@@ -15,6 +18,7 @@ local guide = require("parser.guide")
 ---@field end integer
 
 ---@param astNode parser.object
+---@param state parser.state
 ---@return psi.view.node | nil
 local function toPsiNode(astNode, state)
     if not astNode then
@@ -26,8 +30,13 @@ local function toPsiNode(astNode, state)
 
     local startOffset = guide.positionToOffset(state, astNode.start)
     local finishOffset = guide.positionToOffset(state, astNode.finish)
+    local startPosition = converter.packPosition(state.uri, astNode.start)
+    local finishPosition = converter.packPosition(state.uri, astNode.finish)
     return {
-        name = string.format("%s@%d..%d", astNode.type, startOffset, finishOffset),
+        name = string.format("%s@[%d:%d .. %d:%d]",
+            astNode.type,
+            startPosition.line + 1, startPosition.character + 1,
+            finishPosition.line + 1, finishPosition.character + 1),
         attr = {
             range = {
                 start = startOffset,
@@ -67,9 +76,15 @@ local function collectPsi(astNode, state)
         end
     end
 
-    -- if not psiNode.children then
-    --     psiNode.name = psiNode.name
-    -- end
+    if not psiNode.children then
+        local subber = subString(state)
+        local showText = subber(astNode.start + 1, astNode.finish)
+        if string.len(showText) > 30 then
+            showText = showText:sub(0, 30).. " ... "
+        end
+
+        psiNode.name = psiNode.name .. "   " .. showText
+    end
 
     return psiNode
 end

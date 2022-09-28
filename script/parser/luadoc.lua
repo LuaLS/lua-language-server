@@ -1494,10 +1494,14 @@ local function buildLuaDoc(comment)
             comment = comment,
         }
     end
+    local startOffset = comment.start
+    if comment.type == 'comment.long' then
+        startOffset = startOffset + #comment.mark - 2
+    end
 
     local doc = text:sub(startPos)
 
-    parseTokens(doc, comment.start + startPos)
+    parseTokens(doc, startOffset + startPos)
     local result, rests = convertTokens(doc)
     if result then
         result.range = comment.finish

@@ -1,1 +1,1 @@
-words = { "assert.%w+" }
+words = { "assert%.%w+" }

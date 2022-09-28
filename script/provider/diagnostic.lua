@@ -460,6 +460,9 @@ end
 ---@async
 function m.awaitDiagnosticsScope(suri, callback)
     local scp = scope.getScope(suri)
+    if scp.type == 'fallback' then
+        return
+    end
     while loading.count() > 0 do
         await.sleep(1.0)
     end

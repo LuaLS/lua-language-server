@@ -24,9 +24,6 @@ local function toPsiNode(astNode, state)
     if not astNode then
         return
     end
-    if astNode.type == "doc" then
-        return
-    end
 
     local startOffset = guide.positionToOffset(state, astNode.start)
     local finishOffset = guide.positionToOffset(state, astNode.finish)

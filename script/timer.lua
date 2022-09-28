@@ -97,7 +97,13 @@ local function onTick()
     freeQueue[#freeQueue + 1] = q
 end
 
+---@class timer.manager
 local m = {}
+
+---@class timer
+---@field _onTimer? fun(self: timer)
+---@field _timeoutFrame integer
+---@field _timeout integer
 local mt = {}
 mt.__index = mt
 mt.type = 'timer'

@@ -96,11 +96,15 @@ local function split(str, sep)
     return t
 end
 
+---@class dummyfs
+---@operator div(string|fs.path|dummyfs): dummyfs
+---@field files table
 local dfs = {}
 dfs.__index = dfs
 dfs.type = 'dummy'
 dfs.path = ''
 
+---@return dummyfs
 function m.dummyFS(t)
     return setmetatable({
         files = t or {},
@@ -257,7 +261,7 @@ function dfs:saveFile(path, text)
     return true
 end
 
----@param path   string|fs.path
+---@param path   string|fs.path|dummyfs
 ---@param option table
 ---@return fs.path?
 local function fsAbsolute(path, option)
@@ -449,7 +453,7 @@ local function fileRemove(path, option)
     end
 end
 
----@param source fs.path?
+---@param source fs.path|dummyfs?
 ---@param target fs.path?
 ---@param option table
 local function fileCopy(source, target, option)
@@ -485,7 +489,7 @@ local function fileCopy(source, target, option)
     end
 end
 
----@param source fs.path?
+---@param source fs.path|dummyfs?
 ---@param target fs.path?
 ---@param option table
 local function fileSync(source, target, option)
@@ -594,8 +598,8 @@ function m.fileRemove(path, option)
 end
 
 --- 复制文件（夹）
----@param source string|fs.path
----@param target string|fs.path
+---@param source string|fs.path|dummyfs
+---@param target string|fs.path|dummyfs
 ---@return table
 function m.fileCopy(source, target, option)
     option = buildOption(option)
@@ -608,8 +612,8 @@ function m.fileCopy(source, target, option)
 end
 
 --- 同步文件（夹）
----@param source string|fs.path
----@param target string|fs.path
+---@param source string|fs.path|dummyfs
+---@param target string|fs.path|dummyfs
 ---@return table
 function m.fileSync(source, target, option)
     option = buildOption(option)

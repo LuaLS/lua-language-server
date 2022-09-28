@@ -3,6 +3,7 @@ local files    = require 'files'
 local vm       = require 'vm.vm'
 local ws       = require 'workspace.workspace'
 local guide    = require 'parser.guide'
+local timer    = require 'timer'
 
 ---@type table<vm.object, vm.node>
 vm.nodeCache = {}
@@ -475,10 +476,22 @@ function vm.createNode(a, b)
     return node
 end
 
+---@type timer?
+local delayTimer
 files.watch(function (ev, uri)
     if ev == 'version' then
         if ws.isReady(uri) then
-            vm.clearNodeCache()
+            if PREVIEW then
+                if delayTimer then
+                    delayTimer:restart()
+                end
+                delayTimer = timer.wait(1, function ()
+                    delayTimer = nil
+                    vm.clearNodeCache()
+                end)
+            else
+                vm.clearNodeCache()
+            end
         end
     end
 end)

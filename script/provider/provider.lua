@@ -1400,6 +1400,37 @@ m.register '$/api/report' {
     end
 }
 
+m.register '$/psi/view' {
+    ---@async
+    function (params)
+        local uri = files.getRealUri(params.uri)
+        workspace.awaitReady(uri)
+        local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
+        if not files.exists(uri) then
+            return nil
+        end
+        local core = require 'core.view.psi-view'
+        local result = core(uri)
+        return result
+    end
+}
+
+m.register '$/psi/select' {
+    ---@async
+    function(params)
+        local uri = files.getRealUri(params.uri)
+        workspace.awaitReady(uri)
+        local _<close> = progress.create(uri, lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
+        if not files.exists(uri) then
+            return nil
+        end
+        local core = require 'core.view.psi-select'
+        local result = core(uri, params.position)
+        return result
+    end
+}
+
+
 local function refreshStatusBar()
     local valid = config.get(nil, 'Lua.window.statusBar')
     for _, scp in ipairs(workspace.folders) do

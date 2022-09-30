@@ -3,7 +3,6 @@ local files    = require 'files'
 local vm       = require 'vm.vm'
 local ws       = require 'workspace.workspace'
 local guide    = require 'parser.guide'
-local timer    = require 'timer'
 
 ---@type table<vm.object, vm.node>
 vm.nodeCache = {}
@@ -448,12 +447,25 @@ function vm.unlockCache()
     end
 end
 
-function vm.clearNodeCache()
+---@param uri? uri
+function vm.clearNodeCache(uri)
     if lockCount > 0 then
         needClearCache = true
         return
     end
+
     log.debug('clearNodeCache')
+
+    if uri then
+      for source, _ in pairs(vm.nodeCache) do
+        local ok, source_uri = pcall(guide.getUri, source)
+        if ok and source_uri == uri then
+          vm.nodeCache[source] = nil
+        end
+      end
+      return
+    end
+
     vm.nodeCache = {}
 end
 
@@ -476,22 +488,10 @@ function vm.createNode(a, b)
     return node
 end
 
----@type timer?
-local delayTimer
 files.watch(function (ev, uri)
     if ev == 'version' then
         if ws.isReady(uri) then
-            if PREVIEW then
-                if delayTimer then
-                    delayTimer:restart()
-                end
-                delayTimer = timer.wait(1, function ()
-                    delayTimer = nil
-                    vm.clearNodeCache()
-                end)
-            else
-                vm.clearNodeCache()
-            end
+            vm.clearNodeCache(uri)
         end
     end
 end)

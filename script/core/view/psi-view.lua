@@ -21,7 +21,7 @@ local subString = require 'core.substring'
 ---@param state parser.state
 ---@return psi.view.node | nil
 local function toPsiNode(astNode, state)
-    if not astNode then
+    if not astNode or not astNode.start then
         return
     end
 
@@ -63,7 +63,7 @@ local function collectPsi(astNode, state)
         end
     end)
 
-    if psiNode.children and psiNode.attr then
+    if psiNode.children and #psiNode.children > 0 and psiNode.attr then
         local range = psiNode.attr.range
         if range.start > psiNode.children[1].attr.range.start then
             range.start = psiNode.children[1].attr.range.start

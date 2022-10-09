@@ -29,6 +29,9 @@ m._eventList = {}
 m._watchings = {}
 
 function m.watch(path)
+    if path == '' then
+        return function () end
+    end
     if m._watchings[path] then
         m._watchings[path].count = m._watchings[path].count + 1
     else

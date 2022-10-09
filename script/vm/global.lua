@@ -53,6 +53,7 @@ function mt:getSets(suri)
     if self.setsCache[cacheUri] then
         return self.setsCache[cacheUri]
     end
+    local clock = os.clock()
     self.setsCache[cacheUri] = {}
     local cache = self.setsCache[cacheUri]
     for uri, link in pairs(self.links) do
@@ -63,6 +64,10 @@ function mt:getSets(suri)
                 end
             end
         end
+    end
+    local cost = os.clock() - clock
+    if cost > 0.1 then
+        log.warn('global-manager getSets costs', cost, self.name)
     end
     return cache
 end
@@ -77,6 +82,7 @@ function mt:getGets(suri)
     if self.getsCache[cacheUri] then
         return self.getsCache[cacheUri]
     end
+    local clock = os.clock()
     self.getsCache[cacheUri] = {}
     local cache = self.getsCache[cacheUri]
     for uri, link in pairs(self.links) do
@@ -87,6 +93,10 @@ function mt:getGets(suri)
                 end
             end
         end
+    end
+    local cost = os.clock() - clock
+    if cost > 0.1 then
+        log.warn('global-manager getGets costs', cost, self.name)
     end
     return cache
 end
@@ -431,7 +441,7 @@ function vm.getGlobalFields(cate, name)
     end
     local cost = os.clock() - clock
     if cost > 0.1 then
-        log.warn('global-manager getFields cost %.3f', cost)
+        log.warn('global-manager getFields costs', cost)
     end
 
     return globals
@@ -451,7 +461,7 @@ function vm.getGlobals(cate)
     end
     local cost = os.clock() - clock
     if cost > 0.1 then
-        log.warn('global-manager getGlobals cost %.3f', cost)
+        log.warn('global-manager getGlobals costs', cost)
     end
 
     return globals

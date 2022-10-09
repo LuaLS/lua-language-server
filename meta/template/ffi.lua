@@ -57,7 +57,7 @@ function ffi.cast(ct, init) end
 function ffi.metatype(ct, metatable) end
 
 ---@param cdata     ffi.cdata*
----@param finalizer function
+---@param finalizer? function
 ---@return ffi.cdata* cdata
 function ffi.gc(cdata, finalizer) end
 

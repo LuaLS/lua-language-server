@@ -1800,8 +1800,8 @@ TEST [[
 ---@field children OptionObj[]
 
 ---@type OptionObj[]
-local l = { 
-    { 
+local l = {
+    {
         a = true,
         children = { {<??>} }
     }
@@ -1829,8 +1829,8 @@ TEST [[
 ---@field children OptionObj[]
 
 ---@type OptionObj[]
-local l = { 
-    { 
+local l = {
+    {
         children = {<??>}
     }
 }
@@ -1844,8 +1844,8 @@ TEST [[
 ---@field children OptionObj[]
 
 ---@type OptionObj[]
-local l = { 
-    { 
+local l = {
+    {
         children = <??>
     }
 }
@@ -3641,6 +3641,7 @@ TEST [[
 T = {
     x = 1,
     y = 'ss',
+    z = { 'uu' },
 }
 
 ---@param x A
@@ -3658,11 +3659,19 @@ f(<??>)
         kind     = define.CompletionItemKind.EnumMember,
     },
     {
+        label    = 'T.z',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
         label    = '1',
         kind     = define.CompletionItemKind.EnumMember,
     },
     {
         label    = '"ss"',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label    = 'table',
         kind     = define.CompletionItemKind.EnumMember,
     },
 }
@@ -3672,6 +3681,7 @@ TEST [[
 local ppp = {
     x = 1,
     y = 'ss',
+    z = { 'uu' },
 }
 
 ---@param x A
@@ -3689,11 +3699,19 @@ f(<??>)
         kind     = define.CompletionItemKind.EnumMember,
     },
     {
+        label    = 'ppp.z',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
         label    = '1',
         kind     = define.CompletionItemKind.EnumMember,
     },
     {
         label    = '"ss"',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label    = 'table',
         kind     = define.CompletionItemKind.EnumMember,
     },
 }
@@ -3703,6 +3721,7 @@ TEST [[
 ppp.fff = {
     x = 1,
     y = 'ss',
+    z = { 'uu' },
 }
 
 ---@param x A
@@ -3720,11 +3739,19 @@ f(<??>)
         kind     = define.CompletionItemKind.EnumMember,
     },
     {
+        label    = 'ppp.fff.z',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
         label    = '1',
         kind     = define.CompletionItemKind.EnumMember,
     },
     {
         label    = '"ss"',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label    = 'table',
         kind     = define.CompletionItemKind.EnumMember,
     },
 }

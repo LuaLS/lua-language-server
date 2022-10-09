@@ -1157,7 +1157,8 @@ local function insertDocEnum(state, pos, doc, enums)
                 goto CONTINUE
             end
             if field.value.type == 'integer'
-            or field.value.type == 'string' then
+            or field.value.type == 'string'
+            or field.value.type == 'table' then
                 if parentName then
                     enums[#enums+1] = {
                         label  = parentName .. '.' .. key,
@@ -1171,7 +1172,8 @@ local function insertDocEnum(state, pos, doc, enums)
                     }
                 end
                 valueEnums[#valueEnums+1] = {
-                    label  = util.viewLiteral(field.value[1]),
+                    label  = field.value.type == 'table' and 'table'
+                        or util.viewLiteral(field.value[1]),
                     kind   = define.CompletionItemKind.EnumMember,
                     id     = stack(function () ---@async
                         return {
@@ -1212,7 +1214,7 @@ local function insertEnum(state, pos, src, enums, isInArray)
             kind        = define.CompletionItemKind.EnumMember,
         }
     elseif isInArray and src.type == 'doc.type.array' then
-        for i, d in ipairs(vm.getDefs(src.node)) do
+        for _, d in ipairs(vm.getDefs(src.node)) do
             insertEnum(state, pos, d, enums, isInArray)
         end
     elseif src.type == 'global' and src.cate == 'type' then
@@ -1917,7 +1919,7 @@ local function tryluaDocByErr(state, position, err, docState, results)
         end
         local label = {}
         local insertText = {}
-        for i, arg in ipairs(func.args) do
+        for _, arg in ipairs(func.args) do
             if arg[1] and arg.type ~= 'self' then
                 label[#label+1] = arg[1]
                 if #label == 1 then
@@ -1933,7 +1935,7 @@ local function tryluaDocByErr(state, position, err, docState, results)
             insertTextFormat = 2,
             insertText       = table.concat(insertText, '\n'),
         }
-        for i, arg in ipairs(func.args) do
+        for _, arg in ipairs(func.args) do
             if arg[1] then
                 results[#results+1] = {
                     label  = arg[1],

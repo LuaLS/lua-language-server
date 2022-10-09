@@ -145,7 +145,7 @@ end
 
 ---@class parser.object
 ---@field _globalNode vm.global|false
----@field _enums?     (string|integer)[]
+---@field _enums?     (string|integer|table)[]
 
 ---@type table<string, vm.global>
 local allGlobals = {}
@@ -362,7 +362,8 @@ local compilerGlobalSwitch = util.switch()
                     goto CONTINUE
                 end
                 if field.value.type == 'integer'
-                or field.value.type == 'string' then
+                or field.value.type == 'string'
+                or field.value.type == 'table' then
                     source._enums[#source._enums+1] = field.value[1]
                 end
                 if field.value.type == 'binary'

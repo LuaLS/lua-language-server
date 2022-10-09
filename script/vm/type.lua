@@ -55,13 +55,6 @@ local function checkEnum(parentName, child, uri)
             if not set._enums then
                 return false
             end
-            if  child.type ~= 'string'
-            and child.type ~= 'doc.type.string'
-            and child.type ~= 'integer'
-            and child.type ~= 'number'
-            and child.type ~= 'doc.type.integer' then
-                return false
-            end
             return util.arrayHas(set._enums, child[1])
         end
     end
@@ -73,17 +66,10 @@ end
 ---@param child  vm.node.object
 ---@return boolean
 local function checkValue(parent, child)
-    if parent.type == 'doc.type.integer' then
-        if child.type == 'integer'
-        or child.type == 'doc.type.integer'
-        or child.type == 'number' then
-            return parent[1] == child[1]
-        end
-    elseif parent.type == 'doc.type.string' then
-        if child.type == 'string'
-        or child.type == 'doc.type.string' then
-            return parent[1] == child[1]
-        end
+    if parent.type == 'doc.type.integer'
+    or parent.type == 'doc.type.string'
+    or parent.type == 'doc.type.table' then
+        return parent[1] == child[1]
     end
 
     return true

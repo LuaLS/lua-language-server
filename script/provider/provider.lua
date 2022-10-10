@@ -941,6 +941,7 @@ client.event(function (ev)
                         full  = true,
                     },
                 },
+                abortByFileUpdate = true,
                 ---@async
                 function (params)
                     log.debug('textDocument/semanticTokens/full')
@@ -969,6 +970,7 @@ m.register 'textDocument/semanticTokens/range' {
             range = true,
         },
     },
+    abortByFileUpdate = true,
     ---@async
     function (params)
         log.debug('textDocument/semanticTokens/range')

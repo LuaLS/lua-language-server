@@ -88,9 +88,11 @@ local function diffedUnpackPosition(uri, position)
         local text  = files.getOriginText(uri)
         if text then
             local lineOffset = originLines[row]
-            local textOffset = encoder.offset(offsetEncoding, text, col + 1, lineOffset)
-            if textOffset and lineOffset then
-                col = textOffset - lineOffset
+            if lineOffset then
+                local textOffset = encoder.offset(offsetEncoding, text, col + 1, lineOffset)
+                if textOffset and lineOffset then
+                    col = textOffset - lineOffset
+                end
             end
         end
     end

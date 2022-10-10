@@ -22,7 +22,7 @@ return function(uri, range, options)
     return {
         {
             start = converter.unpackPosition(uri, { line = startLine, character = 0 }),
-            finish = converter.unpackPosition(uri, { line = endLine, character = 999999 }),
+            finish = converter.unpackPosition(uri, { line = endLine + 1, character = 0 }),
             text = formattedText,
         }
     }

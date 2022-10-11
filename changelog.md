@@ -17,6 +17,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
   }
   ```
 * `CHG` [#1177] re-support for symlinks, users need to maintain the correctness of symlinks themselves
+* `FIX` [#1567]
 * `FIX` [#1593]
 * `FIX` [#1606]
 
@@ -24,6 +25,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 [#1458]: https://github.com/sumneko/lua-language-server/issues/1458
 [#1557]: https://github.com/sumneko/lua-language-server/issues/1557
 [#1558]: https://github.com/sumneko/lua-language-server/issues/1558
+[#1567]: https://github.com/sumneko/lua-language-server/issues/1567
 [#1593]: https://github.com/sumneko/lua-language-server/issues/1593
 [#1606]: https://github.com/sumneko/lua-language-server/issues/1606
 

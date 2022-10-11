@@ -932,4 +932,28 @@ local <!b!>
 b.<!<?__index?>!> = b
 ]]
 
+TEST [[
+---@class myClass
+local myClass = { nested = {} }
+
+function myClass.nested.<!fn!>() end
+
+---@type myClass
+local class
+
+class.nested.<?fn?>()
+]]
+
+TEST [[
+---@class myClass
+local myClass = { has = { nested = {} } }
+
+function myClass.has.nested.<!fn!>() end
+
+---@type myClass
+local class
+
+class.has.nested.<?fn?>()
+]]
+
 config.set(nil, 'Lua.type.castNumberToInteger', true)

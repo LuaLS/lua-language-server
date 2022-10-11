@@ -3791,3 +3791,15 @@ TEST 'A|B' [[
 ---@type A|B
 local <?t?>
 ]]
+
+TEST 'function' [[
+---@class myClass
+local myClass = { has = { nested = {} } }
+
+function myClass.has.nested.fn() end
+
+---@type myClass
+local class
+
+class.has.nested.<?fn?>()
+]]

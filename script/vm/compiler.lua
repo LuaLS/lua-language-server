@@ -1818,6 +1818,84 @@ local function compileByGlobal(source)
     end
 end
 
+local nodeSwitch;nodeSwitch = util.switch()
+    : case 'field'
+    : case 'method'
+    : call(function (source, lastKey, pushResult)
+        return nodeSwitch(source.parent.type, source.parent, lastKey, pushResult)
+    end)
+    : case 'getfield'
+    : case 'setfield'
+    : case 'getmethod'
+    : case 'setmethod'
+    : case 'getindex'
+    : case 'setindex'
+    : call(function (source, lastKey, pushResult)
+        local parentNode = vm.compileNode(source.node)
+        local uri = guide.getUri(source)
+        local key = guide.getKeyName(source)
+        if type(key) ~= 'string' then
+            return
+        end
+        if lastKey then
+            key = key .. vm.ID_SPLITE .. lastKey
+        end
+        for pn in parentNode:eachObject() do
+            searchFieldSwitch(pn.type, uri, pn, key, false, pushResult)
+        end
+        return key, source.node
+    end)
+    : case 'tableindex'
+    : case 'tablefield'
+    : call(function (source, lastKey, pushResult)
+        if lastKey then
+            return
+        end
+        local key = guide.getKeyName(source)
+        if type(key) ~= 'string' then
+            return
+        end
+        local uri = guide.getUri(source)
+        local parentNode = vm.compileNode(source.node)
+        for pn in parentNode:eachObject() do
+            searchFieldSwitch(pn.type, uri, pn, key, false, pushResult)
+        end
+    end)
+    : case 'doc.see.field'
+    : call(function (source, lastKey, pushResult)
+        if lastKey then
+            return
+        end
+        local parentNode = vm.compileNode(source.parent.name)
+        local uri = guide.getUri(source)
+        for pn in parentNode:eachObject() do
+            searchFieldSwitch(pn.type, uri, pn, source[1], false, pushResult)
+        end
+    end)
+
+function vm.compileByNodeChain(source, pushResult)
+    local lastKey
+    local src = source
+    while true do
+        local key, node = nodeSwitch(src.type, src, lastKey, pushResult)
+        if not key then
+            break
+        end
+        src = node
+        lastKey = key
+    end
+end
+
+---@param source vm.object
+local function compileByParentNode(source)
+    if not vm.getNode(source):isEmpty() then
+        return
+    end
+    vm.compileByNodeChain(source, function (result)
+        vm.setNode(source, vm.compileNode(result))
+    end)
+end
+
 ---@param source vm.object
 ---@return vm.node
 function vm.compileNode(source)
@@ -1846,6 +1924,7 @@ function vm.compileNode(source)
     LOCK[source] = true
     compileByGlobal(source)
     compileByNode(source)
+    compileByParentNode(source)
     matchCall(source)
     LOCK[source] = nil
 

@@ -768,7 +768,7 @@ function parseType(parent)
                         if comments then
                             resume.comment = table.concat(comments, '\n')
                         else
-                            resume.comment = nextComm.text:match('#%s*(.+)', #resumeHead + 1)
+                            resume.comment = nextComm.text:match('%s*#?%s*(.+)', resume.finish - nextComm.start)
                         end
                         result.types[#result.types+1] = resume
                         result.finish = resume.finish

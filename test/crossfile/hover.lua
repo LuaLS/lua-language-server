@@ -1582,3 +1582,27 @@ TEST {
 }
 ```]]
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@alias someType
+            ---| "#" # description
+            
+            ---@type someType
+            local <?someValue?>
+        ]]
+    },
+    hover = [[
+```lua
+local someValue: "#"
+```
+
+---
+
+```lua
+someType:
+    | "#" -- description
+```]]
+}

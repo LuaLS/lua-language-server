@@ -49,6 +49,27 @@ local function isEmptyFunction(func)
     return finishRow - startRow <= 1
 end
 
+---@param func parser.object
+---@return integer
+local function getReturnsMin(func)
+    local min = vm.countReturnsOfFunction(func, true)
+    if min == 0 then
+        return 0
+    end
+    for _, doc in ipairs(func.bindDocs) do
+        if doc.type == 'doc.overload' then
+            local n = vm.countReturnsOfFunction(doc.overload)
+            if n == 0 then
+                return 0
+            end
+            if n < min then
+                min = n
+            end
+        end
+    end
+    return min
+end
+
 ---@async
 return function (uri, callback)
     local state = files.getState(uri)
@@ -63,7 +84,7 @@ return function (uri, callback)
             return
         end
         await.delay()
-        if vm.countReturnsOfFunction(source, true) == 0 then
+        if getReturnsMin(source) == 0 then
             return
         end
         if hasReturn(source) then

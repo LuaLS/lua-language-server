@@ -29,6 +29,11 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 
   print(class.a.b.c.e.f.g) --> infered as integer
   ```
+* `CHG` [#1582] the following diagnostics consider `overload`
+  * `missing-return`
+  * `missing-return-value`
+  * `redundant-return-value`
+  * `return-type-mismatch`
 * `FIX` [#1567]
 * `FIX` [#1593]
 * `FIX` [#1595]
@@ -41,6 +46,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 [#1558]: https://github.com/sumneko/lua-language-server/issues/1558
 [#1561]: https://github.com/sumneko/lua-language-server/issues/1561
 [#1567]: https://github.com/sumneko/lua-language-server/issues/1567
+[#1582]: https://github.com/sumneko/lua-language-server/issues/1582
 [#1593]: https://github.com/sumneko/lua-language-server/issues/1593
 [#1595]: https://github.com/sumneko/lua-language-server/issues/1595
 [#1606]: https://github.com/sumneko/lua-language-server/issues/1606

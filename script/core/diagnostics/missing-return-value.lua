@@ -5,27 +5,9 @@ local lang   = require 'language'
 local await  = require 'await'
 
 ---@param func parser.object
-local function hasDocReturn(func)
-    if not func.bindDocs then
-        return false
-    end
-    for _, doc in ipairs(func.bindDocs) do
-        if doc.type == 'doc.return' then
-            return true
-        end
-        if doc.type == 'doc.overload' then
-            if #doc.overload.returns > 0 then
-                return true
-            end
-        end
-    end
-    return false
-end
-
----@param func parser.object
 ---@return integer
 local function getReturnsMin(func)
-    local min = vm.countReturnsOfFunction(func)
+    local min = vm.countReturnsOfFunction(func, true)
     if min == 0 then
         return 0
     end
@@ -55,9 +37,6 @@ return function (uri, callback)
         await.delay()
         local returns = source.returns
         if not returns then
-            return
-        end
-        if not hasDocReturn(source) then
             return
         end
         local min = getReturnsMin(source)

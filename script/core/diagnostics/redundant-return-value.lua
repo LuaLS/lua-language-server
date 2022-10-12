@@ -4,16 +4,25 @@ local vm     = require 'vm'
 local lang   = require 'language'
 local await  = require 'await'
 
-local function hasDocReturn(func)
-    if not func.bindDocs then
-        return false
+---@param func parser.object
+---@return number
+local function getReturnsMax(func)
+    local _, max = vm.countReturnsOfFunction(func, true)
+    if max == math.huge then
+        return max
     end
     for _, doc in ipairs(func.bindDocs) do
-        if doc.type == 'doc.return' then
-            return true
+        if doc.type == 'doc.overload' then
+            local _, n = vm.countReturnsOfFunction(doc.overload)
+            if n == math.huge then
+                return n
+            end
+            if n > max then
+                max = n
+            end
         end
     end
-    return false
+    return max
 end
 
 ---@async
@@ -25,15 +34,12 @@ return function (uri, callback)
 
     ---@async
     guide.eachSourceType(state.ast, 'function', function (source)
-        await.delay()
-        if not hasDocReturn(source) then
-            return
-        end
-        local _, max = vm.countReturnsOfFunction(source)
         local returns = source.returns
         if not returns then
             return
         end
+        await.delay()
+        local max = getReturnsMax(source)
         for _, ret in ipairs(returns) do
             local rmin, rmax = vm.countList(ret)
             if rmin > max then

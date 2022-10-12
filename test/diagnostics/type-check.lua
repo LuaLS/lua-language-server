@@ -810,16 +810,29 @@ local function f(x)
 end
 ]]
 
---TEST [[
------@param x boolean
------@return number
------@overload fun()
---local function f(x)
---    if x then
---        return 1
---    end
---end
---]]
+TEST [[
+---@param x boolean
+---@return number
+---@overload fun()
+local function f(x)
+    if x then
+        return 1
+    end
+end
+]]
+
+TEST [[
+---@param x boolean
+---@return number
+---@overload fun(): boolean, boolean
+local function f(x)
+    if x then
+        return 1
+    else
+        return false, false
+    end
+end
+]]
 
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')

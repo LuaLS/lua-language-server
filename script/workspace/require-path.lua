@@ -172,22 +172,45 @@ function mt:findUrisByRequireName(suri, name)
         local fspath = searcher:gsub('%?', (path:gsub('%%', '%%%%')))
         fspath = workspace.normalize(fspath)
         local tail = '/' .. furi.encode(fspath):gsub('^file:[/]*', '')
-        for uri in files.eachFile(self.scp.uri) do
-            if  not searcherMap[uri]
-            and suri ~= uri
-            and util.stringEndWith(uri, tail) then
-                local parentUri = files.getLibraryUri(self.scp.uri, uri) or self.scp.uri
-                if parentUri == nil or parentUri == '' then
-                    parentUri = furi.encode '/'
-                end
-                local relative = uri:sub(#parentUri + 1):sub(1, - #tail)
-                if not strict
-                or relative == '/'
-                or relative == '' then
-                    results[#results+1] = uri
-                    searcherMap[uri] = workspace.normalize(relative .. searcher)
-                end
+
+        if strict then
+          -- Check absolute file and library files
+          local fullPath = workspace.getAbsolutePath(self.scp.uri, fspath)
+          if fullPath then
+              local fullUri  = furi.encode(fullPath)
+              if  files.exists(fullUri)
+              and fullUri ~= suri then
+                  results[#results+1] = fullUri
+                  searcherMap[fullUri] = searcher
+              end
+          end
+          -- Check for tail in library roots. No need to check all files for pathStrict
+          for libUri, _ in scope.getScope(self.scp.uri):eachLink() do
+            libUri = libUri .. tail
+            if  files.exists(libUri)
+              and libUri ~= suri then
+              results[#results+1] = libUri
+              searcherMap[libUri] = searcher
             end
+          end
+        else
+          for uri in files.eachFile(self.scp.uri) do
+              if  not searcherMap[uri]
+              and suri ~= uri
+              and util.stringEndWith(uri, tail) then
+                  local parentUri = files.getLibraryUri(self.scp.uri, uri) or self.scp.uri
+                  if parentUri == nil or parentUri == '' then
+                      parentUri = furi.encode '/'
+                  end
+                  local relative = uri:sub(#parentUri + 1):sub(1, - #tail)
+                  if not strict
+                  or relative == '/'
+                  or relative == '' then
+                      results[#results+1] = uri
+                      searcherMap[uri] = workspace.normalize(relative .. searcher)
+                  end
+              end
+          end
         end
     end
 

@@ -56,3 +56,7 @@ LOGLEVEL = 'warn'
 
 ---@type boolean
 LAZY = false
+
+-- (experiment) Improve performance, but reduce accuracy
+---@type boolean
+CACHEALIVE = false

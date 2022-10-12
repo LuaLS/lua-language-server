@@ -481,7 +481,7 @@ local delayTimer
 files.watch(function (ev, uri)
     if ev == 'version' then
         if ws.isReady(uri) then
-            if PREVIEW then
+            if CACHEALIVE then
                 if delayTimer then
                     delayTimer:restart()
                 end

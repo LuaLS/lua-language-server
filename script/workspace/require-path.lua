@@ -13,6 +13,7 @@ local m = {}
 ---@field scp scope
 ---@field nameMap table<string, string>
 ---@field visibleCache table<string, require-manager.visibleResult[]>
+---@field requireCache table<string, table>
 local mt = {}
 mt.__index = mt
 
@@ -25,6 +26,7 @@ local function createRequireManager(scp)
         scp = scp,
         nameMap = {},
         visibleCache = {},
+        requireCache = {},
     }, mt)
 end
 
@@ -153,14 +155,10 @@ function mt:getVisiblePath(path)
 end
 
 --- 查找符合指定require name的所有uri
----@param suri uri
 ---@param name string
 ---@return uri[]
----@return table<uri, string>?
-function mt:findUrisByRequireName(suri, name)
-    if type(name) ~= 'string' then
-        return {}
-    end
+---@return table<uri, string>
+function mt:searchUrisByRequireName(name)
     local searchers   = config.get(self.scp.uri, 'Lua.runtime.path')
     local strict      = config.get(self.scp.uri, 'Lua.runtime.pathStrict')
     local separator   = config.get(self.scp.uri, 'Lua.completion.requireSeparator')
@@ -174,7 +172,6 @@ function mt:findUrisByRequireName(suri, name)
         local tail = '/' .. furi.encode(fspath):gsub('^file:[/]*', '')
         for uri in files.eachFile(self.scp.uri) do
             if  not searcherMap[uri]
-            and suri ~= uri
             and util.stringEndWith(uri, tail) then
                 local parentUri = files.getLibraryUri(self.scp.uri, uri) or self.scp.uri
                 if parentUri == nil or parentUri == '' then
@@ -200,6 +197,35 @@ function mt:findUrisByRequireName(suri, name)
         end
     end
 
+    return results, searcherMap
+end
+
+--- 查找符合指定require name的所有uri，并排除当前文件
+---@param suri uri
+---@param name string
+---@return uri[]
+---@return table<uri, string>?
+function mt:findUrisByRequireName(suri, name)
+    if type(name) ~= 'string' then
+        return {}
+    end
+    local cache = self.requireCache[name]
+    if not cache then
+        local results, searcherMap = self:searchUrisByRequireName(name)
+        cache = {
+            results = results,
+            searcherMap = searcherMap,
+        }
+        self.requireCache[name] = cache
+    end
+    local results = {}
+    local searcherMap = {}
+    for _, uri in ipairs(cache.results) do
+        if uri ~= suri then
+            results[#results+1] = uri
+            searcherMap[uri] = cache.searcherMap[uri]
+        end
+    end
     return results, searcherMap
 end
 

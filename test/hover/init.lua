@@ -9,13 +9,13 @@ rawset(_G, 'TEST', true)
 function TEST(script)
     return function (expect)
         local newScript, catched = catch(script, '?')
-        files.setText('', newScript)
-        local hover = core.byUri('', catched['?'][1][1])
+        files.setText(TESTURI, newScript)
+        local hover = core.byUri(TESTURI, catched['?'][1][1])
         assert(hover)
         expect = expect:gsub('^[\r\n]*(.-)[\r\n]*$', '%1'):gsub('\r\n', '\n')
         local label = hover:string():gsub('\r\n', '\n'):match('```lua[\r\n]*(.-)[\r\n]*```')
         assert(expect == label)
-        files.remove('')
+        files.remove(TESTURI)
     end
 end
 

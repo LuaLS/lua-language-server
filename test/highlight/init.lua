@@ -21,18 +21,18 @@ end
 
 function TEST(script)
     local newScript, catched = catch(script, '!')
-    files.setText('', newScript)
+    files.setText(TESTURI, newScript)
     for _, enter in ipairs(catched['!']) do
         local start, finish = enter[1], enter[2]
         local pos = (start + finish) // 2
-        local positions = core('', pos)
+        local positions = core(TESTURI, pos)
         local results = {}
         for _, position in ipairs(positions) do
             results[#results+1] = { position.start, position.finish }
         end
         assert(founded(catched['!'], results))
     end
-    files.remove('')
+    files.remove(TESTURI)
 end
 
 TEST [[

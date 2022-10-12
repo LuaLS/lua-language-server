@@ -37,6 +37,12 @@ function mt:removeAllLinks()
     self._links = {}
 end
 
+---@return fun(): uri
+---@return table<uri, true>
+function mt:eachLink()
+    return next, self._links
+end
+
 ---@param uri uri
 ---@return boolean
 function mt:isChildUri(uri)
@@ -46,14 +52,14 @@ function mt:isChildUri(uri)
     if not self.uri then
         return false
     end
-    if self.uri == '' then
-        return true
-    end
     if self.uri == uri then
         return true
     end
-    if  uri:sub(1, #self.uri) == self.uri
-    and uri:sub(#self.uri + 1, #self.uri + 1) == '/' then
+    if uri:sub(1, #self.uri) ~= self.uri then
+        return false
+    end
+    if uri:sub(#self.uri, #self.uri) == '/'
+    or uri:sub(#self.uri + 1, #self.uri + 1) == '/' then
         return true
     end
     return false
@@ -69,10 +75,14 @@ function mt:isLinkedUri(uri)
         if uri == linkUri then
             return true
         end
-        if  uri:sub(1, #linkUri) == linkUri
-        and uri:sub(#linkUri + 1, #linkUri + 1) == '/' then
+        if uri:sub(1, #linkUri) ~= linkUri then
+            goto CONTINUE
+        end
+        if uri:sub(#linkUri, #linkUri) == '/'
+        or uri:sub(#linkUri + 1, #linkUri + 1) == '/' then
             return true
         end
+        ::CONTINUE::
     end
     return false
 end

@@ -49,13 +49,13 @@ function m.create(uri)
         uri = furi.normalize(uri)
     end
     log.info('Workspace create: ', uri)
+    local scp = scope.createFolder(uri)
+    m.folders[#m.folders+1] = scp
     if uri == furi.encode '/'
     or uri == furi.encode(os.getenv 'HOME' or '') then
         client.showMessage('Error', lang.script('WORKSPACE_NOT_ALLOWED', furi.decode(uri)))
-        return
+        scp:set('bad root', true)
     end
-    local scp = scope.createFolder(uri)
-    m.folders[#m.folders+1] = scp
 end
 
 function m.remove(uri)
@@ -306,7 +306,7 @@ function m.awaitPreload(scp)
     local native   = m.getNativeMatcher(scp)
     local librarys = m.getLibraryMatchers(scp)
 
-    if scp.uri then
+    if scp.uri and not scp:get('bad root') then
         log.info('Scan files at:', scp:getName())
         local count = 0
         ---@async

@@ -19,12 +19,12 @@ end
 function TEST(text)
     return function (name)
         return function (expect)
-            files.setText('', text)
+            files.setText(TESTURI, text)
             EditResult = nil
-            local row, fmt = findInsertRow('')
-            applyAutoRequire('', row, name, name, fmt)
+            local row, fmt = findInsertRow(TESTURI)
+            applyAutoRequire(TESTURI, row, name, name, fmt)
             assert(util.equal(EditResult, expect))
-            files.remove('')
+            files.remove(TESTURI)
         end
     end
 end

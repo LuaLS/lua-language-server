@@ -8,8 +8,8 @@ rawset(_G, 'TEST', true)
 function TEST(script)
     return function (expect)
         local newScript, catched1 = catch(script, '?')
-        files.setText('', newScript)
-        local hovers = core('', catched1['?'][1][1])
+        files.setText(TESTURI, newScript)
+        local hovers = core(TESTURI, catched1['?'][1][1])
         if hovers then
             assert(#hovers == #expect)
             for i, hover in ipairs(hovers) do
@@ -28,7 +28,7 @@ function TEST(script)
         else
             assert(expect == nil)
         end
-        files.remove('')
+        files.remove(TESTURI)
     end
 end
 

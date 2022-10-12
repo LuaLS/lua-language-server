@@ -51,15 +51,15 @@ local function testIfExit(path)
         local max = 100
         local need
         for i = 1, max do
-            files.open('')
-            files.setText('', buf)
-            diag('', false, function () end)
+            files.open(TESTURI)
+            files.setText(TESTURI, buf)
+            diag(TESTURI, false, function () end)
             local passed = os.clock() - clock
             if passed >= 1.0 or i == max then
                 need = passed / i
                 break
             end
-            files.remove('')
+            files.remove(TESTURI)
         end
         print(('基准诊断测试[%s]单次耗时：%.10f'):format(path:filename():string(), need))
     end

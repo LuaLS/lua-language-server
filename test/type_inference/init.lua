@@ -7,7 +7,7 @@ local vm     = require 'vm'
 rawset(_G, 'TEST', true)
 
 local function getSource(pos)
-    local state = files.getState('')
+    local state = files.getState(TESTURI)
     if not state then
         return
     end
@@ -31,15 +31,15 @@ end
 function TEST(wanted)
     return function (script)
         local newScript, catched = catch(script, '?')
-        files.setText('', newScript)
+        files.setText(TESTURI, newScript)
         local source = getSource(catched['?'][1][1])
         assert(source)
-        local result = vm.getInfer(source):view('')
+        local result = vm.getInfer(source):view(TESTURI)
         if wanted ~= result then
-            vm.getInfer(source):view('')
+            vm.getInfer(source):view(TESTURI)
         end
         assert(wanted == result)
-        files.remove('')
+        files.remove(TESTURI)
     end
 end
 

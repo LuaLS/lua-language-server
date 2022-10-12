@@ -376,7 +376,7 @@ config.set(nil, 'Lua.runtime.path', {
 
 TEST {
     {
-        path = 'D:/xxxx/1.lua',
+        path = 'tt/xxxx/1.lua',
         content = '',
     },
     {
@@ -386,7 +386,7 @@ TEST {
     },
     completion = {
         {
-            label = 'D:.xxxx',
+            label = 'tt.xxxx',
             kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
@@ -402,12 +402,12 @@ config.set(nil, 'Lua.runtime.path', originRuntimePath)
 
 local originRuntimePath = config.get(nil, 'Lua.runtime.path')
 config.set(nil, 'Lua.runtime.path', {
-    'D:/?/1.lua',
+    'tt/?/1.lua',
 })
 
 TEST {
     {
-        path = 'D:/xxxx/1.lua',
+        path = 'tt/xxxx/1.lua',
         content = '',
     },
     {

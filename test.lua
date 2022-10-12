@@ -76,17 +76,21 @@ local function main()
 
     local lclient = require 'lclient'
     local ws      = require 'workspace'
+    local furi    = require 'file-uri'
 
     --log.print = true
+
+    TESTURI = furi.encode('/unittest.lua')
 
     ---@async
     lclient():start(function (client)
         client:registerFakers()
+        local rootUri = furi.encode '/'
         client:initialize {
-            rootUri = '',
+            rootUri = rootUri,
         }
 
-        ws.awaitReady('')
+        ws.awaitReady(rootUri)
 
         print('Loaded files in', os)
         for uri in files.eachFile() do

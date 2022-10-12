@@ -465,6 +465,7 @@ function m.getAllUris(suri)
             files[i] = uri
         end
     end
+    table.sort(files)
     return files
 end
 

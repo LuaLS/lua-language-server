@@ -8,15 +8,15 @@ rawset(_G, 'TEST', true)
 function TEST(script)
     return function(expect)
         local newScript, catched = catch(script, '?')
-        files.setText('', newScript)
-        local edits = core('', catched['?'][1][1], expect.ch)
+        files.setText(TESTURI, newScript)
+        local edits = core(TESTURI, catched['?'][1][1], expect.ch)
         if edits then
             assert(expect.edits)
             assert(util.equal(edits, expect.edits))
         else
             assert(expect.edits == nil)
         end
-        files.remove('')
+        files.remove(TESTURI)
     end
 end
 

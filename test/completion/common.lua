@@ -3777,3 +3777,21 @@ acceptOptions({
 (function (results)
     assert(#results == 2)
 end)
+
+TEST [[
+local t1 = {}
+
+t1.A = {}
+t1.A.B = {}
+t1.A.B.C = 1
+
+local t2 = t1
+
+print(t2.A.<??>)
+]]
+{
+    {
+        label    = 'B',
+        kind     = define.CompletionItemKind.Field,
+    },
+}

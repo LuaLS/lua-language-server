@@ -3,6 +3,7 @@ local lang  = require 'language'
 local guide = require 'parser.guide'
 local vm    = require 'vm'
 local await = require 'await'
+local util  = require 'utility'
 
 ---@param func parser.object
 ---@return vm.node[]?
@@ -10,14 +11,23 @@ local function getDocReturns(func)
     if not func.bindDocs then
         return nil
     end
-    local returns = {}
+    ---@type table<integer, vm.node>
+    local returns = util.defaultTable(function ()
+        return vm.createNode()
+    end)
     for _, doc in ipairs(func.bindDocs) do
         if doc.type == 'doc.return' then
             for _, ret in ipairs(doc.returns) do
-                returns[ret.returnIndex] = vm.compileNode(ret)
+                returns[ret.returnIndex]:merge(vm.compileNode(ret))
+            end
+        end
+        if doc.type == 'doc.overload' then
+            for i, ret in ipairs(doc.overload.returns) do
+                returns[i]:merge(vm.compileNode(ret))
             end
         end
     end
+    setmetatable(returns, nil)
     if #returns == 0 then
         return nil
     end

@@ -1072,6 +1072,7 @@ m.register '$/status/click' {
         local result = client.awaitRequestMessage('Info', lang.script.WINDOW_LUA_STATUS_DIAGNOSIS_MSG, {
             titleDiagnostic,
             DEVELOP and 'Restart Server',
+            DEVELOP and 'Clear Node Cache',
         })
         if not result then
             return
@@ -1085,6 +1086,11 @@ m.register '$/status/click' {
             local diag = require 'provider.diagnostic'
             diag.clearAll(true)
             os.exit(0, true)
+        elseif result == 'Clear Node Cache' then
+            local vm = require 'vm'
+            vm.clearNodeCache()
+            collectgarbage()
+            collectgarbage()
         end
     end
 }

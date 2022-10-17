@@ -84,11 +84,47 @@ local function searchGlobalAndClass(key, results)
 end
 
 ---@async
-return function (key)
-    local results = {}
+---@param key string
+---@param results table[]
+local function searchClassField(key, results)
+    local class, inField = key:match('^(.+)%.(.-)$')
+    if not class then
+        return
+    end
+    local global = vm.getGlobal('type', class)
+    if not global then
+        return
+    end
+    local set = global:getAllSets()[1]
+    if not set then
+        return
+    end
+    local suri = guide.getUri(set)
+    vm.getClassFields(suri, global, nil, false, function (field, isMark)
+        if field.type == 'generic' then
+            return
+        end
+        ---@cast field -vm.generic
+        local keyName = guide.getKeyName(field)
+        if not keyName then
+            return
+        end
+        if not matchKey(inField, keyName) then
+            return
+        end
+        results[#results+1] = {
+            name  = class .. '.' .. keyName,
+            kind  = define.SymbolKind.Field,
+            uri   = guide.getUri(field),
+            range = { field.start, field.finish },
+        }
+    end)
+end
 
-    searchGlobalAndClass(key, results)
-
+---@async
+---@param key string
+---@param results table[]
+local function searchWords(key, results)
     for uri in files.eachFile() do
         searchFile(uri, key, results)
         if #results > 1000 then
@@ -96,6 +132,15 @@ return function (key)
         end
         await.delay()
     end
+end
+
+---@async
+return function (key)
+    local results = {}
+
+    searchGlobalAndClass(key, results)
+    searchClassField(key, results)
+    searchWords(key, results)
 
     return results
 end

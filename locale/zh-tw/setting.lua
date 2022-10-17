@@ -76,8 +76,16 @@ config.diagnostics.groupFileStatus =
 設定為 `Fallback` 意味著組中的診斷由 `diagnostics.neededFileStatus` 單獨設定。
 其他設定將覆蓋單獨設定，但是不會覆蓋以 `!` 結尾的設定。
 ]]
+config.diagnostics.workspaceEvent = -- TODO: need translate!
+"Set the time to trigger workspace diagnostics."
+config.diagnostics.workspaceEvent.OnChange = -- TODO: need translate!
+"Trigger workspace diagnostics when the file is changed."
+config.diagnostics.workspaceEvent.OnSave = -- TODO: need translate!
+"Trigger workspace diagnostics when the file is saved."
+config.diagnostics.workspaceEvent.None = -- TODO: need translate!
+"Disable workspace diagnostics."
 config.diagnostics.workspaceDelay =
-"進行工作區診斷的延遲（毫秒）。當你啟動工作區，或編輯了任何檔案後，將會在背景對整個工作區進行重新診斷。設定為負數可以停用工作區診斷。"
+"進行工作區診斷的延遲（毫秒）。"
 config.diagnostics.workspaceRate  =
 "工作區診斷的執行速率（百分比）。降低該值會減少CPU使用率，但是也會降低工作區診斷的速度。你目前正在編輯的檔案的診斷總是全速完成，不受該選項影響。"
 config.diagnostics.libraryFiles   =

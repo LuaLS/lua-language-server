@@ -391,6 +391,33 @@ function m.pullDiagnostic(uri, isScopeDiag)
     return full
 end
 
+---@param event string
+---@param uri uri
+function m.refreshScopeDiag(event, uri)
+    if not ws.isReady(uri) then
+        return
+    end
+    local scp     = scope.getScope(uri)
+    local scopeID = 'diagnosticsScope:' .. scp:getName()
+    await.close(scopeID)
+
+    local eventConfig = config.get(uri, 'Lua.diagnostics.workspaceEvent')
+
+    if eventConfig ~= event then
+        return
+    end
+
+    ---@async
+    await.call(function ()
+        local delay = config.get(uri, 'Lua.diagnostics.workspaceDelay') / 1000
+        if delay < 0 then
+            return
+        end
+        await.sleep(math.max(delay, 0.2))
+        m.diagnosticsScope(uri)
+    end)
+end
+
 ---@param uri uri
 function m.refresh(uri)
     if not ws.isReady(uri) then
@@ -403,19 +430,6 @@ function m.refresh(uri)
         await.setID('diag:' .. uri)
         await.sleep(0.1)
         xpcall(m.doDiagnostic, log.error, uri)
-    end)
-
-    local scp     = scope.getScope(uri)
-    local scopeID = 'diagnosticsScope:' .. scp:getName()
-    await.close(scopeID)
-    ---@async
-    await.call(function ()
-        local delay = config.get(uri, 'Lua.diagnostics.workspaceDelay') / 1000
-        if delay < 0 then
-            return
-        end
-        await.sleep(math.max(delay, 0.2))
-        m.diagnosticsScope(uri)
     end)
 end
 
@@ -613,6 +627,7 @@ files.watch(function (ev, uri) ---@async
         m.refresh(uri)
     elseif ev == 'update' then
         m.refresh(uri)
+        m.refreshScopeDiag('OnChange', uri)
     elseif ev == 'open' then
         if ws.isReady(uri) then
             m.resendDiagnostic(uri)
@@ -623,6 +638,8 @@ files.watch(function (ev, uri) ---@async
         or ws.isIgnored(uri) then
             m.clear(uri)
         end
+    elseif ev == 'save' then
+        m.refreshScopeDiag('OnSave', uri)
     end
 end)
 

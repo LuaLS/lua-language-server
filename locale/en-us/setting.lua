@@ -77,8 +77,16 @@ Modify the diagnostic needed file status in a group.
 `Fallback` means that diagnostics in this group are controlled by `diagnostics.neededFileStatus` separately.
 Other settings will override individual settings without end of `!`.
 ]]
+config.diagnostics.workspaceEvent =
+"Set the time to trigger workspace diagnostics."
+config.diagnostics.workspaceEvent.OnChange =
+"Trigger workspace diagnostics when the file is changed."
+config.diagnostics.workspaceEvent.OnSave =
+"Trigger workspace diagnostics when the file is saved."
+config.diagnostics.workspaceEvent.None =
+"Disable workspace diagnostics."
 config.diagnostics.workspaceDelay =
-"Latency (milliseconds) for workspace diagnostics. When you start the workspace, or edit any file, the entire workspace will be re-diagnosed in the background. Set to negative to disable workspace diagnostics."
+"Latency (milliseconds) for workspace diagnostics."
 config.diagnostics.workspaceRate  =
 "Workspace diagnostics run rate (%). Decreasing this value reduces CPU usage, but also reduces the speed of workspace diagnostics. The diagnosis of the file you are currently editing is always done at full speed and is not affected by this setting."
 config.diagnostics.libraryFiles   =

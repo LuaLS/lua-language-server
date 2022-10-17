@@ -76,8 +76,16 @@ config.diagnostics.groupFileStatus =
 设置为 `Fallback` 意味着组中的诊断由 `diagnostics.neededFileStatus` 单独设置。
 其他设置将覆盖单独设置，但是不会覆盖以 `!` 结尾的设置。
 ]]
+config.diagnostics.workspaceEvent =
+"设置触发工作区诊断的时机。"
+config.diagnostics.workspaceEvent.OnChange =
+"当文件发生变化时触发工作区诊断。"
+config.diagnostics.workspaceEvent.OnSave =
+"当文件保存时触发工作区诊断。"
+config.diagnostics.workspaceEvent.None =
+"关闭工作区诊断。"
 config.diagnostics.workspaceDelay =
-"进行工作区诊断的延迟（毫秒）。当你启动工作区，或编辑了任意文件后，将会在后台对整个工作区进行重新诊断。设置为负数可以禁用工作区诊断。"
+"进行工作区诊断的延迟（毫秒）。"
 config.diagnostics.workspaceRate  =
 "工作区诊断的运行速率（百分比）。降低该值会减少CPU占用，但是也会降低工作区诊断的速度。你当前正在编辑的文件的诊断总是全速完成，不受该选项影响。"
 config.diagnostics.libraryFiles   =

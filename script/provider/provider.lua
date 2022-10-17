@@ -312,6 +312,22 @@ m.register 'textDocument/didChange' {
     end
 }
 
+m.register 'textDocument/didSave' {
+    capability = {
+        textDocumentSync = {
+            save = {
+                includeText = false,
+            },
+        }
+    },
+    ---@async
+    function (params)
+        local doc    = params.textDocument
+        local uri    = files.getRealUri(doc.uri)
+        files.onWatch('save', uri)
+    end
+}
+
 m.register 'textDocument/hover' {
     capability = {
         hoverProvider = true,

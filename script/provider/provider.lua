@@ -1329,32 +1329,28 @@ m.register 'textDocument/inlayHint' {
         local results = core(uri, start, finish)
         local hintResults = {}
         for i, res in ipairs(results) do
-            local luri = guide.getUri(res.source)
+            local luri = res.source and guide.getUri(res.source) 
             local lstate = files.getState(luri)
-            if not lstate then
-                goto CONTINUE
-            end
-            hintResults[#hintResults+1] = {
+            hintResults[i] = {
                 label        = {
                     {
                         value    = res.text,
                         tooltip  = res.tooltip,
-                        location = res.source and converter.location(
+                        location = lstate and converter.location(
                             luri,
-                                    converter.packRange(
-                                        lstate,
-                                        res.source.start,
-                                        res.source.finish
-                                    )
-                                ),
+                            converter.packRange(
+                                lstate,
+                                res.source.start,
+                                res.source.finish
+                            )
+                        ),
                     },
                 },
-                position     = converter.packPosition(lstate, res.offset),
+                position     = converter.packPosition(state, res.offset),
                 kind         = res.kind,
                 paddingLeft  = true,
                 paddingRight = true,
             }
-            ::CONTINUE::
         end
         return hintResults
     end

@@ -23,6 +23,7 @@ local vm        = require 'vm.vm'
 local m = {}
 m.cache = {}
 m.sleepRest = 0.0
+m.scopeDiagCount = 0
 
 local function concat(t, sep)
     if type(t) ~= 'table' then
@@ -466,6 +467,14 @@ local function askForDisable(uri)
     end
 end
 
+local function clearMemory()
+    if m.scopeDiagCount > 0 then
+        return
+    end
+    vm.clearNodeCache()
+    collectgarbage()
+end
+
 ---@async
 function m.awaitDiagnosticsScope(suri, callback)
     local scp = scope.getScope(suri)
@@ -475,6 +484,11 @@ function m.awaitDiagnosticsScope(suri, callback)
     while loading.count() > 0 do
         await.sleep(1.0)
     end
+    m.scopeDiagCount = m.scopeDiagCount + 1
+    local scopeDiag <close> = util.defer(function ()
+        m.scopeDiagCount = m.scopeDiagCount - 1
+        clearMemory()
+    end)
     local clock = os.clock()
     local bar <close> = progress.create(suri, lang.script.WORKSPACE_DIAGNOSTIC, 1)
     local cancelled

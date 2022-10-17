@@ -9,8 +9,6 @@ local mathHuge       = math.huge
 
 local weakMT = { __mode = 'kv' }
 
-_ENV = nil
-
 ---@class vm
 local m = {}
 

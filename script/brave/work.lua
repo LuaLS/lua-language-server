@@ -26,7 +26,7 @@ brave.on('loadFile', function (path)
     return util.loadFile(path)
 end)
 
-brave.on('removeCaches', function(path)
+brave.on('removeCaches', function (path)
     local fs  = require 'bee.filesystem'
     local fsu = require 'fs-utility'
     for dir in fs.pairs(fs.path(path)) do
@@ -37,4 +37,26 @@ brave.on('removeCaches', function(path)
             fsu.fileRemove(dir)
         end
     end
+end)
+
+---@class brave.param.compile
+---@field text string
+---@field mode string
+---@field version string
+---@field options brave.param.compile.options
+
+---@class brave.param.compile.options
+---@field special table<string, string>
+---@field unicodeName boolean
+---@field nonstandardSymbol table<string, true>
+
+---@param param brave.param.compile
+brave.on('compile', function (param)
+    local parser = require 'parser'
+    local state, err = parser.compile(param.text
+        , param.mode
+        , param.version
+        , param.options
+    )
+    return state, err
 end)

@@ -260,7 +260,7 @@ end
 function m.start()
     util.enableCloseFunction()
     await.setErrorHandle(log.error)
-    pub.recruitBraves(4)
+    pub.recruitBraves(8)
     proto.listen()
     m.report()
     m.testVersion()

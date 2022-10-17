@@ -49,7 +49,6 @@ function m.reset()
     m.globalVersion  = 0
     m.fileCount      = 0
     m.astCount       = 0
-    m.astMap         = {}
 end
 
 m.reset()
@@ -252,7 +251,7 @@ function m.setText(uri, text, isTrust, callback)
     file.originText = text
     file.rows       = nil
     file.words      = nil
-    m.astMap[uri]   = nil
+    file.state      = nil
     file.cache = {}
     file.cacheActiveTime = math.huge
     m.globalVersion = m.globalVersion + 1
@@ -296,7 +295,7 @@ function m.setRawText(uri, text)
     local file = m.fileMap[uri]
     file.text             = text
     file.originText       = text
-    m.astMap[uri]         = nil
+    file.state            = nil
 end
 
 function m.getCachedRows(uri)
@@ -440,7 +439,6 @@ function m.remove(uri)
         return
     end
     m.fileMap[uri]        = nil
-    m.astMap[uri]         = nil
     m._pairsCache         = nil
 
     m.fileCount     = m.fileCount - 1
@@ -508,12 +506,60 @@ function m.getLazyCache()
     return m.lazyCache
 end
 
-function m.compileState(uri, text)
+---@param state parser.state
+---@param file file
+function m.compileStateThen(state, file)
+    file.state = state
+
+    state.uri = file.uri
+    state.lua = file.text
+    state.ast.uri = file.uri
+    state._diffInfo   = file._diffInfo
+    state.originLines = file.originLines
+    state.originText  = file.originText
+
+    local clock = os.clock()
+    parser.luadoc(state)
+    local passed = os.clock() - clock
+    if passed > 0.1 then
+        log.warn(('Parse LuaDoc of [%s] takes [%.3f] sec, size [%.3f] kb.'):format(file.uri, passed, #file.text / 1000))
+    end
+
+    if LAZY and not file.trusted then
+        local cache = m.getLazyCache()
+        local id = ('%d'):format(file.id)
+        clock = os.clock()
+        state = lazy.build(state, cache:writterAndReader(id)):entry()
+        passed = os.clock() - clock
+        if passed > 0.1 then
+            log.warn(('Convert lazy-table for [%s] takes [%.3f] sec, size [%.3f] kb.'):format(file.uri, passed, #file.text / 1000))
+        end
+    else
+        m.astCount = m.astCount + 1
+        local removed
+        setmetatable(state, {__gc = function ()
+            if removed then
+                return
+            end
+            removed = true
+            m.astCount = m.astCount - 1
+        end})
+    end
+end
+
+---@param uri uri
+---@param file file
+---@param async boolean?
+---@return parser.state?
+function m.compileState(uri, file, async)
+    if file.state then
+        return file.state
+    end
     local ws     = require 'workspace'
     local client = require 'client'
     if  not m.isOpen(uri)
     and not m.isLibrary(uri)
-    and #text >= config.get(uri, 'Lua.workspace.preloadFileSize') * 1000 then
+    and #file.text >= config.get(uri, 'Lua.workspace.preloadFileSize') * 1000 then
         if not m.notifyCache['preloadFileSize'] then
             m.notifyCache['preloadFileSize'] = {}
             m.notifyCache['skipLargeFileCount'] = 0
@@ -524,7 +570,7 @@ function m.compileState(uri, text)
             local message = lang.script('WORKSPACE_SKIP_LARGE_FILE'
                         , ws.getRelativePath(uri)
                         , config.get(uri, 'Lua.workspace.preloadFileSize')
-                        , #text / 1000
+                        , #file.text / 1000
                     )
             if m.notifyCache['skipLargeFileCount'] <= 1 then
                 client.showMessage('Info', message)
@@ -537,7 +583,7 @@ function m.compileState(uri, text)
     local prog <close> = progress.create(uri, lang.script.WINDOW_COMPILING, 0.5)
     prog:setMessage(ws.getRelativePath(uri))
     local clock = os.clock()
-    local state, err = parser.compile(text
+    local state, err = parser.compile(file.text
         , 'Lua'
         , config.get(uri, 'Lua.runtime.version')
         , {
@@ -548,48 +594,17 @@ function m.compileState(uri, text)
     )
     local passed = os.clock() - clock
     if passed > 0.1 then
-        log.warn(('Compile [%s] takes [%.3f] sec, size [%.3f] kb.'):format(uri, passed, #text / 1000))
+        log.warn(('Compile [%s] takes [%.3f] sec, size [%.3f] kb.'):format(uri, passed, #file.text / 1000))
     end
-    --await.delay()
-    if state then
-        state.uri = uri
-        state.lua = text
-        state.ast.uri = uri
 
-        local clock = os.clock()
-        parser.luadoc(state)
-        local passed = os.clock() - clock
-        if passed > 0.1 then
-            log.warn(('Parse LuaDoc of [%s] takes [%.3f] sec, size [%.3f] kb.'):format(uri, passed, #text / 1000))
-        end
-
-        local file = m.fileMap[uri]
-        if LAZY and not file.trusted then
-            local cache = m.getLazyCache()
-            local id = ('%d'):format(file.id)
-            clock = os.clock()
-            state = lazy.build(state, cache:writterAndReader(id)):entry()
-            passed = os.clock() - clock
-            if passed > 0.1 then
-                log.warn(('Convert lazy-table for [%s] takes [%.3f] sec, size [%.3f] kb.'):format(uri, passed, #text / 1000))
-            end
-        else
-            m.astCount = m.astCount + 1
-            local removed
-            setmetatable(state, {__gc = function ()
-                if removed then
-                    return
-                end
-                removed = true
-                m.astCount = m.astCount - 1
-            end})
-        end
-
-        return state
-    else
+    if not state then
         log.error('Compile failed:', uri, err)
         return nil
     end
+
+    m.compileStateThen(state, file)
+
+    return state
 end
 
 ---@class parser.state
@@ -605,16 +620,7 @@ function m.getState(uri)
     if not file then
         return nil
     end
-    local state = m.astMap[uri]
-    if not state then
-        state = m.compileState(uri, file.text)
-        m.astMap[uri] = state
-        file.state = state
-        state._diffInfo   = file._diffInfo
-        state.originLines = file.originLines
-        state.originText  = file.originText
-        --await.delay()
-    end
+    local state = m.compileState(uri, file)
     file.cacheActiveTime = timer.clock()
     return state
 end

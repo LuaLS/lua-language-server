@@ -145,7 +145,7 @@ function m.update()
 end
 
 ---创建一个进度条
----@param uri   uri
+---@param uri?  uri
 ---@param title string # 标题
 ---@param delay number # 至少经过这么久之后才会显示出来
 function m.create(uri, title, delay)

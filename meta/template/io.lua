@@ -101,7 +101,7 @@ function io.write(...) end
 ---@class file*
 local file = {}
 
----@alias readmode integer
+---@alias readmode integer|string
 ---#if VERSION >= 5.3 then
 ---| '"n"'  # ---#DESTAIL 'readmode.n'
 ---| '"a"'  # ---#DESTAIL 'readmode.a'

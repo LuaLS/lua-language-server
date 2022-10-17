@@ -89,11 +89,27 @@ local function checkValue(parent, child)
     return true
 end
 
+---@param name string
+---@param suri uri
+---@return boolean
+local function isAlias(name, suri)
+    local global = vm.getGlobal('type', name)
+    if not global then
+        return false
+    end
+    for _, set in ipairs(global:getSets(suri)) do
+        if set.type == 'doc.alias' then
+            return true
+        end
+    end
+    return false
+end
+
 ---@param uri uri
 ---@param child  vm.node|string|vm.node.object
 ---@param parent vm.node|string|vm.node.object
 ---@param mark?  table
----@return boolean
+---@return boolean?
 function vm.isSubType(uri, child, parent, mark)
     mark = mark or {}
 
@@ -109,29 +125,41 @@ function vm.isSubType(uri, child, parent, mark)
             for n in child:eachObject() do
                 if getNodeName(n) then
                     hasKnownType = true
-                    if vm.isSubType(uri, n, parent, mark) then
+                    if vm.isSubType(uri, n, parent, mark) == true then
                         return true
                     end
                 end
             end
             return not hasKnownType
         else
-            local weakNil   = config.get(uri, 'Lua.type.weakNilCheck')
+            local weakNil = config.get(uri, 'Lua.type.weakNilCheck')
             for n in child:eachObject() do
                 local nodeName = getNodeName(n)
                 if  nodeName
                 and not (nodeName == 'nil' and weakNil)
-                and not vm.isSubType(uri, n, parent, mark) then
+                and vm.isSubType(uri, n, parent, mark) == false then
                     return false
                 end
             end
             if not weakNil and child:isOptional() then
-                if not vm.isSubType(uri, 'nil', parent, mark) then
+                if vm.isSubType(uri, 'nil', parent, mark) == false then
                     return false
                 end
             end
             return true
         end
+    end
+
+    ---@cast child  vm.node.object
+    local childName = getNodeName(child)
+    if childName == 'any'
+    or childName == 'unknown' then
+        return true
+    end
+
+    if not childName
+    or isAlias(childName, uri) then
+        return nil
     end
 
     if type(parent) == 'string' then
@@ -143,7 +171,7 @@ function vm.isSubType(uri, child, parent, mark)
     elseif parent.type == 'vm.node' then
         for n in parent:eachObject() do
             if  getNodeName(n)
-            and vm.isSubType(uri, child, n, mark) then
+            and vm.isSubType(uri, child, n, mark) == true then
                 return true
             end
             if n.type == 'doc.generic.name' then
@@ -151,25 +179,24 @@ function vm.isSubType(uri, child, parent, mark)
             end
         end
         if parent:isOptional() then
-            if vm.isSubType(uri, child, 'nil', mark) then
+            if vm.isSubType(uri, child, 'nil', mark) == true then
                 return true
             end
         end
         return false
     end
 
-    ---@cast child  vm.node.object
     ---@cast parent vm.node.object
 
-    local childName  = getNodeName(child)
     local parentName = getNodeName(parent)
-    if childName  == 'any'
-    or parentName == 'any'
-    or childName  == 'unknown'
-    or parentName == 'unknown'
-    or not childName
-    or not parentName then
+    if parentName == 'any'
+    or parentName == 'unknown' then
         return true
+    end
+
+    if not parentName
+    or isAlias(parentName, uri) then
+        return nil
     end
 
     if childName == parentName then
@@ -223,14 +250,10 @@ function vm.isSubType(uri, child, parent, mark)
                     for _, ext in ipairs(set.extends) do
                         if  ext.type == 'doc.extends.name'
                         and (not isBasicType or guide.isBasicType(ext[1]))
-                        and vm.isSubType(uri, ext[1], parent, mark) then
+                        and vm.isSubType(uri, ext[1], parent, mark) == true then
                             return true
                         end
                     end
-                end
-                if set.type == 'doc.alias'
-                or set.type == 'doc.enum' then
-                    return true
                 end
             end
         end

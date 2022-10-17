@@ -834,6 +834,13 @@ local function f(x)
 end
 ]]
 
+TEST [[
+---@alias test boolean
+
+---@type test
+local <!test!> = 4
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

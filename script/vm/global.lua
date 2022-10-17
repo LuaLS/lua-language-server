@@ -42,7 +42,7 @@ function mt:addGet(uri, source)
     self.getsCache = nil
 end
 
----@param suri  uri
+---@param suri uri
 ---@return parser.object[]
 function mt:getSets(suri)
     if not self.setsCache then
@@ -68,6 +68,27 @@ function mt:getSets(suri)
     local cost = os.clock() - clock
     if cost > 0.1 then
         log.warn('global-manager getSets costs', cost, self.name)
+    end
+    return cache
+end
+
+---@return parser.object[]
+function mt:getAllSets()
+    if not self.setsCache then
+        self.setsCache = {}
+    end
+    local cache = self.setsCache['*']
+    if cache then
+        return cache
+    end
+    cache = {}
+    self.setsCache['*'] = cache
+    for _, link in pairs(self.links) do
+        if link.sets then
+            for _, source in ipairs(link.sets) do
+                cache[#cache+1] = source
+            end
+        end
     end
     return cache
 end
@@ -465,6 +486,11 @@ function vm.getGlobals(cate)
     end
 
     return globals
+end
+
+---@return table<string, vm.global>
+function vm.getAllGlobals()
+    return allGlobals
 end
 
 ---@param suri uri

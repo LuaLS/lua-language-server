@@ -3,6 +3,7 @@ local guide    = require 'parser.guide'
 local matchKey = require 'core.matchkey'
 local define   = require 'proto.define'
 local await    = require 'await'
+local vm       = require 'vm'
 
 local function buildSource(uri, source, key, results)
     if     source.type == 'local'
@@ -55,8 +56,38 @@ local function searchFile(uri, key, results)
 end
 
 ---@async
+---@param key string
+---@param results table[]
+local function searchGlobalAndClass(key, results)
+    for _, global in pairs(vm.getAllGlobals()) do
+        local name = global:getCodeName()
+        if matchKey(key, name) then
+            for _, set in ipairs(global:getAllSets()) do
+                local kind
+                if set.type == 'doc.class' then
+                    kind = define.SymbolKind.Class
+                elseif set.type == 'doc.alias' then
+                    kind = define.SymbolKind.Namespace
+                else
+                    kind = define.SymbolKind.Variable
+                end
+                results[#results+1] = {
+                    name  = name,
+                    kind  = kind,
+                    uri   = guide.getUri(set),
+                    range = { set.start, set.finish },
+                }
+            end
+            await.delay()
+        end
+    end
+end
+
+---@async
 return function (key)
     local results = {}
+
+    searchGlobalAndClass(key, results)
 
     for uri in files.eachFile() do
         searchFile(uri, key, results)

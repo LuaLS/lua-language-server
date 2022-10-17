@@ -565,7 +565,6 @@ function m.compileState(uri, text)
 
         local file = m.fileMap[uri]
         if LAZY and not file.trusted then
-            state.pushError = nil
             local cache = m.getLazyCache()
             local id = ('%d'):format(file.id)
             clock = os.clock()

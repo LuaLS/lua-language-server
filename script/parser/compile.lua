@@ -3856,8 +3856,6 @@ local function initState(lua, version, options)
         errs[#errs+1] = err
         return err
     end
-
-    state.pushError = pushError
 end
 
 return function (lua, mode, version, options)

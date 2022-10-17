@@ -8,6 +8,6 @@ return function(uri, position)
         return
     end
 
-    local pos = converter.unpackPosition(uri, position)
+    local pos = converter.unpackPosition(state, position)
     return { data = guide.positionToOffset(state, pos) }
 end

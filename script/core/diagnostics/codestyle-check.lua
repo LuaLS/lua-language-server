@@ -6,10 +6,11 @@ local pformatting = require 'provider.formatting'
 
 ---@async
 return function(uri, callback)
-    local text = files.getOriginText(uri)
-    if not text then
+    local state = files.getState(uri)
+    if not state then
         return
     end
+    local text = state.originText
 
     local suc, codeFormat  = pcall(require, 'code_format')
     if not suc then
@@ -31,8 +32,8 @@ return function(uri, callback)
     if diagnosticInfos then
         for _, diagnosticInfo in ipairs(diagnosticInfos) do
             callback {
-                start   = converter.unpackPosition(uri, diagnosticInfo.range.start),
-                finish  = converter.unpackPosition(uri, diagnosticInfo.range["end"]),
+                start   = converter.unpackPosition(state, diagnosticInfo.range.start),
+                finish  = converter.unpackPosition(state, diagnosticInfo.range["end"]),
                 message = diagnosticInfo.message
             }
         end

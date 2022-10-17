@@ -11,7 +11,7 @@ local guide     = require 'parser.guide'
 return function (data)
     local state = files.getState(data.uri)
     local text  = files.getText(data.uri)
-    if not text then
+    if not text or not state then
         return
     end
     local start    = guide.positionToOffset(state, data.start)
@@ -43,7 +43,7 @@ return function (data)
             changes = {
                 [data.uri] = {
                     {
-                        range   = converter.packRange(data.uri, data.start, data.finish),
+                        range   = converter.packRange(state, data.start, data.finish),
                         newText = luaStr,
                     }
                 }

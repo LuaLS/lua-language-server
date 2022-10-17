@@ -593,9 +593,14 @@ function m.compileState(uri, text)
     end
 end
 
+---@class parser.state
+---@field _diffInfo? table[]
+---@field originLines? integer[]
+---@field originText string
+
 --- 获取文件语法树
 ---@param uri uri
----@return table? state
+---@return parser.state? state
 function m.getState(uri)
     local file = m.fileMap[uri]
     if not file then
@@ -606,6 +611,9 @@ function m.getState(uri)
         state = m.compileState(uri, file.text)
         m.astMap[uri] = state
         file.state = state
+        state._diffInfo   = file._diffInfo
+        state.originLines = file.originLines
+        state.originText  = file.originText
         --await.delay()
     end
     file.cacheActiveTime = timer.clock()
@@ -637,43 +645,32 @@ local function isNameChar(text)
 end
 
 --- 将应用差异前的offset转换为应用差异后的offset
----@param uri    uri
+---@param state  parser.state
 ---@param offset integer
 ---@return integer start
 ---@return integer finish
-function m.diffedOffset(uri, offset)
-    local file = m.getFile(uri)
-    if not file then
+function m.diffedOffset(state, offset)
+    if not state._diffInfo then
         return offset, offset
     end
-    if not file._diffInfo then
-        return offset, offset
-    end
-    return smerger.getOffset(file._diffInfo, offset)
+    return smerger.getOffset(state._diffInfo, offset)
 end
 
 --- 将应用差异后的offset转换为应用差异前的offset
----@param uri    uri
+---@param state  parser.state
 ---@param offset integer
 ---@return integer start
 ---@return integer finish
-function m.diffedOffsetBack(uri, offset)
-    local file = m.getFile(uri)
-    if not file then
+function m.diffedOffsetBack(state, offset)
+    if not state._diffInfo then
         return offset, offset
     end
-    if not file._diffInfo then
-        return offset, offset
-    end
-    return smerger.getOffsetBack(file._diffInfo, offset)
+    return smerger.getOffsetBack(state._diffInfo, offset)
 end
 
-function m.hasDiffed(uri)
-    local file = m.getFile(uri)
-    if not file then
-        return false
-    end
-    return file._diffInfo ~= nil
+---@param state parser.state
+function m.hasDiffed(state)
+    return state._diffInfo ~= nil
 end
 
 --- 获取文件的自定义缓存信息（在文件内容更新后自动失效）

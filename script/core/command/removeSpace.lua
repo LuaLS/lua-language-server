@@ -38,7 +38,7 @@ return function (data)
         end
         local firstPos = guide.offsetToPosition(state, firstOffset) - 1
         textEdit[#textEdit+1] = {
-            range = converter.packRange(uri, firstPos, lastPos),
+            range = converter.packRange(state, firstPos, lastPos),
             newText = '',
         }
 

@@ -135,7 +135,7 @@ local function solveUndefinedGlobal(uri, diag, results)
     if not state then
         return
     end
-    local start = converter.unpackRange(uri, diag.range)
+    local start = converter.unpackRange(state, diag.range)
     guide.eachSourceContain(state.ast, start, function (source)
         if source.type ~= 'getglobal' then
             return
@@ -157,7 +157,7 @@ local function solveLowercaseGlobal(uri, diag, results)
     if not state then
         return
     end
-    local start = converter.unpackRange(uri, diag.range)
+    local start = converter.unpackRange(state, diag.range)
     guide.eachSourceContain(state.ast, start, function (source)
         if source.type ~= 'setglobal' then
             return
@@ -175,7 +175,7 @@ local function findSyntax(uri, diag)
     end
     for _, err in ipairs(state.errs) do
         if err.type:lower():gsub('_', '-') == diag.code then
-            local range = converter.packRange(uri, err.start, err.finish)
+            local range = converter.packRange(state, err.start, err.finish)
             if util.equal(range, diag.range) then
                 return err
             end
@@ -276,7 +276,11 @@ local function solveSyntax(uri, diag, results)
 end
 
 local function solveNewlineCall(uri, diag, results)
-    local start = converter.unpackRange(uri, diag.range)
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
+    local start = converter.unpackRange(state, diag.range)
     results[#results+1] = {
         title = lang.script.ACTION_ADD_SEMICOLON,
         kind = 'quickfix',
@@ -333,7 +337,7 @@ local function solveAwaitInSync(uri, diag, results)
     if not state then
         return
     end
-    local start, finish = converter.unpackRange(uri, diag.range)
+    local start, finish = converter.unpackRange(state, diag.range)
     local parentFunction
     guide.eachSourceType(state.ast, 'function', function (source)
         if source.start > finish
@@ -369,6 +373,10 @@ local function solveAwaitInSync(uri, diag, results)
 end
 
 local function solveSpell(uri, diag, results)
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
     local spell = require 'provider.spell'
     local word = diag.data
     if word == nil then
@@ -401,8 +409,8 @@ local function solveSpell(uri, diag, results)
                 changes = {
                     [uri] = {
                         {
-                            start   = converter.unpackPosition(uri, diag.range.start),
-                            finish  = converter.unpackPosition(uri, diag.range["end"]),
+                            start   = converter.unpackPosition(state, diag.range.start),
+                            finish  = converter.unpackPosition(state, diag.range["end"]),
                             newText = suggest
                         }
                     }

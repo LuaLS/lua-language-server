@@ -335,10 +335,11 @@ m.register 'textDocument/hover' {
         end
         local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_HOVER, 0.5)
         local core = require 'core.hover'
-        if not files.exists(uri) then
+        local state = files.getState(uri)
+        if not state then
             return nil
         end
-        local pos = converter.unpackPosition(uri, params.position)
+        local pos = converter.unpackPosition(state, params.position)
         local hover, source = core.byUri(uri, pos)
         if not hover or not source then
             return nil
@@ -348,7 +349,7 @@ m.register 'textDocument/hover' {
                 value = tostring(hover),
                 kind  = 'markdown',
             },
-            range = converter.packRange(uri, source.start, source.finish),
+            range = converter.packRange(state, source.start, source.finish),
         }
     end
 }
@@ -362,29 +363,42 @@ m.register 'textDocument/definition' {
     function (params)
         local uri    = files.getRealUri(params.textDocument.uri)
         workspace.awaitReady(uri)
-        if not files.exists(uri) then
+        local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_DEFINITION, 0.5)
+        local state = files.getState(uri)
+        if not state then
             return nil
         end
-        local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_DEFINITION, 0.5)
         local core   = require 'core.definition'
-        local pos = converter.unpackPosition(uri, params.position)
+        local pos = converter.unpackPosition(state, params.position)
         local result = core(uri, pos)
         if not result then
             return nil
         end
         local response = {}
         for i, info in ipairs(result) do
+            ---@type uri
             local targetUri = info.uri
             if targetUri then
-                if client.getAbility 'textDocument.definition.linkSupport' then
-                    response[i] = converter.locationLink(targetUri
-                        , converter.packRange(targetUri, info.target.start, info.target.finish)
-                        , converter.packRange(targetUri, info.target.start, info.target.finish)
-                        , converter.packRange(uri,       info.source.start, info.source.finish)
-                    )
+                local targetState = files.getState(targetUri)
+                if targetState then
+                    if client.getAbility 'textDocument.definition.linkSupport' then
+                        response[i] = converter.locationLink(targetUri
+                            , converter.packRange(targetState, info.target.start, info.target.finish)
+                            , converter.packRange(targetState, info.target.start, info.target.finish)
+                            , converter.packRange(state,       info.source.start, info.source.finish)
+                        )
+                    else
+                        response[i] = converter.location(targetUri
+                            , converter.packRange(targetState, info.target.start, info.target.finish)
+                        )
+                    end
                 else
-                    response[i] = converter.location(targetUri
-                        , converter.packRange(targetUri, info.target.start, info.target.finish)
+                    response[i] = converter.location(
+                        targetUri,
+                        converter.range(
+                            converter.position(guide.rowColOf(info.target.start)),
+                            converter.position(guide.rowColOf(info.target.finish))
+                        )
                     )
                 end
             end
@@ -402,30 +416,35 @@ m.register 'textDocument/typeDefinition' {
     function (params)
         local uri    = files.getRealUri(params.textDocument.uri)
         workspace.awaitReady(uri)
-        if not files.exists(uri) then
-            return nil
-        end
         local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_TYPE_DEFINITION, 0.5)
+        local state = files.getState(uri)
+        if not state then
+            return
+        end
         local core   = require 'core.type-definition'
-        local pos = converter.unpackPosition(uri, params.position)
+        local pos = converter.unpackPosition(state, params.position)
         local result = core(uri, pos)
         if not result then
             return nil
         end
         local response = {}
         for i, info in ipairs(result) do
+            ---@type uri
             local targetUri = info.uri
             if targetUri then
-                if client.getAbility 'textDocument.typeDefinition.linkSupport' then
-                    response[i] = converter.locationLink(targetUri
-                        , converter.packRange(targetUri, info.target.start, info.target.finish)
-                        , converter.packRange(targetUri, info.target.start, info.target.finish)
-                        , converter.packRange(uri,       info.source.start, info.source.finish)
-                    )
-                else
-                    response[i] = converter.location(targetUri
-                        , converter.packRange(targetUri, info.target.start, info.target.finish)
-                    )
+                local targetState = files.getState(targetUri)
+                if targetState then
+                    if client.getAbility 'textDocument.typeDefinition.linkSupport' then
+                        response[i] = converter.locationLink(targetUri
+                            , converter.packRange(targetState, info.target.start, info.target.finish)
+                            , converter.packRange(targetState, info.target.start, info.target.finish)
+                            , converter.packRange(state,       info.source.start, info.source.finish)
+                        )
+                    else
+                        response[i] = converter.location(targetUri
+                            , converter.packRange(targetState, info.target.start, info.target.finish)
+                        )
+                    end
                 end
             end
         end
@@ -442,22 +461,27 @@ m.register 'textDocument/references' {
     function (params)
         local uri    = files.getRealUri(params.textDocument.uri)
         workspace.awaitReady(uri)
-        if not files.exists(uri) then
+        local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_REFERENCE, 0.5)
+        local state = files.getState(uri)
+        if not state then
             return nil
         end
-        local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_REFERENCE, 0.5)
         local core   = require 'core.reference'
-        local pos    = converter.unpackPosition(uri, params.position)
+        local pos    = converter.unpackPosition(state, params.position)
         local result = core(uri, pos)
         if not result then
             return nil
         end
         local response = {}
         for i, info in ipairs(result) do
+            ---@type uri
             local targetUri = info.uri
-            response[i] = converter.location(targetUri
-                , converter.packRange(targetUri, info.target.start, info.target.finish)
-            )
+            local targetState = files.getState(targetUri)
+            if targetState then
+                response[#response+1] = converter.location(targetUri
+                    , converter.packRange(targetState, info.target.start, info.target.finish)
+                )
+            end
         end
         return response
     end
@@ -472,10 +496,11 @@ m.register 'textDocument/documentHighlight' {
         local core = require 'core.highlight'
         local uri  = files.getRealUri(params.textDocument.uri)
         workspace.awaitReady(uri)
-        if not files.exists(uri) then
+        local state = files.getState(uri)
+        if not state then
             return nil
         end
-        local pos    = converter.unpackPosition(uri, params.position)
+        local pos    = converter.unpackPosition(state, params.position)
         local result = core(uri, pos)
         if not result then
             return nil
@@ -483,7 +508,7 @@ m.register 'textDocument/documentHighlight' {
         local response = {}
         for _, info in ipairs(result) do
             response[#response+1] = {
-                range = converter.packRange(uri, info.start, info.finish),
+                range = converter.packRange(state, info.start, info.finish),
                 kind  = info.kind,
             }
         end
@@ -502,12 +527,13 @@ m.register 'textDocument/rename' {
     function (params)
         local uri  = files.getRealUri(params.textDocument.uri)
         workspace.awaitReady(uri)
-        if not files.exists(uri) then
+        local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_RENAME, 0.5)
+        local state = files.getState(uri)
+        if not state then
             return nil
         end
-        local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_RENAME, 0.5)
         local core = require 'core.rename'
-        local pos    = converter.unpackPosition(uri, params.position)
+        local pos    = converter.unpackPosition(state, params.position)
         local result = core.rename(uri, pos, params.newName)
         if not result then
             return nil
@@ -516,12 +542,16 @@ m.register 'textDocument/rename' {
             changes = {},
         }
         for _, info in ipairs(result) do
-            local ruri   = info.uri
-            if not workspaceEdit.changes[ruri] then
-                workspaceEdit.changes[ruri] = {}
+            ---@type uri
+            local ruri = info.uri
+            local rstate = files.getState(ruri)
+            if rstate then
+                if not workspaceEdit.changes[ruri] then
+                    workspaceEdit.changes[ruri] = {}
+                end
+                local textEdit = converter.textEdit(converter.packRange(rstate, info.start, info.finish), info.text)
+                workspaceEdit.changes[ruri][#workspaceEdit.changes[ruri]+1] = textEdit
             end
-            local textEdit = converter.textEdit(converter.packRange(ruri, info.start, info.finish), info.text)
-            workspaceEdit.changes[ruri][#workspaceEdit.changes[ruri]+1] = textEdit
         end
         return workspaceEdit
     end
@@ -532,16 +562,17 @@ m.register 'textDocument/prepareRename' {
     function (params)
         local core = require 'core.rename'
         local uri  = files.getRealUri(params.textDocument.uri)
-        if not files.exists(uri) then
+        local state = files.getState(uri)
+        if not state then
             return nil
         end
-        local pos    = converter.unpackPosition(uri, params.position)
+        local pos    = converter.unpackPosition(state, params.position)
         local result = core.prepareRename(uri, pos)
         if not result then
             return nil
         end
         return {
-            range       = converter.packRange(uri, result.start, result.finish),
+            range       = converter.packRange(state, result.start, result.finish),
             placeholder = result.text,
         }
     end
@@ -571,8 +602,9 @@ m.register 'textDocument/completion' {
         local core  = require 'core.completion'
         --log.debug('textDocument/completion')
         --log.debug('completion:', params.context and params.context.triggerKind, params.context and params.context.triggerCharacter)
-        if not files.exists(uri) then
-            return nil
+        local state = files.getState(uri)
+        if not state then
+            return
         end
         local triggerCharacter = params.context and params.context.triggerCharacter
         if config.get(uri, 'editor.acceptSuggestionOnEnter') ~= 'off' then
@@ -584,7 +616,7 @@ m.register 'textDocument/completion' {
         end
         --await.setPriority(1000)
         local clock  = os.clock()
-        local pos    = converter.unpackPosition(uri, params.position)
+        local pos    = converter.unpackPosition(state, params.position)
         local result = core.completion(uri, pos, triggerCharacter)
         local passed = os.clock() - clock
         if passed > 0.1 then
@@ -611,7 +643,7 @@ m.register 'textDocument/completion' {
                 command          = res.command,
                 textEdit         = res.textEdit and {
                     range   = converter.packRange(
-                        uri,
+                        state,
                         res.textEdit.start,
                         res.textEdit.finish
                     ),
@@ -622,7 +654,7 @@ m.register 'textDocument/completion' {
                     for j, edit in ipairs(res.additionalTextEdits) do
                         t[j] = {
                             range   = converter.packRange(
-                                uri,
+                                state,
                                 edit.start,
                                 edit.finish
                             ),
@@ -676,6 +708,10 @@ m.register 'completionItem/resolve' {
         local id            = item.data.id
         local uri           = item.data.uri
         --await.setPriority(1000)
+        local state = files.getState(uri)
+        if not state then
+            return nil
+        end
         local resolved = core.resolve(id)
         if not resolved then
             return nil
@@ -690,7 +726,7 @@ m.register 'completionItem/resolve' {
             for j, edit in ipairs(resolved.additionalTextEdits) do
                 t[j] = {
                     range   = converter.packRange(
-                        uri,
+                        state,
                         edit.start,
                         edit.finish
                     ),
@@ -717,11 +753,12 @@ m.register 'textDocument/signatureHelp' {
             return nil
         end
         workspace.awaitReady(uri)
-        if not files.exists(uri) then
+        local state = files.getState(uri)
+        if not state then
             return nil
         end
         local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_SIGNATURE, 0.5)
-        local pos = converter.unpackPosition(uri, params.position)
+        local pos = converter.unpackPosition(state, params.position)
         local core = require 'core.signature'
         local results = core(uri, pos)
         if not results then
@@ -764,7 +801,10 @@ m.register 'textDocument/documentSymbol' {
         local uri   = files.getRealUri(params.textDocument.uri)
         workspace.awaitReady(uri)
         local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_SYMBOL, 0.5)
-
+        local state = files.getState(uri)
+        if not state then
+            return nil
+        end
         local core = require 'core.document-symbol'
         local symbols = core(uri)
         if not symbols then
@@ -775,12 +815,12 @@ m.register 'textDocument/documentSymbol' {
         local function convert(symbol)
             await.delay()
             symbol.range = converter.packRange(
-                uri,
+                state,
                 symbol.range[1],
                 symbol.range[2]
             )
             symbol.selectionRange = converter.packRange(
-                uri,
+                state,
                 symbol.selectionRange[1],
                 symbol.selectionRange[2]
             )
@@ -821,11 +861,13 @@ m.register 'textDocument/codeAction' {
         local uri         = files.getRealUri(params.textDocument.uri)
         local range       = params.range
         local diagnostics = params.context.diagnostics
-        if not files.exists(uri) then
+
+        local state = files.getState(uri)
+        if not state then
             return nil
         end
 
-        local start, finish = converter.unpackRange(uri, range)
+        local start, finish = converter.unpackRange(state, range)
         local results = core(uri, start, finish, diagnostics)
 
         if not results or #results == 0 then
@@ -834,11 +876,15 @@ m.register 'textDocument/codeAction' {
 
         for _, res in ipairs(results) do
             if res.edit then
+                ---@param turi uri
                 for turi, changes in pairs(res.edit.changes) do
-                    for _, change in ipairs(changes) do
-                        change.range = converter.packRange(turi, change.start, change.finish)
-                        change.start  = nil
-                        change.finish = nil
+                    local tstate = files.getState(turi)
+                    if tstate then
+                        for _, change in ipairs(changes) do
+                            change.range = converter.packRange(tstate, change.start, change.finish)
+                            change.start  = nil
+                            change.finish = nil
+                        end
                     end
                 end
             end
@@ -898,22 +944,31 @@ m.register 'workspace/symbol' {
         end
 
         local function convert(symbol)
-            symbol.location = converter.location(
-                symbol.uri,
-                converter.packRange(
+            local state = files.getState(symbol.uri)
+            if not state then
+                return nil
+            end
+            return {
+                name = symbol.name,
+                kind = symbol.kind,
+                location = converter.location(
                     symbol.uri,
-                    symbol.range[1],
-                    symbol.range[2]
+                    converter.packRange(
+                        state,
+                        symbol.range[1],
+                        symbol.range[2]
+                    )
                 )
-            )
-            symbol.uri = nil
+            }
         end
+
+        local results = {}
 
         for _, symbol in ipairs(symbols) do
-            convert(symbol)
+            results[#results+1] = convert(symbol)
         end
 
-        return symbols
+        return results
     end
 }
 
@@ -978,8 +1033,12 @@ m.register 'textDocument/semanticTokens/range' {
         workspace.awaitReady(uri)
         local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_SEMANTIC_RANGE, 0.5)
         await.sleep(0.0)
+        local state = files.getState(uri)
+        if not state then
+            return nil
+        end
         local core = require 'core.semantic-tokens'
-        local start, finish = converter.unpackRange(uri, params.range)
+        local start, finish = converter.unpackRange(state, params.range)
         local results = core(uri, start, finish)
         return {
             data = results
@@ -999,6 +1058,10 @@ m.register 'textDocument/foldingRange' {
         if not files.exists(uri) then
             return nil
         end
+        local state = files.getState(uri)
+        if not state then
+            return nil
+        end
         local regions = core(uri)
         if not regions then
             return nil
@@ -1006,8 +1069,8 @@ m.register 'textDocument/foldingRange' {
 
         local results = {}
         for _, region in ipairs(regions) do
-            local startLine = converter.packPosition(uri, region.start).line
-            local endLine   = converter.packPosition(uri, region.finish).line
+            local startLine = converter.packPosition(state, region.start).line
+            local endLine   = converter.packPosition(state, region.finish).line
             if not region.hideLastLine then
                 endLine = endLine - 1
             end
@@ -1033,7 +1096,8 @@ m.register 'textDocument/documentColor' {
         local color = require 'core.color'
         local uri     = files.getRealUri(params.textDocument.uri)
         workspace.awaitReady(uri)
-        if not files.exists(uri) then
+        local state = files.getState(uri)
+        if not state then
             return nil
         end
         local colors = color.colors(uri)
@@ -1043,7 +1107,7 @@ m.register 'textDocument/documentColor' {
         local results = {}
         for _, colorValue in ipairs(colors) do
             results[#results+1] = {
-                range = converter.packRange(uri, colorValue.start, colorValue.finish),
+                range = converter.packRange(state, colorValue.start, colorValue.finish),
                 color = colorValue.color
             }
         end
@@ -1103,7 +1167,8 @@ m.register 'textDocument/formatting' {
     function(params)
         local uri = files.getRealUri(params.textDocument.uri)
 
-        if not files.exists(uri) then
+        local state = files.getState(uri)
+        if not state then
             return nil
         end
 
@@ -1123,7 +1188,7 @@ m.register 'textDocument/formatting' {
         local results = {}
         for i, edit in ipairs(edits) do
             results[i] = {
-                range   = converter.packRange(uri, edit.start, edit.finish),
+                range   = converter.packRange(state, edit.start, edit.finish),
                 newText = edit.text,
             }
         end
@@ -1140,7 +1205,8 @@ m.register 'textDocument/rangeFormatting' {
     function(params)
         local uri = files.getRealUri(params.textDocument.uri)
 
-        if not files.exists(uri) then
+        local state = files.getState(uri)
+        if not state then
             return nil
         end
 
@@ -1160,7 +1226,7 @@ m.register 'textDocument/rangeFormatting' {
         local results = {}
         for i, edit in ipairs(edits) do
             results[i] = {
-                range   = converter.packRange(uri, edit.start, edit.finish),
+                range   = converter.packRange(state, edit.start, edit.finish),
                 newText = edit.text,
             }
         end
@@ -1183,11 +1249,12 @@ m.register 'textDocument/onTypeFormatting' {
         workspace.awaitReady(uri)
         local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_TYPE_FORMATTING, 0.5)
         local ch     = params.ch
-        if not files.exists(uri) then
+        local state  = files.getState(uri)
+        if not state then
             return nil
         end
         local core   = require 'core.type-formatting'
-        local pos    = converter.unpackPosition(uri, params.position)
+        local pos    = converter.unpackPosition(state, params.position)
         local edits  = core(uri, pos, ch, params.options)
         if not edits or #edits == 0 then
             return nil
@@ -1199,7 +1266,7 @@ m.register 'textDocument/onTypeFormatting' {
         local results = {}
         for i, edit in ipairs(edits) do
             results[i] = {
-                range   = converter.packRange(uri, edit.start, edit.finish),
+                range   = converter.packRange(state, edit.start, edit.finish),
                 newText = edit.text:gsub('\t', tab),
             }
         end
@@ -1221,14 +1288,18 @@ m.register '$/requestHint' {
             return
         end
         workspace.awaitReady(uri)
+        local state = files.getState(uri)
+        if not state then
+            return
+        end
         local core = require 'core.hint'
-        local start, finish = converter.unpackRange(uri, params.range)
+        local start, finish = converter.unpackRange(state, params.range)
         local results = core(uri, start, finish)
         local hintResults = {}
         for i, res in ipairs(results) do
             hintResults[i] = {
                 text = res.text,
-                pos  = converter.packPosition(uri, res.offset),
+                pos  = converter.packPosition(state, res.offset),
                 kind = res.kind,
             }
         end
@@ -1246,34 +1317,44 @@ m.register 'textDocument/inlayHint' {
     function (params)
         local uri  = files.getRealUri(params.textDocument.uri)
         if not config.get(uri, 'Lua.hint.enable') then
-            return
+            return nil
         end
         workspace.awaitReady(uri)
         local core = require 'core.hint'
-        local start, finish = converter.unpackRange(uri, params.range)
+        local state = files.getState(uri)
+        if not state then
+            return nil
+        end
+        local start, finish = converter.unpackRange(state, params.range)
         local results = core(uri, start, finish)
         local hintResults = {}
         for i, res in ipairs(results) do
-            hintResults[i] = {
+            local luri = guide.getUri(res.source)
+            local lstate = files.getState(luri)
+            if not lstate then
+                goto CONTINUE
+            end
+            hintResults[#hintResults+1] = {
                 label        = {
                     {
                         value    = res.text,
                         tooltip  = res.tooltip,
                         location = res.source and converter.location(
-                                    guide.getUri(res.source),
+                            luri,
                                     converter.packRange(
-                                        guide.getUri(res.source),
+                                        lstate,
                                         res.source.start,
                                         res.source.finish
                                     )
                                 ),
                     },
                 },
-                position     = converter.packPosition(uri, res.offset),
+                position     = converter.packPosition(lstate, res.offset),
                 kind         = res.kind,
                 paddingLeft  = true,
                 paddingRight = true,
             }
+            ::CONTINUE::
         end
         return hintResults
     end

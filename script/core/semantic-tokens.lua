@@ -699,13 +699,15 @@ local Care = util.switch()
         }
     end)
 
-local function buildTokens(uri, results)
+---@param state table
+---@param results table
+local function buildTokens(state, results)
     local tokens = {}
     local lastLine = 0
     local lastStartChar = 0
     for i, source in ipairs(results) do
-        local startPos  = converter.packPosition(uri, source.start)
-        local finishPos = converter.packPosition(uri, source.finish)
+        local startPos  = converter.packPosition(state, source.start)
+        local finishPos = converter.packPosition(state, source.finish)
         local line      = startPos.line
         local startChar = startPos.character
         local deltaLine = line - lastLine
@@ -881,7 +883,7 @@ return function (uri, start, finish)
 
     results = solveMultilineAndOverlapping(state, results)
 
-    local tokens = buildTokens(uri, results)
+    local tokens = buildTokens(state, results)
 
     return tokens
 end

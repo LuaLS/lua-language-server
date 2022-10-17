@@ -382,10 +382,14 @@ end
 ---@param uri   uri
 ---@param edits textEditor[]
 function m.editText(uri, edits)
-    local files     = require 'files'
+    local files = require 'files'
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
     local textEdits = {}
     for i, edit in ipairs(edits) do
-        textEdits[i] = converter.textEdit(converter.packRange(uri, edit.start, edit.finish), edit.text)
+        textEdits[i] = converter.textEdit(converter.packRange(state, edit.start, edit.finish), edit.text)
     end
     proto.request('workspace/applyEdit', {
         edit = {

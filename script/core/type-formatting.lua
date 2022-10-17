@@ -199,22 +199,22 @@ local function typeFormat(results, uri, position, ch, options)
         return
     end
     local converter = require("proto.converter")
-    local pos = converter.packPosition(uri, position)
+    local pos = converter.packPosition(state, position)
     local typeFormatOptions = config.get(uri, 'Lua.typeFormat.config')
     local success, result = codeFormat.type_format(uri, text, pos.line, pos.character, options, typeFormatOptions)
     if success then
         local range = result.range
         results[#results+1] = {
             text   = result.newText,
-            start  = converter.unpackPosition(uri, { line = range.start.line, character = range.start.character }),
-            finish = converter.unpackPosition(uri, { line = range["end"].line, character = range["end"].character }),
+            start  = converter.unpackPosition(state, { line = range.start.line, character = range.start.character }),
+            finish = converter.unpackPosition(state, { line = range["end"].line, character = range["end"].character }),
         }
     end
 end
 
 return function (uri, position, ch, options)
-    local ast = files.getState(uri)
-    if not ast then
+    local state = files.getState(uri)
+    if not state then
         return nil
     end
 

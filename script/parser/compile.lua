@@ -3818,6 +3818,7 @@ local function initState(lua, version, options)
     Index               = 1
     ---@class parser.state
     ---@field uri uri
+    ---@field lines integer[]
     local state = {
         version = version,
         lua     = lua,

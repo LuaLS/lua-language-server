@@ -27,8 +27,8 @@ local function toPsiNode(astNode, state)
 
     local startOffset = guide.positionToOffset(state, astNode.start)
     local finishOffset = guide.positionToOffset(state, astNode.finish)
-    local startPosition = converter.packPosition(state.uri, astNode.start)
-    local finishPosition = converter.packPosition(state.uri, astNode.finish)
+    local startPosition = converter.packPosition(state, astNode.start)
+    local finishPosition = converter.packPosition(state, astNode.finish)
     return {
         name = string.format("%s@[%d:%d .. %d:%d]",
             astNode.type,

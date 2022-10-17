@@ -32,8 +32,9 @@ local function concat(t, sep)
 end
 
 local function buildSyntaxError(uri, err)
-    local text    = files.getText(uri)
-    if not text then
+    local state = files.getState(uri)
+    local text  = files.getText(uri)
+    if not text or not state then
         return
     end
     local message = lang.script('PARSER_' .. err.type, err.info)
@@ -58,16 +59,19 @@ local function buildSyntaxError(uri, err)
                 rmessage = text:sub(rel.start, rel.finish)
             end
             local relUri = rel.uri or uri
-            relatedInformation[#relatedInformation+1] = {
-                message  = rmessage,
-                location = converter.location(relUri, converter.packRange(relUri, rel.start, rel.finish)),
-            }
+            local relState = files.getState(relUri)
+            if relState then
+                relatedInformation[#relatedInformation+1] = {
+                    message  = rmessage,
+                    location = converter.location(relUri, converter.packRange(relState, rel.start, rel.finish)),
+                }
+            end
         end
     end
 
     return {
         code     = err.type:lower():gsub('_', '-'),
-        range    = converter.packRange(uri, err.start, err.finish),
+        range    = converter.packRange(state, err.start, err.finish),
         severity = define.DiagnosticSeverity[err.level],
         source   = lang.script.DIAG_SYNTAX_CHECK,
         message  = message,
@@ -78,7 +82,8 @@ local function buildSyntaxError(uri, err)
 end
 
 local function buildDiagnostic(uri, diag)
-    if not files.exists(uri) then
+    local state = files.getState(uri)
+    if not state then
         return
     end
 
@@ -90,16 +95,20 @@ local function buildDiagnostic(uri, diag)
             if not rtext then
                 goto CONTINUE
             end
+            local relState = files.getState(rel.uri)
+            if not relState then
+                goto CONTINUE
+            end
             relatedInformation[#relatedInformation+1] = {
                 message  = rel.message or rtext:sub(rel.start, rel.finish),
-                location = converter.location(rel.uri, converter.packRange(rel.uri, rel.start, rel.finish))
+                location = converter.location(rel.uri, converter.packRange(relState, rel.start, rel.finish))
             }
             ::CONTINUE::
         end
     end
 
     return {
-        range    = converter.packRange(uri, diag.start, diag.finish),
+        range    = converter.packRange(state, diag.start, diag.finish),
         source   = lang.script.DIAG_DIAGNOSTICS,
         severity = diag.level,
         message  = diag.message,

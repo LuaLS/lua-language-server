@@ -35,6 +35,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
   * `missing-return-value`
   * `redundant-return-value`
   * `return-type-mismatch`
+* `CHG` workspace-symbol: supports chain fields based on global variables and types. try `io.open` or `iolib.open`
 * `FIX` [#1567]
 * `FIX` [#1593]
 * `FIX` [#1595]

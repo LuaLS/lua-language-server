@@ -1,1 +1,2 @@
-files = { "ecs.so", 'ecs.lua' }
+name  = "luaecs"
+words = { "ecs%.world()" }

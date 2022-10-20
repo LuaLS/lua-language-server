@@ -231,6 +231,7 @@ function meta:group_enable(tagname, ...) end
 ---@return string # tag | lua | c  | M._TYPE*
 function meta:type(name) end
 
+---This will reset `tagname`'s component pool.
 ---Set tag on entitys in pattern `pat`
 ---@param tagname string
 ---@param pat string
@@ -385,7 +386,7 @@ function meta:__gc(...) end
 function meta:group_add(groupid, eid) end
 
 ---C API. Add tag of group's entitys
----**NOTICE: this call will clear the reset the tag's groups.**
+---**NOTICE: this call will clear the the tag's component pool.**
 ---@param tagid number
 ---@param ... number #max number is 1024
 ---@see ECSWorld#group_enable

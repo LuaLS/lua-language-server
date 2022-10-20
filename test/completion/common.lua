@@ -3847,3 +3847,60 @@ print(t2.A.<??>)
         kind     = define.CompletionItemKind.Field,
     },
 }
+
+TEST [[
+---@overload fun(x: number)
+---@overload fun(x: number, y: number)
+local function fff(...)
+end
+
+fff<??>
+]]
+{
+    {
+        label    = 'fff(x)',
+        kind     = define.CompletionItemKind.Function,
+    },
+    {
+        label    = 'fff(x, y)',
+        kind     = define.CompletionItemKind.Function,
+    },
+}
+
+TEST [[
+---@overload fun(x: number)
+---@overload fun(x: number, y: number)
+function fff(...)
+end
+
+fff<??>
+]]
+{
+    {
+        label    = 'fff(x)',
+        kind     = define.CompletionItemKind.Function,
+    },
+    {
+        label    = 'fff(x, y)',
+        kind     = define.CompletionItemKind.Function,
+    },
+}
+
+TEST [[
+---@overload fun(x: number)
+---@overload fun(x: number, y: number)
+function t.fff(...)
+end
+
+t.fff<??>
+]]
+{
+    {
+        label    = 'fff(x)',
+        kind     = define.CompletionItemKind.Function,
+    },
+    {
+        label    = 'fff(x, y)',
+        kind     = define.CompletionItemKind.Function,
+    },
+}

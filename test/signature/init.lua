@@ -316,3 +316,16 @@ X({}, <??>)
 {
 'function X(a: { x: number, y: number, z: number }, <!b: string!>)'
 }
+
+TEST [[
+---@overload fun(x: number)
+---@overload fun(x: number, y: number)
+local function f(...)
+end
+
+f(<??>)
+]]
+{
+'function f(<!x: number!>)',
+'function f(<!x: number!>, y: number)',
+}

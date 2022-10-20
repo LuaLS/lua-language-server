@@ -137,7 +137,7 @@ local function makeSignatures(text, call, pos)
     node = node:getData 'originNode' or node
     local mark = {}
     for src in node:eachObject() do
-        if src.type == 'function'
+        if (src.type == 'function' and not vm.isVarargFunctionWithOverloads(src))
         or src.type == 'doc.type.function' then
             if not mark[src] then
                 mark[src] = true

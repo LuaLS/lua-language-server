@@ -36,6 +36,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
   * `redundant-return-value`
   * `return-type-mismatch`
 * `CHG` workspace-symbol: supports chain fields based on global variables and types. try `io.open` or `iolib.open`
+* `CHG` [#1641] if a function only has varargs and has `---@overload`, the varargs will be ignored
 * `FIX` [#1567]
 * `FIX` [#1593]
 * `FIX` [#1595]
@@ -59,6 +60,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 [#1608]: https://github.com/sumneko/lua-language-server/issues/1608
 [#1626]: https://github.com/sumneko/lua-language-server/issues/1626
 [#1637]: https://github.com/sumneko/lua-language-server/issues/1637
+[#1641]: https://github.com/sumneko/lua-language-server/issues/1641
 [#1642]: https://github.com/sumneko/lua-language-server/issues/1642
 
 ## 3.5.6

@@ -58,5 +58,8 @@ brave.on('compile', function (param)
         , param.version
         , param.options
     )
-    return state, err
+    return {
+        state = state,
+        err   = err,
+    }
 end)

@@ -16,6 +16,7 @@ local scope    = require 'workspace.scope'
 local lazy     = require 'lazytable'
 local cacher   = require 'lazy-cacher'
 local sp       = require 'bee.subprocess'
+local pub      = require 'pub'
 
 ---@class file
 ---@field uri          uri
@@ -554,10 +555,13 @@ function m.compileStateThen(state, file)
 end
 
 ---@param uri uri
----@param file file
 ---@param async boolean?
 ---@return parser.state?
-function m.compileState(uri, file, async)
+function m.compileState(uri, async)
+    local file = m.fileMap[uri]
+    if not file then
+        return
+    end
     if file.state then
         return file.state
     end
@@ -586,17 +590,41 @@ function m.compileState(uri, file, async)
         end
         return nil
     end
+
+    ---@type brave.param.compile.options
+    local options = {
+        special           = config.get(uri, 'Lua.runtime.special'),
+        unicodeName       = config.get(uri, 'Lua.runtime.unicodeName'),
+        nonstandardSymbol = util.arrayToHash(config.get(uri, 'Lua.runtime.nonstandardSymbol')),
+    }
+
+    if async then
+        ---@type brave.param.compile
+        local params = {
+            text    = file.text,
+            mode    = 'Lua',
+            version = config.get(uri, 'Lua.runtime.version'),
+            options = options
+        }
+        pub.task('compile', params, function (result)
+            if file.text ~= params.text then
+                return
+            end
+            if not result.state then
+                log.error('Compile failed:', uri, result.err)
+                return
+            end
+            m.compileStateThen(result.state, file)
+        end)
+    end
+
     local prog <close> = progress.create(uri, lang.script.WINDOW_COMPILING, 0.5)
     prog:setMessage(ws.getRelativePath(uri))
     local clock = os.clock()
     local state, err = parser.compile(file.text
         , 'Lua'
         , config.get(uri, 'Lua.runtime.version')
-        , {
-            special           = config.get(uri, 'Lua.runtime.special'),
-            unicodeName       = config.get(uri, 'Lua.runtime.unicodeName'),
-            nonstandardSymbol = util.arrayToHash(config.get(uri, 'Lua.runtime.nonstandardSymbol')),
-        }
+        , options
     )
     local passed = os.clock() - clock
     if passed > 0.1 then
@@ -626,7 +654,7 @@ function m.getState(uri)
     if not file then
         return nil
     end
-    local state = m.compileState(uri, file)
+    local state = m.compileState(uri)
     file.cacheActiveTime = timer.clock()
     return state
 end

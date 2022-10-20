@@ -1107,6 +1107,37 @@ z<??>
 config.set(nil, 'Lua.runtime.version', 'Lua 5.4')
 
 TEST [[
+中文字段 = 1
+
+中文<??>
+]]
+{
+    {
+        label = '中文字段',
+        kind = define.CompletionItemKind.Enum,
+        textEdit = {
+            start = 20000,
+            finish = 20006,
+            newText = '_ENV["中文字段"]',
+        },
+    },
+}
+
+config.set(nil, 'Lua.runtime.unicodeName', true)
+TEST [[
+中文字段 = 1
+
+中文<??>
+]]
+{
+    {
+        label = '中文字段',
+        kind = define.CompletionItemKind.Enum,
+    },
+}
+config.set(nil, 'Lua.runtime.unicodeName', false)
+
+TEST [[
 io.close(1, <??>)
 ]]
 (nil)

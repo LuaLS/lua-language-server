@@ -364,7 +364,7 @@ local function checkModule(state, word, position, results)
         if  not locals[stemName]
         and not vm.hasGlobalSets(state.uri, 'variable', stemName)
         and not globals[stemName]
-        and stemName:match '^[%a_][%w_]*$'
+        and stemName:match(guide.namePatternFull)
         and matchKey(word, stemName) then
             local targetState = files.getState(uri)
             if not targetState then
@@ -422,8 +422,11 @@ local function checkModule(state, word, position, results)
 end
 
 local function checkFieldFromFieldToIndex(state, name, src, parent, word, startPos, position)
-    if name:match '^[%a_][%w_]*$' then
-        return nil
+    if name:match(guide.namePatternFull) then
+        if not name:match '[\x80-\xff]'
+        or config.get(state.uri, 'Lua.runtime.unicodeName') then
+            return nil
+        end
     end
     local textEdit, additionalTextEdits
     local startOffset = guide.positionToOffset(state, startPos)
@@ -726,7 +729,7 @@ local function checkCommon(state, word, position, results)
             end
         end
     end
-    for str, offset in state.lua:gmatch '([%a_][%w_]+)()' do
+    for str, offset in state.lua:gmatch('(' .. guide.namePattern .. ')()') do
         if #results >= 100 then
             results.incomplete = true
             break

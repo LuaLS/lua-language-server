@@ -1069,7 +1069,7 @@ t['<??>']
 }
 
 TEST [[
-_ENV['z.b.c'] = {}
+_G['z.b.c'] = {}
 
 z<??>
 ]]
@@ -1084,6 +1084,27 @@ z<??>
         },
     },
 }
+
+config.set(nil, 'Lua.runtime.version', 'Lua 5.1')
+
+TEST [[
+_G['z.b.c'] = {}
+
+z<??>
+]]
+{
+    {
+        label = 'z.b.c',
+        kind = define.CompletionItemKind.Field,
+        textEdit = {
+            start = 20000,
+            finish = 20001,
+            newText = '_G["z.b.c"]',
+        },
+    },
+}
+
+config.set(nil, 'Lua.runtime.version', 'Lua 5.4')
 
 TEST [[
 io.close(1, <??>)

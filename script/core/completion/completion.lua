@@ -474,8 +474,8 @@ local function checkFieldFromFieldToIndex(state, name, src, parent, word, startP
             }
         end
     else
-        if config.get(state.uri, 'Lua.runtime.version') == 'lua 5.1'
-        or config.get(state.uri, 'Lua.runtime.version') == 'luaJIT' then
+        if config.get(state.uri, 'Lua.runtime.version') == 'Lua 5.1'
+        or config.get(state.uri, 'Lua.runtime.version') == 'LuaJIT' then
             textEdit.newText = '_G' .. textEdit.newText
         else
             textEdit.newText = '_ENV' .. textEdit.newText

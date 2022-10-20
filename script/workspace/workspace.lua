@@ -558,7 +558,9 @@ config.watch(function (uri, key, value, oldValue)
     or key:find '^Lua.type'
     or key:find '^files' then
         if value ~= oldValue then
-            m.reload(scope.getScope(uri))
+            local scp = scope.getScope(uri)
+            m.reload(scp)
+            m.resetFiles(scp)
         end
     end
 end)

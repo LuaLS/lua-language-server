@@ -283,6 +283,9 @@ end
 
 function m.resetText(uri)
     local file = m.fileMap[uri]
+    if not file then
+        return
+    end
     local originText = file.originText
     file.originText = nil
     m.setText(uri, originText, file.trusted)

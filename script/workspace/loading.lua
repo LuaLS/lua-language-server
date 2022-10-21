@@ -88,7 +88,12 @@ function mt:loadFile(uri, libraryUri)
                 self._cache[uri] = true
                 log.debug(('Skip loaded file: %s'):format(uri))
             else
-                local content = pub.awaitTask('loadFile', furi.decode(uri))
+                local content
+                if COMPILECORES then
+                    content = util.loadFile(furi.decode(uri))
+                else
+                    content = pub.awaitTask('loadFile', furi.decode(uri))
+                end
                 self.read = self.read + 1
                 self:update()
                 if not content then

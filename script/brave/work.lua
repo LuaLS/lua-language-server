@@ -40,6 +40,7 @@ brave.on('removeCaches', function (path)
 end)
 
 ---@class brave.param.compile
+---@field uri uri
 ---@field text string
 ---@field mode string
 ---@field version string
@@ -53,11 +54,13 @@ end)
 ---@param param brave.param.compile
 brave.on('compile', function (param)
     local parser = require 'parser'
+    local clock = os.clock()
     local state, err = parser.compile(param.text
         , param.mode
         , param.version
         , param.options
     )
+    log.debug('compile', param.uri, 'takes:', os.clock() - clock)
     return {
         state = state,
         err   = err,

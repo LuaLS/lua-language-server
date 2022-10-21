@@ -601,6 +601,7 @@ function m.compileState(uri, async)
     if async then
         ---@type brave.param.compile
         local params = {
+            uri     = uri,
             text    = file.text,
             mode    = 'Lua',
             version = config.get(uri, 'Lua.runtime.version'),

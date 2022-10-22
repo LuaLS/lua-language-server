@@ -17,11 +17,21 @@
 ---  <tr>
 ---    <td>macOS</td>
 ---    <td><code>/Users/&lt;user&gt;/Library/Application Support/LOVR/&lt;identity&gt;</code></td>
+---  </tr>
+---  <tr>
+---    <td>Linux</td>
+---    <td><code>/home/&lt;user&gt;/.local/share/LOVR/&lt;identity&gt;</code></td>
+---  </tr>
+---  <tr>
+---    <td>Android</td>
+---    <td><code>/sdcard/Android/data/<identity>/files</code></td>
 ---  </tr> </table>
 ---
 ---`<identity>` should be a unique identifier for your app.
 ---
 ---It can be set either in `lovr.conf` or by using `lovr.filesystem.setIdentity`.
+---
+---On Android, the identity can not be changed and will always be the package id, like `org.lovr.app`.
 ---
 ---All filenames are relative to either the save directory or the directory containing the project source.
 ---
@@ -277,14 +287,6 @@ function lovr.filesystem.setIdentity(identity) end
 ---
 ---@param path? string # An optional semicolon separated list of search patterns.
 function lovr.filesystem.setRequirePath(path) end
-
----
----Sets the location of the project's source.
----
----This can only be done once, and is usually done internally.
----
----@param identity string # The path containing the project's source.
-function lovr.filesystem.setSource(identity) end
 
 ---
 ---Unmounts a directory or archive previously mounted with `lovr.filesystem.mount`.

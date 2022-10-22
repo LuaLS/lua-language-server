@@ -3803,3 +3803,58 @@ local class
 
 class.has.nested.<?fn?>()
 ]]
+
+TEST 'integer[]' [[
+---@generic T
+---@param f fun(x: T)
+---@return T[]
+local function x(f) end
+
+---@param x integer
+local <?arr?> = x(function (x) end)
+]]
+
+TEST 'integer[]' [[
+---@generic T
+---@param f fun():T
+---@return T[]
+local function x(f) end
+
+local <?arr?> = x(function ()
+    return 1
+end)
+]]
+
+TEST 'integer[]' [[
+---@generic T
+---@param f fun():T
+---@return T[]
+local function x(f) end
+
+---@return integer
+local <?arr?> = x(function () end)
+]]
+
+TEST 'integer[]' [[
+---@generic T
+---@param f fun(x: T)
+---@return T[]
+local function x(f) end
+
+---@type fun(x: integer)
+local cb
+
+local <?arr?> = x(cb)
+]]
+
+TEST 'integer[]' [[
+---@generic T
+---@param f fun():T
+---@return T[]
+local function x(f) end
+
+---@type fun(): integer
+local cb
+
+local <?arr?> = x(cb)
+]]

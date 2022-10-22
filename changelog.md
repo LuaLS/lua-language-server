@@ -46,6 +46,18 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 
   print(obj.initValue) --> `obj.initValue` is integer
   ```
+* `CHG` [#1153] infer type by generic parameters or returns of function
+  ```lua
+  ---@generic T
+  ---@param f fun(x: T)
+  ---@return T[]
+  local function x(f) end
+
+  ---@type fun(x: integer)
+  local cb
+
+  local arr = x(cb) --> `arr` is inferred as `integer[]`
+  ```
 * `FIX` [#1567]
 * `FIX` [#1593]
 * `FIX` [#1595]
@@ -56,6 +68,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 * `FIX` [#1640]
 * `FIX` [#1642]
 
+[#1153]: https://github.com/sumneko/lua-language-server/issues/1153
 [#1177]: https://github.com/sumneko/lua-language-server/issues/1177
 [#1458]: https://github.com/sumneko/lua-language-server/issues/1458
 [#1557]: https://github.com/sumneko/lua-language-server/issues/1557

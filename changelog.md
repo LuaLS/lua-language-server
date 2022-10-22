@@ -44,6 +44,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 * `FIX` [#1606]
 * `FIX` [#1608]
 * `FIX` [#1637]
+* `FIX` [#1640]
 * `FIX` [#1642]
 
 [#1177]: https://github.com/sumneko/lua-language-server/issues/1177
@@ -60,6 +61,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 [#1608]: https://github.com/sumneko/lua-language-server/issues/1608
 [#1626]: https://github.com/sumneko/lua-language-server/issues/1626
 [#1637]: https://github.com/sumneko/lua-language-server/issues/1637
+[#1640]: https://github.com/sumneko/lua-language-server/issues/1640
 [#1641]: https://github.com/sumneko/lua-language-server/issues/1641
 [#1642]: https://github.com/sumneko/lua-language-server/issues/1642
 

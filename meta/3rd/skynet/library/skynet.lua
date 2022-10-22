@@ -13,34 +13,34 @@
 ---|+'"trace"'
 ---@alias SERVICEADDR '".servicename"' | '":0000000C"' | integer
 ---@alias MESSAGEHANDLER fun(session:integer, source:integer, cmd:string, ...)
-local skynet  = {
-  -- read skynet.h
-  PTYPE_TEXT      = 0,
-  PTYPE_RESPONSE  = 1,
-  PTYPE_MULTICAST = 2,
-  PTYPE_CLIENT    = 3,
-  PTYPE_SYSTEM    = 4,
-  PTYPE_HARBOR    = 5,
-  PTYPE_SOCKET    = 6,
-  PTYPE_ERROR     = 7,
-  PTYPE_QUEUE     = 8, -- used in deprecated mqueue, use skynet.queue instead
-  PTYPE_DEBUG     = 9,
-  PTYPE_LUA       = 10,
-  PTYPE_SNAX      = 11,
-  PTYPE_TRACE     = 12, -- use for debug trace
-  PNAME_TEXT      = "text",
-  PNAME_RESPONSE  = "response",
-  PNAME_MULTICAST = "muliticast",
-  PNAME_CLIENT    = "client",
-  PNAME_SYSTEM    = "system",
-  PNAME_HARBOR    = "harbor",
-  PNAME_SOCKET    = "socket",
-  PNAME_ERROR     = "error",
-  PNAME_QUEUE     = "queue",
-  PNAME_DEBUG     = "debug",
-  PNAME_LUA       = "lua",
-  PNAME_SNAX      = "snax",
-  PNAME_TRACE     = "trace",
+local skynet = {
+    -- read skynet.h
+    PTYPE_TEXT      = 0,
+    PTYPE_RESPONSE  = 1,
+    PTYPE_MULTICAST = 2,
+    PTYPE_CLIENT    = 3,
+    PTYPE_SYSTEM    = 4,
+    PTYPE_HARBOR    = 5,
+    PTYPE_SOCKET    = 6,
+    PTYPE_ERROR     = 7,
+    PTYPE_QUEUE     = 8, -- used in deprecated mqueue, use skynet.queue instead
+    PTYPE_DEBUG     = 9,
+    PTYPE_LUA       = 10,
+    PTYPE_SNAX      = 11,
+    PTYPE_TRACE     = 12, -- use for debug trace
+    PNAME_TEXT      = "text",
+    PNAME_RESPONSE  = "response",
+    PNAME_MULTICAST = "muliticast",
+    PNAME_CLIENT    = "client",
+    PNAME_SYSTEM    = "system",
+    PNAME_HARBOR    = "harbor",
+    PNAME_SOCKET    = "socket",
+    PNAME_ERROR     = "error",
+    PNAME_QUEUE     = "queue",
+    PNAME_DEBUG     = "debug",
+    PNAME_LUA       = "lua",
+    PNAME_SNAX      = "snax",
+    PNAME_TRACE     = "trace",
 
 }
 
@@ -103,8 +103,8 @@ end
 ---* 你需要挂起一个请求，等将来时机满足，再回应它。而回应的时候已经在别的 coroutine 中了。
 ---针对这种情况，你可以调用 skynet.response(skynet.pack) 获得一个闭包，以后调用这个闭包即可把回应消息发回。
 ---这里的参数 skynet.pack 是可选的，你可以传入其它打包函数，默认即是 skynet.pack 。
----@param msg lightuserdata
----@param sz integer
+---@param msg lightuserdata|string
+---@param sz? integer
 function skynet.ret(msg, sz)
 end
 
@@ -227,8 +227,8 @@ end
 ---* 挂起期间，状态可能会变更，造成重入
 ---@param addr SERVICEADDR @目标服务地址
 ---@param typename string @类型名
----@param msg lightuserdata
----@param sz number
+---@param msg lightuserdata|string
+---@param sz? number
 function skynet.rawcall(addr, typename, msg, sz)
 end
 
@@ -240,8 +240,10 @@ request.__call = request.add
 ---@param obj table # {addr, typename, ...}
 function request:add(obj)
 end
+
 function request:close()
 end
+
 function request:select(timeout)
 end
 
@@ -249,6 +251,7 @@ end
 ---@return request
 function skynet.request(obj)
 end
+
 ---* 返回一个唯一的会话ID
 ---@return number
 function skynet.genid()
@@ -546,4 +549,5 @@ end
 function skynet.info_func(fun)
 
 end
+
 return skynet

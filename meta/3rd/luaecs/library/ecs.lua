@@ -79,15 +79,6 @@ end
 function meta:select(pat)
 end
 
----Sync C memory data to the iter which contains the index id and component id by then pattern the entity meet.
----Read component with in, and write component to C which with out.
----This is a additional featur, we use select most times.
----@param pat string #pattern whcih the iter specified entity meet.
----@param iter ITER # {pool index, cid}
----@see ECSWorld#_sync
-function meta:sync(pat, iter)
-end
-
 ---Sync all then component of the eneity represent by a iter
 ---@param iter number|ITER #ITER or entity id
 ---@return table
@@ -119,15 +110,6 @@ end
 ---@param tagname? string #tagname
 ---@see ECSWorld#_update
 function meta:update(tagname)
-end
-
----Select a singleton component. Singleton component only  hava a instance, the pool index is 1.
----`pattern` and `iter` must gived or not the same time.
----@param name string Component name
----@param pattern? string #key [opt inout] , opt is : or ?, inout is in, out, update, like t:in, b:out, id?update. **Used to select other component into the Singleton Component.
----@param iter? table # when give, is update and return it.
----@return table {1, cid, component...}
-function meta:singleton(name, pattern, iter)
 end
 
 local M = {
@@ -342,22 +324,15 @@ end
 function meta:_object(ref, cv, index)
 end
 
----C API
----Sync data from iter to C memory.
----@param iter userdata #iter function
----@param t ITER
----@return table
----@see ECSWorld#sync
-function meta:_sync(iter, t)
-end
-
 ---@param pattern string
 ---@param iter ITER
 function meta:_read(pattern, iter)
 end
 
----No use
-function meta:submit(...) end
+---C API
+---Commit an mod of a group iter with out or new
+---@param iter ITER
+function meta:submit(iter) end
 
 ---@see ECSWorld:#first
 function meta:_first(...) end

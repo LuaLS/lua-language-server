@@ -383,7 +383,7 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                                     if  not searchedFields[fieldKey]
                                     and guide.isSet(field) then
                                         hasFounded[fieldKey] = true
-                                        --pushResult(field, true)
+                                        pushResult(field, true)
                                     end
                                 end
                             end)

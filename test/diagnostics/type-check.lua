@@ -841,6 +841,20 @@ TEST [[
 local <!test!> = 4
 ]]
 
+TEST [[
+---@class MyClass
+local MyClass = {}
+
+function MyClass:new()
+    ---@class MyClass
+    local myObject = setmetatable({
+        initialField = true
+    }, self)
+
+    print(myObject.initialField)
+end
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

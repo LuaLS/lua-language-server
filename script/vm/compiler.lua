@@ -368,6 +368,27 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                             end
                         end)
                     end
+                    if  src.value
+                    and src.value.type == 'select'
+                    and src.value.vararg.type == 'call' then
+                        local func = src.value.vararg.node
+                        local args = src.value.vararg.args
+                        if  func.special == 'setmetatable'
+                        and args
+                        and args[1]
+                        and args[1].type == 'table' then
+                            searchFieldSwitch('table', suri, args[1], key, ref, function (field)
+                                local fieldKey = guide.getKeyName(field)
+                                if fieldKey then
+                                    if  not searchedFields[fieldKey]
+                                    and guide.isSet(field) then
+                                        hasFounded[fieldKey] = true
+                                        --pushResult(field, true)
+                                    end
+                                end
+                            end)
+                        end
+                    end
                     copyToSearched()
                     searchFieldSwitch(src.type, suri, src, key, ref, function (field)
                         local fieldKey = guide.getKeyName(field)

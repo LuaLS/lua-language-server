@@ -37,6 +37,15 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
   * `return-type-mismatch`
 * `CHG` workspace-symbol: supports chain fields based on global variables and types. try `io.open` or `iolib.open`
 * `CHG` [#1641] if a function only has varargs and has `---@overload`, the varargs will be ignored
+* `CHG` [#1575] search definitions by first argument of `setmetatable`
+  ```lua
+  ---@class Object
+  local obj = setmetatable({
+    initValue = 1,
+  }, mt)
+
+  print(obj.initValue) --> `obj.initValue` is integer
+  ```
 * `FIX` [#1567]
 * `FIX` [#1593]
 * `FIX` [#1595]
@@ -53,6 +62,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 [#1558]: https://github.com/sumneko/lua-language-server/issues/1558
 [#1561]: https://github.com/sumneko/lua-language-server/issues/1561
 [#1567]: https://github.com/sumneko/lua-language-server/issues/1567
+[#1575]: https://github.com/sumneko/lua-language-server/issues/1575
 [#1582]: https://github.com/sumneko/lua-language-server/issues/1582
 [#1593]: https://github.com/sumneko/lua-language-server/issues/1593
 [#1595]: https://github.com/sumneko/lua-language-server/issues/1595

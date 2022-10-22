@@ -1069,7 +1069,7 @@ t['<??>']
 }
 
 TEST [[
-_ENV['z.b.c'] = {}
+_G['z.b.c'] = {}
 
 z<??>
 ]]
@@ -1084,6 +1084,58 @@ z<??>
         },
     },
 }
+
+config.set(nil, 'Lua.runtime.version', 'Lua 5.1')
+
+TEST [[
+_G['z.b.c'] = {}
+
+z<??>
+]]
+{
+    {
+        label = 'z.b.c',
+        kind = define.CompletionItemKind.Field,
+        textEdit = {
+            start = 20000,
+            finish = 20001,
+            newText = '_G["z.b.c"]',
+        },
+    },
+}
+
+config.set(nil, 'Lua.runtime.version', 'Lua 5.4')
+
+TEST [[
+中文字段 = 1
+
+中文<??>
+]]
+{
+    {
+        label = '中文字段',
+        kind = define.CompletionItemKind.Enum,
+        textEdit = {
+            start = 20000,
+            finish = 20006,
+            newText = '_ENV["中文字段"]',
+        },
+    },
+}
+
+config.set(nil, 'Lua.runtime.unicodeName', true)
+TEST [[
+中文字段 = 1
+
+中文<??>
+]]
+{
+    {
+        label = '中文字段',
+        kind = define.CompletionItemKind.Enum,
+    },
+}
+config.set(nil, 'Lua.runtime.unicodeName', false)
 
 TEST [[
 io.close(1, <??>)
@@ -3793,5 +3845,62 @@ print(t2.A.<??>)
     {
         label    = 'B',
         kind     = define.CompletionItemKind.Field,
+    },
+}
+
+TEST [[
+---@overload fun(x: number)
+---@overload fun(x: number, y: number)
+local function fff(...)
+end
+
+fff<??>
+]]
+{
+    {
+        label    = 'fff(x)',
+        kind     = define.CompletionItemKind.Function,
+    },
+    {
+        label    = 'fff(x, y)',
+        kind     = define.CompletionItemKind.Function,
+    },
+}
+
+TEST [[
+---@overload fun(x: number)
+---@overload fun(x: number, y: number)
+function fff(...)
+end
+
+fff<??>
+]]
+{
+    {
+        label    = 'fff(x)',
+        kind     = define.CompletionItemKind.Function,
+    },
+    {
+        label    = 'fff(x, y)',
+        kind     = define.CompletionItemKind.Function,
+    },
+}
+
+TEST [[
+---@overload fun(x: number)
+---@overload fun(x: number, y: number)
+function t.fff(...)
+end
+
+t.fff<??>
+]]
+{
+    {
+        label    = 'fff(x)',
+        kind     = define.CompletionItemKind.Function,
+    },
+    {
+        label    = 'fff(x, y)',
+        kind     = define.CompletionItemKind.Function,
     },
 }

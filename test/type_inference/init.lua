@@ -3858,11 +3858,3 @@ local cb
 
 local <?arr?> = x(cb)
 ]]
-
-TEST 'integer' [[
----@return fun(x: integer)
-local function f()
-    return function (<?x?>)
-    end
-end
-]]

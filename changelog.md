@@ -28,7 +28,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
   ---@type myClass
   local class
 
-  print(class.a.b.c.e.f.g) --> inferred as integer
+  print(class.a.b.c.e.f.g) --> infered as integer
   ```
 * `CHG` [#1582] the following diagnostics consider `overload`
   * `missing-return`
@@ -58,14 +58,6 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 
   local arr = x(cb) --> `arr` is inferred as `integer[]`
   ```
-* `CHG` [#1202] infer parameter type by expected returned function of parent function
-  ```lua
-  ---@return fun(x: integer)
-  local function f()
-      return function (x) --> `x` is inferred as `integer`
-      end
-  end
-  ```
 * `FIX` [#1567]
 * `FIX` [#1593]
 * `FIX` [#1595]
@@ -78,7 +70,6 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 
 [#1153]: https://github.com/sumneko/lua-language-server/issues/1153
 [#1177]: https://github.com/sumneko/lua-language-server/issues/1177
-[#1202]: https://github.com/sumneko/lua-language-server/issues/1202
 [#1458]: https://github.com/sumneko/lua-language-server/issues/1458
 [#1557]: https://github.com/sumneko/lua-language-server/issues/1557
 [#1558]: https://github.com/sumneko/lua-language-server/issues/1558

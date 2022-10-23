@@ -1059,6 +1059,7 @@ local function compileLocal(source)
     end
     if source.parent.type == 'funcargs' and not hasMarkDoc and not hasMarkParam then
         local func = source.parent.parent
+        -- local call ---@type fun(f: fun(x: number));call(function (x) end) --> x -> number
         local funcNode = vm.compileNode(func)
         local hasDocArg
         for n in funcNode:eachObject() do
@@ -1157,6 +1158,22 @@ local compilerSwitch = util.switch()
         if source.parent.type == 'callargs' then
             local call = source.parent.parent
             vm.compileCallArg(source, call)
+        end
+
+        -- function f() return function (<?x?>) end end
+        if source.parent.type == 'return' then
+            for i, ret in ipairs(source.parent) do
+                if ret == source then
+                    local func = guide.getParentFunction(source.parent)
+                    if func then
+                        local returnObj = vm.getReturnOfFunction(func, i)
+                        if returnObj then
+                            vm.setNode(source, vm.compileNode(returnObj))
+                        end
+                    end
+                    break
+                end
+            end
         end
     end)
     : case 'paren'

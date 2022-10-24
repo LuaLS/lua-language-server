@@ -2186,3 +2186,13 @@ local t2
 print(t2._id)
 ]]
 config.set(nil, 'Lua.doc.protectedName', nil)
+
+TEST [[
+---@class A
+---@field private x number
+local mt = {}
+
+function mt:init()
+    print(self.x)
+end
+]]

@@ -1309,4 +1309,42 @@ function m.isBlockType(source)
     return blockTypes[source.type] == true
 end
 
+
+---@param source parser.object
+---@return parser.object?
+function m.getSelfNode(source)
+    if source.type == 'getlocal'
+    or source.type == 'setlocal' then
+        source = source.node
+    end
+    if source.type ~= 'self' then
+        return nil
+    end
+    local args = source.parent
+    if args.type == 'callargs' then
+        local call = args.parent
+        if call.type ~= 'call' then
+            return nil
+        end
+        local getmethod = call.node
+        if getmethod.type ~= 'getmethod' then
+            return nil
+        end
+        return getmethod.node
+    end
+    if args.type == 'funcargs' then
+        local func = args.parent
+        if func.type ~= 'function' then
+            return nil
+        end
+        local setmethod = func.parent
+        if setmethod.type ~= 'setmethod' then
+            return nil
+        end
+        return setmethod.node
+    end
+    return nil
+end
+
+
 return m

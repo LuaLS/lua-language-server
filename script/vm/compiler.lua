@@ -1011,20 +1011,13 @@ local function compileLocal(source)
         hasMarkDoc = bindDocs(source)
     end
     local hasMarkParam
-    if source.type == 'self' and not hasMarkDoc then
-        hasMarkParam = true
-        if source.parent.type == 'callargs' then
-            -- obj:func(...)
-            if source.parent.parent and source.parent.parent.node and source.parent.parent.node.node then
-                vm.setNode(source, vm.compileNode(source.parent.parent.node.node))
-            end
-        else
-            -- function obj:func(...)
-            if source.parent.parent and source.parent.parent.parent and source.parent.parent.parent.node then
-                vm.setNode(source, vm.compileNode(source.parent.parent.parent.node))
-            end
+    if not hasMarkDoc then
+        local selfNode = guide.getSelfNode(source)
+        if selfNode then
+            hasMarkParam = true
+            vm.setNode(source, vm.compileNode(selfNode))
+            vm.getNode(source):remove 'function'
         end
-        vm.getNode(source):remove 'function'
     end
     local hasMarkValue
     if not hasMarkDoc and source.value then

@@ -7,7 +7,7 @@ local glob     = require 'glob'
 ---@alias parser.visibleType 'public' | 'protected' | 'private'
 
 ---@class parser.object
----@field _visibleType? parser.visibleType
+---@field public _visibleType? parser.visibleType
 
 ---@param source parser.object
 ---@return parser.visibleType
@@ -36,18 +36,21 @@ function vm.getVisibleType(source)
     end
 
     local fieldName = guide.getKeyName(source)
-    local uri = guide.getUri(source)
 
-    local privateNames = config.get(uri, 'Lua.doc.privateName')
-    if #privateNames > 0 and glob.glob(privateNames)(fieldName) then
-        source._visibleType = 'private'
-        return 'private'
-    end
+    if type(fieldName) == 'string' then
+        local uri = guide.getUri(source)
 
-    local protectedNames = config.get(uri, 'Lua.doc.protectedName')
-    if #protectedNames > 0 and glob.glob(protectedNames)(fieldName) then
-        source._visibleType = 'protected'
-        return 'protected'
+        local privateNames = config.get(uri, 'Lua.doc.privateName')
+        if #privateNames > 0 and glob.glob(privateNames)(fieldName) then
+            source._visibleType = 'private'
+            return 'private'
+        end
+
+        local protectedNames = config.get(uri, 'Lua.doc.protectedName')
+        if #protectedNames > 0 and glob.glob(protectedNames)(fieldName) then
+            source._visibleType = 'protected'
+            return 'protected'
+        end
     end
 
     source._visibleType = 'public'
@@ -74,6 +77,7 @@ end
 ---@param source parser.object
 ---@return vm.global?
 function vm.getDefinedClass(suri, source)
+    source = guide.getSelfNode(source) or source
     local sets = vm.getLocalSourcesSets(source)
     if sets then
         for _, set in ipairs(sets) do

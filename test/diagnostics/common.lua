@@ -2142,3 +2142,47 @@ local t
 
 print(t.z)
 ]]
+
+TEST [[
+---@class A
+---@field _id number
+
+---@type A
+local t
+
+print(t._id)
+]]
+
+config.set(nil, 'Lua.doc.privateName', { '_*' })
+TEST [[
+---@class A
+---@field _id number
+
+---@type A
+local t
+
+print(t.<!_id!>)
+
+---@class B: A
+local t2
+
+print(t2.<!_id!>)
+]]
+config.set(nil, 'Lua.doc.privateName', nil)
+
+config.set(nil, 'Lua.doc.protectedName', { '_*' })
+TEST [[
+---@class A
+---@field _id number
+
+---@type A
+local t
+
+print(t.<!_id!>)
+
+---@class B: A
+local t2
+
+print(t2._id)
+]]
+config.set(nil, 'Lua.doc.protectedName', nil)

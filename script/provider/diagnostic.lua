@@ -644,8 +644,9 @@ files.watch(function (ev, uri) ---@async
 end)
 
 config.watch(function (uri, key, value, oldValue)
-    if util.stringStartWith(key,  'Lua.diagnostics')
-    or util.stringStartWith(key,  'Lua.spell') then
+    if util.stringStartWith(key, 'Lua.diagnostics')
+    or util.stringStartWith(key, 'Lua.spell')
+    or util.stringStartWith(key, 'Lua.doc') then
         if value ~= oldValue then
             m.diagnosticsScope(uri)
             m.refreshClient()

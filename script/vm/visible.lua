@@ -1,13 +1,40 @@
 ---@class vm
 local vm       = require 'vm.vm'
 local guide    = require 'parser.guide'
+local config   = require 'config'
+local glob     = require 'glob'
+
+---@class parser.object
+---@field _visibleType? 'public' | 'protected' | 'private'
 
 ---@param source parser.object
 ---@return 'public' | 'protected' | 'private'
 function vm.getVisibleType(source)
-    if source.type == 'doc.field' then
-        return source.visible or 'public'
+    if source._visibleType then
+        return source._visibleType
     end
+    if source.type == 'doc.field' then
+        if source.visible then
+            source._visibleType = source.visible
+            return source.visible
+        end
+    end
+    local fieldName = guide.getKeyName(source)
+    local uri = guide.getUri(source)
+
+    local privateNames = config.get(uri, 'Lua.doc.privateName')
+    if #privateNames > 0 and glob.glob(privateNames)(fieldName) then
+        source._visibleType = 'private'
+        return 'private'
+    end
+
+    local protectedNames = config.get(uri, 'Lua.doc.protectedName')
+    if #protectedNames > 0 and glob.glob(protectedNames)(fieldName) then
+        source._visibleType = 'protected'
+        return 'protected'
+    end
+
+    source._visibleType = 'public'
     return 'public'
 end
 

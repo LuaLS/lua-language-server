@@ -307,7 +307,7 @@ local template = {
                                                 'Opened',
                                                 'Disable',
                                             },
-    ['Lua.diagnostics.unusedLocalExclude']   = Type.Array(Type.String),
+    ['Lua.diagnostics.unusedLocalExclude']  = Type.Array(Type.String),
     ['Lua.workspace.ignoreDir']             = Type.Array(Type.String) >> {
                                                 '.vscode',
                                             },
@@ -390,6 +390,8 @@ local template = {
     ['Lua.type.castNumberToInteger']        = Type.Boolean >> true,
     ['Lua.type.weakUnionCheck']             = Type.Boolean >> false,
     ['Lua.type.weakNilCheck']               = Type.Boolean >> false,
+    ['Lua.doc.privateName']                 = Type.Array(Type.String),
+    ['Lua.doc.protectedName']               = Type.Array(Type.String),
 
     -- VSCode
     ['files.associations']                  = Type.Hash(Type.String, Type.String),

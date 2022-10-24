@@ -855,6 +855,16 @@ function MyClass:new()
 end
 ]]
 
+-- TODO
+--TEST [[
+-----@class T
+--local t = {
+--    x = nil
+--}
+--
+--t.x = 1
+--]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

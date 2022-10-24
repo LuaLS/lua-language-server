@@ -147,7 +147,7 @@ DIAG_UNREACHABLE_CODE                 =
 DIAG_INVISIBLE_PRIVATE                =
 '字段 `{field}` 是私有的，只能在 `{class}` 类中才能访问。'
 DIAG_INVISIBLE_PROTECTED              =
-'字段 `{field}` 收到保护，只能在 `{class}` 类极其子类中才能访问。'
+'字段 `{field}` 受到保护，只能在 `{class}` 类极其子类中才能访问。'
 
 MWS_NOT_SUPPORT         =
 '{} 目前还不支持多工作目录，我可能需要重启才能支持新的工作目录...'

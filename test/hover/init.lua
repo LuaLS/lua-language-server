@@ -2280,3 +2280,103 @@ local t: B {
     z: number,
 }
 ]]
+
+TEST [[
+---@class A
+local mt = {}
+
+---@private
+function mt:init()
+end
+
+---@protected
+function mt:update()
+end
+
+function mt:get()
+end
+
+print(<?mt?>)
+]]
+[[
+local mt: A {
+    get: function,
+    init: function,
+    update: function,
+}
+]]
+
+TEST [[
+---@class A
+local mt = {}
+
+---@private
+function mt:init()
+end
+
+---@protected
+function mt:update()
+end
+
+function mt:get()
+end
+
+---@type A
+local <?obj?>
+]]
+[[
+local obj: A {
+    get: function,
+}
+]]
+
+TEST [[
+---@class A
+local mt = {}
+
+---@private
+function mt:init()
+end
+
+---@protected
+function mt:update()
+end
+
+function mt:get()
+end
+
+---@class B: A
+local <?obj?>
+]]
+[[
+local obj: B {
+    get: function,
+    update: function,
+}
+]]
+
+TEST [[
+---@class A
+local mt = {}
+
+---@private
+function mt:init()
+end
+
+---@protected
+function mt:update()
+end
+
+function mt:get()
+end
+
+---@class B: A
+
+---@type B
+local <?obj?>
+]]
+[[
+local obj: B {
+    get: function,
+}
+]]

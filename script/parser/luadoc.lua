@@ -149,7 +149,7 @@ Symbol              <-  ({} {
 ---@field names? parser.object[]
 ---@field path? string
 ---@field bindComments? parser.object[]
----@field visible? 'public' | 'protected' | 'private'
+---@field visible? parser.visibleType
 
 local function parseTokens(text, offset)
     Ci = 0
@@ -1445,6 +1445,22 @@ local docSwitch = util.switch()
         name.parent = result
         return result
     end)
+    : case 'private'
+    : call(function ()
+        return {
+            type   = 'doc.private',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+    end)
+    : case 'protected'
+    : call(function ()
+        return {
+            type   = 'doc.protected',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+    end)
 
 local function convertTokens(doc)
     local tp, text = nextToken()
@@ -1660,7 +1676,9 @@ local function bindDoc(source, binded)
         or doc.type == 'doc.deprecated'
         or doc.type == 'doc.version'
         or doc.type == 'doc.module'
-        or doc.type == 'doc.source' then
+        or doc.type == 'doc.source'
+        or doc.type == 'doc.private'
+        or doc.type == 'doc.protected' then
             if source.type == 'function'
             or isParam then
                 goto CONTINUE

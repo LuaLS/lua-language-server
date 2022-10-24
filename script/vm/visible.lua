@@ -4,11 +4,13 @@ local guide    = require 'parser.guide'
 local config   = require 'config'
 local glob     = require 'glob'
 
+---@alias parser.visibleType 'public' | 'protected' | 'private'
+
 ---@class parser.object
----@field _visibleType? 'public' | 'protected' | 'private'
+---@field _visibleType? parser.visibleType
 
 ---@param source parser.object
----@return 'public' | 'protected' | 'private'
+---@return parser.visibleType
 function vm.getVisibleType(source)
     if source._visibleType then
         return source._visibleType
@@ -19,6 +21,20 @@ function vm.getVisibleType(source)
             return source.visible
         end
     end
+
+    if source.bindDocs then
+        for _, doc in ipairs(source.bindDocs) do
+            if doc.type == 'doc.private' then
+                source._visibleType = 'private'
+                return 'private'
+            end
+            if doc.type == 'doc.protected' then
+                source._visibleType = 'protected'
+                return 'protected'
+            end
+        end
+    end
+
     local fieldName = guide.getKeyName(source)
     local uri = guide.getUri(source)
 
@@ -43,6 +59,13 @@ end
 function vm.getParentClass(source)
     if source.type == 'doc.field' then
         return vm.getGlobalNode(source.class)
+    end
+    if source.type == 'setfield'
+    or source.type == 'setindex'
+    or source.type == 'setmethod'
+    or source.type == 'tablefield'
+    or source.type == 'tableindex' then
+        return vm.getDefinedClass(guide.getUri(source), source.node)
     end
     return nil
 end

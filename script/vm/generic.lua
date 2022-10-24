@@ -2,7 +2,7 @@
 local vm      = require 'vm.vm'
 
 ---@class parser.object
----@field _generic vm.generic
+---@field public _generic vm.generic
 
 ---@class vm.generic
 ---@field sign  vm.sign

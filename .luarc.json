@@ -48,5 +48,10 @@
     },
     "type": {
         "castNumberToInteger": false
+    },
+    "doc": {
+        "privateName": [
+            "_*"
+        ]
     }
 }

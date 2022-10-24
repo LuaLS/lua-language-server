@@ -21,7 +21,7 @@ local pub      = require 'pub'
 ---@class file
 ---@field uri          uri
 ---@field content      string
----@field _ref?        integer
+---@field ref?         integer
 ---@field trusted?     boolean
 ---@field rows?        integer[]
 ---@field originText?  string
@@ -29,7 +29,7 @@ local pub      = require 'pub'
 ---@field version?     integer
 ---@field originLines? integer[]
 ---@field state?       parser.state
----@field _diffInfo?   table[]
+---@field diffInfo?    table[]
 ---@field cache        table
 ---@field id           integer
 
@@ -125,7 +125,7 @@ function m.close(uri)
     end
     m.onWatch('close', uri)
     if file then
-        if (file._ref or 0) <= 0 and not m.isOpen(uri) then
+        if (file.ref or 0) <= 0 and not m.isOpen(uri) then
             m.remove(uri)
         end
     end
@@ -184,7 +184,7 @@ end
 ---@return string
 local function pluginOnSetText(file, text)
     local plugin   = require 'plugin'
-    file._diffInfo = nil
+    file.diffInfo = nil
     local suc, result = plugin.dispatch('OnSetText', file.uri, text)
     if not suc then
         if DEVELOP and result then
@@ -198,7 +198,7 @@ local function pluginOnSetText(file, text)
         local diffs
         suc, result, diffs = xpcall(smerger.mergeDiff, log.error, text, result)
         if suc then
-            file._diffInfo = diffs
+            file.diffInfo = diffs
             file.originLines = parser.lines(text)
             return result
         else
@@ -521,7 +521,7 @@ function m.compileStateThen(state, file)
     state.uri = file.uri
     state.lua = file.text
     state.ast.uri = file.uri
-    state._diffInfo   = file._diffInfo
+    state.diffInfo   = file.diffInfo
     state.originLines = file.originLines
     state.originText  = file.originText
 
@@ -643,7 +643,7 @@ function m.compileState(uri, async)
 end
 
 ---@class parser.state
----@field _diffInfo? table[]
+---@field diffInfo? table[]
 ---@field originLines? integer[]
 ---@field originText string
 
@@ -690,10 +690,10 @@ end
 ---@return integer start
 ---@return integer finish
 function m.diffedOffset(state, offset)
-    if not state._diffInfo then
+    if not state.diffInfo then
         return offset, offset
     end
-    return smerger.getOffset(state._diffInfo, offset)
+    return smerger.getOffset(state.diffInfo, offset)
 end
 
 --- 将应用差异后的offset转换为应用差异前的offset
@@ -702,15 +702,15 @@ end
 ---@return integer start
 ---@return integer finish
 function m.diffedOffsetBack(state, offset)
-    if not state._diffInfo then
+    if not state.diffInfo then
         return offset, offset
     end
-    return smerger.getOffsetBack(state._diffInfo, offset)
+    return smerger.getOffsetBack(state.diffInfo, offset)
 end
 
 ---@param state parser.state
 function m.hasDiffed(state)
-    return state._diffInfo ~= nil
+    return state.diffInfo ~= nil
 end
 
 --- 获取文件的自定义缓存信息（在文件内容更新后自动失效）

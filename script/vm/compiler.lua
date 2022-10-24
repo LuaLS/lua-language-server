@@ -9,12 +9,12 @@ local vm         = require 'vm.vm'
 local LOCK = {}
 
 ---@class parser.object
----@field _compiledNodes  boolean
----@field _node           vm.node
----@field _globalBase     table
----@field cindex          integer
----@field func            parser.object
----@field operators?      parser.object[]
+---@field _compiledNodes     boolean
+---@field _node              vm.node
+---@field public _globalBase table
+---@field cindex             integer
+---@field func               parser.object
+---@field operators?         parser.object[]
 
 -- 该函数有副作用，会给source绑定node！
 ---@param source parser.object
@@ -115,7 +115,7 @@ end
 ---@param ref boolean
 ---@param pushResult fun(res: parser.object, markDoc?: boolean)
 local function searchFieldByGlobalID(suri, source, key, ref, pushResult)
-    local node = source._globalNode
+    local node = vm.getGlobalNode(source)
     if not node then
         return
     end
@@ -398,8 +398,8 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                             and field.value then
                                 if  vm.getLocalID(field)
                                 and vm.getLocalID(field) == vm.getLocalID(field.value) then
-                                elseif src._globalNode
-                                and    src._globalNode == field.value._globalNode then
+                                elseif vm.getGlobalNode(src)
+                                and    vm.getGlobalNode(src) == vm.getGlobalNode(field.value) then
                                 else
                                     hasFounded[fieldKey] = true
                                 end
@@ -448,7 +448,7 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
 end
 
 ---@class parser.object
----@field _sign vm.sign|false
+---@field public _sign vm.sign|false
 
 ---@param source parser.object
 ---@return vm.sign|false
@@ -958,9 +958,9 @@ function vm.compileCallArg(arg, call, index)
 end
 
 ---@class parser.object
----@field _iterator? table
----@field _iterArgs? table
----@field _iterVars? table<parser.object, vm.node>
+---@field public _iterator? table
+---@field public _iterArgs? table
+---@field public _iterVars? table<parser.object, vm.node>
 
 ---@param source parser.object
 ---@param target parser.object
@@ -1762,7 +1762,7 @@ end
 
 ---@param source parser.object
 local function compileByGlobal(source)
-    local global = source._globalNode
+    local global = vm.getGlobalNode(source)
     if not global then
         return
     end

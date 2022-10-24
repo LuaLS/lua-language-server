@@ -44,7 +44,7 @@ function mt:_markHas(obj)
     end
 end
 
-function mt:_collect()
+function mt:collect()
     local startPos  = self._loc.start
     local finishPos = 0
 
@@ -128,7 +128,7 @@ function mt:_lookIntoChild(action, topNode, outNode)
             end
         end
     elseif action.type == 'function' then
-        self:_lookIntoBlock(action, topNode:copy())
+        self:lookIntoBlock(action, topNode:copy())
     elseif action.type == 'unary' then
         if not action[1] then
             goto RETURN
@@ -233,7 +233,7 @@ function mt:_lookIntoChild(action, topNode, outNode)
     or     action.type == 'in'
     or     action.type == 'repeat'
     or     action.type == 'for' then
-        topNode = self:_lookIntoBlock(action, topNode:copy())
+        topNode = self:lookIntoBlock(action, topNode:copy())
     elseif action.type == 'while' then
         local blockNode, mainNode
         if action.filter then
@@ -242,7 +242,7 @@ function mt:_lookIntoChild(action, topNode, outNode)
             blockNode = topNode:copy()
             mainNode  = topNode:copy()
         end
-        blockNode = self:_lookIntoBlock(action, blockNode:copy())
+        blockNode = self:lookIntoBlock(action, blockNode:copy())
         topNode = mainNode:merge(blockNode)
         if action.filter then
             -- look into filter again
@@ -263,7 +263,7 @@ function mt:_lookIntoChild(action, topNode, outNode)
                 hasElse = true
                 mainNode:clear()
             end
-            blockNode = self:_lookIntoBlock(subBlock, blockNode:copy())
+            blockNode = self:lookIntoBlock(subBlock, blockNode:copy())
             local neverReturn = subBlock.hasReturn
                             or  subBlock.hasGoTo
                             or  subBlock.hasBreak
@@ -326,7 +326,7 @@ end
 ---@param block   parser.object
 ---@param topNode  vm.node
 ---@return vm.node topNode
-function mt:_lookIntoBlock(block, topNode)
+function mt:lookIntoBlock(block, topNode)
     if not self._has[block] then
         return topNode
     end
@@ -355,7 +355,7 @@ function vm.launchRunner(loc, callback)
         _callback = callback,
     }, mt)
 
-    self:_collect()
+    self:collect()
 
-    self:_lookIntoBlock(main, vm.getNode(loc):copy())
+    self:lookIntoBlock(main, vm.getNode(loc):copy())
 end

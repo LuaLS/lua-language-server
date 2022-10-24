@@ -4,8 +4,8 @@ local guide = require 'parser.guide'
 local vm    = require 'vm.vm'
 
 ---@class parser.object
----@field _localID string|false
----@field _localIDs table<string, { sets: parser.object[], gets: parser.object[] }>
+---@field public _localID string|false
+---@field public _localIDs table<string, { sets: parser.object[], gets: parser.object[] }>
 
 local compileLocalID, getLocal
 

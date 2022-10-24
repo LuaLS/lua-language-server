@@ -176,21 +176,23 @@ function mt:onTimer()
 end
 
 function m.wait(timeout, onTimer)
+    local _timeout = mathMax(mathFloor(timeout * 1000.0), 1)
     local t = setmetatable({
-        ['_timeout'] = mathMax(mathFloor(timeout * 1000.0), 1),
+        ['_timeout'] = _timeout,
         ['_onTimer'] = onTimer,
         ['_timerCount'] = 1,
     }, mt)
-    mTimeout(t, t._timeout)
+    mTimeout(t, _timeout)
     return t
 end
 
 function m.loop(timeout, onTimer)
+    local _timeout = mathFloor(timeout * 1000.0)
     local t = setmetatable({
-        ['_timeout'] = mathFloor(timeout * 1000.0),
+        ['_timeout'] = _timeout,
         ['_onTimer'] = onTimer,
     }, mt)
-    mTimeout(t, t._timeout)
+    mTimeout(t, _timeout)
     return t
 end
 
@@ -198,12 +200,13 @@ function m.timer(timeout, count, onTimer)
     if count == 0 then
         return m.loop(timeout, onTimer)
     end
+    local _timeout = mathFloor(timeout * 1000.0)
     local t = setmetatable({
-        ['_timeout'] = mathFloor(timeout * 1000.0),
+        ['_timeout'] = _timeout,
         ['_onTimer'] = onTimer,
         ['_timerCount'] = count,
     }, mt)
-    mTimeout(t, t._timeout)
+    mTimeout(t, _timeout)
     return t
 end
 

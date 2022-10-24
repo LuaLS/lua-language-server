@@ -165,8 +165,8 @@ local function createGlobal(name, cate)
 end
 
 ---@class parser.object
----@field _globalNode vm.global|false
----@field _enums?     (string|integer)[]
+---@field public _globalNode vm.global|false
+---@field public _enums?     (string|integer)[]
 
 ---@type table<string, vm.global>
 local allGlobals = {}

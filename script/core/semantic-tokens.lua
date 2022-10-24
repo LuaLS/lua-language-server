@@ -706,8 +706,8 @@ local function buildTokens(state, results)
     local lastLine = 0
     local lastStartChar = 0
     for i, source in ipairs(results) do
-        local startPos  = converter.packPosition(state, source.start)
-        local finishPos = converter.packPosition(state, source.finish)
+        local startPos  = source.start
+        local finishPos = source.finish
         local line      = startPos.line
         local startChar = startPos.character
         local deltaLine = line - lastLine
@@ -788,23 +788,34 @@ local function solveMultilineAndOverlapping(state, results)
 
     local new = {}
     for token in tokens:pairs() do
-        new[#new+1] = token
-        local startRow,  startCol  = guide.rowColOf(token.start)
-        local finishRow, finishCol = guide.rowColOf(token.finish)
-        if finishRow > startRow then
-            token.finish = guide.positionOf(startRow, guide.getLineRange(state, startRow))
-            for i = startRow + 1, finishRow - 1 do
+        local startPos = converter.packPosition(state, token.start)
+        local endPos   = converter.packPosition(state, token.finish)
+        if endPos.line == startPos.line then
+            new[#new+1] = {
+                start      = startPos,
+                finish     = endPos,
+                type       = token.type,
+                modifieres = token.modifieres,
+            }
+        else
+            new[#new+1] = {
+                start      = startPos,
+                finish     = converter.position(startPos.line, 9999),
+                type       = token.type,
+                modifieres = token.modifieres,
+            }
+            for i = startPos.line + 1, endPos.line - 1 do
                 new[#new+1] = {
-                    start      = guide.positionOf(i, 0),
-                    finish     = guide.positionOf(i, guide.getLineRange(state, i)),
+                    start      = converter.position(i, 0),
+                    finish     = converter.position(i, 9999),
                     type       = token.type,
                     modifieres = token.modifieres,
                 }
             end
-            if finishCol > 0 then
+            if endPos.character > 0 then
                 new[#new+1] = {
-                    start      = guide.positionOf(finishRow, 0),
-                    finish     = guide.positionOf(finishRow, finishCol),
+                    start      = converter.position(endPos.line, 0),
+                    finish     = converter.position(endPos.line, endPos.character),
                     type       = token.type,
                     modifieres = token.modifieres,
                 }

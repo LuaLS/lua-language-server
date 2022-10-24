@@ -105,14 +105,18 @@ local typeSorter = {
     ['boolean'] = 3,
 }
 
-local function getKeyMap(fields)
+---@param source parser.object
+---@param fields parser.object[]
+local function getVisibleKeyMap(source, fields)
     local keys = {}
     local map  = {}
     for _, field in ipairs(fields) do
         local key = vm.getKeyName(field)
-        if key and not map[key] then
-            map[key] = true
-            keys[#keys+1] = key
+        if vm.isVisible(source, field) then
+            if key and not map[key] then
+                map[key] = true
+                keys[#keys+1] = key
+            end
         end
     end
     table.sort(keys, function (a, b)
@@ -192,7 +196,7 @@ return function (source)
     end
 
     local fields    = vm.getFields(source)
-    local keys, map = getKeyMap(fields)
+    local keys, map = getVisibleKeyMap(source, fields)
     if #keys == 0 then
         return nil
     end

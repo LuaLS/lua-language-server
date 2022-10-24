@@ -19,4 +19,6 @@ require 'vm.local-id'
 require 'vm.global'
 require 'vm.function'
 require 'vm.operator'
+require 'vm.visible'
+
 return vm

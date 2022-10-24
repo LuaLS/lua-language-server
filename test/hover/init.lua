@@ -2145,3 +2145,138 @@ local function <?f?>(
 )
 end
 ]]
+
+TEST [[
+---@class A
+---@field private x number
+---@field y number
+local <?t?>
+]]
+[[
+local t: A {
+    x: number,
+    y: number,
+}
+]]
+
+TEST [[
+---@class A
+---@field private x number
+---@field y number
+
+---@type A
+local <?t?>
+]]
+[[
+local t: A {
+    y: number,
+}
+]]
+
+TEST [[
+---@class A
+---@field private x number
+---@field y number
+<?t?> = {}
+]]
+[[
+(global) t: A {
+    x: number,
+    y: number,
+}
+]]
+
+TEST [[
+---@class A
+---@field private x number
+---@field y number
+
+---@type A
+<?t?> = {}
+]]
+[[
+(global) t: A {
+    y: number,
+}
+]]
+
+TEST [[
+---@class A
+---@field private x number
+---@field y number
+
+---@type A
+v.<?t?> = {}
+]]
+[[
+(global) v.t: A {
+    y: number,
+}
+]]
+
+TEST [[
+---@class A
+---@field private x number
+---@field protected y number
+---@field z number
+
+---@type A
+local <?t?>
+]]
+[[
+local t: A {
+    z: number,
+}
+]]
+
+TEST [[
+---@class A
+---@field private x number
+---@field protected y number
+---@field z number
+
+---@class B: A
+local <?t?>
+]]
+[[
+local t: B {
+    y: number,
+    z: number,
+}
+]]
+
+TEST [[
+---@class A
+---@field private x number
+---@field protected y number
+---@field z number
+
+---@class B: A
+---@field private a number
+local <?t?>
+]]
+[[
+local t: B {
+    a: number,
+    y: number,
+    z: number,
+}
+]]
+
+TEST [[
+---@class A
+---@field private x number
+---@field protected y number
+---@field z number
+
+---@class B: A
+---@field private a number
+
+---@type B
+local <?t?>
+]]
+[[
+local t: B {
+    z: number,
+}
+]]

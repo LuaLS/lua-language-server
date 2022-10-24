@@ -534,6 +534,12 @@ function compileObject(source)
 end
 
 ---@param source parser.object
+---@return vm.global?
+function vm.getGlobalNode(source)
+    return source._globalNode or nil
+end
+
+---@param source parser.object
 local function compileSelf(source)
     if source.parent.type ~= 'funcargs' then
         return

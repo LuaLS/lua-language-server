@@ -149,6 +149,7 @@ Symbol              <-  ({} {
 ---@field names? parser.object[]
 ---@field path? string
 ---@field bindComments? parser.object[]
+---@field visible? 'public' | 'protected' | 'private'
 
 local function parseTokens(text, offset)
     Ci = 0

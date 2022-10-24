@@ -6,29 +6,6 @@ local vm     = require "vm.vm"
 local util   = require 'utility'
 local diagd  = require 'proto.diagnostic'
 
--- 把耗时最长的诊断放到最后面
-local diagSort = {
-    ['redundant-value']        = 100,
-    ['not-yieldable']          = 100,
-    ['deprecated']             = 100,
-    ['undefined-field']        = 110,
-    ['redundant-parameter']    = 110,
-    ['cast-local-type']        = 120,
-    ['assign-type-mismatch']   = 120,
-    ['param-type-mismatch']    = 120,
-    ['missing-return']         = 120,
-    ['missing-return-value']   = 120,
-    ['redundant-return-value'] = 120,
-}
-
-local diagList = {}
-for k in pairs(define.DiagnosticDefaultSeverity) do
-    diagList[#diagList+1] = k
-end
-table.sort(diagList, function (a, b)
-    return (diagSort[a] or 0) < (diagSort[b] or 0)
-end)
-
 local sleepRest = 0.0
 
 ---@async
@@ -165,6 +142,21 @@ local function check(uri, name, isScopeDiag, response)
     end
 end
 
+local diagList
+local diagCosts = {}
+local function buildDiagList()
+    if not diagList then
+        diagList = {}
+        for name in pairs(define.DiagnosticDefaultSeverity) do
+            diagList[#diagList+1] = name
+        end
+    end
+    table.sort(diagList, function (a, b)
+        return (diagCosts[a] or 0) < (diagCosts[b] or 0)
+    end)
+    return diagList
+end
+
 ---@async
 ---@param uri uri
 ---@param isScopeDiag boolean
@@ -176,9 +168,12 @@ return function (uri, isScopeDiag, response, checked)
         return nil
     end
 
-    for _, name in ipairs(diagList) do
+    for _, name in ipairs(buildDiagList()) do
         await.delay()
+        local clock = os.clock()
         check(uri, name, isScopeDiag, response)
+        local cost = os.clock() - clock
+        diagCosts[name] = (diagCosts[name] or 0) + cost
         if checked then
             checked(name)
         end

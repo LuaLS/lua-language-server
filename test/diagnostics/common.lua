@@ -2081,3 +2081,64 @@ end
 
 print(1)
 ]]
+
+TEST [[
+---@class A
+---@field private x number
+---@field protected y number
+---@field public z number
+local t
+print(t.x)
+]]
+
+TEST [[
+---@class A
+---@field private x number
+---@field protected y number
+---@field public z number
+
+---@type A
+local t
+
+print(t.<!x!>)
+]]
+
+TEST [[
+---@class A
+---@field private x number
+---@field protected y number
+---@field public z number
+
+---@class B: A
+local t
+
+print(t.y)
+]]
+
+TEST [[
+---@class A
+---@field private x number
+---@field protected y number
+---@field public z number
+
+---@class B: A
+
+---@type B
+local t
+
+print(t.<!y!>)
+]]
+
+TEST [[
+---@class A
+---@field private x number
+---@field protected y number
+---@field public z number
+
+---@class B: A
+
+---@type B
+local t
+
+print(t.z)
+]]

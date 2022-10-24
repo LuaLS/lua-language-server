@@ -566,6 +566,9 @@ local function checkFieldOfRefs(refs, state, word, startPos, position, parent, o
         if not matchKey(word, name, count >= 100) then
             goto CONTINUE
         end
+        if not vm.isVisible(parent, src) then
+            goto CONTINUE
+        end
         local funcLabel
         if config.get(state.uri, 'Lua.completion.showParams') then
             --- TODO determine if getlocal should be a function here too

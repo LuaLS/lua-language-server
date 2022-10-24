@@ -3904,3 +3904,62 @@ t.fff<??>
         kind     = define.CompletionItemKind.Function,
     },
 }
+
+TEST [[
+---@class A
+---@field private x number
+---@field y number
+
+---@type A
+local t
+
+t.<??>
+]]
+{
+    {
+        label    = 'y',
+        kind     = define.CompletionItemKind.Field,
+    },
+}
+
+TEST [[
+---@class A
+---@field private x number
+---@field protected y number
+---@field z number
+
+---@class B: A
+local t
+
+t.<??>
+]]
+{
+    {
+        label    = 'y',
+        kind     = define.CompletionItemKind.Field,
+    },
+    {
+        label    = 'z',
+        kind     = define.CompletionItemKind.Field,
+    },
+}
+
+TEST [[
+---@class A
+---@field private x number
+---@field protected y number
+---@field z number
+
+---@class B: A
+
+---@type B
+local t
+
+t.<??>
+]]
+{
+    {
+        label    = 'z',
+        kind     = define.CompletionItemKind.Field,
+    },
+}

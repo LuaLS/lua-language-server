@@ -105,6 +105,20 @@ function vm.getDefinedClass(suri, source)
     return nil
 end
 
+---@param source parser.object
+---@return vm.global?
+local function getEnvClass(source)
+    local func = guide.getParentFunction(source)
+    if not func or func.type ~= 'function' then
+        return nil
+    end
+    local self = func.args and func.args[1]
+    if not self or self.type ~= 'self' then
+        return nil
+    end
+    return vm.getDefinedClass(guide.getUri(source), self)
+end
+
 ---@param parent parser.object
 ---@param field parser.object
 function vm.isVisible(parent, field)
@@ -117,9 +131,14 @@ function vm.isVisible(parent, field)
         return true
     end
     local suri = guide.getUri(parent)
+    -- check     <?obj?>.x
     local myClass = vm.getDefinedClass(suri, parent)
     if not myClass then
-        return false
+        -- check    function <?mt?>:X() ... end
+        myClass = getEnvClass(parent)
+        if not myClass then
+            return false
+        end
     end
     if myClass == class then
         return true

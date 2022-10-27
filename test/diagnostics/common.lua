@@ -2196,3 +2196,17 @@ function mt:init()
     print(self.x)
 end
 ]]
+
+TEST [[
+---@diagnostic disable: unused-local
+---@class A
+---@field private x number
+local mt = {}
+
+function mt:init()
+    ---@type A
+    local obj = {}
+
+    obj.x = 1
+end
+]]

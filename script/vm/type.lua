@@ -433,6 +433,9 @@ function vm.canCastType(uri, defNode, refNode)
     if refInfer:view(uri) == 'unknown' then
         return true
     end
+    if defInfer:view(uri) == 'nil' then
+        return true
+    end
 
     if vm.isSubType(uri, refNode, 'nil') then
         -- allow `local x = {};x = nil`,

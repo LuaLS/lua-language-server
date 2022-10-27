@@ -419,8 +419,8 @@ function m.addRef(uri)
     if not file then
         return nil
     end
-    file._ref = (file._ref or 0) + 1
-    log.debug('add ref', uri, file._ref)
+    file.ref = (file.ref or 0) + 1
+    log.debug('add ref', uri, file.ref)
     return function ()
         m.delRef(uri)
     end
@@ -431,9 +431,9 @@ function m.delRef(uri)
     if not file then
         return
     end
-    file._ref = (file._ref or 0) - 1
-    log.debug('del ref', uri, file._ref)
-    if file._ref <= 0 and not m.isOpen(uri) then
+    file.ref = (file.ref or 0) - 1
+    log.debug('del ref', uri, file.ref)
+    if file.ref <= 0 and not m.isOpen(uri) then
         m.remove(uri)
     end
 end

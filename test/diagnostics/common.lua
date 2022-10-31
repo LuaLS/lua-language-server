@@ -2210,3 +2210,17 @@ function mt:init()
     obj.x = 1
 end
 ]]
+
+TEST [[
+---@diagnostic disable: unused-local
+---@class A
+---@field private x number
+local mt = {}
+
+mt.init = function ()
+    ---@type A
+    local obj = {}
+
+    obj.x = 1
+end
+]]

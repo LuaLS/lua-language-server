@@ -112,11 +112,13 @@ local function getEnvClass(source)
     if not func or func.type ~= 'function' then
         return nil
     end
-    local self = func.args and func.args[1]
-    if not self or self.type ~= 'self' then
-        return nil
+    local parent = func.parent
+    if parent.type == 'setfield'
+    or parent.type == 'setmethod' then
+        local node = parent.node
+        return vm.getDefinedClass(guide.getUri(source), node)
     end
-    return vm.getDefinedClass(guide.getUri(source), self)
+    return nil
 end
 
 ---@param parent parser.object

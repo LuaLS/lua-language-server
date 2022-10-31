@@ -24,7 +24,7 @@
 ---  </tr>
 ---  <tr>
 ---    <td>Android</td>
----    <td><code>/sdcard/Android/data/<identity>/files</code></td>
+---    <td><code>/sdcard/Android/data/&lt;identity&gt;/files</code></td>
 ---  </tr> </table>
 ---
 ---`<identity>` should be a unique identifier for your app.
@@ -144,7 +144,7 @@ function lovr.filesystem.getRequirePath() end
 ---### NOTE:
 ---The save directory takes the following form:
 ---
----``` <appdata>/LOVR/<identity> ```
+---    <appdata>/LOVR/<identity>
 ---
 ---Where `<appdata>` is `lovr.filesystem.getAppdataDirectory` and `<identity>` is `lovr.filesystem.getIdentity` and can be customized using `lovr.conf`.
 ---

@@ -2813,7 +2813,7 @@ function Texture:newView(parent, type, layer, layerCount, mipmap, mipmapCount) e
 ---
 ---Example:
 ---
----``` layout(std140) uniform ObjectScales { float scales[64]; }; ```
+---    layout(std140) uniform ObjectScales { float scales[64]; };
 ---
 ---The `std430` layout corresponds to the std430 layout used for storage buffers in GLSL.
 ---
@@ -2821,7 +2821,7 @@ function Texture:newView(parent, type, layer, layerCount, mipmap, mipmapCount) e
 ---
 ---Example:
 ---
----``` layout(std430) buffer TileSizes { vec2 sizes[]; } ```
+---    layout(std430) buffer TileSizes { vec2 sizes[]; }
 ---
 ---@alias lovr.BufferLayout
 ---

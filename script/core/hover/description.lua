@@ -142,7 +142,10 @@ local function lookUpDocComments(source)
     for _, doc in ipairs(docGroup) do
         if doc.type == 'doc.comment' then
             lines[#lines+1] = normalizeComment(doc.comment.text, uri)
-        elseif doc.type == 'doc.type' then
+        elseif doc.type == 'doc.type'
+        or     doc.type == 'doc.public'
+        or     doc.type == 'doc.protected'
+        or     doc.type == 'doc.private' then
             if doc.comment then
                 lines[#lines+1] = normalizeComment(doc.comment.text, uri)
             end

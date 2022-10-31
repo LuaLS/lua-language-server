@@ -392,6 +392,7 @@ local template = {
     ['Lua.type.weakNilCheck']               = Type.Boolean >> false,
     ['Lua.doc.privateName']                 = Type.Array(Type.String),
     ['Lua.doc.protectedName']               = Type.Array(Type.String),
+    ['Lua.doc.packageName']                 = Type.Array(Type.String),
 
     -- VSCode
     ['files.associations']                  = Type.Hash(Type.String, Type.String),

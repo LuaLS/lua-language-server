@@ -148,6 +148,8 @@ DIAG_INVISIBLE_PRIVATE                = -- TODO: need translate!
 'Field `{field}` is private, it can only be accessed in class `{class}`.'
 DIAG_INVISIBLE_PROTECTED              = -- TODO: need translate!
 'Field `{field}` is protected, it can only be accessed in class `{class}` and its subclasses.'
+DIAG_INVISIBLE_PACKAGE                = -- TODO: need translate!
+'Field `{field}` can only be accessed in same file `{uri}`.'
 
 MWS_NOT_SUPPORT         =
 '{} 目前還不支援多工作目錄，我可能需要重新啟動才能支援新的工作目錄...'

@@ -148,6 +148,8 @@ DIAG_INVISIBLE_PRIVATE                =
 'Field `{field}` is private, it can only be accessed in class `{class}`.'
 DIAG_INVISIBLE_PROTECTED              =
 'Field `{field}` is protected, it can only be accessed in class `{class}` and its subclasses.'
+DIAG_INVISIBLE_PACKAGE                =
+'Field `{field}` can only be accessed in same file `{uri}`.'
 
 MWS_NOT_SUPPORT         =
 '{} does not support multi workspace for now, I may need to restart to support the new workspace ...'

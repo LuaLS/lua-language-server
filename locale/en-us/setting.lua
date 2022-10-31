@@ -299,6 +299,8 @@ config.doc.privateName                   =
 'Treat specific field names as private, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are private, witch can only be accessed in the class where the definition is located.'
 config.doc.protectedName                 =
 'Treat specific field names as protected, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are protected, witch can only be accessed in the class where the definition is located and its subclasses.'
+config.doc.packageName                   =
+'Treat specific field names as package, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are package, witch can only be accessed in the file where the definition is located.'
 config.diagnostics['unused-local']          =
 'Enable unused local variable diagnostics.'
 config.diagnostics['unused-function']       =

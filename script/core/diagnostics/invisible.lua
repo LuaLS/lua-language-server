@@ -37,7 +37,7 @@ return function (uri, callback)
                             class = vm.getParentClass(def):getName(),
                         }),
                     }
-                else
+                elseif vm.getVisibleType(def) == 'protected' then
                     callback {
                         start   = child.start,
                         finish  = child.finish,
@@ -47,6 +47,18 @@ return function (uri, callback)
                             class = vm.getParentClass(def):getName(),
                         }),
                     }
+                elseif vm.getVisibleType(def) == 'package' then
+                    callback {
+                        start   = child.start,
+                        finish  = child.finish,
+                        uri     = uri,
+                        message = lang.script('DIAG_INVISIBLE_PACKAGE', {
+                            field = key,
+                            uri   = guide.getUri(def),
+                        }),
+                    }
+                else
+                    error('Unknown visible type: ' .. vm.getVisibleType(def))
                 end
                 break
             end

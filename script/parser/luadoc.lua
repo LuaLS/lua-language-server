@@ -992,7 +992,8 @@ local docSwitch = util.switch()
                 if value == 'public'
                 or value == 'protected'
                 or value == 'private'
-                or value == 'public' then
+                or value == 'public'
+                or value == 'package' then
                     result.visible = value
                     result.start = getStart()
                     return true
@@ -1470,6 +1471,14 @@ local docSwitch = util.switch()
             finish = getFinish(),
         }
     end)
+    : case 'package'
+    : call(function ()
+        return {
+            type   = 'doc.package',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+    end)
 
 local function convertTokens(doc)
     local tp, text = nextToken()
@@ -1688,7 +1697,8 @@ local function bindDoc(source, binded)
         or doc.type == 'doc.source'
         or doc.type == 'doc.private'
         or doc.type == 'doc.protected'
-        or doc.type == 'doc.public' then
+        or doc.type == 'doc.public'
+        or doc.type == 'doc.package' then
             if source.type == 'function'
             or isParam then
                 goto CONTINUE

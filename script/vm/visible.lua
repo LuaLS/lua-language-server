@@ -4,7 +4,7 @@ local guide    = require 'parser.guide'
 local config   = require 'config'
 local glob     = require 'glob'
 
----@alias parser.visibleType 'public' | 'protected' | 'private'
+---@alias parser.visibleType 'public' | 'protected' | 'private' | 'package'
 
 ---@class parser.object
 ---@field public _visibleType? parser.visibleType
@@ -127,6 +127,9 @@ function vm.isVisible(parent, field)
     local visible = vm.getVisibleType(field)
     if visible == 'public' then
         return true
+    end
+    if visible == 'package' then
+        return guide.getUri(parent) == guide.getUri(field)
     end
     local class = vm.getParentClass(field)
     if not class then

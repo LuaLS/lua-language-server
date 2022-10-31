@@ -140,3 +140,28 @@ TEST {
         content = 'require "f.a"',
     },
 }
+
+TEST {
+    { path = 'a.lua', content = [[
+        ---@class A
+        ---@field package x string
+
+        ---@type A
+        local obj
+
+        print(obj.x)
+    ]]},
+}
+
+TEST {
+    { path = 'a.lua', content = [[
+        ---@class A
+        ---@field package x string
+    ]]},
+    { path = 'b.lua', content = [[
+        ---@type A
+        local obj
+
+        print(obj.<!x!>)
+    ]]}
+}

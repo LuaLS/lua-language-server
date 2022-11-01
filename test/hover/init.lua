@@ -2380,3 +2380,16 @@ local obj: B {
     get: function,
 }
 ]]
+
+TEST [[
+---@class A
+---@field x fun(): string
+
+---@type table<string, A>
+local obj
+
+local x = obj[''].<?x?>()
+]]
+[[
+(field) A.x: fun():string
+]]

@@ -211,6 +211,9 @@ local searchFieldSwitch = util.switch()
     end)
     : case 'doc.type.table'
     : call(function (suri, source, key, ref, pushResult)
+        if type(key) == 'string' and key:find(vm.ID_SPLITE) then
+            return
+        end
         for _, field in ipairs(source.fields) do
             local fieldKey = field.name
             if fieldKey.type == 'doc.type' then

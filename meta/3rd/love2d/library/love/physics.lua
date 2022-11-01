@@ -2278,8 +2278,8 @@ function World:rayCast(fixture, x, y, xn, yn, fraction) end
 ---
 ---@param beginContact function # Gets called when two fixtures begin to overlap.
 ---@param endContact function # Gets called when two fixtures cease to overlap. This will also be called outside of a world update, when colliding objects are destroyed.
----@param preSolve function # Gets called before a collision gets resolved.
----@param postSolve function # Gets called after the collision has been resolved.
+---@param preSolve? function # Gets called before a collision gets resolved.
+---@param postSolve? function # Gets called after the collision has been resolved.
 function World:setCallbacks(beginContact, endContact, preSolve, postSolve) end
 
 ---

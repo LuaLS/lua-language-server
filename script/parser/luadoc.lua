@@ -163,8 +163,9 @@ local function parseTokens(text, offset)
     Ci = 0
 end
 
-local function peekToken()
-    return TokenTypes[Ci+1], TokenContents[Ci+1]
+local function peekToken(offset)
+    offset = offset or 1
+    return TokenTypes[Ci + offset], TokenContents[Ci + offset]
 end
 
 ---@return string? tokenType
@@ -992,8 +993,12 @@ local docSwitch = util.switch()
                 if value == 'public'
                 or value == 'protected'
                 or value == 'private'
-                or value == 'public'
                 or value == 'package' then
+                    local tp2 = peekToken(1)
+                    local tp3 = peekToken(2)
+                    if tp2 == 'name' and not tp3 then
+                        return false
+                    end
                     result.visible = value
                     result.start = getStart()
                     return true

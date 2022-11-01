@@ -93,6 +93,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
       end
   end
   ```
+* `CHG` find reference: respect `includeDeclaration` (although I don't know how to turn off this option in VSCode)
 * `FIX` [#1567]
 * `FIX` [#1593]
 * `FIX` [#1595]

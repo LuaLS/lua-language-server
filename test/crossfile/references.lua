@@ -83,7 +83,7 @@ function TEST(datas)
     end
 
     local sourcePos = (sourceList[1][1] + sourceList[1][2]) // 2
-    local positions = core(sourceUri, sourcePos)
+    local positions = core(sourceUri, sourcePos, true)
     if positions then
         local result = {}
         for i, position in ipairs(positions) do

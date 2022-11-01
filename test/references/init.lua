@@ -25,7 +25,7 @@ function TEST(script)
 
     local input  = catched['?'] + catched['~']
     local expect = catched['!'] + catched['~']
-    local results = core(TESTURI, input[1][1])
+    local results = core(TESTURI, input[1][1], true)
     if results then
         local positions = {}
         for i, result in ipairs(results) do

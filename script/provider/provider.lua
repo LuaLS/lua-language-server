@@ -484,7 +484,7 @@ m.register 'textDocument/references' {
         end
         local core   = require 'core.reference'
         local pos    = converter.unpackPosition(state, params.position)
-        local result = core(uri, pos)
+        local result = core(uri, pos, params.context.includeDeclaration)
         if not result then
             return nil
         end

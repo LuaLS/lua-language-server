@@ -55,7 +55,10 @@ local accept = {
 }
 
 ---@async
-return function (uri, position)
+---@param uri uri
+---@param position integer
+---@param includeDeclaration boolean
+return function (uri, position, includeDeclaration)
     local ast = files.getState(uri)
     if not ast then
         return nil
@@ -80,6 +83,9 @@ return function (uri, position)
             goto CONTINUE
         end
         if src.type == 'self' then
+            goto CONTINUE
+        end
+        if not includeDeclaration and guide.isSet(src) then
             goto CONTINUE
         end
         src = src.field or src.method or src

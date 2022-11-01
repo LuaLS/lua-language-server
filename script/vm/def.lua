@@ -19,6 +19,10 @@ simpleSwitch = util.switch()
             pushResult(loc)
         end
     end)
+    : case 'doc.field'
+    : call(function (source, pushResult)
+        pushResult(source)
+    end)
 
 ---@param source  parser.object
 ---@param pushResult fun(src: parser.object)

@@ -201,3 +201,18 @@ local b = { }
 a.color = { 1, 1, 1 }
 b.<~color~> = a.color
 ]]
+
+TEST [[
+---@alias <~A~> number
+
+---@type <!A!>
+]]
+
+TEST [[
+---@class A
+---@field <~x~> number
+
+---@type A
+local t
+print(t.<!x!>)
+]]

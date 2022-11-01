@@ -1610,6 +1610,10 @@ local compilerSwitch = util.switch()
         end
         vm.setNode(source, fieldNode)
     end)
+    : case 'doc.field.name'
+    : call(function (source)
+        vm.setNode(source, vm.compileNode(source.parent))
+    end)
     : case 'doc.type.field'
     : call(function (source)
         if not source.extends then

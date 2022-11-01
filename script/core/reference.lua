@@ -51,6 +51,7 @@ local accept = {
     ['doc.extends.name'] = true,
     ['doc.alias.name']   = true,
     ['doc.enum.name']    = true,
+    ['doc.field.name']   = true,
 }
 
 ---@async
@@ -115,7 +116,8 @@ return function (uri, position)
             and source.type ~= 'doc.class.name'
             and source.type ~= 'doc.enum.name'
             and source.type ~= 'doc.extends.name'
-            and source.type ~= 'doc.see.name' then
+            and source.type ~= 'doc.see.name'
+            and source.type ~= 'doc.alias.name' then
                 goto CONTINUE
             end
         end

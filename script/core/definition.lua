@@ -56,6 +56,7 @@ local accept = {
     ['doc.see.field']    = true,
     ['doc.cast.name']    = true,
     ['doc.enum.name']    = true,
+    ['doc.field.name']   = true,
 }
 
 local function checkRequire(source, offset)

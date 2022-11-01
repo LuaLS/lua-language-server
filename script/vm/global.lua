@@ -164,9 +164,11 @@ local function createGlobal(name, cate)
     }, mt)
 end
 
+---@alias parser.enum string|integer
+
 ---@class parser.object
----@field public _globalNode vm.global|false
----@field public _enums?     (string|integer)[]
+---@field package _globalNode vm.global|false
+---@field package _enums?     parser.enum[]
 
 ---@type table<string, vm.global>
 local allGlobals = {}
@@ -324,14 +326,15 @@ local compilerGlobalSwitch = util.switch()
         source._globalNode = class
 
         if source.signs then
-            source._sign = vm.createSign()
-            for _, sign in ipairs(source.signs) do
-                source._sign:addSign(vm.compileNode(sign))
+            local sign = vm.createSign()
+            vm.setSign(source, sign)
+            for _, obj in ipairs(source.signs) do
+                sign:addSign(vm.compileNode(obj))
             end
             if source.extends then
                 for _, ext in ipairs(source.extends) do
                     if ext.type == 'doc.type.table' then
-                        ext._generic = vm.createGeneric(ext, source._sign)
+                        vm.setGeneric(ext, vm.createGeneric(ext, sign))
                     end
                 end
             end
@@ -537,6 +540,12 @@ end
 ---@return vm.global?
 function vm.getGlobalNode(source)
     return source._globalNode or nil
+end
+
+---@param source parser.object
+---@return parser.enum[]?
+function vm.getEnums(source)
+    return source._enums
 end
 
 ---@param source parser.object

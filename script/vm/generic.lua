@@ -2,7 +2,7 @@
 local vm      = require 'vm.vm'
 
 ---@class parser.object
----@field public _generic vm.generic
+---@field package _generic vm.generic
 
 ---@class vm.generic
 ---@field sign  vm.sign
@@ -134,6 +134,18 @@ function mt:resolve(uri, args)
         end
     end
     return result
+end
+
+---@param source parser.object
+---@param generic vm.generic
+function vm.setGeneric(source, generic)
+    source._generic = generic
+end
+
+---@param source parser.object
+---@return vm.generic?
+function vm.getGeneric(source)
+    return source._generic
 end
 
 ---@param proto vm.object

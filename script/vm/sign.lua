@@ -260,3 +260,72 @@ function vm.createSign()
     }, mt)
     return genericMgr
 end
+
+---@class parser.object
+---@field package _sign vm.sign|false|nil
+
+---@param source parser.object
+---@param sign vm.sign
+function vm.setSign(source, sign)
+    source._sign = sign
+end
+
+---@param source parser.object
+---@return vm.sign?
+function vm.getSign(source)
+    if source._sign ~= nil then
+        return source._sign or nil
+    end
+    source._sign = false
+    if source.type == 'function' then
+        if not source.bindDocs then
+            return nil
+        end
+        for _, doc in ipairs(source.bindDocs) do
+            if doc.type == 'doc.generic' then
+                if not source._sign then
+                    source._sign = vm.createSign()
+                    break
+                end
+            end
+        end
+        if not source._sign then
+            return nil
+        end
+        if source.args then
+            for _, arg in ipairs(source.args) do
+                local argNode = vm.compileNode(arg)
+                if arg.optional then
+                    argNode:addOptional()
+                end
+                source._sign:addSign(argNode)
+            end
+        end
+    end
+    if source.type == 'doc.type.function'
+    or source.type == 'doc.type.table'
+    or source.type == 'doc.type.array' then
+        local hasGeneric
+        guide.eachSourceType(source, 'doc.generic.name', function ()
+            hasGeneric = true
+        end)
+        if not hasGeneric then
+            return nil
+        end
+        source._sign = vm.createSign()
+        if source.type == 'doc.type.function' then
+            for _, arg in ipairs(source.args) do
+                if arg.extends then
+                    local argNode = vm.compileNode(arg.extends)
+                    if arg.optional then
+                        argNode:addOptional()
+                    end
+                    source._sign:addSign(argNode)
+                else
+                    source._sign:addSign(vm.createNode())
+                end
+            end
+        end
+    end
+    return source._sign or nil
+end

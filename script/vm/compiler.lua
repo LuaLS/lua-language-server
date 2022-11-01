@@ -11,7 +11,7 @@ local LOCK = {}
 ---@class parser.object
 ---@field _compiledNodes     boolean
 ---@field _node              vm.node
----@field public _globalBase table
+---@field package _globalBase table
 ---@field cindex             integer
 ---@field func               parser.object
 ---@field operators?         parser.object[]
@@ -447,69 +447,6 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
     searchGlobal(object)
 end
 
----@class parser.object
----@field public _sign vm.sign|false
-
----@param source parser.object
----@return vm.sign|false
-local function getObjectSign(source)
-    if source._sign ~= nil then
-        return source._sign
-    end
-    source._sign = false
-    if source.type == 'function' then
-        if not source.bindDocs then
-            return false
-        end
-        for _, doc in ipairs(source.bindDocs) do
-            if doc.type == 'doc.generic' then
-                if not source._sign then
-                    source._sign = vm.createSign()
-                    break
-                end
-            end
-        end
-        if not source._sign then
-            return false
-        end
-        if source.args then
-            for _, arg in ipairs(source.args) do
-                local argNode = vm.compileNode(arg)
-                if arg.optional then
-                    argNode:addOptional()
-                end
-                source._sign:addSign(argNode)
-            end
-        end
-    end
-    if source.type == 'doc.type.function'
-    or source.type == 'doc.type.table'
-    or source.type == 'doc.type.array' then
-        local hasGeneric
-        guide.eachSourceType(source, 'doc.generic.name', function ()
-            hasGeneric = true
-        end)
-        if not hasGeneric then
-            return false
-        end
-        source._sign = vm.createSign()
-        if source.type == 'doc.type.function' then
-            for _, arg in ipairs(source.args) do
-                if arg.extends then
-                    local argNode = vm.compileNode(arg.extends)
-                    if arg.optional then
-                        argNode:addOptional()
-                    end
-                    source._sign:addSign(argNode)
-                else
-                    source._sign:addSign(vm.createNode())
-                end
-            end
-        end
-    end
-    return source._sign
-end
-
 ---@param func  parser.object
 ---@param index integer
 ---@return (parser.object|vm.generic)?
@@ -537,7 +474,7 @@ function vm.getReturnOfFunction(func, index)
                 return nil
             end
         end
-        local sign = getObjectSign(func)
+        local sign = vm.getSign(func)
         if not sign then
             return rtn
         end
@@ -880,7 +817,7 @@ local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
     for n in callNode:eachObject() do
         if n.type == 'function' then
             ---@cast n parser.object
-            local sign = getObjectSign(n)
+            local sign = vm.getSign(n)
             local farg = getFuncArg(n, myIndex)
             if farg then
                 for fn in vm.compileNode(farg):eachObject() do
@@ -958,9 +895,9 @@ function vm.compileCallArg(arg, call, index)
 end
 
 ---@class parser.object
----@field public _iterator? table
----@field public _iterArgs? table
----@field public _iterVars? table<parser.object, vm.node>
+---@field package _iterator? table
+---@field package _iterArgs? table
+---@field package _iterVars? table<parser.object, vm.node>
 
 ---@param source parser.object
 ---@param target parser.object
@@ -1391,7 +1328,7 @@ local compilerSwitch = util.switch()
         local index = source.returnIndex
         local hasMarkDoc
         if func.bindDocs then
-            local sign = getObjectSign(func)
+            local sign = vm.getSign(func)
             local lastReturn
             for _, doc in ipairs(func.bindDocs) do
                 if doc.type == 'doc.return' then
@@ -1406,7 +1343,7 @@ local compilerSwitch = util.switch()
                                 end)
                             end
                             if hasGeneric then
-                                ---@cast sign -false
+                                ---@cast sign -?
                                 vm.setNode(source, vm.createGeneric(rtn, sign))
                             else
                                 vm.setNode(source, vm.compileNode(rtn))
@@ -1638,8 +1575,8 @@ local compilerSwitch = util.switch()
                 if set.extends then
                     for _, ext in ipairs(set.extends) do
                         if ext.type == 'doc.type.table' then
-                            if ext._generic then
-                                local resolved = ext._generic:resolve(uri, source.signs)
+                            if vm.getGeneric(ext) then
+                                local resolved = vm.getGeneric(ext):resolve(uri, source.signs)
                                 vm.setNode(source, resolved)
                             end
                         end
@@ -1647,8 +1584,8 @@ local compilerSwitch = util.switch()
                 end
             end
             if set.type == 'doc.alias' then
-                if set.extends._generic then
-                    local resolved = set.extends._generic:resolve(uri, source.signs)
+                if vm.getGeneric(set.extends) then
+                    local resolved = vm.getGeneric(set.extends):resolve(uri, source.signs)
                     vm.setNode(source, resolved)
                 end
             end
@@ -1833,7 +1770,7 @@ local function compileByGlobal(source)
                 if set.extends then
                     for _, ext in ipairs(set.extends) do
                         if ext.type == 'doc.type.table' then
-                            if not ext._generic then
+                            if not vm.getGeneric(ext) then
                                 globalNode:merge(vm.compileNode(ext))
                             end
                         end
@@ -1841,7 +1778,7 @@ local function compileByGlobal(source)
                 end
             end
             if set.type == 'doc.alias' then
-                if not set.extends._generic then
+                if not vm.getGeneric(set.extends) then
                     globalNode:merge(vm.compileNode(set.extends))
                 end
             end

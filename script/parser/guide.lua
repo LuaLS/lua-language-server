@@ -73,7 +73,7 @@ local type         = type
 ---@field hasBreak?             true
 ---@field hasError?             true
 ---@field [integer]             parser.object|any
----@field public _root          parser.object
+---@field package _root          parser.object
 
 ---@class guide
 ---@field debugMode boolean

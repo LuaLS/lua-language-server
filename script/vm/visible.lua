@@ -7,7 +7,7 @@ local glob     = require 'glob'
 ---@alias parser.visibleType 'public' | 'protected' | 'private' | 'package'
 
 ---@class parser.object
----@field public _visibleType? parser.visibleType
+---@field package _visibleType? parser.visibleType
 
 ---@param source parser.object
 ---@return parser.visibleType

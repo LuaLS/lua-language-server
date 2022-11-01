@@ -52,7 +52,7 @@ local function checkEnum(parentName, child, uri)
     end
     for _, set in ipairs(parentClass:getSets(uri)) do
         if set.type == 'doc.enum' then
-            if not set._enums then
+            if not vm.getEnums(set) then
                 return false
             end
             if  child.type ~= 'string'
@@ -62,7 +62,7 @@ local function checkEnum(parentName, child, uri)
             and child.type ~= 'doc.type.integer' then
                 return false
             end
-            return util.arrayHas(set._enums, child[1])
+            return util.arrayHas(vm.getEnums(set), child[1])
         end
     end
 

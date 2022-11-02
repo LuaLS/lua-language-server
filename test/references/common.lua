@@ -216,3 +216,18 @@ TEST [[
 local t
 print(t.<!x!>)
 ]]
+
+TEST [[
+---@class A
+---@field <!x!> number
+
+---@type A
+local t1
+
+t1.<~x~> = 1
+
+---@type A
+local t2
+
+t2.<!x!> = 1
+]]

@@ -259,15 +259,10 @@ local function searchByDef(source, pushResult)
         source = source.parent
     end
     defMap[source] = true
-    if guide.isSet(source) then
-        local defs = vm.getDefs(source)
-        for _, def in ipairs(defs) do
-            pushResult(def)
-        end
-    else
-        local defs = vm.getDefs(source)
-        for _, def in ipairs(defs) do
-            pushResult(def)
+    local defs = vm.getDefs(source)
+    for _, def in ipairs(defs) do
+        pushResult(def)
+        if not guide.isLiteral(def) then
             defMap[def] = true
         end
     end

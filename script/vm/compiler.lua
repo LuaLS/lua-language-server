@@ -1108,6 +1108,12 @@ local compilerSwitch = util.switch()
                 end
             end
         end
+
+        -- { f = function (<?x?>) end }
+        if source.parent.type == 'tablefield'
+        or source.parent.type == 'tableindex' then
+            vm.setNode(source, vm.compileNode(source.parent))
+        end
     end)
     : case 'paren'
     : call(function (source)

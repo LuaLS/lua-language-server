@@ -93,6 +93,16 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
       end
   end
   ```
+* `CHG` [#1332] infer parameter type when function in table
+  ```lua
+  ---@class A
+  ---@field f fun(x: string)
+
+  ---@type A
+  local t = {
+      f = function (x) end --> `x` is inferred as `string`
+  }
+  ```
 * `CHG` find reference: respect `includeDeclaration` (although I don't know how to turn off this option in VSCode)
 * `FIX` [#1567]
 * `FIX` [#1593]
@@ -107,6 +117,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 [#1153]: https://github.com/sumneko/lua-language-server/issues/1153
 [#1177]: https://github.com/sumneko/lua-language-server/issues/1177
 [#1202]: https://github.com/sumneko/lua-language-server/issues/1202
+[#1332]: https://github.com/sumneko/lua-language-server/issues/1332
 [#1458]: https://github.com/sumneko/lua-language-server/issues/1458
 [#1557]: https://github.com/sumneko/lua-language-server/issues/1557
 [#1558]: https://github.com/sumneko/lua-language-server/issues/1558

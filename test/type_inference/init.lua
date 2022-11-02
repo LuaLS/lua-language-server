@@ -3866,3 +3866,13 @@ local function f()
     end
 end
 ]]
+
+TEST 'string' [[
+---@class A
+---@field f fun(x: string)
+
+---@type A
+local t = {
+    f = function (<?x?>) end
+}
+]]

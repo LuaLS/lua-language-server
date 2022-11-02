@@ -1194,7 +1194,7 @@ local docSwitch = util.switch()
         if not result.name then
             pushWarning {
                 type  = 'LUADOC_MISS_SEE_NAME',
-                start  = getStart(),
+                start  = getFinish(),
                 finish = getFinish(),
             }
             return nil

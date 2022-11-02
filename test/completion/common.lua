@@ -3973,5 +3973,10 @@ TEST [[
     {
         label    = 'ABCD',
         kind     = define.CompletionItemKind.Class,
+        textEdit = {
+            newText = 'ABCD',
+            start   = 20008,
+            finish  = 20012,
+        }
     },
 }

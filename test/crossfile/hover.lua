@@ -1644,3 +1644,40 @@ function f(x: number)
 function f(x: number, y: number)
 ```]]
 }
+
+TEST { {path = 'a.lua', content = [[
+---@class A
+
+---@see A # comment1
+local <?x?>
+]]},
+hover = [[
+```lua
+local x: unknown
+```
+
+---
+
+See: [A](file:///a.lua:1:10)  comment1]]
+}
+
+TEST { {path = 'a.lua', content = [[
+---@class A
+
+TTT = 1
+
+---@see A # comment1
+---@see TTT # comment2
+local <?x?>
+]]},
+hover = [[
+```lua
+local x: unknown
+```
+
+---
+
+See:
+  * [A](file:///a.lua:1:10)  comment1
+  * [TTT](file:///a.lua:3:0)  comment2]]
+}

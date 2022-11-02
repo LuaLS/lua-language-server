@@ -6,6 +6,7 @@ local util       = require 'utility'
 local findSource = require 'core.find-source'
 local markdown   = require 'provider.markdown'
 local guide      = require 'parser.guide'
+local wssymbol   = require 'core.workspace-symbol'
 
 ---@async
 local function getHover(source)
@@ -13,6 +14,15 @@ local function getHover(source)
     local defMark   = {}
     local labelMark = {}
     local descMark  = {}
+
+    if source.type == 'doc.see.name' then
+        for _, symbol in ipairs(wssymbol(source[1])) do
+            if symbol.name == source[1] then
+                source = symbol.source
+                break
+            end
+        end
+    end
 
     ---@async
     local function addHover(def, checkLable, oop)
@@ -111,6 +121,7 @@ local accept = {
     ['doc.enum.name']  = true,
     ['function']       = true,
     ['doc.module']     = true,
+    ['doc.see.name']   = true,
 }
 
 ---@async

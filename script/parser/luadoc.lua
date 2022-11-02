@@ -1703,7 +1703,8 @@ local function bindDoc(source, binded)
         or doc.type == 'doc.private'
         or doc.type == 'doc.protected'
         or doc.type == 'doc.public'
-        or doc.type == 'doc.package' then
+        or doc.type == 'doc.package'
+        or doc.type == 'doc.see' then
             if source.type == 'function'
             or isParam then
                 goto CONTINUE

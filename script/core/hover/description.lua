@@ -7,6 +7,7 @@ local util     = require 'utility'
 local guide    = require 'parser.guide'
 local rpath    = require 'workspace.require-path'
 local furi     = require 'file-uri'
+local wssymbol = require 'core.workspace-symbol'
 
 local function collectRequire(mode, literal, uri)
     local result, searchers
@@ -125,6 +126,52 @@ local function getBindComment(source)
     return table.concat(lines, '\n')
 end
 
+---@async
+local function packSee(see)
+    local name = see.name[1]
+    local buf  = {}
+    local target
+    for _, symbol in ipairs(wssymbol(name)) do
+        if symbol.name == name then
+            target = symbol.source
+            break
+        end
+    end
+    if target then
+        local row, col = guide.rowColOf(target.start)
+        buf[#buf+1] = ('[%s](%s#%d#%d)'):format(name, guide.getUri(target), row + 1, col)
+    else
+        buf[#buf+1] = ('~%s~'):format(name)
+    end
+    if see.comment then
+        buf[#buf+1] = ' '
+        buf[#buf+1] = see.comment.text
+    end
+    return table.concat(buf)
+end
+
+---@async
+local function lookUpDocSees(lines, docGroup)
+    local sees = {}
+    for _, doc in ipairs(docGroup) do
+        if doc.type == 'doc.see' then
+            sees[#sees+1] = doc
+        end
+    end
+    if #sees == 0 then
+        return
+    end
+    if #sees == 1 then
+        lines[#lines+1] = ('See: %s'):format(packSee(sees[1]))
+        return
+    end
+    lines[#lines+1] = 'See:'
+    for _, see in ipairs(sees) do
+        lines[#lines+1] = ('  * %s'):format(packSee(see))
+    end
+end
+
+---@async
 local function lookUpDocComments(source)
     local docGroup = source.bindDocs
     if not docGroup then
@@ -158,6 +205,7 @@ local function lookUpDocComments(source)
     if source.comment then
         lines[#lines+1] = normalizeComment(source.comment.text, uri)
     end
+    lookUpDocSees(lines, docGroup)
     if not lines or #lines == 0 then
         return nil
     end
@@ -352,6 +400,7 @@ local function getFunctionComment(source)
     return comment
 end
 
+---@async
 local function tryDocComment(source)
     local md = markdown()
     if source.value and source.value.type == 'function' then
@@ -379,6 +428,7 @@ local function tryDocComment(source)
     return result
 end
 
+---@async
 local function tryDocOverloadToComment(source)
     if source.type ~= 'doc.type.function' then
         return
@@ -457,6 +507,7 @@ local function tryDocEnum(source)
     return md:string()
 end
 
+---@async
 return function (source)
     if source.type == 'string' then
         return asString(source)

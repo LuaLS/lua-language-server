@@ -2393,3 +2393,13 @@ local x = obj[''].<?x?>()
 [[
 (field) A.x: fun():string
 ]]
+
+TEST [[
+---@class A
+---@field x number
+
+---@see <?A.x?>
+]]
+[[
+(field) A.x: number
+]]

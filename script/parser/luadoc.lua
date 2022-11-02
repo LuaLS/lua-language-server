@@ -1192,15 +1192,15 @@ local docSwitch = util.switch()
         }
         result.name = parseName('doc.see.name', result)
         if not result.name then
+            pushWarning {
+                type  = 'LUADOC_MISS_SEE_NAME',
+                start  = getStart(),
+                finish = getFinish(),
+            }
             return nil
         end
-        result.start = result.name.start
+        result.start  = result.name.start
         result.finish = result.name.finish
-        if checkToken('symbol', '#', 1) then
-            nextToken()
-            result.field = parseName('doc.see.field', result)
-            result.finish = getFinish()
-        end
         return result
     end)
     : case 'diagnostic'

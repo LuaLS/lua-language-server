@@ -26,6 +26,7 @@ local function founded(targets, results)
     return true
 end
 
+---@async
 function TEST(datas)
     local targetList = {}
     local sourceList

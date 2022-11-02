@@ -19,6 +19,7 @@ local guide        = require 'parser.guide'
 local await        = require 'await'
 local postfix      = require 'core.completion.postfix'
 local diag         = require 'proto.diagnostic'
+local wssymbol     = require 'core.workspace-symbol'
 
 local diagnosticModes = {
     'disable-next-line',
@@ -1715,6 +1716,7 @@ local function getluaDocByErr(state, start, position)
     return targetError, targetDoc
 end
 
+---@async
 local function tryluaDocBySource(state, position, source, results)
     if     source.type == 'doc.extends.name' then
         if source.parent.type == 'doc.class' then
@@ -1823,8 +1825,8 @@ local function tryluaDocBySource(state, position, source, results)
             if matchKey(source[1], name) then
                 results[#results+1] = {
                     label = name,
-                    kind   = define.CompletionItemKind.Variable,
-                    id     = stack(function () ---@async
+                    kind  = define.CompletionItemKind.Variable,
+                    id    = stack(function () ---@async
                         return {
                             detail      = buildDetail(loc),
                             description = buildDesc(loc),
@@ -1863,10 +1865,33 @@ local function tryluaDocBySource(state, position, source, results)
             end
         end
         return true
+    elseif source.type == 'doc.see.name' then
+        local symbolds = wssymbol(source[1])
+        table.sort(symbolds, function (a, b)
+            return a.name < b.name
+        end)
+        for _, symbol in ipairs(symbolds) do
+            results[#results+1] = {
+                label = symbol.name,
+                kind  = symbol.ckind,
+                id    = stack(function () ---@async
+                    return {
+                        detail      = buildDetail(symbol.source),
+                        description = buildDesc(symbol.source),
+                    }
+                end),
+                textEdit = {
+                    start   = source.start,
+                    finish  = source.finish,
+                    newText = symbol.name,
+                },
+            }
+        end
     end
     return false
 end
 
+---@async
 local function tryluaDocByErr(state, position, err, docState, results)
     if     err.type == 'LUADOC_MISS_CLASS_EXTENDS_NAME' then
         local used = {}
@@ -2003,6 +2028,23 @@ local function tryluaDocByErr(state, position, err, docState, results)
                 description = ('```lua\n%s\n```'):format(vm.OP_OTHER_MAP[name]),
             }
         end
+    elseif err.type == 'LUADOC_MISS_SEE_NAME' then
+        local symbolds = wssymbol('')
+        table.sort(symbolds, function (a, b)
+            return a.name < b.name
+        end)
+        for _, symbol in ipairs(symbolds) do
+            results[#results+1] = {
+                label = symbol.name,
+                kind  = symbol.ckind,
+                id    = stack(function () ---@async
+                    return {
+                        detail      = buildDetail(symbol.source),
+                        description = buildDesc(symbol.source),
+                    }
+                end),
+            }
+        end
     end
 end
 
@@ -2080,6 +2122,7 @@ local function tryluaDocOfFunction(doc, results)
     }
 end
 
+---@async
 local function tryLuaDoc(state, position, results)
     local doc = getLuaDoc(state, position)
     if not doc then

@@ -954,25 +954,26 @@ m.register 'workspace/symbol' {
         local _ <close> = progress.create(workspace.getFirstScope().uri, lang.script.WINDOW_PROCESSING_WS_SYMBOL, 0.5)
         local core = require 'core.workspace-symbol'
 
-        local symbols = core(params.query)
+        local symbols = core(params.query, true)
         if not symbols or #symbols == 0 then
             return nil
         end
 
         local function convert(symbol)
-            local state = files.getState(symbol.uri)
+            local uri = guide.getUri(symbol.source)
+            local state = files.getState(uri)
             if not state then
                 return nil
             end
             return {
                 name = symbol.name,
-                kind = symbol.kind,
+                kind = symbol.skind,
                 location = converter.location(
-                    symbol.uri,
+                    uri,
                     converter.packRange(
                         state,
-                        symbol.range[1],
-                        symbol.range[2]
+                        symbol.source.start,
+                        symbol.source.finish
                     )
                 )
             }

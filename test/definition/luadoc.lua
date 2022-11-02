@@ -207,23 +207,30 @@ y.<?a?>
 ]]
 
 TEST [[
----@class <!loli!>
-local unit!>
+---@class <!A!>
+local mt
 
-function unit:pants()
+function mt:f()
 end
 
----@see <?loli?>
+---@see <?A?>
 ]]
 
 TEST [[
----@class loli
-local unit
+---@class A
+local mt
 
-function unit:<!pants!>()
+function <!mt:f!>()
 end
 
----@see loli#<?pants?>
+---@see <?A.f?>
+]]
+
+TEST [[
+AAA = {}
+<!AAA.BBB!> = 1
+
+---@see <?AAA.BBB?>
 ]]
 
 TEST [[

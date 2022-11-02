@@ -592,17 +592,6 @@ local Care = util.switch()
             type       = define.TokenTypes.class,
         }
     end)
-    : case 'doc.see.field'
-    : call(function (source, options, results)
-        if not options.annotation then
-            return
-        end
-        results[#results+1] = {
-            start      = source.start,
-            finish     = source.finish,
-            type       = define.TokenTypes.property,
-        }
-    end)
     : case 'doc.diagnostic'
     : call(function (source, options, results)
         if not options.annotation then

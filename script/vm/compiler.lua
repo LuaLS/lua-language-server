@@ -1666,13 +1666,6 @@ local compilerSwitch = util.switch()
     : call(function (source)
         vm.setNode(source, vm.compileNode(source.overload))
     end)
-    : case 'doc.see.name'
-    : call(function (source)
-        local type = vm.getGlobal('type', source[1])
-        if type then
-            vm.setNode(source, type)
-        end
-    end)
     : case 'doc.type.arg'
     : call(function (source)
         if source.extends then
@@ -1840,17 +1833,6 @@ local nodeSwitch;nodeSwitch = util.switch()
         local parentNode = vm.compileNode(source.node)
         for pn in parentNode:eachObject() do
             searchFieldSwitch(pn.type, uri, pn, key, false, pushResult)
-        end
-    end)
-    : case 'doc.see.field'
-    : call(function (source, lastKey, pushResult)
-        if lastKey then
-            return
-        end
-        local parentNode = vm.compileNode(source.parent.name)
-        local uri = guide.getUri(source)
-        for pn in parentNode:eachObject() do
-            searchFieldSwitch(pn.type, uri, pn, source[1], false, pushResult)
         end
     end)
 

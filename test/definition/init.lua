@@ -21,6 +21,7 @@ local function founded(targets, results)
     return true
 end
 
+---@async
 function TEST(script)
     local newScript, catched = catch(script, '!?')
 

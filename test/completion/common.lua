@@ -3963,3 +3963,15 @@ t.<??>
         kind     = define.CompletionItemKind.Field,
     },
 }
+
+TEST [[
+---@class ABCD
+
+---@see ABCD<??>
+]]
+{
+    {
+        label    = 'ABCD',
+        kind     = define.CompletionItemKind.Class,
+    },
+}

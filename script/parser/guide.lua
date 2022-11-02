@@ -160,7 +160,7 @@ local childMap = {
     ['doc.type.field']     = {'name', 'extends'},
     ['doc.type.sign']      = {'node', '#signs'},
     ['doc.overload']       = {'overload', 'comment'},
-    ['doc.see']            = {'name', 'field'},
+    ['doc.see']            = {'name'},
     ['doc.version']        = {'#versions'},
     ['doc.diagnostic']     = {'#names'},
     ['doc.as']             = {'as'},
@@ -1015,8 +1015,7 @@ function m.getKeyName(obj)
     elseif tp == 'tableexp' then
         return obj.tindex
     elseif tp == 'field'
-    or     tp == 'method'
-    or     tp == 'doc.see.field' then
+    or     tp == 'method' then
         return obj[1]
     elseif tp == 'doc.class' then
         return obj.class[1]
@@ -1080,8 +1079,7 @@ function m.getKeyType(obj)
     elseif tp == 'tableexp' then
         return 'integer'
     elseif tp == 'field'
-    or     tp == 'method'
-    or     tp == 'doc.see.field' then
+    or     tp == 'method' then
         return 'string'
     elseif tp == 'doc.class' then
         return 'string'

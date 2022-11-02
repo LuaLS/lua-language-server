@@ -5,6 +5,7 @@ local findSource = require 'core.find-source'
 local guide      = require 'parser.guide'
 local rpath      = require 'workspace.require-path'
 local jumpSource = require 'core.jump-source'
+local wssymbol   = require 'core.workspace-symbol'
 
 local function sortResults(results)
     -- 先按照顺序排序
@@ -53,7 +54,6 @@ local accept = {
     ['doc.extends.name'] = true,
     ['doc.alias.name']   = true,
     ['doc.see.name']     = true,
-    ['doc.see.field']    = true,
     ['doc.cast.name']    = true,
     ['doc.enum.name']    = true,
     ['doc.field.name']   = true,
@@ -107,6 +107,26 @@ local function convertIndex(source)
     return source
 end
 
+---@async
+---@param source parser.object
+---@param results table
+local function checkSee(source, results)
+    if source.type ~= 'doc.see.name' then
+        return
+    end
+    local symbols = wssymbol(source[1])
+    for _, symbol in ipairs(symbols) do
+        if symbol.name == source[1] then
+            results[#results+1] = {
+                target = symbol.source,
+                source = source,
+                uri    = guide.getUri(symbol.source),
+            }
+        end
+    end
+end
+
+---@async
 return function (uri, offset)
     local ast = files.getState(uri)
     if not ast then
@@ -133,6 +153,8 @@ return function (uri, offset)
             }
         end
     end
+
+    checkSee(source, results)
 
     local defs = vm.getDefs(source)
 

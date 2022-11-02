@@ -12,10 +12,10 @@ local function buildSource(uri, source, key, results)
         local name = source[1]
         if matchKey(key, name) then
             results[#results+1] = {
-                name  = name,
-                kind  = define.SymbolKind.Variable,
-                uri   = uri,
-                range = { source.start, source.finish },
+                name   = name,
+                skind  = define.SymbolKind.Variable,
+                ckind  = define.CompletionItemKind.Variable,
+                source = source,
             }
         end
     elseif source.type == 'setfield'
@@ -24,10 +24,10 @@ local function buildSource(uri, source, key, results)
         local name  = field and field[1]
         if name and matchKey(key, name) then
             results[#results+1] = {
-                name  = name,
-                kind  = define.SymbolKind.Field,
-                uri   = uri,
-                range = { field.start, field.finish },
+                name   = name,
+                skind  = define.SymbolKind.Field,
+                ckind  = define.CompletionItemKind.Field,
+                source = field,
             }
         end
     elseif source.type == 'setmethod' then
@@ -35,10 +35,10 @@ local function buildSource(uri, source, key, results)
         local name   = method and method[1]
         if name and matchKey(key, name) then
             results[#results+1] = {
-                name  = name,
-                kind  = define.SymbolKind.Method,
-                uri   = uri,
-                range = { method.start, method.finish },
+                name   = name,
+                skind  = define.SymbolKind.Method,
+                ckind  = define.CompletionItemKind.Method,
+                source = method,
             }
         end
     end
@@ -63,19 +63,22 @@ local function searchGlobalAndClass(key, results)
         local name = global:getCodeName()
         if matchKey(key, name) then
             for _, set in ipairs(global:getAllSets()) do
-                local kind
+                local skind, ckind
                 if set.type == 'doc.class' then
-                    kind = define.SymbolKind.Class
+                    skind = define.SymbolKind.Class
+                    ckind = define.CompletionItemKind.Class
                 elseif set.type == 'doc.alias' then
-                    kind = define.SymbolKind.Namespace
+                    skind = define.SymbolKind.Struct
+                    ckind = define.CompletionItemKind.Struct
                 else
-                    kind = define.SymbolKind.Variable
+                    skind = define.SymbolKind.Variable
+                    ckind = define.CompletionItemKind.Variable
                 end
                 results[#results+1] = {
-                    name  = name,
-                    kind  = kind,
-                    uri   = guide.getUri(set),
-                    range = { set.start, set.finish },
+                    name   = name,
+                    skind  = skind,
+                    ckind  = ckind,
+                    source = set,
                 }
             end
             await.delay()
@@ -113,10 +116,10 @@ local function searchClassField(key, results)
             return
         end
         results[#results+1] = {
-            name  = class .. '.' .. keyName,
-            kind  = define.SymbolKind.Field,
-            uri   = guide.getUri(field),
-            range = { field.start, field.finish },
+            name   = class .. '.' .. keyName,
+            skind  = define.SymbolKind.Field,
+            ckind  = define.SymbolKind.Field,
+            source = field,
         }
     end)
 end
@@ -135,12 +138,14 @@ local function searchWords(key, results)
 end
 
 ---@async
-return function (key)
+return function (key, includeWords)
     local results = {}
 
     searchGlobalAndClass(key, results)
     searchClassField(key, results)
-    searchWords(key, results)
+    if includeWords then
+        searchWords(key, results)
+    end
 
     return results
 end

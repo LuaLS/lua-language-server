@@ -496,7 +496,6 @@ local function clearMemory()
         return
     end
     vm.clearNodeCache()
-    collectgarbage()
 end
 
 ---@async

@@ -555,15 +555,11 @@ function m.compileStateThen(state, file)
 end
 
 ---@param uri uri
----@param async boolean?
----@return parser.state?
-function m.compileState(uri, async)
+---@return boolean
+function m.checkPreload(uri)
     local file = m.fileMap[uri]
     if not file then
-        return
-    end
-    if file.state then
-        return file.state
+        return false
     end
     local ws     = require 'workspace'
     local client = require 'client'
@@ -588,7 +584,22 @@ function m.compileState(uri, async)
                 client.logMessage('Info', message)
             end
         end
-        return nil
+        return false
+    end
+    return true
+end
+
+---@param uri uri
+---@param callback fun(state: parser.state?)
+function m.compileStateAsync(uri, callback)
+    local file = m.fileMap[uri]
+    if not file then
+        callback(nil)
+        return
+    end
+    if file.state then
+        callback(file.state)
+        return
     end
 
     ---@type brave.param.compile.options
@@ -598,27 +609,50 @@ function m.compileState(uri, async)
         nonstandardSymbol = util.arrayToHash(config.get(uri, 'Lua.runtime.nonstandardSymbol')),
     }
 
-    if async then
-        ---@type brave.param.compile
-        local params = {
-            uri     = uri,
-            text    = file.text,
-            mode    = 'Lua',
-            version = config.get(uri, 'Lua.runtime.version'),
-            options = options
-        }
-        pub.task('compile', params, function (result)
-            if file.text ~= params.text then
-                return
-            end
-            if not result.state then
-                log.error('Compile failed:', uri, result.err)
-                return
-            end
-            m.compileStateThen(result.state, file)
-        end)
+    ---@type brave.param.compile
+    local params = {
+        uri     = uri,
+        text    = file.text,
+        mode    = 'Lua',
+        version = config.get(uri, 'Lua.runtime.version'),
+        options = options
+    }
+    pub.task('compile', params, function (result)
+        if file.text ~= params.text then
+            return
+        end
+        if not result.state then
+            log.error('Compile failed:', uri, result.err)
+            callback(nil)
+            return
+        end
+        m.compileStateThen(result.state, file)
+        callback(result.state)
+    end)
+end
+
+---@param uri uri
+---@return parser.state?
+function m.compileState(uri)
+    local file = m.fileMap[uri]
+    if not file then
+        return
+    end
+    if file.state then
+        return file.state
+    end
+    if not m.checkPreload(uri) then
+        return
     end
 
+    ---@type brave.param.compile.options
+    local options = {
+        special           = config.get(uri, 'Lua.runtime.special'),
+        unicodeName       = config.get(uri, 'Lua.runtime.unicodeName'),
+        nonstandardSymbol = util.arrayToHash(config.get(uri, 'Lua.runtime.nonstandardSymbol')),
+    }
+
+    local ws     = require 'workspace'
     local prog <close> = progress.create(uri, lang.script.WINDOW_COMPILING, 0.5)
     prog:setMessage(ws.getRelativePath(uri))
     local clock = os.clock()

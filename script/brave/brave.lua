@@ -10,7 +10,7 @@ m.ability = {}
 m.queue = {}
 
 --- 注册成为勇者
-function m.register(id)
+function m.register(id, privatePad)
     m.id = id
 
     if #m.queue > 0 then
@@ -20,7 +20,7 @@ function m.register(id)
     end
     m.queue = nil
 
-    m.start()
+    m.start(privatePad)
 end
 
 --- 注册能力
@@ -41,10 +41,11 @@ function m.push(name, params)
 end
 
 --- 开始找工作
-function m.start()
+function m.start(privatePad)
+    local myPad = privatePad and thread.channel('private:' .. privatePad) or taskPad
     m.push('mem', collectgarbage 'count')
     while true do
-        local name, id, params = taskPad:bpop()
+        local name, id, params = myPad:bpop()
         local ability = m.ability[name]
         -- TODO
         if not ability then

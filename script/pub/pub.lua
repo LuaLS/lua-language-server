@@ -24,7 +24,7 @@ log = require 'brave.log'
 
 xpcall(dofile, log.error, %q)
 local brave = require 'brave'
-brave.register(%d)
+brave.register(%d, %q)
 ]]
 
 ---@class pub
@@ -34,6 +34,7 @@ m.braves    = {}
 m.ability   = {}
 m.taskQueue = {}
 m.taskMap   = {}
+m.prvtPad   = {}
 
 --- 注册酒馆的功能
 function m.on(name, callback)
@@ -42,7 +43,8 @@ end
 
 --- 招募勇者，勇者会从公告板上领取任务，完成任务后到看板娘处交付任务
 ---@param num integer
-function m.recruitBraves(num)
+---@param privatePad string?
+function m.recruitBraves(num, privatePad)
     for _ = 1, num do
         local id = #m.braves + 1
         log.debug('Create brave:', id)
@@ -55,12 +57,17 @@ function m.recruitBraves(num)
                 DBGPORT or 11412,
                 DBGWAIT or 'nil',
                 (ROOT / 'debugger.lua'):string(),
-                id
+                id,
+                privatePad
             )),
             taskMap = {},
             currentTask = nil,
             memory   = 0,
         }
+    end
+    if privatePad and not m.prvtPad[privatePad] then
+        thread.newchannel('private:' .. privatePad)
+        m.prvtPad[privatePad] = thread.channel('private:' .. privatePad)
     end
 end
 
@@ -69,7 +76,11 @@ function m.pushTask(info)
     if info.removed then
         return false
     end
-    taskPad:push(info.name, info.id, info.params)
+    if m.prvtPad[info.name] then
+        m.prvtPad[info.name]:push(info.name, info.id, info.params)
+    else
+        taskPad:push(info.name, info.id, info.params)
+    end
     m.taskMap[info.id] = info
     return true
 end

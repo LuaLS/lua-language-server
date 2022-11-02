@@ -260,7 +260,10 @@ end
 function m.start()
     util.enableCloseFunction()
     await.setErrorHandle(log.error)
-    pub.recruitBraves(4 + (COMPILECORES or 0))
+    pub.recruitBraves(4)
+    if COMPILECORES and COMPILECORES > 0 then
+        pub.recruitBraves(COMPILECORES, 'compile')
+    end
     proto.listen()
     m.report()
     m.testVersion()

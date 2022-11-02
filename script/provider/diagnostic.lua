@@ -303,6 +303,11 @@ function m.doDiagnostic(uri, isScopeDiag)
         end
         m.cache[uri] = full
 
+        if not files.exists(uri) then
+            m.clear(uri)
+            return
+        end
+
         proto.notify('textDocument/publishDiagnostics', {
             uri = uri,
             version = version,
@@ -342,6 +347,11 @@ end
 function m.resendDiagnostic(uri)
     local full = m.cache[uri]
     if not full then
+        return
+    end
+
+    if not files.exists(uri) then
+        m.clear(uri)
         return
     end
 

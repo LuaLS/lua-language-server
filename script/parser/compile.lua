@@ -1721,7 +1721,23 @@ local function checkAmbiguityCall(call, parenPos)
     }
 end
 
+local function bindSpecial(source, name)
+    if Specials[name] then
+        addSpecial(name, source)
+    else
+        local ospeicals = State.options.special
+        if ospeicals and ospeicals[name] then
+            addSpecial(ospeicals[name], source)
+        end
+    end
+end
+
 local function parseSimple(node, funcName)
+    local currentName
+    if node.type == 'getglobal'
+    or node.type == 'getlocal' then
+        currentName = node[1]
+    end
     local lastMethod
     while true do
         if lastMethod and node.node == lastMethod then
@@ -1752,6 +1768,16 @@ local function parseSimple(node, funcName)
             if field then
                 field.parent = getfield
                 field.type   = 'field'
+                if currentName then
+                    if node.type == 'getlocal'
+                    or node.type == 'getglobal'
+                    or node.type == 'getfield' then
+                        currentName = currentName .. '.' .. field[1]
+                        bindSpecial(getfield, currentName)
+                    else
+                        currentName = nil
+                    end
+                end
             else
                 pushError {
                     type   = 'MISS_FIELD',
@@ -2019,7 +2045,7 @@ local function resolveName(node)
     if not node then
         return nil
     end
-    local loc  = getLocal(node[1], node.start)
+    local loc = getLocal(node[1], node.start)
     if loc then
         node.type = 'getlocal'
         node.node = loc
@@ -2042,14 +2068,7 @@ local function resolveName(node)
         end
     end
     local name = node[1]
-    if Specials[name] then
-        addSpecial(name, node)
-    else
-        local ospeicals = State.options.special
-        if ospeicals and ospeicals[name] then
-            addSpecial(ospeicals[name], node)
-        end
-    end
+    bindSpecial(node, name)
     return node
 end
 

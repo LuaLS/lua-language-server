@@ -3876,3 +3876,18 @@ local t = {
     f = function (<?x?>) end
 }
 ]]
+
+config.set(nil, 'Lua.runtime.special', {
+    ['xx.assert'] = 'assert'
+})
+
+TEST 'number' [[
+---@type number?
+local t
+
+xx.assert(t)
+
+print(<?t?>)
+]]
+
+config.set(nil, 'Lua.runtime.special', nil)

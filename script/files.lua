@@ -392,6 +392,16 @@ function m.getOriginText(uri)
     return file.originText
 end
 
+---@param uri uri
+---@param text string
+function m.setOriginText(uri, text)
+    local file = m.fileMap[uri]
+    if not file then
+        return
+    end
+    file.originText = text
+end
+
 --- 获取文件原始行表
 ---@param uri uri
 ---@return integer[]

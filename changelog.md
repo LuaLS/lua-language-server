@@ -105,6 +105,14 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
   ```
 * `CHG` find reference: respect `includeDeclaration` (although I don't know how to turn off this option in VSCode)
 * `CHG` [#1344] improve `---@see`
+* `CHG` [#1484] setting `runtime.special` supports fields
+  ```jsonc
+  {
+    "runtime.special": {
+      "sandbox.require": "require"
+    }
+  }
+  ```
 * `FIX` [#1567]
 * `FIX` [#1593]
 * `FIX` [#1595]
@@ -122,6 +130,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 [#1332]: https://github.com/sumneko/lua-language-server/issues/1332
 [#1344]: https://github.com/sumneko/lua-language-server/issues/1344
 [#1458]: https://github.com/sumneko/lua-language-server/issues/1458
+[#1484]: https://github.com/sumneko/lua-language-server/issues/1484
 [#1557]: https://github.com/sumneko/lua-language-server/issues/1557
 [#1558]: https://github.com/sumneko/lua-language-server/issues/1558
 [#1561]: https://github.com/sumneko/lua-language-server/issues/1561

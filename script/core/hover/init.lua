@@ -16,7 +16,7 @@ local function getHover(source)
     local descMark  = {}
 
     if source.type == 'doc.see.name' then
-        for _, symbol in ipairs(wssymbol(source[1])) do
+        for _, symbol in ipairs(wssymbol(source[1], guide.getUri(source))) do
             if symbol.name == source[1] then
                 source = symbol.source
                 break

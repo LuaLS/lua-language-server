@@ -131,7 +131,7 @@ local function packSee(see)
     local name = see.name[1]
     local buf  = {}
     local target
-    for _, symbol in ipairs(wssymbol(name)) do
+    for _, symbol in ipairs(wssymbol(name, guide.getUri(see))) do
         if symbol.name == name then
             target = symbol.source
             break

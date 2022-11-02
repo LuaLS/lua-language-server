@@ -1866,7 +1866,7 @@ local function tryluaDocBySource(state, position, source, results)
         end
         return true
     elseif source.type == 'doc.see.name' then
-        local symbolds = wssymbol(source[1])
+        local symbolds = wssymbol(source[1], state.uri)
         table.sort(symbolds, function (a, b)
             return a.name < b.name
         end)
@@ -2029,7 +2029,7 @@ local function tryluaDocByErr(state, position, err, docState, results)
             }
         end
     elseif err.type == 'LUADOC_MISS_SEE_NAME' then
-        local symbolds = wssymbol('')
+        local symbolds = wssymbol('', state.uri)
         table.sort(symbolds, function (a, b)
             return a.name < b.name
         end)

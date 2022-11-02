@@ -57,12 +57,19 @@ end
 
 ---@async
 ---@param key string
+---@param suri? uri
 ---@param results table[]
-local function searchGlobalAndClass(key, results)
+local function searchGlobalAndClass(key, suri, results)
     for _, global in pairs(vm.getAllGlobals()) do
         local name = global:getCodeName()
         if matchKey(key, name) then
-            for _, set in ipairs(global:getAllSets()) do
+            local sets
+            if suri then
+                sets = global:getSets(suri)
+            else
+                sets = global:getAllSets()
+            end
+            for _, set in ipairs(sets) do
                 local skind, ckind
                 if set.type == 'doc.class' then
                     skind = define.SymbolKind.Class
@@ -88,8 +95,9 @@ end
 
 ---@async
 ---@param key string
+---@param suri? uri
 ---@param results table[]
-local function searchClassField(key, results)
+local function searchClassField(key, suri, results)
     local class, inField = key:match('^(.+)%.(.-)$')
     if not class then
         return
@@ -98,11 +106,16 @@ local function searchClassField(key, results)
     if not global then
         return
     end
-    local set = global:getAllSets()[1]
+    local set
+    if suri then
+        set = global:getSets(suri)[1]
+    else
+        set = global:getAllSets()[1]
+    end
     if not set then
         return
     end
-    local suri = guide.getUri(set)
+    suri = suri or guide.getUri(set)
     vm.getClassFields(suri, global, nil, false, function (field, isMark)
         if field.type == 'generic' then
             return
@@ -126,9 +139,10 @@ end
 
 ---@async
 ---@param key string
+---@param suri? uri
 ---@param results table[]
-local function searchWords(key, results)
-    for uri in files.eachFile() do
+local function searchWords(key, suri, results)
+    for uri in files.eachFile(suri) do
         searchFile(uri, key, results)
         if #results > 1000 then
             break
@@ -138,13 +152,16 @@ local function searchWords(key, results)
 end
 
 ---@async
-return function (key, includeWords)
+---@param key string
+---@param suri? uri
+---@param includeWords? boolean
+return function (key, suri, includeWords)
     local results = {}
 
-    searchGlobalAndClass(key, results)
-    searchClassField(key, results)
+    searchGlobalAndClass(key, suri, results)
+    searchClassField(key, suri, results)
     if includeWords then
-        searchWords(key, results)
+        searchWords(key, suri, results)
     end
 
     return results

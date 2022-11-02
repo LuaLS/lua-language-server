@@ -954,7 +954,7 @@ m.register 'workspace/symbol' {
         local _ <close> = progress.create(workspace.getFirstScope().uri, lang.script.WINDOW_PROCESSING_WS_SYMBOL, 0.5)
         local core = require 'core.workspace-symbol'
 
-        local symbols = core(params.query, true)
+        local symbols = core(params.query, nil, true)
         if not symbols or #symbols == 0 then
             return nil
         end

@@ -114,7 +114,7 @@ local function checkSee(source, results)
     if source.type ~= 'doc.see.name' then
         return
     end
-    local symbols = wssymbol(source[1])
+    local symbols = wssymbol(source[1], guide.getUri(source))
     for _, symbol in ipairs(symbols) do
         if symbol.name == source[1] then
             results[#results+1] = {

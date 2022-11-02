@@ -1658,7 +1658,7 @@ local x: unknown
 
 ---
 
-See: [A](file:///a.lua:1:10)  comment1]]
+See: [A](file:///a.lua#1#10)  comment1]]
 }
 
 TEST { {path = 'a.lua', content = [[
@@ -1678,6 +1678,6 @@ local x: unknown
 ---
 
 See:
-  * [A](file:///a.lua:1:10)  comment1
-  * [TTT](file:///a.lua:3:0)  comment2]]
+  * [A](file:///a.lua#1#10)  comment1
+  * [TTT](file:///a.lua#3#0)  comment2]]
 }

@@ -66,8 +66,12 @@ function m.recruitBraves(num, privatePad)
         }
     end
     if privatePad and not m.prvtPad[privatePad] then
-        thread.newchannel('private:' .. privatePad)
-        m.prvtPad[privatePad] = thread.channel('private:' .. privatePad)
+        thread.newchannel('req:' .. privatePad)
+        thread.newchannel('res:' .. privatePad)
+        m.prvtPad[privatePad] = {
+            req = thread.channel('req:' .. privatePad),
+            res = thread.channel('res:' .. privatePad),
+        }
     end
 end
 
@@ -77,7 +81,7 @@ function m.pushTask(info)
         return false
     end
     if m.prvtPad[info.name] then
-        m.prvtPad[info.name]:push(info.name, info.id, info.params)
+        m.prvtPad[info.name].req:push(info.name, info.id, info.params)
     else
         taskPad:push(info.name, info.id, info.params)
     end
@@ -146,6 +150,19 @@ function m.task(name, params, callback)
     return m.pushTask(info)
 end
 
+function m.reciveFromPad(pad)
+    local suc, id, name, result = pad:pop()
+    if not suc then
+        return false
+    end
+    if type(name) == 'string' then
+        m.popReport(m.braves[id], name, result)
+    else
+        m.popTask(m.braves[id], name, result)
+    end
+    return true
+end
+
 --- 接收反馈
 function m.recieve(block)
     if block then
@@ -157,14 +174,18 @@ function m.recieve(block)
         end
     else
         while true do
-            local suc, id, name, result = waiter:pop()
-            if not suc then
-                break
+            local ok
+            if m.reciveFromPad(waiter) then
+                ok = true
             end
-            if type(name) == 'string' then
-                m.popReport(m.braves[id], name, result)
-            else
-                m.popTask(m.braves[id], name, result)
+            for _, pad in pairs(m.prvtPad) do
+                if m.reciveFromPad(pad.res) then
+                    ok = true
+                end
+            end
+
+            if not ok then
+                break
             end
         end
     end

@@ -42,22 +42,23 @@ end
 
 --- 开始找工作
 function m.start(privatePad)
-    local myPad = privatePad and thread.channel('private:' .. privatePad) or taskPad
+    local reqPad = privatePad and thread.channel('req:' .. privatePad) or taskPad
+    local resPad = privatePad and thread.channel('res:' .. privatePad) or waiter
     m.push('mem', collectgarbage 'count')
     while true do
-        local name, id, params = myPad:bpop()
+        local name, id, params = reqPad:bpop()
         local ability = m.ability[name]
         -- TODO
         if not ability then
-            waiter:push(m.id, id)
+            resPad:push(m.id, id)
             log.error('Brave can not handle this work: ' .. name)
             goto CONTINUE
         end
         local ok, res = xpcall(ability, log.error, params)
         if ok then
-            waiter:push(m.id, id, res)
+            resPad:push(m.id, id, res)
         else
-            waiter:push(m.id, id)
+            resPad:push(m.id, id)
         end
         m.push('mem', collectgarbage 'count')
         ::CONTINUE::

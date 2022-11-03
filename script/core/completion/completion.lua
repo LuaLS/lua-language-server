@@ -1199,6 +1199,17 @@ local function insertDocEnum(state, pos, doc, enums)
     return enums
 end
 
+local function buildInsertDocFunction(doc)
+    local args = {}
+    for i, arg in ipairs(doc.args) do
+        args[i] = ('${%d:%s}'):format(i, arg.name[1])
+    end
+    return ("\z
+function (%s)\
+\t$0\
+end"):format(table.concat(args, ', '))
+end
+
 ---@param state     parser.state
 ---@param pos       integer
 ---@param src       vm.node.object
@@ -1219,6 +1230,26 @@ local function insertEnum(state, pos, src, enums, isInArray)
             label       = src[1],
             description = src.comment,
             kind        = define.CompletionItemKind.EnumMember,
+        }
+    elseif src.type == 'doc.type.function' then
+        ---@cast src parser.object
+        local insertText = buildInsertDocFunction(src)
+        local description
+        if src.comment then
+            description = src.comment
+        else
+            local descText = insertText:gsub('%$%{%d+:([^}]+)%}', function (val)
+                return val
+            end):gsub('%$%{?%d+%}?', '')
+            description = markdown()
+                : add('lua', descText)
+                : string()
+        end
+        enums[#enums+1] = {
+            label       = vm.getInfer(src):view(state.uri),
+            description = description,
+            kind        = define.CompletionItemKind.Function,
+            insertText  = insertText,
         }
     elseif isInArray and src.type == 'doc.type.array' then
         for i, d in ipairs(vm.getDefs(src.node)) do
@@ -1433,17 +1464,6 @@ local function trySymbol(state, position, results)
     end
 end
 
-local function buildInsertDocFunction(doc)
-    local args = {}
-    for i, arg in ipairs(doc.args) do
-        args[i] = ('${%d:%s}'):format(i, arg.name[1])
-    end
-    return ("\z
-function (%s)\
-\t$0\
-end"):format(table.concat(args, ', '))
-end
-
 local function findCall(state, position)
     local call
     guide.eachSourceContain(state.ast, position, function (src)
@@ -1534,27 +1554,6 @@ local function tryCallArg(state, position, results)
     local enums = {}
     for src in node:eachObject() do
         insertEnum(state, position, src, enums, arg and arg.type == 'table')
-        if src.type == 'doc.type.function' then
-            ---@cast src parser.object
-            local insertText = buildInsertDocFunction(src)
-            local description
-            if src.comment then
-                description = src.comment
-            else
-                local descText = insertText:gsub('%$%{%d+:([^}]+)%}', function (val)
-                    return val
-                end):gsub('%$%{?%d+%}?', '')
-                description = markdown()
-                    : add('lua', descText)
-                    : string()
-            end
-            enums[#enums+1] = {
-                label       = vm.getInfer(src):view(state.uri),
-                description = description,
-                kind        = define.CompletionItemKind.Function,
-                insertText  = insertText,
-            }
-        end
     end
     cleanEnums(enums, arg)
     for _, enum in ipairs(enums) do

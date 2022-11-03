@@ -3980,3 +3980,19 @@ TEST [[
         }
     },
 }
+
+TEST [[
+---@class A
+---@field f fun(x: string): string
+
+---@type A
+local t = {
+    f = <??>
+}
+]]
+{
+    {
+        label = 'fun(x: string):string',
+        kind  = define.CompletionItemKind.Function,
+    }
+}

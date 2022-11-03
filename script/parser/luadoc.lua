@@ -138,18 +138,20 @@ Symbol              <-  ({} {
 })
 
 ---@class parser.object
----@field literal boolean
----@field signs parser.object[]
----@field originalComment parser.object
----@field as? parser.object
----@field touch? integer
----@field module? string
----@field async? boolean
----@field versions? table[]
----@field names? parser.object[]
----@field path? string
----@field bindComments? parser.object[]
----@field visible? parser.visibleType
+---@field literal           boolean
+---@field signs             parser.object[]
+---@field originalComment   parser.object
+---@field as?               parser.object
+---@field touch?            integer
+---@field module?           string
+---@field async?            boolean
+---@field versions?         table[]
+---@field names?            parser.object[]
+---@field path?             string
+---@field bindComments?     parser.object[]
+---@field visible?          parser.visibleType
+---@field operators?        parser.object[]
+---@field calls?            parser.object[]
 
 local function parseTokens(text, offset)
     Ci = 0
@@ -822,6 +824,7 @@ local docSwitch = util.switch()
             type      = 'doc.class',
             fields    = {},
             operators = {},
+            calls     = {},
         }
         result.class = parseName('doc.class.name', result)
         if not result.class then
@@ -1395,12 +1398,16 @@ local docSwitch = util.switch()
 
         if checkToken('symbol', '(', 1) then
             nextToken()
-            local exp = parseType(result)
-            if exp then
-                result.exp = exp
-                result.finish = exp.finish
+            if checkToken('symbol', ')', 1) then
+                nextToken()
+            else
+                local exp = parseType(result)
+                if exp then
+                    result.exp = exp
+                    result.finish = exp.finish
+                end
+                nextSymbolOrError ')'
             end
-            nextSymbolOrError ')'
         end
 
         nextSymbolOrError ':'
@@ -1725,10 +1732,9 @@ local function bindDoc(source, binded)
                 source.bindDocs = {}
             end
             source.bindDocs[#source.bindDocs+1] = doc
-            if source.type ~= 'function' then
-                doc.bindSource = source
+            if source.type == 'function' then
+                bindDocWithSource(doc, source)
             end
-            bindDocWithSource(doc, source)
             ok = true
         elseif doc.type == 'doc.param' then
             if  isParam
@@ -1893,6 +1899,13 @@ local function bindCommentsAndFields(binded)
         elseif doc.type == 'doc.operator' then
             if class then
                 class.operators[#class.operators+1] = doc
+                doc.class = class
+            end
+            bindCommentsToDoc(doc, comments)
+            comments = {}
+        elseif doc.type == 'doc.overload' then
+            if class then
+                class.calls[#class.calls+1] = doc
                 doc.class = class
             end
             bindCommentsToDoc(doc, comments)

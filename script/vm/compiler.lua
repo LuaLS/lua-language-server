@@ -14,7 +14,6 @@ local LOCK = {}
 ---@field package _globalBase table
 ---@field cindex             integer
 ---@field func               parser.object
----@field operators?         parser.object[]
 
 -- 该函数有副作用，会给source绑定node！
 ---@param source parser.object
@@ -58,9 +57,6 @@ local function bindDocs(source)
             end
             vm.setNode(source, vm.compileNode(ast))
             return true
-        end
-        if doc.type == 'doc.overload' then
-            vm.setNode(source, vm.compileNode(doc))
         end
     end
     return false
@@ -1032,6 +1028,35 @@ local function compileLocal(source)
     vm.getNode(source):setData('hasDefined', hasMarkDoc or hasMarkParam or hasMarkValue)
 end
 
+---@param source parser.object
+---@param mfunc  parser.object
+---@param index  integer
+---@param args   parser.object[]
+local function bindReturnOfFunction(source, mfunc, index, args)
+    local returnObject = vm.getReturnOfFunction(mfunc, index)
+    if not returnObject then
+        return
+    end
+    local returnNode = vm.compileNode(returnObject)
+    for rnode in returnNode:eachObject() do
+        if rnode.type == 'generic' then
+            returnNode = rnode:resolve(guide.getUri(source), args)
+            break
+        end
+    end
+    if returnNode then
+        for rnode in returnNode:eachObject() do
+            -- TODO: narrow type
+            if rnode.type ~= 'doc.generic.name' then
+                vm.setNode(source, rnode)
+            end
+        end
+        if returnNode:isOptional() then
+            vm.getNode(source):addOptional()
+        end
+    end
+end
+
 local compilerSwitch = util.switch()
     : case 'nil'
     : case 'boolean'
@@ -1476,28 +1501,17 @@ local compilerSwitch = util.switch()
         end
         local funcNode = vm.compileNode(func)
         ---@type vm.node?
-        for mfunc in funcNode:eachObject() do
-            if mfunc.type == 'function'
-            or mfunc.type == 'doc.type.function' then
-                ---@cast mfunc parser.object
-                local returnObject = vm.getReturnOfFunction(mfunc, index)
-                if returnObject then
-                    local returnNode = vm.compileNode(returnObject)
-                    for rnode in returnNode:eachObject() do
-                        if rnode.type == 'generic' then
-                            returnNode = rnode:resolve(guide.getUri(func), args)
-                            break
-                        end
-                    end
-                    if returnNode then
-                        for rnode in returnNode:eachObject() do
-                            -- TODO: narrow type
-                            if rnode.type ~= 'doc.generic.name' then
-                                vm.setNode(source, rnode)
-                            end
-                        end
-                        if returnNode:isOptional() then
-                            vm.getNode(source):addOptional()
+        for nd in funcNode:eachObject() do
+            if nd.type == 'function'
+            or nd.type == 'doc.type.function' then
+                ---@cast nd parser.object
+                bindReturnOfFunction(source, nd, index, args)
+            elseif nd.type == 'global' and nd.cate == 'type' then
+                ---@cast nd vm.global
+                for _, set in ipairs(nd:getSets(guide.getUri(source))) do
+                    if set.type == 'doc.class' then
+                        for _, overload in ipairs(set.calls) do
+                            bindReturnOfFunction(source, overload.overload, index, args)
                         end
                     end
                 end

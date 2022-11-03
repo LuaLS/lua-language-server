@@ -249,6 +249,7 @@ function m.setText(uri, text, isTrust, callback)
     if file.originText == text then
         return
     end
+    local clock = os.clock()
     local newText = pluginOnSetText(file, text)
     file.text       = newText
     file.trusted    = isTrust
@@ -271,6 +272,7 @@ function m.setText(uri, text, isTrust, callback)
             util.saveFile(LOGPATH .. '/diffed.lua', newText)
         end
     end
+    log.trace('Set text:', uri, 'takes', os.clock() - clock, 'sec.')
 
     --if instance or TEST then
     --else

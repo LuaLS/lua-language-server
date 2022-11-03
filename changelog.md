@@ -114,6 +114,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
   }
   ```
 * `CHG` [#1533] supports completion with table field of function
+* `FIX` [#1480]
 * `FIX` [#1567]
 * `FIX` [#1593]
 * `FIX` [#1595]
@@ -131,6 +132,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 [#1332]: https://github.com/sumneko/lua-language-server/issues/1332
 [#1344]: https://github.com/sumneko/lua-language-server/issues/1344
 [#1458]: https://github.com/sumneko/lua-language-server/issues/1458
+[#1480]: https://github.com/sumneko/lua-language-server/issues/1480
 [#1484]: https://github.com/sumneko/lua-language-server/issues/1484
 [#1533]: https://github.com/sumneko/lua-language-server/issues/1533
 [#1557]: https://github.com/sumneko/lua-language-server/issues/1557

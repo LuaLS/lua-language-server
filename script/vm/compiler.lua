@@ -1564,6 +1564,29 @@ local compilerSwitch = util.switch()
     : call(function (source)
         vm.setNode(source, source)
     end)
+    : case 'doc.type.name'
+    : call(function (source)
+        if source[1] == 'self' then
+            local state = guide.getDocState(source)
+            if state.type == 'doc.return'
+            or state.type == 'doc.param' then
+                local func = state.bindSource
+                if func.type == 'function' then
+                    local node = guide.getFunctionSelfNode(func)
+                    if node then
+                        vm.setNode(source, vm.compileNode(node))
+                        return
+                    end
+                end
+            elseif state.type == 'doc.field' then
+                local class = state.class
+                if class then
+                    vm.setNode(source, vm.compileNode(class))
+                    return
+                end
+            end
+        end
+    end)
     : case 'doc.generic.name'
     : call(function (source)
         vm.setNode(source, source)

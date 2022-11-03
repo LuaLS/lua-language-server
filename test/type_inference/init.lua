@@ -21,7 +21,8 @@ local function getSource(pos)
         or source.type == 'field'
         or source.type == 'method'
         or source.type == 'function'
-        or source.type == 'table' then
+        or source.type == 'table'
+        or source.type == 'doc.type.name' then
             result = source
         end
     end)
@@ -3891,3 +3892,38 @@ print(<?t?>)
 ]]
 
 config.set(nil, 'Lua.runtime.special', nil)
+
+TEST 'A' [[
+---@class A
+local mt
+
+---@return <?self?>
+function mt:init()
+end
+]]
+
+TEST 'A' [[
+---@class A
+local mt
+
+---@return self
+function mt:init()
+end
+
+local <?o?> = mt:init()
+]]
+
+TEST 'A' [[
+---@class A
+---@field x <?self?>
+]]
+
+TEST 'A' [[
+---@class A
+---@field x self
+
+---@type A
+local o
+
+print(o.<?x?>)
+]]

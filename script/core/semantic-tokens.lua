@@ -437,6 +437,13 @@ local Care = util.switch()
                 type       = define.TokenTypes.type,
                 modifieres = define.TokenModifiers.modification,
             }
+        elseif source[1] == 'self' then
+            results[#results+1] = {
+                start      = source.start,
+                finish     = source.finish,
+                type       = define.TokenTypes.type,
+                modifieres = define.TokenModifiers.readonly,
+            }
         else
             results[#results+1] = {
                 start  = source.start,

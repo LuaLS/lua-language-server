@@ -404,6 +404,9 @@ local compilerGlobalSwitch = util.switch()
         if name == '_' then
             return
         end
+        if name == 'self' then
+            return
+        end
         local type = vm.declareGlobal('type', name, uri)
         type:addGet(uri, source)
         source._globalNode = type

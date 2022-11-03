@@ -20,6 +20,7 @@ local await        = require 'await'
 local postfix      = require 'core.completion.postfix'
 local diag         = require 'proto.diagnostic'
 local wssymbol     = require 'core.workspace-symbol'
+local findSource   = require 'core.find-source'
 
 local diagnosticModes = {
     'disable-next-line',
@@ -31,10 +32,24 @@ local diagnosticModes = {
 local stackID = 0
 local stacks = {}
 
----@param callback async fun()
-local function stack(callback)
+---@param callback async fun(newSource: parser.object)
+local function stack(oldSource, callback)
     stackID = stackID + 1
-    stacks[stackID] = callback
+    local uri = guide.getUri(oldSource)
+    local pos = oldSource.start
+    local tp  = oldSource.type
+    ---@async
+    stacks[stackID] = function ()
+        local state = files.getState(uri)
+        if not state then
+            return
+        end
+        local newSource = findSource(state, pos, { [tp] = true })
+        if not newSource then
+            return
+        end
+        return callback(newSource)
+    end
     return stackID
 end
 
@@ -245,10 +260,10 @@ local function buildFunction(results, source, value, oop, data)
             title = 'trigger signature',
             command = 'editor.action.triggerParameterHints',
         }
-        snipData.id               = stack(function () ---@async
+        snipData.id               = stack(source, function (newSource) ---@async
             return {
-                detail      = buildDetail(source),
-                description = buildDesc(source),
+                detail      = buildDetail(newSource),
+                description = buildDesc(newSource),
             }
         end)
 
@@ -324,10 +339,10 @@ local function checkLocal(state, word, position, results)
                         match      = name,
                         insertText = name,
                         kind       = define.CompletionItemKind.Function,
-                        id         = stack(function () ---@async
+                        id         = stack(source, function (newSource) ---@async
                             return {
-                                detail      = buildDetail(source),
-                                description = buildDesc(source),
+                                detail      = buildDetail(newSource),
+                                description = buildDesc(newSource),
                             }
                         end),
                     })
@@ -337,10 +352,10 @@ local function checkLocal(state, word, position, results)
             results[#results+1] = {
                 label  = name,
                 kind   = define.CompletionItemKind.Variable,
-                id     = stack(function () ---@async
+                id     = stack(source, function (newSource) ---@async
                     return {
-                        detail      = buildDetail(source),
-                        description = buildDesc(source),
+                        detail      = buildDetail(newSource),
+                        description = buildDesc(newSource),
                     }
                 end),
             }
@@ -403,15 +418,15 @@ local function checkModule(state, word, position, results)
                         },
                     },
                 },
-                id               = stack(function () ---@async
+                id               = stack(targetSource, function (newSource) ---@async
                     local md = markdown()
                     md:add('md', lang.script('COMPLETION_IMPORT_FROM', ('[%s](%s)'):format(
                         workspace.getRelativePath(uri),
                         uri
                     )))
-                    md:add('md', buildDesc(targetSource))
+                    md:add('md', buildDesc(newSource))
                     return {
-                        detail      = buildDetail(targetSource),
+                        detail      = buildDetail(newSource),
                         description = md,
                         --additionalTextEdits = buildInsertRequire(state, originUri, stemName),
                     }
@@ -504,10 +519,10 @@ local function checkFieldThen(state, name, src, word, startPos, position, parent
             match      = name:match '^[^(]+',
             insertText = name:match '^[^(]+',
             deprecated = vm.getDeprecated(src) and true or nil,
-            id         = stack(function () ---@async
+            id         = stack(src, function (newSrc) ---@async
                 return {
-                    detail      = buildDetail(src),
-                    description = buildDesc(src),
+                    detail      = buildDetail(newSrc),
+                    description = buildDesc(newSrc),
                 }
             end),
         })
@@ -536,10 +551,10 @@ local function checkFieldThen(state, name, src, word, startPos, position, parent
         kind       = kind,
         deprecated = vm.getDeprecated(src) and true or nil,
         textEdit   = textEdit,
-        id         = stack(function () ---@async
+        id         = stack(src, function (newSrc) ---@async
             return {
-                detail      = buildDetail(src),
-                description = buildDesc(src),
+                detail      = buildDetail(newSrc),
+                description = buildDesc(newSrc),
             }
         end),
 
@@ -1171,10 +1186,10 @@ local function insertDocEnum(state, pos, doc, enums)
                     enums[#enums+1] = {
                         label  = parentName .. '.' .. key,
                         kind   = define.CompletionItemKind.EnumMember,
-                        id     = stack(function () ---@async
+                        id     = stack(field, function (newField) ---@async
                             return {
-                                detail      = buildDetail(field),
-                                description = buildDesc(field),
+                                detail      = buildDetail(newField),
+                                description = buildDesc(newField),
                             }
                         end),
                     }
@@ -1182,10 +1197,10 @@ local function insertDocEnum(state, pos, doc, enums)
                 valueEnums[#valueEnums+1] = {
                     label  = util.viewLiteral(field.value[1]),
                     kind   = define.CompletionItemKind.EnumMember,
-                    id     = stack(function () ---@async
+                    id     = stack(field, function (newField) ---@async
                         return {
-                            detail      = buildDetail(field),
-                            description = buildDesc(field),
+                            detail      = buildDetail(newField),
+                            description = buildDesc(newField),
                         }
                     end),
                 }
@@ -1524,10 +1539,10 @@ local function checkTableLiteralField(state, position, tbl, fields, results)
                 results[#results+1] = {
                     label      = guide.getKeyName(field),
                     kind       = define.CompletionItemKind.Property,
-                    id         = stack(function () ---@async
+                    id         = stack(field, function (newField) ---@async
                         return {
-                            detail      = buildDetail(field),
-                            description = buildDesc(field),
+                            detail      = buildDetail(newField),
+                            description = buildDesc(newField),
                         }
                     end),
                 }
@@ -1825,10 +1840,10 @@ local function tryluaDocBySource(state, position, source, results)
                 results[#results+1] = {
                     label = name,
                     kind  = define.CompletionItemKind.Variable,
-                    id    = stack(function () ---@async
+                    id    = stack(loc, function (newLoc) ---@async
                         return {
-                            detail      = buildDetail(loc),
-                            description = buildDesc(loc),
+                            detail      = buildDetail(newLoc),
+                            description = buildDesc(newLoc),
                         }
                     end),
                 }
@@ -1873,10 +1888,10 @@ local function tryluaDocBySource(state, position, source, results)
             results[#results+1] = {
                 label = symbol.name,
                 kind  = symbol.ckind,
-                id    = stack(function () ---@async
+                id    = stack(symbol.source, function (newSource) ---@async
                     return {
-                        detail      = buildDetail(symbol.source),
-                        description = buildDesc(symbol.source),
+                        detail      = buildDetail(newSource),
+                        description = buildDesc(newSource),
                     }
                 end),
                 textEdit = {
@@ -1996,10 +2011,10 @@ local function tryluaDocByErr(state, position, err, docState, results)
                 results[#results+1] = {
                     label = name,
                     kind   = define.CompletionItemKind.Variable,
-                    id     = stack(function () ---@async
+                    id     = stack(loc, function (newLoc) ---@async
                         return {
-                            detail      = buildDetail(loc),
-                            description = buildDesc(loc),
+                            detail      = buildDetail(newLoc),
+                            description = buildDesc(newLoc),
                         }
                     end),
                 }
@@ -2036,10 +2051,10 @@ local function tryluaDocByErr(state, position, err, docState, results)
             results[#results+1] = {
                 label = symbol.name,
                 kind  = symbol.ckind,
-                id    = stack(function () ---@async
+                id    = stack(symbol.source, function (newSource) ---@async
                     return {
-                        detail      = buildDetail(symbol.source),
-                        description = buildDesc(symbol.source),
+                        detail      = buildDetail(newSource),
+                        description = buildDesc(newSource),
                     }
                 end),
             }
@@ -2191,15 +2206,6 @@ end
 
 ---@async
 local function tryCompletions(state, position, triggerCharacter, results)
-    local text = state.lua
-    if not state then
-        local word = lookBackward.findWord(text, guide.positionToOffset(state, position))
-        if not word then
-            return
-        end
-        checkCommon(nil, word, position, results)
-        return
-    end
     if getComment(state, position) then
         tryLuaDoc(state, position, results)
         tryComment(state, position, results)

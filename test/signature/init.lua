@@ -329,3 +329,16 @@ f(<??>)
 'function f(<!x: number!>)',
 'function f(<!x: number!>, y: number)',
 }
+
+TEST [[
+---@class A
+---@overload fun(x: number)
+
+---@type A
+local t
+
+t(<??>)
+]]
+{
+'function (<!x: number!>)',
+}

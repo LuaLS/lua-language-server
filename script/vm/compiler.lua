@@ -1592,7 +1592,8 @@ local compilerSwitch = util.switch()
                         return
                     end
                 end
-            elseif state.type == 'doc.field' then
+            elseif state.type == 'doc.field'
+            or     state.type == 'doc.overload' then
                 local class = state.class
                 if class then
                     vm.setNode(source, vm.compileNode(class))

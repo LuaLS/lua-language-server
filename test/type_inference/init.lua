@@ -3909,3 +3909,11 @@ local o
 
 print(o.<?x?>)
 ]]
+
+TEST 'A' [[
+---@class A
+---@overload fun(): self
+local A
+
+local <?o?> = A()
+]]

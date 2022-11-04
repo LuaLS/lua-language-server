@@ -143,6 +143,19 @@ local function makeSignatures(text, call, pos)
                 mark[src] = true
                 signs[#signs+1] = makeOneSignature(src, oop, index)
             end
+        elseif src.type == 'global' and src.cate == 'type' then
+            ---@cast src vm.global
+            for _, set in ipairs(src:getSets(guide.getUri(call))) do
+                if set.type == 'doc.class' then
+                    for _, overload in ipairs(set.calls) do
+                        local f = overload.overload
+                        if not mark[f] then
+                            mark[f] = true
+                            signs[#signs+1] = makeOneSignature(f, oop, index)
+                        end
+                    end
+                end
+            end
         end
     end
     return signs

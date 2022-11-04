@@ -65,24 +65,13 @@ local function isDocClass(source)
     return false
 end
 
----@param func parser.object
----@return boolean
-local function isEmptyFunction(func)
-    if #func > 0 then
-        return false
-    end
-    local startRow  = guide.rowColOf(func.start)
-    local finishRow = guide.rowColOf(func.finish)
-    return finishRow - startRow <= 1
-end
-
 ---@param source parser.object
 local function isDeclareFunctionParam(source)
     if source.parent.type ~= 'funcargs' then
         return false
     end
     local func = source.parent.parent
-    return isEmptyFunction(func)
+    return vm.isEmptyFunction(func)
 end
 
 return function (uri, callback)
@@ -90,6 +79,8 @@ return function (uri, callback)
     if not ast then
         return
     end
+
+    local isMeta = vm.isMetaFile(uri)
     local ignorePatterns = config.get(uri, 'Lua.diagnostics.unusedLocalExclude')
     local ignore = glob.glob(ignorePatterns)
     guide.eachSourceType(ast.ast, 'local', function (source)
@@ -107,7 +98,7 @@ return function (uri, callback)
         if isDocClass(source) then
             return
         end
-        if isDeclareFunctionParam(source) then
+        if isMeta and isDeclareFunctionParam(source) then
             return
         end
         local data = hasGet(source)

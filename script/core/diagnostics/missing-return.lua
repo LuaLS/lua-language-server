@@ -39,17 +39,6 @@ local function hasReturn(block)
 end
 
 ---@param func parser.object
----@return boolean
-local function isEmptyFunction(func)
-    if #func > 0 then
-        return false
-    end
-    local startRow  = guide.rowColOf(func.start)
-    local finishRow = guide.rowColOf(func.finish)
-    return finishRow - startRow <= 1
-end
-
----@param func parser.object
 ---@return integer
 local function getReturnsMin(func)
     local min = vm.countReturnsOfFunction(func, true)
@@ -77,10 +66,12 @@ return function (uri, callback)
         return
     end
 
+    local isMeta = vm.isMetaFile(uri)
+
     ---@async
     guide.eachSourceType(state.ast, 'function', function (source)
         -- check declare only
-        if isEmptyFunction(source) then
+        if isMeta and vm.isEmptyFunction(source) then
             return
         end
         await.delay()

@@ -1,5 +1,6 @@
 ---@class vm
-local vm = require 'vm.vm'
+local vm    = require 'vm.vm'
+local guide = require 'parser.guide'
 
 ---@param arg parser.object
 ---@return parser.object?
@@ -265,4 +266,15 @@ function vm.isVarargFunctionWithOverloads(func)
         end
     end
     return false
+end
+
+---@param func parser.object
+---@return boolean
+function vm.isEmptyFunction(func)
+    if #func > 0 then
+        return false
+    end
+    local startRow  = guide.rowColOf(func.start)
+    local finishRow = guide.rowColOf(func.finish)
+    return finishRow - startRow <= 1
 end

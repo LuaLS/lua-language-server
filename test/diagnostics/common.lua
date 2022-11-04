@@ -1149,6 +1149,8 @@ return m
 ]]
 
 TEST [[
+---@meta
+
 ---@class A
 ---@field a boolean
 
@@ -1769,6 +1771,8 @@ function t:init() end
 ]]
 
 TEST [[
+---@meta
+
 return function f(x, y, z) end
 ]]
 
@@ -1816,6 +1820,8 @@ end
 ]]
 
 TEST [[
+---@meta
+
 ---@return number, number
 local function r2() end
 
@@ -2057,6 +2063,7 @@ local _ <close> = t
 ]]
 
 TEST [[
+---@meta
 ---@diagnostic disable: duplicate-set-field
 ---@class A
 local m = {}

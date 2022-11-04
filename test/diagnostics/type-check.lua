@@ -3,6 +3,7 @@ local config = require 'config'
 config.add(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.add(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.add(nil, 'Lua.diagnostics.disable', 'undefined-global')
+config.add(nil, 'Lua.diagnostics.disable', 'missing-return')
 config.set(nil, 'Lua.type.castNumberToInteger', false)
 
 TEST [[
@@ -867,4 +868,5 @@ t.x = 1
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')
+config.remove(nil, 'Lua.diagnostics.disable', 'missing-return')
 config.set(nil, 'Lua.type.castNumberToInteger', true)

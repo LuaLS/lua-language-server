@@ -1111,6 +1111,8 @@ local compilerSwitch = util.switch()
     : call(function (source)
         vm.setNode(source, source)
 
+        local parent = source.parent
+
         if source.bindDocs then
             for _, doc in ipairs(source.bindDocs) do
                 if doc.type == 'doc.overload' then
@@ -1120,16 +1122,16 @@ local compilerSwitch = util.switch()
         end
 
         -- table.sort(string[], function (<?x?>) end)
-        if source.parent.type == 'callargs' then
-            local call = source.parent.parent
+        if parent.type == 'callargs' then
+            local call = parent.parent
             vm.compileCallArg(source, call)
         end
 
         -- function f() return function (<?x?>) end end
-        if source.parent.type == 'return' then
-            for i, ret in ipairs(source.parent) do
+        if parent.type == 'return' then
+            for i, ret in ipairs(parent) do
                 if ret == source then
-                    local func = guide.getParentFunction(source.parent)
+                    local func = guide.getParentFunction(parent)
                     if func then
                         local returnObj = vm.getReturnOfFunction(func, i)
                         if returnObj then
@@ -1142,9 +1144,8 @@ local compilerSwitch = util.switch()
         end
 
         -- { f = function (<?x?>) end }
-        if source.parent.type == 'tablefield'
-        or source.parent.type == 'tableindex' then
-            vm.setNode(source, vm.compileNode(source.parent))
+        if guide.isSet(parent) then
+            vm.setNode(source, vm.compileNode(parent))
         end
     end)
     : case 'paren'

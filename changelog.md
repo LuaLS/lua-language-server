@@ -114,6 +114,12 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
   }
   ```
 * `CHG` [#1533] supports completion with table field of function
+* `CHG` [#1457] infer parameter type by function type
+  ```lua
+  ---@type fun(x: number)
+  local function f(x) --> `x` is inferred as `number`
+  end
+  ```
 * `FIX` [#1479]
 * `FIX` [#1480]
 * `FIX` [#1567]
@@ -132,6 +138,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 [#1202]: https://github.com/sumneko/lua-language-server/issues/1202
 [#1332]: https://github.com/sumneko/lua-language-server/issues/1332
 [#1344]: https://github.com/sumneko/lua-language-server/issues/1344
+[#1457]: https://github.com/sumneko/lua-language-server/issues/1457
 [#1458]: https://github.com/sumneko/lua-language-server/issues/1458
 [#1479]: https://github.com/sumneko/lua-language-server/issues/1479
 [#1480]: https://github.com/sumneko/lua-language-server/issues/1480

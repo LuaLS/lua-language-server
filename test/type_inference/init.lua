@@ -3931,3 +3931,8 @@ local t = {
     [5] = function(<?x?>) end,
 }
 ]]
+
+TEST 'number' [[
+---@type fun(x: number)
+local function f(<?x?>) end
+]]

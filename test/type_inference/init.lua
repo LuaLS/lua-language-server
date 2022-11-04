@@ -3917,3 +3917,17 @@ local A
 
 local <?o?> = A()
 ]]
+
+TEST 'number' [[
+---@type table<'Test1', fun(x: number)>
+local t = {
+    ["Test1"] = function(<?x?>) end,
+}
+]]
+
+TEST 'number' [[
+---@type table<5, fun(x: number)>
+local t = {
+    [5] = function(<?x?>) end,
+}
+]]

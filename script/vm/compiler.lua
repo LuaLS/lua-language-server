@@ -224,6 +224,13 @@ local searchFieldSwitch = util.switch()
                         or (fn.name == 'string'  and type(key) == 'string') then
                             pushResult(field)
                         end
+                    elseif fn.type == 'doc.type.string'
+                    or     fn.type == 'doc.type.integer'
+                    or     fn.type == 'doc.type.boolean' then
+                        if key == nil
+                        or fn[1] == key then
+                            pushResult(field)
+                        end
                     end
                 end
             end

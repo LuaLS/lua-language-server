@@ -107,8 +107,12 @@ local viewNodeSwitch;viewNodeSwitch = util.switch()
         return vm.getInfer(source.proto):view(uri)
     end)
     : case 'doc.generic.name'
-    : call(function (source, infer)
-        return ('<%s>'):format(source[1])
+    : call(function (source, infer, uri)
+        if source.generic and source.generic.extends then
+            return ('<%s:%s>'):format(source[1], vm.getInfer(source.generic.extends):view(uri))
+        else
+            return ('<%s>'):format(source[1])
+        end
     end)
     : case 'doc.type.array'
     : call(function (source, infer, uri)

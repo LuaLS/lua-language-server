@@ -169,13 +169,13 @@ function vm.isSubType(uri, child, parent, mark)
         end
         parent = global
     elseif parent.type == 'vm.node' then
+        local hasKnownType
         for n in parent:eachObject() do
-            if  getNodeName(n)
-            and vm.isSubType(uri, child, n, mark) == true then
-                return true
-            end
-            if n.type == 'doc.generic.name' then
-                return true
+            if getNodeName(n) then
+                hasKnownType = true
+                if vm.isSubType(uri, child, n, mark) == true then
+                    return true
+                end
             end
         end
         if parent:isOptional() then
@@ -183,7 +183,7 @@ function vm.isSubType(uri, child, parent, mark)
                 return true
             end
         end
-        return false
+        return not hasKnownType
     end
 
     ---@cast parent vm.node.object

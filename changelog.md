@@ -120,6 +120,17 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
   local function f(x) --> `x` is inferred as `number`
   end
   ```
+* `CHG` [#1663] check parameter types of generic extends
+  ```lua
+  ---@generic T: string | boolean
+  ---@param x T
+  ---@return T
+  local function f(x)
+      return x
+  end
+
+  local x = f(1) --> Warning: Cannot assign `integer` to parameter `<T:boolean|string>`.
+  ```
 * `FIX` [#1479]
 * `FIX` [#1480]
 * `FIX` [#1567]
@@ -161,6 +172,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 [#1641]: https://github.com/sumneko/lua-language-server/issues/1641
 [#1642]: https://github.com/sumneko/lua-language-server/issues/1642
 [#1662]: https://github.com/sumneko/lua-language-server/issues/1662
+[#1663]: https://github.com/sumneko/lua-language-server/issues/1663
 
 ## 3.5.6
 `2022-9-16`

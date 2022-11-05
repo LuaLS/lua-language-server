@@ -865,6 +865,17 @@ local t = {
 t.x = 1
 ]]
 
+TEST [[
+---@generic T: string | boolean | table
+---@param x T
+---@return T
+local function f(x)
+    return x
+end
+
+f(<!1!>)
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

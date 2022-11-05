@@ -162,7 +162,7 @@ TEST [[
 for _ in pairs(<??>) do
 end
 ]]
-{'function pairs(<!t: <T>!>)'}
+{'function pairs(<!t: <T:table>!>)'}
 
 TEST [[
 function m:f()

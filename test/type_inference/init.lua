@@ -3936,3 +3936,14 @@ TEST 'number' [[
 ---@type fun(x: number)
 local function f(<?x?>) end
 ]]
+
+TEST 'boolean' [[
+---@generic T: string | boolean | table
+---@param x T
+---@return T
+local function f(x)
+    return x
+end
+
+local <?x?> = f(true)
+]]

@@ -3,8 +3,9 @@ local guide         = require 'parser.guide'
 local vm            = require 'vm.vm'
 
 ---@class vm.sign
----@field parent   parser.object
----@field signList vm.node[]
+---@field parent    parser.object
+---@field signList  vm.node[]
+---@field docGenric parser.object[]
 local mt = {}
 mt.__index = mt
 mt.type = 'sign'
@@ -14,11 +15,15 @@ function mt:addSign(node)
     self.signList[#self.signList+1] = node
 end
 
+---@param doc parser.object
+function mt:addDocGeneric(doc)
+    self.docGenric[#self.docGenric+1] = doc
+end
+
 ---@param uri uri
 ---@param args parser.object
----@param removeGeneric true?
 ---@return table<string, vm.node>?
-function mt:resolve(uri, args, removeGeneric)
+function mt:resolve(uri, args)
     if not args then
         return nil
     end
@@ -256,7 +261,8 @@ end
 ---@return vm.sign
 function vm.createSign()
     local genericMgr = setmetatable({
-        signList = {},
+        signList  = {},
+        docGenric = {},
     }, mt)
     return genericMgr
 end
@@ -285,8 +291,8 @@ function vm.getSign(source)
             if doc.type == 'doc.generic' then
                 if not source._sign then
                     source._sign = vm.createSign()
-                    break
                 end
+                source._sign:addDocGeneric(doc)
             end
         end
         if not source._sign then

@@ -152,6 +152,8 @@ Symbol              <-  ({} {
 ---@field visible?          parser.visibleType
 ---@field operators?        parser.object[]
 ---@field calls?            parser.object[]
+---@field generics?         parser.object[]
+---@field generic?          parser.object
 
 local function parseTokens(text, offset)
     Ci = 0
@@ -1646,7 +1648,7 @@ local function bindGeneric(binded)
         if doc.type == 'doc.generic' then
             for _, obj in ipairs(doc.generics) do
                 local name = obj.generic[1]
-                generics[name] = true
+                generics[name] = obj
             end
         end
         if doc.type == 'doc.class'
@@ -1654,7 +1656,7 @@ local function bindGeneric(binded)
             if doc.signs then
                 for _, sign in ipairs(doc.signs) do
                     local name = sign[1]
-                    generics[name] = true
+                    generics[name] = sign
                 end
             end
         end
@@ -1668,6 +1670,7 @@ local function bindGeneric(binded)
                 local name = src[1]
                 if generics[name] then
                     src.type = 'doc.generic.name'
+                    src.generic = generics[name]
                 end
             end)
             guide.eachSourceType(doc, 'doc.type.code', function (src)

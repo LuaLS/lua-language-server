@@ -646,7 +646,7 @@ end!>
 ]]
 
 TEST [[
-<!for _ in pairs(_VERSION) do
+<!for _ in pairs({}) do
 end!>
 ]]
 

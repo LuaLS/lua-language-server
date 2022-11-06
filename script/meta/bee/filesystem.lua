@@ -1,3 +1,5 @@
+---@meta
+
 ---@class fs.path
 ---@operator div: fs.path
 local fsPath = {}

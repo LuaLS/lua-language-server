@@ -26,6 +26,7 @@ function TEST(script)
         local start, finish = enter[1], enter[2]
         local pos = (start + finish) // 2
         local positions = core(TESTURI, pos)
+        assert(positions)
         local results = {}
         for _, position in ipairs(positions) do
             results[#results+1] = { position.start, position.finish }

@@ -45,6 +45,9 @@ return function (uri, callback)
         local versions
         if deprecated.type == 'doc.version' then
             local validVersions = vm.getValidVersions(deprecated)
+            if not validVersions then
+                return
+            end
             versions = {}
             for version, valid in pairs(validVersions) do
                 if valid then

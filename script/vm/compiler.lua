@@ -813,6 +813,7 @@ end
 ---@param fixIndex integer
 ---@param myIndex  integer
 local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
+    ---@type integer?, table<any, boolean>?
     local eventIndex, eventMap
     if call.args then
         for i = 1, 2 do

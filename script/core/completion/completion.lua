@@ -21,6 +21,7 @@ local postfix      = require 'core.completion.postfix'
 local diag         = require 'proto.diagnostic'
 local wssymbol     = require 'core.workspace-symbol'
 local findSource   = require 'core.find-source'
+local diagnostic   = require 'provider.diagnostic'
 
 local diagnosticModes = {
     'disable-next-line',
@@ -2232,6 +2233,8 @@ local function completion(uri, position, triggerCharacter)
         return nil
     end
     clearStack()
+    diagnostic.pause()
+    local _ <close> = diagnostic.resume
     local results = {}
     tracy.ZoneBeginN 'completion #2'
     tryCompletions(state, position, triggerCharacter, results)

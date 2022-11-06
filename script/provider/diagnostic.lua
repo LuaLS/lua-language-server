@@ -24,6 +24,7 @@ local m = {}
 m.cache = {}
 m.sleepRest = 0.0
 m.scopeDiagCount = 0
+m.pauseCount = 0
 
 local function concat(t, sep)
     if type(t) ~= 'table' then
@@ -401,15 +402,19 @@ function m.pullDiagnostic(uri, isScopeDiag)
     return full
 end
 
+---@param uri uri
+function m.stopScopeDiag(uri)
+    local scp     = scope.getScope(uri)
+    local scopeID = 'diagnosticsScope:' .. scp:getName()
+    await.close(scopeID)
+end
+
 ---@param event string
 ---@param uri uri
 function m.refreshScopeDiag(event, uri)
     if not ws.isReady(uri) then
         return
     end
-    local scp     = scope.getScope(uri)
-    local scopeID = 'diagnosticsScope:' .. scp:getName()
-    await.close(scopeID)
 
     local eventConfig = config.get(uri, 'Lua.diagnostics.workspaceEvent')
 
@@ -438,7 +443,9 @@ function m.refresh(uri)
     ---@async
     await.call(function ()
         await.setID('diag:' .. uri)
-        await.sleep(0.1)
+        repeat
+            await.sleep(0.1)
+        until not m.isPaused()
         xpcall(m.doDiagnostic, log.error, uri)
     end)
 end
@@ -623,6 +630,19 @@ function m.refreshClient()
     proto.request('workspace/diagnostic/refresh', json.null)
 end
 
+---@return boolean
+function m.isPaused()
+    return m.pauseCount > 0
+end
+
+function m.pause()
+    m.pauseCount = m.pauseCount + 1
+end
+
+function m.resume()
+    m.pauseCount = m.pauseCount - 1
+end
+
 ws.watch(function (ev, uri)
     if ev == 'reload' then
         m.diagnosticsScope(uri)
@@ -633,8 +653,10 @@ end)
 files.watch(function (ev, uri) ---@async
     if ev == 'remove' then
         m.clear(uri)
+        m.stopScopeDiag(uri)
         m.refresh(uri)
     elseif ev == 'update' then
+        m.stopScopeDiag(uri)
         m.refresh(uri)
         m.refreshScopeDiag('OnChange', uri)
     elseif ev == 'open' then

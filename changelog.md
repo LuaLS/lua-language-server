@@ -141,6 +141,11 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 
   x = y --> Warning: Cannot assign `<string, number>` to `<string, string>`
   ```
+* `CHG` [#1374] type check: supports array part in literal table
+  ```lua
+  ---@type boolean[]
+  local t = { 1, 2, 3 } --> Warning: Cannot assign `integer` to `boolean`
+  ```
 * `FIX` [#1479]
 * `FIX` [#1480]
 * `FIX` [#1567]
@@ -159,6 +164,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 [#1202]: https://github.com/sumneko/lua-language-server/issues/1202
 [#1332]: https://github.com/sumneko/lua-language-server/issues/1332
 [#1344]: https://github.com/sumneko/lua-language-server/issues/1344
+[#1374]: https://github.com/sumneko/lua-language-server/issues/1374
 [#1434]: https://github.com/sumneko/lua-language-server/issues/1434
 [#1457]: https://github.com/sumneko/lua-language-server/issues/1457
 [#1458]: https://github.com/sumneko/lua-language-server/issues/1458

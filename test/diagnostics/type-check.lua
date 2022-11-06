@@ -942,6 +942,20 @@ local function bar(opts)
 end
 ]]
 
+TEST [[
+---@type {[1]: string, [10]: number, xx: boolean}
+local t = {
+    <!true!>,
+    <![10]!> = 's',
+    <!xx!> = 1,
+}
+]]
+
+TEST [[
+---@type boolean[]
+local t = { <!1!>, <!2!>, <!3!> }
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

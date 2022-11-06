@@ -12,7 +12,8 @@ local checkTypes = {
     'setindex',
     'setmethod',
     'tablefield',
-    'tableindex'
+    'tableindex',
+    'tableexp',
 }
 
 ---@param source parser.object

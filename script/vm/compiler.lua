@@ -1343,7 +1343,8 @@ local compilerSwitch = util.switch()
         if not hasMarkDoc then
             vm.compileByParentNode(source.node, guide.getKeyName(source), false, function (src)
                 if src.type == 'doc.field'
-                or src.type == 'doc.type.field' then
+                or src.type == 'doc.type.field'
+                or src.type == 'doc.type.name' then
                     hasMarkDoc = true
                     vm.setNode(source, vm.compileNode(src))
                 end
@@ -1362,15 +1363,18 @@ local compilerSwitch = util.switch()
     end)
     : case 'tableexp'
     : call(function (source)
-        if (source.parent.type == 'table') then
-            local node = vm.compileNode(source.parent)
-            for n in node:eachObject() do
-                if n.type == 'doc.type.array' then
-                    vm.setNode(source, vm.compileNode(n.node))
-                end
+        local hasMarkDoc
+        vm.compileByParentNode(source.parent, source.tindex, false, function (src)
+            if src.type == 'doc.field'
+            or src.type == 'doc.type.field'
+            or src.type == 'doc.type.name' then
+                hasMarkDoc = true
+                vm.setNode(source, vm.compileNode(src))
             end
+        end)
+        if not hasMarkDoc then
+            vm.setNode(source, vm.compileNode(source.value))
         end
-        vm.setNode(source, vm.compileNode(source.value))
     end)
     : case 'function.return'
     ---@param source parser.object

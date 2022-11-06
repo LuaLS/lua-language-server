@@ -320,43 +320,51 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                                 hasFounded[fieldKey] = true
                             end
                         end
-                    elseif key and not hasFounded[key] then
-                        local keyType = type(key)
-                        if keyType == 'table' then
-                            -- ---@field [integer] boolean -> class[integer]
+                        goto CONTINUE
+                    end
+                    if key == nil then
+                        pushResult(field, true)
+                        goto CONTINUE
+                    end
+                    if hasFounded[key] then
+                        goto CONTINUE
+                    end
+                    local keyType = type(key)
+                    if keyType == 'table' then
+                        -- ---@field [integer] boolean -> class[integer]
+                        local fieldNode = vm.compileNode(field.field)
+                        if vm.isSubType(suri, key.name, fieldNode) then
+                            local nkey = '|' .. key.name
+                            if not searchedFields[nkey] then
+                                pushResult(field, true)
+                                hasFounded[nkey] = true
+                            end
+                        end
+                    else
+                        local typeName
+                        if keyType == 'number' then
+                            if math.tointeger(key) then
+                                typeName = 'integer'
+                            else
+                                typeName = 'number'
+                            end
+                        elseif keyType == 'boolean'
+                        or     keyType == 'string' then
+                            typeName = keyType
+                        end
+                        if typeName and field.field.type ~= 'doc.field.name' then
+                            -- ---@field [integer] boolean -> class[1]
                             local fieldNode = vm.compileNode(field.field)
-                            if vm.isSubType(suri, key.name, fieldNode) then
-                                local nkey = '|' .. key.name
+                            if vm.isSubType(suri, typeName, fieldNode) then
+                                local nkey = '|' .. typeName
                                 if not searchedFields[nkey] then
                                     pushResult(field, true)
                                     hasFounded[nkey] = true
                                 end
                             end
-                        else
-                            local typeName
-                            if keyType == 'number' then
-                                if math.tointeger(key) then
-                                    typeName = 'integer'
-                                else
-                                    typeName = 'number'
-                                end
-                            elseif keyType == 'boolean'
-                            or     keyType == 'string' then
-                                typeName = keyType
-                            end
-                            if typeName and field.field.type ~= 'doc.field.name' then
-                                -- ---@field [integer] boolean -> class[1]
-                                local fieldNode = vm.compileNode(field.field)
-                                if vm.isSubType(suri, typeName, fieldNode) then
-                                    local nkey = '|' .. typeName
-                                    if not searchedFields[nkey] then
-                                        pushResult(field, true)
-                                        hasFounded[nkey] = true
-                                    end
-                                end
-                            end
                         end
                     end
+                    ::CONTINUE::
                 end
                 copyToSearched()
                 -- check local field and global field
@@ -1667,7 +1675,7 @@ local compilerSwitch = util.switch()
     end)
     : case 'doc.field.name'
     : call(function (source)
-        vm.setNode(source, vm.compileNode(source.parent))
+        vm.setNode(source, source)
     end)
     : case 'doc.type.field'
     : call(function (source)

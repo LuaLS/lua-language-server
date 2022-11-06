@@ -166,7 +166,7 @@ local childMap = {
     ['doc.as']             = {'as'},
     ['doc.cast']           = {'loc', '#casts'},
     ['doc.cast.block']     = {'extends'},
-    ['doc.operator']       = {'op', 'exp', 'extends'}
+    ['doc.operator']       = {'op', 'exp', 'extends'},
 }
 
 ---@type table<string, fun(obj: parser.object, list: parser.object[])>
@@ -1027,8 +1027,6 @@ function m.getKeyName(obj)
         return obj.field[1]
     elseif tp == 'doc.field.name' then
         return obj[1]
-    elseif tp == 'doc.type.field' then
-        return obj.name[1]
     end
     return m.getKeyNameOfLiteral(obj)
 end

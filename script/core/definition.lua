@@ -197,6 +197,9 @@ return function (uri, offset)
         if src.type == 'doc.enum' then
             src = src.enum
         end
+        if src.type == 'doc.type.field' then
+            src = src.name
+        end
         if src.type == 'doc.class.name'
         or src.type == 'doc.alias.name'
         or src.type == 'doc.enum.name' then

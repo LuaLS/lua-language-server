@@ -876,6 +876,72 @@ end
 f(<!1!>)
 ]]
 
+TEST [[
+---@type table<string, string>
+local x
+
+---@type table<number, string>
+local y
+
+<!x!> = y
+]]
+
+TEST [[
+---@type table<string, string>
+local x
+
+---@type table<string, number>
+local y
+
+<!x!> = y
+]]
+
+TEST [[
+---@type table<string, string>
+local x
+
+---@type table<string, string>
+local y
+
+x = y
+]]
+
+TEST [[
+---@param opts {a:number, b:number}
+local function foo(opts)
+
+end
+
+---@param opts {a:number, b:number}
+local function bar(opts)
+    foo(opts)
+end
+]]
+
+TEST [[
+---@param opts {a:number, b:number}
+local function foo(opts)
+
+end
+
+---@param opts {c:number, d:number}
+local function bar(opts)
+    foo(<!opts!>)  -- this should raise linting error
+end
+]]
+
+TEST [[
+---@param opts {[number]: boolean}
+local function foo(opts)
+
+end
+
+---@param opts {[1]: boolean}
+local function bar(opts)
+    foo(opts)
+end
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

@@ -642,7 +642,7 @@ end
 ]]
 
 TEST [[
----@class TT<V>: { <!x: V!> }
+---@class TT<V>: { <!x!>: V }
 
 ---@type TT<A>
 local t
@@ -653,7 +653,7 @@ print(t.<?x?>)
 ]]
 
 TEST [[
----@alias TT<V> { <!x: V!> }
+---@alias TT<V> { <!x!>: V }
 
 ---@type TT<A>
 local t
@@ -823,7 +823,7 @@ z.<?a?>
 ]]
 
 TEST [[
----@type { <!x: number!>, y: number }
+---@type { <!x!>: number, y: number }
 local t
 
 print(t.<?x?>)
@@ -846,14 +846,14 @@ local <!<?v?>!> = t[1]
 
 TEST [[
 ---@class A
----@field <!['xx']!>? <!{}!>
+---@field [<!'xx'!>]? <!{}!>
 local t
 
 print(t.<?xx?>)
 ]]
 
 TEST [[
----@type { <!['xx']?: boolean!> }
+---@type { [<!'xx'!>]?: boolean }
 local t
 
 print(t.<?xx?>)

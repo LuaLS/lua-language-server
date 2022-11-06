@@ -38,6 +38,9 @@ local function getNodeName(object)
     if object.type == 'doc.type.string' then
         return 'string'
     end
+    if object.type == 'doc.field.name' then
+        return 'string'
+    end
     return nil
 end
 
@@ -79,11 +82,46 @@ local function checkValue(parent, child)
         or child.type == 'number' then
             return parent[1] == child[1]
         end
-    elseif parent.type == 'doc.type.string' then
+        return true
+    end
+
+    if parent.type == 'doc.type.string'
+    or parent.type == 'doc.field.name' then
         if child.type == 'string'
-        or child.type == 'doc.type.string' then
+        or child.type == 'doc.type.string'
+        or child.type == 'doc.field.name' then
             return parent[1] == child[1]
         end
+        return true
+    end
+
+    if parent.type == 'doc.type.boolean' then
+        if child.type == 'boolean'
+        or child.type == 'doc.type.boolean' then
+            return parent[1] == child[1]
+        end
+        return true
+    end
+
+    if parent.type == 'doc.type.table' then
+        if child.type == 'doc.type.table' then
+            ---@cast parent parser.object
+            ---@cast child parser.object
+            local uri = guide.getUri(parent)
+            local tnode = vm.compileNode(child)
+            for _, pfield in ipairs(parent.fields) do
+                local knode = vm.compileNode(pfield.name)
+                local pvalues = vm.compileNode(pfield.extends)
+                local cvalues = vm.getTableValue(uri, tnode, knode, true)
+                if not cvalues then
+                    return false
+                end
+                if vm.isSubType(uri, cvalues, pvalues) == false then
+                    return false
+                end
+            end
+        end
+        return true
     end
 
     return true
@@ -296,8 +334,7 @@ function vm.getTableValue(uri, tnode, knode, inversion)
     for tn in tnode:eachObject() do
         if tn.type == 'doc.type.table' then
             for _, field in ipairs(tn.fields) do
-                if  field.name.type ~= 'doc.field.name'
-                and field.extends then
+                if field.extends then
                     if inversion then
                         if vm.isSubType(uri, vm.compileNode(field.name), knode) then
                             result:merge(vm.compileNode(field.extends))

@@ -108,6 +108,10 @@ local viewNodeSwitch;viewNodeSwitch = util.switch()
     end)
     : case 'doc.generic.name'
     : call(function (source, infer, uri)
+        local resolved = vm.getGenericResolved(source)
+        if resolved then
+            return vm.getInfer(resolved):view(uri)
+        end
         if source.generic and source.generic.extends then
             return ('<%s:%s>'):format(source[1], vm.getInfer(source.generic.extends):view(uri))
         else
@@ -518,4 +522,45 @@ end
 ---@return string?
 function vm.viewObject(source, uri)
     return viewNodeSwitch(source.type, source, {}, uri)
+end
+
+---@param source parser.object
+---@param uri uri
+---@return string?
+---@return string|number|boolean|nil
+function vm.viewKey(source, uri)
+    if source.type == 'doc.type' then
+        if #source == 1 then
+            return vm.viewKey(source[1], uri)
+        else
+            local key = vm.viewObject(source, uri)
+            return '[' .. key .. ']', key
+        end
+    end
+    if source.type == 'tableindex' then
+        local name = vm.getKeyName(source)
+        if not name then
+            return nil
+        end
+        local key = util.viewLiteral(name)
+        return ('[%s]'):format(key), name
+    end
+    if source.type == 'tableexp' then
+        return ('[%d]'):format(source.tindex), source.tindex
+    end
+    if source.type == 'doc.field' then
+        return vm.viewKey(source.field, uri)
+    end
+    if source.type == 'doc.type.field' then
+        return vm.viewKey(source.name, uri)
+    end
+    local key = vm.getKeyName(source)
+    if key == nil then
+        return nil
+    end
+    if type(key) == 'string' then
+        return key, key
+    else
+        return ('[%s]'):format(key), key
+    end
 end

@@ -3,6 +3,7 @@ local vm      = require 'vm.vm'
 
 ---@class parser.object
 ---@field package _generic vm.generic
+---@field package _resolved vm.node
 
 ---@class vm.generic
 ---@field sign  vm.sign
@@ -29,6 +30,7 @@ local function cloneObject(source, resolved)
         }
         if resolved[key] then
             vm.setNode(newName, resolved[key], true)
+            newName._resolved = resolved[key]
         end
         return newName
     end
@@ -134,6 +136,15 @@ function mt:resolve(uri, args)
         end
     end
     return result
+end
+
+---@param source parser.object
+---@return vm.node?
+function vm.getGenericResolved(source)
+    if source.type ~= 'doc.generic.name' then
+        return nil
+    end
+    return source._resolved
 end
 
 ---@param source parser.object

@@ -420,7 +420,7 @@ local t: {
     [1]: integer = 2,
     [true]: integer = 3,
     [5.5]: integer = 4,
-    b: integer = 7,
+    ["b"]: integer = 7,
     ["012"]: integer = 8,
 }
 ]]
@@ -1714,11 +1714,11 @@ local <?t?> = {
 local t: {
     x: string = "e",
     y: string = "f",
-    z: string = "g",
+    ["z"]: string = "g",
+    [10]: string = "d",
     [1]: string = "a",
     [2]: string = "b",
     [3]: string = "c"|"h",
-    [10]: string = "d",
 }
 ]]
 

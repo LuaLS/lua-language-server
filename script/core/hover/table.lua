@@ -4,17 +4,6 @@ local config   = require 'config'
 local await    = require 'await'
 local guide    = require 'parser.guide'
 
-local function formatKey(key)
-    if type(key) == 'string' then
-        if key:match '^[%a_][%w_]*$' then
-            return key
-        else
-            return ('[%s]'):format(util.viewLiteral(key))
-        end
-    end
-    return ('[%s]'):format(key)
-end
-
 ---@param uri uri
 ---@param keys string[]
 ---@param nodeMap table<string, vm.node>
@@ -34,14 +23,14 @@ local function buildAsHash(uri, keys, nodeMap, reachMax)
         local literalView = ifr:viewLiterals()
         if literalView then
             lines[#lines+1] = ('    %s%s: %s = %s,'):format(
-                formatKey(key),
+                key,
                 isOptional and '?' or '',
                 typeView,
                 literalView
             )
         else
             lines[#lines+1] = ('    %s%s: %s,'):format(
-                formatKey(key),
+                key,
                 isOptional and '?' or '',
                 typeView
             )
@@ -79,14 +68,14 @@ local function buildAsConst(uri, keys, nodeMap, reachMax)
         local literalView = literalMap[key]
         if literalView then
             lines[#lines+1] = ('    %s%s: %s = %s,'):format(
-                formatKey(key),
+                key,
                 isOptional and '?' or '',
                 typeView,
                 literalView
             )
         else
             lines[#lines+1] = ('    %s%s: %s,'):format(
-                formatKey(key),
+                key,
                 isOptional and '?' or '',
                 typeView
             )
@@ -99,19 +88,14 @@ local function buildAsConst(uri, keys, nodeMap, reachMax)
     return table.concat(lines, '\n')
 end
 
-local typeSorter = {
-    ['string']  = 1,
-    ['number']  = 2,
-    ['boolean'] = 3,
-}
-
 ---@param source parser.object
 ---@param fields parser.object[]
 local function getVisibleKeyMap(source, fields)
+    local uri  = guide.getUri(source)
     local keys = {}
     local map  = {}
     for _, field in ipairs(fields) do
-        local key = vm.getKeyName(field)
+        local key = vm.viewKey(field, uri)
         if vm.isVisible(source, field) then
             if key and not map[key] then
                 map[key] = true
@@ -123,41 +107,34 @@ local function getVisibleKeyMap(source, fields)
         if a == b then
             return false
         end
-        local ta  = type(a)
-        local tb  = type(b)
-        local tsa = typeSorter[ta]
-        local tsb = typeSorter[tb]
-        if tsa == tsb then
-            if ta == 'boolean' then
-                return a == true
-            end
-            if ta == 'string' then
-                if a:sub(1, 1) == '_' then
-                    if b:sub(1, 1) == '_' then
-                        return a < b
-                    else
-                        return false
-                    end
-                elseif b:sub(1, 1) == '_' then
-                    return true
-                else
-                    return a < b
-                end
-            end
-            return a < b
-        else
-            return tsa < tsb
+        local s1 = 0
+        local s2 = 0
+        if a:sub(1, 1) == '_' then
+            s1 = s1 + 10
         end
+        if b:sub(1, 1) == '_' then
+            s2 = s2 + 10
+        end
+        if a:sub(1, 1) == '[' then
+            s1 = s1 + 1
+        end
+        if b:sub(1, 1) == '[' then
+            s2 = s2 + 1
+        end
+        if s1 == s2 then
+            return a < b
+        end
+        return s1 < s2
     end)
     return keys, map
 end
 
 ---@async
-local function getNodeMap(fields, keyMap)
+local function getNodeMap(uri, fields, keyMap)
     ---@type table<string, vm.node>
     local nodeMap = {}
     for _, field in ipairs(fields) do
-        local key = vm.getKeyName(field)
+        local key = vm.viewKey(field, uri)
         if not key or not keyMap[key] then
             goto CONTINUE
         end
@@ -192,6 +169,8 @@ return function (source)
         elseif n.type == 'doc.type.string'
         or     n.type == 'string' then
             return nil
+        elseif n.type == 'doc.type.sign' then
+            return nil
         end
     end
 
@@ -209,7 +188,7 @@ return function (source)
         end
     end
 
-    local nodeMap = getNodeMap(fields, map)
+    local nodeMap = getNodeMap(uri, fields, map)
 
     local isConsts = true
     for i = 1, #keys do

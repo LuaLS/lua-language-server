@@ -250,30 +250,14 @@ local function nextSymbolOrError(symbol)
     return false
 end
 
-local function parseIndexField(tp, parent)
+local function parseIndexField(parent)
     if not checkToken('symbol', '[', 1) then
         return nil
     end
     nextToken()
-    local start = getFinish() - 1
-    local indexTP, index = peekToken()
-    if indexTP == 'name' then
-        local field = parseType(parent)
-        nextSymbolOrError ']'
-        return field
-    else
-        nextToken()
-        local class = {
-            type   = tp,
-            start  = start,
-            finish = getFinish(),
-            parent = parent,
-        }
-        class[1] = index
-        nextSymbolOrError ']'
-        class.finish = getFinish()
-        return class
-    end
+    local field = parseType(parent)
+    nextSymbolOrError ']'
+    return field
 end
 
 local function parseTable(parent)
@@ -305,7 +289,7 @@ local function parseTable(parent)
                 needCloseParen = true
             end
             field.name = parseName('doc.field.name', field)
-                    or   parseIndexField('doc.field.name', field)
+                    or   parseIndexField(field)
             if not field.name then
                 pushWarning {
                     type   = 'LUADOC_MISS_FIELD_NAME',
@@ -1012,7 +996,7 @@ local docSwitch = util.switch()
             return false
         end)
         result.field = parseName('doc.field.name', result)
-                    or parseIndexField('doc.field.name', result)
+                    or parseIndexField(result)
         if not result.field then
             pushWarning {
                 type   = 'LUADOC_MISS_FIELD_NAME',

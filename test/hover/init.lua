@@ -1668,7 +1668,7 @@ TEST [[
 local <?t?>
 ]]
 [[
-local t: {
+local t: { x: string, y: number, z: boolean } {
     x: string,
     y: number,
     z: boolean,
@@ -2402,4 +2402,16 @@ TEST [[
 ]]
 [[
 (field) A.x: number
+]]
+
+TEST [[
+---@type { [string]: string }[]
+local t
+
+print(<?t?>.foo)
+]]
+[[
+local t: { [string]: string }[] {
+    foo: unknown,
+}
 ]]

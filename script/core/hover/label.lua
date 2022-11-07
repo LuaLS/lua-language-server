@@ -58,8 +58,7 @@ local function asValue(source, title)
     and (  type == 'table'
         or type == 'any'
         or type == 'unknown'
-        or type == 'nil'
-        or type:sub(1, 1) == '{') then
+        or type == 'nil') then
     else
         pack[#pack+1] = type
     end

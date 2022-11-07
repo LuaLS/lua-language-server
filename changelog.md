@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.6.0
+`2022-11-8`
 * `NEW` supports `private`/`protected`/`public`/`package`
   * mark in `doc.field`
     ```lua

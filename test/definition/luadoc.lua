@@ -935,7 +935,7 @@ local a
 a.__index = a
 
 ---@class B: A
-local <!b!>
+local b
 b.<!<?__index?>!> = b
 ]]
 

@@ -435,7 +435,7 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            local <!x!>
+            local x
             return {
                 <!x!> = x,
             }

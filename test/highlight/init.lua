@@ -141,3 +141,16 @@ TEST [[
 <!TEST1!> = 1
 TEST2 = 2
 ]]
+
+TEST [[
+local zing = foo
+local foo = 4
+
+local bar = {
+    <!baz!> = foo
+}
+
+bar.<!baz!> = 5
+
+print(bar.<!baz!>)
+]]

@@ -69,6 +69,12 @@ function vm.getDefs(source)
                 return
             end
             hasLocal = true
+            if  source.type ~= 'local'
+            and source.type ~= 'getlocal'
+            and source.type ~= 'setlocal'
+            and source.type ~= 'doc.cast.name' then
+                return
+            end
         end
         if not mark[src] then
             mark[src] = true

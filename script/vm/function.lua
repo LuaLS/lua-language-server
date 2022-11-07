@@ -63,6 +63,54 @@ function vm.countParamsOfFunction(func)
     return min, max, def
 end
 
+---@param source parser.object
+---@return integer min
+---@return number  max
+---@return integer def
+function vm.countParamsOfSource(source)
+    local min = 0
+    local max = 0
+    local def = 0
+    local overloads = {}
+    if source.bindDocs then
+        for _, doc in ipairs(source.bindDocs) do
+            if doc.type == 'doc.overload' then
+                overloads[doc.overload] = true
+            end
+        end
+    end
+    local hasDocFunction
+    for nd in vm.compileNode(source):eachObject() do
+        if nd.type == 'doc.type.function' and not overloads[nd] then
+            hasDocFunction = true
+            ---@cast nd parser.object
+            local dmin, dmax, ddef = vm.countParamsOfFunction(nd)
+            if dmin > min then
+                min = dmin
+            end
+            if dmax > max then
+                max = dmax
+            end
+            if ddef > def then
+                def = ddef
+            end
+        end
+    end
+    if not hasDocFunction then
+        local dmin, dmax, ddef = vm.countParamsOfFunction(source)
+        if dmin > min then
+            min = dmin
+        end
+        if dmax > max then
+            max = dmax
+        end
+        if ddef > def then
+            def = ddef
+        end
+    end
+    return min, max, def
+end
+
 ---@param node vm.node
 ---@return integer min
 ---@return number  max
@@ -136,12 +184,12 @@ function vm.countReturnsOfFunction(func, onlyDoc, mark)
         end
         if not onlyDoc and not hasDocReturn and func.returns then
             for _, ret in ipairs(func.returns) do
-                local rmin, rmax, ddef = vm.countList(ret, mark)
-                if not min or rmin < min then
-                    min = rmin
+                local dmin, dmax, ddef = vm.countList(ret, mark)
+                if not min or dmin < min then
+                    min = dmin
                 end
-                if not max or rmax > max then
-                    max = rmax
+                if not max or dmax > max then
+                    max = dmax
                 end
                 if not def or ddef > def then
                     def = ddef
@@ -154,6 +202,62 @@ function vm.countReturnsOfFunction(func, onlyDoc, mark)
         return vm.countList(func.returns)
     end
     error('not a function')
+end
+
+---@param source parser.object
+---@return integer min
+---@return number  max
+---@return integer def
+function vm.countReturnsOfSource(source)
+    local overloads = {}
+    local hasDocFunction
+    local min, max, def
+    if source.bindDocs then
+        for _, doc in ipairs(source.bindDocs) do
+            if doc.type == 'doc.overload' then
+                overloads[doc.overload] = true
+                local dmin, dmax, ddef = vm.countReturnsOfFunction(doc.overload)
+                if not min or dmin < min then
+                    min = dmin
+                end
+                if not max or dmax > max then
+                    max = dmax
+                end
+                if not def or ddef > def then
+                    def = ddef
+                end
+            end
+        end
+    end
+    for nd in vm.compileNode(source):eachObject() do
+        if nd.type == 'doc.type.function' and not overloads[nd] then
+            ---@cast nd parser.object
+            hasDocFunction = true
+            local dmin, dmax, ddef = vm.countReturnsOfFunction(nd)
+            if not min or dmin < min then
+                min = dmin
+            end
+            if not max or dmax > max then
+                max = dmax
+            end
+            if not def or ddef > def then
+                def = ddef
+            end
+        end
+    end
+    if not hasDocFunction then
+        local dmin, dmax, ddef = vm.countReturnsOfFunction(source, true)
+        if not min or dmin < min then
+            min = dmin
+        end
+        if not max or dmax > max then
+            max = dmax
+        end
+        if not def or ddef > def then
+            def = ddef
+        end
+    end
+    return min, max, def
 end
 
 ---@param func parser.object
@@ -254,7 +358,7 @@ function vm.isVarargFunctionWithOverloads(func)
     if not func.args then
         return false
     end
-    if func.args[1].type ~= '...' then
+    if not func.args[1] or func.args[1].type ~= '...' then
         return false
     end
     if not func.bindDocs then

@@ -38,27 +38,6 @@ local function hasReturn(block)
     return false
 end
 
----@param func parser.object
----@return integer
-local function getReturnsMin(func)
-    local min = vm.countReturnsOfFunction(func, true)
-    if min == 0 then
-        return 0
-    end
-    for _, doc in ipairs(func.bindDocs) do
-        if doc.type == 'doc.overload' then
-            local n = vm.countReturnsOfFunction(doc.overload)
-            if n == 0 then
-                return 0
-            end
-            if n < min then
-                min = n
-            end
-        end
-    end
-    return min
-end
-
 ---@async
 return function (uri, callback)
     local state = files.getState(uri)
@@ -75,7 +54,7 @@ return function (uri, callback)
             return
         end
         await.delay()
-        if getReturnsMin(source) == 0 then
+        if vm.countReturnsOfSource(source) == 0 then
             return
         end
         if hasReturn(source) then
@@ -86,8 +65,7 @@ return function (uri, callback)
         if lastAction then
             pos = lastAction.range or lastAction.finish
         else
-            local row = guide.rowColOf(source.finish)
-            pos = guide.positionOf(row - 1, 0)
+            pos = source.keyword[3] or source.finish
         end
         callback {
             start   = pos,

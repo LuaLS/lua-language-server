@@ -3,7 +3,7 @@ local config = require 'config'
 config.add(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.add(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.add(nil, 'Lua.diagnostics.disable', 'undefined-global')
-config.add(nil, 'Lua.diagnostics.disable', 'missing-return')
+config.add(nil, 'Lua.diagnostics.disable', 'redundant-return')
 config.set(nil, 'Lua.type.castNumberToInteger', false)
 
 TEST [[
@@ -522,7 +522,9 @@ end
 
 TEST [[
 ---@return number, number
-local function f() end
+local function f()
+    return 1, 1
+end
 
 ---@return number, boolean
 function F()
@@ -532,7 +534,9 @@ end
 
 TEST [[
 ---@return boolean, number
-local function f() end
+local function f()
+    return true, 1
+end
 
 ---@return number, boolean
 function F()
@@ -542,7 +546,9 @@ end
 
 TEST [[
 ---@return boolean, number?
-local function f() end
+local function f()
+    return true, 1
+end
 
 ---@return number, boolean
 function F()
@@ -552,7 +558,9 @@ end
 
 TEST [[
 ---@return number, number?
-local function f() end
+local function f()
+    return 1, 1
+end
 
 ---@return number, boolean, number
 function F()
@@ -969,8 +977,47 @@ local x
 local t = { true, false, x }
 ]]
 
+TEST [[
+---@type fun():number
+local function f()
+<!!>end
+]]
+
+TEST [[
+---@type fun():number
+local function f()
+    <!return!>
+end
+]]
+
+TEST [[
+---@type fun():number
+local function f()
+    return 1, <!true!>
+end
+]]
+
+TEST [[
+---@type fun():number
+local function f()
+    return <!true!>
+end
+]]
+
+TEST [[
+---@type fun(x: number)
+local function f<!()!>
+end
+]]
+
+TEST [[
+---@type fun(x: number)
+local function f(x, <!y!>)
+end
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')
-config.remove(nil, 'Lua.diagnostics.disable', 'missing-return')
+config.remove(nil, 'Lua.diagnostics.disable', 'redundant-return')
 config.set(nil, 'Lua.type.castNumberToInteger', true)

@@ -2289,16 +2289,15 @@ local function parseFunction(isLocal, isAction)
         end
     end
     if hasLeftParen then
+        params = params or {}
         local parenLeft = getPosition(Tokens[Index], 'left')
         Index = Index + 2
         params = parseParams(params)
-        if params then
-            params.type   = 'funcargs'
-            params.start  = parenLeft
-            params.finish = lastRightPosition()
-            params.parent = func
-            func.args     = params
-        end
+        params.type   = 'funcargs'
+        params.start  = parenLeft
+        params.finish = lastRightPosition()
+        params.parent = func
+        func.args     = params
         skipSpace(true)
         if Tokens[Index + 1] == ')' then
             local parenRight = getPosition(Tokens[Index], 'right')

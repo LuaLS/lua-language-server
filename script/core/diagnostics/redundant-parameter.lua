@@ -52,4 +52,22 @@ return function (uri, callback)
             end
         end
     end)
+
+    ---@async
+    guide.eachSourceType(state.ast, 'function', function (source)
+        await.delay()
+        if not source.args then
+            return
+        end
+        local _, funcArgs = vm.countParamsOfSource(source)
+        local myArgs = #source.args
+        for i = funcArgs + 1, myArgs do
+            local arg = source.args[i]
+            callback {
+                start   = arg.start,
+                finish  = arg.finish,
+                message = lang.script('DIAG_OVER_MAX_ARGS', funcArgs, myArgs),
+            }
+        end
+    end)
 end

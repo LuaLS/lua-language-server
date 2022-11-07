@@ -1181,11 +1181,25 @@ local function insertDocEnum(state, pos, doc, enums)
             if not key then
                 goto CONTINUE
             end
-            if field.value.type == 'integer'
-            or field.value.type == 'string' then
-                if parentName then
-                    enums[#enums+1] = {
-                        label  = parentName .. '.' .. key,
+            if parentName then
+                enums[#enums+1] = {
+                    label  = parentName .. '.' .. key,
+                    kind   = define.CompletionItemKind.EnumMember,
+                    id     = stack(field, function (newField) ---@async
+                        return {
+                            detail      = buildDetail(newField),
+                            description = buildDesc(newField),
+                        }
+                    end),
+                }
+            end
+            for nd in vm.compileNode(field.value):eachObject() do
+                if nd.type == 'boolean'
+                or nd.type == 'number'
+                or nd.type == 'integer'
+                or nd.type == 'string' then
+                    valueEnums[#valueEnums+1] = {
+                        label  = util.viewLiteral(nd[1]),
                         kind   = define.CompletionItemKind.EnumMember,
                         id     = stack(field, function (newField) ---@async
                             return {
@@ -1195,16 +1209,6 @@ local function insertDocEnum(state, pos, doc, enums)
                         end),
                     }
                 end
-                valueEnums[#valueEnums+1] = {
-                    label  = util.viewLiteral(field.value[1]),
-                    kind   = define.CompletionItemKind.EnumMember,
-                    id     = stack(field, function (newField) ---@async
-                        return {
-                            detail      = buildDetail(newField),
-                            description = buildDesc(newField),
-                        }
-                    end),
-                }
             end
             ::CONTINUE::
         end

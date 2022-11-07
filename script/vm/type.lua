@@ -53,22 +53,43 @@ local function checkEnum(parentName, child, uri)
     if not parentClass then
         return nil
     end
-    for _, set in ipairs(parentClass:getSets(uri)) do
-        if set.type == 'doc.enum' then
-            if not vm.getEnums(set) then
-                return false
+    local hasEnum
+    if child.type == 'global' then
+        ---@cast child vm.global
+        for _, set in ipairs(parentClass:getSets(uri)) do
+            if set.type == 'doc.enum' then
+                hasEnum = true
+                local enums = vm.getEnums(set)
+                if enums then
+                    for _, enum in ipairs(enums) do
+                        if vm.isSubType(uri, child, vm.compileNode(enum)) then
+                            return true
+                        end
+                    end
+                end
             end
-            if  child.type ~= 'string'
-            and child.type ~= 'doc.type.string'
-            and child.type ~= 'integer'
-            and child.type ~= 'number'
-            and child.type ~= 'doc.type.integer' then
-                return false
+        end
+    else
+        ---@cast child -vm.global
+        for _, set in ipairs(parentClass:getSets(uri)) do
+            if set.type == 'doc.enum' then
+                hasEnum = true
+                local myLiteral = vm.getInfer(child):viewLiterals()
+                local enums = vm.getEnums(set)
+                if enums then
+                    for _, enum in ipairs(enums) do
+                        if myLiteral == vm.getInfer(enum):viewLiterals() then
+                            return true
+                        end
+                    end
+                end
             end
-            return util.arrayHas(vm.getEnums(set), child[1])
         end
     end
 
+    if hasEnum then
+        return false
+    end
     return nil
 end
 
@@ -269,7 +290,6 @@ function vm.isSubType(uri, child, parent, mark)
         return isEnum
     end
 
-    -- TODO: check duck
     if parentName == 'table' and not guide.isBasicType(childName) then
         return true
     end

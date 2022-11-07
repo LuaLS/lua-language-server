@@ -3782,6 +3782,40 @@ f(<??>)
 }
 
 TEST [[
+local x = 1
+local y = 2
+
+---@enum Enum
+local t = {
+    x = x,
+    y = y,
+}
+
+---@param p Enum
+local function f(p) end
+
+f(<??>)
+]]
+{
+    {
+        label    = 't.x',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label    = 't.y',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label    = '1',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label    = '2',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+}
+
+TEST [[
 --
 <??>
 ]]

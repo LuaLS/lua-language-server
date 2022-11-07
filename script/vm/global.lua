@@ -164,11 +164,9 @@ local function createGlobal(name, cate)
     }, mt)
 end
 
----@alias parser.enum string|integer
-
 ---@class parser.object
 ---@field package _globalNode vm.global|false
----@field package _enums?     parser.enum[]
+---@field package _enums?     parser.object[]
 
 ---@type table<string, vm.global>
 local allGlobals = {}
@@ -378,22 +376,7 @@ local compilerGlobalSwitch = util.switch()
         for _, field in ipairs(tbl) do
             if field.type == 'tablefield'
             or field.type == 'tableindex' then
-                if not field.value then
-                    goto CONTINUE
-                end
-                local key = guide.getKeyName(field)
-                if not key then
-                    goto CONTINUE
-                end
-                if field.value.type == 'integer'
-                or field.value.type == 'string' then
-                    source._enums[#source._enums+1] = field.value[1]
-                end
-                if field.value.type == 'binary'
-                or field.value.type == 'unary' then
-                    source._enums[#source._enums+1] = vm.getNumber(field.value)
-                end
-                ::CONTINUE::
+                source._enums[#source._enums+1] = field
             end
         end
     end)
@@ -546,7 +529,7 @@ function vm.getGlobalNode(source)
 end
 
 ---@param source parser.object
----@return parser.enum[]?
+---@return parser.object[]?
 function vm.getEnums(source)
     return source._enums
 end

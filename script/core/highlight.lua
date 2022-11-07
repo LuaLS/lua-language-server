@@ -7,7 +7,7 @@ local guide      = require 'parser.guide'
 
 ---@async
 local function eachRef(source, callback)
-    local refs = vm.getRefs(source, function ()
+    local refs = vm.getRefs(source, function (_)
         return false
     end)
     for _, ref in ipairs(refs) do

@@ -635,7 +635,7 @@ end
 --- 遍历所有包含position的source
 ---@param ast parser.object
 ---@param position integer
----@param callback fun(src: parser.object)
+---@param callback fun(src: parser.object): any
 function m.eachSourceContain(ast, position, callback)
     local list = { ast }
     local mark = {}
@@ -744,7 +744,7 @@ end
 
 --- 遍历所有的source
 ---@param ast parser.object
----@param callback fun(src: parser.object)
+---@param callback fun(src: parser.object): boolean?
 function m.eachSource(ast, callback)
     local cache = ast._eachCache
     if not cache then

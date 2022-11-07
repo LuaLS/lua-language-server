@@ -294,6 +294,9 @@ local function fsIsDirectory(path, option)
     return status == 'directory'
 end
 
+---@param path fs.path|dummyfs|nil
+---@param option table
+---@return fun(): fs.path|dummyfs|nil
 local function fsPairs(path, option)
     if not path then
         return function () end
@@ -421,6 +424,8 @@ local function fsCopy(source, target, option)
     return true
 end
 
+---@param path dummyfs|fs.path
+---@param option table
 local function fsCreateDirectories(path, option)
     if not path then
         return
@@ -444,7 +449,7 @@ local function fileRemove(path, option)
         return
     end
     if fsIsDirectory(path, option) then
-        for child in fsPairs(path) do
+        for child in fsPairs(path, option) do
             fileRemove(child, option)
         end
     end
@@ -465,7 +470,7 @@ local function fileCopy(source, target, option)
     local isExists = fsExists(target, option)
     if isDir1 then
         if isDir2 or fsCreateDirectories(target, option) then
-            for filePath in fsPairs(source) do
+            for filePath in fsPairs(source, option) do
                 local name = filePath:filename():string()
                 fileCopy(filePath, target / name, option)
             end
@@ -505,7 +510,7 @@ local function fileSync(source, target, option)
             for filePath in fs.pairs(target) do
                 fileList[filePath] = true
             end
-            for filePath in fsPairs(source) do
+            for filePath in fsPairs(source, option) do
                 local name = filePath:filename():string()
                 local targetPath = target / name
                 fileSync(filePath, targetPath, option)
@@ -518,8 +523,8 @@ local function fileSync(source, target, option)
             if isExists then
                 fileRemove(target, option)
             end
-            if fsCreateDirectories(target) then
-                for filePath in fsPairs(source) do
+            if fsCreateDirectories(target, option) then
+                for filePath in fsPairs(source, option) do
                     local name = filePath:filename():string()
                     fileCopy(filePath, target / name, option)
                 end

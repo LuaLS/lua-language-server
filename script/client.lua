@@ -400,7 +400,7 @@ function m.editText(uri, edits)
     })
 end
 
----@param callback async fun()
+---@param callback async fun(ev: string)
 function m.event(callback)
     m._eventList[#m._eventList+1] = callback
 end

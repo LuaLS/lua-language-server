@@ -37,8 +37,8 @@ local function test(name)
     local clock = os.clock()
     print(('测试[%s]...'):format(name))
     local originRequire = require
-    require = function (n, ...)
-        local v, p = originRequire(n, ...)
+    require = function (n)
+        local v, p = originRequire(n)
         if p and p:find 'test/' then
             package.loaded[n] = nil
         end

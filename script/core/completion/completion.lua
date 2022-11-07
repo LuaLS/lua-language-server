@@ -33,7 +33,7 @@ local diagnosticModes = {
 local stackID = 0
 local stacks = {}
 
----@param callback async fun(newSource: parser.object)
+---@param callback async fun(newSource: parser.object): table
 local function stack(oldSource, callback)
     stackID = stackID + 1
     local uri = guide.getUri(oldSource)

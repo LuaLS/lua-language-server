@@ -581,7 +581,7 @@ end
 ---遍历文本的每一行
 ---@param text string
 ---@param keepNL? boolean # 保留换行符
----@return fun():string, integer
+---@return fun():string?, integer?
 function m.eachLine(text, keepNL)
     local offset = 1
     local lineCount = 0
@@ -730,7 +730,7 @@ function switchMT:has(name)
 end
 
 ---@param name string
----@return any ...
+---@return ...
 function switchMT:__call(name, ...)
     local callback = self.map[name] or self._default
     if not callback then

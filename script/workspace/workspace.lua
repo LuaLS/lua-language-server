@@ -315,7 +315,7 @@ function m.awaitPreload(scp)
             local uri = files.getRealUri(furi.encode(path))
             scp:get('cachedUris')[uri] = true
             ld:loadFile(uri)
-        end, function () ---@async
+        end, function (_) ---@async
             count = count + 1
             if count == 100000 then
                 client.showMessage('Warning', lang.script('WORKSPACE_SCAN_TOO_MUCH', count, furi.decode(scp.uri)))

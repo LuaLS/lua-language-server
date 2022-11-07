@@ -297,22 +297,36 @@ function vm.countList(list, mark)
     if not lastArg then
         return 0, 0, 0
     end
+    ---@type integer, number, integer
+    local min, max, def = #list, #list, #list
     if lastArg.type == '...'
-    or lastArg.type == 'varargs' then
-        return #list - 1, math.huge, #list
-    end
-    if lastArg.type == 'call' then
+    or lastArg.type == 'varargs'
+    or (lastArg.type == 'doc.type' and lastArg.name and lastArg.name[1] == '...') then
+        max = math.huge
+    elseif lastArg.type == 'call' then
         if not mark then
             mark = {}
         end
         if mark[lastArg] then
-            return #list - 1, math.huge, #list
+            min = min - 1
+            max = math.huge
+        else
+            mark[lastArg] = true
+            local rmin, rmax, rdef = vm.countReturnsOfCall(lastArg.node, lastArg.args, mark)
+            return min - 1 + rmin, max - 1 + rmax, def - 1 + rdef
         end
-        mark[lastArg] = true
-        local rmin, rmax, rdef = vm.countReturnsOfCall(lastArg.node, lastArg.args, mark)
-        return #list - 1 + rmin, #list - 1 + rmax, #list - 1 + rdef
     end
-    return #list, #list, #list
+    for i = min, 1, -1 do
+        local arg = list[i]
+        if  arg.type == 'doc.type'
+        and ((arg.name and arg.name[1] == '...')
+            or vm.compileNode(arg):isNullable()) then
+            min = i - 1
+        else
+            break
+        end
+    end
+    return min, max, def
 end
 
 ---@param func parser.object

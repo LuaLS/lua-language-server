@@ -312,7 +312,7 @@ function vm.getSign(source)
     or source.type == 'doc.type.table'
     or source.type == 'doc.type.array' then
         local hasGeneric
-        guide.eachSourceType(source, 'doc.generic.name', function ()
+        guide.eachSourceType(source, 'doc.generic.name', function (_)
             hasGeneric = true
         end)
         if not hasGeneric then

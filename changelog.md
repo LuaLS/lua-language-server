@@ -146,6 +146,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
   ---@type boolean[]
   local t = { 1, 2, 3 } --> Warning: Cannot assign `integer` to `boolean`
   ```
+* `CHG` `---@enum` supports runtime values
 * `FIX` [#1479]
 * `FIX` [#1480]
 * `FIX` [#1567]

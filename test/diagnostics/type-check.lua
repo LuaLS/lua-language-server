@@ -785,6 +785,22 @@ f(<!3!>)
 ]]
 
 TEST [[
+---@enum A
+local t = {
+    x = { h = 1 },
+    y = { h = 2 },
+}
+
+---@param x A
+local function f(x)
+end
+
+f(t.x)
+f(t.y)
+f(<!{ h = 1 }!>)
+]]
+
+TEST [[
 local t = {
     x = 1,
 }
@@ -957,6 +973,26 @@ local t = {
     <![10]!> = 's',
     <!xx!> = 1,
 }
+]]
+
+TEST [[
+---@type { x: number, y: number }
+local t1
+
+---@type { x: number }
+local t2
+
+<!t1!> = t2
+]]
+
+TEST [[
+---@type { x: number, [integer]: number }
+local t1
+
+---@type { x: number }
+local t2
+
+<!t1!> = t2
 ]]
 
 TEST [[

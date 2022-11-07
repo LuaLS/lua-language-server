@@ -100,14 +100,17 @@ return function (uri, callback)
                 -- 因此将假值移除再进行检查
                 refNode = refNode:copy():setTruthy()
             end
-            if not vm.canCastType(uri, defNode, refNode) then
+            local suc, errs = vm.canCastType(uri, defNode, refNode)
+            if not suc then
                 local rawDefNode = getRawDefNode(funcNode, i)
+                assert(errs)
                 callback {
                     start   = arg.start,
                     finish  = arg.finish,
                     message = lang.script('DIAG_PARAM_TYPE_MISMATCH', {
                         def = vm.getInfer(rawDefNode):view(uri),
                         ref = vm.getInfer(refNode):view(uri),
+                        err = vm.viewTypeErrorMessage(uri, errs),
                     })
                 }
             end

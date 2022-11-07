@@ -96,7 +96,8 @@ return function (uri, callback)
         end
 
         local varNode = vm.compileNode(source)
-        if vm.canCastType(uri, varNode, valueNode) then
+        local suc, errs = vm.canCastType(uri, varNode, valueNode)
+        if suc then
             return
         end
 
@@ -107,12 +108,15 @@ return function (uri, callback)
             end
         end
 
+        assert(errs)
+
         callback {
             start   = source.start,
             finish  = source.finish,
             message = lang.script('DIAG_ASSIGN_TYPE_MISMATCH', {
                 def = vm.getInfer(varNode):view(uri),
                 ref = vm.getInfer(valueNode):view(uri),
+                err = vm.viewTypeErrorMessage(uri, errs),
             }),
         }
     end)

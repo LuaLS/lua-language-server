@@ -234,6 +234,10 @@ local viewNodeSwitch;viewNodeSwitch = util.switch()
         end
         return ('fun(%s)%s'):format(argView, regView)
     end)
+    : case 'doc.field.name'
+    : call(function (source, infer, uri)
+        return vm.viewKey(source, uri)
+    end)
 
 ---@class vm.node
 ---@field lastInfer? vm.infer

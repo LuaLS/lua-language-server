@@ -117,17 +117,17 @@ DIAG_UNDEFINED_DOC_PARAM              =
 DIAG_UNKNOWN_DIAG_CODE                =
 '未知的诊断代号 `{}`。'
 DIAG_CAST_LOCAL_TYPE                  =
-'已显式定义变量的类型为 `{def}` ，不能再将其类型转换为 `{ref}`。'
+'已显式定义变量的类型为 `{def}` ，不能再将其类型转换为 `{ref}`。\n{err}'
 DIAG_CAST_FIELD_TYPE                  =
-'已显式定义字段的类型为 `{def}` ，不能再将其类型转换为 `{ref}`。'
+'已显式定义字段的类型为 `{def}` ，不能再将其类型转换为 `{ref}`。\n{err}'
 DIAG_ASSIGN_TYPE_MISMATCH             =
-'不能将 `{ref}` 赋值给 `{def}`。'
+'不能将 `{ref}` 赋值给 `{def}`。\n{err}'
 DIAG_PARAM_TYPE_MISMATCH              =
-'不能将 `{ref}` 赋给参数 `{def}`。'
+'不能将 `{ref}` 赋给参数 `{def}`。\n{err}'
 DIAG_UNKNOWN_CAST_VARIABLE            =
 '未知的类型转换变量 `{}`。'
 DIAG_CAST_TYPE_MISMATCH               =
-'不能将 `{def}` 转换为 `{ref}`。'
+'不能将 `{def}` 转换为 `{ref}`。\n{err}'
 DIAG_MISSING_RETURN_VALUE             =
 '至少需要 {min} 个返回值，但此处只返回 {rmax} 个值。'
 DIAG_MISSING_RETURN_VALUE_RANGE       =
@@ -588,6 +588,40 @@ CLI_CHECK_SUCCESS =
 '诊断完成，没有发现问题'
 CLI_CHECK_RESULTS =
 '诊断完成，共有 {} 个问题，请查看 {}'
+
+TYPE_ERROR_ENUM_GLOBAL_DISMATCH =
+'类型 `{child}` 无法匹配 `{parent}` 的枚举类型'
+TYPE_ERROR_ENUM_GENERIC_UNSUPPORTED =
+'无法在枚举中使用泛型 `{child}`'
+TYPE_ERROR_ENUM_LITERAL_DISMATCH =
+'字面量 `{child}` 无法匹配 `{parent}` 的枚举值'
+TYPE_ERROR_ENUM_OBJECT_DISMATCH =
+'对象 `{child}` 无法匹配 `{parent}` 的枚举值，它们必须是同一个对象'
+TYPE_ERROR_ENUM_NO_OBJECT =
+'无法识别传入的枚举值 `{child}`'
+TYPE_ERROR_INTEGER_DISMATCH =
+'字面量 `{child}` 无法匹配整数 `{parent}`'
+TYPE_ERROR_STRING_DISMATCH =
+'字面量 `{child}` 无法匹配字符串 `{parent}`'
+TYPE_ERROR_BOOLEAN_DISMATCH =
+'字面量 `{child}` 无法匹配布尔值 `{parent}`'
+TYPE_ERROR_TABLE_NO_FIELD =
+'表中不存在字段 `{key}`'
+TYPE_ERROR_TABLE_FIELD_DISMATCH =
+'字段 `{key}` 的类型为 `{child}`，无法匹配 `{parent}`'
+TYPE_ERROR_UNION_ALL_DISMATCH =
+'`{child}` 中的所有子类型均无法匹配 `{parent}`'
+TYPE_ERROR_UNION_DISMATCH =
+'联合类型中的 `{child}` 无法匹配 `{parent}`'
+TYPE_ERROR_OPTIONAL_DISMATCH =
+'可选类型无法匹配 `{parent}`'
+TYPE_ERROR_NUMBER_LITERAL_TO_INTEGER =
+'无法将数字 `{child}` 转换为整数'
+TYPE_ERROR_NUMBER_TYPE_TO_INTEGER =
+'无法将数字类型转换为整数类型'
+TYPE_ERROR_DISMATCH =
+'类型 `{child}` 无法匹配 `{parent}`'
+
 
 LUADOC_DESC_CLASS = -- TODO: need translate!
 [=[

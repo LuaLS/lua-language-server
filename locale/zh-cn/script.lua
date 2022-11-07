@@ -609,10 +609,12 @@ TYPE_ERROR_TABLE_NO_FIELD =
 '表中不存在字段 `{key}`'
 TYPE_ERROR_TABLE_FIELD_DISMATCH =
 '字段 `{key}` 的类型为 `{child}`，无法匹配 `{parent}`'
-TYPE_ERROR_UNION_ALL_DISMATCH =
+TYPE_ERROR_CHILD_ALL_DISMATCH =
 '`{child}` 中的所有子类型均无法匹配 `{parent}`'
+TYPE_ERROR_PARENT_ALL_DISMATCH =
+'`{child}` 无法匹配 `{parent}` 中的任何子类'
 TYPE_ERROR_UNION_DISMATCH =
-'联合类型中的 `{child}` 无法匹配 `{parent}`'
+'`{child}` 无法匹配 `{parent}`'
 TYPE_ERROR_OPTIONAL_DISMATCH =
 '可选类型无法匹配 `{parent}`'
 TYPE_ERROR_NUMBER_LITERAL_TO_INTEGER =

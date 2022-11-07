@@ -609,10 +609,12 @@ TYPE_ERROR_TABLE_NO_FIELD =
 'Field `{key}` does not exist in the table'
 TYPE_ERROR_TABLE_FIELD_DISMATCH =
 'The type of field `{key}` is `{child}`, which cannot match `{parent}`'
-TYPE_ERROR_UNION_ALL_DISMATCH =
+TYPE_ERROR_CHILD_ALL_DISMATCH =
 'All subtypes in `{child}` cannot match `{parent}`'
+TYPE_ERROR_PARENT_ALL_DISMATCH =
+'`{child}` cannot match any subtypes in `{parent}`'
 TYPE_ERROR_UNION_DISMATCH =
-'`{child}` in union type cannot match `{parent}`'
+'`{child}` cannot match `{parent}`'
 TYPE_ERROR_OPTIONAL_DISMATCH =
 'Optional type cannot match `{parent}`'
 TYPE_ERROR_NUMBER_LITERAL_TO_INTEGER =

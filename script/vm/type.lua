@@ -133,8 +133,8 @@ local function checkValue(parent, child, mark, err)
         or child.type == 'number' then
             if parent[1] ~= child[1] then
                 err[#err+1] = 'TYPE_ERROR_INTEGER_DISMATCH'
-                err[#err+1] = child
-                err[#err+1] = parent
+                err[#err+1] = child[1]
+                err[#err+1] = parent[1]
                 return false
             end
         end
@@ -148,8 +148,8 @@ local function checkValue(parent, child, mark, err)
         or child.type == 'doc.field.name' then
             if parent[1] ~= child[1] then
                 err[#err+1] = 'TYPE_ERROR_STRING_DISMATCH'
-                err[#err+1] = child
-                err[#err+1] = parent
+                err[#err+1] = child[1]
+                err[#err+1] = parent[1]
                 return false
             end
         end
@@ -161,8 +161,8 @@ local function checkValue(parent, child, mark, err)
         or child.type == 'doc.type.boolean' then
             if parent[1] ~= child[1] then
                 err[#err+1] = 'TYPE_ERROR_BOOLEAN_DISMATCH'
-                err[#err+1] = child
-                err[#err+1] = parent
+                err[#err+1] = child[1]
+                err[#err+1] = parent[1]
                 return false
             end
         end
@@ -234,19 +234,21 @@ function vm.isSubType(uri, child, parent, mark, err)
         child = global
     elseif child.type == 'vm.node' then
         if config.get(uri, 'Lua.type.weakUnionCheck') then
-            local hasKnownType
+            local hasKnownType = 0
             for n in child:eachObject() do
                 if getNodeName(n) then
-                    hasKnownType = true
+                    hasKnownType = hasKnownType + 1
                     if vm.isSubType(uri, n, parent, mark, err) == true then
                         return true, err
                     end
                 end
             end
-            if hasKnownType then
-                err[#err+1] = 'TYPE_ERROR_UNION_ALL_DISMATCH'
-                err[#err+1] = child
-                err[#err+1] = parent
+            if hasKnownType > 0 then
+                if hasKnownType > 1 then
+                    err[#err+1] = 'TYPE_ERROR_CHILD_ALL_DISMATCH'
+                    err[#err+1] = child
+                    err[#err+1] = parent
+                end
                 return false, err
             end
             return true, err
@@ -293,10 +295,10 @@ function vm.isSubType(uri, child, parent, mark, err)
         end
         parent = global
     elseif parent.type == 'vm.node' then
-        local hasKnownType
+        local hasKnownType = 0
         for n in parent:eachObject() do
             if getNodeName(n) then
-                hasKnownType = true
+                hasKnownType = hasKnownType + 1
                 if vm.isSubType(uri, child, n, mark, err) == true then
                     return true, err
                 end
@@ -307,7 +309,15 @@ function vm.isSubType(uri, child, parent, mark, err)
                 return true, err
             end
         end
-        return not hasKnownType, err
+        if hasKnownType > 0 then
+            if hasKnownType > 1 then
+                err[#err+1] = 'TYPE_ERROR_PARENT_ALL_DISMATCH'
+                err[#err+1] = child
+                err[#err+1] = parent
+            end
+            return false, err
+        end
+        return true, err
     end
 
     ---@cast parent vm.node.object
@@ -342,7 +352,7 @@ function vm.isSubType(uri, child, parent, mark, err)
         and child[1]
         and not math.tointeger(child[1]) then
             err[#err+1] = 'TYPE_ERROR_NUMBER_LITERAL_TO_INTEGER'
-            err[#err+1] = child
+            err[#err+1] = child[1]
             return false, err
         end
         if  child.type == 'global'
@@ -604,7 +614,8 @@ local ErrorMessageMap = {
     TYPE_ERROR_BOOLEAN_DISMATCH           = {'child', 'parent'},
     TYPE_ERROR_TABLE_NO_FIELD             = {'key'},
     TYPE_ERROR_TABLE_FIELD_DISMATCH       = {'key', 'child', 'parent'},
-    TYPE_ERROR_UNION_ALL_DISMATCH         = {'child', 'parent'},
+    TYPE_ERROR_CHILD_ALL_DISMATCH         = {'child', 'parent'},
+    TYPE_ERROR_PARENT_ALL_DISMATCH        = {'child', 'parent'},
     TYPE_ERROR_UNION_DISMATCH             = {'child', 'parent'},
     TYPE_ERROR_OPTIONAL_DISMATCH          = {'parent'},
     TYPE_ERROR_NUMBER_LITERAL_TO_INTEGER  = {'child'},

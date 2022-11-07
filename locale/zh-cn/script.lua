@@ -622,7 +622,6 @@ TYPE_ERROR_NUMBER_TYPE_TO_INTEGER =
 TYPE_ERROR_DISMATCH =
 '类型 `{child}` 无法匹配 `{parent}`'
 
-
 LUADOC_DESC_CLASS = -- TODO: need translate!
 [=[
 Defines a class/table structure

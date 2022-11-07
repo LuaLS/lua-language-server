@@ -589,6 +589,39 @@ CLI_CHECK_SUCCESS =
 CLI_CHECK_RESULTS =
 'Diagnóstico completo, {} problemas encontrados, veja {}'
 
+TYPE_ERROR_ENUM_GLOBAL_DISMATCH = -- TODO: need translate!
+'Type `{child}` cannot match enumeration type of `{parent}`'
+TYPE_ERROR_ENUM_GENERIC_UNSUPPORTED = -- TODO: need translate!
+'Cannot use generic `{child}` in enumeration'
+TYPE_ERROR_ENUM_LITERAL_DISMATCH = -- TODO: need translate!
+'Literal `{child}` cannot match the enumeration value of `{parent}`'
+TYPE_ERROR_ENUM_OBJECT_DISMATCH = -- TODO: need translate!
+'The object `{child}` cannot match the enumeration value of `{parent}`. They must be the same object'
+TYPE_ERROR_ENUM_NO_OBJECT = -- TODO: need translate!
+'The passed in enumeration value `{child}` is not recognized'
+TYPE_ERROR_INTEGER_DISMATCH = -- TODO: need translate!
+'Literal `{child}` cannot match integer `{parent}`'
+TYPE_ERROR_STRING_DISMATCH = -- TODO: need translate!
+'Literal `{child}` cannot match string `{parent}`'
+TYPE_ERROR_BOOLEAN_DISMATCH = -- TODO: need translate!
+'Literal `{child}` cannot match boolean `{parent}`'
+TYPE_ERROR_TABLE_NO_FIELD = -- TODO: need translate!
+'Field `{key}` does not exist in the table'
+TYPE_ERROR_TABLE_FIELD_DISMATCH = -- TODO: need translate!
+'The type of field `{key}` is `{child}`, which cannot match `{parent}`'
+TYPE_ERROR_UNION_ALL_DISMATCH = -- TODO: need translate!
+'All subtypes in `{child}` cannot match `{parent}`'
+TYPE_ERROR_UNION_DISMATCH = -- TODO: need translate!
+'`{child}` in union type cannot match `{parent}`'
+TYPE_ERROR_OPTIONAL_DISMATCH = -- TODO: need translate!
+'Optional type cannot match `{parent}`'
+TYPE_ERROR_NUMBER_LITERAL_TO_INTEGER = -- TODO: need translate!
+'The number `{child}` cannot be converted to an integer'
+TYPE_ERROR_NUMBER_TYPE_TO_INTEGER = -- TODO: need translate!
+'Cannot convert number type to integer type'
+TYPE_ERROR_DISMATCH = -- TODO: need translate!
+'Type `{child}` cannot match `{parent}`'
+
 LUADOC_DESC_CLASS = -- TODO: need translate!
 [=[
 Defines a class/table structure

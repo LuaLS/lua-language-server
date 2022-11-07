@@ -589,6 +589,39 @@ CLI_CHECK_SUCCESS =
 CLI_CHECK_RESULTS =
 'Diagnosis complete, {} problems found, see {}'
 
+TYPE_ERROR_ENUM_GLOBAL_DISMATCH =
+'Type `{child}` cannot match enumeration type of `{parent}`'
+TYPE_ERROR_ENUM_GENERIC_UNSUPPORTED =
+'Cannot use generic `{child}` in enumeration'
+TYPE_ERROR_ENUM_LITERAL_DISMATCH =
+'Literal `{child}` cannot match the enumeration value of `{parent}`'
+TYPE_ERROR_ENUM_OBJECT_DISMATCH =
+'The object `{child}` cannot match the enumeration value of `{parent}`. They must be the same object'
+TYPE_ERROR_ENUM_NO_OBJECT =
+'The passed in enumeration value `{child}` is not recognized'
+TYPE_ERROR_INTEGER_DISMATCH =
+'Literal `{child}` cannot match integer `{parent}`'
+TYPE_ERROR_STRING_DISMATCH =
+'Literal `{child}` cannot match string `{parent}`'
+TYPE_ERROR_BOOLEAN_DISMATCH =
+'Literal `{child}` cannot match boolean `{parent}`'
+TYPE_ERROR_TABLE_NO_FIELD =
+'Field `{key}` does not exist in the table'
+TYPE_ERROR_TABLE_FIELD_DISMATCH =
+'The type of field `{key}` is `{child}`, which cannot match `{parent}`'
+TYPE_ERROR_UNION_ALL_DISMATCH =
+'All subtypes in `{child}` cannot match `{parent}`'
+TYPE_ERROR_UNION_DISMATCH =
+'`{child}` in union type cannot match `{parent}`'
+TYPE_ERROR_OPTIONAL_DISMATCH =
+'Optional type cannot match `{parent}`'
+TYPE_ERROR_NUMBER_LITERAL_TO_INTEGER =
+'The number `{child}` cannot be converted to an integer'
+TYPE_ERROR_NUMBER_TYPE_TO_INTEGER =
+'Cannot convert number type to integer type'
+TYPE_ERROR_DISMATCH =
+'Type `{child}` cannot match `{parent}`'
+
 LUADOC_DESC_CLASS =
 [=[
 Defines a class/table structure

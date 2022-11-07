@@ -5,29 +5,39 @@ local define   = require 'proto.define'
 local util     = require 'utility'
 local subber   = require 'core.substring'
 
+---@param text string
+---@return string
+local function clipLastLine(text)
+    if text:find '[\r\n]' then
+        return '... ' .. util.trim(text:match '[^\r\n]*$')
+    else
+        return text
+    end
+end
+
 local function buildName(source, sub)
     if source.type == 'setmethod'
     or source.type == 'getmethod' then
         if source.method then
-            return sub(source.start + 1, source.method.finish)
+            return clipLastLine(sub(source.start + 1, source.method.finish))
         end
     end
     if source.type == 'setfield'
     or source.type == 'tablefield'
     or source.type == 'getfield' then
         if source.field then
-            return sub(source.start + 1, source.field.finish)
+            return clipLastLine(sub(source.start + 1, source.field.finish))
         end
     end
     if source.type == 'tableindex' then
         if source.index then
-            return sub(source.start + 1, source.finish)
+            return ('[%s]'):format(clipLastLine(sub(source.index.start + 1, source.index.finish)))
         end
     end
     if source.type == 'tableexp' then
         return ('[%d]'):format(source.tindex)
     end
-    return sub(source.start + 1, source.finish)
+    return clipLastLine(sub(source.start + 1, source.finish))
 end
 
 local function buildFunctionParams(func)
@@ -205,18 +215,20 @@ local function buildAnonymous(source, sub, used, symbols)
     end
     used[source] = true
     local head = ''
+    local detail = ''
     local parent = source.parent
     if     parent.type == 'return' then
         head = 'return'
     elseif parent.type == 'callargs' then
         local call = parent.parent
         local node = call.node
-        head = buildName(node, sub) .. ' ->'
+        head = buildName(node, sub)
+        detail = '-> '
     end
     if source.type == 'function' then
         symbols[#symbols+1] = {
             name           = head,
-            detail         = ('function (%s)'):format(buildFunctionParams(source)),
+            detail         = detail .. ('function (%s)'):format(buildFunctionParams(source)),
             kind           = define.SymbolKind.Function,
             range          = { source.start, source.finish },
             selectionRange = { source.keyword[1], source.keyword[2] },
@@ -243,7 +255,7 @@ local function buildAnonymous(source, sub, used, symbols)
         end
         symbols[#symbols+1] = {
             name           = head,
-            detail         = table.concat(details),
+            detail         = detail .. table.concat(details),
             kind           = kind,
             range          = { source.start, source.finish },
             selectionRange = { source.start, source.finish },

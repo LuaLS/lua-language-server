@@ -565,8 +565,8 @@ local t = f({
         valueRange = {10, 20002},
         children = {
             [1] = {
-                name = 'f ->',
-                detail = '{k}',
+                name = 'f',
+                detail = '-> {k}',
                 kind = define.SymbolKind.Object,
                 range = {12, 20001},
                 selectionRange = {12, 20001},
@@ -642,8 +642,8 @@ local a = f {
         valueRange = {10, 30001},
         children = {
             [1] = {
-                name = 'f ->',
-                detail = '{x}',
+                name = 'f',
+                detail = '-> {x}',
                 kind = define.SymbolKind.Object,
                 range = {12, 30001},
                 selectionRange = {12, 30001},
@@ -670,8 +670,8 @@ end)
 ]]
 {
     [1] = {
-        name = 'table.sort ->',
-        detail = 'function (a, b)',
+        name = 'table.sort',
+        detail = '-> function (a, b)',
         kind = define.SymbolKind.Function,
         range = {14, 20003},
         selectionRange = {14, 22},
@@ -856,5 +856,20 @@ end
         selectionRange = {0, 3},
         valueRange = {0, 20003},
         children = EXISTS,
+    },
+}
+
+TEST [[
+X
+.Y
+.Z = 1
+]]
+{
+    {
+        name   = '... .Z',
+        detail = '1',
+        kind = define.SymbolKind.Number,
+        range = {20001, 20006},
+        selectionRange = {20001, 20002},
     },
 }

@@ -3947,3 +3947,18 @@ end
 
 local <?x?> = f(true)
 ]]
+
+TEST 'boolean' [[
+---@enum A
+local e = {
+    x = 1,
+    y = 2,
+}
+
+---@param p A
+---@overload fun(P: A.x): boolean
+---@overload fun(p: A.y): number
+local function f(p) end
+
+local <?r?> = f(e.x)
+]]

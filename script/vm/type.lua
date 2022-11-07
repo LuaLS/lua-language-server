@@ -394,7 +394,7 @@ function vm.isSubType(uri, child, parent, mark, err)
     ]]
     if  guide.isBasicType(childName)
     and guide.isLiteral(child)
-    and vm.isSubType(uri, parentName, childName, mark, err) then
+    and vm.isSubType(uri, parentName, childName, mark) then
         return true, err
     end
 

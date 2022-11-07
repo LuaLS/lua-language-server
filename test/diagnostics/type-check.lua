@@ -956,6 +956,11 @@ TEST [[
 local t = { <!1!>, <!2!>, <!3!> }
 ]]
 
+TEST [[
+---@type boolean[]
+local t = { true, false, nil }
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

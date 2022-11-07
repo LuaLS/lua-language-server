@@ -19,7 +19,7 @@ local scope      = require 'workspace.scope'
 local furi       = require 'file-uri'
 local inspect    = require 'inspect'
 local guide      = require 'parser.guide'
-local fs        = require 'bee.filesystem'
+local fs         = require 'bee.filesystem'
 
 require 'library'
 
@@ -1152,8 +1152,8 @@ m.register '$/status/click' {
         local titleDiagnostic = lang.script.WINDOW_LUA_STATUS_DIAGNOSIS_TITLE
         local result = client.awaitRequestMessage('Info', lang.script.WINDOW_LUA_STATUS_DIAGNOSIS_MSG, {
             titleDiagnostic,
-            DEVELOP and 'Restart Server',
-            DEVELOP and 'Clear Node Cache',
+            DEVELOP and 'Restart Server' or nil,
+            DEVELOP and 'Clear Node Cache' or nil,
         })
         if not result then
             return

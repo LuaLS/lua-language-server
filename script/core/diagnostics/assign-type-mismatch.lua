@@ -76,7 +76,8 @@ return function (uri, callback)
                 return
             end
             if source.type == 'setfield'
-            or source.type == 'setindex' then
+            or source.type == 'setindex'
+            or source.type == 'tableexp' then
                 return
             end
         end

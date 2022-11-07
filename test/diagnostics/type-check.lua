@@ -961,6 +961,14 @@ TEST [[
 local t = { true, false, nil }
 ]]
 
+TEST [[
+---@type boolean|nil
+local x
+
+---@type boolean[]
+local t = { true, false, x }
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

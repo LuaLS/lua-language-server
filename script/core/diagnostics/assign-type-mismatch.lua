@@ -76,14 +76,14 @@ return function (uri, callback)
                 return
             end
             if source.type == 'setfield'
-            or source.type == 'setindex'
-            or source.type == 'tableexp' then
+            or source.type == 'setindex' then
                 return
             end
         end
 
         local valueNode = vm.compileNode(value)
-        if source.type == 'setindex' then
+        if source.type == 'setindex'
+        or source.type == 'tableexp' then
             -- boolean[1] = nil
             valueNode = valueNode:copy():removeOptional()
         end

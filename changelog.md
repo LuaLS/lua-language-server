@@ -1,5 +1,8 @@
 # changelog
 
+## 3.6.1
+* `FIX` wrong diagnostics for `pcall` and `xpcall`
+
 ## 3.6.0
 `2022-11-8`
 * `NEW` supports `private`/`protected`/`public`/`package`

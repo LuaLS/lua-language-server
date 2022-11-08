@@ -158,7 +158,7 @@ function pairs(t) end
 ---#if VERSION == 5.1 and not JIT then
 ---@param f     function
 ---#else
----@param f     async fun()
+---@param f     async fun(...):...
 ---#end
 ---@param arg1? any
 ---@return boolean success
@@ -273,7 +273,7 @@ function warn(message, ...) end
 function xpcall(f, err) end
 ---#else
 ---#DES 'xpcall>5.2'
----@param f     async fun()
+---@param f     async fun(...):...
 ---@param msgh  function
 ---@param arg1? any
 ---@return boolean success

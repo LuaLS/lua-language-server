@@ -3,6 +3,7 @@
 ## 3.6.1
 * `FIX` wrong diagnostics for `pcall` and `xpcall`
 * `FIX` duplicate fields in table hover
+* `FIX` description disapeared for overloaded function
 
 ## 3.6.0
 `2022-11-8`

@@ -1681,3 +1681,27 @@ See:
   * [A](file:///a.lua#1#10)  comment1
   * [TTT](file:///a.lua#3#0)  comment2]]
 }
+
+TEST { {path = 'a.lua', content = [[
+---comment1
+---comment2
+---@overload fun()
+---@param x number
+local function <?f?>(x) end
+]]},
+hover = [[
+```lua
+function f(x: number)
+```
+
+---
+
+comment1
+comment2
+
+---
+
+```lua
+function f()
+```]]
+}

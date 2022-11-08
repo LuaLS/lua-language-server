@@ -1895,8 +1895,6 @@ local function bindCommentsAndFields(binded)
                 class.calls[#class.calls+1] = doc
                 doc.class = class
             end
-            bindCommentsToDoc(doc, comments)
-            comments = {}
         elseif doc.type == 'doc.alias'
         or     doc.type == 'doc.enum' then
             bindCommentsToDoc(doc, comments)

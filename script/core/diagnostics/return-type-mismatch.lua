@@ -69,9 +69,8 @@ return function (uri, callback)
                     message = lang.script('DIAG_RETURN_TYPE_MISMATCH', {
                         def   = vm.getInfer(docRet):view(uri),
                         ref   = vm.getInfer(retNode):view(uri),
-                        err   = vm.viewTypeErrorMessage(uri, errs),
                         index = i,
-                    }),
+                    }) .. '\n' .. vm.viewTypeErrorMessage(uri, errs),
                 }
             end
         end

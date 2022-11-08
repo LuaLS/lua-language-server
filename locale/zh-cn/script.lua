@@ -117,17 +117,17 @@ DIAG_UNDEFINED_DOC_PARAM              =
 DIAG_UNKNOWN_DIAG_CODE                =
 '未知的诊断代号 `{}`。'
 DIAG_CAST_LOCAL_TYPE                  =
-'已显式定义变量的类型为 `{def}` ，不能再将其类型转换为 `{ref}`。\n{err}'
+'已显式定义变量的类型为 `{def}` ，不能再将其类型转换为 `{ref}`。'
 DIAG_CAST_FIELD_TYPE                  =
-'已显式定义字段的类型为 `{def}` ，不能再将其类型转换为 `{ref}`。\n{err}'
+'已显式定义字段的类型为 `{def}` ，不能再将其类型转换为 `{ref}`。'
 DIAG_ASSIGN_TYPE_MISMATCH             =
-'不能将 `{ref}` 赋值给 `{def}`。\n{err}'
+'不能将 `{ref}` 赋值给 `{def}`。'
 DIAG_PARAM_TYPE_MISMATCH              =
-'不能将 `{ref}` 赋给参数 `{def}`。\n{err}'
+'不能将 `{ref}` 赋给参数 `{def}`。'
 DIAG_UNKNOWN_CAST_VARIABLE            =
 '未知的类型转换变量 `{}`。'
 DIAG_CAST_TYPE_MISMATCH               =
-'不能将 `{def}` 转换为 `{ref}`。\n{err}'
+'不能将 `{def}` 转换为 `{ref}`。'
 DIAG_MISSING_RETURN_VALUE             =
 '至少需要 {min} 个返回值，但此处只返回 {rmax} 个值。'
 DIAG_MISSING_RETURN_VALUE_RANGE       =
@@ -139,7 +139,7 @@ DIAG_REDUNDANT_RETURN_VALUE_RANGE     =
 DIAG_MISSING_RETURN                   =
 '此处需要返回值。'
 DIAG_RETURN_TYPE_MISMATCH             =
-'第 {index} 个返回值的类型为 `{def}` ，但实际返回的是 `{ref}`。\n{err}'
+'第 {index} 个返回值的类型为 `{def}` ，但实际返回的是 `{ref}`。'
 DIAG_UNKNOWN_OPERATOR                 =
 '未知的运算符 `{}`。'
 DIAG_UNREACHABLE_CODE                 =

@@ -42,8 +42,7 @@ return function (uri, callback)
                         message = lang.script('DIAG_CAST_LOCAL_TYPE', {
                             def = vm.getInfer(locNode):view(uri),
                             ref = vm.getInfer(refNode):view(uri),
-                            err = vm.viewTypeErrorMessage(uri, errs),
-                        }),
+                        }) .. '\n' .. vm.viewTypeErrorMessage(uri, errs),
                     }
                 end
             end

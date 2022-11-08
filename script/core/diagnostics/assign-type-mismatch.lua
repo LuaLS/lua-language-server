@@ -114,8 +114,7 @@ return function (uri, callback)
             message = lang.script('DIAG_ASSIGN_TYPE_MISMATCH', {
                 def = vm.getInfer(varNode):view(uri),
                 ref = vm.getInfer(valueNode):view(uri),
-                err = vm.viewTypeErrorMessage(uri, errs),
-            }),
+            }) .. '\n' .. vm.viewTypeErrorMessage(uri, errs),
         }
     end)
 end

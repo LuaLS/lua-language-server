@@ -110,8 +110,7 @@ return function (uri, callback)
                     message = lang.script('DIAG_PARAM_TYPE_MISMATCH', {
                         def = vm.getInfer(rawDefNode):view(uri),
                         ref = vm.getInfer(refNode):view(uri),
-                        err = vm.viewTypeErrorMessage(uri, errs),
-                    })
+                    }) .. '\n' .. vm.viewTypeErrorMessage(uri, errs),
                 }
             end
             ::CONTINUE::

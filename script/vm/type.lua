@@ -355,6 +355,9 @@ function vm.isSubType(uri, child, parent, mark, errs)
                     return true
                 end
             end
+            if n.type == 'doc.generic.name' then
+                return true
+            end
         end
         if parent:isOptional() then
             if vm.isSubType(uri, child, 'nil', mark, errs) == true then

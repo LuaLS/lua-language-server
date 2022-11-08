@@ -1088,6 +1088,32 @@ end
 func('hello', 'world')
 ]]
 
+TEST [[
+---@generic T1, T2, T3, T4, T5
+---@param f fun(): T1?, T2?, T3?, T4?, T5?
+---@return T1?, T2?, T3?, T4?, T5?
+local function foo(f)
+    return f()
+end
+
+local a, b = foo(function()
+    return 1
+end)
+]]
+
+TEST [[
+---@generic T1, T2, T3, T4, T5
+---@param f fun(): T1|nil, T2|nil, T3|nil, T4|nil, T5|nil
+---@return T1?, T2?, T3?, T4?, T5?
+local function foo(f)
+    return f()
+end
+
+local a, b = foo(function()
+    return 1
+end)
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

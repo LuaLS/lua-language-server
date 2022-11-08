@@ -36,11 +36,12 @@ local function cloneObject(source, resolved)
     end
     if source.type == 'doc.type' then
         local newType = {
-            type   = source.type,
-            start  = source.start,
-            finish = source.finish,
-            parent = source.parent,
-            types  = {},
+            type     = source.type,
+            start    = source.start,
+            finish   = source.finish,
+            parent   = source.parent,
+            optional = source.optional,
+            types    = {},
         }
         for i, typeUnit in ipairs(source.types) do
             local newObj     = cloneObject(typeUnit, resolved)

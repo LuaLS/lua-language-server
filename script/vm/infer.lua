@@ -542,11 +542,17 @@ function vm.viewKey(source, uri)
         end
     end
     if source.type == 'tableindex' then
-        local name = vm.getKeyName(source)
+        local index = source.index
+        local name = vm.getKeyName(index)
         if not name then
             return nil
         end
-        local key = util.viewLiteral(name)
+        local key
+        if index.type == 'string' then
+            key = util.viewString(name, index[2])
+        else
+            key = util.viewLiteral(name)
+        end
         return ('[%s]'):format(key), name
     end
     if source.type == 'tableexp' then

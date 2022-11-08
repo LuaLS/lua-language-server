@@ -94,14 +94,23 @@ local function getVisibleKeyMap(source, fields)
     local uri  = guide.getUri(source)
     local keys = {}
     local map  = {}
+    local ignored = {}
     for _, field in ipairs(fields) do
         local key = vm.viewKey(field, uri)
-        if vm.isVisible(source, field) then
+        local rawKey = guide.getKeyName(field)
+        if rawKey and rawKey ~= key then
+            ignored[rawKey] = true
+            map[rawKey] = nil
+        end
+        if  not ignored[key]
+        and vm.isVisible(source, field) then
             if key and not map[key] then
                 map[key] = true
-                keys[#keys+1] = key
             end
         end
+    end
+    for key in pairs(map) do
+        keys[#keys+1] = key
     end
     table.sort(keys, function (a, b)
         if a == b then

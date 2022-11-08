@@ -1714,7 +1714,7 @@ local <?t?> = {
 local t: {
     x: string = "e",
     y: string = "f",
-    ["z"]: string = "g",
+    ['z']: string = "g",
     [10]: string = "d",
     [1]: string = "a",
     [2]: string = "b",
@@ -2413,5 +2413,20 @@ print(<?t?>.foo)
 [[
 local t: { [string]: string }[] {
     foo: unknown,
+}
+]]
+
+TEST [[
+local t = {
+    ['x'] = 1,
+    ['y'] = 2,
+}
+
+print(t.x, <?t?>.y)
+]]
+[[
+local t: {
+    ['x']: integer = 1,
+    ['y']: integer = 2,
 }
 ]]

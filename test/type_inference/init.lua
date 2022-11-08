@@ -3947,3 +3947,21 @@ end
 
 local <?x?> = f(true)
 ]]
+
+TEST 'number' [[
+---@class A
+---@field [1] number
+---@field [2] boolean
+local t
+
+local <?n?> = t[1]
+]]
+
+TEST 'boolean' [[
+---@class A
+---@field [1] number
+---@field [2] boolean
+local t
+
+local <?n?> = t[2]
+]]

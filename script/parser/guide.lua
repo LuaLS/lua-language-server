@@ -281,17 +281,10 @@ function m.isLiteral(obj)
 end
 
 --- 获取字面量
----@param obj parser.object
+---@param obj table
 ---@return any
 function m.getLiteral(obj)
-    local tp = obj.type
-    if     tp == 'boolean' then
-        return obj[1]
-    elseif tp == 'string' then
-        return obj[1]
-    elseif tp == 'number' then
-        return obj[1]
-    elseif tp == 'integer' then
+    if m.isLiteral(obj) then
         return obj[1]
     end
     return nil

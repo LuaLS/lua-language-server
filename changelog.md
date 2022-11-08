@@ -3,8 +3,10 @@
 ## 3.6.2
 * `FIX` incorrect type check for generic with nil
 * `FIX` [#1676]
+* `FIX` [#1677]
 
 [#1676]: https://github.com/sumneko/lua-language-server/issues/1676
+[#1677]: https://github.com/sumneko/lua-language-server/issues/1677
 
 ## 3.6.1
 `2022-11-8`

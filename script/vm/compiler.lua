@@ -284,7 +284,7 @@ local searchFieldSwitch = util.switch()
 
 ---@param suri uri
 ---@param object vm.global
----@param key? string|vm.global
+---@param key? string|number|integer|boolean|vm.global
 ---@param ref boolean
 ---@param pushResult fun(field: vm.object, isMark?: boolean)
 function vm.getClassFields(suri, object, key, ref, pushResult)
@@ -341,22 +341,22 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                             end
                         end
                     else
-                        local typeName
+                        local keyObject
                         if keyType == 'number' then
                             if math.tointeger(key) then
-                                typeName = 'integer'
+                                keyObject = { type = 'integer', [1] = key }
                             else
-                                typeName = 'number'
+                                keyObject = { type = 'number', [1] = key }
                             end
                         elseif keyType == 'boolean'
                         or     keyType == 'string' then
-                            typeName = keyType
+                            keyObject = { type = keyType, [1] = key }
                         end
-                        if typeName and field.field.type ~= 'doc.field.name' then
+                        if keyObject and field.field.type ~= 'doc.field.name' then
                             -- ---@field [integer] boolean -> class[1]
                             local fieldNode = vm.compileNode(field.field)
-                            if vm.isSubType(suri, typeName, fieldNode) then
-                                local nkey = '|' .. typeName
+                            if vm.isSubType(suri, keyObject, fieldNode) then
+                                local nkey = '|' .. keyType
                                 if not searchedFields[nkey] then
                                     pushResult(field, true)
                                     hasFounded[nkey] = true

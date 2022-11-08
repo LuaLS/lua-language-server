@@ -9,10 +9,7 @@ local function expandGenerics(defNode)
     local generics = {}
     for dn in defNode:eachObject() do
         if dn.type == 'doc.generic.name' then
-            local limits = dn.generic.extends
-            if limits then
-                generics[#generics+1] = dn
-            end
+            generics[#generics+1] = dn
         end
     end
 
@@ -22,7 +19,14 @@ local function expandGenerics(defNode)
 
     for _, generic in ipairs(generics) do
         local limits = generic.generic.extends
-        defNode:merge(vm.compileNode(limits))
+        if limits then
+            defNode:merge(vm.compileNode(limits))
+        else
+            local unknownType = vm.getGlobal('type', 'unknown')
+            if unknownType then
+                defNode:merge(unknownType)
+            end
+        end
     end
 end
 

@@ -1078,6 +1078,16 @@ local y
 local x = y
 ]]
 
+TEST [[
+---@generic T
+---@param v1 T
+---@param v2 T|table
+local function func(v1, v2)
+end
+
+func('hello', 'world')
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

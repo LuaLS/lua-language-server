@@ -1,5 +1,9 @@
 # changelog
 
+## 3.6.2
+* `FIX` [#1676]
+[#1676]: https://github.com/sumneko/lua-language-server/issues/1676
+
 ## 3.6.1
 `2022-11-8`
 * `FIX` wrong diagnostics for `pcall` and `xpcall`

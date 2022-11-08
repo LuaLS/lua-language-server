@@ -119,12 +119,14 @@ m.register 'initialize' {
             workspace.create(params.rootUri)
         end
 
-        return {
+        local response = {
             capabilities = cap.getProvider(),
             serverInfo   = {
                 name    = 'sumneko.lua',
             },
         }
+        log.debug('Server init', inspect(response))
+        return response
     end
 }
 

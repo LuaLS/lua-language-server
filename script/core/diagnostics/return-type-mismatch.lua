@@ -61,13 +61,15 @@ return function (uri, callback)
                     retNode = retNode:copy():removeOptional()
                 end
             end
-            if not vm.canCastType(uri, docRet, retNode) then
+            local errs = {}
+            if not vm.canCastType(uri, docRet, retNode, errs) then
                 callback {
                     start   = exp.start,
                     finish  = exp.finish,
                     message = lang.script('DIAG_RETURN_TYPE_MISMATCH', {
                         def   = vm.getInfer(docRet):view(uri),
                         ref   = vm.getInfer(retNode):view(uri),
+                        err   = vm.viewTypeErrorMessage(uri, errs),
                         index = i,
                     }),
                 }

@@ -139,7 +139,7 @@ DIAG_REDUNDANT_RETURN_VALUE_RANGE     =
 DIAG_MISSING_RETURN                   =
 '此處需要回傳值。'
 DIAG_RETURN_TYPE_MISMATCH             =
-'第 {index} 個回傳值的類型為 `{def}` ，但實際回傳的是 `{ref}`。'
+'第 {index} 個回傳值的類型為 `{def}` ，但實際回傳的是 `{ref}`。\n{err}'
 DIAG_UNKNOWN_OPERATOR                 = -- TODO: need translate!
 'Unknown operator `{}`.'
 DIAG_UNREACHABLE_CODE                 = -- TODO: need translate!

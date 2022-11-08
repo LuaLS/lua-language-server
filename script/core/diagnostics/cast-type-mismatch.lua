@@ -26,8 +26,8 @@ return function (uri, callback)
                     for _, cast in ipairs(doc.casts) do
                         if not cast.mode and cast.extends then
                             local refNode = vm.compileNode(cast.extends)
-                            local suc, errs = vm.canCastType(uri, defNode, refNode)
-                            if not suc then
+                            local errs = {}
+                            if not vm.canCastType(uri, defNode, refNode, errs) then
                                 assert(errs)
                                 callback {
                                     start   = cast.extends.start,

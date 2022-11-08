@@ -139,7 +139,7 @@ DIAG_REDUNDANT_RETURN_VALUE_RANGE     = -- TODO: need translate!
 DIAG_MISSING_RETURN                   = -- TODO: need translate!
 'Return value is required here.'
 DIAG_RETURN_TYPE_MISMATCH             = -- TODO: need translate!
-'The type of the {index} return value is `{def}`, but the actual return is `{ref}`.'
+'The type of the {index} return value is `{def}`, but the actual return is `{ref}`.\n{err}'
 DIAG_UNKNOWN_OPERATOR                 = -- TODO: need translate!
 'Unknown operator `{}`.'
 DIAG_UNREACHABLE_CODE                 = -- TODO: need translate!

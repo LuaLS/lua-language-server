@@ -100,8 +100,8 @@ return function (uri, callback)
                 -- 因此将假值移除再进行检查
                 refNode = refNode:copy():setTruthy()
             end
-            local suc, errs = vm.canCastType(uri, defNode, refNode)
-            if not suc then
+            local errs = {}
+            if not vm.canCastType(uri, defNode, refNode, errs) then
                 local rawDefNode = getRawDefNode(funcNode, i)
                 assert(errs)
                 callback {

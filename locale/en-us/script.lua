@@ -139,7 +139,7 @@ DIAG_REDUNDANT_RETURN_VALUE_RANGE     =
 DIAG_MISSING_RETURN                   =
 'Return value is required here.'
 DIAG_RETURN_TYPE_MISMATCH             =
-'The type of the {index} return value is `{def}`, but the actual return is `{ref}`.'
+'The type of the {index} return value is `{def}`, but the actual return is `{ref}`.\n{err}'
 DIAG_UNKNOWN_OPERATOR                 =
 'Unknown operator `{}`.'
 DIAG_UNREACHABLE_CODE                 =

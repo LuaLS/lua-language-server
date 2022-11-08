@@ -96,8 +96,8 @@ return function (uri, callback)
         end
 
         local varNode = vm.compileNode(source)
-        local suc, errs = vm.canCastType(uri, varNode, valueNode)
-        if suc then
+        local errs = {}
+        if vm.canCastType(uri, varNode, valueNode, errs) then
             return
         end
 
@@ -107,8 +107,6 @@ return function (uri, callback)
                 return
             end
         end
-
-        assert(errs)
 
         callback {
             start   = source.start,

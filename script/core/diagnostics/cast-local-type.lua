@@ -34,10 +34,8 @@ return function (uri, callback)
                     refNode = refNode:copy():setTruthy()
                 end
 
-                local suc, errs = vm.canCastType(uri, locNode, refNode)
-
-                if not suc then
-                    assert(errs)
+                local errs = {}
+                if not vm.canCastType(uri, locNode, refNode, errs) then
                     callback {
                         start   = ref.start,
                         finish  = ref.finish,

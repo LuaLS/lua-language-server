@@ -168,6 +168,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 
 [#1153]: https://github.com/sumneko/lua-language-server/issues/1153
 [#1177]: https://github.com/sumneko/lua-language-server/issues/1177
+[#1201]: https://github.com/sumneko/lua-language-server/issues/1201
 [#1202]: https://github.com/sumneko/lua-language-server/issues/1202
 [#1332]: https://github.com/sumneko/lua-language-server/issues/1332
 [#1344]: https://github.com/sumneko/lua-language-server/issues/1344

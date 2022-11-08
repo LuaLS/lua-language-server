@@ -50,9 +50,10 @@ end
 ---@param parentName string
 ---@param child      vm.node.object
 ---@param uri        uri
+---@param mark       table
 ---@param errs?      typecheck.err[]
 ---@return boolean?
-local function checkEnum(parentName, child, uri, errs)
+local function checkParentEnum(parentName, child, uri, mark, errs)
     local parentClass = vm.getGlobal('type', parentName)
     if not parentClass then
         return nil
@@ -70,7 +71,7 @@ local function checkEnum(parentName, child, uri, errs)
     if child.type == 'global' then
         ---@cast child vm.global
         for _, enum in ipairs(enums) do
-            if vm.isSubType(uri, child, vm.compileNode(enum)) then
+            if vm.isSubType(uri, child, vm.compileNode(enum), mark) then
                 return true
             end
         end
@@ -129,6 +130,35 @@ local function checkEnum(parentName, child, uri, errs)
         end
         return false
     end
+end
+
+---@param childName  string
+---@param parent     vm.node.object
+---@param uri        uri
+---@param mark       table
+---@param errs?      typecheck.err[]
+---@return boolean?
+local function checkChildEnum(childName, parent , uri, mark, errs)
+    local childClass = vm.getGlobal('type', childName)
+    if not childClass then
+        return nil
+    end
+    local enums
+    for _, set in ipairs(childClass:getSets(uri)) do
+        if set.type == 'doc.enum' then
+            enums = vm.getEnums(set)
+            break
+        end
+    end
+    if not enums then
+        return nil
+    end
+    for _, enum in ipairs(enums) do
+        if not vm.isSubType(uri, vm.compileNode(enum), parent, mark ,errs) then
+            return false
+        end
+    end
+    return true
 end
 
 ---@param parent vm.node.object
@@ -389,9 +419,14 @@ function vm.isSubType(uri, child, parent, mark, errs)
         return true
     end
 
-    local isEnum = checkEnum(parentName, child, uri, errs)
-    if isEnum ~= nil then
-        return isEnum
+    local result = checkParentEnum(parentName, child, uri, mark, errs)
+    if result ~= nil then
+        return result
+    end
+
+    result = checkChildEnum(childName, parent, uri, mark, errs)
+    if result ~= nil then
+        return result
     end
 
     if parentName == 'table' and not guide.isBasicType(childName) then

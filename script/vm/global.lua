@@ -378,13 +378,11 @@ local compilerGlobalSwitch = util.switch()
                 source._enums[#source._enums+1] = field
                 local subType = vm.declareGlobal('type', name .. '.' .. field.field[1], uri)
                 subType:addSet(uri, field)
-                field._globalNode = subType
             elseif field.type == 'tableindex' then
                 source._enums[#source._enums+1] = field
                 if field.index.type == 'string' then
                     local subType = vm.declareGlobal('type', name .. '.' .. field.index[1], uri)
                     subType:addSet(uri, field)
-                    field._globalNode = subType
                 end
             end
         end

@@ -1064,6 +1064,20 @@ local function f(x, <!y!>)
 end
 ]]
 
+TEST [[
+---@enum Enum
+local t = {
+    x = 1,
+    y = 2,
+}
+
+---@type Enum
+local y
+
+---@type integer
+local x = y
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

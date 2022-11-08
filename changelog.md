@@ -4,6 +4,9 @@
 * `FIX` wrong diagnostics for `pcall` and `xpcall`
 * `FIX` duplicate fields in table hover
 * `FIX` description disapeared for overloaded function
+* `FIX` [#1675]
+
+[#1675]: https://github.com/sumneko/lua-language-server/issues/1675
 
 ## 3.6.0
 `2022-11-8`

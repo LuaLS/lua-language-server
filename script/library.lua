@@ -50,7 +50,7 @@ end
 
 local function convertLink(uri, text)
     local fmt = getDocFormater(uri)
-    return text:gsub('%$([%.%w]+)', function (name)
+    return text:gsub('%$([%.%w_%:]+)', function (name)
         local lastDot = ''
         if name:sub(-1) == '.' then
             name = name:sub(1, -2)
@@ -80,7 +80,7 @@ local function createViewDocument(name)
     if not fmt then
         return nil
     end
-    name = name:match '[%w_%.]+'
+    name = name:match '[%w_%.%:]+'
     if name:sub(-1) == '.' then
         name = name:sub(1, -2)
     end

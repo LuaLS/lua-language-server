@@ -1114,6 +1114,11 @@ local a, b = foo(function()
 end)
 ]]
 
+TEST [[
+---@type string|string[]|string[][]
+local t = {{'a'}}
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

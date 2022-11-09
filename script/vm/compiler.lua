@@ -1367,7 +1367,8 @@ local compilerSwitch = util.switch()
         vm.compileByParentNode(source.parent, source.tindex, false, function (src)
             if src.type == 'doc.field'
             or src.type == 'doc.type.field'
-            or src.type == 'doc.type.name' then
+            or src.type == 'doc.type.name'
+            or guide.isLiteral(src) then
                 hasMarkDoc = true
                 vm.setNode(source, vm.compileNode(src))
             end

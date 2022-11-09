@@ -2,13 +2,17 @@
 ---@meta
 
 ---@class ffi.namespace*: table
+---@field [string] function
+
+---@class ffi.ctype*: userdata
+---@overload fun(init?: any, ...): ffi.cdata*
+---@overload fun(nelem?: integer, init?: any, ...): ffi.cdata*
+local ctype
 
 ---@class ffi.cdecl*: string
----@class ffi.ctype*: userdata
-local ctype
 ---@class ffi.cdata*: userdata
----@alias ffi.ct*     ffi.cdecl*|ffi.ctype*|ffi.cdata*
----@class ffi.cb*:    userdata
+---@alias ffi.ct*     ffi.ctype*|ffi.cdecl*|ffi.cdata*
+---@class ffi.cb*:    ffi.cdata*
 local cb
 ---@class ffi.VLA*:   userdata
 ---@class ffi.VLS*:   userdata
@@ -20,8 +24,9 @@ local cb
 ---@field arch string
 local ffi = {}
 
----@param def string
-function ffi.cdef(def) end
+---@param def     string
+---@param params? any
+function ffi.cdef(def, params, ...) end
 
 ---@param name    string
 ---@param global? boolean
@@ -29,6 +34,7 @@ function ffi.cdef(def) end
 ---@nodiscard
 function ffi.load(name, global) end
 
+---@overload fun(ct: ffi.ct*, init: any, ...)
 ---@param ct     ffi.ct*
 ---@param nelem? integer
 ---@param init?  any
@@ -36,19 +42,16 @@ function ffi.load(name, global) end
 ---@nodiscard
 function ffi.new(ct, nelem, init, ...) end
 
----@param nelem? integer
----@param init?  any
----@return ffi.cdata* cdata
-function ffi.ctype(nelem, init, ...) end
-
----@param ct ffi.ct*
+---@param ct      ffi.ct*
+---@param params? any
 ---@return ffi.ctype* ctype
 ---@nodiscard
-function ffi.typeof(ct) end
+function ffi.typeof(ct, params, ...) end
 
 ---@param ct   ffi.ct*
 ---@param init any
 ---@return ffi.cdata* cdata
+---@nodiscard
 function ffi.cast(ct, init) end
 
 ---@param ct        ffi.ct*

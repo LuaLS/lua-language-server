@@ -171,6 +171,7 @@ function dfs:string()
     return self.path
 end
 
+---@return fun(): dummyfs?
 function dfs:listDirectory()
     local dir = self:_open()
     if type(dir) ~= 'table' then
@@ -263,7 +264,7 @@ end
 
 ---@param path   string|fs.path|dummyfs
 ---@param option table
----@return fs.path?
+---@return fs.path|dummyfs?
 local function fsAbsolute(path, option)
     if type(path) == 'string' then
         local suc, res = pcall(fs.path, path)
@@ -459,7 +460,7 @@ local function fileRemove(path, option)
 end
 
 ---@param source fs.path|dummyfs?
----@param target fs.path?
+---@param target fs.path|dummyfs?
 ---@param option table
 local function fileCopy(source, target, option)
     if not source or not target then
@@ -495,7 +496,7 @@ local function fileCopy(source, target, option)
 end
 
 ---@param source fs.path|dummyfs?
----@param target fs.path?
+---@param target fs.path|dummyfs?
 ---@param option table
 local function fileSync(source, target, option)
     if not source or not target then
@@ -507,8 +508,16 @@ local function fileSync(source, target, option)
     if isDir1 then
         if isDir2 then
             local fileList = m.fileList()
-            for filePath in fs.pairs(target) do
-                fileList[filePath] = true
+            if type(target) == 'table' then
+                ---@cast target dummyfs
+                for filePath in target:listDirectory() do
+                    fileList[filePath] = true
+                end
+            else
+                ---@cast target fs.path
+                for filePath in fs.pairs(target) do
+                    fileList[filePath] = true
+                end
             end
             for filePath in fsPairs(source, option) do
                 local name = filePath:filename():string()

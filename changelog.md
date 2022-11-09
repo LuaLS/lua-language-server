@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.6.2
+`2022-11-10`
 * `FIX` incorrect type check for generic with nil
 * `FIX` [#1676]
 * `FIX` [#1677]

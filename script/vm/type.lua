@@ -9,7 +9,7 @@ local lang      = require 'language'
 
 ---@param object vm.node.object
 ---@return string?
-local function getNodeName(object)
+function vm.getNodeName(object)
     if object.type == 'global' and object.cate == 'type' then
         ---@cast object vm.global
         return object.name
@@ -90,14 +90,14 @@ local function checkParentEnum(parentName, child, uri, mark, errs)
         return false
     else
         ---@cast child parser.object
-        local childName = getNodeName(child)
+        local childName = vm.getNodeName(child)
         if childName == 'number'
         or childName == 'integer'
         or childName == 'boolean'
         or childName == 'string' then
             for _, enum in ipairs(enums) do
                 for nd in vm.compileNode(enum):eachObject() do
-                    if childName == getNodeName(nd) and nd[1] == child[1] then
+                    if childName == vm.getNodeName(nd) and nd[1] == child[1] then
                         return true
                     end
                 end
@@ -284,7 +284,7 @@ function vm.isSubType(uri, child, parent, mark, errs)
         if config.get(uri, 'Lua.type.weakUnionCheck') then
             local hasKnownType = 0
             for n in child:eachObject() do
-                if getNodeName(n) then
+                if vm.getNodeName(n) then
                     hasKnownType = hasKnownType + 1
                     if vm.isSubType(uri, n, parent, mark, errs) == true then
                         return true
@@ -303,7 +303,7 @@ function vm.isSubType(uri, child, parent, mark, errs)
         else
             local weakNil = config.get(uri, 'Lua.type.weakNilCheck')
             for n in child:eachObject() do
-                local nodeName = getNodeName(n)
+                local nodeName = vm.getNodeName(n)
                 if  nodeName
                 and not (nodeName == 'nil' and weakNil)
                 and vm.isSubType(uri, n, parent, mark, errs) == false then
@@ -329,7 +329,7 @@ function vm.isSubType(uri, child, parent, mark, errs)
     end
 
     ---@cast child  vm.node.object
-    local childName = getNodeName(child)
+    local childName = vm.getNodeName(child)
     if childName == 'any'
     or childName == 'unknown' then
         return true
@@ -349,7 +349,7 @@ function vm.isSubType(uri, child, parent, mark, errs)
     elseif parent.type == 'vm.node' then
         local hasKnownType = 0
         for n in parent:eachObject() do
-            if getNodeName(n) then
+            if vm.getNodeName(n) then
                 hasKnownType = hasKnownType + 1
                 if vm.isSubType(uri, child, n, mark, errs) == true then
                     return true
@@ -377,7 +377,7 @@ function vm.isSubType(uri, child, parent, mark, errs)
 
     ---@cast parent vm.node.object
 
-    local parentName = getNodeName(parent)
+    local parentName = vm.getNodeName(parent)
     if parentName == 'any'
     or parentName == 'unknown' then
         return true

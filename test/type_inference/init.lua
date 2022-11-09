@@ -3965,3 +3965,12 @@ local t
 
 local <?n?> = t[2]
 ]]
+
+TEST 'N' [[
+---@class N: number
+local x
+
+if x == 0.1 then
+    print(<?x?>)
+end
+]]

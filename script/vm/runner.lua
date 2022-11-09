@@ -11,6 +11,7 @@ local guide     = require 'parser.guide'
 ---@field _mark     table
 ---@field _has      table<parser.object, true>
 ---@field _main     parser.object
+---@field _uri      uri
 local mt = {}
 mt.__index = mt
 mt._index = 1
@@ -168,15 +169,18 @@ function mt:_lookIntoChild(action, topNode, outNode)
                 -- if x == y then
                 topNode = self:_lookIntoChild(handler, topNode, outNode)
                 local checkerNode = vm.compileNode(checker)
-                if action.op.type == '==' then
-                    topNode = checkerNode
-                    if outNode then
-                        outNode:removeNode(topNode)
-                    end
-                else
-                    topNode:removeNode(checkerNode)
-                    if outNode then
-                        outNode = checkerNode
+                local checkerName = vm.getNodeName(checker)
+                if checkerName then
+                    if action.op.type == '==' then
+                        topNode:narrow(self._uri, checkerName)
+                        if outNode then
+                            outNode:removeNode(checkerNode)
+                        end
+                    else
+                        topNode:removeNode(checkerNode)
+                        if outNode then
+                            outNode:narrow(self._uri, checkerName)
+                        end
                     end
                 end
             elseif handler.type == 'call'
@@ -189,14 +193,14 @@ function mt:_lookIntoChild(action, topNode, outNode)
                 -- if type(x) == 'string' then
                 self:_lookIntoChild(handler, topNode:copy())
                 if action.op.type == '==' then
-                    topNode:narrow(checker[1])
+                    topNode:narrow(self._uri, checker[1])
                     if outNode then
                         outNode:remove(checker[1])
                     end
                 else
                     topNode:remove(checker[1])
                     if outNode then
-                        outNode:narrow(checker[1])
+                        outNode:narrow(self._uri, checker[1])
                     end
                 end
             elseif handler.type == 'getlocal'
@@ -215,14 +219,14 @@ function mt:_lookIntoChild(action, topNode, outNode)
                     and call.args[1].node == self._loc then
                         -- `local tp = type(x);if tp == 'string' then`
                         if action.op.type == '==' then
-                            topNode:narrow(checker[1])
+                            topNode:narrow(self._uri, checker[1])
                             if outNode then
                                 outNode:remove(checker[1])
                             end
                         else
                             topNode:remove(checker[1])
                             if outNode then
-                                outNode:narrow(checker[1])
+                                outNode:narrow(self._uri, checker[1])
                             end
                         end
                     end
@@ -352,6 +356,7 @@ function vm.launchRunner(loc, callback)
         _mark     = {},
         _has      = {},
         _main     = main,
+        _uri      = guide.getUri(loc),
         _callback = callback,
     }, mt)
 

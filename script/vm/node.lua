@@ -246,7 +246,8 @@ function mt:remove(name)
         or (c.type == 'doc.type.table'    and name == 'table')
         or (c.type == 'doc.type.array'    and name == 'table')
         or (c.type == 'doc.type.sign'     and name == c.node[1])
-        or (c.type == 'doc.type.function' and name == 'function') then
+        or (c.type == 'doc.type.function' and name == 'function')
+        or (c.type == 'doc.type.string'   and name == 'string') then
             table.remove(self, index)
             self[c] = nil
         end
@@ -254,9 +255,10 @@ function mt:remove(name)
     return self
 end
 
+---@param uri uri
 ---@param name string
-function mt:narrow(name)
-    if name ~= 'nil' and self.optional == true then
+function mt:narrow(uri, name)
+    if self.optional == true then
         self.optional = nil
     end
     for index = #self, 1, -1 do
@@ -267,12 +269,13 @@ function mt:narrow(name)
         or (c.type == 'doc.type.table'    and name == 'table')
         or (c.type == 'doc.type.array'    and name == 'table')
         or (c.type == 'doc.type.sign'     and name == c.node[1])
-        or (c.type == 'doc.type.function' and name == 'function') then
+        or (c.type == 'doc.type.function' and name == 'function')
+        or (c.type == 'doc.type.string'   and name == 'string') then
             goto CONTINUE
         end
         if c.type == 'global' and c.cate == 'type' then
             if (c.name == name)
-            or (c.name == 'integer' and name == 'number') then
+            or (vm.isSubType(uri, c.name, name)) then
                 goto CONTINUE
             end
         end

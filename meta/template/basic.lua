@@ -56,7 +56,7 @@ _G = {}
 
 ---@version 5.1
 ---#DES 'getfenv'
----@param f? integer|async fun()
+---@param f? integer|async fun(...):...
 ---@return table
 ---@nodiscard
 function getfenv(f) end
@@ -204,7 +204,7 @@ function select(index, ...) end
 
 ---@version 5.1
 ---#DES 'setfenv'
----@param f     async fun()|integer
+---@param f     async fun(...):...|integer
 ---@param table table
 ---@return function
 function setfenv(f, table) end

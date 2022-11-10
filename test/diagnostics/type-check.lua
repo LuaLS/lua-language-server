@@ -1119,6 +1119,16 @@ TEST [[
 local t = {{'a'}}
 ]]
 
+TEST [[
+local A = "Hello"
+local B = "World"
+
+---@alias myLiteralAliases `A` | `B`
+
+---@type myLiteralAliases
+local x = A
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

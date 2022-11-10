@@ -790,10 +790,11 @@ function getTags(item) end
 LUADOC_DESC_FIELD =
 [=[
 Declare a field in a class/table. This allows you to provide more in-depth
-documentation for a table.
+documentation for a table. As of `v3.6.0`, you can mark a field as `private`,
+`protected`, `public`, or `package`.
 
 ## Syntax
-`---@field <name> <type> [description]`
+`---@field [scope] <name> <type> [description]`
 
 ## Usage
 ```
@@ -1124,5 +1125,78 @@ local function setColor(color) end
 
 -- Completion and hover is provided for the below param
 setColor(colors.green)
+```
+]=]
+LUADOC_DESC_PACKAGE =
+[=[
+Mark a function as private to the file it is defined in. A packaged function
+cannot be accessed from another file.
+
+## Syntax
+`@package`
+
+## Usage
+```
+---@class Animal
+---@field private eyes integer
+local Animal = {}
+
+---@package
+---This cannot be accessed in another file
+function Animal:eyesCount()
+    return self.eyes
+end
+```
+]=]
+LUADOC_DESC_PRIVATE =
+[=[
+Mark a function as private to a @class. Private functions can be accessed only
+from within their class and are not accessable from child classes.
+
+## Syntax
+`@private`
+
+## Usage
+```
+---@class Animal
+---@field private eyes integer
+local Animal = {}
+
+---@private
+function Animal:eyesCount()
+    return self.eyes
+end
+
+---@class Dog:Animal
+local myDog = {}
+
+---NOT PERMITTED!
+myDog:eyesCount();
+```
+]=]
+LUADOC_DESC_PROTECTED =
+[=[
+Mark a function as protected within a @class. Protected functions can be
+accessed only from within their class or from child classes.
+
+## Syntax
+`@protected`
+
+## Usage
+```
+---@class Animal
+---@field private eyes integer
+local Animal = {}
+
+---@protected
+function Animal:eyesCount()
+    return self.eyes
+end
+
+---@class Dog:Animal
+local myDog = {}
+
+---Permitted because function is protected, not private.
+myDog:eyesCount();
 ```
 ]=]

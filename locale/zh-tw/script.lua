@@ -1121,3 +1121,76 @@ local function setColor(color) end
 setColor(colors.green)
 ```
 ]=]
+LUADOC_DESC_PACKAGE = -- TODO: need translate!
+[=[
+Mark a function as private to the file it is defined in. A packaged function
+cannot be accessed from another file.
+
+## Syntax
+`@package`
+
+## Usage
+```
+---@class Animal
+---@field private eyes integer
+local Animal = {}
+
+---@package
+---This cannot be accessed in another file
+function Animal:eyesCount()
+    return self.eyes
+end
+```
+]=]
+LUADOC_DESC_PRIVATE = -- TODO: need translate!
+[=[
+Mark a function as private to a @class. Private functions can be accessed only
+from within their class and are not accessable from child classes.
+
+## Syntax
+`@private`
+
+## Usage
+```
+---@class Animal
+---@field private eyes integer
+local Animal = {}
+
+---@private
+function Animal:eyesCount()
+    return self.eyes
+end
+
+---@class Dog:Animal
+local myDog = {}
+
+---NOT PERMITTED!
+myDog:eyesCount();
+```
+]=]
+LUADOC_DESC_PROTECTED = -- TODO: need translate!
+[=[
+Mark a function as protected within a @class. Protected functions can be
+accessed only from within their class or from child classes.
+
+## Syntax
+`@protected`
+
+## Usage
+```
+---@class Animal
+---@field private eyes integer
+local Animal = {}
+
+---@protected
+function Animal:eyesCount()
+    return self.eyes
+end
+
+---@class Dog:Animal
+local myDog = {}
+
+---Permitted because function is protected, not private.
+myDog:eyesCount();
+```
+]=]

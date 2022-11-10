@@ -790,7 +790,8 @@ function getTags(item) end
 LUADOC_DESC_FIELD = -- TODO: need translate!
 [=[
 Declare a field in a class/table. This allows you to provide more in-depth
-documentation for a table.
+documentation for a table. As of `v3.6.0`, you can mark a field as `private`,
+`protected`, `public`, or `package`.
 
 ## Syntax
 `---@field <name> <type> [description]`

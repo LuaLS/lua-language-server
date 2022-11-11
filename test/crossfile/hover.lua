@@ -1606,3 +1606,41 @@ someType:
     | "#" -- description
 ```]]
 }
+
+TEST { { path = 'a.lua', content = [[
+---@overload fun(x: number)
+---@overload fun(x: number, y: number)
+local function <?f?>(...)
+end
+]] },
+hover = [[
+```lua
+function f(x: number)
+```
+
+---
+
+```lua
+function f(x: number, y: number)
+```]]
+}
+
+TEST { { path = 'a.lua', content = [[
+---@overload fun(x: number)
+---@overload fun(x: number, y: number)
+local function f(...)
+end
+
+<?f?>
+]] },
+hover = [[
+```lua
+function f(x: number)
+```
+
+---
+
+```lua
+function f(x: number, y: number)
+```]]
+}

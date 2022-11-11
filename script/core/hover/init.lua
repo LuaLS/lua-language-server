@@ -60,8 +60,12 @@ local function getHover(source)
             if guide.isOOP(def) then
                 oop = true
             end
-            if def.type == 'function'
-            or def.type == 'doc.type.function' then
+            if  def.type == 'function'
+            and not vm.isVarargFunctionWithOverloads(def) then
+                hasFunc = true
+                addHover(def, true, oop)
+            end
+            if def.type == 'doc.type.function' then
                 hasFunc = true
                 addHover(def, true, oop)
             end

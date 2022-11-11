@@ -315,7 +315,7 @@ local function checkLocal(state, word, position, results)
                 return orders[a] < orders[b]
             end)
             for _, def in ipairs(defs) do
-                if def.type == 'function'
+                if (def.type == 'function' and not vm.isVarargFunctionWithOverloads(def))
                 or def.type == 'doc.type.function' then
                     local funcLabel = name .. getParams(def, false)
                     buildFunction(results, source, def, false, {
@@ -364,7 +364,7 @@ local function checkModule(state, word, position, results)
         if  not locals[stemName]
         and not vm.hasGlobalSets(state.uri, 'variable', stemName)
         and not globals[stemName]
-        and stemName:match '^[%a_][%w_]*$'
+        and stemName:match(guide.namePatternFull)
         and matchKey(word, stemName) then
             local targetState = files.getState(uri)
             if not targetState then
@@ -422,8 +422,11 @@ local function checkModule(state, word, position, results)
 end
 
 local function checkFieldFromFieldToIndex(state, name, src, parent, word, startPos, position)
-    if name:match '^[%a_][%w_]*$' then
-        return nil
+    if name:match(guide.namePatternFull) then
+        if not name:match '[\x80-\xff]'
+        or config.get(state.uri, 'Lua.runtime.unicodeName') then
+            return nil
+        end
     end
     local textEdit, additionalTextEdits
     local startOffset = guide.positionToOffset(state, startPos)
@@ -474,8 +477,8 @@ local function checkFieldFromFieldToIndex(state, name, src, parent, word, startP
             }
         end
     else
-        if config.get(state.uri, 'Lua.runtime.version') == 'lua 5.1'
-        or config.get(state.uri, 'Lua.runtime.version') == 'luaJIT' then
+        if config.get(state.uri, 'Lua.runtime.version') == 'Lua 5.1'
+        or config.get(state.uri, 'Lua.runtime.version') == 'LuaJIT' then
             textEdit.newText = '_G' .. textEdit.newText
         else
             textEdit.newText = '_ENV' .. textEdit.newText
@@ -487,7 +490,7 @@ end
 local function checkFieldThen(state, name, src, word, startPos, position, parent, oop, results)
     local value = vm.getObjectFunctionValue(src) or src
     local kind = define.CompletionItemKind.Field
-    if value.type == 'function'
+    if (value.type == 'function' and not vm.isVarargFunctionWithOverloads(value))
     or value.type == 'doc.type.function' then
         if oop then
             kind = define.CompletionItemKind.Method
@@ -569,9 +572,11 @@ local function checkFieldOfRefs(refs, state, word, startPos, position, parent, o
             local value = vm.getObjectFunctionValue(src) or src
             if value.type == 'function'
             or value.type == 'doc.type.function' then
-                funcLabel = name .. getParams(value, oop)
-                fields[funcLabel] = src
-                count = count + 1
+                if not vm.isVarargFunctionWithOverloads(value) then
+                    funcLabel = name .. getParams(value, oop)
+                    fields[funcLabel] = src
+                    count = count + 1
+                end
                 if value.type == 'function' and value.bindDocs then
                     for _, doc in ipairs(value.bindDocs) do
                         if doc.type == 'doc.overload' then
@@ -726,7 +731,7 @@ local function checkCommon(state, word, position, results)
             end
         end
     end
-    for str, offset in state.lua:gmatch '([%a_][%w_]+)()' do
+    for str, offset in state.lua:gmatch('(' .. guide.namePattern .. ')()') do
         if #results >= 100 then
             results.incomplete = true
             break

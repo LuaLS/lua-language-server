@@ -112,6 +112,13 @@ local function getDeprecated(value)
             end
         end
     end
+    if value.type == 'function' then
+        local doc = getDeprecated(value.parent)
+        if doc then
+            value._deprecated = doc
+            return doc
+        end
+    end
     value._deprecated = false
     return nil
 end

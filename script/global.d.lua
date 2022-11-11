@@ -60,3 +60,7 @@ LAZY = false
 -- (experiment) Improve performance, but reduce accuracy
 ---@type boolean
 CACHEALIVE = false
+
+-- (experiment) Compile files in multi cpu cores
+---@type integer
+COMPILECORES = 0

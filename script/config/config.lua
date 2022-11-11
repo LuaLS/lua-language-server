@@ -76,7 +76,7 @@ end
 function m.set(uri, key, value)
     local unit = template[key]
     assert(unit, 'unknown key: ' .. key)
-    local scp = getScope(uri)
+    local scp = getScope(uri, key)
     local oldValue = m.get(uri, key)
     m.setByScope(scp, key, value)
     local newValue = m.get(uri, key)

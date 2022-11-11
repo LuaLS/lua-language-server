@@ -1,5 +1,6 @@
 local fw    = require 'bee.filewatch'
 local fs    = require 'bee.filesystem'
+local plat  = require 'bee.platform'
 local await = require 'await'
 
 local MODIFY = 1 << 0
@@ -10,6 +11,9 @@ local function isExists(filename)
     local suc, exists = pcall(fs.exists, path)
     if not suc or not exists then
         return false
+    end
+    if plat.OS ~= 'Windows' then
+        return true
     end
     local suc, res = pcall(fs.fullpath, path)
     if not suc then

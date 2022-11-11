@@ -171,6 +171,7 @@ function mt:_lookIntoChild(action, topNode, outNode)
                 local checkerNode = vm.compileNode(checker)
                 local checkerName = vm.getNodeName(checker)
                 if checkerName then
+                    topNode = topNode:copy()
                     if action.op.type == '==' then
                         topNode:narrow(self._uri, checkerName)
                         if outNode then

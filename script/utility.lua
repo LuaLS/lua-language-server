@@ -772,6 +772,9 @@ end
 
 function m.defaultTable(default)
     return setmetatable({}, { __index = function (t, k)
+        if k == nil then
+            return nil
+        end
         local v = default(k)
         t[k] = v
         return v
@@ -782,12 +785,18 @@ function m.multiTable(count, default)
     local current
     if default then
         current = setmetatable({}, { __index = function (t, k)
+            if k == nil then
+                return nil
+            end
             local v = default(k)
             t[k] = v
             return v
         end })
     else
         current = setmetatable({}, { __index = function (t, k)
+            if k == nil then
+                return nil
+            end
             local v = {}
             t[k] = v
             return v
@@ -795,6 +804,9 @@ function m.multiTable(count, default)
     end
     for _ = 3, count do
         current = setmetatable({}, { __index = function (t, k)
+            if k == nil then
+                return nil
+            end
             t[k] = current
             return current
         end })

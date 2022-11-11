@@ -204,7 +204,7 @@ end
 function mongo_cursor:limit(amount)
 end
 ---统计行数
----@param with_limit_and_skip boolean
+---@param with_limit_and_skip? boolean
 function mongo_cursor:count(with_limit_and_skip)
 end
 ---是否有下一行

@@ -285,9 +285,11 @@ function vm.isSubType(uri, child, parent, mark, errs)
             local hasKnownType = 0
             for n in child:eachObject() do
                 if vm.getNodeName(n) then
-                    hasKnownType = hasKnownType + 1
-                    if vm.isSubType(uri, n, parent, mark, errs) == true then
+                    local res = vm.isSubType(uri, n, parent, mark, errs)
+                    if res == true then
                         return true
+                    elseif res == false then
+                        hasKnownType = hasKnownType + 1
                     end
                 end
             end
@@ -350,9 +352,11 @@ function vm.isSubType(uri, child, parent, mark, errs)
         local hasKnownType = 0
         for n in parent:eachObject() do
             if vm.getNodeName(n) then
-                hasKnownType = hasKnownType + 1
-                if vm.isSubType(uri, child, n, mark, errs) == true then
+                local res = vm.isSubType(uri, child, n, mark, errs)
+                if res == true then
                     return true
+                elseif res == false then
+                    hasKnownType = hasKnownType + 1
                 end
             end
             if n.type == 'doc.generic.name' then

@@ -1,5 +1,5 @@
 name    = 'Defold'
-files   = {'game.project'}
+files   = {'game.project', '*%.script', '*%.gui_script'}
 configs = {
     {
         key    = 'Lua.runtime.version',

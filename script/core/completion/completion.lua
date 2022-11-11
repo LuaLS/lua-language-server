@@ -1683,6 +1683,9 @@ local function tryluaDocCate(word, results)
         'operator',
         'source',
         'enum',
+        'package',
+        'private',
+        'protected'
     } do
         if matchKey(word, docType) then
             results[#results+1] = {

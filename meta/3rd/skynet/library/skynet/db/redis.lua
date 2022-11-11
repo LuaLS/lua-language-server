@@ -1,5 +1,5 @@
 ---@meta
-local redis   = {}
+local redis = {}
 
 ---@class redisconfig
 ---@field host string
@@ -19,31 +19,50 @@ local redis   = {}
 local command = {}
 function command:disconnect()
 end
+
+---Is key exists
+---@param k string
+---@return boolean
 function command:exists(k)
 end
+
+---Does value is a member of set key.
+---@param key string #key of a set
+---@param value string #value
 function command:sismember(key, value)
 end
+
+---Pipline command
+---If resp is a table and exits, return boolean, resp.
+---Or return the last result. boolean, out
+---@param ops string[]
+---@param resp? table
 function command:pipeline(ops, resp)
 end
 
 --- watch mode, only can  do  SUBSCRIBE, PSUBSCRIBE, UNSUBSCRIBE, PUNSUBSCRIBE, PING  and QUIT command.
 --- we can call watch:message in endless loop.
 ---@class watch
-local watch   = {}
+local watch = {}
 function watch:disconnect()
 end
+
 ---阻塞模式读取消息
 function watch:message()
 end
+
 ---subscribe channel
 function watch:subscribe(...)
 end
+
 ---pattern subscribe channels
 function watch:psubscribe(...)
 end
+
 ---unsubscribe
 function watch:unsubscribe(...)
 end
+
 ---punsubscribe
 function watch:punsubscribe(...)
 end

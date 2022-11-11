@@ -79,7 +79,7 @@ end
 function meta:select(pat)
 end
 
----Sync all then component of the eneity represent by a iter
+---Sync all then component of the entity represent by a iter to LUA
 ---@param iter number|ITER #ITER or entity id
 ---@return table
 ---@see ECSWorld#_read
@@ -107,7 +107,7 @@ function meta:dumpid(name)
 end
 
 ---Update world, will free removed(default, or with tag `tagname`) entity.
----@param tagname? string #tagname
+---@param tagname? string #tagname, default is REMOVED, but we also can use other tag to delete entities.
 ---@see ECSWorld#_update
 function meta:update(tagname)
 end
@@ -132,6 +132,7 @@ local M = {
 }
 
 ---Lua function
+---Construct a new LuaECS World
 ---@return ECSWorld
 function M.world()
 end
@@ -156,11 +157,11 @@ end
 function meta:template_instance(eid, temp, obj)
 end
 
----Get an entity's component.
+---Get an entity's one component, can can write the value.
 ---@param eid integer
 ---@param pat string #only one key
----@param value any # when with this values, is write.
----@return any # pattern key is tag, return boolean; lua type, return lua data; else table.
+---@param value? any # when with this values, is write.
+---@return any|nil # pattern key is tag, return boolean; lua type, return lua data; else table; if write, return nil.
 ---@see ECSWorld#readall
 ---@see ECSWorld#fetch
 function meta:access(eid, pat, value)
@@ -172,7 +173,7 @@ end
 function meta:count(pat)
 end
 
----Extend an iter with patther.
+---Extend an iter with pattern.
 ---@param iter ITER
 ---@param expat string
 ---@see ECSWorld#_read
@@ -183,10 +184,11 @@ function meta:extend(iter, expat) end
 ---@return integer #component id
 function meta:component_id(name) end
 
----Persist User
+---Persist Use
 function meta:read_component(reader, name, offset, stride, n) end
 
 ---Get the first entity of pattern `pattern`
+---We can use this as a signletone component.
 ---@param pattern string
 ---@return ITER
 function meta:first(pattern) end
@@ -220,6 +222,7 @@ function meta:type(name) end
 function meta:filter(tagname, pat) end
 
 ---Fetch entity's component with pattern `pat`
+---You can use out, update and then w:sumit() to modify entity.
 ---@param eid integer
 ---@param pat? string
 ---@see ECSWorld#readall
@@ -355,7 +358,9 @@ function meta:_access(...) end
 function meta:__gc(...) end
 
 ---C API
--- Add entity (eid) into a group with groupid (32bit integer)
+--- Add entity (eid) into a group with groupid (32bit integer)
+---**NOTE:We can add entity to a group, but we can not remove it from a group.**
+---**NOTE:We can iterate a group, but we can not random visit a group member.**
 ---@param groupid number #32bit
 ---@param eid number
 function meta:group_add(groupid, eid) end

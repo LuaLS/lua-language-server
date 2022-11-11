@@ -368,6 +368,27 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                             end
                         end)
                     end
+                    if  src.value
+                    and src.value.type == 'select'
+                    and src.value.vararg.type == 'call' then
+                        local func = src.value.vararg.node
+                        local args = src.value.vararg.args
+                        if  func.special == 'setmetatable'
+                        and args
+                        and args[1]
+                        and args[1].type == 'table' then
+                            searchFieldSwitch('table', suri, args[1], key, ref, function (field)
+                                local fieldKey = guide.getKeyName(field)
+                                if fieldKey then
+                                    if  not searchedFields[fieldKey]
+                                    and guide.isSet(field) then
+                                        hasFounded[fieldKey] = true
+                                        pushResult(field, true)
+                                    end
+                                end
+                            end)
+                        end
+                    end
                     copyToSearched()
                     searchFieldSwitch(src.type, suri, src, key, ref, function (field)
                         local fieldKey = guide.getKeyName(field)
@@ -1038,6 +1059,7 @@ local function compileLocal(source)
     end
     if source.parent.type == 'funcargs' and not hasMarkDoc and not hasMarkParam then
         local func = source.parent.parent
+        -- local call ---@type fun(f: fun(x: number));call(function (x) end) --> x -> number
         local funcNode = vm.compileNode(func)
         local hasDocArg
         for n in funcNode:eachObject() do
@@ -1136,6 +1158,22 @@ local compilerSwitch = util.switch()
         if source.parent.type == 'callargs' then
             local call = source.parent.parent
             vm.compileCallArg(source, call)
+        end
+
+        -- function f() return function (<?x?>) end end
+        if source.parent.type == 'return' then
+            for i, ret in ipairs(source.parent) do
+                if ret == source then
+                    local func = guide.getParentFunction(source.parent)
+                    if func then
+                        local returnObj = vm.getReturnOfFunction(func, i)
+                        if returnObj then
+                            vm.setNode(source, vm.compileNode(returnObj))
+                        end
+                    end
+                    break
+                end
+            end
         end
     end)
     : case 'paren'

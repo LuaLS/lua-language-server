@@ -28,7 +28,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
   ---@type myClass
   local class
 
-  print(class.a.b.c.e.f.g) --> infered as integer
+  print(class.a.b.c.e.f.g) --> inferred as integer
   ```
 * `CHG` [#1582] the following diagnostics consider `overload`
   * `missing-return`
@@ -37,6 +37,35 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
   * `return-type-mismatch`
 * `CHG` workspace-symbol: supports chain fields based on global variables and types. try `io.open` or `iolib.open`
 * `CHG` [#1641] if a function only has varargs and has `---@overload`, the varargs will be ignored
+* `CHG` [#1575] search definitions by first argument of `setmetatable`
+  ```lua
+  ---@class Object
+  local obj = setmetatable({
+    initValue = 1,
+  }, mt)
+
+  print(obj.initValue) --> `obj.initValue` is integer
+  ```
+* `CHG` [#1153] infer type by generic parameters or returns of function
+  ```lua
+  ---@generic T
+  ---@param f fun(x: T)
+  ---@return T[]
+  local function x(f) end
+
+  ---@type fun(x: integer)
+  local cb
+
+  local arr = x(cb) --> `arr` is inferred as `integer[]`
+  ```
+* `CHG` [#1201] infer parameter type by expected returned function of parent function
+  ```lua
+  ---@return fun(x: integer)
+  local function f()
+      return function (x) --> `x` is inferred as `integer`
+      end
+  end
+  ```
 * `FIX` [#1567]
 * `FIX` [#1593]
 * `FIX` [#1595]
@@ -44,14 +73,18 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 * `FIX` [#1606]
 * `FIX` [#1608]
 * `FIX` [#1637]
+* `FIX` [#1640]
 * `FIX` [#1642]
 
+[#1153]: https://github.com/sumneko/lua-language-server/issues/1153
 [#1177]: https://github.com/sumneko/lua-language-server/issues/1177
+[#1202]: https://github.com/sumneko/lua-language-server/issues/1202
 [#1458]: https://github.com/sumneko/lua-language-server/issues/1458
 [#1557]: https://github.com/sumneko/lua-language-server/issues/1557
 [#1558]: https://github.com/sumneko/lua-language-server/issues/1558
 [#1561]: https://github.com/sumneko/lua-language-server/issues/1561
 [#1567]: https://github.com/sumneko/lua-language-server/issues/1567
+[#1575]: https://github.com/sumneko/lua-language-server/issues/1575
 [#1582]: https://github.com/sumneko/lua-language-server/issues/1582
 [#1593]: https://github.com/sumneko/lua-language-server/issues/1593
 [#1595]: https://github.com/sumneko/lua-language-server/issues/1595
@@ -60,6 +93,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 [#1608]: https://github.com/sumneko/lua-language-server/issues/1608
 [#1626]: https://github.com/sumneko/lua-language-server/issues/1626
 [#1637]: https://github.com/sumneko/lua-language-server/issues/1637
+[#1640]: https://github.com/sumneko/lua-language-server/issues/1640
 [#1641]: https://github.com/sumneko/lua-language-server/issues/1641
 [#1642]: https://github.com/sumneko/lua-language-server/issues/1642
 

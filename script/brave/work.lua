@@ -60,7 +60,7 @@ brave.on('compile', function (param)
         , param.version
         , param.options
     )
-    log.debug('compile', param.uri, 'takes:', os.clock() - clock)
+    log.debug('Async compile', param.uri, 'takes:', os.clock() - clock)
     return {
         state = state,
         err   = err,

@@ -1411,8 +1411,8 @@ function World:getResponseTime() end
 ---
 ---The default step count is 20.
 ---
----@param steps number # The step count.
-function World:getStepCount(steps) end
+---@return number steps # The step count.
+function World:getStepCount() end
 
 ---
 ---Returns the tightness of joints in the World.

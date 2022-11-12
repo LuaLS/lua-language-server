@@ -1053,18 +1053,6 @@ end
 ]]
 
 TEST [[
----@type fun(x: number)
-local function f<!()!>
-end
-]]
-
-TEST [[
----@type fun(x: number)
-local function f(x, <!y!>)
-end
-]]
-
-TEST [[
 ---@enum Enum
 local t = {
     x = 1,

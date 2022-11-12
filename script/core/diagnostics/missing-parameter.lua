@@ -29,24 +29,4 @@ return function (uri, callback)
             message = lang.script('DIAG_MISS_ARGS', funcArgs, callArgs),
         }
     end)
-
-    ---@async
-    guide.eachSourceType(state.ast, 'function', function (source)
-        await.delay()
-        if not source.args then
-            return
-        end
-        local funcArgs = vm.countParamsOfSource(source)
-        if funcArgs == 0 then
-            return
-        end
-        local myArgs = #source.args
-        if myArgs < funcArgs then
-            callback {
-                start  = source.args.start,
-                finish = source.args.finish,
-                message = lang.script('DIAG_MISS_ARGS', funcArgs, myArgs),
-            }
-        end
-    end)
 end

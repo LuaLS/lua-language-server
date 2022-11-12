@@ -2,8 +2,10 @@
 
 ## 3.6.3
 * `FIX` [#1684]
+* `FIX` [#1692]
 
 [#1684]: https://github.com/sumneko/lua-language-server/issues/1684
+[#1692]: https://github.com/sumneko/lua-language-server/issues/1692
 
 ## 3.6.2
 `2022-11-10`

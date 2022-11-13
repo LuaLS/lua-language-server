@@ -1,1 +1,1 @@
-words = { "assert%.%w+" }
+words = { "require[%s%(\"\']+luassert[%)\"\']" }

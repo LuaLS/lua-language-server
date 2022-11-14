@@ -5,96 +5,55 @@ local guide    = require 'parser.guide'
 local vm       = require 'vm'
 local await    = require 'await'
 
+local sourceTypes = {
+    'setfield',
+    'setmethod',
+    'setindex',
+}
+
 ---@async
 return function (uri, callback)
-    local ast = files.getState(uri)
-    if not ast then
+    local state = files.getState(uri)
+    if not state then
         return
     end
 
     ---@async
-    guide.eachSourceType(ast.ast, 'local', function (source)
-        if not source.ref then
+    guide.eachSourceTypes(state.ast, sourceTypes, function (src)
+        await.delay()
+        local name = guide.getKeyName(src)
+        if not name then
             return
         end
-        await.delay()
-        local sets = {}
-        for _, ref in ipairs(source.ref) do
-            if ref.type ~= 'getlocal' then
-                goto CONTINUE
-            end
-            local nxt = ref.next
-            if not nxt then
-                goto CONTINUE
-            end
-            if nxt.type == 'setfield'
-            or nxt.type == 'setmethod'
-            or nxt.type == 'setindex' then
-                local name = guide.getKeyName(nxt)
-                if not name then
-                    goto CONTINUE
-                end
-                local value = vm.getObjectValue(nxt)
-                if not value or value.type ~= 'function' then
-                    goto CONTINUE
-                end
-                if not sets[name] then
-                    sets[name] = {}
-                end
-                sets[name][#sets[name]+1] = nxt
-            end
-            ::CONTINUE::
+        local value = vm.getObjectValue(src)
+        if not value or value.type ~= 'function' then
+            return
         end
-        for name, values in pairs(sets) do
-            if #values <= 1 then
-                goto CONTINUE_SETS
+        local defs = vm.getDefs(src)
+        for _, def in ipairs(defs) do
+            if def == src then
+                goto CONTINUE
             end
-            local blocks = {}
-            for _, value in ipairs(values) do
-                local block = guide.getBlock(value)
-                if block then
-                    if not blocks[block] then
-                        blocks[block] = {}
-                    end
-                    blocks[block][#blocks[block]+1] = value
-                end
+            if  def.type ~= 'setfield'
+            and def.type ~= 'setmethod'
+            and def.type ~= 'setindex' then
+                goto CONTINUE
             end
-            for _, defs in pairs(blocks) do
-                if #defs <= 1 then
-                    goto CONTINUE_BLOCKS
-                end
-                local related = {}
-                for i = 1, #defs do
-                    local def = defs[i]
-                    related[i] = {
-                        start  = def.start,
-                        finish = def.finish,
-                        uri    = uri,
-                    }
-                end
-                for i = 1, #defs - 1 do
-                    local def = defs[i]
-                    callback {
-                        start   = def.start,
-                        finish  = def.finish,
-                        related = related,
-                        message = lang.script('DIAG_DUPLICATE_SET_FIELD', name),
-                        level   = define.DiagnosticSeverity.Hint,
-                        tags    = { define.DiagnosticTag.Unnecessary },
-                    }
-                end
-                for i = #defs, #defs do
-                    local def = defs[i]
-                    callback {
-                        start   = def.start,
-                        finish  = def.finish,
-                        related = related,
-                        message = lang.script('DIAG_DUPLICATE_SET_FIELD', name),
-                    }
-                end
-                ::CONTINUE_BLOCKS::
+            local defValue = vm.getObjectValue(def)
+            if not defValue or defValue.type ~= 'function' then
+                goto CONTINUE
             end
-            ::CONTINUE_SETS::
+            callback {
+                start   = src.start,
+                finish  = src.finish,
+                related = {{
+                    start  = def.start,
+                    finish = def.finish,
+                    uri    = guide.getUri(def),
+                }},
+                message = lang.script('DIAG_DUPLICATE_SET_FIELD', name),
+            }
+            ::CONTINUE::
         end
     end)
 end

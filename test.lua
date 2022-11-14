@@ -13,6 +13,7 @@ METAPATH = METAPATH or (ROOT:string() .. '/meta')
 
 collectgarbage 'generational'
 
+---@diagnostic disable-next-line: duplicate-set-field
 io.write = function () end
 
 ---@diagnostic disable-next-line: lowercase-global

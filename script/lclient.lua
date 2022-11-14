@@ -24,6 +24,7 @@ function mt:__close()
 end
 
 function mt:_fakeProto()
+    ---@diagnostic disable-next-line: duplicate-set-field
     proto.send = function (data)
         self._outs[#self._outs+1] = data
         if self.onSend then
@@ -47,6 +48,7 @@ function mt:_localLoadFile()
     ---@async
     ---@param name   string
     ---@param params any
+    ---@diagnostic disable-next-line: duplicate-set-field
     pub.awaitTask = function (name, params)
         if name == 'loadFile' then
             local path = params

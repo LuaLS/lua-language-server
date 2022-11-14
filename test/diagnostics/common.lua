@@ -1119,11 +1119,11 @@ return m
 TEST [[
 local m = {}
 
-function m:fff()
+function <!m:fff!>()
 end
 
 do
-    function m:fff()
+    function <!m:fff!>()
     end
 end
 

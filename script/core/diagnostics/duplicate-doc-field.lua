@@ -2,6 +2,7 @@ local files   = require 'files'
 local lang    = require 'language'
 local vm      = require 'vm.vm'
 local await   = require 'await'
+local guide   = require 'parser.guide'
 
 local function getFieldEventName(doc)
     if not doc.extends then
@@ -41,34 +42,69 @@ return function (uri, callback)
         return
     end
 
-    local mark
-    for _, group in ipairs(state.ast.docs.groups) do
-        for _, doc in ipairs(group) do
-            if     doc.type == 'doc.class' then
-                mark = {}
-            elseif doc.type == 'doc.field' then
-                if mark then
-                    await.delay()
-                    local name
-                    if doc.field.type == 'doc.type' then
-                        name = ('[%s]'):format(vm.getInfer(doc.field):view(uri))
-                    else
-                        name = ('%q'):format(doc.field[1])
-                    end
-                    local eventName = getFieldEventName(doc)
-                    if eventName then
-                        name = name .. '|' .. eventName
-                    end
-                    if mark[name] then
-                        callback {
-                            start   = doc.field.start,
-                            finish  = doc.field.finish,
-                            message = lang.script('DIAG_DUPLICATE_DOC_FIELD', name),
-                        }
-                    end
-                    mark[name] = true
+    local cachedKeys = {}
+
+    ---@param field parser.object
+    ---@return string?
+    local function viewKey(field)
+        if not cachedKeys[field] then
+            local view = vm.viewKey(field, uri)
+            if view then
+                local eventName = getFieldEventName(field)
+                if eventName then
+                    view = view .. '|' .. eventName
                 end
             end
+            cachedKeys[field] = view or false
+        end
+        return cachedKeys[field] or nil
+    end
+
+    ---@async
+    ---@param myField parser.object
+    local function checkField(myField)
+        await.delay()
+        local myView = viewKey(myField)
+        if not myView then
+            return
+        end
+
+        local class = myField.class
+        if not class then
+            return
+        end
+        for _, set in ipairs(vm.getGlobal('type', class.class[1]):getSets(uri)) do
+            if not set.fields then
+                goto CONTINUE
+            end
+            for _, field in ipairs(set.fields) do
+                if field == myField then
+                    goto CONTINUE
+                end
+                local view = viewKey(field)
+                if view ~= myView then
+                    goto CONTINUE
+                end
+                callback {
+                    start   = myField.field.start,
+                    finish  = myField.field.finish,
+                    message = lang.script('DIAG_DUPLICATE_DOC_FIELD', myView),
+                    related = {{
+                        start  = field.field.start,
+                        finish = field.field.finish,
+                        uri    = guide.getUri(field),
+                    }}
+                }
+                do return end
+                ::CONTINUE::
+            end
+            ::CONTINUE::
+        end
+    end
+
+    for _, doc in ipairs(state.ast.docs) do
+        if doc.type == 'doc.field' then
+            checkField(doc)
         end
     end
 end

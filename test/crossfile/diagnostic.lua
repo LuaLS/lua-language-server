@@ -165,3 +165,14 @@ TEST {
         print(obj.<!x!>)
     ]]}
 }
+
+TEST {
+    { path = 'a.lua', content = [[
+        ---@class A
+        ---@field <!x!> number
+    ]]},
+    { path = 'b.lua', content = [[
+        ---@class A
+        ---@field <!x!> number
+    ]]}
+}

@@ -4030,3 +4030,28 @@ local t = {
         kind  = define.CompletionItemKind.Function,
     }
 }
+
+TEST [[
+---@type table<string, integer>
+local x = {
+    a = 1,
+    b = 2,
+    c = 3
+}
+
+x.<??>
+]]
+{
+    {
+        label = 'a',
+        kind  = define.CompletionItemKind.Enum,
+    },
+    {
+        label = 'b',
+        kind  = define.CompletionItemKind.Enum,
+    },
+    {
+        label = 'c',
+        kind  = define.CompletionItemKind.Enum,
+    },
+}

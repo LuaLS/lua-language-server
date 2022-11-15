@@ -963,4 +963,15 @@ local class
 class.has.nested.<?fn?>()
 ]]
 
+TEST [[
+---@type table<string, integer>
+local x = {
+    <!a!> = 1,
+    b = 2,
+    c = 3
+}
+
+print(x.<?a?>)
+]]
+
 config.set(nil, 'Lua.type.castNumberToInteger', true)

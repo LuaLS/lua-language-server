@@ -534,11 +534,11 @@ end
 ---@return string|number|boolean|nil
 function vm.viewKey(source, uri)
     if source.type == 'doc.type' then
-        if #source == 1 then
-            return vm.viewKey(source[1], uri)
+        if #source.types == 1 then
+            return vm.viewKey(source.types[1], uri)
         else
             local key = vm.viewObject(source, uri)
-            return '[' .. key .. ']', key
+            return '[' .. key .. ']'
         end
     end
     if source.type == 'tableindex' then
@@ -563,6 +563,9 @@ function vm.viewKey(source, uri)
     end
     if source.type == 'doc.type.field' then
         return vm.viewKey(source.name, uri)
+    end
+    if source.type == 'doc.type.name' then
+        return '[' .. source[1] .. ']'
     end
     local key = vm.getKeyName(source)
     if key == nil then

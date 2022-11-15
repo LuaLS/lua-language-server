@@ -953,26 +953,14 @@ function m.getKeyNameOfLiteral(obj)
     if tp == 'field'
     or     tp == 'method' then
         return obj[1]
-    elseif tp == 'string' then
-        local s = obj[1]
-        if s then
-            return s
-        end
-    elseif tp == 'number' then
-        local n = obj[1]
-        if n then
-            return obj[1]
-        end
-    elseif tp == 'integer' then
-        local n = obj[1]
-        if n then
-            return obj[1]
-        end
-    elseif tp == 'boolean' then
-        local b = obj[1]
-        if b then
-            return b
-        end
+    elseif tp == 'string'
+    or     tp == 'number'
+    or     tp == 'integer'
+    or     tp == 'boolean'
+    or     tp == 'doc.type.integer'
+    or     tp == 'doc.type.string'
+    or     tp == 'doc.type.boolean' then
+        return obj[1]
     end
 end
 

@@ -991,7 +991,8 @@ local function compileLocal(source)
         end
     end
     local hasMarkValue
-    if not hasMarkDoc and source.value then
+    if (not hasMarkDoc and source.value)
+    or (source.value and source.value.type == 'table') then
         hasMarkValue = true
         if source.value.type == 'table' then
             vm.setNode(source, source.value)

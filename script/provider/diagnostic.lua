@@ -655,6 +655,11 @@ files.watch(function (ev, uri) ---@async
         m.clear(uri)
         m.stopScopeDiag(uri)
         m.refresh(uri)
+        m.refreshScopeDiag('OnSave', uri)
+    elseif ev == 'create' then
+        m.stopScopeDiag(uri)
+        m.refresh(uri)
+        m.refreshScopeDiag('OnSave', uri)
     elseif ev == 'update' then
         m.stopScopeDiag(uri)
         m.refresh(uri)

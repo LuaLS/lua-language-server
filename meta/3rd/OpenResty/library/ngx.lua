@@ -106,6 +106,7 @@ ngx.HTTP_VERSION_NOT_SUPPORTED  = 505
 ngx.HTTP_INSUFFICIENT_STORAGE   = 507
 
 ---@alias ngx.http.status_code
+---| integer
 ---| `ngx.HTTP_CONTINUE`
 ---| `ngx.HTTP_SWITCHING_PROTOCOLS`
 ---| `ngx.HTTP_OK`

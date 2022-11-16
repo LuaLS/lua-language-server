@@ -129,17 +129,17 @@ DIAG_UNKNOWN_CAST_VARIABLE            =
 DIAG_CAST_TYPE_MISMATCH               =
 'Cannot convert `{def}` to `{ref}`。'
 DIAG_MISSING_RETURN_VALUE             =
-'At least {min} return values are required, but here only {rmax} values are returned.'
+'Annotations specify that at least {min} return value(s) are required, found {rmax} returned here instead.'
 DIAG_MISSING_RETURN_VALUE_RANGE       =
-'At least {min} return values are required, but here only {rmin} to {rmax} values are returned.'
+'Annotations specify that at least {min} return value(s) are required, found {rmin} to {rmax} returned here instead.'
 DIAG_REDUNDANT_RETURN_VALUE           =
-'At most {max} values returned, but the {rmax}th value was returned here.'
+'Annotations specify that at most {max} return value(s) are required, found {rmax} returned here instead.'
 DIAG_REDUNDANT_RETURN_VALUE_RANGE     =
-'At most {max} values returned, but {rmin}th to {rmax}th values were returned here.'
+'Annotations specify that at most {max} return value(s) are required, found {rmin} to {rmax} returned here instead.'
 DIAG_MISSING_RETURN                   =
-'Return value is required here.'
+'Annotations specify that a return value is required here.'
 DIAG_RETURN_TYPE_MISMATCH             =
-'The type of the {index} return value is `{def}`, but the actual return is `{ref}`.'
+'Annotations specify that return value #{index} has a type of `{def}`, returning value of type `{ref}` here instead.'
 DIAG_UNKNOWN_OPERATOR                 =
 'Unknown operator `{}`.'
 DIAG_UNREACHABLE_CODE                 =

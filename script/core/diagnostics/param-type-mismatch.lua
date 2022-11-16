@@ -22,10 +22,8 @@ local function expandGenerics(defNode)
         if limits then
             defNode:merge(vm.compileNode(limits))
         else
-            local unknownType = vm.getGlobal('type', 'unknown')
-            if unknownType then
-                defNode:merge(unknownType)
-            end
+            local unknownType = vm.declareGlobal('type', 'unknown')
+            defNode:merge(unknownType)
         end
     end
 end

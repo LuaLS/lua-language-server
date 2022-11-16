@@ -1796,7 +1796,7 @@ function Pass:line(x1, y1, z1, x2, y2, z2, ...) end
 ---@param start? number # The 1-based index of the first vertex to render from the vertex buffer (or the first index, when using an index buffer).
 ---@param count? number # The number of vertices to render (or the number of indices, when using an index buffer). When `nil`, as many vertices or indices as possible will be drawn (based on the length of the Buffers and `start`).
 ---@param instances? number # The number of copies of the mesh to render.
----@param base? number # nil
+---@param base? number # A base offset to apply to vertex indices.
 function Pass:mesh(vertices, transform, start, count, instances, base) end
 
 ---

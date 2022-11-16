@@ -1536,6 +1536,21 @@ function World:newMeshCollider(vertices, indices) end
 function World:newSphereCollider(x, y, z, radius) end
 
 ---
+---Adds a new Collider to the World with a TerrainShape already attached.
+---
+---
+---### NOTE:
+---The collider will be positioned at 0, 0, 0.
+---
+---Unlike other colliders, it will automatically be set as kinematic when created.
+---
+---@overload fun(self: lovr.World, scale: number, heightmap: lovr.Image, stretch?: number):lovr.Collider
+---@overload fun(self: lovr.World, scale: number, callback: function, samples?: number):lovr.Collider
+---@param scale number # The width and depth of the terrain, in meters.
+---@return lovr.Collider collider # The new Collider.
+function World:newTerrainCollider(scale) end
+
+---
 ---Returns an iterator that can be used to iterate over "overlaps", or potential collisions between pairs of shapes in the World.
 ---
 ---This should be called after using `World:computeOverlaps` to compute the list of overlaps. Usually this is called automatically by `World:update`.

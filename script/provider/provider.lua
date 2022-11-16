@@ -1167,7 +1167,7 @@ m.register '$/status/click' {
             end
         elseif result == 'Restart Server' then
             local diag = require 'provider.diagnostic'
-            diag.clearAll(true)
+            diag.clearAll(nil, true)
             os.exit(0, true)
         elseif result == 'Clear Node Cache' then
             local vm = require 'vm'

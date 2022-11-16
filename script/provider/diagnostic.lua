@@ -183,14 +183,24 @@ function m.clearCacheExcept(uris)
     end
 end
 
-function m.clearAll(force)
+---@param uri? uri
+---@param force? boolean
+function m.clearAll(uri, force)
+    local scp
+    if uri then
+        scp = scope.getScope(uri)
+    end
     if force then
         for luri in files.eachFile() do
-            m.clear(luri, force)
+            if not scp or scope.getScope(luri) == scp then
+                m.clear(luri, force)
+            end
         end
     else
         for luri in pairs(m.cache) do
-            m.clear(luri)
+            if not scp or scope.getScope(luri) == scp then
+                m.clear(luri)
+            end
         end
     end
 end
@@ -564,7 +574,7 @@ function m.diagnosticsScope(uri, force)
         return
     end
     if not force and not config.get(uri, 'Lua.diagnostics.enable') then
-        m.clearAll()
+        m.clearAll(uri)
         return
     end
     if not force and config.get(uri, 'Lua.diagnostics.workspaceDelay') < 0 then

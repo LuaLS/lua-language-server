@@ -73,7 +73,7 @@ pipe.version = require("resty.core.base").version
 ---```
 ---
 ---
----@param  args           table[]|string
+---@param  args           string[]|string
 ---@param  opts?          ngx.pipe.spawn.opts
 ---@return ngx.pipe.proc? proc
 ---@return string?        error

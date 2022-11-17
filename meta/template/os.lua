@@ -44,7 +44,7 @@ function os.date(format, time) end
 function os.difftime(t2, t1) end
 
 ---#DES 'os.execute'
----#if VERSION <= 5.1 then
+---#if VERSION <= 5.1 and not JIT then
 ---@param command? string
 ---@return integer code
 function os.execute(command) end

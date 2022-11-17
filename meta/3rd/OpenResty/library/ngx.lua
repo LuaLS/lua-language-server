@@ -581,6 +581,9 @@ function ngx.worker.pid() end
 --- This boolean field indicates whether the current NGINX is a debug build, i.e., being built by the `./configure` option `--with-debug`.
 ---@field debug boolean
 ---
+--- This boolean field indicates whether the current NGINX run by resty.
+---@field is_console boolean
+---
 ngx.config = {}
 
 

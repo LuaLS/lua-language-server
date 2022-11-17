@@ -1,6 +1,8 @@
 ---@meta
 
 ---@class ngx.semaphore
+--- sem is the internal c handler
+---@field sem userdata
 local semaphore = {
   version = require("resty.core.base").version,
 }

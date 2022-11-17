@@ -17,7 +17,7 @@ function resty_core_base.get_request() end
 function resty_core_base.get_size_ptr() end
 
 ---@param size number
----@param must_alloc boolean
+---@param must_alloc? boolean
 ---@return userdata
 function resty_core_base.get_string_buf(size, must_alloc) end
 

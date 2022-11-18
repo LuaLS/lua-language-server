@@ -567,6 +567,7 @@ local function matchCall(source)
         local newNode = myNode:copy()
         newNode:removeNode(needRemove)
         newNode:setData('originNode', myNode)
+        newNode:setData('hasResolved', true)
         vm.setNode(source, newNode, true)
     end
 end
@@ -640,7 +641,9 @@ local function bindAs(source)
 
     local doc = ases[index]
     if doc and doc.touch == source.finish then
-        vm.setNode(source, vm.compileNode(doc.as), true)
+        local asNode = vm.compileNode(doc.as)
+        asNode:setData 'hasResolved'
+        vm.setNode(source, asNode, true)
         return true
     end
 
@@ -1186,6 +1189,7 @@ local compilerSwitch = util.switch()
     end)
     : case 'local'
     : case 'self'
+    ---@async
     ---@param source parser.object
     : call(function (source)
         compileLocal(source)
@@ -1222,6 +1226,7 @@ local compilerSwitch = util.switch()
                     return
                 end
                 vm.setNode(src, node, true)
+                node:setData('hasResolved', true)
                 matchCall(src)
             end
         end)
@@ -1244,11 +1249,13 @@ local compilerSwitch = util.switch()
         vm.compileNode(source.node)
     end)
     : case 'getlocal'
+    ---@async
     : call(function (source)
         if bindAs(source) then
             return
         end
         vm.compileNode(source.node)
+        vm.waitResolveRunner(source)
     end)
     : case 'setfield'
     : case 'setmethod'
@@ -1927,6 +1934,13 @@ function vm.compileNode(source)
         else
             log.error('Can not compile nil source')
         end
+    end
+
+    if source.type == 'getlocal' then
+        ---@cast source parser.object
+        vm.storeWaitingRunner(source)
+        ---@diagnostic disable-next-line: await-in-sync
+        vm.waitResolveRunner(source)
     end
 
     local cache = vm.getNode(source)

@@ -1,6 +1,7 @@
 ---@class vm
 local vm        = require 'vm.vm'
 local guide     = require 'parser.guide'
+local linked    = require 'linked-table'
 
 ---@alias vm.runner.callback fun(src: parser.object, node?: vm.node)
 
@@ -344,24 +345,165 @@ function mt:lookIntoBlock(block, topNode)
     return topNode
 end
 
+---@alias runner.info { source?: parser.object, loc: parser.object }
+
+---@type thread?
+local masterRunner = nil
+---@type table<thread, runner.info>
+local runnerInfo = setmetatable({}, {
+    __mode = 'k',
+    __index = function (self, k)
+        self[k] = {}
+        return self[k]
+    end
+})
+---@type linked-table?
+local runnerList = nil
+
+---@async
+---@param info runner.info
+local function waitResolve(info)
+    while true do
+        if not info.source then
+            break
+        end
+        if info.source.node == info.loc then
+            break
+        end
+        local node = vm.getNode(info.source)
+        if node and node:getData('hasResolved') then
+            break
+        end
+        coroutine.yield()
+    end
+    info.source = nil
+end
+
+---@async
 ---@param loc parser.object
 ---@param callback vm.runner.callback
 function vm.launchRunner(loc, callback)
-    local main = guide.getParentBlock(loc)
-    if not main then
+    local locNode = vm.getNode(loc)
+    if not locNode then
         return
     end
-    local self = setmetatable({
-        _loc      = loc,
-        _casts    = {},
-        _mark     = {},
-        _has      = {},
-        _main     = main,
-        _uri      = guide.getUri(loc),
-        _callback = callback,
-    }, mt)
 
-    self:collect()
+    local function resumeMaster()
+        for i = 1, 10010 do
+            if not runnerList or runnerList:getSize() == 0 then
+                return
+            end
+            local allWaiting = true
+            for runner in runnerList:pairs() do
+                local info = runnerInfo[runner]
+                local waitingSource = info.source
+                if coroutine.status(runner) == 'suspended' then
+                    local suc, err = coroutine.resume(runner)
+                    if not suc then
+                        log.error(debug.traceback(runner, err))
+                    end
+                else
+                    runnerList:pop(runner)
+                end
+                if not waitingSource or waitingSource ~= info.source then
+                    allWaiting = false
+                end
+            end
+            if runnerList:getSize() == 0 then
+                return
+            end
+            if allWaiting or i == 10000 then
+                local lines = {}
+                lines[#lines+1] = 'Dead lock:'
+                lines[#lines+1] = guide.getUri(loc)
+                for runner in runnerList:pairs() do
+                    local info = runnerInfo[runner]
+                    lines[#lines+1] = string.format('Runner `%s` at %d waiting for `%s` at %d'
+                        , loc[1]
+                        , loc.start
+                        , info.source and info.source[1] or ''
+                        , info.source and info.source.start or 0
+                    )
+                end
+                local msg = table.concat(lines, '\n')
+                log.error(msg)
+            end
+        end
+    end
 
-    self:lookIntoBlock(main, vm.getNode(loc):copy())
+    local function launch()
+        local main = guide.getParentBlock(loc)
+        if not main then
+            return
+        end
+        local self = setmetatable({
+            _loc      = loc,
+            _casts    = {},
+            _mark     = {},
+            _has      = {},
+            _main     = main,
+            _uri      = guide.getUri(loc),
+            _callback = callback,
+        }, mt)
+
+        self:collect()
+
+        self:lookIntoBlock(main, locNode:copy())
+
+        locNode:setData('runner', nil)
+    end
+
+    local co = coroutine.create(launch)
+    locNode:setData('runner', co)
+    local info = runnerInfo[co]
+    info.loc = loc
+
+    if not runnerList then
+        runnerList = linked()
+    end
+    runnerList:pushTail(co)
+
+    if not masterRunner then
+        masterRunner = coroutine.running()
+        resumeMaster()
+        masterRunner = nil
+        return
+    end
+end
+
+---@async
+---@param source parser.object
+function vm.waitResolveRunner(source)
+    local running = coroutine.running()
+    if not masterRunner or running == masterRunner then
+        return
+    end
+
+    local loc = source.node
+    local locNode = vm.getNode(loc)
+    if not locNode then
+        return
+    end
+    local runner = locNode:getData('runner')
+    if not runner or runner == running then
+        return
+    end
+
+    local info = runnerInfo[running]
+    if info.loc == loc then
+        return
+    end
+    waitResolve(info)
+end
+
+---@param source parser.object
+function vm.storeWaitingRunner(source)
+    local sourceNode = vm.getNode(source)
+    if sourceNode and sourceNode:getData 'hasResolved' then
+        return
+    end
+
+    local running = coroutine.running()
+    local info = runnerInfo[running]
+    info.source = source
 end

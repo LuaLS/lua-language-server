@@ -116,11 +116,11 @@ return function (uri, offset)
     local source = convertIndex(findSource(ast, offset, accept))
     if not source then
         return nil
-    elseif source.type == 'callargs' then
-        source = findSource(ast, offset, acceptGenArg)
-        if not source then
-            return
-        end
+    -- elseif source.type == 'callargs' then
+    --     source = findSource(ast, offset, acceptGenArg)
+    --     if not source then
+    --         return
+    --     end
     end
 
     local results = {}

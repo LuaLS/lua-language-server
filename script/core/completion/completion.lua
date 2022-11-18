@@ -369,10 +369,11 @@ local function checkModule(state, word, position, results)
         for _, sr in ipairs(infos) do
             local pattern = sr.searcher
                 :gsub("(%p)", "%%%1")
-                :gsub("%%%?", "([%%a_][%%w_]*)")
+                :gsub("%%%?", "(.-)")
 
             local stemName = relativePath
                 :match(pattern)
+                :match("[%a_][%w_]*$")
 
             if not stemName or testedStem[stemName] then
                 goto INNER_CONTINUE
@@ -382,7 +383,6 @@ local function checkModule(state, word, position, results)
             if  not locals[stemName]
             and not vm.hasGlobalSets(state.uri, 'variable', stemName)
             and not globals[stemName]
-            and stemName:match '^[%a_][%w_]*$'
             and matchKey(word, stemName) then
                 local targetState = files.getState(uri)
                 if not targetState then

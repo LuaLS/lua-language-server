@@ -11,6 +11,7 @@ local m = {}
 ---@field _links table<uri, boolean>
 ---@field _data  table<string, any>
 ---@field _gc    gc
+---@field _removed? true
 local mt = {}
 mt.__index = mt
 
@@ -85,7 +86,7 @@ function mt:getLinkedUri(uri)
 end
 
 ---@param uri uri
----@return uri
+---@return uri?
 function mt:getRootUri(uri)
     if self:isChildUri(uri) then
         return self.uri
@@ -117,7 +118,28 @@ end
 
 function mt:flushGC()
     self._gc:remove()
+    if self._removed then
+        return
+    end
     self._gc = gc()
+end
+
+function mt:remove()
+    if self._removed then
+        return
+    end
+    self._removed = true
+    for i, scp in ipairs(m.folders) do
+        if scp == self then
+            table.remove(m.folders, i)
+            break
+        end
+    end
+    self:flushGC()
+end
+
+function mt:isRemoved()
+    return self._removed == true
 end
 
 ---@param scopeType scope.type
@@ -164,7 +186,7 @@ function m.createFolder(uri)
 end
 
 ---@param uri uri
----@return scope
+---@return scope?
 function m.getFolder(uri)
     for _, scope in ipairs(m.folders) do
         if scope:isChildUri(uri) then
@@ -175,7 +197,7 @@ function m.getFolder(uri)
 end
 
 ---@param uri uri
----@return scope
+---@return scope?
 function m.getLinkedScope(uri)
     if m.override and m.override:isLinkedUri(uri) then
         return m.override
@@ -188,6 +210,7 @@ function m.getLinkedScope(uri)
     if m.fallback:isLinkedUri(uri) then
         return m.fallback
     end
+    return nil
 end
 
 ---@param uri uri

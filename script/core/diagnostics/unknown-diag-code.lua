@@ -1,6 +1,6 @@
 local files   = require 'files'
 local lang    = require 'language'
-local define  = require 'proto.define'
+local diag    = require 'proto.diagnostic'
 
 return function (uri, callback)
     local state = files.getState(uri)
@@ -17,7 +17,7 @@ return function (uri, callback)
             if doc.names then
                 for _, nameUnit in ipairs(doc.names) do
                     local code = nameUnit[1]
-                    if not define.DiagnosticDefaultSeverity[code] then
+                    if not diag.getDiagAndErrNameMap()[code] then
                         callback {
                             start   = nameUnit.start,
                             finish  = nameUnit.finish,

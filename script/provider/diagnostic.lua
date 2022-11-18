@@ -17,6 +17,7 @@ local ltable    = require 'linked-table'
 local furi      = require 'file-uri'
 local json      = require 'json'
 local fw        = require 'filewatch'
+local vm        = require 'vm.vm'
 
 ---@class diagnosticProvider
 local m = {}
@@ -32,6 +33,9 @@ end
 
 local function buildSyntaxError(uri, err)
     local text    = files.getText(uri)
+    if not text then
+        return
+    end
     local message = lang.script('PARSER_' .. err.type, err.info)
 
     if err.version then
@@ -83,10 +87,14 @@ local function buildDiagnostic(uri, diag)
         relatedInformation = {}
         for _, rel in ipairs(diag.related) do
             local rtext = files.getText(rel.uri)
+            if not rtext then
+                goto CONTINUE
+            end
             relatedInformation[#relatedInformation+1] = {
                 message  = rel.message or rtext:sub(rel.start, rel.finish),
                 location = converter.location(rel.uri, converter.packRange(rel.uri, rel.start, rel.finish))
             }
+            ::CONTINUE::
         end
     end
 
@@ -139,9 +147,9 @@ local function mergeDiags(a, b, c)
 end
 
 -- enable `push`, disable `clear`
-function m.clear(uri)
+function m.clear(uri, force)
     await.close('diag:' .. uri)
-    if m.cache[uri] == nil then
+    if m.cache[uri] == nil and not force then
         return
     end
     m.cache[uri] = nil
@@ -150,11 +158,6 @@ function m.clear(uri)
         diagnostics = {},
     })
     log.info('clearDiagnostics', uri)
-end
-
--- enable `push` and `send`
-function m.clearCache(uri)
-    m.cache[uri] = false
 end
 
 function m.clearCacheExcept(uris)
@@ -169,9 +172,15 @@ function m.clearCacheExcept(uris)
     end
 end
 
-function m.clearAll()
-    for luri in pairs(m.cache) do
-        m.clear(luri)
+function m.clearAll(force)
+    if force then
+        for luri in files.eachFile() do
+            m.clear(luri, force)
+        end
+    else
+        for luri in pairs(m.cache) do
+            m.clear(luri)
+        end
     end
 end
 
@@ -185,7 +194,9 @@ function m.syntaxErrors(uri, ast)
     pcall(function ()
         local disables = util.arrayToHash(config.get(uri, 'Lua.diagnostics.disable'))
         for _, err in ipairs(ast.errs) do
-            if not disables[err.type:lower():gsub('_', '-')] then
+            local id = err.type:lower():gsub('_', '-')
+            if  not disables[id]
+            and not vm.isDiagDisabledAt(uri, err.start, id, true) then
                 results[#results+1] = buildSyntaxError(uri, err)
             end
         end
@@ -297,7 +308,7 @@ function m.doDiagnostic(uri, isScopeDiag)
     xpcall(core, log.error, uri, isScopeDiag, function (result)
         diags[#diags+1] = buildDiagnostic(uri, result)
 
-        if not isScopeDiag and time.time() - lastPushClock >= 200 then
+        if not isScopeDiag and time.time() - lastPushClock >= 500 then
             lastPushClock = time.time()
             pushResult()
         end
@@ -315,6 +326,23 @@ function m.doDiagnostic(uri, isScopeDiag)
 
     lastDiag = nil
     pushResult()
+end
+
+---@param uri uri
+function m.resendDiagnostic(uri)
+    local full = m.cache[uri]
+    if not full then
+        return
+    end
+
+    local version = files.getVersion(uri)
+
+    proto.notify('textDocument/publishDiagnostics', {
+        uri = uri,
+        version = version,
+        diagnostics = full,
+    })
+    log.debug('publishDiagnostics', uri, #full)
 end
 
 ---@async
@@ -353,20 +381,25 @@ function m.pullDiagnostic(uri, isScopeDiag)
     return full
 end
 
+---@param uri uri
 function m.refresh(uri)
     if not ws.isReady(uri) then
         return
     end
+
+    await.close('diag:' .. uri)
+    ---@async
+    await.call(function ()
+        await.setID('diag:' .. uri)
+        await.sleep(0.1)
+        xpcall(m.doDiagnostic, log.error, uri)
+    end)
+
     local scp     = scope.getScope(uri)
     local scopeID = 'diagnosticsScope:' .. scp:getName()
-    await.close('diag:' .. uri)
     await.close(scopeID)
-    await.call(function () ---@async
-        if uri then
-            await.setID('diag:' .. uri)
-            await.sleep(0.1)
-            xpcall(m.doDiagnostic, log.error, uri)
-        end
+    ---@async
+    await.call(function ()
         local delay = config.get(uri, 'Lua.diagnostics.workspaceDelay') / 1000
         if delay < 0 then
             return
@@ -552,7 +585,7 @@ files.watch(function (ev, uri) ---@async
         m.refresh(uri)
     elseif ev == 'open' then
         if ws.isReady(uri) then
-            m.clearCache(uri)
+            m.resendDiagnostic(uri)
             xpcall(m.doDiagnostic, log.error, uri)
         end
     elseif ev == 'close' then
@@ -564,7 +597,8 @@ files.watch(function (ev, uri) ---@async
 end)
 
 config.watch(function (uri, key, value, oldValue)
-    if key:find 'Lua.diagnostics' then
+    if util.stringStartWith(key,  'Lua.diagnostics')
+    or util.stringStartWith(key,  'Lua.spell') then
         if value ~= oldValue then
             m.diagnosticsScope(uri)
             m.refreshClient()

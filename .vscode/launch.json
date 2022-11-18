@@ -8,7 +8,7 @@
 			"request": "launch",
 			"stopOnEntry": false,
 			"program": "${workspaceRoot}/test.lua",
-			"luaexe": "${workspaceFolder}/bin/lua-language-server.exe",
+			"luaexe": "${workspaceFolder}/bin/lua-language-server",
 			"cpath": null,
 			"arg": [
 			],
@@ -25,7 +25,7 @@
 			"type": "lua",
 			"request": "attach",
 			"stopOnEntry": false,
-			"address": "127.0.0.1:11413",
+			"address": "127.0.0.1:11428",
 			"outputCapture": [
 			],
 			"sourceMaps": [
@@ -42,7 +42,7 @@
 			"stopOnEntry": false,
 			"luaexe": "${workspaceFolder}/bin/lua-language-server",
 			"program": "${workspaceRoot}/tools/build-3rd-meta.lua",
-			"cpath": "${workspaceFolder}/bin/?.dll",
+			"cpath": "${workspaceFolder}/bin/?.dll;${workspaceFolder}/bin/?.so",
 			"arg": [
 			],
 			"luaVersion": "latest",
@@ -58,7 +58,7 @@
 			"request": "launch",
 			"stopOnEntry": false,
 			"program": "${workspaceRoot}/main.lua",
-			"luaexe": "${workspaceFolder}/bin/lua-language-server.exe",
+			"luaexe": "${workspaceFolder}/bin/lua-language-server",
 			"cpath": null,
 			"arg": [
 				"--check",
@@ -78,7 +78,7 @@
 			"stopOnEntry": false,
 			"luaexe": "${workspaceFolder}/bin/lua-language-server",
 			"program": "${workspaceRoot}/tools/locale.lua",
-			"cpath": "${workspaceFolder}/bin/?.dll",
+			"cpath": "${workspaceFolder}/bin/?.dll;${workspaceFolder}/bin/?.so",
 			"arg": [
 			],
 			"luaVersion": "latest",
@@ -95,7 +95,7 @@
 			"stopOnEntry": false,
 			"luaexe": "${workspaceFolder}/bin/lua-language-server",
 			"program": "${workspaceRoot}/tools/build-doc.lua",
-			"cpath": "${workspaceFolder}/bin/?.dll",
+			"cpath": "${workspaceFolder}/bin/?.dll;${workspaceFolder}/bin/?.so",
 			"arg": [
 			],
 			"luaVersion": "latest",

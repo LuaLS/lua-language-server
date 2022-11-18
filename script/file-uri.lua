@@ -24,9 +24,6 @@ local m = {}
 ---@param path string
 ---@return uri uri
 function m.encode(path)
-    if not path then
-        return nil
-    end
     local authority = ''
     if platform.OS == 'Windows' then
         path = path:gsub('\\', '/')
@@ -70,9 +67,6 @@ end
 ---@param uri uri
 ---@return string path
 function m.decode(uri)
-    if not uri then
-        return nil
-    end
     local scheme, authority, path = uri:match('([^:]*):?/?/?([^/]*)(.*)')
     if not scheme then
         return ''
@@ -95,7 +89,7 @@ function m.decode(uri)
 end
 
 function m.split(uri)
-    return uri:match('([^:]*):?/?/?([^/]*)(.*)')
+    return uri:match('([^:]*):/?/?([^/]*)(.*)')
 end
 
 return m

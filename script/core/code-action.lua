@@ -5,11 +5,18 @@ local sp        = require 'bee.subprocess'
 local guide     = require "parser.guide"
 local converter = require 'proto.converter'
 
+---@param uri  uri
+---@param row  integer
+---@param mode string
+---@param code string
 local function checkDisableByLuaDocExits(uri, row, mode, code)
     if row < 0 then
         return nil
     end
     local state = files.getState(uri)
+    if not state then
+        return nil
+    end
     local lines = state.lines
     if state.ast.docs and lines then
         return guide.eachSourceBetween(
@@ -124,9 +131,12 @@ local function changeVersion(uri, version, results)
 end
 
 local function solveUndefinedGlobal(uri, diag, results)
-    local ast    = files.getState(uri)
-    local start  = converter.unpackRange(uri, diag.range)
-    guide.eachSourceContain(ast.ast, start, function (source)
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
+    local start = converter.unpackRange(uri, diag.range)
+    guide.eachSourceContain(state.ast, start, function (source)
         if source.type ~= 'getglobal' then
             return
         end
@@ -143,9 +153,12 @@ local function solveUndefinedGlobal(uri, diag, results)
 end
 
 local function solveLowercaseGlobal(uri, diag, results)
-    local ast    = files.getState(uri)
-    local start  = converter.unpackRange(uri, diag.range)
-    guide.eachSourceContain(ast.ast, start, function (source)
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
+    local start = converter.unpackRange(uri, diag.range)
+    guide.eachSourceContain(state.ast, start, function (source)
         if source.type ~= 'setglobal' then
             return
         end
@@ -156,8 +169,11 @@ local function solveLowercaseGlobal(uri, diag, results)
 end
 
 local function findSyntax(uri, diag)
-    local ast = files.getState(uri)
-    for _, err in ipairs(ast.errs) do
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
+    for _, err in ipairs(state.errs) do
         if err.type:lower():gsub('_', '-') == diag.code then
             local range = converter.packRange(uri, err.start, err.finish)
             if util.equal(range, diag.range) then
@@ -435,7 +451,7 @@ end
 local function checkSwapParams(results, uri, start, finish)
     local state = files.getState(uri)
     local text  = files.getText(uri)
-    if not state then
+    if not state or not text then
         return
     end
     local args = {}
@@ -603,6 +619,9 @@ end
 local function checkJsonToLua(results, uri, start, finish)
     local text         = files.getText(uri)
     local state        = files.getState(uri)
+    if not state or not text then
+        return
+    end
     local startOffset  = guide.positionToOffset(state, start)
     local finishOffset = guide.positionToOffset(state, finish)
     local jsonStart    = text:match('()[%{%[]', startOffset + 1)

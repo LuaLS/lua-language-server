@@ -8,9 +8,9 @@ local vm       = require 'vm.vm'
 ---@field views table<string, boolean>
 ---@field cachedView? string
 ---@field node? vm.node
+---@field _drop table
 local mt = {}
 mt.__index = mt
-mt._hasNumber      = false
 mt._hasTable       = false
 mt._hasClass       = false
 mt._hasFunctionDef = false
@@ -19,6 +19,8 @@ mt._isParam        = false
 mt._isLocal        = false
 
 vm.NULL = setmetatable({}, mt)
+
+local LOCK = {}
 
 local inferSorted = {
     ['boolean']  = - 100,
@@ -42,7 +44,6 @@ local viewNodeSwitch = util.switch()
     end)
     : case 'number'
     : call(function (source, infer)
-        infer._hasNumber = true
         return source.type
     end)
     : case 'table'
@@ -77,9 +78,6 @@ local viewNodeSwitch = util.switch()
         if source.cate == 'type' then
             if not guide.isBasicType(source.name) then
                 infer._hasClass = true
-            end
-            if source.name == 'number' then
-                infer._hasNumber = true
             end
             return source.name
         end
@@ -120,11 +118,45 @@ local viewNodeSwitch = util.switch()
         for i, sign in ipairs(source.signs) do
             buf[i] = vm.getInfer(sign):view(uri)
         end
+        if infer._drop then
+            local node = vm.compileNode(source)
+            for c in node:eachObject() do
+                if guide.isLiteral(c) then
+                    infer._drop[c] = true
+                end
+            end
+        end
         return ('%s<%s>'):format(source.node[1], table.concat(buf, ', '))
     end)
     : case 'doc.type.table'
-    : call(function (source, infer)
-        infer._hasTable = true
+    : call(function (source, infer, uri)
+        if #source.fields == 0 then
+            infer._hasTable = true
+            return
+        end
+        if infer._drop and infer._drop[source] then
+            infer._hasTable = true
+            return
+        end
+        infer._hasClass = true
+        local buf = {}
+        buf[#buf+1] = '{ '
+        for i, field in ipairs(source.fields) do
+            if i > 1 then
+                buf[#buf+1] = ', '
+            end
+            local key = field.name
+            if key.type == 'doc.type' then
+                buf[#buf+1] = ('[%s]: '):format(vm.getInfer(key):view(uri))
+            elseif type(key[1]) == 'string' then
+                buf[#buf+1] = key[1] .. ': '
+            else
+                buf[#buf+1] = ('[%q]: '):format(key[1])
+            end
+            buf[#buf+1] = vm.getInfer(field.extends):view(uri)
+        end
+        buf[#buf+1] = ' }'
+        return table.concat(buf)
     end)
     : case 'doc.type.string'
     : call(function (source, infer)
@@ -134,6 +166,10 @@ local viewNodeSwitch = util.switch()
     : case 'doc.type.boolean'
     : call(function (source, infer)
         return ('%q'):format(source[1])
+    end)
+    : case 'doc.type.code'
+    : call(function (source, infer)
+        return ('`%s`'):format(source[1])
     end)
     : case 'doc.type.function'
     : call(function (source, infer, uri)
@@ -149,31 +185,53 @@ local viewNodeSwitch = util.switch()
                 argNode = argNode:copy()
                 argNode:removeOptional()
             end
-            args[i] = string.format('%s%s: %s'
+            args[i] = string.format('%s%s%s%s'
                 , arg.name[1]
                 , isOptional and '?' or ''
+                , arg.name[1] == '...' and '' or ': '
                 , vm.getInfer(argNode):view(uri)
             )
         end
         if #args > 0 then
             argView = table.concat(args, ', ')
         end
+        local needReturnParen
         for i, ret in ipairs(source.returns) do
-            rets[i] = vm.getInfer(ret):view(uri)
+            local retType = vm.getInfer(ret):view(uri)
+            if ret.name then
+                if ret.name[1] == '...' then
+                    rets[i] = ('%s%s'):format(ret.name[1], retType)
+                else
+                    needReturnParen = true
+                    rets[i] = ('%s: %s'):format(ret.name[1], retType)
+                end
+            else
+                rets[i] = retType
+            end
         end
         if #rets > 0 then
-            regView = ':' .. table.concat(rets, ', ')
+            if needReturnParen then
+                regView = (':(%s)'):format(table.concat(rets, ', '))
+            else
+                regView = (':%s'):format(table.concat(rets, ', '))
+            end
         end
         return ('fun(%s)%s'):format(argView, regView)
     end)
 
----@param source parser.object | vm.node
+---@class vm.node
+---@field lastInfer? vm.infer
+
+---@param source vm.object | vm.node
 ---@return vm.infer
 function vm.getInfer(source)
+    ---@type vm.node
     local node
     if source.type == 'vm.node' then
+        ---@cast source vm.node
         node = source
     else
+        ---@cast source vm.object
         node = vm.compileNode(source)
     end
     if node.lastInfer then
@@ -181,6 +239,7 @@ function vm.getInfer(source)
     end
     local infer = setmetatable({
         node  = node,
+        _drop = {},
     }, mt)
     node.lastInfer = infer
 
@@ -188,9 +247,6 @@ function vm.getInfer(source)
 end
 
 function mt:_trim()
-    if self._hasNumber then
-        self.views['integer'] = nil
-    end
     if self._hasDocFunction then
         if self._hasFunctionDef then
             for view in pairs(self.views) do
@@ -205,6 +261,13 @@ function mt:_trim()
     if self._hasTable and not self._hasClass then
         self.views['table'] = true
     end
+    if self.views['number'] then
+        self.views['integer'] = nil
+    end
+    if self.views['boolean'] then
+        self.views['true'] = nil
+        self.views['false'] = nil
+    end
 end
 
 ---@param uri uri
@@ -214,6 +277,10 @@ function mt:_eraseAlias(uri)
     local expandAlias = config.get(uri, 'Lua.hover.expandAlias')
     for n in self.node:eachObject() do
         if n.type == 'global' and n.cate == 'type' then
+            if LOCK[n.name] then
+                goto CONTINUE
+            end
+            LOCK[n.name] = true
             for _, set in ipairs(n:getSets(uri)) do
                 if set.type == 'doc.alias' then
                     if expandAlias then
@@ -234,7 +301,19 @@ function mt:_eraseAlias(uri)
                         end
                     end
                 end
+                if set.type == 'doc.class' then
+                    if set.extends then
+                        for _, ext in ipairs(set.extends) do
+                            if ext.type == 'doc.extends.name' then
+                                local view = ext[1]
+                                drop[view] = true
+                            end
+                        end
+                    end
+                end
             end
+            LOCK[n.name] = nil
+            ::CONTINUE::
         end
     end
     return drop
@@ -246,6 +325,19 @@ end
 function mt:hasType(uri, tp)
     self:_computeViews(uri)
     return self.views[tp] == true
+end
+
+---@param uri uri
+function mt:hasUnknown(uri)
+    self:_computeViews(uri)
+    return not next(self.views)
+        or self.views['unknown'] == true
+end
+
+---@param uri uri
+function mt:hasAny(uri)
+    self:_computeViews(uri)
+    return self.views['any'] == true
 end
 
 ---@param uri uri
@@ -376,7 +468,7 @@ function mt:viewLiterals()
         or n.type == 'integer'
         or n.type == 'boolean' then
             local literal = util.viewLiteral(n[1])
-            if not mark[literal] then
+            if literal and not mark[literal] then
                 literals[#literals+1] = literal
                 mark[literal] = true
             end
@@ -385,7 +477,14 @@ function mt:viewLiterals()
     if #literals == 0 then
         return nil
     end
-    table.sort(literals)
+    table.sort(literals, function (a, b)
+        local sa = inferSorted[a] or 0
+        local sb = inferSorted[b] or 0
+        if sa == sb then
+            return a < b
+        end
+        return sa < sb
+    end)
     return table.concat(literals, '|')
 end
 
@@ -412,8 +511,9 @@ function mt:viewClass()
     return table.concat(class, '|')
 end
 
----@param source parser.object
+---@param source vm.node.object
+---@param uri uri
 ---@return string?
-function vm.viewObject(source)
-    return viewNodeSwitch(source.type, source, {})
+function vm.viewObject(source, uri)
+    return viewNodeSwitch(source.type, source, {}, uri)
 end

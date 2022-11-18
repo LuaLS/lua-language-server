@@ -6,7 +6,7 @@ local spell     = require 'provider.spell'
 
 ---@async
 return function(uri, callback)
-    local text = files.getText(uri)
+    local text = files.getOriginText(uri)
     if not text then
         return
     end

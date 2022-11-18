@@ -4,6 +4,8 @@ local client = require 'client'
 local lang   = require 'language'
 local await  = require 'await'
 local scope  = require 'workspace.scope'
+local ws     = require 'workspace'
+local fs = require 'bee.filesystem'
 
 ---@class plugin
 local m = {}
@@ -69,20 +71,35 @@ local function checkTrustLoad(scp)
     return true
 end
 
----@param scp scope
-function m.init(scp)
+---@param uri uri
+local function initPlugin(uri)
     await.call(function () ---@async
-        local ws    = require 'workspace'
+        local scp = scope.getScope(uri)
         local interface = {}
         scp:set('pluginInterface', interface)
+
+        if not scp.uri then
+            return
+        end
 
         local pluginPath = ws.getAbsolutePath(scp.uri, config.get(scp.uri, 'Lua.runtime.plugin'))
         log.info('plugin path:', pluginPath)
         if not pluginPath then
             return
         end
+
+        --Adding the plugins path to package.path allows for requires in files
+        --to find files relative to itself.
+        local oldPath = package.path
+        local path = fs.path(pluginPath):parent_path() / '?.lua'
+        if not package.path:find(path:string(), 1, true) then
+            package.path = package.path .. ';' .. path:string()
+        end
+
         local pluginLua = util.loadFile(pluginPath)
         if not pluginLua then
+            log.warn('plugin not found:', pluginPath)
+            package.path = oldPath
             return
         end
 
@@ -98,7 +115,7 @@ function m.init(scp)
         if not client.isVSCode() and not checkTrustLoad(scp) then
             return
         end
-        local suc, err = xpcall(f, log.error, f)
+        local suc, err = xpcall(f, log.error, f, config.get(scp.uri, 'Lua.runtime.pluginArgs'))
         if not suc then
             m.showError(scp, err)
             return
@@ -107,5 +124,11 @@ function m.init(scp)
         ws.resetFiles(scp)
     end)
 end
+
+ws.watch(function (ev, uri)
+    if ev == 'startReload' then
+        initPlugin(uri)
+    end
+end)
 
 return m

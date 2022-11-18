@@ -57,7 +57,7 @@ function m.updateConfig(uri)
         local currentPath        = furi.decode(currentUri)
         local editorConfigFSPath = fs.path(currentPath) / '.editorconfig'
         if fs.exists(editorConfigFSPath) then
-            loadedUris[uri] = editorConfigFSPath
+            loadedUris[currentUri] = editorConfigFSPath
             local status, err = codeFormat.update_config(updateType.Created, currentUri, editorConfigFSPath:string())
             if not status and err then
                 log.error(err)

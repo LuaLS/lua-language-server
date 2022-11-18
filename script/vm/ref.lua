@@ -91,21 +91,21 @@ local function searchField(source, pushResult, defMap, fileNotify)
             return
         end
         ---@async
-        guide.eachSourceType(state.ast, 'getfield', function (src)
+        guide.eachSourceTypes(state.ast, {'getfield', 'setfield'}, function (src)
             if src.field and src.field[1] == key then
                 checkDef(src)
                 await.delay()
             end
         end)
         ---@async
-        guide.eachSourceType(state.ast, 'getmethod', function (src)
+        guide.eachSourceTypes(state.ast, {'getmethod', 'setmethod'}, function (src)
             if src.method and src.method[1] == key then
                 checkDef(src)
                 await.delay()
             end
         end)
         ---@async
-        guide.eachSourceType(state.ast, 'getindex', function (src)
+        guide.eachSourceTypes(state.ast, {'getindex', 'setindex'}, function (src)
             if src.index and src.index.type == 'string' and src.index[1] == key then
                 checkDef(src)
                 await.delay()
@@ -223,7 +223,7 @@ end
 ---@async
 ---@param source  parser.object
 ---@param pushResult fun(src: parser.object)
----@param fileNotify fun(uri: uri): boolean
+---@param fileNotify? fun(uri: uri): boolean
 function searchByParentNode(source, pushResult, defMap, fileNotify)
     nodeSwitch(source.type, source, pushResult, defMap, fileNotify)
 end

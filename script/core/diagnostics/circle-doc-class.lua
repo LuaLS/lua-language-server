@@ -2,7 +2,9 @@ local files    = require 'files'
 local lang     = require 'language'
 local vm       = require 'vm'
 local guide    = require 'parser.guide'
+local await    = require 'await'
 
+---@async
 return function (uri, callback)
     local state = files.getState(uri)
     if not state then
@@ -18,6 +20,7 @@ return function (uri, callback)
             if not doc.extends then
                 goto CONTINUE
             end
+            await.delay()
             local myName = guide.getKeyName(doc)
             local list = { doc }
             local mark = {}

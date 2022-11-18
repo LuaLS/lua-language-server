@@ -2,257 +2,22 @@
 local vm        = require 'vm.vm'
 local guide     = require 'parser.guide'
 
+---@alias vm.runner.callback fun(src: parser.object, node?: vm.node)
+
 ---@class vm.runner
----@field loc       parser.object
----@field mainBlock parser.object
----@field blocks    table<parser.object, true>
----@field steps     vm.runner.step[]
+---@field _loc      parser.object
+---@field _casts    parser.object[]
+---@field _callback vm.runner.callback
+---@field _mark     table
+---@field _has      table<parser.object, true>
+---@field _main     parser.object
 local mt = {}
 mt.__index = mt
-mt.index = 1
-
----@class parser.object
----@field _casts parser.object[]
-
----@class vm.runner.step
----@field type    'truthy' | 'falsy' | 'as' | 'add' | 'remove' | 'object' | 'save' | 'push' | 'merge' | 'cast'
----@field pos     integer
----@field order?  integer
----@field node?   vm.node
----@field object? parser.object
----@field name?   string
----@field cast?   parser.object
----@field tag?    string
----@field copy?   boolean
----@field new?    boolean
----@field ref1?   vm.runner.step
----@field ref2?   vm.runner.step
-
----@param filter    parser.object
----@param outStep   vm.runner.step
----@param blockStep vm.runner.step
-function mt:_compileNarrowByFilter(filter, outStep, blockStep)
-    if not filter then
-        return
-    end
-    if filter.type == 'paren' then
-        if filter.exp then
-            self:_compileNarrowByFilter(filter.exp, outStep, blockStep)
-        end
-        return
-    end
-    if filter.type == 'unary' then
-        if not filter.op
-        or not filter[1] then
-            return
-        end
-        if filter.op.type == 'not' then
-            local exp = filter[1]
-            if exp.type == 'getlocal' and exp.node == self.loc then
-                self.steps[#self.steps+1] = {
-                    type  = 'falsy',
-                    pos   = filter.finish,
-                    new   = true,
-                }
-                self.steps[#self.steps+1] = {
-                    type  = 'truthy',
-                    pos   = filter.finish,
-                    ref1  = outStep,
-                }
-            end
-        end
-    elseif filter.type == 'binary' then
-        if not filter.op
-        or not filter[1]
-        or not filter[2] then
-            return
-        end
-        if filter.op.type == 'and' then
-            local dummyStep = {
-                type  = 'save',
-                copy  = true,
-                ref1  = outStep,
-                pos   = filter.start - 1,
-            }
-            self.steps[#self.steps+1] = dummyStep
-            self:_compileNarrowByFilter(filter[1], dummyStep, blockStep)
-            self:_compileNarrowByFilter(filter[2], dummyStep, blockStep)
-        end
-        if filter.op.type == 'or' then
-            self:_compileNarrowByFilter(filter[1], outStep, blockStep)
-            local dummyStep = {
-                type  = 'push',
-                copy  = true,
-                ref1  = outStep,
-                pos   = filter.op.finish,
-            }
-            self.steps[#self.steps+1] = dummyStep
-            self:_compileNarrowByFilter(filter[2], outStep, dummyStep)
-            self.steps[#self.steps+1] = {
-                type  = 'push',
-                tag   = 'or reset',
-                ref1  = blockStep,
-                pos   = filter.finish,
-            }
-        end
-        if filter.op.type == '=='
-        or filter.op.type == '~=' then
-            local loc, exp
-            for i = 1, 2 do
-                loc = filter[i]
-                if loc.type == 'getlocal' and loc.node == self.loc then
-                    exp = filter[i % 2 + 1]
-                    break
-                end
-            end
-            if not loc or not exp then
-                return
-            end
-            if guide.isLiteral(exp) then
-                if filter.op.type == '==' then
-                    self.steps[#self.steps+1] = {
-                        type  = 'remove',
-                        name  = exp.type,
-                        pos   = filter.finish,
-                        ref1  = outStep,
-                    }
-                    self.steps[#self.steps+1] = {
-                        type  = 'as',
-                        name  = exp.type,
-                        pos   = filter.finish,
-                        new   = true,
-                    }
-                end
-                if filter.op.type == '~=' then
-                    self.steps[#self.steps+1] = {
-                        type  = 'as',
-                        name  = exp.type,
-                        pos   = filter.finish,
-                        ref1  = outStep,
-                    }
-                    self.steps[#self.steps+1] = {
-                        type  = 'remove',
-                        name  = exp.type,
-                        pos   = filter.finish,
-                        new   = true,
-                    }
-                end
-            end
-        end
-    else
-        if filter.type == 'getlocal' and filter.node == self.loc then
-            self.steps[#self.steps+1] = {
-                type  = 'truthy',
-                pos   = filter.finish,
-                new   = true,
-            }
-            self.steps[#self.steps+1] = {
-                type  = 'falsy',
-                pos   = filter.finish,
-                ref1  = outStep,
-            }
-        end
-    end
-end
-
----@param block parser.object
-function mt:_compileBlock(block)
-    if self.blocks[block] then
-        return
-    end
-    self.blocks[block] = true
-    if block == self.mainBlock then
-        return
-    end
-
-    local parentBlock = guide.getParentBlock(block)
-    self:_compileBlock(parentBlock)
-
-    if block.type == 'if' then
-        ---@type vm.runner.step[]
-        local finals = {}
-        for i, childBlock in ipairs(block) do
-            local blockStep = {
-                type  = 'save',
-                tag   = 'block',
-                copy  = true,
-                pos   = childBlock.start,
-            }
-            local outStep = {
-                type  = 'save',
-                tag   = 'out',
-                copy  = true,
-                pos   = childBlock.start,
-            }
-            self.steps[#self.steps+1] = blockStep
-            self.steps[#self.steps+1] = outStep
-            self.steps[#self.steps+1] = {
-                type  = 'push',
-                ref1  = blockStep,
-                pos   = childBlock.start,
-            }
-            self:_compileNarrowByFilter(childBlock.filter, outStep, blockStep)
-            if  not childBlock.hasReturn
-            and not childBlock.hasGoTo
-            and not childBlock.hasBreak then
-                local finalStep = {
-                    type = 'save',
-                    pos  = childBlock.finish,
-                    tag  = 'final #' .. i,
-                }
-                finals[#finals+1] = finalStep
-                self.steps[#self.steps+1] = finalStep
-            end
-            self.steps[#self.steps+1] = {
-                type   = 'push',
-                tag    = 'reset child',
-                ref1   = outStep,
-                pos    = childBlock.finish,
-            }
-        end
-        self.steps[#self.steps+1] = {
-            type = 'push',
-            tag  = 'reset if',
-            pos  = block.finish,
-            copy = true,
-        }
-        for _, final in ipairs(finals) do
-            self.steps[#self.steps+1] = {
-                type = 'merge',
-                ref2 = final,
-                pos  = block.finish,
-            }
-        end
-    end
-
-    if block.type == 'function'
-    or block.type == 'while'
-    or block.type == 'loop'
-    or block.type == 'in'
-    or block.type == 'repeat'
-    or block.type == 'for' then
-        local savePoint = {
-            type = 'save',
-            copy = true,
-            pos  = block.start,
-        }
-        self.steps[#self.steps+1] = {
-            type  = 'push',
-            copy  = true,
-            pos   = block.start,
-        }
-        self.steps[#self.steps+1] = savePoint
-        self.steps[#self.steps+1] = {
-            type = 'push',
-            pos  = block.finish,
-            ref1 = savePoint,
-        }
-    end
-end
+mt._index = 1
 
 ---@return parser.object[]
 function mt:_getCasts()
-    local root = guide.getRoot(self.loc)
+    local root = guide.getRoot(self._loc)
     if not root._casts then
         root._casts = {}
         local docs = root.docs
@@ -265,180 +30,332 @@ function mt:_getCasts()
     return root._casts
 end
 
-function mt:_preCompile()
-    local startPos  = self.loc.start
+---@param obj parser.object
+function mt:_markHas(obj)
+    while true do
+        if self._has[obj] then
+            return
+        end
+        self._has[obj] = true
+        if obj == self._main then
+            return
+        end
+        obj = obj.parent
+    end
+end
+
+function mt:_collect()
+    local startPos  = self._loc.start
     local finishPos = 0
 
-    for _, ref in ipairs(self.loc.ref) do
-        self.steps[#self.steps+1] = {
-            type   = 'object',
-            object = ref,
-            pos    = ref.range or ref.start,
-        }
-        if ref.start > finishPos then
-            finishPos = ref.start
-        end
-        local block = guide.getParentBlock(ref)
-        self:_compileBlock(block)
-    end
-
-    for i, step in ipairs(self.steps) do
-        if step.type ~= 'object' then
-            step.order = i
+    for _, ref in ipairs(self._loc.ref) do
+        if ref.type == 'getlocal'
+        or ref.type == 'setlocal' then
+            self:_markHas(ref)
+            if ref.finish > finishPos then
+                finishPos = ref.finish
+            end
         end
     end
 
     local casts = self:_getCasts()
     for _, cast in ipairs(casts) do
-        if  cast.loc[1] == self.loc[1]
+        if  cast.loc[1] == self._loc[1]
         and cast.start > startPos
         and cast.finish < finishPos
-        and guide.getLocal(self.loc, self.loc[1], cast.start) == self.loc then
-            self.steps[#self.steps+1] = {
-                type  = 'cast',
-                cast  = cast,
-                pos   = cast.start,
-            }
+        and guide.getLocal(self._loc, self._loc[1], cast.start) == self._loc then
+            self._casts[#self._casts+1] = cast
         end
     end
-
-    table.sort(self.steps, function (a, b)
-        if a.pos == b.pos then
-            return (a.order or 0) < (b.order or 0)
-        else
-            return a.pos < b.pos
-        end
-    end)
 end
 
----@param loc  parser.object
----@param node vm.node
+---@param pos integer
+---@param topNode vm.node
 ---@return vm.node
-local function checkAssert(loc, node)
-    local parent = loc.parent
-    if parent.type == 'binary' then
-        if parent.op and (parent.op.type == '~=' or parent.op.type == '==') then
-            local exp
-            for i = 1, 2 do
-                if parent[i] == loc then
-                    exp = parent[i % 2 + 1]
+function mt:_fastWardCasts(pos, topNode)
+    for i = self._index, #self._casts do
+        local action = self._casts[i]
+        if action.start > pos then
+            self._index = i
+            return topNode
+        end
+        topNode = topNode:copy()
+        for _, cast in ipairs(action.casts) do
+            if     cast.mode == '+' then
+                if cast.optional then
+                    topNode:addOptional()
                 end
-            end
-            if exp and guide.isLiteral(exp) then
-                local callargs = parent.parent
-                if  callargs.type == 'callargs'
-                and callargs.parent.node.special == 'assert'
-                and callargs[1] == parent then
-                    if parent.op.type == '~=' then
-                        node:remove(exp.type)
-                    end
-                    if parent.op.type == '==' then
-                        node = vm.compileNode(exp)
-                    end
+                if cast.extends then
+                    topNode:merge(vm.compileNode(cast.extends))
+                end
+            elseif cast.mode == '-' then
+                if cast.optional then
+                    topNode:removeOptional()
+                end
+                if cast.extends then
+                    topNode:removeNode(vm.compileNode(cast.extends))
+                end
+            else
+                if cast.extends then
+                    topNode:clear()
+                    topNode:merge(vm.compileNode(cast.extends))
                 end
             end
         end
     end
-    if  parent.type == 'callargs'
-    and parent.parent.node.special == 'assert'
-    and parent[1] == loc then
-        node:setTruthy()
-    end
-    return node
+    self._index = self._index + 1
+    return topNode
 end
 
----@param callback    fun(src: parser.object, node: vm.node)
-function mt:launch(callback)
-    local topNode = vm.getNode(self.loc):copy()
-    for _, step in ipairs(self.steps) do
-        local node = step.ref1 and step.ref1.node or topNode
-        if     step.type == 'truthy' then
-            if step.new then
-                node = node:copy()
-                topNode = node
+---@param action   parser.object
+---@param topNode  vm.node
+---@param outNode? vm.node
+---@return vm.node topNode
+---@return vm.node outNode
+function mt:_lookIntoChild(action, topNode, outNode)
+    if not self._has[action]
+    or self._mark[action] then
+        return topNode, topNode or outNode
+    end
+    self._mark[action] = true
+    topNode = self:_fastWardCasts(action.start, topNode)
+    if     action.type == 'getlocal' then
+        if action.node == self._loc then
+            self._callback(action, topNode)
+            if outNode then
+                topNode = topNode:copy():setTruthy()
+                outNode = outNode:copy():setFalsy()
             end
-            node:setTruthy()
-        elseif step.type == 'falsy' then
-            if step.new then
-                node = node:copy()
-                topNode = node
+        end
+    elseif action.type == 'function' then
+        self:_lookIntoBlock(action, topNode:copy())
+    elseif action.type == 'unary' then
+        if not action[1] then
+            goto RETURN
+        end
+        if action.op.type == 'not' then
+            outNode = outNode or topNode:copy()
+            outNode, topNode = self:_lookIntoChild(action[1], topNode, outNode)
+            outNode = outNode:copy()
+        end
+    elseif action.type == 'binary' then
+        if not action[1] or not action[2] then
+            goto RETURN
+        end
+        if     action.op.type == 'and' then
+            topNode = self:_lookIntoChild(action[1], topNode, topNode:copy())
+            topNode = self:_lookIntoChild(action[2], topNode, topNode:copy())
+        elseif action.op.type == 'or' then
+            outNode = outNode or topNode:copy()
+            local topNode1, outNode1 = self:_lookIntoChild(action[1], topNode, outNode)
+            local topNode2, outNode2 = self:_lookIntoChild(action[2], outNode1, outNode1:copy())
+            topNode = vm.createNode(topNode1, topNode2)
+            outNode = outNode2:copy()
+        elseif action.op.type == '=='
+        or     action.op.type == '~=' then
+            local handler, checker
+            for i = 1, 2 do
+                if guide.isLiteral(action[i]) then
+                    checker = action[i]
+                    handler = action[3-i] -- Copilot tells me use `3-i` instead of `i%2+1`
+                end
             end
-            node:setFalsy()
-        elseif step.type == 'as' then
-            if step.new then
-                topNode = vm.createNode(vm.getGlobal('type', step.name))
-            else
-                node:clear()
-                node:merge(vm.getGlobal('type', step.name))
+            if not handler then
+                goto RETURN
             end
-        elseif step.type == 'add' then
-            if step.new then
-                node = node:copy()
-                topNode = node
-            end
-            node:merge(vm.getGlobal('type', step.name))
-        elseif step.type == 'remove' then
-            if step.new then
-                node = node:copy()
-                topNode = node
-            end
-            node:remove(step.name)
-        elseif step.type == 'object' then
-            topNode = callback(step.object, node) or node
-            if step.object.type == 'getlocal' then
-                topNode = checkAssert(step.object, node)
-            end
-        elseif step.type == 'save' then
-            if step.copy then
-                node = node:copy()
-            end
-            step.node = node
-        elseif step.type == 'push' then
-            if step.copy then
-                node = node:copy()
-            end
-            topNode = node
-        elseif step.type == 'merge' then
-            node:merge(step.ref2.node)
-        elseif step.type == 'cast' then
-            topNode = node:copy()
-            for _, cast in ipairs(step.cast.casts) do
-                if     cast.mode == '+' then
-                    if cast.optional then
-                        topNode:addOptional()
-                    end
-                    if cast.extends then
-                        topNode:merge(vm.compileNode(cast.extends))
-                    end
-                elseif cast.mode == '-' then
-                    if cast.optional then
-                        topNode:removeOptional()
-                    end
-                    if cast.extends then
-                        topNode:removeNode(vm.compileNode(cast.extends))
+            if  handler.type == 'getlocal'
+            and handler.node == self._loc then
+                -- if x == y then
+                topNode = self:_lookIntoChild(handler, topNode, outNode)
+                local checkerNode = vm.compileNode(checker)
+                if action.op.type == '==' then
+                    topNode = checkerNode
+                    if outNode then
+                        outNode:removeNode(topNode)
                     end
                 else
-                    if cast.extends then
-                        topNode:clear()
-                        topNode:merge(vm.compileNode(cast.extends))
+                    topNode:removeNode(checkerNode)
+                    if outNode then
+                        outNode = checkerNode
+                    end
+                end
+            elseif handler.type == 'call'
+            and    checker.type == 'string'
+            and    handler.node.special == 'type'
+            and    handler.args
+            and    handler.args[1]
+            and    handler.args[1].type == 'getlocal'
+            and    handler.args[1].node == self._loc then
+                -- if type(x) == 'string' then
+                self:_lookIntoChild(handler, topNode:copy())
+                if action.op.type == '==' then
+                    topNode:narrow(checker[1])
+                    if outNode then
+                        outNode:remove(checker[1])
+                    end
+                else
+                    topNode:remove(checker[1])
+                    if outNode then
+                        outNode:narrow(checker[1])
+                    end
+                end
+            elseif handler.type == 'getlocal'
+            and    checker.type == 'string' then
+                local nodeValue = vm.getObjectValue(handler.node)
+                if  nodeValue
+                and nodeValue.type == 'select'
+                and nodeValue.sindex == 1 then
+                    local call = nodeValue.vararg
+                    if  call
+                    and call.type == 'call'
+                    and call.node.special == 'type'
+                    and call.args
+                    and call.args[1]
+                    and call.args[1].type == 'getlocal'
+                    and call.args[1].node == self._loc then
+                        -- `local tp = type(x);if tp == 'string' then`
+                        if action.op.type == '==' then
+                            topNode:narrow(checker[1])
+                            if outNode then
+                                outNode:remove(checker[1])
+                            end
+                        else
+                            topNode:remove(checker[1])
+                            if outNode then
+                                outNode:narrow(checker[1])
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    elseif action.type == 'loop'
+    or     action.type == 'in'
+    or     action.type == 'repeat'
+    or     action.type == 'for' then
+        topNode = self:_lookIntoBlock(action, topNode:copy())
+    elseif action.type == 'while' then
+        local blockNode, mainNode
+        if action.filter then
+            blockNode, mainNode = self:_lookIntoChild(action.filter, topNode:copy(), topNode:copy())
+        else
+            blockNode = topNode:copy()
+            mainNode  = topNode:copy()
+        end
+        blockNode = self:_lookIntoBlock(action, blockNode:copy())
+        topNode = mainNode:merge(blockNode)
+        if action.filter then
+            -- look into filter again
+            guide.eachSource(action.filter, function (src)
+                self._mark[src] = nil
+            end)
+            blockNode, topNode = self:_lookIntoChild(action.filter, topNode:copy(), topNode:copy())
+        end
+    elseif action.type == 'if' then
+        local hasElse
+        local mainNode = topNode:copy()
+        local blockNodes = {}
+        for _, subBlock in ipairs(action) do
+            local blockNode = mainNode:copy()
+            if subBlock.filter then
+                blockNode, mainNode = self:_lookIntoChild(subBlock.filter, blockNode, mainNode)
+            else
+                hasElse = true
+                mainNode:clear()
+            end
+            blockNode = self:_lookIntoBlock(subBlock, blockNode:copy())
+            local neverReturn = subBlock.hasReturn
+                            or  subBlock.hasGoTo
+                            or  subBlock.hasBreak
+                            or  subBlock.hasError
+            if not neverReturn then
+                blockNodes[#blockNodes+1] = blockNode
+            end
+        end
+        if not hasElse and not topNode:hasKnownType() then
+            mainNode:merge(vm.declareGlobal('type', 'unknown'))
+        end
+        for _, blockNode in ipairs(blockNodes) do
+            mainNode:merge(blockNode)
+        end
+        topNode = mainNode
+    elseif action.type == 'call' then
+        if action.node.special == 'assert' and action.args and action.args[1] then
+            topNode = self:_lookIntoChild(action.args[1], topNode, topNode:copy())
+        end
+    elseif action.type == 'paren' then
+        topNode, outNode = self:_lookIntoChild(action.exp, topNode, outNode)
+    elseif action.type == 'setlocal' then
+        if action.node == self._loc then
+            if action.value then
+                self:_lookIntoChild(action.value, topNode)
+            end
+            topNode = self._callback(action, topNode)
+        end
+    elseif action.type == 'local' then
+        if  action.value
+        and action.ref
+        and action.value.type == 'select' then
+            local index = action.value.sindex
+            local call  = action.value.vararg
+            if  index == 1
+            and call.type == 'call'
+            and call.node
+            and call.node.special == 'type'
+            and call.args then
+                local getLoc = call.args[1]
+                if  getLoc
+                and getLoc.type == 'getlocal'
+                and getLoc.node == self._loc then
+                    for _, ref in ipairs(action.ref) do
+                        self:_markHas(ref)
                     end
                 end
             end
         end
     end
+    ::RETURN::
+    guide.eachChild(action, function (src)
+        if self._has[src] then
+            self:_lookIntoChild(src, topNode)
+        end
+    end)
+    return topNode, outNode or topNode
+end
+
+---@param block   parser.object
+---@param topNode  vm.node
+---@return vm.node topNode
+function mt:_lookIntoBlock(block, topNode)
+    if not self._has[block] then
+        return topNode
+    end
+    for _, action in ipairs(block) do
+        if self._has[action] then
+            topNode = self:_lookIntoChild(action, topNode)
+        end
+    end
+    topNode = self:_fastWardCasts(block.finish, topNode)
+    return topNode
 end
 
 ---@param loc parser.object
----@return vm.runner
-function vm.createRunner(loc)
+---@param callback vm.runner.callback
+function vm.launchRunner(loc, callback)
+    local main = guide.getParentBlock(loc)
+    if not main then
+        return
+    end
     local self = setmetatable({
-        loc       = loc,
-        mainBlock = guide.getParentBlock(loc),
-        blocks    = {},
-        steps     = {},
+        _loc      = loc,
+        _casts    = {},
+        _mark     = {},
+        _has      = {},
+        _main     = main,
+        _callback = callback,
     }, mt)
 
-    self:_preCompile()
+    self:_collect()
 
-    return self
+    self:_lookIntoBlock(main, vm.getNode(loc):copy())
 end

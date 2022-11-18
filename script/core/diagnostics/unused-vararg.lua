@@ -15,6 +15,9 @@ return function (uri, callback)
     end
 
     guide.eachSourceType(ast.ast, 'function', function (source)
+        if #source == 0 then
+            return
+        end
         local args = source.args
         if not args then
             return

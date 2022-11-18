@@ -14,16 +14,30 @@ local progress = require "progress"
 local encoder  = require 'encoder'
 local scope    = require 'workspace.scope'
 
+---@class file
+---@field uri          uri
+---@field content      string
+---@field _ref?        integer
+---@field trusted?     boolean
+---@field rows?        integer[]
+---@field originText?  string
+---@field text         string
+---@field version?     integer
+---@field originLines? integer[]
+---@field state?       parser.state
+---@field _diffInfo?   table[]
+---@field cache        table
+
 ---@class files
 local m = {}
 
 m.watchList      = {}
 m.notifyCache    = {}
 m.assocVersion   = -1
-m.assocMatcher   = nil
 
 function m.reset()
     m.openMap        = {}
+    ---@type table<string, file>
     m.fileMap        = {}
     m.dllMap         = {}
     m.visible        = {}
@@ -42,11 +56,11 @@ local uriMap = {}
 function m.getRealUri(uri)
     local filename = furi.decode(uri)
     local path = fs.path(filename)
-    local suc, res = pcall(fs.exists, path)
-    if not suc or not res then
+    local suc, exists = pcall(fs.exists, path)
+    if not suc or not exists then
         return uri
     end
-    suc, res = pcall(fs.canonical, path)
+    local suc, res = pcall(fs.canonical, path)
     if not suc then
         return uri
     end
@@ -123,6 +137,7 @@ function m.isLibrary(uri, excludeFolder)
 end
 
 --- 获取库文件的根目录
+---@return uri?
 function m.getLibraryUri(suri, uri)
     local scp = scope.getScope(suri)
     return scp:getLinkedUri(uri)
@@ -134,6 +149,9 @@ function m.exists(uri)
     return m.fileMap[uri] ~= nil
 end
 
+---@param file file
+---@param text string
+---@return string
 local function pluginOnSetText(file, text)
     local plugin   = require 'plugin'
     file._diffInfo = nil
@@ -164,7 +182,7 @@ end
 
 --- 设置文件文本
 ---@param uri uri
----@param text string
+---@param text? string
 ---@param isTrust? boolean
 ---@param callback? function
 function m.setText(uri, text, isTrust, callback)
@@ -320,7 +338,7 @@ end
 
 --- 获取文件文本
 ---@param uri uri
----@return string text
+---@return string? text
 function m.getText(uri)
     local file = m.fileMap[uri]
     if not file then
@@ -331,7 +349,7 @@ end
 
 --- 获取文件原始文本
 ---@param uri uri
----@return string text
+---@return string? text
 function m.getOriginText(uri)
     local file = m.fileMap[uri]
     if not file then
@@ -345,9 +363,7 @@ end
 ---@return integer[]
 function m.getOriginLines(uri)
     local file = m.fileMap[uri]
-    if not file then
-        return nil
-    end
+    assert(file, 'file not exists:' .. uri)
     return file.originLines
 end
 
@@ -444,7 +460,6 @@ function m.eachFile(suri)
 end
 
 --- Pairs dll files
----@return function
 function m.eachDll()
     local map = {}
     for uri, file in pairs(m.dllMap) do
@@ -524,7 +539,7 @@ end
 
 --- 获取文件语法树
 ---@param uri uri
----@return table state
+---@return table? state
 function m.getState(uri)
     local file = m.fileMap[uri]
     if not file then
@@ -534,7 +549,7 @@ function m.getState(uri)
     if not state then
         state = m.compileState(uri, file.text)
         m.astMap[uri] = state
-        file.ast = state
+        file.state = state
         --await.delay()
     end
     file.cacheActiveTime = timer.clock()
@@ -546,7 +561,7 @@ function m.getLastState(uri)
     if not file then
         return nil
     end
-    return file.ast
+    return file.state
 end
 
 function m.getFile(uri)

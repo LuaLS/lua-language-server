@@ -40,8 +40,8 @@ function string.dump(f, strip) end
 function string.find(s, pattern, init, plain) end
 
 ---#DES 'string.format'
----@param s string
----@param ... string
+---@param s any
+---@param ... any
 ---@return string
 ---@nodiscard
 function string.format(s, ...) end
@@ -64,7 +64,7 @@ function string.gmatch(s, pattern, init) end
 ---#DES 'string.gsub'
 ---@param s       string
 ---@param pattern string
----@param repl    string|table|function
+---@param repl    string|number|table|function
 ---@param n?      integer
 ---@return string
 ---@return integer count
@@ -87,16 +87,15 @@ function string.lower(s) end
 ---@param s       string
 ---@param pattern string
 ---@param init?   integer
----@return string | number captured
+---@return ... captured
 ---@nodiscard
 function string.match(s, pattern, init) end
 
 ---@version >5.3
 ---#DES 'string.pack'
 ---@param fmt string
----@param v1  string
----@param v2? string
----@param ... string
+---@param v1  string|number
+---@param ... string|number
 ---@return string binary
 ---@nodiscard
 function string.pack(fmt, v1, v2, ...) end

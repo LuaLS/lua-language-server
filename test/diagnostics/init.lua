@@ -50,4 +50,4 @@ function TEST(script, ...)
 end
 
 require 'diagnostics.common'
---require 'diagnostics.type-check'
+require 'diagnostics.type-check'

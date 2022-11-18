@@ -152,7 +152,7 @@ local care = {
             hideLastLine = true,
         }
         results[#results+1] = folding
-    end
+    end,
 }
 
 ---@async

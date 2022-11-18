@@ -1,3 +1,5 @@
+local diag = require 'proto.diagnostic'
+
 local m = {}
 
 --- 诊断等级
@@ -8,124 +10,21 @@ m.DiagnosticSeverity = {
     Hint        = 4,
 }
 
----@alias DiagnosticDefaultSeverity
----| 'Hint'
----| 'Information'
----| 'Warning'
----| 'Error'
+m.DiagnosticFileStatus = {
+    Any        = 1,
+    Opened     = 2,
+    None       = 3,
+}
 
 --- 诊断类型与默认等级
----@type table<string, DiagnosticDefaultSeverity>
-m.DiagnosticDefaultSeverity = {
-    ['unused-local']            = 'Hint',
-    ['unused-function']         = 'Hint',
-    ['undefined-global']        = 'Warning',
-    ['undefined-field']         = 'Warning',
-    ['global-in-nil-env']       = 'Warning',
-    ['unused-label']            = 'Hint',
-    ['unused-vararg']           = 'Hint',
-    ['trailing-space']          = 'Hint',
-    ['redefined-local']         = 'Hint',
-    ['newline-call']            = 'Information',
-    ['newfield-call']           = 'Warning',
-    ['redundant-parameter']     = 'Warning',
-    ['missing-parameter']       = 'Warning',
-    ['redundant-return']        = 'Warning',
-    ['ambiguity-1']             = 'Warning',
-    ['lowercase-global']        = 'Information',
-    ['undefined-env-child']     = 'Information',
-    ['duplicate-index']         = 'Warning',
-    ['duplicate-set-field']     = 'Warning',
-    ['empty-block']             = 'Hint',
-    ['redundant-value']         = 'Warning',
-    ['code-after-break']        = 'Hint',
-    ['unbalanced-assignments']  = 'Warning',
-    ['close-non-object']        = 'Warning',
-    ['count-down-loop']         = 'Warning',
-    ['no-unknown']              = 'Information',
-    ['deprecated']              = 'Warning',
-    ['different-requires']      = 'Warning',
-    ['await-in-sync']           = 'Warning',
-    ['not-yieldable']           = 'Warning',
-    ['discard-returns']         = 'Warning',
-    ['need-check-nil']          = 'Warning',
-    ['type-check']              = 'Warning',
-
-    ['duplicate-doc-alias']     = 'Warning',
-    ['undefined-doc-class']     = 'Warning',
-    ['undefined-doc-name']      = 'Warning',
-    ['circle-doc-class']        = 'Warning',
-    ['undefined-doc-param']     = 'Warning',
-    ['duplicate-doc-param']     = 'Warning',
-    ['doc-field-no-class']      = 'Warning',
-    ['duplicate-doc-field']     = 'Warning',
-    ['unknown-diag-code']       = 'Warning',
-
-    ['codestyle-check']         = 'Warning',
-    ['spell-check']             = 'Information',
-}
-
----@alias DiagnosticDefaultNeededFileStatus
----| 'Any'
----| 'Opened'
----| 'None'
-
--- 文件状态
-m.FileStatus = {
-    Any     = 1,
-    Opened  = 2,
-}
+m.DiagnosticDefaultSeverity = diag.getDefaultSeverity()
 
 --- 诊断类型与需要的文件状态(可以控制只分析打开的文件、还是所有文件)
----@type table<string, DiagnosticDefaultNeededFileStatus>
-m.DiagnosticDefaultNeededFileStatus = {
-    ['unused-local']            = 'Opened',
-    ['unused-function']         = 'Opened',
-    ['undefined-global']        = 'Any',
-    ['undefined-field']         = 'Opened',
-    ['global-in-nil-env']       = 'Any',
-    ['unused-label']            = 'Opened',
-    ['unused-vararg']           = 'Opened',
-    ['trailing-space']          = 'Opened',
-    ['redefined-local']         = 'Opened',
-    ['newline-call']            = 'Any',
-    ['newfield-call']           = 'Any',
-    ['redundant-parameter']     = 'Opened',
-    ['missing-parameter']       = 'Opened',
-    ['redundant-return']        = 'Opened',
-    ['ambiguity-1']             = 'Any',
-    ['lowercase-global']        = 'Any',
-    ['undefined-env-child']     = 'Any',
-    ['duplicate-index']         = 'Any',
-    ['duplicate-set-field']     = 'Any',
-    ['empty-block']             = 'Opened',
-    ['redundant-value']         = 'Opened',
-    ['code-after-break']        = 'Opened',
-    ['unbalanced-assignments']  = 'Any',
-    ['close-non-object']        = 'Any',
-    ['count-down-loop']         = 'Any',
-    ['no-unknown']              = 'None',
-    ['deprecated']              = 'Opened',
-    ['different-requires']      = 'Any',
-    ['await-in-sync']           = 'None',
-    ['not-yieldable']           = 'None',
-    ['discard-returns']         = 'Opened',
-    ['need-check-nil']          = 'Opened',
-    ['type-check']              = 'None',
+m.DiagnosticDefaultNeededFileStatus = diag.getDefaultStatus()
 
-    ['duplicate-doc-alias']     = 'Any',
-    ['undefined-doc-class']     = 'Any',
-    ['undefined-doc-name']      = 'Any',
-    ['circle-doc-class']        = 'Any',
-    ['undefined-doc-param']     = 'Any',
-    ['duplicate-doc-param']     = 'Any',
-    ['doc-field-no-class']      = 'Any',
-    ['duplicate-doc-field']     = 'Any',
-    ['unknown-diag-code']       = 'Any',
+m.DiagnosticDefaultGroupSeverity = diag.getGroupSeverity()
 
-    ['codestyle-check']         = 'None',
-    ['spell-check']             = 'None',
-}
+m.DiagnosticDefaultGroupFileStatus = diag.getGroupStatus()
 
 --- 诊断报告标签
 m.DiagnosticTag = {
@@ -266,21 +165,23 @@ m.TokenTypes = {
 }
 
 m.BuiltIn = {
-    ['basic']     = 'default',
-    ['bit']       = 'default',
-    ['bit32']     = 'default',
-    ['builtin']   = 'default',
-    ['coroutine'] = 'default',
-    ['debug']     = 'default',
-    ['ffi']       = 'default',
-    ['io']        = 'default',
-    ['jit']       = 'default',
-    ['math']      = 'default',
-    ['os']        = 'default',
-    ['package']   = 'default',
-    ['string']    = 'default',
-    ['table']     = 'default',
-    ['utf8']      = 'default',
+    ['basic']       = 'default',
+    ['bit']         = 'default',
+    ['bit32']       = 'default',
+    ['builtin']     = 'default',
+    ['coroutine']   = 'default',
+    ['debug']       = 'default',
+    ['ffi']         = 'default',
+    ['io']          = 'default',
+    ['jit']         = 'default',
+    ['math']        = 'default',
+    ['os']          = 'default',
+    ['package']     = 'default',
+    ['string']      = 'default',
+    ['table']       = 'default',
+    ['table.new']   = 'default',
+    ['table.clear'] = 'default',
+    ['utf8']        = 'default',
 }
 
 m.InlayHintKind = {

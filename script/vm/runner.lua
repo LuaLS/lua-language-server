@@ -371,7 +371,7 @@ local function waitResolve(info)
             break
         end
         local node = vm.getNode(info.target)
-        if node and node:getData('hasResolved') then
+        if node and node.resolved then
             break
         end
         coroutine.yield()
@@ -403,7 +403,7 @@ local function resolveDeadLock()
     local firstTarget = infos[1].target
     ---@cast firstTarget -?
     local firstNode = vm.setNode(firstTarget, vm.getNode(firstTarget):copy(), true)
-    firstNode:setData('hasResolved', true)
+    firstNode.resolved = true
     firstNode:setData('resolvedByDeadLock', true)
 end
 
@@ -521,7 +521,7 @@ end
 ---@param source parser.object
 function vm.waitResolveRunner(source)
     local myNode = vm.getNode(source)
-    if myNode and myNode:getData('hasResolved') then
+    if myNode and myNode.resolved then
         return
     end
 
@@ -555,7 +555,7 @@ end
 ---@param source parser.object
 function vm.storeWaitingRunner(source)
     local sourceNode = vm.getNode(source)
-    if sourceNode and sourceNode:getData 'hasResolved' then
+    if sourceNode and sourceNode.resolved then
         return
     end
 

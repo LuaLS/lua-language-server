@@ -567,7 +567,6 @@ local function matchCall(source)
         local newNode = myNode:copy()
         newNode:removeNode(needRemove)
         newNode:setData('originNode', myNode)
-        newNode:setData('hasResolved', true)
         vm.setNode(source, newNode, true)
     end
 end
@@ -642,7 +641,7 @@ local function bindAs(source)
     local doc = ases[index]
     if doc and doc.touch == source.finish then
         local asNode = vm.compileNode(doc.as)
-        asNode:setData 'hasResolved'
+        asNode.resolved = true
         vm.setNode(source, asNode, true)
         return true
     end
@@ -1207,7 +1206,7 @@ local compilerSwitch = util.switch()
             end
             compileLocal(source)
 
-            myNode:setData('hasResolved', true)
+            myNode.resolved = true
         end, function ()
             local myNode = vm.getNode(source)
             ---@cast myNode -?
@@ -1251,7 +1250,7 @@ local compilerSwitch = util.switch()
                     return
                 end
                 vm.setNode(src, node, true)
-                node:setData('hasResolved', true)
+                node.resolved = true
                 matchCall(src)
             end
         end)
@@ -1978,5 +1977,6 @@ function vm.compileNode(source)
 
     local node = vm.getNode(source)
     ---@cast node -?
+    node.resolved = true
     return node
 end

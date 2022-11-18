@@ -118,5 +118,47 @@ y = x
     assert(hover6.contents.value:find 'number')
     assert(hover7.contents.value:find 'number')
 
+    client:notify('textDocument/didOpen', {
+        textDocument = {
+            uri = 'file://test.lua',
+            languageId = 'lua',
+            version = 2,
+            text = [[
+---@meta
+
+---@class vector3
+---@operator add(vector3): vector3
+---@operator sub(vector3): vector3
+---@operator mul(vector3): number
+---@operator mul(number):  vector3
+---@operator div(number):  vector3
+local mt
+
+---@return vector3
+function mt:normalize() end
+
+---@param target vector3
+function Walk(target)
+    local moveSpeed = 1.0
+    local deltalTime = 2.0
+
+    ---@type vector3
+    local curPos
+    local targetDirVec = (target - curPos):normalize()
+    local stepMove = targetDirVec * (moveSpeed * deltalTime)
+    local nextPos = curPos + stepMove
+
+    curPos = nextPos
+end
+]]
+        }
+    })
+
+    local hover1 = client:awaitRequest('textDocument/hover', {
+        textDocument = { uri = 'file://test.lua' },
+        position = { line = 20, character = 11 },
+    })
+    assert(hover1.contents.value:find 'vector3')
+
     config.set(nil, 'Lua.diagnostics.enable', true)
 end)

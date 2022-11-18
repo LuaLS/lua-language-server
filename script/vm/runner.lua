@@ -345,7 +345,7 @@ function mt:lookIntoBlock(block, topNode)
     return topNode
 end
 
----@alias runner.info { source?: parser.object, loc: parser.object }
+---@alias runner.info { target?: parser.object, loc: parser.object }
 
 ---@type thread?
 local masterRunner = nil
@@ -364,25 +364,55 @@ local runnerList = nil
 ---@param info runner.info
 local function waitResolve(info)
     while true do
-        if not info.source then
+        if not info.target then
             break
         end
-        if info.source.node == info.loc then
+        if info.target.node == info.loc then
             break
         end
-        local node = vm.getNode(info.source)
+        local node = vm.getNode(info.target)
         if node and node:getData('hasResolved') then
             break
         end
         coroutine.yield()
     end
-    info.source = nil
+    info.target = nil
+end
+
+local function resolveDeadLock()
+    if not runnerList then
+        return
+    end
+
+    ---@type runner.info[]
+    local infos = {}
+    for runner in runnerList:pairs() do
+        local info = runnerInfo[runner]
+        infos[#infos+1] = info
+    end
+
+    table.sort(infos, function (a, b)
+        local uriA = guide.getUri(a.loc)
+        local uriB = guide.getUri(b.loc)
+        if uriA ~= uriB then
+            return uriA < uriB
+        end
+        return a.loc.start < b.loc.start
+    end)
+
+    local firstTarget = infos[1].target
+    ---@cast firstTarget -?
+    local firstNode = vm.setNode(firstTarget, vm.getNode(firstTarget):copy(), true)
+    firstNode:setData('hasResolved', true)
+    firstNode:setData('resolvedByDeadLock', true)
 end
 
 ---@async
 ---@param loc parser.object
+---@param start fun()
+---@param finish fun()
 ---@param callback vm.runner.callback
-function vm.launchRunner(loc, callback)
+function vm.launchRunner(loc, start, finish, callback)
     local locNode = vm.getNode(loc)
     if not locNode then
         return
@@ -393,10 +423,10 @@ function vm.launchRunner(loc, callback)
             if not runnerList or runnerList:getSize() == 0 then
                 return
             end
-            local allWaiting = true
+            local deadLock = true
             for runner in runnerList:pairs() do
                 local info = runnerInfo[runner]
-                local waitingSource = info.source
+                local waitingSource = info.target
                 if coroutine.status(runner) == 'suspended' then
                     local suc, err = coroutine.resume(runner)
                     if not suc then
@@ -404,25 +434,33 @@ function vm.launchRunner(loc, callback)
                     end
                 else
                     runnerList:pop(runner)
+                    deadLock = false
                 end
-                if not waitingSource or waitingSource ~= info.source then
-                    allWaiting = false
+                if not waitingSource or waitingSource ~= info.target then
+                    deadLock = false
                 end
             end
             if runnerList:getSize() == 0 then
                 return
             end
-            if allWaiting or i == 10000 then
+            if deadLock then
+                resolveDeadLock()
+            end
+            if i == 10000 then
                 local lines = {}
                 lines[#lines+1] = 'Dead lock:'
-                lines[#lines+1] = guide.getUri(loc)
                 for runner in runnerList:pairs() do
                     local info = runnerInfo[runner]
-                    lines[#lines+1] = string.format('Runner `%s` at %d waiting for `%s` at %d'
-                        , loc[1]
-                        , loc.start
-                        , info.source and info.source[1] or ''
-                        , info.source and info.source.start or 0
+                    lines[#lines+1] = '==============='
+                    lines[#lines+1] = string.format('Runner `%s` at %d(%s)'
+                        , info.loc[1]
+                        , info.loc.start
+                        , guide.getUri(info.loc)
+                    )
+                    lines[#lines+1] = string.format('Waiting `%s` at %d(%s)'
+                        , info.target[1]
+                        , info.target.start
+                        , guide.getUri(info.target)
                     )
                 end
                 local msg = table.concat(lines, '\n')
@@ -432,8 +470,14 @@ function vm.launchRunner(loc, callback)
     end
 
     local function launch()
+        start()
+        if not loc.ref then
+            finish()
+            return
+        end
         local main = guide.getParentBlock(loc)
         if not main then
+            finish()
             return
         end
         local self = setmetatable({
@@ -451,6 +495,8 @@ function vm.launchRunner(loc, callback)
         self:lookIntoBlock(main, locNode:copy())
 
         locNode:setData('runner', nil)
+
+        finish()
     end
 
     local co = coroutine.create(launch)
@@ -474,25 +520,35 @@ end
 ---@async
 ---@param source parser.object
 function vm.waitResolveRunner(source)
+    local myNode = vm.getNode(source)
+    if myNode and myNode:getData('hasResolved') then
+        return
+    end
+
     local running = coroutine.running()
     if not masterRunner or running == masterRunner then
         return
     end
 
-    local loc = source.node
-    local locNode = vm.getNode(loc)
-    if not locNode then
-        return
+    local info = runnerInfo[running]
+
+    local targetLoc
+    if source.type == 'getlocal' then
+        targetLoc = source.node
+    elseif source.type == 'local'
+    or     source.type == 'self' then
+        targetLoc = source
+        info.target = info.target or source
+    else
+        error('Unknown source type: ' .. source.type)
     end
-    local runner = locNode:getData('runner')
-    if not runner or runner == running then
+
+    local targetNode = vm.getNode(targetLoc)
+    if not targetNode then
+        -- Wait for compiling local by `compiler`
         return
     end
 
-    local info = runnerInfo[running]
-    if info.loc == loc then
-        return
-    end
     waitResolve(info)
 end
 
@@ -505,5 +561,5 @@ function vm.storeWaitingRunner(source)
 
     local running = coroutine.running()
     local info = runnerInfo[running]
-    info.source = source
+    info.target = source
 end

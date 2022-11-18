@@ -976,7 +976,7 @@ end
 
 ---@param source parser.object
 local function compileLocal(source)
-    vm.setNode(source, source)
+    local myNode = vm.setNode(source, source)
 
     local hasMarkDoc
     if source.bindDocs then
@@ -988,7 +988,7 @@ local function compileLocal(source)
         if selfNode then
             hasMarkParam = true
             vm.setNode(source, vm.compileNode(selfNode))
-            vm.getNode(source):remove 'function'
+            myNode:remove 'function'
         end
     end
     local hasMarkValue
@@ -1062,7 +1062,7 @@ local function compileLocal(source)
         end
     end
 
-    vm.getNode(source):setData('hasDefined', hasMarkDoc or hasMarkParam or hasMarkValue)
+    myNode:setData('hasDefined', hasMarkDoc or hasMarkParam or hasMarkValue)
 end
 
 ---@param source parser.object
@@ -1192,15 +1192,40 @@ local compilerSwitch = util.switch()
     ---@async
     ---@param source parser.object
     : call(function (source)
-        compileLocal(source)
-        local refs = source.ref
-        if not refs then
-            return
-        end
+        vm.launchRunner(source, function ()
+            local myNode = vm.getNode(source)
+            ---@cast myNode -?
+            myNode:setData('resolving', true)
 
-        local hasMark = vm.getNode(source):getData 'hasDefined'
+            if source.ref then
+                for _, ref in ipairs(source.ref) do
+                    if ref.type == 'getlocal'
+                    or ref.type == 'setlocal' then
+                        vm.setNode(ref, myNode, true)
+                    end
+                end
+            end
+            compileLocal(source)
 
-        vm.launchRunner(source, function (src, node)
+            myNode:setData('hasResolved', true)
+        end, function ()
+            local myNode = vm.getNode(source)
+            ---@cast myNode -?
+            myNode:setData('resolving', nil)
+            local hasMark = vm.getNode(source):getData 'hasDefined'
+            if source.ref and not hasMark then
+                local parentFunc = guide.getParentFunction(source)
+                for _, ref in ipairs(source.ref) do
+                    if  ref.type == 'setlocal'
+                    and guide.getParentFunction(ref) == parentFunc then
+                        local refNode = vm.getNode(ref)
+                        if refNode then
+                            vm.setNode(source, refNode)
+                        end
+                    end
+                end
+            end
+        end, function (src, node)
             if src.type == 'setlocal' then
                 if src.bindDocs then
                     for _, doc in ipairs(src.bindDocs) do
@@ -1212,7 +1237,7 @@ local compilerSwitch = util.switch()
                 end
                 if src.value then
                     if src.value.type == 'table' then
-                        vm.setNode(src, vm.createNode(src.value))
+                        vm.setNode(src, vm.createNode(src.value), true)
                         vm.setNode(src, node:copy():asTable())
                     else
                         vm.setNode(src, vm.compileNode(src.value), true)
@@ -1231,18 +1256,7 @@ local compilerSwitch = util.switch()
             end
         end)
 
-        if not hasMark then
-            local parentFunc = guide.getParentFunction(source)
-            for _, ref in ipairs(source.ref) do
-                if  ref.type == 'setlocal'
-                and guide.getParentFunction(ref) == parentFunc then
-                    local refNode = vm.getNode(ref)
-                    if refNode then
-                        vm.setNode(source, refNode)
-                    end
-                end
-            end
-        end
+        vm.waitResolveRunner(source)
     end)
     : case 'setlocal'
     : call(function (source)

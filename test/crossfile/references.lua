@@ -361,15 +361,15 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            local <~t~> = require 'b'
-            return <!t!>
+            local <~x~> = require 'b'
+            return <!x!>
         ]]
     },
     {
         path = 'b.lua',
         content = [[
-            local t = require 'a'
-            return t
+            local y = require 'a'
+            return y
         ]]
     },
 }

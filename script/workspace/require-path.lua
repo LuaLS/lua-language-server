@@ -41,6 +41,10 @@ local function getOnePath(uri, path, searcher)
     return nil
 end
 
+---comment
+---@param suri string
+---@param path string
+---@return rpath.SearchResult[]
 function m.getVisiblePath(suri, path)
     local searchers = config.get(suri, 'Lua.runtime.path')
     local strict    = config.get(suri, 'Lua.runtime.pathStrict')
@@ -87,6 +91,7 @@ function m.getVisiblePath(suri, path)
                     if head then
                         mySearcher = head .. searcher
                     end
+                    ---@class rpath.SearchResult
                     result[#result+1] = {
                         searcher = mySearcher,
                         expect   = expect,

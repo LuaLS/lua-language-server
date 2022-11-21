@@ -13,13 +13,13 @@ vm.nodeCache = {}
 ---@class vm.node
 ---@field [integer] vm.node.object
 ---@field [vm.node.object] true
+---@field resolved? boolean
 local mt = {}
 mt.__index    = mt
 mt.id         = 0
 mt.type       = 'vm.node'
 mt.optional   = nil
 mt.data       = nil
-mt.resolved   = nil
 
 ---@param node vm.node | vm.node.object
 ---@return vm.node

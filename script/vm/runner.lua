@@ -345,12 +345,12 @@ function mt:lookIntoBlock(block, topNode)
     return topNode
 end
 
----@alias runner.info { target?: parser.object, loc: parser.object }
+---@alias runner.thread { target?: parser.object, loc: parser.object }
 
 ---@type thread?
 local masterRunner = nil
----@type table<thread, runner.info>
-local runnerInfo = setmetatable({}, {
+---@type table<thread, runner.thread>
+local runnerThread = setmetatable({}, {
     __mode = 'k',
     __index = function (self, k)
         self[k] = {}
@@ -360,8 +360,12 @@ local runnerInfo = setmetatable({}, {
 ---@type linked-table?
 local runnerList = nil
 
+---@class vm.node
+---@field package _runner? thread
+---@field package _resolvedByDeadLock? boolean
+
 ---@async
----@param info runner.info
+---@param info runner.thread
 local function waitResolve(info)
     while true do
         if not info.target then
@@ -384,10 +388,10 @@ local function resolveDeadLock()
         return
     end
 
-    ---@type runner.info[]
+    ---@type runner.thread[]
     local infos = {}
     for runner in runnerList:pairs() do
-        local info = runnerInfo[runner]
+        local info = runnerThread[runner]
         infos[#infos+1] = info
     end
 
@@ -404,7 +408,7 @@ local function resolveDeadLock()
     ---@cast firstTarget -?
     local firstNode = vm.setNode(firstTarget, vm.getNode(firstTarget):copy(), true)
     firstNode.resolved = true
-    firstNode:setData('resolvedByDeadLock', true)
+    firstNode._resolvedByDeadLock = true
 end
 
 ---@async
@@ -425,7 +429,7 @@ function vm.launchRunner(loc, start, finish, callback)
             end
             local deadLock = true
             for runner in runnerList:pairs() do
-                local info = runnerInfo[runner]
+                local info = runnerThread[runner]
                 local waitingSource = info.target
                 if coroutine.status(runner) == 'suspended' then
                     local suc, err = coroutine.resume(runner)
@@ -450,7 +454,7 @@ function vm.launchRunner(loc, start, finish, callback)
                 local lines = {}
                 lines[#lines+1] = 'Dead lock:'
                 for runner in runnerList:pairs() do
-                    local info = runnerInfo[runner]
+                    local info = runnerThread[runner]
                     lines[#lines+1] = '==============='
                     lines[#lines+1] = string.format('Runner `%s` at %d(%s)'
                         , info.loc[1]
@@ -494,14 +498,14 @@ function vm.launchRunner(loc, start, finish, callback)
 
         self:lookIntoBlock(main, locNode:copy())
 
-        locNode:setData('runner', nil)
+        locNode._runner = nil
 
         finish()
     end
 
     local co = coroutine.create(launch)
-    locNode:setData('runner', co)
-    local info = runnerInfo[co]
+    locNode._runner = co
+    local info = runnerThread[co]
     info.loc = loc
 
     if not runnerList then
@@ -530,7 +534,7 @@ function vm.waitResolveRunner(source)
         return
     end
 
-    local info = runnerInfo[running]
+    local info = runnerThread[running]
 
     local targetLoc
     if source.type == 'getlocal' then
@@ -552,6 +556,9 @@ function vm.waitResolveRunner(source)
     waitResolve(info)
 end
 
+---@class parser.object
+---@field package _runner? parser.object
+
 ---@param source parser.object
 function vm.storeWaitingRunner(source)
     local sourceNode = vm.getNode(source)
@@ -560,6 +567,15 @@ function vm.storeWaitingRunner(source)
     end
 
     local running = coroutine.running()
-    local info = runnerInfo[running]
+    local info = runnerThread[running]
     info.target = source
+
+    local targetLoc = source.node
+    if not targetLoc._runner then
+        targetLoc._runner = {
+            type = 'local.runner'
+        }
+    end
+    local runnerInfo = vm.createNode()
+    vm.setNode(targetLoc._runner, runnerInfo, true)
 end

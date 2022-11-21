@@ -6,8 +6,6 @@ local files      = require 'files'
 ---@class vm
 local vm         = require 'vm.vm'
 
-local LOCK = {}
-
 ---@class parser.object
 ---@field _compiledNodes     boolean
 ---@field _node              vm.node
@@ -642,7 +640,9 @@ local function bindAs(source)
 
     local doc = ases[index]
     if doc and doc.touch == source.finish then
-        vm.setNode(source, vm.compileNode(doc.as), true)
+        local asNode = vm.compileNode(doc.as)
+        asNode.resolved = true
+        vm.setNode(source, asNode, true)
         return true
     end
 
@@ -975,7 +975,7 @@ end
 
 ---@param source parser.object
 local function compileLocal(source)
-    vm.setNode(source, source)
+    local myNode = vm.setNode(source, source)
 
     local hasMarkDoc
     if source.bindDocs then
@@ -987,7 +987,7 @@ local function compileLocal(source)
         if selfNode then
             hasMarkParam = true
             vm.setNode(source, vm.compileNode(selfNode))
-            vm.getNode(source):remove 'function'
+            myNode:remove 'function'
         end
     end
     local hasMarkValue
@@ -1061,7 +1061,7 @@ local function compileLocal(source)
         end
     end
 
-    vm.getNode(source):setData('hasDefined', hasMarkDoc or hasMarkParam or hasMarkValue)
+    myNode:setData('hasDefined', hasMarkDoc or hasMarkParam or hasMarkValue)
 end
 
 ---@param source parser.object
@@ -1188,17 +1188,43 @@ local compilerSwitch = util.switch()
     end)
     : case 'local'
     : case 'self'
+    ---@async
     ---@param source parser.object
     : call(function (source)
-        compileLocal(source)
-        local refs = source.ref
-        if not refs then
-            return
-        end
+        vm.launchRunner(source, function ()
+            local myNode = vm.getNode(source)
+            ---@cast myNode -?
+            myNode:setData('resolving', true)
 
-        local hasMark = vm.getNode(source):getData 'hasDefined'
+            if source.ref then
+                for _, ref in ipairs(source.ref) do
+                    if ref.type == 'getlocal'
+                    or ref.type == 'setlocal' then
+                        vm.setNode(ref, myNode, true)
+                    end
+                end
+            end
+            compileLocal(source)
 
-        vm.launchRunner(source, function (src, node)
+            myNode.resolved = true
+        end, function ()
+            local myNode = vm.getNode(source)
+            ---@cast myNode -?
+            myNode:setData('resolving', nil)
+            local hasMark = vm.getNode(source):getData 'hasDefined'
+            if source.ref and not hasMark then
+                local parentFunc = guide.getParentFunction(source)
+                for _, ref in ipairs(source.ref) do
+                    if  ref.type == 'setlocal'
+                    and guide.getParentFunction(ref) == parentFunc then
+                        local refNode = vm.getNode(ref)
+                        if refNode then
+                            vm.setNode(source, refNode)
+                        end
+                    end
+                end
+            end
+        end, function (src, node)
             if src.type == 'setlocal' then
                 if src.bindDocs then
                     for _, doc in ipairs(src.bindDocs) do
@@ -1210,28 +1236,9 @@ local compilerSwitch = util.switch()
                 end
                 if src.value then
                     if src.value.type == 'table' then
-                        vm.setNode(src, vm.createNode(src.value))
+                        vm.setNode(src, vm.createNode(src.value), true)
                         vm.setNode(src, node:copy():asTable())
                     else
-                        local function clearLockedNode(child)
-                            if not child then
-                                return
-                            end
-                            if child.type == 'function' then
-                                return
-                            end
-                            if child.type == 'setlocal'
-                            or child.type == 'getlocal' then
-                                if child.node == source then
-                                    return
-                                end
-                            end
-                            if LOCK[child] then
-                                vm.removeNode(child)
-                            end
-                            guide.eachChild(child, clearLockedNode)
-                        end
-                        clearLockedNode(src.value)
                         vm.setNode(src, vm.compileNode(src.value), true)
                     end
                 else
@@ -1243,33 +1250,25 @@ local compilerSwitch = util.switch()
                     return
                 end
                 vm.setNode(src, node, true)
+                node.resolved = true
                 matchCall(src)
             end
         end)
 
-        if not hasMark then
-            local parentFunc = guide.getParentFunction(source)
-            for _, ref in ipairs(source.ref) do
-                if  ref.type == 'setlocal'
-                and guide.getParentFunction(ref) == parentFunc then
-                    local refNode = vm.getNode(ref)
-                    if refNode then
-                        vm.setNode(source, refNode)
-                    end
-                end
-            end
-        end
+        vm.waitResolveRunner(source)
     end)
     : case 'setlocal'
     : call(function (source)
         vm.compileNode(source.node)
     end)
     : case 'getlocal'
+    ---@async
     : call(function (source)
         if bindAs(source) then
             return
         end
         vm.compileNode(source.node)
+        vm.waitResolveRunner(source)
     end)
     : case 'setfield'
     : case 'setmethod'
@@ -1950,6 +1949,13 @@ function vm.compileNode(source)
         end
     end
 
+    if source.type == 'getlocal' then
+        ---@cast source parser.object
+        vm.storeWaitingRunner(source)
+        ---@diagnostic disable-next-line: await-in-sync
+        vm.waitResolveRunner(source)
+    end
+
     local cache = vm.getNode(source)
     if cache ~= nil then
         return cache
@@ -1964,14 +1970,13 @@ function vm.compileNode(source)
 
     ---@cast source parser.object
     vm.setNode(source, vm.createNode(), true)
-    LOCK[source] = true
     compileByGlobal(source)
     compileByNode(source)
     compileByParentNode(source)
     matchCall(source)
-    LOCK[source] = nil
 
     local node = vm.getNode(source)
     ---@cast node -?
+    node.resolved = true
     return node
 end

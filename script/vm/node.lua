@@ -19,6 +19,7 @@ mt.id         = 0
 mt.type       = 'vm.node'
 mt.optional   = nil
 mt.data       = nil
+mt.resolved   = nil
 
 ---@param node vm.node | vm.node.object
 ---@return vm.node

@@ -766,7 +766,7 @@ function m.eachSource(ast, callback)
 end
 
 ---@param source   parser.object
----@param callback fun(src: parser.object)
+---@param callback async fun(src: parser.object)
 function m.eachChild(source, callback)
     local f = eachChildMap[source.type]
     if not f then

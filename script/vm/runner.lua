@@ -17,6 +17,23 @@ local mt = {}
 mt.__index = mt
 mt._index = 1
 
+---@param source parser.object
+---@return vm.node
+local function getRunnerInfo(source)
+    if not source._runner then
+        source._runner = {
+            type = 'local.runner',
+        }
+        local runnerInfo = vm.createNode()
+        vm.setNode(source._runner, runnerInfo, true)
+        runnerInfo._waitResolved = {}
+    end
+
+    local runnerInfo = vm.getNode(source._runner)
+    ---@cast runnerInfo -?
+    return runnerInfo
+end
+
 ---@return parser.object[]
 function mt:_getCasts()
     local root = guide.getRoot(self._loc)
@@ -109,6 +126,7 @@ function mt:_fastWardCasts(pos, topNode)
     return topNode
 end
 
+---@async
 ---@param action   parser.object
 ---@param topNode  vm.node
 ---@param outNode? vm.node
@@ -127,6 +145,11 @@ function mt:_lookIntoChild(action, topNode, outNode)
             if outNode then
                 topNode = topNode:copy():setTruthy()
                 outNode = outNode:copy():setFalsy()
+            end
+            local runnerInfo = getRunnerInfo(self._loc)
+            runnerInfo._waitResolved[action] = nil
+            while not next(runnerInfo._waitResolved) do
+                coroutine.yield('Nothing to resolve')
             end
         end
     elseif action.type == 'function' then
@@ -321,6 +344,7 @@ function mt:_lookIntoChild(action, topNode, outNode)
         end
     end
     ::RETURN::
+    ---@async
     guide.eachChild(action, function (src)
         if self._has[src] then
             self:_lookIntoChild(src, topNode)
@@ -329,6 +353,7 @@ function mt:_lookIntoChild(action, topNode, outNode)
     return topNode, outNode or topNode
 end
 
+---@async
 ---@param block   parser.object
 ---@param topNode  vm.node
 ---@return vm.node topNode
@@ -363,6 +388,7 @@ local runnerList = nil
 ---@class vm.node
 ---@field package _runner? thread
 ---@field package _resolvedByDeadLock? boolean
+---@field package _waitResolved? table<parser.object, boolean>
 
 ---@async
 ---@param info runner.thread
@@ -378,7 +404,7 @@ local function waitResolve(info)
         if node and node.resolved then
             break
         end
-        coroutine.yield()
+        coroutine.yield('Waiting target')
     end
     info.target = nil
 end
@@ -404,11 +430,78 @@ local function resolveDeadLock()
         return a.loc.start < b.loc.start
     end)
 
-    local firstTarget = infos[1].target
-    ---@cast firstTarget -?
-    local firstNode = vm.setNode(firstTarget, vm.getNode(firstTarget):copy(), true)
-    firstNode.resolved = true
-    firstNode._resolvedByDeadLock = true
+    for _, info in ipairs(infos) do
+        local target = info.target
+        if target then
+            local firstNode = vm.setNode(target, vm.getNode(target):copy(), true)
+            firstNode.resolved = true
+            firstNode._resolvedByDeadLock = true
+        end
+    end
+end
+
+local function resumeMaster()
+    if masterRunner then
+        return
+    end
+
+    masterRunner = coroutine.running()
+
+    for i = 1, 10010 do
+        if not runnerList or runnerList:getSize() == 0 then
+            break
+        end
+        local size = runnerList:getSize()
+        local deadLock = true
+        for runner in runnerList:pairs() do
+            local info = runnerThread[runner]
+            if not vm.getNode(info.loc) then
+                runnerList:pop(runner)
+                goto CONTINUE
+            end
+            local suc, res = coroutine.resume(runner)
+            if not suc then
+                log.error(debug.traceback(runner, res))
+            end
+            if res == 'Nothing to resolve'
+            or coroutine.status(runner) == 'dead' then
+                runnerList:pop(runner)
+                deadLock = false
+            end
+            ::CONTINUE::
+        end
+        if size ~= runnerList:getSize() then
+            deadLock = false
+        end
+        if runnerList:getSize() == 0 then
+            break
+        end
+        if deadLock then
+            resolveDeadLock()
+        end
+        if i == 10000 then
+            local lines = {}
+            lines[#lines+1] = 'Dead lock:'
+            for runner in runnerList:pairs() do
+                local info = runnerThread[runner]
+                lines[#lines+1] = '==============='
+                lines[#lines+1] = string.format('Runner `%s` at %d(%s)'
+                    , info.loc[1]
+                    , info.loc.start
+                    , guide.getUri(info.loc)
+                )
+                lines[#lines+1] = string.format('Waiting `%s` at %d(%s)'
+                    , info.target[1]
+                    , info.target.start
+                    , guide.getUri(info.target)
+                )
+            end
+            local msg = table.concat(lines, '\n')
+            log.error(msg)
+        end
+    end
+
+    masterRunner = nil
 end
 
 ---@async
@@ -422,57 +515,7 @@ function vm.launchRunner(loc, start, finish, callback)
         return
     end
 
-    local function resumeMaster()
-        for i = 1, 10010 do
-            if not runnerList or runnerList:getSize() == 0 then
-                return
-            end
-            local deadLock = true
-            for runner in runnerList:pairs() do
-                local info = runnerThread[runner]
-                local waitingSource = info.target
-                if coroutine.status(runner) == 'suspended' then
-                    local suc, err = coroutine.resume(runner)
-                    if not suc then
-                        log.error(debug.traceback(runner, err))
-                    end
-                else
-                    runnerList:pop(runner)
-                    deadLock = false
-                end
-                if not waitingSource or waitingSource ~= info.target then
-                    deadLock = false
-                end
-            end
-            if runnerList:getSize() == 0 then
-                return
-            end
-            if deadLock then
-                resolveDeadLock()
-            end
-            if i == 10000 then
-                local lines = {}
-                lines[#lines+1] = 'Dead lock:'
-                for runner in runnerList:pairs() do
-                    local info = runnerThread[runner]
-                    lines[#lines+1] = '==============='
-                    lines[#lines+1] = string.format('Runner `%s` at %d(%s)'
-                        , info.loc[1]
-                        , info.loc.start
-                        , guide.getUri(info.loc)
-                    )
-                    lines[#lines+1] = string.format('Waiting `%s` at %d(%s)'
-                        , info.target[1]
-                        , info.target.start
-                        , guide.getUri(info.target)
-                    )
-                end
-                local msg = table.concat(lines, '\n')
-                log.error(msg)
-            end
-        end
-    end
-
+    ---@async
     local function launch()
         start()
         if not loc.ref then
@@ -513,12 +556,7 @@ function vm.launchRunner(loc, start, finish, callback)
     end
     runnerList:pushTail(co)
 
-    if not masterRunner then
-        masterRunner = coroutine.running()
-        resumeMaster()
-        masterRunner = nil
-        return
-    end
+    resumeMaster()
 end
 
 ---@async
@@ -537,7 +575,8 @@ function vm.waitResolveRunner(source)
     local info = runnerThread[running]
 
     local targetLoc
-    if source.type == 'getlocal' then
+    if source.type == 'getlocal'
+    or source.type == 'setlocal' then
         targetLoc = source.node
     elseif source.type == 'local'
     or     source.type == 'self' then
@@ -570,12 +609,8 @@ function vm.storeWaitingRunner(source)
     local info = runnerThread[running]
     info.target = source
 
-    local targetLoc = source.node
-    if not targetLoc._runner then
-        targetLoc._runner = {
-            type = 'local.runner'
-        }
-    end
-    local runnerInfo = vm.createNode()
-    vm.setNode(targetLoc._runner, runnerInfo, true)
+    local runnerInfo = getRunnerInfo(source.node)
+    runnerInfo._waitResolved[source] = true
+
+    resumeMaster()
 end

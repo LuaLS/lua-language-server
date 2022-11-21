@@ -1949,7 +1949,8 @@ function vm.compileNode(source)
         end
     end
 
-    if source.type == 'getlocal' then
+    if source.type == 'getlocal'
+    or source.type == 'setlocal' then
         ---@cast source parser.object
         vm.storeWaitingRunner(source)
         ---@diagnostic disable-next-line: await-in-sync

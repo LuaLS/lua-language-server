@@ -243,3 +243,5 @@ function PrometheusHist:observe(value, label_values) end
 ---This function will wait for `sync_interval` before deleting the
 ---metrics to allow all workers to sync their counters.
 function PrometheusHist:reset() end
+
+return PrometheusLib

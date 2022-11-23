@@ -14,6 +14,7 @@ local encoder = require 'encoder'
 local ws      = require 'workspace.workspace'
 local scope   = require 'workspace.scope'
 local inspect = require 'inspect'
+local jsonc   = require 'jsonc'
 
 local m = {}
 
@@ -275,25 +276,24 @@ end
 
 ---@param libraryDir fs.path
 local function loadSingle3rdConfig(libraryDir)
-    local configText = fsu.loadFile(libraryDir / 'config.lua')
+    local path = libraryDir / 'config.json'
+    local configText = fsu.loadFile(path)
     if not configText then
         return nil
     end
 
-    local env = setmetatable({}, { __index = _G })
-    assert(load(configText, '@' .. libraryDir:string(), 't', env))()
-
-    local cfg = {}
+    local suc, cfg = xpcall(jsonc.decode, function (err)
+        log.error('Decode config.json failed at:', libraryDir:string(), err)
+    end, configText)
+    if not suc then
+        return nil
+    end
 
     cfg.path = libraryDir:filename():string()
     cfg.name = cfg.name or cfg.path
 
     if fs.exists(libraryDir / 'plugin.lua') then
         cfg.plugin = true
-    end
-
-    for k, v in pairs(env) do
-        cfg[k] = v
     end
 
     if cfg.words then

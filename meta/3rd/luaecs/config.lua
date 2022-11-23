@@ -1,2 +1,0 @@
-name  = "luaecs"
-words = { "ecs%.world()" }

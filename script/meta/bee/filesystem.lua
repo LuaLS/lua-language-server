@@ -44,7 +44,7 @@ local copy_options
 
 fs.copy_options = copy_options
 
----@param path string
+---@param path string|fs.path
 ---@return fs.path
 function fs.path(path)
 end
@@ -99,13 +99,17 @@ end
 
 ---@param source fs.path
 ---@param target fs.path
----@param options? `fs.copy_options.overwrite_existing`
+---@param options? integer | `fs.copy_options.overwrite_existing`
 function fs.copy_file(source, target, options)
 end
 
 ---@param oldPath fs.path
 ---@param newPath fs.path
 function fs.rename(oldPath, newPath)
+end
+
+---@return fs.path
+function fs.current_path()
 end
 
 return fs

@@ -1,1 +1,0 @@
-words = { "require[%s%(\"\']+luassert[%)\"\']" }

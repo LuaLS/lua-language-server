@@ -254,7 +254,7 @@ function lovr.math.vec4(x, y, z, w) end
 ---
 ---Once a Curve is created with `lovr.math.newCurve`, you can use `Curve:evaluate` to get a point on the curve or `Curve:render` to get a list of all of the points on the curve.
 ---
----These points can be passed directly to `lovr.graphics.points` or `lovr.graphics.line` to render the curve.
+---These points can be passed directly to `Pass:points` or `Pass:line` to render the curve.
 ---
 ---Note that for longer or more complicated curves (like in a drawing application) it can be easier to store the path as several Curve objects.
 ---

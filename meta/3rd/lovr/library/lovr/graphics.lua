@@ -2310,7 +2310,7 @@ function Pass:sphere(transform, longitudes, latitudes) end
 ---
 ---
 ---### NOTE:
----Strings should be encoded as UTF-8.
+---UTF-8 encoded strings are supported.
 ---
 ---Newlines will start a new line of text.
 ---
@@ -2326,11 +2326,11 @@ function Pass:sphere(transform, longitudes, latitudes) end
 ---
 ---Blending should be enabled when rendering text (it's on by default).
 ---
----This function can draw up to 16384 visible characters at a time.
+---This function can draw up to 16384 visible characters at a time, and will currently throw an error if the string is too long.
 ---
 ---@overload fun(self: lovr.Pass, colortext: table, transform: lovr.Mat4, wrap?: number, halign?: lovr.HorizontalAlign, valign?: lovr.VerticalAlign)
 ---@param text string # The text to render.
----@param transform lovr.Mat4 # The transform of the text.
+---@param transform lovr.Mat4 # The transform of the text.  Can also be provided as position, 1-component scale, and rotation using a mix of `Vectors` or numbers.
 ---@param wrap? number # The maximum width of each line in meters (before scale is applied).  When zero, the text will not wrap.
 ---@param halign? lovr.HorizontalAlign # The horizontal alignment.
 ---@param valign? lovr.VerticalAlign # The vertical alignment.

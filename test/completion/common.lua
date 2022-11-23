@@ -4076,3 +4076,11 @@ f {<??>}
         kind  = define.CompletionItemKind.Property,
     },
 }
+
+TEST [[
+---@alias Foo Foo[]
+---@type Foo
+local foo
+foo = {"<??>"}
+]]
+(EXISTS)

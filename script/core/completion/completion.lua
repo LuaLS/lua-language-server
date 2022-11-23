@@ -1235,7 +1235,13 @@ end
 ---@param src       vm.node.object
 ---@param enums     table[]
 ---@param isInArray boolean?
-local function insertEnum(state, pos, src, enums, isInArray)
+---@param mark      table?
+local function insertEnum(state, pos, src, enums, isInArray, mark)
+    mark = mark or {}
+    if mark[src] then
+        return
+    end
+    mark[src] = true
     if src.type == 'doc.type.string'
     or src.type == 'doc.type.integer'
     or src.type == 'doc.type.boolean' then
@@ -1273,7 +1279,7 @@ local function insertEnum(state, pos, src, enums, isInArray)
         }
     elseif isInArray and src.type == 'doc.type.array' then
         for i, d in ipairs(vm.getDefs(src.node)) do
-            insertEnum(state, pos, d, enums, isInArray)
+            insertEnum(state, pos, d, enums, isInArray, mark)
         end
     elseif src.type == 'global' and src.cate == 'type' then
         for _, set in ipairs(src:getSets(state.uri)) do

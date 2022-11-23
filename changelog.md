@@ -15,9 +15,11 @@
   ```
 * `FIX` [#1698]
 * `FIX` [#1704]
+* `FIX` [#1717]
 
 [#1698]: https://github.com/sumneko/lua-language-server/issues/1698
 [#1704]: https://github.com/sumneko/lua-language-server/issues/1704
+[#1717]: https://github.com/sumneko/lua-language-server/issues/1717
 
 ## 3.6.3
 `2022-11-14`

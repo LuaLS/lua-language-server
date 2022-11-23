@@ -35,6 +35,7 @@ local f <close> = io.open((path / 'test.txt'):string(), 'w')
 assert(f)
 f:write('xxx')
 f:flush()
+f:close()
 
 thread.sleep(1)
 events = {}

@@ -1,1 +1,1 @@
-require 'other.filewatch'
+--require 'other.filewatch'

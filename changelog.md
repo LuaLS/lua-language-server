@@ -1,8 +1,6 @@
 # changelog
 
 ## 3.6.4
-* `FIX` [#1698]
-[#1698]: https://github.com/sumneko/lua-language-server/issues/1698
 * `FIX` circulation reference in process analysis
   ```lua
   ---@type number
@@ -15,6 +13,11 @@
 
   y = x --> Can not infer `y` before
   ```
+* `FIX` [#1698]
+* `FIX` [#1704]
+
+[#1698]: https://github.com/sumneko/lua-language-server/issues/1698
+[#1704]: https://github.com/sumneko/lua-language-server/issues/1704
 
 ## 3.6.3
 `2022-11-14`

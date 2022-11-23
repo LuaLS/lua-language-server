@@ -4055,3 +4055,24 @@ x.<??>
         kind  = define.CompletionItemKind.Enum,
     },
 }
+
+TEST [[
+---@param x {damage: integer, count: integer, health:integer}
+local function f(x) end
+
+f {<??>}
+]]
+{
+    {
+        label = 'count',
+        kind  = define.CompletionItemKind.Property,
+    },
+    {
+        label = 'damage',
+        kind  = define.CompletionItemKind.Property,
+    },
+    {
+        label = 'health',
+        kind  = define.CompletionItemKind.Property,
+    },
+}

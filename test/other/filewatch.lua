@@ -31,7 +31,7 @@ fw.update()
 assert(#events == 1)
 assert(events[1][1] == 'change')
 
-local f <close> = io.open((path / 'test.txt'):string(), 'a')
+local f <close> = io.open((path / 'test.txt'):string(), 'w')
 assert(f)
 f:write('xxx')
 f:flush()

@@ -94,20 +94,21 @@ end
 ---@param name string
 ---@param isScopeDiag boolean
 ---@param response async fun(result: any)
+---@return boolean
 local function check(uri, name, isScopeDiag, response)
     local disables = config.get(uri, 'Lua.diagnostics.disable')
     if util.arrayHas(disables, name) then
-        return
+        return false
     end
     local severity = getSeverity(uri, name)
     local status   = getStatus(uri, name)
 
     if status == 'None' then
-        return
+        return false
     end
 
     if status == 'Opened' and not files.isOpen(uri) then
-        return
+        return false
     end
 
     local level = define.DiagnosticSeverity[severity]
@@ -140,10 +141,12 @@ local function check(uri, name, isScopeDiag, response)
     if DIAGTIMES then
         DIAGTIMES[name] = (DIAGTIMES[name] or 0) + passed
     end
+    return true
 end
 
 local diagList
 local diagCosts = {}
+local diagCount = {}
 local function buildDiagList()
     if not diagList then
         diagList = {}
@@ -152,7 +155,9 @@ local function buildDiagList()
         end
     end
     table.sort(diagList, function (a, b)
-        return (diagCosts[a] or 0) < (diagCosts[b] or 0)
+        local time1 = (diagCosts[a] or 0) / (diagCount[a] or 1)
+        local time2 = (diagCosts[b] or 0) / (diagCount[b] or 1)
+        return time1 < time2
     end)
     return diagList
 end
@@ -171,9 +176,12 @@ return function (uri, isScopeDiag, response, checked)
     for _, name in ipairs(buildDiagList()) do
         await.delay()
         local clock = os.clock()
-        check(uri, name, isScopeDiag, response)
-        local cost = os.clock() - clock
-        diagCosts[name] = (diagCosts[name] or 0) + cost
+        local suc = check(uri, name, isScopeDiag, response)
+        if suc then
+            local cost = os.clock() - clock
+            diagCosts[name] = (diagCosts[name] or 0) + cost
+            diagCount[name] = (diagCount[name] or 0) + 1
+        end
         if checked then
             checked(name)
         end

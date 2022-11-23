@@ -11,15 +11,9 @@ words = {
   'ngx%.%w+',
 }
 
-configs = {
-    {
-        key    = 'Lua.runtime.version',
-        action = 'set',
-        value  = 'LuaJIT',
-    },
-    {
-        key    = 'Lua.diagnostics.globals',
-        action = 'add',
-        value  = 'ngx',
+config = {
+    ["Lua.runtime.version"] = "LuaJIT",
+    ["Lua.diagnostics.globals"] = {
+        "ngx",
     },
 }

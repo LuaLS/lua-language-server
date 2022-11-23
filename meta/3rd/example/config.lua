@@ -5,34 +5,16 @@ words   = {'thisIsAnExampleWord%.ifItExistsInFile%.thenTryLoadThisLibrary'}
 -- list or matched file names. `.lua`, `.dll` and `.so` only
 files   = {'thisIsAnExampleFile%.ifItExistsInWorkSpace%.thenTryLoadThisLibrary%.lua'}
 -- lsit of settings to be changed
-configs = {
-    {
-        key    = 'Lua.runtime.version',
-        action = 'set',
-        value  = 'LuaJIT',
+config  = {
+    ["Lua.runtime.version"] = "LuaJIT",
+    ["Lua.diagnostics.globals"] = {
+        "global1",
+        "global2",
     },
-    {
-        key    = 'Lua.diagnostics.globals',
-        action = 'add',
-        value  = 'global1',
+    ["Lua.runtime.special"] = {
+        ["include"] = "require",
     },
-    {
-        key    = 'Lua.runtime.special',
-        action = 'prop',
-        prop   = 'include',
-        value  = 'require',
-    },
-    {
-        key    = 'Lua.runtime.builtin',
-        action = 'prop',
-        prop   = 'io',
-        value  = 'disable',
+    ["Lua.runtime.builtin"] = {
+        ["io"] = "disable",
     },
 }
-for _, name in ipairs {'global2', 'global3', 'global4'} do
-    configs[#configs+1] = {
-        key    = 'Lua.diagnostics.globals',
-        action = 'add',
-        value  = name,
-    }
-end

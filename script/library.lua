@@ -352,15 +352,37 @@ end
 
 local function apply3rd(uri, cfg, onlyMemory)
     local changes = {}
-    if cfg.configs then
-        for _, change in ipairs(cfg.configs) do
-            changes[#changes+1] = {
-                key    = change.key,
-                action = change.action,
-                prop   = change.prop,
-                value  = change.value,
-                uri    = uri,
-            }
+    if cfg.config then
+        for key, value in pairs(cfg.config) do
+            if type(value) == 'table' then
+                if #value == 0 then
+                    for k, v in pairs(value) do
+                        changes[#changes+1] = {
+                            key    = key,
+                            action = 'prop',
+                            prop   = k,
+                            value  = v,
+                            uri    = uri,
+                        }
+                    end
+                else
+                    for _, v in ipairs(value) do
+                        changes[#changes+1] = {
+                            key    = key,
+                            action = 'add',
+                            value  = v,
+                            uri    = uri,
+                        }
+                    end
+                end
+            else
+                changes[#changes+1] = {
+                    key    = key,
+                    action = 'set',
+                    value  = value,
+                    uri    = uri,
+                }
+            end
         end
     end
 

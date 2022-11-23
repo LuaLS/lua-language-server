@@ -1,7 +1,7 @@
 {
     "name"   : "Defold",
     "files"  : ["game.project", "*%.script", "*%.gui_script"],
-    "config" : {
+    "settings" : {
         "Lua.runtime.version"     : "Lua 5.1",
         "Lua.workspace.library"   : [".internal"],
         "Lua.workspace.ignoreDir" : [".internal"],

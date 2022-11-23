@@ -1,7 +1,7 @@
 {
     "name": "Cocos",
     "files": ["cocos"],
-    "config": {
+    "settings": {
         "Lua.runtime.version": "LuaJIT"
     }
 }

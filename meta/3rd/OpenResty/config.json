@@ -10,7 +10,7 @@
         "resty%.%w+",
         "ngx%.%w+"
     ],
-    "config" : {
+    "settings" : {
         "Lua.runtime.version" : "LuaJIT",
         "Lua.diagnostics.globals" : [
             "ngx"

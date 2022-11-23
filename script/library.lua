@@ -352,8 +352,8 @@ end
 
 local function apply3rd(uri, cfg, onlyMemory)
     local changes = {}
-    if cfg.config then
-        for key, value in pairs(cfg.config) do
+    if cfg.settings then
+        for key, value in pairs(cfg.settings) do
             if type(value) == 'table' then
                 if #value == 0 then
                     for k, v in pairs(value) do

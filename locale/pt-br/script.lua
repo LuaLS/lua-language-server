@@ -721,6 +721,20 @@ function find(path, pattern) end
 ---@param style font-style Style to apply
 function setFontStyle(style) end
 ```
+
+### Literal Enum
+```
+local enums = {
+    READ = 0,
+    WRITE = 1,
+    CLOSED = 2
+}
+
+---@alias FileStates
+---| `enums.READ`
+---| `enums.WRITE`
+---| `enums.CLOSE`
+```
 ---
 [View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#alias)
 ]=]

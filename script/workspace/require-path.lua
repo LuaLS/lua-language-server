@@ -250,6 +250,36 @@ function m.findUrisByRequireName(uri, name)
     return mgr:findUrisByRequireName(uri, name)
 end
 
+---@param suri uri
+---@param uri uri
+---@param name string
+---@return boolean
+function m.isMatchedUri(suri, uri, name)
+    local searchers   = config.get(suri, 'Lua.runtime.path')
+    local strict      = config.get(suri, 'Lua.runtime.pathStrict')
+    local separator   = config.get(suri, 'Lua.completion.requireSeparator')
+    local path        = name:gsub('%' .. separator, '/')
+
+    for _, searcher in ipairs(searchers) do
+        local fspath = searcher:gsub('%?', (path:gsub('%%', '%%%%')))
+        fspath = workspace.normalize(fspath)
+        local tail = '/' .. furi.encode(fspath):gsub('^file:[/]*', '')
+        if util.stringEndWith(uri, tail) then
+            local parentUri = files.getLibraryUri(suri, uri) or uri
+            if parentUri == nil or parentUri == '' then
+                parentUri = furi.encode '/'
+            end
+            local relative = uri:sub(#parentUri + 1):sub(1, - #tail)
+            if not strict
+            or relative == '/'
+            or relative == '' then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 files.watch(function (ev, uri)
     for _, scp in ipairs(workspace.folders) do
         scp:set('requireManager', nil)

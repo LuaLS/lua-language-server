@@ -31,13 +31,8 @@ local function checkConvert(changes, uri, renames)
         if type(name) ~= 'string' then
             return
         end
-        local uris = rpath.findUrisByRequireName(uri, name)
-        local ruri = uris and uris[1]
-        if not ruri then
-            return
-        end
         for _, rename in ipairs(renames) do
-            if rename.oldUri == ruri then
+            if rpath.isMatchedUri(uri, rename.oldUri, name) then
                 local visibles = rpath.getVisiblePath(uri, furi.decode(rename.newUri))
                 if #visibles > 0 then
                     local newName = visibles[1].name

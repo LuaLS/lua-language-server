@@ -667,6 +667,7 @@ function m.compileState(uri)
     local ws     = require 'workspace'
     local prog <close> = progress.create(uri, lang.script.WINDOW_COMPILING, 0.5)
     prog:setMessage(ws.getRelativePath(uri))
+    log.trace('Compile State:', uri)
     local clock = os.clock()
     local state, err = parser.compile(file.text
         , 'Lua'

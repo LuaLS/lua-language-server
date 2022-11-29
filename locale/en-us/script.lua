@@ -547,6 +547,10 @@ WINDOW_ASK_APPLY_LIBRARY         =
 'Do you need to configure your work environment as `{}`?'
 WINDOW_SEARCHING_IN_FILES        =
 'Searching in files...'
+WINDOW_CONFIG_LUA_DEPRECATED     =
+'`config.lua` is deprecated, please use `config.json` instead.'
+WINDOW_CONVERT_CONFIG_LUA        =
+'Convert to `config.json`'
 
 CONFIG_LOAD_FAILED               =
 'Unable to read the settings file: {}'

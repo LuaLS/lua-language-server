@@ -547,6 +547,10 @@ WINDOW_ASK_APPLY_LIBRARY         =
 '是否需要將你的工作環境配置為 `{}` ？'
 WINDOW_SEARCHING_IN_FILES        =
 '正在檔案中搜尋...'
+WINDOW_CONFIG_LUA_DEPRECATED     = -- TODO: need translate!
+'`config.lua` is deprecated, please use `config.json` instead.'
+WINDOW_CONVERT_CONFIG_LUA        = -- TODO: need translate!
+'Convert to `config.json`'
 
 CONFIG_LOAD_FAILED               =
 '無法讀取設定檔案：{}'

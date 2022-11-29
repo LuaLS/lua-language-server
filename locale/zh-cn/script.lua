@@ -547,6 +547,10 @@ WINDOW_ASK_APPLY_LIBRARY         =
 '是否需要将你的工作环境配置为 `{}` ？'
 WINDOW_SEARCHING_IN_FILES        =
 '正在文件中搜索...'
+WINDOW_CONFIG_LUA_DEPRECATED     =
+'`config.lua` 已废弃，请改用 `config.json` 。'
+WINDOW_CONVERT_CONFIG_LUA        =
+'转换为 `config.json`'
 
 CONFIG_LOAD_FAILED               =
 '无法读取设置文件：{}'

@@ -15,6 +15,7 @@ local ws      = require 'workspace.workspace'
 local scope   = require 'workspace.scope'
 local inspect = require 'inspect'
 local jsonc   = require 'jsonc'
+local json    = require 'json'
 
 local m = {}
 
@@ -275,7 +276,8 @@ local function initBuiltIn(uri)
 end
 
 ---@param libraryDir fs.path
-local function loadSingle3rdConfig(libraryDir)
+---@return table?
+local function loadSingle3rdConfigFromJson(libraryDir)
     local path = libraryDir / 'config.json'
     local configText = fsu.loadFile(path)
     if not configText then
@@ -287,6 +289,65 @@ local function loadSingle3rdConfig(libraryDir)
     end, configText)
     if not suc then
         return nil
+    end
+
+    if type(cfg) ~= 'table' then
+        log.error('config.json must be an object:', libraryDir:string())
+        return nil
+    end
+
+    return cfg
+end
+
+---@param libraryDir fs.path
+---@return table?
+local function loadSingle3rdConfigFromLua(libraryDir)
+    local path = libraryDir / 'config.lua'
+    local configText = fsu.loadFile(path)
+    if not configText then
+        return nil
+    end
+
+    local env = setmetatable({}, { __index = _G })
+    local f, err = load(configText, '@' .. libraryDir:string(), 't', env)
+    if not f then
+        log.error('Load config.lua failed at:', libraryDir:string(), err)
+        return nil
+    end
+
+    local suc = xpcall(f, function (err)
+        log.error('Load config.lua failed at:', libraryDir:string(), err)
+    end)
+
+    if not suc then
+        return nil
+    end
+
+    local cfg = {}
+    for k, v in pairs(env) do
+        cfg[k] = v
+    end
+
+    return cfg
+end
+
+---@param libraryDir fs.path
+local function loadSingle3rdConfig(libraryDir)
+    local cfg = loadSingle3rdConfigFromJson(libraryDir)
+    if not cfg then
+        cfg = loadSingle3rdConfigFromLua(libraryDir)
+        if not cfg then
+            return
+        end
+        local jsonbuf = json.beautify(cfg)
+        client.requestMessage('Info', lang.script.WINDOW_CONFIG_LUA_DEPRECATED, {
+            lang.script.WINDOW_CONVERT_CONFIG_LUA,
+        }, function (action, index)
+            if index == 1 and jsonbuf then
+                fsu.saveFile(libraryDir / 'config.json', jsonbuf)
+                fsu.fileRemove(libraryDir / 'config.lua')
+            end
+        end)
     end
 
     cfg.path = libraryDir:filename():string()

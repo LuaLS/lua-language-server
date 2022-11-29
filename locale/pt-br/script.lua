@@ -547,6 +547,10 @@ WINDOW_ASK_APPLY_LIBRARY         =
 'Você precisa configurar seu ambiente de trabalho como `{}`?'
 WINDOW_SEARCHING_IN_FILES        = -- TODO: need translate!
 'Procurando nos arquivos...'
+WINDOW_CONFIG_LUA_DEPRECATED     = -- TODO: need translate!
+'`config.lua` is deprecated, please use `config.json` instead.'
+WINDOW_CONVERT_CONFIG_LUA        = -- TODO: need translate!
+'Convert to `config.json`'
 
 CONFIG_LOAD_FAILED               =
 'Não é possível ler o arquivo de configurações: {}'

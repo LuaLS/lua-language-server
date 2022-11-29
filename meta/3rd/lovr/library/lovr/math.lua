@@ -398,7 +398,7 @@ function Mat4:equals(n) end
 ---@param up number # The top half-angle of the projection, in radians.
 ---@param down number # The bottom half-angle of the projection, in radians.
 ---@param near number # The near plane of the projection.
----@param far number # The far plane of the projection.
+---@param far? number # The far plane.  Zero is a special value that will set an infinite far plane with a reversed Z range, which improves depth buffer precision and is the default.
 ---@return lovr.Mat4 m # The original matrix.
 function Mat4:fov(left, right, up, down, near, far) end
 
@@ -411,7 +411,7 @@ function Mat4:identity() end
 ---
 ---Inverts the matrix, causing it to represent the opposite of its old transform.
 ---
----@return lovr.Mat4 m # The original matrix.
+---@return lovr.Mat4 m # The original matrix, with its values inverted.
 function Mat4:invert() end
 
 ---
@@ -467,7 +467,7 @@ function Mat4:orthographic(left, right, bottom, top, near, far) end
 ---@param fov number # The vertical field of view (in radians).
 ---@param aspect number # The horizontal aspect ratio of the projection (width / height).
 ---@param near number # The near plane.
----@param far number # The far plane.
+---@param far? number # The far plane.  Zero is a special value that will set an infinite far plane with a reversed Z range, which improves depth buffer precision and is the default.
 ---@return lovr.Mat4 m # The original matrix.
 function Mat4:perspective(fov, aspect, near, far) end
 

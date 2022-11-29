@@ -51,15 +51,21 @@ lovr.conf = nil
 lovr.draw = nil
 
 ---
----The "lovr.errhand" callback is run whenever an error occurs.
+---The `lovr.errhand` callback is run whenever an error occurs.
 ---
----It receives two parameters. The first is a string containing the error message. The second is either nil, or a string containing a traceback (as returned by "debug.traceback()"); if nil, this means "lovr.errhand" is being called in the stack where the error occurred, and it can call "debug.traceback()" itself.
+---It receives a parameter containing the error message.
 ---
----"lovr.errhand" should return a handler function to run in a loop to show the error screen. This handler function is of the same type as the one returned by "lovr.run" and has the same requirements (such as pumping events). If an error occurs while this handler is running, the program will terminate immediately-- "lovr.errhand" will not be given a second chance. Errors which occur inside "lovr.errhand" or in the handler it returns may not be cleanly reported, so be careful.
+---It should return a handler function that will run in a loop to render the error screen.
+---
+---This handler function is of the same type as the one returned by `lovr.run` and has the same requirements (such as pumping events).
+---
+---If an error occurs while this handler is running, the program will terminate immediately -- `lovr.errhand` will not be given a second chance.
+---
+---Errors which occur in the error handler or in the handler it returns may not be cleanly reported, so be careful.
 ---
 ---A default error handler is supplied that renders the error message as text to the headset and to the window.
 ---
----@type fun(message: string, traceback: string):function
+---@type fun(message: string):function
 lovr.errhand = nil
 
 ---
@@ -123,7 +129,7 @@ lovr.log = nil
 ---
 ---For example, a stereo view could be drawn instead of a single eye or a 2D HUD could be rendered.
 ---
----@type fun()
+---@type fun(pass: lovr.Pass):boolean
 lovr.mirror = nil
 
 ---
@@ -196,7 +202,7 @@ lovr.run = nil
 ---### NOTE:
 ---Some characters in UTF-8 unicode take multiple bytes to encode.
 ---
----Due to the way Lua works, the length of these strings will be bigger than 1 even though they are just a single character. `lovr.graphics.print` is compatible with UTF-8 but doing other string processing on these strings may require a library.
+---Due to the way Lua works, the length of these strings will be bigger than 1 even though they are just a single character. `Pass:text` is compatible with UTF-8 but doing other string processing on these strings may require a library.
 ---
 ---Lua 5.3+ has support for working with UTF-8 strings.
 ---

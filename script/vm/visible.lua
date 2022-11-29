@@ -4,8 +4,6 @@ local guide    = require 'parser.guide'
 local config   = require 'config'
 local glob     = require 'glob'
 
----@alias parser.visibleType 'public' | 'protected' | 'private' | 'package'
-
 ---@class parser.object
 ---@field package _visibleType? parser.visibleType
 

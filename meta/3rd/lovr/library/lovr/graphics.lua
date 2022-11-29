@@ -2080,19 +2080,17 @@ function Pass:setMeshMode(mode) end
 ---
 ---Alternatively, a projection matrix can be used for other types of projections like orthographic, oblique, etc.
 ---
----There is also a shorthand string "orthographic" that can be used to configure an orthographic projection.
----
 ---Up to 6 views are supported.
 ---
----When rendering to the headset, both projections are changed to match the ones used by the headset.
----
----This is also available by calling `lovr.headset.getViewAngles`.
+---The Pass returned by `lovr.headset.getPass` will have its views automatically configured to match the headset.
 ---
 ---
 ---### NOTE:
 ---A far clipping plane of 0.0 can be used for an infinite far plane with reversed Z range.
 ---
----This is the default.
+---This is the default because it improves depth precision and reduces Z fighting.
+---
+---Using a non-infinite far plane requires the depth buffer to be cleared to 1.0 instead of 0.0 and the default depth test to be changed to `lequal` instead of `gequal`.
 ---
 ---@overload fun(self: lovr.Pass, view: number, matrix: lovr.Mat4)
 ---@param view number # The index of the view to update.
@@ -2733,14 +2731,13 @@ function Texture:isView() end
 ---- Rendering to a particular image or mipmap level of a texture.
 ---- Binding a particular image or mipmap level to a shader.
 ---
----@param parent lovr.Texture # The parent Texture to create the view of.
 ---@param type lovr.TextureType # The texture type of the view.
 ---@param layer? number # The index of the first layer in the view.
 ---@param layerCount? number # The number of layers in the view, or `nil` to use all remaining layers.
 ---@param mipmap? number # The index of the first mipmap in the view.
 ---@param mipmapCount? number # The number of mipmaps in the view, or `nil` to use all remaining mipmaps.
 ---@return lovr.Texture view # The new texture view.
-function Texture:newView(parent, type, layer, layerCount, mipmap, mipmapCount) end
+function Texture:newView(type, layer, layerCount, mipmap, mipmapCount) end
 
 ---
 ---Controls whether premultiplied alpha is enabled.

@@ -137,6 +137,8 @@ Symbol              <-  ({} {
     end,
 })
 
+---@alias parser.visibleType 'public' | 'protected' | 'private' | 'package'
+
 ---@class parser.object
 ---@field literal           boolean
 ---@field signs             parser.object[]

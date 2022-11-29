@@ -251,12 +251,10 @@ function m.findUrisByRequireName(uri, name)
 end
 
 files.watch(function (ev, uri)
-    if ev == 'create' or ev == 'delete' then
-        for _, scp in ipairs(workspace.folders) do
-            scp:set('requireManager', nil)
-        end
-        scope.fallback:set('requireManager', nil)
+    for _, scp in ipairs(workspace.folders) do
+        scp:set('requireManager', nil)
     end
+    scope.fallback:set('requireManager', nil)
 end)
 
 config.watch(function (uri, key, value, oldValue)

@@ -109,6 +109,7 @@ m.register 'initialize' {
 
         if params.rootUri then
             workspace.initRoot(params.rootUri)
+            cap.resolve('ROOT_URI', furi.decode(params.rootUri):gsub('\\', '/') .. '/')
         end
 
         if params.workspaceFolders then
@@ -188,7 +189,10 @@ m.register 'workspace/didRenameFiles' {
                     filters = {
                         {
                             pattern = {
-                                glob = '**',
+                                glob = '{ROOT_URI}**',
+                                options = {
+                                    ignoreCase = true,
+                                }
                             },
                         },
                     },
@@ -203,7 +207,7 @@ m.register 'workspace/didRenameFiles' {
         for _, file in ipairs(params.files) do
             local oldUri = furi.normalize(file.oldUri)
             local newUri = furi.normalize(file.newUri)
-            if  files.exists(oldUri)
+            if  workspace.isValidLuaUri(oldUri)
             and workspace.isValidLuaUri(newUri) then
                 renames[#renames+1] = {
                     oldUri = oldUri,

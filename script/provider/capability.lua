@@ -11,6 +11,7 @@ require 'provider.inlay-hint'
 local m = {}
 
 m.fillings = {}
+m.resolvedMap = {}
 
 local function mergeFillings(provider)
     for _, filling in ipairs(m.fillings) do
@@ -25,6 +26,19 @@ local function mergeFillings(provider)
             else
                 provider[k] = v
             end
+        end
+    end
+end
+
+local function resolve(t)
+    for k, v in pairs(t) do
+        if type(v) == 'table' then
+            resolve(v)
+        end
+        if type(v) == 'string' then
+            t[k] = v:gsub('%{(.-)%}', function (key)
+                return m.resolvedMap[key] or ''
+            end)
         end
     end
 end
@@ -52,12 +66,17 @@ function m.getProvider()
     nonil.disable()
 
     mergeFillings(provider)
+    resolve(provider)
 
     return provider
 end
 
 function m.filling(t)
     m.fillings[#m.fillings+1] = t
+end
+
+function m.resolve(key, value)
+    m.resolvedMap[key] = value
 end
 
 return m

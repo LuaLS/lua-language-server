@@ -10,44 +10,6 @@ require 'provider.inlay-hint'
 
 local m = {}
 
-local function testFileEvents(initer)
-    initer.fileOperations = {
-        didCreate = {
-            filters = {
-                {
-                    pattern = {
-                        glob = '**',
-                        --matches = 'file',
-                        options = platform.OS == 'Windows',
-                    }
-                }
-            }
-        },
-        didDelete = {
-            filters = {
-                {
-                    pattern = {
-                        glob = '**',
-                        --matches = 'file',
-                        options = platform.OS == 'Windows',
-                    }
-                }
-            }
-        },
-        didRename = {
-            filters = {
-                {
-                    pattern = {
-                        glob = '**',
-                        --matches = 'file',
-                        options = platform.OS == 'Windows',
-                    }
-                }
-            }
-        },
-    }
-end
-
 m.fillings = {}
 
 local function mergeFillings(provider)
@@ -78,8 +40,6 @@ function m.getProvider()
             change = 2,
         },
     }
-
-    --testFileEvents()
 
     nonil.enable()
     if not client.info.capabilities.textDocument.completion.dynamicRegistration

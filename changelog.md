@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.6.4
+* `NEW` modify `require` after renaming files
 * `FIX` circulation reference in process analysis
   ```lua
   ---@type number

@@ -551,6 +551,10 @@ WINDOW_CONFIG_LUA_DEPRECATED     =
 '`config.lua` 已废弃，请改用 `config.json` 。'
 WINDOW_CONVERT_CONFIG_LUA        =
 '转换为 `config.json`'
+WINDOW_MODIFY_REQUIRE_PATH      =
+'你想要修改 `require` 的路径吗？'
+WINDOW_MODIFY_REQUIRE_OK        =
+'修改'
 
 CONFIG_LOAD_FAILED               =
 '无法读取设置文件：{}'

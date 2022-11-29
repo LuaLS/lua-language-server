@@ -391,13 +391,41 @@ function m.editText(uri, edits)
     for i, edit in ipairs(edits) do
         textEdits[i] = converter.textEdit(converter.packRange(state, edit.start, edit.finish), edit.text)
     end
-    proto.request('workspace/applyEdit', {
+    local params = {
         edit = {
             changes = {
                 [uri] = textEdits,
             }
         }
-    })
+    }
+    proto.request('workspace/applyEdit', params)
+    log.info('workspace/applyEdit', inspect(params))
+end
+
+---@alias textMultiEditor {uri: uri, start: integer, finish: integer, text: string}
+
+---@param editors textMultiEditor[]
+function m.editMultiText(editors)
+    local files = require 'files'
+    local changes = {}
+    for _, editor in ipairs(editors) do
+        local uri = editor.uri
+        local state = files.getState(uri)
+        if state then
+            if not changes[uri] then
+                changes[uri] = {}
+            end
+            local edit = converter.textEdit(converter.packRange(state, editor.start, editor.finish), editor.text)
+            table.insert(changes[uri], edit)
+        end
+    end
+    local params = {
+        edit = {
+            changes = changes,
+        }
+    }
+    proto.request('workspace/applyEdit', params)
+    log.info('workspace/applyEdit', inspect(params))
 end
 
 ---@param callback async fun(ev: string)

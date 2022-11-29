@@ -776,6 +776,9 @@ function m.eachChild(source, callback)
 end
 
 --- 获取指定的 special
+---@param ast parser.object
+---@param name string
+---@param callback fun(src: parser.object)
 function m.eachSpecialOf(ast, name, callback)
     local root = m.getRoot(ast)
     local state = root.state

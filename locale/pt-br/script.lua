@@ -551,6 +551,10 @@ WINDOW_CONFIG_LUA_DEPRECATED     = -- TODO: need translate!
 '`config.lua` is deprecated, please use `config.json` instead.'
 WINDOW_CONVERT_CONFIG_LUA        = -- TODO: need translate!
 'Convert to `config.json`'
+WINDOW_MODIFY_REQUIRE_PATH       = -- TODO: need translate!
+'Do you want to modify the require path?'
+WINDOW_MODIFY_REQUIRE_OK         = -- TODO: need translate!
+'Modify'
 
 CONFIG_LOAD_FAILED               =
 'Não é possível ler o arquivo de configurações: {}'

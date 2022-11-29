@@ -551,6 +551,10 @@ WINDOW_CONFIG_LUA_DEPRECATED     =
 '`config.lua` is deprecated, please use `config.json` instead.'
 WINDOW_CONVERT_CONFIG_LUA        =
 'Convert to `config.json`'
+WINDOW_MODIFY_REQUIRE_PATH       =
+'Do you want to modify the require path?'
+WINDOW_MODIFY_REQUIRE_OK         =
+'Modify'
 
 CONFIG_LOAD_FAILED               =
 'Unable to read the settings file: {}'

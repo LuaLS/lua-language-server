@@ -180,59 +180,51 @@ m.register 'workspace/didChangeConfiguration' {
     end
 }
 
-m.register 'workspace/didCreateFiles' {
-    ---@async
-    function (params)
-        log.debug('workspace/didCreateFiles', inspect(params))
-        for _, file in ipairs(params.files) do
-            if workspace.isValidLuaUri(file.uri) then
-                files.setText(file.uri, util.loadFile(furi.decode(file.uri)), false)
-            end
-        end
-    end
-}
-
-m.register 'workspace/didDeleteFiles' {
-    function (params)
-        log.debug('workspace/didDeleteFiles', inspect(params))
-        for _, file in ipairs(params.files) do
-            files.remove(file.uri)
-            local childs = files.getChildFiles(file.uri)
-            for _, uri in ipairs(childs) do
-                log.debug('workspace/didDeleteFiles#child', uri)
-                files.remove(uri)
-            end
-        end
-    end
-}
-
 m.register 'workspace/didRenameFiles' {
+    capability = {
+        workspace = {
+            fileOperations = {
+                didRename = {
+                    filters = {
+                        {
+                            pattern = {
+                                glob = '**',
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
     ---@async
     function (params)
         log.debug('workspace/didRenameFiles', inspect(params))
+        local renames = {}
         for _, file in ipairs(params.files) do
-            local text = files.getOriginText(file.oldUri)
-            if text then
-                files.remove(file.oldUri)
-                if workspace.isValidLuaUri(file.newUri) then
-                    files.setText(file.newUri, text, false)
-                end
+            local oldUri = furi.normalize(file.oldUri)
+            local newUri = furi.normalize(file.newUri)
+            if  files.exists(oldUri)
+            and workspace.isValidLuaUri(newUri) then
+                renames[#renames+1] = {
+                    oldUri = oldUri,
+                    newUri = newUri,
+                }
             end
-            local childs = files.getChildFiles(file.oldUri)
+            local childs = files.getChildFiles(oldUri)
             for _, uri in ipairs(childs) do
-                local ctext = files.getOriginText(uri)
-                if ctext then
+                if files.exists(uri) then
                     local ouri = uri
-                    local tail = ouri:sub(#file.oldUri)
+                    local tail = ouri:sub(#oldUri)
                     local nuri = file.newUri .. tail
-                    log.debug('workspace/didRenameFiles#child', ouri, nuri)
-                    files.remove(uri)
-                    if workspace.isValidLuaUri(nuri) then
-                        files.setText(nuri, text, false)
-                    end
+                    renames[#renames+1] = {
+                        oldUri = ouri,
+                        newUri = nuri,
+                    }
                 end
             end
         end
+        local core = require 'core.modifyRequirePath'
+        core(renames)
     end
 }
 

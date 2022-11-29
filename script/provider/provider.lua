@@ -866,11 +866,13 @@ m.register 'textDocument/codeAction' {
         },
     },
     abortByFileUpdate = true,
+    ---@async
     function (params)
         local core        = require 'core.code-action'
         local uri         = files.getRealUri(params.textDocument.uri)
         local range       = params.range
         local diagnostics = params.context.diagnostics
+        workspace.awaitReady(uri)
 
         local state = files.getState(uri)
         if not state then

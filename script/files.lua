@@ -665,6 +665,10 @@ function m.compileState(uri)
     }
 
     local ws     = require 'workspace'
+    local client = require 'client'
+    if not client.isReady() then
+        log.error('Client not ready!', uri)
+    end
     local prog <close> = progress.create(uri, lang.script.WINDOW_COMPILING, 0.5)
     prog:setMessage(ws.getRelativePath(uri))
     log.trace('Compile State:', uri)

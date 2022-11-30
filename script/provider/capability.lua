@@ -40,6 +40,9 @@ local function resolve(t)
                 return m.resolvedMap[key] or ''
             end)
         end
+        if type(v) == 'function' then
+            t[k] = v()
+        end
     end
 end
 

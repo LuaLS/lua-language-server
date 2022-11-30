@@ -109,7 +109,7 @@ m.register 'initialize' {
 
         if params.rootUri then
             workspace.initRoot(params.rootUri)
-            cap.resolve('ROOT_URI', furi.decode(params.rootUri):gsub('\\', '/') .. '/')
+            cap.resolve('ROOT_PATH', furi.decode(params.rootUri):gsub('\\', '/') .. '/')
         end
 
         if params.workspaceFolders then
@@ -186,16 +186,21 @@ m.register 'workspace/didRenameFiles' {
         workspace = {
             fileOperations = {
                 didRename = {
-                    filters = {
-                        {
-                            pattern = {
-                                glob = '{ROOT_URI}**',
-                                options = {
-                                    ignoreCase = true,
-                                }
-                            },
-                        },
-                    },
+                    filters = function ()
+                        local filters = {}
+                        for i, scp in ipairs(workspace.folders) do
+                            local path = furi.decode(scp.uri):gsub('\\', '/')
+                            filters[i] = {
+                                pattern = {
+                                    glob = path .. '/**',
+                                    options = {
+                                        ignoreCase = true,
+                                    }
+                                },
+                            }
+                        end
+                        return filters
+                    end
                 },
             },
         },

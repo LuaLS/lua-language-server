@@ -81,6 +81,7 @@ local function checkOperators(operators, op, value, result)
             result = vm.createNode()
         end
         result:merge(vm.compileNode(operator.extends))
+        break
         ::CONTINUE::
     end
     return result

@@ -3974,3 +3974,29 @@ if x == 0.1 then
     print(<?x?>)
 end
 ]]
+
+TEST 'vec3' [[
+---@class mat4
+---@operator mul(vec3): vec3 -- matrix * vector
+---@operator mul(number): mat4 -- matrix * constant
+
+---@class vec3: number
+
+---@type mat4, vec3
+local m, v
+
+local <?r?> = m * v
+]]
+
+TEST 'mat4' [[
+---@class mat4
+---@operator mul(number): mat4 -- matrix * constant
+---@operator mul(vec3): vec3 -- matrix * vector
+
+---@class vec3: number
+
+---@type mat4, vec3
+local m, v
+
+local <?r?> = m * v
+]]

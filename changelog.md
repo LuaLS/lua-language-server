@@ -1,5 +1,10 @@
 # changelog
 
+## 3.6.5
+* `FIX` [#1729]
+
+[#1729]: https://github.com/sumneko/lua-language-server/issues/1729
+
 `2022-11-29`
 ## 3.6.4
 * `NEW` modify `require` after renaming files

@@ -53,6 +53,9 @@ lclient():start(function (client)
     local disables = util.arrayToHash(config.get(rootUri, 'Lua.diagnostics.disable'))
     for name, serverity in pairs(define.DiagnosticDefaultSeverity) do
         serverity = config.get(rootUri, 'Lua.diagnostics.severity')[name] or 'Warning'
+        if serverity:sub(-1) == '!' then
+            serverity = serverity:sub(1, -2)
+        end
         if define.DiagnosticSeverity[serverity] > checkLevel then
             disables[name] = true
         end

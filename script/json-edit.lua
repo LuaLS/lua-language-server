@@ -1,3 +1,5 @@
+---@diagnostic disable: param-type-mismatch
+
 local type = type
 local next = next
 local error = error

@@ -204,12 +204,15 @@ end
 ---@field global?   boolean
 ---@field uri?      uri
 
----@param uri uri
+---@param uri uri?
 ---@param changes config.change[]
 ---@return config.change[]
 local function getValidChanges(uri, changes)
-    local scp = scope.getScope(uri)
     local newChanges = {}
+    if not uri then
+        return changes
+    end
+    local scp = scope.getScope(uri)
     for _, change in ipairs(changes) do
         if scp:isChildUri(change.uri)
         or scp:isLinkedUri(change.uri) then
@@ -429,6 +432,9 @@ function m.setConfig(changes, onlyMemory)
     xpcall(function ()
         local ws = require 'workspace'
         if #ws.folders == 0 then
+            if tryModifySpecifiedConfig(nil, finalChanges) then
+                return
+            end
             tryModifyClient(nil, finalChanges)
             return
         end

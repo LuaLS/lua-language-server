@@ -23,8 +23,13 @@ local fs         = require 'bee.filesystem'
 
 require 'library'
 
+---@class provider
+local m = {}
+
+m.attributes = {}
+
 ---@async
-local function updateConfig(uri)
+function m.updateConfig(uri)
     config.addNullSymbol(json.null)
     local specified = cfgLoader.loadLocalConfig(uri, CONFIGPATH)
     if specified then
@@ -58,11 +63,6 @@ local function updateConfig(uri)
     config.update(scope.fallback, global)
 end
 
----@class provider
-local m = {}
-
-m.attributes = {}
-
 function m.register(method)
     return function (attrs)
         m.attributes[method] = attrs
@@ -81,7 +81,7 @@ filewatch.event(function (ev, path) ---@async
         for _, scp in ipairs(workspace.folders) do
             local configPath = workspace.getAbsolutePath(scp.uri, CONFIGPATH)
             if path == configPath then
-                updateConfig(scp.uri)
+                m.updateConfig(scp.uri)
             end
         end
     end
@@ -89,7 +89,7 @@ filewatch.event(function (ev, path) ---@async
         for _, scp in ipairs(workspace.folders) do
             local rcPath     = workspace.getAbsolutePath(scp.uri, '.luarc.json')
             if path == rcPath then
-                updateConfig(scp.uri)
+                m.updateConfig(scp.uri)
             end
         end
     end
@@ -97,7 +97,7 @@ filewatch.event(function (ev, path) ---@async
         for _, scp in ipairs(workspace.folders) do
             local rcPath     = workspace.getAbsolutePath(scp.uri, '.luarc.jsonc')
             if path == rcPath then
-                updateConfig(scp.uri)
+                m.updateConfig(scp.uri)
             end
         end
     end
@@ -136,7 +136,7 @@ m.register 'initialized'{
     function (params)
         files.init()
         local _ <close> = progress.create(workspace.getFirstScope().uri, lang.script.WINDOW_INITIALIZING, 0.5)
-        updateConfig()
+        m.updateConfig()
         local registrations = {}
 
         if client.getAbility 'workspace.didChangeConfiguration.dynamicRegistration' then
@@ -177,7 +177,7 @@ m.register 'workspace/didChangeConfiguration' {
         if CONFIGPATH then
             return
         end
-        updateConfig()
+        m.updateConfig()
     end
 }
 
@@ -251,7 +251,7 @@ m.register 'workspace/didChangeWorkspaceFolders' {
         log.debug('workspace/didChangeWorkspaceFolders', inspect(params))
         for _, folder in ipairs(params.event.added) do
             workspace.create(folder.uri)
-            updateConfig()
+            m.updateConfig()
             workspace.reload(scope.getScope(folder.uri))
         end
         for _, folder in ipairs(params.event.removed) do
@@ -1576,3 +1576,5 @@ files.watch(function (ev, uri)
         end
     end
 end)
+
+return m

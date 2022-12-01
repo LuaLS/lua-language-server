@@ -4,7 +4,7 @@ local ws       = require 'workspace'
 local files    = require 'files'
 local diag     = require 'provider.diagnostic'
 local util     = require 'utility'
-local json     = require 'json-beautify'
+local jsonb    = require 'json-beautify'
 local lang     = require 'language'
 local define   = require 'proto.define'
 local config   = require 'config.config'
@@ -93,7 +93,7 @@ if count == 0 then
     print(lang.script('CLI_CHECK_SUCCESS'))
 else
     local outpath = LOGPATH .. '/check.json'
-    util.saveFile(outpath, json.beautify(results))
+    util.saveFile(outpath, jsonb.beautify(results))
 
     print(lang.script('CLI_CHECK_RESULTS', count, outpath))
 end

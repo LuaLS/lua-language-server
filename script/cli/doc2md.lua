@@ -1,12 +1,14 @@
 -- This is an example of how to process the generated `doc.json` file.
 -- You can use it to generate a markdown file or a html file.
 
-local json     = require 'json'
+local jsonc    = require 'jsonc'
 local util     = require 'utility'
 local markdown = require 'provider.markdown'
 
-local doc = json.decode(util.loadFile(LOGPATH .. '/doc.json'))
+local doc = jsonc.decode_jsonc(util.loadFile(LOGPATH .. '/doc.json'))
 local md  = markdown()
+
+assert(type(doc) == 'table')
 
 for _, class in ipairs(doc) do
     md:add('md', '# ' .. class.name)

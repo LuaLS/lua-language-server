@@ -3,7 +3,7 @@ local furi     = require 'file-uri'
 local ws       = require 'workspace'
 local files    = require 'files'
 local util     = require 'utility'
-local json     = require 'json-beautify'
+local jsonb    = require 'json-beautify'
 local lang     = require 'language'
 local define   = require 'proto.define'
 local config   = require 'config.config'
@@ -258,7 +258,7 @@ lclient():start(function (client)
 end)
 
 local outpath = LOGPATH .. '/doc.json'
-json.supportSparseArray = true
-util.saveFile(outpath, json.beautify(results))
+jsonb.supportSparseArray = true
+util.saveFile(outpath, jsonb.beautify(results))
 
 require 'cli.doc2md'

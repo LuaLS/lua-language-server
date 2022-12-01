@@ -1,11 +1,12 @@
 local files     = require 'files'
-local json      = require 'jsonc'
 local util      = require 'utility'
 local proto     = require 'proto'
 local define    = require 'proto.define'
 local lang      = require 'language'
 local converter = require 'proto.converter'
 local guide     = require 'parser.guide'
+local json      = require 'json'
+local jsonc     = require 'jsonc'
 
 ---@async
 return function (data)
@@ -17,7 +18,7 @@ return function (data)
     local start    = guide.positionToOffset(state, data.start)
     local finish   = guide.positionToOffset(state, data.finish)
     local jsonStr  = text:sub(start + 1, finish)
-    local suc, res = pcall(json.decode, jsonStr:match '[%{%[].+')
+    local suc, res = pcall(jsonc.decode_jsonc, jsonStr:match '[%{%[].+')
     if not suc or res == json.null then
         proto.notify('window/showMessage', {
             type     = define.MessageType.Warning,

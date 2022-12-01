@@ -13,6 +13,9 @@ local time   = require 'bee.time'
 local fw     = require 'filewatch'
 local furi   = require 'file-uri'
 
+require 'jsonc'
+require 'json-beautify'
+
 ---@class service
 local m = {}
 m.type = 'service'

@@ -9,13 +9,12 @@ local fsu     = require 'fs-utility'
 local define  = require "proto.define"
 local files   = require 'files'
 local await   = require 'await'
-local timer   = require 'timer'
 local encoder = require 'encoder'
 local ws      = require 'workspace.workspace'
 local scope   = require 'workspace.scope'
 local inspect = require 'inspect'
+local jsonb   = require 'json-beautify'
 local jsonc   = require 'jsonc'
-local json    = require 'json'
 
 local m = {}
 
@@ -284,7 +283,7 @@ local function loadSingle3rdConfigFromJson(libraryDir)
         return nil
     end
 
-    local suc, cfg = xpcall(jsonc.decode, function (err)
+    local suc, cfg = xpcall(jsonc.decode_jsonc, function (err)
         log.error('Decode config.json failed at:', libraryDir:string(), err)
     end, configText)
     if not suc then
@@ -339,7 +338,7 @@ local function loadSingle3rdConfig(libraryDir)
         if not cfg then
             return
         end
-        local jsonbuf = json.beautify(cfg)
+        local jsonbuf = jsonb.beautify(cfg)
         client.requestMessage('Info', lang.script.WINDOW_CONFIG_LUA_DEPRECATED, {
             lang.script.WINDOW_CONVERT_CONFIG_LUA,
         }, function (action, index)

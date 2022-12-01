@@ -6,7 +6,7 @@ local proto     = require 'proto'
 local define    = require 'proto.define'
 local config    = require 'config'
 local converter = require 'proto.converter'
-local json      = require 'json-beautify'
+local jsonb     = require 'json-beautify'
 local await     = require 'await'
 local scope     = require 'workspace.scope'
 local inspect   = require 'inspect'
@@ -243,7 +243,7 @@ local function tryModifySpecifiedConfig(uri, finalChanges)
     if not path then
         return false
     end
-    util.saveFile(path, json.beautify(scp:get('lastLocalConfig'), { indent = '    ' }))
+    util.saveFile(path, jsonb.beautify(scp:get('lastLocalConfig'), { indent = '    ' }))
     return true
 end
 
@@ -274,7 +274,7 @@ local function tryModifyRC(uri, finalChanges, create)
     if not suc then
         return false
     end
-    util.saveFile(path, json.beautify(rc, { indent = '    ' }))
+    util.saveFile(path, jsonb.beautify(rc, { indent = '    ' }))
     return true
 end
 

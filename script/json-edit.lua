@@ -425,7 +425,7 @@ local function query_(ast, pathlst, n)
         end
     end
     if n == #pathlst then
-        return data, k, isarray
+        return ast, k, isarray
     end
     return query_(data[k], pathlst, n + 1)
 end
@@ -499,6 +499,19 @@ local function apply_array_insert_after(str, option, value, node)
         .. finish_text
 end
 
+local function apply_array_insert_empty(str, option, value, node)
+    local start_text = str:sub(1, node.s)
+    local finish_text = str:sub(node.f-1)
+    option.depth = option.depth + node.d + 1
+    return start_text
+        .. option.newline
+        .. string_rep(option.indent, option.depth)
+        .. json.beautify(value, option)
+        .. option.newline
+        .. string_rep(option.indent, option.depth-1)
+        .. finish_text
+end
+
 local function apply_replace(str, option, value, node)
     local start_text = str:sub(1, node.s-1)
     local finish_text = str:sub(node.f)
@@ -509,7 +522,7 @@ local function apply_replace(str, option, value, node)
 end
 
 local function apply_object_insert(str, option, value, t, k)
-    local node = find_max_node(t)
+    local node = find_max_node(t.v)
     if node then
         local start_text = str:sub(1, node.f-1)
         local finish_text = str:sub(node.f)
@@ -522,6 +535,20 @@ local function apply_object_insert(str, option, value, t, k)
             .. json._encode_string(k)
             .. '": '
             .. json.beautify(value, option)
+            .. finish_text
+    else
+        local start_text = str:sub(1, t.s)
+        local finish_text = str:sub(t.f-1)
+        option.depth = option.depth + t.d + 1
+        return start_text
+            .. option.newline
+            .. string_rep(option.indent, option.depth)
+            .. '"'
+            .. json._encode_string(k)
+            .. '": '
+            .. json.beautify(value, option)
+            .. option.newline
+            .. string_rep(option.indent, option.depth-1)
             .. finish_text
     end
 end
@@ -553,14 +580,16 @@ function OP.add(str, option, path, value)
         return
     end
     if isarray then
-        if t[k] then
-            return apply_array_insert_before(str, option, value, t[k])
+        if t.v[k] then
+            return apply_array_insert_before(str, option, value, t.v[k])
+        elseif k == 1 then
+            return apply_array_insert_empty(str, option, value, t)
         else
-            return apply_array_insert_after(str, option, value, t[k-1])
+            return apply_array_insert_after(str, option, value, t.v[k-1])
         end
     else
-        if t[k] then
-            return apply_replace(str, option, value, t[k])
+        if t.v[k] then
+            return apply_replace(str, option, value, t.v[k])
         else
             return apply_object_insert(str, option, value, t, k)
         end
@@ -577,15 +606,15 @@ function OP.remove(str, _, path)
         return
     end
     if isarray then
-        if k > #t then
+        if k > #t.v then
             return
         end
-        return apply_remove(str, t[k].s, t[k].f)
+        return apply_remove(str, t.v[k].s, t.v[k].f)
     else
-        if t[k] == nil then
+        if t.v[k] == nil then
             return
         end
-        return apply_remove(str, t[k].key_s, t[k].f)
+        return apply_remove(str, t.v[k].key_s, t.v[k].f)
     end
 end
 
@@ -601,11 +630,15 @@ function OP.replace(str, option, path, value)
     if not t then
         return
     end
-    if t[k] then
-        return apply_replace(str, option, value, t[k])
+    if t.v[k] then
+        return apply_replace(str, option, value, t.v[k])
     else
         if isarray then
-            return apply_array_insert_after(str, option, value, t[k-1])
+            if k == 1 then
+                return apply_array_insert_empty(str, option, value, t)
+            else
+                return apply_array_insert_after(str, option, value, t.v[k-1])
+            end
         else
             return apply_object_insert(str, option, value, t, k)
         end
@@ -618,7 +651,7 @@ local function edit(str, patch, option)
         return
     end
     option = json.beautify_option(option)
-    return f(str, option, patch.path, patch.data)
+    return f(str, option, patch.path, patch.value)
 end
 
 json.edit = edit

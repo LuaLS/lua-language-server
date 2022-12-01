@@ -225,21 +225,19 @@ end
 ---@class json.patch
 ---@field op 'add' | 'remove' | 'replace' | 'move' | 'copy' | 'test'
 ---@field path string
----@field data any
+---@field value any
 
 ---@param cfg table
 ---@param change config.change
 ---@return json.patch?
 local function makeConfigPatch(cfg, change)
-    local value     = cfg[change.key]
-    local parent    = cfg
-    local parentKey = ''
+    local value = cfg[change.key]
     if change.action == 'add' then
         if type(value) == 'table' and #cfg[change.key] > 0 then
             return {
-                op   = 'add',
-                path = '/' .. change.key .. '/-',
-                data = change.value,
+                op    = 'add',
+                path  = '/' .. change.key .. '/-',
+                value = change.value,
             }
         else
             return makeConfigPatch(cfg, {
@@ -249,35 +247,25 @@ local function makeConfigPatch(cfg, change)
             })
         end
     elseif change.action == 'set' then
-        if next(parent) then
-            if value ~= nil then
-                return {
-                    op   = 'replace',
-                    path = '/' .. change.key,
-                    data = change.value,
-                }
-            else
-                return {
-                    op   = 'add',
-                    path = '/' .. change.key,
-                    data = change.value,
-                }
-            end
-        else
-            -- TODO: workaround, json-edit cannot edit an empty object
+        if value ~= nil then
             return {
-                op   = 'add',
-                path = parentKey,
-                data = { [change.key] = change.value },
+                op    = 'replace',
+                path  = '/' .. change.key,
+                value = change.value,
+            }
+        else
+            return {
+                op    = 'add',
+                path  = '/' .. change.key,
+                value = change.value,
             }
         end
     elseif change.action == 'prop' then
-        if type(value) == 'table' and #value == 0 and next(value) then
-            -- TODO: workaround, json-edit cannot edit an empty object
+        if type(value) == 'table' and #value == 0 then
             return {
-                op   = 'add',
-                path = '/' .. change.key .. '/' .. change.prop,
-                data = change.value,
+                op    = 'add',
+                path  = '/' .. change.key .. '/' .. change.prop,
+                value = change.value,
             }
         else
             return makeConfigPatch(cfg, {

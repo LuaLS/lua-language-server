@@ -13,40 +13,79 @@ local smerger  = require 'string-merger'
 local progress = require "progress"
 local encoder  = require 'encoder'
 local scope    = require 'workspace.scope'
+local lazy     = require 'lazytable'
+local cacher   = require 'lazy-cacher'
+local sp       = require 'bee.subprocess'
+local pub      = require 'pub'
+
+---@class file
+---@field uri          uri
+---@field content      string
+---@field ref?         integer
+---@field trusted?     boolean
+---@field rows?        integer[]
+---@field originText?  string
+---@field text         string
+---@field version?     integer
+---@field originLines? integer[]
+---@field state?       parser.state
+---@field diffInfo?    table[]
+---@field cache        table
+---@field id           integer
 
 ---@class files
+---@field lazyCache?   lazy-cacher
 local m = {}
 
 m.watchList      = {}
 m.notifyCache    = {}
 m.assocVersion   = -1
-m.assocMatcher   = nil
 
 function m.reset()
     m.openMap        = {}
+    ---@type table<string, file>
     m.fileMap        = {}
     m.dllMap         = {}
     m.visible        = {}
     m.globalVersion  = 0
     m.fileCount      = 0
     m.astCount       = 0
-    m.astMap         = {}
 end
 
 m.reset()
 
+local fileID = util.counter()
+
 local uriMap = {}
+
+---@param path fs.path
+---@return fs.path
+local function getRealParent(path)
+    local parent = path:parent_path()
+    if parent:string():gsub('^%w+:', string.lower)
+    == path  :string():gsub('^%w+:', string.lower) then
+        return path
+    end
+    local res = fs.fullpath(path)
+    return getRealParent(parent) / res:filename()
+end
+
 -- 获取文件的真实uri，但不穿透软链接
 ---@param uri uri
 ---@return uri
 function m.getRealUri(uri)
-    local filename = furi.decode(uri)
-    local path = fs.path(filename)
-    local suc, res = pcall(fs.exists, path)
-    if not suc or not res then
+    if platform.OS ~= 'Windows' then
         return uri
     end
-    suc, res = pcall(fs.canonical, path)
+    local filename = furi.decode(uri)
+    -- normalize uri
+    uri = furi.encode(filename)
+    local path = fs.path(filename)
+    local suc, exists = pcall(fs.exists, path)
+    if not suc or not exists then
+        return uri
+    end
+    local suc, res = pcall(fs.canonical, path)
     if not suc then
         return uri
     end
@@ -55,11 +94,16 @@ function m.getRealUri(uri)
     if uri == ruri then
         return ruri
     end
-    if not uriMap[ruri] then
-        uriMap[ruri] = uri
+    local real = getRealParent(path:parent_path()) / res:filename()
+    ruri = furi.encode(real:string())
+    if uri == ruri then
+        return ruri
+    end
+    if not uriMap[uri] then
+        uriMap[uri] = true
         log.warn(('Fix real file uri: %s -> %s'):format(uri, ruri))
     end
-    return uriMap[ruri]
+    return ruri
 end
 
 --- 打开文件
@@ -81,7 +125,7 @@ function m.close(uri)
     end
     m.onWatch('close', uri)
     if file then
-        if (file._ref or 0) <= 0 and not m.isOpen(uri) then
+        if (file.ref or 0) <= 0 and not m.isOpen(uri) then
             m.remove(uri)
         end
     end
@@ -123,6 +167,7 @@ function m.isLibrary(uri, excludeFolder)
 end
 
 --- 获取库文件的根目录
+---@return uri?
 function m.getLibraryUri(suri, uri)
     local scp = scope.getScope(suri)
     return scp:getLinkedUri(uri)
@@ -134,9 +179,12 @@ function m.exists(uri)
     return m.fileMap[uri] ~= nil
 end
 
+---@param file file
+---@param text string
+---@return string
 local function pluginOnSetText(file, text)
     local plugin   = require 'plugin'
-    file._diffInfo = nil
+    file.diffInfo = nil
     local suc, result = plugin.dispatch('OnSetText', file.uri, text)
     if not suc then
         if DEVELOP and result then
@@ -150,7 +198,7 @@ local function pluginOnSetText(file, text)
         local diffs
         suc, result, diffs = xpcall(smerger.mergeDiff, log.error, text, result)
         if suc then
-            file._diffInfo = diffs
+            file.diffInfo = diffs
             file.originLines = parser.lines(text)
             return result
         else
@@ -164,7 +212,7 @@ end
 
 --- 设置文件文本
 ---@param uri uri
----@param text string
+---@param text? string
 ---@param isTrust? boolean
 ---@param callback? function
 function m.setText(uri, text, isTrust, callback)
@@ -181,6 +229,7 @@ function m.setText(uri, text, isTrust, callback)
     if not m.fileMap[uri] then
         m.fileMap[uri] = {
             uri = uri,
+            id  = fileID(),
         }
         m.fileCount = m.fileCount + 1
         create = true
@@ -200,13 +249,14 @@ function m.setText(uri, text, isTrust, callback)
     if file.originText == text then
         return
     end
+    local clock = os.clock()
     local newText = pluginOnSetText(file, text)
     file.text       = newText
     file.trusted    = isTrust
     file.originText = text
     file.rows       = nil
     file.words      = nil
-    m.astMap[uri]   = nil
+    file.state      = nil
     file.cache = {}
     file.cacheActiveTime = math.huge
     m.globalVersion = m.globalVersion + 1
@@ -222,6 +272,7 @@ function m.setText(uri, text, isTrust, callback)
             util.saveFile(LOGPATH .. '/diffed.lua', newText)
         end
     end
+    log.trace('Set text:', uri, 'takes', os.clock() - clock, 'sec.')
 
     --if instance or TEST then
     --else
@@ -238,6 +289,9 @@ end
 
 function m.resetText(uri)
     local file = m.fileMap[uri]
+    if not file then
+        return
+    end
     local originText = file.originText
     file.originText = nil
     m.setText(uri, originText, file.trusted)
@@ -250,7 +304,7 @@ function m.setRawText(uri, text)
     local file = m.fileMap[uri]
     file.text             = text
     file.originText       = text
-    m.astMap[uri]         = nil
+    file.state            = nil
 end
 
 function m.getCachedRows(uri)
@@ -320,7 +374,7 @@ end
 
 --- 获取文件文本
 ---@param uri uri
----@return string text
+---@return string? text
 function m.getText(uri)
     local file = m.fileMap[uri]
     if not file then
@@ -331,7 +385,7 @@ end
 
 --- 获取文件原始文本
 ---@param uri uri
----@return string text
+---@return string? text
 function m.getOriginText(uri)
     local file = m.fileMap[uri]
     if not file then
@@ -340,14 +394,22 @@ function m.getOriginText(uri)
     return file.originText
 end
 
+---@param uri uri
+---@param text string
+function m.setOriginText(uri, text)
+    local file = m.fileMap[uri]
+    if not file then
+        return
+    end
+    file.originText = text
+end
+
 --- 获取文件原始行表
 ---@param uri uri
 ---@return integer[]
 function m.getOriginLines(uri)
     local file = m.fileMap[uri]
-    if not file then
-        return nil
-    end
+    assert(file, 'file not exists:' .. uri)
     return file.originLines
 end
 
@@ -369,8 +431,8 @@ function m.addRef(uri)
     if not file then
         return nil
     end
-    file._ref = (file._ref or 0) + 1
-    log.debug('add ref', uri)
+    file.ref = (file.ref or 0) + 1
+    log.debug('add ref', uri, file.ref)
     return function ()
         m.delRef(uri)
     end
@@ -381,9 +443,9 @@ function m.delRef(uri)
     if not file then
         return
     end
-    file._ref = (file._ref or 0) - 1
-    log.debug('del ref', uri)
-    if file._ref <= 0 and not m.isOpen(uri) then
+    file.ref = (file.ref or 0) - 1
+    log.debug('del ref', uri, file.ref)
+    if file.ref <= 0 and not m.isOpen(uri) then
         m.remove(uri)
     end
 end
@@ -396,7 +458,6 @@ function m.remove(uri)
         return
     end
     m.fileMap[uri]        = nil
-    m.astMap[uri]         = nil
     m._pairsCache         = nil
 
     m.fileCount     = m.fileCount - 1
@@ -421,6 +482,7 @@ function m.getAllUris(suri)
             files[i] = uri
         end
     end
+    table.sort(files)
     return files
 end
 
@@ -444,7 +506,6 @@ function m.eachFile(suri)
 end
 
 --- Pairs dll files
----@return function
 function m.eachDll()
     local map = {}
     for uri, file in pairs(m.dllMap) do
@@ -453,12 +514,70 @@ function m.eachDll()
     return pairs(map)
 end
 
-function m.compileState(uri, text)
+function m.getLazyCache()
+    if not m.lazyCache then
+        local cachePath = string.format('%s/cache/%d'
+            , LOGPATH
+            , sp.get_id()
+        )
+        m.lazyCache = cacher(cachePath, log.error)
+    end
+    return m.lazyCache
+end
+
+---@param state parser.state
+---@param file file
+function m.compileStateThen(state, file)
+    file.state = state
+
+    state.uri = file.uri
+    state.lua = file.text
+    state.ast.uri = file.uri
+    state.diffInfo   = file.diffInfo
+    state.originLines = file.originLines
+    state.originText  = file.originText
+
+    local clock = os.clock()
+    parser.luadoc(state)
+    local passed = os.clock() - clock
+    if passed > 0.1 then
+        log.warn(('Parse LuaDoc of [%s] takes [%.3f] sec, size [%.3f] kb.'):format(file.uri, passed, #file.text / 1000))
+    end
+
+    if LAZY and not file.trusted then
+        local cache = m.getLazyCache()
+        local id = ('%d'):format(file.id)
+        clock = os.clock()
+        state = lazy.build(state, cache:writterAndReader(id)):entry()
+        passed = os.clock() - clock
+        if passed > 0.1 then
+            log.warn(('Convert lazy-table for [%s] takes [%.3f] sec, size [%.3f] kb.'):format(file.uri, passed, #file.text / 1000))
+        end
+    else
+        m.astCount = m.astCount + 1
+        local removed
+        setmetatable(state, {__gc = function ()
+            if removed then
+                return
+            end
+            removed = true
+            m.astCount = m.astCount - 1
+        end})
+    end
+end
+
+---@param uri uri
+---@return boolean
+function m.checkPreload(uri)
+    local file = m.fileMap[uri]
+    if not file then
+        return false
+    end
     local ws     = require 'workspace'
     local client = require 'client'
     if  not m.isOpen(uri)
     and not m.isLibrary(uri)
-    and #text >= config.get(uri, 'Lua.workspace.preloadFileSize') * 1000 then
+    and #file.text >= config.get(uri, 'Lua.workspace.preloadFileSize') * 1000 then
         if not m.notifyCache['preloadFileSize'] then
             m.notifyCache['preloadFileSize'] = {}
             m.notifyCache['skipLargeFileCount'] = 0
@@ -469,7 +588,7 @@ function m.compileState(uri, text)
             local message = lang.script('WORKSPACE_SKIP_LARGE_FILE'
                         , ws.getRelativePath(uri)
                         , config.get(uri, 'Lua.workspace.preloadFileSize')
-                        , #text / 1000
+                        , #file.text / 1000
                     )
             if m.notifyCache['skipLargeFileCount'] <= 1 then
                 client.showMessage('Info', message)
@@ -477,66 +596,117 @@ function m.compileState(uri, text)
                 client.logMessage('Info', message)
             end
         end
-        return nil
+        return false
+    end
+    return true
+end
+
+---@param uri uri
+---@param callback fun(state: parser.state?)
+function m.compileStateAsync(uri, callback)
+    local file = m.fileMap[uri]
+    if not file then
+        callback(nil)
+        return
+    end
+    if file.state then
+        callback(file.state)
+        return
+    end
+
+    ---@type brave.param.compile.options
+    local options = {
+        special           = config.get(uri, 'Lua.runtime.special'),
+        unicodeName       = config.get(uri, 'Lua.runtime.unicodeName'),
+        nonstandardSymbol = util.arrayToHash(config.get(uri, 'Lua.runtime.nonstandardSymbol')),
+    }
+
+    ---@type brave.param.compile
+    local params = {
+        uri     = uri,
+        text    = file.text,
+        mode    = 'Lua',
+        version = config.get(uri, 'Lua.runtime.version'),
+        options = options
+    }
+    pub.task('compile', params, function (result)
+        if file.text ~= params.text then
+            return
+        end
+        if not result.state then
+            log.error('Compile failed:', uri, result.err)
+            callback(nil)
+            return
+        end
+        m.compileStateThen(result.state, file)
+        callback(result.state)
+    end)
+end
+
+---@param uri uri
+---@return parser.state?
+function m.compileState(uri)
+    local file = m.fileMap[uri]
+    if not file then
+        return
+    end
+    if file.state then
+        return file.state
+    end
+    if not m.checkPreload(uri) then
+        return
+    end
+
+    ---@type brave.param.compile.options
+    local options = {
+        special           = config.get(uri, 'Lua.runtime.special'),
+        unicodeName       = config.get(uri, 'Lua.runtime.unicodeName'),
+        nonstandardSymbol = util.arrayToHash(config.get(uri, 'Lua.runtime.nonstandardSymbol')),
+    }
+
+    local ws     = require 'workspace'
+    local client = require 'client'
+    if not client.isReady() then
+        log.error('Client not ready!', uri)
     end
     local prog <close> = progress.create(uri, lang.script.WINDOW_COMPILING, 0.5)
     prog:setMessage(ws.getRelativePath(uri))
+    log.trace('Compile State:', uri)
     local clock = os.clock()
-    local state, err = parser.compile(text
+    local state, err = parser.compile(file.text
         , 'Lua'
         , config.get(uri, 'Lua.runtime.version')
-        , {
-            special           = config.get(uri, 'Lua.runtime.special'),
-            unicodeName       = config.get(uri, 'Lua.runtime.unicodeName'),
-            nonstandardSymbol = util.arrayToHash(config.get(uri, 'Lua.runtime.nonstandardSymbol')),
-        }
+        , options
     )
     local passed = os.clock() - clock
     if passed > 0.1 then
-        log.warn(('Compile [%s] takes [%.3f] sec, size [%.3f] kb.'):format(uri, passed, #text / 1000))
+        log.warn(('Compile [%s] takes [%.3f] sec, size [%.3f] kb.'):format(uri, passed, #file.text / 1000))
     end
-    --await.delay()
-    if state then
-        state.uri = uri
-        state.lua = text
-        state.ast.uri = uri
-        local clock = os.clock()
-        parser.luadoc(state)
-        local passed = os.clock() - clock
-        if passed > 0.1 then
-            log.warn(('Parse LuaDoc of [%s] takes [%.3f] sec, size [%.3f] kb.'):format(uri, passed, #text / 1000))
-        end
-        m.astCount = m.astCount + 1
-        local removed
-        setmetatable(state, {__gc = function ()
-            if removed then
-                return
-            end
-            removed = true
-            m.astCount = m.astCount - 1
-        end})
-        return state
-    else
+
+    if not state then
         log.error('Compile failed:', uri, err)
         return nil
     end
+
+    m.compileStateThen(state, file)
+
+    return state
 end
+
+---@class parser.state
+---@field diffInfo? table[]
+---@field originLines? integer[]
+---@field originText string
 
 --- 获取文件语法树
 ---@param uri uri
----@return table state
+---@return parser.state? state
 function m.getState(uri)
     local file = m.fileMap[uri]
     if not file then
         return nil
     end
-    local state = m.astMap[uri]
-    if not state then
-        state = m.compileState(uri, file.text)
-        m.astMap[uri] = state
-        file.ast = state
-        --await.delay()
-    end
+    local state = m.compileState(uri)
     file.cacheActiveTime = timer.clock()
     return state
 end
@@ -546,7 +716,7 @@ function m.getLastState(uri)
     if not file then
         return nil
     end
-    return file.ast
+    return file.state
 end
 
 function m.getFile(uri)
@@ -566,43 +736,32 @@ local function isNameChar(text)
 end
 
 --- 将应用差异前的offset转换为应用差异后的offset
----@param uri    uri
+---@param state  parser.state
 ---@param offset integer
 ---@return integer start
 ---@return integer finish
-function m.diffedOffset(uri, offset)
-    local file = m.getFile(uri)
-    if not file then
+function m.diffedOffset(state, offset)
+    if not state.diffInfo then
         return offset, offset
     end
-    if not file._diffInfo then
-        return offset, offset
-    end
-    return smerger.getOffset(file._diffInfo, offset)
+    return smerger.getOffset(state.diffInfo, offset)
 end
 
 --- 将应用差异后的offset转换为应用差异前的offset
----@param uri    uri
+---@param state  parser.state
 ---@param offset integer
 ---@return integer start
 ---@return integer finish
-function m.diffedOffsetBack(uri, offset)
-    local file = m.getFile(uri)
-    if not file then
+function m.diffedOffsetBack(state, offset)
+    if not state.diffInfo then
         return offset, offset
     end
-    if not file._diffInfo then
-        return offset, offset
-    end
-    return smerger.getOffsetBack(file._diffInfo, offset)
+    return smerger.getOffsetBack(state.diffInfo, offset)
 end
 
-function m.hasDiffed(uri)
-    local file = m.getFile(uri)
-    if not file then
-        return false
-    end
-    return file._diffInfo ~= nil
+---@param state parser.state
+function m.hasDiffed(state)
+    return state.diffInfo ~= nil
 end
 
 --- 获取文件的自定义缓存信息（在文件内容更新后自动失效）

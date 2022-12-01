@@ -11,6 +11,7 @@ local m = {}
 ---@field _links table<uri, boolean>
 ---@field _data  table<string, any>
 ---@field _gc    gc
+---@field _removed? true
 local mt = {}
 mt.__index = mt
 
@@ -36,6 +37,12 @@ function mt:removeAllLinks()
     self._links = {}
 end
 
+---@return fun(): uri
+---@return table<uri, true>
+function mt:eachLink()
+    return next, self._links
+end
+
 ---@param uri uri
 ---@return boolean
 function mt:isChildUri(uri)
@@ -45,7 +52,17 @@ function mt:isChildUri(uri)
     if not self.uri then
         return false
     end
-    return uri:sub(1, #self.uri) == self.uri
+    if self.uri == uri then
+        return true
+    end
+    if uri:sub(1, #self.uri) ~= self.uri then
+        return false
+    end
+    if uri:sub(#self.uri, #self.uri) == '/'
+    or uri:sub(#self.uri + 1, #self.uri + 1) == '/' then
+        return true
+    end
+    return false
 end
 
 ---@param uri uri
@@ -55,9 +72,17 @@ function mt:isLinkedUri(uri)
         return false
     end
     for linkUri in pairs(self._links) do
-        if uri:sub(1, #linkUri) == linkUri then
+        if uri == linkUri then
             return true
         end
+        if uri:sub(1, #linkUri) ~= linkUri then
+            goto CONTINUE
+        end
+        if uri:sub(#linkUri, #linkUri) == '/'
+        or uri:sub(#linkUri + 1, #linkUri + 1) == '/' then
+            return true
+        end
+        ::CONTINUE::
     end
     return false
 end
@@ -85,7 +110,7 @@ function mt:getLinkedUri(uri)
 end
 
 ---@param uri uri
----@return uri
+---@return uri?
 function mt:getRootUri(uri)
     if self:isChildUri(uri) then
         return self.uri
@@ -117,7 +142,28 @@ end
 
 function mt:flushGC()
     self._gc:remove()
+    if self._removed then
+        return
+    end
     self._gc = gc()
+end
+
+function mt:remove()
+    if self._removed then
+        return
+    end
+    self._removed = true
+    for i, scp in ipairs(m.folders) do
+        if scp == self then
+            table.remove(m.folders, i)
+            break
+        end
+    end
+    self:flushGC()
+end
+
+function mt:isRemoved()
+    return self._removed == true
 end
 
 ---@param scopeType scope.type
@@ -164,7 +210,7 @@ function m.createFolder(uri)
 end
 
 ---@param uri uri
----@return scope
+---@return scope?
 function m.getFolder(uri)
     for _, scope in ipairs(m.folders) do
         if scope:isChildUri(uri) then
@@ -175,7 +221,7 @@ function m.getFolder(uri)
 end
 
 ---@param uri uri
----@return scope
+---@return scope?
 function m.getLinkedScope(uri)
     if m.override and m.override:isLinkedUri(uri) then
         return m.override
@@ -188,6 +234,7 @@ function m.getLinkedScope(uri)
     if m.fallback:isLinkedUri(uri) then
         return m.fallback
     end
+    return nil
 end
 
 ---@param uri uri

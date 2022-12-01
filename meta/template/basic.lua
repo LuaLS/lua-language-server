@@ -6,10 +6,11 @@ arg = {}
 
 ---#DES 'assert'
 ---@generic T
----@param v T
+---@param v? T
 ---@param message? any
 ---@return T
-function assert(v, message) end
+---@return any ...
+function assert(v, message, ...) end
 
 ---@alias gcoptions
 ---|>'"collect"'      # ---#DESTAIL 'cgopt.collect'
@@ -41,7 +42,7 @@ function collectgarbage(opt, arg) end
 
 ---#DES 'dofile'
 ---@param filename? string
----@return any
+---@return any ...
 function dofile(filename) end
 
 ---#DES 'error'
@@ -55,7 +56,7 @@ _G = {}
 
 ---@version 5.1
 ---#DES 'getfenv'
----@param f? async fun()
+---@param f? integer|async fun(...):...
 ---@return table
 ---@nodiscard
 function getfenv(f) end
@@ -141,8 +142,8 @@ function module(name, ...) end
 ---@generic K, V
 ---@param table table<K, V>
 ---@param index? K
----@return K
----@return V
+---@return K?
+---@return V?
 ---@nodiscard
 function next(table, index) end
 
@@ -157,12 +158,12 @@ function pairs(t) end
 ---#if VERSION == 5.1 and not JIT then
 ---@param f     function
 ---#else
----@param f     async fun()
+---@param f     async fun(...):...
 ---#end
 ---@param arg1? any
 ---@return boolean success
 ---@return any result
----@return ...
+---@return any ...
 function pcall(f, arg1, ...) end
 
 ---#DES 'print'
@@ -203,23 +204,23 @@ function select(index, ...) end
 
 ---@version 5.1
 ---#DES 'setfenv'
----@param f     async fun()|integer
+---@param f     async fun(...):...|integer
 ---@param table table
 ---@return function
 function setfenv(f, table) end
 
 ---#DES 'setmetatable'
----@param table     table
----@param metatable table
+---@param table      table
+---@param metatable? table
 ---@return table
 function setmetatable(table, metatable) end
 
 ---#DES 'tonumber'
----@param e     string|number
----@param base? integer
+---@overload fun(e: string, base: integer):integer
+---@param e any
 ---@return number?
 ---@nodiscard
-function tonumber(e, base) end
+function tonumber(e) end
 
 ---#DES 'tostring'
 ---@param v any
@@ -236,6 +237,9 @@ function tostring(v) end
 ---| '"function"'
 ---| '"thread"'
 ---| '"userdata"'
+---#if VERSION == JIT then
+---| '"cdata"'
+---#end
 
 ---#DES 'type'
 ---@param v any
@@ -265,16 +269,16 @@ function warn(message, ...) end
 ---@param err   function
 ---@return boolean success
 ---@return any result
----@return ...
+---@return any ...
 function xpcall(f, err) end
 ---#else
 ---#DES 'xpcall>5.2'
----@param f     async fun()
+---@param f     async fun(...):...
 ---@param msgh  function
 ---@param arg1? any
 ---@return boolean success
 ---@return any result
----@return ...
+---@return any ...
 function xpcall(f, msgh, arg1, ...) end
 ---#end
 
@@ -284,6 +288,6 @@ function xpcall(f, msgh, arg1, ...) end
 ---@param list T[]
 ---@param i?   integer
 ---@param j?   integer
----@return T
+---@return T   ...
 ---@nodiscard
 function unpack(list, i, j) end

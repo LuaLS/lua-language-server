@@ -34,10 +34,10 @@ DIAG_PREFIELD_CALL      =
 'Será interpretado como `{}{}`. Pode ser necessário adicionar uma `,` ou `;`.'
 DIAG_OVER_MAX_ARGS      =
 'A função aceita apenas os parâmetros {:d}, mas você passou {:d}.'
-DIAG_MISS_ARGS          = -- TODO: need translate!
-'the function received at least {:d} arguments, but got {:d}.'
-DIAG_OVER_MAX_VALUES    = -- TODO: need translate!
-'Only has {} variables, but you set {} values.'
+DIAG_MISS_ARGS          =
+'A função recebe pelo menos {:d} argumentos, mas há {:d}.'
+DIAG_OVER_MAX_VALUES    =
+'Apenas há {} variáveis, mas você declarou {} valores.'
 DIAG_AMBIGUITY_1        =
 'Calcule primeiro `{}`. Você pode precisar adicionar colchetes.'
 DIAG_LOWERCASE_GLOBAL   =
@@ -90,20 +90,20 @@ DIAG_DIFFERENT_REQUIRES =
 'O mesmo arquivo é necessário com nomes diferentes.'
 DIAG_REDUNDANT_RETURN   =
 'Retorno redundante.'
-DIAG_AWAIT_IN_SYNC      = -- TODO: need translate!
-'Async function can only be called in async function.'
-DIAG_NOT_YIELDABLE      = -- TODO: need translate!
-'The {}th parameter of this function was not marked as yieldable, but an async function was passed in. (Use `---@param name async fun()` to mark as yieldable)'
-DIAG_DISCARD_RETURNS    = -- TODO: need translate!
-'The return values of this function cannot be discarded.'
-DIAG_NEED_CHECK_NIL     = -- TODO: need translate!
-'Need check nil.'
+DIAG_AWAIT_IN_SYNC      =
+'Funções assíncronas apenas podem ser chamada em funções assíncronas.'
+DIAG_NOT_YIELDABLE      =
+'O {}-ésimo parâmetro desta função não foi marcada como produzível, mas uma função assíncrona foi passada. (Use `---@param name async fun()` para marcar como produzível)'
+DIAG_DISCARD_RETURNS    =
+'Os valores retornados desta função não podem ser descartáveis.'
+DIAG_NEED_CHECK_NIL     =
+'Necessário checar o nil.'
 DIAG_CIRCLE_DOC_CLASS                 =
 'Classes com herança cíclica.'
 DIAG_DOC_FIELD_NO_CLASS               =
 'O campo deve ser definido após a classe.'
-DIAG_DUPLICATE_DOC_CLASS              =
-'Classe definida duplicada `{}`.'
+DIAG_DUPLICATE_DOC_ALIAS              = -- TODO: need translate!
+'Duplicate defined alias `{}`.'
 DIAG_DUPLICATE_DOC_FIELD              =
 'Campos definidos duplicados `{}`.'
 DIAG_DUPLICATE_DOC_PARAM              =
@@ -116,6 +116,40 @@ DIAG_UNDEFINED_DOC_PARAM              =
 'Parâmetro indefinido `{}`.'
 DIAG_UNKNOWN_DIAG_CODE                =
 'Código de diagnóstico desconhecido `{}`.'
+DIAG_CAST_LOCAL_TYPE                  = -- TODO: need translate!
+'This variable is defined as type `{def}`. Cannot convert its type to `{ref}`.'
+DIAG_CAST_FIELD_TYPE                  = -- TODO: need translate!
+'This field is defined as type `{def}`. Cannot convert its type to `{ref}`.'
+DIAG_ASSIGN_TYPE_MISMATCH             = -- TODO: need translate!
+'Cannot assign `{ref}` to `{def}`.'
+DIAG_PARAM_TYPE_MISMATCH              = -- TODO: need translate!
+'Cannot assign `{ref}` to parameter `{def}`.'
+DIAG_UNKNOWN_CAST_VARIABLE            = -- TODO: need translate!
+'Unknown type conversion variable `{}`.'
+DIAG_CAST_TYPE_MISMATCH               = -- TODO: need translate!
+'Cannot convert `{ref}` to `{def}`。'
+DIAG_MISSING_RETURN_VALUE             = -- TODO: need translate!
+'At least {min} return values are required, but here only {rmax} values are returned.'
+DIAG_MISSING_RETURN_VALUE_RANGE       = -- TODO: need translate!
+'At least {min} return values are required, but here only {rmin} to {rmax} values are returned.'
+DIAG_REDUNDANT_RETURN_VALUE           = -- TODO: need translate!
+'At most {max} values returned, but the {rmax}th value was returned here.'
+DIAG_REDUNDANT_RETURN_VALUE_RANGE     = -- TODO: need translate!
+'At most {max} values returned, but {rmin}th to {rmax}th values were returned here.'
+DIAG_MISSING_RETURN                   = -- TODO: need translate!
+'Return value is required here.'
+DIAG_RETURN_TYPE_MISMATCH             = -- TODO: need translate!
+'The type of the {index} return value is `{def}`, but the actual return is `{ref}`.\n{err}'
+DIAG_UNKNOWN_OPERATOR                 = -- TODO: need translate!
+'Unknown operator `{}`.'
+DIAG_UNREACHABLE_CODE                 = -- TODO: need translate!
+'Unreachable code.'
+DIAG_INVISIBLE_PRIVATE                = -- TODO: need translate!
+'Field `{field}` is private, it can only be accessed in class `{class}`.'
+DIAG_INVISIBLE_PROTECTED              = -- TODO: need translate!
+'Field `{field}` is protected, it can only be accessed in class `{class}` and its subclasses.'
+DIAG_INVISIBLE_PACKAGE                = -- TODO: need translate!
+'Field `{field}` can only be accessed in same file `{uri}`.'
 
 MWS_NOT_SUPPORT         =
 '{} não é suportado múltiplos espaços de trabalho por enquanto, posso precisar reiniciar para estabelecer um novo espaço de trabalho ...'
@@ -142,10 +176,10 @@ WORKSPACE_DIAGNOSTIC      =
 'Diagnóstico de espaço de trabalho.'
 WORKSPACE_SKIP_HUGE_FILE  =
 'Por motivos de desempenho, a análise deste arquivo foi interrompida: {}'
-WORKSPACE_NOT_ALLOWED     = -- TODO: need translate!
-'Your workspace is set to `{}`. Lua language server refused to load this directory. Please check your configuration.[learn more here](https://github.com/sumneko/lua-language-server/wiki/Why-scanning-home-folder)'
+WORKSPACE_NOT_ALLOWED     =
+'Seu espaço de trabalho foi definido para `{}`. Servidor da linguagem Lua recusou o carregamneto neste diretório. Por favor, cheque sua configuração. [aprenda mais aqui](https://github.com/sumneko/lua-language-server/wiki/FAQ#why-is-the-server-scanning-the-wrong-folder)'
 WORKSPACE_SCAN_TOO_MUCH   = -- TODO: need translate!
-'More than {} files have been scanned. The current scanned directory is `{}`. Please confirm whether the configuration is correct.'
+'Mais do que {} arquivos foram escaneados. O diretório atual escaneado é `{}`. Por favor, confirmar se a configuração está correta'
 
 PARSER_CRASH            =
 'Parser quebrou! Últimas palavras: {}'
@@ -241,6 +275,10 @@ PARSER_INDEX_IN_FUNC_NAME =
 'A forma `[name]` não pode ser usada em nome de uma função nomeada.'
 PARSER_UNKNOWN_ATTRIBUTE  =
 'Atributo local deve ser `const` ou `close`'
+PARSER_AMBIGUOUS_SYNTAX   = -- TODO: need translate!
+'In Lua 5.1, the left brackets called by the function must be in the same line as the function.'
+PARSER_NEED_PAREN         = -- TODO: need translate!
+'需要添加一对括号。'
 PARSER_LUADOC_MISS_CLASS_NAME           =
 'Esperado <class name>.'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =
@@ -279,10 +317,10 @@ PARSER_LUADOC_MISS_DIAG_MODE            =
 'Esperado <diagnostic mode>.'
 PARSER_LUADOC_ERROR_DIAG_MODE           =
 '<diagnostic mode> incorreto.'
-PARSER_LUADOC_MISS_LOCAL_NAME           = -- TODO: need translate!
-'<local name> expected.'
+PARSER_LUADOC_MISS_LOCAL_NAME           =
+'<local name> esperado.'
 
-SYMBOL_ANONYMOUS        = -- TODO: need translate!
+SYMBOL_ANONYMOUS        =
 '<Anonymous>'
 
 HOVER_VIEW_DOCUMENTS    =
@@ -309,7 +347,7 @@ HOVER_NATIVE_DOCUMENT_LUAJIT    =
 'command:extension.lua.doc?["en-us/51/manual.html/{}"]'
 HOVER_MULTI_PROTOTYPE      =
 '({} protótipos)'
-HOVER_STRING_BYTES         = -- TODO: need translate!
+HOVER_STRING_BYTES         =
 '{} bytes'
 HOVER_STRING_CHARACTERS    =
 '{} bytes, {} caracteres'
@@ -325,8 +363,8 @@ HOVER_TABLE_TIME_UP     =
 'Inferência de tipo parcial foi desativada por motivos de desempenho.'
 HOVER_WS_LOADING        =
 'Carregando espaço de trabalho: {} / {}'
-HOVER_AWAIT_TOOLTIP     = -- TODO: need translate!
-'Calling async function, current thread may be yielded.'
+HOVER_AWAIT_TOOLTIP     =
+'Chamando a função assíncrona, a thread atual deve ser produzível'
 
 ACTION_DISABLE_DIAG     =
 'Desativar diagnósticos no espaço de trabalho ({}).'
@@ -382,10 +420,12 @@ ACTION_DISABLE_DIAG_LINE=
 'Desativa diagnósticos nesta linha ({}).'
 ACTION_DISABLE_DIAG_FILE=
 'Desativa diagnósticos nesta linha ({}).'
-ACTION_MARK_ASYNC       = -- TODO: need translate!
-'Mark current function as async.'
-ACTION_ADD_DICT         = -- TODO: need translate!
-'Add \'{}\' to workspace dict'
+ACTION_MARK_ASYNC       =
+'Marque a função atual como assíncrona'
+ACTION_ADD_DICT         =
+'Adicione \'{}\' ao seu espaço de trabalho no '
+ACTION_FIX_ADD_PAREN    = -- TODO: need translate!
+'添加括号。'
 
 COMMAND_DISABLE_DIAG       =
 'Desativar diagnósticos.'
@@ -405,8 +445,8 @@ COMMAND_JSON_TO_LUA        =
 'Converte de JSON para Lua.'
 COMMAND_JSON_TO_LUA_FAILED =
 'Converção de JSON para Lua falhou: {}.'
-COMMAND_ADD_DICT           = -- TODO: need translate!
-'Add Word to dictionary'
+COMMAND_ADD_DICT           =
+'Adicione uma palavra ao dicionário'
 
 COMPLETION_IMPORT_FROM           =
 'Importa de {}.'
@@ -448,6 +488,8 @@ WINDOW_PROCESSING_SEMANTIC_RANGE =
 'Processando tokens semânticas incrementais...'
 WINDOW_PROCESSING_HINT           =
 'Processando dicas de lina...'
+WINDOW_PROCESSING_BUILD_META     = -- TODO: need translate!
+'Processing build meta...'
 WINDOW_INCREASE_UPPER_LIMIT      =
 'Aumente o limite superior'
 WINDOW_CLOSE                     =
@@ -466,23 +508,23 @@ WINDOW_LUA_STATUS_CACHED_FILES   =
 'Arquivos em cache: {ast}/{max}'
 WINDOW_LUA_STATUS_MEMORY_COUNT   =
 'Uso de memória   : {mem:.f}M'
-WINDOW_LUA_STATUS_TIP            = -- TODO: need translate!
+WINDOW_LUA_STATUS_TIP            =
 [[
 
-This icon is a cat,
-Not a dog nor a fox!
+Este ícone é um gato,
+não é um cachorro nem uma raposa!
              ↓↓↓
 ]]
-WINDOW_LUA_STATUS_DIAGNOSIS_TITLE= -- TODO: need translate!
-'Perform workspace diagnosis'
-WINDOW_LUA_STATUS_DIAGNOSIS_MSG  = -- TODO: need translate!
-'Do you want to perform workspace diagnosis?'
+WINDOW_LUA_STATUS_DIAGNOSIS_TITLE=
+'Execute seu diagnóstico do espaço de trabalho'
+WINDOW_LUA_STATUS_DIAGNOSIS_MSG  =
+'Você quer executar um diagnóstico do espaço de trabalho?'
 WINDOW_APPLY_SETTING             =
 'Aplicar configuração'
 WINDOW_CHECK_SEMANTIC            =
 'Se você estiver usando o tema de cores do market, talvez seja necessário modificar `editor.semanticHighlighting.enabled` para `true` para fazer com tokens semânticas sejam habilitados.'
 WINDOW_TELEMETRY_HINT            =
-'Por favor, permita o envio de dados de uso e relatórios de erro anônimos para nos ajudar a melhorar ainda mais essa extensão. Leia nossa política de privacidade [aqui](https://github.com/sumneko/lua-language-server/wiki/Privacy-Policy) .'
+'Por favor, permita o envio de dados de uso e relatórios de erro anônimos para nos ajudar a melhorar ainda mais essa extensão. Leia nossa política de privacidade [aqui](https://github.com/sumneko/lua-language-server/wiki/Home#privacy) .'
 WINDOW_TELEMETRY_ENABLE          =
 'Permitir'
 WINDOW_TELEMETRY_DISABLE         =
@@ -504,7 +546,15 @@ WINDOW_APPLY_WHITOUT_SETTING     =
 WINDOW_ASK_APPLY_LIBRARY         =
 'Você precisa configurar seu ambiente de trabalho como `{}`?'
 WINDOW_SEARCHING_IN_FILES        = -- TODO: need translate!
-'Searching in files...'
+'Procurando nos arquivos...'
+WINDOW_CONFIG_LUA_DEPRECATED     = -- TODO: need translate!
+'`config.lua` is deprecated, please use `config.json` instead.'
+WINDOW_CONVERT_CONFIG_LUA        = -- TODO: need translate!
+'Convert to `config.json`'
+WINDOW_MODIFY_REQUIRE_PATH       = -- TODO: need translate!
+'Do you want to modify the require path?'
+WINDOW_MODIFY_REQUIRE_OK         = -- TODO: need translate!
+'Modify'
 
 CONFIG_LOAD_FAILED               =
 'Não é possível ler o arquivo de configurações: {}'
@@ -512,6 +562,8 @@ CONFIG_LOAD_ERROR                =
 'Configurando o erro de carregamento do arquivo: {}'
 CONFIG_TYPE_ERROR                =
 'O arquivo de configuração deve estar no formato LUA ou JSON: {}'
+CONFIG_MODIFY_FAIL_SYNTAX_ERROR  = -- TODO: need translate!
+'Failed to modify settings, there are syntax errors in the settings file: {}'
 
 PLUGIN_RUNTIME_ERROR             =
 [[
@@ -534,15 +586,641 @@ PLUGIN_TRUST_NO                  =
 Não carregue este plugin
 ]]
 
-CLI_CHECK_ERROR_TYPE = -- TODO: need translate!
-'The argument of CHECK must be a string, but got {}'
-CLI_CHECK_ERROR_URI = -- TODO: need translate!
-'The argument of CHECK must be a valid uri, but got {}'
-CLI_CHECK_ERROR_LEVEL = -- TODO: need translate!
-'Checklevel must be one of: {}'
-CLI_CHECK_INITING = -- TODO: need translate!
-'Initializing ...'
-CLI_CHECK_SUCCESS = -- TODO: need translate!
-'Diagnosis completed, no problems found'
-CLI_CHECK_RESULTS = -- TODO: need translate!
-'Diagnosis complete, {} problems found, see {}'
+CLI_CHECK_ERROR_TYPE =
+'O argumento do CHECK deve ser uma string, mas é {}'
+CLI_CHECK_ERROR_URI =
+'O argumento do CHECK deve ser uma uri válida, mas é {}'
+CLI_CHECK_ERROR_LEVEL =
+'Checklevel deve ser um de: {}'
+CLI_CHECK_INITING =
+'Inicializando ...'
+CLI_CHECK_SUCCESS =
+'Diagnóstico completo, nenhum problema encontrado'
+CLI_CHECK_RESULTS =
+'Diagnóstico completo, {} problemas encontrados, veja {}'
+
+TYPE_ERROR_ENUM_GLOBAL_DISMATCH = -- TODO: need translate!
+'Type `{child}` cannot match enumeration type of `{parent}`'
+TYPE_ERROR_ENUM_GENERIC_UNSUPPORTED = -- TODO: need translate!
+'Cannot use generic `{child}` in enumeration'
+TYPE_ERROR_ENUM_LITERAL_DISMATCH = -- TODO: need translate!
+'Literal `{child}` cannot match the enumeration value of `{parent}`'
+TYPE_ERROR_ENUM_OBJECT_DISMATCH = -- TODO: need translate!
+'The object `{child}` cannot match the enumeration value of `{parent}`. They must be the same object'
+TYPE_ERROR_ENUM_NO_OBJECT = -- TODO: need translate!
+'The passed in enumeration value `{child}` is not recognized'
+TYPE_ERROR_INTEGER_DISMATCH = -- TODO: need translate!
+'Literal `{child}` cannot match integer `{parent}`'
+TYPE_ERROR_STRING_DISMATCH = -- TODO: need translate!
+'Literal `{child}` cannot match string `{parent}`'
+TYPE_ERROR_BOOLEAN_DISMATCH = -- TODO: need translate!
+'Literal `{child}` cannot match boolean `{parent}`'
+TYPE_ERROR_TABLE_NO_FIELD = -- TODO: need translate!
+'Field `{key}` does not exist in the table'
+TYPE_ERROR_TABLE_FIELD_DISMATCH = -- TODO: need translate!
+'The type of field `{key}` is `{child}`, which cannot match `{parent}`'
+TYPE_ERROR_CHILD_ALL_DISMATCH = -- TODO: need translate!
+'All subtypes in `{child}` cannot match `{parent}`'
+TYPE_ERROR_PARENT_ALL_DISMATCH = -- TODO: need translate!
+'`{child}` cannot match any subtypes in `{parent}`'
+TYPE_ERROR_UNION_DISMATCH = -- TODO: need translate!
+'`{child}` cannot match `{parent}`'
+TYPE_ERROR_OPTIONAL_DISMATCH = -- TODO: need translate!
+'Optional type cannot match `{parent}`'
+TYPE_ERROR_NUMBER_LITERAL_TO_INTEGER = -- TODO: need translate!
+'The number `{child}` cannot be converted to an integer'
+TYPE_ERROR_NUMBER_TYPE_TO_INTEGER = -- TODO: need translate!
+'Cannot convert number type to integer type'
+TYPE_ERROR_DISMATCH = -- TODO: need translate!
+'Type `{child}` cannot match `{parent}`'
+
+LUADOC_DESC_CLASS = -- TODO: need translate!
+[=[
+Defines a class/table structure
+## Syntax
+`---@class <name> [: <parent>[, <parent>]...]`
+## Usage
+```
+---@class Manager: Person, Human
+Manager = {}
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#class)
+]=]
+LUADOC_DESC_TYPE = -- TODO: need translate!
+[=[
+Specify the type of a certain variable
+
+Default types: `nil`, `any`, `boolean`, `string`, `number`, `integer`,
+`function`, `table`, `thread`, `userdata`, `lightuserdata`
+
+(Custom types can be provided using `@alias`)
+
+## Syntax
+`---@type <type>[| [type]...`
+
+## Usage
+### General
+```
+---@type nil|table|myClass
+local Example = nil
+```
+
+### Arrays
+```
+---@type number[]
+local phoneNumbers = {}
+```
+
+### Enums
+```
+---@type "red"|"green"|"blue"
+local color = ""
+```
+
+### Tables
+```
+---@type table<string, boolean>
+local settings = {
+    disableLogging = true,
+    preventShutdown = false,
+}
+
+---@type { [string]: true }
+local x --x[""] is true
+```
+
+### Functions
+```
+---@type fun(mode?: "r"|"w"): string
+local myFunction
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#types-and-type)
+]=]
+LUADOC_DESC_ALIAS = -- TODO: need translate!
+[=[
+Create your own custom type that can be used with `@param`, `@type`, etc.
+
+## Syntax
+`---@alias <name> <type> [description]`\
+or
+```
+---@alias <name>
+---| 'value' [# comment]
+---| 'value2' [# comment]
+...
+```
+
+## Usage
+### Expand to other type
+```
+---@alias filepath string Path to a file
+
+---@param path filepath Path to the file to search in
+function find(path, pattern) end
+```
+
+### Enums
+```
+---@alias font-style
+---| '"underlined"' # Underline the text
+---| '"bold"' # Bolden the text
+---| '"italic"' # Make the text italicized
+
+---@param style font-style Style to apply
+function setFontStyle(style) end
+```
+
+### Literal Enum
+```
+local enums = {
+    READ = 0,
+    WRITE = 1,
+    CLOSED = 2
+}
+
+---@alias FileStates
+---| `enums.READ`
+---| `enums.WRITE`
+---| `enums.CLOSE`
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#alias)
+]=]
+LUADOC_DESC_PARAM = -- TODO: need translate!
+[=[
+Declare a function parameter
+
+## Syntax
+`@param <name>[?] <type> [comment]`
+
+## Usage
+### General
+```
+---@param url string The url to request
+---@param headers? table<string, string> HTTP headers to send
+---@param timeout? number Timeout in seconds
+function get(url, headers, timeout) end
+```
+
+### Variable Arguments
+```
+---@param base string The base to concat to
+---@param ... string The values to concat
+function concat(base, ...) end
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#param)
+]=]
+LUADOC_DESC_RETURN = -- TODO: need translate!
+[=[
+Declare a return value
+
+## Syntax
+`@return <type> [name] [description]`\
+or\
+`@return <type> [# description]`
+
+## Usage
+### General
+```
+---@return number
+---@return number # The green component
+---@return number b The blue component
+function hexToRGB(hex) end
+```
+
+### Type & name only
+```
+---@return number x, number y
+function getCoords() end
+```
+
+### Type only
+```
+---@return string, string
+function getFirstLast() end
+```
+
+### Return variable values
+```
+---@return string ... The tags of the item
+function getTags(item) end
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#return)
+]=]
+LUADOC_DESC_FIELD = -- TODO: need translate!
+[=[
+Declare a field in a class/table. This allows you to provide more in-depth
+documentation for a table. As of `v3.6.0`, you can mark a field as `private`,
+`protected`, `public`, or `package`.
+
+## Syntax
+`---@field <name> <type> [description]`
+
+## Usage
+```
+---@class HTTP_RESPONSE
+---@field status HTTP_STATUS
+---@field headers table<string, string> The headers of the response
+
+---@class HTTP_STATUS
+---@field code number The status code of the response
+---@field message string A message reporting the status
+
+---@return HTTP_RESPONSE response The response from the server
+function get(url) end
+
+--This response variable has all of the fields defined above
+response = get("localhost")
+
+--Extension provided intellisense for the below assignment
+statusCode = response.status.code
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#field)
+]=]
+LUADOC_DESC_GENERIC = -- TODO: need translate!
+[=[
+Simulates generics. Generics can allow types to be re-used as they help define
+a "generic shape" that can be used with different types.
+
+## Syntax
+`---@generic <name> [:parent_type] [, <name> [:parent_type]]`
+
+## Usage
+### General
+```
+---@generic T
+---@param value T The value to return
+---@return T value The exact same value
+function echo(value)
+    return value
+end
+
+-- Type is string
+s = echo("e")
+
+-- Type is number
+n = echo(10)
+
+-- Type is boolean
+b = echo(true)
+
+-- We got all of this info from just using
+-- @generic rather than manually specifying
+-- each allowed type
+```
+
+### Capture name of generic type
+```
+---@class Foo
+local Foo = {}
+function Foo:Bar() end
+
+---@generic T
+---@param name `T` # the name generic type is captured here
+---@return T       # generic type is returned
+function Generic(name) end
+
+local v = Generic("Foo") -- v is an object of Foo
+```
+
+### How Lua tables use generics
+```
+---@class table<K, V>: { [K]: V }
+
+-- This is what allows us to create a table
+-- and intellisense keeps track of any type
+-- we give for key (K) or value (V)
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#generics-and-generic)
+]=]
+LUADOC_DESC_VARARG = -- TODO: need translate!
+[=[
+Primarily for legacy support for EmmyLua annotations. `@vararg` does not
+provide typing or allow descriptions.
+
+**You should instead use `@param` when documenting parameters (variable or not).**
+
+## Syntax
+`@vararg <type>`
+
+## Usage
+```
+---Concat strings together
+---@vararg string
+function concat(...) end
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#vararg)
+]=]
+LUADOC_DESC_OVERLOAD = -- TODO: need translate!
+[=[
+Allows defining of multiple function signatures.
+
+## Syntax
+`---@overload fun(<name>[: <type>] [, <name>[: <type>]]...)[: <type>[, <type>]...]`
+
+## Usage
+```
+---@overload fun(t: table, value: any): number
+function table.insert(t, position, value) end
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#overload)
+]=]
+LUADOC_DESC_DEPRECATED = -- TODO: need translate!
+[=[
+Marks a function as deprecated. This results in any deprecated function calls
+being ~~struck through~~.
+
+## Syntax
+`---@deprecated`
+
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#deprecated)
+]=]
+LUADOC_DESC_META = -- TODO: need translate!
+[=[
+Indicates that this is a meta file and should be used for definitions and intellisense only.
+
+There are 3 main distinctions to note with meta files:
+1. There won't be any context-based intellisense in a meta file
+2. Hovering a `require` filepath in a meta file shows `[meta]` instead of an absolute path
+3. The `Find Reference` function will ignore meta files
+
+## Syntax
+`---@meta`
+
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#meta)
+]=]
+LUADOC_DESC_VERSION = -- TODO: need translate!
+[=[
+Specifies Lua versions that this function is exclusive to.
+
+Lua versions: `5.1`, `5.2`, `5.3`, `5.4`, `JIT`.
+
+Requires configuring the `Diagnostics: Needed File Status` setting.
+
+## Syntax
+`---@version <version>[, <version>]...`
+
+## Usage
+### General
+```
+---@version JIT
+function onlyWorksInJIT() end
+```
+### Specify multiple versions
+```
+---@version <5.2,JIT
+function oldLuaOnly() end
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#version)
+]=]
+LUADOC_DESC_SEE = -- TODO: need translate!
+[=[
+Define something that can be viewed for more information
+
+## Syntax
+`---@see <text>`
+
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#see)
+]=]
+LUADOC_DESC_DIAGNOSTIC = -- TODO: need translate!
+[=[
+Enable/disable diagnostics for error/warnings/etc.
+
+Actions: `disable`, `enable`, `disable-line`, `disable-next-line`
+
+[Names](https://github.com/sumneko/lua-language-server/blob/cbb6e6224094c4eb874ea192c5f85a6cba099588/script/proto/define.lua#L54)
+
+## Syntax
+`---@diagnostic <action>[: <name>]`
+
+## Usage
+### Disable next line
+```
+---@diagnostic disable-next-line: undefined-global
+```
+
+### Manually toggle
+```
+---@diagnostic disable: unused-local
+local unused = "hello world"
+---@diagnostic enable: unused-local
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#diagnostic)
+]=]
+LUADOC_DESC_MODULE = -- TODO: need translate!
+[=[
+Provides the semantics of `require`.
+
+## Syntax
+`---@module <'module_name'>`
+
+## Usage
+```
+---@module 'string.utils'
+local stringUtils
+-- This is functionally the same as:
+local module = require('string.utils')
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#module)
+]=]
+LUADOC_DESC_ASYNC = -- TODO: need translate!
+[=[
+Marks a function as asynchronous.
+
+## Syntax
+`---@async`
+
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#async)
+]=]
+LUADOC_DESC_NODISCARD = -- TODO: need translate!
+[=[
+Prevents this function's return values from being discarded/ignored.
+This will raise the `discard-returns` warning should the return values
+be ignored.
+
+## Syntax
+`---@nodiscard`
+
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#nodiscard)
+]=]
+LUADOC_DESC_CAST = -- TODO: need translate!
+[=[
+Allows type casting (type conversion).
+
+## Syntax
+`@cast <variable> <[+|-]type>[, <[+|-]type>]...`
+
+## Usage
+### Overwrite type
+```
+---@type integer
+local x --> integer
+
+---@cast x string
+print(x) --> string
+```
+### Add Type
+```
+---@type string
+local x --> string
+
+---@cast x +boolean, +number
+print(x) --> string|boolean|number
+```
+### Remove Type
+```
+---@type string|table
+local x --> string|table
+
+---@cast x -string
+print(x) --> table
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#cast)
+]=]
+LUADOC_DESC_OPERATOR = -- TODO: need translate!
+[=[
+Provide type declaration for [operator metamethods](http://lua-users.org/wiki/MetatableEvents).
+
+## Syntax
+`@operator <operation>[(input_type)]:<resulting_type>`
+
+## Usage
+### Vector Add Metamethod
+```
+---@class Vector
+---@operation add(Vector):Vector
+
+vA = Vector.new(1, 2, 3)
+vB = Vector.new(10, 20, 30)
+
+vC = vA + vB
+--> Vector
+```
+### Unary Minus
+```
+---@class Passcode
+---@operation unm:integer
+
+pA = Passcode.new(1234)
+pB = -pA
+--> integer
+```
+[View Request](https://github.com/sumneko/lua-language-server/issues/599)
+]=]
+LUADOC_DESC_ENUM = -- TODO: need translate!
+[=[
+Mark a table as an enum. If you want an enum but can't define it as a Lua
+table, take a look at the [`@alias`](https://github.com/sumneko/lua-language-server/wiki/Annotations#alias)
+tag.
+
+## Syntax
+`@enum <name>`
+
+## Usage
+```
+---@enum colors
+local colors = {
+	white = 0,
+	orange = 2,
+	yellow = 4,
+	green = 8,
+	black = 16,
+}
+
+---@param color colors
+local function setColor(color) end
+
+-- Completion and hover is provided for the below param
+setColor(colors.green)
+```
+]=]
+LUADOC_DESC_PACKAGE = -- TODO: need translate!
+[=[
+Mark a function as private to the file it is defined in. A packaged function
+cannot be accessed from another file.
+
+## Syntax
+`@package`
+
+## Usage
+```
+---@class Animal
+---@field private eyes integer
+local Animal = {}
+
+---@package
+---This cannot be accessed in another file
+function Animal:eyesCount()
+    return self.eyes
+end
+```
+]=]
+LUADOC_DESC_PRIVATE = -- TODO: need translate!
+[=[
+Mark a function as private to a @class. Private functions can be accessed only
+from within their class and are not accessable from child classes.
+
+## Syntax
+`@private`
+
+## Usage
+```
+---@class Animal
+---@field private eyes integer
+local Animal = {}
+
+---@private
+function Animal:eyesCount()
+    return self.eyes
+end
+
+---@class Dog:Animal
+local myDog = {}
+
+---NOT PERMITTED!
+myDog:eyesCount();
+```
+]=]
+LUADOC_DESC_PROTECTED = -- TODO: need translate!
+[=[
+Mark a function as protected within a @class. Protected functions can be
+accessed only from within their class or from child classes.
+
+## Syntax
+`@protected`
+
+## Usage
+```
+---@class Animal
+---@field private eyes integer
+local Animal = {}
+
+---@protected
+function Animal:eyesCount()
+    return self.eyes
+end
+
+---@class Dog:Animal
+local myDog = {}
+
+---Permitted because function is protected, not private.
+myDog:eyesCount();
+```
+]=]

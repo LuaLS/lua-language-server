@@ -5,36 +5,11 @@ local platform = require 'bee.platform'
 local util     = require 'utility'
 local config   = require 'config'
 local catch    = require 'catch'
+local define   = require 'proto.define'
 
 rawset(_G, 'TEST', true)
 
-local CompletionItemKind = {
-    Text = 1,
-    Method = 2,
-    Function = 3,
-    Constructor = 4,
-    Field = 5,
-    Variable = 6,
-    Class = 7,
-    Interface = 8,
-    Module = 9,
-    Property = 10,
-    Unit = 11,
-    Value = 12,
-    Enum = 13,
-    Keyword = 14,
-    Snippet = 15,
-    Color = 16,
-    File = 17,
-    Reference = 18,
-    Folder = 19,
-    EnumMember = 20,
-    Constant = 21,
-    Struct = 22,
-    Event = 23,
-    Operator = 24,
-    TypeParameter = 25,
-}
+local CompletionItemKind = define.CompletionItemKind
 
 local EXISTS = {}
 
@@ -413,7 +388,7 @@ config.set(nil, 'Lua.runtime.path', {
 
 TEST {
     {
-        path = 'D:/xxxx/1.lua',
+        path = 'tt/xxxx/1.lua',
         content = '',
     },
     {
@@ -423,7 +398,7 @@ TEST {
     },
     completion = {
         {
-            label = 'D:.xxxx',
+            label = 'tt.xxxx',
             kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
@@ -439,12 +414,12 @@ config.set(nil, 'Lua.runtime.path', originRuntimePath)
 
 local originRuntimePath = config.get(nil, 'Lua.runtime.path')
 config.set(nil, 'Lua.runtime.path', {
-    'D:/?/1.lua',
+    'tt/?/1.lua',
 })
 
 TEST {
     {
-        path = 'D:/xxxx/1.lua',
+        path = 'tt/xxxx/1.lua',
         content = '',
     },
     {

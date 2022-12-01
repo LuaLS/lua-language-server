@@ -1,18 +1,26 @@
 local fw    = require 'bee.filewatch'
 local fs    = require 'bee.filesystem'
+local plat  = require 'bee.platform'
 local await = require 'await'
 
 local MODIFY = 1 << 0
 local RENAME = 1 << 1
 
-local function exists(filename)
+local function isExists(filename)
     local path = fs.path(filename)
-    local suc, res = pcall(fs.exists, path)
-    if not suc or not res then
+    local suc, exists = pcall(fs.exists, path)
+    if not suc or not exists then
         return false
     end
-    suc, res = pcall(fs.canonical, path)
-    if not suc or res:string() ~= path:string() then
+    if plat.OS ~= 'Windows' then
+        return true
+    end
+    local suc, res = pcall(fs.fullpath, path)
+    if not suc then
+        return false
+    end
+    if res :string():gsub('^%w+:', string.lower)
+    ~= path:string():gsub('^%w+:', string.lower) then
         return false
     end
     return true
@@ -25,6 +33,9 @@ m._eventList = {}
 m._watchings = {}
 
 function m.watch(path)
+    if path == '' then
+        return function () end
+    end
     if m._watchings[path] then
         m._watchings[path].count = m._watchings[path].count + 1
     else
@@ -49,7 +60,7 @@ function m.watch(path)
     end
 end
 
----@param callback async fun()
+---@param callback async fun(ev: string, path: string)
 function m.event(callback)
     m._eventList[#m._eventList+1] = callback
 end
@@ -69,6 +80,7 @@ function m.update()
         if not ev then
             break
         end
+        log.debug('filewatch:', ev, path)
         if not collect then
             collect = {}
         end
@@ -85,7 +97,7 @@ function m.update()
 
     for path, flag in pairs(collect) do
         if flag & RENAME ~= 0 then
-            if exists(path) then
+            if isExists(path) then
                 m._callEvent('create', path)
             else
                 m._callEvent('delete', path)

@@ -4,6 +4,7 @@ local vm         = require 'vm'
 local findSource = require 'core.find-source'
 local guide      = require 'parser.guide'
 local rpath      = require 'workspace.require-path'
+local jumpSource = require 'core.jump-source'
 
 local function sortResults(results)
     -- 先按照顺序排序
@@ -51,8 +52,8 @@ local accept = {
     ['doc.class.name']   = true,
     ['doc.extends.name'] = true,
     ['doc.alias.name']   = true,
+    ['doc.enum.name']    = true,
     ['doc.see.name']     = true,
-    ['doc.see.field']    = true,
 }
 
 local function checkRequire(source, offset)
@@ -74,7 +75,7 @@ local function checkRequire(source, offset)
         return nil
     end
     if     libName == 'require' then
-        return rpath.findUrisByRequirePath(guide.getUri(source), literal)
+        return rpath.findUrisByRequireName(guide.getUri(source), literal)
     elseif libName == 'dofile'
     or     libName == 'loadfile' then
         return workspace.findUrisByFilePath(literal)
@@ -144,6 +145,9 @@ return function (uri, offset)
         if src.type == 'doc.alias' then
             src = src.alias
         end
+        if src.type == 'doc.enum' then
+            src = src.enum
+        end
         if src.type == 'doc.class.name'
         or src.type == 'doc.alias.name'
         or src.type == 'doc.type.function'
@@ -164,6 +168,7 @@ return function (uri, offset)
     end
 
     sortResults(results)
+    jumpSource(results)
 
     return results
 end

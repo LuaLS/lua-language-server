@@ -35,7 +35,7 @@ local Care = util.switch()
         local isFunc = vm.getInfer(source):hasFunction(guide.getUri(source))
 
         local type = isFunc and define.TokenTypes['function'] or define.TokenTypes.variable
-        local modifier = isLib and define.TokenModifiers.defaultLibrary or define.TokenModifiers.static
+        local modifier = isLib and define.TokenModifiers.defaultLibrary or define.TokenModifiers.global
 
         results[#results+1] = {
             start      = source.start,
@@ -134,19 +134,16 @@ local Care = util.switch()
             return
         end
         local loc = source.node or source
+        local uri = guide.getUri(loc)
         -- 1. 值为函数的局部变量 | Local variable whose value is a function
-        if loc.ref then
-            for _, ref in ipairs(loc.ref) do
-                if ref.value and ref.value.type == 'function' then
-                    results[#results+1] = {
-                        start      = source.start,
-                        finish     = source.finish,
-                        type       = define.TokenTypes['function'],
-                        modifieres = define.TokenModifiers.declaration,
-                    }
-                    return
-                end
-            end
+        if vm.getInfer(source):hasFunction(uri) then
+            results[#results+1] = {
+                start      = source.start,
+                finish     = source.finish,
+                type       = define.TokenTypes['function'],
+                modifieres = define.TokenModifiers.declaration,
+            }
+            return
         end
         -- 3. 特殊变量 | Special variableif source[1] == '_ENV' then
         if loc[1] == '_ENV' then
@@ -440,6 +437,13 @@ local Care = util.switch()
                 type       = define.TokenTypes.type,
                 modifieres = define.TokenModifiers.modification,
             }
+        elseif source[1] == 'self' then
+            results[#results+1] = {
+                start      = source.start,
+                finish     = source.finish,
+                type       = define.TokenTypes.type,
+                modifieres = define.TokenModifiers.readonly,
+            }
         else
             results[#results+1] = {
                 start  = source.start,
@@ -449,6 +453,7 @@ local Care = util.switch()
         end
     end)
     : case 'doc.alias.name'
+    : case 'doc.enum.name'
     : call(function (source, options, results)
         if not options.annotation then
             return
@@ -594,17 +599,6 @@ local Care = util.switch()
             type       = define.TokenTypes.class,
         }
     end)
-    : case 'doc.see.field'
-    : call(function (source, options, results)
-        if not options.annotation then
-            return
-        end
-        results[#results+1] = {
-            start      = source.start,
-            finish     = source.finish,
-            type       = define.TokenTypes.property,
-        }
-    end)
     : case 'doc.diagnostic'
     : call(function (source, options, results)
         if not options.annotation then
@@ -667,6 +661,14 @@ local Care = util.switch()
             type   = define.TokenTypes.keyword,
         }
     end)
+    : case 'doc.cast.block'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.keyword,
+        }
+    end)
     : case 'doc.cast.name'
     : call(function (source, options, results)
         results[#results+1] = {
@@ -675,14 +677,33 @@ local Care = util.switch()
             type       = define.TokenTypes.variable,
         }
     end)
+    : case 'doc.type.code'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.string,
+            modifieres = define.TokenModifiers.abstract,
+        }
+    end)
+    : case 'doc.operator.name'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.operator,
+        }
+    end)
 
-local function buildTokens(uri, results)
+---@param state table
+---@param results table
+local function buildTokens(state, results)
     local tokens = {}
     local lastLine = 0
     local lastStartChar = 0
     for i, source in ipairs(results) do
-        local startPos  = converter.packPosition(uri, source.start)
-        local finishPos = converter.packPosition(uri, source.finish)
+        local startPos  = source.start
+        local finishPos = source.finish
         local line      = startPos.line
         local startChar = startPos.character
         local deltaLine = line - lastLine
@@ -763,23 +784,34 @@ local function solveMultilineAndOverlapping(state, results)
 
     local new = {}
     for token in tokens:pairs() do
-        new[#new+1] = token
-        local startRow,  startCol  = guide.rowColOf(token.start)
-        local finishRow, finishCol = guide.rowColOf(token.finish)
-        if finishRow > startRow then
-            token.finish = guide.positionOf(startRow, guide.getLineRange(state, startRow))
-            for i = startRow + 1, finishRow - 1 do
+        local startPos = converter.packPosition(state, token.start)
+        local endPos   = converter.packPosition(state, token.finish)
+        if endPos.line == startPos.line then
+            new[#new+1] = {
+                start      = startPos,
+                finish     = endPos,
+                type       = token.type,
+                modifieres = token.modifieres,
+            }
+        else
+            new[#new+1] = {
+                start      = startPos,
+                finish     = converter.position(startPos.line, 9999),
+                type       = token.type,
+                modifieres = token.modifieres,
+            }
+            for i = startPos.line + 1, endPos.line - 1 do
                 new[#new+1] = {
-                    start      = guide.positionOf(i, 0),
-                    finish     = guide.positionOf(i, guide.getLineRange(state, i)),
+                    start      = converter.position(i, 0),
+                    finish     = converter.position(i, 9999),
                     type       = token.type,
                     modifieres = token.modifieres,
                 }
             end
-            if finishCol > 0 then
+            if endPos.character > 0 then
                 new[#new+1] = {
-                    start      = guide.positionOf(finishRow, 0),
-                    finish     = guide.positionOf(finishRow, finishCol),
+                    start      = converter.position(endPos.line, 0),
+                    finish     = converter.position(endPos.line, endPos.character),
                     type       = token.type,
                     modifieres = token.modifieres,
                 }
@@ -811,9 +843,13 @@ return function (uri, start, finish)
         keyword    = config.get(uri, 'Lua.semantic.keyword'),
     }
 
+    local n = 0
     guide.eachSourceBetween(state.ast, start, finish, function (source) ---@async
         Care(source.type, source, options, results)
-        await.delay()
+        n = n + 1
+        if n % 100 == 0 then
+            await.delay()
+        end
     end)
 
     for _, comm in ipairs(state.comms) do
@@ -854,7 +890,7 @@ return function (uri, start, finish)
 
     results = solveMultilineAndOverlapping(state, results)
 
-    local tokens = buildTokens(uri, results)
+    local tokens = buildTokens(state, results)
 
     return tokens
 end

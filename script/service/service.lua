@@ -13,6 +13,9 @@ local time   = require 'bee.time'
 local fw     = require 'filewatch'
 local furi   = require 'file-uri'
 
+require 'jsonc'
+require 'json-beautify'
+
 ---@class service
 local m = {}
 m.type = 'service'
@@ -165,12 +168,13 @@ function m.eventLoop()
     end
 
     local function doSomething()
+        timer.update()
         pub.step(false)
-        if not await.step() then
-            return false
+        if await.step() then
+            busy()
+            return true
         end
-        busy()
-        return true
+        return false
     end
 
     local function sleep()
@@ -185,10 +189,6 @@ function m.eventLoop()
     end
 
     while true do
-        if doSomething() then
-            goto CONTINUE
-        end
-        timer.update()
         if doSomething() then
             goto CONTINUE
         end
@@ -235,7 +235,7 @@ end
 function m.testVersion()
     local stack = debug.setcstacklimit(200)
     debug.setcstacklimit(stack + 1)
-    if debug.setcstacklimit(stack) == stack + 1 then
+    if type(stack) == 'number' and debug.setcstacklimit(stack) == stack + 1 then
         proto.notify('window/showMessage', {
             type = 2,
             message = 'It seems to be running in Lua 5.4.0 or Lua 5.4.1 . Please upgrade to Lua 5.4.2 or above. Otherwise, it may encounter weird "C stack overflow", resulting in failure to work properly',
@@ -243,13 +243,34 @@ function m.testVersion()
     end
 end
 
+function m.lockCache()
+    local fs = require 'bee.filesystem'
+    local sp = require 'bee.subprocess'
+    local cacheDir = string.format('%s/cache', LOGPATH)
+    local myCacheDir = string.format('%s/%d'
+        , cacheDir
+        , sp.get_id()
+    )
+    fs.create_directories(fs.path(myCacheDir))
+    local err
+    m.lockFile, err = io.open(myCacheDir .. '/.lock', 'wb')
+    if err then
+        log.error(err)
+    end
+    pub.task('removeCaches', cacheDir)
+end
+
 function m.start()
     util.enableCloseFunction()
     await.setErrorHandle(log.error)
     pub.recruitBraves(4)
+    if COMPILECORES and COMPILECORES > 0 then
+        pub.recruitBraves(COMPILECORES, 'compile')
+    end
     proto.listen()
     m.report()
     m.testVersion()
+    m.lockCache()
 
     require 'provider'
 

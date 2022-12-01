@@ -10,45 +10,8 @@ require 'provider.inlay-hint'
 
 local m = {}
 
-local function testFileEvents(initer)
-    initer.fileOperations = {
-        didCreate = {
-            filters = {
-                {
-                    pattern = {
-                        glob = '**',
-                        --matches = 'file',
-                        options = platform.OS == 'Windows',
-                    }
-                }
-            }
-        },
-        didDelete = {
-            filters = {
-                {
-                    pattern = {
-                        glob = '**',
-                        --matches = 'file',
-                        options = platform.OS == 'Windows',
-                    }
-                }
-            }
-        },
-        didRename = {
-            filters = {
-                {
-                    pattern = {
-                        glob = '**',
-                        --matches = 'file',
-                        options = platform.OS == 'Windows',
-                    }
-                }
-            }
-        },
-    }
-end
-
 m.fillings = {}
+m.resolvedMap = {}
 
 local function mergeFillings(provider)
     for _, filling in ipairs(m.fillings) do
@@ -67,6 +30,22 @@ local function mergeFillings(provider)
     end
 end
 
+local function resolve(t)
+    for k, v in pairs(t) do
+        if type(v) == 'table' then
+            resolve(v)
+        end
+        if type(v) == 'string' then
+            t[k] = v:gsub('%{(.-)%}', function (key)
+                return m.resolvedMap[key] or ''
+            end)
+        end
+        if type(v) == 'function' then
+            t[k] = v()
+        end
+    end
+end
+
 function m.getProvider()
     local provider = {
         offsetEncoding = client.getOffsetEncoding(),
@@ -79,8 +58,6 @@ function m.getProvider()
         },
     }
 
-    --testFileEvents()
-
     nonil.enable()
     if not client.info.capabilities.textDocument.completion.dynamicRegistration
     or not client.info.capabilities.workspace.configuration then
@@ -92,12 +69,17 @@ function m.getProvider()
     nonil.disable()
 
     mergeFillings(provider)
+    resolve(provider)
 
     return provider
 end
 
 function m.filling(t)
     m.fillings[#m.fillings+1] = t
+end
+
+function m.resolve(key, value)
+    m.resolvedMap[key] = value
 end
 
 return m

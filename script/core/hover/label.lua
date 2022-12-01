@@ -35,6 +35,9 @@ local function asDocTypeName(source)
         if doc.type == 'doc.alias' then
             return '(alias) ' .. doc.alias[1] .. ' ' .. lang.script('HOVER_EXTENDS', vm.getInfer(doc.extends):view(guide.getUri(source)))
         end
+        if doc.type == 'doc.enum' then
+            return '(enum) ' .. doc.enum[1]
+        end
     end
 end
 
@@ -56,9 +59,9 @@ local function asValue(source, title)
         or type == 'any'
         or type == 'unknown'
         or type == 'nil') then
-        type = nil
+    else
+        pack[#pack+1] = type
     end
-    pack[#pack+1] = type
     if literal then
         pack[#pack+1] = '='
         pack[#pack+1] = literal
@@ -212,7 +215,8 @@ return function (source, oop)
     elseif source.type == 'number'
     or     source.type == 'integer' then
         return asNumber(source)
-    elseif source.type == 'doc.type.name' then
+    elseif source.type == 'doc.type.name'
+    or     source.type == 'doc.enum.name' then
         return asDocTypeName(source)
     elseif source.type == 'doc.field' then
         return asDocFieldName(source)

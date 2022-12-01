@@ -10,7 +10,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -32,7 +32,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "Disable"
 ```
 
@@ -48,7 +48,7 @@ integer
 
 ## default
 
-```json
+```jsonc
 0
 ```
 
@@ -64,7 +64,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -86,7 +86,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "Replace"
 ```
 
@@ -102,7 +102,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "@"
 ```
 
@@ -118,7 +118,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "."
 ```
 
@@ -134,7 +134,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -156,7 +156,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "Fallback"
 ```
 
@@ -172,7 +172,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -186,9 +186,108 @@ true
 Array<string>
 ```
 
+## enum
+
+* ``"action-after-return"``
+* ``"ambiguity-1"``
+* ``"ambiguous-syntax"``
+* ``"args-after-dots"``
+* ``"assign-type-mismatch"``
+* ``"await-in-sync"``
+* ``"block-after-else"``
+* ``"break-outside"``
+* ``"cast-local-type"``
+* ``"cast-type-mismatch"``
+* ``"circle-doc-class"``
+* ``"close-non-object"``
+* ``"code-after-break"``
+* ``"codestyle-check"``
+* ``"count-down-loop"``
+* ``"deprecated"``
+* ``"different-requires"``
+* ``"discard-returns"``
+* ``"doc-field-no-class"``
+* ``"duplicate-doc-alias"``
+* ``"duplicate-doc-field"``
+* ``"duplicate-doc-param"``
+* ``"duplicate-index"``
+* ``"duplicate-set-field"``
+* ``"empty-block"``
+* ``"err-assign-as-eq"``
+* ``"err-c-long-comment"``
+* ``"err-comment-prefix"``
+* ``"err-do-as-then"``
+* ``"err-eq-as-assign"``
+* ``"err-esc"``
+* ``"err-nonstandard-symbol"``
+* ``"err-then-as-do"``
+* ``"exp-in-action"``
+* ``"global-in-nil-env"``
+* ``"index-in-func-name"``
+* ``"jump-local-scope"``
+* ``"keyword"``
+* ``"local-limit"``
+* ``"lowercase-global"``
+* ``"malformed-number"``
+* ``"miss-end"``
+* ``"miss-esc-x"``
+* ``"miss-exp"``
+* ``"miss-exponent"``
+* ``"miss-field"``
+* ``"miss-loop-max"``
+* ``"miss-loop-min"``
+* ``"miss-method"``
+* ``"miss-name"``
+* ``"miss-sep-in-table"``
+* ``"miss-space-between"``
+* ``"miss-symbol"``
+* ``"missing-parameter"``
+* ``"missing-return"``
+* ``"missing-return-value"``
+* ``"need-check-nil"``
+* ``"newfield-call"``
+* ``"newline-call"``
+* ``"no-unknown"``
+* ``"no-visible-label"``
+* ``"not-yieldable"``
+* ``"param-type-mismatch"``
+* ``"redefined-label"``
+* ``"redefined-local"``
+* ``"redundant-parameter"``
+* ``"redundant-return"``
+* ``"redundant-return-value"``
+* ``"redundant-value"``
+* ``"return-type-mismatch"``
+* ``"set-const"``
+* ``"spell-check"``
+* ``"trailing-space"``
+* ``"unbalanced-assignments"``
+* ``"undefined-doc-class"``
+* ``"undefined-doc-name"``
+* ``"undefined-doc-param"``
+* ``"undefined-env-child"``
+* ``"undefined-field"``
+* ``"undefined-global"``
+* ``"unexpect-dots"``
+* ``"unexpect-efunc-name"``
+* ``"unexpect-lfunc-name"``
+* ``"unexpect-symbol"``
+* ``"unicode-name"``
+* ``"unknown-attribute"``
+* ``"unknown-cast-variable"``
+* ``"unknown-diag-code"``
+* ``"unknown-operator"``
+* ``"unknown-symbol"``
+* ``"unreachable-code"``
+* ``"unsupport-symbol"``
+* ``"unused-function"``
+* ``"unused-label"``
+* ``"unused-local"``
+* ``"unused-vararg"``
+
 ## default
 
-```json
+```jsonc
 []
 ```
 
@@ -204,7 +303,7 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 ["git"]
 ```
 
@@ -220,7 +319,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -236,8 +335,248 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 []
+```
+
+# diagnostics.groupFileStatus
+
+批量修改一个组中的文件状态。
+
+* Opened:  只诊断打开的文件
+* Any:     诊断任何文件
+* None:    禁用此诊断
+
+设置为 `Fallback` 意味着组中的诊断由 `diagnostics.neededFileStatus` 单独设置。
+其他设置将覆盖单独设置，但是不会覆盖以 `!` 结尾的设置。
+
+
+## type
+
+```ts
+object<string, string>
+```
+
+## enum
+
+* ``"Any"``
+* ``"Opened"``
+* ``"None"``
+* ``"Fallback"``
+
+## default
+
+```jsonc
+{
+    /*
+    * ambiguity-1
+    * count-down-loop
+    * different-requires
+    * newfield-call
+    * newline-call
+    */
+    "ambiguity": "Fallback",
+    /*
+    * await-in-sync
+    * not-yieldable
+    */
+    "await": "Fallback",
+    /*
+    * codestyle-check
+    * spell-check
+    */
+    "codestyle": "Fallback",
+    /*
+    * duplicate-index
+    * duplicate-set-field
+    */
+    "duplicate": "Fallback",
+    /*
+    * global-in-nil-env
+    * lowercase-global
+    * undefined-env-child
+    * undefined-global
+    */
+    "global": "Fallback",
+    /*
+    * circle-doc-class
+    * doc-field-no-class
+    * duplicate-doc-alias
+    * duplicate-doc-field
+    * duplicate-doc-param
+    * undefined-doc-class
+    * undefined-doc-name
+    * undefined-doc-param
+    * unknown-cast-variable
+    * unknown-diag-code
+    * unknown-operator
+    */
+    "luadoc": "Fallback",
+    /*
+    * redefined-local
+    */
+    "redefined": "Fallback",
+    /*
+    * close-non-object
+    * deprecated
+    * discard-returns
+    */
+    "strict": "Fallback",
+    /*
+    * no-unknown
+    */
+    "strong": "Fallback",
+    /*
+    * assign-type-mismatch
+    * cast-local-type
+    * cast-type-mismatch
+    * need-check-nil
+    * param-type-mismatch
+    * return-type-mismatch
+    * undefined-field
+    */
+    "type-check": "Fallback",
+    /*
+    * missing-parameter
+    * missing-return
+    * missing-return-value
+    * redundant-parameter
+    * redundant-return-value
+    * redundant-value
+    * unbalanced-assignments
+    */
+    "unbalanced": "Fallback",
+    /*
+    * code-after-break
+    * empty-block
+    * redundant-return
+    * trailing-space
+    * unreachable-code
+    * unused-function
+    * unused-label
+    * unused-local
+    * unused-vararg
+    */
+    "unused": "Fallback"
+}
+```
+
+# diagnostics.groupSeverity
+
+批量修改一个组中的诊断等级。
+设置为 `Fallback` 意味着组中的诊断由 `diagnostics.severity` 单独设置。
+其他设置将覆盖单独设置，但是不会覆盖以 `!` 结尾的设置。
+
+
+## type
+
+```ts
+object<string, string>
+```
+
+## enum
+
+* ``"Error"``
+* ``"Warning"``
+* ``"Information"``
+* ``"Hint"``
+* ``"Fallback"``
+
+## default
+
+```jsonc
+{
+    /*
+    * ambiguity-1
+    * count-down-loop
+    * different-requires
+    * newfield-call
+    * newline-call
+    */
+    "ambiguity": "Fallback",
+    /*
+    * await-in-sync
+    * not-yieldable
+    */
+    "await": "Fallback",
+    /*
+    * codestyle-check
+    * spell-check
+    */
+    "codestyle": "Fallback",
+    /*
+    * duplicate-index
+    * duplicate-set-field
+    */
+    "duplicate": "Fallback",
+    /*
+    * global-in-nil-env
+    * lowercase-global
+    * undefined-env-child
+    * undefined-global
+    */
+    "global": "Fallback",
+    /*
+    * circle-doc-class
+    * doc-field-no-class
+    * duplicate-doc-alias
+    * duplicate-doc-field
+    * duplicate-doc-param
+    * undefined-doc-class
+    * undefined-doc-name
+    * undefined-doc-param
+    * unknown-cast-variable
+    * unknown-diag-code
+    * unknown-operator
+    */
+    "luadoc": "Fallback",
+    /*
+    * redefined-local
+    */
+    "redefined": "Fallback",
+    /*
+    * close-non-object
+    * deprecated
+    * discard-returns
+    */
+    "strict": "Fallback",
+    /*
+    * no-unknown
+    */
+    "strong": "Fallback",
+    /*
+    * assign-type-mismatch
+    * cast-local-type
+    * cast-type-mismatch
+    * need-check-nil
+    * param-type-mismatch
+    * return-type-mismatch
+    * undefined-field
+    */
+    "type-check": "Fallback",
+    /*
+    * missing-parameter
+    * missing-return
+    * missing-return-value
+    * redundant-parameter
+    * redundant-return-value
+    * redundant-value
+    * unbalanced-assignments
+    */
+    "unbalanced": "Fallback",
+    /*
+    * code-after-break
+    * empty-block
+    * redundant-return
+    * trailing-space
+    * unreachable-code
+    * unused-function
+    * unused-label
+    * unused-local
+    * unused-vararg
+    */
+    "unused": "Fallback"
+}
 ```
 
 # diagnostics.ignoredFiles
@@ -258,7 +597,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "Opened"
 ```
 
@@ -280,7 +619,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "Opened"
 ```
 
@@ -288,7 +627,9 @@ string
 
 * Opened:  只诊断打开的文件
 * Any:     诊断任何文件
-* Disable: 禁用此诊断
+* None:    禁用此诊断
+
+以 `!` 结尾的设置优先级高于组设置 `diagnostics.groupFileStatus`。
 
 
 ## type
@@ -302,54 +643,118 @@ object<string, string>
 * ``"Any"``
 * ``"Opened"``
 * ``"None"``
+* ``"Any!"``
+* ``"Opened!"``
+* ``"None!"``
 
 ## default
 
-```json
+```jsonc
 {
+    /*
+    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1` 
+    */
     "ambiguity-1": "Any",
+    "assign-type-mismatch": "Opened",
     "await-in-sync": "None",
+    "cast-local-type": "Opened",
+    "cast-type-mismatch": "Opened",
     "circle-doc-class": "Any",
     "close-non-object": "Any",
     "code-after-break": "Opened",
     "codestyle-check": "None",
     "count-down-loop": "Any",
-    "deprecated": "Opened",
+    "deprecated": "Any",
     "different-requires": "Any",
-    "discard-returns": "Opened",
+    "discard-returns": "Any",
     "doc-field-no-class": "Any",
     "duplicate-doc-alias": "Any",
     "duplicate-doc-field": "Any",
     "duplicate-doc-param": "Any",
+    /*
+    在字面量表中重复定义了索引
+    */
     "duplicate-index": "Any",
     "duplicate-set-field": "Any",
+    /*
+    空代码块
+    */
     "empty-block": "Opened",
+    /*
+    不能使用全局变量（ `_ENV` 被设置为了 `nil`）
+    */
     "global-in-nil-env": "Any",
+    /*
+    首字母小写的全局变量定义
+    */
     "lowercase-global": "Any",
-    "missing-parameter": "Opened",
+    "missing-parameter": "Any",
+    "missing-return": "Any",
+    "missing-return-value": "Any",
     "need-check-nil": "Opened",
+    /*
+    在字面量表中，2行代码之间缺少分隔符，在语法上被解析为了一次索引操作
+    */
     "newfield-call": "Any",
+    /*
+    以 `(` 开始的新行，在语法上被解析为了上一行的函数调用
+    */
     "newline-call": "Any",
     "no-unknown": "None",
     "not-yieldable": "None",
+    "param-type-mismatch": "Opened",
+    /*
+    重复定义的局部变量
+    */
     "redefined-local": "Opened",
-    "redundant-parameter": "Opened",
+    /*
+    函数调用时，传入了多余的参数
+    */
+    "redundant-parameter": "Any",
     "redundant-return": "Opened",
-    "redundant-value": "Opened",
+    "redundant-return-value": "Any",
+    /*
+    赋值操作时，值的数量比被赋值的对象多
+    */
+    "redundant-value": "Any",
+    "return-type-mismatch": "Opened",
     "spell-check": "None",
+    /*
+    后置空格
+    */
     "trailing-space": "Opened",
-    "type-check": "None",
     "unbalanced-assignments": "Any",
     "undefined-doc-class": "Any",
     "undefined-doc-name": "Any",
     "undefined-doc-param": "Any",
+    /*
+    `_ENV` 被设置为了新的字面量表，但是试图获取的全局变量不再这张表中
+    */
     "undefined-env-child": "Any",
     "undefined-field": "Opened",
+    /*
+    未定义的全局变量
+    */
     "undefined-global": "Any",
+    "unknown-cast-variable": "Any",
     "unknown-diag-code": "Any",
+    "unknown-operator": "Any",
+    "unreachable-code": "Opened",
+    /*
+    未使用的函数
+    */
     "unused-function": "Opened",
+    /*
+    未使用的标签
+    */
     "unused-label": "Opened",
+    /*
+    未使用的局部变量
+    */
     "unused-local": "Opened",
+    /*
+    未使用的不定参数
+    */
     "unused-vararg": "Opened"
 }
 ```
@@ -357,6 +762,8 @@ object<string, string>
 # diagnostics.severity
 
 修改诊断等级。
+以 `!` 结尾的设置优先级高于组设置 `diagnostics.groupSeverity`。
+
 
 ## type
 
@@ -370,13 +777,23 @@ object<string, string>
 * ``"Warning"``
 * ``"Information"``
 * ``"Hint"``
+* ``"Error!"``
+* ``"Warning!"``
+* ``"Information!"``
+* ``"Hint!"``
 
 ## default
 
-```json
+```jsonc
 {
+    /*
+    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1` 
+    */
     "ambiguity-1": "Warning",
+    "assign-type-mismatch": "Warning",
     "await-in-sync": "Warning",
+    "cast-local-type": "Warning",
+    "cast-type-mismatch": "Warning",
     "circle-doc-class": "Warning",
     "close-non-object": "Warning",
     "code-after-break": "Hint",
@@ -389,37 +806,108 @@ object<string, string>
     "duplicate-doc-alias": "Warning",
     "duplicate-doc-field": "Warning",
     "duplicate-doc-param": "Warning",
+    /*
+    在字面量表中重复定义了索引
+    */
     "duplicate-index": "Warning",
     "duplicate-set-field": "Warning",
+    /*
+    空代码块
+    */
     "empty-block": "Hint",
+    /*
+    不能使用全局变量（ `_ENV` 被设置为了 `nil`）
+    */
     "global-in-nil-env": "Warning",
+    /*
+    首字母小写的全局变量定义
+    */
     "lowercase-global": "Information",
     "missing-parameter": "Warning",
+    "missing-return": "Warning",
+    "missing-return-value": "Warning",
     "need-check-nil": "Warning",
+    /*
+    在字面量表中，2行代码之间缺少分隔符，在语法上被解析为了一次索引操作
+    */
     "newfield-call": "Warning",
-    "newline-call": "Information",
-    "no-unknown": "Information",
+    /*
+    以 `(` 开始的新行，在语法上被解析为了上一行的函数调用
+    */
+    "newline-call": "Warning",
+    "no-unknown": "Warning",
     "not-yieldable": "Warning",
+    "param-type-mismatch": "Warning",
+    /*
+    重复定义的局部变量
+    */
     "redefined-local": "Hint",
+    /*
+    函数调用时，传入了多余的参数
+    */
     "redundant-parameter": "Warning",
-    "redundant-return": "Warning",
+    "redundant-return": "Hint",
+    "redundant-return-value": "Warning",
+    /*
+    赋值操作时，值的数量比被赋值的对象多
+    */
     "redundant-value": "Warning",
+    "return-type-mismatch": "Warning",
     "spell-check": "Information",
+    /*
+    后置空格
+    */
     "trailing-space": "Hint",
-    "type-check": "Warning",
     "unbalanced-assignments": "Warning",
     "undefined-doc-class": "Warning",
     "undefined-doc-name": "Warning",
     "undefined-doc-param": "Warning",
+    /*
+    `_ENV` 被设置为了新的字面量表，但是试图获取的全局变量不再这张表中
+    */
     "undefined-env-child": "Information",
     "undefined-field": "Warning",
+    /*
+    未定义的全局变量
+    */
     "undefined-global": "Warning",
+    "unknown-cast-variable": "Warning",
     "unknown-diag-code": "Warning",
+    "unknown-operator": "Warning",
+    "unreachable-code": "Hint",
+    /*
+    未使用的函数
+    */
     "unused-function": "Hint",
+    /*
+    未使用的标签
+    */
     "unused-label": "Hint",
+    /*
+    未使用的局部变量
+    */
     "unused-local": "Hint",
+    /*
+    未使用的不定参数
+    */
     "unused-vararg": "Hint"
 }
+```
+
+# diagnostics.unusedLocalExclude
+
+如果变量名匹配以下规则，则不对其进行 `unused-local` 诊断。
+
+## type
+
+```ts
+Array<string>
+```
+
+## default
+
+```jsonc
+[]
 ```
 
 # diagnostics.workspaceDelay
@@ -434,7 +922,7 @@ integer
 
 ## default
 
-```json
+```jsonc
 3000
 ```
 
@@ -450,13 +938,15 @@ integer
 
 ## default
 
-```json
+```jsonc
 100
 ```
 
 # format.defaultConfig
 
-**Missing description!!**
+默认的格式化配置，优先级低于工作区内的 `.editorconfig` 文件。
+请查阅[格式化文档](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs)了解用法。
+
 
 ## type
 
@@ -466,7 +956,7 @@ Object<string, string>
 
 ## default
 
-```json
+```jsonc
 {}
 ```
 
@@ -482,7 +972,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -504,7 +994,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "Auto"
 ```
 
@@ -520,7 +1010,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -536,7 +1026,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 false
 ```
 
@@ -558,7 +1048,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "All"
 ```
 
@@ -574,8 +1064,30 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
+```
+
+# hint.semicolon
+
+若语句尾部没有分号，则显示虚拟分号。
+
+## type
+
+```ts
+string
+```
+
+## enum
+
+* ``"All"``: 所有语句都显示虚拟分号。
+* ``"SameLine"``: 2个语句在同一行时，在它们之间显示分号。
+* ``"Disable"``: 禁用虚拟分号。
+
+## default
+
+```jsonc
+"SameLine"
 ```
 
 # hint.setType
@@ -590,7 +1102,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 false
 ```
 
@@ -606,7 +1118,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -622,7 +1134,7 @@ integer
 
 ## default
 
-```json
+```jsonc
 5
 ```
 
@@ -639,7 +1151,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -655,8 +1167,8 @@ integer
 
 ## default
 
-```json
-20
+```jsonc
+50
 ```
 
 # hover.viewNumber
@@ -671,7 +1183,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -687,7 +1199,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -703,13 +1215,13 @@ integer
 
 ## default
 
-```json
+```jsonc
 1000
 ```
 
 # misc.parameters
 
-VSCode中启动语言服务时的[命令行参数](https://github.com/sumneko/lua-language-server/wiki/Command-line)。
+VSCode中启动语言服务时的[命令行参数](https://github.com/sumneko/lua-language-server/wiki/Getting-Started#arguments)。
 
 ## type
 
@@ -719,7 +1231,7 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 []
 ```
 
@@ -746,7 +1258,7 @@ object<string, string>
 
 ## default
 
-```json
+```jsonc
 {
     "basic": "default",
     "bit": "default",
@@ -762,6 +1274,8 @@ object<string, string>
     "package": "default",
     "string": "default",
     "table": "default",
+    "table.clear": "default",
+    "table.new": "default",
     "utf8": "default"
 }
 ```
@@ -785,13 +1299,13 @@ string
 
 ## default
 
-```json
+```jsonc
 "utf8"
 ```
 
 # runtime.meta
 
-**Missing description!!**
+meta文件的目录名称格式。
 
 ## type
 
@@ -801,7 +1315,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "${version} ${language} ${encoding}"
 ```
 
@@ -824,6 +1338,13 @@ Array<string>
 * ``"-="``
 * ``"*="``
 * ``"/="``
+* ``"%="``
+* ``"^="``
+* ``"//="``
+* ``"|="``
+* ``"&="``
+* ``"<<="``
+* ``">>="``
 * ``"||"``
 * ``"&&"``
 * ``"!"``
@@ -832,7 +1353,7 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 []
 ```
 
@@ -852,7 +1373,7 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 ["?.lua","?/init.lua"]
 ```
 
@@ -868,13 +1389,13 @@ boolean
 
 ## default
 
-```json
+```jsonc
 false
 ```
 
 # runtime.plugin
 
-插件路径，请查阅[文档](https://github.com/sumneko/lua-language-server/wiki/Plugin)了解用法。
+插件路径，请查阅[文档](https://github.com/sumneko/lua-language-server/wiki/Plugins)了解用法。
 
 ## type
 
@@ -884,8 +1405,24 @@ string
 
 ## default
 
-```json
+```jsonc
 ""
+```
+
+# runtime.pluginArgs
+
+Additional arguments for the plugin.
+
+## type
+
+```ts
+Array<string>
+```
+
+## default
+
+```jsonc
+[]
 ```
 
 # runtime.special
@@ -907,7 +1444,7 @@ Object<string, string>
 
 ## default
 
-```json
+```jsonc
 {}
 ```
 
@@ -923,7 +1460,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 false
 ```
 
@@ -947,7 +1484,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "Lua 5.4"
 ```
 
@@ -963,7 +1500,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -979,7 +1516,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -995,7 +1532,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 false
 ```
 
@@ -1011,7 +1548,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -1027,13 +1564,13 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
 # spell.dict
 
-**Missing description!!**
+拼写检查的自定义单词。
 
 ## type
 
@@ -1043,13 +1580,13 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 []
 ```
 
 # telemetry.enable
 
-启用遥测，通过网络发送你的编辑器信息与错误日志。在[此处](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%90%E7%A7%81%E5%A3%B0%E6%98%8E)阅读我们的隐私声明。
+启用遥测，通过网络发送你的编辑器信息与错误日志。在[此处](https://github.com/sumneko/lua-language-server/wiki/Home#privacy)阅读我们的隐私声明。
 
 
 ## type
@@ -1060,8 +1597,62 @@ boolean | null
 
 ## default
 
-```json
+```jsonc
 null
+```
+
+# type.castNumberToInteger
+
+允许将 `number` 类型赋给 `integer` 类型。
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+true
+```
+
+# type.weakNilCheck
+
+对联合类型进行类型检查时，忽略其中的 `nil`。
+
+此设置为 `false` 时，`numer|nil` 类型无法赋给 `number` 类型；为 `true` 是则可以。
+
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+false
+```
+
+# type.weakUnionCheck
+
+联合类型中只要有一个子类型满足条件，则联合类型也满足条件。
+
+此设置为 `false` 时，`number|boolean` 类型无法赋给 `number` 类型；为 `true` 时则可以。
+
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+false
 ```
 
 # window.progressBar
@@ -1076,7 +1667,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -1092,7 +1683,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -1116,7 +1707,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -1132,7 +1723,7 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 [".vscode"]
 ```
 
@@ -1148,7 +1739,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -1164,7 +1755,7 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 []
 ```
 
@@ -1180,7 +1771,7 @@ integer
 
 ## default
 
-```json
+```jsonc
 5000
 ```
 
@@ -1196,7 +1787,7 @@ integer
 
 ## default
 
-```json
+```jsonc
 500
 ```
 
@@ -1212,7 +1803,7 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 ["file","untitled","git"]
 ```
 
@@ -1228,7 +1819,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -1244,6 +1835,6 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 []
 ```

@@ -46,7 +46,7 @@ function mt:checkMaxPreload(uri)
     client.requestMessage('Info'
         , lang.script('MWS_MAX_PRELOAD', max)
         , {
-            lang.script
+            lang.script('WINDOW_INCREASE_UPPER_LIMIT'),
         }
         , function (_, index)
             if index == 1 then
@@ -99,6 +99,11 @@ function mt:loadFile(uri, libraryUri)
                 --    self._sets[#self._sets+1] = waker
                 --end)
                 files.setText(uri, content, false)
+                if COMPILECORES then
+                    files.compileStateAsync(uri, function (state) end)
+                else
+                    files.compileState(uri)
+                end
                 if not self._cache[uri] then
                     files.addRef(uri)
                 end
@@ -147,9 +152,9 @@ function mt:loadFile(uri, libraryUri)
 end
 
 ---@async
-function mt:loadAll()
+function mt:loadAll(fileName)
     local startClock = os.clock()
-    log.info('Load files from disk:', self.scp:getName())
+    log.info('Load files from disk:', fileName)
     while self.read < self.max do
         self:update()
         local loader = table.remove(self._stash)
@@ -161,7 +166,7 @@ function mt:loadAll()
         end
     end
     local loadedClock = os.clock()
-    log.info(('Loaded files takes [%.3f] sec: %s'):format(loadedClock - startClock, self.scp:getName()))
+    log.info(('Loaded files takes [%.3f] sec: %s'):format(loadedClock - startClock, fileName))
     self._bar:remove()
     self._bar = progress.create(self.scp.uri, lang.script('WORKSPACE_LOADING', self.scp.uri), 0)
     for i, set in ipairs(self._sets) do
@@ -170,8 +175,8 @@ function mt:loadAll()
         self.read = i
         self:update()
     end
-    log.info(('Compile files takes [%.3f] sec: %s'):format(os.clock() - loadedClock, self.scp:getName()))
-    log.info('Loaded finish:', self.scp:getName())
+    log.info(('Compile files takes [%.3f] sec: %s'):format(os.clock() - loadedClock, fileName))
+    log.info('Loaded finish:', fileName)
 end
 
 function mt:remove()

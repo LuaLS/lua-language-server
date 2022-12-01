@@ -24,10 +24,18 @@ local function searchByLocalID(source, pushResult)
     end
 end
 
-local function searchByNode(source, pushResult)
+local function searchByNode(source, pushResult, mark)
+    mark = mark or {}
+    if mark[source] then
+        return
+    end
+    mark[source] = true
     local uri = guide.getUri(source)
     vm.compileByParentNode(source, nil, true, function (field)
         searchByNodeSwitch(field.type, uri, field, pushResult)
+    end)
+    vm.compileByNodeChain(source, function (src)
+        searchByNode(src, pushResult, mark)
     end)
 end
 

@@ -39,11 +39,11 @@ end
 function TEST(script)
     return function (expect)
         local newScript, catched = catch(script, '?')
-        files.setText('', newScript)
-        local results = core('', catched['?'][1][1], catched['?'][1][2])
+        files.setText(TESTURI, newScript)
+        local results = core(TESTURI, catched['?'][1][1], catched['?'][1][2])
         assert(results)
         assert(eq(expect, results))
-        files.remove('')
+        files.remove(TESTURI)
     end
 end
 

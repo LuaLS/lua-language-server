@@ -6,6 +6,19 @@ local markdown = require 'provider.markdown'
 local util     = require 'utility'
 local lloader  = require 'locale-loader'
 local json     = require 'json-beautify'
+local diagd    = require 'proto.diagnostic'
+
+local function mergeDiagnosticGroupLocale(locale)
+    for groupName, names in pairs(diagd.diagnosticGroups) do
+        local key = ('config.diagnostics.%s'):format(groupName)
+        local list = {}
+        for name in util.sortPairs(names) do
+            list[#list+1] = ('* %s'):format(name)
+        end
+        local desc = table.concat(list, '\n')
+        locale[key] = desc
+    end
+end
 
 local function getLocale()
     local locale = {}
@@ -15,6 +28,8 @@ local function getLocale()
         local text = util.loadFile((dirPath / 'setting.lua'):string())
         if text then
             locale[lang] = lloader(text, lang)
+            -- add `config.diagnostics.XXX`
+            mergeDiagnosticGroupLocale(locale[lang])
         end
     end
 
@@ -85,10 +100,28 @@ local function buildDefault(md, lang, conf)
                 default[k] = v.default
             end
         end
-        setmetatable(default, json.object)
-        md:add('json', ('%s'):format(json.beautify(default, { indent = '    ' })))
+        local list = util.getTableKeys(default, true)
+        if #list == 0 then
+            md:add('jsonc', '{}')
+            return
+        end
+        md:add('jsonc', '{')
+        for i, k in ipairs(list) do
+            local desc = getDesc(lang, conf.properties[k].description)
+            if desc then
+                md:add('jsonc', '    /*')
+                md:add('jsonc', ('    %s'):format(desc:gsub('\n', '\n    ')))
+                md:add('jsonc', '    */')
+            end
+            if i == #list then
+                md:add('jsonc',('    %s: %s'):format(json.encode(k), json.encode(default[k])))
+            else
+                md:add('jsonc',('    %s: %s,'):format(json.encode(k), json.encode(default[k])))
+            end
+        end
+        md:add('jsonc', '}')
     else
-        md:add('json', ('%s'):format(json.encode(default)))
+        md:add('jsonc', ('%s'):format(json.encode(default)))
     end
 end
 

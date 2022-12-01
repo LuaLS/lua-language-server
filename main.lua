@@ -16,9 +16,10 @@ local function getValue(value)
 end
 
 local function loadArgs()
+    ---@type string?
     local lastKey
     for _, v in ipairs(arg) do
-        ---@type string
+        ---@type string?
         local key, tail = v:match '^%-%-([%w_]+)(.*)$'
         local value
         if key then

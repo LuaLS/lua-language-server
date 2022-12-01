@@ -1,5 +1,4 @@
 local files       = require 'files'
-local codeFormat  = require 'code_format'
 local converter   = require 'proto.converter'
 local log         = require 'log'
 local pformatting = require 'provider.formatting'
@@ -7,8 +6,14 @@ local pformatting = require 'provider.formatting'
 
 ---@async
 return function(uri, callback)
-    local text = files.getText(uri)
-    if not text then
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
+    local text = state.originText
+
+    local suc, codeFormat  = pcall(require, 'code_format')
+    if not suc then
         return
     end
 
@@ -27,8 +32,8 @@ return function(uri, callback)
     if diagnosticInfos then
         for _, diagnosticInfo in ipairs(diagnosticInfos) do
             callback {
-                start   = converter.unpackPosition(uri, diagnosticInfo.range.start),
-                finish  = converter.unpackPosition(uri, diagnosticInfo.range["end"]),
+                start   = converter.unpackPosition(state, diagnosticInfo.range.start),
+                finish  = converter.unpackPosition(state, diagnosticInfo.range["end"]),
                 message = diagnosticInfo.message
             }
         end

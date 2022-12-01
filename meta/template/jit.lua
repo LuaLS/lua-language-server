@@ -9,24 +9,24 @@
 ---@field arch        string
 jit = {}
 
----@overload fun()
+---@overload fun(...):...
 ---@param func       function|boolean
 ---@param recursive? boolean
 function jit.on(func, recursive) end
 
----@overload fun()
+---@overload fun(...):...
 ---@param func       function|boolean
 ---@param recursive? boolean
 function jit.off(func, recursive) end
 
----@overload fun()
+---@overload fun(...):...
 ---@overload fun(tr: number)
 ---@param func       function|boolean
 ---@param recursive? boolean
 function jit.flush(func, recursive) end
 
 ---@return boolean status
----@return ...
+---@return string ...
 ---@nodiscard
 function jit.status() end
 

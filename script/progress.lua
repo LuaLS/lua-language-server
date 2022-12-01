@@ -11,10 +11,10 @@ local m = {}
 m.map = {}
 
 ---@class progress
----@field _uri  uri
+---@field _uri   uri
+---@field _token integer
 local mt = {}
 mt.__index     = mt
-mt._token      = nil
 mt._title      = nil
 mt._message    = nil
 mt._removed    = false
@@ -46,6 +46,10 @@ function mt:remove()
     end
 end
 
+function mt:isRemoved()
+    return self._removed == true
+end
+
 ---设置描述
 ---@param message string # 描述
 function mt:setMessage(message)
@@ -54,7 +58,7 @@ function mt:setMessage(message)
     end
     self._message = message
     self._dirty   = true
-    self:_update()
+    self:update()
 end
 
 ---设置百分比
@@ -65,16 +69,16 @@ function mt:setPercentage(per)
     end
     self._percentage = math.floor(per)
     self._dirty      = true
-    self:_update()
+    self:update()
 end
 
 ---取消事件
 function mt:onCancel(callback)
     self._onCancel = callback
-    self:_update()
+    self:update()
 end
 
-function mt:_update()
+function mt:update()
     if self._removed then
         return
     end
@@ -136,28 +140,29 @@ end
 function m.update()
     ---@param prog progress
     for _, prog in pairs(m.map) do
-        if prog._removed then
+        if prog:isRemoved() then
             goto CONTINUE
         end
-        prog:_update()
+        prog:update()
         ::CONTINUE::
     end
 end
 
 ---创建一个进度条
----@param uri   uri
+---@param uri?  uri
 ---@param title string # 标题
 ---@param delay number # 至少经过这么久之后才会显示出来
 function m.create(uri, title, delay)
+    local token = nextToken()
     local prog = setmetatable({
-        _token = nextToken(),
+        _token = token,
         _title = title,
         _clock = time.time(),
         _delay = delay * 1000,
         _uri   = uri,
     }, mt)
 
-    m.map[prog._token] = prog
+    m.map[token] = prog
 
     return prog
 end

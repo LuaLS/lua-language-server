@@ -2,24 +2,15 @@ local type = type
 local next = next
 local error = error
 local tonumber = tonumber
-local tostring = tostring
-local table_concat = table.concat
-local table_sort = table.sort
 local string_char = string.char
 local string_byte = string.byte
 local string_find = string.find
 local string_match = string.match
 local string_gsub = string.gsub
 local string_sub = string.sub
-local string_rep = string.rep
 local string_format = string.format
-local setmetatable = setmetatable
-local getmetatable = getmetatable
-local huge = math.huge
-local tiny = -huge
 
 local utf8_char
-local math_type
 
 if _VERSION == "Lua 5.1" or _VERSION == "Lua 5.2" then
     local math_floor = math.floor
@@ -42,57 +33,13 @@ if _VERSION == "Lua 5.1" or _VERSION == "Lua 5.2" then
                 c % 64 + 128
             )
         end
-        error(string.format("invalid UTF-8 code '%x'", c))
-    end
-    function math_type(v)
-        if v >= -2147483648 and v <= 2147483647 and math_floor(v) == v then
-            return "integer"
-        end
-        return "float"
+        error(string_format("invalid UTF-8 code '%x'", c))
     end
 else
     utf8_char = utf8.char
-    math_type = math.type
 end
 
-local json = {}
-
-json.supportSparseArray = true
-
-local objectMt = {}
-
-function json.createEmptyObject()
-    return setmetatable({}, objectMt)
-end
-
-function json.isObject(t)
-    if t[1] ~= nil then
-        return false
-    end
-    return next(t) ~= nil or getmetatable(t) == objectMt
-end
-
-if debug and debug.upvalueid then
-    -- Generate a lightuserdata
-    json.null = debug.upvalueid(json.createEmptyObject, 1)
-else
-    json.null = function() end
-end
-
--- json.encode --
-
-local statusVisited
-local statusBuilder
-local statusDep
-local statusOpt
-
-local defaultOpt = {
-    newline = "",
-    indent = "",
-}
-defaultOpt.__index = defaultOpt
-
-local encode_map = {}
+local json = require "json"
 
 local encode_escape_map = {
     [ "\"" ] = "\\\"",
@@ -111,182 +58,6 @@ for k, v in next, encode_escape_map do
     decode_escape_map[v] = k
     decode_escape_set[string_byte(v, 2)] = true
 end
-
-for i = 0, 31 do
-    local c = string_char(i)
-    if not encode_escape_map[c] then
-        encode_escape_map[c] = string_format("\\u%04x", i)
-    end
-end
-
-encode_map["nil"] = function ()
-    return "null"
-end
-
-local function encode_string(v)
-    return string_gsub(v, '[%z\1-\31\\"]', encode_escape_map)
-end
-
-local function convertreal(v)
-    local g = string_format('%.16g', v)
-    if tonumber(g) == v then
-        return g
-    end
-    return string_format('%.17g', v)
-end
-
-if string_match(tostring(1/2), "%p") == "," then
-    local _convertreal = convertreal
-    function convertreal(v)
-        return string_gsub(_convertreal(v), ',', '.')
-    end
-end
-
-function encode_map.number(v)
-    if v ~= v or v <= tiny or v >= huge then
-        error("unexpected number value '" .. tostring(v) .. "'")
-    end
-    if math_type(v) == "integer" then
-        return string_format('%d', v)
-    end
-    return convertreal(v)
-end
-
-function encode_map.boolean(v)
-    if v then
-        return "true"
-    else
-        return "false"
-    end
-end
-
-local function encode_unexpected(v)
-    if v == json.null then
-        return "null"
-    else
-        error("unexpected type '"..type(v).."'")
-    end
-end
-encode_map[ "function" ] = encode_unexpected
-encode_map[ "userdata" ] = encode_unexpected
-encode_map[ "thread"   ] = encode_unexpected
-
-local function encode_newline()
-    statusBuilder[#statusBuilder+1] = statusOpt.newline..string_rep(statusOpt.indent, statusDep)
-end
-
-local function encode(v)
-    local res = encode_map[type(v)](v)
-    statusBuilder[#statusBuilder+1] = res
-end
-
-function encode_map.string(v)
-    statusBuilder[#statusBuilder+1] = '"'
-    statusBuilder[#statusBuilder+1] = encode_string(v)
-    return '"'
-end
-
-function encode_map.table(t)
-    local first_val = next(t)
-    if first_val == nil then
-        if getmetatable(t) == objectMt then
-            return "{}"
-        else
-            return "[]"
-        end
-    end
-    if statusVisited[t] then
-        error("circular reference")
-    end
-    statusVisited[t] = true
-    if type(first_val) == 'string' then
-        local key = {}
-        for k in next, t do
-            if type(k) ~= "string" then
-                error("invalid table: mixed or invalid key types")
-            end
-            key[#key+1] = k
-        end
-        table_sort(key)
-        statusBuilder[#statusBuilder+1] = "{"
-        statusDep = statusDep + 1
-        encode_newline()
-        local k = key[1]
-        statusBuilder[#statusBuilder+1] = '"'
-        statusBuilder[#statusBuilder+1] = encode_string(k)
-        statusBuilder[#statusBuilder+1] = '": '
-        encode(t[k])
-        for i = 2, #key do
-            local k = key[i]
-            statusBuilder[#statusBuilder+1] = ","
-            encode_newline()
-            statusBuilder[#statusBuilder+1] = '"'
-            statusBuilder[#statusBuilder+1] = encode_string(k)
-            statusBuilder[#statusBuilder+1] = '": '
-            encode(t[k])
-        end
-        statusDep = statusDep - 1
-        encode_newline()
-        statusVisited[t] = nil
-        return "}"
-    elseif json.supportSparseArray then
-        local max = 0
-        for k in next, t do
-            if math_type(k) ~= "integer" or k <= 0 then
-                error("invalid table: mixed or invalid key types")
-            end
-            if max < k then
-                max = k
-            end
-        end
-        statusBuilder[#statusBuilder+1] = "["
-        statusDep = statusDep + 1
-        encode_newline()
-        encode(t[1])
-        for i = 2, max do
-            statusBuilder[#statusBuilder+1] = ","
-            encode_newline()
-            encode(t[i])
-        end
-        statusDep = statusDep - 1
-        encode_newline()
-        statusVisited[t] = nil
-        return "]"
-    else
-        if t[1] == nil then
-            error("invalid table: mixed or invalid key types")
-        end
-        statusBuilder[#statusBuilder+1] = "["
-        statusDep = statusDep + 1
-        encode_newline()
-        encode(t[1])
-        local count = 2
-        while t[count] ~= nil do
-            statusBuilder[#statusBuilder+1] = ","
-            encode_newline()
-            encode(t[count])
-            count = count + 1
-        end
-        if next(t, count-1) ~= nil then
-            error("invalid table: mixed or invalid key types")
-        end
-        statusDep = statusDep - 1
-        encode_newline()
-        statusVisited[t] = nil
-        return "]"
-    end
-end
-
-function json.encode(v, option)
-    statusVisited = {}
-    statusBuilder = {}
-    statusDep = 0
-    statusOpt = option and setmetatable(option, defaultOpt) or defaultOpt
-    encode(v)
-    return table_concat(statusBuilder)
-end
-
--- json.decode --
 
 local statusBuf
 local statusPos
@@ -580,7 +351,7 @@ local function decode_item()
     end
 end
 
-function json.decode(str)
+function json.decode_jsonc(str)
     if type(str) ~= "string" then
         error("expected argument of type string, got " .. type(str))
     end

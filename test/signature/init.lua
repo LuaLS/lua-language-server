@@ -8,22 +8,27 @@ rawset(_G, 'TEST', true)
 function TEST(script)
     return function (expect)
         local newScript, catched1 = catch(script, '?')
-        local newExpect, catched2 = catch(expect or '', '!')
-        files.setText('', newScript)
-        local hovers = core('', catched1['?'][1][1])
+        files.setText(TESTURI, newScript)
+        local hovers = core(TESTURI, catched1['?'][1][1])
         if hovers then
-            assert(expect)
-            local hover = hovers[#hovers]
+            assert(#hovers == #expect)
+            for i, hover in ipairs(hovers) do
+                local newExpect, catched2 = catch(expect[i], '!')
+                local arg = hover.params[hover.index]
 
-            local arg = hover.params[hover.index].label
-
-            assert(newExpect == hover.label)
-            assert(catched2['!'][1][1] == arg[1])
-            assert(catched2['!'][1][2] == arg[2])
+                assert(newExpect == hover.label)
+                if arg then
+                    assert(catched2['!'][1] ~= nil)
+                    assert(catched2['!'][1][1] == arg.label[1])
+                    assert(catched2['!'][1][2] == arg.label[2])
+                else
+                    assert(#catched2['!'] == 0)
+                end
+            end
         else
             assert(expect == nil)
         end
-        files.remove('')
+        files.remove(TESTURI)
     end
 end
 
@@ -33,7 +38,7 @@ end
 
 x(<??>
 ]]
-'function x(<!a: any!>, b: any)'
+{'function x(<!a: any!>, b: any)'}
 
 TEST [[
 local function x(a, b)
@@ -41,7 +46,7 @@ end
 
 x(<??>)
 ]]
-'function x(<!a: any!>, b: any)'
+{'function x(<!a: any!>, b: any)'}
 
 TEST [[
 local function x(a, b)
@@ -49,7 +54,7 @@ end
 
 x(xxx<??>)
 ]]
-'function x(<!a: any!>, b: any)'
+{'function x(<!a: any!>, b: any)'}
 
 TEST [[
 local function x(a, b)
@@ -57,7 +62,7 @@ end
 
 x(xxx, <??>)
 ]]
-'function x(a: any, <!b: any!>)'
+{'function x(a: any, <!b: any!>)'}
 
 TEST [[
 function mt:f(a)
@@ -65,7 +70,7 @@ end
 
 mt:f(<??>
 ]]
-'(method) mt:f(<!a: any!>)'
+{'(method) mt:f(<!a: any!>)'}
 
 TEST [[
 local function x(a, b)
@@ -74,7 +79,7 @@ end
 
 x(<??>
 ]]
-'function x(<!a: any!>, b: any)'
+{'function x(<!a: any!>, b: any)'}
 
 TEST [[
 local function x(a, ...)
@@ -83,12 +88,12 @@ end
 
 x(1, 2, 3, <??>
 ]]
-'function x(a: any, <!...: any!>)'
+{'function x(a: any, <!...any!>)'}
 
 TEST [[
 (''):sub(<??>
 ]]
-'(method) string:sub(<!i: integer!>, j?: integer)'
+{'(method) string:sub(<!i: integer!>, j?: integer)'}
 
 TEST [[
 (''):sub(1)<??>
@@ -101,7 +106,7 @@ end
 
 f(1, 'string<??>')
 ]]
-'function f(a: any, <!b: any!>, c: any)'
+{'function f(a: any, <!b: any!>, c: any)'}
 
 TEST [[
 pcall(function () <??> end)
@@ -118,7 +123,7 @@ TEST [[
 local zzzz
 zzzz(<??>)
 ]]
-'function zzzz(<!x: number!>, y: number)'
+{'function zzzz(<!x: number!>, y: number)'}
 
 TEST [[
 ('abc'):format(f(<??>))
@@ -132,7 +137,7 @@ end
 
 Foo(<??>)
 ]]
-'function Foo(<!param01: any!>, param02: any)'
+{'function Foo(<!param01: any!>, param02: any)'}
 
 TEST [[
 function f1(a, b)
@@ -143,7 +148,7 @@ end
 
 f2(f1(),<??>)
 ]]
-'function f2(c: any, <!d: any!>)'
+{'function f2(c: any, <!d: any!>)'}
 
 TEST [[
 local function f(a, b, c)
@@ -151,13 +156,13 @@ end
 
 f({},<??>)
 ]]
-'function f(a: any, <!b: any!>, c: any)'
+{'function f(a: any, <!b: any!>, c: any)'}
 
 TEST [[
 for _ in pairs(<??>) do
 end
 ]]
-'function pairs(<!t: <T>!>)'
+{'function pairs(<!t: <T:table>!>)'}
 
 TEST [[
 function m:f()
@@ -165,7 +170,7 @@ end
 
 m.f(<??>)
 ]]
-'function m.f(<!self: any!>)'
+{'function m.f(<!self: any!>)'}
 
 TEST [[
 ---@alias nnn table<number, string>
@@ -175,7 +180,7 @@ local function f(x, y, z) end
 
 f(<??>)
 ]]
-'function f(<!x: table<number, string>!>, y: any, z: any)'
+{'function f(<!x: table<number, string>!>, y: any, z: any)'}
 
 TEST [[
 local function x(a, b)
@@ -183,7 +188,7 @@ end
 
 x(  aaaa  <??>, 2)
 ]]
-"function x(<!a: any!>, b: any)"
+{"function x(<!a: any!>, b: any)"}
 
 TEST [[
 local function x(a, b)
@@ -191,7 +196,7 @@ end
 
 x(<??>   aaaa  , 2)
 ]]
-'function x(<!a: any!>, b: any)'
+{'function x(<!a: any!>, b: any)'}
 
 TEST [[
 local function x(a, b)
@@ -199,7 +204,7 @@ end
 
 x(aaaa  ,<??>    2)
 ]]
-'function x(a: any, <!b: any!>)'
+{'function x(a: any, <!b: any!>)'}
 
 TEST [[
 local function x(a, b)
@@ -207,7 +212,7 @@ end
 
 x(aaaa  ,    2     <??>)
 ]]
-'function x(a: any, <!b: any!>)'
+{'function x(a: any, <!b: any!>)'}
 
 TEST [[
 local fooC
@@ -221,10 +226,119 @@ fooC(function (x, s)
     
 end,<??>)
 ]]
-'function fooC(callback: fun(x: number, s: string):nil, <!par: number!>)'
+{'function fooC(callback: fun(x: number, s: string):nil, <!par: number!>)'}
 
 TEST [[
 (function (a, b)
 end)(<??>)
 ]]
-'function (<!a: any!>, b: any)'
+{'function (<!a: any!>, b: any)'}
+
+TEST [[
+function X() end
+
+---@param a number
+function X(a) end
+
+---@param a number
+---@param b number
+function X(a, b) end
+
+X(<??>)
+]]
+{
+'function X()',
+'function X(<!a: number!>)',
+'function X(<!a: number!>, b: number)',
+}
+
+TEST [[
+function X() end
+
+---@param a number
+function X(a) end
+
+---@param a number
+---@param b number
+function X(a, b) end
+
+X(<?1?>)
+]]
+{
+'function X(<!a: number!>)',
+'function X(<!a: number!>, b: number)',
+}
+
+TEST [[
+function X() end
+
+---@param a number
+function X(a) end
+
+---@param a number
+---@param b number
+function X(a, b) end
+
+X(1, <??>)
+]]
+{
+'function X(a: number, <!b: number!>)',
+}
+
+TEST [[
+function X() end
+
+---@param a number
+function X(a) end
+
+---@param a number
+---@param b number
+function X(a, b) end
+
+X(1, <?2?>)
+]]
+{
+'function X(a: number, <!b: number!>)',
+}
+
+TEST [[
+---@alias A { x:number, y:number, z:number }
+
+---comment
+---@param a A
+---@param b string
+function X(a, b)
+    
+end
+
+X({}, <??>)
+]]
+{
+'function X(a: { x: number, y: number, z: number }, <!b: string!>)'
+}
+
+TEST [[
+---@overload fun(x: number)
+---@overload fun(x: number, y: number)
+local function f(...)
+end
+
+f(<??>)
+]]
+{
+'function f(<!x: number!>)',
+'function f(<!x: number!>, y: number)',
+}
+
+TEST [[
+---@class A
+---@overload fun(x: number)
+
+---@type A
+local t
+
+t(<??>)
+]]
+{
+'function (<!x: number!>)',
+}

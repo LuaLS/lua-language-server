@@ -23,7 +23,7 @@ end)
 
 pub.on('protoerror', function (err)
     log.warn('Load proto error:', err)
-    os.exit(true)
+    os.exit(0, true)
 end)
 
 pub.on('wakeup', function () end)

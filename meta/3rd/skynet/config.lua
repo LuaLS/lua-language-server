@@ -1,1 +1,0 @@
-words = { "skynet.start" }

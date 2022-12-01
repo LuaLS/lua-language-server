@@ -1,5 +1,7 @@
 local m = require 'lpeglabel'
 
+---@class catched
+---@operator add: catched
 local mt = {}
 
 local function catchedTable()
@@ -35,6 +37,8 @@ end
 
 ---@param script string
 ---@param seps string
+---@return string
+---@return table<string, catched>
 return function (script, seps)
     local tokens = parseTokens(script, seps)
     local newBuf = {}

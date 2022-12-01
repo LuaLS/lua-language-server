@@ -25,7 +25,9 @@ config.runtime.unicodeName        = -- TODO: need translate!
 config.runtime.nonstandardSymbol  = -- TODO: need translate!
 "Supports non-standard symbols. Make sure that your runtime environment supports these symbols."
 config.runtime.plugin             = -- TODO: need translate!
-"Plugin path. Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/Plugin) to learn more."
+"Plugin path. Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/Plugins) to learn more."
+config.runtime.pluginArgs         = -- TODO: need translate!
+"Additional arguments for the plugin."
 config.runtime.fileEncoding       = -- TODO: need translate!
 "File encoding. The `ansi` option is only available under the `Windows` platform."
 config.runtime.builtin            = -- TODO: need translate!
@@ -36,6 +38,8 @@ Adjust the enabled state of the built-in library. You can disable (or redefine) 
 * `enable`: always enable
 * `disable`: always disable
 ]]
+config.runtime.meta               = -- TODO: need translate!
+'Format of the directory name of the meta files.'
 config.diagnostics.enable         = -- TODO: need translate!
 "Enable diagnostics."
 config.diagnostics.disable        = -- TODO: need translate!
@@ -43,15 +47,46 @@ config.diagnostics.disable        = -- TODO: need translate!
 config.diagnostics.globals        = -- TODO: need translate!
 "Defined global variables."
 config.diagnostics.severity       = -- TODO: need translate!
-"Modified diagnostic severity."
+[[
+Modify the diagnostic severity.
+
+End with `!` means override the group setting `diagnostics.groupSeverity`.
+]]
 config.diagnostics.neededFileStatus = -- TODO: need translate!
 [[
 * Opened:  only diagnose opened files
 * Any:     diagnose all files
-* Disable: disable this diagnostic
+* None:    disable this diagnostic
+
+End with `!` means override the group setting `diagnostics.groupFileStatus`.
 ]]
+config.diagnostics.groupSeverity  = -- TODO: need translate!
+[[
+Modify the diagnostic severity in a group.
+`Fallback` means that diagnostics in this group are controlled by `diagnostics.severity` separately.
+Other settings will override individual settings without end of `!`.
+]]
+config.diagnostics.groupFileStatus = -- TODO: need translate!
+[[
+Modify the diagnostic needed file status in a group.
+
+* Opened:  only diagnose opened files
+* Any:     diagnose all files
+* None:    disable this diagnostic
+
+`Fallback` means that diagnostics in this group are controlled by `diagnostics.neededFileStatus` separately.
+Other settings will override individual settings without end of `!`.
+]]
+config.diagnostics.workspaceEvent = -- TODO: need translate!
+"Set the time to trigger workspace diagnostics."
+config.diagnostics.workspaceEvent.OnChange = -- TODO: need translate!
+"Trigger workspace diagnostics when the file is changed."
+config.diagnostics.workspaceEvent.OnSave = -- TODO: need translate!
+"Trigger workspace diagnostics when the file is saved."
+config.diagnostics.workspaceEvent.None = -- TODO: need translate!
+"Disable workspace diagnostics."
 config.diagnostics.workspaceDelay = -- TODO: need translate!
-"Latency (milliseconds) for workspace diagnostics. When you start the workspace, or edit any file, the entire workspace will be re-diagnosed in the background. Set to negative to disable workspace diagnostics."
+"Latency (milliseconds) for workspace diagnostics."
 config.diagnostics.workspaceRate  = -- TODO: need translate!
 "Workspace diagnostics run rate (%). Decreasing this value reduces CPU usage, but also reduces the speed of workspace diagnostics. The diagnosis of the file you are currently editing is always done at full speed and is not affected by this setting."
 config.diagnostics.libraryFiles   = -- TODO: need translate!
@@ -72,6 +107,8 @@ config.diagnostics.ignoredFiles.Disable  = -- TODO: need translate!
 "These files are not diagnosed."
 config.diagnostics.disableScheme  = -- TODO: need translate!
 'Do not diagnose Lua files that use the following scheme.'
+config.diagnostics.unusedLocalExclude = -- TODO: need translate!
+'Do not diagnose `unused-local` when the variable name matches the following pattern.'
 config.workspace.ignoreDir        = -- TODO: need translate!
 "Ignored files and directories (Use `.gitignore` grammar)."-- .. example.ignoreDir,
 config.workspace.ignoreSubmodules = -- TODO: need translate!
@@ -211,14 +248,31 @@ config.hint.arrayIndex.Disable           = -- TODO: need translate!
 'Disable hints of array index.'
 config.hint.await                        = -- TODO: need translate!
 'If the called function is marked `---@async`, prompt `await` at the call.'
+config.hint.semicolon                    = -- TODO: need translate!
+'If there is no semicolon at the end of the statement, display a virtual semicolon.'
+config.hint.semicolon.All                = -- TODO: need translate!
+'All statements display virtual semicolons.'
+config.hint.semicolon.SameLine            = -- TODO: need translate!
+'When two statements are on the same line, display a semicolon between them.'
+config.hint.semicolon.Disable            = -- TODO: need translate!
+'Disable virtual semicolons.'
 config.format.enable                     = -- TODO: need translate!
 'Enable code formatter.'
+config.format.defaultConfig              = -- TODO: need translate!
+[[
+The default format configuration. Has a lower priority than `.editorconfig` file in the workspace.
+Read [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) to learn usage.
+]]
+config.spell.dict                        = -- TODO: need translate!
+'Custom words for spell checking.'
 config.telemetry.enable                  = -- TODO: need translate!
 [[
-Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://github.com/sumneko/lua-language-server/wiki/Privacy-Policy).
+Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://github.com/sumneko/lua-language-server/wiki/Home#privacy).
 ]]
 config.misc.parameters                   = -- TODO: need translate!
 '[Command line parameters](https://github.com/sumneko/lua-telemetry-server/tree/master/method) when starting the language service in VSCode.'
+config.misc.executablePath               = -- TODO: need translate!
+'Specify the executable path in VSCode.'
 config.IntelliSense.traceLocalSet        = -- TODO: need translate!
 'Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
 config.IntelliSense.traceReturn          = -- TODO: need translate!
@@ -227,6 +281,26 @@ config.IntelliSense.traceBeSetted        = -- TODO: need translate!
 'Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
 config.IntelliSense.traceFieldInject     = -- TODO: need translate!
 'Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
+config.type.castNumberToInteger          = -- TODO: need translate!
+'Allowed to assign the `number` type to the `integer` type.'
+config.type.weakUnionCheck               = -- TODO: need translate!
+[[
+Once one subtype of a union type meets the condition, the union type also meets the condition.
+
+When this setting is `false`, the `number|boolean` type cannot be assigned to the `number` type. It can be with `true`.
+]]
+config.type.weakNilCheck                 = -- TODO: need translate!
+[[
+When checking the type of union type, ignore the `nil` in it.
+
+When this setting is `false`, the `number|nil` type cannot be assigned to the `number` type. It can be with `true`.
+]]
+config.doc.privateName                   = -- TODO: need translate!
+'Treat specific field names as private, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are private, witch can only be accessed in the class where the definition is located.'
+config.doc.protectedName                 = -- TODO: need translate!
+'Treat specific field names as protected, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are protected, witch can only be accessed in the class where the definition is located and its subclasses.'
+config.doc.packageName                   = -- TODO: need translate!
+'Treat specific field names as package, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are package, witch can only be accessed in the file where the definition is located.'
 config.diagnostics['unused-local']          = -- TODO: need translate!
 '未使用的局部变量'
 config.diagnostics['unused-function']       = -- TODO: need translate!
@@ -261,3 +335,77 @@ config.diagnostics['empty-block']           = -- TODO: need translate!
 '空代码块'
 config.diagnostics['redundant-value']       = -- TODO: need translate!
 '赋值操作时，值的数量比被赋值的对象多'
+config.diagnostics['assign-type-mismatch']  = -- TODO: need translate!
+'Enable diagnostics for assignments in which the value\'s type does not match the type of the assigned variable.'
+config.diagnostics['await-in-sync']         = -- TODO: need translate!
+'Enable diagnostics for calls of asynchronous functions within a synchronous function.'
+config.diagnostics['cast-local-type']    = -- TODO: need translate!
+'Enable diagnostics for casts of local variables where the target type does not match the defined type.'
+config.diagnostics['cast-type-mismatch']    = -- TODO: need translate!
+'Enable diagnostics for casts where the target type does not match the initial type.'
+config.diagnostics['circular-doc-class']    = -- TODO: need translate!
+'Enable diagnostics for two classes inheriting from each other introducing a circular relation.'
+config.diagnostics['close-non-object']      = -- TODO: need translate!
+'Enable diagnostics for attempts to close a variable with a non-object.'
+config.diagnostics['code-after-break']      = -- TODO: need translate!
+'Enable diagnostics for code placed after a break statement in a loop.'
+config.diagnostics['codestyle-check']       = -- TODO: need translate!
+'Enable diagnostics for incorrectly styled lines.'
+config.diagnostics['count-down-loop']       = -- TODO: need translate!
+'Enable diagnostics for `for` loops which will never reach their max/limit because the loop is incrementing instead of decrementing.'
+config.diagnostics['deprecated']            = -- TODO: need translate!
+'Enable diagnostics to highlight deprecated API.'
+config.diagnostics['different-requires']    = -- TODO: need translate!
+'Enable diagnostics for files which are required by two different paths.'
+config.diagnostics['discard-returns']       = -- TODO: need translate!
+'Enable diagnostics for calls of functions annotated with `---@nodiscard` where the return values are ignored.'
+config.diagnostics['doc-field-no-class']    = -- TODO: need translate!
+'Enable diagnostics to highlight a field annotation without a defining class annotation.'
+config.diagnostics['duplicate-doc-alias']   = -- TODO: need translate!
+'Enable diagnostics for a duplicated alias annotation name.'
+config.diagnostics['duplicate-doc-field']   = -- TODO: need translate!
+'Enable diagnostics for a duplicated field annotation name.'
+config.diagnostics['duplicate-doc-param']   = -- TODO: need translate!
+'Enable diagnostics for a duplicated param annotation name.'
+config.diagnostics['duplicate-set-field']   = -- TODO: need translate!
+'Enable diagnostics for setting the same field in a class more than once.'
+config.diagnostics['missing-parameter']     = -- TODO: need translate!
+'Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.'
+config.diagnostics['missing-return']        = -- TODO: need translate!
+'Enable diagnostics for functions with return annotations which have no return statement.'
+config.diagnostics['missing-return-value']  = -- TODO: need translate!
+'Enable diagnostics for return statements without values although the containing function declares returns.'
+config.diagnostics['need-check-nil']        = -- TODO: need translate!
+'Enable diagnostics for variable usages if `nil` or an optional (potentially `nil`) value was assigned to the variable before.'
+config.diagnostics['no-unknown']            = -- TODO: need translate!
+'Enable diagnostics for cases in which the type cannot be inferred.'
+config.diagnostics['not-yieldable']         = -- TODO: need translate!
+'Enable diagnostics for calls to `coroutine.yield()` when it is not permitted.'
+config.diagnostics['param-type-mismatch']   = -- TODO: need translate!
+'Enable diagnostics for function calls where the type of a provided parameter does not match the type of the annotated function definition.'
+config.diagnostics['redundant-return']      = -- TODO: need translate!
+'Enable diagnostics for return statements which are not needed because the function would exit on its own.'
+config.diagnostics['redundant-return-value']= -- TODO: need translate!
+'Enable diagnostics for return statements which return an extra value which is not specified by a return annotation.'
+config.diagnostics['return-type-mismatch']  = -- TODO: need translate!
+'Enable diagnostics for return values whose type does not match the type declared in the corresponding return annotation.'
+config.diagnostics['spell-check']           = -- TODO: need translate!
+'Enable diagnostics for typos in strings.'
+config.diagnostics['unbalanced-assignments']= -- TODO: need translate!
+'Enable diagnostics on multiple assignments if not all variables obtain a value (e.g., `local x,y = 1`).'
+config.diagnostics['undefined-doc-class']   = -- TODO: need translate!
+'Enable diagnostics for class annotations in which an undefined class is referenced.'
+config.diagnostics['undefined-doc-name']    = -- TODO: need translate!
+'Enable diagnostics for type annotations referencing an undefined type or alias.'
+config.diagnostics['undefined-doc-param']   = -- TODO: need translate!
+'Enable diagnostics for cases in which a parameter annotation is given without declaring the parameter in the function definition.'
+config.diagnostics['undefined-field']       = -- TODO: need translate!
+'Enable diagnostics for cases in which an undefined field of a variable is read.'
+config.diagnostics['unknown-cast-variable'] = -- TODO: need translate!
+'Enable diagnostics for casts of undefined variables.'
+config.diagnostics['unknown-diag-code']     = -- TODO: need translate!
+'Enable diagnostics in cases in which an unknown diagnostics code is entered.'
+config.diagnostics['unknown-operator']      = -- TODO: need translate!
+'Enable diagnostics for unknown operators.'
+config.diagnostics['unreachable-code']      = -- TODO: need translate!
+'Enable diagnostics for unreachable code.'

@@ -1,3 +1,5 @@
+local config = require "config.config"
+config.set(nil, 'Lua.type.castNumberToInteger', false)
 TEST [[
 ---@class <!A!>
 ---@class B : <?A?>
@@ -205,23 +207,30 @@ y.<?a?>
 ]]
 
 TEST [[
----@class <!loli!>
-local unit!>
+---@class <!A!>
+local mt
 
-function unit:pants()
+function mt:f()
 end
 
----@see <?loli?>
+---@see <?A?>
 ]]
 
 TEST [[
----@class loli
-local unit
+---@class A
+local mt
 
-function unit:<!pants!>()
+function <!mt:f!>()
 end
 
----@see loli#<?pants?>
+---@see <?A.f?>
+]]
+
+TEST [[
+AAA = {}
+<!AAA.BBB!> = 1
+
+---@see <?AAA.BBB?>
 ]]
 
 TEST [[
@@ -633,7 +642,7 @@ end
 ]]
 
 TEST [[
----@class TT<V>: { <!x: V!> }
+---@class TT<V>: { <!x!>: V }
 
 ---@type TT<A>
 local t
@@ -644,7 +653,7 @@ print(t.<?x?>)
 ]]
 
 TEST [[
----@alias TT<V> { <!x: V!> }
+---@alias TT<V> { <!x!>: V }
 
 ---@type TT<A>
 local t
@@ -814,7 +823,7 @@ z.<?a?>
 ]]
 
 TEST [[
----@type { <!x: number!>, y: number }
+---@type { <!x!>: number, y: number }
 local t
 
 print(t.<?x?>)
@@ -837,14 +846,14 @@ local <!<?v?>!> = t[1]
 
 TEST [[
 ---@class A
----@field <!['xx']!>? <!{}!>
+---@field [<!'xx'!>]? <!{}!>
 local t
 
 print(t.<?xx?>)
 ]]
 
 TEST [[
----@type { <!['xx']?: boolean!> }
+---@type { [<!'xx'!>]?: boolean }
 local t
 
 print(t.<?xx?>)
@@ -899,3 +908,70 @@ local <!x!>
 
 ---@cast <?x?> integer
 ]]
+
+TEST [[
+local function f()
+    local <!x!>
+
+    ---@cast <?x?> integer
+end
+]]
+
+TEST [[
+---@class A
+---@field <!x!> number
+
+---@param a A
+local function f(a) end
+
+f {
+    <!<?x?>!> = 1,
+}
+]]
+
+TEST [[
+---@class A
+local a
+a.__index = a
+
+---@class B: A
+local b
+b.<!<?__index?>!> = b
+]]
+
+TEST [[
+---@class myClass
+local myClass = { nested = {} }
+
+function myClass.nested.<!fn!>() end
+
+---@type myClass
+local class
+
+class.nested.<?fn?>()
+]]
+
+TEST [[
+---@class myClass
+local myClass = { has = { nested = {} } }
+
+function myClass.has.nested.<!fn!>() end
+
+---@type myClass
+local class
+
+class.has.nested.<?fn?>()
+]]
+
+TEST [[
+---@type table<string, integer>
+local x = {
+    <!a!> = 1,
+    b = 2,
+    c = 3
+}
+
+print(x.<?a?>)
+]]
+
+config.set(nil, 'Lua.type.castNumberToInteger', true)

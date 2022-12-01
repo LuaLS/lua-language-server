@@ -26,6 +26,7 @@ local function founded(targets, results)
     return true
 end
 
+---@async
 function TEST(datas)
     local targetList = {}
     local sourceList
@@ -434,7 +435,7 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            local <!x!>
+            local x
             return {
                 <!x!> = x,
             }

@@ -90,6 +90,7 @@ local function pushErrorLog(link)
     ))
 end
 
+---@type boolean?
 local isValid  = false
 
 timer.wait(5, function ()

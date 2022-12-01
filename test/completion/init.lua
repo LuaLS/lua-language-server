@@ -68,8 +68,8 @@ function TEST(script)
         ---@diagnostic disable: await-in-sync
         local newScript, catched = catch(script, '?')
 
-        files.setText('', newScript)
-        local state = files.getState('')
+        files.setText(TESTURI, newScript)
+        local state = files.getState(TESTURI)
         local inputPos = catched['?'][1][2]
         if ContinueTyping then
             local triggerCharacter = script:sub(inputPos - 1, inputPos - 1)
@@ -77,7 +77,7 @@ function TEST(script)
             or triggerCharacter:find '%w_' then
                 triggerCharacter = nil
             end
-            core.completion('', inputPos, triggerCharacter)
+            core.completion(TESTURI, inputPos, triggerCharacter)
         end
         local offset = guide.positionToOffset(state, inputPos)
         local triggerCharacter = script:sub(offset, offset)
@@ -85,7 +85,7 @@ function TEST(script)
         or triggerCharacter:find '%w_' then
             triggerCharacter = nil
         end
-        local result = core.completion('', inputPos, triggerCharacter)
+        local result = core.completion(TESTURI, inputPos, triggerCharacter)
 
         if not expect then
             assert(result == nil)
@@ -131,7 +131,7 @@ function TEST(script)
                 assert(eq(expect, result))
             end
         end
-        files.remove('')
+        files.remove(TESTURI)
     end
 end
 

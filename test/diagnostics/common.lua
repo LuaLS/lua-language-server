@@ -87,6 +87,15 @@ X = [=[
 ]]
 
 TEST [[
+-- xxxx  
+]]
+
+TEST [[
+-- [=[  
+   ]=]
+]]
+
+TEST [[
 local x
 print(x)
 local <!x!>
@@ -121,6 +130,40 @@ end
 TEST [[
 print(1)
 _ENV = nil
+]]
+
+TEST [[
+---@diagnostic disable: undefined-global
+_ENV = nil
+<!print!>(<!A!>) -- `print` and `A` should warning 
+]]
+
+TEST [[
+---@diagnostic disable: undefined-global
+local _ENV = nil
+<!print!>(<!A!>) -- `print` and `A` should warning 
+]]
+
+TEST [[
+_ENV = {}
+print(A) -- no warning
+]]
+
+TEST [[
+local _ENV = {}
+print(A) -- no warning
+]]
+
+TEST [[
+---@type iolib
+_ENV = {}
+<!print!>(stderr) -- `print` is warning but `stderr` is not
+]]
+
+TEST [[
+---@type iolib
+local _ENV = {}
+<!print!>(stderr) -- `print` is warning but `stderr` is not
 ]]
 
 TEST [[
@@ -239,7 +282,7 @@ local m = {}
 function m:x(a, b)
     return a, b
 end
-m.x(1, 2, 3, <!4!>)
+m.x(m, 2, 3, <!4!>)
 ]]
 
 TEST [[
@@ -439,12 +482,14 @@ local <!x!> = {}
 
 TEST [[
 local function f(<!self!>)
+    return 'something'
 end
 f()
 ]]
 
 TEST [[
 local function f(<!...!>)
+    return 'something'
 end
 f()
 ]]
@@ -469,7 +514,7 @@ local mt = {}
 function mt:f(a, b)
     return a, b
 end
-mt.f(1, 2, 3, <!4!>)
+mt.f(mt, 2, 3, <!4!>)
 ]]
 
 
@@ -569,7 +614,7 @@ local m = {}
 function m:open()
 end
 
-m.open('ok')
+m.open(m)
 ]]
 
 TEST [[
@@ -601,7 +646,7 @@ end!>
 ]]
 
 TEST [[
-<!for _ in pairs(_VERSION) do
+<!for _ in pairs({}) do
 end!>
 ]]
 
@@ -797,7 +842,7 @@ TEST [[
 ]]
 
 TEST [[
----@param x <!Class!>
+---@param <!x!> <!Class!>
 ]]
 
 TEST [[
@@ -850,7 +895,7 @@ TEST [[
 
 TEST [[
 ---@class Class
----@field x Class
+---@field <!x!> Class
 ---@field <!x!> Class
 ]]
 
@@ -874,6 +919,7 @@ TEST [[
 ---@param v T
 ---@param message any
 ---@return T
+---@return any message
 function assert(v, message)
     return v, message
 end
@@ -1007,9 +1053,9 @@ function mt2:method2() end
 local v
 ---@type Bar
 local v2
-v2 = v -- TODO 这里应该给警告
-v2:<!method1!>()
-v2:method2()
+<!v2!> = v
+v2:method1()
+v2:<!method2!>()
 ]]
 
 TEST [[
@@ -1041,22 +1087,20 @@ end
 ]]
 
 TEST [[
-for i = 1, 1 do
+for i = <!100, 10, 1!> do
     print(i)
 end
 ]]
 
 TEST [[
----@param a number
-return function (<!a!>)
+for i = <!1, -10!> do
+    print(i)
 end
 ]]
 
 TEST [[
----@meta
-
----@param a number
-return function (a)
+for i = 1, 1 do
+    print(i)
 end
 ]]
 
@@ -1075,11 +1119,11 @@ return m
 TEST [[
 local m = {}
 
-function m:fff()
+function <!m:fff!>()
 end
 
 do
-    function m:fff()
+    function <!m:fff!>()
     end
 end
 
@@ -1105,6 +1149,8 @@ return m
 ]]
 
 TEST [[
+---@meta
+
 ---@class A
 ---@field a boolean
 
@@ -1229,7 +1275,7 @@ local emit = {}
 TEST [[
 --- @class Emit
 --- @field on fun(eventName: string, cb: function)
---- @field on fun(eventName: '"died"', cb: fun(i: integer))
+--- @field <!on!> fun(eventName: '"died"', cb: fun(i: integer))
 --- @field on fun(eventName: '"won"', cb: fun(s: string))
 --- @field <!on!> fun(eventName: '"died"', cb: fun(i: integer))
 local emit = {}
@@ -1315,9 +1361,11 @@ local function f(cb)
     cb()
 end
 
-<!f!>(function () ---@async
-    return nil
-end)
+return function()
+    <!f>(function () ---@async
+        return nil
+    end)
+end
 ]]
 
 TEST [[
@@ -1325,9 +1373,11 @@ local function f(cb)
     pcall(cb)
 end
 
-<!f!>(function () ---@async
-    return nil
-end)
+return function()
+    <!f!>(function () ---@async
+        return nil
+    end)
+end
 ]]
 
 TEST [[
@@ -1336,9 +1386,11 @@ local function f(c)
     return c
 end
 
-f(function () ---@async
-    return nil
-end)
+return function ()
+    f(function () ---@async
+        return nil
+    end)
+end
 ]]
 
 TEST [[
@@ -1347,9 +1399,11 @@ local function f(...)
     return ...
 end
 
-f(function () ---@async
-    return nil
-end)
+return function ()
+    f(function () ---@async
+        return nil
+    end)
+end
 ]]
 
 TEST [[
@@ -1358,9 +1412,11 @@ local function f(...)
     return ...
 end
 
-f(function () ---@async
-    return nil
-end)
+return function ()
+    f(function () ---@async
+        return nil
+    end)
+end
 ]]
 
 TEST [[
@@ -1368,9 +1424,11 @@ local function f(...)
     return ...
 end
 
-f(function () ---@async
-    return nil
-end)
+return function ()
+    f(function () ---@async
+        return nil
+    end)
+end
 ]]
 
 TEST [[
@@ -1378,9 +1436,11 @@ local function f(...)
     return ...
 end
 
-f(1, function () ---@async
-    return nil
-end)
+return function ()
+    f(function () ---@async
+        return nil
+    end)
+end
 ]]
 
 TEST [[
@@ -1561,6 +1621,14 @@ S = <!x!>()
 ]]
 
 TEST [[
+---@type integer?
+local x
+
+T = {}
+T[<!x!>] = 1
+]]
+
+TEST [[
 local x, y
 local z = x and y
 
@@ -1578,4 +1646,588 @@ function y()
 end
 
 x()
+]]
+
+TEST [[
+---@meta
+
+---@param x fun()
+local function f1(x)
+end
+
+---@return fun()
+local function f2()
+end
+
+f1(f2())
+]]
+
+TEST [[
+---@meta
+
+---@type fun():integer
+local f
+
+---@param x integer
+local function foo(x) end
+
+foo(f())
+]]
+
+TEST [[
+---@type string|table
+local n
+
+print(n.x)
+]]
+
+TEST [[
+---@diagnostic disable: unused-local, unused-function, undefined-global
+
+function F() end
+
+---@param x boolean
+function F(x) end
+
+F(k())
+]]
+
+TEST [[
+local function f()
+    return 1, 2, 3
+end
+
+local function k()
+end
+
+k(<!f()!>)
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+local function f()
+    return 1, 2, 3
+end
+
+---@param x integer
+local function k(x)
+end
+
+k(f())
+]]
+
+TEST [[
+---@cast <!x!> integer
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+local x, y
+---@cast y number
+]]
+
+TEST [[
+---@class A
+
+---@class B
+---@field [integer] A
+---@field [A] true
+]]
+
+TEST [[
+---@class A
+
+---@class B
+---@field [<!A!>] A
+---@field [<!A!>] true
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@type 'x'
+local t
+
+local n = t:upper()
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@alias A 'x'
+
+---@type A
+local t
+
+local n = t:upper()
+]]
+
+TEST [[
+local t = {}
+
+function t:init() end
+
+<!t.init()!>
+]]
+
+TEST [[
+---@meta
+
+return function f(x, y, z) end
+]]
+
+util.arrayInsert(disables, 'redundant-return')
+TEST [[
+---@return number
+function F()
+    <!return!>
+end
+]]
+
+TEST [[
+---@return number, number
+function F()
+    <!return!> 1
+end
+]]
+
+TEST [[
+---@return number, number?
+function F()
+    return 1
+end
+]]
+
+TEST [[
+---@return ...
+function F()
+    return
+end
+]]
+
+TEST [[
+---@return number, number?
+function F()
+    return 1, 1, <!1!>
+end
+]]
+
+TEST [[
+---@return number, number?
+function F()
+    return 1, 1, <!1!>, <!2!>, <!3!>
+end
+]]
+
+TEST [[
+---@meta
+
+---@return number, number
+local function r2() end
+
+---@return number, number?
+function F()
+    return 1, <!r2()!>
+end
+]]
+
+TEST [[
+---@return number
+function F()
+    X = 1<!!>
+end
+]]
+
+TEST [[
+local A
+---@return number
+function F()
+    if A then
+        return 1
+    end<!!>
+end
+]]
+
+TEST [[
+local A, B
+---@return number
+function F()
+    if A then
+        return 1
+    elseif B then
+        return 2
+    end<!!>
+end
+]]
+
+TEST [[
+local A, B
+---@return number
+function F()
+    if A then
+        return 1
+    elseif B then
+        return 2
+    else
+        return 3
+    end
+end
+]]
+
+TEST [[
+local A, B
+---@return number
+function F()
+    if A then
+    elseif B then
+        return 2
+    else
+        return 3
+    end<!!>
+end
+]]
+
+TEST [[
+---@return any
+function F()
+    X = 1
+end
+]]
+
+TEST [[
+---@return any, number
+function F()
+    X = 1<!!>
+end
+]]
+
+TEST [[
+---@return number, any
+function F()
+    X = 1<!!>
+end
+]]
+
+TEST [[
+---@return any, any
+function F()
+    X = 1
+end
+]]
+
+TEST [[
+local A
+---@return number
+function F()
+    for _ = 1, 10 do
+        if A then
+            return 1
+        end
+    end
+    error('should not be here')
+end
+]]
+
+TEST [[
+local A
+---@return number
+function F()
+    while true do
+        if A then
+            return 1
+        end
+    end
+end
+]]
+
+TEST [[
+local A
+---@return number
+function F()
+    while A do
+        if A then
+            return 1
+        end
+    end<!!>
+end
+]]
+
+TEST [[
+local A
+---@return number
+function F()
+    while A do
+        if A then
+            return 1
+        else
+            return 2
+        end
+    end
+end
+]]
+
+TEST [[
+---@return number?
+function F()
+
+end
+]]
+
+util.arrayRemove(disables, 'redundant-return')
+
+TEST [[
+---@class A
+---@operator <!xxx!>: A
+]]
+
+config.add(nil, 'Lua.diagnostics.unusedLocalExclude', 'll_*')
+
+TEST [[
+local <!xx!>
+local ll_1
+local ll_2
+local <!ll!>
+]]
+
+config.remove(nil, 'Lua.diagnostics.unusedLocalExclude', 'll_*')
+
+TEST [[
+---@diagnostic disable: undefined-global
+
+if X then
+    return false
+elseif X then
+    return false
+else
+    return false
+end
+<!return true!>
+]]
+
+TEST [[
+---@diagnostic disable: undefined-global
+
+function X()
+    if X then
+        return false
+    elseif X then
+        return false
+    else
+        return false
+    end
+    <!return true!>
+end
+]]
+
+TEST [[
+while true do
+end
+
+<!print(1)!>
+]]
+
+TEST [[
+while true do
+end
+
+<!print(1)!>
+]]
+
+TEST [[
+while X do
+    X = 1
+end
+
+print(1)
+]]
+
+TEST [[
+---@diagnostic disable: undefined-global
+
+while true do
+    if not X then
+        break
+    end
+end
+
+print(1)
+
+do return end
+]]
+
+TEST [[
+---@type unknown
+local t
+
+local _ <close> = t
+]]
+
+TEST [[
+---@meta
+---@diagnostic disable: duplicate-set-field
+---@class A
+local m = {}
+
+function m.ff() end
+
+function m.ff(x) end
+
+m.ff(1)
+]]
+
+TEST [[
+local done = false
+
+local function set_done()
+    done = true
+end
+
+while not done do
+    set_done()
+end
+
+print(1)
+]]
+
+TEST [[
+---@class A
+---@field private x number
+---@field protected y number
+---@field public z number
+local t
+print(t.x)
+]]
+
+TEST [[
+---@class A
+---@field private x number
+---@field protected y number
+---@field public z number
+
+---@type A
+local t
+
+print(t.<!x!>)
+]]
+
+TEST [[
+---@class A
+---@field private x number
+---@field protected y number
+---@field public z number
+
+---@class B: A
+local t
+
+print(t.y)
+]]
+
+TEST [[
+---@class A
+---@field private x number
+---@field protected y number
+---@field public z number
+
+---@class B: A
+
+---@type B
+local t
+
+print(t.<!y!>)
+]]
+
+TEST [[
+---@class A
+---@field private x number
+---@field protected y number
+---@field public z number
+
+---@class B: A
+
+---@type B
+local t
+
+print(t.z)
+]]
+
+TEST [[
+---@class A
+---@field _id number
+
+---@type A
+local t
+
+print(t._id)
+]]
+
+config.set(nil, 'Lua.doc.privateName', { '_*' })
+TEST [[
+---@class A
+---@field _id number
+
+---@type A
+local t
+
+print(t.<!_id!>)
+
+---@class B: A
+local t2
+
+print(t2.<!_id!>)
+]]
+config.set(nil, 'Lua.doc.privateName', nil)
+
+config.set(nil, 'Lua.doc.protectedName', { '_*' })
+TEST [[
+---@class A
+---@field _id number
+
+---@type A
+local t
+
+print(t.<!_id!>)
+
+---@class B: A
+local t2
+
+print(t2._id)
+]]
+config.set(nil, 'Lua.doc.protectedName', nil)
+
+TEST [[
+---@class A
+---@field private x number
+local mt = {}
+
+function mt:init()
+    print(self.x)
+end
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+---@class A
+---@field private x number
+local mt = {}
+
+function mt:init()
+    ---@type A
+    local obj = {}
+
+    obj.x = 1
+end
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+---@class A
+---@field private x number
+local mt = {}
+
+mt.init = function ()
+    ---@type A
+    local obj = {}
+
+    obj.x = 1
+end
 ]]

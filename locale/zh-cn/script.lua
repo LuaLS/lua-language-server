@@ -102,8 +102,8 @@ DIAG_CIRCLE_DOC_CLASS                 =
 '循环继承的类。'
 DIAG_DOC_FIELD_NO_CLASS               =
 '字段必须定义在类之后。'
-DIAG_DUPLICATE_DOC_CLASS              =
-'重复定义的类 `{}`。'
+DIAG_DUPLICATE_DOC_ALIAS              =
+'重复定义的别名 `{}`。'
 DIAG_DUPLICATE_DOC_FIELD              =
 '重复定义的字段 `{}`。'
 DIAG_DUPLICATE_DOC_PARAM              =
@@ -116,6 +116,40 @@ DIAG_UNDEFINED_DOC_PARAM              =
 '指向了未定义的参数 `{}`。'
 DIAG_UNKNOWN_DIAG_CODE                =
 '未知的诊断代号 `{}`。'
+DIAG_CAST_LOCAL_TYPE                  =
+'已显式定义变量的类型为 `{def}` ，不能再将其类型转换为 `{ref}`。'
+DIAG_CAST_FIELD_TYPE                  =
+'已显式定义字段的类型为 `{def}` ，不能再将其类型转换为 `{ref}`。'
+DIAG_ASSIGN_TYPE_MISMATCH             =
+'不能将 `{ref}` 赋值给 `{def}`。'
+DIAG_PARAM_TYPE_MISMATCH              =
+'不能将 `{ref}` 赋给参数 `{def}`。'
+DIAG_UNKNOWN_CAST_VARIABLE            =
+'未知的类型转换变量 `{}`。'
+DIAG_CAST_TYPE_MISMATCH               =
+'不能将 `{def}` 转换为 `{ref}`。'
+DIAG_MISSING_RETURN_VALUE             =
+'至少需要 {min} 个返回值，但此处只返回 {rmax} 个值。'
+DIAG_MISSING_RETURN_VALUE_RANGE       =
+'至少需要 {min} 个返回值，但此处只返回 {rmin} 到 {rmax} 个值。'
+DIAG_REDUNDANT_RETURN_VALUE           =
+'最多只有 {max} 个返回值，但此处返回了第 {rmax} 个值。'
+DIAG_REDUNDANT_RETURN_VALUE_RANGE     =
+'最多只有 {max} 个返回值，但此处返回了第 {rmin} 到第 {rmax} 个值。'
+DIAG_MISSING_RETURN                   =
+'此处需要返回值。'
+DIAG_RETURN_TYPE_MISMATCH             =
+'第 {index} 个返回值的类型为 `{def}` ，但实际返回的是 `{ref}`。'
+DIAG_UNKNOWN_OPERATOR                 =
+'未知的运算符 `{}`。'
+DIAG_UNREACHABLE_CODE                 =
+'不可达的代码。'
+DIAG_INVISIBLE_PRIVATE                =
+'字段 `{field}` 是私有的，只能在 `{class}` 类中才能访问。'
+DIAG_INVISIBLE_PROTECTED              =
+'字段 `{field}` 受到保护，只能在 `{class}` 类极其子类中才能访问。'
+DIAG_INVISIBLE_PACKAGE                =
+'字段 `{field}` 只能在相同的文件 `{uri}` 中才能访问。'
 
 MWS_NOT_SUPPORT         =
 '{} 目前还不支持多工作目录，我可能需要重启才能支持新的工作目录...'
@@ -143,7 +177,7 @@ WORKSPACE_DIAGNOSTIC      =
 WORKSPACE_SKIP_HUGE_FILE  =
 '出于性能考虑，已停止对此文件解析：{}'
 WORKSPACE_NOT_ALLOWED     =
-'你的工作目录被设置为了 `{}`，Lua语言服务拒绝加载此目录，请检查你的配置。[了解更多](https://github.com/sumneko/lua-language-server/wiki/Why-scanning-home-folder)'
+'你的工作目录被设置为了 `{}`，Lua语言服务拒绝加载此目录，请检查你的配置。[了解更多](https://github.com/sumneko/lua-language-server/wiki/FAQ#why-is-the-server-scanning-the-wrong-folder)'
 WORKSPACE_SCAN_TOO_MUCH   =
 '已扫描了超过 {} 个文件，当前扫描的目录为 `{}`，请确认配置是否正确。'
 
@@ -241,6 +275,10 @@ PARSER_INDEX_IN_FUNC_NAME =
 '命名函数的名称中不能使用 `[name]` 形式。'
 PARSER_UNKNOWN_ATTRIBUTE  =
 '局部变量属性应该是 `const` 或 `close`'
+PARSER_AMBIGUOUS_SYNTAX   =
+'在 Lua 5.1 中，函数调用的左括号必须与函数在同一行。'
+PARSER_NEED_PAREN         =
+'需要添加一对括号。'
 PARSER_LUADOC_MISS_CLASS_NAME           =
 '缺少类名称。'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =
@@ -384,8 +422,10 @@ ACTION_DISABLE_DIAG_FILE=
 '在此文件禁用诊断 ({})。'
 ACTION_MARK_ASYNC       =
 '将当前函数标记为异步。'
-ACTION_ADD_DICT         = -- TODO: need translate!
-'Add \'{}\' to workspace dict'
+ACTION_ADD_DICT         =
+'将 \'{}\' 添加到工作区的词典中。'
+ACTION_FIX_ADD_PAREN    =
+'添加括号。'
 
 COMMAND_DISABLE_DIAG       =
 '禁用诊断'
@@ -448,6 +488,8 @@ WINDOW_PROCESSING_SEMANTIC_RANGE =
 '正在处理差量语义着色...'
 WINDOW_PROCESSING_HINT           =
 '正在处理内联提示...'
+WINDOW_PROCESSING_BUILD_META     =
+'正在处理编译器元数据...'
 WINDOW_INCREASE_UPPER_LIMIT      =
 '增加上限'
 WINDOW_CLOSE                     =
@@ -482,7 +524,7 @@ WINDOW_APPLY_SETTING             =
 WINDOW_CHECK_SEMANTIC            =
 '如果你正在使用市场中的颜色主题，你可能需要同时修改 `editor.semanticHighlighting.enabled` 选项为 `true` 才会使语义着色生效。'
 WINDOW_TELEMETRY_HINT            =
-'请允许发送匿名的使用数据与错误报告，帮助我们进一步完善此插件。在[此处](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%90%E7%A7%81%E5%A3%B0%E6%98%8E)阅读我们的隐私声明。'
+'请允许发送匿名的使用数据与错误报告，帮助我们进一步完善此插件。在[此处](https://github.com/sumneko/lua-language-server/wiki/Home#privacy)阅读我们的隐私声明。'
 WINDOW_TELEMETRY_ENABLE          =
 '允许'
 WINDOW_TELEMETRY_DISABLE         =
@@ -505,6 +547,14 @@ WINDOW_ASK_APPLY_LIBRARY         =
 '是否需要将你的工作环境配置为 `{}` ？'
 WINDOW_SEARCHING_IN_FILES        =
 '正在文件中搜索...'
+WINDOW_CONFIG_LUA_DEPRECATED     =
+'`config.lua` 已废弃，请改用 `config.json` 。'
+WINDOW_CONVERT_CONFIG_LUA        =
+'转换为 `config.json`'
+WINDOW_MODIFY_REQUIRE_PATH      =
+'你想要修改 `require` 的路径吗？'
+WINDOW_MODIFY_REQUIRE_OK        =
+'修改'
 
 CONFIG_LOAD_FAILED               =
 '无法读取设置文件：{}'
@@ -512,6 +562,8 @@ CONFIG_LOAD_ERROR                =
 '设置文件加载错误：{}'
 CONFIG_TYPE_ERROR                =
 '设置文件必须是lua或json格式：{}'
+CONFIG_MODIFY_FAIL_SYNTAX_ERROR  =
+'修改设置失败，设置文件中有语法错误：{}'
 
 PLUGIN_RUNTIME_ERROR             =
 [[
@@ -546,3 +598,629 @@ CLI_CHECK_SUCCESS =
 '诊断完成，没有发现问题'
 CLI_CHECK_RESULTS =
 '诊断完成，共有 {} 个问题，请查看 {}'
+
+TYPE_ERROR_ENUM_GLOBAL_DISMATCH =
+'类型 `{child}` 无法匹配 `{parent}` 的枚举类型'
+TYPE_ERROR_ENUM_GENERIC_UNSUPPORTED =
+'无法在枚举中使用泛型 `{child}`'
+TYPE_ERROR_ENUM_LITERAL_DISMATCH =
+'字面量 `{child}` 无法匹配 `{parent}` 的枚举值'
+TYPE_ERROR_ENUM_OBJECT_DISMATCH =
+'对象 `{child}` 无法匹配 `{parent}` 的枚举值，它们必须是同一个对象'
+TYPE_ERROR_ENUM_NO_OBJECT =
+'无法识别传入的枚举值 `{child}`'
+TYPE_ERROR_INTEGER_DISMATCH =
+'字面量 `{child}` 无法匹配整数 `{parent}`'
+TYPE_ERROR_STRING_DISMATCH =
+'字面量 `{child}` 无法匹配字符串 `{parent}`'
+TYPE_ERROR_BOOLEAN_DISMATCH =
+'字面量 `{child}` 无法匹配布尔值 `{parent}`'
+TYPE_ERROR_TABLE_NO_FIELD =
+'表中不存在字段 `{key}`'
+TYPE_ERROR_TABLE_FIELD_DISMATCH =
+'字段 `{key}` 的类型为 `{child}`，无法匹配 `{parent}`'
+TYPE_ERROR_CHILD_ALL_DISMATCH =
+'`{child}` 中的所有子类型均无法匹配 `{parent}`'
+TYPE_ERROR_PARENT_ALL_DISMATCH =
+'`{child}` 无法匹配 `{parent}` 中的任何子类'
+TYPE_ERROR_UNION_DISMATCH =
+'`{child}` 无法匹配 `{parent}`'
+TYPE_ERROR_OPTIONAL_DISMATCH =
+'可选类型无法匹配 `{parent}`'
+TYPE_ERROR_NUMBER_LITERAL_TO_INTEGER =
+'无法将数字 `{child}` 转换为整数'
+TYPE_ERROR_NUMBER_TYPE_TO_INTEGER =
+'无法将数字类型转换为整数类型'
+TYPE_ERROR_DISMATCH =
+'类型 `{child}` 无法匹配 `{parent}`'
+
+LUADOC_DESC_CLASS = -- TODO: need translate!
+[=[
+Defines a class/table structure
+## Syntax
+`---@class <name> [: <parent>[, <parent>]...]`
+## Usage
+```
+---@class Manager: Person, Human
+Manager = {}
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#class)
+]=]
+LUADOC_DESC_TYPE = -- TODO: need translate!
+[=[
+Specify the type of a certain variable
+
+Default types: `nil`, `any`, `boolean`, `string`, `number`, `integer`,
+`function`, `table`, `thread`, `userdata`, `lightuserdata`
+
+(Custom types can be provided using `@alias`)
+
+## Syntax
+`---@type <type>[| [type]...`
+
+## Usage
+### General
+```
+---@type nil|table|myClass
+local Example = nil
+```
+
+### Arrays
+```
+---@type number[]
+local phoneNumbers = {}
+```
+
+### Enums
+```
+---@type "red"|"green"|"blue"
+local color = ""
+```
+
+### Tables
+```
+---@type table<string, boolean>
+local settings = {
+    disableLogging = true,
+    preventShutdown = false,
+}
+
+---@type { [string]: true }
+local x --x[""] is true
+```
+
+### Functions
+```
+---@type fun(mode?: "r"|"w"): string
+local myFunction
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#types-and-type)
+]=]
+LUADOC_DESC_ALIAS = -- TODO: need translate!
+[=[
+Create your own custom type that can be used with `@param`, `@type`, etc.
+
+## Syntax
+`---@alias <name> <type> [description]`\
+or
+```
+---@alias <name>
+---| 'value' [# comment]
+---| 'value2' [# comment]
+...
+```
+
+## Usage
+### Expand to other type
+```
+---@alias filepath string Path to a file
+
+---@param path filepath Path to the file to search in
+function find(path, pattern) end
+```
+
+### Enums
+```
+---@alias font-style
+---| '"underlined"' # Underline the text
+---| '"bold"' # Bolden the text
+---| '"italic"' # Make the text italicized
+
+---@param style font-style Style to apply
+function setFontStyle(style) end
+```
+
+### Literal Enum
+```
+local enums = {
+    READ = 0,
+    WRITE = 1,
+    CLOSED = 2
+}
+
+---@alias FileStates
+---| `enums.READ`
+---| `enums.WRITE`
+---| `enums.CLOSE`
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#alias)
+]=]
+LUADOC_DESC_PARAM = -- TODO: need translate!
+[=[
+Declare a function parameter
+
+## Syntax
+`@param <name>[?] <type> [comment]`
+
+## Usage
+### General
+```
+---@param url string The url to request
+---@param headers? table<string, string> HTTP headers to send
+---@param timeout? number Timeout in seconds
+function get(url, headers, timeout) end
+```
+
+### Variable Arguments
+```
+---@param base string The base to concat to
+---@param ... string The values to concat
+function concat(base, ...) end
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#param)
+]=]
+LUADOC_DESC_RETURN = -- TODO: need translate!
+[=[
+Declare a return value
+
+## Syntax
+`@return <type> [name] [description]`\
+or\
+`@return <type> [# description]`
+
+## Usage
+### General
+```
+---@return number
+---@return number # The green component
+---@return number b The blue component
+function hexToRGB(hex) end
+```
+
+### Type & name only
+```
+---@return number x, number y
+function getCoords() end
+```
+
+### Type only
+```
+---@return string, string
+function getFirstLast() end
+```
+
+### Return variable values
+```
+---@return string ... The tags of the item
+function getTags(item) end
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#return)
+]=]
+LUADOC_DESC_FIELD = -- TODO: need translate!
+[=[
+Declare a field in a class/table. This allows you to provide more in-depth
+documentation for a table. As of `v3.6.0`, you can mark a field as `private`,
+`protected`, `public`, or `package`.
+
+## Syntax
+`---@field <name> <type> [description]`
+
+## Usage
+```
+---@class HTTP_RESPONSE
+---@field status HTTP_STATUS
+---@field headers table<string, string> The headers of the response
+
+---@class HTTP_STATUS
+---@field code number The status code of the response
+---@field message string A message reporting the status
+
+---@return HTTP_RESPONSE response The response from the server
+function get(url) end
+
+--This response variable has all of the fields defined above
+response = get("localhost")
+
+--Extension provided intellisense for the below assignment
+statusCode = response.status.code
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#field)
+]=]
+LUADOC_DESC_GENERIC = -- TODO: need translate!
+[=[
+Simulates generics. Generics can allow types to be re-used as they help define
+a "generic shape" that can be used with different types.
+
+## Syntax
+`---@generic <name> [:parent_type] [, <name> [:parent_type]]`
+
+## Usage
+### General
+```
+---@generic T
+---@param value T The value to return
+---@return T value The exact same value
+function echo(value)
+    return value
+end
+
+-- Type is string
+s = echo("e")
+
+-- Type is number
+n = echo(10)
+
+-- Type is boolean
+b = echo(true)
+
+-- We got all of this info from just using
+-- @generic rather than manually specifying
+-- each allowed type
+```
+
+### Capture name of generic type
+```
+---@class Foo
+local Foo = {}
+function Foo:Bar() end
+
+---@generic T
+---@param name `T` # the name generic type is captured here
+---@return T       # generic type is returned
+function Generic(name) end
+
+local v = Generic("Foo") -- v is an object of Foo
+```
+
+### How Lua tables use generics
+```
+---@class table<K, V>: { [K]: V }
+
+-- This is what allows us to create a table
+-- and intellisense keeps track of any type
+-- we give for key (K) or value (V)
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#generics-and-generic)
+]=]
+LUADOC_DESC_VARARG = -- TODO: need translate!
+[=[
+Primarily for legacy support for EmmyLua annotations. `@vararg` does not
+provide typing or allow descriptions.
+
+**You should instead use `@param` when documenting parameters (variable or not).**
+
+## Syntax
+`@vararg <type>`
+
+## Usage
+```
+---Concat strings together
+---@vararg string
+function concat(...) end
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#vararg)
+]=]
+LUADOC_DESC_OVERLOAD = -- TODO: need translate!
+[=[
+Allows defining of multiple function signatures.
+
+## Syntax
+`---@overload fun(<name>[: <type>] [, <name>[: <type>]]...)[: <type>[, <type>]...]`
+
+## Usage
+```
+---@overload fun(t: table, value: any): number
+function table.insert(t, position, value) end
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#overload)
+]=]
+LUADOC_DESC_DEPRECATED = -- TODO: need translate!
+[=[
+Marks a function as deprecated. This results in any deprecated function calls
+being ~~struck through~~.
+
+## Syntax
+`---@deprecated`
+
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#deprecated)
+]=]
+LUADOC_DESC_META = -- TODO: need translate!
+[=[
+Indicates that this is a meta file and should be used for definitions and intellisense only.
+
+There are 3 main distinctions to note with meta files:
+1. There won't be any context-based intellisense in a meta file
+2. Hovering a `require` filepath in a meta file shows `[meta]` instead of an absolute path
+3. The `Find Reference` function will ignore meta files
+
+## Syntax
+`---@meta`
+
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#meta)
+]=]
+LUADOC_DESC_VERSION = -- TODO: need translate!
+[=[
+Specifies Lua versions that this function is exclusive to.
+
+Lua versions: `5.1`, `5.2`, `5.3`, `5.4`, `JIT`.
+
+Requires configuring the `Diagnostics: Needed File Status` setting.
+
+## Syntax
+`---@version <version>[, <version>]...`
+
+## Usage
+### General
+```
+---@version JIT
+function onlyWorksInJIT() end
+```
+### Specify multiple versions
+```
+---@version <5.2,JIT
+function oldLuaOnly() end
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#version)
+]=]
+LUADOC_DESC_SEE = -- TODO: need translate!
+[=[
+Define something that can be viewed for more information
+
+## Syntax
+`---@see <text>`
+
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#see)
+]=]
+LUADOC_DESC_DIAGNOSTIC = -- TODO: need translate!
+[=[
+Enable/disable diagnostics for error/warnings/etc.
+
+Actions: `disable`, `enable`, `disable-line`, `disable-next-line`
+
+[Names](https://github.com/sumneko/lua-language-server/blob/cbb6e6224094c4eb874ea192c5f85a6cba099588/script/proto/define.lua#L54)
+
+## Syntax
+`---@diagnostic <action>[: <name>]`
+
+## Usage
+### Disable next line
+```
+---@diagnostic disable-next-line: undefined-global
+```
+
+### Manually toggle
+```
+---@diagnostic disable: unused-local
+local unused = "hello world"
+---@diagnostic enable: unused-local
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#diagnostic)
+]=]
+LUADOC_DESC_MODULE = -- TODO: need translate!
+[=[
+Provides the semantics of `require`.
+
+## Syntax
+`---@module <'module_name'>`
+
+## Usage
+```
+---@module 'string.utils'
+local stringUtils
+-- This is functionally the same as:
+local module = require('string.utils')
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#module)
+]=]
+LUADOC_DESC_ASYNC = -- TODO: need translate!
+[=[
+Marks a function as asynchronous.
+
+## Syntax
+`---@async`
+
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#async)
+]=]
+LUADOC_DESC_NODISCARD = -- TODO: need translate!
+[=[
+Prevents this function's return values from being discarded/ignored.
+This will raise the `discard-returns` warning should the return values
+be ignored.
+
+## Syntax
+`---@nodiscard`
+
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#nodiscard)
+]=]
+LUADOC_DESC_CAST = -- TODO: need translate!
+[=[
+Allows type casting (type conversion).
+
+## Syntax
+`@cast <variable> <[+|-]type>[, <[+|-]type>]...`
+
+## Usage
+### Overwrite type
+```
+---@type integer
+local x --> integer
+
+---@cast x string
+print(x) --> string
+```
+### Add Type
+```
+---@type string
+local x --> string
+
+---@cast x +boolean, +number
+print(x) --> string|boolean|number
+```
+### Remove Type
+```
+---@type string|table
+local x --> string|table
+
+---@cast x -string
+print(x) --> table
+```
+---
+[View Wiki](https://github.com/sumneko/lua-language-server/wiki/Annotations#cast)
+]=]
+LUADOC_DESC_OPERATOR = -- TODO: need translate!
+[=[
+Provide type declaration for [operator metamethods](http://lua-users.org/wiki/MetatableEvents).
+
+## Syntax
+`@operator <operation>[(input_type)]:<resulting_type>`
+
+## Usage
+### Vector Add Metamethod
+```
+---@class Vector
+---@operation add(Vector):Vector
+
+vA = Vector.new(1, 2, 3)
+vB = Vector.new(10, 20, 30)
+
+vC = vA + vB
+--> Vector
+```
+### Unary Minus
+```
+---@class Passcode
+---@operation unm:integer
+
+pA = Passcode.new(1234)
+pB = -pA
+--> integer
+```
+[View Request](https://github.com/sumneko/lua-language-server/issues/599)
+]=]
+LUADOC_DESC_ENUM = -- TODO: need translate!
+[=[
+Mark a table as an enum. If you want an enum but can't define it as a Lua
+table, take a look at the [`@alias`](https://github.com/sumneko/lua-language-server/wiki/Annotations#alias)
+tag.
+
+## Syntax
+`@enum <name>`
+
+## Usage
+```
+---@enum colors
+local colors = {
+	white = 0,
+	orange = 2,
+	yellow = 4,
+	green = 8,
+	black = 16,
+}
+
+---@param color colors
+local function setColor(color) end
+
+-- Completion and hover is provided for the below param
+setColor(colors.green)
+```
+]=]
+LUADOC_DESC_PACKAGE = -- TODO: need translate!
+[=[
+Mark a function as private to the file it is defined in. A packaged function
+cannot be accessed from another file.
+
+## Syntax
+`@package`
+
+## Usage
+```
+---@class Animal
+---@field private eyes integer
+local Animal = {}
+
+---@package
+---This cannot be accessed in another file
+function Animal:eyesCount()
+    return self.eyes
+end
+```
+]=]
+LUADOC_DESC_PRIVATE = -- TODO: need translate!
+[=[
+Mark a function as private to a @class. Private functions can be accessed only
+from within their class and are not accessable from child classes.
+
+## Syntax
+`@private`
+
+## Usage
+```
+---@class Animal
+---@field private eyes integer
+local Animal = {}
+
+---@private
+function Animal:eyesCount()
+    return self.eyes
+end
+
+---@class Dog:Animal
+local myDog = {}
+
+---NOT PERMITTED!
+myDog:eyesCount();
+```
+]=]
+LUADOC_DESC_PROTECTED = -- TODO: need translate!
+[=[
+Mark a function as protected within a @class. Protected functions can be
+accessed only from within their class or from child classes.
+
+## Syntax
+`@protected`
+
+## Usage
+```
+---@class Animal
+---@field private eyes integer
+local Animal = {}
+
+---@protected
+function Animal:eyesCount()
+    return self.eyes
+end
+
+---@class Dog:Animal
+local myDog = {}
+
+---Permitted because function is protected, not private.
+myDog:eyesCount();
+```
+]=]

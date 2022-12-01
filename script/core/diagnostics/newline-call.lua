@@ -1,14 +1,18 @@
 local files = require 'files'
 local guide = require 'parser.guide'
 local lang  = require 'language'
+local await = require 'await'
+local sub   = require 'core.substring'
 
+---@async
 return function (uri, callback)
     local state = files.getState(uri)
     local text  = files.getText(uri)
-    if not state then
+    if not state or not text then
         return
     end
 
+    ---@async
     guide.eachSourceType(state.ast, 'call', function (source)
         local node = source.node
         local args = source.args
@@ -20,6 +24,9 @@ return function (uri, callback)
         if not source.next then
             return
         end
+
+        await.delay()
+
         local startOffset  = guide.positionToOffset(state, args.start) + 1
         local finishOffset = guide.positionToOffset(state, args.finish)
         if text:sub(startOffset,  startOffset)  ~= '('
@@ -38,8 +45,8 @@ return function (uri, callback)
                 start   = node.start,
                 finish  = args.finish,
                 message = lang.script('DIAG_PREVIOUS_CALL'
-                    , text:sub(node.start, node.finish)
-                    , text:sub(args.start, args.finish)
+                    , sub(state)(node.start + 1, node.finish)
+                    , sub(state)(args.start + 1, args.finish)
                 ),
             }
         end

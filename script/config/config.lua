@@ -27,7 +27,7 @@ local function update(scp, key, nowValue, rawValue)
     raw[key] = rawValue
 end
 
----@param uri uri
+---@param uri? uri
 ---@param key? string
 ---@return scope
 local function getScope(uri, key)
@@ -38,7 +38,7 @@ local function getScope(uri, key)
         end
     end
     if uri then
-        ---@type scope
+        ---@type scope?
         local scp = scope.getFolder(uri) or scope.getLinkedScope(uri)
         if scp then
             if not key
@@ -70,11 +70,13 @@ function m.setByScope(scp, key, value)
     return true
 end
 
----@param uri   uri
+---@param uri?   uri
 ---@param key   string
 ---@param value any
 function m.set(uri, key, value)
-    local scp = getScope(uri)
+    local unit = template[key]
+    assert(unit, 'unknown key: ' .. key)
+    local scp = getScope(uri, key)
     local oldValue = m.get(uri, key)
     m.setByScope(scp, key, value)
     local newValue = m.get(uri, key)
@@ -87,13 +89,9 @@ end
 
 function m.add(uri, key, value)
     local unit = template[key]
-    if not unit then
-        return false
-    end
+    assert(unit, 'unknown key: ' .. key)
     local list = m.getRaw(uri, key)
-    if type(list) ~= 'table' then
-        return false
-    end
+    assert(type(list) == 'table', 'not a list: ' .. key)
     local copyed = {}
     for i, v in ipairs(list) do
         if util.equal(v, value) then
@@ -112,15 +110,32 @@ function m.add(uri, key, value)
     return false
 end
 
+function m.remove(uri, key, value)
+    local unit = template[key]
+    assert(unit, 'unknown key: ' .. key)
+    local list = m.getRaw(uri, key)
+    assert(type(list) == 'table', 'not a list: ' .. key)
+    local copyed = {}
+    for i, v in ipairs(list) do
+        if not util.equal(v, value) then
+            copyed[i] = v
+        end
+    end
+    local oldValue = m.get(uri, key)
+    m.set(uri, key, copyed)
+    local newValue = m.get(uri, key)
+    if not util.equal(oldValue, newValue) then
+        m.event(uri, key, newValue, oldValue)
+        return true
+    end
+    return false
+end
+
 function m.prop(uri, key, prop, value)
     local unit = template[key]
-    if not unit then
-        return false
-    end
+    assert(unit, 'unknown key: ' .. key)
     local map = m.getRaw(uri, key)
-    if type(map) ~= 'table' then
-        return false
-    end
+    assert(type(map) == 'table', 'not a map: ' .. key)
     if util.equal(map[prop], value) then
         return false
     end
@@ -139,7 +154,7 @@ function m.prop(uri, key, prop, value)
     return false
 end
 
----@param uri uri
+---@param uri? uri
 ---@param key string
 ---@return any
 function m.get(uri, key)

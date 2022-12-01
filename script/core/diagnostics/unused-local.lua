@@ -3,6 +3,8 @@ local guide  = require 'parser.guide'
 local define = require 'proto.define'
 local lang   = require 'language'
 local vm     = require 'vm.vm'
+local config = require 'config.config'
+local glob   = require 'glob'
 
 local function hasGet(loc)
     if not loc.ref then
@@ -63,18 +65,13 @@ local function isDocClass(source)
     return false
 end
 
-local function isDocParam(source)
-    if not source.bindDocs then
+---@param source parser.object
+local function isDeclareFunctionParam(source)
+    if source.parent.type ~= 'funcargs' then
         return false
     end
-    for _, doc in ipairs(source.bindDocs) do
-        if doc.type == 'doc.param' then
-            if doc.param[1] == source[1] then
-                return true
-            end
-        end
-    end
-    return false
+    local func = source.parent.parent
+    return vm.isEmptyFunction(func)
 end
 
 return function (uri, callback)
@@ -82,10 +79,17 @@ return function (uri, callback)
     if not ast then
         return
     end
+
+    local isMeta = vm.isMetaFile(uri)
+    local ignorePatterns = config.get(uri, 'Lua.diagnostics.unusedLocalExclude')
+    local ignore = glob.glob(ignorePatterns)
     guide.eachSourceType(ast.ast, 'local', function (source)
         local name = source[1]
         if name == '_'
         or name == ast.ENVMode then
+            return
+        end
+        if ignore(name) then
             return
         end
         if isToBeClosed(source) then
@@ -94,7 +98,7 @@ return function (uri, callback)
         if isDocClass(source) then
             return
         end
-        if vm.isMetaFile(uri) and isDocParam(source) then
+        if isMeta and isDeclareFunctionParam(source) then
             return
         end
         local data = hasGet(source)

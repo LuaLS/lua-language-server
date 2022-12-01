@@ -12,7 +12,7 @@ config.runtime.path               =
 config.runtime.pathStrict         =
 '啟用後 `runtime.path` 將只搜尋第一層目錄，見 `runtime.path` 的説明。'
 config.runtime.special            =
-[[將自訂全域變數視為一些特殊的內建變數，語言服務將提供特殊的支援。
+[[將自訂全域變數視為一些特殊的內建變數，語言伺服將提供特殊的支援。
 下面這個例子表示將 `include` 視為 `require` 。
 ```json
 "Lua.runtime.special" : {
@@ -25,17 +25,21 @@ config.runtime.unicodeName        =
 config.runtime.nonstandardSymbol  =
 "支援非標準的符號。請務必確認你的執行環境支援這些符號。"
 config.runtime.plugin             =
-"延伸模組路徑，請查閲[文件](https://github.com/sumneko/lua-language-server/wiki/Plugin)瞭解用法。"
+"延伸模組路徑，請查閱[文件](https://github.com/sumneko/lua-language-server/wiki/Plugins)瞭解用法。"
+config.runtime.pluginArgs         = -- TODO: need translate!
+"Additional arguments for the plugin."
 config.runtime.fileEncoding       =
-"檔案編碼，`ansi` 選項只在 `Windows` 平台下有效。"
+"檔案編碼，選項 `ansi` 只在 `Windows` 平台下有效。"
 config.runtime.builtin            =
 [[
-調整內建庫的啟用狀態，你可以根據實際執行環境停用不存在的庫（或重新定義）。
+調整內建庫的啟用狀態，你可以根據實際執行環境停用（或重新定義）不存在的庫。
 
 * `default`: 表示庫會根據執行版本啟用或停用
 * `enable`: 總是啟用
 * `disable`: 總是停用
 ]]
+config.runtime.meta               =
+'meta檔案的目錄名稱格式'
 config.diagnostics.enable         =
 "啟用診斷。"
 config.diagnostics.disable        =
@@ -43,17 +47,47 @@ config.diagnostics.disable        =
 config.diagnostics.globals        =
 "已定義的全域變數。"
 config.diagnostics.severity       =
-"修改診斷等級。"
+[[
+修改診斷等級。
+以 `!` 結尾的設定優先順序高於組設定 `diagnostics.groupSeverity`。
+]]
 config.diagnostics.neededFileStatus =
 [[
 * Opened:  只診斷打開的檔案
-* Any:     診斷任何檔案
-* Disable: 停用此診斷
+* Any:     診斷所有檔案
+* None:    停用此診斷
+
+以 `!` 結尾的設定優先順序高於組設定 `diagnostics.groupFileStatus`。
 ]]
+config.diagnostics.groupSeverity  =
+[[
+批量修改一個組中的診斷等級。
+設定為 `Fallback` 意味著組中的診斷由 `diagnostics.severity` 單獨設定。
+其他設定將覆蓋單獨設定，但是不會覆蓋以 `!` 結尾的設定。
+]]
+config.diagnostics.groupFileStatus =
+[[
+批量修改一個組中的檔案狀態。
+
+* Opened:  只診斷打開的檔案
+* Any:     診斷所有檔案
+* None:    停用此診斷
+
+設定為 `Fallback` 意味著組中的診斷由 `diagnostics.neededFileStatus` 單獨設定。
+其他設定將覆蓋單獨設定，但是不會覆蓋以 `!` 結尾的設定。
+]]
+config.diagnostics.workspaceEvent = -- TODO: need translate!
+"Set the time to trigger workspace diagnostics."
+config.diagnostics.workspaceEvent.OnChange = -- TODO: need translate!
+"Trigger workspace diagnostics when the file is changed."
+config.diagnostics.workspaceEvent.OnSave = -- TODO: need translate!
+"Trigger workspace diagnostics when the file is saved."
+config.diagnostics.workspaceEvent.None = -- TODO: need translate!
+"Disable workspace diagnostics."
 config.diagnostics.workspaceDelay =
-"進行工作區診斷的延遲（毫秒）。當你啟動工作區，或編輯了任意檔案後，將會在背景對整個工作區進行重新診斷。設定為負數可以停用工作區診斷。"
+"進行工作區診斷的延遲（毫秒）。"
 config.diagnostics.workspaceRate  =
-"工作區診斷的執行速率（百分比）。降低該值會減少CPU佔用，但是也會降低工作區診斷的速度。你目前正在編輯的檔案的診斷總是全速完成，不受該選項影響。"
+"工作區診斷的執行速率（百分比）。降低該值會減少CPU使用率，但是也會降低工作區診斷的速度。你目前正在編輯的檔案的診斷總是全速完成，不受該選項影響。"
 config.diagnostics.libraryFiles   =
 "如何診斷透過 `Lua.workspace.library` 載入的檔案。"
 config.diagnostics.libraryFiles.Enable   =
@@ -72,6 +106,8 @@ config.diagnostics.ignoredFiles.Disable  =
 "不診斷這些檔案。"
 config.diagnostics.disableScheme  =
 '不診斷使用以下 scheme 的lua檔案。'
+config.diagnostics.unusedLocalExclude = -- TODO: need translate!
+'Do not diagnose `unused-local` when the variable name matches the following pattern.'
 config.workspace.ignoreDir        =
 "忽略的檔案與目錄（使用 `.gitignore` 語法）。"
 config.workspace.ignoreSubmodules =
@@ -98,7 +134,7 @@ config.workspace.checkThirdParty  =
 config.workspace.userThirdParty          =
 '在這裡添加私有的第三方庫適應檔案路徑，請參考內建的[組態檔案路徑](https://github.com/sumneko/lua-language-server/tree/master/meta/3rd)'
 config.workspace.supportScheme           =
-'為以下 `scheme` 的lua檔案提供語言服務。'
+'為以下 `scheme` 的lua檔案提供語言伺服。'
 config.completion.enable                 =
 '啟用自動完成。'
 config.completion.callSnippet            =
@@ -150,7 +186,7 @@ config.semantic.enable                   =
 config.semantic.variable                 =
 "對變數/欄位/參數進行語義著色。"
 config.semantic.annotation               =
-"對型別註解進行語義著色。"
+"對類型註解進行語義著色。"
 config.semantic.keyword                  =
 "對關鍵字/字面常數/運算子進行語義著色。只有當你的編輯器無法進行語法著色時才需要啟用此功能。"
 config.signatureHelp.enable              =
@@ -164,14 +200,14 @@ config.hover.viewStringMax               =
 config.hover.viewNumber                  =
 "懸浮提示檢視數字內容（僅當字面常數不是十進制時）。"
 config.hover.fieldInfer                  =
-"懸浮提示檢視表時，會對表的每個欄位進行型別推測，當型別推測的用時累計達到該設定值（毫秒）時，將跳過後續欄位的型別推測。"
+"懸浮提示檢視表時，會對表的每個欄位進行類型推測，當類型推測的用時累計達到該設定值（毫秒）時，將跳過後續欄位的類型推測。"
 config.hover.previewFields               =
 "懸浮提示檢視表時，限制表內欄位的最大預覽數量。"
 config.hover.enumsLimit                  =
-"當值對應多個型別時，限制型別的顯示數量。"
-config.hover.expandAlias                 = -- TODO: need translate!
+"當值對應多個類型時，限制類型的顯示數量。"
+config.hover.expandAlias                 =
 [[
-Whether to expand the alias. For example, expands `---@alias myType boolean|number` appears as `boolean|number`, otherwise it appears as `myType'.
+是否展開別名。例如 `---@alias myType boolean|number` 展開後顯示為 `boolean|number`，否則顯示為 `myType'。
 ]]
 config.develop.enable                    =
 '開發者模式。請勿開啟，會影響效能。'
@@ -182,7 +218,7 @@ config.develop.debuggerWait              =
 config.intelliSense.searchDepth          =
 '設定智慧感知的搜尋深度。增大該值可以增加準確度，但會降低效能。不同的工作區對該設定的容忍度差異較大，請自己調整為合適的值。'
 config.intelliSense.fastGlobal           =
-'在對全域變數進行補全，及檢視 `_G` 的懸浮提示時進行最佳化。這會略微降低型別推測的準確度，但是對於大量使用全域變數的專案會有大幅的效能提升。'
+'在對全域變數進行補全，及檢視 `_G` 的懸浮提示時進行最佳化。這會略微降低類型推測的準確度，但是對於大量使用全域變數的專案會有大幅的效能提升。'
 config.window.statusBar                  =
 '在狀態欄顯示延伸模組狀態。'
 config.window.progressBar                =
@@ -190,15 +226,15 @@ config.window.progressBar                =
 config.hint.enable                       =
 '啟用內嵌提示。'
 config.hint.paramType                    =
-'在函式的參數位置提示型別。'
+'在函式的參數位置提示類型。'
 config.hint.setType                      =
-'在賦值操作位置提示型別。'
+'在賦值操作位置提示類型。'
 config.hint.paramName                    =
 '在函式呼叫處提示參數名。'
 config.hint.paramName.All                =
-'所有型別的參數均進行提示。'
+'所有類型的參數均進行提示。'
 config.hint.paramName.Literal            =
-'只有字面常數型別的參數進行提示。'
+'只有字面常數類型的參數進行提示。'
 config.hint.paramName.Disable            =
 '停用參數提示。'
 config.hint.arrayIndex                   =
@@ -206,27 +242,64 @@ config.hint.arrayIndex                   =
 config.hint.arrayIndex.Enable            =
 '所有的表中都提示陣列索引。'
 config.hint.arrayIndex.Auto              =
-'只有表大於3項，或者表是混合型別時才進行提示。'
+'只有表大於3項，或者表是混合類型時才進行提示。'
 config.hint.arrayIndex.Disable           =
 '停用陣列索引提示。'
-config.hint.await                        = -- TODO: need translate!
-'If the called function is marked `---@async`, prompt `await` at the call.'
+config.hint.await                        =
+'如果呼叫的函數被標記為了 `---@async`，則在呼叫處提示 `await`。'
+config.hint.semicolon                    =
+'若陳述式尾部沒有分號，則顯示虛擬分號。'
+config.hint.semicolon.All                =
+'所有陳述式都顯示虛擬分號。'
+config.hint.semicolon.SameLine            =
+'兩個陳述式在同一行時，在它們之間顯示分號。'
+config.hint.semicolon.Disable            =
+'停用虛擬分號。'
 config.format.enable                     =
 '啟用程式碼格式化程式。'
+config.format.defaultConfig              =
+[[
+預設的格式化組態，優先順序低於工作區內的 `.editorconfig` 檔案。
+請查閱[格式化文件](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs)了解用法。
+]]
+config.spell.dict                        =
+'拼寫檢查的自訂單詞。'
 config.telemetry.enable                  =
 [[
-啟用遙測，透過網路發送你的編輯器資訊與錯誤日誌。在[此處](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%B1%E7%A7%81%E8%81%B2%E6%98%8E)閲讀我們的隱私聲明。
+啟用遙測，透過網路發送你的編輯器資訊與錯誤日誌。在[此處](https://github.com/sumneko/lua-language-server/wiki/Home#privacy)閱讀我們的隱私聲明。
 ]]
 config.misc.parameters                   =
-'VSCode中啟動語言服務時的[命令列參數](https://github.com/sumneko/lua-language-server/wiki/Command-line)。'
+'VSCode中啟動語言伺服時的[命令列參數](https://github.com/sumneko/lua-language-server/wiki/Getting-Started#arguments)。'
+config.misc.executablePath               = -- TODO: need translate!
+'Specify the executable path in VSCode.'
 config.IntelliSense.traceLocalSet        =
-'請查閲[文件](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
+'請查閱[文件](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
 config.IntelliSense.traceReturn          =
-'請查閲[文件](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
+'請查閱[文件](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
 config.IntelliSense.traceBeSetted        =
-'請查閲[文件](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
+'請查閱[文件](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
 config.IntelliSense.traceFieldInject     =
-'請查閲[文件](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
+'請查閱[文件](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
+config.type.castNumberToInteger          =
+'允許將 `number` 類型賦值給 `integer` 類型。'
+config.type.weakUnionCheck               =
+[[
+同位類型中只要有一個子類型滿足條件，則同位類型也滿足條件。
+
+此設定為 `false` 時，`number|boolean` 類型無法賦給 `number` 類型；為 `true` 時則可以。
+]]
+config.type.weakNilCheck                 = -- TODO: need translate!
+[[
+When checking the type of union type, ignore the `nil` in it.
+
+When this setting is `false`, the `number|nil` type cannot be assigned to the `number` type. It can be with `true`.
+]]
+config.doc.privateName                   = -- TODO: need translate!
+'Treat specific field names as private, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are private, witch can only be accessed in the class where the definition is located.'
+config.doc.protectedName                 = -- TODO: need translate!
+'Treat specific field names as protected, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are protected, witch can only be accessed in the class where the definition is located and its subclasses.'
+config.doc.packageName                   = -- TODO: need translate!
+'Treat specific field names as package, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are package, witch can only be accessed in the file where the definition is located.'
 config.diagnostics['unused-local']          =
 '未使用的區域變數'
 config.diagnostics['unused-function']       =
@@ -234,7 +307,7 @@ config.diagnostics['unused-function']       =
 config.diagnostics['undefined-global']      =
 '未定義的全域變數'
 config.diagnostics['global-in-nil-env']     =
-'不能使用全域變數（ `_ENV` 被設定為了 `nil`）'
+'不能使用全域變數（ `_ENV` 被設定為 `nil`）'
 config.diagnostics['unused-label']          =
 '未使用的標籤'
 config.diagnostics['unused-vararg']         =
@@ -250,7 +323,7 @@ config.diagnostics['newfield-call']         =
 config.diagnostics['redundant-parameter']   =
 '函式呼叫時，傳入了多餘的引數'
 config.diagnostics['ambiguity-1']           =
-'優先級歧義，如： `num or 0 + 1` ，推測使用者的實際期望為 `(num or 0) + 1`'
+'優先順序歧義，如： `num or 0 + 1` ，推測使用者的實際期望為 `(num or 0) + 1`'
 config.diagnostics['lowercase-global']      =
 '首字母小寫的全域變數定義'
 config.diagnostics['undefined-env-child']   =
@@ -261,3 +334,77 @@ config.diagnostics['empty-block']           =
 '空程式碼區塊'
 config.diagnostics['redundant-value']       =
 '賦值操作時，值的數量比被賦值的對象多'
+config.diagnostics['assign-type-mismatch']  = -- TODO: need translate!
+'Enable diagnostics for assignments in which the value\'s type does not match the type of the assigned variable.'
+config.diagnostics['await-in-sync']         = -- TODO: need translate!
+'Enable diagnostics for calls of asynchronous functions within a synchronous function.'
+config.diagnostics['cast-local-type']    = -- TODO: need translate!
+'Enable diagnostics for casts of local variables where the target type does not match the defined type.'
+config.diagnostics['cast-type-mismatch']    = -- TODO: need translate!
+'Enable diagnostics for casts where the target type does not match the initial type.'
+config.diagnostics['circular-doc-class']    = -- TODO: need translate!
+'Enable diagnostics for two classes inheriting from each other introducing a circular relation.'
+config.diagnostics['close-non-object']      = -- TODO: need translate!
+'Enable diagnostics for attempts to close a variable with a non-object.'
+config.diagnostics['code-after-break']      = -- TODO: need translate!
+'Enable diagnostics for code placed after a break statement in a loop.'
+config.diagnostics['codestyle-check']       = -- TODO: need translate!
+'Enable diagnostics for incorrectly styled lines.'
+config.diagnostics['count-down-loop']       = -- TODO: need translate!
+'Enable diagnostics for `for` loops which will never reach their max/limit because the loop is incrementing instead of decrementing.'
+config.diagnostics['deprecated']            = -- TODO: need translate!
+'Enable diagnostics to highlight deprecated API.'
+config.diagnostics['different-requires']    = -- TODO: need translate!
+'Enable diagnostics for files which are required by two different paths.'
+config.diagnostics['discard-returns']       = -- TODO: need translate!
+'Enable diagnostics for calls of functions annotated with `---@nodiscard` where the return values are ignored.'
+config.diagnostics['doc-field-no-class']    = -- TODO: need translate!
+'Enable diagnostics to highlight a field annotation without a defining class annotation.'
+config.diagnostics['duplicate-doc-alias']   = -- TODO: need translate!
+'Enable diagnostics for a duplicated alias annotation name.'
+config.diagnostics['duplicate-doc-field']   = -- TODO: need translate!
+'Enable diagnostics for a duplicated field annotation name.'
+config.diagnostics['duplicate-doc-param']   = -- TODO: need translate!
+'Enable diagnostics for a duplicated param annotation name.'
+config.diagnostics['duplicate-set-field']   = -- TODO: need translate!
+'Enable diagnostics for setting the same field in a class more than once.'
+config.diagnostics['missing-parameter']     = -- TODO: need translate!
+'Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.'
+config.diagnostics['missing-return']        = -- TODO: need translate!
+'Enable diagnostics for functions with return annotations which have no return statement.'
+config.diagnostics['missing-return-value']  = -- TODO: need translate!
+'Enable diagnostics for return statements without values although the containing function declares returns.'
+config.diagnostics['need-check-nil']        = -- TODO: need translate!
+'Enable diagnostics for variable usages if `nil` or an optional (potentially `nil`) value was assigned to the variable before.'
+config.diagnostics['no-unknown']            = -- TODO: need translate!
+'Enable diagnostics for cases in which the type cannot be inferred.'
+config.diagnostics['not-yieldable']         = -- TODO: need translate!
+'Enable diagnostics for calls to `coroutine.yield()` when it is not permitted.'
+config.diagnostics['param-type-mismatch']   = -- TODO: need translate!
+'Enable diagnostics for function calls where the type of a provided parameter does not match the type of the annotated function definition.'
+config.diagnostics['redundant-return']      = -- TODO: need translate!
+'Enable diagnostics for return statements which are not needed because the function would exit on its own.'
+config.diagnostics['redundant-return-value']= -- TODO: need translate!
+'Enable diagnostics for return statements which return an extra value which is not specified by a return annotation.'
+config.diagnostics['return-type-mismatch']  = -- TODO: need translate!
+'Enable diagnostics for return values whose type does not match the type declared in the corresponding return annotation.'
+config.diagnostics['spell-check']           = -- TODO: need translate!
+'Enable diagnostics for typos in strings.'
+config.diagnostics['unbalanced-assignments']= -- TODO: need translate!
+'Enable diagnostics on multiple assignments if not all variables obtain a value (e.g., `local x,y = 1`).'
+config.diagnostics['undefined-doc-class']   = -- TODO: need translate!
+'Enable diagnostics for class annotations in which an undefined class is referenced.'
+config.diagnostics['undefined-doc-name']    = -- TODO: need translate!
+'Enable diagnostics for type annotations referencing an undefined type or alias.'
+config.diagnostics['undefined-doc-param']   = -- TODO: need translate!
+'Enable diagnostics for cases in which a parameter annotation is given without declaring the parameter in the function definition.'
+config.diagnostics['undefined-field']       = -- TODO: need translate!
+'Enable diagnostics for cases in which an undefined field of a variable is read.'
+config.diagnostics['unknown-cast-variable'] = -- TODO: need translate!
+'Enable diagnostics for casts of undefined variables.'
+config.diagnostics['unknown-diag-code']     = -- TODO: need translate!
+'Enable diagnostics in cases in which an unknown diagnostics code is entered.'
+config.diagnostics['unknown-operator']      = -- TODO: need translate!
+'Enable diagnostics for unknown operators.'
+config.diagnostics['unreachable-code']      = -- TODO: need translate!
+'Enable diagnostics for unreachable code.'

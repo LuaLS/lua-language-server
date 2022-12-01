@@ -10,7 +10,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -32,7 +32,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "Disable"
 ```
 
@@ -48,7 +48,7 @@ integer
 
 ## default
 
-```json
+```jsonc
 0
 ```
 
@@ -64,7 +64,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -86,7 +86,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "Replace"
 ```
 
@@ -102,7 +102,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "@"
 ```
 
@@ -118,7 +118,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "."
 ```
 
@@ -134,7 +134,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -156,7 +156,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "Fallback"
 ```
 
@@ -172,7 +172,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -186,9 +186,108 @@ Disabled diagnostic (Use code in hover brackets).
 Array<string>
 ```
 
+## enum
+
+* ``"action-after-return"``
+* ``"ambiguity-1"``
+* ``"ambiguous-syntax"``
+* ``"args-after-dots"``
+* ``"assign-type-mismatch"``
+* ``"await-in-sync"``
+* ``"block-after-else"``
+* ``"break-outside"``
+* ``"cast-local-type"``
+* ``"cast-type-mismatch"``
+* ``"circle-doc-class"``
+* ``"close-non-object"``
+* ``"code-after-break"``
+* ``"codestyle-check"``
+* ``"count-down-loop"``
+* ``"deprecated"``
+* ``"different-requires"``
+* ``"discard-returns"``
+* ``"doc-field-no-class"``
+* ``"duplicate-doc-alias"``
+* ``"duplicate-doc-field"``
+* ``"duplicate-doc-param"``
+* ``"duplicate-index"``
+* ``"duplicate-set-field"``
+* ``"empty-block"``
+* ``"err-assign-as-eq"``
+* ``"err-c-long-comment"``
+* ``"err-comment-prefix"``
+* ``"err-do-as-then"``
+* ``"err-eq-as-assign"``
+* ``"err-esc"``
+* ``"err-nonstandard-symbol"``
+* ``"err-then-as-do"``
+* ``"exp-in-action"``
+* ``"global-in-nil-env"``
+* ``"index-in-func-name"``
+* ``"jump-local-scope"``
+* ``"keyword"``
+* ``"local-limit"``
+* ``"lowercase-global"``
+* ``"malformed-number"``
+* ``"miss-end"``
+* ``"miss-esc-x"``
+* ``"miss-exp"``
+* ``"miss-exponent"``
+* ``"miss-field"``
+* ``"miss-loop-max"``
+* ``"miss-loop-min"``
+* ``"miss-method"``
+* ``"miss-name"``
+* ``"miss-sep-in-table"``
+* ``"miss-space-between"``
+* ``"miss-symbol"``
+* ``"missing-parameter"``
+* ``"missing-return"``
+* ``"missing-return-value"``
+* ``"need-check-nil"``
+* ``"newfield-call"``
+* ``"newline-call"``
+* ``"no-unknown"``
+* ``"no-visible-label"``
+* ``"not-yieldable"``
+* ``"param-type-mismatch"``
+* ``"redefined-label"``
+* ``"redefined-local"``
+* ``"redundant-parameter"``
+* ``"redundant-return"``
+* ``"redundant-return-value"``
+* ``"redundant-value"``
+* ``"return-type-mismatch"``
+* ``"set-const"``
+* ``"spell-check"``
+* ``"trailing-space"``
+* ``"unbalanced-assignments"``
+* ``"undefined-doc-class"``
+* ``"undefined-doc-name"``
+* ``"undefined-doc-param"``
+* ``"undefined-env-child"``
+* ``"undefined-field"``
+* ``"undefined-global"``
+* ``"unexpect-dots"``
+* ``"unexpect-efunc-name"``
+* ``"unexpect-lfunc-name"``
+* ``"unexpect-symbol"``
+* ``"unicode-name"``
+* ``"unknown-attribute"``
+* ``"unknown-cast-variable"``
+* ``"unknown-diag-code"``
+* ``"unknown-operator"``
+* ``"unknown-symbol"``
+* ``"unreachable-code"``
+* ``"unsupport-symbol"``
+* ``"unused-function"``
+* ``"unused-label"``
+* ``"unused-local"``
+* ``"unused-vararg"``
+
 ## default
 
-```json
+```jsonc
 []
 ```
 
@@ -204,7 +303,7 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 ["git"]
 ```
 
@@ -220,7 +319,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -236,8 +335,248 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 []
+```
+
+# diagnostics.groupFileStatus
+
+Modify the diagnostic needed file status in a group.
+
+* Opened:  only diagnose opened files
+* Any:     diagnose all files
+* None:    disable this diagnostic
+
+`Fallback` means that diagnostics in this group are controlled by `diagnostics.neededFileStatus` separately.
+Other settings will override individual settings without end of `!`.
+
+
+## type
+
+```ts
+object<string, string>
+```
+
+## enum
+
+* ``"Any"``
+* ``"Opened"``
+* ``"None"``
+* ``"Fallback"``
+
+## default
+
+```jsonc
+{
+    /*
+    * ambiguity-1
+    * count-down-loop
+    * different-requires
+    * newfield-call
+    * newline-call
+    */
+    "ambiguity": "Fallback",
+    /*
+    * await-in-sync
+    * not-yieldable
+    */
+    "await": "Fallback",
+    /*
+    * codestyle-check
+    * spell-check
+    */
+    "codestyle": "Fallback",
+    /*
+    * duplicate-index
+    * duplicate-set-field
+    */
+    "duplicate": "Fallback",
+    /*
+    * global-in-nil-env
+    * lowercase-global
+    * undefined-env-child
+    * undefined-global
+    */
+    "global": "Fallback",
+    /*
+    * circle-doc-class
+    * doc-field-no-class
+    * duplicate-doc-alias
+    * duplicate-doc-field
+    * duplicate-doc-param
+    * undefined-doc-class
+    * undefined-doc-name
+    * undefined-doc-param
+    * unknown-cast-variable
+    * unknown-diag-code
+    * unknown-operator
+    */
+    "luadoc": "Fallback",
+    /*
+    * redefined-local
+    */
+    "redefined": "Fallback",
+    /*
+    * close-non-object
+    * deprecated
+    * discard-returns
+    */
+    "strict": "Fallback",
+    /*
+    * no-unknown
+    */
+    "strong": "Fallback",
+    /*
+    * assign-type-mismatch
+    * cast-local-type
+    * cast-type-mismatch
+    * need-check-nil
+    * param-type-mismatch
+    * return-type-mismatch
+    * undefined-field
+    */
+    "type-check": "Fallback",
+    /*
+    * missing-parameter
+    * missing-return
+    * missing-return-value
+    * redundant-parameter
+    * redundant-return-value
+    * redundant-value
+    * unbalanced-assignments
+    */
+    "unbalanced": "Fallback",
+    /*
+    * code-after-break
+    * empty-block
+    * redundant-return
+    * trailing-space
+    * unreachable-code
+    * unused-function
+    * unused-label
+    * unused-local
+    * unused-vararg
+    */
+    "unused": "Fallback"
+}
+```
+
+# diagnostics.groupSeverity
+
+Modify the diagnostic severity in a group.
+`Fallback` means that diagnostics in this group are controlled by `diagnostics.severity` separately.
+Other settings will override individual settings without end of `!`.
+
+
+## type
+
+```ts
+object<string, string>
+```
+
+## enum
+
+* ``"Error"``
+* ``"Warning"``
+* ``"Information"``
+* ``"Hint"``
+* ``"Fallback"``
+
+## default
+
+```jsonc
+{
+    /*
+    * ambiguity-1
+    * count-down-loop
+    * different-requires
+    * newfield-call
+    * newline-call
+    */
+    "ambiguity": "Fallback",
+    /*
+    * await-in-sync
+    * not-yieldable
+    */
+    "await": "Fallback",
+    /*
+    * codestyle-check
+    * spell-check
+    */
+    "codestyle": "Fallback",
+    /*
+    * duplicate-index
+    * duplicate-set-field
+    */
+    "duplicate": "Fallback",
+    /*
+    * global-in-nil-env
+    * lowercase-global
+    * undefined-env-child
+    * undefined-global
+    */
+    "global": "Fallback",
+    /*
+    * circle-doc-class
+    * doc-field-no-class
+    * duplicate-doc-alias
+    * duplicate-doc-field
+    * duplicate-doc-param
+    * undefined-doc-class
+    * undefined-doc-name
+    * undefined-doc-param
+    * unknown-cast-variable
+    * unknown-diag-code
+    * unknown-operator
+    */
+    "luadoc": "Fallback",
+    /*
+    * redefined-local
+    */
+    "redefined": "Fallback",
+    /*
+    * close-non-object
+    * deprecated
+    * discard-returns
+    */
+    "strict": "Fallback",
+    /*
+    * no-unknown
+    */
+    "strong": "Fallback",
+    /*
+    * assign-type-mismatch
+    * cast-local-type
+    * cast-type-mismatch
+    * need-check-nil
+    * param-type-mismatch
+    * return-type-mismatch
+    * undefined-field
+    */
+    "type-check": "Fallback",
+    /*
+    * missing-parameter
+    * missing-return
+    * missing-return-value
+    * redundant-parameter
+    * redundant-return-value
+    * redundant-value
+    * unbalanced-assignments
+    */
+    "unbalanced": "Fallback",
+    /*
+    * code-after-break
+    * empty-block
+    * redundant-return
+    * trailing-space
+    * unreachable-code
+    * unused-function
+    * unused-label
+    * unused-local
+    * unused-vararg
+    */
+    "unused": "Fallback"
+}
 ```
 
 # diagnostics.ignoredFiles
@@ -258,7 +597,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "Opened"
 ```
 
@@ -280,7 +619,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "Opened"
 ```
 
@@ -288,7 +627,9 @@ string
 
 * Opened:  only diagnose opened files
 * Any:     diagnose all files
-* Disable: disable this diagnostic
+* None:    disable this diagnostic
+
+End with `!` means override the group setting `diagnostics.groupFileStatus`.
 
 
 ## type
@@ -302,61 +643,236 @@ object<string, string>
 * ``"Any"``
 * ``"Opened"``
 * ``"None"``
+* ``"Any!"``
+* ``"Opened!"``
+* ``"None!"``
 
 ## default
 
-```json
+```jsonc
 {
+    /*
+    Enable ambiguous operator precedence diagnostics. For example, the `num or 0 + 1` expression will be suggested `(num or 0) + 1` instead.
+    */
     "ambiguity-1": "Any",
+    /*
+    Enable diagnostics for assignments in which the value's type does not match the type of the assigned variable.
+    */
+    "assign-type-mismatch": "Opened",
+    /*
+    Enable diagnostics for calls of asynchronous functions within a synchronous function.
+    */
     "await-in-sync": "None",
+    /*
+    Enable diagnostics for casts of local variables where the target type does not match the defined type.
+    */
+    "cast-local-type": "Opened",
+    /*
+    Enable diagnostics for casts where the target type does not match the initial type.
+    */
+    "cast-type-mismatch": "Opened",
     "circle-doc-class": "Any",
+    /*
+    Enable diagnostics for attempts to close a variable with a non-object.
+    */
     "close-non-object": "Any",
+    /*
+    Enable diagnostics for code placed after a break statement in a loop.
+    */
     "code-after-break": "Opened",
+    /*
+    Enable diagnostics for incorrectly styled lines.
+    */
     "codestyle-check": "None",
+    /*
+    Enable diagnostics for `for` loops which will never reach their max/limit because the loop is incrementing instead of decrementing.
+    */
     "count-down-loop": "Any",
-    "deprecated": "Opened",
+    /*
+    Enable diagnostics to highlight deprecated API.
+    */
+    "deprecated": "Any",
+    /*
+    Enable diagnostics for files which are required by two different paths.
+    */
     "different-requires": "Any",
-    "discard-returns": "Opened",
+    /*
+    Enable diagnostics for calls of functions annotated with `---@nodiscard` where the return values are ignored.
+    */
+    "discard-returns": "Any",
+    /*
+    Enable diagnostics to highlight a field annotation without a defining class annotation.
+    */
     "doc-field-no-class": "Any",
+    /*
+    Enable diagnostics for a duplicated alias annotation name.
+    */
     "duplicate-doc-alias": "Any",
+    /*
+    Enable diagnostics for a duplicated field annotation name.
+    */
     "duplicate-doc-field": "Any",
+    /*
+    Enable diagnostics for a duplicated param annotation name.
+    */
     "duplicate-doc-param": "Any",
+    /*
+    Enable duplicate table index diagnostics.
+    */
     "duplicate-index": "Any",
+    /*
+    Enable diagnostics for setting the same field in a class more than once.
+    */
     "duplicate-set-field": "Any",
+    /*
+    Enable empty code block diagnostics.
+    */
     "empty-block": "Opened",
+    /*
+    Enable cannot use global variables （ `_ENV` is set to `nil`） diagnostics.
+    */
     "global-in-nil-env": "Any",
+    /*
+    Enable lowercase global variable definition diagnostics.
+    */
     "lowercase-global": "Any",
-    "missing-parameter": "Opened",
+    /*
+    Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.
+    */
+    "missing-parameter": "Any",
+    /*
+    Enable diagnostics for functions with return annotations which have no return statement.
+    */
+    "missing-return": "Any",
+    /*
+    Enable diagnostics for return statements without values although the containing function declares returns.
+    */
+    "missing-return-value": "Any",
+    /*
+    Enable diagnostics for variable usages if `nil` or an optional (potentially `nil`) value was assigned to the variable before.
+    */
     "need-check-nil": "Opened",
+    /*
+    Enable newfield call diagnostics. It is raised when the parenthesis of a function call appear on the following line when defining a field in a table.
+    */
     "newfield-call": "Any",
+    /*
+    Enable newline call diagnostics. Is's raised when a line starting with `(` is encountered, which is syntactically parsed as a function call on the previous line.
+    */
     "newline-call": "Any",
+    /*
+    Enable diagnostics for cases in which the type cannot be inferred.
+    */
     "no-unknown": "None",
+    /*
+    Enable diagnostics for calls to `coroutine.yield()` when it is not permitted.
+    */
     "not-yieldable": "None",
+    /*
+    Enable diagnostics for function calls where the type of a provided parameter does not match the type of the annotated function definition.
+    */
+    "param-type-mismatch": "Opened",
+    /*
+    Enable redefined local variable diagnostics.
+    */
     "redefined-local": "Opened",
-    "redundant-parameter": "Opened",
+    /*
+    Enable redundant function parameter diagnostics.
+    */
+    "redundant-parameter": "Any",
+    /*
+    Enable diagnostics for return statements which are not needed because the function would exit on its own.
+    */
     "redundant-return": "Opened",
-    "redundant-value": "Opened",
+    /*
+    Enable diagnostics for return statements which return an extra value which is not specified by a return annotation.
+    */
+    "redundant-return-value": "Any",
+    /*
+    Enable the redundant values assigned diagnostics. It's raised during assignment operation, when the number of values is higher than the number of objects being assigned.
+    */
+    "redundant-value": "Any",
+    /*
+    Enable diagnostics for return values whose type does not match the type declared in the corresponding return annotation.
+    */
+    "return-type-mismatch": "Opened",
+    /*
+    Enable diagnostics for typos in strings.
+    */
     "spell-check": "None",
+    /*
+    Enable trailing space diagnostics.
+    */
     "trailing-space": "Opened",
-    "type-check": "None",
+    /*
+    Enable diagnostics on multiple assignments if not all variables obtain a value (e.g., `local x,y = 1`).
+    */
     "unbalanced-assignments": "Any",
+    /*
+    Enable diagnostics for class annotations in which an undefined class is referenced.
+    */
     "undefined-doc-class": "Any",
+    /*
+    Enable diagnostics for type annotations referencing an undefined type or alias.
+    */
     "undefined-doc-name": "Any",
+    /*
+    Enable diagnostics for cases in which a parameter annotation is given without declaring the parameter in the function definition.
+    */
     "undefined-doc-param": "Any",
+    /*
+    Enable undefined environment variable diagnostics. It's raised when `_ENV` table is set to a new literal table, but the used global variable is no longer present in the global environment.
+    */
     "undefined-env-child": "Any",
+    /*
+    Enable diagnostics for cases in which an undefined field of a variable is read.
+    */
     "undefined-field": "Opened",
+    /*
+    Enable undefined global variable diagnostics.
+    */
     "undefined-global": "Any",
+    /*
+    Enable diagnostics for casts of undefined variables.
+    */
+    "unknown-cast-variable": "Any",
+    /*
+    Enable diagnostics in cases in which an unknown diagnostics code is entered.
+    */
     "unknown-diag-code": "Any",
+    /*
+    Enable diagnostics for unknown operators.
+    */
+    "unknown-operator": "Any",
+    /*
+    Enable diagnostics for unreachable code.
+    */
+    "unreachable-code": "Opened",
+    /*
+    Enable unused function diagnostics.
+    */
     "unused-function": "Opened",
+    /*
+    Enable unused label diagnostics.
+    */
     "unused-label": "Opened",
+    /*
+    Enable unused local variable diagnostics.
+    */
     "unused-local": "Opened",
+    /*
+    Enable unused vararg diagnostics.
+    */
     "unused-vararg": "Opened"
 }
 ```
 
 # diagnostics.severity
 
-Modified diagnostic severity.
+Modify the diagnostic severity.
+
+End with `!` means override the group setting `diagnostics.groupSeverity`.
+
 
 ## type
 
@@ -370,56 +886,245 @@ object<string, string>
 * ``"Warning"``
 * ``"Information"``
 * ``"Hint"``
+* ``"Error!"``
+* ``"Warning!"``
+* ``"Information!"``
+* ``"Hint!"``
 
 ## default
 
-```json
+```jsonc
 {
+    /*
+    Enable ambiguous operator precedence diagnostics. For example, the `num or 0 + 1` expression will be suggested `(num or 0) + 1` instead.
+    */
     "ambiguity-1": "Warning",
+    /*
+    Enable diagnostics for assignments in which the value's type does not match the type of the assigned variable.
+    */
+    "assign-type-mismatch": "Warning",
+    /*
+    Enable diagnostics for calls of asynchronous functions within a synchronous function.
+    */
     "await-in-sync": "Warning",
+    /*
+    Enable diagnostics for casts of local variables where the target type does not match the defined type.
+    */
+    "cast-local-type": "Warning",
+    /*
+    Enable diagnostics for casts where the target type does not match the initial type.
+    */
+    "cast-type-mismatch": "Warning",
     "circle-doc-class": "Warning",
+    /*
+    Enable diagnostics for attempts to close a variable with a non-object.
+    */
     "close-non-object": "Warning",
+    /*
+    Enable diagnostics for code placed after a break statement in a loop.
+    */
     "code-after-break": "Hint",
+    /*
+    Enable diagnostics for incorrectly styled lines.
+    */
     "codestyle-check": "Warning",
+    /*
+    Enable diagnostics for `for` loops which will never reach their max/limit because the loop is incrementing instead of decrementing.
+    */
     "count-down-loop": "Warning",
+    /*
+    Enable diagnostics to highlight deprecated API.
+    */
     "deprecated": "Warning",
+    /*
+    Enable diagnostics for files which are required by two different paths.
+    */
     "different-requires": "Warning",
+    /*
+    Enable diagnostics for calls of functions annotated with `---@nodiscard` where the return values are ignored.
+    */
     "discard-returns": "Warning",
+    /*
+    Enable diagnostics to highlight a field annotation without a defining class annotation.
+    */
     "doc-field-no-class": "Warning",
+    /*
+    Enable diagnostics for a duplicated alias annotation name.
+    */
     "duplicate-doc-alias": "Warning",
+    /*
+    Enable diagnostics for a duplicated field annotation name.
+    */
     "duplicate-doc-field": "Warning",
+    /*
+    Enable diagnostics for a duplicated param annotation name.
+    */
     "duplicate-doc-param": "Warning",
+    /*
+    Enable duplicate table index diagnostics.
+    */
     "duplicate-index": "Warning",
+    /*
+    Enable diagnostics for setting the same field in a class more than once.
+    */
     "duplicate-set-field": "Warning",
+    /*
+    Enable empty code block diagnostics.
+    */
     "empty-block": "Hint",
+    /*
+    Enable cannot use global variables （ `_ENV` is set to `nil`） diagnostics.
+    */
     "global-in-nil-env": "Warning",
+    /*
+    Enable lowercase global variable definition diagnostics.
+    */
     "lowercase-global": "Information",
+    /*
+    Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.
+    */
     "missing-parameter": "Warning",
+    /*
+    Enable diagnostics for functions with return annotations which have no return statement.
+    */
+    "missing-return": "Warning",
+    /*
+    Enable diagnostics for return statements without values although the containing function declares returns.
+    */
+    "missing-return-value": "Warning",
+    /*
+    Enable diagnostics for variable usages if `nil` or an optional (potentially `nil`) value was assigned to the variable before.
+    */
     "need-check-nil": "Warning",
+    /*
+    Enable newfield call diagnostics. It is raised when the parenthesis of a function call appear on the following line when defining a field in a table.
+    */
     "newfield-call": "Warning",
-    "newline-call": "Information",
-    "no-unknown": "Information",
+    /*
+    Enable newline call diagnostics. Is's raised when a line starting with `(` is encountered, which is syntactically parsed as a function call on the previous line.
+    */
+    "newline-call": "Warning",
+    /*
+    Enable diagnostics for cases in which the type cannot be inferred.
+    */
+    "no-unknown": "Warning",
+    /*
+    Enable diagnostics for calls to `coroutine.yield()` when it is not permitted.
+    */
     "not-yieldable": "Warning",
+    /*
+    Enable diagnostics for function calls where the type of a provided parameter does not match the type of the annotated function definition.
+    */
+    "param-type-mismatch": "Warning",
+    /*
+    Enable redefined local variable diagnostics.
+    */
     "redefined-local": "Hint",
+    /*
+    Enable redundant function parameter diagnostics.
+    */
     "redundant-parameter": "Warning",
-    "redundant-return": "Warning",
+    /*
+    Enable diagnostics for return statements which are not needed because the function would exit on its own.
+    */
+    "redundant-return": "Hint",
+    /*
+    Enable diagnostics for return statements which return an extra value which is not specified by a return annotation.
+    */
+    "redundant-return-value": "Warning",
+    /*
+    Enable the redundant values assigned diagnostics. It's raised during assignment operation, when the number of values is higher than the number of objects being assigned.
+    */
     "redundant-value": "Warning",
+    /*
+    Enable diagnostics for return values whose type does not match the type declared in the corresponding return annotation.
+    */
+    "return-type-mismatch": "Warning",
+    /*
+    Enable diagnostics for typos in strings.
+    */
     "spell-check": "Information",
+    /*
+    Enable trailing space diagnostics.
+    */
     "trailing-space": "Hint",
-    "type-check": "Warning",
+    /*
+    Enable diagnostics on multiple assignments if not all variables obtain a value (e.g., `local x,y = 1`).
+    */
     "unbalanced-assignments": "Warning",
+    /*
+    Enable diagnostics for class annotations in which an undefined class is referenced.
+    */
     "undefined-doc-class": "Warning",
+    /*
+    Enable diagnostics for type annotations referencing an undefined type or alias.
+    */
     "undefined-doc-name": "Warning",
+    /*
+    Enable diagnostics for cases in which a parameter annotation is given without declaring the parameter in the function definition.
+    */
     "undefined-doc-param": "Warning",
+    /*
+    Enable undefined environment variable diagnostics. It's raised when `_ENV` table is set to a new literal table, but the used global variable is no longer present in the global environment.
+    */
     "undefined-env-child": "Information",
+    /*
+    Enable diagnostics for cases in which an undefined field of a variable is read.
+    */
     "undefined-field": "Warning",
+    /*
+    Enable undefined global variable diagnostics.
+    */
     "undefined-global": "Warning",
+    /*
+    Enable diagnostics for casts of undefined variables.
+    */
+    "unknown-cast-variable": "Warning",
+    /*
+    Enable diagnostics in cases in which an unknown diagnostics code is entered.
+    */
     "unknown-diag-code": "Warning",
+    /*
+    Enable diagnostics for unknown operators.
+    */
+    "unknown-operator": "Warning",
+    /*
+    Enable diagnostics for unreachable code.
+    */
+    "unreachable-code": "Hint",
+    /*
+    Enable unused function diagnostics.
+    */
     "unused-function": "Hint",
+    /*
+    Enable unused label diagnostics.
+    */
     "unused-label": "Hint",
+    /*
+    Enable unused local variable diagnostics.
+    */
     "unused-local": "Hint",
+    /*
+    Enable unused vararg diagnostics.
+    */
     "unused-vararg": "Hint"
 }
+```
+
+# diagnostics.unusedLocalExclude
+
+Do not diagnose `unused-local` when the variable name matches the following pattern.
+
+## type
+
+```ts
+Array<string>
+```
+
+## default
+
+```jsonc
+[]
 ```
 
 # diagnostics.workspaceDelay
@@ -434,7 +1139,7 @@ integer
 
 ## default
 
-```json
+```jsonc
 3000
 ```
 
@@ -450,13 +1155,15 @@ integer
 
 ## default
 
-```json
+```jsonc
 100
 ```
 
 # format.defaultConfig
 
-**Missing description!!**
+The default format configuration. Has a lower priority than `.editorconfig` file in the workspace.
+Read [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/docs) to learn usage.
+
 
 ## type
 
@@ -466,7 +1173,7 @@ Object<string, string>
 
 ## default
 
-```json
+```jsonc
 {}
 ```
 
@@ -482,7 +1189,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -504,7 +1211,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "Auto"
 ```
 
@@ -520,7 +1227,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -536,7 +1243,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 false
 ```
 
@@ -558,7 +1265,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "All"
 ```
 
@@ -574,8 +1281,30 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
+```
+
+# hint.semicolon
+
+If there is no semicolon at the end of the statement, display a virtual semicolon.
+
+## type
+
+```ts
+string
+```
+
+## enum
+
+* ``"All"``: All statements display virtual semicolons.
+* ``"SameLine"``: When two statements are on the same line, display a semicolon between them.
+* ``"Disable"``: Disable virtual semicolons.
+
+## default
+
+```jsonc
+"SameLine"
 ```
 
 # hint.setType
@@ -590,7 +1319,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 false
 ```
 
@@ -606,7 +1335,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -622,7 +1351,7 @@ integer
 
 ## default
 
-```json
+```jsonc
 5
 ```
 
@@ -639,7 +1368,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -655,8 +1384,8 @@ integer
 
 ## default
 
-```json
-20
+```jsonc
+50
 ```
 
 # hover.viewNumber
@@ -671,7 +1400,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -687,7 +1416,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -703,7 +1432,7 @@ integer
 
 ## default
 
-```json
+```jsonc
 1000
 ```
 
@@ -719,7 +1448,7 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 []
 ```
 
@@ -746,7 +1475,7 @@ object<string, string>
 
 ## default
 
-```json
+```jsonc
 {
     "basic": "default",
     "bit": "default",
@@ -762,6 +1491,8 @@ object<string, string>
     "package": "default",
     "string": "default",
     "table": "default",
+    "table.clear": "default",
+    "table.new": "default",
     "utf8": "default"
 }
 ```
@@ -785,13 +1516,13 @@ string
 
 ## default
 
-```json
+```jsonc
 "utf8"
 ```
 
 # runtime.meta
 
-**Missing description!!**
+Format of the directory name of the meta files.
 
 ## type
 
@@ -801,7 +1532,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "${version} ${language} ${encoding}"
 ```
 
@@ -824,6 +1555,13 @@ Array<string>
 * ``"-="``
 * ``"*="``
 * ``"/="``
+* ``"%="``
+* ``"^="``
+* ``"//="``
+* ``"|="``
+* ``"&="``
+* ``"<<="``
+* ``">>="``
 * ``"||"``
 * ``"&&"``
 * ``"!"``
@@ -832,7 +1570,7 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 []
 ```
 
@@ -852,7 +1590,7 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 ["?.lua","?/init.lua"]
 ```
 
@@ -868,13 +1606,13 @@ boolean
 
 ## default
 
-```json
+```jsonc
 false
 ```
 
 # runtime.plugin
 
-Plugin path. Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/Plugin) to learn more.
+Plugin path. Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/Plugins) to learn more.
 
 ## type
 
@@ -884,8 +1622,24 @@ string
 
 ## default
 
-```json
+```jsonc
 ""
+```
+
+# runtime.pluginArgs
+
+Additional arguments for the plugin.
+
+## type
+
+```ts
+Array<string>
+```
+
+## default
+
+```jsonc
+[]
 ```
 
 # runtime.special
@@ -907,7 +1661,7 @@ Object<string, string>
 
 ## default
 
-```json
+```jsonc
 {}
 ```
 
@@ -923,7 +1677,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 false
 ```
 
@@ -947,7 +1701,7 @@ string
 
 ## default
 
-```json
+```jsonc
 "Lua 5.4"
 ```
 
@@ -963,7 +1717,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -979,7 +1733,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -995,7 +1749,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 false
 ```
 
@@ -1011,7 +1765,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -1027,13 +1781,13 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
 # spell.dict
 
-**Missing description!!**
+Custom words for spell checking.
 
 ## type
 
@@ -1043,13 +1797,13 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 []
 ```
 
 # telemetry.enable
 
-Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://github.com/sumneko/lua-language-server/wiki/Privacy-Policy).
+Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://github.com/sumneko/lua-language-server/wiki/Home#privacy).
 
 
 ## type
@@ -1060,8 +1814,62 @@ boolean | null
 
 ## default
 
-```json
+```jsonc
 null
+```
+
+# type.castNumberToInteger
+
+Allowed to assign the `number` type to the `integer` type.
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+true
+```
+
+# type.weakNilCheck
+
+When checking the type of union type, ignore the `nil` in it.
+
+When this setting is `false`, the `number|nil` type cannot be assigned to the `number` type. It can be with `true`.
+
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+false
+```
+
+# type.weakUnionCheck
+
+Once one subtype of a union type meets the condition, the union type also meets the condition.
+
+When this setting is `false`, the `number|boolean` type cannot be assigned to the `number` type. It can be with `true`.
+
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+false
 ```
 
 # window.progressBar
@@ -1076,7 +1884,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -1092,7 +1900,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -1116,7 +1924,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -1132,7 +1940,7 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 [".vscode"]
 ```
 
@@ -1148,7 +1956,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -1164,7 +1972,7 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 []
 ```
 
@@ -1180,7 +1988,7 @@ integer
 
 ## default
 
-```json
+```jsonc
 5000
 ```
 
@@ -1196,7 +2004,7 @@ integer
 
 ## default
 
-```json
+```jsonc
 500
 ```
 
@@ -1212,7 +2020,7 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 ["file","untitled","git"]
 ```
 
@@ -1228,7 +2036,7 @@ boolean
 
 ## default
 
-```json
+```jsonc
 true
 ```
 
@@ -1244,6 +2052,6 @@ Array<string>
 
 ## default
 
-```json
+```jsonc
 []
 ```

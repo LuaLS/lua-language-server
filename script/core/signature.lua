@@ -8,6 +8,9 @@ local lookback   = require 'core.look-backward'
 local function findNearCall(uri, ast, pos)
     local text  = files.getText(uri)
     local state = files.getState(uri)
+    if not state or not text then
+        return nil
+    end
     local nearCall
     guide.eachSourceContain(ast.ast, pos, function (src)
         if src.type == 'call'
@@ -57,6 +60,9 @@ local function makeOneSignature(source, oop, index)
         : gsub('%b()', function (str)
             return ('_'):rep(#str)
         end)
+        : gsub('%b{}', function (str)
+            return ('_'):rep(#str)
+        end)
         : gsub('[%[%]%(%)]', '_')
     for start, finish in converted:gmatch '%s*()[^,]+()' do
         i = i + 1
@@ -65,27 +71,30 @@ local function makeOneSignature(source, oop, index)
         }
     end
     -- 不定参数
-    if index > i and i > 0 then
+    if index and index > i and i > 0 then
         local lastLabel = params[i].label
         local text = label:sub(lastLabel[1] + 1, lastLabel[2])
         if text:sub(1, 3) == '...' then
             index = i
         end
     end
+    if #params < (index or 0) then
+        return nil
+    end
     return {
         label       = label,
         params      = params,
-        index       = index,
+        index       = index or 1,
         description = hoverDesc(source),
     }
 end
 
 ---@async
 local function makeSignatures(text, call, pos)
-    local node = call.node
-    local oop = node.type == 'method'
-             or node.type == 'getmethod'
-             or node.type == 'setmethod'
+    local func = call.node
+    local oop = func.type == 'method'
+             or func.type == 'getmethod'
+             or func.type == 'setmethod'
     local index
     if call.args then
         local args = {}
@@ -121,18 +130,31 @@ local function makeSignatures(text, call, pos)
                 index = #args
             end
         end
-    else
-        index = 1
     end
     local signs = {}
-    local defs = vm.getDefs(node)
+    local node = vm.compileNode(func)
+    ---@type vm.node
+    node = node:getData 'originNode' or node
     local mark = {}
-    for _, src in ipairs(defs) do
-        if src.type == 'function'
+    for src in node:eachObject() do
+        if (src.type == 'function' and not vm.isVarargFunctionWithOverloads(src))
         or src.type == 'doc.type.function' then
             if not mark[src] then
                 mark[src] = true
                 signs[#signs+1] = makeOneSignature(src, oop, index)
+            end
+        elseif src.type == 'global' and src.cate == 'type' then
+            ---@cast src vm.global
+            for _, set in ipairs(src:getSets(guide.getUri(call))) do
+                if set.type == 'doc.class' then
+                    for _, overload in ipairs(set.calls) do
+                        local f = overload.overload
+                        if not mark[f] then
+                            mark[f] = true
+                            signs[#signs+1] = makeOneSignature(f, oop, index)
+                        end
+                    end
+                end
             end
         end
     end
@@ -142,10 +164,10 @@ end
 ---@async
 return function (uri, pos)
     local state = files.getState(uri)
-    if not state then
+    local text  = files.getText(uri)
+    if not state or not text then
         return nil
     end
-    local text = files.getText(uri)
     local offset = guide.positionToOffset(state, pos)
     pos = guide.offsetToPosition(state, lookback.skipSpace(text, offset))
     local call = findNearCall(uri, state, pos)
@@ -156,5 +178,8 @@ return function (uri, pos)
     if not signs or #signs == 0 then
         return nil
     end
+    table.sort(signs, function (a, b)
+        return #a.params < #b.params
+    end)
     return signs
 end

@@ -4,8 +4,8 @@ local guide = require 'parser.guide'
 local vm    = require 'vm.vm'
 
 ---@class parser.object
----@field _localID string
----@field _localIDs table<string, { sets: parser.object[], gets: parser.object[] }[]>
+---@field package _localID string|false
+---@field package _localIDs table<string, { sets: parser.object[], gets: parser.object[] }>
 
 local compileLocalID, getLocal
 
@@ -147,7 +147,7 @@ function compileLocalID(source)
 end
 
 ---@param source parser.object
----@return string?
+---@return string|false
 function vm.getLocalID(source)
     if source._localID ~= nil then
         return source._localID
@@ -205,7 +205,7 @@ end
 
 ---@param source parser.object
 ---@param includeGets boolean
----@return parser.object[]
+---@return parser.object[]?
 function vm.getLocalFields(source, includeGets)
     local id = vm.getLocalID(source)
     if not id then

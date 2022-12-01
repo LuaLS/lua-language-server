@@ -20,6 +20,8 @@ function vm.getDocSets(suri, name)
     end
 end
 
+---@param uri uri
+---@return boolean
 function vm.isMetaFile(uri)
     local status = files.getState(uri)
     if not status then
@@ -45,6 +47,8 @@ function vm.isMetaFile(uri)
     return false
 end
 
+---@param doc parser.object
+---@return table<string, boolean>?
 function vm.getValidVersions(doc)
     if doc.type ~= 'doc.version' then
         return
@@ -87,13 +91,14 @@ function vm.getValidVersions(doc)
     return valids
 end
 
+---@param value parser.object
 ---@return parser.object?
 local function getDeprecated(value)
     if not value.bindDocs then
-        return false
+        return nil
     end
     if value._deprecated ~= nil then
-        return value._deprecated
+        return value._deprecated or nil
     end
     for _, doc in ipairs(value.bindDocs) do
         if doc.type == 'doc.deprecated' then
@@ -101,24 +106,33 @@ local function getDeprecated(value)
             return doc
         elseif doc.type == 'doc.version' then
             local valids = vm.getValidVersions(doc)
-            if not valids[config.get(guide.getUri(value), 'Lua.runtime.version')] then
+            if valids and not valids[config.get(guide.getUri(value), 'Lua.runtime.version')] then
                 value._deprecated = doc
                 return doc
             end
         end
     end
+    if value.type == 'function' then
+        local doc = getDeprecated(value.parent)
+        if doc then
+            value._deprecated = doc
+            return doc
+        end
+    end
     value._deprecated = false
-    return false
+    return nil
 end
 
+---@param value parser.object
+---@param deep boolean?
 ---@return parser.object?
 function vm.getDeprecated(value, deep)
     if deep then
         local defs = vm.getDefs(value)
         if #defs == 0 then
-            return false
+            return nil
         end
-        local deprecated = false
+        local deprecated
         for _, def in ipairs(defs) do
             if def.type == 'setglobal'
             or def.type == 'setfield'
@@ -128,7 +142,7 @@ function vm.getDeprecated(value, deep)
             or def.type == 'tableindex' then
                 deprecated = getDeprecated(def)
                 if not deprecated then
-                    return false
+                    return nil
                 end
             end
         end
@@ -138,6 +152,8 @@ function vm.getDeprecated(value, deep)
     end
 end
 
+---@param  value parser.object
+---@return boolean
 local function isAsync(value)
     if value.type == 'function' then
         if not value.bindDocs then
@@ -155,9 +171,15 @@ local function isAsync(value)
         value._async = false
         return false
     end
+    if value.type == 'main' then
+        return true
+    end
     return value.async == true
 end
 
+---@param value parser.object
+---@param deep  boolean?
+---@return boolean
 function vm.isAsync(value, deep)
     if isAsync(value) then
         return true
@@ -176,6 +198,8 @@ function vm.isAsync(value, deep)
     return false
 end
 
+---@param value parser.object
+---@return boolean
 local function isNoDiscard(value)
     if value.type == 'function' then
         if not value.bindDocs then
@@ -196,6 +220,9 @@ local function isNoDiscard(value)
     return false
 end
 
+---@param value parser.object
+---@param deep boolean?
+---@return boolean
 function vm.isNoDiscard(value, deep)
     if isNoDiscard(value) then
         return true
@@ -214,6 +241,8 @@ function vm.isNoDiscard(value, deep)
     return false
 end
 
+---@param param parser.object
+---@return boolean
 local function isCalledInFunction(param)
     if not param.ref then
         return false
@@ -238,6 +267,9 @@ local function isCalledInFunction(param)
     return false
 end
 
+---@param node parser.object
+---@param index integer
+---@return boolean
 local function isLinkedCall(node, index)
     for _, def in ipairs(vm.getDefs(node)) do
         if def.type == 'function' then
@@ -252,16 +284,21 @@ local function isLinkedCall(node, index)
     return false
 end
 
+---@param node parser.object
+---@param index integer
+---@return boolean
 function vm.isLinkedCall(node, index)
     return isLinkedCall(node, index)
 end
 
+---@param call parser.object
+---@return boolean
 function vm.isAsyncCall(call)
     if vm.isAsync(call.node, true) then
         return true
     end
     if not call.args then
-        return
+        return false
     end
     for i, arg in ipairs(call.args) do
         if  vm.isAsync(arg, true)
@@ -272,6 +309,9 @@ function vm.isAsyncCall(call)
     return false
 end
 
+---@param uri uri
+---@param doc parser.object
+---@param results table[]
 local function makeDiagRange(uri, doc, results)
     local names
     if doc.names then
@@ -325,7 +365,12 @@ local function makeDiagRange(uri, doc, results)
     end
 end
 
-function vm.isDiagDisabledAt(uri, position, name)
+---@param uri uri
+---@param position integer
+---@param name string
+---@param err? boolean
+---@return boolean
+function vm.isDiagDisabledAt(uri, position, name, err)
     local status = files.getState(uri)
     if not status then
         return false
@@ -355,7 +400,8 @@ function vm.isDiagDisabledAt(uri, position, name)
     local count = 0
     for _, range in ipairs(cache.diagnosticRanges) do
         if range.row <= myRow then
-            if not range.names or range.names[name] then
+            if (range.names and range.names[name])
+            or (not range.names and not err) then
                 if range.mode == 'disable' then
                     count = count + 1
                 elseif range.mode == 'enable' then

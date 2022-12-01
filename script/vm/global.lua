@@ -2,6 +2,7 @@ local util  = require 'utility'
 local scope = require 'workspace.scope'
 local guide = require 'parser.guide'
 local files = require 'files'
+local ws    = require 'workspace'
 ---@class vm
 local vm    = require 'vm.vm'
 
@@ -11,8 +12,8 @@ local vm    = require 'vm.vm'
 
 ---@class vm.global
 ---@field links table<uri, vm.global.link>
----@field setsCache table<uri, parser.object[]>
----@field getsCache table<uri, parser.object[]>
+---@field setsCache? table<uri, parser.object[]>
+---@field getsCache? table<uri, parser.object[]>
 ---@field cate vm.global.cate
 local mt = {}
 mt.__index = mt
@@ -41,6 +42,7 @@ function mt:addGet(uri, source)
     self.getsCache = nil
 end
 
+---@param suri uri
 ---@return parser.object[]
 function mt:getSets(suri)
     if not self.setsCache then
@@ -51,6 +53,7 @@ function mt:getSets(suri)
     if self.setsCache[cacheUri] then
         return self.setsCache[cacheUri]
     end
+    local clock = os.clock()
     self.setsCache[cacheUri] = {}
     local cache = self.setsCache[cacheUri]
     for uri, link in pairs(self.links) do
@@ -59,6 +62,31 @@ function mt:getSets(suri)
                 for _, source in ipairs(link.sets) do
                     cache[#cache+1] = source
                 end
+            end
+        end
+    end
+    local cost = os.clock() - clock
+    if cost > 0.1 then
+        log.warn('global-manager getSets costs', cost, self.name)
+    end
+    return cache
+end
+
+---@return parser.object[]
+function mt:getAllSets()
+    if not self.setsCache then
+        self.setsCache = {}
+    end
+    local cache = self.setsCache['*']
+    if cache then
+        return cache
+    end
+    cache = {}
+    self.setsCache['*'] = cache
+    for _, link in pairs(self.links) do
+        if link.sets then
+            for _, source in ipairs(link.sets) do
+                cache[#cache+1] = source
             end
         end
     end
@@ -75,6 +103,7 @@ function mt:getGets(suri)
     if self.getsCache[cacheUri] then
         return self.getsCache[cacheUri]
     end
+    local clock = os.clock()
     self.getsCache[cacheUri] = {}
     local cache = self.getsCache[cacheUri]
     for uri, link in pairs(self.links) do
@@ -85,6 +114,10 @@ function mt:getGets(suri)
                 end
             end
         end
+    end
+    local cost = os.clock() - clock
+    if cost > 0.1 then
+        log.warn('global-manager getGets costs', cost, self.name)
     end
     return cache
 end
@@ -99,6 +132,11 @@ end
 ---@return string
 function mt:getName()
     return self.name
+end
+
+---@return string
+function mt:getCodeName()
+    return (self.name:gsub(vm.ID_SPLITE, '.'))
 end
 
 ---@return string
@@ -127,7 +165,8 @@ local function createGlobal(name, cate)
 end
 
 ---@class parser.object
----@field _globalNode vm.global
+---@field package _globalNode vm.global|false
+---@field package _enums?     parser.object[]
 
 ---@type table<string, vm.global>
 local allGlobals = {}
@@ -161,6 +200,9 @@ local compilerGlobalSwitch = util.switch()
     : call(function (source)
         local uri    = guide.getUri(source)
         local name   = guide.getKeyName(source)
+        if not name then
+            return
+        end
         local global = vm.declareGlobal('variable', name, uri)
         global:addSet(uri, source)
         source._globalNode = global
@@ -169,6 +211,9 @@ local compilerGlobalSwitch = util.switch()
     : call(function (source)
         local uri    = guide.getUri(source)
         local name   = guide.getKeyName(source)
+        if not name then
+            return
+        end
         local global = vm.declareGlobal('variable', name, uri)
         global:addGet(uri, source)
         source._globalNode = global
@@ -271,19 +316,23 @@ local compilerGlobalSwitch = util.switch()
     : call(function (source)
         local uri  = guide.getUri(source)
         local name = guide.getKeyName(source)
+        if not name then
+            return
+        end
         local class = vm.declareGlobal('type', name, uri)
         class:addSet(uri, source)
         source._globalNode = class
 
         if source.signs then
-            source._sign = vm.createSign()
-            for _, sign in ipairs(source.signs) do
-                source._sign:addSign(vm.compileNode(sign))
+            local sign = vm.createSign()
+            vm.setSign(source, sign)
+            for _, obj in ipairs(source.signs) do
+                sign:addSign(vm.compileNode(obj))
             end
             if source.extends then
                 for _, ext in ipairs(source.extends) do
                     if ext.type == 'doc.type.table' then
-                        ext._generic = vm.createGeneric(ext, source._sign)
+                        vm.setGeneric(ext, vm.createGeneric(ext, sign))
                     end
                 end
             end
@@ -293,6 +342,9 @@ local compilerGlobalSwitch = util.switch()
     : call(function (source)
         local uri  = guide.getUri(source)
         local name = guide.getKeyName(source)
+        if not name then
+            return
+        end
         local alias = vm.declareGlobal('type', name, uri)
         alias:addSet(uri, source)
         source._globalNode = alias
@@ -305,10 +357,46 @@ local compilerGlobalSwitch = util.switch()
             source.extends._generic = vm.createGeneric(source.extends, source._sign)
         end
     end)
+    : case 'doc.enum'
+    : call(function (source)
+        local uri  = guide.getUri(source)
+        local name = guide.getKeyName(source)
+        if not name then
+            return
+        end
+        local enum = vm.declareGlobal('type', name, uri)
+        enum:addSet(uri, source)
+        source._globalNode = enum
+
+        local tbl = source.bindSource
+        if not tbl then
+            return
+        end
+        source._enums = {}
+        for _, field in ipairs(tbl) do
+            if     field.type == 'tablefield' then
+                source._enums[#source._enums+1] = field
+                local subType = vm.declareGlobal('type', name .. '.' .. field.field[1], uri)
+                subType:addSet(uri, field)
+            elseif field.type == 'tableindex' then
+                source._enums[#source._enums+1] = field
+                if field.index.type == 'string' then
+                    local subType = vm.declareGlobal('type', name .. '.' .. field.index[1], uri)
+                    subType:addSet(uri, field)
+                end
+            end
+        end
+    end)
     : case 'doc.type.name'
     : call(function (source)
         local uri  = guide.getUri(source)
         local name = source[1]
+        if name == '_' then
+            return
+        end
+        if name == 'self' then
+            return
+        end
         local type = vm.declareGlobal('type', name, uri)
         type:addGet(uri, source)
         source._globalNode = type
@@ -370,7 +458,7 @@ function vm.getGlobalFields(cate, name)
     end
     local cost = os.clock() - clock
     if cost > 0.1 then
-        log.warn('global-manager getFields cost %.3f', cost)
+        log.warn('global-manager getFields costs', cost)
     end
 
     return globals
@@ -390,10 +478,15 @@ function vm.getGlobals(cate)
     end
     local cost = os.clock() - clock
     if cost > 0.1 then
-        log.warn('global-manager getGlobals cost %.3f', cost)
+        log.warn('global-manager getGlobals costs', cost)
     end
 
     return globals
+end
+
+---@return table<string, vm.global>
+function vm.getAllGlobals()
+    return allGlobals
 end
 
 ---@param suri uri
@@ -434,6 +527,18 @@ function compileObject(source)
     end
     source._globalNode = false
     compilerGlobalSwitch(source.type, source)
+end
+
+---@param source parser.object
+---@return vm.global?
+function vm.getGlobalNode(source)
+    return source._globalNode or nil
+end
+
+---@param source parser.object
+---@return parser.object[]?
+function vm.getEnums(source)
+    return source._enums
 end
 
 ---@param source parser.object
@@ -491,6 +596,7 @@ local function compileAst(source)
         'doc.alias',
         'doc.type.name',
         'doc.extends.name',
+        'doc.enum',
     }, function (src)
         compileObject(src)
     end)
@@ -530,9 +636,11 @@ for uri in files.eachFile() do
     end
 end
 
+---@async
 files.watch(function (ev, uri)
     if ev == 'update' then
         dropUri(uri)
+        ws.awaitReady(uri)
         local state = files.getState(uri)
         if state then
             compileAst(state.ast)

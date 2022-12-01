@@ -32,11 +32,11 @@ return function (data)
     local uri   = data.uri
     local text  = files.getText(uri)
     local state = files.getState(uri)
-    if not state then
+    if not state or not text then
         return
     end
 
-    local start, finish = converter.unpackRange(uri, data.range)
+    local start, finish = converter.unpackRange(state, data.range)
 
     local result = guide.eachSourceContain(state.ast, start, function (source)
         if source.start ~= start
@@ -86,7 +86,7 @@ return function (data)
             changes = {
                 [uri] = {
                     {
-                        range   = converter.packRange(uri, result.start, result.finish),
+                        range   = converter.packRange(state, result.start, result.finish),
                         newText = ('(%s)'):format(text:sub(
                                     guide.positionToOffset(state, result.start + 1),
                                     guide.positionToOffset(state, result.finish)

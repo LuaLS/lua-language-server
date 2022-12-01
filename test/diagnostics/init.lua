@@ -29,11 +29,11 @@ end
 ---@diagnostic disable: await-in-sync
 function TEST(script, ...)
     local newScript, catched = catch(script, '!')
-    files.setText('', newScript)
-    files.open('')
+    files.setText(TESTURI, newScript)
+    files.open(TESTURI)
     local origins = {}
     local results = {}
-    core('', false, function (result)
+    core(TESTURI, false, function (result)
         results[#results+1] = { result.start, result.finish }
         origins[#origins+1] = result
     end)
@@ -46,8 +46,8 @@ function TEST(script, ...)
         assert(#catched['!'] == 0)
     end
 
-    files.remove('')
+    files.remove(TESTURI)
 end
 
 require 'diagnostics.common'
---require 'diagnostics.type-check'
+require 'diagnostics.type-check'

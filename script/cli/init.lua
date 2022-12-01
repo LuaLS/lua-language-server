@@ -7,3 +7,8 @@ if _G['CHECK'] then
     require 'cli.check'
     os.exit(0, true)
 end
+
+if _G['DOC'] then
+    require 'cli.doc'
+    os.exit(0, true)
+end

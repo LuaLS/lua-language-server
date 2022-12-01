@@ -8,10 +8,14 @@ mt._size = 0
 local HEAD = {'<HEAD>'}
 local TAIL = {'<TAIL>'}
 
+---@param node any
+---@return boolean
 function mt:has(node)
     return self._left[node] ~= nil
 end
 
+---@param node any
+---@return boolean
 function mt:isValidNode(node)
     if node == nil
     or node == HEAD
@@ -21,6 +25,9 @@ function mt:isValidNode(node)
     return true
 end
 
+---@param node any
+---@param afterWho any
+---@return boolean
 function mt:pushAfter(node, afterWho)
     if not self:isValidNode(node) then
         return false
@@ -41,6 +48,9 @@ function mt:pushAfter(node, afterWho)
     return true
 end
 
+---@param node any
+---@param beforeWho any
+---@return boolean
 function mt:pushBefore(node, beforeWho)
     if node == nil then
         return false
@@ -52,6 +62,8 @@ function mt:pushBefore(node, beforeWho)
     return self:pushAfter(node, left)
 end
 
+---@param node any
+---@return boolean
 function mt:pop(node)
     if not self:isValidNode(node) then
         return false
@@ -71,14 +83,20 @@ function mt:pop(node)
     return true
 end
 
+---@param node any
+---@return boolean
 function mt:pushHead(node)
     return self:pushAfter(node, HEAD)
 end
 
+---@param node any
+---@return boolean
 function mt:pushTail(node)
     return self:pushBefore(node, TAIL)
 end
 
+---@param node any
+---@return any
 function mt:getAfter(node)
     if node == nil then
         node = HEAD
@@ -90,10 +108,12 @@ function mt:getAfter(node)
     return right
 end
 
+---@return any
 function mt:getHead()
     return self:getAfter(HEAD)
 end
 
+---@return any
 function mt:getBefore(node)
     if node == nil then
         node = TAIL
@@ -105,18 +125,24 @@ function mt:getBefore(node)
     return left
 end
 
+---@return any
 function mt:getTail()
     return self:getBefore(TAIL)
 end
 
+---@return boolean
 function mt:popHead()
     return self:pop(self:getHead())
 end
 
+---@return boolean
 function mt:popTail()
     return self:pop(self:getTail())
 end
 
+---@param old any
+---@param new any
+---@return boolean
 function mt:replace(old, new)
     if not self:isValidNode(old)
     or not self:isValidNode(new) then
@@ -137,10 +163,14 @@ function mt:replace(old, new)
     return true
 end
 
+---@return integer
 function mt:getSize()
     return self._size
 end
 
+---@param start any
+---@param revert? boolean
+---@return fun():any
 function mt:pairs(start, revert)
     if revert then
         if start == nil then
@@ -171,6 +201,9 @@ function mt:pairs(start, revert)
     end
 end
 
+---@param start any
+---@param revert? boolean
+---@return string
 function mt:dump(start, revert)
     local t = {}
     for node in self:pairs(start, revert) do
@@ -186,6 +219,7 @@ function mt:reset()
     self._size = 0
 end
 
+---@return linked-table
 return function ()
     local self = setmetatable({}, mt)
     self:reset()

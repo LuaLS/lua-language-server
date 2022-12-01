@@ -82,7 +82,7 @@ ass<??>
 ]]
 {
     {
-        label = 'assert(v, message)',
+        label = 'assert(v, message, ...)',
         kind  = define.CompletionItemKind.Function,
     },
 }
@@ -93,7 +93,7 @@ ass<??>
 ]]
 {
     {
-        label = 'assert(v, message)',
+        label = 'assert(v, message, ...)',
         kind  = define.CompletionItemKind.Function,
     },
 }
@@ -104,11 +104,11 @@ ass<??>
 ]]
 {
     {
-        label = 'assert(v, message)',
+        label = 'assert(v, message, ...)',
         kind  = define.CompletionItemKind.Function,
     },
     {
-        label = 'assert(v, message)',
+        label = 'assert(v, message, ...)',
         kind  = define.CompletionItemKind.Snippet,
     },
 }
@@ -130,11 +130,11 @@ _G.ass<??>
 ]]
 {
     {
-        label = 'assert(v, message)',
+        label = 'assert(v, message, ...)',
         kind  = define.CompletionItemKind.Function,
     },
     {
-        label = 'assert(v, message)',
+        label = 'assert(v, message, ...)',
         kind  = define.CompletionItemKind.Snippet,
     },
 }
@@ -934,7 +934,7 @@ mt:f<??>
     {
         label = 'f(a, b, c)',
         kind = define.CompletionItemKind.Snippet,
-        insertText = 'f(${1:a: any}, ${2:b: any}, ${3:c: any})',
+        insertText = 'f(${1:a}, ${2:b}, ${3:c})',
     },
 }
 
@@ -1069,7 +1069,7 @@ t['<??>']
 }
 
 TEST [[
-_ENV['z.b.c'] = {}
+_G['z.b.c'] = {}
 
 z<??>
 ]]
@@ -1084,6 +1084,58 @@ z<??>
         },
     },
 }
+
+config.set(nil, 'Lua.runtime.version', 'Lua 5.1')
+
+TEST [[
+_G['z.b.c'] = {}
+
+z<??>
+]]
+{
+    {
+        label = 'z.b.c',
+        kind = define.CompletionItemKind.Field,
+        textEdit = {
+            start = 20000,
+            finish = 20001,
+            newText = '_G["z.b.c"]',
+        },
+    },
+}
+
+config.set(nil, 'Lua.runtime.version', 'Lua 5.4')
+
+TEST [[
+中文字段 = 1
+
+中文<??>
+]]
+{
+    {
+        label = '中文字段',
+        kind = define.CompletionItemKind.Enum,
+        textEdit = {
+            start = 20000,
+            finish = 20006,
+            newText = '_ENV["中文字段"]',
+        },
+    },
+}
+
+config.set(nil, 'Lua.runtime.unicodeName', true)
+TEST [[
+中文字段 = 1
+
+中文<??>
+]]
+{
+    {
+        label = '中文字段',
+        kind = define.CompletionItemKind.Enum,
+    },
+}
+config.set(nil, 'Lua.runtime.unicodeName', false)
 
 TEST [[
 io.close(1, <??>)
@@ -1640,6 +1692,264 @@ f('<??>')
 }
 
 TEST [[
+---@alias Option string | "AAA" | "BBB" | "CCC"
+---@param x Option[]
+function f(x)
+end
+
+f({<??>})
+]]
+{
+    {
+        label = '"AAA"',
+        kind = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS
+    },
+    {
+        label = '"BBB"',
+        kind = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS
+    },
+    {
+        label = '"CCC"',
+        kind = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS
+    }
+}
+
+TEST [[
+---@alias Option string | "AAA" | "BBB" | "CCC"
+---@param x Option[]
+function f(x)
+end
+
+f({"<??>"})
+]]
+{
+    {
+        label = '"AAA"',
+        kind = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS
+    },
+    {
+        label = '"BBB"',
+        kind = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS
+    },
+    {
+        label = '"CCC"',
+        kind = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS
+    }
+}
+
+TEST [[
+---@alias Option string | "AAA" | "BBB" | "CCC"
+---@param x Option[]
+function f(x)
+end
+
+f(<??>)
+]]
+    (nil)
+
+TEST [[
+---@alias Option "AAA" | "BBB" | "CCC"
+
+---@type Option[]
+local l = {<??>}
+]]
+{
+    {
+        label = '"AAA"',
+        kind = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label = '"BBB"',
+        kind = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label = '"CCC"',
+        kind = define.CompletionItemKind.EnumMember,
+    }
+}
+
+TEST [[
+---@alias Option "AAA" | "BBB" | "CCC"
+
+---@type Option[]
+local l = {"<??>"}
+]]
+{
+    {
+        label = '"AAA"',
+        kind = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS
+    },
+    {
+        label = '"BBB"',
+        kind = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS
+    },
+    {
+        label = '"CCC"',
+        kind = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS
+    }
+}
+
+TEST [[
+---@alias Option "AAA" | "BBB" | "CCC"
+
+---@type Option[]
+local l = <??>
+]]
+    (nil)
+
+TEST [[
+---@class OptionObj
+---@field a boolean
+---@field b boolean
+
+---@type OptionObj[]
+local l = { {<??>} }
+]]
+{
+    {
+        label = 'a',
+        kind = define.CompletionItemKind.Property,
+    },
+    {
+        label = 'b',
+        kind = define.CompletionItemKind.Property,
+    }
+}
+
+TEST [[
+---@class OptionObj
+---@field a boolean
+---@field b boolean
+
+---@type OptionObj[]
+local l = { <??> }
+]]
+    (nil)
+
+TEST [[
+---@class OptionObj
+---@field a boolean
+---@field b boolean
+
+---@type OptionObj[]
+local l = <??>
+]]
+    (nil)
+
+TEST [[
+---@class OptionObj
+---@field a boolean
+---@field b boolean
+---@field children OptionObj[]
+
+---@type OptionObj[]
+local l = { 
+    { 
+        a = true,
+        children = { {<??>} }
+    }
+}
+]]
+{
+    {
+        label = 'a',
+        kind = define.CompletionItemKind.Property,
+    },
+    {
+        label = 'b',
+        kind = define.CompletionItemKind.Property,
+    },
+    {
+        label = 'children',
+        kind = define.CompletionItemKind.Property,
+    }
+}
+
+TEST [[
+---@class OptionObj
+---@field a boolean
+---@field b boolean
+---@field children OptionObj[]
+
+---@type OptionObj[]
+local l = { 
+    { 
+        children = {<??>}
+    }
+}
+]]
+(nil)
+
+TEST [[
+---@class OptionObj
+---@field a boolean
+---@field b boolean
+---@field children OptionObj[]
+
+---@type OptionObj[]
+local l = { 
+    { 
+        children = <??>
+    }
+}
+]]
+(nil)
+
+TEST [[
+---@class OptionObj
+---@field a boolean
+---@field b boolean
+---@param x OptionObj[]
+function f(x)
+end
+
+f({ {<??>} })
+]]
+{
+    {
+        label = 'a',
+        kind = define.CompletionItemKind.Property,
+    },
+    {
+        label = 'b',
+        kind = define.CompletionItemKind.Property,
+    }
+}
+
+TEST [[
+---@class OptionObj
+---@field a boolean
+---@field b boolean
+---@param x OptionObj[]
+function f(x)
+end
+
+f({<??>})
+]]
+    (nil)
+
+TEST [[
+---@class OptionObj
+---@field a boolean
+---@field b boolean
+---@param x OptionObj[]
+function f(x)
+end
+
+f(<??>)
+]]
+    (nil)
+
+TEST [[
 ---this is
 ---a multi line
 ---comment
@@ -1754,6 +2064,7 @@ zz<??>
 ```
 
 ---
+
  abc]],
     }
 }
@@ -2430,7 +2741,7 @@ zzzz<??>
     {
         label = 'zzzz(a)',
         kind  = define.CompletionItemKind.Snippet,
-        insertText = 'zzzz(${1:a: any})',
+        insertText = 'zzzz(${1:a})',
     },
     {
         label = 'zzzz(a, b)',
@@ -2440,7 +2751,7 @@ zzzz<??>
     {
         label = 'zzzz(a, b)',
         kind  = define.CompletionItemKind.Snippet,
-        insertText = 'zzzz(${1:a: any}, ${2:b: any})',
+        insertText = 'zzzz(${1:a}, ${2:b})',
     },
 }
 
@@ -2461,28 +2772,7 @@ foo<??>
     {
         label = 'foo(a, b, c, ...)',
         kind  = define.CompletionItemKind.Snippet,
-        insertText = 'foo(${1:a: any})',
-    },
-}
-
-TEST [[
----@param a any
----@param b? any
----@param c? any
----@vararg any
-local function foo(a, b, c, ...) end
-foo<??>
-]]
-{
-    {
-        label = 'foo(a, b, c, ...)',
-        kind  = define.CompletionItemKind.Function,
-        insertText = 'foo',
-    },
-    {
-        label = 'foo(a, b, c, ...)',
-        kind  = define.CompletionItemKind.Snippet,
-        insertText = 'foo(${1:a: any})',
+        insertText = 'foo(${1:a}, ${2:b?}, ${3:c?}, ${4:...})',
     },
 }
 
@@ -2503,28 +2793,7 @@ foo<??>
     {
         label = 'foo(a, b, c, ...)',
         kind  = define.CompletionItemKind.Snippet,
-        insertText = 'foo($1)',
-    },
-}
-
-TEST [[
----@param a? any
----@param b any
----@param c? any
----@vararg any
-local function foo(a, b, c, ...) end
-foo<??>
-]]
-{
-    {
-        label = 'foo(a, b, c, ...)',
-        kind  = define.CompletionItemKind.Function,
-        insertText = 'foo',
-    },
-    {
-        label = 'foo(a, b, c, ...)',
-        kind  = define.CompletionItemKind.Snippet,
-        insertText = 'foo(${1:a?: any}, ${2:b: any})',
+        insertText = 'foo(${1:a?}, ${2:b?}, ${3:c?}, ${4:...})',
     },
 }
 
@@ -2542,7 +2811,7 @@ foo<??>
     {
         label = 'foo(f)',
         kind  = define.CompletionItemKind.Snippet,
-        insertText = 'foo(${1:f: fun(a: any, b: any)})',
+        insertText = 'foo(${1:f})',
     },
 }
 Cared['insertText'] = false
@@ -3348,3 +3617,470 @@ local xyz
         kind  = define.CompletionItemKind.Variable,
     }
 }
+
+TEST [[
+---@type `CONST.X` | `CONST.Y`
+local x
+
+if x == <??>
+]]
+{
+    {
+        label = 'CONST.X',
+        kind  = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label = 'CONST.Y',
+        kind  = define.CompletionItemKind.EnumMember,
+    },
+}
+
+TEST [[
+---@param x `CONST.X` | `CONST.Y`
+local function f(x) end
+
+f(<??>)
+]]
+{
+    {
+        label = 'CONST.X',
+        kind  = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label = 'CONST.Y',
+        kind  = define.CompletionItemKind.EnumMember,
+    },
+}
+
+TEST [[
+return function ()
+    local function fff(xxx)
+        for f in xx<??>
+    end
+end
+]]
+{
+    {
+        label = 'xxx',
+        kind  = define.CompletionItemKind.Variable,
+    },
+}
+
+TEST [[
+---@class A
+---@field xxx 'aaa'|'bbb'
+
+---@type A
+local t = {
+    xxx = '<??>
+}
+]]
+{
+    {
+        label    = "'aaa'",
+        kind     = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS,
+    },
+    {
+        label    = "'bbb'",
+        kind     = define.CompletionItemKind.EnumMember,
+        textEdit = EXISTS,
+    },
+}
+
+TEST [[
+---@enum A
+T = {
+    x = 1,
+    y = 'ss',
+}
+
+---@param x A
+local function f(x) end
+
+f(<??>)
+]]
+{
+    {
+        label    = 'T.x',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label    = 'T.y',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label    = '1',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label    = '"ss"',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+}
+
+TEST [[
+---@enum A
+local ppp = {
+    x = 1,
+    y = 'ss',
+}
+
+---@param x A
+local function f(x) end
+
+f(<??>)
+]]
+{
+    {
+        label    = 'ppp.x',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label    = 'ppp.y',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label    = '1',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label    = '"ss"',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+}
+
+TEST [[
+---@enum A
+ppp.fff = {
+    x = 1,
+    y = 'ss',
+}
+
+---@param x A
+local function f(x) end
+
+f(<??>)
+]]
+{
+    {
+        label    = 'ppp.fff.x',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label    = 'ppp.fff.y',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label    = '1',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label    = '"ss"',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+}
+
+TEST [[
+local x = 1
+local y = 2
+
+---@enum Enum
+local t = {
+    x = x,
+    y = y,
+}
+
+---@param p Enum
+local function f(p) end
+
+f(<??>)
+]]
+{
+    {
+        label    = 't.x',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label    = 't.y',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label    = '1',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label    = '2',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+}
+
+TEST [[
+--
+<??>
+]]
+(function (results)
+    assert(#results > 2)
+end)
+
+TEST [[
+--xxx
+<??>
+]]
+(function (results)
+    assert(#results > 2)
+end)
+
+TEST [[
+---<??>
+local x = function (x, y) end
+]]
+(EXISTS)
+
+TEST [[
+local x = {
+<??>
+})
+]]
+(function (results)
+    for _, res in ipairs(results) do
+        assert(res.label ~= 'do')
+    end
+end)
+
+TEST [[
+---@class Options
+---@field page number
+---@field active boolean
+
+---@param opts Options
+local function acceptOptions(opts) end
+
+acceptOptions({
+<??>
+})
+]]
+(function (results)
+    assert(#results == 2)
+end)
+
+TEST [[
+local t1 = {}
+
+t1.A = {}
+t1.A.B = {}
+t1.A.B.C = 1
+
+local t2 = t1
+
+print(t2.A.<??>)
+]]
+{
+    {
+        label    = 'B',
+        kind     = define.CompletionItemKind.Field,
+    },
+}
+
+TEST [[
+---@overload fun(x: number)
+---@overload fun(x: number, y: number)
+local function fff(...)
+end
+
+fff<??>
+]]
+{
+    {
+        label    = 'fff(x)',
+        kind     = define.CompletionItemKind.Function,
+    },
+    {
+        label    = 'fff(x, y)',
+        kind     = define.CompletionItemKind.Function,
+    },
+}
+
+TEST [[
+---@overload fun(x: number)
+---@overload fun(x: number, y: number)
+function fff(...)
+end
+
+fff<??>
+]]
+{
+    {
+        label    = 'fff(x)',
+        kind     = define.CompletionItemKind.Function,
+    },
+    {
+        label    = 'fff(x, y)',
+        kind     = define.CompletionItemKind.Function,
+    },
+}
+
+TEST [[
+---@overload fun(x: number)
+---@overload fun(x: number, y: number)
+function t.fff(...)
+end
+
+t.fff<??>
+]]
+{
+    {
+        label    = 'fff(x)',
+        kind     = define.CompletionItemKind.Function,
+    },
+    {
+        label    = 'fff(x, y)',
+        kind     = define.CompletionItemKind.Function,
+    },
+}
+
+TEST [[
+---@class A
+---@field private x number
+---@field y number
+
+---@type A
+local t
+
+t.<??>
+]]
+{
+    {
+        label    = 'y',
+        kind     = define.CompletionItemKind.Field,
+    },
+}
+
+TEST [[
+---@class A
+---@field private x number
+---@field protected y number
+---@field z number
+
+---@class B: A
+local t
+
+t.<??>
+]]
+{
+    {
+        label    = 'y',
+        kind     = define.CompletionItemKind.Field,
+    },
+    {
+        label    = 'z',
+        kind     = define.CompletionItemKind.Field,
+    },
+}
+
+TEST [[
+---@class A
+---@field private x number
+---@field protected y number
+---@field z number
+
+---@class B: A
+
+---@type B
+local t
+
+t.<??>
+]]
+{
+    {
+        label    = 'z',
+        kind     = define.CompletionItemKind.Field,
+    },
+}
+
+TEST [[
+---@class ABCD
+
+---@see ABCD<??>
+]]
+{
+    {
+        label    = 'ABCD',
+        kind     = define.CompletionItemKind.Class,
+        textEdit = {
+            newText = 'ABCD',
+            start   = 20008,
+            finish  = 20012,
+        }
+    },
+}
+
+TEST [[
+---@class A
+---@field f fun(x: string): string
+
+---@type A
+local t = {
+    f = <??>
+}
+]]
+{
+    {
+        label = 'fun(x: string):string',
+        kind  = define.CompletionItemKind.Function,
+    }
+}
+
+TEST [[
+---@type table<string, integer>
+local x = {
+    a = 1,
+    b = 2,
+    c = 3
+}
+
+x.<??>
+]]
+{
+    {
+        label = 'a',
+        kind  = define.CompletionItemKind.Enum,
+    },
+    {
+        label = 'b',
+        kind  = define.CompletionItemKind.Enum,
+    },
+    {
+        label = 'c',
+        kind  = define.CompletionItemKind.Enum,
+    },
+}
+
+TEST [[
+---@param x {damage: integer, count: integer, health:integer}
+local function f(x) end
+
+f {<??>}
+]]
+{
+    {
+        label = 'count',
+        kind  = define.CompletionItemKind.Property,
+    },
+    {
+        label = 'damage',
+        kind  = define.CompletionItemKind.Property,
+    },
+    {
+        label = 'health',
+        kind  = define.CompletionItemKind.Property,
+    },
+}
+
+TEST [[
+---@alias Foo Foo[]
+---@type Foo
+local foo
+foo = {"<??>"}
+]]
+(EXISTS)

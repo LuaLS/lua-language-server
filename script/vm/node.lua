@@ -2,28 +2,34 @@ local files    = require 'files'
 ---@class vm
 local vm       = require 'vm.vm'
 local ws       = require 'workspace.workspace'
+local guide    = require 'parser.guide'
+local timer    = require 'timer'
 
 ---@type table<vm.object, vm.node>
 vm.nodeCache = {}
 
+---@alias vm.node.object vm.object | vm.global
+
 ---@class vm.node
----@field [integer] vm.object
+---@field [integer] vm.node.object
+---@field [vm.node.object] true
 local mt = {}
 mt.__index    = mt
 mt.id         = 0
 mt.type       = 'vm.node'
 mt.optional   = nil
-mt.lastInfer  = nil
 mt.data       = nil
+mt.resolved   = nil
 
----@param node vm.node | vm.object
+---@param node vm.node | vm.node.object
+---@return vm.node
 function mt:merge(node)
     if not node then
-        return
+        return self
     end
     if node.type == 'vm.node' then
         if node == self then
-            return
+            return self
         end
         if node:isOptional() then
             self.optional = true
@@ -35,11 +41,13 @@ function mt:merge(node)
             end
         end
     else
+        ---@cast node -vm.node
         if not self[node] then
             self[node]    = true
             self[#self+1] = node
         end
     end
+    return self
 end
 
 ---@return boolean
@@ -56,7 +64,7 @@ function mt:clear()
 end
 
 ---@param n integer
----@return vm.object?
+---@return vm.node.object?
 function mt:get(n)
     return self[n]
 end
@@ -68,6 +76,7 @@ function mt:setData(k, v)
     self.data[k] = v
 end
 
+---@return any
 function mt:getData(k)
     if not self.data then
         return nil
@@ -81,6 +90,7 @@ end
 
 function mt:removeOptional()
     self:remove 'nil'
+    return self
 end
 
 ---@return boolean
@@ -106,6 +116,19 @@ function mt:hasFalsy()
 end
 
 ---@return boolean
+function mt:hasKnownType()
+    for _, c in ipairs(self) do
+        if c.type == 'global' and c.cate == 'type' then
+            return true
+        end
+        if guide.isLiteral(c) then
+            return true
+        end
+    end
+    return false
+end
+
+---@return boolean
 function mt:isNullable()
     if self.optional then
         return true
@@ -116,7 +139,8 @@ function mt:isNullable()
     for _, c in ipairs(self) do
         if c.type == 'nil'
         or (c.type == 'global' and c.cate == 'type' and c.name == 'nil')
-        or (c.type == 'global' and c.cate == 'type' and c.name == 'any') then
+        or (c.type == 'global' and c.cate == 'type' and c.name == 'any')
+        or (c.type == 'global' and c.cate == 'type' and c.name == '...') then
             return true
         end
     end
@@ -140,18 +164,25 @@ function mt:setTruthy()
             self[c] = nil
             goto CONTINUE
         end
-        if (c.type == 'global' and c.cate == 'type' and c.name == 'boolean')
-        or (c.type == 'boolean' or c.type == 'doc.type.boolean') then
+        if c.type == 'global' and c.cate == 'type' and c.name == 'boolean' then
             hasBoolean = true
             table.remove(self, index)
             self[c] = nil
             goto CONTINUE
         end
+        if c.type == 'boolean' or c.type == 'doc.type.boolean' then
+            if c[1] == false then
+                table.remove(self, index)
+                self[c] = nil
+                goto CONTINUE
+            end
+        end
         ::CONTINUE::
     end
     if hasBoolean then
-        self[#self+1] = vm.declareGlobal('type', 'true')
+        self:merge(vm.declareGlobal('type', 'true'))
     end
+    return self
 end
 
 ---@return vm.node
@@ -165,21 +196,39 @@ function mt:setFalsy()
         if c.type == 'nil'
         or (c.type == 'global' and c.cate == 'type' and c.name == 'nil')
         or (c.type == 'global' and c.cate == 'type' and c.name == 'false')
-        or (c.type == 'boolean' and c[1] == true)
-        or (c.type == 'doc.type.boolean' and c[1] == true) then
+        or (c.type == 'boolean' and c[1] == false)
+        or (c.type == 'doc.type.boolean' and c[1] == false) then
             goto CONTINUE
         end
-        if (c.type == 'global' and c.cate == 'type' and c.name == 'boolean')
-        or (c.type == 'boolean' or c.type == 'doc.type.boolean') then
+        if c.type == 'global' and c.cate == 'type' and c.name == 'boolean' then
             hasBoolean = true
             table.remove(self, index)
             self[c] = nil
+            goto CONTINUE
+        end
+        if c.type == 'boolean' or c.type == 'doc.type.boolean' then
+            if c[1] == true then
+                table.remove(self, index)
+                self[c] = nil
+                goto CONTINUE
+            end
+        end
+        if (c.type == 'global' and c.cate == 'type') then
+            table.remove(self, index)
+            self[c] = nil
+            goto CONTINUE
+        end
+        if guide.isLiteral(c) then
+            table.remove(self, index)
+            self[c] = nil
+            goto CONTINUE
         end
         ::CONTINUE::
     end
     if hasBoolean then
-        self[#self+1] = vm.declareGlobal('type', 'false')
+        self:merge(vm.declareGlobal('type', 'false'))
     end
+    return self
 end
 
 ---@param name string
@@ -193,11 +242,61 @@ function mt:remove(name)
         or (c.type == name)
         or (c.type == 'doc.type.integer'  and (name == 'number' or name == 'integer'))
         or (c.type == 'doc.type.boolean'  and name == 'boolean')
+        or (c.type == 'doc.type.boolean'  and name == 'true'  and c[1] == true)
+        or (c.type == 'doc.type.boolean'  and name == 'false' and c[1] == false)
         or (c.type == 'doc.type.table'    and name == 'table')
         or (c.type == 'doc.type.array'    and name == 'table')
-        or (c.type == 'doc.type.function' and name == 'function') then
+        or (c.type == 'doc.type.sign'     and name == c.node[1])
+        or (c.type == 'doc.type.function' and name == 'function')
+        or (c.type == 'doc.type.string'   and name == 'string') then
             table.remove(self, index)
             self[c] = nil
+        end
+    end
+    return self
+end
+
+---@param uri uri
+---@param name string
+function mt:narrow(uri, name)
+    if self.optional == true then
+        self.optional = nil
+    end
+    for index = #self, 1, -1 do
+        local c = self[index]
+        if (c.type == name)
+        or (c.type == 'doc.type.integer'  and (name == 'number' or name == 'integer'))
+        or (c.type == 'doc.type.boolean'  and name == 'boolean')
+        or (c.type == 'doc.type.table'    and name == 'table')
+        or (c.type == 'doc.type.array'    and name == 'table')
+        or (c.type == 'doc.type.sign'     and name == c.node[1])
+        or (c.type == 'doc.type.function' and name == 'function')
+        or (c.type == 'doc.type.string'   and name == 'string') then
+            goto CONTINUE
+        end
+        if c.type == 'global' and c.cate == 'type' then
+            if (c.name == name)
+            or (vm.isSubType(uri, c.name, name)) then
+                goto CONTINUE
+            end
+        end
+        table.remove(self, index)
+        self[c] = nil
+        ::CONTINUE::
+    end
+    if #self == 0 then
+        self[#self+1] = vm.getGlobal('type', name)
+    end
+    return self
+end
+
+---@param obj vm.object
+function mt:removeObject(obj)
+    for index, c in ipairs(self) do
+        if c == obj then
+            table.remove(self, index)
+            self[c] = nil
+            return
         end
     end
 end
@@ -206,12 +305,84 @@ end
 function mt:removeNode(node)
     for _, c in ipairs(node) do
         if c.type == 'global' and c.cate == 'type' then
+            ---@cast c vm.global
             self:remove(c.name)
+        elseif c.type == 'nil' then
+            self:remove 'nil'
+        elseif c.type == 'boolean'
+        or     c.type == 'doc.type.boolean' then
+            if c[1] == true then
+                self:remove 'true'
+            else
+                self:remove 'false'
+            end
+        else
+            ---@cast c -vm.global
+            self:removeObject(c)
         end
     end
 end
 
----@return fun():vm.object
+---@param name string
+---@return boolean
+function mt:hasType(name)
+    for _, c in ipairs(self) do
+        if c.type == 'global' and c.cate == 'type' and c.name == name then
+            return true
+        end
+    end
+    return false
+end
+
+---@param name string
+---@return boolean
+function mt:hasName(name)
+    if name == 'nil' and self.optional == true then
+        return true
+    end
+    for _, c in ipairs(self) do
+        if c.type == 'global' and c.cate == 'type' and c.name == name then
+            return true
+        end
+        if c.type == name then
+            return true
+        end
+        -- TODO
+    end
+    return false
+end
+
+---@return vm.node
+function mt:asTable()
+    self.optional = nil
+    for index = #self, 1, -1 do
+        local c = self[index]
+        if c.type == 'table'
+        or c.type == 'doc.type.table'
+        or c.type == 'doc.type.array' then
+            goto CONTINUE
+        end
+        if c.type == 'doc.type.sign' then
+            if c.node[1] == 'table'
+            or not guide.isBasicType(c.node[1]) then
+                goto CONTINUE
+            end
+        end
+        if c.type == 'global' and c.cate == 'type' then
+            ---@cast c vm.global
+            if c.name == 'table'
+            or not guide.isBasicType(c.name) then
+                goto CONTINUE
+            end
+        end
+        table.remove(self, index)
+        self[c] = nil
+        ::CONTINUE::
+    end
+    return self
+end
+
+---@return fun():vm.node.object
 function mt:eachObject()
     local i = 0
     return function ()
@@ -226,8 +397,9 @@ function mt:copy()
 end
 
 ---@param source vm.object
----@param node vm.node | vm.object
+---@param node vm.node | vm.node.object
 ---@param cover? boolean
+---@return vm.node
 function vm.setNode(source, node, cover)
     if not node then
         if TEST then
@@ -236,23 +408,23 @@ function vm.setNode(source, node, cover)
             log.error('Can not set nil node')
         end
     end
-    if source.type == 'global' then
-        error('Can not set node to global')
-    end
     if cover then
+        ---@cast node vm.node
         vm.nodeCache[source] = node
-        return
+        return node
     end
     local me = vm.nodeCache[source]
     if me then
         me:merge(node)
     else
         if node.type == 'vm.node' then
-            vm.nodeCache[source] = node:copy()
+            me = node:copy()
         else
-            vm.nodeCache[source] = vm.createNode(node)
+            me = vm.createNode(node)
         end
+        vm.nodeCache[source] = me
     end
+    return me
 end
 
 ---@param source vm.object
@@ -291,8 +463,8 @@ end
 
 local ID = 0
 
----@param a? vm.node | vm.object
----@param b? vm.node | vm.object
+---@param a? vm.node | vm.node.object
+---@param b? vm.node | vm.node.object
 ---@return vm.node
 function vm.createNode(a, b)
     ID = ID + 1
@@ -308,10 +480,22 @@ function vm.createNode(a, b)
     return node
 end
 
+---@type timer?
+local delayTimer
 files.watch(function (ev, uri)
     if ev == 'version' then
         if ws.isReady(uri) then
-            vm.clearNodeCache()
+            if CACHEALIVE then
+                if delayTimer then
+                    delayTimer:restart()
+                end
+                delayTimer = timer.wait(1, function ()
+                    delayTimer = nil
+                    vm.clearNodeCache()
+                end)
+            else
+                vm.clearNodeCache()
+            end
         end
     end
 end)

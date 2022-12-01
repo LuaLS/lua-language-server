@@ -8,6 +8,7 @@ local catch    = require 'catch'
 
 config.get(nil, 'Lua.diagnostics.neededFileStatus')['deprecated'] = 'Any'
 config.get(nil, 'Lua.diagnostics.neededFileStatus')['type-check'] = 'Any'
+config.get(nil, 'Lua.diagnostics.neededFileStatus')['duplicate-set-field'] = 'Any'
 config.get(nil, 'Lua.diagnostics.neededFileStatus')['codestyle-check'] = 'None'
 
 rawset(_G, 'TEST', true)
@@ -139,4 +140,74 @@ TEST {
         path = 'c.lua',
         content = 'require "f.a"',
     },
+}
+
+TEST {
+    { path = 'a.lua', content = [[
+        ---@class A
+        ---@field package x string
+
+        ---@type A
+        local obj
+
+        print(obj.x)
+    ]]},
+}
+
+TEST {
+    { path = 'a.lua', content = [[
+        ---@class A
+        ---@field package x string
+    ]]},
+    { path = 'b.lua', content = [[
+        ---@type A
+        local obj
+
+        print(obj.<!x!>)
+    ]]}
+}
+
+TEST {
+    { path = 'a.lua', content = [[
+        ---@class A
+        ---@field <!x!> number
+    ]]},
+    { path = 'b.lua', content = [[
+        ---@class A
+        ---@field <!x!> number
+    ]]}
+}
+
+TEST {
+    { path = 'a.lua', content = [[
+        ---@class A
+        local mt
+
+        function <!mt:init!>()
+        end
+    ]]},
+    { path = 'b.lua', content = [[
+        ---@class A
+        local mt
+
+        function <!mt:init!>()
+        end
+    ]]}
+}
+
+TEST {
+    { path = 'a.lua', content = [[
+        ---@class A
+        local mt
+
+        function mt:init()
+        end
+    ]]},
+    { path = 'b.lua', content = [[
+        ---@class B: A
+        local mt
+
+        function mt:init()
+        end
+    ]]}
 }

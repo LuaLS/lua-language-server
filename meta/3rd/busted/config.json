@@ -1,0 +1,7 @@
+{
+	"settings": {
+		"Lua.workspace.library": [
+			"${3rd}/luassert/library"
+		]
+	}
+}

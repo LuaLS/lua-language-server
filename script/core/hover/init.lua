@@ -6,6 +6,7 @@ local util       = require 'utility'
 local findSource = require 'core.find-source'
 local markdown   = require 'provider.markdown'
 local guide      = require 'parser.guide'
+local wssymbol   = require 'core.workspace-symbol'
 
 ---@async
 local function getHover(source)
@@ -13,6 +14,15 @@ local function getHover(source)
     local defMark   = {}
     local labelMark = {}
     local descMark  = {}
+
+    if source.type == 'doc.see.name' then
+        for _, symbol in ipairs(wssymbol(source[1], guide.getUri(source))) do
+            if symbol.name == source[1] then
+                source = symbol.source
+                break
+            end
+        end
+    end
 
     ---@async
     local function addHover(def, checkLable, oop)
@@ -60,8 +70,12 @@ local function getHover(source)
             if guide.isOOP(def) then
                 oop = true
             end
-            if def.type == 'function'
-            or def.type == 'doc.type.function' then
+            if  def.type == 'function'
+            and not vm.isVarargFunctionWithOverloads(def) then
+                hasFunc = true
+                addHover(def, true, oop)
+            end
+            if def.type == 'doc.type.function' then
                 hasFunc = true
                 addHover(def, true, oop)
             end
@@ -92,19 +106,22 @@ local function getHover(source)
 end
 
 local accept = {
-    ['local']         = true,
-    ['setlocal']      = true,
-    ['getlocal']      = true,
-    ['setglobal']     = true,
-    ['getglobal']     = true,
-    ['field']         = true,
-    ['method']        = true,
-    ['string']        = true,
-    ['number']        = true,
-    ['integer']       = true,
-    ['doc.type.name'] = true,
-    ['function']      = true,
-    ['doc.module']    = true,
+    ['local']          = true,
+    ['setlocal']       = true,
+    ['getlocal']       = true,
+    ['setglobal']      = true,
+    ['getglobal']      = true,
+    ['field']          = true,
+    ['method']         = true,
+    ['string']         = true,
+    ['number']         = true,
+    ['integer']        = true,
+    ['doc.type.name']  = true,
+    ['doc.class.name'] = true,
+    ['doc.enum.name']  = true,
+    ['function']       = true,
+    ['doc.module']     = true,
+    ['doc.see.name']   = true,
 }
 
 ---@async

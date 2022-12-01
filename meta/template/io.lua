@@ -42,7 +42,7 @@ function io.input(file) end
 ---#DES 'io.lines'
 ---@param filename string?
 ---@param ... readmode
----@return fun():string|number
+---@return fun():any, ...
 function io.lines(filename, ...) end
 
 ---#DES 'io.open'
@@ -71,8 +71,8 @@ function io.popen(prog, mode) end
 
 ---#DES 'io.read'
 ---@param ... readmode
----@return string|number
----@return ...
+---@return any
+---@return any ...
 ---@nodiscard
 function io.read(...) end
 
@@ -101,7 +101,7 @@ function io.write(...) end
 ---@class file*
 local file = {}
 
----@alias readmode number
+---@alias readmode integer|string
 ---#if VERSION >= 5.3 then
 ---| '"n"'  # ---#DESTAIL 'readmode.n'
 ---| '"a"'  # ---#DESTAIL 'readmode.a'
@@ -129,12 +129,13 @@ function file:flush() end
 
 ---#DES 'file:lines'
 ---@param ... readmode
----@return fun():string|number
+---@return fun():any, ...
 function file:lines(...) end
 
 ---#DES 'file:read'
 ---@param ... readmode
----@return string|number
+---@return any
+---@return any ...
 ---@nodiscard
 function file:read(...) end
 

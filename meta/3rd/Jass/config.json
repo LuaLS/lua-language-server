@@ -1,0 +1,6 @@
+{
+    "words"   : ["jass%.common"],
+    "settings"  : {
+        "Lua.runtime.version": "Lua 5.3"
+    }
+}

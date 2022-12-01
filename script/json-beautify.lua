@@ -5,23 +5,36 @@ local error = error
 local table_concat = table.concat
 local table_sort = table.sort
 local string_rep = string.rep
-local math_type = math.type
 local setmetatable = setmetatable
-local getmetatable = getmetatable
 
-local statusMark
-local statusQue
+local math_type
+
+if _VERSION == "Lua 5.1" or _VERSION == "Lua 5.2" then
+    local math_floor = math.floor
+    function math_type(v)
+        if v >= -2147483648 and v <= 2147483647 and math_floor(v) == v then
+            return "integer"
+        end
+        return "float"
+    end
+else
+    math_type = math.type
+end
+
+local statusVisited
+local statusBuilder
 local statusDep
 local statusOpt
 
 local defaultOpt = {
     newline = "\n",
-    indent = "  ",
+    indent = "    ",
+    depth = 0,
 }
 defaultOpt.__index = defaultOpt
 
 local function encode_newline()
-    statusQue[#statusQue+1] = statusOpt.newline..string_rep(statusOpt.indent, statusDep)
+    statusBuilder[#statusBuilder+1] = statusOpt.newline..string_rep(statusOpt.indent, statusDep)
 end
 
 local encode_map = {}
@@ -32,96 +45,125 @@ end
 
 local function encode(v)
     local res = encode_map[type(v)](v)
-    statusQue[#statusQue+1] = res
+    statusBuilder[#statusBuilder+1] = res
 end
 
 function encode_map.string(v)
-    statusQue[#statusQue+1] = '"'
-    statusQue[#statusQue+1] = encode_string(v)
+    statusBuilder[#statusBuilder+1] = '"'
+    statusBuilder[#statusBuilder+1] = encode_string(v)
     return '"'
 end
 
 function encode_map.table(t)
     local first_val = next(t)
     if first_val == nil then
-        if getmetatable(t) == json.object then
+        if json.isObject(t) then
             return "{}"
         else
             return "[]"
         end
     end
-    if statusMark[t] then
+    if statusVisited[t] then
         error("circular reference")
     end
-    statusMark[t] = true
+    statusVisited[t] = true
     if type(first_val) == 'string' then
         local key = {}
         for k in next, t do
             if type(k) ~= "string" then
-                error("invalid table: mixed or invalid key types")
+                error("invalid table: mixed or invalid key types: "..k)
             end
             key[#key+1] = k
         end
         table_sort(key)
-        statusQue[#statusQue+1] = "{"
+        statusBuilder[#statusBuilder+1] = "{"
         statusDep = statusDep + 1
         encode_newline()
         local k = key[1]
-        statusQue[#statusQue+1] = '"'
-        statusQue[#statusQue+1] = encode_string(k)
-        statusQue[#statusQue+1] = '": '
+        statusBuilder[#statusBuilder+1] = '"'
+        statusBuilder[#statusBuilder+1] = encode_string(k)
+        statusBuilder[#statusBuilder+1] = '": '
         encode(t[k])
         for i = 2, #key do
             local k = key[i]
-            statusQue[#statusQue+1] = ","
+            statusBuilder[#statusBuilder+1] = ","
             encode_newline()
-            statusQue[#statusQue+1] = '"'
-            statusQue[#statusQue+1] = encode_string(k)
-            statusQue[#statusQue+1] = '": '
+            statusBuilder[#statusBuilder+1] = '"'
+            statusBuilder[#statusBuilder+1] = encode_string(k)
+            statusBuilder[#statusBuilder+1] = '": '
             encode(t[k])
         end
         statusDep = statusDep - 1
         encode_newline()
-        statusMark[t] = nil
+        statusVisited[t] = nil
         return "}"
-    else
+    elseif json.supportSparseArray then
         local max = 0
         for k in next, t do
             if math_type(k) ~= "integer" or k <= 0 then
-                error("invalid table: mixed or invalid key types")
+                error("invalid table: mixed or invalid key types: "..k)
             end
             if max < k then
                 max = k
             end
         end
-        statusQue[#statusQue+1] = "["
+        statusBuilder[#statusBuilder+1] = "["
         statusDep = statusDep + 1
         encode_newline()
         encode(t[1])
         for i = 2, max do
-            statusQue[#statusQue+1] = ","
+            statusBuilder[#statusBuilder+1] = ","
             encode_newline()
             encode(t[i])
         end
         statusDep = statusDep - 1
         encode_newline()
-        statusMark[t] = nil
+        statusVisited[t] = nil
+        return "]"
+    else
+        if t[1] == nil then
+            error("invalid table: sparse array is not supported")
+        end
+        statusBuilder[#statusBuilder+1] = "["
+        statusDep = statusDep + 1
+        encode_newline()
+        encode(t[1])
+        local count = 2
+        while t[count] ~= nil do
+            statusBuilder[#statusBuilder+1] = ","
+            encode_newline()
+            encode(t[count])
+            count = count + 1
+        end
+        if next(t, count-1) ~= nil then
+            local k = next(t, count-1)
+            if type(k) == "number" then
+                error("invalid table: sparse array is not supported")
+            else
+                error("invalid table: mixed or invalid key types: "..k)
+            end
+        end
+        statusDep = statusDep - 1
+        encode_newline()
+        statusVisited[t] = nil
         return "]"
     end
 end
 
+local function beautify_option(option)
+    return setmetatable(option or {}, defaultOpt)
+end
+
 local function beautify(v, option)
-    if type(v) == "string" then
-        v = json.decode(v)
-    end
-    statusMark = {}
-    statusQue = {}
-    statusDep = 0
-    statusOpt = option and setmetatable(option, defaultOpt) or defaultOpt
+    statusVisited = {}
+    statusBuilder = {}
+    statusOpt = beautify_option(option)
+    statusDep = statusOpt.depth
     encode(v)
-    return table_concat(statusQue)
+    return table_concat(statusBuilder)
 end
 
 json.beautify = beautify
+json.beautify_option = beautify_option
 
 return json

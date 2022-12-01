@@ -13,6 +13,7 @@ METAPATH = METAPATH or (ROOT:string() .. '/meta')
 
 collectgarbage 'generational'
 
+---@diagnostic disable-next-line: duplicate-set-field
 io.write = function () end
 
 ---@diagnostic disable-next-line: lowercase-global
@@ -37,8 +38,8 @@ local function test(name)
     local clock = os.clock()
     print(('测试[%s]...'):format(name))
     local originRequire = require
-    require = function (n, ...)
-        local v, p = originRequire(n, ...)
+    require = function (n)
+        local v, p = originRequire(n)
         if p and p:find 'test/' then
             package.loaded[n] = nil
         end
@@ -56,8 +57,8 @@ local function testAll()
     test 'references'
     test 'hover'
     test 'completion'
-    test 'crossfile'
     test 'diagnostics'
+    test 'crossfile'
     test 'highlight'
     test 'rename'
     test 'signature'
@@ -65,7 +66,7 @@ local function testAll()
     test 'document_symbol'
     test 'code_action'
     test 'type_formatting'
-    --test 'other'
+    test 'other'
 end
 
 local files = require "files"
@@ -76,17 +77,21 @@ local function main()
 
     local lclient = require 'lclient'
     local ws      = require 'workspace'
+    local furi    = require 'file-uri'
 
     --log.print = true
+
+    TESTURI = furi.encode('/unittest.lua')
 
     ---@async
     lclient():start(function (client)
         client:registerFakers()
+        local rootUri = furi.encode '/'
         client:initialize {
-            rootUri = '',
+            rootUri = rootUri,
         }
 
-        ws.awaitReady()
+        ws.awaitReady(rootUri)
 
         print('Loaded files in', os)
         for uri in files.eachFile() do

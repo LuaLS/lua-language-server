@@ -2,7 +2,8 @@
 local vm      = require 'vm.vm'
 
 ---@class parser.object
----@field _generic vm.generic
+---@field package _generic vm.generic
+---@field package _resolved vm.node
 
 ---@class vm.generic
 ---@field sign  vm.sign
@@ -11,14 +12,11 @@ local mt = {}
 mt.__index = mt
 mt.type = 'generic'
 
----@param source    parser.object
+---@param source    vm.object?
 ---@param resolved? table<string, vm.node>
----@return parser.object | vm.node
+---@return vm.object?
 local function cloneObject(source, resolved)
-    if not source then
-        return nil
-    end
-    if not resolved then
+    if not resolved or not source then
         return source
     end
     if source.type == 'doc.generic.name' then
@@ -32,16 +30,18 @@ local function cloneObject(source, resolved)
         }
         if resolved[key] then
             vm.setNode(newName, resolved[key], true)
+            newName._resolved = resolved[key]
         end
         return newName
     end
     if source.type == 'doc.type' then
         local newType = {
-            type   = source.type,
-            start  = source.start,
-            finish = source.finish,
-            parent = source.parent,
-            types  = {},
+            type     = source.type,
+            start    = source.start,
+            finish   = source.finish,
+            parent   = source.parent,
+            optional = source.optional,
+            types    = {},
         }
         for i, typeUnit in ipairs(source.types) do
             local newObj     = cloneObject(typeUnit, resolved)
@@ -124,10 +124,40 @@ function mt:resolve(uri, args)
     local protoNode = vm.compileNode(self.proto)
     local result = vm.createNode()
     for nd in protoNode:eachObject() do
-        local clonedNode = vm.compileNode(cloneObject(nd, resolved))
-        result:merge(clonedNode)
+        if nd.type == 'global' then
+            ---@cast nd vm.global
+            result:merge(nd)
+        else
+            ---@cast nd -vm.global
+            local clonedObject = cloneObject(nd, resolved)
+            if clonedObject then
+                local clonedNode   = vm.compileNode(clonedObject)
+                result:merge(clonedNode)
+            end
+        end
     end
     return result
+end
+
+---@param source parser.object
+---@return vm.node?
+function vm.getGenericResolved(source)
+    if source.type ~= 'doc.generic.name' then
+        return nil
+    end
+    return source._resolved
+end
+
+---@param source parser.object
+---@param generic vm.generic
+function vm.setGeneric(source, generic)
+    source._generic = generic
+end
+
+---@param source parser.object
+---@return vm.generic?
+function vm.getGeneric(source)
+    return source._generic
 end
 
 ---@param proto vm.object

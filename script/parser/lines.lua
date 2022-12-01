@@ -6,6 +6,7 @@ return function (text)
     local current = 1
     local lines = {}
     lines[0] = 1
+    lines.size = #text
     local i = 0
     while true do
         local pos = sfind(text,'[\r\n]', current)

@@ -83,7 +83,7 @@ local RESERVED = {
 local m = {}
 
 --- 打印表的结构
----@param tbl table
+---@param tbl any
 ---@param option? table
 ---@return string
 function m.dump(tbl, option)
@@ -158,8 +158,10 @@ function m.dump(tbl, option)
             local tp = type(value)
             local format = option['format'] and option['format'][key]
             if format then
-                lines[#lines+1] = ('%s%s%s,'):format(TAB[deep+1], keyWord, format(value, unpack, deep+1, stack))
-            elseif tp == 'table' then
+                value = format(value, unpack, deep+1, stack)
+                tp    = type(value)
+            end
+            if tp == 'table' then
                 if mark[value] and mark[value] > 0 then
                     lines[#lines+1] = ('%s%s%s,'):format(TAB[deep+1], keyWord, option['loop'] or '"<Loop>"')
                 elseif deep >= (option['deep'] or mathHuge) then
@@ -273,7 +275,7 @@ local function sortTable(tbl)
 end
 
 --- 创建一个有序表
----@param tbl table {optional = 'self'}
+---@param tbl? table
 ---@return table
 function m.container(tbl)
     return sortTable(tbl)
@@ -288,6 +290,9 @@ function m.loadFile(path, keepBom)
     end
     local text = f:read 'a'
     f:close()
+    if not text then
+        return nil
+    end
     if not keepBom then
         if text:sub(1, 3) == '\xEF\xBB\xBF' then
             return text:sub(4)
@@ -522,6 +527,14 @@ function m.revertTable(t)
     return t
 end
 
+function m.revertMap(t)
+    local nt = {}
+    for k, v in pairs(t) do
+        nt[v] = k
+    end
+    return nt
+end
+
 function m.randomSortTable(t, max)
     local len = #t
     if len <= 1 then
@@ -568,7 +581,7 @@ end
 ---遍历文本的每一行
 ---@param text string
 ---@param keepNL? boolean # 保留换行符
----@return fun(text:string):string, integer
+---@return fun():string?, integer?
 function m.eachLine(text, keepNL)
     local offset = 1
     local lineCount = 0
@@ -650,9 +663,6 @@ function m.trim(str, mode)
 end
 
 function m.expandPath(path)
-    if type(path) ~= 'string' then
-        return nil
-    end
     if path:sub(1, 1) == '~' then
         local home = getenv('HOME')
         if not home then -- has to be Windows
@@ -762,6 +772,9 @@ end
 
 function m.defaultTable(default)
     return setmetatable({}, { __index = function (t, k)
+        if k == nil then
+            return nil
+        end
         local v = default(k)
         t[k] = v
         return v
@@ -772,12 +785,18 @@ function m.multiTable(count, default)
     local current
     if default then
         current = setmetatable({}, { __index = function (t, k)
+            if k == nil then
+                return nil
+            end
             local v = default(k)
             t[k] = v
             return v
         end })
     else
         current = setmetatable({}, { __index = function (t, k)
+            if k == nil then
+                return nil
+            end
             local v = {}
             t[k] = v
             return v
@@ -785,6 +804,9 @@ function m.multiTable(count, default)
     end
     for _ = 3, count do
         current = setmetatable({}, { __index = function (t, k)
+            if k == nil then
+                return nil
+            end
             t[k] = current
             return current
         end })
@@ -792,6 +814,8 @@ function m.multiTable(count, default)
     return current
 end
 
+---@param t table
+---@param sorter boolean|function
 function m.getTableKeys(t, sorter)
     local keys = {}
     for k in pairs(t) do
@@ -799,7 +823,7 @@ function m.getTableKeys(t, sorter)
     end
     if sorter == true then
         tableSort(keys)
-    elseif sorter then
+    elseif type(sorter) == 'function' then
         tableSort(keys, sorter)
     end
     return keys
@@ -832,5 +856,18 @@ end
 m.MODE_K  = { __mode = 'k' }
 m.MODE_V  = { __mode = 'v' }
 m.MODE_KV = { __mode = 'kv' }
+
+---@generic T: fun(param: any):any
+---@param func T
+---@return T
+function m.cacheReturn(func)
+    local cache = {}
+    return function (param)
+        if cache[param] == nil then
+            cache[param] = func(param)
+        end
+        return cache[param]
+    end
+end
 
 return m

@@ -3,16 +3,17 @@
         "disable": [
             "close-non-object"
         ],
-        "neededFileStatus": {
-            "undefined-field": "Any",
-            "await-in-sync": "Any",
-            "not-yieldable": "Any",
-            "discard-returns": "Any",
-            "redundant-parameter": "Any",
-            "missing-parameter": "Any",
-            "need-check-nil": "Any",
-            "redundant-value": "Any",
-            "deprecated": "Any"
+        "groupFileStatus": {
+            "ambiguity": "Any",
+            "await": "Any",
+            "duplicate": "Any",
+            "global": "Any",
+            "luadoc": "Any",
+            "redefined": "Any",
+            "strict": "Any",
+            "type-check": "Any",
+            "unbalanced": "Any",
+            "unused": "Any"
         },
         "ignoredFiles": "Opened",
         "libraryFiles": "Opened"
@@ -23,7 +24,8 @@
             "script/?.lua",
             "script/?/init.lua",
             "test/?.lua",
-            "test/?/init.lua"
+            "test/?/init.lua",
+            "script/meta/?.lua"
         ],
         "pathStrict": true
     },
@@ -31,15 +33,25 @@
         "maxPreload": 1600,
         "preloadFileSize": 1000,
         "ignoreDir": [
-            "locale/",
-            "libs/",
-            "3rd",
-            ".vscode",
-            "meta"
+            "/locale/",
+            "/libs/",
+            "/3rd",
+            "/.vscode",
+            "/meta"
         ],
-        "library": [
-            "script/meta",
-            "bin"
+        "checkThirdParty": false
+    },
+    "typeFormat": {
+        "config": {
+            "format_line": "false"
+        }
+    },
+    "type": {
+        "castNumberToInteger": false
+    },
+    "doc": {
+        "privateName": [
+            "_*"
         ]
     }
 }

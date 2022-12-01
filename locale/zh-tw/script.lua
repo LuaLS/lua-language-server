@@ -79,13 +79,13 @@ DIAG_UNBALANCED_ASSIGNMENTS =
 DIAG_REQUIRE_LIKE       =
 '你可以在設定中將 `{}` 視為 `require`。'
 DIAG_COSE_NON_OBJECT    =
-'無法 close 此型別的值。（除非給此型別設定 `__close` 元方法）'
+'無法 close 此類型的值。（除非給此類型設定 `__close` 元方法）'
 DIAG_COUNT_DOWN_LOOP    =
 '你的意思是 `{}` 嗎？'
 DIAG_UNKNOWN            =
-'無法推測出型別。'
+'無法推測出類型。'
 DIAG_DEPRECATED         =
-'已廢棄。'
+'已棄用。'
 DIAG_DIFFERENT_REQUIRES =
 '使用了不同的名字 `require` 了同一個檔案。'
 DIAG_REDUNDANT_RETURN   =
@@ -102,8 +102,8 @@ DIAG_CIRCLE_DOC_CLASS                 =
 '循環繼承的類別。'
 DIAG_DOC_FIELD_NO_CLASS               =
 '欄位必須定義在類別之後。'
-DIAG_DUPLICATE_DOC_CLASS              =
-'重複定義的類別 `{}`。'
+DIAG_DUPLICATE_DOC_ALIAS              =
+'重複定義的別名 `{}`.'
 DIAG_DUPLICATE_DOC_FIELD              =
 '重複定義的欄位 `{}`。'
 DIAG_DUPLICATE_DOC_PARAM              =
@@ -111,11 +111,45 @@ DIAG_DUPLICATE_DOC_PARAM              =
 DIAG_UNDEFINED_DOC_CLASS              =
 '未定義的類別 `{}`。'
 DIAG_UNDEFINED_DOC_NAME               =
-'未定義的型別或別名 `{}`。'
+'未定義的類型或別名 `{}`。'
 DIAG_UNDEFINED_DOC_PARAM              =
 '指向了未定義的參數 `{}`。'
 DIAG_UNKNOWN_DIAG_CODE                =
 '未知的診斷代碼 `{}`。'
+DIAG_CAST_LOCAL_TYPE                  =
+'已顯式定義變數的類型為 `{def}`，不能再將其類型轉換為 `{ref}`。'
+DIAG_CAST_FIELD_TYPE                  =
+'已顯式定義欄位的類型為 `{def}`，不能再將其類型轉換為 `{ref}`。'
+DIAG_ASSIGN_TYPE_MISMATCH             =
+'不能將 `{ref}` 賦值給 `{def}`。'
+DIAG_PARAM_TYPE_MISMATCH              =
+'不能將 `{ref}` 賦值給參數 `{def}`.'
+DIAG_UNKNOWN_CAST_VARIABLE            =
+'未知的類型轉換變數 `{}`.'
+DIAG_CAST_TYPE_MISMATCH               =
+'不能將 `{ref}` 轉換為 `{def}`。'
+DIAG_MISSING_RETURN_VALUE             =
+'至少需要 {min} 個回傳值，但此處只回傳 {rmax} 個值。'
+DIAG_MISSING_RETURN_VALUE_RANGE       =
+'至少需要 {min} 個回傳值，但此處只回傳 {rmin} 到 {rmax} 個值。'
+DIAG_REDUNDANT_RETURN_VALUE           =
+'最多只有 {max} 個回傳值，但此處回傳了第 {rmax} 個值。'
+DIAG_REDUNDANT_RETURN_VALUE_RANGE     =
+'最多只有 {max} 個回傳值，但此處回傳了第 {rmin} 到第 {rmax} 個值。'
+DIAG_MISSING_RETURN                   =
+'此處需要回傳值。'
+DIAG_RETURN_TYPE_MISMATCH             =
+'第 {index} 個回傳值的類型為 `{def}` ，但實際回傳的是 `{ref}`。\n{err}'
+DIAG_UNKNOWN_OPERATOR                 = -- TODO: need translate!
+'Unknown operator `{}`.'
+DIAG_UNREACHABLE_CODE                 = -- TODO: need translate!
+'Unreachable code.'
+DIAG_INVISIBLE_PRIVATE                = -- TODO: need translate!
+'Field `{field}` is private, it can only be accessed in class `{class}`.'
+DIAG_INVISIBLE_PROTECTED              = -- TODO: need translate!
+'Field `{field}` is protected, it can only be accessed in class `{class}` and its subclasses.'
+DIAG_INVISIBLE_PACKAGE                = -- TODO: need translate!
+'Field `{field}` can only be accessed in same file `{uri}`.'
 
 MWS_NOT_SUPPORT         =
 '{} 目前還不支援多工作目錄，我可能需要重新啟動才能支援新的工作目錄...'
@@ -143,7 +177,7 @@ WORKSPACE_DIAGNOSTIC      =
 WORKSPACE_SKIP_HUGE_FILE  =
 '出於效能考慮，已停止對此檔案解析：{}'
 WORKSPACE_NOT_ALLOWED     =
-'你的工作目錄被設定為了 `{}` ，Lua語言服務拒絕載入此目錄，請檢查你的設定檔。[了解更多](https://github.com/sumneko/lua-language-server/wiki/Why-scanning-home-folder)'
+'你的工作目錄被設定為了 `{}` ，Lua語言伺服拒絕載入此目錄，請檢查你的設定檔。[了解更多](https://github.com/sumneko/lua-language-server/wiki/FAQ#why-is-the-server-scanning-the-wrong-folder)'
 WORKSPACE_SCAN_TOO_MUCH   =
 '已掃描了超過 {} 個檔案，目前掃描的目錄為 `{}`，請確認設定檔是否正確。'
 
@@ -241,6 +275,10 @@ PARSER_INDEX_IN_FUNC_NAME =
 '命名函式的名稱中不能使用 `[name]` 形式。'
 PARSER_UNKNOWN_ATTRIBUTE  =
 '區域變數屬性應該是 `const` 或 `close` 。'
+PARSER_AMBIGUOUS_SYNTAX   = -- TODO: need translate!
+'在 Lua 5.1 中，函数调用的左括号必须与函数在同一行。'
+PARSER_NEED_PAREN         = -- TODO: need translate!
+'需要添加一对括号。'
 PARSER_LUADOC_MISS_CLASS_NAME           =
 '缺少類別名稱。'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =
@@ -252,7 +290,7 @@ PARSER_LUADOC_MISS_SYMBOL               =
 PARSER_LUADOC_MISS_ARG_NAME             =
 '缺少參數名稱。'
 PARSER_LUADOC_MISS_TYPE_NAME            =
-'缺少型別名。'
+'缺少類型名。'
 PARSER_LUADOC_MISS_ALIAS_NAME           =
 '缺少別名。'
 PARSER_LUADOC_MISS_ALIAS_EXTENDS        =
@@ -260,21 +298,21 @@ PARSER_LUADOC_MISS_ALIAS_EXTENDS        =
 PARSER_LUADOC_MISS_PARAM_NAME           =
 '缺少要指向的參數名稱。'
 PARSER_LUADOC_MISS_PARAM_EXTENDS        =
-'缺少參數的型別定義。'
+'缺少參數的類型定義。'
 PARSER_LUADOC_MISS_FIELD_NAME           =
 '缺少欄位名稱。'
 PARSER_LUADOC_MISS_FIELD_EXTENDS        =
-'缺少欄位的型別定義。'
+'缺少欄位的類型定義。'
 PARSER_LUADOC_MISS_GENERIC_NAME         =
 '缺少泛型名稱。'
 PARSER_LUADOC_MISS_GENERIC_EXTENDS_NAME =
 '缺少泛型要繼承的類別名稱。'
 PARSER_LUADOC_MISS_VARARG_TYPE          =
-'缺少可變引數的型別定義。'
+'缺少可變引數的類型定義。'
 PARSER_LUADOC_MISS_FUN_AFTER_OVERLOAD   =
 '缺少關鍵字 `fun` 。'
 PARSER_LUADOC_MISS_CATE_NAME            =
-'缺少文件型別名稱。'
+'缺少文件類型名稱。'
 PARSER_LUADOC_MISS_DIAG_MODE            =
 '缺少診斷模式。'
 PARSER_LUADOC_ERROR_DIAG_MODE           =
@@ -322,7 +360,7 @@ HOVER_USE_LUA_PATH      =
 HOVER_EXTENDS           =
 '展開為 {}'
 HOVER_TABLE_TIME_UP     =
-'出於效能考慮，已停用了部分型別推斷。'
+'出於效能考慮，已停用了部分類型推斷。'
 HOVER_WS_LOADING        =
 '正在載入工作目錄：{} / {}'
 HOVER_AWAIT_TOOLTIP     =
@@ -369,7 +407,7 @@ ACTION_ADD_END          =
 ACTION_FIX_COMMENT_PREFIX =
 '改為 `--` 。'
 ACTION_FIX_NONSTANDARD_SYMBOL =
-'改為 `{symbol}`'
+'改為 `{symbol}`。'
 ACTION_RUNTIME_UNICODE_NAME =
 '允許使用 Unicode 字元。'
 ACTION_SWAP_PARAMS      =
@@ -384,8 +422,10 @@ ACTION_DISABLE_DIAG_FILE=
 '在此檔案停用診斷 ({})。'
 ACTION_MARK_ASYNC       =
 '將目前函式標記為非同步。'
-ACTION_ADD_DICT         = -- TODO: need translate!
-'Add \'{}\' to workspace dict'
+ACTION_ADD_DICT         =
+'添加 \'{}\' 到工作區字典'
+ACTION_FIX_ADD_PAREN    = -- TODO: need translate!
+'添加括号。'
 
 COMMAND_DISABLE_DIAG       =
 '停用診斷'
@@ -405,8 +445,8 @@ COMMAND_JSON_TO_LUA        =
 'JSON 轉 Lua'
 COMMAND_JSON_TO_LUA_FAILED =
 'JSON 轉 Lua 失敗：{}'
-COMMAND_ADD_DICT           = -- TODO: need translate!
-'Add Word to dictionary'
+COMMAND_ADD_DICT           =
+'添加單字到字典裡'
 
 COMPLETION_IMPORT_FROM           =
 '從 {} 中匯入'
@@ -416,7 +456,7 @@ COMPLETION_ASK_AUTO_REQUIRE      =
 '在檔案頂部添加程式碼 require 此檔案？'
 
 DEBUG_MEMORY_LEAK       =
-'{} 很抱歉發生了嚴重的記憶體漏失，語言服務即將重新啟動。'
+'{} 很抱歉發生了嚴重的記憶體漏失，語言伺服即將重新啟動。'
 DEBUG_RESTART_NOW       =
 '立即重新啟動'
 
@@ -448,6 +488,8 @@ WINDOW_PROCESSING_SEMANTIC_RANGE =
 '正在處理差量語義著色...'
 WINDOW_PROCESSING_HINT           =
 '正在處理內嵌提示...'
+WINDOW_PROCESSING_BUILD_META     = -- TODO: need translate!
+'Processing build meta...'
 WINDOW_INCREASE_UPPER_LIMIT      =
 '增加上限'
 WINDOW_CLOSE                     =
@@ -482,7 +524,7 @@ WINDOW_APPLY_SETTING             =
 WINDOW_CHECK_SEMANTIC            =
 '如果你正在使用市場中的顏色主題，你可能需要同時修改 `editor.semanticHighlighting.enabled` 選項為 `true` 才會使語義著色生效。'
 WINDOW_TELEMETRY_HINT            =
-'請允許發送匿名的使用資料與錯誤報告，幫助我們進一步完善此延伸模組。在[此處](https://github.com/sumneko/lua-language-server/wiki/%E9%9A%B1%E7%A7%81%E8%81%B2%E6%98%8E)閲讀我們的隱私聲明。'
+'請允許發送匿名的使用資料與錯誤報告，幫助我們進一步完善此延伸模組。在[此處](https://github.com/sumneko/lua-language-server/wiki/Home#privacy)閱讀我們的隱私聲明。'
 WINDOW_TELEMETRY_ENABLE          =
 '允許'
 WINDOW_TELEMETRY_DISABLE         =
@@ -505,6 +547,14 @@ WINDOW_ASK_APPLY_LIBRARY         =
 '是否需要將你的工作環境配置為 `{}` ？'
 WINDOW_SEARCHING_IN_FILES        =
 '正在檔案中搜尋...'
+WINDOW_CONFIG_LUA_DEPRECATED     = -- TODO: need translate!
+'`config.lua` is deprecated, please use `config.json` instead.'
+WINDOW_CONVERT_CONFIG_LUA        = -- TODO: need translate!
+'Convert to `config.json`'
+WINDOW_MODIFY_REQUIRE_PATH       = -- TODO: need translate!
+'Do you want to modify the require path?'
+WINDOW_MODIFY_REQUIRE_OK         = -- TODO: need translate!
+'Modify'
 
 CONFIG_LOAD_FAILED               =
 '無法讀取設定檔案：{}'
@@ -512,6 +562,8 @@ CONFIG_LOAD_ERROR                =
 '設定檔案載入錯誤：{}'
 CONFIG_TYPE_ERROR                =
 '設定檔案必須是lua或json格式：{}'
+CONFIG_MODIFY_FAIL_SYNTAX_ERROR  = -- TODO: need translate!
+'Failed to modify settings, there are syntax errors in the settings file: {}'
 
 PLUGIN_RUNTIME_ERROR             =
 [[
@@ -546,3 +598,623 @@ CLI_CHECK_SUCCESS =
 '診斷完成，沒有發現問題'
 CLI_CHECK_RESULTS =
 '診斷完成，共有 {} 個問題，請查看 {}'
+
+TYPE_ERROR_ENUM_GLOBAL_DISMATCH = -- TODO: need translate!
+'Type `{child}` cannot match enumeration type of `{parent}`'
+TYPE_ERROR_ENUM_GENERIC_UNSUPPORTED = -- TODO: need translate!
+'Cannot use generic `{child}` in enumeration'
+TYPE_ERROR_ENUM_LITERAL_DISMATCH = -- TODO: need translate!
+'Literal `{child}` cannot match the enumeration value of `{parent}`'
+TYPE_ERROR_ENUM_OBJECT_DISMATCH = -- TODO: need translate!
+'The object `{child}` cannot match the enumeration value of `{parent}`. They must be the same object'
+TYPE_ERROR_ENUM_NO_OBJECT = -- TODO: need translate!
+'The passed in enumeration value `{child}` is not recognized'
+TYPE_ERROR_INTEGER_DISMATCH = -- TODO: need translate!
+'Literal `{child}` cannot match integer `{parent}`'
+TYPE_ERROR_STRING_DISMATCH = -- TODO: need translate!
+'Literal `{child}` cannot match string `{parent}`'
+TYPE_ERROR_BOOLEAN_DISMATCH = -- TODO: need translate!
+'Literal `{child}` cannot match boolean `{parent}`'
+TYPE_ERROR_TABLE_NO_FIELD = -- TODO: need translate!
+'Field `{key}` does not exist in the table'
+TYPE_ERROR_TABLE_FIELD_DISMATCH = -- TODO: need translate!
+'The type of field `{key}` is `{child}`, which cannot match `{parent}`'
+TYPE_ERROR_CHILD_ALL_DISMATCH = -- TODO: need translate!
+'All subtypes in `{child}` cannot match `{parent}`'
+TYPE_ERROR_PARENT_ALL_DISMATCH = -- TODO: need translate!
+'`{child}` cannot match any subtypes in `{parent}`'
+TYPE_ERROR_UNION_DISMATCH = -- TODO: need translate!
+'`{child}` cannot match `{parent}`'
+TYPE_ERROR_OPTIONAL_DISMATCH = -- TODO: need translate!
+'Optional type cannot match `{parent}`'
+TYPE_ERROR_NUMBER_LITERAL_TO_INTEGER = -- TODO: need translate!
+'The number `{child}` cannot be converted to an integer'
+TYPE_ERROR_NUMBER_TYPE_TO_INTEGER = -- TODO: need translate!
+'Cannot convert number type to integer type'
+TYPE_ERROR_DISMATCH = -- TODO: need translate!
+'Type `{child}` cannot match `{parent}`'
+
+LUADOC_DESC_CLASS =
+[=[
+定義一個類別/表結構
+## 語法
+`---@class <name> [: <parent>[, <parent>]...]`
+## 用法
+```
+---@class Manager: Person, Human
+Manager = {}
+```
+---
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/Annotations#class)
+]=]
+LUADOC_DESC_TYPE =
+[=[
+指定一個變數的類型
+
+預設類型： `nil` 、 `any` 、 `boolean` 、 `string` 、 `number` 、 `integer`、
+`function` 、 `table` 、 `thread` 、 `userdata` 、 `lightuserdata`
+
+（可以使用 `@alias` 提供自訂類型）
+
+## 語法
+`---@type <type>[| [type]...`
+
+## 用法
+### 一般
+```
+---@type nil|table|myClass
+local Example = nil
+```
+
+### 陣列
+```
+---@type number[]
+local phoneNumbers = {}
+```
+
+### 列舉
+```
+---@type "red"|"green"|"blue"
+local color = ""
+```
+
+### 表
+```
+---@type table<string, boolean>
+local settings = {
+    disableLogging = true,
+    preventShutdown = false,
+}
+
+---@type { [string]: true }
+local x --x[""] is true
+```
+
+### 函式
+```
+---@type fun(mode?: "r"|"w"): string
+local myFunction
+```
+---
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/Annotations#types-and-type)
+]=]
+LUADOC_DESC_ALIAS =
+[=[
+新增你的自訂類型，可以與 `@param`、`@type` 等一起使用。
+
+## 語法
+`---@alias <name> <type> [description]`\
+或
+```
+---@alias <name>
+---| 'value' [# comment]
+---| 'value2' [# comment]
+...
+```
+
+## 用法
+### Expand to other type
+```
+---@alias filepath string Path to a file
+
+---@param path filepath Path to the file to search in
+function find(path, pattern) end
+```
+
+### 列舉
+```
+---@alias font-style
+---| '"underlined"' # Underline the text
+---| '"bold"' # Bolden the text
+---| '"italic"' # Make the text italicized
+
+---@param style font-style Style to apply
+function setFontStyle(style) end
+```
+
+### Literal Enum
+```
+local enums = {
+    READ = 0,
+    WRITE = 1,
+    CLOSED = 2
+}
+
+---@alias FileStates
+---| `enums.READ`
+---| `enums.WRITE`
+---| `enums.CLOSE`
+```
+---
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/Annotations#alias)
+]=]
+LUADOC_DESC_PARAM =
+[=[
+宣告一個函式參數
+
+## 語法
+`@param <name>[?] <type> [comment]`
+
+## 用法
+### 一般
+```
+---@param url string The url to request
+---@param headers? table<string, string> HTTP headers to send
+---@param timeout? number Timeout in seconds
+function get(url, headers, timeout) end
+```
+
+### 可變引數
+```
+---@param base string The base to concat to
+---@param ... string The values to concat
+function concat(base, ...) end
+```
+---
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/Annotations#param)
+]=]
+LUADOC_DESC_RETURN =
+[=[
+宣告一個回傳值
+
+## 語法
+`@return <type> [name] [description]`\
+或\
+`@return <type> [# description]`
+
+## 用法
+### 一般
+```
+---@return number
+---@return number # The green component
+---@return number b The blue component
+function hexToRGB(hex) end
+```
+
+### 僅限類型和名稱
+```
+---@return number x, number y
+function getCoords() end
+```
+
+### 僅限類型
+```
+---@return string, string
+function getFirstLast() end
+```
+
+### 回傳變數值
+```
+---@return string ... The tags of the item
+function getTags(item) end
+```
+---
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/Annotations#return)
+]=]
+LUADOC_DESC_FIELD =
+[=[
+在類別/表中宣告一個欄位。 這使你可以為表提供更深入詳細的文件。
+
+## 語法
+`---@field <name> <type> [description]`
+
+## 用法
+```
+---@class HTTP_RESPONSE
+---@field status HTTP_STATUS
+---@field headers table<string, string> The headers of the response
+
+---@class HTTP_STATUS
+---@field code number The status code of the response
+---@field message string A message reporting the status
+
+---@return HTTP_RESPONSE response The response from the server
+function get(url) end
+
+--This response variable has all of the fields defined above
+response = get("localhost")
+
+--Extension provided intellisense for the below assignment
+statusCode = response.status.code
+```
+---
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/Annotations#field)
+]=]
+LUADOC_DESC_GENERIC =
+[=[
+模擬泛型。 泛型可以允許類型被重用，因為它們有助於定義可用於不同類型的"通用形狀"。
+
+## 語法
+`---@generic <name> [:parent_type] [, <name> [:parent_type]]`
+
+## 用法
+### 一般
+```
+---@generic T
+---@param value T The value to return
+---@return T value The exact same value
+function echo(value)
+    return value
+end
+
+-- Type is string
+s = echo("e")
+
+-- Type is number
+n = echo(10)
+
+-- Type is boolean
+b = echo(true)
+
+-- We got all of this info from just using
+-- @generic rather than manually specifying
+-- each allowed type
+```
+
+### 捕獲泛型類型的名稱
+```
+---@class Foo
+local Foo = {}
+function Foo:Bar() end
+
+---@generic T
+---@param name `T` # the name generic type is captured here
+---@return T       # generic type is returned
+function Generic(name) end
+
+local v = Generic("Foo") -- v is an object of Foo
+```
+
+### Lua 表如何使用泛型
+```
+---@class table<K, V>: { [K]: V }
+
+-- This is what allows us to create a table
+-- and intellisense keeps track of any type
+-- we give for key (K) or value (V)
+```
+---
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/Annotations#generics-and-generic)
+]=]
+LUADOC_DESC_VARARG =
+[=[
+主要用於對 EmmyLua 註解的向下支援。 `@vararg` 不提供輸入或允許描述。
+
+**在記錄參數（變數或非變數）時，您應該改用 `@param`。**
+
+## 語法
+`@vararg <type>`
+
+## 用法
+```
+---Concat strings together
+---@vararg string
+function concat(...) end
+```
+---
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/Annotations#vararg)
+]=]
+LUADOC_DESC_OVERLOAD =
+[=[
+允許定義多個函數簽章。
+
+## 語法
+`---@overload fun(<name>[: <type>] [, <name>[: <type>]]...)[: <type>[, <type>]...]`
+
+## 用法
+```
+---@overload fun(t: table, value: any): number
+function table.insert(t, position, value) end
+```
+---
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/Annotations#overload)
+]=]
+LUADOC_DESC_DEPRECATED =
+[=[
+將函式標記為已棄用。 這會導致任何不推薦使用的函式呼叫被 ~~擊穿~~。
+
+## 語法
+`---@deprecated`
+
+---
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/Annotations#deprecated)
+]=]
+LUADOC_DESC_META =
+[=[
+表示這是一個中繼檔案，應僅用於定義和智慧感知。
+
+中繼檔案有 3 個主要區別需要注意：
+1. 中繼檔案中不會有任何基於上下文的智慧感知
+2. 將 `require` 檔案路徑懸停在中繼檔案中會顯示 `[meta]` 而不是絕對路徑
+3. `Find Reference` 功能會忽略中繼檔案
+
+## 語法
+`---@meta`
+
+---
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/Annotations#meta)
+]=]
+LUADOC_DESC_VERSION =
+[=[
+指定此函式獨有的 Lua 版本。
+
+Lua 版本：`5.1` 、 `5.2` 、 `5.3` 、 `5.4` 、 `JIT`。
+
+需要 `Diagnostics: Needed File Status` 設定。
+
+## 語法
+`---@version <version>[, <version>]...`
+
+## 用法
+### 一般
+```
+---@version JIT
+function onlyWorksInJIT() end
+```
+### 指定多個版本
+```
+---@version <5.2,JIT
+function oldLuaOnly() end
+```
+---
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/Annotations#version)
+]=]
+LUADOC_DESC_SEE =
+[=[
+定義可以檢視以獲取更多資訊的內容
+
+## Syntax
+`---@see <text>`
+
+---
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/Annotations#see)
+]=]
+LUADOC_DESC_DIAGNOSTIC =
+[=[
+啟用/停用診斷錯誤與警告等。
+
+操作：`disable` 、 `enable` 、 `disable-line` 、 `disable-next-line`
+
+[名稱](https://github.com/sumneko/lua-language-server/blob/cbb6e6224094c4eb874ea192c5f85a6cba099588/script/proto/define.lua#L54)
+
+## 語法
+`---@diagnostic <action>[: <name>]`
+
+## 用法
+### 停用下一行
+```
+---@diagnostic disable-next-line: undefined-global
+```
+
+### 手動切換
+```
+---@diagnostic disable: unused-local
+local unused = "hello world"
+---@diagnostic enable: unused-local
+```
+---
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/Annotations#diagnostic)
+]=]
+LUADOC_DESC_MODULE =
+[=[
+提供 `require` 的語義。
+
+## 語法
+`---@module <'module_name'>`
+
+## 用法
+```
+---@module 'string.utils'
+local stringUtils
+-- This is functionally the same as:
+local module = require('string.utils')
+```
+---
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/Annotations#module)
+]=]
+LUADOC_DESC_ASYNC =
+[=[
+將函式標記為非同步。
+
+## 語法
+`---@async`
+
+---
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/Annotations#async)
+]=]
+LUADOC_DESC_NODISCARD =
+[=[
+防止此函式的回傳值被丟棄/忽略。
+如果忽略回傳值，這將引發 `discard-returns` 警告。
+
+## 語法
+`---@nodiscard`
+
+---
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/Annotations#nodiscard)
+]=]
+LUADOC_DESC_CAST =
+[=[
+允許轉型（類型轉換）。
+
+## 語法
+`@cast <variable> <[+|-]type>[, <[+|-]type>]...`
+
+## 用法
+### 覆蓋類型
+```
+---@type integer
+local x --> integer
+
+---@cast x string
+print(x) --> string
+```
+### 增加類型
+```
+---@type string
+local x --> string
+
+---@cast x +boolean, +number
+print(x) --> string|boolean|number
+```
+### 移除類型
+```
+---@type string|table
+local x --> string|table
+
+---@cast x -string
+print(x) --> table
+```
+---
+[檢視文件](https://github.com/sumneko/lua-language-server/wiki/Annotations#cast)
+]=]
+LUADOC_DESC_OPERATOR = -- TODO: need translate!
+[=[
+Provide type declaration for [operator metamethods](http://lua-users.org/wiki/MetatableEvents).
+
+## Syntax
+`@operator <operation>[(input_type)]:<resulting_type>`
+
+## Usage
+### Vector Add Metamethod
+```
+---@class Vector
+---@operation add(Vector):Vector
+
+vA = Vector.new(1, 2, 3)
+vB = Vector.new(10, 20, 30)
+
+vC = vA + vB
+--> Vector
+```
+### Unary Minus
+```
+---@class Passcode
+---@operation unm:integer
+
+pA = Passcode.new(1234)
+pB = -pA
+--> integer
+```
+[View Request](https://github.com/sumneko/lua-language-server/issues/599)
+]=]
+LUADOC_DESC_ENUM = -- TODO: need translate!
+[=[
+Mark a table as an enum. If you want an enum but can't define it as a Lua
+table, take a look at the [`@alias`](https://github.com/sumneko/lua-language-server/wiki/Annotations#alias)
+tag.
+
+## Syntax
+`@enum <name>`
+
+## Usage
+```
+---@enum colors
+local colors = {
+	white = 0,
+	orange = 2,
+	yellow = 4,
+	green = 8,
+	black = 16,
+}
+
+---@param color colors
+local function setColor(color) end
+
+-- Completion and hover is provided for the below param
+setColor(colors.green)
+```
+]=]
+LUADOC_DESC_PACKAGE = -- TODO: need translate!
+[=[
+Mark a function as private to the file it is defined in. A packaged function
+cannot be accessed from another file.
+
+## Syntax
+`@package`
+
+## Usage
+```
+---@class Animal
+---@field private eyes integer
+local Animal = {}
+
+---@package
+---This cannot be accessed in another file
+function Animal:eyesCount()
+    return self.eyes
+end
+```
+]=]
+LUADOC_DESC_PRIVATE = -- TODO: need translate!
+[=[
+Mark a function as private to a @class. Private functions can be accessed only
+from within their class and are not accessable from child classes.
+
+## Syntax
+`@private`
+
+## Usage
+```
+---@class Animal
+---@field private eyes integer
+local Animal = {}
+
+---@private
+function Animal:eyesCount()
+    return self.eyes
+end
+
+---@class Dog:Animal
+local myDog = {}
+
+---NOT PERMITTED!
+myDog:eyesCount();
+```
+]=]
+LUADOC_DESC_PROTECTED = -- TODO: need translate!
+[=[
+Mark a function as protected within a @class. Protected functions can be
+accessed only from within their class or from child classes.
+
+## Syntax
+`@protected`
+
+## Usage
+```
+---@class Animal
+---@field private eyes integer
+local Animal = {}
+
+---@protected
+function Animal:eyesCount()
+    return self.eyes
+end
+
+---@class Dog:Animal
+local myDog = {}
+
+---Permitted because function is protected, not private.
+myDog:eyesCount();
+```
+]=]

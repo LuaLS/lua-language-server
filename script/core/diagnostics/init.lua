@@ -4,23 +4,7 @@ local config = require 'config'
 local await  = require 'await'
 local vm     = require "vm.vm"
 local util   = require 'utility'
-
--- 把耗时最长的诊断放到最后面
-local diagSort = {
-    ['redundant-value']     = 96,
-    ['not-yieldable']       = 97,
-    ['deprecated']          = 98,
-    ['undefined-field']     = 99,
-    ['redundant-parameter'] = 100,
-}
-
-local diagList = {}
-for k in pairs(define.DiagnosticDefaultSeverity) do
-    diagList[#diagList+1] = k
-end
-table.sort(diagList, function (a, b)
-    return (diagSort[a] or 0) < (diagSort[b] or 0)
-end)
+local diagd  = require 'proto.diagnostic'
 
 local sleepRest = 0.0
 
@@ -47,31 +31,87 @@ local function checkSleep(uri, passed)
     sleepRest = sleepRest - sleeped
 end
 
+---@param uri  uri
+---@param name string
+---@return string
+local function getSeverity(uri, name)
+    local severity =   config.get(uri, 'Lua.diagnostics.severity')[name]
+                    or define.DiagnosticDefaultSeverity[name]
+    if severity:sub(-1) == '!' then
+        return severity:sub(1, -2)
+    end
+    local groupSeverity = config.get(uri, 'Lua.diagnostics.groupSeverity')
+    local groups = diagd.getGroups(name)
+    local groupLevel = 999
+    for _, groupName in ipairs(groups) do
+        local gseverity = groupSeverity[groupName]
+        if gseverity and gseverity ~= 'Fallback' then
+            groupLevel = math.min(groupLevel, define.DiagnosticSeverity[gseverity])
+        end
+    end
+    if groupLevel == 999 then
+        return severity
+    end
+    for severityName, level in pairs(define.DiagnosticSeverity) do
+        if level == groupLevel then
+            return severityName
+        end
+    end
+    return severity
+end
+
+---@param uri  uri
+---@param name string
+---@return string
+local function getStatus(uri, name)
+    local status = config.get(uri, 'Lua.diagnostics.neededFileStatus')[name]
+                or define.DiagnosticDefaultNeededFileStatus[name]
+    if status:sub(-1) == '!' then
+        return status:sub(1, -2)
+    end
+    local groupStatus = config.get(uri, 'Lua.diagnostics.groupFileStatus')
+    local groups = diagd.getGroups(name)
+    local groupLevel = 0
+    for _, groupName in ipairs(groups) do
+        local gstatus = groupStatus[groupName]
+        if gstatus and gstatus ~= 'Fallback' then
+            groupLevel = math.max(groupLevel, define.DiagnosticFileStatus[gstatus])
+        end
+    end
+    if groupLevel == 0 then
+        return status
+    end
+    for statusName, level in pairs(define.DiagnosticFileStatus) do
+        if level == groupLevel then
+            return statusName
+        end
+    end
+    return status
+end
+
 ---@async
 ---@param uri uri
 ---@param name string
 ---@param isScopeDiag boolean
 ---@param response async fun(result: any)
+---@return boolean
 local function check(uri, name, isScopeDiag, response)
     local disables = config.get(uri, 'Lua.diagnostics.disable')
     if util.arrayHas(disables, name) then
-        return
+        return false
     end
-    local level =  config.get(uri, 'Lua.diagnostics.severity')[name]
-                or define.DiagnosticDefaultSeverity[name]
+    local severity = getSeverity(uri, name)
+    local status   = getStatus(uri, name)
 
-    local neededFileStatus =   config.get(uri, 'Lua.diagnostics.neededFileStatus')[name]
-                            or define.DiagnosticDefaultNeededFileStatus[name]
-
-    if neededFileStatus == 'None' then
-        return
+    if status == 'None' then
+        return false
     end
 
-    if neededFileStatus == 'Opened' and not files.isOpen(uri) then
-        return
+    if status == 'Opened' and not files.isOpen(uri) then
+        return false
     end
 
-    local severity = define.DiagnosticSeverity[level]
+    local level = define.DiagnosticSeverity[severity]
     local clock = os.clock()
     local mark = {}
     ---@async
@@ -87,7 +127,7 @@ local function check(uri, name, isScopeDiag, response)
         end
         mark[result.start] = true
 
-        result.level = severity or result.level
+        result.level = level or result.level
         result.code  = name
         response(result)
     end, name)
@@ -101,6 +141,25 @@ local function check(uri, name, isScopeDiag, response)
     if DIAGTIMES then
         DIAGTIMES[name] = (DIAGTIMES[name] or 0) + passed
     end
+    return true
+end
+
+local diagList
+local diagCosts = {}
+local diagCount = {}
+local function buildDiagList()
+    if not diagList then
+        diagList = {}
+        for name in pairs(define.DiagnosticDefaultSeverity) do
+            diagList[#diagList+1] = name
+        end
+    end
+    table.sort(diagList, function (a, b)
+        local time1 = (diagCosts[a] or 0) / (diagCount[a] or 1)
+        local time2 = (diagCosts[b] or 0) / (diagCount[b] or 1)
+        return time1 < time2
+    end)
+    return diagList
 end
 
 ---@async
@@ -114,9 +173,15 @@ return function (uri, isScopeDiag, response, checked)
         return nil
     end
 
-    for _, name in ipairs(diagList) do
+    for _, name in ipairs(buildDiagList()) do
         await.delay()
-        check(uri, name, isScopeDiag, response)
+        local clock = os.clock()
+        local suc = check(uri, name, isScopeDiag, response)
+        if suc then
+            local cost = os.clock() - clock
+            diagCosts[name] = (diagCosts[name] or 0) + cost
+            diagCount[name] = (diagCount[name] or 0) + 1
+        end
         if checked then
             checked(name)
         end

@@ -33,7 +33,7 @@ function utf8.codes(s, lax) end
 ---@param i?   integer
 ---@param j?   integer
 ---@return integer code
----@return ...
+---@return integer ...
 ---@nodiscard
 function utf8.codepoint(s, i, j) end
 ---#else
@@ -42,7 +42,7 @@ function utf8.codepoint(s, i, j) end
 ---@param j?   integer
 ---@param lax? boolean
 ---@return integer code
----@return ...
+---@return integer ...
 ---@nodiscard
 function utf8.codepoint(s, i, j, lax) end
 ---#end
@@ -70,7 +70,7 @@ function utf8.len(s, i, j, lax) end
 ---#DES 'utf8.offset'
 ---@param s string
 ---@param n integer
----@param i integer
+---@param i? integer
 ---@return integer p
 ---@nodiscard
 function utf8.offset(s, n, i) end

@@ -562,6 +562,8 @@ CONFIG_LOAD_ERROR                =
 'Setting file loading error: {}'
 CONFIG_TYPE_ERROR                =
 'The setting file must be in lua or json format: {}'
+CONFIG_MODIFY_FAIL_SYNTAX_ERROR  =
+'Failed to modify settings, there are syntax errors in the settings file: {}'
 
 PLUGIN_RUNTIME_ERROR             =
 [[

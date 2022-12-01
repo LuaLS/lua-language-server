@@ -562,6 +562,8 @@ CONFIG_LOAD_ERROR                =
 '设置文件加载错误：{}'
 CONFIG_TYPE_ERROR                =
 '设置文件必须是lua或json格式：{}'
+CONFIG_MODIFY_FAIL_SYNTAX_ERROR  =
+'修改设置失败，设置文件中有语法错误：{}'
 
 PLUGIN_RUNTIME_ERROR             =
 [[

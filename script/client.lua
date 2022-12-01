@@ -223,20 +223,68 @@ local function getValidChanges(uri, changes)
 end
 
 ---@class json.patch
----@field op 'add' | 'remove' | 'replace' | 'move' | 'copy' | 'test'
+---@field op 'add' | 'remove' | 'replace'
 ---@field path string
 ---@field value any
+
+---@class json.patchInfo
+---@field key string
+---@field value any
+
+---@param cfg table
+---@param rawKey string
+---@return json.patchInfo
+local function searchPatchInfo(cfg, rawKey)
+
+    ---@param key string
+    ---@param parentKey string
+    ---@param parentValue table
+    ---@return json.patchInfo?
+    local function searchOnce(key, parentKey, parentValue)
+        if parentValue == nil then
+            return nil
+        end
+        if type(parentValue) ~= 'table' then
+            return {
+                key   = parentKey,
+                value = parentValue,
+            }
+        end
+        if parentValue[key] then
+            return {
+                key   = parentKey .. '/' .. key,
+                value = parentValue[key],
+            }
+        end
+        for pos in key:gmatch '()%.' do
+            local k = key:sub(1, pos - 1)
+            local v = parentValue[k]
+            local info = searchOnce(key:sub(pos + 1), parentKey .. '/' .. k, v)
+            if info then
+                return info
+            end
+        end
+        return nil
+    end
+
+    return searchOnce(rawKey, '', cfg)
+        or searchOnce(rawKey:gsub('^Lua%.', ''), '', cfg)
+        or {
+            key   = '/' .. rawKey,
+            value = nil,
+        }
+end
 
 ---@param cfg table
 ---@param change config.change
 ---@return json.patch?
 local function makeConfigPatch(cfg, change)
-    local value = cfg[change.key]
+    local info  = searchPatchInfo(cfg, change.key)
     if change.action == 'add' then
-        if type(value) == 'table' and #cfg[change.key] > 0 then
+        if type(info.value) == 'table' and #info.value > 0 then
             return {
                 op    = 'add',
-                path  = '/' .. change.key .. '/-',
+                path  = info.key .. '/-',
                 value = change.value,
             }
         else
@@ -247,24 +295,24 @@ local function makeConfigPatch(cfg, change)
             })
         end
     elseif change.action == 'set' then
-        if value ~= nil then
+        if info.value ~= nil then
             return {
                 op    = 'replace',
-                path  = '/' .. change.key,
+                path  = info.key,
                 value = change.value,
             }
         else
             return {
                 op    = 'add',
-                path  = '/' .. change.key,
+                path  = info.key,
                 value = change.value,
             }
         end
     elseif change.action == 'prop' then
-        if type(value) == 'table' and #value == 0 then
+        if type(info.value) == 'table' and #info.value == 0 then
             return {
                 op    = 'add',
-                path  = '/' .. change.key .. '/' .. change.prop,
+                path  = info.key .. '/' .. change.prop,
                 value = change.value,
             }
         else
@@ -286,13 +334,17 @@ local function editConfigJson(path, changes)
     if not text then
         return nil
     end
-    local cfg = jsonc.decode_jsonc(text)
-    if type(cfg) ~= 'table' then
-        cfg = {}
+    local suc, res = pcall(jsonc.decode_jsonc, text)
+    if not suc then
+        m.showMessage('Error', lang.script('CONFIG_MODIFY_FAIL_SYNTAX_ERROR', path .. res:match 'ERROR(.+)$'))
+        return text
     end
-    ---@cast cfg table
+    if type(res) ~= 'table' then
+        res = {}
+    end
+    ---@cast res table
     for _, change in ipairs(changes) do
-        local patch = makeConfigPatch(cfg, change)
+        local patch = makeConfigPatch(res, change)
         if patch then
             text = jsone.edit(text, patch, { indent = '    ' })
         end

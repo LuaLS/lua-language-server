@@ -562,6 +562,8 @@ CONFIG_LOAD_ERROR                =
 'Configurando o erro de carregamento do arquivo: {}'
 CONFIG_TYPE_ERROR                =
 'O arquivo de configuração deve estar no formato LUA ou JSON: {}'
+CONFIG_MODIFY_FAIL_SYNTAX_ERROR  = -- TODO: need translate!
+'Failed to modify settings, there are syntax errors in the settings file: {}'
 
 PLUGIN_RUNTIME_ERROR             =
 [[

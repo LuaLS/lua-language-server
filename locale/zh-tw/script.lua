@@ -562,6 +562,8 @@ CONFIG_LOAD_ERROR                =
 '設定檔案載入錯誤：{}'
 CONFIG_TYPE_ERROR                =
 '設定檔案必須是lua或json格式：{}'
+CONFIG_MODIFY_FAIL_SYNTAX_ERROR  = -- TODO: need translate!
+'Failed to modify settings, there are syntax errors in the settings file: {}'
 
 PLUGIN_RUNTIME_ERROR             =
 [[

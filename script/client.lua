@@ -6,10 +6,11 @@ local proto     = require 'proto'
 local define    = require 'proto.define'
 local config    = require 'config'
 local converter = require 'proto.converter'
-local jsonb     = require 'json-beautify'
 local await     = require 'await'
 local scope     = require 'workspace.scope'
 local inspect   = require 'inspect'
+local jsone     = require 'json-edit'
+local jsonc     = require 'jsonc'
 
 local m = {}
 m._eventList = {}
@@ -203,27 +204,96 @@ end
 ---@field global?   boolean
 ---@field uri?      uri
 
----@param cfg table
 ---@param uri uri
 ---@param changes config.change[]
----@return boolean
-local function applyConfig(cfg, uri, changes)
+---@return config.change[]
+local function getValidChanges(uri, changes)
     local scp = scope.getScope(uri)
-    local ok = false
+    local newChanges = {}
     for _, change in ipairs(changes) do
         if scp:isChildUri(change.uri)
         or scp:isLinkedUri(change.uri) then
-            local value = config.getRaw(change.uri, change.key)
-            local key = change.key:match('^Lua%.(.+)$')
-            if cfg[key] then
-                cfg[key] = value
-            else
-                cfg[change.key] = value
-            end
-            ok = true
+            newChanges[#newChanges+1] = change
         end
     end
-    return ok
+    return newChanges
+end
+
+---@class json.patch
+---@field op 'add' | 'remove' | 'replace' | 'move' | 'copy' | 'test'
+---@field path string
+---@field data any
+
+---@param cfg table
+---@param change config.change
+---@return json.patch?
+local function makeConfigPatch(cfg, change)
+    if change.action == 'add' then
+        if type(cfg[change.key]) == 'table' and #cfg[change.key] > 0 then
+            return {
+                op   = 'add',
+                path = '/' .. change.key .. '/-',
+                data = change.value,
+            }
+        else
+            return makeConfigPatch(cfg, {
+                action = 'set',
+                key    = change.key,
+                value  = { change.value },
+            })
+        end
+    elseif change.action == 'set' then
+        if cfg[change.key] ~= nil then
+            return {
+                op   = 'replace',
+                path = '/' .. change.key,
+                data = change.value,
+            }
+        else
+            return {
+                op   = 'add',
+                path = '/' .. change.key,
+                data = change.value,
+            }
+        end
+    elseif change.action == 'prop' then
+        if type(cfg[change.key]) == 'table' and #cfg[change.key] == 0 then
+            return {
+                op   = 'add',
+                path = '/' .. change.key .. '/' .. change.prop,
+                data = change.value,
+            }
+        else
+            return makeConfigPatch(cfg, {
+                action = 'set',
+                key    = change.key,
+                value  = { [change.prop] = change.value },
+            })
+        end
+    end
+    return nil
+end
+
+---@param path string
+---@param changes config.change[]
+---@return string?
+local function editConfigJson(path, changes)
+    local text = util.loadFile(path)
+    if not text then
+        return nil
+    end
+    local cfg = jsonc.decode_jsonc(text)
+    if type(cfg) ~= 'table' then
+        cfg = {}
+    end
+    ---@cast cfg table
+    for _, change in ipairs(changes) do
+        local patch = makeConfigPatch(cfg, change)
+        if patch then
+            text = jsone.edit(text, patch, { indent = '    ' })
+        end
+    end
+    return text
 end
 
 local function tryModifySpecifiedConfig(uri, finalChanges)
@@ -235,15 +305,19 @@ local function tryModifySpecifiedConfig(uri, finalChanges)
     if scp:get('lastLocalType') ~= 'json' then
         return false
     end
-    local suc = applyConfig(scp:get('lastLocalConfig'), uri, finalChanges)
-    if not suc then
+    local validChanges = getValidChanges(uri, finalChanges)
+    if #validChanges == 0 then
         return false
     end
     local path = workspace.getAbsolutePath(uri, CONFIGPATH)
     if not path then
         return false
     end
-    util.saveFile(path, jsonb.beautify(scp:get('lastLocalConfig'), { indent = '    ' }))
+    local newJson = editConfigJson(path, validChanges)
+    if not newJson then
+        return false
+    end
+    util.saveFile(path, newJson)
     return true
 end
 
@@ -264,17 +338,15 @@ local function tryModifyRC(uri, finalChanges, create)
     if not buf and not create then
         return false
     end
-    local loader = require 'config.loader'
-    local rc = loader.loadRCConfig(uri, path) or {
-        ['$schema'] = lang.id == 'zh-cn'
-            and [[https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema-zh-cn.json]]
-            or  [[https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json]]
-    }
-    local suc = applyConfig(rc, uri, finalChanges)
-    if not suc then
+    local validChanges = getValidChanges(uri, finalChanges)
+    if #validChanges == 0 then
         return false
     end
-    util.saveFile(path, jsonb.beautify(rc, { indent = '    ' }))
+    local newJson = editConfigJson(path, validChanges)
+    if not newJson then
+        return false
+    end
+    util.saveFile(path, newJson)
     return true
 end
 

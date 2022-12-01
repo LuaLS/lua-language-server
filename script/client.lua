@@ -231,8 +231,11 @@ end
 ---@param change config.change
 ---@return json.patch?
 local function makeConfigPatch(cfg, change)
+    local value     = cfg[change.key]
+    local parent    = cfg
+    local parentKey = ''
     if change.action == 'add' then
-        if type(cfg[change.key]) == 'table' and #cfg[change.key] > 0 then
+        if type(value) == 'table' and #cfg[change.key] > 0 then
             return {
                 op   = 'add',
                 path = '/' .. change.key .. '/-',
@@ -246,21 +249,31 @@ local function makeConfigPatch(cfg, change)
             })
         end
     elseif change.action == 'set' then
-        if cfg[change.key] ~= nil then
-            return {
-                op   = 'replace',
-                path = '/' .. change.key,
-                data = change.value,
-            }
+        if next(parent) then
+            if value ~= nil then
+                return {
+                    op   = 'replace',
+                    path = '/' .. change.key,
+                    data = change.value,
+                }
+            else
+                return {
+                    op   = 'add',
+                    path = '/' .. change.key,
+                    data = change.value,
+                }
+            end
         else
+            -- TODO: workaround, json-edit cannot edit an empty object
             return {
                 op   = 'add',
-                path = '/' .. change.key,
-                data = change.value,
+                path = parentKey,
+                data = { [change.key] = change.value },
             }
         end
     elseif change.action == 'prop' then
-        if type(cfg[change.key]) == 'table' and #cfg[change.key] == 0 then
+        if type(value) == 'table' and #value == 0 and next(value) then
+            -- TODO: workaround, json-edit cannot edit an empty object
             return {
                 op   = 'add',
                 path = '/' .. change.key .. '/' .. change.prop,

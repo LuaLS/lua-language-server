@@ -21,9 +21,7 @@ lclient():start(function (languageClient)
 
     -------------------------------
 
-    util.saveFile(configPath, jsonb.beautify {
-        ['xxxx'] = 1, -- TODO: bug of json-edit, can not be an empty json
-    })
+    util.saveFile(configPath, jsonb.beautify(json.createEmptyObject()))
 
     provider.updateConfig()
 
@@ -36,15 +34,12 @@ lclient():start(function (languageClient)
     })
 
     assert(util.equal(jsonc.decode_jsonc(util.loadFile(configPath)), {
-        ['xxxx'] = 1,
         ['Lua.runtime.version'] = 'LuaJIT',
     }))
 
     -------------------------------
 
-    util.saveFile(configPath, jsonb.beautify {
-        ['xxxx'] = 1, -- TODO: bug of json-edit, can not be an empty json
-    })
+    util.saveFile(configPath, jsonb.beautify(json.createEmptyObject()))
 
     provider.updateConfig()
 
@@ -57,7 +52,6 @@ lclient():start(function (languageClient)
     })
 
     assert(util.equal(jsonc.decode_jsonc(util.loadFile(configPath)), {
-        ['xxxx'] = 1,
         ['Lua.diagnostics.disable'] = {
             'undefined-global',
         }
@@ -112,9 +106,7 @@ lclient():start(function (languageClient)
 
     -------------------------------
 
-    util.saveFile(configPath, jsonb.beautify {
-        ['xxxx'] = 1, -- TODO: bug of json-edit, can not be an empty json
-    })
+    util.saveFile(configPath, jsonb.beautify(json.createEmptyObject()))
 
     provider.updateConfig()
 
@@ -128,7 +120,6 @@ lclient():start(function (languageClient)
     })
 
     assert(util.equal(jsonc.decode_jsonc(util.loadFile(configPath)), {
-        ['xxxx'] = 1,
         ['Lua.runtime.special'] = {
             ['include'] = 'require',
         }
@@ -151,12 +142,11 @@ lclient():start(function (languageClient)
         }
     })
 
-    -- TODO: bug of json-edit, can not be an empty json
-    -- assert(util.equal(jsonc.decode_jsonc(util.loadFile(configPath)), {
-    --     ['Lua.runtime.special'] = {
-    --         ['include'] = 'require',
-    --     }
-    -- }))
+    assert(util.equal(jsonc.decode_jsonc(util.loadFile(configPath)), {
+        ['Lua.runtime.special'] = {
+            ['include'] = 'require',
+        }
+    }))
 
     -------------------------------
 

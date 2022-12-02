@@ -376,63 +376,79 @@ local function checkModule(state, word, position, results)
             goto CONTINUE
         end
         local path = furi.decode(uri)
-        local fileName = path:match '[^/\\]*$'
-        local stemName = fileName:gsub('%..+', '')
-        if  not locals[stemName]
-        and not vm.hasGlobalSets(state.uri, 'variable', stemName)
-        and not globals[stemName]
-        and stemName:match(guide.namePatternFull)
-        and matchKey(word, stemName) then
-            local targetState = files.getState(uri)
-            if not targetState then
-                goto CONTINUE
+        local relativePath = workspace.getRelativePath(path)
+        local infos = rpath.getVisiblePath(uri, path)
+        local testedStem = { }
+        for _, sr in ipairs(infos) do
+            local pattern = sr.searcher
+                :gsub("(%p)", "%%%1")
+                :gsub("%%%?", "(.-)")
+
+            local stemName = relativePath
+                :match(pattern)
+                :match("[%a_][%w_]*$")
+
+            if not stemName or testedStem[stemName] then
+                goto INNER_CONTINUE
             end
-            local targetReturns = targetState.ast.returns
-            if not targetReturns then
-                goto CONTINUE
-            end
-            local targetSource = targetReturns[1] and targetReturns[1][1]
-            if not targetSource then
-                goto CONTINUE
-            end
-            if  targetSource.type ~= 'getlocal'
-            and targetSource.type ~= 'table'
-            and targetSource.type ~= 'function' then
-                goto CONTINUE
-            end
-            if  targetSource.type == 'getlocal'
-            and vm.getDeprecated(targetSource.node) then
-                goto CONTINUE
-            end
-            results[#results+1] = {
-                label            = stemName,
-                kind             = define.CompletionItemKind.Variable,
-                commitCharacters = { '.' },
-                command          = {
-                    title     = 'autoRequire',
-                    command   = 'lua.autoRequire',
-                    arguments = {
-                        {
-                            uri    = guide.getUri(state.ast),
-                            target = uri,
-                            name   = stemName,
+            testedStem[stemName] = true
+
+            if  not locals[stemName]
+            and not vm.hasGlobalSets(state.uri, 'variable', stemName)
+            and not globals[stemName]
+            and matchKey(word, stemName) then
+                local targetState = files.getState(uri)
+                if not targetState then
+                    goto INNER_CONTINUE
+                end
+                local targetReturns = targetState.ast.returns
+                if not targetReturns then
+                    goto INNER_CONTINUE
+                end
+                local targetSource = targetReturns[1] and targetReturns[1][1]
+                if not targetSource then
+                    goto INNER_CONTINUE
+                end
+                if  targetSource.type ~= 'getlocal'
+                and targetSource.type ~= 'table'
+                and targetSource.type ~= 'function' then
+                    goto INNER_CONTINUE
+                end
+                if  targetSource.type == 'getlocal'
+                and vm.getDeprecated(targetSource.node) then
+                    goto INNER_CONTINUE
+                end
+                results[#results+1] = {
+                    label            = stemName,
+                    kind             = define.CompletionItemKind.Variable,
+                    commitCharacters = { '.' },
+                    command          = {
+                        title     = 'autoRequire',
+                        command   = 'lua.autoRequire',
+                        arguments = {
+                            {
+                                uri    = guide.getUri(state.ast),
+                                target = uri,
+                                name   = stemName,
+                            },
                         },
                     },
-                },
-                id               = stack(targetSource, function (newSource) ---@async
-                    local md = markdown()
-                    md:add('md', lang.script('COMPLETION_IMPORT_FROM', ('[%s](%s)'):format(
-                        workspace.getRelativePath(uri),
-                        uri
-                    )))
-                    md:add('md', buildDesc(newSource))
-                    return {
-                        detail      = buildDetail(newSource),
-                        description = md,
-                        --additionalTextEdits = buildInsertRequire(state, originUri, stemName),
-                    }
-                end)
-            }
+                    id               = stack(targetSource, function (newSource) ---@async
+                        local md = markdown()
+                        md:add('md', lang.script('COMPLETION_IMPORT_FROM', ('[%s](%s)'):format(
+                            workspace.getRelativePath(uri),
+                            uri
+                        )))
+                        md:add('md', buildDesc(newSource))
+                        return {
+                            detail      = buildDetail(newSource),
+                            description = md,
+                            --additionalTextEdits = buildInsertRequire(state, originUri, stemName),
+                        }
+                    end)
+                }
+            end
+            ::INNER_CONTINUE::
         end
         ::CONTINUE::
     end

@@ -108,6 +108,18 @@ function TEST(data)
     assert(eq(expect, result))
 end
 
+local function WITH_CONFIG(cfg, f)
+    local prev = { }
+    for k, v in pairs(cfg) do
+        prev[k] = config.get(nil, k)
+        config.set(nil, k, v)
+    end
+    f()
+    for k, v in pairs(prev) do
+        config.set(nil, k, v)
+    end
+end
+
 TEST {
     {
         path = 'abc.lua',
@@ -951,3 +963,74 @@ TEST {
     },
     completion = EXISTS
 }
+
+-- Find obscured modules
+
+WITH_CONFIG({
+    ["Lua.runtime.pathStrict"] = true,
+    ["Lua.runtime.path"] = {
+        "?/init.lua",
+        "sub/?/init.lua",
+        "obscure_path/?/?/init.lua"
+    },
+}, function()
+    TEST {
+        { path = 'myLib/init.lua', content = 'return {}' },
+        {
+            path = 'main.lua',
+            main = true,
+            content = [[
+                myLib<??>
+            ]],
+        },
+        completion = EXISTS
+    }
+
+    TEST {
+        { path = 'sub/myLib/init.lua', content = 'return {}' },
+        {
+            path = 'main.lua',
+            main = true,
+            content = [[
+                myLib<??>
+            ]],
+        },
+        completion = EXISTS
+    }
+
+    TEST {
+        { path = 'sub/myLib/sublib/init.lua', content = 'return {}' },
+        {
+            path = 'main.lua',
+            main = true,
+            content = [[
+                sublib<??>
+            ]],
+        },
+        completion = EXISTS
+    }
+
+    TEST {
+        { path = 'sublib/init.lua', content = 'return {}' },
+        {
+            path = 'main.lua',
+            main = true,
+            content = [[
+                sublib<??>
+            ]],
+        },
+        completion = EXISTS
+    }
+
+    TEST {
+        { path = 'obscure_path/myLib/obscure/myLib/obscure/init.lua', content = 'return {}' },
+        {
+            path = 'main.lua',
+            main = true,
+            content = [[
+                obscure<??>
+            ]],
+        },
+        completion = EXISTS
+    }
+end)

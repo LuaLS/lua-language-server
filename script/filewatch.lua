@@ -1,18 +1,26 @@
 local fw    = require 'bee.filewatch'
 local fs    = require 'bee.filesystem'
+local plat  = require 'bee.platform'
 local await = require 'await'
 
 local MODIFY = 1 << 0
 local RENAME = 1 << 1
 
-local function exists(filename)
+local function isExists(filename)
     local path = fs.path(filename)
-    local suc, res = pcall(fs.exists, path)
-    if not suc or not res then
+    local suc, exists = pcall(fs.exists, path)
+    if not suc or not exists then
         return false
     end
-    suc, res = pcall(fs.canonical, path)
-    if not suc or res:string() ~= path:string() then
+    if plat.OS ~= 'Windows' then
+        return true
+    end
+    local suc, res = pcall(fs.fullpath, path)
+    if not suc then
+        return false
+    end
+    if res :string():gsub('^%w+:', string.lower)
+    ~= path:string():gsub('^%w+:', string.lower) then
         return false
     end
     return true
@@ -22,34 +30,57 @@ end
 local m = {}
 
 m._eventList = {}
+m._watchings = {}
 
 function m.watch(path)
-    local id = fw.add(path)
+    if path == '' then
+        return function () end
+    end
+    if m._watchings[path] then
+        m._watchings[path].count = m._watchings[path].count + 1
+    else
+        m._watchings[path] = {
+            count = 1,
+            id    = fw.add(path),
+        }
+        log.debug('fw.add', path)
+    end
+    local removed
     return function ()
-        fw.remove(id)
+        if removed then
+            return
+        end
+        removed = true
+        m._watchings[path].count = m._watchings[path].count - 1
+        if m._watchings[path].count == 0 then
+            fw.remove(m._watchings[path].id)
+            m._watchings[path] = nil
+            log.debug('fw.remove', path)
+        end
     end
 end
 
----@param callback async fun()
+---@param callback async fun(ev: string, path: string)
 function m.event(callback)
     m._eventList[#m._eventList+1] = callback
 end
 
-function m._callEvent(changes)
+function m._callEvent(ev, path)
     for _, callback in ipairs(m._eventList) do
         await.call(function ()
-            callback(changes)
+            callback(ev, path)
         end)
     end
 end
 
 function m.update()
     local collect
-    for _ = 1, 100 do
+    for _ = 1, 10000 do
         local ev, path = fw.select()
         if not ev then
             break
         end
+        log.debug('filewatch:', ev, path)
         if not collect then
             collect = {}
         end
@@ -64,29 +95,18 @@ function m.update()
         return
     end
 
-    local changes = {}
     for path, flag in pairs(collect) do
         if flag & RENAME ~= 0 then
-            if exists(path) then
-                changes[#changes+1] = {
-                    type = 'create',
-                    path = path,
-                }
+            if isExists(path) then
+                m._callEvent('create', path)
             else
-                changes[#changes+1] = {
-                    type = 'delete',
-                    path = path,
-                }
+                m._callEvent('delete', path)
             end
         elseif flag & MODIFY ~= 0 then
-            changes[#changes+1] = {
-                type = 'change',
-                path = path,
-            }
+            m._callEvent('change', path)
         end
     end
 
-    m._callEvent(changes)
 end
 
 return m

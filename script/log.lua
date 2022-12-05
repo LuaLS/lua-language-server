@@ -12,14 +12,20 @@ local mathModf       = math.modf
 local debugGetInfo   = debug.getinfo
 local ioStdErr       = io.stderr
 
-_ENV = nil
-
 local m = {}
 
 m.file = nil
 m.startTime = time.time() - monotonic()
 m.size = 0
 m.maxSize = 100 * 1024 * 1024
+m.level = 'info'
+m.levelMap = {
+    ['trace'] = 1,
+    ['debug'] = 2,
+    ['info']  = 3,
+    ['warn']  = 4,
+    ['error'] = 5,
+}
 
 local function trimSrc(src)
     if src:sub(1, 1) == '@' then
@@ -57,19 +63,21 @@ local function pushLog(level, ...)
         str = str .. '\n' .. debugTraceBack(nil, 3)
     end
     local info = debugGetInfo(3, 'Sl')
-    return m.raw(0, level, str, info.source, info.currentline, monotonic())
+    local text = m.raw(0, level, str, info.source, info.currentline, monotonic())
+
+    return text
 end
 
-function m.info(...)
-    pushLog('info', ...)
+function m.trace(...)
+    pushLog('trace', ...)
 end
 
 function m.debug(...)
     pushLog('debug', ...)
 end
 
-function m.trace(...)
-    pushLog('trace', ...)
+function m.info(...)
+    pushLog('info', ...)
 end
 
 function m.warn(...)
@@ -77,10 +85,16 @@ function m.warn(...)
 end
 
 function m.error(...)
-    return pushLog('error', ...)
+    -- Don't use tail calls,
+    -- Otherwise, the count of `debug.getinfo` will be wrong
+    local msg = pushLog('error', ...)
+    return msg
 end
 
 function m.raw(thd, level, msg, source, currentline, clock)
+    if m.levelMap[level] < (m.levelMap[m.level] or m.levelMap['info']) then
+        return msg
+    end
     if level == 'error' then
         ioStdErr:write(msg .. '\n')
         if not m.firstError then
@@ -88,12 +102,9 @@ function m.raw(thd, level, msg, source, currentline, clock)
         end
     end
     if m.size > m.maxSize then
-        return
+        return msg
     end
     init_log_file()
-    if not m.file then
-        return ''
-    end
     local sec, ms = mathModf((m.startTime + clock) / 1000)
     local timestr = osDate('%H:%M:%S', sec)
     local agl = ''
@@ -107,12 +118,19 @@ function m.raw(thd, level, msg, source, currentline, clock)
         buf = ('[%s.%03.f][%s]%s[#%d:%s:%s]: %s\n'):format(timestr, ms * 1000, level, agl, thd, trimSrc(source), currentline, msg)
     end
     m.size = m.size + #buf
-    if m.size > m.maxSize then
-        m.file:write(buf:sub(1, m.size - m.maxSize))
-        m.file:write('[REACH MAX SIZE]')
-    else
-        m.file:write(buf)
+    if m.file then
+        if m.size > m.maxSize then
+            m.file:write(buf:sub(1, m.size - m.maxSize))
+            m.file:write('[REACH MAX SIZE]')
+        else
+            m.file:write(buf)
+        end
     end
+
+    if log.print then
+        print(buf)
+    end
+
     return buf
 end
 
@@ -130,9 +148,11 @@ function m.init(root, path)
     m.path = path:string()
     m.prefixLen = #root:string()
     m.size = 0
-    if not fs.exists(path:parent_path()) then
-        fs.create_directories(path:parent_path())
-    end
+    pcall(function ()
+        if not fs.exists(path:parent_path()) then
+            fs.create_directories(path:parent_path())
+        end
+    end)
     if lastBuf then
         init_log_file()
         if m.file then

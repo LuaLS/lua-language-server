@@ -9,13 +9,19 @@ local fsu     = require 'fs-utility'
 local define  = require "proto.define"
 local files   = require 'files'
 local await   = require 'await'
-local timer   = require 'timer'
 local encoder = require 'encoder'
+local ws      = require 'workspace.workspace'
+local scope   = require 'workspace.scope'
+local inspect = require 'inspect'
+local jsonb   = require 'json-beautify'
+local jsonc   = require 'jsonc'
 
 local m = {}
 
-local function getDocFormater()
-    local version = config.get 'Lua.runtime.version'
+m.metaPaths = {}
+
+local function getDocFormater(uri)
+    local version = config.get(uri, 'Lua.runtime.version')
     if client.isVSCode() then
         if version == 'Lua 5.1' then
             return 'HOVER_NATIVE_DOCUMENT_LUA51'
@@ -43,9 +49,9 @@ local function getDocFormater()
     end
 end
 
-local function convertLink(text)
-    local fmt = getDocFormater()
-    return text:gsub('%$([%.%w]+)', function (name)
+local function convertLink(uri, text)
+    local fmt = getDocFormater(uri)
+    return text:gsub('%$([%.%w_%:]+)', function (name)
         local lastDot = ''
         if name:sub(-1) == '.' then
             name = name:sub(1, -2)
@@ -75,15 +81,16 @@ local function createViewDocument(name)
     if not fmt then
         return nil
     end
-    name = name:match '[%w_%.]+'
+    name = name:match '[%w_%.%:]+'
     if name:sub(-1) == '.' then
         name = name:sub(1, -2)
     end
     return ('[%s](%s)'):format(lang.script.HOVER_VIEW_DOCUMENTS, lang.script(fmt, 'pdf-' .. name))
 end
 
-local function compileSingleMetaDoc(script, metaLang, status)
+local function compileSingleMetaDoc(uri, script, metaLang, status)
     if not script then
+        log.error('no meta?', uri)
         return nil
     end
 
@@ -99,11 +106,11 @@ local function compileSingleMetaDoc(script, metaLang, status)
     middleBuf[#middleBuf+1] = ('PUSH [===[%s]===]'):format(script:sub(last))
     local middleScript = table.concat(middleBuf, '\n')
     local version, jit
-    if config.get 'Lua.runtime.version' == 'LuaJIT' then
+    if config.get(uri, 'Lua.runtime.version') == 'LuaJIT' then
         version = 5.1
         jit = true
     else
-        version = tonumber(config.get 'Lua.runtime.version':sub(-3))
+        version = tonumber(config.get(uri, 'Lua.runtime.version'):sub(-3)) or 5.4
         jit = false
     end
 
@@ -122,7 +129,7 @@ local function compileSingleMetaDoc(script, metaLang, status)
             compileBuf[#compileBuf+1] = '---\n'
             for line in util.eachLine(des) do
                 compileBuf[#compileBuf+1] = '---'
-                compileBuf[#compileBuf+1] = convertLink(line)
+                compileBuf[#compileBuf+1] = convertLink(uri, line)
                 compileBuf[#compileBuf+1] = '\n'
             end
             local viewDocument = createViewDocument(name)
@@ -138,7 +145,7 @@ local function compileSingleMetaDoc(script, metaLang, status)
             if not des then
                 des = ('Miss locale <%s>'):format(name)
             end
-            compileBuf[#compileBuf+1] = convertLink(des)
+            compileBuf[#compileBuf+1] = convertLink(uri, des)
             compileBuf[#compileBuf+1] = '\n'
         end,
         ALIVE   = function (str)
@@ -197,14 +204,14 @@ local function loadMetaLocale(langID, result)
     return result
 end
 
-local function initBuiltIn()
-    if not m.inited then
-        return
-    end
+local function initBuiltIn(uri)
+    log.info('Init builtin library at:', uri)
+    local scp      = scope.getScope(uri)
     local langID   = lang.id
-    local version  = config.get 'Lua.runtime.version'
-    local encoding = config.get 'Lua.runtime.fileEncoding'
-    local metaPath = fs.path(METAPATH) / config.get 'Lua.runtime.meta':gsub('%$%{(.-)%}', {
+    local version  = config.get(uri, 'Lua.runtime.version')
+    local encoding = config.get(uri, 'Lua.runtime.fileEncoding')
+    ---@type fs.path
+    local metaPath = fs.path(METAPATH) / config.get(uri, 'Lua.runtime.meta'):gsub('%$%{(.-)%}', {
         version  = version,
         language = langID,
         encoding = encoding,
@@ -214,57 +221,139 @@ local function initBuiltIn()
     if langID ~= 'en-US' then
         loadMetaLocale(langID, metaLang)
     end
-    --log.debug('metaLang:', util.dump(metaLang))
 
-    if m.metaPath == metaPath:string() then
+    if scp:get('metaPath') == metaPath:string() then
+        log.debug('Has meta path, skip:', metaPath:string())
         return
     end
-    m.metaPath = metaPath:string()
-    m.metaPaths = {}
-    if not fs.exists(metaPath) then
-        fs.create_directories(metaPath)
+    scp:set('metaPath', metaPath:string())
+    local suc = xpcall(function ()
+        if not fs.exists(metaPath) then
+            fs.create_directories(metaPath)
+        end
+    end, log.error)
+    if not suc then
+        log.warn('Init builtin failed.')
+        return
     end
     local out = fsu.dummyFS()
     local templateDir = ROOT / 'meta' / 'template'
     for libName, status in pairs(define.BuiltIn) do
-        status = config.get 'Lua.runtime.builtin'[libName] or status
+        status = config.get(uri, 'Lua.runtime.builtin')[libName] or status
+        log.debug('Builtin status:', libName, status)
         if status == 'disable' then
             goto CONTINUE
         end
-        libName = libName .. '.lua'
-        local libPath = templateDir / libName
-        local metaDoc = compileSingleMetaDoc(fsu.loadFile(libPath), metaLang, status)
+
+        ---@type fs.path
+        local libPath = templateDir / (libName .. '.lua')
+        local metaDoc = compileSingleMetaDoc(uri, fsu.loadFile(libPath), metaLang, status)
         if metaDoc then
-            local outPath = metaPath / libName
             metaDoc = encoder.encode(encoding, metaDoc, 'auto')
-            out:saveFile(libName, metaDoc)
-            m.metaPaths[#m.metaPaths+1] = outPath:string()
+
+            local outputLibName = libName:gsub('%.', '/') .. '.lua'
+            if outputLibName ~= libName then
+                out:createDirectories(fs.path(outputLibName):parent_path())
+            end
+
+            local ok, err = out:saveFile(outputLibName, metaDoc)
+            if not ok then
+                log.debug("Save Meta File:", err)
+                goto CONTINUE
+            end
+
+            local outputPath = metaPath / outputLibName
+            m.metaPaths[outputPath:string()] = true
+            log.debug('Meta path:', outputPath:string())
         end
         ::CONTINUE::
     end
-    fsu.fileSync(out, metaPath)
+    local result = fsu.fileSync(out, metaPath)
+    if #result.err > 0 then
+        log.warn('File sync error:', inspect(result))
+    end
 end
 
-local function loadSingle3rdConfig(libraryDir)
-    local configText = fsu.loadFile(libraryDir / 'config.lua')
+---@param libraryDir fs.path
+---@return table?
+local function loadSingle3rdConfigFromJson(libraryDir)
+    local path = libraryDir / 'config.json'
+    local configText = fsu.loadFile(path)
+    if not configText then
+        return nil
+    end
+
+    local suc, cfg = xpcall(jsonc.decode_jsonc, function (err)
+        log.error('Decode config.json failed at:', libraryDir:string(), err)
+    end, configText)
+    if not suc then
+        return nil
+    end
+
+    if type(cfg) ~= 'table' then
+        log.error('config.json must be an object:', libraryDir:string())
+        return nil
+    end
+
+    return cfg
+end
+
+---@param libraryDir fs.path
+---@return table?
+local function loadSingle3rdConfigFromLua(libraryDir)
+    local path = libraryDir / 'config.lua'
+    local configText = fsu.loadFile(path)
     if not configText then
         return nil
     end
 
     local env = setmetatable({}, { __index = _G })
-    assert(load(configText, '@' .. libraryDir:string(), 't', env))()
+    local f, err = load(configText, '@' .. libraryDir:string(), 't', env)
+    if not f then
+        log.error('Load config.lua failed at:', libraryDir:string(), err)
+        return nil
+    end
+
+    local suc = xpcall(f, function (err)
+        log.error('Load config.lua failed at:', libraryDir:string(), err)
+    end)
+
+    if not suc then
+        return nil
+    end
 
     local cfg = {}
+    for k, v in pairs(env) do
+        cfg[k] = v
+    end
+
+    return cfg
+end
+
+---@param libraryDir fs.path
+local function loadSingle3rdConfig(libraryDir)
+    local cfg = loadSingle3rdConfigFromJson(libraryDir)
+    if not cfg then
+        cfg = loadSingle3rdConfigFromLua(libraryDir)
+        if not cfg then
+            return
+        end
+        local jsonbuf = jsonb.beautify(cfg)
+        client.requestMessage('Info', lang.script.WINDOW_CONFIG_LUA_DEPRECATED, {
+            lang.script.WINDOW_CONVERT_CONFIG_LUA,
+        }, function (action, index)
+            if index == 1 and jsonbuf then
+                fsu.saveFile(libraryDir / 'config.json', jsonbuf)
+                fsu.fileRemove(libraryDir / 'config.lua')
+            end
+        end)
+    end
 
     cfg.path = libraryDir:filename():string()
     cfg.name = cfg.name or cfg.path
 
     if fs.exists(libraryDir / 'plugin.lua') then
         cfg.plugin = true
-    end
-
-    for k, v in pairs(env) do
-        cfg[k] = v
     end
 
     if cfg.words then
@@ -305,21 +394,55 @@ local function load3rdConfigInDir(dir, configs, inner)
     end
 end
 
-local function load3rdConfig()
-    local configs = {}
+local function load3rdConfig(uri)
+    local scp = scope.getScope(uri)
+    local configs = scp:get 'thirdConfigsCache'
+    if configs then
+        return configs
+    end
+    configs = {}
+    scp:set('thirdConfigsCache', configs)
     load3rdConfigInDir(innerThirdDir, configs, true)
-    local thirdDirs = config.get 'Lua.workspace.userThirdParty'
+    local thirdDirs = config.get(uri, 'Lua.workspace.userThirdParty')
     for _, thirdDir in ipairs(thirdDirs) do
         load3rdConfigInDir(fs.path(thirdDir), configs)
     end
     return configs
 end
 
-local function apply3rd(cfg, onlyMemory)
+local function apply3rd(uri, cfg, onlyMemory)
     local changes = {}
-    if cfg.configs then
-        for _, change in ipairs(cfg.configs) do
-            changes[#changes+1] = change
+    if cfg.settings then
+        for key, value in pairs(cfg.settings) do
+            if type(value) == 'table' then
+                if #value == 0 then
+                    for k, v in pairs(value) do
+                        changes[#changes+1] = {
+                            key    = key,
+                            action = 'prop',
+                            prop   = k,
+                            value  = v,
+                            uri    = uri,
+                        }
+                    end
+                else
+                    for _, v in ipairs(value) do
+                        changes[#changes+1] = {
+                            key    = key,
+                            action = 'add',
+                            value  = v,
+                            uri    = uri,
+                        }
+                    end
+                end
+            else
+                changes[#changes+1] = {
+                    key    = key,
+                    action = 'set',
+                    value  = value,
+                    uri    = uri,
+                }
+            end
         end
     end
 
@@ -328,6 +451,7 @@ local function apply3rd(cfg, onlyMemory)
             key    = 'Lua.runtime.plugin',
             action = 'set',
             value  = ('%s/plugin.lua'):format(cfg.dirname),
+            uri    = uri,
         }
     end
 
@@ -335,15 +459,19 @@ local function apply3rd(cfg, onlyMemory)
         key    = 'Lua.workspace.library',
         action = 'add',
         value  = ('%s/library'):format(cfg.dirname),
+        uri    = uri,
     }
 
     client.setConfig(changes, onlyMemory)
 end
 
-local hasAsked
+local hasAsked = {}
 ---@async
-local function askFor3rd(cfg)
-    hasAsked = true
+local function askFor3rd(uri, cfg)
+    if hasAsked[cfg.name] then
+        return nil
+    end
+    hasAsked[cfg.name] = true
     local yes1 = lang.script.WINDOW_APPLY_WHIT_SETTING
     local yes2 = lang.script.WINDOW_APPLY_WHITOUT_SETTING
     local no   = lang.script.WINDOW_DONT_SHOW_AGAIN
@@ -355,23 +483,18 @@ local function askFor3rd(cfg)
         return nil
     end
     if result == yes1 then
-        apply3rd(cfg, false)
+        apply3rd(uri, cfg, false)
+    elseif result == yes2 then
+        apply3rd(uri, cfg, true)
+    else
         client.setConfig({
             {
                 key    = 'Lua.workspace.checkThirdParty',
                 action = 'set',
                 value  = false,
+                uri    = uri,
             },
         }, false)
-    elseif result == yes2 then
-        apply3rd(cfg, true)
-        client.setConfig({
-            {
-                key    = 'Lua.workspace.checkThirdParty',
-                action = 'set',
-                value  = false,
-            },
-        }, true)
     end
 end
 
@@ -383,7 +506,7 @@ local function wholeMatch(a, b)
     if not pos1 then
         return false
     end
-    local left  = a:sub(pos1 - 1, pos1-1)
+    local left  = a:sub(pos1 - 1, pos1 - 1)
     local right = a:sub(pos2, pos2)
     if left:match '[%w_]'
     or right:match '[%w_]' then
@@ -392,101 +515,137 @@ local function wholeMatch(a, b)
     return true
 end
 
-local function check3rdByWords(text, configs)
-    if hasAsked then
+local function check3rdByWords(uri, configs)
+    if not files.isLua(uri) then
         return
     end
+    local id = 'check3rdByWords:' .. uri
+    await.close(id)
     await.call(function () ---@async
+        await.sleep(0.1)
+        local text = files.getText(uri)
+        if not text then
+            return
+        end
         for _, cfg in ipairs(configs) do
-            if cfg.words then
-                for _, word in ipairs(cfg.words) do
-                    await.delay()
-                    if wholeMatch(text, word) then
-                        askFor3rd(cfg)
-                        return
-                    end
+            if not cfg.words then
+                goto CONTINUE
+            end
+            if hasAsked[cfg.name] then
+                goto CONTINUE
+            end
+            local library = ('%s/library'):format(cfg.dirname)
+            if util.arrayHas(config.get(uri, 'Lua.workspace.library'), library) then
+                goto CONTINUE
+            end
+            for _, word in ipairs(cfg.words) do
+                await.delay()
+                if wholeMatch(text, word) then
+                    ---@async
+                    await.call(function ()
+                        askFor3rd(uri, cfg)
+                    end)
+                    return
                 end
             end
+            ::CONTINUE::
         end
-    end)
+    end, id)
 end
 
 local function check3rdByFileName(uri, configs)
-    if hasAsked then
-        return
-    end
-    local ws   = require 'workspace'
     local path = ws.getRelativePath(uri)
     if not path then
         return
     end
+    local id = 'check3rdByFileName:' .. uri
+    await.close(id)
     await.call(function () ---@async
+        await.sleep(0.1)
         for _, cfg in ipairs(configs) do
-            if cfg.files then
-                for _, filename in ipairs(cfg.files) do
-                    await.delay()
-                    if wholeMatch(path, filename) then
-                        askFor3rd(cfg)
-                        return
-                    end
+            if not cfg.files then
+                goto CONTINUE
+            end
+            if hasAsked[cfg.name] then
+                goto CONTINUE
+            end
+            for _, filename in ipairs(cfg.files) do
+                await.delay()
+                if wholeMatch(path, filename) then
+                    ---@async
+                    await.call(function ()
+                        askFor3rd(uri, cfg)
+                    end)
+                    return
                 end
             end
+            ::CONTINUE::
         end
-    end)
+    end, id)
 end
 
-local lastCheckedUri = {}
-local function checkedUri(uri)
-    if  lastCheckedUri[uri]
-    and timer.clock() - lastCheckedUri[uri] < 5 then
-        return false
-    end
-    lastCheckedUri[uri] = timer.clock()
-    return true
-end
-
-local thirdConfigs
+---@async
 local function check3rd(uri)
-    if hasAsked then
+    if ws.isIgnored(uri) then
         return
     end
-    if not config.get 'Lua.workspace.checkThirdParty' then
+    if not config.get(uri, 'Lua.workspace.checkThirdParty') then
         return
     end
-    if thirdConfigs == nil then
-        thirdConfigs = load3rdConfig() or false
+    local scp = scope.getScope(uri)
+    if not scp:get 'canCheckThirdParty' then
+        return
     end
+    local thirdConfigs = load3rdConfig(uri) or false
     if not thirdConfigs then
         return
     end
-    if checkedUri(uri) then
-        if files.isLua(uri) then
-            local text = files.getText(uri)
-            check3rdByWords(text, thirdConfigs)
-        end
-        check3rdByFileName(uri, thirdConfigs)
-    end
+    check3rdByWords(uri, thirdConfigs)
+    check3rdByFileName(uri, thirdConfigs)
 end
 
-config.watch(function (key, value, oldValue)
+local function check3rdOfWorkspace(suri)
+    local scp = scope.getScope(suri)
+    scp:set('thirdConfigsCache', nil)
+    scp:set('canCheckThirdParty', true)
+    local id = 'check3rdOfWorkspace:' .. scp:getName()
+    await.close(id)
+    ---@async
+    await.call(function ()
+        ws.awaitReady(suri)
+        for uri in files.eachFile(suri) do
+            check3rd(uri)
+        end
+        for uri in files.eachDll() do
+            check3rd(uri)
+        end
+    end, id)
+end
+
+config.watch(function (uri, key, value, oldValue)
     if key:find '^Lua.runtime' then
-        initBuiltIn()
+        initBuiltIn(uri)
+    end
+    if key == 'Lua.workspace.checkThirdParty'
+    or key == 'Lua.workspace.userThirdParty'
+    or key == '' then
+        check3rdOfWorkspace(uri)
     end
 end)
 
+---@async
 files.watch(function (ev, uri)
     if ev == 'update'
     or ev == 'dll' then
+        await.sleep(1)
         check3rd(uri)
     end
 end)
 
-function m.init()
-    if m.inited then
-        return
+ws.watch(function (ev, uri)
+    if ev == 'startReload' then
+        initBuiltIn(uri)
     end
-    m.inited = true
-    initBuiltIn()
-end
+end)
 
 return m

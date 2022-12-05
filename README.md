@@ -1,120 +1,112 @@
 # lua-language-server
 
 ![build](https://github.com/sumneko/lua-language-server/workflows/build/badge.svg)
-![version](https://vsmarketplacebadge.apphb.com/version-short/sumneko.lua.svg)
+[![version](https://vsmarketplacebadge.apphb.com/version-short/sumneko.lua.svg)](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
 ![installs](https://vsmarketplacebadge.apphb.com/installs-short/sumneko.lua.svg)
 ![downloads](https://vsmarketplacebadge.apphb.com/downloads-short/sumneko.lua.svg)
+[![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/sumneko/lua-language-server.svg)](https://github.com/sumneko/lua-language-server/issues "Average time to resolve an issue")
 
-## Install In VSCode
-https://marketplace.visualstudio.com/items?itemName=sumneko.lua
 
-![avatar](https://github.com/sumneko/vscode-lua/raw/master/images//Install%20In%20VSCode.gif)
+***Lua development just got a whole lot better*** 🧠
 
-## Change Log
-https://github.com/sumneko/lua-language-server/blob/master/changelog.md
+The Lua language server provides various language features for Lua to make development easier and faster. With around half a million installs on Visual Studio Code, it is the most popular extension for Lua language support.
 
-## Wiki
-https://github.com/sumneko/lua-language-server/wiki
+## Features
 
-## Feature
+- 📄 Over 20 supported [annotations](https://github.com/sumneko/lua-language-server/wiki/Annotations) for documenting your code
+- ↪ Go to definition
+- 🦺 Dynamic [type checking](https://github.com/sumneko/lua-language-server/wiki/Type-Checking)
+- 🔍 Find references
+- ⚠️ [Diagnostics/Warnings](https://github.com/sumneko/lua-language-server/wiki/Diagnostics)
+- 🕵️ [Syntax checking](https://github.com/sumneko/lua-language-server/wiki/Syntax-Errors)
+- 📝 Element renaming
+- 🗨️ Hover to view details on variables, functions, and more
+- 🖊️ Autocompletion
+- 📚 Support for [libraries](https://github.com/sumneko/lua-language-server/wiki/Libraries)
+- 💅 [Code formatting](https://github.com/sumneko/lua-language-server/wiki/Formatter)
+- 💬 [Spell checking](https://github.com/sumneko/lua-language-server/wiki/Formatter)
+- 🛠️ Custom [plugins](https://github.com/sumneko/lua-language-server/wiki/Plugins)
 
-- [x] Goto Definition
-- [x] Find All References
-- [x] Hover
-- [x] Diagnostics
-- [x] Rename
-- [x] Auto Completion
-- [x] IntelliSense
-- [x] Signature Help
-- [x] Document Symbols
-- [x] Workspace Symbols
-- [x] Syntax Check
-- [x] Highlight
-- [x] Code Action
-- [x] EmmyLua Annotation
-- [x] Multi Workspace
-- [x] Semantic Tokens
-- [ ] Type Format
+## Install
 
-## Preview
+The language server can easily be installed for use in VS Code, but it can also be used by other clients using the command line.
 
-### Goto Definition
+### Visual Studio Code
+[![Install in VS Code](https://img.shields.io/badge/Install%20For-VS%20Code-blue?style=for-the-badge&logo=visualstudiocode "Install in VS Code")](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
 
-![avatar](https://github.com/sumneko/vscode-lua/raw/master/images//Goto%20Definition.gif)
+The language server and Visual Studio Code client can be installed from [the VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=sumneko.lua).
 
-### Find All References
+![](https://github.com/sumneko/vscode-lua/raw/master/images//Install%20In%20VSCode.gif)
 
-![avatar](https://github.com/sumneko/vscode-lua/raw/master/images//Find%20All%20References.gif)
+### Command Line
+[![Install for command line](https://img.shields.io/badge/Install%20For-Command%20Line-blue?style=for-the-badge&logo=windowsterminal "Install for command line")](https://github.com/sumneko/lua-language-server/wiki/Getting-Started#command-line)
 
-### Hover
+Check the [wiki for a guide](https://github.com/sumneko/lua-language-server/wiki/Getting-Started#command-line) to install the language server for use on the command line. This allows the language server to be used for NeoVim and other clients that follow the language server protocol.
 
-![avatar](https://github.com/sumneko/vscode-lua/raw/master/images/Hover.gif)
+## Supported Lua Versions
+| Version |    Supported   |
+| :-----: | :------------: |
+| Lua 5.1 | ![][checkmark] |
+| Lua 5.2 | ![][checkmark] |
+| Lua 5.3 | ![][checkmark] |
+| Lua 5.4 | ![][checkmark] |
+| LuaJIT  | ![][checkmark] |
 
-### Diagnostics
+## Links
+- [Changelog](https://github.com/sumneko/lua-language-server/blob/master/changelog.md)
+- [Wiki](https://github.com/sumneko/lua-language-server/wiki)
+- [FAQ](https://github.com/sumneko/lua-language-server/wiki/FAQ)
+- [Report an issue][issues]
+- [Suggest a feature][issues]
+- [Discuss](https://github.com/sumneko/lua-language-server/discussions)
 
-![avatar](https://github.com/sumneko/vscode-lua/raw/master/images/Diagnostics.gif)
-
-### Rename
-
-![avatar](https://github.com/sumneko/vscode-lua/raw/master/images/Rename.gif)
-
-### Auto Completion
-
-![avatar](https://github.com/sumneko/vscode-lua/raw/master/images/Auto%20Completion.gif)
-
-### Signature Help
-
-![avatar](https://github.com/sumneko/vscode-lua/raw/master/images/Signature%20Help.gif)
-
-### Emmy Annotation
-
-![avatar](https://github.com/sumneko/vscode-lua/raw/master/images/Emmy%20Annotation.gif)
-
-## Version
-
-- [x] Lua 5.1
-- [x] Lua 5.2
-- [x] Lua 5.3
-- [x] Lua 5.4
-- [x] LuaJIT
-
-If you find any mistakes, please [tell me][issues] or use [Pull Requests][@meta] to fix them directly.
-
-如果你发现了任何错误，请[告诉我][issues]或使用[Pull Requests][@meta]来直接修复。
+> If you find any mistakes, please [report it][issues] or open a [pull request][pulls] if you have a fix of your own ❤️
+>
+> 如果你发现了任何错误，请[告诉我][issues]或使用[Pull Requests][pulls]来直接修复。❤️
 
 [issues]: https://github.com/sumneko/lua-language-server/issues
-[@meta]: https://github.com/sumneko/lua-language-server/tree/master/meta/template
+[pulls]: https://github.com/sumneko/lua-language-server/pulls
 
-## Locale
+## Available Languages
 
-- [x] en-us
-- [x] zh-cn
-- [x] pt-br (thanks [Jeferson Ferreira](https://github.com/jefersonf))
+- `en-us` 🇺🇸
+- `zh-cn` 🇨🇳
+- `zh-tw` 🇹🇼
+- `pt-br` 🇧🇷
 
-Please [help me][en-US] improve the quality of `en-US`.
+
+> ℹ Note: All translations are provided and collaborated on by the community. If you find an inappropriate or harmful translation, [please report it immediately](https://github.com/sumneko/lua-language-server/issues).
+
+Are you able to [provide a translation](https://github.com/sumneko/lua-language-server/wiki/Translations)? It would be greatly appreciated!
+
+Thank you to [all contributors of translations](https://github.com/sumneko/lua-language-server/commits/master/locale)!
 
 [en-US]: https://github.com/sumneko/lua-language-server/tree/master/locale/en-us
 
-## Build
-The extensions in the VSCode market already come with pre-compiled binary files, usually you don't need to compile them.
+## Configuration
+Configuration of the server can be done in a number of ways, which are explained more in-depth in the [wiki](https://github.com/sumneko/lua-language-server/wiki/Configuration-File).
 
-Other clients can first try to download and use [pre-compiled binary files](https://github.com/sumneko/lua-language-server/wiki/PreCompiled-Binaries).
+### Visual Studio Code
+You can use the [settings editor](https://code.visualstudio.com/docs/getstarted/settings#_settings-editor) or edit the [raw JSON file](https://code.visualstudio.com/docs/getstarted/settings#_settingsjson).
 
-If you need to compile by yourself, please refer to [here](https://github.com/sumneko/lua-language-server/wiki/Build-and-Run)
+### Other
+See the [configuration file wiki page](https://github.com/sumneko/lua-language-server/wiki/Configuration-File).
 
-## Setting
 
-* In VSCode: Just use the setting of VSCode.
-* Standalone: See https://github.com/sumneko/lua-language-server/wiki/Setting
+## Privacy
+This language server has **opt-in** telemetry that collects usage data and sends it to the development team to help improve the extension. Read our [privacy policy](https://github.com/sumneko/lua-language-server/wiki/Home#privacy) to learn more.
+
+
+## Contributors
+![GitHub Contributors Image](https://contrib.rocks/image?repo=sumneko/lua-language-server)
 
 ## Credit
+Software that the language server (or the development of it) uses:
 
 * [bee.lua](https://github.com/actboy168/bee.lua)
 * [luamake](https://github.com/actboy168/luamake)
-* [lni](https://github.com/actboy168/lni)
 * [LPegLabel](https://github.com/sqmedeiros/lpeglabel)
 * [LuaParser](https://github.com/sumneko/LuaParser)
-* [rcedit](https://github.com/electron/rcedit)
 * [ScreenToGif](https://github.com/NickeManarin/ScreenToGif)
 * [vscode-languageclient](https://github.com/microsoft/vscode-languageserver-node)
 * [lua.tmbundle](https://github.com/textmate/lua.tmbundle)
@@ -123,26 +115,8 @@ If you need to compile by yourself, please refer to [here](https://github.com/su
 * [utility](https://github.com/sumneko/utility)
 * [vscode-lua-doc](https://github.com/actboy168/vscode-lua-doc)
 * [json.lua](https://github.com/actboy168/json.lua)
+* [EmmyLuaCodeStyle](https://github.com/CppCXY/EmmyLuaCodeStyle)
+* [inspect.lua](https://github.com/kikito/inspect.lua)
 
-## Acknowledgement
 
-* [actboy168](https://github.com/actboy168)
-* [Dmitry Sannikov](https://github.com/dasannikov)
-* [Jayden Charbonneau](https://github.com/Reshiram110)
-* [Stjepan Bakrac](https://github.com/z16)
-* [Peter Young](https://github.com/young40)
-* [Li Xiaobin](https://github.com/Xiaobin0860)
-* [Fedora7](https://github.com/Fedora7)
-* [Allen Shaw](https://github.com/shuxiao9058)
-* [Bartel](https://github.com/Letrab)
-* [Ruin0x11](https://github.com/Ruin0x11)
-* [uhziel](https://github.com/uhziel)
-* [火凌之](https://github.com/PhoenixZeng)
-* [CppCXY](https://github.com/CppCXY)
-* [Ketho](https://github.com/Ketho)
-* [Folke Lemaitre](https://github.com/folke)
-* [Vikas Raj](https://github.com/numToStr)
-
-## Telemetry
-
-This language server collects usage data and sends it to the development team to help improve the extension. Read our [privacy policy](https://github.com/sumneko/lua-language-server/wiki/Privacy-Policy) to learn more and how to disable any telemetry.
+[checkmark]: https://user-images.githubusercontent.com/61925890/183228083-d3aa4eca-30c7-4b9f-aaab-26ce3d8a14fb.png

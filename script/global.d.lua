@@ -33,3 +33,34 @@ FOOTPRINT = false
 ---trace rpc, use command line: --rpclog=true
 ---@type boolean
 RPCLOG = false
+
+--enable preview features.
+--
+--the current version is `formatting`
+---@type boolean
+PREVIEW = false
+
+--check path
+---@type string
+CHECK = ''
+
+--make docs path
+---@type string
+DOC = ''
+
+---@type string | '"Error"' | '"Warning"' | '"Information"' | '"Hint"'
+CHECKLEVEL = 'Warning'
+
+---@type 'trace' | 'debug' | 'info' | 'warn' | 'error'
+LOGLEVEL = 'warn'
+
+---@type boolean
+LAZY = false
+
+-- (experiment) Improve performance, but reduce accuracy
+---@type boolean
+CACHEALIVE = false
+
+-- (experiment) Compile files in multi cpu cores
+---@type integer
+COMPILECORES = 0

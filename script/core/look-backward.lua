@@ -2,7 +2,8 @@
 local m = {}
 
 --- 是否是空白符
----@param inline boolean # 必须在同一行中（排除换行符）
+---@param char    string
+---@param inline? boolean # 必须在同一行中（排除换行符）
 function m.isSpace(char, inline)
     if inline then
         if char == ' '
@@ -21,7 +22,9 @@ function m.isSpace(char, inline)
 end
 
 --- 跳过空白符
----@param inline boolean # 必须在同一行中（排除换行符）
+---@param text    string
+---@param offset  integer
+---@param inline? boolean # 必须在同一行中（排除换行符）
 function m.skipSpace(text, offset, inline)
     for i = offset, 1, -1 do
         local char = text:sub(i, i)
@@ -34,11 +37,11 @@ end
 
 function m.findWord(text, offset)
     for i = offset, 1, -1 do
-        if not text:sub(i, i):match '[%w_]' then
+        if not text:sub(i, i):match '[%w_\x80-\xff]' then
             if i == offset then
                 return nil
             end
-            return text:sub(i+1, offset), i+1
+            return text:sub(i + 1, offset), i + 1
         end
     end
     return text:sub(1, offset), 1
@@ -54,7 +57,9 @@ function m.findSymbol(text, offset)
         or char == ':'
         or char == '('
         or char == ','
-        or char == '=' then
+        or char == '['
+        or char == '='
+        or char == '{' then
             return char, i
         else
             return nil
@@ -77,9 +82,19 @@ function m.findTargetSymbol(text, offset, symbol)
     return nil
 end
 
-function m.findAnyOffset(text, offset)
+---@param text string
+---@param offset integer
+---@param inline? boolean # 必须在同一行中（排除换行符）
+function m.findAnyOffset(text, offset, inline)
     for i = offset, 1, -1 do
-        if not m.isSpace(text:sub(i, i)) then
+        local c = text:sub(i, i)
+        if inline then
+            if c == '\r'
+            or c == '\n' then
+                return nil
+            end
+        end
+        if not m.isSpace(c) then
             return i
         end
     end

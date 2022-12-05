@@ -2,23 +2,24 @@ local files    = require 'files'
 local guide    = require 'parser.guide'
 local lang     = require 'language'
 local define   = require 'proto.define'
-local vm       = require 'vm'
-local noder    = require 'core.noder'
+local await    = require 'await'
 
+---@async
 return function (uri, callback)
     local ast = files.getState(uri)
     if not ast then
         return
     end
-
+    ---@async
     guide.eachSourceType(ast.ast, 'table', function (source)
+        await.delay()
         local mark = {}
         for _, obj in ipairs(source) do
             if obj.type == 'tablefield'
             or obj.type == 'tableindex'
             or obj.type == 'tableexp' then
-                local name = noder.getID(obj)
-                if name and name:sub(-1) ~= '*' then
+                local name = guide.getKeyName(obj)
+                if name  then
                     if not mark[name] then
                         mark[name] = {}
                     end

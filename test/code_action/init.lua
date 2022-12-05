@@ -38,13 +38,12 @@ end
 
 function TEST(script)
     return function (expect)
-        files.removeAll()
-
         local newScript, catched = catch(script, '?')
-        files.setText('', newScript)
-        local results = core('', catched['?'][1][1], catched['?'][1][2])
+        files.setText(TESTURI, newScript)
+        local results = core(TESTURI, catched['?'][1][1], catched['?'][1][2])
         assert(results)
         assert(eq(expect, results))
+        files.remove(TESTURI)
     end
 end
 
@@ -108,6 +107,36 @@ return function(<?a?>, b, c) end
         title = lang.script('ACTION_SWAP_PARAMS', {
             node  = lang.script.SYMBOL_ANONYMOUS,
             index = 3,
+        }),
+        kind  = 'refactor.rewrite',
+        edit  = EXISTS,
+    },
+}
+
+TEST [[
+f = function (<?a?>, b) end
+]]
+{
+    {
+        title = lang.script('ACTION_SWAP_PARAMS', {
+            node  = 'f',
+            index = 2,
+        }),
+        kind  = 'refactor.rewrite',
+        edit  = EXISTS,
+    },
+}
+
+TEST [[
+local t = {
+    f = function (<?a?>, b) end
+}
+]]
+{
+    {
+        title = lang.script('ACTION_SWAP_PARAMS', {
+            node  = 'f',
+            index = 2,
         }),
         kind  = 'refactor.rewrite',
         edit  = EXISTS,

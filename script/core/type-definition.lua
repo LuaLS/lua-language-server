@@ -1,11 +1,10 @@
-local searcher   = require 'core.searcher'
 local workspace  = require 'workspace'
 local files      = require 'files'
 local vm         = require 'vm'
 local findSource = require 'core.find-source'
 local guide      = require 'parser.guide'
-local infer      = require 'core.infer'
 local rpath      = require 'workspace.require-path'
+local jumpSource = require 'core.jump-source'
 
 local function sortResults(results)
     -- 先按照顺序排序
@@ -53,8 +52,8 @@ local accept = {
     ['doc.class.name']   = true,
     ['doc.extends.name'] = true,
     ['doc.alias.name']   = true,
+    ['doc.enum.name']    = true,
     ['doc.see.name']     = true,
-    ['doc.see.field']    = true,
 }
 
 local function checkRequire(source, offset)
@@ -76,7 +75,7 @@ local function checkRequire(source, offset)
         return nil
     end
     if     libName == 'require' then
-        return rpath.findUrisByRequirePath(literal)
+        return rpath.findUrisByRequireName(guide.getUri(source), literal)
     elseif libName == 'dofile'
     or     libName == 'loadfile' then
         return workspace.findUrisByFilePath(literal)
@@ -132,33 +131,29 @@ return function (uri, offset)
         end
     end
 
-    local defs = vm.getAllDefs(source)
-    local values = {}
-    for _, src in ipairs(defs) do
-        local value = searcher.getObjectValue(src)
-        if value and value ~= src and guide.isLiteral(value) then
-            values[value] = true
-        end
-    end
+    local defs = vm.getDefs(source)
 
     for _, src in ipairs(defs) do
-        if src.dummy then
-            goto CONTINUE
-        end
-        if values[src] then
-            goto CONTINUE
-        end
         local root = guide.getRoot(src)
         if not root then
             goto CONTINUE
         end
         src = src.field or src.method or src.index or src
+        if src.type == 'doc.class' then
+            src = src.class
+        end
+        if src.type == 'doc.alias' then
+            src = src.alias
+        end
+        if src.type == 'doc.enum' then
+            src = src.enum
+        end
         if src.type == 'doc.class.name'
         or src.type == 'doc.alias.name'
         or src.type == 'doc.type.function'
         or src.type == 'doc.type.array'
         or src.type == 'doc.type.table'
-        or src.type == 'doc.type.ltable' then
+        or src.type == 'function' then
             results[#results+1] = {
                 target = src,
                 uri    = root.uri,
@@ -173,6 +168,7 @@ return function (uri, offset)
     end
 
     sortResults(results)
+    jumpSource(results)
 
     return results
 end

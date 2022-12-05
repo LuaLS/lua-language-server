@@ -5,8 +5,11 @@ local config   = require 'config'
 local platform = require 'bee.platform'
 local catch    = require 'catch'
 
-config.get 'Lua.diagnostics.neededFileStatus'['deprecated'] = 'Any'
-config.get 'Lua.diagnostics.neededFileStatus'['type-check'] = 'Any'
+
+config.get(nil, 'Lua.diagnostics.neededFileStatus')['deprecated'] = 'Any'
+config.get(nil, 'Lua.diagnostics.neededFileStatus')['type-check'] = 'Any'
+config.get(nil, 'Lua.diagnostics.neededFileStatus')['duplicate-set-field'] = 'Any'
+config.get(nil, 'Lua.diagnostics.neededFileStatus')['codestyle-check'] = 'None'
 
 rawset(_G, 'TEST', true)
 
@@ -31,8 +34,6 @@ end
 
 ---@diagnostic disable: await-in-sync
 function TEST(datas)
-    files.removeAll()
-
     local targetList = {}
     for _, data in ipairs(datas) do
         local uri = furi.encode(data.path)
@@ -48,24 +49,25 @@ function TEST(datas)
         files.setText(uri, newScript)
     end
 
-    local result = {}
-    for _, data in ipairs(datas) do
-        local uri = furi.encode(data.path)
-        local results = {}
-        core(uri, function (result)
-            for _, res in ipairs(result) do
-                results[#results+1] = res
-            end
-        end)
-        for i, position in ipairs(results) do
-            result[i] = {
-                position.start,
-                position.finish,
-                uri,
-            }
+    local _ <close> = function ()
+        for _, info in ipairs(datas) do
+            files.remove(furi.encode(info.path))
         end
     end
-    assert(founded(targetList, result))
+
+
+    local results = {}
+    for _, data in ipairs(datas) do
+        local uri = furi.encode(data.path)
+        core(uri, false, function (result)
+            results[#results+1] = {
+                result.start,
+                result.finish,
+                uri,
+            }
+        end)
+    end
+    assert(founded(targetList, results))
 end
 
 TEST {
@@ -138,4 +140,74 @@ TEST {
         path = 'c.lua',
         content = 'require "f.a"',
     },
+}
+
+TEST {
+    { path = 'a.lua', content = [[
+        ---@class A
+        ---@field package x string
+
+        ---@type A
+        local obj
+
+        print(obj.x)
+    ]]},
+}
+
+TEST {
+    { path = 'a.lua', content = [[
+        ---@class A
+        ---@field package x string
+    ]]},
+    { path = 'b.lua', content = [[
+        ---@type A
+        local obj
+
+        print(obj.<!x!>)
+    ]]}
+}
+
+TEST {
+    { path = 'a.lua', content = [[
+        ---@class A
+        ---@field <!x!> number
+    ]]},
+    { path = 'b.lua', content = [[
+        ---@class A
+        ---@field <!x!> number
+    ]]}
+}
+
+TEST {
+    { path = 'a.lua', content = [[
+        ---@class A
+        local mt
+
+        function <!mt:init!>()
+        end
+    ]]},
+    { path = 'b.lua', content = [[
+        ---@class A
+        local mt
+
+        function <!mt:init!>()
+        end
+    ]]}
+}
+
+TEST {
+    { path = 'a.lua', content = [[
+        ---@class A
+        local mt
+
+        function mt:init()
+        end
+    ]]},
+    { path = 'b.lua', content = [[
+        ---@class B: A
+        local mt
+
+        function mt:init()
+        end
+    ]]}
 }

@@ -1,3 +1,4 @@
+---@diagnostic disable: await-in-sync
 local core  = require 'core.highlight'
 local files = require 'files'
 local catch = require 'catch'
@@ -19,19 +20,20 @@ local function founded(targets, results)
 end
 
 function TEST(script)
-    files.removeAll()
     local newScript, catched = catch(script, '!')
-    files.setText('', newScript)
+    files.setText(TESTURI, newScript)
     for _, enter in ipairs(catched['!']) do
         local start, finish = enter[1], enter[2]
         local pos = (start + finish) // 2
-        local positions = core('', pos)
+        local positions = core(TESTURI, pos)
+        assert(positions)
         local results = {}
         for _, position in ipairs(positions) do
             results[#results+1] = { position.start, position.finish }
         end
         assert(founded(catched['!'], results))
     end
+    files.remove(TESTURI)
 end
 
 TEST [[
@@ -138,4 +140,17 @@ TEST [[
 TEST [[
 <!TEST1!> = 1
 TEST2 = 2
+]]
+
+TEST [[
+local zing = foo
+local foo = 4
+
+local bar = {
+    <!baz!> = foo
+}
+
+bar.<!baz!> = 5
+
+print(bar.<!baz!>)
 ]]

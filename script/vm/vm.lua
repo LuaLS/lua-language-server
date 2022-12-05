@@ -1,38 +1,18 @@
 local guide     = require 'parser.guide'
-local util      = require 'utility'
 local files     = require 'files'
 local timer     = require 'timer'
 
 local setmetatable   = setmetatable
-local running        = coroutine.running
-local ipairs         = ipairs
 local log            = log
 local xpcall         = xpcall
 local mathHuge       = math.huge
 
 local weakMT = { __mode = 'kv' }
 
-_ENV = nil
-
 ---@class vm
 local m = {}
 
-function m.getArgInfo(source)
-    local callargs = source.parent
-    if not callargs or callargs.type ~= 'callargs' then
-        return nil
-    end
-    local call = callargs.parent
-    if not call or call.type ~= 'call' then
-        return nil
-    end
-    for i = 1, #callargs do
-        if callargs[i] == source then
-            return call.node, i
-        end
-    end
-    return nil
-end
+m.ID_SPLITE = '\x1F'
 
 function m.getSpecial(source)
     if not source then
@@ -41,6 +21,8 @@ function m.getSpecial(source)
     return source.special
 end
 
+---@param source parser.object
+---@return string?
 function m.getKeyName(source)
     if not source then
         return nil
@@ -67,6 +49,32 @@ function m.getKeyType(source)
         end
     end
     return guide.getKeyType(source)
+end
+
+---@param source parser.object
+---@return parser.object?
+function m.getObjectValue(source)
+    if source.value then
+        return source.value
+    end
+    if source.special == 'rawset' then
+        return source.args and source.args[3]
+    end
+    return nil
+end
+
+---@param source parser.object
+---@return parser.object?
+function m.getObjectFunctionValue(source)
+    local value = m.getObjectValue(source)
+    if value == nil then return end
+    if value.type == 'function' or value.type == 'doc.type.function' then
+        return value
+    end
+    if value.type == 'getlocal' then
+        return m.getObjectFunctionValue(value.node)
+    end
+    return value
 end
 
 m.cacheTracker = setmetatable({}, weakMT)

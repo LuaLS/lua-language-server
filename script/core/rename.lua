@@ -1,11 +1,8 @@
 local files      = require 'files'
 local vm         = require 'vm'
-local proto      = require 'proto'
-local define     = require 'proto.define'
 local util       = require 'utility'
 local findSource = require 'core.find-source'
 local guide      = require 'parser.guide'
-local noder      = require 'core.noder'
 
 local Forcing
 
@@ -84,6 +81,9 @@ local function renameField(source, newname, callback)
         local uri   = guide.getUri(source)
         local text  = files.getText(uri)
         local state = files.getState(uri)
+        if not state or not text then
+            return false
+        end
         local func = parent.value
         -- function mt:name () end --> mt['newname'] = function (self) end
         local startOffset  = guide.positionToOffset(state, parent.start) + 1
@@ -181,65 +181,86 @@ local function ofFieldThen(key, src, newname, callback)
     end
 end
 
+---@async
 local function ofField(source, newname, callback)
-    local key = guide.getKeyName(source)
-    local node
-    if source.type == 'tablefield'
-    or source.type == 'tableindex' then
-        node = source.parent
-    else
-        node = source.node
-    end
-    for _, src in ipairs(vm.getAllRefs(node, '*')) do
-        ofFieldThen(key, src, newname, callback)
+    local key  = guide.getKeyName(source)
+    local refs = vm.getRefs(source)
+    for _, ref in ipairs(refs) do
+        ofFieldThen(key, ref, newname, callback)
     end
 end
 
+---@async
 local function ofGlobal(source, newname, callback)
     local key = guide.getKeyName(source)
-    for _, src in ipairs(vm.getAllRefs(source)) do
-        ofFieldThen(key, src, newname, callback)
+    if not key then
+        return
+    end
+    local global = vm.getGlobal('variable', key)
+    if not global then
+        return
+    end
+    local uri = guide.getUri(source)
+    for _, set in ipairs(global:getSets(uri)) do
+        ofFieldThen(key, set, newname, callback)
+    end
+    for _, get in ipairs(global:getGets(uri)) do
+        ofFieldThen(key, get, newname, callback)
     end
 end
 
+---@async
 local function ofLabel(source, newname, callback)
-    for _, src in ipairs(vm.getAllRefs(source)) do
+    for _, src in ipairs(vm.getRefs(source)) do
         callback(src, src.start, src.finish, newname)
     end
 end
 
+---@async
 local function ofDocTypeName(source, newname, callback)
     local oldname = source[1]
-    for _, doc in ipairs(vm.getAllRefs(source)) do
-        if doc.type == 'doc.class.name'
-        or doc.type == 'doc.type.name'
-        or doc.type == 'doc.alias.name' then
-            if oldname == doc[1] then
-                callback(doc, doc.start, doc.finish, newname)
-            end
+    local global = vm.getGlobal('type', oldname)
+    if not global then
+        return
+    end
+    local uri = guide.getUri(source)
+    for _, doc in ipairs(global:getSets(uri)) do
+        if doc.type == 'doc.class' then
+            callback(doc, doc.class.start, doc.class.finish, newname)
+        end
+        if doc.type == 'doc.alias' then
+            callback(doc, doc.alias.start, doc.alias.finish, newname)
+        end
+        if doc.type == 'doc.enum' then
+            callback(doc, doc.enum.start, doc.enum.finish, newname)
+        end
+    end
+    for _, doc in ipairs(global:getGets(uri)) do
+        if doc.type == 'doc.type.name' then
+            callback(doc, doc.start, doc.finish, newname)
         end
     end
 end
 
 local function ofDocParamName(source, newname, callback)
     callback(source, source.start, source.finish, newname)
-    local doc = noder.getDocState(source)
-    if doc.bindSources then
-        for _, src in ipairs(doc.bindSources) do
-            if src.type == 'local'
-            and src.parent.type == 'funcargs'
-            and src[1] == source[1] then
-                renameLocal(src, newname, callback)
-                if src.ref then
-                    for _, ref in ipairs(src.ref) do
-                        renameLocal(ref, newname, callback)
-                    end
+    local doc = source.parent
+    local src = doc.bindSource
+    if src then
+        if src.type == 'local'
+        and src.parent.type == 'funcargs'
+        and src[1] == source[1] then
+            renameLocal(src, newname, callback)
+            if src.ref then
+                for _, ref in ipairs(src.ref) do
+                    renameLocal(ref, newname, callback)
                 end
             end
         end
     end
 end
 
+---@async
 local function rename(source, newname, callback)
     if source.type == 'label'
     or source.type == 'goto' then
@@ -258,7 +279,8 @@ local function rename(source, newname, callback)
         return ofGlobal(source, newname, callback)
     elseif source.type == 'doc.class.name'
     or     source.type == 'doc.type.name'
-    or     source.type == 'doc.alias.name' then
+    or     source.type == 'doc.alias.name'
+    or     source.type == 'doc.enum.name' then
         return ofDocTypeName(source, newname, callback)
     elseif source.type == 'doc.param.name' then
         return ofDocParamName(source, newname, callback)
@@ -276,7 +298,6 @@ local function rename(source, newname, callback)
             return ofField(parent, newname, callback)
         end
     end
-    return
 end
 
 local function prepareRename(source)
@@ -293,6 +314,7 @@ local function prepareRename(source)
     or source.type == 'doc.class.name'
     or source.type == 'doc.type.name'
     or source.type == 'doc.alias.name'
+    or source.type == 'doc.enum.name'
     or source.type == 'doc.param.name' then
         return source, source[1]
     elseif source.type == 'string'
@@ -333,10 +355,12 @@ local accept = {
     ['doc.type.name']  = true,
     ['doc.alias.name'] = true,
     ['doc.param.name'] = true,
+    ['doc.enum.name']  = true,
 }
 
 local m = {}
 
+---@async
 function m.rename(uri, pos, newname)
     if not newname then
         return nil
@@ -362,7 +386,7 @@ function m.rename(uri, pos, newname)
             return
         end
         mark[uid] = true
-        if files.isLibrary(turi) then
+        if files.isLibrary(turi, true) then
             return
         end
         results[#results+1] = {

@@ -2,6 +2,7 @@ local proto  = require 'proto.proto'
 local util   = require 'utility'
 local timer  = require "timer"
 local config = require 'config'
+local time   = require 'bee.time'
 
 local nextToken = util.counter()
 
@@ -10,9 +11,10 @@ local m = {}
 m.map = {}
 
 ---@class progress
+---@field _uri   uri
+---@field _token integer
 local mt = {}
 mt.__index     = mt
-mt._token      = nil
 mt._title      = nil
 mt._message    = nil
 mt._removed    = false
@@ -44,6 +46,10 @@ function mt:remove()
     end
 end
 
+function mt:isRemoved()
+    return self._removed == true
+end
+
 ---设置描述
 ---@param message string # 描述
 function mt:setMessage(message)
@@ -52,7 +58,7 @@ function mt:setMessage(message)
     end
     self._message = message
     self._dirty   = true
-    self:_update()
+    self:update()
 end
 
 ---设置百分比
@@ -63,16 +69,16 @@ function mt:setPercentage(per)
     end
     self._percentage = math.floor(per)
     self._dirty      = true
-    self:_update()
+    self:update()
 end
 
 ---取消事件
 function mt:onCancel(callback)
     self._onCancel = callback
-    self:_update()
+    self:update()
 end
 
-function mt:_update()
+function mt:update()
     if self._removed then
         return
     end
@@ -80,10 +86,10 @@ function mt:_update()
         return
     end
     if  not self._showed
-    and self._clock + self._delay <= os.clock() then
-        self._updated = os.clock()
+    and self._clock + self._delay <= time.time() then
+        self._updated = time.time()
         self._dirty = false
-        if not config.get 'Lua.window.progressBar' then
+        if not config.get(self._uri, 'Lua.window.progressBar') then
             return
         end
         proto.request('window/workDoneProgress/create', {
@@ -106,15 +112,15 @@ function mt:_update()
     if not self._showed then
         return
     end
-    if not config.get 'Lua.window.progressBar' then
+    if not config.get(self._uri, 'Lua.window.progressBar') then
         self:remove()
         return
     end
-    if os.clock() - self._updated < 0.05 then
+    if time.time() - self._updated < 50 then
         return
     end
     self._dirty = false
-    self._updated = os.clock()
+    self._updated = time.time()
     proto.notify('$/progress', {
         token = self._token,
         value = {
@@ -134,26 +140,29 @@ end
 function m.update()
     ---@param prog progress
     for _, prog in pairs(m.map) do
-        if prog._removed then
+        if prog:isRemoved() then
             goto CONTINUE
         end
-        prog:_update()
+        prog:update()
         ::CONTINUE::
     end
 end
 
 ---创建一个进度条
+---@param uri?  uri
 ---@param title string # 标题
 ---@param delay number # 至少经过这么久之后才会显示出来
-function m.create(title, delay)
+function m.create(uri, title, delay)
+    local token = nextToken()
     local prog = setmetatable({
-        _token = nextToken(),
+        _token = token,
         _title = title,
-        _clock = os.clock(),
-        _delay = delay,
+        _clock = time.time(),
+        _delay = delay * 1000,
+        _uri   = uri,
     }, mt)
 
-    m.map[prog._token] = prog
+    m.map[token] = prog
 
     return prog
 end

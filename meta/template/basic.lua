@@ -6,12 +6,13 @@ arg = {}
 
 ---#DES 'assert'
 ---@generic T
----@param v T
----@param message any
+---@param v? T
+---@param message? any
 ---@return T
-function assert(v, message) end
+---@return any ...
+function assert(v, message, ...) end
 
----@alias cgopt
+---@alias gcoptions
 ---|>'"collect"'      # ---#DESTAIL 'cgopt.collect'
 ---| '"stop"'         # ---#DESTAIL 'cgopt.stop'
 ---| '"restart"'      # ---#DESTAIL 'cgopt.restart'
@@ -28,12 +29,12 @@ function assert(v, message) end
 
 ---#if VERSION >= 5.4 then
 ---#DES 'collectgarbage'
----@param opt? cgopt
+---@param opt? gcoptions
 ---@return any
 function collectgarbage(opt, ...) end
 ---#else
 ---#DES 'collectgarbage'
----@param opt? cgopt
+---@param opt? gcoptions
 ---@param arg? integer
 ---@return any
 function collectgarbage(opt, arg) end
@@ -41,7 +42,7 @@ function collectgarbage(opt, arg) end
 
 ---#DES 'dofile'
 ---@param filename? string
----@return any
+---@return any ...
 function dofile(filename) end
 
 ---#DES 'error'
@@ -55,7 +56,7 @@ _G = {}
 
 ---@version 5.1
 ---#DES 'getfenv'
----@param f? async fun()
+---@param f? integer|async fun(...):...
 ---@return table
 ---@nodiscard
 function getfenv(f) end
@@ -83,8 +84,8 @@ function ipairs(t) end
 ---#DES 'load<5.1'
 ---@param func       function
 ---@param chunkname? string
----@return function
----@return string   error_message
+---@return function?
+---@return string?   error_message
 ---@nodiscard
 function load(func, chunkname) end
 ---#else
@@ -93,8 +94,8 @@ function load(func, chunkname) end
 ---@param chunkname? string
 ---@param mode?      loadmode
 ---@param env?       table
----@return function
----@return string   error_message
+---@return function?
+---@return string?   error_message
 ---@nodiscard
 function load(chunk, chunkname, mode, env) end
 ---#end
@@ -102,8 +103,8 @@ function load(chunk, chunkname, mode, env) end
 ---#if VERSION <= 5.1 and not JIT then
 ---#DES 'loadfile'
 ---@param filename? string
----@return function
----@return string   error_message
+---@return function?
+---@return string?  error_message
 ---@nodiscard
 function loadfile(filename) end
 ---#else
@@ -111,8 +112,8 @@ function loadfile(filename) end
 ---@param filename? string
 ---@param mode?     loadmode
 ---@param env?      table
----@return function
----@return string   error_message
+---@return function?
+---@return string?  error_message
 ---@nodiscard
 function loadfile(filename, mode, env) end
 ---#end
@@ -121,10 +122,16 @@ function loadfile(filename, mode, env) end
 ---#DES 'loadstring'
 ---@param text       string
 ---@param chunkname? string
----@return function
----@return string error_message
+---@return function?
+---@return string?   error_message
 ---@nodiscard
 function loadstring(text, chunkname) end
+
+---@version 5.1
+---@param proxy boolean|table
+---@return userdata
+---@nodiscard
+function newproxy(proxy) end
 
 ---@version 5.1
 ---#DES 'module'
@@ -135,8 +142,8 @@ function module(name, ...) end
 ---@generic K, V
 ---@param table table<K, V>
 ---@param index? K
----@return K
----@return V
+---@return K?
+---@return V?
 ---@nodiscard
 function next(table, index) end
 
@@ -151,12 +158,12 @@ function pairs(t) end
 ---#if VERSION == 5.1 and not JIT then
 ---@param f     function
 ---#else
----@param f     async fun()
+---@param f     async fun(...):...
 ---#end
 ---@param arg1? any
 ---@return boolean success
 ---@return any result
----@return ...
+---@return any ...
 function pcall(f, arg1, ...) end
 
 ---#DES 'print'
@@ -197,23 +204,23 @@ function select(index, ...) end
 
 ---@version 5.1
 ---#DES 'setfenv'
----@param f     async fun()|integer
+---@param f     async fun(...):...|integer
 ---@param table table
 ---@return function
 function setfenv(f, table) end
 
 ---#DES 'setmetatable'
----@param table     table
----@param metatable table
+---@param table      table
+---@param metatable? table
 ---@return table
 function setmetatable(table, metatable) end
 
 ---#DES 'tonumber'
----@param e     string|number
----@param base? integer
+---@overload fun(e: string, base: integer):integer
+---@param e any
 ---@return number?
 ---@nodiscard
-function tonumber(e, base) end
+function tonumber(e) end
 
 ---#DES 'tostring'
 ---@param v any
@@ -230,6 +237,9 @@ function tostring(v) end
 ---| '"function"'
 ---| '"thread"'
 ---| '"userdata"'
+---#if VERSION == JIT then
+---| '"cdata"'
+---#end
 
 ---#DES 'type'
 ---@param v any
@@ -259,23 +269,25 @@ function warn(message, ...) end
 ---@param err   function
 ---@return boolean success
 ---@return any result
----@return ...
+---@return any ...
 function xpcall(f, err) end
 ---#else
 ---#DES 'xpcall>5.2'
----@param f     async fun()
+---@param f     async fun(...):...
 ---@param msgh  function
 ---@param arg1? any
 ---@return boolean success
 ---@return any result
----@return ...
+---@return any ...
 function xpcall(f, msgh, arg1, ...) end
 ---#end
 
 ---@version 5.1
 ---#DES 'unpack'
----@param list table
+---@generic T
+---@param list T[]
 ---@param i?   integer
 ---@param j?   integer
+---@return T   ...
 ---@nodiscard
 function unpack(list, i, j) end

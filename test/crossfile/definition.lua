@@ -26,9 +26,8 @@ local function founded(targets, results)
     return true
 end
 
+---@async
 function TEST(datas)
-    files.removeAll()
-
     local targetList = {}
     local sourceList
     local sourceUri
@@ -49,11 +48,17 @@ function TEST(datas)
                 uri,
             }
         end
-        if catched['?'] or catched['~'] then
-            sourceList = catched['?'] or catched['~']
+        if #catched['?'] > 0 or #catched['~'] > 0 then
+            sourceList = catched['?'] + catched['~']
             sourceUri = uri
         end
         files.setText(uri, newScript)
+    end
+
+    local _ <close> = function ()
+        for _, info in ipairs(datas) do
+            files.remove(furi.encode(info.path))
+        end
     end
 
     local sourcePos = (sourceList[1][1] + sourceList[1][2]) // 2
@@ -117,7 +122,7 @@ TEST {
     },
 }
 
-config.set('Lua.runtime.pathStrict', true)
+config.set(nil, 'Lua.runtime.pathStrict', true)
 TEST {
     {
         path = 'aaa/bbb.lua',
@@ -140,12 +145,12 @@ TEST {
     },
 }
 
-config.set('Lua.runtime.pathStrict', false)
+config.set(nil, 'Lua.runtime.pathStrict', false)
 
 TEST {
     {
         path = 'a.lua',
-        content = 'local <!t!> = 1; return <!t!>',
+        content = 'return <!function () end!>',
     },
     {
         path = 'b.lua',
@@ -156,7 +161,7 @@ TEST {
 TEST {
     {
         path = 'a.lua',
-        content = 'local <!t!> = 1; return <!t!>',
+        content = 'return <!function () end!>',
     },
     {
         path = 'b.lua',
@@ -184,7 +189,7 @@ local <~t~>
 TEST {
     {
         path = 'a.lua',
-        content = 'local <!t!> = 1; return <!t!>',
+        content = 'return <!function () end!>',
     },
     {
         path = 'b.lua',
@@ -250,7 +255,7 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            return <!a():b():c()!>
+            return a():b():c()
         ]],
     },
     {
@@ -351,9 +356,7 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            return <!{
-                a = 1,
-            }!>
+            return <!function () end!>
         ]],
     },
     {
@@ -391,9 +394,9 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            local function <!f!>()
-            end
-            return <!f!>
+            local <!function f()
+            end!>
+            return f
         ]]
     },
     {
@@ -432,7 +435,7 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            local <!x!>
+            local x
             return {
                 <!x!> = x,
             }
@@ -451,11 +454,11 @@ TEST {
     {
         path = 'a.lua',
         content = [[
-            local function <!f!>()
-            end
+            local <!function f()
+            end!>
 
             return {
-                <!f!> = f,
+                f = f,
             }
         ]]
     },
@@ -606,7 +609,7 @@ TEST {
         path = 'a.lua',
         content = [[
             ---@class Class
-            local <!obj!>
+            local obj
         ]]
     },
     {
@@ -632,7 +635,7 @@ TEST {
         path = 'b.lua',
         content = [[
             ---@class Class
-            local <!obj!>
+            local obj
         ]]
     },
 }
@@ -684,8 +687,8 @@ TEST {
     }
 }
 
-local originOS = platform.OS
-platform.OS = 'Linux'
+
+if platform.OS == 'Linux' then
 
 TEST {
     {
@@ -738,10 +741,11 @@ TEST {
         ]]
     }
 }
-platform.OS = originOS
 
-local originRuntimePath = config.get 'Lua.runtime.path'
-config.set('Lua.runtime.path', {
+end
+
+local originRuntimePath = config.get(nil, 'Lua.runtime.path')
+config.set(nil, 'Lua.runtime.path', {
     '?/1.lua',
 })
 TEST {
@@ -760,7 +764,7 @@ TEST {
     },
 }
 
-config.set('Lua.runtime.path', {
+config.set(nil, 'Lua.runtime.path', {
     'D:/?/1.lua',
 })
 TEST {
@@ -778,7 +782,7 @@ TEST {
         ]],
     },
 }
-config.set('Lua.runtime.path', originRuntimePath)
+config.set(nil, 'Lua.runtime.path', originRuntimePath)
 
 TEST {
     {
@@ -795,14 +799,11 @@ TEST {
     },
 }
 
-config.set('Lua.IntelliSense.traceFieldInject', true)
 TEST {
     {
         path = 'a.lua',
         content = [[
-local t = GlobalTable
-
-t.settings = {
+GlobalTable.settings = {
     <!test!> = 1
 }
         ]]
@@ -816,7 +817,27 @@ print(b.<?test?>)
         ]]
     }
 }
-config.set('Lua.IntelliSense.traceFieldInject', false)
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+GlobalTable = {
+    settings = {
+        <!test!> = 1
+    }
+}
+        ]]
+    },
+    {
+        path = 'b.lua',
+        content = [[
+local b = GlobalTable.settings
+
+print(b.<?test?>)
+        ]]
+    }
+}
 
 TEST {
     {
@@ -868,9 +889,9 @@ print(t.<?x?>)
     }
 }
 
-local originRuntimePath = config.get 'Lua.runtime.path'
+local originRuntimePath = config.get(nil, 'Lua.runtime.path')
 
-config.set('Lua.runtime.path', {
+config.set(nil, 'Lua.runtime.path', {
     './?.lua'
 })
 TEST {
@@ -891,7 +912,7 @@ print(t.<?x?>)
     }
 }
 
-config.set('Lua.runtime.path', {
+config.set(nil, 'Lua.runtime.path', {
     '/home/?.lua'
 })
 TEST {
@@ -912,8 +933,8 @@ print(t.<?x?>)
     }
 }
 
-config.set('Lua.runtime.pathStrict', true)
-config.set('Lua.runtime.path', {
+config.set(nil, 'Lua.runtime.pathStrict', true)
+config.set(nil, 'Lua.runtime.path', {
     './?.lua'
 })
 TEST {
@@ -934,7 +955,7 @@ print(t.<?x?>)
     }
 }
 
-config.set('Lua.runtime.path', {
+config.set(nil, 'Lua.runtime.path', {
     '/home/?.lua'
 })
 TEST {
@@ -955,5 +976,16 @@ print(t.<?x?>)
     }
 }
 
-config.set('Lua.runtime.pathStrict', false)
-config.set('Lua.runtime.path', originRuntimePath)
+config.set(nil, 'Lua.runtime.pathStrict', false)
+config.set(nil, 'Lua.runtime.path', originRuntimePath)
+
+-- Don't require self
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+local <~f~> = require 'a'
+return function () end
+        ]]
+    }
+}

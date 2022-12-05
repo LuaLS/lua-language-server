@@ -21,34 +21,36 @@ local function founded(targets, results)
     return true
 end
 
+---@async
 function TEST(script)
-    files.removeAll()
     local newScript, catched = catch(script, '!?')
 
-    files.setText('', newScript)
+    files.setText(TESTURI, newScript)
 
-    local results = core('', catched['?'][1][1])
+    local results = core(TESTURI, catched['?'][1][1])
     if results then
         local positions = {}
         for i, result in ipairs(results) do
             if not vm.isMetaFile(result.uri) then
-                positions[i] = { result.target.start, result.target.finish }
+                positions[#positions+1] = { result.target.start, result.target.finish }
             end
         end
-        assert(founded(catched['!'] or {}, positions))
+        assert(founded(catched['!'], positions))
     else
-        assert(catched['!'] == nil)
+        assert(#catched['!'] == 0)
     end
+
+    files.remove(TESTURI)
 end
 
 require 'definition.local'
 require 'definition.set'
+require 'definition.field'
 require 'definition.arg'
 require 'definition.function'
 require 'definition.table'
 require 'definition.method'
 require 'definition.label'
-require 'definition.call'
 require 'definition.special'
 require 'definition.bug'
 require 'definition.luadoc'

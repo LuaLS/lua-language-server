@@ -1,6 +1,7 @@
 local core   = require 'core.completion'
 local files  = require 'files'
 local catch  = require 'catch'
+local guide  = require 'parser.guide'
 
 EXISTS = {'EXISTS'}
 
@@ -65,18 +66,27 @@ ContinueTyping = false
 function TEST(script)
     return function (expect)
         ---@diagnostic disable: await-in-sync
-        files.removeAll()
         local newScript, catched = catch(script, '?')
 
-        files.setText('', newScript)
-        core.clearCache()
-        local inputPos = catched['?'][1][1]
+        files.setText(TESTURI, newScript)
+        local state = files.getState(TESTURI)
+        local inputPos = catched['?'][1][2]
         if ContinueTyping then
             local triggerCharacter = script:sub(inputPos - 1, inputPos - 1)
-            core.completion('', inputPos, triggerCharacter)
+            if triggerCharacter == '\n'
+            or triggerCharacter:find '%w_' then
+                triggerCharacter = nil
+            end
+            core.completion(TESTURI, inputPos, triggerCharacter)
         end
-        local triggerCharacter = script:sub(inputPos, inputPos)
-        local result = core.completion('', inputPos, triggerCharacter)
+        local offset = guide.positionToOffset(state, inputPos)
+        local triggerCharacter = script:sub(offset, offset)
+        if triggerCharacter == '\n'
+        or triggerCharacter:find '%w_' then
+            triggerCharacter = nil
+        end
+        local result = core.completion(TESTURI, inputPos, triggerCharacter)
+
         if not expect then
             assert(result == nil)
             return
@@ -110,12 +120,18 @@ function TEST(script)
             end
         end
         assert(result)
-        if expect.include then
-            expect.include = nil
-            assert(include(expect, result))
+        result.complete = nil
+        if type(expect) == 'function' then
+            expect(result)
         else
-            assert(eq(expect, result))
+            if expect.include then
+                expect.include = nil
+                assert(include(expect, result))
+            else
+                assert(eq(expect, result))
+            end
         end
+        files.remove(TESTURI)
     end
 end
 

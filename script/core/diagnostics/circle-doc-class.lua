@@ -1,9 +1,10 @@
 local files    = require 'files'
-local searcher = require 'core.searcher'
 local lang     = require 'language'
 local vm       = require 'vm'
 local guide    = require 'parser.guide'
+local await    = require 'await'
 
+---@async
 return function (uri, callback)
     local state = files.getState(uri)
     if not state then
@@ -19,6 +20,7 @@ return function (uri, callback)
             if not doc.extends then
                 goto CONTINUE
             end
+            await.delay()
             local myName = guide.getKeyName(doc)
             local list = { doc }
             local mark = {}
@@ -38,12 +40,12 @@ return function (uri, callback)
                             }
                             goto CONTINUE
                         end
-                        if not mark[newName] then
+                        if newName and not mark[newName] then
                             mark[newName] = true
-                            local docs = vm.getDocDefines(newName)
+                            local docs = vm.getDocSets(uri, newName)
                             for _, otherDoc in ipairs(docs) do
-                                if otherDoc.type == 'doc.class.name' then
-                                    list[#list+1] = otherDoc.parent
+                                if otherDoc.type == 'doc.class' then
+                                    list[#list+1] = otherDoc
                                 end
                             end
                         end

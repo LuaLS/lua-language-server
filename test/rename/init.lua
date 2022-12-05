@@ -1,3 +1,4 @@
+---@diagnostic disable: await-in-sync
 local core   = require 'core.rename'
 local files  = require 'files'
 local catch  = require 'catch'
@@ -5,7 +6,7 @@ local guide  = require 'parser.guide'
 local config = require 'config'
 
 local function replace(text, positions)
-    local state = files.getState('')
+    local state = files.getState(TESTURI)
     local buf = {}
     table.sort(positions, function (a, b)
         return a.start < b.start
@@ -25,19 +26,19 @@ end
 function TEST(oldName, newName)
     return function (oldScript)
         return function (expectScript)
-            files.removeAll()
-            files.setText('', oldScript)
-            local state = files.getState('')
+            files.setText(TESTURI, oldScript)
+            local state = files.getState(TESTURI)
             local offset = oldScript:find('[^%w_]'..oldName..'[^%w_]')
             assert(offset)
             local position = guide.offsetToPosition(state, offset)
 
-            local positions = core.rename('', position, newName)
+            local positions = core.rename(TESTURI, position, newName)
             local script = oldScript
             if positions then
                 script = replace(script, positions)
             end
             assert(script == expectScript)
+            files.remove(TESTURI)
         end
     end
 end
@@ -90,7 +91,6 @@ local function f(b)
 end
 ]]
 
-config.set('Lua.IntelliSense.traceBeSetted', true)
 TEST ('a', '!!!') [[
 t = {
     a = 0
@@ -118,7 +118,6 @@ t = {
 t["!!!"] = 1
 a = t["!!!"]
 ]]
-config.set('Lua.IntelliSense.traceBeSetted', false)
 
 TEST ('a', '"') [[
 print(t[ "a" ])

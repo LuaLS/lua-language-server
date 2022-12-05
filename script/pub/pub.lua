@@ -24,7 +24,7 @@ log = require 'brave.log'
 
 xpcall(dofile, log.error, %q)
 local brave = require 'brave'
-brave.register(%d)
+brave.register(%d, %q)
 ]]
 
 ---@class pub
@@ -34,6 +34,7 @@ m.braves    = {}
 m.ability   = {}
 m.taskQueue = {}
 m.taskMap   = {}
+m.prvtPad   = {}
 
 --- 注册酒馆的功能
 function m.on(name, callback)
@@ -42,10 +43,11 @@ end
 
 --- 招募勇者，勇者会从公告板上领取任务，完成任务后到看板娘处交付任务
 ---@param num integer
-function m.recruitBraves(num)
+---@param privatePad string?
+function m.recruitBraves(num, privatePad)
     for _ = 1, num do
         local id = #m.braves + 1
-        log.info('Create brave:', id)
+        log.debug('Create brave:', id)
         m.braves[id] = {
             id      = id,
             thread  = thread.thread(braveTemplate:format(
@@ -55,11 +57,20 @@ function m.recruitBraves(num)
                 DBGPORT or 11412,
                 DBGWAIT or 'nil',
                 (ROOT / 'debugger.lua'):string(),
-                id
+                id,
+                privatePad
             )),
             taskMap = {},
             currentTask = nil,
             memory   = 0,
+        }
+    end
+    if privatePad and not m.prvtPad[privatePad] then
+        thread.newchannel('req:' .. privatePad)
+        thread.newchannel('res:' .. privatePad)
+        m.prvtPad[privatePad] = {
+            req = thread.channel('req:' .. privatePad),
+            res = thread.channel('res:' .. privatePad),
         }
     end
 end
@@ -69,7 +80,11 @@ function m.pushTask(info)
     if info.removed then
         return false
     end
-    taskPad:push(info.name, info.id, info.params)
+    if m.prvtPad[info.name] then
+        m.prvtPad[info.name].req:push(info.name, info.id, info.params)
+    else
+        taskPad:push(info.name, info.id, info.params)
+    end
     m.taskMap[info.id] = info
     return true
 end
@@ -101,7 +116,7 @@ function m.popReport(brave, name, params)
 end
 
 --- 发布任务
----@parma name string
+---@param name string
 ---@param params any
 ---@return any
 ---@async
@@ -122,9 +137,9 @@ end
 
 --- 发布同步任务，如果任务进入了队列，会返回执行器
 --- 通过 jumpQueue 可以插队
----@parma name string
+---@param name string
 ---@param params any
----@param callback function
+---@param callback? function
 function m.task(name, params, callback)
     local info = {
         id       = counter(),
@@ -135,9 +150,20 @@ function m.task(name, params, callback)
     return m.pushTask(info)
 end
 
+function m.reciveFromPad(pad)
+    local suc, id, name, result = pad:pop()
+    if not suc then
+        return false
+    end
+    if type(name) == 'string' then
+        m.popReport(m.braves[id], name, result)
+    else
+        m.popTask(m.braves[id], name, result)
+    end
+    return true
+end
+
 --- 接收反馈
---- 返回接收到的反馈数量
----@return integer
 function m.recieve(block)
     if block then
         local id, name, result = waiter:bpop()
@@ -148,14 +174,18 @@ function m.recieve(block)
         end
     else
         while true do
-            local suc, id, name, result = waiter:pop()
-            if not suc then
-                break
+            local ok
+            if m.reciveFromPad(waiter) then
+                ok = true
             end
-            if type(name) == 'string' then
-                m.popReport(m.braves[id], name, result)
-            else
-                m.popTask(m.braves[id], name, result)
+            for _, pad in pairs(m.prvtPad) do
+                if m.reciveFromPad(pad.res) then
+                    ok = true
+                end
+            end
+
+            if not ok then
+                break
             end
         end
     end

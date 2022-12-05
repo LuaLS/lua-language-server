@@ -3,7 +3,7 @@ local guide = require "parser.guide"
 local util  = require 'utility'
 local await = require 'await'
 
-local Care = {
+local care = {
     ['function'] = function (source, text, results)
         local folding = {
             start  = source.start,
@@ -66,7 +66,8 @@ local Care = {
     ['repeat'] = function (source, text, results)
         local start  = source.start
         local finish = source.keyword[#source.keyword]
-        if text:sub(finish - #'until' + 1, finish) ~= 'until' then
+        -- must end with 'until'
+        if #source.keyword ~= 4 then
             return
         end
         local folding = {
@@ -95,8 +96,8 @@ local Care = {
     ['comment.short'] = function (source, text, results, status)
         local ltext = source.text:lower()
         ltext = util.trim(ltext, 'left')
-        if ltext:sub(1, #'region') == 'region'
-        or ltext:sub(1, #'#region') == '#region' then
+        if     ltext:sub(1, #'region') == 'region'
+        or     ltext:sub(1, #'#region') == '#region' then
             if not status.regions then
                 status.regions = {}
             end
@@ -143,6 +144,15 @@ local Care = {
         }
         results[#results+1] = folding
     end,
+    ['doc.alias'] = function (source, text, results)
+        local folding = {
+            start        = source.start,
+            finish       = source.bindGroup[#source.bindGroup].finish,
+            kind         = 'comment',
+            hideLastLine = true,
+        }
+        results[#results+1] = folding
+    end,
 }
 
 ---@async
@@ -157,16 +167,16 @@ return function (uri)
 
     guide.eachSource(state.ast, function (source) ---@async
         local tp = source.type
-        if Care[tp] then
+        if care[tp] then
             await.delay()
-            Care[tp](source, text, regions)
+            care[tp](source, text, regions)
         end
     end)
     for _, source in ipairs(state.comms) do
         local tp = source.type
-        if Care[tp] then
+        if care[tp] then
             await.delay()
-            Care[tp](source, text, regions, status)
+            care[tp](source, text, regions, status)
         end
     end
 

@@ -10,7 +10,7 @@ m.ability = {}
 m.queue = {}
 
 --- 注册成为勇者
-function m.register(id)
+function m.register(id, privatePad)
     m.id = id
 
     if #m.queue > 0 then
@@ -20,7 +20,7 @@ function m.register(id)
     end
     m.queue = nil
 
-    m.start()
+    m.start(privatePad)
 end
 
 --- 注册能力
@@ -41,22 +41,24 @@ function m.push(name, params)
 end
 
 --- 开始找工作
-function m.start()
+function m.start(privatePad)
+    local reqPad = privatePad and thread.channel('req:' .. privatePad) or taskPad
+    local resPad = privatePad and thread.channel('res:' .. privatePad) or waiter
     m.push('mem', collectgarbage 'count')
     while true do
-        local name, id, params = taskPad:bpop()
+        local name, id, params = reqPad:bpop()
         local ability = m.ability[name]
         -- TODO
         if not ability then
-            waiter:push(m.id, id)
+            resPad:push(m.id, id)
             log.error('Brave can not handle this work: ' .. name)
             goto CONTINUE
         end
         local ok, res = xpcall(ability, log.error, params)
         if ok then
-            waiter:push(m.id, id, res)
+            resPad:push(m.id, id, res)
         else
-            waiter:push(m.id, id)
+            resPad:push(m.id, id)
         end
         m.push('mem', collectgarbage 'count')
         ::CONTINUE::

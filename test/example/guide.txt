@@ -2718,7 +2718,7 @@ function m.viewInferType(infers)
             or src.type == 'doc.type.name'
             or src.type == 'doc.type.array'
             or src.type == 'doc.type.table'
-            or src.type == 'doc.type.enum'
+            or src.type == 'doc.type.string'
             or src.type == 'doc.resume' then
                 local tp = infer.type or 'any'
                 if not mark[tp] then

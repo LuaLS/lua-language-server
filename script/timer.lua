@@ -11,6 +11,8 @@ _ENV = nil
 local curFrame = 0
 local maxFrame = 0
 local curIndex = 0
+local tarFrame = 0
+local fwFrame  = 0
 local freeQueue = {}
 local timer = {}
 
@@ -29,7 +31,7 @@ local function mTimeout(self, timeout)
     if self._pauseRemaining or self._running then
         return
     end
-    local ti = curFrame + timeout
+    local ti = tarFrame + timeout
     local q = timer[ti]
     if q == nil then
         q = allocQueue()
@@ -95,7 +97,13 @@ local function onTick()
     freeQueue[#freeQueue + 1] = q
 end
 
+---@class timer.manager
 local m = {}
+
+---@class timer
+---@field _onTimer? fun(self: timer)
+---@field _timeoutFrame integer
+---@field _timeout integer
 local mt = {}
 mt.__index = mt
 mt.type = 'timer'
@@ -168,21 +176,23 @@ function mt:onTimer()
 end
 
 function m.wait(timeout, onTimer)
+    local _timeout = mathMax(mathFloor(timeout * 1000.0), 1)
     local t = setmetatable({
-        ['_timeout'] = mathMax(mathFloor(timeout * 1000.0), 1),
+        ['_timeout'] = _timeout,
         ['_onTimer'] = onTimer,
         ['_timerCount'] = 1,
     }, mt)
-    mTimeout(t, t._timeout)
+    mTimeout(t, _timeout)
     return t
 end
 
 function m.loop(timeout, onTimer)
+    local _timeout = mathFloor(timeout * 1000.0)
     local t = setmetatable({
-        ['_timeout'] = mathFloor(timeout * 1000.0),
+        ['_timeout'] = _timeout,
         ['_onTimer'] = onTimer,
     }, mt)
-    mTimeout(t, t._timeout)
+    mTimeout(t, _timeout)
     return t
 end
 
@@ -190,12 +200,13 @@ function m.timer(timeout, count, onTimer)
     if count == 0 then
         return m.loop(timeout, onTimer)
     end
+    local _timeout = mathFloor(timeout * 1000.0)
     local t = setmetatable({
-        ['_timeout'] = mathFloor(timeout * 1000.0),
+        ['_timeout'] = _timeout,
         ['_onTimer'] = onTimer,
         ['_timerCount'] = count,
     }, mt)
-    mTimeout(t, t._timeout)
+    mTimeout(t, _timeout)
     return t
 end
 
@@ -205,17 +216,22 @@ end
 
 local lastClock = monotonic()
 function m.update()
-    local currentClock = monotonic()
+    local currentClock = monotonic() + fwFrame
     local delta = currentClock - lastClock
     lastClock = currentClock
     if curIndex ~= 0 then
         curFrame = curFrame - 1
     end
     maxFrame = maxFrame + delta
+    tarFrame = mathFloor(maxFrame)
     while curFrame < maxFrame do
         curFrame = curFrame + 1
         onTick()
     end
+end
+
+function m.timeJump(delta)
+    fwFrame = fwFrame + mathFloor(delta * 1000.0)
 end
 
 return m

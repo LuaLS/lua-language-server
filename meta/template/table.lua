@@ -37,7 +37,7 @@ function table.maxn(table) end
 ---@return table a2
 function table.move(a1, f, e, t, a2) end
 
----@version >5.2, JIT
+---@version >5.2
 ---#DES 'table.pack'
 ---@return table
 ---@nodiscard
@@ -50,16 +50,46 @@ function table.pack(...) end
 function table.remove(list, pos) end
 
 ---#DES 'table.sort'
----@param list table
----@param comp fun(a: any, b: any):boolean
+---@generic T
+---@param list T[]
+---@param comp? fun(a: T, b: T):boolean
 function table.sort(list, comp) end
 
----@version >5.2, JIT
+---@version >5.2
 ---#DES 'table.unpack'
----@param list table
+---@generic T
+---@param list T[]
 ---@param i?   integer
 ---@param j?   integer
+---@return T   ...
 ---@nodiscard
 function table.unpack(list, i, j) end
+
+---@version <5.1, JIT
+---#DES 'table.foreach'
+---@generic T
+---@param list any
+---@param callback fun(key: string, value: any):T|nil
+---@return T|nil
+---@deprecated
+function table.foreach(list, callback) end
+
+---@version <5.1, JIT
+---#DES 'table.foreachi'
+---@generic T
+---@param list any
+---@param callback fun(key: string, value: any):T|nil
+---@return T|nil
+---@deprecated
+function table.foreachi(list, callback) end
+
+---@version <5.1, JIT
+---#DES 'table.getn'
+---@generic T
+---@param list T[]
+---@return integer
+---@nodiscard
+---@deprecated
+function table.getn(list) end
 
 return table

@@ -10,7 +10,6 @@ m.coMap = setmetatable({}, wkmt)
 m.idMap = {}
 m.delayQueue = {}
 m.delayQueueIndex = 1
-m.watchList = {}
 m.needClose = {}
 m._enable = true
 
@@ -133,9 +132,6 @@ end
 ---@param callback function
 ---@async
 function m.wait(callback, ...)
-    if not coroutine.isyieldable() then
-        return
-    end
     local co = coroutine.running()
     local resumed
     callback(function (...)
@@ -162,9 +158,6 @@ function m.delay()
     end
     local co = coroutine.running()
     local current = m.coMap[co]
-    if m.onWatch('delay', co) == false then
-        return
-    end
     -- TODO
     if current.priority then
         return
@@ -189,7 +182,7 @@ function m.stop()
 end
 
 local function warnStepTime(passed, waker)
-    if passed < 1 then
+    if passed < 2 then
         log.warn(('Await step takes [%.3f] sec.'):format(passed))
         return
     end
@@ -219,7 +212,7 @@ function m.step()
         local clock = os.clock()
         resume()
         local passed = os.clock() - clock
-        if passed > 0.1 then
+        if passed > 0.5 then
             warnStepTime(passed, resume)
         end
         return true
@@ -242,21 +235,6 @@ end
 
 function m.disable()
     m._enable = false
-end
-
---- 注册事件
----@param callback async fun(ev: string, ...)
-function m.watch(callback)
-    m.watchList[#m.watchList+1] = callback
-end
-
-function m.onWatch(ev, ...)
-    for _, callback in ipairs(m.watchList) do
-        local res = callback(ev, ...)
-        if res ~= nil then
-            return res
-        end
-    end
 end
 
 return m

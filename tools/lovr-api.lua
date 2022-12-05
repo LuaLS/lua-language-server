@@ -51,6 +51,22 @@ local function formatIndex(key)
     return ('[%q]'):format(key)
 end
 
+local function getOptional(param)
+    if param.type == 'table' then
+        if not param.table then
+            return ''
+        end
+        for _, field in ipairs(param.table) do
+            if field.default == nil then
+                return ''
+            end
+        end
+        return '?'
+    else
+        return (param.default ~= nil) and '?' or ''
+    end
+end
+
 local buildType
 
 local function buildDocTable(tbl)
@@ -84,25 +100,41 @@ local function buildSuper(tp)
     return (': %s'):format(table.concat(parents, ', '))
 end
 
-local function buildDescription(desc)
-    if desc then
-        return ('---\n---%s\n---'):format(desc:gsub('([\r\n])', '%1---'))
-    else
-        return nil
-    end
+local function buildMD(desc)
+    return desc:gsub('([\r\n])', '%1---')
+               :gsub('%.  ', '.\n---\n---')
 end
 
-local function buildDocFunc(variant)
+local function buildDescription(desc, notes)
+    local lines = {}
+    if desc then
+        lines[#lines+1] = '---'
+        lines[#lines+1] = '---' .. buildMD(desc)
+        lines[#lines+1] = '---'
+    end
+    if notes then
+        lines[#lines+1] = '---'
+        lines[#lines+1] = '---### NOTE:'
+        lines[#lines+1] = '---' .. buildMD(notes)
+        lines[#lines+1] = '---'
+    end
+    return table.concat(lines, '\n')
+end
+
+local function buildDocFunc(variant, overload)
     local params  = {}
     local returns = {}
+    if overload then
+        params[1] = ('self: %s'):format(overload)
+    end
     for _, param in ipairs(variant.arguments or {}) do
         if param.name == '...' then
             params[#params+1] = '...'
         else
             if param.name:find '^[\'"]' then
-                params[#params+1] = ('%s: %s|%q'):format(param.name:sub(2, -2), getTypeName(param.type), param.name)
+                params[#params+1] = ('%s%s: %s|%s'):format(param.name, getOptional(param), getTypeName(param.type), param.name)
             else
-                params[#params+1] = ('%s: %s'):format(param.name, getTypeName(param.type))
+                params[#params+1] = ('%s%s: %s'):format(param.name, getOptional(param), getTypeName(param.type))
             end
         end
     end
@@ -123,12 +155,12 @@ local function buildMultiDocFunc(tp)
     return table.concat(cbs, '|')
 end
 
-local function buildFunction(func)
+local function buildFunction(func, typeName)
     local text = {}
-    text[#text+1] = buildDescription(func.description)
+    text[#text+1] = buildDescription(func.description, func.notes)
     for i = 2, #func.variants do
         local variant = func.variants[i]
-        text[#text+1] = ('---@overload %s'):format(buildDocFunc(variant))
+        text[#text+1] = ('---@overload %s'):format(buildDocFunc(variant, typeName))
     end
     local params = {}
     for _, param in ipairs(func.variants[1].arguments or {}) do
@@ -136,7 +168,15 @@ local function buildFunction(func)
             params[#params+1] = paramName
             text[#text+1] = ('---@param %s%s %s # %s'):format(
                 paramName,
-                param.default == nil and '' or '?',
+                getOptional(param),
+                buildType(param),
+                param.description
+            )
+        end
+
+        if param.name == "..." then
+            params[#params+1] = param.name
+            text[#text+1] = ('---@vararg %s # %s'):format(
                 buildType(param),
                 param.description
             )
@@ -160,12 +200,12 @@ end
 
 local function buildFile(defs)
     local class = defs.key
-    local filePath = libraryPath / (class .. '.lua')
+    local filePath = libraryPath / (class:gsub('%.', '/') .. '.lua')
     local text = {}
 
     text[#text+1] = '---@meta'
     text[#text+1] = ''
-    text[#text+1] = buildDescription(defs.description)
+    text[#text+1] = buildDescription(defs.description, defs.notes)
     text[#text+1] = ('---@class %s'):format(class)
     text[#text+1] = ('%s = {}'):format(class)
 
@@ -177,25 +217,25 @@ local function buildFile(defs)
     for _, obj in ipairs(defs.objects or {}) do
         local mark = {}
         text[#text+1] = ''
-        text[#text+1] = buildDescription(obj.description)
+        text[#text+1] = buildDescription(obj.description, obj.notes)
         text[#text+1] = ('---@class %s%s'):format(getTypeName(obj.name), buildSuper(obj))
         text[#text+1] = ('local %s = {}'):format(obj.name)
         for _, func in ipairs(obj.methods or {}) do
             if not mark[func.name] then
                 mark[func.name] = true
                 text[#text+1] = ''
-                text[#text+1] = buildFunction(func)
+                text[#text+1] = buildFunction(func, getTypeName(obj.name))
             end
         end
     end
 
     for _, enum in ipairs(defs.enums or {}) do
         text[#text+1] = ''
-        text[#text+1] = buildDescription(enum.description)
-        text[#text+1] = ('---@class %s'):format(getTypeName(enum.name))
+        text[#text+1] = buildDescription(enum.description, enum.notes)
+        text[#text+1] = ('---@alias %s'):format(getTypeName(enum.name))
         for _, constant in ipairs(enum.values) do
-            text[#text+1] = buildDescription(constant.description)
-            text[#text+1] = ('---@field %s integer'):format(formatIndex(constant.name))
+            text[#text+1] = buildDescription(constant.description, constant.notes)
+            text[#text+1] = ([[---| %q]]):format(constant.name)
         end
     end
 
@@ -206,6 +246,7 @@ local function buildFile(defs)
 
     text[#text+1] = ''
 
+    fs.create_directories(filePath:parent_path())
     fsu.saveFile(filePath, table.concat(text, '\n'))
 end
 
@@ -217,7 +258,7 @@ local function buildCallback(defs)
 
     for _, cb in ipairs(defs.callbacks or {}) do
         text[#text+1] = ''
-        text[#text+1] = buildDescription(cb.description)
+        text[#text+1] = buildDescription(cb.description, cb.notes)
         text[#text+1] = ('---@type %s'):format(buildMultiDocFunc(cb))
         text[#text+1] = ('%s = nil'):format(cb.key)
     end

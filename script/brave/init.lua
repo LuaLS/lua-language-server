@@ -1,4 +1,4 @@
-local brave   = require 'brave.brave'
+local brave = require 'brave.brave'
 require 'brave.work'
 
 return brave

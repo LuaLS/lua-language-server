@@ -1,37 +1,38 @@
 local vm       = require 'vm'
 local util     = require 'utility'
 local config   = require 'config'
-local infer    = require 'core.infer'
 local await    = require 'await'
+local guide    = require 'parser.guide'
 
-local function formatKey(key)
-    if type(key) == 'string' then
-        if key:match '^[%a_][%w_]*$' then
-            return key
-        else
-            return ('[%s]'):format(util.viewLiteral(key))
-        end
-    end
-    return ('[%s]'):format(key)
-end
-
-local function buildAsHash(keys, inferMap, literalMap, optMap, reachMax)
+---@param uri uri
+---@param keys string[]
+---@param nodeMap table<string, vm.node>
+---@param reachMax integer
+local function buildAsHash(uri, keys, nodeMap, reachMax)
     local lines = {}
     lines[#lines+1] = '{'
     for _, key in ipairs(keys) do
-        local inferView   = inferMap[key]
-        local literalView = literalMap[key]
+        local node        = nodeMap[key]
+        local isOptional  = node:isOptional()
+        if isOptional then
+            node = node:copy()
+            node:removeOptional()
+        end
+        local ifr         = vm.getInfer(node)
+        local typeView    = ifr:view(uri, 'unknown')
+        local literalView = ifr:viewLiterals()
         if literalView then
             lines[#lines+1] = ('    %s%s: %s = %s,'):format(
-                formatKey(key),
-                optMap[key] and '?' or '',
-                inferView,
-                literalView)
+                key,
+                isOptional and '?' or '',
+                typeView,
+                literalView
+            )
         else
             lines[#lines+1] = ('    %s%s: %s,'):format(
-                formatKey(key),
-                optMap[key] and '?' or '',
-                inferView
+                key,
+                isOptional and '?' or '',
+                typeView
             )
         end
     end
@@ -42,27 +43,41 @@ local function buildAsHash(keys, inferMap, literalMap, optMap, reachMax)
     return table.concat(lines, '\n')
 end
 
-local function buildAsConst(keys, inferMap, literalMap, optMap, reachMax)
+---@param uri uri
+---@param keys string[]
+---@param nodeMap table<string, vm.node>
+---@param reachMax integer
+local function buildAsConst(uri, keys, nodeMap, reachMax)
+    local literalMap = {}
+    for _, key in ipairs(keys) do
+        literalMap[key] = vm.getInfer(nodeMap[key]):viewLiterals()
+    end
     table.sort(keys, function (a, b)
         return tonumber(literalMap[a]) < tonumber(literalMap[b])
     end)
     local lines = {}
     lines[#lines+1] = '{'
     for _, key in ipairs(keys) do
-        local inferView   = inferMap[key]
+        local node        = nodeMap[key]
+        local isOptional    = node:isOptional()
+        if isOptional then
+            node = node:copy()
+            node:removeOptional()
+        end
+        local typeView    = vm.getInfer(node):view(uri, 'unknown')
         local literalView = literalMap[key]
         if literalView then
             lines[#lines+1] = ('    %s%s: %s = %s,'):format(
-                formatKey(key),
-                optMap[key] and '?' or '',
-                inferView,
+                key,
+                isOptional and '?' or '',
+                typeView,
                 literalView
             )
         else
             lines[#lines+1] = ('    %s%s: %s,'):format(
-                formatKey(key),
-                optMap[key] and '?' or '',
-                inferView
+                key,
+                isOptional and '?' or '',
+                typeView
             )
         end
     end
@@ -73,99 +88,123 @@ local function buildAsConst(keys, inferMap, literalMap, optMap, reachMax)
     return table.concat(lines, '\n')
 end
 
-local typeSorter = {
-    ['string']  = 1,
-    ['number']  = 2,
-    ['boolean'] = 3,
-}
-
-local function getKeyMap(fields)
+---@param source parser.object
+---@param fields parser.object[]
+local function getVisibleKeyMap(source, fields)
+    local uri  = guide.getUri(source)
     local keys = {}
-    local mark = {}
+    local map  = {}
+    local ignored = {}
     for _, field in ipairs(fields) do
-        local key = vm.getKeyName(field)
-        local tp  = vm.getKeyType(field)
-        if tp == 'number' or tp == 'integer' then
-            key = tonumber(key)
-        elseif tp == 'boolean' then
-            key = key == 'true'
+        local key = vm.viewKey(field, uri)
+        local rawKey = guide.getKeyName(field)
+        if rawKey and rawKey ~= key then
+            ignored[rawKey] = true
+            map[rawKey] = nil
         end
-        if key and not mark[key] then
-            mark[key] = true
-            keys[#keys+1] = key
+        if  not ignored[key]
+        and vm.isVisible(source, field) then
+            if key and not map[key] then
+                map[key] = true
+            end
         end
+    end
+    for key in pairs(map) do
+        keys[#keys+1] = key
     end
     table.sort(keys, function (a, b)
         if a == b then
             return false
         end
-        local ta  = type(a)
-        local tb  = type(b)
-        local tsa = typeSorter[ta]
-        local tsb = typeSorter[tb]
-        if tsa == tsb then
-            if ta == 'boolean' then
-                return a == true
-            end
+        local s1 = 0
+        local s2 = 0
+        if a:sub(1, 1) == '_' then
+            s1 = s1 + 10
+        end
+        if b:sub(1, 1) == '_' then
+            s2 = s2 + 10
+        end
+        if a:sub(1, 1) == '[' then
+            s1 = s1 + 1
+        end
+        if b:sub(1, 1) == '[' then
+            s2 = s2 + 1
+        end
+        if s1 == s2 then
             return a < b
-        else
-            return tsa < tsb
         end
+        return s1 < s2
     end)
-    return keys
-end
-
-local function getOptionalMap(fields)
-    local optionals = {}
-    for _, field in ipairs(fields) do
-        if field.type == 'doc.field.name' then
-            if field.parent.optional then
-                local key = vm.getKeyName(field)
-                optionals[key] = true
-            end
-        end
-        if field.type == 'doc.type.field' then
-            if field.optional then
-                local key = vm.getKeyName(field)
-                optionals[key] = true
-            end
-        end
-    end
-    return optionals
+    return keys, map
 end
 
 ---@async
+local function getNodeMap(uri, fields, keyMap)
+    ---@type table<string, vm.node>
+    local nodeMap = {}
+    for _, field in ipairs(fields) do
+        local key = vm.viewKey(field, uri)
+        if not key or not keyMap[key] then
+            goto CONTINUE
+        end
+        await.delay()
+        local node = vm.compileNode(field)
+        if nodeMap[key] then
+            nodeMap[key]:merge(node)
+        else
+            nodeMap[key] = node:copy()
+        end
+        ::CONTINUE::
+    end
+    return nodeMap
+end
+
+---@async
+---@return string?
 return function (source)
-    local maxFields = config.get 'Lua.hover.previewFields'
+    local uri = guide.getUri(source)
+    local maxFields = config.get(uri, 'Lua.hover.previewFields')
     if maxFields <= 0 then
-        return 'table'
+        return nil
     end
 
-    local fields = vm.getRefs(source, '*')
-    local keys   = getKeyMap(fields)
-    local optMap = getOptionalMap(fields)
+    local node = vm.compileNode(source)
+    for n in node:eachObject() do
+        if n.type == 'global' and n.cate == 'type' then
+            if n.name == 'string'
+            or (n.name ~= 'unknown' and n.name ~= 'any' and vm.isSubType(uri, n.name, 'string')) then
+                return nil
+            end
+        elseif n.type == 'doc.type.string'
+        or     n.type == 'string' then
+            return nil
+        elseif n.type == 'doc.type.sign' then
+            return nil
+        end
+    end
 
+    local fields    = vm.getFields(source)
+    local keys, map = getVisibleKeyMap(source, fields)
     if #keys == 0 then
-        return '{}'
+        return nil
     end
-
-    local inferMap   = {}
-    local literalMap = {}
 
     local reachMax = #keys - maxFields
     if #keys > maxFields then
         for i = maxFields + 1, #keys do
+            map[keys[i]] = nil
             keys[i] = nil
         end
     end
+
+    local nodeMap = getNodeMap(uri, fields, map)
 
     local isConsts = true
     for i = 1, #keys do
         await.delay()
         local key = keys[i]
-        inferMap[key]   = infer.searchAndViewInfers(source, key)
-        literalMap[key] = infer.searchAndViewLiterals(source, key)
-        if not tonumber(literalMap[key]) then
+        local literal = vm.getInfer(nodeMap[key]):viewLiterals()
+        if not tonumber(literal) then
             isConsts = false
         end
     end
@@ -173,9 +212,9 @@ return function (source)
     local result
 
     if isConsts then
-        result = buildAsConst(keys, inferMap, literalMap, optMap, reachMax)
+        result = buildAsConst(uri, keys, nodeMap, reachMax)
     else
-        result = buildAsHash(keys, inferMap, literalMap, optMap, reachMax)
+        result = buildAsHash(uri, keys, nodeMap, reachMax)
     end
 
     --if timeUp then

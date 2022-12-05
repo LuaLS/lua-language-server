@@ -1,7 +1,7 @@
 local main, exec
 local i = 1
 while arg[i] do
-    if arg[i] == '-E' then
+    if     arg[i] == '-E' then
     elseif arg[i] == '-e' then
         i = i + 1
         local expr = assert(arg[i], "'-e' needs argument")
@@ -10,6 +10,8 @@ while arg[i] do
         exec = true
     elseif not main and arg[i]:sub(1, 1) ~= '-' then
         main = i
+    elseif arg[i]:sub(1, 2) == '--' then
+        break
     end
     i = i + 1
 end
@@ -35,7 +37,8 @@ if main then
     end
 end
 
-local root; do
+local root
+do
     if main then
         local fs = require 'bee.filesystem'
         local mainPath = fs.path(arg[0])
@@ -44,21 +47,21 @@ local root; do
             root = '.'
         end
     else
-        local sep = package.config:sub(1,1)
+        local sep = package.config:sub(1, 1)
         if sep == '\\' then
             sep = '/\\'
         end
-        local pattern = "["..sep.."][^"..sep.."]+"
-        root = package.cpath:match("([^;]+)"..pattern..pattern.."$")
-        arg[0] = root .. package.config:sub(1,1) .. 'main.lua'
+        local pattern = "[" .. sep .. "]+[^" .. sep .. "]+"
+        root = package.cpath:match("([^;]+)" .. pattern .. pattern .. "$")
+        arg[0] = root .. package.config:sub(1, 1) .. 'main.lua'
     end
-    root = root:gsub('[/\\]', package.config:sub(1,1))
+    root = root:gsub('[/\\]', package.config:sub(1, 1))
 end
 
 package.path = table.concat({
     root .. "/script/?.lua",
     root .. "/script/?/init.lua",
-}, ";"):gsub('/', package.config:sub(1,1))
+}, ";"):gsub('/', package.config:sub(1, 1))
 
 package.searchers[2] = function (name)
     local filename, err = package.searchpath(name, package.path)
@@ -66,6 +69,9 @@ package.searchers[2] = function (name)
         return err
     end
     local f = io.open(filename)
+    if not f then
+        return 'cannot open file:' .. filename
+    end
     local buf = f:read '*a'
     f:close()
     local relative = filename:sub(1, #root) == root and filename:sub(#root + 2) or filename

@@ -32,10 +32,10 @@ return function (uri, callback)
             return
         end
         local name = source[1]
-        if name == '...' then
+        if name == '...' or name == '_' or name == 'self' then
             return
         end
-        if vm.isDocDefined(name)
+        if #vm.getDocSets(uri, name) > 0
         or hasNameOfGeneric(name, source) then
             return
         end

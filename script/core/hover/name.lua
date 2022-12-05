@@ -1,5 +1,3 @@
-local searcher = require 'core.searcher'
-local infer    = require 'core.infer'
 local guide    = require 'parser.guide'
 local vm       = require 'vm'
 
@@ -21,7 +19,10 @@ end
 local function asField(source, oop)
     local class
     if source.node.type ~= 'getglobal' then
-        class = infer.getClass(source.node)
+        class = vm.getInfer(source.node):viewClass()
+        if class == 'any' or class == 'unknown' then
+            class = nil
+        end
     end
     local node = class
         or buildName(source.node, false)
@@ -49,14 +50,12 @@ end
 local function asDocFunction(source, oop)
     local doc = guide.getParentType(source, 'doc.type')
             or  guide.getParentType(source, 'doc.overload')
-    if not doc or not doc.bindSources then
+    if not doc or not doc.bindSource then
         return ''
     end
-    for _, src in ipairs(doc.bindSources) do
-        local name = buildName(src, oop)
-        if name ~= '' then
-            return name
-        end
+    local name = buildName(doc.bindSource, oop)
+    if name ~= '' then
+        return name
     end
     return ''
 end

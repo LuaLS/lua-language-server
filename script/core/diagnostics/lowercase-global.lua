@@ -1,8 +1,9 @@
-local files   = require 'files'
-local guide   = require 'parser.guide'
-local lang    = require 'language'
-local config  = require 'config'
-local vm      = require 'vm'
+local files     = require 'files'
+local guide     = require 'parser.guide'
+local lang      = require 'language'
+local config    = require 'config'
+local vm        = require 'vm'
+local util      = require 'utility'
 
 local function isDocClass(source)
     if not source.bindDocs then
@@ -23,14 +24,11 @@ return function (uri, callback)
         return
     end
 
-    local definedGlobal = {}
-    for name in pairs(config.get 'Lua.diagnostics.globals') do
-        definedGlobal[name] = true
-    end
+    local definedGlobal = util.arrayToHash(config.get(uri, 'Lua.diagnostics.globals'))
 
     guide.eachSourceType(ast.ast, 'setglobal', function (source)
         local name = guide.getKeyName(source)
-        if definedGlobal[name] then
+        if not name or definedGlobal[name] then
             return
         end
         local first = name:match '%w'
@@ -44,8 +42,17 @@ return function (uri, callback)
         if isDocClass(source) then
             return
         end
-        if vm.isGlobalLibraryName(name) then
-            return
+        if definedGlobal[name] == nil then
+            definedGlobal[name] = false
+            local global = vm.getGlobal('variable', name)
+            if global then
+                for _, set in ipairs(global:getSets(uri)) do
+                    if vm.isMetaFile(guide.getUri(set)) then
+                        definedGlobal[name] = true
+                        return
+                    end
+                end
+            end
         end
         callback {
             start   = source.start,

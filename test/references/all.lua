@@ -3,7 +3,7 @@ local config = require 'config'
 TEST [[
 ---@class A
 local a = {}
-a.<?x?> = 1
+a.<~x~> = 1
 
 ---@return A
 local function f() end
@@ -15,7 +15,7 @@ return b.<!x!>
 TEST [[
 ---@class A
 local a = {}
-a.<?x?> = 1
+a.<~x~> = 1
 
 ---@return table
 ---@return A
@@ -26,40 +26,42 @@ return a.x, b.<!x!>
 ]]
 
 TEST [[
-local <?mt?> = {}
+local <~mt~> = {}
 function <!mt!>:x()
-    <!self!>:x()
+    self:x()
 end
 ]]
 
 TEST [[
 local mt = {}
-function mt:<?x?>()
+function mt:<~x~>()
     self:<!x!>()
 end
 ]]
 
-TEST [[
----@class Dog
-local mt = {}
-function mt:<?eat?>()
-end
+--TEST [[
+-----@class Dog
+--local mt = {}
+--function mt:<~eat~>()
+--end
+--
+-----@class Master
+--local mt2 = {}
+--function mt2:init()
+--    ---@type Dog
+--    local foo = self:doSomething()
+--    ---@type Dog
+--    self.dog = getDog()
+--end
+--function mt2:feed()
+--    self.dog:<!eat!>()
+--end
+--function mt2:doSomething()
+--end
+--]]
 
----@class Master
-local mt2 = {}
-function mt2:init()
-    ---@type Dog
-    local foo = self:doSomething()
-    ---@type Dog
-    self.dog = getDog()
-end
-function mt2:feed()
-    self.dog:<!eat!>()
-end
-function mt2:doSomething()
-end
-]]
-
+-- TODO: How to search references of function?
+--[=[
 TEST [[
 local function f()
     return <~<!function~> ()
@@ -77,55 +79,20 @@ end
 
 local _, <!f2!> = f()
 ]]
-
-config.set('Lua.IntelliSense.traceReturn', true)
-TEST [[
-local <?x?>
-local function f()
-    return <!x!>
-end
-local <!y!> = f()
-]]
-
-TEST [[
-local <?x?>
-local function f()
-    return function ()
-        return <!x!>
-    end
-end
-local <!y!> = f()()
-]]
-config.set('Lua.IntelliSense.traceReturn', false)
+]=]
 
 TEST [[
 ---@class A
 local t
 
 ---@class B: A
-local <?v?>
-]]
-
--- TODO
--- 泛型的反向搜索
-do return end
-TEST [[
----@class Dog
-local <?Dog?> = {}
-
----@generic T
----@param type1 T
----@return T
-function foobar(type1)
-end
-
-local <!v1!> = foobar(<!Dog!>)
+local <~v~>
 ]]
 
 TEST [[
 ---@class Dog
 local Dog = {}
-function Dog:<?eat?>()
+function Dog:<~eat~>()
 end
 
 ---@generic T
@@ -142,7 +109,7 @@ v1:<!eat!>()
 TEST [[
 ---@class Dog
 local Dog = {}
-function Dog:<?eat?>()
+function Dog:<~eat~>()
 end
 
 ---@class Master
@@ -158,52 +125,4 @@ end
 
 local v1 = Master:foobar("", Dog)
 v1.<!eat!>()
-]]
-
-TEST [[
----@class A
-local <?A?>
-
----@generic T
----@param self T
----@return T
-function m.f(self) end
-
-local <!b!> = m.f(<!A!>)
-]]
-
-TEST [[
----@class A
-local <?A?>
-
----@generic T
----@param self T
----@return T
-function m:f() end
-
-local <!b!> = m.f(<!A!>)
-]]
-
-TEST [[
----@class A
-local <?A?>
-
----@generic T
----@param self T
----@return T
-function <!A!>.f(self) end
-
-local <!b!> = <!A!>:f()
-]]
-
-TEST [[
----@class A
-local <?A?>
-
----@generic T
----@param self T
----@return T
-function <!A!>:f() end
-
-local <!b!> = <!A!>:f()
 ]]

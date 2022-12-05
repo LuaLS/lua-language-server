@@ -1,0 +1,9 @@
+{
+    "name" : "luafilesystem",
+    "words" : [ "require[%s%(\"']+lfs[%)\"']" ],
+    "settings" : {
+        "Lua.diagnostics.globals" : [
+            "lfs"
+        ]
+    }
+}

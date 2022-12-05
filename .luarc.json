@@ -1,17 +1,19 @@
 {
-    "$schema": "https://raw.githubusercontent.com/sumneko/vscode-lua/master/setting/schema.json",
-    "color": {
-        "mode": "SemanticEnhanced"
-    },
     "diagnostics": {
         "disable": [
             "close-non-object"
         ],
-        "neededFileStatus": {
-            "undefined-field": "Any",
-            "await-in-sync": "Any",
-            "not-yieldable": "Any",
-            "discard-returns": "Any"
+        "groupFileStatus": {
+            "ambiguity": "Any",
+            "await": "Any",
+            "duplicate": "Any",
+            "global": "Any",
+            "luadoc": "Any",
+            "redefined": "Any",
+            "strict": "Any",
+            "type-check": "Any",
+            "unbalanced": "Any",
+            "unused": "Any"
         },
         "ignoredFiles": "Opened",
         "libraryFiles": "Opened"
@@ -20,7 +22,10 @@
         "version": "Lua 5.4",
         "path": [
             "script/?.lua",
-            "script/?/init.lua"
+            "script/?/init.lua",
+            "test/?.lua",
+            "test/?/init.lua",
+            "script/meta/?.lua"
         ],
         "pathStrict": true
     },
@@ -28,18 +33,25 @@
         "maxPreload": 1600,
         "preloadFileSize": 1000,
         "ignoreDir": [
-            "locale/",
-            "libs/",
-            "3rd",
-            ".vscode",
-            "meta"
+            "/locale/",
+            "/libs/",
+            "/3rd",
+            "/.vscode",
+            "/meta"
         ],
-        "library": [
-            "script/meta",
-            "bin"
-        ]
+        "checkThirdParty": false
     },
-    "hint": {
-        "enable": true
+    "typeFormat": {
+        "config": {
+            "format_line": "false"
+        }
+    },
+    "type": {
+        "castNumberToInteger": false
+    },
+    "doc": {
+        "privateName": [
+            "_*"
+        ]
     }
 }

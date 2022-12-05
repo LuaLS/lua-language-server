@@ -39,23 +39,27 @@ end
 
 ---@diagnostic disable: await-in-sync
 function TEST(expect)
-    files.removeAll()
-
     local sourcePos, sourceUri
     for _, file in ipairs(expect) do
         local script, list = catch(file.content, '?')
         local uri          = furi.encode(file.path)
         files.setText(uri, script)
-        if list['?'] then
+        if #list['?'] > 0 then
             sourceUri = uri
             sourcePos = (list['?'][1][1] + list['?'][1][2]) // 2
         end
     end
 
+    local _ <close> = function ()
+        for _, info in ipairs(expect) do
+            files.remove(furi.encode(info.path))
+        end
+    end
+
     local hover = core.byUri(sourceUri, sourcePos)
     assert(hover)
-    hover = tostring(hover):gsub('\r\n', '\n')
-    assert(eq(hover, expect.hover))
+    local content = tostring(hover):gsub('\r\n', '\n')
+    assert(eq(content, expect.hover))
 end
 
 TEST {
@@ -73,6 +77,7 @@ TEST {
 ```
 
 ---
+
 * [a.lua](file:///a.lua) （搜索路径： `?.lua`）]],
 }
 
@@ -105,6 +110,7 @@ TEST {
 ```
 
 ---
+
 * [Folder\a.lua](file:///Folder/a.lua) （搜索路径： `Folder\?.lua`）]],
 }
 
@@ -123,6 +129,7 @@ TEST {
 ```
 
 ---
+
 * [Folder\a.lua](file:///Folder/a.lua) （搜索路径： `?.lua`）]],
 }
 
@@ -141,6 +148,7 @@ TEST {
 ```
 
 ---
+
 * [Folder\a.lua](file:///Folder/a.lua) （搜索路径： `?.lua`）]],
 }
 else
@@ -159,6 +167,7 @@ TEST {
 ```
 
 ---
+
 * [Folder/a.lua](file:///Folder/a.lua) （搜索路径： `Folder/?.lua`）]],
 }
 end
@@ -231,7 +240,7 @@ TEST {
     },
     hover = [[
 ```lua
-method mt:add(a: any, b: any)
+(method) mt:add(a: any, b: any)
 ```]]
 }
 
@@ -252,7 +261,7 @@ TEST {
     },
     hover = [[
 ```lua
-global t: {
+(global) t: {
     [1]: integer = 1|2,
 }
 ```]],
@@ -275,7 +284,7 @@ TEST {
     },
     hover = [[
 ```lua
-global t: {
+(global) t: {
     [1]: integer = 2,
 }
 ```]],
@@ -325,6 +334,7 @@ function f(x: number)
 ```
 
 ---
+
  abc]]
 }
 
@@ -342,10 +352,11 @@ TEST {
     },
     hover = [[
 ```lua
-global x: integer = 1
+(global) x: integer = 1
 ```
 
 ---
+
  abc]]
 }
 
@@ -358,22 +369,22 @@ TEST {
         path = 'b.lua',
         content = [[
             ---@param x string
-            ---|   "'选项1'" # 注释1
-            ---| > "'选项2'" # 注释2
+            ---|   "选项1" # 注释1
+            ---| > "选项2" # 注释2
             function <?f?>(x) end
         ]]
     },
     hover = [[
 ```lua
-function f(x: string|'选项1'|'选项2')
+function f(x: string|"选项1"|"选项2")
 ```
 
 ---
 
 ```lua
-x: string
-    | '选项1' -- 注释1
-   -> '选项2' -- 注释2
+x:
+    | "选项1" -- 注释1
+   -> "选项2" -- 注释2
 ```]]
 }
 
@@ -386,23 +397,23 @@ TEST {
         path = 'b.lua',
         content = [[
             ---@alias option
-            ---|   "'选项1'" # 注释1
-            ---| > "'选项2'" # 注释2
+            ---|   "选项1" # 注释1
+            ---| > "选项2" # 注释2
             ---@param x option
             function <?f?>(x) end
         ]]
     },
     hover = [[
 ```lua
-function f(x: '选项1'|'选项2')
+function f(x: "选项1"|"选项2")
 ```
 
 ---
 
 ```lua
-x: option
-    | '选项1' -- 注释1
-   -> '选项2' -- 注释2
+x:
+    | "选项1" -- 注释1
+   -> "选项2" -- 注释2
 ```]]
 }
 
@@ -415,8 +426,8 @@ TEST {
         path = 'b.lua',
         content = [[
             ---@alias option
-            ---|   "'选项1'" # 注释1
-            ---| > "'选项2'" # 注释2
+            ---|   "选项1" # 注释1
+            ---| > "选项2" # 注释2
             ---@return option x
             function <?f?>() end
         ]]
@@ -424,15 +435,15 @@ TEST {
     hover = [[
 ```lua
 function f()
-  -> x: '选项1'|'选项2'
+  -> x: "选项1"|"选项2"
 ```
 
 ---
 
 ```lua
-x: option
-    | '选项1' -- 注释1
-   -> '选项2' -- 注释2
+x:
+    | "选项1" -- 注释1
+   -> "选项2" -- 注释2
 ```]]
 }
 
@@ -445,8 +456,8 @@ TEST {
         path = 'b.lua',
         content = [[
             ---@alias option
-            ---|   "'选项1'" # 注释1
-            ---| > "'选项2'" # 注释2
+            ---|   "选项1" # 注释1
+            ---| > "选项2" # 注释2
             ---@return option
             function <?f?>() end
         ]]
@@ -454,15 +465,15 @@ TEST {
     hover = [[
 ```lua
 function f()
-  -> '选项1'|'选项2'
+  -> "选项1"|"选项2"
 ```
 
 ---
 
 ```lua
-return #1: option
-    | '选项1' -- 注释1
-   -> '选项2' -- 注释2
+return #1:
+    | "选项1" -- 注释1
+   -> "选项2" -- 注释2
 ```]]
 }
 
@@ -480,10 +491,11 @@ function f(<?x?>) end
     },
     hover = [[
 ```lua
-local x: string
+(parameter) x: string
 ```
 
 ---
+
 this is comment]]
 }
 
@@ -531,7 +543,7 @@ function f(<?x?>) end
 },
 hover = [[
 ```lua
-local x: string
+(parameter) x: string
 ```]]}
 
 
@@ -553,6 +565,7 @@ function f(arg1: integer, arg2: integer)
 ```
 
 ---
+
 comment1
 
 @*param* `arg2` — comment2
@@ -662,6 +675,7 @@ function f()
 ```
 
 ---
+
 comment1
 comment2]]}
 
@@ -669,15 +683,15 @@ TEST {{ path = 'a.lua', content = '', }, {
     path = 'b.lua',
     content = [[
         ---@param a boolean # xxx
-        ---| 'true'  # ttt
-        ---| 'false' # fff
+        ---| true  # ttt
+        ---| false # fff
         local function <?f?>(a)
         end
     ]]
 },
 hover = [[
 ```lua
-function f(a: boolean|true|false)
+function f(a: boolean)
 ```
 
 ---
@@ -685,7 +699,7 @@ function f(a: boolean|true|false)
 @*param* `a` —  xxx
 
 ```lua
-a: boolean
+a:
     | true -- ttt
     | false -- fff
 ```]]}
@@ -706,6 +720,7 @@ local x: A
 ```
 
 ---
+
 AAA]]}
 
 TEST {{ path = 'a.lua', content = '', }, {
@@ -726,6 +741,7 @@ local x: A {
 ```
 
 ---
+
 AAA]]}
 
 TEST {{ path = 'a.lua', content = '', }, {
@@ -745,9 +761,11 @@ local x: A
 ```
 
 ---
+
 BBB
 
 ---
+
 AAA]]}
 
 TEST {{ path = 'a.lua', content = '', }, {
@@ -762,13 +780,15 @@ G.A = 1
 },
 hover = [[
 ```lua
-global G.A: integer = 1
+(global) G.A: integer = 1
 ```
 
 ---
+
 AAA
 
 ---
+
 BBB]]}
 
 TEST {{ path = 'a.lua', content = '', }, {
@@ -783,13 +803,15 @@ G.<?A?> = 1
 },
 hover = [[
 ```lua
-global G.A: integer = 1
+(global) G.A: integer = 1
 ```
 
 ---
+
 BBB
 
 ---
+
 AAA]]}
 
 TEST {{ path = 'a.lua', content = '', }, {
@@ -807,7 +829,7 @@ food.secondField = 2
 },
 hover = [[
 ```lua
-field Food.firstField: number = 0
+(field) Food.firstField: number
 ```]]}
 
 TEST {{ path = 'a.lua', content = '', }, {
@@ -821,10 +843,11 @@ local <?food?>
 },
 hover = [[
 ```lua
-local food: any
+local food: unknown
 ```
 
 ---
+
 I'm a multiline comment
 ]]}
 
@@ -933,6 +956,7 @@ function bthci.rawhci(hcibytes: any, callback: any)
 ```
 
 ---
+
  Sends a raw HCI command to the BlueTooth controller.]]}
 
 TEST {{ path = 'a.lua', content = '', }, {
@@ -972,17 +996,17 @@ end
 },
 hover = [[
 ```lua
-function f(p: a|b)
+function f(p: 'a'|'b')
 ```
 
 ---
 
 ```lua
-p: T
-    | a -- comment 1
-        -- comment 2
-    | b -- comment 3
-        -- comment 4
+p:
+    | 'a' -- comment 1
+          -- comment 2
+    | 'b' -- comment 3
+          -- comment 4
 ```]]}
 
 --TEST {{ path = 'a.lua', content = '', }, {
@@ -1017,6 +1041,7 @@ function fn()
 ```
 
 ---
+
 line1
 
 line2]]}
@@ -1040,13 +1065,13 @@ end
 
 
 for _, x in ipairs({} and {}) do
-    print(<?x?>) -- `x` is infered as `string`
+    print(<?x?>) -- `x` is infered as `string` (fixed bug)
 end
 ]],
     },
     hover = [[
 ```lua
-local x: any
+local x: unknown
 ```]]
 }
 
@@ -1067,7 +1092,7 @@ G = {}
     },
     hover = [[
 ```lua
-global G: A {
+(global) G: A {
     x: number,
 }
 ```]]
@@ -1083,13 +1108,13 @@ TEST {
     },
     hover = [[
 ```lua
-method C:f(a: any, b: any)
+(method) C:f(a: any, b: any)
 ```
 
 ---
 
 ```lua
-method C:f(a: any)
+(method) C:f(a: any)
 ```]]
 }
 
@@ -1124,12 +1149,559 @@ TEST {
     },
     hover = [[
 ```lua
-async method C:f(a: any, b: any)
+(async) (method) C:f(a: any, b: any)
 ```
 
 ---
 
 ```lua
-async method C:f(a: any)
+(async) (method) C:f(a: any)
+```]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@class Apple
+            ---The color of your awesome apple!
+            ---@field color string
+            local Apple = {}
+
+            Apple.<?color?>
+        ]]
+    },
+    hover = [[
+```lua
+(field) Apple.color: string
+```
+
+---
+
+The color of your awesome apple!]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@type fun(x: number, y: number, ...: number):(x: number, y: number, ...: number)
+            local <?f?>
+        ]]
+    },
+    hover = [[
+```lua
+local f: fun(x: number, y: number, ...number):(x: number, y: number, ...number)
+```
+
+---
+
+```lua
+function f(x: number, y: number, ...: number)
+  -> x: number
+  2. y: number
+  3. ...number
+```]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@param p   'a1' | 'a2'
+            ---@param ... 'a3' | 'a4'
+            ---@return 'r1' | 'r2' ret1
+            ---@return 'r3' | 'r4' ...
+            local function <?f?>(p, ...) end
+        ]]
+    },
+    hover = [[
+```lua
+function f(p: 'a1'|'a2', ...'a3'|'a4')
+  -> ret1: 'r1'|'r2'
+  2. ...'r3'|'r4'
+```
+
+---
+
+```lua
+p:
+    | 'a1'
+    | 'a2'
+
+...(param):
+    | 'a3'
+    | 'a4'
+
+ret1:
+    | 'r1'
+    | 'r2'
+
+...(return):
+    | 'r3'
+    | 'r4'
+```]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@type integer @ comments
+            local <?n?>
+        ]]
+    },
+    hover = [[
+```lua
+local n: integer
+```
+
+---
+
+ comments]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            --- comments
+            ---@type integer
+            local <?n?>
+        ]]
+    },
+    hover = [[
+```lua
+local n: integer
+```
+
+---
+
+ comments]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@type integer
+            --- comments
+            local <?n?>
+        ]]
+    },
+    hover = [[
+```lua
+local n: integer
+```
+
+---
+
+ comments]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@TODO XXXX
+            ---@type integer @ comments
+            local <?n?>
+        ]]
+    },
+    hover = [[
+```lua
+local n: integer
+```
+
+---
+
+ comments]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@type integer @ comments
+            ---@TODO XXXX
+            local <?n?>
+        ]]
+    },
+    hover = [[
+```lua
+local n: integer
+```
+
+---
+
+ comments]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            --[here](x.lua)
+            local <?n?>
+        ]]
+    },
+    hover = [[
+```lua
+local n: unknown
+```
+
+---
+
+[here](file:///x.lua)]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            --[here](D:/x.lua)
+            local <?n?>
+        ]]
+    },
+    hover = [[
+```lua
+local n: unknown
+```
+
+---
+
+[here](file:///d%3A/x.lua)]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            --[here](command:xxxxx)
+            local <?n?>
+        ]]
+    },
+    hover = [[
+```lua
+local n: unknown
+```
+
+---
+
+[here](command:xxxxx)]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@class A
+            ---@field x number # comments
+
+            ---@type A
+            local t
+
+            print(t.<?x?>)
+        ]]
+    },
+    hover = [[
+```lua
+(field) A.x: number
+```
+
+---
+
+ comments]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            -- comments
+            <?A?> = function () end
+        ]]
+    },
+    hover = [[
+```lua
+function A()
+```
+
+---
+
+ comments]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            local t = {
+                -- comments
+                <?A?> = function () end
+            }
+        ]]
+    },
+    hover = [[
+```lua
+function A()
+```
+
+---
+
+ comments]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            -- comments
+            ---@return number
+            <?A?> = function () end
+        ]]
+    },
+    hover = [[
+```lua
+function A()
+  -> number
+```
+
+---
+
+ comments]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@alias A
+            ---| 1 # comment1
+            ---| 2 # comment2
+
+            ---@type A
+            local <?x?>
+        ]]
+    },
+    hover = [[
+```lua
+local x: 1|2
+```
+
+---
+
+```lua
+A:
+    | 1 -- comment1
+    | 2 -- comment2
+```]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@enum <?A?>
+            local t = {
+                x = 1,
+                y = 2,
+                z = 3,
+            }
+        ]]
+    },
+    hover = [[
+```lua
+(enum) A
+```
+
+---
+
+```lua
+{
+    x: integer = 1,
+    y: integer = 2,
+    z: integer = 3,
+}
+```]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@enum <?A?>
+            local t =
+            {
+                x = 1,
+                y = 2,
+                z = 3,
+            }
+        ]]
+    },
+    hover = [[
+```lua
+(enum) A
+```
+
+---
+
+```lua
+{
+    x: integer = 1,
+    y: integer = 2,
+    z: integer = 3,
+}
+```]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@enum <?A?>
+            local t = {
+                x = 1 << 0,
+                y = 1 << 1,
+                z = 1 << 2,
+            }
+        ]]
+    },
+    hover = [[
+```lua
+(enum) A
+```
+
+---
+
+```lua
+{
+    x: integer = 1,
+    y: integer = 2,
+    z: integer = 4,
+}
+```]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@alias someType
+            ---| "#" # description
+            
+            ---@type someType
+            local <?someValue?>
+        ]]
+    },
+    hover = [[
+```lua
+local someValue: "#"
+```
+
+---
+
+```lua
+someType:
+    | "#" -- description
+```]]
+}
+
+TEST { { path = 'a.lua', content = [[
+---@overload fun(x: number)
+---@overload fun(x: number, y: number)
+local function <?f?>(...)
+end
+]] },
+hover = [[
+```lua
+function f(x: number)
+```
+
+---
+
+```lua
+function f(x: number, y: number)
+```]]
+}
+
+TEST { { path = 'a.lua', content = [[
+---@overload fun(x: number)
+---@overload fun(x: number, y: number)
+local function f(...)
+end
+
+<?f?>
+]] },
+hover = [[
+```lua
+function f(x: number)
+```
+
+---
+
+```lua
+function f(x: number, y: number)
+```]]
+}
+
+TEST { {path = 'a.lua', content = [[
+---@class A
+
+---@see A # comment1
+local <?x?>
+]]},
+hover = [[
+```lua
+local x: unknown
+```
+
+---
+
+See: [A](file:///a.lua#1#10)  comment1]]
+}
+
+TEST { {path = 'a.lua', content = [[
+---@class A
+
+TTT = 1
+
+---@see A # comment1
+---@see TTT # comment2
+local <?x?>
+]]},
+hover = [[
+```lua
+local x: unknown
+```
+
+---
+
+See:
+  * [A](file:///a.lua#1#10)  comment1
+  * [TTT](file:///a.lua#3#0)  comment2]]
+}
+
+TEST { {path = 'a.lua', content = [[
+---comment1
+---comment2
+---@overload fun()
+---@param x number
+local function <?f?>(x) end
+]]},
+hover = [[
+```lua
+function f(x: number)
+```
+
+---
+
+comment1
+comment2
+
+---
+
+```lua
+function f()
 ```]]
 }

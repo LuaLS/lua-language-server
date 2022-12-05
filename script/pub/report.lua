@@ -1,5 +1,6 @@
 local pub   = require 'pub.pub'
 local await = require 'await'
+local util  = require 'utility'
 
 pub.on('log', function (params, brave)
     log.raw(brave.id, params.level, params.msg, params.src, params.line, params.clock)
@@ -22,7 +23,7 @@ end)
 
 pub.on('protoerror', function (err)
     log.warn('Load proto error:', err)
-    os.exit(true)
+    os.exit(0, true)
 end)
 
 pub.on('wakeup', function () end)

@@ -1,5 +1,7 @@
 local m = require 'lpeglabel'
 
+---@class catched
+---@operator add: catched
 local mt = {}
 
 local function catchedTable()
@@ -35,11 +37,17 @@ end
 
 ---@param script string
 ---@param seps string
+---@return string
+---@return table<string, catched>
 return function (script, seps)
     local tokens = parseTokens(script, seps)
     local newBuf = {}
     local result = {}
     local marks  = {}
+
+    for s in seps:gmatch '.' do
+        result[s] = catchedTable()
+    end
 
     local lineOffset = 1
     local line       = 0
@@ -68,9 +76,6 @@ return function (script, seps)
                 local mark = marks[j]
                 if mark.char == text then
                     local position = line * 10000 + offset - skipOffset - lineOffset
-                    if not result[text] then
-                        result[text] = catchedTable()
-                    end
                     result[text][#result[text]+1] = { mark.position, position }
                     table.remove(marks, j)
                     break

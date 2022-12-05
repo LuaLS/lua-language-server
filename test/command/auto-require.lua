@@ -3,12 +3,16 @@ local files       = require 'files'
 local autoRequire = require 'core.command.autoRequire'
 local client      = require 'client'
 
-local findInsertRow = util.getUpvalue(autoRequire, 'findInsertRow')
+local findInsertRow    = util.getUpvalue(autoRequire, 'findInsertRow')
 local applyAutoRequire = util.getUpvalue(autoRequire, 'applyAutoRequire')
+
+assert(findInsertRow)
+assert(applyAutoRequire)
 
 local originEditText = client.editText
 local EditResult
 
+---@diagnostic disable-next-line: duplicate-set-field
 client.editText = function (uri, edits)
     EditResult = edits[1]
 end
@@ -16,12 +20,12 @@ end
 function TEST(text)
     return function (name)
         return function (expect)
-            files.removeAll()
-            files.setText('', text)
+            files.setText(TESTURI, text)
             EditResult = nil
-            local row, fmt = findInsertRow('')
-            applyAutoRequire('', row, name, name, fmt)
+            local row, fmt = findInsertRow(TESTURI)
+            applyAutoRequire(TESTURI, row, name, name, fmt)
             assert(util.equal(EditResult, expect))
+            files.remove(TESTURI)
         end
     end
 end

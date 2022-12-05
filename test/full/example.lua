@@ -5,12 +5,11 @@ local diag   = require 'core.diagnostics'
 local config = require 'config'
 local fs     = require 'bee.filesystem'
 local luadoc = require "parser.luadoc"
-local noder  = require 'core.noder'
 
 -- 临时
 ---@diagnostic disable: await-in-sync
 local function testIfExit(path)
-    config.set('Lua.workspace.preloadFileSize', 1000000000)
+    config.set(nil, 'Lua.workspace.preloadFileSize', 1000000000)
     local buf = util.loadFile(path:string())
     if buf then
         local state
@@ -23,6 +22,7 @@ local function testIfExit(path)
         local noderClock = 0
         local total
         for i = 1, max do
+            ---@type table
             state = TEST(buf)
             local luadocStart = os.clock()
             luadoc(state)
@@ -51,15 +51,15 @@ local function testIfExit(path)
         local max = 100
         local need
         for i = 1, max do
-            files.removeAll()
-            files.open('')
-            files.setText('', buf)
-            diag('', function () end)
+            files.open(TESTURI)
+            files.setText(TESTURI, buf)
+            diag(TESTURI, false, function () end)
             local passed = os.clock() - clock
             if passed >= 1.0 or i == max then
                 need = passed / i
                 break
             end
+            files.remove(TESTURI)
         end
         print(('基准诊断测试[%s]单次耗时：%.10f'):format(path:filename():string(), need))
     end
@@ -68,4 +68,5 @@ end
 testIfExit(ROOT / 'test' / 'example' / 'vm.txt')
 testIfExit(ROOT / 'test' / 'example' / 'largeGlobal.txt')
 testIfExit(ROOT / 'test' / 'example' / 'guide.txt')
+testIfExit(ROOT / 'test' / 'example' / 'jass-common.txt')
 testIfExit(fs.path [[D:\github\test\ECObject.lua]])

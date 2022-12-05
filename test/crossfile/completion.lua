@@ -5,36 +5,11 @@ local platform = require 'bee.platform'
 local util     = require 'utility'
 local config   = require 'config'
 local catch    = require 'catch'
+local define   = require 'proto.define'
 
 rawset(_G, 'TEST', true)
 
-local CompletionItemKind = {
-    Text = 1,
-    Method = 2,
-    Function = 3,
-    Constructor = 4,
-    Field = 5,
-    Variable = 6,
-    Class = 7,
-    Interface = 8,
-    Module = 9,
-    Property = 10,
-    Unit = 11,
-    Value = 12,
-    Enum = 13,
-    Keyword = 14,
-    Snippet = 15,
-    Color = 16,
-    File = 17,
-    Reference = 18,
-    Folder = 19,
-    EnumMember = 20,
-    Constant = 21,
-    Struct = 22,
-    Event = 23,
-    Operator = 24,
-    TypeParameter = 25,
-}
+local CompletionItemKind = define.CompletionItemKind
 
 local EXISTS = {}
 
@@ -82,8 +57,6 @@ end
 
 ---@diagnostic disable: await-in-sync
 function TEST(data)
-    files.removeAll()
-
     local mainUri
     local pos
     for _, info in ipairs(data) do
@@ -98,14 +71,20 @@ function TEST(data)
         files.setText(uri, script)
     end
 
+    local _ <close> = function ()
+        for _, info in ipairs(data) do
+            files.remove(furi.encode(info.path))
+        end
+    end
+
     local expect = data.completion
-    core.clearCache()
     local result = core.completion(mainUri, pos, '')
     if not expect then
         assert(result == nil)
         return
     end
     assert(result ~= nil)
+    result.complete = nil
     result.enableCommon = nil
     removeMetas(result)
     for _, item in ipairs(result) do
@@ -129,6 +108,18 @@ function TEST(data)
     assert(eq(expect, result))
 end
 
+local function WITH_CONFIG(cfg, f)
+    local prev = { }
+    for k, v in pairs(cfg) do
+        prev[k] = config.get(nil, k)
+        config.set(nil, k, v)
+    end
+    f()
+    for k, v in pairs(prev) do
+        config.set(nil, k, v)
+    end
+end
+
 TEST {
     {
         path = 'abc.lua',
@@ -150,27 +141,27 @@ TEST {
     completion = {
         {
             label = 'aaa',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'abc',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'abc.aaa',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'abcde',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'xxx.abcde',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -189,7 +180,7 @@ TEST {
     completion = {
         {
             label = 'abc',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -212,12 +203,12 @@ TEST {
     completion = {
         {
             label = 'ABCD',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'abc',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -240,12 +231,12 @@ TEST {
     completion = {
         {
             label = 'abc',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'abc.init',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -268,17 +259,17 @@ TEST {
     completion = {
         {
             label = 'abc',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'abc.bbc',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'abc.init',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -301,14 +292,14 @@ TEST {
     completion = {
         {
             label = 'abc.init',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
 }
 
-local originSeparator = config.get 'Lua.completion.requireSeparator'
-config.set('Lua.completion.requireSeparator', '/')
+local originSeparator = config.get(nil, 'Lua.completion.requireSeparator')
+config.set(nil, 'Lua.completion.requireSeparator', '/')
 TEST {
     {
         path = 'abc.lua',
@@ -326,12 +317,12 @@ TEST {
     completion = {
         {
             label = 'abc/init',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
 }
-config.set('Lua.completion.requireSeparator', originSeparator)
+config.set(nil, 'Lua.completion.requireSeparator', originSeparator)
 
 TEST {
     {
@@ -350,7 +341,7 @@ TEST {
     completion = {
         {
             label = 'core.core',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -373,31 +364,31 @@ TEST {
     completion = {
         {
             label = 'abc.x111',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'x000',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'x111',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
 }
 
 
-local originRuntimePath = config.get 'Lua.runtime.path'
-config.set('Lua.runtime.path', {
+local originRuntimePath = config.get(nil, 'Lua.runtime.path')
+config.set(nil, 'Lua.runtime.path', {
     '?/1.lua',
 })
 
 TEST {
     {
-        path = 'D:/xxxx/1.lua',
+        path = 'tt/xxxx/1.lua',
         content = '',
     },
     {
@@ -407,28 +398,28 @@ TEST {
     },
     completion = {
         {
-            label = 'D:.xxxx',
-            kind = CompletionItemKind.Reference,
+            label = 'tt.xxxx',
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'xxxx',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
 }
 
-config.set('Lua.runtime.path', originRuntimePath)
+config.set(nil, 'Lua.runtime.path', originRuntimePath)
 
-local originRuntimePath = config.get 'Lua.runtime.path'
-config.set('Lua.runtime.path', {
-    'D:/?/1.lua',
+local originRuntimePath = config.get(nil, 'Lua.runtime.path')
+config.set(nil, 'Lua.runtime.path', {
+    'tt/?/1.lua',
 })
 
 TEST {
     {
-        path = 'D:/xxxx/1.lua',
+        path = 'tt/xxxx/1.lua',
         content = '',
     },
     {
@@ -439,13 +430,13 @@ TEST {
     completion = {
         {
             label = 'xxxx',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
 }
 
-config.set('Lua.runtime.path', originRuntimePath)
+config.set(nil, 'Lua.runtime.path', originRuntimePath)
 
 TEST {
     {
@@ -582,22 +573,22 @@ TEST {
     completion = {
         {
             label = 'a',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'b',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'f.a',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'f.b',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -616,18 +607,18 @@ TEST {
     completion = {
         {
             label = 'a',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'f.a',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
 }
 
-config.set('Lua.runtime.pathStrict', true)
+config.set(nil, 'Lua.runtime.pathStrict', true)
 
 TEST {
     { path = 'f/a.lua' },
@@ -642,12 +633,12 @@ TEST {
     completion = {
         {
             label = 'f.a',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
         {
             label = 'f.b',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -666,13 +657,13 @@ TEST {
     completion = {
         {
             label = 'f.a',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
 }
 
-config.set('Lua.runtime.pathStrict', false)
+config.set(nil, 'Lua.runtime.pathStrict', false)
 
 TEST {
     {
@@ -689,7 +680,7 @@ TEST {
     completion = {
         {
             label = 'xxx',
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -710,7 +701,7 @@ TEST {
     completion = {
         {
             label = [[xx'xx]],
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -731,7 +722,7 @@ TEST {
     completion = {
         {
             label = [[xx]=]xx]],
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -752,8 +743,8 @@ TEST {
     },
     completion = {
         {
-            label = [[abc\init.lua]],
-            kind = CompletionItemKind.Reference,
+            label = [[abc/init.lua]],
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -774,7 +765,7 @@ TEST {
     completion = {
         {
             label = [[abc/init.lua]],
-            kind = CompletionItemKind.Reference,
+            kind = CompletionItemKind.File,
             textEdit = EXISTS,
         },
     }
@@ -833,7 +824,7 @@ TEST {
             kind = CompletionItemKind.Variable,
             description = [[
 ```lua
-local z: {}
+local z: table
 ```]]
         },
     }
@@ -960,7 +951,7 @@ TEST {
     completion = EXISTS
 }
 
-config.prop('Lua.runtime.special', 'import', 'require')
+config.prop(nil, 'Lua.runtime.special', 'import', 'require')
 TEST {
     { path = 'abcde.lua', content = '' },
     {
@@ -972,3 +963,74 @@ TEST {
     },
     completion = EXISTS
 }
+
+-- Find obscured modules
+
+WITH_CONFIG({
+    ["Lua.runtime.pathStrict"] = true,
+    ["Lua.runtime.path"] = {
+        "?/init.lua",
+        "sub/?/init.lua",
+        "obscure_path/?/?/init.lua"
+    },
+}, function()
+    TEST {
+        { path = 'myLib/init.lua', content = 'return {}' },
+        {
+            path = 'main.lua',
+            main = true,
+            content = [[
+                myLib<??>
+            ]],
+        },
+        completion = EXISTS
+    }
+
+    TEST {
+        { path = 'sub/myLib/init.lua', content = 'return {}' },
+        {
+            path = 'main.lua',
+            main = true,
+            content = [[
+                myLib<??>
+            ]],
+        },
+        completion = EXISTS
+    }
+
+    TEST {
+        { path = 'sub/myLib/sublib/init.lua', content = 'return {}' },
+        {
+            path = 'main.lua',
+            main = true,
+            content = [[
+                sublib<??>
+            ]],
+        },
+        completion = EXISTS
+    }
+
+    TEST {
+        { path = 'sublib/init.lua', content = 'return {}' },
+        {
+            path = 'main.lua',
+            main = true,
+            content = [[
+                sublib<??>
+            ]],
+        },
+        completion = EXISTS
+    }
+
+    TEST {
+        { path = 'obscure_path/myLib/obscure/myLib/obscure/init.lua', content = 'return {}' },
+        {
+            path = 'main.lua',
+            main = true,
+            content = [[
+                obscure<??>
+            ]],
+        },
+        completion = EXISTS
+    }
+end)

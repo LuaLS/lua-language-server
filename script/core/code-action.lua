@@ -5,31 +5,43 @@ local sp        = require 'bee.subprocess'
 local guide     = require "parser.guide"
 local converter = require 'proto.converter'
 
+---@param uri  uri
+---@param row  integer
+---@param mode string
+---@param code string
 local function checkDisableByLuaDocExits(uri, row, mode, code)
     if row < 0 then
         return nil
     end
     local state = files.getState(uri)
+    if not state then
+        return nil
+    end
     local lines = state.lines
     if state.ast.docs and lines then
-        return guide.eachSourceBetween(state.ast.docs, guide.positionOf(row, 0), guide.positionOf(row + 1, 0), function (doc)
-            if  doc.type == 'doc.diagnostic'
-            and doc.mode == mode then
-                if doc.names then
-                    return {
-                        start   = doc.finish,
-                        finish  = doc.finish,
-                        newText = ', ' .. code,
-                    }
-                else
-                    return {
-                        start   = doc.finish,
-                        finish  = doc.finish,
-                        newText = ': ' .. code,
-                    }
+        return guide.eachSourceBetween(
+            state.ast.docs,
+            guide.positionOf(row, 0),
+            guide.positionOf(row + 1, 0),
+            function (doc)
+                if  doc.type == 'doc.diagnostic'
+                and doc.mode == mode then
+                    if doc.names then
+                        return {
+                            start   = doc.finish,
+                            finish  = doc.finish,
+                            newText = ', ' .. code,
+                        }
+                    else
+                        return {
+                            start   = doc.finish,
+                            finish  = doc.finish,
+                            newText = ': ' .. code,
+                        }
+                    end
                 end
             end
-        end)
+        )
     end
     return nil
 end
@@ -43,13 +55,13 @@ local function checkDisableByLuaDocInsert(uri, row, mode, code)
 end
 
 local function disableDiagnostic(uri, code, start, results)
-    local row   = guide.rowColOf(start)
+    local row = guide.rowColOf(start)
     results[#results+1] = {
         title   = lang.script('ACTION_DISABLE_DIAG', code),
         kind    = 'quickfix',
         command = {
-            title    = lang.script.COMMAND_DISABLE_DIAG,
-            command = 'lua.setConfig:' .. sp:get_id(),
+            title     = lang.script.COMMAND_DISABLE_DIAG,
+            command   = 'lua.setConfig',
             arguments = {
                 {
                     key    = 'Lua.diagnostics.disable',
@@ -86,7 +98,7 @@ local function markGlobal(uri, name, results)
         kind    = 'quickfix',
         command = {
             title     = lang.script.COMMAND_MARK_GLOBAL,
-            command = 'lua.setConfig:' .. sp:get_id(),
+            command   = 'lua.setConfig',
             arguments = {
                 {
                     key    = 'Lua.diagnostics.globals',
@@ -105,7 +117,7 @@ local function changeVersion(uri, version, results)
         kind    = 'quickfix',
         command = {
             title     = lang.script.COMMAND_RUNTIME_VERSION,
-            command   = 'lua.setConfig:' .. sp:get_id(),
+            command   = 'lua.setConfig',
             arguments = {
                 {
                     key    = 'Lua.runtime.version',
@@ -119,9 +131,12 @@ local function changeVersion(uri, version, results)
 end
 
 local function solveUndefinedGlobal(uri, diag, results)
-    local ast    = files.getState(uri)
-    local start  = converter.unpackRange(uri, diag.range)
-    guide.eachSourceContain(ast.ast, start, function (source)
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
+    local start = converter.unpackRange(state, diag.range)
+    guide.eachSourceContain(state.ast, start, function (source)
         if source.type ~= 'getglobal' then
             return
         end
@@ -138,9 +153,12 @@ local function solveUndefinedGlobal(uri, diag, results)
 end
 
 local function solveLowercaseGlobal(uri, diag, results)
-    local ast    = files.getState(uri)
-    local start  = converter.unpackRange(uri, diag.range)
-    guide.eachSourceContain(ast.ast, start, function (source)
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
+    local start = converter.unpackRange(state, diag.range)
+    guide.eachSourceContain(state.ast, start, function (source)
         if source.type ~= 'setglobal' then
             return
         end
@@ -151,10 +169,13 @@ local function solveLowercaseGlobal(uri, diag, results)
 end
 
 local function findSyntax(uri, diag)
-    local ast = files.getState(uri)
-    for _, err in ipairs(ast.errs) do
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
+    for _, err in ipairs(state.errs) do
         if err.type:lower():gsub('_', '-') == diag.code then
-            local range = converter.packRange(uri, err.start, err.finish)
+            local range = converter.packRange(state, err.start, err.finish)
             if util.equal(range, diag.range) then
                 return err
             end
@@ -174,7 +195,6 @@ local function solveSyntaxByChangeVersion(uri, err, results)
 end
 
 local function solveSyntaxByAddDoEnd(uri, err, results)
-    local text   = files.getText(uri)
     results[#results+1] = {
         title = lang.script.ACTION_ADD_DO_END,
         kind = 'quickfix',
@@ -209,7 +229,7 @@ local function solveSyntaxByFix(uri, err, results)
     results[#results+1] = {
         title = lang.script('ACTION_' .. err.fix.title, err.fix),
         kind  = 'quickfix',
-        edit = {
+        edit  = {
             changes = {
                 [uri] = changes,
             }
@@ -223,7 +243,7 @@ local function solveSyntaxUnicodeName(uri, err, results)
         kind    = 'quickfix',
         command = {
             title     = lang.script.COMMAND_UNICODE_NAME,
-            command   = 'lua.setConfig:' .. sp:get_id(),
+            command   = 'lua.setConfig',
             arguments = {
                 {
                     key    = 'Lua.runtime.unicodeName',
@@ -256,7 +276,11 @@ local function solveSyntax(uri, diag, results)
 end
 
 local function solveNewlineCall(uri, diag, results)
-    local start = converter.unpackRange(uri, diag.range)
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
+    local start = converter.unpackRange(state, diag.range)
     results[#results+1] = {
         title = lang.script.ACTION_ADD_SEMICOLON,
         kind = 'quickfix',
@@ -264,8 +288,8 @@ local function solveNewlineCall(uri, diag, results)
             changes = {
                 [uri] = {
                     {
-                        start  = start,
-                        finish = start,
+                        start   = start,
+                        finish  = start,
                         newText = ';',
                     }
                 }
@@ -280,7 +304,7 @@ local function solveAmbiguity1(uri, diag, results)
         kind = 'quickfix',
         command = {
             title = lang.script.COMMAND_ADD_BRACKETS,
-            command = 'lua.solve:' .. sp:get_id(),
+            command = 'lua.solve',
             arguments = {
                 {
                     name  = 'ambiguity-1',
@@ -298,7 +322,7 @@ local function solveTrailingSpace(uri, diag, results)
         kind = 'quickfix',
         command = {
             title = lang.script.COMMAND_REMOVE_SPACE,
-            command = 'lua.removeSpace:' .. sp:get_id(),
+            command = 'lua.removeSpace',
             arguments = {
                 {
                     uri = uri,
@@ -313,7 +337,7 @@ local function solveAwaitInSync(uri, diag, results)
     if not state then
         return
     end
-    local start, finish = converter.unpackRange(uri, diag.range)
+    local start, finish = converter.unpackRange(state, diag.range)
     local parentFunction
     guide.eachSourceType(state.ast, 'function', function (source)
         if source.start > finish
@@ -329,6 +353,8 @@ local function solveAwaitInSync(uri, diag, results)
     end
     local row = guide.rowColOf(parentFunction.start)
     local pos = guide.positionOf(row, 0)
+    local offset = guide.positionToOffset(state, pos + 1)
+    local space = state.lua:match('[ \t]*', offset)
     results[#results+1] = {
         title = lang.script.ACTION_MARK_ASYNC,
         kind = 'quickfix',
@@ -336,14 +362,63 @@ local function solveAwaitInSync(uri, diag, results)
             changes = {
                 [uri] = {
                     {
-                        start  = pos,
-                        finish = pos,
-                        newText = '---@async\n',
+                        start   = pos,
+                        finish  = pos,
+                        newText = space .. '---@async\n',
                     }
                 }
             }
         },
     }
+end
+
+local function solveSpell(uri, diag, results)
+    local state = files.getState(uri)
+    if not state then
+        return
+    end
+    local spell = require 'provider.spell'
+    local word = diag.data
+    if word == nil then
+        return
+    end
+
+    results[#results+1] = {
+        title   = lang.script('ACTION_ADD_DICT', word),
+        kind    = 'quickfix',
+        command = {
+            title     = lang.script.COMMAND_ADD_DICT,
+            command   = 'lua.setConfig',
+            arguments = {
+                {
+                    key    = 'Lua.spell.dict',
+                    action = 'add',
+                    value  = word,
+                    uri    = uri,
+                }
+            }
+        }
+    }
+
+    local suggests = spell.getSpellSuggest(word)
+    for _, suggest in ipairs(suggests) do
+        results[#results+1] = {
+            title = suggest,
+            kind = 'quickfix',
+            edit = {
+                changes = {
+                    [uri] = {
+                        {
+                            start   = converter.unpackPosition(state, diag.range.start),
+                            finish  = converter.unpackPosition(state, diag.range["end"]),
+                            newText = suggest
+                        }
+                    }
+                }
+            }
+        }
+    end
+
 end
 
 local function solveDiagnostic(uri, diag, start, results)
@@ -366,6 +441,8 @@ local function solveDiagnostic(uri, diag, start, results)
         solveTrailingSpace(uri, diag, results)
     elseif diag.code == 'await-in-sync' then
         solveAwaitInSync(uri, diag, results)
+    elseif diag.code == 'spell-check' then
+        solveSpell(uri, diag, results)
     end
     disableDiagnostic(uri, diag.code, start, results)
 end
@@ -382,7 +459,7 @@ end
 local function checkSwapParams(results, uri, start, finish)
     local state = files.getState(uri)
     local text  = files.getText(uri)
-    if not state then
+    if not state or not text then
         return
     end
     local args = {}
@@ -411,6 +488,12 @@ local function checkSwapParams(results, uri, start, finish)
             elseif source.type == 'funcargs' then
                 local var = source.parent.parent
                 if guide.isSet(var) then
+                    if var.type == 'tablefield' then
+                        var = var.field
+                    end
+                    if var.type == 'tableindex' then
+                        var = var.index
+                    end
                     node = text:sub(
                         guide.positionToOffset(state, var.start) + 1,
                         guide.positionToOffset(state, var.finish)
@@ -542,35 +625,46 @@ end
 --end
 
 local function checkJsonToLua(results, uri, start, finish)
-    local text  = files.getText(uri)
-    local state = files.getState(uri)
+    local text         = files.getText(uri)
+    local state        = files.getState(uri)
+    if not state or not text then
+        return
+    end
     local startOffset  = guide.positionToOffset(state, start)
     local finishOffset = guide.positionToOffset(state, finish)
-    local jsonStart = text:match ('()[%{%[]', startOffset + 1)
+    local jsonStart = text:match('()["%{%[]', startOffset + 1)
     if not jsonStart then
         return
     end
-    local jsonFinish
+    local jsonFinish, finishChar
     for i = math.min(finishOffset, #text), jsonStart + 1, -1 do
         local char = text:sub(i, i)
         if char == ']'
         or char == '}' then
             jsonFinish = i
+            finishChar = char
             break
         end
     end
     if not jsonFinish then
         return
     end
-    if not text:sub(jsonStart, jsonFinish):find '"%s*%:' then
-        return
+    if finishChar == '}' then
+        if not text:sub(jsonStart, jsonFinish):find '"%s*%:' then
+            return
+        end
+    end
+    if finishChar == ']' then
+        if not text:sub(jsonStart, jsonFinish):find ',' then
+            return
+        end
     end
     results[#results+1] = {
         title = lang.script.ACTION_JSON_TO_LUA,
         kind = 'refactor.rewrite',
         command = {
             title = lang.script.COMMAND_JSON_TO_LUA,
-            command = 'lua.jsonToLua:' .. sp:get_id(),
+            command = 'lua.jsonToLua',
             arguments = {
                 {
                     uri    = uri,

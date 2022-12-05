@@ -8,8 +8,7 @@ string = {}
 ---@param s  string
 ---@param i? integer
 ---@param j? integer
----@return integer
----@return ...
+---@return integer ...
 ---@nodiscard
 function string.byte(s, i, j) end
 
@@ -17,12 +16,11 @@ function string.byte(s, i, j) end
 ---@param byte integer
 ---@param ... integer
 ---@return string
----@return ...
 ---@nodiscard
 function string.char(byte, ...) end
 
 ---#DES 'string.dump'
----@param f      async fun()
+---@param f      async fun(...):...
 ---@param strip? boolean
 ---@return string
 ---@nodiscard
@@ -35,13 +33,13 @@ function string.dump(f, strip) end
 ---@param plain?  boolean
 ---@return integer start
 ---@return integer end
----@return ... captured
+---@return any ... captured
 ---@nodiscard
 function string.find(s, pattern, init, plain) end
 
 ---#DES 'string.format'
----@param s string
----@param ... string
+---@param s any
+---@param ... any
 ---@return string
 ---@nodiscard
 function string.format(s, ...) end
@@ -51,6 +49,7 @@ function string.format(s, ...) end
 ---@param s       string
 ---@param pattern string
 ---@return fun():string, ...
+---@nodiscard
 function string.gmatch(s, pattern) end
 ---#else
 ---@param s       string
@@ -63,8 +62,8 @@ function string.gmatch(s, pattern, init) end
 ---#DES 'string.gsub'
 ---@param s       string
 ---@param pattern string
----@param repl    string|table|function
----@param n       integer
+---@param repl    string|number|table|function
+---@param n?      integer
 ---@return string
 ---@return integer count
 ---@nodiscard
@@ -86,16 +85,15 @@ function string.lower(s) end
 ---@param s       string
 ---@param pattern string
 ---@param init?   integer
----@return string | number captured
+---@return any ...
 ---@nodiscard
 function string.match(s, pattern, init) end
 
 ---@version >5.3
 ---#DES 'string.pack'
 ---@param fmt string
----@param v1  string
----@param v2? string
----@param ... string
+---@param v1  string|number
+---@param ... string|number
 ---@return string binary
 ---@nodiscard
 function string.pack(fmt, v1, v2, ...) end
@@ -143,7 +141,7 @@ function string.sub(s, i, j) end
 ---@param fmt  string
 ---@param s    string
 ---@param pos? integer
----@return ...
+---@return any ...
 ---@return integer offset
 ---@nodiscard
 function string.unpack(fmt, s, pos) end

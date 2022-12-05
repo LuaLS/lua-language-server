@@ -21,6 +21,9 @@ end
 local function findInsertRow(uri)
     local text  = files.getText(uri)
     local state = files.getState(uri)
+    if not state or not text then
+        return
+    end
     local lines = state.lines
     local fmt   = {
         pair = false,
@@ -64,11 +67,11 @@ local function findInsertRow(uri)
 end
 
 ---@async
-local function askAutoRequire(visiblePaths)
+local function askAutoRequire(uri, visiblePaths)
     local selects = {}
     local nameMap = {}
     for _, visible in ipairs(visiblePaths) do
-        local expect = visible.expect
+        local expect = visible.name
         local select = lang.script(expect)
         if not nameMap[select] then
             nameMap[select] = expect
@@ -91,6 +94,7 @@ local function askAutoRequire(visiblePaths)
                 key    = 'Lua.completion.autoRequire',
                 action = 'set',
                 value  = false,
+                uri    = uri,
             }
         }
         return
@@ -137,15 +141,15 @@ return function (data)
     end
 
     local path = furi.decode(target)
-    local visiblePaths = rpath.getVisiblePath(path)
+    local visiblePaths = rpath.getVisiblePath(uri, path)
     if not visiblePaths or #visiblePaths == 0 then
         return
     end
     table.sort(visiblePaths, function (a, b)
-        return #a.expect < #b.expect
+        return #a.name < #b.name
     end)
 
-    local result = askAutoRequire(visiblePaths)
+    local result = askAutoRequire(uri, visiblePaths)
     if not result then
         return
     end

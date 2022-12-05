@@ -1,7 +1,7 @@
 local json     = require 'json'
+local inspect  = require 'inspect'
 local pcall    = pcall
 local tonumber = tonumber
-local util     = require 'utility'
 
 ---@class jsonrpc
 local m = {}
@@ -44,12 +44,13 @@ function m.decode(reader)
     end
     local len = head['Content-Length']
     if not len then
-        return nil, 'Proto header error: ' .. util.dump(head)
+        return nil, 'Proto header error: ' .. inspect(head)
     end
     local content = reader(len)
     if not content then
         return nil, 'Proto read error'
     end
+    ---@type any
     local null = json.null
     json.null = nil
     local suc, res = pcall(json.decode, content)

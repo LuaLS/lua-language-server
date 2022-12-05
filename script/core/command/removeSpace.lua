@@ -4,20 +4,12 @@ local proto     = require 'proto'
 local lang      = require 'language'
 local converter = require 'proto.converter'
 
-local function isInString(ast, offset)
-    return guide.eachSourceContain(ast.ast, offset, function (source)
-        if source.type == 'string' then
-            return true
-        end
-    end) or false
-end
-
 ---@async
 return function (data)
     local uri   = data.uri
     local text  = files.getText(uri)
     local state = files.getState(uri)
-    if not state then
+    if not state or not text then
         return
     end
 
@@ -32,7 +24,8 @@ return function (data)
             goto NEXT_LINE
         end
         local lastPos = guide.offsetToPosition(state, lastOffset)
-        if isInString(state.ast, lastPos) then
+        if guide.isInString(state.ast, lastPos)
+        or guide.isInComment(state.ast, lastPos) then
             goto NEXT_LINE
         end
         local firstOffset = startOffset
@@ -45,7 +38,7 @@ return function (data)
         end
         local firstPos = guide.offsetToPosition(state, firstOffset) - 1
         textEdit[#textEdit+1] = {
-            range = converter.packRange(uri, firstPos, lastPos),
+            range = converter.packRange(state, firstPos, lastPos),
             newText = '',
         }
 

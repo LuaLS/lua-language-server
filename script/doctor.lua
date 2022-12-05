@@ -20,6 +20,7 @@ local maxinterger    = 10000
 local mathType       = math.type
 local _G             = _G
 local registry       = getregistry()
+local ccreate        = coroutine.create
 
 _ENV = nil
 
@@ -161,6 +162,9 @@ local function private(o)
 end
 
 local m = private {}
+
+m._ignoreMainThread = true
+
 --- 获取内存快照，生成一个内部数据结构。
 --- 一般不用这个API，改用 report 或 catch。
 ---@return table
@@ -175,6 +179,9 @@ m.snapshot = private(function ()
             exclude[o] = true
         end
     end
+    ---@generic T
+    ---@param o T
+    ---@return T
     local function private(o)
         if not o then
             return nil
@@ -187,7 +194,6 @@ m.snapshot = private(function ()
 
     local find
     local mark = private {}
-
 
     local function findTable(t, result)
         result = result or {}
@@ -208,21 +214,45 @@ m.snapshot = private(function ()
             if not wk then
                 local keyInfo = find(k)
                 if keyInfo then
-                    result[#result+1] = private {
-                        type = 'key',
-                        name = formatName(k),
-                        info = keyInfo,
-                    }
+                    if wv then
+                        find(v)
+                        local valueResults = mark[v]
+                        if valueResults then
+                            valueResults[#valueResults+1] = private {
+                                type = 'weakvalue-key',
+                                name = formatName(t) .. '|' .. formatName(v),
+                                info = keyInfo,
+                            }
+                        end
+                    else
+                        result[#result+1] = private {
+                            type = 'key',
+                            name = formatName(k),
+                            info = keyInfo,
+                        }
+                    end
                 end
             end
             if not wv then
                 local valueInfo = find(v)
                 if valueInfo then
-                    result[#result+1] = private {
-                        type = 'field',
-                        name = formatName(k) .. '|' .. formatName(v),
-                        info = valueInfo,
-                    }
+                    if wk then
+                        find(k)
+                        local keyResults = mark[k]
+                        if keyResults then
+                            keyResults[#keyResults+1] = private {
+                                type = 'weakkey-field',
+                                name = formatName(t) .. '|' .. formatName(k),
+                                info = valueInfo,
+                            }
+                        end
+                    else
+                        result[#result+1] = private {
+                            type = 'field',
+                            name = formatName(k) .. '|' .. formatName(v),
+                            info = valueInfo,
+                        }
+                    end
                 end
             end
         end
@@ -420,6 +450,20 @@ m.snapshot = private(function ()
             info = find(_G),
         }
     end
+    for name, mt in next, private {
+        ['nil']       = getmetatable(nil),
+        ['boolean']   = getmetatable(true),
+        ['number']    = getmetatable(0),
+        ['string']    = getmetatable(''),
+        ['function']  = getmetatable(function () end),
+        ['thread']    = getmetatable(ccreate(function () end)),
+    } do
+        result.info[#result.info+1] = private {
+            type = 'metatable',
+            name = name,
+            info = find(mt),
+        }
+    end
     if m._cache then
         m._lastCache = result
     end
@@ -535,7 +579,7 @@ m.exclude = private(function (...)
 end)
 
 --- 比较2个报告
----@return string
+---@return table
 m.compare = private(function (old, new)
     local newHash = {}
     local ret = {}

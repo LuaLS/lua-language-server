@@ -6,15 +6,15 @@ rawset(_G, 'TEST', true)
 
 function TEST(script)
     local clock = os.clock()
-    local state = parser.compile(script, 'Lua', 'Lua 5.3')
+    local state = parser.compile(script, 'Lua', 'Lua 5.4')
     state.compileClock = os.clock() - clock
     return state
 end
 
 local function startCollectDiagTimes()
-    for name in pairs(config.get 'Lua.diagnostics.neededFileStatus') do
+    for name in pairs(config.get(nil, 'Lua.diagnostics.neededFileStatus')) do
         if name ~= 'no-implicit-any' then
-            --config.get 'Lua.diagnostics.neededFileStatus'[name] = 'Any'
+            --config.get(nil, 'Lua.diagnostics.neededFileStatus')[name] = 'Any'
         end
     end
     DIAGTIMES = {}
@@ -27,8 +27,17 @@ require 'full.dirty'
 require 'full.projects'
 require 'full.self'
 
+local times = {}
 for name, time in util.sortPairs(DIAGTIMES, function (k1, k2)
-    return DIAGTIMES[k1] < DIAGTIMES[k2]
+    return DIAGTIMES[k1] > DIAGTIMES[k2]
 end) do
-    print('诊断任务耗时：', name, time)
+    times[#times+1] = ('诊断任务耗时：%05.3f [%s]'):format(time, name)
+    if #times >= 10 then
+        break
+    end
+end
+
+util.revertTable(times)
+for _, time in ipairs(times) do
+    print(time)
 end

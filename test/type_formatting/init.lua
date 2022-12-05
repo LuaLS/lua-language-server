@@ -6,17 +6,17 @@ local catch = require 'catch'
 rawset(_G, 'TEST', true)
 
 function TEST(script)
-    return function (expect)
-        files.removeAll()
+    return function(expect)
         local newScript, catched = catch(script, '?')
-        files.setText('', newScript)
-        local edits = core('', catched['?'][1][1], expect.ch)
+        files.setText(TESTURI, newScript)
+        local edits = core(TESTURI, catched['?'][1][1], expect.ch)
         if edits then
             assert(expect.edits)
             assert(util.equal(edits, expect.edits))
         else
             assert(expect.edits == nil)
         end
+        files.remove(TESTURI)
     end
 end
 
@@ -117,11 +117,93 @@ TEST [[
 }
 
 TEST [[
-if true then
+local x = 1
+<??>
+]]
+{
+    ch = '\n',
+    edits = nil,
+}
+
+TEST [[
+local x = 'if 1 then'
+    <??>
+]]
+{
+    ch = '\n',
+    edits = {
+        {
+            start  = 10000,
+            finish = 10004,
+            text   = '',
+        }
+    }
+}
+
+TEST [[
+local x = 'do'
+    <??>
+]]
+{
+    ch = '\n',
+    edits = {
+        {
+            start  = 10000,
+            finish = 10004,
+            text   = '',
+        }
+    }
+}
+
+TEST [[
+local x = 'function'
+    <??>
+]]
+{
+    ch = '\n',
+    edits = {
+        {
+            start  = 10000,
+            finish = 10004,
+            text   = '',
+        }
+    }
+}
+
+TEST [[
+do
+    <??>
+]]
+{
+    ch = '\n',
+    edits = nil
+}
+
+TEST [[
+do
     <??>
 end
 ]]
 {
     ch = '\n',
-    edits = {}
+    edits = nil
+}
+
+TEST [[
+function ()
+    <??>
+]]
+{
+    ch = '\n',
+    edits = nil
+}
+
+TEST [[
+function ()
+    <??>
+end
+]]
+{
+    ch = '\n',
+    edits = nil
 }

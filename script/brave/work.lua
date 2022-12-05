@@ -1,9 +1,4 @@
 local brave   = require 'brave.brave'
-local parser  = require 'parser'
-local fs      = require 'bee.filesystem'
-local furi    = require 'file-uri'
-local util    = require 'utility'
-local thread  = require 'bee.thread'
 
 brave.on('loadProto', function ()
     local jsonrpc = require 'jsonrpc'
@@ -19,48 +14,55 @@ brave.on('loadProto', function ()
 end)
 
 brave.on('timer', function (time)
+    local thread = require 'bee.thread'
     while true do
         thread.sleep(time)
         brave.push('wakeup')
     end
 end)
 
-brave.on('compile', function (text)
-    local state, err = parser.compile(text, 'Lua', 'Lua 5.4')
-    if not state then
-        log.error(err)
-        return
+brave.on('loadFile', function (path)
+    local util    = require 'utility'
+    return util.loadFile(path)
+end)
+
+brave.on('removeCaches', function (path)
+    local fs  = require 'bee.filesystem'
+    local fsu = require 'fs-utility'
+    for dir in fs.pairs(fs.path(path)) do
+        local lockFile = dir / '.lock'
+        local f = io.open(lockFile:string(), 'wb')
+        if f then
+            f:close()
+            fsu.fileRemove(dir)
+        end
     end
-    local lines = parser.lines(text)
+end)
+
+---@class brave.param.compile
+---@field uri uri
+---@field text string
+---@field mode string
+---@field version string
+---@field options brave.param.compile.options
+
+---@class brave.param.compile.options
+---@field special table<string, string>
+---@field unicodeName boolean
+---@field nonstandardSymbol table<string, true>
+
+---@param param brave.param.compile
+brave.on('compile', function (param)
+    local parser = require 'parser'
+    local clock = os.clock()
+    local state, err = parser.compile(param.text
+        , param.mode
+        , param.version
+        , param.options
+    )
+    log.debug('Async compile', param.uri, 'takes:', os.clock() - clock)
     return {
-        root  = state.root,
-        value = state.value,
-        errs  = state.errs,
-        lines = lines,
+        state = state,
+        err   = err,
     }
-end)
-
-brave.on('listDirectory', function (uri)
-    local path = fs.path(furi.decode(uri))
-    local uris = {}
-    for child in fs.pairs(path) do
-        local childUri = furi.encode(child:string())
-        uris[#uris+1] = childUri
-    end
-    return uris
-end)
-
-brave.on('isDirectory', function (uri)
-    local path = fs.path(furi.decode(uri))
-    return fs.is_directory(path)
-end)
-
-brave.on('loadFile', function (uri)
-    local filename = furi.decode(uri)
-    return util.loadFile(filename)
-end)
-
-brave.on('saveFile', function (params)
-    local filename = furi.decode(params.uri)
-    return util.saveFile(filename, params.text)
 end)

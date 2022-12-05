@@ -11,10 +11,16 @@ local lang   = require 'language'
 local ws     = require 'workspace'
 local time   = require 'bee.time'
 local fw     = require 'filewatch'
+local furi   = require 'file-uri'
 
+require 'jsonc'
+require 'json-beautify'
+
+---@class service
 local m = {}
 m.type = 'service'
 m.idleClock = 0.0
+m.sleeping = false
 
 local function countMemory()
     local mems = {}
@@ -118,14 +124,14 @@ function m.reportProto()
     end
 
     local lines = {}
-    lines[#lines+1] = '    --------------- Proto ---------------'
+    lines[#lines+1] = '    ---------------  RPC  ---------------'
     lines[#lines+1] = ('        Holdon:   %d'):format(holdon)
     lines[#lines+1] = ('        Waiting:  %d'):format(waiting)
     return table.concat(lines, '\n')
 end
 
 function m.report()
-    local t = timer.loop(60.0, function ()
+    local t = timer.loop(600.0, function ()
         local lines = {}
         lines[#lines+1] = ''
         lines[#lines+1] = '========= Medical Examination Report ========='
@@ -135,50 +141,63 @@ function m.report()
         lines[#lines+1] = m.reportProto()
         lines[#lines+1] = '=============================================='
 
-        log.debug(table.concat(lines, '\n'))
+        log.info(table.concat(lines, '\n'))
     end)
     t:onTimer()
 end
 
-function m.startTimer()
+function m.eventLoop()
     pub.task('timer', 1)
-    while true do
-        pub.step(not m.workingClock)
+    pub.on('wakeup', function ()
+        m.reportStatus()
+        fw.update()
+    end)
+
+    local function busy()
+        if not m.workingClock then
+            m.workingClock = time.monotonic()
+            m.reportStatus()
+        end
+    end
+
+    local function idle()
+        if m.workingClock then
+            m.workingClock = nil
+            m.reportStatus()
+        end
+    end
+
+    local function doSomething()
+        timer.update()
+        pub.step(false)
         if await.step() then
-            m.sleeping = false
-            if not m.workingClock then
-                m.workingClock = time.monotonic()
-            end
-        else
-            if m.workingClock then
-                m.workingClock = nil
-                m.idleClock = time.monotonic()
-                m.reportStatus()
+            busy()
+            return true
+        end
+        return false
+    end
+
+    local function sleep()
+        idle()
+        for _ = 1, 10 do
+            thread.sleep(0.1)
+            if doSomething() then
+                return
             end
         end
-        timer.update()
+        pub.step(true)
+    end
+
+    while true do
+        if doSomething() then
+            goto CONTINUE
+        end
+        sleep()
+        ::CONTINUE::
     end
 end
 
-function m.pulse()
-    --timer.loop(10, function ()
-    --    if not m.workingClock and not m.sleeping and time.monotonic() - m.idleClock >= 300000 then
-    --        m.sleeping = true
-    --        files.flushCache()
-    --        vm.flushCache()
-    --        ws.flushCache()
-    --        collectgarbage()
-    --        collectgarbage()
-    --    end
-    --    m.reportStatus()
-    --end)
-    timer.loop(0.1, function ()
-        m.reportStatus()
-    end)
-    timer.loop(1, function ()
-        fw.update()
-    end)
-end
+local showStatusTip = math.random(100) == 1
 
 function m.reportStatus()
     local info = {}
@@ -189,12 +208,23 @@ function m.reportStatus()
     else
         info.text = '😺Lua'
     end
-    info.tooltip = lang.script('WINDOW_LUA_STATUS', {
-        ws  = ws.path or '',
+
+    local tooltips = {}
+    local params = {
         ast = files.astCount,
         max = files.fileCount,
         mem = collectgarbage('count') / 1000,
-    })
+    }
+    for i, scp in ipairs(ws.folders) do
+        tooltips[i] = lang.script('WINDOW_LUA_STATUS_WORKSPACE', furi.decode(scp.uri))
+    end
+    tooltips[#tooltips+1] = lang.script('WINDOW_LUA_STATUS_CACHED_FILES', params)
+    tooltips[#tooltips+1] = lang.script('WINDOW_LUA_STATUS_MEMORY_COUNT', params)
+    if showStatusTip then
+        tooltips[#tooltips+1] = lang.script('WINDOW_LUA_STATUS_TIP')
+    end
+
+    info.tooltip = table.concat(tooltips, '\n')
     if util.equal(m.lastInfo, info) then
         return
     end
@@ -205,7 +235,7 @@ end
 function m.testVersion()
     local stack = debug.setcstacklimit(200)
     debug.setcstacklimit(stack + 1)
-    if debug.setcstacklimit(stack) == stack + 1 then
+    if type(stack) == 'number' and debug.setcstacklimit(stack) == stack + 1 then
         proto.notify('window/showMessage', {
             type = 2,
             message = 'It seems to be running in Lua 5.4.0 or Lua 5.4.1 . Please upgrade to Lua 5.4.2 or above. Otherwise, it may encounter weird "C stack overflow", resulting in failure to work properly',
@@ -213,21 +243,38 @@ function m.testVersion()
     end
 end
 
+function m.lockCache()
+    local fs = require 'bee.filesystem'
+    local sp = require 'bee.subprocess'
+    local cacheDir = string.format('%s/cache', LOGPATH)
+    local myCacheDir = string.format('%s/%d'
+        , cacheDir
+        , sp.get_id()
+    )
+    fs.create_directories(fs.path(myCacheDir))
+    local err
+    m.lockFile, err = io.open(myCacheDir .. '/.lock', 'wb')
+    if err then
+        log.error(err)
+    end
+    pub.task('removeCaches', cacheDir)
+end
+
 function m.start()
     util.enableCloseFunction()
     await.setErrorHandle(log.error)
     pub.recruitBraves(4)
+    if COMPILECORES and COMPILECORES > 0 then
+        pub.recruitBraves(COMPILECORES, 'compile')
+    end
     proto.listen()
     m.report()
-    m.pulse()
-    m.reportStatus()
     m.testVersion()
+    m.lockCache()
 
     require 'provider'
 
-    m.startTimer()
-
-    ws.reload()
+    m.eventLoop()
 end
 
 return m

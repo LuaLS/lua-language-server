@@ -15,7 +15,7 @@ debug = {}
 ---@field currentline     integer
 ---@field istailcall      boolean
 ---@field nups            integer
----#if VERSION >= 5.2 then
+---#if VERSION >= 5.2 or JIT then
 ---@field nparams         integer
 ---@field isvararg        boolean
 ---#end
@@ -63,7 +63,7 @@ function debug.gethook(co) end
 ---#DES 'debug.getinfo'
 ---@overload fun(f: integer|function, what?: infowhat):debuginfo
 ---@param thread thread
----@param f      integer|async fun()
+---@param f      integer|async fun(...):...
 ---@param what?  infowhat
 ---@return debuginfo
 ---@nodiscard
@@ -81,9 +81,9 @@ function debug.getinfo(thread, f, what) end
 function debug.getlocal(thread, level, index) end
 ---#else
 ---#DES 'debug.getlocal>5.2'
----@overload fun(f: integer|async fun(), index: integer):string, any
+---@overload fun(f: integer|async fun(...):..., index: integer):string, any
 ---@param thread  thread
----@param f       integer|async fun()
+---@param f       integer|async fun(...):...
 ---@param index   integer
 ---@return string name
 ---@return any    value
@@ -103,7 +103,7 @@ function debug.getmetatable(object) end
 function debug.getregistry() end
 
 ---#DES 'debug.getupvalue'
----@param f  async fun()
+---@param f  async fun(...):...
 ---@param up integer
 ---@return string name
 ---@return any    value
@@ -112,8 +112,8 @@ function debug.getupvalue(f, up) end
 
 ---#if VERSION >= 5.4 then
 ---#DES 'debug.getuservalue>5.4'
----@param u userdata
----@param n integer
+---@param u  userdata
+---@param n? integer
 ---@return any
 ---@return boolean
 ---@nodiscard
@@ -146,9 +146,11 @@ function debug.setfenv(object, env) end
 ---|+'"l"' # ---#DESTAIL 'hookmask.l'
 
 ---#DES 'debug.sethook'
----@overload fun(hook: function, mask: hookmask, count?: integer)
+---@overload fun(hook: (async fun(...):...), mask: hookmask, count?: integer)
+---@overload fun(thread: thread):...
+---@overload fun(...):...
 ---@param thread thread
----@param hook   async fun()
+---@param hook   async fun(...):...
 ---@param mask   hookmask
 ---@param count? integer
 function debug.sethook(thread, hook, mask, count) end
@@ -165,12 +167,12 @@ function debug.setlocal(thread, level, index, value) end
 ---#DES 'debug.setmetatable'
 ---@generic T
 ---@param value T
----@param meta  table
+---@param meta? table
 ---@return T value
 function debug.setmetatable(value, meta) end
 
 ---#DES 'debug.setupvalue'
----@param f     async fun()
+---@param f     async fun(...):...
 ---@param up    integer
 ---@param value any
 ---@return string name
@@ -180,7 +182,7 @@ function debug.setupvalue(f, up, value) end
 ---#DES 'debug.setuservalue>5.4'
 ---@param udata userdata
 ---@param value any
----@param n     integer
+---@param n?    integer
 ---@return userdata udata
 function debug.setuservalue(udata, value, n) end
 ---#elseif VERSION >= 5.2 or JIT then
@@ -202,7 +204,7 @@ function debug.traceback(thread, message, level) end
 
 ---@version >5.2, JIT
 ---#DES 'debug.upvalueid'
----@param f async fun()
+---@param f async fun(...):...
 ---@param n integer
 ---@return lightuserdata id
 ---@nodiscard
@@ -210,9 +212,9 @@ function debug.upvalueid(f, n) end
 
 ---@version >5.2, JIT
 ---#DES 'debug.upvaluejoin'
----@param f1 async fun()
+---@param f1 async fun(...):...
 ---@param n1 integer
----@param f2 async fun()
+---@param f2 async fun(...):...
 ---@param n2 integer
 function debug.upvaluejoin(f1, n1, f2, n2) end
 

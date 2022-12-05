@@ -2,10 +2,9 @@ local files   = require 'files'
 local vm      = require 'vm'
 local lang    = require 'language'
 local guide   = require 'parser.guide'
-local noder   = require 'core.noder'
 local await   = require 'await'
 
-local SkipCheckClass = {
+local skipCheckClass = {
     ['unknown']       = true,
     ['any']           = true,
     ['table']         = true,
@@ -25,42 +24,28 @@ return function (uri, callback)
         return
     end
 
-    local cache = {}
-
     ---@async
     local function checkUndefinedField(src)
-        local id = noder.getID(src)
-        if not id then
-            return
-        end
-        if cache[id] then
-            return
-        end
-
         await.delay()
 
         if #vm.getDefs(src) > 0 then
-            cache[id] = true
             return
         end
         local node = src.node
         if node then
-            local defs = vm.getDefs(node)
             local ok
-            for _, def in ipairs(defs) do
-                if  def.type == 'doc.class.name'
-                and not SkipCheckClass[def[1]] then
-                    ok = true
-                    break
+            for view in vm.getInfer(node):eachView(uri) do
+                if skipCheckClass[view] then
+                    return
                 end
+                ok = true
             end
             if not ok then
-                cache[id] = true
                 return
             end
         end
         local message = lang.script('DIAG_UNDEF_FIELD', guide.getKeyName(src))
-        if src.type == 'getfield' and src.field then
+        if     src.type == 'getfield' and src.field then
             callback {
                 start   = src.field.start,
                 finish  = src.field.finish,

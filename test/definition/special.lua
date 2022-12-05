@@ -32,24 +32,28 @@ local obj = setmetatable({}, { __index = mt })
 obj:<?method1?>()
 ]]
 
-TEST [[
-local mt
-function mt:<!method1!>()
-end
+-- 不再支持在变量的引用中使用 setmetatable 操作。
+-- 这会将引用转换为定义，为了搜索定义去检查引用性价比太差了。
+-- 如果有必要，请使用 ---@class 系统。
 
-setmetatable(api, { __index = mt })
-api:<?method1?>()
-]]
+--TEST [[
+--local mt
+--function mt:<!method1!>()
+--end
+--
+--setmetatable(api, { __index = mt })
+--api:<?method1?>()
+--]]
 
-TEST [[
-local mt
-local api
-function mt:<!method1!>()
-end
-
-setmetatable(api, { __index = mt })
-api:<?method1?>()
-]]
+--TEST [[
+--local mt
+--local api
+--function mt:<!method1!>()
+--end
+--
+--setmetatable(api, { __index = mt })
+--api:<?method1?>()
+--]]
 
 -- TODO 不支持从方法内部找外部的赋值
 --TEST [[

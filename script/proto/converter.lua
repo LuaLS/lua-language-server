@@ -8,12 +8,24 @@ local m = {}
 
 ---@alias position {line: integer, character: integer}
 
-local function rawPackPosition(uri, pos)
+---@param row integer
+---@param col integer
+---@return position
+function m.position(row, col)
+    return {
+        line      = row,
+        character = col,
+    }
+end
+
+---@param state parser.state
+---@param pos integer
+---@return position
+local function rawPackPosition(state, pos)
     local row, col = guide.rowColOf(pos)
     if col > 0 then
-        local state = files.getState(uri)
-        local text  = files.getText(uri)
-        if text then
+        local text  = state.lua
+        if state and text then
             local lineOffset = state.lines[row]
             if lineOffset then
                 local start = lineOffset
@@ -32,17 +44,18 @@ local function rawPackPosition(uri, pos)
     }
 end
 
-local function diffedPackPosition(uri, pos)
-    local state        = files.getState(uri)
+---@param state parser.state
+---@param pos integer
+---@return position
+local function diffedPackPosition(state, pos)
     local offset       = guide.positionToOffset(state, pos)
-    local originOffset = files.diffedOffsetBack(uri, offset)
-    local originLines  = files.getOriginLines(uri)
-    local originPos    = guide.offsetToPositionByLines(originLines, originOffset)
+    local originOffset = files.diffedOffsetBack(state, offset)
+    local originPos    = guide.offsetToPositionByLines(state.originLines, originOffset)
     local row, col     = guide.rowColOf(originPos)
     if col > 0 then
-        local text = files.getOriginText(uri)
+        local text = state.originText
         if text then
-            local lineOffset  = originLines[row]
+            local lineOffset  = state.originLines[row]
             local finalOffset = math.min(lineOffset + col - 1, #text + 1)
             col = encoder.len(offsetEncoding, text, lineOffset, finalOffset)
         end
@@ -53,22 +66,24 @@ local function diffedPackPosition(uri, pos)
     }
 end
 
----@param uri uri
+---@param state parser.state
 ---@param pos integer
 ---@return position
-function m.packPosition(uri, pos)
-    if files.hasDiffed(uri) then
-        return diffedPackPosition(uri, pos)
+function m.packPosition(state, pos)
+    if files.hasDiffed(state) then
+        return diffedPackPosition(state, pos)
     else
-        return rawPackPosition(uri, pos)
+        return rawPackPosition(state, pos)
     end
 end
 
-local function rawUnpackPosition(uri, position)
+---@param state parser.state
+---@param position position
+---@return integer
+local function rawUnpackPosition(state, position)
     local row, col = position.line, position.character
     if col > 0 then
-        local state = files.getState(uri)
-        local text  = files.getText(uri)
+        local text  = state.lua
         if state and text then
             local lineOffset = state.lines[row]
             local textOffset = encoder.offset(offsetEncoding, text, col + 1, lineOffset)
@@ -81,59 +96,69 @@ local function rawUnpackPosition(uri, position)
     return pos
 end
 
-local function diffedUnpackPosition(uri, position)
-    local row, col     = position.line, position.character
-    local originLines  = files.getOriginLines(uri)
+---@param state parser.state
+---@param position position
+---@return integer
+local function diffedUnpackPosition(state, position)
+    local row, col = position.line, position.character
     if col > 0 then
-        local text  = files.getOriginText(uri)
-        if text then
-            local lineOffset = originLines[row]
-            local textOffset = encoder.offset(offsetEncoding, text, col + 1, lineOffset)
+        local lineOffset = state.originLines[row]
+        if lineOffset then
+            local textOffset = encoder.offset(offsetEncoding, state.originText, col + 1, lineOffset)
             if textOffset and lineOffset then
                 col = textOffset - lineOffset
             end
         end
     end
-    local state        = files.getState(uri)
     local originPos    = guide.positionOf(row, col)
-    local originOffset = guide.positionToOffsetByLines(originLines, originPos)
-    local offset       = files.diffedOffset(uri, originOffset)
+    local originOffset = guide.positionToOffsetByLines(state.originLines, originPos)
+    local offset       = files.diffedOffset(state, originOffset)
     local pos          = guide.offsetToPosition(state, offset)
     return pos
 end
 
----@param uri      uri
+---@param state    parser.state
 ---@param position position
 ---@return integer
-function m.unpackPosition(uri, position)
-    if files.hasDiffed(uri) then
-        return diffedUnpackPosition(uri, position)
+function m.unpackPosition(state, position)
+    if files.hasDiffed(state) then
+        return diffedUnpackPosition(state, position)
     else
-        return rawUnpackPosition(uri, position)
+        return rawUnpackPosition(state, position)
     end
 end
 
 ---@alias range {start: position, end: position}
 
----@param uri    uri
+---@param state  parser.state
 ---@param start  integer
 ---@param finish integer
 ---@return range
-function m.packRange(uri, start, finish)
+function m.packRange(state, start, finish)
     local range = {
-        start   = m.packPosition(uri, start),
-        ['end'] = m.packPosition(uri, finish),
+        start   = m.packPosition(state, start),
+        ['end'] = m.packPosition(state, finish),
     }
     return range
 end
 
----@param uri   uri
+---@param start position
+---@param finish position
+---@return range
+function m.range(start, finish)
+    return {
+        start   = start,
+        ['end'] = finish,
+    }
+end
+
+---@param state parser.state
 ---@param range range
 ---@return integer start
 ---@return integer finish
-function m.unpackRange(uri, range)
-    local start  = m.unpackPosition(uri, range.start)
-    local finish = m.unpackPosition(uri, range['end'])
+function m.unpackRange(state, range)
+    local start  = m.unpackPosition(state, range.start)
+    local finish = m.unpackPosition(state, range['end'])
     return start, finish
 end
 

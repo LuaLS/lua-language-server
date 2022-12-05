@@ -1,23 +1,42 @@
-local files     = require 'files'
-local searcher = require 'core.searcher'
-local guide    = require 'parser.guide'
-local lang     = require 'language'
-local vm = require "vm.vm"
+local files = require 'files'
+local guide = require 'parser.guide'
+local lang  = require 'language'
+local vm    = require "vm.vm"
+
+---@param source parser.object
+---@return boolean
+local function isBindDoc(source)
+    if not source.bindDocs then
+        return false
+    end
+    for _, doc in ipairs(source.bindDocs) do
+        if doc.type == 'doc.type'
+        or doc.type == 'doc.class' then
+            return true
+        end
+    end
+    return false
+end
 
 return function (uri, callback)
-    local ast = files.getState(uri)
-    if not ast then
+    local state = files.getState(uri)
+    if not state then
         return
     end
-    guide.eachSourceType(ast.ast, 'getglobal', function (source)
-        -- 单独验证自己是否在重载过的 _ENV 中有定义
+
+    guide.eachSourceType(state.ast, 'getglobal', function (source)
         if source.node.tag == '_ENV' then
             return
         end
-        local defs = vm.getDefs(source)
-        if #defs > 0 then
+
+        if not isBindDoc(source.node) then
             return
         end
+
+        if #vm.getDefs(source) > 0 then
+            return
+        end
+
         local key = source[1]
         callback {
             start   = source.start,

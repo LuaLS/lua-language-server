@@ -21,7 +21,7 @@ return function (uri, callback)
             return
         end
         local literal = arg1[1]
-        local results = rpath.findUrisByRequirePath(literal)
+        local results = rpath.findUrisByRequireName(uri, literal)
         if not results or #results ~= 1 then
             return
         end

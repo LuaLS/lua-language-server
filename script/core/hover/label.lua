@@ -1,8 +1,7 @@
 local buildName   = require 'core.hover.name'
-local buildArg    = require 'core.hover.arg'
+local buildArgs   = require 'core.hover.args'
 local buildReturn = require 'core.hover.return'
 local buildTable  = require 'core.hover.table'
-local infer       = require 'core.infer'
 local vm          = require 'vm'
 local util        = require 'utility'
 local lang        = require 'language'
@@ -12,28 +11,32 @@ local guide       = require 'parser.guide'
 
 local function asFunction(source, oop)
     local name  = buildName(source, oop)
-    local arg   = buildArg(source, oop)
+    local args  = buildArgs(source)
     local rtn   = buildReturn(source)
     local lines = {}
+
     lines[1] = string.format('%s%s %s(%s)'
-        , vm.isAsync(source) and 'async ' or ''
-        , oop and 'method' or 'function'
+        , vm.isAsync(source) and '(async) ' or ''
+        , oop and '(method)' or 'function'
         , name or ''
-        , arg
+        , oop and table.concat(args, ', ', 2) or table.concat(args, ', ')
     )
     lines[2] = rtn
+
     return table.concat(lines, '\n')
 end
 
 local function asDocTypeName(source)
     local defs = vm.getDefs(source)
     for _, doc in ipairs(defs) do
-        if doc.type == 'doc.class.name' then
-            return 'class ' .. doc[1]
+        if doc.type == 'doc.class' then
+            return '(class) ' .. doc.class[1]
         end
-        if doc.type == 'doc.alias.name' then
-            local extends = doc.parent.extends
-            return lang.script('HOVER_EXTENDS', infer.searchAndViewInfers(extends))
+        if doc.type == 'doc.alias' then
+            return '(alias) ' .. doc.alias[1] .. ' ' .. lang.script('HOVER_EXTENDS', vm.getInfer(doc.extends):view(guide.getUri(source)))
+        end
+        if doc.type == 'doc.enum' then
+            return '(enum) ' .. doc.enum[1]
         end
     end
 end
@@ -41,16 +44,10 @@ end
 ---@async
 local function asValue(source, title)
     local name    = buildName(source, false) or ''
-    local type    = infer.searchAndViewInfers(source)
-    local literal = infer.searchAndViewLiterals(source)
-    local cont
-    if  not infer.hasType(source, 'string')
-    and not type:find('%[%]$') then
-        if #vm.getRefs(source, '*') > 0
-        or infer.hasType(source, 'table') then
-            cont = buildTable(source)
-        end
-    end
+    local ifr     = vm.getInfer(source)
+    local type    = ifr:view(guide.getUri(source))
+    local literal = ifr:viewLiterals()
+    local cont    = buildTable(source)
     local pack = {}
     pack[#pack+1] = title
     pack[#pack+1] = name .. ':'
@@ -60,10 +57,11 @@ local function asValue(source, title)
     if  cont
     and (  type == 'table'
         or type == 'any'
+        or type == 'unknown'
         or type == 'nil') then
-        type = nil
+    else
+        pack[#pack+1] = type
     end
-    pack[#pack+1] = type
     if literal then
         pack[#pack+1] = '='
         pack[#pack+1] = literal
@@ -76,12 +74,28 @@ end
 
 ---@async
 local function asLocal(source)
-    return asValue(source, 'local')
+    local node
+    if source.type == 'local'
+    or source.type == 'self' then
+        node = source
+    else
+        node = source.node
+    end
+    if node.type == 'self' then
+        return asValue(source, '(self)')
+    end
+    if node.parent.type == 'funcargs' then
+        return asValue(source, '(parameter)')
+    elseif guide.getParentFunction(source) ~= guide.getParentFunction(node) then
+        return asValue(source, '(upvalue)')
+    else
+        return asValue(source, 'local')
+    end
 end
 
 ---@async
 local function asGlobal(source)
-    return asValue(source, 'global')
+    return asValue(source, '(global)')
 end
 
 local function isGlobalField(source)
@@ -89,10 +103,10 @@ local function isGlobalField(source)
     or source.type == 'method' then
         source = source.parent
     end
-    if source.type == 'setfield'
-    or source.type == 'getfield'
-    or source.type == 'setmethod'
-    or source.type == 'getmethod' then
+    if     source.type == 'setfield'
+    or     source.type == 'getfield'
+    or     source.type == 'setmethod'
+    or     source.type == 'getmethod' then
         local node = source.node
         if node.type == 'setglobal'
         or node.type == 'getglobal' then
@@ -116,24 +130,23 @@ local function asField(source)
     if isGlobalField(source) then
         return asGlobal(source)
     end
-    return asValue(source, 'field')
+    return asValue(source, '(field)')
 end
 
 local function asDocFieldName(source)
-    local name     = source[1]
-    local docField = source.parent
+    local name     = source.field[1]
     local class
-    for _, doc in ipairs(docField.bindGroup) do
+    for _, doc in ipairs(source.bindGroup) do
         if doc.type == 'doc.class' then
             class = doc
             break
         end
     end
-    local view = infer.searchAndViewInfers(docField.extends)
+    local view = vm.getInfer(source.extends):view(guide.getUri(source))
     if not class then
-        return ('field ?.%s: %s'):format(name, view)
+        return ('(field) ?.%s: %s'):format(name, view)
     end
-    return ('field %s.%s: %s'):format(class.class[1], name, view)
+    return ('(field) %s.%s: %s'):format(class.class[1], name, view)
 end
 
 local function asString(source)
@@ -157,7 +170,7 @@ local function formatNumber(n)
 end
 
 local function asNumber(source)
-    if not config.get 'Lua.hover.viewNumber' then
+    if not config.get(guide.getUri(source), 'Lua.hover.viewNumber') then
         return nil
     end
     local num = source[1]
@@ -169,7 +182,7 @@ local function asNumber(source)
     if not text then
         return nil
     end
-    local raw = text:sub(source.start, source.finish)
+    local raw = text:sub(source.start + 1, source.finish)
     if not raw or not raw:find '[^%-%d%.]' then
         return nil
     end
@@ -178,10 +191,11 @@ end
 
 ---@async
 return function (source, oop)
-    if source.type == 'function'
-    or source.type == 'doc.type.function' then
+    if     source.type == 'function'
+    or     source.type == 'doc.type.function' then
         return asFunction(source, oop)
     elseif source.type == 'local'
+    or     source.type == 'self'
     or     source.type == 'getlocal'
     or     source.type == 'setlocal' then
         return asLocal(source)
@@ -201,9 +215,10 @@ return function (source, oop)
     elseif source.type == 'number'
     or     source.type == 'integer' then
         return asNumber(source)
-    elseif source.type == 'doc.type.name' then
+    elseif source.type == 'doc.type.name'
+    or     source.type == 'doc.enum.name' then
         return asDocTypeName(source)
-    elseif source.type == 'doc.field.name' then
+    elseif source.type == 'doc.field' then
         return asDocFieldName(source)
     end
 end

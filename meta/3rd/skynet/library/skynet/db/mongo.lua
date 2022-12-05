@@ -14,7 +14,7 @@ local mongo_client     = {}
 
 ---@class mongo_db
 ---@field connection mongo_client
----@field name string 
+---@field name string
 ---@field full_name string
 ---@field database mongo_db
 ---@field _cmd string dbname.$cmd
@@ -57,7 +57,8 @@ end
 function mongo_db:auth(user, pass)
 
 end
----执行命令
+---执行命令，命令的格式需要参考  [https://docs.mongodb.com/manual/reference/command/](https://docs.mongodb.com/manual/reference/command/),
+---命令的键要单独分开来放，如 mongo_db:runCommand('find','account','limit','1')
 function mongo_db:runCommand(cmd, cmd_v, ...)
 end
 ---获取集合
@@ -76,8 +77,11 @@ end
 function mongo_collection:insert(doc)
 end
 ---向集合安全的插入数据
----@param dco table
-function mongo_collection:safe_insert(dco)
+---@param doc table
+---@return boolean ok #是否成功
+---@return string|nil err #错误消息
+---@return table r #成功时表示返回的数据，失败时表示错误的详细信息
+function mongo_collection:safe_insert(doc)
 end
 
 ---插入批量数据
@@ -87,6 +91,9 @@ function mongo_collection:batch_insert(docs)
 end
 ---安全插入批量数据
 ---@param docs table[]
+---@return boolean ok #是否成功
+---@return string|nil err #错误消息
+---@return table r #成功时表示返回的数据，失败时表示错误的详细信息
 function mongo_collection:safe_batch_insert(docs)
 
 end
@@ -101,8 +108,11 @@ end
 ---安全更新数据
 ---@param selector table
 ---@param update table
----@param upsert boolean
----@param multi boolean
+---@param upsert boolean #没有数据是否插入
+---@param multi boolean #是否更新多行
+---@return boolean ok #是否成功
+---@return string|nil err #错误消息
+---@return table r #成功时表示返回的数据，失败时表示错误的详细信息
 function mongo_collection:safe_update(selector, update, upsert, multi)
 
 end
@@ -116,9 +126,13 @@ end
 ---安全删除数据
 ---@param selector table
 ---@param single boolean
+---@return boolean ok #是否成功
+---@return string err #错误消息
+---@return table r #错误返回数据
 function mongo_collection:safe_delete(selector, single)
 
 end
+---查找数据，返回的是一个游标，我们需要遍历游标才能获取所有返回
 ---@param query table
 ---@param selector table
 ---@return mongo_cursor
@@ -137,7 +151,7 @@ end
 ---* or collection:createIndex { "key1", "key2",  unique = true }
 ---* or collection:createIndex( { key1 = 1} , { unique = true } )	-- For compatibility
 ---@param arg1 table
----@param arg2 table
+---@param arg2? table
 function mongo_collection:createIndex(arg1, arg2)
 
 end
@@ -155,7 +169,7 @@ end
 --- 删除索引
 ---* collection:dropIndex("age_1")
 ---* collection:dropIndex("*")
----@param indexName  string 
+---@param indexName  string
 function mongo_collection:dropIndex(indexName)
 
 end
@@ -190,7 +204,7 @@ end
 function mongo_cursor:limit(amount)
 end
 ---统计行数
----@param with_limit_and_skip boolean
+---@param with_limit_and_skip? boolean
 function mongo_cursor:count(with_limit_and_skip)
 end
 ---是否有下一行

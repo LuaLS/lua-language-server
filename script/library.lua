@@ -569,6 +569,10 @@ local function check3rdByFileName(uri, configs)
             if hasAsked[cfg.name] then
                 goto CONTINUE
             end
+            local library = ('%s/library'):format(cfg.dirname)
+            if util.arrayHas(config.get(uri, 'Lua.workspace.library'), library) then
+                goto CONTINUE
+            end
             for _, filename in ipairs(cfg.files) do
                 await.delay()
                 if wholeMatch(path, filename) then

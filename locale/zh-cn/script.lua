@@ -365,6 +365,8 @@ HOVER_WS_LOADING        =
 '正在加载工作目录：{} / {}'
 HOVER_AWAIT_TOOLTIP     =
 '正在调用异步函数，可能会让出当前协程'
+HOVER_EXPENSIVE_TOOLTIP = 
+'这个功能很昂贵，应避免使用'
 
 ACTION_DISABLE_DIAG     =
 '在工作区禁用诊断 ({})。'

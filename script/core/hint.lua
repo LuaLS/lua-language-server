@@ -259,6 +259,35 @@ local function awaitHint(uri, results, start, finish)
     end)
 end
 
+---@async
+local function expensiveHint(uri, results, start, finish)
+  local awaitConfig = config.get(uri, 'Lua.hint.await')
+  if not awaitConfig then
+      return
+  end
+  local state = files.getState(uri)
+  if not state then
+      return
+  end
+  guide.eachSourceBetween(state.ast, start, finish, function (source) ---@async
+      if source.type ~= 'call' then
+          return
+      end
+      await.delay()
+      local node = source.node
+      if not vm.isExpensiveCall(source) then
+          return
+      end
+      results[#results+1] = {
+          text    = 'expensive ',
+          offset  = node.start,
+          kind    = define.InlayHintKind.Other,
+          where   = 'left',
+          tooltip = lang.script.HOVER_EXPENSIVE_TOOLTIP,
+      }
+  end)
+end
+
 local blockTypes = {
     'main',
     'function',
@@ -331,6 +360,7 @@ return function (uri, start, finish)
     typeHint(uri, results, start, finish)
     paramName(uri, results, start, finish)
     awaitHint(uri, results, start, finish)
+    expensiveHint(uri, results, start, finish)
     arrayIndex(uri, results, start, finish)
     semicolonHint(uri, results, start, finish)
     return results

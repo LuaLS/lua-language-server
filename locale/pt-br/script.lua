@@ -365,6 +365,8 @@ HOVER_WS_LOADING        =
 'Carregando espaço de trabalho: {} / {}'
 HOVER_AWAIT_TOOLTIP     =
 'Chamando a função assíncrona, a thread atual deve ser produzível'
+HOVER_EXPENSIVE_TOOLTIP = 
+'Esta função é dispendiosa e deve ser evitada'
 
 ACTION_DISABLE_DIAG     =
 'Desativar diagnósticos no espaço de trabalho ({}).'

@@ -483,7 +483,7 @@ end
 
 local function parseFunction(parent)
     local _, content = peekToken()
-    if content == 'async' then
+    if content == 'async' or content == 'expensive' then
         nextToken()
         local pos = getStart()
         local tp, cont = peekToken()
@@ -491,9 +491,15 @@ local function parseFunction(parent)
             if cont == 'fun' then
                 local func = parseTypeUnit(parent)
                 if func then
-                    func.async = true
-                    func.asyncPos = pos
-                    return func
+                    if content == 'async' then
+                        func.async = true
+                        func.asyncPos = pos
+                        return func
+                    elseif content == 'expensive' then
+                        func.expensive = true
+                        func.expensivePos = pos
+                        return func
+                    end
                 end
             end
         end
@@ -1086,7 +1092,7 @@ local docSwitch = util.switch()
     : call(function ()
         local tp, name = peekToken()
         if tp ~= 'name'
-        or (name ~= 'fun' and name ~= 'async') then
+        or (name ~= 'fun' and name ~= 'async' and name ~= 'expensive') then
             pushWarning {
                 type   = 'LUADOC_MISS_FUN_AFTER_OVERLOAD',
                 start  = getFinish(),
@@ -1274,6 +1280,14 @@ local docSwitch = util.switch()
     : call(function ()
         return {
             type   = 'doc.async',
+            start  = getFinish(),
+            finish = getFinish(),
+        }
+    end)
+    : case 'expensive'
+    : call(function ()
+        return {
+            type   = 'doc.expensive',
             start  = getFinish(),
             finish = getFinish(),
         }
@@ -1760,6 +1774,7 @@ local function bindDoc(source, binded)
         elseif doc.type == 'doc.return'
         or     doc.type == 'doc.generic'
         or     doc.type == 'doc.async'
+        or     doc.type == 'doc.expensive'
         or     doc.type == 'doc.nodiscard' then
             if source.type == 'function' then
                 bindDocWithSource(doc, source)

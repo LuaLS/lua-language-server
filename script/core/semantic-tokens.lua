@@ -553,6 +553,14 @@ local Care = util.switch()
                 modifieres = define.TokenModifiers.async,
             }
         end
+        if source.expensive then
+            results[#results+1] = {
+                start      = source.expensivePos,
+                finish     = source.expensivePos + #'expensive',
+                type       = define.TokenTypes.keyword,
+                modifieres = define.TokenModifiers.documentation,
+            }
+        end
     end)
     : case 'doc.type.table'
     : call(function (source, options, results)

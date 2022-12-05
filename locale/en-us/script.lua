@@ -365,6 +365,8 @@ HOVER_WS_LOADING        =
 'Workspace loading: {} / {}'
 HOVER_AWAIT_TOOLTIP     =
 'Calling async function, current thread may be yielded.'
+HOVER_EXPENSIVE_TOOLTIP = 
+'This function is expensive and should be avoided'
 
 ACTION_DISABLE_DIAG     =
 'Disable diagnostics in the workspace ({}).'

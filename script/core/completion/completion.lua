@@ -1700,6 +1700,7 @@ local function tryluaDocCate(word, results)
         'diagnostic',
         'module',
         'async',
+        'expensive',
         'nodiscard',
         'cast',
         'operator',

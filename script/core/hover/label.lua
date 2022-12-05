@@ -54,6 +54,9 @@ local function asValue(source, title)
     if vm.isAsync(source, true) then
         pack[#pack+1] = 'async'
     end
+    if vm.isExpensive(source, true) then
+        pack[#pack+1] = 'expensive'
+    end
     if  cont
     and (  type == 'table'
         or type == 'any'

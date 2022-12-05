@@ -154,6 +154,52 @@ end
 
 ---@param  value parser.object
 ---@return boolean
+local function isExpensive(value)
+  if value.type == 'function' then
+      if not value.bindDocs then
+          return false
+      end
+      if value._expensive ~= nil then
+          return value._expensive
+      end
+      for _, doc in ipairs(value.bindDocs) do
+          if doc.type == 'doc.expensive' then
+              value._expensive = true
+              return true
+          end
+      end
+      value._expensive = false
+      return false
+  end
+  if value.type == 'main' then
+      return true
+  end
+  return value.expensive == true
+end
+
+---@param value parser.object
+---@param deep  boolean?
+---@return boolean
+function vm.isExpensive(value, deep)
+  if isExpensive(value) then
+      return true
+  end
+  if deep then
+      local defs = vm.getDefs(value)
+      if #defs == 0 then
+          return false
+      end
+      for _, def in ipairs(defs) do
+          if isExpensive(def) then
+              return true
+          end
+      end
+  end
+  return false
+end
+
+---@param  value parser.object
+---@return boolean
 local function isAsync(value)
     if value.type == 'function' then
         if not value.bindDocs then
@@ -289,6 +335,24 @@ end
 ---@return boolean
 function vm.isLinkedCall(node, index)
     return isLinkedCall(node, index)
+end
+
+---@param call parser.object
+---@return boolean
+function vm.isExpensiveCall(call)
+  if vm.isExpensive(call.node, true) then
+      return true
+  end
+  if not call.args then
+      return false
+  end
+  for i, arg in ipairs(call.args) do
+      if  vm.isExpensive(arg, true)
+      and isLinkedCall(call.node, i) then
+          return true
+      end
+  end
+  return false
 end
 
 ---@param call parser.object

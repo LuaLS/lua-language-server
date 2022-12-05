@@ -365,6 +365,8 @@ HOVER_WS_LOADING        =
 '正在載入工作目錄：{} / {}'
 HOVER_AWAIT_TOOLTIP     =
 '正在呼叫非同步函式，可能會讓出目前共常式'
+HOVER_EXPENSIVE_TOOLTIP = 
+'这个功能很昂贵，应避免使用'
 
 ACTION_DISABLE_DIAG     =
 '在工作區停用診斷 ({})。'

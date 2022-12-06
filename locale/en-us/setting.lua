@@ -369,6 +369,8 @@ config.diagnostics['duplicate-doc-param']   =
 'Enable diagnostics for a duplicated param annotation name.'
 config.diagnostics['duplicate-set-field']   =
 'Enable diagnostics for setting the same field in a class more than once.'
+config.diagnostics['invisible']             =
+'Enable diagnostics for accesses to fields which are invisible.'
 config.diagnostics['missing-parameter']     =
 'Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.'
 config.diagnostics['missing-return']        =
@@ -409,3 +411,11 @@ config.diagnostics['unknown-operator']      =
 'Enable diagnostics for unknown operators.'
 config.diagnostics['unreachable-code']      =
 'Enable diagnostics for unreachable code.'
+config.typeFormat.config                    =
+'Configures the formatting behavior while typing Lua code.'
+config.typeFormat.config.auto_complete_end  =
+'Controls if `end` is automatically completed at suitable positions.'
+config.typeFormat.config.auto_complete_table_sep =
+'Controls if a separator is automatically appended at the end of a table declaration.'
+config.typeFormat.config.format_line        =
+'Controls if a line is formatted at all.'

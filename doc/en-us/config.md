@@ -224,10 +224,36 @@ Array<string>
 * ``"exp-in-action"``
 * ``"global-in-nil-env"``
 * ``"index-in-func-name"``
+* ``"invisible"``
 * ``"jump-local-scope"``
 * ``"keyword"``
 * ``"local-limit"``
 * ``"lowercase-global"``
+* ``"lua-doc-miss-sign"``
+* ``"luadoc-error-diag-mode"``
+* ``"luadoc-miss-alias-extends"``
+* ``"luadoc-miss-alias-name"``
+* ``"luadoc-miss-arg-name"``
+* ``"luadoc-miss-cate-name"``
+* ``"luadoc-miss-class-extends-name"``
+* ``"luadoc-miss-class-name"``
+* ``"luadoc-miss-diag-mode"``
+* ``"luadoc-miss-diag-name"``
+* ``"luadoc-miss-field-extends"``
+* ``"luadoc-miss-field-name"``
+* ``"luadoc-miss-fun-after-overload"``
+* ``"luadoc-miss-generic-name"``
+* ``"luadoc-miss-local-name"``
+* ``"luadoc-miss-module-name"``
+* ``"luadoc-miss-operator-name"``
+* ``"luadoc-miss-param-extends"``
+* ``"luadoc-miss-param-name"``
+* ``"luadoc-miss-see-name"``
+* ``"luadoc-miss-sign-name"``
+* ``"luadoc-miss-symbol"``
+* ``"luadoc-miss-type-name"``
+* ``"luadoc-miss-vararg-type"``
+* ``"luadoc-miss-version"``
 * ``"malformed-number"``
 * ``"miss-end"``
 * ``"miss-esc-x"``
@@ -245,6 +271,7 @@ Array<string>
 * ``"missing-return"``
 * ``"missing-return-value"``
 * ``"need-check-nil"``
+* ``"need-paren"``
 * ``"newfield-call"``
 * ``"newline-call"``
 * ``"no-unknown"``
@@ -420,6 +447,7 @@ object<string, string>
     * close-non-object
     * deprecated
     * discard-returns
+    * invisible
     */
     "strict": "Fallback",
     /*
@@ -538,6 +566,7 @@ object<string, string>
     * close-non-object
     * deprecated
     * discard-returns
+    * invisible
     */
     "strict": "Fallback",
     /*
@@ -723,7 +752,7 @@ object<string, string>
     /*
     Enable diagnostics for setting the same field in a class more than once.
     */
-    "duplicate-set-field": "Any",
+    "duplicate-set-field": "Opened",
     /*
     Enable empty code block diagnostics.
     */
@@ -732,6 +761,10 @@ object<string, string>
     Enable cannot use global variables （ `_ENV` is set to `nil`） diagnostics.
     */
     "global-in-nil-env": "Any",
+    /*
+    Enable diagnostics for accesses to fields which are invisible.
+    */
+    "invisible": "Any",
     /*
     Enable lowercase global variable definition diagnostics.
     */
@@ -977,6 +1010,10 @@ object<string, string>
     */
     "global-in-nil-env": "Warning",
     /*
+    Enable diagnostics for accesses to fields which are invisible.
+    */
+    "invisible": "Warning",
+    /*
     Enable lowercase global variable definition diagnostics.
     */
     "lowercase-global": "Information",
@@ -1129,7 +1166,7 @@ Array<string>
 
 # diagnostics.workspaceDelay
 
-Latency (milliseconds) for workspace diagnostics. When you start the workspace, or edit any file, the entire workspace will be re-diagnosed in the background. Set to negative to disable workspace diagnostics.
+Latency (milliseconds) for workspace diagnostics.
 
 ## type
 
@@ -1141,6 +1178,28 @@ integer
 
 ```jsonc
 3000
+```
+
+# diagnostics.workspaceEvent
+
+Set the time to trigger workspace diagnostics.
+
+## type
+
+```ts
+string
+```
+
+## enum
+
+* ``"OnChange"``: Trigger workspace diagnostics when the file is changed.
+* ``"OnSave"``: Trigger workspace diagnostics when the file is saved.
+* ``"None"``: Disable workspace diagnostics.
+
+## default
+
+```jsonc
+"OnSave"
 ```
 
 # diagnostics.workspaceRate
@@ -1157,6 +1216,54 @@ integer
 
 ```jsonc
 100
+```
+
+# doc.packageName
+
+Treat specific field names as package, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are package, witch can only be accessed in the file where the definition is located.
+
+## type
+
+```ts
+Array<string>
+```
+
+## default
+
+```jsonc
+[]
+```
+
+# doc.privateName
+
+Treat specific field names as private, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are private, witch can only be accessed in the class where the definition is located.
+
+## type
+
+```ts
+Array<string>
+```
+
+## default
+
+```jsonc
+[]
+```
+
+# doc.protectedName
+
+Treat specific field names as protected, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are protected, witch can only be accessed in the class where the definition is located and its subclasses.
+
+## type
+
+```ts
+Array<string>
+```
+
+## default
+
+```jsonc
+[]
 ```
 
 # format.defaultConfig
@@ -1436,9 +1543,25 @@ integer
 1000
 ```
 
+# misc.executablePath
+
+Specify the executable path in VSCode.
+
+## type
+
+```ts
+string
+```
+
+## default
+
+```jsonc
+""
+```
+
 # misc.parameters
 
-[Command line parameters](https://github.com/sumneko/lua-telemetry-server/tree/master/method) when starting the language service in VSCode.
+[Command line parameters](https://github.com/sumneko/lua-telemetry-server/tree/master/method) when starting the language server in VSCode.
 
 ## type
 
@@ -1490,6 +1613,7 @@ object<string, string>
     "os": "default",
     "package": "default",
     "string": "default",
+    "string.buffer": "default",
     "table": "default",
     "table.clear": "default",
     "table.new": "default",
@@ -1870,6 +1994,35 @@ boolean
 
 ```jsonc
 false
+```
+
+# typeFormat.config
+
+Configures the formatting behavior while typing Lua code.
+
+## type
+
+```ts
+object<string, string>
+```
+
+## default
+
+```jsonc
+{
+    /*
+    Controls if `end` is automatically completed at suitable positions.
+    */
+    "auto_complete_end": "true",
+    /*
+    Controls if a separator is automatically appended at the end of a table declaration.
+    */
+    "auto_complete_table_sep": "true",
+    /*
+    Controls if a line is formatted at all.
+    */
+    "format_line": "true"
+}
 ```
 
 # window.progressBar

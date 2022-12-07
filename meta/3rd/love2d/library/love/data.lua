@@ -3,11 +3,17 @@
 ---
 ---Provides functionality for creating and transforming data.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.data)
+---
 ---@class love.data
 love.data = {}
 
 ---
 ---Compresses a string or data using a specific compression algorithm.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.data.compress)
 ---
 ---@overload fun(container: love.ContainerType, format: love.CompressedDataFormat, data: love.Data, level?: number):love.CompressedData|string
 ---@param container love.ContainerType # What type to return the compressed data as.
@@ -20,6 +26,9 @@ function love.data.compress(container, format, rawstring, level) end
 ---
 ---Decode Data or a string from any of the EncodeFormats to Data or string.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.data.decode)
+---
 ---@overload fun(container: love.ContainerType, format: love.EncodeFormat, sourceData: love.Data):love.ByteData|string
 ---@param container love.ContainerType # What type to return the decoded data as.
 ---@param format love.EncodeFormat # The format of the input data.
@@ -30,6 +39,9 @@ function love.data.decode(container, format, sourceString) end
 ---
 ---Decompresses a CompressedData or previously compressed string or Data object.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.data.decompress)
+---
 ---@overload fun(container: love.ContainerType, format: love.CompressedDataFormat, compressedString: string):love.Data|string
 ---@overload fun(container: love.ContainerType, format: love.CompressedDataFormat, data: love.Data):love.Data|string
 ---@param container love.ContainerType # What type to return the decompressed data as.
@@ -39,6 +51,9 @@ function love.data.decompress(container, compressedData) end
 
 ---
 ---Encode Data or a string to a Data or string in one of the EncodeFormats.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.data.encode)
 ---
 ---@overload fun(container: love.ContainerType, format: love.EncodeFormat, sourceData: love.Data, linelength?: number):love.ByteData|string
 ---@param container love.ContainerType # What type to return the encoded data as.
@@ -53,12 +68,18 @@ function love.data.encode(container, format, sourceString, linelength) end
 ---
 ---This function behaves the same as Lua 5.3's string.packsize.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.data.getPackedSize)
+---
 ---@param format string # A string determining how the values are packed. Follows the rules of Lua 5.3's string.pack format strings.
 ---@return number size # The size in bytes that the packed data will use.
 function love.data.getPackedSize(format) end
 
 ---
 ---Compute the message digest of a string using a specified hash algorithm.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.data.hash)
 ---
 ---@overload fun(hashFunction: love.HashFunction, data: love.Data):string
 ---@param hashFunction love.HashFunction # Hash algorithm to use.
@@ -71,6 +92,9 @@ function love.data.hash(hashFunction, string) end
 ---
 ---Data:getPointer along with LuaJIT's FFI can be used to manipulate the contents of the ByteData object after it has been created.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.data.newByteData)
+---
 ---@overload fun(Data: love.Data, offset?: number, size?: number):love.ByteData
 ---@overload fun(size: number):love.ByteData
 ---@param datastring string # The byte string to copy.
@@ -79,6 +103,9 @@ function love.data.newByteData(datastring) end
 
 ---
 ---Creates a new Data referencing a subsection of an existing Data object.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.data.newDataView)
 ---
 ---@param data love.Data # The Data object to reference.
 ---@param offset number # The offset of the subsection to reference, in bytes.
@@ -91,6 +118,9 @@ function love.data.newDataView(data, offset, size) end
 ---
 ---This function behaves the same as Lua 5.3's string.pack.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.data.pack)
+---
 ---@param container love.ContainerType # What type to return the encoded data as.
 ---@param format string # A string determining how the values are packed. Follows the rules of Lua 5.3's string.pack format strings.
 ---@param v1 number|boolean|string # The first value (number, boolean, or string) to serialize.
@@ -102,6 +132,9 @@ function love.data.pack(container, format, v1, ...) end
 ---Unpacks (deserializes) a byte-string or Data into simple Lua values.
 ---
 ---This function behaves the same as Lua 5.3's string.unpack.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.data.unpack)
 ---
 ---@overload fun(format: string, data: love.Data, pos?: number):number|boolean|string, number|boolean|string, number
 ---@param format string # A string determining how the values were packed. Follows the rules of Lua 5.3's string.pack format strings.
@@ -116,6 +149,9 @@ function love.data.unpack(format, datastring, pos) end
 ---
 ---There are currently no LÖVE functions provided for manipulating the contents of a ByteData, but Data:getPointer can be used with LuaJIT's FFI to access and write to the contents directly.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.data)
+---
 ---@class love.ByteData: love.Object, love.Data
 local ByteData = {}
 
@@ -124,17 +160,26 @@ local ByteData = {}
 ---
 ---love.data.decompress can be used to de-compress the data (or love.math.decompress in 0.10.2 or earlier).
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.data)
+---
 ---@class love.CompressedData: love.Data, love.Object
 local CompressedData = {}
 
 ---
 ---Gets the compression format of the CompressedData.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/CompressedData:getFormat)
+---
 ---@return love.CompressedDataFormat format # The format of the CompressedData.
 function CompressedData:getFormat() end
 
 ---
 ---Compressed data formats.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/CompressedDataFormat)
 ---
 ---@alias love.CompressedDataFormat
 ---
@@ -157,6 +202,9 @@ function CompressedData:getFormat() end
 ---
 ---Return type of various data-returning functions.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ContainerType)
+---
 ---@alias love.ContainerType
 ---
 ---Return type is ByteData.
@@ -170,6 +218,9 @@ function CompressedData:getFormat() end
 ---
 ---Encoding format used to encode or decode data.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/EncodeFormat)
+---
 ---@alias love.EncodeFormat
 ---
 ---Encode/decode data as base64 binary-to-text encoding.
@@ -182,6 +233,9 @@ function CompressedData:getFormat() end
 
 ---
 ---Hash algorithm of love.data.hash.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/HashFunction)
 ---
 ---@alias love.HashFunction
 ---

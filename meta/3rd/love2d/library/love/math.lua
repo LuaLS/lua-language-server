@@ -3,11 +3,17 @@
 ---
 ---Provides system-independent mathematical functions.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.math)
+---
 ---@class love.math
 love.math = {}
 
 ---
 ---Converts a color from 0..255 to 0..1 range.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.math.colorFromBytes)
 ---
 ---@param rb number # Red color component in 0..255 range.
 ---@param gb number # Green color component in 0..255 range.
@@ -22,6 +28,9 @@ function love.math.colorFromBytes(rb, gb, bb, ab) end
 ---
 ---Converts a color from 0..1 to 0..255 range.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.math.colorToBytes)
+---
 ---@param r number # Red color component.
 ---@param g number # Green color component.
 ---@param b number # Blue color component.
@@ -35,6 +44,9 @@ function love.math.colorToBytes(r, g, b, a) end
 ---
 ---Compresses a string or data using a specific compression algorithm.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.math.compress)
+---
 ---@overload fun(data: love.Data, format?: love.CompressedDataFormat, level?: number):love.CompressedData
 ---@param rawstring string # The raw (un-compressed) string to compress.
 ---@param format? love.CompressedDataFormat # The format to use when compressing the string.
@@ -44,6 +56,9 @@ function love.math.compress(rawstring, format, level) end
 
 ---
 ---Decompresses a CompressedData or previously compressed string or Data object.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.math.decompress)
 ---
 ---@overload fun(compressedstring: string, format: love.CompressedDataFormat):string
 ---@overload fun(data: love.Data, format: love.CompressedDataFormat):string
@@ -57,6 +72,9 @@ function love.math.decompress(compressedData) end
 ---Read more about gamma-correct rendering here, here, and here.
 ---
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.math.gammaToLinear)
 ---
 ---@overload fun(color: table):number, number, number
 ---@overload fun(c: number):number
@@ -73,6 +91,9 @@ function love.math.gammaToLinear(r, g, b) end
 ---
 ---The seed is split into two numbers due to Lua's use of doubles for all number values - doubles can't accurately represent integer  values above 2^53, but the seed can be an integer value up to 2^64.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.math.getRandomSeed)
+---
 ---@return number low # Integer number representing the lower 32 bits of the random number generator's 64 bit seed value.
 ---@return number high # Integer number representing the higher 32 bits of the random number generator's 64 bit seed value.
 function love.math.getRandomSeed() end
@@ -82,6 +103,9 @@ function love.math.getRandomSeed() end
 ---
 ---This is different from love.math.getRandomSeed in that getRandomState gets the random number generator's current state, whereas getRandomSeed gets the previously set seed number.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.math.getRandomState)
+---
 ---@return string state # The current state of the random number generator, represented as a string.
 function love.math.getRandomState() end
 
@@ -89,6 +113,9 @@ function love.math.getRandomState() end
 ---Checks whether a polygon is convex.
 ---
 ---PolygonShapes in love.physics, some forms of Meshes, and polygons drawn with love.graphics.polygon must be simple convex polygons.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.math.isConvex)
 ---
 ---@overload fun(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number):boolean
 ---@param vertices table # The vertices of the polygon as a table in the form of {x1, y1, x2, y2, x3, y3, ...}.
@@ -103,6 +130,9 @@ function love.math.isConvex(vertices) end
 ---Read more about gamma-correct rendering here, here, and here.
 ---
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.math.linearToGamma)
 ---
 ---@overload fun(color: table):number, number, number
 ---@overload fun(lc: number):number
@@ -119,6 +149,9 @@ function love.math.linearToGamma(lr, lg, lb) end
 ---
 ---The number of vertices in the control polygon determines the degree of the curve, e.g. three vertices define a quadratic (degree 2) Bézier curve, four vertices define a cubic (degree 3) Bézier curve, etc.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.math.newBezierCurve)
+---
 ---@overload fun(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number):love.BezierCurve
 ---@param vertices table # The vertices of the control polygon as a table in the form of {x1, y1, x2, y2, x3, y3, ...}.
 ---@return love.BezierCurve curve # A Bézier curve object.
@@ -127,6 +160,9 @@ function love.math.newBezierCurve(vertices) end
 ---
 ---Creates a new RandomGenerator object which is completely independent of other RandomGenerator objects and random functions.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.math.newRandomGenerator)
+---
 ---@overload fun(seed: number):love.RandomGenerator
 ---@overload fun(low: number, high: number):love.RandomGenerator
 ---@return love.RandomGenerator rng # The new Random Number Generator object.
@@ -134,6 +170,9 @@ function love.math.newRandomGenerator() end
 
 ---
 ---Creates a new Transform object.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.math.newTransform)
 ---
 ---@overload fun(x: number, y: number, angle?: number, sx?: number, sy?: number, ox?: number, oy?: number, kx?: number, ky?: number):love.Transform
 ---@return love.Transform transform # The new Transform object.
@@ -146,6 +185,9 @@ function love.math.newTransform() end
 ---
 ---There are many webpages which discuss Perlin and Simplex noise in detail.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.math.noise)
+---
 ---@overload fun(x: number, y: number):number
 ---@overload fun(x: number, y: number, z: number):number
 ---@overload fun(x: number, y: number, z: number, w: number):number
@@ -156,6 +198,9 @@ function love.math.noise(x) end
 ---
 ---Generates a pseudo-random number in a platform independent manner. The default love.run seeds this function at startup, so you generally don't need to seed it yourself.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.math.random)
+---
 ---@overload fun(max: number):number
 ---@overload fun(min: number, max: number):number
 ---@return number number # The pseudo-random number.
@@ -164,6 +209,9 @@ function love.math.random() end
 ---
 ---Get a normally distributed pseudo random number.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.math.randomNormal)
+---
 ---@param stddev? number # Standard deviation of the distribution.
 ---@param mean? number # The mean of the distribution.
 ---@return number number # Normally distributed random number with variance (stddev)² and the specified mean.
@@ -171,6 +219,9 @@ function love.math.randomNormal(stddev, mean) end
 
 ---
 ---Sets the seed of the random number generator using the specified integer number. This is called internally at startup, so you generally don't need to call it yourself.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.math.setRandomSeed)
 ---
 ---@overload fun(low: number, high: number)
 ---@param seed number # The integer number with which you want to seed the randomization. Must be within the range of 2^53 - 1.
@@ -181,11 +232,17 @@ function love.math.setRandomSeed(seed) end
 ---
 ---This is different from love.math.setRandomSeed in that setRandomState directly sets the random number generator's current implementation-dependent state, whereas setRandomSeed gives it a new seed value.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.math.setRandomState)
+---
 ---@param state string # The new state of the random number generator, represented as a string. This should originate from a previous call to love.math.getRandomState.
 function love.math.setRandomState(state) end
 
 ---
 ---Decomposes a simple convex or concave polygon into triangles.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.math.triangulate)
 ---
 ---@overload fun(x1: number, y1: number, x2: number, y2: number, x3: number, y3: number):table
 ---@param polygon table # Polygon to triangulate. Must not intersect itself.
@@ -197,6 +254,9 @@ function love.math.triangulate(polygon) end
 ---
 ---For more information on Bézier curves check this great article on Wikipedia.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.math)
+---
 ---@class love.BezierCurve: love.Object
 local BezierCurve = {}
 
@@ -204,6 +264,9 @@ local BezierCurve = {}
 ---Evaluate Bézier curve at parameter t. The parameter must be between 0 and 1 (inclusive).
 ---
 ---This function can be used to move objects along paths or tween parameters. However it should not be used to render the curve, see BezierCurve:render for that purpose.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:evaluate)
 ---
 ---@param t number # Where to evaluate the curve.
 ---@return number x # x coordinate of the curve at parameter t.
@@ -213,6 +276,9 @@ function BezierCurve:evaluate(t) end
 ---
 ---Get coordinates of the i-th control point. Indices start with 1.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:getControlPoint)
+---
 ---@param i number # Index of the control point.
 ---@return number x # Position of the control point along the x axis.
 ---@return number y # Position of the control point along the y axis.
@@ -221,11 +287,17 @@ function BezierCurve:getControlPoint(i) end
 ---
 ---Get the number of control points in the Bézier curve.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:getControlPointCount)
+---
 ---@return number count # The number of control points.
 function BezierCurve:getControlPointCount() end
 
 ---
 ---Get degree of the Bézier curve. The degree is equal to number-of-control-points - 1.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:getDegree)
 ---
 ---@return number degree # Degree of the Bézier curve.
 function BezierCurve:getDegree() end
@@ -235,11 +307,17 @@ function BezierCurve:getDegree() end
 ---
 ---This function can be used to rotate sprites moving along a curve in the direction of the movement and compute the direction perpendicular to the curve at some parameter t.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:getDerivative)
+---
 ---@return love.BezierCurve derivative # The derivative curve.
 function BezierCurve:getDerivative() end
 
 ---
 ---Gets a BezierCurve that corresponds to the specified segment of this BezierCurve.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:getSegment)
 ---
 ---@param startpoint number # The starting point along the curve. Must be between 0 and 1.
 ---@param endpoint number # The end of the segment. Must be between 0 and 1.
@@ -249,6 +327,9 @@ function BezierCurve:getSegment(startpoint, endpoint) end
 ---
 ---Insert control point as the new i-th control point. Existing control points from i onwards are pushed back by 1. Indices start with 1. Negative indices wrap around: -1 is the last control point, -2 the one before the last, etc.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:insertControlPoint)
+---
 ---@param x number # Position of the control point along the x axis.
 ---@param y number # Position of the control point along the y axis.
 ---@param i? number # Index of the control point.
@@ -256,6 +337,9 @@ function BezierCurve:insertControlPoint(x, y, i) end
 
 ---
 ---Removes the specified control point.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:removeControlPoint)
 ---
 ---@param index number # The index of the control point to remove.
 function BezierCurve:removeControlPoint(index) end
@@ -266,6 +350,9 @@ function BezierCurve:removeControlPoint(index) end
 ---This function samples the Bézier curve using recursive subdivision. You can control the recursion depth using the depth parameter.
 ---
 ---If you are just interested to know the position on the curve given a parameter, use BezierCurve:evaluate.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:render)
 ---
 ---@param depth? number # Number of recursive subdivision steps.
 ---@return table coordinates # List of x,y-coordinate pairs of points on the curve.
@@ -278,6 +365,9 @@ function BezierCurve:render(depth) end
 ---
 ---If you are just need to know the position on the curve given a parameter, use BezierCurve:evaluate.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:renderSegment)
+---
 ---@param startpoint number # The starting point along the curve. Must be between 0 and 1.
 ---@param endpoint number # The end of the segment to render. Must be between 0 and 1.
 ---@param depth? number # Number of recursive subdivision steps.
@@ -287,6 +377,9 @@ function BezierCurve:renderSegment(startpoint, endpoint, depth) end
 ---
 ---Rotate the Bézier curve by an angle.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:rotate)
+---
 ---@param angle number # Rotation angle in radians.
 ---@param ox? number # X coordinate of the rotation center.
 ---@param oy? number # Y coordinate of the rotation center.
@@ -294,6 +387,9 @@ function BezierCurve:rotate(angle, ox, oy) end
 
 ---
 ---Scale the Bézier curve by a factor.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:scale)
 ---
 ---@param s number # Scale factor.
 ---@param ox? number # X coordinate of the scaling center.
@@ -303,6 +399,9 @@ function BezierCurve:scale(s, ox, oy) end
 ---
 ---Set coordinates of the i-th control point. Indices start with 1.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:setControlPoint)
+---
 ---@param i number # Index of the control point.
 ---@param x number # Position of the control point along the x axis.
 ---@param y number # Position of the control point along the y axis.
@@ -311,12 +410,18 @@ function BezierCurve:setControlPoint(i, x, y) end
 ---
 ---Move the Bézier curve by an offset.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/BezierCurve:translate)
+---
 ---@param dx number # Offset along the x axis.
 ---@param dy number # Offset along the y axis.
 function BezierCurve:translate(dx, dy) end
 
 ---
 ---A random number generation object which has its own random state.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.math)
 ---
 ---@class love.RandomGenerator: love.Object
 local RandomGenerator = {}
@@ -325,6 +430,9 @@ local RandomGenerator = {}
 ---Gets the seed of the random number generator object.
 ---
 ---The seed is split into two numbers due to Lua's use of doubles for all number values - doubles can't accurately represent integer  values above 2^53, but the seed value is an integer number in the range of 2^64 - 1.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/RandomGenerator:getSeed)
 ---
 ---@return number low # Integer number representing the lower 32 bits of the RandomGenerator's 64 bit seed value.
 ---@return number high # Integer number representing the higher 32 bits of the RandomGenerator's 64 bit seed value.
@@ -335,11 +443,17 @@ function RandomGenerator:getSeed() end
 ---
 ---This is different from RandomGenerator:getSeed in that getState gets the RandomGenerator's current state, whereas getSeed gets the previously set seed number.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/RandomGenerator:getState)
+---
 ---@return string state # The current state of the RandomGenerator object, represented as a string.
 function RandomGenerator:getState() end
 
 ---
 ---Generates a pseudo-random number in a platform independent manner.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/RandomGenerator:random)
 ---
 ---@overload fun(self: love.RandomGenerator, max: number):number
 ---@overload fun(self: love.RandomGenerator, min: number, max: number):number
@@ -349,6 +463,9 @@ function RandomGenerator:random() end
 ---
 ---Get a normally distributed pseudo random number.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/RandomGenerator:randomNormal)
+---
 ---@param stddev? number # Standard deviation of the distribution.
 ---@param mean? number # The mean of the distribution.
 ---@return number number # Normally distributed random number with variance (stddev)² and the specified mean.
@@ -356,6 +473,9 @@ function RandomGenerator:randomNormal(stddev, mean) end
 
 ---
 ---Sets the seed of the random number generator using the specified integer number.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/RandomGenerator:setSeed)
 ---
 ---@overload fun(self: love.RandomGenerator, low: number, high: number)
 ---@param seed number # The integer number with which you want to seed the randomization. Must be within the range of 2^53.
@@ -366,6 +486,9 @@ function RandomGenerator:setSeed(seed) end
 ---
 ---This is different from RandomGenerator:setSeed in that setState directly sets the RandomGenerator's current implementation-dependent state, whereas setSeed gives it a new seed value.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/RandomGenerator:setState)
+---
 ---@param state string # The new state of the RandomGenerator object, represented as a string. This should originate from a previous call to RandomGenerator:getState.
 function RandomGenerator:setState(state) end
 
@@ -373,6 +496,9 @@ function RandomGenerator:setState(state) end
 ---Object containing a coordinate system transformation.
 ---
 ---The love.graphics module has several functions and function variants which accept Transform objects.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.math)
 ---
 ---@class love.Transform: love.Object
 local Transform = {}
@@ -382,6 +508,9 @@ local Transform = {}
 ---
 ---This effectively multiplies this Transform's internal transformation matrix with the other Transform's (i.e. self * other), and stores the result in this object.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Transform:apply)
+---
 ---@param other love.Transform # The other Transform object to apply to this Transform.
 ---@return love.Transform transform # The Transform object the method was called on. Allows easily chaining Transform methods.
 function Transform:apply(other) end
@@ -389,11 +518,17 @@ function Transform:apply(other) end
 ---
 ---Creates a new copy of this Transform.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Transform:clone)
+---
 ---@return love.Transform clone # The copy of this Transform.
 function Transform:clone() end
 
 ---
 ---Gets the internal 4x4 transformation matrix stored by this Transform. The matrix is returned in row-major order.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Transform:getMatrix)
 ---
 ---@return number e1_1 # The first column of the first row of the matrix.
 ---@return number e1_2 # The second column of the first row of the matrix.
@@ -402,6 +537,9 @@ function Transform:getMatrix() end
 
 ---
 ---Creates a new Transform containing the inverse of this Transform.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Transform:inverse)
 ---
 ---@return love.Transform inverse # A new Transform object representing the inverse of this Transform's matrix.
 function Transform:inverse() end
@@ -413,6 +551,9 @@ function Transform:inverse() end
 ---
 ---One use of this method can be to convert a screen-space mouse position into global world coordinates, if the given Transform has transformations applied that are used for a camera system in-game.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Transform:inverseTransformPoint)
+---
 ---@param localX number # The x component of the position with the transform applied.
 ---@param localY number # The y component of the position with the transform applied.
 ---@return number globalX # The x component of the position in global coordinates.
@@ -422,17 +563,26 @@ function Transform:inverseTransformPoint(localX, localY) end
 ---
 ---Checks whether the Transform is an affine transformation.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Transform:isAffine2DTransform)
+---
 ---@return boolean affine # true if the transform object is an affine transformation, false otherwise.
 function Transform:isAffine2DTransform() end
 
 ---
 ---Resets the Transform to an identity state. All previously applied transformations are erased.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Transform:reset)
+---
 ---@return love.Transform transform # The Transform object the method was called on. Allows easily chaining Transform methods.
 function Transform:reset() end
 
 ---
 ---Applies a rotation to the Transform's coordinate system. This method does not reset any previously applied transformations.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Transform:rotate)
 ---
 ---@param angle number # The relative angle in radians to rotate this Transform by.
 ---@return love.Transform transform # The Transform object the method was called on. Allows easily chaining Transform methods.
@@ -441,6 +591,9 @@ function Transform:rotate(angle) end
 ---
 ---Scales the Transform's coordinate system. This method does not reset any previously applied transformations.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Transform:scale)
+---
 ---@param sx number # The relative scale factor along the x-axis.
 ---@param sy? number # The relative scale factor along the y-axis.
 ---@return love.Transform transform # The Transform object the method was called on. Allows easily chaining Transform methods.
@@ -448,6 +601,9 @@ function Transform:scale(sx, sy) end
 
 ---
 ---Directly sets the Transform's internal 4x4 transformation matrix.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Transform:setMatrix)
 ---
 ---@overload fun(self: love.Transform, layout: love.MatrixLayout, e1_1: number, e1_2: number, ..., e4_4: number):love.Transform
 ---@overload fun(self: love.Transform, layout: love.MatrixLayout, matrix: table):love.Transform
@@ -461,6 +617,9 @@ function Transform:setMatrix(e1_1, e1_2, ..., e4_4) end
 
 ---
 ---Resets the Transform to the specified transformation parameters.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Transform:setTransformation)
 ---
 ---@param x number # The position of the Transform on the x-axis.
 ---@param y number # The position of the Transform on the y-axis.
@@ -477,6 +636,9 @@ function Transform:setTransformation(x, y, angle, sx, sy, ox, oy, kx, ky) end
 ---
 ---Applies a shear factor (skew) to the Transform's coordinate system. This method does not reset any previously applied transformations.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Transform:shear)
+---
 ---@param kx number # The shear factor along the x-axis.
 ---@param ky number # The shear factor along the y-axis.
 ---@return love.Transform transform # The Transform object the method was called on. Allows easily chaining Transform methods.
@@ -487,6 +649,9 @@ function Transform:shear(kx, ky) end
 ---
 ---This effectively converts the given position from global coordinates into the local coordinate space of the Transform.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Transform:transformPoint)
+---
 ---@param globalX number # The x component of the position in global coordinates.
 ---@param globalY number # The y component of the position in global coordinates.
 ---@return number localX # The x component of the position with the transform applied.
@@ -496,6 +661,9 @@ function Transform:transformPoint(globalX, globalY) end
 ---
 ---Applies a translation to the Transform's coordinate system. This method does not reset any previously applied transformations.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Transform:translate)
+---
 ---@param dx number # The relative translation along the x-axis.
 ---@param dy number # The relative translation along the y-axis.
 ---@return love.Transform transform # The Transform object the method was called on. Allows easily chaining Transform methods.
@@ -503,6 +671,9 @@ function Transform:translate(dx, dy) end
 
 ---
 ---The layout of matrix elements (row-major or column-major).
+---
+---
+---[Open in Browser](https://love2d.org/wiki/MatrixLayout)
 ---
 ---@alias love.MatrixLayout
 ---

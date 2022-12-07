@@ -211,7 +211,7 @@ function m.reportStatus()
 
     local tooltips = {}
     local params = {
-        ast = files.astCount,
+        ast = files.countStates(),
         max = files.fileCount,
         mem = collectgarbage('count') / 1000,
     }

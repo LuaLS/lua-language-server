@@ -28,7 +28,6 @@ local pub      = require 'pub'
 ---@field text         string
 ---@field version?     integer
 ---@field originLines? integer[]
----@field state?       parser.state
 ---@field diffInfo?    table[]
 ---@field cache        table
 ---@field id           integer
@@ -49,7 +48,10 @@ function m.reset()
     m.visible        = {}
     m.globalVersion  = 0
     m.fileCount      = 0
-    m.astCount       = 0
+    ---@type table<uri, parser.state>
+    m.stateMap       = setmetatable({}, util.MODE_V)
+    ---@type table<parser.state, true>
+    m.stateTrace     = setmetatable({}, util.MODE_K)
 end
 
 m.reset()
@@ -251,12 +253,12 @@ function m.setText(uri, text, isTrust, callback)
     end
     local clock = os.clock()
     local newText = pluginOnSetText(file, text)
+    m.stateMap[uri] = nil
     file.text       = newText
     file.trusted    = isTrust
     file.originText = text
     file.rows       = nil
     file.words      = nil
-    file.state      = nil
     file.cache = {}
     file.cacheActiveTime = math.huge
     m.globalVersion = m.globalVersion + 1
@@ -301,10 +303,10 @@ function m.setRawText(uri, text)
     if not text then
         return
     end
+    m.stateMap[uri] = nil
     local file = m.fileMap[uri]
     file.text             = text
     file.originText       = text
-    file.state            = nil
 end
 
 function m.getCachedRows(uri)
@@ -458,6 +460,7 @@ function m.remove(uri)
         return
     end
     m.fileMap[uri]        = nil
+    m.stateMap[uri]       = nil
     m._pairsCache         = nil
 
     m.fileCount     = m.fileCount - 1
@@ -528,8 +531,8 @@ end
 ---@param state parser.state
 ---@param file file
 function m.compileStateThen(state, file)
-    file.state = state
-
+    m.stateTrace[state] = true
+    m.stateMap[file.uri] = state
     state.uri = file.uri
     state.lua = file.text
     state.ast.uri = file.uri
@@ -553,16 +556,6 @@ function m.compileStateThen(state, file)
         if passed > 0.1 then
             log.warn(('Convert lazy-table for [%s] takes [%.3f] sec, size [%.3f] kb.'):format(file.uri, passed, #file.text / 1000))
         end
-    else
-        m.astCount = m.astCount + 1
-        local removed
-        setmetatable(state, {__gc = function ()
-            if removed then
-                return
-            end
-            removed = true
-            m.astCount = m.astCount - 1
-        end})
     end
 end
 
@@ -609,8 +602,8 @@ function m.compileStateAsync(uri, callback)
         callback(nil)
         return
     end
-    if file.state then
-        callback(file.state)
+    if m.stateMap[uri] then
+        callback(m.stateMap[uri])
         return
     end
 
@@ -650,8 +643,8 @@ function m.compileState(uri)
     if not file then
         return
     end
-    if file.state then
-        return file.state
+    if m.stateMap[uri] then
+        return m.stateMap[uri]
     end
     if not m.checkPreload(uri) then
         return
@@ -711,12 +704,10 @@ function m.getState(uri)
     return state
 end
 
+---@param uri uri
+---@return parser.state?
 function m.getLastState(uri)
-    local file = m.fileMap[uri]
-    if not file then
-        return nil
-    end
-    return file.state
+    return m.stateMap[uri]
 end
 
 function m.getFile(uri)
@@ -871,6 +862,15 @@ function m.getDllWords(uri)
         return nil
     end
     return file.words
+end
+
+---@return integer
+function m.countStates()
+    local n = 0
+    for _ in pairs(m.stateTrace) do
+        n = n + 1
+    end
+    return n
 end
 
 --- 注册事件

@@ -3,11 +3,17 @@
 ---
 ---Provides an interface to the user's filesystem.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem)
+---
 ---@class love.filesystem
 love.filesystem = {}
 
 ---
 ---Append data to an existing file.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.append)
 ---
 ---@overload fun(name: string, data: love.Data, size?: number):boolean, string
 ---@param name string # The name (and path) of the file.
@@ -20,6 +26,9 @@ function love.filesystem.append(name, data, size) end
 ---
 ---Gets whether love.filesystem follows symbolic links.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.areSymlinksEnabled)
+---
 ---@return boolean enable # Whether love.filesystem follows symbolic links.
 function love.filesystem.areSymlinksEnabled() end
 
@@ -28,12 +37,18 @@ function love.filesystem.areSymlinksEnabled() end
 ---
 ---When called with 'a/b' it creates both 'a' and 'a/b', if they don't exist already.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.createDirectory)
+---
 ---@param name string # The directory to create.
 ---@return boolean success # True if the directory was created, false if not.
 function love.filesystem.createDirectory(name) end
 
 ---
 ---Returns the application data directory (could be the same as getUserDirectory)
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.getAppdataDirectory)
 ---
 ---@return string path # The path of the application data directory
 function love.filesystem.getAppdataDirectory() end
@@ -45,6 +60,9 @@ function love.filesystem.getAppdataDirectory() end
 ---
 ---The paths are relative to the game's source and save directories, as well as any paths mounted with love.filesystem.mount.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.getCRequirePath)
+---
 ---@return string paths # The paths that the ''require'' function will check for c libraries in love's filesystem.
 function love.filesystem.getCRequirePath() end
 
@@ -52,6 +70,9 @@ function love.filesystem.getCRequirePath() end
 ---Returns a table with the names of files and subdirectories in the specified path. The table is not sorted in any way; the order is undefined.
 ---
 ---If the path passed to the function exists in the game and the save directory, it will list the files and directories from both places.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.getDirectoryItems)
 ---
 ---@overload fun(dir: string, callback: function):table
 ---@param dir string # The directory.
@@ -63,11 +84,17 @@ function love.filesystem.getDirectoryItems(dir) end
 ---
 ---Note that this only returns the name of the folder to store your files in, not the full path.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.getIdentity)
+---
 ---@return string name # The identity that is used as write directory.
 function love.filesystem.getIdentity() end
 
 ---
 ---Gets information about the specified file or directory.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.getInfo)
 ---
 ---@overload fun(path: string, info: table):table
 ---@overload fun(path: string, filtertype: love.FileType, info: table):table
@@ -81,6 +108,9 @@ function love.filesystem.getInfo(path, filtertype) end
 ---
 ---This can be used to determine whether a file is inside the save directory or the game's source .love.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.getRealDirectory)
+---
 ---@param filepath string # The filepath to get the directory of.
 ---@return string realdir # The platform-specific full path of the directory containing the filepath.
 function love.filesystem.getRealDirectory(filepath) end
@@ -92,6 +122,9 @@ function love.filesystem.getRealDirectory(filepath) end
 ---
 ---The paths are relative to the game's source and save directories, as well as any paths mounted with love.filesystem.mount.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.getRequirePath)
+---
 ---@return string paths # The paths that the ''require'' function will check in love's filesystem.
 function love.filesystem.getRequirePath() end
 
@@ -102,11 +135,17 @@ function love.filesystem.getRequirePath() end
 ---
 ---read or write in the save directory.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.getSaveDirectory)
+---
 ---@return string dir # The absolute path to the save directory.
 function love.filesystem.getSaveDirectory() end
 
 ---
 ---Returns the full path to the the .love file or directory. If the game is fused to the LÖVE executable, then the executable is returned.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.getSource)
 ---
 ---@return string path # The full platform-dependent path of the .love file or directory.
 function love.filesystem.getSource() end
@@ -116,11 +155,17 @@ function love.filesystem.getSource() end
 ---
 ---If love.filesystem.isFused is true, the path returned by this function can be passed to love.filesystem.mount, which will make the directory containing the main game (e.g. C:\Program Files\coolgame\) readable by love.filesystem.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.getSourceBaseDirectory)
+---
 ---@return string path # The full platform-dependent path of the directory containing the .love file.
 function love.filesystem.getSourceBaseDirectory() end
 
 ---
 ---Returns the path of the user's directory
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.getUserDirectory)
 ---
 ---@return string path # The path of the user's directory
 function love.filesystem.getUserDirectory() end
@@ -128,11 +173,17 @@ function love.filesystem.getUserDirectory() end
 ---
 ---Gets the current working directory.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.getWorkingDirectory)
+---
 ---@return string cwd # The current working directory.
 function love.filesystem.getWorkingDirectory() end
 
 ---
 ---Initializes love.filesystem, will be called internally, so should not be used explicitly.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.init)
 ---
 ---@param appname string # The name of the application binary, typically love.
 function love.filesystem.init(appname) end
@@ -144,11 +195,17 @@ function love.filesystem.init(appname) end
 ---
 ---A game is in fused mode if the source .love has been fused to the executable (see Game Distribution), or if '--fused' has been given as a command-line argument when starting the game.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.isFused)
+---
 ---@return boolean fused # True if the game is in fused mode, false otherwise.
 function love.filesystem.isFused() end
 
 ---
 ---Iterate over the lines in a file.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.lines)
 ---
 ---@param name string # The name (and path) of the file
 ---@return function iterator # A function that iterates over all the lines in the file
@@ -156,6 +213,9 @@ function love.filesystem.lines(name) end
 
 ---
 ---Loads a Lua file (but does not run it).
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.load)
 ---
 ---@param name string # The name (and path) of the file.
 ---@return function chunk # The loaded chunk.
@@ -166,6 +226,9 @@ function love.filesystem.load(name) end
 ---Mounts a zip file or folder in the game's save directory for reading.
 ---
 ---It is also possible to mount love.filesystem.getSourceBaseDirectory if the game is in fused mode.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.mount)
 ---
 ---@overload fun(filedata: love.FileData, mountpoint: string, appendToPath?: boolean):boolean
 ---@overload fun(data: love.Data, archivename: string, mountpoint: string, appendToPath?: boolean):boolean
@@ -180,6 +243,9 @@ function love.filesystem.mount(archive, mountpoint, appendToPath) end
 ---
 ---It needs to be opened before it can be accessed.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.newFile)
+---
 ---@overload fun(filename: string, mode: love.FileMode):love.File, string
 ---@param filename string # The filename of the file.
 ---@return love.File file # The new File object.
@@ -187,6 +253,9 @@ function love.filesystem.newFile(filename) end
 
 ---
 ---Creates a new FileData object from a file on disk, or from a string in memory.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.newFileData)
 ---
 ---@overload fun(originaldata: love.Data, name: string):love.FileData
 ---@overload fun(filepath: string):love.FileData, string
@@ -197,6 +266,9 @@ function love.filesystem.newFileData(contents, name) end
 
 ---
 ---Read the contents of a file.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.read)
 ---
 ---@overload fun(container: love.ContainerType, name: string, size?: number):love.FileData|string, number, nil, string
 ---@param name string # The name (and path) of the file.
@@ -210,6 +282,9 @@ function love.filesystem.read(name, size) end
 ---
 ---Removes a file or empty directory.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.remove)
+---
 ---@param name string # The file or directory to remove.
 ---@return boolean success # True if the file/directory was removed, false otherwise.
 function love.filesystem.remove(name) end
@@ -221,6 +296,9 @@ function love.filesystem.remove(name) end
 ---
 ---The paths are relative to the game's source and save directories, as well as any paths mounted with love.filesystem.mount.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.setCRequirePath)
+---
 ---@param paths string # The paths that the ''require'' function will check in love's filesystem.
 function love.filesystem.setCRequirePath(paths) end
 
@@ -228,6 +306,9 @@ function love.filesystem.setCRequirePath(paths) end
 ---Sets the write directory for your game. 
 ---
 ---Note that you can only set the name of the folder to store your files in, not the location.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.setIdentity)
 ---
 ---@overload fun(name: string)
 ---@param name string # The new identity that will be used as write directory.
@@ -240,11 +321,17 @@ function love.filesystem.setIdentity(name) end
 ---
 ---The paths are relative to the game's source and save directories, as well as any paths mounted with love.filesystem.mount.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.setRequirePath)
+---
 ---@param paths string # The paths that the ''require'' function will check in love's filesystem.
 function love.filesystem.setRequirePath(paths) end
 
 ---
 ---Sets the source of the game, where the code is present. This function can only be called once, and is normally automatically done by LÖVE.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.setSource)
 ---
 ---@param path string # Absolute path to the game's source folder.
 function love.filesystem.setSource(path) end
@@ -252,11 +339,17 @@ function love.filesystem.setSource(path) end
 ---
 ---Sets whether love.filesystem follows symbolic links. It is enabled by default in version 0.10.0 and newer, and disabled by default in 0.9.2.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.setSymlinksEnabled)
+---
 ---@param enable boolean # Whether love.filesystem should follow symbolic links.
 function love.filesystem.setSymlinksEnabled(enable) end
 
 ---
 ---Unmounts a zip file or folder previously mounted for reading with love.filesystem.mount.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.unmount)
 ---
 ---@param archive string # The folder or zip file in the game's save directory which is currently mounted.
 ---@return boolean success # True if the archive was successfully unmounted, false otherwise.
@@ -264,6 +357,9 @@ function love.filesystem.unmount(archive) end
 
 ---
 ---Write data to a file in the save directory. If the file existed already, it will be completely replaced by the new contents.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem.write)
 ---
 ---@overload fun(name: string, data: love.Data, size?: number):boolean, string
 ---@param name string # The name (and path) of the file.
@@ -278,11 +374,17 @@ function love.filesystem.write(name, data, size) end
 ---
 ---Note that the DroppedFile type can only be obtained from love.filedropped callback, and can't be constructed manually by the user.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem)
+---
 ---@class love.DroppedFile: love.File, love.Object
 local DroppedFile = {}
 
 ---
 ---Represents a file on the filesystem. A function that takes a file path can also take a File.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem)
 ---
 ---@class love.File: love.Object
 local File = {}
@@ -290,11 +392,17 @@ local File = {}
 ---
 ---Closes a File.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/File:close)
+---
 ---@return boolean success # Whether closing was successful.
 function File:close() end
 
 ---
 ---Flushes any buffered written data in the file to the disk.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/File:flush)
 ---
 ---@return boolean success # Whether the file successfully flushed any buffered data to the disk.
 ---@return string err # The error string, if an error occurred and the file could not be flushed.
@@ -303,6 +411,9 @@ function File:flush() end
 ---
 ---Gets the buffer mode of a file.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/File:getBuffer)
+---
 ---@return love.BufferMode mode # The current buffer mode of the file.
 ---@return number size # The maximum size in bytes of the file's buffer.
 function File:getBuffer() end
@@ -310,11 +421,17 @@ function File:getBuffer() end
 ---
 ---Gets the filename that the File object was created with. If the file object originated from the love.filedropped callback, the filename will be the full platform-dependent file path.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/File:getFilename)
+---
 ---@return string filename # The filename of the File.
 function File:getFilename() end
 
 ---
 ---Gets the FileMode the file has been opened with.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/File:getMode)
 ---
 ---@return love.FileMode mode # The mode this file has been opened with.
 function File:getMode() end
@@ -322,11 +439,17 @@ function File:getMode() end
 ---
 ---Returns the file size.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/File:getSize)
+---
 ---@return number size # The file size in bytes.
 function File:getSize() end
 
 ---
 ---Gets whether end-of-file has been reached.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/File:isEOF)
 ---
 ---@return boolean eof # Whether EOF has been reached.
 function File:isEOF() end
@@ -334,17 +457,26 @@ function File:isEOF() end
 ---
 ---Gets whether the file is open.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/File:isOpen)
+---
 ---@return boolean open # True if the file is currently open, false otherwise.
 function File:isOpen() end
 
 ---
 ---Iterate over all the lines in a file.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/File:lines)
+---
 ---@return function iterator # The iterator (can be used in for loops).
 function File:lines() end
 
 ---
 ---Open the file for write, read or append.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/File:open)
 ---
 ---@param mode love.FileMode # The mode to open the file in.
 ---@return boolean ok # True on success, false otherwise.
@@ -353,6 +485,9 @@ function File:open(mode) end
 
 ---
 ---Read a number of bytes from a file.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/File:read)
 ---
 ---@overload fun(self: love.File, container: love.ContainerType, bytes?: number):love.FileData|string, number
 ---@param bytes? number # The number of bytes to read.
@@ -363,6 +498,9 @@ function File:read(bytes) end
 ---
 ---Seek to a position in a file
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/File:seek)
+---
 ---@param pos number # The position to seek to
 ---@return boolean success # Whether the operation was successful
 function File:seek(pos) end
@@ -371,6 +509,9 @@ function File:seek(pos) end
 ---Sets the buffer mode for a file opened for writing or appending. Files with buffering enabled will not write data to the disk until the buffer size limit is reached, depending on the buffer mode.
 ---
 ---File:flush will force any buffered data to be written to the disk.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/File:setBuffer)
 ---
 ---@param mode love.BufferMode # The buffer mode to use.
 ---@param size? number # The maximum size in bytes of the file's buffer.
@@ -381,11 +522,17 @@ function File:setBuffer(mode, size) end
 ---
 ---Returns the position in the file.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/File:tell)
+---
 ---@return number pos # The current position.
 function File:tell() end
 
 ---
 ---Write data to a file.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/File:write)
 ---
 ---@overload fun(self: love.File, data: love.Data, size?: number):boolean, string
 ---@param data string # The string data to write.
@@ -397,11 +544,17 @@ function File:write(data, size) end
 ---
 ---Data representing the contents of a file.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.filesystem)
+---
 ---@class love.FileData: love.Data, love.Object
 local FileData = {}
 
 ---
 ---Gets the extension of the FileData.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/FileData:getExtension)
 ---
 ---@return string ext # The extension of the file the FileData represents.
 function FileData:getExtension() end
@@ -409,11 +562,17 @@ function FileData:getExtension() end
 ---
 ---Gets the filename of the FileData.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/FileData:getFilename)
+---
 ---@return string name # The name of the file the FileData represents.
 function FileData:getFilename() end
 
 ---
 ---Buffer modes for File objects.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/BufferMode)
 ---
 ---@alias love.BufferMode
 ---
@@ -432,6 +591,9 @@ function FileData:getFilename() end
 ---
 ---How to decode a given FileData.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/FileDecoder)
+---
 ---@alias love.FileDecoder
 ---
 ---The data is unencoded.
@@ -444,6 +606,9 @@ function FileData:getFilename() end
 
 ---
 ---The different modes you can open a File in.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/FileMode)
 ---
 ---@alias love.FileMode
 ---
@@ -465,6 +630,9 @@ function FileData:getFilename() end
 
 ---
 ---The type of a file.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/FileType)
 ---
 ---@alias love.FileType
 ---

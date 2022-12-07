@@ -34,6 +34,9 @@ end
 ---@param uri    uri
 ---@param source parser.object
 function mt:addGet(uri, source)
+    if PREVIEW then
+        return
+    end
     local link = self.links[uri]
     if not link.gets then
         link.gets = {}

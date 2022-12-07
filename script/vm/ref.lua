@@ -26,19 +26,6 @@ simpleSwitch = util.switch()
             end
         end
     end)
-    : case 'doc.alias.name'
-    : call(function (source, pushResult)
-        local global = vm.getGlobal('type', source[1])
-        if not global then
-            return
-        end
-        for _, get in ipairs(global:getGets(guide.getUri(source))) do
-            pushResult(get)
-        end
-        for _, set in ipairs(global:getSets(guide.getUri(source))) do
-            pushResult(set)
-        end
-    end)
 
 ---@async
 local function searchInAllFiles(suri, searcher, notify)
@@ -229,18 +216,23 @@ function searchByParentNode(source, pushResult, defMap, fileNotify)
     nodeSwitch(source.type, source, pushResult, defMap, fileNotify)
 end
 
-local function searchByNode(source, pushResult)
-    local node = vm.compileNode(source)
+local function searchByGlobal(source, pushResult)
+    if source.type == 'field'
+    or source.type == 'method'
+    or source.type == 'doc.class.name'
+    or source.type == 'doc.alias.name' then
+        source = source.parent
+    end
+    local node = vm.getGlobalNode(source)
     if not node then
         return
     end
     local uri = guide.getUri(source)
-    for n in node:eachObject() do
-        if n.type == 'global' then
-            for _, get in ipairs(n:getGets(uri)) do
-                pushResult(get)
-            end
-        end
+    for _, set in ipairs(node:getSets(uri)) do
+        pushResult(set)
+    end
+    for _, get in ipairs(node:getGets(uri)) do
+        pushResult(get)
     end
 end
 
@@ -292,7 +284,7 @@ function vm.getRefs(source, fileNotify)
 
     searchBySimple(source, pushResult)
     searchByLocalID(source, pushResult)
-    searchByNode(source, pushResult)
+    searchByGlobal(source, pushResult)
     local defMap = searchByDef(source, pushResult)
     searchByParentNode(source, pushResult, defMap, fileNotify)
 

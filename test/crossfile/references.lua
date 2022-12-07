@@ -373,3 +373,18 @@ TEST {
         ]]
     },
 }
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
+            ---@alias <~XX~> number
+        ]]
+    },
+    {
+        path = 'b.lua',
+        content = [[
+            ---@type <!XX!>
+        ]]
+    }
+}

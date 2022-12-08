@@ -62,8 +62,13 @@ local function searchInAllFiles(suri, searcher, notify)
 end
 
 ---@async
-local function searchField(source, pushResult, defMap, fileNotify)
+local function searchWord(source, pushResult, defMap, fileNotify)
     local key = guide.getKeyName(source)
+    if not key then
+        return
+    end
+
+    local global = vm.getGlobalNode(source)
 
     ---@param src parser.object
     local function checkDef(src)
@@ -75,42 +80,53 @@ local function searchField(source, pushResult, defMap, fileNotify)
         end
     end
 
-    local pat   = '[:.]%s*' .. key
-
     ---@async
     local function findWord(uri)
         local text = files.getText(uri)
         if not text then
             return
         end
-        if not text:match(pat) then
+        if not text:match(key) then
             return
         end
         local state = files.getState(uri)
         if not state then
             return
         end
-        ---@async
-        guide.eachSourceTypes(state.ast, {'getfield', 'setfield'}, function (src)
-            if src.field and src.field[1] == key then
-                checkDef(src)
-                await.delay()
-            end
-        end)
-        ---@async
-        guide.eachSourceTypes(state.ast, {'getmethod', 'setmethod'}, function (src)
-            if src.method and src.method[1] == key then
-                checkDef(src)
-                await.delay()
-            end
-        end)
-        ---@async
-        guide.eachSourceTypes(state.ast, {'getindex', 'setindex'}, function (src)
-            if src.index and src.index.type == 'string' and src.index[1] == key then
-                checkDef(src)
-                await.delay()
-            end
-        end)
+
+        if global then
+            local globalName = global:asKeyName()
+            ---@async
+            guide.eachSourceTypes(state.ast, {'getglobal', 'setglobal', 'setfield', 'getfield', 'setmethod', 'getmethod', 'setindex', 'getindex', 'doc.type.name', 'doc.class.name', 'doc.alias.name'}, function (src)
+                local myGlobal = vm.getGlobalNode(src)
+                if myGlobal and myGlobal:asKeyName() == globalName then
+                    pushResult(src)
+                    await.delay()
+                end
+            end)
+        else
+            ---@async
+            guide.eachSourceTypes(state.ast, {'getfield', 'setfield'}, function (src)
+                if src.field and src.field[1] == key then
+                    checkDef(src)
+                    await.delay()
+                end
+            end)
+            ---@async
+            guide.eachSourceTypes(state.ast, {'getmethod', 'setmethod'}, function (src)
+                if src.method and src.method[1] == key then
+                    checkDef(src)
+                    await.delay()
+                end
+            end)
+            ---@async
+            guide.eachSourceTypes(state.ast, {'getindex', 'setindex'}, function (src)
+                if src.index and src.index.type == 'string' and src.index[1] == key then
+                    checkDef(src)
+                    await.delay()
+                end
+            end)
+        end
     end
 
     searchInAllFiles(guide.getUri(source), findWord, fileNotify)
@@ -165,18 +181,35 @@ local nodeSwitch = util.switch()
             return
         end
 
-        searchField(source, pushResult, defMap, fileNotify)
+        searchWord(source, pushResult, defMap, fileNotify)
     end)
     : case 'tablefield'
     : case 'tableindex'
-    ---@async
-    : call(function (source, pushResult, defMap, fileNotify)
-        searchField(source, pushResult, defMap, fileNotify)
-    end)
     : case 'doc.field.name'
     ---@async
     : call(function (source, pushResult, defMap, fileNotify)
-        searchField(source, pushResult, defMap, fileNotify)
+        searchWord(source, pushResult, defMap, fileNotify)
+    end)
+    : case 'setglobal'
+    : case 'getglobal'
+    ---@async
+    : call(function (source, pushResult, defMap, fileNotify)
+        searchWord(source, pushResult, defMap, fileNotify)
+    end)
+    : case 'doc.alias.name'
+    : case 'doc.class.name'
+    : case 'doc.enum.name'
+    ---@async
+    : call(function (source, pushResult, defMap, fileNotify)
+        searchWord(source.parent, pushResult, defMap, fileNotify)
+    end)
+    : case 'doc.alias'
+    : case 'doc.class'
+    : case 'doc.enum'
+    : case 'doc.type.name'
+    ---@async
+    : call(function (source, pushResult, defMap, fileNotify)
+        searchWord(source, pushResult, defMap, fileNotify)
     end)
     : case 'function'
     : case 'doc.type.function'
@@ -216,7 +249,6 @@ function searchByParentNode(source, pushResult, defMap, fileNotify)
     nodeSwitch(source.type, source, pushResult, defMap, fileNotify)
 end
 
----@async
 local function searchByGlobal(source, pushResult)
     if source.type == 'field'
     or source.type == 'method'

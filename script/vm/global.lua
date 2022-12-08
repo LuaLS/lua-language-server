@@ -9,7 +9,6 @@ local vm    = require 'vm.vm'
 ---@class vm.global.link
 ---@field gets   parser.object[]
 ---@field sets   parser.object[]
----@field hasGet boolean?
 
 ---@class vm.global
 ---@field links table<uri, vm.global.link>
@@ -35,11 +34,10 @@ end
 ---@param uri    uri
 ---@param source parser.object
 function mt:addGet(uri, source)
-    local link = self.links[uri]
     if PREVIEW then
-        link.hasGet = true
         return
     end
+    local link = self.links[uri]
     if not link.gets then
         link.gets = {}
     end
@@ -98,7 +96,6 @@ function mt:getAllSets()
     return cache
 end
 
----@async
 ---@return parser.object[]
 function mt:getGets(suri)
     if not self.getsCache then

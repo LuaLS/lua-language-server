@@ -7,7 +7,6 @@ local ws    = require 'workspace'
 local vm    = require 'vm.vm'
 
 ---@class vm.global.link
----@field gets   parser.object[]
 ---@field sets   parser.object[]
 
 ---@class vm.global
@@ -29,20 +28,6 @@ function mt:addSet(uri, source)
     end
     link.sets[#link.sets+1] = source
     self.setsCache = nil
-end
-
----@param uri    uri
----@param source parser.object
-function mt:addGet(uri, source)
-    if PREVIEW then
-        return
-    end
-    local link = self.links[uri]
-    if not link.gets then
-        link.gets = {}
-    end
-    link.gets[#link.gets+1] = source
-    self.getsCache = nil
 end
 
 ---@param suri uri
@@ -92,35 +77,6 @@ function mt:getAllSets()
                 cache[#cache+1] = source
             end
         end
-    end
-    return cache
-end
-
----@return parser.object[]
-function mt:getGets(suri)
-    if not self.getsCache then
-        self.getsCache = {}
-    end
-    local scp = scope.getScope(suri)
-    local cacheUri = scp.uri or '<callback>'
-    if self.getsCache[cacheUri] then
-        return self.getsCache[cacheUri]
-    end
-    local clock = os.clock()
-    self.getsCache[cacheUri] = {}
-    local cache = self.getsCache[cacheUri]
-    for uri, link in pairs(self.links) do
-        if link.gets then
-            if scp:isVisible(uri) then
-                for _, source in ipairs(link.gets) do
-                    cache[#cache+1] = source
-                end
-            end
-        end
-    end
-    local cost = os.clock() - clock
-    if cost > 0.1 then
-        log.warn('global-manager getGets costs', cost, self.name)
     end
     return cache
 end
@@ -218,7 +174,6 @@ local compilerGlobalSwitch = util.switch()
             return
         end
         local global = vm.declareGlobal('variable', name, uri)
-        global:addGet(uri, source)
         source._globalNode = global
 
         local nxt = source.next
@@ -276,7 +231,6 @@ local compilerGlobalSwitch = util.switch()
         end
         local uri    = guide.getUri(source)
         local global = vm.declareGlobal('variable', name, uri)
-        global:addGet(uri, source)
         source._globalNode = global
 
         local nxt = source.next
@@ -301,8 +255,6 @@ local compilerGlobalSwitch = util.switch()
                     if source.node.special == 'rawset' then
                         global:addSet(uri, source)
                         source.value = source.args[3]
-                    else
-                        global:addGet(uri, source)
                     end
                     source._globalNode = global
 
@@ -401,7 +353,6 @@ local compilerGlobalSwitch = util.switch()
             return
         end
         local type = vm.declareGlobal('type', name, uri)
-        type:addGet(uri, source)
         source._globalNode = type
     end)
     : case 'doc.extends.name'
@@ -409,7 +360,6 @@ local compilerGlobalSwitch = util.switch()
         local uri  = guide.getUri(source)
         local name = source[1]
         local class = vm.declareGlobal('type', name, uri)
-        class:addGet(uri, source)
         source._globalNode = class
     end)
 

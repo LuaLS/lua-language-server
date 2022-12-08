@@ -97,7 +97,7 @@ local function searchWord(source, pushResult, defMap, fileNotify)
         if global then
             local globalName = global:asKeyName()
             ---@async
-            guide.eachSourceTypes(state.ast, {'getglobal', 'setglobal', 'setfield', 'getfield', 'setmethod', 'getmethod', 'setindex', 'getindex', 'doc.type.name', 'doc.class.name', 'doc.alias.name'}, function (src)
+            guide.eachSourceTypes(state.ast, {'getglobal', 'setglobal', 'setfield', 'getfield', 'setmethod', 'getmethod', 'setindex', 'getindex', 'doc.type.name', 'doc.class.name', 'doc.alias.name', 'doc.extends.name'}, function (src)
                 local myGlobal = vm.getGlobalNode(src)
                 if myGlobal and myGlobal:asKeyName() == globalName then
                     pushResult(src)
@@ -207,6 +207,7 @@ local nodeSwitch = util.switch()
     : case 'doc.class'
     : case 'doc.enum'
     : case 'doc.type.name'
+    : case 'doc.extends.name'
     ---@async
     : call(function (source, pushResult, defMap, fileNotify)
         searchWord(source, pushResult, defMap, fileNotify)
@@ -263,9 +264,6 @@ local function searchByGlobal(source, pushResult)
     local uri = guide.getUri(source)
     for _, set in ipairs(node:getSets(uri)) do
         pushResult(set)
-    end
-    for _, get in ipairs(node:getGets(uri)) do
-        pushResult(get)
     end
 end
 

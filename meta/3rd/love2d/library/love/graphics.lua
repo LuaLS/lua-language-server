@@ -9,6 +9,9 @@
 ---
 ---Many of the functions are used to manipulate the graphics coordinate system, which is essentially the way coordinates are mapped to the display. You can change the position, scale, and even rotation in this way.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics)
+---
 ---@class love.graphics
 love.graphics = {}
 
@@ -17,11 +20,17 @@ love.graphics = {}
 ---
 ---This effectively multiplies the existing coordinate transformation's matrix with the Transform object's internal matrix to produce the new coordinate transformation.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.applyTransform)
+---
 ---@param transform love.Transform # The Transform object to apply to the current graphics coordinate transform.
 function love.graphics.applyTransform(transform) end
 
 ---
 ---Draws a filled or unfilled arc at position (x, y). The arc is drawn from angle1 to angle2 in radians. The segments parameter determines how many segments are used to draw the arc. The more segments, the smoother the edge.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.arc)
 ---
 ---@overload fun(drawmode: love.DrawMode, arctype: love.ArcType, x: number, y: number, radius: number, angle1: number, angle2: number, segments?: number)
 ---@param drawmode love.DrawMode # How to draw the arc.
@@ -38,6 +47,9 @@ function love.graphics.arc(drawmode, x, y, radius, angle1, angle2, segments) end
 ---
 ---Since this function enqueues a screenshot capture rather than executing it immediately, it can be called from an input callback or love.update and it will still capture all of what's drawn to the screen in that frame.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.captureScreenshot)
+---
 ---@overload fun(callback: function)
 ---@overload fun(channel: love.Channel)
 ---@param filename string # The filename to save the screenshot to. The encoded image type is determined based on the extension of the filename, and must be one of the ImageFormats.
@@ -45,6 +57,9 @@ function love.graphics.captureScreenshot(filename) end
 
 ---
 ---Draws a circle.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.circle)
 ---
 ---@overload fun(mode: love.DrawMode, x: number, y: number, radius: number, segments: number)
 ---@param mode love.DrawMode # How to draw the circle.
@@ -64,6 +79,9 @@ function love.graphics.circle(mode, x, y, radius) end
 ---
 ---In versions prior to background color instead.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.clear)
+---
 ---@overload fun(r: number, g: number, b: number, a?: number, clearstencil?: boolean, cleardepth?: boolean)
 ---@overload fun(color: table, ..., clearstencil?: boolean, cleardepth?: boolean)
 ---@overload fun(clearcolor: boolean, clearstencil: boolean, cleardepth: boolean)
@@ -75,6 +93,9 @@ function love.graphics.clear() end
 ---If the active Canvas has just been changed and the 'replace' BlendMode is about to be used to draw something which covers the entire screen, calling love.graphics.discard rather than calling love.graphics.clear or doing nothing may improve performance on mobile devices.
 ---
 ---On some desktop systems this function may do nothing.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.discard)
 ---
 ---@overload fun(discardcolors: table, discardstencil?: boolean)
 ---@param discardcolor? boolean # Whether to discard the texture(s) of the active Canvas(es) (the contents of the screen if no Canvas is active.)
@@ -95,6 +116,9 @@ function love.graphics.discard(discardcolor, discardstencil) end
 ---When using the default shader anything drawn with this function will be tinted according to the currently selected color.
 ---
 ---Set it to pure white to preserve the object's original colors.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.draw)
 ---
 ---@overload fun(texture: love.Texture, quad: love.Quad, x: number, y: number, r?: number, sx?: number, sy?: number, ox?: number, oy?: number, kx?: number, ky?: number)
 ---@overload fun(drawable: love.Drawable, transform: love.Transform)
@@ -118,6 +142,9 @@ function love.graphics.draw(drawable, x, y, r, sx, sy, ox, oy, kx, ky) end
 ---
 ---Instancing is not supported by some older GPUs that are only capable of using OpenGL ES 2 or OpenGL 2. Use love.graphics.getSupported to check.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.drawInstanced)
+---
 ---@overload fun(mesh: love.Mesh, instancecount: number, transform: love.Transform)
 ---@param mesh love.Mesh # The mesh to render.
 ---@param instancecount number # The number of instances to render.
@@ -134,6 +161,9 @@ function love.graphics.drawInstanced(mesh, instancecount, x, y, r, sx, sy, ox, o
 
 ---
 ---Draws a layer of an Array Texture.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.drawLayer)
 ---
 ---@overload fun(texture: love.Texture, layerindex: number, quad: love.Quad, x?: number, y?: number, r?: number, sx?: number, sy?: number, ox?: number, oy?: number, kx?: number, ky?: number)
 ---@overload fun(texture: love.Texture, layerindex: number, transform: love.Transform)
@@ -154,6 +184,9 @@ function love.graphics.drawLayer(texture, layerindex, x, y, r, sx, sy, ox, oy, k
 ---
 ---Draws an ellipse.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.ellipse)
+---
 ---@overload fun(mode: love.DrawMode, x: number, y: number, radiusx: number, radiusy: number, segments: number)
 ---@param mode love.DrawMode # How to draw the ellipse.
 ---@param x number # The position of the center along x-axis.
@@ -171,12 +204,18 @@ function love.graphics.ellipse(mode, x, y, radiusx, radiusy) end
 ---
 ---SpriteBatches, ParticleSystems, Meshes, and Text objects do their own batching and do not affect automatic batching of other draws, aside from flushing the current batch when they're drawn.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.flushBatch)
+---
 function love.graphics.flushBatch() end
 
 ---
 ---Gets the current background color.
 ---
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getBackgroundColor)
 ---
 ---@return number r # The red component (0-1).
 ---@return number g # The green component (0-1).
@@ -187,6 +226,9 @@ function love.graphics.getBackgroundColor() end
 ---
 ---Gets the blending mode.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getBlendMode)
+---
 ---@return love.BlendMode mode # The current blend mode.
 ---@return love.BlendAlphaMode alphamode # The current blend alpha mode – it determines how the alpha of drawn objects affects blending.
 function love.graphics.getBlendMode() end
@@ -194,11 +236,17 @@ function love.graphics.getBlendMode() end
 ---
 ---Gets the current target Canvas.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getCanvas)
+---
 ---@return love.Canvas canvas # The Canvas set by setCanvas. Returns nil if drawing to the real screen.
 function love.graphics.getCanvas() end
 
 ---
 ---Gets the available Canvas formats, and whether each is supported.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getCanvasFormats)
 ---
 ---@overload fun(readable: boolean):table
 ---@return table formats # A table containing CanvasFormats as keys, and a boolean indicating whether the format is supported as values. Not all systems support all formats.
@@ -208,6 +256,9 @@ function love.graphics.getCanvasFormats() end
 ---Gets the current color.
 ---
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getColor)
 ---
 ---@return number r # The red component (0-1).
 ---@return number g # The green component (0-1).
@@ -219,6 +270,9 @@ function love.graphics.getColor() end
 ---Gets the active color components used when drawing. Normally all 4 components are active unless love.graphics.setColorMask has been used.
 ---
 ---The color mask determines whether individual components of the colors of drawn objects will affect the color of the screen. They affect love.graphics.clear and Canvas:clear as well.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getColorMask)
 ---
 ---@return boolean r # Whether the red color component is active when rendering.
 ---@return boolean g # Whether the green color component is active when rendering.
@@ -235,11 +289,17 @@ function love.graphics.getColorMask() end
 ---
 ---The highdpi window flag must be enabled to use the full pixel density of a Retina screen on Mac OS X and iOS. The flag currently does nothing on Windows and Linux, and on Android it is effectively always enabled.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getDPIScale)
+---
 ---@return number scale # The pixel scale factor associated with the window.
 function love.graphics.getDPIScale() end
 
 ---
 ---Returns the default scaling filters used with Images, Canvases, and Fonts.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getDefaultFilter)
 ---
 ---@return love.FilterMode min # Filter mode used when scaling the image down.
 ---@return love.FilterMode mag # Filter mode used when scaling the image up.
@@ -251,6 +311,9 @@ function love.graphics.getDefaultFilter() end
 ---
 ---This is low-level functionality designed for use with custom vertex shaders and Meshes with custom vertex attributes. No higher level APIs are provided to set the depth of 2D graphics such as shapes, lines, and Images.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getDepthMode)
+---
 ---@return love.CompareMode comparemode # Depth comparison mode used for depth testing.
 ---@return boolean write # Whether to write update / write values to the depth buffer when rendering.
 function love.graphics.getDepthMode() end
@@ -258,12 +321,18 @@ function love.graphics.getDepthMode() end
 ---
 ---Gets the width and height in pixels of the window.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getDimensions)
+---
 ---@return number width # The width of the window.
 ---@return number height # The height of the window.
 function love.graphics.getDimensions() end
 
 ---
 ---Gets the current Font object.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getFont)
 ---
 ---@return love.Font font # The current Font. Automatically creates and sets the default font, if none is set yet.
 function love.graphics.getFont() end
@@ -273,11 +342,17 @@ function love.graphics.getFont() end
 ---
 ---This is designed for use in combination with Mesh face culling. Other love.graphics shapes, lines, and sprites are not guaranteed to have a specific winding order to their internal vertices.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getFrontFaceWinding)
+---
 ---@return love.VertexWinding winding # The winding mode being used. The default winding is counterclockwise ('ccw').
 function love.graphics.getFrontFaceWinding() end
 
 ---
 ---Gets the height in pixels of the window.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getHeight)
 ---
 ---@return number height # The height of the window.
 function love.graphics.getHeight() end
@@ -285,11 +360,17 @@ function love.graphics.getHeight() end
 ---
 ---Gets the raw and compressed pixel formats usable for Images, and whether each is supported.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getImageFormats)
+---
 ---@return table formats # A table containing PixelFormats as keys, and a boolean indicating whether the format is supported as values. Not all systems support all formats.
 function love.graphics.getImageFormats() end
 
 ---
 ---Gets the line join style.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getLineJoin)
 ---
 ---@return love.LineJoin join # The LineJoin style.
 function love.graphics.getLineJoin() end
@@ -297,11 +378,17 @@ function love.graphics.getLineJoin() end
 ---
 ---Gets the line style.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getLineStyle)
+---
 ---@return love.LineStyle style # The current line style.
 function love.graphics.getLineStyle() end
 
 ---
 ---Gets the current line width.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getLineWidth)
 ---
 ---@return number width # The current line width.
 function love.graphics.getLineWidth() end
@@ -311,6 +398,9 @@ function love.graphics.getLineWidth() end
 ---
 ---Mesh face culling is designed for use with low level custom hardware-accelerated 3D rendering via custom vertex attributes on Meshes, custom vertex shaders, and depth testing with a depth buffer.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getMeshCullMode)
+---
 ---@return love.CullMode mode # The Mesh face culling mode in use (whether to render everything, cull back-facing triangles, or cull front-facing triangles).
 function love.graphics.getMeshCullMode() end
 
@@ -318,6 +408,9 @@ function love.graphics.getMeshCullMode() end
 ---Gets the width and height in pixels of the window.
 ---
 ---love.graphics.getDimensions gets the dimensions of the window in units scaled by the screen's DPI scale factor, rather than pixels. Use getDimensions for calculations related to drawing to the screen and using the graphics coordinate system (calculating the center of the screen, for example), and getPixelDimensions only when dealing specifically with underlying pixels (pixel-related calculations in a pixel Shader, for example).
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getPixelDimenions)
 ---
 ---@return number pixelwidth # The width of the window in pixels.
 ---@return number pixelheight # The height of the window in pixels.
@@ -328,6 +421,9 @@ function love.graphics.getPixelDimenions() end
 ---
 ---The graphics coordinate system and DPI scale factor, rather than raw pixels. Use getHeight for calculations related to drawing to the screen and using the coordinate system (calculating the center of the screen, for example), and getPixelHeight only when dealing specifically with underlying pixels (pixel-related calculations in a pixel Shader, for example).
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getPixelHeight)
+---
 ---@return number pixelheight # The height of the window in pixels.
 function love.graphics.getPixelHeight() end
 
@@ -336,17 +432,26 @@ function love.graphics.getPixelHeight() end
 ---
 ---The graphics coordinate system and DPI scale factor, rather than raw pixels. Use getWidth for calculations related to drawing to the screen and using the coordinate system (calculating the center of the screen, for example), and getPixelWidth only when dealing specifically with underlying pixels (pixel-related calculations in a pixel Shader, for example).
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getPixelWidth)
+---
 ---@return number pixelwidth # The width of the window in pixels.
 function love.graphics.getPixelWidth() end
 
 ---
 ---Gets the point size.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getPointSize)
+---
 ---@return number size # The current point size.
 function love.graphics.getPointSize() end
 
 ---
 ---Gets information about the system's video card and drivers.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getRendererInfo)
 ---
 ---@return string name # The name of the renderer, e.g. 'OpenGL' or 'OpenGL ES'.
 ---@return string version # The version of the renderer with some extra driver-dependent version info, e.g. '2.1 INTEL-8.10.44'.
@@ -357,6 +462,9 @@ function love.graphics.getRendererInfo() end
 ---
 ---Gets the current scissor box.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getScissor)
+---
 ---@return number x # The x-component of the top-left point of the box.
 ---@return number y # The y-component of the top-left point of the box.
 ---@return number width # The width of the box.
@@ -366,17 +474,26 @@ function love.graphics.getScissor() end
 ---
 ---Gets the current Shader. Returns nil if none is set.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getShader)
+---
 ---@return love.Shader shader # The currently active Shader, or nil if none is set.
 function love.graphics.getShader() end
 
 ---
 ---Gets the current depth of the transform / state stack (the number of pushes without corresponding pops).
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getStackDepth)
+---
 ---@return number depth # The current depth of the transform and state love.graphics stack.
 function love.graphics.getStackDepth() end
 
 ---
 ---Gets performance-related rendering statistics. 
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getStats)
 ---
 ---@overload fun(stats: table):table
 ---@return {drawcalls: number, canvasswitches: number, texturememory: number, images: number, canvases: number, fonts: number, shaderswitches: number, drawcallsbatched: number} stats # A table with the following fields:
@@ -389,6 +506,9 @@ function love.graphics.getStats() end
 ---
 ---Each Canvas has its own per-pixel stencil values.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getStencilTest)
+---
 ---@return love.CompareMode comparemode # The type of comparison that is made for each pixel. Will be 'always' if stencil testing is disabled.
 ---@return number comparevalue # The value used when comparing with the stencil value of each pixel.
 function love.graphics.getStencilTest() end
@@ -398,11 +518,17 @@ function love.graphics.getStencilTest() end
 ---
 ---Some older or low-end systems don't always support all graphics features.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getSupported)
+---
 ---@return table features # A table containing GraphicsFeature keys, and boolean values indicating whether each feature is supported.
 function love.graphics.getSupported() end
 
 ---
 ---Gets the system-dependent maximum values for love.graphics features.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getSystemLimits)
 ---
 ---@return table limits # A table containing GraphicsLimit keys, and number values.
 function love.graphics.getSystemLimits() end
@@ -410,11 +536,17 @@ function love.graphics.getSystemLimits() end
 ---
 ---Gets the available texture types, and whether each is supported.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getTextureTypes)
+---
 ---@return table texturetypes # A table containing TextureTypes as keys, and a boolean indicating whether the type is supported as values. Not all systems support all types.
 function love.graphics.getTextureTypes() end
 
 ---
 ---Gets the width in pixels of the window.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getWidth)
 ---
 ---@return number width # The width of the window.
 function love.graphics.getWidth() end
@@ -428,6 +560,9 @@ function love.graphics.getWidth() end
 ---
 ---The dimensions of the scissor is unaffected by graphical transformations (translate, scale, ...).
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.intersectScissor)
+---
 ---@param x number # The x-coordinate of the upper left corner of the rectangle to intersect with the existing scissor rectangle.
 ---@param y number # The y-coordinate of the upper left corner of the rectangle to intersect with the existing scissor rectangle.
 ---@param width number # The width of the rectangle to intersect with the existing scissor rectangle.
@@ -439,6 +574,9 @@ function love.graphics.intersectScissor(x, y, width, height) end
 ---
 ---This effectively applies the reverse of the current graphics transformations to the given position. A similar Transform:inverseTransformPoint method exists for Transform objects.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.inverseTransformPoint)
+---
 ---@param screenX number # The x component of the screen-space position.
 ---@param screenY number # The y component of the screen-space position.
 ---@return number globalX # The x component of the position in global coordinates.
@@ -449,6 +587,9 @@ function love.graphics.inverseTransformPoint(screenX, screenY) end
 ---Gets whether the graphics module is able to be used. If it is not active, love.graphics function and method calls will not work correctly and may cause the program to crash.
 ---The graphics module is inactive if a window is not open, or if the app is in the background on iOS. Typically the app's execution will be automatically paused by the system, in the latter case.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.isActive)
+---
 ---@return boolean active # Whether the graphics module is active and able to be used.
 function love.graphics.isActive() end
 
@@ -457,17 +598,26 @@ function love.graphics.isActive() end
 ---
 ---Not all devices support gamma-correct rendering, in which case it will be automatically disabled and this function will return false. It is supported on desktop systems which have graphics cards that are capable of using OpenGL 3 / DirectX 10, and iOS devices that can use OpenGL ES 3.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.isGammaCorrect)
+---
 ---@return boolean gammacorrect # True if gamma-correct rendering is supported and was enabled in love.conf, false otherwise.
 function love.graphics.isGammaCorrect() end
 
 ---
 ---Gets whether wireframe mode is used when drawing.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.isWireframe)
+---
 ---@return boolean wireframe # True if wireframe lines are used when drawing, false if it's not.
 function love.graphics.isWireframe() end
 
 ---
 ---Draws lines between points.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.line)
 ---
 ---@overload fun(points: table)
 ---@param x1 number # The position of first point on the x-axis.
@@ -486,6 +636,9 @@ function love.graphics.line(x1, y1, x2, y2, ...) end
 ---
 ---To use an array image in a Shader, it must be declared as a ArrayImage or sampler2DArray type (instead of Image or sampler2D). The Texel(ArrayImage image, vec3 texturecoord) shader function must be used to get pixel colors from a slice of the array image. The vec3 argument contains the texture coordinate in the first two components, and the 0-based slice index in the third component.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.newArrayImage)
+---
 ---@param slices table # A table containing filepaths to images (or File, FileData, ImageData, or CompressedImageData objects), in an array. Each sub-image must have the same dimensions. A table of tables can also be given, where each sub-table contains all mipmap levels for the slice index of that sub-table.
 ---@param settings? {mipmaps: boolean, linear: boolean, dpiscale: number} # Optional table of settings to configure the array image, containing the following fields:
 ---@return love.Image image # An Array Image object.
@@ -493,6 +646,9 @@ function love.graphics.newArrayImage(slices, settings) end
 
 ---
 ---Creates a new Canvas object for offscreen rendering.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.newCanvas)
 ---
 ---@overload fun(width: number, height: number):love.Canvas
 ---@overload fun(width: number, height: number, settings: table):love.Canvas
@@ -545,6 +701,9 @@ function love.graphics.newCanvas() end
 ---
 ---+x -x +y -y +z -z
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.newCubeImage)
+---
 ---@overload fun(faces: table, settings?: table):love.Image
 ---@param filename string # The filepath to a cubemap image file (or a File, FileData, or ImageData).
 ---@param settings? {mipmaps: boolean, linear: boolean} # Optional table of settings to configure the cubemap image, containing the following fields:
@@ -556,6 +715,9 @@ function love.graphics.newCubeImage(filename, settings) end
 ---
 ---All variants which accept a filename can also accept a Data object instead.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.newFont)
+---
 ---@overload fun(filename: string, size: number, hinting?: love.HintingMode, dpiscale?: number):love.Font
 ---@overload fun(filename: string, imagefilename: string):love.Font
 ---@overload fun(size?: number, hinting?: love.HintingMode, dpiscale?: number):love.Font
@@ -566,18 +728,24 @@ function love.graphics.newFont(filename) end
 ---
 ---Creates a new Image from a filepath, FileData, an ImageData, or a CompressedImageData, and optionally generates or specifies mipmaps for the image.
 ---
----@overload fun(fileData: love.FileData, settings?: table):love.Image
----@overload fun(imageData: love.ImageData, settings?: table):love.Image
----@overload fun(compressedImageData: love.CompressedImageData, settings?: table):love.Image
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.newImage)
+---
+---@overload fun(fileData: love.FileData, flags?: table):love.Image
+---@overload fun(imageData: love.ImageData, flags?: table):love.Image
+---@overload fun(compressedImageData: love.CompressedImageData, flags?: table):love.Image
 ---@param filename string # The filepath to the image file.
----@param settings? {dpiscale: number, linear: boolean, mipmaps: boolean} # A table containing the following fields:
+---@param flags? {dpiscale: number, linear: boolean, mipmaps: boolean} # A table containing the following fields:
 ---@return love.Image image # A new Image object which can be drawn on screen.
-function love.graphics.newImage(filename, settings) end
+function love.graphics.newImage(filename, flags) end
 
 ---
 ---Creates a new specifically formatted image.
 ---
 ---In versions prior to 0.9.0, LÖVE expects ISO 8859-1 encoding for the glyphs string.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.newImageFont)
 ---
 ---@overload fun(imageData: love.ImageData, glyphs: string):love.Font
 ---@overload fun(filename: string, glyphs: string, extraspacing: number):love.Font
@@ -593,6 +761,9 @@ function love.graphics.newImageFont(filename, glyphs) end
 ---
 ---In versions prior to 11.0, color and byte component values were within the range of 0 to 255 instead of 0 to 1.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.newMesh)
+---
 ---@overload fun(vertexcount: number, mode?: love.MeshDrawMode, usage?: love.SpriteBatchUsage):love.Mesh
 ---@overload fun(vertexformat: table, vertices: table, mode?: love.MeshDrawMode, usage?: love.SpriteBatchUsage):love.Mesh
 ---@overload fun(vertexformat: table, vertexcount: number, mode?: love.MeshDrawMode, usage?: love.SpriteBatchUsage):love.Mesh
@@ -606,6 +777,9 @@ function love.graphics.newMesh(vertices, mode, usage) end
 ---
 ---Creates a new ParticleSystem.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.newParticleSystem)
+---
 ---@overload fun(texture: love.Texture, buffer?: number):love.ParticleSystem
 ---@param image love.Image # The image to use.
 ---@param buffer? number # The max number of particles at the same time.
@@ -616,6 +790,9 @@ function love.graphics.newParticleSystem(image, buffer) end
 ---Creates a new Quad.
 ---
 ---The purpose of a Quad is to use a fraction of an image to draw objects, as opposed to drawing entire image. It is most useful for sprite sheets and atlases: in a sprite atlas, multiple sprites reside in same image, quad is used to draw a specific sprite from that image; in animated sprites with all frames residing in the same image, quad is used to draw specific frame from the animation.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.newQuad)
 ---
 ---@param x number # The top-left position in the Image along the x-axis.
 ---@param y number # The top-left position in the Image along the y-axis.
@@ -631,6 +808,9 @@ function love.graphics.newQuad(x, y, width, height, sw, sh) end
 ---
 ---Shaders are small programs which are run on the graphics card when drawing. Vertex shaders are run once for each vertex (for example, an image has 4 vertices - one at each corner. A Mesh might have many more.) Pixel shaders are run once for each pixel on the screen which the drawn object touches. Pixel shader code is executed after all the object's vertices have been processed by the vertex shader.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.newShader)
+---
 ---@overload fun(pixelcode: string, vertexcode: string):love.Shader
 ---@param code string # The pixel shader or vertex shader code, or a filename pointing to a file with the code.
 ---@return love.Shader shader # A Shader object for use in drawing operations.
@@ -638,6 +818,9 @@ function love.graphics.newShader(code) end
 
 ---
 ---Creates a new SpriteBatch object.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.newSpriteBatch)
 ---
 ---@overload fun(image: love.Image, maxsprites?: number, usage?: love.SpriteBatchUsage):love.SpriteBatch
 ---@overload fun(texture: love.Texture, maxsprites?: number, usage?: love.SpriteBatchUsage):love.SpriteBatch
@@ -649,6 +832,9 @@ function love.graphics.newSpriteBatch(image, maxsprites) end
 ---
 ---Creates a new drawable Text object.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.newText)
+---
 ---@param font love.Font # The font to use for the text.
 ---@param textstring? string # The initial string of text that the new Text object will contain. May be nil.
 ---@return love.Text text # The new drawable Text object.
@@ -656,6 +842,9 @@ function love.graphics.newText(font, textstring) end
 
 ---
 ---Creates a new drawable Video. Currently only Ogg Theora video files are supported.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.newVideo)
 ---
 ---@overload fun(videostream: love.VideoStream):love.Video
 ---@overload fun(filename: string, settings?: table):love.Video
@@ -676,6 +865,9 @@ function love.graphics.newVideo(filename) end
 ---
 ---Array images are a much better choice than volume images for storing multiple different sprites in a single array image for directly drawing them.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.newVolumeImage)
+---
 ---@param layers table # A table containing filepaths to images (or File, FileData, ImageData, or CompressedImageData objects), in an array. A table of tables can also be given, where each sub-table represents a single mipmap level and contains all layers for that mipmap.
 ---@param settings? {mipmaps: boolean, linear: boolean} # Optional table of settings to configure the volume image, containing the following fields:
 ---@return love.Image image # A volume Image object.
@@ -686,10 +878,16 @@ function love.graphics.newVolumeImage(layers, settings) end
 ---
 ---This function is always used to reverse any previous calls to love.graphics.rotate, love.graphics.scale, love.graphics.shear or love.graphics.translate. It returns the current transformation state to its defaults.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.origin)
+---
 function love.graphics.origin() end
 
 ---
 ---Draws one or more points.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.points)
 ---
 ---@overload fun(points: table)
 ---@overload fun(points: table)
@@ -703,6 +901,9 @@ function love.graphics.points(x, y, ...) end
 ---
 ---Following the mode argument, this function can accept multiple numeric arguments or a single table of numeric arguments. In either case the arguments are interpreted as alternating x and y coordinates of the polygon's vertices.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.polygon)
+---
 ---@overload fun(mode: love.DrawMode, vertices: table)
 ---@param mode love.DrawMode # How to draw the polygon.
 ---@vararg number # The vertices of the polygon.
@@ -713,12 +914,18 @@ function love.graphics.polygon(mode, ...) end
 ---
 ---This function is always used to reverse a previous push operation. It returns the current transformation state to what it was before the last preceding push.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.pop)
+---
 function love.graphics.pop() end
 
 ---
 ---Displays the results of drawing operations on the screen.
 ---
 ---This function is used when writing your own love.run function. It presents all the results of your drawing operations on the screen. See the example in love.run for a typical use of this function.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.present)
 ---
 function love.graphics.present() end
 
@@ -732,6 +939,9 @@ function love.graphics.present() end
 ---love.graphics.print and love.graphics.printf both support UTF-8 encoding. You'll also need a proper Font for special characters.
 ---
 ---In versions prior to 11.0, color and byte component values were within the range of 0 to 255 instead of 0 to 1.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.print)
 ---
 ---@overload fun(coloredtext: table, x?: number, y?: number, angle?: number, sx?: number, sy?: number, ox?: number, oy?: number, kx?: number, ky?: number)
 ---@overload fun(text: string, transform: love.Transform)
@@ -761,6 +971,9 @@ function love.graphics.print(text, x, y, r, sx, sy, ox, oy, kx, ky) end
 ---
 ---In versions prior to 11.0, color and byte component values were within the range of 0 to 255 instead of 0 to 1.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.printf)
+---
 ---@overload fun(text: string, font: love.Font, x: number, y: number, limit: number, align?: love.AlignMode, r?: number, sx?: number, sy?: number, ox?: number, oy?: number, kx?: number, ky?: number)
 ---@overload fun(text: string, transform: love.Transform, limit: number, align?: love.AlignMode)
 ---@overload fun(text: string, font: love.Font, transform: love.Transform, limit: number, align?: love.AlignMode)
@@ -787,11 +1000,17 @@ function love.graphics.printf(text, x, y, limit, align, r, sx, sy, ox, oy, kx, k
 ---
 ---This function is always used to prepare for a corresponding pop operation later. It stores the current coordinate transformation state into the transformation stack and keeps it active. Later changes to the transformation can be undone by using the pop operation, which returns the coordinate transform to the state it was in before calling push.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.push)
+---
 ---@overload fun(stack: love.StackType)
 function love.graphics.push() end
 
 ---
 ---Draws a rectangle.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.rectangle)
 ---
 ---@overload fun(mode: love.DrawMode, x: number, y: number, width: number, height: number, rx: number, ry?: number, segments?: number)
 ---@param mode love.DrawMode # How to draw the rectangle.
@@ -804,6 +1023,9 @@ function love.graphics.rectangle(mode, x, y, width, height) end
 ---
 ---Replaces the current coordinate transformation with the given Transform object.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.replaceTransform)
+---
 ---@param transform love.Transform # The Transform object to replace the current graphics coordinate transform with.
 function love.graphics.replaceTransform(transform) end
 
@@ -812,12 +1034,18 @@ function love.graphics.replaceTransform(transform) end
 ---
 ---Calling reset makes the current drawing color white, the current background color black, disables any active color component masks, disables wireframe mode and resets the current graphics transformation to the origin. It also sets both the point and line drawing modes to smooth and their sizes to 1.0.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.reset)
+---
 function love.graphics.reset() end
 
 ---
 ---Rotates the coordinate system in two dimensions.
 ---
 ---Calling this function affects all future drawing operations by rotating the coordinate system around the origin by the given amount of radians. This change lasts until love.draw() exits.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.rotate)
 ---
 ---@param angle number # The amount to rotate the coordinate system in radians.
 function love.graphics.rotate(angle) end
@@ -833,6 +1061,9 @@ function love.graphics.rotate(angle) end
 ---
 ---Scaling lasts until love.draw() exits.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.scale)
+---
 ---@param sx number # The scaling in the direction of the x-axis.
 ---@param sy? number # The scaling in the direction of the y-axis. If omitted, it defaults to same as parameter sx.
 function love.graphics.scale(sx, sy) end
@@ -840,7 +1071,11 @@ function love.graphics.scale(sx, sy) end
 ---
 ---Sets the background color.
 ---
----@overload fun(rgba: table)
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.setBackgroundColor)
+---
+---@overload fun()
+---@overload fun()
 ---@param red number # The red component (0-1).
 ---@param green number # The green component (0-1).
 ---@param blue number # The blue component (0-1).
@@ -850,12 +1085,18 @@ function love.graphics.setBackgroundColor(red, green, blue, alpha) end
 ---
 ---Sets the blending mode.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.setBlendMode)
+---
 ---@overload fun(mode: love.BlendMode, alphamode?: love.BlendAlphaMode)
 ---@param mode love.BlendMode # The blend mode to use.
 function love.graphics.setBlendMode(mode) end
 
 ---
 ---Captures drawing operations to a Canvas.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.setCanvas)
 ---
 ---@overload fun()
 ---@overload fun(canvas1: love.Canvas, canvas2: love.Canvas, ...)
@@ -870,6 +1111,9 @@ function love.graphics.setCanvas(canvas, mipmap) end
 ---
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.setColor)
+---
 ---@overload fun(rgba: table)
 ---@param red number # The amount of red.
 ---@param green number # The amount of green.
@@ -879,6 +1123,9 @@ function love.graphics.setColor(red, green, blue, alpha) end
 
 ---
 ---Sets the color mask. Enables or disables specific color components when rendering and clearing the screen. For example, if '''red''' is set to '''false''', no further changes will be made to the red component of any pixels.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.setColorMask)
 ---
 ---@overload fun()
 ---@param red boolean # Render red component.
@@ -890,6 +1137,9 @@ function love.graphics.setColorMask(red, green, blue, alpha) end
 ---
 ---Sets the default scaling filters used with Images, Canvases, and Fonts.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.setDefaultFilter)
+---
 ---@param min love.FilterMode # Filter mode used when scaling the image down.
 ---@param mag love.FilterMode # Filter mode used when scaling the image up.
 ---@param anisotropy? number # Maximum amount of Anisotropic Filtering used.
@@ -899,6 +1149,9 @@ function love.graphics.setDefaultFilter(min, mag, anisotropy) end
 ---Configures depth testing and writing to the depth buffer.
 ---
 ---This is low-level functionality designed for use with custom vertex shaders and Meshes with custom vertex attributes. No higher level APIs are provided to set the depth of 2D graphics such as shapes, lines, and Images.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.setDepthMode)
 ---
 ---@overload fun()
 ---@param comparemode love.CompareMode # Depth comparison mode used for depth testing.
@@ -910,6 +1163,9 @@ function love.graphics.setDepthMode(comparemode, write) end
 ---
 ---It's recommended that Font objects are created with love.graphics.newFont in the loading stage and then passed to this function in the drawing stage.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.setFont)
+---
 ---@param font love.Font # The Font object to use.
 function love.graphics.setFont(font) end
 
@@ -918,11 +1174,17 @@ function love.graphics.setFont(font) end
 ---
 ---This is designed for use in combination with Mesh face culling. Other love.graphics shapes, lines, and sprites are not guaranteed to have a specific winding order to their internal vertices.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.setFrontFaceWinding)
+---
 ---@param winding love.VertexWinding # The winding mode to use. The default winding is counterclockwise ('ccw').
 function love.graphics.setFrontFaceWinding(winding) end
 
 ---
 ---Sets the line join style. See LineJoin for the possible options.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.setLineJoin)
 ---
 ---@param join love.LineJoin # The LineJoin to use.
 function love.graphics.setLineJoin(join) end
@@ -930,11 +1192,17 @@ function love.graphics.setLineJoin(join) end
 ---
 ---Sets the line style.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.setLineStyle)
+---
 ---@param style love.LineStyle # The LineStyle to use. Line styles include smooth and rough.
 function love.graphics.setLineStyle(style) end
 
 ---
 ---Sets the line width.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.setLineWidth)
 ---
 ---@param width number # The width of the line.
 function love.graphics.setLineWidth(width) end
@@ -946,11 +1214,17 @@ function love.graphics.setLineWidth(width) end
 ---
 ---By default, both front- and back-facing triangles in Meshes are rendered.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.setMeshCullMode)
+---
 ---@param mode love.CullMode # The Mesh face culling mode to use (whether to render everything, cull back-facing triangles, or cull front-facing triangles).
 function love.graphics.setMeshCullMode(mode) end
 
 ---
 ---Creates and sets a new Font.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.setNewFont)
 ---
 ---@overload fun(filename: string, size?: number):love.Font
 ---@overload fun(file: love.File, size?: number):love.Font
@@ -963,6 +1237,9 @@ function love.graphics.setNewFont(size) end
 ---
 ---Sets the point size.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.setPointSize)
+---
 ---@param size number # The new point size.
 function love.graphics.setPointSize(size) end
 
@@ -972,6 +1249,9 @@ function love.graphics.setPointSize(size) end
 ---The scissor limits the drawing area to a specified rectangle. This affects all graphics calls, including love.graphics.clear. 
 ---
 ---The dimensions of the scissor is unaffected by graphical transformations (translate, scale, ...).
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.setScissor)
 ---
 ---@overload fun()
 ---@param x number # x coordinate of upper left corner.
@@ -983,6 +1263,9 @@ function love.graphics.setScissor(x, y, width, height) end
 ---
 ---Sets or resets a Shader as the current pixel effect or vertex shaders. All drawing operations until the next ''love.graphics.setShader'' will be drawn using the Shader object specified.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.setShader)
+---
 ---@overload fun()
 ---@param shader love.Shader # The new shader.
 function love.graphics.setShader(shader) end
@@ -992,6 +1275,9 @@ function love.graphics.setShader(shader) end
 ---
 ---When stencil testing is enabled, the geometry of everything that is drawn afterward will be clipped / stencilled out based on a comparison between the arguments of this function and the stencil value of each pixel that the geometry touches. The stencil values of pixels are affected via love.graphics.stencil.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.setStencilTest)
+---
 ---@overload fun()
 ---@param comparemode love.CompareMode # The type of comparison to make for each pixel.
 ---@param comparevalue number # The value to use when comparing with the stencil value of each pixel. Must be between 0 and 255.
@@ -1000,11 +1286,17 @@ function love.graphics.setStencilTest(comparemode, comparevalue) end
 ---
 ---Sets whether wireframe lines will be used when drawing.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.setWireframe)
+---
 ---@param enable boolean # True to enable wireframe mode when drawing, false to disable it.
 function love.graphics.setWireframe(enable) end
 
 ---
 ---Shears the coordinate system.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.shear)
 ---
 ---@param kx number # The shear factor on the x-axis.
 ---@param ky number # The shear factor on the y-axis.
@@ -1017,6 +1309,9 @@ function love.graphics.shear(kx, ky) end
 ---
 ---Stencil values are integers within the range of 255.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.stencil)
+---
 ---@param stencilfunction function # Function which draws geometry. The stencil values of pixels, rather than the color of each pixel, will be affected by the geometry.
 ---@param action? love.StencilAction # How to modify any stencil values of pixels that are touched by what's drawn in the stencil function.
 ---@param value? number # The new stencil value to use for pixels if the 'replace' stencil action is used. Has no effect with other stencil actions. Must be between 0 and 255.
@@ -1027,6 +1322,9 @@ function love.graphics.stencil(stencilfunction, action, value, keepvalues) end
 ---Converts the given 2D position from global coordinates into screen-space.
 ---
 ---This effectively applies the current graphics transformations to the given position. A similar Transform:transformPoint method exists for Transform objects.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.transformPoint)
 ---
 ---@param globalX number # The x component of the position in global coordinates.
 ---@param globalY number # The y component of the position in global coordinates.
@@ -1045,12 +1343,18 @@ function love.graphics.transformPoint(globalX, globalY) end
 ---
 ---Translating using whole numbers will prevent tearing/blurring of images and fonts draw after translating.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.translate)
+---
 ---@param dx number # The translation relative to the x-axis.
 ---@param dy number # The translation relative to the y-axis.
 function love.graphics.translate(dx, dy) end
 
 ---
 ---Validates shader code. Check if specified shader code does not contain any errors.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics.validateShader)
 ---
 ---@overload fun(gles: boolean, pixelcode: string, vertexcode: string):boolean, string
 ---@param gles boolean # Validate code as GLSL ES shader.
@@ -1066,6 +1370,9 @@ function love.graphics.validateShader(gles, code) end
 ---
 ---In versions prior to love.graphics.isSupported("canvas") could be used to check for support at runtime.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics)
+---
 ---@class love.Canvas: love.Texture, love.Drawable, love.Object
 local Canvas = {}
 
@@ -1076,6 +1383,9 @@ local Canvas = {}
 ---
 ---If the mipmap mode is set to 'auto', this function is automatically called inside love.graphics.setCanvas when switching from this Canvas to another Canvas or to the main screen.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Canvas:generateMipmaps)
+---
 function Canvas:generateMipmaps() end
 
 ---
@@ -1083,17 +1393,26 @@ function Canvas:generateMipmaps() end
 ---
 ---This may be different than the number used as an argument to love.graphics.newCanvas if the system running LÖVE doesn't support that number.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Canvas:getMSAA)
+---
 ---@return number samples # The number of multisample antialiasing samples used by the canvas when drawing to it.
 function Canvas:getMSAA() end
 
 ---
 ---Gets the MipmapMode this Canvas was created with.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Canvas:getMipmapMode)
+---
 ---@return love.MipmapMode mode # The mipmap mode this Canvas was created with.
 function Canvas:getMipmapMode() end
 
 ---
 ---Generates ImageData from the contents of the Canvas.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Canvas:newImageData)
 ---
 ---@overload fun(self: love.Canvas, slice: number, mipmap?: number, x: number, y: number, width: number, height: number):love.ImageData
 ---@return love.ImageData data # The new ImageData made from the Canvas' contents.
@@ -1114,17 +1433,26 @@ function Canvas:newImageData() end
 ---
 ---love.graphics.setCanvas()
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Canvas:renderTo)
+---
 ---@param func function # A function performing drawing operations.
 function Canvas:renderTo(func) end
 
 ---
 ---Superclass for all things that can be drawn on screen. This is an abstract type that can't be created directly.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics)
+---
 ---@class love.Drawable: love.Object
 local Drawable = {}
 
 ---
 ---Defines the shape of characters that can be drawn onto the screen.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics)
 ---
 ---@class love.Font: love.Object
 local Font = {}
@@ -1134,6 +1462,9 @@ local Font = {}
 ---
 ---The ascent spans the distance between the baseline and the top of the glyph that reaches farthest from the baseline.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Font:getAscent)
+---
 ---@return number ascent # The ascent of the Font in pixels.
 function Font:getAscent() end
 
@@ -1141,6 +1472,9 @@ function Font:getAscent() end
 ---Gets the baseline of the Font.
 ---
 ---Most scripts share the notion of a baseline: an imaginary horizontal line on which characters rest. In some scripts, parts of glyphs lie below the baseline.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Font:getBaseline)
 ---
 ---@return number baseline # The baseline of the Font in pixels.
 function Font:getBaseline() end
@@ -1152,6 +1486,9 @@ function Font:getBaseline() end
 ---
 ---The font size of TrueType fonts is scaled internally by the font's specified DPI scale factor. By default, LÖVE uses the screen's DPI scale factor when creating TrueType fonts.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Font:getDPIScale)
+---
 ---@return number dpiscale # The DPI scale factor of the Font.
 function Font:getDPIScale() end
 
@@ -1160,11 +1497,17 @@ function Font:getDPIScale() end
 ---
 ---The descent spans the distance between the baseline and the lowest descending glyph in a typeface.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Font:getDescent)
+---
 ---@return number descent # The descent of the Font in pixels.
 function Font:getDescent() end
 
 ---
 ---Gets the filter mode for a font.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Font:getFilter)
 ---
 ---@return love.FilterMode min # Filter mode used when minifying the font.
 ---@return love.FilterMode mag # Filter mode used when magnifying the font.
@@ -1176,6 +1519,9 @@ function Font:getFilter() end
 ---
 ---The height of the font is the size including any spacing; the height which it will need.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Font:getHeight)
+---
 ---@return number height # The height of the Font in pixels.
 function Font:getHeight() end
 
@@ -1183,6 +1529,9 @@ function Font:getHeight() end
 ---Gets the kerning between two characters in the Font.
 ---
 ---Kerning is normally handled automatically in love.graphics.print, Text objects, Font:getWidth, Font:getWrap, etc. This function is useful when stitching text together manually.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Font:getKerning)
 ---
 ---@overload fun(self: love.Font, leftglyph: number, rightglyph: number):number
 ---@param leftchar string # The left character.
@@ -1195,11 +1544,17 @@ function Font:getKerning(leftchar, rightchar) end
 ---
 ---This will be the value previously set by Font:setLineHeight, or 1.0 by default.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Font:getLineHeight)
+---
 ---@return number height # The current line height.
 function Font:getLineHeight() end
 
 ---
 ---Determines the maximum width (accounting for newlines) taken by the given string.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Font:getWidth)
 ---
 ---@param text string # A string.
 ---@return number width # The width of the text.
@@ -1210,6 +1565,9 @@ function Font:getWidth(text) end
 ---
 ---This function accounts for newlines correctly (i.e. '\n').
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Font:getWrap)
+---
 ---@param text string # The text that will be wrapped.
 ---@param wraplimit number # The maximum width in pixels of each line that ''text'' is allowed before wrapping.
 ---@return number width # The maximum width of the wrapped text.
@@ -1218,6 +1576,9 @@ function Font:getWrap(text, wraplimit) end
 
 ---
 ---Gets whether the Font can render a character or string.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Font:hasGlyphs)
 ---
 ---@overload fun(self: love.Font, character1: string, character2: string):boolean
 ---@overload fun(self: love.Font, codepoint1: number, codepoint2: number):boolean
@@ -1228,12 +1589,18 @@ function Font:hasGlyphs(text) end
 ---
 ---Sets the fallback fonts. When the Font doesn't contain a glyph, it will substitute the glyph from the next subsequent fallback Fonts. This is akin to setting a 'font stack' in Cascading Style Sheets (CSS).
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Font:setFallbacks)
+---
 ---@param fallbackfont1 love.Font # The first fallback Font to use.
 ---@vararg love.Font # Additional fallback Fonts.
 function Font:setFallbacks(fallbackfont1, ...) end
 
 ---
 ---Sets the filter mode for a font.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Font:setFilter)
 ---
 ---@param min love.FilterMode # How to scale a font down.
 ---@param mag love.FilterMode # How to scale a font up.
@@ -1245,17 +1612,26 @@ function Font:setFilter(min, mag, anisotropy) end
 ---
 ---When rendering the font in lines the actual height will be determined by the line height multiplied by the height of the font. The default is 1.0.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Font:setLineHeight)
+---
 ---@param height number # The new line height.
 function Font:setLineHeight(height) end
 
 ---
 ---Drawable image type.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics)
+---
 ---@class love.Image: love.Texture, love.Drawable, love.Object
 local Image = {}
 
 ---
 ---Gets the flags used when the image was created.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Image:getFlags)
 ---
 ---@return table flags # A table with ImageFlag keys.
 function Image:getFlags() end
@@ -1265,11 +1641,17 @@ function Image:getFlags() end
 ---
 ---Compressed images take up less space in VRAM, and drawing a compressed image will generally be more efficient than drawing one created from raw pixel data.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Image:isCompressed)
+---
 ---@return boolean compressed # Whether the Image is stored as a compressed texture on the GPU.
 function Image:isCompressed() end
 
 ---
 ---Replace the contents of an Image.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Image:replacePixels)
 ---
 ---@param data love.ImageData # The new ImageData to replace the contents with.
 ---@param slice number # Which cubemap face, array index, or volume layer to replace, if applicable.
@@ -1282,11 +1664,17 @@ function Image:replacePixels(data, slice, mipmap, x, y, reloadmipmaps) end
 ---
 ---A 2D polygon mesh used for drawing arbitrary textured shapes.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics)
+---
 ---@class love.Mesh: love.Drawable, love.Object
 local Mesh = {}
 
 ---
 ---Attaches a vertex attribute from a different Mesh onto this Mesh, for use when drawing. This can be used to share vertex attribute data between several different Meshes.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Mesh:attachAttribute)
 ---
 ---@overload fun(self: love.Mesh, name: string, mesh: love.Mesh, step?: love.VertexAttributeStep, attachname?: string)
 ---@param name string # The name of the vertex attribute to attach.
@@ -1296,6 +1684,9 @@ function Mesh:attachAttribute(name, mesh) end
 ---
 ---Removes a previously attached vertex attribute from this Mesh.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Mesh:detachAttribute)
+---
 ---@param name string # The name of the attached vertex attribute to detach.
 ---@return boolean success # Whether the attribute was successfully detached.
 function Mesh:detachAttribute(name) end
@@ -1303,11 +1694,17 @@ function Mesh:detachAttribute(name) end
 ---
 ---Gets the mode used when drawing the Mesh.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Mesh:getDrawMode)
+---
 ---@return love.MeshDrawMode mode # The mode used when drawing the Mesh.
 function Mesh:getDrawMode() end
 
 ---
 ---Gets the range of vertices used when drawing the Mesh.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Mesh:getDrawRange)
 ---
 ---@return number min # The index of the first vertex used when drawing, or the index of the first value in the vertex map used if one is set for this Mesh.
 ---@return number max # The index of the last vertex used when drawing, or the index of the last value in the vertex map used if one is set for this Mesh.
@@ -1316,6 +1713,9 @@ function Mesh:getDrawRange() end
 ---
 ---Gets the texture (Image or Canvas) used when drawing the Mesh.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Mesh:getTexture)
+---
 ---@return love.Texture texture # The Image or Canvas to texture the Mesh with when drawing, or nil if none is set.
 function Mesh:getTexture() end
 
@@ -1323,6 +1723,9 @@ function Mesh:getTexture() end
 ---Gets the properties of a vertex in the Mesh.
 ---
 ---In versions prior to 11.0, color and byte component values were within the range of 0 to 255 instead of 0 to 1.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Mesh:getVertex)
 ---
 ---@overload fun(self: love.Mesh, index: number):number, number, number, number, number, number, number, number
 ---@param index number # The one-based index of the vertex you want to retrieve the information for.
@@ -1334,6 +1737,9 @@ function Mesh:getVertex(index) end
 ---
 ---Meshes without a custom vertex format specified in love.graphics.newMesh have position as their first attribute, texture coordinates as their second attribute, and color as their third attribute.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Mesh:getVertexAttribute)
+---
 ---@param vertexindex number # The index of the the vertex you want to retrieve the attribute for (one-based).
 ---@param attributeindex number # The index of the attribute within the vertex to be retrieved (one-based).
 ---@return number value1 # The value of the first component of the attribute.
@@ -1343,11 +1749,17 @@ function Mesh:getVertexAttribute(vertexindex, attributeindex) end
 ---
 ---Gets the total number of vertices in the Mesh.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Mesh:getVertexCount)
+---
 ---@return number count # The total number of vertices in the mesh.
 function Mesh:getVertexCount() end
 
 ---
 ---Gets the vertex format that the Mesh was created with.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Mesh:getVertexFormat)
 ---
 ---@return {attribute: table} format # The vertex format of the Mesh, which is a table containing tables for each vertex attribute the Mesh was created with, in the form of {attribute, ...}.
 function Mesh:getVertexFormat() end
@@ -1357,11 +1769,17 @@ function Mesh:getVertexFormat() end
 ---
 ---If no vertex map has been set previously via Mesh:setVertexMap, then this function will return nil in LÖVE 0.10.0+, or an empty table in 0.9.2 and older.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Mesh:getVertexMap)
+---
 ---@return table map # A table containing the list of vertex indices used when drawing.
 function Mesh:getVertexMap() end
 
 ---
 ---Gets whether a specific vertex attribute in the Mesh is enabled. Vertex data from disabled attributes is not used when drawing the Mesh.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Mesh:isAttributeEnabled)
 ---
 ---@param name string # The name of the vertex attribute to be checked.
 ---@return boolean enabled # Whether the vertex attribute is used when drawing this Mesh.
@@ -1370,6 +1788,9 @@ function Mesh:isAttributeEnabled(name) end
 ---
 ---Enables or disables a specific vertex attribute in the Mesh. Vertex data from disabled attributes is not used when drawing the Mesh.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Mesh:setAttributeEnabled)
+---
 ---@param name string # The name of the vertex attribute to enable or disable.
 ---@param enable boolean # Whether the vertex attribute is used when drawing this Mesh.
 function Mesh:setAttributeEnabled(name, enable) end
@@ -1377,11 +1798,17 @@ function Mesh:setAttributeEnabled(name, enable) end
 ---
 ---Sets the mode used when drawing the Mesh.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Mesh:setDrawMode)
+---
 ---@param mode love.MeshDrawMode # The mode to use when drawing the Mesh.
 function Mesh:setDrawMode(mode) end
 
 ---
 ---Restricts the drawn vertices of the Mesh to a subset of the total.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Mesh:setDrawRange)
 ---
 ---@overload fun(self: love.Mesh)
 ---@param start number # The index of the first vertex to use when drawing, or the index of the first value in the vertex map to use if one is set for this Mesh.
@@ -1391,6 +1818,9 @@ function Mesh:setDrawRange(start, count) end
 ---
 ---Sets the texture (Image or Canvas) used when drawing the Mesh.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Mesh:setTexture)
+---
 ---@overload fun(self: love.Mesh)
 ---@param texture love.Texture # The Image or Canvas to texture the Mesh with when drawing.
 function Mesh:setTexture(texture) end
@@ -1399,6 +1829,9 @@ function Mesh:setTexture(texture) end
 ---Sets the properties of a vertex in the Mesh.
 ---
 ---In versions prior to 11.0, color and byte component values were within the range of 0 to 255 instead of 0 to 1.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Mesh:setVertex)
 ---
 ---@overload fun(self: love.Mesh, index: number, vertex: table)
 ---@overload fun(self: love.Mesh, index: number, x: number, y: number, u: number, v: number, r?: number, g?: number, b?: number, a?: number)
@@ -1413,6 +1846,9 @@ function Mesh:setVertex(index, attributecomponent, ...) end
 ---
 ---Meshes without a custom vertex format specified in love.graphics.newMesh have position as their first attribute, texture coordinates as their second attribute, and color as their third attribute.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Mesh:setVertexAttribute)
+---
 ---@param vertexindex number # The index of the the vertex to be modified (one-based).
 ---@param attributeindex number # The index of the attribute within the vertex to be modified (one-based).
 ---@param value1 number # The new value for the first component of the attribute.
@@ -1425,6 +1861,9 @@ function Mesh:setVertexAttribute(vertexindex, attributeindex, value1, value2, ..
 ---
 ---The vertex map allows you to re-order or reuse vertices when drawing without changing the actual vertex parameters or duplicating vertices. It is especially useful when combined with different Mesh Draw Modes.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Mesh:setVertexMap)
+---
 ---@overload fun(self: love.Mesh, vi1: number, vi2: number, vi3: number)
 ---@overload fun(self: love.Mesh, data: love.Data, datatype: love.IndexDataType)
 ---@param map table # A table containing a list of vertex indices to use when drawing. Values must be in the range of Mesh:getVertexCount().
@@ -1432,6 +1871,9 @@ function Mesh:setVertexMap(map) end
 
 ---
 ---Replaces a range of vertices in the Mesh with new ones. The total number of vertices in a Mesh cannot be changed after it has been created. This is often more efficient than calling Mesh:setVertex in a loop.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Mesh:setVertices)
 ---
 ---@overload fun(self: love.Mesh, data: love.Data, startvertex?: number)
 ---@overload fun(self: love.Mesh, vertices: table)
@@ -1446,11 +1888,17 @@ function Mesh:setVertices(vertices, startvertex) end
 ---
 ---The particle system won't create any particles unless you call setParticleLifetime and setEmissionRate.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics)
+---
 ---@class love.ParticleSystem: love.Drawable, love.Object
 local ParticleSystem = {}
 
 ---
 ---Creates an identical copy of the ParticleSystem in the stopped state.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:clone)
 ---
 ---@return love.ParticleSystem particlesystem # The new identical copy of this ParticleSystem.
 function ParticleSystem:clone() end
@@ -1458,11 +1906,17 @@ function ParticleSystem:clone() end
 ---
 ---Emits a burst of particles from the particle emitter.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:emit)
+---
 ---@param numparticles number # The amount of particles to emit. The number of emitted particles will be truncated if the particle system's max buffer size is reached.
 function ParticleSystem:emit(numparticles) end
 
 ---
 ---Gets the maximum number of particles the ParticleSystem can have at once.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:getBufferSize)
 ---
 ---@return number size # The maximum number of particles.
 function ParticleSystem:getBufferSize() end
@@ -1471,6 +1925,9 @@ function ParticleSystem:getBufferSize() end
 ---Gets the series of colors applied to the particle sprite.
 ---
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:getColors)
 ---
 ---@return number r1 # First color, red component (0-1).
 ---@return number g1 # First color, green component (0-1).
@@ -1489,17 +1946,26 @@ function ParticleSystem:getColors() end
 ---
 ---Gets the number of particles that are currently in the system.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:getCount)
+---
 ---@return number count # The current number of live particles.
 function ParticleSystem:getCount() end
 
 ---
 ---Gets the direction of the particle emitter (in radians).
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:getDirection)
+---
 ---@return number direction # The direction of the emitter (radians).
 function ParticleSystem:getDirection() end
 
 ---
 ---Gets the area-based spawn parameters for the particles.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:getEmissionArea)
 ---
 ---@return love.AreaSpreadDistribution distribution # The type of distribution for new particles.
 ---@return number dx # The maximum spawn distance from the emitter along the x-axis for uniform distribution, or the standard deviation along the x-axis for normal distribution.
@@ -1511,17 +1977,26 @@ function ParticleSystem:getEmissionArea() end
 ---
 ---Gets the amount of particles emitted per second.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:getEmissionRate)
+---
 ---@return number rate # The amount of particles per second.
 function ParticleSystem:getEmissionRate() end
 
 ---
 ---Gets how long the particle system will emit particles (if -1 then it emits particles forever).
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:getEmitterLifetime)
+---
 ---@return number life # The lifetime of the emitter (in seconds).
 function ParticleSystem:getEmitterLifetime() end
 
 ---
 ---Gets the mode used when the ParticleSystem adds new particles.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:getInsertMode)
 ---
 ---@return love.ParticleInsertMode mode # The mode used when the ParticleSystem adds new particles.
 function ParticleSystem:getInsertMode() end
@@ -1530,6 +2005,9 @@ function ParticleSystem:getInsertMode() end
 ---Gets the linear acceleration (acceleration along the x and y axes) for particles.
 ---
 ---Every particle created will accelerate along the x and y axes between xmin,ymin and xmax,ymax.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:getLinearAcceleration)
 ---
 ---@return number xmin # The minimum acceleration along the x axis.
 ---@return number ymin # The minimum acceleration along the y axis.
@@ -1540,12 +2018,18 @@ function ParticleSystem:getLinearAcceleration() end
 ---
 ---Gets the amount of linear damping (constant deceleration) for particles.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:getLinearDamping)
+---
 ---@return number min # The minimum amount of linear damping applied to particles.
 ---@return number max # The maximum amount of linear damping applied to particles.
 function ParticleSystem:getLinearDamping() end
 
 ---
 ---Gets the particle image's draw offset.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:getOffset)
 ---
 ---@return number ox # The x coordinate of the particle image's draw offset.
 ---@return number oy # The y coordinate of the particle image's draw offset.
@@ -1554,12 +2038,18 @@ function ParticleSystem:getOffset() end
 ---
 ---Gets the lifetime of the particles.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:getParticleLifetime)
+---
 ---@return number min # The minimum life of the particles (in seconds).
 ---@return number max # The maximum life of the particles (in seconds).
 function ParticleSystem:getParticleLifetime() end
 
 ---
 ---Gets the position of the emitter.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:getPosition)
 ---
 ---@return number x # Position along x-axis.
 ---@return number y # Position along y-axis.
@@ -1568,11 +2058,17 @@ function ParticleSystem:getPosition() end
 ---
 ---Gets the series of Quads used for the particle sprites.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:getQuads)
+---
 ---@return table quads # A table containing the Quads used.
 function ParticleSystem:getQuads() end
 
 ---
 ---Gets the radial acceleration (away from the emitter).
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:getRadialAcceleration)
 ---
 ---@return number min # The minimum acceleration.
 ---@return number max # The maximum acceleration.
@@ -1581,6 +2077,9 @@ function ParticleSystem:getRadialAcceleration() end
 ---
 ---Gets the rotation of the image upon particle creation (in radians).
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:getRotation)
+---
 ---@return number min # The minimum initial angle (radians).
 ---@return number max # The maximum initial angle (radians).
 function ParticleSystem:getRotation() end
@@ -1588,11 +2087,17 @@ function ParticleSystem:getRotation() end
 ---
 ---Gets the amount of size variation (0 meaning no variation and 1 meaning full variation between start and end).
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:getSizeVariation)
+---
 ---@return number variation # The amount of variation (0 meaning no variation and 1 meaning full variation between start and end).
 function ParticleSystem:getSizeVariation() end
 
 ---
 ---Gets the series of sizes by which the sprite is scaled. 1.0 is normal size. The particle system will interpolate between each size evenly over the particle's lifetime.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:getSizes)
 ---
 ---@return number size1 # The first size.
 ---@return number size2 # The second size.
@@ -1602,12 +2107,18 @@ function ParticleSystem:getSizes() end
 ---
 ---Gets the speed of the particles.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:getSpeed)
+---
 ---@return number min # The minimum linear speed of the particles.
 ---@return number max # The maximum linear speed of the particles.
 function ParticleSystem:getSpeed() end
 
 ---
 ---Gets the spin of the sprite.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:getSpin)
 ---
 ---@return number min # The minimum spin (radians per second).
 ---@return number max # The maximum spin (radians per second).
@@ -1617,17 +2128,26 @@ function ParticleSystem:getSpin() end
 ---
 ---Gets the amount of spin variation (0 meaning no variation and 1 meaning full variation between start and end).
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:getSpinVariation)
+---
 ---@return number variation # The amount of variation (0 meaning no variation and 1 meaning full variation between start and end).
 function ParticleSystem:getSpinVariation() end
 
 ---
 ---Gets the amount of directional spread of the particle emitter (in radians).
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:getSpread)
+---
 ---@return number spread # The spread of the emitter (radians).
 function ParticleSystem:getSpread() end
 
 ---
 ---Gets the tangential acceleration (acceleration perpendicular to the particle's direction).
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:getTangentialAcceleration)
 ---
 ---@return number min # The minimum acceleration.
 ---@return number max # The maximum acceleration.
@@ -1636,11 +2156,17 @@ function ParticleSystem:getTangentialAcceleration() end
 ---
 ---Gets the texture (Image or Canvas) used for the particles.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:getTexture)
+---
 ---@return love.Texture texture # The Image or Canvas used for the particles.
 function ParticleSystem:getTexture() end
 
 ---
 ---Gets whether particle angles and rotations are relative to their velocities. If enabled, particles are aligned to the angle of their velocities and rotate relative to that angle.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:hasRelativeRotation)
 ---
 ---@return boolean enable # True if relative particle rotation is enabled, false if it's disabled.
 function ParticleSystem:hasRelativeRotation() end
@@ -1648,11 +2174,17 @@ function ParticleSystem:hasRelativeRotation() end
 ---
 ---Checks whether the particle system is actively emitting particles.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:isActive)
+---
 ---@return boolean active # True if system is active, false otherwise.
 function ParticleSystem:isActive() end
 
 ---
 ---Checks whether the particle system is paused.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:isPaused)
 ---
 ---@return boolean paused # True if system is paused, false otherwise.
 function ParticleSystem:isPaused() end
@@ -1660,11 +2192,17 @@ function ParticleSystem:isPaused() end
 ---
 ---Checks whether the particle system is stopped.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:isStopped)
+---
 ---@return boolean stopped # True if system is stopped, false otherwise.
 function ParticleSystem:isStopped() end
 
 ---
 ---Moves the position of the emitter. This results in smoother particle spawning behaviour than if ParticleSystem:setPosition is used every frame.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:moveTo)
 ---
 ---@param x number # Position along x-axis.
 ---@param y number # Position along y-axis.
@@ -1673,15 +2211,24 @@ function ParticleSystem:moveTo(x, y) end
 ---
 ---Pauses the particle emitter.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:pause)
+---
 function ParticleSystem:pause() end
 
 ---
 ---Resets the particle emitter, removing any existing particles and resetting the lifetime counter.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:reset)
+---
 function ParticleSystem:reset() end
 
 ---
 ---Sets the size of the buffer (the max allowed amount of particles in the system).
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setBufferSize)
 ---
 ---@param size number # The buffer size.
 function ParticleSystem:setBufferSize(size) end
@@ -1693,29 +2240,37 @@ function ParticleSystem:setBufferSize(size) end
 ---
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
 ---
----@overload fun(self: love.ParticleSystem, rgba1: table, rgba2: table, rgba8: table)
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setColors)
+---
 ---@param r1 number # First color, red component (0-1).
 ---@param g1 number # First color, green component (0-1).
 ---@param b1 number # First color, blue component (0-1).
----@param a1? number # First color, alpha component (0-1).
----@param r2? number # Second color, red component (0-1).
----@param g2? number # Second color, green component (0-1).
----@param b2? number # Second color, blue component (0-1).
----@param a2? number # Second color, alpha component (0-1).
----@param r8? number # Eighth color, red component (0-1).
----@param g8? number # Eighth color, green component (0-1).
----@param b8? number # Eighth color, blue component (0-1).
----@param a8? number # Eighth color, alpha component (0-1).
+---@param a1 number # First color, alpha component (0-1).
+---@param r2 number # Second color, red component (0-1).
+---@param g2 number # Second color, green component (0-1).
+---@param b2 number # Second color, blue component (0-1).
+---@param a2 number # Second color, alpha component (0-1).
+---@param r8 number # Eighth color, red component (0-1).
+---@param g8 number # Eighth color, green component (0-1).
+---@param b8 number # Eighth color, blue component (0-1).
+---@param a8 number # Eighth color, alpha component (0-1).
 function ParticleSystem:setColors(r1, g1, b1, a1, r2, g2, b2, a2, r8, g8, b8, a8) end
 
 ---
 ---Sets the direction the particles will be emitted in.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setDirection)
 ---
 ---@param direction number # The direction of the particles (in radians).
 function ParticleSystem:setDirection(direction) end
 
 ---
 ---Sets area-based spawn parameters for the particles. Newly created particles will spawn in an area around the emitter based on the parameters to this function.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setEmissionArea)
 ---
 ---@param distribution love.AreaSpreadDistribution # The type of distribution for new particles.
 ---@param dx number # The maximum spawn distance from the emitter along the x-axis for uniform distribution, or the standard deviation along the x-axis for normal distribution.
@@ -1727,17 +2282,26 @@ function ParticleSystem:setEmissionArea(distribution, dx, dy, angle, directionRe
 ---
 ---Sets the amount of particles emitted per second.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setEmissionRate)
+---
 ---@param rate number # The amount of particles per second.
 function ParticleSystem:setEmissionRate(rate) end
 
 ---
 ---Sets how long the particle system should emit particles (if -1 then it emits particles forever).
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setEmitterLifetime)
+---
 ---@param life number # The lifetime of the emitter (in seconds).
 function ParticleSystem:setEmitterLifetime(life) end
 
 ---
 ---Sets the mode to use when the ParticleSystem adds new particles.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setInsertMode)
 ---
 ---@param mode love.ParticleInsertMode # The mode to use when the ParticleSystem adds new particles.
 function ParticleSystem:setInsertMode(mode) end
@@ -1746,6 +2310,9 @@ function ParticleSystem:setInsertMode(mode) end
 ---Sets the linear acceleration (acceleration along the x and y axes) for particles.
 ---
 ---Every particle created will accelerate along the x and y axes between xmin,ymin and xmax,ymax.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setLinearAcceleration)
 ---
 ---@param xmin number # The minimum acceleration along the x axis.
 ---@param ymin number # The minimum acceleration along the y axis.
@@ -1756,6 +2323,9 @@ function ParticleSystem:setLinearAcceleration(xmin, ymin, xmax, ymax) end
 ---
 ---Sets the amount of linear damping (constant deceleration) for particles.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setLinearDamping)
+---
 ---@param min number # The minimum amount of linear damping applied to particles.
 ---@param max? number # The maximum amount of linear damping applied to particles.
 function ParticleSystem:setLinearDamping(min, max) end
@@ -1765,12 +2335,18 @@ function ParticleSystem:setLinearDamping(min, max) end
 ---
 ---If this function is not used, the particles rotate around their center.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setOffset)
+---
 ---@param x number # The x coordinate of the rotation offset.
 ---@param y number # The y coordinate of the rotation offset.
 function ParticleSystem:setOffset(x, y) end
 
 ---
 ---Sets the lifetime of the particles.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setParticleLifetime)
 ---
 ---@param min number # The minimum life of the particles (in seconds).
 ---@param max? number # The maximum life of the particles (in seconds).
@@ -1779,12 +2355,18 @@ function ParticleSystem:setParticleLifetime(min, max) end
 ---
 ---Sets the position of the emitter.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setPosition)
+---
 ---@param x number # Position along x-axis.
 ---@param y number # Position along y-axis.
 function ParticleSystem:setPosition(x, y) end
 
 ---
 ---Sets a series of Quads to use for the particle sprites. Particles will choose a Quad from the list based on the particle's current lifetime, allowing for the use of animated sprite sheets with ParticleSystems.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setQuads)
 ---
 ---@overload fun(self: love.ParticleSystem, quads: table)
 ---@param quad1 love.Quad # The first Quad to use.
@@ -1794,6 +2376,9 @@ function ParticleSystem:setQuads(quad1, quad2) end
 ---
 ---Set the radial acceleration (away from the emitter).
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setRadialAcceleration)
+---
 ---@param min number # The minimum acceleration.
 ---@param max? number # The maximum acceleration.
 function ParticleSystem:setRadialAcceleration(min, max) end
@@ -1801,11 +2386,17 @@ function ParticleSystem:setRadialAcceleration(min, max) end
 ---
 ---Sets whether particle angles and rotations are relative to their velocities. If enabled, particles are aligned to the angle of their velocities and rotate relative to that angle.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setRelativeRotation)
+---
 ---@param enable boolean # True to enable relative particle rotation, false to disable it.
 function ParticleSystem:setRelativeRotation(enable) end
 
 ---
 ---Sets the rotation of the image upon particle creation (in radians).
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setRotation)
 ---
 ---@param min number # The minimum initial angle (radians).
 ---@param max? number # The maximum initial angle (radians).
@@ -1813,6 +2404,9 @@ function ParticleSystem:setRotation(min, max) end
 
 ---
 ---Sets the amount of size variation (0 meaning no variation and 1 meaning full variation between start and end).
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setSizeVariation)
 ---
 ---@param variation number # The amount of variation (0 meaning no variation and 1 meaning full variation between start and end).
 function ParticleSystem:setSizeVariation(variation) end
@@ -1822,13 +2416,19 @@ function ParticleSystem:setSizeVariation(variation) end
 ---
 ---At least one size must be specified. A maximum of eight may be used.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setSizes)
+---
 ---@param size1 number # The first size.
----@param size2? number # The second size.
----@param size8? number # The eighth size.
+---@param size2 number # The second size.
+---@param size8 number # The eighth size.
 function ParticleSystem:setSizes(size1, size2, size8) end
 
 ---
 ---Sets the speed of the particles.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setSpeed)
 ---
 ---@param min number # The minimum linear speed of the particles.
 ---@param max? number # The maximum linear speed of the particles.
@@ -1837,6 +2437,9 @@ function ParticleSystem:setSpeed(min, max) end
 ---
 ---Sets the spin of the sprite.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setSpin)
+---
 ---@param min number # The minimum spin (radians per second).
 ---@param max? number # The maximum spin (radians per second).
 function ParticleSystem:setSpin(min, max) end
@@ -1844,17 +2447,26 @@ function ParticleSystem:setSpin(min, max) end
 ---
 ---Sets the amount of spin variation (0 meaning no variation and 1 meaning full variation between start and end).
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setSpinVariation)
+---
 ---@param variation number # The amount of variation (0 meaning no variation and 1 meaning full variation between start and end).
 function ParticleSystem:setSpinVariation(variation) end
 
 ---
 ---Sets the amount of spread for the system.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setSpread)
+---
 ---@param spread number # The amount of spread (radians).
 function ParticleSystem:setSpread(spread) end
 
 ---
 ---Sets the tangential acceleration (acceleration perpendicular to the particle's direction).
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setTangentialAcceleration)
 ---
 ---@param min number # The minimum acceleration.
 ---@param max? number # The maximum acceleration.
@@ -1863,21 +2475,33 @@ function ParticleSystem:setTangentialAcceleration(min, max) end
 ---
 ---Sets the texture (Image or Canvas) to be used for the particles.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setTexture)
+---
 ---@param texture love.Texture # An Image or Canvas to use for the particles.
 function ParticleSystem:setTexture(texture) end
 
 ---
 ---Starts the particle emitter.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:start)
+---
 function ParticleSystem:start() end
 
 ---
 ---Stops the particle emitter, resetting the lifetime counter.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:stop)
+---
 function ParticleSystem:stop() end
 
 ---
 ---Updates the particle system; moving, creating and killing particles.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleSystem:update)
 ---
 ---@param dt number # The time (seconds) since last frame.
 function ParticleSystem:update(dt) end
@@ -1887,11 +2511,17 @@ function ParticleSystem:update(dt) end
 ---
 ---Quads can be used to select part of a texture to draw. In this way, one large texture atlas can be loaded, and then split up into sub-images.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics)
+---
 ---@class love.Quad: love.Object
 local Quad = {}
 
 ---
 ---Gets reference texture dimensions initially specified in love.graphics.newQuad.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Quad:getTextureDimensions)
 ---
 ---@return number sw # The Texture width used by the Quad.
 ---@return number sh # The Texture height used by the Quad.
@@ -1899,6 +2529,9 @@ function Quad:getTextureDimensions() end
 
 ---
 ---Gets the current viewport of this Quad.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Quad:getViewport)
 ---
 ---@return number x # The top-left corner along the x-axis.
 ---@return number y # The top-left corner along the y-axis.
@@ -1908,6 +2541,9 @@ function Quad:getViewport() end
 
 ---
 ---Sets the texture coordinates according to a viewport.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Quad:setViewport)
 ---
 ---@param x number # The top-left corner along the x-axis.
 ---@param y number # The top-left corner along the y-axis.
@@ -1922,11 +2558,17 @@ function Quad:setViewport(x, y, w, h, sw, sh) end
 ---
 ---Potential uses for shaders include HDR/bloom, motion blur, grayscale/invert/sepia/any kind of color effect, reflection/refraction, distortions, bump mapping, and much more! Here is a collection of basic shaders and good starting point to learn: https://github.com/vrld/moonshine
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics)
+---
 ---@class love.Shader: love.Object
 local Shader = {}
 
 ---
 ---Returns any warning and error messages from compiling the shader code. This can be used for debugging your shaders if there's anything the graphics hardware doesn't like.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Shader:getWarnings)
 ---
 ---@return string warnings # Warning and error messages (if any).
 function Shader:getWarnings() end
@@ -1935,6 +2577,9 @@ function Shader:getWarnings() end
 ---Gets whether a uniform / extern variable exists in the Shader.
 ---
 ---If a graphics driver's shader compiler determines that a uniform / extern variable doesn't affect the final output of the shader, it may optimize the variable out. This function will return false in that case.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Shader:hasUniform)
 ---
 ---@param name string # The name of the uniform variable.
 ---@return boolean hasuniform # Whether the uniform exists in the shader and affects its final output.
@@ -1960,6 +2605,9 @@ function Shader:hasUniform(name) end
 ---shader:send('colors', {r1, g1, b1, a1},  {r2, g2, b2, a2},  {r3, g3, b3, a3},  {r4, g4, b4, a4})
 ---
 ---Uniform / extern variables are read-only in the shader code and remain constant until modified by a Shader:send call. Uniform variables can be accessed in both the Vertex and Pixel components of a shader, as long as the variable is declared in each.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Shader:send)
 ---
 ---@overload fun(self: love.Shader, name: string, vector: table, ...)
 ---@overload fun(self: love.Shader, name: string, matrix: table, ...)
@@ -1989,6 +2637,9 @@ function Shader:send(name, number, ...) end
 ---
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Shader:sendColor)
+---
 ---@param name string # The name of the color extern variable to send to in the shader.
 ---@param color table # A table with red, green, blue, and optional alpha color components in the range of 1 to send to the extern as a vector.
 ---@vararg table # Additional colors to send in case the extern is an array. All colors need to be of the same size (e.g. only vec3's).
@@ -1999,11 +2650,17 @@ function Shader:sendColor(name, color, ...) end
 ---
 ---A SpriteBatch can be even more useful when the underlying image is a texture atlas (a single image file containing many independent images); by adding Quads to the batch, different sub-images from within the atlas can be drawn.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics)
+---
 ---@class love.SpriteBatch: love.Drawable, love.Object
 local SpriteBatch = {}
 
 ---
 ---Adds a sprite to the batch. Sprites are drawn in the order they are added.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/SpriteBatch:add)
 ---
 ---@overload fun(self: love.SpriteBatch, quad: love.Quad, x: number, y: number, r?: number, sx?: number, sy?: number, ox?: number, oy?: number, kx?: number, ky?: number):number
 ---@param x number # The position to draw the object (x-axis).
@@ -2020,6 +2677,9 @@ function SpriteBatch:add(x, y, r, sx, sy, ox, oy, kx, ky) end
 
 ---
 ---Adds a sprite to a batch created with an Array Texture.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/SpriteBatch:addLayer)
 ---
 ---@overload fun(self: love.SpriteBatch, layerindex: number, quad: love.Quad, x?: number, y?: number, r?: number, sx?: number, sy?: number, ox?: number, oy?: number, kx?: number, ky?: number):number
 ---@overload fun(self: love.SpriteBatch, layerindex: number, transform: love.Transform):number
@@ -2042,12 +2702,18 @@ function SpriteBatch:addLayer(layerindex, x, y, r, sx, sy, ox, oy, kx, ky) end
 ---
 ---Each sprite in a SpriteBatch has 4 vertices in the following order: top-left, bottom-left, top-right, bottom-right. The index returned by SpriteBatch:add (and used by SpriteBatch:set) can used to determine the first vertex of a specific sprite with the formula 1 + 4 * ( id - 1 ).
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/SpriteBatch:attachAttribute)
+---
 ---@param name string # The name of the vertex attribute to attach.
 ---@param mesh love.Mesh # The Mesh to get the vertex attribute from.
 function SpriteBatch:attachAttribute(name, mesh) end
 
 ---
 ---Removes all sprites from the buffer.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/SpriteBatch:clear)
 ---
 function SpriteBatch:clear() end
 
@@ -2058,10 +2724,16 @@ function SpriteBatch:clear() end
 ---
 ---If this method is used, it generally shouldn't be called more than once (at most) between love.graphics.draw(spritebatch, ...) calls.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/SpriteBatch:flush)
+---
 function SpriteBatch:flush() end
 
 ---
 ---Gets the maximum number of sprites the SpriteBatch can hold.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/SpriteBatch:getBufferSize)
 ---
 ---@return number size # The maximum number of sprites the batch can hold.
 function SpriteBatch:getBufferSize() end
@@ -2073,6 +2745,9 @@ function SpriteBatch:getBufferSize() end
 ---
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/SpriteBatch:getColor)
+---
 ---@return number r # The red component (0-1).
 ---@return number g # The green component (0-1).
 ---@return number b # The blue component (0-1).
@@ -2082,17 +2757,26 @@ function SpriteBatch:getColor() end
 ---
 ---Gets the number of sprites currently in the SpriteBatch.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/SpriteBatch:getCount)
+---
 ---@return number count # The number of sprites currently in the batch.
 function SpriteBatch:getCount() end
 
 ---
 ---Gets the texture (Image or Canvas) used by the SpriteBatch.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/SpriteBatch:getTexture)
+---
 ---@return love.Texture texture # The Image or Canvas used by the SpriteBatch.
 function SpriteBatch:getTexture() end
 
 ---
 ---Changes a sprite in the batch. This requires the sprite index returned by SpriteBatch:add or SpriteBatch:addLayer.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/SpriteBatch:set)
 ---
 ---@overload fun(self: love.SpriteBatch, spriteindex: number, quad: love.Quad, x: number, y: number, r?: number, sx?: number, sy?: number, ox?: number, oy?: number, kx?: number, ky?: number)
 ---@param spriteindex number # The index of the sprite that will be changed.
@@ -2114,6 +2798,9 @@ function SpriteBatch:set(spriteindex, x, y, r, sx, sy, ox, oy, kx, ky) end
 ---
 ---In version 0.9.2 and older, the global color set with love.graphics.setColor will not work on the SpriteBatch if any of the sprites has its own color.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/SpriteBatch:setColor)
+---
 ---@overload fun(self: love.SpriteBatch)
 ---@param r number # The amount of red.
 ---@param g number # The amount of green.
@@ -2124,6 +2811,9 @@ function SpriteBatch:setColor(r, g, b, a) end
 ---
 ---Restricts the drawn sprites in the SpriteBatch to a subset of the total.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/SpriteBatch:setDrawRange)
+---
 ---@overload fun(self: love.SpriteBatch)
 ---@param start number # The index of the first sprite to draw. Index 1 corresponds to the first sprite added with SpriteBatch:add.
 ---@param count number # The number of sprites to draw.
@@ -2131,6 +2821,9 @@ function SpriteBatch:setDrawRange(start, count) end
 
 ---
 ---Changes a sprite previously added with add or addLayer, in a batch created with an Array Texture.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/SpriteBatch:setLayer)
 ---
 ---@overload fun(self: love.SpriteBatch, spriteindex: number, layerindex: number, quad: love.Quad, x?: number, y?: number, r?: number, sx?: number, sy?: number, ox?: number, oy?: number, kx?: number, ky?: number)
 ---@overload fun(self: love.SpriteBatch, spriteindex: number, layerindex: number, transform: love.Transform)
@@ -2151,17 +2844,26 @@ function SpriteBatch:setLayer(spriteindex, layerindex, x, y, r, sx, sy, ox, oy, 
 ---
 ---Sets the texture (Image or Canvas) used for the sprites in the batch, when drawing.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/SpriteBatch:setTexture)
+---
 ---@param texture love.Texture # The new Image or Canvas to use for the sprites in the batch.
 function SpriteBatch:setTexture(texture) end
 
 ---
 ---Drawable text.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics)
+---
 ---@class love.Text: love.Drawable, love.Object
 local Text = {}
 
 ---
 ---Adds additional colored text to the Text object at the specified position.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Text:add)
 ---
 ---@overload fun(self: love.Text, coloredtext: table, x?: number, y?: number, angle?: number, sx?: number, sy?: number, ox?: number, oy?: number, kx?: number, ky?: number):number
 ---@param textstring string # The text to add to the object.
@@ -2182,6 +2884,9 @@ function Text:add(textstring, x, y, angle, sx, sy, ox, oy, kx, ky) end
 ---
 ---The word wrap limit is applied before any scaling, rotation, and other coordinate transformations. Therefore the amount of text per line stays constant given the same wrap limit, even if the scale arguments change.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Text:addf)
+---
 ---@overload fun(self: love.Text, coloredtext: table, wraplimit: number, align: love.AlignMode, x: number, y: number, angle?: number, sx?: number, sy?: number, ox?: number, oy?: number, kx?: number, ky?: number):number
 ---@param textstring string # The text to add to the object.
 ---@param wraplimit number # The maximum width in pixels of the text before it gets automatically wrapped to a new line.
@@ -2201,10 +2906,16 @@ function Text:addf(textstring, wraplimit, align, x, y, angle, sx, sy, ox, oy, kx
 ---
 ---Clears the contents of the Text object.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Text:clear)
+---
 function Text:clear() end
 
 ---
 ---Gets the width and height of the text in pixels.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Text:getDimensions)
 ---
 ---@overload fun(self: love.Text, index: number):number, number
 ---@return number width # The width of the text. If multiple sub-strings have been added with Text:add, the width of the last sub-string is returned.
@@ -2214,11 +2925,17 @@ function Text:getDimensions() end
 ---
 ---Gets the Font used with the Text object.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Text:getFont)
+---
 ---@return love.Font font # The font used with this Text object.
 function Text:getFont() end
 
 ---
 ---Gets the height of the text in pixels.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Text:getHeight)
 ---
 ---@overload fun(self: love.Text, index: number):number
 ---@return number height # The height of the text. If multiple sub-strings have been added with Text:add, the height of the last sub-string is returned.
@@ -2227,12 +2944,18 @@ function Text:getHeight() end
 ---
 ---Gets the width of the text in pixels.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Text:getWidth)
+---
 ---@overload fun(self: love.Text, index: number):number
 ---@return number width # The width of the text. If multiple sub-strings have been added with Text:add, the width of the last sub-string is returned.
 function Text:getWidth() end
 
 ---
 ---Replaces the contents of the Text object with a new unformatted string.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Text:set)
 ---
 ---@overload fun(self: love.Text, coloredtext: table)
 ---@param textstring string # The new string of text to use.
@@ -2241,11 +2964,17 @@ function Text:set(textstring) end
 ---
 ---Replaces the Font used with the text.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Text:setFont)
+---
 ---@param font love.Font # The new font to use with this Text object.
 function Text:setFont(font) end
 
 ---
 ---Replaces the contents of the Text object with a new formatted string.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Text:setf)
 ---
 ---@overload fun(self: love.Text, coloredtext: table, wraplimit: number, align: love.AlignMode)
 ---@param textstring string # The new string of text to use.
@@ -2255,6 +2984,9 @@ function Text:setf(textstring, wraplimit, align) end
 
 ---
 ---Superclass for drawable objects which represent a texture. All Textures can be drawn with Quads. This is an abstract type that can't be created directly.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics)
 ---
 ---@class love.Texture: love.Drawable, love.Object
 local Texture = {}
@@ -2266,11 +2998,17 @@ local Texture = {}
 ---
 ---For example, a texture with pixel dimensions of 100x100 with a DPI scale factor of 2 will be drawn as if it was 50x50. This is useful with high-dpi /  retina displays to easily allow swapping out higher or lower pixel density Images and Canvases without needing any extra manual scaling logic.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Texture:getDPIScale)
+---
 ---@return number dpiscale # The DPI scale factor of the Texture.
 function Texture:getDPIScale() end
 
 ---
 ---Gets the depth of a Volume Texture. Returns 1 for 2D, Cubemap, and Array textures.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Texture:getDepth)
 ---
 ---@return number depth # The depth of the volume Texture.
 function Texture:getDepth() end
@@ -2280,11 +3018,17 @@ function Texture:getDepth() end
 ---
 ---Depth texture comparison modes are advanced low-level functionality typically used with shadow mapping in 3D.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Texture:getDepthSampleMode)
+---
 ---@return love.CompareMode compare # The comparison mode used when sampling from this texture in a shader, or nil if setDepthSampleMode has not been called on this Texture.
 function Texture:getDepthSampleMode() end
 
 ---
 ---Gets the width and height of the Texture.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Texture:getDimensions)
 ---
 ---@return number width # The width of the Texture.
 ---@return number height # The height of the Texture.
@@ -2292,6 +3036,9 @@ function Texture:getDimensions() end
 
 ---
 ---Gets the filter mode of the Texture.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Texture:getFilter)
 ---
 ---@return love.FilterMode min # Filter mode to use when minifying the texture (rendering it at a smaller size on-screen than its size in pixels).
 ---@return love.FilterMode mag # Filter mode to use when magnifying the texture (rendering it at a smaller size on-screen than its size in pixels).
@@ -2301,11 +3048,17 @@ function Texture:getFilter() end
 ---
 ---Gets the pixel format of the Texture.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Texture:getFormat)
+---
 ---@return love.PixelFormat format # The pixel format the Texture was created with.
 function Texture:getFormat() end
 
 ---
 ---Gets the height of the Texture.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Texture:getHeight)
 ---
 ---@return number height # The height of the Texture.
 function Texture:getHeight() end
@@ -2313,17 +3066,26 @@ function Texture:getHeight() end
 ---
 ---Gets the number of layers / slices in an Array Texture. Returns 1 for 2D, Cubemap, and Volume textures.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Texture:getLayerCount)
+---
 ---@return number layers # The number of layers in the Array Texture.
 function Texture:getLayerCount() end
 
 ---
 ---Gets the number of mipmaps contained in the Texture. If the texture was not created with mipmaps, it will return 1.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Texture:getMipmapCount)
+---
 ---@return number mipmaps # The number of mipmaps in the Texture.
 function Texture:getMipmapCount() end
 
 ---
 ---Gets the mipmap filter mode for a Texture. Prior to 11.0 this method only worked on Images.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Texture:getMipmapFilter)
 ---
 ---@return love.FilterMode mode # The filter mode used in between mipmap levels. nil if mipmap filtering is not enabled.
 ---@return number sharpness # Value used to determine whether the image should use more or less detailed mipmap levels than normal when drawing.
@@ -2334,6 +3096,9 @@ function Texture:getMipmapFilter() end
 ---
 ---Texture:getDimensions gets the dimensions of the texture in units scaled by the texture's DPI scale factor, rather than pixels. Use getDimensions for calculations related to drawing the texture (calculating an origin offset, for example), and getPixelDimensions only when dealing specifically with pixels, for example when using Canvas:newImageData.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Texture:getPixelDimensions)
+---
 ---@return number pixelwidth # The width of the Texture, in pixels.
 ---@return number pixelheight # The height of the Texture, in pixels.
 function Texture:getPixelDimensions() end
@@ -2343,6 +3108,9 @@ function Texture:getPixelDimensions() end
 ---
 ---DPI scale factor, rather than pixels. Use getHeight for calculations related to drawing the texture (calculating an origin offset, for example), and getPixelHeight only when dealing specifically with pixels, for example when using Canvas:newImageData.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Texture:getPixelHeight)
+---
 ---@return number pixelheight # The height of the Texture, in pixels.
 function Texture:getPixelHeight() end
 
@@ -2351,17 +3119,26 @@ function Texture:getPixelHeight() end
 ---
 ---DPI scale factor, rather than pixels. Use getWidth for calculations related to drawing the texture (calculating an origin offset, for example), and getPixelWidth only when dealing specifically with pixels, for example when using Canvas:newImageData.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Texture:getPixelWidth)
+---
 ---@return number pixelwidth # The width of the Texture, in pixels.
 function Texture:getPixelWidth() end
 
 ---
 ---Gets the type of the Texture.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Texture:getTextureType)
+---
 ---@return love.TextureType texturetype # The type of the Texture.
 function Texture:getTextureType() end
 
 ---
 ---Gets the width of the Texture.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Texture:getWidth)
 ---
 ---@return number width # The width of the Texture.
 function Texture:getWidth() end
@@ -2370,6 +3147,9 @@ function Texture:getWidth() end
 ---Gets the wrapping properties of a Texture.
 ---
 ---This function returns the currently set horizontal and vertical wrapping modes for the texture.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Texture:getWrap)
 ---
 ---@return love.WrapMode horiz # Horizontal wrapping mode of the texture.
 ---@return love.WrapMode vert # Vertical wrapping mode of the texture.
@@ -2383,6 +3163,9 @@ function Texture:getWrap() end
 ---
 ---Non-readable Canvases can still be rendered to.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Texture:isReadable)
+---
 ---@return boolean readable # Whether the Texture is readable.
 function Texture:isReadable() end
 
@@ -2393,11 +3176,17 @@ function Texture:isReadable() end
 ---
 ---Depth texture comparison can only be used with readable depth-formatted Canvases.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Texture:setDepthSampleMode)
+---
 ---@param compare love.CompareMode # The comparison mode used when sampling from this texture in a shader.
 function Texture:setDepthSampleMode(compare) end
 
 ---
 ---Sets the filter mode of the Texture.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Texture:setFilter)
 ---
 ---@param min love.FilterMode # Filter mode to use when minifying the texture (rendering it at a smaller size on-screen than its size in pixels).
 ---@param mag love.FilterMode # Filter mode to use when magnifying the texture (rendering it at a larger size on-screen than its size in pixels).
@@ -2413,6 +3202,9 @@ function Texture:setFilter(min, mag, anisotropy) end
 ---
 ---Due to hardware restrictions and driver bugs, in versions prior to 0.10.0 images that weren't loaded from a CompressedData must have power-of-two dimensions (64x64, 512x256, etc.) to use mipmaps.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Texture:setMipmapFilter)
+---
 ---@overload fun(self: love.Texture)
 ---@param filtermode love.FilterMode # The filter mode to use in between mipmap levels. 'nearest' will often give better performance.
 ---@param sharpness? number # A positive sharpness value makes the texture use a more detailed mipmap level when drawing, at the expense of performance. A negative value does the reverse.
@@ -2425,6 +3217,9 @@ function Texture:setMipmapFilter(filtermode, sharpness) end
 ---
 ---Clamped textures appear only once (with the edges of the texture stretching to fill the extent of the Quad), whereas repeated ones repeat as many times as there is room in the Quad.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Texture:setWrap)
+---
 ---@param horiz love.WrapMode # Horizontal wrapping mode of the texture.
 ---@param vert? love.WrapMode # Vertical wrapping mode of the texture.
 ---@param depth? love.WrapMode # Wrapping mode for the z-axis of a Volume texture.
@@ -2433,11 +3228,17 @@ function Texture:setWrap(horiz, vert, depth) end
 ---
 ---A drawable video.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.graphics)
+---
 ---@class love.Video: love.Drawable, love.Object
 local Video = {}
 
 ---
 ---Gets the width and height of the Video in pixels.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Video:getDimensions)
 ---
 ---@return number width # The width of the Video.
 ---@return number height # The height of the Video.
@@ -2445,6 +3246,9 @@ function Video:getDimensions() end
 
 ---
 ---Gets the scaling filters used when drawing the Video.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Video:getFilter)
 ---
 ---@return love.FilterMode min # The filter mode used when scaling the Video down.
 ---@return love.FilterMode mag # The filter mode used when scaling the Video up.
@@ -2454,11 +3258,17 @@ function Video:getFilter() end
 ---
 ---Gets the height of the Video in pixels.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Video:getHeight)
+---
 ---@return number height # The height of the Video.
 function Video:getHeight() end
 
 ---
 ---Gets the audio Source used for playing back the video's audio. May return nil if the video has no audio, or if Video:setSource is called with a nil argument.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Video:getSource)
 ---
 ---@return love.Source source # The audio Source used for audio playback, or nil if the video has no audio.
 function Video:getSource() end
@@ -2466,11 +3276,17 @@ function Video:getSource() end
 ---
 ---Gets the VideoStream object used for decoding and controlling the video.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Video:getStream)
+---
 ---@return love.VideoStream stream # The VideoStream used for decoding and controlling the video.
 function Video:getStream() end
 
 ---
 ---Gets the width of the Video in pixels.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Video:getWidth)
 ---
 ---@return number width # The width of the Video.
 function Video:getWidth() end
@@ -2478,32 +3294,50 @@ function Video:getWidth() end
 ---
 ---Gets whether the Video is currently playing.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Video:isPlaying)
+---
 ---@return boolean playing # Whether the video is playing.
 function Video:isPlaying() end
 
 ---
 ---Pauses the Video.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Video:pause)
+---
 function Video:pause() end
 
 ---
 ---Starts playing the Video. In order for the video to appear onscreen it must be drawn with love.graphics.draw.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Video:play)
 ---
 function Video:play() end
 
 ---
 ---Rewinds the Video to the beginning.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Video:rewind)
+---
 function Video:rewind() end
 
 ---
 ---Sets the current playback position of the Video.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Video:seek)
 ---
 ---@param offset number # The time in seconds since the beginning of the Video.
 function Video:seek(offset) end
 
 ---
 ---Sets the scaling filters used when drawing the Video.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Video:setFilter)
 ---
 ---@param min love.FilterMode # The filter mode used when scaling the Video down.
 ---@param mag love.FilterMode # The filter mode used when scaling the Video up.
@@ -2513,17 +3347,26 @@ function Video:setFilter(min, mag, anisotropy) end
 ---
 ---Sets the audio Source used for playing back the video's audio. The audio Source also controls playback speed and synchronization.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Video:setSource)
+---
 ---@param source? love.Source # The audio Source used for audio playback, or nil to disable audio synchronization.
 function Video:setSource(source) end
 
 ---
 ---Gets the current playback position of the Video.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Video:tell)
+---
 ---@return number seconds # The time in seconds since the beginning of the Video.
 function Video:tell() end
 
 ---
 ---Text alignment.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/AlignMode)
 ---
 ---@alias love.AlignMode
 ---
@@ -2546,6 +3389,9 @@ function Video:tell() end
 ---
 ---Different types of arcs that can be drawn.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ArcType)
+---
 ---@alias love.ArcType
 ---
 ---The arc is drawn like a slice of pie, with the arc circle connected to the center at its end-points.
@@ -2562,6 +3408,9 @@ function Video:tell() end
 
 ---
 ---Types of particle area spread distribution.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/AreaSpreadDistribution)
 ---
 ---@alias love.AreaSpreadDistribution
 ---
@@ -2592,6 +3441,9 @@ function Video:tell() end
 ---
 ---Different ways alpha affects color blending. See BlendMode and the BlendMode Formulas for additional notes.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/BlendAlphaMode)
+---
 ---@alias love.BlendAlphaMode
 ---
 ---The RGB values of what's drawn are multiplied by the alpha values of those colors during blending. This is the default alpha mode.
@@ -2604,6 +3456,9 @@ function Video:tell() end
 
 ---
 ---Different ways to do color blending. See BlendAlphaMode and the BlendMode Formulas for additional notes.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/BlendMode)
 ---
 ---@alias love.BlendMode
 ---
@@ -2658,6 +3513,9 @@ function Video:tell() end
 ---
 ---Different types of per-pixel stencil test and depth test comparisons. The pixels of an object will be drawn if the comparison succeeds, for each pixel that the object touches.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/CompareMode)
+---
 ---@alias love.CompareMode
 ---
 ---* stencil tests: the stencil value of the pixel must be equal to the supplied value.
@@ -2701,6 +3559,9 @@ function Video:tell() end
 ---
 ---How Mesh geometry is culled when rendering.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/CullMode)
+---
 ---@alias love.CullMode
 ---
 ---Back-facing triangles in Meshes are culled (not rendered). The vertex order of a triangle determines whether it is back- or front-facing.
@@ -2718,6 +3579,9 @@ function Video:tell() end
 ---
 ---Controls whether shapes are drawn as an outline, or filled.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/DrawMode)
+---
 ---@alias love.DrawMode
 ---
 ---Draw filled shape.
@@ -2731,6 +3595,9 @@ function Video:tell() end
 ---
 ---How the image is filtered when scaling.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/FilterMode)
+---
 ---@alias love.FilterMode
 ---
 ---Scale image with linear interpolation.
@@ -2743,6 +3610,9 @@ function Video:tell() end
 
 ---
 ---Graphics features that can be checked for with love.graphics.getSupported.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/GraphicsFeature)
 ---
 ---@alias love.GraphicsFeature
 ---
@@ -2781,6 +3651,9 @@ function Video:tell() end
 ---
 ---Types of system-dependent graphics limits checked for using love.graphics.getSystemLimits.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/GraphicsLimit)
+---
 ---@alias love.GraphicsLimit
 ---
 ---The maximum size of points.
@@ -2818,6 +3691,9 @@ function Video:tell() end
 ---
 ---Vertex map datatype for Data variant of Mesh:setVertexMap.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/IndexDataType)
+---
 ---@alias love.IndexDataType
 ---
 ---The vertex map is array of unsigned word (16-bit).
@@ -2830,6 +3706,9 @@ function Video:tell() end
 
 ---
 ---Line join style.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/LineJoin)
 ---
 ---@alias love.LineJoin
 ---
@@ -2848,6 +3727,9 @@ function Video:tell() end
 ---
 ---The styles in which lines are drawn.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/LineStyle)
+---
 ---@alias love.LineStyle
 ---
 ---Draw rough lines.
@@ -2860,6 +3742,9 @@ function Video:tell() end
 
 ---
 ---How a Mesh's vertices are used when drawing.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/MeshDrawMode)
 ---
 ---@alias love.MeshDrawMode
 ---
@@ -2882,6 +3767,9 @@ function Video:tell() end
 ---
 ---Controls whether a Canvas has mipmaps, and its behaviour when it does.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/MipmapMode)
+---
 ---@alias love.MipmapMode
 ---
 ---The Canvas has no mipmaps.
@@ -2898,6 +3786,9 @@ function Video:tell() end
 
 ---
 ---How newly created particles are added to the ParticleSystem.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ParticleInsertMode)
 ---
 ---@alias love.ParticleInsertMode
 ---
@@ -2916,6 +3807,9 @@ function Video:tell() end
 ---
 ---Usage hints for SpriteBatches and Meshes to optimize data storage and access.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/SpriteBatchUsage)
+---
 ---@alias love.SpriteBatchUsage
 ---
 ---The object's data will change occasionally during its lifetime. 
@@ -2933,6 +3827,9 @@ function Video:tell() end
 ---
 ---Graphics state stack types used with love.graphics.push.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/StackType)
+---
 ---@alias love.StackType
 ---
 ---The transformation stack (love.graphics.translate, love.graphics.rotate, etc.)
@@ -2945,6 +3842,9 @@ function Video:tell() end
 
 ---
 ---How a stencil function modifies the stencil values of pixels it touches.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/StencilAction)
 ---
 ---@alias love.StencilAction
 ---
@@ -2975,6 +3875,9 @@ function Video:tell() end
 ---
 ---Types of textures (2D, cubemap, etc.)
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/TextureType)
+---
 ---@alias love.TextureType
 ---
 ---Regular 2D texture with width and height.
@@ -2998,6 +3901,9 @@ function Video:tell() end
 ---
 ---Per-instance attributes can be used to render a Mesh many times with different positions, colors, or other attributes via a single love.graphics.drawInstanced call, without using the love_InstanceID vertex shader variable.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/VertexAttributeStep)
+---
 ---@alias love.VertexAttributeStep
 ---
 ---The vertex attribute will have a unique value for each vertex in the Mesh.
@@ -3011,6 +3917,9 @@ function Video:tell() end
 ---
 ---How Mesh geometry vertices are ordered.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/VertexWinding)
+---
 ---@alias love.VertexWinding
 ---
 ---Clockwise.
@@ -3023,6 +3932,9 @@ function Video:tell() end
 
 ---
 ---How the image wraps inside a Quad with a larger quad size than image size. This also affects how Meshes with texture coordinates which are outside the range of 1 are drawn, and the color returned by the Texel Shader function when using it to sample from texture coordinates outside of the range of 1.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/WrapMode)
 ---
 ---@alias love.WrapMode
 ---

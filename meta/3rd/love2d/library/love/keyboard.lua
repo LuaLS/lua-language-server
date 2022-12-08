@@ -3,6 +3,9 @@
 ---
 ---Provides an interface to the user's keyboard.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.keyboard)
+---
 ---@class love.keyboard
 love.keyboard = {}
 
@@ -12,6 +15,9 @@ love.keyboard = {}
 ---Unlike key constants, Scancodes are keyboard layout-independent. For example the scancode 'w' will be generated if the key in the same place as the 'w' key on an American keyboard is pressed, no matter what the key is labelled or what the user's operating system settings are.
 ---
 ---Scancodes are useful for creating default controls that have the same physical locations on on all systems.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.keyboard.getKeyFromScancode)
 ---
 ---@param scancode love.Scancode # The scancode to get the key from.
 ---@return love.KeyConstant key # The key corresponding to the given scancode, or 'unknown' if the scancode doesn't map to a KeyConstant on the current system.
@@ -24,6 +30,9 @@ function love.keyboard.getKeyFromScancode(scancode) end
 ---
 ---Scancodes are useful for creating default controls that have the same physical locations on on all systems.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.keyboard.getScancodeFromKey)
+---
 ---@param key love.KeyConstant # The key to get the scancode from.
 ---@return love.Scancode scancode # The scancode corresponding to the given key, or 'unknown' if the given key has no known physical representation on the current system.
 function love.keyboard.getScancodeFromKey(key) end
@@ -31,11 +40,17 @@ function love.keyboard.getScancodeFromKey(key) end
 ---
 ---Gets whether key repeat is enabled.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.keyboard.hasKeyRepeat)
+---
 ---@return boolean enabled # Whether key repeat is enabled.
 function love.keyboard.hasKeyRepeat() end
 
 ---
 ---Gets whether screen keyboard is supported.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.keyboard.hasScreenKeyboard)
 ---
 ---@return boolean supported # Whether screen keyboard is supported.
 function love.keyboard.hasScreenKeyboard() end
@@ -43,11 +58,17 @@ function love.keyboard.hasScreenKeyboard() end
 ---
 ---Gets whether text input events are enabled.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.keyboard.hasTextInput)
+---
 ---@return boolean enabled # Whether text input events are enabled.
 function love.keyboard.hasTextInput() end
 
 ---
 ---Checks whether a certain key is down. Not to be confused with love.keypressed or love.keyreleased.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.keyboard.isDown)
 ---
 ---@overload fun(key: love.KeyConstant, ...):boolean
 ---@param key love.KeyConstant # The key to check.
@@ -59,6 +80,9 @@ function love.keyboard.isDown(key) end
 ---
 ---Unlike regular KeyConstants, Scancodes are keyboard layout-independent. The scancode 'w' is used if the key in the same place as the 'w' key on an American keyboard is pressed, no matter what the key is labelled or what the user's operating system settings are.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.keyboard.isScancodeDown)
+---
 ---@param scancode love.Scancode # A Scancode to check.
 ---@vararg love.Scancode # Additional Scancodes to check.
 ---@return boolean down # True if any supplied Scancode is down, false if not.
@@ -66,6 +90,9 @@ function love.keyboard.isScancodeDown(scancode, ...) end
 
 ---
 ---Enables or disables key repeat for love.keypressed. It is disabled by default.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.keyboard.setKeyRepeat)
 ---
 ---@param enable boolean # Whether repeat keypress events should be enabled when a key is held down.
 function love.keyboard.setKeyRepeat(enable) end
@@ -75,12 +102,18 @@ function love.keyboard.setKeyRepeat(enable) end
 ---
 ---On touch devices, this shows the system's native on-screen keyboard when it's enabled.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.keyboard.setTextInput)
+---
 ---@overload fun(enable: boolean, x: number, y: number, w: number, h: number)
 ---@param enable boolean # Whether text input events should be enabled.
 function love.keyboard.setTextInput(enable) end
 
 ---
 ---All the keys you can press. Note that some keys may not be available on your keyboard or system.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/KeyConstant)
 ---
 ---@alias love.KeyConstant
 ---
@@ -668,6 +701,9 @@ function love.keyboard.setTextInput(enable) end
 ---Using scancodes, rather than keycodes, is useful because keyboards with layouts differing from the US/UK layout(s) might have keys that generate 'unknown' keycodes, but the scancodes will still be detected. This however would necessitate having a list for each keyboard layout one would choose to support.
 ---
 ---One could use textinput or textedited instead, but those only give back the end result of keys used, i.e. you can't get modifiers on their own from it, only the final symbols that were generated.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Scancode)
 ---
 ---@alias love.Scancode
 ---

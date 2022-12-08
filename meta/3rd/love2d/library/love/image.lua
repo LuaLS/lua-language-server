@@ -3,11 +3,17 @@
 ---
 ---Provides an interface to decode encoded image data.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.image)
+---
 ---@class love.image
 love.image = {}
 
 ---
 ---Determines whether a file can be loaded as CompressedImageData.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.image.isCompressed)
 ---
 ---@overload fun(fileData: love.FileData):boolean
 ---@param filename string # The filename of the potentially compressed image file.
@@ -17,6 +23,9 @@ function love.image.isCompressed(filename) end
 ---
 ---Create a new CompressedImageData object from a compressed image file. LÖVE supports several compressed texture formats, enumerated in the CompressedImageFormat page.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.image.newCompressedData)
+---
 ---@overload fun(fileData: love.FileData):love.CompressedImageData
 ---@param filename string # The filename of the compressed image file.
 ---@return love.CompressedImageData compressedImageData # The new CompressedImageData object.
@@ -24,6 +33,9 @@ function love.image.newCompressedData(filename) end
 
 ---
 ---Creates a new ImageData object.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.image.newImageData)
 ---
 ---@overload fun(width: number, height: number, format?: love.PixelFormat, data?: string):love.ImageData
 ---@overload fun(width: number, height: number, data: string):love.ImageData
@@ -41,11 +53,17 @@ function love.image.newImageData(width, height) end
 ---
 ---You can't draw CompressedImageData directly to the screen. See Image for that.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.image)
+---
 ---@class love.CompressedImageData: love.Data, love.Object
 local CompressedImageData = {}
 
 ---
 ---Gets the width and height of the CompressedImageData.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/CompressedImageData:getDimensions)
 ---
 ---@overload fun(self: love.CompressedImageData, level: number):number, number
 ---@return number width # The width of the CompressedImageData.
@@ -55,11 +73,17 @@ function CompressedImageData:getDimensions() end
 ---
 ---Gets the format of the CompressedImageData.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/CompressedImageData:getFormat)
+---
 ---@return love.CompressedImageFormat format # The format of the CompressedImageData.
 function CompressedImageData:getFormat() end
 
 ---
 ---Gets the height of the CompressedImageData.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/CompressedImageData:getHeight)
 ---
 ---@overload fun(self: love.CompressedImageData, level: number):number
 ---@return number height # The height of the CompressedImageData.
@@ -68,11 +92,17 @@ function CompressedImageData:getHeight() end
 ---
 ---Gets the number of mipmap levels in the CompressedImageData. The base mipmap level (original image) is included in the count.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/CompressedImageData:getMipmapCount)
+---
 ---@return number mipmaps # The number of mipmap levels stored in the CompressedImageData.
 function CompressedImageData:getMipmapCount() end
 
 ---
 ---Gets the width of the CompressedImageData.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/CompressedImageData:getWidth)
 ---
 ---@overload fun(self: love.CompressedImageData, level: number):number
 ---@return number width # The width of the CompressedImageData.
@@ -83,11 +113,17 @@ function CompressedImageData:getWidth() end
 ---
 ---You can't draw ImageData directly to screen. See Image for that.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.image)
+---
 ---@class love.ImageData: love.Data, love.Object
 local ImageData = {}
 
 ---
 ---Encodes the ImageData and optionally writes it to the save directory.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ImageData:encode)
 ---
 ---@overload fun(self: love.ImageData, outFile: string)
 ---@overload fun(self: love.ImageData, outFile: string, format: love.ImageFormat)
@@ -99,12 +135,18 @@ function ImageData:encode(format, filename) end
 ---
 ---Gets the width and height of the ImageData in pixels.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ImageData:getDimensions)
+---
 ---@return number width # The width of the ImageData in pixels.
 ---@return number height # The height of the ImageData in pixels.
 function ImageData:getDimensions() end
 
 ---
 ---Gets the height of the ImageData in pixels.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ImageData:getHeight)
 ---
 ---@return number height # The height of the ImageData in pixels.
 function ImageData:getHeight() end
@@ -116,6 +158,9 @@ function ImageData:getHeight() end
 ---
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ImageData:getPixel)
+---
 ---@param x number # The position of the pixel on the x-axis.
 ---@param y number # The position of the pixel on the y-axis.
 ---@return number r # The red component (0-1).
@@ -126,6 +171,9 @@ function ImageData:getPixel(x, y) end
 
 ---
 ---Gets the width of the ImageData in pixels.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ImageData:getWidth)
 ---
 ---@return number width # The width of the ImageData in pixels.
 function ImageData:getWidth() end
@@ -151,6 +199,9 @@ function ImageData:getWidth() end
 ---
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ImageData:mapPixel)
+---
 ---@param pixelFunction function # Function to apply to every pixel.
 ---@param x? number # The x-axis of the top-left corner of the area within the ImageData to apply the function to.
 ---@param y? number # The y-axis of the top-left corner of the area within the ImageData to apply the function to.
@@ -160,6 +211,9 @@ function ImageData:mapPixel(pixelFunction, x, y, width, height) end
 
 ---
 ---Paste into ImageData from another source ImageData.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/ImageData:paste)
 ---
 ---@param source love.ImageData # Source ImageData from which to copy.
 ---@param dx number # Destination top-left position on x-axis.
@@ -177,6 +231,9 @@ function ImageData:paste(source, dx, dy, sx, sy, sw, sh) end
 ---
 ---In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ImageData:setPixel)
+---
 ---@param x number # The position of the pixel on the x-axis.
 ---@param y number # The position of the pixel on the y-axis.
 ---@param r number # The red component (0-1).
@@ -188,6 +245,9 @@ function ImageData:setPixel(x, y, r, g, b, a) end
 ---
 ---Gets the pixel format of the ImageData.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ImageData:getFormat)
+---
 ---@return love.PixelFormat format # The pixel format the ImageData was created with.
 function ImageData:getFormat() end
 
@@ -195,6 +255,9 @@ function ImageData:getFormat() end
 ---Compressed image data formats. Here and here are a couple overviews of many of the formats.
 ---
 ---Unlike traditional PNG or jpeg, these formats stay compressed in RAM and in the graphics card's VRAM. This is good for saving memory space as well as improving performance, since the graphics card will be able to keep more of the image's pixels in its fast-access cache when drawing it.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/CompressedImageFormat)
 ---
 ---@alias love.CompressedImageFormat
 ---
@@ -345,6 +408,9 @@ function ImageData:getFormat() end
 ---
 ---Encoded image formats.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/ImageFormat)
+---
 ---@alias love.ImageFormat
 ---
 ---Targa image format.
@@ -365,6 +431,9 @@ function ImageData:getFormat() end
 
 ---
 ---Pixel formats for Textures, ImageData, and CompressedImageData.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/PixelFormat)
 ---
 ---@alias love.PixelFormat
 ---

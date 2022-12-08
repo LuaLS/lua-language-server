@@ -274,6 +274,7 @@ function m.setText(uri, text, isTrust, callback)
             util.saveFile(LOGPATH .. '/diffed.lua', newText)
         end
     end
+    m.getState(uri)
     log.trace('Set text:', uri, 'takes', os.clock() - clock, 'sec.')
 
     --if instance or TEST then
@@ -557,6 +558,8 @@ function m.compileStateThen(state, file)
             log.warn(('Convert lazy-table for [%s] takes [%.3f] sec, size [%.3f] kb.'):format(file.uri, passed, #file.text / 1000))
         end
     end
+
+    m.onWatch('compile', file.uri)
 end
 
 ---@param uri uri

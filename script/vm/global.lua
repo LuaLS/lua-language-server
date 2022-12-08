@@ -2,17 +2,16 @@ local util  = require 'utility'
 local scope = require 'workspace.scope'
 local guide = require 'parser.guide'
 local files = require 'files'
-local ws    = require 'workspace'
 ---@class vm
 local vm    = require 'vm.vm'
 
 ---@class vm.global.link
 ---@field sets   parser.object[]
+---@field hasGet boolean?
 
 ---@class vm.global
 ---@field links table<uri, vm.global.link>
 ---@field setsCache? table<uri, parser.object[]>
----@field getsCache? table<uri, parser.object[]>
 ---@field cate vm.global.cate
 local mt = {}
 mt.__index = mt
@@ -28,6 +27,12 @@ function mt:addSet(uri, source)
     end
     link.sets[#link.sets+1] = source
     self.setsCache = nil
+end
+
+---@param uri    uri
+function mt:addGet(uri)
+    local link = self.links[uri]
+    link.hasGet = true
 end
 
 ---@param suri uri
@@ -85,7 +90,6 @@ end
 function mt:dropUri(uri)
     self.links[uri] = nil
     self.setsCache = nil
-    self.getsCache = nil
 end
 
 ---@return string
@@ -174,6 +178,7 @@ local compilerGlobalSwitch = util.switch()
             return
         end
         local global = vm.declareGlobal('variable', name, uri)
+        global:addGet(uri)
         source._globalNode = global
 
         local nxt = source.next
@@ -231,6 +236,7 @@ local compilerGlobalSwitch = util.switch()
         end
         local uri    = guide.getUri(source)
         local global = vm.declareGlobal('variable', name, uri)
+        global:addGet(uri)
         source._globalNode = global
 
         local nxt = source.next
@@ -255,6 +261,8 @@ local compilerGlobalSwitch = util.switch()
                     if source.node.special == 'rawset' then
                         global:addSet(uri, source)
                         source.value = source.args[3]
+                    else
+                        global:addGet(uri)
                     end
                     source._globalNode = global
 
@@ -353,6 +361,7 @@ local compilerGlobalSwitch = util.switch()
             return
         end
         local type = vm.declareGlobal('type', name, uri)
+        type:addGet(uri)
         source._globalNode = type
     end)
     : case 'doc.extends.name'
@@ -360,6 +369,7 @@ local compilerGlobalSwitch = util.switch()
         local uri  = guide.getUri(source)
         local name = source[1]
         local class = vm.declareGlobal('type', name, uri)
+        class:addGet(uri)
         source._globalNode = class
     end)
 
@@ -582,24 +592,18 @@ local function dropUri(uri)
     end
 end
 
-for uri in files.eachFile() do
-    local state = files.getState(uri)
-    if state then
-        compileAst(state.ast)
-    end
-end
-
 ---@async
 files.watch(function (ev, uri)
     if ev == 'update' then
         dropUri(uri)
-        ws.awaitReady(uri)
-        local state = files.getState(uri)
-        if state then
-            compileAst(state.ast)
-        end
     end
     if ev == 'remove' then
         dropUri(uri)
+    end
+    if ev == 'compile' then
+        local state = files.getLastState(uri)
+        if state then
+            compileAst(state.ast)
+        end
     end
 end)

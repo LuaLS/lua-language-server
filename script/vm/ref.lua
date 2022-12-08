@@ -216,6 +216,7 @@ function searchByParentNode(source, pushResult, defMap, fileNotify)
     nodeSwitch(source.type, source, pushResult, defMap, fileNotify)
 end
 
+---@async
 local function searchByGlobal(source, pushResult)
     if source.type == 'field'
     or source.type == 'method'

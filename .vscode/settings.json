@@ -1,7 +1,7 @@
 // Just some comment
 {
     "Lua.misc.parameters": [
-        "--preview",
+        //"--preview",
         "--develop=true",
         "--dbgport=11413",
         "--loglevel=trace",

@@ -797,7 +797,7 @@ m.register 'textDocument/signatureHelp' {
             infos[i] = {
                 label           = result.label,
                 parameters      = parameters,
-                activeParameter = result.index - 1,
+                activeParameter = math.max(0, result.index - 1),
                 documentation   = result.description and {
                     value = tostring(result.description),
                     kind  = 'markdown',

@@ -1,5 +1,8 @@
 # changelog
 
+## Unreleased
+* `NEW` Added LuaCheck
+
 ## 3.6.5
 * `FIX` [#831]
 * `FIX` [#1729]

@@ -1,5 +1,6 @@
 local lm = require 'luamake'
 
+lm.notest = true
 lm.bindir = "bin"
 lm.c = lm.compiler == 'msvc' and 'c89' or 'c11'
 lm.cxx = 'c++17'

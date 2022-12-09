@@ -149,7 +149,7 @@ local function collect(global)
     results[#results+1] = result
     ---@async
     ---@diagnostic disable-next-line: not-yieldable
-    vm.getClassFields(rootUri, global, nil, false, function (source)
+    vm.getClassFields(rootUri, global, nil, function (source)
         if source.type == 'doc.field' then
             ---@cast source parser.object
             if files.isLibrary(guide.getUri(source)) then

@@ -78,6 +78,7 @@ local function main()
     local lclient = require 'lclient'
     local ws      = require 'workspace'
     local furi    = require 'file-uri'
+    require 'vm'
 
     --log.print = true
 

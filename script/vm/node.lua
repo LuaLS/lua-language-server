@@ -4,9 +4,10 @@ local vm       = require 'vm.vm'
 local ws       = require 'workspace.workspace'
 local guide    = require 'parser.guide'
 local timer    = require 'timer'
+local util     = require 'utility'
 
 ---@type table<vm.object, vm.node>
-vm.nodeCache = {}
+vm.nodeCache = setmetatable({}, util.MODE_K)
 
 ---@alias vm.node.object vm.object | vm.global
 

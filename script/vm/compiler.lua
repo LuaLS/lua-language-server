@@ -62,21 +62,11 @@ end
 
 ---@param source parser.object
 ---@param key any
----@param ref boolean
 ---@param pushResult fun(res: parser.object, markDoc?: boolean)
-local function searchFieldByLocalID(source, key, ref, pushResult)
+local function searchFieldByLocalID(source, key, pushResult)
     local fields
     if key then
         fields = vm.getLocalSourcesSets(source, key)
-        if ref then
-            local gets = vm.getLocalSourcesGets(source, key)
-            if gets then
-                fields = fields or {}
-                for _, src in ipairs(gets) do
-                    fields[#fields+1] = src
-                end
-            end
-        end
     else
         fields = vm.getLocalFields(source, false)
     end
@@ -106,9 +96,8 @@ end
 ---@param suri uri
 ---@param source parser.object
 ---@param key any
----@param ref boolean
 ---@param pushResult fun(res: parser.object, markDoc?: boolean)
-local function searchFieldByGlobalID(suri, source, key, ref, pushResult)
+local function searchFieldByGlobalID(suri, source, key, pushResult)
     local node = vm.getGlobalNode(source)
     if not node then
         return
@@ -123,9 +112,6 @@ local function searchFieldByGlobalID(suri, source, key, ref, pushResult)
                 for _, set in ipairs(global:getSets(suri)) do
                     pushResult(set)
                 end
-                for _, get in ipairs(global:getGets(suri)) do
-                    pushResult(get)
-                end
             end
         else
             local globals = vm.getGlobalFields('variable', node.name)
@@ -133,20 +119,17 @@ local function searchFieldByGlobalID(suri, source, key, ref, pushResult)
                 for _, set in ipairs(global:getSets(suri)) do
                     pushResult(set)
                 end
-                for _, get in ipairs(global:getGets(suri)) do
-                    pushResult(get)
-                end
             end
         end
     end
     if node.cate == 'type' then
-        vm.getClassFields(suri, node, key, ref, pushResult)
+        vm.getClassFields(suri, node, key, pushResult)
     end
 end
 
 local searchFieldSwitch = util.switch()
     : case 'table'
-    : call(function (suri, source, key, ref, pushResult)
+    : call(function (suri, source, key, pushResult)
         local hasFiled = false
         for _, field in ipairs(source) do
             if field.type == 'tablefield'
@@ -181,15 +164,15 @@ local searchFieldSwitch = util.switch()
     end)
     : case 'string'
     : case 'doc.type.string'
-    : call(function (suri, source, key, ref, pushResult)
+    : call(function (suri, source, key, pushResult)
         -- change to `string: stringlib` ?
         local stringlib = vm.getGlobal('type', 'stringlib')
         if stringlib then
-            vm.getClassFields(suri, stringlib, key, ref, pushResult)
+            vm.getClassFields(suri, stringlib, key, pushResult)
         end
     end)
     : case 'doc.type.array'
-    : call(function (suri, source, key, ref, pushResult)
+    : call(function (suri, source, key, pushResult)
         if type(key) == 'number' then
             if key < 1
             or not math.tointeger(key) then
@@ -204,7 +187,7 @@ local searchFieldSwitch = util.switch()
         end
     end)
     : case 'doc.type.table'
-    : call(function (suri, source, key, ref, pushResult)
+    : call(function (suri, source, key, pushResult)
         if type(key) == 'string' and key:find(vm.ID_SPLITE) then
             return
         end
@@ -240,7 +223,7 @@ local searchFieldSwitch = util.switch()
         end
     end)
     : case 'global'
-    : call(function (suri, node, key, ref, pushResult)
+    : call(function (suri, node, key, pushResult)
         if node.cate == 'variable' then
             if key then
                 if type(key) ~= 'string' then
@@ -251,11 +234,6 @@ local searchFieldSwitch = util.switch()
                     for _, set in ipairs(global:getSets(suri)) do
                         pushResult(set)
                     end
-                    if ref then
-                        for _, get in ipairs(global:getGets(suri)) do
-                            pushResult(get)
-                        end
-                    end
                 end
             else
                 local globals = vm.getGlobalFields('variable', node.name)
@@ -263,29 +241,23 @@ local searchFieldSwitch = util.switch()
                     for _, set in ipairs(global:getSets(suri)) do
                         pushResult(set)
                     end
-                    if ref then
-                        for _, get in ipairs(global:getGets(suri)) do
-                            pushResult(get)
-                        end
-                    end
                 end
             end
         end
         if node.cate == 'type' then
-            vm.getClassFields(suri, node, key, ref, pushResult)
+            vm.getClassFields(suri, node, key, pushResult)
         end
     end)
-    : default(function (suri, source, key, ref, pushResult)
-        searchFieldByLocalID(source, key, ref, pushResult)
-        searchFieldByGlobalID(suri, source, key, ref, pushResult)
+    : default(function (suri, source, key, pushResult)
+        searchFieldByLocalID(source, key, pushResult)
+        searchFieldByGlobalID(suri, source, key, pushResult)
     end)
 
 ---@param suri uri
 ---@param object vm.global
 ---@param key? string|number|integer|boolean|vm.global
----@param ref boolean
 ---@param pushResult fun(field: vm.object, isMark?: boolean)
-function vm.getClassFields(suri, object, key, ref, pushResult)
+function vm.getClassFields(suri, object, key, pushResult)
     local mark = {}
 
     local function searchClass(class, searchedFields)
@@ -375,7 +347,7 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                 if not searchedFields[key] and set.bindSource then
                     local src = set.bindSource
                     if src.value and src.value.type == 'table' then
-                        searchFieldSwitch('table', suri, src.value, key, ref, function (field)
+                        searchFieldSwitch('table', suri, src.value, key, function (field)
                             local fieldKey = guide.getKeyName(field)
                             if fieldKey then
                                 if  not searchedFields[fieldKey]
@@ -395,7 +367,7 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
                         and args
                         and args[1]
                         and args[1].type == 'table' then
-                            searchFieldSwitch('table', suri, args[1], key, ref, function (field)
+                            searchFieldSwitch('table', suri, args[1], key, function (field)
                                 local fieldKey = guide.getKeyName(field)
                                 if fieldKey then
                                     if  not searchedFields[fieldKey]
@@ -416,7 +388,7 @@ function vm.getClassFields(suri, object, key, ref, pushResult)
             if set.type == 'doc.class' then
                 if not searchedFields[key] and set.bindSource then
                     local src = set.bindSource
-                    searchFieldSwitch(src.type, suri, src, key, ref, function (field)
+                    searchFieldSwitch(src.type, suri, src, key, function (field)
                         local fieldKey = guide.getKeyName(field)
                         if fieldKey and not searchedFields[fieldKey] then
                             if  not searchedFields[fieldKey]
@@ -524,7 +496,7 @@ local function getReturnOfSetMetaTable(args)
         node:merge(vm.compileNode(tbl))
     end
     if mt then
-        vm.compileByParentNode(mt, '__index', false, function (src)
+        vm.compileByParentNode(mt, '__index', function (src)
             for n in vm.compileNode(src):eachObject() do
                 if n.type == 'global'
                 or n.type == 'local'
@@ -652,7 +624,7 @@ end
 ---@param source parser.object
 ---@param key? string|vm.global
 ---@param pushResult fun(source: parser.object)
-function vm.compileByParentNode(source, key, ref, pushResult)
+function vm.compileByParentNode(source, key, pushResult)
     local parentNode = vm.compileNode(source)
     local docedResults = {}
     local commonResults = {}
@@ -677,7 +649,7 @@ function vm.compileByParentNode(source, key, ref, pushResult)
             and not guide.isBasicType(node.name)
         )
         or guide.isLiteral(node) then
-            searchFieldSwitch(node.type, suri, node, key, ref, function (res, markDoc)
+            searchFieldSwitch(node.type, suri, node, key, function (res, markDoc)
                 if mark[res] then
                     return
                 end
@@ -692,7 +664,7 @@ function vm.compileByParentNode(source, key, ref, pushResult)
     end
 
     if not next(mark) then
-        searchFieldByLocalID(source, key, ref, function (res, markDoc)
+        searchFieldByLocalID(source, key, function (res, markDoc)
             if mark[res] then
                 return
             end
@@ -1298,7 +1270,7 @@ local compilerSwitch = util.switch()
             for k in key:eachObject() do
                 if k.type == 'global' and k.cate == 'type' then
                     ---@cast k vm.global
-                    vm.compileByParentNode(source.node, k, false, function (src)
+                    vm.compileByParentNode(source.node, k, function (src)
                         vm.setNode(source, vm.compileNode(src))
                         if src.value then
                             vm.setNode(source, vm.compileNode(src.value))
@@ -1308,7 +1280,7 @@ local compilerSwitch = util.switch()
             end
         else
             ---@cast key string
-            vm.compileByParentNode(source.node, key, false, function (src)
+            vm.compileByParentNode(source.node, key, function (src)
                 if src.value then
                     if bindDocs(src) then
                         vm.setNode(source, vm.compileNode(src))
@@ -1331,7 +1303,7 @@ local compilerSwitch = util.switch()
             return
         end
         local key = guide.getKeyName(source)
-        vm.compileByParentNode(source.node, key, false, function (src)
+        vm.compileByParentNode(source.node, key, function (src)
             if src.type == 'doc.type.field'
             or src.type == 'doc.field' then
                 vm.setNode(source, vm.compileNode(src))
@@ -1347,7 +1319,7 @@ local compilerSwitch = util.switch()
             return
         end
         local key = guide.getKeyName(source)
-        vm.compileByParentNode(source.node, key, false, function (src)
+        vm.compileByParentNode(source.node, key, function (src)
             vm.setNode(source, vm.compileNode(src))
         end)
     end)
@@ -1360,7 +1332,7 @@ local compilerSwitch = util.switch()
         end
 
         if not hasMarkDoc then
-            vm.compileByParentNode(source.node, guide.getKeyName(source), false, function (src)
+            vm.compileByParentNode(source.node, guide.getKeyName(source), function (src)
                 if src.type == 'doc.field'
                 or src.type == 'doc.type.field'
                 or src.type == 'doc.type.name' then
@@ -1383,7 +1355,7 @@ local compilerSwitch = util.switch()
     : case 'tableexp'
     : call(function (source)
         local hasMarkDoc
-        vm.compileByParentNode(source.parent, source.tindex, false, function (src)
+        vm.compileByParentNode(source.parent, source.tindex, function (src)
             if src.type == 'doc.field'
             or src.type == 'doc.type.field'
             or src.type == 'doc.type.name'
@@ -1894,7 +1866,7 @@ local nodeSwitch;nodeSwitch = util.switch()
             key = key .. vm.ID_SPLITE .. lastKey
         end
         for pn in parentNode:eachObject() do
-            searchFieldSwitch(pn.type, uri, pn, key, false, pushResult)
+            searchFieldSwitch(pn.type, uri, pn, key, pushResult)
         end
         return key, source.node
     end)
@@ -1911,7 +1883,7 @@ local nodeSwitch;nodeSwitch = util.switch()
         local uri = guide.getUri(source)
         local parentNode = vm.compileNode(source.node)
         for pn in parentNode:eachObject() do
-            searchFieldSwitch(pn.type, uri, pn, key, false, pushResult)
+            searchFieldSwitch(pn.type, uri, pn, key, pushResult)
         end
     end)
 

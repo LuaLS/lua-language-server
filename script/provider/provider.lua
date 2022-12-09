@@ -1159,6 +1159,7 @@ m.register '$/status/click' {
             titleDiagnostic,
             DEVELOP and 'Restart Server' or nil,
             DEVELOP and 'Clear Node Cache' or nil,
+            DEVELOP and 'GC' or nil,
         })
         if not result then
             return
@@ -1175,6 +1176,9 @@ m.register '$/status/click' {
         elseif result == 'Clear Node Cache' then
             local vm = require 'vm'
             vm.clearNodeCache()
+            collectgarbage()
+            collectgarbage()
+        elseif result == 'GC' then
             collectgarbage()
             collectgarbage()
         end

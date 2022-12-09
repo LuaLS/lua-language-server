@@ -26,19 +26,6 @@ simpleSwitch = util.switch()
             end
         end
     end)
-    : case 'doc.alias.name'
-    : call(function (source, pushResult)
-        local global = vm.getGlobal('type', source[1])
-        if not global then
-            return
-        end
-        for _, get in ipairs(global:getGets(guide.getUri(source))) do
-            pushResult(get)
-        end
-        for _, set in ipairs(global:getSets(guide.getUri(source))) do
-            pushResult(set)
-        end
-    end)
 
 ---@async
 local function searchInAllFiles(suri, searcher, notify)
@@ -75,8 +62,13 @@ local function searchInAllFiles(suri, searcher, notify)
 end
 
 ---@async
-local function searchField(source, pushResult, defMap, fileNotify)
+local function searchWord(source, pushResult, defMap, fileNotify)
     local key = guide.getKeyName(source)
+    if not key then
+        return
+    end
+
+    local global = vm.getGlobalNode(source)
 
     ---@param src parser.object
     local function checkDef(src)
@@ -88,42 +80,53 @@ local function searchField(source, pushResult, defMap, fileNotify)
         end
     end
 
-    local pat   = '[:.]%s*' .. key
-
     ---@async
     local function findWord(uri)
         local text = files.getText(uri)
         if not text then
             return
         end
-        if not text:match(pat) then
+        if not text:match(key) then
             return
         end
         local state = files.getState(uri)
         if not state then
             return
         end
-        ---@async
-        guide.eachSourceTypes(state.ast, {'getfield', 'setfield'}, function (src)
-            if src.field and src.field[1] == key then
-                checkDef(src)
-                await.delay()
-            end
-        end)
-        ---@async
-        guide.eachSourceTypes(state.ast, {'getmethod', 'setmethod'}, function (src)
-            if src.method and src.method[1] == key then
-                checkDef(src)
-                await.delay()
-            end
-        end)
-        ---@async
-        guide.eachSourceTypes(state.ast, {'getindex', 'setindex'}, function (src)
-            if src.index and src.index.type == 'string' and src.index[1] == key then
-                checkDef(src)
-                await.delay()
-            end
-        end)
+
+        if global then
+            local globalName = global:asKeyName()
+            ---@async
+            guide.eachSourceTypes(state.ast, {'getglobal', 'setglobal', 'setfield', 'getfield', 'setmethod', 'getmethod', 'setindex', 'getindex', 'doc.type.name', 'doc.class.name', 'doc.alias.name', 'doc.extends.name'}, function (src)
+                local myGlobal = vm.getGlobalNode(src)
+                if myGlobal and myGlobal:asKeyName() == globalName then
+                    pushResult(src)
+                    await.delay()
+                end
+            end)
+        else
+            ---@async
+            guide.eachSourceTypes(state.ast, {'getfield', 'setfield'}, function (src)
+                if src.field and src.field[1] == key then
+                    checkDef(src)
+                    await.delay()
+                end
+            end)
+            ---@async
+            guide.eachSourceTypes(state.ast, {'getmethod', 'setmethod'}, function (src)
+                if src.method and src.method[1] == key then
+                    checkDef(src)
+                    await.delay()
+                end
+            end)
+            ---@async
+            guide.eachSourceTypes(state.ast, {'getindex', 'setindex'}, function (src)
+                if src.index and src.index.type == 'string' and src.index[1] == key then
+                    checkDef(src)
+                    await.delay()
+                end
+            end)
+        end
     end
 
     searchInAllFiles(guide.getUri(source), findWord, fileNotify)
@@ -178,18 +181,36 @@ local nodeSwitch = util.switch()
             return
         end
 
-        searchField(source, pushResult, defMap, fileNotify)
+        searchWord(source, pushResult, defMap, fileNotify)
     end)
     : case 'tablefield'
     : case 'tableindex'
-    ---@async
-    : call(function (source, pushResult, defMap, fileNotify)
-        searchField(source, pushResult, defMap, fileNotify)
-    end)
     : case 'doc.field.name'
     ---@async
     : call(function (source, pushResult, defMap, fileNotify)
-        searchField(source, pushResult, defMap, fileNotify)
+        searchWord(source, pushResult, defMap, fileNotify)
+    end)
+    : case 'setglobal'
+    : case 'getglobal'
+    ---@async
+    : call(function (source, pushResult, defMap, fileNotify)
+        searchWord(source, pushResult, defMap, fileNotify)
+    end)
+    : case 'doc.alias.name'
+    : case 'doc.class.name'
+    : case 'doc.enum.name'
+    ---@async
+    : call(function (source, pushResult, defMap, fileNotify)
+        searchWord(source.parent, pushResult, defMap, fileNotify)
+    end)
+    : case 'doc.alias'
+    : case 'doc.class'
+    : case 'doc.enum'
+    : case 'doc.type.name'
+    : case 'doc.extends.name'
+    ---@async
+    : call(function (source, pushResult, defMap, fileNotify)
+        searchWord(source, pushResult, defMap, fileNotify)
     end)
     : case 'function'
     : case 'doc.type.function'
@@ -229,18 +250,20 @@ function searchByParentNode(source, pushResult, defMap, fileNotify)
     nodeSwitch(source.type, source, pushResult, defMap, fileNotify)
 end
 
-local function searchByNode(source, pushResult)
-    local node = vm.compileNode(source)
+local function searchByGlobal(source, pushResult)
+    if source.type == 'field'
+    or source.type == 'method'
+    or source.type == 'doc.class.name'
+    or source.type == 'doc.alias.name' then
+        source = source.parent
+    end
+    local node = vm.getGlobalNode(source)
     if not node then
         return
     end
     local uri = guide.getUri(source)
-    for n in node:eachObject() do
-        if n.type == 'global' then
-            for _, get in ipairs(n:getGets(uri)) do
-                pushResult(get)
-            end
-        end
+    for _, set in ipairs(node:getSets(uri)) do
+        pushResult(set)
     end
 end
 
@@ -292,7 +315,7 @@ function vm.getRefs(source, fileNotify)
 
     searchBySimple(source, pushResult)
     searchByLocalID(source, pushResult)
-    searchByNode(source, pushResult)
+    searchByGlobal(source, pushResult)
     local defMap = searchByDef(source, pushResult)
     searchByParentNode(source, pushResult, defMap, fileNotify)
 

@@ -508,11 +508,15 @@ local function askForDisable(uri)
     end
 end
 
-local function clearMemory()
+local function clearMemory(finished)
     if m.scopeDiagCount > 0 then
         return
     end
     vm.clearNodeCache()
+    if finished then
+        collectgarbage()
+        collectgarbage()
+    end
 end
 
 ---@async
@@ -524,10 +528,11 @@ function m.awaitDiagnosticsScope(suri, callback)
     while loading.count() > 0 do
         await.sleep(1.0)
     end
+    local finished
     m.scopeDiagCount = m.scopeDiagCount + 1
     local scopeDiag <close> = util.defer(function ()
         m.scopeDiagCount = m.scopeDiagCount - 1
-        clearMemory()
+        clearMemory(finished)
     end)
     local clock = os.clock()
     local bar <close> = progress.create(suri, lang.script.WORKSPACE_DIAGNOSTIC, 1)
@@ -567,6 +572,7 @@ function m.awaitDiagnosticsScope(suri, callback)
     end
     bar:remove()
     log.info(('Diagnostics scope [%s] finished, takes [%.3f] sec.'):format(scp:getName(), os.clock() - clock))
+    finished = true
 end
 
 function m.diagnosticsScope(uri, force)

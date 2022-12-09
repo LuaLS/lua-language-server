@@ -200,12 +200,9 @@ local function ofGlobal(source, newname, callback)
     if not global then
         return
     end
-    local uri = guide.getUri(source)
-    for _, set in ipairs(global:getSets(uri)) do
-        ofFieldThen(key, set, newname, callback)
-    end
-    for _, get in ipairs(global:getGets(uri)) do
-        ofFieldThen(key, get, newname, callback)
+    local refs = vm.getRefs(source)
+    for _, ref in ipairs(refs) do
+        ofFieldThen(key, ref, newname, callback)
     end
 end
 
@@ -235,7 +232,8 @@ local function ofDocTypeName(source, newname, callback)
             callback(doc, doc.enum.start, doc.enum.finish, newname)
         end
     end
-    for _, doc in ipairs(global:getGets(uri)) do
+    local refs = vm.getRefs(source)
+    for _, doc in ipairs(refs) do
         if doc.type == 'doc.type.name' then
             callback(doc, doc.start, doc.finish, newname)
         end

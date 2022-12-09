@@ -22,6 +22,7 @@ local diag         = require 'proto.diagnostic'
 local wssymbol     = require 'core.workspace-symbol'
 local findSource   = require 'core.find-source'
 local diagnostic   = require 'provider.diagnostic'
+local autoRequire  = require 'core.completion.auto-require'
 
 local diagnosticModes = {
     'disable-next-line',
@@ -369,89 +370,37 @@ local function checkModule(state, word, position, results)
     if not config.get(state.uri, 'Lua.completion.autoRequire') then
         return
     end
-    local globals = util.arrayToHash(config.get(state.uri, 'Lua.diagnostics.globals'))
-    local locals = guide.getVisibleLocals(state.ast, position)
-    for uri in files.eachFile(state.uri) do
-        if uri == guide.getUri(state.ast) then
-            goto CONTINUE
-        end
-        local path = furi.decode(uri)
-        local relativePath = workspace.getRelativePath(path)
-        local infos = rpath.getVisiblePath(uri, path)
-        local testedStem = { }
-        for _, sr in ipairs(infos) do
-            local pattern = sr.searcher
-                :gsub("(%p)", "%%%1")
-                :gsub("%%%?", "(.-)")
-
-            local stemName = relativePath
-                :match(pattern)
-                :match("[%a_][%w_]*$")
-
-            if not stemName or testedStem[stemName] then
-                goto INNER_CONTINUE
-            end
-            testedStem[stemName] = true
-
-            if  not locals[stemName]
-            and not vm.hasGlobalSets(state.uri, 'variable', stemName)
-            and not globals[stemName]
-            and matchKey(word, stemName) then
-                local targetState = files.getState(uri)
-                if not targetState then
-                    goto INNER_CONTINUE
-                end
-                local targetReturns = targetState.ast.returns
-                if not targetReturns then
-                    goto INNER_CONTINUE
-                end
-                local targetSource = targetReturns[1] and targetReturns[1][1]
-                if not targetSource then
-                    goto INNER_CONTINUE
-                end
-                if  targetSource.type ~= 'getlocal'
-                and targetSource.type ~= 'table'
-                and targetSource.type ~= 'function' then
-                    goto INNER_CONTINUE
-                end
-                if  targetSource.type == 'getlocal'
-                and vm.getDeprecated(targetSource.node) then
-                    goto INNER_CONTINUE
-                end
-                results[#results+1] = {
-                    label            = stemName,
-                    kind             = define.CompletionItemKind.Variable,
-                    commitCharacters = { '.' },
-                    command          = {
-                        title     = 'autoRequire',
-                        command   = 'lua.autoRequire',
-                        arguments = {
-                            {
-                                uri    = guide.getUri(state.ast),
-                                target = uri,
-                                name   = stemName,
-                            },
-                        },
+    autoRequire.check(state, word, position, function (uri, stemName, targetSource)
+        results[#results+1] = {
+            label            = stemName,
+            kind             = define.CompletionItemKind.Variable,
+            commitCharacters = { '.' },
+            command          = {
+                title     = 'autoRequire',
+                command   = 'lua.autoRequire',
+                arguments = {
+                    {
+                        uri    = guide.getUri(state.ast),
+                        target = uri,
+                        name   = stemName,
                     },
-                    id               = stack(targetSource, function (newSource) ---@async
-                        local md = markdown()
-                        md:add('md', lang.script('COMPLETION_IMPORT_FROM', ('[%s](%s)'):format(
-                            workspace.getRelativePath(uri),
-                            uri
-                        )))
-                        md:add('md', buildDesc(newSource))
-                        return {
-                            detail      = buildDetail(newSource),
-                            description = md,
-                            --additionalTextEdits = buildInsertRequire(state, originUri, stemName),
-                        }
-                    end)
+                },
+            },
+            id               = stack(targetSource, function (newSource) ---@async
+                local md = markdown()
+                md:add('md', lang.script('COMPLETION_IMPORT_FROM', ('[%s](%s)'):format(
+                    workspace.getRelativePath(uri),
+                    uri
+                )))
+                md:add('md', buildDesc(newSource))
+                return {
+                    detail      = buildDetail(newSource),
+                    description = md,
+                    --additionalTextEdits = buildInsertRequire(state, originUri, stemName),
                 }
-            end
-            ::INNER_CONTINUE::
-        end
-        ::CONTINUE::
-    end
+            end)
+        }
+    end)
 end
 
 local function checkFieldFromFieldToIndex(state, name, src, parent, word, startPos, position)

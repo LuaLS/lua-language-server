@@ -1590,7 +1590,7 @@ AAA = {}
 local <?x?> = AAA()
 ]]
 
-TEST 'string|integer' [[
+TEST 'string' [[
 local <?x?>
 x = '1'
 x = 1

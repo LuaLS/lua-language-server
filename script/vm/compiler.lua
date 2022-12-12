@@ -973,14 +973,11 @@ local function compileLocal(source)
         end
     end
     if not hasMarkValue and not hasMarkValue then
-        if source.ref then
-            for _, ref in ipairs(source.ref) do
-                if  ref.type == 'setlocal'
-                and ref.value
-                and ref.value.type == 'function' then
-                    vm.setNode(source, vm.compileNode(ref.value))
-                end
-            end
+        local firstRef = source.ref and source.ref[1]
+        if  firstRef
+        and guide.isSet(firstRef)
+        and guide.getBlock(firstRef) == guide.getBlock(source) then
+            vm.setNode(source, vm.compileNode(firstRef))
         end
     end
     -- function x.y(self, ...) --> function x:y(...)
@@ -1163,73 +1160,12 @@ local compilerSwitch = util.switch()
     ---@async
     ---@param source parser.object
     : call(function (source)
-        vm.launchRunner(source, function ()
-            local myNode = vm.getNode(source)
-            ---@cast myNode -?
-            myNode:setData('resolving', true)
-
-            if source.ref then
-                for _, ref in ipairs(source.ref) do
-                    if ref.type == 'getlocal'
-                    or ref.type == 'setlocal' then
-                        vm.setNode(ref, myNode, true)
-                    end
-                end
-            end
-            compileLocal(source)
-
-            myNode.resolved = true
-        end, function ()
-            local myNode = vm.getNode(source)
-            ---@cast myNode -?
-            myNode:setData('resolving', nil)
-            local hasMark = vm.getNode(source):getData 'hasDefined'
-            if source.ref and not hasMark then
-                local parentFunc = guide.getParentFunction(source)
-                for _, ref in ipairs(source.ref) do
-                    if  ref.type == 'setlocal'
-                    and guide.getParentFunction(ref) == parentFunc then
-                        local refNode = vm.getNode(ref)
-                        if refNode then
-                            vm.setNode(source, refNode)
-                        end
-                    end
-                end
-            end
-        end, function (src, node)
-            if src.type == 'setlocal' then
-                if src.bindDocs then
-                    for _, doc in ipairs(src.bindDocs) do
-                        if doc.type == 'doc.type' then
-                            vm.setNode(src, vm.compileNode(doc), true)
-                            return vm.getNode(src)
-                        end
-                    end
-                end
-                if src.value then
-                    if src.value.type == 'table' then
-                        vm.setNode(src, vm.createNode(src.value), true)
-                        vm.setNode(src, node:copy():asTable())
-                    else
-                        vm.setNode(src, vm.compileNode(src.value), true)
-                    end
-                else
-                    vm.setNode(src, node, true)
-                end
-                return vm.getNode(src)
-            elseif src.type == 'getlocal' then
-                if bindAs(src) then
-                    return
-                end
-                vm.setNode(src, node, true)
-                node.resolved = true
-                matchCall(src)
-            end
-        end)
+        compileLocal(source)
     end)
     : case 'setlocal'
     : call(function (source)
-        vm.compileNode(source.node)
+        local valueNode = vm.compileNode(source.value)
+        vm.setNode(source, valueNode)
     end)
     : case 'getlocal'
     ---@async
@@ -1237,7 +1173,11 @@ local compilerSwitch = util.switch()
         if bindAs(source) then
             return
         end
-        vm.compileNode(source.node)
+        local node = vm.traceNode(source)
+        if not node then
+            return
+        end
+        vm.setNode(source, node, true)
     end)
     : case 'setfield'
     : case 'setmethod'

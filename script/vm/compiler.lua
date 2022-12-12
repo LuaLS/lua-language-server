@@ -1226,8 +1226,6 @@ local compilerSwitch = util.switch()
                 matchCall(src)
             end
         end)
-
-        vm.waitResolveRunner(source)
     end)
     : case 'setlocal'
     : call(function (source)
@@ -1240,7 +1238,6 @@ local compilerSwitch = util.switch()
             return
         end
         vm.compileNode(source.node)
-        vm.waitResolveRunner(source)
     end)
     : case 'setfield'
     : case 'setmethod'
@@ -1919,13 +1916,6 @@ function vm.compileNode(source)
         else
             log.error('Can not compile nil source')
         end
-    end
-
-    if source.type == 'getlocal' then
-        ---@cast source parser.object
-        vm.storeWaitingRunner(source)
-        ---@diagnostic disable-next-line: await-in-sync
-        vm.waitResolveRunner(source)
     end
 
     local cache = vm.getNode(source)

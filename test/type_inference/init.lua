@@ -1829,6 +1829,17 @@ end
 print(<?x?>)
 ]]
 
+TEST 'nil' [[
+---@type integer?
+local x
+
+if not x then
+    print(<?x?>)
+end
+
+print(x)
+]]
+
 TEST 'integer' [[
 ---@type integer?
 local x

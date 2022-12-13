@@ -3136,6 +3136,22 @@ local function parseGoTo()
     return action
 end
 
+local function parseFilter()
+    local exp = parseExp()
+    if exp then
+        local filter = {
+            type   = 'filter',
+            start  = exp.start,
+            finish = exp.finish,
+            exp    = exp,
+        }
+        exp.parent = filter
+        return filter
+    else
+        missExp()
+    end
+end
+
 local function parseIfBlock(parent)
     local ifLeft  = getPosition(Tokens[Index], 'left')
     local ifRight = getPosition(Tokens[Index] + 1, 'right')
@@ -3151,13 +3167,11 @@ local function parseIfBlock(parent)
         }
     }
     skipSpace()
-    local filter = parseExp()
+    local filter = parseFilter()
     if filter then
         ifblock.filter = filter
         ifblock.finish = filter.finish
         filter.parent = ifblock
-    else
-        missExp()
     end
     skipSpace()
     local thenToken = Tokens[Index + 1]
@@ -3210,13 +3224,11 @@ local function parseElseIfBlock(parent)
     }
     Index = Index + 2
     skipSpace()
-    local filter = parseExp()
+    local filter = parseFilter()
     if filter then
         elseifblock.filter = filter
         elseifblock.finish = filter.finish
         filter.parent = elseifblock
-    else
-        missExp()
     end
     skipSpace()
     local thenToken = Tokens[Index + 1]
@@ -3524,15 +3536,16 @@ local function parseWhile()
 
     skipSpace()
     local nextToken = Tokens[Index + 1]
-    local filter =  nextToken ~= 'do'
-                and nextToken ~= 'then'
-                and parseExp()
-    if filter then
-        action.filter = filter
-        action.finish = filter.finish
-        filter.parent = action
-    else
+    if nextToken == 'do'
+    or nextToken == 'then' then
         missExp()
+    else
+        local filter = parseFilter()
+        if filter then
+            action.filter = filter
+            action.finish = filter.finish
+            filter.parent = action
+        end
     end
 
     skipSpace()
@@ -3611,12 +3624,10 @@ local function parseRepeat()
         Index = Index + 2
 
         skipSpace()
-        local filter = parseExp()
+        local filter = parseFilter()
         if filter then
             action.filter = filter
             filter.parent = action
-        else
-            missExp()
         end
 
     else

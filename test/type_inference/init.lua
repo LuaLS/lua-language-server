@@ -1758,6 +1758,15 @@ x = '1'
 x = 1
 ]]
 
+TEST 'integer' [[
+local x
+x = true
+do
+    x = 1
+end
+print(<?x?>)
+]]
+
 TEST 'integer?' [[
 ---@type integer?
 local <?x?>

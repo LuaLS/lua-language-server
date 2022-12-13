@@ -9,7 +9,7 @@ local guide     = require 'parser.guide'
 ---@class vm.tracer
 ---@field source   parser.object
 ---@field assigns  parser.object[]
----@field nodes    table<parser.object, vm.node>
+---@field nodes    table<parser.object, vm.node|false>
 ---@field main     parser.object
 ---@field uri      uri
 local mt = {}
@@ -34,15 +34,20 @@ end
 ---@param mark table
 function mt:collectBlock(obj, mark)
     while true do
+        obj = obj.parent
         if mark[obj] then
             return
         end
-        mark[obj] = true
-        self.assigns[#self.assigns+1] = obj
+        if not guide.isBlockType(obj) then
+            return
+        end
         if obj == self.main then
             return
         end
-        obj = obj.parent
+        mark[obj] = true
+        if obj.type ~= 'do' then
+            self.assigns[#self.assigns+1] = obj
+        end
     end
 end
 
@@ -78,11 +83,23 @@ end
 ---@return parser.object?
 function mt:getLastAssign(source)
     local assign = self.source
+    local block  = guide.getParentBlock(source)
+    if not block then
+        return nil
+    end
     for _, obj in ipairs(self.assigns) do
-        if obj.start > source.start then
+        if obj.start >= source.start then
             break
         end
-        assign = obj
+        local objBlock = guide.getParentBlock(obj)
+        if not objBlock then
+            break
+        end
+        if objBlock == block
+        or objBlock.type == 'do'
+        or objBlock.finish > block.finish then
+            assign = obj
+        end
     end
     return assign
 end
@@ -90,17 +107,22 @@ end
 ---@param source parser.object
 ---@return vm.node?
 function mt:getNode(source)
-    if self.nodes[source] then
-        return self.nodes[source]
+    if self.nodes[source] ~= nil then
+        return self.nodes[source] or nil
     end
     local lastAssign = self:getLastAssign(source)
     if not lastAssign then
+        self.nodes[source] = false
         return nil
     end
     if guide.isSet(lastAssign) then
         local lastNode = vm.compileNode(lastAssign)
+        self.nodes[source] = lastNode
         return lastNode
     end
+    local lastNode = self:getNode(lastAssign)
+    self.nodes[source] = lastNode
+    return lastNode
 end
 
 ---@param source parser.object

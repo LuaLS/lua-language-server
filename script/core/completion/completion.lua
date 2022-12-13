@@ -534,6 +534,9 @@ local function checkFieldOfRefs(refs, state, word, startPos, position, parent, o
     local funcs  = {}
     local count  = 0
     for _, src in ipairs(refs) do
+        if count > 100 then
+            break
+        end
         local _, name = vm.viewKey(src, state.uri)
         if not name then
             goto CONTINUE

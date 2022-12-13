@@ -45,9 +45,7 @@ function mt:collectBlock(obj, mark)
             return
         end
         mark[obj] = true
-        if obj.type ~= 'do' then
-            self.assigns[#self.assigns+1] = obj
-        end
+        self.assigns[#self.assigns+1] = obj
     end
 end
 
@@ -56,6 +54,8 @@ function mt:collectLocal()
     local finishPos = 0
 
     local mark = {}
+
+    self.assigns[#self.assigns+1] = self.source
 
     for _, obj in ipairs(self.source.ref) do
         if obj.type == 'setlocal' then
@@ -79,25 +79,23 @@ function mt:collectLocal()
     end)
 end
 
----@param source parser.object
+---@param block parser.object
+---@param pos   integer
 ---@return parser.object?
-function mt:getLastAssign(source)
-    local assign = self.source
-    local block  = guide.getParentBlock(source)
+function mt:getLastAssign(block, pos)
     if not block then
         return nil
     end
+    local assign
     for _, obj in ipairs(self.assigns) do
-        if obj.start >= source.start then
+        if obj.start >= pos then
             break
         end
         local objBlock = guide.getParentBlock(obj)
         if not objBlock then
             break
         end
-        if objBlock == block
-        or objBlock.type == 'do'
-        or objBlock.finish > block.finish then
+        if objBlock == block then
             assign = obj
         end
     end
@@ -106,23 +104,45 @@ end
 
 ---@param source parser.object
 ---@return vm.node?
+function mt:calcNode(source)
+    if guide.isSet(source) then
+        local node = vm.compileNode(source)
+        return node
+    end
+    if source.type == 'do' then
+        local lastAssign = self:getLastAssign(source, source.finish)
+        if lastAssign then
+            return self:getNode(lastAssign)
+        else
+            return nil
+        end
+    end
+end
+
+---@param source parser.object
+---@return vm.node?
 function mt:getNode(source)
     if self.nodes[source] ~= nil then
         return self.nodes[source] or nil
     end
-    local lastAssign = self:getLastAssign(source)
-    if not lastAssign then
+    local parentBlock = guide.getParentBlock(source)
+    if not parentBlock then
         self.nodes[source] = false
         return nil
     end
-    if guide.isSet(lastAssign) then
-        local lastNode = vm.compileNode(lastAssign)
-        self.nodes[source] = lastNode
-        return lastNode
+    if source == self.main then
+        self.nodes[source] = false
+        return nil
     end
-    local lastNode = self:getNode(lastAssign)
-    self.nodes[source] = lastNode
-    return lastNode
+    local node = self:calcNode(source)
+    if node then
+        self.nodes[source] = node
+        return node
+    end
+    local lastAssign = self:getLastAssign(parentBlock, source.start)
+    local parentNode = self:getNode(lastAssign or parentBlock)
+    self.nodes[source] = parentNode or false
+    return parentNode
 end
 
 ---@param source parser.object

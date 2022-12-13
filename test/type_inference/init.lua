@@ -1767,6 +1767,17 @@ end
 print(<?x?>)
 ]]
 
+TEST 'boolean' [[
+local x
+x = true
+function XX()
+    do
+        x = 1
+    end
+end
+print(<?x?>)
+]]
+
 TEST 'integer?' [[
 ---@type integer?
 local <?x?>

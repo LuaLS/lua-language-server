@@ -33,6 +33,7 @@ lm:source_set 'luafilesystem' {
 lm:executable "lua-language-server" {
     deps = {
         "lpeglabel",
+        "luafilesystem",
         "source_bootstrap",
         includeCodeFormat and "code_format" or nil,
     },

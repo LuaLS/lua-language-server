@@ -24,6 +24,12 @@ lm:source_set 'lpeglabel' {
     },
 }
 
+lm:source_set 'luafilesystem' {
+    rootdir = '3rd',
+    includes = "luafilesystem/src",
+    sources = "luafilesystem/src/*.c",
+}
+
 lm:executable "lua-language-server" {
     deps = {
         "lpeglabel",

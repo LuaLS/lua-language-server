@@ -16,3 +16,6 @@
 [submodule "3rd/EmmyLuaCodeStyle"]
 	path = 3rd/EmmyLuaCodeStyle
 	url = https://github.com/CppCXY/EmmyLuaCodeStyle
+[submodule "3rd/luafilesystem"]
+	path = 3rd/luafilesystem
+	url = https://github.com/lunarmodules/luafilesystem

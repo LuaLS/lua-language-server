@@ -4,40 +4,47 @@ local signal = {
     version = 0.03,
 }
 
+
 ---@alias resty.signal.name
----| '"HUP"'
----| '"INT"'
----| '"QUIT"'
----| '"ILL"'
----| '"TRAP"'
----| '"ABRT"'
----| '"BUS"'
----| '"FPE"'
----| '"KILL"'
----| '"USR1"'
----| '"SEGV"'
----| '"USR2"'
----| '"PIPE"'
----| '"ALRM"'
----| '"TERM"'
----| '"CHLD"'
----| '"CONT"'
----| '"STOP"'
----| '"TSTP"'
----| '"TTIN"'
----| '"TTOU"'
----| '"URG"'
----| '"XCPU"'
----| '"XFSZ"'
----| '"VTALRM"'
----| '"PROF"'
----| '"WINCH"'
----| '"IO"'
----| '"PWR"'
----| '"EMT"'
----| '"SYS"'
----| '"INFO"'
----| '"NONE"' # The special signal name NONE is also supported, which is mapped to zero (0).
+---| "NONE"   # SIG_NONE
+---| "HUP"    # SIG_HUP
+---| "INT"    # SIG_INT
+---| "QUIT"   # SIG_QUIT
+---| "ILL"    # SIG_ILL
+---| "TRAP"   # SIG_TRAP
+---| "ABRT"   # SIG_ABRT
+---| "BUS"    # SIG_BUS
+---| "FPE"    # SIG_FPE
+---| "KILL"   # SIG_KILL
+---| "USR1"   # SIG_USR1
+---| "SEGV"   # SIG_SEGV
+---| "USR2"   # SIG_USR2
+---| "PIPE"   # SIG_PIPE
+---| "ALRM"   # SIG_ALRM
+---| "TERM"   # SIG_TERM
+---| "CHLD"   # SIG_CHLD
+---| "CONT"   # SIG_CONT
+---| "STOP"   # SIG_STOP
+---| "TSTP"   # SIG_TSTP
+---| "TTIN"   # SIG_TTIN
+---| "TTOU"   # SIG_TTOU
+---| "URG"    # SIG_URG
+---| "XCPU"   # SIG_XCPU
+---| "XFSZ"   # SIG_XFSZ
+---| "VTALRM" # SIG_VTALRM
+---| "PROF"   # SIG_PROF
+---| "WINCH"  # SIG_WINCH
+---| "IO"     # SIG_IO
+---| "PWR"    # SIG_PWR
+---| "EMT"    # SIG_EMT
+---| "SYS"    # SIG_SYS
+---| "INFO"   # SIG_INFO
+
+
+---@alias resty.signal.signal
+---| resty.signal.name
+---| integer
+---| string
 
 
 ---
@@ -48,18 +55,20 @@ local signal = {
 -- Signal numbers are also supported when specifying nonportable system-specific signals is desired.
 --
 ---@param pid number
----@param signal_name_or_num number|resty.signal.name
+---@param signal_name_or_num resty.signal.signal
 ---
 ---@return boolean ok
 ---@return string? error
 function signal.kill(pid, signal_name_or_num) end
 
+
 ---
 -- Maps the signal name specified to the system-specific signal number.
 -- Returns `nil` if the signal name is not known.
 --
----@param name resty.signal.name
----@return number|nil
+---@param name string|resty.signal.name
+---@return integer|nil
 function signal.signum(name) end
+
 
 return signal

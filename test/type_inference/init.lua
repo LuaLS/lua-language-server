@@ -4060,3 +4060,17 @@ local m, v
 
 local <?r?> = m * v
 ]]
+
+TEST 'A|B' [[
+---@class A
+---@class B
+
+---@type A|B
+local t
+
+if x then
+    ---@cast t A
+else
+    print(<?t?>)
+end
+]]

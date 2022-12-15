@@ -202,7 +202,7 @@ function mt:lookIntoChild(action, topNode, outNode)
             end
         end
     elseif action.type == 'function' then
-        self:lookIntoBlock(action, 0, topNode:copy())
+        self:lookIntoBlock(action, action.args.finish, topNode:copy())
     elseif action.type == 'unary' then
         if not action[1] then
             goto RETURN
@@ -312,12 +312,24 @@ function mt:lookIntoChild(action, topNode, outNode)
     or     action.type == 'repeat'
     or     action.type == 'for'
     or     action.type == 'do' then
-        self:lookIntoBlock(action, 0, topNode:copy())
-        local lastAssign = self:getLastAssign(action.start, action.finish)
-        if lastAssign then
-            local node = self:getNode(lastAssign)
-            if node then
-                topNode = node:copy()
+        if action[1] then
+            local actionStart
+            if action.type == 'loop' then
+                actionStart = action.keyword[4]
+            elseif action.type == 'in' then
+                actionStart = action.keyword[6]
+            elseif action.type == 'repeat'
+            or     action.type == 'for'
+            or     action.type == 'do' then
+                actionStart = action.keyword[2]
+            end
+            self:lookIntoBlock(action, actionStart, topNode:copy())
+            local lastAssign = self:getLastAssign(action.start, action.finish)
+            if lastAssign then
+                local node = self:getNode(lastAssign)
+                if node then
+                    topNode = node:copy()
+                end
             end
         end
     elseif action.type == 'while' then
@@ -328,12 +340,14 @@ function mt:lookIntoChild(action, topNode, outNode)
             blockNode = topNode:copy()
             mainNode  = topNode:copy()
         end
-        self:lookIntoBlock(action, 0, blockNode:copy())
-        local lastAssign = self:getLastAssign(action.start, action.finish)
-        if lastAssign then
-            local node = self:getNode(lastAssign)
-            if node then
-                topNode = mainNode:merge(node)
+        if action[1] then
+            self:lookIntoBlock(action, action.keyword[4], blockNode:copy())
+            local lastAssign = self:getLastAssign(action.start, action.finish)
+            if lastAssign then
+                local node = self:getNode(lastAssign)
+                if node then
+                    topNode = mainNode:merge(node)
+                end
             end
         end
         if action.filter then
@@ -355,24 +369,35 @@ function mt:lookIntoChild(action, topNode, outNode)
                 hasElse = true
                 mainNode:clear()
             end
-            self:lookIntoBlock(subBlock, 0, blockNode:copy())
-            local neverReturn = subBlock.hasReturn
-                            or  subBlock.hasGoTo
-                            or  subBlock.hasBreak
-                            or  subBlock.hasError
-            if not neverReturn then
-                local ok
-                local lastAssign = self:getLastAssign(subBlock.start, subBlock.finish)
-                if lastAssign then
-                    local node = self:getNode(lastAssign)
-                    if node then
-                        blockNodes[#blockNodes+1] = node
-                        ok = true
+            local mergedNode
+            if subBlock[1] then
+                local actionStart
+                if subBlock.type == 'ifblock'
+                or subBlock.type == 'elseif' then
+                    actionStart = subBlock.keyword[4]
+                else
+                    actionStart = subBlock.keyword[2]
+                end
+                self:lookIntoBlock(subBlock, actionStart, blockNode:copy())
+                local neverReturn = subBlock.hasReturn
+                                or  subBlock.hasGoTo
+                                or  subBlock.hasBreak
+                                or  subBlock.hasError
+                if neverReturn then
+                    mergedNode = true
+                else
+                    local lastAssign = self:getLastAssign(subBlock.start, subBlock.finish)
+                    if lastAssign then
+                        local node = self:getNode(lastAssign)
+                        if node then
+                            blockNodes[#blockNodes+1] = node
+                            mergedNode = true
+                        end
                     end
                 end
-                if not ok then
-                    blockNodes[#blockNodes+1] = blockNode
-                end
+            end
+            if not mergedNode then
+                blockNodes[#blockNodes+1] = blockNode
             end
         end
         if not hasElse and not topNode:hasKnownType() then

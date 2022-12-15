@@ -1,6 +1,7 @@
 ---@class vm
 local vm        = require 'vm.vm'
 local guide     = require 'parser.guide'
+local util      = require 'utility'
 
 ---@class parser.object
 ---@field package _tracer? vm.tracer
@@ -102,106 +103,120 @@ function mt:getLastAssign(block, pos)
     return assign
 end
 
----@param filter parser.object
----@param node vm.node?
----@return vm.node
-function mt:narrowByFilter(filter, node)
+---@param source parser.object
+---@return vm.node?
+function mt:narrow(source)
+    local node = self:getNode(source)
     if not node then
-        node = vm.createNode()
+        return nil
     end
-    if filter.type == 'filter' then
-        node = self:narrowByFilter(filter.exp, node)
+
+    if source.type == 'getlocal' then
+        node = node:copy():setTruthy()
         return node
     end
-    if filter.type == 'getlocal' then
-        if filter.node == self.source then
-            node = node:copy()
-            node:removeOptional()
-        end
-        return node
-    end
-    return node
+
+    return nil
 end
 
 ---@param source parser.object
 ---@return vm.node?
 function mt:calcNode(source)
     if source.type == 'getlocal' then
-        return nil
-    end
-    if source.type == 'local' then
-        if source ~= self.source then
+        if source.node ~= self.source then
             return nil
         end
+        local block = guide.getParentBlock(source)
+        if not block then
+            return nil
+        end
+        local lastAssign = self:getLastAssign(block, source.start)
+        if lastAssign then
+            local node = self:getNode(lastAssign)
+            return node
+        end
+        local parent = source.parent
+        while true do
+            if parent.type == 'filter'
+            or parent.type == 'unary'
+            or parent.type == 'ifblock'
+            or parent.type == 'elseifblock' then
+                parent = parent.parent
+            else
+                break
+            end
+        end
+        local node = self:getNode(parent)
+        return node
     end
     if source.type == 'setlocal' then
         if source.node ~= self.source then
             return nil
         end
-    end
-    if guide.isSet(source) then
         local node = vm.compileNode(source)
+        return node
+    end
+    if source.type == 'local'
+    or source.type == 'self' then
+        if source ~= self.source then
+            return nil
+        end
+        local node = vm.compileNode(source)
+        return node
+    end
+    if source.type == 'filter' then
+        local node = self:narrow(source.exp)
         return node
     end
     if source.type == 'do' then
         local lastAssign = self:getLastAssign(source, source.finish)
-        return self:getNode(lastAssign or source.parent)
+        local node = self:getNode(lastAssign or source.parent)
+        return node
     end
     if source.type == 'ifblock' then
-        local currentNode  = self:getNode(source.parent)
-        local narrowedNode = self:narrowByFilter(source.filter, currentNode)
-        return narrowedNode
-    end
-    if source.type == 'filter' then
-        local parent = source.parent
-        ---@type parser.object
-        local outBlock
-        if parent.type == 'ifblock' then
-            outBlock = parent.parent.parent
-            local lastAssign = self:getLastAssign(outBlock, parent.start)
-            return self:getNode(lastAssign or source.parent)
-        elseif parent.type == 'elseifblock' then
-            outBlock = parent.parent.parent
-            local lastAssign = self:getLastAssign(outBlock, parent.start)
-            return self:getNode(lastAssign or source.parent)
-        elseif parent.type == 'while' then
-            outBlock = parent.parent
-            local lastAssign = self:getLastAssign(outBlock, parent.start)
-            return self:getNode(lastAssign or source.parent)
-        elseif parent.type == 'repeat' then
-            outBlock = parent.parent
-            local lastAssign = self:getLastAssign(outBlock, parent.start)
-            return self:getNode(lastAssign or source.parent)
+        local filter = source.filter
+        if filter then
+            local node = self:getNode(filter)
+            return node
         end
-        assert(outBlock, parent.type)
     end
-    return nil
+    if source.type == 'unary' then
+        if source.op.type == 'not' then
+            local node = self:getNode(source[1])
+            if node then
+                node = node:copy()
+                node:setFalsy()
+                return node
+            end
+        end
+    end
+
+    local block = guide.getParentBlock(source)
+    if not block then
+        return nil
+    end
+    local lastAssign = self:getLastAssign(block, source.start)
+    local node = self:getNode(lastAssign or source.parent)
+    return node
 end
 
 ---@param source parser.object
 ---@return vm.node?
 function mt:getNode(source)
-    if self.nodes[source] ~= nil then
-        return self.nodes[source] or nil
-    end
-    local parentBlock = guide.getParentBlock(source)
-    if not parentBlock then
-        self.nodes[source] = false
-        return nil
+    local cache = self.nodes[source]
+    if cache ~= nil then
+        return cache or nil
     end
     if source == self.main then
         self.nodes[source] = false
         return nil
     end
+    self.nodes[source] = false
     local node = self:calcNode(source)
     if node then
         self.nodes[source] = node
-        return node
     end
-    local lastAssign = self:getLastAssign(parentBlock, source.start)
-    local parentNode = self:getNode(lastAssign or source.parent)
-    self.nodes[source] = parentNode or false
-    return parentNode
+    return node
 end
 
 ---@param source parser.object

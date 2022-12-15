@@ -35,11 +35,12 @@ end
 ---@param mark table
 function mt:collectBlock(obj, mark)
     while true do
-        obj = obj.parent
-        if mark[obj] then
+        local block = guide.getParentBlock(obj)
+        if not block then
             return
         end
-        if not guide.isBlockType(obj) then
+        obj = block
+        if mark[obj] then
             return
         end
         if obj == self.main then
@@ -61,6 +62,9 @@ function mt:collectLocal()
     for _, obj in ipairs(self.source.ref) do
         if obj.type == 'setlocal' then
             self.assigns[#self.assigns+1] = obj
+            self:collectBlock(obj, mark)
+        end
+        if obj.type == 'getlocal' then
             self:collectBlock(obj, mark)
         end
     end
@@ -112,10 +116,31 @@ function mt:narrow(source)
     end
 
     if source.type == 'getlocal' then
-        node = node:copy():setTruthy()
-        return node
+        node = node:copy()
+        node:setTruthy()
     end
 
+    return node
+end
+
+---@param source parser.object
+---@return vm.node?
+function mt:calcGet(source)
+    local parent = source.parent
+    if parent.type == 'filter' then
+        return self:calcGet(parent)
+    end
+    if parent.type == 'ifblock' then
+        local parentBlock = guide.getParentBlock(parent.parent)
+        if parentBlock then
+            local lastAssign = self:getLastAssign(parentBlock, parent.start)
+            local node       = self:getNode(lastAssign or parentBlock)
+            return node
+        end
+    end
+    if parent.type == 'unary' then
+        return self:calcGet(parent)
+    end
     return nil
 end
 
@@ -135,19 +160,10 @@ function mt:calcNode(source)
             local node = self:getNode(lastAssign)
             return node
         end
-        local parent = source.parent
-        while true do
-            if parent.type == 'filter'
-            or parent.type == 'unary'
-            or parent.type == 'ifblock'
-            or parent.type == 'elseifblock' then
-                parent = parent.parent
-            else
-                break
-            end
+        local node = self:calcGet(source)
+        if node then
+            return node
         end
-        local node = self:getNode(parent)
-        return node
     end
     if source.type == 'setlocal' then
         if source.node ~= self.source then
@@ -178,6 +194,37 @@ function mt:calcNode(source)
         if filter then
             local node = self:getNode(filter)
             return node
+        end
+    end
+    if source.type == 'if' then
+        local parentBlock = guide.getParentBlock(source)
+        if not parentBlock then
+            return nil
+        end
+        local lastAssign = self:getLastAssign(parentBlock, source.start)
+        local outNode    = self:getNode(lastAssign or source.parent) or vm.createNode()
+        for _, block in ipairs(source) do
+            local blockNode = self:getNode(block)
+            if not blockNode then
+                goto CONTINUE
+            end
+            if block.hasReturn
+            or block.hasError
+            or block.hasBreak then
+                outNode:removeNode(blockNode)
+                goto CONTINUE
+            end
+            local blockAssign = self:getLastAssign(block, block.finish)
+            if not blockAssign then
+                goto CONTINUE
+            end
+            local blockAssignNode = self:getNode(blockAssign)
+            if not blockAssignNode then
+                goto CONTINUE
+            end
+            outNode:removeNode(blockNode)
+            outNode:merge(blockAssignNode)
+            ::CONTINUE::
         end
     end
     if source.type == 'unary' then

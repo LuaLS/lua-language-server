@@ -4074,3 +4074,9 @@ else
     print(<?t?>)
 end
 ]]
+
+TEST 'function' [[
+local function x()
+    print(<?x?>)
+end
+]]

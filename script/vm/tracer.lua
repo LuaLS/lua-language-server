@@ -454,13 +454,13 @@ end
 function mt:lookIntoBlock(block, start, node)
     self:resetCastsIndex(start)
     for _, action in ipairs(block) do
-        if action.start < start then
+        if (action.effect or action.start) < start then
             goto CONTINUE
         end
         if self.careMap[action] then
             node = self:lookIntoChild(action, node)
         end
-        if self.assignMap[action] then
+        if action.finish > start and self.assignMap[action] then
             break
         end
         ::CONTINUE::
@@ -472,7 +472,7 @@ function mt:calcNode(source)
     if source.type == 'getlocal' then
         local lastAssign = self:getLastAssign(0, source.start)
         if not lastAssign then
-            return
+            lastAssign = source.node
         end
         self:calcNode(lastAssign)
         return

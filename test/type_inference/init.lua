@@ -1871,6 +1871,15 @@ if xxx and x then
 end
 ]]
 
+TEST 'unknown' [[
+---@type integer?
+local x
+
+if not x and x then
+    print(<?x?>)
+end
+]]
+
 TEST 'integer' [[
 ---@type integer?
 local x

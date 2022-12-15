@@ -972,7 +972,7 @@ local function compileLocal(source)
             vm.setNode(source, vm.compileNode(source.value))
         end
     end
-    if  not hasMarkValue
+    if  not hasMarkDoc
     and not hasMarkValue
     and source.ref then
         local firstSet

@@ -201,8 +201,6 @@ function mt:lookIntoChild(action, topNode, outNode)
                 outNode = outNode:copy():setFalsy()
             end
         end
-    elseif action.type == 'filter' then
-        return self:lookIntoChild(action.exp, topNode, outNode)
     elseif action.type == 'function' then
         self:lookIntoBlock(action, 0, topNode:copy())
     elseif action.type == 'unary' then

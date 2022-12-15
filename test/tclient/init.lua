@@ -11,7 +11,7 @@ require 'tclient.tests.jump-source'
 require 'tclient.tests.load-relative-library'
 require 'tclient.tests.hover-set-local'
 require 'tclient.tests.same-prefix'
---require 'tclient.tests.recursive-runner'
+require 'tclient.tests.recursive-runner'
 require 'tclient.tests.modify-luarc'
 
 require 'tclient.tests.performance-jass-common'

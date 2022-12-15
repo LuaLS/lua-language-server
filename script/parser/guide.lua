@@ -139,8 +139,7 @@ local childMap = {
     ['getfield']    = {'node', 'field'},
     ['list']        = {'#'},
     ['binary']      = {1, 2},
-    ['unary']       = { 1 },
-    ['filter']      = {'exp'},
+    ['unary']       = {1},
 
     ['doc']                = {'#'},
     ['doc.class']          = {'class', '#extends', '#signs', 'comment'},

@@ -1180,8 +1180,20 @@ local compilerSwitch = util.switch()
         if bindDocs(source) then
             return
         end
+        local locNode = vm.compileNode(source.node)
+        if not source.value then
+            vm.setNode(source, locNode)
+            return
+        end
         local valueNode = vm.compileNode(source.value)
         vm.setNode(source, valueNode)
+        if  locNode:getData 'hasDefined'
+        and guide.isLiteral(source.value) then
+            vm.setNode(source, locNode)
+            vm.getNode(source):narrow(guide.getUri(source), source.value.type)
+        else
+            vm.setNode(source, valueNode)
+        end
     end)
     : case 'getlocal'
     ---@async

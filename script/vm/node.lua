@@ -188,6 +188,9 @@ end
 
 ---@return vm.node
 function mt:setFalsy()
+    if self.optional == false then
+        self.optional = nil
+    end
     local hasBoolean
     for index = #self, 1, -1 do
         local c = self[index]
@@ -225,10 +228,6 @@ function mt:setFalsy()
     end
     if hasBoolean then
         self:merge(vm.declareGlobal('type', 'false'))
-    end
-    if self.optional then
-        self.optional = nil
-        self:merge(vm.declareGlobal('type', 'nil'))
     end
     return self
 end

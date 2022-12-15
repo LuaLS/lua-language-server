@@ -13,9 +13,11 @@ local util      = require 'utility'
 ---@field assignMap table<parser.object, true>
 ---@field careMap   table<parser.object, true>
 ---@field mark      table<parser.object, true>
+---@field casts     parser.object[]
 ---@field nodes     table<parser.object, vm.node|false>
 ---@field main      parser.object
 ---@field uri       uri
+---@field castIndex integer?
 local mt = {}
 mt.__index = mt
 
@@ -79,25 +81,27 @@ function mt:collectLocal()
             self.assigns[#self.assigns+1] = obj
             self.assignMap[obj] = true
             self:collectCare(obj)
+            if obj.finish > finishPos then
+                finishPos = obj.finish
+            end
         end
         if obj.type == 'getlocal' then
             self:collectCare(obj)
+            if obj.finish > finishPos then
+                finishPos = obj.finish
+            end
         end
     end
 
     local casts = self:getCasts()
     for _, cast in ipairs(casts) do
         if  cast.loc[1] == self.source[1]
-        and cast.start > startPos
+        and cast.start  > startPos
         and cast.finish < finishPos
         and guide.getLocal(self.source, self.source[1], cast.start) == self.source then
-            self.assigns[#self.assigns+1] = cast
+            self.casts[#self.casts+1] = cast
         end
     end
-
-    table.sort(self.assigns, function (a, b)
-        return a.start < b.start
-    end)
 end
 
 ---@param start  integer
@@ -109,7 +113,7 @@ function mt:getLastAssign(start, finish)
         if obj.start < start then
             goto CONTINUE
         end
-        if obj.start >= finish then
+        if (obj.range or obj.start) >= finish then
             break
         end
         local objBlock = guide.getParentBlock(obj)
@@ -125,6 +129,58 @@ function mt:getLastAssign(start, finish)
     return assign
 end
 
+---@param pos integer
+function mt:resetCastsIndex(pos)
+    for i = 1, #self.casts do
+        local cast = self.casts[i]
+        if cast.start > pos then
+            self.castIndex = i
+            return
+        end
+    end
+    self.castIndex = nil
+end
+
+---@param pos integer
+---@param node vm.node
+---@return vm.node
+function mt:fastWardCasts(pos, node)
+    if not self.castIndex then
+        return node
+    end
+    for i = self.castIndex, #self.casts do
+        local action = self.casts[i]
+        if action.start > pos then
+            return node
+        end
+        node = node:copy()
+        for _, cast in ipairs(action.casts) do
+            if     cast.mode == '+' then
+                if cast.optional then
+                    node:addOptional()
+                end
+                if cast.extends then
+                    node:merge(vm.compileNode(cast.extends))
+                end
+            elseif cast.mode == '-' then
+                if cast.optional then
+                    node:removeOptional()
+                end
+                if cast.extends then
+                    node:removeNode(vm.compileNode(cast.extends))
+                end
+            else
+                if cast.extends then
+                    node:clear()
+                    node:merge(vm.compileNode(cast.extends))
+                end
+            end
+        end
+    end
+    self.castIndex = self.castIndex + 1
+    return node
+end
+
 ---@param action   parser.object
 ---@param topNode  vm.node
 ---@param outNode? vm.node
@@ -136,6 +192,7 @@ function mt:lookIntoChild(action, topNode, outNode)
         return topNode, outNode or topNode
     end
     self.mark[action] = true
+    topNode = self:fastWardCasts(action.start, topNode)
     if action.type == 'getlocal' then
         if action.node == self.source then
             self.nodes[action] = topNode
@@ -306,12 +363,17 @@ function mt:lookIntoChild(action, topNode, outNode)
                             or  subBlock.hasBreak
                             or  subBlock.hasError
             if not neverReturn then
+                local ok
                 local lastAssign = self:getLastAssign(subBlock.start, subBlock.finish)
                 if lastAssign then
                     local node = self:getNode(lastAssign)
                     if node then
                         blockNodes[#blockNodes+1] = node
+                        ok = true
                     end
+                end
+                if not ok then
+                    blockNodes[#blockNodes+1] = blockNode
                 end
             end
         end
@@ -367,6 +429,7 @@ end
 ---@param start integer
 ---@param node  vm.node
 function mt:lookIntoBlock(block, start, node)
+    self:resetCastsIndex(start)
     for _, action in ipairs(block) do
         if action.start < start then
             goto CONTINUE
@@ -436,6 +499,7 @@ local function createTracer(source)
         assignMap = {},
         careMap   = {},
         mark      = {},
+        casts     = {},
         nodes     = {},
         main      = main,
         uri       = guide.getUri(source),

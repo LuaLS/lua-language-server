@@ -972,12 +972,25 @@ local function compileLocal(source)
             vm.setNode(source, vm.compileNode(source.value))
         end
     end
-    if not hasMarkValue and not hasMarkValue then
-        local firstRef = source.ref and source.ref[1]
-        if  firstRef
-        and guide.isSet(firstRef)
-        and guide.getBlock(firstRef) == guide.getBlock(source) then
-            vm.setNode(source, vm.compileNode(firstRef))
+    if  not hasMarkValue
+    and not hasMarkValue
+    and source.ref then
+        local firstSet
+        local myFunction = guide.getParentFunction(source)
+        for _, ref in ipairs(source.ref) do
+            if ref.type == 'setlocal' then
+                firstSet = ref
+                break
+            end
+            if ref.type == 'getlocal' then
+                if guide.getParentFunction(ref) == myFunction then
+                    break
+                end
+            end
+        end
+        if  firstSet
+        and guide.getBlock(firstSet) == guide.getBlock(source) then
+            vm.setNode(source, vm.compileNode(firstSet))
         end
     end
     -- function x.y(self, ...) --> function x:y(...)
@@ -1164,6 +1177,9 @@ local compilerSwitch = util.switch()
     end)
     : case 'setlocal'
     : call(function (source)
+        if bindDocs(source) then
+            return
+        end
         local valueNode = vm.compileNode(source.value)
         vm.setNode(source, valueNode)
     end)

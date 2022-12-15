@@ -1637,7 +1637,7 @@ function A()
 end
 ]]
 
-TEST 'unknown' [[
+TEST 'string' [[
 local x
 
 function A()
@@ -2317,7 +2317,7 @@ local x
 print(<?x?>)
 ]]
 
-TEST 'unknown?' [[
+TEST 'nil' [[
 ---@type string?
 local x
 
@@ -2391,7 +2391,7 @@ end
 print(<?t?>)
 ]]
 
-TEST 'unknown?' [[
+TEST 'nil' [[
 ---@type integer?
 local t
 
@@ -3200,10 +3200,30 @@ local function f() end
 local x, y, <?z?> = 1, 2, f()
 ]]
 
-TEST 'function' [[
+TEST 'unknown' [[
 local f
 
 print(<?f?>)
+
+function f() end
+]]
+
+TEST 'unknown' [[
+local f
+
+do
+    print(<?f?>)
+end
+
+function f() end
+]]
+
+TEST 'function' [[
+local f
+
+function A()
+    print(<?f?>)
+end
 
 function f() end
 ]]

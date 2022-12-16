@@ -134,7 +134,6 @@ m.register 'initialize' {
 m.register 'initialized'{
     ---@async
     function (params)
-        files.init()
         local _ <close> = progress.create(workspace.getFirstScope().uri, lang.script.WINDOW_INITIALIZING, 0.5)
         m.updateConfig()
         local registrations = {}
@@ -277,7 +276,7 @@ m.register 'textDocument/didOpen' {
         end)
         files.open(uri)
         workspace.awaitReady(uri)
-        files.getState(uri)
+        files.compileState(uri)
     end
 }
 

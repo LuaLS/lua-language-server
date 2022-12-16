@@ -18,7 +18,7 @@ return function (uri, callback)
         end
         await.delay()
         local locNode = vm.compileNode(loc)
-        if not locNode:getData 'hasDefined' then
+        if not locNode.hasDefined then
             return
         end
         for _, ref in ipairs(loc.ref) do

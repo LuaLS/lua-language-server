@@ -20,7 +20,8 @@ mt.id         = 0
 mt.type       = 'vm.node'
 mt.optional   = nil
 mt.data       = nil
-mt.resolved   = nil
+mt.hasDefined = nil
+mt.originNode = nil
 
 ---@param node vm.node | vm.node.object
 ---@return vm.node
@@ -68,21 +69,6 @@ end
 ---@return vm.node.object?
 function mt:get(n)
     return self[n]
-end
-
-function mt:setData(k, v)
-    if not self.data then
-        self.data = {}
-    end
-    self.data[k] = v
-end
-
----@return any
-function mt:getData(k)
-    if not self.data then
-        return nil
-    end
-    return self.data[k]
 end
 
 function mt:addOptional()

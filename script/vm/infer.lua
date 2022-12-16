@@ -432,10 +432,14 @@ function mt:view(uri, default)
     end
 
     if self.node:isOptional() then
-        if max > 1 then
-            view = '(' .. view .. ')?'
+        if #array == 0 then
+            view = 'nil'
         else
-            view = view .. '?'
+            if max > 1 then
+                view = '(' .. view .. ')?'
+            else
+                view = view .. '?'
+            end
         end
     end
 

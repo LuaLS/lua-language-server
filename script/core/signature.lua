@@ -134,7 +134,7 @@ local function makeSignatures(text, call, pos)
     local signs = {}
     local node = vm.compileNode(func)
     ---@type vm.node
-    node = node:getData 'originNode' or node
+    node = node.originNode or node
     local mark = {}
     for src in node:eachObject() do
         if (src.type == 'function' and not vm.isVarargFunctionWithOverloads(src))

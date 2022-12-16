@@ -22,7 +22,7 @@ return function (uri, callback)
             local loc = defs[1]
             if loc then
                 local defNode = vm.compileNode(loc)
-                if defNode:getData 'hasDefined' then
+                if defNode.hasDefined then
                     for _, cast in ipairs(doc.casts) do
                         if not cast.mode and cast.extends then
                             local refNode = vm.compileNode(cast.extends)

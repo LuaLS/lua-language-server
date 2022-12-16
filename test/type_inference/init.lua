@@ -1590,7 +1590,7 @@ AAA = {}
 local <?x?> = AAA()
 ]]
 
-TEST 'string|integer' [[
+TEST 'string' [[
 local <?x?>
 x = '1'
 x = 1
@@ -1637,7 +1637,7 @@ function A()
 end
 ]]
 
-TEST 'unknown' [[
+TEST 'string' [[
 local x
 
 function A()
@@ -1758,6 +1758,26 @@ x = '1'
 x = 1
 ]]
 
+TEST 'integer' [[
+local x
+x = true
+do
+    x = 1
+end
+print(<?x?>)
+]]
+
+TEST 'boolean' [[
+local x
+x = true
+function XX()
+    do
+        x = 1
+    end
+end
+print(<?x?>)
+]]
+
 TEST 'integer?' [[
 ---@type integer?
 local <?x?>
@@ -1809,6 +1829,17 @@ end
 print(<?x?>)
 ]]
 
+TEST 'nil' [[
+---@type integer?
+local x
+
+if not x then
+    print(<?x?>)
+end
+
+print(x)
+]]
+
 TEST 'integer' [[
 ---@type integer?
 local x
@@ -1836,6 +1867,15 @@ TEST 'integer' [[
 local x
 
 if xxx and x then
+    print(<?x?>)
+end
+]]
+
+TEST 'unknown' [[
+---@type integer?
+local x
+
+if not x and x then
     print(<?x?>)
 end
 ]]
@@ -2277,7 +2317,7 @@ local x
 print(<?x?>)
 ]]
 
-TEST 'unknown?' [[
+TEST 'nil' [[
 ---@type string?
 local x
 
@@ -2351,7 +2391,7 @@ end
 print(<?t?>)
 ]]
 
-TEST 'unknown?' [[
+TEST 'nil' [[
 ---@type integer?
 local t
 
@@ -3160,10 +3200,30 @@ local function f() end
 local x, y, <?z?> = 1, 2, f()
 ]]
 
-TEST 'function' [[
+TEST 'unknown' [[
 local f
 
 print(<?f?>)
+
+function f() end
+]]
+
+TEST 'unknown' [[
+local f
+
+do
+    print(<?f?>)
+end
+
+function f() end
+]]
+
+TEST 'function' [[
+local f
+
+function A()
+    print(<?f?>)
+end
 
 function f() end
 ]]
@@ -3999,4 +4059,92 @@ TEST 'mat4' [[
 local m, v
 
 local <?r?> = m * v
+]]
+
+TEST 'A|B' [[
+---@class A
+---@class B
+
+---@type A|B
+local t
+
+if x then
+    ---@cast t A
+else
+    print(<?t?>)
+end
+]]
+
+TEST 'A|B' [[
+---@class A
+---@class B
+
+---@type A|B
+local t
+
+if x then
+    ---@cast t A
+elseif <?t?> then
+end
+]]
+
+TEST 'A|B' [[
+---@class A
+---@class B
+
+---@type A|B
+local t
+
+if x then
+    ---@cast t A
+    print(t)
+elseif <?t?> then
+end
+]]
+
+TEST 'A|B' [[
+---@class A
+---@class B
+
+---@type A|B
+local t
+
+if x then
+    ---@cast t A
+    print(t)
+elseif <?t?> then
+    ---@cast t A
+    print(t)
+end
+]]
+
+TEST 'function' [[
+local function x()
+    print(<?x?>)
+end
+]]
+
+TEST 'number' [[
+---@type number?
+local x
+
+do
+    if not x then
+        return
+    end
+end
+
+print(<?x?>)
+]]
+
+TEST 'number' [[
+---@type number[]
+local xs
+
+---@type fun(x): number?
+local f
+
+for _, <?x?> in ipairs(xs) do
+    x = f(x)
+end
 ]]

@@ -1,12 +1,17 @@
 ---@meta
 
 -- version: 11.4
-
+---
+---[Open in Browser](https://love2d.org/wiki/love)
+---
 ---@class love
 love = {}
 
 ---
 ---Gets the current running version of LÖVE.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.getVersion)
 ---
 ---@return number major # The major version of LÖVE, i.e. 0 for version 0.9.1.
 ---@return number minor # The minor version of LÖVE, i.e. 9 for version 0.9.1.
@@ -19,11 +24,17 @@ function love.getVersion() end
 ---
 ---When deprecation output is enabled, the first use of a formally deprecated LÖVE API will show a message at the bottom of the screen for a short time, and print the message to the console.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.hasDeprecationOutput)
+---
 ---@return boolean enabled # Whether deprecation output is enabled.
 function love.hasDeprecationOutput() end
 
 ---
 ---Gets whether the given version is compatible with the current running version of LÖVE.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love.isVersionCompatible)
 ---
 ---@overload fun(major: number, minor: number, revision: number):boolean
 ---@param version string # The version to check (for example '11.3' or '0.10.2').
@@ -35,17 +46,26 @@ function love.isVersionCompatible(version) end
 ---
 ---When deprecation output is enabled, the first use of a formally deprecated LÖVE API will show a message at the bottom of the screen for a short time, and print the message to the console.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love.setDeprecationOutput)
+---
 ---@param enable boolean # Whether to enable or disable deprecation output.
 function love.setDeprecationOutput(enable) end
 
 ---
 ---The superclass of all data.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/love)
+---
 ---@class love.Data: love.Object
 local Data = {}
 
 ---
 ---Creates a new copy of the Data object.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Data:clone)
 ---
 ---@return love.Data clone # The new copy.
 function Data:clone() end
@@ -55,11 +75,17 @@ function Data:clone() end
 ---
 ---This function should be preferred instead of Data:getPointer because the latter uses light userdata which can't store more all possible memory addresses on some new ARM64 architectures, when LuaJIT is used.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Data:getFFIPointer)
+---
 ---@return ffi.cdata* pointer # A raw void* pointer to the Data, or nil if FFI is unavailable.
 function Data:getFFIPointer() end
 
 ---
 ---Gets a pointer to the Data. Can be used with libraries such as LuaJIT's FFI.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Data:getPointer)
 ---
 ---@return lightuserdata pointer # A raw pointer to the Data.
 function Data:getPointer() end
@@ -67,17 +93,26 @@ function Data:getPointer() end
 ---
 ---Gets the Data's size in bytes.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Data:getSize)
+---
 ---@return number size # The size of the Data in bytes.
 function Data:getSize() end
 
 ---
 ---Gets the full Data as a string.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Data:getString)
+---
 ---@return string data # The raw data.
 function Data:getString() end
 
 ---
 ---The superclass of all LÖVE types.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/love)
 ---
 ---@class love.Object
 local Object = {}
@@ -87,17 +122,26 @@ local Object = {}
 ---
 ---This method can be used to immediately clean up resources without waiting for Lua's garbage collector.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Object:release)
+---
 ---@return boolean success # True if the object was released by this call, false if it had been previously released.
 function Object:release() end
 
 ---
 ---Gets the type of the object as a string.
 ---
+---
+---[Open in Browser](https://love2d.org/wiki/Object:type)
+---
 ---@return string type # The type as a string.
 function Object:type() end
 
 ---
 ---Checks whether an object is of a certain type. If the object has the type with the specified name in its hierarchy, this function will return true.
+---
+---
+---[Open in Browser](https://love2d.org/wiki/Object:typeOf)
 ---
 ---@param name string # The name of the type to check for.
 ---@return boolean b # True if the object is of the specified type, false otherwise.

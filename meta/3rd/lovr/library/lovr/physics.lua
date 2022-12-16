@@ -103,6 +103,19 @@ function lovr.physics.newDistanceJoint(colliderA, colliderB, x1, y1, z1, x2, y2,
 function lovr.physics.newHingeJoint(colliderA, colliderB, x, y, z, ax, ay, az) end
 
 ---
+---Creates a new MeshShape.
+---
+---
+---### NOTE:
+---A Shape can be attached to a Collider using `Collider:addShape`.
+---
+---@overload fun(model: lovr.Model):lovr.MeshShape
+---@param vertices table # The table of vertices in the mesh.  Each vertex is a table with 3 numbers.
+---@param indices table # A table of triangle indices representing how the vertices are connected in the Mesh.
+---@return lovr.MeshShape mesh # The new MeshShape.
+function lovr.physics.newMeshShape(vertices, indices) end
+
+---
 ---Creates a new SliderJoint.
 ---
 ---
@@ -127,6 +140,19 @@ function lovr.physics.newSliderJoint(colliderA, colliderB, ax, ay, az) end
 ---@param radius? number # The radius of the sphere, in meters.
 ---@return lovr.SphereShape sphere # The new SphereShape.
 function lovr.physics.newSphereShape(radius) end
+
+---
+---Creates a new TerrainShape.
+---
+---
+---### NOTE:
+---A Shape can be attached to a Collider using `Collider:addShape`. For immobile terrain use the `Collider:setKinematic`.
+---
+---@overload fun(scale: number, heightmap: lovr.Image, stretch?: number):lovr.TerrainShape
+---@overload fun(scale: number, callback: function, samples?: number):lovr.TerrainShape
+---@param scale number # The width and depth of the terrain, in meters.
+---@return lovr.TerrainShape terrain # The new TerrainShape.
+function lovr.physics.newTerrainShape(scale) end
 
 ---
 ---Creates a new physics World, which tracks the overall physics simulation, holds collider objects, and resolves collisions between them.
@@ -1033,6 +1059,12 @@ function Joint:setEnabled(enabled) end
 function Joint:setUserData(data) end
 
 ---
+---A type of `Shape` that can be used for triangle meshes.
+---
+---@class lovr.MeshShape
+local MeshShape = {}
+
+---
 ---A Shape is a physics object that can be attached to colliders to define their shape.
 ---
 ---@class lovr.Shape
@@ -1266,6 +1298,12 @@ function SphereShape:getRadius() end
 ---
 ---@param radius number # The radius of the sphere, in meters.
 function SphereShape:setRadius(radius) end
+
+---
+---A type of `Shape` that can be used for terrains and irregular surfaces.
+---
+---@class lovr.TerrainShape
+local TerrainShape = {}
 
 ---
 ---A World is an object that holds the colliders, joints, and shapes in a physics simulation.

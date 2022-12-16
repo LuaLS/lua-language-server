@@ -310,8 +310,8 @@ function lovr.filesystem.unmount(path) end
 ---
 ---If the file already has data in it, it will be replaced with the new content.
 ---
----@overload fun(filename: string, blob: lovr.Blob):number
+---@overload fun(filename: string, blob: lovr.Blob):boolean
 ---@param filename string # The file to write to.
 ---@param content string # A string to write to the file.
----@return number bytes # The number of bytes written.
+---@return boolean success # Whether the write was successful.
 function lovr.filesystem.write(filename, content) end

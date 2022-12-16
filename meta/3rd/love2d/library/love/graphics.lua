@@ -731,13 +731,13 @@ function love.graphics.newFont(filename) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.graphics.newImage)
 ---
----@overload fun(fileData: love.FileData, flags?: table):love.Image
----@overload fun(imageData: love.ImageData, flags?: table):love.Image
----@overload fun(compressedImageData: love.CompressedImageData, flags?: table):love.Image
+---@overload fun(fileData: love.FileData, settings?: table):love.Image
+---@overload fun(imageData: love.ImageData, settings?: table):love.Image
+---@overload fun(compressedImageData: love.CompressedImageData, settings?: table):love.Image
 ---@param filename string # The filepath to the image file.
----@param flags? {dpiscale: number, linear: boolean, mipmaps: boolean} # A table containing the following fields:
+---@param settings? {dpiscale: number, linear: boolean, mipmaps: boolean} # A table containing the following fields:
 ---@return love.Image image # A new Image object which can be drawn on screen.
-function love.graphics.newImage(filename, flags) end
+function love.graphics.newImage(filename, settings) end
 
 ---
 ---Creates a new specifically formatted image.
@@ -1074,8 +1074,7 @@ function love.graphics.scale(sx, sy) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.graphics.setBackgroundColor)
 ---
----@overload fun()
----@overload fun()
+---@overload fun(rgba: table)
 ---@param red number # The red component (0-1).
 ---@param green number # The green component (0-1).
 ---@param blue number # The blue component (0-1).
@@ -2243,18 +2242,19 @@ function ParticleSystem:setBufferSize(size) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setColors)
 ---
+---@overload fun(self: love.ParticleSystem, rgba1: table, rgba2: table, rgba8: table)
 ---@param r1 number # First color, red component (0-1).
 ---@param g1 number # First color, green component (0-1).
 ---@param b1 number # First color, blue component (0-1).
----@param a1 number # First color, alpha component (0-1).
----@param r2 number # Second color, red component (0-1).
----@param g2 number # Second color, green component (0-1).
----@param b2 number # Second color, blue component (0-1).
----@param a2 number # Second color, alpha component (0-1).
----@param r8 number # Eighth color, red component (0-1).
----@param g8 number # Eighth color, green component (0-1).
----@param b8 number # Eighth color, blue component (0-1).
----@param a8 number # Eighth color, alpha component (0-1).
+---@param a1? number # First color, alpha component (0-1).
+---@param r2? number # Second color, red component (0-1).
+---@param g2? number # Second color, green component (0-1).
+---@param b2? number # Second color, blue component (0-1).
+---@param a2? number # Second color, alpha component (0-1).
+---@param r8? number # Eighth color, red component (0-1).
+---@param g8? number # Eighth color, green component (0-1).
+---@param b8? number # Eighth color, blue component (0-1).
+---@param a8? number # Eighth color, alpha component (0-1).
 function ParticleSystem:setColors(r1, g1, b1, a1, r2, g2, b2, a2, r8, g8, b8, a8) end
 
 ---
@@ -2420,8 +2420,8 @@ function ParticleSystem:setSizeVariation(variation) end
 ---[Open in Browser](https://love2d.org/wiki/ParticleSystem:setSizes)
 ---
 ---@param size1 number # The first size.
----@param size2 number # The second size.
----@param size8 number # The eighth size.
+---@param size2? number # The second size.
+---@param size8? number # The eighth size.
 function ParticleSystem:setSizes(size1, size2, size8) end
 
 ---

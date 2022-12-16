@@ -9,7 +9,7 @@ fs.create_directories(path)
 
 os.remove((path / 'test.txt'):string())
 
-local _ <close> = fw.watch(path:string())
+local _ <close> = fw.watch(path:string(), true)
 fsu.saveFile(path / 'test.txt', 'test')
 
 local events

@@ -4136,3 +4136,15 @@ end
 
 print(<?x?>)
 ]]
+
+TEST 'number' [[
+---@type number[]
+local xs
+
+---@type fun(x): number?
+local f
+
+for _, <?x?> in ipairs(xs) do
+    x = f(x)
+end
+]]

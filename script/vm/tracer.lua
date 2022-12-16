@@ -508,17 +508,22 @@ function mt:getNode(source)
     return self.nodes[source] or nil
 end
 
+---@class vm.node
+---@field package _tracer vm.tracer
+
 ---@param source parser.object
 ---@return vm.tracer?
 local function createTracer(source)
-    if source._tracer then
-        return source._tracer
+    local node = vm.compileNode(source)
+    local tracer = node._tracer
+    if tracer then
+        return tracer
     end
     local main = guide.getParentBlock(source)
     if not main then
         return nil
     end
-    local tracer = setmetatable({
+    tracer = setmetatable({
         source    = source,
         assigns   = {},
         assignMap = {},
@@ -529,7 +534,7 @@ local function createTracer(source)
         main      = main,
         uri       = guide.getUri(source),
     }, mt)
-    source._tracer = tracer
+    node._tracer = tracer
 
     tracer:collectLocal()
 

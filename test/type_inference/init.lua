@@ -4075,6 +4075,19 @@ else
 end
 ]]
 
+TEST 'A|B' [[
+---@class A
+---@class B
+
+---@type A|B
+local t
+
+if x then
+    ---@cast t A
+elseif <?t?> then
+end
+]]
+
 TEST 'function' [[
 local function x()
     print(<?x?>)

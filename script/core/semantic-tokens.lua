@@ -65,18 +65,21 @@ local Care = util.switch()
         if not options.variable then
             return
         end
-        local modifiers = 0
-        if source.parent and source.parent.type == 'tablefield' then
-            modifiers = define.TokenModifiers.declaration
-        end
         if source.parent then
+            if source.parent.type == 'tablefield' then
+                results[#results+1] = {
+                    start      = source.start,
+                    finish     = source.finish,
+                    type       = define.TokenTypes.property,
+                }
+                return
+            end
             local value = source.parent.value
             if value and value.type == 'function' then
                 results[#results+1] = {
                     start      = source.start,
                     finish     = source.finish,
                     type       = define.TokenTypes.method,
-                    modifieres = modifiers,
                 }
                 return
             end
@@ -86,7 +89,6 @@ local Care = util.switch()
                 start      = source.start,
                 finish     = source.finish,
                 type       = define.TokenTypes.method,
-                modifieres = modifiers,
             }
             return
         end
@@ -95,7 +97,6 @@ local Care = util.switch()
                 start      = source.start,
                 finish     = source.finish,
                 type       = define.TokenTypes.method,
-                modifieres = modifiers,
             }
             return
         end
@@ -103,7 +104,6 @@ local Care = util.switch()
             start      = source.start,
             finish     = source.finish,
             type       = define.TokenTypes.property,
-            modifieres = modifiers,
         }
     end)
     : case 'local'

@@ -362,7 +362,7 @@ function mt:lookIntoChild(action, topNode, outNode)
         local mainNode = topNode:copy()
         local blockNodes = {}
         for _, subBlock in ipairs(action) do
-            self:fastWardCasts(subBlock.start, mainNode)
+            self:resetCastsIndex(subBlock.start)
             local blockNode = mainNode:copy()
             if subBlock.filter then
                 blockNode, mainNode = self:lookIntoChild(subBlock.filter, blockNode, mainNode)

@@ -270,7 +270,7 @@ local function searchPatchInfo(cfg, rawKey)
     return searchOnce(rawKey, '', cfg)
         or searchOnce(rawKey:gsub('^Lua%.', ''), '', cfg)
         or {
-            key   = '/' .. rawKey,
+            key   = '/' .. rawKey:gsub('^Lua%.', ''),
             value = nil,
         }
 end

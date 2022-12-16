@@ -31,6 +31,8 @@ local pub      = require 'pub'
 ---@field diffInfo?    table[]
 ---@field cache        table
 ---@field id           integer
+---@field state?       parser.state
+---@field compileCount integer
 
 ---@class files
 ---@field lazyCache?   lazy-cacher
@@ -274,7 +276,6 @@ function m.setText(uri, text, isTrust, callback)
             util.saveFile(LOGPATH .. '/diffed.lua', newText)
         end
     end
-    m.getState(uri)
     log.trace('Set text:', uri, 'takes', os.clock() - clock, 'sec.')
 
     --if instance or TEST then

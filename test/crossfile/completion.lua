@@ -69,6 +69,7 @@ function TEST(data)
             mainUri = uri
         end
         files.setText(uri, script)
+        files.getState(uri)
     end
 
     local _ <close> = function ()

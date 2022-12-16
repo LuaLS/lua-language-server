@@ -53,6 +53,7 @@ function TEST(datas)
             sourceUri = uri
         end
         files.setText(uri, newScript)
+        files.getState(uri)
     end
 
     local _ <close> = function ()

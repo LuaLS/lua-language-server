@@ -271,12 +271,13 @@ m.register 'textDocument/didOpen' {
         end
         local uri    = files.getRealUri(doc.uri)
         log.debug('didOpen', uri)
-        workspace.awaitReady(uri)
         local text  = doc.text
         files.setText(uri, text, true, function (file)
             file.version = doc.version
         end)
         files.open(uri)
+        workspace.awaitReady(uri)
+        files.getState(uri)
     end
 }
 

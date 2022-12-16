@@ -44,6 +44,7 @@ function TEST(expect)
         local script, list = catch(file.content, '?')
         local uri          = furi.encode(file.path)
         files.setText(uri, script)
+        files.getState(uri)
         if #list['?'] > 0 then
             sourceUri = uri
             sourcePos = (list['?'][1][1] + list['?'][1][2]) // 2

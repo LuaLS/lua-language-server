@@ -47,6 +47,7 @@ function TEST(datas)
         end
         data.content = newScript
         files.setText(uri, newScript)
+        files.getState(uri)
     end
 
     local _ <close> = function ()

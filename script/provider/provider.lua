@@ -261,6 +261,7 @@ m.register 'workspace/didChangeWorkspaceFolders' {
 }
 
 m.register 'textDocument/didOpen' {
+    ---@async
     function (params)
         local doc      = params.textDocument
         local scheme   = furi.split(doc.uri)
@@ -270,6 +271,7 @@ m.register 'textDocument/didOpen' {
         end
         local uri    = files.getRealUri(doc.uri)
         log.debug('didOpen', uri)
+        workspace.awaitReady(uri)
         local text  = doc.text
         files.setText(uri, text, true, function (file)
             file.version = doc.version
@@ -301,6 +303,7 @@ m.register 'textDocument/didChange' {
         end
         local changes = params.contentChanges
         local uri     = files.getRealUri(doc.uri)
+        workspace.awaitReady(uri)
         local text = files.getOriginText(uri)
         if not text then
             files.setText(uri, pub.awaitTask('loadFile', furi.decode(uri)), false)

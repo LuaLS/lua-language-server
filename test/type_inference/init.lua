@@ -4080,3 +4080,16 @@ local function x()
     print(<?x?>)
 end
 ]]
+
+TEST 'number' [[
+---@type number?
+local x
+
+do
+    if not x then
+        return
+    end
+end
+
+print(<?x?>)
+]]

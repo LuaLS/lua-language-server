@@ -326,10 +326,10 @@ function mt:lookIntoChild(action, topNode, outNode)
             self:lookIntoBlock(action, actionStart, topNode:copy())
             local lastAssign = self:getLastAssign(action.start, action.finish)
             if lastAssign then
-                local node = self:getNode(lastAssign)
-                if node then
-                    topNode = node:copy()
-                end
+                self:getNode(lastAssign)
+            end
+            if self.nodes[action] then
+                topNode = self.nodes[action]:copy()
             end
         end
     elseif action.type == 'while' then
@@ -344,10 +344,10 @@ function mt:lookIntoChild(action, topNode, outNode)
             self:lookIntoBlock(action, action.keyword[4], blockNode:copy())
             local lastAssign = self:getLastAssign(action.start, action.finish)
             if lastAssign then
-                local node = self:getNode(lastAssign)
-                if node then
-                    topNode = mainNode:merge(node)
-                end
+                self:getNode(lastAssign)
+            end
+            if self.nodes[action] then
+                topNode = mainNode:merge(self.nodes[action])
             end
         end
         if action.filter then
@@ -388,11 +388,11 @@ function mt:lookIntoChild(action, topNode, outNode)
                 else
                     local lastAssign = self:getLastAssign(subBlock.start, subBlock.finish)
                     if lastAssign then
-                        local node = self:getNode(lastAssign)
-                        if node then
-                            blockNodes[#blockNodes+1] = node
-                            mergedNode = true
-                        end
+                        self:getNode(lastAssign)
+                    end
+                    if self.nodes[subBlock] then
+                        blockNodes[#blockNodes+1] = self.nodes[subBlock]
+                        mergedNode = true
                     end
                 end
             end
@@ -461,10 +461,11 @@ function mt:lookIntoBlock(block, start, node)
             node = self:lookIntoChild(action, node)
         end
         if action.finish > start and self.assignMap[action] then
-            break
+            return
         end
         ::CONTINUE::
     end
+    self.nodes[block] = node
 end
 
 ---@param source parser.object

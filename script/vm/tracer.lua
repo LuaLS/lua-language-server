@@ -313,17 +313,7 @@ function mt:lookIntoChild(action, topNode, outNode)
     or     action.type == 'for'
     or     action.type == 'do' then
         if action[1] then
-            local actionStart
-            if action.type == 'loop' then
-                actionStart = action.keyword[4]
-            elseif action.type == 'in' then
-                actionStart = action.keyword[6]
-            elseif action.type == 'repeat'
-            or     action.type == 'for'
-            or     action.type == 'do' then
-                actionStart = action.keyword[2]
-            end
-            self:lookIntoBlock(action, actionStart, topNode:copy())
+            self:lookIntoBlock(action, action.bstart, topNode:copy())
             local lastAssign = self:getLastAssign(action.start, action.finish)
             if lastAssign then
                 self:getNode(lastAssign)
@@ -341,7 +331,7 @@ function mt:lookIntoChild(action, topNode, outNode)
             mainNode  = topNode:copy()
         end
         if action[1] then
-            self:lookIntoBlock(action, action.keyword[4], blockNode:copy())
+            self:lookIntoBlock(action, action.bstart, blockNode:copy())
             local lastAssign = self:getLastAssign(action.start, action.finish)
             if lastAssign then
                 self:getNode(lastAssign)
@@ -372,14 +362,7 @@ function mt:lookIntoChild(action, topNode, outNode)
             end
             local mergedNode
             if subBlock[1] then
-                local actionStart
-                if subBlock.type == 'ifblock'
-                or subBlock.type == 'elseif' then
-                    actionStart = subBlock.keyword[4]
-                else
-                    actionStart = subBlock.keyword[2]
-                end
-                self:lookIntoBlock(subBlock, actionStart, blockNode:copy())
+                self:lookIntoBlock(subBlock, subBlock.bstart, blockNode:copy())
                 local neverReturn = subBlock.hasReturn
                                 or  subBlock.hasGoTo
                                 or  subBlock.hasBreak

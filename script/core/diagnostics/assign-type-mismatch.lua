@@ -61,7 +61,7 @@ return function (uri, callback)
         await.delay()
         if source.type == 'setlocal' then
             local locNode = vm.compileNode(source.node)
-            if not locNode:getData 'hasDefined' then
+            if not locNode.hasDefined then
                 return
             end
         end

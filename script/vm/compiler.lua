@@ -538,7 +538,7 @@ local function matchCall(source)
     if needRemove then
         local newNode = myNode:copy()
         newNode:removeNode(needRemove)
-        newNode:setData('originNode', myNode)
+        newNode.originNode = myNode
         vm.setNode(source, newNode, true)
     end
 end
@@ -1043,7 +1043,7 @@ local function compileLocal(source)
         end
     end
 
-    myNode:setData('hasDefined', hasMarkDoc or hasMarkParam or hasMarkValue)
+    myNode.hasDefined = hasMarkDoc or hasMarkParam or hasMarkValue
 end
 
 ---@param source parser.object
@@ -1187,7 +1187,7 @@ local compilerSwitch = util.switch()
         end
         local valueNode = vm.compileNode(source.value)
         vm.setNode(source, valueNode)
-        if  locNode:getData 'hasDefined'
+        if  locNode.hasDefined
         and guide.isLiteral(source.value) then
             vm.setNode(source, locNode)
             vm.getNode(source):narrow(guide.getUri(source), source.value.type)

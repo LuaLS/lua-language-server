@@ -4,8 +4,8 @@ local await  = require 'await'
 local conv   = require 'proto.converter'
 local getRef = require 'core.reference'
 
----@type codeLens
-local latestCodeLens
+---@class parser.state
+---@field package _codeLens codeLens
 
 ---@class codeLens.resolving
 ---@field mode   'reference'
@@ -13,6 +13,7 @@ local latestCodeLens
 
 ---@class codeLens.result
 ---@field position integer
+---@field uri      uri
 ---@field id       integer
 
 ---@class codeLens
@@ -64,14 +65,19 @@ end
 ---@async
 function mt:collectReferences()
     await.delay()
+    ---@async
     guide.eachSourceType(self.state.ast, 'function', function (src)
-        local assign = src.parent
-        if not guide.isSet(assign) then
+        local parent = src.parent
+        if guide.isSet(parent) then
+            src = parent
+        elseif parent.type == 'return' then
+        else
             return
         end
+        await.delay()
         self:addResult(src.start, {
             mode   = 'reference',
-            source = assign,
+            source = src,
         })
     end)
 end
@@ -80,15 +86,12 @@ end
 ---@param source parser.object
 ---@return proto.command?
 function mt:resolveReference(source)
-    local refs = getRef(self.uri, source.start, false)
+    local refs = getRef(self.uri, source.finish, false)
     local count = refs and #refs or 0
     local command = conv.command(
         ('%d个引用'):format(count),
-        'editor.action.showReferences',
-        {
-            self.uri,
-            conv.packPosition(self.state, source.start),
-        }
+        '',
+        {}
     )
     return command
 end
@@ -96,34 +99,44 @@ end
 ---@async
 ---@param uri uri
 ---@return codeLens.result[]?
-local function codeLens(uri)
-    latestCodeLens = setmetatable({}, mt)
-    local suc = latestCodeLens:init(uri)
+local function getCodeLens(uri)
+    local state = files.getState(uri)
+    if not state then
+        return nil
+    end
+    local codeLens = setmetatable({}, mt)
+    local suc = codeLens:init(uri)
     if not suc then
         return nil
     end
+    state._codeLens = codeLens
 
-    latestCodeLens:collectReferences()
+    codeLens:collectReferences()
 
-    if #latestCodeLens.results == 0 then
+    if #codeLens.results == 0 then
         return nil
     end
 
-    return latestCodeLens.results
+    return codeLens.results
 end
 
 ---@async
 ---@param id integer
 ---@return proto.command?
-local function resolve(id)
-    if not latestCodeLens then
+local function resolve(uri, id)
+    local state = files.getState(uri)
+    if not state then
         return nil
     end
-    local command = latestCodeLens:resolve(id)
+    local codeLens = state._codeLens
+    if not codeLens then
+        return nil
+    end
+    local command = codeLens:resolve(id)
     return command
 end
 
 return {
-    codeLens = codeLens,
+    codeLens = getCodeLens,
     resolve  = resolve,
 }

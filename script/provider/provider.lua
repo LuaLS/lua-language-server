@@ -941,7 +941,10 @@ m.register 'textDocument/codeLens' {
         for _, result in ipairs(results) do
             codeLens[#codeLens+1] = {
                 range = converter.packRange(state, result.position, result.position),
-                data  = result.id,
+                data  = {
+                    uri = uri,
+                    id   = result.id,
+                },
             }
         end
         return codeLens
@@ -952,7 +955,7 @@ m.register 'codeLens/resolve' {
     ---@async
     function (codeLen)
         local core = require 'core.code-lens'
-        local command = core.resolve(codeLen.data)
+        local command = core.resolve(codeLen.data.uri, codeLen.data.id)
         codeLen.command = command
         return codeLen
     end

@@ -1,10 +1,11 @@
 # changelog
 
 ## 3.6.5
-* `NEW` code lens. This feature is disabled by default.
+* `NEW` code lens: this feature is disabled by default.
 * `NEW` settings:
   * `Lua.codeLens.enable`: Enable code lens.
-* `CHG` supports finding definition for `@class` and `@alias`, since they may defined multi times.
+* `CHG` definition: supports finding definitions for `@class` and `@alias`, since they may be defined multi times.
+* `CHG` rename: supports `@field`
 * `FIX` [#831]
 * `FIX` [#1729]
 * `FIX` [#1737]

@@ -178,6 +178,11 @@ local function ofFieldThen(key, src, newname, callback)
         if not suc then
             return
         end
+    elseif src.type == 'doc.field' then
+        local suc = renameField(src.field, newname, callback)
+        if not suc then
+            return
+        end
     end
 end
 
@@ -282,6 +287,8 @@ local function rename(source, newname, callback)
         return ofDocTypeName(source, newname, callback)
     elseif source.type == 'doc.param.name' then
         return ofDocParamName(source, newname, callback)
+    elseif source.type == 'doc.field.name' then
+        return ofField(source, newname, callback)
     elseif source.type == 'string'
     or     source.type == 'number'
     or     source.type == 'integer'
@@ -313,7 +320,8 @@ local function prepareRename(source)
     or source.type == 'doc.type.name'
     or source.type == 'doc.alias.name'
     or source.type == 'doc.enum.name'
-    or source.type == 'doc.param.name' then
+    or source.type == 'doc.param.name'
+    or source.type == 'doc.field.name' then
         return source, source[1]
     elseif source.type == 'string'
     or     source.type == 'number'
@@ -354,6 +362,7 @@ local accept = {
     ['doc.alias.name'] = true,
     ['doc.param.name'] = true,
     ['doc.enum.name']  = true,
+    ['doc.field.name'] = true,
 }
 
 local m = {}

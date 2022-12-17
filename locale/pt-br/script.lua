@@ -447,6 +447,8 @@ COMMAND_JSON_TO_LUA_FAILED =
 'Converção de JSON para Lua falhou: {}.'
 COMMAND_ADD_DICT           =
 'Adicione uma palavra ao dicionário'
+COMMAND_REFERENCE_COUNT    = -- TODO: need translate!
+'{} references'
 
 COMPLETION_IMPORT_FROM           =
 'Importa de {}.'

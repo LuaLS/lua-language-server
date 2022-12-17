@@ -3,13 +3,14 @@ local guide  = require 'parser.guide'
 local await  = require 'await'
 local conv   = require 'proto.converter'
 local getRef = require 'core.reference'
+local lang   = require 'language'
 
 ---@class parser.state
 ---@field package _codeLens codeLens
 
 ---@class codeLens.resolving
----@field mode   'reference'
----@field source parser.object
+---@field mode    'reference'
+---@field source? parser.object
 
 ---@class codeLens.result
 ---@field position integer
@@ -89,7 +90,7 @@ function mt:resolveReference(source)
     local refs = getRef(self.uri, source.finish, false)
     local count = refs and #refs or 0
     local command = conv.command(
-        ('%d个引用'):format(count),
+        lang.script('COMMAND_REFERENCE_COUNT', count),
         '',
         {}
     )

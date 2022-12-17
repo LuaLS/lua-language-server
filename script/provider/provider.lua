@@ -927,6 +927,9 @@ m.register 'textDocument/codeLens' {
     ---@async
     function (params)
         local uri = files.getRealUri(params.textDocument.uri)
+        if not config.get(uri, 'Lua.codeLens.enable') then
+            return
+        end
         workspace.awaitReady(uri)
         local state = files.getState(uri)
         if not state then

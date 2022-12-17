@@ -255,6 +255,8 @@ config.hint.semicolon.SameLine            =
 '兩個陳述式在同一行時，在它們之間顯示分號。'
 config.hint.semicolon.Disable            =
 '停用虛擬分號。'
+config.codeLens.enable                   = -- TODO: need translate!
+'Enable code lens.'
 config.format.enable                     =
 '啟用程式碼格式化程式。'
 config.format.defaultConfig              =

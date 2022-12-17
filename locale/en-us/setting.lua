@@ -256,6 +256,8 @@ config.hint.semicolon.SameLine            =
 'When two statements are on the same line, display a semicolon between them.'
 config.hint.semicolon.Disable            =
 'Disable virtual semicolons.'
+config.codeLens.enable                   =
+'Enable code lens.'
 config.format.enable                     =
 'Enable code formatter.'
 config.format.defaultConfig              =

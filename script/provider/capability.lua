@@ -7,6 +7,7 @@ local define     = require 'proto.define'
 require 'provider.semantic-tokens'
 require 'provider.formatting'
 require 'provider.inlay-hint'
+require 'provider.code-lens'
 
 local m = {}
 

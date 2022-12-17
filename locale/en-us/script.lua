@@ -447,6 +447,8 @@ COMMAND_JSON_TO_LUA_FAILED =
 'Convert JSON to Lua failed: {}'
 COMMAND_ADD_DICT           =
 'Add Word to dictionary'
+COMMAND_REFERENCE_COUNT    =
+'{} references'
 
 COMPLETION_IMPORT_FROM           =
 'Import from {}'

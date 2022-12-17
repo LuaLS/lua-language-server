@@ -447,6 +447,8 @@ COMMAND_JSON_TO_LUA_FAILED =
 'JSON 转 Lua 失败：{}'
 COMMAND_ADD_DICT           = -- TODO: need translate!
 'Add Word to dictionary'
+COMMAND_REFERENCE_COUNT    =
+'{} 个引用'
 
 COMPLETION_IMPORT_FROM           =
 '从 {} 中导入'

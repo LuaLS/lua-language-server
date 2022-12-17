@@ -255,6 +255,8 @@ config.hint.semicolon.SameLine           =
 '2个语句在同一行时，在它们之间显示分号。'
 config.hint.semicolon.Disable            =
 '禁用虚拟分号。'
+config.codeLens.enable                   = -- TODO: need translate!
+'启用代码度量。'
 config.format.enable                     =
 '启用代码格式化程序。'
 config.format.defaultConfig              =

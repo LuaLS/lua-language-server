@@ -975,3 +975,15 @@ print(x.<?a?>)
 ]]
 
 config.set(nil, 'Lua.type.castNumberToInteger', true)
+
+TEST [[
+---@class <!A!>
+
+---@class <!<?A?>!>
+]]
+
+TEST [[
+---@alias <!A!> number
+
+---@alias <!<?A?>!> number
+]]

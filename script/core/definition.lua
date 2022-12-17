@@ -205,7 +205,9 @@ return function (uri, offset)
         or src.type == 'doc.enum.name' then
             if  source.type ~= 'doc.type.name'
             and source.type ~= 'doc.extends.name'
-            and source.type ~= 'doc.see.name' then
+            and source.type ~= 'doc.see.name'
+            and source.type ~= 'doc.class.name'
+            and source.type ~= 'doc.alias.name' then
                 goto CONTINUE
             end
         end

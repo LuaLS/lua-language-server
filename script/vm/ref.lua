@@ -86,7 +86,7 @@ local function searchWord(source, pushResult, defMap, fileNotify)
         if not text then
             return
         end
-        if not text:match(key) then
+        if not text:find(key, 1, true) then
             return
         end
         local state = files.getState(uri)

@@ -1626,6 +1626,7 @@ local compilerSwitch = util.switch()
         end
     end)
     : case 'doc.class.name'
+    : case 'doc.alias.name'
     : call(function (source)
         vm.setNode(source, vm.compileNode(source.parent))
     end)

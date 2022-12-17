@@ -918,6 +918,46 @@ m.register 'textDocument/codeAction' {
     end
 }
 
+m.register 'textDocument/codeLens' {
+    capability = {
+        codeLensProvider = {
+            resolveProvider = true,
+        }
+    },
+    ---@async
+    function (params)
+        local uri = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
+        local state = files.getState(uri)
+        if not state then
+            return nil
+        end
+        local core = require 'core.code-lens'
+        local results = core.codeLens(uri)
+        if not results then
+            return nil
+        end
+        local codeLens = {}
+        for _, result in ipairs(results) do
+            codeLens[#codeLens+1] = {
+                range = converter.packRange(state, result.position, result.position),
+                data  = result.id,
+            }
+        end
+        return codeLens
+    end
+}
+
+m.register 'codeLens/resolve' {
+    ---@async
+    function (codeLen)
+        local core = require 'core.code-lens'
+        local command = core.resolve(codeLen.data)
+        codeLen.command = command
+        return codeLen
+    end
+}
+
 m.register 'workspace/executeCommand' {
     capability = {
         executeCommandProvider = {

@@ -85,8 +85,11 @@ return function (uri, position, includeDeclaration)
         if src.type == 'self' then
             goto CONTINUE
         end
-        if not includeDeclaration and guide.isSet(src) then
-            goto CONTINUE
+        if not includeDeclaration then
+            if guide.isSet(src)
+            or guide.isLiteral(src) then
+                goto CONTINUE
+            end
         end
         src = src.field or src.method or src
         if src.type == 'getindex'

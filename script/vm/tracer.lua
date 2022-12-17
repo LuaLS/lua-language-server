@@ -202,7 +202,7 @@ function mt:lookIntoChild(action, topNode, outNode)
             end
         end
     elseif action.type == 'function' then
-        self:lookIntoBlock(action, action.args.finish, topNode:copy())
+        self:lookIntoBlock(action, action.bstart, topNode:copy())
     elseif action.type == 'unary' then
         if not action[1] then
             goto RETURN

@@ -34,7 +34,7 @@ lclient():start(function (languageClient)
     })
 
     assert(util.equal(jsonc.decode_jsonc(util.loadFile(configPath)), {
-        ['Lua.runtime.version'] = 'LuaJIT',
+        ['runtime.version'] = 'LuaJIT',
     }))
 
     -------------------------------
@@ -72,7 +72,7 @@ lclient():start(function (languageClient)
     })
 
     assert(util.equal(jsonc.decode_jsonc(util.loadFile(configPath)), {
-        ['Lua.diagnostics.disable'] = {
+        ['diagnostics.disable'] = {
             'undefined-global',
         }
     }))
@@ -140,7 +140,7 @@ lclient():start(function (languageClient)
     })
 
     assert(util.equal(jsonc.decode_jsonc(util.loadFile(configPath)), {
-        ['Lua.runtime.special'] = {
+        ['runtime.special'] = {
             ['include'] = 'require',
         }
     }))

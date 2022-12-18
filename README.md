@@ -1,9 +1,9 @@
 # lua-language-server
 
 ![build](https://github.com/sumneko/lua-language-server/workflows/build/badge.svg)
-[![version](https://vsmarketplacebadge.apphb.com/version-short/sumneko.lua.svg)](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
-![installs](https://vsmarketplacebadge.apphb.com/installs-short/sumneko.lua.svg)
-![downloads](https://vsmarketplacebadge.apphb.com/downloads-short/sumneko.lua.svg)
+[![version](https://vsmarketplacebadges.dev/version-short/sumneko.lua.svg)](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
+![installs](https://vsmarketplacebadges.dev/installs-short/sumneko.lua.svg)
+![downloads](https://vsmarketplacebadges.dev/downloads-short/sumneko.lua.svg)
 [![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/sumneko/lua-language-server.svg)](https://github.com/sumneko/lua-language-server/issues "Average time to resolve an issue")
 
 

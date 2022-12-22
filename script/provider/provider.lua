@@ -924,6 +924,7 @@ m.register 'textDocument/codeLens' {
             resolveProvider = true,
         }
     },
+    abortByFileUpdate = true,
     ---@async
     function (params)
         local uri = files.getRealUri(params.textDocument.uri)
@@ -959,7 +960,7 @@ m.register 'codeLens/resolve' {
     function (codeLen)
         local core = require 'core.code-lens'
         local command = core.resolve(codeLen.data.uri, codeLen.data.id)
-        codeLen.command = command
+        codeLen.command = command or converter.command('...', '', {})
         return codeLen
     end
 }

@@ -23,6 +23,7 @@ local function logRecieve(proto)
     log.info('rpc recieve:', json.encode(proto))
 end
 
+---@class proto
 local m = {}
 
 m.ability = {}
@@ -181,7 +182,7 @@ function m.doMethod(proto)
                 m.responseErr(proto.id, proto._closeReason or define.ErrorCodes.InternalError, proto._closeMessage or res)
             end
         end
-        ok, res = xpcall(abil, log.error, proto.params)
+        ok, res = xpcall(abil, log.error, proto.params, proto.id)
         await.delay()
     end)
 end

@@ -33,7 +33,7 @@ end
 ---@param source  parser.object
 ---@param pushResult fun(src: parser.object)
 local function searchByLocalID(source, pushResult)
-    local idSources = vm.getLocalSourcesSets(source)
+    local idSources = vm.getLocalSets(source)
     if not idSources then
         return
     end

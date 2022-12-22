@@ -3,9 +3,14 @@ local guide = require 'parser.guide'
 ---@class vm
 local vm    = require 'vm.vm'
 
+---@class vm.local
+---@field sets parser.object[]
+---@field gets parser.object[]
+---@field node? vm.node
+
 ---@class parser.object
 ---@field package _localID string|false
----@field package _localIDs table<string, { sets: parser.object[], gets: parser.object[] }>
+---@field package _localIDs table<string, vm.local>
 
 local compileLocalID, getLocal
 
@@ -163,8 +168,8 @@ end
 
 ---@param source parser.object
 ---@param key?   string
----@return parser.object[]?
-function vm.getLocalSourcesSets(source, key)
+---@return vm.local?
+function vm.getLocalInfo(source, key)
     local id = vm.getLocalID(source)
     if not id then
         return nil
@@ -179,28 +184,29 @@ function vm.getLocalSourcesSets(source, key)
         end
         id = id .. vm.ID_SPLITE .. key
     end
-    return root._localIDs[id].sets
+    return root._localIDs[id]
 end
 
 ---@param source parser.object
 ---@param key?   string
 ---@return parser.object[]?
-function vm.getLocalSourcesGets(source, key)
-    local id = vm.getLocalID(source)
-    if not id then
+function vm.getLocalSets(source, key)
+    local localInfo = vm.getLocalInfo(source, key)
+    if not localInfo then
         return nil
     end
-    local root = guide.getRoot(source)
-    if not root._localIDs then
+    return localInfo.sets
+end
+
+---@param source parser.object
+---@param key?   string
+---@return parser.object[]?
+function vm.getLocalGets(source, key)
+    local localInfo = vm.getLocalInfo(source, key)
+    if not localInfo then
         return nil
     end
-    if key then
-        if type(key) ~= 'string' then
-            return nil
-        end
-        id = id .. vm.ID_SPLITE .. key
-    end
-    return root._localIDs[id].gets
+    return localInfo.gets
 end
 
 ---@param source parser.object

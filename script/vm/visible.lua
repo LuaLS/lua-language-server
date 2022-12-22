@@ -76,7 +76,7 @@ end
 ---@return vm.global?
 function vm.getDefinedClass(suri, source)
     source = guide.getSelfNode(source) or source
-    local sets = vm.getLocalSourcesSets(source)
+    local sets = vm.getLocalSets(source)
     if sets then
         for _, set in ipairs(sets) do
             if set.bindDocs then

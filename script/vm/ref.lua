@@ -228,13 +228,13 @@ end
 ---@param source  parser.object
 ---@param pushResult fun(src: parser.object)
 local function searchByLocalID(source, pushResult)
-    local sourceSets = vm.getLocalSourcesSets(source)
+    local sourceSets = vm.getLocalSets(source)
     if sourceSets then
         for _, src in ipairs(sourceSets) do
             pushResult(src)
         end
     end
-    local sourceGets = vm.getLocalSourcesGets(source)
+    local sourceGets = vm.getLocalGets(source)
     if sourceGets then
         for _, src in ipairs(sourceGets) do
             pushResult(src)

@@ -3,39 +3,39 @@ local guide = require 'parser.guide'
 ---@class vm
 local vm    = require 'vm.vm'
 
----@class vm.local
+---@class vm.variable
 ---@field sets parser.object[]
 ---@field gets parser.object[]
 ---@field node? vm.node
 
 ---@class parser.object
----@field package _localID string|false
----@field package _localIDs table<string, vm.local>
+---@field package _variableID string|false
+---@field package _variableIDs table<string, vm.variable>
 
-local compileLocalID, getLocal
+local compileVariableID, getVariable
 
 local compileSwitch = util.switch()
     : case 'local'
     : case 'self'
     : call(function (source)
-        source._localID = ('%d'):format(source.start)
+        source._variableID = ('l|%d'):format(source.start)
         if not source.ref then
             return
         end
         for _, ref in ipairs(source.ref) do
-            compileLocalID(ref)
+            compileVariableID(ref)
         end
     end)
     : case 'setlocal'
     : case 'getlocal'
     : call(function (source)
-        source._localID = ('%d'):format(source.node.start)
-        compileLocalID(source.next)
+        source._variableID = ('l|%d'):format(source.node.start)
+        compileVariableID(source.next)
     end)
     : case 'getfield'
     : case 'setfield'
     : call(function (source)
-        local parentID = source.node._localID
+        local parentID = source.node._variableID
         if not parentID then
             return
         end
@@ -43,16 +43,16 @@ local compileSwitch = util.switch()
         if type(key) ~= 'string' then
             return
         end
-        source._localID = parentID .. vm.ID_SPLITE .. key
-        source.field._localID = source._localID
+        source._variableID = parentID .. vm.ID_SPLITE .. key
+        source.field._variableID = source._variableID
         if source.type == 'getfield' then
-            compileLocalID(source.next)
+            compileVariableID(source.next)
         end
     end)
     : case 'getmethod'
     : case 'setmethod'
     : call(function (source)
-        local parentID = source.node._localID
+        local parentID = source.node._variableID
         if not parentID then
             return
         end
@@ -60,16 +60,16 @@ local compileSwitch = util.switch()
         if type(key) ~= 'string' then
             return
         end
-        source._localID = parentID .. vm.ID_SPLITE .. key
-        source.method._localID = source._localID
+        source._variableID = parentID .. vm.ID_SPLITE .. key
+        source.method._variableID = source._variableID
         if source.type == 'getmethod' then
-            compileLocalID(source.next)
+            compileVariableID(source.next)
         end
     end)
     : case 'getindex'
     : case 'setindex'
     : call(function (source)
-        local parentID = source.node._localID
+        local parentID = source.node._variableID
         if not parentID then
             return
         end
@@ -77,10 +77,10 @@ local compileSwitch = util.switch()
         if type(key) ~= 'string' then
             return
         end
-        source._localID = parentID .. vm.ID_SPLITE .. key
-        source.index._localID = source._localID
+        source._variableID = parentID .. vm.ID_SPLITE .. key
+        source.index._variableID = source._variableID
         if source.type == 'setindex' then
-            compileLocalID(source.next)
+            compileVariableID(source.next)
         end
     end)
 
@@ -88,7 +88,7 @@ local leftSwitch = util.switch()
     : case 'field'
     : case 'method'
     : call(function (source)
-        return getLocal(source.parent)
+        return getVariable(source.parent)
     end)
     : case 'getfield'
     : case 'setfield'
@@ -97,7 +97,7 @@ local leftSwitch = util.switch()
     : case 'getindex'
     : case 'setindex'
     : call(function (source)
-        return getLocal(source.node)
+        return getVariable(source.node)
     end)
     : case 'getlocal'
     : call(function (source)
@@ -111,23 +111,23 @@ local leftSwitch = util.switch()
 
 ---@param source parser.object
 ---@return parser.object?
-function getLocal(source)
+function getVariable(source)
     return leftSwitch(source.type, source)
 end
 
 ---@param id string
 ---@param source parser.object
-function vm.insertLocalID(id, source)
+function vm.insertVariableID(id, source)
     local root = guide.getRoot(source)
-    if not root._localIDs then
-        root._localIDs = util.multiTable(2, function ()
+    if not root._variableIDs then
+        root._variableIDs = util.multiTable(2, function ()
             return {
                 sets = {},
                 gets = {},
             }
         end)
     end
-    local sources = root._localIDs[id]
+    local sources = root._variableIDs[id]
     if guide.isSet(source) then
         sources.sets[#sources.sets+1] = source
     else
@@ -135,47 +135,47 @@ function vm.insertLocalID(id, source)
     end
 end
 
-function compileLocalID(source)
+function compileVariableID(source)
     if not source then
         return
     end
-    source._localID = false
+    source._variableID = false
     if not compileSwitch:has(source.type) then
         return
     end
     compileSwitch(source.type, source)
-    local id = source._localID
+    local id = source._variableID
     if not id then
         return
     end
-    vm.insertLocalID(id, source)
+    vm.insertVariableID(id, source)
 end
 
 ---@param source parser.object
 ---@return string|false
-function vm.getLocalID(source)
-    if source._localID ~= nil then
-        return source._localID
+function vm.getVariableID(source)
+    if source._variableID ~= nil then
+        return source._variableID
     end
-    source._localID = false
-    local loc = getLocal(source)
+    source._variableID = false
+    local loc = getVariable(source)
     if not loc then
-        return source._localID
+        return source._variableID
     end
-    compileLocalID(loc)
-    return source._localID
+    compileVariableID(loc)
+    return source._variableID
 end
 
 ---@param source parser.object
 ---@param key?   string
----@return vm.local?
-function vm.getLocalInfo(source, key)
-    local id = vm.getLocalID(source)
+---@return vm.variable?
+function vm.getVariableInfo(source, key)
+    local id = vm.getVariableID(source)
     if not id then
         return nil
     end
     local root = guide.getRoot(source)
-    if not root._localIDs then
+    if not root._variableIDs then
         return nil
     end
     if key then
@@ -184,14 +184,14 @@ function vm.getLocalInfo(source, key)
         end
         id = id .. vm.ID_SPLITE .. key
     end
-    return root._localIDs[id]
+    return root._variableIDs[id]
 end
 
 ---@param source parser.object
 ---@param key?   string
 ---@return parser.object[]?
-function vm.getLocalSets(source, key)
-    local localInfo = vm.getLocalInfo(source, key)
+function vm.getVariableSets(source, key)
+    local localInfo = vm.getVariableInfo(source, key)
     if not localInfo then
         return nil
     end
@@ -201,8 +201,8 @@ end
 ---@param source parser.object
 ---@param key?   string
 ---@return parser.object[]?
-function vm.getLocalGets(source, key)
-    local localInfo = vm.getLocalInfo(source, key)
+function vm.getVariableGets(source, key)
+    local localInfo = vm.getVariableInfo(source, key)
     if not localInfo then
         return nil
     end
@@ -212,19 +212,19 @@ end
 ---@param source parser.object
 ---@param includeGets boolean
 ---@return parser.object[]?
-function vm.getLocalFields(source, includeGets)
-    local id = vm.getLocalID(source)
+function vm.getVariableFields(source, includeGets)
+    local id = vm.getVariableID(source)
     if not id then
         return nil
     end
     local root = guide.getRoot(source)
-    if not root._localIDs then
+    if not root._variableIDs then
         return nil
     end
     -- TODO：optimize
     local clock = os.clock()
     local fields = {}
-    for lid, sources in pairs(root._localIDs) do
+    for lid, sources in pairs(root._variableIDs) do
         if  lid ~= id
         and util.stringStartWith(lid, id)
         and lid:sub(#id + 1, #id + 1) == vm.ID_SPLITE
@@ -242,7 +242,7 @@ function vm.getLocalFields(source, includeGets)
     end
     local cost = os.clock() - clock
     if cost > 1.0 then
-        log.warn('local-id getFields takes %.3f seconds', cost)
+        log.warn('variable-id getFields takes %.3f seconds', cost)
     end
     return fields
 end

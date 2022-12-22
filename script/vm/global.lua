@@ -514,11 +514,11 @@ local function compileSelf(source)
     if not node then
         return
     end
-    local fields = vm.getLocalFields(source, false)
+    local fields = vm.getVariableFields(source, false)
     if not fields then
         return
     end
-    local nodeLocalID = vm.getLocalID(node)
+    local nodeLocalID = vm.getVariableID(node)
     local globalNode  = node._globalNode
     if not nodeLocalID and not globalNode then
         return
@@ -529,7 +529,7 @@ local function compileSelf(source)
             if key then
                 if nodeLocalID then
                     local myID = nodeLocalID .. vm.ID_SPLITE .. key
-                    vm.insertLocalID(myID, field)
+                    vm.insertVariableID(myID, field)
                 end
                 if globalNode then
                     local myID = globalNode:getName() .. vm.ID_SPLITE .. key

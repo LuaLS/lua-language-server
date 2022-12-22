@@ -66,9 +66,9 @@ end
 local function searchFieldByLocalID(source, key, pushResult)
     local fields
     if key then
-        fields = vm.getLocalSets(source, key)
+        fields = vm.getVariableSets(source, key)
     else
-        fields = vm.getLocalFields(source, false)
+        fields = vm.getVariableFields(source, false)
     end
     if not fields then
         return
@@ -394,8 +394,8 @@ function vm.getClassFields(suri, object, key, pushResult)
                             if  not searchedFields[fieldKey]
                             and guide.isSet(field)
                             and field.value then
-                                if  vm.getLocalID(field)
-                                and vm.getLocalID(field) == vm.getLocalID(field.value) then
+                                if  vm.getVariableID(field)
+                                and vm.getVariableID(field) == vm.getVariableID(field.value) then
                                 elseif vm.getGlobalNode(src)
                                 and    vm.getGlobalNode(src) == vm.getGlobalNode(field.value) then
                                 else
@@ -1239,7 +1239,7 @@ local compilerSwitch = util.switch()
         local cacheNode, needCompile
 
         do
-            local localInfo = vm.getLocalInfo(source)
+            local localInfo = vm.getVariableInfo(source)
             if localInfo then
                 cacheNode = localInfo.node
                 if not cacheNode then

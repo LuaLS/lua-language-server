@@ -2,6 +2,9 @@
     "name"   : "LÖVE",
     "words"  : ["love%.%w+"],
     "settings" : {
-        "Lua.runtime.version" : "LuaJIT"
+        "Lua.runtime.version" : "LuaJIT",
+        "Lua.runtime.special" : {
+            "love.filesystem.load" : "loadfile"
+        }
     }
 }

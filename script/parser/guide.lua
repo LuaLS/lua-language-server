@@ -1013,7 +1013,8 @@ function m.getKeyName(obj)
     or     tp == 'doc.type.name'
     or     tp == 'doc.class.name'
     or     tp == 'doc.alias.name'
-    or     tp == 'doc.enum.name' then
+    or     tp == 'doc.enum.name'
+    or     tp == 'doc.extends.name' then
         return obj[1]
     elseif tp == 'doc.type.field' then
         return m.getKeyName(obj.name)

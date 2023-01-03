@@ -230,3 +230,19 @@ local t
 
 print(t.field2)
 ]]
+
+TEST ('A', 'C') [[
+---@class A
+
+---@class B: A
+]] [[
+---@class C
+
+---@class B: C
+]]
+
+TEST ('A', 'C') [[
+---@class B: A
+]] [[
+---@class B: C
+]]

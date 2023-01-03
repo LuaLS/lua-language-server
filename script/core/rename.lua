@@ -239,7 +239,8 @@ local function ofDocTypeName(source, newname, callback)
     end
     local refs = vm.getRefs(source)
     for _, doc in ipairs(refs) do
-        if doc.type == 'doc.type.name' then
+        if doc.type == 'doc.type.name'
+        or doc.type == 'doc.extends.name' then
             callback(doc, doc.start, doc.finish, newname)
         end
     end
@@ -283,7 +284,8 @@ local function rename(source, newname, callback)
     elseif source.type == 'doc.class.name'
     or     source.type == 'doc.type.name'
     or     source.type == 'doc.alias.name'
-    or     source.type == 'doc.enum.name' then
+    or     source.type == 'doc.enum.name'
+    or     source.type == 'doc.extends.name' then
         return ofDocTypeName(source, newname, callback)
     elseif source.type == 'doc.param.name' then
         return ofDocParamName(source, newname, callback)
@@ -321,7 +323,8 @@ local function prepareRename(source)
     or source.type == 'doc.alias.name'
     or source.type == 'doc.enum.name'
     or source.type == 'doc.param.name'
-    or source.type == 'doc.field.name' then
+    or source.type == 'doc.field.name'
+    or source.type == 'doc.extends.name' then
         return source, source[1]
     elseif source.type == 'string'
     or     source.type == 'number'
@@ -357,12 +360,13 @@ local accept = {
     ['number']     = true,
     ['integer']    = true,
 
-    ['doc.class.name'] = true,
-    ['doc.type.name']  = true,
-    ['doc.alias.name'] = true,
-    ['doc.param.name'] = true,
-    ['doc.enum.name']  = true,
-    ['doc.field.name'] = true,
+    ['doc.class.name']   = true,
+    ['doc.type.name']    = true,
+    ['doc.alias.name']   = true,
+    ['doc.param.name']   = true,
+    ['doc.enum.name']    = true,
+    ['doc.field.name']   = true,
+    ['doc.extends.name'] = true,
 }
 
 local m = {}

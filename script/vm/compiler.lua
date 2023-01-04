@@ -613,7 +613,6 @@ local function bindAs(source)
     local doc = ases[index]
     if doc and doc.touch == source.finish then
         local asNode = vm.compileNode(doc.as)
-        asNode.resolved = true
         vm.setNode(source, asNode, true)
         return true
     end
@@ -1947,6 +1946,5 @@ function vm.compileNode(source)
 
     local node = vm.getNode(source)
     ---@cast node -?
-    node.resolved = true
     return node
 end

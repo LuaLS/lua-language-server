@@ -134,11 +134,12 @@ local viewNodeSwitch;viewNodeSwitch = util.switch()
         for i, sign in ipairs(source.signs) do
             buf[i] = vm.getInfer(sign):view(uri)
         end
-        if infer._drop then
-            local node = vm.compileNode(source)
-            for c in node:eachObject() do
-                if guide.isLiteral(c) then
-                    infer._drop[c] = true
+        local node = vm.compileNode(source)
+        for c in node:eachObject() do
+            if guide.isLiteral(c) then
+                local view = vm.viewObject(c, uri)
+                if view then
+                    infer._drop[view] = true
                 end
             end
         end
@@ -147,10 +148,6 @@ local viewNodeSwitch;viewNodeSwitch = util.switch()
     : case 'doc.type.table'
     : call(function (source, infer, uri)
         if #source.fields == 0 then
-            infer._hasTable = true
-            return
-        end
-        if infer._drop and infer._drop[source] then
             infer._hasTable = true
             return
         end
@@ -291,9 +288,7 @@ function mt:_trim()
 end
 
 ---@param uri uri
----@return table<string, true>
 function mt:_eraseAlias(uri)
-    local drop = {}
     local expandAlias = config.get(uri, 'Lua.hover.expandAlias')
     for n in self.node:eachObject() do
         if n.type == 'global' and n.cate == 'type' then
@@ -304,8 +299,10 @@ function mt:_eraseAlias(uri)
             for _, set in ipairs(n:getSets(uri)) do
                 if set.type == 'doc.alias' then
                     if expandAlias then
-                        drop[n.name] = true
-                        local newInfer = {}
+                        self._drop[n.name] = true
+                        local newInfer = setmetatable({
+                            _drop = {},
+                        }, mt)
                         for _, ext in ipairs(set.extends.types) do
                             viewNodeSwitch(ext.type, ext, newInfer, uri)
                         end
@@ -316,7 +313,7 @@ function mt:_eraseAlias(uri)
                         for _, ext in ipairs(set.extends.types) do
                             local view = viewNodeSwitch(ext.type, ext, {}, uri)
                             if view and view ~= n.name then
-                                drop[view] = true
+                                self._drop[view] = true
                             end
                         end
                     end
@@ -326,7 +323,6 @@ function mt:_eraseAlias(uri)
             ::CONTINUE::
         end
     end
-    return drop
 end
 
 ---@param uri uri
@@ -393,14 +389,13 @@ function mt:view(uri, default)
         return 'any'
     end
 
-    local drop
     if self._hasClass then
-        drop = self:_eraseAlias(uri)
+        self:_eraseAlias(uri)
     end
 
     local array = {}
     for view in pairs(self.views) do
-        if not drop or not drop[view] then
+        if not self._drop[view] then
             array[#array+1] = view
         end
     end
@@ -529,7 +524,10 @@ end
 ---@param uri uri
 ---@return string?
 function vm.viewObject(source, uri)
-    return viewNodeSwitch(source.type, source, {}, uri)
+    local infer = setmetatable({
+        _drop = {},
+    }, mt)
+    return viewNodeSwitch(source.type, source, infer, uri)
 end
 
 ---@param source parser.object

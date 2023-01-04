@@ -137,7 +137,15 @@ local function getHoverByUri(uri, position)
     local hover = getHover(source)
     if SHOWSOURCE then
         hover:splitLine()
+        hover:add('md', 'Source Info')
         hover:add('lua', util.dump(source, {
+            deep = 1,
+        }))
+    end
+    if SHOWNODE then
+        hover:splitLine()
+        hover:add('md', 'Node Info')
+        hover:add('lua', util.dump(vm.compileNode(source), {
             deep = 1,
         }))
     end

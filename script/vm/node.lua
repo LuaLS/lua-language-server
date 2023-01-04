@@ -384,7 +384,7 @@ function mt:copy()
     return vm.createNode(self)
 end
 
----@param source vm.object
+---@param source vm.object | vm.variable
 ---@param node vm.node | vm.node.object
 ---@param cover? boolean
 ---@return vm.node
@@ -415,7 +415,7 @@ function vm.setNode(source, node, cover)
     return me
 end
 
----@param source vm.object
+---@param source vm.object | vm.variable
 ---@return vm.node?
 function vm.getNode(source)
     return vm.nodeCache[source]

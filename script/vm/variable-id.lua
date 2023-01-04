@@ -6,7 +6,6 @@ local vm    = require 'vm.vm'
 ---@class vm.variable
 ---@field sets parser.object[]
 ---@field gets parser.object[]
----@field node? vm.node
 
 ---@class parser.object
 ---@field package _variableID string|false

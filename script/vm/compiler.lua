@@ -1235,27 +1235,29 @@ local compilerSwitch = util.switch()
         end
 
         ---@type vm.node, boolean
-        local cacheNode, needCompile
+        local variableNode, needCompile
 
         do
             local localInfo = vm.getVariableInfo(source)
             if localInfo then
-                cacheNode = localInfo.node
-                if not cacheNode then
+                local lastCacheNode = vm.getNode(localInfo)
+                if lastCacheNode then
+                    variableNode = lastCacheNode
+                else
                     needCompile = true
-                    cacheNode = vm.createNode()
-                    localInfo.node = cacheNode
+                    variableNode = vm.createNode()
+                    vm.setNode(localInfo, variableNode, true)
                 end
             else
                 local parentNode = vm.compileNode(source.node)
                 if not parentNode.fields then
                     parentNode.fields = {}
                 end
-                cacheNode = parentNode.fields[key]
-                if not cacheNode then
+                variableNode = parentNode.fields[key]
+                if not variableNode then
                     needCompile = true
-                    cacheNode = vm.createNode()
-                    parentNode.fields[key] = cacheNode
+                    variableNode = vm.createNode()
+                    parentNode.fields[key] = variableNode
                 end
             end
         end
@@ -1266,15 +1268,15 @@ local compilerSwitch = util.switch()
                 local uri = guide.getUri(source)
                 local value = vm.getTableValue(uri, vm.compileNode(source.node), key)
                 if value then
-                    cacheNode:merge(value)
+                    variableNode:merge(value)
                 end
                 for k in key:eachObject() do
                     if k.type == 'global' and k.cate == 'type' then
                         ---@cast k vm.global
                         vm.compileByParentNode(source.node, k, function (src)
-                            cacheNode:merge(vm.compileNode(src))
+                            variableNode:merge(vm.compileNode(src))
                             if src.value then
-                                cacheNode:merge(vm.compileNode(src.value))
+                                variableNode:merge(vm.compileNode(src.value))
                             end
                         end)
                     end
@@ -1284,21 +1286,21 @@ local compilerSwitch = util.switch()
                 vm.compileByParentNode(source.node, key, function (src)
                     if src.value then
                         if bindDocs(src) then
-                            cacheNode:merge(vm.compileNode(src))
+                            variableNode:merge(vm.compileNode(src))
                         elseif src.value.type ~= 'nil' then
-                            cacheNode:merge(vm.compileNode(src.value))
+                            variableNode:merge(vm.compileNode(src.value))
                             local node = vm.getNode(src)
                             if node then
-                                cacheNode:merge(node)
+                                variableNode:merge(node)
                             end
                         end
                     else
-                        cacheNode:merge(vm.compileNode(src))
+                        variableNode:merge(vm.compileNode(src))
                     end
                 end)
             end
         end
-        vm.setNode(source, cacheNode)
+        vm.setNode(source, variableNode)
     end)
     : case 'setglobal'
     : call(function (source)

@@ -1087,99 +1087,6 @@ function m.getKeyType(obj)
     return m.getKeyTypeOfLiteral(obj)
 end
 
---- 测试 a 到 b 的路径（不经过函数，不考虑 goto），
---- 每个路径是一个 block 。
----
---- 如果 a 在 b 的前面，返回 `"before"` 加上 2个`list<block>`
----
---- 如果 a 在 b 的后面，返回 `"after"` 加上 2个`list<block>`
----
---- 否则返回 `false`
----
---- 返回的2个 `list` 分别为基准block到达 a 与 b 的路径。
----@param a table
----@param b table
----@return string|false mode
----@return table? pathA
----@return table? pathB
-function m.getPath(a, b, sameFunction)
-    --- 首先测试双方在同一个函数内
-    if sameFunction and m.getParentFunction(a) ~= m.getParentFunction(b) then
-        return false
-    end
-    local mode
-    local objA
-    local objB
-    if a.finish < b.start then
-        mode = 'before'
-        objA = a
-        objB = b
-    elseif a.start > b.finish then
-        mode = 'after'
-        objA = b
-        objB = a
-    else
-        return 'equal', {}, {}
-    end
-    local pathA = {}
-    local pathB = {}
-    for _ = 1, 1000 do
-        objA = m.getParentBlock(objA)
-        if objA then
-            pathA[#pathA+1] = objA
-            if (not sameFunction and objA.type == 'function') or objA.type == 'main' then
-                break
-            end
-        end
-    end
-    for _ = 1, 1000 do
-        objB = m.getParentBlock(objB)
-        if objB then
-            pathB[#pathB+1] = objB
-            if (not sameFunction and objB.type == 'function') or objB.type == 'main' then
-                break
-            end
-        end
-    end
-    -- pathA: {1, 2, 3, 4, 5}
-    -- pathB: {5, 6, 2, 3}
-    local top = #pathB
-    local start
-    for i = #pathA, 1, -1 do
-        local currentBlock = pathA[i]
-        if currentBlock == pathB[top] then
-            start = i
-            break
-        end
-    end
-    if not start then
-        return false
-    end
-    -- pathA: {   1, 2, 3}
-    -- pathB: {5, 6, 2, 3}
-    local extra = 0
-    local align = top - start
-    for i = start, 1, -1 do
-        local currentA = pathA[i]
-        local currentB = pathB[i+align]
-        if currentA ~= currentB then
-            extra = i
-            break
-        end
-    end
-    -- pathA: {1}
-    local resultA = {}
-    for i = extra, 1, -1 do
-        resultA[#resultA+1] = pathA[i]
-    end
-    -- pathB: {5, 6}
-    local resultB = {}
-    for i = extra + align, 1, -1 do
-        resultB[#resultB+1] = pathB[i]
-    end
-    return mode, resultA, resultB
-end
-
 ---是否是全局变量（包括 _G.XXX 形式）
 ---@param source parser.object
 ---@return boolean
@@ -1334,6 +1241,21 @@ function m.getFunctionSelfNode(func)
     if parent.type == 'setmethod'
     or parent.type == 'setfield' then
         return parent.node
+    end
+    return nil
+end
+
+---@param source parser.object
+---@return parser.object?
+function m.getTopBlock(source)
+    for _ = 1, 1000 do
+        local block = source.parent
+        if not m.isBlockType(block) then
+            return nil
+        end
+        if block.type ~= 'do' then
+            return block
+        end
     end
     return nil
 end

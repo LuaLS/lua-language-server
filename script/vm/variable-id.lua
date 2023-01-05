@@ -6,6 +6,8 @@ local vm    = require 'vm.vm'
 ---@class vm.variable
 ---@field sets parser.object[]
 ---@field gets parser.object[]
+---@field node? vm.node
+---@field type 'global'|'local'
 
 ---@class parser.object
 ---@field package _variableID string|false
@@ -119,8 +121,9 @@ end
 function vm.insertVariableID(id, source)
     local root = guide.getRoot(source)
     if not root._variableIDs then
-        root._variableIDs = util.multiTable(2, function ()
+        root._variableIDs = util.multiTable(2, function (head)
             return {
+                type = head:sub(1, 1) == 'l' and 'local' or 'global',
                 sets = {},
                 gets = {},
             }

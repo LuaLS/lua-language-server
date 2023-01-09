@@ -781,8 +781,9 @@ end
 ---@field package _tracer vm.tracer
 
 ---@param source parser.object
+---@param name string
 ---@return vm.tracer?
-local function createTracer(source)
+local function createTracer(source, name)
     local node = vm.compileNode(source)
     local tracer = node._tracer
     if tracer then
@@ -794,6 +795,7 @@ local function createTracer(source)
     end
     tracer = setmetatable({
         source    = source,
+        name      = name,
         assigns   = {},
         assignMap = {},
         getMap    = {},
@@ -808,10 +810,8 @@ local function createTracer(source)
 
     if source.type == 'local'
     or source.type == 'self' then
-        tracer.name = source[1]
         tracer:collectLocal()
     else
-        tracer.name = source.global:getName()
         tracer:collectGlobal()
     end
 
@@ -821,15 +821,29 @@ end
 ---@param source parser.object
 ---@return vm.node?
 function vm.traceNode(source)
-    local base
+    local base, name
     if source.type == 'getlocal'
     or source.type == 'setlocal' then
         base = source.node
-    else
+        ---@type string
+        name = source[1]
+    elseif vm.getGlobalNode(source) then
         base = vm.getGlobalBase(source)
+        if not base then
+            return nil
+        end
+        name = base.global:getCodeName()
+    else
+        base = vm.getVariableHead(source)
+        if not base then
+            return nil
+        end
+        name = vm.getVariableName(source)
+        if not name then
+            return nil
+        end
     end
-    assert(base)
-    local tracer = createTracer(base)
+    local tracer = createTracer(base, name)
     if not tracer then
         return nil
     end

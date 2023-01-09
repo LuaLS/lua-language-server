@@ -1252,22 +1252,29 @@ local compilerSwitch = util.switch()
                 end
             end
         else
-            ---@cast key string
-            vm.compileByParentNode(source.node, key, function (src)
-                if src.value then
-                    if bindDocs(src) then
-                        vm.setNode(source, vm.compileNode(src))
-                    elseif src.value.type ~= 'nil' then
-                        vm.setNode(source, vm.compileNode(src.value))
-                        local node = vm.getNode(src)
-                        if node then
-                            vm.setNode(source, node)
+            if guide.isAssign(source) then
+                ---@cast key string
+                vm.compileByParentNode(source.node, key, function (src)
+                    if src.value then
+                        if bindDocs(src) then
+                            vm.setNode(source, vm.compileNode(src))
+                        elseif src.value.type ~= 'nil' then
+                            vm.setNode(source, vm.compileNode(src.value))
+                            local node = vm.getNode(src)
+                            if node then
+                                vm.setNode(source, node)
+                            end
                         end
+                    else
+                        vm.setNode(source, vm.compileNode(src))
                     end
-                else
-                    vm.setNode(source, vm.compileNode(src))
+                end)
+            else
+                local node = vm.traceNode(source)
+                if node then
+                    vm.setNode(source, node)
                 end
-            end)
+            end
         end
     end)
     : case 'setglobal'

@@ -6,8 +6,6 @@ local vm    = require 'vm.vm'
 ---@class vm.variable
 ---@field sets parser.object[]
 ---@field gets parser.object[]
----@field node? vm.node
----@field type 'global'|'local'
 
 ---@class parser.object
 ---@field package _variableID string|false
@@ -19,7 +17,7 @@ local compileSwitch = util.switch()
     : case 'local'
     : case 'self'
     : call(function (source)
-        source._variableID = ('l|%d'):format(source.start)
+        source._variableID = ('%d'):format(source.start)
         if not source.ref then
             return
         end
@@ -30,7 +28,7 @@ local compileSwitch = util.switch()
     : case 'setlocal'
     : case 'getlocal'
     : call(function (source)
-        source._variableID = ('l|%d'):format(source.node.start)
+        source._variableID = ('%d'):format(source.node.start)
         compileVariableID(source.next)
     end)
     : case 'getfield'
@@ -123,7 +121,6 @@ function vm.insertVariableID(id, source)
     if not root._variableIDs then
         root._variableIDs = util.multiTable(2, function (head)
             return {
-                type = head:sub(1, 1) == 'l' and 'local' or 'global',
                 sets = {},
                 gets = {},
             }
@@ -154,18 +151,33 @@ function compileVariableID(source)
 end
 
 ---@param source parser.object
----@return string|false
+---@return string?
 function vm.getVariableID(source)
     if source._variableID ~= nil then
-        return source._variableID
+        return source._variableID or nil
     end
     source._variableID = false
     local loc = getVariable(source)
     if not loc then
-        return source._variableID
+        return source._variableID or nil
     end
     compileVariableID(loc)
-    return source._variableID
+    return source._variableID or nil
+end
+
+---@param source parser.object
+---@return string?
+function vm.getVariableName(source)
+    local id = vm.getVariableID(source)
+    if not id then
+        return nil
+    end
+    local head = vm.getVariableHead(source)
+    if not head then
+        return nil
+    end
+    local name = id:gsub('%d+', head[1]):gsub(vm.ID_SPLITE, '.')
+    return name
 end
 
 ---@param source parser.object
@@ -247,4 +259,21 @@ function vm.getVariableFields(source, includeGets)
         log.warn('variable-id getFields takes %.3f seconds', cost)
     end
     return fields
+end
+
+---@param source parser.object
+---@return parser.object?
+function vm.getVariableHead(source)
+    local id = vm.getVariableID(source)
+    if not id then
+        return nil
+    end
+    for _ = 1, 1000 do
+        if source.type == 'local'
+        or source.type == 'self' then
+            return source
+        end
+        source = source.node
+    end
+    return nil
 end

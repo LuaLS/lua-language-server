@@ -4166,3 +4166,12 @@ X = Y
 
 print(<?X?>)
 ]]
+
+TEST 'number' [[
+---@type number
+local t
+
+if xxx == <?t?> then
+    print(t)
+end
+]]

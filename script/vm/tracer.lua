@@ -595,6 +595,8 @@ local lookIntoChild = util.switch()
                 end
             end
             if not handler then
+                tracer:lookIntoChild(action[1], topNode)
+                tracer:lookIntoChild(action[2], topNode)
                 return topNode, outNode
             end
             if tracer.getMap[handler] then

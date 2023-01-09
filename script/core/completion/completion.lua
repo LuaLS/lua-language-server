@@ -575,7 +575,7 @@ local function checkFieldOfRefs(refs, state, word, startPos, position, parent, o
                     end
                 end
                 funcs[name] = true
-                if fields[name] and not guide.isSet(fields[name]) then
+                if fields[name] and not guide.isAssign(fields[name]) then
                     fields[name] = nil
                 end
                 goto CONTINUE
@@ -590,7 +590,7 @@ local function checkFieldOfRefs(refs, state, word, startPos, position, parent, o
         if vm.getDeprecated(src) then
             goto CONTINUE
         end
-        if guide.isSet(src) then
+        if guide.isAssign(src) then
             fields[name] = src
             goto CONTINUE
         end

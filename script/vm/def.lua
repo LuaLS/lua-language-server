@@ -78,7 +78,7 @@ function vm.getDefs(source)
         end
         if not mark[src] then
             mark[src] = true
-            if guide.isSet(src)
+            if guide.isAssign(src)
             or guide.isLiteral(src) then
                 results[#results+1] = src
             end

@@ -487,7 +487,7 @@ local function checkSwapParams(results, uri, start, finish)
                 )
             elseif source.type == 'funcargs' then
                 local var = source.parent.parent
-                if guide.isSet(var) then
+                if guide.isAssign(var) then
                     if var.type == 'tablefield' then
                         var = var.field
                     end

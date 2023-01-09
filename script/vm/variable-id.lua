@@ -130,7 +130,7 @@ function vm.insertVariableID(id, source)
         end)
     end
     local sources = root._variableIDs[id]
-    if guide.isSet(source) then
+    if guide.isAssign(source) then
         sources.sets[#sources.sets+1] = source
     else
         sources.gets[#sources.gets+1] = source

@@ -350,7 +350,7 @@ function vm.getClassFields(suri, object, key, pushResult)
                             local fieldKey = guide.getKeyName(field)
                             if fieldKey then
                                 if  not searchedFields[fieldKey]
-                                and guide.isSet(field) then
+                                and guide.isAssign(field) then
                                     hasFounded[fieldKey] = true
                                     pushResult(field, true)
                                 end
@@ -370,7 +370,7 @@ function vm.getClassFields(suri, object, key, pushResult)
                                 local fieldKey = guide.getKeyName(field)
                                 if fieldKey then
                                     if  not searchedFields[fieldKey]
-                                    and guide.isSet(field) then
+                                    and guide.isAssign(field) then
                                         hasFounded[fieldKey] = true
                                         pushResult(field, true)
                                     end
@@ -391,7 +391,7 @@ function vm.getClassFields(suri, object, key, pushResult)
                         local fieldKey = guide.getKeyName(field)
                         if fieldKey and not searchedFields[fieldKey] then
                             if  not searchedFields[fieldKey]
-                            and guide.isSet(field)
+                            and guide.isAssign(field)
                             and field.value then
                                 if  vm.getVariableID(field)
                                 and vm.getVariableID(field) == vm.getVariableID(field.value) then
@@ -1162,7 +1162,7 @@ local compilerSwitch = util.switch()
         end
 
         -- { f = function (<?x?>) end }
-        if guide.isSet(parent) then
+        if guide.isAssign(parent) then
             vm.setNode(source, vm.compileNode(parent))
         end
     end)
@@ -1758,37 +1758,16 @@ local compilerSwitch = util.switch()
         ---@type vm.global
         local global = source.global
         local uri = guide.getUri(source)
-        local globalNode = vm.getNode(source)
-        if not globalNode then
-            return
-        end
-        globalNode:merge(global)
+        vm.setNode(source, global)
         if global.cate == 'variable' then
-            local hasMarkDoc
-            for _, set in ipairs(global:getSets(uri)) do
-                if set.bindDocs and set.parent.type == 'main' then
-                    if bindDocs(set) then
-                        globalNode:merge(vm.compileNode(set))
-                        hasMarkDoc = true
-                    end
-                    if vm.getNode(set) then
-                        globalNode:merge(vm.compileNode(set))
+            for luri, link in pairs(global.links) do
+                if luri ~= uri then
+                    local firstSet = link.sets[1]
+                    if firstSet then
+                        local setNode = vm.compileNode(firstSet)
+                        vm.setNode(source, setNode)
                     end
                 end
-            end
-            -- Set all globals node first to avoid recursive
-            for _, set in ipairs(global:getSets(uri)) do
-                vm.setNode(set, globalNode, true)
-            end
-            for _, set in ipairs(global:getSets(uri)) do
-                if set.value and set.value.type ~= 'nil' and set.parent.type == 'main' then
-                    if not hasMarkDoc or guide.isLiteral(set.value) then
-                        globalNode:merge(vm.compileNode(set.value))
-                    end
-                end
-            end
-            for _, set in ipairs(global:getSets(uri)) do
-                vm.setNode(set, globalNode, true)
             end
         end
         if global.cate == 'type' then
@@ -1798,7 +1777,7 @@ local compilerSwitch = util.switch()
                         for _, ext in ipairs(set.extends) do
                             if ext.type == 'doc.type.table' then
                                 if not vm.getGeneric(ext) then
-                                    globalNode:merge(vm.compileNode(ext))
+                                    vm.setNode(source, vm.compileNode(ext))
                                 end
                             end
                         end
@@ -1806,7 +1785,7 @@ local compilerSwitch = util.switch()
                 end
                 if set.type == 'doc.alias' then
                     if not vm.getGeneric(set.extends) then
-                        globalNode:merge(vm.compileNode(set.extends))
+                        vm.setNode(source, vm.compileNode(set.extends))
                     end
                 end
             end

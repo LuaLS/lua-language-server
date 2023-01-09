@@ -69,7 +69,7 @@ function mt:collectReferences()
     ---@async
     guide.eachSourceType(self.state.ast, 'function', function (src)
         local parent = src.parent
-        if guide.isSet(parent) then
+        if guide.isAssign(parent) then
             src = parent
         elseif parent.type == 'return' then
         else

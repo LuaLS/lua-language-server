@@ -198,7 +198,7 @@ local Care = util.switch()
                 start      = source.start,
                 finish     = source.finish,
                 type       = define.TokenTypes['function'],
-                modifieres = guide.isSet(source) and define.TokenModifiers.declaration or nil,
+                modifieres = guide.isAssign(source) and define.TokenModifiers.declaration or nil,
             }
             return
         end

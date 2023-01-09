@@ -60,7 +60,7 @@ local viewNodeSwitch;viewNodeSwitch = util.switch()
     : case 'function'
     : call(function (source, infer)
         local parent = source.parent
-        if guide.isSet(parent) then
+        if guide.isAssign(parent) then
             infer._hasFunctionDef = true
         end
         return source.type

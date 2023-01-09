@@ -906,7 +906,7 @@ local isSetMap = {
     ['doc.type.field']    = true,
     ['doc.type.array']    = true,
 }
-function m.isSet(source)
+function m.isAssign(source)
     local tp = source.type
     if isSetMap[tp] then
         return true

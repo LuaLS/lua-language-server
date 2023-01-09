@@ -11,8 +11,8 @@ local vm    = require 'vm.vm'
 ---@field global vm.global
 
 ---@class vm.global.link
----@field sets   parser.object[]
----@field hasGet boolean?
+---@field sets parser.object[]
+---@field gets parser.object[]
 
 ---@class vm.global
 ---@field links table<uri, vm.global.link>
@@ -27,17 +27,15 @@ mt.name = ''
 ---@param source parser.object
 function mt:addSet(uri, source)
     local link = self.links[uri]
-    if not link.sets then
-        link.sets = {}
-    end
     link.sets[#link.sets+1] = source
     self.setsCache = nil
 end
 
 ---@param uri    uri
-function mt:addGet(uri)
+---@param source parser.object
+function mt:addGet(uri, source)
     local link = self.links[uri]
-    link.hasGet = true
+    link.gets[#link.gets+1] = source
 end
 
 ---@param suri uri
@@ -128,7 +126,12 @@ local function createGlobal(name, cate)
     return setmetatable({
         name  = name,
         cate  = cate,
-        links = util.multiTable(2),
+        links = util.multiTable(2, function ()
+            return {
+                sets = {},
+                gets = {},
+            }
+        end),
     }, mt)
 end
 
@@ -183,7 +186,7 @@ local compilerGlobalSwitch = util.switch()
             return
         end
         local global = vm.declareGlobal('variable', name, uri)
-        global:addGet(uri)
+        global:addGet(uri, source)
         source._globalNode = global
 
         local nxt = source.next
@@ -241,7 +244,7 @@ local compilerGlobalSwitch = util.switch()
         end
         local uri    = guide.getUri(source)
         local global = vm.declareGlobal('variable', name, uri)
-        global:addGet(uri)
+        global:addGet(uri, source)
         source._globalNode = global
 
         local nxt = source.next
@@ -267,7 +270,7 @@ local compilerGlobalSwitch = util.switch()
                         global:addSet(uri, source)
                         source.value = source.args[3]
                     else
-                        global:addGet(uri)
+                        global:addGet(uri, source)
                     end
                     source._globalNode = global
 
@@ -366,7 +369,7 @@ local compilerGlobalSwitch = util.switch()
             return
         end
         local type = vm.declareGlobal('type', name, uri)
-        type:addGet(uri)
+        type:addGet(uri, source)
         source._globalNode = type
     end)
     : case 'doc.extends.name'
@@ -374,7 +377,7 @@ local compilerGlobalSwitch = util.switch()
         local uri  = guide.getUri(source)
         local name = source[1]
         local class = vm.declareGlobal('type', name, uri)
-        class:addGet(uri)
+        class:addGet(uri, source)
         source._globalNode = class
     end)
 
@@ -515,6 +518,15 @@ function vm.compileByGlobal(source)
     if not global then
         return
     end
+    if global.cate == 'variable' then
+        vm.setNode(source, global)
+        if guide.isAssign(source) then
+            vm.setNode(source, vm.compileNode(source.value))
+            return
+        end
+        vm.traceNode(source)
+        return
+    end
     local globalBase = vm.getGlobalBase(source)
     if not globalBase then
         return
@@ -544,6 +556,8 @@ function vm.getGlobalBase(source)
             type   = 'globalbase',
             parent = root,
             global = global,
+            start  = 0,
+            finish = 0,
         }
     end
     source._globalBase = root._globalBaseMap[name]

@@ -86,7 +86,7 @@ return function (uri, position, includeDeclaration)
             goto CONTINUE
         end
         if not includeDeclaration then
-            if guide.isSet(src)
+            if guide.isAssign(src)
             or guide.isLiteral(src) then
                 goto CONTINUE
             end

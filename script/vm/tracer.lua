@@ -21,6 +21,7 @@ local util      = require 'utility'
 ---@field castIndex integer?
 local mt = {}
 mt.__index = mt
+mt.fastCalc    = true
 
 ---@return parser.object[]
 function mt:getCasts()
@@ -66,6 +67,21 @@ function mt:collectCare(obj)
             return
         end
         self.careMap[obj] = true
+
+        if self.fastCalc then
+            if obj.type == 'if'
+            or obj.type == 'while'
+            or obj.type == 'binary' then
+                self.fastCalc = false
+            end
+            if obj.type == 'call' and obj.node then
+                if obj.node.special == 'assert'
+                or obj.node.special == 'type' then
+                    self.fastCalc = false
+                end
+            end
+        end
+
         obj = obj.parent
     end
 end
@@ -104,6 +120,10 @@ function mt:collectLocal()
             self.casts[#self.casts+1] = cast
         end
     end
+
+    if #self.casts > 0 then
+        self.fastCalc = false
+    end
 end
 
 function mt:collectGlobal()
@@ -139,7 +159,7 @@ end
 ---@param finish integer
 ---@return parser.object?
 function mt:getLastAssign(start, finish)
-    local assign
+    local assign = self.assigns[1]
     for _, obj in ipairs(self.assigns) do
         if obj.start < start then
             goto CONTINUE
@@ -147,7 +167,7 @@ function mt:getLastAssign(start, finish)
         if (obj.range or obj.start) >= finish then
             break
         end
-        local objBlock = guide.getParentBlock(obj)
+        local objBlock = guide.getTopBlock(obj)
         if not objBlock then
             break
         end
@@ -683,6 +703,12 @@ function mt:lookIntoBlock(block, start, node)
         end
         if self.careMap[action] then
             node = self:lookIntoChild(action, node)
+            if action.type == 'do'
+            or action.type == 'loop'
+            or action.type == 'in'
+            or action.type == 'repeat' then
+                return
+            end
         end
         if action.finish > start and self.assignMap[action] then
             return
@@ -690,14 +716,22 @@ function mt:lookIntoBlock(block, start, node)
         ::CONTINUE::
     end
     self.nodes[block] = node
+    if block.type == 'do'
+    or block.type == 'loop'
+    or block.type == 'in'
+    or block.type == 'repeat' then
+        self:lookIntoBlock(block.parent, block.finish, node)
+    end
 end
 
 ---@param source parser.object
 function mt:calcNode(source)
     if self.getMap[source] then
         local lastAssign = self:getLastAssign(0, source.finish)
-        if not lastAssign then
-            lastAssign = source.node
+        assert(lastAssign)
+        if self.fastCalc then
+            self.nodes[source] = vm.compileNode(lastAssign)
+            return
         end
         self:calcNode(lastAssign)
         return

@@ -1253,9 +1253,13 @@ function m.getTopBlock(source)
         if not m.isBlockType(block) then
             return nil
         end
-        if block.type ~= 'do' then
+        if  block.type ~= 'do'
+        and block.type ~= 'in'
+        and block.type ~= 'loop'
+        and block.type ~= 'repeat' then
             return block
         end
+        source = block
     end
     return nil
 end

@@ -165,7 +165,7 @@ local childMap = {
     ['doc.version']        = {'#versions'},
     ['doc.diagnostic']     = {'#names'},
     ['doc.as']             = {'as'},
-    ['doc.cast']           = {'loc', '#casts'},
+    ['doc.cast']           = {'name', '#casts'},
     ['doc.cast.block']     = {'extends'},
     ['doc.operator']       = {'op', 'exp', 'extends'},
 }

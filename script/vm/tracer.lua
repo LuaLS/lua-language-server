@@ -8,6 +8,7 @@ local util      = require 'utility'
 ---@field package _casts?  parser.object[]
 
 ---@class vm.tracer
+---@field name      string
 ---@field source    parser.object
 ---@field assigns   parser.object[]
 ---@field assignMap table<parser.object, true>
@@ -30,7 +31,7 @@ function mt:getCasts()
         root._casts = {}
         local docs = root.docs
         for _, doc in ipairs(docs) do
-            if doc.type == 'doc.cast' and doc.loc then
+            if doc.type == 'doc.cast' and doc.name then
                 root._casts[#root._casts+1] = doc
             end
         end
@@ -113,10 +114,10 @@ function mt:collectLocal()
 
     local casts = self:getCasts()
     for _, cast in ipairs(casts) do
-        if  cast.loc[1] == self.source[1]
+        if  cast.name[1] == self.name
         and cast.start  > startPos
         and cast.finish < finishPos
-        and guide.getLocal(self.source, self.source[1], cast.start) == self.source then
+        and guide.getLocal(self.source, self.name, cast.start) == self.source then
             self.casts[#self.casts+1] = cast
         end
     end
@@ -152,6 +153,17 @@ function mt:collectGlobal()
         if get.finish > finishPos then
             finishPos = get.finish
         end
+    end
+
+    local casts = self:getCasts()
+    for _, cast in ipairs(casts) do
+        if cast.name[1] == self.name then
+            self.casts[#self.casts+1] = cast
+        end
+    end
+
+    if #self.casts > 0 then
+        self.fastCalc = false
     end
 end
 
@@ -794,8 +806,10 @@ local function createTracer(source)
 
     if source.type == 'local'
     or source.type == 'self' then
+        tracer.name = source[1]
         tracer:collectLocal()
     else
+        tracer.name = source.global:getName()
         tracer:collectGlobal()
     end
 

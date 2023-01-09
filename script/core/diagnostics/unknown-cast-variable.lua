@@ -16,15 +16,15 @@ return function (uri, callback)
     end
 
     for _, doc in ipairs(state.ast.docs) do
-        if doc.type == 'doc.cast' and doc.loc then
+        if doc.type == 'doc.cast' and doc.name then
             await.delay()
-            local defs = vm.getDefs(doc.loc)
+            local defs = vm.getDefs(doc.name)
             local loc = defs[1]
             if not loc then
                 callback {
-                    start   = doc.loc.start,
-                    finish  = doc.loc.finish,
-                    message = lang.script('DIAG_UNKNOWN_CAST_VARIABLE', doc.loc[1])
+                    start   = doc.name.start,
+                    finish  = doc.name.finish,
+                    message = lang.script('DIAG_UNKNOWN_CAST_VARIABLE', doc.name[1])
                 }
             end
         end

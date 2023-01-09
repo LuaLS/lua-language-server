@@ -16,9 +16,9 @@ return function (uri, callback)
     end
 
     for _, doc in ipairs(state.ast.docs) do
-        if doc.type == 'doc.cast' and doc.loc then
+        if doc.type == 'doc.cast' and doc.name then
             await.delay()
-            local defs = vm.getDefs(doc.loc)
+            local defs = vm.getDefs(doc.name)
             local loc = defs[1]
             if loc then
                 local defNode = vm.compileNode(loc)

@@ -1316,7 +1316,7 @@ local docSwitch = util.switch()
             return result
         end
 
-        result.loc    = loc
+        result.name   = loc
         result.finish = loc.finish
 
         while true do

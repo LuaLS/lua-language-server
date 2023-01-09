@@ -4157,3 +4157,12 @@ if type(X) ~= 'number' then
     print(<?X?>)
 end
 ]]
+
+TEST 'boolean' [[
+---@type number
+X = Y
+
+---@cast X boolean
+
+print(<?X?>)
+]]

@@ -514,28 +514,19 @@ function vm.compileByGlobal(source)
     if not global then
         return
     end
-    ---@cast source parser.object
-    local root = guide.getRoot(source)
-    local uri = guide.getUri(source)
-    if not root._globalBaseMap then
-        root._globalBaseMap = {}
+    local globalBase = vm.getGlobalBase(source)
+    if not globalBase then
+        return
     end
-    local name = global:asKeyName()
-    if not root._globalBaseMap[name] then
-        root._globalBaseMap[name] = {
-            type   = 'globalbase',
-            parent = root,
-        }
-    end
-    source._globalBase = root._globalBaseMap[name]
     local globalNode = vm.getNode(source._globalBase)
     if globalNode then
         vm.setNode(source, globalNode, true)
         return
     end
+    local uri = guide.getUri(source)
     ---@type vm.node
     globalNode = vm.createNode(global)
-    vm.setNode(source._globalBase, globalNode, true)
+    vm.setNode(globalBase, globalNode, true)
     vm.setNode(source, globalNode, true)
 
     -- TODO:don't mix
@@ -596,6 +587,32 @@ function vm.compileByGlobal(source)
             end
         end
     end
+end
+
+---@param source parser.object
+---@return parser.object?
+function vm.getGlobalBase(source)
+    if source._globalBase then
+        return source._globalBase
+    end
+    local global = vm.getGlobalNode(source)
+    if not global then
+        return nil
+    end
+    ---@cast source parser.object
+    local root = guide.getRoot(source)
+    if not root._globalBaseMap then
+        root._globalBaseMap = {}
+    end
+    local name = global:asKeyName()
+    if not root._globalBaseMap[name] then
+        root._globalBaseMap[name] = {
+            type   = 'globalbase',
+            parent = root,
+        }
+    end
+    source._globalBase = root._globalBaseMap[name]
+    return source._globalBase
 end
 
 ---@param source parser.object

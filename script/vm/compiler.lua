@@ -15,7 +15,7 @@ local vm         = require 'vm.vm'
 -- 该函数有副作用，会给source绑定node！
 ---@param source parser.object
 ---@return boolean
-function vm.bindDocs(source)
+local function bindDocs(source)
     local docs = source.bindDocs
     if not docs then
         return false
@@ -75,7 +75,7 @@ local function searchFieldByLocalID(source, key, pushResult)
     local hasMarkDoc = {}
     for _, src in ipairs(fields) do
         if src.bindDocs then
-            if vm.bindDocs(src) then
+            if bindDocs(src) then
                 local skey = guide.getKeyName(src)
                 if skey then
                     hasMarkDoc[skey] = true
@@ -955,7 +955,7 @@ local function compileLocal(source)
 
     local hasMarkDoc
     if source.bindDocs then
-        hasMarkDoc = vm.bindDocs(source)
+        hasMarkDoc = bindDocs(source)
     end
     local hasMarkParam
     if not hasMarkDoc then
@@ -1020,7 +1020,7 @@ local function compileLocal(source)
     -- for x = ... do
     if source.parent.type == 'loop' then
         if source.parent.loc == source then
-            if vm.bindDocs(source) then
+            if bindDocs(source) then
                 return
             end
             vm.setNode(source, vm.declareGlobal('type', 'integer'))
@@ -1184,7 +1184,7 @@ local compilerSwitch = util.switch()
     end)
     : case 'setlocal'
     : call(function (source)
-        if vm.bindDocs(source) then
+        if bindDocs(source) then
             return
         end
         local locNode = vm.compileNode(source.node)
@@ -1284,7 +1284,7 @@ local compilerSwitch = util.switch()
                 ---@cast key string
                 vm.compileByParentNode(source.node, key, function (src)
                     if src.value then
-                        if vm.bindDocs(src) then
+                        if bindDocs(src) then
                             variableNode:merge(vm.compileNode(src))
                         elseif src.value.type ~= 'nil' then
                             variableNode:merge(vm.compileNode(src.value))
@@ -1332,7 +1332,7 @@ local compilerSwitch = util.switch()
     : call(function (source)
         local hasMarkDoc
         if source.bindDocs then
-            hasMarkDoc = vm.bindDocs(source)
+            hasMarkDoc = bindDocs(source)
         end
 
         if not hasMarkDoc then
@@ -1752,6 +1752,65 @@ local compilerSwitch = util.switch()
             return
         end
         vm.binarySwitch(source.op.type, source)
+    end)
+    : case 'globalbase'
+    : call(function (source)
+        ---@type vm.global
+        local global = source.global
+        local uri = guide.getUri(source)
+        local globalNode = vm.getNode(source)
+        if not globalNode then
+            return
+        end
+        globalNode:merge(global)
+        if global.cate == 'variable' then
+            local hasMarkDoc
+            for _, set in ipairs(global:getSets(uri)) do
+                if set.bindDocs and set.parent.type == 'main' then
+                    if bindDocs(set) then
+                        globalNode:merge(vm.compileNode(set))
+                        hasMarkDoc = true
+                    end
+                    if vm.getNode(set) then
+                        globalNode:merge(vm.compileNode(set))
+                    end
+                end
+            end
+            -- Set all globals node first to avoid recursive
+            for _, set in ipairs(global:getSets(uri)) do
+                vm.setNode(set, globalNode, true)
+            end
+            for _, set in ipairs(global:getSets(uri)) do
+                if set.value and set.value.type ~= 'nil' and set.parent.type == 'main' then
+                    if not hasMarkDoc or guide.isLiteral(set.value) then
+                        globalNode:merge(vm.compileNode(set.value))
+                    end
+                end
+            end
+            for _, set in ipairs(global:getSets(uri)) do
+                vm.setNode(set, globalNode, true)
+            end
+        end
+        if global.cate == 'type' then
+            for _, set in ipairs(global:getSets(uri)) do
+                if set.type == 'doc.class' then
+                    if set.extends then
+                        for _, ext in ipairs(set.extends) do
+                            if ext.type == 'doc.type.table' then
+                                if not vm.getGeneric(ext) then
+                                    globalNode:merge(vm.compileNode(ext))
+                                end
+                            end
+                        end
+                    end
+                end
+                if set.type == 'doc.alias' then
+                    if not vm.getGeneric(set.extends) then
+                        globalNode:merge(vm.compileNode(set.extends))
+                    end
+                end
+            end
+        end
     end)
 
 ---@param source parser.object

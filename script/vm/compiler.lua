@@ -1233,73 +1233,42 @@ local compilerSwitch = util.switch()
             return
         end
 
-        ---@type vm.node, boolean
-        local variableNode, needCompile
-
-        do
-            local localInfo = vm.getVariableInfo(source)
-            if localInfo then
-                local lastCacheNode = vm.getNode(localInfo)
-                if lastCacheNode then
-                    variableNode = lastCacheNode
-                else
-                    needCompile = true
-                    variableNode = vm.createNode()
-                    vm.setNode(localInfo, variableNode, true)
-                end
-            else
-                local parentNode = vm.compileNode(source.node)
-                if not parentNode.fields then
-                    parentNode.fields = {}
-                end
-                variableNode = parentNode.fields[key]
-                if not variableNode then
-                    needCompile = true
-                    variableNode = vm.createNode()
-                    parentNode.fields[key] = variableNode
-                end
+        if type(key) == 'table' then
+            ---@cast key vm.node
+            local uri = guide.getUri(source)
+            local value = vm.getTableValue(uri, vm.compileNode(source.node), key)
+            if value then
+                vm.setNode(source, value)
             end
-        end
-
-        if needCompile then
-            if type(key) == 'table' then
-                ---@cast key vm.node
-                local uri = guide.getUri(source)
-                local value = vm.getTableValue(uri, vm.compileNode(source.node), key)
-                if value then
-                    variableNode:merge(value)
-                end
-                for k in key:eachObject() do
-                    if k.type == 'global' and k.cate == 'type' then
-                        ---@cast k vm.global
-                        vm.compileByParentNode(source.node, k, function (src)
-                            variableNode:merge(vm.compileNode(src))
-                            if src.value then
-                                variableNode:merge(vm.compileNode(src.value))
-                            end
-                        end)
-                    end
-                end
-            else
-                ---@cast key string
-                vm.compileByParentNode(source.node, key, function (src)
-                    if src.value then
-                        if bindDocs(src) then
-                            variableNode:merge(vm.compileNode(src))
-                        elseif src.value.type ~= 'nil' then
-                            variableNode:merge(vm.compileNode(src.value))
-                            local node = vm.getNode(src)
-                            if node then
-                                variableNode:merge(node)
-                            end
+            for k in key:eachObject() do
+                if k.type == 'global' and k.cate == 'type' then
+                    ---@cast k vm.global
+                    vm.compileByParentNode(source.node, k, function (src)
+                        vm.setNode(source, vm.compileNode(src))
+                        if src.value then
+                            vm.setNode(source, vm.compileNode(src.value))
                         end
-                    else
-                        variableNode:merge(vm.compileNode(src))
-                    end
-                end)
+                    end)
+                end
             end
+        else
+            ---@cast key string
+            vm.compileByParentNode(source.node, key, function (src)
+                if src.value then
+                    if bindDocs(src) then
+                        vm.setNode(source, vm.compileNode(src))
+                    elseif src.value.type ~= 'nil' then
+                        vm.setNode(source, vm.compileNode(src.value))
+                        local node = vm.getNode(src)
+                        if node then
+                            vm.setNode(source, node)
+                        end
+                    end
+                else
+                    vm.setNode(source, vm.compileNode(src))
+                end
+            end)
         end
-        vm.setNode(source, variableNode)
     end)
     : case 'setglobal'
     : call(function (source)

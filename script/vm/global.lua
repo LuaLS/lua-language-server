@@ -5,6 +5,10 @@ local files = require 'files'
 ---@class vm
 local vm    = require 'vm.vm'
 
+---@class parser.object
+---@field package _globalBase parser.object
+---@field package _globalBaseMap table<string, parser.object>
+
 ---@class vm.global.link
 ---@field sets   parser.object[]
 ---@field hasGet boolean?
@@ -502,6 +506,96 @@ end
 ---@return parser.object[]?
 function vm.getEnums(source)
     return source._enums
+end
+
+---@param source parser.object
+function vm.compileByGlobal(source)
+    local global = vm.getGlobalNode(source)
+    if not global then
+        return
+    end
+    ---@cast source parser.object
+    local root = guide.getRoot(source)
+    local uri = guide.getUri(source)
+    if not root._globalBaseMap then
+        root._globalBaseMap = {}
+    end
+    local name = global:asKeyName()
+    if not root._globalBaseMap[name] then
+        root._globalBaseMap[name] = {
+            type   = 'globalbase',
+            parent = root,
+        }
+    end
+    source._globalBase = root._globalBaseMap[name]
+    local globalNode = vm.getNode(source._globalBase)
+    if globalNode then
+        vm.setNode(source, globalNode, true)
+        return
+    end
+    ---@type vm.node
+    globalNode = vm.createNode(global)
+    vm.setNode(source._globalBase, globalNode, true)
+    vm.setNode(source, globalNode, true)
+
+    -- TODO:don't mix
+    --local sets = global.links[uri].sets or {}
+    --local gets = global.links[uri].gets or {}
+    --for _, set in ipairs(sets) do
+    --    vm.setNode(set, globalNode, true)
+    --end
+    --for _, get in ipairs(gets) do
+    --    vm.setNode(get, globalNode, true)
+    --end
+
+    if global.cate == 'variable' then
+        local hasMarkDoc
+        for _, set in ipairs(global:getSets(uri)) do
+            if set.bindDocs and set.parent.type == 'main' then
+                if vm.bindDocs(set) then
+                    globalNode:merge(vm.compileNode(set))
+                    hasMarkDoc = true
+                end
+                if vm.getNode(set) then
+                    globalNode:merge(vm.compileNode(set))
+                end
+            end
+        end
+        -- Set all globals node first to avoid recursive
+        for _, set in ipairs(global:getSets(uri)) do
+            vm.setNode(set, globalNode, true)
+        end
+        for _, set in ipairs(global:getSets(uri)) do
+            if set.value and set.value.type ~= 'nil' and set.parent.type == 'main' then
+                if not hasMarkDoc or guide.isLiteral(set.value) then
+                    globalNode:merge(vm.compileNode(set.value))
+                end
+            end
+        end
+        for _, set in ipairs(global:getSets(uri)) do
+            vm.setNode(set, globalNode, true)
+        end
+    end
+    if global.cate == 'type' then
+        for _, set in ipairs(global:getSets(uri)) do
+            if set.type == 'doc.class' then
+                if set.extends then
+                    for _, ext in ipairs(set.extends) do
+                        if ext.type == 'doc.type.table' then
+                            if not vm.getGeneric(ext) then
+                                globalNode:merge(vm.compileNode(ext))
+                            end
+                        end
+                    end
+                end
+            end
+            if set.type == 'doc.alias' then
+                if not vm.getGeneric(set.extends) then
+                    globalNode:merge(vm.compileNode(set.extends))
+                end
+            end
+        end
+    end
 end
 
 ---@param source parser.object

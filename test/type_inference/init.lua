@@ -2893,10 +2893,7 @@ local <?x?> = echo(b)
 ]]
 
 TEST 'boolean' [[
----@return boolean
-function f()
-end
-
+---@overload fun():boolean
 ---@param x integer
 ---@return number
 function f(x)
@@ -2906,10 +2903,7 @@ local <?x?> = f()
 ]]
 
 TEST 'number' [[
----@return boolean
-function f()
-end
-
+---@overload fun():boolean
 ---@param x integer
 ---@return number
 function f(x)
@@ -2919,10 +2913,7 @@ local <?x?> = f(1)
 ]]
 
 TEST 'boolean' [[
----@return boolean
-function f()
-end
-
+---@overload fun():boolean
 ---@param x integer
 ---@return number
 function f(x)
@@ -2936,10 +2927,7 @@ local <?x?> = f(r0())
 ]]
 
 TEST 'number' [[
----@return boolean
-function f()
-end
-
+---@overload fun():boolean
 ---@param x integer
 ---@return number
 function f(x)
@@ -2953,10 +2941,7 @@ local <?x?> = f(r1())
 ]]
 
 TEST 'boolean' [[
----@return boolean
-function f()
-end
-
+---@overload fun():boolean
 ---@param x integer
 ---@return number
 function f(x)
@@ -2969,10 +2954,7 @@ local <?x?> = f(r0())
 ]]
 
 TEST 'number' [[
----@return boolean
-function f()
-end
-
+---@overload fun():boolean
 ---@param x integer
 ---@return number
 function f(x)
@@ -3430,7 +3412,7 @@ local mt = {}
 mt.<?x?> = nil
 ]]
 
-TEST 'unknown' [[
+TEST 'nil' [[
 mt = {}
 mt.<?x?> = nil
 ]]
@@ -4146,5 +4128,32 @@ local f
 
 for _, <?x?> in ipairs(xs) do
     x = f(x)
+end
+]]
+
+TEST 'number' [[
+---@type number?
+X = Y
+
+if X then
+    print(<?X?>)
+end
+]]
+
+TEST 'number' [[
+---@type number|boolean
+X = Y
+
+if type(X) == 'number' then
+    print(<?X?>)
+end
+]]
+
+TEST 'boolean' [[
+---@type number|boolean
+X = Y
+
+if type(X) ~= 'number' then
+    print(<?X?>)
 end
 ]]

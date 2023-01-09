@@ -521,10 +521,15 @@ function vm.compileByGlobal(source)
     if global.cate == 'variable' then
         vm.setNode(source, global)
         if guide.isAssign(source) then
-            vm.setNode(source, vm.compileNode(source.value))
+            if source.value then
+                vm.setNode(source, vm.compileNode(source.value))
+            end
             return
         end
-        vm.traceNode(source)
+        local node = vm.traceNode(source)
+        if node then
+            vm.setNode(source, node, true)
+        end
         return
     end
     local globalBase = vm.getGlobalBase(source)

@@ -235,11 +235,8 @@ end)(<??>)
 {'function (<!a: any!>, b: any)'}
 
 TEST [[
-function X() end
-
----@param a number
-function X(a) end
-
+---@overload fun()
+---@overload fun(a:number)
 ---@param a number
 ---@param b number
 function X(a, b) end
@@ -252,12 +249,9 @@ X(<??>)
 'function X(<!a: number!>, b: number)',
 }
 
-TEST [[
-function X() end
-
----@param a number
-function X(a) end
-
+TEST [[\
+---@overload fun()
+---@overload fun(a:number)
 ---@param a number
 ---@param b number
 function X(a, b) end
@@ -270,11 +264,8 @@ X(<?1?>)
 }
 
 TEST [[
-function X() end
-
----@param a number
-function X(a) end
-
+---@overload fun()
+---@overload fun(a:number)
 ---@param a number
 ---@param b number
 function X(a, b) end
@@ -286,11 +277,8 @@ X(1, <??>)
 }
 
 TEST [[
-function X() end
-
----@param a number
-function X(a) end
-
+---@overload fun()
+---@overload fun(a:number)
 ---@param a number
 ---@param b number
 function X(a, b) end

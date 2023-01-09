@@ -1303,16 +1303,13 @@ local compilerSwitch = util.switch()
     end)
     : case 'setglobal'
     : call(function (source)
+        if bindDocs(source) then
+            return
+        end
         if source.node[1] ~= '_ENV' then
             return
         end
-        local key = guide.getKeyName(source)
-        vm.compileByParentNode(source.node, key, function (src)
-            if src.type == 'doc.type.field'
-            or src.type == 'doc.field' then
-                vm.setNode(source, vm.compileNode(src))
-            end
-        end)
+        vm.setNode(source, vm.compileNode(source.value))
     end)
     : case 'getglobal'
     : call(function (source)

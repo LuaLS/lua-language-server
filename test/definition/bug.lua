@@ -48,6 +48,13 @@ obj[#<?obj?>+1] = {}
 
 TEST [[
 self = {
+    <!results!> = {}
+}
+self[self.<?results?>] = lbl
+]]
+
+TEST [[
+self = {
     results = {
         <!labels!> = {},
     }

@@ -214,6 +214,7 @@ end
 
 local lookIntoChild = util.switch()
     : case 'getlocal'
+    : case 'getglobal'
     ---@param tracer   vm.tracer
     ---@param action   parser.object
     ---@param topNode  vm.node
@@ -466,7 +467,7 @@ local lookIntoChild = util.switch()
             and call.args then
                 local getVar = call.args[1]
                 if  getVar
-                and tracer.assignMap[getVar] then
+                and tracer.getMap[getVar] then
                     for _, ref in ipairs(action.ref) do
                         tracer:collectCare(ref)
                     end
@@ -694,7 +695,7 @@ end
 ---@param source parser.object
 function mt:calcNode(source)
     if self.getMap[source] then
-        local lastAssign = self:getLastAssign(0, source.start)
+        local lastAssign = self:getLastAssign(0, source.finish)
         if not lastAssign then
             lastAssign = source.node
         end

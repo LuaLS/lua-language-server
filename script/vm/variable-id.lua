@@ -202,6 +202,26 @@ function vm.getVariableInfo(source, key)
 end
 
 ---@param source parser.object
+---@param name   string
+---@return vm.variable?
+function vm.getVariableInfoByName(source, name)
+    local id = vm.getVariableID(source)
+    if not id then
+        return nil
+    end
+    local root = guide.getRoot(source)
+    if not root._variableIDs then
+        return nil
+    end
+    local headPos = name:find('.', 1, true)
+    if not headPos then
+        return root._variableIDs[id]
+    end
+    local vid = id .. name:sub(headPos):gsub('%.', vm.ID_SPLITE)
+    return root._variableIDs[vid]
+end
+
+---@param source parser.object
 ---@param key?   string
 ---@return parser.object[]?
 function vm.getVariableSets(source, key)

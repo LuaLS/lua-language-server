@@ -4,6 +4,9 @@ local guide     = require 'parser.guide'
 local vm        = require 'vm.vm'
 local config    = require 'config'
 
+---@class parser.object
+---@field package _castTargetHead parser.object | vm.global | false
+
 ---获取class与alias
 ---@param suri uri
 ---@param name? string
@@ -413,4 +416,28 @@ function vm.isDiagDisabledAt(uri, position, name, err)
         end
     end
     return count > 0
+end
+
+---@param doc parser.object
+---@return (parser.object | vm.global)?
+function vm.getCastTargetHead(doc)
+    if doc._castTargetHead ~= nil then
+        return doc._castTargetHead or nil
+    end
+    local name = doc.name[1]:match '^[^%.]+'
+    if not name then
+        doc._castTargetHead = false
+        return nil
+    end
+    local loc = guide.getLocal(doc, name, doc.start)
+    if loc then
+        doc._castTargetHead = loc
+        return loc
+    end
+    local global = vm.getGlobal('variable', name)
+    if global then
+        doc._castTargetHead = global
+        return global
+    end
+    return nil
 end

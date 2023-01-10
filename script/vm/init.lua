@@ -15,10 +15,11 @@ require 'vm.tracer'
 require 'vm.infer'
 require 'vm.generic'
 require 'vm.sign'
-require 'vm.variable-id'
+require 'vm.variable'
 require 'vm.global'
 require 'vm.function'
 require 'vm.operator'
 require 'vm.visible'
+require 'vm.precompile'
 
 return vm

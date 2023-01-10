@@ -1,7 +1,6 @@
 local util  = require 'utility'
 local scope = require 'workspace.scope'
 local guide = require 'parser.guide'
-local files = require 'files'
 ---@class vm
 local vm    = require 'vm.vm'
 
@@ -570,43 +569,6 @@ function vm.getGlobalBase(source)
 end
 
 ---@param source parser.object
-local function compileSelf(source)
-    if source.parent.type ~= 'funcargs' then
-        return
-    end
-    ---@type parser.object
-    local node = source.parent.parent and source.parent.parent.parent and source.parent.parent.parent.node
-    if not node then
-        return
-    end
-    local fields = vm.getVariableFields(source, false)
-    if not fields then
-        return
-    end
-    local nodeLocalID = vm.getVariableID(node)
-    local globalNode  = node._globalNode
-    if not nodeLocalID and not globalNode then
-        return
-    end
-    for _, field in ipairs(fields) do
-        if field.type == 'setfield' then
-            local key = guide.getKeyName(field)
-            if key then
-                if nodeLocalID then
-                    local myID = nodeLocalID .. vm.ID_SPLITE .. key
-                    vm.insertVariableID(myID, field)
-                end
-                if globalNode then
-                    local myID = globalNode:getName() .. vm.ID_SPLITE .. key
-                    local myGlobal = vm.declareGlobal('variable', myID, guide.getUri(node))
-                    myGlobal:addSet(guide.getUri(node), field)
-                end
-            end
-        end
-    end
-end
-
----@param source parser.object
 local function compileAst(source)
     local env = guide.getENV(source)
     if not env then
@@ -628,18 +590,6 @@ local function compileAst(source)
     }, function (src)
         compileObject(src)
     end)
-
-    --[[
-    local mt
-    function mt:xxx()
-        self.a = 1
-    end
-
-    mt.a --> find this definition
-    ]]
-    guide.eachSourceType(source, 'self', function (src)
-        compileSelf(src)
-    end)
 end
 
 ---@param uri uri
@@ -657,18 +607,7 @@ local function dropUri(uri)
     end
 end
 
----@async
-files.watch(function (ev, uri)
-    if ev == 'update' then
-        dropUri(uri)
-    end
-    if ev == 'remove' then
-        dropUri(uri)
-    end
-    if ev == 'compile' then
-        local state = files.getLastState(uri)
-        if state then
-            compileAst(state.ast)
-        end
-    end
-end)
+return {
+    compileAst = compileAst,
+    dropUri    = dropUri,
+}

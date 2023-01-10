@@ -97,11 +97,11 @@ function mt:collectLocal()
     self.assigns[#self.assigns+1] = self.source
     self.assignMap[self.source] = true
 
-    local varInfo = vm.getVariableInfoByName(self.source, self.name)
+    local variable = vm.getVariableInfoByCodeName(self.source, self.name)
 
-    assert(varInfo)
+    assert(variable)
 
-    for _, set in ipairs(varInfo.sets) do
+    for _, set in ipairs(variable.sets) do
         self.assigns[#self.assigns+1] = set
         self.assignMap[set] = true
         self:collectCare(set)
@@ -110,7 +110,7 @@ function mt:collectLocal()
         end
     end
 
-    for _, get in ipairs(varInfo.gets) do
+    for _, get in ipairs(variable.gets) do
         self:collectCare(get)
         self.getMap[get] = true
         if get.finish > finishPos then
@@ -831,14 +831,12 @@ function vm.traceNode(source)
         mode = 'global'
         name = base.global:getCodeName()
     else
-        base = vm.getVariableHead(source)
-        if not base then
+        local variable = vm.getVariable(source)
+        if not variable then
             return nil
         end
-        name = vm.getVariableName(source)
-        if not name then
-            return nil
-        end
+        base = variable.base
+        name = variable:getCodeName()
         mode = 'local'
     end
     local tracer = createTracer(mode, base, name)

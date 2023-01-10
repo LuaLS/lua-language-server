@@ -884,7 +884,7 @@ function m.getLineRange(state, row)
     return 0
 end
 
-local isSetMap = {
+local assignTypeMap = {
     ['setglobal']         = true,
     ['local']             = true,
     ['self']              = true,
@@ -908,7 +908,7 @@ local isSetMap = {
 }
 function m.isAssign(source)
     local tp = source.type
-    if isSetMap[tp] then
+    if assignTypeMap[tp] then
         return true
     end
     if tp == 'call' then
@@ -920,7 +920,7 @@ function m.isAssign(source)
     return false
 end
 
-local isGetMap = {
+local getTypeMap = {
     ['getglobal'] = true,
     ['getlocal']  = true,
     ['getfield']  = true,
@@ -929,7 +929,7 @@ local isGetMap = {
 }
 function m.isGet(source)
     local tp = source.type
-    if isGetMap[tp] then
+    if getTypeMap[tp] then
         return true
     end
     if tp == 'call' then

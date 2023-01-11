@@ -716,13 +716,13 @@ function vm.selectNode(list, index)
     local result
     if exp.type == 'call' then
         result = getReturn(exp.node, index, exp.args)
-        if result:isEmpty() then
+        if not result:isTyped() then
             result:merge(vm.declareGlobal('type', 'unknown'))
         end
     else
         ---@type vm.node
         result = vm.compileNode(exp)
-        if result:isEmpty() then
+        if not result:isTyped() then
             result:merge(vm.declareGlobal('type', 'unknown'))
         end
     end
@@ -1526,7 +1526,7 @@ local compilerSwitch = util.switch()
             if not node then
                 return
             end
-            if node:isEmpty() then
+            if not node:isTyped() then
                 node = vm.runOperator('call', vararg.node) or node
             end
             vm.setNode(source, node)
@@ -1547,7 +1547,7 @@ local compilerSwitch = util.switch()
         if not node then
             return
         end
-        if node:isEmpty() then
+        if not node:isTyped() then
             node = vm.runOperator('call', source.node) or node
         end
         vm.setNode(source, node)
@@ -1829,7 +1829,7 @@ end
 
 ---@param source vm.object
 local function compileByParentNode(source)
-    if not vm.getNode(source):isEmpty() then
+    if vm.getNode(source):isTyped() then
         return
     end
     vm.compileByNodeChain(source, function (result)
@@ -1837,7 +1837,7 @@ local function compileByParentNode(source)
     end)
 end
 
----@param source vm.object
+---@param source vm.object | vm.variable
 ---@return vm.node
 function vm.compileNode(source)
     if not source then
@@ -1863,6 +1863,7 @@ function vm.compileNode(source)
     ---@cast source parser.object
     vm.setNode(source, vm.createNode(), true)
     vm.compileByGlobal(source)
+    vm.compileByVariable(source)
     compileByNode(source)
     compileByParentNode(source)
     matchCall(source)

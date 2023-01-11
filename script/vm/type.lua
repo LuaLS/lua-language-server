@@ -721,8 +721,9 @@ function vm.viewTypeErrorMessage(uri, errs)
             elseif value.type == 'generic' then
                 ---@cast value vm.generic
                 lparams[paramName] = vm.viewObject(value, uri)
+            elseif value.type == 'variable' then
             else
-                ---@cast value -string, -vm.global, -vm.node, -vm.generic
+                ---@cast value -string, -vm.global, -vm.node, -vm.generic, -vm.variable
                 if paramName == 'key' then
                     lparams[paramName] = vm.viewKey(value, uri)
                 else

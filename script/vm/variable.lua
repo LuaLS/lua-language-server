@@ -11,7 +11,7 @@ local vm    = require 'vm.vm'
 ---@field gets parser.object[]
 local mt = {}
 mt.__index = mt
-mt.type = 'vm.variable'
+mt.type = 'variable'
 
 ---@param id string
 ---@return vm.variable
@@ -33,20 +33,18 @@ local compileVariables, getLoc
 
 ---@param id string
 ---@param source parser.object
+---@param base parser.object
 ---@return vm.variable
-local function insertVariableID(id, source)
+local function insertVariableID(id, source, base)
     local root = guide.getRoot(source)
     if not root._variableNodes then
         root._variableNodes = util.multiTable(2, function (lid)
             local variable = createVariable(root, lid)
-            if source.type == 'local'
-            or source.type == 'self' then
-                variable.base = source
-            end
             return variable
         end)
     end
     local variable = root._variableNodes[id]
+    variable.base = base
     if guide.isAssign(source) then
         variable.sets[#variable.sets+1] = source
     else
@@ -58,28 +56,28 @@ end
 local compileSwitch = util.switch()
     : case 'local'
     : case 'self'
-    : call(function (source)
+    : call(function (source, base)
         local id = ('%d'):format(source.start)
-        local variable = insertVariableID(id, source)
+        local variable = insertVariableID(id, source, base)
         source._variableNode = variable
         if not source.ref then
             return
         end
         for _, ref in ipairs(source.ref) do
-            compileVariables(ref)
+            compileVariables(ref, base)
         end
     end)
     : case 'setlocal'
     : case 'getlocal'
-    : call(function (source)
+    : call(function (source, base)
         local id = ('%d'):format(source.node.start)
-        local variable = insertVariableID(id, source)
+        local variable = insertVariableID(id, source, base)
         source._variableNode = variable
-        compileVariables(source.next)
+        compileVariables(source.next, base)
     end)
     : case 'getfield'
     : case 'setfield'
-    : call(function (source)
+    : call(function (source, base)
         local parentNode = source.node._variableNode
         if not parentNode then
             return
@@ -89,16 +87,16 @@ local compileSwitch = util.switch()
             return
         end
         local id = parentNode.id .. vm.ID_SPLITE .. key
-        local variable = insertVariableID(id, source)
+        local variable = insertVariableID(id, source, base)
         source._variableNode = variable
         source.field._variableNode = variable
         if source.type == 'getfield' then
-            compileVariables(source.next)
+            compileVariables(source.next, base)
         end
     end)
     : case 'getmethod'
     : case 'setmethod'
-    : call(function (source)
+    : call(function (source, base)
         local parentNode = source.node._variableNode
         if not parentNode then
             return
@@ -108,16 +106,16 @@ local compileSwitch = util.switch()
             return
         end
         local id = parentNode.id .. vm.ID_SPLITE .. key
-        local variable = insertVariableID(id, source)
+        local variable = insertVariableID(id, source, base)
         source._variableNode = variable
         source.method._variableNode = variable
         if source.type == 'getmethod' then
-            compileVariables(source.next)
+            compileVariables(source.next, base)
         end
     end)
     : case 'getindex'
     : case 'setindex'
-    : call(function (source)
+    : call(function (source, base)
         local parentNode = source.node._variableNode
         if not parentNode then
             return
@@ -127,11 +125,11 @@ local compileSwitch = util.switch()
             return
         end
         local id = parentNode.id .. vm.ID_SPLITE .. key
-        local variable = insertVariableID(id, source)
+        local variable = insertVariableID(id, source, base)
         source._variableNode = variable
         source.index._variableNode = variable
         if source.type == 'setindex' then
-            compileVariables(source.next)
+            compileVariables(source.next, base)
         end
     end)
 
@@ -177,7 +175,9 @@ function mt:getCodeName()
     return name
 end
 
-function compileVariables(source)
+---@param source parser.object
+---@param base parser.object
+function compileVariables(source, base)
     if not source then
         return
     end
@@ -185,7 +185,7 @@ function compileVariables(source)
     if not compileSwitch:has(source.type) then
         return
     end
-    compileSwitch(source.type, source)
+    compileSwitch(source.type, source, base)
 end
 
 ---@param source parser.object
@@ -233,7 +233,7 @@ function vm.getVariableNode(source)
     if not loc then
         return nil
     end
-    compileVariables(loc)
+    compileVariables(loc, loc)
     return source._variableNode or nil
 end
 
@@ -318,6 +318,15 @@ function vm.getVariableFields(source, includeGets)
 end
 
 ---@param source parser.object
+function vm.compileByVariable(source)
+    local variable = vm.getVariableNode(source)
+    if not variable then
+        return
+    end
+    vm.setNode(source, variable)
+end
+
+---@param source parser.object
 local function compileSelf(source)
     if source.parent.type ~= 'funcargs' then
         return
@@ -331,18 +340,18 @@ local function compileSelf(source)
     if not fields then
         return
     end
-    local nodeLocalID = vm.getVariableID(node)
-    local globalNode  = vm.getGlobalNode(node)
-    if not nodeLocalID and not globalNode then
+    local variableNode = vm.getVariableNode(node)
+    local globalNode   = vm.getGlobalNode(node)
+    if not variableNode and not globalNode then
         return
     end
     for _, field in ipairs(fields) do
         if field.type == 'setfield' then
             local key = guide.getKeyName(field)
             if key then
-                if nodeLocalID then
-                    local myID = nodeLocalID .. vm.ID_SPLITE .. key
-                    insertVariableID(myID, field)
+                if variableNode then
+                    local myID = variableNode.id .. vm.ID_SPLITE .. key
+                    insertVariableID(myID, field, variableNode.base)
                 end
                 if globalNode then
                     local myID = globalNode:getName() .. vm.ID_SPLITE .. key

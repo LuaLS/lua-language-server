@@ -13,6 +13,7 @@ local util      = require 'utility'
 ---@field mode      tracer.mode
 ---@field name      string
 ---@field source    parser.object
+---@field variable  vm.variable
 ---@field assigns   parser.object[]
 ---@field assignMap table<parser.object, true>
 ---@field getMap    table<parser.object, true>
@@ -94,10 +95,7 @@ function mt:collectLocal()
     local startPos  = self.source.start
     local finishPos = 0
 
-    self.assigns[#self.assigns+1] = self.source
-    self.assignMap[self.source] = true
-
-    local variable = vm.getVariableInfoByCodeName(self.source, self.name)
+    local variable = self.variable
 
     assert(variable)
 
@@ -129,6 +127,10 @@ function mt:collectLocal()
     end
 
     if #self.casts > 0 then
+        self.fastCalc = false
+    end
+
+    if variable ~= vm.getVariable(self.source) then
         self.fastCalc = false
     end
 end
@@ -171,8 +173,13 @@ end
 ---@param finish integer
 ---@return parser.object?
 function mt:getLastAssign(start, finish)
-    local assign = self.assigns[1]
+    local assign
     for _, obj in ipairs(self.assigns) do
+        if obj.type == 'local'
+        or obj.type == 'self' then
+            assign = obj
+            break
+        end
         if obj.start < start then
             goto CONTINUE
         end
@@ -742,7 +749,9 @@ end
 function mt:calcNode(source)
     if self.getMap[source] then
         local lastAssign = self:getLastAssign(0, source.finish)
-        assert(lastAssign)
+        if not lastAssign then
+            return
+        end
         if self.fastCalc then
             self.nodes[source] = vm.compileNode(lastAssign)
             return
@@ -783,9 +792,10 @@ end
 ---@param mode tracer.mode
 ---@param source parser.object
 ---@param name string
+---@param variable vm.variable?
 ---@return vm.tracer?
-local function createTracer(mode, source, name)
-    local node = vm.compileNode(source)
+local function createTracer(mode, source, name, variable)
+    local node = vm.compileNode(variable or source)
     local tracer = node._tracer
     if tracer then
         return tracer
@@ -796,6 +806,7 @@ local function createTracer(mode, source, name)
     end
     tracer = setmetatable({
         source    = source,
+        variable  = variable,
         mode      = mode,
         name      = name,
         assigns   = {},
@@ -806,7 +817,7 @@ local function createTracer(mode, source, name)
         casts     = {},
         nodes     = {},
         main      = main,
-        uri       = guide.getUri(source),
+        uri       = guide.getUri(main),
     }, mt)
     node._tracer = tracer
 
@@ -822,7 +833,7 @@ end
 ---@param source parser.object
 ---@return vm.node?
 function vm.traceNode(source)
-    local mode, base, name
+    local mode, base, name, variable
     if vm.getGlobalNode(source) then
         base = vm.getGlobalBase(source)
         if not base then
@@ -831,15 +842,15 @@ function vm.traceNode(source)
         mode = 'global'
         name = base.global:getCodeName()
     else
-        local variable = vm.getVariable(source)
+        variable = vm.getVariable(source)
         if not variable then
             return nil
         end
-        base = variable.base
+        base = variable:getBase()
         name = variable:getCodeName()
         mode = 'local'
     end
-    local tracer = createTracer(mode, base, name)
+    local tracer = createTracer(mode, base, name, variable)
     if not tracer then
         return nil
     end

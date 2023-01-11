@@ -9,7 +9,7 @@ local util     = require 'utility'
 ---@type table<vm.object, vm.node>
 vm.nodeCache = setmetatable({}, util.MODE_K)
 
----@alias vm.node.object vm.object | vm.global
+---@alias vm.node.object vm.object | vm.global | vm.variable
 
 ---@class vm.node
 ---@field [integer] vm.node.object
@@ -56,6 +56,19 @@ end
 ---@return boolean
 function mt:isEmpty()
     return #self == 0
+end
+
+---@return boolean
+function mt:isTyped()
+    for _, c in ipairs(self) do
+        if c.type == 'global' and c.cate == 'variable' then
+            return true
+        end
+        if guide.isLiteral(c) then
+            return true
+        end
+    end
+    return false
 end
 
 function mt:clear()
@@ -278,7 +291,7 @@ function mt:narrow(uri, name)
     return self
 end
 
----@param obj vm.object
+---@param obj vm.object | vm.variable
 function mt:removeObject(obj)
     for index, c in ipairs(self) do
         if c == obj then

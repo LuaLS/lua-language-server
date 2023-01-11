@@ -124,11 +124,11 @@ function mt:resolve(uri, args)
     local protoNode = vm.compileNode(self.proto)
     local result = vm.createNode()
     for nd in protoNode:eachObject() do
-        if nd.type == 'global' then
-            ---@cast nd vm.global
+        if nd.type == 'global' or nd.type == 'variable' then
+            ---@cast nd vm.global | vm.variable
             result:merge(nd)
         else
-            ---@cast nd -vm.global
+            ---@cast nd -vm.global, -vm.variable
             local clonedObject = cloneObject(nd, resolved)
             if clonedObject then
                 local clonedNode   = vm.compileNode(clonedObject)

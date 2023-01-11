@@ -3407,7 +3407,7 @@ TEST '{ [string]: number, [true]: string, [1]: boolean, tag: integer }' [[
 local <?t?>
 ]]
 
-TEST 'unknown' [[
+TEST 'nil' [[
 local mt = {}
 mt.<?x?> = nil
 ]]

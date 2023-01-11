@@ -99,6 +99,16 @@ local blockTypes = {
     ['main']        = true,
 }
 
+local topBlockTypes = {
+    ['while']       = true,
+    ['function']    = true,
+    ['if']          = true,
+    ['ifblock']     = true,
+    ['elseblock']   = true,
+    ['elseifblock'] = true,
+    ['main']        = true,
+}
+
 local breakBlockTypes = {
     ['while']       = true,
     ['in']          = true,
@@ -1250,13 +1260,10 @@ end
 function m.getTopBlock(source)
     for _ = 1, 1000 do
         local block = source.parent
-        if not m.isBlockType(block) then
+        if not block then
             return nil
         end
-        if  block.type ~= 'do'
-        and block.type ~= 'in'
-        and block.type ~= 'loop'
-        and block.type ~= 'repeat' then
+        if topBlockTypes[block.type] then
             return block
         end
         source = block

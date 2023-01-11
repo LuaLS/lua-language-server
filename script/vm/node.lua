@@ -61,7 +61,7 @@ end
 ---@return boolean
 function mt:isTyped()
     for _, c in ipairs(self) do
-        if c.type == 'global' and c.cate == 'variable' then
+        if c.type == 'global' and c.cate == 'type' then
             return true
         end
         if guide.isLiteral(c) then

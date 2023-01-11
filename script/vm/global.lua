@@ -4,6 +4,11 @@ local guide = require 'parser.guide'
 ---@class vm
 local vm    = require 'vm.vm'
 
+---@type table<string, vm.global>
+local allGlobals = {}
+---@type table<uri, table<string, boolean>>
+local globalSubs = util.multiTable(2)
+
 ---@class parser.object
 ---@field package _globalBase parser.object
 ---@field package _globalBaseMap table<string, parser.object>
@@ -114,9 +119,37 @@ function mt:getKeyName()
     return self.name:match('[^' .. vm.ID_SPLITE .. ']+$')
 end
 
+---@return string?
+function mt:getFieldName()
+    return self.name:match(vm.ID_SPLITE .. '(.-)$')
+end
+
 ---@return boolean
 function mt:isAlive()
     return next(self.links) ~= nil
+end
+
+---@param uri uri
+---@return parser.object?
+function mt:getParentBase(uri)
+    local parentID = self.name:match('^(.-)' .. vm.ID_SPLITE)
+    if not parentID then
+        return nil
+    end
+    local parentName = self.cate .. '|' .. parentID
+    local global = allGlobals[parentName]
+    if not global then
+        return nil
+    end
+    local link = global.links[uri]
+    if not link then
+        return nil
+    end
+    local luckyBoy = link.sets[1] or link.gets[1]
+    if not luckyBoy then
+        return nil
+    end
+    return vm.getGlobalBase(luckyBoy)
 end
 
 ---@param cate vm.global.cate
@@ -137,11 +170,6 @@ end
 ---@class parser.object
 ---@field package _globalNode vm.global|false
 ---@field package _enums?     parser.object[]
-
----@type table<string, vm.global>
-local allGlobals = {}
----@type table<uri, table<string, boolean>>
-local globalSubs = util.multiTable(2)
 
 local compileObject
 local compilerGlobalSwitch = util.switch()

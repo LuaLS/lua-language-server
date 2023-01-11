@@ -67,6 +67,9 @@ local function searchFieldByLocalID(source, key, pushResult)
     if key then
         if source.type == 'variable' then
             ---@cast source vm.variable
+            if type(key) ~= 'string' then
+                return
+            end
             fields = source:getSets(key)
         else
             ---@cast source parser.object
@@ -728,13 +731,13 @@ function vm.selectNode(list, index)
     local result
     if exp.type == 'call' then
         result = getReturn(exp.node, index, exp.args)
-        if not result:isTyped() then
+        if result:isEmpty() then
             result:merge(vm.declareGlobal('type', 'unknown'))
         end
     else
         ---@type vm.node
         result = vm.compileNode(exp)
-        if not result:isTyped() then
+        if result:isEmpty() then
             result:merge(vm.declareGlobal('type', 'unknown'))
         end
     end
@@ -1233,6 +1236,9 @@ local compilerSwitch = util.switch()
     : case 'getmethod'
     : case 'getindex'
     : call(function (source)
+        if bindDocs(source) then
+            return
+        end
         if guide.isGet(source) and bindAs(source) then
             return
         end
@@ -1257,18 +1263,28 @@ local compilerSwitch = util.switch()
                     ---@cast k vm.global
                     vm.compileByParentNode(source.node, k, function (src)
                         vm.setNode(source, vm.compileNode(src))
-                        if src.value then
-                            vm.setNode(source, vm.compileNode(src.value))
-                        end
                     end)
                 end
             end
         else
             if guide.isGet(source) then
-                local node = vm.traceNode(source)
-                if node then
-                    vm.setNode(source, node)
-                    return
+                --local node = vm.traceNode(source)
+                --if node then
+                --    vm.setNode(source, node)
+                --end
+                ---@cast key string
+                vm.compileByParentNode(source.node, key, function (src)
+                    vm.setNode(source, vm.compileNode(src))
+                end)
+            else
+                local hasDefinedField
+                ---@cast key string
+                vm.compileByParentNode(source.node, key, function (src)
+                    hasDefinedField = true
+                    vm.setNode(source, vm.compileNode(src))
+                end)
+                if not hasDefinedField and source.value then
+                    vm.setNode(source, vm.compileNode(source.value))
                 end
             end
         end
@@ -1767,26 +1783,6 @@ local compilerSwitch = util.switch()
             vm.setNode(variable, vm.compileNode(variable.base))
             return
         end
-        local parentVariable = variable:getParent()
-        local fieldName      = variable:getFieldName()
-        if not parentVariable or not fieldName then
-            return
-        end
-        vm.compileByParentNode(parentVariable, fieldName, function (src)
-            if src.value then
-                if bindDocs(src) then
-                    vm.setNode(variable, vm.compileNode(src))
-                elseif src.value.type ~= 'nil' then
-                    vm.setNode(variable, vm.compileNode(src.value))
-                    local node = vm.getNode(src)
-                    if node then
-                        vm.setNode(variable, node)
-                    end
-                end
-            else
-                vm.setNode(variable, vm.compileNode(src))
-            end
-        end)
     end)
 
 ---@param source parser.object

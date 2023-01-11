@@ -59,15 +59,27 @@ local function bindDocs(source)
     return false
 end
 
----@param source parser.object
+---@param source parser.object | vm.variable
 ---@param key any
 ---@param pushResult fun(res: parser.object, markDoc?: boolean)
 local function searchFieldByLocalID(source, key, pushResult)
     local fields
     if key then
-        fields = vm.getVariableSets(source, key)
+        if source.type == 'variable' then
+            ---@cast source vm.variable
+            fields = source:getSets(key)
+        else
+            ---@cast source parser.object
+            fields = vm.getVariableSets(source, key)
+        end
     else
-        fields = vm.getVariableFields(source, false)
+        if source.type == 'variable' then
+            ---@cast source vm.variable
+            fields = source:getFields(false)
+        else
+            ---@cast source parser.object
+            fields = vm.getVariableFields(source, false)
+        end
     end
     if not fields then
         return
@@ -619,7 +631,7 @@ local function bindAs(source)
     return false
 end
 
----@param source parser.object
+---@param source parser.object | vm.variable
 ---@param key? string|vm.global
 ---@param pushResult fun(source: parser.object)
 function vm.compileByParentNode(source, key, pushResult)
@@ -1259,22 +1271,6 @@ local compilerSwitch = util.switch()
                     return
                 end
             end
-            ---@cast key string
-            vm.compileByParentNode(source.node, key, function (src)
-                if src.value then
-                    if bindDocs(src) then
-                        vm.setNode(source, vm.compileNode(src))
-                    elseif src.value.type ~= 'nil' then
-                        vm.setNode(source, vm.compileNode(src.value))
-                        local node = vm.getNode(src)
-                        if node then
-                            vm.setNode(source, node)
-                        end
-                    end
-                else
-                    vm.setNode(source, vm.compileNode(src))
-                end
-            end)
         end
     end)
     : case 'setglobal'
@@ -1763,6 +1759,34 @@ local compilerSwitch = util.switch()
                 end
             end
         end
+    end)
+    : case 'variable'
+    ---@param variable vm.variable
+    : call(function (variable)
+        if variable == vm.getVariable(variable.base) then
+            vm.setNode(variable, vm.compileNode(variable.base))
+            return
+        end
+        local parentVariable = variable:getParent()
+        local fieldName      = variable:getFieldName()
+        if not parentVariable or not fieldName then
+            return
+        end
+        vm.compileByParentNode(parentVariable, fieldName, function (src)
+            if src.value then
+                if bindDocs(src) then
+                    vm.setNode(variable, vm.compileNode(src))
+                elseif src.value.type ~= 'nil' then
+                    vm.setNode(variable, vm.compileNode(src.value))
+                    local node = vm.getNode(src)
+                    if node then
+                        vm.setNode(variable, node)
+                    end
+                end
+            else
+                vm.setNode(variable, vm.compileNode(src))
+            end
+        end)
     end)
 
 ---@param source parser.object

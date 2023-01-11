@@ -4,6 +4,7 @@ local guide = require 'parser.guide'
 local vm    = require 'vm.vm'
 
 ---@class vm.variable
+---@field uri uri
 ---@field root parser.object
 ---@field id string
 ---@field base parser.object
@@ -18,6 +19,7 @@ mt.type = 'variable'
 local function createVariable(root, id)
     local variable = setmetatable({
         root = root,
+        uri  = root.uri,
         id   = id,
         sets = {},
         gets = {},
@@ -175,6 +177,60 @@ function mt:getCodeName()
     return name
 end
 
+---@return vm.variable?
+function mt:getParent()
+    local parentID = self.id:match('^(.+)' .. vm.ID_SPLITE)
+    if not parentID then
+        return nil
+    end
+    return self.root._variableNodes[parentID]
+end
+
+---@return string?
+function mt:getFieldName()
+    return self.id:match(vm.ID_SPLITE .. '(.-)$')
+end
+
+---@param key?   string
+function mt:getSets(key)
+    if not key then
+        return self.sets
+    end
+    local id = self.id .. vm.ID_SPLITE .. key
+    local variable = self.root._variableNodes[id]
+    return variable.sets
+end
+
+---@param includeGets boolean?
+function mt:getFields(includeGets)
+    local id   = self.id
+    local root = self.root
+    -- TODO：optimize
+    local clock = os.clock()
+    local fields = {}
+    for lid, variable in pairs(root._variableNodes) do
+        if  lid ~= id
+        and util.stringStartWith(lid, id)
+        and lid:sub(#id + 1, #id + 1) == vm.ID_SPLITE
+        -- only one field
+        and not lid:find(vm.ID_SPLITE, #id + 2) then
+            for _, src in ipairs(variable.sets) do
+                fields[#fields+1] = src
+            end
+            if includeGets then
+                for _, src in ipairs(variable.gets) do
+                    fields[#fields+1] = src
+                end
+            end
+        end
+    end
+    local cost = os.clock() - clock
+    if cost > 1.0 then
+        log.warn('variable-id getFields takes %.3f seconds', cost)
+    end
+    return fields
+end
+
 ---@param source parser.object
 ---@param base parser.object
 function compileVariables(source, base)
@@ -283,38 +339,11 @@ end
 ---@param includeGets boolean
 ---@return parser.object[]?
 function vm.getVariableFields(source, includeGets)
-    local id = vm.getVariableID(source)
-    if not id then
+    local variable = vm.getVariable(source)
+    if not variable then
         return nil
     end
-    local root = guide.getRoot(source)
-    if not root._variableNodes then
-        return nil
-    end
-    -- TODO：optimize
-    local clock = os.clock()
-    local fields = {}
-    for lid, variable in pairs(root._variableNodes) do
-        if  lid ~= id
-        and util.stringStartWith(lid, id)
-        and lid:sub(#id + 1, #id + 1) == vm.ID_SPLITE
-        -- only one field
-        and not lid:find(vm.ID_SPLITE, #id + 2) then
-            for _, src in ipairs(variable.sets) do
-                fields[#fields+1] = src
-            end
-            if includeGets then
-                for _, src in ipairs(variable.gets) do
-                    fields[#fields+1] = src
-                end
-            end
-        end
-    end
-    local cost = os.clock() - clock
-    if cost > 1.0 then
-        log.warn('variable-id getFields takes %.3f seconds', cost)
-    end
-    return fields
+    return variable:getFields(includeGets)
 end
 
 ---@param source parser.object

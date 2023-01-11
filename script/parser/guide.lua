@@ -433,7 +433,7 @@ function m.getRoot(obj)
     error('guide.getRoot overstack')
 end
 
----@param obj parser.object
+---@param obj parser.object | { uri: uri }
 ---@return uri
 function m.getUri(obj)
     if obj.uri then

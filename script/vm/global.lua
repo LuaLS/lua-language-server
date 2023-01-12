@@ -540,31 +540,38 @@ function vm.getEnums(source)
 end
 
 ---@param source parser.object
+---@return boolean
 function vm.compileByGlobal(source)
     local global = vm.getGlobalNode(source)
     if not global then
-        return
+        return false
     end
-    if global.cate == 'variable' then
+    if global.cate == 'type' then
         vm.setNode(source, global)
-        if guide.isAssign(source) then
-            if source.value then
-                vm.setNode(source, vm.compileNode(source.value))
-            end
-            return
-        end
-        local node = vm.traceNode(source)
-        if node then
-            vm.setNode(source, node, true)
-        end
-        return
+        return false
     end
-    local globalBase = vm.getGlobalBase(source)
-    if not globalBase then
-        return
+    vm.setNode(source, global)
+    if guide.isAssign(source) then
+        if vm.bindDocs(source) then
+            return true
+        end
+        if source.value then
+            vm.setNode(source, vm.compileNode(source.value))
+        end
+        return true
     end
-    local globalNode = vm.compileNode(globalBase)
-    vm.setNode(source, globalNode, true)
+    local node = vm.traceNode(source)
+    if node then
+        vm.setNode(source, node, true)
+    else
+        local globalBase = vm.getGlobalBase(source)
+        if not globalBase then
+            return false
+        end
+        local globalNode = vm.compileNode(globalBase)
+        vm.setNode(source, globalNode, true)
+    end
+    return true
 end
 
 ---@param source parser.object

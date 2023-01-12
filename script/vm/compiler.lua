@@ -9,25 +9,32 @@ local vm         = require 'vm.vm'
 ---@class parser.object
 ---@field _compiledNodes     boolean
 ---@field _node              vm.node
+---@field package _hasBindedDocs? boolean
 ---@field cindex             integer
 ---@field func               parser.object
 
 -- 该函数有副作用，会给source绑定node！
 ---@param source parser.object
 ---@return boolean
-local function bindDocs(source)
+function vm.bindDocs(source)
     local docs = source.bindDocs
     if not docs then
         return false
     end
+    if source._hasBindedDocs ~= nil then
+        return source._hasBindedDocs
+    end
+    source._hasBindedDocs = false
     for i = #docs, 1, -1 do
         local doc = docs[i]
         if doc.type == 'doc.type' then
             vm.setNode(source, vm.compileNode(doc))
+            source._hasBindedDocs = true
             return true
         end
         if doc.type == 'doc.class' then
             vm.setNode(source, vm.compileNode(doc))
+            source._hasBindedDocs = true
             return true
         end
         if doc.type == 'doc.param' then
@@ -36,23 +43,28 @@ local function bindDocs(source)
                 node:addOptional()
             end
             vm.setNode(source, node)
+            source._hasBindedDocs = true
             return true
         end
         if doc.type == 'doc.module' then
             local name = doc.module
             if not name then
+                source._hasBindedDocs = true
                 return true
             end
             local uri = rpath.findUrisByRequireName(guide.getUri(source), name)[1]
             if not uri then
+                source._hasBindedDocs = true
                 return true
             end
             local state = files.getState(uri)
             local ast   = state and state.ast
             if not ast then
+                source._hasBindedDocs = true
                 return true
             end
             vm.setNode(source, vm.compileNode(ast))
+            source._hasBindedDocs = true
             return true
         end
     end
@@ -90,7 +102,7 @@ local function searchFieldByLocalID(source, key, pushResult)
     local hasMarkDoc = {}
     for _, src in ipairs(fields) do
         if src.bindDocs then
-            if bindDocs(src) then
+            if vm.bindDocs(src) then
                 local skey = guide.getKeyName(src)
                 if skey then
                     hasMarkDoc[skey] = true
@@ -170,7 +182,7 @@ local searchFieldSwitch = util.switch()
                     hasFiled = true
                     pushResult(field)
                 end
-                if key == nil then
+                if key == vm.ANY then
                     pushResult(field)
                 end
             end
@@ -695,7 +707,7 @@ function vm.compileByParentNode(source, key, pushResult)
             pushResult(res)
         end
     end
-    if #docedResults == 0 or key == nil then
+    if #docedResults == 0 or key == vm.ANY then
         for _, res in ipairs(commonResults) do
             pushResult(res)
         end
@@ -970,7 +982,7 @@ local function compileLocal(source)
 
     local hasMarkDoc
     if source.bindDocs then
-        hasMarkDoc = bindDocs(source)
+        hasMarkDoc = vm.bindDocs(source)
     end
     local hasMarkParam
     if not hasMarkDoc then
@@ -1035,7 +1047,7 @@ local function compileLocal(source)
     -- for x = ... do
     if source.parent.type == 'loop' then
         if source.parent.loc == source then
-            if bindDocs(source) then
+            if vm.bindDocs(source) then
                 return
             end
             vm.setNode(source, vm.declareGlobal('type', 'integer'))
@@ -1199,7 +1211,7 @@ local compilerSwitch = util.switch()
     end)
     : case 'setlocal'
     : call(function (source)
-        if bindDocs(source) then
+        if vm.bindDocs(source) then
             return
         end
         local locNode = vm.compileNode(source.node)
@@ -1236,7 +1248,7 @@ local compilerSwitch = util.switch()
     : case 'getmethod'
     : case 'getindex'
     : call(function (source)
-        if bindDocs(source) then
+        if vm.bindDocs(source) then
             return
         end
         if guide.isGet(source) and bindAs(source) then
@@ -1278,7 +1290,7 @@ local compilerSwitch = util.switch()
     end)
     : case 'setglobal'
     : call(function (source)
-        if bindDocs(source) then
+        if vm.bindDocs(source) then
             return
         end
         if source.node[1] ~= '_ENV' then
@@ -1307,7 +1319,7 @@ local compilerSwitch = util.switch()
     : call(function (source)
         local hasMarkDoc
         if source.bindDocs then
-            hasMarkDoc = bindDocs(source)
+            hasMarkDoc = vm.bindDocs(source)
         end
 
         if not hasMarkDoc then
@@ -1875,9 +1887,10 @@ function vm.compileNode(source)
 
     ---@cast source parser.object
     vm.setNode(source, vm.createNode(), true)
-    vm.compileByGlobal(source)
-    vm.compileByVariable(source)
-    compileByNode(source)
+    if not vm.compileByGlobal(source) then
+        vm.compileByVariable(source)
+        compileByNode(source)
+    end
     compileByParentNode(source)
     matchCall(source)
 

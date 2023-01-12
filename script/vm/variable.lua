@@ -344,12 +344,14 @@ function vm.getVariableFields(source, includeGets)
 end
 
 ---@param source parser.object
+---@return boolean
 function vm.compileByVariable(source)
     local variable = vm.getVariableNode(source)
     if not variable then
-        return
+        return false
     end
     vm.setNode(source, variable)
+    return true
 end
 
 ---@param source parser.object

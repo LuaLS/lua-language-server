@@ -4175,3 +4175,17 @@ if xxx == <?t?> then
     print(t)
 end
 ]]
+
+TEST 'V' [[
+---@class V
+X = 1
+
+print(<?X?>)
+]]
+
+TEST 'V' [[
+---@class V
+X.Y = 1
+
+print(X.<?Y?>)
+]]

@@ -116,7 +116,7 @@ local function searchClassField(key, suri, results)
         return
     end
     suri = suri or guide.getUri(set)
-    vm.getClassFields(suri, global, nil, function (field)
+    vm.getClassFields(suri, global, vm.ANY, function (field)
         if field.type == 'generic' then
             return
         end

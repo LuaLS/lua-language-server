@@ -265,9 +265,6 @@ function vm.getVariable(source, key)
     if not key then
         return variable
     end
-    if type(key) ~= 'string' then
-        return nil
-    end
     local root = guide.getRoot(source)
     if not root._variableNodes then
         return nil

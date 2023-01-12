@@ -31,7 +31,7 @@ local function searchByNode(source, pushResult, mark)
     end
     mark[source] = true
     local uri = guide.getUri(source)
-    vm.compileByParentNode(source, nil, function (field)
+    vm.compileByParentNode(source, vm.ANY, function (field)
         searchByNodeSwitch(field.type, uri, field, pushResult)
     end)
     vm.compileByNodeChain(source, function (src)

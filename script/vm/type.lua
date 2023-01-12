@@ -5,6 +5,10 @@ local config    = require 'config.config'
 local util      = require 'utility'
 local lang      = require 'language'
 
+---@class vm.ANY
+---@diagnostic disable-next-line: assign-type-mismatch
+vm.ANY = debug.upvalueid(require, 1)
+
 ---@alias typecheck.err vm.node.object|string|vm.node
 
 ---@param object vm.node.object

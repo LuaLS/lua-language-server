@@ -239,7 +239,7 @@ local searchFieldSwitch = util.switch()
     : case 'global'
     : call(function (suri, node, key, pushResult)
         if node.cate == 'variable' then
-            if key then
+            if key ~= vm.ANY then
                 if type(key) ~= 'string' then
                     return
                 end
@@ -1267,25 +1267,13 @@ local compilerSwitch = util.switch()
                 end
             end
         else
-            if guide.isGet(source) then
-                --local node = vm.traceNode(source)
-                --if node then
-                --    vm.setNode(source, node)
-                --end
-                ---@cast key string
-                vm.compileByParentNode(source.node, key, function (src)
-                    vm.setNode(source, vm.compileNode(src))
-                end)
-            else
-                ---@cast key string
-                if source.value then
-                    vm.setNode(source, vm.compileNode(source.value))
-                else
-                    vm.compileByParentNode(source.node, key, function (src)
-                        vm.setNode(source, vm.compileNode(src))
-                    end)
+            ---@cast key string
+            vm.compileByParentNode(source.node, key, function (src)
+                vm.setNode(source, vm.compileNode(src))
+                if src.value then
+                    vm.setNode(source, vm.compileNode(src.value))
                 end
-            end
+            end)
         end
     end)
     : case 'setglobal'

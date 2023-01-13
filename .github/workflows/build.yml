@@ -34,7 +34,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: recursive
       - uses: actboy168/setup-luamake@master
@@ -67,13 +67,13 @@ jobs:
           # Staging area for tarballs
           PKG_STAGING="ci_staging/$PKG_BASENAME"
 
-          echo ::set-output name=PKG_VERSION::${PKG_VERSION}
-          echo ::set-output name=PKG_BASENAME::${PKG_BASENAME}
-          echo ::set-output name=PKG_NAME::${PKG_NAME}
-          echo ::set-output name=PKG_PATH::"${PKG_STAGING}/${PKG_NAME}"
-          echo ::set-output name=PKG_STAGING::${PKG_STAGING}
+          echo PKG_VERSION=${PKG_VERSION}   >> $GITHUB_OUTPUT
+          echo PKG_BASENAME=${PKG_BASENAME} >> $GITHUB_OUTPUT
+          echo PKG_NAME=${PKG_NAME}         >> $GITHUB_OUTPUT
+          echo PKG_PATH="${PKG_STAGING}/${  >> $GITHUB_OUTPUTPKG_NAME}"
+          echo PKG_STAGING=${PKG_STAGING}   >> $GITHUB_OUTPUT
       
-      - uses: actions/upload-artifact@v2
+      - uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.vars.outputs.PKG_BASENAME }}
           path: |
@@ -120,7 +120,7 @@ jobs:
 
           zip -r $PKG_SUBMOD_PATH ./ -x "*.git*" -x "*.vscode*" -x "build*" -x "${{ env.BIN_DIR }}*" -x "${STAGING}*"
 
-          echo ::set-output name=PKG_SUBMOD_PATH::${PKG_SUBMOD_PATH}
+          echo PKG_SUBMOD_PATH=${PKG_SUBMOD_PATH} >> $GITHUB_OUTPUT
 
       - name: Publish release assets
         uses: softprops/action-gh-release@v1

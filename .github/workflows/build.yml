@@ -67,11 +67,11 @@ jobs:
           # Staging area for tarballs
           PKG_STAGING="ci_staging/$PKG_BASENAME"
 
-          echo PKG_VERSION=${PKG_VERSION}   >> $GITHUB_OUTPUT
-          echo PKG_BASENAME=${PKG_BASENAME} >> $GITHUB_OUTPUT
-          echo PKG_NAME=${PKG_NAME}         >> $GITHUB_OUTPUT
-          echo PKG_PATH="${PKG_STAGING}/${  >> $GITHUB_OUTPUTPKG_NAME}"
-          echo PKG_STAGING=${PKG_STAGING}   >> $GITHUB_OUTPUT
+          echo PKG_VERSION=${PKG_VERSION}             >> $GITHUB_OUTPUT
+          echo PKG_BASENAME=${PKG_BASENAME}           >> $GITHUB_OUTPUT
+          echo PKG_NAME=${PKG_NAME}                   >> $GITHUB_OUTPUT
+          echo PKG_PATH="${PKG_STAGING}/${PKG_NAME}"  >> $GITHUB_OUTPUT
+          echo PKG_STAGING=${PKG_STAGING}             >> $GITHUB_OUTPUT
       
       - uses: actions/upload-artifact@v3
         with:

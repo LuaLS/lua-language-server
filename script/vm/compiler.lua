@@ -1236,10 +1236,10 @@ local compilerSwitch = util.switch()
     : case 'getmethod'
     : case 'getindex'
     : call(function (source)
-        if vm.bindDocs(source) then
+        if guide.isGet(source) and vm.bindAs(source) then
             return
         end
-        if guide.isGet(source) and vm.bindAs(source) then
+        if vm.bindDocs(source) then
             return
         end
         ---@type (string|vm.node)?
@@ -1270,8 +1270,8 @@ local compilerSwitch = util.switch()
             ---@cast key string
             vm.compileByParentNode(source.node, key, function (src)
                 vm.setNode(source, vm.compileNode(src))
-                if src.value then
-                    vm.setNode(source, vm.compileNode(src.value))
+                if src == source and source.value then
+                    vm.setNode(source, vm.compileNode(source.value))
                 end
             end)
         end

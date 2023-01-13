@@ -1,4 +1,5 @@
 require 'crossfile.definition'
+require 'crossfile.infer'
 require 'crossfile.references'
 require 'crossfile.hover'
 require 'crossfile.completion'

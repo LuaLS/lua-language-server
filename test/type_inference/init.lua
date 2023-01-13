@@ -3407,12 +3407,12 @@ TEST '{ [string]: number, [true]: string, [1]: boolean, tag: integer }' [[
 local <?t?>
 ]]
 
-TEST 'nil' [[
+TEST 'unknown' [[
 local mt = {}
 mt.<?x?> = nil
 ]]
 
-TEST 'nil' [[
+TEST 'unknown' [[
 mt = {}
 mt.<?x?> = nil
 ]]
@@ -4188,4 +4188,14 @@ TEST 'V' [[
 X.Y = 1
 
 print(X.<?Y?>)
+]]
+
+TEST 'integer' [[
+local x = {}
+
+x.y = 1
+local y = x.y
+x.y = nil
+
+print(<?y?>)
 ]]

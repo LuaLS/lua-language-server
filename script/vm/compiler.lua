@@ -1270,7 +1270,7 @@ local compilerSwitch = util.switch()
             ---@cast key string
             vm.compileByParentNode(source.node, key, function (src)
                 vm.setNode(source, vm.compileNode(src))
-                if src == source and source.value then
+                if src == source and source.value and source.value.type ~= 'nil' then
                     vm.setNode(source, vm.compileNode(source.value))
                 end
             end)

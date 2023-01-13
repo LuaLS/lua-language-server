@@ -552,7 +552,7 @@ function vm.compileByGlobal(source)
             if vm.bindDocs(source) then
                 return true
             end
-            if source.value then
+            if source.value and source.value.type ~= 'nil' then
                 vm.setNode(source, vm.compileNode(source.value))
                 return true
             end

@@ -9,7 +9,6 @@ local vm         = require 'vm.vm'
 ---@class parser.object
 ---@field _compiledNodes     boolean
 ---@field _node              vm.node
----@field package _hasBindedDocs? boolean
 ---@field cindex             integer
 ---@field func               parser.object
 
@@ -21,20 +20,14 @@ function vm.bindDocs(source)
     if not docs then
         return false
     end
-    if source._hasBindedDocs ~= nil then
-        return source._hasBindedDocs
-    end
-    source._hasBindedDocs = false
     for i = #docs, 1, -1 do
         local doc = docs[i]
         if doc.type == 'doc.type' then
             vm.setNode(source, vm.compileNode(doc))
-            source._hasBindedDocs = true
             return true
         end
         if doc.type == 'doc.class' then
             vm.setNode(source, vm.compileNode(doc))
-            source._hasBindedDocs = true
             return true
         end
         if doc.type == 'doc.param' then
@@ -43,28 +36,23 @@ function vm.bindDocs(source)
                 node:addOptional()
             end
             vm.setNode(source, node)
-            source._hasBindedDocs = true
             return true
         end
         if doc.type == 'doc.module' then
             local name = doc.module
             if not name then
-                source._hasBindedDocs = true
                 return true
             end
             local uri = rpath.findUrisByRequireName(guide.getUri(source), name)[1]
             if not uri then
-                source._hasBindedDocs = true
                 return true
             end
             local state = files.getState(uri)
             local ast   = state and state.ast
             if not ast then
-                source._hasBindedDocs = true
                 return true
             end
             vm.setNode(source, vm.compileNode(ast))
-            source._hasBindedDocs = true
             return true
         end
     end
@@ -594,7 +582,7 @@ end
 
 ---@param source parser.object
 ---@return boolean
-local function bindAs(source)
+function vm.bindAs(source)
     local root = guide.getRoot(source)
     local docs = root.docs
     if not docs then
@@ -1195,7 +1183,7 @@ local compilerSwitch = util.switch()
     end)
     : case 'paren'
     : call(function (source)
-        if bindAs(source) then
+        if vm.bindAs(source) then
             return
         end
         if source.exp then
@@ -1232,7 +1220,7 @@ local compilerSwitch = util.switch()
     : case 'getlocal'
     ---@async
     : call(function (source)
-        if bindAs(source) then
+        if vm.bindAs(source) then
             return
         end
         local node = vm.traceNode(source)
@@ -1251,7 +1239,7 @@ local compilerSwitch = util.switch()
         if vm.bindDocs(source) then
             return
         end
-        if guide.isGet(source) and bindAs(source) then
+        if guide.isGet(source) and vm.bindAs(source) then
             return
         end
         ---@type (string|vm.node)?
@@ -1300,7 +1288,7 @@ local compilerSwitch = util.switch()
     end)
     : case 'getglobal'
     : call(function (source)
-        if bindAs(source) then
+        if vm.bindAs(source) then
             return
         end
         if source.node[1] ~= '_ENV' then
@@ -1441,7 +1429,7 @@ local compilerSwitch = util.switch()
     : case 'call.return'
     ---@param source parser.object
     : call(function (source)
-        if bindAs(source) then
+        if vm.bindAs(source) then
             return
         end
         local func  = source.func
@@ -1725,7 +1713,7 @@ local compilerSwitch = util.switch()
     end)
     : case 'unary'
     : call(function (source)
-        if bindAs(source) then
+        if vm.bindAs(source) then
             return
         end
         if not source[1] then
@@ -1735,7 +1723,7 @@ local compilerSwitch = util.switch()
     end)
     : case 'binary'
     : call(function (source)
-        if bindAs(source) then
+        if vm.bindAs(source) then
             return
         end
         if not source[1] or not source[2] then

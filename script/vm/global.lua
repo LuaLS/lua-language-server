@@ -546,31 +546,33 @@ function vm.compileByGlobal(source)
     if not global then
         return false
     end
-    if global.cate == 'type' then
-        vm.setNode(source, global)
+    vm.setNode(source, global)
+    if global.cate == 'variable' then
+        if guide.isAssign(source) then
+            if vm.bindDocs(source) then
+                return true
+            end
+            if source.value then
+                vm.setNode(source, vm.compileNode(source.value))
+                return true
+            end
+        else
+            if vm.bindAs(source) then
+                return true
+            end
+            local node = vm.traceNode(source)
+            if node then
+                vm.setNode(source, node, true)
+                return true
+            end
+        end
+    end
+    local globalBase = vm.getGlobalBase(source)
+    if not globalBase then
         return false
     end
-    vm.setNode(source, global)
-    if guide.isAssign(source) then
-        if vm.bindDocs(source) then
-            return true
-        end
-        if source.value then
-            vm.setNode(source, vm.compileNode(source.value))
-        end
-        return true
-    end
-    local node = vm.traceNode(source)
-    if node then
-        vm.setNode(source, node, true)
-    else
-        local globalBase = vm.getGlobalBase(source)
-        if not globalBase then
-            return false
-        end
-        local globalNode = vm.compileNode(globalBase)
-        vm.setNode(source, globalNode, true)
-    end
+    local globalNode = vm.compileNode(globalBase)
+    vm.setNode(source, globalNode, true)
     return true
 end
 

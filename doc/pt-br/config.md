@@ -1,3 +1,19 @@
+# codeLens.enable
+
+Enable code lens.
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+false
+```
+
 # completion.autoRequire
 
 When the input looks like a file name, automatically `require` this file.
@@ -1923,23 +1939,6 @@ Array<string>
 
 ```jsonc
 []
-```
-
-# telemetry.enable
-
-Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://github.com/sumneko/lua-language-server/wiki/Home#privacy).
-
-
-## type
-
-```ts
-boolean | null
-```
-
-## default
-
-```jsonc
-null
 ```
 
 # type.castNumberToInteger

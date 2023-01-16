@@ -120,6 +120,4 @@ for name, temp in pairs(template) do
     ::CONTINUE::
 end
 
-config['Lua.telemetry.enable'].tags = { 'telemetry' }
-
 return config

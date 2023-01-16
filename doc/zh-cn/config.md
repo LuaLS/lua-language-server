@@ -1,3 +1,19 @@
+# codeLens.enable
+
+启用代码度量。
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+false
+```
+
 # completion.autoRequire
 
 输入内容看起来是个文件名时，自动 `require` 此文件。
@@ -1922,23 +1938,6 @@ Array<string>
 
 ```jsonc
 []
-```
-
-# telemetry.enable
-
-启用遥测，通过网络发送你的编辑器信息与错误日志。在[此处](https://github.com/sumneko/lua-language-server/wiki/Home#privacy)阅读我们的隐私声明。
-
-
-## type
-
-```ts
-boolean | null
-```
-
-## default
-
-```jsonc
-null
 ```
 
 # type.castNumberToInteger

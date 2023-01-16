@@ -1,10 +1,12 @@
 # changelog
 
-## 3.6.5
-`2023-1-16`
+## 3.6.6
 * `NEW` VSCode: add addon manager, you can install, enable, disable, and uninstall addons from the [LLS-Addons repo](https://github.com/carsakiller/LLS-Addons) by command `lua.addon_manager.open`.  
   this feature is contributed by [carsakiller](https://github.com/carsakiller), thank you!  
   ![](https://user-images.githubusercontent.com/61925890/211632470-6cdbacdf-b5f7-4797-9998-ca6577d3947f.gif)
+
+## 3.6.5
+`2023-1-16`
 * `NEW` support casting global variables
 * `NEW` code lens: this feature is disabled by default.
 * `NEW` settings:

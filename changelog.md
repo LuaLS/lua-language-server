@@ -1,9 +1,11 @@
 # changelog
 
 ## 3.6.5
+* `NEW` support casting global variables
 * `NEW` code lens: this feature is disabled by default.
 * `NEW` settings:
   * `Lua.codeLens.enable`: Enable code lens.
+* `CHG` improve memory usage for large libraries
 * `CHG` definition: supports finding definitions for `@class` and `@alias`, since they may be defined multi times.
 * `CHG` rename: supports `@field`
 * `FIX` [#831]

@@ -6,8 +6,9 @@
 * `NEW` settings:
   * `Lua.codeLens.enable`: Enable code lens.
 * `CHG` improve memory usage for large libraries
-* `CHG` definition: supports finding definitions for `@class` and `@alias`, since they may be defined multi times.
+* `CHG` definition: supports finding definitions for `@class` and `@alias`, since they may be defined multi times
 * `CHG` rename: supports `@field`
+* `CHG` improve patch for `.luarc.json`
 * `FIX` [#831]
 * `FIX` [#1729]
 * `FIX` [#1737]

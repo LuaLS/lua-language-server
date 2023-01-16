@@ -279,6 +279,8 @@ PARSER_AMBIGUOUS_SYNTAX   = -- TODO: need translate!
 '在 Lua 5.1 中，函数调用的左括号必须与函数在同一行。'
 PARSER_NEED_PAREN         = -- TODO: need translate!
 '需要添加一对括号。'
+PARSER_NESTING_LONG_MARK  = -- TODO: need translate!
+'Nesting of `[[...]]` is not allowed in Lua 5.1 .'
 PARSER_LUADOC_MISS_CLASS_NAME           =
 '缺少類別名稱。'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =

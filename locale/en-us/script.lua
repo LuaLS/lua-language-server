@@ -279,6 +279,8 @@ PARSER_AMBIGUOUS_SYNTAX   = -- TODO: need translate!
 'In Lua 5.1, the left brackets called by the function must be in the same line as the function.'
 PARSER_NEED_PAREN         = -- TODO: need translate!
 'Need to add a pair of parentheses.'
+PARSER_NESTING_LONG_MARK  =
+'Nesting of `[[...]]` is not allowed in Lua 5.1 .'
 PARSER_LUADOC_MISS_CLASS_NAME           =
 '<class name> expected.'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =

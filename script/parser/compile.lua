@@ -431,6 +431,19 @@ local function resolveLongString(finishMark)
             : gsub('\r\n?', '\n')
         stringResult = result
     end
+    if finishMark == ']]' and State.version == 'Lua 5.1' then
+        local nestOffset = sfind(Lua, '[[', start, true)
+        if nestOffset then
+            fastForwardToken(nestOffset)
+            local nestStartPos = getPosition(nestOffset, 'left')
+            local nestFinishPos = getPosition(nestOffset + 1, 'right')
+            pushError {
+                type   = 'NESTING_LONG_MARK',
+                start  = nestStartPos,
+                finish = nestFinishPos,
+            }
+        end
+    end
     fastForwardToken(finishOffset + #finishMark)
     if miss then
         local pos = getPosition(finishOffset - 1, 'right')

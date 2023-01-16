@@ -279,6 +279,8 @@ PARSER_AMBIGUOUS_SYNTAX   =
 '在 Lua 5.1 中，函数调用的左括号必须与函数在同一行。'
 PARSER_NEED_PAREN         =
 '需要添加一对括号。'
+PARSER_NESTING_LONG_MARK  =
+'Lua 5.1 中不允许使用嵌套的 `[[...]]` 。'
 PARSER_LUADOC_MISS_CLASS_NAME           =
 '缺少类名称。'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =

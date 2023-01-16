@@ -70,6 +70,9 @@ function mt:collectCare(obj)
         if obj == self.main then
             return
         end
+        if not obj then
+            return
+        end
         self.careMap[obj] = true
 
         if self.fastCalc then

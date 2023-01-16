@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.6.5
+`2023-1-16`
 * `NEW` support casting global variables
 * `NEW` code lens: this feature is disabled by default.
 * `NEW` settings:
@@ -33,8 +34,8 @@
 [#1811]: https://github.com/sumneko/lua-language-server/issues/1811
 [#1824]: https://github.com/sumneko/lua-language-server/issues/1824
 
-`2022-11-29`
 ## 3.6.4
+`2022-11-29`
 * `NEW` modify `require` after renaming files
 * `FIX` circulation reference in process analysis
   ```lua

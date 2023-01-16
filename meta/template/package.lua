@@ -1,4 +1,4 @@
----@meta
+---@meta package
 
 ---#if VERSION >=5.4 then
 ---#DES 'require>5.4'

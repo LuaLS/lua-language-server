@@ -176,6 +176,55 @@ end
 TEST {
     {
         path = 'a.lua',
+        content = '---@meta _',
+    },
+    {
+        path = 'b.lua',
+        content = 'require <?"a"?>',
+    },
+    hover = [[
+```lua
+1 个字节
+```]],
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = '---@meta xxx',
+    },
+    {
+        path = 'b.lua',
+        content = 'require <?"a"?>',
+    },
+    hover = [[
+```lua
+1 个字节
+```]],
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = '---@meta xxx',
+    },
+    {
+        path = 'b.lua',
+        content = 'require <?"xxx"?>',
+    },
+    hover = [=[
+```lua
+3 个字节
+```
+
+---
+
+* [[meta]](file:///a.lua)]=],
+}
+
+TEST {
+    {
+        path = 'a.lua',
         content = [[
             local function f(a, b)
             end

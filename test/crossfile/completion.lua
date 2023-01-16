@@ -10,6 +10,7 @@ local define   = require 'proto.define'
 rawset(_G, 'TEST', true)
 
 local CompletionItemKind = define.CompletionItemKind
+local NeedRemoveMeta = false
 
 local EXISTS = {}
 
@@ -87,7 +88,9 @@ function TEST(data)
     assert(result ~= nil)
     result.complete = nil
     result.enableCommon = nil
-    removeMetas(result)
+    if NeedRemoveMeta then
+        removeMetas(result)
+    end
     for _, item in ipairs(result) do
         if item.id then
             local r = core.resolve(item.id)
@@ -441,6 +444,51 @@ config.set(nil, 'Lua.runtime.path', originRuntimePath)
 
 TEST {
     {
+        path = 'abc.lua',
+        content = '---@meta _',
+    },
+    {
+        path = 'test.lua',
+        content = 'require "a<??>"',
+        main = true,
+    },
+    completion = nil
+}
+
+TEST {
+    {
+        path = 'abc.lua',
+        content = '---@meta xxxxx',
+    },
+    {
+        path = 'test.lua',
+        content = 'require "a<??>"',
+        main = true,
+    },
+    completion = nil
+}
+
+TEST {
+    {
+        path = 'abc.lua',
+        content = '---@meta xxxxx',
+    },
+    {
+        path = 'test.lua',
+        content = 'require "xx<??>"',
+        main = true,
+    },
+    completion = {
+        {
+            label = 'xxxxx',
+            kind = CompletionItemKind.File,
+            textEdit = EXISTS,
+        }
+    }
+}
+
+TEST {
+    {
         path = 'a.lua',
         content = [[
             return {
@@ -560,6 +608,8 @@ TEST {
     },
     completion = nil,
 }
+
+NeedRemoveMeta = true
 
 TEST {
     { path = 'f/a.lua' },

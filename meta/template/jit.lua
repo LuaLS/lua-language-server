@@ -1,5 +1,5 @@
 ---#if not JIT then DISABLE() end
----@meta
+---@meta jit
 
 ---@version JIT
 ---@class jitlib

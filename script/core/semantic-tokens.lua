@@ -694,6 +694,14 @@ local Care = util.switch()
             type       = define.TokenTypes.operator,
         }
     end)
+    : case 'doc.meta.name'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.namespace,
+        }
+    end)
 
 ---@param state table
 ---@param results table

@@ -178,6 +178,7 @@ local childMap = {
     ['doc.cast']           = {'name', '#casts'},
     ['doc.cast.block']     = {'extends'},
     ['doc.operator']       = {'op', 'exp', 'extends'},
+    ['doc.meta']           = {'name'},
 }
 
 ---@type table<string, fun(obj: parser.object, list: parser.object[])>

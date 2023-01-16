@@ -1116,8 +1116,10 @@ local docSwitch = util.switch()
     end)
     : case 'meta'
     : call(function ()
+        local requireName = parseName('doc.meta.name')
         return {
             type   = 'doc.meta',
+            name   = requireName,
             start  = getFinish(),
             finish = getFinish(),
         }

@@ -1,5 +1,5 @@
 ---#if not JIT then DISABLE() end
----@meta
+---@meta ffi
 
 ---@class ffi.namespace*: table
 ---@field [string] function

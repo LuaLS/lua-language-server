@@ -1,4 +1,4 @@
----@meta
+---@meta debug
 
 ---#DES 'debug'
 ---@class debuglib

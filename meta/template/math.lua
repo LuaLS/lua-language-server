@@ -1,4 +1,4 @@
----@meta
+---@meta math
 
 ---#DES 'math'
 ---@class mathlib

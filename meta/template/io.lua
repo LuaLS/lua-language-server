@@ -1,4 +1,4 @@
----@meta
+---@meta io
 
 ---#DES 'io'
 ---@class iolib

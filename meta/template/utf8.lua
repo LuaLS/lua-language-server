@@ -1,5 +1,5 @@
 ---#if VERSION <= 5.2 then DISABLE() end
----@meta
+---@meta utf8
 
 ---@version >5.3
 ---#DES 'utf8'

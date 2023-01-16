@@ -1,5 +1,5 @@
 ---#if VERSION ~= 5.2 then DISABLE() end
----@meta
+---@meta bit32
 
 ---@version 5.2
 ---#DES 'bit32'

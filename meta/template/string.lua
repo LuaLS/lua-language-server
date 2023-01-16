@@ -1,4 +1,4 @@
----@meta
+---@meta string
 
 ---#DES 'string'
 ---@class stringlib

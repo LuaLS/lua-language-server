@@ -1,4 +1,4 @@
----@meta
+---@meta coroutine
 
 ---#DES 'coroutine'
 ---@class coroutinelib

@@ -1,4 +1,4 @@
----@meta
+---@meta table
 
 ---#DES 'table'
 ---@class tablelib

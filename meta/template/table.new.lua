@@ -1,5 +1,5 @@
 ---#if not JIT then DISABLE() end
----@meta
+---@meta table.new
 
 ---@version JIT
 ---#DES 'table.new'

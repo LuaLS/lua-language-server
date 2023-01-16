@@ -1,5 +1,5 @@
 ---#if not JIT then DISABLE() end
----@meta
+---@meta bit
 
 ---@version JIT
 ---@class bitlib

@@ -1,5 +1,5 @@
 ---#if not JIT then DISABLE() end
----@meta
+---@meta string.buffer
 
 ---@version JIT
 --- The string buffer library allows high-performance manipulation of string-like data.

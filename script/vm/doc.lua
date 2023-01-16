@@ -44,10 +44,36 @@ function vm.isMetaFile(uri)
     for _, doc in ipairs(status.ast.docs) do
         if doc.type == 'doc.meta' then
             cache.isMeta = true
+            cache.metaName = doc.name
             return true
         end
     end
     return false
+end
+
+---@param uri uri
+---@return string?
+function vm.getMetaName(uri)
+    if not vm.isMetaFile(uri) then
+        return nil
+    end
+    local cache = files.getCache(uri)
+    if not cache then
+        return nil
+    end
+    if not cache.metaName then
+        return nil
+    end
+    return cache.metaName[1]
+end
+
+---@param uri uri
+---@return boolean
+function vm.isMetaFileRequireable(uri)
+    if not vm.isMetaFile(uri) then
+        return false
+    end
+    return vm.getMetaName(uri) ~= '_'
 end
 
 ---@param doc parser.object

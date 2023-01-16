@@ -9,6 +9,7 @@
 * `CHG` definition: supports finding definitions for `@class` and `@alias`, since they may be defined multi times
 * `CHG` rename: supports `@field`
 * `CHG` improve patch for `.luarc.json`
+* `CHG` `---@meta [name]`: once declared `name`, user can only require this file by declared name. meta file can not be required with name `_`
 * `CHG` remove telemetry
 * `FIX` [#831]
 * `FIX` [#1729]

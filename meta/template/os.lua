@@ -1,4 +1,4 @@
----@meta
+---@meta os
 
 ---#DES 'os'
 ---@class oslib

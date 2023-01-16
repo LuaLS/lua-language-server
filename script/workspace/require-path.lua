@@ -59,12 +59,24 @@ end
 ---@param path string
 ---@return require-manager.visibleResult[]
 function mt:getRequireResultByPath(path)
+    local vm  = require 'vm'
     local uri = furi.encode(path)
+    local result = {}
+    if vm.isMetaFile(uri) then
+        local metaName = vm.getMetaName(uri)
+        if metaName then
+            if vm.isMetaFileRequireable(uri) then
+                result[#result+1] = {
+                    name = metaName,
+                }
+            end
+            return result
+        end
+    end
     local searchers   = config.get(self.scp.uri, 'Lua.runtime.path')
     local strict      = config.get(self.scp.uri, 'Lua.runtime.pathStrict')
     local libUri      = files.getLibraryUri(self.scp.uri, uri)
     local libraryPath = libUri and furi.decode(libUri)
-    local result = {}
     for _, searcher in ipairs(searchers) do
         local isAbsolute = searcher:match '^[/\\]'
                         or searcher:match '^%a+%:'
@@ -157,14 +169,29 @@ end
 --- 查找符合指定require name的所有uri
 ---@param name string
 ---@return uri[]
----@return table<uri, string>
+---@return table<uri, string>?
 function mt:searchUrisByRequireName(name)
+    local vm          = require 'vm'
     local searchers   = config.get(self.scp.uri, 'Lua.runtime.path')
     local strict      = config.get(self.scp.uri, 'Lua.runtime.pathStrict')
     local separator   = config.get(self.scp.uri, 'Lua.completion.requireSeparator')
     local path        = name:gsub('%' .. separator, '/')
     local results     = {}
     local searcherMap = {}
+    local excludes    = {}
+
+    for uri in files.eachFile(self.scp.uri) do
+        if vm.isMetaFileRequireable(uri) then
+            local metaName = vm.getMetaName(uri)
+            if metaName == name then
+                results[#results+1] = uri
+                return results
+            end
+            if metaName then
+                excludes[uri] = true
+            end
+        end
+    end
 
     for _, searcher in ipairs(searchers) do
         local fspath = searcher:gsub('%?', (path:gsub('%%', '%%%%')))
@@ -172,7 +199,9 @@ function mt:searchUrisByRequireName(name)
         local tail = '/' .. furi.encode(fspath):gsub('^file:[/]*', '')
         for uri in files.eachFile(self.scp.uri) do
             if  not searcherMap[uri]
-            and util.stringEndWith(uri, tail) then
+            and not excludes[uri]
+            and util.stringEndWith(uri, tail)
+            and (not vm.isMetaFile(uri) or vm.isMetaFileRequireable(uri)) then
                 local parentUri = files.getLibraryUri(self.scp.uri, uri) or self.scp.uri
                 if parentUri == nil or parentUri == '' then
                     parentUri = furi.encode '/'
@@ -223,7 +252,7 @@ function mt:findUrisByRequireName(suri, name)
     for _, uri in ipairs(cache.results) do
         if uri ~= suri then
             results[#results+1] = uri
-            searcherMap[uri] = cache.searcherMap[uri]
+            searcherMap[uri] = cache.searcherMap and cache.searcherMap[uri]
         end
     end
     return results, searcherMap
@@ -242,6 +271,8 @@ end
 
 ---@param uri uri
 ---@param name string
+---@return uri[]
+---@return table<uri, string>?
 function m.findUrisByRequireName(uri, name)
     local scp = scope.getScope(uri)
     ---@type require-manager

@@ -83,9 +83,9 @@ local function findNearestSource(state, position)
     return source
 end
 
-local function findNearestTableField(state, position)
-    local uri     = state.uri
-    local text    = files.getText(uri)
+local function findNearestTable(state, position)
+    local uri  = state.uri
+    local text = files.getText(uri)
     if not text then
         return nil
     end
@@ -101,13 +101,47 @@ local function findNearestTableField(state, position)
     local sposition = guide.offsetToPosition(state, soffset)
     local source
     guide.eachSourceContain(state.ast, sposition, function (src)
-        if src.type == 'table'
-        or src.type == 'tablefield'
-        or src.type == 'tableindex'
-        or src.type == 'tableexp' then
+        if src.type == 'table' then
             source = src
         end
     end)
+
+    if not source then
+        return nil
+    end
+
+    for _, field in ipairs(source) do
+        if field.start <= position and (field.range or field.finish) >= position then
+            if field.type == 'tableexp' then
+                if field.value.type == 'getlocal'
+                or field.value.type == 'getglobal' then
+                    if field.finish >= position then
+                        return source
+                    else
+                        return nil
+                    end
+                end
+            end
+            if field.type == 'tablefield' then
+                if field.finish >= position then
+                    return source
+                else
+                    return nil
+                end
+            end
+            if field.type == 'tableindex' then
+                if field.index.type == 'string' then
+                    if field.index.finish >= position then
+                        return source
+                    else
+                        return nil
+                    end
+                end
+            end
+            return nil
+        end
+    end
+
     return source
 end
 
@@ -1557,20 +1591,15 @@ local function tryCallArg(state, position, results)
 end
 
 local function tryTable(state, position, results)
-    local source = findNearestTableField(state, position)
-    if not source then
+    local tbl = findNearestTable(state, position)
+    if not tbl then
         return false
     end
-    if  source.type ~= 'table'
-    and (not source.parent or source.parent.type ~= 'table') then
+    if  tbl.type ~= 'table' then
         return
     end
     local mark = {}
     local fields = {}
-    local tbl = source
-    if source.type ~= 'table' then
-        tbl = source.parent
-    end
 
     local defs = vm.getFields(tbl)
     for _, field in ipairs(defs) do

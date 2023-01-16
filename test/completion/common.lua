@@ -4084,3 +4084,33 @@ local foo
 foo = {"<??>"}
 ]]
 (EXISTS)
+
+TEST [[
+---@class c
+---@field abc fun()
+---@field abc2 fun()
+
+---@param p c
+local function f(p) end
+
+f({
+    abc = function(s)
+        local abc3
+        abc<??>
+    end,
+})
+]]
+{
+    {
+        label = 'abc3',
+        kind  = define.CompletionItemKind.Variable,
+    },
+    {
+        label = 'abc',
+        kind  = define.CompletionItemKind.Text,
+    },
+    {
+        label = 'abc2',
+        kind  = define.CompletionItemKind.Text,
+    },
+}

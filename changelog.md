@@ -18,6 +18,7 @@
 * `FIX` [#1805]
 * `FIX` [#1808]
 * `FIX` [#1811]
+* `FIX` [#1824]
 
 [#831]:  https://github.com/sumneko/lua-language-server/issues/831
 [#1729]: https://github.com/sumneko/lua-language-server/issues/1729
@@ -27,6 +28,7 @@
 [#1805]: https://github.com/sumneko/lua-language-server/issues/1805
 [#1808]: https://github.com/sumneko/lua-language-server/issues/1808
 [#1811]: https://github.com/sumneko/lua-language-server/issues/1811
+[#1824]: https://github.com/sumneko/lua-language-server/issues/1824
 
 `2022-11-29`
 ## 3.6.4

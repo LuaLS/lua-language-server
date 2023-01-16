@@ -54,7 +54,10 @@ function m.response(id, res)
         log.error('Response id is nil!', inspect(res))
         return
     end
-    assert(m.holdon[id])
+    if not m.holdon[id] then
+        log.error('Unknown response id!', id)
+        return
+    end
     m.holdon[id] = nil
     local data  = {}
     data.id     = id
@@ -67,7 +70,10 @@ function m.responseErr(id, code, message)
         log.error('Response id is nil!', inspect(message))
         return
     end
-    assert(m.holdon[id])
+    if not m.holdon[id] then
+        log.error('Unknown response id!', id)
+        return
+    end
     m.holdon[id] = nil
     m.send {
         id    = id,

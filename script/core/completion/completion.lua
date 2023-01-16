@@ -1216,7 +1216,7 @@ local function insertEnum(state, pos, src, enums, isInArray, mark)
     or src.type == 'doc.type.boolean' then
         ---@cast src parser.object
         enums[#enums+1] = {
-            label       = vm.viewObject(src, state.uri),
+            label       = vm.getInfer(src):view(state.uri),
             description = src.comment,
             kind        = define.CompletionItemKind.EnumMember,
         }

@@ -2552,21 +2552,21 @@ end
 print(<?x?>)
 ]]
 
-TEST 'table<unknown, true>' [[
+TEST 'table<xxx, true>' [[
 ---@alias xxx table<xxx, true>
 
 ---@type xxx
 local <?t?>
 ]]
 
-TEST 'unknown[][]' [[
+TEST 'xxx[][]' [[
 ---@alias xxx xxx[]
 
 ---@type xxx
 local <?t?>
 ]]
 
-TEST 'fun(x: fun(x: unknown))' [[
+TEST 'fun(x: fun(x: xxx))' [[
 ---@alias xxx fun(x: xxx)
 
 ---@type xxx

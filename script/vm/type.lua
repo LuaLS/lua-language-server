@@ -724,14 +724,14 @@ function vm.viewTypeErrorMessage(uri, errs)
                 lparams[paramName] = 'table'
             elseif value.type == 'generic' then
                 ---@cast value vm.generic
-                lparams[paramName] = vm.viewObject(value, uri)
+                lparams[paramName] = vm.getInfer(value):view(uri)
             elseif value.type == 'variable' then
             else
                 ---@cast value -string, -vm.global, -vm.node, -vm.generic, -vm.variable
                 if paramName == 'key' then
                     lparams[paramName] = vm.viewKey(value, uri)
                 else
-                    lparams[paramName] = vm.viewObject(value, uri)
+                    lparams[paramName] = vm.getInfer(value):view(uri)
                                       or vm.getInfer(value):view(uri)
                 end
             end

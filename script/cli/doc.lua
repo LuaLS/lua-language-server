@@ -160,7 +160,7 @@ local function collect(global)
             if source.field.type == 'doc.field.name' then
                 field.name = source.field[1]
             else
-                field.name = ('[%s]'):format(vm.viewObject(source.field, rootUri))
+                field.name = ('[%s]'):format(vm.getInfer(source.field):view(rootUri))
             end
             field.type    = source.type
             field.file    = guide.getUri(source)

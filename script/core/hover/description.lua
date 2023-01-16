@@ -263,7 +263,7 @@ local function buildEnumChunk(docType, name, uri)
                 (enum.default    and '->')
             or  (enum.additional and '+>')
             or  ' |',
-            vm.viewObject(enum, uri)
+            vm.getInfer(enum):view(uri)
         )
         if enum.comment then
             local first = true

@@ -5,9 +5,8 @@ local guide    = require 'parser.guide'
 local vm       = require 'vm.vm'
 
 ---@class vm.infer
+---@field node vm.node
 ---@field views table<string, boolean>
----@field cachedView? string
----@field node? vm.node
 ---@field _drop table
 local mt = {}
 mt.__index = mt
@@ -137,7 +136,8 @@ local viewNodeSwitch;viewNodeSwitch = util.switch()
         local node = vm.compileNode(source)
         for c in node:eachObject() do
             if guide.isLiteral(c) then
-                local view = vm.viewObject(c, uri)
+                ---@cast c parser.object
+                local view = vm.getInfer(c):view(uri)
                 if view then
                     infer._drop[view] = true
                 end
@@ -239,7 +239,7 @@ local viewNodeSwitch;viewNodeSwitch = util.switch()
 ---@class vm.node
 ---@field lastInfer? vm.infer
 
----@param source vm.object | vm.node
+---@param source vm.node.object | vm.node
 ---@return vm.infer
 function vm.getInfer(source)
     ---@type vm.node
@@ -289,6 +289,13 @@ end
 
 ---@param uri uri
 function mt:_eraseAlias(uri)
+    local count = 0
+    for _ in pairs(self.views) do
+        count = count + 1
+    end
+    if count <= 1 then
+        return
+    end
     local expandAlias = config.get(uri, 'Lua.hover.expandAlias')
     for n in self.node:eachObject() do
         if n.type == 'global' and n.cate == 'type' then
@@ -447,23 +454,6 @@ function mt:eachView(uri)
     return next, self.views
 end
 
----@param other vm.infer
----@return vm.infer
-function mt:merge(other)
-    if self == vm.NULL then
-        return other
-    end
-    if other == vm.NULL then
-        return self
-    end
-
-    local infer = setmetatable({
-        node  = vm.createNode(self.node, other.node),
-    }, mt)
-
-    return infer
-end
-
 ---@return string?
 function mt:viewLiterals()
     if not self.node then
@@ -539,7 +529,7 @@ function vm.viewKey(source, uri)
         if #source.types == 1 then
             return vm.viewKey(source.types[1], uri)
         else
-            local key = vm.viewObject(source, uri)
+            local key = vm.getInfer(source):view(uri)
             return '[' .. key .. ']'
         end
     end

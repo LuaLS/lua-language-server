@@ -193,7 +193,11 @@ function mt:resolve(uri, args)
                     goto CONTINUE
                 end
             end
-            local view = vm.viewObject(obj, uri)
+            if obj.type == 'variable'
+            or obj.type == 'local' then
+                goto CONTINUE
+            end
+            local view = vm.getInfer(obj):view(uri)
             if view then
                 knownTypes[view] = true
             end
@@ -219,7 +223,7 @@ function mt:resolve(uri, args)
                     goto CONTINUE
                 end
             end
-            local view = vm.viewObject(n, uri)
+            local view = vm.getInfer(n):view(uri)
             if knownTypes[view] then
                 goto CONTINUE
             end

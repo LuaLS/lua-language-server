@@ -1777,6 +1777,11 @@ local compilerSwitch = util.switch()
             return
         end
     end)
+    : case 'global'
+    : case 'generic'
+    : call(function (source)
+        vm.setNode(source, source)
+    end)
 
 ---@param source parser.object
 local function compileByNode(source)
@@ -1850,7 +1855,7 @@ local function compileByParentNode(source)
     end)
 end
 
----@param source vm.object | vm.variable
+---@param source vm.node.object | vm.variable
 ---@return vm.node
 function vm.compileNode(source)
     if not source then
@@ -1864,13 +1869,6 @@ function vm.compileNode(source)
     local cache = vm.getNode(source)
     if cache ~= nil then
         return cache
-    end
-
-    if source.type == 'generic' then
-        vm.setNode(source, source)
-        local node = vm.getNode(source)
-        ---@cast node -?
-        return node
     end
 
     ---@cast source parser.object

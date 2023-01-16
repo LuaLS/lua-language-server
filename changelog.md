@@ -15,6 +15,7 @@
 * `FIX` [#1737]
 * `FIX` [#1751]
 * `FIX` [#1767]
+* `FIX` [#1796]
 * `FIX` [#1805]
 * `FIX` [#1808]
 * `FIX` [#1811]
@@ -25,6 +26,7 @@
 [#1737]: https://github.com/sumneko/lua-language-server/issues/1737
 [#1751]: https://github.com/sumneko/lua-language-server/issues/1751
 [#1767]: https://github.com/sumneko/lua-language-server/issues/1767
+[#1796]: https://github.com/sumneko/lua-language-server/issues/1796
 [#1805]: https://github.com/sumneko/lua-language-server/issues/1805
 [#1808]: https://github.com/sumneko/lua-language-server/issues/1808
 [#1811]: https://github.com/sumneko/lua-language-server/issues/1811

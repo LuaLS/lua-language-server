@@ -188,10 +188,14 @@ local function compileSingleMetaDoc(uri, script, metaLang, status)
     if not suc then
         log.debug('MiddleScript:\n', middleScript)
     end
+    local text = table.concat(compileBuf)
     if disable and status == 'default' then
-        return nil
+        return text, false
     end
-    return table.concat(compileBuf)
+    if status == 'disable' then
+        return text, false
+    end
+    return text, true
 end
 
 local function loadMetaLocale(langID, result)
@@ -222,11 +226,8 @@ local function initBuiltIn(uri)
         loadMetaLocale(langID, metaLang)
     end
 
-    if scp:get('metaPath') == metaPath:string() then
-        log.debug('Has meta path, skip:', metaPath:string())
-        return
-    end
-    scp:set('metaPath', metaPath:string())
+    local metaPaths = {}
+    scp:set('metaPaths', metaPaths)
     local suc = xpcall(function ()
         if not fs.exists(metaPath) then
             fs.create_directories(metaPath)
@@ -241,13 +242,10 @@ local function initBuiltIn(uri)
     for libName, status in pairs(define.BuiltIn) do
         status = config.get(uri, 'Lua.runtime.builtin')[libName] or status
         log.debug('Builtin status:', libName, status)
-        if status == 'disable' then
-            goto CONTINUE
-        end
 
         ---@type fs.path
         local libPath = templateDir / (libName .. '.lua')
-        local metaDoc = compileSingleMetaDoc(uri, fsu.loadFile(libPath), metaLang, status)
+        local metaDoc, include = compileSingleMetaDoc(uri, fsu.loadFile(libPath), metaLang, status)
         if metaDoc then
             metaDoc = encoder.encode(encoding, metaDoc, 'auto')
 
@@ -258,13 +256,17 @@ local function initBuiltIn(uri)
 
             local ok, err = out:saveFile(outputLibName, metaDoc)
             if not ok then
-                log.debug("Save Meta File:", err)
+                log.debug("Save Meta File Failed:", err)
                 goto CONTINUE
             end
 
             local outputPath = metaPath / outputLibName
             m.metaPaths[outputPath:string()] = true
             log.debug('Meta path:', outputPath:string())
+
+            if include then
+                metaPaths[#metaPaths+1] = outputPath:string()
+            end
         end
         ::CONTINUE::
     end

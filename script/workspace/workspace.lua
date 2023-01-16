@@ -204,9 +204,12 @@ function m.getLibraryMatchers(scp)
             librarys[m.normalize(path)] = true
         end
     end
-    log.debug('meta path:', scp:get 'metaPath')
-    if scp:get 'metaPath' then
-        librarys[m.normalize(scp:get 'metaPath')] = true
+    local metaPaths = scp:get 'metaPaths'
+    log.debug('meta path:', inspect(metaPaths))
+    if metaPaths then
+        for _, metaPath in ipairs(metaPaths) do
+            librarys[m.normalize(metaPath)] = true
+        end
     end
 
     local matchers = {}

@@ -8,6 +8,9 @@ local vm       = require 'vm.vm'
 ---@field node vm.node
 ---@field views table<string, boolean>
 ---@field _drop table
+---@field _lastView? string
+---@field _lastViewUri? uri
+---@field _lastViewDefault? any
 local mt = {}
 mt.__index = mt
 mt._hasTable       = false
@@ -390,9 +393,18 @@ end
 ---@param default? string
 ---@return string
 function mt:view(uri, default)
+    if  self._lastView
+    and self._lastViewUri == uri
+    and self._lastViewDefault == default then
+        return self._lastView
+    end
+    self._lastViewUri = uri
+    self._lastViewDefault = default
+
     self:_computeViews(uri)
 
     if self.views['any'] then
+        self._lastView = 'any'
         return 'any'
     end
 
@@ -445,6 +457,11 @@ function mt:view(uri, default)
         end
     end
 
+    if #view > 200 then
+        view = view:sub(1, 180) .. '...(too long)...' .. view:sub(-10)
+    end
+
+    self._lastView = view
     return view
 end
 

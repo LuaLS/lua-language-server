@@ -221,6 +221,9 @@ local function checkValue(parent, child, mark, errs)
 
     if parent.type == 'doc.type.table' then
         if child.type == 'doc.type.table' then
+            if child == parent then
+                return true
+            end
             ---@cast parent parser.object
             ---@cast child parser.object
             local uri = guide.getUri(parent)

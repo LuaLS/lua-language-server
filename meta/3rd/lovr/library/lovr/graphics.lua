@@ -1477,7 +1477,7 @@ local Pass = {}
 ---
 ---Similar to `Pass:copy`, except the source and destination sizes can be different.
 ---
----The pixels from the source texture will be scaled to the destination size.
+---The pixels from the source texture will be scaled to the destination size. This can only be called on a transfer pass, which can be created with `lovr.graphics.getPass`.
 ---
 ---
 ---### NOTE:
@@ -1546,6 +1546,8 @@ function Pass:circle(transform, style, angle1, angle2, segments) end
 ---
 ---Clears a Buffer or Texture.
 ---
+---This can only be called on a transfer pass, which can be created with `lovr.graphics.getPass`.
+---
 ---@overload fun(self: lovr.Pass, texture: lovr.Texture, color: lovr.Vec4, layer?: number, layers?: number, level?: number, levels?: number)
 ---@param buffer lovr.Buffer # The Buffer to clear.
 ---@param index? number # The index of the first item to clear.
@@ -1555,24 +1557,59 @@ function Pass:clear(buffer, index, count) end
 ---
 ---Runs a compute shader.
 ---
----Compute shaders are run in 3D grids of workgroups.
+---Before calling this, a compute shader needs to be active, using `Pass:setShader`.
 ---
----Each local workgroup is itself a 3D grid of invocations, declared using `local_size_x`, `local_size_y`, and `local_size_z` in the shader code.
+---This can only be called on a Pass with the `compute` type, which can be created using `lovr.graphics.getPass`.
 ---
 ---
 ---### NOTE:
----All these 3D grids can get confusing, but the basic idea is to make the local workgroup size a small block of e.g. 8x8 pixels or 4x4x4 voxels, and then dispatch however many global workgroups are needed to cover an image or voxel field.
+---Usually compute shaders are run many times in parallel: once for each pixel in an image, once per particle, once per object, etc.
 ---
----The reason to do it this way is that the GPU runs invocations in bundles called subgroups.
+---The 3 arguments represent how many times to run, or "dispatch", the compute shader, in up to 3 dimensions.
 ---
----Subgroups are usually 32 or 64 invocations (the exact size is given by the `subgroupSize` property of `lovr.graphics.getDevice`).
+---Each element of this grid is called a **workgroup**.
 ---
----If the local workgroup size was `1x1x1`, then the GPU would only run 1 invocation per subgroup and waste the other 31 or 63.
+---To make things even more complicated, each workgroup itself is made up of a set of "mini GPU threads", which are called **local workgroups**.
+---
+---Like workgroups, the local workgroup size can also be 3D.
+---
+---It's declared in the shader code, like this:
+---
+---    layout(local_size_x = w, local_size_y = h, local_size_z = d) in;
+---
+---All these 3D grids can get confusing, but the basic idea is to make the local workgroup size a small block of e.g. 32 particles or 8x8 pixels or 4x4x4 voxels, and then dispatch however many workgroups are needed to cover a list of particles, image, voxel field, etc.
+---
+---The reason to do it this way is that the GPU runs its threads in little fixed-size bundles called subgroups.
+---
+---Subgroups are usually 32 or 64 threads (the exact size is given by the `subgroupSize` property of `lovr.graphics.getDevice`) and all run together.
+---
+---If the local workgroup size was `1x1x1`, then the GPU would only run 1 thread per subgroup and waste the other 31 or 63.
+---
+---So for the best performance, be sure to set a local workgroup size bigger than 1!
+---
+---Inside the compute shader, a few builtin variables can be used to figure out which workgroup is running:
+---
+---- `uvec3 WorkgroupCount` is the workgroup count per axis (the `Pass:compute` arguments).
+---- `uvec3 WorkgroupSize` is the local workgroup size (declared in the shader).
+---- `uvec3 WorkgroupID` is the index of the current (global) workgroup.
+---- `uvec3 LocalThreadID` is the index of the local workgroup inside its workgroup.
+---- `uint LocalThreadIndex` is a 1D version of `LocalThreadID`.
+---- `uvec3 GlobalThreadID` is the unique identifier for a thread within all workgroups in a
+---  dispatch. It's equivalent to `WorkgroupID * WorkgroupSize + LocalThreadID` (usually what you
+---  want!)
+---
+---Indirect compute dispatches are useful to "chain" compute shaders together, while keeping all of the data on the GPU.
+---
+---The first dispatch can do some computation and write some results to buffers, then the second indirect dispatch can use the data in those buffers to know how many times it should run.
+---
+---An example would be a compute shader that does some sort of object culling, writing the number of visible objects to a buffer along with the IDs of each one. Subsequent compute shaders can be indirectly dispatched to perform extra processing on the visible objects.
+---
+---Finally, an indirect draw can be used to render them.
 ---
 ---@overload fun(self: lovr.Pass, buffer: lovr.Buffer, offset?: number)
----@param x? number # How many workgroups to dispatch in the x dimension.
----@param y? number # How many workgroups to dispatch in the y dimension.
----@param z? number # How many workgroups to dispatch in the z dimension.
+---@param x? number # The number of workgroups to dispatch in the x dimension.
+---@param y? number # The number of workgroups to dispatch in the y dimension.
+---@param z? number # The number of workgroups to dispatch in the z dimension.
 function Pass:compute(x, y, z) end
 
 ---
@@ -1589,7 +1626,7 @@ function Pass:cone(transform, segments) end
 ---
 ---Copies data to or between `Buffer` and `Texture` objects.
 ---
----This function must be called on a `transfer` pass.
+---This can only be called on a transfer pass, which can be created with `lovr.graphics.getPass`.
 ---
 ---@overload fun(self: lovr.Pass, blob: lovr.Blob, bufferdst: lovr.Buffer, srcoffset?: number, dstoffset?: number, size?: number)
 ---@overload fun(self: lovr.Pass, buffersrc: lovr.Buffer, bufferdst: lovr.Buffer, srcoffset?: number, dstoffset?: number, size?: number)
@@ -1714,6 +1751,7 @@ function Pass:getTarget() end
 ---
 ---The type restricts what kinds of functions can be called on the pass.
 ---
+---@return lovr.PassType type # The type of the Pass.
 function Pass:getType() end
 
 ---
@@ -1802,6 +1840,10 @@ function Pass:mesh(vertices, transform, start, count, instances, base) end
 ---
 ---Generates mipmaps for a texture.
 ---
+---This can only be called on a transfer pass, which can be created with `lovr.graphics.getPass`.
+---
+---When rendering to textures with a render pass, it's also possible to automatically regenerate mipmaps after rendering by adding the `mipmaps` flag when creating the pass.
+---
 ---@param texture lovr.Texture # The texture to mipmap.
 ---@param base? number # The index of the mipmap used to generate the remaining mipmaps.
 ---@param count? number # The number of mipmaps to generate.  If nil, generates the remaining mipmaps.
@@ -1871,7 +1913,9 @@ function Pass:push(stack) end
 ---
 ---Creates a `Readback` object which asynchronously downloads data from a `Buffer`, `Texture`, or `Tally`.
 ---
----The readback can be polled for completion, or, after this transfer pass is completed, `Readback:wait` can be used to block until the download is complete.
+---The readback can be polled for completion, or, after this transfer pass is submitted, `Readback:wait` can be used to block until the download is complete.
+---
+---This can only be called on a transfer pass, which can be created with `lovr.graphics.getPass`.
 ---
 ---@overload fun(self: lovr.Pass, texture: lovr.Texture, x?: number, y?: number, layer?: number, level?: number, width?: number, height?: number):lovr.Readback
 ---@overload fun(self: lovr.Pass, tally: lovr.Tally, index: number, count: number):lovr.Readback
@@ -3134,6 +3178,14 @@ function Texture:newView(type, layer, layerCount, mipmap, mipmapCount) end
 ---A 4x4 matrix containing sixteen 32-bit floats.
 ---
 ---| "mat4"
+---
+---Like u16, but 1-indexed.
+---
+---| "index16"
+---
+---Like u32, but 1-indexed.
+---
+---| "index32"
 
 ---
 ---Controls how `Sampler` objects smooth pixels in textures.

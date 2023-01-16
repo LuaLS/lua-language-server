@@ -15,9 +15,7 @@ lovr.audio = {}
 ---
 ---This affects Sources that have the `absorption` effect enabled, causing audio volume to drop off with distance as it is absorbed by the medium it's traveling through (air, water, etc.).
 ---
----The difference between absorption and falloff is that absorption is more subtle and is frequency-dependent, so higher-frequency bands can get absorbed more quickly than lower ones.
----
----This can be used to apply "underwater" effects and stuff.
+---The difference between absorption and the attenuation effect is that absorption is more subtle and is frequency-dependent, so higher-frequency bands can get absorbed more quickly than lower ones. This can be used to apply "underwater" effects and stuff.
 ---
 ---
 ---### NOTE:
@@ -186,7 +184,7 @@ function lovr.audio.isStarted(type) end
 ---@overload fun(blob: lovr.Blob, options?: table):lovr.Source
 ---@overload fun(sound: lovr.Sound, options?: table):lovr.Source
 ---@param filename string # The filename of the sound to load.
----@param options? {decode: boolean, effects: table} # Optional options.
+---@param options? {decode: boolean, pitchable: boolean, spatial: boolean, effects: table} # Optional options.
 ---@return lovr.Source source # The new Source.
 function lovr.audio.newSource(filename, options) end
 
@@ -195,7 +193,7 @@ function lovr.audio.newSource(filename, options) end
 ---
 ---This affects Sources that have the `absorption` effect enabled, causing audio volume to drop off with distance as it is absorbed by the medium it's traveling through (air, water, etc.).
 ---
----The difference between absorption and falloff is that absorption is more subtle and is frequency-dependent, so higher-frequency bands can get absorbed more quickly than lower ones.
+---The difference between absorption and the attenuation effect is that absorption is more subtle and is frequency-dependent, so higher-frequency bands can get absorbed more quickly than lower ones.
 ---
 ---This can be used to apply "underwater" effects and stuff.
 ---
@@ -420,6 +418,20 @@ function Source:getDuration(unit) end
 function Source:getOrientation() end
 
 ---
+---Returns the pitch of the Source.
+---
+---
+---### NOTE:
+---The default pitch is 1.
+---
+---Every doubling/halving of the pitch will raise/lower the pitch by one octave.
+---
+---Changing the pitch also changes the playback speed.
+---
+---@return number pitch # The pitch.
+function Source:getPitch() end
+
+---
 ---Returns the position and orientation of the Source.
 ---
 ---@return number x # The x position of the Source, in meters.
@@ -485,7 +497,7 @@ function Source:getVolume(units) end
 ---
 ---See `lovr.audio.getSpatializer` for a table showing the effects supported by each spatializer.
 ---
----Calling this function on a Source that was created with `{ effects = false }` will always return false.
+---Calling this function on a non-spatial Source will always return false.
 ---
 ---@param effect lovr.Effect # The effect.
 ---@return boolean enabled # Whether the effect is enabled.
@@ -502,6 +514,14 @@ function Source:isLooping() end
 ---
 ---@return boolean playing # Whether the Source is playing.
 function Source:isPlaying() end
+
+---
+---Returns whether the Source was created with the `spatial` flag.
+---
+---Non-spatial sources are routed directly to the speakers and can not use effects.
+---
+---@return boolean spatial # Whether the source is spatial.
+function Source:isSpatial() end
 
 ---
 ---Pauses the source.
@@ -573,7 +593,7 @@ function Source:setDirectivity(weight, power) end
 ---
 ---See `lovr.audio.getSpatializer` for a table showing the effects supported by each spatializer.
 ---
----Calling this function on a Source that was created with `{ effects = false }` will throw an error.
+---Calling this function on a non-spatial Source will throw an error.
 ---
 ---@param effect lovr.Effect # The effect.
 ---@param enable boolean # Whether the effect should be enabled.
@@ -597,6 +617,20 @@ function Source:setLooping(loop) end
 ---@param ay number # The y component of the axis of rotation.
 ---@param az number # The z component of the axis of rotation.
 function Source:setOrientation(angle, ax, ay, az) end
+
+---
+---Sets the pitch of the Source.
+---
+---
+---### NOTE:
+---The default pitch is 1.
+---
+---Every doubling/halving of the pitch will raise/lower the pitch by one octave.
+---
+---Changing the pitch also changes the playback speed.
+---
+---@param pitch number # The new pitch.
+function Source:setPitch(pitch) end
 
 ---
 ---Sets the position and orientation of the Source.
@@ -763,7 +797,7 @@ function Source:tell(unit) end
 ---
 ---Decreases audio volume with distance (1 / max(distance, 1)).
 ---
----| "falloff"
+---| "attenuation"
 ---
 ---Causes audio to drop off when the Source is occluded by geometry.
 ---

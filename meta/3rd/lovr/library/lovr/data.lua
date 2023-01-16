@@ -205,7 +205,7 @@ function Image:getHeight() end
 ---
 ---
 ---### NOTE:
----The following texture formats are supported: `rgba`, `rgb`, `r32f`, `rg32f`, and `rgba32f`.
+---The following texture formats are supported: `r8`, `rg8`, `rgba8`, `r16`, `rg16`, `rgba16`, `r32f`, `rg32f`, `rgba32f`.
 ---
 ---@param x number # The x coordinate of the pixel to get (0-indexed).
 ---@param y number # The y coordinate of the pixel to get (0-indexed).
@@ -246,7 +246,7 @@ function Image:paste(source, x, y, fromX, fromY, width, height) end
 ---
 ---
 ---### NOTE:
----The following texture formats are supported: `rgba`, `rgb`, `r32f`, `rg32f`, and `rgba32f`.
+---The following texture formats are supported: `r8`, `rg8`, `rgba8`, `r16`, `rg16`, `rgba16`, `r32f`, `rg32f`, `rgba32f`.
 ---
 ---@param x number # The x coordinate of the pixel to set (0-indexed).
 ---@param y number # The y coordinate of the pixel to set (0-indexed).

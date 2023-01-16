@@ -410,11 +410,11 @@ function love.graphics.getMeshCullMode() end
 ---love.graphics.getDimensions gets the dimensions of the window in units scaled by the screen's DPI scale factor, rather than pixels. Use getDimensions for calculations related to drawing to the screen and using the graphics coordinate system (calculating the center of the screen, for example), and getPixelDimensions only when dealing specifically with underlying pixels (pixel-related calculations in a pixel Shader, for example).
 ---
 ---
----[Open in Browser](https://love2d.org/wiki/love.graphics.getPixelDimenions)
+---[Open in Browser](https://love2d.org/wiki/love.graphics.getPixelDimensions)
 ---
 ---@return number pixelwidth # The width of the window in pixels.
 ---@return number pixelheight # The height of the window in pixels.
-function love.graphics.getPixelDimenions() end
+function love.graphics.getPixelDimensions() end
 
 ---
 ---Gets the height in pixels of the window.

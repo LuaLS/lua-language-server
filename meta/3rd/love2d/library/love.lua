@@ -170,7 +170,7 @@ function Object:typeOf(name) end
 ---
 ---The error handler, used to display error messages.
 ---
----@alias love.errorhandler fun(msg: string)
+---@alias love.errorhandler fun(msg: string):function
 
 ---
 ---Callback function triggered when a file is dragged and dropped onto the window.

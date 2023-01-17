@@ -66,7 +66,7 @@ function love.event.push(n, a, b, c, d, e, f, ...) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.event.quit)
 ---
----@overload fun('restart': string|'restart')
+---@overload fun(restart: string|'restart')
 ---@param exitstatus? number # The program exit status to use when closing the application.
 function love.event.quit(exitstatus) end
 

@@ -1,5 +1,10 @@
 # changelog
 
+## 3.6.7
+* `FIX` [#1829]
+
+[#1829]: https://github.com/sumneko/lua-language-server/issues/1829
+
 ## 3.6.6
 `2023-1-17`
 * `FIX` [#1825]

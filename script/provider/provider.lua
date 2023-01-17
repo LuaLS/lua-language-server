@@ -991,7 +991,7 @@ m.register 'workspace/executeCommand' {
             return core(params.arguments[1])
         elseif command == 'lua.setConfig' then
             local core = require 'core.command.setConfig'
-            return core(params.arguments[1])
+            return core(params.arguments)
         elseif command == 'lua.autoRequire' then
             local core = require 'core.command.autoRequire'
             return core(params.arguments[1])

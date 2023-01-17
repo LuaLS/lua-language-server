@@ -110,3 +110,26 @@ end
     },
     infer = 'V',
 }
+
+TEST {
+    { path = 'a.lua', content = [[
+X = 1
+X = true
+]], },
+    { path = 'b.lua', content = [[
+print(<?X?>)
+]], },
+    infer = 'integer',
+}
+
+TEST {
+    { path = 'a.lua', content = [[
+---@meta
+X = 1
+X = true
+]], },
+    { path = 'b.lua', content = [[
+print(<?X?>)
+]], },
+    infer = 'boolean|integer',
+}

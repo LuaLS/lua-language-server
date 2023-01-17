@@ -1744,6 +1744,12 @@ local compilerSwitch = util.switch()
                     if firstSet then
                         local setNode = vm.compileNode(firstSet)
                         vm.setNode(source, setNode)
+                        if vm.isMetaFile(luri) then
+                            for i = 2, #link.sets do
+                                setNode = vm.compileNode(link.sets[i])
+                                vm.setNode(source, setNode)
+                            end
+                        end
                     end
                 end
             end

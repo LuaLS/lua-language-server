@@ -124,3 +124,5 @@ end
 ---@return table
 function reflect.getmetatable(v)
 end
+
+return reflect

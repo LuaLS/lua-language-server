@@ -45,9 +45,6 @@ end
 
 --- 初始化工作区
 function m.create(uri)
-    if furi.isValid(uri) then
-        uri = furi.normalize(uri)
-    end
     log.info('Workspace create: ', uri)
     local scp = scope.createFolder(uri)
     m.folders[#m.folders+1] = scp

@@ -106,7 +106,7 @@ function m.isValid(uri)
 end
 
 function m.normalize(uri)
-    if uri == '' then
+    if not m.isValid(uri) then
         return uri
     end
     return m.encode(m.decode(uri))

@@ -79,7 +79,7 @@ end
 ---@return uri
 function m.getRealUri(uri)
     if platform.OS ~= 'Windows' then
-        return uri
+        return furi.normalize(uri)
     end
     local filename = furi.decode(uri)
     -- normalize uri

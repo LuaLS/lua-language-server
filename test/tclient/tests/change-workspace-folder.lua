@@ -98,4 +98,22 @@ lclient():start(function (client)
     assert(files.getState(rootUri .. '/ws1/test.lua') == nil)
     assert(files.getState(rootUri .. '/ws2/test.lua') == nil)
     assert(files.getState(rootUri .. '/ws3/test.lua') ~= nil)
+
+    -- normalize uri
+    client:notify('workspace/didChangeWorkspaceFolders', {
+        event = {
+            added = {
+                {
+                    name = 'ws2',
+                    uri = rootUri .. '%2F%77%73%32'--[[/ws2]],
+                },
+            },
+            removed = {},
+        },
+    })
+
+    ws.awaitReady(rootUri .. '/ws2')
+    assert(files.getState(rootUri .. '/ws1/test.lua') == nil)
+    assert(files.getState(rootUri .. '/ws2/test.lua') ~= nil)
+    assert(files.getState(rootUri .. '/ws3/test.lua') ~= nil)
 end)

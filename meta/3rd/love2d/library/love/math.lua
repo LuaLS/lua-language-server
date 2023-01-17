@@ -610,10 +610,22 @@ function Transform:scale(sx, sy) end
 ---@overload fun(self: love.Transform, layout: love.MatrixLayout, matrix: table):love.Transform
 ---@param e1_1 number # The first column of the first row of the matrix.
 ---@param e1_2 number # The second column of the first row of the matrix.
----@vararg number # Additional matrix elements.
+---@param e1_3 number # The third column of the first row of the matrix.
+---@param e1_4 number # The fourth column of the first row of the matrix.
+---@param e2_1 number # The first column of the second row of the matrix.
+---@param e2_2 number # The second column of the second row of the matrix.
+---@param e2_3 number # The third column of the second row of the matrix.
+---@param e2_4 number # The fourth column of the second row of the matrix.
+---@param e3_1 number # The first column of the third row of the matrix.
+---@param e3_2 number # The second column of the third row of the matrix.
+---@param e3_3 number # The third column of the third row of the matrix.
+---@param e3_4 number # The fourth column of the third row of the matrix.
+---@param e4_1 number # The first column of the fourth row of the matrix.
+---@param e4_2 number # The second column of the fourth row of the matrix.
+---@param e4_3 number # The third column of the fourth row of the matrix.
 ---@param e4_4 number # The fourth column of the fourth row of the matrix.
 ---@return love.Transform transform # The Transform object the method was called on. Allows easily chaining Transform methods.
-function Transform:setMatrix(e1_1, e1_2, ..., e4_4) end
+function Transform:setMatrix(e1_1, e1_2, e1_3, e1_4, e2_1, e2_2, e2_3, e2_4, e3_1, e3_2, e3_3, e3_4, e4_1, e4_2, e4_3, e4_4) end
 
 ---
 ---Resets the Transform to the specified transformation parameters.

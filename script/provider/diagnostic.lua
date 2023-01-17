@@ -642,6 +642,12 @@ function m.pullDiagnosticScope(callback)
 end
 
 function m.refreshClient()
+    if not client.isReady() then
+        return
+    end
+    if not client.getAbility 'workspace.diagnostics.refreshSupport' then
+        return
+    end
     log.debug('Refresh client diagnostics')
     proto.request('workspace/diagnostic/refresh', json.null)
 end

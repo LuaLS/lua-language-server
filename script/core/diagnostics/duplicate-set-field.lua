@@ -11,10 +11,30 @@ local sourceTypes = {
     'setindex',
 }
 
+---@param source parser.object
+---@return parser.object?
+local function getTopFunctionOfIf(source)
+    while true do
+        if source.type == 'ifblock'
+        or source.type == 'elseifblock'
+        or source.type == 'elseblock'
+        or source.type == 'function'
+        or source.type == 'main' then
+            return source
+        end
+        source = source.parent
+    end
+    return nil
+end
+
 ---@async
 return function (uri, callback)
     local state = files.getState(uri)
     if not state then
+        return
+    end
+
+    if vm.isMetaFile(uri) then
         return
     end
 
@@ -29,6 +49,7 @@ return function (uri, callback)
         if not value or value.type ~= 'function' then
             return
         end
+        local myTopBlock = getTopFunctionOfIf(src)
         local defs = vm.getDefs(src)
         for _, def in ipairs(defs) do
             if def == src then
@@ -37,6 +58,10 @@ return function (uri, callback)
             if  def.type ~= 'setfield'
             and def.type ~= 'setmethod'
             and def.type ~= 'setindex' then
+                goto CONTINUE
+            end
+            local defTopBlock = getTopFunctionOfIf(def)
+            if uri == guide.getUri(def) and myTopBlock ~= defTopBlock then
                 goto CONTINUE
             end
             local defValue = vm.getObjectValue(def)

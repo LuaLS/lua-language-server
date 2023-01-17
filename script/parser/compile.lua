@@ -433,7 +433,7 @@ local function resolveLongString(finishMark)
     end
     if finishMark == ']]' and State.version == 'Lua 5.1' then
         local nestOffset = sfind(Lua, '[[', start, true)
-        if nestOffset then
+        if nestOffset and nestOffset < finishOffset then
             fastForwardToken(nestOffset)
             local nestStartPos = getPosition(nestOffset, 'left')
             local nestFinishPos = getPosition(nestOffset + 1, 'right')

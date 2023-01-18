@@ -26,6 +26,7 @@ The Lua language server provides various language features for Lua to make devel
 - 💅 [Code formatting](https://github.com/sumneko/lua-language-server/wiki/Formatter)
 - 💬 [Spell checking](https://github.com/sumneko/lua-language-server/wiki/Formatter)
 - 🛠️ Custom [plugins](https://github.com/sumneko/lua-language-server/wiki/Plugins)
+- 📖 [Documentation Generation](https://github.com/sumneko/lua-language-server/wiki/Export-Documentation)
 
 ## Install
 

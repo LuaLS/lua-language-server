@@ -2430,3 +2430,20 @@ local t: {
     ['y']: integer = 2,
 }
 ]]
+
+TEST [[
+local enum = { a = 1, b = 2 }
+
+local <?t?> = {
+    [enum.a] = true,
+    [enum.b] = 2,
+    [3] = {}
+}
+]]
+[[
+local t: {
+    [1]: boolean = true,
+    [2]: integer = 2,
+    [3]: table,
+}
+]]

@@ -555,19 +555,14 @@ function vm.viewKey(source, uri)
             return '[' .. key .. ']'
         end
     end
-    if source.type == 'tableindex' then
+    if source.type == 'tableindex'
+    or source.type == 'setindex' then
         local index = source.index
-        local name = vm.getKeyName(index)
+        local name = vm.getInfer(index):viewLiterals()
         if not name then
             return nil
         end
-        local key
-        if index.type == 'string' then
-            key = util.viewString(name, index[2])
-        else
-            key = util.viewLiteral(name)
-        end
-        return ('[%s]'):format(key), name
+        return ('[%s]'):format(name), name
     end
     if source.type == 'tableexp' then
         return ('[%d]'):format(source.tindex), source.tindex

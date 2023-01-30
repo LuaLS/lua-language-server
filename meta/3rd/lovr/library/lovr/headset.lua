@@ -612,11 +612,25 @@ function lovr.headset.wasReleased(device, button) end
 ---
 ---Different types of input devices supported by the `lovr.headset` module.
 ---
+---
+---### NOTE:
+---The difference between `hand/left` and `hand/left/point` is the first represents an object held in the hand, whereas the second represents the laser pointer used to aim.
+---
+---Drawing a controller model would use `hand/left`, whereas drawing a pointer or aiming would use `hand/left/point`.
+---
 ---@alias lovr.Device
 ---
 ---The headset.
 ---
 ---| "head"
+---
+---A shorthand for hand/left.
+---
+---| "left"
+---
+---A shorthand for hand/right.
+---
+---| "right"
 ---
 ---The left controller.
 ---
@@ -626,13 +640,13 @@ function lovr.headset.wasReleased(device, button) end
 ---
 ---| "hand/right"
 ---
----A shorthand for hand/left.
+---The left controller pointer (pose only).
 ---
----| "left"
+---| "hand/left/point"
 ---
----A shorthand for hand/right.
+---The right controller pointer (pose only).
 ---
----| "right"
+---| "hand/right/point"
 ---
 ---A device tracking the left elbow.
 ---

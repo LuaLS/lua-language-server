@@ -532,6 +532,19 @@ function Transform:clone() end
 ---
 ---@return number e1_1 # The first column of the first row of the matrix.
 ---@return number e1_2 # The second column of the first row of the matrix.
+---@return number e1_3 # The third column of the first row of the matrix.
+---@return number e1_4 # The fourth column of the first row of the matrix.
+---@return number e2_1 # The first column of the second row of the matrix.
+---@return number e2_2 # The second column of the second row of the matrix.
+---@return number e2_3 # The third column of the second row of the matrix.
+---@return number e2_4 # The fourth column of the second row of the matrix.
+---@return number e3_1 # The first column of the third row of the matrix.
+---@return number e3_2 # The second column of the third row of the matrix.
+---@return number e3_3 # The third column of the third row of the matrix.
+---@return number e3_4 # The fourth column of the third row of the matrix.
+---@return number e4_1 # The first column of the fourth row of the matrix.
+---@return number e4_2 # The second column of the fourth row of the matrix.
+---@return number e4_3 # The third column of the fourth row of the matrix.
 ---@return number e4_4 # The fourth column of the fourth row of the matrix.
 function Transform:getMatrix() end
 
@@ -605,7 +618,7 @@ function Transform:scale(sx, sy) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/Transform:setMatrix)
 ---
----@overload fun(self: love.Transform, layout: love.MatrixLayout, e1_1: number, e1_2: number, ..., e4_4: number):love.Transform
+---@overload fun(self: love.Transform, layout: love.MatrixLayout, e1_1: number, e1_2: number, e1_3: number, e1_4: number, e2_1: number, e2_2: number, e2_3: number, e2_4: number, e3_1: number, e3_2: number, e3_3: number, e3_4: number, e4_1: number, e4_2: number, e4_3: number, e4_4: number):love.Transform
 ---@overload fun(self: love.Transform, layout: love.MatrixLayout, matrix: table):love.Transform
 ---@overload fun(self: love.Transform, layout: love.MatrixLayout, matrix: table):love.Transform
 ---@param e1_1 number # The first column of the first row of the matrix.

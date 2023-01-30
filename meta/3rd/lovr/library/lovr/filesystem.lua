@@ -269,7 +269,11 @@ function lovr.filesystem.remove(path) end
 ---
 ---Set the name of the save directory.
 ---
----@param identity string # The new name of the save directory.
+---This function can only be called once and is called automatically at startup, so this function normally isn't called manually.
+---
+---However, the identity can be changed by setting the `t.identity` option in `lovr.conf`.
+---
+---@param identity string # The name of the save directory.
 function lovr.filesystem.setIdentity(identity) end
 
 ---

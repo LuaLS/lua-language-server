@@ -528,7 +528,7 @@ function Mat4:transpose() end
 ---
 ---Returns the components of matrix, either as 10 separated numbers representing the position, scale, and rotation, or as 16 raw numbers representing the individual components of the matrix in column-major order.
 ---
----@param raw boolean # Whether to return the 16 raw components.
+---@param raw? boolean # Whether to return the 16 raw components.
 function Mat4:unpack(raw) end
 
 ---

@@ -483,7 +483,12 @@ function mt:viewLiterals()
         or n.type == 'number'
         or n.type == 'integer'
         or n.type == 'boolean' then
-            local literal = util.viewLiteral(n[1])
+            local literal
+            if n.type == 'string' then
+                literal = util.viewString(n[1], n[2])
+            else
+                literal = util.viewLiteral(n[1])
+            end
             if literal and not mark[literal] then
                 literals[#literals+1] = literal
                 mark[literal] = true

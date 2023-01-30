@@ -1177,7 +1177,8 @@ local compilerSwitch = util.switch()
         end
 
         -- { f = function (<?x?>) end }
-        if guide.isAssign(parent) then
+        if  guide.isAssign(parent)
+        and parent.value == source then
             vm.setNode(source, vm.compileNode(parent))
         end
     end)

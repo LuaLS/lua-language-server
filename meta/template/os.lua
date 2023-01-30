@@ -87,12 +87,12 @@ function os.remove(filename) end
 function os.rename(oldname, newname) end
 
 ---@alias localecategory
----|>'"all"'
----| '"collate"'
----| '"ctype"'
----| '"monetary"'
----| '"numeric"'
----| '"time"'
+---|>"all"
+---| "collate"
+---| "ctype"
+---| "monetary"
+---| "numeric"
+---| "time"
 
 ---#DES 'os.setlocale'
 ---@param locale    string|nil

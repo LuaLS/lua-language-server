@@ -13,18 +13,18 @@ arg = {}
 function assert(v, message, ...) end
 
 ---@alias gcoptions
----|>'"collect"'      # ---#DESTAIL 'cgopt.collect'
----| '"stop"'         # ---#DESTAIL 'cgopt.stop'
----| '"restart"'      # ---#DESTAIL 'cgopt.restart'
----| '"count"'        # ---#DESTAIL 'cgopt.count'
----| '"step"'         # ---#DESTAIL 'cgopt.step'
----| '"isrunning"'    # ---#DESTAIL 'cgopt.isrunning'
+---|>"collect"      # ---#DESTAIL 'cgopt.collect'
+---| "stop"         # ---#DESTAIL 'cgopt.stop'
+---| "restart"      # ---#DESTAIL 'cgopt.restart'
+---| "count"        # ---#DESTAIL 'cgopt.count'
+---| "step"         # ---#DESTAIL 'cgopt.step'
+---| "isrunning"    # ---#DESTAIL 'cgopt.isrunning'
 ---#if VERSION >= 5.4 then
----| '"incremental"'  # ---#DESTAIL 'cgopt.incremental'
----| '"generational"' # ---#DESTAIL 'cgopt.generational'
+---| "incremental"  # ---#DESTAIL 'cgopt.incremental'
+---| "generational" # ---#DESTAIL 'cgopt.generational'
 ---#else
----| '"setpause"'     # ---#DESTAIL 'cgopt.setpause'
----| '"setstepmul"'   # ---#DESTAIL 'cgopt.setstepmul'
+---| "setpause"     # ---#DESTAIL 'cgopt.setpause'
+---| "setstepmul"   # ---#DESTAIL 'cgopt.setstepmul'
 ---#end
 
 ---#if VERSION >= 5.4 then
@@ -76,9 +76,9 @@ function getmetatable(object) end
 function ipairs(t) end
 
 ---@alias loadmode
----| '"b"'  # ---#DESTAIL 'loadmode.b'
----| '"t"'  # ---#DESTAIL 'loadmode.t'
----|>'"bt"' # ---#DESTAIL 'loadmode.bt'
+---| "b"  # ---#DESTAIL 'loadmode.b'
+---| "t"  # ---#DESTAIL 'loadmode.t'
+---|>"bt" # ---#DESTAIL 'loadmode.bt'
 
 ---#if VERSION <= 5.1 and not JIT then
 ---#DES 'load<5.1'
@@ -197,7 +197,7 @@ function rawlen(v) end
 function rawset(table, index, value) end
 
 ---#DES 'select'
----@param index integer|'"#"'
+---@param index integer|"#"
 ---@return any
 ---@nodiscard
 function select(index, ...) end
@@ -229,16 +229,16 @@ function tonumber(e) end
 function tostring(v) end
 
 ---@alias type
----| '"nil"'
----| '"number"'
----| '"string"'
----| '"boolean"'
----| '"table"'
----| '"function"'
----| '"thread"'
----| '"userdata"'
+---| "nil"
+---| "number"
+---| "string"
+---| "boolean"
+---| "table"
+---| "function"
+---| "thread"
+---| "userdata"
 ---#if VERSION == JIT then
----| '"cdata"'
+---| "cdata"
 ---#end
 
 ---#DES 'type'
@@ -249,13 +249,13 @@ function type(v) end
 
 ---#DES '_VERSION'
 ---#if VERSION == 5.1 then
-_VERSION = 'Lua 5.1'
+_VERSION = "Lua 5.1"
 ---#elseif VERSION == 5.2 then
-_VERSION = 'Lua 5.2'
+_VERSION = "Lua 5.2"
 ---#elseif VERSION == 5.3 then
-_VERSION = 'Lua 5.3'
+_VERSION = "Lua 5.3"
 ---#elseif VERSION == 5.4 then
-_VERSION = 'Lua 5.4'
+_VERSION = "Lua 5.4"
 ---#end
 
 ---@version >5.4

@@ -11,18 +11,18 @@
 io = {}
 
 ---@alias openmode
----|>'"r"'   # ---#DESTAIL 'openmode.r'
----| '"w"'   # ---#DESTAIL 'openmode.w'
----| '"a"'   # ---#DESTAIL 'openmode.a'
----| '"r+"'  # ---#DESTAIL 'openmode.r+'
----| '"w+"'  # ---#DESTAIL 'openmode.w+'
----| '"a+"'  # ---#DESTAIL 'openmode.a+'
----| '"rb"'  # ---#DESTAIL 'openmode.rb'
----| '"wb"'  # ---#DESTAIL 'openmode.wb'
----| '"ab"'  # ---#DESTAIL 'openmode.ab'
----| '"r+b"' # ---#DESTAIL 'openmode.r+b'
----| '"w+b"' # ---#DESTAIL 'openmode.w+b'
----| '"a+b"' # ---#DESTAIL 'openmode.a+b'
+---|>"r"   # ---#DESTAIL 'openmode.r'
+---| "w"   # ---#DESTAIL 'openmode.w'
+---| "a"   # ---#DESTAIL 'openmode.a'
+---| "r+"  # ---#DESTAIL 'openmode.r+'
+---| "w+"  # ---#DESTAIL 'openmode.w+'
+---| "a+"  # ---#DESTAIL 'openmode.a+'
+---| "rb"  # ---#DESTAIL 'openmode.rb'
+---| "wb"  # ---#DESTAIL 'openmode.wb'
+---| "ab"  # ---#DESTAIL 'openmode.ab'
+---| "r+b" # ---#DESTAIL 'openmode.r+b'
+---| "w+b" # ---#DESTAIL 'openmode.w+b'
+---| "a+b" # ---#DESTAIL 'openmode.a+b'
 
 ---#DES 'io.close'
 ---@param file? file*
@@ -59,8 +59,8 @@ function io.open(filename, mode) end
 function io.output(file) end
 
 ---@alias popenmode
----| '"r"' # ---#DESTAIL 'popenmode.r'
----| '"w"' # ---#DESTAIL 'popenmode.w'
+---| "r" # ---#DESTAIL 'popenmode.r'
+---| "w" # ---#DESTAIL 'popenmode.w'
 
 ---#DES 'io.popen'
 ---@param prog  string
@@ -82,9 +82,9 @@ function io.read(...) end
 function io.tmpfile() end
 
 ---@alias filetype
----| '"file"'        # ---#DESTAIL 'filetype.file'
----| '"closed file"' # ---#DESTAIL 'filetype.closed file'
----| 'nil'           # ---#DESTAIL 'filetype.nil'
+---| "file"        # ---#DESTAIL 'filetype.file'
+---| "closed file" # ---#DESTAIL 'filetype.closed file'
+---| `nil`         # ---#DESTAIL 'filetype.nil'
 
 ---#DES 'io.type'
 ---@param file file*
@@ -103,20 +103,20 @@ local file = {}
 
 ---@alias readmode integer|string
 ---#if VERSION >= 5.3 then
----| '"n"'  # ---#DESTAIL 'readmode.n'
----| '"a"'  # ---#DESTAIL 'readmode.a'
----|>'"l"'  # ---#DESTAIL 'readmode.l'
----| '"L"'  # ---#DESTAIL 'readmode.L'
+---| "n"  # ---#DESTAIL 'readmode.n'
+---| "a"  # ---#DESTAIL 'readmode.a'
+---|>"l"  # ---#DESTAIL 'readmode.l'
+---| "L"  # ---#DESTAIL 'readmode.L'
 ---#else
----| '"*n"' # ---#DESTAIL 'readmode.n'
----| '"*a"' # ---#DESTAIL 'readmode.a'
----|>'"*l"' # ---#DESTAIL 'readmode.l'
+---| "*n" # ---#DESTAIL 'readmode.n'
+---| "*a" # ---#DESTAIL 'readmode.a'
+---|>"*l" # ---#DESTAIL 'readmode.l'
 ---#if JIT then
----| '"*L"' # ---#DESTAIL 'readmode.L'
+---| "*L" # ---#DESTAIL 'readmode.L'
 ---#end
 ---#end
 
----@alias exitcode '"exit"'|'"signal"'
+---@alias exitcode "exit"|"signal"
 
 ---#DES 'file:close'
 ---@return boolean?  suc
@@ -140,9 +140,9 @@ function file:lines(...) end
 function file:read(...) end
 
 ---@alias seekwhence
----| '"set"' # ---#DESTAIL 'seekwhence.set'
----|>'"cur"' # ---#DESTAIL 'seekwhence.cur'
----| '"end"' # ---#DESTAIL 'seekwhence.end'
+---| "set" # ---#DESTAIL 'seekwhence.set'
+---|>"cur" # ---#DESTAIL 'seekwhence.cur'
+---| "end" # ---#DESTAIL 'seekwhence.end'
 
 ---#DES 'file:seek'
 ---@param whence? seekwhence
@@ -152,9 +152,9 @@ function file:read(...) end
 function file:seek(whence, offset) end
 
 ---@alias vbuf
----| '"no"'   # ---#DESTAIL 'vbuf.no'
----| '"full"' # ---#DESTAIL 'vbuf.full'
----| '"line"' # ---#DESTAIL 'vbuf.line'
+---| "no"   # ---#DESTAIL 'vbuf.no'
+---| "full" # ---#DESTAIL 'vbuf.full'
+---| "line" # ---#DESTAIL 'vbuf.line'
 
 ---#DES 'file:setvbuf'
 ---@param mode vbuf

@@ -443,6 +443,7 @@ local function checkFieldFromFieldToIndex(state, name, src, parent, word, startP
         or config.get(state.uri, 'Lua.runtime.unicodeName') then
             return nil
         end
+        name = ('%q'):format(name)
     end
     local textEdit, additionalTextEdits
     local startOffset = guide.positionToOffset(state, startPos)
@@ -459,12 +460,7 @@ local function checkFieldFromFieldToIndex(state, name, src, parent, word, startP
         wordStartOffset = offset - #word
     end
     local wordStartPos = guide.offsetToPosition(state, wordStartOffset)
-    local newText
-    if vm.getKeyType(src) == 'string' then
-        newText = ('[%q]'):format(name)
-    else
-        newText = ('[%s]'):format(name)
-    end
+    local newText = ('[%s]'):format(name)
     textEdit = {
         start   = wordStartPos,
         finish  = position,
@@ -541,7 +537,7 @@ local function checkFieldThen(state, name, src, word, startPos, position, parent
         textEdit = {
             start   = str.start + #str[2],
             finish  = position,
-            newText = name,
+            newText = name:sub(#str[2] + 1, - #str[2] - 1),
         }
     else
         textEdit, additionalTextEdits = checkFieldFromFieldToIndex(state, name, src, parent, word, startPos, position)
@@ -583,7 +579,7 @@ local function checkFieldOfRefs(refs, state, word, startPos, position, parent, o
         if isGlobal and locals and locals[name] then
             goto CONTINUE
         end
-        if not matchKey(word, name, count >= 100) then
+        if not matchKey(word, name:gsub([=[^['"]]=], ''), count >= 100) then
             goto CONTINUE
         end
         if not vm.isVisible(parent, src) then

@@ -1006,12 +1006,12 @@ t.<??>
 ]]
 {
     {
-        label = 'a.b.c',
+        label = "'a.b.c'",
         kind = define.CompletionItemKind.Field,
         textEdit = {
             start = 40002,
             finish = 40002,
-            newText = '["a.b.c"]',
+            newText = "['a.b.c']",
         },
         additionalTextEdits = {
             {
@@ -1032,12 +1032,12 @@ t.   <??>
 ]]
 {
     {
-        label = 'a.b.c',
+        label = "'a.b.c'",
         kind = define.CompletionItemKind.Field,
         textEdit = {
             start = 40005,
             finish = 40005,
-            newText = '["a.b.c"]',
+            newText = "['a.b.c']",
         },
         additionalTextEdits = {
             {
@@ -1058,7 +1058,7 @@ t['<??>']
 ]]
 {
     {
-        label = 'a.b.c',
+        label = "'a.b.c'",
         kind = define.CompletionItemKind.Field,
         textEdit = {
             start = 40003,
@@ -1075,12 +1075,12 @@ z<??>
 ]]
 {
     {
-        label = 'z.b.c',
+        label = "'z.b.c'",
         kind = define.CompletionItemKind.Field,
         textEdit = {
             start = 20000,
             finish = 20001,
-            newText = '_ENV["z.b.c"]',
+            newText = "_ENV['z.b.c']",
         },
     },
 }
@@ -1094,12 +1094,12 @@ z<??>
 ]]
 {
     {
-        label = 'z.b.c',
+        label = "'z.b.c'",
         kind = define.CompletionItemKind.Field,
         textEdit = {
             start = 20000,
             finish = 20001,
-            newText = '_G["z.b.c"]',
+            newText = "_G['z.b.c']",
         },
     },
 }

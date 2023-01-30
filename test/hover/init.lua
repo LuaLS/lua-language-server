@@ -490,7 +490,7 @@ local self: {
     id: integer = 1,
     remove: function,
     __index: table,
-    __name: string = "obj",
+    __name: string = 'obj',
 }
 ]]
 
@@ -610,7 +610,7 @@ end
 local <?r?> = a(1)
 ]]
 [[
-local r: string = "a"
+local r: string = 'a'
 ]]
 
 TEST[[
@@ -620,7 +620,7 @@ end
 local _, <?r?> = pcall(a, 1)
 ]]
 [[
-local r: string = "a"
+local r: string = 'a'
 ]]
 
 TEST[[
@@ -633,7 +633,7 @@ local n: integer
 TEST[[
 local <?x?> = '\a'
 ]]
-[[local x: string = "\007"]]
+[[local x: string = '\007']]
 
 TEST [[
 local <?t?> = {
@@ -827,9 +827,9 @@ local <?t?> = {
 ]]
 [[
 local t: {
-    [1]: string = "aaa",
-    [2]: string = "bbb",
-    [3]: string = "ccc",
+    [1]: string = 'aaa',
+    [2]: string = 'bbb',
+    [3]: string = 'ccc',
 }
 ]]
 
@@ -1712,13 +1712,13 @@ local <?t?> = {
 ]]
 [[
 local t: {
-    x: string = "e",
-    y: string = "f",
-    ['z']: string = "g",
-    [10]: string = "d",
-    [1]: string = "a",
-    [2]: string = "b",
-    [3]: string = "c"|"h",
+    x: string = 'e',
+    y: string = 'f',
+    ['z']: string = 'g',
+    [10]: string = 'd',
+    [1]: string = 'a',
+    [2]: string = 'b',
+    [3]: string = 'c'|'h',
 }
 ]]
 
@@ -1830,7 +1830,7 @@ local t = {
 local <?x?> = t[#t]
 ]]
 [[
-local x: string = "x"
+local x: string = 'x'
 ]]
 
 TEST [[
@@ -1864,10 +1864,10 @@ local <?x?> = {
 ]]
 [[
 local x: {
-    x: string = "",
-    y: string = "",
-    _x: string = "",
-    _y: string = "",
+    x: string = '',
+    y: string = '',
+    _x: string = '',
+    _y: string = '',
 }
 ]]
 

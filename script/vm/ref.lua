@@ -29,7 +29,10 @@ simpleSwitch = util.switch()
 
 ---@async
 local function searchInAllFiles(suri, searcher, notify)
+    await.delay()
+
     searcher(suri)
+    await.delay()
 
     local uris = {}
     for uri in files.eachFile(suri) do

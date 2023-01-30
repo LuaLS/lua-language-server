@@ -301,7 +301,9 @@ function vm.isSubType(uri, child, parent, mark, errs)
                 end
             end
             if hasKnownType > 0 then
-                if errs and hasKnownType > 1 then
+                if  errs
+                and hasKnownType > 1
+                and #vm.getInfer(child):getSubViews(uri) > 1 then
                     errs[#errs+1] = 'TYPE_ERROR_CHILD_ALL_DISMATCH'
                     errs[#errs+1] = child
                     errs[#errs+1] = parent
@@ -376,7 +378,9 @@ function vm.isSubType(uri, child, parent, mark, errs)
             end
         end
         if hasKnownType > 0 then
-            if errs and hasKnownType > 1 then
+            if  errs
+            and hasKnownType > 1
+            and #vm.getInfer(parent):getSubViews(uri) > 1 then
                 errs[#errs+1] = 'TYPE_ERROR_PARENT_ALL_DISMATCH'
                 errs[#errs+1] = child
                 errs[#errs+1] = parent
@@ -703,6 +707,7 @@ local ErrorMessageMap = {
 ---@return string
 function vm.viewTypeErrorMessage(uri, errs)
     local lines = {}
+    local mark  = {}
     local index = 1
     while true do
         local name = errs[index]
@@ -741,8 +746,17 @@ function vm.viewTypeErrorMessage(uri, errs)
             index = index + 1
         end
         local line = lang.script(name, lparams)
-        lines[#lines+1] = '- ' .. line
+        if not mark[line] then
+            mark[line] = true
+            lines[#lines+1] = '- ' .. line
+        end
     end
     util.revertTable(lines)
-    return table.concat(lines, '\n')
+    if #lines > 15 then
+        lines[13] = ('...(+%d)'):format(#lines - 15)
+        table.move(lines, #lines - 2, #lines, 14)
+        return table.concat(lines, '\n', 1, 16)
+    else
+        return table.concat(lines, '\n')
+    end
 end

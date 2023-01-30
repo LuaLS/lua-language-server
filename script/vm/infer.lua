@@ -11,6 +11,7 @@ local vm       = require 'vm.vm'
 ---@field _lastView? string
 ---@field _lastViewUri? uri
 ---@field _lastViewDefault? any
+---@field _subViews? string[]
 local mt = {}
 mt.__index = mt
 mt._hasTable       = false
@@ -413,6 +414,7 @@ function mt:view(uri, default)
     end
 
     local array = {}
+    self._subViews = array
     for view in pairs(self.views) do
         if not self._drop[view] then
             array[#array+1] = view
@@ -469,6 +471,13 @@ end
 function mt:eachView(uri)
     self:_computeViews(uri)
     return next, self.views
+end
+
+---@param uri uri
+---@return string[]
+function mt:getSubViews(uri)
+    self:view(uri)
+    return self._subViews
 end
 
 ---@return string?

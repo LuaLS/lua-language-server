@@ -47,6 +47,10 @@ function TEST(script, ...)
     end
 
     files.remove(TESTURI)
+
+    return function (callback)
+        callback(origins)
+    end
 end
 
 require 'diagnostics.common'

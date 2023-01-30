@@ -48,16 +48,21 @@ function m.check(state, word, position, callback)
         local infos = rpath.getVisiblePath(uri, path)
         local testedStem = { }
         for _, sr in ipairs(infos) do
-            local pattern = sr.searcher
-                :gsub("(%p)", "%%%1")
-                :gsub("%%%?", "(.-)")
+            local stemName
+            if sr.searcher == '[[meta]]' then
+                stemName = sr.name
+            else
+                local pattern = sr.searcher
+                    : gsub("(%p)", "%%%1")
+                    : gsub("%%%?", "(.-)")
 
-            local stemName = relativePath
-                :match(pattern)
-                :match("[%a_][%w_]*$")
+                stemName = relativePath
+                    : match(pattern)
+                    : match("[%a_][%w_]*$")
 
-            if not stemName or testedStem[stemName] then
-                goto INNER_CONTINUE
+                if not stemName or testedStem[stemName] then
+                    goto INNER_CONTINUE
+                end
             end
             testedStem[stemName] = true
 

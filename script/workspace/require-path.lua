@@ -68,6 +68,7 @@ function mt:getRequireResultByPath(path)
             if vm.isMetaFileRequireable(uri) then
                 result[#result+1] = {
                     name = metaName,
+                    searcher = '[[meta]]',
                 }
             end
             return result

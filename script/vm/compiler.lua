@@ -1325,6 +1325,18 @@ local compilerSwitch = util.switch()
             end
         end
 
+        if not hasMarkDoc and source.type == 'tableindex' then
+            vm.compileByParentNode(source.node, vm.ANY, function (src)
+                if src.type == 'doc.field'
+                or src.type == 'doc.type.field' then
+                    if vm.isSubType(guide.getUri(source), vm.compileNode(source.index), vm.compileNode(src.field or src.name)) then
+                        hasMarkDoc = true
+                        vm.setNode(source, vm.compileNode(src))
+                    end
+                end
+            end)
+        end
+
         if not hasMarkDoc and source.value then
             vm.setNode(source, vm.compileNode(source.value))
         end

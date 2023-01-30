@@ -1117,6 +1117,17 @@ local B = "World"
 local x = A
 ]]
 
+TEST [[
+local enum = { a = 1, b = 2 }
+
+---@type { [integer] : boolean }
+local t = {
+    <![enum.a]!> = 1,
+    <![enum.b]!> = 2,
+    <![3]!> = 3,
+}
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

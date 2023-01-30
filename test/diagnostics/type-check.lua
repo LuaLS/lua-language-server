@@ -1180,6 +1180,16 @@ local x
 - 类型 `nil` 无法匹配 `'A'`]])
 end)
 
+TEST [[
+---@param v integer
+---@return boolean
+local function is_string(v)
+    return type(v) == 'string'
+end
+
+print(is_string(3))
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

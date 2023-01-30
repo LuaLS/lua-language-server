@@ -530,7 +530,7 @@ local lookIntoChild = util.switch()
     ---@param outNode? vm.node
     : call(function (tracer, action, topNode, outNode)
         for _, ret in ipairs(action) do
-            tracer:lookIntoChild(ret, topNode)
+            tracer:lookIntoChild(ret, topNode:copy())
         end
         return topNode, outNode
     end)
@@ -571,7 +571,7 @@ local lookIntoChild = util.switch()
             for i = 2, #action.args do
                 tracer:lookIntoChild(action.args[i], topNode, topNode:copy())
             end
-            topNode = tracer:lookIntoChild(action.args[1], topNode, topNode:copy())
+            topNode = tracer:lookIntoChild(action.args[1], topNode:copy(), topNode:copy())
         end
         tracer:lookIntoChild(action.node, topNode)
         tracer:lookIntoChild(action.args, topNode)

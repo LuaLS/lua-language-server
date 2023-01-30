@@ -4,9 +4,11 @@
 * `NEW` command `lua.exportDocument` . VSCode will display this command in the right-click menu
 * `FIX` [#1831]
 * `FIX` [#1838]
+* `FIX` [#1841]
 
 [#1831]: https://github.com/sumneko/lua-language-server/issues/1831
 [#1838]: https://github.com/sumneko/lua-language-server/issues/1838
+[#1841]: https://github.com/sumneko/lua-language-server/issues/1841
 
 ## 3.6.7
 `2023-1-20`

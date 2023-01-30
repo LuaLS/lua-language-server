@@ -602,6 +602,14 @@ CLI_CHECK_SUCCESS =
 '診斷完成，沒有發現問題'
 CLI_CHECK_RESULTS =
 '診斷完成，共有 {} 個問題，請查看 {}'
+CLI_DOC_INITING   = -- TODO: need translate!
+'Loading documents ...'
+CLI_DOC_DONE      = -- TODO: need translate!
+[[
+Document exporting completed!
+Raw data: {}
+Markdown(example): {}
+]]
 
 TYPE_ERROR_ENUM_GLOBAL_DISMATCH = -- TODO: need translate!
 'Type `{child}` cannot match enumeration type of `{parent}`'

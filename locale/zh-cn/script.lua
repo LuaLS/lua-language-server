@@ -602,6 +602,14 @@ CLI_CHECK_SUCCESS =
 '诊断完成，没有发现问题'
 CLI_CHECK_RESULTS =
 '诊断完成，共有 {} 个问题，请查看 {}'
+CLI_DOC_INITING   =
+'加载文档 ...'
+CLI_DOC_DONE      =
+[[
+文档导出完成！
+原始数据: {}
+Markdown(演示用): {}
+]]
 
 TYPE_ERROR_ENUM_GLOBAL_DISMATCH =
 '类型 `{child}` 无法匹配 `{parent}` 的枚举类型'

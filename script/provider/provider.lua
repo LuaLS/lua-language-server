@@ -1001,6 +1001,9 @@ m.register 'workspace/executeCommand' {
         elseif command == 'lua.autoRequire' then
             local core = require 'core.command.autoRequire'
             return core(params.arguments[1])
+        elseif command == 'lua.exportDocument' then
+            local core = require 'core.command.exportDocument'
+            core(params.arguments)
         end
     end
 }

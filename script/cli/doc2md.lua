@@ -5,29 +5,39 @@ local jsonc    = require 'jsonc'
 local util     = require 'utility'
 local markdown = require 'provider.markdown'
 
-local doc = jsonc.decode_jsonc(util.loadFile(LOGPATH .. '/doc.json'))
-local md  = markdown()
+local export = {}
 
-assert(type(doc) == 'table')
+function export.buildMD(outputPath)
+    local doc = jsonc.decode_jsonc(util.loadFile(outputPath .. '/doc.json'))
+    local md  = markdown()
 
-for _, class in ipairs(doc) do
-    md:add('md', '# ' .. class.name)
-    md:emptyLine()
-    md:add('md', class.desc)
-    md:emptyLine()
-    local mark = {}
-    for _, field in ipairs(class.fields) do
-        if not mark[field.name] then
-            mark[field.name] = true
-            md:add('md', '## ' .. field.name)
-            md:emptyLine()
-            md:add('lua', field.extends.view)
-            md:emptyLine()
-            md:add('md', field.desc)
-            md:emptyLine()
+    assert(type(doc) == 'table')
+
+    for _, class in ipairs(doc) do
+        md:add('md', '# ' .. class.name)
+        md:emptyLine()
+        md:add('md', class.desc)
+        md:emptyLine()
+        local mark = {}
+        for _, field in ipairs(class.fields) do
+            if not mark[field.name] then
+                mark[field.name] = true
+                md:add('md', '## ' .. field.name)
+                md:emptyLine()
+                md:add('lua', field.extends.view)
+                md:emptyLine()
+                md:add('md', field.desc)
+                md:emptyLine()
+            end
         end
+        md:splitLine()
     end
-    md:splitLine()
+
+    local mdPath = outputPath .. '/doc.md'
+
+    util.saveFile(mdPath, md:string())
+
+    return mdPath
 end
 
-util.saveFile(LOGPATH .. '/doc.md', md:string())
+return export

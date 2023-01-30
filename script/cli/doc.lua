@@ -12,24 +12,11 @@ local vm       = require 'vm'
 local guide    = require 'parser.guide'
 local getDesc  = require 'core.hover.description'
 local getLabel = require 'core.hover.label'
+local doc2md   = require 'cli.doc2md'
+local progress = require 'progress'
+local fs       = require 'bee.filesystem'
 
-lang(LOCALE)
-
-if type(DOC) ~= 'string' then
-    print(lang.script('CLI_CHECK_ERROR_TYPE', type(DOC)))
-    return
-end
-
-local rootUri = furi.encode(DOC)
-if not rootUri then
-    print(lang.script('CLI_CHECK_ERROR_URI', DOC))
-    return
-end
-
-util.enableCloseFunction()
-
-local lastClock = os.clock()
-local results = {}
+local export = {}
 
 ---@async
 local function packObject(source, mark)
@@ -89,7 +76,7 @@ local function packObject(source, mark)
         if source.bindDocs then
             new['desc'] = getDesc(source)
         end
-        new['view'] = new['view'] or vm.getInfer(source):view(rootUri)
+        new['view'] = new['view'] or vm.getInfer(source):view(ws.rootUri)
     end
     return new
 end
@@ -112,7 +99,8 @@ end
 
 ---@async
 ---@param global vm.global
-local function collect(global)
+---@param results table
+local function collect(global, results)
     if guide.isBasicType(global.name) then
         return
     end
@@ -122,7 +110,7 @@ local function collect(global)
         defines = {},
         fields  = {},
     }
-    for _, set in ipairs(global:getSets(rootUri)) do
+    for _, set in ipairs(global:getSets(ws.rootUri)) do
         local uri = guide.getUri(set)
         if files.isLibrary(uri) then
             goto CONTINUE
@@ -149,7 +137,7 @@ local function collect(global)
     results[#results+1] = result
     ---@async
     ---@diagnostic disable-next-line: not-yieldable
-    vm.getClassFields(rootUri, global, vm.ANY, function (source)
+    vm.getClassFields(ws.rootUri, global, vm.ANY, function (source)
         if source.type == 'doc.field' then
             ---@cast source parser.object
             if files.isLibrary(guide.getUri(source)) then
@@ -160,7 +148,7 @@ local function collect(global)
             if source.field.type == 'doc.field.name' then
                 field.name = source.field[1]
             else
-                field.name = ('[%s]'):format(vm.getInfer(source.field):view(rootUri))
+                field.name = ('[%s]'):format(vm.getInfer(source.field):view(ws.rootUri))
             end
             field.type    = source.type
             field.file    = guide.getUri(source)
@@ -219,46 +207,109 @@ local function collect(global)
 end
 
 ---@async
-lclient():start(function (client)
-    client:registerFakers()
+---@param outputPath string
+function export.makeDoc(outputPath)
+    local results = {}
 
-    client:initialize {
-        rootUri = rootUri,
-    }
+    ws.awaitReady(ws.rootUri)
 
-    io.write(lang.script('CLI_DOC_INITING'))
+    local expandAlias = config.get(ws.rootUri, 'Lua.hover.expandAlias')
+    config.set(ws.rootUri, 'Lua.hover.expandAlias', false)
+    local _ <close> = function ()
+        config.set(ws.rootUri, 'Lua.hover.expandAlias', expandAlias)
+    end
 
-    config.set(nil, 'Lua.diagnostics.enable', false)
-    config.set(nil, 'Lua.hover.expandAlias', false)
-
-    ws.awaitReady(rootUri)
     await.sleep(0.1)
 
+    local prog <close> = progress.create(ws.rootUri, '正在生成文档...', 0)
     local globals = vm.getGlobals 'type'
 
     local max  = #globals
     for i, global in ipairs(globals) do
-        collect(global)
-        if os.clock() - lastClock > 0.2 then
-            lastClock = os.clock()
-            local output = '\x0D'
-                        .. ('>'):rep(math.ceil(i / max * 20))
-                        .. ('='):rep(20 - math.ceil(i / max * 20))
-                        .. ' '
-                        .. ('0'):rep(#tostring(max) - #tostring(i))
-                        .. tostring(i) .. '/' .. tostring(max)
-            io.write(output)
-        end
+        collect(global, results)
+        prog:setMessage(('%d/%d'):format(i, max))
+        prog:setPercentage(i / max * 100)
     end
-    io.write('\x0D')
 
     table.sort(results, function (a, b)
         return a.name < b.name
     end)
-end)
 
-local outpath = LOGPATH .. '/doc.json'
-jsonb.supportSparseArray = true
-util.saveFile(outpath, jsonb.beautify(results))
+    local docPath = outputPath .. '/doc.json'
+    jsonb.supportSparseArray = true
+    util.saveFile(docPath, jsonb.beautify(results))
 
-require 'cli.doc2md'
+    local mdPath = doc2md.buildMD(outputPath)
+    return docPath, mdPath
+end
+
+function export.runCLI()
+    lang(LOCALE)
+
+    if type(DOC) ~= 'string' then
+        print(lang.script('CLI_CHECK_ERROR_TYPE', type(DOC)))
+        return
+    end
+
+    local rootUri = furi.encode(fs.absolute(fs.path(DOC)):string())
+    if not rootUri then
+        print(lang.script('CLI_CHECK_ERROR_URI', DOC))
+        return
+    end
+
+    print('root uri = ' .. rootUri)
+
+    util.enableCloseFunction()
+
+    local lastClock = os.clock()
+    local results = {}
+
+    ---@async
+    lclient():start(function (client)
+        client:registerFakers()
+
+        client:initialize {
+            rootUri = rootUri,
+        }
+
+        io.write(lang.script('CLI_DOC_INITING'))
+
+        config.set(nil, 'Lua.diagnostics.enable', false)
+        config.set(nil, 'Lua.hover.expandAlias', false)
+
+        ws.awaitReady(rootUri)
+        await.sleep(0.1)
+
+        local globals = vm.getGlobals 'type'
+
+        local max  = #globals
+        for i, global in ipairs(globals) do
+            collect(global, results)
+            if os.clock() - lastClock > 0.2 then
+                lastClock = os.clock()
+                local output = '\x0D'
+                            .. ('>'):rep(math.ceil(i / max * 20))
+                            .. ('='):rep(20 - math.ceil(i / max * 20))
+                            .. ' '
+                            .. ('0'):rep(#tostring(max) - #tostring(i))
+                            .. tostring(i) .. '/' .. tostring(max)
+                io.write(output)
+            end
+        end
+        io.write('\x0D')
+
+        table.sort(results, function (a, b)
+            return a.name < b.name
+        end)
+    end)
+
+    local docPath = LOGPATH .. '/doc.json'
+    jsonb.supportSparseArray = true
+    util.saveFile(docPath, jsonb.beautify(results))
+
+    local mdPath = doc2md.buildMD(LOGPATH)
+
+    print(lang.script('CLI_DOC_DONE', furi.encode(docPath), furi.encode(mdPath)))
+end
+
+return export

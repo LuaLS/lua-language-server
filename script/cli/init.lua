@@ -9,6 +9,6 @@ if _G['CHECK'] then
 end
 
 if _G['DOC'] then
-    require 'cli.doc'
+    require 'cli.doc' .runCLI()
     os.exit(0, true)
 end

@@ -536,9 +536,24 @@ function m.awaitReady(uri)
 end
 
 ---@param uri uri
+---@return boolean
 function m.isReady(uri)
     local scp = scope.getScope(uri)
     return scp:get('ready') == true
+end
+
+---@return boolean
+function m.isAllReady()
+    local scp = scope.fallback
+    if not scp:get 'ready' then
+        return false
+    end
+    for _, folder in ipairs(scope.folders) do
+        if not folder:get 'ready' then
+            return false
+        end
+    end
+    return true
 end
 
 function m.getLoadingProcess(uri)

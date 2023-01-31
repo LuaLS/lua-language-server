@@ -421,3 +421,6 @@ config.typeFormat.config.auto_complete_table_sep = -- TODO: need translate!
 'Controls if a separator is automatically appended at the end of a table declaration.'
 config.typeFormat.config.format_line        = -- TODO: need translate!
 'Controls if a line is formatted at all.'
+
+command.exportDocument = -- TODO: need translate!
+'Export Document ...'

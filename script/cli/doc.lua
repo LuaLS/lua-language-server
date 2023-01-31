@@ -309,7 +309,10 @@ function export.runCLI()
 
     local mdPath = doc2md.buildMD(LOGPATH)
 
-    print(lang.script('CLI_DOC_DONE', furi.encode(docPath), furi.encode(mdPath)))
+    print(lang.script('CLI_DOC_DONE'
+        , ('[%s](%s)'):format(ws.normalize(docPath), furi.encode(docPath))
+        , ('[%s](%s)'):format(ws.normalize(mdPath),  furi.encode(mdPath))
+    ))
 end
 
 return export

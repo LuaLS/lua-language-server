@@ -318,7 +318,6 @@ local template = {
     ['Lua.workspace.library']               = Type.Array(Type.String),
     ['Lua.workspace.checkThirdParty']       = Type.Boolean >> true,
     ['Lua.workspace.userThirdParty']        = Type.Array(Type.String),
-    ['Lua.workspace.supportScheme']         = Type.Array(Type.String) >> { 'file', 'untitled', 'git' },
     ['Lua.completion.enable']               = Type.Boolean >> true,
     ['Lua.completion.callSnippet']          = Type.String  >> 'Disable' << {
                                                 'Disable',

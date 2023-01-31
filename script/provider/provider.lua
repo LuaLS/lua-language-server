@@ -266,11 +266,6 @@ m.register 'textDocument/didOpen' {
     function (params)
         local doc      = params.textDocument
         local uri      = files.getRealUri(doc.uri)
-        local scheme   = furi.split(uri)
-        local supports = config.get(uri, 'Lua.workspace.supportScheme')
-        if not util.arrayHas(supports, scheme) then
-            return
-        end
         log.debug('didOpen', uri)
         local text  = doc.text
         files.setText(uri, text, true, function (file)
@@ -298,11 +293,6 @@ m.register 'textDocument/didChange' {
     ---@async
     function (params)
         local doc      = params.textDocument
-        local scheme   = furi.split(doc.uri)
-        local supports = config.get(doc.uri, 'Lua.workspace.supportScheme')
-        if not util.arrayHas(supports, scheme) then
-            return
-        end
         local changes = params.contentChanges
         local uri     = files.getRealUri(doc.uri)
         workspace.awaitReady(uri)

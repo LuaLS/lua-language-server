@@ -231,3 +231,18 @@ local t2
 
 t2.<!x!> = 1
 ]]
+
+TEST [[
+---@alias lang 'en' | 'de'
+
+---@class A
+local a
+
+---@type lang
+a.test = 'en'
+
+---@class B
+local b
+
+b.<?<!test!>?> = a.test
+]]

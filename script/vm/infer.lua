@@ -451,7 +451,8 @@ function mt:view(uri, default)
         if #array == 0 then
             view = 'nil'
         else
-            if max > 1 then
+            if max > 1
+            or view:find(guide.notNamePattern .. guide.namePattern .. '$') then
                 view = '(' .. view .. ')?'
             else
                 view = view .. '?'

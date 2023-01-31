@@ -1752,16 +1752,14 @@ local compilerSwitch = util.switch()
         vm.setNode(source, global)
         if global.cate == 'variable' then
             for luri, link in pairs(global.links) do
-                if luri ~= uri then
-                    local firstSet = link.sets[1]
-                    if firstSet then
-                        local setNode = vm.compileNode(firstSet)
-                        vm.setNode(source, setNode)
-                        if vm.isMetaFile(luri) then
-                            for i = 2, #link.sets do
-                                setNode = vm.compileNode(link.sets[i])
-                                vm.setNode(source, setNode)
-                            end
+                local firstSet = link.sets[1]
+                if firstSet then
+                    local setNode = vm.compileNode(firstSet)
+                    vm.setNode(source, setNode)
+                    if vm.isMetaFile(luri) then
+                        for i = 2, #link.sets do
+                            setNode = vm.compileNode(link.sets[i])
+                            vm.setNode(source, setNode)
                         end
                     end
                 end

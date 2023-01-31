@@ -6,11 +6,13 @@
 * `FIX` [#1838]
 * `FIX` [#1841]
 * `FIX` [#1851]
+* `FIX` [#1857]
 
 [#1831]: https://github.com/sumneko/lua-language-server/issues/1831
 [#1838]: https://github.com/sumneko/lua-language-server/issues/1838
 [#1841]: https://github.com/sumneko/lua-language-server/issues/1841
 [#1851]: https://github.com/sumneko/lua-language-server/issues/1851
+[#1857]: https://github.com/sumneko/lua-language-server/issues/1857
 
 ## 3.6.7
 `2023-1-20`

@@ -4199,3 +4199,12 @@ x.y = nil
 
 print(<?y?>)
 ]]
+
+TEST 'function' [[
+function X()
+    <?Y?>()
+end
+
+function Y()
+end
+]]

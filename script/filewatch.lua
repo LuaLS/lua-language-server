@@ -34,8 +34,9 @@ m._watchings = {}
 
 ---@param path string
 ---@param recursive boolean
-function m.watch(path, recursive)
-    if path == '' then
+---@param filter? fun(path: string):boolean
+function m.watch(path, recursive, filter)
+    if path == '' or not fs.is_directory(fs.path(path)) then
         return function () end
     end
     if m._watchings[path] then
@@ -43,7 +44,22 @@ function m.watch(path, recursive)
     else
         local watch = fw.create()
         watch:add(path)
-        watch:recursive(recursive)
+        log.debug('Watch add:', path)
+        if recursive then
+            local function scanDirctory(dir)
+                for fullpath in fs.pairs(dir) do
+                    if fs.is_directory(fullpath) then
+                        if not filter or filter(fullpath:string()) then
+                            watch:add(fullpath:string())
+                            log.debug('Watch add:', fullpath:string())
+                            scanDirctory(fullpath)
+                        end
+                    end
+                end
+            end
+
+            scanDirctory(fs.path(path))
+        end
         m._watchings[path] = {
             count = 1,
             watch = watch,

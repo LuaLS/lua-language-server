@@ -82,7 +82,8 @@ local m = {}
 
 m.ANY = {"<ANY>"}
 
-m.namePattern = '[%a_\x80-\xff][%w_\x80-\xff]*'
+m.notNamePattern  = '[^%w_\x80-\xff]'
+m.namePattern     = '[%a_\x80-\xff][%w_\x80-\xff]*'
 m.namePatternFull = '^' .. m.namePattern .. '$'
 
 local blockTypes = {

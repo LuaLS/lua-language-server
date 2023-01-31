@@ -183,11 +183,13 @@ function encode_map.table(t)
             keys[#keys+1] = k
         end
         table_sort(keys)
-        local k = keys[1]
-        statusBuilder[#statusBuilder+1] = '{"'
-        statusBuilder[#statusBuilder+1] = encode_string(k)
-        statusBuilder[#statusBuilder+1] = '":'
-        encode(t[k])
+        do
+            local k = keys[1]
+            statusBuilder[#statusBuilder+1] = '{"'
+            statusBuilder[#statusBuilder+1] = encode_string(k)
+            statusBuilder[#statusBuilder+1] = '":'
+            encode(t[k])
+        end
         for i = 2, #keys do
             local k = keys[i]
             statusBuilder[#statusBuilder+1] = ',"'
@@ -218,6 +220,10 @@ function encode_map.table(t)
     else
         if t[1] == nil then
             error("invalid table: sparse array is not supported")
+        end
+        if jit and t[0] ~= nil then
+            -- 0 is the first index in luajit
+            error("invalid table: mixed or invalid key types: "..0)
         end
         statusBuilder[#statusBuilder+1] = "["
         encode(t[1])

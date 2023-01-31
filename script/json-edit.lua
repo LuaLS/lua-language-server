@@ -1,9 +1,9 @@
----@diagnostic disable: param-type-mismatch
-
 local type = type
 local next = next
 local error = error
 local tonumber = tonumber
+local table_concat = table.concat
+local table_move = table.move
 local string_char = string.char
 local string_byte = string.byte
 local string_find = string.find
@@ -44,6 +44,12 @@ if _VERSION == "Lua 5.1" or _VERSION == "Lua 5.2" then
             return "integer"
         end
         return "float"
+    end
+    function table_move(a1, f, e, t, a2)
+        for i = f, e do
+           a2[t+(i-f)] = a1[i]
+        end
+       return a2
     end
 else
     utf8_char = utf8.char
@@ -376,6 +382,8 @@ local function decode_item()
     end
 end
 
+local JsonEmpty = function () end
+
 local function decode_ast(str)
     if type(str) ~= "string" then
         error("expected argument of type string, got " .. type(str))
@@ -384,7 +392,7 @@ local function decode_ast(str)
     statusPos = 1
     statusTop = 0
     if next_byte() == -1 then
-        return json.null
+        return {s = statusPos, d = statusTop, f = statusPos, v = JsonEmpty}
     end
     local res = decode()
     while statusTop > 0 do
@@ -407,7 +415,7 @@ end
 local function query_(ast, pathlst, n)
     local data = ast.v
     if type(data) ~= "table" then
-        return
+        return nil, string_format("path `%s` does not point to object or array", "/"..table_concat(pathlst, "/", 1, n-1))
     end
     local k = pathlst[n]
     local isarray = not json.isObject(data)
@@ -416,28 +424,36 @@ local function query_(ast, pathlst, n)
             k = #data + 1
         else
             if k:match "^0%d+" then
-                return
+                return nil, string_format("path `%s` point to array, but invalid", "/"..table_concat(pathlst, "/", 1, n))
             end
             k = tonumber(k)
             if k == nil or math_type(k) ~= "integer" or k <= 0 or k > #data + 1 then
-                return
+                return nil, string_format("path `%s` point to array, but invalid", "/"..table_concat(pathlst, "/", 1, n))
             end
         end
     end
     if n == #pathlst then
         return ast, k, isarray
     end
-    return query_(data[k], pathlst, n + 1)
+    local v = data[k]
+    if v == nil then
+        return ast, k, isarray, table_move(pathlst, n + 1, #pathlst, 1, {})
+    end
+    return query_(v, pathlst, n + 1)
+end
+
+local function split_path(path)
+    if type(path) ~= "string" then
+        return nil, "path is not a string"
+    end
+    if path:sub(1,1) ~= "/" then
+        return nil, "path must start with `/`"
+    end
+    return split(path:sub(2))
 end
 
 local function query(ast, path)
-    if type(path) ~= "string" then
-        return
-    end
-    if path:sub(1,1) ~= "/" then
-        return
-    end
-    return query_(ast, split(path:sub(2)), 1)
+    return query_(ast, split_path(path), 1)
 end
 
 local function del_first_empty_line(str)
@@ -475,50 +491,59 @@ local function find_max_node(t)
     return max
 end
 
+local function encode_newline(option)
+    return option.newline..string_rep(option.indent, option.depth)
+end
+
 local function apply_array_insert_before(str, option, value, node)
     local start_text = str:sub(1, node.s-1)
     local finish_text = str:sub(node.s)
     option.depth = option.depth + node.d
-    return start_text
-        .. json.beautify(value, option)
-        .. ","
-        .. option.newline
-        .. string_rep(option.indent, option.depth)
-        .. finish_text
+    local bd = {}
+    bd[#bd+1] = start_text
+    json._beautify_builder(bd, value, option)
+    bd[#bd+1] = ","
+    bd[#bd+1] = encode_newline(option)
+    bd[#bd+1] = finish_text
+    return table_concat(bd)
 end
 
 local function apply_array_insert_after(str, option, value, node)
     local start_text = str:sub(1, node.f-1)
     local finish_text = str:sub(node.f)
     option.depth = option.depth + node.d
-    return start_text
-        .. ","
-        .. option.newline
-        .. string_rep(option.indent, option.depth)
-        .. json.beautify(value, option)
-        .. finish_text
+    local bd = {}
+    bd[#bd+1] = start_text
+    bd[#bd+1] = ","
+    bd[#bd+1] = encode_newline(option)
+    json._beautify_builder(bd, value, option)
+    bd[#bd+1] = finish_text
+    return table_concat(bd)
 end
 
 local function apply_array_insert_empty(str, option, value, node)
     local start_text = str:sub(1, node.s)
     local finish_text = str:sub(node.f-1)
     option.depth = option.depth + node.d + 1
-    return start_text
-        .. option.newline
-        .. string_rep(option.indent, option.depth)
-        .. json.beautify(value, option)
-        .. option.newline
-        .. string_rep(option.indent, option.depth-1)
-        .. finish_text
+    local bd = {}
+    bd[#bd+1] = start_text
+    bd[#bd+1] = encode_newline(option)
+    json._beautify_builder(bd, value, option)
+    option.depth = option.depth - 1
+    bd[#bd+1] = encode_newline(option)
+    bd[#bd+1] = finish_text
+    return table_concat(bd)
 end
 
 local function apply_replace(str, option, value, node)
     local start_text = str:sub(1, node.s-1)
     local finish_text = str:sub(node.f)
     option.depth = option.depth + node.d
-    return start_text
-        .. json.beautify(value, option)
-        .. finish_text
+    local bd = {}
+    bd[#bd+1] = start_text
+    json._beautify_builder(bd, value, option)
+    bd[#bd+1] = finish_text
+    return table_concat(bd)
 end
 
 local function apply_object_insert(str, option, value, t, k)
@@ -527,29 +552,31 @@ local function apply_object_insert(str, option, value, t, k)
         local start_text = str:sub(1, node.f-1)
         local finish_text = str:sub(node.f)
         option.depth = option.depth + node.d
-        return start_text
-            .. ","
-            .. option.newline
-            .. string_rep(option.indent, option.depth)
-            .. '"'
-            .. json._encode_string(k)
-            .. '": '
-            .. json.beautify(value, option)
-            .. finish_text
+        local bd = {}
+        bd[#bd+1] = start_text
+        bd[#bd+1] = ","
+        bd[#bd+1] = encode_newline(option)
+        bd[#bd+1] = '"'
+        bd[#bd+1] = json._encode_string(k)
+        bd[#bd+1] = '": '
+        json._beautify_builder(bd, value, option)
+        bd[#bd+1] = finish_text
+        return table_concat(bd)
     else
         local start_text = str:sub(1, t.s)
         local finish_text = str:sub(t.f-1)
         option.depth = option.depth + t.d + 1
-        return start_text
-            .. option.newline
-            .. string_rep(option.indent, option.depth)
-            .. '"'
-            .. json._encode_string(k)
-            .. '": '
-            .. json.beautify(value, option)
-            .. option.newline
-            .. string_rep(option.indent, option.depth-1)
-            .. finish_text
+        local bd = {}
+        bd[#bd+1] = start_text
+        bd[#bd+1] = encode_newline(option)
+        bd[#bd+1] = '"'
+        bd[#bd+1] = json._encode_string(k)
+        bd[#bd+1] = '": '
+        json._beautify_builder(bd, value, option)
+        option.depth = option.depth - 1
+        bd[#bd+1] = encode_newline(option)
+        bd[#bd+1] = finish_text
+        return table_concat(bd)
     end
 end
 
@@ -565,19 +592,32 @@ local function apply_remove(str, s, f)
     end
 end
 
+local function add_prefix(v, pathlst)
+    for i = #pathlst, 1, -1 do
+        v = { [pathlst[i]] = v }
+    end
+    return v
+end
+
 local OP = {}
 
 function OP.add(str, option, path, value)
-    if value == nil then
-        return
-    end
-    if path == '' then
+    if path == '/' then
         return json.beautify(value, option)
     end
     local ast = decode_ast(str)
-    local t, k, isarray = query(ast, path)
+    if ast.v == JsonEmpty then
+        local pathlst = split_path(path)
+        value = add_prefix(value, pathlst)
+        return json.beautify(value, option)
+    end
+    local t, k, isarray, lastpath = query(ast, path)
     if not t then
+        error(k)
         return
+    end
+    if lastpath then
+        value = add_prefix(value, lastpath)
     end
     if isarray then
         if t.v[k] then
@@ -597,38 +637,54 @@ function OP.add(str, option, path, value)
 end
 
 function OP.remove(str, _, path)
-    if path == '' then
+    if path == '/' then
         return ''
     end
     local ast = decode_ast(str)
-    local t, k, isarray = query(ast, path)
+    if ast.v == JsonEmpty then
+        return ''
+    end
+    local t, k, isarray, lastpath = query(ast, path)
     if not t then
+        error(k)
         return
+    end
+    if lastpath then
+        --warning: path does not exist
+        return str
     end
     if isarray then
         if k > #t.v then
-            return
+            --warning: path does not exist
+            return str
         end
         return apply_remove(str, t.v[k].s, t.v[k].f)
     else
         if t.v[k] == nil then
-            return
+            --warning: path does not exist
+            return str
         end
         return apply_remove(str, t.v[k].key_s, t.v[k].f)
     end
 end
 
 function OP.replace(str, option, path, value)
-    if value == nil then
-        return
-    end
-    if path == '' then
+    if path == '/' then
         return json.beautify(value, option)
     end
     local ast = decode_ast(str)
-    local t, k, isarray = query(ast, path)
+    if ast.v == JsonEmpty then
+        local pathlst = split_path(path)
+        value = add_prefix(value, pathlst)
+        return json.beautify(value, option)
+    end
+    local t, k, isarray, lastpath = query(ast, path)
     if not t then
+        error(k)
         return
+    end
+    if lastpath then
+        value = add_prefix(value, lastpath)
     end
     if t.v[k] then
         return apply_replace(str, option, value, t.v[k])
@@ -648,9 +704,10 @@ end
 local function edit(str, patch, option)
     local f = OP[patch.op]
     if not f then
+        error(string_format("invalid op: %s", patch.op))
         return
     end
-    option = json.beautify_option(option)
+    option = json._beautify_option(option)
     return f(str, option, patch.path, patch.value)
 end
 

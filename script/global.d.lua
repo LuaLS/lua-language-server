@@ -69,3 +69,7 @@ CACHEALIVE = false
 -- (experiment) Compile files in multi cpu cores
 ---@type integer
 COMPILECORES = 0
+
+-- TODO: delete this after new config
+---@diagnostic disable-next-line: lowercase-global
+jit = false

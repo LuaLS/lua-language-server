@@ -79,11 +79,13 @@ function encode_map.table(t)
         statusBuilder[#statusBuilder+1] = "{"
         statusDep = statusDep + 1
         encode_newline()
-        local k = key[1]
-        statusBuilder[#statusBuilder+1] = '"'
-        statusBuilder[#statusBuilder+1] = encode_string(k)
-        statusBuilder[#statusBuilder+1] = '": '
-        encode(t[k])
+        do
+            local k = key[1]
+            statusBuilder[#statusBuilder+1] = '"'
+            statusBuilder[#statusBuilder+1] = encode_string(k)
+            statusBuilder[#statusBuilder+1] = '": '
+            encode(t[k])
+        end
         for i = 2, #key do
             local k = key[i]
             statusBuilder[#statusBuilder+1] = ","
@@ -154,16 +156,21 @@ local function beautify_option(option)
     return setmetatable(option or {}, defaultOpt)
 end
 
-local function beautify(v, option)
+local function beautify_builder(builder, v, option)
     statusVisited = {}
-    statusBuilder = {}
+    statusBuilder = builder
     statusOpt = beautify_option(option)
     statusDep = statusOpt.depth
     encode(v)
+end
+
+local function beautify(v, option)
+    beautify_builder({}, v, option)
     return table_concat(statusBuilder)
 end
 
 json.beautify = beautify
-json.beautify_option = beautify_option
+json._beautify_builder = beautify_builder
+json._beautify_option = beautify_option
 
 return json

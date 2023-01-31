@@ -130,7 +130,7 @@ local function findNearestTable(state, position)
                 end
             end
             if field.type == 'tableindex' then
-                if field.index.type == 'string' then
+                if field.index and field.index.type == 'string' then
                     if field.index.finish >= position then
                         return source
                     else

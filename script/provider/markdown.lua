@@ -71,6 +71,10 @@ function mt:string(nl)
             elseif obj.type == 'emptyline' then
                 if  #lines > 0
                 and lines[#lines] ~= '' then
+                    if language ~= 'md' then
+                        language = 'md'
+                        lines[#lines+1] = '```'
+                    end
                     lines[#lines+1] = ''
                 end
             elseif obj.type == 'markdown' then

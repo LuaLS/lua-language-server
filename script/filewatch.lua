@@ -52,13 +52,13 @@ function m.watch(path, recursive, filter)
                         if not filter or filter(fullpath:string()) then
                             watch:add(fullpath:string())
                             log.debug('Watch add:', fullpath:string())
-                            scanDirctory(fullpath)
+                            xpcall(scanDirctory, log.error, fullpath)
                         end
                     end
                 end
             end
 
-            scanDirctory(fs.path(path))
+            xpcall(scanDirctory, log.error, fs.path(path))
         end
         m._watchings[path] = {
             count = 1,

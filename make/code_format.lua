@@ -36,11 +36,7 @@ lm:source_set 'code_format' {
         defines = "NOT_SUPPORT_FILE_SYSTEM"
     },
     linux = {
-        defines = (function()
-            if lm.platform == "linux-arm64" then
-                return "NOT_SUPPORT_FILE_SYSTEM"
-            end
-        end)(),
+        defines = "NOT_SUPPORT_FILE_SYSTEM",
         flags = "-Wall -Werror"
     }
 }

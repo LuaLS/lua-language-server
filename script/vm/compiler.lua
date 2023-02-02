@@ -1484,6 +1484,21 @@ local compilerSwitch = util.switch()
             return
         end
         if func.special == 'require' then
+            if index == 2 then
+                local uri = guide.getUri(source)
+                local version = config.get(uri, 'Lua.runtime.version')
+                if version == 'Lua 5.3'
+                or version == 'Lua 5.4' then
+                    vm.setNode(source, vm.declareGlobal('type', 'unknown'))
+                else
+                    vm.setNode(source, vm.declareGlobal('type', 'nil'))
+                end
+                return
+            end
+            if index >= 3 then
+                vm.setNode(source, vm.declareGlobal('type', 'nil'))
+                return
+            end
             if not args then
                 return
             end

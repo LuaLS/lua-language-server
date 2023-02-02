@@ -133,3 +133,33 @@ print(<?X?>)
 ]], },
     infer = 'boolean|integer',
 }
+
+TEST {
+    { path = 'a.lua', content = [[
+return 1337, "string", true
+]], },
+    { path = 'b.lua', content = [[
+local <?a?>, b, c = require 'a
+]], },
+    infer = 'integer',
+}
+
+TEST {
+    { path = 'a.lua', content = [[
+return 1337, "string", true
+]], },
+    { path = 'b.lua', content = [[
+local a, <?b?>, c = require 'a
+]], },
+    infer = 'unknown',
+}
+
+TEST {
+    { path = 'a.lua', content = [[
+return 1337, "string", true
+]], },
+    { path = 'b.lua', content = [[
+local a, b, <?c?> = require 'a
+]], },
+    infer = 'nil',
+}

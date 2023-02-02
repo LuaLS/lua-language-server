@@ -568,6 +568,22 @@ CONFIG_TYPE_ERROR                =
 'The setting file must be in lua or json format: {}'
 CONFIG_MODIFY_FAIL_SYNTAX_ERROR  =
 'Failed to modify settings, there are syntax errors in the settings file: {}'
+CONFIG_MODIFY_FAIL_NO_WORKSPACE  =
+[[
+Failed to modify settings:
+* The current mode is single-file mode, server cannot create `.luarc.json` without workspace.
+* The language client dose not support modifying settings from the server side.
+
+Please modify following settings manually:
+{}
+]]
+CONFIG_MODIFY_FAIL               =
+[[
+Failed to modify settings
+
+Please modify following settings manually:
+{}
+]]
 
 PLUGIN_RUNTIME_ERROR             =
 [[

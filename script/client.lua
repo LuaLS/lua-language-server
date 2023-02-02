@@ -332,12 +332,13 @@ end
 local function editConfigJson(path, changes)
     local text = util.loadFile(path)
     if not text then
+        m.showMessage('Error', lang.script('CONFIG_LOAD_FAILED', path))
         return nil
     end
     local suc, res = pcall(jsonc.decode_jsonc, text)
     if not suc then
         m.showMessage('Error', lang.script('CONFIG_MODIFY_FAIL_SYNTAX_ERROR', path .. res:match 'ERROR(.+)$'))
-        return text
+        return nil
     end
     if type(res) ~= 'table' then
         res = {}
@@ -350,6 +351,20 @@ local function editConfigJson(path, changes)
         end
     end
     return text
+end
+
+---@param changes config.change[]
+---@param applied config.change[]
+local function removeAppliedChanges(changes, applied)
+    local appliedMap = {}
+    for _, change in ipairs(applied) do
+        appliedMap[change] = true
+    end
+    for i = #changes, 1, -1 do
+        if appliedMap[changes[i]] then
+            table.remove(changes, i)
+        end
+    end
 end
 
 local function tryModifySpecifiedConfig(uri, finalChanges)
@@ -374,6 +389,7 @@ local function tryModifySpecifiedConfig(uri, finalChanges)
         return false
     end
     util.saveFile(path, newJson)
+    removeAppliedChanges(finalChanges, validChanges)
     return true
 end
 
@@ -398,11 +414,15 @@ local function tryModifyRC(uri, finalChanges, create)
     if #validChanges == 0 then
         return false
     end
+    if not buf then
+        util.saveFile(path, '')
+    end
     local newJson = editConfigJson(path, validChanges)
     if not newJson then
         return false
     end
     util.saveFile(path, newJson)
+    removeAppliedChanges(finalChanges, validChanges)
     return true
 end
 
@@ -428,6 +448,7 @@ local function tryModifyClient(uri, finalChanges)
         command   = 'lua.config',
         data      = scpChanges,
     })
+    removeAppliedChanges(finalChanges, scpChanges)
     return true
 end
 
@@ -440,18 +461,32 @@ local function tryModifyClientGlobal(finalChanges)
         return
     end
     local changes = {}
-    for i = #finalChanges, 1, -1 do
-        local change = finalChanges[i]
+    for _, change in ipairs(finalChanges) do
         if change.global then
             changes[#changes+1] = change
-            finalChanges[i] = finalChanges[#finalChanges]
-            finalChanges[#finalChanges] = nil
         end
     end
     proto.notify('$/command', {
         command   = 'lua.config',
         data      = changes,
     })
+    removeAppliedChanges(finalChanges, changes)
+end
+
+---@param changes config.change[]
+---@return string
+local function buildMaunuallyMessage(changes)
+    local message = {}
+    for _, change in ipairs(changes) do
+        if change.action == 'add' then
+            message[#message+1] = '* ' .. lang.script('WINDOW_MANUAL_CONFIG_ADD', change.key, change.value)
+        elseif change.action == 'set' then
+            message[#message+1] = '* ' .. lang.script('WINDOW_MANUAL_CONFIG_SET', change.key, change.value)
+        elseif change.action == 'prop' then
+            message[#message+1] = '* ' .. lang.script('WINDOW_MANUAL_CONFIG_PROP', change.key, change.prop, change.value)
+        end
+    end
+    return table.concat(message, '\n')
 end
 
 ---@param changes config.change[]
@@ -484,26 +519,24 @@ function m.setConfig(changes, onlyMemory)
     end
     xpcall(function ()
         local ws = require 'workspace'
-        if #ws.folders == 0 then
-            if tryModifySpecifiedConfig(nil, finalChanges) then
-                return
-            end
-            tryModifyClient(nil, finalChanges)
-            return
-        end
         tryModifyClientGlobal(finalChanges)
-        for _, scp in ipairs(ws.folders) do
-            if tryModifySpecifiedConfig(scp.uri, finalChanges) then
-                goto CONTINUE
+        if #ws.folders == 0 then
+            tryModifySpecifiedConfig(nil, finalChanges)
+            tryModifyClient(nil, finalChanges)
+            if #finalChanges > 0 then
+                local manuallyModifyConfig = buildMaunuallyMessage(finalChanges)
+                m.showMessage('Warning', lang.script('CONFIG_MODIFY_FAIL_NO_WORKSPACE', manuallyModifyConfig))
             end
-            if tryModifyRC(scp.uri, finalChanges, false) then
-                goto CONTINUE
+        else
+            for _, scp in ipairs(ws.folders) do
+                tryModifySpecifiedConfig(scp.uri, finalChanges)
+                tryModifyRC(scp.uri, finalChanges, false)
+                tryModifyClient(scp.uri, finalChanges)
+                tryModifyRC(scp.uri, finalChanges, true)
             end
-            if tryModifyClient(scp.uri, finalChanges) then
-                goto CONTINUE
+            if #finalChanges > 0 then
+                m.showMessage('Warning', lang.script('CONFIG_MODIFY_FAIL', buildMaunuallyMessage(finalChanges)))
             end
-            tryModifyRC(scp.uri, finalChanges, true)
-            ::CONTINUE::
         end
     end, log.error)
 end

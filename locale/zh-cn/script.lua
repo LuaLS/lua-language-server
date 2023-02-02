@@ -538,7 +538,7 @@ WINDOW_CLIENT_NOT_SUPPORT_CONFIG =
 WINDOW_LCONFIG_NOT_SUPPORT_CONFIG=
 '暂不支持自动修改本地设置，请手动修改如下设置：'
 WINDOW_MANUAL_CONFIG_ADD         =
-'为 `{key}` 添加值 `{value:q}`;'
+'为 `{key}` 添加元素 `{value:q}`;'
 WINDOW_MANUAL_CONFIG_SET         =
 '将 `{key}` 的值设置为 `{value:q}`;'
 WINDOW_MANUAL_CONFIG_PROP        =
@@ -568,6 +568,22 @@ CONFIG_TYPE_ERROR                =
 '设置文件必须是lua或json格式：{}'
 CONFIG_MODIFY_FAIL_SYNTAX_ERROR  =
 '修改设置失败，设置文件中有语法错误：{}'
+CONFIG_MODIFY_FAIL_NO_WORKSPACE  =
+[[
+修改设置失败：
+* 当前模式为单文件模式，服务器只能在工作区中创建 `.luarc.json` 文件。
+* 语言客户端不支持从服务器侧修改设置。
+
+请手动修改以下设置：
+{}
+]]
+CONFIG_MODIFY_FAIL               =
+[[
+修改设置失败
+
+请手动修改以下设置：
+{}
+]]
 
 PLUGIN_RUNTIME_ERROR             =
 [[

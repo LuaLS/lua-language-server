@@ -568,6 +568,22 @@ CONFIG_TYPE_ERROR                =
 '設定檔案必須是lua或json格式：{}'
 CONFIG_MODIFY_FAIL_SYNTAX_ERROR  = -- TODO: need translate!
 'Failed to modify settings, there are syntax errors in the settings file: {}'
+CONFIG_MODIFY_FAIL_NO_WORKSPACE  = -- TODO: need translate!
+[[
+Failed to modify settings:
+* The current mode is single-file mode, server cannot create `.luarc.json` without workspace.
+* The language client dose not support modifying settings from the server side.
+
+Please modify following settings manually:
+{}
+]]
+CONFIG_MODIFY_FAIL               = -- TODO: need translate!
+[[
+Failed to modify settings
+
+Please modify following settings manually:
+{}
+]]
 
 PLUGIN_RUNTIME_ERROR             =
 [[

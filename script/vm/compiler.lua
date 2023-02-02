@@ -192,11 +192,11 @@ local searchFieldSwitch = util.switch()
             or not math.tointeger(key) then
                 return
             end
-            pushResult(source.node)
+            pushResult(source.node, true)
         end
         if type(key) == 'table' then
             if vm.isSubType(suri, key, 'integer') then
-                pushResult(source.node)
+                pushResult(source.node, true)
             end
         end
     end)
@@ -217,21 +217,21 @@ local searchFieldSwitch = util.switch()
                         or (fn.name == 'number'  and type(key) == 'number')
                         or (fn.name == 'integer' and math.tointeger(key))
                         or (fn.name == 'string'  and type(key) == 'string') then
-                            pushResult(field)
+                            pushResult(field, true)
                         end
                     elseif fn.type == 'doc.type.string'
                     or     fn.type == 'doc.type.integer'
                     or     fn.type == 'doc.type.boolean' then
                         if key == vm.ANY
                         or fn[1] == key then
-                            pushResult(field)
+                            pushResult(field, true)
                         end
                     end
                 end
             end
             if fieldKey.type == 'doc.field.name' then
                 if key == vm.ANY or fieldKey[1] == key then
-                    pushResult(field)
+                    pushResult(field, true)
                 end
             end
         end

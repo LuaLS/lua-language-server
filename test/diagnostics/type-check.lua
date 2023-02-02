@@ -1190,6 +1190,17 @@ end
 print(is_string(3))
 ]]
 
+TEST [[
+---@class SomeClass
+---@field [1] string
+-- ...
+
+---@param some_param SomeClass|SomeClass[]
+local function some_fn(some_param) return end
+
+some_fn { { "test" } } -- <- diagnostic: "Cannot assign `table` to `string`."
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

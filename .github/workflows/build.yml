@@ -130,7 +130,7 @@ jobs:
           PKG_SUBMOD_NAME="${{ env.PROJECT }}-${{ steps.vars.outputs.PKG_VERSION }}-submodules.zip"
           PKG_SUBMOD_PATH="${STAGING}/$PKG_SUBMOD_NAME"
 
-          zip -r $PKG_SUBMOD_PATH ./ -x "*.git*" -x "*.vscode*" -x "build*" -x "${{ env.BIN_DIR }}*" -x "${STAGING}*"
+          zip -r $PKG_SUBMOD_PATH ./ -x "*.git*" -x "*.vscode*" -x "build*" -x "${{ env.BIN_DIR }}*" -x "${STAGING}*" -x "3rd/json.lua" -x "log"
 
           echo PKG_SUBMOD_PATH=${PKG_SUBMOD_PATH} >> $GITHUB_OUTPUT
 

@@ -4208,3 +4208,56 @@ end
 function Y()
 end
 ]]
+
+TEST 'integer' [[
+---@generic A, B, C
+---@type fun(x: A, y: B, z: C):C, B, A
+local f
+
+local <?x?>, y, z = f(true, '', 1)
+]]
+
+TEST 'string' [[
+---@generic A, B, C
+---@type fun(x: A, y: B, z: C):C, B, A
+local f
+
+local x, <?y?>, z = f(true, '', 1)
+]]
+
+TEST 'boolean' [[
+---@generic A, B, C
+---@type fun(x: A, y: B, z: C):C, B, A
+local f
+
+local x, y, <?z?> = f(true, '', 1)
+]]
+
+TEST '<A>[]' [[
+---@generic A
+---@param x A[]
+local function f(x)
+    local v = <?x?>[1]
+end
+]]
+
+TEST '<A>' [[
+---@generic A
+---@param x A[]
+local function f(x)
+    local <?v?> = x[1]
+end
+]]
+
+TEST '<A>' [[
+---@generic A
+---@param x A[]
+local function f(x)
+    ---@generic B
+    ---@param y A[]
+    ---@return A
+    local function g(y) end
+
+    local <?v?> = g(x)
+end
+]]

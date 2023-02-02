@@ -1379,7 +1379,7 @@ local compilerSwitch = util.switch()
                         if rtn.returnIndex == index then
                             hasMarkDoc = true
                             local hasGeneric
-                            if sign then
+                            if sign and doc.hasGeneric then
                                 guide.eachSourceType(rtn, 'doc.generic.name', function (src)
                                     hasGeneric = true
                                 end)

@@ -156,6 +156,7 @@ Symbol              <-  ({} {
 ---@field calls?            parser.object[]
 ---@field generics?         parser.object[]
 ---@field generic?          parser.object
+---@field hasGeneric?       true
 
 local function parseTokens(text, offset)
     Ci = 0
@@ -1659,6 +1660,7 @@ local function bindGeneric(binded)
                 if generics[name] then
                     src.type = 'doc.generic.name'
                     src.generic = generics[name]
+                    doc.hasGeneric = true
                 end
             end)
             guide.eachSourceType(doc, 'doc.type.code', function (src)
@@ -1666,6 +1668,7 @@ local function bindGeneric(binded)
                 if generics[name] then
                     src.type = 'doc.generic.name'
                     src.literal = true
+                    doc.hasGeneric = true
                 end
             end)
         end

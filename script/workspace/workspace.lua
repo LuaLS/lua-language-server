@@ -307,11 +307,13 @@ function m.awaitPreload(scp)
 
     if scp.uri and not scp:get('bad root') then
         log.info('Scan files at:', scp:getName())
+        ---@async
         scp:gc(fw.watch(m.normalize(furi.decode(scp.uri)), true, function (path)
             local uri = furi.encode(path)
             if m.isIgnored(uri) and not files.isLibrary(uri) then
                 return false
             end
+            await.delay()
             return true
         end))
         local count = 0
@@ -331,11 +333,13 @@ function m.awaitPreload(scp)
     for _, libMatcher in ipairs(librarys) do
         log.info('Scan library at:', libMatcher.uri)
         local count = 0
+        ---@async
         scp:gc(fw.watch(furi.decode(libMatcher.uri), true, function (path)
             local uri = furi.encode(path)
             if m.isIgnored(uri) and not files.isLibrary(uri) then
                 return false
             end
+            await.delay()
             return true
         end))
         scp:addLink(libMatcher.uri)

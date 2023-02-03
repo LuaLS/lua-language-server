@@ -592,9 +592,6 @@ end
 
 ---@async
 local function check3rd(uri)
-    if not ws.isReady(uri) then
-        return
-    end
     if ws.isIgnored(uri) then
         return
     end

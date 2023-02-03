@@ -88,7 +88,7 @@ body:
       label: Log File
       description: >
         Please provide your log file. Refer to the wiki to find your log file:
-        https://github.com/sumneko/lua-language-server/wiki/FAQ#where-can-i-find-the-log-file
+        https://github.com/LuaLS/lua-language-server/wiki/FAQ#where-can-i-find-the-log-file
   - type: markdown
     attributes:
       value: |

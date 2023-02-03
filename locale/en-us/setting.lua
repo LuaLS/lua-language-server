@@ -25,7 +25,7 @@ config.runtime.unicodeName        =
 config.runtime.nonstandardSymbol  =
 "Supports non-standard symbols. Make sure that your runtime environment supports these symbols."
 config.runtime.plugin             =
-"Plugin path. Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/Plugins) to learn more."
+"Plugin path. Please read [wiki](https://github.com/LuaLS/lua-language-server/wiki/Plugins) to learn more."
 config.runtime.pluginArgs         =
 "Additional arguments for the plugin."
 config.runtime.fileEncoding       =
@@ -133,7 +133,7 @@ Automatic detection and adaptation of third-party libraries, currently supported
 * Jass
 ]]
 config.workspace.userThirdParty          =
-'Add private third-party library configuration file paths here, please refer to the built-in [configuration file path](https://github.com/sumneko/lua-language-server/tree/master/meta/3rd)'
+'Add private third-party library configuration file paths here, please refer to the built-in [configuration file path](https://github.com/LuaLS/lua-language-server/tree/master/meta/3rd)'
 config.workspace.supportScheme           =
 'Provide language server for the Lua files of the following scheme.'
 config.completion.enable                 =
@@ -269,20 +269,20 @@ config.spell.dict                        =
 'Custom words for spell checking.'
 config.telemetry.enable                  =
 [[
-Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://github.com/sumneko/lua-language-server/wiki/Home#privacy).
+Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://github.com/LuaLS/lua-language-server/wiki/Home#privacy).
 ]]
 config.misc.parameters                   =
-'[Command line parameters](https://github.com/sumneko/lua-telemetry-server/tree/master/method) when starting the language server in VSCode.'
+'[Command line parameters](https://github.com/LuaLS/lua-telemetry-server/tree/master/method) when starting the language server in VSCode.'
 config.misc.executablePath               =
 'Specify the executable path in VSCode.'
 config.IntelliSense.traceLocalSet        =
-'Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
+'Please read [wiki](https://github.com/LuaLS/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
 config.IntelliSense.traceReturn          =
-'Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
+'Please read [wiki](https://github.com/LuaLS/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
 config.IntelliSense.traceBeSetted        =
-'Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
+'Please read [wiki](https://github.com/LuaLS/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
 config.IntelliSense.traceFieldInject     =
-'Please read [wiki](https://github.com/sumneko/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
+'Please read [wiki](https://github.com/LuaLS/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
 config.type.castNumberToInteger          =
 'Allowed to assign the `number` type to the `integer` type.'
 config.type.weakUnionCheck               =

@@ -543,6 +543,7 @@ local function check3rdByWords(uri, configs)
             for _, word in ipairs(cfg.words) do
                 await.delay()
                 if wholeMatch(text, word) then
+                    log.info('Found 3rd library by word: ', word, uri, library, inspect(config.get(uri, 'Lua.workspace.library')))
                     ---@async
                     await.call(function ()
                         askFor3rd(uri, cfg)
@@ -578,6 +579,7 @@ local function check3rdByFileName(uri, configs)
             for _, filename in ipairs(cfg.files) do
                 await.delay()
                 if wholeMatch(path, filename) then
+                    log.info('Found 3rd library by filename: ', filename, uri, library, inspect(config.get(uri, 'Lua.workspace.library')))
                     ---@async
                     await.call(function ()
                         askFor3rd(uri, cfg)

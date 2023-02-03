@@ -109,6 +109,7 @@ function m.showMessage(type, ...)
         type = define.MessageType[type] or 3,
         message = message,
     })
+    log.info('ShowMessage', type, message)
 end
 
 ---@param type message.type
@@ -128,11 +129,13 @@ function m.requestMessage(type, message, titles, callback)
         }
         map[title] = i
     end
+    log.info('requestMessage', type, message)
     proto.request('window/showMessageRequest', {
         type    = define.MessageType[type] or 3,
         message = message,
         actions = actions,
     }, function (item)
+        log.info('responseMessage', message, item and item.title or nil)
         if item then
             callback(item.title, map[item.title])
         else

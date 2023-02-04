@@ -32,9 +32,10 @@ local m = {}
 m._eventList = {}
 m._watchings = {}
 
+---@async
 ---@param path string
 ---@param recursive boolean
----@param filter? fun(path: string):boolean
+---@param filter? async fun(path: string):boolean
 function m.watch(path, recursive, filter)
     if path == '' or not fs.is_directory(fs.path(path)) then
         return function () end
@@ -46,12 +47,21 @@ function m.watch(path, recursive, filter)
         watch:add(path)
         log.debug('Watch add:', path)
         if recursive then
+            local count = 1
+            ---@async
             local function scanDirctory(dir)
+                count = count + 1
+                if count % 10 == 0 then
+                    await.delay()
+                    if count % 100 == 0 then
+                        log.warn('Watching so many dirs:', count, dir:string())
+                    end
+                end
                 for fullpath in fs.pairs(dir) do
                     if fs.is_directory(fullpath) then
                         if not filter or filter(fullpath:string()) then
                             watch:add(fullpath:string())
-                            log.debug('Watch add:', fullpath:string())
+                            log.trace('Watch add:', fullpath:string())
                             xpcall(scanDirctory, log.error, fullpath)
                         end
                     end

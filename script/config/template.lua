@@ -395,7 +395,15 @@ local template = {
 
     -- VSCode
     ['files.associations']                  = Type.Hash(Type.String, Type.String),
-    ['files.exclude']                       = Type.Hash(Type.String, Type.Boolean),
+                                            -- copy from VSCode default
+    ['files.exclude']                       = Type.Hash(Type.String, Type.Boolean) >> {
+                                                ["**/.DS_Store"] = true,
+                                                ["**/.git"]      = true,
+                                                ["**/.hg"]       = true,
+                                                ["**/.svn"]      = true,
+                                                ["**/CVS"]       = true,
+                                                ["**/Thumbs.db"] = true,
+                                            },
     ['editor.semanticHighlighting.enabled'] = Type.Or(Type.Boolean, Type.String),
     ['editor.acceptSuggestionOnEnter']      = Type.String  >> 'on',
 }

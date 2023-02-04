@@ -278,10 +278,11 @@ local function searchPatchInfo(cfg, rawKey)
         }
 end
 
+---@param uri uri
 ---@param cfg table
 ---@param change config.change
 ---@return json.patch?
-local function makeConfigPatch(cfg, change)
+local function makeConfigPatch(uri, cfg, change)
     local info  = searchPatchInfo(cfg, change.key)
     if change.action == 'add' then
         if type(info.value) == 'table' and #info.value > 0 then
@@ -291,10 +292,10 @@ local function makeConfigPatch(cfg, change)
                 value = change.value,
             }
         else
-            return makeConfigPatch(cfg, {
+            return makeConfigPatch(uri, cfg, {
                 action = 'set',
                 key    = change.key,
-                value  = { change.value },
+                value  = config.get(uri, change.key),
             })
         end
     elseif change.action == 'set' then
@@ -312,27 +313,28 @@ local function makeConfigPatch(cfg, change)
             }
         end
     elseif change.action == 'prop' then
-        if type(info.value) == 'table' and #info.value == 0 then
+        if type(info.value) == 'table' and next(info.value) then
             return {
                 op    = 'add',
                 path  = info.key .. '/' .. change.prop,
                 value = change.value,
             }
         else
-            return makeConfigPatch(cfg, {
+            return makeConfigPatch(uri, cfg, {
                 action = 'set',
                 key    = change.key,
-                value  = { [change.prop] = change.value },
+                value  = config.get(uri, change.key),
             })
         end
     end
     return nil
 end
 
+---@param uri uri
 ---@param path string
 ---@param changes config.change[]
 ---@return string?
-local function editConfigJson(path, changes)
+local function editConfigJson(uri, path, changes)
     local text = util.loadFile(path)
     if not text then
         m.showMessage('Error', lang.script('CONFIG_LOAD_FAILED', path))
@@ -348,7 +350,7 @@ local function editConfigJson(path, changes)
     end
     ---@cast res table
     for _, change in ipairs(changes) do
-        local patch = makeConfigPatch(res, change)
+        local patch = makeConfigPatch(uri, res, change)
         if patch then
             text = jsone.edit(text, patch, { indent = '    ' })
         end
@@ -387,7 +389,7 @@ local function tryModifySpecifiedConfig(uri, finalChanges)
     if not path then
         return false
     end
-    local newJson = editConfigJson(path, validChanges)
+    local newJson = editConfigJson(uri, path, validChanges)
     if not newJson then
         return false
     end
@@ -420,7 +422,7 @@ local function tryModifyRC(uri, finalChanges, create)
     if not buf then
         util.saveFile(path, '')
     end
-    local newJson = editConfigJson(path, validChanges)
+    local newJson = editConfigJson(uri, path, validChanges)
     if not newJson then
         return false
     end

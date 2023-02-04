@@ -1577,7 +1577,7 @@ string
 
 # misc.parameters
 
-VSCode中啟動語言伺服時的[命令列參數](https://github.com/sumneko/lua-language-server/wiki/Getting-Started#arguments)。
+VSCode中啟動語言伺服時的[命令列參數](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#arguments)。
 
 ## type
 
@@ -1752,7 +1752,7 @@ false
 
 # runtime.plugin
 
-延伸模組路徑，請查閱[文件](https://github.com/sumneko/lua-language-server/wiki/Plugins)瞭解用法。
+延伸模組路徑，請查閱[文件](https://github.com/LuaLS/lua-language-server/wiki/Plugins)瞭解用法。
 
 ## type
 
@@ -2194,7 +2194,7 @@ true
 
 # workspace.userThirdParty
 
-在這裡添加私有的第三方庫適應檔案路徑，請參考內建的[組態檔案路徑](https://github.com/sumneko/lua-language-server/tree/master/meta/3rd)
+在這裡添加私有的第三方庫適應檔案路徑，請參考內建的[組態檔案路徑](https://github.com/LuaLS/lua-language-server/tree/master/meta/3rd)
 
 ## type
 

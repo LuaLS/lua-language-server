@@ -57,8 +57,11 @@ function m.watch(path, recursive, filter)
                         log.warn('Watching so many dirs:', count, dir:string())
                     end
                 end
-                for fullpath in fs.pairs(dir) do
-                    if fs.is_directory(fullpath) then
+                for fullpath, status in fs.pairs(dir) do
+                    local st = status:type()
+                    if st == 'directory'
+                    or st == 'symlink'
+                    or st == 'junction' then
                         if not filter or filter(fullpath:string()) then
                             watch:add(fullpath:string())
                             log.trace('Watch add:', fullpath:string())

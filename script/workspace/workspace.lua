@@ -84,26 +84,45 @@ function m.getRootUri(uri)
 end
 
 local globInteferFace = {
-    type = function (path)
+    type = function (path, data)
+        if data[path] then
+            return data[path]
+        end
         local result
         pcall(function ()
-            if fs.is_directory(path) then
+            if fs.is_directory(fs.path(path)) then
                 result = 'directory'
+                data[path] = 'directory'
             else
                 result = 'file'
+                data[path] = 'file'
             end
         end)
         return result
     end,
-    list = function (path)
-        local fullPath = fs.path(path)
-        if not fs.is_directory(fullPath) then
+    list = function (path, data)
+        if data[path] == 'file' then
             return nil
         end
+        local fullPath = fs.path(path)
+        if not fs.is_directory(fullPath) then
+            data[path] = 'file'
+            return nil
+        end
+        data[path] = true
         local paths = {}
         pcall(function ()
-            for fullpath in fs.pairs(fullPath) do
-                paths[#paths+1] = fullpath:string()
+            for fullpath, status in fs.pairs(fullPath) do
+                local pathString = fullpath:string()
+                paths[#paths+1] = pathString
+                local st = status:type()
+                if st == 'directory'
+                or st == 'symlink'
+                or st == 'junction' then
+                    data[pathString] = 'directory'
+                else
+                    data[pathString] = 'file'
+                end
             end
         end)
         return paths
@@ -225,7 +244,7 @@ function m.getLibraryMatchers(scp)
     end
 
     scp:set('libraryMatcher', matchers)
-    log.debug('library matcher:', inspect(matchers))
+    --log.debug('library matcher:', inspect(matchers))
 
     return matchers
 end

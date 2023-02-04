@@ -629,7 +629,7 @@ local function hookPrint()
 end
 
 function m.init(t)
-    log.debug('Client init', inspect(t))
+    log.info('Client init', inspect(t))
     m.info = t
     nonil.enable()
     m.client(t.clientInfo.name)

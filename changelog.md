@@ -1,5 +1,10 @@
 # changelog
 
+## 3.6.10
+* `FIX` [#1869]
+
+[#1869]: https://github.com/LuaLS/lua-language-server/issues/1869
+
 ## 3.6.9
 `2023-2-2`
 * `FIX` [#1864]

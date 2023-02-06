@@ -35,7 +35,7 @@ m._watchings = {}
 ---@async
 ---@param path string
 ---@param recursive boolean
----@param filter? async fun(path: string):boolean
+---@param filter? fun(path: string):boolean
 function m.watch(path, recursive, filter)
     if path == '' or not fs.is_directory(fs.path(path)) then
         return function () end
@@ -47,31 +47,9 @@ function m.watch(path, recursive, filter)
         watch:add(path)
         log.debug('Watch add:', path)
         if recursive then
-            local count = 1
-            ---@async
-            local function scanDirctory(dir)
-                count = count + 1
-                if count % 10 == 0 then
-                    await.delay()
-                    if count % 100 == 0 then
-                        log.warn('Watching so many dirs:', count, dir:string())
-                    end
-                end
-                for fullpath, status in fs.pairs(dir) do
-                    local st = status:type()
-                    if st == 'directory'
-                    or st == 'symlink'
-                    or st == 'junction' then
-                        if not filter or filter(fullpath:string()) then
-                            watch:add(fullpath:string())
-                            log.trace('Watch add:', fullpath:string())
-                            xpcall(scanDirctory, log.error, fullpath)
-                        end
-                    end
-                end
-            end
-
-            xpcall(scanDirctory, log.error, fs.path(path))
+            watch:set_filter(filter)
+            watch:set_follow_symlinks(true)
+            watch:set_recursive(true)
         end
         m._watchings[path] = {
             count = 1,

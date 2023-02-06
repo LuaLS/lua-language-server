@@ -35,7 +35,7 @@ local fsStatus = {}
 function fsStatus:type()
 end
 
----@class fs
+---@class bee.filesystem
 local fs = {}
 
 ---@class fs.copy_options

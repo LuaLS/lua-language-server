@@ -1,5 +1,5 @@
 -- if this file exists, then change setting `Lua.runtime.plugin`
--- see https://github.com/sumneko/lua-language-server/wiki/Plugins
+-- see https://github.com/LuaLS/lua-language-server/wiki/Plugins
 
 function OnSetText(uri, text)
     local diffs = {}

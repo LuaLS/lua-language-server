@@ -109,6 +109,7 @@ function m.showMessage(type, ...)
         type = define.MessageType[type] or 3,
         message = message,
     })
+    log.info('ShowMessage', type, message)
 end
 
 ---@param type message.type
@@ -128,11 +129,13 @@ function m.requestMessage(type, message, titles, callback)
         }
         map[title] = i
     end
+    log.info('requestMessage', type, message)
     proto.request('window/showMessageRequest', {
         type    = define.MessageType[type] or 3,
         message = message,
         actions = actions,
     }, function (item)
+        log.info('responseMessage', message, item and item.title or nil)
         if item then
             callback(item.title, map[item.title])
         else
@@ -275,10 +278,11 @@ local function searchPatchInfo(cfg, rawKey)
         }
 end
 
+---@param uri uri
 ---@param cfg table
 ---@param change config.change
 ---@return json.patch?
-local function makeConfigPatch(cfg, change)
+local function makeConfigPatch(uri, cfg, change)
     local info  = searchPatchInfo(cfg, change.key)
     if change.action == 'add' then
         if type(info.value) == 'table' and #info.value > 0 then
@@ -288,10 +292,10 @@ local function makeConfigPatch(cfg, change)
                 value = change.value,
             }
         else
-            return makeConfigPatch(cfg, {
+            return makeConfigPatch(uri, cfg, {
                 action = 'set',
                 key    = change.key,
-                value  = { change.value },
+                value  = config.get(uri, change.key),
             })
         end
     elseif change.action == 'set' then
@@ -309,47 +313,63 @@ local function makeConfigPatch(cfg, change)
             }
         end
     elseif change.action == 'prop' then
-        if type(info.value) == 'table' and #info.value == 0 then
+        if type(info.value) == 'table' and next(info.value) then
             return {
                 op    = 'add',
                 path  = info.key .. '/' .. change.prop,
                 value = change.value,
             }
         else
-            return makeConfigPatch(cfg, {
+            return makeConfigPatch(uri, cfg, {
                 action = 'set',
                 key    = change.key,
-                value  = { [change.prop] = change.value },
+                value  = config.get(uri, change.key),
             })
         end
     end
     return nil
 end
 
+---@param uri uri
 ---@param path string
 ---@param changes config.change[]
 ---@return string?
-local function editConfigJson(path, changes)
+local function editConfigJson(uri, path, changes)
     local text = util.loadFile(path)
     if not text then
+        m.showMessage('Error', lang.script('CONFIG_LOAD_FAILED', path))
         return nil
     end
     local suc, res = pcall(jsonc.decode_jsonc, text)
     if not suc then
         m.showMessage('Error', lang.script('CONFIG_MODIFY_FAIL_SYNTAX_ERROR', path .. res:match 'ERROR(.+)$'))
-        return text
+        return nil
     end
     if type(res) ~= 'table' then
         res = {}
     end
     ---@cast res table
     for _, change in ipairs(changes) do
-        local patch = makeConfigPatch(res, change)
+        local patch = makeConfigPatch(uri, res, change)
         if patch then
             text = jsone.edit(text, patch, { indent = '    ' })
         end
     end
     return text
+end
+
+---@param changes config.change[]
+---@param applied config.change[]
+local function removeAppliedChanges(changes, applied)
+    local appliedMap = {}
+    for _, change in ipairs(applied) do
+        appliedMap[change] = true
+    end
+    for i = #changes, 1, -1 do
+        if appliedMap[changes[i]] then
+            table.remove(changes, i)
+        end
+    end
 end
 
 local function tryModifySpecifiedConfig(uri, finalChanges)
@@ -369,11 +389,12 @@ local function tryModifySpecifiedConfig(uri, finalChanges)
     if not path then
         return false
     end
-    local newJson = editConfigJson(path, validChanges)
+    local newJson = editConfigJson(uri, path, validChanges)
     if not newJson then
         return false
     end
     util.saveFile(path, newJson)
+    removeAppliedChanges(finalChanges, validChanges)
     return true
 end
 
@@ -398,11 +419,15 @@ local function tryModifyRC(uri, finalChanges, create)
     if #validChanges == 0 then
         return false
     end
-    local newJson = editConfigJson(path, validChanges)
+    if not buf then
+        util.saveFile(path, '')
+    end
+    local newJson = editConfigJson(uri, path, validChanges)
     if not newJson then
         return false
     end
     util.saveFile(path, newJson)
+    removeAppliedChanges(finalChanges, validChanges)
     return true
 end
 
@@ -428,6 +453,7 @@ local function tryModifyClient(uri, finalChanges)
         command   = 'lua.config',
         data      = scpChanges,
     })
+    removeAppliedChanges(finalChanges, scpChanges)
     return true
 end
 
@@ -440,18 +466,32 @@ local function tryModifyClientGlobal(finalChanges)
         return
     end
     local changes = {}
-    for i = #finalChanges, 1, -1 do
-        local change = finalChanges[i]
+    for _, change in ipairs(finalChanges) do
         if change.global then
             changes[#changes+1] = change
-            finalChanges[i] = finalChanges[#finalChanges]
-            finalChanges[#finalChanges] = nil
         end
     end
     proto.notify('$/command', {
         command   = 'lua.config',
         data      = changes,
     })
+    removeAppliedChanges(finalChanges, changes)
+end
+
+---@param changes config.change[]
+---@return string
+local function buildMaunuallyMessage(changes)
+    local message = {}
+    for _, change in ipairs(changes) do
+        if change.action == 'add' then
+            message[#message+1] = '* ' .. lang.script('WINDOW_MANUAL_CONFIG_ADD', change.key, change.value)
+        elseif change.action == 'set' then
+            message[#message+1] = '* ' .. lang.script('WINDOW_MANUAL_CONFIG_SET', change.key, change.value)
+        elseif change.action == 'prop' then
+            message[#message+1] = '* ' .. lang.script('WINDOW_MANUAL_CONFIG_PROP', change.key, change.prop, change.value)
+        end
+    end
+    return table.concat(message, '\n')
 end
 
 ---@param changes config.change[]
@@ -484,26 +524,24 @@ function m.setConfig(changes, onlyMemory)
     end
     xpcall(function ()
         local ws = require 'workspace'
-        if #ws.folders == 0 then
-            if tryModifySpecifiedConfig(nil, finalChanges) then
-                return
-            end
-            tryModifyClient(nil, finalChanges)
-            return
-        end
         tryModifyClientGlobal(finalChanges)
-        for _, scp in ipairs(ws.folders) do
-            if tryModifySpecifiedConfig(scp.uri, finalChanges) then
-                goto CONTINUE
+        if #ws.folders == 0 then
+            tryModifySpecifiedConfig(nil, finalChanges)
+            tryModifyClient(nil, finalChanges)
+            if #finalChanges > 0 then
+                local manuallyModifyConfig = buildMaunuallyMessage(finalChanges)
+                m.showMessage('Warning', lang.script('CONFIG_MODIFY_FAIL_NO_WORKSPACE', manuallyModifyConfig))
             end
-            if tryModifyRC(scp.uri, finalChanges, false) then
-                goto CONTINUE
+        else
+            for _, scp in ipairs(ws.folders) do
+                tryModifySpecifiedConfig(scp.uri, finalChanges)
+                tryModifyRC(scp.uri, finalChanges, false)
+                tryModifyClient(scp.uri, finalChanges)
+                tryModifyRC(scp.uri, finalChanges, true)
             end
-            if tryModifyClient(scp.uri, finalChanges) then
-                goto CONTINUE
+            if #finalChanges > 0 then
+                m.showMessage('Warning', lang.script('CONFIG_MODIFY_FAIL', buildMaunuallyMessage(finalChanges)))
             end
-            tryModifyRC(scp.uri, finalChanges, true)
-            ::CONTINUE::
         end
     end, log.error)
 end

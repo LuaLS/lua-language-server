@@ -1,90 +1,128 @@
+
 # see https://github.com/CppCXY/EmmyLuaCodeStyle
 [*.lua]
-# [basic code reformat option]
+# [basic]
+
 # optional space/tab
 indent_style = space
 # if indent_style is space, this is valid
 indent_size = 4
 # if indent_style is tab, this is valid
 tab_width = 4
-# only support number
-continuation_indent_size = 4
-# if true, continuation_indent_size for local or assign statement is invalid
-# however, if the expression list has cross row expression, it will not be aligned to the first expression
-local_assign_continuation_align_to_first_expression = false
-# function call expression's args will align to first arg
-# however, if the args has cross row arg, it will not be aligned to the first arg
-align_call_args = false
-# if true, format like this "print( "123", 456 )"
-keep_one_space_between_call_args_and_parentheses = false
-# if true, all function define params will align to first param
-align_function_define_params = true
-# if true, format like this "local t = { 1, 2, 3 }"
-keep_one_space_between_table_and_bracket = true
-# if indent_style is tab, this option is invalid
-align_table_field_to_first_field = false
-# if true, ormat like this "local t <const> = 1"
-keep_one_space_between_namedef_and_attribute = false
-# continous line distance
-max_continuous_line_distance = 1
-# if true, iff any one of the consecutive rows meets the condition of aligning to the equal sign,
-# the consecutive rows will be aligned to the equal sign
-weak_alignment_rule = true
-# see document for detail
-continuous_assign_statement_align_to_equal_sign = true
-# see document for detail
-continuous_assign_table_field_align_to_equal_sign = true
-# if true, the label loses its current indentation
-label_no_indent = false
-# if true, there will be no indentation in the do statement
-do_statement_no_indent = false
-# if true, the conditional expression of the if statement will not be a continuation line indent
-if_condition_no_continuation_indent = false
+# none/single/double
+quote_style = none
 
+continuation_indent = 4
 
-# optional crlf/lf
-end_of_line = auto
-detect_end_of_line = true
-
-# [line layout]
-# The following configuration supports three expressions
-# minLine:${n}   
-# keepLine   
-# KeepLine:${n}
-
-keep_line_after_if_statement = minLine:0
-keep_line_after_do_statement = minLine:0
-keep_line_after_while_statement = minLine:0
-keep_line_after_repeat_statement = minLine:0
-keep_line_after_for_statement = minLine:0
-keep_line_after_local_or_assign_statement = keepLine
-keep_line_after_function_define_statement = keepLine:1
-
-# [diagnostic]
-# the following is code diagnostic options
-enable_check_codestyle = true
-# this mean utf8 length
+# this mean utf8 length , if this is 'unset' then the line width is no longer checked
+# this option decides when to chopdown the code
 max_line_length = 120
-# this will check text end with new line(format always end with new line)
+
+# optional crlf/lf/cr/auto, if it is 'auto', in windows it is crlf other platforms are lf
+# in neovim the value 'auto' is not a valid option, please use 'unset' 
+end_of_line = auto
+
+#optional keep/never/always/smart
+trailing_table_separator = keep
+
+# keep/remove/remove_table_only/remove_string_only
+call_arg_parentheses = keep
+
+detect_end_of_line = false
+
+# this will check text end with new line
 insert_final_newline = true
 
-# [name style check]
-enable_name_style_check = true
-# the following is name style check rule 
-# base option off/camel_case/snake_case/upper_snake_case/pascal_case/same(filename/first_param/'<const string>', snake_case/pascal_case/camel_case)
-# all option can use '|' represent or 
-# for example:
-# snake_case | upper_snake_case
-# same(first_param, snake_case)
-# same('m')
-local_name_define_style = camel_case|upper_snake_case
-function_param_name_style = camel_case
-function_name_define_style = camel_case
-local_function_name_define_style = camel_case
-table_field_name_define_style = camel_case|pascal_case
-global_variable_name_define_style = camel_case|upper_snake_case
-module_name_define_style = camel_case
-require_module_name_style = camel_case
-class_name_define_style = camel_case
-table_append_expression_no_space = true
-if_condition_align_with_each_other = true
+# [space]
+space_around_table_field_list = true
+
+space_before_attribute = true
+
+space_before_function_open_parenthesis = false
+
+space_before_function_call_open_parenthesis = false
+
+space_before_closure_open_parenthesis = true
+
+space_before_function_call_single_arg = true
+
+space_before_open_square_bracket = false
+
+space_inside_function_call_parentheses = false
+
+space_inside_function_param_list_parentheses = false
+
+space_inside_square_brackets = false
+
+# like t[#t+1] = 1
+space_around_table_append_operator = true
+
+ignore_spaces_inside_function_call = false
+
+space_before_inline_comment = 1
+
+# [operator space]
+space_around_math_operator = true
+
+space_after_comma = true
+
+space_after_comma_in_for_statement = true
+
+space_around_concat_operator = true
+
+# [align]
+
+align_call_args = false
+
+align_function_params = true
+
+align_continuous_assign_statement = true
+
+align_continuous_rect_table_field = true
+
+align_if_branch = true
+
+align_array_table = true
+
+# [indent]
+
+never_indent_before_if_condition = false
+
+never_indent_comment_on_if_branch = false
+
+# [line space]
+
+# The following configuration supports four expressions
+# keep  
+# fixed(n)   
+# min(n)
+# max(n)
+# for eg. min(2)
+
+line_space_after_if_statement = keep
+
+line_space_after_do_statement = keep
+
+line_space_after_while_statement = keep
+
+line_space_after_repeat_statement = keep
+
+line_space_after_for_statement = keep
+
+line_space_after_local_or_assign_statement = keep
+
+line_space_after_function_statement = fixed(2)
+
+line_space_after_expression_statement = keep
+
+line_space_after_comment = keep
+
+# [line break]
+break_all_list_when_line_exceed = false
+
+auto_collapse_lines = false
+
+# [preference]
+ignore_space_after_colon = true
+
+remove_call_expression_list_finish_comma = false

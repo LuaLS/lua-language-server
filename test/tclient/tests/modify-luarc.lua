@@ -6,6 +6,7 @@ local jsonb    = require 'json-beautify'
 local client   = require 'client'
 local provider = require 'provider'
 local json     = require 'json'
+local config   = require 'config'
 
 local configPath = LOGPATH .. '/modify-luarc.json'
 
@@ -322,6 +323,55 @@ lclient():start(function (languageClient)
                 import  = 'require',
                 include = 'require',
             }
+        }
+    }))
+
+    -------------------------------
+    -- merrge other configs --
+    -------------------------------
+
+    util.saveFile(configPath, jsonb.beautify(json.createEmptyObject()))
+
+    provider.updateConfig()
+
+    config.add(nil, 'Lua.diagnostics.globals', 'x')
+    config.add(nil, 'Lua.diagnostics.globals', 'y')
+
+    client.setConfig({
+        {
+            action = 'add',
+            key    = 'Lua.diagnostics.globals',
+            value  = 'z',
+        }
+    })
+
+    assert(util.equal(jsonc.decode_jsonc(util.loadFile(configPath)), {
+        ['diagnostics.globals'] = { 'x', 'y', 'z' }
+    }))
+
+    -------------------------------
+
+    util.saveFile(configPath, jsonb.beautify(json.createEmptyObject()))
+
+    provider.updateConfig()
+
+    config.prop(nil, 'Lua.runtime.special', 'kx', 'require')
+    config.prop(nil, 'Lua.runtime.special', 'ky', 'require')
+
+    client.setConfig({
+        {
+            action = 'prop',
+            key    = 'Lua.runtime.special',
+            prop   = 'kz',
+            value  = 'require',
+        }
+    })
+
+    assert(util.equal(jsonc.decode_jsonc(util.loadFile(configPath)), {
+        ['runtime.special'] = {
+            ['kx'] = 'require',
+            ['ky'] = 'require',
+            ['kz'] = 'require',
         }
     }))
 end)

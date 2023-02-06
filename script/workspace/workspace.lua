@@ -84,26 +84,45 @@ function m.getRootUri(uri)
 end
 
 local globInteferFace = {
-    type = function (path)
+    type = function (path, data)
+        if data[path] then
+            return data[path]
+        end
         local result
         pcall(function ()
-            if fs.is_directory(path) then
+            if fs.is_directory(fs.path(path)) then
                 result = 'directory'
+                data[path] = 'directory'
             else
                 result = 'file'
+                data[path] = 'file'
             end
         end)
         return result
     end,
-    list = function (path)
-        local fullPath = fs.path(path)
-        if not fs.is_directory(fullPath) then
+    list = function (path, data)
+        if data[path] == 'file' then
             return nil
         end
+        local fullPath = fs.path(path)
+        if not fs.is_directory(fullPath) then
+            data[path] = 'file'
+            return nil
+        end
+        data[path] = true
         local paths = {}
         pcall(function ()
-            for fullpath in fs.pairs(fullPath) do
-                paths[#paths+1] = fullpath:string()
+            for fullpath, status in fs.pairs(fullPath) do
+                local pathString = fullpath:string()
+                paths[#paths+1] = pathString
+                local st = status:type()
+                if st == 'directory'
+                or st == 'symlink'
+                or st == 'junction' then
+                    data[pathString] = 'directory'
+                else
+                    data[pathString] = 'file'
+                end
             end
         end)
         return paths
@@ -225,7 +244,7 @@ function m.getLibraryMatchers(scp)
     end
 
     scp:set('libraryMatcher', matchers)
-    log.debug('library matcher:', inspect(matchers))
+    --log.debug('library matcher:', inspect(matchers))
 
     return matchers
 end
@@ -308,8 +327,8 @@ function m.awaitPreload(scp)
     if scp.uri and not scp:get('bad root') then
         log.info('Scan files at:', scp:getName())
         scp:gc(fw.watch(m.normalize(furi.decode(scp.uri)), true, function (path)
-            local uri = furi.encode(path)
-            if m.isIgnored(uri) and not files.isLibrary(uri) then
+            local rpath = m.getRelativePath(path)
+            if native(rpath) then
                 return false
             end
             return true
@@ -332,8 +351,8 @@ function m.awaitPreload(scp)
         log.info('Scan library at:', libMatcher.uri)
         local count = 0
         scp:gc(fw.watch(furi.decode(libMatcher.uri), true, function (path)
-            local uri = furi.encode(path)
-            if m.isIgnored(uri) and not files.isLibrary(uri) then
+            local rpath = m.getRelativePath(path)
+            if libMatcher.matcher(rpath) then
                 return false
             end
             return true

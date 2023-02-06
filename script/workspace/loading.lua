@@ -94,6 +94,10 @@ function mt:loadFile(uri, libraryUri)
                 if not content then
                     return
                 end
+                if files.getFile(uri) then
+                    log.info(('Skip loaded file: %s'):format(uri))
+                    return
+                end
                 log.info(('Preload file at: %s , size = %.3f KB'):format(uri, #content / 1024.0))
                 --await.wait(function (waker)
                 --    self._sets[#self._sets+1] = waker
@@ -127,6 +131,10 @@ function mt:loadFile(uri, libraryUri)
                 self.read = self.read + 1
                 self:update()
                 if not content then
+                    return
+                end
+                if files.getFile(uri) then
+                    log.info(('Skip loaded file: %s'):format(uri))
                     return
                 end
                 log.info(('Preload dll at: %s , size = %.3f KB'):format(uri, #content / 1024.0))

@@ -49,6 +49,7 @@ local parser = m.P {
 ---@field errors table[]
 ---@field matcher table
 ---@field interface function[]
+---@field data table
 local mt = {}
 mt.__index = mt
 mt.__name = 'gitignore'
@@ -90,9 +91,9 @@ function mt:setInterface(key, func)
     self.interface[key] = func
 end
 
-function mt:callInterface(name, ...)
+function mt:callInterface(name, params)
     local func = self.interface[name]
-    return func(...)
+    return func(params, self.data)
 end
 
 function mt:hasInterface(name)
@@ -223,6 +224,7 @@ return function (pattern, options, interface)
         matcher   = {},
         errors    = {},
         interface = {},
+        data      = {},
     }, mt)
 
     if type(options) == 'table' then

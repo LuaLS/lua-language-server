@@ -31,11 +31,11 @@ end
 ---@class fs.status
 local fsStatus = {}
 
----@return string
+---@return 'none' | 'not_found' | 'regular' | 'directory' | 'symlink' | 'block' | 'character' | 'fifo' | 'junction' | 'unknown'
 function fsStatus:type()
 end
 
----@class fs
+---@class bee.filesystem
 local fs = {}
 
 ---@class fs.copy_options
@@ -64,7 +64,7 @@ function fs.is_directory(path)
 end
 
 ---@param path fs.path
----@return fun():fs.path
+---@return fun():fs.path, fs.status
 function fs.pairs(path)
 end
 

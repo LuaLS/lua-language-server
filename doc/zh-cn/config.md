@@ -698,7 +698,7 @@ object<string, string>
 ```jsonc
 {
     /*
-    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1` 
+    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1`
     */
     "ambiguity-1": "Any",
     /*
@@ -945,7 +945,7 @@ object<string, string>
 ```jsonc
 {
     /*
-    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1` 
+    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1`
     */
     "ambiguity-1": "Warning",
     /*
@@ -1577,7 +1577,7 @@ string
 
 # misc.parameters
 
-VSCode中启动语言服务时的[命令行参数](https://github.com/sumneko/lua-language-server/wiki/Getting-Started#arguments)。
+VSCode中启动语言服务时的[命令行参数](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#arguments)。
 
 ## type
 
@@ -1752,7 +1752,7 @@ false
 
 # runtime.plugin
 
-插件路径，请查阅[文档](https://github.com/sumneko/lua-language-server/wiki/Plugins)了解用法。
+插件路径，请查阅[文档](https://github.com/LuaLS/lua-language-server/wiki/Plugins)了解用法。
 
 ## type
 
@@ -2194,7 +2194,7 @@ true
 
 # workspace.userThirdParty
 
-在这里添加私有的第三方库适配文件路径，请参考内置的[配置文件路径](https://github.com/sumneko/lua-language-server/tree/master/meta/3rd)
+在这里添加私有的第三方库适配文件路径，请参考内置的[配置文件路径](https://github.com/LuaLS/lua-language-server/tree/master/meta/3rd)
 
 ## type
 

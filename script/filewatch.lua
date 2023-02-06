@@ -44,13 +44,13 @@ function m.watch(path, recursive, filter)
         m._watchings[path].count = m._watchings[path].count + 1
     else
         local watch = fw.create()
-        watch:add(path)
-        log.debug('Watch add:', path)
         if recursive then
-            watch:set_filter(filter)
-            watch:set_follow_symlinks(true)
             watch:set_recursive(true)
+            watch:set_follow_symlinks(true)
+            watch:set_filter(filter)
         end
+        log.debug('Watch add:', path)
+        watch:add(path)
         m._watchings[path] = {
             count = 1,
             watch = watch,

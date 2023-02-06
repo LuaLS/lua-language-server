@@ -1378,13 +1378,7 @@ local compilerSwitch = util.switch()
                         lastReturn = rtn
                         if rtn.returnIndex == index then
                             hasMarkDoc = true
-                            local hasGeneric
-                            if sign and doc.hasGeneric then
-                                guide.eachSourceType(rtn, 'doc.generic.name', function (src)
-                                    hasGeneric = true
-                                end)
-                            end
-                            if hasGeneric then
+                            if rtn.hasGeneric then
                                 ---@cast sign -?
                                 vm.setNode(source, vm.createGeneric(rtn, sign))
                             else

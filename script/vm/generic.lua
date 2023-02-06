@@ -13,24 +13,25 @@ mt.__index = mt
 mt.type = 'generic'
 
 ---@param source    vm.object?
----@param resolved? table<string, vm.node>
+---@param resolved? table<parser.object, vm.node>
 ---@return vm.object?
 local function cloneObject(source, resolved)
     if not resolved or not source then
         return source
     end
     if source.type == 'doc.generic.name' then
-        local key = source[1]
+        local generic = source.generic
         local newName = {
-            type   = source.type,
-            start  = source.start,
-            finish = source.finish,
-            parent = source.parent,
-            [1]    = source[1],
+            type    = source.type,
+            start   = source.start,
+            finish  = source.finish,
+            parent  = source.parent,
+            generic = source.generic,
+            [1]     = source[1],
         }
-        if resolved[key] then
-            vm.setNode(newName, resolved[key], true)
-            newName._resolved = resolved[key]
+        if resolved[generic] then
+            vm.setNode(newName, resolved[generic], true)
+            newName._resolved = resolved[generic]
         end
         return newName
     end

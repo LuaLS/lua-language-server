@@ -351,6 +351,7 @@ local function parseSigns(parent)
             }
             break
         end
+        sign.generic = sign
         signs[#signs+1] = sign
         if checkToken('symbol', ',', 1) then
             nextToken()
@@ -1631,6 +1632,17 @@ local function isNextLine(lastDoc, nextDoc)
     return newRow - lastRow == 1
 end
 
+local function markHasGeneric(obj)
+    if obj.type == 'doc' then
+        return
+    end
+    if obj.hasGeneric then
+        return
+    end
+    obj.hasGeneric = true
+    markHasGeneric(obj.parent)
+end
+
 local function bindGeneric(binded)
     local generics = {}
     for _, doc in ipairs(binded) do
@@ -1660,15 +1672,16 @@ local function bindGeneric(binded)
                 if generics[name] then
                     src.type = 'doc.generic.name'
                     src.generic = generics[name]
-                    doc.hasGeneric = true
+                    markHasGeneric(src)
                 end
             end)
             guide.eachSourceType(doc, 'doc.type.code', function (src)
                 local name = src[1]
                 if generics[name] then
                     src.type = 'doc.generic.name'
+                    src.generic = generics[name]
                     src.literal = true
-                    doc.hasGeneric = true
+                    markHasGeneric(src)
                 end
             end)
         end

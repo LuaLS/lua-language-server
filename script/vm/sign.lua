@@ -1,11 +1,12 @@
 local guide         = require 'parser.guide'
 ---@class vm
 local vm            = require 'vm.vm'
+local util          = require 'utility'
 
 ---@class vm.sign
----@field parent    parser.object
----@field signList  vm.node[]
----@field docGenric parser.object[]
+---@field parent         parser.object
+---@field signList       vm.node[]
+---@field genericObjects parser.object[]
 local mt = {}
 mt.__index = mt
 mt.type = 'sign'
@@ -15,20 +16,26 @@ function mt:addSign(node)
     self.signList[#self.signList+1] = node
 end
 
----@param doc parser.object
-function mt:addDocGeneric(doc)
-    self.docGenric[#self.docGenric+1] = doc
+---@param object parser.object
+function mt:addGenericObject(object)
+    self.genericObjects[#self.genericObjects+1] = object
+end
+
+---@param generic parser.object
+---@return boolean
+function mt:isValidGeneric(generic)
+    return util.arrayHas(self.genericObjects, generic)
 end
 
 ---@param uri uri
 ---@param args parser.object
----@return table<string, vm.node>?
+---@return table<parser.object, vm.node>?
 function mt:resolve(uri, args)
     if not args then
         return nil
     end
 
-    ---@type table<string, vm.node>
+    ---@type table<parser.object, vm.node>
     local resolved = {}
 
     ---@param object vm.node|vm.node.object
@@ -46,15 +53,17 @@ function mt:resolve(uri, args)
             return
         end
         if object.type == 'doc.generic.name' then
-            ---@type string
-            local key = object[1]
+            local generic = object.generic
+            if not generic or not self:isValidGeneric(generic) then
+                return
+            end
             if object.literal then
                 -- 'number' -> `T`
                 for n in node:eachObject() do
                     if n.type == 'string' then
                         ---@cast n parser.object
                         local type = vm.declareGlobal('type', n[1], guide.getUri(n))
-                        resolved[key] = vm.createNode(type, resolved[key])
+                        resolved[generic] = vm.createNode(type, resolved[generic])
                     end
                 end
             else
@@ -62,15 +71,15 @@ function mt:resolve(uri, args)
                 for n in node:eachObject() do
                     if  n.type ~= 'doc.generic.name'
                     and n.type ~= 'generic' then
-                        if resolved[key] then
-                            resolved[key]:merge(n)
+                        if resolved[generic] then
+                            resolved[generic]:merge(n)
                         else
-                            resolved[key] = vm.createNode(n)
+                            resolved[generic] = vm.createNode(n)
                         end
                     end
                 end
-                if resolved[key] and node:isOptional() then
-                    resolved[key]:addOptional()
+                if resolved[generic] and node:isOptional() then
+                    resolved[generic]:addOptional()
                 end
             end
             return
@@ -171,27 +180,11 @@ function mt:resolve(uri, args)
 
     ---@param sign vm.node
     ---@return table<string, true>
-    ---@return table<string, true>
     local function getSignInfo(sign)
         local knownTypes = {}
-        local genericsNames   = {}
         for obj in sign:eachObject() do
-            if obj.type == 'doc.generic.name' then
-                genericsNames[obj[1]] = true
+            if obj.hasGeneric then
                 goto CONTINUE
-            end
-            if obj.type == 'doc.type.table'
-            or obj.type == 'doc.type.function'
-            or obj.type == 'doc.type.array' then
-                ---@cast obj parser.object
-                local hasGeneric
-                guide.eachSourceType(obj, 'doc.generic.name', function (src)
-                    hasGeneric = true
-                    genericsNames[src[1]] = true
-                end)
-                if hasGeneric then
-                    goto CONTINUE
-                end
             end
             if obj.type == 'variable'
             or obj.type == 'local' then
@@ -203,7 +196,7 @@ function mt:resolve(uri, args)
             end
             ::CONTINUE::
         end
-        return knownTypes, genericsNames
+        return knownTypes
     end
 
     -- remove un-generic type
@@ -236,9 +229,8 @@ function mt:resolve(uri, args)
         return newArgNode
     end
 
-    ---@param genericNames table<string, true>
-    local function isAllResolved(genericNames)
-        for n in pairs(genericNames) do
+    local function isAllResolved()
+        for _, n in ipairs(self.genericObjects) do
             if not resolved[n] then
                 return false
             end
@@ -252,8 +244,8 @@ function mt:resolve(uri, args)
             break
         end
         local argNode = vm.compileNode(arg)
-        local knownTypes, genericNames = getSignInfo(sign)
-        if not isAllResolved(genericNames) then
+        local knownTypes = getSignInfo(sign)
+        if not isAllResolved() then
             local newArgNode = buildArgNode(argNode,sign, knownTypes)
             resolve(sign, newArgNode)
         end
@@ -265,8 +257,8 @@ end
 ---@return vm.sign
 function vm.createSign()
     local genericMgr = setmetatable({
-        signList  = {},
-        docGenric = {},
+        signList       = {},
+        genericObjects = {},
     }, mt)
     return genericMgr
 end
@@ -296,7 +288,9 @@ function vm.getSign(source)
                 if not source._sign then
                     source._sign = vm.createSign()
                 end
-                source._sign:addDocGeneric(doc)
+                for _, object in ipairs(doc.generics) do
+                    source._sign:addGenericObject(object)
+                end
             end
         end
         if not source._sign then
@@ -315,12 +309,8 @@ function vm.getSign(source)
     if source.type == 'doc.type.function'
     or source.type == 'doc.type.table'
     or source.type == 'doc.type.array' then
-        local hasGeneric
-        guide.eachSourceType(source, 'doc.generic.name', function (_)
-            hasGeneric = true
-        end)
-        if not hasGeneric then
-            return nil
+        if not source.hasGeneric then
+            return
         end
         source._sign = vm.createSign()
         if source.type == 'doc.type.function' then
@@ -336,6 +326,15 @@ function vm.getSign(source)
                 end
             end
         end
+        local mark = {}
+        guide.eachSourceType(source, 'doc.generic.name', function (src)
+            local genericObject = src.generic
+            assert(genericObject)
+            if not mark[genericObject] then
+                mark[genericObject] = true
+                source._sign:addGenericObject(genericObject)
+            end
+        end)
     end
     return source._sign or nil
 end

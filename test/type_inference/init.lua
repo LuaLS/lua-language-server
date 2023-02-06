@@ -4254,8 +4254,8 @@ TEST '<A>' [[
 ---@param x A[]
 local function f(x)
     ---@generic B
-    ---@param y A[]
-    ---@return A
+    ---@param y B[]
+    ---@return B
     local function g(y) end
 
     local <?v?> = g(x)

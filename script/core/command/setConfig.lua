@@ -1,11 +1,11 @@
 local client = require 'client'
-local ws     = require 'workspace'
+local await  = require 'await'
 
 ---@async
 ---@param changes config.change[]
 return function (changes)
-    for _, change in ipairs(changes) do
-        ws.awaitReady(change.uri)
+    while not client:isReady() do
+        await.sleep(0.1)
     end
     client.setConfig(changes)
 end

@@ -2351,7 +2351,16 @@ local function parseFunction(isLocal, isAction)
     return func
 end
 
-local function pushErrorNeedParen(source)
+local function checkNeedParen(source)
+    local token = Tokens[Index + 1]
+    if  token ~= '.'
+    and token ~= ':' then
+        return source
+    end
+    local exp = parseSimple(source, false)
+    if exp == source then
+        return exp
+    end
     pushError {
         type   = 'NEED_PAREN',
         start  = source.start,
@@ -2370,6 +2379,7 @@ local function pushErrorNeedParen(source)
             }
         }
     }
+    return exp
 end
 
 local function parseExpUnit()
@@ -2389,10 +2399,7 @@ local function parseExpUnit()
         if not table then
             return nil
         end
-        local exp = parseSimple(table, false)
-        if exp ~= table then
-            pushErrorNeedParen(table)
-        end
+        local exp = checkNeedParen(table)
         return exp
     end
 
@@ -2401,10 +2408,7 @@ local function parseExpUnit()
         if not string then
             return nil
         end
-        local exp = parseSimple(string, false)
-        if exp ~= string then
-            pushErrorNeedParen(string)
-        end
+        local exp = checkNeedParen(string)
         return exp
     end
 
@@ -2413,10 +2417,7 @@ local function parseExpUnit()
         if not string then
             return nil
         end
-        local exp = parseSimple(string, false)
-        if exp ~= string then
-            pushErrorNeedParen(string)
-        end
+        local exp = checkNeedParen(string)
         return exp
     end
 

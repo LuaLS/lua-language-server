@@ -14,13 +14,13 @@ lm:source_set 'code_format' {
         -- codeFormatLib
         "CodeFormatLib/src/*.cpp",
         -- LuaParser
-        "LuaParser/src/**.cpp",
+        "LuaParser/src/**/*.cpp",
         -- Util
         "Util/src/StringUtil.cpp",
         "Util/src/Utf8.cpp",
         "Util/src/SymSpell/*.cpp",
         --CodeService
-        "CodeService/src/**.cpp",
+        "CodeService/src/**/*.cpp",
     },
     windows = {
         flags = "/utf-8",

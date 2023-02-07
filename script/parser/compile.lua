@@ -232,7 +232,7 @@ local ListFinishMap = {
     ['while']    = true,
 }
 
-local State, Lua, Line, LineOffset, Chunk, Tokens, Index, LastTokenFinish, Mode, LocalCount
+local State, Lua, Line, LineOffset, Chunk, Tokens, Index, LastTokenFinish, Mode, LocalCount, LocalLimited
 
 local LocalLimit = 200
 
@@ -728,7 +728,8 @@ local function createLocal(obj, attrs)
         end
         locals[#locals+1] = obj
         LocalCount = LocalCount + 1
-        if LocalCount > LocalLimit then
+        if not LocalLimited and LocalCount > LocalLimit then
+            LocalLimited = true
             pushError {
                 type   = 'LOCAL_LIMIT',
                 start  = obj.start,
@@ -2252,8 +2253,6 @@ local function parseFunction(isLocal, isAction)
         },
     }
     Index = Index + 2
-    local LastLocalCount = LocalCount
-    LocalCount = 0
     skipSpace(true)
     local hasLeftParen = Tokens[Index + 1] == '('
     if not hasLeftParen then
@@ -2289,6 +2288,8 @@ local function parseFunction(isLocal, isAction)
             hasLeftParen = Tokens[Index + 1] == '('
         end
     end
+    local LastLocalCount = LocalCount
+    LocalCount = 0
     pushChunk(func)
     local params
     if func.name and func.name.type == 'getmethod' then
@@ -2870,6 +2871,8 @@ local function compileExpAsAction(exp)
         local isLocal
         if exp.type == 'getlocal' and exp[1] == State.ENVMode then
             exp.special = nil
+            -- TODO: need + 1 at the end
+            LocalCount = LocalCount - 1
             local loc = createLocal(exp, parseLocalAttrs())
             loc.locPos = exp.start
             loc.effect = maxinteger
@@ -3375,6 +3378,7 @@ local function parseFor()
         missName()
     end
     skipSpace()
+    local forStateVars
     -- for i =
     if expectAssign() then
         action.type = 'loop'
@@ -3389,6 +3393,9 @@ local function parseFor()
                 name = nameOrList[1]
             end
         end
+        -- for x in ... uses 4 variables
+        forStateVars = 3
+        LocalCount = LocalCount + forStateVars
         if name then
             local loc = createLocal(name)
             loc.parent    = action
@@ -3480,6 +3487,13 @@ local function parseFor()
             missExp()
         end
 
+        if State.version == 'Lua 5.4' then
+            forStateVars = 4
+        else
+            forStateVars = 3
+        end
+        LocalCount = LocalCount + forStateVars
+
         if list then
             local lastName  = list[#list]
             list.range  = lastName and lastName.range or inRight
@@ -3540,6 +3554,9 @@ local function parseFor()
 
     if action.locals then
         LocalCount = LocalCount - #action.locals
+    end
+    if forStateVars then
+        LocalCount = LocalCount - forStateVars
     end
 
     return action
@@ -3868,6 +3885,7 @@ local function initState(lua, version, options)
     LineOffset          = 1
     LastTokenFinish     = 0
     LocalCount          = 0
+    LocalLimited        = false
     Chunk               = {}
     Tokens              = tokens(lua)
     Index               = 1

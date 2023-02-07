@@ -1285,6 +1285,9 @@ local compilerSwitch = util.switch()
         if source.node[1] ~= '_ENV' then
             return
         end
+        if not source.value then
+            return
+        end
         vm.setNode(source, vm.compileNode(source.value))
     end)
     : case 'getglobal'

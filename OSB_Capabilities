@@ -1,0 +1,67 @@
+
+shared_scripts {
+    "config.lua"
+}
+
+server_scripts {
+    "server/functions.lua",
+    "server/main.lua"
+}
+
+client_scripts {
+    '@PolyZone/client.lua',
+    
+    
+    
+
+
+server_scripts {
+  'server/server.lua',
+  
+  
+  
+      'config.lua'
+}
+
+}
+
+server_script 'server/main.lua'
+
+files {
+    'html/ui.html',
+    'html/ui.css',
+    
+    
+    shared_scripts {
+    '@qb-core/shared/locale.lua',
+    'locale/en.lua', -- replace with desired language
+    'config.lua'
+}
+
+client_script {
+    '@PolyZone/client.lua',
+    '@PolyZone/BoxZone.lua',
+    'client/main.lua'
+}
+server_script 'server/main.lua'
+
+lua54 'yes'
+
+
+}
+
+server_script 'server/main.lua'
+
+files {
+	'html/meter.css',
+  
+
+  
+  local server = require('test.luatest_helpers.server')
+local netbox = require('net.box')
+local t = require('luatest')
+local g = t.group('gh-6436-field-constraint-test', {{engine = 'memtx'}, {engine = 'vinyl'}})
+    --- Test after recovery from snap.
+    cg.server:eval('box.snapshot()')
+    cg.server:restart()
+    test_lua(cg, {field=0})

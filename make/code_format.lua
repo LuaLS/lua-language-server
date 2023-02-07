@@ -23,8 +23,7 @@ lm:source_set 'code_format' {
         "CodeService/src/**.cpp",
     },
     windows = {
-        -- 不要开哦
-        -- flasg = "/W3 /WX"
+        flags = "/utf-8",
     },
     macos = {
         flags = "-Wall -Werror",

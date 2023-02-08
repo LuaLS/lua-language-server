@@ -287,6 +287,11 @@ _VERSION = 'Lua 5.4'
 ]]
 
 TEST 'table' [[
+---@type table
+local <?t?>
+]]
+
+TEST 'table' [[
 <?x?> = setmetatable({})
 ]]
 

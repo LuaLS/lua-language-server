@@ -147,10 +147,14 @@ local viewNodeSwitch;viewNodeSwitch = util.switch()
                 end
             end
         end
+        infer._drop[source.node[1]] = true
         return ('%s<%s>'):format(source.node[1], table.concat(buf, ', '))
     end)
     : case 'doc.type.table'
     : call(function (source, infer, uri)
+        if source.hideView then
+            return
+        end
         if #source.fields == 0 then
             infer._hasTable = true
             return

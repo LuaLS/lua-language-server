@@ -246,7 +246,7 @@ function mt:resolve(uri, args)
         local argNode = vm.compileNode(arg)
         local knownTypes = getSignInfo(sign)
         if not isAllResolved() then
-            local newArgNode = buildArgNode(argNode,sign, knownTypes)
+            local newArgNode = buildArgNode(argNode, sign, knownTypes)
             resolve(sign, newArgNode)
         end
     end

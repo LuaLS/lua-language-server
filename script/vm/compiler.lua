@@ -1772,17 +1772,13 @@ local compilerSwitch = util.switch()
                     if set.extends then
                         for _, ext in ipairs(set.extends) do
                             if ext.type == 'doc.type.table' then
-                                if not vm.getGeneric(ext) then
-                                    vm.setNode(source, vm.compileNode(ext))
-                                end
+                                vm.setNode(source, vm.compileNode(ext))
                             end
                         end
                     end
                 end
                 if set.type == 'doc.alias' then
-                    if not vm.getGeneric(set.extends) then
-                        vm.setNode(source, vm.compileNode(set.extends))
-                    end
+                    vm.setNode(source, vm.compileNode(set.extends))
                 end
             end
         end

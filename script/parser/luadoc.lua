@@ -157,6 +157,7 @@ Symbol              <-  ({} {
 ---@field generics?         parser.object[]
 ---@field generic?          parser.object
 ---@field hasGeneric?       true
+---@field hideView?         true
 
 local function parseTokens(text, offset)
     Ci = 0
@@ -335,6 +336,17 @@ local function parseTable(parent)
     return typeUnit
 end
 
+local function markHasGeneric(obj)
+    if not obj or obj.type == 'doc' then
+        return
+    end
+    if obj.hasGeneric then
+        return
+    end
+    obj.hasGeneric = true
+    markHasGeneric(obj.parent)
+end
+
 local function parseSigns(parent)
     if not checkToken('symbol', '<', 1) then
         return nil
@@ -352,6 +364,7 @@ local function parseSigns(parent)
             break
         end
         sign.generic = sign
+        markHasGeneric(sign)
         signs[#signs+1] = sign
         if checkToken('symbol', ',', 1) then
             nextToken()
@@ -845,6 +858,9 @@ local docSwitch = util.switch()
                     finish = getFinish(),
                 }
                 return result
+            end
+            if extend.type == 'doc.type.table' then
+                extend.hideView = true
             end
             result.extends[#result.extends+1] = extend
             result.finish = getFinish()
@@ -1630,17 +1646,6 @@ local function isNextLine(lastDoc, nextDoc)
     local lastRow = guide.rowColOf(lastDoc.finish)
     local newRow  = guide.rowColOf(nextDoc.start)
     return newRow - lastRow == 1
-end
-
-local function markHasGeneric(obj)
-    if obj.type == 'doc' then
-        return
-    end
-    if obj.hasGeneric then
-        return
-    end
-    obj.hasGeneric = true
-    markHasGeneric(obj.parent)
 end
 
 local function bindGeneric(binded)

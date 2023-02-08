@@ -12,10 +12,22 @@ local mt = {}
 mt.__index = mt
 mt.type = 'generic'
 
+local function markHasGeneric(obj)
+    if obj.type == 'doc' then
+        return
+    end
+    if obj.hasGeneric then
+        return
+    end
+    obj.hasGeneric = true
+    markHasGeneric(obj.parent)
+end
+
 ---@param source    vm.object?
 ---@param resolved? table<parser.object, vm.node>
+---@param parent?   parser.object
 ---@return vm.object?
-local function cloneObject(source, resolved)
+local function cloneObject(source, resolved, parent)
     if not resolved or not source then
         return source
     end
@@ -25,13 +37,15 @@ local function cloneObject(source, resolved)
             type    = source.type,
             start   = source.start,
             finish  = source.finish,
-            parent  = source.parent,
+            parent  = parent or source.parent,
             generic = source.generic,
             [1]     = source[1],
         }
         if resolved[generic] then
             vm.setNode(newName, resolved[generic], true)
             newName._resolved = resolved[generic]
+        else
+            markHasGeneric(newName)
         end
         return newName
     end
@@ -40,12 +54,12 @@ local function cloneObject(source, resolved)
             type     = source.type,
             start    = source.start,
             finish   = source.finish,
-            parent   = source.parent,
+            parent   = parent or source.parent,
             optional = source.optional,
             types    = {},
         }
         for i, typeUnit in ipairs(source.types) do
-            local newObj     = cloneObject(typeUnit, resolved)
+            local newObj     = cloneObject(typeUnit, resolved, newType)
             newType.types[i] = newObj
         end
         return newType
@@ -55,10 +69,10 @@ local function cloneObject(source, resolved)
             type    = source.type,
             start   = source.start,
             finish  = source.finish,
-            parent  = source.parent,
+            parent  = parent or source.parent,
             name    = source.name,
-            extends = cloneObject(source.extends, resolved)
         }
+        newArg.extends = cloneObject(source.extends, resolved, newArg)
         return newArg
     end
     if source.type == 'doc.type.array' then
@@ -66,9 +80,9 @@ local function cloneObject(source, resolved)
             type   = source.type,
             start  = source.start,
             finish = source.finish,
-            parent = source.parent,
-            node   = cloneObject(source.node, resolved),
+            parent = parent or source.parent,
         }
+        newArray.node   = cloneObject(source.node, resolved, newArray)
         return newArray
     end
     if source.type == 'doc.type.table' then
@@ -76,7 +90,7 @@ local function cloneObject(source, resolved)
             type   = source.type,
             start  = source.start,
             finish = source.finish,
-            parent = source.parent,
+            parent = parent or source.parent,
             fields = {},
         }
         for i, field in ipairs(source.fields) do
@@ -85,9 +99,9 @@ local function cloneObject(source, resolved)
                 start   = field.start,
                 finish  = field.finish,
                 parent  = newTable,
-                name    = cloneObject(field.name, resolved),
-                extends = cloneObject(field.extends, resolved),
             }
+            newField.name    = cloneObject(field.name, resolved, newField)
+            newField.extends = cloneObject(field.extends, resolved, newField)
             newTable.fields[i] = newField
         end
         return newTable
@@ -97,20 +111,20 @@ local function cloneObject(source, resolved)
             type    = source.type,
             start   = source.start,
             finish  = source.finish,
-            parent  = source.parent,
+            parent  = parent or source.parent,
             args    = {},
             returns = {},
         }
         for i, arg in ipairs(source.args) do
-            local newObj = cloneObject(arg, resolved)
+            local newObj = cloneObject(arg, resolved, newDocFunc)
             newObj.optional    = arg.optional
             newDocFunc.args[i] = newObj
         end
         for i, ret in ipairs(source.returns) do
-            local newObj  = cloneObject(ret, resolved)
+            local newObj  = cloneObject(ret, resolved, newDocFunc)
             newObj.parent   = newDocFunc
             newObj.optional = ret.optional
-            newDocFunc.returns[i] = cloneObject(ret, resolved)
+            newDocFunc.returns[i] = cloneObject(ret, resolved, newDocFunc)
         end
         return newDocFunc
     end

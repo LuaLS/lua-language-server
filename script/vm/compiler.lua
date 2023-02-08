@@ -1635,21 +1635,13 @@ local compilerSwitch = util.switch()
             return
         end
         for _, set in ipairs(global:getSets(uri)) do
-            if set.type == 'doc.class' then
-                if set.extends then
-                    for _, ext in ipairs(set.extends) do
-                        if ext.type == 'doc.type.table' then
-                            if vm.getGeneric(ext) then
-                                local resolved = vm.getGeneric(ext):resolve(uri, source.signs)
-                                vm.setNode(source, resolved)
-                            end
-                        end
-                    end
-                end
-            end
-            if set.type == 'doc.alias' then
-                if vm.getGeneric(set.extends) then
-                    local resolved = vm.getGeneric(set.extends):resolve(uri, source.signs)
+            if set.type == 'doc.class'
+            or set.type == 'doc.alias' then
+                local sign = vm.getSign(set)
+                if sign then
+                    local generic = vm.getGeneric(set)
+                                 or vm.createGeneric(set, sign)
+                    local resolved = generic:resolve(uri, source.signs)
                     vm.setNode(source, resolved)
                 end
             end

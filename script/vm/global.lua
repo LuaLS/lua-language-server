@@ -320,21 +320,6 @@ local compilerGlobalSwitch = util.switch()
         local class = vm.declareGlobal('type', name, uri)
         class:addSet(uri, source)
         source._globalNode = class
-
-        if source.signs then
-            local sign = vm.createSign()
-            vm.setSign(source, sign)
-            for _, obj in ipairs(source.signs) do
-                sign:addSign(vm.compileNode(obj))
-            end
-            if source.extends then
-                for _, ext in ipairs(source.extends) do
-                    if ext.type == 'doc.type.table' then
-                        vm.setGeneric(ext, vm.createGeneric(ext, sign))
-                    end
-                end
-            end
-        end
     end)
     : case 'doc.alias'
     : call(function (source)
@@ -346,14 +331,6 @@ local compilerGlobalSwitch = util.switch()
         local alias = vm.declareGlobal('type', name, uri)
         alias:addSet(uri, source)
         source._globalNode = alias
-
-        if source.signs then
-            source._sign = vm.createSign()
-            for _, sign in ipairs(source.signs) do
-                source._sign:addSign(vm.compileNode(sign))
-            end
-            source.extends._generic = vm.createGeneric(source.extends, source._sign)
-        end
     end)
     : case 'doc.enum'
     : call(function (source)

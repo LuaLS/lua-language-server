@@ -31,6 +31,9 @@ local function cloneObject(source, resolved, parent)
     if not resolved or not source then
         return source
     end
+    if not source.hasGeneric then
+        return source
+    end
     if source.type == 'doc.generic.name' then
         local generic = source.generic
         local newName = {
@@ -94,15 +97,19 @@ local function cloneObject(source, resolved, parent)
             fields = {},
         }
         for i, field in ipairs(source.fields) do
-            local newField = {
-                type    = field.type,
-                start   = field.start,
-                finish  = field.finish,
-                parent  = newTable,
-            }
-            newField.name    = cloneObject(field.name, resolved, newField)
-            newField.extends = cloneObject(field.extends, resolved, newField)
-            newTable.fields[i] = newField
+            if field.hasGeneric then
+                local newField = {
+                    type    = field.type,
+                    start   = field.start,
+                    finish  = field.finish,
+                    parent  = newTable,
+                }
+                newField.name    = cloneObject(field.name, resolved, newField)
+                newField.extends = cloneObject(field.extends, resolved, newField)
+                newTable.fields[i] = newField
+            else
+                newTable.fields[i] = field
+            end
         end
         return newTable
     end
@@ -122,7 +129,6 @@ local function cloneObject(source, resolved, parent)
         end
         for i, ret in ipairs(source.returns) do
             local newObj  = cloneObject(ret, resolved, newDocFunc)
-            newObj.parent   = newDocFunc
             newObj.optional = ret.optional
             newDocFunc.returns[i] = cloneObject(ret, resolved, newDocFunc)
         end
@@ -164,12 +170,6 @@ function vm.getGenericResolved(source)
 end
 
 ---@param source parser.object
----@param generic vm.generic
-function vm.setGeneric(source, generic)
-    source._generic = generic
-end
-
----@param source parser.object
 ---@return vm.generic?
 function vm.getGeneric(source)
     return source._generic
@@ -183,5 +183,6 @@ function vm.createGeneric(proto, sign)
         sign  = sign,
         proto = proto,
     }, mt)
+    proto._generic = generic
     return generic
 end

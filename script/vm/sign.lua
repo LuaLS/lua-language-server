@@ -306,24 +306,18 @@ function vm.getSign(source)
             end
         end
     end
-    if source.type == 'doc.type.function'
-    or source.type == 'doc.type.table'
-    or source.type == 'doc.type.array' then
+    if source.type == 'doc.type.function' then
         if not source.hasGeneric then
-            return
+            return nil
         end
         source._sign = vm.createSign()
-        if source.type == 'doc.type.function' then
+        if source.args then
             for _, arg in ipairs(source.args) do
-                if arg.extends then
-                    local argNode = vm.compileNode(arg.extends)
-                    if arg.optional then
-                        argNode:addOptional()
-                    end
-                    source._sign:addSign(argNode)
-                else
-                    source._sign:addSign(vm.createNode())
+                local argNode = vm.compileNode(arg)
+                if arg.optional then
+                    argNode:addOptional()
                 end
+                source._sign:addSign(argNode)
             end
         end
         local mark = {}
@@ -335,6 +329,18 @@ function vm.getSign(source)
                 source._sign:addGenericObject(genericObject)
             end
         end)
+    end
+    if source.type == 'doc.class'
+    or source.type == 'doc.alias' then
+        if not source.signs then
+            return nil
+        end
+        source._sign = vm.createSign()
+        for _, sign in ipairs(source.signs) do
+            local signNode = vm.compileNode(sign)
+            source._sign:addSign(signNode)
+            source._sign:addGenericObject(sign.generic)
+        end
     end
     return source._sign or nil
 end

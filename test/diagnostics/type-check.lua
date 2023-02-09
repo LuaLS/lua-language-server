@@ -1211,6 +1211,16 @@ local y
 x = y
 ]]
 
+TEST [[
+---@type table<string, string>
+local x
+
+---@type table
+local y
+
+x = y
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

@@ -3861,8 +3861,8 @@ TEST 'integer[]' [[
 ---@return T[]
 local function x(f) end
 
----@param x integer
-local <?arr?> = x(function (x) end)
+---@param y integer
+local <?arr?> = x(function (y) end)
 ]]
 
 TEST 'integer[]' [[

@@ -153,7 +153,9 @@ function mt:resolve(uri, args)
                     or n.type == 'doc.type.function' then
                         ---@cast n parser.object
                         local farg = n.args and n.args[i]
-                        if farg then
+                        if  farg
+                        and not farg.hasGeneric
+                        and farg.type ~= 'generic' then
                             resolve(arg.extends, vm.compileNode(farg))
                         end
                     end
@@ -165,7 +167,9 @@ function mt:resolve(uri, args)
                     or n.type == 'doc.type.function' then
                         ---@cast n parser.object
                         local fret = vm.getReturnOfFunction(n, i)
-                        if fret then
+                        if  fret
+                        and not fret.hasGeneric
+                        and fret.type ~= 'generic' then
                             resolve(ret, vm.compileNode(fret))
                         end
                     end

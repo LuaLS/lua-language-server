@@ -174,8 +174,18 @@ function mt:resolve(uri, args, removeUnresolved)
     local protoNode = vm.compileNode(self.proto)
     local result = vm.createNode()
     for nd in protoNode:eachObject() do
-        if nd.type == 'global' or nd.type == 'variable' then
-            ---@cast nd vm.global | vm.variable
+        if nd.type == 'global' then
+            ---@cast nd vm.global
+            if nd.cate == 'variable' then
+                result:merge(nd)
+            end
+            if nd.cate == 'type' then
+                if not nd:getSigns(uri) then
+                    result:merge(nd)
+                end
+            end
+        elseif nd.type == 'variable' then
+            ---@cast nd vm.variable
             result:merge(nd)
         else
             ---@cast nd -vm.global, -vm.variable

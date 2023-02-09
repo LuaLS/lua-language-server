@@ -165,12 +165,13 @@ local function checkChildEnum(childName, parent , uri, mark, errs)
     return true
 end
 
+---@param uri    uri
 ---@param parent vm.node.object
 ---@param child  vm.node.object
 ---@param mark   table
 ---@param errs?  typecheck.err[]
 ---@return boolean
-local function checkValue(parent, child, mark, errs)
+local function checkValue(uri, parent, child, mark, errs)
     if parent.type == 'doc.type.integer' then
         if child.type == 'integer'
         or child.type == 'doc.type.integer'
@@ -226,7 +227,6 @@ local function checkValue(parent, child, mark, errs)
             end
             ---@cast parent parser.object
             ---@cast child parser.object
-            local uri = guide.getUri(parent)
             local tnode = vm.compileNode(child)
             for _, pfield in ipairs(parent.fields) do
                 local knode = vm.compileNode(pfield.name)
@@ -404,17 +404,7 @@ function vm.isSubType(uri, child, parent, mark, errs)
     end
 
     if childName == parentName then
-        if parent.type == 'global' and parent.cate == 'type' then
-            if parent:hasSigns(uri) then
-                return nil
-            end
-        end
-        if child.type == 'global' and child.cate == 'type' then
-            if child:hasSigns(uri) then
-                return nil
-            end
-        end
-        if not checkValue(parent, child, mark, errs) then
+        if not checkValue(uri, parent, child, mark, errs) then
             return false
         end
         return true

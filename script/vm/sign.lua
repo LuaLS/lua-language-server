@@ -192,7 +192,7 @@ function mt:resolve(uri, args)
                 goto CONTINUE
             end
             if  obj.type == 'global'
-            and obj:hasSigns(uri) then
+            and obj:getSigns(uri) then
                 goto CONTINUE
             end
             local view = vm.getInfer(obj):view(uri)

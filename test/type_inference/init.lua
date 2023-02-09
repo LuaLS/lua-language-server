@@ -4287,3 +4287,9 @@ local function f(x)
     local <?v?> = g(x)
 end
 ]]
+
+TEST 'unknown' [[
+local t = setmetatable({}, {})
+
+local <?v?> = t[x]
+]]

@@ -526,7 +526,7 @@ function vm.getTableValue(uri, tnode, knode, inversion)
     for tn in tnode:eachObject() do
         if tn.type == 'doc.type.table' then
             for _, field in ipairs(tn.fields) do
-                if field.extends then
+                if field.extends and not field.hasGeneric then
                     if inversion then
                         if vm.isSubType(uri, vm.compileNode(field.name), knode) then
                             result:merge(vm.compileNode(field.extends))
@@ -600,7 +600,8 @@ function vm.getTableKey(uri, tnode, vnode, reverse)
         if tn.type == 'doc.type.table' then
             for _, field in ipairs(tn.fields) do
                 if  field.name.type ~= 'doc.field.name'
-                and field.extends then
+                and field.extends
+                and not field.hasGeneric then
                     if reverse then
                         if vm.isSubType(uri, vm.compileNode(field.extends), vnode) then
                             result:merge(vm.compileNode(field.name))

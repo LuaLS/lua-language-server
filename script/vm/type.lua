@@ -404,6 +404,16 @@ function vm.isSubType(uri, child, parent, mark, errs)
     end
 
     if childName == parentName then
+        if parent.type == 'global' and parent.cate == 'type' then
+            if parent:hasSigns(uri) then
+                return nil
+            end
+        end
+        if child.type == 'global' and child.cate == 'type' then
+            if child:hasSigns(uri) then
+                return nil
+            end
+        end
         if not checkValue(parent, child, mark, errs) then
             return false
         end

@@ -169,6 +169,9 @@ return function (uri, offset)
         if src.type == 'self' then
             goto CONTINUE
         end
+        if src.hideView then
+            goto CONTINUE
+        end
         src = src.field or src.method or src
         if src.type == 'getindex'
         or src.type == 'setindex'

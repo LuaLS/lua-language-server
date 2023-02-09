@@ -22,6 +22,7 @@ local globalSubs = util.multiTable(2)
 ---@field links table<uri, vm.global.link>
 ---@field setsCache? table<uri, parser.object[]>
 ---@field cate vm.global.cate
+---@field hasSignsCache? boolean
 local mt = {}
 mt.__index = mt
 mt.type = 'global'
@@ -33,6 +34,7 @@ function mt:addSet(uri, source)
     local link = self.links[uri]
     link.sets[#link.sets+1] = source
     self.setsCache = nil
+    self.hasSignsCache = nil
 end
 
 ---@param uri    uri
@@ -75,11 +77,16 @@ end
 ---@param uri uri
 ---@return boolean
 function mt:hasSigns(uri)
+    if self.hasSignsCache ~= nil then
+        return self.hasSignsCache
+    end
     for _, set in ipairs(self:getSets(uri)) do
         if set.signs then
+            self.hasSignsCache = true
             return true
         end
     end
+    self.hasSignsCache = false
     return false
 end
 
@@ -108,6 +115,7 @@ end
 function mt:dropUri(uri)
     self.links[uri] = nil
     self.setsCache = nil
+    self.hasSignsCache = nil
 end
 
 ---@return string

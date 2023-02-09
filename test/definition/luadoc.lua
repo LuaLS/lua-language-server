@@ -152,7 +152,7 @@ local <!<?x?>!>
 ]]
 
 TEST [[
----@class A: <!{}!>
+---@class A: {}
 
 ---@type A
 local <!<?x?>!>
@@ -647,7 +647,7 @@ TEST [[
 ---@type TT<A>
 local t
 
----@class A: <!{}!>
+---@class A: {}
 
 print(t.<?x?>)
 ]]
@@ -658,7 +658,7 @@ TEST [[
 ---@type TT<A>
 local t
 
----@class A: <!{}!>
+---@class A: {}
 
 print(t.<?x?>)
 ]]

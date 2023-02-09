@@ -1087,16 +1087,13 @@ local function bindReturnOfFunction(source, mfunc, index, args)
     local returnNode = vm.compileNode(returnObject)
     for rnode in returnNode:eachObject() do
         if rnode.type == 'generic' then
-            returnNode = rnode:resolve(guide.getUri(source), args)
+            returnNode = rnode:resolve(guide.getUri(source), args, true)
             break
         end
     end
     if returnNode then
         for rnode in returnNode:eachObject() do
-            -- TODO: narrow type
-            if rnode.type ~= 'doc.generic.name' then
-                vm.setNode(source, rnode)
-            end
+            vm.setNode(source, rnode)
         end
         if returnNode:isOptional() then
             vm.getNode(source):addOptional()

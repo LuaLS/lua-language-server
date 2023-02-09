@@ -26,9 +26,10 @@ end
 ---@param source    vm.object?
 ---@param resolved? table<parser.object, vm.node>
 ---@param parent?   parser.object
+---@param removeUnresolved? boolean
 ---@return vm.object?
-local function cloneObject(source, resolved, parent)
-    if not resolved or not source then
+local function cloneObject(source, resolved, parent, removeUnresolved)
+    if not source then
         return source
     end
     if not source.hasGeneric then
@@ -45,11 +46,32 @@ local function cloneObject(source, resolved, parent)
             cloned  = true,
             [1]     = source[1],
         }
-        if resolved[generic] then
-            vm.setNode(newName, resolved[generic], true)
-            newName._resolved = resolved[generic]
+        local resolvedNode = resolved and resolved[generic]
+        if not resolvedNode then
+            if removeUnresolved then
+                newName.type = 'doc.generic.resolved'
+            else
+                markHasGeneric(newName)
+            end
+            return newName
         end
-        markHasGeneric(newName)
+
+        vm.setNode(newName, resolvedNode, true)
+        newName._resolved = resolvedNode
+        local hasGeneric
+        for n in resolvedNode:eachObject() do
+            if n.type == 'doc.generic.name' then
+                hasGeneric = true
+                break
+            end
+        end
+
+        if hasGeneric then
+            markHasGeneric(newName)
+        else
+            newName.type = 'doc.generic.resolved'
+        end
+
         return newName
     end
     if source.type == 'doc.type' then
@@ -145,8 +167,9 @@ end
 
 ---@param uri uri
 ---@param args parser.object
+---@param removeUnresolved? boolean
 ---@return vm.node
-function mt:resolve(uri, args)
+function mt:resolve(uri, args, removeUnresolved)
     local resolved  = self.sign:resolve(uri, args)
     local protoNode = vm.compileNode(self.proto)
     local result = vm.createNode()
@@ -156,7 +179,7 @@ function mt:resolve(uri, args)
             result:merge(nd)
         else
             ---@cast nd -vm.global, -vm.variable
-            local clonedObject = cloneObject(nd, resolved)
+            local clonedObject = cloneObject(nd, resolved, nil, removeUnresolved)
             if clonedObject then
                 local clonedNode   = vm.compileNode(clonedObject)
                 result:merge(clonedNode)

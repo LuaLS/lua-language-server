@@ -933,10 +933,17 @@ local function compileForVars(source, target)
     --> local k, v = iterator(status, initValue)
     if not source._iterator then
         source._iterator = {
-            type = 'dummyfunc',
+            type = 'forstate.iterator',
             parent = source,
         }
-        source._iterArgs = {{},{}}
+        source._iterArgs = {
+            {
+                type = 'forstate.table'
+            },
+            {
+                type = 'forstate.initValue'
+            },
+        }
         source._iterVars = {}
     end
     -- iterator
@@ -1643,6 +1650,7 @@ local compilerSwitch = util.switch()
                                  or vm.createGeneric(set, sign)
                     local resolved = generic:resolve(uri, source.signs)
                     vm.setNode(source, resolved)
+                    break
                 end
             end
         end

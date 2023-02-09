@@ -42,14 +42,14 @@ local function cloneObject(source, resolved, parent)
             finish  = source.finish,
             parent  = parent or source.parent,
             generic = source.generic,
+            cloned  = true,
             [1]     = source[1],
         }
         if resolved[generic] then
             vm.setNode(newName, resolved[generic], true)
             newName._resolved = resolved[generic]
-        else
-            markHasGeneric(newName)
         end
+        markHasGeneric(newName)
         return newName
     end
     if source.type == 'doc.type' then
@@ -59,6 +59,7 @@ local function cloneObject(source, resolved, parent)
             finish   = source.finish,
             parent   = parent or source.parent,
             optional = source.optional,
+            cloned   = true,
             types    = {},
         }
         for i, typeUnit in ipairs(source.types) do
@@ -74,6 +75,7 @@ local function cloneObject(source, resolved, parent)
             finish  = source.finish,
             parent  = parent or source.parent,
             name    = source.name,
+            cloned  = true,
         }
         newArg.extends = cloneObject(source.extends, resolved, newArg)
         return newArg
@@ -84,6 +86,7 @@ local function cloneObject(source, resolved, parent)
             start  = source.start,
             finish = source.finish,
             parent = parent or source.parent,
+            cloned = true,
         }
         newArray.node   = cloneObject(source.node, resolved, newArray)
         return newArray
@@ -94,6 +97,7 @@ local function cloneObject(source, resolved, parent)
             start  = source.start,
             finish = source.finish,
             parent = parent or source.parent,
+            cloned = true,
             fields = {},
         }
         for i, field in ipairs(source.fields) do
@@ -103,6 +107,7 @@ local function cloneObject(source, resolved, parent)
                     start   = field.start,
                     finish  = field.finish,
                     parent  = newTable,
+                    cloned  = true,
                 }
                 newField.name    = cloneObject(field.name, resolved, newField)
                 newField.extends = cloneObject(field.extends, resolved, newField)
@@ -119,6 +124,7 @@ local function cloneObject(source, resolved, parent)
             start   = source.start,
             finish  = source.finish,
             parent  = parent or source.parent,
+            cloned  = true,
             args    = {},
             returns = {},
         }

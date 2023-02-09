@@ -72,6 +72,17 @@ function mt:getSets(suri)
     return cache
 end
 
+---@param uri uri
+---@return boolean
+function mt:hasSigns(uri)
+    for _, set in ipairs(self:getSets(uri)) do
+        if set.signs then
+            return true
+        end
+    end
+    return false
+end
+
 ---@return parser.object[]
 function mt:getAllSets()
     if not self.setsCache then
@@ -574,6 +585,7 @@ function vm.getGlobalBase(source)
             type   = 'globalbase',
             parent = root,
             global = global,
+            signs  = source.signs,
             start  = 0,
             finish = 0,
         }

@@ -242,6 +242,27 @@ table = {}
 <?table?>()
 ]]
 
+TEST 'X' [[
+---@class X
+
+---@type X
+local <?x?>
+]]
+
+TEST 'X' [[
+---@class X<T>
+
+---@type X
+local <?x?>
+]]
+
+TEST 'X<string>' [[
+---@class X<T>
+
+---@type X<string>
+local <?x?>
+]]
+
 TEST 'string' [[
 _VERSION = 'Lua 5.4'
 
@@ -637,10 +658,10 @@ local k, v = next(<?t?>)
 TEST 'string' [[
 ---@class string
 
----@generic K, V
----@param t table<K, V>
----@return K
----@return V
+---@generic KK, VV
+---@param t table<KK, VV>
+---@return KK
+---@return VV
 local function next(t) end
 
 ---@type table<string, boolean>

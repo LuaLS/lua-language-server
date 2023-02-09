@@ -69,13 +69,10 @@ function mt:resolve(uri, args)
             else
                 -- number -> T
                 for n in node:eachObject() do
-                    if  n.type ~= 'doc.generic.name'
-                    and n.type ~= 'generic' then
-                        if resolved[generic] then
-                            resolved[generic]:merge(n)
-                        else
-                            resolved[generic] = vm.createNode(n)
-                        end
+                    if resolved[generic] then
+                        resolved[generic]:merge(n)
+                    else
+                        resolved[generic] = vm.createNode(n)
                     end
                 end
                 if resolved[generic] and node:isOptional() then
@@ -188,6 +185,10 @@ function mt:resolve(uri, args)
             end
             if obj.type == 'variable'
             or obj.type == 'local' then
+                goto CONTINUE
+            end
+            if  obj.type == 'global'
+            and obj:hasSigns(uri) then
                 goto CONTINUE
             end
             local view = vm.getInfer(obj):view(uri)

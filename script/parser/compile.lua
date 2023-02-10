@@ -118,6 +118,7 @@ local Specials = {
     ['assert']       = true,
     ['error']        = true,
     ['type']         = true,
+    ['os.exit']      = true,
 }
 
 local UnarySymbol = {
@@ -2899,14 +2900,15 @@ local function compileExpAsAction(exp)
     end
 
     if exp.type == 'call' then
-        if exp.node.special == 'error' then
+        if exp.node.special == 'error'
+        or exp.node.special == 'os.exit' then
             for i = #Chunk, 1, -1 do
                 local block = Chunk[i]
                 if block.type == 'ifblock'
                 or block.type == 'elseifblock'
                 or block.type == 'elseblock'
                 or block.type == 'function' then
-                    block.hasError = true
+                    block.hasExit = true
                     break
                 end
             end

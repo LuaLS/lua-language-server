@@ -2620,6 +2620,17 @@ end
 print(<?n?>)
 ]]
 
+TEST 'integer' [[
+---@type integer?
+local n
+
+if not n then
+    os.exit()
+end
+
+print(<?n?>)
+]]
+
 TEST 'table' [[
 ---@type table?
 local n

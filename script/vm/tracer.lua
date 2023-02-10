@@ -369,7 +369,7 @@ local lookIntoChild = util.switch()
                 local neverReturn = subBlock.hasReturn
                                 or  subBlock.hasGoTo
                                 or  subBlock.hasBreak
-                                or  subBlock.hasError
+                                or  subBlock.hasExit
                 if neverReturn then
                     mergedNode = true
                 else

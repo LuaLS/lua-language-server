@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.6.11
+* `CHG` completion: don't show loading process
 * `FIX` [#1886]
 
 [#1886]: https://github.com/LuaLS/lua-language-server/issues/1886

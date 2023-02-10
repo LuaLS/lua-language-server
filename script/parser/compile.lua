@@ -1379,12 +1379,24 @@ local function parseNumber()
     return result
 end
 
-local function isKeyWord(word)
+local function isKeyWord(word, nextToken)
     if KeyWord[word] then
         return true
     end
     if word == 'goto' then
-        return State.version ~= 'Lua 5.1'
+        if State.version == 'Lua 5.1' then
+            return false
+        end
+        if State.version == 'LuaJIT' then
+            if not nextToken then
+                return true
+            end
+            if CharMapWord[ssub(nextToken, 1, 1)] then
+                return true
+            end
+            return false
+        end
+        return true
     end
     return false
 end
@@ -1410,7 +1422,7 @@ local function parseName(asAction)
             finish = finishPos,
         }
     end
-    if isKeyWord(word) then
+    if isKeyWord(word, Tokens[Index]) then
         pushError {
             type   = 'KEYWORD',
             start  = startPos,
@@ -1491,7 +1503,7 @@ local function parseExpList(mini)
                     break
                 end
                 local nextToken = peekWord()
-                if  isKeyWord(nextToken)
+                if  isKeyWord(nextToken, Tokens[Index + 2])
                 and nextToken ~= 'function'
                 and nextToken ~= 'true'
                 and nextToken ~= 'false'
@@ -2223,7 +2235,7 @@ local function parseParams(params)
                     finish = getPosition(Tokens[Index] + #token - 1, 'right'),
                 }
             end
-            if isKeyWord(token) then
+            if isKeyWord(token, Tokens[Index + 2]) then
                 pushError {
                     type   = 'KEYWORD',
                     start  = getPosition(Tokens[Index], 'left'),

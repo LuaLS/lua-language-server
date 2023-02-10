@@ -4219,3 +4219,17 @@ end
 function Y()
 end
 ]]
+
+TEST 'A_Class' [[
+---@class A_Class
+local A = { x = 5 }
+
+function A:func()
+    for i = 1, <?self?>.x do
+        print(i)
+    end
+
+    self.y = 3
+    self.y = self.y + 3
+end
+]]

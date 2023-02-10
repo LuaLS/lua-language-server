@@ -3,12 +3,14 @@
 ## 3.6.11
 * `CHG` completion: don't show loading process
 * `FIX` [#1886]
-* `FIX` [#1895]
+* `FIX` [#1887]
 * `FIX` [#1889]
+* `FIX` [#1895]
 
 [#1886]: https://github.com/LuaLS/lua-language-server/issues/1886
-[#1895]: https://github.com/LuaLS/lua-language-server/issues/1895
+[#1887]: https://github.com/LuaLS/lua-language-server/issues/1887
 [#1889]: https://github.com/LuaLS/lua-language-server/issues/1889
+[#1895]: https://github.com/LuaLS/lua-language-server/issues/1895
 
 ## 3.6.10
 `2023-2-7`

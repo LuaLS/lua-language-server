@@ -1389,7 +1389,7 @@ local function isKeyWord(word, nextToken)
         end
         if State.version == 'LuaJIT' then
             if not nextToken then
-                return true
+                return false
             end
             if CharMapWord[ssub(nextToken, 1, 1)] then
                 return true
@@ -1422,7 +1422,7 @@ local function parseName(asAction)
             finish = finishPos,
         }
     end
-    if isKeyWord(word, Tokens[Index]) then
+    if isKeyWord(word, Tokens[Index + 1]) then
         pushError {
             type   = 'KEYWORD',
             start  = startPos,
@@ -2235,7 +2235,7 @@ local function parseParams(params)
                     finish = getPosition(Tokens[Index] + #token - 1, 'right'),
                 }
             end
-            if isKeyWord(token, Tokens[Index + 2]) then
+            if isKeyWord(token, Tokens[Index + 3]) then
                 pushError {
                     type   = 'KEYWORD',
                     start  = getPosition(Tokens[Index], 'left'),
@@ -3797,7 +3797,7 @@ function parseAction()
         return parseRepeat()
     end
 
-    if token == 'goto' and isKeyWord 'goto' then
+    if token == 'goto' and isKeyWord('goto', Tokens[Index + 3]) then
         return parseGoTo()
     end
 

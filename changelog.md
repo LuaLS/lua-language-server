@@ -6,11 +6,13 @@
 * `FIX` [#1887]
 * `FIX` [#1889]
 * `FIX` [#1895]
+* `FIX` [#1902]
 
 [#1886]: https://github.com/LuaLS/lua-language-server/issues/1886
 [#1887]: https://github.com/LuaLS/lua-language-server/issues/1887
 [#1889]: https://github.com/LuaLS/lua-language-server/issues/1889
 [#1895]: https://github.com/LuaLS/lua-language-server/issues/1895
+[#1902]: https://github.com/LuaLS/lua-language-server/issues/1902
 
 ## 3.6.10
 `2023-2-7`

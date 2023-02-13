@@ -282,6 +282,10 @@ local lookIntoChild = util.switch()
     ---@param topNode  vm.node
     ---@param outNode? vm.node
     : call(function (tracer, action, topNode, outNode)
+        if action.type == 'loop' then
+            tracer:lookIntoChild(action.init, topNode)
+            tracer:lookIntoChild(action.max, topNode)
+        end
         if action[1] then
             tracer:lookIntoBlock(action, action.bstart, topNode:copy())
             local lastAssign = tracer:getLastAssign(action.start, action.finish)
@@ -369,7 +373,7 @@ local lookIntoChild = util.switch()
                 local neverReturn = subBlock.hasReturn
                                 or  subBlock.hasGoTo
                                 or  subBlock.hasBreak
-                                or  subBlock.hasError
+                                or  subBlock.hasExit
                 if neverReturn then
                     mergedNode = true
                 else

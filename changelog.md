@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.6.11
+`2023-2-13`
 * `CHG` completion: don't show loading process
 * `FIX` [#1886]
 * `FIX` [#1887]

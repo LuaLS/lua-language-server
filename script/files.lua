@@ -887,6 +887,41 @@ function m.countStates()
     return n
 end
 
+---@param path string
+---@return string
+function m.normalize(path)
+    path = path:gsub('%$%{(.-)%}', function (key)
+        if key == '3rd' then
+            return (ROOT / 'meta' / '3rd'):string()
+        end
+        if key:sub(1, 4) == 'env:' then
+            local env = os.getenv(key:sub(5))
+            return env
+        end
+    end)
+    path = util.expandPath(path)
+    path = path:gsub('^%.[/\\]+', '')
+    for _ = 1, 1000 do
+        if path:sub(1, 2) == '..' then
+            break
+        end
+        local count
+        path, count = path:gsub('[^/\\]+[/\\]+%.%.[/\\]', '/', 1)
+        if count == 0 then
+            break
+        end
+    end
+    if platform.OS == 'Windows' then
+        path = path:gsub('[/\\]+', '\\')
+                   :gsub('[/\\]+$', '')
+                   :gsub('^(%a:)$', '%1\\')
+    else
+        path = path:gsub('[/\\]+', '/')
+                   :gsub('[/\\]+$', '')
+    end
+    return path
+end
+
 --- 注册事件
 ---@param callback async fun(ev: string, uri: uri)
 function m.watch(callback)

@@ -210,6 +210,7 @@ local template = {
                                                     'assert',
                                                     'error',
                                                     'type',
+                                                    'os.exit',
                                                 }
                                             ),
     ['Lua.runtime.meta']                    = Type.String >> '${version} ${language} ${encoding}',

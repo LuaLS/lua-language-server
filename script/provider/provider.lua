@@ -597,19 +597,7 @@ m.register 'textDocument/completion' {
     function (params)
         local uri  = files.getRealUri(params.textDocument.uri)
         if not workspace.isReady(uri) then
-            local count, max = workspace.getLoadingProcess(uri)
-            return {
-                {
-                    label = lang.script('HOVER_WS_LOADING', count, max),
-                    textEdit    = {
-                        range   = {
-                            start   = params.position,
-                            ['end'] = params.position,
-                        },
-                        newText = '',
-                    },
-                }
-            }
+            return nil
         end
         local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_COMPLETION, 0.5)
         --log.info(util.dump(params))

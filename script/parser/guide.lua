@@ -72,7 +72,7 @@ local type         = type
 ---@field hasGoTo?              true
 ---@field hasReturn?            true
 ---@field hasBreak?             true
----@field hasError?             true
+---@field hasExit?              true
 ---@field [integer]             parser.object|any
 ---@field package _root          parser.object
 

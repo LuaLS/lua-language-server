@@ -2,6 +2,7 @@ local fw    = require 'bee.filewatch'
 local fs    = require 'bee.filesystem'
 local plat  = require 'bee.platform'
 local await = require 'await'
+local files = require 'files'
 
 local MODIFY = 1 << 0
 local RENAME = 1 << 1
@@ -93,6 +94,7 @@ function m.update()
             if not ev then
                 break
             end
+            path = files.normalize(path)
             log.debug('filewatch:', ev, path)
             if not collect then
                 collect = {}

@@ -2160,22 +2160,6 @@ integer
 500
 ```
 
-# workspace.supportScheme
-
-為以下 `scheme` 的lua檔案提供語言伺服。
-
-## type
-
-```ts
-Array<string>
-```
-
-## default
-
-```jsonc
-["file","untitled","git"]
-```
-
 # workspace.useGitIgnore
 
 忽略 `.gitignore` 中列舉的檔案。

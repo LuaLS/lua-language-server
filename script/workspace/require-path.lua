@@ -81,7 +81,7 @@ function mt:getRequireResultByPath(path)
     for _, searcher in ipairs(searchers) do
         local isAbsolute = searcher:match '^[/\\]'
                         or searcher:match '^%a+%:'
-        searcher = workspace.normalize(searcher)
+        searcher = files.normalize(searcher)
         if searcher:sub(1, 1) == '.' then
             strict = true
         end
@@ -158,7 +158,7 @@ function mt:getVisiblePath(path)
     and not self.scp:isLinkedUri(uri) then
         return {}
     end
-    path = workspace.normalize(path)
+    path = files.normalize(path)
     local result = self.visibleCache[path]
     if not result then
         result = self:getRequireResultByPath(path)
@@ -196,7 +196,7 @@ function mt:searchUrisByRequireName(name)
 
     for _, searcher in ipairs(searchers) do
         local fspath = searcher:gsub('%?', (path:gsub('%%', '%%%%')))
-        fspath = workspace.normalize(fspath)
+        fspath = files.normalize(fspath)
         local tail = '/' .. furi.encode(fspath):gsub('^file:[/]*', '')
         for uri in files.eachFile(self.scp.uri) do
             if  not searcherMap[uri]
@@ -212,7 +212,7 @@ function mt:searchUrisByRequireName(name)
                 or relative == '/'
                 or relative == '' then
                     results[#results+1] = uri
-                    searcherMap[uri] = workspace.normalize(relative .. searcher)
+                    searcherMap[uri] = files.normalize(relative .. searcher)
                 end
             end
         end
@@ -294,7 +294,7 @@ function m.isMatchedUri(suri, uri, name)
 
     for _, searcher in ipairs(searchers) do
         local fspath = searcher:gsub('%?', (path:gsub('%%', '%%%%')))
-        fspath = workspace.normalize(fspath)
+        fspath = files.normalize(fspath)
         local tail = '/' .. furi.encode(fspath):gsub('^file:[/]*', '')
         if util.stringEndWith(uri, tail) then
             local parentUri = files.getLibraryUri(suri, uri) or uri

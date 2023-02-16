@@ -1201,6 +1201,16 @@ local function some_fn(some_param) return end
 some_fn { { "test" } } -- <- diagnostic: "Cannot assign `table` to `string`."
 ]]
 
+TEST [[
+---@param p integer|string
+local function get_val(p)
+    local is_number = type(p) == 'number'
+    return is_number and p or p
+end
+
+get_val('hi')
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

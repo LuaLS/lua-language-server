@@ -4,6 +4,17 @@ lm.bindir = "bin"
 lm.c = lm.compiler == 'msvc' and 'c89' or 'c11'
 lm.cxx = 'c++17'
 
+if lm.sanitize then
+    lm.mode = "debug"
+    lm.flags = "-fsanitize=address"
+    lm.gcc = {
+        ldflags = "-fsanitize=address"
+    }
+    lm.clang = {
+        ldflags = "-fsanitize=address"
+    }
+end
+
 ---@diagnostic disable-next-line: codestyle-check
 lm.EXE_DIR = ""
 
@@ -79,23 +90,24 @@ end
 local platform = require 'bee.platform'
 local exe      = platform.OS == 'Windows' and ".exe" or ""
 
-lm:build "bee-test" {
-    lm.bindir .. "/lua-language-server" .. exe, "3rd/bee.lua/test/test.lua",
+lm:rule "runtest" {
+    lm.bindir .. "/lua-language-server" .. exe, "$in",
+    description = "Run test: $in.",
     pool = "console",
-    deps = {
-        "all",
-    }
+}
+
+lm:build "bee-test" {
+    rule = "runtest",
+    deps = { "all" },
+    input = "3rd/bee.lua/test/test.lua",
 }
 
 lm:build 'unit-test' {
-    lm.bindir .. "/lua-language-server" .. exe, 'test.lua',
-    pool = "console",
-    deps = {
-        "bee-test",
-    }
+    rule = "runtest",
+    deps = { "bee-test", "all" },
+    input = "test.lua",
 }
 
 lm:default {
-    "bee-test",
     "unit-test",
 }

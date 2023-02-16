@@ -217,14 +217,14 @@ function m.getLibraryMatchers(scp)
     for _, path in ipairs(config.get(scp.uri, 'Lua.workspace.library')) do
         path = m.getAbsolutePath(scp.uri, path)
         if path then
-            librarys[m.normalize(path)] = true
+            librarys[files.normalize(path)] = true
         end
     end
     local metaPaths = scp:get 'metaPaths'
     log.debug('meta path:', inspect(metaPaths))
     if metaPaths then
         for _, metaPath in ipairs(metaPaths) do
-            librarys[m.normalize(metaPath)] = true
+            librarys[files.normalize(metaPath)] = true
         end
     end
 
@@ -326,7 +326,7 @@ function m.awaitPreload(scp)
 
     if scp.uri and not scp:get('bad root') then
         log.info('Scan files at:', scp:getName())
-        scp:gc(fw.watch(m.normalize(furi.decode(scp.uri)), true, function (path)
+        scp:gc(fw.watch(files.normalize(furi.decode(scp.uri)), true, function (path)
             local rpath = m.getRelativePath(path)
             if native(rpath) then
                 return false
@@ -401,52 +401,18 @@ function m.findUrisByFilePath(path)
     return results
 end
 
----@param path string
----@return string
-function m.normalize(path)
-    path = path:gsub('%$%{(.-)%}', function (key)
-        if key == '3rd' then
-            return (ROOT / 'meta' / '3rd'):string()
-        end
-        if key:sub(1, 4) == 'env:' then
-            local env = os.getenv(key:sub(5))
-            return env
-        end
-    end)
-    path = util.expandPath(path)
-    path = path:gsub('^%.[/\\]+', '')
-    for _ = 1, 1000 do
-        if path:sub(1, 2) == '..' then
-            break
-        end
-        local count
-        path, count = path:gsub('[^/\\]+[/\\]+%.%.[/\\]', '/', 1)
-        if count == 0 then
-            break
-        end
-    end
-    if platform.OS == 'Windows' then
-        path = path:gsub('[/\\]+', '\\')
-                   :gsub('[/\\]+$', '')
-                   :gsub('^(%a:)$', '%1\\')
-    else
-        path = path:gsub('[/\\]+', '/')
-                   :gsub('[/\\]+$', '')
-    end
-    return path
-end
 
 ---@param folderUri? uri
 ---@param path string
 ---@return string?
 function m.getAbsolutePath(folderUri, path)
-    path = m.normalize(path)
+    path = files.normalize(path)
     if fs.path(path):is_relative() then
         if not folderUri then
             return nil
         end
         local folderPath = furi.decode(folderUri)
-        path = m.normalize(folderPath .. '/' .. path)
+        path = files.normalize(folderPath .. '/' .. path)
     end
     return path
 end
@@ -465,14 +431,14 @@ function m.getRelativePath(uriOrPath)
     end
     local scp = scope.getScope(uri)
     if not scp.uri then
-        local relative = m.normalize(path)
+        local relative = files.normalize(path)
         return relative:gsub('^[/\\]+', ''), false
     end
-    local _, pos = m.normalize(path):find(furi.decode(scp.uri), 1, true)
+    local _, pos = files.normalize(path):find(furi.decode(scp.uri), 1, true)
     if pos then
-        return m.normalize(path:sub(pos + 1)):gsub('^[/\\]+', ''), true
+        return files.normalize(path:sub(pos + 1)):gsub('^[/\\]+', ''), true
     else
-        return m.normalize(path):gsub('^[/\\]+', ''), false
+        return files.normalize(path):gsub('^[/\\]+', ''), false
     end
 end
 

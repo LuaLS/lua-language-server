@@ -641,7 +641,8 @@ local lookIntoChild = util.switch()
             and    handler.args[1]
             and    tracer.getMap[handler.args[1]] then
                 -- if type(x) == 'string' then
-                tracer:lookIntoChild(handler, topNode:copy())
+                tracer:lookIntoChild(handler, topNode)
+                topNode = topNode:copy()
                 if action.op.type == '==' then
                     topNode:narrow(tracer.uri, checker[1])
                     if outNode then

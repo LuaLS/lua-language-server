@@ -21,7 +21,7 @@ env:
 jobs:
   compile:
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         include:
           - { os: ubuntu-20.04,   target: linux,   platform: linux-x64,   container: 'ubuntu:18.04' }
@@ -53,13 +53,14 @@ jobs:
         with:
           arch: armv7
           distro: ubuntu18.04
-          run:
+          run: echo linux-arm32
+
       - uses: uraimo/run-on-arch-action@v2
         if: ${{ matrix.platform == 'linux-arm64' }}
         with:
           arch: aarch64
           distro: ubuntu18.04
-          run:
+          run: echo linux-arm64
       - uses: actboy168/setup-luamake@master
       - run: luamake -platform ${{ matrix.platform }}
 

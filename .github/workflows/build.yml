@@ -44,7 +44,7 @@ jobs:
           add-apt-repository -y ppa:git-core/ppa # For git>=2.18.
           apt-get update
           apt-get install -y sudo git gcc-9 g++-9
-          apt-get install docker-compose
+          apt-get install -y docker-compose
 
       - uses: actions/checkout@v3
         with:

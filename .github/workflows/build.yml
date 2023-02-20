@@ -21,7 +21,7 @@ env:
 jobs:
   compile:
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
           - { os: ubuntu-20.04,   target: linux,   platform: linux-x64,   container: 'ubuntu:18.04' }
@@ -36,7 +36,7 @@ jobs:
       image: ${{ matrix.container }}
     steps:
       - name: Prepare container
-        if: ${{ matrix.target == 'linux' }}
+        if: ${{ matrix.platform == 'linux-x64' }}
         run: |
           apt-get update
           apt-get install -y software-properties-common
@@ -53,14 +53,13 @@ jobs:
         with:
           arch: armv7
           distro: ubuntu18.04
-          run: echo linux-arm32
-
+          run: echo linuxarm32
       - uses: uraimo/run-on-arch-action@v2
         if: ${{ matrix.platform == 'linux-arm64' }}
         with:
           arch: aarch64
           distro: ubuntu18.04
-          run: echo linux-arm64
+          run: echo linuxarm64
       - uses: actboy168/setup-luamake@master
       - run: luamake -platform ${{ matrix.platform }}
 

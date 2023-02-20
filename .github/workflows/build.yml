@@ -53,11 +53,13 @@ jobs:
         with:
           arch: armv7
           distro: ubuntu18.04
+          run:
       - uses: uraimo/run-on-arch-action@v2
         if: ${{ matrix.platform == 'linux-arm64' }}
         with:
           arch: aarch64
           distro: ubuntu18.04
+          run:
       - uses: actboy168/setup-luamake@master
       - run: luamake -platform ${{ matrix.platform }}
 

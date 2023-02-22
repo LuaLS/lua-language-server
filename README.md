@@ -1,10 +1,9 @@
 # lua-language-server
 
-![build](https://github.com/LuaLS/lua-language-server/workflows/build/badge.svg)
+[![build](https://github.com/LuaLS/lua-language-server/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/LuaLS/lua-language-server/actions/workflows/build.yml)
 [![version](https://vsmarketplacebadges.dev/version-short/sumneko.lua.svg)](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
 ![installs](https://vsmarketplacebadges.dev/installs-short/sumneko.lua.svg)
 ![downloads](https://vsmarketplacebadges.dev/downloads-short/sumneko.lua.svg)
-[![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/LuaLS/lua-language-server.svg)](https://github.com/LuaLS/lua-language-server/issues "Average time to resolve an issue")
 
 
 ***Lua development just got a whole lot better*** 🧠

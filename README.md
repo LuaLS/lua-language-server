@@ -75,13 +75,12 @@ Check the [wiki for a guide](https://github.com/LuaLS/lua-language-server/wiki/G
 - `pt-br` 🇧🇷
 
 
-> ℹ Note: All translations are provided and collaborated on by the community. If you find an inappropriate or harmful translation, [please report it immediately](https://github.com/LuaLS/lua-language-server/issues).
+> **Note**
+> All translations are provided and collaborated on by the community. If you find an inappropriate or harmful translation, [please report it immediately](https://github.com/LuaLS/lua-language-server/issues).
 
 Are you able to [provide a translation](https://github.com/LuaLS/lua-language-server/wiki/Translations)? It would be greatly appreciated!
 
 Thank you to [all contributors of translations](https://github.com/LuaLS/lua-language-server/commits/master/locale)!
-
-[en-US]: https://github.com/LuaLS/lua-language-server/tree/master/locale/en-us
 
 ## Configuration
 Configuration of the server can be done in a number of ways, which are explained more in-depth in the [wiki](https://github.com/LuaLS/lua-language-server/wiki/Configuration-File).

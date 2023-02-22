@@ -32,14 +32,14 @@ The Lua language server provides various language features for Lua to make devel
 The language server can easily be installed for use in VS Code, but it can also be used by other clients using the command line.
 
 ### Visual Studio Code
-[![Install in VS Code](https://img.shields.io/badge/Install%20For-VS%20Code-blue?style=for-the-badge&logo=visualstudiocode "Install in VS Code")](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
+[![Install in VS Code](https://img.shields.io/badge/VS%20Code-Install-blue?style=for-the-badge&logo=visualstudiocode "Install in VS Code")](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
 
 The language server and Visual Studio Code client can be installed from [the VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=sumneko.lua).
 
 ![](https://github.com/LuaLS/vscode-lua/raw/master/images//Install%20In%20VSCode.gif)
 
 ### Command Line
-[![Install for command line](https://img.shields.io/badge/Install%20For-Command%20Line-blue?style=for-the-badge&logo=windowsterminal "Install for command line")](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#command-line)
+[![Install for command line](https://img.shields.io/badge/Command%20Line-Install-blue?style=for-the-badge&logo=windowsterminal "Install for command line")](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#command-line)
 
 Check the [wiki for a guide](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#command-line) to install the language server for use on the command line. This allows the language server to be used for NeoVim and other clients that follow the language server protocol.
 

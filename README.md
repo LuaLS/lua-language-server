@@ -41,7 +41,7 @@ The language server and Visual Studio Code client can be installed from [the VS 
 ### Command Line
 [![Install for command line](https://img.shields.io/badge/Command%20Line-Install-blue?style=for-the-badge&logo=windowsterminal "Install for command line")](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#command-line)
 
-Check the [wiki for a guide](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#command-line) to install the language server for use on the command line. This allows the language server to be used for NeoVim and other clients that follow the language server protocol.
+Check the [wiki for a guide](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#command-line) to install the language server for use on the command line. This allows the language server to be used with NeoVim and [other clients](https://microsoft.github.io/language-server-protocol/implementors/tools/) that follow the [language server protocol](https://microsoft.github.io/language-server-protocol/overviews/lsp/overview/).
 
 ## Supported Lua Versions
 | Version |    Supported   |

@@ -94,7 +94,7 @@ See the [configuration file wiki page](https://github.com/LuaLS/lua-language-ser
 
 
 ## Privacy
-This language server has **opt-in** telemetry that collects usage data and sends it to the development team to help improve the extension. Read our [privacy policy](https://github.com/LuaLS/lua-language-server/wiki/Home#privacy) to learn more.
+The language server had **opt-in** telemetry that collected usage data and sent it to the development team to help improve the extension. Read our [privacy policy](https://github.com/LuaLS/lua-language-server/wiki/Home#privacy) to learn more. Telemetry was removed in `v3.6.5` and is no longer part of the language server.
 
 
 ## Contributors

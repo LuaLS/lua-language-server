@@ -44,13 +44,13 @@ The language server and Visual Studio Code client can be installed from [the VS 
 Check the [wiki for a guide](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#command-line) to install the language server for use on the command line. This allows the language server to be used with NeoVim and [other clients](https://microsoft.github.io/language-server-protocol/implementors/tools/) that follow the [language server protocol](https://microsoft.github.io/language-server-protocol/overviews/lsp/overview/).
 
 ## Supported Lua Versions
-| Version |    Supported   |
+| Version |   Supported    |
 | :-----: | :------------: |
-| Lua 5.1 | ![][checkmark] |
-| Lua 5.2 | ![][checkmark] |
-| Lua 5.3 | ![][checkmark] |
-| Lua 5.4 | ![][checkmark] |
-| LuaJIT  | ![][checkmark] |
+| Lua 5.1 | ![✅][checkmark] |
+| Lua 5.2 | ![✅][checkmark] |
+| Lua 5.3 | ![✅][checkmark] |
+| Lua 5.4 | ![✅][checkmark] |
+| LuaJIT  | ![✅][checkmark] |
 
 ## Links
 - [Changelog](https://github.com/LuaLS/lua-language-server/blob/master/changelog.md)

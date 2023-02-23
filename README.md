@@ -1,10 +1,9 @@
 # lua-language-server
 
-![build](https://github.com/LuaLS/lua-language-server/workflows/build/badge.svg)
+[![build](https://github.com/LuaLS/lua-language-server/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/LuaLS/lua-language-server/actions/workflows/build.yml)
 [![version](https://vsmarketplacebadges.dev/version-short/sumneko.lua.svg)](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
 ![installs](https://vsmarketplacebadges.dev/installs-short/sumneko.lua.svg)
 ![downloads](https://vsmarketplacebadges.dev/downloads-short/sumneko.lua.svg)
-[![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/LuaLS/lua-language-server.svg)](https://github.com/LuaLS/lua-language-server/issues "Average time to resolve an issue")
 
 
 ***Lua development just got a whole lot better*** 🧠
@@ -33,25 +32,25 @@ The Lua language server provides various language features for Lua to make devel
 The language server can easily be installed for use in VS Code, but it can also be used by other clients using the command line.
 
 ### Visual Studio Code
-[![Install in VS Code](https://img.shields.io/badge/Install%20For-VS%20Code-blue?style=for-the-badge&logo=visualstudiocode "Install in VS Code")](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
+[![Install in VS Code](https://img.shields.io/badge/VS%20Code-Install-blue?style=for-the-badge&logo=visualstudiocode "Install in VS Code")](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
 
 The language server and Visual Studio Code client can be installed from [the VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=sumneko.lua).
 
 ![](https://github.com/LuaLS/vscode-lua/raw/master/images//Install%20In%20VSCode.gif)
 
 ### Command Line
-[![Install for command line](https://img.shields.io/badge/Install%20For-Command%20Line-blue?style=for-the-badge&logo=windowsterminal "Install for command line")](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#command-line)
+[![Install for command line](https://img.shields.io/badge/Command%20Line-Install-blue?style=for-the-badge&logo=windowsterminal "Install for command line")](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#command-line)
 
-Check the [wiki for a guide](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#command-line) to install the language server for use on the command line. This allows the language server to be used for NeoVim and other clients that follow the language server protocol.
+Check the [wiki for a guide](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#command-line) to install the language server for use on the command line. This allows the language server to be used with NeoVim and [other clients](https://microsoft.github.io/language-server-protocol/implementors/tools/) that follow the [language server protocol](https://microsoft.github.io/language-server-protocol/overviews/lsp/overview/).
 
 ## Supported Lua Versions
-| Version |    Supported   |
+| Version |   Supported    |
 | :-----: | :------------: |
-| Lua 5.1 | ![][checkmark] |
-| Lua 5.2 | ![][checkmark] |
-| Lua 5.3 | ![][checkmark] |
-| Lua 5.4 | ![][checkmark] |
-| LuaJIT  | ![][checkmark] |
+| Lua 5.1 | ![✅][checkmark] |
+| Lua 5.2 | ![✅][checkmark] |
+| Lua 5.3 | ![✅][checkmark] |
+| Lua 5.4 | ![✅][checkmark] |
+| LuaJIT  | ![✅][checkmark] |
 
 ## Links
 - [Changelog](https://github.com/LuaLS/lua-language-server/blob/master/changelog.md)
@@ -76,13 +75,12 @@ Check the [wiki for a guide](https://github.com/LuaLS/lua-language-server/wiki/G
 - `pt-br` 🇧🇷
 
 
-> ℹ Note: All translations are provided and collaborated on by the community. If you find an inappropriate or harmful translation, [please report it immediately](https://github.com/LuaLS/lua-language-server/issues).
+> **Note**
+> All translations are provided and collaborated on by the community. If you find an inappropriate or harmful translation, [please report it immediately](https://github.com/LuaLS/lua-language-server/issues).
 
 Are you able to [provide a translation](https://github.com/LuaLS/lua-language-server/wiki/Translations)? It would be greatly appreciated!
 
 Thank you to [all contributors of translations](https://github.com/LuaLS/lua-language-server/commits/master/locale)!
-
-[en-US]: https://github.com/LuaLS/lua-language-server/tree/master/locale/en-us
 
 ## Configuration
 Configuration of the server can be done in a number of ways, which are explained more in-depth in the [wiki](https://github.com/LuaLS/lua-language-server/wiki/Configuration-File).
@@ -95,7 +93,7 @@ See the [configuration file wiki page](https://github.com/LuaLS/lua-language-ser
 
 
 ## Privacy
-This language server has **opt-in** telemetry that collects usage data and sends it to the development team to help improve the extension. Read our [privacy policy](https://github.com/LuaLS/lua-language-server/wiki/Home#privacy) to learn more.
+The language server had **opt-in** telemetry that collected usage data and sent it to the development team to help improve the extension. Read our [privacy policy](https://github.com/LuaLS/lua-language-server/wiki/Home#privacy) to learn more. Telemetry was removed in `v3.6.5` and is no longer part of the language server.
 
 
 ## Contributors

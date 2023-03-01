@@ -1,5 +1,8 @@
 # changelog
 
+## 3.6.12
+* `NEW` [Addon Manager](https://github.com/LuaLS/lua-language-server/discussions/1607), try it with command `lua.addon_manager.open`. Thanks to [carsakiller](https://github.com/carsakiller)!
+
 ## 3.6.11
 `2023-2-13`
 * `CHG` completion: don't show loading process

@@ -133,6 +133,39 @@ register 'xpcall' {
     end
 }
 
+register 'ifcall' {
+    function (state, source, callback)
+        if  source.type ~= 'getglobal'
+        and source.type ~= 'getfield'
+        and source.type ~= 'getmethod'
+        and source.type ~= 'getindex'
+        and source.type ~= 'getlocal'
+        and source.type ~= 'call' then
+            return
+        end
+        local subber = subString(state)
+        if source.type == 'call' then
+            if source.args and #source.args > 0 then
+                callback(string.format('if %s then %s(%s) end$0'
+                    , subber(source.node.start + 1, source.node.finish)
+                    , subber(source.node.start + 1, source.node.finish)
+                    , subber(source.args[1].start + 1, source.args[#source.args].finish)
+                ))
+            else
+                callback(string.format('if %s then %s() end$0'
+                    , subber(source.node.start + 1, source.node.finish)
+                    , subber(source.node.start + 1, source.node.finish)
+                ))
+            end
+        else
+            callback(string.format('if %s then %s($1) end$0'
+                , subber(source.node.start + 1, source.node.finish)
+                , subber(source.node.start + 1, source.node.finish)
+            ))
+        end
+    end
+}
+
 register 'local' {
     function (state, source, callback)
         if  source.type ~= 'getglobal'

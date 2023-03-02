@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.6.12
+`2023-3-2`
 * `NEW` [Addon Manager](https://github.com/LuaLS/lua-language-server/discussions/1607), try it with command `lua.addon_manager.open`. Thanks to [carsakiller](https://github.com/carsakiller)!
 
 ## 3.6.11

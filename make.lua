@@ -1,6 +1,5 @@
 local lm = require 'luamake'
 
-lm.bindir = "bin"
 lm.c = lm.compiler == 'msvc' and 'c89' or 'c11'
 lm.cxx = 'c++17'
 
@@ -14,9 +13,6 @@ if lm.sanitize then
         ldflags = "-fsanitize=address"
     }
 end
-
----@diagnostic disable-next-line: codestyle-check
-lm.EXE_DIR = ""
 
 local includeCodeFormat = true
 
@@ -58,19 +54,28 @@ lm:executable "lua-language-server" {
     }
 }
 
+local platform = require 'bee.platform'
+local exe      = platform.OS == 'Windows' and ".exe" or ""
+
+lm:copy "copy_lua-language-server" {
+    input = lm.bindir .. "/lua-language-server" .. exe,
+    output = "bin/lua-language-server" .. exe,
+}
+
 lm:copy "copy_bootstrap" {
     input = "make/bootstrap.lua",
-    output = lm.bindir .. "/main.lua",
+    output = "bin/main.lua",
 }
 
 lm:msvc_copydll 'copy_vcrt' {
     type = "vcrt",
-    output = lm.bindir,
+    output = "bin",
 }
 
 lm:phony "all" {
     deps = {
         "lua-language-server",
+        "copy_lua-language-server",
         "copy_bootstrap",
     },
     windows = {
@@ -87,11 +92,8 @@ if lm.notest then
     return
 end
 
-local platform = require 'bee.platform'
-local exe      = platform.OS == 'Windows' and ".exe" or ""
-
 lm:rule "runtest" {
-    lm.bindir .. "/lua-language-server" .. exe, "$in",
+    "bin/lua-language-server" .. exe, "$in",
     description = "Run test: $in.",
     pool = "console",
 }

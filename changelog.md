@@ -1,5 +1,10 @@
 # changelog
 
+## 3.6.14
+* `FIX` [#1753]
+
+[#1753]: https://github.com/LuaLS/lua-language-server/issues/1753
+
 ## 3.6.13
 `2023-3-2`
 * `FIX` setting: `Lua.addonManager.enable` should be `true` by default

@@ -69,7 +69,7 @@ lm:copy "copy_bootstrap" {
 
 lm:msvc_copydll 'copy_vcrt' {
     type = "vcrt",
-    output = lm.bindir,
+    output = "bin",
 }
 
 lm:phony "all" {

@@ -526,8 +526,8 @@ function lovr.graphics.newTally(type, count, views) end
 ---### NOTE:
 ---If no `type` is provided in the options table, LÖVR will guess the `TextureType` of the Texture based on the number of layers:
 ---
----- If there's 1 layer, the type will be `2d`.
----- If there are 6 layers, the type will be `cube`.
+---- If there's only 1 layer, the type will be `2d`.
+---- If there are 6 images provided, the type will be `cube`.
 ---- Otherwise, the type will be `array`.
 ---
 ---Note that an Image can contain multiple layers and mipmaps.
@@ -1534,7 +1534,9 @@ function Pass:capsule(transform, segments) end
 ---
 ---
 ---### NOTE:
----The local origin of the circle is in its center, and the local z axis goes through the center.
+---The local origin of the circle is in its center.
+---
+---The local z axis is perpendicular to plane of the circle.
 ---
 ---@param transform lovr.Mat4 # The transform of the circle.  Can also be provided as position, radius, and rotation, using a mix of `Vectors` or numbers.
 ---@param style? lovr.DrawStyle # Whether the circle should be filled or outlined.
@@ -1987,6 +1989,7 @@ function Pass:setAlphaToCoverage(enable) end
 ---### NOTE:
 ---The default blend mode is `alpha` with the `alphamultiply` alpha mode.
 ---
+---@overload fun(self: lovr.Pass)
 ---@param blend lovr.BlendMode # The blend mode.
 ---@param alphaBlend lovr.BlendAlphaMode # The alpha blend mode, used to control premultiplied alpha.
 function Pass:setBlendMode(blend, alphaBlend) end

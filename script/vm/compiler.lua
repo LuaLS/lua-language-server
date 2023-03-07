@@ -1908,10 +1908,9 @@ function vm.compileNode(source)
 
     ---@cast source parser.object
     vm.setNode(source, vm.createNode(), true)
-    if not vm.compileByGlobal(source) then
-        vm.compileByVariable(source)
-        compileByNode(source)
-    end
+    vm.compileByGlobal(source)
+    vm.compileByVariable(source)
+    compileByNode(source)
     compileByParentNode(source)
     matchCall(source)
 

@@ -59,7 +59,7 @@ function m.getAbility(name)
         end
         current = current[parent]
         if not current then
-            return nil
+            return current
         end
         if nextPos > #name then
             break

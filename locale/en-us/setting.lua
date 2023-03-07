@@ -423,4 +423,6 @@ config.typeFormat.config.format_line        =
 'Controls if a line is formatted at all.'
 
 command.exportDocument =
-'Export Document ...'
+'Lua: Export Document ...'
+command.addon_manager.open =
+'Lua: Open Addon Manager ...'

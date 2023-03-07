@@ -7,6 +7,7 @@ local guide          = require 'parser.guide'
 local converter      = require 'proto.converter'
 local config         = require 'config'
 local linkedTable    = require 'linked-table'
+local client         = require 'client'
 
 local Care = util.switch()
     : case 'getglobal'
@@ -794,7 +795,8 @@ local function solveMultilineAndOverlapping(state, results)
     for token in tokens:pairs() do
         local startPos = converter.packPosition(state, token.start)
         local endPos   = converter.packPosition(state, token.finish)
-        if endPos.line == startPos.line then
+        if endPos.line == startPos.line
+        or client.getAbility 'textDocument.semanticTokens.multilineTokenSupport' then
             new[#new+1] = {
                 start      = startPos,
                 finish     = endPos,

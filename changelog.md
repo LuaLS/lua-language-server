@@ -1,5 +1,19 @@
 # changelog
 
+## 3.6.14
+* `FIX` [#1753]
+
+[#1753]: https://github.com/LuaLS/lua-language-server/issues/1753
+
+## 3.6.13
+`2023-3-2`
+* `FIX` setting: `Lua.addonManager.enable` should be `true` by default
+* `FIX` failed to publish to Windows
+
+## 3.6.12
+`2023-3-2`
+* `NEW` [Addon Manager](https://github.com/LuaLS/lua-language-server/discussions/1607), try it with command `lua.addon_manager.open`. Thanks to [carsakiller](https://github.com/carsakiller)!
+
 ## 3.6.11
 `2023-2-13`
 * `CHG` completion: don't show loading process

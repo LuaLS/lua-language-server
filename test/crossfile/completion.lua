@@ -127,6 +127,37 @@ end
 TEST {
     {
         path = 'abc.lua',
+        content = [[
+            ---@meta
+
+            ---@class A
+            ---@field f1 integer
+            ---@field f2 boolean
+            
+            ---@type A[]
+            X = {}
+]],
+    },
+    {
+        path = 'test.lua',
+        content = [[ X[1].<??>]],
+        main = true,
+    },
+    completion = {
+        {
+            label = 'f1',
+            kind = CompletionItemKind.Field,
+        },
+        {
+            label = 'f2',
+            kind = CompletionItemKind.Field,
+        },
+    }
+}
+
+TEST {
+    {
+        path = 'abc.lua',
         content = '',
     },
     {

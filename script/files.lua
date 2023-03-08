@@ -81,6 +81,9 @@ function m.getRealUri(uri)
     if platform.OS ~= 'Windows' then
         return furi.normalize(uri)
     end
+    if not furi.isValid(uri) then
+        return uri
+    end
     local filename = furi.decode(uri)
     -- normalize uri
     uri = furi.encode(filename)

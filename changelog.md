@@ -4,10 +4,12 @@
 * `FIX` [#1715]
 * `FIX` [#1753]
 * `FIX` [#1914]
+* `FIX` [#1922]
 
 [#1715]: https://github.com/LuaLS/lua-language-server/issues/1715
 [#1753]: https://github.com/LuaLS/lua-language-server/issues/1753
 [#1914]: https://github.com/LuaLS/lua-language-server/issues/1914
+[#1922]: https://github.com/LuaLS/lua-language-server/issues/1922
 
 ## 3.6.13
 `2023-3-2`

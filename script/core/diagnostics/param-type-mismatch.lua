@@ -87,9 +87,6 @@ return function (uri, callback)
         await.delay()
         local funcNode = vm.compileNode(source.node)
         for i, arg in ipairs(source.args) do
-            if i == 1 and source.node.type == 'getmethod' then
-                goto CONTINUE
-            end
             local refNode = vm.compileNode(arg)
             if not refNode then
                 goto CONTINUE
@@ -99,7 +96,8 @@ return function (uri, callback)
                 goto CONTINUE
             end
             if arg.type == 'getfield'
-            or arg.type == 'getindex' then
+            or arg.type == 'getindex'
+            or arg.type == 'self' then
                 -- 由于无法对字段进行类型收窄，
                 -- 因此将假值移除再进行检查
                 refNode = refNode:copy():setTruthy()

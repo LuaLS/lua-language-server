@@ -1211,6 +1211,19 @@ end
 get_val('hi')
 ]]
 
+TESTWITH 'param-type-mismatch' [[
+---@class Class
+local Class = {}
+
+---@param source string
+function Class.staticCreator(source)
+
+end
+
+Class.staticCreator(<!true!>)
+Class<!:!>staticCreator() -- Expecting a waring
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

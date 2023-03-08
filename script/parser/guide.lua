@@ -1276,4 +1276,17 @@ function m.getTopBlock(source)
     return nil
 end
 
+---@param source parser.object
+---@return boolean
+function m.isParam(source)
+    if  source.type ~= 'local'
+    and source.type ~= 'self' then
+        return false
+    end
+    if source.parent.type ~= 'funcargs' then
+        return false
+    end
+    return true
+end
+
 return m

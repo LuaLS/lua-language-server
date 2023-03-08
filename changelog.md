@@ -1,9 +1,11 @@
 # changelog
 
 ## 3.6.14
+* `FIX` [#1715]
 * `FIX` [#1753]
 * `FIX` [#1914]
 
+[#1715]: https://github.com/LuaLS/lua-language-server/issues/1715
 [#1753]: https://github.com/LuaLS/lua-language-server/issues/1753
 [#1914]: https://github.com/LuaLS/lua-language-server/issues/1914
 

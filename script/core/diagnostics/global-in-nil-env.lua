@@ -13,6 +13,9 @@ return function (uri, callback)
         if node.tag == '_ENV' then
             return
         end
+        if guide.isParam(node) then
+            return
+        end
 
         if not node.value or node.value.type == 'nil' then
             callback {

@@ -1,5 +1,7 @@
 ---@diagnostic disable: undefined-global
 
+config.addonManager.enable        =
+"Whether the addon manager is enabled or not."
 config.runtime.version            =
 "Lua runtime version."
 config.runtime.path               =

@@ -1357,6 +1357,7 @@ local compilerSwitch = util.switch()
             if src.type == 'doc.field'
             or src.type == 'doc.type.field'
             or src.type == 'doc.type.name'
+            or src.type == 'doc.type'
             or guide.isLiteral(src) then
                 hasMarkDoc = true
                 vm.setNode(source, vm.compileNode(src))

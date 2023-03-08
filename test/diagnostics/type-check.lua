@@ -1224,6 +1224,20 @@ Class.staticCreator(<!true!>)
 Class<!:!>staticCreator() -- Expecting a waring
 ]]
 
+TESTWITH 'assign-type-mismatch' [[
+---@type string[]
+local arr = {
+    <!3!>,
+}
+]]
+
+TESTWITH 'assign-type-mismatch' [[
+---@type (string|boolean)[]
+local arr2 = {
+    <!3!>, -- no warnings
+}
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

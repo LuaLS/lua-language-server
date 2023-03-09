@@ -37,7 +37,7 @@ jobs:
         if: ${{ matrix.target == 'linux' }}
         run: |
           apt-get update
-          apt-get install -y gcc
+          apt-get install -y gcc git
 
       - name: Install aarch64-linux-gnu
         if: ${{ matrix.platform == 'linux-arm64' }}

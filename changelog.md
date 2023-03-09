@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.6.14
+`2023-3-9`
 * `CHG` export documents: export global variables
 * `FIX` [#1715]
 * `FIX` [#1753]

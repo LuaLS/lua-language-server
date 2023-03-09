@@ -199,7 +199,10 @@ vm.binarySwitch = util.switch()
         elseif r1 == false then
             vm.setNode(source, node2)
         else
-            local node = node1:copy():setTruthy():merge(node2)
+            local node = node1:copy():setTruthy()
+            if not source[2].hasExit then
+                node:merge(node2)
+            end
             vm.setNode(source, node)
         end
     end)

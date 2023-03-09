@@ -8,6 +8,7 @@
 * `FIX` [#1922]
 * `FIX` [#1924]
 * `FIX` [#1928]
+* `FIX` [#1945]
 
 [#1715]: https://github.com/LuaLS/lua-language-server/issues/1715
 [#1753]: https://github.com/LuaLS/lua-language-server/issues/1753
@@ -15,6 +16,7 @@
 [#1922]: https://github.com/LuaLS/lua-language-server/issues/1922
 [#1924]: https://github.com/LuaLS/lua-language-server/issues/1924
 [#1928]: https://github.com/LuaLS/lua-language-server/issues/1928
+[#1945]: https://github.com/LuaLS/lua-language-server/issues/1945
 
 ## 3.6.13
 `2023-3-2`

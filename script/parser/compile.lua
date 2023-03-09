@@ -1974,6 +1974,12 @@ local function parseSimple(node, funcName)
     and node.node == lastMethod then
         lastMethod = nil
     end
+    if node.type == 'call' then
+        if node.node.special == 'error'
+        or node.node.special == 'os.exit' then
+            node.hasExit = true
+        end
+    end
     if node == lastMethod then
         if funcName then
             lastMethod = nil
@@ -2899,18 +2905,15 @@ local function compileExpAsAction(exp)
         end
     end
 
-    if exp.type == 'call' then
-        if exp.node.special == 'error'
-        or exp.node.special == 'os.exit' then
-            for i = #Chunk, 1, -1 do
-                local block = Chunk[i]
-                if block.type == 'ifblock'
-                or block.type == 'elseifblock'
-                or block.type == 'elseblock'
-                or block.type == 'function' then
-                    block.hasExit = true
-                    break
-                end
+    if exp.hasExit then
+        for i = #Chunk, 1, -1 do
+            local block = Chunk[i]
+            if block.type == 'ifblock'
+            or block.type == 'elseifblock'
+            or block.type == 'elseblock'
+            or block.type == 'function' then
+                block.hasExit = true
+                break
             end
         end
         return exp

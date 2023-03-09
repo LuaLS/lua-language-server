@@ -4233,3 +4233,9 @@ function A:func()
     self.y = self.y + 3
 end
 ]]
+
+TEST 'number' [[
+---@type number?
+local n
+local <?v?> = n or error('')
+]]

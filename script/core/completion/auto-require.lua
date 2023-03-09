@@ -56,9 +56,12 @@ function m.check(state, word, position, callback)
                     : gsub("(%p)", "%%%1")
                     : gsub("%%%?", "(.-)")
 
-                stemName = relativePath
-                    : match(pattern)
-                    : match("[%a_][%w_]*$")
+                local stemPath = relativePath:match(pattern)
+                if not stemPath then
+                    goto INNER_CONTINUE
+                end
+
+                stemName = stemPath:match("[%a_][%w_]*$")
 
                 if not stemName or testedStem[stemName] then
                     goto INNER_CONTINUE

@@ -100,12 +100,13 @@ end
 ---@async
 ---@param global vm.global
 ---@param results table
-local function collect(global, results)
+local function collectTypes(global, results)
     if guide.isBasicType(global.name) then
         return
     end
     local result = {
         name    = global.name,
+        type    = 'type',
         desc    = nil,
         defines = {},
         fields  = {},
@@ -207,6 +208,48 @@ local function collect(global, results)
 end
 
 ---@async
+---@param global vm.global
+---@param results table
+local function collectVars(global, results)
+    local result = {
+        name    = global:getCodeName(),
+        type    = 'variable',
+        desc    = nil,
+        defines = {},
+    }
+    for _, set in ipairs(global:getSets(ws.rootUri)) do
+        local uri = guide.getUri(set)
+        if files.isLibrary(uri) then
+            goto CONTINUE
+        end
+        if set.type == 'setglobal'
+        or set.type == 'setfield'
+        or set.type == 'setmethod'
+        or set.type == 'setindex' then
+            result.defines[#result.defines+1] = {
+                type    = set.type,
+                file    = guide.getUri(set),
+                start   = set.start,
+                finish  = set.finish,
+                extends = packObject(set.value),
+            }
+            result.desc = result.desc or getDesc(set)
+        end
+        ::CONTINUE::
+    end
+    if #result.defines == 0 then
+        return
+    end
+    table.sort(result.defines, function (a, b)
+        if a.file ~= b.file then
+            return a.file < b.file
+        end
+        return a.start < b.start
+    end)
+    results[#results+1] = result
+end
+
+---@async
 ---@param outputPath string
 function export.makeDoc(outputPath)
     local results = {}
@@ -222,13 +265,21 @@ function export.makeDoc(outputPath)
     await.sleep(0.1)
 
     local prog <close> = progress.create(ws.rootUri, '正在生成文档...', 0)
-    local globals = vm.getGlobals 'type'
+    local globalTypes = vm.getGlobals 'type'
+    local globalVars  = vm.getGlobals 'variable'
 
-    local max  = #globals
-    for i, global in ipairs(globals) do
-        collect(global, results)
+    local max = #globalTypes + #globalVars
+
+    for i, global in ipairs(globalTypes) do
+        collectTypes(global, results)
         prog:setMessage(('%d/%d'):format(i, max))
         prog:setPercentage(i / max * 100)
+    end
+
+    for i, global in ipairs(globalVars) do
+        collectVars(global, results)
+        prog:setMessage(('%d/%d'):format(i + #globalTypes, max))
+        prog:setPercentage((i + #globalTypes) / max * 100)
     end
 
     table.sort(results, function (a, b)
@@ -284,7 +335,7 @@ function export.runCLI()
 
         local max  = #globals
         for i, global in ipairs(globals) do
-            collect(global, results)
+            collectTypes(global, results)
             if os.clock() - lastClock > 0.2 then
                 lastClock = os.clock()
                 local output = '\x0D'

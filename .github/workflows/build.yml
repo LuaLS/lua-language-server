@@ -36,12 +36,8 @@ jobs:
       - name: Prepare container
         if: ${{ matrix.target == 'linux' }}
         run: |
-          apt-get update
-          apt-get install -y software-properties-common
-          add-apt-repository -y ppa:ubuntu-toolchain-r/test # For gcc-9 and g++-9
-          add-apt-repository -y ppa:git-core/ppa # For git>=2.18.
-          apt-get update
-          apt-get install -y sudo git gcc-9 g++-9
+          sudo apt-get update
+          sudo apt-get install -y gcc
 
       - name: Install aarch64-linux-gnu
         if: ${{ matrix.platform == 'linux-arm64' }}

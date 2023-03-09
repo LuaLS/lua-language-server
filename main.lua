@@ -70,9 +70,10 @@ log.info('METAPATH:', METAPATH)
 log.info('VERSION:', version.getVersion())
 
 require 'tracy'
-require 'cli'
 
 xpcall(dofile, log.debug, (ROOT / 'debugger.lua'):string())
+
+require 'cli'
 
 local _, service = xpcall(require, log.error, 'service')
 

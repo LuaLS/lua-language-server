@@ -8,6 +8,9 @@ local jsonb    = require 'json-beautify'
 local lang     = require 'language'
 local define   = require 'proto.define'
 local config   = require 'config.config'
+local fs       = require 'bee.filesystem'
+
+require 'vm'
 
 lang(LOCALE)
 
@@ -16,9 +19,10 @@ if type(CHECK) ~= 'string' then
     return
 end
 
-local rootUri = furi.encode(CHECK)
+local rootPath = fs.absolute(fs.path(CHECK)):string()
+local rootUri = furi.encode(rootPath)
 if not rootUri then
-    print(lang.script('CLI_CHECK_ERROR_URI', CHECK))
+    print(lang.script('CLI_CHECK_ERROR_URI', rootPath))
     return
 end
 

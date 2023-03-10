@@ -719,6 +719,9 @@ local function buildTokens(state, results)
         local deltaStartChar
         if deltaLine == 0 then
             deltaStartChar = startChar - lastStartChar
+            if deltaStartChar == 0 then
+                goto continue
+            end
         else
             deltaStartChar = startChar
         end
@@ -731,6 +734,7 @@ local function buildTokens(state, results)
         tokens[len + 3] = finishPos.character - startPos.character -- length
         tokens[len + 4] = source.type
         tokens[len + 5] = source.modifieres or 0
+        ::continue::
     end
     return tokens
 end
@@ -795,6 +799,10 @@ local function solveMultilineAndOverlapping(state, results)
     for token in tokens:pairs() do
         local startPos = converter.packPosition(state, token.start)
         local endPos   = converter.packPosition(state, token.finish)
+        if  startPos.line == endPos.line
+        and startPos.character == endPos.character then
+            goto continue
+        end
         if endPos.line == startPos.line
         or client.getAbility 'textDocument.semanticTokens.multilineTokenSupport' then
             new[#new+1] = {
@@ -827,6 +835,7 @@ local function solveMultilineAndOverlapping(state, results)
                 }
             end
         end
+        ::continue::
     end
 
     return new

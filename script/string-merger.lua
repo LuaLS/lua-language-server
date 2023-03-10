@@ -127,6 +127,10 @@ function m.getOffsetBack(info, offset)
             finish = diff.finish
         end
         if not start or not finish then
+            if  offset > diff.cstart
+            and offset < diff.cfinish then
+                return diff.finish, diff.finish
+            end
             local soff = offset - diff.cstart
             local pos = math.min(diff.start + soff, diff.finish)
             start  = start or pos

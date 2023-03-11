@@ -710,7 +710,8 @@ local function buildTokens(state, results)
     local tokens = {}
     local lastLine = 0
     local lastStartChar = 0
-    for i, source in ipairs(results) do
+    local index = 0
+    for _, source in ipairs(results) do
         local startPos  = source.start
         local finishPos = source.finish
         local line      = startPos.line
@@ -728,7 +729,8 @@ local function buildTokens(state, results)
         lastLine = line
         lastStartChar = startChar
         -- see https://microsoft.github.io/language-server-protocol/specifications/specification-3-16/#textDocument_semanticTokens
-        local len = i * 5 - 5
+        index = index + 1
+        local len = index * 5 - 5
         tokens[len + 1] = deltaLine
         tokens[len + 2] = deltaStartChar
         tokens[len + 3] = finishPos.character - startPos.character -- length

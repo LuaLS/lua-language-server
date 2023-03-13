@@ -4239,3 +4239,18 @@ TEST 'number' [[
 local n
 local <?v?> = n or error('')
 ]]
+
+TEST 'Foo' [[
+---@class Foo
+---@operator mul(Foo): Foo
+---@operator mul(Bar): Foo
+---@class Bar
+
+---@type Foo
+local foo
+
+---@type Foo|Bar
+local fooOrBar
+
+local <?b?> = foo * fooOrBar
+]]

@@ -73,15 +73,22 @@ local function checkOperators(operators, op, value, result)
             local valueNode = vm.compileNode(value)
             local expNode   = vm.compileNode(operator.exp)
             local uri       = guide.getUri(operator)
-            if not vm.isSubType(uri, valueNode, expNode) then
-                goto CONTINUE
+            for vo in valueNode:eachObject() do
+                if vm.isSubType(uri, vo, expNode) then
+                    if not result then
+                        result = vm.createNode()
+                    end
+                    result:merge(vm.compileNode(operator.extends))
+                    return result
+                end
             end
+        else
+            if not result then
+                result = vm.createNode()
+            end
+            result:merge(vm.compileNode(operator.extends))
+            return result
         end
-        if not result then
-            result = vm.createNode()
-        end
-        result:merge(vm.compileNode(operator.extends))
-        break
         ::CONTINUE::
     end
     return result

@@ -218,10 +218,6 @@ local function collectVars(global, results)
         defines = {},
     }
     for _, set in ipairs(global:getSets(ws.rootUri)) do
-        local uri = guide.getUri(set)
-        if files.isLibrary(uri) then
-            goto CONTINUE
-        end
         if set.type == 'setglobal'
         or set.type == 'setfield'
         or set.type == 'setmethod'
@@ -235,7 +231,6 @@ local function collectVars(global, results)
             }
             result.desc = result.desc or getDesc(set)
         end
-        ::CONTINUE::
     end
     if #result.defines == 0 then
         return

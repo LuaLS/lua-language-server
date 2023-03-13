@@ -249,7 +249,9 @@ vm.binarySwitch = util.switch()
             })
         else
             local node = vm.runOperator(binaryMap[op], source[1], source[2])
-            vm.setNode(source, node or vm.declareGlobal('type', 'integer'))
+            if node then
+                vm.setNode(source, node)
+            end
         end
     end)
     : case '+'
@@ -296,20 +298,17 @@ vm.binarySwitch = util.switch()
                 local uri = guide.getUri(source)
                 local infer1 = vm.getInfer(source[1])
                 local infer2 = vm.getInfer(source[2])
-                if infer1:hasType(uri, 'integer')
-                or infer2:hasType(uri, 'integer') then
-                    if  not infer1:hasType(uri, 'number')
-                    and not infer2:hasType(uri, 'number') then
-                        vm.setNode(source, vm.declareGlobal('type', 'integer'))
-                        return
-                    end
+                if  infer1:hasType(uri, 'integer')
+                and infer2:hasType(uri, 'integer') then
+                    vm.setNode(source, vm.declareGlobal('type', 'integer'))
+                    return
+                end
+                if  (infer1:hasType(uri, 'number') or infer1:hasType(uri, 'integer'))
+                and (infer2:hasType(uri, 'number') or infer2:hasType(uri, 'integer')) then
+                    vm.setNode(source, vm.declareGlobal('type', 'number'))
+                    return
                 end
             end
-            if op == '//' then
-                vm.setNode(source, node or vm.declareGlobal('type', 'integer'))
-                return
-            end
-            vm.setNode(source, node or vm.declareGlobal('type', 'number'))
         end
     end)
     : case '..'
@@ -346,7 +345,9 @@ vm.binarySwitch = util.switch()
             })
         else
             local node = vm.runOperator(binaryMap[source.op.type], source[1], source[2])
-            vm.setNode(source, node or vm.declareGlobal('type', 'string'))
+            if node then
+                vm.setNode(source, node)
+            end
         end
     end)
     : case '>'

@@ -178,7 +178,7 @@ TEST 'boolean' [[
 <?x?> = a == b
 ]]
 
-TEST 'integer' [[
+TEST 'unknown' [[
 <?x?> = a << b
 ]]
 
@@ -186,7 +186,7 @@ TEST 'integer' [[
 <?x?> = 1 << 2
 ]]
 
-TEST 'string' [[
+TEST 'unknown' [[
 <?x?> = a .. b
 ]]
 
@@ -202,7 +202,7 @@ TEST 'string' [[
 <?x?> = 'a' .. 1.0
 ]]
 
-TEST 'number' [[
+TEST 'unknown' [[
 <?x?> = a + b
 ]]
 
@@ -227,11 +227,11 @@ local a
 <?x?> = - a
 ]]
 
-TEST 'integer' [[
+TEST 'unknown' [[
 <?x?> = 1 + X
 ]]
 
-TEST 'number' [[
+TEST 'unknown' [[
 <?x?> = 1.0 + X
 ]]
 
@@ -2416,7 +2416,7 @@ local <?z?> = f()
 
 TEST 'integer|table' [[
 local function returnI()
-    return a + 1
+    return 1
 end
 
 local function f()

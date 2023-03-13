@@ -1,5 +1,10 @@
 # changelog
 
+## 3.6.18
+* `FIX` [#1943]
+
+[#1943]: https://github.com/LuaLS/lua-language-server/issues/1943
+
 ## 3.6.17
 `2023-3-9`
 * `CHG` export documents: export global variables

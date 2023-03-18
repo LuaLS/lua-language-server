@@ -5,7 +5,7 @@
 string = {}
 
 ---#DES 'string.byte'
----@param s  string
+---@param s  string|number
 ---@param i? integer
 ---@param j? integer
 ---@return integer ...
@@ -27,7 +27,7 @@ function string.char(byte, ...) end
 function string.dump(f, strip) end
 
 ---#DES 'string.find'
----@param s       string
+---@param s       string|number
 ---@param pattern string
 ---@param init?   integer
 ---@param plain?  boolean
@@ -60,7 +60,7 @@ function string.gmatch(s, pattern, init) end
 ---#end
 
 ---#DES 'string.gsub'
----@param s       string
+---@param s       string|number
 ---@param pattern string
 ---@param repl    string|number|table|function
 ---@param n?      integer
@@ -70,19 +70,19 @@ function string.gmatch(s, pattern, init) end
 function string.gsub(s, pattern, repl, n) end
 
 ---#DES 'string.len'
----@param s string
+---@param s string|number
 ---@return integer
 ---@nodiscard
 function string.len(s) end
 
 ---#DES 'string.lower'
----@param s string
+---@param s string|number
 ---@return string
 ---@nodiscard
 function string.lower(s) end
 
 ---#DES 'string.match'
----@param s       string
+---@param s       string|number
 ---@param pattern string
 ---@param init?   integer
 ---@return any ...
@@ -107,14 +107,14 @@ function string.packsize(fmt) end
 
 ---#if VERSION <= 5.1 and not JIT then
 ---#DES 'string.rep<5.1'
----@param s    string
+---@param s    string|number
 ---@param n    integer
 ---@return string
 ---@nodiscard
 function string.rep(s, n) end
 ---#else
 ---#DES 'string.rep>5.2'
----@param s    string
+---@param s    string|number
 ---@param n    integer
 ---@param sep? string
 ---@return string
@@ -123,13 +123,13 @@ function string.rep(s, n, sep) end
 ---#end
 
 ---#DES 'string.reverse'
----@param s string
+---@param s string|number
 ---@return string
 ---@nodiscard
 function string.reverse(s) end
 
 ---#DES 'string.sub'
----@param s  string
+---@param s  string|number
 ---@param i  integer
 ---@param j? integer
 ---@return string
@@ -147,7 +147,7 @@ function string.sub(s, i, j) end
 function string.unpack(fmt, s, pos) end
 
 ---#DES 'string.upper'
----@param s string
+---@param s string|number
 ---@return string
 ---@nodiscard
 function string.upper(s) end

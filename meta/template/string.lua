@@ -38,7 +38,7 @@ function string.dump(f, strip) end
 function string.find(s, pattern, init, plain) end
 
 ---#DES 'string.format'
----@param s any
+---@param s string|number
 ---@param ... any
 ---@return string
 ---@nodiscard

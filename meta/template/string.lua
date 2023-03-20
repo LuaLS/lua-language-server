@@ -28,7 +28,7 @@ function string.dump(f, strip) end
 
 ---#DES 'string.find'
 ---@param s       string|number
----@param pattern string
+---@param pattern string|number
 ---@param init?   integer
 ---@param plain?  boolean
 ---@return integer start
@@ -61,7 +61,7 @@ function string.gmatch(s, pattern, init) end
 
 ---#DES 'string.gsub'
 ---@param s       string|number
----@param pattern string
+---@param pattern string|number
 ---@param repl    string|number|table|function
 ---@param n?      integer
 ---@return string
@@ -83,7 +83,7 @@ function string.lower(s) end
 
 ---#DES 'string.match'
 ---@param s       string|number
----@param pattern string
+---@param pattern string|number
 ---@param init?   integer
 ---@return any ...
 ---@nodiscard
@@ -116,7 +116,7 @@ function string.rep(s, n) end
 ---#DES 'string.rep>5.2'
 ---@param s    string|number
 ---@param n    integer
----@param sep? string
+---@param sep? string|number
 ---@return string
 ---@nodiscard
 function string.rep(s, n, sep) end

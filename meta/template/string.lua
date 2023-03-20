@@ -46,14 +46,14 @@ function string.format(s, ...) end
 
 ---#DES 'string.gmatch'
 ---#if VERSION <= 5.3 then
----@param s       string
----@param pattern string
+---@param s       string|number
+---@param pattern string|number
 ---@return fun():string, ...
 ---@nodiscard
 function string.gmatch(s, pattern) end
 ---#else
----@param s       string
----@param pattern string
+---@param s       string|number
+---@param pattern string|number
 ---@param init?   integer
 ---@return fun():string, ...
 function string.gmatch(s, pattern, init) end

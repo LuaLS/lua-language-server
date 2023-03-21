@@ -3,7 +3,7 @@
 ---@class bee.file:lightuserdata
 local file = {}
 
----@alias bee.file.readmode integer|"'*a'"
+---@alias bee.file.readmode integer|"'a'"
 
 ---@param mode bee.file.readmode
 ---@return string

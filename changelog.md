@@ -3,10 +3,12 @@
 ## 3.6.18
 * `FIX` [#1943]
 * `FIX` [#1996]
+* `FIX` [#2004]
 * `FIX` [#2013]
 
 [#1943]: https://github.com/LuaLS/lua-language-server/issues/1943
 [#1996]: https://github.com/LuaLS/lua-language-server/issues/1996
+[#2004]: https://github.com/LuaLS/lua-language-server/issues/2004
 [#2013]: https://github.com/LuaLS/lua-language-server/issues/2013
 
 ## 3.6.17

@@ -1238,6 +1238,23 @@ local arr2 = {
 }
 ]]
 
+TEST [[
+---@class A
+
+---@class B : A
+
+---@class C : B
+
+---@class D : B
+
+---@param x A
+local function func(x) end
+
+---@type C|D
+local var
+func(var)
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

@@ -466,6 +466,7 @@ function vm.isSubType(uri, child, parent, mark, errs)
                         if  ext.type == 'doc.extends.name'
                         and (not isBasicType or guide.isBasicType(ext[1]))
                         and vm.isSubType(uri, ext[1], parent, mark, errs) == true then
+                            mark[childName] = nil
                             return true
                         end
                     end

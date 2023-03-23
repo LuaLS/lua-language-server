@@ -471,7 +471,14 @@ function skynet.stat(what)
 end
 
 ---返回任务信息
----@param ret any
+---这里说的任务是指：服务发出了请求，但未收到响应，已挂起的协程
+---当参数ret的值为：
+--- nil: 返回挂起的协程数量
+--- "init": 返回 traceback(init_thread)
+--- table:  所有挂起协程的状态信息
+--- number :代表一个会话ID，显示此会话状态信息
+--- thread: 某个协程的信息
+---@param ret nil|number|table|string
 function skynet.task(ret)
 end
 

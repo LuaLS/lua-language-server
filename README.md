@@ -37,8 +37,6 @@ The language server can easily be installed for use in VS Code, but it can also 
 
 The language server and Visual Studio Code client can be installed from [the VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=sumneko.lua).
 
-![](https://github.com/LuaLS/vscode-lua/raw/master/images//Install%20In%20VSCode.gif)
-
 ### Command Line
 [![Install for command line](https://img.shields.io/badge/Command%20Line-Install-blue?style=for-the-badge&logo=windowsterminal "Install for command line")](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#command-line)
 

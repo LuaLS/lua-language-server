@@ -29,8 +29,7 @@ The Lua language server provides various language features for Lua to make devel
 - 📖 [Documentation Generation](https://github.com/LuaLS/lua-language-server/wiki/Export-Documentation)
 
 ## Install
-
-The language server can easily be installed for use in VS Code, but it can also be used by other clients using the command line.
+The language server can be installed for use in Visual Studio Code, NeoVim, and any [other clients](https://microsoft.github.io/language-server-protocol/implementors/tools/) that support the [Language Server Protocol](https://microsoft.github.io/language-server-protocol/). The language server can the be configured using a [configuration file](https://github.com/LuaLS/lua-language-server/wiki/Configuration-File).
 
 ### Visual Studio Code
 [![Install in VS Code](https://img.shields.io/badge/VS%20Code-Install-blue?style=for-the-badge&logo=visualstudiocode "Install in VS Code")](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
@@ -72,15 +71,6 @@ Check the [wiki for a guide](https://github.com/LuaLS/lua-language-server/wiki/G
 Are you able to [provide a translation](https://github.com/LuaLS/lua-language-server/wiki/Translations)? It would be greatly appreciated!
 
 Thank you to [all contributors of translations](https://github.com/LuaLS/lua-language-server/commits/master/locale)!
-
-## Configuration
-Configuration of the server can be done in a number of ways, which are explained more in-depth in the [wiki](https://github.com/LuaLS/lua-language-server/wiki/Configuration-File).
-
-### Visual Studio Code
-You can use the [settings editor](https://code.visualstudio.com/docs/getstarted/settings#_settings-editor) or edit the [raw JSON file](https://code.visualstudio.com/docs/getstarted/settings#_settingsjson).
-
-### Other
-See the [configuration file wiki page](https://github.com/LuaLS/lua-language-server/wiki/Configuration-File).
 
 
 ## Privacy

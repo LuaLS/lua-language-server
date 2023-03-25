@@ -36,6 +36,11 @@ The language server can be installed for use in Visual Studio Code, NeoVim, and 
 
 The language server and Visual Studio Code client can be installed from [the VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=sumneko.lua).
 
+### NeoVim
+[![Install for NeoVim](https://img.shields.io/badge/NeoVim-Install-blue?style=for-the-badge&logo=neovim "Install for NeoVim")](https://dev.to/vonheikemen/getting-started-with-neovims-native-lsp-client-in-the-year-of-2022-the-easy-way-bp3)
+
+You can read [Heiker's guide](https://dev.to/vonheikemen/getting-started-with-neovims-native-lsp-client-in-the-year-of-2022-the-easy-way-bp3) for getting set up from scratch.
+
 ### Command Line
 [![Install for command line](https://img.shields.io/badge/Command%20Line-Install-blue?style=for-the-badge&logo=windowsterminal "Install for command line")](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#command-line)
 

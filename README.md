@@ -12,6 +12,7 @@ The Lua language server provides various language features for Lua to make devel
 
 ## Features
 
+- ⚙️ Supports `Lua 5.4`, `Lua 5.3`, `Lua 5.2`, `Lua 5.1`, and `LuaJIT`
 - 📄 Over 20 supported [annotations](https://github.com/LuaLS/lua-language-server/wiki/Annotations) for documenting your code
 - ↪ Go to definition
 - 🦺 Dynamic [type checking](https://github.com/LuaLS/lua-language-server/wiki/Type-Checking)
@@ -43,14 +44,6 @@ The language server and Visual Studio Code client can be installed from [the VS 
 
 Check the [wiki for a guide](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#command-line) to install the language server for use on the command line. This allows the language server to be used with NeoVim and [other clients](https://microsoft.github.io/language-server-protocol/implementors/tools/) that follow the [language server protocol](https://microsoft.github.io/language-server-protocol/overviews/lsp/overview/).
 
-## Supported Lua Versions
-| Version |   Supported    |
-| :-----: | :------------: |
-| Lua 5.1 | ![✅][checkmark] |
-| Lua 5.2 | ![✅][checkmark] |
-| Lua 5.3 | ![✅][checkmark] |
-| Lua 5.4 | ![✅][checkmark] |
-| LuaJIT  | ![✅][checkmark] |
 
 ## Links
 - [Changelog](https://github.com/LuaLS/lua-language-server/blob/master/changelog.md)
@@ -116,6 +109,3 @@ Software that the language server (or the development of it) uses:
 * [json.lua](https://github.com/actboy168/json.lua)
 * [EmmyLuaCodeStyle](https://github.com/CppCXY/EmmyLuaCodeStyle)
 * [inspect.lua](https://github.com/kikito/inspect.lua)
-
-
-[checkmark]: https://user-images.githubusercontent.com/61925890/183228083-d3aa4eca-30c7-4b9f-aaab-26ce3d8a14fb.png

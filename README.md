@@ -29,7 +29,7 @@ The Lua language server provides various language features for Lua to make devel
 - 📖 [Documentation Generation](https://github.com/LuaLS/lua-language-server/wiki/Export-Documentation)
 
 ## Install
-The language server can be installed for use in Visual Studio Code, NeoVim, and any [other clients](https://microsoft.github.io/language-server-protocol/implementors/tools/) that support the [Language Server Protocol](https://microsoft.github.io/language-server-protocol/). The language server can the be configured using a [configuration file](https://github.com/LuaLS/lua-language-server/wiki/Configuration-File).
+The language server can be installed for use in Visual Studio Code, NeoVim, and any [other clients](https://microsoft.github.io/language-server-protocol/implementors/tools/) that support the [Language Server Protocol](https://microsoft.github.io/language-server-protocol/). The language server can be configured using a [configuration file](https://github.com/LuaLS/lua-language-server/wiki/Configuration-File). For a more detailed intro, check out the [getting started page in the wiki](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started).
 
 ### Visual Studio Code
 [![Install in VS Code](https://img.shields.io/badge/VS%20Code-Install-blue?style=for-the-badge&logo=visualstudiocode "Install in VS Code")](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
@@ -44,8 +44,12 @@ You can read [Heiker's guide](https://dev.to/vonheikemen/getting-started-with-ne
 ### Command Line
 [![Install for command line](https://img.shields.io/badge/Command%20Line-Install-blue?style=for-the-badge&logo=windowsterminal "Install for command line")](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#command-line)
 
-Check the [wiki for a guide](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#command-line) to install the language server for use on the command line. This allows the language server to be used with NeoVim and [other clients](https://microsoft.github.io/language-server-protocol/implementors/tools/) that follow the [language server protocol](https://microsoft.github.io/language-server-protocol/overviews/lsp/overview/).
+Check the [wiki for a guide](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#command-line) to install the language server for use on the command line. This allows the language server to be used with [other clients](https://microsoft.github.io/language-server-protocol/implementors/tools/) that follow the [language server protocol](https://microsoft.github.io/language-server-protocol/overviews/lsp/overview/).
 
+### Community Install Methods
+The install methods below are maintained by community members.
+
+[asdf plugin](https://github.com/bellini666/asdf-lua-language-server)
 
 ## Links
 - [Changelog](https://github.com/LuaLS/lua-language-server/blob/master/changelog.md)

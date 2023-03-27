@@ -281,6 +281,8 @@ PARSER_NEED_PAREN         =
 '需要添加一对括号。'
 PARSER_NESTING_LONG_MARK  =
 'Lua 5.1 中不允许使用嵌套的 `[[...]]` 。'
+PARSER_LOCAL_LIMIT        =
+'只能同时存在200个活跃的局部变量与上值。'
 PARSER_LUADOC_MISS_CLASS_NAME           =
 '缺少类名称。'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =

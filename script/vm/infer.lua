@@ -247,6 +247,16 @@ local viewNodeSwitch;viewNodeSwitch = util.switch()
 ---@class vm.node
 ---@field lastInfer? vm.infer
 
+---@param node? vm.node
+---@return vm.infer
+local function createInfer(node)
+    local infer = setmetatable({
+        node  = node,
+        _drop = {},
+    }, mt)
+    return infer
+end
+
 ---@param source vm.node.object | vm.node
 ---@return vm.infer
 function vm.getInfer(source)
@@ -262,10 +272,7 @@ function vm.getInfer(source)
     if node.lastInfer then
         return node.lastInfer
     end
-    local infer = setmetatable({
-        node  = node,
-        _drop = {},
-    }, mt)
+    local infer = createInfer(node)
     node.lastInfer = infer
 
     return infer
@@ -315,9 +322,7 @@ function mt:_eraseAlias(uri)
                 if set.type == 'doc.alias' then
                     if expandAlias then
                         self._drop[n.name] = true
-                        local newInfer = setmetatable({
-                            _drop = {},
-                        }, mt)
+                        local newInfer = createInfer()
                         for _, ext in ipairs(set.extends.types) do
                             viewNodeSwitch(ext.type, ext, newInfer, uri)
                         end
@@ -326,7 +331,7 @@ function mt:_eraseAlias(uri)
                         end
                     else
                         for _, ext in ipairs(set.extends.types) do
-                            local view = viewNodeSwitch(ext.type, ext, {}, uri)
+                            local view = viewNodeSwitch(ext.type, ext, createInfer(), uri)
                             if view and view ~= n.name then
                                 self._drop[view] = true
                             end
@@ -550,9 +555,7 @@ end
 ---@param uri uri
 ---@return string?
 function vm.viewObject(source, uri)
-    local infer = setmetatable({
-        _drop = {},
-    }, mt)
+    local infer = createInfer()
     return viewNodeSwitch(source.type, source, infer, uri)
 end
 

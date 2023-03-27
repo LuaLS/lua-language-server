@@ -59,7 +59,7 @@ function m.getAbility(name)
         end
         current = current[parent]
         if not current then
-            return nil
+            return current
         end
         if nextPos > #name then
             break
@@ -376,24 +376,30 @@ local function tryModifySpecifiedConfig(uri, finalChanges)
     if #finalChanges == 0 then
         return false
     end
+    log.info('tryModifySpecifiedConfig', uri, inspect(finalChanges))
     local workspace = require 'workspace'
     local scp = scope.getScope(uri)
     if scp:get('lastLocalType') ~= 'json' then
+        log.info('lastLocalType ~= json')
         return false
     end
     local validChanges = getValidChanges(uri, finalChanges)
     if #validChanges == 0 then
+        log.info('No valid changes')
         return false
     end
     local path = workspace.getAbsolutePath(uri, CONFIGPATH)
     if not path then
+        log.info('Can not get absolute path')
         return false
     end
     local newJson = editConfigJson(uri, path, validChanges)
     if not newJson then
+        log.info('Can not edit config json')
         return false
     end
     util.saveFile(path, newJson)
+    log.info('Apply changes to config file', inspect(validChanges))
     removeAppliedChanges(finalChanges, validChanges)
     return true
 end
@@ -402,21 +408,26 @@ local function tryModifyRC(uri, finalChanges, create)
     if #finalChanges == 0 then
         return false
     end
+    log.info('tryModifyRC', uri, inspect(finalChanges))
     local workspace = require 'workspace'
     local path = workspace.getAbsolutePath(uri, '.luarc.jsonc')
     if not path then
+        log.info('Can not get absolute path of .luarc.jsonc')
         return false
     end
     path = fs.exists(fs.path(path)) and path or workspace.getAbsolutePath(uri, '.luarc.json')
     if not path then
+        log.info('Can not get absolute path of .luarc.json')
         return false
     end
     local buf = util.loadFile(path)
     if not buf and not create then
+        log.info('Can not load .luarc.json and not create')
         return false
     end
     local validChanges = getValidChanges(uri, finalChanges)
     if #validChanges == 0 then
+        log.info('No valid changes')
         return false
     end
     if not buf then
@@ -424,9 +435,11 @@ local function tryModifyRC(uri, finalChanges, create)
     end
     local newJson = editConfigJson(uri, path, validChanges)
     if not newJson then
+        log.info('Can not edit config json')
         return false
     end
     util.saveFile(path, newJson)
+    log.info('Apply changes to .luarc.json', inspect(validChanges))
     removeAppliedChanges(finalChanges, validChanges)
     return true
 end
@@ -435,6 +448,7 @@ local function tryModifyClient(uri, finalChanges)
     if #finalChanges == 0 then
         return false
     end
+    log.info('tryModifyClient', uri, inspect(finalChanges))
     if not m.getOption 'changeConfiguration' then
         return false
     end
@@ -447,12 +461,14 @@ local function tryModifyClient(uri, finalChanges)
         end
     end
     if #scpChanges == 0 then
+        log.info('No changes in client scope')
         return false
     end
     proto.notify('$/command', {
         command   = 'lua.config',
         data      = scpChanges,
     })
+    log.info('Apply client changes', uri, inspect(scpChanges))
     removeAppliedChanges(finalChanges, scpChanges)
     return true
 end
@@ -462,7 +478,9 @@ local function tryModifyClientGlobal(finalChanges)
     if #finalChanges == 0 then
         return
     end
+    log.info('tryModifyClientGlobal', inspect(finalChanges))
     if not m.getOption 'changeConfiguration' then
+        log.info('Client dose not support modifying config')
         return
     end
     local changes = {}
@@ -471,10 +489,15 @@ local function tryModifyClientGlobal(finalChanges)
             changes[#changes+1] = change
         end
     end
+    if #changes == 0 then
+        log.info('No global changes')
+        return
+    end
     proto.notify('$/command', {
         command   = 'lua.config',
         data      = changes,
     })
+    log.info('Apply client global changes', inspect(changes))
     removeAppliedChanges(finalChanges, changes)
 end
 
@@ -522,6 +545,7 @@ function m.setConfig(changes, onlyMemory)
     if #finalChanges == 0 then
         return
     end
+    log.info('Modify config', inspect(finalChanges))
     xpcall(function ()
         local ws = require 'workspace'
         tryModifyClientGlobal(finalChanges)
@@ -541,6 +565,7 @@ function m.setConfig(changes, onlyMemory)
             end
             if #finalChanges > 0 then
                 m.showMessage('Warning', lang.script('CONFIG_MODIFY_FAIL', buildMaunuallyMessage(finalChanges)))
+                log.warn('Config modify fail', inspect(finalChanges))
             end
         end
     end, log.error)
@@ -629,7 +654,7 @@ local function hookPrint()
 end
 
 function m.init(t)
-    log.debug('Client init', inspect(t))
+    log.info('Client init', inspect(t))
     m.info = t
     nonil.enable()
     m.client(t.clientInfo.name)

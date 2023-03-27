@@ -1,11 +1,18 @@
 local lm = require 'luamake'
 
-lm.bindir = "bin"
 lm.c = lm.compiler == 'msvc' and 'c89' or 'c11'
 lm.cxx = 'c++17'
 
----@diagnostic disable-next-line: codestyle-check
-lm.EXE_DIR = ""
+if lm.sanitize then
+    lm.mode = "debug"
+    lm.flags = "-fsanitize=address"
+    lm.gcc = {
+        ldflags = "-fsanitize=address"
+    }
+    lm.clang = {
+        ldflags = "-fsanitize=address"
+    }
+end
 
 local includeCodeFormat = true
 
@@ -47,19 +54,28 @@ lm:executable "lua-language-server" {
     }
 }
 
+local platform = require 'bee.platform'
+local exe      = platform.OS == 'Windows' and ".exe" or ""
+
+lm:copy "copy_lua-language-server" {
+    input = lm.bindir .. "/lua-language-server" .. exe,
+    output = "bin/lua-language-server" .. exe,
+}
+
 lm:copy "copy_bootstrap" {
     input = "make/bootstrap.lua",
-    output = lm.bindir .. "/main.lua",
+    output = "bin/main.lua",
 }
 
 lm:msvc_copydll 'copy_vcrt' {
     type = "vcrt",
-    output = lm.bindir,
+    output = "bin",
 }
 
 lm:phony "all" {
     deps = {
         "lua-language-server",
+        "copy_lua-language-server",
         "copy_bootstrap",
     },
     windows = {
@@ -76,26 +92,30 @@ if lm.notest then
     return
 end
 
-local platform = require 'bee.platform'
-local exe      = platform.OS == 'Windows' and ".exe" or ""
+lm:rule "run-bee-test" {
+    lm.bindir .. "/lua-language-server" .. exe, "$in",
+    description = "Run test: $in.",
+    pool = "console",
+}
+
+lm:rule "run-unit-test" {
+    "bin/lua-language-server" .. exe, "$in",
+    description = "Run test: $in.",
+    pool = "console",
+}
 
 lm:build "bee-test" {
-    lm.bindir .. "/lua-language-server" .. exe, "3rd/bee.lua/test/test.lua",
-    pool = "console",
-    deps = {
-        "all",
-    }
+    rule = "run-bee-test",
+    deps = { "lua-language-server", "copy_script" },
+    input = "3rd/bee.lua/test/test.lua",
 }
 
 lm:build 'unit-test' {
-    lm.bindir .. "/lua-language-server" .. exe, 'test.lua',
-    pool = "console",
-    deps = {
-        "bee-test",
-    }
+    rule = "run-unit-test",
+    deps = { "bee-test", "all" },
+    input = "test.lua",
 }
 
 lm:default {
-    "bee-test",
     "unit-test",
 }

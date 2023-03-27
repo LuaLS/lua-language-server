@@ -18,16 +18,26 @@ function export.buildMD(outputPath)
         md:emptyLine()
         md:add('md', class.desc)
         md:emptyLine()
-        local mark = {}
-        for _, field in ipairs(class.fields) do
-            if not mark[field.name] then
-                mark[field.name] = true
-                md:add('md', '## ' .. field.name)
-                md:emptyLine()
-                md:add('lua', field.extends.view)
-                md:emptyLine()
-                md:add('md', field.desc)
-                md:emptyLine()
+        if class.defines then
+            for _, define in ipairs(class.defines) do
+                if define.extends then
+                    md:add('lua', define.extends.view)
+                    md:emptyLine()
+                end
+            end
+        end
+        if class.fields then
+            local mark = {}
+            for _, field in ipairs(class.fields) do
+                if not mark[field.name] then
+                    mark[field.name] = true
+                    md:add('md', '## ' .. field.name)
+                    md:emptyLine()
+                    md:add('lua', field.extends.view)
+                    md:emptyLine()
+                    md:add('md', field.desc)
+                    md:emptyLine()
+                end
             end
         end
         md:splitLine()

@@ -1,5 +1,8 @@
 name: build
 
+permissions:
+  contents: write
+
 on:
   push:
     branches:
@@ -43,8 +46,14 @@ jobs:
       - name: Install aarch64-linux-gnu
         if: ${{ matrix.platform == 'linux-arm64' }}
         run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+          apt-get update
+          apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
+
+      - name: Prepare container
+        if: ${{ matrix.target == 'linux' }}
+        run: |
+          update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
+          update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
 
       - uses: actions/checkout@v3
         with:

@@ -81,6 +81,9 @@ function m.getRealUri(uri)
     if platform.OS ~= 'Windows' then
         return furi.normalize(uri)
     end
+    if not furi.isValid(uri) then
+        return uri
+    end
     local filename = furi.decode(uri)
     -- normalize uri
     uri = furi.encode(filename)
@@ -885,6 +888,41 @@ function m.countStates()
         n = n + 1
     end
     return n
+end
+
+---@param path string
+---@return string
+function m.normalize(path)
+    path = path:gsub('%$%{(.-)%}', function (key)
+        if key == '3rd' then
+            return (ROOT / 'meta' / '3rd'):string()
+        end
+        if key:sub(1, 4) == 'env:' then
+            local env = os.getenv(key:sub(5))
+            return env
+        end
+    end)
+    path = util.expandPath(path)
+    path = path:gsub('^%.[/\\]+', '')
+    for _ = 1, 1000 do
+        if path:sub(1, 2) == '..' then
+            break
+        end
+        local count
+        path, count = path:gsub('[^/\\]+[/\\]+%.%.[/\\]', '/', 1)
+        if count == 0 then
+            break
+        end
+    end
+    if platform.OS == 'Windows' then
+        path = path:gsub('[/\\]+', '\\')
+                   :gsub('[/\\]+$', '')
+                   :gsub('^(%a:)$', '%1\\')
+    else
+        path = path:gsub('[/\\]+', '/')
+                   :gsub('[/\\]+$', '')
+    end
+    return path
 end
 
 --- 注册事件

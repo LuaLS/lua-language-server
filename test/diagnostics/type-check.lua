@@ -1202,6 +1202,60 @@ some_fn { { "test" } } -- <- diagnostic: "Cannot assign `table` to `string`."
 ]]
 
 TEST [[
+---@param p integer|string
+local function get_val(p)
+    local is_number = type(p) == 'number'
+    return is_number and p or p
+end
+
+get_val('hi')
+]]
+
+TESTWITH 'param-type-mismatch' [[
+---@class Class
+local Class = {}
+
+---@param source string
+function Class.staticCreator(source)
+
+end
+
+Class.staticCreator(<!true!>)
+Class<!:!>staticCreator() -- Expecting a waring
+]]
+
+TESTWITH 'assign-type-mismatch' [[
+---@type string[]
+local arr = {
+    <!3!>,
+}
+]]
+
+TESTWITH 'assign-type-mismatch' [[
+---@type (string|boolean)[]
+local arr2 = {
+    <!3!>, -- no warnings
+}
+]]
+
+TEST [[
+---@class A
+
+---@class B : A
+
+---@class C : B
+
+---@class D : B
+
+---@param x A
+local function func(x) end
+
+---@type C|D
+local var
+func(var)
+]]
+
+TEST [[
 ---@type string|table
 local x
 

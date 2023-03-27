@@ -2161,22 +2161,6 @@ integer
 500
 ```
 
-# workspace.supportScheme
-
-Provide language server for the Lua files of the following scheme.
-
-## type
-
-```ts
-Array<string>
-```
-
-## default
-
-```jsonc
-["file","untitled","git"]
-```
-
 # workspace.useGitIgnore
 
 Ignore files list in `.gitignore` .

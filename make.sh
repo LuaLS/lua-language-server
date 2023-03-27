@@ -1,5 +1,7 @@
+#!/usr/bin/env bash
+
 git submodule update --init --recursive
-cd 3rd/luamake
+pushd 3rd/luamake
 ./compile/install.sh
-cd ../..
+popd
 ./3rd/luamake/luamake rebuild

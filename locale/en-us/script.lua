@@ -281,6 +281,8 @@ PARSER_NEED_PAREN         = -- TODO: need translate!
 'Need to add a pair of parentheses.'
 PARSER_NESTING_LONG_MARK  =
 'Nesting of `[[...]]` is not allowed in Lua 5.1 .'
+PARSER_LOCAL_LIMIT        =
+'Only 200 active local variables and upvalues can be existed at the same time.'
 PARSER_LUADOC_MISS_CLASS_NAME           =
 '<class name> expected.'
 PARSER_LUADOC_MISS_EXTENDS_SYMBOL       =

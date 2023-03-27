@@ -210,6 +210,7 @@ local template = {
                                                     'assert',
                                                     'error',
                                                     'type',
+                                                    'os.exit',
                                                 }
                                             ),
     ['Lua.runtime.meta']                    = Type.String >> '${version} ${language} ${encoding}',
@@ -394,6 +395,7 @@ local template = {
     ['Lua.doc.packageName']                 = Type.Array(Type.String),
 
     -- VSCode
+    ["Lua.addonManager.enable"]             = Type.Boolean >> true,
     ['files.associations']                  = Type.Hash(Type.String, Type.String),
                                             -- copy from VSCode default
     ['files.exclude']                       = Type.Hash(Type.String, Type.Boolean) >> {

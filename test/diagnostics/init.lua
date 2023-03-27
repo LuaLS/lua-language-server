@@ -27,7 +27,7 @@ local function founded(targets, results)
 end
 
 ---@diagnostic disable: await-in-sync
-function TEST(script, ...)
+function TEST(script)
     local newScript, catched = catch(script, '!')
     files.setText(TESTURI, newScript)
     files.open(TESTURI)
@@ -50,6 +50,37 @@ function TEST(script, ...)
 
     return function (callback)
         callback(origins)
+    end
+end
+
+function TESTWITH(code)
+    return function (script)
+        local newScript, catched = catch(script, '!')
+        files.setText(TESTURI, newScript)
+        files.open(TESTURI)
+        local origins = {}
+        local results = {}
+        core(TESTURI, false, function (result)
+            if code ~= result.code then
+                return
+            end
+            results[#results+1] = { result.start, result.finish }
+            origins[#origins+1] = result
+        end)
+
+        if results[1] then
+            if not founded(catched['!'] or {}, results) then
+                error(('%s\n%s'):format(util.dump(catched['!']), util.dump(results)))
+            end
+        else
+            assert(#catched['!'] == 0)
+        end
+
+        files.remove(TESTURI)
+
+        return function (callback)
+            callback(origins)
+        end
     end
 end
 

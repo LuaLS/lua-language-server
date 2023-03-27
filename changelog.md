@@ -1,9 +1,76 @@
 # changelog
 
+## 3.6.19
+* `FIX` [#2036]
+
+[#2036]: https://github.com/LuaLS/lua-language-server/issues/2036
+
+## 3.6.18
+`2023-3-23`
+* `FIX` [#1943]
+* `FIX` [#1996]
+* `FIX` [#2004]
+* `FIX` [#2013]
+
+[#1943]: https://github.com/LuaLS/lua-language-server/issues/1943
+[#1996]: https://github.com/LuaLS/lua-language-server/issues/1996
+[#2004]: https://github.com/LuaLS/lua-language-server/issues/2004
+[#2013]: https://github.com/LuaLS/lua-language-server/issues/2013
+
+## 3.6.17
+`2023-3-9`
+* `CHG` export documents: export global variables
+* `FIX` [#1715]
+* `FIX` [#1753]
+* `FIX` [#1914]
+* `FIX` [#1922]
+* `FIX` [#1924]
+* `FIX` [#1928]
+* `FIX` [#1945]
+* `FIX` [#1955]
+* `FIX` [#1978]
+
+[#1715]: https://github.com/LuaLS/lua-language-server/issues/1715
+[#1753]: https://github.com/LuaLS/lua-language-server/issues/1753
+[#1914]: https://github.com/LuaLS/lua-language-server/issues/1914
+[#1922]: https://github.com/LuaLS/lua-language-server/issues/1922
+[#1924]: https://github.com/LuaLS/lua-language-server/issues/1924
+[#1928]: https://github.com/LuaLS/lua-language-server/issues/1928
+[#1945]: https://github.com/LuaLS/lua-language-server/issues/1945
+[#1955]: https://github.com/LuaLS/lua-language-server/issues/1955
+[#1978]: https://github.com/LuaLS/lua-language-server/issues/1978
+
+## 3.6.13
+`2023-3-2`
+* `FIX` setting: `Lua.addonManager.enable` should be `true` by default
+* `FIX` failed to publish to Windows
+
+## 3.6.12
+`2023-3-2`
+* `NEW` [Addon Manager](https://github.com/LuaLS/lua-language-server/discussions/1607), try it with command `lua.addon_manager.open`. Thanks to [carsakiller](https://github.com/carsakiller)!
+
+## 3.6.11
+`2023-2-13`
+* `CHG` completion: don't show loading process
+* `FIX` [#1886]
+* `FIX` [#1887]
+* `FIX` [#1889]
+* `FIX` [#1895]
+* `FIX` [#1902]
+
+[#1886]: https://github.com/LuaLS/lua-language-server/issues/1886
+[#1887]: https://github.com/LuaLS/lua-language-server/issues/1887
+[#1889]: https://github.com/LuaLS/lua-language-server/issues/1889
+[#1895]: https://github.com/LuaLS/lua-language-server/issues/1895
+[#1902]: https://github.com/LuaLS/lua-language-server/issues/1902
+
 ## 3.6.10
+`2023-2-7`
 * `FIX` [#1869]
+* `FIX` [#1872]
 
 [#1869]: https://github.com/LuaLS/lua-language-server/issues/1869
+[#1872]: https://github.com/LuaLS/lua-language-server/issues/1872
 
 ## 3.6.9
 `2023-2-2`

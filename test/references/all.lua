@@ -126,3 +126,16 @@ end
 local v1 = Master:foobar("", Dog)
 v1.<!eat!>()
 ]]
+
+TEST [[
+---@class A
+A = {}
+
+function A:<~TestA~>()
+end
+
+---@param param A
+function TestB(param)
+    param:<!TestA!>()
+end
+]]

@@ -698,7 +698,7 @@ object<string, string>
 ```jsonc
 {
     /*
-    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1`
+    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1` 
     */
     "ambiguity-1": "Any",
     /*
@@ -945,7 +945,7 @@ object<string, string>
 ```jsonc
 {
     /*
-    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1`
+    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1` 
     */
     "ambiguity-1": "Warning",
     /*
@@ -2158,22 +2158,6 @@ integer
 
 ```jsonc
 500
-```
-
-# workspace.supportScheme
-
-为以下 scheme 的lua文件提供语言服务。
-
-## type
-
-```ts
-Array<string>
-```
-
-## default
-
-```jsonc
-["file","untitled","git"]
 ```
 
 # workspace.useGitIgnore

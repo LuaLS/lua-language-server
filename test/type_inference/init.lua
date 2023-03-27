@@ -178,7 +178,7 @@ TEST 'boolean' [[
 <?x?> = a == b
 ]]
 
-TEST 'integer' [[
+TEST 'unknown' [[
 <?x?> = a << b
 ]]
 
@@ -186,7 +186,7 @@ TEST 'integer' [[
 <?x?> = 1 << 2
 ]]
 
-TEST 'string' [[
+TEST 'unknown' [[
 <?x?> = a .. b
 ]]
 
@@ -202,7 +202,7 @@ TEST 'string' [[
 <?x?> = 'a' .. 1.0
 ]]
 
-TEST 'number' [[
+TEST 'unknown' [[
 <?x?> = a + b
 ]]
 
@@ -227,11 +227,11 @@ local a
 <?x?> = - a
 ]]
 
-TEST 'integer' [[
+TEST 'unknown' [[
 <?x?> = 1 + X
 ]]
 
-TEST 'number' [[
+TEST 'unknown' [[
 <?x?> = 1.0 + X
 ]]
 
@@ -2442,7 +2442,7 @@ local <?z?> = f()
 
 TEST 'integer|table' [[
 local function returnI()
-    return a + 1
+    return 1
 end
 
 local function f()
@@ -2641,6 +2641,17 @@ local n
 
 if not n then
     error('n is nil')
+end
+
+print(<?n?>)
+]]
+
+TEST 'integer' [[
+---@type integer?
+local n
+
+if not n then
+    os.exit()
 end
 
 print(<?n?>)
@@ -4233,6 +4244,48 @@ end
 
 function Y()
 end
+]]
+
+TEST 'A_Class' [[
+---@class A_Class
+local A = { x = 5 }
+
+function A:func()
+    for i = 1, <?self?>.x do
+        print(i)
+    end
+
+    self.y = 3
+    self.y = self.y + 3
+end
+]]
+
+TEST 'number' [[
+---@type number?
+local n
+local <?v?> = n or error('')
+]]
+
+TEST 'Foo' [[
+---@class Foo
+---@operator mul(Foo): Foo
+---@operator mul(Bar): Foo
+---@class Bar
+
+---@type Foo
+local foo
+
+---@type Foo|Bar
+local fooOrBar
+
+local <?b?> = foo * fooOrBar
+]]
+
+TEST 'number' [[
+local a = 4;
+local b = 2;
+
+local <?c?> = a / b;
 ]]
 
 TEST 'integer' [[

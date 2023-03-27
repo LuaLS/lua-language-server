@@ -1,5 +1,7 @@
 ---@diagnostic disable: undefined-global
 
+config.addonManager.enable        =
+"Whether the addon manager is enabled or not."
 config.runtime.version            =
 "Lua runtime version."
 config.runtime.path               =
@@ -423,4 +425,6 @@ config.typeFormat.config.format_line        =
 'Controls if a line is formatted at all.'
 
 command.exportDocument =
-'Export Document ...'
+'Lua: Export Document ...'
+command.addon_manager.open =
+'Lua: Open Addon Manager ...'

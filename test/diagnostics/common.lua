@@ -2262,3 +2262,9 @@ else
     function X.f() end
 end
 ]]
+
+TESTWITH 'global-in-nil-env' [[
+local function foo(_ENV)
+    Joe = "human"
+end
+]]

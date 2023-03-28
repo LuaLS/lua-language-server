@@ -61,6 +61,7 @@ function lovr.math.mat4() end
 ---
 ---Creates a new `Curve` from a list of control points.
 ---
+---@overload fun(v: lovr.Vec3, ...):lovr.Curve
 ---@overload fun(points: table):lovr.Curve
 ---@overload fun(n: number):lovr.Curve
 ---@param x number # The x coordinate of the first control point.
@@ -491,8 +492,10 @@ function Mat4:scale(scale) end
 ---Sets the components of the matrix from separate position, rotation, and scale arguments or an existing matrix.
 ---
 ---@overload fun(self: lovr.Mat4, n: lovr.mat4):lovr.Mat4
----@overload fun(self: lovr.Mat4, position?: lovr.Vec3, scale?: lovr.Vec3, rotation?: lovr.Quat):lovr.Mat4
----@overload fun(self: lovr.Mat4, position?: lovr.Vec3, rotation?: lovr.Quat):lovr.Mat4
+---@overload fun(self: lovr.Mat4, x: number, y: number, z: number, sx: number, sy: number, sz: number, angle: number, ax: number, ay: number, az: number):lovr.Mat4
+---@overload fun(self: lovr.Mat4, x: number, y: number, z: number, angle: number, ax: number, ay: number, az: number):lovr.Mat4
+---@overload fun(self: lovr.Mat4, position: lovr.Vec3, scale: lovr.Vec3, rotation: lovr.Quat):lovr.Mat4
+---@overload fun(self: lovr.Mat4, position: lovr.Vec3, rotation: lovr.Quat):lovr.Mat4
 ---@overload fun(self: lovr.Mat4, ...):lovr.Mat4
 ---@overload fun(self: lovr.Mat4, d: number):lovr.Mat4
 ---@return lovr.Mat4 m # The input matrix.

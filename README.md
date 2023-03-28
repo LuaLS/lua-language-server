@@ -12,6 +12,7 @@ The Lua language server provides various language features for Lua to make devel
 
 ## Features
 
+- ⚙️ Supports `Lua 5.4`, `Lua 5.3`, `Lua 5.2`, `Lua 5.1`, and `LuaJIT`
 - 📄 Over 20 supported [annotations](https://github.com/LuaLS/lua-language-server/wiki/Annotations) for documenting your code
 - ↪ Go to definition
 - 🦺 Dynamic [type checking](https://github.com/LuaLS/lua-language-server/wiki/Type-Checking)
@@ -28,29 +29,27 @@ The Lua language server provides various language features for Lua to make devel
 - 📖 [Documentation Generation](https://github.com/LuaLS/lua-language-server/wiki/Export-Documentation)
 
 ## Install
-
-The language server can easily be installed for use in VS Code, but it can also be used by other clients using the command line.
+The language server can be installed for use in Visual Studio Code, NeoVim, and any [other clients](https://microsoft.github.io/language-server-protocol/implementors/tools/) that support the [Language Server Protocol](https://microsoft.github.io/language-server-protocol/). The language server can be configured using a [configuration file](https://github.com/LuaLS/lua-language-server/wiki/Configuration-File). For a more detailed intro, check out the [getting started page in the wiki](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started).
 
 ### Visual Studio Code
 [![Install in VS Code](https://img.shields.io/badge/VS%20Code-Install-blue?style=for-the-badge&logo=visualstudiocode "Install in VS Code")](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
 
 The language server and Visual Studio Code client can be installed from [the VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=sumneko.lua).
 
-![](https://github.com/LuaLS/vscode-lua/raw/master/images//Install%20In%20VSCode.gif)
+### NeoVim
+[![Install for NeoVim](https://img.shields.io/badge/NeoVim-Install-blue?style=for-the-badge&logo=neovim "Install for NeoVim")](https://dev.to/vonheikemen/getting-started-with-neovims-native-lsp-client-in-the-year-of-2022-the-easy-way-bp3)
+
+You can read [Heiker's guide](https://dev.to/vonheikemen/getting-started-with-neovims-native-lsp-client-in-the-year-of-2022-the-easy-way-bp3) for getting set up from scratch.
 
 ### Command Line
 [![Install for command line](https://img.shields.io/badge/Command%20Line-Install-blue?style=for-the-badge&logo=windowsterminal "Install for command line")](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#command-line)
 
-Check the [wiki for a guide](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#command-line) to install the language server for use on the command line. This allows the language server to be used with NeoVim and [other clients](https://microsoft.github.io/language-server-protocol/implementors/tools/) that follow the [language server protocol](https://microsoft.github.io/language-server-protocol/overviews/lsp/overview/).
+Check the [wiki for a guide](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#command-line) to install the language server for use on the command line. This allows the language server to be used with [other clients](https://microsoft.github.io/language-server-protocol/implementors/tools/) that follow the [language server protocol](https://microsoft.github.io/language-server-protocol/overviews/lsp/overview/).
 
-## Supported Lua Versions
-| Version |   Supported    |
-| :-----: | :------------: |
-| Lua 5.1 | ![✅][checkmark] |
-| Lua 5.2 | ![✅][checkmark] |
-| Lua 5.3 | ![✅][checkmark] |
-| Lua 5.4 | ![✅][checkmark] |
-| LuaJIT  | ![✅][checkmark] |
+### Community Install Methods
+The install methods below are maintained by community members.
+
+[asdf plugin](https://github.com/bellini666/asdf-lua-language-server)
 
 ## Links
 - [Changelog](https://github.com/LuaLS/lua-language-server/blob/master/changelog.md)
@@ -82,15 +81,6 @@ Are you able to [provide a translation](https://github.com/LuaLS/lua-language-se
 
 Thank you to [all contributors of translations](https://github.com/LuaLS/lua-language-server/commits/master/locale)!
 
-## Configuration
-Configuration of the server can be done in a number of ways, which are explained more in-depth in the [wiki](https://github.com/LuaLS/lua-language-server/wiki/Configuration-File).
-
-### Visual Studio Code
-You can use the [settings editor](https://code.visualstudio.com/docs/getstarted/settings#_settings-editor) or edit the [raw JSON file](https://code.visualstudio.com/docs/getstarted/settings#_settingsjson).
-
-### Other
-See the [configuration file wiki page](https://github.com/LuaLS/lua-language-server/wiki/Configuration-File).
-
 
 ## Privacy
 The language server had **opt-in** telemetry that collected usage data and sent it to the development team to help improve the extension. Read our [privacy policy](https://github.com/LuaLS/lua-language-server/wiki/Home#privacy) to learn more. Telemetry was removed in `v3.6.5` and is no longer part of the language server.
@@ -116,6 +106,3 @@ Software that the language server (or the development of it) uses:
 * [json.lua](https://github.com/actboy168/json.lua)
 * [EmmyLuaCodeStyle](https://github.com/CppCXY/EmmyLuaCodeStyle)
 * [inspect.lua](https://github.com/kikito/inspect.lua)
-
-
-[checkmark]: https://user-images.githubusercontent.com/61925890/183228083-d3aa4eca-30c7-4b9f-aaab-26ce3d8a14fb.png

@@ -2,8 +2,10 @@
 
 ## 3.6.19
 * `FIX` [#2036]
+* `FIX` [#2037]
 
 [#2036]: https://github.com/LuaLS/lua-language-server/issues/2036
+[#2037]: https://github.com/LuaLS/lua-language-server/issues/2037
 
 ## 3.6.18
 `2023-3-23`

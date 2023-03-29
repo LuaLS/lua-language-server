@@ -372,6 +372,22 @@ vm.binarySwitch = util.switch()
                 [1]    = a .. b,
             })
         else
+            local uri = guide.getUri(source)
+            local infer1 = vm.getInfer(source[1])
+            local infer2 = vm.getInfer(source[2])
+            if  (
+                infer1:hasType(uri, 'integer')
+            or  infer1:hasType(uri, 'number')
+            or  infer1:hasType(uri, 'string')
+            )
+            and (
+                infer2:hasType(uri, 'integer')
+            or  infer2:hasType(uri, 'number')
+            or  infer2:hasType(uri, 'string')
+            ) then
+                vm.setNode(source, vm.declareGlobal('type', 'string'))
+                return
+            end
             local node = vm.runOperator(binaryMap[source.op.type], source[1], source[2])
             if node then
                 vm.setNode(source, node)

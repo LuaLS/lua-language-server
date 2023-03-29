@@ -4288,6 +4288,13 @@ local b = 2;
 local <?c?> = a / b;
 ]]
 
+TEST 'string' [[
+local a = '4';
+local b = '2';
+
+local <?c?> = a .. b;
+]]
+
 TEST 'integer' [[
 ---@generic A, B, C
 ---@type fun(x: A, y: B, z: C):C, B, A

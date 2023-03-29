@@ -25,6 +25,7 @@ LOCALE = 'zh-cn'
 
 --dofile((ROOT / 'build_package.lua'):string())
 require 'tracy'
+require 'main'
 
 local function loadAllLibs()
     assert(require 'bee.filesystem')

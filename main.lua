@@ -73,6 +73,7 @@ require 'tracy'
 
 xpcall(dofile, log.debug, (ROOT / 'debugger.lua'):string())
 
+require 'main'
 require 'cli'
 
 local _, service = xpcall(require, log.error, 'service')

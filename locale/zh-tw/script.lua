@@ -150,10 +150,8 @@ DIAG_INVISIBLE_PROTECTED              = -- TODO: need translate!
 'Field `{field}` is protected, it can only be accessed in class `{class}` and its subclasses.'
 DIAG_INVISIBLE_PACKAGE                = -- TODO: need translate!
 'Field `{field}` can only be accessed in same file `{uri}`.'
-DIAG_GLOBAL_ELEMENT                   = -- TODO: need translate!
+DIAG_GLOBAL_ELEMENT                  = -- TODO: need translate!
 'Element is global.'
-DIAG_UPPERCASE_LOCAL                  = -- TODO: need translate!
-'Local element `{}` must start with lowercase letter'
 
 MWS_NOT_SUPPORT         =
 '{} 目前還不支援多工作目錄，我可能需要重新啟動才能支援新的工作目錄...'

@@ -173,7 +173,6 @@ m.register {
 
 m.register {
     'global-element',
-    'uppercase-local',
 } {
     group   = 'strict-conventions',
     severity = 'Warning',

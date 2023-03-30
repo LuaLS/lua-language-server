@@ -150,10 +150,8 @@ DIAG_INVISIBLE_PROTECTED              =
 '字段 `{field}` 受到保护，只能在 `{class}` 类极其子类中才能访问。'
 DIAG_INVISIBLE_PACKAGE                =
 '字段 `{field}` 只能在相同的文件 `{uri}` 中才能访问。'
-DIAG_GLOBAL_ELEMENT                   = -- TODO: need translate!
+DIAG_GLOBAL_ELEMENT                  = -- TODO: need translate!
 'Element is global.'
-DIAG_UPPERCASE_LOCAL                  = -- TODO: need translate!
-'Local element `{}` must start with lowercase letter'
 
 MWS_NOT_SUPPORT         =
 '{} 目前还不支持多工作目录，我可能需要重启才能支持新的工作目录...'

@@ -6,7 +6,7 @@ local guide = require 'parser.guide'
 ---@overload fun(name: string):Type
 ---@field private name string
 ---@field private subMgr SubMgr
----@field private cate Type.Category
+---@field private cate Type.Category|nil
 local Type = C.class 'Type'
 
 ---@private
@@ -75,10 +75,16 @@ end
 ---@package
 ---@param uri uri
 function Type:dropUri(uri)
+    self:clearCache()
     self.subMgr:dropUri(uri)
     if not self.subMgr:hasAnyLink() then
         Type.allTypes[self.name] = nil
     end
+end
+
+---@private
+function Type:clearCache()
+    self.cate = nil
 end
 
 -- 预编译语法树，绑定所有类型

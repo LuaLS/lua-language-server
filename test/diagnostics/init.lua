@@ -87,4 +87,3 @@ end
 require 'diagnostics.common'
 require 'diagnostics.type-check'
 require 'diagnostics.global-element'
-require 'diagnostics.uppercase-local'

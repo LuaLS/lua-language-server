@@ -238,14 +238,14 @@ TEST [[
 string.<?sub?>()
 ]]
 [[
-function string.sub(s: string, i: integer, j?: integer)
+function string.sub(s: string|number, i: integer, j?: integer)
   -> string
 ]]
 
 TEST[[
 ('xx'):<?sub?>()
 ]]
-[[function string.sub(s: string, i: integer, j?: integer)
+[[function string.sub(s: string|number, i: integer, j?: integer)
   -> string]]
 
 TEST [[
@@ -272,7 +272,7 @@ TEST [[
 string.<?lower?>()
 ]]
 [[
-function string.lower(s: string)
+function string.lower(s: string|number)
   -> string
 ]]
 

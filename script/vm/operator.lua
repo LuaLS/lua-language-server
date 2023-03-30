@@ -73,15 +73,22 @@ local function checkOperators(operators, op, value, result)
             local valueNode = vm.compileNode(value)
             local expNode   = vm.compileNode(operator.exp)
             local uri       = guide.getUri(operator)
-            if not vm.isSubType(uri, valueNode, expNode) then
-                goto CONTINUE
+            for vo in valueNode:eachObject() do
+                if vm.isSubType(uri, vo, expNode) then
+                    if not result then
+                        result = vm.createNode()
+                    end
+                    result:merge(vm.compileNode(operator.extends))
+                    return result
+                end
             end
+        else
+            if not result then
+                result = vm.createNode()
+            end
+            result:merge(vm.compileNode(operator.extends))
+            return result
         end
-        if not result then
-            result = vm.createNode()
-        end
-        result:merge(vm.compileNode(operator.extends))
-        break
         ::CONTINUE::
     end
     return result
@@ -249,7 +256,9 @@ vm.binarySwitch = util.switch()
             })
         else
             local node = vm.runOperator(binaryMap[op], source[1], source[2])
-            vm.setNode(source, node or vm.declareGlobal('type', 'integer'))
+            if node then
+                vm.setNode(source, node)
+            end
         end
     end)
     : case '+'
@@ -296,20 +305,38 @@ vm.binarySwitch = util.switch()
                 local uri = guide.getUri(source)
                 local infer1 = vm.getInfer(source[1])
                 local infer2 = vm.getInfer(source[2])
-                if infer1:hasType(uri, 'integer')
-                or infer2:hasType(uri, 'integer') then
-                    if  not infer1:hasType(uri, 'number')
-                    and not infer2:hasType(uri, 'number') then
-                        vm.setNode(source, vm.declareGlobal('type', 'integer'))
-                        return
-                    end
+                if  infer1:hasType(uri, 'integer')
+                and infer2:hasType(uri, 'integer') then
+                    vm.setNode(source, vm.declareGlobal('type', 'integer'))
+                    return
+                end
+                if  (infer1:hasType(uri, 'number') or infer1:hasType(uri, 'integer'))
+                and (infer2:hasType(uri, 'number') or infer2:hasType(uri, 'integer')) then
+                    vm.setNode(source, vm.declareGlobal('type', 'number'))
+                    return
+                end
+            end
+            if op == '/'
+            or op == '^' then
+                local uri = guide.getUri(source)
+                local infer1 = vm.getInfer(source[1])
+                local infer2 = vm.getInfer(source[2])
+                if  (infer1:hasType(uri, 'integer') or infer1:hasType(uri, 'number'))
+                and (infer2:hasType(uri, 'integer') or infer2:hasType(uri, 'number')) then
+                    vm.setNode(source, vm.declareGlobal('type', 'number'))
+                    return
                 end
             end
             if op == '//' then
-                vm.setNode(source, node or vm.declareGlobal('type', 'integer'))
-                return
+                local uri = guide.getUri(source)
+                local infer1 = vm.getInfer(source[1])
+                local infer2 = vm.getInfer(source[2])
+                if  (infer1:hasType(uri, 'integer') or infer1:hasType(uri, 'number'))
+                and (infer2:hasType(uri, 'integer') or infer2:hasType(uri, 'number')) then
+                    vm.setNode(source, vm.declareGlobal('type', 'integer'))
+                    return
+                end
             end
-            vm.setNode(source, node or vm.declareGlobal('type', 'number'))
         end
     end)
     : case '..'
@@ -345,8 +372,26 @@ vm.binarySwitch = util.switch()
                 [1]    = a .. b,
             })
         else
+            local uri = guide.getUri(source)
+            local infer1 = vm.getInfer(source[1])
+            local infer2 = vm.getInfer(source[2])
+            if  (
+                infer1:hasType(uri, 'integer')
+            or  infer1:hasType(uri, 'number')
+            or  infer1:hasType(uri, 'string')
+            )
+            and (
+                infer2:hasType(uri, 'integer')
+            or  infer2:hasType(uri, 'number')
+            or  infer2:hasType(uri, 'string')
+            ) then
+                vm.setNode(source, vm.declareGlobal('type', 'string'))
+                return
+            end
             local node = vm.runOperator(binaryMap[source.op.type], source[1], source[2])
-            vm.setNode(source, node or vm.declareGlobal('type', 'string'))
+            if node then
+                vm.setNode(source, node)
+            end
         end
     end)
     : case '>'

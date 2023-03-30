@@ -218,10 +218,6 @@ local function collectVars(global, results)
         defines = {},
     }
     for _, set in ipairs(global:getSets(ws.rootUri)) do
-        local uri = guide.getUri(set)
-        if files.isLibrary(uri) then
-            goto CONTINUE
-        end
         if set.type == 'setglobal'
         or set.type == 'setfield'
         or set.type == 'setmethod'
@@ -235,7 +231,6 @@ local function collectVars(global, results)
             }
             result.desc = result.desc or getDesc(set)
         end
-        ::CONTINUE::
     end
     if #result.defines == 0 then
         return
@@ -250,36 +245,24 @@ local function collectVars(global, results)
 end
 
 ---@async
----@param outputPath string
-function export.makeDoc(outputPath)
+---@param callback fun(i, max)
+function export.export(outputPath, callback)
     local results = {}
+    local globals = vm.getAllGlobals()
 
-    ws.awaitReady(ws.rootUri)
-
-    local expandAlias = config.get(ws.rootUri, 'Lua.hover.expandAlias')
-    config.set(ws.rootUri, 'Lua.hover.expandAlias', false)
-    local _ <close> = function ()
-        config.set(ws.rootUri, 'Lua.hover.expandAlias', expandAlias)
+    local max = 0
+    for _ in pairs(globals) do
+        max = max + 1
     end
-
-    await.sleep(0.1)
-
-    local prog <close> = progress.create(ws.rootUri, '正在生成文档...', 0)
-    local globalTypes = vm.getGlobals 'type'
-    local globalVars  = vm.getGlobals 'variable'
-
-    local max = #globalTypes + #globalVars
-
-    for i, global in ipairs(globalTypes) do
-        collectTypes(global, results)
-        prog:setMessage(('%d/%d'):format(i, max))
-        prog:setPercentage(i / max * 100)
-    end
-
-    for i, global in ipairs(globalVars) do
-        collectVars(global, results)
-        prog:setMessage(('%d/%d'):format(i + #globalTypes, max))
-        prog:setPercentage((i + #globalTypes) / max * 100)
+    local i = 0
+    for _, global in pairs(globals) do
+        if global.cate == 'variable' then
+            collectVars(global, results)
+        elseif global.cate == 'type' then
+            collectTypes(global, results)
+        end
+        i = i + 1
+        callback(i, max)
     end
 
     table.sort(results, function (a, b)
@@ -291,6 +274,28 @@ function export.makeDoc(outputPath)
     util.saveFile(docPath, jsonb.beautify(results))
 
     local mdPath = doc2md.buildMD(outputPath)
+    return docPath, mdPath
+end
+
+---@async
+---@param outputPath string
+function export.makeDoc(outputPath)
+    ws.awaitReady(ws.rootUri)
+
+    local expandAlias = config.get(ws.rootUri, 'Lua.hover.expandAlias')
+    config.set(ws.rootUri, 'Lua.hover.expandAlias', false)
+    local _ <close> = function ()
+        config.set(ws.rootUri, 'Lua.hover.expandAlias', expandAlias)
+    end
+
+    await.sleep(0.1)
+
+    local prog <close> = progress.create(ws.rootUri, '正在生成文档...', 0)
+    local docPath, mdPath = export.export(outputPath, function (i, max)
+        prog:setMessage(('%d/%d'):format(i, max))
+        prog:setPercentage((i) / max * 100)
+    end)
+
     return docPath, mdPath
 end
 
@@ -313,7 +318,6 @@ function export.runCLI()
     util.enableCloseFunction()
 
     local lastClock = os.clock()
-    local results = {}
 
     ---@async
     lclient():start(function (client)
@@ -331,11 +335,7 @@ function export.runCLI()
         ws.awaitReady(rootUri)
         await.sleep(0.1)
 
-        local globals = vm.getGlobals 'type'
-
-        local max  = #globals
-        for i, global in ipairs(globals) do
-            collectTypes(global, results)
+        local docPath, mdPath = export.export(LOGPATH, function (i, max)
             if os.clock() - lastClock > 0.2 then
                 lastClock = os.clock()
                 local output = '\x0D'
@@ -346,24 +346,15 @@ function export.runCLI()
                             .. tostring(i) .. '/' .. tostring(max)
                 io.write(output)
             end
-        end
+        end)
+
         io.write('\x0D')
 
-        table.sort(results, function (a, b)
-            return a.name < b.name
-        end)
+        print(lang.script('CLI_DOC_DONE'
+            , ('[%s](%s)'):format(files.normalize(docPath), furi.encode(docPath))
+            , ('[%s](%s)'):format(files.normalize(mdPath),  furi.encode(mdPath))
+        ))
     end)
-
-    local docPath = LOGPATH .. '/doc.json'
-    jsonb.supportSparseArray = true
-    util.saveFile(docPath, jsonb.beautify(results))
-
-    local mdPath = doc2md.buildMD(LOGPATH)
-
-    print(lang.script('CLI_DOC_DONE'
-        , ('[%s](%s)'):format(files.normalize(docPath), furi.encode(docPath))
-        , ('[%s](%s)'):format(files.normalize(mdPath),  furi.encode(mdPath))
-    ))
 end
 
 return export

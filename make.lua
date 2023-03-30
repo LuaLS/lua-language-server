@@ -92,20 +92,26 @@ if lm.notest then
     return
 end
 
-lm:rule "runtest" {
+lm:rule "run-bee-test" {
+    lm.bindir .. "/lua-language-server" .. exe, "$in",
+    description = "Run test: $in.",
+    pool = "console",
+}
+
+lm:rule "run-unit-test" {
     "bin/lua-language-server" .. exe, "$in",
     description = "Run test: $in.",
     pool = "console",
 }
 
 lm:build "bee-test" {
-    rule = "runtest",
-    deps = { "all" },
+    rule = "run-bee-test",
+    deps = { "lua-language-server", "copy_script" },
     input = "3rd/bee.lua/test/test.lua",
 }
 
 lm:build 'unit-test' {
-    rule = "runtest",
+    rule = "run-unit-test",
     deps = { "bee-test", "all" },
     input = "test.lua",
 }

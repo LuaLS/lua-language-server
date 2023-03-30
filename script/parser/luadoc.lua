@@ -1501,21 +1501,22 @@ end
 local function trimTailComment(text)
     local comment = text
     if text:sub(1, 1) == '@' then
-        comment = text:sub(2)
+        comment = util.trim(text:sub(2))
     end
     if text:sub(1, 1) == '#' then
-        comment = text:sub(2)
+        comment = util.trim(text:sub(2))
     end
     if text:sub(1, 2) == '--' then
-        comment = text:sub(3)
+        comment = util.trim(text:sub(3))
     end
-    if comment:find '^%s*[\'"[]' then
+    if  comment:find '^%s*[\'"[]'
+    and comment:find '[\'"%]]%s*$' then
         local state = compile(comment:gsub('^%s+', ''), 'String')
         if state and state.ast then
             comment = state.ast[1]
         end
     end
-    return comment
+    return util.trim(comment)
 end
 
 local function buildLuaDoc(comment)

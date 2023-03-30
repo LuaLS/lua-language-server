@@ -1,5 +1,25 @@
 # changelog
 
+## 3.6.19
+* `FIX` commandline parameter `checklevel` may not work
+* `FIX` [#2036]
+* `FIX` [#2037]
+
+[#2036]: https://github.com/LuaLS/lua-language-server/issues/2036
+[#2037]: https://github.com/LuaLS/lua-language-server/issues/2037
+
+## 3.6.18
+`2023-3-23`
+* `FIX` [#1943]
+* `FIX` [#1996]
+* `FIX` [#2004]
+* `FIX` [#2013]
+
+[#1943]: https://github.com/LuaLS/lua-language-server/issues/1943
+[#1996]: https://github.com/LuaLS/lua-language-server/issues/1996
+[#2004]: https://github.com/LuaLS/lua-language-server/issues/2004
+[#2013]: https://github.com/LuaLS/lua-language-server/issues/2013
+
 ## 3.6.17
 `2023-3-9`
 * `CHG` export documents: export global variables

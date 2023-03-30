@@ -710,7 +710,8 @@ local function buildTokens(state, results)
     local tokens = {}
     local lastLine = 0
     local lastStartChar = 0
-    for i, source in ipairs(results) do
+    local index = 0
+    for _, source in ipairs(results) do
         local startPos  = source.start
         local finishPos = source.finish
         local line      = startPos.line
@@ -719,18 +720,23 @@ local function buildTokens(state, results)
         local deltaStartChar
         if deltaLine == 0 then
             deltaStartChar = startChar - lastStartChar
+            if deltaStartChar == 0 then
+                goto continue
+            end
         else
             deltaStartChar = startChar
         end
         lastLine = line
         lastStartChar = startChar
         -- see https://microsoft.github.io/language-server-protocol/specifications/specification-3-16/#textDocument_semanticTokens
-        local len = i * 5 - 5
+        index = index + 1
+        local len = index * 5 - 5
         tokens[len + 1] = deltaLine
         tokens[len + 2] = deltaStartChar
         tokens[len + 3] = finishPos.character - startPos.character -- length
         tokens[len + 4] = source.type
         tokens[len + 5] = source.modifieres or 0
+        ::continue::
     end
     return tokens
 end
@@ -795,6 +801,10 @@ local function solveMultilineAndOverlapping(state, results)
     for token in tokens:pairs() do
         local startPos = converter.packPosition(state, token.start)
         local endPos   = converter.packPosition(state, token.finish)
+        if  startPos.line == endPos.line
+        and startPos.character == endPos.character then
+            goto continue
+        end
         if endPos.line == startPos.line
         or client.getAbility 'textDocument.semanticTokens.multilineTokenSupport' then
             new[#new+1] = {
@@ -827,6 +837,7 @@ local function solveMultilineAndOverlapping(state, results)
                 }
             end
         end
+        ::continue::
     end
 
     return new

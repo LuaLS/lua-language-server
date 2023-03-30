@@ -64,7 +64,7 @@ lclient():start(function (client)
             disables[name] = true
         end
     end
-    config.set(nil, 'Lua.diagnostics.disable', util.getTableKeys(disables, true))
+    config.set(rootUri, 'Lua.diagnostics.disable', util.getTableKeys(disables, true))
 
     local uris = files.getAllUris(rootUri)
     local max  = #uris

@@ -575,7 +575,7 @@ function f(x: string, y: table)
 
 @*param* `x` — this is comment
 
-@*param* `y` —  comment 1
+@*param* `y` — comment 1
 
 @*return* `name` — comment 2
 
@@ -746,7 +746,7 @@ function f(a: boolean)
 
 ---
 
-@*param* `a` —  xxx
+@*param* `a` — xxx
 
 ```lua
 a:
@@ -1308,7 +1308,7 @@ local n: integer
 
 ---
 
- comments]]
+comments]]
 }
 
 TEST {
@@ -1365,7 +1365,7 @@ local n: integer
 
 ---
 
- comments]]
+comments]]
 }
 
 TEST {
@@ -1384,7 +1384,7 @@ local n: integer
 
 ---
 
- comments]]
+comments]]
 }
 
 TEST {
@@ -1461,7 +1461,7 @@ TEST {
 
 ---
 
- comments]]
+comments]]
 }
 
 TEST {
@@ -1708,7 +1708,7 @@ local x: unknown
 
 ---
 
-See: [A](file:///a.lua#1#10)  comment1]]
+See: [A](file:///a.lua#1#10) comment1]]
 }
 
 TEST { {path = 'a.lua', content = [[
@@ -1728,8 +1728,8 @@ local x: unknown
 ---
 
 See:
-  * [A](file:///a.lua#1#10)  comment1
-  * [TTT](file:///a.lua#3#0)  comment2]]
+  * [A](file:///a.lua#1#10) comment1
+  * [TTT](file:///a.lua#3#0) comment2]]
 }
 
 TEST { {path = 'a.lua', content = [[
@@ -1754,4 +1754,25 @@ comment2
 ```lua
 function f()
 ```]]
+}
+
+TEST { {path = 'a.lua', content = [[
+---"hello world" this is ok
+---@param bar any "lorem ipsum" this is ignored
+---@param baz any # "dolor sit" this is ignored
+local function <?foo?>(bar, baz)
+end
+]]},
+hover = [[
+```lua
+function foo(bar: any, baz: any)
+```
+
+---
+
+"hello world" this is ok
+
+@*param* `bar` — "lorem ipsum" this is ignored
+
+@*param* `baz` — "dolor sit" this is ignored]]
 }

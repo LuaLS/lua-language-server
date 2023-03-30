@@ -27,6 +27,14 @@ function m.class(name, super)
     return class
 end
 
+-- 获取一个类
+---@generic T: string
+---@param name `T`
+---@return T
+function m.get(name)
+    return m._classes[name]
+end
+
 ---@generic T: string
 ---@param name `T`
 ---@return T

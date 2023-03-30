@@ -174,7 +174,7 @@ m.register {
 m.register {
     'global-element',
 } {
-    group   = 'strict-conventions',
+    group   = 'conventions',
     severity = 'Warning',
     status = 'None'
 }

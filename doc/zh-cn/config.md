@@ -471,7 +471,7 @@ object<string, string>
     /*
     * global-element
     */
-    "strict-convention": "None",
+    "conventions": "None",
     /*
     * no-unknown
     */
@@ -594,7 +594,7 @@ object<string, string>
     /*
     * global-element
     */
-    "strict-convention": "Fallback",
+    "conventions": "Fallback",
     /*
     * no-unknown
     */

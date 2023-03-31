@@ -172,6 +172,14 @@ m.register {
 }
 
 m.register {
+    'global-element',
+} {
+    group   = 'conventions',
+    severity = 'Warning',
+    status = 'None'
+}
+
+m.register {
     'duplicate-index',
 } {
     group    = 'duplicate',

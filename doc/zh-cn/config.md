@@ -238,6 +238,7 @@ Array<string>
 * ``"err-nonstandard-symbol"``
 * ``"err-then-as-do"``
 * ``"exp-in-action"``
+* ``"global-element"``
 * ``"global-in-nil-env"``
 * ``"index-in-func-name"``
 * ``"invisible"``
@@ -468,6 +469,10 @@ object<string, string>
     */
     "strict": "Fallback",
     /*
+    * global-element
+    */
+    "conventions": "None",
+    /*
     * no-unknown
     */
     "strong": "Fallback",
@@ -586,6 +591,10 @@ object<string, string>
     * invisible
     */
     "strict": "Fallback",
+    /*
+    * global-element
+    */
+    "conventions": "Fallback",
     /*
     * no-unknown
     */
@@ -774,6 +783,10 @@ object<string, string>
     空代码块
     */
     "empty-block": "Opened",
+    /*
+    Enable diagnostics to warn about global elements.
+    */
+    "global-element": "None",
     /*
     不能使用全局变量（ `_ENV` 被设置为了 `nil`）
     */
@@ -1021,6 +1034,10 @@ object<string, string>
     空代码块
     */
     "empty-block": "Hint",
+    /*
+    Enable diagnostics to warn about global elements.
+    */
+    "global-element": "Warning",
     /*
     不能使用全局变量（ `_ENV` 被设置为了 `nil`）
     */

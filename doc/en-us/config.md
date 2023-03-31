@@ -238,6 +238,7 @@ Array<string>
 * ``"err-nonstandard-symbol"``
 * ``"err-then-as-do"``
 * ``"exp-in-action"``
+* ``"global-element"``
 * ``"global-in-nil-env"``
 * ``"index-in-func-name"``
 * ``"invisible"``
@@ -468,6 +469,10 @@ object<string, string>
     */
     "strict": "Fallback",
     /*
+    * global-element
+    */
+    "conventions": "None",
+    /*
     * no-unknown
     */
     "strong": "Fallback",
@@ -586,6 +591,10 @@ object<string, string>
     * invisible
     */
     "strict": "Fallback",
+    /*
+    * global-element
+    */
+    "conventions": "Fallback",
     /*
     * no-unknown
     */
@@ -774,6 +783,10 @@ object<string, string>
     Enable empty code block diagnostics.
     */
     "empty-block": "Opened",
+    /*
+    Enable diagnostics to warn about global elements.
+    */
+    "global-element": "None",
     /*
     Enable cannot use global variables （ `_ENV` is set to `nil`） diagnostics.
     */
@@ -1022,6 +1035,10 @@ object<string, string>
     Enable empty code block diagnostics.
     */
     "empty-block": "Hint",
+    /*
+    Enable diagnostics to warn about global elements.
+    */
+    "global-element": "Warning",
     /*
     Enable cannot use global variables （ `_ENV` is set to `nil`） diagnostics.
     */

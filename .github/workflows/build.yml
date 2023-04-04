@@ -23,6 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - { os: ubuntu-22.04,   target: linux,   platform: linux-x64,   container: 'alpine:latest', libc: musl }
           - { os: ubuntu-20.04,   target: linux,   platform: linux-x64,   container: 'ubuntu:18.04' }
           - { os: ubuntu-20.04,   target: linux,   platform: linux-arm64, container: 'ubuntu:18.04' }
           - { os: macos-11,       target: darwin,  platform: darwin-x64   }
@@ -34,7 +35,7 @@ jobs:
       image: ${{ matrix.container }}
     steps:
       - name: Prepare container
-        if: ${{ matrix.target == 'linux' }}
+        if: ${{ matrix.target == 'linux' && matrix.libc != 'musl' }}
         run: |
           apt-get update
           apt-get install -y software-properties-common
@@ -44,22 +45,38 @@ jobs:
           apt-get install -y sudo git gcc-9 g++-9
 
       - name: Install aarch64-linux-gnu
-        if: ${{ matrix.platform == 'linux-arm64' }}
+        if: ${{ matrix.platform == 'linux-arm64' && matrix.libc != 'musl' }}
         run: |
           apt-get update
           apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
 
-      - name: Prepare container
-        if: ${{ matrix.target == 'linux' }}
+      - name: Prepare container env
+        if: ${{ matrix.target == 'linux' && matrix.libc != 'musl' }}
         run: |
           update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 100
           update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 100
 
+      - name: Prepare container for musl
+        if: ${{ matrix.target == 'linux' && matrix.libc == 'musl' }}
+        run: |
+          apk update
+          apk add git ninja bash build-base nodejs
+
       - uses: actions/checkout@v3
         with:
           submodules: recursive
-      - uses: actboy168/setup-luamake@master
-      - run: luamake -platform ${{ matrix.platform }}
+
+      - name: Build for others step-1
+        if: ${{ matrix.libc != 'musl' }}
+        uses: actboy168/setup-luamake@master
+
+      - name: Build for others step-2
+        if: ${{ matrix.libc != 'musl' }}
+        run: luamake -platform ${{ matrix.platform }}
+
+      - name: Build for musl
+        if: ${{ matrix.target == 'linux' && matrix.libc == 'musl' }}
+        run: ./make.sh
 
       - name: Setting up workflow variables
         id: vars
@@ -81,6 +98,9 @@ jobs:
 
           # Package name w/ version
           PKG_BASENAME="${{ env.PROJECT }}-${PKG_VERSION}-${{ matrix.platform }}"
+          if [[ "${{ matrix.libc }}" = musl ]]; then
+            PKG_BASENAME="${PKG_BASENAME}-${{matrix.libc}}"
+          fi
 
           # Full name of the tarball asset
           PKG_NAME="${PKG_BASENAME}.${PKG_SUFFIX}"
@@ -93,7 +113,7 @@ jobs:
           echo PKG_NAME=${PKG_NAME}                   >> $GITHUB_OUTPUT
           echo PKG_PATH="${PKG_STAGING}/${PKG_NAME}"  >> $GITHUB_OUTPUT
           echo PKG_STAGING=${PKG_STAGING}             >> $GITHUB_OUTPUT
-      
+
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.vars.outputs.PKG_BASENAME }}

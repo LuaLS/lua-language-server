@@ -329,6 +329,7 @@ Array<string>
 * ``"unused-label"``
 * ``"unused-local"``
 * ``"unused-vararg"``
+* ``"uppercase-local"``
 
 ## default
 
@@ -470,6 +471,7 @@ object<string, string>
     "strict": "Fallback",
     /*
     * global-element
+    * uppercase-local
     */
     "conventions": "None",
     /*
@@ -593,6 +595,7 @@ object<string, string>
     "strict": "Fallback",
     /*
     * global-element
+    * uppercase-local
     */
     "conventions": "Fallback",
     /*
@@ -926,7 +929,11 @@ object<string, string>
     /*
     Enable unused vararg diagnostics.
     */
-    "unused-vararg": "Opened"
+    "unused-vararg": "Opened",
+    /*
+    Enable diagnostics to warn about local element names starting with an uppercase letter.
+    */
+    "uppercase-local": "None"
 }
 ```
 
@@ -1178,7 +1185,11 @@ object<string, string>
     /*
     Enable unused vararg diagnostics.
     */
-    "unused-vararg": "Hint"
+    "unused-vararg": "Hint",
+    /*
+    Enable diagnostics to warn about local element names starting with an uppercase letter.
+    */
+    "uppercase-local": "Warning"
 }
 ```
 

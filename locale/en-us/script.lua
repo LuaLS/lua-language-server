@@ -150,8 +150,11 @@ DIAG_INVISIBLE_PROTECTED              =
 'Field `{field}` is protected, it can only be accessed in class `{class}` and its subclasses.'
 DIAG_INVISIBLE_PACKAGE                =
 'Field `{field}` can only be accessed in same file `{uri}`.'
-DIAG_GLOBAL_ELEMENT                  =
+DIAG_GLOBAL_ELEMENT                   =
 'Element is global.'
+DIAG_UPPERCASE_LOCAL                  =
+'Local element `{}` must start with lowercase letter'
+
 
 MWS_NOT_SUPPORT         =
 '{} does not support multi workspace for now, I may need to restart to support the new workspace ...'

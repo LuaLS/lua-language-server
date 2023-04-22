@@ -181,7 +181,7 @@ WORKSPACE_SKIP_HUGE_FILE  =
 WORKSPACE_NOT_ALLOWED     =
 'Your workspace is set to `{}`. Lua language server refused to load this directory. Please check your configuration.[learn more here](https://github.com/LuaLS/lua-language-server/wiki/FAQ#why-is-the-server-scanning-the-wrong-folder)'
 WORKSPACE_SCAN_TOO_MUCH   =
-'More than {} files have been scanned. The current scanned directory is `{}`. Please confirm whether the configuration is correct.'
+'More than {} files have been scanned. The current scanned directory is `{}`. Please see the [FAQ](https://github.com/LuaLS/lua-language-server/wiki/FAQ#how-can-i-improve-startup-speeds) to see how you can include fewer files. It is also possible that your [configuration is incorrect](https://github.com/LuaLS/lua-language-server/wiki/FAQ#why-is-the-server-scanning-the-wrong-folder).'
 
 PARSER_CRASH            =
 'Parser crashed! Last words:{}'

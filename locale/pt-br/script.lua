@@ -181,7 +181,7 @@ WORKSPACE_SKIP_HUGE_FILE  =
 WORKSPACE_NOT_ALLOWED     =
 'Seu espaço de trabalho foi definido para `{}`. Servidor da linguagem Lua recusou o carregamneto neste diretório. Por favor, cheque sua configuração. [aprenda mais aqui](https://github.com/LuaLS/lua-language-server/wiki/FAQ#why-is-the-server-scanning-the-wrong-folder)'
 WORKSPACE_SCAN_TOO_MUCH   = -- TODO: need translate!
-'Mais do que {} arquivos foram escaneados. O diretório atual escaneado é `{}`. Por favor, confirmar se a configuração está correta'
+'Mais do que {} arquivos foram escaneados. O diretório atual escaneado é `{}`. Please see the [FAQ](https://github.com/LuaLS/lua-language-server/wiki/FAQ#how-can-i-improve-startup-speeds) to see how you can include fewer files. It is also possible that your [configuration is incorrect](https://github.com/LuaLS/lua-language-server/wiki/FAQ#why-is-the-server-scanning-the-wrong-folder).'
 
 PARSER_CRASH            =
 'Parser quebrou! Últimas palavras: {}'

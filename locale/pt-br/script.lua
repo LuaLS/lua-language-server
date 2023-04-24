@@ -114,7 +114,17 @@ DIAG_UNDEFINED_DOC_NAME               =
 'Tipo ou alias indefinido `{}`.'
 DIAG_UNDEFINED_DOC_PARAM              =
 'Parâmetro indefinido `{}`.'
-DIAG_UNKNOWN_DIAG_CODE                =
+DIAG_MISSING_GLOBAL_DOC_COMMENT       = -- TODO: need translate!
+'Missing comment for global function `{}`.'
+DIAG_MISSING_GLOBAL_DOC_PARAM         = -- TODO: need translate!
+'Missing @param annotation for parameter `{}` in global function `{}`.'
+DIAG_MISSING_GLOBAL_DOC_RETURN        = -- TODO: need translate!
+'Missing @return annotation at index `{}` in global function `{}`.'
+DIAG_INCOMPLETE_SIGNATURE_DOC_PARAM   = -- TODO: need translate!
+'Incomplete signature. Missing @param annotation for parameter `{}` in function `{}`.'
+DIAG_INCOMPLETE_SIGNATURE_DOC_RETURN  = -- TODO: need translate!
+'Incomplete signature. Missing @return annotation at index `{}` in function `{}`.'
+DIAG_UNKNOWN_DIAG_CODE                = -- TODO: need translate!
 'Código de diagnóstico desconhecido `{}`.'
 DIAG_CAST_LOCAL_TYPE                  = -- TODO: need translate!
 'This variable is defined as type `{def}`. Cannot convert its type to `{ref}`.'

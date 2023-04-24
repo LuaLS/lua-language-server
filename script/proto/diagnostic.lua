@@ -101,6 +101,15 @@ m.register {
 }
 
 m.register {
+    'incomplete-signature-doc',
+    'missing-global-doc',
+} {
+	group    = 'luadoc',
+	severity = 'Warning',
+	status   = 'None',
+}
+
+m.register {
     'codestyle-check'
 } {
     group    = 'codestyle',

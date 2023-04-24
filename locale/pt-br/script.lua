@@ -160,10 +160,8 @@ DIAG_INVISIBLE_PROTECTED              = -- TODO: need translate!
 'Field `{field}` is protected, it can only be accessed in class `{class}` and its subclasses.'
 DIAG_INVISIBLE_PACKAGE                = -- TODO: need translate!
 'Field `{field}` can only be accessed in same file `{uri}`.'
-DIAG_GLOBAL_ELEMENT                   = -- TODO: need translate!
+DIAG_GLOBAL_ELEMENT                  = -- TODO: need translate!
 'Element is global.'
-DIAG_UPPERCASE_LOCAL                  = -- TODO: need translate!
-'Local element `{}` must start with lowercase letter'
 
 MWS_NOT_SUPPORT         =
 '{} não é suportado múltiplos espaços de trabalho por enquanto, posso precisar reiniciar para estabelecer um novo espaço de trabalho ...'

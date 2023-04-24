@@ -104,9 +104,9 @@ m.register {
     'incomplete-signature-doc',
     'missing-global-doc',
 } {
-	group    = 'luadoc',
-	severity = 'Warning',
-	status   = 'None',
+    group    = 'luadoc',
+    severity = 'Warning',
+    status   = 'None',
 }
 
 m.register {
@@ -182,7 +182,6 @@ m.register {
 
 m.register {
     'global-element',
-    'uppercase-local',
 } {
     group   = 'conventions',
     severity = 'Warning',

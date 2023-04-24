@@ -192,8 +192,8 @@ WORKSPACE_SKIP_HUGE_FILE  =
 '出于性能考虑，已停止对此文件解析：{}'
 WORKSPACE_NOT_ALLOWED     =
 '你的工作目录被设置为了 `{}`，Lua语言服务拒绝加载此目录，请检查你的配置。[了解更多](https://github.com/LuaLS/lua-language-server/wiki/FAQ#why-is-the-server-scanning-the-wrong-folder)'
-WORKSPACE_SCAN_TOO_MUCH   =
-'已扫描了超过 {} 个文件，当前扫描的目录为 `{}`，请确认配置是否正确。'
+WORKSPACE_SCAN_TOO_MUCH   = -- TODO: need translate!
+'已扫描了超过 {} 个文件，当前扫描的目录为 `{}`. Please see the [FAQ](https://github.com/LuaLS/lua-language-server/wiki/FAQ#how-can-i-improve-startup-speeds) to see how you can include fewer files. It is also possible that your [configuration is incorrect](https://github.com/LuaLS/lua-language-server/wiki/FAQ#why-is-the-server-scanning-the-wrong-folder).'
 
 PARSER_CRASH            =
 '语法解析崩溃了！遗言：{}'

@@ -4,9 +4,11 @@
 * `FIX` commandline parameter `checklevel` may not work
 * `FIX` [#2036]
 * `FIX` [#2037]
+* `FIX` [#2081]
 
 [#2036]: https://github.com/LuaLS/lua-language-server/issues/2036
 [#2037]: https://github.com/LuaLS/lua-language-server/issues/2037
+[#2081]: https://github.com/LuaLS/lua-language-server/issues/2081
 
 ## 3.6.18
 `2023-3-23`

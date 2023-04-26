@@ -126,6 +126,14 @@ m.register {
 }
 
 m.register {
+    'namestyle-check'
+} {
+    group    = 'codestyle',
+    severity = 'Warning',
+    status   = 'None',
+}
+
+m.register {
     'newline-call',
     'newfield-call',
     'ambiguity-1',

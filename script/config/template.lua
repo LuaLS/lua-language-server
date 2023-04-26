@@ -385,6 +385,8 @@ local template = {
                                                 auto_complete_table_sep = "true"
                                             },
     ['Lua.spell.dict']                      = Type.Array(Type.String),
+    ['Lua.nameStyle.config']                = Type.Hash(Type.String, Type.Or(Type.String, Type.Hash(Type.String, Type.String)))
+                                            >> {},
     ['Lua.misc.parameters']                 = Type.Array(Type.String),
     ['Lua.misc.executablePath']             = Type.String,
     ['Lua.type.castNumberToInteger']        = Type.Boolean >> true,

@@ -1226,7 +1226,6 @@ m.register 'textDocument/formatting' {
     capability = {
         documentFormattingProvider = true,
     },
-    abortByFileUpdate = true,
     ---@async
     function(params)
         local uri = files.getRealUri(params.textDocument.uri)
@@ -1257,8 +1256,6 @@ m.register 'textDocument/formatting' {
             }
         end
 
-        await.sleep(0.1)
-
         return results
     end
 }
@@ -1267,7 +1264,6 @@ m.register 'textDocument/rangeFormatting' {
     capability = {
         documentRangeFormattingProvider = true,
     },
-    abortByFileUpdate = true,
     ---@async
     function(params)
         local uri = files.getRealUri(params.textDocument.uri)
@@ -1297,8 +1293,6 @@ m.register 'textDocument/rangeFormatting' {
                 newText = edit.text,
             }
         end
-
-        await.sleep(0.1)
 
         return results
     end
@@ -1339,7 +1333,6 @@ m.register 'textDocument/onTypeFormatting' {
                 newText = edit.text:gsub('\t', tab),
             }
         end
-        await.sleep(0.1)
         return results
     end
 }

@@ -57,7 +57,14 @@ local function packObject(source, mark)
                     new.returns[i] = packObject(rtn)
                 end
             end
-            new['view'] = getLabel(source)
+            new['view'] = getLabel(source, source.parent.type == 'setmethod')
+        end
+        if source.type == 'local'
+        or source.type == 'self' then
+            new['name'] = source[1]
+        end
+        if source.type == 'function.return' then
+            new['desc'] = source.comment and getDesc(source.comment)
         end
         if source.type == 'doc.type.table' then
             new['fields'] = packObject(source.fields, mark)

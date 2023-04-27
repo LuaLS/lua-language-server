@@ -1,7 +1,9 @@
 {
     "diagnostics": {
         "disable": [
-            "close-non-object"
+            "close-non-object",
+            "incomplete-signature-doc",
+            "missing-global-doc"
         ],
         "groupFileStatus": {
             "ambiguity": "Any",

@@ -114,6 +114,16 @@ DIAG_UNDEFINED_DOC_NAME               =
 '未定义的类型或别名 `{}`。'
 DIAG_UNDEFINED_DOC_PARAM              =
 '指向了未定义的参数 `{}`。'
+DIAG_MISSING_GLOBAL_DOC_COMMENT       = -- TODO: need translate!
+'Missing comment for global function `{}`.'
+DIAG_MISSING_GLOBAL_DOC_PARAM         = -- TODO: need translate!
+'Missing @param annotation for parameter `{}` in global function `{}`.'
+DIAG_MISSING_GLOBAL_DOC_RETURN        = -- TODO: need translate!
+'Missing @return annotation at index `{}` in global function `{}`.'
+DIAG_INCOMPLETE_SIGNATURE_DOC_PARAM   = -- TODO: need translate!
+'Incomplete signature. Missing @param annotation for parameter `{}` in function `{}`.'
+DIAG_INCOMPLETE_SIGNATURE_DOC_RETURN  = -- TODO: need translate!
+'Incomplete signature. Missing @return annotation at index `{}` in function `{}`.'
 DIAG_UNKNOWN_DIAG_CODE                =
 '未知的诊断代号 `{}`。'
 DIAG_CAST_LOCAL_TYPE                  =
@@ -150,6 +160,8 @@ DIAG_INVISIBLE_PROTECTED              =
 '字段 `{field}` 受到保护，只能在 `{class}` 类极其子类中才能访问。'
 DIAG_INVISIBLE_PACKAGE                =
 '字段 `{field}` 只能在相同的文件 `{uri}` 中才能访问。'
+DIAG_GLOBAL_ELEMENT                  = -- TODO: need translate!
+'Element is global.'
 
 MWS_NOT_SUPPORT         =
 '{} 目前还不支持多工作目录，我可能需要重启才能支持新的工作目录...'
@@ -178,8 +190,8 @@ WORKSPACE_SKIP_HUGE_FILE  =
 '出于性能考虑，已停止对此文件解析：{}'
 WORKSPACE_NOT_ALLOWED     =
 '你的工作目录被设置为了 `{}`，Lua语言服务拒绝加载此目录，请检查你的配置。[了解更多](https://github.com/LuaLS/lua-language-server/wiki/FAQ#why-is-the-server-scanning-the-wrong-folder)'
-WORKSPACE_SCAN_TOO_MUCH   =
-'已扫描了超过 {} 个文件，当前扫描的目录为 `{}`，请确认配置是否正确。'
+WORKSPACE_SCAN_TOO_MUCH   = -- TODO: need translate!
+'已扫描了超过 {} 个文件，当前扫描的目录为 `{}`. Please see the [FAQ](https://github.com/LuaLS/lua-language-server/wiki/FAQ#how-can-i-improve-startup-speeds) to see how you can include fewer files. It is also possible that your [configuration is incorrect](https://github.com/LuaLS/lua-language-server/wiki/FAQ#why-is-the-server-scanning-the-wrong-folder).'
 
 PARSER_CRASH            =
 '语法解析崩溃了！遗言：{}'

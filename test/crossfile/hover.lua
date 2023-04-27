@@ -1776,3 +1776,22 @@ function foo(bar: any, baz: any)
 
 @*param* `baz` — "dolor sit" this is ignored]]
 }
+
+TEST { {path = 'a.lua', content = [[
+--comment1
+local x
+
+--comment2
+x = 1
+
+print(<?x?>)
+]]},
+hover = [[
+```lua
+local x: integer = 1
+```
+
+---
+
+comment1]]
+}

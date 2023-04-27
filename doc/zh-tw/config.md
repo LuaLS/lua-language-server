@@ -238,7 +238,9 @@ Array<string>
 * ``"err-nonstandard-symbol"``
 * ``"err-then-as-do"``
 * ``"exp-in-action"``
+* ``"global-element"``
 * ``"global-in-nil-env"``
+* ``"incomplete-signature-doc"``
 * ``"index-in-func-name"``
 * ``"invisible"``
 * ``"jump-local-scope"``
@@ -283,6 +285,7 @@ Array<string>
 * ``"miss-sep-in-table"``
 * ``"miss-space-between"``
 * ``"miss-symbol"``
+* ``"missing-global-doc"``
 * ``"missing-parameter"``
 * ``"missing-return"``
 * ``"missing-return-value"``
@@ -448,6 +451,8 @@ object<string, string>
     * duplicate-doc-alias
     * duplicate-doc-field
     * duplicate-doc-param
+    * incomplete-signature-doc
+    * missing-global-doc
     * undefined-doc-class
     * undefined-doc-name
     * undefined-doc-param
@@ -467,6 +472,10 @@ object<string, string>
     * invisible
     */
     "strict": "Fallback",
+    /*
+    * global-element
+    */
+    "convention": "None",
     /*
     * no-unknown
     */
@@ -567,6 +576,8 @@ object<string, string>
     * duplicate-doc-alias
     * duplicate-doc-field
     * duplicate-doc-param
+    * incomplete-signature-doc
+    * missing-global-doc
     * undefined-doc-class
     * undefined-doc-name
     * undefined-doc-param
@@ -586,6 +597,10 @@ object<string, string>
     * invisible
     */
     "strict": "Fallback",
+    /*
+    * global-element
+    */
+    "convention": "Fallback",
     /*
     * no-unknown
     */
@@ -775,9 +790,17 @@ object<string, string>
     */
     "empty-block": "Opened",
     /*
+    Enable diagnostics to warn about global elements.
+    */
+    "global-element": "None",
+    /*
     不能使用全域變數（ `_ENV` 被設定為 `nil`）
     */
     "global-in-nil-env": "Any",
+    /*
+    Enable diagnostics for function definitions which are not fully annotated.
+    */
+    "incomplete-signature-doc": "None",
     /*
     Enable diagnostics for accesses to fields which are invisible.
     */
@@ -786,6 +809,10 @@ object<string, string>
     首字母小寫的全域變數定義
     */
     "lowercase-global": "Any",
+    /*
+    Enable diagnostics for global function definitions which are not fully annotated.
+    */
+    "missing-global-doc": "None",
     /*
     Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.
     */
@@ -1022,9 +1049,17 @@ object<string, string>
     */
     "empty-block": "Hint",
     /*
+    Enable diagnostics to warn about global elements.
+    */
+    "global-element": "Warning",
+    /*
     不能使用全域變數（ `_ENV` 被設定為 `nil`）
     */
     "global-in-nil-env": "Warning",
+    /*
+    Enable diagnostics for function definitions which are not fully annotated.
+    */
+    "incomplete-signature-doc": "Warning",
     /*
     Enable diagnostics for accesses to fields which are invisible.
     */
@@ -1033,6 +1068,10 @@ object<string, string>
     首字母小寫的全域變數定義
     */
     "lowercase-global": "Information",
+    /*
+    Enable diagnostics for global function definitions which are not annotated.
+    */
+    "missing-global-doc": "Warning",
     /*
     Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.
     */

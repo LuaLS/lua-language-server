@@ -373,8 +373,12 @@ config.diagnostics['duplicate-doc-param']   = -- TODO: need translate!
 'Enable diagnostics for a duplicated param annotation name.'
 config.diagnostics['duplicate-set-field']   = -- TODO: need translate!
 'Enable diagnostics for setting the same field in a class more than once.'
+config.diagnostics['incomplete-signature-doc'] = -- TODO: need translate!
+'Incomplete @param or @return annotations for functions.'
 config.diagnostics['invisible']             = -- TODO: need translate!
 'Enable diagnostics for accesses to fields which are invisible.'
+config.diagnostics['missing-global-doc']    = -- TODO: need translate!
+'Missing annotations for globals! Global functions must have a comment and annotations for all parameters and return values.'
 config.diagnostics['missing-parameter']     = -- TODO: need translate!
 'Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.'
 config.diagnostics['missing-return']        = -- TODO: need translate!
@@ -415,6 +419,8 @@ config.diagnostics['unknown-operator']      = -- TODO: need translate!
 'Enable diagnostics for unknown operators.'
 config.diagnostics['unreachable-code']      = -- TODO: need translate!
 'Enable diagnostics for unreachable code.'
+config.diagnostics['global-element']       = -- TODO: need translate!
+'Enable diagnostics to warn about global elements.'
 config.typeFormat.config                    = -- TODO: need translate!
 'Configures the formatting behavior while typing Lua code.'
 config.typeFormat.config.auto_complete_end  = -- TODO: need translate!

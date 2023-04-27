@@ -1,12 +1,19 @@
 # changelog
 
 ## 3.6.19
+`2023-4-26`
 * `FIX` commandline parameter `checklevel` may not work
 * `FIX` [#2036]
 * `FIX` [#2037]
+* `FIX` [#2056]
+* `FIX` [#2077]
+* `FIX` [#2081]
 
 [#2036]: https://github.com/LuaLS/lua-language-server/issues/2036
 [#2037]: https://github.com/LuaLS/lua-language-server/issues/2037
+[#2056]: https://github.com/LuaLS/lua-language-server/issues/2056
+[#2077]: https://github.com/LuaLS/lua-language-server/issues/2077
+[#2081]: https://github.com/LuaLS/lua-language-server/issues/2081
 
 ## 3.6.18
 `2023-3-23`

@@ -4295,6 +4295,16 @@ local b = '2';
 local <?c?> = a .. b;
 ]]
 
+TEST 'number|{ [1]: string }' [[
+---@alias Some
+---| { [1]: string }
+---| number
+
+local x ---@type Some
+
+print(<?x?>)
+]]
+
 TEST 'integer' [[
 ---@generic A, B, C
 ---@type fun(x: A, y: B, z: C):C, B, A

@@ -114,6 +114,16 @@ DIAG_UNDEFINED_DOC_NAME               =
 'Undefined type or alias `{}`.'
 DIAG_UNDEFINED_DOC_PARAM              =
 'Undefined param `{}`.'
+DIAG_MISSING_GLOBAL_DOC_COMMENT       =
+'Missing comment for global function `{}`.'
+DIAG_MISSING_GLOBAL_DOC_PARAM         =
+'Missing @param annotation for parameter `{}` in global function `{}`.'
+DIAG_MISSING_GLOBAL_DOC_RETURN        =
+'Missing @return annotation at index `{}` in global function `{}`.'
+DIAG_INCOMPLETE_SIGNATURE_DOC_PARAM   =
+'Incomplete signature. Missing @param annotation for parameter `{}` in function `{}`.'
+DIAG_INCOMPLETE_SIGNATURE_DOC_RETURN  =
+'Incomplete signature. Missing @return annotation at index `{}` in function `{}`.'
 DIAG_UNKNOWN_DIAG_CODE                =
 'Unknown diagnostic code `{}`.'
 DIAG_CAST_LOCAL_TYPE                  =
@@ -150,6 +160,8 @@ DIAG_INVISIBLE_PROTECTED              =
 'Field `{field}` is protected, it can only be accessed in class `{class}` and its subclasses.'
 DIAG_INVISIBLE_PACKAGE                =
 'Field `{field}` can only be accessed in same file `{uri}`.'
+DIAG_GLOBAL_ELEMENT                  =
+'Element is global.'
 
 MWS_NOT_SUPPORT         =
 '{} does not support multi workspace for now, I may need to restart to support the new workspace ...'
@@ -179,7 +191,7 @@ WORKSPACE_SKIP_HUGE_FILE  =
 WORKSPACE_NOT_ALLOWED     =
 'Your workspace is set to `{}`. Lua language server refused to load this directory. Please check your configuration.[learn more here](https://github.com/LuaLS/lua-language-server/wiki/FAQ#why-is-the-server-scanning-the-wrong-folder)'
 WORKSPACE_SCAN_TOO_MUCH   =
-'More than {} files have been scanned. The current scanned directory is `{}`. Please confirm whether the configuration is correct.'
+'More than {} files have been scanned. The current scanned directory is `{}`. Please see the [FAQ](https://github.com/LuaLS/lua-language-server/wiki/FAQ#how-can-i-improve-startup-speeds) to see how you can include fewer files. It is also possible that your [configuration is incorrect](https://github.com/LuaLS/lua-language-server/wiki/FAQ#why-is-the-server-scanning-the-wrong-folder).'
 
 PARSER_CRASH            =
 'Parser crashed! Last words:{}'

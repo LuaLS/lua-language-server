@@ -478,6 +478,7 @@ function vm.getReturnOfFunction(func, index)
                 parent      = func,
                 returnIndex = index,
             }
+            vm.compileNode(func._returns[index])
         end
         return func._returns[index]
     end
@@ -1386,6 +1387,10 @@ local compilerSwitch = util.switch()
                         lastReturn = rtn
                         if rtn.returnIndex == index then
                             hasMarkDoc = true
+                            source.comment = doc.comment
+                            if rtn.name then
+                                source.name = rtn.name[1]
+                            end
                             if rtn.hasGeneric then
                                 ---@cast sign -?
                                 vm.setNode(source, vm.createGeneric(rtn, sign))

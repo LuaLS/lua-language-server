@@ -114,7 +114,17 @@ DIAG_UNDEFINED_DOC_NAME               =
 'Tipo ou alias indefinido `{}`.'
 DIAG_UNDEFINED_DOC_PARAM              =
 'Parâmetro indefinido `{}`.'
-DIAG_UNKNOWN_DIAG_CODE                =
+DIAG_MISSING_GLOBAL_DOC_COMMENT       = -- TODO: need translate!
+'Missing comment for global function `{}`.'
+DIAG_MISSING_GLOBAL_DOC_PARAM         = -- TODO: need translate!
+'Missing @param annotation for parameter `{}` in global function `{}`.'
+DIAG_MISSING_GLOBAL_DOC_RETURN        = -- TODO: need translate!
+'Missing @return annotation at index `{}` in global function `{}`.'
+DIAG_INCOMPLETE_SIGNATURE_DOC_PARAM   = -- TODO: need translate!
+'Incomplete signature. Missing @param annotation for parameter `{}` in function `{}`.'
+DIAG_INCOMPLETE_SIGNATURE_DOC_RETURN  = -- TODO: need translate!
+'Incomplete signature. Missing @return annotation at index `{}` in function `{}`.'
+DIAG_UNKNOWN_DIAG_CODE                = -- TODO: need translate!
 'Código de diagnóstico desconhecido `{}`.'
 DIAG_CAST_LOCAL_TYPE                  = -- TODO: need translate!
 'This variable is defined as type `{def}`. Cannot convert its type to `{ref}`.'
@@ -150,6 +160,8 @@ DIAG_INVISIBLE_PROTECTED              = -- TODO: need translate!
 'Field `{field}` is protected, it can only be accessed in class `{class}` and its subclasses.'
 DIAG_INVISIBLE_PACKAGE                = -- TODO: need translate!
 'Field `{field}` can only be accessed in same file `{uri}`.'
+DIAG_GLOBAL_ELEMENT                  = -- TODO: need translate!
+'Element is global.'
 
 MWS_NOT_SUPPORT         =
 '{} não é suportado múltiplos espaços de trabalho por enquanto, posso precisar reiniciar para estabelecer um novo espaço de trabalho ...'
@@ -179,7 +191,7 @@ WORKSPACE_SKIP_HUGE_FILE  =
 WORKSPACE_NOT_ALLOWED     =
 'Seu espaço de trabalho foi definido para `{}`. Servidor da linguagem Lua recusou o carregamneto neste diretório. Por favor, cheque sua configuração. [aprenda mais aqui](https://github.com/LuaLS/lua-language-server/wiki/FAQ#why-is-the-server-scanning-the-wrong-folder)'
 WORKSPACE_SCAN_TOO_MUCH   = -- TODO: need translate!
-'Mais do que {} arquivos foram escaneados. O diretório atual escaneado é `{}`. Por favor, confirmar se a configuração está correta'
+'Mais do que {} arquivos foram escaneados. O diretório atual escaneado é `{}`. Please see the [FAQ](https://github.com/LuaLS/lua-language-server/wiki/FAQ#how-can-i-improve-startup-speeds) to see how you can include fewer files. It is also possible that your [configuration is incorrect](https://github.com/LuaLS/lua-language-server/wiki/FAQ#why-is-the-server-scanning-the-wrong-folder).'
 
 PARSER_CRASH            =
 'Parser quebrou! Últimas palavras: {}'

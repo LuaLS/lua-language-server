@@ -126,7 +126,7 @@ m.register {
 }
 
 m.register {
-    'namestyle-check'
+    'name-style-check'
 } {
     group    = 'codestyle',
     severity = 'Warning',

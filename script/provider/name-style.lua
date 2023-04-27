@@ -5,10 +5,17 @@ end
 
 local config = require 'config'
 
-
 local m = {}
 
+m.loaded = false
+
 function m.nameStyleCheck(uri, text)
+    if not m.loaded then
+        local value = config.get(nil, "Lua.nameStyle.config")
+        codeFormat.update_name_style_config(value)
+        m.loaded = true
+    end
+
     return codeFormat.name_style_analysis(uri, text)
 end
 

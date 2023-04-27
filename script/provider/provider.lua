@@ -293,7 +293,7 @@ m.register 'textDocument/didChange' {
     ---@async
     function (params)
         local doc     = params.textDocument
-        local changes = params.contentChange
+        local changes = params.contentChanges
         local uri     = files.getRealUri(doc.uri)
         local text    = files.getOriginText(uri)
         if not text then

@@ -700,6 +700,8 @@ local function parseResume(parent)
     return result
 end
 
+local lockResume = false
+
 function parseType(parent)
     local result = {
         type    = 'doc.type',
@@ -778,20 +780,10 @@ function parseType(parent)
         return false
     end
 
-    local checkResume = true
-    local nsymbol, ncontent = peekToken()
-    if nsymbol == 'symbol' then
-        if ncontent == ','
-        or ncontent == ':'
-        or ncontent == '|'
-        or ncontent == ')'
-        or ncontent == '}' then
-            checkResume = false
-        end
-    end
-
-    if checkResume then
+    if not lockResume then
+        lockResume = true
         while pushResume() do end
+        lockResume = false
     end
 
     if #result.types == 0 then
@@ -2051,6 +2043,7 @@ return function (state)
         if not comment then
             break
         end
+        lockResume = false
         local doc, rests = buildLuaDoc(comment)
         if doc then
             insertDoc(doc, comment)

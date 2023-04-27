@@ -711,7 +711,7 @@ local function buildTokens(state, results)
     local lastLine = 0
     local lastStartChar = 0
     local index = 0
-    for _, source in ipairs(results) do
+    for i, source in ipairs(results) do
         local startPos  = source.start
         local finishPos = source.finish
         local line      = startPos.line
@@ -720,7 +720,7 @@ local function buildTokens(state, results)
         local deltaStartChar
         if deltaLine == 0 then
             deltaStartChar = startChar - lastStartChar
-            if deltaStartChar == 0 then
+            if deltaStartChar == 0 and i > 1 then
                 goto continue
             end
         else

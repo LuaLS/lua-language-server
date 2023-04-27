@@ -127,7 +127,7 @@ function m.raw(thd, level, msg, source, currentline, clock)
         end
     end
 
-    if log.print then
+    if m.print then
         print(buf)
     end
 

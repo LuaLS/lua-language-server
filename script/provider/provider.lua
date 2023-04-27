@@ -292,13 +292,13 @@ m.register 'textDocument/didClose' {
 m.register 'textDocument/didChange' {
     ---@async
     function (params)
-        local doc      = params.textDocument
+        local doc     = params.textDocument
         local changes = params.contentChanges
         local uri     = files.getRealUri(doc.uri)
-        workspace.awaitReady(uri)
-        local text = files.getOriginText(uri)
+        local text    = files.getOriginText(uri)
         if not text then
-            files.setText(uri, pub.awaitTask('loadFile', furi.decode(uri)), false)
+            text = util.loadFile(furi.decode(uri))
+            files.setText(uri, text, false)
             return
         end
         local rows = files.getCachedRows(uri)

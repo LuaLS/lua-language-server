@@ -512,6 +512,9 @@ return function (source)
     if source.type == 'string' then
         return asString(source)
     end
+    if source.type == 'doc.tailcomment' then
+        return source.text
+    end
     if source.type == 'field' then
         source = source.parent
     end

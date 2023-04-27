@@ -10,13 +10,14 @@ coroutine = {}
 ---@nodiscard
 function coroutine.create(f) end
 
----#if VERSION >= 5.3 then
+---#if VERSION >= 5.4 then
 ---#DES 'coroutine.isyieldable>5.4'
 ---@param co? thread
 ---@return boolean
 ---@nodiscard
 function coroutine.isyieldable(co) end
 ---#else
+---@version >5.2
 ---#DES 'coroutine.isyieldable'
 ---@return boolean
 ---@nodiscard

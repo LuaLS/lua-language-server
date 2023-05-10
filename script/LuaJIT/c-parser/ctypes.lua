@@ -1,6 +1,7 @@
 local ctypes = {}
 
 local inspect = require("inspect")
+local utility = require 'utility'
 local typed = require("LuaJIT.c-parser.typed")
 
 local equal_declarations
@@ -121,6 +122,22 @@ local convert_value = typed("TypeList, table -> CType?, string?", function (lst,
     }), nil
 end)
 
+local function convert_fields(lst, field_src, fields)
+    if field_src.ids then
+        for i, id in ipairs(field_src.ids) do
+            id.type = utility.deepCopy(field_src.type)
+            if id.type and id[1] then
+                for i, v in ipairs(id[1]) do
+                    table.insert(id.type, v)
+                end
+                id[1] = nil
+            end
+            table.insert(fields, id)
+        end
+        return true
+    end
+end
+
 -- Interpret field data from `field_src` and add it to `fields`.
 local function add_to_fields(lst, field_src, fields)
     if type(field_src) == "table" and not field_src.ids then
@@ -132,13 +149,13 @@ local function add_to_fields(lst, field_src, fields)
         return true
     end
 
+    if convert_fields(lst, field_src, fields) then
+        return true
+    end
     local field, err = convert_value(lst, field_src)
     if not field then
         return nil, err
     end
-
-    table.insert(fields, field)
-    return true
 end
 
 get_fields = function (lst, fields_src)

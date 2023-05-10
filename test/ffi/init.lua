@@ -1,14 +1,16 @@
-local lclient = require 'lclient'
-local ws      = require 'workspace'
-local furi    = require 'file-uri'
-local config  = require 'config'
+local lclient  = require 'lclient'
+local ws       = require 'workspace'
+local furi     = require 'file-uri'
+
+--TODO how to changed the runtime version?
+local template = require 'config.template'
+template['Lua.runtime.version'].default = 'LuaJIT'
 
 ---@async
-lclient():start(function (client)
-    client:registerFakers()
+lclient():start(function (languageClient)
+    languageClient:registerFakers()
     local rootUri = furi.encode '/'
-    config.set(rootUri, 'Lua.runtime.version', 'LuaJIT')
-    client:initialize {
+    languageClient:initialize {
         rootUri = rootUri,
     }
 

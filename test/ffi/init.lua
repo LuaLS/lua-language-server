@@ -1,15 +1,13 @@
-local template = require 'config.template'
 local lclient = require 'lclient'
 local ws      = require 'workspace'
 local furi    = require 'file-uri'
-
-template['Lua.runtime.version'].default = 'LuaJIT'
-
+local config  = require 'config'
 
 ---@async
 lclient():start(function (client)
     client:registerFakers()
     local rootUri = furi.encode '/'
+    config.set(rootUri, 'Lua.runtime.version', 'LuaJIT')
     client:initialize {
         rootUri = rootUri,
     }

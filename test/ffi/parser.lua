@@ -50,10 +50,9 @@ TEST {
 TEST {
     name = 'enum@anonymous',
     type = {
-        name = 'a',
         type = 'enum',
         values = {
-            { name = 'a', value = { 1 } },
+            { name = 'a', value = { '1' } },
             { name = 'b', value = { 'a' } },
         }
     }
@@ -70,7 +69,7 @@ TEST {
         name = 'a',
         type = 'enum',
         values = {
-            { name = 'b', value = { op = '|', { 1 }, { 2 } } },
+            { name = 'b', value = { op = '|', { '1' }, { '2' } } },
         }
     }
 } [[
@@ -117,7 +116,7 @@ TEST {
 ]]
 
 TEST({
-    { name = "struct@nil", type = { type = 'struct' } },
+    { name = "struct@anonymous", type = { type = 'struct' } },
     {
         name = 'a',
         type = {

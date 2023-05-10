@@ -361,7 +361,7 @@ structOrUnionSpecifier <- {| {:type: structOrUnion :} ({:id: IDENTIFIER :})? "{"
 structOrUnion <- { "struct" } _
                / { "union"  } _
 
-anonymousUnion <- {| {:type: {| {:type: { "union" } :} _ "{" _ {:fields: {| structDeclaration+ |} :} "}" _ |} :} |} ";" _
+anonymousUnion <- {| {:type: {| {:type: { "union" } :} _ "{" _ {:fields: {| structDeclaration+ |} :}? "}" _ |} :} |} ";" _
 
 structDeclaration <- anonymousUnion
                    / {| {:type: {| specifierQualifier+ |} :} {:ids: structDeclaratorList :} |} ";" _
@@ -374,7 +374,7 @@ structDeclaratorList <- {| structDeclarator ("," _ structDeclarator)* |}
 structDeclarator <- declarator? ":" _ constantExpression
                   / declarator
 
-enumSpecifier <- {| {:type: enum :} ({:id: IDENTIFIER :})? "{" _ {:values: enumeratorList :} ("," _)? "}" _ |}
+enumSpecifier <- {| {:type: enum :} ({:id: IDENTIFIER :})? "{" _ {:values: enumeratorList :}? ("," _)? "}" _ |}
                / {| {:type: enum :}  {:id: IDENTIFIER :}                                                          |}
 
 enum <- { "enum" } _

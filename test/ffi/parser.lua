@@ -2,6 +2,8 @@ local utility = require 'utility'
 local cdriver = require 'LuaJIT.c-parser.cdriver'
 
 rawset(_G, 'TEST', true)
+local ctypes = require 'LuaJIT.c-parser.ctypes'
+ctypes.TESTMODE = true
 
 function TEST(wanted, full)
     return function (script)
@@ -17,6 +19,75 @@ function TEST(wanted, full)
     end
 end
 
+
+TEST {
+    name = 'union@a',
+    type = {
+        name = 'a',
+        type = 'union',
+        fields = {
+            { name = 'b', type = { 'int' } },
+            { name = 'c', type = { 'int8_t' } }
+        }
+    }
+} [[
+    union a{
+        int b;
+        int8_t c;
+    };
+]]
+
+TEST {
+    name = 'union@a',
+    type = {
+        name = 'a',
+        type = 'union',
+    }
+} [[
+    union a{};
+]]
+
+TEST {
+    name = 'enum@anonymous',
+    type = {
+        name = 'a',
+        type = 'enum',
+        values = {
+            { name = 'a', value = { 1 } },
+            { name = 'b', value = { 'a' } },
+        }
+    }
+} [[
+    enum {
+        a = 1,
+        b = a,
+    };
+]]
+
+TEST {
+    name = 'enum@a',
+    type = {
+        name = 'a',
+        type = 'enum',
+        values = {
+            { name = 'b', value = { op = '|', { 1 }, { 2 } } },
+        }
+    }
+} [[
+    enum a{
+        b = 1|2,
+    };
+]]
+
+TEST {
+    name = 'enum@a',
+    type = {
+        name = 'a',
+        type = 'enum',
+    }
+} [[
+    enum a{};
+]]
 
 TEST {
     name = 'struct@a',

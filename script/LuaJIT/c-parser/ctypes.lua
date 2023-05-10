@@ -1,4 +1,4 @@
-local ctypes = {}
+local ctypes = { TESTMODE = false }
 
 local inspect = require("inspect")
 local utility = require 'utility'
@@ -173,15 +173,21 @@ local function get_enum_items(_, values)
     local items = {}
     for _, v in ipairs(values) do
         -- TODO store enum actual values
-        table.insert(items, { name = v.id })
+        table.insert(items, { name = v.id, value = v.value })
     end
     return items
+end
+
+local function getAnonymousID(t)
+    local v = tostring(t)
+    local _, e = v:find("table: 0x", 0, true)
+    return v:sub(e + 1)
 end
 
 local get_composite_type = typed("TypeList, string?, string, array, string, function -> CType, string",
     function (lst, specid, spectype, parts, partsfield, get_parts)
         local name = specid
-        local key = spectype .. "@" .. (name or tostring(parts))
+        local key = spectype .. "@" .. (name or ctypes.TESTMODE and 'anonymous' or getAnonymousID(parts))
 
         if not lst[key] then
             -- Forward declaration
@@ -500,7 +506,11 @@ local function to_set(array)
 end
 
 local function need_expand(t)
-    return #t == 1 and (t[1].type == 'struct' or t[1].type == 'union')
+    if #t ~= 1 then
+        return false
+    end
+    local tt = t[1].type
+    return tt == 'struct' or tt == 'union' or tt == 'enum'
 end
 
 ctypes.register_types = typed("{Decl} -> TypeList?, string?", function (parsed)

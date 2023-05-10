@@ -1,5 +1,8 @@
 # changelog
 
+## 3.6.20
+* `NEW` support connecting by socket with `--socket=PORT`
+
 ## 3.6.19
 `2023-4-26`
 * `FIX` commandline parameter `checklevel` may not work

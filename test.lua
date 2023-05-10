@@ -105,6 +105,7 @@ local function main()
 
     test 'tclient'
     test 'full'
+    test 'ffi'
 end
 
 loadAllLibs()

@@ -18,5 +18,5 @@ lclient():start(function (languageClient)
 
     require 'ffi.cdef'
     require 'ffi.parser'
-    require 'ffi.compiler'
+    require 'ffi.builder'
 end)

@@ -46,24 +46,61 @@ local knownTypes        = {
     ["__complex"] = 1,
     ["__complex__"] = 1,
 ]]
+    ["unsignedchar"] = 'integer',
+    ["unsignedshort"] = 'integer',
+    ["unsignedint"] = 'integer',
+    ["unsignedlong"] = 'integer',
+    ["signedchar"] = 'integer',
+    ["signedshort"] = 'integer',
+    ["signedint"] = 'integer',
+    ["signedlong"] = 'integer',
 }
 
 local constName <const> = 'm'
 
+---@class ffi.builder
 local builder           = { switch_ast = util.switch() }
+
+function builder:getTypeAst(name)
+    for i, asts in ipairs(self.globalAsts) do
+        if asts[name] then
+            return asts[name]
+        end
+    end
+end
+
+function builder:needDeref(ast)
+    if not ast then
+        return false
+    end
+    if ast.type == 'typedef' then
+        -- maybe no name
+        ast = ast.def[1]
+        if type(ast) ~= 'table' then
+            return self:needDeref(self:getTypeAst(ast))
+        end
+    end
+    if ast.type == 'struct' or ast.type == 'union' then
+        return true
+    else
+        return false
+    end
+end
 
 function builder:getType(name)
     if type(name) == 'table' then
         local t = ""
-        local isStruct = false
+        local isStruct
         for _, n in ipairs(name) do
             if type(n) == 'table' then
-                t = t .. n.name
-                isStruct = true
-            else
-                t = t .. n
+                n = n.name
             end
+            if not isStruct then
+                isStruct = self:needDeref(self:getTypeAst(n))
+            end
+            t = t .. n
         end
+        -- deref 一级指针
         if isStruct and t:sub(#t) == '*' then
             t = t:sub(1, #t - 1)
         end
@@ -76,10 +113,18 @@ function builder:getType(name)
 end
 
 function builder:isVoid(ast)
-    if ast.type == 'typedef' then
-        return self:isVoid(ast.def[1])
+    if not ast then
+        return false
     end
-    return #ast.type == 1 and ast.type[1] == 'void'
+    if ast.type == 'typedef' then
+        return self:isVoid(self:getTypeAst(ast.def[1]) or ast.def[1])
+    end
+
+    local typename = type(ast.type) == 'table' and ast.type[1] or ast
+    if typename == 'void' then
+        return true
+    end
+    return self:isVoid(self:getTypeAst(typename))
 end
 
 function builder:buildStructOrUnion(lines, ast, tt, name)
@@ -110,11 +155,11 @@ end
 
 function builder:buildTypedef(lines, ast, tt, name)
     local def = tt.def[1]
-    if not def.name then
+    if type(def) == 'table' and not def.name then
         -- 这个时候没有主类型，只有一个别名,直接创建一个别名结构体
         self.switch_ast(def.type, self, lines, def, def, name)
     else
-        lines[#lines+1] = ('---@alias %s %s'):format(name, self:getType(def.name))
+        lines[#lines+1] = ('---@alias %s %s'):format(name, self:getType(def))
     end
 end
 
@@ -134,15 +179,20 @@ builder.switch_ast
     :call(builder.buildTypedef)
 
 
+local firstline = ('---@meta \n ---@class %s \n local %s = {}'):format(namespace, constName)
 local m = {}
 function m.compileCodes(codes)
-    local b = setmetatable({}, { __index = builder })
-    local lines = { ('---@meta \n ---@class %s \n local %s = {}'):format(namespace, constName) }
+    ---@class ffi.builder
+    local b = setmetatable({ globalAsts = {} }, { __index = builder })
+
+    local lines
     for _, code in ipairs(codes) do
         local asts = cdriver.process_context(code)
         if not asts then
             goto continue
         end
+        lines = lines or { firstline }
+        table.insert(b.globalAsts, asts)
         for _, ast in ipairs(asts) do
             local tt = ast.type
             if tt.name then

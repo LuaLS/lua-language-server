@@ -267,7 +267,12 @@ function m.start()
     if COMPILECORES and COMPILECORES > 0 then
         pub.recruitBraves(COMPILECORES, 'compile')
     end
-    proto.listen()
+    if SOCKET then
+        assert(math.tointeger(SOCKET), '`socket` must be integer')
+        proto.listen('socket', SOCKET)
+    else
+        proto.listen('stdio')
+    end
     m.report()
     m.testVersion()
     m.lockCache()

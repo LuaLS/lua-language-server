@@ -28,7 +28,9 @@ return function ()
     if ffi_state then
         local res = reference(ffi_state.uri, getCdefSourcePosition(ffi_state), true)
         if res then
-            remove(res, 1)
+            if res[1].uri == ffi_state.uri then
+                remove(res, 1)
+            end
             return res
         end
     end

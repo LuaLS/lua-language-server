@@ -1,5 +1,4 @@
-local vm        = require 'vm'
-
+local vm = require 'vm'
 
 local function getLiterals(arg)
     local literals = vm.getLiterals(arg)
@@ -16,7 +15,7 @@ end
 local function getCode(CdefReference)
     local target = CdefReference.target
     if not (target.type == 'field' and target.parent.type == 'getfield') then
-        return nil
+        return
     end
     target = target.parent.parent
     if target.type == 'call' then
@@ -44,17 +43,24 @@ local function getCode(CdefReference)
 end
 
 ---@async
-return function (CdefReference)
+return function (CdefReference, target_uri)
     if not CdefReference then
         return nil
     end
     local codeResults
     for i, v in ipairs(CdefReference) do
+        if v.uri ~= target_uri then
+            goto continue
+        end
         local codes = getCode(v)
-        for i, v in ipairs(codes or {}) do
+        if not codes then
+            goto continue
+        end
+        for i, v in ipairs(codes) do
             codeResults = codeResults or {}
             codeResults[#codeResults+1] = v
         end
+        ::continue::
     end
     return codeResults
 end

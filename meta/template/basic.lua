@@ -210,7 +210,7 @@ function select(index, ...) end
 function setfenv(f, table) end
 
 
----@class metatable
+---@class metatable : table
 ---@field __mode 'v'|'k'|'kv'
 ---@field __metatable any
 ---@field __tostring fun(t):string

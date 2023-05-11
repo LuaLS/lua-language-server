@@ -1,4 +1,5 @@
 local subprocess = require 'bee.subprocess'
+local socket     = require 'bee.socket'
 local util       = require 'utility'
 local await      = require 'await'
 local pub        = require 'pub'
@@ -6,6 +7,7 @@ local jsonrpc    = require 'jsonrpc'
 local define     = require 'proto.define'
 local json       = require 'json'
 local inspect    = require 'inspect'
+local thread     = require 'bee.thread'
 
 local reqCounter = util.counter()
 
@@ -29,6 +31,9 @@ local m = {}
 m.ability = {}
 m.waiting = {}
 m.holdon  = {}
+m.mode    = 'stdio'
+---@type bee.socket.fd
+m.fd      = nil
 
 function m.getMethodName(proto)
     if proto.method:sub(1, 2) == '$/' then
@@ -46,7 +51,11 @@ end
 function m.send(data)
     local buf = jsonrpc.encode(data)
     logSend(buf)
-    io.write(buf)
+    if m.mode == 'stdio' then
+        io.write(buf)
+    elseif m.mode == 'socket' then
+        m.fd:send(buf)
+    end
 end
 
 function m.response(id, res)
@@ -219,12 +228,20 @@ function m.doResponse(proto)
     waiting.resume(proto.result)
 end
 
-function m.listen()
-    subprocess.filemode(io.stdin,  'b')
-    subprocess.filemode(io.stdout, 'b')
-    io.stdin:setvbuf  'no'
-    io.stdout:setvbuf 'no'
-    pub.task('loadProto')
+function m.listen(mode, socketPort)
+    m.mode = mode
+    if mode == 'stdio' then
+        subprocess.filemode(io.stdin,  'b')
+        subprocess.filemode(io.stdout, 'b')
+        io.stdin:setvbuf  'no'
+        io.stdout:setvbuf 'no'
+        pub.task('loadProtoByStdio')
+    elseif mode == 'socket' then
+        local fd = assert(socket('tcp'))
+        fd:connect('127.0.0.1', socketPort)
+        m.fd = fd
+        pub.task('loadProtoBySocket', fd:handle())
+    end
 end
 
 return m

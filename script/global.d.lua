@@ -73,3 +73,7 @@ COMPILECORES = 0
 -- TODO: delete this after new config
 ---@diagnostic disable-next-line: lowercase-global
 jit = false
+
+-- connect to client by socket
+---@type integer
+SOCKET = 0

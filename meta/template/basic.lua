@@ -209,9 +209,46 @@ function select(index, ...) end
 ---@return function
 function setfenv(f, table) end
 
+
+---@class metatable
+---@field __mode 'v'|'k'|'kv'
+---@field __metatable any
+---@field __tostring fun(t):string
+---@field __gc fun(t)
+---@field __add fun(t1,t2):any
+---@field __sub fun(t1,t2):any
+---@field __mul fun(t1,t2):any
+---@field __div fun(t1,t2):any
+---@field __mod fun(t1,t2):any
+---@field __pow fun(t1,t2):any
+---@field __unm fun(t):any
+---#if VERSION >= 5.3 then
+---@field __idiv fun(t1,t2):any
+---@field __band fun(t1,t2):any
+---@field __bor fun(t1,t2):any
+---@field __bxor fun(t1,t2):any
+---@field __bnot fun(t):any
+---@field __shl fun(t1,t2):any
+---@field __shr fun(t1,t2):any
+---#end
+---@field __concat fun(t1,t2):any
+---@field __len fun(t):integer
+---@field __eq fun(t1,t2):boolean
+---@field __lt fun(t1,t2):boolean
+---@field __le fun(t1,t2):boolean
+---@field __index table|fun(t,k)
+---@field __newindex table|fun(t,k,v)
+---@field __call fun(t,...)
+---#if VERSION > 5.1 or VERSION == JIT then
+---@field __pairs fun(t):fun(t,k,v)
+---#end
+---#if VERSION == JIT or VERSION == 5.2 then
+---@field __ipairs fun(t):fun(t,k,v)
+---#end
+
 ---#DES 'setmetatable'
 ---@param table      table
----@param metatable? table
+---@param metatable? metatable
 ---@return table
 function setmetatable(table, metatable) end
 

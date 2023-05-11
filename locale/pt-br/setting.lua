@@ -269,6 +269,8 @@ Read [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/doc
 ]]
 config.spell.dict                        = -- TODO: need translate!
 'Custom words for spell checking.'
+config.nameStyle.config                  = -- TODO: need translate!
+'Set name style config'
 config.telemetry.enable                  = -- TODO: need translate!
 [[
 Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://github.com/LuaLS/lua-language-server/wiki/Home#privacy).
@@ -401,6 +403,8 @@ config.diagnostics['return-type-mismatch']  = -- TODO: need translate!
 'Enable diagnostics for return values whose type does not match the type declared in the corresponding return annotation.'
 config.diagnostics['spell-check']           = -- TODO: need translate!
 'Enable diagnostics for typos in strings.'
+config.diagnostics['name-style-check']      = -- TODO: need translate!
+'Enable diagnostics for name style.'
 config.diagnostics['unbalanced-assignments']= -- TODO: need translate!
 'Enable diagnostics on multiple assignments if not all variables obtain a value (e.g., `local x,y = 1`).'
 config.diagnostics['undefined-doc-class']   = -- TODO: need translate!

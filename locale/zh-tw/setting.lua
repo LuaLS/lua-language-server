@@ -268,6 +268,8 @@ config.format.defaultConfig              =
 ]]
 config.spell.dict                        =
 '拼寫檢查的自訂單詞。'
+config.nameStyle.config                  = -- TODO: need translate!
+'Set name style config'
 config.telemetry.enable                  =
 [[
 啟用遙測，透過網路發送你的編輯器資訊與錯誤日誌。在[此處](https://github.com/LuaLS/lua-language-server/wiki/Home#privacy)閱讀我們的隱私聲明。
@@ -400,6 +402,8 @@ config.diagnostics['return-type-mismatch']  = -- TODO: need translate!
 'Enable diagnostics for return values whose type does not match the type declared in the corresponding return annotation.'
 config.diagnostics['spell-check']           = -- TODO: need translate!
 'Enable diagnostics for typos in strings.'
+config.diagnostics['name-style-check']      = -- TODO: need translate!
+'Enable diagnostics for name style.'
 config.diagnostics['unbalanced-assignments']= -- TODO: need translate!
 'Enable diagnostics on multiple assignments if not all variables obtain a value (e.g., `local x,y = 1`).'
 config.diagnostics['undefined-doc-class']   = -- TODO: need translate!

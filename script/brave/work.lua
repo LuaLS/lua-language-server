@@ -1,9 +1,40 @@
 local brave   = require 'brave.brave'
 
-brave.on('loadProto', function ()
+brave.on('loadProtoByStdio', function ()
     local jsonrpc = require 'jsonrpc'
     while true do
         local proto, err = jsonrpc.decode(io.read)
+        --log.debug('loaded proto', proto.method)
+        if not proto then
+            brave.push('protoerror', err)
+            return
+        end
+        brave.push('proto', proto)
+    end
+end)
+
+brave.on('loadProtoBySocket', function (fdHandle)
+    local jsonrpc = require 'jsonrpc'
+    local socket  = require 'bee.socket'
+    local thread  = require 'bee.thread'
+    local fd = socket.fd(fdHandle)
+    local buf = ''
+    while true do
+        local proto, err = jsonrpc.decode(function (len)
+            while true do
+                if #buf >= len then
+                    local res = buf:sub(1, len)
+                    buf = buf:sub(len + 1)
+                    return res
+                end
+                local data = fd:recv()
+                if data then
+                    buf = buf .. data
+                else
+                    thread.sleep(0.01)
+                end
+            end
+        end)
         --log.debug('loaded proto', proto.method)
         if not proto then
             brave.push('protoerror', err)

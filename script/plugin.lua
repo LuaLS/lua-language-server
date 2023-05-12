@@ -6,6 +6,7 @@ local await  = require 'await'
 local scope  = require 'workspace.scope'
 local ws     = require 'workspace'
 local fs = require 'bee.filesystem'
+require 'plugins'
 
 ---@class plugin
 local m = {}

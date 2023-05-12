@@ -11,7 +11,7 @@ template['Lua.runtime.version'].default = 'LuaJIT'
 
 ---@async
 local function TestBuilder()
-    local builder = require 'LuaJIT'.initBuilder()
+    local builder = require 'plugins.ffi'.initBuilder()
     files.setText(TESTURI, [[
         local ffi = require 'ffi'
         ffi.cdef 'void test();'

@@ -1,9 +1,9 @@
 
 local cdefines = {}
 
-local c99 = require("LuaJIT.c-parser.c99")
-local cpp = require("LuaJIT.c-parser.cpp")
-local typed = require("LuaJIT.c-parser.typed")
+local c99 = require("plugins.ffi.c-parser.c99")
+local cpp = require("plugins.ffi.c-parser.cpp")
+local typed = require("plugins.ffi.c-parser.typed")
 
 local function add_type(lst, name, typ)
     lst[name] = typ

@@ -28,7 +28,7 @@
 local c99 = {}
 
 local re = require("parser.relabel")
-local typed = require("LuaJIT.c-parser.typed")
+local typed = require("plugins.ffi.c-parser.typed")
 
 local defs = {}
 

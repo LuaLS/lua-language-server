@@ -1,8 +1,8 @@
 
 local cpp = {}
 
-local typed = require("LuaJIT.c-parser.typed")
-local c99 = require("LuaJIT.c-parser.c99")
+local typed = require("plugins.ffi.c-parser.typed")
+local c99 = require("plugins.ffi.c-parser.c99")
 
 local SEP = package.config:sub(1,1)
 

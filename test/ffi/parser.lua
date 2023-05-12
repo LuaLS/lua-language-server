@@ -1,8 +1,8 @@
 local utility = require 'utility'
-local cdriver = require 'LuaJIT.c-parser.cdriver'
+local cdriver = require 'plugins.ffi.c-parser.cdriver'
 
 rawset(_G, 'TEST', true)
-local ctypes = require 'LuaJIT.c-parser.ctypes'
+local ctypes = require 'plugins.ffi.c-parser.ctypes'
 ctypes.TESTMODE = true
 
 function TEST(wanted, full)

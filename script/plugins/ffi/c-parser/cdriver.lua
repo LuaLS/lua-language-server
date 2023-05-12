@@ -1,9 +1,9 @@
 local cdriver = {}
 
-local cpp = require("LuaJIT.c-parser.cpp")
-local c99 = require("LuaJIT.c-parser.c99")
-local ctypes = require("LuaJIT.c-parser.ctypes")
-local cdefines = require("LuaJIT.c-parser.cdefines")
+local cpp = require("plugins.ffi.c-parser.cpp")
+local c99 = require("plugins.ffi.c-parser.c99")
+local ctypes = require("plugins.ffi.c-parser.ctypes")
+local cdefines = require("plugins.ffi.c-parser.cdefines")
 
 function cdriver.process_file(filename)
     local ctx, err = cpp.parse_file(filename)

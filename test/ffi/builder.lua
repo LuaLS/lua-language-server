@@ -1,4 +1,4 @@
-local luajit = require 'LuaJIT'
+local ffi = require 'plugins.ffi'
 local util = require 'utility'
 rawset(_G, 'TEST', true)
 
@@ -34,7 +34,7 @@ end
 function TEST(wanted)
     wanted = removeEmpty(splitLines(wanted))
     return function (script)
-        local lines = formatLines(luajit.compileCodes({ script }))
+        local lines = formatLines(ffi.compileCodes({ script }))
         assert(util.equal(wanted, lines), util.dump(lines))
     end
 end

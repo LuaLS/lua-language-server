@@ -1,8 +1,14 @@
-local searchCode        = require 'LuaJIT.searchCode'
-local cdefRerence       = require 'LuaJIT.cdefRerence'
-local cdriver           = require 'LuaJIT.c-parser.cdriver'
+local searchCode        = require 'plugins.ffi.searchCode'
+local cdefRerence       = require 'plugins.ffi.cdefRerence'
+local cdriver           = require 'plugins.ffi.c-parser.cdriver'
 local util              = require 'utility'
 local SDBMHash          = require 'SDBMHash'
+local ws                = require 'workspace'
+local files             = require 'files'
+local await             = require 'await'
+local config            = require 'config'
+local fs                = require 'bee.filesystem'
+local scope             = require 'workspace.scope'
 
 local namespace <const> = 'ffi.namespace*.'
 
@@ -323,9 +329,16 @@ function m.compileCodes(codes)
     return lines
 end
 
-function m.initBuilder()
-    local config = require 'config'
-    local fs = require 'bee.filesystem'
+local function createDir(uri)
+    local dir     = scope.getScope(uri).uri or 'default'
+    local fileDir = fs.path(METAPATH) / ('%08x'):format(SDBMHash():hash(dir))
+    fs.create_directories(fileDir)
+    return fileDir
+end
+
+local builder
+function m.initBuilder(fileDir)
+    fileDir = fileDir or createDir()
     ---@async
     return function (uri)
         local refs = cdefRerence()
@@ -342,14 +355,44 @@ function m.initBuilder()
         if not texts then
             return
         end
-
         local hash = ('%08x'):format(SDBMHash():hash(uri))
         local encoding = config.get(nil, 'Lua.runtime.fileEncoding')
-        local filePath = METAPATH .. '/ffi/' .. table.concat({ hash, encoding }, '_')
+        local filePath = fileDir / table.concat({ hash, encoding }, '_')
 
-        fs.create_directories(fs.path(filePath):parent_path())
-        util.saveFile(filePath .. '.d.lua', table.concat(texts, '\n'))
+        util.saveFile(tostring(filePath) .. '.d.lua', table.concat(texts, '\n'))
     end
 end
+
+files.watch(function (ev, uri)
+    if ev == 'compiler' or ev == 'update' then
+        if builder then
+            await.call(function () ---@async
+                builder(uri)
+            end)
+        end
+    end
+end)
+
+ws.watch(function (ev, uri)
+    if ev == 'startReload' then
+        if config.get(uri, 'Lua.runtime.version') ~= 'LuaJIT' then
+            return
+        end
+        await.call(function () ---@async
+            ws.awaitReady(uri)
+            local fileDir = createDir(uri)
+            builder = m.initBuilder(fileDir)
+            local client = require 'client'
+            client.setConfig {
+                {
+                    key    = 'Lua.workspace.library',
+                    action = 'add',
+                    value  = tostring(fileDir),
+                    uri    = uri,
+                }
+            }
+        end)
+    end
+end)
 
 return m

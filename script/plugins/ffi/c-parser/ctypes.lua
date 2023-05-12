@@ -2,7 +2,7 @@ local ctypes = { TESTMODE = false }
 
 local inspect = require("inspect")
 local utility = require 'utility'
-local typed = require("LuaJIT.c-parser.typed")
+local typed = require("plugins.ffi.c-parser.typed")
 
 local equal_declarations
 

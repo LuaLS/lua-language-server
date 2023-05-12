@@ -1,7 +1,7 @@
 
 local files = require 'files'
-local code  = require 'LuaJIT.searchCode'
-local cdefRerence = require 'LuaJIT.cdefRerence'
+local code  = require 'plugins.ffi.searchCode'
+local cdefRerence = require 'plugins.ffi.cdefRerence'
 
 rawset(_G, 'TEST', true)
 

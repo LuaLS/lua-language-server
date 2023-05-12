@@ -2,7 +2,7 @@ local searchCode        = require 'plugins.ffi.searchCode'
 local cdefRerence       = require 'plugins.ffi.cdefRerence'
 local cdriver           = require 'plugins.ffi.c-parser.cdriver'
 local util              = require 'plugins.ffi.c-parser.util'
-local utility              = require 'utility'
+local utility           = require 'utility'
 local SDBMHash          = require 'SDBMHash'
 local ws                = require 'workspace'
 local files             = require 'files'
@@ -134,11 +134,23 @@ function builder:isVoid(ast)
     return self:isVoid(self:getTypeAst(typename))
 end
 
+local function getArrayType(arr)
+    if type(arr) ~= "table" then
+        return arr and '[]' or ''
+    end
+    local res = ''
+    for i, v in ipairs(arr) do
+        res = res .. '[]'
+    end
+    return res
+end
+
 function builder:buildStructOrUnion(lines, tt, name)
     lines[#lines+1] = '---@class ' .. self:getType(name)
     for _, field in ipairs(tt.fields or {}) do
         if field.name and field.type then
-            lines[#lines+1] = ('---@field %s %s'):format(field.name, self:getType(field.type))
+            lines[#lines+1] = ('---@field %s %s%s'):format(field.name, self:getType(field.type),
+                getArrayType(field.isarray))
         end
     end
 end
@@ -146,7 +158,7 @@ end
 function builder:buildFunction(lines, tt, name)
     local param_names = {}
     for i, param in ipairs(tt.params or {}) do
-        lines[#lines+1] = ('---@param %s %s'):format(param.name, self:getType(param.type))
+        lines[#lines+1] = ('---@param %s %s%s'):format(param.name, self:getType(param.type), getArrayType(param.idxs))
         param_names[#param_names+1] = param.name
     end
     if tt.vararg then
@@ -213,7 +225,7 @@ do
 end
 
 local function pushEnumValue(enumer, name, v)
-    v = tonumber(util.expandSingle(v)) 
+    v = tonumber(util.expandSingle(v))
     enumer[name] = v
     enumer[#enumer+1] = v
     return v

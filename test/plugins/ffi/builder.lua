@@ -40,6 +40,24 @@ function TEST(wanted)
 end
 
 TEST [[
+    ---@param a integer[][]
+    function m.test(a) end
+]][[
+    void test(int a[][]);
+]]
+
+TEST [[
+    ---@class ffi.namespace*.struct@A
+    ---@field b integer[]
+    ---@field c integer[]
+]] [[
+    struct A {
+        int b[5];
+        int c[];
+    };
+]]
+
+TEST [[
     m.B = 5
     m.A = 0
     m.D = 7

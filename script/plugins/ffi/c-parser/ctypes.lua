@@ -125,6 +125,25 @@ local convert_value = typed("TypeList, table -> CType?, string?", function (lst,
     }), nil
 end)
 
+local function convert_fields(lst, field_src, fields)
+    if field_src.ids then
+        for i, id in ipairs(field_src.ids) do
+            id.type = utility.deepCopy(field_src.type)
+            if id.type and id[1] then
+                for i, v in ipairs(id[1]) do
+                    table.insert(id.type, v)
+                end
+                if id[1].idx then
+                    id.isarray = true
+                end
+                id[1] = nil
+            end
+            table.insert(fields, id)
+        end
+        return true
+    end
+end
+
 -- Interpret field data from `field_src` and add it to `fields`.
 local function add_to_fields(lst, field_src, fields)
     if type(field_src) == "table" and not field_src.ids then
@@ -136,6 +155,9 @@ local function add_to_fields(lst, field_src, fields)
         return true
     end
 
+    if convert_fields(lst, field_src, fields) then
+        return true
+    end
     local field, err = convert_value(lst, field_src)
     if not field then
         return nil, err
@@ -541,7 +563,15 @@ ctypes.register_types = typed("{Decl} -> TypeList?, string?", function (parsed)
                 return nil, err or "failed typedef"
             end
         else
-            item.spec = util.expandSingle(item.spec)
+            local expandSingle <const> = {
+                ["struct"] = true,
+                ["union"] = true,
+                ["enum"] = true,
+            }
+            local spec = util.expandSingle(item.spec)
+            if expandSingle[spec.type] then
+                item.spec = spec
+            end
             if item.spec.type == "struct" or item.spec.type == "union" then
                 local ok, err = register_structunion(lst, item)
                 if not ok then

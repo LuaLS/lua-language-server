@@ -1,10 +1,26 @@
-local files             = require 'files'
 local searchCode        = require 'LuaJIT.searchCode'
 local cdefRerence       = require 'LuaJIT.cdefRerence'
 local cdriver           = require 'LuaJIT.c-parser.cdriver'
 local util              = require 'utility'
+local SDBMHash          = require 'SDBMHash'
 
 local namespace <const> = 'ffi.namespace*.'
+
+local function nkeys(t)
+    local n = 0
+    for key, value in pairs(t) do
+        n = n + 1
+    end
+    return n
+end
+
+local function isSingleNode(ast)
+    if type(ast) ~= 'table' then
+        return false
+    end
+    local len = #ast
+    return len == 1 and len == nkeys(ast)
+end
 
 --TODO:supprot 32bit ffi, need config
 local knownTypes        = {
@@ -93,7 +109,7 @@ function builder:getType(name)
         local isStruct
         for _, n in ipairs(name) do
             if type(n) == 'table' then
-                n = n.name
+                n = n.full_name
             end
             if not isStruct then
                 isStruct = self:needDeref(self:getTypeAst(n))
@@ -127,7 +143,7 @@ function builder:isVoid(ast)
     return self:isVoid(self:getTypeAst(typename))
 end
 
-function builder:buildStructOrUnion(lines, ast, tt, name)
+function builder:buildStructOrUnion(lines, tt, name)
     lines[#lines+1] = '---@class ' .. self:getType(name)
     for _, field in ipairs(tt.fields or {}) do
         if field.name and field.type then
@@ -136,7 +152,7 @@ function builder:buildStructOrUnion(lines, ast, tt, name)
     end
 end
 
-function builder:buildFunction(lines, ast, tt, name)
+function builder:buildFunction(lines, tt, name)
     local param_names = {}
     for i, param in ipairs(tt.params or {}) do
         lines[#lines+1] = ('---@param %s %s'):format(param.name, self:getType(param.type))
@@ -153,18 +169,98 @@ function builder:buildFunction(lines, ast, tt, name)
     lines[#lines+1] = ('function m.%s(%s) end'):format(name, table.concat(param_names, ', '))
 end
 
-function builder:buildTypedef(lines, ast, tt, name)
+function builder:buildTypedef(lines, tt, name)
     local def = tt.def[1]
     if type(def) == 'table' and not def.name then
         -- 这个时候没有主类型，只有一个别名,直接创建一个别名结构体
-        self.switch_ast(def.type, self, lines, def, def, name)
+        self.switch_ast(def.type, self, lines, def, name)
     else
         lines[#lines+1] = ('---@alias %s %s'):format(name, self:getType(def))
     end
 end
 
-function builder:buildEnum(lines, ast, tt, name)
-    --TODO
+local calculate
+
+local function binop(enumer, val, fn)
+    local e1, e2 = calculate(enumer, val[1]), calculate(enumer, val[2])
+    if type(e1) == "number" and type(e2) == "number" then
+        return fn(e1, e2)
+    else
+        return { e1, e2, op = val.op }
+    end
+end
+do
+    local ops = {
+        ['+'] = function (a, b) return a + b end,
+        ['-'] = function (a, b) return a - b end,
+        ['*'] = function (a, b) return a * b end,
+        ['/'] = function (a, b) return a / b end,
+        ['&'] = function (a, b) return a & b end,
+        ['|'] = function (a, b) return a | b end,
+        ['~'] = function (a, b)
+            if not b then
+                return ~a
+            end
+            return a ~ b
+        end,
+        ['<<'] = function (a, b) return a << b end,
+        ['>>'] = function (a, b) return a >> b end,
+    }
+    calculate = function (enumer, val)
+        if ops[val.op] then
+            return binop(enumer, val, ops[val.op])
+        end
+        if isSingleNode(val) then
+            val = val[1]
+        end
+        if type(val) == "string" then
+            if enumer[val] then
+                return enumer[val]
+            end
+            return tonumber(val)
+        end
+        return val
+    end
+end
+
+local function pushEnumValue(enumer, name, v)
+    if isSingleNode(v) then
+        v = tonumber(v[1])
+    end
+    enumer[name] = v
+    enumer[#enumer+1] = v
+    return v
+end
+
+function builder:buildEnum(lines, tt, name)
+    local enumer = {}
+    for i, val in ipairs(tt.values) do
+        local name = val.name
+        local v = val.value
+        if not v then
+            if i == 1 then
+                v = 0
+            else
+                v = tt.values[i - 1].realValue + 1
+            end
+        end
+        if type(v) == 'table' and v.op then
+            v = calculate(enumer, v)
+        end
+        if v then
+            val.realValue = pushEnumValue(enumer, name, v)
+        end
+    end
+    local alias = {}
+    for k, v in pairs(enumer) do
+        alias[#alias+1] = type(k) == 'number' and v or ([['%s']]):format(k)
+        if type(k) ~= 'number' then
+            lines[#lines+1] = ('m.%s = %s'):format(k, v)
+        end
+    end
+    if name then
+        lines[#lines+1] = ('---@alias %s %s'):format(self:getType(name), table.concat(alias, ' | '))
+    end
 end
 
 builder.switch_ast
@@ -178,12 +274,41 @@ builder.switch_ast
     :case 'typedef'
     :call(builder.buildTypedef)
 
-
+local function stringStartsWith(self, searchString, position)
+    if position == nil or position < 0 then
+        position = 0
+    end
+    return string.sub(self, position + 1, #searchString + position) == searchString
+end
 local firstline = ('---@meta \n ---@class %s \n local %s = {}'):format(namespace, constName)
 local m = {}
+local function compileCode(lines, asts, b)
+    for _, ast in ipairs(asts) do
+        local tt = ast.type
+
+        if tt.type == 'enum' and not stringStartsWith(ast.name, 'enum@') then
+            goto continue
+        end
+        if not tt.name then
+            if tt.type ~= 'enum' then
+                goto continue
+            end
+            --匿名枚举也要创建具体的值
+            lines = lines or { firstline }
+            builder.switch_ast(tt.type, b, lines, tt)
+        else
+            tt.full_name = ast.name
+            lines = lines or { firstline }
+            builder.switch_ast(tt.type, b, lines, tt, tt.full_name)
+            lines[#lines+1] = '\n'
+        end
+        ::continue::
+    end
+    return lines
+end
 function m.compileCodes(codes)
     ---@class ffi.builder
-    local b = setmetatable({ globalAsts = {} }, { __index = builder })
+    local b = setmetatable({ globalAsts = {}, cacheEnums = {} }, { __index = builder })
 
     local lines
     for _, code in ipairs(codes) do
@@ -191,24 +316,18 @@ function m.compileCodes(codes)
         if not asts then
             goto continue
         end
-        lines = lines or { firstline }
         table.insert(b.globalAsts, asts)
-        for _, ast in ipairs(asts) do
-            local tt = ast.type
-            if tt.name then
-                tt.name = ast.name
-                builder.switch_ast(tt.type, b, lines, ast, tt, tt.name)
-                lines[#lines+1] = '\n'
-            end
-        end
+        lines = compileCode(lines, asts, b)
         ::continue::
     end
     return lines
 end
 
----@async
-files.watch(function (ev, uri)
-    if ev == 'compile' then
+function m.initBuilder()
+    local config = require 'config'
+    local fs = require 'bee.filesystem'
+    ---@async
+    return function (uri)
         local refs = cdefRerence()
         if not refs or #refs == 0 then
             return
@@ -218,8 +337,19 @@ files.watch(function (ev, uri)
         if not codes then
             return
         end
-        local res = m.compileCodes(codes)
+
+        local texts = m.compileCodes(codes)
+        if not texts then
+            return
+        end
+
+        local hash = ('%08x'):format(SDBMHash():hash(uri))
+        local encoding = config.get(nil, 'Lua.runtime.fileEncoding')
+        local filePath = METAPATH .. '/ffi/' .. table.concat({ hash, encoding }, '_')
+
+        fs.create_directories(fs.path(filePath):parent_path())
+        util.saveFile(filePath .. '.d.lua', table.concat(texts, '\n'))
     end
-end)
+end
 
 return m

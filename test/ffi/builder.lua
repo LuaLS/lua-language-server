@@ -13,6 +13,9 @@ local function removeEmpty(lines)
 end
 
 local function formatLines(lines)
+    if not lines or #lines == 0 then
+        return {}
+    end
     table.remove(lines, 1)
     return removeEmpty(lines)
 end
@@ -36,7 +39,34 @@ function TEST(wanted)
     end
 end
 
-TEST[[
+TEST [[
+    m.B = 5
+    m.A = 0
+    m.D = 7
+    m.C = 6
+]] [[
+    enum {
+        A,
+        B=5,
+        C,
+        D,
+    };
+]]
+
+TEST [[
+    m.B = 2
+    m.A = 1
+    m.C = 5
+    ---@alias ffi.namespace*.enum@a 1 | 2 | 'B' | 'A' | 5 | 'C'
+]][[
+    enum a {
+       A = 1,
+       B = 2,
+       C = A|B+2,
+    };
+]]
+
+TEST [[
     ---@param a boolean
     ---@param b boolean
     ---@param c integer
@@ -46,7 +76,7 @@ TEST[[
     void test(bool a, _Bool b, size_t c, ssize_t d);
 ]]
 
-TEST[[
+TEST [[
     ---@param a integer
     ---@param b integer
     ---@param c integer
@@ -56,7 +86,7 @@ TEST[[
     void test(int8_t a, int16_t b, int32_t c, int64_t d);
 ]]
 
-TEST[[
+TEST [[
     ---@param a integer
     ---@param b integer
     ---@param c integer
@@ -66,7 +96,7 @@ TEST[[
     void test(uint8_t a, uint16_t b, uint32_t c, uint64_t d);
 ]]
 
-TEST[[
+TEST [[
     ---@param a integer
     ---@param b integer
     ---@param c integer
@@ -76,7 +106,7 @@ TEST[[
     void test(unsigned char a, unsigned short b, unsigned long c, unsigned int d);
 ]]
 
-TEST[[
+TEST [[
     ---@param a integer
     ---@param b integer
     ---@param c integer
@@ -86,7 +116,7 @@ TEST[[
     void test(unsigned char a, unsigned short b, unsigned long c, unsigned int d);
 ]]
 
-TEST[[
+TEST [[
     ---@param a integer
     ---@param b integer
     ---@param c integer
@@ -96,7 +126,7 @@ TEST[[
     void test(signed char a, signed short b, signed long c, signed int d);
 ]]
 
-TEST[[
+TEST [[
     ---@param a integer
     ---@param b integer
     ---@param c integer
@@ -106,7 +136,7 @@ TEST[[
     void test(char a, short b, long c, int d);
 ]]
 
-TEST[[
+TEST [[
     ---@param a number
     ---@param b number
     ---@param c integer

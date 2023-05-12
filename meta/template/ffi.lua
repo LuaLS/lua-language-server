@@ -11,6 +11,8 @@ local ctype
 
 ---@class ffi.cdecl*: string
 ---@class ffi.cdata*: userdata
+---@class ffi.ref<T>: {[0]:T}, ffi.cdata*
+
 ---@alias ffi.ct*     ffi.ctype*|ffi.cdecl*|ffi.cdata*
 ---@class ffi.cb*:    ffi.cdata*
 local cb

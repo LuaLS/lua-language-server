@@ -105,7 +105,7 @@ local function main()
 
     test 'tclient'
     test 'full'
-    test 'plugin.ffi.test'
+    test 'plugins.ffi.test'
 end
 
 loadAllLibs()

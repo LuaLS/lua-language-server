@@ -30,8 +30,8 @@ lclient():start(function (languageClient)
 
     ws.awaitReady(rootUri)
 
-    require 'ffi.cdef'
-    require 'ffi.parser'
-    require 'ffi.builder'
+    require 'plugins.ffi.cdef'
+    require 'plugins.ffi.parser'
+    require 'plugins.ffi.builder'
     TestBuilder()
 end)

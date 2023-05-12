@@ -1,7 +1,8 @@
 local searchCode        = require 'plugins.ffi.searchCode'
 local cdefRerence       = require 'plugins.ffi.cdefRerence'
 local cdriver           = require 'plugins.ffi.c-parser.cdriver'
-local util              = require 'utility'
+local util              = require 'plugins.ffi.c-parser.util'
+local utility              = require 'utility'
 local SDBMHash          = require 'SDBMHash'
 local ws                = require 'workspace'
 local files             = require 'files'
@@ -11,22 +12,6 @@ local fs                = require 'bee.filesystem'
 local scope             = require 'workspace.scope'
 
 local namespace <const> = 'ffi.namespace*.'
-
-local function nkeys(t)
-    local n = 0
-    for key, value in pairs(t) do
-        n = n + 1
-    end
-    return n
-end
-
-local function isSingleNode(ast)
-    if type(ast) ~= 'table' then
-        return false
-    end
-    local len = #ast
-    return len == 1 and len == nkeys(ast)
-end
 
 --TODO:supprot 32bit ffi, need config
 local knownTypes        = {
@@ -81,7 +66,7 @@ local knownTypes        = {
 local constName <const> = 'm'
 
 ---@class ffi.builder
-local builder           = { switch_ast = util.switch() }
+local builder           = { switch_ast = utility.switch() }
 
 function builder:getTypeAst(name)
     for i, asts in ipairs(self.globalAsts) do
@@ -216,9 +201,7 @@ do
         if ops[val.op] then
             return binop(enumer, val, ops[val.op])
         end
-        if isSingleNode(val) then
-            val = val[1]
-        end
+        val = util.expandSingle(val)
         if type(val) == "string" then
             if enumer[val] then
                 return enumer[val]
@@ -230,9 +213,7 @@ do
 end
 
 local function pushEnumValue(enumer, name, v)
-    if isSingleNode(v) then
-        v = tonumber(v[1])
-    end
+    v = tonumber(util.expandSingle(v)) 
     enumer[name] = v
     enumer[#enumer+1] = v
     return v
@@ -359,7 +340,7 @@ function m.initBuilder(fileDir)
         local encoding = config.get(nil, 'Lua.runtime.fileEncoding')
         local filePath = fileDir / table.concat({ hash, encoding }, '_')
 
-        util.saveFile(tostring(filePath) .. '.d.lua', table.concat(texts, '\n'))
+        utility.saveFile(tostring(filePath) .. '.d.lua', table.concat(texts, '\n'))
     end
 end
 

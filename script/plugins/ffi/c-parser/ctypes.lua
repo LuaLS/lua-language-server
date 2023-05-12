@@ -2,6 +2,7 @@ local ctypes = { TESTMODE = false }
 
 local inspect = require("inspect")
 local utility = require 'utility'
+local util = require 'plugins.ffi.c-parser.util'
 local typed = require("plugins.ffi.c-parser.typed")
 
 local equal_declarations
@@ -102,6 +103,8 @@ local convert_value = typed("TypeList, table -> CType?, string?", function (lst,
     local idxs = nil
 
     if type(src.id) == "table" or type(src.ids) == "table" then
+        src.id = util.expandSingle(src.id)
+        src.ids = util.expandSingle(src.ids)
         -- FIXME multiple ids, e.g.: int *x, y, *z;
         local ok
         ok, name, ret_pointer, idxs = get_name(src.id or src.ids)
@@ -122,22 +125,6 @@ local convert_value = typed("TypeList, table -> CType?, string?", function (lst,
     }), nil
 end)
 
-local function convert_fields(lst, field_src, fields)
-    if field_src.ids then
-        for i, id in ipairs(field_src.ids) do
-            id.type = utility.deepCopy(field_src.type)
-            if id.type and id[1] then
-                for i, v in ipairs(id[1]) do
-                    table.insert(id.type, v)
-                end
-                id[1] = nil
-            end
-            table.insert(fields, id)
-        end
-        return true
-    end
-end
-
 -- Interpret field data from `field_src` and add it to `fields`.
 local function add_to_fields(lst, field_src, fields)
     if type(field_src) == "table" and not field_src.ids then
@@ -149,9 +136,6 @@ local function add_to_fields(lst, field_src, fields)
         return true
     end
 
-    if convert_fields(lst, field_src, fields) then
-        return true
-    end
     local field, err = convert_value(lst, field_src)
     if not field then
         return nil, err
@@ -531,14 +515,6 @@ local function to_set(array)
     return set
 end
 
-local function need_expand(t)
-    if #t ~= 1 then
-        return false
-    end
-    local tt = t[1].type
-    return tt == 'struct' or tt == 'union' or tt == 'enum'
-end
-
 ctypes.register_types = typed("{Decl} -> TypeList?, string?", function (parsed)
     local lst = typed.table("TypeList", {})
     for _, item in ipairs(parsed) do
@@ -565,9 +541,7 @@ ctypes.register_types = typed("{Decl} -> TypeList?, string?", function (parsed)
                 return nil, err or "failed typedef"
             end
         else
-            if not item.spec.type and need_expand(item.spec) then
-                item.spec = item.spec[1]
-            end
+            item.spec = util.expandSingle(item.spec)
             if item.spec.type == "struct" or item.spec.type == "union" then
                 local ok, err = register_structunion(lst, item)
                 if not ok then

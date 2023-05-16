@@ -1675,6 +1675,8 @@ object<string, string>
     "ffi": "default",
     "io": "default",
     "jit": "default",
+    "jit.profile": "default",
+    "jit.util": "default",
     "math": "default",
     "os": "default",
     "package": "default",

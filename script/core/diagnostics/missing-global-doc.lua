@@ -1,41 +1,7 @@
 local files   = require 'files'
-local lang    = require 'language'
 local guide   = require "parser.guide"
 local await   = require 'await'
-
-local function findParam(docs, param)
-    if not docs then
-        return false
-    end
-
-    for _, doc in ipairs(docs) do
-        if doc.type == 'doc.param' then
-            if doc.param[1] == param then
-                return true
-            end
-        end
-    end
-
-    return false
-end
-
-local function findReturn(docs, index)
-    if not docs then
-        return false
-    end
-
-    for _, doc in ipairs(docs) do
-        if doc.type == 'doc.return' then
-            for _, ret in ipairs(doc.returns) do
-                if ret.returnIndex == index then
-                    return true
-                end
-            end
-        end
-    end
-
-    return false
-end
+local helper  = require 'core.diagnostics.helper.missing-doc-helper'
 
 ---@async
 return function (uri, callback)
@@ -56,43 +22,6 @@ return function (uri, callback)
             return
         end
 
-        local functionName = source.parent[1]
-
-        if #source.args == 0 and not source.returns and not source.bindDocs then
-            callback {
-                start   = source.start,
-                finish  = source.finish,
-                message = lang.script('DIAG_MISSING_GLOBAL_DOC_COMMENT', functionName),
-            }
-        end
-
-        if #source.args > 0 then
-            for _, arg in ipairs(source.args) do
-                local argName = arg[1]
-                if argName ~= 'self' then
-                    if not findParam(source.bindDocs, argName) then
-                        callback {
-                            start   = arg.start,
-                            finish  = arg.finish,
-                            message = lang.script('DIAG_MISSING_GLOBAL_DOC_PARAM', argName, functionName),
-                        }
-                    end
-                end
-            end
-        end
-
-        if  source.returns then
-            for _, ret in ipairs(source.returns) do
-                for index, expr in ipairs(ret) do
-                    if not findReturn(source.bindDocs, index) then
-                        callback {
-                            start   = expr.start,
-                            finish  = expr.finish,
-                            message = lang.script('DIAG_MISSING_GLOBAL_DOC_RETURN', index, functionName),
-                        }
-                    end
-                end
-            end
-        end
+        helper.CheckFunction(source, callback, 'DIAG_MISSING_GLOBAL_DOC_COMMENT', 'DIAG_MISSING_GLOBAL_DOC_PARAM', 'DIAG_MISSING_GLOBAL_DOC_RETURN')
     end)
 end

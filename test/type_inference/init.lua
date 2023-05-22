@@ -4278,3 +4278,17 @@ local x ---@type Some
 
 print(<?x?>)
 ]]
+
+TEST 'integer' [[
+---@class metatable : table
+---@field __index table
+
+---@param table      table
+---@param metatable? metatable
+---@return table
+function setmetatable(table, metatable) end
+
+local m = setmetatable({},{ __index = { a = 1 } })
+
+m.<?a?>
+]]

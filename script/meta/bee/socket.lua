@@ -22,6 +22,10 @@ function socket.select(readfds, writefds, timeout) end
 ---@return bee.socket.fd
 function socket.fd(handle) end
 
+---@return bee.socket.fd
+---@return bee.socket.fd
+function socket.pair() end
+
 ---@class bee.socket.fd
 local fd = {}
 
@@ -52,6 +56,9 @@ function fd:send(content) end
 
 ---@return lightuserdata
 function fd:handle() end
+
+---@return lightuserdata
+function fd:detach() end
 
 ---@return boolean
 function fd:status() end

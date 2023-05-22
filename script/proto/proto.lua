@@ -237,10 +237,15 @@ function m.listen(mode, socketPort)
         io.stdout:setvbuf 'no'
         pub.task('loadProtoByStdio')
     elseif mode == 'socket' then
-        local fd = assert(socket('tcp'))
-        fd:connect('127.0.0.1', socketPort)
-        m.fd = fd
-        pub.task('loadProtoBySocket', fd:handle())
+        local rfd = assert(socket('tcp'))
+        rfd:connect('127.0.0.1', socketPort)
+        local wfd1, wfd2 = socket.pair()
+        m.fd = wfd1
+        m.fdRefs = { rfd, wfd1, wfd2 }
+        pub.task('loadProtoBySocket', {
+            wfd = wfd2:handle(),
+            rfd = rfd:handle(),
+        })
     end
 end
 

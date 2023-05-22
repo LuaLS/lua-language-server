@@ -13,34 +13,47 @@ brave.on('loadProtoByStdio', function ()
     end
 end)
 
-brave.on('loadProtoBySocket', function (fdHandle)
+brave.on('loadProtoBySocket', function (param)
     local jsonrpc = require 'jsonrpc'
     local socket  = require 'bee.socket'
-    local thread  = require 'bee.thread'
-    local fd = socket.fd(fdHandle)
+    local rfd = socket.fd(param.rfd)
+    local wfd = socket.fd(param.wfd)
     local buf = ''
-    while true do
-        local proto, err = jsonrpc.decode(function (len)
-            while true do
-                if #buf >= len then
-                    local res = buf:sub(1, len)
-                    buf = buf:sub(len + 1)
-                    return res
+
+    ---@async
+    local parser = coroutine.create(function ()
+        while true do
+            ---@async
+            local proto, err = jsonrpc.decode(function (len)
+                while true do
+                    if #buf >= len then
+                        local res = buf:sub(1, len)
+                        buf = buf:sub(len + 1)
+                        return res
+                    end
+                    coroutine.yield()
                 end
-                local data = fd:recv()
-                if data then
-                    buf = buf .. data
-                else
-                    thread.sleep(0.01)
-                end
+            end)
+            --log.debug('loaded proto', proto.method)
+            if not proto then
+                brave.push('protoerror', err)
+                return
             end
-        end)
-        --log.debug('loaded proto', proto.method)
-        if not proto then
-            brave.push('protoerror', err)
-            return
+            brave.push('proto', proto)
         end
-        brave.push('proto', proto)
+    end)
+
+    while true do
+        socket.select({rfd, wfd}, nil, 10)
+        local needSend = wfd:recv()
+        if needSend then
+            rfd:send(needSend)
+        end
+        local recved = rfd:recv()
+        if recved then
+            buf = buf .. recved
+        end
+        coroutine.resume(parser)
     end
 end)
 

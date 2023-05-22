@@ -241,10 +241,9 @@ function m.listen(mode, socketPort)
         rfd:connect('127.0.0.1', socketPort)
         local wfd1, wfd2 = socket.pair()
         m.fd = wfd1
-        m.fdRefs = { rfd, wfd1, wfd2 }
         pub.task('loadProtoBySocket', {
-            wfd = wfd2:handle(),
-            rfd = rfd:handle(),
+            wfd = wfd2:detach(),
+            rfd = rfd:detach(),
         })
     end
 end

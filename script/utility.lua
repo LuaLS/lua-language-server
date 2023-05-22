@@ -336,7 +336,10 @@ function m.counter(init, step)
 end
 
 --- 排序后遍历
----@param t table
+---@generic K, V
+---@param t table<K, V>
+---@param sorter? fun(a: K, b: K): boolean
+---@return fun(): K, V
 function m.sortPairs(t, sorter)
     local keys = {}
     for k in pairs(t) do

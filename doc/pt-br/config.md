@@ -286,6 +286,7 @@ Array<string>
 * ``"miss-space-between"``
 * ``"miss-symbol"``
 * ``"missing-global-doc"``
+* ``"missing-local-export-doc"``
 * ``"missing-parameter"``
 * ``"missing-return"``
 * ``"missing-return-value"``
@@ -453,6 +454,7 @@ object<string, string>
     * duplicate-doc-param
     * incomplete-signature-doc
     * missing-global-doc
+    * missing-local-export-doc
     * undefined-doc-class
     * undefined-doc-name
     * undefined-doc-param
@@ -577,6 +579,8 @@ object<string, string>
     * duplicate-doc-field
     * duplicate-doc-param
     * incomplete-signature-doc
+    * missing-global-doc
+    * missing-local-export-doc
     * undefined-doc-class
     * undefined-doc-name
     * undefined-doc-param
@@ -812,6 +816,10 @@ object<string, string>
     Enable diagnostics for global function definitions which are not fully annotated.
     */
     "missing-global-doc": "None",
+    /*
+    Enable diagnostics for exported local function definitions which are not fully annotated.
+    */
+    "missing-local-export-doc": "None",
     /*
     Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.
     */
@@ -1072,6 +1080,10 @@ object<string, string>
     Enable diagnostics for global function definitions which are not annotated.
     */
     "missing-global-doc": "Warning",
+    /*
+    Enable diagnostics for exported local function definitions which are not annotated.
+    */
+    "missing-local-export-doc": "Warning",
     /*
     Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.
     */
@@ -1664,6 +1676,8 @@ object<string, string>
     "ffi": "default",
     "io": "default",
     "jit": "default",
+    "jit.profile": "default",
+    "jit.util": "default",
     "math": "default",
     "os": "default",
     "package": "default",

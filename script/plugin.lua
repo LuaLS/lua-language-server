@@ -128,6 +128,7 @@ end
 
 ws.watch(function (ev, uri)
     if ev == 'startReload' then
+        require 'plugins'
         initPlugin(uri)
     end
 end)

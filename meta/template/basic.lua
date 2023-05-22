@@ -236,6 +236,7 @@ function setfenv(f, table) end
 ---@field __eq fun(t1,t2):boolean
 ---@field __lt fun(t1,t2):boolean
 ---@field __le fun(t1,t2):boolean
+---@field __index table|fun(t,k)
 ---@field __newindex table|fun(t,k,v)
 ---@field __call fun(t,...)
 ---#if VERSION > 5.1 or VERSION == JIT then

@@ -1,4 +1,3 @@
-
 local cpp = {}
 
 local typed = require("plugins.ffi.c-parser.typed")
@@ -6,27 +5,14 @@ local c99 = require("plugins.ffi.c-parser.c99")
 
 local SEP = package.config:sub(1,1)
 
-local shl, shr
-if jit then
-    shl = function(a, b)
-        return bit.lshift(a, b)
-    end
-    shr = function(a, b)
-        return bit.rshift(a, b)
-    end
-else
-    shl, shr = load([[
-        local function shl(a, b)
-            return a << b
-        end
-        local function shr(a, b)
-            return a >> b
-        end
-        return shl, shr
-    ]])()
+local function shl(a, b)
+    return a << b
+end
+local function shr(a, b)
+    return a >> b
 end
 
-local function debug() end
+local function debug(...) end
 --[[
 local inspect = require("inspect")
 local function debug(...)
@@ -623,6 +609,7 @@ cpp.parse_file = typed("string, FILE*?, Ctx? -> Ctx?, string?", function(filenam
         ctx = {
             incdirs = cpp_include_paths(),
             defines = gcc_default_defines(),
+            ---@type any[]
             ifmode = { true },
             output = {},
             current_dir = {}
@@ -785,7 +772,7 @@ cpp.parse_context = typed("string, FILE*?, Ctx? -> Ctx?, string?", function(cont
     for cur, lineitem in ipairs(linelist) do
         local line = lineitem.line
         local tk = lineitem.tk
-        debug(filename, cur, ifmode[#ifmode], #ifmode, line)
+        debug(cur, ifmode[#ifmode], #ifmode, line)
 
         if #ifmode == 1 and (tk.directive == "elif" or tk.directive == "else" or tk.directive == "endif") then
             return nil, "unexpected directive " .. tk.directive
@@ -812,6 +799,7 @@ cpp.parse_context = typed("string, FILE*?, Ctx? -> Ctx?, string?", function(cont
             elseif tk.directive == "if" then
                 table.insert(ifmode, run_expression(ctx, tk.exp))
             elseif tk.directive == "elif" then
+---@diagnostic disable-next-line: assign-type-mismatch
                 ifmode[#ifmode] = "skip"
             elseif tk.directive == "else" then
                 ifmode[#ifmode] = not ifmode[#ifmode]

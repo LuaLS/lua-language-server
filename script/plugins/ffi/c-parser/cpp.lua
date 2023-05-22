@@ -1,3 +1,4 @@
+---@diagnostic disable: undefined-global, assign-type-mismatch
 
 local cpp = {}
 
@@ -26,7 +27,7 @@ else
     ]])()
 end
 
-local function debug() end
+local function debug(...) end
 --[[
 local inspect = require("inspect")
 local function debug(...)

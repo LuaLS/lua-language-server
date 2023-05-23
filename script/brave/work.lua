@@ -16,6 +16,7 @@ end)
 brave.on('loadProtoBySocket', function (param)
     local jsonrpc = require 'jsonrpc'
     local socket  = require 'bee.socket'
+    local util    = require 'utility'
     local rfd = socket.fd(param.rfd)
     local wfd = socket.fd(param.wfd)
     local buf = ''
@@ -44,16 +45,28 @@ brave.on('loadProtoBySocket', function (param)
     end)
 
     while true do
-        socket.select({rfd, wfd}, nil, 10)
-        local needSend = wfd:recv()
-        if needSend then
-            rfd:send(needSend)
+        local rd = socket.select({rfd, wfd}, nil, 10)
+        if not rd or #rd == 0 then
+            goto continue
         end
-        local recved = rfd:recv()
-        if recved then
-            buf = buf .. recved
+        if util.arrayHas(rd, wfd) then
+            local needSend = wfd:recv()
+            if needSend then
+                rfd:send(needSend)
+            elseif needSend == nil then
+                error('socket closed!')
+            end
         end
-        coroutine.resume(parser)
+        if util.arrayHas(rd, rfd) then
+            local recved = rfd:recv()
+            if recved then
+                buf = buf .. recved
+            elseif recved == nil then
+                error('socket closed!')
+            end
+            coroutine.resume(parser)
+        end
+        ::continue::
     end
 end)
 

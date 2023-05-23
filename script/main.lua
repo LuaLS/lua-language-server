@@ -1,4 +1,7 @@
-C = require 'class'
+local class = require 'class'
+
+Class = class.declare
+New   = class.new
 
 ---@class ls
 ls = {}

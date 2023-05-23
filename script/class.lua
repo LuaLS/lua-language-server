@@ -8,7 +8,7 @@ m._classes = {}
 ---@param name  `T`
 ---@param super? string
 ---@return T
-function m.class(name, super)
+function m.declare(name, super)
     if m._classes[name] then
         return m._classes[name]
     end

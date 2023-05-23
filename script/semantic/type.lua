@@ -7,12 +7,12 @@ local guide = require 'parser.guide'
 ---@field private name string
 ---@field private subMgr SubMgr
 ---@field private cate Type.Category|nil
-local Type = C.class 'Type'
+local Type = Class 'Type'
 
 ---@private
 ---@type table<string, Type>
 Type.allTypes = ls.util.multiTable(2, function (name)
-    return C.new 'Type' (name)
+    return New 'Type' (name)
 end)
 
 ---@private
@@ -22,7 +22,7 @@ Type.uriSubs = ls.util.multTable(2)
 ---@param name string
 function Type:__call(name)
     self.name = name
-    self.subMgr = C.new 'SubMgr' ()
+    self.subMgr = New 'SubMgr' ()
     return self
 end
 

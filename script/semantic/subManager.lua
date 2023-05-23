@@ -4,7 +4,7 @@ local scope = require 'workspace.scope'
 ---@overload fun():self
 ---@field sets parser.object[]
 ---@field gets parser.object[]
-local SubMgrLink = C.class 'SubMgr.Link'
+local SubMgrLink = Class 'SubMgr.Link'
 
 function SubMgrLink:__call()
     self.sets = {}
@@ -16,11 +16,11 @@ end
 ---@overload fun():self
 ---@field private links table<uri, SubMgr.Link>
 ---@field private setsCache? table<uri, parser.object[]>
-local SubMgr = C.class 'SubMgr'
+local SubMgr = Class 'SubMgr'
 
 function SubMgr:__call()
     self.links = ls.util.multiTable(2, function ()
-        return C.new 'GlobalLink' ()
+        return New 'GlobalLink' ()
     end)
     return self
 end

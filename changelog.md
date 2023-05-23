@@ -1,5 +1,12 @@
 # changelog
 
+## 3.6.20
+`2023-5-23`
+* `NEW` support connecting by socket with `--socket=PORT`
+* `FIX` [#2113]
+
+[#2113]: https://github.com/LuaLS/lua-language-server/issues/2113
+
 ## 3.6.19
 `2023-4-26`
 * `FIX` commandline parameter `checklevel` may not work

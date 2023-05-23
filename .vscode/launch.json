@@ -36,9 +36,6 @@
 				]
 			],
 			"windows": {
-				"name": "🍄attach",
-				"type": "lua",
-				"request": "attach",
 				"sourceMaps": [
 					[
 						"script\\*",

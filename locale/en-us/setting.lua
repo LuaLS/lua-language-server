@@ -269,6 +269,8 @@ Read [formatter docs](https://github.com/CppCXY/EmmyLuaCodeStyle/tree/master/doc
 ]]
 config.spell.dict                        =
 'Custom words for spell checking.'
+config.nameStyle.config                  =
+'Set name style config'
 config.telemetry.enable                  =
 [[
 Enable telemetry to send your editor information and error logs over the network. Read our privacy policy [here](https://github.com/LuaLS/lua-language-server/wiki/Home#privacy).
@@ -379,6 +381,8 @@ config.diagnostics['invisible']             =
 'Enable diagnostics for accesses to fields which are invisible.'
 config.diagnostics['missing-global-doc']    =
 'Missing annotations for globals! Global functions must have a comment and annotations for all parameters and return values.'
+config.diagnostics['missing-local-export-doc'] =
+'Missing annotations for exported locals! Exported local functions must have a comment and annotations for all parameters and return values.'
 config.diagnostics['missing-parameter']     =
 'Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.'
 config.diagnostics['missing-return']        =
@@ -401,6 +405,8 @@ config.diagnostics['return-type-mismatch']  =
 'Enable diagnostics for return values whose type does not match the type declared in the corresponding return annotation.'
 config.diagnostics['spell-check']           =
 'Enable diagnostics for typos in strings.'
+config.diagnostics['name-style-check']      =
+'Enable diagnostics for name style.'
 config.diagnostics['unbalanced-assignments']=
 'Enable diagnostics on multiple assignments if not all variables obtain a value (e.g., `local x,y = 1`).'
 config.diagnostics['undefined-doc-class']   =

@@ -511,7 +511,7 @@ local function getReturnOfSetMetaTable(args)
         node:merge(vm.compileNode(tbl))
     end
     if mt then
-        vm.compileByParentNode(mt, '__index', function (src)
+        vm.compileByParentNodeAll(mt, '__index', function (src)
             for n in vm.compileNode(src):eachObject() do
                 if n.type == 'global'
                 or n.type == 'local'
@@ -637,8 +637,9 @@ end
 
 ---@param source parser.object | vm.variable
 ---@param key string|vm.global|vm.ANY
----@param pushResult fun(source: parser.object)
-function vm.compileByParentNode(source, key, pushResult)
+---@return parser.object[] docedResults
+---@return parser.object[] commonResults
+function vm.getNodesOfParentNode(source, key)
     local parentNode = vm.compileNode(source)
     local docedResults = {}
     local commonResults = {}
@@ -691,6 +692,16 @@ function vm.compileByParentNode(source, key, pushResult)
         end)
     end
 
+    return docedResults, commonResults
+end
+
+-- 遍历所有字段（按照优先级）
+---@param source parser.object | vm.variable
+---@param key string|vm.global|vm.ANY
+---@param pushResult fun(source: parser.object)
+function vm.compileByParentNode(source, key, pushResult)
+    local docedResults, commonResults = vm.getNodesOfParentNode(source, key)
+
     if #docedResults > 0 then
         for _, res in ipairs(docedResults) do
             pushResult(res)
@@ -700,6 +711,21 @@ function vm.compileByParentNode(source, key, pushResult)
         for _, res in ipairs(commonResults) do
             pushResult(res)
         end
+    end
+end
+
+-- 遍历所有字段（无视优先级）
+---@param source parser.object | vm.variable
+---@param key string|vm.global|vm.ANY
+---@param pushResult fun(source: parser.object)
+function vm.compileByParentNodeAll(source, key, pushResult)
+    local docedResults, commonResults = vm.getNodesOfParentNode(source, key)
+
+    for _, res in ipairs(docedResults) do
+        pushResult(res)
+    end
+    for _, res in ipairs(commonResults) do
+        pushResult(res)
     end
 end
 
@@ -1345,8 +1371,10 @@ local compilerSwitch = util.switch()
             end)
         end
 
-        if not hasMarkDoc and source.value then
-            vm.setNode(source, vm.compileNode(source.value))
+        if source.value then
+            if not hasMarkDoc or source.value.type == 'table' then
+                vm.setNode(source, vm.compileNode(source.value))
+            end
         end
 
     end)

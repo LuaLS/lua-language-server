@@ -3,7 +3,8 @@
         "disable": [
             "close-non-object",
             "incomplete-signature-doc",
-            "missing-global-doc"
+            "missing-global-doc",
+            "missing-local-export-doc"
         ],
         "groupFileStatus": {
             "ambiguity": "Any",

@@ -120,6 +120,12 @@ DIAG_MISSING_GLOBAL_DOC_PARAM         = -- TODO: need translate!
 'Missing @param annotation for parameter `{}` in global function `{}`.'
 DIAG_MISSING_GLOBAL_DOC_RETURN        = -- TODO: need translate!
 'Missing @return annotation at index `{}` in global function `{}`.'
+DIAG_MISSING_LOCAL_EXPORT_DOC_COMMENT = -- TODO: need translate!
+'Missing comment for exported local function `{}`.'
+DIAG_MISSING_LOCAL_EXPORT_DOC_PARAM   = -- TODO: need translate!
+'Missing @param annotation for parameter `{}` in exported local function `{}`.'
+DIAG_MISSING_LOCAL_EXPORT_DOC_RETURN  = -- TODO: need translate!
+'Missing @return annotation at index `{}` in exported local function `{}`.'
 DIAG_INCOMPLETE_SIGNATURE_DOC_PARAM   = -- TODO: need translate!
 'Incomplete signature. Missing @param annotation for parameter `{}` in function `{}`.'
 DIAG_INCOMPLETE_SIGNATURE_DOC_RETURN  = -- TODO: need translate!

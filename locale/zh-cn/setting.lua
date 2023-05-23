@@ -268,6 +268,8 @@ config.format.defaultConfig              =
 ]]
 config.spell.dict                        =
 '拼写检查的自定义单词。'
+config.nameStyle.config                  =
+'设定命名风格检查的配置'
 config.telemetry.enable                  =
 [[
 启用遥测，通过网络发送你的编辑器信息与错误日志。在[此处](https://github.com/LuaLS/lua-language-server/wiki/Home#privacy)阅读我们的隐私声明。
@@ -378,6 +380,8 @@ config.diagnostics['invisible']             = -- TODO: need translate!
 'Enable diagnostics for accesses to fields which are invisible.'
 config.diagnostics['missing-global-doc']    = -- TODO: need translate!
 'Missing annotations for globals! Global functions must have a comment and annotations for all parameters and return values.'
+config.diagnostics['missing-local-export-doc'] = -- TODO: need translate!
+'Missing annotations for exported locals! Exported local functions must have a comment and annotations for all parameters and return values.'
 config.diagnostics['missing-parameter']     = -- TODO: need translate!
 'Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.'
 config.diagnostics['missing-return']        = -- TODO: need translate!
@@ -400,6 +404,8 @@ config.diagnostics['return-type-mismatch']  = -- TODO: need translate!
 'Enable diagnostics for return values whose type does not match the type declared in the corresponding return annotation.'
 config.diagnostics['spell-check']           = -- TODO: need translate!
 'Enable diagnostics for typos in strings.'
+config.diagnostics['name-style-check']      = -- TODO: need translate!
+'Enable diagnostics for name style.'
 config.diagnostics['unbalanced-assignments']= -- TODO: need translate!
 'Enable diagnostics on multiple assignments if not all variables obtain a value (e.g., `local x,y = 1`).'
 config.diagnostics['undefined-doc-class']   = -- TODO: need translate!

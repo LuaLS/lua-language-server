@@ -103,6 +103,7 @@ m.register {
 m.register {
     'incomplete-signature-doc',
     'missing-global-doc',
+    'missing-local-export-doc',
 } {
     group    = 'luadoc',
     severity = 'Warning',
@@ -122,6 +123,14 @@ m.register {
 } {
     group    = 'codestyle',
     severity = 'Information',
+    status   = 'None',
+}
+
+m.register {
+    'name-style-check'
+} {
+    group    = 'codestyle',
+    severity = 'Warning',
     status   = 'None',
 }
 

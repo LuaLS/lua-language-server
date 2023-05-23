@@ -4292,3 +4292,9 @@ local m = setmetatable({},{ __index = { a = 1 } })
 
 m.<?a?>
 ]]
+
+TEST 'integer' [[
+local x = 1
+repeat
+until <?x?>
+]]

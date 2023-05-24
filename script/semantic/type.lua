@@ -2,22 +2,22 @@ local guide = require 'parser.guide'
 
 ---@alias Type.Category 'class'|'alias'|'enum'|'unknown'
 
----@class Type
----@overload fun(name: string):Type
+---@class SType
+---@overload fun(name: string): self
 ---@field private name string
 ---@field private subMgr SubMgr
 ---@field private cate Type.Category|nil
-local Type = Class 'Type'
+local Type = Class 'SType'
 
 ---@private
----@type table<string, Type>
-Type.allTypes = ls.util.multiTable(2, function (name)
+---@type table<string, SType>
+Type.allTypes = LS.util.multiTable(2, function (name)
     return New 'Type' (name)
 end)
 
 ---@private
 ---@type table<uri, table<string, boolean>>
-Type.uriSubs = ls.util.multTable(2)
+Type.uriSubs = LS.util.multTable(2)
 
 ---@param name string
 function Type:__call(name)
@@ -107,7 +107,7 @@ end
 
 -- 获取一个类型
 ---@param name string
----@return Type
+---@return SType
 function Type.get(name)
     return Type.allTypes[name]
 end

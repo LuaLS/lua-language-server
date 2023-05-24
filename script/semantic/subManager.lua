@@ -19,7 +19,7 @@ end
 local SubMgr = Class 'SubMgr'
 
 function SubMgr:__call()
-    self.links = ls.util.multiTable(2, function ()
+    self.links = LS.util.multiTable(2, function ()
         return New 'GlobalLink' ()
     end)
     return self

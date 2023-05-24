@@ -1,15 +1,20 @@
 require 'semantic.type'
+require 'semantic.union'
 
-local Type  = C.get 'Type'
+local Type  = Class 'SType'
 local files = require 'files'
 
 ---@class Semantic
-se = {}
+Semantic = {}
+
+---@alias SNode
+---| SType
+---| SUnion
 
 -- 获取类型对象
 ---@param name string
----@return Type
-function se.getType(name)
+---@return SType
+function Semantic.getType(name)
     return Type.get(name)
 end
 

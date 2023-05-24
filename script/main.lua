@@ -3,12 +3,12 @@ local class = require 'class'
 Class = class.declare
 New   = class.new
 
----@class ls
-ls = {}
+---@class LS
+LS = {}
 
-ls.gc      = require 'gc'
-ls.timer   = require 'timer'
-ls.inspect = require 'inspect'
-ls.util    = require 'utility'
-ls.fsu     = require 'fs-utility'
-ls.furi    = require 'file-uri'
+LS.gc      = require 'gc'
+LS.timer   = require 'timer'
+LS.inspect = require 'inspect'
+LS.util    = require 'utility'
+LS.fsu     = require 'fs-utility'
+LS.furi    = require 'file-uri'

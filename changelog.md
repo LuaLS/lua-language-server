@@ -1,5 +1,9 @@
 # changelog
 
+## 3.6.21
+`2023-5-24`
+* `FIX` disable ffi plugin
+
 ## 3.6.20
 `2023-5-23`
 * `NEW` support connecting by socket with `--socket=PORT`

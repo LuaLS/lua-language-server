@@ -3,6 +3,9 @@ local vm = require 'vm'
 local function getLiterals(arg)
     local literals = vm.getLiterals(arg)
     local res = {}
+    if not literals then
+        return res
+    end
     for k, v in pairs(literals) do
         if type(k) == 'string' then
             res[#res+1] = k

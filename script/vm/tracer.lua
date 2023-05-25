@@ -296,6 +296,9 @@ local lookIntoChild = util.switch()
                 topNode = tracer.nodes[action]:copy()
             end
         end
+        if action.type == 'repeat' then
+            tracer:lookIntoChild(action.filter, topNode)
+        end
         return topNode, outNode
     end)
     : case 'in'
@@ -745,6 +748,9 @@ function mt:lookIntoBlock(block, start, node)
         ::CONTINUE::
     end
     self.nodes[block] = node
+    if block.type == 'repeat' then
+        self:lookIntoChild(block.filter, node)
+    end
     if block.type == 'do'
     or block.type == 'loop'
     or block.type == 'in'

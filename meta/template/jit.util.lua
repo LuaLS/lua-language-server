@@ -105,7 +105,7 @@ end
 function util.tracemc(tr)
 end
 
----@overload fun(exitno:integer):integer
+---@overload fun(exitno: integer): integer
 ---@param tr Trace
 ---@param exitno integer
 ---@return integer? addr

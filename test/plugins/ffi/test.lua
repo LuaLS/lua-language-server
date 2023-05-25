@@ -8,16 +8,15 @@ local template = require 'config.template'
 
 template['Lua.runtime.version'].default = 'LuaJIT'
 
-
 ---@async
 local function TestBuilder()
-    local builder = require 'plugins.ffi'.initBuilder()
+    local builder = require 'core.command.reloadFFIMeta'
     files.setText(TESTURI, [[
         local ffi = require 'ffi'
         ffi.cdef 'void test();'
     ]])
-
-    builder(TESTURI)
+    local uri = ws.getFirstScope().uri
+    builder(uri)
 end
 
 ---@async

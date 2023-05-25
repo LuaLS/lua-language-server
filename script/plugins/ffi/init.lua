@@ -367,6 +367,8 @@ files.watch(function (ev, uri)
 end)
 
 ws.watch(function (ev, uri)
+    -- TODO
+    do return end
     if ev == 'startReload' then
         if config.get(uri, 'Lua.runtime.version') ~= 'LuaJIT' then
             return

@@ -1,17 +1,17 @@
-local searchCode        = require 'plugins.ffi.searchCode'
-local cdefRerence       = require 'plugins.ffi.cdefRerence'
-local cdriver           = require 'plugins.ffi.c-parser.cdriver'
-local util              = require 'plugins.ffi.c-parser.util'
-local utility           = require 'utility'
-local SDBMHash          = require 'SDBMHash'
-local config            = require 'config'
-local fs                = require 'bee.filesystem'
-local scope             = require 'workspace.scope'
+local searchCode             = require 'plugins.ffi.searchCode'
+local cdefRerence            = require 'plugins.ffi.cdefRerence'
+local cdriver                = require 'plugins.ffi.c-parser.cdriver'
+local util                   = require 'plugins.ffi.c-parser.util'
+local utility                = require 'utility'
+local SDBMHash               = require 'SDBMHash'
+local config                 = require 'config'
+local fs                     = require 'bee.filesystem'
+local scope                  = require 'workspace.scope'
 
-local namespace <const> = 'ffi.namespace*.'
+local namespace <const>      = 'ffi.namespace*.'
 
 --TODO:supprot 32bit ffi, need config
-local knownTypes        = {
+local knownTypes             = {
     ["bool"] = 'boolean',
     ["char"] = 'integer',
     ["short"] = 'integer',
@@ -60,10 +60,33 @@ local knownTypes        = {
     ["signedlong"] = 'integer',
 }
 
-local constName <const> = 'm'
+local blackKeyWord <const>   = {
+    ['and']      = "_and",
+    ['do']       = "_do",
+    ['elseif']   = "_elseif",
+    ['end']      = "_end",
+    ['false']    = "_false",
+    ['function'] = "_function",
+    ['in']       = "_in",
+    ['local']    = "_local",
+    ['nil']      = "_nil",
+    ['not']      = "_not",
+    ['or']       = "_or",
+    ['repeat']   = "_repeat",
+    ['then']     = "_then",
+    ['true']     = "_true",
+}
+
+local invaildKeyWord <const> = {
+    const = true,
+    restrict = true,
+    volatile = true,
+}
+
+local constName <const>      = 'm'
 
 ---@class ffi.builder
-local builder           = { switch_ast = utility.switch() }
+local builder                = { switch_ast = utility.switch() }
 
 function builder:getTypeAst(name)
     for i, asts in ipairs(self.globalAsts) do
@@ -95,14 +118,22 @@ function builder:getType(name)
     if type(name) == 'table' then
         local t = ""
         local isStruct
+        if name.type then
+            t = t .. name.type .. "@"
+            name = name.name
+        end
         for _, n in ipairs(name) do
             if type(n) == 'table' then
                 n = n.full_name
+            end
+            if invaildKeyWord[n] then
+                goto continue
             end
             if not isStruct then
                 isStruct = self:needDeref(self:getTypeAst(n))
             end
             t = t .. n
+            ::continue::
         end
         -- deref 一级指针
         if isStruct and t:sub(#t) == '*' then
@@ -142,11 +173,15 @@ local function getArrayType(arr)
     return res
 end
 
+local function getValidName(name)
+    return blackKeyWord[name] or name
+end
+
 function builder:buildStructOrUnion(lines, tt, name)
     lines[#lines+1] = '---@class ' .. self:getType(name)
     for _, field in ipairs(tt.fields or {}) do
         if field.name and field.type then
-            lines[#lines+1] = ('---@field %s %s%s'):format(field.name, self:getType(field.type),
+            lines[#lines+1] = ('---@field %s %s%s'):format(getValidName(field.name), self:getType(field.type),
                 getArrayType(field.isarray))
         end
     end
@@ -155,8 +190,9 @@ end
 function builder:buildFunction(lines, tt, name)
     local param_names = {}
     for i, param in ipairs(tt.params or {}) do
-        lines[#lines+1] = ('---@param %s %s%s'):format(param.name, self:getType(param.type), getArrayType(param.idxs))
-        param_names[#param_names+1] = param.name
+        local param_name = getValidName(param.name)
+        lines[#lines+1] = ('---@param %s %s%s'):format(param_name, self:getType(param.type), getArrayType(param.idxs))
+        param_names[#param_names+1] = param_name
     end
     if tt.vararg then
         param_names[#param_names+1] = '...'
@@ -175,7 +211,7 @@ function builder:buildTypedef(lines, tt, name)
         -- 这个时候没有主类型，只有一个别名,直接创建一个别名结构体
         self.switch_ast(def.type, self, lines, def, name)
     else
-        lines[#lines+1] = ('---@alias %s %s'):format(name, self:getType(def))
+        lines[#lines+1] = ('---@alias %s %s'):format(self:getType(name), self:getType(def))
     end
 end
 

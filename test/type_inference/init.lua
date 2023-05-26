@@ -4294,6 +4294,21 @@ m.<?a?>
 ]]
 
 TEST 'integer' [[
+---@class metatable : table
+---@field __index table
+
+---@param table      table
+---@param metatable? metatable
+---@return table
+function setmetatable(table, metatable) end
+
+local mt = {a = 1 }
+local m = setmetatable({},{ __index = mt })
+
+m.<?a?>
+]]
+
+TEST 'integer' [[
 local x = 1
 repeat
 until <?x?>

@@ -982,6 +982,11 @@ m.register 'workspace/executeCommand' {
         elseif command == 'lua.exportDocument' then
             local core = require 'core.command.exportDocument'
             core(params.arguments)
+        elseif command == 'lua.reloadFFIMeta' then
+            local core = require 'core.command.reloadFFIMeta'
+            for _, scp in ipairs(workspace.folders) do
+                core(scp.uri)
+            end
         end
     end
 }

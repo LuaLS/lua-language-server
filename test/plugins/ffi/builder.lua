@@ -40,9 +40,43 @@ function TEST(wanted)
 end
 
 TEST [[
+    ---@alias ffi.namespace*.EVP_MD ffi.namespace*.struct@env_md_st
+
+    ---@return ffi.namespace*.EVP_MD
+    function m.EVP_md5() end
+]] [[
+    typedef struct env_md_st EVP_MD;
+    const EVP_MD *EVP_md5(void);
+]]
+
+TEST [[
+    ---@class ffi.namespace*.struct@a
+    ---@field _in integer
+]] [[
+    struct a {
+        int in;
+    };
+]]
+
+TEST [[
+---@param _in integer
+function m.test(_in) end
+]] [[
+    void test(int in);
+]]
+
+TEST [[
+    ---@alias ffi.namespace*.ENGINE ffi.namespace*.struct@engine_st
+    ---@alias ffi.namespace*.ENGINE1 ffi.namespace*.enum@engine_st1
+]] [[
+    typedef struct engine_st ENGINE;
+    typedef enum engine_st1 ENGINE1;
+]]
+
+TEST [[
     ---@param a integer[][]
     function m.test(a) end
-]][[
+]] [[
     void test(int a[][]);
 ]]
 
@@ -76,7 +110,7 @@ TEST [[
     m.A = 1
     m.C = 5
     ---@alias ffi.namespace*.enum@a 1 | 2 | 'B' | 'A' | 5 | 'C'
-]][[
+]] [[
     enum a {
        A = 1,
        B = 2,
@@ -165,7 +199,7 @@ TEST [[
 ]]
 
 TEST [[
-    ---@alias H ffi.namespace*.void
+    ---@alias ffi.namespace*.H ffi.namespace*.void
 
     function m.test() end
 ]] [[

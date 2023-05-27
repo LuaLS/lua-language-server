@@ -20,7 +20,7 @@ end
 return function ()
     local ffi_state
     for uri in files.eachFile() do
-        if find(uri, "/ffi.lua", 0, true) then
+        if find(uri, "ffi.lua", 0, true) and find(uri, "lua-language-server", 0, true) then
             ffi_state = files.getState(uri)
             break
         end

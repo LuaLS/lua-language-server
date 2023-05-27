@@ -1,20 +1,17 @@
-local searchCode        = require 'plugins.ffi.searchCode'
-local cdefRerence       = require 'plugins.ffi.cdefRerence'
-local cdriver           = require 'plugins.ffi.c-parser.cdriver'
-local util              = require 'plugins.ffi.c-parser.util'
-local utility           = require 'utility'
-local SDBMHash          = require 'SDBMHash'
-local ws                = require 'workspace'
-local files             = require 'files'
-local await             = require 'await'
-local config            = require 'config'
-local fs                = require 'bee.filesystem'
-local scope             = require 'workspace.scope'
+local searchCode             = require 'plugins.ffi.searchCode'
+local cdefRerence            = require 'plugins.ffi.cdefRerence'
+local cdriver                = require 'plugins.ffi.c-parser.cdriver'
+local util                   = require 'plugins.ffi.c-parser.util'
+local utility                = require 'utility'
+local SDBMHash               = require 'SDBMHash'
+local config                 = require 'config'
+local fs                     = require 'bee.filesystem'
+local scope                  = require 'workspace.scope'
 
-local namespace <const> = 'ffi.namespace*.'
+local namespace <const>      = 'ffi.namespace*.'
 
 --TODO:supprot 32bit ffi, need config
-local knownTypes        = {
+local knownTypes             = {
     ["bool"] = 'boolean',
     ["char"] = 'integer',
     ["short"] = 'integer',
@@ -63,10 +60,33 @@ local knownTypes        = {
     ["signedlong"] = 'integer',
 }
 
-local constName <const> = 'm'
+local blackKeyWord <const>   = {
+    ['and']      = "_and",
+    ['do']       = "_do",
+    ['elseif']   = "_elseif",
+    ['end']      = "_end",
+    ['false']    = "_false",
+    ['function'] = "_function",
+    ['in']       = "_in",
+    ['local']    = "_local",
+    ['nil']      = "_nil",
+    ['not']      = "_not",
+    ['or']       = "_or",
+    ['repeat']   = "_repeat",
+    ['then']     = "_then",
+    ['true']     = "_true",
+}
+
+local invaildKeyWord <const> = {
+    const = true,
+    restrict = true,
+    volatile = true,
+}
+
+local constName <const>      = 'm'
 
 ---@class ffi.builder
-local builder           = { switch_ast = utility.switch() }
+local builder                = { switch_ast = utility.switch() }
 
 function builder:getTypeAst(name)
     for i, asts in ipairs(self.globalAsts) do
@@ -98,14 +118,22 @@ function builder:getType(name)
     if type(name) == 'table' then
         local t = ""
         local isStruct
+        if name.type then
+            t = t .. name.type .. "@"
+            name = name.name
+        end
         for _, n in ipairs(name) do
             if type(n) == 'table' then
                 n = n.full_name
+            end
+            if invaildKeyWord[n] then
+                goto continue
             end
             if not isStruct then
                 isStruct = self:needDeref(self:getTypeAst(n))
             end
             t = t .. n
+            ::continue::
         end
         -- deref 一级指针
         if isStruct and t:sub(#t) == '*' then
@@ -145,11 +173,15 @@ local function getArrayType(arr)
     return res
 end
 
+local function getValidName(name)
+    return blackKeyWord[name] or name
+end
+
 function builder:buildStructOrUnion(lines, tt, name)
     lines[#lines+1] = '---@class ' .. self:getType(name)
     for _, field in ipairs(tt.fields or {}) do
         if field.name and field.type then
-            lines[#lines+1] = ('---@field %s %s%s'):format(field.name, self:getType(field.type),
+            lines[#lines+1] = ('---@field %s %s%s'):format(getValidName(field.name), self:getType(field.type),
                 getArrayType(field.isarray))
         end
     end
@@ -158,8 +190,9 @@ end
 function builder:buildFunction(lines, tt, name)
     local param_names = {}
     for i, param in ipairs(tt.params or {}) do
-        lines[#lines+1] = ('---@param %s %s%s'):format(param.name, self:getType(param.type), getArrayType(param.idxs))
-        param_names[#param_names+1] = param.name
+        local param_name = getValidName(param.name)
+        lines[#lines+1] = ('---@param %s %s%s'):format(param_name, self:getType(param.type), getArrayType(param.idxs))
+        param_names[#param_names+1] = param_name
     end
     if tt.vararg then
         param_names[#param_names+1] = '...'
@@ -178,7 +211,7 @@ function builder:buildTypedef(lines, tt, name)
         -- 这个时候没有主类型，只有一个别名,直接创建一个别名结构体
         self.switch_ast(def.type, self, lines, def, name)
     else
-        lines[#lines+1] = ('---@alias %s %s'):format(name, self:getType(def))
+        lines[#lines+1] = ('---@alias %s %s'):format(self:getType(name), self:getType(def))
     end
 end
 
@@ -322,72 +355,18 @@ function m.compileCodes(codes)
     return lines
 end
 
-local function createDir(uri)
-    local dir     = scope.getScope(uri).uri or 'default'
-    local fileDir = fs.path(METAPATH) / ('%08x'):format(SDBMHash():hash(dir))
-    fs.create_directories(fileDir)
-    return fileDir
+function m.build_single(codes, fileDir, uri)
+    local texts = m.compileCodes(codes)
+    if not texts then
+        return
+    end
+
+    local hash = ('%08x'):format(SDBMHash():hash(uri))
+    local encoding = config.get(nil, 'Lua.runtime.fileEncoding')
+    local filePath = fileDir / table.concat({ hash, encoding }, '_')
+
+    utility.saveFile(tostring(filePath) .. '.d.lua', table.concat(texts, '\n'))
+    return true
 end
-
-local builder
-function m.initBuilder(fileDir)
-    fileDir = fileDir or createDir()
-    ---@async
-    return function (uri)
-        local refs = cdefRerence()
-        if not refs or #refs == 0 then
-            return
-        end
-
-        local codes = searchCode(refs, uri)
-        if not codes then
-            return
-        end
-
-        local texts = m.compileCodes(codes)
-        if not texts then
-            return
-        end
-        local hash = ('%08x'):format(SDBMHash():hash(uri))
-        local encoding = config.get(nil, 'Lua.runtime.fileEncoding')
-        local filePath = fileDir / table.concat({ hash, encoding }, '_')
-
-        utility.saveFile(tostring(filePath) .. '.d.lua', table.concat(texts, '\n'))
-    end
-end
-
-files.watch(function (ev, uri)
-    if ev == 'compiler' or ev == 'update' then
-        if builder then
-            await.call(function () ---@async
-                builder(uri)
-            end)
-        end
-    end
-end)
-
-ws.watch(function (ev, uri)
-    -- TODO
-    do return end
-    if ev == 'startReload' then
-        if config.get(uri, 'Lua.runtime.version') ~= 'LuaJIT' then
-            return
-        end
-        await.call(function () ---@async
-            ws.awaitReady(uri)
-            local fileDir = createDir(uri)
-            builder = m.initBuilder(fileDir)
-            local client = require 'client'
-            client.setConfig {
-                {
-                    key    = 'Lua.workspace.library',
-                    action = 'add',
-                    value  = tostring(fileDir),
-                    uri    = uri,
-                }
-            }
-        end)
-    end
-end)
 
 return m

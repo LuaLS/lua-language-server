@@ -1416,8 +1416,8 @@ m.register 'textDocument/inlayHint' {
                 },
                 position     = converter.packPosition(state, res.offset),
                 kind         = res.kind,
-                paddingLeft  = true,
-                paddingRight = true,
+                paddingLeft  = res.kind == 1,
+                paddingRight = res.kind == 2,
             }
         end
         return hintResults

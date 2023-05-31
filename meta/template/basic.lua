@@ -248,7 +248,7 @@ function setfenv(f, table) end
 
 ---#DES 'setmetatable'
 ---@param table      table
----@param metatable? metatable
+---@param metatable? metatable|table
 ---@return table
 function setmetatable(table, metatable) end
 

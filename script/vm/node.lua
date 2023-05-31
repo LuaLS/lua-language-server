@@ -397,6 +397,7 @@ function mt:copy()
     return vm.createNode(self)
 end
 
+---@deprecated
 ---@param source vm.node.object | vm.generic
 ---@param node vm.node | vm.node.object
 ---@param cover? boolean

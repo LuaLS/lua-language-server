@@ -1911,8 +1911,8 @@ local function compileByParentNode(source)
     end)
 end
 
----@param source vm.node.object | vm.variable
----@return vm.node
+---@param source parser.object
+---@return SNode
 function vm.compileNode(source)
     if not source then
         if TEST then
@@ -1922,20 +1922,20 @@ function vm.compileNode(source)
         end
     end
 
-    local cache = vm.getNode(source)
-    if cache ~= nil then
-        return cache
+    local semantic = Semantic.get(source)
+    if semantic ~= nil then
+        return semantic
     end
 
-    ---@cast source parser.object
-    vm.setNode(source, vm.createNode(), true)
+    Semantic.bind(source, Semantic.getType 'unknown')
+
     vm.compileByGlobal(source)
     vm.compileByVariable(source)
     compileByNode(source)
     compileByParentNode(source)
     matchCall(source)
 
-    local node = vm.getNode(source)
+    local node = Semantic.get(source)
     ---@cast node -?
     return node
 end

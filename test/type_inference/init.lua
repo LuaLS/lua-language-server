@@ -1209,7 +1209,7 @@ local t = {}
 f(t, function (<?v?>) end)
 ]]
 
-TEST 'table|nil' [[
+TEST 'table' [[
 local <?t?> = setmetatable({}, { __index = function () end })
 ]]
 

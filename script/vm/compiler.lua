@@ -522,6 +522,17 @@ local function getReturnOfSetMetaTable(args)
             end
         end)
     end
+    --过滤nil
+    local len = #node
+    for i = len, 1, -1 do
+        local n = node[i]
+        if n.cate == 'type' then
+            if n.name == 'nil' then
+                table.remove(node, i)
+                break
+            end
+        end
+    end
     return node
 end
 

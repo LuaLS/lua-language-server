@@ -454,7 +454,7 @@ mt.c = 3
 local <?obj?> = setmetatable({}, {__index = mt})
 ]]
 [[
-local obj: table|nil {
+local obj: {
     a: integer = 1,
     b: integer = 2,
     c: integer = 3,

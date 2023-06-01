@@ -1,12 +1,11 @@
-local searchCode             = require 'plugins.ffi.searchCode'
-local cdefRerence            = require 'plugins.ffi.cdefRerence'
 local cdriver                = require 'plugins.ffi.c-parser.cdriver'
 local util                   = require 'plugins.ffi.c-parser.util'
 local utility                = require 'utility'
 local SDBMHash               = require 'SDBMHash'
 local config                 = require 'config'
 local fs                     = require 'bee.filesystem'
-local scope                  = require 'workspace.scope'
+local ws                     = require 'workspace'
+local furi                   = require 'file-uri'
 
 local namespace <const>      = 'ffi.namespace*.'
 
@@ -360,12 +359,15 @@ function m.build_single(codes, fileDir, uri)
     if not texts then
         return
     end
+    local fullPath = fileDir /ws.getRelativePath(uri)
 
-    local hash = ('%08x'):format(SDBMHash():hash(uri))
-    local encoding = config.get(nil, 'Lua.runtime.fileEncoding')
-    local filePath = fileDir / table.concat({ hash, encoding }, '_')
+    if fullPath:stem():string():find '%.' then
+        local newPath = fullPath:parent_path() / (fullPath:stem():string():gsub('%.', '/') .. ".lua")
+        fs.create_directories(newPath:parent_path())
+        fullPath = newPath
+    end
 
-    utility.saveFile(tostring(filePath) .. '.d.lua', table.concat(texts, '\n'))
+    utility.saveFile(tostring(fullPath), table.concat(texts, '\n'))
     return true
 end
 

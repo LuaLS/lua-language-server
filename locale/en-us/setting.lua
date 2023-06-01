@@ -440,3 +440,5 @@ command.exportDocument =
 'Lua: Export Document ...'
 command.addon_manager.open =
 'Lua: Open Addon Manager ...'
+command.reloadFFIMeta =
+'Lua: Reload luajit ffi meta'

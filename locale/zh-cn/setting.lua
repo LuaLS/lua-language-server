@@ -439,3 +439,5 @@ command.exportDocument =
 'Lua: 导出文档...'
 command.addon_manager.open =
 'Lua: 打开插件管理器...'
+command.reloadFFIMeta =
+'Lua: 重新生成luajit的FFI模块C语言元数据'

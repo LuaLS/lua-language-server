@@ -439,3 +439,5 @@ command.exportDocument = -- TODO: need translate!
 'Lua: Export Document ...'
 command.addon_manager.open = -- TODO: need translate!
 'Lua: Open Addon Manager ...'
+command.reloadFFIMeta = -- TODO: need translate!
+'Lua: Reload luajit ffi meta'

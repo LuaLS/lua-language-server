@@ -522,6 +522,8 @@ local function getReturnOfSetMetaTable(args)
             end
         end)
     end
+    --过滤nil
+   node:remove 'nil'
     return node
 end
 

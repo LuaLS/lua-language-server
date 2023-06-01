@@ -209,9 +209,46 @@ function select(index, ...) end
 ---@return function
 function setfenv(f, table) end
 
+
+---@class metatable
+---@field __mode 'v'|'k'|'kv'|nil
+---@field __metatable any|nil
+---@field __tostring fun(t):string|nil
+---@field __gc fun(t)|nil
+---@field __add fun(t1,t2):any|nil
+---@field __sub fun(t1,t2):any|nil
+---@field __mul fun(t1,t2):any|nil
+---@field __div fun(t1,t2):any|nil
+---@field __mod fun(t1,t2):any|nil
+---@field __pow fun(t1,t2):any|nil
+---@field __unm fun(t):any|nil
+---#if VERSION >= 5.3 then
+---@field __idiv fun(t1,t2):any|nil
+---@field __band fun(t1,t2):any|nil
+---@field __bor fun(t1,t2):any|nil
+---@field __bxor fun(t1,t2):any|nil
+---@field __bnot fun(t):any|nil
+---@field __shl fun(t1,t2):any|nil
+---@field __shr fun(t1,t2):any|nil
+---#end
+---@field __concat fun(t1,t2):any|nil
+---@field __len fun(t):integer|nil
+---@field __eq fun(t1,t2):boolean|nil
+---@field __lt fun(t1,t2):boolean|nil
+---@field __le fun(t1,t2):boolean|nil
+---@field __index table|fun(t,k)|nil
+---@field __newindex table|fun(t,k,v)|nil
+---@field __call fun(t,...)|nil
+---#if VERSION > 5.1 or VERSION == JIT then
+---@field __pairs fun(t):fun(t,k,v)|nil
+---#end
+---#if VERSION == JIT or VERSION == 5.2 then
+---@field __ipairs fun(t):fun(t,k,v)|nil
+---#end
+
 ---#DES 'setmetatable'
 ---@param table      table
----@param metatable? table
+---@param metatable? metatable|table
 ---@return table
 function setmetatable(table, metatable) end
 

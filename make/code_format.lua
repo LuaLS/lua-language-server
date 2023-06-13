@@ -6,7 +6,9 @@ lm.cxx = 'c++17'
 lm:source_set 'code_format' {
     rootdir = '../3rd/EmmyLuaCodeStyle',
     includes = {
-        "include",
+        "Util/include",
+        "CodeFormatCore/include",
+        "LuaParser/include",
         "../bee.lua/3rd/lua",
         "3rd/wildcards/include"
     },
@@ -21,7 +23,7 @@ lm:source_set 'code_format' {
         "Util/src/SymSpell/*.cpp",
         "Util/src/InfoTree/*.cpp",
         --CodeService
-        "CodeService/src/**/*.cpp",
+        "CodeFormatCore/src/**/*.cpp",
     },
     windows = {
         flags = "/utf-8",

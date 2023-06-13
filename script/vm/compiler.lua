@@ -55,6 +55,9 @@ function vm.bindDocs(source)
             vm.setNode(source, vm.compileNode(ast))
             return true
         end
+        if doc.type == 'doc.overload' then
+            vm.setNode(source, vm.compileNode(doc))
+        end
     end
     return false
 end
@@ -1020,6 +1023,7 @@ local function compileLocal(source)
             vm.setNode(source, vm.compileNode(source.value))
         end
     end
+
     -- function x.y(self, ...) --> function x:y(...)
     if  source[1] == 'self'
     and not hasMarkDoc
@@ -1031,6 +1035,7 @@ local function compileLocal(source)
             vm.setNode(source, vm.compileNode(setfield.node))
         end
     end
+
     if source.parent.type == 'funcargs' and not hasMarkDoc and not hasMarkParam then
         local func = source.parent.parent
         -- local call ---@type fun(f: fun(x: number));call(function (x) end) --> x -> number
@@ -1055,6 +1060,7 @@ local function compileLocal(source)
             vm.setNode(source, vm.declareGlobal('type', 'any'))
         end
     end
+
     -- for x in ... do
     if source.parent.type == 'in' then
         compileForVars(source.parent, source)

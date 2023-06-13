@@ -1255,6 +1255,14 @@ local var
 func(var)
 ]]
 
+TEST [[
+---@class MyClass
+---@overload fun(x : string) : MyClass
+local MyClass = {}
+
+local w = MyClass(<!1!>)
+]]
+
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
 config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
 config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')

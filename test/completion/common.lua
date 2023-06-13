@@ -4114,3 +4114,73 @@ f({
         kind  = define.CompletionItemKind.Text,
     },
 }
+
+TEST [[
+while true do
+    continue<??>
+end
+]]
+{
+    {
+        label      = 'continue',
+        kind       = define.CompletionItemKind.Keyword,
+    },
+    {
+        label      = 'goto continue ..',
+        kind       = define.CompletionItemKind.Snippet,
+        additionalTextEdits = {
+            {
+                start   = 10004,
+                finish  = 10004,
+                newText = 'goto ',
+            },
+            {
+                start   = 20000,
+                finish  = 20000,
+                newText = '    ::continue::\n',
+            },
+        }
+    },
+}
+
+TEST [[
+while true do
+    goto continue<??>
+end
+]]
+{
+    {
+        label      = 'continue',
+        kind       = define.CompletionItemKind.Keyword,
+    },
+    {
+        label      = 'goto continue ..',
+        kind       = define.CompletionItemKind.Snippet,
+        additionalTextEdits = {
+            {
+                start   = 20000,
+                finish  = 20000,
+                newText = '    ::continue::\n',
+            }
+        }
+    },
+}
+
+TEST [[
+while true do
+    goto continue<??>
+    ::continue::
+end
+]]
+{
+    {
+        label      = 'continue',
+        kind       = define.CompletionItemKind.Keyword,
+    },
+    {
+        label      = 'goto continue ..',
+        kind       = define.CompletionItemKind.Snippet,
+        additionalTextEdits = {
+        }
+    },
+}

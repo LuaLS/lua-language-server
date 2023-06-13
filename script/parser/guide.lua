@@ -720,7 +720,7 @@ end
 --- 遍历所有指定类型的source
 ---@param ast parser.object
 ---@param type string
----@param callback fun(src: parser.object)
+---@param callback fun(src: parser.object): any
 ---@return any
 function m.eachSourceType(ast, type, callback)
     local cache = getSourceTypeCache(ast)

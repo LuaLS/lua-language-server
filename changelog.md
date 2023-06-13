@@ -2,7 +2,9 @@
 
 ## 3.6.22
 * `FIX` [#2038]
+* `FIX` [#2042]
 
+[#2042]: https://github.com/LuaLS/lua-language-server/issues/2042
 [#2038]: https://github.com/LuaLS/lua-language-server/issues/2038
 
 ## 3.6.21

@@ -59,7 +59,7 @@ return function (uri, callback)
 
         local functionName = source.parent[1]
 
-        if #source.args > 0 then
+        if source.args and #source.args > 0 then
             for _, arg in ipairs(source.args) do
                 local argName = arg[1]
                 if argName ~= 'self' then

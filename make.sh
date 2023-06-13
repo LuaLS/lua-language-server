@@ -2,6 +2,6 @@
 
 git submodule update --init --recursive
 pushd 3rd/luamake
-./compile/install.sh
+./compile/build.sh
 popd
 ./3rd/luamake/luamake rebuild

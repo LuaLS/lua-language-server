@@ -565,11 +565,12 @@ function vm.viewKey(source, uri)
             return vm.viewKey(source.types[1], uri)
         else
             local key = vm.getInfer(source):view(uri)
-            return '[' .. key .. ']'
+            return '[' .. key .. ']', key
         end
     end
     if source.type == 'tableindex'
-    or source.type == 'setindex' then
+    or source.type == 'setindex'
+    or source.type == 'getindex' then
         local index = source.index
         local name = vm.getInfer(index):viewLiterals()
         if not name then
@@ -587,7 +588,11 @@ function vm.viewKey(source, uri)
         return vm.viewKey(source.name, uri)
     end
     if source.type == 'doc.type.name' then
-        return '[' .. source[1] .. ']'
+        return '[' .. source[1] .. ']', source[1]
+    end
+    if source.type == 'doc.type.string' then
+        local name = util.viewString(source[1], source[2])
+        return ('[%s]'):format(name), name
     end
     local key = vm.getKeyName(source)
     if key == nil then

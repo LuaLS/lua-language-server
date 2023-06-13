@@ -134,7 +134,7 @@ local function asField(source)
 end
 
 local function asDocFieldName(source)
-    local name     = source.field[1]
+    local name = vm.viewKey(source, guide.getUri(source)) or '?'
     local class
     for _, doc in ipairs(source.bindGroup) do
         if doc.type == 'doc.class' then
@@ -143,10 +143,12 @@ local function asDocFieldName(source)
         end
     end
     local view = vm.getInfer(source.extends):view(guide.getUri(source))
-    if not class then
-        return ('(field) ?.%s: %s'):format(name, view)
+    local className = class and class.class[1] or '?'
+    if name:match(guide.namePatternFull) then
+        return ('(field) %s.%s: %s'):format(className, name, view)
+    else
+        return ('(field) %s%s: %s'):format(className, name, view)
     end
-    return ('(field) %s.%s: %s'):format(class.class[1], name, view)
 end
 
 local function asString(source)

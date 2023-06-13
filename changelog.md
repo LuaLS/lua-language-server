@@ -1,5 +1,10 @@
 # changelog
 
+## 3.6.22
+* `FIX` [#2038]
+
+[#2038]: https://github.com/LuaLS/lua-language-server/issues/2038
+
 ## 3.6.21
 `2023-5-24`
 * `FIX` disable ffi plugin

@@ -138,12 +138,20 @@ local Care = util.switch()
         local uri = guide.getUri(loc)
         -- 1. 值为函数的局部变量 | Local variable whose value is a function
         if vm.getInfer(source):hasFunction(uri) then
-            results[#results+1] = {
-                start      = source.start,
-                finish     = source.finish,
-                type       = define.TokenTypes['function'],
-                modifieres = define.TokenModifiers.declaration,
-            }
+            if source.type == 'local' then
+                results[#results+1] = {
+                    start      = source.start,
+                    finish     = source.finish,
+                    type       = define.TokenTypes['function'],
+                    modifieres = define.TokenModifiers.declaration,
+                }
+            else
+                results[#results+1] = {
+                    start      = source.start,
+                    finish     = source.finish,
+                    type       = define.TokenTypes['function'],
+                }
+            end
             return
         end
         -- 3. 特殊变量 | Special variableif source[1] == '_ENV' then

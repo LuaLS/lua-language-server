@@ -7,6 +7,7 @@
 * `FIX` [#2083]
 * `FIX` [#2088]
 * `FIX` [#2110]
+* `FIX` [#2129]
 
 [#2038]: https://github.com/LuaLS/lua-language-server/issues/2038
 [#2042]: https://github.com/LuaLS/lua-language-server/issues/2042
@@ -14,6 +15,7 @@
 [#2083]: https://github.com/LuaLS/lua-language-server/issues/2083
 [#2088]: https://github.com/LuaLS/lua-language-server/issues/2088
 [#2110]: https://github.com/LuaLS/lua-language-server/issues/2110
+[#2129]: https://github.com/LuaLS/lua-language-server/issues/2129
 
 ## 3.6.21
 `2023-5-24`

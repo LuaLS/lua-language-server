@@ -14,6 +14,9 @@ local function findSetField(ast, name, callback)
                 return
             end
             local func = funcPtr.value
+            if not func then
+                return
+            end
             if funcPtr.type == 'local' and func.type == 'function' then
                 helper.CheckFunction(func, callback, 'DIAG_MISSING_LOCAL_EXPORT_DOC_COMMENT', 'DIAG_MISSING_LOCAL_EXPORT_DOC_PARAM', 'DIAG_MISSING_LOCAL_EXPORT_DOC_RETURN')
             end

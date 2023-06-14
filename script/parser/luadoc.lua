@@ -1534,7 +1534,7 @@ local function buildLuaDoc(comment)
     parseTokens(doc, startOffset + startPos)
     local result, rests = convertTokens(doc)
     if result then
-        result.range = comment.finish
+        result.range = math.max(comment.finish, result.finish)
         local finish = result.firstFinish or result.finish
         if rests then
             for _, rest in ipairs(rests) do

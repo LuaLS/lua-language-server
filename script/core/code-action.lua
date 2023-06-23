@@ -688,6 +688,10 @@ local function findRequireTargets(visiblePaths)
 end
 
 local function checkMissingRequire(results, uri, start, finish, diagnostics)
+    if not diagnostics then
+        return
+    end
+
     local state = files.getState(uri)
     local text  = files.getText(uri)
     if not state or not text then

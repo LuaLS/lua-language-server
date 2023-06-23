@@ -154,3 +154,5 @@ local t = {
 --        edit  = EXISTS,
 --    },
 --}
+
+-- TODO: Add some tests for ACTION_AUTOREQUIRE

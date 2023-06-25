@@ -1199,6 +1199,33 @@ local function setColor(color) end
 setColor(colors.green)
 ```
 ]=]
+LUADOC_DESC_SOURCE = -- TODO: need translate!
+[=[
+Provide a reference to some source code which lives in another file. When
+searching for the defintion of an item, its `@source` will be used.
+
+## Syntax
+`@source <path>`
+
+## Usage
+```
+---You can use absolute paths
+---@source C:/Users/me/Documents/program/myFile.c
+local a
+
+---Or URIs
+---@source file:///C:/Users/me/Documents/program/myFile.c:10
+local b
+
+---Or relative paths
+---@source local/file.c
+local c
+
+---You can also include line and char numbers
+---@source local/file.c:10:8
+local d
+```
+]=]
 LUADOC_DESC_PACKAGE = -- TODO: need translate!
 [=[
 Mark a function as private to the file it is defined in. A packaged function

@@ -7,6 +7,7 @@ local converter = require 'proto.converter'
 local autoreq   = require 'core.completion.auto-require'
 local rpath     = require 'workspace.require-path'
 local furi      = require 'file-uri'
+local undefined = require 'core.diagnostics.undefined-global'
 
 ---@param uri  uri
 ---@param row  integer
@@ -687,11 +688,7 @@ local function findRequireTargets(visiblePaths)
     return targets
 end
 
-local function checkMissingRequire(results, uri, start, finish, diagnostics)
-    if not diagnostics then
-        return
-    end
-
+local function checkMissingRequire(results, uri, start, finish)
     local state = files.getState(uri)
     local text  = files.getText(uri)
     if not state or not text then
@@ -705,14 +702,14 @@ local function checkMissingRequire(results, uri, start, finish, diagnostics)
         end
     end)
 
-    local function addPotentialRequires(global)
-        autoreq.check(state, global.name, global.endpos, function(moduleFile, stemname, targetSource)
+    local function addPotentialRequires(global, endpos)
+        autoreq.check(state, global, endpos, function(moduleFile, stemname, targetSource)
             local visiblePaths = rpath.getVisiblePath(uri, furi.decode(moduleFile))
             if not visiblePaths or #visiblePaths == 0 then return end
 
             for _, target in ipairs(findRequireTargets(visiblePaths)) do
                 results[#results+1] = {
-                    title = lang.script('ACTION_AUTOREQUIRE', global.name, target),
+                    title = lang.script('ACTION_AUTOREQUIRE', global, target),
                     kind = 'refactor.rewrite',
                     command = {
                         title     = 'autoRequire',
@@ -721,7 +718,7 @@ local function checkMissingRequire(results, uri, start, finish, diagnostics)
                             {
                                 uri         = guide.getUri(state.ast),
                                 target      = moduleFile,
-                                name        = global.name,
+                                name        = global,
                                 requireName = target
                             },
                         },
@@ -731,16 +728,11 @@ local function checkMissingRequire(results, uri, start, finish, diagnostics)
         end)
     end
 
-    -- TODO: Is there a better way to detect undefined-global?
-    for _, diag in ipairs(diagnostics) do
-        if diag.code == 'undefined-global' then
-            for _, potglobal in ipairs(potentialGlobals) do
-                if diag.message:find(potglobal.name) then
-                    addPotentialRequires(potglobal)
-                end
-            end
+    undefined(uri, function(foundUndefined)
+        if foundUndefined.start <= start and start <= foundUndefined.finish and foundUndefined.start <= finish and finish <= foundUndefined.finish then
+            addPotentialRequires(foundUndefined.undefinedGlobal, foundUndefined.finish)
         end
-    end
+    end)
 end
 
 return function (uri, start, finish, diagnostics)

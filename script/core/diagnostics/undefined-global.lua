@@ -55,6 +55,7 @@ return function (uri, callback)
             start   = src.start,
             finish  = src.finish,
             message = message,
+            undefinedGlobal = src[1]
         }
     end)
 end

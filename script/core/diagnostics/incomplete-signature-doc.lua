@@ -81,7 +81,8 @@ return function (uri, callback)
         if source.args and #source.args > 0 then
             for _, arg in ipairs(source.args) do
                 local argName = arg[1]
-                if argName ~= 'self' then
+                if  argName ~= 'self'
+                and argName ~= '_' then
                     if not findParam(source.bindDocs, argName) then
                         callback {
                             start   = arg.start,

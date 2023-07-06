@@ -344,3 +344,31 @@ f(1, 2<??>)
 {
 'function f(a: 😅, <!b: integer!>)',
 }
+
+TEST [[
+---@class A
+---@field event fun(self: self, ev: "onChat", c: string)
+---@field event fun(self: self, ev: "onTimer", t: integer)
+
+---@type A
+local t
+
+t:event("onChat", <??>)
+]]
+{
+'(method) (ev: "onChat", <!c: string!>)',
+}
+
+TEST [[
+---@class A
+---@field event fun(self: self, ev: "onChat", c: string)
+---@field event fun(self: self, ev: "onTimer", t: integer)
+
+---@type A
+local t
+
+t:event("onTimer", <??>)
+]]
+{
+'(method) (ev: "onTimer", <!t: integer!>)',
+}

@@ -1,5 +1,8 @@
 # changelog
 
+## 3.6.23
+* `CHG` signature: narrow by inputed literal
+
 ## 3.6.22
 `2023-6-14`
 * `FIX` [#2038]

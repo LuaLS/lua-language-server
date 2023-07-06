@@ -330,3 +330,17 @@ t(<??>)
 {
 'function (<!x: number!>)',
 }
+
+TEST [[
+---@class 😅
+
+---@param a 😅
+---@param b integer
+local function f(a, b)
+end
+
+f(1, 2<??>)
+]]
+{
+'function f(a: 😅, <!b: integer!>)',
+}

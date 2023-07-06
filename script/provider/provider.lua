@@ -772,8 +772,8 @@ m.register 'textDocument/signatureHelp' {
             for j, param in ipairs(result.params) do
                 parameters[j] = {
                     label = {
-                        param.label[1],
-                        param.label[2],
+                        converter.len(result.label, 1, param.label[1]),
+                        converter.len(result.label, 1, param.label[2]),
                     }
                 }
             end

@@ -470,7 +470,7 @@ end
 
 local function parseLongString()
     local start, finish, mark = sfind(Lua, '^(%[%=*%[)', Tokens[Index])
-    if not mark then
+    if not start then
         return nil
     end
     fastForwardToken(finish + 1)

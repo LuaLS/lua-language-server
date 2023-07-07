@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.6.23
+`2023-7-7`
 * `CHG` signature: narrow by inputed literal
 
 ## 3.6.22

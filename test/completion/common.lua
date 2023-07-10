@@ -4114,3 +4114,116 @@ f({
         kind  = define.CompletionItemKind.Text,
     },
 }
+
+TEST [[
+while true do
+    continue<??>
+end
+]]
+{
+    {
+        label      = 'continue',
+        kind       = define.CompletionItemKind.Keyword,
+    },
+    {
+        label      = 'goto continue ..',
+        kind       = define.CompletionItemKind.Snippet,
+        additionalTextEdits = {
+            {
+                start   = 10004,
+                finish  = 10004,
+                newText = 'goto ',
+            },
+            {
+                start   = 20000,
+                finish  = 20000,
+                newText = '    ::continue::\n',
+            },
+        }
+    },
+}
+
+TEST [[
+while true do
+    goto continue<??>
+end
+]]
+{
+    {
+        label      = 'continue',
+        kind       = define.CompletionItemKind.Keyword,
+    },
+    {
+        label      = 'goto continue ..',
+        kind       = define.CompletionItemKind.Snippet,
+        additionalTextEdits = {
+            {
+                start   = 20000,
+                finish  = 20000,
+                newText = '    ::continue::\n',
+            }
+        }
+    },
+}
+
+TEST [[
+while true do
+    goto continue<??>
+    ::continue::
+end
+]]
+{
+    {
+        label      = 'continue',
+        kind       = define.CompletionItemKind.Keyword,
+    },
+    {
+        label      = 'goto continue ..',
+        kind       = define.CompletionItemKind.Snippet,
+        additionalTextEdits = {
+        }
+    },
+}
+
+Cared['description'] = true
+TEST [[
+---@class Foo
+---@field ['with quotes'] integer
+---@field without_quotes integer
+
+---@type Foo
+local bar = {}
+
+bar.<??>
+]]
+{
+    {
+        label = "'with quotes'",
+        kind  = define.CompletionItemKind.Field,
+        textEdit = {
+            start   = 70004,
+            finish  = 70004,
+            newText = "['with quotes']"
+        },
+        additionalTextEdits = {
+            {
+                start   = 70003,
+                finish  = 70004,
+                newText = '',
+            }
+        },
+        description = [[
+```lua
+(field) Foo['with quotes']: integer
+```]]
+    },
+    {
+        label = 'without_quotes',
+        kind  = define.CompletionItemKind.Field,
+        description = [[
+```lua
+(field) Foo.without_quotes: integer
+```]]
+    },
+}
+Cared['description'] = false

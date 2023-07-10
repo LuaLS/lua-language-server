@@ -283,6 +283,9 @@ end
 
 --- 读取文件
 ---@param path string
+---@param keepBom? boolean
+---@return string? text
+---@return string? errMsg
 function m.loadFile(path, keepBom)
     local f, e = ioOpen(path, 'rb')
     if not f then
@@ -308,6 +311,8 @@ end
 --- 写入文件
 ---@param path string
 ---@param content string
+---@return boolean ok
+---@return string? errMsg
 function m.saveFile(path, content)
     local f, e = ioOpen(path, "wb")
 
@@ -357,6 +362,7 @@ end
 --- 深拷贝（不处理元表）
 ---@param source  table
 ---@param target? table
+---@return table
 function m.deepCopy(source, target)
     local mark = {}
     local function copy(a, b)
@@ -379,6 +385,8 @@ function m.deepCopy(source, target)
 end
 
 --- 序列化
+---@param t table
+---@return table
 function m.unpack(t)
     local result = {}
     local tid = 0
@@ -406,6 +414,8 @@ function m.unpack(t)
 end
 
 --- 反序列化
+---@param t table
+---@return table
 function m.pack(t)
     local cache = {}
     local function pack(id)
@@ -733,6 +743,7 @@ function switchMT:has(name)
 end
 
 ---@param name string
+---@param ... any
 ---@return ...
 function switchMT:__call(name, ...)
     local callback = self.map[name] or self._default
@@ -752,6 +763,8 @@ function m.switch()
 end
 
 ---@param f async fun()
+---@param name string
+---@return any, boolean
 function m.getUpvalue(f, name)
     for i = 1, 999 do
         local uname, value = getupvalue(f, i)
@@ -819,6 +832,7 @@ end
 
 ---@param t table
 ---@param sorter boolean|function
+---@return any[]
 function m.getTableKeys(t, sorter)
     local keys = {}
     for k in pairs(t) do

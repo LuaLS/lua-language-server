@@ -1,5 +1,27 @@
 # changelog
 
+## 3.6.23
+`2023-7-7`
+* `CHG` signature: narrow by inputed literal
+
+## 3.6.22
+`2023-6-14`
+* `FIX` [#2038]
+* `FIX` [#2042]
+* `FIX` [#2062]
+* `FIX` [#2083]
+* `FIX` [#2088]
+* `FIX` [#2110]
+* `FIX` [#2129]
+
+[#2038]: https://github.com/LuaLS/lua-language-server/issues/2038
+[#2042]: https://github.com/LuaLS/lua-language-server/issues/2042
+[#2062]: https://github.com/LuaLS/lua-language-server/issues/2062
+[#2083]: https://github.com/LuaLS/lua-language-server/issues/2083
+[#2088]: https://github.com/LuaLS/lua-language-server/issues/2088
+[#2110]: https://github.com/LuaLS/lua-language-server/issues/2110
+[#2129]: https://github.com/LuaLS/lua-language-server/issues/2129
+
 ## 3.6.21
 `2023-5-24`
 * `FIX` disable ffi plugin

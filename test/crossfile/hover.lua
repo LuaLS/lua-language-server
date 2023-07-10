@@ -1795,3 +1795,16 @@ local x: integer = 1
 
 comment1]]
 }
+
+TEST { {path = 'a.lua', content = [[
+local t = {}
+
+print(<?t?>['a b'])
+]]},
+hover = [[
+```lua
+local t: {
+    ['a b']: unknown,
+}
+```]]
+}

@@ -9,12 +9,10 @@
 			"stopOnEntry": false,
 			"program": "${workspaceRoot}/test.lua",
 			"luaexe": "${workspaceFolder}/bin/lua-language-server",
-			"cpath": null,
-			"arg": [
-			],
 			"luaVersion": "5.4",
 			"sourceCoding": "utf8",
-			"console": "internalConsole",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "openOnSessionStart",
 			"outputCapture": [
 				"print",
 				"stderr",

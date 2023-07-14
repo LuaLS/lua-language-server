@@ -1,5 +1,8 @@
 # changelog
 
+## 3.6.24
+* `FIX` shake of `codeLens`
+
 ## 3.6.23
 `2023-7-7`
 * `CHG` signature: narrow by inputed literal

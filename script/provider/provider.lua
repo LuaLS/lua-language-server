@@ -904,7 +904,7 @@ m.register 'textDocument/codeLens' {
             resolveProvider = true,
         }
     },
-    abortByFileUpdate = true,
+    --abortByFileUpdate = true,
     ---@async
     function (params)
         local uri = files.getRealUri(params.textDocument.uri)

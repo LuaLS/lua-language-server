@@ -540,10 +540,10 @@ end
 ---@return boolean
 function vm.isUndefinedGlobal(src)
     local node = vm.compileNode(src)
-    if node._undefined_global == nil then
-        node._undefined_global = checkIsUndefinedGlobal(src)
+    if node.undefinedGlobal == nil then
+        node.undefinedGlobal = checkIsUndefinedGlobal(src)
     end
-    return node._undefined_global
+    return node.undefinedGlobal
 end
 
 ---@param source parser.object

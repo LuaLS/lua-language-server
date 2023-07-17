@@ -722,7 +722,8 @@ local function checkMissingRequire(results, uri, start, finish)
         end)
     end
 
-    guide.eachSourceBetween(state.ast, start, finish, function (source)if vm.isUndefinedGlobal(source) then
+    guide.eachSourceBetween(state.ast, start, finish, function (source)
+        if vm.isUndefinedGlobal(source) then
             addRequires(source[1], source.finish)
         end
     end)

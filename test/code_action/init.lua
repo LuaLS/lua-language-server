@@ -183,8 +183,6 @@ local t = {
 --    },
 --}
 
--- TODO: Add some tests for ACTION_AUTOREQUIRE
-
 TEST_CROSSFILE {
 [[
     <?unrequiredModule?>.myFunction()
@@ -214,4 +212,67 @@ TEST_CROSSFILE {
             },
         }
     }
+}
+
+TEST_CROSSFILE {
+[[
+    <?myModule?>.myFunction()
+]],
+    {
+        path = 'myModule/init.lua',
+        content = [[
+            local m = {}
+            m.myFunction = print
+            return m
+        ]]
+    }
+} {
+    {
+        title = lang.script('ACTION_AUTOREQUIRE', 'myModule.init', 'myModule'),
+        kind = 'refactor.rewrite',
+        command = {
+            title     = 'autoRequire',
+            command   = 'lua.autoRequire',
+            arguments = {
+                {
+                    uri         = TESTURI,
+                    target      = furi.encode 'myModule/init.lua',
+                    name        = 'myModule',
+                    requireName = 'myModule.init'
+                },
+            },
+        }
+    },
+    {
+        title = lang.script('ACTION_AUTOREQUIRE', 'init', 'myModule'),
+        kind = 'refactor.rewrite',
+        command = {
+            title     = 'autoRequire',
+            command   = 'lua.autoRequire',
+            arguments = {
+                {
+                    uri         = TESTURI,
+                    target      = furi.encode 'myModule/init.lua',
+                    name        = 'myModule',
+                    requireName = 'init'
+                },
+            },
+        }
+    },
+    {
+        title = lang.script('ACTION_AUTOREQUIRE', 'myModule', 'myModule'),
+        kind = 'refactor.rewrite',
+        command = {
+            title     = 'autoRequire',
+            command   = 'lua.autoRequire',
+            arguments = {
+                {
+                    uri         = TESTURI,
+                    target      = furi.encode 'myModule/init.lua',
+                    name        = 'myModule',
+                    requireName = 'myModule'
+                },
+            },
+        }
+    },
 }

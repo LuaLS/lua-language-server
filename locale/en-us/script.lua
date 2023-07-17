@@ -449,7 +449,7 @@ ACTION_ADD_DICT         =
 ACTION_FIX_ADD_PAREN    = -- TODO: need translate!
 'Add parentheses.'
 ACTION_AUTOREQUIRE      = -- TODO: need translate!
-"Import {} as '{}'"
+"Import '{}' as {}"
 
 COMMAND_DISABLE_DIAG       =
 'Disable diagnostics'

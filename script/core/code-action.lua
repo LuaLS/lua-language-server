@@ -703,7 +703,7 @@ local function checkMissingRequire(results, uri, start, finish)
 
             for _, target in ipairs(findRequireTargets(visiblePaths)) do
                 results[#results+1] = {
-                    title = lang.script('ACTION_AUTOREQUIRE', global, target),
+                    title = lang.script('ACTION_AUTOREQUIRE', target, global),
                     kind = 'refactor.rewrite',
                     command = {
                         title     = 'autoRequire',

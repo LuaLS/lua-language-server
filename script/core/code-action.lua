@@ -8,6 +8,7 @@ local autoreq   = require 'core.completion.auto-require'
 local rpath     = require 'workspace.require-path'
 local furi      = require 'file-uri'
 local undefined = require 'core.diagnostics.undefined-global'
+local vm        = require 'vm'
 
 ---@param uri  uri
 ---@param row  integer
@@ -695,14 +696,7 @@ local function checkMissingRequire(results, uri, start, finish)
         return
     end
 
-    local potentialGlobals = {}
-    guide.eachSourceBetween(state.ast, start, finish, function (source)
-        if source.type == 'getglobal' then
-            potentialGlobals[#potentialGlobals+1] = { name = source[1], endpos = source.finish }
-        end
-    end)
-
-    local function addPotentialRequires(global, endpos)
+    local function addRequires(global, endpos)
         autoreq.check(state, global, endpos, function(moduleFile, stemname, targetSource)
             local visiblePaths = rpath.getVisiblePath(uri, furi.decode(moduleFile))
             if not visiblePaths or #visiblePaths == 0 then return end
@@ -728,9 +722,8 @@ local function checkMissingRequire(results, uri, start, finish)
         end)
     end
 
-    undefined(uri, function(foundUndefined)
-        if foundUndefined.start <= start and start <= foundUndefined.finish and foundUndefined.start <= finish and finish <= foundUndefined.finish then
-            addPotentialRequires(foundUndefined.undefinedGlobal, foundUndefined.finish)
+    guide.eachSourceBetween(state.ast, start, finish, function (source)if vm.isUndefinedGlobal(source) then
+            addRequires(source[1], source.finish)
         end
     end)
 end
@@ -747,7 +740,7 @@ return function (uri, start, finish, diagnostics)
     checkSwapParams(results, uri, start, finish)
     --checkExtractAsFunction(results, uri, start, finish)
     checkJsonToLua(results, uri, start, finish)
-    checkMissingRequire(results, uri, start, finish, diagnostics)
+    checkMissingRequire(results, uri, start, finish)
 
     return results
 end

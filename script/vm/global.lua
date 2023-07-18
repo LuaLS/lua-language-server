@@ -1,6 +1,7 @@
 local util  = require 'utility'
 local scope = require 'workspace.scope'
 local guide = require 'parser.guide'
+local config = require 'config'
 ---@class vm
 local vm    = require 'vm.vm'
 
@@ -516,6 +517,33 @@ function vm.hasGlobalSets(suri, cate, name)
         return false
     end
     return true
+end
+
+---@param src parser.object
+local function checkIsUndefinedGlobal(src)
+    local key = src[1]
+
+    local uri = guide.getUri(src)
+    local dglobals = util.arrayToHash(config.get(uri, 'Lua.diagnostics.globals'))
+    local rspecial = config.get(uri, 'Lua.runtime.special')
+
+    local node = src.node
+    return src.type == 'getglobal' and key and not (
+        dglobals[key] or
+        rspecial[key] or
+        node.tag ~= '_ENV' or
+        vm.hasGlobalSets(uri, 'variable', key)
+    )
+end
+
+---@param src parser.object
+---@return boolean
+function vm.isUndefinedGlobal(src)
+    local node = vm.compileNode(src)
+    if node.undefinedGlobal == nil then
+        node.undefinedGlobal = checkIsUndefinedGlobal(src)
+    end
+    return node.undefinedGlobal
 end
 
 ---@param source parser.object

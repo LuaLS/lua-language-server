@@ -4,6 +4,11 @@ local util      = require 'utility'
 local sp        = require 'bee.subprocess'
 local guide     = require "parser.guide"
 local converter = require 'proto.converter'
+local autoreq   = require 'core.completion.auto-require'
+local rpath     = require 'workspace.require-path'
+local furi      = require 'file-uri'
+local undefined = require 'core.diagnostics.undefined-global'
+local vm        = require 'vm'
 
 ---@param uri  uri
 ---@param row  integer
@@ -676,6 +681,54 @@ local function checkJsonToLua(results, uri, start, finish)
     }
 end
 
+local function findRequireTargets(visiblePaths)
+    local targets = {}
+    for _, visible in ipairs(visiblePaths) do
+        targets[#targets+1] = visible.name
+    end
+    return targets
+end
+
+local function checkMissingRequire(results, uri, start, finish)
+    local state = files.getState(uri)
+    local text  = files.getText(uri)
+    if not state or not text then
+        return
+    end
+
+    local function addRequires(global, endpos)
+        autoreq.check(state, global, endpos, function(moduleFile, stemname, targetSource)
+            local visiblePaths = rpath.getVisiblePath(uri, furi.decode(moduleFile))
+            if not visiblePaths or #visiblePaths == 0 then return end
+
+            for _, target in ipairs(findRequireTargets(visiblePaths)) do
+                results[#results+1] = {
+                    title = lang.script('ACTION_AUTOREQUIRE', target, global),
+                    kind = 'refactor.rewrite',
+                    command = {
+                        title     = 'autoRequire',
+                        command   = 'lua.autoRequire',
+                        arguments = {
+                            {
+                                uri         = guide.getUri(state.ast),
+                                target      = moduleFile,
+                                name        = global,
+                                requireName = target
+                            },
+                        },
+                    }
+                }
+            end
+        end)
+    end
+
+    guide.eachSourceBetween(state.ast, start, finish, function (source)
+        if vm.isUndefinedGlobal(source) then
+            addRequires(source[1], source.finish)
+        end
+    end)
+end
+
 return function (uri, start, finish, diagnostics)
     local ast = files.getState(uri)
     if not ast then
@@ -688,6 +741,7 @@ return function (uri, start, finish, diagnostics)
     checkSwapParams(results, uri, start, finish)
     --checkExtractAsFunction(results, uri, start, finish)
     checkJsonToLua(results, uri, start, finish)
+    checkMissingRequire(results, uri, start, finish)
 
     return results
 end

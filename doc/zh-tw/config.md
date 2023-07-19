@@ -1,3 +1,19 @@
+# addonManager.enable
+
+Whether the addon manager is enabled or not.
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+true
+```
+
 # codeLens.enable
 
 Enable code lens.
@@ -290,6 +306,7 @@ Array<string>
 * ``"missing-parameter"``
 * ``"missing-return"``
 * ``"missing-return-value"``
+* ``"name-style-check"``
 * ``"need-check-nil"``
 * ``"need-paren"``
 * ``"nesting-long-mark"``
@@ -431,9 +448,14 @@ object<string, string>
     "await": "Fallback",
     /*
     * codestyle-check
+    * name-style-check
     * spell-check
     */
     "codestyle": "Fallback",
+    /*
+    * global-element
+    */
+    "conventions": "Fallback",
     /*
     * duplicate-index
     * duplicate-set-field
@@ -474,10 +496,6 @@ object<string, string>
     * invisible
     */
     "strict": "Fallback",
-    /*
-    * global-element
-    */
-    "convention": "None",
     /*
     * no-unknown
     */
@@ -557,9 +575,14 @@ object<string, string>
     "await": "Fallback",
     /*
     * codestyle-check
+    * name-style-check
     * spell-check
     */
     "codestyle": "Fallback",
+    /*
+    * global-element
+    */
+    "conventions": "Fallback",
     /*
     * duplicate-index
     * duplicate-set-field
@@ -600,10 +623,6 @@ object<string, string>
     * invisible
     */
     "strict": "Fallback",
-    /*
-    * global-element
-    */
-    "convention": "Fallback",
     /*
     * no-unknown
     */
@@ -801,7 +820,7 @@ object<string, string>
     */
     "global-in-nil-env": "Any",
     /*
-    Enable diagnostics for function definitions which are not fully annotated.
+    Incomplete @param or @return annotations for functions.
     */
     "incomplete-signature-doc": "None",
     /*
@@ -813,11 +832,11 @@ object<string, string>
     */
     "lowercase-global": "Any",
     /*
-    Enable diagnostics for global function definitions which are not fully annotated.
+    Missing annotations for globals! Global functions must have a comment and annotations for all parameters and return values.
     */
     "missing-global-doc": "None",
     /*
-    Enable diagnostics for exported local function definitions which are not fully annotated.
+    Missing annotations for exported locals! Exported local functions must have a comment and annotations for all parameters and return values.
     */
     "missing-local-export-doc": "None",
     /*
@@ -832,6 +851,10 @@ object<string, string>
     Enable diagnostics for return statements without values although the containing function declares returns.
     */
     "missing-return-value": "Any",
+    /*
+    Enable diagnostics for name style.
+    */
+    "name-style-check": "None",
     /*
     Enable diagnostics for variable usages if `nil` or an optional (potentially `nil`) value was assigned to the variable before.
     */
@@ -1064,7 +1087,7 @@ object<string, string>
     */
     "global-in-nil-env": "Warning",
     /*
-    Enable diagnostics for function definitions which are not fully annotated.
+    Incomplete @param or @return annotations for functions.
     */
     "incomplete-signature-doc": "Warning",
     /*
@@ -1076,11 +1099,11 @@ object<string, string>
     */
     "lowercase-global": "Information",
     /*
-    Enable diagnostics for global function definitions which are not annotated.
+    Missing annotations for globals! Global functions must have a comment and annotations for all parameters and return values.
     */
     "missing-global-doc": "Warning",
     /*
-    Enable diagnostics for exported local function definitions which are not annotated.
+    Missing annotations for exported locals! Exported local functions must have a comment and annotations for all parameters and return values.
     */
     "missing-local-export-doc": "Warning",
     /*
@@ -1095,6 +1118,10 @@ object<string, string>
     Enable diagnostics for return statements without values although the containing function declares returns.
     */
     "missing-return-value": "Warning",
+    /*
+    Enable diagnostics for name style.
+    */
+    "name-style-check": "Warning",
     /*
     Enable diagnostics for variable usages if `nil` or an optional (potentially `nil`) value was assigned to the variable before.
     */
@@ -1639,6 +1666,22 @@ Array<string>
 
 ```jsonc
 []
+```
+
+# nameStyle.config
+
+Set name style config
+
+## type
+
+```ts
+Object<string, table: 0000029B6DB8EAE0>
+```
+
+## default
+
+```jsonc
+{}
 ```
 
 # runtime.builtin

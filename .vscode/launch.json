@@ -50,6 +50,8 @@
 			"luaexe": "${workspaceFolder}/bin/lua-language-server",
 			"program": "${workspaceRoot}/tools/build-3rd-meta.lua",
 			"cpath": "${workspaceFolder}/bin/?.dll;${workspaceFolder}/bin/?.so",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "openOnSessionStart",
 			"arg": [
 			],
 			"luaVersion": "latest",
@@ -67,6 +69,8 @@
 			"luaexe": "${workspaceFolder}/bin/lua-language-server",
 			"program": "${workspaceRoot}/tools/locale.lua",
 			"cpath": "${workspaceFolder}/bin/?.dll;${workspaceFolder}/bin/?.so",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "openOnSessionStart",
 			"arg": [
 			],
 			"luaVersion": "latest",
@@ -84,6 +88,8 @@
 			"luaexe": "${workspaceFolder}/bin/lua-language-server",
 			"program": "${workspaceRoot}/tools/build-doc.lua",
 			"cpath": "${workspaceFolder}/bin/?.dll;${workspaceFolder}/bin/?.so",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "openOnSessionStart",
 			"arg": [
 			],
 			"luaVersion": "latest",

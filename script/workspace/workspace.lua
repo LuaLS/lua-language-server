@@ -469,8 +469,6 @@ function m.flushFiles(scp)
     for uri in pairs(cachedUris) do
         files.delRef(uri)
     end
-    collectgarbage()
-    collectgarbage()
 end
 
 ---@param scp scope
@@ -491,6 +489,8 @@ end
 ---@async
 ---@param scp scope
 function m.awaitReload(scp)
+    await.unique('workspace reload:' .. scp:getName())
+    await.sleep(0.1)
     scp:set('ready', false)
     scp:set('nativeMatcher', nil)
     scp:set('libraryMatcher', nil)

@@ -2,6 +2,9 @@
 
 ## 3.6.24
 * `FIX` shake of `codeLens`
+* `FIX` [#2145]
+
+[#2145]: https://github.com/LuaLS/lua-language-server/issues/2145
 
 ## 3.6.23
 `2023-7-7`

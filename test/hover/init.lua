@@ -2383,6 +2383,25 @@ local obj: B {
 
 TEST [[
 ---@class A
+local M = {}
+
+---@private
+M.x = 0
+
+---@private
+function M:init()
+    self.x = 1
+end
+
+---@type A
+local <?a?>
+]]
+[[
+local a: A
+]]
+
+TEST [[
+---@class A
 ---@field x fun(): string
 
 ---@type table<string, A>

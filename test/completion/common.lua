@@ -4227,3 +4227,83 @@ bar.<??>
     },
 }
 Cared['description'] = false
+
+TEST [[
+---@class A
+local M = {}
+
+function M:method1()
+end
+
+function M.static1(tt)
+end
+
+function M:method2()
+end
+
+function M.static2(tt)
+end
+
+---@type A
+local a
+
+a.<??>
+]]
+{
+    {
+        label ='static1(tt)',
+        kind  = define.CompletionItemKind.Function,
+    },
+    {
+        label ='static2(tt)',
+        kind  = define.CompletionItemKind.Function,
+    },
+    {
+        label ='method1(self)',
+        kind  = define.CompletionItemKind.Method,
+    },
+    {
+        label ='method2(self)',
+        kind  = define.CompletionItemKind.Method,
+    },
+}
+
+TEST [[
+---@class A
+local M = {}
+
+function M:method1()
+end
+
+function M.static1(tt)
+end
+
+function M:method2()
+end
+
+function M.static2(tt)
+end
+
+---@type A
+local a
+
+a:<??>
+]]
+{
+    {
+        label ='method1()',
+        kind  = define.CompletionItemKind.Method,
+    },
+    {
+        label ='method2()',
+        kind  = define.CompletionItemKind.Method,
+    },
+    {
+        label ='static1()',
+        kind  = define.CompletionItemKind.Function,
+    },
+    {
+        label ='static2()',
+        kind  = define.CompletionItemKind.Function,
+    },
+}

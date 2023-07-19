@@ -504,7 +504,8 @@ local function checkFieldThen(state, name, src, word, startPos, position, parent
     local kind = define.CompletionItemKind.Field
     if (value.type == 'function' and not vm.isVarargFunctionWithOverloads(value))
     or value.type == 'doc.type.function' then
-        if oop then
+        local isMethod = value.parent.type == 'setmethod'
+        if isMethod then
             kind = define.CompletionItemKind.Method
         else
             kind = define.CompletionItemKind.Function
@@ -512,6 +513,7 @@ local function checkFieldThen(state, name, src, word, startPos, position, parent
         buildFunction(results, src, value, oop, {
             label      = name,
             kind       = kind,
+            isMethod   = isMethod,
             match      = name:match '^[^(]+',
             insertText = name:match '^[^(]+',
             deprecated = vm.getDeprecated(src) and true or nil,
@@ -626,11 +628,42 @@ local function checkFieldOfRefs(refs, state, word, startPos, position, parent, o
         end
         ::CONTINUE::
     end
+
+    local fieldResults = {}
     for name, src in util.sortPairs(fields) do
         if src then
-            checkFieldThen(state, name, src, word, startPos, position, parent, oop, results)
+            checkFieldThen(state, name, src, word, startPos, position, parent, oop, fieldResults)
             await.delay()
         end
+    end
+
+    local scoreMap = {}
+    for i, res in ipairs(fieldResults) do
+        scoreMap[res] = i
+    end
+    table.sort(fieldResults, function (a, b)
+        local score1 = scoreMap[a]
+        local score2 = scoreMap[b]
+        if oop then
+            if not a.isMethod then
+                score1 = score1 + 10000
+            end
+            if not b.isMethod then
+                score2 = score2 + 10000
+            end
+        else
+            if a.isMethod then
+                score1 = score1 + 10000
+            end
+            if b.isMethod then
+                score2 = score2 + 10000
+            end
+        end
+        return score1 < score2
+    end)
+
+    for _, res in ipairs(fieldResults) do
+        results[#results+1] = res
     end
 end
 

@@ -33,6 +33,10 @@ function lovr.headset.animate(device, model) end
 ---
 ---Returns the current angular velocity of a device.
 ---
+---
+---### NOTE:
+---If the device isn't tracked, all zeroes will be returned.
+---
 ---@param device? lovr.Device # The device to get the velocity of.
 ---@return number x # The x component of the angular velocity.
 ---@return number y # The y component of the angular velocity.
@@ -61,19 +65,11 @@ function lovr.headset.getAxis(device, axis) end
 ---
 ---Returns the depth of the play area, in meters.
 ---
----
----### NOTE:
----This currently returns 0 on the Quest.
----
 ---@return number depth # The depth of the play area, in meters.
 function lovr.headset.getBoundsDepth() end
 
 ---
 ---Returns the size of the play area, in meters.
----
----
----### NOTE:
----This currently returns 0 on the Quest.
 ---
 ---@return number width # The width of the play area, in meters.
 ---@return number depth # The depth of the play area, in meters.
@@ -88,10 +84,6 @@ function lovr.headset.getBoundsGeometry(t) end
 
 ---
 ---Returns the width of the play area, in meters.
----
----
----### NOTE:
----This currently returns 0 on the Quest.
 ---
 ---@return number width # The width of the play area, in meters.
 function lovr.headset.getBoundsWidth() end
@@ -423,6 +415,10 @@ function lovr.headset.getTime() end
 ---
 ---Returns the current linear velocity of a device, in meters per second.
 ---
+---
+---### NOTE:
+---If the device isn't tracked, all zeroes will be returned.
+---
 ---@param device? lovr.Device # The device to get the velocity of.
 ---@return number vx # The x component of the linear velocity.
 ---@return number vy # The y component of the linear velocity.
@@ -495,6 +491,18 @@ function lovr.headset.isDown(device, button) end
 function lovr.headset.isFocused() end
 
 ---
+---Returns whether passthrough is active.
+---
+---When passthrough is active, the real world will be rendered behind any content rendered by LÖVR, using the alpha channel to blend between the two.
+---
+---
+---### NOTE:
+---This feature is currently only supported on Oculus Quest devices.
+---
+---@return boolean active # Whether passthrough is active.
+function lovr.headset.isPassthroughEnabled() end
+
+---
 ---Returns whether a button on a device is currently touched.
 ---
 ---@param device lovr.Device # The device.
@@ -548,6 +556,19 @@ function lovr.headset.setClipDistance(near, far) end
 ---@param frequency number # The new refresh rate, in Hz.
 ---@return boolean success # Whether the display refresh rate was successfully set.
 function lovr.headset.setDisplayFrequency(frequency) end
+
+---
+---Sets whether passthrough is active.
+---
+---When passthrough is active, the real world will be rendered behind any content rendered by LÖVR, using the alpha channel to blend between the two.
+---
+---
+---### NOTE:
+---This feature is currently only supported on Oculus Quest devices.
+---
+---@param enable boolean # Whether passthrough should be enabled.
+---@return boolean success # Whether the passthrough state was set successfully.
+function lovr.headset.setPassthroughEnabled(enable) end
 
 ---
 ---Starts the headset session.

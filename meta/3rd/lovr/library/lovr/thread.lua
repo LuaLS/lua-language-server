@@ -116,9 +116,9 @@ function Channel:pop(wait) end
 ---
 ---Pushes a message onto the Channel.
 ---
----The following types of data can be pushed: nil, boolean, number, string, and userdata.
+---The following types of data can be pushed: nil, boolean, number, string, lightuserdata, vectors, and userdata (LÖVR objects).
 ---
----Tables should be serialized to strings.
+---Notably, tables are not currently supported and should be serialized to strings.
 ---
 ---
 ---### NOTE:

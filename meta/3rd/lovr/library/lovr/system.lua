@@ -13,6 +13,25 @@ lovr.system = {}
 function lovr.system.getCoreCount() end
 
 ---
+---Returns the position of the mouse.
+---
+---@return number x # The x position of the mouse, relative to the top-left of the window.
+---@return number y # The y position of the mouse, relative to the top-left of the window.
+function lovr.system.getMousePosition() end
+
+---
+---Returns the x position of the mouse.
+---
+---@return number x # The x position of the mouse, relative to the top-left of the window.
+function lovr.system.getMouseX() end
+
+---
+---Returns the y position of the mouse.
+---
+---@return number y # The y position of the mouse, relative to the top-left of the window.
+function lovr.system.getMouseY() end
+
+---
 ---Returns the current operating system.
 ---
 ---@return string os # Either "Windows", "macOS", "Linux", "Android" or "Web".
@@ -65,6 +84,13 @@ function lovr.system.getWindowWidth() end
 ---@param key lovr.KeyCode # The key.
 ---@return boolean down # Whether the key is currently pressed.
 function lovr.system.isKeyDown(key) end
+
+---
+---Returns whether a mouse button is currently pressed.
+---
+---@param button number # The index of a button to check.  Use 1 for the primary mouse button, 2 for the secondary button, and 3 for the middle button.  Other indices can be used, but are hardware-specific.
+---@return boolean down # Whether the mouse button is currently down.
+function lovr.system.isMouseDown(button) end
 
 ---
 ---Returns whether the desktop window is open.

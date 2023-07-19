@@ -149,7 +149,7 @@ function lovr.graphics.getDevice() end
 ---
 ---Returns a table indicating which features are supported by the GPU.
 ---
----@return {textureBC: boolean, textureASTC: boolean, wireframe: boolean, depthClamp: boolean, indirectDrawFirstInstance: boolean, float64: boolean, int64: boolean, int16: boolean} features # 
+---@return {textureBC: boolean, textureASTC: boolean, wireframe: boolean, depthClamp: boolean, depthResolve: boolean, indirectDrawFirstInstance: boolean, float64: boolean, int64: boolean, int16: boolean} features # 
 function lovr.graphics.getFeatures() end
 
 ---
@@ -471,7 +471,6 @@ function lovr.graphics.newMaterial(properties) end
 ---### NOTE:
 ---Currently, the following features are not supported by the model importer:
 ---
----- glTF: Morph targets are not supported.
 ---- glTF: Only the default scene is loaded.
 ---- glTF: Currently, each skin in a Model can have up to 256 joints.
 ---- glTF: Meshes can't appear multiple times in the node hierarchy with different skins, they need
@@ -481,6 +480,10 @@ function lovr.graphics.newMaterial(properties) end
 ---- STL: ASCII STL files are not supported.
 ---
 ---Diffuse and emissive textures will be loaded using sRGB encoding, all other textures will be loaded as linear.
+---
+---Loading a model file will fail if the asset references textures or other files using absolute paths.
+---
+---Relative paths should be used instead, and will be relative to the model file within the virtual filesystem.
 ---
 ---@overload fun(blob: lovr.Blob, options?: table):lovr.Model
 ---@overload fun(modelData: lovr.ModelData, options?: table):lovr.Model
@@ -1099,6 +1102,45 @@ function Model:getAnimationDuration(index) end
 function Model:getAnimationName(index) end
 
 ---
+---Returns the number of blend shapes in the model.
+---
+---@return number count # The number of blend shapes in the model.
+function Model:getBlendShapeCount() end
+
+---
+---Returns the name of a blend shape in the model.
+---
+---
+---### NOTE:
+---This function will throw an error if the blend shape index is invalid.
+---
+---@param index number # The index of a blend shape.
+---@return string name # The name of the blend shape.
+function Model:getBlendShapeName(index) end
+
+---
+---Returns the weight of a blend shape.
+---
+---A blend shape contains offset values for the vertices of one of the meshes in a Model.
+---
+---Whenever the Model is drawn, the offsets are multiplied by the weight of the blend shape, allowing for smooth blending between different meshes.
+---
+---A weight of zero won't apply any displacement and will skip processing of the blend shape.
+---
+---
+---### NOTE:
+---The initial weights are declared in the model file.
+---
+---Weights can be any number, but usually they're kept between 0 and 1.
+---
+---This function will throw an error if the blend shape name or index doesn't exist.
+---
+---@overload fun(self: lovr.Model, name: string):number
+---@param index number # The index of a blend shape.
+---@return number weight # The weight of the blend shape.
+function Model:getBlendShapeWeight(index) end
+
+---
 ---Returns the 6 values of the Model's axis-aligned bounding box.
 ---
 ---@return number minx # The minimum x coordinate of the vertices in the Model.
@@ -1400,6 +1442,28 @@ function Model:hasJoints() end
 ---Resets node transforms to the original ones defined in the model file.
 ---
 function Model:resetNodeTransforms() end
+
+---
+---Sets the weight of a blend shape.
+---
+---A blend shape contains offset values for the vertices of one of the meshes in a Model.
+---
+---Whenever the Model is drawn, the offsets are multiplied by the weight of the blend shape, allowing for smooth blending between different meshes.
+---
+---A weight of zero won't apply any displacement and will skip processing of the blend shape.
+---
+---
+---### NOTE:
+---The initial weights are declared in the model file.
+---
+---Weights can be any number, but usually they're kept between 0 and 1.
+---
+---This function will throw an error if the blend shape name or index doesn't exist.
+---
+---@overload fun(self: lovr.Model, name: string, weight: number)
+---@param index number # The index of a blend shape.
+---@param weight number # The new weight for the blend shape.
+function Model:setBlendShapeWeight(index, weight) end
 
 ---
 ---Sets or blends the orientation of a node to a new orientation.
@@ -1707,6 +1771,7 @@ function Pass:compute(x, y, z) end
 ---
 ---@overload fun(self: lovr.Pass, position: lovr.Vec3, scale: lovr.Vec3, orientation: lovr.Quat, segments?: number)
 ---@overload fun(self: lovr.Pass, transform: lovr.Mat4, segments?: number)
+---@overload fun(self: lovr.Pass, p1: lovr.Vec3, p2: lovr.Vec3, radius?: number, segments?: number)
 ---@param x? number # The x coordinate of the center of the base of the cone.
 ---@param y? number # The y coordinate of the center of the base of the cone.
 ---@param z? number # The z coordinate of the center of the base of the cone.
@@ -2082,18 +2147,37 @@ function Pass:read(buffer, index, count) end
 function Pass:rotate(angle, ax, ay, az) end
 
 ---
+---Draws a rounded rectangle.
+---
+---@overload fun(self: lovr.Pass, position: lovr.Vec3, size: lovr.Vec3, orientation: lovr.Quat, radius?: number, segments?: number)
+---@overload fun(self: lovr.Pass, transform: lovr.Mat4, radius?: number, segments?: number)
+---@param x? number # The x coordinate of the center of the rectangle.
+---@param y? number # The y coordinate of the center of the rectangle.
+---@param z? number # The z coordinate of the center of the rectangle.
+---@param width? number # The width of the rectangle.
+---@param height? number # The height of the rectangle.
+---@param thickness? number # The thickness of the rectangle.
+---@param angle? number # The rotation of the rectangle around its rotation axis, in radians.
+---@param ax? number # The x component of the axis of rotation.
+---@param ay? number # The y component of the axis of rotation.
+---@param az? number # The z component of the axis of rotation.
+---@param radius? number # The radius of the rectangle corners.  If the radius is zero or negative, the rectangle will have sharp corners.
+---@param segments? number # The number of circular segments to use for each corner.  This increases the smoothness, but increases the number of vertices in the mesh.
+function Pass:roundrect(x, y, z, width, height, thickness, angle, ax, ay, az, radius, segments) end
+
+---
 ---Scales the coordinate system.
 ---
 ---@overload fun(self: lovr.Pass, scale: lovr.Vec3)
 ---@param sx number # The x component of the scale.
----@param sy number # The y component of the scale.
----@param sz number # The z component of the scale.
+---@param sy? number # The y component of the scale.
+---@param sz? number # The z component of the scale.
 function Pass:scale(sx, sy, sz) end
 
 ---
 ---Sends a value to a variable in the Pass's active `Shader`.
 ---
----The active shader is changed using using `Pass:setShader`.
+---The active shader is changed using `Pass:setShader`.
 ---
 ---
 ---### NOTE:

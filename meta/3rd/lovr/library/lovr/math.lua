@@ -50,7 +50,7 @@ function lovr.math.linearToGamma(lr, lg, lb) end
 ---
 ---This function takes the same arguments as `Mat4:set`.
 ---
----@overload fun(n: lovr.mat4):lovr.Mat4
+---@overload fun(n: lovr.Mat4):lovr.Mat4
 ---@overload fun(position?: lovr.Vec3, scale?: lovr.Vec3, rotation?: lovr.Quat):lovr.Mat4
 ---@overload fun(position?: lovr.Vec3, rotation?: lovr.Quat):lovr.Mat4
 ---@overload fun(...):lovr.Mat4
@@ -76,7 +76,7 @@ function lovr.math.newCurve(x, y, z, ...) end
 ---
 ---This function takes the same arguments as `Mat4:set`.
 ---
----@overload fun(n: lovr.mat4):lovr.Mat4
+---@overload fun(n: lovr.Mat4):lovr.Mat4
 ---@overload fun(position?: lovr.Vec3, scale?: lovr.Vec3, rotation?: lovr.Quat):lovr.Mat4
 ---@overload fun(position?: lovr.Vec3, rotation?: lovr.Quat):lovr.Mat4
 ---@overload fun(...):lovr.Mat4
@@ -89,17 +89,17 @@ function lovr.math.newMat4() end
 ---
 ---This function takes the same arguments as `Quat:set`.
 ---
----@overload fun(r: lovr.quat):lovr.quat
----@overload fun(v: lovr.vec3):lovr.quat
----@overload fun(v: lovr.vec3, u: lovr.vec3):lovr.quat
----@overload fun(m: lovr.mat4):lovr.quat
----@overload fun():lovr.quat
+---@overload fun(r: lovr.Quat):lovr.Quat
+---@overload fun(v: lovr.Vec3):lovr.Quat
+---@overload fun(v: lovr.Vec3, u: lovr.Vec3):lovr.Quat
+---@overload fun(m: lovr.Mat4):lovr.Quat
+---@overload fun():lovr.Quat
 ---@param angle? number # An angle to use for the rotation, in radians.
 ---@param ax? number # The x component of the axis of rotation.
 ---@param ay? number # The y component of the axis of rotation.
 ---@param az? number # The z component of the axis of rotation.
 ---@param raw? boolean # Whether the components should be interpreted as raw `(x, y, z, w)` components.
----@return lovr.quat q # The new quaternion.
+---@return lovr.Quat q # The new quaternion.
 function lovr.math.newQuat(angle, ax, ay, az, raw) end
 
 ---
@@ -164,17 +164,17 @@ function lovr.math.noise(x) end
 ---
 ---This function takes the same arguments as `Quat:set`.
 ---
----@overload fun(r: lovr.quat):lovr.quat
----@overload fun(v: lovr.vec3):lovr.quat
----@overload fun(v: lovr.vec3, u: lovr.vec3):lovr.quat
----@overload fun(m: lovr.mat4):lovr.quat
----@overload fun():lovr.quat
+---@overload fun(r: lovr.Quat):lovr.Quat
+---@overload fun(v: lovr.Vec3):lovr.Quat
+---@overload fun(v: lovr.Vec3, u: lovr.Vec3):lovr.Quat
+---@overload fun(m: lovr.Mat4):lovr.Quat
+---@overload fun():lovr.Quat
 ---@param angle? number # An angle to use for the rotation, in radians.
 ---@param ax? number # The x component of the axis of rotation.
 ---@param ay? number # The y component of the axis of rotation.
 ---@param az? number # The z component of the axis of rotation.
 ---@param raw? boolean # Whether the components should be interpreted as raw `(x, y, z, w)` components.
----@return lovr.quat q # The new quaternion.
+---@return lovr.Quat q # The new quaternion.
 function lovr.math.quat(angle, ax, ay, az, raw) end
 
 ---
@@ -400,19 +400,19 @@ function Mat4:equals(n) end
 ---@param down number # The bottom half-angle of the projection, in radians.
 ---@param near number # The near plane of the projection.
 ---@param far? number # The far plane.  Zero is a special value that will set an infinite far plane with a reversed Z range, which improves depth buffer precision and is the default.
----@return lovr.Mat4 m # The original matrix.
+---@return lovr.Mat4 self # The modified matrix.
 function Mat4:fov(left, right, up, down, near, far) end
 
 ---
 ---Resets the matrix to the identity, effectively setting its translation to zero, its scale to 1, and clearing any rotation.
 ---
----@return lovr.Mat4 m # The original matrix.
+---@return lovr.Mat4 self # The modified matrix.
 function Mat4:identity() end
 
 ---
 ---Inverts the matrix, causing it to represent the opposite of its old transform.
 ---
----@return lovr.Mat4 m # The original matrix, with its values inverted.
+---@return lovr.Mat4 self # The inverted matrix.
 function Mat4:invert() end
 
 ---
@@ -425,7 +425,7 @@ function Mat4:invert() end
 ---@param from lovr.Vec3 # The position of the viewer.
 ---@param to lovr.Vec3 # The position of the target.
 ---@param up? lovr.Vec3 # The up vector of the viewer.
----@return lovr.Mat4 m # The original matrix.
+---@return lovr.Mat4 self # The modified matrix.
 function Mat4:lookAt(from, to, up) end
 
 ---
@@ -442,7 +442,7 @@ function Mat4:lookAt(from, to, up) end
 ---@overload fun(self: lovr.Mat4, v3: lovr.Vec3):lovr.Vec3
 ---@overload fun(self: lovr.Mat4, v4: lovr.Vec4):lovr.Vec4
 ---@param n lovr.Mat4 # The matrix.
----@return lovr.Mat4 m # The original matrix, containing the result.
+---@return lovr.Mat4 self # The modified matrix.
 function Mat4:mul(n) end
 
 ---
@@ -457,7 +457,7 @@ function Mat4:mul(n) end
 ---@param top number # The top edge of the projection.
 ---@param near number # The position of the near clipping plane.
 ---@param far number # The position of the far clipping plane.
----@return lovr.Mat4 m # The original matrix.
+---@return lovr.Mat4 self # The modified matrix.
 function Mat4:orthographic(left, right, bottom, top, near, far) end
 
 ---
@@ -469,15 +469,23 @@ function Mat4:orthographic(left, right, bottom, top, near, far) end
 ---@param aspect number # The horizontal aspect ratio of the projection (width / height).
 ---@param near number # The near plane.
 ---@param far? number # The far plane.  Zero is a special value that will set an infinite far plane with a reversed Z range, which improves depth buffer precision and is the default.
----@return lovr.Mat4 m # The original matrix.
+---@return lovr.Mat4 self # The modified matrix.
 function Mat4:perspective(fov, aspect, near, far) end
+
+---
+---Turns the matrix into a reflection matrix that transforms values as though they were reflected across a plane.
+---
+---@param position lovr.Vec3 # The position of the plane.
+---@param normal lovr.Vec3 # The normal vector of the plane.
+---@return lovr.Mat4 self # The reflected matrix.
+function Mat4:reflect(position, normal) end
 
 ---
 ---Rotates the matrix using a quaternion or an angle/axis rotation.
 ---
 ---@overload fun(self: lovr.Mat4, angle: number, ax?: number, ay?: number, az?: number):lovr.Mat4
 ---@param q lovr.Quat # The rotation to apply to the matrix.
----@return lovr.Mat4 m # The original matrix.
+---@return lovr.Mat4 self # The rotated matrix.
 function Mat4:rotate(q) end
 
 ---
@@ -485,13 +493,13 @@ function Mat4:rotate(q) end
 ---
 ---@overload fun(self: lovr.Mat4, sx: number, sy?: number, sz?: number):lovr.Mat4
 ---@param scale lovr.Vec3 # The 3D scale to apply.
----@return lovr.Mat4 m # The original matrix.
+---@return lovr.Mat4 self # The modified matrix.
 function Mat4:scale(scale) end
 
 ---
 ---Sets the components of the matrix from separate position, rotation, and scale arguments or an existing matrix.
 ---
----@overload fun(self: lovr.Mat4, n: lovr.mat4):lovr.Mat4
+---@overload fun(self: lovr.Mat4, n: lovr.Mat4):lovr.Mat4
 ---@overload fun(self: lovr.Mat4, x: number, y: number, z: number, sx: number, sy: number, sz: number, angle: number, ax: number, ay: number, az: number):lovr.Mat4
 ---@overload fun(self: lovr.Mat4, x: number, y: number, z: number, angle: number, ax: number, ay: number, az: number):lovr.Mat4
 ---@overload fun(self: lovr.Mat4, position: lovr.Vec3, scale: lovr.Vec3, rotation: lovr.Quat):lovr.Mat4
@@ -511,7 +519,7 @@ function Mat4:set() end
 ---@param from lovr.Vec3 # The position of the viewer.
 ---@param to lovr.Vec3 # The position of the target.
 ---@param up? lovr.Vec3 # The up vector of the viewer.
----@return lovr.Mat4 m # The original matrix.
+---@return lovr.Mat4 self # The modified matrix.
 function Mat4:target(from, to, up) end
 
 ---
@@ -519,13 +527,13 @@ function Mat4:target(from, to, up) end
 ---
 ---@overload fun(self: lovr.Mat4, x: number, y: number, z: number):lovr.Mat4
 ---@param v lovr.Vec3 # The translation vector.
----@return lovr.Mat4 m # The original matrix.
+---@return lovr.Mat4 self # The translated matrix.
 function Mat4:translate(v) end
 
 ---
 ---Transposes the matrix, mirroring its values along the diagonal.
 ---
----@return lovr.Mat4 m # The original matrix.
+---@return lovr.Mat4 self # The transposed matrix.
 function Mat4:transpose() end
 
 ---
@@ -547,7 +555,7 @@ local Quat = {}
 ---
 ---It negates the (x, y, z) components of the quaternion.
 ---
----@return lovr.Quat q # The original quaternion.
+---@return lovr.Quat self # The inverted quaternion.
 function Quat:conjugate() end
 
 ---
@@ -576,9 +584,9 @@ function Quat:length() end
 ---
 ---If the value is a vector, then the input vector is rotated by the quaternion and returned.
 ---
----@overload fun(self: lovr.Quat, v3: lovr.vec3):lovr.vec3
----@param r lovr.quat # A quaternion to combine with the original.
----@return lovr.quat q # The original quaternion.
+---@overload fun(self: lovr.Quat, v3: lovr.Vec3):lovr.Vec3
+---@param r lovr.Quat # A quaternion to combine with the original.
+---@return lovr.Quat self # The modified quaternion.
 function Quat:mul(r) end
 
 ---
@@ -590,7 +598,7 @@ function Quat:mul(r) end
 ---
 ---Try normalizing a quaternion if some of the calculations aren't working quite right!
 ---
----@return lovr.Quat q # The original quaternion.
+---@return lovr.Quat self # The normalized quaternion.
 function Quat:normalize() end
 
 ---
@@ -607,17 +615,17 @@ function Quat:normalize() end
 ---  two vectors.
 ---- A matrix can be passed in to extract the rotation of the matrix into a quaternion.
 ---
----@overload fun(self: lovr.Quat, r: lovr.quat):lovr.quat
----@overload fun(self: lovr.Quat, v: lovr.vec3):lovr.quat
----@overload fun(self: lovr.Quat, v: lovr.vec3, u: lovr.vec3):lovr.quat
----@overload fun(self: lovr.Quat, m: lovr.mat4):lovr.quat
----@overload fun(self: lovr.Quat):lovr.quat
+---@overload fun(self: lovr.Quat, r: lovr.Quat):lovr.Quat
+---@overload fun(self: lovr.Quat, v: lovr.Vec3):lovr.Quat
+---@overload fun(self: lovr.Quat, v: lovr.Vec3, u: lovr.Vec3):lovr.Quat
+---@overload fun(self: lovr.Quat, m: lovr.Mat4):lovr.Quat
+---@overload fun(self: lovr.Quat):lovr.Quat
 ---@param angle? number # The angle to use for the rotation, in radians.
 ---@param ax? number # The x component of the axis of rotation.
 ---@param ay? number # The y component of the axis of rotation.
 ---@param az? number # The z component of the axis of rotation.
 ---@param raw? boolean # Whether the components should be interpreted as raw `(x, y, z, w)` components.
----@return lovr.quat q # The original quaternion.
+---@return lovr.Quat self # The modified quaternion.
 function Quat:set(angle, ax, ay, az, raw) end
 
 ---
@@ -631,7 +639,7 @@ function Quat:set(angle, ax, ay, az, raw) end
 ---
 ---@param r lovr.Quat # The quaternion to slerp towards.
 ---@param t number # The lerping parameter.
----@return lovr.Quat q # The original quaternion, containing the new lerped values.
+---@return lovr.Quat self # The modified quaternion, containing the new lerped values.
 function Quat:slerp(r, t) end
 
 ---
@@ -725,7 +733,7 @@ local Vec2 = {}
 ---
 ---@overload fun(self: lovr.Vec2, x: number, y?: number):lovr.Vec2
 ---@param u lovr.Vec2 # The other vector.
----@return lovr.Vec2 v # The original vector.
+---@return lovr.Vec2 self # The modified vector.
 function Vec2:add(u) end
 
 ---
@@ -755,7 +763,7 @@ function Vec2:distance(u) end
 ---
 ---@overload fun(self: lovr.Vec2, x: number, y?: number):lovr.Vec2
 ---@param u lovr.Vec2 # The other vector to divide the components by.
----@return lovr.Vec2 v # The original vector.
+---@return lovr.Vec2 self # The modified vector.
 function Vec2:div(u) end
 
 ---
@@ -806,7 +814,7 @@ function Vec2:length() end
 ---@overload fun(self: lovr.Vec2, x: number, y: number, t: number):lovr.Vec2
 ---@param u lovr.Vec2 # The vector to lerp towards.
 ---@param t number # The lerping parameter.
----@return lovr.Vec2 v # The original vector, containing the new lerped values.
+---@return lovr.Vec2 self # The interpolated vector.
 function Vec2:lerp(u, t) end
 
 ---
@@ -814,13 +822,13 @@ function Vec2:lerp(u, t) end
 ---
 ---@overload fun(self: lovr.Vec2, x: number, y?: number):lovr.Vec2
 ---@param u lovr.Vec2 # The other vector to multiply the components by.
----@return lovr.Vec2 v # The original vector.
+---@return lovr.Vec2 self # The modified vector.
 function Vec2:mul(u) end
 
 ---
 ---Adjusts the values in the vector so that its direction stays the same but its length becomes 1.
 ---
----@return lovr.Vec2 v # The original vector.
+---@return lovr.Vec2 self # The normalized vector.
 function Vec2:normalize() end
 
 ---
@@ -837,7 +845,7 @@ function Vec2:set(x, y) end
 ---
 ---@overload fun(self: lovr.Vec2, x: number, y?: number):lovr.Vec2
 ---@param u lovr.Vec2 # The other vector.
----@return lovr.Vec2 v # The original vector.
+---@return lovr.Vec2 self # The modified vector.
 function Vec2:sub(u) end
 
 ---
@@ -858,7 +866,7 @@ local Vec3 = {}
 ---
 ---@overload fun(self: lovr.Vec3, x: number, y?: number, z?: number):lovr.Vec3
 ---@param u lovr.Vec3 # The other vector.
----@return lovr.Vec3 v # The original vector.
+---@return lovr.Vec3 self # The modified vector.
 function Vec3:add(u) end
 
 ---
@@ -886,7 +894,7 @@ function Vec3:angle(u) end
 ---
 ---@overload fun(self: lovr.Vec3, x: number, y: number, z: number):lovr.Vec3
 ---@param u lovr.Vec3 # The vector to compute the cross product with.
----@return lovr.Vec3 v # The original vector, with the cross product as its values.
+---@return lovr.Vec3 self # The modified vector.
 function Vec3:cross(u) end
 
 ---
@@ -902,7 +910,7 @@ function Vec3:distance(u) end
 ---
 ---@overload fun(self: lovr.Vec3, x: number, y?: number, z?: number):lovr.Vec3
 ---@param u lovr.Vec3 # The other vector to divide the components by.
----@return lovr.Vec3 v # The original vector.
+---@return lovr.Vec3 self # The modified vector.
 function Vec3:div(u) end
 
 ---
@@ -953,7 +961,7 @@ function Vec3:length() end
 ---@overload fun(self: lovr.Vec3, x: number, y: number, z: number, t: number):lovr.Vec3
 ---@param u lovr.Vec3 # The vector to lerp towards.
 ---@param t number # The lerping parameter.
----@return lovr.Vec3 v # The original vector, containing the new lerped values.
+---@return lovr.Vec3 self # The interpolated vector.
 function Vec3:lerp(u, t) end
 
 ---
@@ -961,19 +969,20 @@ function Vec3:lerp(u, t) end
 ---
 ---@overload fun(self: lovr.Vec3, x: number, y?: number, z?: number):lovr.Vec3
 ---@param u lovr.Vec3 # The other vector to multiply the components by.
----@return lovr.Vec3 v # The original vector.
+---@return lovr.Vec3 self # The modified vector.
 function Vec3:mul(u) end
 
 ---
 ---Adjusts the values in the vector so that its direction stays the same but its length becomes 1.
 ---
----@return lovr.Vec3 v # The original vector.
+---@return lovr.Vec3 self # The normalized vector.
 function Vec3:normalize() end
 
 ---
 ---Sets the components of the vector, either from numbers or an existing vector.
 ---
 ---@overload fun(self: lovr.Vec3, u: lovr.Vec3):lovr.Vec3
+---@overload fun(self: lovr.Vec3, q: lovr.Quat):lovr.Vec3
 ---@overload fun(self: lovr.Vec3, m: lovr.Mat4):lovr.Vec3
 ---@param x? number # The new x value of the vector.
 ---@param y? number # The new y value of the vector.
@@ -986,7 +995,7 @@ function Vec3:set(x, y, z) end
 ---
 ---@overload fun(self: lovr.Vec3, x: number, y?: number, z?: number):lovr.Vec3
 ---@param u lovr.Vec3 # The other vector.
----@return lovr.Vec3 v # The original vector.
+---@return lovr.Vec3 self # The modified vector.
 function Vec3:sub(u) end
 
 ---
@@ -1008,7 +1017,7 @@ local Vec4 = {}
 ---
 ---@overload fun(self: lovr.Vec4, x: number, y?: number, z?: number, w?: number):lovr.Vec4
 ---@param u lovr.Vec4 # The other vector.
----@return lovr.Vec4 v # The original vector.
+---@return lovr.Vec4 self # The modified vector.
 function Vec4:add(u) end
 
 ---
@@ -1038,7 +1047,7 @@ function Vec4:distance(u) end
 ---
 ---@overload fun(self: lovr.Vec4, x: number, y?: number, z?: number, w?: number):lovr.Vec4
 ---@param u lovr.Vec4 # The other vector to divide the components by.
----@return lovr.Vec4 v # The original vector.
+---@return lovr.Vec4 self # The modified vector.
 function Vec4:div(u) end
 
 ---
@@ -1089,7 +1098,7 @@ function Vec4:length() end
 ---@overload fun(self: lovr.Vec4, x: number, y: number, z: number, w: number, t: number):lovr.Vec4
 ---@param u lovr.Vec4 # The vector to lerp towards.
 ---@param t number # The lerping parameter.
----@return lovr.Vec4 v # The original vector, containing the new lerped values.
+---@return lovr.Vec4 self # The interpolated vector.
 function Vec4:lerp(u, t) end
 
 ---
@@ -1097,13 +1106,13 @@ function Vec4:lerp(u, t) end
 ---
 ---@overload fun(self: lovr.Vec4, x: number, y?: number, z?: number, w?: number):lovr.Vec4
 ---@param u lovr.Vec4 # The other vector to multiply the components by.
----@return lovr.Vec4 v # The original vector.
+---@return lovr.Vec4 self # The modified vector.
 function Vec4:mul(u) end
 
 ---
 ---Adjusts the values in the vector so that its direction stays the same but its length becomes 1.
 ---
----@return lovr.Vec4 v # The original vector.
+---@return lovr.Vec4 self # The normalized vector.
 function Vec4:normalize() end
 
 ---
@@ -1122,7 +1131,7 @@ function Vec4:set(x, y, z, w) end
 ---
 ---@overload fun(self: lovr.Vec4, x: number, y?: number, z?: number, w?: number):lovr.Vec4
 ---@param u lovr.Vec4 # The other vector.
----@return lovr.Vec4 v # The original vector.
+---@return lovr.Vec4 self # The modified vector.
 function Vec4:sub(u) end
 
 ---
@@ -1168,11 +1177,14 @@ function Vec4:unpack() end
 ---
 ---    local position = lovr.math.vec3(x, y, z)
 ---
----As a further shorthand, these vector constructors are placed on the global scope.
+---As a shortcut, vector constructors are placed on the global scope.
 ---
----If you prefer to keep the global scope clean, this can be configured using the `t.math.globals` flag in `lovr.conf`.
+---The uppercase name of the vector is a function that will create a permanent vector, and the lowercase name will create a temporary vector.
+---
+---This can be disabled using the `t.math.globals` option in `lovr.conf`.
 ---
 ---    local position = vec3(x1, y1, z1) + vec3(x2, y2, z2)
+---    local transform = Mat4()
 ---
 ---Temporary vectors, with all their speed, come with an important restriction: they can only be used during the frame in which they were created.
 ---
@@ -1181,7 +1193,7 @@ function Vec4:unpack() end
 ---    local position = vec3(1, 2, 3)
 ---
 ---    function lovr.update(dt)
----      -- Reusing a temporary vector across frames will error:
+---      -- Reusing the temporary 'position' vector across frames will error:
 ---      position:add(vec3(dt))
 ---    end
 ---
@@ -1231,6 +1243,26 @@ function Vec4:unpack() end
 ---For quaternions you can choose whether you want to unpack the angle/axis representation or the raw quaternion components.
 ---
 ---Similarly, matrices support raw unpacking as well as decomposition into translation/scale/rotation values.
+---
+---### Vector Constants
+---
+---The following vector constants are available.
+---
+---They return new temporary vectors each time they are used:
+---
+---- `vec2.zero` (0, 0)
+---- `vec2.one` (1, 1)
+---- `vec3.zero` (0, 0, 0)
+---- `vec3.one` (1, 1, 1)
+---- `vec3.left` (-1, 0, 0)
+---- `vec3.right` (1, 0, 0)
+---- `vec3.up` (0, 1, 0)
+---- `vec3.down` (0, -1, 0)
+---- `vec3.back` (0, 0, 1)
+---- `vec3.forward` (0, 0, -1)
+---- `vec4.zero` (0, 0, 0, 0)
+---- `vec4.one` (1, 1, 1, 1)
+---- `quat.identity` (0, 0, 0, 1)
 ---
 ---@class lovr.Vectors
 local Vectors = {}

@@ -448,6 +448,8 @@ ACTION_ADD_DICT         =
 '将 \'{}\' 添加到工作区的词典中。'
 ACTION_FIX_ADD_PAREN    =
 '添加括号。'
+ACTION_AUTOREQUIRE      = -- TODO: need translate!
+"Import '{}' as {}"
 
 COMMAND_DISABLE_DIAG       =
 '禁用诊断'

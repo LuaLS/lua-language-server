@@ -448,6 +448,8 @@ ACTION_ADD_DICT         =
 'Adicione \'{}\' ao seu espaço de trabalho no '
 ACTION_FIX_ADD_PAREN    = -- TODO: need translate!
 '添加括号。'
+ACTION_AUTOREQUIRE      = -- TODO: need translate!
+"Import '{}' as {}"
 
 COMMAND_DISABLE_DIAG       =
 'Desativar diagnósticos.'

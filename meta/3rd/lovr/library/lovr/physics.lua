@@ -1224,7 +1224,7 @@ function Shape:setPosition(x, y, z) end
 ---
 ---Sets whether this Shape is a sensor.
 ---
----Sensors do not trigger any collision response, but they still report collisions in `World:collide`.
+---When a Shape is a sensor, it will not generate any collision response when it collides with things, but collisions can still be detected with `World:collide` and `World:getContacts`.
 ---
 ---@param sensor boolean # Whether the Shape should be a sensor.
 function Shape:setSensor(sensor) end
@@ -1343,11 +1343,15 @@ local World = {}
 ---
 ---Attempt to collide two shapes.
 ---
----Internally this uses joints and forces to ensure the colliders attached to the shapes do not pass through each other.
+---Internally this sets up constraint forces to move the shapes' colliders apart if they are touching.
 ---
----Collisions can be customized using friction and restitution (bounciness) parameters, and default to using a mix of the colliders' friction and restitution parameters.
+---The colliders won't actually move until `World:update` is called again to advance the physics simulation.
 ---
----Usually this is called automatically by `World:update`.
+---Collision responses can be customized using friction and restitution (bounciness) parameters, and default to using a mix between the parameters of the two colliders.
+---
+---Usually this is called internally by `World:update`, or in a custom collision resolver passed to `World:update`.
+---
+---If you want to detect if objects are touching without colliding them, use `World:getContacts` or make one or both of the shapes sensors using `Shape:setSensor`.
 ---
 ---
 ---### NOTE:
@@ -1368,6 +1372,10 @@ function World:collide(shapeA, shapeB, friction, restitution) end
 ---Detects which pairs of shapes in the world are near each other and could be colliding.
 ---
 ---After calling this function, the `World:overlaps` iterator can be used to iterate over the overlaps, and `World:collide` can be used to resolve a collision for the shapes (if any). Usually this is called automatically by `World:update`.
+---
+---
+---### NOTE:
+---This performs the "broad phase" culling of objects in the World, usually using a spatial hash or other acceleration structure like a quad tree or octree.
 ---
 function World:computeOverlaps() end
 
@@ -1427,6 +1435,24 @@ function World:getAngularDamping() end
 function World:getColliders() end
 
 ---
+---Computes collision information between two shapes and returns a list of contacts where the shapes intersect.
+---
+---Each contact point consists of a position, a normal vector, and a penetration depth.
+---
+---
+---### NOTE:
+---This only detects collision information, it does not cause the shapes to collide with each other.
+---
+---Use `World:collide` for that.
+---
+---This function ignores collision tags.
+---
+---@param shapeA lovr.Shape # The first shape.
+---@param shapeB lovr.Shape # The second shape.
+---@return table contacts # A list of contacts.  Each contact consists of 7 numbers: the contact position, the normal vector, and a depth value indicating how far the shapes intersect each other at the contact point (`{ x, y, z, nx, ny, nz, depth }`).
+function World:getContacts(shapeA, shapeB) end
+
+---
 ---Returns the gravity of the World.
 ---
 ---@return number xg # The x component of the gravity force.
@@ -1476,6 +1502,12 @@ function World:getResponseTime() end
 ---
 ---@return number steps # The step count.
 function World:getStepCount() end
+
+---
+---Returns the list of collision tags used when creating the World.
+---
+---@return table tags # A table of collision tags (strings).
+function World:getTags() end
 
 ---
 ---Returns the tightness of joints in the World.

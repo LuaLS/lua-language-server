@@ -794,6 +794,7 @@ function love.graphics.newParticleSystem(image, buffer) end
 ---
 ---[Open in Browser](https://love2d.org/wiki/love.graphics.newQuad)
 ---
+---@overload fun(x: number, y: number, width: number, height: number, texture: love.Texture):love.Quad
 ---@param x number # The top-left position in the Image along the x-axis.
 ---@param y number # The top-left position in the Image along the y-axis.
 ---@param width number # The width of the Quad in the Image. (Must be greater than 0.)

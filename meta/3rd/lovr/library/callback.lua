@@ -133,6 +133,24 @@ lovr.log = nil
 lovr.mirror = nil
 
 ---
+---This callback is called when the mouse is moved.
+---
+---@type fun(x: number, y: number, dx: number, dy: number)
+lovr.mousemoved = nil
+
+---
+---This callback is called when a mouse button is pressed.
+---
+---@type fun(x: number, y: number, button: number)
+lovr.mousepressed = nil
+
+---
+---This callback is called when a mouse button is released.
+---
+---@type fun(x: number, y: number, button: number)
+lovr.mousereleased = nil
+
+---
 ---This callback contains a permission response previously requested with `lovr.system.requestPermission`.
 ---
 ---The callback contains information on whether permission was granted or denied.

@@ -82,12 +82,14 @@ local function main()
 
     --log.print = true
 
-    TESTURI = furi.encode('/unittest.lua')
+    TESTROOT = ROOT:string() .. '/test_root/'
+    TESTROOTURI = furi.encode(TESTROOT)
+    TESTURI = furi.encode(TESTROOT .. 'unittest.lua')
 
     ---@async
     lclient():start(function (client)
         client:registerFakers()
-        local rootUri = furi.encode '/'
+        local rootUri = furi.encode(TESTROOT)
         client:initialize {
             rootUri = rootUri,
         }

@@ -17,7 +17,7 @@ local function eq(expected, result)
     end
     local tp1, tp2 = type(expected), type(result)
     if tp1 ~= tp2 then
-        return false, string.format(": expected type %s, got %s for %s", tp1, tp2)
+        return false, string.format(": expected type %s, got %s", tp1, tp2)
     end
     if tp1 == 'table' then
         local mark = {}
@@ -53,7 +53,7 @@ local function TEST_CROSSFILE(testfiles)
     local mainscript = table.remove(testfiles, 1)
     return function(expected)
         for _, data in ipairs(testfiles) do
-            local uri = furi.encode(data.path)
+            local uri = furi.encode(TESTROOT .. data.path)
             files.setText(uri, data.content)
             files.compileState(uri)
         end
@@ -64,7 +64,7 @@ local function TEST_CROSSFILE(testfiles)
 
         local _ <close> = function ()
             for _, info in ipairs(testfiles) do
-                files.remove(furi.encode(info.path))
+                files.remove(furi.encode(TESTROOT .. info.path))
             end
             files.remove(TESTURI)
         end
@@ -205,7 +205,7 @@ TEST_CROSSFILE {
             arguments = {
                 {
                     uri         = TESTURI,
-                    target      = furi.encode 'unrequiredModule.lua',
+                    target      = furi.encode(TESTROOT .. 'unrequiredModule.lua'),
                     name        = 'unrequiredModule',
                     requireName = 'unrequiredModule'
                 },
@@ -236,7 +236,7 @@ TEST_CROSSFILE {
             arguments = {
                 {
                     uri         = TESTURI,
-                    target      = furi.encode 'myModule/init.lua',
+                    target      = furi.encode(TESTROOT .. 'myModule/init.lua'),
                     name        = 'myModule',
                     requireName = 'myModule.init'
                 },
@@ -252,7 +252,7 @@ TEST_CROSSFILE {
             arguments = {
                 {
                     uri         = TESTURI,
-                    target      = furi.encode 'myModule/init.lua',
+                    target      = furi.encode(TESTROOT .. 'myModule/init.lua'),
                     name        = 'myModule',
                     requireName = 'init'
                 },
@@ -268,7 +268,7 @@ TEST_CROSSFILE {
             arguments = {
                 {
                     uri         = TESTURI,
-                    target      = furi.encode 'myModule/init.lua',
+                    target      = furi.encode(TESTROOT .. 'myModule/init.lua'),
                     name        = 'myModule',
                     requireName = 'myModule'
                 },

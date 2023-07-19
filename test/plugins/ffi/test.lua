@@ -8,7 +8,7 @@ local template = require 'config.template'
 
 template['Lua.runtime.version'].default = 'LuaJIT'
 
-TESTURI = furi.encode('/unittest.ffi.lua')
+TESTURI = furi.encode(TESTROOT .. 'unittest.ffi.lua')
 
 ---@async
 local function TestBuilder()

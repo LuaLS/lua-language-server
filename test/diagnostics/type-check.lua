@@ -174,6 +174,7 @@ m.ints = {}
 ]]
 
 TEST [[
+---@diagnostic disable: missing-fields
 ---@class A
 ---@field x A
 

@@ -62,6 +62,7 @@ m.register {
     'missing-return-value',
     'redundant-return-value',
     'missing-return',
+    'missing-fields',
 } {
     group    = 'unbalanced',
     severity = 'Warning',

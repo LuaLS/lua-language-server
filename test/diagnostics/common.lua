@@ -156,13 +156,13 @@ print(A) -- no warning
 
 TEST [[
 ---@type iolib
-_ENV = {}
+_ENV = io
 <!print!>(stderr) -- `print` is warning but `stderr` is not
 ]]
 
 TEST [[
 ---@type iolib
-local _ENV = {}
+local _ENV = io
 <!print!>(stderr) -- `print` is warning but `stderr` is not
 ]]
 
@@ -2206,6 +2206,7 @@ end
 
 TEST [[
 ---@diagnostic disable: unused-local
+---@diagnostic disable: missing-fields
 ---@class A
 ---@field private x number
 local mt = {}
@@ -2220,6 +2221,7 @@ end
 
 TEST [[
 ---@diagnostic disable: unused-local
+---@diagnostic disable: missing-fields
 ---@class A
 ---@field private x number
 local mt = {}
@@ -2267,4 +2269,148 @@ TESTWITH 'global-in-nil-env' [[
 local function foo(_ENV)
     Joe = "human"
 end
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+---@class A
+---@field x number
+---@field y? number
+---@field z number
+
+---@type A
+local t = <!{}!>
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+---@class A
+---@field x number
+---@field y? number
+---@field z number
+
+---@type A
+local t = <!{
+    x = 1,
+}!>
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+---@class A
+---@field x number
+---@field y? number
+---@field z number
+
+---@type A
+local t = <!{
+    x = 1,
+    y = 2,
+}!>
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+---@class A
+---@field x number
+---@field y? number
+---@field z number
+
+---@type A
+local t = {
+    x = 1,
+    y = 2,
+    z = 3,
+}
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+---@class A
+---@field x number
+---@field y? number
+---@field z number
+
+---@type A
+local t = {
+    x = 1,
+    z = 3,
+}
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+---@class A
+---@field x number
+---@field y? number
+---@field z number
+
+---@param a A
+local function f(a) end
+
+f <!{}!>
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+---@class A
+---@field x number
+---@field y? number
+---@field z number
+
+---@param a A
+local function f(a) end
+
+f <!{
+    x = 1,
+}!>
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+---@class A
+---@field x number
+---@field y? number
+---@field z number
+
+---@param a A
+local function f(a) end
+
+f <!{
+    x = 1,
+    y = 2,
+}!>
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+---@class A
+---@field x number
+---@field y? number
+---@field z number
+
+---@param a A
+local function f(a) end
+
+f {
+    x = 1,
+    y = 2,
+    z = 3,
+}
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+---@class A
+---@field x number
+---@field y? number
+---@field z number
+
+---@param a A
+local function f(a) end
+
+f {
+    x = 1,
+    z = 3,
+}
 ]]

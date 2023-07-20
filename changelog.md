@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.6.24
+* `NEW` diagnostic: `missing-fields`
 * `FIX` shake of `codeLens`
 * `FIX` [#2145]
 

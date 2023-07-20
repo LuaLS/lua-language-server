@@ -1572,14 +1572,13 @@ local function checkTableLiteralField(state, position, tbl, fields, results)
         end
     end
     if left then
-        local hasResult = false
+        local fieldResults = {}
         for _, field in ipairs(fields) do
             local name = guide.getKeyName(field)
             if  name
             and not mark[name]
             and matchKey(left, tostring(name)) then
-                hasResult = true
-                results[#results+1] = {
+                local res = {
                     label      = guide.getKeyName(field),
                     kind       = define.CompletionItemKind.Property,
                     id         = stack(field, function (newField) ---@async
@@ -1589,9 +1588,19 @@ local function checkTableLiteralField(state, position, tbl, fields, results)
                         }
                     end),
                 }
+                if field.optional then
+                    res.insertText = res.label
+                    res.label      = res.label.. '?'
+                end
+                fieldResults[#fieldResults+1] = res
             end
         end
-        return hasResult
+        util.sortByScore(fieldResults, {
+            function (r) return r.insertText and 0 or 1 end,
+            util.sortCallbackOfIndex(fieldResults),
+        })
+        util.arrayMerge(results, fieldResults)
+        return #fieldResults > 0
     end
 end
 

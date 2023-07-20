@@ -752,7 +752,7 @@ function vm.viewTypeErrorMessage(uri, errs)
             lines[#lines+1] = '- ' .. line
         end
     end
-    util.revertTable(lines)
+    util.revertArray(lines)
     if #lines > 15 then
         lines[13] = ('...(+%d)'):format(#lines - 15)
         table.move(lines, #lines - 2, #lines, 14)

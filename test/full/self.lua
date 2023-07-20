@@ -86,7 +86,7 @@ end) do
     end
 end
 
-util.revertTable(printTexts)
+util.revertArray(printTexts)
 
 for _, text in ipairs(printTexts) do
     print(text)

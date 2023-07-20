@@ -4307,3 +4307,57 @@ a:<??>
         kind  = define.CompletionItemKind.Function,
     },
 }
+
+TEST [[
+---@class A
+---@field x number
+---@field y? number
+---@field z number
+
+---@type A
+local t = {
+    <??>
+}
+]]
+{
+    {
+        label = 'x',
+        kind  = define.CompletionItemKind.Property,
+    },
+    {
+        label = 'z',
+        kind  = define.CompletionItemKind.Property,
+    },
+    {
+        label = 'y?',
+        kind  = define.CompletionItemKind.Property,
+    },
+}
+
+TEST [[
+---@class A
+---@field x number
+---@field y? number
+---@field z number
+
+---@param t A
+local function f(t) end
+
+f {
+    <??>
+}
+]]
+{
+    {
+        label = 'x',
+        kind  = define.CompletionItemKind.Property,
+    },
+    {
+        label = 'z',
+        kind  = define.CompletionItemKind.Property,
+    },
+    {
+        label = 'y?',
+        kind  = define.CompletionItemKind.Property,
+    },
+}

@@ -37,7 +37,7 @@ end) do
     end
 end
 
-util.revertTable(times)
+util.revertArray(times)
 for _, time in ipairs(times) do
     print(time)
 end

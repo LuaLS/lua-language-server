@@ -528,18 +528,25 @@ function m.utf8Len(str, start, finish)
     return len
 end
 
-function m.revertTable(t)
-    local len = #t
+-- 把数组中的元素顺序*原地*反转
+---@param arr any[]
+---@return any[]
+function m.revertArray(arr)
+    local len = #arr
     if len <= 1 then
-        return t
+        return arr
     end
     for x = 1, len // 2 do
         local y = len - x + 1
-        t[x], t[y] = t[y], t[x]
+        arr[x], arr[y] = arr[y], arr[x]
     end
-    return t
+    return arr
 end
 
+-- 创建一个value-key表
+---@generic K, V
+---@param t table<K, V>
+---@return table<V, K>
 function m.revertMap(t)
     local nt = {}
     for k, v in pairs(t) do
@@ -634,6 +641,11 @@ function m.eachLine(text, keepNL)
     end
 end
 
+---@alias SortByScoreCallback fun(o: any): integer
+
+-- 按照分数排序，分数越高越靠前
+---@param tbl any[]
+---@param callbacks SortByScoreCallback | SortByScoreCallback[]
 function m.sortByScore(tbl, callbacks)
     if type(callbacks) ~= 'table' then
         callbacks = { callbacks }
@@ -659,6 +671,16 @@ function m.sortByScore(tbl, callbacks)
         end
         return false
     end)
+end
+
+---@param arr any[]
+---@return SortByScoreCallback
+function m.sortCallbackOfIndex(arr)
+    ---@type table<any, integer>
+    local indexMap = m.revertMap(arr)
+    return function (v)
+        return - indexMap[v]
+    end
 end
 
 ---裁剪字符串
@@ -855,6 +877,15 @@ function m.arrayHas(array, value)
     return false
 end
 
+function m.arrayIndexOf(array, value)
+    for i = 1, #array do
+        if array[i] == value then
+            return i
+        end
+    end
+    return nil
+end
+
 function m.arrayInsert(array, value)
     if not m.arrayHas(array, value) then
         array[#array+1] = value
@@ -885,6 +916,26 @@ function m.cacheReturn(func)
         end
         return cache[param]
     end
+end
+
+---@param a table
+---@param b table
+---@return table
+function m.tableMerge(a, b)
+    for k, v in pairs(b) do
+        a[k] = v
+    end
+    return a
+end
+
+---@param a any[]
+---@param b any[]
+---@return any[]
+function m.arrayMerge(a, b)
+    for i = 1, #b do
+        a[#a+1] = b[i]
+    end
+    return a
 end
 
 return m

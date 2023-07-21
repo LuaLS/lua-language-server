@@ -234,7 +234,7 @@ local PrometheusHist = {}
 ---  metric_response_sizes:observe(tonumber(ngx.var.bytes_sent))
 ---}
 ---```
----@param value string is a value that should be recorded. Required.
+---@param value number is a value that should be recorded. Required.
 ---@param label_values? string[] is an array of label values.
 function PrometheusHist:observe(value, label_values) end
 

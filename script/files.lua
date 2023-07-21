@@ -19,20 +19,19 @@ local sp       = require 'bee.subprocess'
 local pub      = require 'pub'
 
 ---@class file
----@field uri          uri
----@field content      string
----@field ref?         integer
----@field trusted?     boolean
----@field rows?        integer[]
----@field originText?  string
----@field text         string
----@field version?     integer
----@field originLines? integer[]
----@field diffInfo?    table[]
----@field cache        table
----@field id           integer
----@field state?       parser.state
----@field compileCount integer
+---@field uri           uri
+---@field ref?          integer
+---@field trusted?      boolean
+---@field rows?         integer[]
+---@field originText?   string
+---@field text?         string
+---@field version?      integer
+---@field originLines?  integer[]
+---@field diffInfo?     table[]
+---@field cache?        table
+---@field id            integer
+---@field state?        parser.state
+---@field compileCount? integer
 
 ---@class files
 ---@field lazyCache?   lazy-cacher
@@ -708,7 +707,7 @@ end
 ---@class parser.state
 ---@field diffInfo? table[]
 ---@field originLines? integer[]
----@field originText string
+---@field originText? string
 
 --- 获取文件语法树
 ---@param uri uri

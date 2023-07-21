@@ -3937,7 +3937,7 @@ local function initState(lua, version, options)
     else
         state.ENVMode = '_ENV'
     end
- 
+
     pushError = function (err)
         local errs = state.errs
         if err.finish < err.start then

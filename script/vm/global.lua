@@ -621,6 +621,7 @@ function vm.getGlobalBase(source)
     end
     local name = global:asKeyName()
     if not root._globalBaseMap[name] then
+        ---@diagnostic disable-next-line: missing-fields
         root._globalBaseMap[name] = {
             type   = 'globalbase',
             parent = root,

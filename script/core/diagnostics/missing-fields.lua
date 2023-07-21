@@ -2,6 +2,7 @@ local vm    = require 'vm'
 local files = require 'files'
 local guide = require 'parser.guide'
 local await = require 'await'
+local lang  = require 'language'
 
 ---@async
 return function (uri, callback)
@@ -66,7 +67,7 @@ return function (uri, callback)
         callback {
             start   = src.start,
             finish  = src.finish,
-            message = string.format('Missing fields: %s', table.concat(missedKeys, ', ')),
+            message = lang.script('DIAG_MISSING_FIELDS', table.concat(missedKeys, ', ')),
         }
     end)
 end

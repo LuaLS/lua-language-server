@@ -168,6 +168,8 @@ DIAG_INVISIBLE_PACKAGE                = -- TODO: need translate!
 'Field `{field}` can only be accessed in same file `{uri}`.'
 DIAG_GLOBAL_ELEMENT                  = -- TODO: need translate!
 'Element is global.'
+DIAG_MISSING_FIELDS                   = -- TODO: need translate!
+'Missing fields: {}'
 
 MWS_NOT_SUPPORT         =
 '{} não é suportado múltiplos espaços de trabalho por enquanto, posso precisar reiniciar para estabelecer um novo espaço de trabalho ...'

@@ -2414,3 +2414,20 @@ f {
     z = 3,
 }
 ]]
+
+TEST [[
+---@diagnostic disable: unused-local
+---@class A
+---@field x number
+local t = {}
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@class A
+---@field x number
+
+---@class A
+local t = {}
+]]

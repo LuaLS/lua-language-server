@@ -17,6 +17,7 @@ return function (uri, callback)
 
         local defs = vm.getDefs(src)
         local requiresKeys = {}
+        local isClass = false
         for _, def in ipairs(defs) do
             if def.type == 'doc.class' then
                 if not def.fields then
@@ -24,7 +25,8 @@ return function (uri, callback)
                 end
                 if def.bindSource then
                     if guide.isInRange(def.bindSource, src.start) then
-                        goto continue
+                        isClass = true
+                        break
                     end
                 end
                 for _, field in ipairs(def.fields) do
@@ -41,7 +43,7 @@ return function (uri, callback)
             ::continue::
         end
 
-        if #requiresKeys == 0 then
+        if #requiresKeys == 0 or isClass then
             return
         end
 

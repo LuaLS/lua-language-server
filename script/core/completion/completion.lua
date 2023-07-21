@@ -1588,7 +1588,8 @@ local function checkTableLiteralField(state, position, tbl, fields, results)
                         }
                     end),
                 }
-                if field.optional then
+                if field.optional
+                or vm.compileNode(field):isNullable() then
                     res.insertText = res.label
                     res.label      = res.label.. '?'
                 end

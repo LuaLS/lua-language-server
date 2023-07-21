@@ -301,6 +301,7 @@ Array<string>
 * ``"miss-sep-in-table"``
 * ``"miss-space-between"``
 * ``"miss-symbol"``
+* ``"missing-fields"``
 * ``"missing-global-doc"``
 * ``"missing-local-export-doc"``
 * ``"missing-parameter"``
@@ -511,6 +512,7 @@ object<string, string>
     */
     "type-check": "Fallback",
     /*
+    * missing-fields
     * missing-parameter
     * missing-return
     * missing-return-value
@@ -638,6 +640,7 @@ object<string, string>
     */
     "type-check": "Fallback",
     /*
+    * missing-fields
     * missing-parameter
     * missing-return
     * missing-return-value
@@ -831,6 +834,7 @@ object<string, string>
     首字母小写的全局变量定义
     */
     "lowercase-global": "Any",
+    "missing-fields": "Any",
     /*
     Missing annotations for globals! Global functions must have a comment and annotations for all parameters and return values.
     */
@@ -1099,6 +1103,7 @@ object<string, string>
     首字母小写的全局变量定义
     */
     "lowercase-global": "Information",
+    "missing-fields": "Warning",
     /*
     Missing annotations for globals! Global functions must have a comment and annotations for all parameters and return values.
     */
@@ -1676,7 +1681,7 @@ Set name style config
 ## type
 
 ```ts
-Object<string, table: 0000029B6DB8EAE0>
+Object<string, string | array>
 ```
 
 ## default

@@ -53,27 +53,35 @@ local function getDesc(lang, desc)
     return locale[id]
 end
 
-local function buildType(md, lang, conf)
-    md:add('md', '## type')
+local function view(conf)
     if type(conf.type) == 'table' then
-        md:add('ts', ('%s | %s'):format(conf.type[1], conf.type[2]))
+        local subViews = {}
+        for i = 1, #conf.type do
+            subViews[i] = conf.type[i]
+        end
+        return table.concat(subViews, ' | ')
     elseif conf.type == 'array' then
-        md:add('ts', ('Array<%s>'):format(conf.items.type))
+        return ('Array<%s>'):format(view(conf.items))
     elseif conf.type == 'object' then
         if conf.properties then
             local _, first = next(conf.properties)
             assert(first)
-            md:add('ts', ('object<string, %s>'):format(first.type))
+            return ('object<string, %s>'):format(view(first))
         elseif conf.patternProperties then
             local _, first = next(conf.patternProperties)
             assert(first)
-            md:add('ts', ('Object<string, %s>'):format(first.type))
+            return ('Object<string, %s>'):format(view(first))
         else
-            md:add('ts', '**Unknown object type!!**')
+            return '**Unknown object type!!**'
         end
     else
-        md:add('ts', ('%s'):format(conf.type))
+        return tostring(conf.type)
     end
+end
+
+local function buildType(md, lang, conf)
+    md:add('md', '## type')
+    md:add('ts', view(conf))
 end
 
 local function buildDesc(md, lang, conf)

@@ -16,19 +16,24 @@ return function (uri, callback)
         await.delay()
 
         local defs = vm.getDefs(src)
-        local requiresKeys = {}
-        local isClass = false
+        for _, def in ipairs(defs) do
+            if def.type == 'doc.class' and def.bindSource then
+                if guide.isInRange(def.bindSource, src.start) then
+                    return
+                end
+            end
+            if def.type == 'doc.type.array'
+            or def.type == 'doc.type.table' then
+                return
+            end
+        end
         for _, def in ipairs(defs) do
             if def.type == 'doc.class' then
                 if not def.fields then
-                    goto continue
+                    return
                 end
-                if def.bindSource then
-                    if guide.isInRange(def.bindSource, src.start) then
-                        isClass = true
-                        break
-                    end
-                end
+
+                local requiresKeys = {}
                 for _, field in ipairs(def.fields) do
                     if  not field.optional
                     and not vm.compileNode(field):isNullable() then
@@ -39,37 +44,35 @@ return function (uri, callback)
                         end
                     end
                 end
+
+                if #requiresKeys == 0 then
+                    return
+                end
+                local myKeys = {}
+                for _, field in ipairs(src) do
+                    local key = vm.getKeyName(field)
+                    if key then
+                        myKeys[key] = true
+                    end
+                end
+
+                local missedKeys = {}
+                for _, key in ipairs(requiresKeys) do
+                    if not myKeys[key] then
+                        missedKeys[#missedKeys+1] = ('`%s`'):format(key)
+                    end
+                end
+
+                if #missedKeys == 0 then
+                    return
+                end
+
+                callback {
+                    start   = src.start,
+                    finish  = src.finish,
+                    message = lang.script('DIAG_MISSING_FIELDS', table.concat(missedKeys, ', ')),
+                }
             end
-            ::continue::
         end
-
-        if #requiresKeys == 0 or isClass then
-            return
-        end
-
-        local myKeys = {}
-        for _, field in ipairs(src) do
-            local key = vm.getKeyName(field)
-            if key then
-                myKeys[key] = true
-            end
-        end
-
-        local missedKeys = {}
-        for _, key in ipairs(requiresKeys) do
-            if not myKeys[key] then
-                missedKeys[#missedKeys+1] = ('`%s`'):format(key)
-            end
-        end
-
-        if #missedKeys == 0 then
-            return
-        end
-
-        callback {
-            start   = src.start,
-            finish  = src.finish,
-            message = lang.script('DIAG_MISSING_FIELDS', table.concat(missedKeys, ', ')),
-        }
     end)
 end

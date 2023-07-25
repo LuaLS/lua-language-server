@@ -1,5 +1,10 @@
 # changelog
 
+## 3.6.25
+* `FIX` [#2214]
+
+[#2214]: https://github.com/LuaLS/lua-language-server/issues/2145
+
 ## 3.6.24
 `2023-7-21`
 * `NEW` diagnostic: `missing-fields`

@@ -2431,3 +2431,42 @@ TEST [[
 ---@class A
 local t = {}
 ]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@class Foo
+---@field a number
+---@field b number
+---@field c number
+
+---@type Foo|Foo[]
+local a = {
+    {
+        a = 1,
+        b = 2,
+        c = 3,
+    }
+}
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@class Foo
+---@field a number
+---@field b number
+---@field c number
+
+---@class Bar
+---@field ba number
+---@field bb number
+---@field bc number
+
+---@type Foo|Bar
+local b = {
+    a = 1,
+    b = 2,
+    c = 3,
+}
+]]

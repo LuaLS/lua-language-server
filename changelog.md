@@ -4,7 +4,7 @@
 `2023-7-26`
 * `FIX` [#2214]
 
-[#2214]: https://github.com/LuaLS/lua-language-server/issues/2145
+[#2214]: https://github.com/LuaLS/lua-language-server/issues/2214
 
 ## 3.6.24
 `2023-7-21`

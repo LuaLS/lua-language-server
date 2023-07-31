@@ -114,9 +114,9 @@ function os.setlocale(locale, category) end
 ---#DES 'osdate.sec'
 ---@field sec   (integer|string)?
 ---#DES 'osdate.wday'
----@field wday  integer|string
+---@field wday  (integer|string)?
 ---#DES 'osdate.yday'
----@field yday  integer|string
+---@field yday  (integer|string)?
 ---#DES 'osdate.isdst'
 ---@field isdst boolean?
 

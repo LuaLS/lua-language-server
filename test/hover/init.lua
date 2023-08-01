@@ -2466,3 +2466,12 @@ local t: {
     [3]: table,
 }
 ]]
+
+TEST [[
+---@class A
+---@overload fun(x: number): boolean
+local <?x?>
+]]
+[[
+local x: A
+]]

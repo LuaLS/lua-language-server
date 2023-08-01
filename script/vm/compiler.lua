@@ -11,6 +11,7 @@ local vm         = require 'vm.vm'
 ---@field _node              vm.node
 ---@field cindex             integer
 ---@field func               parser.object
+---@field hideView           boolean
 
 -- 该函数有副作用，会给source绑定node！
 ---@param source parser.object
@@ -28,6 +29,12 @@ function vm.bindDocs(source)
         end
         if doc.type == 'doc.class' then
             vm.setNode(source, vm.compileNode(doc))
+            for j = i + 1, #docs do
+                local overload = docs[j]
+                if overload.type == 'doc.overload' then
+                    overload.overload.hideView = true
+                end
+            end
             return true
         end
         if doc.type == 'doc.param' then

@@ -386,9 +386,11 @@ function mt:_computeViews(uri)
     self.views = {}
 
     for n in self.node:eachObject() do
-        local view = viewNodeSwitch(n.type, n, self, uri)
-        if view then
-            self.views[view] = true
+        if not n.hideView then
+            local view = viewNodeSwitch(n.type, n, self, uri)
+            if view then
+                self.views[view] = true
+            end
         end
     end
 

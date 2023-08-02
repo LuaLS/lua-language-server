@@ -100,7 +100,7 @@ function string.match(s, pattern, init) end
 ---#DES 'string.pack'
 ---@param fmt string
 ---@param v1  string|number
----@param v2  string|number
+---@param v2? string|number
 ---@param ... string|number
 ---@return string binary
 ---@nodiscard

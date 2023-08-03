@@ -127,9 +127,9 @@ DIAG_MISSING_LOCAL_EXPORT_DOC_PARAM   =
 DIAG_MISSING_LOCAL_EXPORT_DOC_RETURN  =
 '导出的局部函数 `{2}` 的第 {1} 个返回值缺少 @return 注解。'
 DIAG_INCOMPLETE_SIGNATURE_DOC_PARAM   =
-'签名不完整。函数 `{2}` 的参数 `{1}` 缺少 @param 注解。'
+'签名不完整。参数 `{1}` 缺少 @param 注解。'
 DIAG_INCOMPLETE_SIGNATURE_DOC_RETURN  =
-'签名不完整。函数 `{2}` 的第 {1} 个返回值缺少 @return 注解。'
+'签名不完整。第 {1} 个返回值缺少 @return 注解。'
 DIAG_UNKNOWN_DIAG_CODE                =
 '未知的诊断代号 `{}`。'
 DIAG_CAST_LOCAL_TYPE                  =

@@ -127,9 +127,9 @@ DIAG_MISSING_LOCAL_EXPORT_DOC_PARAM    =
 DIAG_MISSING_LOCAL_EXPORT_DOC_RETURN   =
 'Missing @return annotation at index `{}` in exported local function `{}`.'
 DIAG_INCOMPLETE_SIGNATURE_DOC_PARAM   =
-'Incomplete signature. Missing @param annotation for parameter `{}` in function `{}`.'
+'Incomplete signature. Missing @param annotation for parameter `{}`.'
 DIAG_INCOMPLETE_SIGNATURE_DOC_RETURN  =
-'Incomplete signature. Missing @return annotation at index `{}` in function `{}`.'
+'Incomplete signature. Missing @return annotation at index `{}`.'
 DIAG_UNKNOWN_DIAG_CODE                =
 'Unknown diagnostic code `{}`.'
 DIAG_CAST_LOCAL_TYPE                  =

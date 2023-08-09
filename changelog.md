@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.6.26
+* `FIX` wrong hover and signature for method with varargs and overloads
 * `FIX` [#2224]
 
 [#2224]: https://github.com/LuaLS/lua-language-server/issues/2224

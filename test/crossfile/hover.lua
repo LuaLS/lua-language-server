@@ -1695,6 +1695,26 @@ function f(x: number, y: number)
 ```]]
 }
 
+TEST { { path = 'a.lua', content = [[
+---@overload fun(self: self, x: number)
+---@overload fun(self: self, x: number, y: number)
+function M:f(...)
+end
+
+M:<?f?>
+]] },
+hover = [[
+```lua
+(method) M:f(x: number)
+```
+
+---
+
+```lua
+(method) M:f(x: number, y: number)
+```]]
+}
+
 TEST { {path = 'a.lua', content = [[
 ---@class A
 

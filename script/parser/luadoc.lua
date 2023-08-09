@@ -1669,7 +1669,9 @@ local function bindDocWithSource(doc, source)
     if not source.bindDocs then
         source.bindDocs = {}
     end
-    source.bindDocs[#source.bindDocs+1] = doc
+    if source.bindDocs[#source.bindDocs] ~= doc then
+        source.bindDocs[#source.bindDocs+1] = doc
+    end
     doc.bindSource = source
 end
 

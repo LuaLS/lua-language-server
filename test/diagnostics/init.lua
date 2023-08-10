@@ -10,6 +10,10 @@ for key in pairs(status) do
     status[key] = 'Any!'
 end
 
+config.set('nil', 'Lua.type.castNumberToInteger', false)
+config.set('nil', 'Lua.type.weakUnionCheck', false)
+config.set('nil', 'Lua.type.weakNilCheck', false)
+
 rawset(_G, 'TEST', true)
 
 local function founded(targets, results)
@@ -34,11 +38,13 @@ function TEST(script)
     files.setText(TESTURI, newScript)
     files.open(TESTURI)
     local origins = {}
+    local filteds = {}
     local results = {}
     core(TESTURI, false, function (result)
         if DIAG_CARE == result.code
         or DIAG_CARE == '*' then
             results[#results+1] = { result.start, result.finish }
+            filteds[#filteds+1] = result
         end
         origins[#origins+1] = result
     end)
@@ -54,38 +60,7 @@ function TEST(script)
     files.remove(TESTURI)
 
     return function (callback)
-        callback(origins)
-    end
-end
-
-function TESTWITH(code)
-    return function (script)
-        local newScript, catched = catch(script, '!')
-        files.setText(TESTURI, newScript)
-        files.open(TESTURI)
-        local origins = {}
-        local results = {}
-        core(TESTURI, false, function (result)
-            if code ~= result.code then
-                return
-            end
-            results[#results+1] = { result.start, result.finish }
-            origins[#origins+1] = result
-        end)
-
-        if results[1] then
-            if not founded(catched['!'] or {}, results) then
-                error(('%s\n%s'):format(util.dump(catched['!']), util.dump(results)))
-            end
-        else
-            assert(#catched['!'] == 0)
-        end
-
-        files.remove(TESTURI)
-
-        return function (callback)
-            callback(origins)
-        end
+        callback(filteds)
     end
 end
 
@@ -105,7 +80,14 @@ check 'undefined-env-child'
 check 'newline-call'
 check 'newfield-call'
 check 'redundant-parameter'
-require 'diagnostics.type-check'
+check 'cast-local-type'
+check 'assign-type-mismatch'
+check 'cast-type-mismatch'
+check 'need-check-nil'
+check 'return-type-mismatch'
+check 'missing-return'
+check 'missing-return-value'
+check 'redundant-return-value'
 require 'diagnostics.incomplete-signature-doc'
 require 'diagnostics.missing-global-doc'
 require 'diagnostics.missing-local-export-doc'

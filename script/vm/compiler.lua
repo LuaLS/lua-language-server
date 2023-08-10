@@ -1153,6 +1153,9 @@ local compilerSwitch = util.switch()
     end)
     : case 'table'
     : call(function (source)
+        if vm.bindAs(source) then
+            return
+        end
         vm.setNode(source, source)
 
         if source.parent.type == 'callargs' then

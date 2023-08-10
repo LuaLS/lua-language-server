@@ -1,6 +1,6 @@
 # changelog
 
-## 3.6.26
+## 3.7.0
 * `FIX` wrong hover and signature for method with varargs and overloads
 * `FIX` [#2224]
 

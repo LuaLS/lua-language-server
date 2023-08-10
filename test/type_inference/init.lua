@@ -4313,3 +4313,11 @@ local x = 1
 repeat
 until <?x?>
 ]]
+
+TEST 'A' [=[
+local function f()
+    return {} --[[@as A]]
+end
+
+local <?x?> = f()
+]=]

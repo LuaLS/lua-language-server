@@ -4,9 +4,11 @@ local config = require 'config'
 local util   = require 'utility'
 local catch  = require 'catch'
 
-config.get(nil, 'Lua.diagnostics.neededFileStatus')['deprecated']    = 'Any'
-config.get(nil, 'Lua.diagnostics.neededFileStatus')['type-check']    = 'Any'
-config.get(nil, 'Lua.diagnostics.neededFileStatus')['await-in-sync'] = 'Any'
+local status = config.get(nil, 'Lua.diagnostics.neededFileStatus')
+
+for key in pairs(status) do
+    status[key] = 'Any!'
+end
 
 rawset(_G, 'TEST', true)
 
@@ -34,7 +36,10 @@ function TEST(script)
     local origins = {}
     local results = {}
     core(TESTURI, false, function (result)
-        results[#results+1] = { result.start, result.finish }
+        if DIAG_CARE == result.code
+        or DIAG_CARE == '*' then
+            results[#results+1] = { result.start, result.finish }
+        end
         origins[#origins+1] = result
     end)
 
@@ -84,9 +89,26 @@ function TESTWITH(code)
     end
 end
 
-require 'diagnostics.common'
+local function check(name)
+    DIAG_CARE = name
+    require('diagnostics.' .. name)
+end
+
+check 'unused-local'
+check 'unused-function'
+check 'undefined-global'
+check 'unused-label'
+check 'trailing-space'
+check 'redefined-local'
+check 'global-in-nil-env'
+check 'undefined-env-child'
+check 'newline-call'
+check 'newfield-call'
+check 'redundant-parameter'
 require 'diagnostics.type-check'
 require 'diagnostics.incomplete-signature-doc'
 require 'diagnostics.missing-global-doc'
 require 'diagnostics.missing-local-export-doc'
-require 'diagnostics.global-element'
+check 'global-element'
+
+require 'diagnostics.common'

@@ -1,11 +1,5 @@
 local config = require 'config'
 
-config.add(nil, 'Lua.diagnostics.disable', 'unused-local')
-config.add(nil, 'Lua.diagnostics.disable', 'unused-function')
-config.add(nil, 'Lua.diagnostics.disable', 'undefined-global')
-config.add(nil, 'Lua.diagnostics.disable', 'redundant-return')
-config.set(nil, 'Lua.type.castNumberToInteger', false)
-
 TEST [[
 local x = 0
 
@@ -174,7 +168,6 @@ m.ints = {}
 ]]
 
 TEST [[
----@diagnostic disable: missing-fields
 ---@class A
 ---@field x A
 
@@ -329,7 +322,6 @@ local x
 ]]
 
 TEST [[
----@diagnostic disable:undefined-global
 ---@type integer
 local x
 
@@ -337,7 +329,6 @@ x = 1 + G
 ]]
 
 TEST [[
----@diagnostic disable:undefined-global
 ---@type integer
 local x
 
@@ -1263,9 +1254,3 @@ local MyClass = {}
 
 local w = MyClass(<!1!>)
 ]]
-
-config.remove(nil, 'Lua.diagnostics.disable', 'unused-local')
-config.remove(nil, 'Lua.diagnostics.disable', 'unused-function')
-config.remove(nil, 'Lua.diagnostics.disable', 'undefined-global')
-config.remove(nil, 'Lua.diagnostics.disable', 'redundant-return')
-config.set(nil, 'Lua.type.castNumberToInteger', true)

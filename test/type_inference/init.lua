@@ -4314,6 +4314,7 @@ repeat
 until <?x?>
 ]]
 
+-- #2144
 TEST 'A' [=[
 local function f()
     return {} --[[@as A]]
@@ -4321,3 +4322,13 @@ end
 
 local <?x?> = f()
 ]=]
+
+TEST 'A' [=[
+local function f()
+    ---@type A
+    return {}
+end
+
+local <?x?> = f()
+]=]
+--

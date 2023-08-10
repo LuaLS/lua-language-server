@@ -766,6 +766,11 @@ function vm.selectNode(list, index)
     if not exp then
         return vm.createNode(vm.declareGlobal('type', 'nil')), nil
     end
+
+    if vm.bindDocs(list) then
+        return vm.compileNode(list), exp
+    end
+
     ---@type vm.node?
     local result
     if exp.type == 'call' then

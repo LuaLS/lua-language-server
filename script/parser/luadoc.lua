@@ -1822,7 +1822,7 @@ local function bindDocsBetween(sources, binded, start, finish)
                 or src.type == 'setindex'
                 or src.type == 'setmethod'
                 or src.type == 'function'
-                or src.type == 'table'
+                or src.type == 'return'
                 or src.type == '...' then
                     if bindDoc(src, binded) then
                         ok = true
@@ -1934,7 +1934,7 @@ local bindDocAccept = {
     'local'     , 'setlocal'  , 'setglobal',
     'setfield'  , 'setmethod' , 'setindex' ,
     'tablefield', 'tableindex', 'self'     ,
-    'function'  , 'table'     , '...'      ,
+    'function'  , 'return'     , '...'      ,
 }
 
 local function bindDocs(state)

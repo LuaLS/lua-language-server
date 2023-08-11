@@ -19,3 +19,30 @@ local <!function y()
     x()
 end!>
 ]]
+
+TEST [[
+local f = <!function () end!>
+]]
+
+TEST [[
+local f;f = <!function () end!>
+]]
+
+TEST [[
+local <!function f() end!>
+]]
+
+TEST [[
+local <!function f()
+    f()
+end!>
+]]
+
+
+TEST [[
+local <!function test()
+end!>
+
+local <!function foo ()
+end!>
+]]

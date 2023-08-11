@@ -465,3 +465,10 @@ local arr2 = {
     <!3!>, -- no warnings
 }
 ]]
+
+TEST [[
+local t = {}
+t.a = 1
+t.a = 2
+return t
+]]

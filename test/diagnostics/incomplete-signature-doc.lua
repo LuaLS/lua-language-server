@@ -1,30 +1,3 @@
-local config = require 'config'
-local util   = require 'utility'
-
--- disable all default groups to make isolated tests
-config.set(nil, 'Lua.diagnostics.groupFileStatus',
-{
-    ['ambiguity']     = 'None',
-    ['await']         = 'None',
-    ['codestyle']     = 'None',
-    ['conventions']   = 'None',
-    ['duplicate']     = 'None',
-    ['global']        = 'None',
-    ['luadoc']        = 'None',
-    ['redefined']     = 'None',
-    ['strict']        = 'None',
-    ['strong']        = 'None',
-    ['type-check']    = 'None',
-    ['unbalanced']    = 'None',
-    ['unused']        = 'None'
-})
-
--- enable single diagnostic that is to be tested
-config.set(nil, 'Lua.diagnostics.neededFileStatus',
-{
-    ['incomplete-signature-doc'] = 'Any!' -- override groupFileStatus
-})
-
 -- -------------------------------------
 -- about the structure of these test cases
 --
@@ -42,6 +15,7 @@ config.set(nil, 'Lua.diagnostics.neededFileStatus',
 
 -- global functions no parameter, no return value
 -- no incomplete signature docs possible
+
 TEST [[
 function FG0()
 end
@@ -422,11 +396,3 @@ end
 
 local vpr4 = FLPR4(0)
 ]]
-
--- reset configurations
-config.set(nil, 'Lua.diagnostics.groupFileStatus',
-{})
-config.set(nil, 'Lua.diagnostics.neededFileStatus',
-{})
-config.set(nil, 'Lua.diagnostics.globals',
-{})

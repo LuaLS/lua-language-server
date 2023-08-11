@@ -1,0 +1,3 @@
+TEST [[
+local _ = <!unpack!>
+]]

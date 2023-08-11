@@ -3,8 +3,10 @@
 ## 3.7.0
 * `NEW` support `---@type` and `--[[@as]]` for return statement
 * `FIX` wrong hover and signature for method with varargs and overloads
+* `FIX` [#2155]
 * `FIX` [#2224]
 
+[#2155]: https://github.com/LuaLS/lua-language-server/issues/2155
 [#2224]: https://github.com/LuaLS/lua-language-server/issues/2224
 
 ## 3.6.25

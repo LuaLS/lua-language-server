@@ -44,6 +44,10 @@ function TEST(wanted)
     end
 end
 
+TEST 'nil' [[
+local <?t?> = nil
+]]
+
 TEST 'string' [[
 local <?var?> = '111'
 ]]

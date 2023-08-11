@@ -1112,6 +1112,12 @@ local function compileLocal(source)
         end
     end
 
+    if  source.value
+    and source.value.type == 'nil'
+    and not myNode:hasKnownType() then
+        vm.setNode(source, vm.compileNode(source.value))
+    end
+
     myNode.hasDefined = hasMarkDoc or hasMarkParam or hasMarkValue
 end
 

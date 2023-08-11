@@ -876,7 +876,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 
 ## 2.6.7
 `2022-3-9`
-* `NEW` offline diagnostic, [read more](https://github.com/LuaLS/lua-language-server/wiki/Offline-Diagnostic)
+* `NEW` diagnosis report, [read more](https://luals.github.io/wiki/diagnosis-report/)
 * `CHG` `VSCode`: 1.65 has built in new `Lua` syntax files, so this extension no longer provides syntax files, which means you can install other syntax extensions in the marketplace. If you have any suggestions or issues, please [open issues here](https://github.com/LuaLS/lua.tmbundle).
 * `CHG` telemetry: the prompt will only appear in VSCode to avoid repeated prompts in other platforms due to the inability to automatically modify the settings.
 * `FIX` [#965](https://github.com/LuaLS/lua-language-server/issues/965)
@@ -930,7 +930,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 
 ## 2.6.0
 `2022-1-13`
-* `NEW` supports multi-workspace in server side, for developers of language clients, please [read here](https://github.com/LuaLS/lua-language-server/wiki/Multi-workspace-supports) to learn more.
+* `NEW` supports multi-workspace in server side, for developers of language clients, please [read here](https://luals.github.io/wiki/developing/#multiple-workspace-support) to learn more.
 * `NEW` setting:
   + `Lua.hint.arrayIndex`
   + `Lua.semantic.enable`
@@ -1297,7 +1297,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 
 ## 2.1.0
 `2021-7-2`
-* `NEW` supports local config file, using `--configpath="config.json"`, [learn more here](https://github.com/LuaLS/lua-language-server/wiki/Setting-without-VSCode)
+* `NEW` supports local config file, using `--configpath="config.json"`, [learn more here](https://luals.github.io/wiki/usage/#--configpath)
 * `NEW` goto `type definition`
 * `NEW` infer type by callback param:
     ```lua
@@ -1452,7 +1452,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 
 ## 1.20.0
 `2021-3-27`
-* `CHG` telemetry: change to opt-in, see [#462](https://github.com/LuaLS/lua-language-server/issues/462) and [Privacy-Policy](https://github.com/LuaLS/lua-language-server/wiki/Privacy-Policy)
+* `CHG` telemetry: change to opt-in, see [#462](https://github.com/LuaLS/lua-language-server/issues/462) and [Privacy-Policy](https://luals.github.io/privacy/#language-server)
 * `FIX` [#467](https://github.com/LuaLS/lua-language-server/issues/467)
 
 ## 1.19.1

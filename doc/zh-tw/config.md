@@ -1659,7 +1659,7 @@ string
 
 # misc.parameters
 
-VSCode中啟動語言伺服時的[命令列參數](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#arguments)。
+VSCode中啟動語言伺服時的[命令列參數](https://luals.github.io/wiki/usage#arguments)。
 
 ## type
 
@@ -1852,7 +1852,7 @@ false
 
 # runtime.plugin
 
-延伸模組路徑，請查閱[文件](https://github.com/LuaLS/lua-language-server/wiki/Plugins)瞭解用法。
+延伸模組路徑，請查閱[文件](https://luals.github.io/wiki/plugins)瞭解用法。
 
 ## type
 

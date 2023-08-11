@@ -738,7 +738,7 @@ object<string, string>
 ```jsonc
 {
     /*
-    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1` 
+    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1`
     */
     "ambiguity-1": "Any",
     /*
@@ -1006,7 +1006,7 @@ object<string, string>
 ```jsonc
 {
     /*
-    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1` 
+    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1`
     */
     "ambiguity-1": "Warning",
     /*
@@ -1659,7 +1659,7 @@ string
 
 # misc.parameters
 
-VSCode中启动语言服务时的[命令行参数](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#arguments)。
+VSCode中启动语言服务时的[命令行参数](https://luals.github.io/wiki/usage/#arguments)。
 
 ## type
 
@@ -1852,7 +1852,7 @@ false
 
 # runtime.plugin
 
-插件路径，请查阅[文档](https://github.com/LuaLS/lua-language-server/wiki/Plugins)了解用法。
+插件路径，请查阅[文档](https://luals.github.io/wiki/plugins)了解用法。
 
 ## type
 

@@ -1685,7 +1685,7 @@ local compilerSwitch = util.switch()
             if state.type == 'doc.return'
             or state.type == 'doc.param' then
                 local func = state.bindSource
-                if func.type == 'function' then
+                if func and func.type == 'function' then
                     local node = guide.getFunctionSelfNode(func)
                     if node then
                         vm.setNode(source, vm.compileNode(node))

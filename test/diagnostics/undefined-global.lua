@@ -29,3 +29,8 @@ print(T5)
 print(T6)
 print(T7)
 ]]
+
+TEST [[
+---@class c
+c = {}
+]]

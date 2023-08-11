@@ -133,3 +133,69 @@ m.open(m)
 TEST [[
 table.insert({}, 1, 2, <!3!>)
 ]]
+
+TEST [[
+---@overload fun(...)
+local function f() end
+
+f(1)
+]]
+
+TEST [[
+function F() end
+
+---@param x boolean
+function F(x) end
+
+F(k())
+]]
+
+TEST [[
+local function f()
+    return 1, 2, 3
+end
+
+local function k()
+end
+
+k(<!f()!>)
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+local function f()
+    return 1, 2, 3
+end
+
+---@param x integer
+local function k(x)
+end
+
+k(f())
+]]
+
+TEST [[
+---@meta
+
+---@param x fun()
+local function f1(x)
+end
+
+---@return fun()
+local function f2()
+end
+
+f1(f2())
+]]
+
+TEST [[
+---@meta
+
+---@type fun():integer
+local f
+
+---@param x integer
+local function foo(x) end
+
+foo(f())
+]]

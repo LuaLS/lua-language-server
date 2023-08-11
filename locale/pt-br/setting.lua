@@ -279,14 +279,6 @@ config.misc.parameters                   = -- TODO: need translate!
 '[Command line parameters](https://github.com/LuaLS/lua-telemetry-server/tree/master/method) when starting the language service in VSCode.'
 config.misc.executablePath               = -- TODO: need translate!
 'Specify the executable path in VSCode.'
-config.IntelliSense.traceLocalSet        = -- TODO: need translate!
-'Please read [wiki](https://github.com/LuaLS/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
-config.IntelliSense.traceReturn          = -- TODO: need translate!
-'Please read [wiki](https://github.com/LuaLS/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
-config.IntelliSense.traceBeSetted        = -- TODO: need translate!
-'Please read [wiki](https://github.com/LuaLS/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
-config.IntelliSense.traceFieldInject     = -- TODO: need translate!
-'Please read [wiki](https://github.com/LuaLS/lua-language-server/wiki/IntelliSense-optional-features) to learn more.'
 config.type.castNumberToInteger          = -- TODO: need translate!
 'Allowed to assign the `number` type to the `integer` type.'
 config.type.weakUnionCheck               = -- TODO: need translate!

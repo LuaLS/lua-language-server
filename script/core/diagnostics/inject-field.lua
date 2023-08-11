@@ -18,12 +18,9 @@ return function (uri, callback)
     end
 
     ---@async
-    local function checkUndefinedField(src)
+    local function checkInjectField(src)
         await.delay()
 
-        if #vm.getDefs(src) > 0 then
-            return
-        end
         local node = src.node
         if node then
             local ok
@@ -37,14 +34,14 @@ return function (uri, callback)
                 return
             end
         end
-        local message = lang.script('DIAG_UNDEF_FIELD', guide.getKeyName(src))
-        if     src.type == 'getfield' and src.field then
+        local message = lang.script('DIAG_INJECT_FIELD', guide.getKeyName(src))
+        if     src.type == 'setfield' and src.field then
             callback {
                 start   = src.field.start,
                 finish  = src.field.finish,
                 message = message,
             }
-        elseif src.type == 'getmethod' and src.method then
+        elseif src.type == 'setfield' and src.method then
             callback {
                 start   = src.method.start,
                 finish  = src.method.finish,
@@ -52,6 +49,6 @@ return function (uri, callback)
             }
         end
     end
-    guide.eachSourceType(ast.ast, 'getfield',  checkUndefinedField)
-    guide.eachSourceType(ast.ast, 'getmethod', checkUndefinedField)
+    guide.eachSourceType(ast.ast, 'setfield',  checkInjectField)
+    guide.eachSourceType(ast.ast, 'setmethod', checkInjectField)
 end

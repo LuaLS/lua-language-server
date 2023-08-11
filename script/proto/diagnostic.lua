@@ -77,6 +77,7 @@ m.register {
     'param-type-mismatch',
     'cast-type-mismatch',
     'return-type-mismatch',
+    'inject-field',
 } {
     group    = 'type-check',
     severity = 'Warning',

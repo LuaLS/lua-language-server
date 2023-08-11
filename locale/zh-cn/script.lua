@@ -197,9 +197,9 @@ WORKSPACE_DIAGNOSTIC      =
 WORKSPACE_SKIP_HUGE_FILE  =
 '出于性能考虑，已停止对此文件解析：{}'
 WORKSPACE_NOT_ALLOWED     =
-'你的工作目录被设置为了 `{}`，Lua语言服务拒绝加载此目录，请检查你的配置。[了解更多](https://github.com/LuaLS/lua-language-server/wiki/FAQ#why-is-the-server-scanning-the-wrong-folder)'
+'你的工作目录被设置为了 `{}`，Lua语言服务拒绝加载此目录，请检查你的配置。[了解更多](https://luals.github.io/wiki/faq#why-is-the-server-scanning-the-wrong-folder)'
 WORKSPACE_SCAN_TOO_MUCH   =
-'已扫描了超过 {} 个文件，当前扫描的目录为 `{}`. 请参阅 [FAQ](https://github.com/LuaLS/lua-language-server/wiki/FAQ#how-can-i-improve-startup-speeds) 了解如何排除多余的文件。也可能是你的 [设置有错误](https://github.com/LuaLS/lua-language-server/wiki/FAQ#why-is-the-server-scanning-the-wrong-folder).'
+'已扫描了超过 {} 个文件，当前扫描的目录为 `{}`. 请参阅 [FAQ](https://luals.github.io/wiki/faq#how-can-i-improve-startup-speeds) 了解如何排除多余的文件。也可能是你的 [设置有错误](https://luals.github.io/wiki/faq#why-is-the-server-scanning-the-wrong-folder).'
 
 PARSER_CRASH            =
 '语法解析崩溃了！遗言：{}'
@@ -552,7 +552,7 @@ WINDOW_APPLY_SETTING             =
 WINDOW_CHECK_SEMANTIC            =
 '如果你正在使用市场中的颜色主题，你可能需要同时修改 `editor.semanticHighlighting.enabled` 选项为 `true` 才会使语义着色生效。'
 WINDOW_TELEMETRY_HINT            =
-'请允许发送匿名的使用数据与错误报告，帮助我们进一步完善此插件。在[此处](https://github.com/LuaLS/lua-language-server/wiki/Home#privacy)阅读我们的隐私声明。'
+'请允许发送匿名的使用数据与错误报告，帮助我们进一步完善此插件。在[此处](https://luals.github.io/privacy/#language-server)阅读我们的隐私声明。'
 WINDOW_TELEMETRY_ENABLE          =
 '允许'
 WINDOW_TELEMETRY_DISABLE         =
@@ -697,7 +697,7 @@ Defines a class/table structure
 Manager = {}
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#class)
+[View Wiki](https://luals.github.io/wiki/annotations#class)
 ]=]
 LUADOC_DESC_TYPE = -- TODO: need translate!
 [=[
@@ -748,7 +748,7 @@ local x --x[""] is true
 local myFunction
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#types-and-type)
+[View Wiki](https://luals.github.io/wiki/annotations#type)
 ]=]
 LUADOC_DESC_ALIAS = -- TODO: need translate!
 [=[
@@ -798,7 +798,7 @@ local enums = {
 ---| `enums.CLOSE`
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#alias)
+[View Wiki](https://luals.github.io/wiki/annotations#alias)
 ]=]
 LUADOC_DESC_PARAM = -- TODO: need translate!
 [=[
@@ -823,7 +823,7 @@ function get(url, headers, timeout) end
 function concat(base, ...) end
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#param)
+[View Wiki](https://luals.github.io/wiki/annotations#param)
 ]=]
 LUADOC_DESC_RETURN = -- TODO: need translate!
 [=[
@@ -861,7 +861,7 @@ function getFirstLast() end
 function getTags(item) end
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#return)
+[View Wiki](https://luals.github.io/wiki/annotations#return)
 ]=]
 LUADOC_DESC_FIELD = -- TODO: need translate!
 [=[
@@ -892,7 +892,7 @@ response = get("localhost")
 statusCode = response.status.code
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#field)
+[View Wiki](https://luals.github.io/wiki/annotations#field)
 ]=]
 LUADOC_DESC_GENERIC = -- TODO: need translate!
 [=[
@@ -949,7 +949,7 @@ local v = Generic("Foo") -- v is an object of Foo
 -- we give for key (K) or value (V)
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#generics-and-generic)
+[View Wiki](https://luals.github.io/wiki/annotations/#generic)
 ]=]
 LUADOC_DESC_VARARG = -- TODO: need translate!
 [=[
@@ -968,7 +968,7 @@ provide typing or allow descriptions.
 function concat(...) end
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#vararg)
+[View Wiki](https://luals.github.io/wiki/annotations#vararg)
 ]=]
 LUADOC_DESC_OVERLOAD = -- TODO: need translate!
 [=[
@@ -983,7 +983,7 @@ Allows defining of multiple function signatures.
 function table.insert(t, position, value) end
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#overload)
+[View Wiki](https://luals.github.io/wiki/annotations#overload)
 ]=]
 LUADOC_DESC_DEPRECATED = -- TODO: need translate!
 [=[
@@ -994,7 +994,7 @@ being ~~struck through~~.
 `---@deprecated`
 
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#deprecated)
+[View Wiki](https://luals.github.io/wiki/annotations#deprecated)
 ]=]
 LUADOC_DESC_META = -- TODO: need translate!
 [=[
@@ -1009,7 +1009,7 @@ There are 3 main distinctions to note with meta files:
 `---@meta`
 
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#meta)
+[View Wiki](https://luals.github.io/wiki/annotations#meta)
 ]=]
 LUADOC_DESC_VERSION = -- TODO: need translate!
 [=[
@@ -1034,7 +1034,7 @@ function onlyWorksInJIT() end
 function oldLuaOnly() end
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#version)
+[View Wiki](https://luals.github.io/wiki/annotations#version)
 ]=]
 LUADOC_DESC_SEE = -- TODO: need translate!
 [=[
@@ -1044,7 +1044,7 @@ Define something that can be viewed for more information
 `---@see <text>`
 
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#see)
+[View Wiki](https://luals.github.io/wiki/annotations#see)
 ]=]
 LUADOC_DESC_DIAGNOSTIC = -- TODO: need translate!
 [=[
@@ -1070,7 +1070,7 @@ local unused = "hello world"
 ---@diagnostic enable: unused-local
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#diagnostic)
+[View Wiki](https://luals.github.io/wiki/annotations#diagnostic)
 ]=]
 LUADOC_DESC_MODULE = -- TODO: need translate!
 [=[
@@ -1087,7 +1087,7 @@ local stringUtils
 local module = require('string.utils')
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#module)
+[View Wiki](https://luals.github.io/wiki/annotations#module)
 ]=]
 LUADOC_DESC_ASYNC = -- TODO: need translate!
 [=[
@@ -1097,7 +1097,7 @@ Marks a function as asynchronous.
 `---@async`
 
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#async)
+[View Wiki](https://luals.github.io/wiki/annotations#async)
 ]=]
 LUADOC_DESC_NODISCARD = -- TODO: need translate!
 [=[
@@ -1109,7 +1109,7 @@ be ignored.
 `---@nodiscard`
 
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#nodiscard)
+[View Wiki](https://luals.github.io/wiki/annotations#nodiscard)
 ]=]
 LUADOC_DESC_CAST = -- TODO: need translate!
 [=[
@@ -1144,7 +1144,7 @@ local x --> string|table
 print(x) --> table
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#cast)
+[View Wiki](https://luals.github.io/wiki/annotations#cast)
 ]=]
 LUADOC_DESC_OPERATOR = -- TODO: need translate!
 [=[
@@ -1179,7 +1179,7 @@ pB = -pA
 LUADOC_DESC_ENUM = -- TODO: need translate!
 [=[
 Mark a table as an enum. If you want an enum but can't define it as a Lua
-table, take a look at the [`@alias`](https://github.com/LuaLS/lua-language-server/wiki/Annotations#alias)
+table, take a look at the [`@alias`](https://luals.github.io/wiki/annotations#alias)
 tag.
 
 ## Syntax

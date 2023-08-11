@@ -1853,7 +1853,7 @@ false
 
 # runtime.plugin
 
-Plugin path. Please read [wiki](https://github.com/LuaLS/lua-language-server/wiki/Plugins) to learn more.
+Plugin path. Please read the [wiki](https://luals.github.io/wiki/plugins) to learn more.
 
 ## type
 

@@ -2475,3 +2475,16 @@ local <?x?>
 [[
 local x: A
 ]]
+
+TEST [[
+---@type A
+local <?f?>
+
+---@enum A
+local t = {
+    x = f,
+}
+]]
+[[
+local f: A
+]]

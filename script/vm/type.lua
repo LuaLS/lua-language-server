@@ -143,6 +143,9 @@ end
 ---@param errs?      typecheck.err[]
 ---@return boolean?
 local function checkChildEnum(childName, parent , uri, mark, errs)
+    if mark[childName] then
+        return
+    end
     local childClass = vm.getGlobal('type', childName)
     if not childClass then
         return nil
@@ -157,11 +160,14 @@ local function checkChildEnum(childName, parent , uri, mark, errs)
     if not enums then
         return nil
     end
+    mark[childName] = true
     for _, enum in ipairs(enums) do
         if not vm.isSubType(uri, vm.compileNode(enum), parent, mark ,errs) then
+            mark[childName] = nil
             return false
         end
     end
+    mark[childName] = nil
     return true
 end
 

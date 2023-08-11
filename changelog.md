@@ -876,7 +876,7 @@ server will generate `doc.json` and `doc.md` in `LOGPATH`.
 
 ## 2.6.7
 `2022-3-9`
-* `NEW` offline diagnostic, [read more](https://github.com/LuaLS/lua-language-server/wiki/Offline-Diagnostic)
+* `NEW` diagnosis report, [read more](https://luals.github.io/wiki/diagnosis-report/)
 * `CHG` `VSCode`: 1.65 has built in new `Lua` syntax files, so this extension no longer provides syntax files, which means you can install other syntax extensions in the marketplace. If you have any suggestions or issues, please [open issues here](https://github.com/LuaLS/lua.tmbundle).
 * `CHG` telemetry: the prompt will only appear in VSCode to avoid repeated prompts in other platforms due to the inability to automatically modify the settings.
 * `FIX` [#965](https://github.com/LuaLS/lua-language-server/issues/965)

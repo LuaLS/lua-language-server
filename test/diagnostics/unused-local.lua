@@ -1,3 +1,5 @@
+local config = require 'config'
+
 TEST [[
 local <!x!>
 ]]
@@ -84,3 +86,14 @@ TEST [[
 local <!t!> = {}
 <!t!>[1] = 1
 ]]
+
+config.add(nil, 'Lua.diagnostics.unusedLocalExclude', 'll_*')
+
+TEST [[
+local <!xx!>
+local ll_1
+local ll_2
+local <!ll!>
+]]
+
+config.remove(nil, 'Lua.diagnostics.unusedLocalExclude', 'll_*')

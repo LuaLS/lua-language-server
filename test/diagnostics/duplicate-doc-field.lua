@@ -20,3 +20,19 @@ TEST [[
 --- @field <!on!> fun(eventName: '"died"', cb: fun(i: integer))
 local emit = {}
 ]]
+
+TEST [[
+---@class A
+
+---@class B
+---@field [integer] A
+---@field [A] true
+]]
+
+TEST [[
+---@class A
+
+---@class B
+---@field [<!A!>] A
+---@field [<!A!>] true
+]]

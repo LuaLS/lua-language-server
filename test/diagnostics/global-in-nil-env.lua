@@ -36,3 +36,9 @@ TEST [[
 _ENV = nil
 local _ = <!print!> --> local _ = _ENV.print
 ]]
+
+TEST [[
+local function foo(_ENV)
+    Joe = "human"
+end
+]]

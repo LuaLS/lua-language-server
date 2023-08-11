@@ -130,3 +130,19 @@ local n
 
 print(n.x)
 ]]
+
+TEST [[
+---@type 'x'
+local t
+
+local n = t:upper()
+]]
+
+TEST [[
+---@alias A 'x'
+
+---@type A
+local t
+
+local n = t:upper()
+]]

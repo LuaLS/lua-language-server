@@ -80,3 +80,11 @@ local function x(a, b)
 end
 x(1)
 ]]
+
+TEST [[
+local t = {}
+
+function t:init() end
+
+<!t.init()!>
+]]

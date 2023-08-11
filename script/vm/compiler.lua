@@ -1168,6 +1168,16 @@ local compilerSwitch = util.switch()
             vm.compileCallArg(source, call)
         end
 
+        if source.parent.type == 'return' then
+            local myIndex = util.arrayIndexOf(source.parent, source)
+            ---@cast myIndex -?
+            local parentNode = vm.selectNode(source.parent, myIndex)
+            if not parentNode:isEmpty() then
+                vm.setNode(source, parentNode)
+                return
+            end
+        end
+
         if source.parent.type == 'setglobal'
         or source.parent.type == 'local'
         or source.parent.type == 'setlocal'

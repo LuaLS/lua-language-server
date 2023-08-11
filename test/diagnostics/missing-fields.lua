@@ -197,3 +197,11 @@ local b = {
     c = 3,
 }
 ]]
+
+TEST [[
+---@class A
+---@field x integer
+
+---@type A
+return <!{}!>
+]]

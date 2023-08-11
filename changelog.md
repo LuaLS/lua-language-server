@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.7.0
+* `NEW` support `---@type` and `--[[@as]]` for return statement
 * `FIX` wrong hover and signature for method with varargs and overloads
 * `FIX` [#2224]
 

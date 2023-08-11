@@ -50,8 +50,10 @@ function m.create(uri)
     m.folders[#m.folders+1] = scp
     if uri == furi.encode '/'
     or uri == furi.encode(os.getenv 'HOME' or '') then
-        client.showMessage('Error', lang.script('WORKSPACE_NOT_ALLOWED', furi.decode(uri)))
-        scp:set('bad root', true)
+        if not FORCE_ACCEPT_WORKSPACE then
+            client.showMessage('Error', lang.script('WORKSPACE_NOT_ALLOWED', furi.decode(uri)))
+            scp:set('bad root', true)
+        end
     end
 end
 

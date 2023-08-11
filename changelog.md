@@ -2,6 +2,7 @@
 
 ## 3.7.0
 * `NEW` support `---@type` and `--[[@as]]` for return statement
+* `NEW` commandline parameter `--force-accept-workspace`: allowing the use of the root directory or home directory as the workspace
 * `FIX` wrong hover and signature for method with varargs and overloads
 * `FIX` [#2155]
 * `FIX` [#2224]

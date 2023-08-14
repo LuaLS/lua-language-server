@@ -50,6 +50,9 @@ return function (uri, callback)
             if def.type == 'doc.type.field' then
                 return
             end
+            if def.type == 'doc.field' then
+                return
+            end
         end
 
         local howToFix = lang.script('DIAG_INJECT_FIELD_FIX_CLASS', {

@@ -170,6 +170,8 @@ DIAG_GLOBAL_ELEMENT                   =
 '全局变量。'
 DIAG_MISSING_FIELDS                   =
 '缺少字段： {}'
+DIAG_INJECT_FIELD                     =
+'不能在 `{class}` 的引用中注入字段 `{field}` 。如要这么做，请对 `{node}` 使用 `---@class` 。'
 
 MWS_NOT_SUPPORT         =
 '{} 目前还不支持多工作目录，我可能需要重启才能支持新的工作目录...'

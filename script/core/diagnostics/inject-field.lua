@@ -3,6 +3,7 @@ local vm      = require 'vm'
 local lang    = require 'language'
 local guide   = require 'parser.guide'
 local await   = require 'await'
+local hname   = require 'core.hover.name'
 
 local skipCheckClass = {
     ['unknown']       = true,
@@ -22,19 +23,37 @@ return function (uri, callback)
         await.delay()
 
         local node = src.node
-        if node then
-            local ok
-            for view in vm.getInfer(node):eachView(uri) do
-                if skipCheckClass[view] then
-                    return
-                end
-                ok = true
+        if not node then
+            return
+        end
+        local ok
+        for view in vm.getInfer(node):eachView(uri) do
+            if skipCheckClass[view] then
+                return
             end
-            if not ok then
+            ok = true
+        end
+        if not ok then
+            return
+        end
+
+        local class = vm.getDefinedClass(uri, node)
+        if class then
+            return
+        end
+
+        for _, def in ipairs(vm.getDefs(src)) do
+            local dnode = def.node
+            if dnode and vm.getDefinedClass(uri, dnode) then
                 return
             end
         end
-        local message = lang.script('DIAG_INJECT_FIELD', guide.getKeyName(src))
+
+        local message = lang.script('DIAG_INJECT_FIELD', {
+            class = vm.getInfer(node):view(uri),
+            field = guide.getKeyName(src),
+            node  = hname(node),
+        })
         if     src.type == 'setfield' and src.field then
             callback {
                 start   = src.field.start,

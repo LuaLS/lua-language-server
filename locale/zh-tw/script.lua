@@ -170,6 +170,8 @@ DIAG_GLOBAL_ELEMENT                  = -- TODO: need translate!
 'Element is global.'
 DIAG_MISSING_FIELDS                   = -- TODO: need translate!
 'Missing fields: {}'
+DIAG_INJECT_FIELD                     = -- TODO: need translate!
+'Fields cannot be injected into the reference of `{class}` for `{field}`. To do so, use `---@class` for `{node}`.'
 
 MWS_NOT_SUPPORT         =
 '{} 目前還不支援多工作目錄，我可能需要重新啟動才能支援新的工作目錄...'

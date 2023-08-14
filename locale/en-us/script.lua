@@ -170,6 +170,8 @@ DIAG_GLOBAL_ELEMENT                   =
 'Element is global.'
 DIAG_MISSING_FIELDS                   =
 'Missing fields: {}'
+DIAG_INJECT_FIELD                     =
+'Fields cannot be injected into the reference of `{class}` for `{field}`. To do so, use `---@class` for `{node}`.'
 
 MWS_NOT_SUPPORT         =
 '{} does not support multi workspace for now, I may need to restart to support the new workspace ...'

@@ -519,11 +519,11 @@ math.log10                  =
 'Returns the base-10 logarithm of x.'
 math.max                    =
 'Returns the argument with the maximum value, according to the Lua operator `<`.'
-math.maxinteger             =
+math.maxinteger['>5.3']     =
 'An integer with the maximum value for an integer.'
 math.min                    =
 'Returns the argument with the minimum value, according to the Lua operator `<`.'
-math.mininteger             =
+math.mininteger['>5.3']     =
 'An integer with the minimum value for an integer.'
 math.modf                   =
 'Returns the integral part of `x` and the fractional part of `x`.'
@@ -557,11 +557,11 @@ math.tan                    =
 'Returns the tangent of `x` (assumed to be in radians).'
 math.tanh                   =
 'Returns the hyperbolic tangent of `x` (assumed to be in radians).'
-math.tointeger              =
+math.tointeger['>5.3']      =
 'If the value `x` is convertible to an integer, returns that integer.'
-math.type                   =
+math.type['>5.3']           =
 'Returns `"integer"` if `x` is an integer, `"float"` if it is a float, or `nil` if `x` is not a number.'
-math.ult                    =
+math.ult['>5.3']            =
 'Returns `true` if and only if `m` is below `n` when they are compared as unsigned integers.'
 
 os                          =

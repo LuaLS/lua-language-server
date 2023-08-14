@@ -47,12 +47,28 @@ return function (uri, callback)
             if dnode and vm.getDefinedClass(uri, dnode) then
                 return
             end
+            if def.type == 'doc.type.field' then
+                return
+            end
+        end
+
+        local howToFix = lang.script('DIAG_INJECT_FIELD_FIX_CLASS', {
+            node = hname(node),
+            fix  = '---@class',
+        })
+        for _, ndef in ipairs(vm.getDefs(node)) do
+            if ndef.type == 'doc.type.table' then
+                howToFix = lang.script('DIAG_INJECT_FIELD_FIX_TABLE', {
+                    fix   = '[any]: any',
+                })
+                break
+            end
         end
 
         local message = lang.script('DIAG_INJECT_FIELD', {
             class = vm.getInfer(node):view(uri),
             field = guide.getKeyName(src),
-            node  = hname(node),
+            fix   = howToFix,
         })
         if     src.type == 'setfield' and src.field then
             callback {

@@ -171,7 +171,11 @@ DIAG_GLOBAL_ELEMENT                  = -- TODO: need translate!
 DIAG_MISSING_FIELDS                   = -- TODO: need translate!
 'Missing fields: {}'
 DIAG_INJECT_FIELD                     = -- TODO: need translate!
-'Fields cannot be injected into the reference of `{class}` for `{field}`. To do so, use `---@class` for `{node}`.'
+'Fields cannot be injected into the reference of `{class}` for `{field}`. {fix}'
+DIAG_INJECT_FIELD_FIX_CLASS           = -- TODO: need translate!
+'To do so, use `---@class` for `{node}`.'
+DIAG_INJECT_FIELD_FIX_TABLE           = -- TODO: need translate!
+'如要允许注入，请在定义中添加 `{fix}` 。'
 
 MWS_NOT_SUPPORT         =
 '{} não é suportado múltiplos espaços de trabalho por enquanto, posso precisar reiniciar para estabelecer um novo espaço de trabalho ...'

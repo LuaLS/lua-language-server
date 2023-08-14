@@ -171,7 +171,11 @@ DIAG_GLOBAL_ELEMENT                   =
 DIAG_MISSING_FIELDS                   =
 'Missing fields: {}'
 DIAG_INJECT_FIELD                     =
-'Fields cannot be injected into the reference of `{class}` for `{field}`. To do so, use `---@class` for `{node}`.'
+'Fields cannot be injected into the reference of `{class}` for `{field}`. {fix}'
+DIAG_INJECT_FIELD_FIX_CLASS           =
+'To do so, use `---@class` for `{node}`.'
+DIAG_INJECT_FIELD_FIX_TABLE           = -- TODO: need translate!
+'如要允许注入，请在定义中添加 `{fix}` 。'
 
 MWS_NOT_SUPPORT         =
 '{} does not support multi workspace for now, I may need to restart to support the new workspace ...'

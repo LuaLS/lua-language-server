@@ -56,7 +56,7 @@ local type         = type
 ---@field returnIndex           integer
 ---@field assignIndex           integer
 ---@field docIndex              integer
----@field docs                  parser.object[]
+---@field docs                  parser.object
 ---@field state                 table
 ---@field comment               table
 ---@field optional              boolean
@@ -74,7 +74,9 @@ local type         = type
 ---@field hasBreak?             true
 ---@field hasExit?              true
 ---@field [integer]             parser.object|any
----@field package _root          parser.object
+---@field package _root         parser.object
+---@field package _eachCache?   parser.object[]
+---@field package _isGlobal?    boolean
 
 ---@class guide
 ---@field debugMode boolean

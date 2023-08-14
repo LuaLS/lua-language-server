@@ -7,11 +7,14 @@ local files      = require 'files'
 local vm         = require 'vm.vm'
 
 ---@class parser.object
----@field _compiledNodes     boolean
----@field _node              vm.node
----@field cindex             integer
----@field func               parser.object
----@field hideView           boolean
+---@field _compiledNodes        boolean
+---@field _node                 vm.node
+---@field cindex                integer
+---@field func                  parser.object
+---@field hideView              boolean
+---@field package _returns?     parser.object[]
+---@field package _callReturns? parser.object[]
+---@field package _asCache?     parser.object[]
 
 -- 该函数有副作用，会给source绑定node！
 ---@param source parser.object
@@ -483,6 +486,7 @@ function vm.getReturnOfFunction(func, index)
             func._returns = {}
         end
         if not func._returns[index] then
+            ---@diagnostic disable-next-line: missing-fields
             func._returns[index] = {
                 type        = 'function.return',
                 parent      = func,
@@ -580,6 +584,7 @@ local function getReturn(func, index, args)
     end
     if not func._callReturns[index] then
         local call = func.parent
+        ---@diagnostic disable-next-line: missing-fields
         func._callReturns[index] = {
             type   = 'call.return',
             parent = call,

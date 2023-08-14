@@ -32,6 +32,7 @@ local pub      = require 'pub'
 ---@field id            integer
 ---@field state?        parser.state
 ---@field compileCount? integer
+---@field words?        table
 
 ---@class files
 ---@field lazyCache?   lazy-cacher
@@ -708,6 +709,7 @@ end
 ---@field diffInfo? table[]
 ---@field originLines? integer[]
 ---@field originText? string
+---@field lua? string
 
 --- 获取文件语法树
 ---@param uri uri

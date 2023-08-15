@@ -7,9 +7,11 @@
 * `FIX` wrong hover and signature for method with varargs and overloads
 * `FIX` [#2155]
 * `FIX` [#2224]
+* `FIX` [#2267]
 
 [#2155]: https://github.com/LuaLS/lua-language-server/issues/2155
 [#2224]: https://github.com/LuaLS/lua-language-server/issues/2224
+[#2267]: https://github.com/LuaLS/lua-language-server/issues/2267
 
 ## 3.6.25
 `2023-7-26`

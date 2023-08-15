@@ -519,11 +519,11 @@ math.log10                  =
 'Retorna o logaritmo `x` na base 10.'
 math.max                    =
 'Retorna o argumento com o valor máximo de acordo com o operador `<`.'
-math.maxinteger             =
+math.maxinteger['>5.3']     =
 'Retorna o valor máximo para um inteiro.'
 math.min                    =
 'Retorna o argumento com o valor mínimo de acordo com o operador `<`.'
-math.mininteger             =
+math.mixinteger['>5.3']     =
 'Retorna o valor mínimo para um inteiro.'
 math.modf                   =
 'Retorna a parte inteira e a parte fracionária de `x`.'
@@ -557,11 +557,11 @@ math.tan                    =
 'Retorna a tangente de `x` (requer valor em radianos).'
 math.tanh                   =
 'Retorna a tangente hiperbólica de `x` (requer valor em radianos).'
-math.tointeger              =
+math.tointeger['>5.3']      =
 'Se o valor `x` pode ser convertido para um inteiro, retorna esse inteiro.'
-math.type                   =
+math.type['>5.3']           =
 'Retorna `"integer"` se `x` é um inteiro, `"float"` se for um valor real (i.e., ponto flutuante), ou `nil` se `x` não é um número.'
-math.ult                    =
+math.ult['>5.3']            =
 'Retorna `true` se e somente se `m` é menor `n` quando eles são comparados como inteiros sem sinal.'
 
 os                          =

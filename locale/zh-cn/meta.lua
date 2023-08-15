@@ -497,11 +497,11 @@ math.log10                  =
 '返回 `x` 的以10为底的对数。'
 math.max                    =
 '返回参数中最大的值， 大小由 Lua 操作 `<` 决定。'
-math.maxinteger             =
+math.maxinteger['>5.3']     =
 '最大值的整数。'
 math.min                    =
 '返回参数中最小的值， 大小由 Lua 操作 `<` 决定。'
-math.mininteger             =
+math.mininteger['>5.3']     =
 '最小值的整数。'
 math.modf                   =
 '返回 `x` 的整数部分和小数部分。'
@@ -535,11 +535,11 @@ math.tan                    =
 '返回 `x` 的正切值（假定参数是弧度）。'
 math.tanh                   =
 '返回 `x` 的双曲正切值（假定参数是弧度）。'
-math.tointeger              =
+math.tointeger['>5.3']      =
 '如果 `x` 可以转换为一个整数， 返回该整数。'
-math.type                   =
+math.type['>5.3']           =
 '如果 `x` 是整数，返回 `"integer"`， 如果它是浮点数，返回 `"float"`， 如果 `x` 不是数字，返回 `nil`。'
-math.ult                    =
+math.ult['>5.3']            =
 '如果整数 `m` 和 `n` 以无符号整数形式比较， `m` 在 `n` 之下，返回布尔真否则返回假。'
 
 os                          =

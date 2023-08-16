@@ -4,6 +4,24 @@
 * `NEW` support `---@type` and `--[[@as]]` for return statement
 * `NEW` commandline parameter `--force-accept-workspace`: allowing the use of the root directory or home directory as the workspace
 * `NEW` diagnostic: `inject-field`
+* `NEW` `---@enum` supports attribute `key`
+  ```lua
+  ---@enum (key) AnimalType
+  local enum = {
+    Cat = 1,
+    Dog = 2,
+  }
+  
+  ---@param animal userdata
+  ---@param atp AnimalType
+  ---@return boolean
+  local function isAnimalType(animal, atp)
+    return API.isAnimalType(animal, enum[atp])
+  end
+
+  assert(isAnimalType(animal, 'Cat'))
+  ```
+
 * `FIX` wrong hover and signature for method with varargs and overloads
 * `FIX` [#2155]
 * `FIX` [#2224]

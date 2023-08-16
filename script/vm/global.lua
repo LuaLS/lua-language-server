@@ -372,16 +372,36 @@ local compilerGlobalSwitch = util.switch()
             return
         end
         source._enums = {}
-        for _, field in ipairs(tbl) do
-            if     field.type == 'tablefield' then
-                source._enums[#source._enums+1] = field
-                local subType = vm.declareGlobal('type', name .. '.' .. field.field[1], uri)
-                subType:addSet(uri, field)
-            elseif field.type == 'tableindex' then
-                source._enums[#source._enums+1] = field
-                if field.index.type == 'string' then
-                    local subType = vm.declareGlobal('type', name .. '.' .. field.index[1], uri)
+        if vm.docHasAttr(source, 'key') then
+            for _, field in ipairs(tbl) do
+                if     field.type == 'tablefield' then
+                    source._enums[#source._enums+1] = {
+                        type   = 'doc.type.string',
+                        start  = field.field.start,
+                        finish = field.field.finish,
+                        [1]    = field.field[1],
+                    }
+                elseif field.type == 'tableindex' then
+                    source._enums[#source._enums+1] = {
+                        type   = 'doc.type.string',
+                        start  = field.index.start,
+                        finish = field.index.finish,
+                        [1]    = field.index[1],
+                    }
+                end
+            end
+        else
+            for _, field in ipairs(tbl) do
+                if     field.type == 'tablefield' then
+                    source._enums[#source._enums+1] = field
+                    local subType = vm.declareGlobal('type', name .. '.' .. field.field[1], uri)
                     subType:addSet(uri, field)
+                elseif field.type == 'tableindex' then
+                    source._enums[#source._enums+1] = field
+                    if field.index.type == 'string' then
+                        local subType = vm.declareGlobal('type', name .. '.' .. field.index[1], uri)
+                        subType:addSet(uri, field)
+                    end
                 end
             end
         end

@@ -471,3 +471,18 @@ function vm.getCastTargetHead(doc)
     end
     return nil
 end
+
+---@param doc parser.object
+---@param key string
+---@return boolean
+function vm.docHasAttr(doc, key)
+    if not doc.docAttr then
+        return false
+    end
+    for _, name in ipairs(doc.docAttr.names) do
+        if name[1] == key then
+            return true
+        end
+    end
+    return false
+end

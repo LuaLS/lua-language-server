@@ -91,6 +91,22 @@ f(<!{ h = 1 }!>)
 ]]
 
 TEST [[
+---@enum(key) A
+local t = {
+    x = 1,
+    ['y'] = 2,
+}
+
+---@param x A
+local function f(x)
+end
+
+f('x')
+f('y')
+f(<!'z'!>)
+]]
+
+TEST [[
 ---@generic T: string | boolean | table
 ---@param x T
 ---@return T

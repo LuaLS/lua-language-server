@@ -159,7 +159,7 @@ local childMap = {
     ['doc.class']          = {'class', '#extends', '#signs', 'comment'},
     ['doc.type']           = {'#types', 'name', 'comment'},
     ['doc.alias']          = {'alias', 'extends', 'comment'},
-    ['doc.enum']           = {'enum', 'extends', 'comment'},
+    ['doc.enum']           = {'enum', 'extends', 'comment', 'docAttr'},
     ['doc.param']          = {'param', 'extends', 'comment'},
     ['doc.return']         = {'#returns', 'comment'},
     ['doc.field']          = {'field', 'extends', 'comment'},
@@ -182,6 +182,7 @@ local childMap = {
     ['doc.cast.block']     = {'extends'},
     ['doc.operator']       = {'op', 'exp', 'extends'},
     ['doc.meta']           = {'name'},
+    ['doc.attr']           = {'#names'},
 }
 
 ---@type table<string, fun(obj: parser.object, list: parser.object[])>

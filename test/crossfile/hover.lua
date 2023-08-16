@@ -1637,6 +1637,30 @@ TEST {
     {
         path = 'a.lua',
         content = [[
+            ---@enum(key) <?A?>
+            local t = {
+                x = 1 << 0,
+                y = 1 << 1,
+                z = 1 << 2,
+            }
+        ]]
+    },
+    hover = [[
+```lua
+(enum) A
+```
+
+---
+
+```lua
+"x" | "y" | "z"
+```]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
             ---@alias someType
             ---| "#" # description
             

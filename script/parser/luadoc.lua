@@ -156,6 +156,7 @@ Symbol              <-  ({} {
 ---@field calls?            parser.object[]
 ---@field generics?         parser.object[]
 ---@field generic?          parser.object
+---@field docAttr?          parser.object
 
 local function parseTokens(text, offset)
     Ci = 0
@@ -250,6 +251,40 @@ local function nextSymbolOrError(symbol)
         }
     }
     return false
+end
+
+local function parseDocAttr(parent)
+    if not checkToken('symbol', '(', 1) then
+        return nil
+    end
+    nextToken()
+
+    local attrs = {
+        type   = 'doc.attr',
+        parent = parent,
+        start  = getStart(),
+        finish = getStart(),
+        names  = {},
+    }
+
+    while true do
+        if checkToken('symbol', ',', 1) then
+            nextToken()
+            goto continue
+        end
+        local name = parseName('doc.attr.name', attrs)
+        if not name then
+            break
+        end
+        attrs.names[#attrs.names+1] = name
+        attrs.finish = name.finish
+        ::continue::
+    end
+
+    nextSymbolOrError(')')
+    attrs.finish = getFinish()
+
+    return attrs
 end
 
 local function parseIndexField(parent)
@@ -1428,17 +1463,22 @@ local docSwitch = util.switch()
     end)
     : case 'enum'
     : call(function ()
+        local attr = parseDocAttr()
         local name = parseName('doc.enum.name')
         if not name then
             return nil
         end
         local result = {
-            type   = 'doc.enum',
-            start  = name.start,
-            finish = name.finish,
-            enum   = name,
+            type    = 'doc.enum',
+            start   = name.start,
+            finish  = name.finish,
+            enum    = name,
+            docAttr = attr,
         }
         name.parent = result
+        if attr then
+            attr.parent = result
+        end
         return result
     end)
     : case 'private'

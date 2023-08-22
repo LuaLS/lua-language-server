@@ -27,6 +27,7 @@ return function (uri, callback)
                 return
             end
         end
+        local warnings = {}
         for _, def in ipairs(defs) do
             if def.type == 'doc.class' then
                 if not def.fields then
@@ -67,12 +68,17 @@ return function (uri, callback)
                     return
                 end
 
-                callback {
-                    start   = src.start,
-                    finish  = src.finish,
-                    message = lang.script('DIAG_MISSING_FIELDS', table.concat(missedKeys, ', ')),
-                }
+                warnings[#warnings+1] = lang.script('DIAG_MISSING_FIELDS', def.class[1], table.concat(missedKeys, ', '))
             end
         end
+
+        if #warnings == 0 then
+            return
+        end
+        callback {
+            start   = src.start,
+            finish  = src.finish,
+            message = table.concat(warnings, '\n')
+        }
     end)
 end

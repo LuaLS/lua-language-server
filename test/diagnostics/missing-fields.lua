@@ -205,3 +205,29 @@ TEST [[
 ---@type A
 return <!{}!>
 ]]
+
+TEST [[
+---@class A
+---@field x number
+
+---@class B
+---@field y number
+
+---@type A|B
+local t = <!{
+    z = 1,
+}!>
+]]
+
+TEST [[
+---@class A
+---@field x number
+
+---@class B
+---@field y number
+
+---@type A|B
+local t = {
+    y = 1,
+}
+]]

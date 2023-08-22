@@ -169,7 +169,7 @@ DIAG_INVISIBLE_PACKAGE                =
 DIAG_GLOBAL_ELEMENT                   =
 '全局变量。'
 DIAG_MISSING_FIELDS                   =
-'缺少字段： {}'
+'缺少类型 `{1}` 的必要字段： {2}'
 DIAG_INJECT_FIELD                     =
 '不能在 `{class}` 的引用中注入字段 `{field}` 。{fix}'
 DIAG_INJECT_FIELD_FIX_CLASS           =

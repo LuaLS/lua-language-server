@@ -169,7 +169,7 @@ DIAG_INVISIBLE_PACKAGE                = -- TODO: need translate!
 DIAG_GLOBAL_ELEMENT                  = -- TODO: need translate!
 'Element is global.'
 DIAG_MISSING_FIELDS                   = -- TODO: need translate!
-'Missing fields: {}'
+'Missing required fields in type `{1}`: {2}'
 DIAG_INJECT_FIELD                     = -- TODO: need translate!
 'Fields cannot be injected into the reference of `{class}` for `{field}`. {fix}'
 DIAG_INJECT_FIELD_FIX_CLASS           = -- TODO: need translate!

@@ -169,7 +169,7 @@ DIAG_INVISIBLE_PACKAGE                =
 DIAG_GLOBAL_ELEMENT                   =
 'Element is global.'
 DIAG_MISSING_FIELDS                   =
-'Missing fields: {}'
+'Missing required fields in type `{1}`: {2}'
 DIAG_INJECT_FIELD                     =
 'Fields cannot be injected into the reference of `{class}` for `{field}`. {fix}'
 DIAG_INJECT_FIELD_FIX_CLASS           =

@@ -156,7 +156,7 @@ local childMap = {
     ['unary']       = {1},
 
     ['doc']                = {'#'},
-    ['doc.class']          = {'class', '#extends', '#signs', 'comment'},
+    ['doc.class']          = {'class', '#extends', '#signs', 'docAttr', 'comment'},
     ['doc.type']           = {'#types', 'name', 'comment'},
     ['doc.alias']          = {'alias', 'extends', 'comment'},
     ['doc.enum']           = {'enum', 'extends', 'comment', 'docAttr'},

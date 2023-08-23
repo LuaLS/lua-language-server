@@ -37,14 +37,29 @@ return function (uri, callback)
             return
         end
 
+        local isExact
         local class = vm.getDefinedClass(uri, node)
         if class then
-            return
+            for _, doc in ipairs(class:getSets(uri)) do
+                if vm.docHasAttr(doc, 'exact') then
+                    isExact = true
+                    break
+                end
+            end
+            if not isExact then
+                return
+            end
+            if  src.type == 'setmethod'
+            and not guide.getSelfNode(node) then
+                return
+            end
         end
 
         for _, def in ipairs(vm.getDefs(src)) do
             local dnode = def.node
-            if dnode and vm.getDefinedClass(uri, dnode) then
+            if dnode
+            and not isExact
+            and vm.getDefinedClass(uri, dnode) then
                 return
             end
             if def.type == 'doc.type.field' then
@@ -55,16 +70,19 @@ return function (uri, callback)
             end
         end
 
-        local howToFix = lang.script('DIAG_INJECT_FIELD_FIX_CLASS', {
-            node = hname(node),
-            fix  = '---@class',
-        })
-        for _, ndef in ipairs(vm.getDefs(node)) do
-            if ndef.type == 'doc.type.table' then
-                howToFix = lang.script('DIAG_INJECT_FIELD_FIX_TABLE', {
-                    fix   = '[any]: any',
-                })
-                break
+        local howToFix = ''
+        if not isExact then
+            howToFix = lang.script('DIAG_INJECT_FIELD_FIX_CLASS', {
+                node = hname(node),
+                fix  = '---@class',
+            })
+            for _, ndef in ipairs(vm.getDefs(node)) do
+                if ndef.type == 'doc.type.table' then
+                    howToFix = lang.script('DIAG_INJECT_FIELD_FIX_TABLE', {
+                        fix   = '[any]: any',
+                    })
+                    break
+                end
             end
         end
 
@@ -79,7 +97,7 @@ return function (uri, callback)
                 finish  = src.field.finish,
                 message = message,
             }
-        elseif src.type == 'setfield' and src.method then
+        elseif src.type == 'setmethod' and src.method then
             callback {
                 start   = src.method.start,
                 finish  = src.method.finish,
@@ -89,4 +107,41 @@ return function (uri, callback)
     end
     guide.eachSourceType(ast.ast, 'setfield',  checkInjectField)
     guide.eachSourceType(ast.ast, 'setmethod', checkInjectField)
+
+    ---@async
+    local function checkExtraTableField(src)
+        await.delay()
+
+        if not src.bindSource then
+            return
+        end
+        if not vm.docHasAttr(src, 'exact') then
+            return
+        end
+        local value = src.bindSource.value
+        if not value or value.type ~= 'table' then
+            return
+        end
+        for _, field in ipairs(value) do
+            local defs = vm.getDefs(field)
+            for _, def in ipairs(defs) do
+                if def.type == 'doc.field' then
+                    goto nextField
+                end
+            end
+            local message = lang.script('DIAG_INJECT_FIELD', {
+                class = vm.getInfer(src):view(uri),
+                field = guide.getKeyName(src),
+                fix   = '',
+            })
+            callback {
+                start   = field.start,
+                finish  = field.finish,
+                message = message,
+            }
+            ::nextField::
+        end
+    end
+
+    guide.eachSourceType(ast.ast, 'doc.class', checkExtraTableField)
 end

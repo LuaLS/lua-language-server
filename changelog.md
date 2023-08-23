@@ -21,6 +21,16 @@
 
   assert(isAnimalType(animal, 'Cat'))
   ```
+* `NEW` `---@class` supports attribute `exact`
+  ```lua
+  ---@class (exact) Point
+  ---@field x number
+  ---@field y number
+  local m = {}
+  m.x = 1 -- OK
+  m.y = 2 -- OK
+  m.z = 3 -- Warning
+  ```
 
 * `FIX` wrong hover and signature for method with varargs and overloads
 * `FIX` [#2155]

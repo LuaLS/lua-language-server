@@ -62,3 +62,23 @@ local t
 t.x = 1 -- OK
 t.y = 2 -- OK
 ]]
+
+
+TEST [[
+---@class (exact) Class
+---@field x number
+local m = {
+    x = 1, -- OK
+    <!y!> = 2, -- Warning
+}
+
+m.x = 1 -- OK
+m.<!y!> = 2 -- Warning
+
+function m:init() -- OK
+    self.x = 1 -- OK
+    self.<!y!> = 2 -- Warning
+    function self:<!xx!>() -- Warning
+    end
+end
+]]

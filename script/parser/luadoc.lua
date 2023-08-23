@@ -841,6 +841,7 @@ local docSwitch = util.switch()
             operators = {},
             calls     = {},
         }
+        result.docAttr = parseDocAttr(result)
         result.class = parseName('doc.class.name', result)
         if not result.class then
             pushWarning {

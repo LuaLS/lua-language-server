@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.7.0
+`2023-8-24`
 * `NEW` support `---@type` and `--[[@as]]` for return statement
 * `NEW` commandline parameter `--force-accept-workspace`: allowing the use of the root directory or home directory as the workspace
 * `NEW` diagnostic: `inject-field`

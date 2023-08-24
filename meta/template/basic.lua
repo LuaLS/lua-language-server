@@ -8,6 +8,7 @@ arg = {}
 ---@generic T
 ---@param v? T
 ---@param message? any
+---@param ... any
 ---@return T
 ---@return any ...
 function assert(v, message, ...) end
@@ -30,6 +31,7 @@ function assert(v, message, ...) end
 ---#if VERSION >= 5.4 then
 ---#DES 'collectgarbage'
 ---@param opt? gcoptions
+---@param ... any
 ---@return any
 function collectgarbage(opt, ...) end
 ---#else
@@ -136,6 +138,7 @@ function newproxy(proxy) end
 ---@version 5.1
 ---#DES 'module'
 ---@param name string
+---@param ...  any
 function module(name, ...) end
 
 ---#DES 'next'
@@ -161,12 +164,14 @@ function pairs(t) end
 ---@param f     async fun(...):...
 ---#end
 ---@param arg1? any
+---@param ...   any
 ---@return boolean success
 ---@return any result
 ---@return any ...
 function pcall(f, arg1, ...) end
 
 ---#DES 'print'
+---@param ... any
 function print(...) end
 
 ---#DES 'rawequal'
@@ -198,6 +203,7 @@ function rawset(table, index, value) end
 
 ---#DES 'select'
 ---@param index integer|"#"
+---@param ...   any
 ---@return any
 ---@nodiscard
 function select(index, ...) end
@@ -298,6 +304,7 @@ _VERSION = "Lua 5.4"
 ---@version >5.4
 ---#DES 'warn'
 ---@param message string
+---@param ...     any
 function warn(message, ...) end
 
 ---#if VERSION == 5.1 and not JIT then
@@ -313,6 +320,7 @@ function xpcall(f, err) end
 ---@param f     async fun(...):...
 ---@param msgh  function
 ---@param arg1? any
+---@param ...   any
 ---@return boolean success
 ---@return any result
 ---@return any ...

@@ -1,7 +1,7 @@
 DIAG_LINE_ONLY_SPACE    =
 'Line with spaces only.'
 DIAG_LINE_POST_SPACE    =
-'Line with postspace.'
+'Line with trailing space.'
 DIAG_UNUSED_LOCAL       =
 'Unused local `{}`.'
 DIAG_UNDEF_GLOBAL       =
@@ -174,8 +174,8 @@ DIAG_INJECT_FIELD                     =
 'Fields cannot be injected into the reference of `{class}` for `{field}`. {fix}'
 DIAG_INJECT_FIELD_FIX_CLASS           =
 'To do so, use `---@class` for `{node}`.'
-DIAG_INJECT_FIELD_FIX_TABLE           = -- TODO: need translate!
-'如要允许注入，请在定义中添加 `{fix}` 。'
+DIAG_INJECT_FIELD_FIX_TABLE           =
+'To allow injection, add `{fix}` to the definition.'
 
 MWS_NOT_SUPPORT         =
 '{} does not support multi workspace for now, I may need to restart to support the new workspace ...'
@@ -301,9 +301,9 @@ PARSER_INDEX_IN_FUNC_NAME =
 'The `[name]` form cannot be used in the name of a named function.'
 PARSER_UNKNOWN_ATTRIBUTE  =
 'Local attribute should be `const` or `close`'
-PARSER_AMBIGUOUS_SYNTAX   = -- TODO: need translate!
+PARSER_AMBIGUOUS_SYNTAX   =
 'In Lua 5.1, the left brackets called by the function must be in the same line as the function.'
-PARSER_NEED_PAREN         = -- TODO: need translate!
+PARSER_NEED_PAREN         =
 'Need to add a pair of parentheses.'
 PARSER_NESTING_LONG_MARK  =
 'Nesting of `[[...]]` is not allowed in Lua 5.1 .'
@@ -454,9 +454,9 @@ ACTION_MARK_ASYNC       =
 'Mark current function as async.'
 ACTION_ADD_DICT         =
 'Add \'{}\' to workspace dict'
-ACTION_FIX_ADD_PAREN    = -- TODO: need translate!
+ACTION_FIX_ADD_PAREN    =
 'Add parentheses.'
-ACTION_AUTOREQUIRE      = -- TODO: need translate!
+ACTION_AUTOREQUIRE      =
 "Import '{}' as {}"
 
 COMMAND_DISABLE_DIAG       =
@@ -1212,7 +1212,7 @@ setColor(colors.green)
 LUADOC_DESC_SOURCE =
 [=[
 Provide a reference to some source code which lives in another file. When
-searching for the defintion of an item, its `@source` will be used.
+searching for the definition of an item, its `@source` will be used.
 
 ## Syntax
 `@source <path>`
@@ -1260,7 +1260,7 @@ end
 LUADOC_DESC_PRIVATE =
 [=[
 Mark a function as private to a @class. Private functions can be accessed only
-from within their class and are not accessable from child classes.
+from within their class and are not accessible from child classes.
 
 ## Syntax
 `@private`

@@ -1,5 +1,10 @@
 # changelog
 
+## 3.7.1
+* `FIX` [#2299]
+
+[#2299]: https://github.com/LuaLS/lua-language-server/issues/2299
+
 ## 3.7.0
 `2023-8-24`
 * `NEW` support `---@type` and `--[[@as]]` for return statement

@@ -712,11 +712,11 @@ m.register 'completionItem/resolve' {
         --await.setPriority(1000)
         local state = files.getState(uri)
         if not state then
-            return nil
+            return item
         end
         local resolved = core.resolve(id)
         if not resolved then
-            return nil
+            return item
         end
         item.detail = resolved.detail or item.detail
         item.documentation = resolved.description and {

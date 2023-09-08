@@ -11,7 +11,7 @@ arg = {}
 ---@param ... any
 ---@return T
 ---@return any ... => args[reti + 1]
----@error => args[1].istruly
+---@throw => args[1].isFalsy
 ---@narrow v => args[1].truly
 function assert(v, message, ...) end
 
@@ -36,3 +36,15 @@ function assert(v, message, ...) end
 ---@prototype
 ]]
 function collectgarbage(...) end
+
+---#DES 'dofile'
+---@param filename? string
+---@return any
+---@custom dofile
+function dofile(filename) end
+
+---#DES 'error'
+---@param message any
+---@param level?  integer
+---@throw
+function error(message, level) end

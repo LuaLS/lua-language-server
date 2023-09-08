@@ -1,81 +1,81 @@
 local cat
 
-cat.rule.inner.default = function (self)
-    self.istruly = true
+cat.rule.default = function (self)
+    self.isTruly = true
     self.truly   = self
     self.falsy   = cat.class 'never'
     self.view    = self.name
 end
 
-cat.rule.inner.never = function (self)
-    self.istruly = nil
+cat.rule.never = function (self)
+    self.isTruly = nil
 end
 
-cat.rule.inner.any = function (self)
-    self.istruly = nil
+cat.rule.any = function (self)
+    self.isTruly = nil
     self.truly   = cat.class 'truly'
     self.falsy   = cat.boolean(false) | cat.class 'nil'
 end
 
-cat.rule.inner['nil'] = function (self)
-    self.istruly = false
+cat.rule['nil'] = function (self)
+    self.isTruly = false
     self.truly   = cat.class 'never'
     self.falsy   = self
 end
 
-cat.rule.inner.boolean = function (self)
+cat.rule.boolean = function (self)
     if self.value == true then
-        self.istruly = true
+        self.isTruly = true
         self.truly   = self
         self.falsy   = cat.class 'never'
     elseif self.value == false then
-        self.istruly = false
+        self.isTruly = false
         self.truly   = cat.class 'never'
         self.falsy   = self
     else
-        self.istruly = nil
+        self.isTruly = nil
         self.truly   = cat.boolean(true)
         self.falsy   = cat.boolean(false)
     end
 end
 
-cat.rule.inner.number = function (self)
-    self.istruly = true
+cat.rule.number = function (self)
+    self.isTruly = true
     self.truly   = self
     self.falsy   = cat.class 'never'
     self.view    = tostring(self.value)
 end
 
-cat.rule.inner.integer = function (self)
-    self.istruly = true
+cat.rule.integer = function (self)
+    self.isTruly = true
     self.truly   = self
     self.falsy   = cat.class 'never'
     self.view    = tostring(self.value)
 end
 
-cat.rule.inner.string = function (self)
-    self.istruly = true
+cat.rule.string = function (self)
+    self.isTruly = true
     self.truly   = self
     self.falsy   = cat.class 'never'
     self.view    = cat.util.viewString(self.value, self.quotation)
 end
 
-cat.rule.inner.union = function (self)
-    self.istruly = function (union)
-        local istruly = union.subs[1].istruly
-        if istruly == nil then
+cat.rule.union = function (self)
+    self.isTruly = function (union)
+        local isTruly = union.subs[1].isTruly
+        if isTruly == nil then
             return nil
         end
-        if istruly == true then
+        if isTruly == true then
             for i = 2, #union.subs do
-                if union.subs[i].istruly ~= true then
+                if union.subs[i].isTruly ~= true then
                     return nil
                 end
             end
             return true
         else
             for i = 2, #union.subs do
-                if union.subs[i].istruly ~= false then
+                if union.subs[i].isTruly ~= false then
                     return nil
                 end
             end
@@ -119,4 +119,10 @@ cat.rule.inner.union = function (self)
         end
         return table.concat(views, '|')
     end
+end
+
+cat.custom.dofile.onReturn = function (context)
+    local filename = context.args[1].asString
+    local file     = cat.files[filename]
+    return file.returns[1]
 end

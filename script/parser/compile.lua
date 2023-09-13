@@ -1167,7 +1167,7 @@ local function parseShortString()
         end
     end
 
-    if State.options.nonstandardSymbolTypes[mark] then
+    if State.options.nonstandardSymbolTypes and State.options.nonstandardSymbolTypes[mark] then
         str.type = State.options.nonstandardSymbolTypes[mark]
     end
 

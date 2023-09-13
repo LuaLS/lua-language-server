@@ -1166,6 +1166,11 @@ local function parseShortString()
             }
         end
     end
+
+    if State.options.nonstandardSymbolTypes[mark] then
+        str.type = State.options.nonstandardSymbolTypes[mark]
+    end
+
     return str
 end
 

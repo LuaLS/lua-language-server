@@ -1814,6 +1814,20 @@ Array<string>
 []
 ```
 
+# runtime.nonstandardSymbolTypes
+
+Set the type for non standardSymbols to something other than string.
+
+## type
+```ts
+Object<string, string>
+```
+
+## default
+```jsonc
+{}
+```
+
 # runtime.path
 
 当使用 `require` 时，如何根据输入的名字来查找文件。

@@ -1815,6 +1815,20 @@ Array<string>
 []
 ```
 
+# runtime.nonstandardSymbolTypes
+
+Set the type for non standardSymbols to something other than string.
+
+## type
+```ts
+Object<string, string>
+```
+
+## default
+```jsonc
+{}
+```
+
 # runtime.path
 
 When using `require`, how to find the file based on the input name.

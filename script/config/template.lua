@@ -223,6 +223,17 @@ local template = {
                                                 '||', '&&', '!', '!=',
                                                 'continue',
                                             }),
+    ['Lua.runtime.nonstandardSymbolTypes']  = Type.Hash(
+                                                Type.String,
+                                                Type.String >> '`' << {
+                                                    '//', '/**/',
+                                                    '`',
+                                                    '+=', '-=', '*=', '/=', '%=', '^=', '//=',
+                                                    '|=', '&=', '<<=', '>>=',
+                                                    '||', '&&', '!', '!=',
+                                                    'continue',
+                                                }
+                                            ),
     ['Lua.runtime.plugin']                  = Type.String,
     ['Lua.runtime.pluginArgs']              = Type.Array(Type.String),
     ['Lua.runtime.fileEncoding']            = Type.String >> 'utf8' << {

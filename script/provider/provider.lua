@@ -41,7 +41,10 @@ function m.updateConfig(uri)
     end
 
     for _, folder in ipairs(scope.folders) do
-        local clientConfig = cfgLoader.loadClientConfig(folder.uri)
+        local clientConfig = nil
+        if client.getAbility('workspace.configuration') then
+            clientConfig = cfgLoader.loadClientConfig(folder.uri)
+        end
         if clientConfig then
             log.info('Load config from client', folder.uri)
             log.info(inspect(clientConfig))
@@ -57,10 +60,12 @@ function m.updateConfig(uri)
         config.update(folder, clientConfig, rc)
     end
 
-    local global = cfgLoader.loadClientConfig()
-    log.info('Load config from client', 'fallback')
-    log.info(inspect(global))
-    config.update(scope.fallback, global)
+    if client.getAbility('workspace.configuration') then
+        local global = cfgLoader.loadClientConfig()
+        log.info('Load config from client', 'fallback')
+        log.info(inspect(global))
+        config.update(scope.fallback, global)
+    end
 end
 
 function m.register(method)

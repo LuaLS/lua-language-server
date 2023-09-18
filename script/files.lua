@@ -17,6 +17,7 @@ local lazy     = require 'lazytable'
 local cacher   = require 'lazy-cacher'
 local sp       = require 'bee.subprocess'
 local pub      = require 'pub'
+local json       = require 'json'
 
 ---@class file
 ---@field uri           uri
@@ -677,6 +678,8 @@ function m.compileState(uri)
         nonstandardSymbol = util.arrayToHash(config.get(uri, 'Lua.runtime.nonstandardSymbol')),
         nonstandardSymbolTypes = config.get(uri, 'Lua.runtime.nonstandardSymbolTypes'),
     }
+
+    log.info(json.encode(options.nonstandardSymbolTypes), json.encode(options.nonstandardSymbol))
 
     local ws     = require 'workspace'
     local client = require 'client'

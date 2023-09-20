@@ -251,6 +251,9 @@ function setfenv(f, table) end
 ---#if VERSION == JIT or VERSION == 5.2 then
 ---@field __ipairs (fun(t):(fun(t,k,v):(integer|nil),any))|nil
 ---#end
+---#if VERSION >= 5.4 then
+---@field __close (fun(t,errobj):any)|nil
+---#end
 
 ---#DES 'setmetatable'
 ---@param table      table

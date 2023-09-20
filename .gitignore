@@ -4,4 +4,5 @@
 /meta/*
 !/meta/template
 !/meta/3rd
+!/meta/whimsical
 /bin*

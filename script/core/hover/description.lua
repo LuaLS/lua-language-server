@@ -477,34 +477,55 @@ local function tryDocEnum(source)
     if not tbl then
         return
     end
-    local md = markdown()
-    md:add('lua', '{')
-    for _, field in ipairs(tbl) do
-        if field.type == 'tablefield'
-        or field.type == 'tableindex' then
-            if not field.value then
-                goto CONTINUE
-            end
-            local key = guide.getKeyName(field)
-            if not key then
-                goto CONTINUE
-            end
-            if field.value.type == 'integer'
-            or field.value.type == 'string' then
-                md:add('lua', ('    %s: %s = %s,'):format(key, field.value.type, field.value[1]))
-            end
-            if field.value.type == 'binary'
-            or field.value.type == 'unary' then
-                local number = vm.getNumber(field.value)
-                if number then
-                    md:add('lua', ('    %s: %s = %s,'):format(key, math.tointeger(number) and 'integer' or 'number', number))
+    if vm.docHasAttr(source, 'key') then
+        local md = markdown()
+        local keys = {}
+        for _, field in ipairs(tbl) do
+            if field.type == 'tablefield'
+            or field.type == 'tableindex' then
+                if not field.value then
+                    goto CONTINUE
                 end
+                local key = guide.getKeyName(field)
+                if not key then
+                    goto CONTINUE
+                end
+                keys[#keys+1] = ('%q'):format(key)
+                ::CONTINUE::
             end
-            ::CONTINUE::
         end
+        md:add('lua', table.concat(keys, ' | '))
+        return md:string()
+    else
+        local md = markdown()
+        md:add('lua', '{')
+        for _, field in ipairs(tbl) do
+            if field.type == 'tablefield'
+            or field.type == 'tableindex' then
+                if not field.value then
+                    goto CONTINUE
+                end
+                local key = guide.getKeyName(field)
+                if not key then
+                    goto CONTINUE
+                end
+                if field.value.type == 'integer'
+                or field.value.type == 'string' then
+                    md:add('lua', ('    %s: %s = %s,'):format(key, field.value.type, field.value[1]))
+                end
+                if field.value.type == 'binary'
+                or field.value.type == 'unary' then
+                    local number = vm.getNumber(field.value)
+                    if number then
+                        md:add('lua', ('    %s: %s = %s,'):format(key, math.tointeger(number) and 'integer' or 'number', number))
+                    end
+                end
+                ::CONTINUE::
+            end
+        end
+        md:add('lua', '}')
+        return md:string()
     end
-    md:add('lua', '}')
-    return md:string()
 end
 
 ---@async

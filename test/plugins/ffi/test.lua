@@ -24,7 +24,7 @@ end
 ---@async
 lclient():start(function (languageClient)
     languageClient:registerFakers()
-    local rootUri = furi.encode '/'
+    local rootUri = TESTURI
     languageClient:initialize {
         rootUri = rootUri,
     }

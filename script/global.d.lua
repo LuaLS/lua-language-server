@@ -77,3 +77,6 @@ jit = false
 -- connect to client by socket
 ---@type integer
 SOCKET = 0
+
+-- Allowing the use of the root directory or home directory as the workspace
+FORCE_ACCEPT_WORKSPACE = false

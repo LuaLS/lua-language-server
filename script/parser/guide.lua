@@ -56,7 +56,7 @@ local type         = type
 ---@field returnIndex           integer
 ---@field assignIndex           integer
 ---@field docIndex              integer
----@field docs                  parser.object[]
+---@field docs                  parser.object
 ---@field state                 table
 ---@field comment               table
 ---@field optional              boolean
@@ -74,7 +74,9 @@ local type         = type
 ---@field hasBreak?             true
 ---@field hasExit?              true
 ---@field [integer]             parser.object|any
----@field package _root          parser.object
+---@field package _root         parser.object
+---@field package _eachCache?   parser.object[]
+---@field package _isGlobal?    boolean
 
 ---@class guide
 ---@field debugMode boolean
@@ -154,10 +156,10 @@ local childMap = {
     ['unary']       = {1},
 
     ['doc']                = {'#'},
-    ['doc.class']          = {'class', '#extends', '#signs', 'comment'},
+    ['doc.class']          = {'class', '#extends', '#signs', 'docAttr', 'comment'},
     ['doc.type']           = {'#types', 'name', 'comment'},
     ['doc.alias']          = {'alias', 'extends', 'comment'},
-    ['doc.enum']           = {'enum', 'extends', 'comment'},
+    ['doc.enum']           = {'enum', 'extends', 'comment', 'docAttr'},
     ['doc.param']          = {'param', 'extends', 'comment'},
     ['doc.return']         = {'#returns', 'comment'},
     ['doc.field']          = {'field', 'extends', 'comment'},
@@ -180,6 +182,7 @@ local childMap = {
     ['doc.cast.block']     = {'extends'},
     ['doc.operator']       = {'op', 'exp', 'extends'},
     ['doc.meta']           = {'name'},
+    ['doc.attr']           = {'#names'},
 }
 
 ---@type table<string, fun(obj: parser.object, list: parser.object[])>

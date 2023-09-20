@@ -127,9 +127,9 @@ DIAG_MISSING_LOCAL_EXPORT_DOC_PARAM   = -- TODO: need translate!
 DIAG_MISSING_LOCAL_EXPORT_DOC_RETURN  = -- TODO: need translate!
 'Missing @return annotation at index `{}` in exported local function `{}`.'
 DIAG_INCOMPLETE_SIGNATURE_DOC_PARAM   = -- TODO: need translate!
-'Incomplete signature. Missing @param annotation for parameter `{}` in function `{}`.'
+'Incomplete signature. Missing @param annotation for parameter `{}`.'
 DIAG_INCOMPLETE_SIGNATURE_DOC_RETURN  = -- TODO: need translate!
-'Incomplete signature. Missing @return annotation at index `{}` in function `{}`.'
+'Incomplete signature. Missing @return annotation at index `{}`.'
 DIAG_UNKNOWN_DIAG_CODE                =
 '未知的診斷代碼 `{}`。'
 DIAG_CAST_LOCAL_TYPE                  =
@@ -169,7 +169,13 @@ DIAG_INVISIBLE_PACKAGE                = -- TODO: need translate!
 DIAG_GLOBAL_ELEMENT                  = -- TODO: need translate!
 'Element is global.'
 DIAG_MISSING_FIELDS                   = -- TODO: need translate!
-'Missing fields: {}'
+'Missing required fields in type `{1}`: {2}'
+DIAG_INJECT_FIELD                     = -- TODO: need translate!
+'Fields cannot be injected into the reference of `{class}` for `{field}`. {fix}'
+DIAG_INJECT_FIELD_FIX_CLASS           = -- TODO: need translate!
+'To do so, use `---@class` for `{node}`.'
+DIAG_INJECT_FIELD_FIX_TABLE           = -- TODO: need translate!
+'如要允许注入，请在定义中添加 `{fix}` 。'
 
 MWS_NOT_SUPPORT         =
 '{} 目前還不支援多工作目錄，我可能需要重新啟動才能支援新的工作目錄...'
@@ -197,9 +203,9 @@ WORKSPACE_DIAGNOSTIC      =
 WORKSPACE_SKIP_HUGE_FILE  =
 '出於效能考慮，已停止對此檔案解析：{}'
 WORKSPACE_NOT_ALLOWED     =
-'你的工作目錄被設定為了 `{}` ，Lua語言伺服拒絕載入此目錄，請檢查你的設定檔。[了解更多](https://github.com/LuaLS/lua-language-server/wiki/FAQ#why-is-the-server-scanning-the-wrong-folder)'
+'你的工作目錄被設定為了 `{}` ，Lua語言伺服拒絕載入此目錄，請檢查你的設定檔。[了解更多](https://luals.github.io/wiki/faq#why-is-the-server-scanning-the-wrong-folder)'
 WORKSPACE_SCAN_TOO_MUCH   = -- TODO: need translate!
-'已掃描了超過 {} 個檔案，目前掃描的目錄為 `{}`. Please see the [FAQ](https://github.com/LuaLS/lua-language-server/wiki/FAQ#how-can-i-improve-startup-speeds) to see how you can include fewer files. It is also possible that your [configuration is incorrect](https://github.com/LuaLS/lua-language-server/wiki/FAQ#why-is-the-server-scanning-the-wrong-folder).'
+'已掃描了超過 {} 個檔案，目前掃描的目錄為 `{}`. Please see the [FAQ](https://luals.github.io/wiki/faq#how-can-i-improve-startup-speeds) to see how you can include fewer files. It is also possible that your [configuration is incorrect](https://luals.github.io/wiki/faq#why-is-the-server-scanning-the-wrong-folder).'
 
 PARSER_CRASH            =
 '語法解析崩潰了！遺言：{}'
@@ -552,7 +558,7 @@ WINDOW_APPLY_SETTING             =
 WINDOW_CHECK_SEMANTIC            =
 '如果你正在使用市場中的顏色主題，你可能需要同時修改 `editor.semanticHighlighting.enabled` 選項為 `true` 才會使語義著色生效。'
 WINDOW_TELEMETRY_HINT            =
-'請允許發送匿名的使用資料與錯誤報告，幫助我們進一步完善此延伸模組。在[此處](https://github.com/LuaLS/lua-language-server/wiki/Home#privacy)閱讀我們的隱私聲明。'
+'請允許發送匿名的使用資料與錯誤報告，幫助我們進一步完善此延伸模組。在[此處](https://luals.github.io/privacy/#language-server)閱讀我們的隱私聲明。'
 WINDOW_TELEMETRY_ENABLE          =
 '允許'
 WINDOW_TELEMETRY_DISABLE         =
@@ -697,7 +703,7 @@ LUADOC_DESC_CLASS =
 Manager = {}
 ```
 ---
-[檢視文件](https://github.com/LuaLS/lua-language-server/wiki/Annotations#class)
+[檢視文件](https://luals.github.io/wiki/annotations#class)
 ]=]
 LUADOC_DESC_TYPE =
 [=[
@@ -748,7 +754,7 @@ local x --x[""] is true
 local myFunction
 ```
 ---
-[檢視文件](https://github.com/LuaLS/lua-language-server/wiki/Annotations#types-and-type)
+[檢視文件](https://luals.github.io/wiki/annotations#type)
 ]=]
 LUADOC_DESC_ALIAS =
 [=[
@@ -798,7 +804,7 @@ local enums = {
 ---| `enums.CLOSE`
 ```
 ---
-[檢視文件](https://github.com/LuaLS/lua-language-server/wiki/Annotations#alias)
+[檢視文件](https://luals.github.io/wiki/annotations#alias)
 ]=]
 LUADOC_DESC_PARAM =
 [=[
@@ -823,7 +829,7 @@ function get(url, headers, timeout) end
 function concat(base, ...) end
 ```
 ---
-[檢視文件](https://github.com/LuaLS/lua-language-server/wiki/Annotations#param)
+[檢視文件](https://luals.github.io/wiki/annotations#param)
 ]=]
 LUADOC_DESC_RETURN =
 [=[
@@ -861,7 +867,7 @@ function getFirstLast() end
 function getTags(item) end
 ```
 ---
-[檢視文件](https://github.com/LuaLS/lua-language-server/wiki/Annotations#return)
+[檢視文件](https://luals.github.io/wiki/annotations#return)
 ]=]
 LUADOC_DESC_FIELD =
 [=[
@@ -890,7 +896,7 @@ response = get("localhost")
 statusCode = response.status.code
 ```
 ---
-[檢視文件](https://github.com/LuaLS/lua-language-server/wiki/Annotations#field)
+[檢視文件](https://luals.github.io/wiki/annotations#field)
 ]=]
 LUADOC_DESC_GENERIC =
 [=[
@@ -946,7 +952,7 @@ local v = Generic("Foo") -- v is an object of Foo
 -- we give for key (K) or value (V)
 ```
 ---
-[檢視文件](https://github.com/LuaLS/lua-language-server/wiki/Annotations#generics-and-generic)
+[檢視文件](https://luals.github.io/wiki/annotations#generic)
 ]=]
 LUADOC_DESC_VARARG =
 [=[
@@ -964,7 +970,7 @@ LUADOC_DESC_VARARG =
 function concat(...) end
 ```
 ---
-[檢視文件](https://github.com/LuaLS/lua-language-server/wiki/Annotations#vararg)
+[檢視文件](https://luals.github.io/wiki/annotations#vararg)
 ]=]
 LUADOC_DESC_OVERLOAD =
 [=[
@@ -979,7 +985,7 @@ LUADOC_DESC_OVERLOAD =
 function table.insert(t, position, value) end
 ```
 ---
-[檢視文件](https://github.com/LuaLS/lua-language-server/wiki/Annotations#overload)
+[檢視文件](https://luals.github.io/wiki/annotations#overload)
 ]=]
 LUADOC_DESC_DEPRECATED =
 [=[
@@ -989,7 +995,7 @@ LUADOC_DESC_DEPRECATED =
 `---@deprecated`
 
 ---
-[檢視文件](https://github.com/LuaLS/lua-language-server/wiki/Annotations#deprecated)
+[檢視文件](https://luals.github.io/wiki/annotations#deprecated)
 ]=]
 LUADOC_DESC_META =
 [=[
@@ -1004,7 +1010,7 @@ LUADOC_DESC_META =
 `---@meta`
 
 ---
-[檢視文件](https://github.com/LuaLS/lua-language-server/wiki/Annotations#meta)
+[檢視文件](https://luals.github.io/wiki/annotations#meta)
 ]=]
 LUADOC_DESC_VERSION =
 [=[
@@ -1029,7 +1035,7 @@ function onlyWorksInJIT() end
 function oldLuaOnly() end
 ```
 ---
-[檢視文件](https://github.com/LuaLS/lua-language-server/wiki/Annotations#version)
+[檢視文件](https://luals.github.io/wiki/annotations#version)
 ]=]
 LUADOC_DESC_SEE =
 [=[
@@ -1039,7 +1045,7 @@ LUADOC_DESC_SEE =
 `---@see <text>`
 
 ---
-[檢視文件](https://github.com/LuaLS/lua-language-server/wiki/Annotations#see)
+[檢視文件](https://luals.github.io/wiki/annotations#see)
 ]=]
 LUADOC_DESC_DIAGNOSTIC =
 [=[
@@ -1065,7 +1071,7 @@ local unused = "hello world"
 ---@diagnostic enable: unused-local
 ```
 ---
-[檢視文件](https://github.com/LuaLS/lua-language-server/wiki/Annotations#diagnostic)
+[檢視文件](https://luals.github.io/wiki/annotations#diagnostic)
 ]=]
 LUADOC_DESC_MODULE =
 [=[
@@ -1082,7 +1088,7 @@ local stringUtils
 local module = require('string.utils')
 ```
 ---
-[檢視文件](https://github.com/LuaLS/lua-language-server/wiki/Annotations#module)
+[檢視文件](https://luals.github.io/wiki/annotations#module)
 ]=]
 LUADOC_DESC_ASYNC =
 [=[
@@ -1092,7 +1098,7 @@ LUADOC_DESC_ASYNC =
 `---@async`
 
 ---
-[檢視文件](https://github.com/LuaLS/lua-language-server/wiki/Annotations#async)
+[檢視文件](https://luals.github.io/wiki/annotations#async)
 ]=]
 LUADOC_DESC_NODISCARD =
 [=[
@@ -1103,7 +1109,7 @@ LUADOC_DESC_NODISCARD =
 `---@nodiscard`
 
 ---
-[檢視文件](https://github.com/LuaLS/lua-language-server/wiki/Annotations#nodiscard)
+[檢視文件](https://luals.github.io/wiki/annotations#nodiscard)
 ]=]
 LUADOC_DESC_CAST =
 [=[
@@ -1138,7 +1144,7 @@ local x --> string|table
 print(x) --> table
 ```
 ---
-[檢視文件](https://github.com/LuaLS/lua-language-server/wiki/Annotations#cast)
+[檢視文件](https://luals.github.io/wiki/annotations#cast)
 ]=]
 LUADOC_DESC_OPERATOR = -- TODO: need translate!
 [=[
@@ -1173,7 +1179,7 @@ pB = -pA
 LUADOC_DESC_ENUM = -- TODO: need translate!
 [=[
 Mark a table as an enum. If you want an enum but can't define it as a Lua
-table, take a look at the [`@alias`](https://github.com/LuaLS/lua-language-server/wiki/Annotations#alias)
+table, take a look at the [`@alias`](https://luals.github.io/wiki/annotations#alias)
 tag.
 
 ## Syntax

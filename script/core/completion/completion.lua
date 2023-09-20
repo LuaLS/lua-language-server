@@ -1251,6 +1251,46 @@ local function insertDocEnum(state, pos, doc, enums)
     return enums
 end
 
+---@param state     parser.state
+---@param pos       integer
+---@param doc       vm.node.object
+---@param enums     table[]
+---@return table[]?
+local function insertDocEnumKey(state, pos, doc, enums)
+    local tbl = doc.bindSource
+    if not tbl then
+        return nil
+    end
+    local keyEnums = {}
+    for _, field in ipairs(tbl) do
+        if field.type == 'tablefield'
+        or field.type == 'tableindex' then
+            if not field.value then
+                goto CONTINUE
+            end
+            local key = guide.getKeyName(field)
+            if not key then
+                goto CONTINUE
+            end
+            enums[#enums+1] = {
+                label  = ('%q'):format(key),
+                kind   = define.CompletionItemKind.EnumMember,
+                id     = stack(field, function (newField) ---@async
+                    return {
+                        detail      = buildDetail(newField),
+                        description = buildDesc(newField),
+                    }
+                end),
+            }
+            ::CONTINUE::
+        end
+    end
+    for _, enum in ipairs(keyEnums) do
+        enums[#enums+1] = enum
+    end
+    return enums
+end
+
 local function buildInsertDocFunction(doc)
     local args = {}
     for i, arg in ipairs(doc.args) do
@@ -1316,7 +1356,11 @@ local function insertEnum(state, pos, src, enums, isInArray, mark)
     elseif src.type == 'global' and src.cate == 'type' then
         for _, set in ipairs(src:getSets(state.uri)) do
             if set.type == 'doc.enum' then
-                insertDocEnum(state, pos, set, enums)
+                if vm.docHasAttr(set, 'key') then
+                    insertDocEnumKey(state, pos, set, enums)
+                else
+                    insertDocEnum(state, pos, set, enums)
+                end
             end
         end
     end

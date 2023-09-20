@@ -102,6 +102,9 @@ function m.isValid(uri)
     if path == '' then
         return false
     end
+    if scheme ~= 'file' then
+        return false
+    end
     return true
 end
 

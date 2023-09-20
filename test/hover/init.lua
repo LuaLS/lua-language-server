@@ -2466,3 +2466,25 @@ local t: {
     [3]: table,
 }
 ]]
+
+TEST [[
+---@class A
+---@overload fun(x: number): boolean
+local <?x?>
+]]
+[[
+local x: A
+]]
+
+TEST [[
+---@type A
+local <?f?>
+
+---@enum A
+local t = {
+    x = f,
+}
+]]
+[[
+local f: A
+]]

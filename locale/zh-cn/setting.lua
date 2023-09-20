@@ -27,7 +27,7 @@ config.runtime.unicodeName        =
 config.runtime.nonstandardSymbol  =
 "支持非标准的符号。请务必确认你的运行环境支持这些符号。"
 config.runtime.plugin             =
-"插件路径，请查阅[文档](https://github.com/LuaLS/lua-language-server/wiki/Plugins)了解用法。"
+"插件路径，请查阅[文档](https://luals.github.io/wiki/plugins)了解用法。"
 config.runtime.pluginArgs         = -- TODO: need translate!
 "Additional arguments for the plugin."
 config.runtime.fileEncoding       =
@@ -272,20 +272,12 @@ config.nameStyle.config                  =
 '设定命名风格检查的配置'
 config.telemetry.enable                  =
 [[
-启用遥测，通过网络发送你的编辑器信息与错误日志。在[此处](https://github.com/LuaLS/lua-language-server/wiki/Home#privacy)阅读我们的隐私声明。
+启用遥测，通过网络发送你的编辑器信息与错误日志。在[此处](https://luals.github.io/privacy/#language-server)阅读我们的隐私声明。
 ]]
 config.misc.parameters                   =
-'VSCode中启动语言服务时的[命令行参数](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#arguments)。'
+'VSCode中启动语言服务时的[命令行参数](https://luals.github.io/wiki/usage#arguments)。'
 config.misc.executablePath               =
 'VSCode中指定可执行文件路径。'
-config.IntelliSense.traceLocalSet        =
-'请查阅[文档](https://github.com/LuaLS/lua-language-server/wiki/IntelliSense-optional-features)了解用法。'
-config.IntelliSense.traceReturn          =
-'请查阅[文档](https://github.com/LuaLS/lua-language-server/wiki/IntelliSense-optional-features)了解用法。'
-config.IntelliSense.traceBeSetted        =
-'请查阅[文档](https://github.com/LuaLS/lua-language-server/wiki/IntelliSense-optional-features)了解用法。'
-config.IntelliSense.traceFieldInject     =
-'请查阅[文档](https://github.com/LuaLS/lua-language-server/wiki/IntelliSense-optional-features)了解用法。'
 config.type.castNumberToInteger          =
 '允许将 `number` 类型赋给 `integer` 类型。'
 config.type.weakUnionCheck               =

@@ -711,6 +711,14 @@ local Care = util.switch()
             type       = define.TokenTypes.namespace,
         }
     end)
+    : case 'doc.attr'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.decorator,
+        }
+    end)
 
 ---@param state table
 ---@param results table

@@ -70,8 +70,6 @@ return function (uri, callback)
             return
         end
 
-        local functionName = source.parent[1]
-
         --- don't apply rule if there is no @param or @return annotation yet
         --- so comments and @async can be applied without the need for a full documentation
         if(not findSignatureDoc(source.bindDocs)) then
@@ -87,7 +85,7 @@ return function (uri, callback)
                         callback {
                             start   = arg.start,
                             finish  = arg.finish,
-                            message = lang.script('DIAG_INCOMPLETE_SIGNATURE_DOC_PARAM', argName, functionName),
+                            message = lang.script('DIAG_INCOMPLETE_SIGNATURE_DOC_PARAM', argName),
                         }
                     end
                 end
@@ -101,7 +99,7 @@ return function (uri, callback)
                         callback {
                             start   = expr.start,
                             finish  = expr.finish,
-                            message = lang.script('DIAG_INCOMPLETE_SIGNATURE_DOC_RETURN', index, functionName),
+                            message = lang.script('DIAG_INCOMPLETE_SIGNATURE_DOC_RETURN', index),
                         }
                     end
                 end

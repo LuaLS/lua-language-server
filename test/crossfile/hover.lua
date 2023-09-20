@@ -1637,6 +1637,30 @@ TEST {
     {
         path = 'a.lua',
         content = [[
+            ---@enum(key) <?A?>
+            local t = {
+                x = 1 << 0,
+                y = 1 << 1,
+                z = 1 << 2,
+            }
+        ]]
+    },
+    hover = [[
+```lua
+(enum) A
+```
+
+---
+
+```lua
+"x" | "y" | "z"
+```]]
+}
+
+TEST {
+    {
+        path = 'a.lua',
+        content = [[
             ---@alias someType
             ---| "#" # description
             
@@ -1692,6 +1716,26 @@ function f(x: number)
 
 ```lua
 function f(x: number, y: number)
+```]]
+}
+
+TEST { { path = 'a.lua', content = [[
+---@overload fun(self: self, x: number)
+---@overload fun(self: self, x: number, y: number)
+function M:f(...)
+end
+
+M:<?f?>
+]] },
+hover = [[
+```lua
+(method) M:f(x: number)
+```
+
+---
+
+```lua
+(method) M:f(x: number, y: number)
 ```]]
 }
 

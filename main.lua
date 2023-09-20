@@ -36,7 +36,7 @@ local function loadArgs()
             end
         end
         if key then
-            _G[key:upper()] = getValue(value)
+            _G[key:upper():gsub('-', '_')] = getValue(value)
         end
     end
 end

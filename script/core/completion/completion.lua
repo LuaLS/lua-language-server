@@ -2158,7 +2158,7 @@ local function tryluaDocByErr(state, position, err, docState, results)
     end
 end
 
-local function buildluaDocOfFunction(func)
+local function buildluaDocOfFunction(func, pad)
     local index = 1
     local buf = {}
     buf[#buf+1] = '${1:comment}'
@@ -2182,7 +2182,8 @@ local function buildluaDocOfFunction(func)
         local funcArg = func.args[n]
         if funcArg[1] and funcArg.type ~= 'self' then
             index = index + 1
-            buf[#buf+1] = ('---@param %s ${%d:%s}'):format(
+            buf[#buf+1] = ('---%s@param %s ${%d:%s}'):format(
+                pad and ' ' or '',
                 funcArg[1],
                 index,
                 arg
@@ -2200,7 +2201,7 @@ local function buildluaDocOfFunction(func)
     return insertText
 end
 
-local function tryluaDocOfFunction(doc, results)
+local function tryluaDocOfFunction(doc, results, pad)
     if not doc.bindSource then
         return
     end
@@ -2222,7 +2223,7 @@ local function tryluaDocOfFunction(doc, results)
             end
         end
     end
-    local insertText = buildluaDocOfFunction(func)
+    local insertText = buildluaDocOfFunction(func, pad)
     results[#results+1] = {
         label            = '@param;@return',
         kind             = define.CompletionItemKind.Snippet,
@@ -2240,9 +2241,9 @@ local function tryLuaDoc(state, position, results)
     end
     if doc.type == 'doc.comment' then
         local line = doc.originalComment.text
-        -- 尝试 ---$
-        if line == '-' then
-            tryluaDocOfFunction(doc, results)
+        -- 尝试 '---$' or '--- $'
+        if line == '-' or line == '- ' then
+            tryluaDocOfFunction(doc, results, line == '- ')
             return
         end
         -- 尝试 ---@$

@@ -3864,6 +3864,12 @@ local x = function (x, y) end
 (EXISTS)
 
 TEST [[
+--- <??>
+local x = function (x, y) end
+]]
+(EXISTS)
+
+TEST [[
 local x = {
 <??>
 })

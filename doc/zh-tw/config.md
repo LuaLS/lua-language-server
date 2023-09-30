@@ -2172,17 +2172,24 @@ true
 * skynet
 * Jass
 
+Value can be one of:
+* `Ask` (ask every time)
+* `Apply` (always apply third-party libraries and set the workspace
+  configuration)
+* `ApplyInMemory` (always apply third-party libraries but don't set the
+  workspace configuration)
+* `Disable` (don't ask and don't apply)
 
 ## type
 
 ```ts
-boolean
+string
 ```
 
 ## default
 
 ```jsonc
-true
+"Ask"
 ```
 
 # workspace.ignoreDir

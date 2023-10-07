@@ -2,6 +2,7 @@ local lclient = require 'lclient'
 local ws = require 'workspace'
 local furi = require 'file-uri'
 local files = require 'files'
+local diagnostic = require 'provider.diagnostic'
 
 --TODO how to changed the runtime version?
 local template = require 'config.template'
@@ -29,10 +30,14 @@ lclient():start(function (languageClient)
         rootUri = rootUri,
     }
 
+    diagnostic.pause()
+
     ws.awaitReady(rootUri)
 
     require 'plugins.ffi.cdef'
     require 'plugins.ffi.parser'
     require 'plugins.ffi.builder'
     TestBuilder()
+
+    diagnostic.resume()
 end)

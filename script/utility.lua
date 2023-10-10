@@ -190,38 +190,48 @@ function m.dump(tbl, option)
 end
 
 --- 递归判断A与B是否相等
----@param a any
----@param b any
+---@param valueA any
+---@param valueB any
 ---@return boolean
-function m.equal(a, b)
-    local tp1 = type(a)
-    local tp2 = type(b)
-    if tp1 ~= tp2 then
-        return false
-    end
-    if tp1 == 'table' then
-        local mark = {}
-        for k, v in pairs(a) do
-            mark[k] = true
-            local res = m.equal(v, b[k])
-            if not res then
-                return false
-            end
+function m.equal(valueA, valueB)
+    local hasChecked = {}
+
+    local function equal(a, b)
+        local tp1 = type(a)
+        local tp2 = type(b)
+        if tp1 ~= tp2 then
+            return false
         end
-        for k in pairs(b) do
-            if not mark[k] then
-                return false
+        if tp1 == 'table' then
+            if hasChecked[a] then
+                return true
             end
-        end
-        return true
-    elseif tp1 == 'number' then
-        if mathAbs(a - b) <= 1e-10 then
+            hasChecked[a] = true
+            local mark = {}
+            for k, v in pairs(a) do
+                mark[k] = true
+                local res = equal(v, b[k])
+                if not res then
+                    return false
+                end
+            end
+            for k in pairs(b) do
+                if not mark[k] then
+                    return false
+                end
+            end
             return true
+        elseif tp1 == 'number' then
+            if mathAbs(a - b) <= 1e-10 then
+                return true
+            end
+            return tostring(a) == tostring(b)
+        else
+            return a == b
         end
-        return tostring(a) == tostring(b)
-    else
-        return a == b
     end
+
+    return equal(valueA, valueB)
 end
 
 local function sortTable(tbl)

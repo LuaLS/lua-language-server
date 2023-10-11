@@ -258,6 +258,7 @@ Array<string>
 * ``"global-in-nil-env"``
 * ``"incomplete-signature-doc"``
 * ``"index-in-func-name"``
+* ``"inject-field"``
 * ``"invisible"``
 * ``"jump-local-scope"``
 * ``"keyword"``
@@ -505,6 +506,7 @@ object<string, string>
     * assign-type-mismatch
     * cast-local-type
     * cast-type-mismatch
+    * inject-field
     * need-check-nil
     * param-type-mismatch
     * return-type-mismatch
@@ -633,6 +635,7 @@ object<string, string>
     * assign-type-mismatch
     * cast-local-type
     * cast-type-mismatch
+    * inject-field
     * need-check-nil
     * param-type-mismatch
     * return-type-mismatch
@@ -826,6 +829,7 @@ object<string, string>
     Incomplete @param or @return annotations for functions.
     */
     "incomplete-signature-doc": "None",
+    "inject-field": "Opened",
     /*
     Enable diagnostics for accesses to fields which are invisible.
     */
@@ -1095,6 +1099,7 @@ object<string, string>
     Incomplete @param or @return annotations for functions.
     */
     "incomplete-signature-doc": "Warning",
+    "inject-field": "Warning",
     /*
     Enable diagnostics for accesses to fields which are invisible.
     */
@@ -1853,7 +1858,7 @@ false
 
 # runtime.plugin
 
-Plugin path. Please read the [wiki](https://luals.github.io/wiki/plugins) to learn more.
+Plugin path. Please read [wiki](https://luals.github.io/wiki/plugins) to learn more.
 
 ## type
 

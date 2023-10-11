@@ -523,7 +523,7 @@ math.maxinteger['>5.3']     =
 'Retorna o valor máximo para um inteiro.'
 math.min                    =
 'Retorna o argumento com o valor mínimo de acordo com o operador `<`.'
-math.mixinteger['>5.3']     =
+math.mininteger['>5.3']     =
 'Retorna o valor mínimo para um inteiro.'
 math.modf                   =
 'Retorna a parte inteira e a parte fracionária de `x`.'

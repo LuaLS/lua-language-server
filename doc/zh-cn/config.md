@@ -258,6 +258,7 @@ Array<string>
 * ``"global-in-nil-env"``
 * ``"incomplete-signature-doc"``
 * ``"index-in-func-name"``
+* ``"inject-field"``
 * ``"invisible"``
 * ``"jump-local-scope"``
 * ``"keyword"``
@@ -505,6 +506,7 @@ object<string, string>
     * assign-type-mismatch
     * cast-local-type
     * cast-type-mismatch
+    * inject-field
     * need-check-nil
     * param-type-mismatch
     * return-type-mismatch
@@ -633,6 +635,7 @@ object<string, string>
     * assign-type-mismatch
     * cast-local-type
     * cast-type-mismatch
+    * inject-field
     * need-check-nil
     * param-type-mismatch
     * return-type-mismatch
@@ -738,7 +741,7 @@ object<string, string>
 ```jsonc
 {
     /*
-    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1`
+    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1` 
     */
     "ambiguity-1": "Any",
     /*
@@ -826,6 +829,7 @@ object<string, string>
     Incomplete @param or @return annotations for functions.
     */
     "incomplete-signature-doc": "None",
+    "inject-field": "Opened",
     /*
     Enable diagnostics for accesses to fields which are invisible.
     */
@@ -1006,7 +1010,7 @@ object<string, string>
 ```jsonc
 {
     /*
-    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1`
+    优先级歧义，如：`num or 0 + 1`，推测用户的实际期望为 `(num or 0) + 1` 
     */
     "ambiguity-1": "Warning",
     /*
@@ -1094,6 +1098,7 @@ object<string, string>
     Incomplete @param or @return annotations for functions.
     */
     "incomplete-signature-doc": "Warning",
+    "inject-field": "Warning",
     /*
     Enable diagnostics for accesses to fields which are invisible.
     */
@@ -1659,7 +1664,7 @@ string
 
 # misc.parameters
 
-VSCode中启动语言服务时的[命令行参数](https://luals.github.io/wiki/usage/#arguments)。
+VSCode中启动语言服务时的[命令行参数](https://luals.github.io/wiki/usage#arguments)。
 
 ## type
 

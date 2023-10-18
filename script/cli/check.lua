@@ -99,7 +99,10 @@ end
 if count == 0 then
     print(lang.script('CLI_CHECK_SUCCESS'))
 else
-    local outpath = LOGPATH .. '/check.json'
+    local outpath = CHECK_OUT_PATH
+    if outpath == nil then
+        outpath = LOGPATH .. '/check.json'
+    end
     util.saveFile(outpath, jsonb.beautify(results))
 
     print(lang.script('CLI_CHECK_RESULTS', count, outpath))

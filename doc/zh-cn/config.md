@@ -2176,13 +2176,20 @@ true
 ## type
 
 ```ts
-boolean
+string
 ```
+
+## enum
+
+* ``"Ask"``
+* ``"Apply"``
+* ``"ApplyInMemory"``
+* ``"Disable"``
 
 ## default
 
 ```jsonc
-true
+"Ask"
 ```
 
 # workspace.ignoreDir

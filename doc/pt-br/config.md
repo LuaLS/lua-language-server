@@ -2177,13 +2177,20 @@ Automatic detection and adaptation of third-party libraries, currently supported
 ## type
 
 ```ts
-boolean
+string
 ```
+
+## enum
+
+* ``"Ask"``
+* ``"Apply"``
+* ``"ApplyInMemory"``
+* ``"Disable"``
 
 ## default
 
 ```jsonc
-true
+"Ask"
 ```
 
 # workspace.ignoreDir

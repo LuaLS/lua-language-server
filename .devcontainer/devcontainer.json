@@ -1,0 +1,13 @@
+{
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "sumneko.lua"
+            ]
+        }
+    },
+    "appPort": 5050
+}

@@ -125,6 +125,7 @@ function stream:select_w()
     if n == nil then
         self.shutdown_w = true
         close_write(self)
+    elseif n == false then
     else
         self._writebuf = self._writebuf:sub(n + 1)
         if self._writebuf == "" then

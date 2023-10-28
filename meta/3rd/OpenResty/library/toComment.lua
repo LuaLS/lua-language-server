@@ -1,3 +1,0 @@
----@meta
-toComment={}
-return toComment

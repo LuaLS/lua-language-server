@@ -37,3 +37,6 @@
 [submodule "meta/3rd/Jass"]
 	path = meta/3rd/Jass
 	url = https://github.com/LuaCATS/jass.git
+[submodule "meta/3rd/lfs"]
+	path = meta/3rd/lfs
+	url = https://github.com/LuaCATS/luafilesystem.git

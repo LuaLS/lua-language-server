@@ -19,3 +19,6 @@
 [submodule "3rd/json.lua"]
 	path = 3rd/json.lua
 	url = https://github.com/actboy168/json.lua
+[submodule "meta/3rd/OpenResty"]
+	path = meta/3rd/OpenResty
+	url = https://github.com/LuaCATS/openresty.git

@@ -31,3 +31,6 @@
 [submodule "meta/3rd/Cocos4.0"]
 	path = meta/3rd/Cocos4.0
 	url = https://github.com/LuaCATS/cocos4.0.git
+[submodule "meta/3rd/Defold"]
+	path = meta/3rd/Defold
+	url = https://github.com/LuaCATS/defold.git

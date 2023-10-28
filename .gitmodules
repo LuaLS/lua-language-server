@@ -46,3 +46,6 @@
 [submodule "meta/3rd/lovr"]
 	path = meta/3rd/lovr
 	url = https://github.com/LuaCATS/lovr.git
+[submodule "meta/3rd/luaecs"]
+	path = meta/3rd/luaecs
+	url = https://github.com/LuaCATS/luaecs.git

@@ -28,3 +28,6 @@
 [submodule "meta/3rd/busted"]
 	path = meta/3rd/busted
 	url = https://github.com/LuaCATS/busted.git
+[submodule "meta/3rd/Cocos4.0"]
+	path = meta/3rd/Cocos4.0
+	url = https://github.com/LuaCATS/cocos4.0.git

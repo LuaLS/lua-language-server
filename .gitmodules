@@ -58,3 +58,6 @@
 [submodule "meta/3rd/ffi-reflect"]
 	path = meta/3rd/ffi-reflect
 	url = git@github.com:LuaCATS/ffi-reflect.git
+[submodule "meta/3rd/luv"]
+	path = meta/3rd/luv
+	url = git@github.com:LuaCATS/luv.git

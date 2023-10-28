@@ -49,3 +49,6 @@
 [submodule "meta/3rd/luaecs"]
 	path = meta/3rd/luaecs
 	url = https://github.com/LuaCATS/luaecs.git
+[submodule "meta/3rd/luassert"]
+	path = meta/3rd/luassert
+	url = https://github.com/LuaCATS/luassert.git

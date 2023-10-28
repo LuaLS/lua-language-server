@@ -22,3 +22,6 @@
 [submodule "meta/3rd/OpenResty"]
 	path = meta/3rd/OpenResty
 	url = https://github.com/LuaCATS/openresty.git
+[submodule "meta/3rd/bee"]
+	path = meta/3rd/bee
+	url = https://github.com/LuaCATS/bee.git

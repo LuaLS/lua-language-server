@@ -34,3 +34,6 @@
 [submodule "meta/3rd/Defold"]
 	path = meta/3rd/Defold
 	url = https://github.com/LuaCATS/defold.git
+[submodule "meta/3rd/Jass"]
+	path = meta/3rd/Jass
+	url = https://github.com/LuaCATS/jass.git

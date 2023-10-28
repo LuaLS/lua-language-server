@@ -40,3 +40,6 @@
 [submodule "meta/3rd/lfs"]
 	path = meta/3rd/lfs
 	url = https://github.com/LuaCATS/luafilesystem.git
+[submodule "meta/3rd/love2d"]
+	path = meta/3rd/love2d
+	url = https://github.com/LuaCATS/love2d.git

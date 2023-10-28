@@ -52,3 +52,6 @@
 [submodule "meta/3rd/luassert"]
 	path = meta/3rd/luassert
 	url = https://github.com/LuaCATS/luassert.git
+[submodule "meta/3rd/skynet"]
+	path = meta/3rd/skynet
+	url = https://github.com/LuaCATS/skynet.git

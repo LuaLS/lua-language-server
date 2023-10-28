@@ -43,3 +43,6 @@
 [submodule "meta/3rd/love2d"]
 	path = meta/3rd/love2d
 	url = https://github.com/LuaCATS/love2d.git
+[submodule "meta/3rd/lovr"]
+	path = meta/3rd/lovr
+	url = https://github.com/LuaCATS/lovr.git

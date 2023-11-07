@@ -610,9 +610,13 @@ local function check3rd(uri)
     end
     local checkThirdParty = config.get(uri, 'Lua.workspace.checkThirdParty')
     -- Backwards compatability: `checkThirdParty` used to be a boolean.
-    if not checkThirdParty or checkThirdParty == 'Disable' then
+    -- Note: `checkThirdParty` is defined as a string, so if a boolean is
+    -- supplied, it's converted to a string by the `config.config` module.
+    -- Hence we check for the strings `'true'` and `'false`' here, rather than
+    -- the boolean literals.
+    if checkThirdParty == 'Disable' or checkThirdParty == 'false' then
         return
-    elseif checkThirdParty == true then
+    elseif checkThirdParty == 'true' then
         checkThirdParty = 'Ask'
     end
     local scp = scope.getScope(uri)

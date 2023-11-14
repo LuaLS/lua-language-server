@@ -1,5 +1,8 @@
 # changelog
 
+## 3.7.3
+* `FIX` can not infer arg type in some cases.
+
 ## 3.7.2
 `2023-11-9`
 * `FIX` [#2407]

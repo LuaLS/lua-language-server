@@ -4393,3 +4393,23 @@ f {
         kind  = define.CompletionItemKind.Property,
     },
 }
+
+TEST [[
+---@class A
+---@overload fun(x: {id: string})
+
+---@generic T
+---@param t `T`
+---@return T
+local function new(t) end
+
+new 'A' {
+    <??>
+}
+]]
+{
+    {
+        label = 'id',
+        kind  = define.CompletionItemKind.Property,
+    }
+}

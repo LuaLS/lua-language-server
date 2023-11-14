@@ -1659,7 +1659,7 @@ local function tryCallArg(state, position, results)
         return
     end
     ---@diagnostic disable-next-line: missing-fields
-    local node = vm.compileCallArg({ type = 'dummyarg' }, call, argIndex)
+    local node = vm.compileCallArg({ type = 'dummyarg', uri = state.uri }, call, argIndex)
     if not node then
         return
     end

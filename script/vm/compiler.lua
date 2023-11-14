@@ -882,52 +882,69 @@ local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
         end
     end
 
-    for n in callNode:eachObject() do
-        if n.type == 'function' then
-            ---@cast n parser.object
-            local sign = vm.getSign(n)
+    ---@param n parser.object
+    local function dealDocFunc(n)
+        local myEvent
+        if n.args[eventIndex] then
+            local argNode = vm.compileNode(n.args[eventIndex])
+            myEvent = argNode:get(1)
+        end
+        if not myEvent
+        or not eventMap
+        or myIndex <= eventIndex
+        or myEvent.type ~= 'doc.type.string'
+        or eventMap[myEvent[1]] then
             local farg = getFuncArg(n, myIndex)
             if farg then
                 for fn in vm.compileNode(farg):eachObject() do
                     if isValidCallArgNode(arg, fn) then
-                        if fn.type == 'doc.type.function' then
-                            ---@cast fn parser.object
-                            if sign then
-                                local generic = vm.createGeneric(fn, sign)
-                                local args    = {}
-                                for i = fixIndex + 1, myIndex - 1 do
-                                    args[#args+1] = call.args[i]
-                                end
-                                local resolvedNode = generic:resolve(guide.getUri(call), args)
-                                vm.setNode(arg, resolvedNode)
-                                goto CONTINUE
-                            end
-                        end
                         vm.setNode(arg, fn)
-                        ::CONTINUE::
                     end
                 end
             end
         end
-        if n.type == 'doc.type.function' then
-            ---@cast n parser.object
-            local myEvent
-            if n.args[eventIndex] then
-                local argNode = vm.compileNode(n.args[eventIndex])
-                myEvent = argNode:get(1)
-            end
-            if not myEvent
-            or not eventMap
-            or myIndex <= eventIndex
-            or myEvent.type ~= 'doc.type.string'
-            or eventMap[myEvent[1]] then
-                local farg = getFuncArg(n, myIndex)
-                if farg then
-                    for fn in vm.compileNode(farg):eachObject() do
-                        if isValidCallArgNode(arg, fn) then
-                            vm.setNode(arg, fn)
+    end
+
+    ---@param n parser.object
+    local function dealFunction(n)
+        local sign = vm.getSign(n)
+        local farg = getFuncArg(n, myIndex)
+        if farg then
+            for fn in vm.compileNode(farg):eachObject() do
+                if isValidCallArgNode(arg, fn) then
+                    if fn.type == 'doc.type.function' then
+                        ---@cast fn parser.object
+                        if sign then
+                            local generic = vm.createGeneric(fn, sign)
+                            local args    = {}
+                            for i = fixIndex + 1, myIndex - 1 do
+                                args[#args+1] = call.args[i]
+                            end
+                            local resolvedNode = generic:resolve(guide.getUri(call), args)
+                            vm.setNode(arg, resolvedNode)
+                            goto CONTINUE
                         end
                     end
+                    vm.setNode(arg, fn)
+                    ::CONTINUE::
+                end
+            end
+        end
+    end
+
+    for n in callNode:eachObject() do
+        if n.type == 'function' then
+            ---@cast n parser.object
+            dealFunction(n)
+        elseif n.type == 'doc.type.function' then
+            ---@cast n parser.object
+            dealDocFunc(n)
+        elseif n.type == 'global' and n.cate == 'type' then
+            ---@cast n vm.global
+            local overloads = vm.getOverloadsByTypeName(n.name, guide.getUri(arg))
+            if overloads then
+                for _, func in ipairs(overloads) do
+                    dealDocFunc(func)
                 end
             end
         end

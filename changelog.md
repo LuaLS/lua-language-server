@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.7.3
+`2023-11-14`
 * `FIX` can not infer arg type in some cases.
 
 ## 3.7.2

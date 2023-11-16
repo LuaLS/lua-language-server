@@ -43,25 +43,6 @@
 			},
 		},
 		{
-			"name": "🍉build-3rd-meta",
-			"type": "lua",
-			"request": "launch",
-			"stopOnEntry": false,
-			"luaexe": "${workspaceFolder}/bin/lua-language-server",
-			"program": "${workspaceRoot}/tools/build-3rd-meta.lua",
-			"cpath": "${workspaceFolder}/bin/?.dll;${workspaceFolder}/bin/?.so",
-			"console": "integratedTerminal",
-			"internalConsoleOptions": "openOnSessionStart",
-			"arg": [
-			],
-			"luaVersion": "lua-latest",
-			"sourceCoding": "utf8",
-			"outputCapture": [
-				"print",
-				"stderr",
-			],
-		},
-		{
 			"name": "📝locale",
 			"type": "lua",
 			"request": "launch",

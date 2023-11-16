@@ -707,6 +707,8 @@ function m.trim(str, mode)
     return (str:match '^%s*(.-)%s*$')
 end
 
+---@param path string
+---@return string
 function m.expandPath(path)
     if path:sub(1, 1) == '~' then
         local home = getenv('HOME')

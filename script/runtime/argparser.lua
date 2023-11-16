@@ -1,4 +1,4 @@
----@class ArgParser
+---@class Runtime.ArgParser
 local M = {}
 
 ---@alias ArgParser.Value string | number | boolean

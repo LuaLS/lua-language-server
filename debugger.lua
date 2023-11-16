@@ -1,66 +1,37 @@
-if not DEVELOP then
-    return
-end
+local INSIDERS = false
 
-local fs = require 'bee.filesystem'
-local luaDebugs = {}
-
-local home = os.getenv 'USERPROFILE' or os.getenv 'HOME'
-if not home then
-    log.error('Cannot find home directory')
-    return
-end
-for _, vscodePath in ipairs { '.vscode', '.vscode-insiders', '.vscode-server-insiders' } do
-    local extensionPath =  fs.path(home) / vscodePath / 'extensions'
-    log.debug('Search extensions at:', extensionPath:string())
-
-    if fs.exists(extensionPath) then
-        for path in fs.pairs(extensionPath) do
-            if fs.is_directory(path) then
-                local name = path:filename():string()
-                if name:find('actboy168.lua-debug-', 1, true) then
-                    luaDebugs[#luaDebugs+1] = path:string()
-                end
-            end
+local function searchDebugger(luaDebugs, tag)
+    if INSIDERS then
+        tag = tag .. "-insiders"
+    end
+    local isWindows = package.config:sub(1,1) == "\\"
+    local extensionPath = (isWindows and os.getenv "USERPROFILE" or os.getenv "HOME") .. "/.vscode"..tag.."/extensions"
+    local command = isWindows and ("dir /B " .. extensionPath:gsub("/", "\\") .. " 2>nul") or ("ls -1 " .. extensionPath .. " 2>/dev/null")
+    for name in io.popen(command):lines() do
+        local a, b, c = name:match "^actboy168%.lua%-debug%-(%d+)%.(%d+)%.(%d+)"
+        if a then
+            luaDebugs[#luaDebugs+1] = { a * 10000 + b * 100 + c, extensionPath .. "/" .. name }
         end
     end
 end
 
-if #luaDebugs == 0 then
-    log.debug('Cant find "actboy168.lua-debug"')
-    return
-end
-
-local function getVer(filename)
-    local a, b, c = filename:match('actboy168%.lua%-debug%-(%d+)%.(%d+)%.(%d+)')
-    if not a then
-        return 0
+local function getLatestDebugger()
+    local luaDebugs = {}
+    searchDebugger(luaDebugs, "")
+    searchDebugger(luaDebugs, "-server")
+    if #luaDebugs == 0 then
+        error "Cant find `actboy168.lua-debug`"
     end
-    return a * 1000000 + b * 1000 + c
+    table.sort(luaDebugs, function (a, b) return a[1] == b[1] and a[2] > b[2] or a[1] > b[1] end)
+    return luaDebugs[1][2]
 end
 
-table.sort(luaDebugs, function (a, b)
-    return getVer(a) > getVer(b)
-end)
-
-local debugPath = luaDebugs[1]
-local cpath     = "/runtime/win64/lua54/?.dll;/runtime/win64/lua54/?.so"
-local path      = "/script/?.lua"
-
-local function tryDebugger()
-    local entry = assert(package.searchpath('debugger', debugPath .. path))
-    local root = debugPath
-    local addr = ("127.0.0.1:%d"):format(DBGPORT)
-    local dbg = loadfile(entry)(entry)
-    dbg:start {
-        address = addr,
-    }
-    log.debug('Debugger startup, listen port:', DBGPORT)
-    log.debug('Debugger args:', addr, root, path, cpath)
-    if DBGWAIT then
-        dbg:event('wait')
-    end
-    return dbg
+local function dofile(filename)
+    local f = assert(io.open(filename))
+    local str = f:read "*a"
+    f:close()
+    return assert(load(str, "=(debugger.lua)"))(filename)
 end
 
-xpcall(tryDebugger, log.debug)
+local path = getLatestDebugger()
+return dofile(path .. "/script/debugger.lua")

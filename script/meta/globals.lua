@@ -1,0 +1,2 @@
+---@meta _
+jit = nil

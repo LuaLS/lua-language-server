@@ -1,51 +1,22 @@
-local fs      = require 'bee.filesystem'
-local util    = require 'utility'
-local version = require 'version'
+local fs        = require 'bee.filesystem'
 
-local function getValue(value)
-    if     value == 'true' or value == nil then
-        value = true
-    elseif value == 'false' then
-        value = false
-    elseif tonumber(value) then
-        value = tonumber(value)
-    elseif value:sub(1, 1) == '"' and value:sub(-1, -1) == '"' then
-        value = value:sub(2, -2)
-    end
-    return value
-end
+---@class LuaLS
+luals = {}
 
-local function loadArgs()
-    ---@type string?
-    local lastKey
-    for _, v in ipairs(arg) do
-        ---@type string?
-        local key, tail = v:match '^%-%-([%w_]+)(.*)$'
-        local value
-        if key then
-            value   = tail:match '=(.+)'
-            lastKey = nil
-            if not value then
-                lastKey = key
-            end
-        else
-            if lastKey then
-                key     = lastKey
-                value   = v
-                lastKey = nil
-            end
-        end
-        if key then
-            _G[key:upper():gsub('-', '_')] = getValue(value)
-        end
-    end
-end
+luals.util    = require 'tools.utility'
+luals.inspect = require 'tools.inspect'
+luals.json    = require 'tools.json'
+package.loaded['json'] = luals.json
+require 'tools.json-beautify'
+require 'tools.jsonc'
+require 'tools.json-edit'
 
-loadArgs()
+--语言服务器自身的状态
+---@class LuaLS.Runtime
+luals.runtime = require 'runtime.lua'
 
 local currentPath = debug.getinfo(1, 'S').source:sub(2)
 local rootPath    = currentPath:gsub('[/\\]*[^/\\]-$', '')
-
 rootPath = (rootPath == '' and '.' or rootPath)
 ROOT     = fs.path(util.expandPath(rootPath))
 LOGPATH  = LOGPATH  and util.expandPath(LOGPATH)  or (ROOT:string() .. '/log')

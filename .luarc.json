@@ -2,8 +2,6 @@
     "diagnostics": {
         "disable": [
             "close-non-object",
-            "incomplete-signature-doc",
-            "missing-global-doc",
             "missing-local-export-doc"
         ],
         "groupFileStatus": {
@@ -49,8 +47,12 @@
             "format_line": "false"
         }
     },
+    "hover": {
+        "expandAlias": false
+    },
     "type": {
-        "castNumberToInteger": false
+        "castNumberToInteger": false,
+        "weakUnionCheck": false
     },
     "doc": {
         "privateName": [

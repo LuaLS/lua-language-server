@@ -7,9 +7,6 @@ local M = {}
 
 --启动时的命令行参数
 ---@class LuaLS.Runtime.Args
----@field DEVELOP? boolean # 是否为开发模式
----@field DBGPORT? integer # 调试器端口号，默认为 11411
----@field DBGADDRESS? string # 调试器地址，默认为 '127.0.0.1'
 M.args = {
     --指定日志输出目录，默认为 `./log`
     LOGPATH = '$LUALSPATH/log',

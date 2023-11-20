@@ -24,9 +24,8 @@
         "path": [
             "script/?.lua",
             "script/?/init.lua",
-            "test/?.lua",
-            "test/?/init.lua",
-            "script/meta/?.lua"
+            "?.lua",
+            "?/init.lua"
         ],
         "pathStrict": true
     },

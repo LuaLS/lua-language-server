@@ -1,31 +1,8 @@
-local core  = require 'core.definition'
-local files = require 'files'
-local vm    = require 'vm'
-local catch = require 'catch'
-
-rawset(_G, 'TEST', true)
-
-local function founded(targets, results)
-    if #targets ~= #results then
-        return false
-    end
-    for _, target in ipairs(targets) do
-        for _, result in ipairs(results) do
-            if target[1] == result[1] and target[2] == result[2] then
-                goto NEXT
-            end
-        end
-        do return false end
-        ::NEXT::
-    end
-    return true
-end
-
 ---@async
+---@param script string
 function TEST(script)
-    local newScript, catched = catch(script, '!?')
-
-    files.setText(TESTURI, newScript)
+    local newScript, catched = test.catch(script, '!?')
+    test.singleFile(newScript)
 
     local results = core(TESTURI, catched['?'][1][1])
     if results then
@@ -43,14 +20,14 @@ function TEST(script)
     files.remove(TESTURI)
 end
 
-require 'definition.local'
-require 'definition.set'
-require 'definition.field'
-require 'definition.arg'
-require 'definition.function'
-require 'definition.table'
-require 'definition.method'
-require 'definition.label'
-require 'definition.special'
-require 'definition.bug'
-require 'definition.luadoc'
+require 'test.definition.local'
+require 'test.definition.set'
+require 'test.definition.field'
+require 'test.definition.arg'
+require 'test.definition.function'
+require 'test.definition.table'
+require 'test.definition.method'
+require 'test.definition.label'
+require 'test.definition.special'
+require 'test.definition.bug'
+require 'test.definition.luadoc'

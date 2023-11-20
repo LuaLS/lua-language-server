@@ -16,7 +16,13 @@ package.loaded['json-beautify'] = require 'tools.json-beautify'
 require 'tools.jsonc'
 require 'tools.json-edit'
 require 'tools.log'
+require 'tools.linked-table'
+require 'file'
 
 luals.uri     = require 'tools.uri'
+luals.config  = require 'config'
+luals.files   = New 'FileManager' ()
+---@type VM?
+luals.vm      = nil
 
 return luals

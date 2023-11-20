@@ -1,4 +1,4 @@
-local m = require 'lpeglabel'
+local l = require 'lpeglabel'
 
 ---@class Catched
 ---@operator add: Catched
@@ -22,14 +22,44 @@ function mt.__add(a, b)
     return t
 end
 
+function mt.__eq(a, b)
+    if not a or not b then
+        return false
+    end
+    if #a ~= #b then
+        return false
+    end
+    table.sort(a, function (m, n)
+        if m[1] == n[1] then
+            return m[2] < n[2]
+        end
+        return m[1] < n[1]
+    end)
+    table.sort(b, function (m, n)
+        if m[1] == n[1] then
+            return m[2] < n[2]
+        end
+        return m[1] < n[1]
+    end)
+    for i = 1, #a do
+        if a[i][1] ~= b[i][1] then
+            return false
+        end
+        if a[i][2] ~= b[i][2] then
+            return false
+        end
+    end
+    return true
+end
+
 local function parseTokens(script, seps)
-    local parser = m.P {
-        m.Ct(m.V 'Token'^0),
-        Token = m.Cp() * (m.V 'Mark' + m.V 'Nl' + m.V 'Text'),
-        Mark  = m.Cc 'ML' * m.P '<' * m.C(m.S(seps))
-              + m.Cc 'MR' * m.C(m.S(seps)) * m.P '>',
-        Nl    = m.Cc 'NL' * m.C(m.P '\r\n' + m.S '\r\n'),
-        Text  = m.Cc 'TX' * m.C((1 - m.V 'Nl' - m.V 'Mark')^1),
+    local parser = l.P {
+        l.Ct(l.V 'Token'^0),
+        Token = l.Cp() * (l.V 'Mark' + l.V 'Nl' + l.V 'Text'),
+        Mark  = l.Cc 'ML' * l.P '<' * l.C(l.S(seps))
+              + l.Cc 'MR' * l.C(l.S(seps)) * l.P '>',
+        Nl    = l.Cc 'NL' * l.C(l.P '\r\n' + l.S '\r\n'),
+        Text  = l.Cc 'TX' * l.C((1 - l.V 'Nl' - l.V 'Mark')^1),
     }
     local results = parser:match(script)
     return results

@@ -21,3 +21,5 @@ xpcall(function ()
 end, log.warn)
 
 print = log.debug
+
+require 'core'

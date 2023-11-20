@@ -38,3 +38,8 @@ xpcall(function ()
 end, log.warn)
 
 print = log.debug
+
+luals.API = require 'master.api'
+
+luals.eventLoop = require 'master.eventLoop'
+luals.eventLoop.startEventLoop()

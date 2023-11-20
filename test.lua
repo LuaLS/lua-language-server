@@ -27,6 +27,17 @@ log = New 'Log' {
 ---@class Test
 test = {}
 test.catch = require 'test.catch'
+
 test.rootPath = luals.runtime.rootPath .. '/test_root'
 test.rootUri  = luals.uri.encode(test.rootPath)
 test.fileUri  = luals.uri.encode(test.rootPath .. '/unittest.lua')
+
+test.singleFile = function (text)
+    luals.files = New 'FileManager' ()
+    luals.files:setText(test.fileUri, text)
+    luals.files:flush()
+    luals.vm = New 'VM' (luals.files)
+end
+
+print('开始测试')
+require 'test.definition'

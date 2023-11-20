@@ -5,7 +5,7 @@ local time = require 'bee.time'
 ---@class LuaLS.Runtime
 luals.runtime = require 'runtime'
 
-fs.create_directories(fs.path(luals.runtime.rootPath) / 'log')
+fs.create_directories(fs.path(luals.runtime.logPath))
 
 ---@class Log
 log = New 'Log' {

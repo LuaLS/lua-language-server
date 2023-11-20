@@ -12,9 +12,9 @@ local M = {}
 ---@field DBGADDRESS? string # 调试器地址，默认为 '127.0.0.1'
 M.args = {
     --指定日志输出目录，默认为 `./log`
-    LOGPATH = '${LUALS}/log',
+    LOGPATH = '$LUALSPATH/log',
     --指定meta文件的生成目录，默认为 `./meta`
-    METAPATH = '${LUALS}/meta',
+    METAPATH = '$LUALSPATH/meta',
     --是否为开发模式
     DEVELOP = false,
     --调试器端口号，默认为 11411
@@ -40,39 +40,42 @@ M.args = {
     ---@type 'Error' | 'Warning' | 'Information' | 'Hint'
     CHECKLEVEL = 'Warning',
     --诊断报告生成的文件路径（json），默认为 `$LOGPATH/check.json`
-    CHECK_OUT_PATH = '${LOGPATH}/check.json',
+    CHECK_OUT_PATH = '$LOGPATH/check.json',
 
     --命令行：生成文档
     DOC = '',
 }
 luals.util.tableMerge(M.args, argparser.parse(arg, true))
 
---启动时的版本号
-M.version = version.getVersion()
-
---路径相关
----@class LuaLS.Path
-M.path = {}
-
 ---@return string
 local function findRoot()
-    local lastPath
-    for i = 1, 10 do
-        local currentPath = debug.getinfo(i, 'S').source
-        if currentPath:sub(1, 1) ~= '@' then
+    local currentPath
+    for i = 1, 100 do
+        currentPath = debug.getinfo(i, 'S').source
+        if currentPath:match '@%a:' then
             break
         end
-        lastPath = currentPath:sub(2)
     end
-    assert(lastPath, 'Can not find root path')
-    local rootPath = lastPath:gsub('[/\\]*[^/\\]-$', '')
+    assert(currentPath, 'Can not find root path')
+    local rootPath = currentPath:sub(2):gsub('[/\\]*[^/\\]-$', '')
     rootPath = (rootPath == '' and '.' or rootPath)
     return rootPath
 end
 
+--环境变量
+M.env = {}
 --语言服务器根路径
-M.rootUri = luals.uri.encode(luals.util.expandPath(findRoot()))
-M.logUri  = luals.uri.encode(luals.util.expandPath(M.args.LOGPATH))
-M.metaUri = luals.uri.encode(luals.util.expandPath(M.args.METAPATH))
+M.rootPath      = luals.util.expandPath(findRoot())
+M.env.LUALSPATH = M.rootPath
+M.logPath       = luals.util.expandPath(M.args.LOGPATH, M.env)
+M.env.LOGPATH   = M.logPath
+M.metaPath      = luals.util.expandPath(M.args.METAPATH, M.env)
+M.env.METAPATH  = M.metaPath
+M.rootUri       = luals.uri.encode(M.rootPath)
+M.logUri        = luals.uri.encode(M.logPath)
+M.metaUri       = luals.uri.encode(M.metaPath)
+
+--启动时的版本号
+M.version = version.getVersion(M.rootPath)
 
 return M

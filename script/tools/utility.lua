@@ -708,8 +708,9 @@ function m.trim(str, mode)
 end
 
 ---@param path string
+---@param env? table
 ---@return string
-function m.expandPath(path)
+function m.expandPath(path, env)
     if path:sub(1, 1) == '~' then
         local home = getenv('HOME')
         if not home then -- has to be Windows
@@ -717,7 +718,9 @@ function m.expandPath(path)
         end
         return home .. path:sub(2)
     elseif path:sub(1, 1) == '$' then
-        path = path:gsub('%$([%w_]+)', getenv)
+        path = path:gsub('%$([%w_]+)', function (name)
+            return env and env[name] or getenv(name)
+        end)
         return path
     end
     return path

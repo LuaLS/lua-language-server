@@ -30,7 +30,7 @@ M.time = os.time
 ---@private
 M.messageFormat = '[%s][%5s][%s]: %s\n'
 
----@enum (key) Log.Level
+---@enum(key) Log.Level
 M.logLevel = {
     trace = 1,
     debug = 2,

@@ -1,6 +1,7 @@
-local function loadVersion()
-    local changelogUri = luals.uri.join(luals.runtime.rootUri, 'changelog.md')
-    local changelog = luals.util.loadFile(luals.uri.decode(changelogUri))
+---@param rootPath string
+---@return string?
+local function loadVersion(rootPath)
+    local changelog = luals.util.loadFile(rootPath .. '/changelog.md')
     if not changelog then
         return
     end
@@ -19,10 +20,11 @@ end
 ---@class Runtime.VersionParser
 local M = {}
 
+---@param rootPath string
 ---@return string
-function M.getVersion()
+function M.getVersion(rootPath)
     if not M.version then
-        M.version = loadVersion() or '<Unknown>'
+        M.version = loadVersion(rootPath) or '<Unknown>'
     end
 
     return M.version

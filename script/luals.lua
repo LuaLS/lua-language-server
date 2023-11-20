@@ -10,9 +10,10 @@ luals.inspect = require 'tools.inspect'
 
 luals.json    = require 'tools.json'
 package.loaded['json'] = luals.json
-require 'tools.json-beautify'
+package.loaded['json-beautify'] = require 'tools.json-beautify'
 require 'tools.jsonc'
 require 'tools.json-edit'
+require 'tools.log'
 
 luals.uri     = require 'tools.uri'
 

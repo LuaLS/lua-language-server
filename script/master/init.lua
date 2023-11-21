@@ -6,6 +6,8 @@ luals.threadName = 'master'
 --语言服务器自身的状态
 ---@class LuaLS.Runtime
 luals.runtime = require 'runtime'
+luals.API = require 'master.api'
+luals.eventLoop = require 'master.eventLoop'
 
 fs.create_directories(fs.path(luals.runtime.logPath))
 
@@ -39,7 +41,8 @@ end, log.warn)
 
 print = log.debug
 
-luals.API = require 'master.api'
+luals.eventLoop.addTask(luals.timer.update)
 
-luals.eventLoop = require 'master.eventLoop'
+luals.task.setTimer(luals.timer.wait)
+
 luals.eventLoop.startEventLoop()

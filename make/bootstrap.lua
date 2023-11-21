@@ -61,6 +61,8 @@ end
 package.path = table.concat({
     root .. "/script/?.lua",
     root .. "/script/?/init.lua",
+    root .. "/script/tools/?.lua",
+    root .. "/script/tools/?/init.lua",
 }, ";"):gsub('/', package.config:sub(1, 1))
 
 package.searchers[2] = function (name)

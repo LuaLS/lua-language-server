@@ -24,6 +24,8 @@
         "path": [
             "script/?.lua",
             "script/?/init.lua",
+            "script/tools/?.lua",
+            "script/tools/?/init.lua",
             "?.lua",
             "?/init.lua"
         ],

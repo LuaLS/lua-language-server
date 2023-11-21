@@ -74,8 +74,17 @@ function M:removeFile(uri)
     return file
 end
 
+---@type Timer?
+M.flushDelayTimer = nil
+
 ---@return boolean
 function M:flush()
+    if M.flushDelayTimer then
+        M.flushDelayTimer:remove()
+    end
+    if not next(self.newFiles) then
+        return false
+    end
     local ok = false
     for uri in luals.util.sortPairs(self.newFiles) do
         local file = self:getFile(uri)
@@ -85,6 +94,17 @@ function M:flush()
     end
     self.newFiles = {}
     return ok
+end
+
+---@param time number
+function M:flushDelay(time)
+    if M.flushDelayTimer then
+        if M.flushDelayTimer:getRemainingTime() >= time then
+            return
+        end
+        M.flushDelayTimer:remove()
+    end
+    M.flushDelayTimer = luals.timer.wait(time, M.flush)
 end
 
 return M

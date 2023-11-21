@@ -3,7 +3,7 @@ local thread = require 'bee.thread'
 ---@class EventLoop
 local M = {}
 
-M.tasks = New 'LinkedTable'
+M.tasks = {}
 
 function M.startEventLoop()
     while true do
@@ -14,19 +14,14 @@ end
 
 ---@private
 function M.runTask()
-    while true do
-        local task = M.tasks:getHead()
-        if not task then
-            return
-        end
-        M.tasks:pop(task)
-        xpcall(task, log.error)
+    for i = 1, #M.tasks do
+        xpcall(M.tasks[i], log.error)
     end
 end
 
 ---@param callback fun()
 function M.addTask(callback)
-    M.tasks:pushTail(callback)
+    M.tasks[#M.tasks+1] = callback
 end
 
 return M

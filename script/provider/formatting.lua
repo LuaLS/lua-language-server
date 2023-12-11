@@ -82,6 +82,11 @@ function m.updateNonStandardSymbols(symbols)
         return
     end
 
+    for _, symbol in ipairs(symbols) do
+        if symbol == "//" then
+            codeFormat.set_clike_comments_symbol()
+        end
+    end
 
     codeFormat.set_nonstandard_symbol()
 end

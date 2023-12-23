@@ -1,7 +1,7 @@
 ---@diagnostic disable: undefined-global
 
-config.addonManager.enable        = -- TODO: need translate!
-"Whether the addon manager is enabled or not."
+config.addonManager.enable        =
+"是否启用扩展的附加插件管理器(Addon Manager)"
 config.runtime.version            =
 "Lua运行版本。"
 config.runtime.path               =
@@ -257,7 +257,7 @@ config.hint.semicolon.SameLine           =
 '2个语句在同一行时，在它们之间显示分号。'
 config.hint.semicolon.Disable            =
 '禁用虚拟分号。'
-config.codeLens.enable                   = -- TODO: need translate!
+config.codeLens.enable                   =
 '启用代码度量。'
 config.format.enable                     =
 '启用代码格式化程序。'
@@ -332,100 +332,100 @@ config.diagnostics['empty-block']           =
 '空代码块'
 config.diagnostics['redundant-value']       =
 '赋值操作时，值的数量比被赋值的对象多'
-config.diagnostics['assign-type-mismatch']  = -- TODO: need translate!
-'Enable diagnostics for assignments in which the value\'s type does not match the type of the assigned variable.'
-config.diagnostics['await-in-sync']         = -- TODO: need translate!
-'Enable diagnostics for calls of asynchronous functions within a synchronous function.'
-config.diagnostics['cast-local-type']    = -- TODO: need translate!
-'Enable diagnostics for casts of local variables where the target type does not match the defined type.'
-config.diagnostics['cast-type-mismatch']    = -- TODO: need translate!
-'Enable diagnostics for casts where the target type does not match the initial type.'
-config.diagnostics['circular-doc-class']    = -- TODO: need translate!
-'Enable diagnostics for two classes inheriting from each other introducing a circular relation.'
+config.diagnostics['assign-type-mismatch']  =
+'值类型与赋值变量类型不匹配'
+config.diagnostics['await-in-sync']         =
+'同步函数中异步函数调用'
+config.diagnostics['cast-local-type']    =
+'已显式定义变量类型与要定义的值的类型不匹配'
+config.diagnostics['cast-type-mismatch']    =
+'变量被转换为与其初始类型不匹配的类型'
+config.diagnostics['circular-doc-class']    =
+'两个类相互继承并互相循环'
 config.diagnostics['close-non-object']      = -- TODO: need translate!
 'Enable diagnostics for attempts to close a variable with a non-object.'
-config.diagnostics['code-after-break']      = -- TODO: need translate!
-'Enable diagnostics for code placed after a break statement in a loop.'
+config.diagnostics['code-after-break']      =
+'放在循环中break语句后面的代码'
 config.diagnostics['codestyle-check']       = -- TODO: need translate!
 'Enable diagnostics for incorrectly styled lines.'
-config.diagnostics['count-down-loop']       = -- TODO: need translate!
-'Enable diagnostics for `for` loops which will never reach their max/limit because the loop is incrementing instead of decrementing.'
-config.diagnostics['deprecated']            = -- TODO: need translate!
-'Enable diagnostics to highlight deprecated API.'
-config.diagnostics['different-requires']    = -- TODO: need translate!
-'Enable diagnostics for files which are required by two different paths.'
-config.diagnostics['discard-returns']       = -- TODO: need translate!
-'Enable diagnostics for calls of functions annotated with `---@nodiscard` where the return values are ignored.'
-config.diagnostics['doc-field-no-class']    = -- TODO: need translate!
-'Enable diagnostics to highlight a field annotation without a defining class annotation.'
-config.diagnostics['duplicate-doc-alias']   = -- TODO: need translate!
-'Enable diagnostics for a duplicated alias annotation name.'
-config.diagnostics['duplicate-doc-field']   = -- TODO: need translate!
-'Enable diagnostics for a duplicated field annotation name.'
-config.diagnostics['duplicate-doc-param']   = -- TODO: need translate!
-'Enable diagnostics for a duplicated param annotation name.'
-config.diagnostics['duplicate-set-field']   = -- TODO: need translate!
-'Enable diagnostics for setting the same field in a class more than once.'
-config.diagnostics['incomplete-signature-doc'] = -- TODO: need translate!
-'Incomplete @param or @return annotations for functions.'
-config.diagnostics['invisible']             = -- TODO: need translate!
-'Enable diagnostics for accesses to fields which are invisible.'
-config.diagnostics['missing-global-doc']    = -- TODO: need translate!
-'Missing annotations for globals! Global functions must have a comment and annotations for all parameters and return values.'
-config.diagnostics['missing-local-export-doc'] = -- TODO: need translate!
-'Missing annotations for exported locals! Exported local functions must have a comment and annotations for all parameters and return values.'
-config.diagnostics['missing-parameter']     = -- TODO: need translate!
-'Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.'
-config.diagnostics['missing-return']        = -- TODO: need translate!
-'Enable diagnostics for functions with return annotations which have no return statement.'
-config.diagnostics['missing-return-value']  = -- TODO: need translate!
-'Enable diagnostics for return statements without values although the containing function declares returns.'
-config.diagnostics['need-check-nil']        = -- TODO: need translate!
-'Enable diagnostics for variable usages if `nil` or an optional (potentially `nil`) value was assigned to the variable before.'
-config.diagnostics['no-unknown']            = -- TODO: need translate!
-'Enable diagnostics for cases in which the type cannot be inferred.'
-config.diagnostics['not-yieldable']         = -- TODO: need translate!
-'Enable diagnostics for calls to `coroutine.yield()` when it is not permitted.'
-config.diagnostics['param-type-mismatch']   = -- TODO: need translate!
-'Enable diagnostics for function calls where the type of a provided parameter does not match the type of the annotated function definition.'
-config.diagnostics['redundant-return']      = -- TODO: need translate!
-'Enable diagnostics for return statements which are not needed because the function would exit on its own.'
-config.diagnostics['redundant-return-value']= -- TODO: need translate!
-'Enable diagnostics for return statements which return an extra value which is not specified by a return annotation.'
-config.diagnostics['return-type-mismatch']  = -- TODO: need translate!
-'Enable diagnostics for return values whose type does not match the type declared in the corresponding return annotation.'
+config.diagnostics['count-down-loop']       =
+'for循环永远无法达到最大/极限值(在递减时递增)'
+config.diagnostics['deprecated']            =
+'变量已被标记为deprecated(过时)但仍在使用'
+config.diagnostics['different-requires']    =
+'required的同一个文件使用了两个不同的名字'
+config.diagnostics['discard-returns']       =
+'函数的返回值被忽略(函数被`@nodiscard`标记时)'
+config.diagnostics['doc-field-no-class']    =
+'为不存在的类`@class`标记`@field`字段'
+config.diagnostics['duplicate-doc-alias']   =
+'`@alias`字段的名字冲突'
+config.diagnostics['duplicate-doc-field']   =
+'`@field`字段的名字冲突'
+config.diagnostics['duplicate-doc-param']   =
+'`@param`字段的名字冲突'
+config.diagnostics['duplicate-set-field']   =
+'在一个类中多次定义同一字段'
+config.diagnostics['incomplete-signature-doc'] =
+'`@param`或`@return`的注释不完整'
+config.diagnostics['invisible']             =
+'使用不可见的值'
+config.diagnostics['missing-global-doc']    =
+'全局变量的注释缺失(全局函数必须为所有参数和返回值提供注释和注释)'
+config.diagnostics['missing-local-export-doc'] =
+'导出的本地函数缺少注释(导出的本地函数必须有包括本身以及所有参数和返回值的注释)'
+config.diagnostics['missing-parameter']     =
+'函数参数数少于注释函数参数数'
+config.diagnostics['missing-return']        =
+'函数带有返回注释而无返回语句'
+config.diagnostics['missing-return-value']  =
+'函数无值返回但函数使用`@return`标记了返回值'
+config.diagnostics['need-check-nil']        =
+'变量之前被赋值为`nil`或可选值(可能为 `nil`)'
+config.diagnostics['no-unknown']            =
+'变量的未知类型无法推断'
+config.diagnostics['not-yieldable']         =
+'不允许调用 `coroutine.yield()` '
+config.diagnostics['param-type-mismatch']   =
+'给定参数的类型与函数定义所要求的类型(`@param`)不匹配'
+config.diagnostics['redundant-return']      =
+'当放置一个不需要的返回值时触发(函数会自行退出)'
+config.diagnostics['redundant-return-value']=
+'返回`@return`注释未指定的额外值'
+config.diagnostics['return-type-mismatch']  =
+'返回值的类型与`@return`中声明的类型不匹配'
 config.diagnostics['spell-check']           = -- TODO: need translate!
 'Enable diagnostics for typos in strings.'
 config.diagnostics['name-style-check']      = -- TODO: need translate!
-'Enable diagnostics for name style.'
-config.diagnostics['unbalanced-assignments']= -- TODO: need translate!
-'Enable diagnostics on multiple assignments if not all variables obtain a value (e.g., `local x,y = 1`).'
-config.diagnostics['undefined-doc-class']   = -- TODO: need translate!
-'Enable diagnostics for class annotations in which an undefined class is referenced.'
-config.diagnostics['undefined-doc-name']    = -- TODO: need translate!
-'Enable diagnostics for type annotations referencing an undefined type or alias.'
-config.diagnostics['undefined-doc-param']   = -- TODO: need translate!
-'Enable diagnostics for cases in which a parameter annotation is given without declaring the parameter in the function definition.'
-config.diagnostics['undefined-field']       = -- TODO: need translate!
-'Enable diagnostics for cases in which an undefined field of a variable is read.'
-config.diagnostics['unknown-cast-variable'] = -- TODO: need translate!
-'Enable diagnostics for casts of undefined variables.'
-config.diagnostics['unknown-diag-code']     = -- TODO: need translate!
-'Enable diagnostics in cases in which an unknown diagnostics code is entered.'
-config.diagnostics['unknown-operator']      = -- TODO: need translate!
-'Enable diagnostics for unknown operators.'
-config.diagnostics['unreachable-code']      = -- TODO: need translate!
-'Enable diagnostics for unreachable code.'
+'变量的名称样式检查'
+config.diagnostics['unbalanced-assignments']=
+'多重赋值时没有赋值所有变量(如`local x,y = 1`)'
+config.diagnostics['undefined-doc-class']   =
+'在`@class`注解中引用未定义的类。'
+config.diagnostics['undefined-doc-name']    =
+'在`@type`注解中引用未定义的类型或`@alias`'
+config.diagnostics['undefined-doc-param']   =
+'函数声明中`@param`引用了未定义的参数'
+config.diagnostics['undefined-field']       =
+'引用变量的未定义字段'
+config.diagnostics['unknown-cast-variable'] =
+'使用`@cast`对未定义变量的强制转换'
+config.diagnostics['unknown-diag-code']     =
+'未知的诊断代码'
+config.diagnostics['unknown-operator']      =
+'未知的运算符'
+config.diagnostics['unreachable-code']      =
+'不可达的代码'
 config.diagnostics['global-element']       = -- TODO: need translate!
 'Enable diagnostics to warn about global elements.'
-config.typeFormat.config                    = -- TODO: need translate!
-'Configures the formatting behavior while typing Lua code.'
-config.typeFormat.config.auto_complete_end  = -- TODO: need translate!
-'Controls if `end` is automatically completed at suitable positions.'
-config.typeFormat.config.auto_complete_table_sep = -- TODO: need translate!
-'Controls if a separator is automatically appended at the end of a table declaration.'
-config.typeFormat.config.format_line        = -- TODO: need translate!
-'Controls if a line is formatted at all.'
+config.typeFormat.config                    =
+'配置输入Lua代码时的格式化行为'
+config.typeFormat.config.auto_complete_end  =
+'是否在合适的位置自动完成 `end`'
+config.typeFormat.config.auto_complete_table_sep =
+'是否在table末尾自动添加分隔符'
+config.typeFormat.config.format_line        =
+'是否对某一行进行格式化'
 
 command.exportDocument =
 'Lua: 导出文档...'

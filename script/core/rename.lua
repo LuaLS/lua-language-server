@@ -3,42 +3,59 @@ local vm         = require 'vm'
 local util       = require 'utility'
 local findSource = require 'core.find-source'
 local guide      = require 'parser.guide'
+local config     = require 'config'
 
 local Forcing
 
+---@param str string
+---@return string
 local function trim(str)
     return str:match '^%s*(%S+)%s*$'
 end
 
-local function isValidName(str)
+---@param uri uri
+---@param str string
+---@return boolean
+local function isValidName(uri, str)
     if not str then
         return false
     end
-    return str:match '^[%a_][%w_]*$'
+    local allowUnicode = config.get(uri, 'Lua.runtime.unicodeName')
+    if allowUnicode then
+        return str:match '^[%a_\x80-\xff][%w_\x80-\xff]*$'
+    else
+        return str:match '^[%a_][%w_]*$'
+    end
 end
 
-local function isValidGlobal(str)
+---@param uri uri
+---@param str string
+---@return boolean
+local function isValidGlobal(uri, str)
     if not str then
         return false
     end
     for s in str:gmatch '[^%.]*' do
-        if not isValidName(trim(s)) then
+        if not isValidName(uri, trim(s)) then
             return false
         end
     end
     return true
 end
 
-local function isValidFunctionName(str)
-    if isValidGlobal(str) then
+---@param uri uri
+---@param str string
+---@return boolean
+local function isValidFunctionName(uri, str)
+    if isValidGlobal(uri, str) then
         return true
     end
     local offset = str:find(':', 1, true)
     if not offset then
         return false
     end
-    return  isValidGlobal(trim(str:sub(1, offset-1)))
-        and isValidName(trim(str:sub(offset+1)))
+    return  isValidGlobal(uri, trim(str:sub(1, offset-1)))
+        and isValidName(uri, trim(str:sub(offset+1)))
 end
 
 local function isFunctionGlobalName(source)
@@ -54,7 +71,7 @@ local function isFunctionGlobalName(source)
 end
 
 local function renameLocal(source, newname, callback)
-    if isValidName(newname) then
+    if isValidName(guide.getUri(source), newname) then
         callback(source, source.start, source.finish, newname)
         return
     end
@@ -62,7 +79,7 @@ local function renameLocal(source, newname, callback)
 end
 
 local function renameField(source, newname, callback)
-    if isValidName(newname) then
+    if isValidName(guide.getUri(source), newname) then
         callback(source, source.start, source.finish, newname)
         return true
     end
@@ -108,11 +125,11 @@ local function renameField(source, newname, callback)
 end
 
 local function renameGlobal(source, newname, callback)
-    if isValidGlobal(newname) then
+    if isValidGlobal(guide.getUri(source), newname) then
         callback(source, source.start, source.finish, newname)
         return true
     end
-    if isValidFunctionName(newname) then
+    if isValidFunctionName(guide.getUri(source), newname) then
         callback(source, source.start, source.finish, newname)
         return true
     end

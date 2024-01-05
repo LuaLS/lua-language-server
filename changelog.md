@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.7.4
+`2024-1-5`
 * `FIX` rename to unicode with `Lua.runtime.unicodeName = true`
 
 ## 3.7.3

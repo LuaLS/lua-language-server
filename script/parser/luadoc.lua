@@ -1958,7 +1958,7 @@ local function bindDocs(state)
             binded = {}
             state.ast.docs.groups[#state.ast.docs.groups+1] = binded
         end
-        binded[#binded+1] = doc 
+        binded[#binded+1] = doc
         if isTailComment(text, doc) then
             bindDocWithSources(sources, binded)
             binded = nil
@@ -1994,6 +1994,95 @@ local function findTouch(state, doc)
     end
 end
 
+local function luadoc(state)
+    local ast = state.ast
+    local comments = state.comms
+    table.sort(comments, function (a, b)
+        return a.start < b.start
+    end)
+    ast.docs = {
+        type   = 'doc',
+        parent = ast,
+        groups = {},
+    }
+
+    pushWarning = function (err)
+        local errs = state.errs
+        if err.finish < err.start then
+            err.finish = err.start
+        end
+        local last = errs[#errs]
+        if last then
+            if last.start <= err.start and last.finish >= err.finish then
+                return
+            end
+        end
+        err.level = err.level or 'Warning'
+        errs[#errs+1] = err
+        return err
+    end
+    Lines       = state.lines
+
+    local ci = 1
+    NextComment = function (offset, peek)
+        local comment = comments[ci + (offset or 0)]
+        if not peek then
+            ci = ci + 1 + (offset or 0)
+        end
+        return comment
+    end
+
+    local function insertDoc(doc, comment)
+        ast.docs[#ast.docs+1] = doc
+        doc.parent = ast.docs
+        if ast.start > doc.start then
+            ast.start = doc.start
+        end
+        if ast.finish < doc.finish then
+            ast.finish = doc.finish
+        end
+        doc.originalComment = comment
+        if comment.type == 'comment.long' then
+            findTouch(state, doc)
+        end
+    end
+
+    while true do
+        local comment = NextComment()
+        if not comment then
+            break
+        end
+        lockResume = false
+        local doc, rests = buildLuaDoc(comment)
+        if doc then
+            insertDoc(doc, comment)
+            if rests then
+                for _, rest in ipairs(rests) do
+                    insertDoc(rest, comment)
+                end
+            end
+        end
+    end
+    
+    if ast.state.pluginDocs then
+        for i, doc in ipairs(ast.state.pluginDocs) do
+            insertDoc(doc, doc.originalComment)
+        end
+        table.sort(ast.docs, function (a, b)
+            return a.start < b.start
+        end)
+    end
+
+    ast.docs.start  = ast.start
+    ast.docs.finish = ast.finish
+
+    if #ast.docs == 0 then
+        return
+    end
+
+    bindDocs(state)
+end
+
 return {
     buildAndBindDoc = function (ast, src, comment)
         local doc = buildLuaDoc(comment)
@@ -2007,92 +2096,5 @@ return {
         end
         return false
     end,
-    luadoc = function (state)
-        local ast = state.ast
-        local comments = state.comms
-        table.sort(comments, function (a, b)
-            return a.start < b.start
-        end)
-        ast.docs = {
-            type   = 'doc',
-            parent = ast,
-            groups = {},
-        }
-
-        pushWarning = function (err)
-            local errs = state.errs
-            if err.finish < err.start then
-                err.finish = err.start
-            end
-            local last = errs[#errs]
-            if last then
-                if last.start <= err.start and last.finish >= err.finish then
-                    return
-                end
-            end
-            err.level = err.level or 'Warning'
-            errs[#errs+1] = err
-            return err
-        end
-        Lines       = state.lines
-
-        local ci = 1
-        NextComment = function (offset, peek)
-            local comment = comments[ci + (offset or 0)]
-            if not peek then
-                ci = ci + 1 + (offset or 0)
-            end
-            return comment
-        end
-
-        local function insertDoc(doc, comment)
-            ast.docs[#ast.docs+1] = doc
-            doc.parent = ast.docs
-            if ast.start > doc.start then
-                ast.start = doc.start
-            end
-            if ast.finish < doc.finish then
-                ast.finish = doc.finish
-            end
-            doc.originalComment = comment
-            if comment.type == 'comment.long' then
-                findTouch(state, doc)
-            end
-        end
-
-        while true do
-            local comment = NextComment()
-            if not comment then
-                break
-            end
-            lockResume = false
-            local doc, rests = buildLuaDoc(comment)
-            if doc then
-                insertDoc(doc, comment)
-                if rests then
-                    for _, rest in ipairs(rests) do
-                        insertDoc(rest, comment)
-                    end
-                end
-            end
-        end
-        
-        if ast.state.pluginDocs then
-            for i, doc in ipairs(ast.state.pluginDocs) do
-                insertDoc(doc, doc.originalComment)
-            end
-            table.sort(ast.docs, function (a, b)
-                return a.start < b.start
-            end)
-        end
-
-        ast.docs.start  = ast.start
-        ast.docs.finish = ast.finish
-
-        if #ast.docs == 0 then
-            return
-        end
-
-        bindDocs(state)
-    end
+    luadoc = luadoc
 }

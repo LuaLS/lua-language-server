@@ -291,7 +291,7 @@ local function parseTable(parent)
                 needCloseParen = true
             end
             field.name = parseName('doc.field.name', field)
-                    or   parseIndexField(field)
+                or   parseIndexField(field)
             if not field.name then
                 pushWarning {
                     type   = 'LUADOC_MISS_FIELD_NAME',
@@ -401,7 +401,7 @@ local function  parseTypeUnitFunction(parent)
             parent = typeUnit,
         }
         arg.name = parseName('doc.type.arg.name', arg)
-                or parseDots('doc.type.arg.name', arg)
+            or parseDots('doc.type.arg.name', arg)
         if not arg.name then
             pushWarning {
                 type   = 'LUADOC_MISS_ARG_NAME',
@@ -442,7 +442,7 @@ local function  parseTypeUnitFunction(parent)
             local name
             try(function ()
                 local returnName = parseName('doc.return.name', typeUnit)
-                                or parseDots('doc.return.name', typeUnit)
+                    or parseDots('doc.return.name', typeUnit)
                 if not returnName then
                     return false
                 end
@@ -646,15 +646,15 @@ end
 
 function parseTypeUnit(parent)
     local result = parseFunction(parent)
-                or parseTable(parent)
-                or parseString(parent)
-                or parseCode(parent)
-                or parseInteger(parent)
-                or parseBoolean(parent)
-                or parseParen(parent)
+        or parseTable(parent)
+        or parseString(parent)
+        or parseCode(parent)
+        or parseInteger(parent)
+        or parseBoolean(parent)
+        or parseParen(parent)
     if not result then
         result = parseName('doc.type.name', parent)
-              or parseDots('doc.type.name', parent)
+            or parseDots('doc.type.name', parent)
         if not result then
             return nil
         end
@@ -827,7 +827,7 @@ local docSwitch = util.switch()
 
         while true do
             local extend = parseName('doc.extends.name', result)
-                        or parseTable(result)
+                or parseTable(result)
             if not extend then
                 pushWarning {
                     type   = 'LUADOC_MISS_CLASS_EXTENDS_NAME',
@@ -896,7 +896,7 @@ local docSwitch = util.switch()
             type   = 'doc.param',
         }
         result.param = parseName('doc.param.name', result)
-                    or parseDots('doc.param.name', result)
+            or parseDots('doc.param.name', result)
         if not result.param then
             pushWarning {
                 type   = 'LUADOC_MISS_PARAM_NAME',
@@ -951,7 +951,7 @@ local docSwitch = util.switch()
                 dots.parent  = docType
             else
                 docType.name = parseName('doc.return.name', docType)
-                            or parseDots('doc.return.name', docType)
+                    or parseDots('doc.return.name', docType)
             end
             result.returns[#result.returns+1] = docType
             if not checkToken('symbol', ',', 1) then
@@ -990,7 +990,7 @@ local docSwitch = util.switch()
             return false
         end)
         result.field = parseName('doc.field.name', result)
-                    or parseIndexField(result)
+            or parseIndexField(result)
         if not result.field then
             pushWarning {
                 type   = 'LUADOC_MISS_FIELD_NAME',
@@ -1514,7 +1514,7 @@ end
 local function buildLuaDoc(comment)
     local text = comment.text
     local startPos = (comment.type == 'comment.short' and text:match '^%-%s*@()')
-                  or (comment.type == 'comment.long'  and text:match '^@()')
+        or (comment.type == 'comment.long'  and text:match '^@()')
     if not startPos then
         return {
             type    = 'doc.comment',
@@ -1921,6 +1921,14 @@ local function bindDocWithSources(sources, binded)
     bindGeneric(binded)
     bindCommentsAndFields(binded)
     bindReturnIndex(binded)
+    
+    -- doc is special node
+    if lastDoc.special then
+        if bindDoc(lastDoc.special, binded) then
+            return
+        end
+    end
+
     local row = guide.rowColOf(lastDoc.finish)
     local suc = bindDocsBetween(sources, binded, guide.positionOf(row, 0), lastDoc.start)
     if not suc then
@@ -1950,13 +1958,14 @@ local function bindDocs(state)
             binded = {}
             state.ast.docs.groups[#state.ast.docs.groups+1] = binded
         end
-        binded[#binded+1] = doc
+        binded[#binded+1] = doc 
         if isTailComment(text, doc) then
             bindDocWithSources(sources, binded)
             binded = nil
         else
             local nextDoc = state.ast.docs[i+1]
-            if not isNextLine(doc, nextDoc) then
+            if nextDoc and nextDoc.special
+            or not isNextLine(doc, nextDoc) then
                 bindDocWithSources(sources, binded)
                 binded = nil
             end
@@ -1974,8 +1983,8 @@ local function findTouch(state, doc)
     local pos  = guide.positionToOffset(state, doc.originalComment.start)
     for i = pos - 2, 1, -1 do
         local c = text:sub(i, i)
-        if c == '\r'
-        or c == '\n' then
+        if     c == '\r'
+        or     c == '\n' then
             break
         elseif c ~= ' '
         and    c ~= '\t' then
@@ -1985,82 +1994,105 @@ local function findTouch(state, doc)
     end
 end
 
-return function (state)
-    local ast = state.ast
-    local comments = state.comms
-    table.sort(comments, function (a, b)
-        return a.start < b.start
-    end)
-    ast.docs = {
-        type   = 'doc',
-        parent = ast,
-        groups = {},
-    }
-
-    pushWarning = function (err)
-        local errs = state.errs
-        if err.finish < err.start then
-            err.finish = err.start
+return {
+    buildAndBindDoc = function (ast, src, comment)
+        local doc = buildLuaDoc(comment)
+        if doc then
+            local pluginDocs = ast.state.pluginDocs or {}
+            pluginDocs[#pluginDocs+1] = doc
+            doc.special = src
+            doc.originalComment = comment
+            ast.state.pluginDocs = pluginDocs
+            return true
         end
-        local last = errs[#errs]
-        if last then
-            if last.start <= err.start and last.finish >= err.finish then
-                return
+        return false
+    end,
+    luadoc = function (state)
+        local ast = state.ast
+        local comments = state.comms
+        table.sort(comments, function (a, b)
+            return a.start < b.start
+        end)
+        ast.docs = ast.docs or {
+            type   = 'doc',
+            parent = ast,
+            groups = {},
+        }
+
+        pushWarning = function (err)
+            local errs = state.errs
+            if err.finish < err.start then
+                err.finish = err.start
+            end
+            local last = errs[#errs]
+            if last then
+                if last.start <= err.start and last.finish >= err.finish then
+                    return
+                end
+            end
+            err.level = err.level or 'Warning'
+            errs[#errs+1] = err
+            return err
+        end
+        Lines       = state.lines
+
+        local ci = 1
+        NextComment = function (offset, peek)
+            local comment = comments[ci + (offset or 0)]
+            if not peek then
+                ci = ci + 1 + (offset or 0)
+            end
+            return comment
+        end
+
+        local function insertDoc(doc, comment)
+            ast.docs[#ast.docs+1] = doc
+            doc.parent = ast.docs
+            if ast.start > doc.start then
+                ast.start = doc.start
+            end
+            if ast.finish < doc.finish then
+                ast.finish = doc.finish
+            end
+            doc.originalComment = comment
+            if comment.type == 'comment.long' then
+                findTouch(state, doc)
             end
         end
-        err.level = err.level or 'Warning'
-        errs[#errs+1] = err
-        return err
-    end
-    Lines       = state.lines
 
-    local ci = 1
-    NextComment = function (offset, peek)
-        local comment = comments[ci + (offset or 0)]
-        if not peek then
-            ci = ci + 1 + (offset or 0)
-        end
-        return comment
-    end
-
-    local function insertDoc(doc, comment)
-        ast.docs[#ast.docs+1] = doc
-        doc.parent = ast.docs
-        if ast.start > doc.start then
-            ast.start = doc.start
-        end
-        if ast.finish < doc.finish then
-            ast.finish = doc.finish
-        end
-        doc.originalComment = comment
-        if comment.type == 'comment.long' then
-            findTouch(state, doc)
-        end
-    end
-
-    while true do
-        local comment = NextComment()
-        if not comment then
-            break
-        end
-        lockResume = false
-        local doc, rests = buildLuaDoc(comment)
-        if doc then
-            insertDoc(doc, comment)
-            if rests then
-                for _, rest in ipairs(rests) do
-                    insertDoc(rest, comment)
+        while true do
+            local comment = NextComment()
+            if not comment then
+                break
+            end
+            lockResume = false
+            local doc, rests = buildLuaDoc(comment)
+            if doc then
+                insertDoc(doc, comment)
+                if rests then
+                    for _, rest in ipairs(rests) do
+                        insertDoc(rest, comment)
+                    end
                 end
             end
         end
+        
+        if ast.state.pluginDocs then
+            for i, doc in ipairs(ast.state.pluginDocs) do
+                insertDoc(doc, doc.originalComment)
+            end
+            table.sort(ast.docs, function (a, b)
+                return a.start < b.start
+            end)
+        end
+
+        ast.docs.start  = ast.start
+        ast.docs.finish = ast.finish
+
+        if #ast.docs == 0 then
+            return
+        end
+
+        bindDocs(state)
     end
-
-    ast.docs.start  = ast.start
-    ast.docs.finish = ast.finish
-
-    if #ast.docs == 0 then
-        return
-    end
-
-    bindDocs(state)
-end
+}

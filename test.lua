@@ -102,11 +102,12 @@ local function main()
 
         testAll()
     end)
-
+    
     test 'tclient'
     test 'full'
     test 'plugins.ffi.test'
-end
+    test 'plugins.ast'
+    end
 
 loadAllLibs()
 main()

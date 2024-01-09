@@ -419,6 +419,22 @@ function m.getParentType(obj, want)
     error('guide.getParentType overstack')
 end
 
+--- 寻找所在父类型
+---@param obj parser.object
+---@return parser.object?
+function m.getParentTypes(obj, wants)
+    for _ = 1, 10000 do
+        obj = obj.parent
+        if not obj then
+            return nil
+        end
+        if wants[obj.type] then
+            return obj
+        end
+    end
+    error('guide.getParentTypes overstack')
+end
+
 --- 寻找根区块
 ---@param obj parser.object
 ---@return parser.object
@@ -1287,6 +1303,24 @@ function m.isParam(source)
         return false
     end
     return true
+end
+
+---@param source parser.object
+---@param index integer
+---@return parser.object?
+function m.getParam(source, index)
+    if source.type == 'call' then
+        local args = source.args
+        assert(args.type == 'callargs', 'call.args type is\'t callargs')
+        return args[index]
+    elseif source.type == 'callargs' then
+        return source[index]
+    elseif source.type == 'function' then
+        local args = source.args
+        assert(args.type == 'funcargs', 'function.args type is\'t callargs')
+        return args[index]
+    end
+    return nil
 end
 
 return m

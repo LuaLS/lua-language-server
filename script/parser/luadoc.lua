@@ -291,7 +291,7 @@ local function parseTable(parent)
                 needCloseParen = true
             end
             field.name = parseName('doc.field.name', field)
-                or   parseIndexField(field)
+                    or   parseIndexField(field)
             if not field.name then
                 pushWarning {
                     type   = 'LUADOC_MISS_FIELD_NAME',
@@ -401,7 +401,7 @@ local function  parseTypeUnitFunction(parent)
             parent = typeUnit,
         }
         arg.name = parseName('doc.type.arg.name', arg)
-            or parseDots('doc.type.arg.name', arg)
+                or parseDots('doc.type.arg.name', arg)
         if not arg.name then
             pushWarning {
                 type   = 'LUADOC_MISS_ARG_NAME',
@@ -442,7 +442,7 @@ local function  parseTypeUnitFunction(parent)
             local name
             try(function ()
                 local returnName = parseName('doc.return.name', typeUnit)
-                    or parseDots('doc.return.name', typeUnit)
+                                or parseDots('doc.return.name', typeUnit)
                 if not returnName then
                     return false
                 end
@@ -646,15 +646,15 @@ end
 
 function parseTypeUnit(parent)
     local result = parseFunction(parent)
-        or parseTable(parent)
-        or parseString(parent)
-        or parseCode(parent)
-        or parseInteger(parent)
-        or parseBoolean(parent)
-        or parseParen(parent)
+                or parseTable(parent)
+                or parseString(parent)
+                or parseCode(parent)
+                or parseInteger(parent)
+                or parseBoolean(parent)
+                or parseParen(parent)
     if not result then
         result = parseName('doc.type.name', parent)
-            or parseDots('doc.type.name', parent)
+              or parseDots('doc.type.name', parent)
         if not result then
             return nil
         end
@@ -827,7 +827,7 @@ local docSwitch = util.switch()
 
         while true do
             local extend = parseName('doc.extends.name', result)
-                or parseTable(result)
+                        or parseTable(result)
             if not extend then
                 pushWarning {
                     type   = 'LUADOC_MISS_CLASS_EXTENDS_NAME',
@@ -896,7 +896,7 @@ local docSwitch = util.switch()
             type   = 'doc.param',
         }
         result.param = parseName('doc.param.name', result)
-            or parseDots('doc.param.name', result)
+                    or parseDots('doc.param.name', result)
         if not result.param then
             pushWarning {
                 type   = 'LUADOC_MISS_PARAM_NAME',
@@ -951,7 +951,7 @@ local docSwitch = util.switch()
                 dots.parent  = docType
             else
                 docType.name = parseName('doc.return.name', docType)
-                    or parseDots('doc.return.name', docType)
+                            or parseDots('doc.return.name', docType)
             end
             result.returns[#result.returns+1] = docType
             if not checkToken('symbol', ',', 1) then
@@ -990,7 +990,7 @@ local docSwitch = util.switch()
             return false
         end)
         result.field = parseName('doc.field.name', result)
-            or parseIndexField(result)
+                    or parseIndexField(result)
         if not result.field then
             pushWarning {
                 type   = 'LUADOC_MISS_FIELD_NAME',
@@ -1514,7 +1514,7 @@ end
 local function buildLuaDoc(comment)
     local text = comment.text
     local startPos = (comment.type == 'comment.short' and text:match '^%-%s*@()')
-        or (comment.type == 'comment.long'  and text:match '^@()')
+                  or (comment.type == 'comment.long'  and text:match '^@()')
     if not startPos then
         return {
             type    = 'doc.comment',
@@ -1983,8 +1983,8 @@ local function findTouch(state, doc)
     local pos  = guide.positionToOffset(state, doc.originalComment.start)
     for i = pos - 2, 1, -1 do
         local c = text:sub(i, i)
-        if     c == '\r'
-        or     c == '\n' then
+        if c == '\r'
+        or c == '\n' then
             break
         elseif c ~= ' '
         and    c ~= '\t' then
@@ -2013,7 +2013,7 @@ return {
         table.sort(comments, function (a, b)
             return a.start < b.start
         end)
-        ast.docs = ast.docs or {
+        ast.docs = {
             type   = 'doc',
             parent = ast,
             groups = {},

@@ -2192,7 +2192,8 @@ local function buildluaDocOfFunction(func, pad)
     end
     for _, rtn in ipairs(returns) do
         index = index + 1
-        buf[#buf+1] = ('---@return ${%d:%s}'):format(
+        buf[#buf+1] = ('---%s@return ${%d:%s}'):format(
+            pad and ' ' or '',
             index,
             rtn
         )

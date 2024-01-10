@@ -26,6 +26,8 @@ config.runtime.unicodeName        = -- TODO: need translate!
 "Allows Unicode characters in name."
 config.runtime.nonstandardSymbol  = -- TODO: need translate!
 "Supports non-standard symbols. Make sure that your runtime environment supports these symbols."
+config.runtime.nonstandardSymbolTypes = -- TODO: need translate!
+"Override the type for non-standard symbols."
 config.runtime.plugin             = -- TODO: need translate!
 "Plugin path. Please read [wiki](https://luals.github.io/wiki/plugins) to learn more."
 config.runtime.pluginArgs         = -- TODO: need translate!

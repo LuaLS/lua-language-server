@@ -17,6 +17,7 @@ local lazy     = require 'lazytable'
 local cacher   = require 'lazy-cacher'
 local sp       = require 'bee.subprocess'
 local pub      = require 'pub'
+local json       = require 'json'
 
 ---@class file
 ---@field uri           uri
@@ -631,6 +632,7 @@ function m.compileStateAsync(uri, callback)
         special           = config.get(uri, 'Lua.runtime.special'),
         unicodeName       = config.get(uri, 'Lua.runtime.unicodeName'),
         nonstandardSymbol = util.arrayToHash(config.get(uri, 'Lua.runtime.nonstandardSymbol')),
+        nonstandardSymbolTypes = config.get(uri, 'Lua.runtime.nonstandardSymbolTypes'),
     }
 
     ---@type brave.param.compile
@@ -685,7 +687,10 @@ function m.compileState(uri)
         special           = config.get(uri, 'Lua.runtime.special'),
         unicodeName       = config.get(uri, 'Lua.runtime.unicodeName'),
         nonstandardSymbol = util.arrayToHash(config.get(uri, 'Lua.runtime.nonstandardSymbol')),
+        nonstandardSymbolTypes = config.get(uri, 'Lua.runtime.nonstandardSymbolTypes'),
     }
+
+    log.info(json.encode(options.nonstandardSymbolTypes), json.encode(options.nonstandardSymbol))
 
     local ws     = require 'workspace'
     local client = require 'client'

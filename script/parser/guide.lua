@@ -1309,21 +1309,28 @@ function m.isParam(source)
 end
 
 ---@param source parser.object
----@param index integer
----@return parser.object?
-function m.getParam(source, index)
+---@return parser.object[]?
+function m.getParams(source)
     if source.type == 'call' then
         local args = source.args
         assert(args.type == 'callargs', 'call.args type is\'t callargs')
-        return args[index]
+        return args
     elseif source.type == 'callargs' then
-        return source[index]
+        return source
     elseif source.type == 'function' then
         local args = source.args
         assert(args.type == 'funcargs', 'function.args type is\'t callargs')
-        return args[index]
+        return args
     end
     return nil
+end
+
+---@param source parser.object
+---@param index integer
+---@return parser.object?
+function m.getParam(source, index)
+    local args = m.getParams(source)
+    return args and args[index] or nil
 end
 
 return m

@@ -2114,6 +2114,7 @@ local function luadoc(state)
         table.sort(ast.docs, function (a, b)
             return a.start < b.start
         end)
+        ast.state.pluginDocs = nil
     end
 
     ast.docs.start  = ast.start
@@ -2134,10 +2135,11 @@ return {
             pluginDocs[#pluginDocs+1] = doc
             doc.special = src
             doc.originalComment = comment
+            doc.virtual = true
             ast.state.pluginDocs = pluginDocs
-            return true
+            return doc
         end
-        return false
+        return nil
     end,
     luadoc = luadoc
 }

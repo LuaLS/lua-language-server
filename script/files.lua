@@ -655,6 +655,17 @@ function m.compileStateAsync(uri, callback)
     end)
 end
 
+local function pluginOnTransformAst(uri, state)
+    local plugin   = require 'plugin'
+    ---TODO: maybe deepcopy astNode
+    local suc, result = plugin.dispatch('OnTransformAst', uri, state.ast)
+    if not suc then
+        return state
+    end
+    state.ast = result
+    return state
+end
+
 ---@param uri uri
 ---@return parser.state?
 function m.compileState(uri)
@@ -697,6 +708,12 @@ function m.compileState(uri)
 
     if not state then
         log.error('Compile failed:', uri, err)
+        return nil
+    end
+
+    state = pluginOnTransformAst(uri, state)
+    if not state then
+        log.error('pluginOnTransformAst failed! discard the file state')
         return nil
     end
 

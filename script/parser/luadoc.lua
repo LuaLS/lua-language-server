@@ -1964,6 +1964,14 @@ local function bindDocWithSources(sources, binded)
     bindGeneric(binded)
     bindCommentsAndFields(binded)
     bindReturnIndex(binded)
+    
+    -- doc is special node
+    if lastDoc.special then
+        if bindDoc(lastDoc.special, binded) then
+            return
+        end
+    end
+
     local row = guide.rowColOf(lastDoc.finish)
     local suc = bindDocsBetween(sources, binded, guide.positionOf(row, 0), lastDoc.start)
     if not suc then
@@ -1999,7 +2007,8 @@ local function bindDocs(state)
             binded = nil
         else
             local nextDoc = state.ast.docs[i+1]
-            if not isNextLine(doc, nextDoc) then
+            if nextDoc and nextDoc.special
+            or not isNextLine(doc, nextDoc) then
                 bindDocWithSources(sources, binded)
                 binded = nil
             end
@@ -2028,7 +2037,7 @@ local function findTouch(state, doc)
     end
 end
 
-return function (state)
+local function luadoc(state)
     local ast = state.ast
     local comments = state.comms
     table.sort(comments, function (a, b)
@@ -2097,6 +2106,15 @@ return function (state)
             end
         end
     end
+    
+    if ast.state.pluginDocs then
+        for i, doc in ipairs(ast.state.pluginDocs) do
+            insertDoc(doc, doc.originalComment)
+        end
+        table.sort(ast.docs, function (a, b)
+            return a.start < b.start
+        end)
+    end
 
     ast.docs.start  = ast.start
     ast.docs.finish = ast.finish
@@ -2107,3 +2125,19 @@ return function (state)
 
     bindDocs(state)
 end
+
+return {
+    buildAndBindDoc = function (ast, src, comment)
+        local doc = buildLuaDoc(comment)
+        if doc then
+            local pluginDocs = ast.state.pluginDocs or {}
+            pluginDocs[#pluginDocs+1] = doc
+            doc.special = src
+            doc.originalComment = comment
+            ast.state.pluginDocs = pluginDocs
+            return true
+        end
+        return false
+    end,
+    luadoc = luadoc
+}

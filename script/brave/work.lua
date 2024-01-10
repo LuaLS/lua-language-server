@@ -15,10 +15,7 @@ end)
 
 brave.on('loadProtoBySocket', function (param)
     local jsonrpc = require 'jsonrpc'
-    local socket  = require 'bee.socket'
-    local util    = require 'utility'
-    local rfd = socket.fd(param.rfd)
-    local wfd = socket.fd(param.wfd)
+    local net     = require 'service.net'
     local buf = ''
 
     ---@async
@@ -44,29 +41,24 @@ brave.on('loadProtoBySocket', function (param)
         end
     end)
 
+    local lsclient = net.connect('tcp', '127.0.0.1', param.port)
+    local lsmaster = net.connect('unix', param.unixPath)
+
+    assert(lsclient)
+    assert(lsmaster)
+
+    function lsclient:on_data(data)
+        buf = buf .. data
+        coroutine.resume(parser)
+    end
+
+    function lsmaster:on_data(data)
+        lsclient:write(data)
+        net.update()
+    end
+
     while true do
-        local rd = socket.select({rfd, wfd}, nil, 10)
-        if not rd or #rd == 0 then
-            goto continue
-        end
-        if util.arrayHas(rd, wfd) then
-            local needSend = wfd:recv()
-            if needSend then
-                rfd:send(needSend)
-            elseif needSend == nil then
-                error('socket closed!')
-            end
-        end
-        if util.arrayHas(rd, rfd) then
-            local recved = rfd:recv()
-            if recved then
-                buf = buf .. recved
-            elseif recved == nil then
-                error('socket closed!')
-            end
-            coroutine.resume(parser)
-        end
-        ::continue::
+        net.update(10)
     end
 end)
 

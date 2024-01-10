@@ -469,34 +469,45 @@ end
 
 local hasAsked = {}
 ---@async
-local function askFor3rd(uri, cfg)
+local function askFor3rd(uri, cfg, checkThirdParty)
     if hasAsked[cfg.name] then
         return nil
     end
-    hasAsked[cfg.name] = true
-    local yes1 = lang.script.WINDOW_APPLY_WHIT_SETTING
-    local yes2 = lang.script.WINDOW_APPLY_WHITOUT_SETTING
-    local no   = lang.script.WINDOW_DONT_SHOW_AGAIN
-    local result = client.awaitRequestMessage('Info'
-        , lang.script('WINDOW_ASK_APPLY_LIBRARY', cfg.name)
-        , {yes1, yes2, no}
-    )
-    if not result then
-        return nil
-    end
-    if result == yes1 then
+
+    if checkThirdParty == 'Apply' then
         apply3rd(uri, cfg, false)
-    elseif result == yes2 then
+    elseif checkThirdParty == 'ApplyInMemory' then
         apply3rd(uri, cfg, true)
-    else
-        client.setConfig({
-            {
-                key    = 'Lua.workspace.checkThirdParty',
-                action = 'set',
-                value  = false,
-                uri    = uri,
-            },
-        }, false)
+    elseif checkThirdParty == 'Disable' then
+        return nil
+    elseif checkThirdParty == 'Ask' then
+        hasAsked[cfg.name] = true
+        local applyAndSetConfig = lang.script.WINDOW_APPLY_WHIT_SETTING
+        local applyInMemory = lang.script.WINDOW_APPLY_WHITOUT_SETTING
+        local dontShowAgain   = lang.script.WINDOW_DONT_SHOW_AGAIN
+        local result = client.awaitRequestMessage('Info'
+            , lang.script('WINDOW_ASK_APPLY_LIBRARY', cfg.name)
+            , {applyAndSetConfig, applyInMemory, dontShowAgain}
+        )
+        if not result then
+            -- "If none got selected"
+            -- See: https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#window_showMessageRequest
+            return nil
+        end
+        if result == applyAndSetConfig then
+            apply3rd(uri, cfg, false)
+        elseif result == applyInMemory then
+            apply3rd(uri, cfg, true)
+        else
+            client.setConfig({
+                {
+                    key    = 'Lua.workspace.checkThirdParty',
+                    action = 'set',
+                    value  = 'Disable',
+                    uri    = uri,
+                },
+            }, false)
+        end
     end
 end
 
@@ -517,7 +528,7 @@ local function wholeMatch(a, b)
     return true
 end
 
-local function check3rdByWords(uri, configs)
+local function check3rdByWords(uri, configs, checkThirdParty)
     if not files.isLua(uri) then
         return
     end
@@ -546,7 +557,7 @@ local function check3rdByWords(uri, configs)
                     log.info('Found 3rd library by word: ', word, uri, library, inspect(config.get(uri, 'Lua.workspace.library')))
                     ---@async
                     await.call(function ()
-                        askFor3rd(uri, cfg)
+                        askFor3rd(uri, cfg, checkThirdParty)
                     end)
                     return
                 end
@@ -556,7 +567,7 @@ local function check3rdByWords(uri, configs)
     end, id)
 end
 
-local function check3rdByFileName(uri, configs)
+local function check3rdByFileName(uri, configs, checkThirdParty)
     local path = ws.getRelativePath(uri)
     if not path then
         return
@@ -582,7 +593,7 @@ local function check3rdByFileName(uri, configs)
                     log.info('Found 3rd library by filename: ', filename, uri, library, inspect(config.get(uri, 'Lua.workspace.library')))
                     ---@async
                     await.call(function ()
-                        askFor3rd(uri, cfg)
+                        askFor3rd(uri, cfg, checkThirdParty)
                     end)
                     return
                 end
@@ -597,8 +608,12 @@ local function check3rd(uri)
     if ws.isIgnored(uri) then
         return
     end
-    if not config.get(uri, 'Lua.workspace.checkThirdParty') then
+    local checkThirdParty = config.get(uri, 'Lua.workspace.checkThirdParty')
+    -- Backwards compatability: `checkThirdParty` used to be a boolean.
+    if not checkThirdParty or checkThirdParty == 'Disable' then
         return
+    elseif checkThirdParty == true then
+        checkThirdParty = 'Ask'
     end
     local scp = scope.getScope(uri)
     if not scp:get 'canCheckThirdParty' then
@@ -608,8 +623,8 @@ local function check3rd(uri)
     if not thirdConfigs then
         return
     end
-    check3rdByWords(uri, thirdConfigs)
-    check3rdByFileName(uri, thirdConfigs)
+    check3rdByWords(uri, thirdConfigs, checkThirdParty)
+    check3rdByFileName(uri, thirdConfigs, checkThirdParty)
 end
 
 local function check3rdOfWorkspace(suri)

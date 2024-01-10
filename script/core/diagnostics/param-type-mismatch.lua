@@ -32,26 +32,28 @@ end
 
 ---@param funcNode vm.node
 ---@param i integer
+---@param uri uri
 ---@return vm.node?
-local function getDefNode(funcNode, i)
+local function getDefNode(funcNode, i, uri)
     local defNode = vm.createNode()
-    for f in funcNode:eachObject() do
-        if f.type == 'function'
-        or f.type == 'doc.type.function' then
-            local param = f.args and f.args[i]
+    for src in funcNode:eachObject() do
+        if src.type == 'function'
+        or src.type == 'doc.type.function' then
+            local param = src.args and src.args[i]
             if param then
                 defNode:merge(vm.compileNode(param))
                 if param[1] == '...' then
                     defNode:addOptional()
                 end
-
-                expandGenerics(defNode)
             end
         end
     end
     if defNode:isEmpty() then
         return nil
     end
+
+    expandGenerics(defNode)
+
     return defNode
 end
 
@@ -91,7 +93,7 @@ return function (uri, callback)
             if not refNode then
                 goto CONTINUE
             end
-            local defNode = getDefNode(funcNode, i)
+            local defNode = getDefNode(funcNode, i, uri)
             if not defNode then
                 goto CONTINUE
             end

@@ -100,8 +100,28 @@ function os.rename(oldname, newname) end
 ---@return string localecategory
 function os.setlocale(locale, category) end
 
+---@class osdateparam
+---#DES 'osdate.year'
+---@field year  integer|string
+---#DES 'osdate.month'
+---@field month integer|string
+---#DES 'osdate.day'
+---@field day   integer|string
+---#DES 'osdate.hour'
+---@field hour  (integer|string)?
+---#DES 'osdate.min'
+---@field min   (integer|string)?
+---#DES 'osdate.sec'
+---@field sec   (integer|string)?
+---#DES 'osdate.wday'
+---@field wday  (integer|string)?
+---#DES 'osdate.yday'
+---@field yday  (integer|string)?
+---#DES 'osdate.isdst'
+---@field isdst boolean?
+
 ---#DES 'os.time'
----@param date? osdate
+---@param date? osdateparam
 ---@return integer
 ---@nodiscard
 function os.time(date) end

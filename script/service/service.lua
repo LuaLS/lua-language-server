@@ -257,7 +257,6 @@ function m.lockCache()
     if err then
         log.error(err)
     end
-    pub.task('removeCaches', cacheDir)
 end
 
 function m.start()

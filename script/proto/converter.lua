@@ -207,6 +207,14 @@ function m.setOffsetEncoding(encoding)
     offsetEncoding = encoding:lower():gsub('%-', '')
 end
 
+---@param s        string
+---@param i?       integer
+---@param j?       integer
+---@return integer
+function m.len(s, i, j)
+    return encoder.len(offsetEncoding, s, i, j)
+end
+
 ---@class proto.command
 ---@field title string
 ---@field command string

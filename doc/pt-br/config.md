@@ -1,3 +1,19 @@
+# addonManager.enable
+
+Whether the addon manager is enabled or not.
+
+## type
+
+```ts
+boolean
+```
+
+## default
+
+```jsonc
+true
+```
+
 # codeLens.enable
 
 Enable code lens.
@@ -242,6 +258,7 @@ Array<string>
 * ``"global-in-nil-env"``
 * ``"incomplete-signature-doc"``
 * ``"index-in-func-name"``
+* ``"inject-field"``
 * ``"invisible"``
 * ``"jump-local-scope"``
 * ``"keyword"``
@@ -285,11 +302,13 @@ Array<string>
 * ``"miss-sep-in-table"``
 * ``"miss-space-between"``
 * ``"miss-symbol"``
+* ``"missing-fields"``
 * ``"missing-global-doc"``
 * ``"missing-local-export-doc"``
 * ``"missing-parameter"``
 * ``"missing-return"``
 * ``"missing-return-value"``
+* ``"name-style-check"``
 * ``"need-check-nil"``
 * ``"need-paren"``
 * ``"nesting-long-mark"``
@@ -431,9 +450,14 @@ object<string, string>
     "await": "Fallback",
     /*
     * codestyle-check
+    * name-style-check
     * spell-check
     */
     "codestyle": "Fallback",
+    /*
+    * global-element
+    */
+    "conventions": "Fallback",
     /*
     * duplicate-index
     * duplicate-set-field
@@ -475,10 +499,6 @@ object<string, string>
     */
     "strict": "Fallback",
     /*
-    * global-element
-    */
-    "conventionss": "None",
-    /*
     * no-unknown
     */
     "strong": "Fallback",
@@ -486,6 +506,7 @@ object<string, string>
     * assign-type-mismatch
     * cast-local-type
     * cast-type-mismatch
+    * inject-field
     * need-check-nil
     * param-type-mismatch
     * return-type-mismatch
@@ -493,6 +514,7 @@ object<string, string>
     */
     "type-check": "Fallback",
     /*
+    * missing-fields
     * missing-parameter
     * missing-return
     * missing-return-value
@@ -557,9 +579,14 @@ object<string, string>
     "await": "Fallback",
     /*
     * codestyle-check
+    * name-style-check
     * spell-check
     */
     "codestyle": "Fallback",
+    /*
+    * global-element
+    */
+    "conventions": "Fallback",
     /*
     * duplicate-index
     * duplicate-set-field
@@ -601,10 +628,6 @@ object<string, string>
     */
     "strict": "Fallback",
     /*
-    * global-element
-    */
-    "conventionss": "Fallback",
-    /*
     * no-unknown
     */
     "strong": "Fallback",
@@ -612,6 +635,7 @@ object<string, string>
     * assign-type-mismatch
     * cast-local-type
     * cast-type-mismatch
+    * inject-field
     * need-check-nil
     * param-type-mismatch
     * return-type-mismatch
@@ -619,6 +643,7 @@ object<string, string>
     */
     "type-check": "Fallback",
     /*
+    * missing-fields
     * missing-parameter
     * missing-return
     * missing-return-value
@@ -801,9 +826,10 @@ object<string, string>
     */
     "global-in-nil-env": "Any",
     /*
-    Enable diagnostics for function definitions which are not fully annotated.
+    Incomplete @param or @return annotations for functions.
     */
     "incomplete-signature-doc": "None",
+    "inject-field": "Opened",
     /*
     Enable diagnostics for accesses to fields which are invisible.
     */
@@ -812,12 +838,13 @@ object<string, string>
     首字母小写的全局变量定义
     */
     "lowercase-global": "Any",
+    "missing-fields": "Any",
     /*
-    Enable diagnostics for global function definitions which are not fully annotated.
+    Missing annotations for globals! Global functions must have a comment and annotations for all parameters and return values.
     */
     "missing-global-doc": "None",
     /*
-    Enable diagnostics for exported local function definitions which are not fully annotated.
+    Missing annotations for exported locals! Exported local functions must have a comment and annotations for all parameters and return values.
     */
     "missing-local-export-doc": "None",
     /*
@@ -832,6 +859,10 @@ object<string, string>
     Enable diagnostics for return statements without values although the containing function declares returns.
     */
     "missing-return-value": "Any",
+    /*
+    Enable diagnostics for name style.
+    */
+    "name-style-check": "None",
     /*
     Enable diagnostics for variable usages if `nil` or an optional (potentially `nil`) value was assigned to the variable before.
     */
@@ -1065,9 +1096,10 @@ object<string, string>
     */
     "global-in-nil-env": "Warning",
     /*
-    Enable diagnostics for function definitions which are not fully annotated.
+    Incomplete @param or @return annotations for functions.
     */
     "incomplete-signature-doc": "Warning",
+    "inject-field": "Warning",
     /*
     Enable diagnostics for accesses to fields which are invisible.
     */
@@ -1076,12 +1108,13 @@ object<string, string>
     首字母小写的全局变量定义
     */
     "lowercase-global": "Information",
+    "missing-fields": "Warning",
     /*
-    Enable diagnostics for global function definitions which are not annotated.
+    Missing annotations for globals! Global functions must have a comment and annotations for all parameters and return values.
     */
     "missing-global-doc": "Warning",
     /*
-    Enable diagnostics for exported local function definitions which are not annotated.
+    Missing annotations for exported locals! Exported local functions must have a comment and annotations for all parameters and return values.
     */
     "missing-local-export-doc": "Warning",
     /*
@@ -1096,6 +1129,10 @@ object<string, string>
     Enable diagnostics for return statements without values although the containing function declares returns.
     */
     "missing-return-value": "Warning",
+    /*
+    Enable diagnostics for name style.
+    */
+    "name-style-check": "Warning",
     /*
     Enable diagnostics for variable usages if `nil` or an optional (potentially `nil`) value was assigned to the variable before.
     */
@@ -1642,6 +1679,22 @@ Array<string>
 []
 ```
 
+# nameStyle.config
+
+Set name style config
+
+## type
+
+```ts
+Object<string, string | array>
+```
+
+## default
+
+```jsonc
+{}
+```
+
 # runtime.builtin
 
 Adjust the enabled state of the built-in library. You can disable (or redefine) the non-existent library according to the actual runtime environment.
@@ -1805,7 +1858,7 @@ false
 
 # runtime.plugin
 
-Plugin path. Please read [wiki](https://github.com/LuaLS/lua-language-server/wiki/Plugins) to learn more.
+Plugin path. Please read [wiki](https://luals.github.io/wiki/plugins) to learn more.
 
 ## type
 
@@ -2124,13 +2177,20 @@ Automatic detection and adaptation of third-party libraries, currently supported
 ## type
 
 ```ts
-boolean
+string
 ```
+
+## enum
+
+* ``"Ask"``
+* ``"Apply"``
+* ``"ApplyInMemory"``
+* ``"Disable"``
 
 ## default
 
 ```jsonc
-true
+"Ask"
 ```
 
 # workspace.ignoreDir

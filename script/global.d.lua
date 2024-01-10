@@ -55,6 +55,12 @@ DOC = ''
 ---@type string | '"Error"' | '"Warning"' | '"Information"' | '"Hint"'
 CHECKLEVEL = 'Warning'
 
+--Where to write the check results (JSON).
+--
+--If nil, use `LOGPATH/check.json`.
+---@type string|nil
+CHECK_OUT_PATH = ''
+
 ---@type 'trace' | 'debug' | 'info' | 'warn' | 'error'
 LOGLEVEL = 'warn'
 
@@ -77,3 +83,6 @@ jit = false
 -- connect to client by socket
 ---@type integer
 SOCKET = 0
+
+-- Allowing the use of the root directory or home directory as the workspace
+FORCE_ACCEPT_WORKSPACE = false

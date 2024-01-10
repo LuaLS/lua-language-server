@@ -2,13 +2,14 @@ local lclient = require 'lclient'
 local ws = require 'workspace'
 local furi = require 'file-uri'
 local files = require 'files'
+local diagnostic = require 'provider.diagnostic'
 
 --TODO how to changed the runtime version?
 local template = require 'config.template'
 
 template['Lua.runtime.version'].default = 'LuaJIT'
 
-TESTURI = furi.encode('/unittest.ffi.lua')
+TESTURI = furi.encode(TESTROOT .. 'unittest.ffi.lua')
 
 ---@async
 local function TestBuilder()
@@ -24,10 +25,12 @@ end
 ---@async
 lclient():start(function (languageClient)
     languageClient:registerFakers()
-    local rootUri = furi.encode '/'
+    local rootUri = TESTURI
     languageClient:initialize {
         rootUri = rootUri,
     }
+
+    diagnostic.pause()
 
     ws.awaitReady(rootUri)
 
@@ -35,4 +38,6 @@ lclient():start(function (languageClient)
     require 'plugins.ffi.parser'
     require 'plugins.ffi.builder'
     TestBuilder()
+
+    diagnostic.resume()
 end)

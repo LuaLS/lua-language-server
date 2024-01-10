@@ -1,7 +1,7 @@
 DIAG_LINE_ONLY_SPACE    =
 'Line with spaces only.'
 DIAG_LINE_POST_SPACE    =
-'Line with postspace.'
+'Line with trailing space.'
 DIAG_UNUSED_LOCAL       =
 'Unused local `{}`.'
 DIAG_UNDEF_GLOBAL       =
@@ -127,9 +127,9 @@ DIAG_MISSING_LOCAL_EXPORT_DOC_PARAM    =
 DIAG_MISSING_LOCAL_EXPORT_DOC_RETURN   =
 'Missing @return annotation at index `{}` in exported local function `{}`.'
 DIAG_INCOMPLETE_SIGNATURE_DOC_PARAM   =
-'Incomplete signature. Missing @param annotation for parameter `{}` in function `{}`.'
+'Incomplete signature. Missing @param annotation for parameter `{}`.'
 DIAG_INCOMPLETE_SIGNATURE_DOC_RETURN  =
-'Incomplete signature. Missing @return annotation at index `{}` in function `{}`.'
+'Incomplete signature. Missing @return annotation at index `{}`.'
 DIAG_UNKNOWN_DIAG_CODE                =
 'Unknown diagnostic code `{}`.'
 DIAG_CAST_LOCAL_TYPE                  =
@@ -166,8 +166,16 @@ DIAG_INVISIBLE_PROTECTED              =
 'Field `{field}` is protected, it can only be accessed in class `{class}` and its subclasses.'
 DIAG_INVISIBLE_PACKAGE                =
 'Field `{field}` can only be accessed in same file `{uri}`.'
-DIAG_GLOBAL_ELEMENT                  =
+DIAG_GLOBAL_ELEMENT                   =
 'Element is global.'
+DIAG_MISSING_FIELDS                   =
+'Missing required fields in type `{1}`: {2}'
+DIAG_INJECT_FIELD                     =
+'Fields cannot be injected into the reference of `{class}` for `{field}`. {fix}'
+DIAG_INJECT_FIELD_FIX_CLASS           =
+'To do so, use `---@class` for `{node}`.'
+DIAG_INJECT_FIELD_FIX_TABLE           =
+'To allow injection, add `{fix}` to the definition.'
 
 MWS_NOT_SUPPORT         =
 '{} does not support multi workspace for now, I may need to restart to support the new workspace ...'
@@ -195,9 +203,9 @@ WORKSPACE_DIAGNOSTIC      =
 WORKSPACE_SKIP_HUGE_FILE  =
 'For performance reasons, the parsing of this file has been stopped: {}'
 WORKSPACE_NOT_ALLOWED     =
-'Your workspace is set to `{}`. Lua language server refused to load this directory. Please check your configuration.[learn more here](https://github.com/LuaLS/lua-language-server/wiki/FAQ#why-is-the-server-scanning-the-wrong-folder)'
+'Your workspace is set to `{}`. Lua language server refused to load this directory. Please check your configuration.[learn more here](https://luals.github.io/wiki/faq#why-is-the-server-scanning-the-wrong-folder)'
 WORKSPACE_SCAN_TOO_MUCH   =
-'More than {} files have been scanned. The current scanned directory is `{}`. Please see the [FAQ](https://github.com/LuaLS/lua-language-server/wiki/FAQ#how-can-i-improve-startup-speeds) to see how you can include fewer files. It is also possible that your [configuration is incorrect](https://github.com/LuaLS/lua-language-server/wiki/FAQ#why-is-the-server-scanning-the-wrong-folder).'
+'More than {} files have been scanned. The current scanned directory is `{}`. Please see the [FAQ](https://luals.github.io/wiki/faq/#how-can-i-improve-startup-speeds) to see how you can include fewer files. It is also possible that your [configuration is incorrect](https://luals.github.io/wiki/faq#why-is-the-server-scanning-the-wrong-folder).'
 
 PARSER_CRASH            =
 'Parser crashed! Last words:{}'
@@ -293,9 +301,9 @@ PARSER_INDEX_IN_FUNC_NAME =
 'The `[name]` form cannot be used in the name of a named function.'
 PARSER_UNKNOWN_ATTRIBUTE  =
 'Local attribute should be `const` or `close`'
-PARSER_AMBIGUOUS_SYNTAX   = -- TODO: need translate!
+PARSER_AMBIGUOUS_SYNTAX   =
 'In Lua 5.1, the left brackets called by the function must be in the same line as the function.'
-PARSER_NEED_PAREN         = -- TODO: need translate!
+PARSER_NEED_PAREN         =
 'Need to add a pair of parentheses.'
 PARSER_NESTING_LONG_MARK  =
 'Nesting of `[[...]]` is not allowed in Lua 5.1 .'
@@ -446,8 +454,10 @@ ACTION_MARK_ASYNC       =
 'Mark current function as async.'
 ACTION_ADD_DICT         =
 'Add \'{}\' to workspace dict'
-ACTION_FIX_ADD_PAREN    = -- TODO: need translate!
+ACTION_FIX_ADD_PAREN    =
 'Add parentheses.'
+ACTION_AUTOREQUIRE      =
+"Import '{}' as {}"
 
 COMMAND_DISABLE_DIAG       =
 'Disable diagnostics'
@@ -548,7 +558,7 @@ WINDOW_APPLY_SETTING             =
 WINDOW_CHECK_SEMANTIC            =
 'If you are using the color theme in the market, you may need to modify `editor.semanticHighlighting.enabled` to `true` to make semantic tokens take effect.'
 WINDOW_TELEMETRY_HINT            =
-'Please allow sending anonymous usage data and error reports to help us further improve this extension. Read our privacy policy [here](https://github.com/LuaLS/lua-language-server/wiki/Home#privacy) .'
+'Please allow sending anonymous usage data and error reports to help us further improve this extension. Read our privacy policy [here](https://luals.github.io/privacy#language-server) .'
 WINDOW_TELEMETRY_ENABLE          =
 'Allow'
 WINDOW_TELEMETRY_DISABLE         =
@@ -693,7 +703,7 @@ Defines a class/table structure
 Manager = {}
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#class)
+[View Wiki](https://luals.github.io/wiki/annotations#class)
 ]=]
 LUADOC_DESC_TYPE =
 [=[
@@ -744,7 +754,7 @@ local x --x[""] is true
 local myFunction
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#types-and-type)
+[View Wiki](https://luals.github.io/wiki/annotations#type)
 ]=]
 LUADOC_DESC_ALIAS =
 [=[
@@ -794,7 +804,7 @@ local enums = {
 ---| `enums.CLOSE`
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#alias)
+[View Wiki](https://luals.github.io/wiki/annotations#alias)
 ]=]
 LUADOC_DESC_PARAM =
 [=[
@@ -819,7 +829,7 @@ function get(url, headers, timeout) end
 function concat(base, ...) end
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#param)
+[View Wiki](https://luals.github.io/wiki/annotations#param)
 ]=]
 LUADOC_DESC_RETURN =
 [=[
@@ -857,7 +867,7 @@ function getFirstLast() end
 function getTags(item) end
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#return)
+[View Wiki](https://luals.github.io/wiki/annotations#return)
 ]=]
 LUADOC_DESC_FIELD =
 [=[
@@ -888,7 +898,7 @@ response = get("localhost")
 statusCode = response.status.code
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#field)
+[View Wiki](https://luals.github.io/wiki/annotations#field)
 ]=]
 LUADOC_DESC_GENERIC =
 [=[
@@ -945,7 +955,7 @@ local v = Generic("Foo") -- v is an object of Foo
 -- we give for key (K) or value (V)
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#generics-and-generic)
+[View Wiki](https://luals.github.io/wiki/annotations/#generic)
 ]=]
 LUADOC_DESC_VARARG =
 [=[
@@ -964,7 +974,7 @@ provide typing or allow descriptions.
 function concat(...) end
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#vararg)
+[View Wiki](https://luals.github.io/wiki/annotations/#vararg)
 ]=]
 LUADOC_DESC_OVERLOAD =
 [=[
@@ -979,7 +989,7 @@ Allows defining of multiple function signatures.
 function table.insert(t, position, value) end
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#overload)
+[View Wiki](https://luals.github.io/wiki/annotations#overload)
 ]=]
 LUADOC_DESC_DEPRECATED =
 [=[
@@ -990,7 +1000,7 @@ being ~~struck through~~.
 `---@deprecated`
 
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#deprecated)
+[View Wiki](https://luals.github.io/wiki/annotations#deprecated)
 ]=]
 LUADOC_DESC_META =
 [=[
@@ -1005,7 +1015,7 @@ There are 3 main distinctions to note with meta files:
 `---@meta`
 
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#meta)
+[View Wiki](https://luals.github.io/wiki/annotations#meta)
 ]=]
 LUADOC_DESC_VERSION =
 [=[
@@ -1030,7 +1040,7 @@ function onlyWorksInJIT() end
 function oldLuaOnly() end
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#version)
+[View Wiki](https://luals.github.io/wiki/annotations#version)
 ]=]
 LUADOC_DESC_SEE =
 [=[
@@ -1040,7 +1050,7 @@ Define something that can be viewed for more information
 `---@see <text>`
 
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#see)
+[View Wiki](https://luals.github.io/wiki/annotations#see)
 ]=]
 LUADOC_DESC_DIAGNOSTIC =
 [=[
@@ -1066,7 +1076,7 @@ local unused = "hello world"
 ---@diagnostic enable: unused-local
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#diagnostic)
+[View Wiki](https://luals.github.io/wiki/annotations#diagnostic)
 ]=]
 LUADOC_DESC_MODULE =
 [=[
@@ -1083,7 +1093,7 @@ local stringUtils
 local module = require('string.utils')
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#module)
+[View Wiki](https://luals.github.io/wiki/annotations#module)
 ]=]
 LUADOC_DESC_ASYNC =
 [=[
@@ -1093,7 +1103,7 @@ Marks a function as asynchronous.
 `---@async`
 
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#async)
+[View Wiki](https://luals.github.io/wiki/annotations#async)
 ]=]
 LUADOC_DESC_NODISCARD =
 [=[
@@ -1105,7 +1115,7 @@ be ignored.
 `---@nodiscard`
 
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#nodiscard)
+[View Wiki](https://luals.github.io/wiki/annotations#nodiscard)
 ]=]
 LUADOC_DESC_CAST =
 [=[
@@ -1140,7 +1150,7 @@ local x --> string|table
 print(x) --> table
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#cast)
+[View Wiki](https://luals.github.io/wiki/annotations#cast)
 ]=]
 LUADOC_DESC_OPERATOR =
 [=[
@@ -1175,7 +1185,7 @@ pB = -pA
 LUADOC_DESC_ENUM =
 [=[
 Mark a table as an enum. If you want an enum but can't define it as a Lua
-table, take a look at the [`@alias`](https://github.com/LuaLS/lua-language-server/wiki/Annotations#alias)
+table, take a look at the [`@alias`](https://luals.github.io/wiki/annotations#alias)
 tag.
 
 ## Syntax
@@ -1197,6 +1207,33 @@ local function setColor(color) end
 
 -- Completion and hover is provided for the below param
 setColor(colors.green)
+```
+]=]
+LUADOC_DESC_SOURCE =
+[=[
+Provide a reference to some source code which lives in another file. When
+searching for the definition of an item, its `@source` will be used.
+
+## Syntax
+`@source <path>`
+
+## Usage
+```
+---You can use absolute paths
+---@source C:/Users/me/Documents/program/myFile.c
+local a
+
+---Or URIs
+---@source file:///C:/Users/me/Documents/program/myFile.c:10
+local b
+
+---Or relative paths
+---@source local/file.c
+local c
+
+---You can also include line and char numbers
+---@source local/file.c:10:8
+local d
 ```
 ]=]
 LUADOC_DESC_PACKAGE =
@@ -1223,7 +1260,7 @@ end
 LUADOC_DESC_PRIVATE =
 [=[
 Mark a function as private to a @class. Private functions can be accessed only
-from within their class and are not accessable from child classes.
+from within their class and are not accessible from child classes.
 
 ## Syntax
 `@private`

@@ -190,38 +190,48 @@ function m.dump(tbl, option)
 end
 
 --- 递归判断A与B是否相等
----@param a any
----@param b any
+---@param valueA any
+---@param valueB any
 ---@return boolean
-function m.equal(a, b)
-    local tp1 = type(a)
-    local tp2 = type(b)
-    if tp1 ~= tp2 then
-        return false
-    end
-    if tp1 == 'table' then
-        local mark = {}
-        for k, v in pairs(a) do
-            mark[k] = true
-            local res = m.equal(v, b[k])
-            if not res then
-                return false
-            end
+function m.equal(valueA, valueB)
+    local hasChecked = {}
+
+    local function equal(a, b)
+        local tp1 = type(a)
+        local tp2 = type(b)
+        if tp1 ~= tp2 then
+            return false
         end
-        for k in pairs(b) do
-            if not mark[k] then
-                return false
+        if tp1 == 'table' then
+            if hasChecked[a] then
+                return true
             end
-        end
-        return true
-    elseif tp1 == 'number' then
-        if mathAbs(a - b) <= 1e-10 then
+            hasChecked[a] = true
+            local mark = {}
+            for k, v in pairs(a) do
+                mark[k] = true
+                local res = equal(v, b[k])
+                if not res then
+                    return false
+                end
+            end
+            for k in pairs(b) do
+                if not mark[k] then
+                    return false
+                end
+            end
             return true
+        elseif tp1 == 'number' then
+            if mathAbs(a - b) <= 1e-10 then
+                return true
+            end
+            return tostring(a) == tostring(b)
+        else
+            return a == b
         end
-        return tostring(a) == tostring(b)
-    else
-        return a == b
     end
+
+    return equal(valueA, valueB)
 end
 
 local function sortTable(tbl)
@@ -283,6 +293,9 @@ end
 
 --- 读取文件
 ---@param path string
+---@param keepBom? boolean
+---@return string? text
+---@return string? errMsg
 function m.loadFile(path, keepBom)
     local f, e = ioOpen(path, 'rb')
     if not f then
@@ -308,6 +321,8 @@ end
 --- 写入文件
 ---@param path string
 ---@param content string
+---@return boolean ok
+---@return string? errMsg
 function m.saveFile(path, content)
     local f, e = ioOpen(path, "wb")
 
@@ -357,6 +372,7 @@ end
 --- 深拷贝（不处理元表）
 ---@param source  table
 ---@param target? table
+---@return table
 function m.deepCopy(source, target)
     local mark = {}
     local function copy(a, b)
@@ -379,6 +395,8 @@ function m.deepCopy(source, target)
 end
 
 --- 序列化
+---@param t table
+---@return table
 function m.unpack(t)
     local result = {}
     local tid = 0
@@ -406,6 +424,8 @@ function m.unpack(t)
 end
 
 --- 反序列化
+---@param t table
+---@return table
 function m.pack(t)
     local cache = {}
     local function pack(id)
@@ -518,18 +538,25 @@ function m.utf8Len(str, start, finish)
     return len
 end
 
-function m.revertTable(t)
-    local len = #t
+-- 把数组中的元素顺序*原地*反转
+---@param arr any[]
+---@return any[]
+function m.revertArray(arr)
+    local len = #arr
     if len <= 1 then
-        return t
+        return arr
     end
     for x = 1, len // 2 do
         local y = len - x + 1
-        t[x], t[y] = t[y], t[x]
+        arr[x], arr[y] = arr[y], arr[x]
     end
-    return t
+    return arr
 end
 
+-- 创建一个value-key表
+---@generic K, V
+---@param t table<K, V>
+---@return table<V, K>
 function m.revertMap(t)
     local nt = {}
     for k, v in pairs(t) do
@@ -624,6 +651,11 @@ function m.eachLine(text, keepNL)
     end
 end
 
+---@alias SortByScoreCallback fun(o: any): integer
+
+-- 按照分数排序，分数越高越靠前
+---@param tbl any[]
+---@param callbacks SortByScoreCallback | SortByScoreCallback[]
 function m.sortByScore(tbl, callbacks)
     if type(callbacks) ~= 'table' then
         callbacks = { callbacks }
@@ -649,6 +681,16 @@ function m.sortByScore(tbl, callbacks)
         end
         return false
     end)
+end
+
+---@param arr any[]
+---@return SortByScoreCallback
+function m.sortCallbackOfIndex(arr)
+    ---@type table<any, integer>
+    local indexMap = m.revertMap(arr)
+    return function (v)
+        return - indexMap[v]
+    end
 end
 
 ---裁剪字符串
@@ -733,6 +775,7 @@ function switchMT:has(name)
 end
 
 ---@param name string
+---@param ... any
 ---@return ...
 function switchMT:__call(name, ...)
     local callback = self.map[name] or self._default
@@ -752,6 +795,8 @@ function m.switch()
 end
 
 ---@param f async fun()
+---@param name string
+---@return any, boolean
 function m.getUpvalue(f, name)
     for i = 1, 999 do
         local uname, value = getupvalue(f, i)
@@ -819,6 +864,7 @@ end
 
 ---@param t table
 ---@param sorter boolean|function
+---@return any[]
 function m.getTableKeys(t, sorter)
     local keys = {}
     for k in pairs(t) do
@@ -839,6 +885,15 @@ function m.arrayHas(array, value)
         end
     end
     return false
+end
+
+function m.arrayIndexOf(array, value)
+    for i = 1, #array do
+        if array[i] == value then
+            return i
+        end
+    end
+    return nil
 end
 
 function m.arrayInsert(array, value)
@@ -871,6 +926,26 @@ function m.cacheReturn(func)
         end
         return cache[param]
     end
+end
+
+---@param a table
+---@param b table
+---@return table
+function m.tableMerge(a, b)
+    for k, v in pairs(b) do
+        a[k] = v
+    end
+    return a
+end
+
+---@param a any[]
+---@param b any[]
+---@return any[]
+function m.arrayMerge(a, b)
+    for i = 1, #b do
+        a[#a+1] = b[i]
+    end
+    return a
 end
 
 return m

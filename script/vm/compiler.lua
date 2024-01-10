@@ -7,10 +7,14 @@ local files      = require 'files'
 local vm         = require 'vm.vm'
 
 ---@class parser.object
----@field _compiledNodes     boolean
----@field _node              vm.node
----@field cindex             integer
----@field func               parser.object
+---@field _compiledNodes        boolean
+---@field _node                 vm.node
+---@field cindex                integer
+---@field func                  parser.object
+---@field hideView              boolean
+---@field package _returns?     parser.object[]
+---@field package _callReturns? parser.object[]
+---@field package _asCache?     parser.object[]
 
 -- 该函数有副作用，会给source绑定node！
 ---@param source parser.object
@@ -28,6 +32,12 @@ function vm.bindDocs(source)
         end
         if doc.type == 'doc.class' then
             vm.setNode(source, vm.compileNode(doc))
+            for j = i + 1, #docs do
+                local overload = docs[j]
+                if overload.type == 'doc.overload' then
+                    overload.overload.hideView = true
+                end
+            end
             return true
         end
         if doc.type == 'doc.param' then
@@ -54,6 +64,9 @@ function vm.bindDocs(source)
             end
             vm.setNode(source, vm.compileNode(ast))
             return true
+        end
+        if doc.type == 'doc.overload' then
+            vm.setNode(source, vm.compileNode(doc))
         end
     end
     return false
@@ -473,6 +486,7 @@ function vm.getReturnOfFunction(func, index)
             func._returns = {}
         end
         if not func._returns[index] then
+            ---@diagnostic disable-next-line: missing-fields
             func._returns[index] = {
                 type        = 'function.return',
                 parent      = func,
@@ -570,6 +584,7 @@ local function getReturn(func, index, args)
     end
     if not func._callReturns[index] then
         local call = func.parent
+        ---@diagnostic disable-next-line: missing-fields
         func._callReturns[index] = {
             type   = 'call.return',
             parent = call,
@@ -756,6 +771,11 @@ function vm.selectNode(list, index)
     if not exp then
         return vm.createNode(vm.declareGlobal('type', 'nil')), nil
     end
+
+    if vm.bindDocs(list) then
+        return vm.compileNode(list), exp
+    end
+
     ---@type vm.node?
     local result
     if exp.type == 'call' then
@@ -862,52 +882,69 @@ local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
         end
     end
 
-    for n in callNode:eachObject() do
-        if n.type == 'function' then
-            ---@cast n parser.object
-            local sign = vm.getSign(n)
+    ---@param n parser.object
+    local function dealDocFunc(n)
+        local myEvent
+        if n.args[eventIndex] then
+            local argNode = vm.compileNode(n.args[eventIndex])
+            myEvent = argNode:get(1)
+        end
+        if not myEvent
+        or not eventMap
+        or myIndex <= eventIndex
+        or myEvent.type ~= 'doc.type.string'
+        or eventMap[myEvent[1]] then
             local farg = getFuncArg(n, myIndex)
             if farg then
                 for fn in vm.compileNode(farg):eachObject() do
                     if isValidCallArgNode(arg, fn) then
-                        if fn.type == 'doc.type.function' then
-                            ---@cast fn parser.object
-                            if sign then
-                                local generic = vm.createGeneric(fn, sign)
-                                local args    = {}
-                                for i = fixIndex + 1, myIndex - 1 do
-                                    args[#args+1] = call.args[i]
-                                end
-                                local resolvedNode = generic:resolve(guide.getUri(call), args)
-                                vm.setNode(arg, resolvedNode)
-                                goto CONTINUE
-                            end
-                        end
                         vm.setNode(arg, fn)
-                        ::CONTINUE::
                     end
                 end
             end
         end
-        if n.type == 'doc.type.function' then
-            ---@cast n parser.object
-            local myEvent
-            if n.args[eventIndex] then
-                local argNode = vm.compileNode(n.args[eventIndex])
-                myEvent = argNode:get(1)
-            end
-            if not myEvent
-            or not eventMap
-            or myIndex <= eventIndex
-            or myEvent.type ~= 'doc.type.string'
-            or eventMap[myEvent[1]] then
-                local farg = getFuncArg(n, myIndex)
-                if farg then
-                    for fn in vm.compileNode(farg):eachObject() do
-                        if isValidCallArgNode(arg, fn) then
-                            vm.setNode(arg, fn)
+    end
+
+    ---@param n parser.object
+    local function dealFunction(n)
+        local sign = vm.getSign(n)
+        local farg = getFuncArg(n, myIndex)
+        if farg then
+            for fn in vm.compileNode(farg):eachObject() do
+                if isValidCallArgNode(arg, fn) then
+                    if fn.type == 'doc.type.function' then
+                        ---@cast fn parser.object
+                        if sign then
+                            local generic = vm.createGeneric(fn, sign)
+                            local args    = {}
+                            for i = fixIndex + 1, myIndex - 1 do
+                                args[#args+1] = call.args[i]
+                            end
+                            local resolvedNode = generic:resolve(guide.getUri(call), args)
+                            vm.setNode(arg, resolvedNode)
+                            goto CONTINUE
                         end
                     end
+                    vm.setNode(arg, fn)
+                    ::CONTINUE::
+                end
+            end
+        end
+    end
+
+    for n in callNode:eachObject() do
+        if n.type == 'function' then
+            ---@cast n parser.object
+            dealFunction(n)
+        elseif n.type == 'doc.type.function' then
+            ---@cast n parser.object
+            dealDocFunc(n)
+        elseif n.type == 'global' and n.cate == 'type' then
+            ---@cast n vm.global
+            local overloads = vm.getOverloadsByTypeName(n.name, guide.getUri(arg))
+            if overloads then
+                for _, func in ipairs(overloads) do
+                    dealDocFunc(func)
                 end
             end
         end
@@ -1020,6 +1057,7 @@ local function compileLocal(source)
             vm.setNode(source, vm.compileNode(source.value))
         end
     end
+
     -- function x.y(self, ...) --> function x:y(...)
     if  source[1] == 'self'
     and not hasMarkDoc
@@ -1031,6 +1069,7 @@ local function compileLocal(source)
             vm.setNode(source, vm.compileNode(setfield.node))
         end
     end
+
     if source.parent.type == 'funcargs' and not hasMarkDoc and not hasMarkParam then
         local func = source.parent.parent
         -- local call ---@type fun(f: fun(x: number));call(function (x) end) --> x -> number
@@ -1055,6 +1094,7 @@ local function compileLocal(source)
             vm.setNode(source, vm.declareGlobal('type', 'any'))
         end
     end
+
     -- for x in ... do
     if source.parent.type == 'in' then
         compileForVars(source.parent, source)
@@ -1092,6 +1132,12 @@ local function compileLocal(source)
         and guide.getBlock(firstSet) == guide.getBlock(source) then
             vm.setNode(source, vm.compileNode(firstSet))
         end
+    end
+
+    if  source.value
+    and source.value.type == 'nil'
+    and not myNode:hasKnownType() then
+        vm.setNode(source, vm.compileNode(source.value))
     end
 
     myNode.hasDefined = hasMarkDoc or hasMarkParam or hasMarkValue
@@ -1140,11 +1186,24 @@ local compilerSwitch = util.switch()
     end)
     : case 'table'
     : call(function (source)
+        if vm.bindAs(source) then
+            return
+        end
         vm.setNode(source, source)
 
         if source.parent.type == 'callargs' then
             local call = source.parent.parent
             vm.compileCallArg(source, call)
+        end
+
+        if source.parent.type == 'return' then
+            local myIndex = util.arrayIndexOf(source.parent, source)
+            ---@cast myIndex -?
+            local parentNode = vm.selectNode(source.parent, myIndex)
+            if not parentNode:isEmpty() then
+                vm.setNode(source, parentNode)
+                return
+            end
         end
 
         if source.parent.type == 'setglobal'
@@ -1648,7 +1707,7 @@ local compilerSwitch = util.switch()
             if state.type == 'doc.return'
             or state.type == 'doc.param' then
                 local func = state.bindSource
-                if func.type == 'function' then
+                if func and func.type == 'function' then
                     local node = guide.getFunctionSelfNode(func)
                     if node then
                         vm.setNode(source, vm.compileNode(node))

@@ -65,6 +65,7 @@ local function packObject(source, mark)
         end
         if source.type == 'function.return' then
             new['desc'] = source.comment and getDesc(source.comment)
+            new['rawdesc'] = source.comment and getDesc(source.comment, true)
         end
         if source.type == 'doc.type.table' then
             new['fields'] = packObject(source.fields, mark)
@@ -82,6 +83,7 @@ local function packObject(source, mark)
         end
         if source.bindDocs then
             new['desc'] = getDesc(source)
+            new['rawdesc'] = getDesc(source, true)
         end
         new['view'] = new['view'] or vm.getInfer(source):view(ws.rootUri)
     end
@@ -115,6 +117,7 @@ local function collectTypes(global, results)
         name    = global.name,
         type    = 'type',
         desc    = nil,
+        rawdesc = nil,
         defines = {},
         fields  = {},
     }
@@ -131,6 +134,7 @@ local function collectTypes(global, results)
             extends = getExtends(set),
         }
         result.desc = result.desc or getDesc(set)
+        result.rawdesc = result.rawdesc or getDesc(set, true)
         ::CONTINUE::
     end
     if #result.defines == 0 then
@@ -163,6 +167,7 @@ local function collectTypes(global, results)
             field.start   = source.start
             field.finish  = source.finish
             field.desc    = getDesc(source)
+            field.rawdesc = getDesc(source, true)
             field.extends = packObject(source.extends)
             return
         end
@@ -180,6 +185,7 @@ local function collectTypes(global, results)
             field.start   = source.start
             field.finish  = source.finish
             field.desc    = getDesc(source)
+            field.rawdesc = getDesc(source, true)
             field.extends = packObject(source.value)
             return
         end
@@ -199,6 +205,7 @@ local function collectTypes(global, results)
             field.start   = source.start
             field.finish  = source.finish
             field.desc    = getDesc(source)
+            field.rawdesc = getDesc(source, true)
             field.extends = packObject(source.value)
             return
         end
@@ -237,6 +244,7 @@ local function collectVars(global, results)
                 extends = packObject(set.value),
             }
             result.desc = result.desc or getDesc(set)
+            result.rawdesc = result.rawdesc or getDesc(set, true)
         end
     end
     if #result.defines == 0 then

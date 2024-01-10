@@ -62,6 +62,7 @@ m.register {
     'missing-return-value',
     'redundant-return-value',
     'missing-return',
+    'missing-fields',
 } {
     group    = 'unbalanced',
     severity = 'Warning',
@@ -76,6 +77,7 @@ m.register {
     'param-type-mismatch',
     'cast-type-mismatch',
     'return-type-mismatch',
+    'inject-field',
 } {
     group    = 'type-check',
     severity = 'Warning',

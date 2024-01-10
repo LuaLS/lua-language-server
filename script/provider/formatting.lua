@@ -82,16 +82,13 @@ function m.updateNonStandardSymbols(symbols)
         return
     end
 
-    local eqTokens = {}
-    for _, token in ipairs(symbols) do
-        if token:find("=") and token ~= "!=" then
-            table.insert(eqTokens, token)
+    for _, symbol in ipairs(symbols) do
+        if symbol == "//" then
+            codeFormat.set_clike_comments_symbol()
         end
     end
 
-    if #eqTokens ~= 0 then
-        codeFormat.set_nonstandard_symbol()
-    end
+    codeFormat.set_nonstandard_symbol()
 end
 
 config.watch(function(uri, key, value)

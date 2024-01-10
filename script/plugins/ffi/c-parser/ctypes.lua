@@ -149,7 +149,10 @@ end
 local function add_to_fields(lst, field_src, fields)
     if type(field_src) == "table" and not field_src.ids then
         assert(field_src.type.type == "union")
-        local subfields = get_fields(lst, field_src.type.fields)
+        local subfields, err = get_fields(lst, field_src.type.fields)
+        if not subfields then
+            return nil, err
+        end
         for _, subfield in ipairs(subfields) do
             table.insert(fields, subfield)
         end

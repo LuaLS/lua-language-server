@@ -8,6 +8,9 @@ local define     = require 'proto.define'
 local json       = require 'json'
 local inspect    = require 'inspect'
 local thread     = require 'bee.thread'
+local fs         = require 'bee.filesystem'
+local net        = require 'service.net'
+local timer      = require 'timer'
 
 local reqCounter = util.counter()
 
@@ -32,8 +35,7 @@ m.ability = {}
 m.waiting = {}
 m.holdon  = {}
 m.mode    = 'stdio'
----@type bee.socket.fd
-m.fd      = nil
+m.client  = nil
 
 function m.getMethodName(proto)
     if proto.method:sub(1, 2) == '$/' then
@@ -54,7 +56,8 @@ function m.send(data)
     if m.mode == 'stdio' then
         io.write(buf)
     elseif m.mode == 'socket' then
-        m.fd:send(buf)
+        m.client:write(buf)
+        net.update()
     end
 end
 
@@ -237,13 +240,37 @@ function m.listen(mode, socketPort)
         io.stdout:setvbuf 'no'
         pub.task('loadProtoByStdio')
     elseif mode == 'socket' then
-        local rfd = assert(socket('tcp'))
-        rfd:connect('127.0.0.1', socketPort)
-        local wfd1, wfd2 = socket.pair()
-        m.fd = wfd1
+        local unixFolder = LOGPATH .. '/unix'
+        fs.create_directories(fs.path(unixFolder))
+        local unixPath = unixFolder .. '/' .. tostring(socketPort)
+
+        local server = net.listen('unix', unixPath)
+
+        assert(server)
+
+        local dummyClient = {
+            buf = '',
+            write = function (self, data)
+                self.buf = self.buf.. data
+            end,
+            update = function () end,
+        }
+        m.client = dummyClient
+
+        local t = timer.loop(0.1, function ()
+            net.update()
+        end)
+
+        function server:on_accept(client)
+            t:remove()
+            m.client = client
+            client:write(dummyClient.buf)
+            net.update()
+        end
+
         pub.task('loadProtoBySocket', {
-            wfd = wfd2:detach(),
-            rfd = rfd:detach(),
+            port = socketPort,
+            unixPath = unixPath,
         })
     end
 end

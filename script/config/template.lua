@@ -317,7 +317,12 @@ local template = {
     ['Lua.workspace.maxPreload']            = Type.Integer >> 5000,
     ['Lua.workspace.preloadFileSize']       = Type.Integer >> 500,
     ['Lua.workspace.library']               = Type.Array(Type.String),
-    ['Lua.workspace.checkThirdParty']       = Type.Boolean >> true,
+    ['Lua.workspace.checkThirdParty']       = Type.Or(Type.String >> 'Ask' << {
+                                                'Ask',
+                                                'Apply',
+                                                'ApplyInMemory',
+                                                'Disable',
+                                            }, Type.Boolean),
     ['Lua.workspace.userThirdParty']        = Type.Array(Type.String),
     ['Lua.completion.enable']               = Type.Boolean >> true,
     ['Lua.completion.callSnippet']          = Type.String  >> 'Disable' << {

@@ -12,7 +12,7 @@ function bit.tobit(x) end
 
 ---@param x  integer
 ---@param n? integer
----@return integer y
+---@return string y
 ---@nodiscard
 function bit.tohex(x, n) end
 

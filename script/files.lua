@@ -662,7 +662,7 @@ local function pluginOnTransformAst(uri, state)
     if not suc then
         return state
     end
-    state.ast = result
+    state.ast = result or state.ast
     return state
 end
 

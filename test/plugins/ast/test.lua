@@ -1,14 +1,9 @@
-local config  = require 'config'
-local utility = require 'utility'
 local parser  = require 'parser'
-local luadoc  = require 'parser.luadoc'
 local guide   = require 'parser.guide'
-local vm      = require 'vm'
 local helper  = require 'plugins.astHelper'
 
 ---@diagnostic disable: await-in-sync
 local function TestPlugin(script, plugin, checker)
-    config.set(TESTURI, 'Lua.workspace.preloadFileSize', 1000000000)
     local state = parser.compile(script, "Lua", "Lua 5.4")
     state.ast = plugin(TESTURI, state.ast) or state.ast
     parser.luadoc(state)
@@ -90,3 +85,5 @@ TestPlugin2 [[
 TestPlugin2 [[
     function ctor(self) end
 ]]
+
+require 'plugins.ast.helper'

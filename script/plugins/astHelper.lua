@@ -38,7 +38,7 @@ end
 ---@param index integer
 ---@return parser.object?
 function _M.removeArg(source, index)
-    if source.type == 'function' then
+    if source.type == 'function' or source.type == 'call' then
         local arg = table.remove(source.args, index)
         if not arg then
             return nil

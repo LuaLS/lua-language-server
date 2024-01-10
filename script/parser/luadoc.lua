@@ -2137,9 +2137,9 @@ return {
             doc.originalComment = comment
             doc.virtual = true
             ast.state.pluginDocs = pluginDocs
-            return true
+            return doc
         end
-        return false
+        return nil
     end,
     luadoc = luadoc
 }

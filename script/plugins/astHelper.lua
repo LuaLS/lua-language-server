@@ -78,7 +78,7 @@ function _M.addParamTypeDoc(ast, typename, source)
         ('%s %s'):format(paramname, typename),
         source.start - 1)
 
-    return luadoc.buildAndBindDoc(ast, source, comment)
+    return luadoc.buildAndBindDoc(ast, source.parent.parent, comment)
 end
 
 return _M

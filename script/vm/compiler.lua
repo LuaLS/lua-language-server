@@ -1030,6 +1030,7 @@ local function compileForVars(source, target)
     return false
 end
 
+---@async
 ---@param source parser.object
 local function compileLocal(source)
     local myNode = vm.setNode(source, source)

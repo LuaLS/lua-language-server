@@ -94,7 +94,7 @@ print(1, 2, 3, 4, 5)
 
 TEST [[
 local function f(callback)
-    callback(1, 2, 3)
+    callback(<!1!>, <!2!>, <!3!>)
 end
 f(function () end)
 ]]

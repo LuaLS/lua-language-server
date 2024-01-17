@@ -5,6 +5,7 @@ local rpath      = require 'workspace.require-path'
 local files      = require 'files'
 ---@class vm
 local vm         = require 'vm.vm'
+local plugin     = require 'plugin'
 
 ---@class parser.object
 ---@field _compiledNodes        boolean
@@ -1088,6 +1089,13 @@ local function compileLocal(source)
                         hasDocArg = true
                     end
                 end
+            end
+        end
+        if not hasDocArg then
+            local suc, node = plugin.dispatch("OnNodeCompileFunctionParam", guide.getUri(source), source)
+            if suc and node then
+                hasDocArg = true
+                vm.setNode(source, node)
             end
         end
         if not hasDocArg then

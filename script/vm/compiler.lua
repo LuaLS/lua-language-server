@@ -1030,7 +1030,6 @@ local function compileForVars(source, target)
     return false
 end
 
----@async
 ---@param source parser.object
 local function compileLocal(source)
     local myNode = vm.setNode(source, source)
@@ -1093,9 +1092,7 @@ local function compileLocal(source)
         end
         if not hasDocArg
         and func.parent.type == 'local' then
-            local refs = vm.getRefs(func, function (_)
-                return false
-            end)
+            local refs = func.parent.ref
             local findCall
             if refs then
                 for i, ref in ipairs(refs) do

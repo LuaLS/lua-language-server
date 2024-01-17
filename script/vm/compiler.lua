@@ -1091,6 +1091,35 @@ local function compileLocal(source)
                 end
             end
         end
+        if not hasDocArg
+        and func.parent.type == 'local' then
+            local refs = func.parent.ref
+            local findCall
+            if refs then
+                for i, ref in ipairs(refs) do
+                    if ref.parent.type == 'call' then
+                        findCall = ref.parent
+                        break
+                    end
+                end
+            end
+            if findCall and findCall.args then
+                local index
+                for i, arg in ipairs(source.parent) do
+                    if arg == source then
+                        index = i
+                        break
+                    end
+                end
+                if index then
+                    local callerArg = findCall.args[index]
+                    if callerArg then
+                        hasDocArg = true
+                        vm.setNode(source, vm.compileNode(callerArg))
+                    end
+                end
+            end
+        end
         if not hasDocArg then
             local suc, node = plugin.dispatch("OnNodeCompileFunctionParam", guide.getUri(source), source)
             if suc and node then

@@ -84,24 +84,30 @@ local function initPlugin(uri)
         local scp = scope.getScope(uri)
         local interfaces = {}
         scp:set('pluginInterfaces', interfaces)
-    
+
         if not scp.uri then
             return
         end
         ---@type string[]|string
         local pluginConfigPaths = config.get(scp.uri, 'Lua.runtime.plugin')
+        if not pluginConfigPaths then
+            return
+        end
         local args = config.get(scp.uri, 'Lua.runtime.pluginArgs')
         if type(pluginConfigPaths) == 'string' then
-            pluginConfigPaths = {pluginConfigPaths}
+            pluginConfigPaths = { pluginConfigPaths }
         end
         for i, pluginConfigPath in ipairs(pluginConfigPaths) do
             local myArgs = args
-            for k, v in pairs(args) do
-                if pluginConfigPath:find(k, 1, true) then
-                    myArgs = v
-                    break
+            if args then
+                for k, v in pairs(args) do
+                    if pluginConfigPath:find(k, 1, true) then
+                        myArgs = v
+                        break
+                    end
                 end
             end
+
             local pluginPath = ws.getAbsolutePath(scp.uri, pluginConfigPath)
             log.info('plugin path:', pluginPath)
             if not pluginPath then
@@ -126,7 +132,7 @@ local function initPlugin(uri)
             scp:set('pluginPath', pluginPath)
 
             local interface = setmetatable({}, { __index = _ENV })
-            local f, err = load(pluginLua, '@'..pluginPath, "t", interface)
+            local f, err = load(pluginLua, '@' .. pluginPath, "t", interface)
             if not f then
                 log.error(err)
                 m.showError(scp, err)

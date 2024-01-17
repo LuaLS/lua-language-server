@@ -633,6 +633,53 @@ local function parseCode(parent)
     return code
 end
 
+local function parseCodePattern(parent)
+    local tp, pattern = peekToken()
+    if not tp or tp ~= 'name' then
+        return nil
+    end
+    local codeOffset
+    local finishOffset
+    local content
+    for i = 2, 8 do
+        local next, nextContent = peekToken(i)
+        if not next or TokenFinishs[Ci+i-1] + 1 ~= TokenStarts[Ci+i] then
+            if codeOffset then
+                finishOffset = i
+                break
+            end
+            ---不连续的name，无效的
+            return nil
+        end
+        if next == 'code' then
+            if codeOffset and content ~= nextContent then
+                -- 暂时不支持多generic
+                return nil
+            end
+            codeOffset = i
+            pattern = pattern .. "%s"
+            content = nextContent
+        elseif next ~= 'name' then
+            return nil
+        else
+            pattern = pattern .. nextContent
+        end
+    end
+    local start = getStart()
+    for i = 2 , finishOffset do
+        nextToken()
+    end
+    local code = {
+        type   = 'doc.type.code',
+        start  = start,
+        finish = getFinish(),
+        parent = parent,
+        pattern = pattern,
+        [1]    = content,
+    }
+    return code
+end
+
 local function parseInteger(parent)
     local tp, content = peekToken()
     if not tp or tp ~= 'integer' then
@@ -687,6 +734,7 @@ function parseTypeUnit(parent)
                 or parseInteger(parent)
                 or parseBoolean(parent)
                 or parseParen(parent)
+                or parseCodePattern(parent)
     if not result then
         result = parseName('doc.type.name', parent)
               or parseDots('doc.type.name', parent)

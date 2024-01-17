@@ -276,7 +276,7 @@ function string.lower(s: string|number)
   -> string
 ]]
 
--- 不根据传入值推测参数类型
+-- 根据传入值推测参数类型
 TEST [[
 local function x(a, ...)
 end
@@ -284,7 +284,7 @@ end
 <?x?>(1, 2, 3, 4, 5, 6, 7)
 ]]
 [[
-function x(a: any, ...any)
+function x(a: integer, ...any)
 ]]
 
 TEST [[

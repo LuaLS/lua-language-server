@@ -18,30 +18,37 @@ function m.showError(scp, err)
     client.showMessage('Error', lang.script('PLUGIN_RUNTIME_ERROR', scp:get('pluginPath'), err))
 end
 
+---@alias plugin.event 'OnSetText' | 'OnTransformAst'
+
+---@param event plugin.event
 function m.dispatch(event, uri, ...)
     local scp = scope.getScope(uri)
-    local interface = scp:get('pluginInterface')
-    if not interface then
+    local interfaces = scp:get('pluginInterfaces')
+    if not interfaces then
         return false
     end
-    local method = interface[event]
-    if type(method) ~= 'function' then
-        return false
+    local failed = 0
+    local res1, res2
+    for i, interface in ipairs(interfaces) do
+        local method = interface[event]
+        if type(method) ~= 'function' then
+            return false
+        end
+        local clock = os.clock()
+        tracy.ZoneBeginN('plugin dispatch:' .. event)
+        local suc
+        suc, res1, res2 = xpcall(method, log.error, uri, ...)
+        tracy.ZoneEnd()
+        local passed = os.clock() - clock
+        if passed > 0.1 then
+            log.warn(('Call plugin event [%s] takes [%.3f] sec'):format(event, passed))
+        end
+        if not suc then
+            m.showError(scp, res1)
+            failed = failed + 1
+        end
     end
-    local clock = os.clock()
-    tracy.ZoneBeginN('plugin dispatch:' .. event)
-    local suc, res1, res2 = xpcall(method, log.error, uri, ...)
-    tracy.ZoneEnd()
-    local passed = os.clock() - clock
-    if passed > 0.1 then
-        log.warn(('Call plugin event [%s] takes [%.3f] sec'):format(event, passed))
-    end
-    if suc then
-        return true, res1, res2
-    else
-        m.showError(scp, res1)
-    end
-    return false, res1
+    return failed == 0, res1, res2
 end
 
 ---@async
@@ -75,53 +82,72 @@ end
 local function initPlugin(uri)
     await.call(function () ---@async
         local scp = scope.getScope(uri)
-        local interface = {}
-        scp:set('pluginInterface', interface)
+        local interfaces = {}
+        scp:set('pluginInterfaces', interfaces)
 
         if not scp.uri then
             return
         end
-
-        local pluginPath = ws.getAbsolutePath(scp.uri, config.get(scp.uri, 'Lua.runtime.plugin'))
-        log.info('plugin path:', pluginPath)
-        if not pluginPath then
+        ---@type string[]|string
+        local pluginConfigPaths = config.get(scp.uri, 'Lua.runtime.plugin')
+        if not pluginConfigPaths then
             return
         end
-
-        --Adding the plugins path to package.path allows for requires in files
-        --to find files relative to itself.
-        local oldPath = package.path
-        local path = fs.path(pluginPath):parent_path() / '?.lua'
-        if not package.path:find(path:string(), 1, true) then
-            package.path = package.path .. ';' .. path:string()
+        local args = config.get(scp.uri, 'Lua.runtime.pluginArgs')
+        if type(pluginConfigPaths) == 'string' then
+            pluginConfigPaths = { pluginConfigPaths }
         end
+        for i, pluginConfigPath in ipairs(pluginConfigPaths) do
+            local myArgs = args
+            if args then
+                for k, v in pairs(args) do
+                    if pluginConfigPath:find(k, 1, true) then
+                        myArgs = v
+                        break
+                    end
+                end
+            end
 
-        local pluginLua = util.loadFile(pluginPath)
-        if not pluginLua then
-            log.warn('plugin not found:', pluginPath)
-            package.path = oldPath
-            return
-        end
+            local pluginPath = ws.getAbsolutePath(scp.uri, pluginConfigPath)
+            log.info('plugin path:', pluginPath)
+            if not pluginPath then
+                return
+            end
 
-        scp:set('pluginPath', pluginPath)
+            --Adding the plugins path to package.path allows for requires in files
+            --to find files relative to itself.
+            local oldPath = package.path
+            local path = fs.path(pluginPath):parent_path() / '?.lua'
+            if not package.path:find(path:string(), 1, true) then
+                package.path = package.path .. ';' .. path:string()
+            end
 
-        local env = setmetatable(interface, { __index = _ENV })
-        local f, err = load(pluginLua, '@'..pluginPath, "t", env)
-        if not f then
-            log.error(err)
-            m.showError(scp, err)
-            return
-        end
-        if not client.isVSCode() and not checkTrustLoad(scp) then
-            return
-        end
-        local pluginArgs = config.get(scp.uri, 'Lua.runtime.pluginArgs')
-        local suc, err = xpcall(f, log.error, f, uri, pluginArgs)
-        if not suc then
-            m.showError(scp, err)
-            return
-        end
+            local pluginLua = util.loadFile(pluginPath)
+            if not pluginLua then
+                log.warn('plugin not found:', pluginPath)
+                package.path = oldPath
+                return
+            end
 
+            scp:set('pluginPath', pluginPath)
+
+            local interface = setmetatable({}, { __index = _ENV })
+            local f, err = load(pluginLua, '@' .. pluginPath, "t", interface)
+            if not f then
+                log.error(err)
+                m.showError(scp, err)
+                return
+            end
+            if not client.isVSCode() and not checkTrustLoad(scp) then
+                return
+            end
+            local suc, err = xpcall(f, log.error, f, uri, myArgs)
+            if not suc then
+                m.showError(scp, err)
+                return
+            end
+            interfaces[#interfaces+1] = interface
+        end
         ws.resetFiles(scp)
     end)
 end

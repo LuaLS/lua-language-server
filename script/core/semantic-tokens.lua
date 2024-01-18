@@ -882,6 +882,10 @@ return function (uri, start, finish)
 
     local n = 0
     guide.eachSourceBetween(state.ast, start, finish, function (source) ---@async
+        -- skip virtual source
+        if source.virtual then
+            return
+        end
         Care(source.type, source, options, results)
         n = n + 1
         if n % 100 == 0 then
@@ -890,6 +894,10 @@ return function (uri, start, finish)
     end)
 
     for _, comm in ipairs(state.comms) do
+        -- skip virtual comment
+        if comm.virtual then
+            return
+        end
         if start <= comm.start and comm.finish <= finish then
             local headPos = (comm.type == 'comment.short' and comm.text:match '^%-%s*[@|]()')
                          or (comm.type == 'comment.long'  and comm.text:match '^@()')

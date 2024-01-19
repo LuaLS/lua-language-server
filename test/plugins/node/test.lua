@@ -9,15 +9,19 @@ local pattern, msg = nodeHelper.createFieldPattern("*.components")
 assert(pattern, msg)
 
 ---@param source parser.object
-function OnNodeCompileFunctionParam(uri, source)
+function OnCompileFunctionParam(next, func, source)
+    if next(func, source) then
+        return true
+    end
     --从该参数的使用模式来推导该类型
     if nodeHelper.matchPattern(source, pattern) then
         local type = vm.declareGlobal('type', 'TestClass', TESTURI)
-        return vm.createNode(type, source)
+        vm.setNode(source, vm.createNode(type, source))
+        return true
     end
 end
 
-local myplugin = { OnNodeCompileFunctionParam = OnNodeCompileFunctionParam }
+local myplugin = { OnCompileFunctionParam = OnCompileFunctionParam }
 
 ---@diagnostic disable: await-in-sync
 local function TestPlugin(script)

@@ -1035,7 +1035,6 @@ end
 local function compileFunctionParam(func, source)
     -- local call ---@type fun(f: fun(x: number));call(function (x) end) --> x -> number
     local funcNode = vm.compileNode(func)
-    local hasDocArg
     for n in funcNode:eachObject() do
         if n.type == 'doc.type.function' then
             for index, arg in ipairs(n.args) do

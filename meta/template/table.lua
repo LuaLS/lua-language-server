@@ -27,7 +27,7 @@ function table.insert(list, pos, value) end
 ---@nodiscard
 function table.maxn(table) end
 
----@version >5.3
+---@version >5.3, JIT
 ---#DES 'table.move'
 ---@param a1  table
 ---@param f   integer

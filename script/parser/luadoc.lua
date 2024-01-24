@@ -2106,11 +2106,13 @@ local function luadoc(state)
             end
         end
     end
-    
+
     if ast.state.pluginDocs then
         for i, doc in ipairs(ast.state.pluginDocs) do
             insertDoc(doc, doc.originalComment)
         end
+        ---@param a unknown
+        ---@param b unknown
         table.sort(ast.docs, function (a, b)
             return a.start < b.start
         end)

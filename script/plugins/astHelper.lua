@@ -57,7 +57,7 @@ end
 function _M.addClassDocAtParam(ast, classname, source, index)
     local arg = _M.removeArg(source, index)
     if arg then
-        return _M.addClassDoc(ast, arg, classname), arg
+        return not not _M.addClassDoc(ast, arg, classname), arg
     end
     return false
 end

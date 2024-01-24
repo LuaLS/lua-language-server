@@ -125,8 +125,9 @@ function mt:set(k, v)
     return v
 end
 
----@param k string
----@return any
+---@generic T
+---@param k `T`
+---@return T
 function mt:get(k)
     return self._data[k]
 end

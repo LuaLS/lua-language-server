@@ -1121,9 +1121,24 @@ local function compileLocal(source)
     end
     if source.parent.type == 'funcargs' and not hasMarkDoc and not hasMarkParam then
         local func = source.parent.parent
-        local vmPlugin = plugin.getVmPlugin(guide.getUri(source))
-        local hasDocArg = vmPlugin and vmPlugin.OnCompileFunctionParam(compileFunctionParam, func, source)
-            or compileFunctionParam(func, source)
+        -- local call ---@type fun(f: fun(x: number));call(function (x) end) --> x -> number
+        local funcNode = vm.compileNode(func)
+        local hasDocArg
+        for n in funcNode:eachObject() do
+            if n.type == 'doc.type.function' then
+                for index, arg in ipairs(n.args) do
+                    if func.args[index] == source then
+                        local argNode = vm.compileNode(arg)
+                        for an in argNode:eachObject() do
+                            if an.type ~= 'doc.generic.name' then
+                                vm.setNode(source, an)
+                            end
+                        end
+                        hasDocArg = true
+                    end
+                end
+            end
+        end
         if not hasDocArg then
             vm.setNode(source, vm.declareGlobal('type', 'any'))
         end

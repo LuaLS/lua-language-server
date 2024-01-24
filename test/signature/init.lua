@@ -88,7 +88,7 @@ end
 
 x(1, 2, 3, <??>
 ]]
-{'function x(a: integer, <!...any!>)'}
+{'function x(a: any, <!...any!>)'}
 
 TEST [[
 (''):sub(<??>
@@ -106,7 +106,7 @@ end
 
 f(1, 'string<??>')
 ]]
-{'function f(a: integer, <!b: string!>, c: any)'}
+{'function f(a: any, <!b: any!>, c: any)'}
 
 TEST [[
 pcall(function () <??> end)
@@ -156,7 +156,7 @@ end
 
 f({},<??>)
 ]]
-{'function f(a: table, <!b: any!>, c: any)'}
+{'function f(a: any, <!b: any!>, c: any)'}
 
 TEST [[
 for _ in pairs(<??>) do
@@ -188,7 +188,7 @@ end
 
 x(  aaaa  <??>, 2)
 ]]
-{"function x(<!a: any!>, b: integer)"}
+{"function x(<!a: any!>, b: any)"}
 
 TEST [[
 local function x(a, b)
@@ -196,7 +196,7 @@ end
 
 x(<??>   aaaa  , 2)
 ]]
-{'function x(<!a: any!>, b: integer)'}
+{'function x(<!a: any!>, b: any)'}
 
 TEST [[
 local function x(a, b)
@@ -204,7 +204,7 @@ end
 
 x(aaaa  ,<??>    2)
 ]]
-{'function x(a: any, <!b: integer!>)'}
+{'function x(a: any, <!b: any!>)'}
 
 TEST [[
 local function x(a, b)
@@ -212,7 +212,7 @@ end
 
 x(aaaa  ,    2     <??>)
 ]]
-{'function x(a: any, <!b: integer!>)'}
+{'function x(a: any, <!b: any!>)'}
 
 TEST [[
 local fooC

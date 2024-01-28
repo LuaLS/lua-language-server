@@ -23,14 +23,27 @@ end
 ---@param ast parser.object
 ---@param source parser.object local/global variable
 ---@param classname string
-function _M.addClassDoc(ast, source, classname)
+---@param group table?
+function _M.addClassDoc(ast, source, classname, group)
+    return _M.addDoc(ast, source, "class", classname, group)
+end
+
+--- give the local/global variable a luadoc comment
+---@param ast parser.object
+---@param source parser.object local/global variable
+---@param key string
+---@param value string
+---@param group table?
+function _M.addDoc(ast, source, key, value, group)
     if source.type ~= 'local' and not guide.isGlobal(source) then
         return false
     end
-    --TODO fileds
-    --TODO callers
-    local comment = _M.buildComment("class", classname, source.start - 1)
-    return luadoc.buildAndBindDoc(ast, source, comment)
+    local comment = _M.buildComment(key, value, source.start - 1)
+    local doc = luadoc.buildAndBindDoc(ast, source, comment, group)
+	if group then
+		group[#group+1] = doc
+	end
+	return doc
 end
 
 ---remove `ast` function node `index` arg, the variable will be the function local variable

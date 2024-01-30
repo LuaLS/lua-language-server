@@ -369,6 +369,75 @@ local function parseTable(parent)
     return typeUnit
 end
 
+local function parseTuple(parent)
+    if not checkToken('symbol', '[', 1) then
+        return nil
+    end
+    nextToken()
+    local typeUnit = {
+        type    = 'doc.type.table',
+        start   = getStart(),
+        parent  = parent,
+        fields  = {},
+        isTuple = true,
+    }
+
+    local index = 1
+    while true do
+        if checkToken('symbol', ']', 1) then
+            nextToken()
+            break
+        end
+        local field = {
+            type   = 'doc.type.field',
+            parent = typeUnit,
+        }
+
+        do
+            local needCloseParen
+            if checkToken('symbol', '(', 1) then
+                nextToken()
+                needCloseParen = true
+            end
+            field.name = {
+                type        = 'doc.type',
+                start       = getFinish(),
+                firstFinish = getFinish(),
+                finish      = getFinish(),
+                parent      = field,
+            }
+            field.name.types = {
+                [1] = {
+                    type   = 'doc.type.integer',
+                    start  = getFinish(),
+                    finish = getFinish(),
+                    parent = field.name,
+                    [1]    = index,
+                }
+            }
+            index          = index + 1
+            field.extends  = parseType(field)
+            field.optional = field.extends.optional
+            field.start    = field.extends.start
+            field.finish   = field.extends.finish
+            if needCloseParen then
+                nextSymbolOrError ')'
+            end
+        end
+
+        typeUnit.fields[#typeUnit.fields+1] = field
+        if checkToken('symbol', ',', 1)
+        or checkToken('symbol', ';', 1) then
+            nextToken()
+        else
+            nextSymbolOrError(']')
+            break
+        end
+    end
+    typeUnit.finish = getFinish()
+    return typeUnit
+end
+
 local function parseSigns(parent)
     if not checkToken('symbol', '<', 1) then
         return nil
@@ -682,6 +751,7 @@ end
 function parseTypeUnit(parent)
     local result = parseFunction(parent)
                 or parseTable(parent)
+                or parseTuple(parent)
                 or parseString(parent)
                 or parseCode(parent)
                 or parseInteger(parent)
@@ -864,6 +934,7 @@ local docSwitch = util.switch()
         while true do
             local extend = parseName('doc.extends.name', result)
                         or parseTable(result)
+                        or parseTuple(result)
             if not extend then
                 pushWarning {
                     type   = 'LUADOC_MISS_CLASS_EXTENDS_NAME',

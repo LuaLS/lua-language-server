@@ -1228,6 +1228,17 @@ local <?x?>
 local x: table<ClassA, ClassB>
 ]]
 
+TEST [[
+---@type [ClassA, ClassB]
+local <?x?>
+]]
+[[
+local x: [ClassA, ClassB] {
+    [1]: ClassA,
+    [2]: ClassB,
+}
+]]
+
 --TEST [[
 -----@class ClassA
 -----@class ClassB

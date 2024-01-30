@@ -417,6 +417,9 @@ local function parseTuple(parent)
             }
             index          = index + 1
             field.extends  = parseType(field)
+            if not field.extends then
+                break
+            end
             field.optional = field.extends.optional
             field.start    = field.extends.start
             field.finish   = field.extends.finish

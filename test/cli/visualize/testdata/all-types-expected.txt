@@ -1,0 +1,587 @@
+digraph AST {
+	node [shape = rect]
+	"main:0:300000" [
+		label="main\l\l"
+		tooltip="start: 0\nfinish: 300000\nlocals: <table>\nstate: <table>\nreturns: <table>\n1: <node setglobal>\n2: <node setfield>\n3: <node setindex>\n4: <node setmethod>\n5: <node local>\n6: <node while>\n7: <node call>\n8: <node loop>\n9: <node setglobal>\n10: <node if>\n"
+	]
+	"setglobal:0:3" [
+		label="setglobal\lfoo\l"
+		tooltip="start: 0\nfinish: 3\nrange: 35\nvalue: <node table>\nnode: <node local>\n1: foo\n"
+	]
+	"main:0:300000" -> "setglobal:0:3"
+	"table:6:35" [
+		label="table\l\l"
+		tooltip="start: 6\nfinish: 35\n1: <node tablefield>\n2: <node tablefield>\n3: <node tableindex>\n"
+	]
+	"setglobal:0:3" -> "table:6:35"
+	"tablefield:7:8" [
+		label="tablefield\lx\l"
+		tooltip="start: 7\nfinish: 8\nnode: <node table>\nrange: 12\nfield: <node field>\nvalue: <node integer>\n"
+	]
+	"table:6:35" -> "tablefield:7:8"
+	"field:7:8" [
+		label="field\lx\l"
+		tooltip="start: 7\nfinish: 8\n1: x\n"
+	]
+	"tablefield:7:8" -> "field:7:8"
+	"integer:11:12" [
+		label="integer\l5\l"
+		tooltip="start: 11\nfinish: 12\n1: 5\n"
+	]
+	"tablefield:7:8" -> "integer:11:12"
+	"tablefield:14:17" [
+		label="tablefield\lbar\l"
+		tooltip="start: 14\nfinish: 17\nnode: <node table>\nrange: 21\nfield: <node field>\nvalue: <node integer>\n"
+	]
+	"table:6:35" -> "tablefield:14:17"
+	"field:14:17" [
+		label="field\lbar\l"
+		tooltip="start: 14\nfinish: 17\n1: bar\n"
+	]
+	"tablefield:14:17" -> "field:14:17"
+	"integer:20:21" [
+		label="integer\l6\l"
+		tooltip="start: 20\nfinish: 21\n1: 6\n"
+	]
+	"tablefield:14:17" -> "integer:20:21"
+	"tableindex:23:30" [
+		label="tableindex\lbaz\l"
+		tooltip="start: 23\nfinish: 30\nrange: 34\nnode: <node table>\nvalue: <node integer>\nindex: <node string>\n"
+	]
+	"table:6:35" -> "tableindex:23:30"
+	"string:24:29" [
+		label="string\lbaz\l"
+		tooltip="start: 24\nfinish: 29\n1: baz\n2: \"\n"
+	]
+	"tableindex:23:30" -> "string:24:29"
+	"integer:33:34" [
+		label="integer\l7\l"
+		tooltip="start: 33\nfinish: 34\n1: 7\n"
+	]
+	"tableindex:23:30" -> "integer:33:34"
+	"setfield:10000:10005" [
+		label="setfield\ly\l"
+		tooltip="start: 10000\nfinish: 10005\nrange: 10017\nfield: <node field>\nnode: <node getglobal>\ndot: <node .>\nvalue: <node binary>\n"
+	]
+	"main:0:300000" -> "setfield:10000:10005"
+	"getglobal:10000:10003" [
+		label="getglobal\lfoo\l"
+		tooltip="start: 10000\nfinish: 10003\nnext: <node setfield>\nnode: <node local>\n1: foo\n"
+	]
+	"setfield:10000:10005" -> "getglobal:10000:10003"
+	"field:10004:10005" [
+		label="field\ly\l"
+		tooltip="start: 10004\nfinish: 10005\n1: y\n"
+	]
+	"setfield:10000:10005" -> "field:10004:10005"
+	"binary:10008:10017" [
+		label="binary\l+\l"
+		tooltip="start: 10008\nfinish: 10017\nop: <node +>\n1: <node getfield>\n2: <node integer>\n"
+	]
+	"setfield:10000:10005" -> "binary:10008:10017"
+	"getfield:10008:10013" [
+		label="getfield\lx\l"
+		tooltip="start: 10008\nfinish: 10013\nfield: <node field>\ndot: <node .>\nnode: <node getglobal>\n"
+	]
+	"binary:10008:10017" -> "getfield:10008:10013"
+	"getglobal:10008:10011" [
+		label="getglobal\lfoo\l"
+		tooltip="start: 10008\nfinish: 10011\nnext: <node getfield>\nnode: <node local>\n1: foo\n"
+	]
+	"getfield:10008:10013" -> "getglobal:10008:10011"
+	"field:10012:10013" [
+		label="field\lx\l"
+		tooltip="start: 10012\nfinish: 10013\n1: x\n"
+	]
+	"getfield:10008:10013" -> "field:10012:10013"
+	"integer:10016:10017" [
+		label="integer\l1\l"
+		tooltip="start: 10016\nfinish: 10017\n1: 1\n"
+	]
+	"binary:10008:10017" -> "integer:10016:10017"
+	"setindex:20000:20006" [
+		label="setindex\l1\l"
+		tooltip="start: 20000\nfinish: 20006\nrange: 20015\nnode: <node getglobal>\nvalue: <node getindex>\nindex: <node integer>\n"
+	]
+	"main:0:300000" -> "setindex:20000:20006"
+	"getglobal:20000:20003" [
+		label="getglobal\lfoo\l"
+		tooltip="start: 20000\nfinish: 20003\nnext: <node setindex>\nnode: <node local>\n1: foo\n"
+	]
+	"setindex:20000:20006" -> "getglobal:20000:20003"
+	"integer:20004:20005" [
+		label="integer\l1\l"
+		tooltip="start: 20004\nfinish: 20005\n1: 1\n"
+	]
+	"setindex:20000:20006" -> "integer:20004:20005"
+	"getindex:20009:20015" [
+		label="getindex\l0\l"
+		tooltip="start: 20009\nfinish: 20015\nnode: <node getglobal>\nindex: <node integer>\n"
+	]
+	"setindex:20000:20006" -> "getindex:20009:20015"
+	"getglobal:20009:20012" [
+		label="getglobal\lfoo\l"
+		tooltip="start: 20009\nfinish: 20012\nnext: <node getindex>\nnode: <node local>\n1: foo\n"
+	]
+	"getindex:20009:20015" -> "getglobal:20009:20012"
+	"integer:20013:20014" [
+		label="integer\l0\l"
+		tooltip="start: 20013\nfinish: 20014\n1: 0\n"
+	]
+	"getindex:20009:20015" -> "integer:20013:20014"
+	"setmethod:30009:30023" [
+		label="setmethod\lsomeMethod\l"
+		tooltip="start: 30009\nfinish: 30023\nrange: 30042\nmethod: <node method>\nvalue: <node function>\ncolon: <node :>\nvstart: 30000\nnode: <node getglobal>\n"
+	]
+	"main:0:300000" -> "setmethod:30009:30023"
+	"getglobal:30009:30012" [
+		label="getglobal\lfoo\l"
+		tooltip="start: 30009\nfinish: 30012\nnode: <node local>\nnext: <node setmethod>\n1: foo\n"
+	]
+	"setmethod:30009:30023" -> "getglobal:30009:30012"
+	"method:30013:30023" [
+		label="method\lsomeMethod\l"
+		tooltip="start: 30013\nfinish: 30023\n1: someMethod\n"
+	]
+	"setmethod:30009:30023" -> "method:30013:30023"
+	"function:30000:30042" [
+		label="function\l\l"
+		tooltip="start: 30000\nfinish: 30042\nhasReturn: true\nargs: <node funcargs>\nlocals: <table>\nkeyword: <table>\nbstart: 30025\nreturns: <table>\n1: <node return>\n"
+	]
+	"setmethod:30009:30023" -> "function:30000:30042"
+	"funcargs:30023:30025" [
+		label="funcargs\l\l"
+		tooltip="start: 30023\nfinish: 30025\n1: <node self>\n"
+	]
+	"function:30000:30042" -> "funcargs:30023:30025"
+	"self:30008:30008" [
+		label="self\lself\l"
+		tooltip="start: 30008\nfinish: 30008\neffect: 30008\n1: self\n"
+	]
+	"funcargs:30023:30025" -> "self:30008:30008"
+	"return:30026:30038" [
+		label="return\l\l"
+		tooltip="start: 30026\nfinish: 30038\n1: <node boolean>\n"
+	]
+	"function:30000:30042" -> "return:30026:30038"
+	"boolean:30033:30038" [
+		label="boolean\l\l"
+		tooltip="start: 30033\nfinish: 30038\n1: false\n"
+	]
+	"return:30026:30038" -> "boolean:30033:30038"
+	"local:40006:40007" [
+		label="local\ls\l"
+		tooltip="start: 40006\nfinish: 40007\nrange: 40011\nlocPos: 40000\nvalue: <node integer>\nref: <table>\neffect: 40011\n1: s\n"
+	]
+	"main:0:300000" -> "local:40006:40007"
+	"integer:40010:40011" [
+		label="integer\l0\l"
+		tooltip="start: 40010\nfinish: 40011\n1: 0\n"
+	]
+	"local:40006:40007" -> "integer:40010:40011"
+	"while:50000:70003" [
+		label="while\l\l"
+		tooltip="start: 50000\nfinish: 70003\nfilter: <node binary>\nkeyword: <table>\nbstart: 50013\n1: <node setlocal>\n"
+	]
+	"main:0:300000" -> "while:50000:70003"
+	"binary:50006:50012" [
+		label="binary\l<\l"
+		tooltip="start: 50006\nfinish: 50012\nop: <node <>\n1: <node getlocal>\n2: <node integer>\n"
+	]
+	"while:50000:70003" -> "binary:50006:50012"
+	"getlocal:50006:50007" [
+		label="getlocal\ls\l"
+		tooltip="start: 50006\nfinish: 50007\nnode: <node local>\n1: s\n"
+	]
+	"binary:50006:50012" -> "getlocal:50006:50007"
+	"integer:50010:50012" [
+		label="integer\l10\l"
+		tooltip="start: 50010\nfinish: 50012\n1: 10\n"
+	]
+	"binary:50006:50012" -> "integer:50010:50012"
+	"setlocal:60001:60002" [
+		label="setlocal\ls\l"
+		tooltip="start: 60001\nfinish: 60002\nrange: 60038\nvalue: <node binary>\nnode: <node local>\n1: s\n"
+	]
+	"while:50000:70003" -> "setlocal:60001:60002"
+	"binary:60005:60038" [
+		label="binary\l+\l"
+		tooltip="start: 60005\nfinish: 60038\nop: <node +>\n1: <node getlocal>\n2: <node paren>\n"
+	]
+	"setlocal:60001:60002" -> "binary:60005:60038"
+	"getlocal:60005:60006" [
+		label="getlocal\ls\l"
+		tooltip="start: 60005\nfinish: 60006\nnode: <node local>\n1: s\n"
+	]
+	"binary:60005:60038" -> "getlocal:60005:60006"
+	"paren:60009:60038" [
+		label="paren\l\l"
+		tooltip="start: 60009\nfinish: 60038\nexp: <node binary>\n"
+	]
+	"binary:60005:60038" -> "paren:60009:60038"
+	"binary:60010:60037" [
+		label="binary\lor\l"
+		tooltip="start: 60010\nfinish: 60037\nop: <node or>\n1: <node call>\n2: <node integer>\n"
+	]
+	"paren:60009:60038" -> "binary:60010:60037"
+	"call:60010:60031" [
+		label="call\l\l"
+		tooltip="start: 60010\nfinish: 60031\nargs: <node callargs>\nnode: <node getmethod>\n"
+	]
+	"binary:60010:60037" -> "call:60010:60031"
+	"getmethod:60010:60024" [
+		label="getmethod\lsomeMethod\l"
+		tooltip="start: 60010\nfinish: 60024\nmethod: <node method>\nnode: <node getglobal>\ncolon: <node :>\n"
+	]
+	"call:60010:60031" -> "getmethod:60010:60024"
+	"getglobal:60010:60013" [
+		label="getglobal\lfoo\l"
+		tooltip="start: 60010\nfinish: 60013\nnext: <node getmethod>\nnode: <node local>\n1: foo\n"
+	]
+	"getmethod:60010:60024" -> "getglobal:60010:60013"
+	"method:60014:60024" [
+		label="method\lsomeMethod\l"
+		tooltip="start: 60014\nfinish: 60024\n1: someMethod\n"
+	]
+	"getmethod:60010:60024" -> "method:60014:60024"
+	"callargs:60024:60031" [
+		label="callargs\l\l"
+		tooltip="start: 60024\nfinish: 60031\n1: <node self>\n2: <node getglobal>\n3: <node integer>\n"
+	]
+	"call:60010:60031" -> "callargs:60024:60031"
+	"self:60013:60014" [
+		label="self\lself\l"
+		tooltip="start: 60013\nfinish: 60014\n1: self\n"
+	]
+	"callargs:60024:60031" -> "self:60013:60014"
+	"getglobal:60025:60026" [
+		label="getglobal\li\l"
+		tooltip="start: 60025\nfinish: 60026\nnode: <node local>\n1: i\n"
+	]
+	"callargs:60024:60031" -> "getglobal:60025:60026"
+	"integer:60028:60030" [
+		label="integer\l10\l"
+		tooltip="start: 60028\nfinish: 60030\n1: 10\n"
+	]
+	"callargs:60024:60031" -> "integer:60028:60030"
+	"integer:60035:60037" [
+		label="integer\l10\l"
+		tooltip="start: 60035\nfinish: 60037\n1: 10\n"
+	]
+	"binary:60010:60037" -> "integer:60035:60037"
+	"call:80000:80008" [
+		label="call\l\l"
+		tooltip="start: 80000\nfinish: 80008\nargs: <node callargs>\nnode: <node getglobal>\n"
+	]
+	"main:0:300000" -> "call:80000:80008"
+	"getglobal:80000:80005" [
+		label="getglobal\lprint\l"
+		tooltip="start: 80000\nfinish: 80005\nnode: <node local>\n1: print\n"
+	]
+	"call:80000:80008" -> "getglobal:80000:80005"
+	"callargs:80005:80008" [
+		label="callargs\l\l"
+		tooltip="start: 80005\nfinish: 80008\n1: <node getlocal>\n"
+	]
+	"call:80000:80008" -> "callargs:80005:80008"
+	"getlocal:80006:80007" [
+		label="getlocal\ls\l"
+		tooltip="start: 80006\nfinish: 80007\nnode: <node local>\n1: s\n"
+	]
+	"callargs:80005:80008" -> "getlocal:80006:80007"
+	"loop:90000:140003" [
+		label="loop\l\l"
+		tooltip="start: 90000\nfinish: 140003\ninit: <node integer>\nstep: <node integer>\nmax: <node integer>\nlocals: <table>\nkeyword: <table>\nbstart: 90018\nloc: <node local>\n1: <node in>\n"
+	]
+	"main:0:300000" -> "loop:90000:140003"
+	"local:90004:90005" [
+		label="local\lj\l"
+		tooltip="start: 90004\nfinish: 90005\neffect: 90017\n1: j\n"
+	]
+	"loop:90000:140003" -> "local:90004:90005"
+	"integer:90008:90010" [
+		label="integer\l10\l"
+		tooltip="start: 90008\nfinish: 90010\n1: 10\n"
+	]
+	"loop:90000:140003" -> "integer:90008:90010"
+	"integer:90012:90013" [
+		label="integer\l1\l"
+		tooltip="start: 90012\nfinish: 90013\n1: 1\n"
+	]
+	"loop:90000:140003" -> "integer:90012:90013"
+	"integer:90015:90017" [
+		label="integer\l-1\l"
+		tooltip="start: 90015\nfinish: 90017\n1: -1\n"
+	]
+	"loop:90000:140003" -> "integer:90015:90017"
+	"in:100001:130004" [
+		label="in\l\l"
+		tooltip="start: 100001\nfinish: 130004\nexps: <node list>\nlabels: <table>\nlocals: <table>\nkeyword: <table>\nbstart: 100020\nkeys: <node list>\n1: <node goto>\n2: <node label>\n"
+	]
+	"loop:90000:140003" -> "in:100001:130004"
+	"list:100005:100006" [
+		label="list\l\l"
+		tooltip="start: 100005\nfinish: 100006\nrange: 100009\n1: <node local>\n"
+	]
+	"in:100001:130004" -> "list:100005:100006"
+	"local:100005:100006" [
+		label="local\li\l"
+		tooltip="start: 100005\nfinish: 100006\neffect: 100019\n1: i\n"
+	]
+	"list:100005:100006" -> "local:100005:100006"
+	"list:100010:100019" [
+		label="list\l\l"
+		tooltip="start: 100010\nfinish: 100019\n1: <node call>\n"
+	]
+	"in:100001:130004" -> "list:100010:100019"
+	"call:100010:100019" [
+		label="call\l\l"
+		tooltip="start: 100010\nfinish: 100019\nargs: <node callargs>\nnode: <node getglobal>\n"
+	]
+	"list:100010:100019" -> "call:100010:100019"
+	"getglobal:100010:100016" [
+		label="getglobal\lipairs\l"
+		tooltip="start: 100010\nfinish: 100016\nspecial: ipairs\nnode: <node local>\n1: ipairs\n"
+	]
+	"call:100010:100019" -> "getglobal:100010:100016"
+	"callargs:100016:100019" [
+		label="callargs\l\l"
+		tooltip="start: 100016\nfinish: 100019\n1: <node getlocal>\n"
+	]
+	"call:100010:100019" -> "callargs:100016:100019"
+	"getlocal:100017:100018" [
+		label="getlocal\ls\l"
+		tooltip="start: 100017\nfinish: 100018\nnode: <node local>\n1: s\n"
+	]
+	"callargs:100016:100019" -> "getlocal:100017:100018"
+	"goto:110007:110015" [
+		label="goto\lfoolabel\l"
+		tooltip="start: 110007\nfinish: 110015\nkeyStart: 110002\nnode: <node label>\n1: foolabel\n"
+	]
+	"in:100001:130004" -> "goto:110007:110015"
+	"label:120004:120012" [
+		label="label\lfoolabel\l"
+		tooltip="start: 120004\nfinish: 120012\nref: <table>\n1: foolabel\n"
+	]
+	"in:100001:130004" -> "label:120004:120012"
+	"setglobal:160009:160012" [
+		label="setglobal\lfoo\l"
+		tooltip="start: 160009\nfinish: 160012\nrange: 210003\nvstart: 160000\nvalue: <node function>\nnode: <node local>\n1: foo\n"
+	]
+	"main:0:300000" -> "setglobal:160009:160012"
+	"function:160000:210003" [
+		label="function\l\l"
+		tooltip="start: 160000\nfinish: 210003\nkeyword: <table>\nhasReturn: true\nargs: <node funcargs>\nbstart: 160014\nreturns: <table>\n1: <node return>\n"
+	]
+	"setglobal:160009:160012" -> "function:160000:210003"
+	"funcargs:160012:160014" [
+		label="funcargs\l\l"
+		tooltip="start: 160012\nfinish: 160014\n"
+	]
+	"function:160000:210003" -> "funcargs:160012:160014"
+	"return:170001:200004" [
+		label="return\l\l"
+		tooltip="start: 170001\nfinish: 200004\n1: <node function>\n"
+	]
+	"function:160000:210003" -> "return:170001:200004"
+	"function:170008:200004" [
+		label="function\l\l"
+		tooltip="start: 170008\nfinish: 200004\nargs: <node funcargs>\nlocals: <table>\nbstart: 170024\nkeyword: <table>\nvararg: <node ...>\n1: <node repeat>\n"
+	]
+	"return:170001:200004" -> "function:170008:200004"
+	"funcargs:170016:170024" [
+		label="funcargs\l\l"
+		tooltip="start: 170016\nfinish: 170024\n1: <node local>\n2: <node ...>\n"
+	]
+	"function:170008:200004" -> "funcargs:170016:170024"
+	"local:170017:170018" [
+		label="local\lx\l"
+		tooltip="start: 170017\nfinish: 170018\neffect: 170018\n1: x\n"
+	]
+	"funcargs:170016:170024" -> "local:170017:170018"
+	"...:170020:170023" [
+		label="...\l\l"
+		tooltip="start: 170020\nfinish: 170023\nref: <table>\n1: ...\n"
+	]
+	"funcargs:170016:170024" -> "...:170020:170023"
+	"repeat:180002:190028" [
+		label="repeat\l\l"
+		tooltip="start: 180002\nfinish: 190028\nfilter: <node binary>\nkeyword: <table>\nbstart: 180008\n"
+	]
+	"function:170008:200004" -> "repeat:180002:190028"
+	"binary:190008:190028" [
+		label="binary\l>\l"
+		tooltip="start: 190008\nfinish: 190028\nop: <node >>\n1: <node call>\n2: <node integer>\n"
+	]
+	"repeat:180002:190028" -> "binary:190008:190028"
+	"call:190008:190024" [
+		label="call\l\l"
+		tooltip="start: 190008\nfinish: 190024\nargs: <node callargs>\nnode: <node getglobal>\n"
+	]
+	"binary:190008:190028" -> "call:190008:190024"
+	"getglobal:190008:190014" [
+		label="getglobal\lselect\l"
+		tooltip="start: 190008\nfinish: 190014\nnode: <node local>\n1: select\n"
+	]
+	"call:190008:190024" -> "getglobal:190008:190014"
+	"callargs:190014:190024" [
+		label="callargs\l\l"
+		tooltip="start: 190014\nfinish: 190024\n1: <node string>\n2: <node varargs>\n"
+	]
+	"call:190008:190024" -> "callargs:190014:190024"
+	"string:190015:190018" [
+		label="string\l#\l"
+		tooltip="start: 190015\nfinish: 190018\n1: #\n2: '\n"
+	]
+	"callargs:190014:190024" -> "string:190015:190018"
+	"varargs:190020:190023" [
+		label="varargs\l\l"
+		tooltip="start: 190020\nfinish: 190023\nnode: <node ...>\n"
+	]
+	"callargs:190014:190024" -> "varargs:190020:190023"
+	"integer:190027:190028" [
+		label="integer\l0\l"
+		tooltip="start: 190027\nfinish: 190028\n1: 0\n"
+	]
+	"binary:190008:190028" -> "integer:190027:190028"
+	"if:230000:290003" [
+		label="if\l\l"
+		tooltip="start: 230000\nfinish: 290003\n1: <node ifblock>\n2: <node elseifblock>\n3: <node elseblock>\n"
+	]
+	"main:0:300000" -> "if:230000:290003"
+	"ifblock:230000:250000" [
+		label="ifblock\l\l"
+		tooltip="start: 230000\nfinish: 250000\nbstart: 230009\nfilter: <node getglobal>\nhasReturn: true\nkeyword: <table>\n1: <node return>\n"
+	]
+	"if:230000:290003" -> "ifblock:230000:250000"
+	"getglobal:230003:230004" [
+		label="getglobal\lx\l"
+		tooltip="start: 230003\nfinish: 230004\nnode: <node local>\n1: x\n"
+	]
+	"ifblock:230000:250000" -> "getglobal:230003:230004"
+	"return:240001:240048" [
+		label="return\l\l"
+		tooltip="start: 240001\nfinish: 240048\n1: <node binary>\n"
+	]
+	"ifblock:230000:250000" -> "return:240001:240048"
+	"binary:240008:240048" [
+		label="binary\lor\l"
+		tooltip="start: 240008\nfinish: 240048\nop: <node or>\n1: <node binary>\n2: <node binary>\n"
+	]
+	"return:240001:240048" -> "binary:240008:240048"
+	"binary:240008:240023" [
+		label="binary\lor\l"
+		tooltip="start: 240008\nfinish: 240023\nop: <node or>\n1: <node binary>\n2: <node binary>\n"
+	]
+	"binary:240008:240048" -> "binary:240008:240023"
+	"binary:240008:240013" [
+		label="binary\l<\l"
+		tooltip="start: 240008\nfinish: 240013\nop: <node <>\n1: <node getglobal>\n2: <node integer>\n"
+	]
+	"binary:240008:240023" -> "binary:240008:240013"
+	"getglobal:240008:240009" [
+		label="getglobal\lx\l"
+		tooltip="start: 240008\nfinish: 240009\nnode: <node local>\n1: x\n"
+	]
+	"binary:240008:240013" -> "getglobal:240008:240009"
+	"integer:240012:240013" [
+		label="integer\l0\l"
+		tooltip="start: 240012\nfinish: 240013\n1: 0\n"
+	]
+	"binary:240008:240013" -> "integer:240012:240013"
+	"binary:240017:240023" [
+		label="binary\l>=\l"
+		tooltip="start: 240017\nfinish: 240023\nop: <node >=>\n1: <node getglobal>\n2: <node integer>\n"
+	]
+	"binary:240008:240023" -> "binary:240017:240023"
+	"getglobal:240017:240018" [
+		label="getglobal\lx\l"
+		tooltip="start: 240017\nfinish: 240018\nnode: <node local>\n1: x\n"
+	]
+	"binary:240017:240023" -> "getglobal:240017:240018"
+	"integer:240022:240023" [
+		label="integer\l0\l"
+		tooltip="start: 240022\nfinish: 240023\n1: 0\n"
+	]
+	"binary:240017:240023" -> "integer:240022:240023"
+	"binary:240027:240048" [
+		label="binary\land\l"
+		tooltip="start: 240027\nfinish: 240048\nop: <node and>\n1: <node binary>\n2: <node binary>\n"
+	]
+	"binary:240008:240048" -> "binary:240027:240048"
+	"binary:240027:240037" [
+		label="binary\l<=\l"
+		tooltip="start: 240027\nfinish: 240037\nop: <node <=>\n1: <node unary>\n2: <node integer>\n"
+	]
+	"binary:240027:240048" -> "binary:240027:240037"
+	"unary:240027:240032" [
+		label="unary\lnot\l"
+		tooltip="start: 240027\nfinish: 240032\nop: <node not>\n1: <node getglobal>\n"
+	]
+	"binary:240027:240037" -> "unary:240027:240032"
+	"getglobal:240031:240032" [
+		label="getglobal\lx\l"
+		tooltip="start: 240031\nfinish: 240032\nnode: <node local>\n1: x\n"
+	]
+	"unary:240027:240032" -> "getglobal:240031:240032"
+	"integer:240036:240037" [
+		label="integer\l0\l"
+		tooltip="start: 240036\nfinish: 240037\n1: 0\n"
+	]
+	"binary:240027:240037" -> "integer:240036:240037"
+	"binary:240042:240048" [
+		label="binary\l>\l"
+		tooltip="start: 240042\nfinish: 240048\nop: <node >>\n1: <node unary>\n2: <node integer>\n"
+	]
+	"binary:240027:240048" -> "binary:240042:240048"
+	"unary:240042:240044" [
+		label="unary\l-\l"
+		tooltip="start: 240042\nfinish: 240044\nop: <node ->\n1: <node getglobal>\n"
+	]
+	"binary:240042:240048" -> "unary:240042:240044"
+	"getglobal:240043:240044" [
+		label="getglobal\lx\l"
+		tooltip="start: 240043\nfinish: 240044\nnode: <node local>\n1: x\n"
+	]
+	"unary:240042:240044" -> "getglobal:240043:240044"
+	"integer:240047:240048" [
+		label="integer\l7\l"
+		tooltip="start: 240047\nfinish: 240048\n1: 7\n"
+	]
+	"binary:240042:240048" -> "integer:240047:240048"
+	"elseifblock:250000:270000" [
+		label="elseifblock\l\l"
+		tooltip="start: 250000\nfinish: 270000\nbstart: 250013\nfilter: <node getglobal>\nhasReturn: true\nkeyword: <table>\n1: <node return>\n"
+	]
+	"if:230000:290003" -> "elseifblock:250000:270000"
+	"getglobal:250007:250008" [
+		label="getglobal\ly\l"
+		tooltip="start: 250007\nfinish: 250008\nnode: <node local>\n1: y\n"
+	]
+	"elseifblock:250000:270000" -> "getglobal:250007:250008"
+	"return:260001:260011" [
+		label="return\l\l"
+		tooltip="start: 260001\nfinish: 260011\n1: <node number>\n"
+	]
+	"elseifblock:250000:270000" -> "return:260001:260011"
+	"number:260008:260011" [
+		label="number\l5.7\l"
+		tooltip="start: 260008\nfinish: 260011\n1: 5.7\n"
+	]
+	"return:260001:260011" -> "number:260008:260011"
+	"elseblock:270000:290000" [
+		label="elseblock\l\l"
+		tooltip="start: 270000\nfinish: 290000\nkeyword: <table>\nbstart: 270004\nhasReturn: true\n1: <node return>\n"
+	]
+	"if:230000:290003" -> "elseblock:270000:290000"
+	"return:280001:280091" [
+		label="return\l\l"
+		tooltip="start: 280001\nfinish: 280091\n1: <node string>\n"
+	]
+	"elseblock:270000:290000" -> "return:280001:280091"
+	"string:280008:280091" [
+		label="string\la very long strin...\l"
+		tooltip="start: 280008\nfinish: 280091\n1: a very long strin...\n2: \"\n"
+	]
+	"return:280001:280091" -> "string:280008:280091"
+}

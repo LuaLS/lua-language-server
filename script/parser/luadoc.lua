@@ -2002,7 +2002,10 @@ local function bindDocs(state)
             state.ast.docs.groups[#state.ast.docs.groups+1] = binded
         end
         binded[#binded+1] = doc
-        if isTailComment(text, doc) then
+		if doc.specialBindGroup then
+			bindDocWithSources(sources, doc.specialBindGroup)
+			binded = nil
+		elseif isTailComment(text, doc) and doc.type ~= "doc.class" and doc.type ~= "doc.field" then
             bindDocWithSources(sources, binded)
             binded = nil
         else
@@ -2130,7 +2133,7 @@ local function luadoc(state)
 end
 
 return {
-    buildAndBindDoc = function (ast, src, comment)
+    buildAndBindDoc = function (ast, src, comment, group)
         local doc = buildLuaDoc(comment)
         if doc then
             local pluginDocs = ast.state.pluginDocs or {}
@@ -2138,6 +2141,7 @@ return {
             doc.special = src
             doc.originalComment = comment
             doc.virtual = true
+			doc.specialBindGroup = group
             ast.state.pluginDocs = pluginDocs
             return doc
         end

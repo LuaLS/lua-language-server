@@ -16,8 +16,6 @@ jobs:
         include:
           - { os: ubuntu-20.04,   platform: linux-x64 }
           - { os: macos-latest,   platform: darwin-x64 }
-          - { os: macos-latest,   platform: darwin-arm64 }
-          - { os: windows-latest, platform: win32-ia32 }
           - { os: windows-latest, platform: win32-x64 }
     runs-on: ${{ matrix.os }}
     steps:

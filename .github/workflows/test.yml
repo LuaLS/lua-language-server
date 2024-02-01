@@ -1,0 +1,28 @@
+name: test
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - "*"
+  pull_request:
+    branches:
+      - master
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-20.04,   platform: linux-x64 }
+          - { os: macos-latest,   platform: darwin-x64 }
+          - { os: macos-latest,   platform: darwin-arm64 }
+          - { os: windows-latest, platform: win32-ia32 }
+          - { os: windows-latest, platform: win32-x64 }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actboy168/setup-luamake@master
+      - run: luamake -platform ${{ matrix.platform }}

@@ -113,7 +113,8 @@ m.register {
 }
 
 m.register {
-    'codestyle-check'
+    'codestyle-check',
+	'mismatched-quote-types'
 } {
     group    = 'codestyle',
     severity = 'Warning',

@@ -419,6 +419,8 @@ config.diagnostics['unreachable-code']      =
 'Enable diagnostics for unreachable code.'
 config.diagnostics['global-element']       =
 'Enable diagnostics to warn about global elements.'
+config.diagnostics['mismatched-quote-types']=
+'Enable diagnostics for mismatched quote types on string literals within a file.'
 config.typeFormat.config                    =
 'Configures the formatting behavior while typing Lua code.'
 config.typeFormat.config.auto_complete_end  =

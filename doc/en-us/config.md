@@ -290,6 +290,7 @@ Array<string>
 * ``"luadoc-miss-vararg-type"``
 * ``"luadoc-miss-version"``
 * ``"malformed-number"``
+* ``"mismatched-quote-types"``
 * ``"miss-end"``
 * ``"miss-esc-x"``
 * ``"miss-exp"``

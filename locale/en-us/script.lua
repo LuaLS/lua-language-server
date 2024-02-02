@@ -176,6 +176,8 @@ DIAG_INJECT_FIELD_FIX_CLASS           =
 'To do so, use `---@class` for `{node}`.'
 DIAG_INJECT_FIELD_FIX_TABLE           =
 'To allow injection, add `{fix}` to the definition.'
+DIAG_MISMATCHED_QUOTE_TYPES           =
+'This string uses different quote types than other strings in this file.'
 
 MWS_NOT_SUPPORT         =
 '{} does not support multi workspace for now, I may need to restart to support the new workspace ...'

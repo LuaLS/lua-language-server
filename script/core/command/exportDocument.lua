@@ -7,7 +7,7 @@ local files  = require 'files'
 
 ---@async
 return function (args)
-    local outputPath = args[1] and furi.decode(args[1]) or LOGPATH
+    local outputPath = args[1] and furi.decode(args[1]) or doc.outputPath()
     local docPath, mdPath = doc.makeDoc(outputPath)
     client.showMessage('Info', lang.script('CLI_DOC_DONE'
         , ('[%s](%s)'):format(files.normalize(docPath), furi.encode(docPath))

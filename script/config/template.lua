@@ -400,6 +400,9 @@ local template = {
     ['Lua.doc.privateName']                 = Type.Array(Type.String),
     ['Lua.doc.protectedName']               = Type.Array(Type.String),
     ['Lua.doc.packageName']                 = Type.Array(Type.String),
+    ['Lua.doc.output.path']                 = Type.String,
+    ['Lua.doc.output.filenameJSON']         = Type.String >> 'doc.json',
+    ['Lua.doc.output.filenameMD']           = Type.String >> 'doc.md',
 
     -- VSCode
     ["Lua.addonManager.enable"]             = Type.Boolean >> true,

@@ -284,12 +284,45 @@ function export.export(outputPath, callback)
         return a.name < b.name
     end)
 
-    local docPath = outputPath .. '/doc.json'
+    local docPath = fs.canonical(
+       outputPath .. '/' .. config.get(ws.rootUri, 'Lua.doc.output.filenameJSON')):string()
+
     jsonb.supportSparseArray = true
     util.saveFile(docPath, jsonb.beautify(results))
 
     local mdPath = doc2md.buildMD(outputPath)
+
     return docPath, mdPath
+end
+
+
+---Return path of directory where documentation files should be saved.
+---@return string # Path.
+function export.outputPath()
+    local outputPath = config.get(ws.rootUri, 'Lua.doc.output.path')
+    if outputPath == '' then
+       outputPath = LOGPATH
+    end
+    outputPath = fs.canonical(fs.absolute(outputPath)):string()
+    local jsonPath = outputPath .. '/' .. config.get(ws.rootUri, 'Lua.doc.output.filenameJSON')
+    local mdPath = outputPath .. '/' .. config.get(ws.rootUri, 'Lua.doc.output.filenameMD')
+
+    local function is_writeable(path)
+        local fd = io.open(path, 'w')
+        if fd then
+            fd:close()
+            return true
+        else
+            io.stderr:write(string.format('WARNING: No write permissions for %s.\n', path))
+            return false
+        end
+   end
+
+   if not is_writeable(jsonPath) or not is_writeable(mdPath) then
+       outputPath = LOGPATH
+       io.stderr:write(string.format('WARNING: Falling back to LOGPATH: %s\n', LOGPATH))
+   end
+   return outputPath
 end
 
 ---@async
@@ -350,7 +383,7 @@ function export.runCLI()
         ws.awaitReady(rootUri)
         await.sleep(0.1)
 
-        local docPath, mdPath = export.export(LOGPATH, function (i, max)
+        local docPath, mdPath = export.export(export.outputPath(), function (i, max)
             if os.clock() - lastClock > 0.2 then
                 lastClock = os.clock()
                 local output = '\x0D'

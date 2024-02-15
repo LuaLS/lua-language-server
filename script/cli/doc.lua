@@ -245,6 +245,8 @@ local function collectVars(global, results)
             }
             result.desc = result.desc or getDesc(set)
             result.rawdesc = result.rawdesc or getDesc(set, true)
+            result.defines[#result.defines].extends['desc'] = getDesc(set)
+            result.defines[#result.defines].extends['rawdesc'] = getDesc(set, true)
         end
     end
     if #result.defines == 0 then

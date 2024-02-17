@@ -169,6 +169,7 @@ local function collectTypes(global, results)
             field.desc    = getDesc(source)
             field.rawdesc = getDesc(source, true)
             field.extends = packObject(source.extends)
+            field.visible = vm.getVisibleType(source)
             return
         end
         if source.type == 'setfield'
@@ -208,6 +209,7 @@ local function collectTypes(global, results)
             field.desc    = getDesc(source)
             field.rawdesc = getDesc(source, true)
             field.extends = packObject(source.value)
+            field.visible = vm.getVisibleType(source)
             return
         end
     end)

@@ -52,6 +52,10 @@ CHECK = ''
 ---@type string
 DOC = ''
 
+--output directory path for documentation (doc.json, ...)
+---@type string
+DOC_OUT_PATH = ''
+
 ---@type string | '"Error"' | '"Warning"' | '"Information"' | '"Hint"'
 CHECKLEVEL = 'Warning'
 

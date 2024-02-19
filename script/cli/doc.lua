@@ -297,6 +297,18 @@ function export.export(outputPath, callback)
     return docPath, mdPath
 end
 
+function export.getDocOutputPath()
+    local doc_output_path = ''
+    if type(DOC_OUT_PATH) == 'string' then
+        doc_output_path = fs.absolute(fs.path(DOC_OUT_PATH)):string()
+    elseif DOC_OUT_PATH == true then
+        doc_output_path = fs.current_path():string()
+    else
+        doc_output_path = LOGPATH
+    end
+    return doc_output_path
+end
+
 ---@async
 ---@param outputPath string
 function export.makeDoc(outputPath)
@@ -355,7 +367,7 @@ function export.runCLI()
         ws.awaitReady(rootUri)
         await.sleep(0.1)
 
-        local docPath, mdPath = export.export(LOGPATH, function (i, max)
+        local docPath, mdPath = export.export(export.getDocOutputPath(), function (i, max)
             if os.clock() - lastClock > 0.2 then
                 lastClock = os.clock()
                 local output = '\x0D'

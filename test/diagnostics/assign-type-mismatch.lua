@@ -99,6 +99,13 @@ t['x'] = nil
 ]]
 
 TEST [[
+---@type [boolean]
+local t = { <![1]!> = nil }
+
+t = nil
+]]
+
+TEST [[
 local t = { true }
 
 t[1] = nil

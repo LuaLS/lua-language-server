@@ -1,24 +1,24 @@
 local platform = require 'bee.platform'
-local unicode
+local windows
 
 if platform.OS == 'Windows' then
-    unicode = require 'bee.unicode'
+    windows = require 'bee.windows'
 end
 
 local m = {}
 
 function m.toutf8(text)
-    if not unicode then
+    if not windows then
         return text
     end
-    return unicode.a2u(text)
+    return windows.a2u(text)
 end
 
 function m.fromutf8(text)
-    if not unicode then
+    if not windows then
         return text
     end
-    return unicode.u2a(text)
+    return windows.u2a(text)
 end
 
 return m

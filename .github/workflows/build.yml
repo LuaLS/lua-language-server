@@ -36,7 +36,6 @@ jobs:
       - name: Prepare Linux-ARM64
         if: ${{ matrix.platform == 'linux-arm64' }}
         run: |
-          apt-get update
           apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
 
       - name: Install Luamake

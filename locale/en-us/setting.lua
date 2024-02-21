@@ -293,6 +293,12 @@ When checking the type of union type, ignore the `nil` in it.
 
 When this setting is `false`, the `number|nil` type cannot be assigned to the `number` type. It can be with `true`.
 ]]
+config.type.inferParamType               =
+[[
+When the parameter type is not annotated, the parameter type is inferred from the function's incoming parameters.
+
+When this setting is `false`, the type of the parameter is `any` when it is not annotated.
+]]
 config.doc.privateName                   =
 'Treat specific field names as private, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are private, witch can only be accessed in the class where the definition is located.'
 config.doc.protectedName                 =

@@ -62,6 +62,7 @@ end
 
 function m.getVmPlugin(uri)
     local scp = scope.getScope(uri)
+    ---@type pluginInterfaces
     local interfaces = scp:get('pluginInterfaces')
     if not interfaces then
         return

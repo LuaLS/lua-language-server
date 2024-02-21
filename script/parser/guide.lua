@@ -77,6 +77,7 @@ local type         = type
 ---@field package _root         parser.object
 ---@field package _eachCache?   parser.object[]
 ---@field package _isGlobal?    boolean
+---@field package _typeCache?   parser.object[][]
 
 ---@class guide
 ---@field debugMode boolean

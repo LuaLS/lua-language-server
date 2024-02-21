@@ -147,6 +147,9 @@ end
 
 local function findParent(state, position)
     local text = state.lua
+    if not text then
+        return
+    end
     local offset = guide.positionToOffset(state, position)
     for i = offset, 1, -1 do
         local char = text:sub(i, i)
@@ -675,6 +678,7 @@ local function checkGlobal(state, word, startPos, position, parent, oop, results
 end
 
 ---@async
+---@param parent parser.object
 local function checkField(state, word, start, position, parent, oop, results)
     if parent.tag == '_ENV' or parent.special == '_G' then
         local globals = vm.getGlobalSets(state.uri, 'variable')
@@ -955,8 +959,7 @@ local function checkFunctionArgByDocParam(state, word, startPos, results)
     end
 end
 
-local function isAfterLocal(state, startPos)
-    local text   = state.lua
+local function isAfterLocal(state, text, startPos)
     local offset = guide.positionToOffset(state, startPos)
     local pos    = lookBackward.skipSpace(text, offset)
     local word   = lookBackward.findWord(text, pos)
@@ -965,6 +968,8 @@ end
 
 local function collectRequireNames(mode, myUri, literal, source, smark, position, results)
     local collect = {}
+    local source_start   = source and smark and (source.start + #smark) or position
+    local source_finish  = source and smark and (source.finish - #smark) or position
     if mode == 'require' then
         for uri in files.eachFile(myUri) do
             if myUri == uri then
@@ -978,8 +983,8 @@ local function collectRequireNames(mode, myUri, literal, source, smark, position
                     if not collect[info.name] then
                         collect[info.name] = {
                             textEdit = {
-                                start   = smark and (source.start + #smark) or position,
-                                finish  = smark and (source.finish - #smark) or position,
+                                start   = source_start,
+                                finish  = source_finish,
                                 newText = smark and info.name or util.viewString(info.name),
                             },
                             path = relative,
@@ -1006,8 +1011,8 @@ local function collectRequireNames(mode, myUri, literal, source, smark, position
                     if not collect[open] then
                         collect[open] = {
                             textEdit = {
-                                start   = smark and (source.start + #smark) or position,
-                                finish  = smark and (source.finish - #smark) or position,
+                                start   = source_start,
+                                finish  = source_finish,
                                 newText = smark and open or util.viewString(open),
                             },
                             path = path,
@@ -1034,8 +1039,8 @@ local function collectRequireNames(mode, myUri, literal, source, smark, position
                 if not collect[path] then
                     collect[path] = {
                         textEdit = {
-                            start   = smark and (source.start + #smark) or position,
-                            finish  = smark and (source.finish - #smark) or position,
+                            start   = source_start,
+                            finish  = source_finish,
                             newText = smark and path or util.viewString(path),
                         }
                     }
@@ -1097,6 +1102,9 @@ end
 
 local function checkLenPlusOne(state, position, results)
     local text = state.lua
+    if not text then
+        return
+    end
     guide.eachSourceContain(state.ast, position, function (source)
         if source.type == 'getindex'
         or source.type == 'setindex' then
@@ -1392,6 +1400,9 @@ end
 
 local function checkEqualEnum(state, position, results)
     local text  = state.lua
+    if not text then
+        return
+    end
     local start = lookBackward.findTargetSymbol(text, guide.positionToOffset(state, position), '=')
     if not start then
         return
@@ -1493,6 +1504,9 @@ local function tryWord(state, position, triggerCharacter, results)
         return
     end
     local text = state.lua
+    if not text then
+        return
+    end
     local offset = guide.positionToOffset(state, position)
     local finish = lookBackward.skipSpace(text, offset)
     local word, start = lookBackward.findWord(text, offset)
@@ -1518,7 +1532,7 @@ local function tryWord(state, position, triggerCharacter, results)
             checkProvideLocal(state, word, startPos, results)
             checkFunctionArgByDocParam(state, word, startPos, results)
         else
-            local afterLocal = isAfterLocal(state, startPos)
+            local afterLocal = isAfterLocal(state, text, startPos)
             local stop = checkKeyWord(state, startPos, position, word, hasSpace, afterLocal, results)
             if stop then
                 return
@@ -1530,8 +1544,10 @@ local function tryWord(state, position, triggerCharacter, results)
                     checkLocal(state, word, startPos, results)
                     checkTableField(state, word, startPos, results)
                     local env = guide.getENV(state.ast, startPos)
-                    checkGlobal(state, word, startPos, position, env, false, results)
-                    checkModule(state, word, startPos, results)
+                    if env then
+                        checkGlobal(state, word, startPos, position, env, false, results)
+                        checkModule(state, word, startPos, results) 
+                    end
                 end
             end
         end
@@ -1592,6 +1608,9 @@ end
 
 local function checkTableLiteralField(state, position, tbl, fields, results)
     local text = state.lua
+    if not text then
+        return
+    end
     local mark = {}
     for _, field in ipairs(tbl) do
         if field.type == 'tablefield'
@@ -1610,9 +1629,11 @@ local function checkTableLiteralField(state, position, tbl, fields, results)
     local left = lookBackward.findWord(text, guide.positionToOffset(state, position))
     if not left then
         local pos = lookBackward.findAnyOffset(text, guide.positionToOffset(state, position))
-        local char = text:sub(pos, pos)
-        if char == '{' or char == ',' or char == ';' then
-            left = ''
+        if pos then
+            local char = text:sub(pos, pos)
+            if char == '{' or char == ',' or char == ';' then
+                left = ''
+            end
         end
     end
     if left then
@@ -1801,6 +1822,7 @@ local function getluaDocByContain(state, position)
     return result
 end
 
+---@return parser.state.err?, parser.object?
 local function getluaDocByErr(state, start, position)
     local targetError
     for _, err in ipairs(state.errs) do
@@ -2008,7 +2030,7 @@ local function tryluaDocByErr(state, position, err, docState, results)
         for _, doc in ipairs(vm.getDocSets(state.uri)) do
             if  doc.type == 'doc.class'
             and not used[doc.class[1]]
-            and doc.class[1] ~= docState.class[1] then
+            and docState and doc.class[1] ~= docState.class[1] then
                 used[doc.class[1]] = true
                 results[#results+1] = {
                     label       = doc.class[1],

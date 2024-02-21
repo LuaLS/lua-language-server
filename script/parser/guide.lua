@@ -10,7 +10,7 @@ local type         = type
 ---@field type                  string
 ---@field special               string
 ---@field tag                   string
----@field args                  { [integer]: parser.object, start: integer, finish: integer }
+---@field args                  { [integer]: parser.object, start: integer, finish: integer, type: string }
 ---@field locals                parser.object[]
 ---@field returns?              parser.object[]
 ---@field breaks?               parser.object[]
@@ -1313,12 +1313,18 @@ end
 function m.getParams(source)
     if source.type == 'call' then
         local args = source.args
+        if not args then
+            return
+        end
         assert(args.type == 'callargs', 'call.args type is\'t callargs')
         return args
     elseif source.type == 'callargs' then
         return source
     elseif source.type == 'function' then
         local args = source.args
+        if not args then
+            return
+        end
         assert(args.type == 'funcargs', 'function.args type is\'t callargs')
         return args
     end

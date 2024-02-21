@@ -414,7 +414,11 @@ function m.rename(uri, pos, newname)
             return
         end
         mark[uid] = true
-        if files.isLibrary(turi, true) then
+        if vm.isMetaFile(turi) then
+            return
+        end
+        if files.isLibrary(turi, true)
+        and not files.isLibrary(uri, true) then
             return
         end
         results[#results+1] = {

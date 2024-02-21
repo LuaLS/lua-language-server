@@ -108,6 +108,7 @@ local function main()
     test 'tclient'
     test 'full'
     test 'plugins.test'
+	test 'cli.test'
 end
 
 loadAllLibs()

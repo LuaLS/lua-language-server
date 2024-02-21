@@ -1,5 +1,3 @@
-local subprocess = require 'bee.subprocess'
-local socket     = require 'bee.socket'
 local util       = require 'utility'
 local await      = require 'await'
 local pub        = require 'pub'
@@ -7,7 +5,7 @@ local jsonrpc    = require 'jsonrpc'
 local define     = require 'proto.define'
 local json       = require 'json'
 local inspect    = require 'inspect'
-local thread     = require 'bee.thread'
+local platform   = require 'bee.platform'
 local fs         = require 'bee.filesystem'
 local net        = require 'service.net'
 local timer      = require 'timer'
@@ -234,8 +232,11 @@ end
 function m.listen(mode, socketPort)
     m.mode = mode
     if mode == 'stdio' then
-        subprocess.filemode(io.stdin,  'b')
-        subprocess.filemode(io.stdout, 'b')
+        if platform.OS == 'Windows' then
+            local windows = require 'bee.windows'
+            windows.filemode(io.stdin,  'b')
+            windows.filemode(io.stdout, 'b')
+        end
         io.stdin:setvbuf  'no'
         io.stdout:setvbuf 'no'
         pub.task('loadProtoByStdio')

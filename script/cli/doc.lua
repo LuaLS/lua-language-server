@@ -169,6 +169,7 @@ local function collectTypes(global, results)
             field.desc    = getDesc(source)
             field.rawdesc = getDesc(source, true)
             field.extends = packObject(source.extends)
+            field.visible = vm.getVisibleType(source)
             return
         end
         if source.type == 'setfield'
@@ -187,6 +188,7 @@ local function collectTypes(global, results)
             field.desc    = getDesc(source)
             field.rawdesc = getDesc(source, true)
             field.extends = packObject(source.value)
+            field.visible = vm.getVisibleType(source)
             return
         end
         if source.type == 'tableindex' then
@@ -207,6 +209,7 @@ local function collectTypes(global, results)
             field.desc    = getDesc(source)
             field.rawdesc = getDesc(source, true)
             field.extends = packObject(source.value)
+            field.visible = vm.getVisibleType(source)
             return
         end
     end)
@@ -245,6 +248,8 @@ local function collectVars(global, results)
             }
             result.desc = result.desc or getDesc(set)
             result.rawdesc = result.rawdesc or getDesc(set, true)
+            result.defines[#result.defines].extends['desc'] = getDesc(set)
+            result.defines[#result.defines].extends['rawdesc'] = getDesc(set, true)
         end
     end
     if #result.defines == 0 then
@@ -290,6 +295,18 @@ function export.export(outputPath, callback)
 
     local mdPath = doc2md.buildMD(outputPath)
     return docPath, mdPath
+end
+
+function export.getDocOutputPath()
+    local doc_output_path = ''
+    if type(DOC_OUT_PATH) == 'string' then
+        doc_output_path = fs.absolute(fs.path(DOC_OUT_PATH)):string()
+    elseif DOC_OUT_PATH == true then
+        doc_output_path = fs.current_path():string()
+    else
+        doc_output_path = LOGPATH
+    end
+    return doc_output_path
 end
 
 ---@async
@@ -350,7 +367,7 @@ function export.runCLI()
         ws.awaitReady(rootUri)
         await.sleep(0.1)
 
-        local docPath, mdPath = export.export(LOGPATH, function (i, max)
+        local docPath, mdPath = export.export(export.getDocOutputPath(), function (i, max)
             if os.clock() - lastClock > 0.2 then
                 lastClock = os.clock()
                 local output = '\x0D'

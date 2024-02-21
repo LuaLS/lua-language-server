@@ -1,0 +1,30 @@
+foo = {x = 5, bar = 6, ["baz"] = 7}
+foo.y = foo.x + 1
+foo[1] = foo[0]
+function foo:someMethod() return false end
+local s = 0
+while s < 10 do
+	s = s + (foo:someMethod(i, 10) or 10)
+end
+print(s)
+for j = 10, 1, -1 do
+	for i in ipairs(s) do
+		goto foolabel
+		::foolabel::
+	end
+end
+
+function foo()
+	return function(x, ...)
+		repeat
+		until select('#', ...) > 0
+	end
+end
+
+if x then
+	return x < 0 or x >= 0 or not x <= 0 and -x > 7
+elseif y then
+	return 5.7
+else
+	return "a very long string that should get shortened to not destroy the layout completely"
+end

@@ -276,7 +276,7 @@ function string.lower(s: string|number)
   -> string
 ]]
 
--- 根据传入值推测参数类型
+-- 不根据传入值推测参数类型
 TEST [[
 local function x(a, ...)
 end
@@ -284,7 +284,7 @@ end
 <?x?>(1, 2, 3, 4, 5, 6, 7)
 ]]
 [[
-function x(a: integer, ...any)
+function x(a: any, ...any)
 ]]
 
 TEST [[
@@ -1226,6 +1226,17 @@ local <?x?>
 ]]
 [[
 local x: table<ClassA, ClassB>
+]]
+
+TEST [[
+---@type [ClassA, ClassB]
+local <?x?>
+]]
+[[
+local x: [ClassA, ClassB] {
+    [1]: ClassA,
+    [2]: ClassB,
+}
 ]]
 
 --TEST [[

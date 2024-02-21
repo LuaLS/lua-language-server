@@ -369,6 +369,78 @@ local function parseTable(parent)
     return typeUnit
 end
 
+local function parseTuple(parent)
+    if not checkToken('symbol', '[', 1) then
+        return nil
+    end
+    nextToken()
+    local typeUnit = {
+        type    = 'doc.type.table',
+        start   = getStart(),
+        parent  = parent,
+        fields  = {},
+        isTuple = true,
+    }
+
+    local index = 1
+    while true do
+        if checkToken('symbol', ']', 1) then
+            nextToken()
+            break
+        end
+        local field = {
+            type   = 'doc.type.field',
+            parent = typeUnit,
+        }
+
+        do
+            local needCloseParen
+            if checkToken('symbol', '(', 1) then
+                nextToken()
+                needCloseParen = true
+            end
+            field.name = {
+                type        = 'doc.type',
+                start       = getFinish(),
+                firstFinish = getFinish(),
+                finish      = getFinish(),
+                parent      = field,
+            }
+            field.name.types = {
+                [1] = {
+                    type   = 'doc.type.integer',
+                    start  = getFinish(),
+                    finish = getFinish(),
+                    parent = field.name,
+                    [1]    = index,
+                }
+            }
+            index          = index + 1
+            field.extends  = parseType(field)
+            if not field.extends then
+                break
+            end
+            field.optional = field.extends.optional
+            field.start    = field.extends.start
+            field.finish   = field.extends.finish
+            if needCloseParen then
+                nextSymbolOrError ')'
+            end
+        end
+
+        typeUnit.fields[#typeUnit.fields+1] = field
+        if checkToken('symbol', ',', 1)
+        or checkToken('symbol', ';', 1) then
+            nextToken()
+        else
+            nextSymbolOrError(']')
+            break
+        end
+    end
+    typeUnit.finish = getFinish()
+    return typeUnit
+end
+
 local function parseSigns(parent)
     if not checkToken('symbol', '<', 1) then
         return nil
@@ -729,6 +801,7 @@ end
 function parseTypeUnit(parent)
     local result = parseFunction(parent)
                 or parseTable(parent)
+                or parseTuple(parent)
                 or parseString(parent)
                 or parseCode(parent)
                 or parseInteger(parent)
@@ -912,6 +985,7 @@ local docSwitch = util.switch()
         while true do
             local extend = parseName('doc.extends.name', result)
                         or parseTable(result)
+                        or parseTuple(result)
             if not extend then
                 pushWarning {
                     type   = 'LUADOC_MISS_CLASS_EXTENDS_NAME',
@@ -2050,7 +2124,10 @@ local function bindDocs(state)
             state.ast.docs.groups[#state.ast.docs.groups+1] = binded
         end
         binded[#binded+1] = doc
-        if isTailComment(text, doc) then
+		if doc.specialBindGroup then
+			bindDocWithSources(sources, doc.specialBindGroup)
+			binded = nil
+		elseif isTailComment(text, doc) and doc.type ~= "doc.class" and doc.type ~= "doc.field" then
             bindDocWithSources(sources, binded)
             binded = nil
         else
@@ -2154,11 +2231,13 @@ local function luadoc(state)
             end
         end
     end
-    
+
     if ast.state.pluginDocs then
         for i, doc in ipairs(ast.state.pluginDocs) do
             insertDoc(doc, doc.originalComment)
         end
+        ---@param a unknown
+        ---@param b unknown
         table.sort(ast.docs, function (a, b)
             return a.start < b.start
         end)
@@ -2176,7 +2255,7 @@ local function luadoc(state)
 end
 
 return {
-    buildAndBindDoc = function (ast, src, comment)
+    buildAndBindDoc = function (ast, src, comment, group)
         local doc = buildLuaDoc(comment)
         if doc then
             local pluginDocs = ast.state.pluginDocs or {}
@@ -2184,6 +2263,7 @@ return {
             doc.special = src
             doc.originalComment = comment
             doc.virtual = true
+			doc.specialBindGroup = group
             ast.state.pluginDocs = pluginDocs
             return doc
         end

@@ -157,22 +157,24 @@ local viewNodeSwitch;viewNodeSwitch = util.switch()
         end
         infer._hasClass = true
         local buf = {}
-        buf[#buf+1] = '{ '
+        buf[#buf+1] = source.isTuple and '[' or '{ '
         for i, field in ipairs(source.fields) do
             if i > 1 then
                 buf[#buf+1] = ', '
             end
-            local key = field.name
-            if key.type == 'doc.type' then
-                buf[#buf+1] = ('[%s]: '):format(vm.getInfer(key):view(uri))
-            elseif type(key[1]) == 'string' then
-                buf[#buf+1] = key[1] .. ': '
-            else
-                buf[#buf+1] = ('[%q]: '):format(key[1])
+            if not source.isTuple then
+                local key = field.name
+                if key.type == 'doc.type' then
+                    buf[#buf+1] = ('[%s]: '):format(vm.getInfer(key):view(uri))
+                elseif type(key[1]) == 'string' then
+                    buf[#buf+1] = key[1] .. ': '
+                else
+                    buf[#buf+1] = ('[%q]: '):format(key[1])
+                end
             end
             buf[#buf+1] = vm.getInfer(field.extends):view(uri)
         end
-        buf[#buf+1] = ' }'
+        buf[#buf+1] = source.isTuple and ']' or ' }'
         return table.concat(buf)
     end)
     : case 'doc.type.string'

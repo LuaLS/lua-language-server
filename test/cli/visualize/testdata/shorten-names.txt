@@ -1,0 +1,18 @@
+s = "very long string that is very long and would be annoying if it was fully included in the output"
+s = "string\nwith\n\new\nlines"
+x = x + 1
+x = x + 1
+x = x + 1
+x = x + 1
+x = x + 1
+x = x + 1
+x = x + 1
+x = x + 1
+x = x + 1
+x = x + 1
+x = x + 1
+x = x + 1
+x = x + 1
+-- more than 15 lines should be shortened for tooltip in main
+x = x + 1
+x = x + 1

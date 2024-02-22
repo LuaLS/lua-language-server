@@ -1,4 +1,3 @@
-local subprocess = require 'bee.subprocess'
 local util       = require 'utility'
 local await      = require 'await'
 local pub        = require 'pub'
@@ -6,6 +5,10 @@ local jsonrpc    = require 'jsonrpc'
 local define     = require 'proto.define'
 local json       = require 'json'
 local inspect    = require 'inspect'
+local platform   = require 'bee.platform'
+local fs         = require 'bee.filesystem'
+local net        = require 'service.net'
+local timer      = require 'timer'
 
 local reqCounter = util.counter()
 
@@ -29,6 +32,8 @@ local m = {}
 m.ability = {}
 m.waiting = {}
 m.holdon  = {}
+m.mode    = 'stdio'
+m.client  = nil
 
 function m.getMethodName(proto)
     if proto.method:sub(1, 2) == '$/' then
@@ -46,7 +51,12 @@ end
 function m.send(data)
     local buf = jsonrpc.encode(data)
     logSend(buf)
-    io.write(buf)
+    if m.mode == 'stdio' then
+        io.write(buf)
+    elseif m.mode == 'socket' then
+        m.client:write(buf)
+        net.update()
+    end
 end
 
 function m.response(id, res)
@@ -219,12 +229,51 @@ function m.doResponse(proto)
     waiting.resume(proto.result)
 end
 
-function m.listen()
-    subprocess.filemode(io.stdin,  'b')
-    subprocess.filemode(io.stdout, 'b')
-    io.stdin:setvbuf  'no'
-    io.stdout:setvbuf 'no'
-    pub.task('loadProto')
+function m.listen(mode, socketPort)
+    m.mode = mode
+    if mode == 'stdio' then
+        if platform.OS == 'Windows' then
+            local windows = require 'bee.windows'
+            windows.filemode(io.stdin,  'b')
+            windows.filemode(io.stdout, 'b')
+        end
+        io.stdin:setvbuf  'no'
+        io.stdout:setvbuf 'no'
+        pub.task('loadProtoByStdio')
+    elseif mode == 'socket' then
+        local unixFolder = LOGPATH .. '/unix'
+        fs.create_directories(fs.path(unixFolder))
+        local unixPath = unixFolder .. '/' .. tostring(socketPort)
+
+        local server = net.listen('unix', unixPath)
+
+        assert(server)
+
+        local dummyClient = {
+            buf = '',
+            write = function (self, data)
+                self.buf = self.buf.. data
+            end,
+            update = function () end,
+        }
+        m.client = dummyClient
+
+        local t = timer.loop(0.1, function ()
+            net.update()
+        end)
+
+        function server:on_accept(client)
+            t:remove()
+            m.client = client
+            client:write(dummyClient.buf)
+            net.update()
+        end
+
+        pub.task('loadProtoBySocket', {
+            port = socketPort,
+            unixPath = unixPath,
+        })
+    end
 end
 
 return m

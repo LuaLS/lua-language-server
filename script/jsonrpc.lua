@@ -14,16 +14,22 @@ function m.encode(pack)
     return buf
 end
 
+---@param reader fun(arg: integer):string
 local function readProtoHead(reader)
     local head = {}
+    local line = ''
     while true do
-        local line = reader 'L'
-        if line == nil then
+        local char = reader(1)
+        if char == nil then
             -- 说明管道已经关闭了
             return nil, 'Disconnected!'
         end
+        line = line .. char
         if line == '\r\n' then
             break
+        end
+        if line:sub(-2) ~= '\r\n' then
+            goto continue
         end
         local k, v = line:match '^([^:]+)%s*%:%s*(.+)\r\n$'
         if not k then
@@ -33,10 +39,13 @@ local function readProtoHead(reader)
             v = tonumber(v)
         end
         head[k] = v
+        line = ''
+        ::continue::
     end
     return head
 end
 
+---@param reader fun(arg: integer):string
 function m.decode(reader)
     local head, err = readProtoHead(reader)
     if not head then

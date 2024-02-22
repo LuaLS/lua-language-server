@@ -7,9 +7,10 @@ local glob     = require 'glob'
 ---@class parser.object
 ---@field package _visibleType? parser.visibleType
 
----@param source parser.object
----@return parser.visibleType
-function vm.getVisibleType(source)
+local function getVisibleType(source)
+    if guide.isLiteral(source) then
+        return 'public'
+    end
     if source._visibleType then
         return source._visibleType
     end
@@ -52,6 +53,27 @@ function vm.getVisibleType(source)
     end
 
     source._visibleType = 'public'
+    return 'public'
+end
+
+---@class vm.node
+---@field package _visibleType parser.visibleType
+
+---@param source parser.object
+---@return parser.visibleType
+function vm.getVisibleType(source)
+    local node = vm.compileNode(source)
+    if node._visibleType then
+        return node._visibleType
+    end
+    for _, def in ipairs(vm.getDefs(source)) do
+        local visible = getVisibleType(def)
+        if visible ~= 'public' then
+            node._visibleType = visible
+            return visible
+        end
+    end
+    node._visibleType = 'public'
     return 'public'
 end
 

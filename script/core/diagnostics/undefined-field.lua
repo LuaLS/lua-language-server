@@ -8,13 +8,6 @@ local skipCheckClass = {
     ['unknown']       = true,
     ['any']           = true,
     ['table']         = true,
-    ['nil']           = true,
-    ['number']        = true,
-    ['integer']       = true,
-    ['boolean']       = true,
-    ['function']      = true,
-    ['userdata']      = true,
-    ['lightuserdata'] = true,
 }
 
 ---@async
@@ -61,5 +54,4 @@ return function (uri, callback)
     end
     guide.eachSourceType(ast.ast, 'getfield',  checkUndefinedField)
     guide.eachSourceType(ast.ast, 'getmethod', checkUndefinedField)
-    guide.eachSourceType(ast.ast, 'getindex',  checkUndefinedField)
 end

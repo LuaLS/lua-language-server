@@ -336,7 +336,7 @@ local function tryDocFieldComment(source)
     end
 end
 
-local function getFunctionComment(source)
+local function getFunctionComment(source, raw)
     local docGroup = source.bindDocs
     if not docGroup then
         return
@@ -356,14 +356,14 @@ local function getFunctionComment(source)
         if     doc.type == 'doc.comment' then
             local comment = normalizeComment(doc.comment.text, uri)
             md:add('md', comment)
-        elseif doc.type == 'doc.param' then
+        elseif doc.type == 'doc.param' and not raw then
             if doc.comment then
                 md:add('md', ('@*param* `%s` — %s'):format(
                     doc.param[1],
                     doc.comment.text
                 ))
             end
-        elseif doc.type == 'doc.return' then
+        elseif doc.type == 'doc.return' and not raw then
             if hasReturnComment then
                 local name = {}
                 for _, rtn in ipairs(doc.returns) do
@@ -401,13 +401,13 @@ local function getFunctionComment(source)
 end
 
 ---@async
-local function tryDocComment(source)
+local function tryDocComment(source, raw)
     local md = markdown()
     if source.value and source.value.type == 'function' then
         source = source.value
     end
     if source.type == 'function' then
-        local comment = getFunctionComment(source)
+        local comment = getFunctionComment(source, raw)
         md:add('md', comment)
         source = source.parent
     end
@@ -429,7 +429,7 @@ local function tryDocComment(source)
 end
 
 ---@async
-local function tryDocOverloadToComment(source)
+local function tryDocOverloadToComment(source, raw)
     if source.type ~= 'doc.type.function' then
         return
     end
@@ -438,7 +438,7 @@ local function tryDocOverloadToComment(source)
     or not doc.bindSource then
         return
     end
-    local md = tryDocComment(doc.bindSource)
+    local md = tryDocComment(doc.bindSource, raw)
     if md then
         return md
     end
@@ -477,38 +477,59 @@ local function tryDocEnum(source)
     if not tbl then
         return
     end
-    local md = markdown()
-    md:add('lua', '{')
-    for _, field in ipairs(tbl) do
-        if field.type == 'tablefield'
-        or field.type == 'tableindex' then
-            if not field.value then
-                goto CONTINUE
-            end
-            local key = guide.getKeyName(field)
-            if not key then
-                goto CONTINUE
-            end
-            if field.value.type == 'integer'
-            or field.value.type == 'string' then
-                md:add('lua', ('    %s: %s = %s,'):format(key, field.value.type, field.value[1]))
-            end
-            if field.value.type == 'binary'
-            or field.value.type == 'unary' then
-                local number = vm.getNumber(field.value)
-                if number then
-                    md:add('lua', ('    %s: %s = %s,'):format(key, math.tointeger(number) and 'integer' or 'number', number))
+    if vm.docHasAttr(source, 'key') then
+        local md = markdown()
+        local keys = {}
+        for _, field in ipairs(tbl) do
+            if field.type == 'tablefield'
+            or field.type == 'tableindex' then
+                if not field.value then
+                    goto CONTINUE
                 end
+                local key = guide.getKeyName(field)
+                if not key then
+                    goto CONTINUE
+                end
+                keys[#keys+1] = ('%q'):format(key)
+                ::CONTINUE::
             end
-            ::CONTINUE::
         end
+        md:add('lua', table.concat(keys, ' | '))
+        return md:string()
+    else
+        local md = markdown()
+        md:add('lua', '{')
+        for _, field in ipairs(tbl) do
+            if field.type == 'tablefield'
+            or field.type == 'tableindex' then
+                if not field.value then
+                    goto CONTINUE
+                end
+                local key = guide.getKeyName(field)
+                if not key then
+                    goto CONTINUE
+                end
+                if field.value.type == 'integer'
+                or field.value.type == 'string' then
+                    md:add('lua', ('    %s: %s = %s,'):format(key, field.value.type, field.value[1]))
+                end
+                if field.value.type == 'binary'
+                or field.value.type == 'unary' then
+                    local number = vm.getNumber(field.value)
+                    if number then
+                        md:add('lua', ('    %s: %s = %s,'):format(key, math.tointeger(number) and 'integer' or 'number', number))
+                    end
+                end
+                ::CONTINUE::
+            end
+        end
+        md:add('lua', '}')
+        return md:string()
     end
-    md:add('lua', '}')
-    return md:string()
 end
 
 ---@async
-return function (source)
+return function (source, raw)
     if source.type == 'string' then
         return asString(source)
     end
@@ -518,10 +539,10 @@ return function (source)
     if source.type == 'field' then
         source = source.parent
     end
-    return tryDocOverloadToComment(source)
+    return tryDocOverloadToComment(source, raw)
         or tryDocFieldComment(source)
         or tyrDocParamComment(source)
-        or tryDocComment(source)
+        or tryDocComment(source, raw)
         or tryDocClassComment(source)
         or tryDocModule(source)
         or tryDocEnum(source)

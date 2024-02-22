@@ -1228,6 +1228,17 @@ local <?x?>
 local x: table<ClassA, ClassB>
 ]]
 
+TEST [[
+---@type [ClassA, ClassB]
+local <?x?>
+]]
+[[
+local x: [ClassA, ClassB] {
+    [1]: ClassA,
+    [2]: ClassB,
+}
+]]
+
 --TEST [[
 -----@class ClassA
 -----@class ClassB
@@ -2383,6 +2394,25 @@ local obj: B {
 
 TEST [[
 ---@class A
+local M = {}
+
+---@private
+M.x = 0
+
+---@private
+function M:init()
+    self.x = 1
+end
+
+---@type A
+local <?a?>
+]]
+[[
+local a: A
+]]
+
+TEST [[
+---@class A
 ---@field x fun(): string
 
 ---@type table<string, A>
@@ -2446,4 +2476,26 @@ local t: {
     [2]: integer = 2,
     [3]: table,
 }
+]]
+
+TEST [[
+---@class A
+---@overload fun(x: number): boolean
+local <?x?>
+]]
+[[
+local x: A
+]]
+
+TEST [[
+---@type A
+local <?f?>
+
+---@enum A
+local t = {
+    x = f,
+}
+]]
+[[
+local f: A
 ]]

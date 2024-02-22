@@ -27,7 +27,7 @@ config.runtime.unicodeName        =
 config.runtime.nonstandardSymbol  =
 "支援非標準的符號。請務必確認你的執行環境支援這些符號。"
 config.runtime.plugin             =
-"延伸模組路徑，請查閱[文件](https://github.com/LuaLS/lua-language-server/wiki/Plugins)瞭解用法。"
+"延伸模組路徑，請查閱[文件](https://luals.github.io/wiki/plugins)瞭解用法。"
 config.runtime.pluginArgs         = -- TODO: need translate!
 "Additional arguments for the plugin."
 config.runtime.fileEncoding       =
@@ -268,22 +268,16 @@ config.format.defaultConfig              =
 ]]
 config.spell.dict                        =
 '拼寫檢查的自訂單詞。'
+config.nameStyle.config                  = -- TODO: need translate!
+'Set name style config'
 config.telemetry.enable                  =
 [[
-啟用遙測，透過網路發送你的編輯器資訊與錯誤日誌。在[此處](https://github.com/LuaLS/lua-language-server/wiki/Home#privacy)閱讀我們的隱私聲明。
+啟用遙測，透過網路發送你的編輯器資訊與錯誤日誌。在[此處](https://luals.github.io/privacy/#language-server)閱讀我們的隱私聲明。
 ]]
 config.misc.parameters                   =
-'VSCode中啟動語言伺服時的[命令列參數](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#arguments)。'
+'VSCode中啟動語言伺服時的[命令列參數](https://luals.github.io/wiki/usage#arguments)。'
 config.misc.executablePath               = -- TODO: need translate!
 'Specify the executable path in VSCode.'
-config.IntelliSense.traceLocalSet        =
-'請查閱[文件](https://github.com/LuaLS/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
-config.IntelliSense.traceReturn          =
-'請查閱[文件](https://github.com/LuaLS/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
-config.IntelliSense.traceBeSetted        =
-'請查閱[文件](https://github.com/LuaLS/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
-config.IntelliSense.traceFieldInject     =
-'請查閱[文件](https://github.com/LuaLS/lua-language-server/wiki/IntelliSense-optional-features)瞭解用法。'
 config.type.castNumberToInteger          =
 '允許將 `number` 類型賦值給 `integer` 類型。'
 config.type.weakUnionCheck               =
@@ -378,6 +372,8 @@ config.diagnostics['invisible']             = -- TODO: need translate!
 'Enable diagnostics for accesses to fields which are invisible.'
 config.diagnostics['missing-global-doc']    = -- TODO: need translate!
 'Missing annotations for globals! Global functions must have a comment and annotations for all parameters and return values.'
+config.diagnostics['missing-local-export-doc'] = -- TODO: need translate!
+'Missing annotations for exported locals! Exported local functions must have a comment and annotations for all parameters and return values.'
 config.diagnostics['missing-parameter']     = -- TODO: need translate!
 'Enable diagnostics for function calls where the number of arguments is less than the number of annotated function parameters.'
 config.diagnostics['missing-return']        = -- TODO: need translate!
@@ -400,6 +396,8 @@ config.diagnostics['return-type-mismatch']  = -- TODO: need translate!
 'Enable diagnostics for return values whose type does not match the type declared in the corresponding return annotation.'
 config.diagnostics['spell-check']           = -- TODO: need translate!
 'Enable diagnostics for typos in strings.'
+config.diagnostics['name-style-check']      = -- TODO: need translate!
+'Enable diagnostics for name style.'
 config.diagnostics['unbalanced-assignments']= -- TODO: need translate!
 'Enable diagnostics on multiple assignments if not all variables obtain a value (e.g., `local x,y = 1`).'
 config.diagnostics['undefined-doc-class']   = -- TODO: need translate!
@@ -433,3 +431,5 @@ command.exportDocument = -- TODO: need translate!
 'Lua: Export Document ...'
 command.addon_manager.open = -- TODO: need translate!
 'Lua: Open Addon Manager ...'
+command.reloadFFIMeta = -- TODO: need translate!
+'Lua: Reload luajit ffi meta'

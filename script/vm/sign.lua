@@ -142,13 +142,15 @@ function mt:resolve(uri, args)
         end
         if object.type == 'doc.type.function' then
             for i, arg in ipairs(object.args) do
-                for n in node:eachObject() do
-                    if n.type == 'function'
-                    or n.type == 'doc.type.function' then
-                        ---@cast n parser.object
-                        local farg = n.args and n.args[i]
-                        if farg then
-                            resolve(arg.extends, vm.compileNode(farg))
+                if arg.extends then
+                    for n in node:eachObject() do
+                        if n.type == 'function'
+                        or n.type == 'doc.type.function' then
+                            ---@cast n parser.object
+                            local farg = n.args and n.args[i]
+                            if farg then
+                                resolve(arg.extends, vm.compileNode(farg))
+                            end
                         end
                     end
                 end
@@ -254,7 +256,7 @@ function mt:resolve(uri, args)
         local argNode = vm.compileNode(arg)
         local knownTypes, genericNames = getSignInfo(sign)
         if not isAllResolved(genericNames) then
-            local newArgNode = buildArgNode(argNode,sign, knownTypes)
+            local newArgNode = buildArgNode(argNode, sign, knownTypes)
             resolve(sign, newArgNode)
         end
     end

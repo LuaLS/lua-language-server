@@ -8,6 +8,7 @@ arg = {}
 ---@generic T
 ---@param v? T
 ---@param message? any
+---@param ... any
 ---@return T
 ---@return any ...
 function assert(v, message, ...) end
@@ -30,6 +31,7 @@ function assert(v, message, ...) end
 ---#if VERSION >= 5.4 then
 ---#DES 'collectgarbage'
 ---@param opt? gcoptions
+---@param ... any
 ---@return any
 function collectgarbage(opt, ...) end
 ---#else
@@ -136,6 +138,7 @@ function newproxy(proxy) end
 ---@version 5.1
 ---#DES 'module'
 ---@param name string
+---@param ...  any
 function module(name, ...) end
 
 ---#DES 'next'
@@ -161,12 +164,14 @@ function pairs(t) end
 ---@param f     async fun(...):...
 ---#end
 ---@param arg1? any
+---@param ...   any
 ---@return boolean success
 ---@return any result
 ---@return any ...
 function pcall(f, arg1, ...) end
 
 ---#DES 'print'
+---@param ... any
 function print(...) end
 
 ---#DES 'rawequal'
@@ -198,6 +203,7 @@ function rawset(table, index, value) end
 
 ---#DES 'select'
 ---@param index integer|"#"
+---@param ...   any
 ---@return any
 ---@nodiscard
 function select(index, ...) end
@@ -209,9 +215,49 @@ function select(index, ...) end
 ---@return function
 function setfenv(f, table) end
 
+
+---@class metatable
+---@field __mode 'v'|'k'|'kv'|nil
+---@field __metatable any|nil
+---@field __tostring (fun(t):string)|nil
+---@field __gc fun(t)|nil
+---@field __add (fun(t1,t2):any)|nil
+---@field __sub (fun(t1,t2):any)|nil
+---@field __mul (fun(t1,t2):any)|nil
+---@field __div (fun(t1,t2):any)|nil
+---@field __mod (fun(t1,t2):any)|nil
+---@field __pow (fun(t1,t2):any)|nil
+---@field __unm (fun(t):any)|nil
+---#if VERSION >= 5.3 then
+---@field __idiv (fun(t1,t2):any)|nil
+---@field __band (fun(t1,t2):any)|nil
+---@field __bor (fun(t1,t2):any)|nil
+---@field __bxor (fun(t1,t2):any)|nil
+---@field __bnot (fun(t):any)|nil
+---@field __shl (fun(t1,t2):any)|nil
+---@field __shr (fun(t1,t2):any)|nil
+---#end
+---@field __concat (fun(t1,t2):any)|nil
+---@field __len (fun(t):integer)|nil
+---@field __eq (fun(t1,t2):boolean)|nil
+---@field __lt (fun(t1,t2):boolean)|nil
+---@field __le (fun(t1,t2):boolean)|nil
+---@field __index table|(fun(t,k):any)|nil
+---@field __newindex table|fun(t,k,v)|nil
+---@field __call (fun(t,...):...)|nil
+---#if VERSION > 5.1 or VERSION == JIT then
+---@field __pairs (fun(t):(fun(t,k,v):any,any))|nil
+---#end
+---#if VERSION == JIT or VERSION == 5.2 then
+---@field __ipairs (fun(t):(fun(t,k,v):(integer|nil),any))|nil
+---#end
+---#if VERSION >= 5.4 then
+---@field __close (fun(t,errobj):any)|nil
+---#end
+
 ---#DES 'setmetatable'
 ---@param table      table
----@param metatable? table
+---@param metatable? metatable|table
 ---@return table
 function setmetatable(table, metatable) end
 
@@ -261,6 +307,7 @@ _VERSION = "Lua 5.4"
 ---@version >5.4
 ---#DES 'warn'
 ---@param message string
+---@param ...     any
 function warn(message, ...) end
 
 ---#if VERSION == 5.1 and not JIT then
@@ -276,6 +323,7 @@ function xpcall(f, err) end
 ---@param f     async fun(...):...
 ---@param msgh  function
 ---@param arg1? any
+---@param ...   any
 ---@return boolean success
 ---@return any result
 ---@return any ...

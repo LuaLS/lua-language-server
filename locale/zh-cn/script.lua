@@ -114,16 +114,22 @@ DIAG_UNDEFINED_DOC_NAME               =
 '未定义的类型或别名 `{}`。'
 DIAG_UNDEFINED_DOC_PARAM              =
 '指向了未定义的参数 `{}`。'
-DIAG_MISSING_GLOBAL_DOC_COMMENT       = -- TODO: need translate!
-'Missing comment for global function `{}`.'
-DIAG_MISSING_GLOBAL_DOC_PARAM         = -- TODO: need translate!
-'Missing @param annotation for parameter `{}` in global function `{}`.'
-DIAG_MISSING_GLOBAL_DOC_RETURN        = -- TODO: need translate!
-'Missing @return annotation at index `{}` in global function `{}`.'
-DIAG_INCOMPLETE_SIGNATURE_DOC_PARAM   = -- TODO: need translate!
-'Incomplete signature. Missing @param annotation for parameter `{}` in function `{}`.'
-DIAG_INCOMPLETE_SIGNATURE_DOC_RETURN  = -- TODO: need translate!
-'Incomplete signature. Missing @return annotation at index `{}` in function `{}`.'
+DIAG_MISSING_GLOBAL_DOC_COMMENT       =
+'全局函数 `{}` 缺少注释。'
+DIAG_MISSING_GLOBAL_DOC_PARAM         =
+'全局函数 `{2}` 的参数 `{1}` 缺少 @param 注解。'
+DIAG_MISSING_GLOBAL_DOC_RETURN        =
+'全局函数 `{2}` 的第 `{1}` 个返回值缺少 @return 注解。'
+DIAG_MISSING_LOCAL_EXPORT_DOC_COMMENT =
+'导出的局部函数 `{}` 缺少注释。'
+DIAG_MISSING_LOCAL_EXPORT_DOC_PARAM   =
+'导出的局部函数 `{2}` 的参数 `{1}` 缺少 @param 注解。'
+DIAG_MISSING_LOCAL_EXPORT_DOC_RETURN  =
+'导出的局部函数 `{2}` 的第 {1} 个返回值缺少 @return 注解。'
+DIAG_INCOMPLETE_SIGNATURE_DOC_PARAM   =
+'签名不完整。参数 `{1}` 缺少 @param 注解。'
+DIAG_INCOMPLETE_SIGNATURE_DOC_RETURN  =
+'签名不完整。第 {1} 个返回值缺少 @return 注解。'
 DIAG_UNKNOWN_DIAG_CODE                =
 '未知的诊断代号 `{}`。'
 DIAG_CAST_LOCAL_TYPE                  =
@@ -160,8 +166,16 @@ DIAG_INVISIBLE_PROTECTED              =
 '字段 `{field}` 受到保护，只能在 `{class}` 类极其子类中才能访问。'
 DIAG_INVISIBLE_PACKAGE                =
 '字段 `{field}` 只能在相同的文件 `{uri}` 中才能访问。'
-DIAG_GLOBAL_ELEMENT                  = -- TODO: need translate!
-'Element is global.'
+DIAG_GLOBAL_ELEMENT                   =
+'全局变量。'
+DIAG_MISSING_FIELDS                   =
+'缺少类型 `{1}` 的必要字段： {2}'
+DIAG_INJECT_FIELD                     =
+'不能在 `{class}` 的引用中注入字段 `{field}` 。{fix}'
+DIAG_INJECT_FIELD_FIX_CLASS           =
+'如要允许注入，请对 `{node}` 使用 `{fix}` 。'
+DIAG_INJECT_FIELD_FIX_TABLE           =
+'如要允许注入，请在定义中添加 `{fix}` 。'
 
 MWS_NOT_SUPPORT         =
 '{} 目前还不支持多工作目录，我可能需要重启才能支持新的工作目录...'
@@ -189,9 +203,9 @@ WORKSPACE_DIAGNOSTIC      =
 WORKSPACE_SKIP_HUGE_FILE  =
 '出于性能考虑，已停止对此文件解析：{}'
 WORKSPACE_NOT_ALLOWED     =
-'你的工作目录被设置为了 `{}`，Lua语言服务拒绝加载此目录，请检查你的配置。[了解更多](https://github.com/LuaLS/lua-language-server/wiki/FAQ#why-is-the-server-scanning-the-wrong-folder)'
-WORKSPACE_SCAN_TOO_MUCH   = -- TODO: need translate!
-'已扫描了超过 {} 个文件，当前扫描的目录为 `{}`. Please see the [FAQ](https://github.com/LuaLS/lua-language-server/wiki/FAQ#how-can-i-improve-startup-speeds) to see how you can include fewer files. It is also possible that your [configuration is incorrect](https://github.com/LuaLS/lua-language-server/wiki/FAQ#why-is-the-server-scanning-the-wrong-folder).'
+'你的工作目录被设置为了 `{}`，Lua语言服务拒绝加载此目录，请检查你的配置。[了解更多](https://luals.github.io/wiki/faq#why-is-the-server-scanning-the-wrong-folder)'
+WORKSPACE_SCAN_TOO_MUCH   =
+'已扫描了超过 {} 个文件，当前扫描的目录为 `{}`. 请参阅 [FAQ](https://luals.github.io/wiki/faq#how-can-i-improve-startup-speeds) 了解如何排除多余的文件。也可能是你的 [设置有错误](https://luals.github.io/wiki/faq#why-is-the-server-scanning-the-wrong-folder).'
 
 PARSER_CRASH            =
 '语法解析崩溃了！遗言：{}'
@@ -442,6 +456,8 @@ ACTION_ADD_DICT         =
 '将 \'{}\' 添加到工作区的词典中。'
 ACTION_FIX_ADD_PAREN    =
 '添加括号。'
+ACTION_AUTOREQUIRE      =
+"导入 '{}' 作为 `{}`"
 
 COMMAND_DISABLE_DIAG       =
 '禁用诊断'
@@ -461,8 +477,8 @@ COMMAND_JSON_TO_LUA        =
 'JSON 转 Lua'
 COMMAND_JSON_TO_LUA_FAILED =
 'JSON 转 Lua 失败：{}'
-COMMAND_ADD_DICT           = -- TODO: need translate!
-'Add Word to dictionary'
+COMMAND_ADD_DICT           =
+'将单词添加到字典'
 COMMAND_REFERENCE_COUNT    =
 '{} 个引用'
 
@@ -542,7 +558,7 @@ WINDOW_APPLY_SETTING             =
 WINDOW_CHECK_SEMANTIC            =
 '如果你正在使用市场中的颜色主题，你可能需要同时修改 `editor.semanticHighlighting.enabled` 选项为 `true` 才会使语义着色生效。'
 WINDOW_TELEMETRY_HINT            =
-'请允许发送匿名的使用数据与错误报告，帮助我们进一步完善此插件。在[此处](https://github.com/LuaLS/lua-language-server/wiki/Home#privacy)阅读我们的隐私声明。'
+'请允许发送匿名的使用数据与错误报告，帮助我们进一步完善此插件。在[此处](https://luals.github.io/privacy/#language-server)阅读我们的隐私声明。'
 WINDOW_TELEMETRY_ENABLE          =
 '允许'
 WINDOW_TELEMETRY_DISABLE         =
@@ -687,7 +703,7 @@ Defines a class/table structure
 Manager = {}
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#class)
+[View Wiki](https://luals.github.io/wiki/annotations#class)
 ]=]
 LUADOC_DESC_TYPE = -- TODO: need translate!
 [=[
@@ -738,7 +754,7 @@ local x --x[""] is true
 local myFunction
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#types-and-type)
+[View Wiki](https://luals.github.io/wiki/annotations#type)
 ]=]
 LUADOC_DESC_ALIAS = -- TODO: need translate!
 [=[
@@ -788,7 +804,7 @@ local enums = {
 ---| `enums.CLOSE`
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#alias)
+[View Wiki](https://luals.github.io/wiki/annotations#alias)
 ]=]
 LUADOC_DESC_PARAM = -- TODO: need translate!
 [=[
@@ -813,7 +829,7 @@ function get(url, headers, timeout) end
 function concat(base, ...) end
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#param)
+[View Wiki](https://luals.github.io/wiki/annotations#param)
 ]=]
 LUADOC_DESC_RETURN = -- TODO: need translate!
 [=[
@@ -851,7 +867,7 @@ function getFirstLast() end
 function getTags(item) end
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#return)
+[View Wiki](https://luals.github.io/wiki/annotations#return)
 ]=]
 LUADOC_DESC_FIELD = -- TODO: need translate!
 [=[
@@ -882,7 +898,7 @@ response = get("localhost")
 statusCode = response.status.code
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#field)
+[View Wiki](https://luals.github.io/wiki/annotations#field)
 ]=]
 LUADOC_DESC_GENERIC = -- TODO: need translate!
 [=[
@@ -939,7 +955,7 @@ local v = Generic("Foo") -- v is an object of Foo
 -- we give for key (K) or value (V)
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#generics-and-generic)
+[View Wiki](https://luals.github.io/wiki/annotations/#generic)
 ]=]
 LUADOC_DESC_VARARG = -- TODO: need translate!
 [=[
@@ -958,7 +974,7 @@ provide typing or allow descriptions.
 function concat(...) end
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#vararg)
+[View Wiki](https://luals.github.io/wiki/annotations#vararg)
 ]=]
 LUADOC_DESC_OVERLOAD = -- TODO: need translate!
 [=[
@@ -973,7 +989,7 @@ Allows defining of multiple function signatures.
 function table.insert(t, position, value) end
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#overload)
+[View Wiki](https://luals.github.io/wiki/annotations#overload)
 ]=]
 LUADOC_DESC_DEPRECATED = -- TODO: need translate!
 [=[
@@ -984,7 +1000,7 @@ being ~~struck through~~.
 `---@deprecated`
 
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#deprecated)
+[View Wiki](https://luals.github.io/wiki/annotations#deprecated)
 ]=]
 LUADOC_DESC_META = -- TODO: need translate!
 [=[
@@ -999,7 +1015,7 @@ There are 3 main distinctions to note with meta files:
 `---@meta`
 
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#meta)
+[View Wiki](https://luals.github.io/wiki/annotations#meta)
 ]=]
 LUADOC_DESC_VERSION = -- TODO: need translate!
 [=[
@@ -1024,7 +1040,7 @@ function onlyWorksInJIT() end
 function oldLuaOnly() end
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#version)
+[View Wiki](https://luals.github.io/wiki/annotations#version)
 ]=]
 LUADOC_DESC_SEE = -- TODO: need translate!
 [=[
@@ -1034,7 +1050,7 @@ Define something that can be viewed for more information
 `---@see <text>`
 
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#see)
+[View Wiki](https://luals.github.io/wiki/annotations#see)
 ]=]
 LUADOC_DESC_DIAGNOSTIC = -- TODO: need translate!
 [=[
@@ -1060,7 +1076,7 @@ local unused = "hello world"
 ---@diagnostic enable: unused-local
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#diagnostic)
+[View Wiki](https://luals.github.io/wiki/annotations#diagnostic)
 ]=]
 LUADOC_DESC_MODULE = -- TODO: need translate!
 [=[
@@ -1077,7 +1093,7 @@ local stringUtils
 local module = require('string.utils')
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#module)
+[View Wiki](https://luals.github.io/wiki/annotations#module)
 ]=]
 LUADOC_DESC_ASYNC = -- TODO: need translate!
 [=[
@@ -1087,7 +1103,7 @@ Marks a function as asynchronous.
 `---@async`
 
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#async)
+[View Wiki](https://luals.github.io/wiki/annotations#async)
 ]=]
 LUADOC_DESC_NODISCARD = -- TODO: need translate!
 [=[
@@ -1099,7 +1115,7 @@ be ignored.
 `---@nodiscard`
 
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#nodiscard)
+[View Wiki](https://luals.github.io/wiki/annotations#nodiscard)
 ]=]
 LUADOC_DESC_CAST = -- TODO: need translate!
 [=[
@@ -1134,7 +1150,7 @@ local x --> string|table
 print(x) --> table
 ```
 ---
-[View Wiki](https://github.com/LuaLS/lua-language-server/wiki/Annotations#cast)
+[View Wiki](https://luals.github.io/wiki/annotations#cast)
 ]=]
 LUADOC_DESC_OPERATOR = -- TODO: need translate!
 [=[
@@ -1169,7 +1185,7 @@ pB = -pA
 LUADOC_DESC_ENUM = -- TODO: need translate!
 [=[
 Mark a table as an enum. If you want an enum but can't define it as a Lua
-table, take a look at the [`@alias`](https://github.com/LuaLS/lua-language-server/wiki/Annotations#alias)
+table, take a look at the [`@alias`](https://luals.github.io/wiki/annotations#alias)
 tag.
 
 ## Syntax
@@ -1191,6 +1207,33 @@ local function setColor(color) end
 
 -- Completion and hover is provided for the below param
 setColor(colors.green)
+```
+]=]
+LUADOC_DESC_SOURCE = -- TODO: need translate!
+[=[
+Provide a reference to some source code which lives in another file. When
+searching for the defintion of an item, its `@source` will be used.
+
+## Syntax
+`@source <path>`
+
+## Usage
+```
+---You can use absolute paths
+---@source C:/Users/me/Documents/program/myFile.c
+local a
+
+---Or URIs
+---@source file:///C:/Users/me/Documents/program/myFile.c:10
+local b
+
+---Or relative paths
+---@source local/file.c
+local c
+
+---You can also include line and char numbers
+---@source local/file.c:10:8
+local d
 ```
 ]=]
 LUADOC_DESC_PACKAGE = -- TODO: need translate!

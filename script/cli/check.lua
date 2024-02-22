@@ -9,6 +9,7 @@ local lang     = require 'language'
 local define   = require 'proto.define'
 local config   = require 'config.config'
 local fs       = require 'bee.filesystem'
+local provider = require 'provider'
 
 require 'vm'
 
@@ -51,6 +52,8 @@ lclient():start(function (client)
     end)
 
     io.write(lang.script('CLI_CHECK_INITING'))
+
+    provider.updateConfig(rootUri)
 
     ws.awaitReady(rootUri)
 
@@ -96,7 +99,10 @@ end
 if count == 0 then
     print(lang.script('CLI_CHECK_SUCCESS'))
 else
-    local outpath = LOGPATH .. '/check.json'
+    local outpath = CHECK_OUT_PATH
+    if outpath == nil then
+        outpath = LOGPATH .. '/check.json'
+    end
     util.saveFile(outpath, jsonb.beautify(results))
 
     print(lang.script('CLI_CHECK_RESULTS', count, outpath))

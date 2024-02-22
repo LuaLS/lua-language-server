@@ -32,7 +32,7 @@ end
 
 print('基准诊断目录：', path)
 
-ws.ready = true
+ws.awaitReady(furi.encode(path:string()))
 diag.diagnosticsScope(furi.encode(path:string()))
 
 local clock = os.clock()
@@ -86,7 +86,7 @@ end) do
     end
 end
 
-util.revertTable(printTexts)
+util.revertArray(printTexts)
 
 for _, text in ipairs(printTexts) do
     print(text)

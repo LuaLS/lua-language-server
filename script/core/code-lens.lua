@@ -6,7 +6,7 @@ local getRef = require 'core.reference'
 local lang   = require 'language'
 
 ---@class parser.state
----@field package _codeLens codeLens
+---@field package _codeLens? codeLens
 
 ---@class codeLens.resolving
 ---@field mode    'reference'
@@ -14,7 +14,6 @@ local lang   = require 'language'
 
 ---@class codeLens.result
 ---@field position integer
----@field uri      uri
 ---@field id       integer
 
 ---@class codeLens

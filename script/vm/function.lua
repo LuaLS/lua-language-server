@@ -372,8 +372,14 @@ function vm.isVarargFunctionWithOverloads(func)
     if not func.args then
         return false
     end
-    if not func.args[1] or func.args[1].type ~= '...' then
-        return false
+    if func.args[1] and func.args[1].type == 'self' then
+        if not func.args[2] or func.args[2].type ~= '...' then
+            return false
+        end
+    else
+        if not func.args[1] or func.args[1].type ~= '...' then
+            return false
+        end
     end
     if not func.bindDocs then
         return false

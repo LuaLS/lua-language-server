@@ -61,7 +61,7 @@ function TEST(data)
     local mainUri
     local pos
     for _, info in ipairs(data) do
-        local uri = furi.encode(info.path)
+        local uri = furi.encode(TESTROOT .. info.path)
         local script = info.content or ''
         if info.main then
             local newScript, catched = catch(script, '?')
@@ -75,7 +75,7 @@ function TEST(data)
 
     local _ <close> = function ()
         for _, info in ipairs(data) do
-            files.remove(furi.encode(info.path))
+            files.remove(furi.encode(TESTROOT .. info.path))
         end
     end
 
@@ -106,6 +106,12 @@ function TEST(data)
         if item['description'] then
             item['description'] = tostring(item['description'])
                 : gsub('\r\n', '\n')
+        end
+    end
+    for _, eitem in ipairs(expect) do
+        if eitem['description'] then
+            eitem['description'] = eitem['description']
+                : gsub('%$(.-)%$', _G)
         end
     end
     assert(result)
@@ -936,7 +942,7 @@ TEST {
             kind  = CompletionItemKind.Variable,
             detail = 'function',
             description = [[
-从 [myfunc.lua](file:///myfunc.lua) 中导入
+从 [myfunc.lua]($TESTROOTURI$myfunc.lua) 中导入
 
 ```lua
 function (a: any, b: any)
@@ -967,7 +973,7 @@ TEST {
             kind  = CompletionItemKind.Variable,
             detail = 'function',
             description = [[
-从 [dir\myfunc.lua](file:///dir/myfunc.lua) 中导入
+从 [dir\myfunc.lua]($TESTROOTURI$dir/myfunc.lua) 中导入
 
 ```lua
 function (a: any, b: any)

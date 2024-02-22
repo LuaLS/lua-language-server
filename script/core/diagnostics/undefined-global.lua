@@ -20,41 +20,21 @@ return function (uri, callback)
         return
     end
 
-    local dglobals = util.arrayToHash(config.get(uri, 'Lua.diagnostics.globals'))
-    local rspecial = config.get(uri, 'Lua.runtime.special')
-    local cache    = {}
-
     -- 遍历全局变量，检查所有没有 set 模式的全局变量
     guide.eachSourceType(state.ast, 'getglobal', function (src) ---@async
-        local key = src[1]
-        if not key then
-            return
+        if vm.isUndefinedGlobal(src) then
+            local key = src[1]
+            local message = lang.script('DIAG_UNDEF_GLOBAL', key)
+            if requireLike[key:lower()] then
+                message = ('%s(%s)'):format(message, lang.script('DIAG_REQUIRE_LIKE', key))
+            end
+
+            callback {
+                start   = src.start,
+                finish  = src.finish,
+                message = message,
+                undefinedGlobal = src[1]
+            }
         end
-        if dglobals[key] then
-            return
-        end
-        if rspecial[key] then
-            return
-        end
-        local node = src.node
-        if node.tag ~= '_ENV' then
-            return
-        end
-        if cache[key] == nil then
-            await.delay()
-            cache[key] = vm.hasGlobalSets(uri, 'variable', key)
-        end
-        if cache[key] then
-            return
-        end
-        local message = lang.script('DIAG_UNDEF_GLOBAL', key)
-        if requireLike[key:lower()] then
-            message = ('%s(%s)'):format(message, lang.script('DIAG_REQUIRE_LIKE', key))
-        end
-        callback {
-            start   = src.start,
-            finish  = src.finish,
-            message = message,
-        }
     end)
 end

@@ -138,12 +138,20 @@ local Care = util.switch()
         local uri = guide.getUri(loc)
         -- 1. 值为函数的局部变量 | Local variable whose value is a function
         if vm.getInfer(source):hasFunction(uri) then
-            results[#results+1] = {
-                start      = source.start,
-                finish     = source.finish,
-                type       = define.TokenTypes['function'],
-                modifieres = define.TokenModifiers.declaration,
-            }
+            if source.type == 'local' then
+                results[#results+1] = {
+                    start      = source.start,
+                    finish     = source.finish,
+                    type       = define.TokenTypes['function'],
+                    modifieres = define.TokenModifiers.declaration,
+                }
+            else
+                results[#results+1] = {
+                    start      = source.start,
+                    finish     = source.finish,
+                    type       = define.TokenTypes['function'],
+                }
+            end
             return
         end
         -- 3. 特殊变量 | Special variableif source[1] == '_ENV' then
@@ -703,6 +711,14 @@ local Care = util.switch()
             type       = define.TokenTypes.namespace,
         }
     end)
+    : case 'doc.attr'
+    : call(function (source, options, results)
+        results[#results+1] = {
+            start      = source.start,
+            finish     = source.finish,
+            type       = define.TokenTypes.decorator,
+        }
+    end)
 
 ---@param state table
 ---@param results table
@@ -866,6 +882,10 @@ return function (uri, start, finish)
 
     local n = 0
     guide.eachSourceBetween(state.ast, start, finish, function (source) ---@async
+        -- skip virtual source
+        if source.virtual then
+            return
+        end
         Care(source.type, source, options, results)
         n = n + 1
         if n % 100 == 0 then
@@ -874,6 +894,10 @@ return function (uri, start, finish)
     end)
 
     for _, comm in ipairs(state.comms) do
+        -- skip virtual comment
+        if comm.virtual then
+            return
+        end
         if start <= comm.start and comm.finish <= finish then
             local headPos = (comm.type == 'comment.short' and comm.text:match '^%-%s*[@|]()')
                          or (comm.type == 'comment.long'  and comm.text:match '^@()')

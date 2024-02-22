@@ -9,12 +9,10 @@
 			"stopOnEntry": false,
 			"program": "${workspaceRoot}/test.lua",
 			"luaexe": "${workspaceFolder}/bin/lua-language-server",
-			"cpath": null,
-			"arg": [
-			],
-			"luaVersion": "5.4",
+			"luaVersion": "lua54",
 			"sourceCoding": "utf8",
-			"console": "internalConsole",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "openOnSessionStart",
 			"outputCapture": [
 				"print",
 				"stderr",
@@ -36,9 +34,6 @@
 				]
 			],
 			"windows": {
-				"name": "🍄attach",
-				"type": "lua",
-				"request": "attach",
 				"sourceMaps": [
 					[
 						"script\\*",
@@ -55,9 +50,11 @@
 			"luaexe": "${workspaceFolder}/bin/lua-language-server",
 			"program": "${workspaceRoot}/tools/build-3rd-meta.lua",
 			"cpath": "${workspaceFolder}/bin/?.dll;${workspaceFolder}/bin/?.so",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "openOnSessionStart",
 			"arg": [
 			],
-			"luaVersion": "latest",
+			"luaVersion": "lua-latest",
 			"sourceCoding": "utf8",
 			"outputCapture": [
 				"print",
@@ -72,9 +69,11 @@
 			"luaexe": "${workspaceFolder}/bin/lua-language-server",
 			"program": "${workspaceRoot}/tools/locale.lua",
 			"cpath": "${workspaceFolder}/bin/?.dll;${workspaceFolder}/bin/?.so",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "openOnSessionStart",
 			"arg": [
 			],
-			"luaVersion": "latest",
+			"luaVersion": "lua-latest",
 			"sourceCoding": "utf8",
 			"outputCapture": [
 				"print",
@@ -89,9 +88,11 @@
 			"luaexe": "${workspaceFolder}/bin/lua-language-server",
 			"program": "${workspaceRoot}/tools/build-doc.lua",
 			"cpath": "${workspaceFolder}/bin/?.dll;${workspaceFolder}/bin/?.so",
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "openOnSessionStart",
 			"arg": [
 			],
-			"luaVersion": "latest",
+			"luaVersion": "lua-latest",
 			"sourceCoding": "utf8",
 			"outputCapture": [
 				"print",
@@ -110,7 +111,7 @@
 				"--check",
 				"${workspaceRoot}",
 			],
-			"luaVersion": "5.4",
+			"luaVersion": "lua-latest",
 			"sourceCoding": "utf8",
 			"outputCapture": [
 				"print",
@@ -129,7 +130,7 @@
 				"--doc",
 				"${workspaceRoot}",
 			],
-			"luaVersion": "5.4",
+			"luaVersion": "lua-latest",
 			"sourceCoding": "utf8",
 			"outputCapture": [
 				"print",

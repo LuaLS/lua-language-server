@@ -1,6 +1,7 @@
 local util  = require 'utility'
 local scope = require 'workspace.scope'
 local guide = require 'parser.guide'
+local config = require 'config'
 ---@class vm
 local vm    = require 'vm.vm'
 
@@ -371,16 +372,36 @@ local compilerGlobalSwitch = util.switch()
             return
         end
         source._enums = {}
-        for _, field in ipairs(tbl) do
-            if     field.type == 'tablefield' then
-                source._enums[#source._enums+1] = field
-                local subType = vm.declareGlobal('type', name .. '.' .. field.field[1], uri)
-                subType:addSet(uri, field)
-            elseif field.type == 'tableindex' then
-                source._enums[#source._enums+1] = field
-                if field.index.type == 'string' then
-                    local subType = vm.declareGlobal('type', name .. '.' .. field.index[1], uri)
+        if vm.docHasAttr(source, 'key') then
+            for _, field in ipairs(tbl) do
+                if     field.type == 'tablefield' then
+                    source._enums[#source._enums+1] = {
+                        type   = 'doc.type.string',
+                        start  = field.field.start,
+                        finish = field.field.finish,
+                        [1]    = field.field[1],
+                    }
+                elseif field.type == 'tableindex' then
+                    source._enums[#source._enums+1] = {
+                        type   = 'doc.type.string',
+                        start  = field.index.start,
+                        finish = field.index.finish,
+                        [1]    = field.index[1],
+                    }
+                end
+            end
+        else
+            for _, field in ipairs(tbl) do
+                if     field.type == 'tablefield' then
+                    source._enums[#source._enums+1] = field
+                    local subType = vm.declareGlobal('type', name .. '.' .. field.field[1], uri)
                     subType:addSet(uri, field)
+                elseif field.type == 'tableindex' then
+                    source._enums[#source._enums+1] = field
+                    if field.index.type == 'string' then
+                        local subType = vm.declareGlobal('type', name .. '.' .. field.index[1], uri)
+                        subType:addSet(uri, field)
+                    end
                 end
             end
         end
@@ -518,6 +539,33 @@ function vm.hasGlobalSets(suri, cate, name)
     return true
 end
 
+---@param src parser.object
+local function checkIsUndefinedGlobal(src)
+    local key = src[1]
+
+    local uri = guide.getUri(src)
+    local dglobals = util.arrayToHash(config.get(uri, 'Lua.diagnostics.globals'))
+    local rspecial = config.get(uri, 'Lua.runtime.special')
+
+    local node = src.node
+    return src.type == 'getglobal' and key and not (
+        dglobals[key] or
+        rspecial[key] or
+        node.tag ~= '_ENV' or
+        vm.hasGlobalSets(uri, 'variable', key)
+    )
+end
+
+---@param src parser.object
+---@return boolean
+function vm.isUndefinedGlobal(src)
+    local node = vm.compileNode(src)
+    if node.undefinedGlobal == nil then
+        node.undefinedGlobal = checkIsUndefinedGlobal(src)
+    end
+    return node.undefinedGlobal
+end
+
 ---@param source parser.object
 function compileObject(source)
     if source._globalNode ~= nil then
@@ -593,6 +641,7 @@ function vm.getGlobalBase(source)
     end
     local name = global:asKeyName()
     if not root._globalBaseMap[name] then
+        ---@diagnostic disable-next-line: missing-fields
         root._globalBaseMap[name] = {
             type   = 'globalbase',
             parent = root,

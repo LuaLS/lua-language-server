@@ -44,6 +44,10 @@ function TEST(wanted)
     end
 end
 
+TEST 'nil' [[
+local <?t?> = nil
+]]
+
 TEST 'string' [[
 local <?var?> = '111'
 ]]
@@ -4278,3 +4282,57 @@ local x ---@type Some
 
 print(<?x?>)
 ]]
+
+TEST 'integer' [[
+---@class metatable : table
+---@field __index table
+
+---@param table      table
+---@param metatable? metatable
+---@return table
+function setmetatable(table, metatable) end
+
+local m = setmetatable({},{ __index = { a = 1 } })
+
+m.<?a?>
+]]
+
+TEST 'integer' [[
+---@class metatable : table
+---@field __index table
+
+---@param table      table
+---@param metatable? metatable
+---@return table
+function setmetatable(table, metatable) end
+
+local mt = {a = 1 }
+local m = setmetatable({},{ __index = mt })
+
+m.<?a?>
+]]
+
+TEST 'integer' [[
+local x = 1
+repeat
+until <?x?>
+]]
+
+-- #2144
+TEST 'A' [=[
+local function f()
+    return {} --[[@as A]]
+end
+
+local <?x?> = f()
+]=]
+
+TEST 'A' [=[
+local function f()
+    ---@type A
+    return {}
+end
+
+local <?x?> = f()
+]=]
+--

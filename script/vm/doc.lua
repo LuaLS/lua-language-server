@@ -5,7 +5,11 @@ local vm        = require 'vm.vm'
 local config    = require 'config'
 
 ---@class parser.object
----@field package _castTargetHead parser.object | vm.global | false
+---@field package _castTargetHead? parser.object | vm.global | false
+---@field package _validVersions? table<string, boolean>
+---@field package _deprecated? parser.object | false
+---@field package _async? boolean
+---@field package _nodiscard? boolean
 
 ---获取class与alias
 ---@param suri uri
@@ -466,4 +470,19 @@ function vm.getCastTargetHead(doc)
         return global
     end
     return nil
+end
+
+---@param doc parser.object
+---@param key string
+---@return boolean
+function vm.docHasAttr(doc, key)
+    if not doc.docAttr then
+        return false
+    end
+    for _, name in ipairs(doc.docAttr.names) do
+        if name[1] == key then
+            return true
+        end
+    end
+    return false
 end

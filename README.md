@@ -1,52 +1,43 @@
 # lua-language-server
 
-[![build](https://github.com/LuaLS/lua-language-server/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/LuaLS/lua-language-server/actions/workflows/build.yml)
-[![version](https://vsmarketplacebadges.dev/version-short/sumneko.lua.svg)](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
-![installs](https://vsmarketplacebadges.dev/installs-short/sumneko.lua.svg)
-![downloads](https://vsmarketplacebadges.dev/downloads-short/sumneko.lua.svg)
+![build](https://img.shields.io/github/actions/workflow/status/LuaLS/lua-language-server/.github%2Fworkflows%2Fbuild.yml)
+![Version (including pre-releases)](https://img.shields.io/visual-studio-marketplace/v/sumneko.lua)
+![Installs](https://img.shields.io/visual-studio-marketplace/i/sumneko.lua)
+![Downloads](https://img.shields.io/visual-studio-marketplace/d/sumneko.lua)
 
 
 ***Lua development just got a whole lot better*** 🧠
 
-The Lua language server provides various language features for Lua to make development easier and faster. With around half a million installs on Visual Studio Code, it is the most popular extension for Lua language support.
+The Lua language server provides various language features for Lua to make development easier and faster. With nearly a million installs in Visual Studio Code, it is the most popular extension for Lua language support.
+
+[See our website for more info](https://luals.github.io).
 
 ## Features
 
 - ⚙️ Supports `Lua 5.4`, `Lua 5.3`, `Lua 5.2`, `Lua 5.1`, and `LuaJIT`
-- 📄 Over 20 supported [annotations](https://github.com/LuaLS/lua-language-server/wiki/Annotations) for documenting your code
+- 📄 Over 20 supported [annotations](https://luals.github.io/wiki/annotations/) for documenting your code
 - ↪ Go to definition
-- 🦺 Dynamic [type checking](https://github.com/LuaLS/lua-language-server/wiki/Type-Checking)
+- 🦺 Dynamic [type checking](https://luals.github.io/wiki/type-checking/)
 - 🔍 Find references
-- ⚠️ [Diagnostics/Warnings](https://github.com/LuaLS/lua-language-server/wiki/Diagnostics)
-- 🕵️ [Syntax checking](https://github.com/LuaLS/lua-language-server/wiki/Syntax-Errors)
+- ⚠️ [Diagnostics/Warnings](https://luals.github.io/wiki/diagnostics/)
+- 🕵️ [Syntax checking](https://luals.github.io/wiki/syntax-errors/)
 - 📝 Element renaming
 - 🗨️ Hover to view details on variables, functions, and more
 - 🖊️ Autocompletion
-- 📚 Support for [libraries](https://github.com/LuaLS/lua-language-server/wiki/Libraries)
-- 💅 [Code formatting](https://github.com/LuaLS/lua-language-server/wiki/Formatter)
-- 💬 [Spell checking](https://github.com/LuaLS/lua-language-server/wiki/Formatter)
-- 🛠️ Custom [plugins](https://github.com/LuaLS/lua-language-server/wiki/Plugins)
-- 📖 [Documentation Generation](https://github.com/LuaLS/lua-language-server/wiki/Export-Documentation)
+- 📚 Support for [libraries](https://luals.github.io/wiki/settings/#workspacelibrary)
+- 💅 [Code formatting](https://luals.github.io/wiki/formatter/)
+- 💬 [Spell checking](https://luals.github.io/wiki/diagnostics/#spell-check)
+- 🛠️ Custom [plugins](https://luals.github.io/wiki/plugins/)
+- 📖 [Documentation Generation](https://luals.github.io/wiki/export-docs/)
 
 ## Install
-The language server can be installed for use in Visual Studio Code, NeoVim, and any [other clients](https://microsoft.github.io/language-server-protocol/implementors/tools/) that support the [Language Server Protocol](https://microsoft.github.io/language-server-protocol/). The language server can be configured using a [configuration file](https://github.com/LuaLS/lua-language-server/wiki/Configuration-File). For a more detailed intro, check out the [getting started page in the wiki](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started).
+The language server can be installed for use in Visual Studio Code, NeoVim, and any [other clients](https://microsoft.github.io/language-server-protocol/implementors/tools/) that support the [Language Server Protocol](https://microsoft.github.io/language-server-protocol/).
 
-### Visual Studio Code
-[![Install in VS Code](https://img.shields.io/badge/VS%20Code-Install-blue?style=for-the-badge&logo=visualstudiocode "Install in VS Code")](https://marketplace.visualstudio.com/items?itemName=sumneko.lua)
+See [installation instructions on our website](https://luals.github.io/#install).
 
-The language server and Visual Studio Code client can be installed from [the VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=sumneko.lua).
-
-### NeoVim
-[![Install for NeoVim](https://img.shields.io/badge/NeoVim-Install-blue?style=for-the-badge&logo=neovim "Install for NeoVim")](https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#lua_ls)
-
-View the installation instructions for NeoVim in the [nvim-lspconfig repo](https://github.com/neovim/nvim-lspconfig/blob/master/doc/server_configurations.md#lua_ls).
-
-For a guide to getting started from scratch using Mason, read [Heiker's guide](https://dev.to/vonheikemen/getting-started-with-neovims-native-lsp-client-in-the-year-of-2022-the-easy-way-bp3).
-
-### Command Line
-[![Install for command line](https://img.shields.io/badge/Command%20Line-Install-blue?style=for-the-badge&logo=windowsterminal "Install for command line")](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#command-line)
-
-Check the [wiki for a guide](https://github.com/LuaLS/lua-language-server/wiki/Getting-Started#command-line) to install the language server for use on the command line. This allows the language server to be used with [other clients](https://microsoft.github.io/language-server-protocol/implementors/tools/) that follow the [language server protocol](https://microsoft.github.io/language-server-protocol/overviews/lsp/overview/).
+[![Install in VS Code](https://img.shields.io/badge/VS%20Code-Install-blue?style=for-the-badge&logo=visualstudiocode "Install in VS Code")](https://luals.github.io/#vscode-install)
+[![Install for NeoVim](https://img.shields.io/badge/NeoVim-Install-blue?style=for-the-badge&logo=neovim "Install for NeoVim")](https://luals.github.io/#neovim-install)
+[![Other](https://img.shields.io/badge/Other-Install-blue?style=for-the-badge&logo=windowsterminal "Install for command line")](https://luals.github.io/#other-install)
 
 ### Community Install Methods
 The install methods below are maintained by community members.
@@ -55,8 +46,8 @@ The install methods below are maintained by community members.
 
 ## Links
 - [Changelog](https://github.com/LuaLS/lua-language-server/blob/master/changelog.md)
-- [Wiki](https://github.com/LuaLS/lua-language-server/wiki)
-- [FAQ](https://github.com/LuaLS/lua-language-server/wiki/FAQ)
+- [Wiki](https://luals.github.io/wiki)
+- [FAQ](https://luals.github.io/wiki/faq)
 - [Report an issue][issues]
 - [Suggest a feature][issues]
 - [Discuss](https://github.com/LuaLS/lua-language-server/discussions)
@@ -79,13 +70,13 @@ The install methods below are maintained by community members.
 > **Note**
 > All translations are provided and collaborated on by the community. If you find an inappropriate or harmful translation, [please report it immediately](https://github.com/LuaLS/lua-language-server/issues).
 
-Are you able to [provide a translation](https://github.com/LuaLS/lua-language-server/wiki/Translations)? It would be greatly appreciated!
+Are you able to [provide a translation](https://luals.github.io/wiki/translations)? It would be greatly appreciated!
 
 Thank you to [all contributors of translations](https://github.com/LuaLS/lua-language-server/commits/master/locale)!
 
 
 ## Privacy
-The language server had **opt-in** telemetry that collected usage data and sent it to the development team to help improve the extension. Read our [privacy policy](https://github.com/LuaLS/lua-language-server/wiki/Home#privacy) to learn more. Telemetry was removed in `v3.6.5` and is no longer part of the language server.
+The language server had **opt-in** telemetry that collected usage data and sent it to the development team to help improve the extension. Read our [privacy policy](https://luals.github.io/privacy#language-server) to learn more. Telemetry was removed in `v3.6.5` and is no longer part of the language server.
 
 
 ## Contributors

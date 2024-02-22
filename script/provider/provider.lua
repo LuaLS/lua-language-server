@@ -292,13 +292,13 @@ m.register 'textDocument/didClose' {
 m.register 'textDocument/didChange' {
     ---@async
     function (params)
-        local doc      = params.textDocument
+        local doc     = params.textDocument
         local changes = params.contentChanges
         local uri     = files.getRealUri(doc.uri)
-        workspace.awaitReady(uri)
-        local text = files.getOriginText(uri)
+        local text    = files.getOriginText(uri)
         if not text then
-            files.setText(uri, pub.awaitTask('loadFile', furi.decode(uri)), false)
+            text = util.loadFile(furi.decode(uri))
+            files.setText(uri, text, false)
             return
         end
         local rows = files.getCachedRows(uri)
@@ -712,11 +712,11 @@ m.register 'completionItem/resolve' {
         --await.setPriority(1000)
         local state = files.getState(uri)
         if not state then
-            return nil
+            return item
         end
         local resolved = core.resolve(id)
         if not resolved then
-            return nil
+            return item
         end
         item.detail = resolved.detail or item.detail
         item.documentation = resolved.description and {
@@ -772,8 +772,8 @@ m.register 'textDocument/signatureHelp' {
             for j, param in ipairs(result.params) do
                 parameters[j] = {
                     label = {
-                        param.label[1],
-                        param.label[2],
+                        converter.len(result.label, 1, param.label[1]),
+                        converter.len(result.label, 1, param.label[2]),
                     }
                 }
             end
@@ -904,7 +904,7 @@ m.register 'textDocument/codeLens' {
             resolveProvider = true,
         }
     },
-    abortByFileUpdate = true,
+    --abortByFileUpdate = true,
     ---@async
     function (params)
         local uri = files.getRealUri(params.textDocument.uri)
@@ -982,6 +982,11 @@ m.register 'workspace/executeCommand' {
         elseif command == 'lua.exportDocument' then
             local core = require 'core.command.exportDocument'
             core(params.arguments)
+        elseif command == 'lua.reloadFFIMeta' then
+            local core = require 'core.command.reloadFFIMeta'
+            for _, scp in ipairs(workspace.folders) do
+                core(scp.uri)
+            end
         end
     end
 }
@@ -1226,7 +1231,6 @@ m.register 'textDocument/formatting' {
     capability = {
         documentFormattingProvider = true,
     },
-    abortByFileUpdate = true,
     ---@async
     function(params)
         local uri = files.getRealUri(params.textDocument.uri)
@@ -1257,8 +1261,6 @@ m.register 'textDocument/formatting' {
             }
         end
 
-        await.sleep(0.1)
-
         return results
     end
 }
@@ -1267,7 +1269,6 @@ m.register 'textDocument/rangeFormatting' {
     capability = {
         documentRangeFormattingProvider = true,
     },
-    abortByFileUpdate = true,
     ---@async
     function(params)
         local uri = files.getRealUri(params.textDocument.uri)
@@ -1297,8 +1298,6 @@ m.register 'textDocument/rangeFormatting' {
                 newText = edit.text,
             }
         end
-
-        await.sleep(0.1)
 
         return results
     end
@@ -1339,7 +1338,6 @@ m.register 'textDocument/onTypeFormatting' {
                 newText = edit.text:gsub('\t', tab),
             }
         end
-        await.sleep(0.1)
         return results
     end
 }
@@ -1418,8 +1416,8 @@ m.register 'textDocument/inlayHint' {
                 },
                 position     = converter.packPosition(state, res.offset),
                 kind         = res.kind,
-                paddingLeft  = true,
-                paddingRight = true,
+                paddingLeft  = res.kind == 1,
+                paddingRight = res.kind == 2,
             }
         end
         return hintResults

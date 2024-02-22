@@ -20,20 +20,27 @@ function string.byte(s, i, j) end
 function string.char(byte, ...) end
 
 ---#DES 'string.dump'
+---#if VERSION >= 5.3 or JIT then
 ---@param f      async fun(...):...
 ---@param strip? boolean
 ---@return string
 ---@nodiscard
 function string.dump(f, strip) end
+---#else
+---@param f      async fun(...):...
+---@return string
+---@nodiscard
+function string.dump(f) end
+---#end
 
 ---#DES 'string.find'
 ---@param s       string|number
 ---@param pattern string|number
 ---@param init?   integer
 ---@param plain?  boolean
----@return integer start
----@return integer end
----@return any ... captured
+---@return integer|nil start
+---@return integer|nil end
+---@return any|nil ... captured
 ---@nodiscard
 function string.find(s, pattern, init, plain) end
 
@@ -93,6 +100,7 @@ function string.match(s, pattern, init) end
 ---#DES 'string.pack'
 ---@param fmt string
 ---@param v1  string|number
+---@param v2? string|number
 ---@param ... string|number
 ---@return string binary
 ---@nodiscard

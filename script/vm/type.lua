@@ -143,6 +143,9 @@ end
 ---@param errs?      typecheck.err[]
 ---@return boolean?
 local function checkChildEnum(childName, parent , uri, mark, errs)
+    if mark[childName] then
+        return
+    end
     local childClass = vm.getGlobal('type', childName)
     if not childClass then
         return nil
@@ -157,11 +160,14 @@ local function checkChildEnum(childName, parent , uri, mark, errs)
     if not enums then
         return nil
     end
+    mark[childName] = true
     for _, enum in ipairs(enums) do
         if not vm.isSubType(uri, vm.compileNode(enum), parent, mark ,errs) then
+            mark[childName] = nil
             return false
         end
     end
+    mark[childName] = nil
     return true
 end
 
@@ -752,7 +758,7 @@ function vm.viewTypeErrorMessage(uri, errs)
             lines[#lines+1] = '- ' .. line
         end
     end
-    util.revertTable(lines)
+    util.revertArray(lines)
     if #lines > 15 then
         lines[13] = ('...(+%d)'):format(#lines - 15)
         table.move(lines, #lines - 2, #lines, 14)
@@ -760,4 +766,26 @@ function vm.viewTypeErrorMessage(uri, errs)
     else
         return table.concat(lines, '\n')
     end
+end
+
+---@param name string
+---@param uri uri
+---@return parser.object[]?
+function vm.getOverloadsByTypeName(name, uri)
+    local global = vm.getGlobal('type', name)
+    if not global then
+        return nil
+    end
+    local results
+    for _, set in ipairs(global:getSets(uri)) do
+        for _, doc in ipairs(set.bindGroup) do
+            if doc.type == 'doc.overload' then
+                if not results then
+                    results = {}
+                end
+                results[#results+1] = doc.overload
+            end
+        end
+    end
+    return results
 end

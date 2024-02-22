@@ -108,6 +108,11 @@ function m.hasID(id, co)
     return m.idMap[id] and m.idMap[id][co] ~= nil
 end
 
+function m.unique(id, callback)
+    m.close(id)
+    m.setID(id, callback)
+end
+
 --- 休眠一段时间
 ---@param time number
 ---@async

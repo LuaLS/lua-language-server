@@ -41,7 +41,7 @@ local function doProjects(pathname)
 
     print('开始诊断...')
 
-    ws.ready = true
+    furi.encode(path:string())
     diag.diagnosticsScope(furi.encode(path:string()))
 
     local clock = os.clock()

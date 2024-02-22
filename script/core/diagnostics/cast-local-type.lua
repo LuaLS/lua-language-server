@@ -16,6 +16,9 @@ return function (uri, callback)
         if not loc.ref then
             return
         end
+        if loc[1] == '_' then
+            return
+        end
         await.delay()
         local locNode = vm.compileNode(loc)
         if not locNode.hasDefined then

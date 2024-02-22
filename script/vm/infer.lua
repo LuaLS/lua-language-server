@@ -157,22 +157,24 @@ local viewNodeSwitch;viewNodeSwitch = util.switch()
         end
         infer._hasClass = true
         local buf = {}
-        buf[#buf+1] = '{ '
+        buf[#buf+1] = source.isTuple and '[' or '{ '
         for i, field in ipairs(source.fields) do
             if i > 1 then
                 buf[#buf+1] = ', '
             end
-            local key = field.name
-            if key.type == 'doc.type' then
-                buf[#buf+1] = ('[%s]: '):format(vm.getInfer(key):view(uri))
-            elseif type(key[1]) == 'string' then
-                buf[#buf+1] = key[1] .. ': '
-            else
-                buf[#buf+1] = ('[%q]: '):format(key[1])
+            if not source.isTuple then
+                local key = field.name
+                if key.type == 'doc.type' then
+                    buf[#buf+1] = ('[%s]: '):format(vm.getInfer(key):view(uri))
+                elseif type(key[1]) == 'string' then
+                    buf[#buf+1] = key[1] .. ': '
+                else
+                    buf[#buf+1] = ('[%q]: '):format(key[1])
+                end
             end
             buf[#buf+1] = vm.getInfer(field.extends):view(uri)
         end
-        buf[#buf+1] = ' }'
+        buf[#buf+1] = source.isTuple and ']' or ' }'
         return table.concat(buf)
     end)
     : case 'doc.type.string'
@@ -386,9 +388,11 @@ function mt:_computeViews(uri)
     self.views = {}
 
     for n in self.node:eachObject() do
-        local view = viewNodeSwitch(n.type, n, self, uri)
-        if view then
-            self.views[view] = true
+        if not n.hideView then
+            local view = viewNodeSwitch(n.type, n, self, uri)
+            if view then
+                self.views[view] = true
+            end
         end
     end
 
@@ -565,11 +569,12 @@ function vm.viewKey(source, uri)
             return vm.viewKey(source.types[1], uri)
         else
             local key = vm.getInfer(source):view(uri)
-            return '[' .. key .. ']'
+            return '[' .. key .. ']', key
         end
     end
     if source.type == 'tableindex'
-    or source.type == 'setindex' then
+    or source.type == 'setindex'
+    or source.type == 'getindex' then
         local index = source.index
         local name = vm.getInfer(index):viewLiterals()
         if not name then
@@ -587,7 +592,11 @@ function vm.viewKey(source, uri)
         return vm.viewKey(source.name, uri)
     end
     if source.type == 'doc.type.name' then
-        return '[' .. source[1] .. ']'
+        return '[' .. source[1] .. ']', source[1]
+    end
+    if source.type == 'doc.type.string' then
+        local name = util.viewString(source[1], source[2])
+        return ('[%s]'):format(name), name
     end
     local key = vm.getKeyName(source)
     if key == nil then

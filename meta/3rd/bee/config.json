@@ -1,4 +1,0 @@
-{
-    "name" : "bee",
-    "words" : [ "require[%s%(\"']+bee%.%w+[%)\"']" ]
-}

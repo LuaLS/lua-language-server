@@ -135,6 +135,7 @@ return function (data)
     local uri    = data.uri
     local target = data.target
     local name   = data.name
+    local requireName   = data.requireName
     local state  = files.getState(uri)
     if not state then
         return
@@ -149,11 +150,13 @@ return function (data)
         return #a.name < #b.name
     end)
 
-    local result = askAutoRequire(uri, visiblePaths)
-    if not result then
-        return
+    if not requireName then
+        requireName = askAutoRequire(uri, visiblePaths)
+        if not requireName then
+            return
+        end
     end
 
     local offset, fmt = findInsertRow(uri)
-    applyAutoRequire(uri, offset, name, result, fmt)
+    applyAutoRequire(uri, offset, name, requireName, fmt)
 end

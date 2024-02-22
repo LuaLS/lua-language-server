@@ -50,8 +50,10 @@ function m.create(uri)
     m.folders[#m.folders+1] = scp
     if uri == furi.encode '/'
     or uri == furi.encode(os.getenv 'HOME' or '') then
-        client.showMessage('Error', lang.script('WORKSPACE_NOT_ALLOWED', furi.decode(uri)))
-        scp:set('bad root', true)
+        if not FORCE_ACCEPT_WORKSPACE then
+            client.showMessage('Error', lang.script('WORKSPACE_NOT_ALLOWED', furi.decode(uri)))
+            scp:set('bad root', true)
+        end
     end
 end
 
@@ -469,10 +471,6 @@ function m.flushFiles(scp)
     for uri in pairs(cachedUris) do
         files.delRef(uri)
     end
-    collectgarbage()
-    collectgarbage()
-    -- TODO: wait maillist
-    collectgarbage 'restart'
 end
 
 ---@param scp scope
@@ -493,6 +491,8 @@ end
 ---@async
 ---@param scp scope
 function m.awaitReload(scp)
+    await.unique('workspace reload:' .. scp:getName())
+    await.sleep(0.1)
     scp:set('ready', false)
     scp:set('nativeMatcher', nil)
     scp:set('libraryMatcher', nil)

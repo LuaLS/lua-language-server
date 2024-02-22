@@ -1,0 +1,327 @@
+digraph AST {
+	node [shape = rect]
+	"main:0:170009" [
+		label="main\l\l"
+		tooltip="start: 0\nfinish: 170009\nlocals: <table>\nstate: <table>\n1: <node setglobal>\n2: <node setglobal>\n3: <node setglobal>\n4: <node setglobal>\n5: <node setglobal>\n6: <node setglobal>\n7: <node setglobal>\n8: <node setglobal>\n9: <node setglobal>\n10: <node setglobal>\n11: <node setglobal>\n12: <node setglobal>\n13: <node setglobal>\n14: <node setglobal>\n15: <node setglobal>\n15..17: (...)\n"
+	]
+	"setglobal:0:1" [
+		label="setglobal\ls\l"
+		tooltip="start: 0\nfinish: 1\nrange: 101\nvalue: <node string>\nnode: <node local>\n1: s\n"
+	]
+	"main:0:170009" -> "setglobal:0:1"
+	"string:4:101" [
+		label="string\lvery long string ...\l"
+		tooltip="start: 4\nfinish: 101\n1: very long string ...\n2: \"\n"
+	]
+	"setglobal:0:1" -> "string:4:101"
+	"setglobal:10000:10001" [
+		label="setglobal\ls\l"
+		tooltip="start: 10000\nfinish: 10001\nrange: 10031\nvalue: <node string>\nnode: <node local>\n1: s\n"
+	]
+	"main:0:170009" -> "setglobal:10000:10001"
+	"string:10004:10031" [
+		label="string\lstring\\nwith\\n\...\l"
+		tooltip="start: 10004\nfinish: 10031\nescs: <table>\n1: string\\nwith\\n\...\n2: \"\n"
+	]
+	"setglobal:10000:10001" -> "string:10004:10031"
+	"setglobal:20000:20001" [
+		label="setglobal\lx\l"
+		tooltip="start: 20000\nfinish: 20001\nrange: 20009\nvalue: <node binary>\nnode: <node local>\n1: x\n"
+	]
+	"main:0:170009" -> "setglobal:20000:20001"
+	"binary:20004:20009" [
+		label="binary\l+\l"
+		tooltip="start: 20004\nfinish: 20009\nop: <node +>\n1: <node getglobal>\n2: <node integer>\n"
+	]
+	"setglobal:20000:20001" -> "binary:20004:20009"
+	"getglobal:20004:20005" [
+		label="getglobal\lx\l"
+		tooltip="start: 20004\nfinish: 20005\nnode: <node local>\n1: x\n"
+	]
+	"binary:20004:20009" -> "getglobal:20004:20005"
+	"integer:20008:20009" [
+		label="integer\l1\l"
+		tooltip="start: 20008\nfinish: 20009\n1: 1\n"
+	]
+	"binary:20004:20009" -> "integer:20008:20009"
+	"setglobal:30000:30001" [
+		label="setglobal\lx\l"
+		tooltip="start: 30000\nfinish: 30001\nrange: 30009\nvalue: <node binary>\nnode: <node local>\n1: x\n"
+	]
+	"main:0:170009" -> "setglobal:30000:30001"
+	"binary:30004:30009" [
+		label="binary\l+\l"
+		tooltip="start: 30004\nfinish: 30009\nop: <node +>\n1: <node getglobal>\n2: <node integer>\n"
+	]
+	"setglobal:30000:30001" -> "binary:30004:30009"
+	"getglobal:30004:30005" [
+		label="getglobal\lx\l"
+		tooltip="start: 30004\nfinish: 30005\nnode: <node local>\n1: x\n"
+	]
+	"binary:30004:30009" -> "getglobal:30004:30005"
+	"integer:30008:30009" [
+		label="integer\l1\l"
+		tooltip="start: 30008\nfinish: 30009\n1: 1\n"
+	]
+	"binary:30004:30009" -> "integer:30008:30009"
+	"setglobal:40000:40001" [
+		label="setglobal\lx\l"
+		tooltip="start: 40000\nfinish: 40001\nrange: 40009\nvalue: <node binary>\nnode: <node local>\n1: x\n"
+	]
+	"main:0:170009" -> "setglobal:40000:40001"
+	"binary:40004:40009" [
+		label="binary\l+\l"
+		tooltip="start: 40004\nfinish: 40009\nop: <node +>\n1: <node getglobal>\n2: <node integer>\n"
+	]
+	"setglobal:40000:40001" -> "binary:40004:40009"
+	"getglobal:40004:40005" [
+		label="getglobal\lx\l"
+		tooltip="start: 40004\nfinish: 40005\nnode: <node local>\n1: x\n"
+	]
+	"binary:40004:40009" -> "getglobal:40004:40005"
+	"integer:40008:40009" [
+		label="integer\l1\l"
+		tooltip="start: 40008\nfinish: 40009\n1: 1\n"
+	]
+	"binary:40004:40009" -> "integer:40008:40009"
+	"setglobal:50000:50001" [
+		label="setglobal\lx\l"
+		tooltip="start: 50000\nfinish: 50001\nrange: 50009\nvalue: <node binary>\nnode: <node local>\n1: x\n"
+	]
+	"main:0:170009" -> "setglobal:50000:50001"
+	"binary:50004:50009" [
+		label="binary\l+\l"
+		tooltip="start: 50004\nfinish: 50009\nop: <node +>\n1: <node getglobal>\n2: <node integer>\n"
+	]
+	"setglobal:50000:50001" -> "binary:50004:50009"
+	"getglobal:50004:50005" [
+		label="getglobal\lx\l"
+		tooltip="start: 50004\nfinish: 50005\nnode: <node local>\n1: x\n"
+	]
+	"binary:50004:50009" -> "getglobal:50004:50005"
+	"integer:50008:50009" [
+		label="integer\l1\l"
+		tooltip="start: 50008\nfinish: 50009\n1: 1\n"
+	]
+	"binary:50004:50009" -> "integer:50008:50009"
+	"setglobal:60000:60001" [
+		label="setglobal\lx\l"
+		tooltip="start: 60000\nfinish: 60001\nrange: 60009\nvalue: <node binary>\nnode: <node local>\n1: x\n"
+	]
+	"main:0:170009" -> "setglobal:60000:60001"
+	"binary:60004:60009" [
+		label="binary\l+\l"
+		tooltip="start: 60004\nfinish: 60009\nop: <node +>\n1: <node getglobal>\n2: <node integer>\n"
+	]
+	"setglobal:60000:60001" -> "binary:60004:60009"
+	"getglobal:60004:60005" [
+		label="getglobal\lx\l"
+		tooltip="start: 60004\nfinish: 60005\nnode: <node local>\n1: x\n"
+	]
+	"binary:60004:60009" -> "getglobal:60004:60005"
+	"integer:60008:60009" [
+		label="integer\l1\l"
+		tooltip="start: 60008\nfinish: 60009\n1: 1\n"
+	]
+	"binary:60004:60009" -> "integer:60008:60009"
+	"setglobal:70000:70001" [
+		label="setglobal\lx\l"
+		tooltip="start: 70000\nfinish: 70001\nrange: 70009\nvalue: <node binary>\nnode: <node local>\n1: x\n"
+	]
+	"main:0:170009" -> "setglobal:70000:70001"
+	"binary:70004:70009" [
+		label="binary\l+\l"
+		tooltip="start: 70004\nfinish: 70009\nop: <node +>\n1: <node getglobal>\n2: <node integer>\n"
+	]
+	"setglobal:70000:70001" -> "binary:70004:70009"
+	"getglobal:70004:70005" [
+		label="getglobal\lx\l"
+		tooltip="start: 70004\nfinish: 70005\nnode: <node local>\n1: x\n"
+	]
+	"binary:70004:70009" -> "getglobal:70004:70005"
+	"integer:70008:70009" [
+		label="integer\l1\l"
+		tooltip="start: 70008\nfinish: 70009\n1: 1\n"
+	]
+	"binary:70004:70009" -> "integer:70008:70009"
+	"setglobal:80000:80001" [
+		label="setglobal\lx\l"
+		tooltip="start: 80000\nfinish: 80001\nrange: 80009\nvalue: <node binary>\nnode: <node local>\n1: x\n"
+	]
+	"main:0:170009" -> "setglobal:80000:80001"
+	"binary:80004:80009" [
+		label="binary\l+\l"
+		tooltip="start: 80004\nfinish: 80009\nop: <node +>\n1: <node getglobal>\n2: <node integer>\n"
+	]
+	"setglobal:80000:80001" -> "binary:80004:80009"
+	"getglobal:80004:80005" [
+		label="getglobal\lx\l"
+		tooltip="start: 80004\nfinish: 80005\nnode: <node local>\n1: x\n"
+	]
+	"binary:80004:80009" -> "getglobal:80004:80005"
+	"integer:80008:80009" [
+		label="integer\l1\l"
+		tooltip="start: 80008\nfinish: 80009\n1: 1\n"
+	]
+	"binary:80004:80009" -> "integer:80008:80009"
+	"setglobal:90000:90001" [
+		label="setglobal\lx\l"
+		tooltip="start: 90000\nfinish: 90001\nrange: 90009\nvalue: <node binary>\nnode: <node local>\n1: x\n"
+	]
+	"main:0:170009" -> "setglobal:90000:90001"
+	"binary:90004:90009" [
+		label="binary\l+\l"
+		tooltip="start: 90004\nfinish: 90009\nop: <node +>\n1: <node getglobal>\n2: <node integer>\n"
+	]
+	"setglobal:90000:90001" -> "binary:90004:90009"
+	"getglobal:90004:90005" [
+		label="getglobal\lx\l"
+		tooltip="start: 90004\nfinish: 90005\nnode: <node local>\n1: x\n"
+	]
+	"binary:90004:90009" -> "getglobal:90004:90005"
+	"integer:90008:90009" [
+		label="integer\l1\l"
+		tooltip="start: 90008\nfinish: 90009\n1: 1\n"
+	]
+	"binary:90004:90009" -> "integer:90008:90009"
+	"setglobal:100000:100001" [
+		label="setglobal\lx\l"
+		tooltip="start: 100000\nfinish: 100001\nrange: 100009\nvalue: <node binary>\nnode: <node local>\n1: x\n"
+	]
+	"main:0:170009" -> "setglobal:100000:100001"
+	"binary:100004:100009" [
+		label="binary\l+\l"
+		tooltip="start: 100004\nfinish: 100009\nop: <node +>\n1: <node getglobal>\n2: <node integer>\n"
+	]
+	"setglobal:100000:100001" -> "binary:100004:100009"
+	"getglobal:100004:100005" [
+		label="getglobal\lx\l"
+		tooltip="start: 100004\nfinish: 100005\nnode: <node local>\n1: x\n"
+	]
+	"binary:100004:100009" -> "getglobal:100004:100005"
+	"integer:100008:100009" [
+		label="integer\l1\l"
+		tooltip="start: 100008\nfinish: 100009\n1: 1\n"
+	]
+	"binary:100004:100009" -> "integer:100008:100009"
+	"setglobal:110000:110001" [
+		label="setglobal\lx\l"
+		tooltip="start: 110000\nfinish: 110001\nrange: 110009\nvalue: <node binary>\nnode: <node local>\n1: x\n"
+	]
+	"main:0:170009" -> "setglobal:110000:110001"
+	"binary:110004:110009" [
+		label="binary\l+\l"
+		tooltip="start: 110004\nfinish: 110009\nop: <node +>\n1: <node getglobal>\n2: <node integer>\n"
+	]
+	"setglobal:110000:110001" -> "binary:110004:110009"
+	"getglobal:110004:110005" [
+		label="getglobal\lx\l"
+		tooltip="start: 110004\nfinish: 110005\nnode: <node local>\n1: x\n"
+	]
+	"binary:110004:110009" -> "getglobal:110004:110005"
+	"integer:110008:110009" [
+		label="integer\l1\l"
+		tooltip="start: 110008\nfinish: 110009\n1: 1\n"
+	]
+	"binary:110004:110009" -> "integer:110008:110009"
+	"setglobal:120000:120001" [
+		label="setglobal\lx\l"
+		tooltip="start: 120000\nfinish: 120001\nrange: 120009\nvalue: <node binary>\nnode: <node local>\n1: x\n"
+	]
+	"main:0:170009" -> "setglobal:120000:120001"
+	"binary:120004:120009" [
+		label="binary\l+\l"
+		tooltip="start: 120004\nfinish: 120009\nop: <node +>\n1: <node getglobal>\n2: <node integer>\n"
+	]
+	"setglobal:120000:120001" -> "binary:120004:120009"
+	"getglobal:120004:120005" [
+		label="getglobal\lx\l"
+		tooltip="start: 120004\nfinish: 120005\nnode: <node local>\n1: x\n"
+	]
+	"binary:120004:120009" -> "getglobal:120004:120005"
+	"integer:120008:120009" [
+		label="integer\l1\l"
+		tooltip="start: 120008\nfinish: 120009\n1: 1\n"
+	]
+	"binary:120004:120009" -> "integer:120008:120009"
+	"setglobal:130000:130001" [
+		label="setglobal\lx\l"
+		tooltip="start: 130000\nfinish: 130001\nrange: 130009\nvalue: <node binary>\nnode: <node local>\n1: x\n"
+	]
+	"main:0:170009" -> "setglobal:130000:130001"
+	"binary:130004:130009" [
+		label="binary\l+\l"
+		tooltip="start: 130004\nfinish: 130009\nop: <node +>\n1: <node getglobal>\n2: <node integer>\n"
+	]
+	"setglobal:130000:130001" -> "binary:130004:130009"
+	"getglobal:130004:130005" [
+		label="getglobal\lx\l"
+		tooltip="start: 130004\nfinish: 130005\nnode: <node local>\n1: x\n"
+	]
+	"binary:130004:130009" -> "getglobal:130004:130005"
+	"integer:130008:130009" [
+		label="integer\l1\l"
+		tooltip="start: 130008\nfinish: 130009\n1: 1\n"
+	]
+	"binary:130004:130009" -> "integer:130008:130009"
+	"setglobal:140000:140001" [
+		label="setglobal\lx\l"
+		tooltip="start: 140000\nfinish: 140001\nrange: 140009\nvalue: <node binary>\nnode: <node local>\n1: x\n"
+	]
+	"main:0:170009" -> "setglobal:140000:140001"
+	"binary:140004:140009" [
+		label="binary\l+\l"
+		tooltip="start: 140004\nfinish: 140009\nop: <node +>\n1: <node getglobal>\n2: <node integer>\n"
+	]
+	"setglobal:140000:140001" -> "binary:140004:140009"
+	"getglobal:140004:140005" [
+		label="getglobal\lx\l"
+		tooltip="start: 140004\nfinish: 140005\nnode: <node local>\n1: x\n"
+	]
+	"binary:140004:140009" -> "getglobal:140004:140005"
+	"integer:140008:140009" [
+		label="integer\l1\l"
+		tooltip="start: 140008\nfinish: 140009\n1: 1\n"
+	]
+	"binary:140004:140009" -> "integer:140008:140009"
+	"setglobal:160000:160001" [
+		label="setglobal\lx\l"
+		tooltip="start: 160000\nfinish: 160001\nrange: 160009\nvalue: <node binary>\nnode: <node local>\n1: x\n"
+	]
+	"main:0:170009" -> "setglobal:160000:160001"
+	"binary:160004:160009" [
+		label="binary\l+\l"
+		tooltip="start: 160004\nfinish: 160009\nop: <node +>\n1: <node getglobal>\n2: <node integer>\n"
+	]
+	"setglobal:160000:160001" -> "binary:160004:160009"
+	"getglobal:160004:160005" [
+		label="getglobal\lx\l"
+		tooltip="start: 160004\nfinish: 160005\nnode: <node local>\n1: x\n"
+	]
+	"binary:160004:160009" -> "getglobal:160004:160005"
+	"integer:160008:160009" [
+		label="integer\l1\l"
+		tooltip="start: 160008\nfinish: 160009\n1: 1\n"
+	]
+	"binary:160004:160009" -> "integer:160008:160009"
+	"setglobal:170000:170001" [
+		label="setglobal\lx\l"
+		tooltip="start: 170000\nfinish: 170001\nrange: 170009\nvalue: <node binary>\nnode: <node local>\n1: x\n"
+	]
+	"main:0:170009" -> "setglobal:170000:170001"
+	"binary:170004:170009" [
+		label="binary\l+\l"
+		tooltip="start: 170004\nfinish: 170009\nop: <node +>\n1: <node getglobal>\n2: <node integer>\n"
+	]
+	"setglobal:170000:170001" -> "binary:170004:170009"
+	"getglobal:170004:170005" [
+		label="getglobal\lx\l"
+		tooltip="start: 170004\nfinish: 170005\nnode: <node local>\n1: x\n"
+	]
+	"binary:170004:170009" -> "getglobal:170004:170005"
+	"integer:170008:170009" [
+		label="integer\l1\l"
+		tooltip="start: 170008\nfinish: 170009\n1: 1\n"
+	]
+	"binary:170004:170009" -> "integer:170008:170009"
+}

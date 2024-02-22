@@ -10,7 +10,7 @@ local type         = type
 ---@field type                  string
 ---@field special               string
 ---@field tag                   string
----@field args                  { [integer]: parser.object, start: integer, finish: integer }
+---@field args                  { [integer]: parser.object, start: integer, finish: integer, type: string }
 ---@field locals                parser.object[]
 ---@field returns?              parser.object[]
 ---@field breaks?               parser.object[]
@@ -56,7 +56,7 @@ local type         = type
 ---@field returnIndex           integer
 ---@field assignIndex           integer
 ---@field docIndex              integer
----@field docs                  parser.object[]
+---@field docs                  parser.object
 ---@field state                 table
 ---@field comment               table
 ---@field optional              boolean
@@ -74,7 +74,9 @@ local type         = type
 ---@field hasBreak?             true
 ---@field hasExit?              true
 ---@field [integer]             parser.object|any
----@field package _root          parser.object
+---@field package _root         parser.object
+---@field package _eachCache?   parser.object[]
+---@field package _isGlobal?    boolean
 
 ---@class guide
 ---@field debugMode boolean
@@ -154,10 +156,10 @@ local childMap = {
     ['unary']       = {1},
 
     ['doc']                = {'#'},
-    ['doc.class']          = {'class', '#extends', '#signs', 'comment'},
+    ['doc.class']          = {'class', '#extends', '#signs', 'docAttr', 'comment'},
     ['doc.type']           = {'#types', 'name', 'comment'},
     ['doc.alias']          = {'alias', 'extends', 'comment'},
-    ['doc.enum']           = {'enum', 'extends', 'comment'},
+    ['doc.enum']           = {'enum', 'extends', 'comment', 'docAttr'},
     ['doc.param']          = {'param', 'extends', 'comment'},
     ['doc.return']         = {'#returns', 'comment'},
     ['doc.field']          = {'field', 'extends', 'comment'},
@@ -180,6 +182,7 @@ local childMap = {
     ['doc.cast.block']     = {'extends'},
     ['doc.operator']       = {'op', 'exp', 'extends'},
     ['doc.meta']           = {'name'},
+    ['doc.attr']           = {'#names'},
 }
 
 ---@type table<string, fun(obj: parser.object, list: parser.object[])>
@@ -417,6 +420,22 @@ function m.getParentType(obj, want)
         end
     end
     error('guide.getParentType overstack')
+end
+
+--- 寻找所在父类型
+---@param obj parser.object
+---@return parser.object?
+function m.getParentTypes(obj, wants)
+    for _ = 1, 10000 do
+        obj = obj.parent
+        if not obj then
+            return nil
+        end
+        if wants[obj.type] then
+            return obj
+        end
+    end
+    error('guide.getParentTypes overstack')
 end
 
 --- 寻找根区块
@@ -720,7 +739,7 @@ end
 --- 遍历所有指定类型的source
 ---@param ast parser.object
 ---@param type string
----@param callback fun(src: parser.object)
+---@param callback fun(src: parser.object): any
 ---@return any
 function m.eachSourceType(ast, type, callback)
     local cache = getSourceTypeCache(ast)
@@ -1287,6 +1306,37 @@ function m.isParam(source)
         return false
     end
     return true
+end
+
+---@param source parser.object
+---@return parser.object[]?
+function m.getParams(source)
+    if source.type == 'call' then
+        local args = source.args
+        if not args then
+            return
+        end
+        assert(args.type == 'callargs', 'call.args type is\'t callargs')
+        return args
+    elseif source.type == 'callargs' then
+        return source
+    elseif source.type == 'function' then
+        local args = source.args
+        if not args then
+            return
+        end
+        assert(args.type == 'funcargs', 'function.args type is\'t callargs')
+        return args
+    end
+    return nil
+end
+
+---@param source parser.object
+---@param index integer
+---@return parser.object?
+function m.getParam(source, index)
+    local args = m.getParams(source)
+    return args and args[index] or nil
 end
 
 return m

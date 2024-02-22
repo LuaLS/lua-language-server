@@ -51,7 +51,7 @@ local function tryDebugger()
     local entry = assert(package.searchpath('debugger', debugPath .. path))
     local root = debugPath
     local addr = ("127.0.0.1:%d"):format(DBGPORT)
-    local dbg = loadfile(entry)(root)
+    local dbg = loadfile(entry)(entry)
     dbg:start {
         address = addr,
     }

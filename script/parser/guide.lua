@@ -74,6 +74,8 @@ local type         = type
 ---@field hasBreak?             true
 ---@field hasExit?              true
 ---@field [integer]             parser.object|any
+---@field dot                   { type: string, start: integer, finish: integer }
+---@field colon                 { type: string, start: integer, finish: integer }
 ---@field package _root         parser.object
 ---@field package _eachCache?   parser.object[]
 ---@field package _isGlobal?    boolean

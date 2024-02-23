@@ -1055,7 +1055,7 @@ local function compileFunctionParam(func, source)
     local derviationParam = config.get(guide.getUri(func), 'Lua.type.inferParamType')
     if derviationParam and func.parent.type == 'local' and func.parent.ref then
         local refs = func.parent.ref
-        local finded
+        local found 
         for _, ref in ipairs(refs) do
             if ref.parent.type ~= 'call' then
                 goto continue

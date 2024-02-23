@@ -295,7 +295,7 @@ When this setting is `false`, the `number|nil` type cannot be assigned to the `n
 ]]
 config.type.inferParamType               =
 [[
-When the parameter type is not annotated, the parameter type is inferred from the function's incoming parameters.
+When a parameter type is not annotated, it is inferred from the function's call sites.
 
 When this setting is `false`, the type of the parameter is `any` when it is not annotated.
 ]]

@@ -146,6 +146,7 @@ local function initPlugin(uri)
             return
         end
         local args = config.get(scp.uri, 'Lua.runtime.pluginArgs')
+        if args == nil then args = {} end
         if type(pluginConfigPaths) == 'string' then
             pluginConfigPaths = { pluginConfigPaths }
         end

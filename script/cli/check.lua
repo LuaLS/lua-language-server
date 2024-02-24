@@ -11,6 +11,7 @@ local config   = require 'config.config'
 local fs       = require 'bee.filesystem'
 local provider = require 'provider'
 
+require 'plugin'
 require 'vm'
 
 lang(LOCALE)

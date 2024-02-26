@@ -13,16 +13,6 @@ return function (uri, callback)
         return
     end
 
-    local function hasNameOfGeneric(name, source)
-        if not source.typeGeneric then
-            return false
-        end
-        if not source.typeGeneric[name] then
-            return false
-        end
-        return true
-    end
-
     guide.eachSource(state.ast.docs, function (source)
         if  source.type ~= 'doc.extends.name'
         and source.type ~= 'doc.type.name' then
@@ -35,8 +25,7 @@ return function (uri, callback)
         if name == '...' or name == '_' or name == 'self' then
             return
         end
-        if #vm.getDocSets(uri, name) > 0
-        or hasNameOfGeneric(name, source) then
+        if #vm.getDocSets(uri, name) > 0 then
             return
         end
         callback {

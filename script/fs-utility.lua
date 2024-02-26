@@ -128,6 +128,7 @@ function dfs:__div(filename)
     return new
 end
 
+---@package
 function dfs:_open(index)
     local paths = split(self.path, '[/\\]')
     local current = self.files
@@ -147,6 +148,7 @@ function dfs:_open(index)
     return current
 end
 
+---@package
 function dfs:_filename()
     return self.path:match '[^/\\]+$'
 end
@@ -291,6 +293,7 @@ local function fsIsDirectory(path, option)
     if path.type == 'dummy' then
         return path:isDirectory()
     end
+    ---@cast path -dummyfs
     local status = fs.symlink_status(path):type()
     return status == 'directory'
 end
@@ -347,6 +350,7 @@ local function fsSave(path, text, option)
         return false
     end
     if path.type == 'dummy' then
+        ---@cast path -fs.path
         local dir = path:_open(-2)
         if not dir then
             option.err[#option.err+1] = '无法打开:' .. path:string()
@@ -385,6 +389,7 @@ local function fsLoad(path, option)
             return nil
         end
     else
+        ---@cast path -dummyfs
         local text, err = m.loadFile(path)
         if text then
             return text
@@ -407,6 +412,7 @@ local function fsCopy(source, target, option)
         end
         return fsSave(target, sourceText, option)
     else
+        ---@cast source -dummyfs
         if target.type == 'dummy' then
             local sourceText, err = m.loadFile(source)
             if not sourceText then
@@ -564,7 +570,6 @@ end
 --- 文件列表
 function m.fileList(option)
     option = option or buildOption(option)
-    local os = platform.OS
     local keyMap = {}
     local fileList = {}
     local function computeKey(path)

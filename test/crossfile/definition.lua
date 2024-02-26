@@ -689,7 +689,7 @@ TEST {
 }
 
 
-if platform.OS == 'Linux' then
+if platform.os == 'linux' then
 
 TEST {
     {

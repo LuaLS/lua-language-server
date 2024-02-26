@@ -55,21 +55,21 @@ lm:executable "lua-language-server" {
 }
 
 local platform = require 'bee.platform'
-local exe      = platform.OS == 'Windows' and ".exe" or ""
+local exe      = platform.os == 'windows' and ".exe" or ""
 
 lm:copy "copy_lua-language-server" {
-    input = lm.bindir .. "/lua-language-server" .. exe,
-    output = "bin/lua-language-server" .. exe,
+    inputs = "$bin/lua-language-server" .. exe,
+    outputs = "bin/lua-language-server" .. exe,
 }
 
 lm:copy "copy_bootstrap" {
-    input = "make/bootstrap.lua",
-    output = "bin/main.lua",
+    inputs = "make/bootstrap.lua",
+    outputs = "bin/main.lua",
 }
 
 lm:msvc_copydll 'copy_vcrt' {
     type = "vcrt",
-    output = "bin",
+    outputs = "bin",
 }
 
 lm:phony "all" {
@@ -93,7 +93,7 @@ if lm.notest then
 end
 
 lm:rule "run-bee-test" {
-    lm.bindir .. "/lua-language-server" .. exe, "$in",
+    "$bin/lua-language-server" .. exe, "$in",
     description = "Run test: $in.",
     pool = "console",
 }
@@ -107,13 +107,13 @@ lm:rule "run-unit-test" {
 lm:build "bee-test" {
     rule = "run-bee-test",
     deps = { "lua-language-server", "copy_script" },
-    input = "3rd/bee.lua/test/test.lua",
+    inputs = "3rd/bee.lua/test/test.lua",
 }
 
 lm:build 'unit-test' {
     rule = "run-unit-test",
     deps = { "bee-test", "all" },
-    input = "test.lua",
+    inputs = "test.lua",
 }
 
 lm:default {

@@ -2,7 +2,7 @@ local lm = require 'luamake'
 
 local platform = require 'bee.platform'
 
-if     platform.OS == 'macOS' then
+if     platform.os == 'macos' then
     if     lm.platform == nil then
     elseif lm.platform == "darwin-arm64" then
         lm.target = "arm64-apple-macos11"
@@ -11,7 +11,7 @@ if     platform.OS == 'macOS' then
     else
         error "unknown platform"
     end
-elseif platform.OS == 'Windows' then
+elseif platform.os == 'windows' then
     if     lm.platform == nil then
     elseif lm.platform == "win32-ia32" then
         lm.arch = "x86"
@@ -20,7 +20,7 @@ elseif platform.OS == 'Windows' then
     else
         error "unknown platform"
     end
-elseif platform.OS == 'Linux' then
+elseif platform.os == 'linux' then
     if     lm.platform == nil then
     elseif lm.platform == "linux-x64" then
     elseif lm.platform == "linux-arm64" then
@@ -52,7 +52,7 @@ local ARCH <const> = {
 }
 
 local function detectArch()
-    if platform.OS == 'Windows' then
+    if platform.os == 'windows' then
         return detectWindowsArch()
     end
     local posixArch = detectPosixArch()
@@ -67,5 +67,5 @@ local function targetPlatformArch()
 end
 
 if not lm.notest then
-    lm.notest = (platform.OS ~= 'Windows' and targetPlatformArch() ~= detectArch())
+    lm.notest = (platform.os ~= 'windows' and targetPlatformArch() ~= detectArch())
 end

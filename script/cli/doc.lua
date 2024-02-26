@@ -190,7 +190,11 @@ local function collectTypes(global, results)
             field.extends = packObject(source.value)
             field.visible = vm.getVisibleType(source)
             if vm.isAsync(source, true) then
-               field.async = true
+                field.async = true
+            end
+            local depr = vm.getDeprecated(source)
+            if (depr and not depr.versions) then
+                field.deprecated = true
             end
             return
         end
@@ -254,7 +258,11 @@ local function collectVars(global, results)
             result.defines[#result.defines].extends['desc'] = getDesc(set)
             result.defines[#result.defines].extends['rawdesc'] = getDesc(set, true)
             if vm.isAsync(set, true) then
-               result.defines[#result.defines].extends['async'] = true
+                result.defines[#result.defines].extends['async'] = true
+            end
+            local depr = vm.getDeprecated(set)
+            if (depr and not depr.versions) then
+                result.defines[#result.defines].extends['deprecated'] = true
             end
         end
     end

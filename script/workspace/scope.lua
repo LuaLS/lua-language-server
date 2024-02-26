@@ -235,11 +235,11 @@ function m.getLinkedScope(uri)
     return nil
 end
 
----@param uri uri
+---@param uri? uri
 ---@return scope
 function m.getScope(uri)
-    return m.getFolder(uri)
-        or m.getLinkedScope(uri)
+    return uri and (m.getFolder(uri)
+        or m.getLinkedScope(uri))
         or m.fallback
 end
 

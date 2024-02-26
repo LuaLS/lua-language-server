@@ -31,6 +31,10 @@ local function getVisibleType(source)
                 source._visibleType = 'protected'
                 return 'protected'
             end
+            if doc.type == 'doc.package' then
+                source._visibleType = 'package'
+                return 'package'
+            end
         end
     end
 
@@ -49,6 +53,12 @@ local function getVisibleType(source)
         if #protectedNames > 0 and glob.glob(protectedNames)(fieldName) then
             source._visibleType = 'protected'
             return 'protected'
+        end
+
+        local packageNames = config.get(uri, 'Lua.doc.packageName')
+        if #packageNames > 0 and glob.glob(packageNames)(fieldName) then
+            source._visibleType = 'package'
+            return 'package'
         end
     end
 

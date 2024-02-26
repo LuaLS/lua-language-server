@@ -123,7 +123,7 @@ function mt:getRequireResultByPath(path)
             cutedPath = currentPath:sub(pos)
             head = currentPath:sub(1, pos - 1)
             pos = currentPath:match('[/\\]+()', pos)
-            if platform.OS == 'Windows' then
+            if platform.os == 'windows' then
                 searcher = searcher :gsub('[/\\]+', '\\')
             else
                 searcher = searcher :gsub('[/\\]+', '/')

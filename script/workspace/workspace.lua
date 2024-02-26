@@ -188,7 +188,7 @@ function m.getNativeMatcher(scp)
 
     local matcher = glob.gitignore(pattern, {
         root       = scp.uri and furi.decode(scp.uri),
-        ignoreCase = platform.OS == 'Windows',
+        ignoreCase = platform.os == 'windows',
     }, globInteferFace)
 
     scp:set('nativeMatcher', matcher)
@@ -236,7 +236,7 @@ function m.getLibraryMatchers(scp)
             local nPath = fs.absolute(fs.path(path)):string()
             local matcher = glob.gitignore(pattern, {
                 root       = path,
-                ignoreCase = platform.OS == 'Windows',
+                ignoreCase = platform.os == 'windows',
             }, globInteferFace)
             matchers[#matchers+1] = {
                 uri     = furi.encode(nPath),

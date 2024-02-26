@@ -163,7 +163,7 @@ print(D3)
         position = { line = 9, character = 7 },
     })
 
-    if platform.OS == 'Windows' then
+    if platform.os == 'windows' then
         assert(util.equal(locations, {
             {
                 uri = 'file:///d%3A/xxx/2.lua',

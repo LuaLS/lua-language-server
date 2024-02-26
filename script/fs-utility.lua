@@ -570,7 +570,6 @@ end
 --- 文件列表
 function m.fileList(option)
     option = option or buildOption(option)
-    local os = platform.OS
     local keyMap = {}
     local fileList = {}
     local function computeKey(path)

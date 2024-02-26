@@ -119,7 +119,7 @@ end
 
 TEST [[
 local function f(cb)
-    <!cb!>()
+    cb()
 end
 
 local function af()

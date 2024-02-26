@@ -63,13 +63,13 @@ lm:copy "copy_lua-language-server" {
 }
 
 lm:copy "copy_bootstrap" {
-    input = "make/bootstrap.lua",
+    inputs = "make/bootstrap.lua",
     outputs = "bin/main.lua",
 }
 
 lm:msvc_copydll 'copy_vcrt' {
     type = "vcrt",
-    output = "bin",
+    outputs = "bin",
 }
 
 lm:phony "all" {

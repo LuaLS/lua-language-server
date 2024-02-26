@@ -189,6 +189,10 @@ local function collectTypes(global, results)
             field.rawdesc = getDesc(source, true)
             field.extends = packObject(source.value)
             field.visible = vm.getVisibleType(source)
+            local depr = vm.getDeprecated(source)
+            if (depr and not depr.versions) then
+               field.deprecated = true
+            end
             return
         end
         if source.type == 'tableindex' then
@@ -250,6 +254,10 @@ local function collectVars(global, results)
             result.rawdesc = result.rawdesc or getDesc(set, true)
             result.defines[#result.defines].extends['desc'] = getDesc(set)
             result.defines[#result.defines].extends['rawdesc'] = getDesc(set, true)
+            local depr = vm.getDeprecated(set)
+            if (depr and not depr.versions) then
+               result.defines[#result.defines].extends['deprecated'] = true
+            end
         end
     end
     if #result.defines == 0 then

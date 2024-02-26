@@ -449,7 +449,8 @@ local function tyrDocParamComment(source)
     or source.type == 'getlocal' then
         source = source.node
     end
-    if source.type ~= 'local' then
+    if source.type ~= 'local'
+    and source.type ~= '...' then
         return
     end
     if source.parent.type ~= 'funcargs' then

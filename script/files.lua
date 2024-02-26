@@ -78,7 +78,7 @@ end
 ---@param uri uri
 ---@return uri
 function m.getRealUri(uri)
-    if platform.OS ~= 'Windows' then
+    if platform.os ~= 'windows' then
         return furi.normalize(uri)
     end
     if not furi.isValid(uri) then
@@ -833,7 +833,7 @@ function m.isDll(uri)
     if not ext then
         return false
     end
-    if platform.OS == 'Windows' then
+    if platform.os == 'windows' then
         if ext == 'dll' then
             return true
         end
@@ -932,7 +932,7 @@ function m.normalize(path)
             break
         end
     end
-    if platform.OS == 'Windows' then
+    if platform.os == 'windows' then
         path = path:gsub('[/\\]+', '\\')
                    :gsub('[/\\]+$', '')
                    :gsub('^(%a:)$', '%1\\')

@@ -132,6 +132,7 @@ end
 
 ---@async
 return function (data)
+    ---@type uri
     local uri    = data.uri
     local target = data.target
     local name   = data.name
@@ -158,5 +159,7 @@ return function (data)
     end
 
     local offset, fmt = findInsertRow(uri)
-    applyAutoRequire(uri, offset, name, requireName, fmt)
+    if offset and fmt then
+        applyAutoRequire(uri, offset, name, requireName, fmt)
+    end
 end

@@ -73,6 +73,9 @@ end
 ---@async
 ---@param scp scope
 local function checkTrustLoad(scp)
+	if TRUST_ALL_PLUGINS then
+		return true
+	end
     local pluginPath = scp:get('pluginPath')
     local filePath = LOGPATH .. '/trusted'
     local trusted = util.loadFile(filePath)

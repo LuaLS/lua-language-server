@@ -85,6 +85,7 @@ lclient():start(function (client)
                         .. ('0'):rep(#tostring(max) - #tostring(i))
                         .. tostring(i) .. '/' .. tostring(max)
             io.write(output)
+            io.flush()
         end
     end
     io.write('\x0D')

@@ -49,7 +49,7 @@ function TEST(script)
     end
 end
 
----@param testfiles [string, {path:string, content:string}]
+---@param testfiles string<{path:string, content:string}>
 local function TEST_CROSSFILE(testfiles)
     local mainscript = table.remove(testfiles, 1)
     return function(expected)

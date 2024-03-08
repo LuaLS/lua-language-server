@@ -94,3 +94,7 @@ SOCKET = 0
 
 -- Allowing the use of the root directory or home directory as the workspace
 FORCE_ACCEPT_WORKSPACE = false
+
+-- Trust all plugins that are being loaded by workspace config files.
+-- This is potentially unsafe for normal use and meant for usage in CI environments only.
+TRUST_ALL_PLUGINS = false

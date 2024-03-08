@@ -93,13 +93,13 @@ if lm.notest then
 end
 
 lm:rule "run-bee-test" {
-    "$bin/lua-language-server" .. exe, "$in",
+    args = { "$bin/lua-language-server" .. exe, "$in" },
     description = "Run test: $in.",
     pool = "console",
 }
 
 lm:rule "run-unit-test" {
-    "bin/lua-language-server" .. exe, "$in",
+    args = { "bin/lua-language-server" .. exe, "$in" },
     description = "Run test: $in.",
     pool = "console",
 }

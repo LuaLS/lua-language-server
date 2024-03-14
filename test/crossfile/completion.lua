@@ -918,7 +918,7 @@ local z: table
     }
 }
 
-if platform.OS == 'Windows' then
+if platform.os == 'windows' then
 Cared['detail'] = true
 Cared['additionalTextEdits'] = true
 TEST {

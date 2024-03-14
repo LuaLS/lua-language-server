@@ -278,7 +278,7 @@ local function searchPatchInfo(cfg, rawKey)
         }
 end
 
----@param uri uri
+---@param uri? uri
 ---@param cfg table
 ---@param change config.change
 ---@return json.patch?
@@ -330,7 +330,7 @@ local function makeConfigPatch(uri, cfg, change)
     return nil
 end
 
----@param uri uri
+---@param uri? uri
 ---@param path string
 ---@param changes config.change[]
 ---@return string?

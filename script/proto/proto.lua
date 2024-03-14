@@ -232,7 +232,7 @@ end
 function m.listen(mode, socketPort)
     m.mode = mode
     if mode == 'stdio' then
-        if platform.OS == 'Windows' then
+        if platform.os == 'windows' then
             local windows = require 'bee.windows'
             windows.filemode(io.stdin,  'b')
             windows.filemode(io.stdout, 'b')

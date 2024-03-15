@@ -18,7 +18,7 @@ local includeCodeFormat = true
 
 require "make.detect_platform"
 
-lm:import "3rd/bee.lua"
+lm:import "3rd/bee.lua/make.lua"
 lm:import "make/code_format.lua"
 
 lm:source_set 'lpeglabel' {

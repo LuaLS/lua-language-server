@@ -56,6 +56,10 @@ DOC = ''
 ---@type string
 DOC_OUT_PATH = ''
 
+---update an existing doc.json
+---@type string
+DOC_UPDATE = ''
+
 ---@type string | '"Error"' | '"Warning"' | '"Information"' | '"Hint"'
 CHECKLEVEL = 'Warning'
 

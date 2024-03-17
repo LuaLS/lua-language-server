@@ -278,12 +278,26 @@ local function collectVars(global, results)
     results[#results+1] = result
 end
 
+---Add config settings to JSON output.
+---@param results table
+local function collectConfig(results)
+    local result = {
+        name = 'LuaLS',
+        type = 'luals.config',
+        DOC = fs.absolute(fs.path(DOC)):string(),
+        defines = {},
+        fields = {}
+    }
+    results[#results+1] = result
+end
+
 ---@async
 ---@param callback fun(i, max)
 function export.export(outputPath, callback)
     local results = {}
     local globals = vm.getAllGlobals()
 
+    collectConfig(results)
     local max = 0
     for _ in pairs(globals) do
         max = max + 1
@@ -345,8 +359,52 @@ function export.makeDoc(outputPath)
     return docPath, mdPath
 end
 
+
+---Find file 'doc.json'.
+---@return fs.path
+local function findDocJson()
+    local doc_json_path
+    if type(DOC_UPDATE) == 'string' then
+        doc_json_path = fs.absolute(fs.path(DOC_UPDATE)) .. '/doc.json'
+    else
+        doc_json_path = fs.current_path() .. '/doc.json'
+    end
+    if fs.exists(doc_json_path) then
+        return doc_json_path
+    else
+        error(string.format('Error: File "%s" not found.', doc_json_path))
+    end
+end
+
+---@return string # path of 'doc.json'
+---@return string # path to be documented
+local function getPathDocUpdate()
+    local doc_json_path = findDocJson()
+    local ok, doc_path = pcall(
+        function ()
+            local json = require('json')
+            local json_file = io.open(doc_json_path:string(), 'r'):read('*all')
+            local json_data = json.decode(json_file)
+            for _, section in ipairs(json_data) do
+                if section.type == 'luals.config' then
+                    return section.DOC
+                end
+            end
+    end)
+    if ok then
+        local doc_json_dir = doc_json_path:string():gsub('/doc.json', '')
+        return doc_json_dir, doc_path
+    else
+        error(string.format('Error: Cannot update "%s".', doc_json_path .. '/doc.json'))
+    end
+end
+
 function export.runCLI()
     lang(LOCALE)
+
+    if DOC_UPDATE then
+        DOC_OUT_PATH, DOC = getPathDocUpdate()
+    end
 
     if type(DOC) ~= 'string' then
         print(lang.script('CLI_CHECK_ERROR_TYPE', type(DOC)))

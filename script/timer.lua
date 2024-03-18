@@ -14,6 +14,7 @@ local curIndex = 0
 local tarFrame = 0
 local fwFrame  = 0
 local freeQueue = {}
+---@type (timer|false)[][]
 local timer = {}
 
 local function allocQueue()
@@ -101,9 +102,10 @@ end
 local m = {}
 
 ---@class timer
----@field _onTimer? fun(self: timer)
----@field _timeoutFrame integer
----@field _timeout integer
+---@field package _onTimer? fun(self: timer)
+---@field package _timeoutFrame integer
+---@field package _timeout integer
+---@field package _timerCount integer
 local mt = {}
 mt.__index = mt
 mt.type = 'timer'
@@ -119,6 +121,7 @@ function mt:__call()
 end
 
 function mt:remove()
+    ---@package
     self._removed = true
 end
 
@@ -126,7 +129,9 @@ function mt:pause()
     if self._removed or self._pauseRemaining then
         return
     end
+    ---@package
     self._pauseRemaining = getRemaining(self)
+    ---@package
     self._running = false
     local ti = self._timeoutFrame
     local q = timer[ti]
@@ -145,6 +150,7 @@ function mt:resume()
         return
     end
     local timeout = self._pauseRemaining
+    ---@package
     self._pauseRemaining = nil
     mTimeout(self, timeout)
 end
@@ -163,6 +169,7 @@ function mt:restart()
             end
         end
     end
+    ---@package
     self._running = false
     mTimeout(self, self._timeout)
 end

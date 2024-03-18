@@ -1668,7 +1668,7 @@ local function trimTailComment(text)
     and comment:find '[\'"%]]%s*$' then
         local state = compile(comment:gsub('^%s+', ''), 'String')
         if state and state.ast then
-            comment = state.ast[1]
+            comment = state.ast[1] --[[@as string]]
         end
     end
     return util.trim(comment)

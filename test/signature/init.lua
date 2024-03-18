@@ -372,3 +372,30 @@ t:event("onTimer", <??>)
 {
 '(method) (ev: "onTimer", <!t: integer!>)',
 }
+
+local config = require 'config'
+config.set(nil, "Lua.type.inferParamType", true)
+
+TEST [[
+local function x(a, b)
+end
+
+x("1", <??>)
+]]
+{
+'function x(a: string, <!b: any!>)'
+}
+
+TEST [[
+local function x(a)
+   
+end
+x('str')
+x(1)
+x(<??>)
+]]
+{
+'function x(<!a: string|integer!>)',
+}
+
+config.set(nil, "Lua.type.inferParamType", false)

@@ -1,7 +1,7 @@
 local platform = require 'bee.platform'
 local windows
 
-if platform.OS == 'Windows' then
+if platform.os == 'windows' then
     windows = require 'bee.windows'
 end
 

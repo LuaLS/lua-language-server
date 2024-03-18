@@ -239,6 +239,16 @@ local LocalLimit = 200
 
 local parseExp, parseAction
 
+---@class parser.state.err
+---@field type string
+---@field start? parser.position
+---@field finish? parser.position
+---@field info? table
+---@field fix? table
+---@field version? string[]|string
+---@field level? string | 'Error' | 'Warning'
+
+---@type fun(err:parser.state.err):parser.state.err|nil
 local pushError
 
 local function addSpecial(name, obj)
@@ -711,6 +721,7 @@ local function parseLocalAttrs()
     return attrs
 end
 
+---@param obj table
 local function createLocal(obj, attrs)
     obj.type   = 'local'
     obj.effect = obj.finish
@@ -1709,6 +1720,9 @@ local function parseTable()
 end
 
 local function addDummySelf(node, call)
+    if not node then
+        return
+    end
     if node.type ~= 'getmethod' then
         return
     end
@@ -1736,6 +1750,9 @@ local function checkAmbiguityCall(call, parenPos)
         return
     end
     local node = call.node
+    if not node then
+        return
+    end
     local nodeRow = guide.rowColOf(node.finish)
     local callRow = guide.rowColOf(parenPos)
     if nodeRow == callRow then
@@ -2470,7 +2487,10 @@ local function parseExpUnit()
 
     local node = parseName()
     if node then
-        return parseSimple(resolveName(node), false)
+        local nameNode = resolveName(node)
+        if nameNode then
+            return parseSimple(nameNode, false)
+        end
     end
 
     return nil
@@ -3421,6 +3441,7 @@ local function parseFor()
         forStateVars = 3
         LocalCount = LocalCount + forStateVars
         if name then
+            ---@cast name parser.object
             local loc = createLocal(name)
             loc.parent    = action
             action.finish = name.finish
@@ -3523,7 +3544,9 @@ local function parseFor()
             list.range  = lastName and lastName.range or inRight
             action.keys = list
             for i = 1, #list do
-                local loc = createLocal(list[i])
+                local obj = list[i]
+                ---@cast obj parser.object
+                local loc = createLocal(obj)
                 loc.parent = action
                 loc.effect = action.finish
             end

@@ -1,12 +1,13 @@
 local util = require 'utility'
 
 ---@class gc
----@field _list table
+---@field package _list table
 local mt = {}
 mt.__index = mt
 mt.type = 'gc'
 mt._removed = false
 
+---@package
 mt._max = 10
 
 local function destroyGCObject(obj)

@@ -62,6 +62,7 @@ end
 
 function m.getVmPlugin(uri)
     local scp = scope.getScope(uri)
+    ---@type pluginInterfaces
     local interfaces = scp:get('pluginInterfaces')
     if not interfaces then
         return
@@ -72,6 +73,9 @@ end
 ---@async
 ---@param scp scope
 local function checkTrustLoad(scp)
+	if TRUST_ALL_PLUGINS then
+		return true
+	end
     local pluginPath = scp:get('pluginPath')
     local filePath = LOGPATH .. '/trusted'
     local trusted = util.loadFile(filePath)
@@ -146,6 +150,7 @@ local function initPlugin(uri)
             return
         end
         local args = config.get(scp.uri, 'Lua.runtime.pluginArgs')
+        if args == nil then args = {} end
         if type(pluginConfigPaths) == 'string' then
             pluginConfigPaths = { pluginConfigPaths }
         end

@@ -384,6 +384,7 @@ end
 
 local JsonEmpty = function () end
 
+---@return {s: integer, d:integer, f:integer, v: any}
 local function decode_ast(str)
     if type(str) ~= "string" then
         error("expected argument of type string, got " .. type(str))
@@ -607,7 +608,11 @@ function OP.add(str, option, path, value)
     end
     local ast = decode_ast(str)
     if ast.v == JsonEmpty then
-        local pathlst = split_path(path)
+        local pathlst, err = split_path(path)
+        if not pathlst then
+            error(err)
+            return
+        end
         value = add_prefix(value, pathlst)
         return json.beautify(value, option)
     end
@@ -674,7 +679,11 @@ function OP.replace(str, option, path, value)
     end
     local ast = decode_ast(str)
     if ast.v == JsonEmpty then
-        local pathlst = split_path(path)
+        local pathlst, err = split_path(path)
+        if not pathlst then
+            error(err)
+            return
+        end
         value = add_prefix(value, pathlst)
         return json.beautify(value, option)
     end

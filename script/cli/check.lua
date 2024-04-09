@@ -11,6 +11,7 @@ local config   = require 'config.config'
 local fs       = require 'bee.filesystem'
 local provider = require 'provider'
 
+require 'plugin'
 require 'vm'
 
 lang(LOCALE)
@@ -26,6 +27,7 @@ if not rootUri then
     print(lang.script('CLI_CHECK_ERROR_URI', rootPath))
     return
 end
+rootUri = rootUri:gsub("/$", "")
 
 if CHECKLEVEL then
     if not define.DiagnosticSeverity[CHECKLEVEL] then
@@ -69,7 +71,7 @@ lclient():start(function (client)
     end
     config.set(rootUri, 'Lua.diagnostics.disable', util.getTableKeys(disables, true))
 
-    local uris = files.getAllUris(rootUri)
+    local uris = files.getChildFiles(rootUri)
     local max  = #uris
     for i, uri in ipairs(uris) do
         files.open(uri)
@@ -83,6 +85,7 @@ lclient():start(function (client)
                         .. ('0'):rep(#tostring(max) - #tostring(i))
                         .. tostring(i) .. '/' .. tostring(max)
             io.write(output)
+            io.flush()
         end
     end
     io.write('\x0D')

@@ -27,7 +27,7 @@ function m.showError(scp, err)
     client.showMessage('Error', lang.script('PLUGIN_RUNTIME_ERROR', scp:get('pluginPath'), err))
 end
 
----@alias plugin.event 'OnSetText' | 'OnTransformAst'
+---@alias plugin.event 'OnSetText' | 'OnTransformAst' | 'ResolveRequire'
 
 ---@param event plugin.event
 function m.dispatch(event, uri, ...)

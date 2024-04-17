@@ -95,7 +95,7 @@ TEST {
 * [a.lua](file:///a.lua) （搜索路径： `?.lua`）]],
 }
 
-if require 'bee.platform'.OS == 'Windows' then
+if require 'bee.platform'.os == 'windows' then
 TEST {
     {
         path = 'Folder/a.lua',

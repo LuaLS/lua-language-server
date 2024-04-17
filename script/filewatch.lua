@@ -13,7 +13,7 @@ local function isExists(filename)
     if not suc or not exists then
         return false
     end
-    if plat.OS ~= 'Windows' then
+    if plat.os ~= 'windows' then
         return true
     end
     local res = fs.fullpath(path)

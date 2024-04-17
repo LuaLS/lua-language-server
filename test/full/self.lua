@@ -14,7 +14,7 @@ local uris = {}
 
 files.reset()
 fsu.scanDirectory(path, function (path)
-    if path:extension():string() ~= '.lua' then
+    if path:extension() ~= '.lua' then
         return
     end
     local uri  = furi.encode(path:string())

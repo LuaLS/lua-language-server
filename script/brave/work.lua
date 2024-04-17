@@ -65,7 +65,7 @@ end)
 brave.on('timer', function (time)
     local thread = require 'bee.thread'
     while true do
-        thread.sleep(time)
+        thread.sleep(math.floor(time * 1000))
         brave.push('wakeup')
     end
 end)

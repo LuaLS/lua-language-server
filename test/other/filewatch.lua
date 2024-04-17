@@ -17,7 +17,7 @@ fw.event(function (ev, filename)
     events[#events+1] = {ev, filename}
 end)
 
-thread.sleep(1)
+thread.sleep(1000)
 events = {}
 fw.update()
 assert(#events == 1)
@@ -25,7 +25,7 @@ assert(events[1][1] == 'create')
 
 fsu.saveFile(path / 'test.txt', 'modify')
 
-thread.sleep(1)
+thread.sleep(1000)
 events = {}
 fw.update()
 assert(#events == 1)
@@ -37,7 +37,7 @@ f:write('xxx')
 f:flush()
 f:close()
 
-thread.sleep(1)
+thread.sleep(1000)
 events = {}
 fw.update()
 assert(#events == 1)

@@ -115,5 +115,5 @@ loadAllLibs()
 main()
 
 log.debug('test finish.')
-require 'bee.thread'.sleep(1)
+require 'bee.thread'.sleep(1000)
 os.exit()

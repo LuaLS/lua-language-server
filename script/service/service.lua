@@ -180,7 +180,7 @@ function m.eventLoop()
     local function sleep()
         idle()
         for _ = 1, 10 do
-            thread.sleep(0.1)
+            thread.sleep(100)
             if doSomething() then
                 return
             end

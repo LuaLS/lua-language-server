@@ -157,6 +157,7 @@ Symbol              <-  ({} {
 ---@field generics?         parser.object[]
 ---@field generic?          parser.object
 ---@field docAttr?          parser.object
+---@field pattern?          string
 
 local function parseTokens(text, offset)
     Ci = 0

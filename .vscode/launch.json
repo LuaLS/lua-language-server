@@ -51,6 +51,9 @@
 			"request": "launch",
 			"stopOnEntry": false,
 			"luaexe": "${workspaceFolder}/bin/lua-language-server",
+			"windows": {
+				"luaexe": "${workspaceFolder}/bin/lua-language-server.exe"
+			},
 			"program": "${workspaceRoot}/tools/build-3rd-meta.lua",
 			"cpath": "${workspaceFolder}/bin/?.dll;${workspaceFolder}/bin/?.so",
 			"console": "integratedTerminal",
@@ -70,6 +73,9 @@
 			"request": "launch",
 			"stopOnEntry": false,
 			"luaexe": "${workspaceFolder}/bin/lua-language-server",
+			"windows": {
+				"luaexe": "${workspaceFolder}/bin/lua-language-server.exe"
+			},
 			"program": "${workspaceRoot}/tools/locale.lua",
 			"cpath": "${workspaceFolder}/bin/?.dll;${workspaceFolder}/bin/?.so",
 			"console": "integratedTerminal",
@@ -89,6 +95,9 @@
 			"request": "launch",
 			"stopOnEntry": false,
 			"luaexe": "${workspaceFolder}/bin/lua-language-server",
+			"windows": {
+				"luaexe": "${workspaceFolder}/bin/lua-language-server.exe"
+			},
 			"program": "${workspaceRoot}/tools/build-doc.lua",
 			"cpath": "${workspaceFolder}/bin/?.dll;${workspaceFolder}/bin/?.so",
 			"console": "integratedTerminal",
@@ -109,6 +118,9 @@
 			"stopOnEntry": false,
 			"program": "${workspaceRoot}/main.lua",
 			"luaexe": "${workspaceFolder}/bin/lua-language-server",
+			"windows": {
+				"luaexe": "${workspaceFolder}/bin/lua-language-server.exe"
+			},
 			"cpath": null,
 			"arg": [
 				"--check",
@@ -128,6 +140,9 @@
 			"stopOnEntry": false,
 			"program": "${workspaceRoot}/main.lua",
 			"luaexe": "${workspaceFolder}/bin/lua-language-server",
+			"windows": {
+				"luaexe": "${workspaceFolder}/bin/lua-language-server.exe"
+			},
 			"cpath": null,
 			"arg": [
 				"--doc",

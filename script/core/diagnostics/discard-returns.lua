@@ -15,6 +15,9 @@ return function (uri, callback)
         if not guide.isBlockType(source.parent) then
             return
         end
+        if source.parent.filter == source then
+            return
+        end
         await.delay()
         if vm.isNoDiscard(source.node, true) then
             callback {

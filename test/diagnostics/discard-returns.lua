@@ -261,3 +261,13 @@ local t = {10, 20, 30}
 for element in list_iter(t) do
 end
 ]]
+
+TEST [[
+---@nodiscard
+local function f()
+    return 1
+end
+
+if f() then
+end
+]]

@@ -12,6 +12,7 @@ local ws     = require 'workspace'
 local time   = require 'bee.time'
 local fw     = require 'filewatch'
 local furi   = require 'file-uri'
+local net    = require 'service.net'
 
 require 'jsonc'
 require 'json-beautify'
@@ -168,6 +169,7 @@ function m.eventLoop()
     end
 
     local function doSomething()
+        net.update()
         timer.update()
         pub.step(false)
         if await.step() then
@@ -180,7 +182,7 @@ function m.eventLoop()
     local function sleep()
         idle()
         for _ = 1, 10 do
-            thread.sleep(100)
+            net.update(100)
             if doSomething() then
                 return
             end

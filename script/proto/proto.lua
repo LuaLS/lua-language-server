@@ -55,7 +55,6 @@ function m.send(data)
         io.write(buf)
     elseif m.mode == 'socket' then
         m.client:write(buf)
-        net.update()
     end
 end
 
@@ -258,15 +257,9 @@ function m.listen(mode, socketPort)
         }
         m.client = dummyClient
 
-        local t = timer.loop(0.1, function ()
-            net.update()
-        end)
-
         function server:on_accepted(client)
-            t:remove()
             m.client = client
             client:write(dummyClient.buf)
-            net.update()
         end
 
         pub.task('loadProtoBySocket', {

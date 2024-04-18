@@ -11,11 +11,11 @@ TEST [[
 
 TEST [[
 ---@alias A integer
----@alias(merge) A integer
+---@alias(partial) A integer
 
 ---@enum B
----@enum(merge) B
+---@enum(partial) B
 
 ---@enum(key) C
----@enum(key, merge) C
+---@enum(key, partial) C
 ]]

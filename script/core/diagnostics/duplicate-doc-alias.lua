@@ -37,7 +37,7 @@ return function (uri, callback)
                             finish = otherDoc.finish,
                             uri    = guide.getUri(otherDoc),
                         }
-                        merged[name] = merged[name] or vm.docHasAttr(otherDoc, 'merge')
+                        merged[name] = merged[name] or vm.docHasAttr(otherDoc, 'partial')
                     end
                 end
             end

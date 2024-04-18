@@ -1,11 +1,11 @@
 # changelog
 
 ## 3.7.5
-* `NEW` alias and enums supports attribute `merge`
+* `NEW` alias and enums supports attribute `partial`
   ```lua
   ---@alias Animal Cat
 
-  ---@alias(merge) Animal Dog
+  ---@alias(partial) Animal Dog
 
   ---@type Animal
   local animal --> animal is `Cat|Dog` here
@@ -19,7 +19,7 @@
       FATAL = 2,
   }
 
-  ---@enum(key, merge) ErrorCodes
+  ---@enum(key, partial) ErrorCodes
   local codes2 = {
       WARN = 3,
       INFO = 4,

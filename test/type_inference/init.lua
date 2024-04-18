@@ -4338,7 +4338,7 @@ local <?x?> = f()
 
 TEST 'boolean|number' [[
 ---@alias A number
----@alias(merge) A boolean
+---@alias(partial) A boolean
 
 ---@type A
 local <?x?>

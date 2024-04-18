@@ -1,6 +1,37 @@
 # changelog
 
 ## 3.7.5
+* `NEW` alias and enums supports attribute `merge`
+  ```lua
+  ---@alias Animal Cat
+
+  ---@alias(merge) Animal Dog
+
+  ---@type Animal
+  local animal --> animal is `Cat|Dog` here
+  ```
+
+  ```lua
+  ---@enum(key) ErrorCodes
+  local codes1 = {
+      OK = 0,
+      ERROR = 1,
+      FATAL = 2,
+  }
+
+  ---@enum(key, merge) ErrorCodes
+  local codes2 = {
+      WARN = 3,
+      INFO = 4,
+  }
+
+  ---@type ErrorCodes
+  local code
+
+  code = 'ERROR' --> OK
+  code = 'WARN'  --> OK
+
+  ```
 * `FIX` rename in library files
 
 ## 3.7.4

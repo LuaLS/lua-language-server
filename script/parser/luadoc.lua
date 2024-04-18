@@ -1026,6 +1026,7 @@ local docSwitch = util.switch()
         local result = {
             type   = 'doc.alias',
         }
+        result.docAttr = parseDocAttr()
         result.alias = parseName('doc.alias.name', result)
         if not result.alias then
             pushWarning {

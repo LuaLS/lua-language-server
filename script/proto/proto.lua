@@ -265,6 +265,7 @@ function m.listen(mode, socketPort)
         function server:on_accepted(client)
             m.client = client
             client:write(dummyClient.buf)
+            return true
         end
 
         pub.task('loadProtoBySocket', {

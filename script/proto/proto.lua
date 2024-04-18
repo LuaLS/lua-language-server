@@ -231,6 +231,7 @@ end
 function m.listen(mode, socketPort)
     m.mode = mode
     if mode == 'stdio' then
+        log.info('Listen Mode: stdio')
         if platform.os == 'windows' then
             local windows = require 'bee.windows'
             windows.filemode(io.stdin,  'b')
@@ -245,6 +246,10 @@ function m.listen(mode, socketPort)
         local unixPath = unixFolder .. '/' .. tostring(socketPort)
 
         local server = net.listen('unix', unixPath)
+
+        log.info('Listen Mode: socket')
+        log.info('Listen Port:', socketPort)
+        log.info('Listen Path:', unixPath)
 
         assert(server)
 

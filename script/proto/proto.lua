@@ -262,7 +262,7 @@ function m.listen(mode, socketPort)
             net.update()
         end)
 
-        function server:on_accept(client)
+        function server:on_accepted(client)
             t:remove()
             m.client = client
             client:write(dummyClient.buf)

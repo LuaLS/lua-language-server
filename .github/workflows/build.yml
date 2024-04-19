@@ -92,7 +92,7 @@ jobs:
           echo PKG_PATH="${PKG_STAGING}/${PKG_NAME}"  >> $GITHUB_OUTPUT
           echo PKG_STAGING=${PKG_STAGING}             >> $GITHUB_OUTPUT
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.vars.outputs.PKG_BASENAME }}
           path: |

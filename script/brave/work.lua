@@ -52,9 +52,17 @@ brave.on('loadProtoBySocket', function (param)
         coroutine.resume(parser)
     end
 
+    function lsclient:on_error(...)
+        log.error(...)
+    end
+
     function lsmaster:on_data(data)
         lsclient:write(data)
         --net.update()
+    end
+
+    function lsmaster:on_error(...)
+        log.error(...)
     end
 
     while true do

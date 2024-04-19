@@ -268,6 +268,10 @@ function m.listen(mode, socketPort)
             return true
         end
 
+        function server:on_error(...)
+            log.error(...)
+        end
+
         pub.task('loadProtoBySocket', {
             port = socketPort,
             unixPath = unixPath,

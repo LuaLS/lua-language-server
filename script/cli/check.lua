@@ -1,4 +1,4 @@
-local lclient  = require 'lclient'
+local lclient  = require 'lclient'()
 local furi     = require 'file-uri'
 local ws       = require 'workspace'
 local files    = require 'files'
@@ -41,8 +41,14 @@ util.enableCloseFunction()
 
 local lastClock   = os.clock()
 local results = {}
+
+local function errorhandler(err)
+	print(err)
+	print(debug.traceback())
+end
+
 ---@async
-lclient():start(function (client)
+xpcall(lclient.start, errorhandler, lclient, function (client)
     client:registerFakers()
 
     client:initialize {

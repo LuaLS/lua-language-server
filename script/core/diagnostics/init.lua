@@ -94,8 +94,9 @@ end
 ---@param name string
 ---@param isScopeDiag boolean
 ---@param response async fun(result: any)
+---@param ignoreFileOpenState? boolean
 ---@return boolean
-local function check(uri, name, isScopeDiag, response)
+local function check(uri, name, isScopeDiag, response, ignoreFileOpenState)
     local disables = config.get(uri, 'Lua.diagnostics.disable')
     if util.arrayHas(disables, name) then
         return false
@@ -107,7 +108,7 @@ local function check(uri, name, isScopeDiag, response)
         return false
     end
 
-    if status == 'Opened' and not files.isOpen(uri) then
+    if not ignoreFileOpenState and status == 'Opened' and not files.isOpen(uri) then
         return false
     end
 
@@ -167,7 +168,8 @@ end
 ---@param isScopeDiag boolean
 ---@param response async fun(result: any)
 ---@param checked? async fun(name: string)
-return function (uri, isScopeDiag, response, checked)
+---@param ignoreFileOpenState? boolean
+return function (uri, isScopeDiag, response, checked, ignoreFileOpenState)
     local ast = files.getState(uri)
     if not ast then
         return nil
@@ -176,7 +178,7 @@ return function (uri, isScopeDiag, response, checked)
     for _, name in ipairs(buildDiagList()) do
         await.delay()
         local clock = os.clock()
-        local suc = check(uri, name, isScopeDiag, response)
+        local suc = check(uri, name, isScopeDiag, response, ignoreFileOpenState)
         if suc then
             local cost = os.clock() - clock
             diagCosts[name] = (diagCosts[name] or 0) + cost

@@ -1209,7 +1209,7 @@ m.register '$/status/click' {
         if result == titleDiagnostic then
             local diagnostic = require 'provider.diagnostic'
             for _, scp in ipairs(workspace.folders) do
-                diagnostic.diagnosticsScope(scp.uri, true)
+                diagnostic.diagnosticsScope(scp.uri, true, true)
             end
         elseif result == 'Restart Server' then
             local diag = require 'provider.diagnostic'

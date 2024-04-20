@@ -76,8 +76,10 @@ lclient():start(function (client)
     for i, uri in ipairs(uris) do
         files.open(uri)
         diag.doDiagnostic(uri, true)
-        if os.clock() - lastClock > 0.2 then
+		-- Print regularly but always print the last entry to ensure that logs written to files don't look incomplete.
+        if os.clock() - lastClock > 0.2 or i == #uris then
             lastClock = os.clock()
+			client:update()
             local output = '\x0D'
                         .. ('>'):rep(math.ceil(i / max * 20))
                         .. ('='):rep(20 - math.ceil(i / max * 20))
@@ -85,6 +87,16 @@ lclient():start(function (client)
                         .. ('0'):rep(#tostring(max) - #tostring(i))
                         .. tostring(i) .. '/' .. tostring(max)
             io.write(output)
+			local filesWithErrors = 0
+			local errors = 0
+			for _, diags in pairs(results) do
+				filesWithErrors = filesWithErrors + 1
+				errors = errors + #diags
+			end
+			if errors > 0 then
+				local errorDetails = ' [' .. lang.script('CLI_CHECK_PROGRESS', errors, filesWithErrors) .. ']'
+				io.write(errorDetails)
+			end
             io.flush()
         end
     end

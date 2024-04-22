@@ -646,6 +646,8 @@ CLI_CHECK_INITING =
 '正在初始化...'
 CLI_CHECK_SUCCESS =
 '診斷完成，沒有發現問題'
+CLI_CHECK_PROGRESS = -- TODO: need translate!
+'Found {} problems in {} files'
 CLI_CHECK_RESULTS =
 '診斷完成，共有 {} 個問題，請查看 {}'
 CLI_DOC_INITING   = -- TODO: need translate!

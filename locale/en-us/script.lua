@@ -646,6 +646,8 @@ CLI_CHECK_INITING =
 'Initializing ...'
 CLI_CHECK_SUCCESS =
 'Diagnosis completed, no problems found'
+CLI_CHECK_PROGRESS =
+'Found {} problems in {} files'
 CLI_CHECK_RESULTS =
 'Diagnosis complete, {} problems found, see {}'
 CLI_DOC_INITING   =

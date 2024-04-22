@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.8.0
+`2024-4-22`
 * `NEW` supports tuple type (@[lizho])
   ```lua
   ---@type [string, number, boolean]

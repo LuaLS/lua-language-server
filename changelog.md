@@ -1,6 +1,24 @@
 # changelog
 
-## 3.7.5
+## 3.8.0
+* `NEW` supports tuple type (@[lizho])
+  ```lua
+  ---@type [string, number, boolean]
+  local t
+
+  local x = t[1] --> x is `string`
+  local y = t[2] --> y is `number`
+  local z = t[3] --> z is `boolean`
+  ```
+* `NEW` generic pattern (@[fesily])
+  ```lua
+  ---@generic T
+  ---@param t Cat.`T`
+  ---@return T
+  local function f(t) end
+
+  local t = f('Smile') --> t is `Cat.Smile`
+  ```
 * `NEW` alias and enums supports attribute `partial`
   ```lua
   ---@alias Animal Cat
@@ -32,6 +50,17 @@
   code = 'WARN'  --> OK
 
   ```
+* `NEW` plugin: add `OnTransFormAst` interface (@[fesily])
+* `NEW` plugin: add `OnNodeCompileFunctionParam` interface (@[fesily])
+* `NEW` plugin: add `ResolveRequire` interface (@[Artem Dzhemesiuk])
+* `NEW` plugin: support multi plugins (@[fesily])
+  + setting: `Lua.runtime.plugin` can be `string|string[]`
+  + setting: `Lua.runtime.pluginArgs` can be `string[]|table<string, string>`
+* `NEW` CLI: `--doc` add option `--doc_out_path <PATH>` (@[Andreas Matthias])
+* `NEW` CLI: `--doc_update`, update an existing `doc.json` without using `--doc` again (@[Andreas Matthias])
+* `NEW` CLI: `--trust_all_plugins`, this is potentially unsafe for normal use and meant for usage in CI environments only (@[Paul Emmerich])
+* `CHG` CLI: `--check` will run plugins (@[Daniel Farrell])
+* `FIX` diagnostic: `discard-returns` not works in some blocks (@Jakub)
 * `FIX` rename in library files
 
 ## 3.7.4
@@ -1997,3 +2026,11 @@ f( -- view comments of `1` and `2` in completion
 `2020-11-9`
 
 * `NEW` implementation, NEW start!
+
+<!-- contributors -->
+[lizho]: (https://github.com/lizho)
+[fesily]: (https://github.com/fesily)
+[Andreas Matthias]: (https://github.com/AndreasMatthias)
+[Daniel Farrell]: (https://github.com/danpf)
+[Paul Emmerich]: (https://github.com/emmericp)
+[Artem Dzhemesiuk]: (https://github.com/zziger)

@@ -60,7 +60,7 @@
 * `NEW` CLI: `--doc_update`, update an existing `doc.json` without using `--doc` again (@[Andreas Matthias])
 * `NEW` CLI: `--trust_all_plugins`, this is potentially unsafe for normal use and meant for usage in CI environments only (@[Paul Emmerich])
 * `CHG` CLI: `--check` will run plugins (@[Daniel Farrell])
-* `FIX` diagnostic: `discard-returns` not works in some blocks (@Jakub)
+* `FIX` diagnostic: `discard-returns` not works in some blocks (@clay-golem)
 * `FIX` rename in library files
 
 ## 3.7.4
@@ -2034,3 +2034,4 @@ f( -- view comments of `1` and `2` in completion
 [Daniel Farrell]: (https://github.com/danpf)
 [Paul Emmerich]: (https://github.com/emmericp)
 [Artem Dzhemesiuk]: (https://github.com/zziger)
+[clay-golem]: (https://github.com/clay-golem)

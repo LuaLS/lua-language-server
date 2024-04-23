@@ -48,6 +48,8 @@ config.diagnostics.disable        =
 "禁用的诊断（使用浮框括号内的代码）。"
 config.diagnostics.globals        =
 "已定义的全局变量。"
+config.diagnostics.globalsRegex   = -- TODO: need translate!
+"Find defined global variables using regex."
 config.diagnostics.severity       =
 [[
 修改诊断等级。

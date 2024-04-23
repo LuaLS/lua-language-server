@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.8.3
+`2024-4-23`
 * `FIX` server may crash when the workspace is using a non-English path.
 
 ## 3.8.2

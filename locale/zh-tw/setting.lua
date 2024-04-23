@@ -48,6 +48,8 @@ config.diagnostics.disable        =
 "停用的診斷（使用浮框括號內的程式碼）。"
 config.diagnostics.globals        =
 "已定義的全域變數。"
+config.diagnostics.globalsRegex   = -- TODO: need translate!
+"Find defined global variables using regex."
 config.diagnostics.severity       =
 [[
 修改診斷等級。

@@ -48,6 +48,8 @@ config.diagnostics.disable        = -- TODO: need translate!
 "Disabled diagnostic (Use code in hover brackets)."
 config.diagnostics.globals        = -- TODO: need translate!
 "Defined global variables."
+config.diagnostics.globalsRegex   = -- TODO: need translate!
+"Find defined global variables using regex."
 config.diagnostics.severity       = -- TODO: need translate!
 [[
 Modify the diagnostic severity.

@@ -1,5 +1,8 @@
 # changelog
 
+## 3.8.3
+* `FIX` server may crash when the workspace is using a non-English path.
+
 ## 3.8.2
 `2024-4-23`
 * This is a fake version only for the new version of VSCode, with a core of 3.8.0.

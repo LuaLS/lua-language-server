@@ -1,5 +1,9 @@
 # changelog
 
+## 3.8.1
+`2024-4-23`
+* This is a fake version only for the old version of VSCode, with a core of `3.7.4`. Starting from the next minor version, the version requirement for VSCode will be raised to prevent users still using the old version of VSCode from updating to the new version and experiencing compatibility issues.
+
 ## 3.8.0
 `2024-4-22`
 * `NEW` supports tuple type (@[lizho])

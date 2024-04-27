@@ -8,6 +8,11 @@ if _G['CHECK'] then
     os.exit(0, true)
 end
 
+if _G['CHECK_WORKER'] then
+    require 'cli.check_worker'
+    os.exit(0, true)
+end
+
 if _G['DOC_UPDATE'] then
     require 'cli.doc' .runCLI()
     os.exit(0, true)

@@ -1,7 +1,24 @@
-local thread = require 'bee.thread'
+local channel = require 'bee.channel'
+local select = require 'bee.select'
 
-local taskPad = thread.channel('taskpad')
-local waiter  = thread.channel('waiter')
+local function channel_init(chan)
+    local selector = select.create()
+    selector:event_add(chan:fd(), select.SELECT_READ)
+    return { selector, chan }
+end
+
+local function channel_bpop(ctx)
+    local selector, chan = ctx[1], ctx[2]
+    for _ in selector:wait() do
+        local r = table.pack(chan:pop())
+        if r[1] == true then
+            return table.unpack(r, 2)
+        end
+    end
+end
+
+local taskPad = channel_init(channel.query('taskpad'))
+local waiter  = channel.query('waiter')
 
 ---@class pub_brave
 local m = {}
@@ -42,11 +59,11 @@ end
 
 --- 开始找工作
 function m.start(privatePad)
-    local reqPad = privatePad and thread.channel('req:' .. privatePad) or taskPad
-    local resPad = privatePad and thread.channel('res:' .. privatePad) or waiter
+    local reqPad = privatePad and channel_init(channel.query('req:' .. privatePad)) or taskPad
+    local resPad = privatePad and channel.query('res:' .. privatePad) or waiter
     m.push('mem', collectgarbage 'count')
     while true do
-        local name, id, params = reqPad:bpop()
+        local name, id, params = channel_bpop(reqPad)
         local ability = m.ability[name]
         -- TODO
         if not ability then

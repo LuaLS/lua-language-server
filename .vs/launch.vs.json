@@ -1,0 +1,16 @@
+{
+  "version": "0.2.1",
+  "defaults": {},
+  "configurations": [
+    {
+      "type": "native",
+      "name": "debug",
+      "project": "bin\\lua-language-server.exe",
+      "args": [
+        "test.lua"
+      ],
+      "currentDir": ".",
+      "projectTarget": ""
+    }
+  ]
+}

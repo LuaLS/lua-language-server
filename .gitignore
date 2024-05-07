@@ -6,3 +6,6 @@
 !/meta/3rd
 !/meta/whimsical
 /bin*
+/.vs/*
+!/.vs/launch.vs.json
+!/.vs/tasks.vs.json

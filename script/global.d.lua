@@ -98,3 +98,11 @@ FORCE_ACCEPT_WORKSPACE = false
 -- Trust all plugins that are being loaded by workspace config files.
 -- This is potentially unsafe for normal use and meant for usage in CI environments only.
 TRUST_ALL_PLUGINS = false
+
+NUM_THREADS = 1
+
+THREAD_ID = 1
+
+CHECK_WORKER = ''
+
+QUIET = false

@@ -1,9 +1,16 @@
 -- Handles loading environment arguments
 
+---Convert a string to boolean
+---@param v string
+local function strToBool(v)
+    return v == "true"
+end
+
 ---ENV args are defined here.
 ---- `name` is the ENV arg name
 ---- `key` is the value used to index `_G` for setting the argument
----@type { name: string, key: string }[]
+---- `converter` if present, will be used to convert the string value into another type
+---@type { name: string, key: string, converter: fun(value: string): any }[]
 local vars = {
     {
         name = "LLS_CHECK_LEVEL",
@@ -15,7 +22,7 @@ local vars = {
     },
     {
         name = "LLS_CONFIG_PATH",
-        key = "CONFIGPATH"
+        key = "CONFIGPATH",
     },
     {
         name = "LLS_DOC_OUT_PATH",
@@ -27,7 +34,8 @@ local vars = {
     },
     {
         name = "LLS_FORCE_ACCEPT_WORKSPACE",
-        key = "FORCE_ACCEPT_WORKSPACE"
+        key = "FORCE_ACCEPT_WORKSPACE",
+        converter = strToBool,
     },
     {
         name = "LLS_LOCALE",
@@ -43,13 +51,17 @@ local vars = {
     },
     {
         name = "LLS_META_PATH",
-        key = "METAPATH"
-    }
+        key = "METAPATH",
+    },
 }
 
 for _, var in ipairs(vars) do
     local value = os.getenv(var.name)
     if value then
+        if var.converter then
+            value = var.converter(value)
+        end
+
         _G[var.key] = value
     end
 end

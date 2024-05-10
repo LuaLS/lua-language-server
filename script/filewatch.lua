@@ -1,6 +1,7 @@
 local fw    = require 'bee.filewatch'
 local fs    = require 'bee.filesystem'
 local plat  = require 'bee.platform'
+local sys   = require 'bee.sys'
 local await = require 'await'
 local files = require 'files'
 
@@ -16,7 +17,7 @@ local function isExists(filename)
     if plat.os ~= 'windows' then
         return true
     end
-    local res = fs.fullpath(path)
+    local res = sys.fullpath(path)
     if not res then
         return false
     end

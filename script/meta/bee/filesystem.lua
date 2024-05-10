@@ -1,4 +1,4 @@
----@meta
+---@meta bee.filesystem
 
 ---@class fs.path
 ---@operator div: fs.path
@@ -71,11 +71,6 @@ end
 ---@param path fs.path
 ---@return fs.path
 function fs.canonical(path)
-end
-
----@param path fs.path
----@return fs.path
-function fs.fullpath(path)
 end
 
 ---@param path fs.path

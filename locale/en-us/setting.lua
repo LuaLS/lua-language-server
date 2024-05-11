@@ -442,3 +442,7 @@ command.addon_manager.open =
 'Lua: Open Addon Manager ...'
 command.reloadFFIMeta =
 'Lua: Reload luajit ffi meta'
+command.startServer =
+'Lua: (debug) Start Language Server'
+command.stopServer =
+'Lua: (debug) Stop Language Server'

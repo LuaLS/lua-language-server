@@ -550,9 +550,12 @@ local function matchCall(source)
     or call.node ~= source then
         return
     end
-    local funcs = vm.getMatchedFunctions(source, call.args)
     local myNode = vm.getNode(source)
     if not myNode then
+        return
+    end
+    local funcs = vm.getExactMatchedFunctions(source, call.args)
+    if not funcs then
         return
     end
     local needRemove

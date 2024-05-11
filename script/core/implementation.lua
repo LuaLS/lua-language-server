@@ -78,6 +78,7 @@ local function convertIndex(source)
     return source
 end
 
+---@async
 return function (uri, offset)
     local ast = files.getState(uri)
     if not ast then
@@ -91,9 +92,12 @@ return function (uri, offset)
 
     local results = {}
 
-    local defs = vm.getDefs(source)
+    local defs = vm.getRefs(source)
 
     for _, src in ipairs(defs) do
+        if not guide.isAssign(src) then
+            goto CONTINUE
+        end
         if src.type == 'global' then
             goto CONTINUE
         end

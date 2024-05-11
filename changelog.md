@@ -1,5 +1,8 @@
 # changelog
 
+## 3.8.4
+* `NEW` goto implementation
+
 ## 3.8.3
 `2024-4-23`
 * `FIX` server may crash when the workspace is using a non-English path.

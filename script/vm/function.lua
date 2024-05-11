@@ -267,6 +267,9 @@ end
 ---@return integer def
 function vm.countReturnsOfCall(func, args, mark)
     local funcs = vm.getMatchedFunctions(func, args, mark)
+    if not funcs then
+        return 0, math.huge, 0
+    end
     ---@type integer?, number?, integer?
     local min, max, def
     for _, f in ipairs(funcs) do
@@ -329,10 +332,52 @@ function vm.countList(list, mark)
     return min, max, def
 end
 
+---@param uri uri
+---@param args parser.object[]
+---@return boolean
+local function isAllParamMatched(uri, args, params)
+    if not params then
+        return false
+    end
+    for i = 1, #args do
+        if not params[i] then
+            break
+        end
+        local argNode = vm.compileNode(args[i])
+        local defNode = vm.compileNode(params[i])
+        if not vm.canCastType(uri, defNode, argNode) then
+            return false
+        end
+    end
+    return true
+end
+
 ---@param func parser.object
----@param args parser.object[]?
+---@param args? parser.object[]
+---@return parser.object[]?
+function vm.getExactMatchedFunctions(func, args)
+    local funcs = vm.getMatchedFunctions(func, args)
+    if not args or not funcs then
+        return funcs
+    end
+    local uri = guide.getUri(func)
+    local result = {}
+    for _, n in ipairs(funcs) do
+        if not vm.isVarargFunctionWithOverloads(n)
+        and isAllParamMatched(uri, args, n.args) then
+            result[#result+1] = n
+        end
+    end
+    if #result == 0 then
+        return nil
+    end
+    return result
+end
+
+---@param func parser.object
+---@param args? parser.object[]
 ---@param mark? table
----@return parser.object[]
+---@return parser.object[]?
 function vm.getMatchedFunctions(func, args, mark)
     local funcs = {}
     local node = vm.compileNode(func)
@@ -341,9 +386,6 @@ function vm.getMatchedFunctions(func, args, mark)
         or n.type == 'doc.type.function' then
             funcs[#funcs+1] = n
         end
-    end
-    if #funcs <= 1 then
-        return funcs
     end
 
     local amin, amax = vm.countList(args, mark)
@@ -357,7 +399,7 @@ function vm.getMatchedFunctions(func, args, mark)
     end
 
     if #matched == 0 then
-        return funcs
+        return nil
     else
         return matched
     end

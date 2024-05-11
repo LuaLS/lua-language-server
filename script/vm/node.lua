@@ -16,6 +16,7 @@ vm.nodeCache = setmetatable({}, util.MODE_K)
 ---@field [vm.node.object] true
 ---@field fields? table<vm.node|string, vm.node>
 ---@field undefinedGlobal boolean?
+---@field lastInfer? vm.infer
 local mt = {}
 mt.__index    = mt
 mt.id         = 0
@@ -31,6 +32,7 @@ function mt:merge(node)
     if not node then
         return self
     end
+    self.lastInfer = nil
     if node.type == 'vm.node' then
         if node == self then
             return self

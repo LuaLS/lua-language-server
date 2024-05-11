@@ -1,7 +1,16 @@
 # changelog
 
-## 3.8.4
+## 3.9.0
 * `NEW` goto implementation
+* `NEW` narrow the function prototype based on the parameter type
+  ```lua
+  ---@overload fun(a: boolean): A
+  ---@overload fun(a: number): B
+  local function f(...) end
+
+  local r1 = f(true) --> r1 is `A`
+  local r2 = f(10) --> r2 is `B`
+  ```
 
 ## 3.8.3
 `2024-4-23`

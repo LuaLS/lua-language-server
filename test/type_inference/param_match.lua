@@ -105,3 +105,35 @@ local r1
 
 local <?x?> = f(r1())
 ]]
+
+TEST '1' [[
+---@overload fun(a: 'x'): 1
+---@overload fun(a: 'y'): 2
+local function f(...) end
+
+local <?r?> = f('x')
+]]
+
+TEST '2' [[
+---@overload fun(a: 'x'): 1
+---@overload fun(a: 'y'): 2
+local function f(...) end
+
+local <?r?> = f('y')
+]]
+
+TEST '1' [[
+---@overload fun(a: boolean): 1
+---@overload fun(a: number): 2
+local function f(...) end
+
+local <?r?> = f(true)
+]]
+
+TEST '2' [[
+---@overload fun(a: boolean): 1
+---@overload fun(a: number): 2
+local function f(...) end
+
+local <?r?> = f(10)
+]]

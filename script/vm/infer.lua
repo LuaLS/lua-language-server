@@ -242,9 +242,6 @@ local viewNodeSwitch;viewNodeSwitch = util.switch()
         return vm.viewKey(source, uri)
     end)
 
----@class vm.node
----@field lastInfer? vm.infer
-
 ---@param node? vm.node
 ---@return vm.infer
 local function createInfer(node)

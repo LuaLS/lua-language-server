@@ -17,6 +17,7 @@ local function channel_bpop(ctx)
                 return table.unpack(r, 2)
             end
         end
+        thread.sleep(10)
     end
 end
 

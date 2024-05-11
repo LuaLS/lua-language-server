@@ -1,6 +1,7 @@
 # changelog
 
 ## 3.9.0
+`2024-5-11`
 * `NEW` goto implementation
 * `NEW` narrow the function prototype based on the parameter type
   ```lua

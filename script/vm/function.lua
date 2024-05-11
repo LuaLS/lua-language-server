@@ -337,7 +337,7 @@ function vm.getMatchedFunctions(func, args, mark)
     local funcs = {}
     local node = vm.compileNode(func)
     for n in node:eachObject() do
-        if (n.type == 'function' and not vm.isVarargFunctionWithOverloads(n))
+        if n.type == 'function'
         or n.type == 'doc.type.function' then
             funcs[#funcs+1] = n
         end

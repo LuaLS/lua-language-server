@@ -94,10 +94,7 @@ local function isEventNotMatch(call, src)
         return false
     end
     local literal, index
-    for i = 1, 2 do
-        if not call.args[i] then
-            break
-        end
+    for i = 1, #call.args do
         literal = guide.getLiteral(call.args[i])
         if literal then
             index = i

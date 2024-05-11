@@ -15,7 +15,7 @@ local function getFieldEventName(doc)
     if docFunc.type ~= 'doc.type.function' then
         return nil
     end
-    for i = 1, 2 do
+    for i = 1, #docFunc.args do
         local arg = docFunc.args[i]
         if  arg
         and arg.extends

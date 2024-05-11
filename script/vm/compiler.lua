@@ -873,7 +873,7 @@ local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
     ---@type integer?, table<any, boolean>?
     local eventIndex, eventMap
     if call.args then
-        for i = 1, 2 do
+        for i = 1, 10 do
             local eventArg = call.args[i + fixIndex]
             if not eventArg then
                 break

@@ -21,6 +21,49 @@ require "make.detect_platform"
 lm:import "3rd/bee.lua/make.lua"
 lm:import "make/code_format.lua"
 
+lm:copy 'ltask-script' {
+    inputs = {
+        "3rd/ltask/lualib/bootstrap.lua",
+        "3rd/ltask/lualib/service.lua",
+        "3rd/ltask/service/timer.lua",
+        "3rd/ltask/service/root.lua",
+    },
+    outputs = {
+        "script/ltask/bootstrap.lua",
+        "script/ltask/service.lua",
+        "script/ltask/service/timer.lua",
+        "script/ltask/service/root.lua",
+    },
+}
+
+lm:source_set 'ltask' {
+    deps = "ltask-script",
+    rootdir = '3rd',
+    c = "c11",
+    includes = "bee.lua/3rd/lua",
+    sources = {
+        "ltask/src/*.c",
+        "!ltask/src/lua-seri.c",
+    },
+    defines = {
+        --"DEBUGLOG",
+        lm.mode=="debug" and "DEBUGTHREADNAME",
+    },
+    windows = {
+        defines = {
+            "_WIN32_WINNT=0x0601"
+        },
+    },
+    msvc = {
+        flags = {
+            "/experimental:c11atomics"
+        },
+    },
+    gcc = {
+        defines = "_XOPEN_SOURCE=600",
+    }
+}
+
 lm:source_set 'lpeglabel' {
     rootdir = '3rd',
     includes = "bee.lua/3rd/lua",
@@ -36,6 +79,7 @@ lm:executable "lua-language-server" {
         "source_lua",
         "source_bootstrap",
         "lpeglabel",
+        "ltask",
         includeCodeFormat and "code_format" or nil,
     },
     includes = {

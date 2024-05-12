@@ -1,3 +1,8 @@
+if not package.loaded["ltask"] then
+    require "ltask.init"
+    return
+end
+
 local fs      = require 'bee.filesystem'
 local util    = require 'utility'
 local version = require 'version'

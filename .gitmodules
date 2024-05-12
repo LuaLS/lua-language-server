@@ -61,3 +61,6 @@
 [submodule "meta/3rd/luv"]
 	path = meta/3rd/luv
   url = https://github.com/LuaCATS/luv.git
+[submodule "3rd/ltask"]
+	path = 3rd/ltask
+	url = https://github.com/cloudwu/ltask

@@ -1,6 +1,7 @@
 ---@class vm
 local vm    = require 'vm.vm'
 local guide = require 'parser.guide'
+local util  = require 'utility'
 
 ---@param arg parser.object
 ---@return parser.object?
@@ -360,18 +361,28 @@ function vm.getExactMatchedFunctions(func, args)
     if not args or not funcs then
         return funcs
     end
+    if #funcs == 1 then
+        return funcs
+    end
     local uri = guide.getUri(func)
-    local result = {}
-    for _, n in ipairs(funcs) do
-        if not vm.isVarargFunctionWithOverloads(n)
-        and isAllParamMatched(uri, args, n.args) then
-            result[#result+1] = n
+    local needRemove
+    for i, n in ipairs(funcs) do
+        if vm.isVarargFunctionWithOverloads(n)
+        or not isAllParamMatched(uri, args, n.args) then
+            if not needRemove then
+                needRemove = {}
+            end
+            needRemove[#needRemove+1] = i
         end
     end
-    if #result == 0 then
+    if not needRemove then
+        return funcs
+    end
+    if #needRemove == #funcs then
         return nil
     end
-    return result
+    util.tableMultiRemove(funcs, needRemove)
+    return funcs
 end
 
 ---@param func parser.object
@@ -414,23 +425,31 @@ function vm.isVarargFunctionWithOverloads(func)
     if not func.args then
         return false
     end
+    if func._varargFunction ~= nil then
+        return func._varargFunction
+    end
     if func.args[1] and func.args[1].type == 'self' then
         if not func.args[2] or func.args[2].type ~= '...' then
+            func._varargFunction = false
             return false
         end
     else
         if not func.args[1] or func.args[1].type ~= '...' then
+            func._varargFunction = false
             return false
         end
     end
     if not func.bindDocs then
+        func._varargFunction = false
         return false
     end
     for _, doc in ipairs(func.bindDocs) do
         if doc.type == 'doc.overload' then
+            func._varargFunction = true
             return true
         end
     end
+    func._varargFunction = false
     return false
 end
 

@@ -1,8 +1,3 @@
-if not package.loaded["ltask"] then
-    require "ltask"
-    return
-end
-
 local fs      = require 'bee.filesystem'
 local util    = require 'utility'
 local version = require 'version'
@@ -82,6 +77,4 @@ xpcall(dofile, log.debug, (ROOT / 'debugger.lua'):string())
 
 require 'cli'
 
-local _, service = xpcall(require, log.error, 'service')
-
-service.start()
+xpcall(require, log.error, 'ltask2')

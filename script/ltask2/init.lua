@@ -1,7 +1,7 @@
 local boot = require "ltask.bootstrap"
 
 local function searchpath(name)
-    return assert(package.searchpath(name, "script/ltask/?.lua"))
+    return assert(package.searchpath(name, (ROOT / 'script/ltask2/lualib/?.lua'):string()))
 end
 
 local function readall(path)
@@ -18,8 +18,19 @@ local root_config = {
             unique = true,
         },
         {
+            name = "logger",
+            unique = true,
+            args = {
+                LOGPATH = LOGPATH,
+            }
+        },
+        {
             name = "main",
-            args = { arg },
+            args = {
+                ROOT     = ROOT:string(),
+                LOGPATH  = LOGPATH,
+                METAPATH = METAPATH,
+            },
         },
     },
     service_source = readall(servicepath),
@@ -28,23 +39,24 @@ local root_config = {
 local name = ...
 package.path = [[${lua_path}]]
 package.cpath = [[${lua_cpath}]]
-local filename, err = package.searchpath(name, "${service_path}")
+local filename, err = package.searchpath(name, package.path)
 if not filename then
-	return nil, err
+    return nil, err
 end
 return loadfile(filename)
 ]=]):gsub("%$%{([^}]*)%}", {
         lua_path = package.path,
         lua_cpath = package.cpath,
-        service_path = "script/ltask/service/?.lua",
+        service_path = (ROOT / "script/ltask2/service/?.lua"):string(),
     }),
 }
 
 boot.init_socket()
-local bootstrap = dofile(searchpath "bootstrap")
+local bootstrap = require 'ltask2.lualib.bootstrap'
 local ctx = bootstrap.start {
     core = {},
     root = root_config,
     root_initfunc = root_config.initfunc,
 }
+
 bootstrap.wait(ctx)

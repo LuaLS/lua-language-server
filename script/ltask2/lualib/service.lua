@@ -1,3 +1,4 @@
+---@diagnostic disable: await-in-sync
 local SERVICE_ROOT <const> = 1
 
 local MESSAGE_SYSTEM <const> = 0
@@ -797,7 +798,7 @@ local function error_handler(errobj)
 end
 
 function sys_service.init(t)
-	local ok, errobj = xpcall(sys_service_init, error_handler, t)
+	local ok, errobj = xpcall(sys_service_init, debug.traceback, t)
 	if not ok then
 		ltask.quit()
 		rethrow_error(1, errobj)
@@ -840,7 +841,7 @@ SESSION[MESSAGE_SYSTEM] = function (type, msg, sz)
 end
 
 local function request(command, ...)
-	local s = service[command]
+	local s = service and service[command]
 	if not s then
 		error("Unknown request message : " .. command)
 		return

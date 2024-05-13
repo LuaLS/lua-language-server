@@ -33,6 +33,7 @@ local root_config = {
                     ROOT     = ROOT:string(),
                     LOGPATH  = LOGPATH,
                     METAPATH = METAPATH,
+                    LOGLEVEL = LOGLEVEL,
                 }
             },
         },

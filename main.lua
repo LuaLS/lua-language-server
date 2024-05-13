@@ -60,7 +60,7 @@ collectgarbage('generational', 10, 50)
 
 ---@diagnostic disable-next-line: lowercase-global
 log = require 'log'
-log.init(ROOT, fs.path(LOGPATH) / 'service.log')
+log.init(ROOT, fs.path(LOGPATH) / 'startup.log')
 if LOGLEVEL then
     log.level = tostring(LOGLEVEL):lower()
 end
@@ -70,8 +70,6 @@ log.info('ROOT:', ROOT:string())
 log.info('LOGPATH:', LOGPATH)
 log.info('METAPATH:', METAPATH)
 log.info('VERSION:', version.getVersion())
-
-require 'tracy'
 
 xpcall(dofile, log.debug, (ROOT / 'debugger.lua'):string())
 

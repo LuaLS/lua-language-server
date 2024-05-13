@@ -14,11 +14,11 @@ local servicepath = searchpath "service"
 local root_config = {
     bootstrap = {
         {
-            name = "timer",
+            name = "ltask2.lualib.timer",
             unique = true,
         },
         {
-            name = "logger",
+            name = "ltask2.lualib.logger",
             unique = true,
             args = {
                 LOGPATH = LOGPATH,
@@ -47,7 +47,6 @@ return loadfile(filename)
 ]=]):gsub("%$%{([^}]*)%}", {
         lua_path = package.path,
         lua_cpath = package.cpath,
-        service_path = (ROOT / "script/ltask2/service/?.lua"):string(),
     }),
 }
 
@@ -60,3 +59,4 @@ local ctx = bootstrap.start {
 }
 
 bootstrap.wait(ctx)
+print('bootstrap.wait(ctx) 结束！')

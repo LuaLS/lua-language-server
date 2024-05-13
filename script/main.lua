@@ -6,5 +6,4 @@ LOGPATH  = args.LOGPATH
 METAPATH = args.METAPATH
 
 local _, service = xpcall(require, log.error, 'service')
-
 service.start()

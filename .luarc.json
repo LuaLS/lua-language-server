@@ -41,7 +41,7 @@
             "/3rd",
             "/.vscode",
             "/meta",
-            "script/ltask/lualib"
+            "/script/ltask2/lualib"
         ],
         "checkThirdParty": false
     },

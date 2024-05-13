@@ -1,5 +1,5 @@
 if not package.loaded["ltask"] then
-    require "ltask.init"
+    require "ltask"
     return
 end
 

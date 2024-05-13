@@ -15,7 +15,7 @@ local function writelog()
 		local tsec = ti // 100
 		local msec = ti % 100
 		local level, message = ltask.unpack_remove(msg, sz)
-		io.write(string.format("[%s.%02d][%-5s]%s\n", os.date("%Y-%m-%d %H:%M:%S", tsec), msec, level:upper(), message))
+		--io.write(string.format("[%s.%02d][%-5s]%s\n", os.date("%Y-%m-%d %H:%M:%S", tsec), msec, level:upper(), message))
 		flush = true
 	end
 end

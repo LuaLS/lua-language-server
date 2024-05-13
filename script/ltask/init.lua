@@ -18,10 +18,6 @@ local root_config = {
             unique = true,
         },
         {
-            name = "logger",
-            unique = true,
-        },
-        {
             name = "main",
             args = { arg },
         },

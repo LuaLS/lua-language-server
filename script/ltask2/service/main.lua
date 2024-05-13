@@ -5,5 +5,6 @@ ROOT     = fs.path(args.ROOT)
 LOGPATH  = args.LOGPATH
 METAPATH = args.METAPATH
 
+local log = require 'brave.log'
 local _, service = xpcall(require, log.error, 'service')
 service.start()

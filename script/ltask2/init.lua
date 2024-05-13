@@ -14,22 +14,26 @@ local servicepath = searchpath "service"
 local root_config = {
     bootstrap = {
         {
-            name = "ltask2.lualib.timer",
+            name = "timer",
             unique = true,
         },
         {
-            name = "ltask2.lualib.logger",
+            name = "logger",
             unique = true,
             args = {
-                LOGPATH = LOGPATH,
+                {
+                    LOGPATH = LOGPATH,
+                }
             }
         },
         {
             name = "main",
             args = {
-                ROOT     = ROOT:string(),
-                LOGPATH  = LOGPATH,
-                METAPATH = METAPATH,
+                {
+                    ROOT     = ROOT:string(),
+                    LOGPATH  = LOGPATH,
+                    METAPATH = METAPATH,
+                }
             },
         },
     },
@@ -39,7 +43,7 @@ local root_config = {
 local name = ...
 package.path = [[${lua_path}]]
 package.cpath = [[${lua_cpath}]]
-local filename, err = package.searchpath(name, package.path)
+local filename, err = package.searchpath(name, [[${service_path}]])
 if not filename then
     return nil, err
 end
@@ -47,6 +51,7 @@ return loadfile(filename)
 ]=]):gsub("%$%{([^}]*)%}", {
         lua_path = package.path,
         lua_cpath = package.cpath,
+        service_path = (ROOT / 'script/ltask2/service/?.lua'):string()
     }),
 }
 

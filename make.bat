@@ -1,6 +1,7 @@
 git submodule update --init --recursive
 cd 3rd\luamake
 call compile\install.bat
+call compile\build.bat
 cd ..\..
 IF "%~1"=="" (
     call 3rd\luamake\luamake.exe rebuild

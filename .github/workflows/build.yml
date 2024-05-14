@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - master
+      - '*.*.*'
     tags:
       - "*"
   pull_request:
@@ -40,8 +41,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu
 
-      - name: Install ninja
-        if: ${{ matrix.target == 'linux' || matrix.target == 'darwin' }}
+      - name: Prepare container for musl
+        if: ${{ matrix.target == 'linux' && matrix.libc == 'musl' }}
         run: |
           apk update
           apk add git ninja bash build-base nodejs linux-headers
@@ -51,12 +52,21 @@ jobs:
           submodules: recursive
 
       - name: Build for Windows
-        if: ${{ matrix.target == 'linux' || matrix.target == 'darwin' }}
+        if: ${{ matrix.target == 'windows' }}
         run: .\make.bat ${{ matrix.platform }}
 
-      - name: Build for Non-Windows
-        if: ${{ matrix.target == 'linux' || matrix.target == 'darwin' }}
-        run: ./make.sh ${{ matrix.platform }}
+      - name: Build for Linux
+        if: ${{ matrix.target == 'linux' }}
+        run: |
+          sudo apt update
+          sudo apt install ninja-build
+          ./make.sh ${{ matrix.platform }}
+          
+      - name: Build for macOS
+        if: ${{ matrix.target == 'darwin' }}
+        run: |
+          brew install ninja
+          ./make.sh ${{ matrix.platform }}
 
       - name: Build for x64 glibc
         if: ${{ matrix.platform == 'linux-x64' && matrix.libc != 'musl' }}

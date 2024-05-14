@@ -17,11 +17,14 @@ jobs:
       - name: Build for Windows
         if: ${{ matrix.target == 'windows' }}
         run: .\make.bat
-      - name: Install ninja
-        if: ${{ matrix.target == 'linux' || matrix.target == 'darwin' }}
+      - name: Build for Linux
+        if: ${{ matrix.target == 'linux' }}
         run: |
-          apk update
-          apk add git ninja bash build-base nodejs linux-headers
-      - name: Build for Non-Windows
-        if: ${{ matrix.target == 'linux' || matrix.target == 'darwin' }}
-        run: ./make.sh
+          sudo apt update
+          sudo apt install ninja-build
+          ./make.sh
+      - name: Build for macOS
+        if: ${{ matrix.target == 'darwin' }}
+        run: |
+          brew install ninja
+          ./make.sh

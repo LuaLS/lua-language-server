@@ -1,5 +1,9 @@
 # changelog
 
+## 3.9.1
+`2024-5-14`
+* revert extension runtime
+
 ## 3.9.0
 `2024-5-11`
 * `NEW` goto implementation

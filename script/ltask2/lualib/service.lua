@@ -14,6 +14,7 @@ local RECEIPT_BLOCK <const> = 3
 
 local SESSION_SEND_MESSAGE <const> = 0
 
+---@class ltask
 local ltask = require "ltask"
 
 local CURRENT_SERVICE <const> = ltask.self()

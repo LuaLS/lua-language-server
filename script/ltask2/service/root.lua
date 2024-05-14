@@ -20,6 +20,7 @@ local anonymous_services = {}
 local named_services = {}
 
 local root_quit = ltask.quit
+---@diagnostic disable-next-line: duplicate-set-field
 ltask.quit = function() end
 
 local function writelog()

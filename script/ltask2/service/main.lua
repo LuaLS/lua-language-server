@@ -13,7 +13,7 @@ LOGLEVEL = ENV.LOGLEVEL
 require 'tracy'
 
 ---@diagnostic disable-next-line: lowercase-global
-log = require 'log'
+log = require 'brave.log'
 log.init(ROOT, fs.path(LOGPATH) / 'service.log')
 if LOGLEVEL then
     log.level = tostring(LOGLEVEL):lower()

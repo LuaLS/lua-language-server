@@ -1,5 +1,5 @@
-local brave          = require 'brave'
 local time           = require 'bee.time'
+local ltask          = require 'ltask'
 
 local tablePack      = table.pack
 local tostring       = tostring
@@ -7,6 +7,8 @@ local tableConcat    = table.concat
 local debugTraceBack = debug.traceback
 local debugGetInfo   = debug.getinfo
 local monotonic      = time.monotonic
+
+local logAddr        = ltask.queryservice('log')
 
 _ENV = nil
 
@@ -20,7 +22,7 @@ local function pushLog(level, ...)
         str = str .. '\n' .. debugTraceBack(nil, 3)
     end
     local info = debugGetInfo(3, 'Sl')
-    brave.push('log', {
+    ltask.call(logAddr, 'log', {
         level = level,
         msg   = str,
         src   = info.source,
@@ -50,6 +52,12 @@ end
 
 function m.error(...)
     pushLog('error', ...)
+end
+
+---@param root fs.path
+---@param path fs.path
+function m.init(root, path)
+    ltask.call(logAddr, 'init', root:string(), path:string())
 end
 
 return m

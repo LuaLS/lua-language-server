@@ -27,6 +27,10 @@ local root_config = {
             }
         },
         {
+            name = 'log',
+            unique = true,
+        },
+        {
             name = "main",
             args = {
                 {

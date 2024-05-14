@@ -46,7 +46,12 @@ jobs:
         run: |
           apk update
           apk add git ninja bash build-base nodejs linux-headers
-          alias sudo=''
+
+      - name: Prepare for Linux
+        if: ${{ matrix.target == 'linux' && matrix.libc != 'musl' }}
+        run: |
+          sudo apt update
+          sudo apt install ninja-build
 
       - uses: actions/checkout@v4
         with:
@@ -59,8 +64,6 @@ jobs:
       - name: Build for Linux
         if: ${{ matrix.target == 'linux' }}
         run: |
-          sudo apt update
-          sudo apt install ninja-build
           ./make.sh ${{ matrix.platform }}
           
       - name: Build for macOS

@@ -1,10 +1,14 @@
 local fs = require 'bee.filesystem'
-local args = ...
+local ENV, ARG = ...
 
-ROOT     = fs.path(args.ROOT)
-LOGPATH  = args.LOGPATH
-METAPATH = args.METAPATH
-LOGLEVEL = args.LOGLEVEL
+for k, v in pairs(ARG) do
+    _G[k] = v
+end
+
+ROOT     = fs.path(ENV.ROOT)
+LOGPATH  = ENV.LOGPATH
+METAPATH = ENV.METAPATH
+LOGLEVEL = ENV.LOGLEVEL
 
 require 'tracy'
 

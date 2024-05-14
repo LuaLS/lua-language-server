@@ -2,7 +2,7 @@ local fs      = require 'bee.filesystem'
 local util    = require 'utility'
 local version = require 'version'
 
-require 'config.env'
+ARG = require 'config.env'
 
 local function getValue(value)
     if     value == 'true' or value == nil then
@@ -38,7 +38,9 @@ local function loadArgs()
             end
         end
         if key then
-            _G[key:upper():gsub('-', '_')] = getValue(value)
+            local lkey = key:lower():gsub('-', '_')
+            _G[lkey] = getValue(value)
+            ARG[lkey] = getValue(value)
         end
     end
 end
@@ -60,7 +62,7 @@ collectgarbage('generational', 10, 50)
 
 ---@diagnostic disable-next-line: lowercase-global
 log = require 'log'
-log.init(ROOT, fs.path(LOGPATH) / 'startup.log')
+log.init(ROOT, fs.path(LOGPATH) / 'cli.log')
 if LOGLEVEL then
     log.level = tostring(LOGLEVEL):lower()
 end

@@ -55,6 +55,8 @@ local vars = {
     },
 }
 
+local env = {}
+
 for _, var in ipairs(vars) do
     local value = os.getenv(var.name)
     if value then
@@ -63,5 +65,8 @@ for _, var in ipairs(vars) do
         end
 
         _G[var.key] = value
+        env[var.key] = value
     end
 end
+
+return env

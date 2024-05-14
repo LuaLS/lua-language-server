@@ -34,7 +34,8 @@ local root_config = {
                     LOGPATH  = LOGPATH,
                     METAPATH = METAPATH,
                     LOGLEVEL = LOGLEVEL,
-                }
+                },
+                ARG,
             },
         },
     },

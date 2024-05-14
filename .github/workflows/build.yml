@@ -56,7 +56,7 @@ jobs:
         run: .\make.bat ${{ matrix.platform }}
 
       - name: Build for Linux
-        if: ${{ matrix.target == 'linux' }}
+        if: ${{ matrix.target == 'linux' && matrix.libc != 'musl' }}
         run: |
           sudo apt update
           sudo apt install ninja-build

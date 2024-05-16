@@ -11,6 +11,7 @@ local protoDiag = require 'proto.diagnostic'
 local config    = require 'config.config'
 local fs        = require 'bee.filesystem'
 local provider  = require 'provider'
+local await     = require 'await'
 require 'plugin'
 require 'vm'
 
@@ -61,6 +62,7 @@ end
 
 ---@async
 xpcall(lclient.start, errorhandler, lclient, function (client)
+    await.disable()
     client:registerFakers()
 
     client:initialize {

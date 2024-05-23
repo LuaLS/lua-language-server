@@ -48,6 +48,8 @@ config.diagnostics.disable        =
 "禁用的诊断（使用浮框括号内的代码）。"
 config.diagnostics.globals        =
 "已定义的全局变量。"
+config.diagnostics.globalsRegex   = -- TODO: need translate!
+"Find defined global variables using regex."
 config.diagnostics.severity       =
 [[
 修改诊断等级。
@@ -439,3 +441,7 @@ command.addon_manager.open =
 'Lua: 打开插件管理器...'
 command.reloadFFIMeta =
 'Lua: 重新生成luajit的FFI模块C语言元数据'
+command.startServer =
+'Lua: (debug) 启动服务器'
+command.stopServer =
+'Lua: (debug) 停止服务器'

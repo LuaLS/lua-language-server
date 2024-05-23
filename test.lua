@@ -2,7 +2,8 @@ package.path  = package.path
       .. ';./test/?.lua'
       .. ';./test/?/init.lua'
 local fs = require 'bee.filesystem'
-local rootPath = fs.exe_path():parent_path():parent_path():string()
+local sys = require 'bee.sys'
+local rootPath = sys.exe_path():parent_path():parent_path():string()
 ROOT = fs.path(rootPath)
 TEST = true
 DEVELOP = true
@@ -54,6 +55,7 @@ local function testAll()
     test 'basic'
     test 'definition'
     test 'type_inference'
+    test 'implementation'
     test 'references'
     test 'hover'
     test 'completion'

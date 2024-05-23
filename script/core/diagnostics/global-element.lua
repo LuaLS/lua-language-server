@@ -17,6 +17,20 @@ local function isDocClass(source)
     return false
 end
 
+local function isGlobalRegex(name, definedGlobalRegex)
+    if not definedGlobalRegex then
+        return false
+    end
+
+    for _, pattern in ipairs(definedGlobalRegex) do
+        if name:match(pattern) then
+            return true
+        end
+    end
+
+    return false
+end
+
 -- If global elements are discouraged by coding convention, this diagnostic helps with reminding about that
 -- Exceptions may be added to Lua.diagnostics.globals
 return function (uri, callback)
@@ -26,6 +40,7 @@ return function (uri, callback)
     end
 
     local definedGlobal = util.arrayToHash(config.get(uri, 'Lua.diagnostics.globals'))
+    local definedGlobalRegex = config.get(uri, 'Lua.diagnostics.globalsRegex')
 
     guide.eachSourceType(ast.ast, 'setglobal', function (source)
         local name = guide.getKeyName(source)
@@ -34,6 +49,9 @@ return function (uri, callback)
         end
         -- If the assignment is marked as doc.class, then it is considered allowed 
         if isDocClass(source) then
+            return
+        end
+        if isGlobalRegex(name, definedGlobalRegex) then
             return
         end
         if definedGlobal[name] == nil then

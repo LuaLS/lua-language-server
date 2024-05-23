@@ -48,6 +48,8 @@ config.diagnostics.disable        = -- TODO: need translate!
 "Disabled diagnostic (Use code in hover brackets)."
 config.diagnostics.globals        = -- TODO: need translate!
 "Defined global variables."
+config.diagnostics.globalsRegex   = -- TODO: need translate!
+"Find defined global variables using regex."
 config.diagnostics.severity       = -- TODO: need translate!
 [[
 Modify the diagnostic severity.
@@ -440,3 +442,7 @@ command.addon_manager.open = -- TODO: need translate!
 'Lua: Open Addon Manager ...'
 command.reloadFFIMeta = -- TODO: need translate!
 'Lua: Reload luajit ffi meta'
+command.startServer = -- TODO: need translate!
+'Lua: (debug) Start Language Server'
+command.stopServer = -- TODO: need translate!
+'Lua: (debug) Stop Language Server'

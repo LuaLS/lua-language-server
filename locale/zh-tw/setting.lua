@@ -48,6 +48,8 @@ config.diagnostics.disable        =
 "停用的診斷（使用浮框括號內的程式碼）。"
 config.diagnostics.globals        =
 "已定義的全域變數。"
+config.diagnostics.globalsRegex   = -- TODO: need translate!
+"Find defined global variables using regex."
 config.diagnostics.severity       =
 [[
 修改診斷等級。
@@ -439,3 +441,7 @@ command.addon_manager.open = -- TODO: need translate!
 'Lua: Open Addon Manager ...'
 command.reloadFFIMeta = -- TODO: need translate!
 'Lua: Reload luajit ffi meta'
+command.startServer = -- TODO: need translate!
+'Lua: (debug) Start Language Server'
+command.stopServer = -- TODO: need translate!
+'Lua: (debug) Stop Language Server'

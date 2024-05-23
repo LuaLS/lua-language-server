@@ -12,11 +12,14 @@ end
 
 local function channel_bpop(ctx)
     local selector, chan = ctx[1], ctx[2]
-    for _ in selector:wait() do
-        local r = table.pack(chan:pop())
-        if r[1] == true then
-            return table.unpack(r, 2)
+    while true do
+        for _ in selector:wait() do
+            local r = table.pack(chan:pop())
+            if r[1] == true then
+                return table.unpack(r, 2)
+            end
         end
+        thread.sleep(10)
     end
 end
 

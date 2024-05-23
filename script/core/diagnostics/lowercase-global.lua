@@ -17,6 +17,20 @@ local function isDocClass(source)
     return false
 end
 
+local function isGlobalRegex(name, definedGlobalRegex)
+    if not definedGlobalRegex then
+        return false
+    end
+
+    for _, pattern in ipairs(definedGlobalRegex) do
+        if name:match(pattern) then
+            return true
+        end
+    end
+
+    return false
+end
+
 -- 不允许定义首字母小写的全局变量（很可能是拼错或者漏删）
 return function (uri, callback)
     local ast = files.getState(uri)
@@ -25,6 +39,7 @@ return function (uri, callback)
     end
 
     local definedGlobal = util.arrayToHash(config.get(uri, 'Lua.diagnostics.globals'))
+    local definedGlobalRegex = config.get(uri, 'Lua.diagnostics.globalsRegex')
 
     guide.eachSourceType(ast.ast, 'setglobal', function (source)
         local name = guide.getKeyName(source)
@@ -40,6 +55,9 @@ return function (uri, callback)
         end
         -- 如果赋值被标记为 doc.class ,则认为是允许的
         if isDocClass(source) then
+            return
+        end
+        if isGlobalRegex(name, definedGlobalRegex) then
             return
         end
         if definedGlobal[name] == nil then

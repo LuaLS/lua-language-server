@@ -406,6 +406,22 @@ Array<string>
 []
 ```
 
+# diagnostics.globalsRegex
+
+Find defined global variables using regex.
+
+## type
+
+```ts
+Array<string>
+```
+
+## default
+
+```jsonc
+[]
+```
+
 # diagnostics.groupFileStatus
 
 批量修改一个组中的文件状态。

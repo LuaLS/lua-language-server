@@ -11,7 +11,7 @@ git fetch
 echo $(git branch -a)
 
 # Check if the changelog file was modified in the PR
-if git diff --name-only origin/$GITHUB_BASE_REF..$GITHUB_SOURCE_REF | grep -q $CHANGELOG_FILE; then
+if git diff --name-only origin/$GITHUB_BASE_REF..remotes/pull/$GITHUB_SOURCE_REF | grep -q $CHANGELOG_FILE; then
   echo "Thank you for updating the changelog!"
   exit 0
 else

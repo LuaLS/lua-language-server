@@ -5,6 +5,7 @@ set -e
 CHANGELOG_FILE="changelog.md"
 
 git fetch origin $GITHUB_BASE_REF
+git fetch
 
 # Check if the changelog file was modified in the PR
 if git diff --name-only origin/$GITHUB_BASE_REF..$GITHUB_HEAD_REF | grep -q $CHANGELOG_FILE; then

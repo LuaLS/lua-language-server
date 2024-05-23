@@ -6,7 +6,7 @@ CHANGELOG_FILE="changelog.md"
 
 
 git fetch origin $GITHUB_BASE_REF
-git fetch --unshallow
+git fetch
 
 echo $(git remote)
 echo $(git branch)

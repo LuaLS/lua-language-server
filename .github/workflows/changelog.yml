@@ -13,11 +13,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Set up environment
         run: |
-          echo "GITHUB_HEAD_REF=${{ github.head_ref }}" >> $GITHUB_ENV
+          echo "GITHUB_HEAD_REF=${{ github.head_ref || github.ref_name }}" >> $GITHUB_ENV
           echo "GITHUB_BASE_REF=${{ github.base_ref }}" >> $GITHUB_ENV
 
       - name: Check if changelog is updated

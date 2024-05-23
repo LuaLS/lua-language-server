@@ -17,7 +17,7 @@ jobs:
 
       - name: Set up environment
         run: |
-          echo "GITHUB_HEAD_REF=${{ github.head_ref || github.ref_name }}" >> $GITHUB_ENV
+          echo "GITHUB_SOURCE_REF=${{ github.ref_name }}" >> $GITHUB_ENV
           echo "GITHUB_BASE_REF=${{ github.base_ref }}" >> $GITHUB_ENV
 
       - name: Check if changelog is updated

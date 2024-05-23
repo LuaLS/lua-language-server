@@ -13,7 +13,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0 # Need entire git history
+          fetch-depth: 2
 
       - name: Set up environment
         run: |

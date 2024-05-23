@@ -2268,7 +2268,7 @@ local function trySymbolReference(state, position, results)
 
     -- User will ask for completion at end of symbol name so we need to perform a reverse match to see if they are in a symbol reference
     -- Matching in reverse allows the symbol to be of any length and we can still match all the way back to `](lua://` from right to left
-    local symbol = string.match(string.reverse(line), "%)?(.*)//:aul%(%]", #line - col)
+    local symbol = string.match(string.reverse(line), "%)?([%w%s-_.*]*)//:aul%(%]", #line - col)
 
     if symbol then
         -- flip it back the right way around

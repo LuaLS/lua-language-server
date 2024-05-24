@@ -52,13 +52,14 @@ return function (uri, callback)
         return
     end
 
+    local delayer = await.newThrottledDelayer(15)
     ---@async
     guide.eachSourceTypes(state.ast, checkTypes, function (source)
         local value = source.value
         if not value then
             return
         end
-        await.delay()
+        delayer:delay()
         if source.type == 'setlocal' then
             local locNode = vm.compileNode(source.node)
             if not locNode.hasDefined then

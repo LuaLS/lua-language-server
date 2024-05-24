@@ -176,6 +176,28 @@ function m.delay()
     return coroutine.yield()
 end
 
+local throttledDelayer = {}
+throttledDelayer.__index = throttledDelayer
+
+---@async
+function throttledDelayer:delay()
+    if not m._enable then
+        return
+    end
+    self.calls = self.calls + 1
+    if self.calls == self.factor then
+        self.calls = 0
+        return m.delay()
+    end
+end
+
+function m.newThrottledDelayer(factor)
+    return setmetatable({
+        factor = factor,
+        calls = 0,
+    }, throttledDelayer)
+end
+
 --- stop then close
 ---@async
 function m.stop()

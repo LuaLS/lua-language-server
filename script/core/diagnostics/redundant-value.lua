@@ -11,8 +11,9 @@ return function (uri, callback)
         return
     end
 
+    local delayer = await.newThrottledDelayer(50000)
     guide.eachSource(state.ast, function (src) ---@async
-        await.delay()
+        delayer:delay()
         if src.redundant then
             callback {
                 start   = src.start,

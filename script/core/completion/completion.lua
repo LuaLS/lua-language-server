@@ -2357,8 +2357,8 @@ end
 local function tryCompletions(state, position, triggerCharacter, results)
     if getComment(state, position) then
         trySymbolReference(state, position, results)
-        tryComment(state, position, results)
         tryLuaDoc(state, position, results)
+        tryComment(state, position, results)
         return
     end
     if postfix(state, position, results) then

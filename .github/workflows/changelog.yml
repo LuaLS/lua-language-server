@@ -1,0 +1,24 @@
+name: changelog
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches:
+      - master
+
+jobs:
+  check-changelog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up environment
+        run: |
+          echo "GITHUB_SOURCE_REF=${{ github.ref_name }}" >> $GITHUB_ENV
+          echo "GITHUB_BASE_REF=${{ github.base_ref }}" >> $GITHUB_ENV
+
+      - name: Check if changelog is updated
+        run: .github/scripts/check-changelog.sh

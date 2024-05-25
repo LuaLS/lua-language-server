@@ -1,5 +1,8 @@
 # changelog
 
+## Unreleased
+<!-- Add all new changes here. They will be moved under a version at release -->
+
 ## 3.9.0
 `2024-5-11`
 * `NEW` goto implementation
@@ -123,7 +126,7 @@
     Cat = 1,
     Dog = 2,
   }
-  
+
   ---@param animal userdata
   ---@param atp AnimalType
   ---@return boolean

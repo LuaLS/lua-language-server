@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` Reference workspace symbols in comments using `[some text](lua://symbolName)` syntax
 
 ## 3.9.0
 `2024-5-11`

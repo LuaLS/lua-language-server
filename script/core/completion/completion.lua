@@ -1546,7 +1546,7 @@ local function tryWord(state, position, triggerCharacter, results)
                     local env = guide.getENV(state.ast, startPos)
                     if env then
                         checkGlobal(state, word, startPos, position, env, false, results)
-                        checkModule(state, word, startPos, results) 
+                        checkModule(state, word, startPos, results)
                     end
                 end
             end
@@ -2256,7 +2256,8 @@ local function tryluaDocOfFunction(doc, results, pad)
     }
 end
 
----Checks for a lua symbol reference in comment and returns an async callback if found
+---Checks for a lua symbol reference in comment
+---@async
 local function trySymbolReference(state, position, results)
     local doc = getLuaDoc(state, position)
     if not doc then
@@ -2274,15 +2275,12 @@ local function trySymbolReference(state, position, results)
         -- flip it back the right way around
         symbol = string.reverse(symbol)
 
-        ---@async
-        return function ()
-            for _, match in ipairs(wssymbol(symbol)) do
-                results[#results+1] = {
-                    label = match.name,
-                    kind = define.CompletionItemKind.Class,
-                    insertText = match.name
-                }
-            end
+        for _, match in ipairs(wssymbol(symbol)) do
+            results[#results+1] = {
+                label = match.name,
+                kind = define.CompletionItemKind.Class,
+                insertText = match.name
+            }
         end
     end
 end
@@ -2358,12 +2356,8 @@ end
 ---@async
 local function tryCompletions(state, position, triggerCharacter, results)
     if getComment(state, position) then
-        local callback = trySymbolReference(state, position, results)
-        if callback then
-            callback()
-        else
-            tryComment(state, position, results)
-        end
+        trySymbolReference(state, position, results)
+        tryComment(state, position, results)
         tryLuaDoc(state, position, results)
         return
     end

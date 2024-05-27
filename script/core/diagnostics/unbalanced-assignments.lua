@@ -41,9 +41,10 @@ return function (uri, callback, code)
         end
     end
 
+    local delayer = await.newThrottledDelayer(1000)
     ---@async
     guide.eachSourceTypes(ast.ast, types, function (source)
-        await.delay()
+        delayer:delay()
         checkSet(source)
     end)
 end

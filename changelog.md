@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Don't do diagnostics when the workspace is not ready
 * `NEW` Reference workspace symbols in comments using `[some text](lua://symbolName)` syntax
 
 ## 3.9.0

@@ -246,6 +246,9 @@ local function isValid(uri)
     if not config.get(uri, 'Lua.diagnostics.enable') then
         return false
     end
+    if not ws.isReady(uri) then
+        return false
+    end
     if files.isLibrary(uri, true) then
         local status = config.get(uri, 'Lua.diagnostics.libraryFiles')
         if status == 'Disable' then

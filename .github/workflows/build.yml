@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - master
+      - 'v*.*.*'
     tags:
       - "*"
   pull_request:
@@ -46,21 +47,30 @@ jobs:
           apk update
           apk add git ninja bash build-base nodejs linux-headers
 
+      - name: Prepare for Linux
+        if: ${{ matrix.target == 'linux' && matrix.libc != 'musl' }}
+        run: |
+          sudo apt update
+          sudo apt install ninja-build
+
       - uses: actions/checkout@v4
         with:
           submodules: recursive
 
-      - name: Build for others step-1
-        if: ${{ matrix.platform != 'linux-x64' }}
-        uses: actboy168/setup-luamake@master
+      - name: Build for Windows
+        if: ${{ matrix.target == 'windows' }}
+        run: .\make.bat ${{ matrix.platform }}
 
-      - name: Build for others step-2
-        if: ${{ matrix.platform != 'linux-x64' }}
-        run: luamake -platform ${{ matrix.platform }}
-
-      - name: Build for musl
-        if: ${{ matrix.platform == 'linux-x64' && matrix.libc == 'musl' }}
-        run: ./make.sh
+      - name: Build for Linux
+        if: ${{ matrix.target == 'linux' }}
+        run: |
+          ./make.sh ${{ matrix.platform }}
+          
+      - name: Build for macOS
+        if: ${{ matrix.target == 'darwin' }}
+        run: |
+          brew install ninja
+          ./make.sh ${{ matrix.platform }}
 
       - name: Build for x64 glibc
         if: ${{ matrix.platform == 'linux-x64' && matrix.libc != 'musl' }}

@@ -32,10 +32,8 @@ lm:source_set 'lpeglabel' {
 
 lm:executable "lua-language-server" {
     deps = {
-        "source_bee",
-        "source_lua",
-        "source_bootstrap",
         "lpeglabel",
+        "source_bootstrap",
         includeCodeFormat and "code_format" or nil,
     },
     includes = {

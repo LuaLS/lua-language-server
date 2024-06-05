@@ -1,9 +1,9 @@
----@meta
+---@meta bee.thread
 
 ---@class bee.thread
 local thread = {}
 
----@param time integer
+---@param time number
 function thread.sleep(time) end
 
 ---@param name string
@@ -15,7 +15,7 @@ function thread.channel(name) end
 
 ---@param script string
 ---@return bee.thread.thread
-function thread.create(script) end
+function thread.thread(script) end
 
 ---@return string?
 function thread.errlog() end

@@ -1,4 +1,4 @@
----@meta bee.filewatch
+---@meta
 
 ---@class bee.filewatch.instance
 local instance = {}

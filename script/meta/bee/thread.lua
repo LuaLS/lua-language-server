@@ -1,4 +1,4 @@
----@meta bee.thread
+---@meta
 
 ---@class bee.thread
 local thread = {}

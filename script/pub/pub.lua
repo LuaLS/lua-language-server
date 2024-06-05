@@ -66,7 +66,7 @@ function m.recruitBraves(num, privatePad)
         log.debug('Create brave:', id)
         m.braves[id] = {
             id      = id,
-            thread  = thread.create(braveTemplate:format(
+            thread  = thread.thread(braveTemplate:format(
                 package.path,
                 package.cpath,
                 DEVELOP,
@@ -208,8 +208,8 @@ end
 --- 检查伤亡情况
 function m.checkDead()
     while true do
-        local err = thread.errlog()
-        if not err then
+        local suc, err = thread.errlog()
+        if not suc then
             break
         end
         log.error('Brave is dead!: ' .. err)

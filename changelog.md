@@ -2,9 +2,9 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
-* `FIX` Don't do diagnostics when the workspace is not ready
 * `NEW` Reference workspace symbols in comments using `[some text](lua://symbolName)` syntax
-
+* `FIX` Don't do diagnostics when the workspace is not ready
+* `FIX` Autocompletion for enum values ​​is not available in some cases
 ## 3.9.1
 `2024-5-14`
 * revert extension runtime

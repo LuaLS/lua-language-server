@@ -3842,6 +3842,35 @@ f(<??>)
 }
 
 TEST [[
+---@class optional
+---@field enum enum
+
+---@enum(key) enum
+local t = {
+    a = 1,
+    b = 2,
+}
+
+---@param a optional
+local function f(a)
+end
+
+f {
+    enum = <??>
+}
+]]
+{
+    {
+        label    = '"a"',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label    = '"b"',
+        kind     = define.CompletionItemKind.EnumMember,
+    },
+}
+
+TEST [[
 --
 <??>
 ]]
@@ -4433,4 +4462,3 @@ new 'A' {
         kind  = define.CompletionItemKind.Property,
     }
 }
-

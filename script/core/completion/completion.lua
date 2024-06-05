@@ -1357,6 +1357,13 @@ local function insertEnum(state, pos, src, enums, isInArray, mark)
             kind        = define.CompletionItemKind.Function,
             insertText  = insertText,
         }
+    elseif src.type == 'doc.enum' then
+        ---@cast src parser.object
+        if vm.docHasAttr(src, 'key') then
+            insertDocEnumKey(state, pos, src, enums)
+        else
+            insertDocEnum(state, pos, src, enums)
+        end
     elseif isInArray and src.type == 'doc.type.array' then
         for i, d in ipairs(vm.getDefs(src.node)) do
             insertEnum(state, pos, d, enums, isInArray, mark)
@@ -1364,11 +1371,7 @@ local function insertEnum(state, pos, src, enums, isInArray, mark)
     elseif src.type == 'global' and src.cate == 'type' then
         for _, set in ipairs(src:getSets(state.uri)) do
             if set.type == 'doc.enum' then
-                if vm.docHasAttr(set, 'key') then
-                    insertDocEnumKey(state, pos, set, enums)
-                else
-                    insertDocEnum(state, pos, set, enums)
-                end
+                insertEnum(state, pos, set, enums, isInArray, mark)
             end
         end
     end

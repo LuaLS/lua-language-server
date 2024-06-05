@@ -1,29 +1,13 @@
 local thread  = require 'bee.thread'
-local channel = require 'bee.channel'
-local select = require 'bee.select'
 local utility = require 'utility'
 local await   = require 'await'
 
-local function channel_init(chan)
-    local selector = select.create()
-    selector:event_add(chan:fd(), select.SELECT_READ)
-    return { selector, chan }
-end
+thread.newchannel 'taskpad'
+thread.newchannel 'waiter'
 
-local function channel_bpop(ctx)
-    local selector, chan = ctx[1], ctx[2]
-    while true do
-        for _ in selector:wait() do
-            local r = table.pack(chan:pop())
-            if r[1] == true then
-                return table.unpack(r, 2)
-            end
-        end
-    end
-end
-
-local taskPad = channel.create 'taskpad'
-local waiter  = channel_init(channel.create 'waiter')
+local errLog  = thread.channel 'errlog'
+local taskPad = thread.channel 'taskpad'
+local waiter  = thread.channel 'waiter'
 local type    = type
 local counter = utility.counter()
 
@@ -82,9 +66,11 @@ function m.recruitBraves(num, privatePad)
         }
     end
     if privatePad and not m.prvtPad[privatePad] then
+        thread.newchannel('req:' .. privatePad)
+        thread.newchannel('res:' .. privatePad)
         m.prvtPad[privatePad] = {
-            req = channel.create('req:' .. privatePad),
-            res = channel.create('res:' .. privatePad),
+            req = thread.channel('req:' .. privatePad),
+            res = thread.channel('res:' .. privatePad),
         }
     end
 end
@@ -180,7 +166,7 @@ end
 --- 接收反馈
 function m.recieve(block)
     if block then
-        local id, name, result = channel_bpop(waiter)
+        local id, name, result = waiter:bpop()
         if type(name) == 'string' then
             m.popReport(m.braves[id], name, result)
         else
@@ -189,7 +175,7 @@ function m.recieve(block)
     else
         while true do
             local ok
-            if m.reciveFromPad(waiter[2]) then
+            if m.reciveFromPad(waiter) then
                 ok = true
             end
             for _, pad in pairs(m.prvtPad) do
@@ -208,7 +194,7 @@ end
 --- 检查伤亡情况
 function m.checkDead()
     while true do
-        local suc, err = thread.errlog()
+        local suc, err = errLog:pop()
         if not suc then
             break
         end

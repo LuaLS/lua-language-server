@@ -5,6 +5,10 @@
 * `FIX` Don't do diagnostics when the workspace is not ready
 * `NEW` Reference workspace symbols in comments using `[some text](lua://symbolName)` syntax
 
+## 3.9.1
+`2024-5-14`
+* revert extension runtime
+
 ## 3.9.0
 `2024-5-11`
 * `NEW` goto implementation
@@ -128,7 +132,7 @@
     Cat = 1,
     Dog = 2,
   }
-
+  
   ---@param animal userdata
   ---@param atp AnimalType
   ---@return boolean

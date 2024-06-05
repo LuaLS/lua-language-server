@@ -8,7 +8,6 @@ mt.__name = 'markdown'
 
 mt._splitLine = false
 
----@async
 ---Converts `[mySymbol](lua://mySymbol)` into a link that points to the origin of `mySymbol`.
 ---@param txt string
 local function processSymbolReferences(txt)

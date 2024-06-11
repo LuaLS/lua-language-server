@@ -3,6 +3,9 @@
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
 
+## 3.9.3
+* `FIX` Sometimes providing incorrect autocompletion when chaining calls
+
 ## 3.9.2
 `2024-6-6`
 * `NEW` Reference workspace symbols in comments using `[some text](lua://symbolName)` syntax

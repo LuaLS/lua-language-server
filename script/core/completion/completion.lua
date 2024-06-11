@@ -1594,6 +1594,12 @@ local function findCall(state, position)
             end
         end
     end)
+    if not call then
+        return nil
+    end
+    if call.node.finish > position then
+        return nil
+    end
     return call
 end
 

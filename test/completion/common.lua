@@ -4462,3 +4462,30 @@ new 'A' {
         kind  = define.CompletionItemKind.Property,
     }
 }
+
+TEST [[
+---@enum(key) enum
+local t = {
+    a = 1,
+    b = 2,
+    c = 3,
+}
+
+---@class A
+local M
+
+---@param optional enum
+function M:optional(optional)
+end
+
+---@return A
+function M:self()
+    return self
+end
+
+---@type A
+local m
+
+m:self(<??>):optional()
+]]
+(nil)

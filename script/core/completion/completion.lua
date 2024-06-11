@@ -1588,18 +1588,12 @@ end
 local function findCall(state, position)
     local call
     guide.eachSourceContain(state.ast, position, function (src)
-        if src.type == 'call' then
-            if not call or call.start < src.start then
+        if src.type == 'call' and src.node.finish <= position then
+            if not call or call.start < src.start  then
                 call = src
             end
         end
     end)
-    if not call then
-        return nil
-    end
-    if call.node.finish > position then
-        return nil
-    end
     return call
 end
 

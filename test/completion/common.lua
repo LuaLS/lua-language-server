@@ -4489,3 +4489,48 @@ local m
 m:self(<??>):optional()
 ]]
 (nil)
+
+TEST [[
+---@enum(key) enum
+local t = {
+    a = 1,
+    b = 2,
+    c = 3,
+}
+
+---@class A
+local M
+
+---@return A
+function M.create()
+    return M
+end
+
+---@param optional enum
+---@return self
+function M:optional(optional)
+    return self
+end
+
+---@return A
+function M:self()
+    return self
+end
+
+
+M.create():optional(<??>):self()
+]]
+{
+    {
+        label = '"a"',
+        kind  = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label = '"b"',
+        kind  = define.CompletionItemKind.EnumMember,
+    },
+    {
+        label = '"c"',
+        kind  = define.CompletionItemKind.EnumMember,
+    },
+}

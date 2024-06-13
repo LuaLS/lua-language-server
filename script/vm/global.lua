@@ -382,12 +382,14 @@ local compilerGlobalSwitch = util.switch()
                         [1]    = field.field[1],
                     }
                 elseif field.type == 'tableindex' then
-                    source._enums[#source._enums+1] = {
-                        type   = 'doc.type.string',
-                        start  = field.index.start,
-                        finish = field.index.finish,
-                        [1]    = field.index[1],
-                    }
+                    if field.index then
+                        source._enums[#source._enums+1] = {
+                            type   = 'doc.type.string',
+                            start  = field.index.start,
+                            finish = field.index.finish,
+                            [1]    = field.index[1],
+                        }
+                    end
                 end
             end
         else

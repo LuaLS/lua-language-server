@@ -156,7 +156,7 @@ local function initPlugin(uri)
         end
         for i, pluginConfigPath in ipairs(pluginConfigPaths) do
             local myArgs = args
-            if args then
+            if args and not args[1] then
                 for k, v in pairs(args) do
                     if pluginConfigPath:find(k, 1, true) then
                         myArgs = v

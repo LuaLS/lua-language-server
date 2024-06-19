@@ -1829,6 +1829,7 @@ Array<string>
 * ``"!"``
 * ``"!="``
 * ``"continue"``
+* ``"|lambda|"``
 
 ## default
 

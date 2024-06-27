@@ -83,7 +83,7 @@ xpcall(lclient.start, errorhandler, lclient, function (client)
 
     local disables = util.arrayToHash(config.get(rootUri, 'Lua.diagnostics.disable'))
     for name, serverity in pairs(define.DiagnosticDefaultSeverity) do
-        serverity = config.get(rootUri, 'Lua.diagnostics.severity')[name] or 'Warning'
+        serverity = config.get(rootUri, 'Lua.diagnostics.severity')[name] or serverity
         if serverity:sub(-1) == '!' then
             serverity = serverity:sub(1, -2)
         end

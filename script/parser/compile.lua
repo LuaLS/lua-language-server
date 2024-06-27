@@ -2188,13 +2188,14 @@ local function parseActions()
     end
 end
 
-local function parseParams(params)
+local function parseParams(params, isLambda)
     local lastSep
     local hasDots
+    local endToken = isLambda and '|' or ')'
     while true do
         skipSpace()
         local token = Tokens[Index + 1]
-        if not token or token == ')' then
+        if not token or token == endToken then
             if lastSep then
                 missName()
             end
@@ -2269,7 +2270,7 @@ local function parseParams(params)
             Index = Index + 2
             goto CONTINUE
         end
-        skipUnknownSymbol '%,%)%.'
+        skipUnknownSymbol ('%,%' .. endToken .. '%.')
         ::CONTINUE::
     end
     return params
@@ -2393,6 +2394,91 @@ local function parseFunction(isLocal, isAction)
     return func
 end
 
+local function parseLambda(isDoublePipe)
+    local lambdaLeft = getPosition(Tokens[Index], 'left')
+    local lambdaRight = getPosition(Tokens[Index], 'right')
+    local lambda = {
+        type   = 'function',
+        start  = lambdaLeft,
+        finish = lambdaRight,
+        bstart = lambdaRight,
+        keyword = {
+            [1] = lambdaLeft,
+            [2] = lambdaRight,
+        },
+        hasReturn = true
+    }
+    Index = Index + 2
+    local pipeLeft = getPosition(Tokens[Index], 'left')
+    local pipeRight = getPosition(Tokens[Index], 'right')
+    skipSpace(true)
+    local params
+    local LastLocalCount = LocalCount
+    -- if nonstandardSymbol for '||' is true it is possible for token to be || when there are no params
+    if isDoublePipe then
+        params = {
+            start = pipeLeft,
+            finish = pipeRight,
+            parent = lambda,
+            type = 'funcargs'
+        }
+    else
+        -- fake chunk to store locals
+        pushChunk(lambda)
+        LocalCount = 0
+        params = parseParams({}, true)
+        params.type   = 'funcargs'
+        params.start  = pipeLeft
+        params.finish = lastRightPosition()
+        params.parent = lambda
+        lambda.args   = params
+        skipSpace()
+        if Tokens[Index + 1] == '|' then
+            pipeRight = getPosition(Tokens[Index], 'right')
+            lambda.finish = pipeRight
+            lambda.bstart = pipeRight
+            if params then
+                params.finish = pipeRight
+            end
+            Index = Index + 2
+            skipSpace()
+        else
+            lambda.finish = lastRightPosition()
+            lambda.bstart = lambda.finish
+            if params then
+                params.finish = lambda.finish
+            end
+            missSymbol '|'
+        end
+    end
+    local child = parseExp()
+
+
+    -- don't want popChunk logic here as this is not a real chunk
+    Chunk[#Chunk] = nil
+
+    if child then
+        -- create dummy return
+        local rtn = {
+            type   = 'return',
+            start  = child.start,
+            finish = child.finish,
+            parent = lambda,
+            [1]    = child}
+        child.parent = rtn
+        lambda[1] = rtn
+        lambda.returns = {rtn}
+        lambda.finish = child.finish
+        lambda.keyword[3] = child.finish
+        lambda.keyword[4] = child.finish
+    else
+        lambda.finish = lastRightPosition()
+        missExp()
+    end
+    LocalCount = LastLocalCount
+    return lambda
+end
+
 local function checkNeedParen(source)
     local token = Tokens[Index + 1]
     if  token ~= '.'
@@ -2483,6 +2569,12 @@ local function parseExpUnit()
 
     if token == 'function' then
         return parseFunction()
+    end
+
+    -- FIXME: Use something other than nonstandardSymbol to check for lambda support
+    if State.options.nonstandardSymbol['|lambda|'] and (token == '|'
+    or token == '||') then
+        return parseLambda(token == '||')
     end
 
     local node = parseName()

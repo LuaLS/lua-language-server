@@ -9,6 +9,9 @@
 			"stopOnEntry": false,
 			"program": "${workspaceRoot}/test.lua",
 			"luaexe": "${workspaceFolder}/bin/lua-language-server",
+			"windows": {
+				"luaexe": "${workspaceFolder}/bin/lua-language-server.exe",
+			},
 			"luaVersion": "lua54",
 			"sourceCoding": "utf8",
 			"console": "integratedTerminal",

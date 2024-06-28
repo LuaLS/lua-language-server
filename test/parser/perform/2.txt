@@ -1,0 +1,132 @@
+return {
+    ast = {
+        [001] = {
+            _enable = true,
+            _id = "if_then_else",
+            _params = {
+                [001] = {
+                    _enable = true,
+                    _list = {
+                    },
+                    _source = "表达式",
+                    _type = 4,
+                    _valid = true,
+                },
+                [002] = {
+                    _enable = true,
+                    _list = {
+                    },
+                    _source = "表达式",
+                    _type = 0,
+                    _valid = true,
+                },
+                [003] = {
+                    _enable = true,
+                    _list = {
+                        [001] = {
+                            _enable = true,
+                            _id = "if_then_else",
+                            _params = {
+                                [001] = {
+                                    _enable = true,
+                                    _list = {
+                                    },
+                                    _source = "表达式",
+                                    _type = 4,
+                                    _valid = true,
+                                },
+                                [002] = {
+                                    _enable = true,
+                                    _list = {
+                                    },
+                                    _source = "表达式",
+                                    _type = 0,
+                                    _valid = true,
+                                },
+                                [003] = {
+                                    _enable = true,
+                                    _list = {
+                                        [001] = {
+                                            _enable = true,
+                                            _id = "if_then_else",
+                                            _params = {
+                                                [001] = {
+                                                    _enable = true,
+                                                    _list = {
+                                                    },
+                                                    _source = "表达式",
+                                                    _type = 4,
+                                                    _valid = true,
+                                                },
+                                                [002] = {
+                                                    _enable = true,
+                                                    _list = {
+                                                    },
+                                                    _source = "表达式",
+                                                    _type = 0,
+                                                    _valid = true,
+                                                },
+                                                [003] = {
+                                                    _enable = true,
+                                                    _list = {
+                                                        [001] = {
+                                                            _enable = true,
+                                                            _id = "set_var",
+                                                            _params = {
+                                                                [001] = {
+                                                                    _enable = true,
+                                                                    _source = "变量",
+                                                                    _type = 7,
+                                                                    _valid = true,
+                                                                    _varName = "var_name",
+                                                                },
+                                                                [002] = {
+                                                                    _enable = true,
+                                                                    _source = "变量",
+                                                                    _type = 8,
+                                                                    _valid = true,
+                                                                    _varName = "",
+                                                                },
+                                                                _size = 2,
+                                                            },
+                                                            _source = "表达式",
+                                                            _type = 0,
+                                                            _valid = true,
+                                                        },
+                                                    },
+                                                    _source = "表达式",
+                                                    _type = 0,
+                                                    _valid = true,
+                                                },
+                                                _size = 3,
+                                            },
+                                            _source = "表达式",
+                                            _type = 0,
+                                            _valid = true,
+                                        },
+                                    },
+                                    _source = "表达式",
+                                    _type = 0,
+                                    _valid = true,
+                                },
+                                _size = 3,
+                            },
+                            _source = "表达式",
+                            _type = 0,
+                            _valid = true,
+                        },
+                    },
+                    _source = "表达式",
+                    _type = 0,
+                    _valid = true,
+                },
+                _size = 3,
+            },
+            _source = "表达式",
+            _type = 0,
+            _valid = true,
+        },
+    },
+    description = "",
+    name = "Trigger001",
+}

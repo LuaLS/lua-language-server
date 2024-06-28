@@ -1,13 +1,12 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.Nil: LuaParser.Node.Literal
-local Nil = class.declare('LuaParser.Node.Nil', 'LuaParser.Node.Literal')
+local Nil = Class('LuaParser.Node.Nil', 'LuaParser.Node.Literal')
 
 Nil.toString = 'nil'
 Nil.isTruly = false
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 -- 解析 nil
 ---@private

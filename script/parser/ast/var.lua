@@ -1,4 +1,3 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.Var: LuaParser.Node.Base
 ---@field subtype 'global' | 'local'
@@ -7,14 +6,14 @@ local class = require 'class'
 ---@field loc? LuaParser.Node.Local
 ---@field next? LuaParser.Node.Field
 ---@field value? LuaParser.Node.Exp
-local Var = class.declare('LuaParser.Node.Var', 'LuaParser.Node.Base')
+local Var = Class('LuaParser.Node.Var', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.Varargs: LuaParser.Node.Base
 ---@field loc? LuaParser.Node.Local
-local Varargs = class.declare('LuaParser.Node.Varargs', 'LuaParser.Node.Base')
+local Varargs = Class('LuaParser.Node.Varargs', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@return LuaParser.Node.Var?

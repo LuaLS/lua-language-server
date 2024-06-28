@@ -1,4 +1,3 @@
-local class = require 'class'
 
 ---@alias LuaParser.EscMode 'normal' | 'unicode' | 'err' | 'byte'
 
@@ -7,7 +6,7 @@ local class = require 'class'
 ---@field quo string
 ---@field escs? table
 ---@field missQuo? true
-local String = class.declare('LuaParser.Node.String', 'LuaParser.Node.Literal')
+local String = Class('LuaParser.Node.String', 'LuaParser.Node.Literal')
 
 local escMap = {
     ['a']  = '\a',
@@ -45,7 +44,7 @@ String.__getter.value = function (self)
 end
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 -- 解析字符串
 ---@private

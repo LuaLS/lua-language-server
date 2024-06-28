@@ -1,11 +1,10 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.Boolean: LuaParser.Node.Literal
 ---@field value boolean
-local Boolean = class.declare('LuaParser.Node.Boolean', 'LuaParser.Node.Literal')
+local Boolean = Class('LuaParser.Node.Boolean', 'LuaParser.Node.Literal')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 -- 解析布尔值
 ---@private

@@ -1,7 +1,6 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.ParenBase: LuaParser.Node.Base
-local ParenBase = class.declare('LuaParser.Node.ParenBase', 'LuaParser.Node.Base')
+local ParenBase = Class('LuaParser.Node.ParenBase', 'LuaParser.Node.Base')
 
 function ParenBase.__getter.asNumber(self)
     return self.exp.asNumber, true
@@ -38,10 +37,10 @@ end
 ---@class LuaParser.Node.Paren: LuaParser.Node.ParenBase
 ---@field exp? LuaParser.Node.Exp
 ---@field next? LuaParser.Node.Field
-local Paren = class.declare('LuaParser.Node.Paren', 'LuaParser.Node.ParenBase')
+local Paren = Class('LuaParser.Node.Paren', 'LuaParser.Node.ParenBase')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@alias LuaParser.Node.Exp
 ---| LuaParser.Node.Term

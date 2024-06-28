@@ -1,4 +1,3 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.Base: Class.Base
 ---@field type string
@@ -27,7 +26,7 @@ local class = require 'class'
 ---@field isTruly? boolean
 ---@field dummy? boolean
 ---@field index? integer
-local Base = class.declare 'LuaParser.Node.Base'
+local Base = Class 'LuaParser.Node.Base'
 
 ---@type boolean
 Base.isBlock = false
@@ -44,7 +43,7 @@ local rowcolMulti = 10000
 ---@return string
 ---@return true
 Base.__getter.type = function (self)
-    return class.type(self):match '[^.]+$', true
+    return Type(self):match '[^.]+$', true
 end
 
 ---@param self LuaParser.Node.Base
@@ -149,7 +148,7 @@ end
 
 ---@class LuaParser.Node.Literal: LuaParser.Node.Base
 ---@field value? nil|boolean|number|string|integer
-local Literal = class.declare('LuaParser.Node.Literal', 'LuaParser.Node.Base')
+local Literal = Class('LuaParser.Node.Literal', 'LuaParser.Node.Base')
 
 Literal.isLiteral = true
 

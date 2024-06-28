@@ -1,4 +1,3 @@
-local class = require 'class'
 
 ---@alias LuaParser.Node.CatType
 ---| LuaParser.Node.CatID
@@ -16,23 +15,23 @@ local class = require 'class'
 ---@class LuaParser.Node.CatParen: LuaParser.Node.ParenBase
 ---@field value? LuaParser.Node.CatType
 ---@field symbolPos? integer # 右括号的位置
-local CatParen = class.declare('LuaParser.Node.CatParen', 'LuaParser.Node.ParenBase')
+local CatParen = Class('LuaParser.Node.CatParen', 'LuaParser.Node.ParenBase')
 
 ---@class LuaParser.Node.CatArray: LuaParser.Node.Base
 ---@field node LuaParser.Node.CatType
 ---@field symbolPos1 integer # 左括号的位置
 ---@field symbolPos2? integer # 右括号的位置
-local CatArray = class.declare('LuaParser.Node.CatArray', 'LuaParser.Node.Base')
+local CatArray = Class('LuaParser.Node.CatArray', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.CatCall: LuaParser.Node.Base
 ---@field node LuaParser.Node.CatID
 ---@field args LuaParser.Node.CatType[]
 ---@field symbolPos1 integer # 左括号的位置
 ---@field symbolPos2? integer # 右括号的位置
-local CatCall = class.declare('LuaParser.Node.CatCall', 'LuaParser.Node.Base')
+local CatCall = Class('LuaParser.Node.CatCall', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@param required? boolean

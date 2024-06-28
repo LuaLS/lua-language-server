@@ -1,4 +1,3 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.Field: LuaParser.Node.Base
 ---@field subtype 'field' | 'method' | 'index'
@@ -8,12 +7,12 @@ local class = require 'class'
 ---@field next? LuaParser.Node.Field
 ---@field last? LuaParser.Node.Term
 ---@field value? LuaParser.Node.Exp
-local Field = class.declare('LuaParser.Node.Field', 'LuaParser.Node.Base')
+local Field = Class('LuaParser.Node.Field', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.FieldID: LuaParser.Node.Base
 ---@field id string
 ---@field parent LuaParser.Node.Field
-local FieldID = class.declare('LuaParser.Node.FieldID', 'LuaParser.Node.Base')
+local FieldID = Class('LuaParser.Node.FieldID', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.TableField: LuaParser.Node.Base
 ---@field subtype 'field' | 'index' | 'exp'
@@ -22,15 +21,15 @@ local FieldID = class.declare('LuaParser.Node.FieldID', 'LuaParser.Node.Base')
 ---@field symbolPos? integer
 ---@field symbolPos2? integer
 ---@field parent LuaParser.Node.Table
-local TableField = class.declare('LuaParser.Node.TableField', 'LuaParser.Node.Base')
+local TableField = Class('LuaParser.Node.TableField', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.TableFieldID: LuaParser.Node.Base
 ---@field id string
 ---@field parent LuaParser.Node.TableField
-local TableFieldID = class.declare('LuaParser.Node.TableFieldID', 'LuaParser.Node.Base')
+local TableFieldID = Class('LuaParser.Node.TableFieldID', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@param last LuaParser.Node.Term

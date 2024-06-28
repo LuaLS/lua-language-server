@@ -1,11 +1,10 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.CatID: LuaParser.Node.Base
 ---@field id string
-local CatID = class.declare('LuaParser.Node.CatID', 'LuaParser.Node.Base')
+local CatID = Class('LuaParser.Node.CatID', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@return LuaParser.Node.CatID?
 function Ast:parseCatID()

@@ -1,4 +1,3 @@
-local class = require 'class'
 
 -- 符号的优先级
 ---@enum(key) LuaParser.BinarySymbol
@@ -48,10 +47,10 @@ local RevertConcat = {
 ---@field symbolPos integer
 ---@field exp1 LuaParser.Node.Exp
 ---@field exp2? LuaParser.Node.Exp
-local Binary = class.declare('LuaParser.Node.Binary', 'LuaParser.Node.Base')
+local Binary = Class('LuaParser.Node.Binary', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@param curExp LuaParser.Node.Exp

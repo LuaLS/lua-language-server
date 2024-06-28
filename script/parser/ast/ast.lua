@@ -1,4 +1,3 @@
-local class = require 'class'
 local lexer = require 'parser.lexer'
 local util  = require 'utility'
 
@@ -27,7 +26,7 @@ require 'parser.ast.cats.cat'
 ---@field envMode 'fenv' | '_ENV'
 ---@field main LuaParser.Node.Main
 ---@overload fun(code: string, version: LuaParser.LuaVersion, options: LuaParser.CompileOptions): LuaParser.Ast
-local M = class.get 'LuaParser.Ast'
+local M = Class 'LuaParser.Ast'
 
 ---@alias LuaParser.Status
 ---| 'Lua' # Lua代码
@@ -193,7 +192,7 @@ end
 ---@return T
 function M:createNode(type, data)
     data.ast = self
-    local node = class.new(type, data)
+    local node = New(type, data)
 
     local nodeMap = self.nodesMap[node.type]
     nodeMap[#nodeMap+1] = node

@@ -1,9 +1,7 @@
-local class = require 'class'
-
 require 'parser.ast.ast'
 
 ---@class LuaParser
-local LuaParser = class.get 'LuaParser'
+local LuaParser = Class 'LuaParser'
 
 ---@alias LuaParser.LuaVersion
 ---| 'Lua 5.1'
@@ -31,7 +29,7 @@ local LuaParser = class.get 'LuaParser'
 ---@param options? LuaParser.CompileOptions
 ---@return LuaParser.Ast
 function LuaParser.compile(code, version, options)
-    local ast = class.new 'LuaParser.Ast' (code, version, options)
+    local ast = New 'LuaParser.Ast' (code, version, options)
     ast.main = ast:parseMain()
 
     ---@diagnostic disable-next-line: invisible

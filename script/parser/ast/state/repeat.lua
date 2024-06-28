@@ -1,12 +1,11 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.Repeat: LuaParser.Node.Block
 ---@field condition? LuaParser.Node.Exp
 ---@field symbolPos? integer # until 的位置
-local Repeat = class.declare('LuaParser.Node.Repeat', 'LuaParser.Node.Block')
+local Repeat = Class('LuaParser.Node.Repeat', 'LuaParser.Node.Block')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@return LuaParser.Node.Repeat?

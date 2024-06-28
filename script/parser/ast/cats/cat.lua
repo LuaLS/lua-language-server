@@ -1,4 +1,3 @@
-local class = require 'class'
 
 require 'parser.ast.cats.id'
 require 'parser.ast.cats.class'
@@ -20,7 +19,7 @@ require 'parser.ast.cats.string'
 ---@field value? LuaParser.Node.CatValue
 ---@field extends? LuaParser.Node.CatType
 ---@field tail? string
-local Cat = class.declare('LuaParser.Node.Cat', 'LuaParser.Node.Base')
+local Cat = Class('LuaParser.Node.Cat', 'LuaParser.Node.Base')
 
 ---@alias LuaParser.Node.CatValue
 ---| LuaParser.Node.CatClass
@@ -28,10 +27,10 @@ local Cat = class.declare('LuaParser.Node.Cat', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.CatAttr: LuaParser.Node.Base
 ---@field id string
-local CatAttr = class.declare('LuaParser.Node.CatAttr', 'LuaParser.Node.Base')
+local CatAttr = Class('LuaParser.Node.CatAttr', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 Ast.catParserMap = {}

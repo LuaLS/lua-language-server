@@ -1,10 +1,9 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.CatString: LuaParser.Node.String
-local CatString = class.declare('LuaParser.Node.CatString', 'LuaParser.Node.Base')
+local CatString = Class('LuaParser.Node.CatString', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@return LuaParser.Node.CatString?

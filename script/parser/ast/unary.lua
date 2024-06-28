@@ -1,4 +1,3 @@
-local class = require 'class'
 
 ---@enum(key) LuaParser.UnarySymbol
 local UnarySymbol = {
@@ -17,10 +16,10 @@ local UnaryAlias = {
 ---@class LuaParser.Node.Unary: LuaParser.Node.Base
 ---@field op LuaParser.UnarySymbol
 ---@field exp? LuaParser.Node.Exp
-local Unary = class.declare('LuaParser.Node.Unary', 'LuaParser.Node.Base')
+local Unary = Class('LuaParser.Node.Unary', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@return LuaParser.Node.Unary?

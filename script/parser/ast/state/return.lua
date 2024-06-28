@@ -1,11 +1,10 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.Return: LuaParser.Node.Base
 ---@field exps LuaParser.Node.Exp[]
-local Return = class.declare('LuaParser.Node.Return', 'LuaParser.Node.Base')
+local Return = Class('LuaParser.Node.Return', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@return LuaParser.Node.Return?

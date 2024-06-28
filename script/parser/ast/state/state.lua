@@ -1,4 +1,3 @@
-local class = require 'class'
 
 require 'parser.ast.state.local'
 require 'parser.ast.state.function'
@@ -15,18 +14,18 @@ require 'parser.ast.state.break'
 ---@field symbolPos? integer # 等号的位置
 ---@field exps LuaParser.Node.Exp[]
 ---@field values LuaParser.Node.Var[]
-local Assign = class.declare('LuaParser.Node.Assign', 'LuaParser.Node.Base')
+local Assign = Class('LuaParser.Node.Assign', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.SingleExp: LuaParser.Node.Base
 ---@field exp LuaParser.Node.Exp
-local SingleExp = class.declare('LuaParser.Node.SingleExp', 'LuaParser.Node.Base')
+local SingleExp = Class('LuaParser.Node.SingleExp', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.Select
 ---@field index integer
-local Select = class.declare('LuaParser.Node.Select', 'LuaParser.Node.Base')
+local Select = Class('LuaParser.Node.Select', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@alias LuaParser.Node.State
 ---| LuaParser.Node.LocalDef

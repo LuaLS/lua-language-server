@@ -236,7 +236,8 @@ TEST [[:: continue ::]]
     type   = 'Label',
     start  = 0,
     finish = 14,
-    label  = {
+    symbolPos = 12,
+    name   = {
         start  = 3,
         finish = 11,
         id     = 'continue',
@@ -248,7 +249,7 @@ TEST [[goto continue]]
     type   = 'Goto',
     start  = 0,
     finish = 13,
-    label  = {
+    name  = {
         start  = 5,
         finish = 13,
         id     = 'continue',

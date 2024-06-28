@@ -1,4 +1,3 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.CatFunction: LuaParser.Node.Base
 ---@field params LuaParser.Node.CatParam[]
@@ -10,36 +9,36 @@ local class = require 'class'
 ---@field symbolPos4? integer # 返回值左括号的位置
 ---@field symbolPos5? integer # 返回值右括号的位置
 ---@field async? boolean # 是否异步
-local CatFunction = class.declare('LuaParser.Node.CatFunction', 'LuaParser.Node.Base')
+local CatFunction = Class('LuaParser.Node.CatFunction', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.CatParam: LuaParser.Node.Base
 ---@field parent LuaParser.Node.CatFunction
 ---@field name LuaParser.Node.CatParamName
 ---@field symbolPos? integer # 冒号的位置
 ---@field value? LuaParser.Node.CatType
-local CatParam = class.declare('LuaParser.Node.CatParam', 'LuaParser.Node.Base')
+local CatParam = Class('LuaParser.Node.CatParam', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.CatParamName: LuaParser.Node.Base
 ---@field parent LuaParser.Node.CatParam
 ---@field index integer
 ---@field id string
-local CatParamName = class.declare('LuaParser.Node.CatParamName', 'LuaParser.Node.Base')
+local CatParamName = Class('LuaParser.Node.CatParamName', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.CatReturn: LuaParser.Node.Base
 ---@field parent LuaParser.Node.CatFunction
 ---@field name LuaParser.Node.CatReturnName
 ---@field symbolPos? integer # 冒号的位置
 ---@field value? LuaParser.Node.CatType
-local CatReturn = class.declare('LuaParser.Node.CatReturn', 'LuaParser.Node.Base')
+local CatReturn = Class('LuaParser.Node.CatReturn', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.CatReturnName: LuaParser.Node.Base
 ---@field parent LuaParser.Node.CatReturn
 ---@field index integer
 ---@field id string
-local CatReturnName = class.declare('LuaParser.Node.CatReturnName', 'LuaParser.Node.Base')
+local CatReturnName = Class('LuaParser.Node.CatReturnName', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 function Ast:parseCatFunction()

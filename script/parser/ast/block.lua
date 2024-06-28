@@ -1,4 +1,3 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.Block: LuaParser.Node.Base
 ---@field childs LuaParser.Node.State[]
@@ -7,7 +6,7 @@ local class = require 'class'
 ---@field isMain boolean
 ---@field localMap table<string, LuaParser.Node.Local>
 ---@field labelMap table<string, LuaParser.Node.Label>
-local Block = class.declare('LuaParser.Node.Block', 'LuaParser.Node.Base')
+local Block = Class('LuaParser.Node.Block', 'LuaParser.Node.Base')
 
 Block.isBlock = true
 Block.isMain = false
@@ -71,7 +70,7 @@ Block.__getter.referBlock = function (self)
 end
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 local FinishMap = {
     ['end']    = true,

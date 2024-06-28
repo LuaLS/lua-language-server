@@ -1,13 +1,12 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.While: LuaParser.Node.Block
 ---@field condition LuaParser.Node.Exp
 ---@field symbolPos1? integer # do 的位置
 ---@field symbolPos2? integer # end 的位置
-local While = class.declare('LuaParser.Node.While', 'LuaParser.Node.Block')
+local While = Class('LuaParser.Node.While', 'LuaParser.Node.Block')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@return LuaParser.Node.While?

@@ -1,13 +1,12 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.CatClass: LuaParser.Node.Base
 ---@field classID LuaParser.Node.CatID
 ---@field symbolPos? integer # :的位置
 ---@field extends? LuaParser.Node.CatType
-local CatClass = class.declare('LuaParser.Node.CatClass', 'LuaParser.Node.Base')
+local CatClass = Class('LuaParser.Node.CatClass', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@return LuaParser.Node.CatClass?
 function Ast:parseCatClass()

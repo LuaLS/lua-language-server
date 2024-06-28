@@ -1,8 +1,7 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.CatTable: LuaParser.Node.Base
 ---@field fields LuaParser.Node.CatTableField[]
-local CatTable = class.declare('LuaParser.Node.CatTable', 'LuaParser.Node.Base')
+local CatTable = Class('LuaParser.Node.CatTable', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.CatTableField: LuaParser.Node.Base
 ---@field subtype 'field' | 'index'
@@ -11,15 +10,15 @@ local CatTable = class.declare('LuaParser.Node.CatTable', 'LuaParser.Node.Base')
 ---@field symbolPos? integer
 ---@field symbolPos2? integer
 ---@field parent LuaParser.Node.CatTable
-local CatTableField = class.declare('LuaParser.Node.CatTableField', 'LuaParser.Node.Base')
+local CatTableField = Class('LuaParser.Node.CatTableField', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.CatTableFieldID: LuaParser.Node.Base
 ---@field id string
 ---@field parent LuaParser.Node.CatTableField
-local CatTableFieldID = class.declare('LuaParser.Node.CatTableFieldID', 'LuaParser.Node.Base')
+local CatTableFieldID = Class('LuaParser.Node.CatTableFieldID', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@return LuaParser.Node.CatTable?

@@ -1,7 +1,6 @@
-local class = require 'class'
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@param atLeastOne? boolean

@@ -1,13 +1,12 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.Call: LuaParser.Node.Base
 ---@field node LuaParser.Node.Term
 ---@field argPos integer
 ---@field args LuaParser.Node.Exp[]
-local Call = class.declare('LuaParser.Node.Call', 'LuaParser.Node.Base')
+local Call = Class('LuaParser.Node.Call', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@param last LuaParser.Node.Term

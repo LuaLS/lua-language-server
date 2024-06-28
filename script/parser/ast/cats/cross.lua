@@ -3,10 +3,10 @@ local class = require'class'
 ---@class LuaParser.Node.CatCross: LuaParser.Node.Base
 ---@field poses integer[] # 所有 & 的位置
 ---@field exps LuaParser.Node.CatType[] # 所有的子表达式
-local Cross = class.declare('LuaParser.Node.CatCross', 'LuaParser.Node.Base')
+local Cross = Class('LuaParser.Node.CatCross', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@param required? boolean

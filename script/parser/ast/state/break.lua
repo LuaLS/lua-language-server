@@ -1,14 +1,13 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.Break: LuaParser.Node.Base
 ---@field breeakBlock? LuaParser.Node.Block
-local Break = class.declare('LuaParser.Node.Break', 'LuaParser.Node.Base')
+local Break = Class('LuaParser.Node.Break', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.Continue: LuaParser.Node.Base
-local Continue = class.declare('LuaParser.Node.Continue', 'LuaParser.Node.Base')
+local Continue = Class('LuaParser.Node.Continue', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@return LuaParser.Node.Block?
 function Ast:findBreakBlock()

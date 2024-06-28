@@ -1,7 +1,5 @@
-local class = require 'class'
-
 ---@class LuaParser
-local M = class.declare 'LuaParser'
+local M = Class 'LuaParser'
 
 require 'parser.compile'
 

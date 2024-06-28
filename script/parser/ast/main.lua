@@ -1,8 +1,7 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.Main: LuaParser.Node.Function
 ---@field parent LuaParser.Ast
-local Main = class.declare('LuaParser.Node.Main', 'LuaParser.Node.Function')
+local Main = Class('LuaParser.Node.Main', 'LuaParser.Node.Function')
 
 Main.isMain = true
 
@@ -15,7 +14,7 @@ function Main.__getter.parentBlock()
 end
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 function Ast:skipShebang()

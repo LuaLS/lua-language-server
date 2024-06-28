@@ -1,10 +1,9 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.LocalDef: LuaParser.Node.Base
 ---@field vars LuaParser.Node.Local[]
 ---@field symbolPos? integer # 等号的位置
 ---@field values? LuaParser.Node.Exp[]
-local LocalDef = class.declare('LuaParser.Node.LocalDef', 'LuaParser.Node.Base')
+local LocalDef = Class('LuaParser.Node.LocalDef', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.Local: LuaParser.Node.Base
 ---@field id string
@@ -16,7 +15,7 @@ local LocalDef = class.declare('LuaParser.Node.LocalDef', 'LuaParser.Node.Base')
 ---@field sets? LuaParser.Node.Var[]
 ---@field envRefs? LuaParser.Node.Var[]
 ---@field attr? LuaParser.Node.Attr
-local Local = class.declare('LuaParser.Node.Local', 'LuaParser.Node.Base')
+local Local = Class('LuaParser.Node.Local', 'LuaParser.Node.Base')
 
 -- 所有的引用对象
 Local.__getter.refs = function ()
@@ -65,15 +64,15 @@ end
 ---@class LuaParser.Node.Attr: LuaParser.Node.Base
 ---@field name LuaParser.Node.AttrName
 ---@field symbolPos? integer # > 的位置
-local Attr = class.declare('LuaParser.Node.Attr', 'LuaParser.Node.Base')
+local Attr = Class('LuaParser.Node.Attr', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.AttrName: LuaParser.Node.Base
 ---@field parent LuaParser.Node.Attr
 ---@field id string
-local AttrName = class.declare('LuaParser.Node.AttrName', 'LuaParser.Node.Base')
+local AttrName = Class('LuaParser.Node.AttrName', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@return (LuaParser.Node.LocalDef | LuaParser.Node.Function)?

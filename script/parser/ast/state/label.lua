@@ -1,10 +1,9 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.Label: LuaParser.Node.Base
 ---@field name? LuaParser.Node.LabelName
 ---@field symbolPos? integer # 右边标签符号的位置
 ---@field gotos LuaParser.Node.Goto[] # 关联的Goto
-local Label = class.declare('LuaParser.Node.Label', 'LuaParser.Node.Base')
+local Label = Class('LuaParser.Node.Label', 'LuaParser.Node.Base')
 
 Label.__getter.gotos = function (self)
     return {}, true
@@ -13,15 +12,15 @@ end
 ---@class LuaParser.Node.LabelName: LuaParser.Node.Base
 ---@field parent LuaParser.Node.Label | LuaParser.Node.Goto
 ---@field id string
-local LabelName = class.declare('LuaParser.Node.LabelName', 'LuaParser.Node.Base')
+local LabelName = Class('LuaParser.Node.LabelName', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.Goto: LuaParser.Node.Base
 ---@field name? LuaParser.Node.LabelName
 ---@field label? LuaParser.Node.Label # 关联的Label
-local Goto = class.declare('LuaParser.Node.Goto', 'LuaParser.Node.Base')
+local Goto = Class('LuaParser.Node.Goto', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@return LuaParser.Node.Label?

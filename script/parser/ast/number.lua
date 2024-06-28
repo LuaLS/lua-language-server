@@ -1,4 +1,3 @@
-local class = require 'class'
 
 ---@alias LuaParser.Node.Number LuaParser.Node.Float | LuaParser.Node.Integer
 
@@ -6,7 +5,7 @@ local class = require 'class'
 ---@field value number
 ---@field valuei? number # 虚数
 ---@field numBase 2 | 10 | 16
-local Float = class.declare('LuaParser.Node.Float', 'LuaParser.Node.Literal')
+local Float = Class('LuaParser.Node.Float', 'LuaParser.Node.Literal')
 
 Float.value = 0.0
 
@@ -58,7 +57,7 @@ end
 ---@field valuei? number # 虚数
 ---@field numBase 2 | 10 | 16
 ---@field intTail? 'LL' | 'ULL'
-local Integer = class.declare('LuaParser.Node.Integer', 'LuaParser.Node.Literal')
+local Integer = Class('LuaParser.Node.Integer', 'LuaParser.Node.Literal')
 
 Integer.value = 0
 
@@ -105,7 +104,7 @@ Integer.__getter.asInteger = function (self)
 end
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 -- 解析数字（可以带负号）
 ---@private

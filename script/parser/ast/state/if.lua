@@ -1,17 +1,16 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.If: LuaParser.Node.Base
 ---@field childs LuaParser.Node.IfChild[]
-local If = class.declare('LuaParser.Node.If', 'LuaParser.Node.Base')
+local If = Class('LuaParser.Node.If', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Node.IfChild: LuaParser.Node.Block
 ---@field subtype 'if' | 'elseif' | 'else'
 ---@field condition? LuaParser.Node.Exp
 ---@field symbolPos? integer # then 的位置
-local IfChild = class.declare('LuaParser.Node.IfChild', 'LuaParser.Node.Block')
+local IfChild = Class('LuaParser.Node.IfChild', 'LuaParser.Node.Block')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@return LuaParser.Node.If?

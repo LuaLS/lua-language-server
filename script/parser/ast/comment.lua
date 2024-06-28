@@ -1,9 +1,8 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.Comment: LuaParser.Node.Base
 ---@field subtype 'short' | 'long'
 ---@field value string
-local Comment = class.declare('LuaParser.Node.Comment', 'LuaParser.Node.Base')
+local Comment = Class('LuaParser.Node.Comment', 'LuaParser.Node.Base')
 
 ---@param self LuaParser.Node.Comment
 ---@return string
@@ -23,7 +22,7 @@ Comment.__getter.value = function (self)
 end
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@param inExp? boolean

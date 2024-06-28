@@ -3,10 +3,10 @@ local class = require'class'
 ---@class LuaParser.Node.CatUnion: LuaParser.Node.Base
 ---@field poses integer[] # 所有 | 的位置
 ---@field exps LuaParser.Node.CatType[] # 所有的子表达式
-local Union = class.declare('LuaParser.Node.CatUnion', 'LuaParser.Node.Base')
+local Union = Class('LuaParser.Node.CatUnion', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@param required? boolean

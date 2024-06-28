@@ -1,13 +1,12 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.Table: LuaParser.Node.Base
 ---@field fields LuaParser.Node.Field[]
-local Table = class.declare('LuaParser.Node.Table', 'LuaParser.Node.Base')
+local Table = Class('LuaParser.Node.Table', 'LuaParser.Node.Base')
 
 Table.isLiteral = true
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@return LuaParser.Node.Table?

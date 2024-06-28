@@ -1,8 +1,7 @@
 Class  = require 'class'.declare
 New    = require 'class'.new
 Delete = require 'class'.delete
-
-package.loaded['class'] = require 'class'
+Type   = require 'class'.type
 
 ---@class LuaLS
 ls = {}

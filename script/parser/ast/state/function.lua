@@ -1,10 +1,9 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.Param: LuaParser.Node.Local
 ---@field parent LuaParser.Node.Function
 ---@field index integer
 ---@field id string
-local Param = class.declare('LuaParser.Node.Param', 'LuaParser.Node.Local')
+local Param = Class('LuaParser.Node.Param', 'LuaParser.Node.Local')
 
 ---@alias LuaParser.Node.FuncName
 ---| LuaParser.Node.Var
@@ -17,7 +16,7 @@ local Param = class.declare('LuaParser.Node.Param', 'LuaParser.Node.Local')
 ---@field symbolPos1? integer # 左括号
 ---@field symbolPos2? integer # 右括号
 ---@field symbolPos3? integer # `end`
-local Function = class.declare('LuaParser.Node.Function', 'LuaParser.Node.Block')
+local Function = Class('LuaParser.Node.Function', 'LuaParser.Node.Block')
 
 Function.isLiteral = true
 Function.isFunction = true
@@ -28,7 +27,7 @@ end
 
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@param isLocal? boolean

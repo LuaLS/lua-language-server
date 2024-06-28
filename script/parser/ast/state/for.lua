@@ -1,4 +1,3 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.For: LuaParser.Node.Block
 ---@field subtype 'loop' | 'in' | 'incomplete'
@@ -7,14 +6,14 @@ local class = require 'class'
 ---@field symbolPos1? integer # in 或 = 的位置
 ---@field symbolPos2? integer # do 的位置
 ---@field symbolPos3? integer # end 的位置
-local For = class.declare('LuaParser.Node.For', 'LuaParser.Node.Block')
+local For = Class('LuaParser.Node.For', 'LuaParser.Node.Block')
 
 For.subtype = 'incomplete'
 For.vars = {}
 For.exps = {}
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@return LuaParser.Node.For?

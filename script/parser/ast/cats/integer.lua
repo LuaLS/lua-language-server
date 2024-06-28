@@ -1,11 +1,10 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.CatInteger: LuaParser.Node.Literal
 ---@field value integer
-local CatInteger = class.declare('LuaParser.Node.CatInteger', 'LuaParser.Node.Base')
+local CatInteger = Class('LuaParser.Node.CatInteger', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@return LuaParser.Node.CatInteger?

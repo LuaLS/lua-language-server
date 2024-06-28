@@ -1,11 +1,10 @@
-local class = require 'class'
 
 ---@class LuaParser.Node.Do: LuaParser.Node.Block
 ---@field symbolPos? integer # end 的位置
-local Do = class.declare('LuaParser.Node.Do', 'LuaParser.Node.Block')
+local Do = Class('LuaParser.Node.Do', 'LuaParser.Node.Block')
 
 ---@class LuaParser.Ast
-local Ast = class.get 'LuaParser.Ast'
+local Ast = Class 'LuaParser.Ast'
 
 ---@private
 ---@return LuaParser.Node.Do?

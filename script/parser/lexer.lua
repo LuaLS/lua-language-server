@@ -1,5 +1,4 @@
 local l     = require 'lpeglabel'
-local class = require 'class'
 
 local Sp     = l.S' \t\v\f'
 local Nl     = l.P'\r\n' + l.S'\r\n'
@@ -58,7 +57,7 @@ local Parser  = l.Ct((Sp^1 + Token)^0)
 
 ---@class Lexer
 ---@overload fun(code: string, mode: 'Lua' | 'Cat'): Lexer
-local M = class.declare 'Lexer'
+local M = Class 'Lexer'
 
 ---@param code string
 ---@param mode 'Lua' | 'Cat'
@@ -216,7 +215,7 @@ local API = {}
 ---@param code string
 ---@return Lexer
 function API.parseLua(code)
-    local lexer = class.new 'Lexer' (code, 'Lua')
+    local lexer = New 'Lexer' (code, 'Lua')
     return lexer
 end
 

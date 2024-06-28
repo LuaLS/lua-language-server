@@ -109,7 +109,16 @@ function Ast:parseBinary(curExp, curLevel, asState)
     self.lexer:next()
     self:skipSpace()
 
-    local exp2 = self:parseExp(true, false, myLevel)
+    local exp2 = self:parseExp(false, false, myLevel)
+
+    if not exp2 then
+        --尝试跳过下个符号，然后重新解析一次表达式
+        local nextToken, nextPos = self.lexer:consumeType 'Symbol'
+        if nextToken and nextPos then
+            self:throw('UNKNOWN_SYMBOL', nextPos, nextPos + #nextToken)
+        end
+        exp2 = self:parseExp(true, false, myLevel)
+    end
 
     local binary = self:createNode('LuaParser.Node.Binary', {
         start     = curExp.start,

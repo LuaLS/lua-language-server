@@ -63,7 +63,7 @@ function Ast:parseVarargs()
     end
 
     local loc = self:bindVarargs()
-    if not loc then
+    if not loc and self:getCurrentFunction() then
         self:throw('UNEXPECT_DOTS', pos, pos + #'...')
     end
 

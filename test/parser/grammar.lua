@@ -1,5 +1,3 @@
-local class = require 'class'
-
 local function check_str(code, name, mode)
     ---@class LuaParser.Ast
     local ast = New 'LuaParser.Ast' (code)

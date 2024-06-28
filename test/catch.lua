@@ -55,11 +55,12 @@ end
 local function parseTokens(script, seps)
     local parser = l.P {
         l.Ct(l.V 'Token'^0),
-        Token = l.Cp() * (l.V 'Mark' + l.V 'Nl' + l.V 'Text'),
+        Token = l.Cp() * (l.V 'Raw' + l.V 'Mark' + l.V 'Nl' + l.V 'Text'),
         Mark  = l.Cc 'ML' * l.P '<' * l.C(l.S(seps))
               + l.Cc 'MR' * l.C(l.S(seps)) * l.P '>',
         Nl    = l.Cc 'NL' * l.C(l.P '\r\n' + l.S '\r\n'),
         Text  = l.Cc 'TX' * l.C((1 - l.V 'Nl' - l.V 'Mark')^1),
+        Raw   = l.Cc 'RX' * l.C(l.P '%' * l.P(1)),
     }
     local results = parser:match(script)
     return results
@@ -88,6 +89,10 @@ return function (script, seps)
         local text   = tokens[i + 2]
         if mode == 'TX' then
             newBuf[#newBuf+1] = text
+        end
+        if mode == 'RX' then
+            newBuf[#newBuf+1] = text:sub(2)
+            skipOffset = skipOffset + 1
         end
         if mode == 'NL' then
             newBuf[#newBuf+1] = text

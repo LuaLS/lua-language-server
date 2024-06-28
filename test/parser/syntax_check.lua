@@ -312,9 +312,6 @@ f(<!,!>1)
 ]]
 {
     code = 'UNEXPECT_SYMBOL',
-    extra = {
-        symbol = ',',
-    }
 }
 
 TEST[[
@@ -566,10 +563,10 @@ function f(a,<!!>) end
 }
 
 TEST[[
-function f(<!!>,a) end
+function f(<!,!>a) end
 ]]
 {
-    code = 'MISS_NAME',
+    code = 'UNEXPECT_SYMBOL',
 }
 
 TEST[[
@@ -1166,9 +1163,6 @@ a = 3 / <!/!> 2
 ]]
 {
     code = 'UNKNOWN_SYMBOL',
-    extra = {
-        symbol = '/'
-    }
 }
 
 TEST[[
@@ -1186,19 +1180,13 @@ b = 1 <<!>!> 0
 ]]
 {
     code = 'UNKNOWN_SYMBOL',
-    extra = {
-        symbol = '>',
-    }
 }
 
 TEST[[
-b = 1 < <!<!> 0
+b = 1 < <!%<!> 0
 ]]
 {
     code = 'UNKNOWN_SYMBOL',
-    extra = {
-        symbol = '<',
-    }
 }
 
 TEST[[
@@ -1291,6 +1279,10 @@ TEST[[
 {
     multi = 2,
     code = 'MISS_END',
+    extra = {
+        start = 9,
+        finish = 9,
+    }
 }
 
 TEST[[
@@ -1314,6 +1306,10 @@ TEST[[
 {
     multi = 2,
     code = 'MISS_END',
+    extra = {
+        start = 14,
+        finish = 14,
+    }
 }
 
 TEST[[
@@ -1348,7 +1344,7 @@ TEST[[
 }
 
 TEST[[
-local function <!a.b!>()
+local function a<!.b!>()
 end
 ]]
 {

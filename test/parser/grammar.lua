@@ -2,7 +2,7 @@ local class = require 'class'
 
 local function check_str(code, name, mode)
     ---@class LuaParser.Ast
-    local ast = class.new 'LuaParser.Ast' (code)
+    local ast = New 'LuaParser.Ast' (code)
     local parser = 'parse' .. mode
     if mode == 'Dirty' then
         parser = 'parseMain'

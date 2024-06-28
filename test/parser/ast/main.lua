@@ -5,7 +5,7 @@ local class = require 'class'
 ---@return fun(table)
 local function TEST(code, optional)
     return function (expect)
-        local ast = class.new 'LuaParser.Ast' (code, nil, optional)
+        local ast = New 'LuaParser.Ast' (code, nil, optional)
         local main = ast:parseMain()
         assert(main)
         Match(main, expect)

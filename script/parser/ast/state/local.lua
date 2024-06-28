@@ -135,7 +135,8 @@ function Ast:initLocal(loc)
     ---@class LuaParser.Node.Block
     local block = self.curBlock
     if not block then
-        return
+        block = New 'LuaParser.Node.Block' ()
+        self:blockStart(block)
     end
 
     block.locals[#block.locals+1] = loc

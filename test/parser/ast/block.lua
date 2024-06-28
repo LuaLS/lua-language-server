@@ -481,16 +481,6 @@ end
 ]]
 {
     type = 'Function',
-    locals = {
-        [1] = {
-            id = 'f',
-            gets = {
-                [1] = {
-                    left = 10011,
-                }
-            }
-        }
-    },
     childs = {
         [1] = {
             type = 'Return',

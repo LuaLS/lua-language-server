@@ -9,9 +9,9 @@ require 'luals'
 
 --语言服务器自身的状态
 ---@class LuaLS.Runtime
-luals.runtime = require 'runtime'
+ls.runtime = require 'runtime'
 
-fs.create_directories(fs.path(luals.runtime.logPath))
+fs.create_directories(fs.path(ls.runtime.logPath))
 
 ---@diagnostic disable-next-line: lowercase-global
 log = New 'Log' {
@@ -21,22 +21,22 @@ log = New 'Log' {
     time  = function ()
         return time.time() // 1000
     end,
-    path = luals.uri.decode(luals.runtime.logUri) .. '/test.log',
+    path = ls.uri.decode(ls.runtime.logUri) .. '/test.log',
 }
 
 ---@class Test
 test = {}
 test.catch = require 'test.catch'
 
-test.rootPath = luals.runtime.rootPath .. '/test_root'
-test.rootUri  = luals.uri.encode(test.rootPath)
-test.fileUri  = luals.uri.encode(test.rootPath .. '/unittest.lua')
+test.rootPath = ls.runtime.rootPath .. '/test_root'
+test.rootUri  = ls.uri.encode(test.rootPath)
+test.fileUri  = ls.uri.encode(test.rootPath .. '/unittest.lua')
 
 test.singleFile = function (text)
-    luals.files = New 'FileManager' ()
-    luals.files:setText(test.fileUri, text)
-    luals.files:flush()
-    luals.vm = New 'VM' (luals.files)
+    ls.files = New 'FileManager' ()
+    ls.files:setText(test.fileUri, text)
+    ls.files:flush()
+    ls.vm = New 'VM' (ls.files)
 end
 
 print('开始测试')

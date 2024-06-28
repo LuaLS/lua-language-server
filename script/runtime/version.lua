@@ -1,7 +1,7 @@
 ---@param rootPath string
 ---@return string?
 local function loadVersion(rootPath)
-    local changelog = luals.util.loadFile(rootPath .. '/changelog.md')
+    local changelog = ls.util.loadFile(rootPath .. '/changelog.md')
     if not changelog then
         return
     end

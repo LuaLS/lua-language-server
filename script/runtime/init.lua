@@ -42,7 +42,7 @@ M.args = {
     --命令行：生成文档
     DOC = '',
 }
-luals.util.tableMerge(M.args, argparser.parse(arg, true))
+ls.util.tableMerge(M.args, argparser.parse(arg, true))
 
 ---@return string
 local function findRoot()
@@ -62,15 +62,15 @@ end
 --环境变量
 M.env = {}
 --语言服务器根路径
-M.rootPath      = luals.util.expandPath(findRoot())
+M.rootPath      = ls.util.expandPath(findRoot())
 M.env.LUALSPATH = M.rootPath
-M.logPath       = luals.util.expandPath(M.args.LOGPATH, M.env)
+M.logPath       = ls.util.expandPath(M.args.LOGPATH, M.env)
 M.env.LOGPATH   = M.logPath
-M.metaPath      = luals.util.expandPath(M.args.METAPATH, M.env)
+M.metaPath      = ls.util.expandPath(M.args.METAPATH, M.env)
 M.env.METAPATH  = M.metaPath
-M.rootUri       = luals.uri.encode(M.rootPath)
-M.logUri        = luals.uri.encode(M.logPath)
-M.metaUri       = luals.uri.encode(M.metaPath)
+M.rootUri       = ls.uri.encode(M.rootPath)
+M.logUri        = ls.uri.encode(M.logPath)
+M.metaUri       = ls.uri.encode(M.metaPath)
 
 --启动时的版本号
 M.version = version.getVersion(M.rootPath)

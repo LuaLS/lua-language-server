@@ -5,27 +5,27 @@ Delete = require 'class'.delete
 package.loaded['class'] = require 'class'
 
 ---@class LuaLS
-luals = {}
+ls = {}
 
-luals.util    = require 'utility'
-luals.inspect = require 'inspect'
-luals.encoder = require 'encoder'
+ls.util    = require 'utility'
+ls.inspect = require 'inspect'
+ls.encoder = require 'encoder'
 
-luals.json    = require 'json'
+ls.json    = require 'json'
 require 'jsonc'
 require 'json-edit'
 require 'log'
 require 'linked-table'
 
-luals.uri     = require 'uri'
-luals.task    = require 'task'
-luals.timer   = require 'timer'
+ls.uri     = require 'uri'
+ls.task    = require 'task'
+ls.timer   = require 'timer'
 
-luals.config  = require 'config'
+ls.config  = require 'config'
 
 require 'file'
-luals.files   = New 'FileManager' ()
+ls.files   = New 'FileManager' ()
 ---@type VM?
-luals.vm      = nil
+ls.vm      = nil
 
-return luals
+return ls

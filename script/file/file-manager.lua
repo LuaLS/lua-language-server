@@ -86,7 +86,7 @@ function M:flush()
         return false
     end
     local ok = false
-    for uri in luals.util.sortPairs(self.newFiles) do
+    for uri in ls.util.sortPairs(self.newFiles) do
         local file = self:getFile(uri)
         if file and file:flush() then
             ok = true
@@ -104,7 +104,7 @@ function M:flushDelay(time)
         end
         M.flushDelayTimer:remove()
     end
-    M.flushDelayTimer = luals.timer.wait(time, M.flush)
+    M.flushDelayTimer = ls.timer.wait(time, M.flush)
 end
 
 return M

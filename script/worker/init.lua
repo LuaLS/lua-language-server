@@ -1,4 +1,4 @@
-luals.threadName = 'worker'
+ls.threadName = 'worker'
 
 ---@diagnostic disable-next-line: lowercase-global
 log = New 'Log' {
@@ -10,12 +10,12 @@ log = New 'Log' {
 log.info('Worker ready!')
 
 xpcall(function ()
-    if not luals.runtime.args.DEVELOP then
+    if not ls.runtime.args.DEVELOP then
         return
     end
     local dbg = require 'debugger'
-    dbg:start(luals.runtime.args.DBGADDRESS .. ':' .. luals.runtime.args.DBGPORT)
-    if luals.runtime.args.DBGWAIT then
+    dbg:start(ls.runtime.args.DBGADDRESS .. ':' .. ls.runtime.args.DBGPORT)
+    if ls.runtime.args.DBGWAIT then
         dbg:event 'wait'
     end
 end, log.warn)

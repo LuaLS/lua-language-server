@@ -43,15 +43,6 @@ local checkLevel = define.DiagnosticSeverity[CHECKLEVEL] or define.DiagnosticSev
 
 util.enableCloseFunction()
 
--- Hash function used to distribute work.
-local function hashString(str)
-    local hash = 0
-    for i = 1, #str do
-        hash = (hash * 37 & 0xFFFFFFFF) + str:byte(i, i)
-    end
-    return hash
-end
-
 local lastClock = os.clock()
 local results = {}
 
@@ -109,9 +100,9 @@ xpcall(lclient.start, errorhandler, lclient, function (client)
 
     local uris = files.getChildFiles(rootUri)
     local max  = #uris
+    table.sort(uris)    -- sort file list to ensure the work distribution order across multiple threads
     for i, uri in ipairs(uris) do
-        local hash = hashString(uri) % numThreads + 1
-        if hash == threadId then
+        if (i % numThreads + 1) == threadId then
             files.open(uri)
             diag.doDiagnostic(uri, true)
             -- Print regularly but always print the last entry to ensure that logs written to files don't look incomplete.

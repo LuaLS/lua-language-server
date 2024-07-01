@@ -550,9 +550,12 @@ local function matchCall(source)
     or call.node ~= source then
         return
     end
-    local funcs = vm.getMatchedFunctions(source, call.args)
     local myNode = vm.getNode(source)
     if not myNode then
+        return
+    end
+    local funcs = vm.getExactMatchedFunctions(source, call.args)
+    if not funcs then
         return
     end
     local needRemove
@@ -870,7 +873,7 @@ local function compileCallArgNode(arg, call, callNode, fixIndex, myIndex)
     ---@type integer?, table<any, boolean>?
     local eventIndex, eventMap
     if call.args then
-        for i = 1, 2 do
+        for i = 1, 10 do
             local eventArg = call.args[i + fixIndex]
             if not eventArg then
                 break
@@ -1055,7 +1058,7 @@ local function compileFunctionParam(func, source)
     local derviationParam = config.get(guide.getUri(func), 'Lua.type.inferParamType')
     if derviationParam and func.parent.type == 'local' and func.parent.ref then
         local refs = func.parent.ref
-        local found 
+        local found
         for _, ref in ipairs(refs) do
             if ref.parent.type ~= 'call' then
                 goto continue
@@ -1069,13 +1072,13 @@ local function compileFunctionParam(func, source)
                     local callerArg = caller.args[index]
                     if callerArg then
                         vm.setNode(source, vm.compileNode(callerArg))
-                        finded = true
+                        found = true
                     end
                 end
             end
             ::continue::
         end
-        return finded
+        return found
     end
 end
 

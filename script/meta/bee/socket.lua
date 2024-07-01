@@ -8,8 +8,12 @@
 ---| 'udp6'
 
 ---@class bee.socket
----@overload fun(protocol: bee.socket.protocol): bee.socket.fd?, string?
 local socket = {}
+
+---@param protocol bee.socket.protocol
+---@return bee.socket.fd?
+---@return string?
+function socket.create(protocol) end
 
 ---@param readfds? bee.socket.fd[]
 ---@param writefds? bee.socket.fd[]

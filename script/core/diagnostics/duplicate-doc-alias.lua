@@ -15,6 +15,7 @@ return function (uri, callback)
         return
     end
 
+    local merged = {}
     local cache = {}
     for _, doc in ipairs(state.ast.docs) do
         if doc.type == 'doc.alias'
@@ -36,10 +37,11 @@ return function (uri, callback)
                             finish = otherDoc.finish,
                             uri    = guide.getUri(otherDoc),
                         }
+                        merged[name] = merged[name] or vm.docHasAttr(otherDoc, 'partial')
                     end
                 end
             end
-            if #cache[name] > 1 then
+            if not merged[name] and #cache[name] > 1 then
                 callback {
                     start   = (doc.alias or doc.enum).start,
                     finish  = (doc.alias or doc.enum).finish,

@@ -12,9 +12,10 @@ return function (uri, callback)
     end
     ---@async
     guide.eachSourceType(state.ast, 'call', function (source)
-        local parent = source.parent
-        if  parent.type ~= 'function'
-        and parent.type ~= 'main' then
+        if not guide.isBlockType(source.parent) then
+            return
+        end
+        if source.parent.filter == source then
             return
         end
         await.delay()

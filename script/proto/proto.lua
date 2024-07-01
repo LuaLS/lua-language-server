@@ -55,7 +55,6 @@ function m.send(data)
         io.write(buf)
     elseif m.mode == 'socket' then
         m.client:write(buf)
-        net.update()
     end
 end
 
@@ -232,6 +231,7 @@ end
 function m.listen(mode, socketPort)
     m.mode = mode
     if mode == 'stdio' then
+        log.info('Listen Mode: stdio')
         if platform.os == 'windows' then
             local windows = require 'bee.windows'
             windows.filemode(io.stdin,  'b')
@@ -247,6 +247,10 @@ function m.listen(mode, socketPort)
 
         local server = net.listen('unix', unixPath)
 
+        log.info('Listen Mode: socket')
+        log.info('Listen Port:', socketPort)
+        log.info('Listen Path:', unixPath)
+
         assert(server)
 
         local dummyClient = {
@@ -258,15 +262,14 @@ function m.listen(mode, socketPort)
         }
         m.client = dummyClient
 
-        local t = timer.loop(0.1, function ()
-            net.update()
-        end)
-
-        function server:on_accept(client)
-            t:remove()
+        function server:on_accepted(client)
             m.client = client
             client:write(dummyClient.buf)
-            net.update()
+            return true
+        end
+
+        function server:on_error(...)
+            log.error(...)
         end
 
         pub.task('loadProtoBySocket', {

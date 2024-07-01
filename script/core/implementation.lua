@@ -57,33 +57,6 @@ local accept = {
     ['doc.field.name']   = true,
 }
 
-local function checkRequire(source, offset)
-    if source.type ~= 'string' then
-        return nil
-    end
-    local callargs = source.parent
-    if callargs.type ~= 'callargs' then
-        return
-    end
-    if callargs[1] ~= source then
-        return
-    end
-    local call = callargs.parent
-    local func = call.node
-    local literal = guide.getLiteral(source)
-    local libName = vm.getLibraryName(func)
-    if not libName then
-        return nil
-    end
-    if     libName == 'require' then
-        return rpath.findUrisByRequireName(guide.getUri(source), literal)
-    elseif libName == 'dofile'
-    or     libName == 'loadfile' then
-        return workspace.findUrisByFilePath(literal)
-    end
-    return nil
-end
-
 local function convertIndex(source)
     if not source then
         return
@@ -105,6 +78,7 @@ local function convertIndex(source)
     return source
 end
 
+---@async
 return function (uri, offset)
     local ast = files.getState(uri)
     if not ast then
@@ -117,50 +91,72 @@ return function (uri, offset)
     end
 
     local results = {}
-    local uris = checkRequire(source)
-    if uris then
-        for i, uri in ipairs(uris) do
-            results[#results+1] = {
-                uri    = uri,
-                source = source,
-                target = {
-                    start  = 0,
-                    finish = 0,
-                    uri    = uri,
-                }
-            }
-        end
-    end
 
-    local defs = vm.getDefs(source)
+    local defs = vm.getRefs(source)
 
     for _, src in ipairs(defs) do
+        if not guide.isAssign(src) then
+            goto CONTINUE
+        end
+        if src.type == 'global' then
+            goto CONTINUE
+        end
         local root = guide.getRoot(src)
         if not root then
             goto CONTINUE
         end
-        src = src.field or src.method or src.index or src
+        if src.type == 'self' then
+            goto CONTINUE
+        end
+        src = src.field or src.method or src
+        if src.type == 'getindex'
+        or src.type == 'setindex'
+        or src.type == 'tableindex' then
+            src = src.index
+            if not src then
+                goto CONTINUE
+            end
+            if not guide.isLiteral(src) then
+                goto CONTINUE
+            end
+        end
+        if src.type == 'doc.type.function'
+        or src.type == 'doc.type.table'
+        or src.type == 'doc.type.boolean'
+        or src.type == 'doc.type.integer'
+        or src.type == 'doc.type.string' then
+            goto CONTINUE
+        end
         if src.type == 'doc.class' then
-            src = src.class
+            goto CONTINUE
         end
         if src.type == 'doc.alias' then
-            src = src.alias
+            goto CONTINUE
         end
         if src.type == 'doc.enum' then
-            src = src.enum
+            goto CONTINUE
+        end
+        if src.type == 'doc.type.field' then
+            goto CONTINUE
         end
         if src.type == 'doc.class.name'
         or src.type == 'doc.alias.name'
-        or src.type == 'doc.type.function'
-        or src.type == 'doc.type.array'
-        or src.type == 'doc.type.table'
-        or src.type == 'function' then
-            results[#results+1] = {
-                target = src,
-                uri    = root.uri,
-                source = source,
-            }
+        or src.type == 'doc.enum.name'
+        or src.type == 'doc.field.name' then
+            goto CONTINUE
         end
+        if src.type == 'doc.generic.name' then
+            goto CONTINUE
+        end
+        if src.type == 'doc.param' then
+            goto CONTINUE
+        end
+
+        results[#results+1] = {
+            target = src,
+            uri    = root.uri,
+            source = source,
+        }
         ::CONTINUE::
     end
 

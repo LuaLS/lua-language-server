@@ -382,12 +382,14 @@ local compilerGlobalSwitch = util.switch()
                         [1]    = field.field[1],
                     }
                 elseif field.type == 'tableindex' then
-                    source._enums[#source._enums+1] = {
-                        type   = 'doc.type.string',
-                        start  = field.index.start,
-                        finish = field.index.finish,
-                        [1]    = field.index[1],
-                    }
+                    if field.index then
+                        source._enums[#source._enums+1] = {
+                            type   = 'doc.type.string',
+                            start  = field.index.start,
+                            finish = field.index.finish,
+                            [1]    = field.index[1],
+                        }
+                    end
                 end
             end
         else
@@ -539,21 +541,60 @@ function vm.hasGlobalSets(suri, cate, name)
     return true
 end
 
+---@param uri uri
+---@param key string
+---@return boolean
+local function checkIsGlobalRegex(uri, key)
+    local dglobalsregex = config.get(uri, 'Lua.diagnostics.globalsRegex')
+    if not dglobalsregex then
+        return false
+    end
+
+    for _, pattern in ipairs(dglobalsregex) do
+        if key:match(pattern) then
+            return true
+        end
+    end
+
+    return false
+end
+
 ---@param src parser.object
 local function checkIsUndefinedGlobal(src)
-    local key = src[1]
+    if src.type ~= 'getglobal' then
+        return false
+    end
 
-    local uri = guide.getUri(src)
-    local dglobals = util.arrayToHash(config.get(uri, 'Lua.diagnostics.globals'))
-    local rspecial = config.get(uri, 'Lua.runtime.special')
+    local key = src[1]
+    if not key then
+        return false
+    end
 
     local node = src.node
-    return src.type == 'getglobal' and key and not (
-        dglobals[key] or
-        rspecial[key] or
-        node.tag ~= '_ENV' or
-        vm.hasGlobalSets(uri, 'variable', key)
-    )
+    if node.tag ~= '_ENV' then
+        return false
+    end
+
+    local uri = guide.getUri(src)
+    local rspecial = config.get(uri, 'Lua.runtime.special')
+    if rspecial[key] then
+        return false
+    end
+
+    if vm.hasGlobalSets(uri, 'variable', key) then
+        return false
+    end
+
+    local dglobals = config.get(uri, 'Lua.diagnostics.globals')
+    if util.arrayHas(dglobals, key) then
+        return false
+    end
+
+    if checkIsGlobalRegex(uri, key) then
+        return false
+    end
+
+    return true
 end
 
 ---@param src parser.object

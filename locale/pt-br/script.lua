@@ -646,8 +646,12 @@ CLI_CHECK_INITING =
 'Inicializando ...'
 CLI_CHECK_SUCCESS =
 'Diagnóstico completo, nenhum problema encontrado'
+CLI_CHECK_PROGRESS = -- TODO: need translate!
+'Found {} problems in {} files'
 CLI_CHECK_RESULTS =
 'Diagnóstico completo, {} problemas encontrados, veja {}'
+CLI_CHECK_MULTIPLE_WORKERS = -- TODO: need translate!
+'Starting {} worker tasks, progress output will be disabled. This may take a few minutes.'
 CLI_DOC_INITING   = -- TODO: need translate!
 'Loading documents ...'
 CLI_DOC_DONE      = -- TODO: need translate!

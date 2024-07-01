@@ -11,9 +11,10 @@ return function (uri, callback)
         return
     end
 
+    local delayer = await.newThrottledDelayer(500)
     ---@async
     guide.eachSourceType(state.ast, 'getlocal', function (src)
-        await.delay()
+        delayer:delay()
         local checkNil
         local nxt = src.next
         if nxt then

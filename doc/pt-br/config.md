@@ -406,6 +406,22 @@ Array<string>
 []
 ```
 
+# diagnostics.globalsRegex
+
+Find defined global variables using regex.
+
+## type
+
+```ts
+Array<string>
+```
+
+## default
+
+```jsonc
+[]
+```
+
 # diagnostics.groupFileStatus
 
 Modify the diagnostic needed file status in a group.
@@ -1813,6 +1829,7 @@ Array<string>
 * ``"!"``
 * ``"!="``
 * ``"continue"``
+* ``"|lambda|"``
 
 ## default
 

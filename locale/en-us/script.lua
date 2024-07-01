@@ -646,8 +646,12 @@ CLI_CHECK_INITING =
 'Initializing ...'
 CLI_CHECK_SUCCESS =
 'Diagnosis completed, no problems found'
+CLI_CHECK_PROGRESS =
+'Found {} problems in {} files'
 CLI_CHECK_RESULTS =
 'Diagnosis complete, {} problems found, see {}'
+CLI_CHECK_MULTIPLE_WORKERS =
+'Starting {} worker tasks, progress output will be disabled. This may take a few minutes.'
 CLI_DOC_INITING   =
 'Loading documents ...'
 CLI_DOC_DONE      =

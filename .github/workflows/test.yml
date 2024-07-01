@@ -6,13 +6,25 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - { os: ubuntu-20.04,   platform: linux-x64 }
-          - { os: macos-14,       platform: darwin-arm64 }
-          - { os: windows-latest, platform: win32-x64 }
+          - { os: ubuntu-20.04,   target: linux,   platform: linux-x64 }
+          - { os: macos-14,       target: darwin,  platform: darwin-arm64 }
+          - { os: windows-latest, target: windows, platform: win32-x64 }
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - uses: actboy168/setup-luamake@master
-      - run: luamake -platform ${{ matrix.platform }}
+      - name: Build for Windows
+        if: ${{ matrix.target == 'windows' }}
+        run: .\make.bat
+      - name: Build for Linux
+        if: ${{ matrix.target == 'linux' }}
+        run: |
+          sudo apt update
+          sudo apt install ninja-build
+          ./make.sh
+      - name: Build for macOS
+        if: ${{ matrix.target == 'darwin' }}
+        run: |
+          brew install ninja
+          ./make.sh

@@ -1357,6 +1357,13 @@ local function insertEnum(state, pos, src, enums, isInArray, mark)
             kind        = define.CompletionItemKind.Function,
             insertText  = insertText,
         }
+    elseif src.type == 'doc.enum' then
+        ---@cast src parser.object
+        if vm.docHasAttr(src, 'key') then
+            insertDocEnumKey(state, pos, src, enums)
+        else
+            insertDocEnum(state, pos, src, enums)
+        end
     elseif isInArray and src.type == 'doc.type.array' then
         for i, d in ipairs(vm.getDefs(src.node)) do
             insertEnum(state, pos, d, enums, isInArray, mark)
@@ -1364,11 +1371,7 @@ local function insertEnum(state, pos, src, enums, isInArray, mark)
     elseif src.type == 'global' and src.cate == 'type' then
         for _, set in ipairs(src:getSets(state.uri)) do
             if set.type == 'doc.enum' then
-                if vm.docHasAttr(set, 'key') then
-                    insertDocEnumKey(state, pos, set, enums)
-                else
-                    insertDocEnum(state, pos, set, enums)
-                end
+                insertEnum(state, pos, set, enums, isInArray, mark)
             end
         end
     end
@@ -1546,7 +1549,7 @@ local function tryWord(state, position, triggerCharacter, results)
                     local env = guide.getENV(state.ast, startPos)
                     if env then
                         checkGlobal(state, word, startPos, position, env, false, results)
-                        checkModule(state, word, startPos, results) 
+                        checkModule(state, word, startPos, results)
                     end
                 end
             end
@@ -1585,8 +1588,8 @@ end
 local function findCall(state, position)
     local call
     guide.eachSourceContain(state.ast, position, function (src)
-        if src.type == 'call' then
-            if not call or call.start < src.start then
+        if src.type == 'call' and src.node.finish <= position then
+            if not call or call.start < src.start  then
                 call = src
             end
         end
@@ -2256,6 +2259,35 @@ local function tryluaDocOfFunction(doc, results, pad)
     }
 end
 
+---Checks for a lua symbol reference in comment
+---@async
+local function trySymbolReference(state, position, results)
+    local doc = getLuaDoc(state, position)
+    if not doc then
+        return
+    end
+
+    local line = doc.originalComment.text ---@type string
+    local col = select(2, guide.rowColOf(position)) - 2 ---@type integer
+
+    -- User will ask for completion at end of symbol name so we need to perform a reverse match to see if they are in a symbol reference
+    -- Matching in reverse allows the symbol to be of any length and we can still match all the way back to `](lua://` from right to left
+    local symbol = string.match(string.reverse(line), "%)?([%w%s-_.*]*)//:aul%(%]", #line - col)
+
+    if symbol then
+        -- flip it back the right way around
+        symbol = string.reverse(symbol)
+
+        for _, match in ipairs(wssymbol(symbol)) do
+            results[#results+1] = {
+                label = match.name,
+                kind = define.CompletionItemKind.Class,
+                insertText = match.name
+            }
+        end
+    end
+end
+
 ---@async
 local function tryLuaDoc(state, position, results)
     local doc = getLuaDoc(state, position)
@@ -2327,6 +2359,7 @@ end
 ---@async
 local function tryCompletions(state, position, triggerCharacter, results)
     if getComment(state, position) then
+        trySymbolReference(state, position, results)
         tryLuaDoc(state, position, results)
         tryComment(state, position, results)
         return

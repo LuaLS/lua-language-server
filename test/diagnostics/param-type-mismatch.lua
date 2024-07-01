@@ -246,3 +246,21 @@ local MyClass = {}
 
 local w = MyClass(<!1!>)
 ]]
+
+TEST [[
+---@enum(key) A
+local t1 = {
+    x = 1,
+}
+
+---@enum(key) A
+local t2 = {
+    y = 1,
+}
+
+---@param v A
+local function f(v) end
+
+f 'x'
+f 'y'
+]]

@@ -1,4 +1,4 @@
----@meta
+---@meta bee.thread
 
 ---@class bee.thread
 local thread = {}
@@ -16,6 +16,9 @@ function thread.channel(name) end
 ---@param script string
 ---@return bee.thread.thread
 function thread.thread(script) end
+
+---@return string?
+function thread.errlog() end
 
 ---@class bee.thread.channel
 local channel = {}

@@ -10,9 +10,10 @@ return function (uri, callback)
     if not state or not text then
         return
     end
+    local delayer = await.newThrottledDelayer(5000)
     local lines = state.lines
     for i = 0, #lines do
-        await.delay()
+        delayer:delay()
         local startOffset  = lines[i]
         local finishOffset = text:find('[\r\n]', startOffset) or (#text + 1)
         local lastOffset   = finishOffset - 1

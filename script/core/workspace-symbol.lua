@@ -55,7 +55,6 @@ local function searchFile(uri, key, results)
     end)
 end
 
----@async
 ---@param key string
 ---@param suri? uri
 ---@param results table[]
@@ -88,12 +87,10 @@ local function searchGlobalAndClass(key, suri, results)
                     source = set,
                 }
             end
-            await.delay()
         end
     end
 end
 
----@async
 ---@param key string
 ---@param suri? uri
 ---@param results table[]
@@ -137,7 +134,6 @@ local function searchClassField(key, suri, results)
     end)
 end
 
----@async
 ---@param key string
 ---@param suri? uri
 ---@param results table[]
@@ -147,11 +143,9 @@ local function searchWords(key, suri, results)
         if #results > 1000 then
             break
         end
-        await.delay()
     end
 end
 
----@async
 ---@param key string
 ---@param suri? uri
 ---@param includeWords? boolean

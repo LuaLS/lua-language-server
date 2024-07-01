@@ -1,9 +1,39 @@
+local wssymbol = require("core.workspace-symbol")
+local guide = require("parser.guide")
+
 ---@class markdown
 local mt = {}
 mt.__index = mt
 mt.__name = 'markdown'
 
 mt._splitLine = false
+
+---Converts `[mySymbol](lua://mySymbol)` into a link that points to the origin of `mySymbol`.
+---@param txt string
+local function processSymbolReferences(txt)
+	local function replacer(linkText, symbol)
+		local source ---@type table
+
+		for _, match in ipairs(wssymbol(symbol)) do
+			if match.name == symbol then
+				source = match.source
+				break
+			end
+		end
+
+		if not source then
+			log.warn(string.format("Failed to find source of %q symbol in markdown comment", symbol))
+			return
+		end
+
+		local row, _ = guide.rowColOf(source.start)
+		local uri = string.format("%s#%i", guide.getUri(source), row + 1)
+
+		return string.format("[%s](%s)", linkText, uri)
+	end
+
+	return string.gsub(txt, "%[([^]]*)%]%(lua://([^)]+)%)", replacer)
+end
 
 function mt:__tostring()
     return self:string()
@@ -104,7 +134,7 @@ function mt:string(nl)
                         end
                     end
                 end
-                lines[#lines+1] = obj.text
+                lines[#lines + 1] = processSymbolReferences(obj.text)
                 language = obj.language
             end
         end

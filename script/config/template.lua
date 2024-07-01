@@ -242,6 +242,7 @@ local template = {
                                             >> util.deepCopy(define.BuiltIn),
     ['Lua.diagnostics.enable']              = Type.Boolean >> true,
     ['Lua.diagnostics.globals']             = Type.Array(Type.String),
+    ['Lua.diagnostics.globalsRegex']        = Type.Array(Type.String),
     ['Lua.diagnostics.disable']             = Type.Array(Type.String << util.getTableKeys(diag.getDiagAndErrNameMap(), true)),
     ['Lua.diagnostics.severity']            = Type.Hash(
                                                 Type.String << util.getTableKeys(define.DiagnosticDefaultNeededFileStatus, true),

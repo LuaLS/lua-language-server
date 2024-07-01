@@ -1,6 +1,112 @@
 # changelog
 
-## 3.7.5
+## Unreleased
+<!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` Add postfix snippet for `unpack`
+* `FIX` `diagnostics.severity` defaulting to "Warning" when run using `--check` [#2730](https://github.com/LuaLS/lua-language-server/issues/2730)
+* `NEW` Add support for lambda style functions, `|paramList| expr` is syntactic sugar for `function(paramList) return expr end` 
+
+## 3.9.3
+`2024-6-11`
+* `FIX` Sometimes providing incorrect autocompletion when chaining calls
+
+## 3.9.2
+`2024-6-6`
+* `NEW` Reference workspace symbols in comments using `[some text](lua://symbolName)` syntax
+* `FIX` Don't do diagnostics when the workspace is not ready
+* `FIX` Autocompletion for enum values ​​is not available in some cases
+
+## 3.9.1
+`2024-5-14`
+* revert extension runtime
+
+## 3.9.0
+`2024-5-11`
+* `NEW` goto implementation
+* `NEW` narrow the function prototype based on the parameter type
+  ```lua
+  ---@overload fun(a: boolean): A
+  ---@overload fun(a: number): B
+  local function f(...) end
+
+  local r1 = f(true) --> r1 is `A`
+  local r2 = f(10) --> r2 is `B`
+  ```
+
+## 3.8.3
+`2024-4-23`
+* `FIX` server may crash when the workspace is using a non-English path.
+
+## 3.8.2
+`2024-4-23`
+* This is a fake version only for the new version of VSCode, with a core of 3.8.0.
+
+## 3.8.1
+`2024-4-23`
+* This is a fake version only for the old version of VSCode, with a core of `3.7.4`. Starting from the next minor version, the version requirement for VSCode will be raised to prevent users still using the old version of VSCode from updating to the new version and experiencing compatibility issues.
+
+## 3.8.0
+`2024-4-22`
+* `NEW` supports tuple type (@[lizho])
+  ```lua
+  ---@type [string, number, boolean]
+  local t
+
+  local x = t[1] --> x is `string`
+  local y = t[2] --> y is `number`
+  local z = t[3] --> z is `boolean`
+  ```
+* `NEW` generic pattern (@[fesily])
+  ```lua
+  ---@generic T
+  ---@param t Cat.`T`
+  ---@return T
+  local function f(t) end
+
+  local t = f('Smile') --> t is `Cat.Smile`
+  ```
+* `NEW` alias and enums supports attribute `partial`
+  ```lua
+  ---@alias Animal Cat
+
+  ---@alias(partial) Animal Dog
+
+  ---@type Animal
+  local animal --> animal is `Cat|Dog` here
+  ```
+
+  ```lua
+  ---@enum(key) ErrorCodes
+  local codes1 = {
+      OK = 0,
+      ERROR = 1,
+      FATAL = 2,
+  }
+
+  ---@enum(key, partial) ErrorCodes
+  local codes2 = {
+      WARN = 3,
+      INFO = 4,
+  }
+
+  ---@type ErrorCodes
+  local code
+
+  code = 'ERROR' --> OK
+  code = 'WARN'  --> OK
+
+  ```
+* `NEW` plugin: add `OnTransFormAst` interface (@[fesily])
+* `NEW` plugin: add `OnNodeCompileFunctionParam` interface (@[fesily])
+* `NEW` plugin: add `ResolveRequire` interface (@[Artem Dzhemesiuk])
+* `NEW` plugin: support multi plugins (@[fesily])
+  + setting: `Lua.runtime.plugin` can be `string|string[]`
+  + setting: `Lua.runtime.pluginArgs` can be `string[]|table<string, string>`
+* `NEW` CLI: `--doc` add option `--doc_out_path <PATH>` (@[Andreas Matthias])
+* `NEW` CLI: `--doc_update`, update an existing `doc.json` without using `--doc` again (@[Andreas Matthias])
+* `NEW` CLI: `--trust_all_plugins`, this is potentially unsafe for normal use and meant for usage in CI environments only (@[Paul Emmerich])
+* `CHG` CLI: `--check` will run plugins (@[Daniel Farrell])
+* `FIX` diagnostic: `discard-returns` not works in some blocks (@clay-golem)
 * `FIX` rename in library files
 
 ## 3.7.4
@@ -1966,3 +2072,12 @@ f( -- view comments of `1` and `2` in completion
 `2020-11-9`
 
 * `NEW` implementation, NEW start!
+
+<!-- contributors -->
+[lizho]: (https://github.com/lizho)
+[fesily]: (https://github.com/fesily)
+[Andreas Matthias]: (https://github.com/AndreasMatthias)
+[Daniel Farrell]: (https://github.com/danpf)
+[Paul Emmerich]: (https://github.com/emmericp)
+[Artem Dzhemesiuk]: (https://github.com/zziger)
+[clay-golem]: (https://github.com/clay-golem)

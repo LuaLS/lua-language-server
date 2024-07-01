@@ -157,6 +157,7 @@ Symbol              <-  ({} {
 ---@field generics?         parser.object[]
 ---@field generic?          parser.object
 ---@field docAttr?          parser.object
+---@field pattern?          string
 
 local function parseTokens(text, offset)
     Ci = 0
@@ -1025,6 +1026,7 @@ local docSwitch = util.switch()
         local result = {
             type   = 'doc.alias',
         }
+        result.docAttr = parseDocAttr(result)
         result.alias = parseName('doc.alias.name', result)
         if not result.alias then
             pushWarning {

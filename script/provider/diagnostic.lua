@@ -246,6 +246,9 @@ local function isValid(uri)
     if not config.get(uri, 'Lua.diagnostics.enable') then
         return false
     end
+    if not ws.isReady(uri) then
+        return false
+    end
     if files.isLibrary(uri, true) then
         local status = config.get(uri, 'Lua.diagnostics.libraryFiles')
         if status == 'Disable' then
@@ -275,7 +278,7 @@ local function isValid(uri)
 end
 
 ---@async
-function m.doDiagnostic(uri, isScopeDiag)
+function m.doDiagnostic(uri, isScopeDiag, ignoreFileState)
     if not isValid(uri) then
         return
     end
@@ -348,7 +351,7 @@ function m.doDiagnostic(uri, isScopeDiag)
                 lastDiag[#lastDiag] = nil
             end
         end
-    end)
+    end, ignoreFileState)
 
     lastDiag = nil
     pushResult()
@@ -575,7 +578,7 @@ function m.awaitDiagnosticsScope(suri, callback)
     finished = true
 end
 
-function m.diagnosticsScope(uri, force)
+function m.diagnosticsScope(uri, force, ignoreFileOpenState)
     if not ws.isReady(uri) then
         return
     end
@@ -592,7 +595,7 @@ function m.diagnosticsScope(uri, force)
     await.call(function () ---@async
         await.sleep(0.0)
         m.awaitDiagnosticsScope(uri, function (fileUri)
-            xpcall(m.doDiagnostic, log.error, fileUri, true)
+            xpcall(m.doDiagnostic, log.error, fileUri, true, ignoreFileOpenState)
         end)
     end, id)
 end

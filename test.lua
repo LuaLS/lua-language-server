@@ -54,6 +54,7 @@ local function testAll()
     test 'basic'
     test 'definition'
     test 'type_inference'
+    test 'implementation'
     test 'references'
     test 'hover'
     test 'completion'
@@ -115,5 +116,5 @@ loadAllLibs()
 main()
 
 log.debug('test finish.')
-require 'bee.thread'.sleep(1)
+require 'bee.thread'.sleep(1000)
 os.exit()

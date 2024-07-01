@@ -365,7 +365,7 @@ local function loadSingle3rdConfig(libraryDir)
     end
     if cfg.files then
         for i, filename in ipairs(cfg.files) do
-            if plat.OS == 'Windows' then
+            if plat.os == 'windows' then
                 filename = filename:gsub('/', '\\')
             else
                 filename = filename:gsub('\\', '/')

@@ -368,6 +368,39 @@ m.register 'textDocument/hover' {
     end
 }
 
+local function convertDefinitionResult(state, result)
+    local response = {}
+    for i, info in ipairs(result) do
+        ---@type uri
+        local targetUri = info.uri
+        if targetUri then
+            local targetState = files.getState(targetUri)
+            if targetState then
+                if client.getAbility 'textDocument.definition.linkSupport' then
+                    response[i] = converter.locationLink(targetUri
+                        , converter.packRange(targetState, info.target.start, info.target.finish)
+                        , converter.packRange(targetState, info.target.start, info.target.finish)
+                        , converter.packRange(state,       info.source.start, info.source.finish)
+                    )
+                else
+                    response[i] = converter.location(targetUri
+                        , converter.packRange(targetState, info.target.start, info.target.finish)
+                    )
+                end
+            else
+                response[i] = converter.location(
+                    targetUri,
+                    converter.range(
+                        converter.position(guide.rowColOf(info.target.start)),
+                        converter.position(guide.rowColOf(info.target.finish))
+                    )
+                )
+            end
+        end
+    end
+    return response
+end
+
 m.register 'textDocument/definition' {
     capability = {
         definitionProvider = true,
@@ -388,35 +421,7 @@ m.register 'textDocument/definition' {
         if not result then
             return nil
         end
-        local response = {}
-        for i, info in ipairs(result) do
-            ---@type uri
-            local targetUri = info.uri
-            if targetUri then
-                local targetState = files.getState(targetUri)
-                if targetState then
-                    if client.getAbility 'textDocument.definition.linkSupport' then
-                        response[i] = converter.locationLink(targetUri
-                            , converter.packRange(targetState, info.target.start, info.target.finish)
-                            , converter.packRange(targetState, info.target.start, info.target.finish)
-                            , converter.packRange(state,       info.source.start, info.source.finish)
-                        )
-                    else
-                        response[i] = converter.location(targetUri
-                            , converter.packRange(targetState, info.target.start, info.target.finish)
-                        )
-                    end
-                else
-                    response[i] = converter.location(
-                        targetUri,
-                        converter.range(
-                            converter.position(guide.rowColOf(info.target.start)),
-                            converter.position(guide.rowColOf(info.target.finish))
-                        )
-                    )
-                end
-            end
-        end
+        local response = convertDefinitionResult(state, result)
         return response
     end
 }
@@ -441,27 +446,32 @@ m.register 'textDocument/typeDefinition' {
         if not result then
             return nil
         end
-        local response = {}
-        for i, info in ipairs(result) do
-            ---@type uri
-            local targetUri = info.uri
-            if targetUri then
-                local targetState = files.getState(targetUri)
-                if targetState then
-                    if client.getAbility 'textDocument.typeDefinition.linkSupport' then
-                        response[i] = converter.locationLink(targetUri
-                            , converter.packRange(targetState, info.target.start, info.target.finish)
-                            , converter.packRange(targetState, info.target.start, info.target.finish)
-                            , converter.packRange(state,       info.source.start, info.source.finish)
-                        )
-                    else
-                        response[i] = converter.location(targetUri
-                            , converter.packRange(targetState, info.target.start, info.target.finish)
-                        )
-                    end
-                end
-            end
+        local response = convertDefinitionResult(state, result)
+        return response
+    end
+}
+
+m.register 'textDocument/implementation' {
+    capability = {
+        implementationProvider = true,
+    },
+    abortByFileUpdate = true,
+    ---@async
+    function (params)
+        local uri    = files.getRealUri(params.textDocument.uri)
+        workspace.awaitReady(uri)
+        local _ <close> = progress.create(uri, lang.script.WINDOW_PROCESSING_TYPE_DEFINITION, 0.5)
+        local state = files.getState(uri)
+        if not state then
+            return
         end
+        local core   = require 'core.implementation'
+        local pos = converter.unpackPosition(state, params.position)
+        local result = core(uri, pos)
+        if not result then
+            return nil
+        end
+        local response = convertDefinitionResult(state, result)
         return response
     end
 }
@@ -1209,7 +1219,7 @@ m.register '$/status/click' {
         if result == titleDiagnostic then
             local diagnostic = require 'provider.diagnostic'
             for _, scp in ipairs(workspace.folders) do
-                diagnostic.diagnosticsScope(scp.uri, true)
+                diagnostic.diagnosticsScope(scp.uri, true, true)
             end
         elseif result == 'Restart Server' then
             local diag = require 'provider.diagnostic'

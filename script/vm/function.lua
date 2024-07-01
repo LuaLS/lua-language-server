@@ -1,6 +1,7 @@
 ---@class vm
 local vm    = require 'vm.vm'
 local guide = require 'parser.guide'
+local util  = require 'utility'
 
 ---@param arg parser.object
 ---@return parser.object?
@@ -267,6 +268,9 @@ end
 ---@return integer def
 function vm.countReturnsOfCall(func, args, mark)
     local funcs = vm.getMatchedFunctions(func, args, mark)
+    if not funcs then
+        return 0, math.huge, 0
+    end
     ---@type integer?, number?, integer?
     local min, max, def
     for _, f in ipairs(funcs) do
@@ -329,21 +333,70 @@ function vm.countList(list, mark)
     return min, max, def
 end
 
+---@param uri uri
+---@param args parser.object[]
+---@return boolean
+local function isAllParamMatched(uri, args, params)
+    if not params then
+        return false
+    end
+    for i = 1, #args do
+        if not params[i] then
+            break
+        end
+        local argNode = vm.compileNode(args[i])
+        local defNode = vm.compileNode(params[i])
+        if not vm.canCastType(uri, defNode, argNode) then
+            return false
+        end
+    end
+    return true
+end
+
 ---@param func parser.object
----@param args parser.object[]?
+---@param args? parser.object[]
+---@return parser.object[]?
+function vm.getExactMatchedFunctions(func, args)
+    local funcs = vm.getMatchedFunctions(func, args)
+    if not args or not funcs then
+        return funcs
+    end
+    if #funcs == 1 then
+        return funcs
+    end
+    local uri = guide.getUri(func)
+    local needRemove
+    for i, n in ipairs(funcs) do
+        if vm.isVarargFunctionWithOverloads(n)
+        or not isAllParamMatched(uri, args, n.args) then
+            if not needRemove then
+                needRemove = {}
+            end
+            needRemove[#needRemove+1] = i
+        end
+    end
+    if not needRemove then
+        return funcs
+    end
+    if #needRemove == #funcs then
+        return nil
+    end
+    util.tableMultiRemove(funcs, needRemove)
+    return funcs
+end
+
+---@param func parser.object
+---@param args? parser.object[]
 ---@param mark? table
----@return parser.object[]
+---@return parser.object[]?
 function vm.getMatchedFunctions(func, args, mark)
     local funcs = {}
     local node = vm.compileNode(func)
     for n in node:eachObject() do
-        if (n.type == 'function' and not vm.isVarargFunctionWithOverloads(n))
+        if n.type == 'function'
         or n.type == 'doc.type.function' then
             funcs[#funcs+1] = n
         end
-    end
-    if #funcs <= 1 then
-        return funcs
     end
 
     local amin, amax = vm.countList(args, mark)
@@ -357,7 +410,7 @@ function vm.getMatchedFunctions(func, args, mark)
     end
 
     if #matched == 0 then
-        return funcs
+        return nil
     else
         return matched
     end
@@ -372,23 +425,31 @@ function vm.isVarargFunctionWithOverloads(func)
     if not func.args then
         return false
     end
+    if func._varargFunction ~= nil then
+        return func._varargFunction
+    end
     if func.args[1] and func.args[1].type == 'self' then
         if not func.args[2] or func.args[2].type ~= '...' then
+            func._varargFunction = false
             return false
         end
     else
         if not func.args[1] or func.args[1].type ~= '...' then
+            func._varargFunction = false
             return false
         end
     end
     if not func.bindDocs then
+        func._varargFunction = false
         return false
     end
     for _, doc in ipairs(func.bindDocs) do
         if doc.type == 'doc.overload' then
+            func._varargFunction = true
             return true
         end
     end
+    func._varargFunction = false
     return false
 end
 

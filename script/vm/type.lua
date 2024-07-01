@@ -65,8 +65,14 @@ local function checkParentEnum(parentName, child, uri, mark, errs)
     local enums
     for _, set in ipairs(parentClass:getSets(uri)) do
         if set.type == 'doc.enum' then
-            enums = vm.getEnums(set)
-            break
+            local denums = vm.getEnums(set)
+            if denums then
+                if enums then
+                    enums = util.arrayMerge(enums, denums)
+                else
+                    enums = denums
+                end
+            end
         end
     end
     if not enums then

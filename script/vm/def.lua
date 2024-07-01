@@ -92,3 +92,42 @@ function vm.getDefs(source)
 
     return results
 end
+
+local HAS_DEF_ERR = {}  -- the error object for comparing
+local function checkHasDef(checkFunc, source, pushResult)
+    local _, err = pcall(checkFunc, source, pushResult)
+    return err == HAS_DEF_ERR
+end
+
+---@param source parser.object
+function vm.hasDef(source)
+    local mark = {}
+    local hasLocal
+    local function pushResult(src)
+        if src.type == 'local' then
+            if hasLocal then
+                return
+            end
+            hasLocal = true
+            if  source.type ~= 'local'
+            and source.type ~= 'getlocal'
+            and source.type ~= 'setlocal'
+            and source.type ~= 'doc.cast.name' then
+                return
+            end
+        end
+        if not mark[src] then
+            mark[src] = true
+            if guide.isAssign(src)
+            or guide.isLiteral(src) then
+                -- break out on 1st result using error() with a unique error object
+                error(HAS_DEF_ERR)
+            end
+        end
+    end
+
+    return checkHasDef(searchBySimple, source, pushResult)
+        or checkHasDef(searchByLocalID, source, pushResult)
+        or checkHasDef(vm.compileByNodeChain, source, pushResult)
+        or checkHasDef(searchByNode, source, pushResult)
+end

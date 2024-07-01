@@ -21,7 +21,7 @@ return function (uri, callback)
     local function checkUndefinedField(src)
         await.delay()
 
-        if #vm.getDefs(src) > 0 then
+        if vm.hasDef(src) then
             return
         end
         local node = src.node

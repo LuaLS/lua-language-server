@@ -343,6 +343,7 @@ end
 
 local function checkLocal(state, word, position, results)
     local locals = guide.getVisibleLocals(state.ast, position)
+    local showParams = config.get(state.uri, 'Lua.completion.showParams')
     for name, source in util.sortPairs(locals) do
         if isSameSource(state, source, position) then
             goto CONTINUE
@@ -372,7 +373,12 @@ local function checkLocal(state, word, position, results)
             for _, def in ipairs(defs) do
                 if (def.type == 'function' and not vm.isVarargFunctionWithOverloads(def))
                 or def.type == 'doc.type.function' then
-                    local funcLabel = name .. getParams(def, false)
+                    local funcLabel
+                    if showParams then
+                        funcLabel = name .. getParams(def, false)
+                    else
+                        funcLabel = name
+                    end
                     buildFunction(results, source, def, false, {
                         label      = funcLabel,
                         match      = name,

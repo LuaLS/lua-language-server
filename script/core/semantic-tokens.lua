@@ -830,6 +830,10 @@ local function solveMultilineAndOverlapping(state, results)
                 modifieres = token.modifieres,
             }
         else
+            --LSP规范说客户端不支持token跨行的话，
+            --token长度可以超出行的范围，客户端应该
+            --将其视为在行的末尾结束。
+            --正好可以测试（拷打）一下客户端的实现。
             new[#new+1] = {
                 start      = startPos,
                 finish     = converter.position(startPos.line, 9999),

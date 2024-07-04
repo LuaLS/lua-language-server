@@ -7,6 +7,7 @@
 * `NEW` Add support for lambda style functions, `|paramList| expr` is syntactic sugar for `function(paramList) return expr end` 
 * `FIX` Respect `completion.showParams` config for local function completion 
 * `CHG` Improve performance of multithreaded `--check` and `undefined-field` diagnostic
+* `CHG` Change spacing of parameter inlay hints to match other LSPs, like `rust-analyzer`
 
 ## 3.9.3
 `2024-6-11`

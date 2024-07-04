@@ -59,7 +59,7 @@ local function typeHint(uri, results, start, finish)
         end
         mark[src] = true
         results[#results+1] = {
-            text   = ':' .. view,
+            text   = ': ' .. view,
             offset = src.finish,
             kind   = define.InlayHintKind.Type,
             where  = 'right',

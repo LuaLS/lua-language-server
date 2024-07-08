@@ -68,7 +68,7 @@ return function (uri, callback)
             if def.type == 'doc.field' then
                 return
             end
-            if def.type == 'tablefield' then
+            if def.type == 'tablefield' and not isExact then
                 return
             end
         end

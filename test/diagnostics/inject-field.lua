@@ -82,3 +82,16 @@ function m:init() -- OK
     end
 end
 ]]
+
+TEST [[
+---@class Class
+local m = {
+    xx = 1, -- OK
+}
+
+---@type Class
+local m
+
+m.xx = 1 -- OK
+m.<!yy!> = 1 -- Warning
+]]

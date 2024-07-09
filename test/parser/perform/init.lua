@@ -1,44 +1,20 @@
-local fs = require 'bee.filesystem'
 local thread = require 'bee.thread'
 local parser = require 'parser'
-local utility = require 'utility'
 
 thread.newchannel 'TEST'
-local ch = thread.channel 'TEST'
-
-local function scanDirectory(path)
-    local files = {}
-
-    local function scan(path)
-        if fs.is_directory(path) then
-            for path in fs.pairs(path) do
-                scan(path)
-            end
-        else
-            files[#files+1] = path
-        end
-    end
-
-    scan(path)
-
-    local i = 0
-    return function ()
-        i = i + 1
-        return files[i]
-    end
-end
 
 local function performTest()
-    local targetPath = ROOT
+    local targetPath = ls.runtime.rootPath
     local files = {}
     local size = 0
-    for path in scanDirectory(targetPath) do
-        if path:extension():string() == '.lua' then
-            local buf = utility.loadFile(path:string())
-            files[path] = buf
+    ls.fsu.scanDirectory(targetPath, function (fullPath)
+        if fullPath:extension() == '.lua' then
+            local buf = ls.fsu.loadFile(fullPath)
+            files[fullPath] = buf
             size = size + #buf
         end
-    end
+    end)
+    print('已收集文件数量：', ls.util.countTable(files), '总大小：', size / 1000 / 1000, 'mb')
     local clock = os.clock()
     for path, buf in pairs(files) do
         local ast = parser.compile(buf, 'Lua 5.4')
@@ -56,7 +32,7 @@ local function performTest()
 end
 
 local function test(path)
-    local buf = utility.loadFile(path)
+    local buf = ls.util.loadFile(ls.runtime.rootPath .. '/test/parser/perform/' .. path)
     if not buf then
         return
     end
@@ -90,12 +66,12 @@ local function test(path)
 end
 
 collectgarbage 'stop'
-test[[test\perform\1.txt]]
-test[[test\perform\2.txt]]
-test[[test\perform\3.txt]]
-test[[test\perform\4.txt]]
-test[[test\perform\5.txt]]
-test[[test\perform\6.txt]]
-test[[test\perform\7.txt]]
+test[[1.txt]]
+test[[2.txt]]
+test[[3.txt]]
+test[[4.txt]]
+test[[5.txt]]
+test[[6.txt]]
+test[[7.txt]]
 performTest()
 collectgarbage 'restart'

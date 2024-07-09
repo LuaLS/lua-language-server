@@ -94,7 +94,7 @@ function Ast:parseCat()
     end
 
     -- 检查 `---@` 开头
-    local symbolPos, subtype = self.code:match('%-[ \t]*()@(%a+)', pos + 3)
+    local symbolPos, subtype = self.code:match('^%-[ \t]*()@(%a+)', pos + 3)
     if not symbolPos then
         return nil
     end

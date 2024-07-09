@@ -7,6 +7,7 @@ Type   = require 'class'.type
 ls = {}
 
 ls.util    = require 'utility'
+ls.fsu     = require 'fs-utility'
 ls.inspect = require 'inspect'
 ls.encoder = require 'encoder'
 

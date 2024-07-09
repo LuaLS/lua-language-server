@@ -41,4 +41,4 @@ end
 
 print('开始测试')
 require 'test.parser'
-require 'test.definition'
+--require 'test.definition'

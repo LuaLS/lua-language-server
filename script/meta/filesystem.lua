@@ -24,7 +24,7 @@ end
 function fsPath:stem()
 end
 
----@return fs.path
+---@return string
 function fsPath:extension()
 end
 

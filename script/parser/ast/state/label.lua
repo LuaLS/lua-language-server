@@ -68,7 +68,7 @@ function Ast:parseLabel()
     end
 
     if self.versionNum <= 51 and not self.jit then
-        self:throw('UNSUPPORT_SYMBOL', pos, pos + 2)
+        self:throw('UNSUPPORT_SYMBOL', label.start, label.finish)
     end
 
     return label

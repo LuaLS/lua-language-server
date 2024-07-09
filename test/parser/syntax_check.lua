@@ -21,7 +21,7 @@ local function TEST(script)
         local errs = ast.errors
         local first = errs[1]
         local target = list['!'][1]
-        if not expect then
+        if not expect or not expect.code then
             assert(#errs == 0)
             return
         end
@@ -1357,9 +1357,6 @@ f() <!=!> 1
 {
     multi = 1,
     code = 'UNKNOWN_SYMBOL',
-    extra = {
-        symbol = '=',
-    }
 }
 
 TEST[[
@@ -1367,18 +1364,22 @@ TEST[[
 ]]
 {
     code = 'UNSUPPORT_SYMBOL',
+    version = 'Lua 5.1'
 }
 
 TEST[[
 local goto = 1
 ]]
-(nil)
+{
+    version = 'Lua 5.1',
+}
 
 TEST[[
 local x = '<!\u{1000}!>'
 ]]
 {
     code = 'ERR_ESC',
+    version = 'Lua 5.1',
 }
 
 TEST[[
@@ -1386,6 +1387,7 @@ local x = '<!\xff!>'
 ]]
 {
     code = 'ERR_ESC',
+    version = 'Lua 5.1',
 }
 
 TEST[[

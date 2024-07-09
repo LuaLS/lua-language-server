@@ -40,6 +40,9 @@ function Ast:parseID(nodeType, required, canBeKeyword)
             return nil
         end
     end
+    if self:isReservedWord(token) then
+        self:throw('RESERVED_WORD', pos, pos + #token)
+    end
     if not self.unicodeName and token:find '[\x80-\xff]' then
         self:throw('UNICODE_NAME', pos, pos + #token)
     end
@@ -71,21 +74,24 @@ Ast.keyWordMap = {
     ['else']     = true,
     ['elseif']   = true,
     ['end']      = true,
-    ['false']    = true,
     ['for']      = true,
     ['function'] = true,
     ['if']       = true,
     ['in']       = true,
     ['local']    = true,
-    ['nil']      = true,
     ['not']      = true,
     ['or']       = true,
     ['repeat']   = true,
     ['return']   = true,
     ['then']     = true,
-    ['true']     = true,
     ['until']    = true,
     ['while']    = true,
+}
+
+Ast.reservedWordMap = {
+    ['true']     = true,
+    ['false']    = true,
+    ['nil']      = true,
 }
 
 ---@private
@@ -105,4 +111,11 @@ function Ast:isKeyWord(word)
         return self.versionNum >= 52
     end
     return false
+end
+
+---@Private
+---@param word string
+---@return boolean
+function Ast:isReservedWord(word)
+    return self.reservedWordMap[word] or false
 end

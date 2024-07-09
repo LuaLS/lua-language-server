@@ -147,7 +147,7 @@ function Ast:resolveGoto(gotoNode)
         for _, loc in ipairs(labelBlock.locals) do
             if  loc.start > gotoNode.start
             and loc.start < labelNode.start then
-                self:throw('JUMP_LOCAL_SCOPE', gotoNode.name.start, gotoNode.name.finish, {
+                self:throw('JUMP_LOCAL_SCOPE', gotoNode.start, gotoNode.finish, {
                     loc    = loc.id,
                     start  = loc.start,
                     finish = loc.finish,

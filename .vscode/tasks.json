@@ -29,7 +29,7 @@
             },
             "options": {
                 "cwd": "${workspaceFolder}/3rd/luamake"
-            }
+            },
         },
         {
             "type": "shell",
@@ -42,12 +42,7 @@
             },
             "osx": {
                 "command": "${workspaceFolder}/3rd/luamake/luamake rebuild"
-            },
-            "problemMatcher": [],
-            "group": {
-                "kind": "build",
-                "isDefault": true
             }
-        }
+        },
     ]
 }

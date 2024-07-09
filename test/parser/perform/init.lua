@@ -14,7 +14,10 @@ local function performTest()
             size = size + #buf
         end
     end)
-    print('已收集文件数量：', ls.util.countTable(files), '总大小：', size / 1000 / 1000, 'mb')
+    print(string.format('以收集[%d]个文件，总大小[%.3f]mb'
+        , ls.util.countTable(files)
+        , size / 1000 / 1000
+    ))
     local clock = os.clock()
     for path, buf in pairs(files) do
         local ast = parser.compile(buf, 'Lua 5.4')

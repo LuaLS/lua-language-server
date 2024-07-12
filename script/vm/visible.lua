@@ -42,21 +42,33 @@ local function getVisibleType(source)
 
     if type(fieldName) == 'string' then
         local uri = guide.getUri(source)
+        local regengine = config.get(uri, 'Lua.doc.regengine')
+        local function match(patterns)
+            if regengine == "glob" then
+               return glob.glob(patterns)(fieldName)
+            else
+                for i = 1, #patterns do
+                    if string.find(fieldName, patterns[i]) then
+                        return true
+                    end
+                end
+            end
+        end
 
         local privateNames = config.get(uri, 'Lua.doc.privateName')
-        if #privateNames > 0 and glob.glob(privateNames)(fieldName) then
+        if #privateNames > 0 and match(privateNames) then
             source._visibleType = 'private'
             return 'private'
         end
-
+        
         local protectedNames = config.get(uri, 'Lua.doc.protectedName')
-        if #protectedNames > 0 and glob.glob(protectedNames)(fieldName) then
+        if #protectedNames > 0 and match(protectedNames) then
             source._visibleType = 'protected'
             return 'protected'
         end
-
+        
         local packageNames = config.get(uri, 'Lua.doc.packageName')
-        if #packageNames > 0 and glob.glob(packageNames)(fieldName) then
+        if #packageNames > 0 and match(packageNames) then
             source._visibleType = 'package'
             return 'package'
         end

@@ -7,6 +7,7 @@
 * `NEW` Add support for lambda style functions, `|paramList| expr` is syntactic sugar for `function(paramList) return expr end` 
 * `FIX` Respect `completion.showParams` config for local function completion 
 * `CHG` Improve performance of multithreaded `--check` and `undefined-field` diagnostic
+* `FIX` Now correctly evaluates the visibility of fields in a class when they are defined directly in the object. use for completion and invisible dianostic. [#2752](https://github.com/LuaLS/lua-language-server/issues/2752)
 
 ## 3.9.3
 `2024-6-11`

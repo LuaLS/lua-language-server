@@ -360,7 +360,7 @@ local function loadSingle3rdConfig(libraryDir)
 
     if cfg.words then
         for i, word in ipairs(cfg.words) do
-            cfg.words[i] = '()' .. word .. '()'
+            cfg.words[i] = '([%w_]?)' .. word .. '([%w_]?)'
         end
     end
     if cfg.files then
@@ -370,7 +370,7 @@ local function loadSingle3rdConfig(libraryDir)
             else
                 filename = filename:gsub('\\', '/')
             end
-            cfg.files[i] = '()' .. filename .. '()'
+            cfg.files[i] = '([%w_]?)' .. filename .. '([%w_]?)'
         end
     end
 
@@ -515,17 +515,10 @@ end
 ---@param b string
 ---@return boolean
 local function wholeMatch(a, b)
-    local pos1, pos2 = a:match(b)
-    if not pos1 then
-        return false
-    end
-    local left  = a:sub(pos1 - 1, pos1 - 1)
-    local right = a:sub(pos2, pos2)
-    if left:match '[%w_]'
-    or right:match '[%w_]' then
-        return false
-    end
-    return true
+    local captures = {
+        a:match(b),
+    }
+    return captures[1] == '' and captures[#captures] == ''
 end
 
 local function check3rdByWords(uri, configs, checkThirdParty)

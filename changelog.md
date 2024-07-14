@@ -4,9 +4,10 @@
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `NEW` Add postfix snippet for `unpack`
 * `FIX` `diagnostics.severity` defaulting to "Warning" when run using `--check` [#2730](https://github.com/LuaLS/lua-language-server/issues/2730)
-* `NEW` Add support for lambda style functions, `|paramList| expr` is syntactic sugar for `function(paramList) return expr end` 
-* `FIX` Respect `completion.showParams` config for local function completion 
+* `NEW` Add support for lambda style functions, `|paramList| expr` is syntactic sugar for `function(paramList) return expr end`
+* `FIX` Respect `completion.showParams` config for local function completion
 * `CHG` Improve performance of multithreaded `--check` and `undefined-field` diagnostic
+* `FIX` Addons can now self-recommend as expected. Fixed by correcting the `wholeMatch` function
 
 ## 3.9.3
 `2024-6-11`
@@ -145,7 +146,7 @@
     Cat = 1,
     Dog = 2,
   }
-  
+
   ---@param animal userdata
   ---@param atp AnimalType
   ---@return boolean

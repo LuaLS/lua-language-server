@@ -402,7 +402,10 @@ local template = {
     ['Lua.doc.privateName']                 = Type.Array(Type.String),
     ['Lua.doc.protectedName']               = Type.Array(Type.String),
     ['Lua.doc.packageName']                 = Type.Array(Type.String),
-
+    ['Lua.doc.regengine']                   = Type.String >> 'glob' << {
+                                                'glob',
+                                                'lua',
+                                            },
     -- VSCode
     ["Lua.addonManager.enable"]             = Type.Boolean >> true,
     ['files.associations']                  = Type.Hash(Type.String, Type.String),

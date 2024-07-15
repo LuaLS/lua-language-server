@@ -8,6 +8,7 @@
 * `FIX` Respect `completion.showParams` config for local function completion 
 * `CHG` Improve performance of multithreaded `--check` and `undefined-field` diagnostic
 * `FIX` Bad triggering of the `inject-field` diagnostic, when the fields are declared at the creation of the object [#2746](https://github.com/LuaLS/lua-language-server/issues/2746)
+* `CHG` Change spacing of parameter inlay hints to match other LSPs, like `rust-analyzer`
 
 ## 3.9.3
 `2024-6-11`

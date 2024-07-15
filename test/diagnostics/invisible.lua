@@ -138,6 +138,28 @@ print(t2._id)
 ]]
 config.set(nil, 'Lua.doc.protectedName', nil)
 
+config.set(nil, 'Lua.doc.regengine', 'lua' )
+config.set(nil, 'Lua.doc.privateName', { '^_[%w_]*%w$' })
+config.set(nil, 'Lua.doc.protectedName', { '^_[%w_]*_$' })
+TEST [[
+---@class A
+---@field _id_ number
+---@field _user number
+
+---@type A
+local t
+print(t.<!_id_!>)
+print(t.<!_user!>)
+
+---@class B: A
+local t2
+print(t2._id_)
+print(t2.<!_user!>)
+]]
+config.set(nil, 'Lua.doc.privateName', nil)
+config.set(nil, 'Lua.doc.protectedName', nil)
+config.set(nil, 'Lua.doc.regengine', nil )
+
 TEST [[
 ---@class A
 ---@field private x number

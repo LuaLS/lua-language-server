@@ -4,9 +4,10 @@
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `NEW` Add postfix snippet for `unpack`
 * `FIX` `diagnostics.severity` defaulting to "Warning" when run using `--check` [#2730](https://github.com/LuaLS/lua-language-server/issues/2730)
-* `NEW` Add support for lambda style functions, `|paramList| expr` is syntactic sugar for `function(paramList) return expr end` 
-* `FIX` Respect `completion.showParams` config for local function completion 
+* `NEW` Add support for lambda style functions, `|paramList| expr` is syntactic sugar for `function(paramList) return expr end`
+* `FIX` Respect `completion.showParams` config for local function completion
 * `CHG` Improve performance of multithreaded `--check` and `undefined-field` diagnostic
+* `FIX` Addons can now self-recommend as expected. Fixed by correcting the `wholeMatch` function
 * `FIX` Now correctly evaluates the visibility of fields in a class when they are defined directly in the object. use for completion and invisible dianostic. [#2752](https://github.com/LuaLS/lua-language-server/issues/2752)
 * `NEW` added lua regular expression support for Lua.doc.<scope>Name [#2753](https://github.com/LuaLS/lua-language-server/pull/2753)
 * `FIX` Bad triggering of the `inject-field` diagnostic, when the fields are declared at the creation of the object [#2746](https://github.com/LuaLS/lua-language-server/issues/2746)
@@ -149,7 +150,7 @@
     Cat = 1,
     Dog = 2,
   }
-  
+
   ---@param animal userdata
   ---@param atp AnimalType
   ---@return boolean

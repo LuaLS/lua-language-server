@@ -7,6 +7,19 @@ local glob     = require 'glob'
 ---@class parser.object
 ---@field package _visibleType? parser.visibleType
 
+local function globMatch(patterns, fieldName)
+    return glob.glob(patterns)(fieldName)
+end
+
+local function luaMatch(patterns, fieldName)
+    for i = 1, #patterns do
+        if string.find(fieldName, patterns[i]) then
+            return true
+        end
+    end
+    return false
+end
+
 local function getVisibleType(source)
     if guide.isLiteral(source) then
         return 'public'
@@ -42,21 +55,22 @@ local function getVisibleType(source)
 
     if type(fieldName) == 'string' then
         local uri = guide.getUri(source)
-
+        local regengine = config.get(uri, 'Lua.doc.regengine')
+        local match = regengine  == "glob" and globMatch or luaMatch
         local privateNames = config.get(uri, 'Lua.doc.privateName')
-        if #privateNames > 0 and glob.glob(privateNames)(fieldName) then
+        if #privateNames > 0 and match(privateNames, fieldName) then
             source._visibleType = 'private'
             return 'private'
         end
-
+        
         local protectedNames = config.get(uri, 'Lua.doc.protectedName')
-        if #protectedNames > 0 and glob.glob(protectedNames)(fieldName) then
+        if #protectedNames > 0 and match(protectedNames, fieldName) then
             source._visibleType = 'protected'
             return 'protected'
         end
-
+        
         local packageNames = config.get(uri, 'Lua.doc.packageName')
-        if #packageNames > 0 and glob.glob(packageNames)(fieldName) then
+        if #packageNames > 0 and match(packageNames, fieldName) then
             source._visibleType = 'package'
             return 'package'
         end
@@ -96,9 +110,13 @@ function vm.getParentClass(source)
     if source.type == 'setfield'
     or source.type == 'setindex'
     or source.type == 'setmethod'
-    or source.type == 'tablefield'
     or source.type == 'tableindex' then
         return vm.getDefinedClass(guide.getUri(source), source.node)
+    end
+
+    if source.type == 'tablefield' then
+        return vm.getDefinedClass(guide.getUri(source), source.node) or
+                vm.getDefinedClass(guide.getUri(source), source.parent.parent)
     end
     return nil
 end

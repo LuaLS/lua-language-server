@@ -1426,8 +1426,8 @@ m.register 'textDocument/inlayHint' {
                 },
                 position     = converter.packPosition(state, res.offset),
                 kind         = res.kind,
-                paddingLeft  = res.kind == 1,
-                paddingRight = res.kind == 2,
+                paddingLeft  = false,
+                paddingRight = res.kind == define.InlayHintKind.Parameter,
             }
         end
         return hintResults

@@ -110,9 +110,13 @@ function vm.getParentClass(source)
     if source.type == 'setfield'
     or source.type == 'setindex'
     or source.type == 'setmethod'
-    or source.type == 'tablefield'
     or source.type == 'tableindex' then
         return vm.getDefinedClass(guide.getUri(source), source.node)
+    end
+
+    if source.type == 'tablefield' then
+        return vm.getDefinedClass(guide.getUri(source), source.node) or
+                vm.getDefinedClass(guide.getUri(source), source.parent.parent)
     end
     return nil
 end

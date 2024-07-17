@@ -12,6 +12,7 @@
 * `NEW` added lua regular expression support for Lua.doc.<scope>Name [#2753](https://github.com/LuaLS/lua-language-server/pull/2753)
 * `FIX` Bad triggering of the `inject-field` diagnostic, when the fields are declared at the creation of the object [#2746](https://github.com/LuaLS/lua-language-server/issues/2746)
 * `CHG` Change spacing of parameter inlay hints to match other LSPs, like `rust-analyzer`
+* `FIX` Inconsistent type narrow behavior of function call args [#2758](https://github.com/LuaLS/lua-language-server/issues/2758)
 
 ## 3.9.3
 `2024-6-11`

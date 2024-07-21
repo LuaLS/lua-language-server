@@ -325,16 +325,6 @@ function vm.isSubType(uri, child, parent, mark, errs)
             return true
         else
             local weakNil = config.get(uri, 'Lua.type.weakNilCheck')
-            local iscomplextype
-            for i = #child, 1, -1 do
-                local name = vm.getNodeName(child[i])
-                if name then
-                    iscomplextype = not guide.isBasicType(name)
-                    if iscomplextype then
-                        break
-                    end
-                end
-            end
             for n in child:eachObject() do
                 local nodeName = vm.getNodeName(n)
                 if  nodeName
@@ -483,20 +473,16 @@ function vm.isSubType(uri, child, parent, mark, errs)
                 set[#set+1] = field
             end
         end)
-        print('set', set)
+
         for i, field in ipairs(set) do
-            if  not field.optional
-            and not vm.compileNode(field):isNullable() then
                 local key = vm.getKeyName(field)
                 local node = vm.compileNode(field)
                 if key and not requiresKeys[key] then
                     requiresKeys[key] = node
-                    requiresKeys[#requiresKeys+1] = key
-                end
             end
         end
         if #requiresKeys == 0 then
-            return
+            return --true
         end
         local refkey = {}
         for _, field in ipairs(child) do
@@ -507,10 +493,10 @@ function vm.isSubType(uri, child, parent, mark, errs)
             end
         end
         local ok
-        for _, key in ipairs(requiresKeys) do
+        for key, node in pairs(requiresKeys) do
             if refkey[key] then
               ok = vm.isSubType(uri, refkey[key], requiresKeys[key], mark, errs)
-            else
+            elseif not node:isNullable() then
                 return false
             end
             if not ok then
@@ -519,7 +505,7 @@ function vm.isSubType(uri, child, parent, mark, errs)
         end
 
         -------------------------------
-        return true --true
+        return true
     end
 
     -- check class parent

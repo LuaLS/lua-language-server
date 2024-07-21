@@ -325,10 +325,20 @@ function vm.isSubType(uri, child, parent, mark, errs)
             return true
         else
             local weakNil = config.get(uri, 'Lua.type.weakNilCheck')
+            local iscomplextype
+            for i = #child, 1, -1 do
+                local name = vm.getNodeName(child[i])
+                if name then
+                    iscomplextype = not guide.isBasicType(name)
+                    if iscomplextype then
+                        break
+                    end
+                end
+            end
             for n in child:eachObject() do
                 local nodeName = vm.getNodeName(n)
                 if  nodeName
-                and not (nodeName == 'nil' and weakNil)
+                and not (nodeName == 'nil' and weakNil) 
                 and vm.isSubType(uri, n, parent, mark, errs) == false then
                     if errs then
                         errs[#errs+1] = 'TYPE_ERROR_UNION_DISMATCH'
@@ -463,7 +473,53 @@ function vm.isSubType(uri, child, parent, mark, errs)
         return true
     end
     if childName == 'table' and not guide.isBasicType(parentName) then
-        return true
+        -------------------------------------------------------------------------
+        local requiresKeys = {}
+        local t = parent
+        local set = {}
+        vm.getClassFields(uri, parent, vm.ANY, function (field, isMark)
+            if not set[field] then
+                set[field] = true
+                set[#set+1] = field
+            end
+        end)
+        print('set', set)
+        for i, field in ipairs(set) do
+            if  not field.optional
+            and not vm.compileNode(field):isNullable() then
+                local key = vm.getKeyName(field)
+                local node = vm.compileNode(field)
+                if key and not requiresKeys[key] then
+                    requiresKeys[key] = node
+                    requiresKeys[#requiresKeys+1] = key
+                end
+            end
+        end
+        if #requiresKeys == 0 then
+            return
+        end
+        local refkey = {}
+        for _, field in ipairs(child) do
+            local name = vm.getKeyName(field)
+            local node = vm.compileNode(field)
+            if name then
+                refkey[name] = node
+            end
+        end
+        local ok
+        for _, key in ipairs(requiresKeys) do
+            if refkey[key] then
+              ok = vm.isSubType(uri, refkey[key], requiresKeys[key], mark, errs)
+            else
+                return false
+            end
+            if not ok then
+                return false
+            end
+        end
+
+        -------------------------------
+        return true --true
     end
 
     -- check class parent
@@ -692,6 +748,7 @@ function vm.canCastType(uri, defNode, refNode, errs)
         return true
     end
 
+
     return false
 end
 
@@ -753,7 +810,7 @@ function vm.viewTypeErrorMessage(uri, errs)
                     lparams[paramName] = vm.viewKey(value, uri)
                 else
                     lparams[paramName] = vm.getInfer(value):view(uri)
-                                      or vm.getInfer(value):view(uri)
+                        or vm.getInfer(value):view(uri)
                 end
             end
             index = index + 1

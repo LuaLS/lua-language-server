@@ -575,6 +575,12 @@ local function matchCall(source)
         newNode:removeNode(needRemove)
         newNode.originNode = myNode
         vm.setNode(source, newNode, true)
+        if call.args then
+            -- clear node caches of args to allow recomputation with the type narrowed call
+            for _, arg in ipairs(call.args) do
+                vm.removeNode(arg)
+            end
+        end
     end
 end
 

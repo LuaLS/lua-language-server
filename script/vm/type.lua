@@ -148,7 +148,7 @@ end
 ---@param mark       table
 ---@param errs?      typecheck.err[]
 ---@return boolean?
-local function checkChildEnum(childName, parent , uri, mark, errs)
+local function checkChildEnum(childName, parent, uri, mark, errs)
     if mark[childName] then
         return
     end
@@ -168,7 +168,7 @@ local function checkChildEnum(childName, parent , uri, mark, errs)
     end
     mark[childName] = true
     for _, enum in ipairs(enums) do
-        if not vm.isSubType(uri, vm.compileNode(enum), parent, mark ,errs) then
+        if not vm.isSubType(uri, vm.compileNode(enum), parent, mark, errs) then
             mark[childName] = nil
             return false
         end
@@ -328,7 +328,7 @@ function vm.isSubType(uri, child, parent, mark, errs)
             for n in child:eachObject() do
                 local nodeName = vm.getNodeName(n)
                 if  nodeName
-                and not (nodeName == 'nil' and weakNil) 
+                and not (nodeName == 'nil' and weakNil)
                 and vm.isSubType(uri, n, parent, mark, errs) == false then
                     if errs then
                         errs[#errs+1] = 'TYPE_ERROR_UNION_DISMATCH'
@@ -463,7 +463,6 @@ function vm.isSubType(uri, child, parent, mark, errs)
         return true
     end
     if childName == 'table' and not guide.isBasicType(parentName) then
-        -------------------------------------------------------------------------
         local requiresKeys = {}
         local t = parent
         local set = {}
@@ -475,14 +474,14 @@ function vm.isSubType(uri, child, parent, mark, errs)
         end)
 
         for i, field in ipairs(set) do
-                local key = vm.getKeyName(field)
-                local node = vm.compileNode(field)
-                if key and not requiresKeys[key] then
-                    requiresKeys[key] = node
+            local key = vm.getKeyName(field)
+            local node = vm.compileNode(field)
+            if key and not requiresKeys[key] then
+                requiresKeys[key] = node
             end
         end
-        if #requiresKeys == 0 then
-            return --true
+        if not next(requiresKeys) then
+            return true
         end
         local refkey = {}
         for _, field in ipairs(child) do
@@ -495,7 +494,7 @@ function vm.isSubType(uri, child, parent, mark, errs)
         local ok
         for key, node in pairs(requiresKeys) do
             if refkey[key] then
-              ok = vm.isSubType(uri, refkey[key], requiresKeys[key], mark, errs)
+                ok = vm.isSubType(uri, refkey[key], requiresKeys[key], mark, errs)
             elseif not node:isNullable() then
                 return false
             end
@@ -503,8 +502,7 @@ function vm.isSubType(uri, child, parent, mark, errs)
                 return false
             end
         end
-
-        -------------------------------
+        
         return true
     end
 
@@ -612,11 +610,11 @@ function vm.getTableValue(uri, tnode, knode, inversion)
                 and field.value
                 and field.tindex == 1 then
                     if inversion then
-                        if vm.isSubType(uri, 'integer', knode)  then
+                        if vm.isSubType(uri, 'integer', knode) then
                             result:merge(vm.compileNode(field.value))
                         end
                     else
-                        if vm.isSubType(uri, knode, 'integer')  then
+                        if vm.isSubType(uri, knode, 'integer') then
                             result:merge(vm.compileNode(field.value))
                         end
                     end
@@ -796,7 +794,7 @@ function vm.viewTypeErrorMessage(uri, errs)
                     lparams[paramName] = vm.viewKey(value, uri)
                 else
                     lparams[paramName] = vm.getInfer(value):view(uri)
-                        or vm.getInfer(value):view(uri)
+                                      or vm.getInfer(value):view(uri)
                 end
             end
             index = index + 1

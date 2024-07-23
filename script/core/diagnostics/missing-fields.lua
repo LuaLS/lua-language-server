@@ -67,9 +67,9 @@ return function (uri, callback)
 
             if #missedKeys == 0 then
                 return
-            else
-                warnings[#warnings+1] = lang.script('DIAG_MISSING_FIELDS', className, table.concat(missedKeys, ', '))
             end
+            
+            warnings[#warnings+1] = lang.script('DIAG_MISSING_FIELDS', className, table.concat(missedKeys, ', '))
         end
 
         if #warnings == 0 then

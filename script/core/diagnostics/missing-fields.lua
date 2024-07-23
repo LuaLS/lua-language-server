@@ -22,10 +22,11 @@ return function (uri, callback)
                 if def.bindSource and guide.isInRange(def.bindSource, src.start) then
                     return
                 end
-                if not sortedDefs[def.class[1]] then
-                    sortedDefs[def.class[1]] = {}
+                local className = def.class[1]
+                if not sortedDefs[className] then
+                    sortedDefs[className] = {}
                 end
-                local samedefs = sortedDefs[def.class[1]]
+                local samedefs = sortedDefs[className]
                 samedefs[#samedefs+1] = def
             end
             if def.type == 'doc.type.array'
@@ -33,69 +34,51 @@ return function (uri, callback)
                 return
             end
         end
-        
-        local Allwarnings = {}
+
+        local warnings = {}
         for _, samedefs in pairs(sortedDefs) do
-            local warnings = {}
+            local missedKeys = {}
+            local className
             for _, def in ipairs(samedefs) do
-                if def.type == 'doc.class' then
-                    if not def.fields then
-                        goto continue
-                    end
+                className = def.class[1]
+                if not def.fields or #def.fields == 0 then
+                    goto continue
+                end
 
-                    local requiresKeys = {}
-                    for _, field in ipairs(def.fields) do
-                        if  not field.optional
-                        and not vm.compileNode(field):isNullable() then
-                            local key = vm.getKeyName(field)
-                            if key and not requiresKeys[key] then
-                                requiresKeys[key] = true
-                                requiresKeys[#requiresKeys+1] = key
-                            end
-                        end
+                local myKeys = {}
+                for _, field in ipairs(src) do
+                    local key = vm.getKeyName(field)
+                    if key then
+                        myKeys[key] = true
                     end
+                end
 
-                    if #requiresKeys == 0 then
-                        goto continue
-                    end
-                    local myKeys = {}
-                    for _, field in ipairs(src) do
+                for _, field in ipairs(def.fields) do
+                    if  not field.optional
+                    and not vm.compileNode(field):isNullable() then
                         local key = vm.getKeyName(field)
-                        if key then
-                            myKeys[key] = true
-                        end
-                    end
-
-                    local missedKeys = {}
-                    for _, key in ipairs(requiresKeys) do
-                        if not myKeys[key] then
+                        if key and not myKeys[key] then
                             missedKeys[#missedKeys+1] = ('`%s`'):format(key)
                         end
                     end
-
-                    if #missedKeys == 0 then
-                        goto continue
-                    end
-
-                    warnings[#warnings+1] = lang.script('DIAG_MISSING_FIELDS', def.class[1], table.concat(missedKeys, ', '))
-                end  
+                end
                 ::continue::
             end
-            if #warnings == 0 then
+
+            if #missedKeys == 0 then
                 return
             else
-                for i = 1, #warnings do
-                    Allwarnings[#Allwarnings+1] = warnings[i]
-                end
+                warnings[#warnings+1] = lang.script('DIAG_MISSING_FIELDS', className, table.concat(missedKeys, ', '))
             end
         end
-        if #Allwarnings == 0 then
+
+        if #warnings == 0 then
             return
         end
         callback {
             start   = src.start,
             finish  = src.finish,
-            message = table.concat(Allwarnings, '\n')
+            message = table.concat(warnings, '\n')
         }
     end)
 end

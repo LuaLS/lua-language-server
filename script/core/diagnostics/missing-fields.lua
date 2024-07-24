@@ -15,6 +15,7 @@ return function (uri, callback)
     guide.eachSourceType(state.ast, 'table', function (src)
         await.delay()
 
+        vm.removeNode(src) -- the node is not updated correctly, reason still unknown
         local defs = vm.getDefs(src)
         local sortedDefs = {}
         for _, def in ipairs(defs) do
@@ -47,7 +48,7 @@ return function (uri, callback)
 
                 local myKeys = {}
                 for _, field in ipairs(src) do
-                    local key = vm.getKeyName(field)
+                    local key = vm.getKeyName(field) or field.tindex
                     if key then
                         myKeys[key] = true
                     end
@@ -57,8 +58,20 @@ return function (uri, callback)
                     if  not field.optional
                     and not vm.compileNode(field):isNullable() then
                         local key = vm.getKeyName(field)
+                        if not key then
+                            local fieldnode = vm.compileNode(field.field)[1]
+                            if fieldnode and fieldnode.type == 'doc.type.integer' then
+                                ---@cast fieldnode parser.object
+                                key = vm.getKeyName(fieldnode)
+                            end
+                        end
+
                         if key and not myKeys[key] then
-                            missedKeys[#missedKeys+1] = ('`%s`'):format(key)
+                            if type(key) == "number" then
+                                missedKeys[#missedKeys+1] = ('`[%s]`'):format(key)
+                            else
+                                missedKeys[#missedKeys+1] = ('`%s`'):format(key)
+                            end
                         end
                     end
                 end

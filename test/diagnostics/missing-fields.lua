@@ -335,3 +335,21 @@ local x = <!{
 	bd = 4,
 }!>
 ]]
+
+TEST[[
+---@class A
+---@field [1] string
+---@field x number
+
+---@type A
+local t = {x = 1, ""}
+]]
+
+TEST[[
+---@class A
+---@field [1] string
+---@field x number
+
+---@type A
+local t = <!{x = 1}!>
+]]

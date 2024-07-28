@@ -325,10 +325,30 @@ function vm.isSubType(uri, child, parent, mark, errs)
             return true
         else
             local weakNil = config.get(uri, 'Lua.type.weakNilCheck')
+            local skipTable
             for n in child:eachObject() do
+                if skipTable == nil and n.type == "table" and parent.type == "vm.node" then -- skip table type check if child has class
+                    ---@cast parent vm.node
+                    for _, c in ipairs(child) do
+                        if c.type == 'global' and c.cate == 'type' then
+                            for _, set in ipairs(c:getSets(uri)) do
+                                if set.type == 'doc.class' then
+                                    skipTable = true
+                                    break
+                                end
+                            end
+                        end
+                        if skipTable then
+                            break
+                        end
+                    end
+                    if not skipTable then
+                        skipTable = false
+                    end
+                end
                 local nodeName = vm.getNodeName(n)
                 if  nodeName
-                and not (nodeName == 'nil' and weakNil)
+                and not (nodeName == 'nil' and weakNil) and not (skipTable and n.type == 'table')
                 and vm.isSubType(uri, n, parent, mark, errs) == false then
                     if errs then
                         errs[#errs+1] = 'TYPE_ERROR_UNION_DISMATCH'
@@ -463,44 +483,65 @@ function vm.isSubType(uri, child, parent, mark, errs)
         return true
     end
     if childName == 'table' and not guide.isBasicType(parentName) then
-        local requiresKeys = {}
-        local t = parent
-        local set = {}
-        vm.getClassFields(uri, parent, vm.ANY, function (field, isMark)
-            if not set[field] then
-                set[field] = true
-                set[#set+1] = field
+        local set = parent:getSets(uri)
+        local missedKeys = {}
+        local failedCheck
+        local myKeys
+        for _, def in ipairs(set) do
+            if not def.fields or #def.fields == 0 then
+                goto continue
             end
-        end)
+            if not myKeys then
+                myKeys = {}
+                for _, field in ipairs(child) do
+                    local key = vm.getKeyName(field) or field.tindex
+                    if key then
+                        myKeys[key] = vm.compileNode(field)
+                    end
+                end
+            end
 
-        for i, field in ipairs(set) do
-            local key = vm.getKeyName(field)
-            local node = vm.compileNode(field)
-            if key and not requiresKeys[key] then
-                requiresKeys[key] = node
+            for _, field in ipairs(def.fields) do
+                local key = vm.getKeyName(field)
+                if not key then
+                    local fieldnode = vm.compileNode(field.field)[1]
+                    if fieldnode and fieldnode.type == 'doc.type.integer' then
+                        ---@cast fieldnode parser.object
+                        key = vm.getKeyName(fieldnode)
+                    end
+                end
+                if not key then
+                    goto continue
+                end
+
+                local ok
+                local nodeField = vm.compileNode(field)
+                if myKeys[key] then
+                    ok = vm.isSubType(uri, myKeys[key], nodeField, mark, errs)
+                    if ok == false then
+                        errs[#errs+1] = 'TYPE_ERROR_PARENT_ALL_DISMATCH' -- error display can be greatly improved
+                        errs[#errs+1] = myKeys[key]
+                        errs[#errs+1] = nodeField
+                        failedCheck = true
+                    end
+                elseif not nodeField:isNullable() then
+                    if type(key) == "number" then
+                        missedKeys[#missedKeys+1] = ('`[%s]`'):format(key)
+                    else
+                        missedKeys[#missedKeys+1] = ('`%s`'):format(key)
+                    end
+                    failedCheck = true
+                end
             end
+            ::continue::
         end
-        if not next(requiresKeys) then
-            return true
+        if #missedKeys > 0 then
+            errs[#errs+1] = 'DIAG_MISSING_FIELDS'
+            errs[#errs+1] = parent
+            errs[#errs+1] = table.concat(missedKeys, ', ')
         end
-        local refkey = {}
-        for _, field in ipairs(child) do
-            local name = vm.getKeyName(field)
-            local node = vm.compileNode(field)
-            if name then
-                refkey[name] = node
-            end
-        end
-        local ok
-        for key, node in pairs(requiresKeys) do
-            if refkey[key] then
-                ok = vm.isSubType(uri, refkey[key], requiresKeys[key], mark, errs)
-            elseif not node:isNullable() then
-                return false
-            end
-            if not ok then
-                return false
-            end
+        if failedCheck then
+            return false
         end
         
         return true
@@ -754,6 +795,7 @@ local ErrorMessageMap = {
     TYPE_ERROR_NUMBER_LITERAL_TO_INTEGER  = {'child'},
     TYPE_ERROR_NUMBER_TYPE_TO_INTEGER     = {},
     TYPE_ERROR_DISMATCH                   = {'child', 'parent'},
+    DIAG_MISSING_FIELDS                   = {"1", "2"},
 }
 
 ---@param uri uri

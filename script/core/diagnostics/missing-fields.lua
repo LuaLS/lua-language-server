@@ -37,11 +37,9 @@ return function (uri, callback)
         end
 
         local warnings = {}
-        for _, samedefs in pairs(sortedDefs) do
+        for className, samedefs in pairs(sortedDefs) do
             local missedKeys = {}
-            local className
             for _, def in ipairs(samedefs) do
-                className = def.class[1]
                 if not def.fields or #def.fields == 0 then
                     goto continue
                 end

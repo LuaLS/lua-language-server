@@ -332,3 +332,69 @@ local x
 - 类型 `nil` 无法匹配 `'B'`
 - 类型 `nil` 无法匹配 `'A'`]])
 end)
+
+TEST [[
+---@class A
+---@field x string
+---@field y number
+
+local a = {x = "", y = 0}
+
+---@type A
+local v
+v = a
+]]
+
+TEST [[
+---@class A
+---@field x string
+---@field y number
+
+local a = {x = ""}
+
+---@type A
+local v
+<!v!> = a
+]]
+
+TEST [[
+---@class A
+---@field x string
+---@field y number
+
+local a = {x = "", y = ""}
+
+---@type A
+local v
+<!v!> = a
+]]
+
+TEST [[
+---@class A
+---@field x string
+---@field y? B
+
+---@class B
+---@field x string
+
+local a = {x = "b", y = {x = "c"}}
+
+---@type A
+local v
+v = a
+]]
+
+TEST [[
+---@class A
+---@field x string
+---@field y B
+
+---@class B
+---@field x string
+
+local a = {x = "b", y = {}}
+
+---@type A
+local v
+<!v!> = a
+]]

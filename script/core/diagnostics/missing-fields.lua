@@ -35,7 +35,8 @@ return function (uri, callback)
                 return
             end
         end
-
+        
+        local myKeys
         local warnings = {}
         for className, samedefs in pairs(sortedDefs) do
             local missedKeys = {}
@@ -43,12 +44,14 @@ return function (uri, callback)
                 if not def.fields or #def.fields == 0 then
                     goto continue
                 end
-
-                local myKeys = {}
-                for _, field in ipairs(src) do
-                    local key = vm.getKeyName(field) or field.tindex
-                    if key then
-                        myKeys[key] = true
+                
+                if not myKeys then
+                    myKeys = {}
+                    for _, field in ipairs(src) do
+                        local key = vm.getKeyName(field) or field.tindex
+                        if key then
+                            myKeys[key] = true
+                        end
                     end
                 end
 

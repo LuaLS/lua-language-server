@@ -15,6 +15,7 @@
 * `FIX` Inconsistent type narrow behavior of function call args [#2758](https://github.com/LuaLS/lua-language-server/issues/2758)
 * `FIX` Typos in annotation descriptions
 * `NEW` You can now click on "References" in CodeLen to display the reference list
+* `FIX` incorrect `CompletionItemKind` for postfix snippets [#2773](https://github.com/LuaLS/lua-language-server/pull/2773)
 
 ## 3.9.3
 `2024-6-11`

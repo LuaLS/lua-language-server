@@ -8,7 +8,12 @@ local util       = require 'utility'
 
 local numThreads = tonumber(NUM_THREADS or 1)
 
-local exe = arg[-1]
+local exe
+local minIndex = -1
+while arg[minIndex] do
+    exe = arg[minIndex]
+    minIndex = minIndex - 1
+end
 -- TODO: is this necessary? got it from the shell.lua helper in bee.lua tests
 if platform.os == 'windows' and not exe:match('%.[eE][xX][eE]$') then
     exe = exe..'.exe'

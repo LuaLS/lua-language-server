@@ -5,6 +5,8 @@ local await   = require 'await'
 local timer   = require 'timer'
 local pub     = require 'pub'
 local json    = require 'json'
+local client  = require 'client'
+local define  = require 'proto.define'
 
 require 'provider'
 
@@ -61,9 +63,33 @@ function mt:_localLoadFile()
     end)
 end
 
+local defaultClientOptions = {
+    initializationOptions = {
+        changeConfiguration = true,
+        viewDocument = true,
+        trustByClient = true,
+        useSemanticByRange = true,
+    },
+    capabilities = {
+        textDocument = {
+            completion = {
+                completionItem = {
+                    tagSupport = {
+                        valueSet = {
+                            define.DiagnosticTag.Unnecessary,
+                            define.DiagnosticTag.Deprecated,
+                         },
+                    },
+                },
+            },
+        },
+    },
+}
+
 ---@async
 function mt:initialize(params)
-    self:awaitRequest('initialize', params or {})
+    local initParams = util.tableMerge(params or {}, defaultClientOptions)
+    self:awaitRequest('initialize', initParams)
     self:notify('initialized')
 end
 

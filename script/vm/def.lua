@@ -93,7 +93,7 @@ function vm.getDefs(source)
     return results
 end
 
-local HAS_DEF_ERR = {}  -- the error object for comparing
+local HAS_DEF_ERR = {'<HAS_DEF_ERR>'}  -- the error object for comparing
 local function checkHasDef(checkFunc, source, pushResult)
     local _, err = pcall(checkFunc, source, pushResult)
     return err == HAS_DEF_ERR

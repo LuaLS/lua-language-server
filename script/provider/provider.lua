@@ -292,6 +292,7 @@ m.register 'textDocument/didClose' {
 m.register 'textDocument/didChange' {
     ---@async
     function (params)
+        local fixIndent = require 'core.fix-indent'
         local doc     = params.textDocument
         local changes = params.contentChanges
         local uri     = files.getRealUri(doc.uri)
@@ -299,6 +300,7 @@ m.register 'textDocument/didChange' {
         if not text then
             text = util.loadFile(furi.decode(uri))
             files.setText(uri, text, false)
+            fixIndent(uri, changes)
             return
         end
         local rows = files.getCachedRows(uri)
@@ -307,6 +309,8 @@ m.register 'textDocument/didChange' {
             file.version = doc.version
         end)
         files.setCachedRows(uri, rows)
+
+        fixIndent(uri, changes)
     end
 }
 
@@ -1059,7 +1063,7 @@ end
 
 client.event(function (ev)
     if ev == 'init' then
-        if not client.isVSCode() then
+        if not client.getOption('useSemanticByRange') then
             m.register 'textDocument/semanticTokens/full' {
                 capability = {
                     semanticTokensProvider = {

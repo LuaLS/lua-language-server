@@ -195,7 +195,7 @@ local function initPlugin(uri)
                 m.showError(scp, err)
                 return
             end
-            if not client.isVSCode() and not checkTrustLoad(scp) then
+            if not client.getOption('trustByClient') and not checkTrustLoad(scp) then
                 return
             end
             local suc, err = xpcall(f, log.error, f, uri, myArgs)

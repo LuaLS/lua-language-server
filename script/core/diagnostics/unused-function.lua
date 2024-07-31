@@ -5,6 +5,7 @@ local define  = require 'proto.define'
 local lang    = require 'language'
 local await   = require 'await'
 local client  = require 'client'
+local util    = require 'utility'
 
 local function isToBeClosed(source)
     if not source.attrs then
@@ -105,8 +106,11 @@ return function (uri, callback)
         turnBlack(source, black, white, links)
     end
 
+    local tagSupports = client.getAbility('textDocument.completion.completionItem.tagSupport.valueSet')
+    local supportUnnecessary = tagSupports and util.arrayHas(tagSupports, define.DiagnosticTag.Unnecessary)
+
     for source in pairs(white) do
-        if client.isVSCode() then
+        if supportUnnecessary then
             callback {
                 start   = source.start,
                 finish  = source.finish,

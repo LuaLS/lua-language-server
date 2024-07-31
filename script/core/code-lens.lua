@@ -4,6 +4,7 @@ local await  = require 'await'
 local conv   = require 'proto.converter'
 local getRef = require 'core.reference'
 local lang   = require 'language'
+local client = require 'client'
 
 ---@class parser.state
 ---@field package _codeLens? codeLens
@@ -88,12 +89,35 @@ end
 function mt:resolveReference(source)
     local refs = getRef(self.uri, source.finish, false)
     local count = refs and #refs or 0
-    local command = conv.command(
-        lang.script('COMMAND_REFERENCE_COUNT', count),
-        '',
-        {}
-    )
-    return command
+    if client.getOption('codeLensViewReferences') then
+        local locations = {}
+        for _, ref in ipairs(refs or {}) do
+            local state = files.getState(ref.uri)
+            if state then
+                locations[#locations+1] = conv.location(
+                    ref.uri,
+                    conv.packRange(state, ref.target.start, ref.target.finish)
+                )
+            end
+        end
+        local command = conv.command(
+            lang.script('COMMAND_REFERENCE_COUNT', count),
+            'lua.showReferences',
+            {
+                self.uri,
+                conv.packPosition(self.state, source.start),
+                locations,
+            }
+        )
+        return command
+    else
+        local command = conv.command(
+            lang.script('COMMAND_REFERENCE_COUNT', count),
+            '',
+            {}
+        )
+        return command
+    end
 end
 
 ---@async

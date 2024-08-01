@@ -14,7 +14,11 @@
 * `CHG` Change spacing of parameter inlay hints to match other LSPs, like `rust-analyzer`
 * `FIX` Inconsistent type narrow behavior of function call args [#2758](https://github.com/LuaLS/lua-language-server/issues/2758)
 * `FIX` Typos in annotation descriptions
-* `NEW` You can now click on "References" in CodeLen to display the reference list
+* `NEW` You can now click on "References" in CodeLen to display the reference list（VSCode）
+* `NEW` Improved behavior for inserting new lines:
+  + When inside an annotation, an annotation tag will be added at the beginning of the line (VSCode).
+  + When between `function () end` or similar constructs, the format will be adjusted to a more reasonable one (VSCode) and leading/trailing spaces will be removed (generic).
+  + Attempts to semantically fix improper indentation (generic).
 
 ## 3.9.3
 `2024-6-11`

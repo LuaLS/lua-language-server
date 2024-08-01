@@ -105,6 +105,8 @@ local blockTypes = {
     ['main']        = true,
 }
 
+m.blockTypes = blockTypes
+
 local topBlockTypes = {
     ['while']       = true,
     ['function']    = true,

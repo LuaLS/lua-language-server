@@ -1,19 +1,20 @@
 local files = require 'files'
 local guide = require 'parser.guide'
-local lookBackward = require 'core.look-backward'
 local proto = require 'proto.proto'
+local lookBackward = require 'core.look-backward'
+local util = require 'utility'
 
 ---@param state parser.state
 ---@param change table
----@param edits table[]
-local function removeSpacesAfterEnter(state, change, edits)
-    if not change.text:match '^\r?\n[\t ]+\r?\n' then
-        return
+local function removeSpacesAfterEnter(state, change)
+    if not change.text:match '^\r?\n[\t ]+\r?\n$' then
+        return false
     end
     local lines = state.originLines or state.lines
     local text  = state.originText  or state.lua
     ---@cast text -?
 
+    local edits = {}
     -- 清除前置空格
     local startPos = guide.positionOf(change.range.start.line, change.range.start.character)
     local startOffset = guide.positionToOffsetByLines(lines, startPos)
@@ -25,6 +26,7 @@ local function removeSpacesAfterEnter(state, change, edits)
             break
         end
     end
+
     if leftOffset and leftOffset < startOffset then
         edits[#edits+1] = {
             start  = leftOffset,
@@ -43,6 +45,108 @@ local function removeSpacesAfterEnter(state, change, edits)
             text   = '',
         }
     end
+
+    if #edits == 0 then
+        return nil
+    end
+
+    return edits
+end
+
+local function getIndent(state, row)
+    local offset    = state.lines[row]
+    local indent    = state.lua:match('^[\t ]*', offset)
+    return indent
+end
+
+local function isInBlock(state, position)
+    local block = guide.eachSourceContain(state.ast, position, function(source)
+        if source.type == 'ifblock'
+        or source.type == 'elseifblock' then
+            if source.keyword[4] and source.keyword[4] <= position then
+                return true
+            end
+        end
+        if source.type == 'else' then
+            if source.keyword[2] and source.keyword[2] <= position then
+                return true
+            end
+        end
+        if source.type == 'while' then
+            if source.keyword[4] and source.keyword[4] <= position then
+                return true
+            end
+        end
+        if source.type == 'repeat' then
+            if source.keyword[2] and source.keyword[2] <= position then
+                return true
+            end
+        end
+        if source.type == 'loop' then
+            if source.keyword[4] and source.keyword[4] <= position then
+                return true
+            end
+        end
+        if source.type == 'in' then
+            if source.keyword[6] and source.keyword[6] <= position then
+                return true
+            end
+        end
+        if source.type == 'do' then
+            if source.keyword[2] and source.keyword[2] <= position then
+                return true
+            end
+        end
+        if source.type == 'function' then
+            if source.args and source.args.finish <= position then
+                return true
+            end
+            if not source.keyword[3] or source.keyword[3] >= position then
+                return true
+            end
+        end
+        if source.type == 'table' then
+            if source.start + 1 == position then
+                return true
+            end
+        end
+    end)
+    return block ~= nil
+end
+
+local function fixWrongIdent(state, change)
+    if not change.text:match '^\r?\n[\t ]+$' then
+        return false
+    end
+    local position = guide.positionOf(change.range.start.line, change.range.start.character)
+    local row = guide.rowColOf(position)
+    local myIndent   = getIndent(state, row + 1)
+    local lastIndent = getIndent(state, row)
+    if #myIndent <= #lastIndent then
+        return
+    end
+    if not util.stringStartWith(myIndent, lastIndent) then
+        return
+    end
+    local lastOffset = lookBackward.findAnyOffset(state.lua, guide.positionToOffset(state, position))
+    if not lastOffset then
+        return
+    end
+    local lastPosition = guide.offsetToPosition(state, lastOffset)
+    if isInBlock(state, lastPosition) then
+        return
+    end
+
+    local endOffset = guide.positionToOffset(state, position) + #change.text
+
+    local edits = {}
+    edits[#edits+1] = {
+        start  = endOffset - #myIndent + #lastIndent,
+        finish = endOffset,
+        text   = '',
+    }
+
+    return edits
 end
 
 ---@param state parser.state
@@ -90,11 +194,12 @@ return function (uri, changes)
         return
     end
 
-    local edits = {}
     local firstChange = changes[1]
     if firstChange.range then
-        removeSpacesAfterEnter(state, firstChange, edits)
+        local edits = removeSpacesAfterEnter(state, firstChange)
+                or    fixWrongIdent(state, firstChange)
+        if edits then
+            applyEdits(state, edits)
+        end
     end
-
-    applyEdits(state, edits)
 end

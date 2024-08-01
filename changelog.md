@@ -9,10 +9,11 @@
 * `CHG` Improve performance of multithreaded `--check` and `undefined-field` diagnostic
 * `FIX` Addons can now self-recommend as expected. Fixed by correcting the `wholeMatch` function
 * `FIX` Now correctly evaluates the visibility of fields in a class when they are defined directly in the object. use for completion and invisible dianostic. [#2752](https://github.com/LuaLS/lua-language-server/issues/2752)
-* `NEW` added lua regular expression support for Lua.doc.<scope>Name [#2753](https://github.com/LuaLS/lua-language-server/pull/2753)
+* `NEW` Added lua regular expression support for `Lua.doc.<scope>Name` [#2753](https://github.com/LuaLS/lua-language-server/pull/2753)
 * `FIX` Bad triggering of the `inject-field` diagnostic, when the fields are declared at the creation of the object [#2746](https://github.com/LuaLS/lua-language-server/issues/2746)
 * `CHG` Change spacing of parameter inlay hints to match other LSPs, like `rust-analyzer`
 * `FIX` Inconsistent type narrow behavior of function call args [#2758](https://github.com/LuaLS/lua-language-server/issues/2758)
+* `FIX` Improve the `missing-fields` logic to be able to correctly handle classes defined several times [#22770](https://github.com/LuaLS/lua-language-server/pull/2770)
 * `FIX` Typos in annotation descriptions
 * `NEW` You can now click on "References" in CodeLen to display the reference list
 * `FIX` incorrect `CompletionItemKind` for postfix snippets [#2773](https://github.com/LuaLS/lua-language-server/pull/2773)

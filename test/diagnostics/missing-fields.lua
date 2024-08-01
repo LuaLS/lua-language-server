@@ -231,3 +231,125 @@ local t = {
     y = 1,
 }
 ]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@class Foo
+---@field a number
+---@field b number
+---@field c number
+
+---@class Foo
+
+---@class Bar
+---@field ba number
+---@field bb number
+---@field bc number
+
+---@class Bar
+---@field bd number
+
+---@type Foo|Bar
+local x = {
+	ba = 1,
+	bb = 2,
+	bc = 3,
+	bd = 4,
+}
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@class Foo
+---@field a number
+---@field b number
+---@field c number
+
+---@class Foo
+
+---@class Bar
+---@field ba number
+---@field bb number
+---@field bc number
+
+---@class Bar
+---@field bd number
+
+---@type Foo|Bar
+local x = {
+	a = 1,
+	b = 2,
+	c = 3,
+}
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@class Foo
+---@field a number
+---@field b number
+---@field c number
+
+---@class Foo
+
+---@class Bar
+---@field ba number
+---@field bb number
+---@field bc number
+
+---@class Bar
+---@field bd number
+
+---@type Foo|Bar
+local x = <!{
+	a = 1,
+	b = 2,
+}!>
+]]
+
+TEST [[
+---@diagnostic disable: unused-local
+
+---@class Foo
+---@field a number
+---@field b number
+---@field c number
+
+---@class Foo
+
+---@class Bar
+---@field ba number
+---@field bb number
+---@field bc number
+
+---@class Bar
+---@field bd number
+
+---@type Foo|Bar
+local x = <!{
+	ba = 1,
+	bb = 2,
+	bd = 4,
+}!>
+]]
+
+TEST[[
+---@class A
+---@field [1] string
+---@field x number
+
+---@type A
+local t = {x = 1, ""}
+]]
+
+TEST[[
+---@class A
+---@field [1] string
+---@field x number
+
+---@type A
+local t = <!{x = 1}!>
+]]

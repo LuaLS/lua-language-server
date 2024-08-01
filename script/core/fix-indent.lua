@@ -1,99 +1,152 @@
 local files = require 'files'
 local guide = require 'parser.guide'
-local lookBackward = require 'core.look-backward'
 local proto = require 'proto.proto'
-
----@param state parser.state
-local function insertIndentation(state, position, edits)
-    local text   = state.originText or state.lua
-    local lines  = state.originLines or state.lines
-    local row    = guide.rowColOf(position)
-    if not lines or not text then
-        return
-    end
-    local offset = lines[row]
-    local indent = text:match('^%s*', offset)
-    for _, edit in ipairs(edits) do
-        edit.text = edit.text:gsub('\n', '\n' .. indent)
-    end
-end
-
----@param state parser.state
-local function findForward(state, position, ...)
-    local lines = state.originLines or state.lines
-    local offset      = guide.positionToOffsetByLines(lines, position)
-    local firstOffset = state.originText:match('^[ \t]*()', offset + 1)
-    if not firstOffset then
-        return nil
-    end
-    for _, symbol in ipairs { ... } do
-        if state.originText:sub(firstOffset, firstOffset + #symbol - 1) == symbol then
-            return guide.offsetToPositionByLines(lines, firstOffset - 1), symbol
-        end
-    end
-    return nil
-end
-
----@param state parser.state
-local function findBackward(state, position, ...)
-    local text       = state.originText or state.lua
-    local lines      = state.originLines or state.lines
-    if not text or not lines then
-        return nil
-    end
-    local offset     = guide.positionToOffsetByLines(lines, position)
-    local lastOffset = lookBackward.findAnyOffset(text, offset)
-    if not lastOffset then
-        return nil
-    end
-    for _, symbol in ipairs { ... } do
-        if text:sub(lastOffset - #symbol + 1, lastOffset) == symbol then
-            return guide.offsetToPositionByLines(lines, lastOffset)
-        end
-    end
-    return nil
-end
+local lookBackward = require 'core.look-backward'
+local util = require 'utility'
 
 ---@param state parser.state
 ---@param change table
----@param result any[]
-local function checkSplitOneLine(state, change, result)
-    if  change.text ~= '\r\n'
-    and change.text ~= '\n' then
-        return
+local function removeSpacesAfterEnter(state, change)
+    if not change.text:match '^\r?\n[\t ]+\r?\n$' then
+        return false
     end
-
     local lines = state.originLines or state.lines
-    local position = lines[change.range.start.line + 1]
+    local text  = state.originText  or state.lua
+    ---@cast text -?
 
-    local fPosition, fSymbol = findForward(state, position, 'end', '}')
-    if not fPosition or not fSymbol then
+    local edits = {}
+    -- 清除前置空格
+    local startPos = guide.positionOf(change.range.start.line, change.range.start.character)
+    local startOffset = guide.positionToOffsetByLines(lines, startPos)
+    local leftOffset
+    for offset = startOffset, lines[change.range.start.line], -1 do
+        leftOffset = offset
+        local char = text:sub(offset, offset)
+        if char ~= ' ' and char ~= '\t' then
+            break
+        end
+    end
+
+    if leftOffset and leftOffset < startOffset then
+        edits[#edits+1] = {
+            start  = leftOffset,
+            finish = startOffset,
+            text   = '',
+        }
+    end
+
+    -- 清除后置空格
+    local endOffset = startOffset + #change.text
+    local _, rightOffset = text:find('^[\t ]+', endOffset + 1)
+    if rightOffset then
+        edits[#edits+1] = {
+            start  = endOffset,
+            finish = rightOffset,
+            text   = '',
+        }
+    end
+
+    if #edits == 0 then
+        return nil
+    end
+
+    return edits
+end
+
+local function getIndent(state, row)
+    local offset    = state.lines[row]
+    local indent    = state.lua:match('^[\t ]*', offset)
+    return indent
+end
+
+local function isInBlock(state, position)
+    local block = guide.eachSourceContain(state.ast, position, function(source)
+        if source.type == 'ifblock'
+        or source.type == 'elseifblock' then
+            if source.keyword[4] and source.keyword[4] <= position then
+                return true
+            end
+        end
+        if source.type == 'else' then
+            if source.keyword[2] and source.keyword[2] <= position then
+                return true
+            end
+        end
+        if source.type == 'while' then
+            if source.keyword[4] and source.keyword[4] <= position then
+                return true
+            end
+        end
+        if source.type == 'repeat' then
+            if source.keyword[2] and source.keyword[2] <= position then
+                return true
+            end
+        end
+        if source.type == 'loop' then
+            if source.keyword[4] and source.keyword[4] <= position then
+                return true
+            end
+        end
+        if source.type == 'in' then
+            if source.keyword[6] and source.keyword[6] <= position then
+                return true
+            end
+        end
+        if source.type == 'do' then
+            if source.keyword[2] and source.keyword[2] <= position then
+                return true
+            end
+        end
+        if source.type == 'function' then
+            if source.args and source.args.finish <= position then
+                return true
+            end
+            if not source.keyword[3] or source.keyword[3] >= position then
+                return true
+            end
+        end
+        if source.type == 'table' then
+            if source.start + 1 == position then
+                return true
+            end
+        end
+    end)
+    return block ~= nil
+end
+
+local function fixWrongIdent(state, change)
+    if not change.text:match '^\r?\n[\t ]+$' then
+        return false
+    end
+    local position = guide.positionOf(change.range.start.line, change.range.start.character)
+    local row = guide.rowColOf(position)
+    local myIndent   = getIndent(state, row + 1)
+    local lastIndent = getIndent(state, row)
+    if #myIndent <= #lastIndent then
         return
     end
-    local bPosition = findBackward(state, position, 'then', 'do', ')', '{')
-    if not bPosition then
+    if not util.stringStartWith(myIndent, lastIndent) then
         return
     end
+    local lastOffset = lookBackward.findAnyOffset(state.lua, guide.positionToOffset(state, position))
+    if not lastOffset then
+        return
+    end
+    local lastPosition = guide.offsetToPosition(state, lastOffset)
+    if isInBlock(state, lastPosition) then
+        return
+    end
+
+    local endOffset = guide.positionToOffset(state, position) + #change.text
+
     local edits = {}
     edits[#edits+1] = {
-        start  = bPosition,
-        finish = position,
-        text   = '\n\t',
-    }
-    edits[#edits+1] = {
-        start  = position,
-        finish = fPosition + 1,
+        start  = endOffset - #myIndent + #lastIndent,
+        finish = endOffset,
         text   = '',
     }
-    edits[#edits+1] = {
-        start  = fPosition + 1,
-        finish = fPosition + 1,
-        text   = '\n' .. fSymbol:sub(1, 1)
-    }
-    insertIndentation(state, bPosition, edits)
-    for _, edit in ipairs(edits) do
-        result[#result+1] = edit
-    end
+
+    return edits
 end
 
 ---@param state parser.state
@@ -129,42 +182,24 @@ local function applyEdits(state, edits)
         label = 'Fix Indent',
         edit = {
             changes = {
-                [state.uri] = {
-                    {
-                        range = {
-                            start = {
-                                line = 1,
-                                character = 0,
-                            },
-                            ['end'] = {
-                                line = 1,
-                                character = 0,
-                            }
-                        },
-                        newText = '\t',
-                    },
-                }
+                [state.uri] = results
             }
         },
-    })
-    proto.notify('$/command', {
-        command = 'cursorMove',
     })
 end
 
 return function (uri, changes)
-    do return end
     local state = files.compileState(uri)
     if not state then
         return
     end
 
-    local edits = {}
-    for _, change in ipairs(changes) do
-        if change.range then
-            checkSplitOneLine(state, change, edits)
+    local firstChange = changes[1]
+    if firstChange.range then
+        local edits = removeSpacesAfterEnter(state, firstChange)
+                or    fixWrongIdent(state, firstChange)
+        if edits then
+            applyEdits(state, edits)
         end
     end
-
-    applyEdits(state, edits)
 end

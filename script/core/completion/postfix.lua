@@ -353,7 +353,7 @@ local function checkPostFix(state, word, wordPosition, position, symbol, results
                 end):gsub('%$%{?%d+%}?', '')
                 results[#results+1] = {
                     label       = action.key,
-                    kind        = define.CompletionItemKind.Event,
+                    kind        = define.CompletionItemKind.Snippet,
                     description = markdown()
                                     : add('lua', descText)
                                     : string(),

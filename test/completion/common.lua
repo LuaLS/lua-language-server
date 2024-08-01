@@ -3235,7 +3235,7 @@ xx@pcall<??>
 {
     [1] = {
         label = 'pcall',
-        kind  = define.CompletionItemKind.Event,
+        kind  = define.CompletionItemKind.Snippet,
         textEdit = {
             start   = 3,
             finish  = 8,
@@ -3257,7 +3257,7 @@ xx()@pcall<??>
 {
     [1] = {
         label = 'pcall',
-        kind  = define.CompletionItemKind.Event,
+        kind  = define.CompletionItemKind.Snippet,
         textEdit = {
             start   = 5,
             finish  = 10,
@@ -3279,7 +3279,7 @@ xx(1, 2, 3)@pcall<??>
 {
     [1] = {
         label = 'pcall',
-        kind  = define.CompletionItemKind.Event,
+        kind  = define.CompletionItemKind.Snippet,
         textEdit = {
             start   = 12,
             finish  = 17,
@@ -3301,7 +3301,7 @@ xx@xpcall<??>
 {
     [1] = {
         label = 'xpcall',
-        kind  = define.CompletionItemKind.Event,
+        kind  = define.CompletionItemKind.Snippet,
         textEdit = {
             start   = 3,
             finish  = 9,
@@ -3323,7 +3323,7 @@ xx()@xpcall<??>
 {
     [1] = {
         label = 'xpcall',
-        kind  = define.CompletionItemKind.Event,
+        kind  = define.CompletionItemKind.Snippet,
         textEdit = {
             start   = 5,
             finish  = 11,
@@ -3345,7 +3345,7 @@ xx(1, 2, 3)@xpcall<??>
 {
     [1] = {
         label = 'xpcall',
-        kind  = define.CompletionItemKind.Event,
+        kind  = define.CompletionItemKind.Snippet,
         textEdit = {
             start   = 12,
             finish  = 18,
@@ -3367,7 +3367,7 @@ xx@function<??>
 {
     [1] = {
         label = 'function',
-        kind  = define.CompletionItemKind.Event,
+        kind  = define.CompletionItemKind.Snippet,
         textEdit = {
             start   = 3,
             finish  = 11,
@@ -3389,7 +3389,7 @@ xx.yy@method<??>
 {
     [1] = {
         label = 'method',
-        kind  = define.CompletionItemKind.Event,
+        kind  = define.CompletionItemKind.Snippet,
         textEdit = {
             start   = 6,
             finish  = 12,
@@ -3411,7 +3411,7 @@ xx:yy@method<??>
 {
     [1] = {
         label = 'method',
-        kind  = define.CompletionItemKind.Event,
+        kind  = define.CompletionItemKind.Snippet,
         textEdit = {
             start   = 6,
             finish  = 12,
@@ -3433,7 +3433,7 @@ xx@insert<??>
 {
     [1] = {
         label = 'insert',
-        kind  = define.CompletionItemKind.Event,
+        kind  = define.CompletionItemKind.Snippet,
         textEdit = {
             start   = 3,
             finish  = 9,
@@ -3455,7 +3455,7 @@ xx++<??>
 {
     [1] = {
         label = '++',
-        kind  = define.CompletionItemKind.Event,
+        kind  = define.CompletionItemKind.Snippet,
         textEdit = {
             start   = 2,
             finish  = 4,
@@ -3471,7 +3471,7 @@ xx++<??>
     },
     [2] = {
         label = '++?',
-        kind  = define.CompletionItemKind.Event,
+        kind  = define.CompletionItemKind.Snippet,
         textEdit = {
             start   = 2,
             finish  = 4,
@@ -3495,7 +3495,7 @@ end)
 {
     [1] = {
         label = 'xpcall',
-        kind  = define.CompletionItemKind.Event,
+        kind  = define.CompletionItemKind.Snippet,
         textEdit = {
             start   = 10007,
             finish  = 10013,

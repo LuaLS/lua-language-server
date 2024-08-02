@@ -3,6 +3,9 @@
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
 
+## 3.10.1
+* `FIX` Runtime error
+
 ## 3.10.0
 `2024-8-1`
 * `NEW` Add postfix snippet for `unpack`

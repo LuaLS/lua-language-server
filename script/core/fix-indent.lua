@@ -3,6 +3,7 @@ local guide = require 'parser.guide'
 local proto = require 'proto.proto'
 local lookBackward = require 'core.look-backward'
 local util = require 'utility'
+local client = require 'client'
 
 ---@param state parser.state
 ---@param change table
@@ -114,7 +115,7 @@ local function isInBlock(state, position)
     return block ~= nil
 end
 
-local function fixWrongIdent(state, change)
+local function fixWrongIndent(state, change)
     if not change.text:match '^\r?\n[\t ]+$' then
         return false
     end
@@ -189,6 +190,9 @@ local function applyEdits(state, edits)
 end
 
 return function (uri, changes)
+    if not client.getOption('fixIndents') then
+        return
+    end
     local state = files.compileState(uri)
     if not state then
         return
@@ -197,7 +201,7 @@ return function (uri, changes)
     local firstChange = changes[1]
     if firstChange.range then
         local edits = removeSpacesAfterEnter(state, firstChange)
-                or    fixWrongIdent(state, firstChange)
+                or    fixWrongIndent(state, firstChange)
         if edits then
             applyEdits(state, edits)
         end

@@ -5,6 +5,7 @@
 
 ## 3.10.1
 * `FIX` Runtime error
+* `FIX` Disable indentation fixing for Non-VSCode
 
 ## 3.10.0
 `2024-8-1`

@@ -4,6 +4,7 @@
 <!-- Add all new changes here. They will be moved under a version at release -->
 
 ## 3.10.1
+`2024-8-2`
 * `FIX` Runtime error
 * `FIX` Disable indentation fixing for Non-VSCode
 

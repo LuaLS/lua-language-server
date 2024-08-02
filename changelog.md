@@ -8,7 +8,6 @@
 * `NEW` Add postfix snippet for `unpack`
 * `NEW` Add support for lambda style functions, `|paramList| expr` is syntactic sugar for `function(paramList) return expr end`
 * `NEW` Added lua regular expression support for `Lua.doc.<scope>Name` [#2753](https://github.com/LuaLS/lua-language-server/pull/2753)
-* `NEW` You can now click on "References" in CodeLen to display the reference list
 * `NEW` You can now click on "References" in CodeLen to display the reference list（VSCode）
 * `NEW` Improved behavior for inserting new lines:
   + When inside an annotation, an annotation tag will be added at the beginning of the line (VSCode).

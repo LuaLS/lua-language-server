@@ -1599,6 +1599,9 @@ m.register '$/psi/select' {
 
 
 local function refreshStatusBar()
+    if not client.getOption('statusBar') then
+        return
+    end
     local valid = config.get(nil, 'Lua.window.statusBar')
     for _, scp in ipairs(workspace.folders) do
         if not config.get(scp.uri, 'Lua.window.statusBar') then

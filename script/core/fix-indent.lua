@@ -122,18 +122,19 @@ local function fixWrongIndent(state, change)
     local position = guide.positionOf(change.range.start.line, change.range.start.character)
     local row = guide.rowColOf(position)
     local myIndent   = getIndent(state, row + 1)
-    local lastIndent = getIndent(state, row)
+    local lastOffset = lookBackward.findAnyOffset(state.lua, guide.positionToOffset(state, position))
+    if not lastOffset then
+        return
+    end
+    local lastPosition = guide.offsetToPosition(state, lastOffset)
+    local lastRow = guide.rowColOf(lastPosition)
+    local lastIndent = getIndent(state, lastRow)
     if #myIndent <= #lastIndent then
         return
     end
     if not util.stringStartWith(myIndent, lastIndent) then
         return
     end
-    local lastOffset = lookBackward.findAnyOffset(state.lua, guide.positionToOffset(state, position))
-    if not lastOffset then
-        return
-    end
-    local lastPosition = guide.offsetToPosition(state, lastOffset)
     if isInBlock(state, lastPosition) then
         return
     end

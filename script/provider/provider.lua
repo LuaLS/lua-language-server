@@ -1597,6 +1597,18 @@ m.register '$/psi/select' {
     end
 }
 
+local function refreshLanguageConfiguration()
+    if not client.getOption('languageConfiguration') then
+        return
+    end
+    proto.notify('$/languageConfiguration', require 'provider.language-configuration')
+end
+
+config.watch(function (uri, key, value)
+    if key == '' then
+        refreshLanguageConfiguration()
+    end
+end)
 
 local function refreshStatusBar()
     if not client.getOption('statusBar') then

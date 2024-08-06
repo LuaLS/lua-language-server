@@ -261,6 +261,9 @@ vm.binarySwitch = util.switch()
             })
         else
             local node = vm.runOperator(binaryMap[op], source[1], source[2])
+            if not node then
+                node = vm.runOperator(binaryMap[op], source[2], source[1])
+            end
             if node then
                 vm.setNode(source, node)
             end
@@ -300,6 +303,9 @@ vm.binarySwitch = util.switch()
             })
         else
             local node = vm.runOperator(binaryMap[op], source[1], source[2])
+            if not node then
+                node = vm.runOperator(binaryMap[op], source[2], source[1])
+            end
             if node then
                 vm.setNode(source, node)
                 return
@@ -396,6 +402,9 @@ vm.binarySwitch = util.switch()
                 return
             end
             local node = vm.runOperator(binaryMap[source.op.type], source[1], source[2])
+            if not node then
+                node = vm.runOperator(binaryMap[source.op.type], source[2], source[1])
+            end
             if node then
                 vm.setNode(source, node)
             end

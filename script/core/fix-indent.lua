@@ -138,7 +138,8 @@ local function fixWrongIndent(state, change)
         return
     end
 
-    local endOffset = guide.positionToOffset(state, position) + #change.text
+    local endPosition = guide.positionOf(change.range.start.line + 1, #myIndent)
+    local endOffset = guide.positionToOffset(state, endPosition)
 
     local edits = {}
     edits[#edits+1] = {

@@ -249,6 +249,10 @@ function m.testVersion()
     end
 end
 
+function m.sayHello()
+    proto.notify('$/hello', 'world')
+end
+
 function m.lockCache()
     local fs = require 'bee.filesystem'
     local sp = require 'bee.subprocess'
@@ -283,6 +287,8 @@ function m.start()
     m.lockCache()
 
     require 'provider'
+
+    m.sayHello()
 
     m.eventLoop()
 end

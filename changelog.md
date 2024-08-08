@@ -3,6 +3,10 @@
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
 
+## 3.10.3
+`2024-8-8`
+* `FIX` Memory leak with `---@enum(partical)`
+
 ## 3.10.2
 `2024-8-7`
 * `NEW` Add support for binary metamethod on right operand [#2777](https://github.com/LuaLS/lua-language-server/pull/2777)

@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Error `attempt to index a nil value` when `Lua.hint.semicolon == 'All'` [#2788](https://github.com/LuaLS/lua-language-server/issues/2788)
 
 ## 3.10.3
 `2024-8-8`

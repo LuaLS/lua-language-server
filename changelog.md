@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Improved ordering of results for `textDocument/definition`.
 
 ## 3.10.3
 `2024-8-8`

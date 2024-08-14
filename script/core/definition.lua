@@ -7,18 +7,73 @@ local rpath      = require 'workspace.require-path'
 local jumpSource = require 'core.jump-source'
 local wssymbol   = require 'core.workspace-symbol'
 
-local function sortResults(results)
+--- @param s string
+--- @return string[]
+local function split(s)
+    local r = {}
+    s:gsub('[^/]+', function (w)
+        r[#r+1] = w:gsub("~1", "/"):gsub("~0", "~")
+    end)
+    return r
+end
+
+--- Returns the Levenshtein distance between the two given string arrays
+--- @param a string[]
+--- @param b string[]
+--- @return number
+local function levenshteinDistance(a, b)
+    local a_len, b_len = #a, #b
+    local matrix = {} --- @type integer[][]
+
+    -- Initialize the matrix
+    for i = 1, a_len + 1 do
+        matrix[i] = { [1] = i }
+    end
+
+    for j = 1, b_len + 1 do
+        matrix[1][j] = j
+    end
+
+    -- Compute the Levenshtein distance
+    for i = 1, a_len do
+        for j = 1, b_len do
+            local cost = (a[i] == b[j]) and 0 or 1
+            matrix[i + 1][j + 1] =
+                math.min(matrix[i][j + 1] + 1, matrix[i + 1][j] + 1, matrix[i][j] + cost)
+         end
+    end
+
+    -- Return the Levenshtein distance
+    return matrix[a_len + 1][b_len + 1]
+end
+
+--- @param path1 string
+--- @param path2 string
+--- @return number
+local function pathSimilarityRatio(path1, path2)
+    local parts1 = split(path1)
+    local parts2 = split(path2)
+    local distance = levenshteinDistance(parts1, parts2)
+    return distance * 2 / (#parts1 + #parts2)
+end
+
+local function sortResults(results, uri)
     -- 先按照顺序排序
+    -- Sort in order first
+    local simularity_cache = {} --- @type table<string,number>
     table.sort(results, function (a, b)
         local u1 = guide.getUri(a.target)
         local u2 = guide.getUri(b.target)
         if u1 == u2 then
             return a.target.start < b.target.start
         else
-            return u1 < u2
+            simularity_cache[u1] = simularity_cache[u1] or pathSimilarityRatio(uri, u1)
+            simularity_cache[u2] = simularity_cache[u2] or pathSimilarityRatio(uri, u2)
+            return simularity_cache[u1] < simularity_cache[u2]
         end
     end)
     -- 如果2个结果处于嵌套状态，则取范围小的那个
+    -- If two results are nested, take the one with the smaller range
     local lf, lu
     for i = #results, 1, -1 do
         local res = results[i].target
@@ -141,7 +196,7 @@ return function (uri, offset)
     local results = {}
     local uris = checkRequire(source)
     if uris then
-        for i, uri in ipairs(uris) do
+        for _, uri in ipairs(uris) do
             results[#results+1] = {
                 uri    = uri,
                 source = source,
@@ -230,7 +285,7 @@ return function (uri, offset)
         return nil
     end
 
-    sortResults(results)
+    sortResults(results, uri)
     jumpSource(results)
 
     return results

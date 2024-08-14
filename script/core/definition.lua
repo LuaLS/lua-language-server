@@ -51,6 +51,9 @@ end
 --- @param path2 string
 --- @return number
 local function pathSimilarityRatio(path1, path2)
+    if path1 == path2 then
+        return 0
+    end
     local parts1 = split(path1)
     local parts2 = split(path2)
     local distance = levenshteinDistance(parts1, parts2)

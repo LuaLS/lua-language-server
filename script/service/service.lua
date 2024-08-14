@@ -250,7 +250,7 @@ function m.testVersion()
 end
 
 function m.sayHello()
-    proto.notify('$/hello', 'world')
+    proto.notify('$/hello', {'world'})
 end
 
 function m.lockCache()

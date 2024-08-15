@@ -2,7 +2,7 @@ digraph AST {
 	node [shape = rect]
 	"main:0:170009" [
 		label="main\l\l"
-		tooltip="start: 0\nfinish: 170009\nlocals: <table>\nstate: <table>\n1: <node setglobal>\n2: <node setglobal>\n3: <node setglobal>\n4: <node setglobal>\n5: <node setglobal>\n6: <node setglobal>\n7: <node setglobal>\n8: <node setglobal>\n9: <node setglobal>\n10: <node setglobal>\n11: <node setglobal>\n12: <node setglobal>\n13: <node setglobal>\n14: <node setglobal>\n15: <node setglobal>\n15..17: (...)\n"
+		tooltip="start: 0\nfinish: 170009\nstate: <table>\nlocals: <table>\nbstart: 0\nbfinish: 170009\n1: <node setglobal>\n2: <node setglobal>\n3: <node setglobal>\n4: <node setglobal>\n5: <node setglobal>\n6: <node setglobal>\n7: <node setglobal>\n8: <node setglobal>\n9: <node setglobal>\n10: <node setglobal>\n11: <node setglobal>\n12: <node setglobal>\n13: <node setglobal>\n14: <node setglobal>\n15: <node setglobal>\n15..17: (...)\n"
 	]
 	"setglobal:0:1" [
 		label="setglobal\ls\l"

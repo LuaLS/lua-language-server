@@ -674,7 +674,7 @@ local function parseString(parent)
     -- compatibility
     if content:sub(1, 1) == '"'
     or content:sub(1, 1) == "'" then
-        if content:sub(1, 1) == content:sub(-1, -1) then
+        if #content > 1 and content:sub(1, 1) == content:sub(-1, -1) then
             mark = content:sub(1, 1)
             content = content:sub(2, -2)
         end

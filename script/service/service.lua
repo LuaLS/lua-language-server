@@ -13,6 +13,7 @@ local time   = require 'bee.time'
 local fw     = require 'filewatch'
 local furi   = require 'file-uri'
 local net    = require 'service.net'
+local client = require 'client'
 
 require 'jsonc'
 require 'json-beautify'
@@ -202,6 +203,9 @@ end
 local showStatusTip = math.random(100) == 1
 
 function m.reportStatus()
+    if not client.getOption('statusBar') then
+        return
+    end
     local info = {}
     if m.workingClock and time.monotonic() - m.workingClock > 100 then
         info.text = '$(loading~spin)Lua'
@@ -245,6 +249,10 @@ function m.testVersion()
     end
 end
 
+function m.sayHello()
+    proto.notify('$/hello', {'world'})
+end
+
 function m.lockCache()
     local fs = require 'bee.filesystem'
     local sp = require 'bee.subprocess'
@@ -279,6 +287,8 @@ function m.start()
     m.lockCache()
 
     require 'provider'
+
+    m.sayHello()
 
     m.eventLoop()
 end

@@ -1,0 +1,5 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Report LuaLS.github.io issues
+    url: https://github.com/LuaLS/LuaLS.github.io/issues
+    about: Please report issues regarding our website (and the documentation on it) in the website repository.

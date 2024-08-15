@@ -2,18 +2,44 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` Add matching checks between the shape of tables and classes, during type checking. [#2768](https://github.com/LuaLS/lua-language-server/pull/2768
+* `FIX` Error `attempt to index a nil value` when `Lua.hint.semicolon == 'All'` [#2788](https://github.com/LuaLS/lua-language-server/issues/2788)
+
+## 3.10.3
+`2024-8-8`
+* `FIX` Memory leak with `---@enum(partical)`
+
+## 3.10.2
+`2024-8-7`
+* `NEW` Add support for binary metamethod on right operand [#2777](https://github.com/LuaLS/lua-language-server/pull/2777)
+* `FIX` Incorrect indentation fixing in some case
+
+## 3.10.1
+`2024-8-2`
+* `FIX` Runtime error
+* `FIX` Disable indentation fixing for Non-VSCode
+
+## 3.10.0
+`2024-8-1`
 * `NEW` Add postfix snippet for `unpack`
-* `FIX` `diagnostics.severity` defaulting to "Warning" when run using `--check` [#2730](https://github.com/LuaLS/lua-language-server/issues/2730)
 * `NEW` Add support for lambda style functions, `|paramList| expr` is syntactic sugar for `function(paramList) return expr end`
-* `FIX` Respect `completion.showParams` config for local function completion
+* `NEW` Added lua regular expression support for `Lua.doc.<scope>Name` [#2753](https://github.com/LuaLS/lua-language-server/pull/2753)
+* `NEW` You can now click on "References" in CodeLen to display the reference list（VSCode）
+* `NEW` Improved behavior for inserting new lines:
+  + When inside an annotation, an annotation tag will be added at the beginning of the line (VSCode).
+  + When between `function () end` or similar constructs, the format will be adjusted to a more reasonable one (VSCode) and leading/trailing spaces will be removed (generic).
+  + Attempts to semantically fix improper indentation (generic).
 * `CHG` Improve performance of multithreaded `--check` and `undefined-field` diagnostic
+* `CHG` Change spacing of parameter inlay hints to match other LSPs, like `rust-analyzer`
+* `FIX` `diagnostics.severity` defaulting to "Warning" when run using `--check` [#2730](https://github.com/LuaLS/lua-language-server/issues/2730)
+* `FIX` Respect `completion.showParams` config for local function completion
 * `FIX` Addons can now self-recommend as expected. Fixed by correcting the `wholeMatch` function
 * `FIX` Now correctly evaluates the visibility of fields in a class when they are defined directly in the object. use for completion and invisible dianostic. [#2752](https://github.com/LuaLS/lua-language-server/issues/2752)
-* `NEW` added lua regular expression support for Lua.doc.<scope>Name [#2753](https://github.com/LuaLS/lua-language-server/pull/2753)
 * `FIX` Bad triggering of the `inject-field` diagnostic, when the fields are declared at the creation of the object [#2746](https://github.com/LuaLS/lua-language-server/issues/2746)
-* `CHG` Change spacing of parameter inlay hints to match other LSPs, like `rust-analyzer`
 * `FIX` Inconsistent type narrow behavior of function call args [#2758](https://github.com/LuaLS/lua-language-server/issues/2758)
-* `NEW` Add matching checks between the shape of tables and classes, during type checking. [#2768](https://github.com/LuaLS/lua-language-server/pull/2768
+* `FIX` Improve the `missing-fields` logic to be able to correctly handle classes defined several times [#22770](https://github.com/LuaLS/lua-language-server/pull/2770)
+* `FIX` Typos in annotation descriptions
+* `FIX` incorrect `CompletionItemKind` for postfix snippets [#2773](https://github.com/LuaLS/lua-language-server/pull/2773)
 
 ## 3.9.3
 `2024-6-11`

@@ -70,7 +70,7 @@ local function checkParentEnum(parentName, child, uri, mark, errs)
                 if enums then
                     enums = util.arrayMerge(enums, denums)
                 else
-                    enums = denums
+                    enums = util.arrayMerge({}, denums)
                 end
             end
         end

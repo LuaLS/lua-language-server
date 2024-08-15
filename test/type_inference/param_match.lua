@@ -137,3 +137,27 @@ local function f(...) end
 
 local <?r?> = f(10)
 ]]
+
+TEST 'number' [[
+---@overload fun(a: 1, c: fun(x: number))
+---@overload fun(a: 2, c: fun(x: string))
+local function f(...) end
+
+f(1, function (<?a?>) end)
+]]
+
+TEST 'string' [[
+---@overload fun(a: 1, c: fun(x: number))
+---@overload fun(a: 2, c: fun(x: string))
+local function f(...) end
+
+f(2, function (<?a?>) end)
+]]
+
+TEST 'any' [[
+---@overload fun(a: 1)
+---@overload fun(a: 2)
+local function f(...) end
+
+f(1, function (<?a?>) end)
+]]

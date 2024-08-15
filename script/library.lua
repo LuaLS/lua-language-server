@@ -22,7 +22,7 @@ m.metaPaths = {}
 
 local function getDocFormater(uri)
     local version = config.get(uri, 'Lua.runtime.version')
-    if client.isVSCode() then
+    if client.getOption('viewDocument') then
         if version == 'Lua 5.1' then
             return 'HOVER_NATIVE_DOCUMENT_LUA51'
         elseif version == 'Lua 5.2' then

@@ -1167,7 +1167,7 @@ Provide type declaration for [operator metamethods](http://lua-users.org/wiki/Me
 ### Vector Add Metamethod
 ```
 ---@class Vector
----@operation add(Vector):Vector
+---@operator add(Vector):Vector
 
 vA = Vector.new(1, 2, 3)
 vB = Vector.new(10, 20, 30)
@@ -1178,7 +1178,7 @@ vC = vA + vB
 ### Unary Minus
 ```
 ---@class Passcode
----@operation unm:integer
+---@operator unm:integer
 
 pA = Passcode.new(1234)
 pB = -pA
@@ -1216,7 +1216,7 @@ setColor(colors.green)
 LUADOC_DESC_SOURCE = -- TODO: need translate!
 [=[
 Provide a reference to some source code which lives in another file. When
-searching for the defintion of an item, its `@source` will be used.
+searching for the definition of an item, its `@source` will be used.
 
 ## Syntax
 `@source <path>`
@@ -1264,7 +1264,7 @@ end
 LUADOC_DESC_PRIVATE = -- TODO: need translate!
 [=[
 Mark a function as private to a @class. Private functions can be accessed only
-from within their class and are not accessable from child classes.
+from within their class and are not accessible from child classes.
 
 ## Syntax
 `@private`

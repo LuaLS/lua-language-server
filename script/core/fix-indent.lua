@@ -60,59 +60,20 @@ local function getIndent(state, row)
     return indent
 end
 
-local function isInBlock(state, position)
-    local block = guide.eachSourceContain(state.ast, position, function(source)
-        if source.type == 'ifblock'
-        or source.type == 'elseifblock' then
-            if source.keyword[4] and source.keyword[4] <= position then
-                return true
-            end
+---@param state parser.state
+---@param pos integer
+---@return parser.object
+local function getBlock(state, pos)
+    local block
+    guide.eachSourceContain(state.ast, pos, function (src)
+        if not src.bstart then
+            return
         end
-        if source.type == 'else' then
-            if source.keyword[2] and source.keyword[2] <= position then
-                return true
-            end
-        end
-        if source.type == 'while' then
-            if source.keyword[4] and source.keyword[4] <= position then
-                return true
-            end
-        end
-        if source.type == 'repeat' then
-            if source.keyword[2] and source.keyword[2] <= position then
-                return true
-            end
-        end
-        if source.type == 'loop' then
-            if source.keyword[4] and source.keyword[4] <= position then
-                return true
-            end
-        end
-        if source.type == 'in' then
-            if source.keyword[6] and source.keyword[6] <= position then
-                return true
-            end
-        end
-        if source.type == 'do' then
-            if source.keyword[2] and source.keyword[2] <= position then
-                return true
-            end
-        end
-        if source.type == 'function' then
-            if source.args and source.args.finish <= position then
-                return true
-            end
-            if not source.keyword[3] or source.keyword[3] >= position then
-                return true
-            end
-        end
-        if source.type == 'table' then
-            if source.start + 1 == position then
-                return true
-            end
+        if not block or block.bstart < src.bstart then
+            block = src
         end
     end)
-    return block ~= nil
+    return block
 end
 
 local function fixWrongIndent(state, change)
@@ -135,7 +96,8 @@ local function fixWrongIndent(state, change)
     if not util.stringStartWith(myIndent, lastIndent) then
         return
     end
-    if isInBlock(state, lastPosition) then
+    local myBlock = getBlock(state, position)
+    if myBlock.bstart >= lastOffset then
         return
     end
 

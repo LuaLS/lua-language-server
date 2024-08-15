@@ -1585,6 +1585,7 @@ local function parseTable()
         start  = getPosition(Tokens[Index], 'left'),
         finish = getPosition(Tokens[Index], 'right'),
     }
+    tbl.bstart = tbl.finish
     Index = Index + 2
     local index = 0
     local tindex = 0
@@ -1593,6 +1594,7 @@ local function parseTable()
         skipSpace(true)
         local token = Tokens[Index + 1]
         if token == '}' then
+            tbl.bfinish = getPosition(Tokens[Index], 'left')
             Index = Index + 2
             break
         end
@@ -1712,6 +1714,8 @@ local function parseTable()
         end
 
         missSymbol '}'
+        skipSpace()
+        tbl.bfinish = getPosition(Tokens[Index], 'left')
         break
         ::CONTINUE::
     end
@@ -2379,6 +2383,7 @@ local function parseFunction(isLocal, isAction)
     end
     parseActions()
     popChunk()
+    func.bfinish = getPosition(Tokens[Index], 'left')
     if Tokens[Index + 1] == 'end' then
         local endLeft   = getPosition(Tokens[Index], 'left')
         local endRight  = getPosition(Tokens[Index] + 2, 'right')
@@ -2464,7 +2469,8 @@ local function parseLambda(isDoublePipe)
             start  = child.start,
             finish = child.finish,
             parent = lambda,
-            [1]    = child}
+            [1]    = child
+        }
         child.parent = rtn
         lambda[1] = rtn
         lambda.returns = {rtn}
@@ -2475,6 +2481,7 @@ local function parseLambda(isDoublePipe)
         lambda.finish = lastRightPosition()
         missExp()
     end
+    lambda.bfinish = getPosition(Tokens[Index], 'left')
     LocalCount = LastLocalCount
     return lambda
 end
@@ -3131,6 +3138,7 @@ local function parseDo()
     pushChunk(obj)
     parseActions()
     popChunk()
+    obj.bfinish = getPosition(Tokens[Index], 'left')
     if Tokens[Index + 1] == 'end' then
         obj.finish     = getPosition(Tokens[Index] + 2, 'right')
         obj.keyword[3] = getPosition(Tokens[Index], 'left')
@@ -3350,6 +3358,7 @@ local function parseIfBlock(parent)
     parseActions()
     popChunk()
     ifblock.finish = getPosition(Tokens[Index], 'left')
+    ifblock.bfinish = ifblock.finish
     if ifblock.locals then
         LocalCount = LocalCount - #ifblock.locals
     end
@@ -3412,6 +3421,7 @@ local function parseElseIfBlock(parent)
     parseActions()
     popChunk()
     elseifblock.finish = getPosition(Tokens[Index], 'left')
+    elseifblock.bfinish = elseifblock.finish
     if elseifblock.locals then
         LocalCount = LocalCount - #elseifblock.locals
     end
@@ -3438,6 +3448,7 @@ local function parseElseBlock(parent)
     parseActions()
     popChunk()
     elseblock.finish = getPosition(Tokens[Index], 'left')
+    elseblock.bfinish = elseblock.finish
     if elseblock.locals then
         LocalCount = LocalCount - #elseblock.locals
     end
@@ -3680,8 +3691,8 @@ local function parseFor()
     skipSpace()
     parseActions()
     popChunk()
-
     skipSpace()
+    action.bfinish = getPosition(Tokens[Index], 'left')
     if Tokens[Index + 1] == 'end' then
         action.finish                     = getPosition(Tokens[Index] + 2, 'right')
         action.keyword[#action.keyword+1] = getPosition(Tokens[Index], 'left')
@@ -3763,6 +3774,7 @@ local function parseWhile()
     popChunk()
 
     skipSpace()
+    action.bfinish = getPosition(Tokens[Index], 'left')
     if Tokens[Index + 1] == 'end' then
         action.finish                     = getPosition(Tokens[Index] + 2, 'right')
         action.keyword[#action.keyword+1] = getPosition(Tokens[Index], 'left')
@@ -3797,6 +3809,7 @@ local function parseRepeat()
     parseActions()
 
     skipSpace()
+    action.bfinish = getPosition(Tokens[Index], 'left')
     if Tokens[Index + 1] == 'until' then
         action.finish                     = getPosition(Tokens[Index] + 4, 'right')
         action.keyword[#action.keyword+1] = getPosition(Tokens[Index], 'left')
@@ -3989,6 +4002,7 @@ local function parseLua()
         type   = 'main',
         start  = 0,
         finish = 0,
+        bstart = 0,
     }
     pushChunk(main)
     createLocal{
@@ -4014,6 +4028,7 @@ local function parseLua()
     end
     popChunk()
     main.finish = getPosition(#Lua, 'right')
+    main.bfinish = main.finish
 
     return main
 end

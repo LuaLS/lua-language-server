@@ -22,6 +22,7 @@ local type         = type
 ---@field range                 integer
 ---@field effect                integer
 ---@field bstart                integer
+---@field bfinish               integer
 ---@field attrs                 string[]
 ---@field specials              parser.object[]
 ---@field labels                parser.object[]
@@ -589,6 +590,9 @@ end
 function m.getStartFinish(source)
     local start  = source.start
     local finish = source.finish
+    if source.bfinish and source.bfinish > finish then
+        finish = source.bfinish
+    end
     if not start then
         local first = source[1]
         if not first then
@@ -604,6 +608,9 @@ end
 function m.getRange(source)
     local start  = source.vstart or source.start
     local finish = source.range  or source.finish
+    if source.bfinish and source.bfinish > finish then
+        finish = source.bfinish
+    end
     if not start then
         local first = source[1]
         if not first then

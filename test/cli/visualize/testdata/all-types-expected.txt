@@ -2,7 +2,7 @@ digraph AST {
 	node [shape = rect]
 	"main:0:300000" [
 		label="main\l\l"
-		tooltip="start: 0\nfinish: 300000\nlocals: <table>\nstate: <table>\nreturns: <table>\n1: <node setglobal>\n2: <node setfield>\n3: <node setindex>\n4: <node setmethod>\n5: <node local>\n6: <node while>\n7: <node call>\n8: <node loop>\n9: <node setglobal>\n10: <node if>\n"
+		tooltip="start: 0\nfinish: 300000\nlocals: <table>\nbfinish: 300000\nbstart: 0\nstate: <table>\nreturns: <table>\n1: <node setglobal>\n2: <node setfield>\n3: <node setindex>\n4: <node setmethod>\n5: <node local>\n6: <node while>\n7: <node call>\n8: <node loop>\n9: <node setglobal>\n10: <node if>\n"
 	]
 	"setglobal:0:3" [
 		label="setglobal\lfoo\l"
@@ -11,7 +11,7 @@ digraph AST {
 	"main:0:300000" -> "setglobal:0:3"
 	"table:6:35" [
 		label="table\l\l"
-		tooltip="start: 6\nfinish: 35\n1: <node tablefield>\n2: <node tablefield>\n3: <node tableindex>\n"
+		tooltip="start: 6\nfinish: 35\nbfinish: 34\nbstart: 7\n1: <node tablefield>\n2: <node tablefield>\n3: <node tableindex>\n"
 	]
 	"setglobal:0:3" -> "table:6:35"
 	"tablefield:7:8" [
@@ -146,7 +146,7 @@ digraph AST {
 	"setmethod:30009:30023" -> "method:30013:30023"
 	"function:30000:30042" [
 		label="function\l\l"
-		tooltip="start: 30000\nfinish: 30042\nhasReturn: true\nargs: <node funcargs>\nlocals: <table>\nkeyword: <table>\nbstart: 30025\nreturns: <table>\n1: <node return>\n"
+		tooltip="start: 30000\nfinish: 30042\nbfinish: 30039\nhasReturn: true\nargs: <node funcargs>\nlocals: <table>\nkeyword: <table>\nbstart: 30025\nreturns: <table>\n1: <node return>\n"
 	]
 	"setmethod:30009:30023" -> "function:30000:30042"
 	"funcargs:30023:30025" [
@@ -181,7 +181,7 @@ digraph AST {
 	"local:40006:40007" -> "integer:40010:40011"
 	"while:50000:70003" [
 		label="while\l\l"
-		tooltip="start: 50000\nfinish: 70003\nfilter: <node binary>\nkeyword: <table>\nbstart: 50013\n1: <node setlocal>\n"
+		tooltip="start: 50000\nfinish: 70003\nbfinish: 70000\nfilter: <node binary>\nkeyword: <table>\nbstart: 50013\n1: <node setlocal>\n"
 	]
 	"main:0:300000" -> "while:50000:70003"
 	"binary:50006:50012" [
@@ -291,7 +291,7 @@ digraph AST {
 	"callargs:80005:80008" -> "getlocal:80006:80007"
 	"loop:90000:140003" [
 		label="loop\l\l"
-		tooltip="start: 90000\nfinish: 140003\ninit: <node integer>\nstep: <node integer>\nmax: <node integer>\nlocals: <table>\nkeyword: <table>\nbstart: 90018\nloc: <node local>\n1: <node in>\n"
+		tooltip="start: 90000\nfinish: 140003\ninit: <node integer>\nstep: <node integer>\nbfinish: 140000\nmax: <node integer>\nlocals: <table>\nkeyword: <table>\nbstart: 90018\nloc: <node local>\n1: <node in>\n"
 	]
 	"main:0:300000" -> "loop:90000:140003"
 	"local:90004:90005" [
@@ -316,7 +316,7 @@ digraph AST {
 	"loop:90000:140003" -> "integer:90015:90017"
 	"in:100001:130004" [
 		label="in\l\l"
-		tooltip="start: 100001\nfinish: 130004\nexps: <node list>\nlabels: <table>\nlocals: <table>\nkeyword: <table>\nbstart: 100020\nkeys: <node list>\n1: <node goto>\n2: <node label>\n"
+		tooltip="start: 100001\nfinish: 130004\nbfinish: 130001\nexps: <node list>\nlabels: <table>\nlocals: <table>\nkeyword: <table>\nbstart: 100020\nkeys: <node list>\n1: <node goto>\n2: <node label>\n"
 	]
 	"loop:90000:140003" -> "in:100001:130004"
 	"list:100005:100006" [
@@ -371,7 +371,7 @@ digraph AST {
 	"main:0:300000" -> "setglobal:160009:160012"
 	"function:160000:210003" [
 		label="function\l\l"
-		tooltip="start: 160000\nfinish: 210003\nkeyword: <table>\nhasReturn: true\nargs: <node funcargs>\nbstart: 160014\nreturns: <table>\n1: <node return>\n"
+		tooltip="start: 160000\nfinish: 210003\nbfinish: 210000\nkeyword: <table>\nhasReturn: true\nargs: <node funcargs>\nbstart: 160014\nreturns: <table>\n1: <node return>\n"
 	]
 	"setglobal:160009:160012" -> "function:160000:210003"
 	"funcargs:160012:160014" [
@@ -386,7 +386,7 @@ digraph AST {
 	"function:160000:210003" -> "return:170001:200004"
 	"function:170008:200004" [
 		label="function\l\l"
-		tooltip="start: 170008\nfinish: 200004\nargs: <node funcargs>\nlocals: <table>\nbstart: 170024\nkeyword: <table>\nvararg: <node ...>\n1: <node repeat>\n"
+		tooltip="start: 170008\nfinish: 200004\nbfinish: 200001\nargs: <node funcargs>\nlocals: <table>\nbstart: 170024\nkeyword: <table>\nvararg: <node ...>\n1: <node repeat>\n"
 	]
 	"return:170001:200004" -> "function:170008:200004"
 	"funcargs:170016:170024" [
@@ -406,7 +406,7 @@ digraph AST {
 	"funcargs:170016:170024" -> "...:170020:170023"
 	"repeat:180002:190028" [
 		label="repeat\l\l"
-		tooltip="start: 180002\nfinish: 190028\nfilter: <node binary>\nkeyword: <table>\nbstart: 180008\n"
+		tooltip="start: 180002\nfinish: 190028\nfilter: <node binary>\nbfinish: 190002\nkeyword: <table>\nbstart: 180008\n"
 	]
 	"function:170008:200004" -> "repeat:180002:190028"
 	"binary:190008:190028" [
@@ -451,7 +451,7 @@ digraph AST {
 	"main:0:300000" -> "if:230000:290003"
 	"ifblock:230000:250000" [
 		label="ifblock\l\l"
-		tooltip="start: 230000\nfinish: 250000\nbstart: 230009\nfilter: <node getglobal>\nhasReturn: true\nkeyword: <table>\n1: <node return>\n"
+		tooltip="start: 230000\nfinish: 250000\nfilter: <node getglobal>\nbstart: 230009\nhasReturn: true\nbfinish: 250000\nkeyword: <table>\n1: <node return>\n"
 	]
 	"if:230000:290003" -> "ifblock:230000:250000"
 	"getglobal:230003:230004" [
@@ -551,7 +551,7 @@ digraph AST {
 	"binary:240042:240048" -> "integer:240047:240048"
 	"elseifblock:250000:270000" [
 		label="elseifblock\l\l"
-		tooltip="start: 250000\nfinish: 270000\nbstart: 250013\nfilter: <node getglobal>\nhasReturn: true\nkeyword: <table>\n1: <node return>\n"
+		tooltip="start: 250000\nfinish: 270000\nfilter: <node getglobal>\nbstart: 250013\nhasReturn: true\nbfinish: 270000\nkeyword: <table>\n1: <node return>\n"
 	]
 	"if:230000:290003" -> "elseifblock:250000:270000"
 	"getglobal:250007:250008" [
@@ -571,7 +571,7 @@ digraph AST {
 	"return:260001:260011" -> "number:260008:260011"
 	"elseblock:270000:290000" [
 		label="elseblock\l\l"
-		tooltip="start: 270000\nfinish: 290000\nkeyword: <table>\nbstart: 270004\nhasReturn: true\n1: <node return>\n"
+		tooltip="start: 270000\nfinish: 290000\nbfinish: 290000\nbstart: 270004\nhasReturn: true\nkeyword: <table>\n1: <node return>\n"
 	]
 	"if:230000:290003" -> "elseblock:270000:290000"
 	"return:280001:280091" [

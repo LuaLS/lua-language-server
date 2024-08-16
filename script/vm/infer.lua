@@ -51,11 +51,18 @@ local viewNodeSwitch;viewNodeSwitch = util.switch()
     end)
     : case 'table'
     : call(function (source, infer, uri)
-        if source.type == 'table' then
-            if #source == 1 and source[1].type == 'varargs' then
-                local node = vm.getInfer(source[1]):view(uri)
-                return ('%s[]'):format(node)
+        local docs = source.bindDocs
+        if docs then
+            for _, doc in ipairs(docs) do
+                if doc.type == 'doc.enum' then
+                    return 'enum ' .. doc.enum[1]
+                end
             end
+        end
+
+        if #source == 1 and source[1].type == 'varargs' then
+            local node = vm.getInfer(source[1]):view(uri)
+            return ('%s[]'):format(node)
         end
 
         infer._hasTable = true

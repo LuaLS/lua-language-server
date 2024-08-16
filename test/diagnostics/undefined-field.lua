@@ -146,3 +146,13 @@ local t
 
 local n = t:upper()
 ]]
+
+TEST [[
+---@enum X
+X = {
+    A = 1,
+    B = 2
+}
+
+print(X.<!C!>)
+]]

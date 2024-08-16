@@ -300,6 +300,10 @@ config.type.inferParamType               =
 
 如果设置为 "false"，则在未注释时，参数类型为 "any"。
 ]]
+config.type.checkTableShape              =
+[[
+对表的形状进行严格检查。
+]]
 config.doc.privateName                   =
 '将特定名称的字段视为私有，例如 `m_*` 意味着 `XXX.m_id` 与 `XXX.m_type` 是私有字段，只能在定义所在的类中访问。'
 config.doc.protectedName                 =

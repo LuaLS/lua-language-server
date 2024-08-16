@@ -1,3 +1,4 @@
+local config = require "config.config"
 TEST [[
 local x = 0
 
@@ -345,6 +346,8 @@ local v
 v = a
 ]]
 
+config.set(nil, 'Lua.type.checkTableShape', true)
+
 TEST [[
 ---@class A
 ---@field x string
@@ -398,3 +401,5 @@ local a = {x = "b", y = {}}
 local v
 <!v!> = a
 ]]
+
+config.set(nil, 'Lua.type.checkTableShape', false)

@@ -4,9 +4,9 @@ local diag   = require 'proto.diagnostic'
 
 ---@class config.unit
 ---@field caller function
+---@field loader function
 ---@field _checker fun(self: config.unit, value: any): boolean
 ---@field name     string
----@field [string] config.unit
 ---@operator shl:  config.unit
 ---@operator shr:  config.unit
 ---@operator call: config.unit
@@ -57,7 +57,8 @@ local function register(name, default, checker, loader, caller)
     }
 end
 
----@type config.unit
+---@class config.master
+---@field [string] config.unit
 local Type = setmetatable({}, { __index = function (_, name)
     local unit = {}
     for k, v in pairs(units[name]) do
@@ -398,7 +399,8 @@ local template = {
     ['Lua.type.castNumberToInteger']        = Type.Boolean >> true,
     ['Lua.type.weakUnionCheck']             = Type.Boolean >> false,
     ['Lua.type.weakNilCheck']               = Type.Boolean >> false,
-    ['Lua.type.inferParamType']            = Type.Boolean >> false,
+    ['Lua.type.inferParamType']             = Type.Boolean >> false,
+    ['Lua.type.checkTableShape']            = Type.Boolean >> false,
     ['Lua.doc.privateName']                 = Type.Array(Type.String),
     ['Lua.doc.protectedName']               = Type.Array(Type.String),
     ['Lua.doc.packageName']                 = Type.Array(Type.String),

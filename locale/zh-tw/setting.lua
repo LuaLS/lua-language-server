@@ -300,6 +300,10 @@ config.type.inferParamType               = -- TODO: need translate!
 
 如果设置为 "false"，则在未注释时，参数类型为 "any"。
 ]]
+config.type.checkTableShape              = -- TODO: need translate!
+[[
+对表的形状进行严格检查。
+]]
 config.doc.privateName                   = -- TODO: need translate!
 'Treat specific field names as private, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are private, witch can only be accessed in the class where the definition is located.'
 config.doc.protectedName                 = -- TODO: need translate!

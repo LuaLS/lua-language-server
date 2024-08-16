@@ -301,6 +301,10 @@ When a parameter type is not annotated, it is inferred from the function's call 
 
 When this setting is `false`, the type of the parameter is `any` when it is not annotated.
 ]]
+config.type.checkTableShape              =
+[[
+Strictly check the shape of the table.
+]]
 config.doc.privateName                   =
 'Treat specific field names as private, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are private, witch can only be accessed in the class where the definition is located.'
 config.doc.protectedName                 =

@@ -1,3 +1,4 @@
+local config = require "config.config"
 TEST [[
 ---@param x number
 local function f(x) end
@@ -278,6 +279,8 @@ function f(a) end
 f(a)
 ]]
 
+config.set(nil, 'Lua.type.checkTableShape', true)
+
 TEST [[
 ---@class A
 ---@field x string
@@ -348,3 +351,5 @@ function f(a) end
 
 f(a)
 ]]
+
+config.set(nil, 'Lua.type.checkTableShape', false)

@@ -693,6 +693,21 @@ function m.sortCallbackOfIndex(arr)
     end
 end
 
+---@param datas any[]
+---@param scores integer[]
+---@return SortByScoreCallback
+function m.sortCallbackOfScore(datas, scores)
+    local map = {}
+    for i = 1, #datas do
+        local data = datas[i]
+        local score = scores[i]
+        map[data] = score
+    end
+    return function (v)
+        return map[v]
+    end
+end
+
 ---裁剪字符串
 ---@param str string
 ---@param mode? '"left"'|'"right"'
@@ -851,12 +866,13 @@ function m.multiTable(count, default)
         end })
     end
     for _ = 3, count do
+        local tt = current
         current = setmetatable({}, { __index = function (t, k)
             if k == nil then
                 return nil
             end
-            t[k] = current
-            return current
+            t[k] = tt
+            return tt
         end })
     end
     return current

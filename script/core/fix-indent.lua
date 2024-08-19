@@ -5,10 +5,14 @@ local lookBackward = require 'core.look-backward'
 local util = require 'utility'
 local client = require 'client'
 
----@param state parser.state
+---@param uri uri
 ---@param change table
-local function removeSpacesAfterEnter(state, change)
+local function removeSpacesAfterEnter(uri, change)
     if not change.text:match '^\r?\n[\t ]+\r?\n$' then
+        return false
+    end
+    local state = files.getState(uri)
+    if not state then
         return false
     end
     local lines = state.originLines or state.lines
@@ -76,8 +80,13 @@ local function getBlock(state, pos)
     return block
 end
 
-local function fixWrongIndent(state, change)
+---@param uri uri
+local function fixWrongIndent(uri, change)
     if not change.text:match '^\r?\n[\t ]+$' then
+        return false
+    end
+    local state = files.getState(uri)
+    if not state then
         return false
     end
     local position = guide.positionOf(change.range.start.line, change.range.start.character)
@@ -114,9 +123,14 @@ local function fixWrongIndent(state, change)
     return edits
 end
 
----@param state parser.state
-local function applyEdits(state, edits)
+---@param uri uri
+local function applyEdits(uri, edits)
     if #edits == 0 then
+        return
+    end
+
+    local state = files.getState(uri)
+    if not state then
         return
     end
 
@@ -157,17 +171,13 @@ return function (uri, changes)
     if not client.getOption('fixIndents') then
         return
     end
-    local state = files.compileState(uri)
-    if not state then
-        return
-    end
 
     local firstChange = changes[1]
     if firstChange.range then
-        local edits = removeSpacesAfterEnter(state, firstChange)
-                or    fixWrongIndent(state, firstChange)
+        local edits = removeSpacesAfterEnter(uri, firstChange)
+                or    fixWrongIndent(uri, firstChange)
         if edits then
-            applyEdits(state, edits)
+            applyEdits(uri, edits)
         end
     end
 end

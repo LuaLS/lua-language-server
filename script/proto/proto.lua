@@ -156,7 +156,9 @@ local secretOption = {
     end
 }
 
-function m.doMethod(proto)
+m.methodQueue = {}
+
+function m.applyMethod(proto)
     logRecieve(proto)
     local method, optional = m.getMethodName(proto)
     local abil = m.ability[method]
@@ -200,6 +202,30 @@ function m.doMethod(proto)
         ok, res = xpcall(abil, log.error, proto.params, proto.id)
         await.delay()
     end)
+end
+
+function m.applyMethodQueue()
+    local queue = m.methodQueue
+    m.methodQueue = {}
+    local canceled = {}
+    for _, proto in ipairs(queue) do
+        if proto.method == '$/cancelRequest' then
+            canceled[proto.params.id] = true
+        end
+    end
+    for _, proto in ipairs(queue) do
+        if not canceled[proto.id] then
+            m.applyMethod(proto)
+        end
+    end
+end
+
+function m.doMethod(proto)
+    m.methodQueue[#m.methodQueue+1] = proto
+    if #m.methodQueue > 1 then
+        return
+    end
+    timer.wait(0, m.applyMethodQueue)
 end
 
 function m.close(id, reason, message)

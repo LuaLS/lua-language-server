@@ -6,6 +6,7 @@
 * `NEW` When using `enum["<key>" or <index>]`, undefined fields will raise an 'undefined' error.
 * `FIX` Renaming files in the directory leads to the auto-correction in "require" adding extra characters.
 * `FIX` Performance issue
+* `FIX` Fix incorrect indent fixing for `for`
 
 ## 3.10.4
 `2024-8-16`

@@ -3664,7 +3664,7 @@ local function parseFor()
     or doToken == 'then' then
         local left  = getPosition(Tokens[Index], 'left')
         local right = getPosition(Tokens[Index] + #doToken - 1, 'right')
-        action.finish                     = left
+        action.finish                     = right
         action.bstart                     = action.finish
         action.keyword[#action.keyword+1] = left
         action.keyword[#action.keyword+1] = right

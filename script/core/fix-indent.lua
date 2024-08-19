@@ -105,8 +105,8 @@ local function fixWrongIndent(uri, change)
     if not util.stringStartWith(myIndent, lastIndent) then
         return
     end
-    local myBlock = getBlock(state, position)
-    if myBlock.bstart >= lastOffset then
+    local myBlock = getBlock(state, lastPosition)
+    if myBlock.bstart >= lastPosition then
         return
     end
 

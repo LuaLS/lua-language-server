@@ -52,6 +52,39 @@ return function (uri, callback)
             }
         end
     end
+    ---@async
+    local function checkUndefinedFieldByIndexEnum(src)
+        await.delay()
+        local isEnum = false
+        for _, node in ipairs(vm.compileNode(src.node)) do
+            local docs = node.bindDocs
+            if docs then
+                for _, doc in ipairs(docs) do
+                    if doc.type == "doc.enum" then
+                        isEnum = true
+                        break
+                    end
+                end
+            end
+        end
+        if not isEnum then
+            return
+        end
+        if vm.hasDef(src) then
+            return
+        end
+        local keyName = guide.getKeyName(src)
+        if not keyName then
+            return
+        end
+        local message = lang.script('DIAG_UNDEF_FIELD', guide.getKeyName(src))
+        callback {
+            start   = src.index.start,
+            finish  = src.index.finish,
+            message = message,
+        }
+    end
     guide.eachSourceType(ast.ast, 'getfield',  checkUndefinedField)
     guide.eachSourceType(ast.ast, 'getmethod', checkUndefinedField)
+    guide.eachSourceType(ast.ast, 'getindex', checkUndefinedFieldByIndexEnum)
 end

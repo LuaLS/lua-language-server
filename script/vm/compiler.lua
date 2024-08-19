@@ -189,6 +189,41 @@ local searchFieldSwitch = util.switch()
                 end
             end
         end
+        local docs = source.bindDocs
+        if docs then
+            for _, doc in ipairs(docs) do
+                if doc.type == 'doc.enum' then
+                    if not vm.docHasAttr(doc, 'partial')  then
+                        return
+                    end
+                    for _, def in ipairs(vm.getDefs(doc)) do
+                        if def.type ~= 'doc.enum' then
+                            goto CONTINUE
+                        end
+                        local tbl = def.bindSource
+                        if not tbl then
+                            return
+                        end
+                        for _, field in ipairs(tbl) do
+                            if field.type == 'tablefield'
+                            or field.type == 'tableindex' then
+                                if not field.value then
+                                    goto CONTINUE
+                                end
+                                local fieldKey = guide.getKeyName(field)
+                                if key == vm.ANY
+                                or key == fieldKey then
+                                    hasFiled = true
+                                    pushResult(field)
+                                end
+                                ::CONTINUE::
+                            end
+                        end
+                        ::CONTINUE::
+                    end
+                end
+            end
+        end
     end)
     : case 'string'
     : case 'doc.type.string'

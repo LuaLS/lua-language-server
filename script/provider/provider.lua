@@ -222,7 +222,7 @@ m.register 'workspace/didRenameFiles' {
             for _, uri in ipairs(childs) do
                 if files.exists(uri) then
                     local ouri = uri
-                    local tail = ouri:sub(#oldUri)
+                    local tail = ouri:sub(#oldUri + 1)
                     local nuri = file.newUri .. tail
                     renames[#renames+1] = {
                         oldUri = ouri,

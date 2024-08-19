@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Renaming files in the directory leads to the auto-correction in "require" adding extra characters.
 
 ## 3.10.4
 `2024-8-16`

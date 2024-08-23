@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `FIX` Improve type narrow by checking exact match on literal type params
 
 ## 3.10.5
 `2024-8-19`

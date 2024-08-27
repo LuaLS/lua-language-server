@@ -138,6 +138,40 @@ local function f(...) end
 local <?r?> = f(10)
 ]]
 
+TEST '1' [[
+---@overload fun(a: string): 1
+---@overload fun(a: 'y'): 2
+local function f(...) end
+
+local <?r?> = f('x')
+]]
+
+TEST '2' [[
+---@overload fun(a: string): 1
+---@overload fun(a: 'y'): 2
+local function f(...) end
+
+local <?r?> = f('y')
+]]
+
+TEST '1' [[
+---@overload fun(a: string): 1
+---@overload fun(a: 'y'): 2
+local function f(...) end
+
+local v = 'x'
+local <?r?> = f(v)
+]]
+
+TEST '2' [[
+---@overload fun(a: string): 1
+---@overload fun(a: 'y'): 2
+local function f(...) end
+
+local v = 'y'
+local <?r?> = f(v)
+]]
+
 TEST 'number' [[
 ---@overload fun(a: 1, c: fun(x: number))
 ---@overload fun(a: 2, c: fun(x: string))

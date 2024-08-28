@@ -408,6 +408,8 @@ local template = {
                                                 'glob',
                                                 'lua',
                                             },
+    --testma
+    ["Lua.docScriptPath"]                   = Type.String,
     -- VSCode
     ["Lua.addonManager.enable"]             = Type.Boolean >> true,
     ['files.associations']                  = Type.Hash(Type.String, Type.String),

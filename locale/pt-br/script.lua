@@ -654,12 +654,10 @@ CLI_CHECK_MULTIPLE_WORKERS = -- TODO: need translate!
 'Starting {} worker tasks, progress output will be disabled. This may take a few minutes.'
 CLI_DOC_INITING   = -- TODO: need translate!
 'Loading documents ...'
-CLI_DOC_DONE      = -- TODO: need translate!
-[[
-Document exporting completed!
-Raw data: {}
-Markdown(example): {}
-]]
+CLI_DOC_DONE      =
+'Documentos exportados:'
+CLI_DOC_WORKING   =
+'Construindo docs...'
 
 TYPE_ERROR_ENUM_GLOBAL_DISMATCH = -- TODO: need translate!
 'Type `{child}` cannot match enumeration type of `{parent}`'

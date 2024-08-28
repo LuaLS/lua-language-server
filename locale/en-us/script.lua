@@ -656,10 +656,10 @@ CLI_DOC_INITING   =
 'Loading documents ...'
 CLI_DOC_DONE      =
 [[
-Document exporting completed!
-Raw data: {}
-Markdown(example): {}
+Documentation exported:
 ]]
+CLI_DOC_WORKING   =
+'Building docs...'
 
 TYPE_ERROR_ENUM_GLOBAL_DISMATCH =
 'Type `{child}` cannot match enumeration type of `{parent}`'

@@ -654,12 +654,10 @@ CLI_CHECK_MULTIPLE_WORKERS = -- TODO: need translate!
 'Starting {} worker tasks, progress output will be disabled. This may take a few minutes.'
 CLI_DOC_INITING   =
 '加载文档 ...'
-CLI_DOC_DONE      =
-[[
-文档导出完成！
-原始数据: {}
-Markdown(演示用): {}
-]]
+CLI_DOC_DONE      = -- TODO: need translate!
+'文档导出完成！'
+CLI_DOC_WORKING   =
+'正在生成文档...'
 
 TYPE_ERROR_ENUM_GLOBAL_DISMATCH =
 '类型 `{child}` 无法匹配 `{parent}` 的枚举类型'

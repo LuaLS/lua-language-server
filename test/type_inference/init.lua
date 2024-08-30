@@ -39,7 +39,7 @@ function TEST(wanted)
         if wanted ~= result then
             vm.getInfer(source):view(TESTURI)
         end
-        assert(wanted == result)
+        assert(wanted == result, "Assertion failed! Wanted: " .. tostring(wanted) .. " Got: " .. tostring(result))
         files.remove(TESTURI)
     end
 end

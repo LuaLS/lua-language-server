@@ -221,7 +221,7 @@ end
 ---@param onTimer Timer.OnTimer
 ---@return Timer
 function M.wait(timeout, onTimer)
-    local timer = New 'LocalTimer' (timeout, 'second', 1, onTimer)
+    local timer = New 'Timer' (timeout, 'second', 1, onTimer)
     return timer
 end
 
@@ -230,7 +230,7 @@ end
 ---@param onTimer Timer.OnTimer
 ---@return Timer
 function M.loop(timeout, onTimer)
-    local timer = New 'LocalTimer' (timeout, 'second', 0, onTimer)
+    local timer = New 'Timer' (timeout, 'second', 0, onTimer)
     return timer
 end
 
@@ -240,7 +240,7 @@ end
 ---@param onTimer Timer.OnTimer
 ---@return Timer
 function M.loop_count(timeout, count, onTimer)
-    local timer = New 'LocalTimer' (timeout, 'second', count, onTimer)
+    local timer = New 'Timer' (timeout, 'second', count, onTimer)
     return timer
 end
 

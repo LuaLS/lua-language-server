@@ -1,10 +1,14 @@
 local l     = require 'lpeglabel'
+local class = require 'class'
 
-local Sp     = l.S' \t\v\f'
-local Nl     = l.P'\r\n' + l.S'\r\n'
-local Number = l.R'09'^1
-local Word   = l.R('AZ', 'az', '__', '\x80\xff') * l.R('AZ', 'az', '09', '__', '\x80\xff')^0
-local Symbol = l.P'=='
+---@class Lexer
+local Lexer = class.declare 'Lexer'
+
+Lexer.Sp = l.S' \t\v\f'
+Lexer.Nl = l.P'\r\n' + l.S'\r\n'
+Lexer.Number = l.R'09'^1
+Lexer.Word   = l.R('AZ', 'az', '__', '\x80\xff') * l.R('AZ', 'az', '09', '__', '\x80\xff')^0
+Lexer.Symbol = l.P'=='
             +  l.P'~='
             +  l.P'--'
             -- non-standard:
@@ -37,38 +41,47 @@ local Symbol = l.P'=='
             -- end non-standard
             -- singles
             +  l.S'+-*/!#%^&()={}[]|\\\'":;<>,.?~`'
-local Unknown = (1 - Number - Word - Symbol - Sp - Nl)^1
-local Token   = l.Cp() * l.C(
-      Nl      * l.Cc 'NL'
-    + Number  * l.Cc 'Num'
-    + Word    * l.Cc 'Word'
-    + Symbol  * l.Cc 'Symbol'
-    + Unknown * l.Cc 'Unknown'
-)
 
-local Parser  = l.Ct((Sp^1 + Token)^0)
+---@param code string
+---@return Lexer.Result
+function Lexer:parse(code)
+    if not self.Unknown then
+        ---@private
+        self.Unknown = (1 - self.Number - self.Word - self.Symbol - self.Sp - self.Nl)^1
+        ---@private
+        self.Token   = l.Cp() * l.C(
+              self.Nl      * l.Cc 'NL'
+            + self.Number  * l.Cc 'Num'
+            + self.Word    * l.Cc 'Word'
+            + self.Symbol  * l.Cc 'Symbol'
+            + self.Unknown * l.Cc 'Unknown'
+        )
+        self.Parser  = l.Ct((self.Sp^1 + self.Token)^0)
+    end
+    local result = class.new 'Lexer.Result' (code, self.Parser)
+    return result
+end
 
----@alias LuaParser.Lexer.Type
+---@alias Lexer.Type
 ---| 'NL'
 ---| 'Num'
 ---| 'Word'
 ---| 'Symbol'
 ---| 'Unknown'
 
----@class Lexer
----@overload fun(code: string, mode: 'Lua' | 'Cat'): Lexer
-local M = Class 'Lexer'
+---@class Lexer.Result
+local M = class.declare 'Lexer.Result'
 
 ---@param code string
----@param mode 'Lua' | 'Cat'
-function M:__init(code, mode)
-    local results = Parser:match(code)
+---@param parser any
+function M:__init(code, parser)
+    local results = parser:match(code)
     self.len = #code -- 总长度
     ---@type string[]
     self.tokens = {} -- 分离出来的词
     ---@type integer[]
     self.poses  = {} -- 每个词的字节开始位置（光标位置，第一个字符为0）
-    ---@type LuaParser.Lexer.Type[]
+    ---@type Lexer.Type[]
     self.types  = {} -- 每个词的类型
     ---@type integer[]
     self.nls    = {} -- 每个换行符的字节结束位置（下一行的开始位置）
@@ -90,7 +103,7 @@ end
 -- 看看当前的词
 ---@param next? integer # 默认为0表示当前的词，1表示下一个词，以此类推
 ---@return string?
----@return LuaParser.Lexer.Type?
+---@return Lexer.Type?
 ---@return integer?
 function M:peek(next)
     local i = self.ci + (next or 0)
@@ -103,7 +116,7 @@ end
 -- 消耗一个词，返回这个词
 ---@param count? integer # 默认为1表示消耗一个词，2表示消耗两个词，以此类推
 ---@return string?
----@return LuaParser.Lexer.Type?
+---@return Lexer.Type?
 ---@return integer?
 function M:next(count)
     local i = self.ci + (count or 1)
@@ -127,7 +140,7 @@ function M:consume(token)
 end
 
 -- 消耗一个指定的类型，返回消耗掉词和位置
----@param tp LuaParser.Lexer.Type
+---@param tp Lexer.Type
 ---@return string?
 ---@return integer?
 function M:consumeType(tp)
@@ -209,14 +222,12 @@ function M:savePoint()
     end
 end
 
+---@class Lexer.API
 local API = {}
 
--- 对Lua代码进行分词
----@param code string
 ---@return Lexer
-function API.parseLua(code)
-    local lexer = New 'Lexer' (code, 'Lua')
-    return lexer
+function API.new()
+    return class.new 'Lexer' ()
 end
 
 return API

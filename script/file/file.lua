@@ -11,7 +11,7 @@ M.isOpened = false
 
 ---@param uri uri
 function M:__init(uri)
-    
+    self.uri = uri
 end
 
 function M:open()

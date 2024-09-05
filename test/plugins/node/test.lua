@@ -30,10 +30,10 @@ local function TestPlugin(script)
         ---@field b string
     ]]
     ---@param checker fun(state:parser.state)
-    return function (plugin, checker)
+    return function (interfaces, checker)
         files.open(TESTURI)
         files.setText(TESTURI, prefix .. script, true)
-        scope.getScope(TESTURI):set('pluginInterfaces', plugin)
+        scope.getScope(TESTURI):set('pluginInterfaces', interfaces)
         local state = files.getState(TESTURI)
         assert(state)
         checker(state)
@@ -45,7 +45,7 @@ TestPlugin [[
     local function t(a)
         a.components:test()
     end
-]](myplugin, function (state)
+]]({ myplugin }, function (state)
     guide.eachSourceType(state.ast, 'local', function (src)
         if guide.getKeyName(src) == 'a' then
             local node = vm.compileNode(src)

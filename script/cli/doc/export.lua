@@ -1,3 +1,4 @@
+---@diagnostic disable: await-in-sync, param-type-mismatch
 local ws       = require 'workspace'
 local vm       = require 'vm'
 local guide    = require 'parser.guide'

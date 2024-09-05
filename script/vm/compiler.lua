@@ -517,7 +517,7 @@ end
 ---@param suri uri
 ---@param object vm.global
 ---@param key string|number|integer|boolean|vm.global|vm.ANY
----@param pushResult fun(field: vm.object, isMark?: boolean, discardParentFields?: boolean)
+---@param pushResult fun(field: vm.object | vm.global, isMark?: boolean, discardParentFields?: boolean)
 function vm.getSimpleClassFields(suri, object, key, pushResult)
     local mark = {}
     local function searchClass(class, searchedFields, discardParentFields)

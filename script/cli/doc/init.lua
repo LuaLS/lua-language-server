@@ -52,8 +52,8 @@ end
 
 ---clones a module and assigns any internal upvalues pointing to the module to the new clone
 ---useful for sandboxing
----@param tbl table module to be cloned
----@return table module_clone the cloned module
+---@param tbl any module to be cloned
+---@return any module_clone the cloned module
 local function reinstantiateModule(tbl, _new_module, _old_module, _has_seen)
     _old_module = _old_module or tbl --remember old module only at root
     _has_seen = _has_seen or {} --remember visited indecies
@@ -78,6 +78,7 @@ local function reinstantiateModule(tbl, _new_module, _old_module, _has_seen)
             i = i + 1
         end
         local new_func = load(string.dump(func))--, 'function@reinstantiateModule()', 'b', _ENV)
+        assert(new_func, 'could not load dumped function')
         for index, upvalue in ipairs(upvalues) do
             debug.setupvalue(new_func, index, upvalue)
         end

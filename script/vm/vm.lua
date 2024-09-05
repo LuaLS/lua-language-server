@@ -1,14 +1,18 @@
 ---@class VM
----@overload fun(files: FileManager): self
+---@overload fun(): self
 local M = Class 'VM'
 
+---版本
 M.version = 0
---是否已经过期
+---是否已经过期
 M.outdate = false
 
----@param files FileManager
-function M:__init(files)
-    self.files = files
+function M:__init()
+end
+
+---@return VM
+function ls.vm.create()
+    return New 'VM' ()
 end
 
 return M

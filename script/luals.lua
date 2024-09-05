@@ -25,7 +25,5 @@ ls.config  = require 'config'
 
 require 'file'
 ls.files   = New 'FileManager' ()
----@type VM?
-ls.vm      = nil
 
 return ls

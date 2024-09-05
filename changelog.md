@@ -6,6 +6,7 @@
 * `NEW` Setting: `Lua.docScriptPath`: Path to a script that overrides `cli.doc.export`, allowing user-specified documentation exporting.
 * `FIX` Fix `VM.OnCompileFunctionParam` function in plugins
 * `FIX` Lua 5.1: fix incorrect warning when using setfenv with an int as first parameter
+* `FIX` Improve type narrow by checking exact match on literal type params
 
 ## 3.10.5
 `2024-8-19`

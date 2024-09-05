@@ -213,11 +213,13 @@ end
 
 ---@param v vm.object
 ---@return table<any, boolean>?
+---@return integer
 function vm.getLiterals(v)
     if not v then
-        return nil
+        return nil, 0
     end
     local map
+    local count = 0
     local node = vm.compileNode(v)
     for n in node:eachObject() do
         local literal
@@ -237,7 +239,8 @@ function vm.getLiterals(v)
                 map = {}
             end
             map[literal] = true
+            count = count + 1
         end
     end
-    return map
+    return map, count
 end

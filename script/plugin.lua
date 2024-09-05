@@ -7,15 +7,6 @@ local scope  = require 'workspace.scope'
 local ws     = require 'workspace'
 local fs = require 'bee.filesystem'
 
----@class pluginInterfaces
-local pluginConfigs = {
-    -- create plugin for vm module
-    VM = {
-        OnCompileFunctionParam = function (next, func, source)
-        end
-    }
-}
-
 ---@class plugin
 local m = {}
 
@@ -60,14 +51,13 @@ function m.dispatch(event, uri, ...)
     return failed == 0, res1, res2
 end
 
-function m.getVmPlugin(uri)
+function m.getPluginInterfaces(uri)
     local scp = scope.getScope(uri)
-    ---@type pluginInterfaces
     local interfaces = scp:get('pluginInterfaces')
     if not interfaces then
         return
     end
-    return interfaces.VM
+    return interfaces
 end
 
 ---@async
@@ -98,40 +88,6 @@ local function checkTrustLoad(scp)
     lines[#lines+1] = pluginPath
     util.saveFile(filePath, table.concat(lines, '\n'))
     return true
-end
-
-local function createMethodGroup(interfaces, key, methods)
-    local methodGroup = {}
-
-    for method in pairs(methods) do
-        local funcs = setmetatable({}, {
-            __call = function (t, next, ...)
-                if #t == 0 then
-                    return next(...)
-                else
-                    local result
-                    for _, fn in ipairs(t) do
-                        result = fn(next, ...)
-                    end
-                    return result
-                end
-            end
-        })
-        for _, interface in ipairs(interfaces) do
-            local func = interface[method]
-            if not func then
-                local namespace = interface[key]
-                if namespace then
-                    func = namespace[method]
-                end
-            end
-            if func then
-                funcs[#funcs+1] = func
-            end
-        end
-        methodGroup[method] = funcs
-    end
-    return #methodGroup>0 and methodGroup or nil
 end
 
 ---@param uri uri
@@ -204,10 +160,6 @@ local function initPlugin(uri)
                 return
             end
             interfaces[#interfaces+1] = interface
-        end
-
-        for key, config in pairs(pluginConfigs) do
-            interfaces[key] = createMethodGroup(interfaces, key, config)
         end
 
         ws.resetFiles(scp)

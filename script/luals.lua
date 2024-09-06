@@ -26,4 +26,7 @@ ls.config  = require 'config'
 require 'file'
 ls.files   = New 'FileManager' ()
 
+require 'node'
+require 'vm'
+
 return ls

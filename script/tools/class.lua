@@ -367,7 +367,7 @@ function Config:extends(extendsName, init)
 
     do --复制父类的字段与 getter 和 setter
         for k, v in pairs(extends) do
-            if (not class[k] or self.extendsKeys[k])
+            if (class[k] == nil or self.extendsKeys[k])
             and not k:match '^__' then
                 self.extendsKeys[k] = true
                 class[k] = v

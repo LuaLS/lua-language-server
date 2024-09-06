@@ -1,0 +1,1 @@
+require 'test.node.view'

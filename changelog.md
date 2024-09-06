@@ -4,6 +4,7 @@
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `NEW` Custom documentation exporter
 * `NEW` Setting: `Lua.docScriptPath`: Path to a script that overrides `cli.doc.export`, allowing user-specified documentation exporting.
+* `NEW` Infer the parameter types of a same-named function in the subclass based on the parameter types in the superclass function.
 * `FIX` Fix `VM.OnCompileFunctionParam` function in plugins
 * `FIX` Lua 5.1: fix incorrect warning when using setfenv with an int as first parameter
 * `FIX` Improve type narrow by checking exact match on literal type params

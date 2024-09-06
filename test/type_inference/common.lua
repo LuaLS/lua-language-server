@@ -4428,3 +4428,16 @@ TEST 'A' [[
 local x
 local <?y?> = 1 >> x
 ]]
+
+TEST 'number' [[
+---@class A
+local A = {}
+
+---@param x number
+function A:func(x) end
+
+---@class B: A
+local B = {}
+
+function B:func(<?x?>) end
+]]

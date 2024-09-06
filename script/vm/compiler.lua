@@ -1088,21 +1088,26 @@ end
 ---@param func parser.object
 ---@param source parser.object
 local function compileFunctionParam(func, source)
+    local aindex
+    for index, arg in ipairs(func.args) do
+        if arg == source then
+            aindex = index
+            break
+        end
+    end
+    ---@cast aindex integer
+
     -- local call ---@type fun(f: fun(x: number));call(function (x) end) --> x -> number
     local funcNode = vm.compileNode(func)
     for n in funcNode:eachObject() do
         if n.type == 'doc.type.function' then
-            for index, arg in ipairs(n.args) do
-                if func.args[index] == source then
-                    local argNode = vm.compileNode(arg)
-                    for an in argNode:eachObject() do
-                        if an.type ~= 'doc.generic.name' then
-                            vm.setNode(source, an)
-                        end
-                    end
-                    return true
+            local argNode = vm.compileNode(n.args[aindex])
+            for an in argNode:eachObject() do
+                if an.type ~= 'doc.generic.name' then
+                    vm.setNode(source, an)
                 end
             end
+            return true
         end
     end
 
@@ -1118,18 +1123,49 @@ local function compileFunctionParam(func, source)
             if not caller.args then
                 goto continue
             end
-            for index, arg in ipairs(source.parent) do
-                if arg == source then
-                    local callerArg = caller.args[index]
-                    if callerArg then
-                        vm.setNode(source, vm.compileNode(callerArg))
-                        found = true
-                    end
-                end
+            local callerArg = caller.args[aindex]
+            if callerArg then
+                vm.setNode(source, vm.compileNode(callerArg))
+                found = true
             end
             ::continue::
         end
         return found
+    end
+
+    do
+        local parent = func.parent
+        local key = vm.getKeyName(parent)
+        local classDef = vm.getParentClass(parent)
+        local suri = guide.getUri(func)
+        if classDef and key then
+            local found
+            for _, set in ipairs(classDef:getSets(suri)) do
+                if set.type == 'doc.class' and set.extends then
+                    for _, ext in ipairs(set.extends) do
+                        local extClass = vm.getGlobal('type', ext[1])
+                        if extClass then
+                            vm.getClassFields(suri, extClass, key, function (field, isMark)
+                                for n in vm.compileNode(field):eachObject() do
+                                    if n.type == 'function' then
+                                        local argNode = vm.compileNode(n.args[aindex])
+                                        for an in argNode:eachObject() do
+                                            if an.type ~= 'doc.generic.name' then
+                                                vm.setNode(source, an)
+                                                found = true
+                                            end
+                                        end
+                                    end
+                                end
+                            end)
+                        end
+                    end
+                end
+            end
+            if found then
+                return true
+            end
+        end
     end
 end
 

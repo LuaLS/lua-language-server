@@ -1100,7 +1100,7 @@ local function compileFunctionParam(func, source)
     -- local call ---@type fun(f: fun(x: number));call(function (x) end) --> x -> number
     local funcNode = vm.compileNode(func)
     for n in funcNode:eachObject() do
-        if n.type == 'doc.type.function' then
+        if n.type == 'doc.type.function' and n.args[aindex] then
             local argNode = vm.compileNode(n.args[aindex])
             for an in argNode:eachObject() do
                 if an.type ~= 'doc.generic.name' then
@@ -1147,7 +1147,7 @@ local function compileFunctionParam(func, source)
                         if extClass then
                             vm.getClassFields(suri, extClass, key, function (field, isMark)
                                 for n in vm.compileNode(field):eachObject() do
-                                    if n.type == 'function' then
+                                    if n.type == 'function' and n.args[aindex] then
                                         local argNode = vm.compileNode(n.args[aindex])
                                         for an in argNode:eachObject() do
                                             if an.type ~= 'doc.generic.name' then

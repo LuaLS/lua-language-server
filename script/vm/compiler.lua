@@ -1099,6 +1099,7 @@ local function compileFunctionParam(func, source)
 
     -- local call ---@type fun(f: fun(x: number));call(function (x) end) --> x -> number
     local funcNode = vm.compileNode(func)
+    local found = false
     for n in funcNode:eachObject() do
         if n.type == 'doc.type.function' and n.args[aindex] then
             local argNode = vm.compileNode(n.args[aindex])
@@ -1107,8 +1108,15 @@ local function compileFunctionParam(func, source)
                     vm.setNode(source, an)
                 end
             end
-            return true
+            -- NOTE: keep existing behavior for local call which only set type based on the 1st match
+            if func.parent.type == 'callargs' then
+                return true
+            end
+            found = true
         end
+    end
+    if found then
+        return true
     end
 
     local derviationParam = config.get(guide.getUri(func), 'Lua.type.inferParamType')

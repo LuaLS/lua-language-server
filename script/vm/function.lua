@@ -359,6 +359,7 @@ end
 ---@return number
 local function calcFunctionMatchScore(uri, args, func)
     if vm.isVarargFunctionWithOverloads(func)
+    or vm.isFunctionWithOnlyOverloads(func)
     or not isAllParamMatched(uri, args, func.args)
     then
         return -1
@@ -488,6 +489,36 @@ function vm.isVarargFunctionWithOverloads(func)
     end
     func._varargFunction = false
     return false
+end
+
+---@param func table
+---@return boolean
+function vm.isFunctionWithOnlyOverloads(func)
+    if func.type ~= 'function' then
+        return false
+    end
+    if func._onlyOverloadFunction ~= nil then
+        return func._onlyOverloadFunction
+    end
+
+    if not func.bindDocs then
+        func._onlyOverloadFunction = false
+        return false
+    end
+    local hasOverload = false
+    for _, doc in ipairs(func.bindDocs) do
+        if doc.type == 'doc.overload' then
+            hasOverload = true
+        elseif doc.type == 'doc.param'
+        or doc.type == 'doc.return'
+        then
+            -- has specified @param or @return, thus not only @overload
+            func._onlyOverloadFunction = false
+            return false
+        end
+    end
+    func._onlyOverloadFunction = hasOverload
+    return true
 end
 
 ---@param func parser.object

@@ -5,6 +5,12 @@ do
 end
 
 do
+    local a = ls.node.type('number')
+
+    assert(a:view() == 'number')
+end
+
+do
     local a = ls.node.value(1)
 
     assert(a:view() == '1')
@@ -44,6 +50,12 @@ do
     local a = ls.node.value('abc', "[[")
 
     assert(a:view() == "[[abc]]")
+end
+
+do
+    local a = ls.node.type('number') | ls.node.type('string')
+
+    assert(a:view() == 'number|string')
 end
 
 do

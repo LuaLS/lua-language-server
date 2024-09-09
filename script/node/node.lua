@@ -4,7 +4,7 @@
 local M = Class 'Node'
 
 ---基础分类
----@type 'never' | 'type' | 'value' | 'table' | 'function' | 'union' | 'cross'
+---@type 'never' | 'any' | 'unknown' | 'type' | 'value' | 'table' | 'function' | 'union' | 'cross'
 M.kind = 'never'
 
 ---@param a Node
@@ -14,8 +14,7 @@ local function makeUnion(a, b)
     if a == nil then
         return b
     end
-    if a.kind == 'never'
-    or a.kind == 'void' then
+    if a.kind == 'never' then
         return b
     end
     if a.kind == 'any' then
@@ -36,9 +35,11 @@ function M:view(skipLevel)
     return 'never'
 end
 
+ls.node.NEVER = New 'Node' ()
+
 ---@return Node
 function ls.node.create()
-    return New 'Node' ()
+    return ls.node.NEVER
 end
 
 function ls.node.register(nodeType)

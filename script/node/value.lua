@@ -27,9 +27,21 @@ function M:view(skipLevel)
     end
 end
 
+ls.node.VALUE = setmetatable({}, {
+    __mode = 'v',
+    __index = function (t, k)
+        local v = New 'Node.Value' (k)
+        t[k] = v
+        return v
+    end,
+})
+
 ---@overload fun(v: number): Node.Value
 ---@overload fun(v: boolean): Node.Value
 ---@overload fun(v: string, quo?: '"' | "'" | '[['): Node.Value
-function ls.node.value(...)
-    return New 'Node.Value' (...)
+function ls.node.value(v, quo)
+    if quo == nil or quo == '"' then
+        return ls.node.VALUE[v]
+    end
+    return New 'Node.Value' (v, quo)
 end

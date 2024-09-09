@@ -1,13 +1,32 @@
 do
-    local a = ls.node.create()
-
-    assert(a:view() == 'never')
-end
-
-do
     local a = ls.node.type('number')
 
     assert(a:view() == 'number')
+end
+
+
+do
+    local a = ls.node.create()
+    local b = ls.node.type('never')
+
+    assert(a:view() == 'never')
+    assert(b:view() == 'never')
+end
+
+do
+    local a = ls.node.any()
+    local b = ls.node.type('any')
+
+    assert(a:view() == 'any')
+    assert(b:view() == 'any')
+end
+
+do
+    local a = ls.node.unknown()
+    local b = ls.node.type('unknown')
+
+    assert(a:view() == 'unknown')
+    assert(b:view() == 'unknown')
 end
 
 do

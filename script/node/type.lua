@@ -14,12 +14,29 @@ function M:view()
     return self.name
 end
 
----@param name string
----@return Node.Type
+---@type { never: Node, any: Node.Any, unknown: Node.Unknown, [string]: Node.Type}
+ls.node.TYPE = setmetatable({}, {
+    __mode = 'v',
+    __index = function (t, k)
+        local v
+        if k == 'never' then
+            v = ls.node.NEVER
+        elseif k == 'any' then
+            v = ls.node.ANY
+        elseif k == 'unknown' then
+            v = ls.node.UNKNOWN
+        else
+            v = New 'Node.Type' (k)
+        end
+        t[k] = v
+        return v
+    end,
+})
+
+---@overload fun(name: 'never'): Node
+---@overload fun(name: 'any'): Node.Any
+---@overload fun(name: 'unknown'): Node.Unknown
+---@overload fun(name: string): Node.Type
 function ls.node.type(name)
-    if name == 'never'
-    or name == 'void' then
-        error('Invalid type name: ' .. name)
-    end
-    return New 'Node.Type' (name)
+    return ls.node.TYPE[name]
 end

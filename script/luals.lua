@@ -1,7 +1,8 @@
-Class  = require 'class'.declare
-New    = require 'class'.new
-Delete = require 'class'.delete
-Type   = require 'class'.type
+Class   = require 'class'.declare
+New     = require 'class'.new
+Delete  = require 'class'.delete
+Type    = require 'class'.type
+IsValid = require 'class'.isValid
 
 ---@class LuaLS
 ls = {}
@@ -10,6 +11,7 @@ ls.util    = require 'utility'
 ls.fsu     = require 'fs-utility'
 ls.inspect = require 'inspect'
 ls.encoder = require 'encoder'
+ls.gc      = require 'gc'
 
 ls.json    = require 'json'
 require 'jsonc'

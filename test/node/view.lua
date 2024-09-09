@@ -148,8 +148,20 @@ do
 end
 
 do
-    local c = ls.node.def('A')
-        : insert(ls.node.value('x'), ls.node.value(1))
+    local class = ls.node.def('A')
 
-    assert(c:view() == 'A')
+    assert(class:view() == 'A')
+
+    class:asClass()
+    assert(class:view() == 'class A')
+
+    local alias = ls.node.def('B')
+
+    alias:asAlias()
+    assert(alias:view() == 'alias B')
+
+    local enum = ls.node.def('C')
+
+    enum:asEnum()
+    assert(enum:view() == 'enum C')
 end

@@ -11,16 +11,40 @@ end
 
 ---@param key Node.Value
 ---@param value Node
----@return Node.Def
+---@return GCNode
 function M:insert(key, value)
+    if not self.isClass then
+        error('Node.Def:insert() only available for class')
+    end
     if not self.fields then
         self.fields = ls.node.table()
     end
     self.fields:insert(key, value)
-    return self
+    return ls.gc.node(function () end)
+end
+
+function M:asClass()
+    self.isClass = true
+end
+
+function M:asAlias()
+    self.isAlias = true
+end
+
+function M:asEnum()
+    self.isEnum = true
 end
 
 function M:view()
+    if self.isClass then
+        return 'class ' .. self.name
+    end
+    if self.isAlias then
+        return 'alias ' .. self.name
+    end
+    if self.isEnum then
+        return 'enum ' .. self.name
+    end
     return self.name
 end
 

@@ -1,7 +1,7 @@
 ---@class Node.Union: Node
 ---@operator bor(Node): Node
 ---@overload fun(...: Node): Node.Union
-local M = Class('Node.Union', 'Node')
+local M = ls.node.register 'Node.Union'
 
 M.cate = 'union'
 
@@ -10,8 +10,6 @@ function M:__init(...)
     ---@package
     self._value = {...}
 end
-
-M.__bor = ls.node.bor
 
 ---@type Node[]
 M.value = nil

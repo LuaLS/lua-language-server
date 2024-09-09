@@ -1,11 +1,9 @@
 ---@class Node.Value: Node
 ---@operator bor(Node): Node
 ---@overload fun(v: string | number | boolean, quo?: '"' | "'" | '[['): Node.Value
-local M = Class('Node.Value', 'Node')
+local M = ls.node.register 'Node.Value'
 
 M.cate = 'value'
-
-M.__bor = ls.node.bor
 
 ---@param v string | number | boolean
 ---@param quo? '"' | "'" | '[['

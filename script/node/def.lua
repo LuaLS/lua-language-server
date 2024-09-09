@@ -11,7 +11,7 @@ end
 
 ---@param key Node.Value
 ---@param value Node
----@return Node.Def
+---@return GCNode
 function M:insert(key, value)
     if not self.isClass then
         error('Node.Def:insert() only available for class')
@@ -20,7 +20,9 @@ function M:insert(key, value)
         self.fields = ls.node.table()
     end
     self.fields:insert(key, value)
-    return self
+    return ls.gc.node(function ()
+        
+    end)
 end
 
 function M:asClass()

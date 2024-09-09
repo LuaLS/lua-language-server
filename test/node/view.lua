@@ -138,6 +138,27 @@ do
 end
 
 do
+    local t = ls.node.tuple({ls.node.value(1), ls.node.value(2), ls.node.value(3)})
+
+    assert(t:view() == '[1, 2, 3]')
+end
+
+do
+    local t = ls.node.tuple()
+        : insert(ls.node.value(1))
+        : insert(ls.node.value(2))
+        : insert(ls.node.value(3))
+
+    assert(t:view() == '[1, 2, 3]')
+end
+
+do
+    local a = ls.node.array(ls.node.type('number'))
+
+    assert(a:view() == 'number[]')
+end
+
+do
     local func = ls.node.func()
         : addParam('a', ls.node.value(1))
         : addParam('b', ls.node.value(2))

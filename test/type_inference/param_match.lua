@@ -172,6 +172,44 @@ local v = 'y'
 local <?r?> = f(v)
 ]]
 
+TEST 'string|number' [[
+---@overload fun(a: string)
+---@overload fun(a: number)
+local function f(<?a?>) end
+]]
+
+TEST '1|2' [[
+---@overload fun(a: 1)
+---@overload fun(a: 2)
+local function f(<?a?>) end
+]]
+
+TEST 'string' [[
+---@overload fun(a: 1): string
+---@overload fun(a: 2): number
+local function f(a) end
+
+local <?r?> = f(1)
+]]
+
+TEST 'number' [[
+---@overload fun(a: 1): string
+---@overload fun(a: 2): number
+local function f(a) end
+
+local <?r?> = f(2)
+]]
+
+TEST 'string|number' [[
+---@overload fun(a: 1): string
+---@overload fun(a: 2): number
+local function f(a) end
+
+---@type number
+local v
+local <?r?> = f(v)
+]]
+
 TEST 'number' [[
 ---@overload fun(a: 1, c: fun(x: number))
 ---@overload fun(a: 2, c: fun(x: string))

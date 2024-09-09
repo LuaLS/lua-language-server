@@ -3,7 +3,7 @@
 ---@overload fun(v: string | number | boolean, quo?: '"' | "'" | '[['): Node.Value
 local M = ls.node.register 'Node.Value'
 
-M.cate = 'value'
+M.kind = 'value'
 
 ---@param v string | number | boolean
 ---@param quo? '"' | "'" | '[['

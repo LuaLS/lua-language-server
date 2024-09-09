@@ -5,7 +5,7 @@ local M = Class 'Node'
 
 ---基础分类
 ---@type 'never' | 'any' | 'unknown' | 'value' | 'table' | 'function' | 'union' | 'cross'
-M.cate = 'never'
+M.kind = 'never'
 
 ---@param a Node
 ---@param b Node
@@ -14,11 +14,11 @@ local function makeUnion(a, b)
     if a == nil then
         return b
     end
-    if a.cate == 'never'
-    or a.cate == 'void' then
+    if a.kind == 'never'
+    or a.kind == 'void' then
         return b
     end
-    if a.cate == 'any' then
+    if a.kind == 'any' then
         return a
     end
 end

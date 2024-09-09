@@ -3,7 +3,7 @@
 ---@overload fun(): Node.Function
 local M = ls.node.register 'Node.Function'
 
-M.cate = 'function'
+M.kind = 'function'
 
 ---@class Node.Function.Param
 ---@field key string

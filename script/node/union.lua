@@ -3,7 +3,7 @@
 ---@overload fun(...: Node): Node.Union
 local M = ls.node.register 'Node.Union'
 
-M.cate = 'union'
+M.kind = 'union'
 
 ---@param ... Node
 function M:__init(...)
@@ -19,7 +19,7 @@ function M.__getter:value()
 
     local hasUnion = false
     for _, v in ipairs(self._value) do
-        if v.cate == 'union' then
+        if v.kind == 'union' then
             hasUnion = true
             break
         end
@@ -31,7 +31,7 @@ function M.__getter:value()
 
     local value = {}
     for _, v in ipairs(self._value) do
-        if v.cate == 'union' then
+        if v.kind == 'union' then
             ---@cast v Node.Union
             for _, vv in ipairs(v.value) do
                 value[#value+1] = vv

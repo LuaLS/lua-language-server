@@ -3,7 +3,7 @@
 ---@overload fun(): Node.Table
 local M = ls.node.register 'Node.Table'
 
-M.cate = 'table'
+M.kind = 'table'
 
 function M:__init()
     ---@private
@@ -18,7 +18,7 @@ end
 ---@param value Node
 ---@return Node.Table
 function M:insert(key, value)
-    if key.cate == 'value' then
+    if key.kind == 'value' then
         ---@cast key Node.Value
         local k = key.value
         if key.valueType == 'string' then

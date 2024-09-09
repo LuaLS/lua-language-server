@@ -8,7 +8,7 @@ M.kind = 'table'
 function M:__init()
     ---@private
     ---@type { [string]: Node }
-    self.sfields = {}
+    self.vfields = {}
     ---@private
     ---@type { key: Node, value: Node }[]
     self.nfields = {}
@@ -21,10 +21,8 @@ function M:insert(key, value)
     if key.kind == 'value' then
         ---@cast key Node.Value
         local k = key.value
-        if key.valueType == 'string' then
-            self.sfields[k] = value | self.sfields[k]
-            return self
-        end
+        self.vfields[k] = value | self.vfields[k]
+        return self
     end
 
     table.insert(self.nfields, { key = key, value = value })
@@ -34,13 +32,39 @@ end
 function M:view(skipLevel)
     local fields = {}
 
-    for k, v in pairs(self.sfields) do
-        fields[#fields+1] = string.format('%s: %s'
-            , k
-            , v:view(skipLevel)
-        )
+    local typeOrder = {
+        ['number']  = 1,
+        ['string']  = 2,
+        ['boolean'] = 3,
+    }
+
+    for k, v in ls.util.sortPairs(self.vfields, function (a, b)
+        local ta = type(a)
+        local tb = type(b)
+        local sa = typeOrder[ta] or 0
+        local sb = typeOrder[tb] or 0
+        if sa == sb then
+            if ta == 'number' or ta == 'string' then
+                return a < b
+            else
+                return a == true
+            end
+        else
+            return sa < sb
+        end
+    end) do
+        if type(k) == 'string' then
+            fields[#fields+1] = string.format('%s: %s'
+                , k
+                , v:view(skipLevel)
+            )
+        else
+            fields[#fields+1] = string.format('[%s]: %s'
+                , k
+                , v:view(skipLevel)
+            )
+        end
     end
-    table.sort(fields)
 
     for _, v in ipairs(self.nfields) do
         fields[#fields+1] = string.format('[%s]: %s'

@@ -134,7 +134,7 @@ do
         : insert(ls.node.value(2), ls.node.value('y'))
         : insert(ls.node.value(3), ls.node.value('z'))
 
-    assert(t:view() == [[{ x: 1, y: 2, z: 3, [1]: "x", [2]: "y", [3]: "z" }]])
+    assert(t:view() == [[{ [1]: "x", [2]: "y", [3]: "z", x: 1, y: 2, z: 3 }]])
 end
 
 do

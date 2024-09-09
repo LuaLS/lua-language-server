@@ -96,12 +96,22 @@ end
 
 do
     local t = ls.node.table()
-    t:insert(ls.node.value('x'), ls.node.value(1))
-    t:insert(ls.node.value('y'), ls.node.value(2))
-    t:insert(ls.node.value('z'), ls.node.value(3))
-    t:insert(ls.node.value(1), ls.node.value('x'))
-    t:insert(ls.node.value(2), ls.node.value('y'))
-    t:insert(ls.node.value(3), ls.node.value('z'))
+        : insert(ls.node.value('x'), ls.node.value(1))
+        : insert(ls.node.value('y'), ls.node.value(2))
+        : insert(ls.node.value('z'), ls.node.value(3))
+        : insert(ls.node.value(1), ls.node.value('x'))
+        : insert(ls.node.value(2), ls.node.value('y'))
+        : insert(ls.node.value(3), ls.node.value('z'))
 
     assert(t:view() == [[{ x: 1, y: 2, z: 3, [1]: "x", [2]: "y", [3]: "z" }]])
+end
+
+do
+    local func = ls.node.func()
+        : addParam('a', ls.node.value(1))
+        : addParam('b', ls.node.value(2))
+        : addReturn('suc', ls.node.value(true))
+        : addReturn(nil, ls.node.value(false))
+
+    assert(func:view() == 'fun(a: 1, b: 2):true, false')
 end

@@ -16,17 +16,19 @@ end
 
 ---@param key Node.Value
 ---@param value Node
+---@return Node.Table
 function M:insert(key, value)
     if key.cate == 'value' then
         ---@cast key Node.Value
         local k = key.value
         if key.valueType == 'string' then
             self.sfields[k] = value | self.sfields[k]
-            return
+            return self
         end
     end
 
     table.insert(self.nfields, { key = key, value = value })
+    return self
 end
 
 function M:view(skipLevel)

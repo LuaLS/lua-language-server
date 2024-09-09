@@ -6,31 +6,42 @@ local M = ls.node.register 'Node.Table'
 M.kind = 'table'
 
 function M:__init()
-    ---@private
+    ---@package
     ---@type { [string]: Node }
     self.vfields = {}
-    ---@private
+    ---@package
     ---@type { key: Node, value: Node }[]
     self.nfields = {}
 end
 
----@param key Node.Value
+---@param key Node
 ---@param value Node
 ---@return Node.Table
 function M:insert(key, value)
     if key.kind == 'value' then
         ---@cast key Node.Value
         local k = key.value
-        self.vfields[k] = value | self.vfields[k]
+        if self.vfields[k] then
+            self.vfields[k] = value | self.vfields[k]
+        else
+            self.vfields[k] = value
+            self.values = nil
+        end
         return self
     end
 
     table.insert(self.nfields, { key = key, value = value })
+    self.values = nil
     return self
 end
 
-function M:view(skipLevel)
-    local fields = {}
+---@type { key: Node, value: Node }[]
+M.values = nil
+
+---@param self Node.Table
+---@return { key: Node, value: Node }[], boolean
+M.__getter.values = function (self)
+    local values = {}
 
     local typeOrder = {
         ['number']  = 1,
@@ -53,31 +64,32 @@ function M:view(skipLevel)
             return sa < sb
         end
     end) do
-        if type(k) == 'string' then
-            fields[#fields+1] = string.format('%s: %s'
-                , k
-                , v:view(skipLevel)
-            )
-        else
-            fields[#fields+1] = string.format('[%s]: %s'
-                , k
-                , v:view(skipLevel)
-            )
-        end
+        table.insert(values, { key = ls.node.value(k), value = v })
     end
 
     for _, v in ipairs(self.nfields) do
-        fields[#fields+1] = string.format('[%s]: %s'
-            , v.key:view(skipLevel)
-            , v.value:view(skipLevel)
+        table.insert(values, v)
+    end
+
+    return values, true
+end
+
+function M:view(skipLevel)
+    if #self.values == 0 then
+        return '{}'
+    end
+
+    local fields = {}
+
+    local childSkipLevel = skipLevel and skipLevel + 1 or nil
+    for _, v in ipairs(self.values) do
+        fields[#fields+1] = string.format('%s: %s'
+            , v.key:viewAsKey(childSkipLevel)
+            , v.value:view(childSkipLevel)
         )
     end
 
-    if #fields == 0 then
-        return '{}'
-    else
-        return '{ ' .. table.concat(fields, ', ') .. ' }'
-    end
+    return '{ ' .. table.concat(fields, ', ') .. ' }'
 end
 
 ---@return Node.Table

@@ -35,6 +35,10 @@ function M:view(skipLevel)
     return 'never'
 end
 
+function M:viewAsKey(skipLevel)
+    return '[' .. self:view(skipLevel) .. ']'
+end
+
 ls.node.NEVER = New 'Node' ()
 
 ---@return Node

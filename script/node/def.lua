@@ -17,7 +17,7 @@ function M:insert(key, value)
         error('Node.Def:insert() only available for class')
     end
     if not self.fields then
-        self.fields = ls.node.table()
+        self.fields = {}
     end
     self.fields:insert(key, value)
     return ls.gc.node(function ()
@@ -25,26 +25,59 @@ function M:insert(key, value)
     end)
 end
 
+---@private
+M._asClass = 0
+
+---@return GCNode
 function M:asClass()
-    self.isClass = true
+    self._asClass = self._asClass + 1
+    return ls.gc.node(function ()
+        self._asClass = self._asClass - 1
+    end)
 end
 
+function M:isClass()
+    return self._asClass > 0
+end
+
+---@private
+M._asAlias = 0
+
+---@return GCNode
 function M:asAlias()
-    self.isAlias = true
+    self._asAlias = self._asAlias + 1
+    return ls.gc.node(function ()
+        self._asAlias = self._asAlias - 1
+    end)
 end
 
+function M:isAlias()
+    return self._asAlias > 0
+end
+
+---@private
+M._asEnum = 0
+
+---@return GCNode
 function M:asEnum()
-    self.isEnum = true
+    self._asEnum = self._asEnum + 1
+    return ls.gc.node(function ()
+        self._asEnum = self._asEnum - 1
+    end)
+end
+
+function M:isEnum()
+    return self._asEnum > 0
 end
 
 function M:view()
-    if self.isClass then
+    if self:isClass() then
         return 'class ' .. self.name
     end
-    if self.isAlias then
+    if self:isAlias() then
         return 'alias ' .. self.name
     end
-    if self.isEnum then
+    if self:isEnum() then
         return 'enum ' .. self.name
     end
     return self.name

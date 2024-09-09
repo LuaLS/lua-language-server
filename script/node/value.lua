@@ -27,6 +27,14 @@ function M:view(skipLevel)
     end
 end
 
+function M:viewAsKey(skipLevel)
+    if self.valueType == 'string' then
+        return self.value
+    else
+        return '[' .. self:view(skipLevel) .. ']'
+    end
+end
+
 ---@type { [string | number | boolean]: Node.Value }
 ls.node.VALUE = setmetatable({}, {
     __mode = 'v',

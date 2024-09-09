@@ -78,7 +78,9 @@ local function findNearestSource(state, position)
     ---@type parser.object
     local source
     guide.eachSourceContain(state.ast, position, function (src)
-        source = src
+        if not source or source.start <= src.start then
+            source = src
+        end
     end)
     return source
 end

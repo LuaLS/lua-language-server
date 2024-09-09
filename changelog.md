@@ -9,6 +9,7 @@
 * `FIX` Lua 5.1: fix incorrect warning when using setfenv with an int as first parameter
 * `FIX` Improve type narrow by checking exact match on literal type params
 * `FIX` Correctly list enums for function overload arguments [#2840](https://github.com/LuaLS/lua-language-server/pull/2840)
+* `FIX` Incorrect function params' type infer when there is only `@overload` [#2509](https://github.com/LuaLS/lua-language-server/issues/2509) [#2708](https://github.com/LuaLS/lua-language-server/issues/2708) [#2709](https://github.com/LuaLS/lua-language-server/issues/2709)
 
 ## 3.10.5
 `2024-8-19`

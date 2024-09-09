@@ -4,7 +4,7 @@
 local M = Class 'Node'
 
 ---基础分类
----@type 'never' | 'any' | 'unknown' | 'void' | 'literal' | 'union' | 'cross'
+---@type 'never' | 'any' | 'unknown' | 'value' | 'union' | 'cross'
 M.cate = 'never'
 
 M.__bor = ls.node.bor

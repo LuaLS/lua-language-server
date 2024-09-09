@@ -1,16 +1,19 @@
 ---@class Node: Class.Base
----@operator bor(Node): Node
+---@operator bor(Node?): Node
 ---@overload fun(): Node
 local M = Class 'Node'
 
 ---基础分类
----@type 'never' | 'any' | 'unknown' | 'value' | 'union' | 'cross'
+---@type 'never' | 'any' | 'unknown' | 'value' | 'table' | 'function' | 'union' | 'cross'
 M.cate = 'never'
 
 ---@param a Node
 ---@param b Node
 ---@return Node?
 local function makeUnion(a, b)
+    if a == nil then
+        return b
+    end
     if a.cate == 'never'
     or a.cate == 'void' then
         return b

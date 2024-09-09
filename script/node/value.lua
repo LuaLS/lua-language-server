@@ -1,5 +1,5 @@
 ---@class Node.Value: Node
----@operator bor(Node): Node
+---@operator bor(Node?): Node
 ---@overload fun(v: string | number | boolean, quo?: '"' | "'" | '[['): Node.Value
 local M = ls.node.register 'Node.Value'
 

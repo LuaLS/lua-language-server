@@ -1,5 +1,5 @@
 ---@class Node.Union: Node
----@operator bor(Node): Node
+---@operator bor(Node?): Node
 ---@overload fun(...: Node): Node.Union
 local M = ls.node.register 'Node.Union'
 
@@ -45,11 +45,10 @@ function M.__getter:value()
 end
 
 function M:view(skipLevel)
-    skipLevel = skipLevel or 0
     local view = {}
     local mark = {}
     for _, v in ipairs(self.value) do
-        local thisView = v:view(skipLevel + 1)
+        local thisView = v:view(skipLevel and skipLevel + 1 or nil)
         if not thisView or mark[thisView] then
             goto continue
         end

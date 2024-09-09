@@ -146,3 +146,10 @@ do
 
     assert(func:view() == 'fun(a: 1, b: 2):true, false')
 end
+
+do
+    local c = ls.node.def('A')
+        : insert(ls.node.value('x'), ls.node.value(1))
+
+    assert(c:view() == 'A')
+end

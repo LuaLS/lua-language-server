@@ -56,6 +56,7 @@ function M:view(skipLevel)
     end
 end
 
+---@return Node.Table
 function ls.node.table()
     return New 'Node.Table' ()
 end

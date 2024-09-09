@@ -27,6 +27,7 @@ function M:view(skipLevel)
     end
 end
 
+---@type { [string | number | boolean]: Node.Value }
 ls.node.VALUE = setmetatable({}, {
     __mode = 'v',
     __index = function (t, k)

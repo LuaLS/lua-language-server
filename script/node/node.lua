@@ -4,7 +4,7 @@
 local M = Class 'Node'
 
 ---基础分类
----@type 'never' | 'any' | 'unknown' | 'type' | 'value' | 'table' | 'function' | 'union' | 'cross'
+---@type 'never' | 'any' | 'unknown' | 'type' | 'value' | 'table' | 'function' | 'union' | 'cross' | 'def'
 M.kind = 'never'
 
 ---@param a Node

@@ -10,6 +10,7 @@
 * `FIX` Improve type narrow by checking exact match on literal type params
 * `FIX` Correctly list enums for function overload arguments [#2840](https://github.com/LuaLS/lua-language-server/pull/2840)
 * `FIX` Incorrect function params' type infer when there is only `@overload` [#2509](https://github.com/LuaLS/lua-language-server/issues/2509) [#2708](https://github.com/LuaLS/lua-language-server/issues/2708) [#2709](https://github.com/LuaLS/lua-language-server/issues/2709)
+* `FIX` Only call workspace/configuration when available [#981](https://github.com/LuaLS/lua-language-server/issues/981), [#2318](https://github.com/LuaLS/lua-language-server/issues/2318), [2336](https://github.com/LuaLS/lua-language-server/issues/2336) [#2843](https://github.com/LuaLS/lua-language-server/pull/2843)
 
 ## 3.10.5
 `2024-8-19`

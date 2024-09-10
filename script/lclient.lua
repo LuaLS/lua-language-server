@@ -83,6 +83,9 @@ local defaultClientOptions = {
                 },
             },
         },
+        workspace = {
+            configuration = true,
+        },
     },
 }
 

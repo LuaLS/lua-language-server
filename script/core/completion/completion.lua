@@ -457,19 +457,8 @@ local function checkFieldFromFieldToIndex(state, name, src, parent, word, startP
         name = ('%q'):format(name)
     end
     local textEdit, additionalTextEdits
-    local startOffset = guide.positionToOffset(state, startPos)
     local offset      = guide.positionToOffset(state, position)
-    local wordStartOffset
-    if word == '' then
-        wordStartOffset = state.lua:match('()%S', startOffset + 1)
-        if wordStartOffset then
-            wordStartOffset = wordStartOffset - 1
-        else
-            wordStartOffset = offset
-        end
-    else
-        wordStartOffset = offset - #word
-    end
+    local wordStartOffset = offset - #word
     local wordStartPos = guide.offsetToPosition(state, wordStartOffset)
     local newText = ('[%s]'):format(name)
     textEdit = {

@@ -2,6 +2,9 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+
+## 3.10.6
+`2024-9-10`
 * `NEW` Custom documentation exporter
 * `NEW` Setting: `Lua.docScriptPath`: Path to a script that overrides `cli.doc.export`, allowing user-specified documentation exporting.
 * `NEW` Infer the parameter types of a same-named function in the subclass based on the parameter types in the superclass function.

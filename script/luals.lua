@@ -8,20 +8,21 @@ IsValid = require 'class'.isValid
 ls = {}
 
 ls.util    = require 'utility'
-ls.fsu     = require 'fs-utility'
-ls.inspect = require 'inspect'
-ls.encoder = require 'encoder'
-ls.gc      = require 'gc'
+ls.fsu     = require 'tools.fs-utility'
+ls.inspect = require 'tools.inspect'
+ls.encoder = require 'tools.encoder'
+ls.gc      = require 'tools.gc'
+ls.json    = require 'tools.json'
+package.loaded['json'] = ls.json
+package.loaded['json-beautify'] = require 'tools.json-beautify'
+package.loaded['jsonc']         = require 'tools.jsonc'
+package.loaded['json-edit']     = require 'tools.json-edit'
+ls.linkedTable = require 'tools.linked-table'
+ls.uri         = require 'tools.uri'
+ls.task        = require 'tools.task'
+ls.timer       = require 'tools.timer'
 
-ls.json    = require 'json'
-require 'jsonc'
-require 'json-edit'
-require 'log'
-require 'linked-table'
-
-ls.uri     = require 'uri'
-ls.task    = require 'task'
-ls.timer   = require 'timer'
+require 'tools.log'
 
 ls.config  = require 'config'
 

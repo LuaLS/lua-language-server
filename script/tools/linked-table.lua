@@ -1,6 +1,6 @@
 ---@class LinkedTable
----@field private _left  table
----@field private _right table
+---@field package _left  table
+---@field package _right table
 ---@overload fun(): self
 local M = Class 'LinkedTable'
 
@@ -177,6 +177,45 @@ function M:getSize()
     return self._size
 end
 
+---@param lt LinkedTable
+---@param current any
+---@return any
+local function pairsLeftNode(lt, current)
+    local node = lt._left[current or TAIL]
+    if node == HEAD then
+        return nil
+    end
+    return node
+end
+
+---@param lt LinkedTable
+---@param current any
+---@return any
+local function pairsRightNode(lt, current)
+    local node = lt._right[current or HEAD]
+    if node == TAIL then
+        return nil
+    end
+    return node
+end
+
+--遍历链表，速度较快，但不支持改变当前节点
+---@param start any
+---@param revert? boolean
+---@return fun():any
+---@return LinkedTable
+---@return any
+function M:pairsFast(start, revert)
+    if revert then
+        return pairsLeftNode, self, start
+    else
+        return pairsRightNode, self, start
+    end
+end
+
+--遍历链表，遍历到当前节点时已经确定下一个节点，
+--因此改变当前节点（如删除当前节点）
+--不会影响下一个要遍历的节点
 ---@param start any
 ---@param revert? boolean
 ---@return fun():any
@@ -210,12 +249,27 @@ function M:pairs(start, revert)
     end
 end
 
+--遍历节点，遍历开始前会先复制一份链表，
+--因此遍历过程中改变链表不会影响遍历结果，
+--但速度较慢
+function M:pairsSafe(start, revert)
+    local nodes = {}
+    for node in self:pairsFast(start, revert) do
+        nodes[#nodes+1] = node
+    end
+    local i = 0
+    return function ()
+        i = i + 1
+        return nodes[i]
+    end
+end
+
 ---@param start any
 ---@param revert? boolean
 ---@return string
 function M:dump(start, revert)
     local t = {}
-    for node in self:pairs(start, revert) do
+    for node in self:pairsFast(start, revert) do
         t[#t+1] = tostring(node)
     end
     return table.concat(t, ' ')
@@ -227,3 +281,13 @@ function M:reset()
 
     self._size = 0
 end
+
+---@class LinkedTable.API
+local API = {}
+
+---@return LinkedTable
+function API.create()
+    return New 'LinkedTable' ()
+end
+
+return API

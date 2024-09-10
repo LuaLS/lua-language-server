@@ -6,10 +6,10 @@
 local M = Class 'Task'
 
 ---@package
-M.all = New 'LinkedTable' ()
+M.all = ls.linkedTable.create()
 
 ---@package
-M.sleeps = New 'LinkedTable' ()
+M.sleeps = ls.linkedTable.create()
 
 ---@package
 ---@type Task.Timer?

@@ -5,42 +5,67 @@ local M = ls.node.register 'Node.Table'
 
 M.kind = 'table'
 
+---@class Node.Field
+---@field key Node
+---@field value Node
+
 function M:__init()
     ---@package
-    ---@type { [string]: Node }
-    self.vfields = {}
-    ---@package
-    ---@type { key: Node, value: Node }[]
-    self.nfields = {}
+    self._values = ls.linkedTable.create()
 end
 
----@param key Node
----@param value Node
----@return Node.Table
-function M:insert(key, value)
-    if key.kind == 'value' then
-        ---@cast key Node.Value
-        local k = key.value
-        if self.vfields[k] then
-            self.vfields[k] = value | self.vfields[k]
-        else
-            self.vfields[k] = value
-            self.values = nil
-        end
-        return self
-    end
-
-    table.insert(self.nfields, { key = key, value = value })
+---@param field Node.Field
+---@return self
+function M:insert(field)
     self.values = nil
+    self.literals = nil
+
+    self._values:pushTail(field)
+
     return self
 end
 
----@type { key: Node, value: Node }[]
+---@param field Node.Field
+---@return self
+function M:remove(field)
+    self.values = nil
+    self.literals = nil
+
+    self._values:pop(field)
+
+    return self
+end
+
+---@type table<string|number|boolean, Node>
+M.literals = nil
+
+---@param self Node.Table
+---@return table<string|number|boolean, Node>
+---@return true
+M.__getter.literals = function (self)
+    local literals = {}
+
+    ---@param field Node.Field
+    for field in self._values:pairsFast() do
+        local key = field.key
+        if key.kind == 'value' then
+            ---@cast key Node.Value
+            local k = key.value
+            literals[k] = literals[k] | field.value
+        end
+    end
+
+    return literals, true
+end
+
+---@type Node.Field[]
 M.values = nil
 
 ---@param self Node.Table
----@return { key: Node, value: Node }[], boolean
+---@return { key: Node, value: Node }[]
+---@return true
 M.__getter.values = function (self)
+    ---@type { key: Node, value: Node }[]
     local values = {}
 
     local typeOrder = {
@@ -49,7 +74,7 @@ M.__getter.values = function (self)
         ['boolean'] = 3,
     }
 
-    for k, v in ls.util.sortPairs(self.vfields, function (a, b)
+    for k, v in ls.util.sortPairs(self.literals, function (a, b)
         local ta = type(a)
         local tb = type(b)
         local sa = typeOrder[ta] or 0
@@ -64,11 +89,15 @@ M.__getter.values = function (self)
             return sa < sb
         end
     end) do
-        table.insert(values, { key = ls.node.value(k), value = v })
+        values[#values+1] = { key = ls.node.value(k), value = v }
     end
 
-    for _, v in ipairs(self.nfields) do
-        table.insert(values, v)
+    ---@param field Node.Field
+    for field in self._values:pairsFast() do
+        local key = field.key
+        if key.kind ~= 'value' then
+            values[#values+1] = field
+        end
     end
 
     return values, true

@@ -127,12 +127,12 @@ end
 
 do
     local t = ls.node.table()
-        : insert(ls.node.value('x'), ls.node.value(1))
-        : insert(ls.node.value('y'), ls.node.value(2))
-        : insert(ls.node.value('z'), ls.node.value(3))
-        : insert(ls.node.value(1), ls.node.value('x'))
-        : insert(ls.node.value(2), ls.node.value('y'))
-        : insert(ls.node.value(3), ls.node.value('z'))
+    t:insert({ key = ls.node.value('x'), value = ls.node.value(1)})
+    t:insert({ key = ls.node.value('y'), value = ls.node.value(2)})
+    t:insert({ key = ls.node.value('z'), value = ls.node.value(3)})
+    t:insert({ key = ls.node.value(1),   value = ls.node.value('x')})
+    t:insert({ key = ls.node.value(2),   value = ls.node.value('y')})
+    t:insert({ key = ls.node.value(3),   value = ls.node.value('z')})
 
     assert(t:view() == [[{ [1]: "x", [2]: "y", [3]: "z", x: 1, y: 2, z: 3 }]])
 end

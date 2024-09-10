@@ -101,6 +101,26 @@ local function searchFieldByLocalID(source, key, pushResult)
     if not fields then
         return
     end
+
+    --Exact classes do not allow injected fields
+    if source.type ~= 'variable' and source.bindDocs then
+        ---@cast source parser.object
+        local uri = guide.getUri(source)
+        for _, src in ipairs(fields) do
+            if src.type == "setfield" then
+                local class = vm.getDefinedClass(uri, source)
+                if class then
+                    for _, doc in ipairs(class:getSets(uri)) do
+                        if vm.docHasAttr(doc, 'exact') then
+                            return
+                        end
+                    end
+                end
+            end
+        end
+    end
+    
+
     local hasMarkDoc = {}
     for _, src in ipairs(fields) do
         if src.bindDocs then

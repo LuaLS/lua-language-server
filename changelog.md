@@ -2,6 +2,7 @@
 
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
+* `NEW` Added support for Japanese locale
 
 ## 3.10.6
 `2024-9-10`

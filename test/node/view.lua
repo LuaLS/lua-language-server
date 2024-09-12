@@ -6,7 +6,7 @@ end
 
 
 do
-    local a = ls.node.create()
+    local a = ls.node.never()
     local b = ls.node.type('never')
 
     assert(a:view() == 'never')
@@ -102,13 +102,13 @@ do
 end
 
 do
-    local a = ls.node.create() | ls.node.value(1)
+    local a = ls.node.never() | ls.node.value(1)
 
     assert(a:view() == '1')
 end
 
 do
-    local a = ls.node.value(1) | ls.node.create()
+    local a = ls.node.value(1) | ls.node.never()
 
     assert(a:view() == '1')
 end

@@ -32,18 +32,11 @@ end
 ---@param skipLevel? integer
 ---@return string?
 function M:view(skipLevel)
-    return 'never'
+    error('Not implemented')
 end
 
 function M:viewAsKey(skipLevel)
     return '[' .. self:view(skipLevel) .. ']'
-end
-
-ls.node.NEVER = New 'Node' ()
-
----@return Node
-function ls.node.create()
-    return ls.node.NEVER
 end
 
 function ls.node.register(nodeType)

@@ -2,6 +2,7 @@
 ls.node = {}
 
 require 'node.node'
+require 'node.nil'
 require 'node.never'
 require 'node.any'
 require 'node.unknown'

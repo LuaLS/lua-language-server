@@ -4,6 +4,11 @@ do
     assert(a:view() == 'number')
 end
 
+do
+    local a = ls.node.Nil()
+
+    assert(a:view() == 'nil')
+end
 
 do
     local a = ls.node.never()

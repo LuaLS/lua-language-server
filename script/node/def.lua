@@ -1,6 +1,8 @@
 ---@class Node.Def: Node
 ---@overload fun(name: string): Node.Def
-local M = Class('Node.Def', 'Node')
+local M = ls.node.register('Node.Def', {
+    supportUnion = false,
+})
 
 M.kind = 'def'
 

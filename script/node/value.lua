@@ -46,17 +46,52 @@ function M:isMatch(other)
     end
     if other.kind == 'type' then
         ---@cast other Node.Type
-        local targetType = ls.node.type(self.valueType)
-        return other:canCast(targetType)
+        return other:canCast(self.nodeType)
     end
     return false
 end
 
----@type { [string | number | boolean]: Node.Value }
+---@type Node.Type
+M.nodeType = nil
+M.__getter.nodeType = function (self)
+    return ls.node.type(self.valueType), true
+end
+
+---@type { [string | integer | boolean]: Node.Value }
 ls.node.VALUE = setmetatable({}, {
     __mode = 'v',
     __index = function (t, k)
         local v = New 'Node.Value' (k)
+        t[k] = v
+        return v
+    end,
+})
+
+---@type { number: Node.Value }
+ls.node.VALUE_NUMBER = setmetatable({}, {
+    __mode = 'v',
+    __index = function (t, k)
+        local v = New 'Node.Value' (k)
+        t[k] = v
+        return v
+    end,
+})
+
+---@type { string: Node.Value }
+ls.node.VALUE_STR2 = setmetatable({}, {
+    __mode = 'v',
+    __index = function (t, k)
+        local v = New 'Node.Value' (k, "'")
+        t[k] = v
+        return v
+    end,
+})
+
+---@type { string: Node.Value }
+ls.node.VALUE_STR3 = setmetatable({}, {
+    __mode = 'v',
+    __index = function (t, k)
+        local v = New 'Node.Value' (k, '[[')
         t[k] = v
         return v
     end,
@@ -67,10 +102,13 @@ ls.node.VALUE = setmetatable({}, {
 ---@overload fun(v: string, quo?: '"' | "'" | '[['): Node.Value
 function ls.node.value(v, quo)
     if math.type(v) == 'float' then
-        return New 'Node.Value' (v)
+        return ls.node.VALUE_NUMBER[v]
     end
-    if quo == nil or quo == '"' then
-        return ls.node.VALUE[v]
+    if quo == "'" then
+        return ls.node.VALUE_STR2[v]
     end
-    return New 'Node.Value' (v, quo)
+    if quo == '[[' then
+        return ls.node.VALUE_STR3[v]
+    end
+    return ls.node.VALUE[v]
 end

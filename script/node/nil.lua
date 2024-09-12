@@ -9,6 +9,10 @@ function M:view()
     return 'nil'
 end
 
+function M:isMatch(other)
+    return other.kind == 'nil'
+end
+
 ls.node.NIL = New 'Node.Nil' ()
 
 function ls.node.Nil()

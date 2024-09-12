@@ -9,6 +9,22 @@ function M:view()
     return 'any'
 end
 
+function M:isMatch(other)
+    if other.kind == 'never' then
+        return false
+    end
+    return true
+end
+
+---@param other Node
+---@return boolean
+function M:canBeCast(other)
+    if other.kind == 'never' then
+        return false
+    end
+    return true
+end
+
 ls.node.ANY = New 'Node.Any' ()
 
 function ls.node.any()

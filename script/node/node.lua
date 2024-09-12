@@ -1,4 +1,5 @@
 ---@class Node: Class.Base
+---@field canBeCast? fun(self: Node, other: Node): boolean # 另一个节点是否能转换为自己，用于双向检查的反向检查
 ---@operator bor(Node?): Node
 ---@overload fun(): Node
 local M = Class 'Node'
@@ -41,11 +42,21 @@ function M:viewAsKey(skipLevel)
     return '[' .. self:view(skipLevel) .. ']'
 end
 
----是否能转换为另一个节点
----@param node Node
+---是否能转换为另一个节点(单向检查)
+---@param other Node
 ---@return boolean
-function M:isMatch(node)
+function M:isMatch(other)
     error('Not implemented')
+end
+
+---是否能转换为另一个节点(双向检查)
+---@param other Node
+---@return boolean
+function M:canCast(other)
+    if other.canBeCast and other:canBeCast(self) then
+        return true
+    end
+    return self:isMatch(other)
 end
 
 ---@class Node.Options

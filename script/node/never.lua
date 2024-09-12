@@ -9,6 +9,14 @@ function M:view()
     return 'never'
 end
 
+function M:isMatch(other)
+    return false
+end
+
+function M:canBeCast(other)
+    return false
+end
+
 ls.node.NEVER = New 'Node.Never' ()
 
 function ls.node.never()

@@ -10,28 +10,27 @@ M.kind = 'table'
 ---@field value Node
 
 function M:__init()
-    ---@package
-    self._values = ls.linkedTable.create()
+    self.fields = ls.linkedTable.create()
 end
 
 ---@param field Node.Field
 ---@return self
-function M:insert(field)
+function M:addField(field)
     self.values = nil
     self.literals = nil
 
-    self._values:pushTail(field)
+    self.fields:pushTail(field)
 
     return self
 end
 
 ---@param field Node.Field
 ---@return self
-function M:remove(field)
+function M:removeField(field)
     self.values = nil
     self.literals = nil
 
-    self._values:pop(field)
+    self.fields:pop(field)
 
     return self
 end
@@ -46,7 +45,7 @@ M.__getter.literals = function (self)
     local literals = {}
 
     ---@param field Node.Field
-    for field in self._values:pairsFast() do
+    for field in self.fields:pairsFast() do
         local key = field.key
         if key.kind == 'value' then
             ---@cast key Node.Value
@@ -93,7 +92,7 @@ M.__getter.values = function (self)
     end
 
     ---@param field Node.Field
-    for field in self._values:pairsFast() do
+    for field in self.fields:pairsFast() do
         local key = field.key
         if key.kind ~= 'value' then
             values[#values+1] = field

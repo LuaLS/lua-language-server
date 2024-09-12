@@ -9,20 +9,24 @@ function M:__init(name)
     self.name = name
 end
 
----@param key Node.Value
----@param value Node
----@return GCNode
-function M:insert(key, value)
-    if not self.isClass then
-        error('Node.Def:insert() only available for class')
+---@param field Node.Field
+---@return self
+function M:addField(field)
+    if not self.table then
+        self.table = ls.node.table()
     end
-    if not self.fields then
-        self.fields = {}
+    self.table:addField(field)
+    return self
+end
+
+---@param field Node.Field
+---@return self
+function M:removeField(field)
+    if not self.table then
+        return self
     end
-    self.fields:insert(key, value)
-    return ls.gc.node(function ()
-        
-    end)
+    self.table:removeField(field)
+    return self
 end
 
 ---@private

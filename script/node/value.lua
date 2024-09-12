@@ -46,7 +46,8 @@ function M:isMatch(other)
     end
     if other.kind == 'type' then
         ---@cast other Node.Type
-        return other:canCast(ls.node.type(self.valueType))
+        local targetType = ls.node.type(self.valueType)
+        return other:canCast(targetType)
     end
     return false
 end
@@ -65,6 +66,9 @@ ls.node.VALUE = setmetatable({}, {
 ---@overload fun(v: boolean): Node.Value
 ---@overload fun(v: string, quo?: '"' | "'" | '[['): Node.Value
 function ls.node.value(v, quo)
+    if math.type(v) == 'float' then
+        return New 'Node.Value' (v)
+    end
     if quo == nil or quo == '"' then
         return ls.node.VALUE[v]
     end

@@ -15,6 +15,14 @@ function M:view()
     return self.name
 end
 
+function M:isMatch(other)
+    if other.kind == 'type' then
+        ---@cast other Node.Type
+        return self.name == other.name
+    end
+    return false
+end
+
 ---@type { never: Node, any: Node.Any, unknown: Node.Unknown, [string]: Node.Type}
 ls.node.TYPE = setmetatable({}, {
     __mode = 'v',

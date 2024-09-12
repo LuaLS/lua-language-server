@@ -58,7 +58,10 @@ end
 ---@param other Node
 ---@return boolean
 function M:canCast(other)
-    if other.canBeCast and other:canBeCast(self) then
+    if other.canBeCast then
+        return other:canBeCast(self)
+    end
+    if self == other then
         return true
     end
     return self:isMatch(other)

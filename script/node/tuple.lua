@@ -1,5 +1,6 @@
 ---@class Node.Tuple: Node
 ---@operator bor(Node?): Node
+---@operator shr(Node): boolean
 ---@overload fun(values?: Node[]): Node.Tuple
 local M = ls.node.register 'Node.Tuple'
 

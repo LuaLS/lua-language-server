@@ -1,5 +1,6 @@
 ---@class Node.Never: Node
 ---@operator bor(Node?): Node
+---@operator shr(Node): boolean
 ---@overload fun(): Node.Never
 local M = ls.node.register 'Node.Never'
 

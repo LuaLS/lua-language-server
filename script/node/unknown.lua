@@ -1,5 +1,6 @@
 ---@class Node.Unknown: Node
 ---@operator bor(Node?): Node
+---@operator shr(Node): boolean
 ---@overload fun(): Node.Unknown
 local M = ls.node.register 'Node.Unknown'
 

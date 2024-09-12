@@ -1,6 +1,7 @@
 ---@class Node: Class.Base
 ---@field canBeCast? fun(self: Node, other: Node): boolean # 另一个节点是否能转换为自己，用于双向检查的反向检查
 ---@operator bor(Node?): Node
+---@operator shr(Node): boolean
 ---@overload fun(): Node
 local M = Class 'Node'
 
@@ -29,6 +30,10 @@ function M.__bor(a, b)
     return makeUnion(a, b)
         or makeUnion(b, a)
         or ls.node.union(a, b)
+end
+
+function M:__shr(other)
+    return self:canCast(other)
 end
 
 ---展示节点内容
@@ -70,6 +75,7 @@ function ls.node.register(nodeType, options)
     local child = Class(nodeType, 'Node')
 
     child.__bor = M.__bor
+    child.__shr = M.__shr
 
     if options then
         if options.supportUnion == false then

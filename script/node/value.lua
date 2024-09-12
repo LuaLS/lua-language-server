@@ -1,21 +1,25 @@
 ---@class Node.Value: Node
 ---@operator bor(Node?): Node
+---@operator shr(Node): boolean
 ---@overload fun(v: string | number | boolean, quo?: '"' | "'" | '[['): Node.Value
 local M = ls.node.register 'Node.Value'
 
 M.kind = 'value'
 
----@param v string | number | boolean
+---@param v string | number | integer | boolean
 ---@param quo? '"' | "'" | '[['
 function M:__init(v, quo)
     local tp = type(v)
     if tp ~= 'string' and tp ~= 'number' and tp ~= 'boolean' then
         error('Invalid value type: ' .. tp)
     end
+    ---@cast tp 'string' | 'number' | 'boolean'
     self.value = v
-    ---@type 'string' | 'number' | 'boolean'
-    ---@diagnostic disable-next-line: assign-type-mismatch
+    ---@type 'string' | 'number' | 'integer' | 'boolean'
     self.valueType = tp
+    if tp == 'number' and math.type(v) == 'integer' then
+        self.valueType = 'integer'
+    end
     self.quo = quo
 end
 
@@ -33,6 +37,18 @@ function M:viewAsKey(skipLevel)
     else
         return '[' .. self:view(skipLevel) .. ']'
     end
+end
+
+function M:isMatch(other)
+    if other.kind == 'value' then
+        ---@cast other Node.Value
+        return self.value == other.value
+    end
+    if other.kind == 'type' then
+        ---@cast other Node.Type
+        return other:canCast(ls.node.type(self.valueType))
+    end
+    return false
 end
 
 ---@type { [string | number | boolean]: Node.Value }

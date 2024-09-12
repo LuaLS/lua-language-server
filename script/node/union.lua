@@ -1,5 +1,6 @@
 ---@class Node.Union: Node
 ---@operator bor(Node?): Node
+---@operator shr(Node): boolean
 ---@overload fun(...: Node): Node.Union
 local M = ls.node.register 'Node.Union'
 

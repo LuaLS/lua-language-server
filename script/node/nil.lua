@@ -1,5 +1,6 @@
 ---@class Node.Nil: Node
 ---@operator bor(Node?): Node
+---@operator shr(Node): boolean
 ---@overload fun(): Node.Nil
 local M = ls.node.register 'Node.Nil'
 

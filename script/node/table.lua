@@ -19,6 +19,7 @@ end
 function M:addField(field)
     self.values = nil
     self.literals = nil
+    self.types = nil
 
     self.fields:pushTail(field)
 
@@ -30,6 +31,7 @@ end
 function M:removeField(field)
     self.values = nil
     self.literals = nil
+    self.types = nil
 
     self.fields:pop(field)
 
@@ -56,6 +58,26 @@ M.__getter.literals = function (self)
     end
 
     return literals, true
+end
+
+---@type table<string, Node>
+M.types = nil
+
+---@param self Node.Table
+---@return table<string, Node>
+---@return true
+M.__getter.types = function (self)
+    local types = {}
+
+    ---@param field Node.Field
+    for field in self.fields:pairsFast() do
+        local k = field.key.typeName
+        if k then
+            types[k] = types[k] | field.value
+        end
+    end
+
+    return types, true
 end
 
 ---@type Node.Field[]
@@ -92,12 +114,8 @@ M.__getter.values = function (self)
         values[#values+1] = { key = ls.node.value(k), value = v }
     end
 
-    ---@param field Node.Field
-    for field in self.fields:pairsFast() do
-        local key = field.key
-        if key.kind ~= 'value' then
-            values[#values+1] = field
-        end
+    for k, v in ls.util.sortPairs(self.types) do
+        values[#values+1] = { key = ls.node.value(k), value = v }
     end
 
     return values, true

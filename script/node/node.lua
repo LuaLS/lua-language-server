@@ -1,5 +1,6 @@
 ---@class Node: Class.Base
 ---@field canBeCast? fun(self: Node, other: Node): boolean? # 另一个节点是否能转换为自己，用于双向检查的反向检查
+---@field typeName? string
 ---@operator bor(Node?): Node
 ---@operator shr(Node): boolean
 ---@overload fun(): Node

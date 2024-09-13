@@ -6,7 +6,7 @@ local M = ls.node.register 'Node.Value'
 
 M.kind = 'value'
 
----@param v string | number | integer | boolean
+---@param v string | number | boolean
 ---@param quo? '"' | "'" | '[['
 function M:__init(v, quo)
     local tp = type(v)
@@ -46,7 +46,7 @@ function M:isMatch(other)
     end
     if other.kind == 'type' then
         ---@cast other Node.Type
-        return other:canCast(self.nodeType)
+        return self.nodeType:canCast(other)
     end
     return false
 end
@@ -57,18 +57,8 @@ M.__getter.nodeType = function (self)
     return ls.node.type(self.valueType), true
 end
 
----@type { [string | integer | boolean]: Node.Value }
+---@type { [string | number | boolean]: Node.Value }
 ls.node.VALUE = setmetatable({}, {
-    __mode = 'v',
-    __index = function (t, k)
-        local v = New 'Node.Value' (k)
-        t[k] = v
-        return v
-    end,
-})
-
----@type { number: Node.Value }
-ls.node.VALUE_NUMBER = setmetatable({}, {
     __mode = 'v',
     __index = function (t, k)
         local v = New 'Node.Value' (k)
@@ -101,9 +91,6 @@ ls.node.VALUE_STR3 = setmetatable({}, {
 ---@overload fun(v: boolean): Node.Value
 ---@overload fun(v: string, quo?: '"' | "'" | '[['): Node.Value
 function ls.node.value(v, quo)
-    if math.type(v) == 'float' then
-        return ls.node.VALUE_NUMBER[v]
-    end
     if quo == "'" then
         return ls.node.VALUE_STR2[v]
     end

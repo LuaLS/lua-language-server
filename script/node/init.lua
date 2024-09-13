@@ -13,3 +13,5 @@ require 'node.table'
 require 'node.tuple'
 require 'node.array'
 require 'node.function'
+
+require 'node.preset'

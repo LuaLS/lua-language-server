@@ -56,9 +56,16 @@ do
     assert(ls.node.value(1.0) >> ls.node.value(1) == true)
     assert(ls.node.value(1.0) >> ls.node.value(1.0) == true)
     assert(ls.node.value(1.0) >> ls.node.value(2) == false)
-    assert(ls.node.value(1.0) >> ls.node.type 'number' == true)
+    assert(ls.node.value(1.0) >> ls.node.type 'integer' == true)
 
-    assert(ls.node.type 'number' >> ls.node.value(1.0) == false)
+    assert(ls.node.type 'integer' >> ls.node.value(1.0) == false)
+end
+
+do
+    assert(ls.node.value(1.1) >> ls.node.type 'integer' == false)
+    assert(ls.node.value(1.1) >> ls.node.type 'number'  == true)
+
+    assert(ls.node.type 'number' >> ls.node.value(1.1) == false)
 end
 
 do
@@ -115,4 +122,12 @@ do
 
     assert(a >> b == true)
     assert(b >> a == false)
+end
+
+do
+    local a = ls.node.type 'number'
+    local b = ls.node.type 'integer'
+
+    assert(a >> b == false)
+    assert(b >> a == true)
 end

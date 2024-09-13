@@ -31,24 +31,62 @@ function M:removeField(field)
     return self
 end
 
----@param extends Node.Type | Node.Table
+---@param extends Node
 ---@return self
 function M:addExtends(extends)
     if not self.extends then
         self.extends = ls.linkedTable.create()
     end
     self.extends:pushTail(extends)
+
+    self.fullExtends = nil
     return self
 end
 
----@param extends Node.Type | Node.Table
+---@param extends Node
 ---@return self
 function M:removeExtends(extends)
     if not self.extends then
         return self
     end
     self.extends:pop(extends)
+
+    self.fullExtends = nil
     return self
+end
+
+---@type Node[]
+M.fullExtends = nil
+
+---@param self Node.Type
+---@return Node[]
+---@return true
+M.__getter.fullExtends = function (self)
+    local result = {}
+    local mark = {}
+
+    ---@param t Node.Type
+    local function pushExtends(t)
+        if not t.extends then
+            return
+        end
+        ---@param v Node
+        for v in t.extends:pairsFast() do
+            if mark[v] then
+                goto continue
+            end
+            mark[v] = true
+            result[#result+1] = v
+            if v.kind == 'type' then
+                pushExtends(v)
+            end
+            ::continue::
+        end
+    end
+
+    pushExtends(self)
+
+    return result, true
 end
 
 ---@private
@@ -112,7 +150,17 @@ end
 function M:isMatch(other)
     if other.kind == 'type' then
         ---@cast other Node.Type
-        return self.typeName == other.typeName
+        if self.typeName == other.typeName then
+            return true
+        end
+        for _, v in ipairs(self.fullExtends) do
+            if v.kind == 'type' then
+                ---@cast v Node.Type
+                if v.typeName == other.typeName then
+                    return true
+                end
+            end
+        end
     end
     return false
 end
@@ -146,3 +194,12 @@ ls.node.TYPE = setmetatable({}, {
 function ls.node.type(name)
     return ls.node.TYPE[name]
 end
+
+ls.node.NUMBER   = ls.node.type 'number'
+ls.node.INTEGER  = ls.node.type 'integer'
+ls.node.STRING   = ls.node.type 'string'
+ls.node.BOOLEAN  = ls.node.type 'boolean'
+ls.node.FUNCTION = ls.node.type 'function'
+ls.node.TABLE    = ls.node.type 'table'
+ls.node.USERDATA = ls.node.type 'userdata'
+ls.node.THREAD   = ls.node.type 'thread'

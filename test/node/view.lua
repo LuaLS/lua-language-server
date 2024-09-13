@@ -83,7 +83,7 @@ do
 end
 
 do
-    local a = ls.node.union(ls.node.value(1), ls.node.value(2))
+    local a = ls.node.union { ls.node.value(1), ls.node.value(2) }
 
     assert(a:view() == '1|2')
 end
@@ -171,23 +171,4 @@ do
         : addReturn(nil, ls.node.value(false))
 
     assert(func:view() == 'fun(a: 1, b: 2):true, false')
-end
-
-do
-    local class = ls.node.type('A')
-
-    assert(class:view() == 'A')
-
-    local _ <close> = class:asClass()
-    assert(class:view() == 'class A')
-
-    local alias = ls.node.type('B')
-
-    local _ <close> = alias:asAlias()
-    assert(alias:view() == 'alias B')
-
-    local enum = ls.node.type('C')
-
-    local _ <close> = enum:asEnum()
-    assert(enum:view() == 'enum C')
 end

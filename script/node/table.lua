@@ -17,7 +17,7 @@ end
 ---@param field Node.Field
 ---@return self
 function M:addField(field)
-    self.values = nil
+    self.sortedFields = nil
     self.literals = nil
     self.types = nil
 
@@ -29,7 +29,7 @@ end
 ---@param field Node.Field
 ---@return self
 function M:removeField(field)
-    self.values = nil
+    self.sortedFields = nil
     self.literals = nil
     self.types = nil
 
@@ -55,6 +55,16 @@ M.__getter.literals = function (self)
             local k = key.value
             literals[k] = literals[k] | field.value
         end
+        if key.kind == 'union' then
+            ---@cast key Node.Union
+            for _, v in ipairs(key.values) do
+                if v.kind == 'value' then
+                    ---@cast v Node.Value
+                    local k = v.value
+                    literals[k] = literals[k] | field.value
+                end
+            end
+        end
     end
 
     return literals, true
@@ -71,22 +81,66 @@ M.__getter.types = function (self)
 
     ---@param field Node.Field
     for field in self.fields:pairsFast() do
-        local k = field.key.typeName
-        if k then
-            types[k] = types[k] | field.value
+        local key = field.key
+        if key.kind ~= 'value' and key.typeName then
+            types[key.typeName] = types[key.typeName] | field.value
+        end
+        if key.kind == 'union' then
+            ---@cast key Node.Union
+            for _, v in ipairs(key.values) do
+                if v.kind ~= 'value' and v.typeName then
+                    types[v.typeName] = types[v.typeName] | field.value
+                end
+            end
         end
     end
 
     return types, true
 end
 
----@type Node.Field[]
+---获取所有的键。没有进行去重或排序。
+---@type Node[]
+M.keys = nil
+
+---@param self Node.Table
+---@return Node[]
+---@return true
+M.__getter.keys = function (self)
+    local keys = {}
+
+    ---@param field Node.Field
+    for field in self.fields:pairsFast() do
+        keys[#keys+1] = field.key
+    end
+
+    return keys, true
+end
+
+---获取所有的值。没有进行去重或排序。
+---@type Node[]
 M.values = nil
+
+---@param self Node.Table
+---@return Node[]
+---@return true
+M.__getter.values = function (self)
+    local values = {}
+
+    ---@param field Node.Field
+    for field in self.fields:pairsFast() do
+        values[#values+1] = field.value
+    end
+
+    return values, true
+end
+
+---@type Node.Field[]
+M.sortedFields = nil
 
 ---@param self Node.Table
 ---@return { key: Node, value: Node }[]
 ---@return true
-M.__getter.values = function (self)
+M.__getter.sortedFields = function (self)
     ---@type { key: Node, value: Node }[]
     local values = {}
 
@@ -121,15 +175,45 @@ M.__getter.values = function (self)
     return values, true
 end
 
+---@param key string|number|boolean|Node
+---@return Node
+function M:get(key)
+    local tp = type(key)
+    if tp ~= 'table' then
+        ---@cast key -Node
+        return self.literals[key] or self:get(ls.node.value(key))
+    end
+    if key == ls.node.ANY then
+        return ls.node.union(self.values):simplify() or ls.node.ANY
+    end
+    if key == ls.node.UNKNOWN then
+        return ls.node.union(self.values):simplify() or ls.node.NIL
+    end
+    ---@cast key Node
+    if key.typeName then
+        return self.types[key.typeName] or ls.node.NIL
+    end
+    if key.kind == 'union' then
+        local result
+        ---@cast key Node.Union
+        for _, v in ipairs(key.values) do
+            local r = self:get(v) or ls.node.NIL
+            result = result | r
+        end
+        return result or ls.node.NIL
+    end
+    return ls.node.NIL
+end
+
 function M:view(skipLevel)
-    if #self.values == 0 then
+    if #self.sortedFields == 0 then
         return '{}'
     end
 
     local fields = {}
 
     local childSkipLevel = skipLevel and skipLevel + 1 or nil
-    for _, v in ipairs(self.values) do
+    for _, v in ipairs(self.sortedFields) do
         fields[#fields+1] = string.format('%s: %s'
             , v.key:viewAsKey(childSkipLevel)
             , v.value:view(childSkipLevel)

@@ -30,7 +30,7 @@ end
 function M.__bor(a, b)
     return makeUnion(a, b)
         or makeUnion(b, a)
-        or ls.node.union(a, b)
+        or ls.node.union {a, b}
 end
 
 function M:__shr(other)

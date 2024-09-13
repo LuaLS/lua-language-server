@@ -1,15 +1,15 @@
 ---@class Node.Union: Node
 ---@operator bor(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(...: Node): Node.Union
+---@overload fun(nodes?: Node[]): Node.Union
 local M = ls.node.register 'Node.Union'
 
 M.kind = 'union'
 
----@param ... Node
-function M:__init(...)
+---@param nodes? Node[]
+function M:__init(nodes)
     ---@package
-    self._values = {...}
+    self._values = nodes or {}
 end
 
 ---@param other Node
@@ -94,8 +94,19 @@ function M:view(skipLevel)
     return table.concat(view, '|')
 end
 
----@param ... Node
----@return Node
-function ls.node.union(...)
-    return New 'Node.Union' (...)
+---@return Node?
+function M:simplify()
+    if #self.values == 0 then
+        return nil
+    end
+    if #self.values == 1 then
+        return self.values[1]
+    end
+    return self
+end
+
+---@param nodes? Node[]
+---@return Node.Union
+function ls.node.union(nodes)
+    return New 'Node.Union' (nodes)
 end

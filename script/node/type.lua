@@ -135,15 +135,6 @@ function M:isEnum()
 end
 
 function M:view()
-    if self:isClass() then
-        return 'class ' .. self.typeName
-    end
-    if self:isAlias() then
-        return 'alias ' .. self.typeName
-    end
-    if self:isEnum() then
-        return 'enum ' .. self.typeName
-    end
     return self.typeName
 end
 

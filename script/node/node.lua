@@ -71,24 +71,14 @@ function M:canCast(other)
     return self:isMatch(other)
 end
 
----@class Node.Options
----@field supportUnion? boolean # 是否支持联合类型，默认为 true
-
 ---@generic T: Node
 ---@param nodeType `T`
----@param options? Node.Options
 ---@return T
-function ls.node.register(nodeType, options)
+function ls.node.register(nodeType)
     local child = Class(nodeType, 'Node')
 
     child.__bor = M.__bor
     child.__shr = M.__shr
-
-    if options then
-        if options.supportUnion == false then
-            child.__bor = nil
-        end
-    end
 
     return child
 end

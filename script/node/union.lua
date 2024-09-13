@@ -9,17 +9,51 @@ M.kind = 'union'
 ---@param ... Node
 function M:__init(...)
     ---@package
-    self._value = {...}
+    self._values = {...}
+end
+
+---@param other Node
+---@return boolean?
+function M:canBeCast(other)
+    if other.kind == 'union' then
+        return nil
+    end
+    if other.kind == 'never' then
+        return false
+    end
+    if other.kind == 'any' then
+        return true
+    end
+    for _, v in ipairs(self.values) do
+        if other:canCast(v) then
+            return true
+        end
+    end
+    return false
+end
+
+---@param other Node
+---@return boolean
+function M:isMatch(other)
+    if other.kind == 'union' then
+        for _, v in ipairs(self.values) do
+            if not v:canCast(other) then
+                return false
+            end
+        end
+        return true
+    end
+    return false
 end
 
 ---@type Node[]
-M.value = nil
+M.values = nil
 
-function M.__getter:value()
+function M.__getter:values()
     ---@cast self Node.Union
 
     local hasUnion = false
-    for _, v in ipairs(self._value) do
+    for _, v in ipairs(self._values) do
         if v.kind == 'union' then
             hasUnion = true
             break
@@ -27,28 +61,28 @@ function M.__getter:value()
     end
 
     if not hasUnion then
-        return self._value, true
+        return self._values, true
     end
 
-    local value = {}
-    for _, v in ipairs(self._value) do
+    local values = {}
+    for _, v in ipairs(self._values) do
         if v.kind == 'union' then
             ---@cast v Node.Union
-            for _, vv in ipairs(v.value) do
-                value[#value+1] = vv
+            for _, vv in ipairs(v.values) do
+                values[#values+1] = vv
             end
         else
-            value[#value+1] = v
+            values[#values+1] = v
         end
     end
 
-    return value, true
+    return values, true
 end
 
 function M:view(skipLevel)
     local view = {}
     local mark = {}
-    for _, v in ipairs(self.value) do
+    for _, v in ipairs(self.values) do
         local thisView = v:view(skipLevel and skipLevel + 1 or nil)
         if not thisView or mark[thisView] then
             goto continue

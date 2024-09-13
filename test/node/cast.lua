@@ -84,3 +84,35 @@ do
 
     assert(ls.node.type 'string' >> ls.node.value('abc', '"') == false)
 end
+
+do
+    local a = ls.node.type 'number'
+    local b = ls.node.type 'string'
+
+    assert(a >> b == false)
+    assert(b >> a == false)
+end
+
+do
+    local a = ls.node.type 'number'
+    local b = ls.node.type 'number' | ls.node.type 'string'
+
+    assert(a >> b == true)
+    assert(b >> a == false)
+end
+
+do
+    local a = ls.node.type 'number' | ls.node.type 'string'
+    local b = ls.node.type 'number' | ls.node.type 'boolean'
+
+    assert(a >> b == false)
+    assert(b >> a == false)
+end
+
+do
+    local a = ls.node.type 'number' | ls.node.type 'string'
+    local b = ls.node.type 'number' | ls.node.type 'boolean' | ls.node.type 'string'
+
+    assert(a >> b == true)
+    assert(b >> a == false)
+end

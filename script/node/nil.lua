@@ -6,6 +6,8 @@ local M = ls.node.register 'Node.Nil'
 
 M.kind = 'nil'
 
+M.typeName = 'nil'
+
 function M:view()
     return 'nil'
 end

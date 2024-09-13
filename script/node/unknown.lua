@@ -6,6 +6,8 @@ local M = ls.node.register 'Node.Unknown'
 
 M.kind = 'unknown'
 
+M.typeName = 'unknown'
+
 function M:view()
     return 'unknown'
 end

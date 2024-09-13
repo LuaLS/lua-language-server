@@ -6,6 +6,8 @@ local M = ls.node.register 'Node.Never'
 
 M.kind = 'never'
 
+M.typeName = 'never'
+
 function M:view()
     return 'never'
 end

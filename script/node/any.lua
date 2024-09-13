@@ -6,6 +6,8 @@ local M = ls.node.register 'Node.Any'
 
 M.kind = 'any'
 
+M.typeName = 'any'
+
 function M:view()
     return 'any'
 end

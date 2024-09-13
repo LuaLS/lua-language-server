@@ -1,5 +1,5 @@
 ---@class Node: Class.Base
----@field canBeCast? fun(self: Node, other: Node): boolean # 另一个节点是否能转换为自己，用于双向检查的反向检查
+---@field canBeCast? fun(self: Node, other: Node): boolean? # 另一个节点是否能转换为自己，用于双向检查的反向检查
 ---@operator bor(Node?): Node
 ---@operator shr(Node): boolean
 ---@overload fun(): Node
@@ -59,7 +59,10 @@ end
 ---@return boolean
 function M:canCast(other)
     if other.canBeCast then
-        return other:canBeCast(self)
+        local result = other:canBeCast(self)
+        if result ~= nil then
+            return result
+        end
     end
     if self == other then
         return true

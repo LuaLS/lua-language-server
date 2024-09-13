@@ -8,28 +8,30 @@ M.kind = 'type'
 
 ---@param name string
 function M:__init(name)
-    self.name = name
+    self.typeName = name
 end
 
 function M:view()
-    return self.name
+    return self.typeName
 end
 
 function M:isMatch(other)
     if other.kind == 'type' then
         ---@cast other Node.Type
-        return self.name == other.name
+        return self.typeName == other.typeName
     end
     return false
 end
 
----@type { never: Node, any: Node.Any, unknown: Node.Unknown, [string]: Node.Type}
+---@type { never: Node, nil: Node.Nil, any: Node.Any, unknown: Node.Unknown, [string]: Node.Type}
 ls.node.TYPE = setmetatable({}, {
     __mode = 'v',
     __index = function (t, k)
         local v
         if k == 'never' then
             v = ls.node.NEVER
+        elseif k == 'nil' then
+            v = ls.node.NIL
         elseif k == 'any' then
             v = ls.node.ANY
         elseif k == 'unknown' then
@@ -43,6 +45,7 @@ ls.node.TYPE = setmetatable({}, {
 })
 
 ---@overload fun(name: 'never'): Node
+---@overload fun(name: 'nil'): Node.Nil
 ---@overload fun(name: 'any'): Node.Any
 ---@overload fun(name: 'unknown'): Node.Unknown
 ---@overload fun(name: string): Node.Type

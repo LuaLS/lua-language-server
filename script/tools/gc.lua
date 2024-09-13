@@ -103,6 +103,10 @@ function GCNode:__del()
     self.onDel()
 end
 
+function GCNode:__close()
+    Delete(self)
+end
+
 local API = {}
 
 ---@return GCHost

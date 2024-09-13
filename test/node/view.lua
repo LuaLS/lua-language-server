@@ -178,16 +178,16 @@ do
 
     assert(class:view() == 'A')
 
-    class:asClass()
+    local _ <close> = class:asClass()
     assert(class:view() == 'class A')
 
     local alias = ls.node.type('B')
 
-    alias:asAlias()
+    local _ <close> = alias:asAlias()
     assert(alias:view() == 'alias B')
 
     local enum = ls.node.type('C')
 
-    enum:asEnum()
+    local _ <close> = enum:asEnum()
     assert(enum:view() == 'enum C')
 end

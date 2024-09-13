@@ -131,3 +131,24 @@ do
     assert(a >> b == false)
     assert(b >> a == true)
 end
+
+do
+    local a = ls.node.type 'A'
+    local b = ls.node.type 'B'
+    local c = ls.node.type 'C'
+
+    a:addExtends(b)
+    b:addExtends(c)
+    c:addExtends(a)
+
+    assert(a >> b == true)
+    assert(a >> c == true)
+    assert(b >> c == true)
+    assert(b >> a == true)
+    assert(c >> a == true)
+    assert(c >> b == true)
+
+    a:removeExtends(b)
+    b:removeExtends(c)
+    c:removeExtends(a)
+end

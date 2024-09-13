@@ -174,19 +174,19 @@ do
 end
 
 do
-    local class = ls.node.def('A')
+    local class = ls.node.type('A')
 
     assert(class:view() == 'A')
 
     class:asClass()
     assert(class:view() == 'class A')
 
-    local alias = ls.node.def('B')
+    local alias = ls.node.type('B')
 
     alias:asAlias()
     assert(alias:view() == 'alias B')
 
-    local enum = ls.node.def('C')
+    local enum = ls.node.type('C')
 
     enum:asEnum()
     assert(enum:view() == 'enum C')

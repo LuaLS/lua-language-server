@@ -6,7 +6,7 @@
 ---@overload fun(): Node
 local M = Class 'Node'
 
----@alias Node.Kind 'never' | 'nil' | 'any' | 'unknown' | 'type' | 'value' | 'table' | 'tuple' | 'array' | 'function' | 'union' | 'cross' | 'def'
+---@alias Node.Kind 'never' | 'nil' | 'any' | 'unknown' | 'type' | 'value' | 'table' | 'tuple' | 'array' | 'function' | 'union' | 'cross'
 
 ---基础分类
 ---@type Node.Kind

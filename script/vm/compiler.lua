@@ -1171,22 +1171,27 @@ local function compileFunctionParam(func, source)
             for _, set in ipairs(classDef:getSets(suri)) do
                 if set.type == 'doc.class' and set.extends then
                     for _, ext in ipairs(set.extends) do
+                        if not ext[1] then
+                            goto continue
+                        end
                         local extClass = vm.getGlobal('type', ext[1])
-                        if extClass then
-                            vm.getClassFields(suri, extClass, key, function (field, isMark)
-                                for n in vm.compileNode(field):eachObject() do
-                                    if n.type == 'function' and n.args[aindex] then
-                                        local argNode = vm.compileNode(n.args[aindex])
-                                        for an in argNode:eachObject() do
-                                            if an.type ~= 'doc.generic.name' then
-                                                vm.setNode(source, an)
-                                                found = true
-                                            end
+                        if not extClass then
+                            goto continue
+                        end
+                        vm.getClassFields(suri, extClass, key, function (field, isMark)
+                            for n in vm.compileNode(field):eachObject() do
+                                if n.type == 'function' and n.args[aindex] then
+                                    local argNode = vm.compileNode(n.args[aindex])
+                                    for an in argNode:eachObject() do
+                                        if an.type ~= 'doc.generic.name' then
+                                            vm.setNode(source, an)
+                                            found = true
                                         end
                                     end
                                 end
-                            end)
-                        end
+                            end
+                        end)
+                        ::continue::
                     end
                 end
             end

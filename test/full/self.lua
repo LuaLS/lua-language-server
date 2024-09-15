@@ -48,7 +48,7 @@ for uri in files.eachFile() do
     end)
     local fileClock = os.clock()
     diag.doDiagnostic(uri, true)
-    print('诊断文件耗时：', os.clock() - fileClock, uri)
+    print('诊断文件耗时：', string.format("%.6f", os.clock() - fileClock), uri)
     ::CONTINUE::
 end
 

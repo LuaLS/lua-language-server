@@ -2,7 +2,6 @@
 
 git submodule update --init --recursive
 pushd 3rd/luamake
-./compile/install.sh
 ./compile/build.sh
 popd
 if [ -z "$1" ]; then

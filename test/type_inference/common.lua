@@ -4441,3 +4441,15 @@ local B = {}
 
 function B:func(<?x?>) end
 ]]
+
+TEST 'number' [[
+---@class A
+local A = {}
+
+---@param x number
+function A:func(x) end
+
+---@type A
+local a = {}
+function a:func(<?x?>) end
+]]

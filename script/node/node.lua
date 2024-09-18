@@ -1,4 +1,5 @@
 ---@class Node: Class.Base
+---@field onCanCast? fun(self: Node, other: Node): boolean # 能否转换为另一个节点
 ---@field onCanBeCast? fun(self: Node, other: Node): boolean? # 另一个节点是否能转换为自己，用于双向检查的反向检查
 ---@field typeName? string
 ---@operator bor(Node?): Node
@@ -48,27 +49,46 @@ function M:viewAsKey(skipLevel)
     return '[' .. self:view(skipLevel) .. ']'
 end
 
----是否能转换为另一个节点(单向检查)
----@param other Node
----@return boolean
-function M:onCanCast(other)
-    error('Not implemented')
+---@alias Node.CastResult 'yes' | 'no' | 'unknown'
+
+function M:refreshCastCache()
+    ---@type table<Node, Node.CastResult>
+    self._castCache = nil
 end
 
 ---是否能转换为另一个节点(双向检查)
 ---@param other Node
 ---@return boolean
 function M:canCast(other)
+    if not self._castCache then
+        self._castCache = setmetatable({}, ls.util.MODE_K)
+    end
+    if self._castCache[other] then
+        return self._castCache[other] == 'yes'
+    end
+    self._castCache[other] = 'unknown'
     if other.onCanBeCast then
         local result = other:onCanBeCast(self)
-        if result ~= nil then
-            return result
+        if result == true then
+            self._castCache[other] = 'yes'
+            return true
+        elseif result == false then
+            self._castCache[other] = 'no'
+            return false
         end
     end
     if self == other then
+        self._castCache[other] = 'yes'
         return true
     end
-    return self:onCanCast(other)
+    if self.onCanCast then
+        if self:onCanCast(other) then
+            self._castCache[other] = 'yes'
+            return true
+        end
+    end
+    self._castCache[other] = 'no'
+    return false
 end
 
 ---@generic T: Node

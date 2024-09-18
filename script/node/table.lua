@@ -184,7 +184,11 @@ function M:get(key)
     end
     if type(key) ~= 'table' then
         ---@cast key -Node
-        return self.literals[key] or self:get(ls.node.value(key))
+        return self.literals[key] or self:get(ls.node.value(key).nodeType)
+    end
+    if key.kind == 'value' then
+        ---@cast key Node.Value
+        return self.literals[key.value] or self:get(key.nodeType)
     end
     ---@cast key Node
     if key.typeName then
@@ -204,6 +208,26 @@ function M:get(key)
         return result
     end
     return nil
+end
+
+---@param other Node
+---@return boolean
+function M:onCanCast(other)
+    if self == other then
+        return true
+    end
+    if  other.kind ~= 'table'
+    and other.kind ~= 'type' then
+        return false
+    end
+    ---@cast other Node.Table | Node.Type
+    for _, field in ipairs(other.sortedFields) do
+        local v = self:get(field.key) or ls.node.NIL
+        if not v:canCast(field.value) then
+            return false
+        end
+    end
+    return true
 end
 
 function M:view(skipLevel)

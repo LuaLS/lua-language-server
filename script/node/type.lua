@@ -161,6 +161,9 @@ end
 ---@param dontLookup? boolean
 ---@return Node?
 function M:get(key, dontLookup)
+    if not self.extends and not self.table then
+        return nil
+    end
     if key == ls.node.ANY then
         return ls.node.union(self.tableValues):simplify() or ls.node.ANY
     end
@@ -283,51 +286,6 @@ M.__getter.fullTables = function (self)
     return tables, true
 end
 
----@private
-M._asClass = 0
-
----@return GCNode
-function M:asClass()
-    self._asClass = self._asClass + 1
-    return ls.gc.node(function ()
-        self._asClass = self._asClass - 1
-    end)
-end
-
-function M:isClass()
-    return self._asClass > 0
-end
-
----@private
-M._asAlias = 0
-
----@return GCNode
-function M:asAlias()
-    self._asAlias = self._asAlias + 1
-    return ls.gc.node(function ()
-        self._asAlias = self._asAlias - 1
-    end)
-end
-
-function M:isAlias()
-    return self._asAlias > 0
-end
-
----@private
-M._asEnum = 0
-
----@return GCNode
-function M:asEnum()
-    self._asEnum = self._asEnum + 1
-    return ls.gc.node(function ()
-        self._asEnum = self._asEnum - 1
-    end)
-end
-
-function M:isEnum()
-    return self._asEnum > 0
-end
-
 function M:view()
     return self.typeName
 end
@@ -391,6 +349,16 @@ function M:onCanCast(other)
                 end
             end
         end
+    end
+    if other.kind == 'table' then
+        ---@cast other Node.Table | Node.Type
+        for _, field in ipairs(other.sortedFields) do
+            local v = self:get(field.key) or ls.node.NIL
+            if not v:canCast(field.value) then
+                return false
+            end
+        end
+        return true
     end
     return false
 end

@@ -1,6 +1,5 @@
 git submodule update --init --recursive
 cd 3rd\luamake
-call compile\install.bat
 call compile\build.bat
 cd ..\..
 IF "%~1"=="" (

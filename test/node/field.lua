@@ -50,35 +50,48 @@ do
 end
 
 do
-    ls.node.TYPE['A']   = nil
-    ls.node.TYPE['A1']  = nil
-    ls.node.TYPE['A2']  = nil
-    ls.node.TYPE['A11'] = nil
-    ls.node.TYPE['A12'] = nil
-    ls.node.TYPE['A21'] = nil
-    ls.node.TYPE['A22'] = nil
+    ---@type table<string, Node.Type>
+    local t = {}
+    local names = {'A', 'A1', 'A2', 'A11', 'A12', 'A21', 'A22'}
 
-    local A   = ls.node.type 'A'
-    local A1  = ls.node.type 'A1'
-    local A2  = ls.node.type 'A2'
-    local A11 = ls.node.type 'A11'
-    local A12 = ls.node.type 'A12'
-    local A21 = ls.node.type 'A21'
-    local A22 = ls.node.type 'A22'
+    for _, name in ipairs(names) do
+        ls.node.TYPE[name] = nil
+        t[name] = ls.node.type(name)
+    end
 
-    A:addExtends(A1)
-    A:addExtends(A2)
-    A1:addExtends(A11)
-    A1:addExtends(A12)
-    A2:addExtends(A21)
-    A2:addExtends(A22)
-    A22:addExtends(A)
+    t.A:addExtends(t.A1)
+    t.A:addExtends(t.A2)
+    t.A1:addExtends(t.A11)
+    t.A1:addExtends(t.A12)
+    t.A2:addExtends(t.A21)
+    t.A2:addExtends(t.A22)
+    t.A22:addExtends(t.A)
 
-    local extends = A.fullExtends
-    assert(extends[1] == A1)
-    assert(extends[2] == A2)
-    assert(extends[3] == A11)
-    assert(extends[4] == A12)
-    assert(extends[5] == A21)
-    assert(extends[6] == A22)
+    local extends = t.A.fullExtends
+    assert(extends[1] == t.A1)
+    assert(extends[2] == t.A2)
+    assert(extends[3] == t.A11)
+    assert(extends[4] == t.A12)
+    assert(extends[5] == t.A21)
+    assert(extends[6] == t.A22)
+
+    for _, name in ipairs(names) do
+        t[name]:addField {
+            key   = ls.node.value(name),
+            value = ls.node.value(name),
+        }
+    end
+
+    assert(t.A:get('A1'):view() == '"A1"')
+    assert(t.A:get('A11'):view() == '"A11"')
+    assert(t.A:get('A33') == nil)
+
+    assert(t.A:get(ls.node.ANY):view() == [["A"|"A1"|"A11"|"A12"|"A2"|"A21"|"A22"]])
+    assert(t.A.sortedFields[1].key == ls.node.value "A")
+    assert(t.A.sortedFields[2].key == ls.node.value "A1")
+    assert(t.A.sortedFields[3].key == ls.node.value "A11")
+    assert(t.A.sortedFields[4].key == ls.node.value "A12")
+    assert(t.A.sortedFields[5].key == ls.node.value "A2")
+    assert(t.A.sortedFields[6].key == ls.node.value "A21")
+    assert(t.A.sortedFields[7].key == ls.node.value "A22")
 end

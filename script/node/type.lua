@@ -63,7 +63,7 @@ end
 ---@type Node[]
 M.tableValues = nil
 
----@param self Node.Table
+---@param self Node.Type
 ---@return Node[]
 ---@return true
 M.__getter.tableValues = function (self)
@@ -82,7 +82,7 @@ M.tableLiterals = nil
 ---@param self Node.Type
 ---@return table<string|number|boolean, Node>
 ---@return true
-M.__getter.literals = function (self)
+M.__getter.tableLiterals = function (self)
     local literals = {}
 
     for _, t in ipairs(self.fullTables) do
@@ -183,7 +183,7 @@ function M:get(key, dontLookup)
     return nil
 end
 
----@param extends Node
+---@param extends Node.Type | Node.Table
 ---@return self
 function M:addExtends(extends)
     if not self.extends then

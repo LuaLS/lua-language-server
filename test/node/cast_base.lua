@@ -1,7 +1,7 @@
-local Any     = ls.node.any()
-local Nil     = ls.node.Nil()
-local Never   = ls.node.never()
-local Unknown = ls.node.unknown()
+local Any     = ls.node.ANY
+local Nil     = ls.node.NIL
+local Never   = ls.node.NEVER
+local Unknown = ls.node.UNKNOWN
 
 do
     assert(Any >> Any == true)

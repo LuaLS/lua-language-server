@@ -138,7 +138,46 @@ function M:view()
     return self.typeName
 end
 
+---@type fun(self: Node.Type, other: Node): boolean?
+M._onCanCast = nil
+
+---@type fun(self: Node.Type, other: Node): boolean?
+M._onCanBeCast = nil
+
+---@overload fun(self, key: 'onCanCast', value: fun(self: Node.Type, other: Node): boolean?): Node.Type
+---@overload fun(self, key: 'onCanBeCast', value: fun(self: Node.Type, other: Node): boolean?): Node.Type
+function M:setConfig(key, value)
+    self['_' .. key] = value
+    return self
+end
+
+---@param other Node
+---@return boolean?
+function M:onCanBeCast(other)
+    if other.kind == 'never' then
+        return false
+    end
+    if self._onCanBeCast then
+        ---@cast other Node.Type
+        local res = self._onCanBeCast(self, other)
+        if res ~= nil then
+            return res
+        end
+    end
+end
+
+---@param other Node
+---@return boolean
 function M:onCanCast(other)
+    if other.kind == 'never' then
+        return false
+    end
+    if self._onCanCast then
+        local res = self._onCanCast(self, other)
+        if res then
+            return res
+        end
+    end
     if other.kind == 'type' then
         ---@cast other Node.Type
         if self.typeName == other.typeName then
@@ -150,25 +189,25 @@ function M:onCanCast(other)
                 if v.typeName == other.typeName then
                     return true
                 end
+                if v._onCanCast then
+                    local res = v._onCanCast(v, other)
+                    if res then
+                        return res
+                    end
+                end
             end
         end
     end
     return false
 end
 
----@type { never: Node, nil: Node.Nil, any: Node.Any, unknown: Node.Unknown, [string]: Node.Type}
+---@type { never: nil, [string]: Node.Type}
 ls.node.TYPE = setmetatable({}, {
     __mode = 'v',
     __index = function (t, k)
         local v
         if k == 'never' then
-            v = ls.node.NEVER
-        elseif k == 'nil' then
-            v = ls.node.NIL
-        elseif k == 'any' then
-            v = ls.node.ANY
-        elseif k == 'unknown' then
-            v = ls.node.UNKNOWN
+            error('Can not use "never" as a type name.')
         else
             v = New 'Node.Type' (k)
         end
@@ -178,9 +217,6 @@ ls.node.TYPE = setmetatable({}, {
 })
 
 ---@overload fun(name: 'never'): Node
----@overload fun(name: 'nil'): Node.Nil
----@overload fun(name: 'any'): Node.Any
----@overload fun(name: 'unknown'): Node.Unknown
 ---@overload fun(name: string): Node.Type
 function ls.node.type(name)
     return ls.node.TYPE[name]

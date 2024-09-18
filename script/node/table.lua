@@ -100,12 +100,12 @@ end
 
 ---获取所有的键。没有进行去重或排序。
 ---@type Node[]
-M.keys = nil
+M.tableKeys = nil
 
 ---@param self Node.Table
 ---@return Node[]
 ---@return true
-M.__getter.keys = function (self)
+M.__getter.tableKeys = function (self)
     local keys = {}
 
     ---@param field Node.Field
@@ -118,12 +118,12 @@ end
 
 ---获取所有的值。没有进行去重或排序。
 ---@type Node[]
-M.values = nil
+M.tableValues = nil
 
 ---@param self Node.Table
 ---@return Node[]
 ---@return true
-M.__getter.values = function (self)
+M.__getter.tableValues = function (self)
     local values = {}
 
     ---@param field Node.Field
@@ -184,10 +184,10 @@ function M:get(key)
         return self.literals[key] or self:get(ls.node.value(key))
     end
     if key == ls.node.ANY then
-        return ls.node.union(self.values):simplify() or ls.node.ANY
+        return ls.node.union(self.tableValues):simplify() or ls.node.ANY
     end
     if key == ls.node.UNKNOWN then
-        return ls.node.union(self.values):simplify() or ls.node.NIL
+        return ls.node.union(self.tableValues):simplify() or ls.node.NIL
     end
     ---@cast key Node
     if key.typeName then

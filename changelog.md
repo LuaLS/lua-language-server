@@ -3,6 +3,7 @@
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `NEW` Added support for Japanese locale
+* `FIX` Eliminate floating point error in test benchmark output
 * `FIX` Remove luamake install from make scripts
 
 ## 3.10.6

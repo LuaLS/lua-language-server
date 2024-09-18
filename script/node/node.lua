@@ -1,5 +1,5 @@
 ---@class Node: Class.Base
----@field canBeCast? fun(self: Node, other: Node): boolean? # 另一个节点是否能转换为自己，用于双向检查的反向检查
+---@field onCanBeCast? fun(self: Node, other: Node): boolean? # 另一个节点是否能转换为自己，用于双向检查的反向检查
 ---@field typeName? string
 ---@operator bor(Node?): Node
 ---@operator shr(Node): boolean
@@ -51,7 +51,7 @@ end
 ---是否能转换为另一个节点(单向检查)
 ---@param other Node
 ---@return boolean
-function M:isMatch(other)
+function M:onCanCast(other)
     error('Not implemented')
 end
 
@@ -59,8 +59,8 @@ end
 ---@param other Node
 ---@return boolean
 function M:canCast(other)
-    if other.canBeCast then
-        local result = other:canBeCast(self)
+    if other.onCanBeCast then
+        local result = other:onCanBeCast(self)
         if result ~= nil then
             return result
         end
@@ -68,7 +68,7 @@ function M:canCast(other)
     if self == other then
         return true
     end
-    return self:isMatch(other)
+    return self:onCanCast(other)
 end
 
 ---@generic T: Node

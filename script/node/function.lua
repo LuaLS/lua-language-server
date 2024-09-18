@@ -29,7 +29,7 @@ end
 
 ---@param other Node
 ---@return boolean?
-function M:canBeCast(other)
+function M:onCanBeCast(other)
     if other.typeName == 'function' then
         return true
     end
@@ -37,7 +37,7 @@ end
 
 ---@param other Node
 ---@return boolean
-function M:isMatch(other)
+function M:onCanCast(other)
     if other.typeName == 'function' then
         return true
     end

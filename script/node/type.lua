@@ -138,7 +138,7 @@ function M:view()
     return self.typeName
 end
 
-function M:isMatch(other)
+function M:onCanCast(other)
     if other.kind == 'type' then
         ---@cast other Node.Type
         if self.typeName == other.typeName then
@@ -185,12 +185,3 @@ ls.node.TYPE = setmetatable({}, {
 function ls.node.type(name)
     return ls.node.TYPE[name]
 end
-
-ls.node.NUMBER   = ls.node.type 'number'
-ls.node.INTEGER  = ls.node.type 'integer'
-ls.node.STRING   = ls.node.type 'string'
-ls.node.BOOLEAN  = ls.node.type 'boolean'
-ls.node.FUNCTION = ls.node.type 'function'
-ls.node.TABLE    = ls.node.type 'table'
-ls.node.USERDATA = ls.node.type 'userdata'
-ls.node.THREAD   = ls.node.type 'thread'

@@ -14,7 +14,7 @@ end
 
 ---@param other Node
 ---@return boolean?
-function M:canBeCast(other)
+function M:onCanBeCast(other)
     if other.kind == 'union' then
         return nil
     end
@@ -34,7 +34,7 @@ end
 
 ---@param other Node
 ---@return boolean
-function M:isMatch(other)
+function M:onCanCast(other)
     if other.kind == 'union' then
         for _, v in ipairs(self.values) do
             if not v:canCast(other) then

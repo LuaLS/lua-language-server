@@ -39,7 +39,7 @@ function M:viewAsKey(skipLevel)
     end
 end
 
-function M:isMatch(other)
+function M:onCanCast(other)
     if other.kind == 'value' then
         ---@cast other Node.Value
         return self.value == other.value

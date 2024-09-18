@@ -12,7 +12,7 @@ function M:view()
     return 'nil'
 end
 
-function M:isMatch(other)
+function M:onCanCast(other)
     return other.kind == 'nil'
 end
 

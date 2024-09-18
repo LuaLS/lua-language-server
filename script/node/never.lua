@@ -12,11 +12,11 @@ function M:view()
     return 'never'
 end
 
-function M:isMatch(other)
+function M:onCanCast(other)
     return false
 end
 
-function M:canBeCast(other)
+function M:onCanBeCast(other)
     return false
 end
 

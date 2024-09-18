@@ -12,7 +12,7 @@ function M:view()
     return 'any'
 end
 
-function M:isMatch(other)
+function M:onCanCast(other)
     if other.kind == 'never' then
         return false
     end
@@ -21,7 +21,7 @@ end
 
 ---@param other Node
 ---@return boolean
-function M:canBeCast(other)
+function M:onCanBeCast(other)
     if other.kind == 'never' then
         return false
     end

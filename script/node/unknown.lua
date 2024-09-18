@@ -12,7 +12,7 @@ function M:view()
     return 'unknown'
 end
 
-function M:isMatch(other)
+function M:onCanCast(other)
     if other.kind == 'never'
     or other.kind == 'nil' then
         return false
@@ -20,7 +20,7 @@ function M:isMatch(other)
     return true
 end
 
-function M:canBeCast(other)
+function M:onCanBeCast(other)
     if other.kind == 'never'
     or other.kind == 'nil' then
         return false

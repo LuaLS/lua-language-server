@@ -98,36 +98,34 @@ M.__getter.types = function (self)
     return types, true
 end
 
----获取所有的键。没有进行去重或排序。
+---获取所有的键。
 ---@type Node[]
-M.tableKeys = nil
+M.keys = nil
 
 ---@param self Node.Table
 ---@return Node[]
 ---@return true
-M.__getter.tableKeys = function (self)
+M.__getter.keys = function (self)
     local keys = {}
 
-    ---@param field Node.Field
-    for field in self.fields:pairsFast() do
+    for _, field in ipairs(self.sortedFields) do
         keys[#keys+1] = field.key
     end
 
     return keys, true
 end
 
----获取所有的值。没有进行去重或排序。
+---获取所有的值。按key的顺序排序。
 ---@type Node[]
-M.tableValues = nil
+M.values = nil
 
 ---@param self Node.Table
 ---@return Node[]
 ---@return true
-M.__getter.tableValues = function (self)
+M.__getter.values = function (self)
     local values = {}
 
-    ---@param field Node.Field
-    for field in self.fields:pairsFast() do
+    for _, field in ipairs(self.sortedFields) do
         values[#values+1] = field.value
     end
 
@@ -169,40 +167,43 @@ M.__getter.sortedFields = function (self)
     end
 
     for k, v in ls.util.sortPairs(self.types) do
-        values[#values+1] = { key = ls.node.value(k), value = v }
+        values[#values+1] = { key = ls.node.type(k), value = v }
     end
 
     return values, true
 end
 
 ---@param key string|number|boolean|Node
----@return Node
+---@return Node?
 function M:get(key)
-    local tp = type(key)
-    if tp ~= 'table' then
+    if key == ls.node.ANY then
+        return ls.node.union(self.values):simplify() or ls.node.ANY
+    end
+    if key == ls.node.UNKNOWN then
+        return ls.node.union(self.values):simplify()
+    end
+    if type(key) ~= 'table' then
         ---@cast key -Node
         return self.literals[key] or self:get(ls.node.value(key))
     end
-    if key == ls.node.ANY then
-        return ls.node.union(self.tableValues):simplify() or ls.node.ANY
-    end
-    if key == ls.node.UNKNOWN then
-        return ls.node.union(self.tableValues):simplify() or ls.node.NIL
-    end
     ---@cast key Node
     if key.typeName then
-        return self.types[key.typeName] or ls.node.NIL
+        return self.types[key.typeName]
     end
     if key.kind == 'union' then
-        local result
         ---@cast key Node.Union
+        ---@type Node
+        local result = ls.node.NEVER
         for _, v in ipairs(key.values) do
-            local r = self:get(v) or ls.node.NIL
+            local r = self:get(v)
             result = result | r
         end
-        return result or ls.node.NIL
+        if result == ls.node.NEVER then
+            return nil
+        end
+        return result
     end
-    return ls.node.NIL
+    return nil
 end
 
 function M:view(skipLevel)

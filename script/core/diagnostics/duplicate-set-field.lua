@@ -68,6 +68,12 @@ return function (uri, callback)
             if not defValue or defValue.type ~= 'function' then
                 goto CONTINUE
             end
+            if vm.getDefinedClass(guide.getUri(def), def.node)
+            and not vm.getDefinedClass(guide.getUri(src), src.node)
+            then
+                -- allow type variable to override function defined in class variable
+                goto CONTINUE
+            end
             callback {
                 start   = src.start,
                 finish  = src.finish,

@@ -72,3 +72,29 @@ else
     function X.f() end
 end
 ]]
+
+TEST [[
+---@class A
+X = {}
+
+function X:f() end
+
+---@type x
+local x
+
+function x:f() end
+]]
+
+TEST [[
+---@class A
+X = {}
+
+function X:f() end
+
+---@type x
+local x
+
+function <!x:f!>() end
+
+function <!x:f!>() end
+]]

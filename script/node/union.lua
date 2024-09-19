@@ -1,5 +1,6 @@
 ---@class Node.Union: Node
 ---@operator bor(Node?): Node
+---@operator band(Node?): Node
 ---@operator shr(Node): boolean
 ---@overload fun(nodes?: Node[]): Node.Union
 local M = ls.node.register 'Node.Union'
@@ -9,7 +10,7 @@ M.kind = 'union'
 ---@param nodes? Node[]
 function M:__init(nodes)
     ---@package
-    self._values = nodes or {}
+    self.rawNodes = nodes or {}
 end
 
 ---@param other Node
@@ -53,7 +54,7 @@ function M.__getter:values()
     ---@cast self Node.Union
 
     local hasUnion = false
-    for _, v in ipairs(self._values) do
+    for _, v in ipairs(self.rawNodes) do
         if v.kind == 'union' then
             hasUnion = true
             break
@@ -61,11 +62,11 @@ function M.__getter:values()
     end
 
     if not hasUnion then
-        return self._values, true
+        return self.rawNodes, true
     end
 
     local values = {}
-    for _, v in ipairs(self._values) do
+    for _, v in ipairs(self.rawNodes) do
         if v.kind == 'union' then
             ---@cast v Node.Union
             for _, vv in ipairs(v.values) do

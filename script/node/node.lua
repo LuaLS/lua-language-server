@@ -3,6 +3,7 @@
 ---@field onCanBeCast? fun(self: Node, other: Node): boolean? # 另一个节点是否能转换为自己，用于双向检查的反向检查
 ---@field typeName? string
 ---@operator bor(Node?): Node
+---@operator band(Node?): Node
 ---@operator shr(Node): boolean
 local M = Class 'Node'
 
@@ -31,6 +32,23 @@ function M.__bor(a, b)
     return makeUnion(a, b)
         or makeUnion(b, a)
         or ls.node.union {a, b}
+end
+
+---@param a Node
+---@param b Node
+---@return Node?
+local function makeCross(a, b)
+    if a == b then
+        return a
+    end
+    if a == nil or b == nil then
+        return ls.node.NEVER
+    end
+end
+
+function M.__band(a, b)
+    return makeCross(a, b)
+        or ls.node.cross {a, b}
 end
 
 function M:__shr(other)
@@ -102,8 +120,9 @@ end
 function ls.node.register(nodeType)
     local child = Class(nodeType, 'Node')
 
-    child.__bor = M.__bor
-    child.__shr = M.__shr
+    child.__bor  = M.__bor
+    child.__band = M.__band
+    child.__shr  = M.__shr
 
     return child
 end

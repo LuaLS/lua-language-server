@@ -1,5 +1,6 @@
 ---@class Node.Table: Node
 ---@operator bor(Node?): Node
+---@operator band(Node?): Node
 ---@operator shr(Node): boolean
 ---@overload fun(): Node.Table
 local M = ls.node.register 'Node.Table'

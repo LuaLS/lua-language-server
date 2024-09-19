@@ -1,7 +1,6 @@
 ---@class Node.Type: Node
 ---@operator bor(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(name: string): Node.Type
 local M = ls.node.register 'Node.Type'
 
 M.kind = 'type'
@@ -159,31 +158,34 @@ end
 
 ---@param key string|number|boolean|Node
 ---@param dontLookup? boolean
----@return Node?
+---@return Node
 function M:get(key, dontLookup)
     if not self.extends and not self.table then
-        return nil
+        return ls.node.NEVER
     end
     if key == ls.node.ANY then
         return ls.node.union(self.tableValues):simplify() or ls.node.ANY
     end
     if key == ls.node.UNKNOWN then
-        return ls.node.union(self.tableValues):simplify()
+        return ls.node.union(self.tableValues):simplify() or ls.node.NIL
+    end
+    if key == ls.node.NIL then
+        return ls.node.NIL
     end
     local res = self.table:get(key)
-    if res then
+    if res ~= ls.node.NIL then
         return res
     end
     if dontLookup then
-        return nil
+        return ls.node.NIL
     end
     for _, v in ipairs(self.fullTables) do
         res = v:get(key)
-        if res then
+        if res ~= ls.node.NIL then
             return res
         end
     end
-    return nil
+    return ls.node.NIL
 end
 
 ---@param extends Node.Type | Node.Table

@@ -49,6 +49,12 @@ function M:viewAsKey(skipLevel)
     return '[' .. self:view(skipLevel) .. ']'
 end
 
+---@param key string|number|boolean|Node
+---@return Node?
+function M:get(key)
+    return ls.node.NEVER
+end
+
 ---@alias Node.CastResult 'yes' | 'no' | 'unknown'
 
 function M:refreshCastCache()

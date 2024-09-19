@@ -174,25 +174,41 @@ M.__getter.sortedFields = function (self)
 end
 
 ---@param key string|number|boolean|Node
----@return Node?
+---@return Node
 function M:get(key)
     if key == ls.node.ANY then
         return ls.node.union(self.values):simplify() or ls.node.ANY
     end
     if key == ls.node.UNKNOWN then
-        return ls.node.union(self.values):simplify()
+        return ls.node.union(self.values):simplify() or ls.node.NIL
+    end
+    if key == ls.node.NIL then
+        return ls.node.NIL
     end
     if type(key) ~= 'table' then
         ---@cast key -Node
-        return self.literals[key] or self:get(ls.node.value(key).nodeType)
+        return self.literals[key]
+            or self:get(ls.node.value(key).nodeType)
+            or ls.node.NIL
     end
     if key.kind == 'value' then
         ---@cast key Node.Value
-        return self.literals[key.value] or self:get(key.nodeType)
+        return self.literals[key.value]
+            or self:get(key.nodeType)
+            or ls.node.NIL
     end
     ---@cast key Node
     if key.typeName then
-        return self.types[key.typeName]
+        if self.types[key.typeName] then
+            return self.types[key.typeName]
+        end
+        ---@param field Node.Field
+        for field in self.fields:pairsFast() do
+            if field.key.kind == 'type' and key:canCast(field.key) then
+                return field.value
+            end
+        end
+        return ls.node.NIL
     end
     if key.kind == 'union' then
         ---@cast key Node.Union
@@ -203,11 +219,11 @@ function M:get(key)
             result = result | r
         end
         if result == ls.node.NEVER then
-            return nil
+            return ls.node.NIL
         end
         return result
     end
-    return nil
+    return ls.node.NIL
 end
 
 ---@param other Node

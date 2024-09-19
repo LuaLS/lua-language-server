@@ -1,4 +1,12 @@
 do
+    assert(ls.node.NEVER:get('x') == ls.node.NEVER)
+    assert(ls.node.NIL:get('x') == ls.node.NEVER)
+    assert(ls.node.UNKNOWN:get('x') == ls.node.ANY)
+    assert(ls.node.ANY:get('x') == ls.node.ANY)
+    assert(ls.node.TABLE:get('x') == ls.node.ANY)
+end
+
+do
     local t = ls.node.table()
         : addField {
             key   = ls.node.value 'x',
@@ -37,7 +45,7 @@ do
     assert(t:get('www'):view() == '"string"')
     assert(t:get(3):view() == '"integer"')
     assert(t:get(0.5):view() == '"number"')
-    assert(t:get(true) == nil)
+    assert(t:get(true):view() == 'nil')
     assert(t:get(ls.node.ANY):view() == [["union"|number|boolean|string|"integer"|"number"|"string"]])
     assert(t.sortedFields[1].key == ls.node.value(1))
     assert(t.sortedFields[2].key == ls.node.value(2))
@@ -84,7 +92,7 @@ do
 
     assert(t.A:get('A1'):view() == '"A1"')
     assert(t.A:get('A11'):view() == '"A11"')
-    assert(t.A:get('A33') == nil)
+    assert(t.A:get('A33'):view() == 'nil')
 
     assert(t.A:get(ls.node.ANY):view() == [["A"|"A1"|"A11"|"A12"|"A2"|"A21"|"A22"]])
     assert(t.A.sortedFields[1].key == ls.node.value "A")

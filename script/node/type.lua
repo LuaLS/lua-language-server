@@ -158,14 +158,34 @@ M.__getter.sortedFields = function (self)
     return values, true
 end
 
+---@type boolean
+M.isBasicType = nil
+
+---@param self Node.Type
+---@return boolean
+---@return true
+M.__getter.isBasicType = function (self)
+    if self:isComplex() then
+        return false, true
+    end
+    if self._basicType then
+        return true, true
+    end
+    return false, true
+end
+
 ---@type Node?
 M.value = nil
+
+function M:isComplex()
+    return self.extends or self.table
+end
 
 ---@param key string|number|boolean|Node
 ---@param dontLookup? boolean
 ---@return Node
 function M:get(key, dontLookup)
-    if not self.extends and not self.table then
+    if not self:isComplex() then
         return ls.node.NEVER
     end
     if key == ls.node.ANY then
@@ -308,8 +328,13 @@ M._onCanCast = nil
 ---@type fun(self: Node.Type, other: Node): boolean?
 M._onCanBeCast = nil
 
+---@package
+---@type boolean
+M._basicType = false
+
 ---@overload fun(self, key: 'onCanCast', value: fun(self: Node.Type, other: Node): boolean?): Node.Type
 ---@overload fun(self, key: 'onCanBeCast', value: fun(self: Node.Type, other: Node): boolean?): Node.Type
+---@overload fun(self, key: 'basicType', value: boolean): Node.Type
 function M:setConfig(key, value)
     self['_' .. key] = value
     return self
@@ -375,7 +400,7 @@ function M:onCanCast(other)
     return false
 end
 
----@type { never: nil, [string]: Node.Type}
+---@type { [string]: Node.Type}
 ls.node.TYPE = setmetatable({}, {
     __mode = 'v',
     __index = function (t, k)
@@ -385,7 +410,6 @@ ls.node.TYPE = setmetatable({}, {
     end,
 })
 
----@overload fun(name: 'never'): Node
 ---@overload fun(name: string): Node.Type
 function ls.node.type(name)
     return ls.node.TYPE[name]

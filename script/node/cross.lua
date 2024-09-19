@@ -69,10 +69,24 @@ M.__getter.value = function (self)
         end
         return ls.node.union(values), true
     end
+    if a.kind == 'type' then
+        ---@cast a Node.Type
+        if a.isBasicType then
+            return ls.node.NEVER, true
+        end
+    end
+    if b.kind == 'type' then
+        ---@cast b Node.Type
+        if b.isBasicType then
+            return ls.node.NEVER, true
+        end
+    end
     if a.kind == 'table'
     or a.kind == 'cross'
+    or a.kind == 'type'
     or b.kind == 'table'
-    or b.kind == 'cross' then
+    or b.kind == 'cross'
+    or b.kind == 'type' then
         return self, true
     end
     return ls.node.NEVER, true

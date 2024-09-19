@@ -36,15 +36,12 @@ end
 ---@param other Node
 ---@return boolean
 function M:onCanCast(other)
-    if other.kind == 'union' then
-        for _, v in ipairs(self.values) do
-            if not v:canCast(other) then
-                return false
-            end
+    for _, v in ipairs(self.values) do
+        if not v:canCast(other) then
+            return false
         end
-        return true
     end
-    return false
+    return true
 end
 
 ---@type Node[]
@@ -71,9 +68,15 @@ function M.__getter:values()
             ---@cast v Node.Union
             for _, vv in ipairs(v.values) do
                 values[#values+1] = vv
+                if #values >= 1000 then
+                    return values, true
+                end
             end
         else
             values[#values+1] = v
+            if #values >= 1000 then
+                return values, true
+            end
         end
     end
 

@@ -152,3 +152,43 @@ do
     b:removeExtends(c)
     c:removeExtends(a)
 end
+
+do
+    local a = ls.node.value(1)
+    local b = ls.node.value(2)
+    local c = ls.node.type 'number'
+
+    assert(a >> b == false)
+    assert(a >> c == true)
+    assert(b >> c == true)
+    assert(c >> a == false)
+    assert(c >> b == false)
+
+    assert((a | b) >> c == true)
+    assert((b | c) >> a == false)
+    assert((c | a) >> b == false)
+    assert(c >> (a | b) == false)
+    assert(a >> (b | c) == true)
+    assert(b >> (c | a) == true)
+end
+
+do
+    local a = ls.node.type 'number'
+            & (ls.node.value(1) | ls.node.value(2))
+
+    assert(a:view() == '1|2')
+end
+
+do
+    local a = (ls.node.value(1) | ls.node.value(2))
+            & ls.node.type 'number'
+
+    assert(a:view() == '1|2')
+end
+
+do
+    local a = (ls.node.value(1) | ls.node.value(2))
+            & (ls.node.type 'number' | ls.node.type 'string')
+
+    assert(a:view() == '1|2')
+end

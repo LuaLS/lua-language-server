@@ -1,3 +1,4 @@
+ls.node.NEVER = ls.node.type 'never'
 ls.node.ANY = ls.node.type 'any'
     : setConfig('onCanCast', function (self, other)
         return true

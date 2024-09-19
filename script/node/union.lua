@@ -15,14 +15,14 @@ end
 ---@param other Node
 ---@return boolean?
 function M:onCanBeCast(other)
-    if other.kind == 'union' then
-        return nil
-    end
-    if other.kind == 'never' then
+    if other.typeName == 'never' then
         return false
     end
-    if other.kind == 'any' then
+    if other.typeName == 'any' then
         return true
+    end
+    if other.kind == 'union' then
+        return nil
     end
     for _, v in ipairs(self.values) do
         if other:canCast(v) then

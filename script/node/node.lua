@@ -4,10 +4,9 @@
 ---@field typeName? string
 ---@operator bor(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(): Node
 local M = Class 'Node'
 
----@alias Node.Kind 'never' | 'nil' | 'any' | 'unknown' | 'type' | 'value' | 'table' | 'tuple' | 'array' | 'function' | 'union' | 'cross'
+---@alias Node.Kind 'type' | 'value' | 'table' | 'tuple' | 'array' | 'function' | 'union' | 'cross'
 
 ---基础分类
 ---@type Node.Kind
@@ -20,10 +19,10 @@ local function makeUnion(a, b)
     if a == nil then
         return b
     end
-    if a.kind == 'never' then
+    if a.typeName == 'never' then
         return b
     end
-    if a.kind == 'any' then
+    if a.typeName == 'any' then
         return a
     end
 end

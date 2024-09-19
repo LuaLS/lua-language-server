@@ -83,13 +83,13 @@ do
 end
 
 do
-    local a = ls.node.never() | ls.node.value(1)
+    local a = ls.node.NEVER | ls.node.value(1)
 
     assert(a:view() == '1')
 end
 
 do
-    local a = ls.node.value(1) | ls.node.never()
+    local a = ls.node.value(1) | ls.node.NEVER
 
     assert(a:view() == '1')
 end

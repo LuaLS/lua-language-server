@@ -1,0 +1,3 @@
+---@class Node.Cross: Node
+---@operator bor(Node?): Node
+---@operator shr(Node): boolean

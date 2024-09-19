@@ -1,6 +1,7 @@
 ---@class Node.Type: Node
 ---@operator bor(Node?): Node
 ---@operator shr(Node): boolean
+---@overload fun(name: string): Node.Type
 local M = ls.node.register 'Node.Type'
 
 M.kind = 'type'
@@ -308,7 +309,7 @@ end
 ---@param other Node
 ---@return boolean?
 function M:onCanBeCast(other)
-    if other.kind == 'never' then
+    if other.typeName == 'never' then
         return false
     end
     if self._onCanBeCast then
@@ -323,7 +324,7 @@ end
 ---@param other Node
 ---@return boolean
 function M:onCanCast(other)
-    if other.kind == 'never' then
+    if other.typeName == 'never' then
         return false
     end
     if self._onCanCast then
@@ -369,12 +370,7 @@ end
 ls.node.TYPE = setmetatable({}, {
     __mode = 'v',
     __index = function (t, k)
-        local v
-        if k == 'never' then
-            error('Can not use "never" as a type name.')
-        else
-            v = New 'Node.Type' (k)
-        end
+        local v = New 'Node.Type' (k)
         t[k] = v
         return v
     end,

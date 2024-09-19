@@ -48,7 +48,7 @@ end
 
 function M.__band(a, b)
     return makeCross(a, b)
-        or ls.node.cross {a, b}
+        or ls.node.cross(a, b)
 end
 
 function M:__shr(other)

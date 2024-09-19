@@ -178,10 +178,15 @@ end
 ---@return Node
 function M:get(key)
     if key == ls.node.ANY then
-        return ls.node.union(self.values):simplify() or ls.node.ANY
+        local res = ls.node.union(self.values).value
+        if res == ls.node.NIL then
+            return ls.node.ANY
+        else
+            return res
+        end
     end
     if key == ls.node.UNKNOWN then
-        return ls.node.union(self.values):simplify() or ls.node.NIL
+        return ls.node.union(self.values).value
     end
     if key == ls.node.NIL then
         return ls.node.NIL

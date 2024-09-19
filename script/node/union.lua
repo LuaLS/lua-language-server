@@ -118,15 +118,20 @@ function M:get(key)
     return value
 end
 
----@return Node?
-function M:simplify()
+---@type Node
+M.value = nil
+
+---@param self Node.Union
+---@return Node
+---@return true
+M.__getter.value = function (self)
     if #self.values == 0 then
-        return nil
+        return ls.node.NIL, true
     end
     if #self.values == 1 then
-        return self.values[1]
+        return self.values[1], true
     end
-    return self
+    return self, true
 end
 
 ---@param nodes? Node[]

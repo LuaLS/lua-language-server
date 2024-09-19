@@ -158,6 +158,9 @@ M.__getter.sortedFields = function (self)
     return values, true
 end
 
+---@type Node?
+M.value = nil
+
 ---@param key string|number|boolean|Node
 ---@param dontLookup? boolean
 ---@return Node
@@ -166,10 +169,15 @@ function M:get(key, dontLookup)
         return ls.node.NEVER
     end
     if key == ls.node.ANY then
-        return ls.node.union(self.tableValues):simplify() or ls.node.ANY
+        local res = ls.node.union(self.tableValues).value
+        if res == ls.node.NIL then
+            return ls.node.ANY
+        else
+            return res
+        end
     end
     if key == ls.node.UNKNOWN then
-        return ls.node.union(self.tableValues):simplify() or ls.node.NIL
+        return ls.node.union(self.tableValues).value
     end
     if key == ls.node.NIL then
         return ls.node.NIL

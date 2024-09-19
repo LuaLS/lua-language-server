@@ -79,7 +79,12 @@ function M.__getter:values()
     return values, true
 end
 
+M.sortScore = {
+    ['nil'] = -1000,
+}
+
 function M:view(skipLevel)
+    ---@type string[]
     local view = {}
     local mark = {}
     for _, v in ipairs(self.values) do
@@ -91,7 +96,22 @@ function M:view(skipLevel)
         view[#view+1] = thisView
         ::continue::
     end
+    ls.util.sortByScore(view, {
+        function (v)
+            return self.sortScore[v] or 0
+        end,
+        ls.util.sortCallbackOfIndex(view),
+    })
     return table.concat(view, '|')
+end
+
+function M:get(key)
+    local value
+    for _, v in ipairs(self.values) do
+        local thisValue = v:get(key)
+        value = value | thisValue
+    end
+    return value
 end
 
 ---@return Node?

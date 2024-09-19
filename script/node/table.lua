@@ -213,13 +213,10 @@ function M:get(key)
     if key.kind == 'union' then
         ---@cast key Node.Union
         ---@type Node
-        local result = ls.node.NEVER
+        local result
         for _, v in ipairs(key.values) do
             local r = self:get(v)
             result = result | r
-        end
-        if result == ls.node.NEVER then
-            return ls.node.NIL
         end
         return result
     end

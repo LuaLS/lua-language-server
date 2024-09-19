@@ -58,6 +58,26 @@ do
 end
 
 do
+    local a = ls.node.table()
+        : addField {
+            key   = ls.node.value 'x',
+            value = ls.node.value 'x'
+        }
+
+    local b = ls.node.table()
+        : addField {
+            key   = ls.node.value 'y',
+            value = ls.node.value 'y'
+        }
+
+    local u = a | b
+
+    assert(u:get('x'):view() == '"x"|nil')
+    assert(u:get('y'):view() == '"y"|nil')
+    assert(u:get(ls.node.ANY):view() == [["x"|"y"]])
+end
+
+do
     ---@type table<string, Node.Type>
     local t = {}
     local names = {'A', 'A1', 'A2', 'A11', 'A12', 'A21', 'A22'}

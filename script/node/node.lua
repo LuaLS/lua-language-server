@@ -50,7 +50,7 @@ function M:viewAsKey(skipLevel)
 end
 
 ---@param key string|number|boolean|Node
----@return Node?
+---@return Node
 function M:get(key)
     return ls.node.NEVER
 end

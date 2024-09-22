@@ -6,6 +6,7 @@
 * `NEW` Infer function parameter types when overriding the same-named class function in an instance of that class [#2158](https://github.com/LuaLS/lua-language-server/issues/2158)
 * `FIX` Eliminate floating point error in test benchmark output
 * `FIX` Remove luamake install from make scripts
+* `NEW` Types with literal fields can be narrowed.
 
 ## 3.10.6
 `2024-9-10`

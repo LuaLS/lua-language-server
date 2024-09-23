@@ -47,21 +47,10 @@ end
 ---@type Node[]
 M.values = nil
 
-function M.__getter:values()
-    ---@cast self Node.Union
-
-    local hasUnion = false
-    for _, v in ipairs(self.rawNodes) do
-        if v.kind == 'union' then
-            hasUnion = true
-            break
-        end
-    end
-
-    if not hasUnion then
-        return self.rawNodes, true
-    end
-
+---@param self Node.Union
+---@return Node[]
+---@return true
+M.__getter.values = function (self)
     local values = {}
     for _, v in ipairs(self.rawNodes) do
         if v.kind == 'union' then
@@ -80,6 +69,7 @@ function M.__getter:values()
         end
     end
 
+    ls.util.arrayRemoveDuplicate(values)
     return values, true
 end
 
@@ -90,13 +80,11 @@ M.sortScore = {
 function M:view(skipLevel)
     ---@type string[]
     local view = {}
-    local mark = {}
     for _, v in ipairs(self.values) do
         local thisView = v:view(skipLevel and skipLevel + 1 or nil)
-        if not thisView or mark[thisView] then
+        if not thisView then
             goto continue
         end
-        mark[thisView] = true
         view[#view+1] = thisView
         ::continue::
     end
@@ -106,7 +94,7 @@ function M:view(skipLevel)
         end,
         ls.util.sortCallbackOfIndex(view),
     })
-    return table.concat(view, '|')
+    return table.concat(view, ' | ')
 end
 
 function M:get(key)

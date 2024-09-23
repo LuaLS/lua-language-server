@@ -78,3 +78,31 @@ do
 
     assert(c:view() == '{ x: "x" } & { y: "y" }')
 end
+
+do
+    ls.node.TYPE['A'] = nil
+    ls.node.TYPE['B'] = nil
+    ls.node.TYPE['C'] = nil
+    local a = ls.node.type('A') & ls.node.type('B') & ls.node.type('C') & ls.node.type('A')
+
+    assert(a:view() == 'A & B & C')
+end
+
+do
+    ls.node.TYPE['A'] = nil
+    ls.node.TYPE['B'] = nil
+    ls.node.TYPE['C'] = nil
+    ls.node.TYPE['D'] = nil
+    local a = ls.node.type('A') & (ls.node.type('B') | ls.node.type('C')) & ls.node.type('D')
+
+    assert(a:view() == 'A & (B | C) & D')
+end
+
+do
+    ls.node.TYPE['A'] = nil
+    ls.node.TYPE['B'] = nil
+    ls.node.TYPE['C'] = nil
+    local a = ls.node.type('A') & (ls.node.type('B') | ls.node.type('C')) & ls.node.type('A')
+
+    assert(a:view() == 'A & (B | C)')
+end

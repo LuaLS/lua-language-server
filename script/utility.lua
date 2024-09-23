@@ -985,4 +985,23 @@ function m.countTable(t)
     return count
 end
 
+---@param arr any[]
+function m.arrayRemoveDuplicate(arr)
+    local mark = {}
+    local offset = 0
+    local len = #arr
+    for i = 1, len do
+        local v = arr[i]
+        if mark[v] then
+            offset = offset + 1
+        else
+            arr[i - offset] = v
+            mark[v] = true
+        end
+    end
+    for i = len - offset + 1, len do
+        arr[i] = nil
+    end
+end
+
 return m

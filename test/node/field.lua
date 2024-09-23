@@ -46,7 +46,7 @@ do
     assert(t:get(3):view() == '"integer"')
     assert(t:get(0.5):view() == '"number"')
     assert(t:get(true):view() == 'nil')
-    assert(t:get(ls.node.ANY):view() == [["union"|number|boolean|string|"integer"|"number"|"string"]])
+    assert(t:get(ls.node.ANY):view() == [["union" | number | boolean | string | "integer" | "number" | "string"]])
     assert(t.sortedFields[1].key == ls.node.value(1))
     assert(t.sortedFields[2].key == ls.node.value(2))
     assert(t.sortedFields[3].key == ls.node.value 'x')
@@ -72,9 +72,9 @@ do
 
     local u = a | b
 
-    assert(u:get('x'):view() == '"x"|nil')
-    assert(u:get('y'):view() == '"y"|nil')
-    assert(u:get(ls.node.ANY):view() == [["x"|"y"]])
+    assert(u:get('x'):view() == '"x" | nil')
+    assert(u:get('y'):view() == '"y" | nil')
+    assert(u:get(ls.node.ANY):view() == [["x" | "y"]])
 end
 
 do
@@ -114,7 +114,7 @@ do
     assert(t.A:get('A11'):view() == '"A11"')
     assert(t.A:get('A33'):view() == 'nil')
 
-    assert(t.A:get(ls.node.ANY):view() == [["A"|"A1"|"A11"|"A12"|"A2"|"A21"|"A22"]])
+    assert(t.A:get(ls.node.ANY):view() == [["A" | "A1" | "A11" | "A12" | "A2" | "A21" | "A22"]])
     assert(t.A.sortedFields[1].key == ls.node.value "A")
     assert(t.A.sortedFields[2].key == ls.node.value "A1")
     assert(t.A.sortedFields[3].key == ls.node.value "A11")

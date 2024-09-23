@@ -29,7 +29,7 @@ local function allWords()
     return list
 end
 
-local function enable(uri)
+local function enable(_uri)
     if isEnable then
         return
     end
@@ -55,7 +55,7 @@ local function enable(uri)
     })
 end
 
-local function disable(uri)
+local function disable(_uri)
     if not isEnable then
         return
     end

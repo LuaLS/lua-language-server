@@ -1,4 +1,3 @@
-local files   = require 'files'
 local util    = require 'utility'
 local encoder = require 'encoder'
 local client  = require 'client'

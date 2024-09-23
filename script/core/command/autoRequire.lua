@@ -1,6 +1,5 @@
 local files  = require 'files'
 local furi   = require 'file-uri'
-local config = require 'config'
 local rpath  = require 'workspace.require-path'
 local client = require 'client'
 local lang   = require 'language'

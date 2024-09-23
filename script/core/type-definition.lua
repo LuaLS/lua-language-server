@@ -57,7 +57,7 @@ local accept = {
     ['doc.field.name']   = true,
 }
 
-local function checkRequire(source, offset)
+local function checkRequire(source)
     if source.type ~= 'string' then
         return nil
     end
@@ -119,14 +119,14 @@ return function (uri, offset)
     local results = {}
     local uris = checkRequire(source)
     if uris then
-        for i, uri in ipairs(uris) do
+        for _, uri0 in ipairs(uris) do
             results[#results+1] = {
-                uri    = uri,
+                uri    = uri0,
                 source = source,
                 target = {
                     start  = 0,
                     finish = 0,
-                    uri    = uri,
+                    uri    = uri0,
                 }
             }
         end

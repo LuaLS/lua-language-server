@@ -119,7 +119,6 @@ local function searchFieldByLocalID(source, key, pushResult)
             end
         end
     end
-    
 
     local hasMarkDoc = {}
     for _, src in ipairs(fields) do
@@ -177,7 +176,7 @@ end
 
 local searchFieldSwitch = util.switch()
     : case 'table'
-    : call(function (suri, source, key, pushResult)
+    : call(function (_suri, source, key, pushResult)
         local hasFiled = false
         for _, field in ipairs(source) do
             if field.type == 'tablefield'
@@ -247,7 +246,7 @@ local searchFieldSwitch = util.switch()
     end)
     : case 'string'
     : case 'doc.type.string'
-    : call(function (suri, source, key, pushResult)
+    : call(function (suri, _source, key, pushResult)
         -- change to `string: stringlib` ?
         local stringlib = vm.getGlobal('type', 'stringlib')
         if stringlib then
@@ -270,7 +269,7 @@ local searchFieldSwitch = util.switch()
         end
     end)
     : case 'doc.type.table'
-    : call(function (suri, source, key, pushResult)
+    : call(function (_suri, source, key, pushResult)
         if type(key) == 'string' and key:find(vm.ID_SPLITE) then
             return
         end
@@ -1208,7 +1207,7 @@ local function compileFunctionParam(func, source)
                         if not extClass then
                             goto continue
                         end
-                        vm.getClassFields(suri, extClass, key, function (field, isMark)
+                        vm.getClassFields(suri, extClass, key, function (field, _isMark)
                             for n in vm.compileNode(field):eachObject() do
                                 if n.type == 'function' and n.args[aindex] then
                                     local argNode = vm.compileNode(n.args[aindex])
@@ -1672,7 +1671,7 @@ local compilerSwitch = util.switch()
                             end
                             local hasGeneric
                             if sign then
-                                guide.eachSourceType(rtn, 'doc.generic.name', function (src)
+                                guide.eachSourceType(rtn, 'doc.generic.name', function (_src)
                                     hasGeneric = true
                                 end)
                             end

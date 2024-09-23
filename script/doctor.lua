@@ -182,7 +182,7 @@ m.snapshot = private(function ()
     ---@generic T
     ---@param o T
     ---@return T
-    local function private(o)
+    local function private0(o)
         if not o then
             return nil
         end
@@ -190,10 +190,10 @@ m.snapshot = private(function ()
         return o
     end
 
-    private(exclude)
+    private0(exclude)
 
     local find
-    local mark = private {}
+    local mark = private0 {}
 
     local function findTable(t, result)
         result = result or {}
@@ -218,14 +218,14 @@ m.snapshot = private(function ()
                         find(v)
                         local valueResults = mark[v]
                         if valueResults then
-                            valueResults[#valueResults+1] = private {
+                            valueResults[#valueResults+1] = private0 {
                                 type = 'weakvalue-key',
                                 name = formatName(t) .. '|' .. formatName(v),
                                 info = keyInfo,
                             }
                         end
                     else
-                        result[#result+1] = private {
+                        result[#result+1] = private0 {
                             type = 'key',
                             name = formatName(k),
                             info = keyInfo,
@@ -240,14 +240,14 @@ m.snapshot = private(function ()
                         find(k)
                         local keyResults = mark[k]
                         if keyResults then
-                            keyResults[#keyResults+1] = private {
+                            keyResults[#keyResults+1] = private0 {
                                 type = 'weakkey-field',
                                 name = formatName(t) .. '|' .. formatName(k),
                                 info = valueInfo,
                             }
                         end
                     else
-                        result[#result+1] = private {
+                        result[#result+1] = private0 {
                             type = 'field',
                             name = formatName(k) .. '|' .. formatName(v),
                             info = valueInfo,
@@ -258,7 +258,7 @@ m.snapshot = private(function ()
         end
         local MTInfo = find(getmetatable(t))
         if MTInfo then
-            result[#result+1] = private {
+            result[#result+1] = private0 {
                 type = 'metatable',
                 name = '',
                 info = MTInfo,
@@ -276,7 +276,7 @@ m.snapshot = private(function ()
             end
             local valueInfo = find(v)
             if valueInfo then
-                result[#result+1] = private {
+                result[#result+1] = private0 {
                     type = 'upvalue',
                     name = n,
                     info = valueInfo,
@@ -296,7 +296,7 @@ m.snapshot = private(function ()
             end
             local valueInfo = find(v)
             if valueInfo then
-                result[#result+1] = private {
+                result[#result+1] = private0 {
                     type = 'uservalue',
                     name = formatName(i),
                     info = valueInfo,
@@ -305,7 +305,7 @@ m.snapshot = private(function ()
         end
         local MTInfo = find(getmetatable(u))
         if MTInfo then
-            result[#result+1] = private {
+            result[#result+1] = private0 {
                 type = 'metatable',
                 name = '',
                 info = MTInfo,
@@ -322,7 +322,7 @@ m.snapshot = private(function ()
         if m._ignoreMainThread and trd == registry[1] then
             return nil
         end
-        result = result or private {}
+        result = result or private0 {}
 
         for i = 1, maxinterger do
             local info = getinfo(trd, i, 'Sf')
@@ -338,14 +338,14 @@ m.snapshot = private(function ()
                     end
                     local valueInfo = find(l)
                     if valueInfo then
-                        funcInfo[#funcInfo+1] = private {
+                        funcInfo[#funcInfo+1] = private0 {
                             type = 'local',
                             name = n,
                             info = valueInfo,
                         }
                     end
                 end
-                result[#result+1] = private {
+                result[#result+1] = private0 {
                     type = 'stack',
                     name = i .. '@' .. formatName(info.func),
                     info = funcInfo,
@@ -364,7 +364,7 @@ m.snapshot = private(function ()
         if m._ignoreMainThread then
             return nil
         end
-        local result = private {}
+        local result = private0 {}
 
         for i = 1, maxinterger do
             local info = getinfo(i, 'Sf')
@@ -380,14 +380,14 @@ m.snapshot = private(function ()
                     end
                     local valueInfo = find(l)
                     if valueInfo then
-                        funcInfo[#funcInfo+1] = private {
+                        funcInfo[#funcInfo+1] = private0 {
                             type = 'local',
                             name = n,
                             info = valueInfo,
                         }
                     end
                 end
-                result[#result+1] = private {
+                result[#result+1] = private0 {
                     type = 'stack',
                     name = i .. '@' .. formatName(info.func),
                     info = funcInfo,
@@ -410,16 +410,16 @@ m.snapshot = private(function ()
         end
         local tp = type(obj)
         if tp == 'table' then
-            mark[obj] = private {}
+            mark[obj] = private0 {}
             mark[obj] = findTable(obj, mark[obj])
         elseif tp == 'function' then
-            mark[obj] = private {}
+            mark[obj] = private0 {}
             mark[obj] = findFunction(obj, mark[obj])
         elseif tp == 'userdata' then
-            mark[obj] = private {}
+            mark[obj] = private0 {}
             mark[obj] = findUserData(obj, mark[obj])
         elseif tp == 'thread' then
-            mark[obj] = private {}
+            mark[obj] = private0 {}
             mark[obj] = findThread(obj, mark[obj])
         else
             return nil
@@ -431,26 +431,26 @@ m.snapshot = private(function ()
     end
 
     -- TODO: Lua 5.1中，主线程与_G都不在注册表里
-    local result = private {
+    local result = private0 {
         name = formatName(registry),
         type = 'root',
         info = find(registry),
     }
     if not registry[1] then
-        result.info[#result.info+1] = private {
+        result.info[#result.info+1] = private0 {
             type = 'thread',
             name = 'main',
             info = findMainThread(),
         }
     end
     if not registry[2] then
-        result.info[#result.info+1] = private {
+        result.info[#result.info+1] = private0 {
             type = '_G',
             name = '_G',
             info = find(_G),
         }
     end
-    for name, mt in next, private {
+    for name, mt in next, private0 {
         ['nil']       = getmetatable(nil),
         ['boolean']   = getmetatable(true),
         ['number']    = getmetatable(0),
@@ -458,7 +458,7 @@ m.snapshot = private(function ()
         ['function']  = getmetatable(function () end),
         ['thread']    = getmetatable(ccreate(function () end)),
     } do
-        result.info[#result.info+1] = private {
+        result.info[#result.info+1] = private0 {
             type = 'metatable',
             name = name,
             info = find(mt),

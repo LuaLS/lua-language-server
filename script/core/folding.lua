@@ -4,7 +4,7 @@ local util  = require 'utility'
 local await = require 'await'
 
 local care = {
-    ['function'] = function (source, text, results)
+    ['function'] = function (source, _text, results)
         local folding = {
             start  = source.start,
             finish = source.finish,
@@ -20,7 +20,7 @@ local care = {
             }
         end
     end,
-    ['do'] = function (source, text, results)
+    ['do'] = function (source, _text, results)
         local folding = {
             start  = source.start,
             finish = source.finish,
@@ -28,7 +28,7 @@ local care = {
         }
         results[#results+1] = folding
     end,
-    ['if'] = function (source, text, results)
+    ['if'] = function (source, _text, results)
         for i = 1, #source do
             local block = source[i]
             local nblock = source[i + 1]
@@ -39,7 +39,7 @@ local care = {
             }
         end
     end,
-    ['loop'] = function (source, text, results)
+    ['loop'] = function (source, _text, results)
         local folding = {
             start  = source.start,
             finish = source.finish,
@@ -47,7 +47,7 @@ local care = {
         }
         results[#results+1] = folding
     end,
-    ['in'] = function (source, text, results)
+    ['in'] = function (source, _text, results)
         local folding = {
             start  = source.start,
             finish = source.finish,
@@ -55,7 +55,7 @@ local care = {
         }
         results[#results+1] = folding
     end,
-    ['while'] = function (source, text, results)
+    ['while'] = function (source, _text, results)
         local folding = {
             start  = source.start,
             finish = source.finish,
@@ -63,7 +63,7 @@ local care = {
         }
         results[#results+1] = folding
     end,
-    ['repeat'] = function (source, text, results)
+    ['repeat'] = function (source, _text, results)
         local start  = source.start
         local finish = source.keyword[#source.keyword]
         -- must end with 'until'
@@ -77,7 +77,7 @@ local care = {
         }
         results[#results+1] = folding
     end,
-    ['table'] = function (source, text, results)
+    ['table'] = function (source, _text, results)
         local folding = {
             start  = source.start,
             finish = source.finish,
@@ -85,7 +85,7 @@ local care = {
         }
         results[#results+1] = folding
     end,
-    ['string'] = function (source, text, results)
+    ['string'] = function (source, _text, results)
         local folding = {
             start  = source.start,
             finish = source.finish,
@@ -93,7 +93,7 @@ local care = {
         }
         results[#results+1] = folding
     end,
-    ['comment.short'] = function (source, text, results, status)
+    ['comment.short'] = function (source, _text, results, status)
         local ltext = source.text:lower()
         ltext = util.trim(ltext, 'left')
         if     ltext:sub(1, #'region') == 'region'
@@ -119,7 +119,7 @@ local care = {
             }
         end
     end,
-    ['comment.long'] = function (source, text, results)
+    ['comment.long'] = function (source, _text, results)
         local folding = {
             start  = source.start,
             finish = source.finish,
@@ -127,7 +127,7 @@ local care = {
         }
         results[#results+1] = folding
     end,
-    ['comment.clong'] = function (source, text, results)
+    ['comment.clong'] = function (source, _text, results)
         local folding = {
             start  = source.start,
             finish = source.finish,
@@ -135,7 +135,7 @@ local care = {
         }
         results[#results+1] = folding
     end,
-    ['doc.class'] = function (source, text, results)
+    ['doc.class'] = function (source, _text, results)
         local folding = {
             start        = source.start,
             finish       = source.bindGroup[#source.bindGroup].finish,
@@ -144,7 +144,7 @@ local care = {
         }
         results[#results+1] = folding
     end,
-    ['doc.alias'] = function (source, text, results)
+    ['doc.alias'] = function (source, _text, results)
         local folding = {
             start        = source.start,
             finish       = source.bindGroup[#source.bindGroup].finish,

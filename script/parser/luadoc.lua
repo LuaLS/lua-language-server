@@ -739,7 +739,7 @@ local function parseCodePattern(parent)
         end
     end
     local start = getStart()
-    for i = 2 , finishOffset do
+    for _ = 2, finishOffset do
         nextToken()
     end
     local code = {
@@ -2088,7 +2088,7 @@ local function bindDocWithSources(sources, binded)
     bindGeneric(binded)
     bindCommentsAndFields(binded)
     bindReturnIndex(binded)
-    
+
     -- doc is special node
     if lastDoc.special then
         if bindDoc(lastDoc.special, binded) then
@@ -2235,7 +2235,7 @@ local function luadoc(state)
     end
 
     if ast.state.pluginDocs then
-        for i, doc in ipairs(ast.state.pluginDocs) do
+        for _, doc in ipairs(ast.state.pluginDocs) do
             insertDoc(doc, doc.originalComment)
         end
         ---@param a unknown

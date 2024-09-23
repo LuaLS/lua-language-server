@@ -23,7 +23,6 @@ _ENV = nil
 
 
 local any = m.P(1)
-local dummy = mm.P(false)
 
 
 local errinfo = {

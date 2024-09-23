@@ -318,14 +318,14 @@ function m.isMatchedUri(suri, uri, name)
     return false
 end
 
-files.watch(function (ev, uri)
+files.watch(function (_ev, _uri)
     for _, scp in ipairs(workspace.folders) do
         scp:set('requireManager', nil)
     end
     scope.fallback:set('requireManager', nil)
 end)
 
-config.watch(function (uri, key, value, oldValue)
+config.watch(function (uri, key, _value, _oldValue)
     if key == 'Lua.completion.requireSeparator'
     or key == 'Lua.runtime.path'
     or key == 'Lua.runtime.pathStrict' then

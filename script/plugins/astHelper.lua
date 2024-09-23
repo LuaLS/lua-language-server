@@ -1,5 +1,4 @@
 local luadoc = require 'parser.luadoc'
-local ssub = require 'core.substring'
 local guide = require 'parser.guide'
 local _M = {}
 

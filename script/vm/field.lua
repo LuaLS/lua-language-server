@@ -11,7 +11,7 @@ local searchByNodeSwitch = util.switch()
             pushResult(set)
         end
     end)
-    : default(function (suri, source, pushResult)
+    : default(function (_suri, source, pushResult)
         pushResult(source)
     end)
 

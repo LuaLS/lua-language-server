@@ -14,7 +14,7 @@ local function refresh()
     proto.request('workspace/semanticTokens/refresh', json.null)
 end
 
-config.watch(function (uri, key, value, oldValue)
+config.watch(function (_uri, key, _value, _oldValue)
     if key == '' then
         refresh()
     end

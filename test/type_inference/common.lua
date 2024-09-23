@@ -4453,3 +4453,53 @@ function A:func(x) end
 local a = {}
 function a:func(<?x?>) end
 ]]
+
+TEST 'A' [[
+---@class A
+---@field type 'a'
+---@field field1 integer
+
+---@class B
+---@field type 'b'
+
+local obj --- @type A|B
+
+if obj.type == 'a' and obj.field1 > 0 then
+    local <?r?> = obj
+end
+]]
+
+TEST 'B' [[
+---@class A
+---@field type 'a'
+
+---@class B
+---@field type 'b'
+
+local obj --- @type A|B
+
+if obj.type == 'a' then
+    ---
+else
+    local <?r?> = obj
+end
+]]
+
+TEST 'A' [[
+---@class A
+---@field type 'a'
+
+---@class B
+---@field type 'b'
+
+---@class C
+---@field type 'c'
+
+---@alias AB A|B
+
+local obj --- @type C|AB
+
+if obj.type == 'a' then
+    local <?r?> = obj
+end
+]]

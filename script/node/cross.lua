@@ -161,23 +161,37 @@ M.__getter.value = function (self)
         return values[1], true
     end
 
-    return self, true
+    local table = ls.node.table()
+    ---@type Node.Union[]
+    local unionParts = {}
+    for _, value in ipairs(values) do
+        if value.kind == 'union' then
+            ---@cast value Node.Union
+            unionParts[#unionParts+1] = value
+        elseif value.kind == 'table' then
+        end
+    end
+
+    return table, true
 end
 
 function M:view(skipLevel)
-    if self.value == self then
-        local elements = {}
-        for _, v in ipairs(self.rawNodes) do
-            local view = v:view(skipLevel)
-            if v.kind == 'union' then
-                view = '(' .. view .. ')'
-            end
-            elements[#elements+1] = view
-        end
-        return table.concat(elements, ' & ')
-    else
-        return self.value:view(skipLevel)
+    local values = self.values
+    if #values == 0 then
+        return 'never'
     end
+    if #values == 1 then
+        return values[1]:view(skipLevel)
+    end
+    local elements = {}
+    for _, v in ipairs(self.rawNodes) do
+        local view = v:view(skipLevel)
+        if v.kind == 'union' then
+            view = '(' .. view .. ')'
+        end
+        elements[#elements+1] = view
+    end
+    return table.concat(elements, ' & ')
 end
 
 ---@param a Node

@@ -123,3 +123,24 @@ do
     assert(t.A.sortedFields[6].key == ls.node.value "A21")
     assert(t.A.sortedFields[7].key == ls.node.value "A22")
 end
+
+do
+    local a = ls.node.table()
+        : addField {
+            key   = ls.node.value 'x',
+            value = ls.node.value 'x'
+        }
+
+    local b = ls.node.table()
+        : addField {
+            key   = ls.node.value 'y',
+            value = ls.node.value 'y'
+        }
+
+    local u = a & b
+
+    assert(u:view() == '{ x: "x" } & { y: "y" }')
+    assert(u.kind == 'cross')
+    ---@cast u Node.Cross
+    assert(u.value:view() == '{ x: "x", y: "y" }')
+end

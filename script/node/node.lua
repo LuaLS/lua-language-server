@@ -69,7 +69,11 @@ end
 ---@param key string|number|boolean|Node
 ---@return Node
 function M:get(key)
-    return ls.node.NEVER
+    local value = self.value
+    if value == self then
+        return ls.node.NEVER
+    end
+    return value:get(key)
 end
 
 ---@alias Node.CastResult 'yes' | 'no' | 'unknown'

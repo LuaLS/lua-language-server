@@ -143,6 +143,8 @@ do
     assert(u.kind == 'cross')
     ---@cast u Node.Cross
     assert(u.value:view() == '{ x: "x", y: "y" }')
+    assert(u:get('x'):view() == '"x"')
+    assert(u:get('y'):view() == '"y"')
 end
 
 do
@@ -168,6 +170,8 @@ do
     assert(u.kind == 'cross')
     ---@cast u Node.Cross
     assert(u.value:view() == '{ x: never, y: "y" }')
+    assert(u:get('x'):view() == 'never')
+    assert(u:get('y'):view() == '"y"')
 end
 
 do
@@ -195,4 +199,7 @@ do
     assert(u.kind == 'cross')
     ---@cast u Node.Cross
     assert(u.value:view() == '({ x: "x" } & { y: "y" }) | ({ x: "x" } & { z: "z" })')
+    assert(u:get('x'):view() == '"x"')
+    assert(u:get('y'):view() == '"y" | nil')
+    assert(u:get('z'):view() == '"z" | nil')
 end

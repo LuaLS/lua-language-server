@@ -7,6 +7,7 @@
 * `FIX` Eliminate floating point error in test benchmark output
 * `FIX` Remove luamake install from make scripts
 * `NEW` Types with literal fields can be narrowed.
+* `NEW` Reference addons installed via the addon manager with `${addons}` [#2866](https://github.com/LuaLS/lua-language-server/pull/2866).
 
 ## 3.10.6
 `2024-9-10`

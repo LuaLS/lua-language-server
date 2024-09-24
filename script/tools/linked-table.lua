@@ -282,6 +282,17 @@ function M:reset()
     self._size = 0
 end
 
+---@param start any
+---@param revert? boolean
+---@return any[]
+function M:toArray(start, revert)
+    local nodes = {}
+    for node in self:pairsFast(start, revert) do
+        nodes[#nodes+1] = node
+    end
+    return nodes
+end
+
 ---@class LinkedTable.API
 local API = {}
 

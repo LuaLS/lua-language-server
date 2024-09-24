@@ -53,8 +53,14 @@ M.__getter.isBasicType = function (self)
     return false, true
 end
 
+---@return boolean
 function M:isComplex()
-    return self.table or self.extends
+    if self.table
+    or self.extends
+    or self.alias then
+        return true
+    end
+    return false
 end
 
 ---@param extends Node.Type | Node.Table
@@ -70,7 +76,7 @@ function M:addExtends(extends)
 end
 
 ---@param extends Node
----@return Node.Type
+---@return self
 function M:removeExtends(extends)
     if not self.extends then
         return self
@@ -78,6 +84,33 @@ function M:removeExtends(extends)
     self.extends:pop(extends)
     if self.extends:getSize() == 0 then
         self.extends = nil
+    end
+
+    self:flushCache()
+
+    return self
+end
+
+---@param alias Node
+---@return Node.Type
+function M:addAlias(alias)
+    if not self.alias then
+        self.alias = ls.linkedTable.create()
+    end
+    self.alias:pushTail(alias)
+
+    self:flushCache()
+
+    return self
+end
+
+function M:removeAlias(alias)
+    if not self.alias then
+        return self
+    end
+    self.alias:pop(alias)
+    if self.alias:getSize() == 0 then
+        self.alias = nil
     end
 
     self:flushCache()
@@ -165,12 +198,21 @@ M.__getter.value = function (self)
     if not self:isComplex() then
         return self, true
     end
-    if self.table and self.extendsTable then
-        local value = ls.node.table()
-        value:extends { self.table, self.extendsTable }
-        return value, true
+    if self.table or self.extends then
+        if self.table and self.extends then
+            local value = ls.node.table()
+            value:extends { self.table, self.extendsTable }
+            return value, true
+        end
+        return self.table or self.extendsTable, true
     end
-    return self.table or self.extendsTable, true
+    if self.alias:getSize() == 1 then
+        local head = self.alias:getHead()
+        return head.value, true
+    end
+    local alias = self.alias:toArray()
+    local union = ls.node.union(alias)
+    return union.value, true
 end
 
 function M:view()

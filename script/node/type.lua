@@ -44,11 +44,11 @@ M.isBasicType = nil
 ---@return boolean
 ---@return true
 M.__getter.isBasicType = function (self)
-    if self:isComplex() then
-        return false, true
-    end
     if self._basicType then
         return true, true
+    end
+    if self:isComplex() then
+        return false, true
     end
     return false, true
 end
@@ -58,6 +58,24 @@ function M:isComplex()
     if self.table
     or self.extends
     or self.alias then
+        return true
+    end
+    return false
+end
+
+---@return boolean
+function M:isClassLike()
+    if self.table
+    or self.extends then
+        return true
+    end
+    return false
+end
+
+function M:isAliasLike()
+    if  self.alias
+    and not self.table
+    and not self.extends then
         return true
     end
     return false
@@ -122,6 +140,7 @@ function M:flushCache()
     self.value = nil
     self.fullExtends = nil
     self.extendsTable  = nil
+    self.isBasicType = nil
 end
 
 ---@type Node[]
@@ -198,7 +217,7 @@ M.__getter.value = function (self)
     if not self:isComplex() then
         return self, true
     end
-    if self.table or self.extends then
+    if self:isClassLike() then
         if self.table and self.extends then
             local value = ls.node.table()
             value:extends { self.table, self.extendsTable }
@@ -206,13 +225,16 @@ M.__getter.value = function (self)
         end
         return self.table or self.extendsTable, true
     end
-    if self.alias:getSize() == 1 then
-        local head = self.alias:getHead()
-        return head.value, true
+    if self:isAliasLike() then
+        if self.alias:getSize() == 1 then
+            local head = self.alias:getHead()
+            return head.value, true
+        end
+        local alias = self.alias:toArray()
+        local union = ls.node.union(alias)
+        return union.value, true
     end
-    local alias = self.alias:toArray()
-    local union = ls.node.union(alias)
-    return union.value, true
+    return self, true
 end
 
 function M:view()
@@ -250,10 +272,20 @@ function M:onCanBeCast(other)
             return res
         end
     end
-    if self.table or self.extends then
+    if self.isBasicType then
         return nil
     end
-    if self.alias then
+    if self:isClassLike() then
+        if other.kind ~= 'type' then
+            return false
+        end
+        ---@cast other Node.Type
+        if other:isAliasLike() then
+            return false
+        end
+        return nil
+    end
+    if self:isAliasLike() then
         return other:canCast(self.value)
     end
 end
@@ -269,6 +301,9 @@ function M:onCanCast(other)
         if res then
             return res
         end
+    end
+    if self:isAliasLike() then
+        return self.value:canCast(other.value)
     end
     if other.kind == 'type' then
         ---@cast other Node.Type
@@ -290,7 +325,7 @@ function M:onCanCast(other)
             end
         end
     end
-    if self.value ~= self then
+    if self:isClassLike() then
         return self.value:canCast(other.value)
     end
     return false

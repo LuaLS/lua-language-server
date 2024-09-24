@@ -16,7 +16,7 @@ function M:__init()
 end
 
 ---@param field Node.Field
----@return self
+---@return Node.Table
 function M:addField(field)
     self:flushCache()
     self.fields:pushTail(field)
@@ -24,7 +24,7 @@ function M:addField(field)
 end
 
 ---@param field Node.Field
----@return self
+---@return Node.Table
 function M:removeField(field)
     self:flushCache()
     self.fields:pop(field)

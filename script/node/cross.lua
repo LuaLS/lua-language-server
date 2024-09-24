@@ -226,6 +226,14 @@ M.__getter.value = function (self)
     return ls.node.union(results), true
 end
 
+function M:onCanBeCast(other)
+    return other.value:canCast(self.value)
+end
+
+function M:onCanCast(other)
+    return self.value:canCast(other.value)
+end
+
 function M:view(skipLevel)
     local values = self.values
     if #values == 0 then

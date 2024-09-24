@@ -22,6 +22,7 @@ function M:onCanBeCast(other)
     if other.typeName == 'any' then
         return true
     end
+    other = other.value
     if other.kind == 'union' then
         return nil
     end

@@ -930,7 +930,7 @@ function m.resolvePathPlaceholders(path)
                     return "~/.config/Code/" .. dataPath
                 end
             elseif platform.os == "macos" then
-                return "~/Library/Application/Support/Code/" .. dataPath
+                return "~/Library/Application Support/Code/" .. dataPath
             end
         elseif key:sub(1, 4) == "env:" then
             local env = os.getenv(key:sub(5))

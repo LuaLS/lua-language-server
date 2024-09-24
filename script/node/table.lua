@@ -55,7 +55,7 @@ M.__getter.literals = function (self)
         local key = field.key
         if key.kind == 'value' then
             ---@cast key Node.Value
-            local k = key.value
+            local k = key.literal
             literals[k] = literals[k] | field.value
         end
         if key.kind == 'union' then
@@ -63,7 +63,7 @@ M.__getter.literals = function (self)
             for _, v in ipairs(key.values) do
                 if v.kind == 'value' then
                     ---@cast v Node.Value
-                    local k = v.value
+                    local k = v.literal
                     literals[k] = literals[k] | field.value
                 end
             end
@@ -201,7 +201,7 @@ function M:get(key)
     end
     if key.kind == 'value' then
         ---@cast key Node.Value
-        return self.literals[key.value]
+        return self.literals[key.literal]
             or self:get(key.nodeType)
             or ls.node.NIL
     end
@@ -237,8 +237,7 @@ function M:onCanCast(other)
     if self == other then
         return true
     end
-    if  other.kind ~= 'table'
-    and other.kind ~= 'type' then
+    if  other.kind ~= 'table' then
         return false
     end
     ---@cast other Node.Table | Node.Type

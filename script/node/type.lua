@@ -250,6 +250,12 @@ function M:onCanBeCast(other)
             return res
         end
     end
+    if self.table or self.extends then
+        return nil
+    end
+    if self.alias then
+        return other:canCast(self.value)
+    end
 end
 
 ---@param other Node
@@ -284,15 +290,8 @@ function M:onCanCast(other)
             end
         end
     end
-    if other.kind == 'table' then
-        ---@cast other Node.Table | Node.Type
-        for _, field in ipairs(other.sortedFields) do
-            local v = self:get(field.key) or ls.node.NIL
-            if not v:canCast(field.value) then
-                return false
-            end
-        end
-        return true
+    if self.value ~= self then
+        return self.value:canCast(other.value)
     end
     return false
 end

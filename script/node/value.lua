@@ -14,7 +14,7 @@ function M:__init(v, quo)
         error('Invalid value type: ' .. tp)
     end
     ---@cast tp 'string' | 'number' | 'boolean'
-    self.value = v
+    self.literal = v
     ---@type 'string' | 'number' | 'integer' | 'boolean'
     self.typeName = tp
     if tp == 'number' and math.type(v) == 'integer' then
@@ -25,15 +25,15 @@ end
 
 function M:view(skipLevel)
     if self.typeName == 'string' then
-        return ls.util.viewString(self.value, self.quo)
+        return ls.util.viewString(self.literal, self.quo)
     else
-        return ls.util.viewLiteral(self.value)
+        return ls.util.viewLiteral(self.literal)
     end
 end
 
 function M:viewAsKey(skipLevel)
     if self.typeName == 'string' then
-        return self.value
+        return self.literal
     else
         return '[' .. self:view(skipLevel) .. ']'
     end
@@ -42,7 +42,7 @@ end
 function M:onCanCast(other)
     if other.kind == 'value' then
         ---@cast other Node.Value
-        return self.value == other.value
+        return self.literal == other.literal
     end
     if other.kind == 'type' then
         ---@cast other Node.Type

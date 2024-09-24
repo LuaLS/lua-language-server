@@ -85,6 +85,9 @@ function M:view(skipLevel)
         if not thisView then
             goto continue
         end
+        if v.kind == 'cross' then
+            thisView = '(' .. thisView .. ')'
+        end
         view[#view+1] = thisView
         ::continue::
     end

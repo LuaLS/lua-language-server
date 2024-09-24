@@ -194,5 +194,5 @@ do
     assert(u:view() == '{ x: "x" } & ({ y: "y" } | { z: "z" })')
     assert(u.kind == 'cross')
     ---@cast u Node.Cross
-    assert(u.value:view() == '{ x: "x" } & { y: "y" } | { x: "x" } & { z: "z" }')
+    assert(u.value:view() == '({ x: "x" } & { y: "y" }) | ({ x: "x" } & { z: "z" })')
 end

@@ -144,3 +144,55 @@ do
     ---@cast u Node.Cross
     assert(u.value:view() == '{ x: "x", y: "y" }')
 end
+
+do
+    local a = ls.node.table()
+        : addField {
+            key   = ls.node.value 'x',
+            value = ls.node.value 'x'
+        }
+
+    local b = ls.node.table()
+        : addField {
+            key   = ls.node.value 'x',
+            value = ls.node.value 'y'
+        }
+        : addField {
+            key   = ls.node.value 'y',
+            value = ls.node.value 'y'
+        }
+
+    local u = a & b
+
+    assert(u:view() == '{ x: "x" } & { x: "y", y: "y" }')
+    assert(u.kind == 'cross')
+    ---@cast u Node.Cross
+    assert(u.value:view() == '{ x: never, y: "y" }')
+end
+
+do
+    local a = ls.node.table()
+        : addField {
+            key   = ls.node.value 'x',
+            value = ls.node.value 'x'
+        }
+
+    local b = ls.node.table()
+        : addField {
+            key   = ls.node.value 'y',
+            value = ls.node.value 'y'
+        }
+
+    local c = ls.node.table()
+        : addField {
+            key   = ls.node.value 'z',
+            value = ls.node.value 'z'
+        }
+
+    local u = a & (b | c)
+
+    assert(u:view() == '{ x: "x" } & ({ y: "y" } | { z: "z" })')
+    assert(u.kind == 'cross')
+    ---@cast u Node.Cross
+    assert(u.value:view() == '{ x: "x" } & { y: "y" } | { x: "x" } & { z: "z" }')
+end

@@ -152,6 +152,7 @@ M.value = nil
 ---@return Node
 ---@return true
 M.__getter.value = function (self)
+    self.value = ls.node.NEVER
     local values = self.values
 
     if #values == 0 then
@@ -161,18 +162,68 @@ M.__getter.value = function (self)
         return values[1], true
     end
 
-    local table = ls.node.table()
+    local mergedLiterals = {}
+    local mergedTypes = {}
     ---@type Node.Union[]
     local unionParts = {}
     for _, value in ipairs(values) do
         if value.kind == 'union' then
             ---@cast value Node.Union
             unionParts[#unionParts+1] = value
-        elseif value.kind == 'table' then
+            goto continue
         end
+        if value.kind == 'table' then
+            ---@cast value Node.Table
+            for k, v in pairs(value.literals) do
+                if mergedLiterals[k] == nil then
+                    mergedLiterals[k] = v
+                else
+                    mergedLiterals[k] = mergedLiterals[k] & v
+                end
+            end
+            for k, v in pairs(value.types) do
+                if mergedTypes[k] == nil then
+                    mergedTypes[k] = v
+                else
+                    mergedTypes[k] = mergedTypes[k] & v
+                end
+            end
+        end
+        ::continue::
     end
 
-    return table, true
+    local table = ls.node.table()
+    for k, v in pairs(mergedLiterals) do
+        table:addField {
+            key   = ls.node.value(k),
+            value = v,
+        }
+    end
+    for k, v in pairs(mergedTypes) do
+        table:addField {
+            key   = ls.node.type(k),
+            value = v,
+        }
+    end
+
+    if #unionParts == 0 then
+        return table, true
+    end
+
+    local unionValue = ls.node.union(unionParts).value
+
+    if unionValue.kind ~= 'union' then
+        local result = table & unionValue
+        return result.value, true
+    end
+
+    local results = {}
+    ---@cast unionValue Node.Union
+    for i, n in ipairs(unionValue.values) do
+        results[i] = table & n
+    end
+
+    return ls.node.union(results), true
 end
 
 function M:view(skipLevel)

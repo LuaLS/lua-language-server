@@ -114,6 +114,16 @@ function M:canCast(other)
     return false
 end
 
+---@type Node
+M.value = nil
+
+---@param self Node
+---@return Node
+---@return true
+M.__getter.value = function (self)
+    return self, true
+end
+
 ---@generic T: Node
 ---@param nodeType `T`
 ---@return T

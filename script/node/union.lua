@@ -113,6 +113,7 @@ M.value = nil
 ---@return Node
 ---@return true
 M.__getter.value = function (self)
+    self.value = ls.node.NEVER
     if #self.values == 0 then
         return ls.node.NIL, true
     end

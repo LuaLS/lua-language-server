@@ -13,7 +13,7 @@ function M:__init(name)
 end
 
 ---@param field Node.Field
----@return self
+---@return Node.Type
 function M:addField(field)
     if not self.table then
         self.table = ls.node.table()
@@ -24,7 +24,7 @@ function M:addField(field)
 end
 
 ---@param field Node.Field
----@return self
+---@return Node.Type
 function M:removeField(field)
     if not self.table then
         return self
@@ -58,7 +58,7 @@ function M:isComplex()
 end
 
 ---@param extends Node.Type | Node.Table
----@return self
+---@return Node.Type
 function M:addExtends(extends)
     if not self.extends then
         self.extends = ls.linkedTable.create()
@@ -70,7 +70,7 @@ function M:addExtends(extends)
 end
 
 ---@param extends Node
----@return self
+---@return Node.Type
 function M:removeExtends(extends)
     if not self.extends then
         return self

@@ -908,18 +908,43 @@ function m.countStates()
     return n
 end
 
+---Resolve path variables/placeholders like ${3rd} and ${addons}
 ---@param path string
----@return string
-function m.normalize(path)
-    path = path:gsub('%$%{(.-)%}', function (key)
-        if key == '3rd' then
-            return (ROOT / 'meta' / '3rd'):string()
-        end
-        if key:sub(1, 4) == 'env:' then
+---@return string resolvedPath
+function m.resolvePathPlaceholders(path)
+    path = path:gsub("%$%{(.-)%}", function(key)
+        if key == "3rd" then
+            return (ROOT / "meta" / "3rd"):string()
+        elseif key == "addons" then
+            -- Common path across OSes
+            local dataPath = "User/globalStorage/sumneko.lua/addonManager/addons"
+
+            if platform.os == "windows" then
+                return "$APPDATA/Code/" .. dataPath
+            elseif platform.os == "linux" then
+                local serverPath = util.expandPath(fs.path("~/.vscode-server/data"):string())
+                if fs.exists(serverPath) then
+                    -- addons are installed via SSH remote
+                    return serverPath .."/" .. dataPath
+                else
+                    return "~/.config/Code/" .. dataPath
+                end
+            elseif platform.os == "macos" then
+                return "~/Library/Application/Support/Code/" .. dataPath
+            end
+        elseif key:sub(1, 4) == "env:" then
             local env = os.getenv(key:sub(5))
             return env
         end
     end)
+
+    return path
+end
+
+---@param path string
+---@return string
+function m.normalize(path)
+    path = m.resolvePathPlaceholders(path)
     path = util.expandPath(path)
     path = path:gsub('^%.[/\\]+', '')
     for _ = 1, 1000 do

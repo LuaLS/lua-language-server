@@ -115,13 +115,16 @@ do
     assert(t.A:get('A33'):view() == 'nil')
 
     assert(t.A:get(ls.node.ANY):view() == [["A" | "A1" | "A11" | "A12" | "A2" | "A21" | "A22"]])
-    assert(t.A.sortedFields[1].key == ls.node.value "A")
-    assert(t.A.sortedFields[2].key == ls.node.value "A1")
-    assert(t.A.sortedFields[3].key == ls.node.value "A11")
-    assert(t.A.sortedFields[4].key == ls.node.value "A12")
-    assert(t.A.sortedFields[5].key == ls.node.value "A2")
-    assert(t.A.sortedFields[6].key == ls.node.value "A21")
-    assert(t.A.sortedFields[7].key == ls.node.value "A22")
+    local value = t.A.value
+    assert(value.kind == 'table')
+    ---@cast value Node.Table
+    assert(value.sortedFields[1].key == ls.node.value "A")
+    assert(value.sortedFields[2].key == ls.node.value "A1")
+    assert(value.sortedFields[3].key == ls.node.value "A11")
+    assert(value.sortedFields[4].key == ls.node.value "A12")
+    assert(value.sortedFields[5].key == ls.node.value "A2")
+    assert(value.sortedFields[6].key == ls.node.value "A21")
+    assert(value.sortedFields[7].key == ls.node.value "A22")
 end
 
 do

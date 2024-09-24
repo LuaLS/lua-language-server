@@ -19,7 +19,7 @@ function M:addField(field)
         self.table = ls.node.table()
     end
     self.table:addField(field)
-    self:refreshFieldCache()
+    self.value = nil
     return self
 end
 
@@ -30,132 +30,11 @@ function M:removeField(field)
         return self
     end
     self.table:removeField(field)
-    self:refreshFieldCache()
+    if self.table:isEmpty() then
+        self.table = nil
+    end
+    self.value = nil
     return self
-end
-
----@package
-function M:refreshFieldCache()
-    self.sortedFields  = nil
-    self.tableKeys     = nil
-    self.tableValues   = nil
-    self.tableLiterals = nil
-    self.tableTypes    = nil
-end
-
----获取所有的键。
----@type Node[]
-M.tableKeys = nil
-
----@param self Node.Table
----@return Node[]
----@return true
-M.__getter.tableKeys = function (self)
-    local keys = {}
-
-    for _, field in ipairs(self.sortedFields) do
-        keys[#keys+1] = field.key
-    end
-
-    return keys, true
-end
-
----获取所有的值。按key的顺序排序。
----@type Node[]
-M.tableValues = nil
-
----@param self Node.Type
----@return Node[]
----@return true
-M.__getter.tableValues = function (self)
-    local values = {}
-
-    for _, field in ipairs(self.sortedFields) do
-        values[#values+1] = field.value
-    end
-
-    return values, true
-end
-
----@type table<string|number|boolean, Node>
-M.tableLiterals = nil
-
----@param self Node.Type
----@return table<string|number|boolean, Node>
----@return true
-M.__getter.tableLiterals = function (self)
-    local literals = {}
-
-    for _, t in ipairs(self.fullTables) do
-        for k, v in pairs(t.literals) do
-            if literals[k] == nil then
-                literals[k] = v
-            end
-        end
-    end
-
-    return literals, true
-end
-
----@type table<string, Node>
-M.tableTypes = nil
-
----@param self Node.Type
----@return table<string, Node>
----@return true
-M.__getter.tableTypes = function (self)
-    local types = {}
-
-    for _, t in ipairs(self.fullTables) do
-        for k, v in pairs(t.types) do
-            if types[k] == nil then
-                types[k] = v
-            end
-        end
-    end
-
-    return types, true
-end
-
----@type Node.Field[]
-M.sortedFields = nil
-
----@param self Node.Type
----@return { key: Node, value: Node }[]
----@return true
-M.__getter.sortedFields = function (self)
-    ---@type { key: Node, value: Node }[]
-    local values = {}
-
-    local typeOrder = {
-        ['number']  = 1,
-        ['string']  = 2,
-        ['boolean'] = 3,
-    }
-
-    for k, v in ls.util.sortPairs(self.tableLiterals, function (a, b)
-        local ta = type(a)
-        local tb = type(b)
-        local sa = typeOrder[ta] or 0
-        local sb = typeOrder[tb] or 0
-        if sa == sb then
-            if ta == 'number' or ta == 'string' then
-                return a < b
-            else
-                return a == true
-            end
-        else
-            return sa < sb
-        end
-    end) do
-        values[#values+1] = { key = ls.node.value(k), value = v }
-    end
-
-    for k, v in ls.util.sortPairs(self.tableTypes) do
-        values[#values+1] = { key = ls.node.type(k), value = v }
-    end
-
-    return values, true
 end
 
 ---@type boolean
@@ -174,48 +53,8 @@ M.__getter.isBasicType = function (self)
     return false, true
 end
 
----@type Node?
-M.value = nil
-
 function M:isComplex()
-    return self.extends or self.table
-end
-
----@param key string|number|boolean|Node
----@param dontLookup? boolean
----@return Node
-function M:get(key, dontLookup)
-    if not self:isComplex() then
-        return ls.node.NEVER
-    end
-    if key == ls.node.ANY then
-        local res = ls.node.union(self.tableValues).value
-        if res == ls.node.NIL then
-            return ls.node.ANY
-        else
-            return res
-        end
-    end
-    if key == ls.node.UNKNOWN then
-        return ls.node.union(self.tableValues).value
-    end
-    if key == ls.node.NIL then
-        return ls.node.NIL
-    end
-    local res = self.table:get(key)
-    if res ~= ls.node.NIL then
-        return res
-    end
-    if dontLookup then
-        return ls.node.NIL
-    end
-    for _, v in ipairs(self.fullTables) do
-        res = v:get(key)
-        if res ~= ls.node.NIL then
-            return res
-        end
-    end
-    return ls.node.NIL
+    return self.table or self.extends
 end
 
 ---@param extends Node.Type | Node.Table
@@ -226,9 +65,7 @@ function M:addExtends(extends)
     end
     self.extends:pushTail(extends)
 
-    self.fullExtends = nil
-    self.fullTables  = nil
-    self:refreshFieldCache()
+    self:flushCache()
     return self
 end
 
@@ -239,11 +76,19 @@ function M:removeExtends(extends)
         return self
     end
     self.extends:pop(extends)
+    if self.extends:getSize() == 0 then
+        self.extends = nil
+    end
 
-    self.fullExtends = nil
-    self.fullTables  = nil
-    self:refreshFieldCache()
+    self:flushCache()
+
     return self
+end
+
+function M:flushCache()
+    self.value = nil
+    self.fullExtends = nil
+    self.extendsTable  = nil
 end
 
 ---@type Node[]
@@ -295,27 +140,37 @@ M.__getter.fullExtends = function (self)
 end
 
 ---@type Node.Table[]
-M.fullTables = nil
+M.extendsTable = nil
 
----获取所有继承的表（广度优先）
+---获取所有继承的合并表
 ---@param self Node.Type
----@return Node.Table[]
+---@return Node.Table
 ---@return true
-M.__getter.fullTables = function (self)
-    ---@type Node.Table[]
-    local tables = { self.table }
+M.__getter.extendsTable = function (self)
+    local table = ls.node.table()
 
-    for _, v in ipairs(self.fullExtends) do
-        if v.kind == 'table' then
-            ---@cast v Node.Table
-            tables[#tables+1] = v
-        elseif v.kind == 'type' then
-            ---@cast v Node.Type
-            tables[#tables+1] = v.table
-        end
+    table:extends(self.fullExtends)
+
+    return table, true
+end
+
+---@type Node
+M.value = nil
+
+---@param self Node.Type
+---@return Node
+---@return true
+M.__getter.value = function (self)
+    self.value = ls.node.NEVER
+    if not self:isComplex() then
+        return self, true
     end
-
-    return tables, true
+    if self.table and self.extendsTable then
+        local value = ls.node.table()
+        value:extends { self.table, self.extendsTable }
+        return value, true
+    end
+    return self.table or self.extendsTable, true
 end
 
 function M:view()

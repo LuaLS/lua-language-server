@@ -18,25 +18,27 @@ end
 ---@param field Node.Field
 ---@return self
 function M:addField(field)
-    self.sortedFields = nil
-    self.literals = nil
-    self.types = nil
-
+    self:flushCache()
     self.fields:pushTail(field)
-
     return self
 end
 
 ---@param field Node.Field
 ---@return self
 function M:removeField(field)
+    self:flushCache()
+    self.fields:pop(field)
+    return self
+end
+
+function M:flushCache()
     self.sortedFields = nil
     self.literals = nil
     self.types = nil
+end
 
-    self.fields:pop(field)
-
-    return self
+function M:isEmpty()
+    return self.fields:getSize() == 0
 end
 
 ---@type table<string|number|boolean, Node>
@@ -265,6 +267,42 @@ function M:view(skipLevel)
     end
 
     return '{ ' .. table.concat(fields, ', ') .. ' }'
+end
+
+---@param others Node[]
+function M:extends(others)
+    local literals = self.literals
+    local types = self.types
+
+    for _, other in ipairs(others) do
+        local value = other.value
+        if value.kind == 'table' then
+            ---@cast value Node.Table
+            for k, v in pairs(value.literals) do
+                if literals[k] == nil then
+                    literals[k] = v
+                end
+            end
+            for k, v in pairs(value.types) do
+                if types[k] == nil then
+                    types[k] = v
+                end
+            end
+        end
+    end
+
+    for k, v in pairs(literals) do
+        self:addField {
+            key   = ls.node.value(k),
+            value = v,
+        }
+    end
+    for k, v in pairs(types) do
+        self:addField {
+            key   = ls.node.type(k),
+            value = v,
+        }
+    end
 end
 
 ---@return Node.Table

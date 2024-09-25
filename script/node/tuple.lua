@@ -19,6 +19,57 @@ function M:insert(value)
     return self
 end
 
+---@type Node.Value[]
+M.keys = nil
+
+---@param self Node.Tuple
+---@return Node.Value[]
+---@return true
+M.__getter.keys = function (self)
+    local keys = {}
+    for i = 1, #self.values do
+        keys[i] = ls.node.value(i)
+    end
+    return keys, true
+end
+
+function M:get(key)
+    if key == ls.node.NEVER then
+        return ls.node.NEVER
+    end
+    if key == ls.node.ANY
+    or key == ls.node.UNKNOWN
+    or key == ls.node.TRULY then
+        return ls.node.union(self.values):getValue(ls.node.NIL)
+    end
+    if key == ls.node.NIL then
+        return ls.node.NIL
+    end
+    if type(key) ~= 'table' then
+        return self.values[key]
+            or ls.node.NIL
+    end
+    if key.kind == 'value' then
+        return self.values[key.literal]
+            or ls.node.NIL
+    end
+    if key.typeName == 'number'
+    or key.typeName == 'integer' then
+        return ls.node.union(self.values):getValue(ls.node.NIL)
+    end
+    if key.kind == 'union' then
+        ---@cast key Node.Union
+        ---@type Node
+        local result
+        for _, v in ipairs(key.values) do
+            local r = self:get(v)
+            result = result | r
+        end
+        return result
+    end
+    return ls.node.NIL
+end
+
 function M:view(skipLevel)
     local buf = {}
     for _, v in ipairs(self.values) do

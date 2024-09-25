@@ -131,6 +131,15 @@ M.__getter.value = function (self)
     return self, true
 end
 
+---@param default Node
+---@return Node
+function M:getValue(default)
+    if #self.values == 0 then
+        return default
+    end
+    return self.value
+end
+
 ---@param self Node.Union
 ---@return Node
 ---@return true

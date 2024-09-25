@@ -179,16 +179,12 @@ end
 ---@param key string|number|boolean|Node
 ---@return Node
 function M:get(key)
-    if key == ls.node.ANY then
-        local res = ls.node.union(self.values).value
-        if res == ls.node.NIL then
-            return ls.node.ANY
-        else
-            return res
-        end
+    if key == ls.node.NEVER then
+        return ls.node.NEVER
     end
-    if key == ls.node.UNKNOWN then
-        return ls.node.union(self.values).value
+    if key == ls.node.ANY
+    or key == ls.node.UNKNOWN then
+        return ls.node.union(self.values):getValue(ls.node.NIL)
     end
     if key == ls.node.NIL then
         return ls.node.NIL

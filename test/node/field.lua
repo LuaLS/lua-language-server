@@ -206,3 +206,58 @@ do
     assert(u:get('y'):view() == '"y" | nil')
     assert(u:get('z'):view() == '"z" | nil')
 end
+
+do
+    local t = ls.node.table()
+
+    assert(t:get(ls.node.ANY):view() == 'nil')
+    assert(t:get(ls.node.UNKNOWN):view() == 'nil')
+end
+
+do
+    local t = ls.node.tuple()
+
+    assert(t:get(ls.node.ANY):view() == 'nil')
+    assert(t:get(ls.node.UNKNOWN):view() == 'nil')
+end
+
+do
+    local t = ls.node.tuple()
+        : insert(ls.node.value 'x')
+        : insert(ls.node.value 'y')
+        : insert(ls.node.value 'z')
+
+    assert(t:get(ls.node.ANY):view() == '"x" | "y" | "z"')
+    assert(t:get(ls.node.UNKNOWN):view() == '"x" | "y" | "z"')
+
+    assert(t:get(1):view() == '"x"')
+    assert(t:get(2):view() == '"y"')
+    assert(t:get(3):view() == '"z"')
+    assert(t:get(4):view() == 'nil')
+
+    assert(t:get(ls.node.value(1)):view() == '"x"')
+
+    assert(t:get(ls.node.type 'number'):view() == '"x" | "y" | "z"')
+    assert(t:get(ls.node.type 'integer'):view() == '"x" | "y" | "z"')
+    assert(t:get(ls.node.type 'boolean'):view() == 'nil')
+
+    assert(t:get(ls.node.value(1) | ls.node.value(2) | ls.node.value(9)):view() == '"x" | "y" | nil')
+end
+
+do
+    local t = ls.node.array(ls.node.value(true))
+
+    assert(t:get(ls.node.ANY):view() == 'true')
+    assert(t:get(ls.node.UNKNOWN):view() == 'true')
+
+    assert(t:get(0):view() == 'nil')
+    assert(t:get(1):view() == 'true')
+    assert(t:get(ls.node.value(1)):view() == 'true')
+
+    assert(t:get(ls.node.type 'number'):view() == 'true')
+    assert(t:get(ls.node.type 'integer'):view() == 'true')
+    assert(t:get(ls.node.type 'boolean'):view() == 'nil')
+
+    assert(t:get(ls.node.value(1) | ls.node.value(2)):view() == 'true')
+    assert(t:get(ls.node.value(0) | ls.node.value(1)):view() == 'true | nil')
+end

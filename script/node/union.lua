@@ -162,8 +162,39 @@ M.__getter.falsy = function (self)
     return ls.node.union(result).value, true
 end
 
+function M:narrow(other)
+    return ls.node.makeUnion(self.values, function (v)
+        return v:canCast(other)
+    end)
+end
+
+function M:narrowByField(key, value)
+    return ls.node.makeUnion(self.values, function (v)
+        return v:get(key):canCast(value)
+    end)
+end
+
 ---@param nodes? Node[]
 ---@return Node.Union
 function ls.node.union(nodes)
     return New 'Node.Union' (nodes)
+end
+
+---@param values Node[]
+---@param callback fun(node: Node): boolean
+---@return Node
+function ls.node.makeUnion(values, callback)
+    local result = {}
+    for _, v in ipairs(values) do
+        if callback(v) then
+            result[#result+1] = v
+        end
+    end
+    if #result == 0 then
+        return ls.node.NEVER
+    end
+    if #result == 1 then
+        return result[1]
+    end
+    return ls.node.union(result)
 end

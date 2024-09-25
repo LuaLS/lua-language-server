@@ -145,6 +145,26 @@ end
 ---@type boolean | number | string | nil
 M.literal = nil
 
+---@param other Node
+---@return Node
+function M:narrow(other)
+    if self:canCast(other) then
+        return self
+    end
+    return ls.node.NEVER
+end
+
+---@param key string | number | boolean | Node
+---@param value Node
+---@return Node
+function M:narrowByField(key, value)
+    local myValue = self:get(key)
+    if myValue:canCast(value) then
+        return self
+    end
+    return ls.node.NEVER
+end
+
 ---@generic T: Node
 ---@param nodeType `T`
 ---@return T

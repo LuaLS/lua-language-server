@@ -29,7 +29,7 @@ function m.dispatch(event, uri, ...)
     end
     local failed = 0
     local res1, res2
-    for i, interface in ipairs(interfaces) do
+    for _, interface in ipairs(interfaces) do
         local method = interface[event]
         if type(method) ~= 'function' then
             return false
@@ -110,7 +110,7 @@ local function initPlugin(uri)
         if type(pluginConfigPaths) == 'string' then
             pluginConfigPaths = { pluginConfigPaths }
         end
-        for i, pluginConfigPath in ipairs(pluginConfigPaths) do
+        for _, pluginConfigPath in ipairs(pluginConfigPaths) do
             local myArgs = args
             if args and not args[1] then
                 for k, v in pairs(args) do

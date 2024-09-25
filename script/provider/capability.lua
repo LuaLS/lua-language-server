@@ -1,8 +1,6 @@
 local nonil      = require 'without-check-nil'
 local client     = require 'client'
-local platform   = require 'bee.platform'
 local completion = require 'provider.completion'
-local define     = require 'proto.define'
 
 require 'provider.semantic-tokens'
 require 'provider.formatting'

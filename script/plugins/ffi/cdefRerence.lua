@@ -8,7 +8,7 @@ local remove    = table.remove
 local function getCdefSourcePosition(ffi_state)
     local cdef_position = ffi_state.ast.returns[1][1]
     local source = vm.getFields(cdef_position)
-    for index, value in ipairs(source) do
+    for _, value in ipairs(source) do
         local name = guide.getKeyName(value)
         if name == 'cdef' then
             return value.field.start

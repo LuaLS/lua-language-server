@@ -4,7 +4,6 @@ local await    = require 'await'
 local files    = require 'files'
 local config   = require 'config.config'
 local client   = require 'client'
-local util     = require 'utility'
 local furi     = require 'file-uri'
 local pub      = require 'pub'
 

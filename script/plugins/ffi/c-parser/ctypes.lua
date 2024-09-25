@@ -126,12 +126,12 @@ local convert_value = typed("TypeList, table -> CType?, string?", function (lst,
     }), nil
 end)
 
-local function convert_fields(lst, field_src, fields)
+local function convert_fields(field_src, fields)
     if field_src.ids then
-        for i, id in ipairs(field_src.ids) do
+        for _, id in ipairs(field_src.ids) do
             id.type = utility.deepCopy(field_src.type)
             if id.type and id[1] then
-                for i, v in ipairs(id[1]) do
+                for _, v in ipairs(id[1]) do
                     table.insert(id.type, v)
                 end
                 if id[1].idx then
@@ -159,7 +159,7 @@ local function add_to_fields(lst, field_src, fields)
         return true
     end
 
-    if convert_fields(lst, field_src, fields) then
+    if convert_fields(field_src, fields) then
         return true
     end
     local field, err = convert_value(lst, field_src)

@@ -32,7 +32,7 @@ return function (uri)
         return
     end
 
-    for i, v in ipairs(refs) do
+    for _, v in ipairs(refs) do
         local target_uri = v.uri
         local codes = searchCode(refs, target_uri)
         if not codes then

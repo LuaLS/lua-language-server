@@ -41,7 +41,7 @@ return function (uri, callback)
         await.delay()
         --table
 
-        for i, ret in ipairs(source) do
+        for _, ret in ipairs(source) do
             if ret.type == 'getlocal' then
                 if ret.node.value and ret.node.value.type == 'table' then
                     findSetField(state.ast, ret[1], callback)

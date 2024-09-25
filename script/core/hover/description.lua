@@ -19,16 +19,16 @@ local function collectRequire(mode, literal, uri)
     end
     if result and #result > 0 then
         local shows = {}
-        for i, uri in ipairs(result) do
-            local searcher = searchers and searchers[uri]
-            local path = ws.getRelativePath(uri)
-            if vm.isMetaFile(uri) then
-                shows[i] = ('* [[meta]](%s)'):format(uri)
+        for i, uri0 in ipairs(result) do
+            local searcher = searchers and searchers[uri0]
+            local path = ws.getRelativePath(uri0)
+            if vm.isMetaFile(uri0) then
+                shows[i] = ('* [[meta]](%s)'):format(uri0)
             elseif searcher then
                 searcher = searcher:gsub('^[/\\]+', '')
-                shows[i] = ('* [%s](%s) %s'):format(path, uri, lang.script('HOVER_USE_LUA_PATH', searcher))
+                shows[i] = ('* [%s](%s) %s'):format(path, uri0, lang.script('HOVER_USE_LUA_PATH', searcher))
             else
-                shows[i] = ('* [%s](%s)'):format(path, uri)
+                shows[i] = ('* [%s](%s)'):format(path, uri0)
             end
         end
         table.sort(shows)

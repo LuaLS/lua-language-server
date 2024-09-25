@@ -1,7 +1,6 @@
 local files   = require 'files'
 local guide   = require 'parser.guide'
 local lang    = require 'language'
-local config  = require 'config'
 local vm      = require 'vm'
 local rpath   = require 'workspace.require-path'
 

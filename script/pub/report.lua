@@ -1,6 +1,5 @@
 local pub   = require 'pub.pub'
 local await = require 'await'
-local util  = require 'utility'
 
 pub.on('log', function (params, brave)
     log.raw(brave.id, params.level, params.msg, params.src, params.line, params.clock)

@@ -51,7 +51,7 @@ end
 local function zip(self)
     local list = self._list
     local index = 1
-    for i = 1, #list do
+    for _ = 1, #list do
         local obj = list[index]
         if not obj then
             break

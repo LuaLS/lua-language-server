@@ -1,5 +1,3 @@
-local fs       = require 'bee.filesystem'
-local config   = require 'config'
 local util     = require 'utility'
 local await    = require 'await'
 local progress = require 'progress'

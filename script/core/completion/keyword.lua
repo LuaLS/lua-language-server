@@ -1,5 +1,4 @@
 local define     = require 'proto.define'
-local files      = require 'files'
 local guide      = require 'parser.guide'
 local config     = require 'config'
 local util       = require 'utility'

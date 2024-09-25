@@ -1,8 +1,5 @@
-local files        = require 'files'
-local lookBackward = require 'core.look-backward'
-local guide        = require 'parser.guide'
-local config       = require 'config'
-local util         = require 'utility'
+local files  = require 'files'
+local config = require 'config'
 
 local function typeFormat(results, uri, position, ch, options)
     if ch ~= '\n' then

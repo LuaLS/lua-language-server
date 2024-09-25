@@ -2,10 +2,9 @@ local files    = require 'files'
 local guide    = require 'parser.guide'
 local matchKey = require 'core.matchkey'
 local define   = require 'proto.define'
-local await    = require 'await'
 local vm       = require 'vm'
 
-local function buildSource(uri, source, key, results)
+local function buildSource(source, key, results)
     if     source.type == 'local'
     or     source.type == 'setlocal'
     or     source.type == 'setglobal' then
@@ -51,7 +50,7 @@ local function searchFile(uri, key, results)
     end
 
     guide.eachSource(ast.ast, function (source)
-        buildSource(uri, source, key, results)
+        buildSource(source, key, results)
     end)
 end
 

@@ -66,7 +66,6 @@ function m.findSymbol(text, offset)
         end
         ::CONTINUE::
     end
-    return nil
 end
 
 function m.findTargetSymbol(text, offset, symbol)
@@ -79,7 +78,6 @@ function m.findTargetSymbol(text, offset, symbol)
             return nil
         end
     end
-    return nil
 end
 
 ---@param text string

@@ -7,7 +7,7 @@ local function enable()
             originTracy = tracy
         else
             originTracy = {
-                ZoneBeginN = function (info) end,
+                ZoneBeginN = function (_info) end,
                 ZoneEnd    = function () end,
             }
         end
@@ -19,7 +19,7 @@ end
 local function disable()
 ---@diagnostic disable-next-line: lowercase-global
     tracy = {
-        ZoneBeginN = function (info) end,
+        ZoneBeginN = function (_info) end,
         ZoneEnd    = function () end,
     }
 end

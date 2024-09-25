@@ -1,5 +1,4 @@
 local fs           = require 'bee.filesystem'
-local platform     = require 'bee.platform'
 
 local type         = type
 local ioOpen       = io.open
@@ -7,7 +6,6 @@ local pcall        = pcall
 local pairs        = pairs
 local setmetatable = setmetatable
 local next         = next
-local ipairs       = ipairs
 local tostring     = tostring
 local tableSort    = table.sort
 
@@ -286,7 +284,7 @@ local function fsAbsolute(path, option)
     return res
 end
 
-local function fsIsDirectory(path, option)
+local function fsIsDirectory(path)
     if not path then
         return false
     end
@@ -455,7 +453,7 @@ local function fileRemove(path, option)
     if option.onRemove and option.onRemove(path) == false then
         return
     end
-    if fsIsDirectory(path, option) then
+    if fsIsDirectory(path) then
         for child in fsPairs(path, option) do
             fileRemove(child, option)
         end
@@ -472,8 +470,8 @@ local function fileCopy(source, target, option)
     if not source or not target then
         return
     end
-    local isDir1   = fsIsDirectory(source, option)
-    local isDir2   = fsIsDirectory(target, option)
+    local isDir1   = fsIsDirectory(source)
+    local isDir2   = fsIsDirectory(target)
     local isExists = fsExists(target, option)
     if isDir1 then
         if isDir2 or fsCreateDirectories(target, option) then
@@ -508,8 +506,8 @@ local function fileSync(source, target, option)
     if not source or not target then
         return
     end
-    local isDir1   = fsIsDirectory(source, option)
-    local isDir2   = fsIsDirectory(target, option)
+    local isDir1   = fsIsDirectory(source)
+    local isDir2   = fsIsDirectory(target)
     local isExists = fsExists(target, option)
     if isDir1 then
         if isDir2 then

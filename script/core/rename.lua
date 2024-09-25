@@ -110,8 +110,8 @@ local function renameField(source, newname, callback)
             , util.viewString(newname)
         )
         callback(source, func.start, parent.finish, newstr)
-        local finishOffset = guide.positionToOffset(state, parent.finish)
-        local pl = text:find('(', finishOffset, true)
+        local finishOffset0 = guide.positionToOffset(state, parent.finish)
+        local pl = text:find('(', finishOffset0, true)
         if pl then
             local insertPos = guide.offsetToPosition(state, pl)
             if text:find('^%s*%)', pl + 1) then

@@ -1,6 +1,3 @@
-local vm = require 'vm'
-local guide = require 'parser.guide'
-
 local _M = {}
 
 ---@class node.match.pattern
@@ -32,7 +29,7 @@ end
 function _M.matchPattern(source, pattern)
     if source.type == 'local' then
         if source.parent.type == 'funcargs' and source.parent.parent.type == 'function' then
-            for i, ref in ipairs(source.ref) do
+            for _, ref in ipairs(source.ref) do
                 if deepCompare(ref, pattern) then
                     return true
                 end

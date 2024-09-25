@@ -35,7 +35,7 @@ return function (uri, callback)
                 return
             end
         end
-        
+
         local myKeys
         local warnings = {}
         for className, samedefs in pairs(sortedDefs) do
@@ -44,7 +44,7 @@ return function (uri, callback)
                 if not def.fields or #def.fields == 0 then
                     goto continue
                 end
-                
+
                 if not myKeys then
                     myKeys = {}
                     for _, field in ipairs(src) do
@@ -82,7 +82,7 @@ return function (uri, callback)
             if #missedKeys == 0 then
                 return
             end
-            
+
             warnings[#warnings+1] = lang.script('DIAG_MISSING_FIELDS', className, table.concat(missedKeys, ', '))
         end
 

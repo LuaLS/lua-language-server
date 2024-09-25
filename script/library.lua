@@ -343,7 +343,7 @@ local function loadSingle3rdConfig(libraryDir)
         local jsonbuf = jsonb.beautify(cfg)
         client.requestMessage('Info', lang.script.WINDOW_CONFIG_LUA_DEPRECATED, {
             lang.script.WINDOW_CONVERT_CONFIG_LUA,
-        }, function (action, index)
+        }, function (_action, index)
             if index == 1 and jsonbuf then
                 fsu.saveFile(libraryDir / 'config.json', jsonbuf)
                 fsu.fileRemove(libraryDir / 'config.lua')
@@ -638,7 +638,7 @@ local function check3rdOfWorkspace(suri)
     end, id)
 end
 
-config.watch(function (uri, key, value, oldValue)
+config.watch(function (uri, key, _value, _oldValue)
     if key:find '^Lua.runtime' then
         initBuiltIn(uri)
     end

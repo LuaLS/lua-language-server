@@ -715,7 +715,7 @@ config.watch(function (uri, key, value, oldValue)
     end
 end)
 
-fw.event(function (ev, path)
+fw.event(function (_ev, path)
     if util.stringEndWith(path, '.editorconfig') then
         for _, scp in ipairs(ws.folders) do
             m.diagnosticsScope(scp.uri)

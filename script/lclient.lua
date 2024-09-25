@@ -5,7 +5,6 @@ local await   = require 'await'
 local timer   = require 'timer'
 local pub     = require 'pub'
 local json    = require 'json'
-local client  = require 'client'
 local define  = require 'proto.define'
 
 require 'provider'

@@ -23,7 +23,6 @@ local mathHuge     = math.huge
 local inf          = 1 / 0
 local nan          = 0 / 0
 local error        = error
-local assert       = assert
 
 _ENV = nil
 

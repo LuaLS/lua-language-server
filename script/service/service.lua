@@ -1,6 +1,5 @@
 ---@diagnostic disable: deprecated
 local pub    = require 'pub'
-local thread = require 'bee.thread'
 local await  = require 'await'
 local timer  = require 'timer'
 local proto  = require 'proto'

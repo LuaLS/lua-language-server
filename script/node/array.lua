@@ -2,14 +2,16 @@
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(value: Node): Node.Array
+---@overload fun(value: Node, len?: integer): Node.Array
 local M = ls.node.register 'Node.Array'
 
 M.kind = 'array'
 
 ---@param value Node
-function M:__init(value)
+---@param len? integer
+function M:__init(value, len)
     self.head = value
+    self.len = len or math.huge
 end
 
 function M:get(key)
@@ -30,6 +32,7 @@ function M:get(key)
     if type(key) ~= 'table' then
         if  type(key) == 'number'
         and key >= 1
+        and key <= self.len
         and key % 1 == 0 then
             return self.head
         else
@@ -58,7 +61,8 @@ function M:view(skipLevel)
 end
 
 ---@param value Node
+---@param len? integer
 ---@return Node.Array
-function ls.node.array(value)
-    return New 'Node.Array' (value)
+function ls.node.array(value, len)
+    return New 'Node.Array' (value, len)
 end

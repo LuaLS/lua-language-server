@@ -261,3 +261,23 @@ do
     assert(t:get(ls.node.value(1) | ls.node.value(2)):view() == 'true')
     assert(t:get(ls.node.value(0) | ls.node.value(1)):view() == 'true | nil')
 end
+
+do
+    local t = ls.node.array(ls.node.value(true), 3)
+
+    assert(t:get(ls.node.ANY):view() == 'true')
+    assert(t:get(ls.node.UNKNOWN):view() == 'true')
+
+    assert(t:get(0):view() == 'nil')
+    assert(t:get(1):view() == 'true')
+    assert(t:get(ls.node.value(1)):view() == 'true')
+    assert(t:get(ls.node.value(4)):view() == 'nil')
+
+    assert(t:get(ls.node.type 'number'):view() == 'true')
+    assert(t:get(ls.node.type 'integer'):view() == 'true')
+    assert(t:get(ls.node.type 'boolean'):view() == 'nil')
+
+    assert(t:get(ls.node.value(1) | ls.node.value(2)):view() == 'true')
+    assert(t:get(ls.node.value(0) | ls.node.value(1)):view() == 'true | nil')
+    assert(t:get(ls.node.value(1) | ls.node.value(4)):view() == 'true | nil')
+end

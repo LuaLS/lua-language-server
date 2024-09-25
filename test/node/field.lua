@@ -143,8 +143,8 @@ do
     local u = a & b
 
     assert(u:view() == '{ x: "x" } & { y: "y" }')
-    assert(u.kind == 'cross')
-    ---@cast u Node.Cross
+    assert(u.kind == 'intersection')
+    ---@cast u Node.Intersection
     assert(u.value:view() == '{ x: "x", y: "y" }')
     assert(u:get('x'):view() == '"x"')
     assert(u:get('y'):view() == '"y"')
@@ -170,8 +170,8 @@ do
     local u = a & b
 
     assert(u:view() == '{ x: "x" } & { x: "y", y: "y" }')
-    assert(u.kind == 'cross')
-    ---@cast u Node.Cross
+    assert(u.kind == 'intersection')
+    ---@cast u Node.Intersection
     assert(u.value:view() == '{ x: never, y: "y" }')
     assert(u:get('x'):view() == 'never')
     assert(u:get('y'):view() == '"y"')
@@ -199,8 +199,8 @@ do
     local u = a & (b | c)
 
     assert(u:view() == '{ x: "x" } & ({ y: "y" } | { z: "z" })')
-    assert(u.kind == 'cross')
-    ---@cast u Node.Cross
+    assert(u.kind == 'intersection')
+    ---@cast u Node.Intersection
     assert(u.value:view() == '({ x: "x" } & { y: "y" }) | ({ x: "x" } & { z: "z" })')
     assert(u:get('x'):view() == '"x"')
     assert(u:get('y'):view() == '"y" | nil')

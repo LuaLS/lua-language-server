@@ -86,7 +86,7 @@ function M:view(skipLevel)
         if not thisView then
             goto continue
         end
-        if v.kind == 'cross' then
+        if v.kind == 'intersection' then
             thisView = '(' .. thisView .. ')'
         end
         view[#view+1] = thisView

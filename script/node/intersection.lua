@@ -1,11 +1,11 @@
----@class Node.Cross: Node
+---@class Node.Intersection: Node
 ---@operator bor(Node?): Node
 ---@operator band(Node?): Node
 ---@operator shr(Node): boolean
----@overload fun(a: Node, b: Node): Node.Cross
-local M = ls.node.register 'Node.Cross'
+---@overload fun(a: Node, b: Node): Node.Intersection
+local M = ls.node.register 'Node.Intersection'
 
-M.kind = 'cross'
+M.kind = 'intersection'
 
 ---@param a Node
 ---@param b Node
@@ -13,14 +13,14 @@ function M:__init(a, b)
     ---@type Node[]
     local values = {}
 
-    if a.kind == 'cross' then
-        ---@cast a Node.Cross
+    if a.kind == 'intersection' then
+        ---@cast a Node.Intersection
         ls.util.arrayMerge(values, a.rawNodes)
     else
         values[#values+1] = a
     end
-    if b.kind == 'cross' then
-        ---@cast b Node.Cross
+    if b.kind == 'intersection' then
+        ---@cast b Node.Intersection
         ls.util.arrayMerge(values, b.rawNodes)
     else
         values[#values+1] = b
@@ -34,7 +34,7 @@ end
 ---@type Node[]
 M.values = nil
 
----@param self Node.Cross
+---@param self Node.Intersection
 ---@return Node[]
 ---@return true
 M.__getter.values = function (self)
@@ -148,7 +148,7 @@ end
 ---@type Node
 M.value = nil
 
----@param self Node.Cross
+---@param self Node.Intersection
 ---@return Node
 ---@return true
 M.__getter.value = function (self)
@@ -255,7 +255,7 @@ end
 
 ---@param a Node
 ---@param b Node
----@return Node.Cross
-function ls.node.cross(a, b)
-    return New 'Node.Cross' (a, b)
+---@return Node.Intersection
+function ls.node.intersection(a, b)
+    return New 'Node.Intersection' (a, b)
 end

@@ -5,7 +5,7 @@
 ---| LuaParser.Node.CatArray
 ---| LuaParser.Node.CatCall
 ---| LuaParser.Node.CatUnion
----| LuaParser.Node.CatCross
+---| LuaParser.Node.CatIntersection
 ---| LuaParser.Node.CatFunction
 ---| LuaParser.Node.CatTable
 ---| LuaParser.Node.CatBoolean

@@ -7,7 +7,7 @@
 ---@operator shr(Node): boolean
 local M = Class 'Node'
 
----@alias Node.Kind 'type' | 'value' | 'table' | 'tuple' | 'array' | 'function' | 'union' | 'cross'
+---@alias Node.Kind 'type' | 'value' | 'table' | 'tuple' | 'array' | 'function' | 'union' | 'intersection'
 
 ---基础分类
 ---@type Node.Kind
@@ -37,7 +37,7 @@ end
 ---@param a Node
 ---@param b Node
 ---@return Node?
-local function makeCross(a, b)
+local function makeIntersection(a, b)
     if a == b then
         return a
     end
@@ -47,8 +47,8 @@ local function makeCross(a, b)
 end
 
 function M.__band(a, b)
-    return makeCross(a, b)
-        or ls.node.cross(a, b)
+    return makeIntersection(a, b)
+        or ls.node.intersection(a, b)
 end
 
 function M:__shr(other)

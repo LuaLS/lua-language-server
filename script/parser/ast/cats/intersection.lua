@@ -1,9 +1,9 @@
 local class = require'class'
 
----@class LuaParser.Node.CatCross: LuaParser.Node.Base
+---@class LuaParser.Node.CatIntersection: LuaParser.Node.Base
 ---@field poses integer[] # 所有 & 的位置
 ---@field exps LuaParser.Node.CatType[] # 所有的子表达式
-local Cross = Class('LuaParser.Node.CatCross', 'LuaParser.Node.Base')
+local Intersection = Class('LuaParser.Node.CatIntersection', 'LuaParser.Node.Base')
 
 ---@class LuaParser.Ast
 local Ast = Class 'LuaParser.Ast'
@@ -11,7 +11,7 @@ local Ast = Class 'LuaParser.Ast'
 ---@private
 ---@param required? boolean
 ---@return LuaParser.Node.CatType?
-function Ast:parseCatCross(required)
+function Ast:parseCatIntersection(required)
     local first = self:parseCatTerm(required)
     if not first then
         return nil
@@ -22,7 +22,7 @@ function Ast:parseCatCross(required)
         return first
     end
 
-    local cross = self:createNode('LuaParser.Node.CatCross', {
+    local intersection = self:createNode('LuaParser.Node.CatIntersection', {
         start = first.start,
         poses = { pos },
         exps  = { first },
@@ -31,7 +31,7 @@ function Ast:parseCatCross(required)
     while true do
         self:skipSpace()
         local nextNode = self:parseCatTerm(true)
-        cross.exps[#cross.exps+1] = nextNode
+        intersection.exps[#intersection.exps+1] = nextNode
 
         self:skipSpace()
         local nextPos = self.lexer:consume '&'
@@ -39,10 +39,10 @@ function Ast:parseCatCross(required)
             break
         end
 
-        cross.poses[#cross.poses+1] = nextPos
+        intersection.poses[#intersection.poses+1] = nextPos
     end
 
-    cross.finish = self:getLastPos()
+    intersection.finish = self:getLastPos()
 
-    return cross
+    return intersection
 end

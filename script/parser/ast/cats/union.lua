@@ -12,7 +12,7 @@ local Ast = Class 'LuaParser.Ast'
 ---@param required? boolean
 ---@return LuaParser.Node.CatType?
 function Ast:parseCatUnion(required)
-    local first = self:parseCatCross(required)
+    local first = self:parseCatIntersection(required)
     if not first then
         return nil
     end
@@ -32,7 +32,7 @@ function Ast:parseCatUnion(required)
 
     while true do
         self:skipSpace()
-        local nextNode = self:parseCatCross(true)
+        local nextNode = self:parseCatIntersection(true)
         union.exps[#union.exps+1] = nextNode
 
         self:skipSpace()

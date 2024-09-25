@@ -11,7 +11,7 @@ M.kind = 'array'
 ---@param len? integer
 function M:__init(value, len)
     self.head = value
-    self.len = len
+    self.len = len or math.huge
 end
 
 function M:get(key)
@@ -32,7 +32,7 @@ function M:get(key)
     if type(key) ~= 'table' then
         if  type(key) == 'number'
         and key >= 1
-        and (not self.len or key <= self.len)
+        and key <= self.len
         and key % 1 == 0 then
             return self.head
         else
@@ -54,6 +54,19 @@ function M:get(key)
         return result
     end
     return ls.node.NIL
+end
+
+---@param other Node
+---@return boolean
+function M:onCanCast(other)
+    if other.kind == 'array' then
+        ---@cast other Node.Array
+        if self.len < other.len then
+            return false
+        end
+        return self.head:canCast(other.head)
+    end
+    return false
 end
 
 function M:view(skipLevel)

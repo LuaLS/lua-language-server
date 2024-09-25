@@ -148,3 +148,90 @@ do
     assert(A >> B == true)
     assert(B >> A == false)
 end
+
+do
+    local A = ls.node.array(ls.node.value('x'))
+    local B = ls.node.array(ls.node.type 'string')
+
+    assert(A >> B == true)
+    assert(B >> A == false)
+end
+
+do
+    local A = ls.node.array(ls.node.value('x'), 3)
+    local B = ls.node.array(ls.node.type 'string')
+
+    assert(A >> B == false)
+    assert(B >> A == false)
+end
+
+do
+    local A = ls.node.array(ls.node.value('x'))
+    local B = ls.node.table()
+        : addField {
+            key   = ls.node.value(1),
+            value = ls.node.value('x'),
+        }
+        : addField {
+            key   = ls.node.value(2),
+            value = ls.node.value('x'),
+        }
+
+    assert(A >> B == true)
+    assert(B >> A == true)
+end
+
+do
+    local A = ls.node.array(ls.node.value('x'))
+    local B = ls.node.table()
+        : addField {
+            key   = ls.node.value(1),
+            value = ls.node.value('x'),
+        }
+        : addField {
+            key   = ls.node.value(2),
+            value = ls.node.value('x'),
+        }
+        : addField {
+            key   = ls.node.value(3),
+            value = ls.node.value('y'),
+        }
+
+    assert(A >> B == false)
+    assert(B >> A == false)
+end
+
+do
+    local A = ls.node.array(ls.node.value('x'))
+    local B = ls.node.tuple()
+        : insert(ls.node.STRING)
+        : insert(ls.node.STRING)
+        : insert(ls.node.STRING)
+
+    assert(A >> B == true)
+    assert(B >> A == false)
+end
+
+do
+    local A = ls.node.array(ls.node.STRING)
+    local B = ls.node.tuple()
+        : insert(ls.node.value 'x')
+        : insert(ls.node.value 'y')
+        : insert(ls.node.value 'z')
+
+    assert(A >> B == false)
+    assert(B >> A == true)
+end
+
+do
+    local A = ls.node.tuple()
+        : insert(ls.node.STRING)
+        : insert(ls.node.STRING)
+    local B = ls.node.tuple()
+        : insert(ls.node.value 'x')
+        : insert(ls.node.value 'y')
+        : insert(ls.node.value 'z')
+
+    assert(A >> B == false)
+    assert(B >> A == true)
+end

@@ -79,6 +79,39 @@ function M:view(skipLevel)
     return '[' .. table.concat(buf, ', ') .. ']'
 end
 
+---@param other Node
+---@return boolean
+function M:onCanBeCast(other)
+    if self == other then
+        return true
+    end
+    for i, v in ipairs(self.values) do
+        local value = other:get(i)
+        if not value:canCast(v) then
+            return false
+        end
+    end
+    return true
+end
+
+---@param other Node
+---@return boolean
+function M:onCanCast(other)
+    if other.kind == 'array' then
+        ---@cast other Node.Array
+        for i, v in ipairs(self.values) do
+            if i > other.len then
+                break
+            end
+            if not v:canCast(other.head) then
+                return false
+            end
+        end
+        return true
+    end
+    return false
+end
+
 ---@param values? Node[]
 ---@return Node.Tuple
 function ls.node.tuple(values)

@@ -229,20 +229,22 @@ end
 
 ---@param other Node
 ---@return boolean
-function M:onCanCast(other)
+function M:onCanBeCast(other)
     if self == other then
         return true
     end
-    if other.kind == 'table' then
-        ---@cast other Node.Table
-        for _, field in ipairs(other.sortedFields) do
-            local v = self:get(field.key) or ls.node.NIL
-            if not v:canCast(field.value) then
-                return false
-            end
+    for _, field in ipairs(self.sortedFields) do
+        local v = other:get(field.key)
+        if not v:canCast(field.value) then
+            return false
         end
-        return true
     end
+    return true
+end
+
+---@param other Node
+---@return boolean
+function M:onCanCast(other)
     if other.kind == 'array' then
         ---@cast other Node.Array
         local myType = self:get(ls.node.INTEGER)
@@ -255,20 +257,10 @@ function M:onCanCast(other)
             if  type(k) == 'number'
             and k % 1 == 0
             and k >= 1
-            and (not other.len or k <= other.len) then
+            and k <= other.len then
                 if not v:canCast(other.head) then
                     return false
                 end
-            end
-        end
-        return true
-    end
-    if other.kind == 'tuple' then
-        ---@cast other Node.Tuple
-        for i, v in ipairs(other.values) do
-            local myValue = self:get(i)
-            if not myValue:canCast(v) then
-                return false
             end
         end
         return true

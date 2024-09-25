@@ -237,6 +237,26 @@ M.__getter.value = function (self)
     return self, true
 end
 
+---@param self Node.Type
+---@return Node
+---@return true
+M.__getter.truly = function (self)
+    if self:isAliasLike() then
+        return self.value.truly, true
+    end
+    return self, true
+end
+
+---@param self Node.Type
+---@return Node
+---@return true
+M.__getter.falsy = function (self)
+    if self:isAliasLike() then
+        return self.value.falsy, true
+    end
+    return ls.node.NEVER, true
+end
+
 function M:view()
     return self.typeName
 end

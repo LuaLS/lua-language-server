@@ -54,6 +54,9 @@ M.values = nil
 M.__getter.values = function (self)
     local values = {}
     for _, v in ipairs(self.rawNodes) do
+        if v == ls.node.NEVER then
+            goto continue
+        end
         if v.kind == 'union' then
             ---@cast v Node.Union
             for _, vv in ipairs(v.values) do
@@ -68,6 +71,7 @@ M.__getter.values = function (self)
                 return values, true
             end
         end
+        ::continue::
     end
 
     ls.util.arrayRemoveDuplicate(values)
@@ -119,12 +123,34 @@ M.value = nil
 M.__getter.value = function (self)
     self.value = ls.node.NEVER
     if #self.values == 0 then
-        return ls.node.NIL, true
+        return ls.node.NEVER, true
     end
     if #self.values == 1 then
         return self.values[1], true
     end
     return self, true
+end
+
+---@param self Node.Union
+---@return Node
+---@return true
+M.__getter.truly = function (self)
+    local result = {}
+    for _, v in ipairs(self.values) do
+        result[#result+1] = v.truly
+    end
+    return ls.node.union(result).value, true
+end
+
+---@param self Node.Union
+---@return Node
+---@return true
+M.__getter.falsy = function (self)
+    local result = {}
+    for _, v in ipairs(self.values) do
+        result[#result+1] = v.falsy
+    end
+    return ls.node.union(result).value, true
 end
 
 ---@param nodes? Node[]

@@ -226,6 +226,20 @@ M.__getter.value = function (self)
     return ls.node.union(results), true
 end
 
+---@param self Node.Intersection
+---@return Node
+---@return true
+M.__getter.truly = function (self)
+    return self.value.truly, true
+end
+
+---@param self Node.Intersection
+---@return Node
+---@return true
+M.__getter.falsy = function (self)
+    return self.value.falsy, true
+end
+
 function M:onCanBeCast(other)
     return other.value:canCast(self.value)
 end

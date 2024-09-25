@@ -29,3 +29,78 @@ do
     assert(ls.node.value(1).truly:view() == '1')
     assert(ls.node.value(1).falsy:view() == 'never')
 end
+
+do
+    local u = ls.node.value(0) | ls.node.value(1) | ls.node.value(true) | ls.node.value(false) | ls.node.NIL
+
+    assert(u:view() == '0 | 1 | true | false | nil')
+    assert(u.truly:view() == '0 | 1 | true')
+    assert(u.falsy:view() == 'false | nil')
+end
+
+do
+    local u = ls.node.table()
+        : addField {
+            key   = ls.node.value('x'),
+            value = ls.node.value(1)
+        }
+        : addField {
+            key   = ls.node.value('y'),
+            value = ls.node.value(2)
+        }
+
+    assert(u:view() == '{ x: 1, y: 2 }')
+    assert(u.truly:view() == '{ x: 1, y: 2 }')
+    assert(u.falsy:view() == 'never')
+end
+
+do
+    local a = ls.node.table()
+        : addField {
+            key   = ls.node.value('x'),
+            value = ls.node.value(1)
+        }
+    local b = ls.node.table()
+        : addField {
+            key   = ls.node.value('y'),
+            value = ls.node.value(2)
+        }
+
+    local u = a & b
+    assert(u:view() == '{ x: 1 } & { y: 2 }')
+    assert(u.truly:view() == '{ x: 1, y: 2 }')
+    assert(u.falsy:view() == 'never')
+end
+
+do
+    ls.node.TYPE_POOL['A'] = nil
+    local a = ls.node.type 'A'
+
+    assert(a.truly:view() == 'A')
+    assert(a.falsy:view() == 'never')
+end
+
+do
+    ls.node.TYPE_POOL['A'] = nil
+    local a = ls.node.type 'A'
+        : addField {
+            key   = ls.node.value('x'),
+            value = ls.node.value(1)
+        }
+
+    assert(a.truly:view() == 'A')
+    assert(a.falsy:view() == 'never')
+end
+
+do
+    ls.node.TYPE_POOL['A'] = nil
+    local a = ls.node.type 'A'
+        : addAlias(ls.node.value(1))
+        : addAlias(ls.node.value(2))
+        : addAlias(ls.node.value(true))
+        : addAlias(ls.node.value(false))
+
+    assert(a:view() == 'A')
+    assert(a.truly:view() == '1 | 2 | true')
+    assert(a.falsy:view() == 'false')
+end

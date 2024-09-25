@@ -20,6 +20,9 @@
 				"print",
 				"stderr",
 			],
+			"skipFiles": [
+				"**/class.lua"
+			]
 		},
 		{
 			"name": "🍄attach",

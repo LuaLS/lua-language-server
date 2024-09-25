@@ -1988,7 +1988,9 @@ local function bindDocsBetween(sources, binded, start, finish)
                 or src.type == 'setmethod'
                 or src.type == 'function'
                 or src.type == 'return'
-                or src.type == '...' then
+                or src.type == '...'
+                or src.type == 'call'   -- for `rawset`
+                then
                     if bindDoc(src, binded) then
                         ok = true
                     end
@@ -2108,12 +2110,23 @@ local bindDocAccept = {
     'setfield'  , 'setmethod' , 'setindex' ,
     'tablefield', 'tableindex', 'self'     ,
     'function'  , 'return'     , '...'      ,
+    'call',
 }
 
 local function bindDocs(state)
     local text = state.lua
     local sources = {}
     guide.eachSourceTypes(state.ast, bindDocAccept, function (src)
+        -- allow binding docs with rawset(_G, "key", value)
+        if src.type == 'call' then
+            if src.node.special ~= 'rawset' or not src.args then
+                return
+            end
+            local g, key = src.args[1], src.args[2]
+            if not g or not key or g.special ~= '_G' then
+                return
+            end
+        end
         sources[#sources+1] = src
     end)
     table.sort(sources, function (a, b)

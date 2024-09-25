@@ -1322,6 +1322,32 @@ _G.<?Test?> = {}
 ]]
 
 TEST 'integer' [[
+rawset(_G, 'Test', 1)
+print(<?Test?>)
+]]
+
+TEST 'string' [[
+rawset(_G, 'Test', '')
+print(<?Test?>)
+]]
+
+TEST 'boolean' [[
+rawset(_G, 'Test', true)
+print(<?Test?>)
+]]
+
+TEST 'table' [[
+rawset(_G, 'Test', {})
+print(<?Test?>)
+]]
+
+TEST 'Test' [[
+---@class Test
+rawset(_G, 'Test', {})
+print(<?Test?>)
+]]
+
+TEST 'integer' [[
 local mt = {}
 
 ---@param callback fun(i: integer)

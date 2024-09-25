@@ -1867,6 +1867,10 @@ local compilerSwitch = util.switch()
     end)
     : case 'call'
     : call(function (source)
+        -- ignore rawset
+        if source.node.special == 'rawset' then
+            return
+        end
         local node = getReturn(source.node, 1, source.args)
         if not node then
             return

@@ -273,7 +273,7 @@ function vm.createSign()
     return genericMgr
 end
 
----@class parser.object
+---@class parser.object.base
 ---@field package _sign vm.sign|false|nil
 
 ---@param source parser.object

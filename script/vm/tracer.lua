@@ -3,7 +3,7 @@ local vm        = require 'vm.vm'
 local guide     = require 'parser.guide'
 local util      = require 'utility'
 
----@class parser.object
+---@class parser.object.base
 ---@field package _tracer? vm.tracer
 ---@field package _casts?  parser.object[]
 

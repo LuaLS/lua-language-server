@@ -27,7 +27,7 @@ local function createVariable(root, id)
     return variable
 end
 
----@class parser.object
+---@class parser.object.base
 ---@field package _variableNode vm.variable|false
 ---@field package _variableNodes table<string, vm.variable>
 

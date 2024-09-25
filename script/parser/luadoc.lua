@@ -139,7 +139,7 @@ Symbol              <-  ({} {
 
 ---@alias parser.visibleType 'public' | 'protected' | 'private' | 'package'
 
----@class parser.object
+---@class parser.object.base
 ---@field literal           boolean
 ---@field signs             parser.object[]
 ---@field originalComment   parser.object

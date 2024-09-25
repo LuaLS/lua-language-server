@@ -7,7 +7,7 @@ local files      = require 'files'
 local vm         = require 'vm.vm'
 local plugin     = require 'plugin'
 
----@class parser.object
+---@class parser.object.base
 ---@field _compiledNodes        boolean
 ---@field _node                 vm.node
 ---@field cindex                integer
@@ -825,7 +825,7 @@ end
 ---@return vm.node
 ---@return parser.object?
 function vm.selectNode(list, index)
-    local exp
+    local exp ---@type parser.object
     if list[index] then
         exp = list[index]
         index = 1
@@ -1056,7 +1056,7 @@ function vm.compileCallArg(arg, call, index)
     return vm.getNode(arg)
 end
 
----@class parser.object
+---@class parser.object.base
 ---@field package _iterator? table
 ---@field package _iterArgs? table
 ---@field package _iterVars? table<parser.object, vm.node>
@@ -1168,9 +1168,10 @@ local function compileFunctionParam(func, source)
         end
     end
 
+    local parent = func.parent
     local derviationParam = config.get(guide.getUri(func), 'Lua.type.inferParamType')
-    if derviationParam and func.parent.type == 'local' and func.parent.ref then
-        local refs = func.parent.ref
+    if derviationParam and parent.type == 'local' and parent.ref then
+        local refs = assert(parent.ref)
         local found
         for _, ref in ipairs(refs) do
             if ref.parent.type ~= 'call' then
@@ -1191,7 +1192,6 @@ local function compileFunctionParam(func, source)
     end
 
     do
-        local parent = func.parent
         local key = vm.getKeyName(parent)
         local classDef = vm.getParentClass(parent)
         local suri = guide.getUri(func)
@@ -1271,7 +1271,7 @@ local function compileLocal(source)
         end
     end
     if source.parent.type == 'funcargs' and not hasMarkDoc and not hasMarkParam then
-        local func = source.parent.parent
+        local func = source.parent.parent --[[@as parser.object.function]]
         local interfaces = plugin.getPluginInterfaces(guide.getUri(source))
         local hasDocArg = false
         if interfaces then
@@ -1653,7 +1653,7 @@ local compilerSwitch = util.switch()
     : case 'function.return'
     ---@param source parser.object
     : call(function (source)
-        local func  = source.parent
+    local func  = source.parent --[[@as parser.object.function]]
         local index = source.returnIndex
         local hasMarkDoc
         if func.bindDocs then

@@ -816,6 +816,7 @@ local function resolveLable(label, obj)
     end
 end
 
+---@param gotos parser.object.goto[]
 local function resolveGoTo(gotos)
     for i = 1, #gotos do
         local action = gotos[i]
@@ -848,6 +849,7 @@ local function popChunk()
     Chunk[#Chunk] = nil
 end
 
+---@return parser.object.nil?
 local function parseNil()
     if Tokens[Index + 1] ~= 'nil' then
         return nil
@@ -861,6 +863,7 @@ local function parseNil()
     }
 end
 
+---@return parser.object.boolean?
 local function parseBoolean()
     local word = Tokens[Index+1]
     if  word ~= 'true'
@@ -1342,6 +1345,7 @@ local function dropNumberTail(offset, integer)
     return finish + 1
 end
 
+---@return (parser.object.number|parser.object.integer)?
 local function parseNumber()
     local offset = Tokens[Index]
     if not offset then
@@ -1379,6 +1383,7 @@ local function parseNumber()
     if neg then
         number = - number
     end
+    --- @type parser.object.number|parser.object.integer
     local result = {
         type   = integer and 'integer' or 'number',
         start  = startPos,
@@ -1412,6 +1417,7 @@ local function isKeyWord(word, nextToken)
     return false
 end
 
+---@return parser.object.name?
 local function parseName(asAction)
     local word = peekWord()
     if not word then
@@ -1552,11 +1558,13 @@ local function parseExpList(mini)
     return list
 end
 
+---@return parser.object.index
 local function parseIndex()
     local start = getPosition(Tokens[Index], 'left')
     Index = Index + 2
     skipSpace()
     local exp = parseExp()
+    --- @type parser.object.index
     local index = {
         type   = 'index',
         start  = start,
@@ -1578,13 +1586,18 @@ local function parseIndex()
     return index
 end
 
+---@return parser.object.table
 local function parseTable()
+    local start  = getPosition(Tokens[Index], 'left')
+    local finish = getPosition(Tokens[Index], 'right')
+    ---@type parser.object.table
     local tbl = {
         type   = 'table',
-        start  = getPosition(Tokens[Index], 'left'),
-        finish = getPosition(Tokens[Index], 'right'),
+        start  = start,
+        finish = finish,
+        bstart = finish,
+        bfinish = finish,
     }
-    tbl.bstart = tbl.finish
     Index = Index + 2
     local index = 0
     local tindex = 0
@@ -1624,6 +1637,7 @@ local function parseTable()
                     wantSep = true
                     skipSpace()
                     local fvalue = parseExp()
+                    ---@type parser.object.tablefield
                     local tfield = {
                         type   = 'tablefield',
                         start  = name.start,
@@ -1634,8 +1648,9 @@ local function parseTable()
                         field  = name,
                         value  = fvalue,
                     }
-                    name.type   = 'field'
-                    name.parent = tfield
+                    local field = name --[[@as parser.object.field]]
+                    field.type   = 'field'
+                    field.parent = tfield
                     if fvalue then
                         fvalue.parent = tfield
                     else
@@ -1667,6 +1682,7 @@ local function parseTable()
             end
             index = index + 1
             tindex = tindex + 1
+            ---@type parser.object.tableexp
             local texp = {
                 type   = 'tableexp',
                 start  = exp.start,
@@ -1689,7 +1705,7 @@ local function parseTable()
                 }
             end
             wantSep = true
-            local tindex = parseIndex()
+            local tindex = parseIndex() --[[@as parser.object.tableindex]]
             skipSpace()
             tindex.type   = 'tableindex'
             tindex.node   = tbl
@@ -1803,7 +1819,12 @@ local function parseSimple(node, funcName)
             }
             Index = Index + 2
             skipSpace()
-            local field = parseName(true)
+            local field = parseName(true) --[[@as parser.object.field?]]
+            if field then
+                field.type = 'field'
+            end
+
+            ---@type parser.object.getfield
             local getfield = {
                 type   = 'getfield',
                 start  = node.start,
@@ -1814,7 +1835,6 @@ local function parseSimple(node, funcName)
             }
             if field then
                 field.parent = getfield
-                field.type   = 'field'
                 if currentName then
                     if node.type == 'getlocal'
                     or node.type == 'getglobal'
@@ -1843,7 +1863,8 @@ local function parseSimple(node, funcName)
             }
             Index = Index + 2
             skipSpace()
-            local method = parseName(true)
+            local method = parseName(true) --[[@as parser.object.method?]]
+            ---@type parser.object.getmethod
             local getmethod = {
                 type   = 'getmethod',
                 start  = node.start,
@@ -1904,12 +1925,14 @@ local function parseSimple(node, funcName)
                 break
             end
             local tbl = parseTable()
+            ---@type parser.object.call
             local call = {
                 type   = 'call',
                 start  = node.start,
                 finish = tbl.finish,
                 node   = node,
             }
+            ---@type parser.object.callargs
             local args = {
                 type   = 'callargs',
                 start  = tbl.start,
@@ -1970,7 +1993,7 @@ local function parseSimple(node, funcName)
                 node.parent = call
                 node        = call
             else
-                local index  = parseIndex()
+                local index  = parseIndex() --[[@as parser.object.getindex]]
                 local bstart = index.start
                 index.type   = 'getindex'
                 index.start  = node.start
@@ -2279,6 +2302,7 @@ local function parseParams(params, isLambda)
     return params
 end
 
+---@return parser.object.function
 local function parseFunction(isLocal, isAction)
     local funcLeft  = getPosition(Tokens[Index], 'left')
     local funcRight = getPosition(Tokens[Index] + 7, 'right')
@@ -2292,6 +2316,7 @@ local function parseFunction(isLocal, isAction)
             [2] = funcRight,
         },
     }
+    ---@cast func parser.object.function
     Index = Index + 2
     skipSpace(true)
     local hasLeftParen = Tokens[Index + 1] == '('
@@ -2463,6 +2488,7 @@ local function parseLambda(isDoublePipe)
 
     if child then
         -- create dummy return
+        ---@type parser.object.return
         local rtn = {
             type   = 'return',
             start  = child.start,
@@ -2741,6 +2767,7 @@ function parseExp(asAction, level)
                 missExp()
             end
         end
+        ---@type parser.object.binary
         local bin = {
             type   = 'binary',
             start  = exp.start,
@@ -3199,7 +3226,11 @@ local function parseLabel()
     local left = getPosition(Tokens[Index], 'left')
     Index = Index + 2
     skipSpace()
-    local label = parseName()
+    local label = parseName() --[[@as parser.object.label]]
+    if label then
+        label.type = 'label'
+    end
+
     skipSpace()
 
     if not label then
@@ -3218,7 +3249,6 @@ local function parseLabel()
         return nil
     end
 
-    label.type = 'label'
     pushActionIntoCurrentChunk(label)
 
     local block = guide.getBlock(label)
@@ -3262,19 +3292,22 @@ local function parseLabel()
     return label
 end
 
+---@return parser.object.goto?
 local function parseGoTo()
     local start = getPosition(Tokens[Index], 'left')
     Index = Index + 2
     skipSpace()
 
-    local action = parseName()
+    local action = parseName() --[[@as parser.object.goto]]
+    if action then
+        action.type = 'goto'
+        action.keyStart = start
+    end
+
     if not action then
         missName()
         return nil
     end
-
-    action.type = 'goto'
-    action.keyStart = start
 
     for i = #Chunk, 1, -1 do
         local chunk = Chunk[i]
@@ -3305,6 +3338,7 @@ local function parseIfBlock(parent)
     local ifLeft  = getPosition(Tokens[Index], 'left')
     local ifRight = getPosition(Tokens[Index] + 1, 'right')
     Index = Index + 2
+    ---@type parser.object.ifblock
     local ifblock = {
         type    = 'ifblock',
         parent  = parent,
@@ -3712,6 +3746,7 @@ local function parseFor()
 end
 
 local function parseWhile()
+    ---@type parser.object.while
     local action = {
         type    = 'while',
         start   = getPosition(Tokens[Index], 'left'),
@@ -3840,6 +3875,7 @@ local function parseRepeat()
     return action
 end
 
+---@return parser.object.break
 local function parseBreak()
     local returnLeft  = getPosition(Tokens[Index], 'left')
     local returnRight = getPosition(Tokens[Index] + #Tokens[Index + 1] - 1, 'right')
@@ -3952,7 +3988,7 @@ function parseAction()
             exp.parent  = name
             if name.type == 'setlocal' then
                 local loc = name.node
-                if loc.attrs then
+                if loc and loc.attrs then
                     pushError {
                         type   = 'SET_CONST',
                         start  = name.start,

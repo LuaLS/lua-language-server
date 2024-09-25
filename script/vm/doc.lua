@@ -4,7 +4,7 @@ local guide     = require 'parser.guide'
 local vm        = require 'vm.vm'
 local config    = require 'config'
 
----@class parser.object
+---@class parser.object.base
 ---@field package _castTargetHead? parser.object | vm.global | false
 ---@field package _validVersions? table<string, boolean>
 ---@field package _deprecated? parser.object | false

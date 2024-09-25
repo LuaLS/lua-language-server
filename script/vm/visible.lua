@@ -4,7 +4,7 @@ local guide    = require 'parser.guide'
 local config   = require 'config'
 local glob     = require 'glob'
 
----@class parser.object
+---@class parser.object.base
 ---@field package _visibleType? parser.visibleType
 
 local function globMatch(patterns, fieldName)

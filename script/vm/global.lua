@@ -10,7 +10,7 @@ local allGlobals = {}
 ---@type table<uri, table<string, boolean>>
 local globalSubs = util.multiTable(2)
 
----@class parser.object
+---@class parser.object.base
 ---@field package _globalBase parser.object
 ---@field package _globalBaseMap table<string, parser.object>
 ---@field global vm.global
@@ -168,7 +168,7 @@ local function createGlobal(name, cate)
     }, mt)
 end
 
----@class parser.object
+---@class parser.object.base
 ---@field package _globalNode vm.global|false
 ---@field package _enums?     parser.object[]
 

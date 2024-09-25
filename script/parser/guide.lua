@@ -1,12 +1,271 @@
 local error        = error
 local type         = type
 
----@class parser.object
----@field bindDocs              parser.object[]
+---@alias parser.object
+---| parser.object.binary
+---| parser.object.boolean
+---| parser.object.break
+---| parser.object.getglobal
+---| parser.object.call
+---| parser.object.callargs
+---| parser.object.elseifblock
+---| parser.object.field
+---| parser.object.function
+---| parser.object.getfield
+---| parser.object.getindex
+---| parser.object.getlocal
+---| parser.object.getmethod
+---| parser.object.goto
+---| parser.object.ifblock
+---| parser.object.index
+---| parser.object.integer
+---| parser.object.label
+---| parser.object.local
+---| parser.object.method
+---| parser.object.name
+---| parser.object.nil
+---| parser.object.number
+---| parser.object.paren
+---| parser.object.repeat
+---| parser.object.return
+---| parser.object.self
+---| parser.object.setfield
+---| parser.object.setindex
+---| parser.object.setlocal
+---| parser.object.table
+---| parser.object.tableexp
+---| parser.object.tablefield
+---| parser.object.tableindex
+---| parser.object.while
+---
+--- Everything else
+---| parser.object.other
+
+---@class parser.object.base
+---@field start  integer
+---@field vstart  integer
+---@field finish integer
+---@field uri? uri
+---@field parent? parser.object
+---@field hasExit? true
+---@field docs parser.object.other
+---@field bindDocs? parser.object.other[]
+---
+--- Used to mark expressions that are redundant
+---@field redundant? { max: integer, passed: integer }
+---
+---@field package _root         parser.object
+---@field package _eachCache?   parser.object[]
+---@field package _isGlobal?    boolean
+---@field package _typeCache?   parser.object[][]
+
+---@class parser.object.nil : parser.object.base
+---@field type 'nil'
+
+---@class parser.object.boolean : parser.object.base
+---@field type 'boolean'
+---@field [1] boolean value
+
+---@class parser.object.integer : parser.object.base
+---@field type 'integer'
+---@field [1] integer value
+
+---@class parser.object.number : parser.object.base
+---@field type 'number'
+---@field [1] number value
+
+---@class parser.object.name : parser.object.base
+---@field type 'name'
+---@field [1] string value
+
+---@class parser.object.field : parser.object.base
+---@field type 'field'
+---@field [1] string value
+
+---@class parser.object.method : parser.object.base
+---@field type 'method'
+---@field [1] string value
+
+---@class parser.object.call : parser.object.base
+---@field type 'call'
+---@field args? parser.object.callargs
+---@field node parser.object
+---@field extParent? parser.object[]
+
+---@class parser.object.callargs : parser.object.base
+---@field type 'callargs'
+---@field parent parser.object
+---@field [integer] parser.object
+
+---@class parser.object.getmethod : parser.object.base
+---@field type 'getmethod'
+---@field node parser.object
+---@field colon { type: 'colon', start: integer, finish: integer }
+---@field method? parser.object.method
+
+---@class parser.object.getfield : parser.object.base
+---@field type 'getfield'
+---@field dot { type: 'dot', start: integer, finish: integer }
+---@field field? parser.object.field
+---@field node parser.object
+
+---@class parser.object.setfield : parser.object.base
+---@field type 'setfield'
+---@field node parser.object
+---@field field? parser.object.field
+---@field value? parser.object
+
+---@class parser.object.getindex : parser.object.base
+---@field type 'getindex'
+---@field index? parser.object
+---@field node parser.object
+
+---@class parser.object.setindex : parser.object.base
+---@field type 'setindex'
+---@field node parser.object
+---@field index? parser.object.index
+---@field value? parser.object
+
+---@class parser.object.getlocal : parser.object.base
+---@field type 'getlocal'
+---@field node parser.object.local|parser.object.self
+---@field [1] string Name
+
+---@class parser.object.setlocal : parser.object.base
+---@field type 'setlocal'
+---@field node parser.object.local|parser.object.self
+---@field value parser.object
+
+---@class parser.object.table : parser.object.base
+---@field type 'table'
+---@field bstart integer
+---@field bfinish integer
+---@field [integer] parser.object
+
+---@class parser.object.index : parser.object.base
+---@field type 'index'
+---@field index? parser.object
+
+---@class parser.object.tablefield : parser.object.base
+---@field type 'tablefield'
+---@field field parser.object
+---@field value? parser.object
+---@field node? parser.object
+
+---@class parser.object.tableindex : parser.object.base
+---@field type 'tableindex'
+---@field index? parser.object
+---@field node parser.object.table
+---@field range? integer
+---@field value? parser.object
+
+---@class parser.object.tableexp : parser.object.base
+---@field type 'tableexp'
+---@field value parser.object
+---@field tindex? integer
+
+---@class parser.object.break : parser.object.base
+---@field type 'break'
+
+---@class parser.object.local : parser.object.base
+---@field type 'local'
+---@field effect integer
+---@field attrs? parser.object
+---@field ref? parser.object[] References to local
+---@field locPos? integer Start position of the 'local' keyword
+---@field value? parser.object
+---@field tag? '_ENV'
+---@field [1] string Name of local variable
+
+---@class parser.object.self : parser.object.local
+---@field type 'self'
+---@field parent parser.object
+
+---@class parser.object.goto : parser.object.base
+---@field type 'goto'
+---@field node? parser.object.label
+---@field keyStart integer
+---@field [1] string name
+
+---@class parser.object.return : parser.object.base
+---@field type 'return'
+---@field [1] parser.object
+
+---@class parser.binop
+---@field type 'or' | 'and' | '<=' | '>=' | '<' | '>' | '~=' | '==' | '|' | '~' | '&' | '<<' | '>>' | '..' | '+' | '-' | '*' | '//' | '/' | '%' | '^'
+---@field start integer
+---@field finish integer
+
+---@class parser.object.binary : parser.object.base
+---@field type 'binary
+---@field op parser.binop
+---@field [1] parser.object
+---@field [2] parser.object?
+
+---@class parser.object.label : parser.object.base
+---@field type 'label'
+---@field ref? parser.object.goto[] References to label
+---@field [1] string value
+
+---@class parser.object.getglobal : parser.object.base
+---@field type 'getglobal'
+---@field node parser.object.local
+---@field value parser.object
+---@field [1] string Name
+
+---@class parser.object.paren : parser.object.base
+---@field type 'paren'
+---@field exp? parser.object
+
+---@class parser.object.block.base : parser.object.base
+---@field bstart integer Block start
+---@field bfinish? integer Block end
+---@field labels? table<string,parser.object.other>
+---@field locals parser.object.other[]
+---@field gotos parser.object.goto[]
+---@field breaks parser.object.break[]
+---@field hasGoTo? true
+---@field hasReturn? true
+---@field hasBreak? true
+---@field [integer] parser.object
+
+---@class parser.object.ifblock : parser.object.block.base
+---@field type 'ifblock'
+---@field parent parser.object.other
+---@field filter? parser.object?
+---@field keyword [integer,integer]
+
+---@class parser.object.elseifblock : parser.object.block.base
+---@field type 'elseifblock'
+---@field parent parser.object.other
+---@field filter? parser.object?
+---@field keyword [integer,integer]
+
+---@class parser.object.repeat : parser.object.block.base
+---@field type 'repeat'
+---@field filter? parser.object
+---@field keyword [integer,integer, integer, integer]
+
+---@class parser.object.while : parser.object.block.base
+---@field type 'while'
+---@field keyword [integer,integer]
+---@field filter? parser.object
+
+---@class parser.object.function : parser.object.block.base
+---@field type 'function'
+---@field keyword [integer,integer]
+---@field vararg? parser.object.other
+---@field args? parser.object.other
+---@field name? parser.object
+---@field parent parser.object
+---
+---@field returns? parser.object.other[]
+---@field locPos? integer Start position of the 'local' keyword
+
+---@class parser.object.other : parser.object.base
 ---@field bindGroup             parser.object[]
 ---@field bindSource            parser.object
 ---@field value                 parser.object
----@field parent                parser.object
 ---@field type                  string
 ---@field special               string
 ---@field tag                   string
@@ -16,9 +275,6 @@ local type         = type
 ---@field breaks?               parser.object[]
 ---@field exps                  parser.object[]
 ---@field keys                  parser.object
----@field uri                   uri
----@field start                 integer
----@field finish                integer
 ---@field range                 integer
 ---@field effect                integer
 ---@field bstart                integer
@@ -33,9 +289,6 @@ local type         = type
 ---@field extends               parser.object[]|parser.object
 ---@field types                 parser.object[]
 ---@field fields                parser.object[]
----@field tkey                  parser.object
----@field tvalue                parser.object
----@field tindex                integer
 ---@field op                    parser.object
 ---@field next                  parser.object
 ---@field docParam              parser.object
@@ -57,15 +310,12 @@ local type         = type
 ---@field returnIndex           integer
 ---@field assignIndex           integer
 ---@field docIndex              integer
----@field docs                  parser.object
 ---@field state                 table
 ---@field comment               table
 ---@field optional              boolean
 ---@field max                   parser.object
 ---@field init                  parser.object
 ---@field step                  parser.object
----@field redundant             { max: integer, passed: integer }
----@field filter                parser.object
 ---@field loc                   parser.object
 ---@field keyword               integer[]
 ---@field casts                 parser.object[]
@@ -73,14 +323,7 @@ local type         = type
 ---@field hasGoTo?              true
 ---@field hasReturn?            true
 ---@field hasBreak?             true
----@field hasExit?              true
 ---@field [integer]             parser.object|any
----@field dot                   { type: string, start: integer, finish: integer }
----@field colon                 { type: string, start: integer, finish: integer }
----@field package _root         parser.object
----@field package _eachCache?   parser.object[]
----@field package _isGlobal?    boolean
----@field package _typeCache?   parser.object[][]
 
 ---@class guide
 ---@field debugMode boolean
@@ -346,6 +589,7 @@ function m.getBlock(obj)
         end
         obj = obj.parent
     end
+    ---@cast obj -?
     -- make stack
     local stack = {}
     for _ = 1, 10 do
@@ -476,6 +720,7 @@ function m.getUri(obj)
     if obj.uri then
         return obj.uri
     end
+    ---@cast obj parser.object
     local root = m.getRoot(obj)
     if root then
         return root.uri or ''
@@ -1159,6 +1404,7 @@ function m.isGlobal(source)
     or source.type == 'getfield'
     or source.type == 'setindex'
     or source.type == 'getindex' then
+        --- @type parser.object
         local current = source
         while current do
             local node = current.node

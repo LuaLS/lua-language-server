@@ -95,7 +95,7 @@ end
 ---@param uri string
 ---@return boolean
 function m.isValid(uri)
-    local scheme, authority, path = m.split(uri)
+    local scheme, _authority, path = m.split(uri)
     if not scheme or scheme == '' then
         return false
     end

@@ -6,7 +6,7 @@ local function getLiterals(arg)
     if not literals then
         return res
     end
-    for k, v in pairs(literals) do
+    for k in pairs(literals) do
         if type(k) == 'string' then
             res[#res+1] = k
         end
@@ -34,7 +34,7 @@ local function getCode(CdefReference)
             if not literals then
                 goto CONTINUE
             end
-            for k, v in pairs(literals) do
+            for k in pairs(literals) do
                 if type(k) == 'string' then
                     res[#res+1] = k
                 end
@@ -51,7 +51,7 @@ return function (CdefReference, target_uri)
         return nil
     end
     local codeResults
-    for i, v in ipairs(CdefReference) do
+    for _, v in ipairs(CdefReference) do
         if v.uri ~= target_uri then
             goto continue
         end
@@ -59,9 +59,9 @@ return function (CdefReference, target_uri)
         if not codes then
             goto continue
         end
-        for i, v in ipairs(codes) do
+        for _, v0 in ipairs(codes) do
             codeResults = codeResults or {}
-            codeResults[#codeResults+1] = v
+            codeResults[#codeResults+1] = v0
         end
         ::continue::
     end

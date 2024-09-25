@@ -32,9 +32,8 @@ end
 
 ---@param funcNode vm.node
 ---@param i integer
----@param uri uri
 ---@return vm.node?
-local function getDefNode(funcNode, i, uri)
+local function getDefNode(funcNode, i)
     local defNode = vm.createNode()
     for src in funcNode:eachObject() do
         if src.type == 'function'
@@ -93,7 +92,7 @@ return function (uri, callback)
             if not refNode then
                 goto CONTINUE
             end
-            local defNode = getDefNode(funcNode, i, uri)
+            local defNode = getDefNode(funcNode, i)
             if not defNode then
                 goto CONTINUE
             end

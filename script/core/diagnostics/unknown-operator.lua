@@ -1,9 +1,6 @@
 local files   = require 'files'
-local guide   = require 'parser.guide'
 local lang    = require 'language'
 local vm      = require 'vm'
-local await   = require 'await'
-local util    = require 'utility'
 
 ---@async
 return function (uri, callback)

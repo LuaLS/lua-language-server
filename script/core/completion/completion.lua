@@ -448,7 +448,7 @@ local function checkModule(state, word, position, results)
     end)
 end
 
-local function checkFieldFromFieldToIndex(state, name, src, parent, word, startPos, position)
+local function checkFieldFromFieldToIndex(state, name, parent, word, position)
     if name:match(guide.namePatternFull) then
         if not name:match '[\x80-\xff]'
         or config.get(state.uri, 'Lua.runtime.unicodeName') then
@@ -499,7 +499,7 @@ local function checkFieldFromFieldToIndex(state, name, src, parent, word, startP
     return textEdit, additionalTextEdits
 end
 
-local function checkFieldThen(state, name, src, word, startPos, position, parent, oop, results)
+local function checkFieldThen(state, name, src, word, position, parent, oop, results)
     local value = vm.getObjectFunctionValue(src) or src
     local kind = define.CompletionItemKind.Field
     if (value.type == 'function' and not vm.isVarargFunctionWithOverloads(value))
@@ -542,7 +542,7 @@ local function checkFieldThen(state, name, src, word, startPos, position, parent
             newText = name:sub(#str[2] + 1, - #str[2] - 1),
         }
     else
-        textEdit, additionalTextEdits = checkFieldFromFieldToIndex(state, name, src, parent, word, startPos, position)
+        textEdit, additionalTextEdits = checkFieldFromFieldToIndex(state, name, parent, word, position)
     end
     results[#results+1] = {
         label      = name,
@@ -632,7 +632,7 @@ local function checkFieldOfRefs(refs, state, word, startPos, position, parent, o
     local fieldResults = {}
     for name, src in util.sortPairs(fields) do
         if src then
-            checkFieldThen(state, name, src, word, startPos, position, parent, oop, fieldResults)
+            checkFieldThen(state, name, src, word, position, parent, oop, fieldResults)
             await.delay()
         end
     end
@@ -1256,12 +1256,10 @@ local function insertDocEnum(state, pos, doc, enums)
     return enums
 end
 
----@param state     parser.state
----@param pos       integer
 ---@param doc       vm.node.object
 ---@param enums     table[]
 ---@return table[]?
-local function insertDocEnumKey(state, pos, doc, enums)
+local function insertDocEnumKey(doc, enums)
     local tbl = doc.bindSource
     if not tbl then
         return nil
@@ -1357,12 +1355,12 @@ local function insertEnum(state, pos, src, enums, isInArray, mark)
     elseif src.type == 'doc.enum' then
         ---@cast src parser.object
         if vm.docHasAttr(src, 'key') then
-            insertDocEnumKey(state, pos, src, enums)
+            insertDocEnumKey(src, enums)
         else
             insertDocEnum(state, pos, src, enums)
         end
     elseif isInArray and src.type == 'doc.type.array' then
-        for i, d in ipairs(vm.getDefs(src.node)) do
+        for _, d in ipairs(vm.getDefs(src.node)) do
             insertEnum(state, pos, d, enums, isInArray, mark)
         end
     elseif src.type == 'global' and src.cate == 'type' then
@@ -2082,7 +2080,7 @@ local function tryluaDocByErr(state, position, err, docState, results)
         end
         local label = {}
         local insertText = {}
-        for i, arg in ipairs(func.args) do
+        for _, arg in ipairs(func.args) do
             if arg[1] and arg.type ~= 'self' then
                 label[#label+1] = arg[1]
                 if #label == 1 then
@@ -2098,7 +2096,7 @@ local function tryluaDocByErr(state, position, err, docState, results)
             insertTextFormat = 2,
             insertText       = table.concat(insertText, '\n'),
         }
-        for i, arg in ipairs(func.args) do
+        for _, arg in ipairs(func.args) do
             if arg[1] then
                 results[#results+1] = {
                     label  = arg[1],

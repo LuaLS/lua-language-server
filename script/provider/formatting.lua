@@ -8,7 +8,6 @@ local furi        = require 'file-uri'
 local fs          = require 'bee.filesystem'
 local fw          = require 'filewatch'
 local util        = require 'utility'
-local diagnostics = require 'provider.diagnostic'
 local config      = require 'config'
 
 local loadedUris = {}
@@ -19,7 +18,7 @@ local updateType = {
     Deleted = 3,
 }
 
-fw.event(function(ev, path)
+fw.event(function(_ev, path)
     if util.stringEndWith(path, '.editorconfig') then
         for uri, fsPath in pairs(loadedUris) do
             loadedUris[uri] = nil
@@ -91,7 +90,7 @@ function m.updateNonStandardSymbols(symbols)
     codeFormat.set_nonstandard_symbol()
 end
 
-config.watch(function(uri, key, value)
+config.watch(function(_uri, key, value)
     if  key == "Lua.format.defaultConfig" then
         codeFormat.set_default_config(value)
     elseif key == "Lua.runtime.nonstandardSymbol" then

@@ -2,7 +2,6 @@ local doc    = require 'cli.doc'
 local client = require 'client'
 local furi   = require 'file-uri'
 local lang   = require 'language'
-local ws     = require 'workspace'
 local files  = require 'files'
 
 ---@async

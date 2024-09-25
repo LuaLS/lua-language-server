@@ -20,7 +20,8 @@
             "unused": "Any"
         },
         "ignoredFiles": "Opened",
-        "libraryFiles": "Opened"
+        "libraryFiles": "Opened",
+        "unusedLocalExclude": [ "_*" ]
     },
     "runtime": {
         "version": "Lua 5.4",

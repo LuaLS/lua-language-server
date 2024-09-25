@@ -1,5 +1,4 @@
 local vm       = require 'vm'
-local util     = require 'utility'
 local config   = require 'config'
 local await    = require 'await'
 local guide    = require 'parser.guide'

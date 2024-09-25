@@ -1,5 +1,4 @@
 local files  = require 'files'
-local define = require 'proto.define'
 local lang   = require 'language'
 local guide  = require 'parser.guide'
 local await  = require 'await'
@@ -13,7 +12,7 @@ local types = {
 }
 
 ---@async
-return function (uri, callback, code)
+return function (uri, callback)
     local ast = files.getState(uri)
     if not ast then
         return

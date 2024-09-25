@@ -100,11 +100,11 @@ function mt:hasInterface(name)
     return self.interface[name] ~= nil
 end
 
-function mt:checkDirectory(catch, path, matcher)
+function mt:checkDirectory(catch, path, matcher0)
     if not self:hasInterface 'type' then
         return true
     end
-    if not matcher:isNeedDirectory() then
+    if not matcher0:isNeedDirectory() then
         return true
     end
     if #catch < #path then
@@ -119,10 +119,10 @@ end
 function mt:simpleMatch(path)
     path = self:getRelativePath(path)
     for i = #self.matcher, 1, -1 do
-        local matcher = self.matcher[i]
-        local catch = matcher(path)
-        if catch and self:checkDirectory(catch, path, matcher) then
-            if matcher:isNegative() then
+        local matcher0 = self.matcher[i]
+        local catch = matcher0(path)
+        if catch and self:checkDirectory(catch, path, matcher0) then
+            if matcher0:isNegative() then
                 return false
             else
                 return true
@@ -182,12 +182,12 @@ function mt:scan(path, callback, hook)
         elseif fileType == 'directory' then
             local result = self:callInterface('list', current)
             if type(result) == 'table' then
-                for _, path in ipairs(result) do
-                    local filename = path:match '([^/\\]+)[/\\]*$'
+                for _, path0 in ipairs(result) do
+                    local filename = path0:match '([^/\\]+)[/\\]*$'
                     if  filename
                     and filename ~= '.'
                     and filename ~= '..' then
-                        list[#list+1] = path
+                        list[#list+1] = path0
                     end
                 end
             end

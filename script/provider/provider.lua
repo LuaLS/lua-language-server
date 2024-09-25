@@ -7,7 +7,6 @@ local define     = require 'proto.define'
 local workspace  = require 'workspace'
 local config     = require 'config'
 local client     = require 'client'
-local pub        = require 'pub'
 local lang       = require 'language'
 local progress   = require 'progress'
 local tm         = require 'text-merger'
@@ -81,7 +80,7 @@ function m.register(method)
     end
 end
 
-filewatch.event(function (ev, path) ---@async
+filewatch.event(function (_ev, path) ---@async
     if (CONFIGPATH and util.stringEndWith(path, CONFIGPATH)) then
         for _, scp in ipairs(workspace.folders) do
             local configPath = workspace.getAbsolutePath(scp.uri, CONFIGPATH)
@@ -138,7 +137,7 @@ m.register 'initialize' {
 
 m.register 'initialized'{
     ---@async
-    function (params)
+    function (_params)
         local _ <close> = progress.create(workspace.getFirstScope().uri, lang.script.WINDOW_INITIALIZING, 0.5)
         m.updateConfig()
         local registrations = {}
@@ -506,7 +505,7 @@ m.register 'textDocument/references' {
             return nil
         end
         local response = {}
-        for i, info in ipairs(result) do
+        for _, info in ipairs(result) do
             ---@type uri
             local targetUri = info.uri
             local targetState = files.getState(targetUri)
@@ -1416,7 +1415,7 @@ m.register 'textDocument/inlayHint' {
         local results = core(uri, start, finish)
         local hintResults = {}
         for i, res in ipairs(results) do
-            local luri = res.source and guide.getUri(res.source) 
+            local luri = res.source and guide.getUri(res.source)
             local lstate = files.getState(luri)
             hintResults[i] = {
                 label        = {
@@ -1609,7 +1608,7 @@ local function refreshLanguageConfiguration()
     proto.notify('$/languageConfiguration', require 'provider.language-configuration')
 end
 
-config.watch(function (uri, key, value)
+config.watch(function (_uri, key, _value)
     if key == '' then
         refreshLanguageConfiguration()
     end
@@ -1633,7 +1632,7 @@ local function refreshStatusBar()
     end
 end
 
-config.watch(function (uri, key, value)
+config.watch(function (_uri, key, _value)
     if key == 'Lua.window.statusBar'
     or key == '' then
         refreshStatusBar()

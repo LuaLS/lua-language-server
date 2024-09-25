@@ -504,7 +504,7 @@ files.watch(function (ev, uri)
     end
 end)
 
-ws.watch(function (ev, uri)
+ws.watch(function (ev, _uri)
     if ev == 'reload' then
         vm.clearNodeCache()
     end

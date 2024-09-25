@@ -19,7 +19,7 @@ function m.nameStyleCheck(uri, text)
     return codeFormat.name_style_analysis(uri, text)
 end
 
-config.watch(function (uri, key, value)
+config.watch(function (_uri, key, value)
     if key == "Lua.nameStyle.config" then
         codeFormat.update_name_style_config(value)
     end

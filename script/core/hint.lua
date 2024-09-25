@@ -274,7 +274,7 @@ local blockTypes = {
 }
 
 ---@async
-local function semicolonHint(uri, results, start, finish)
+local function semicolonHint(uri, results, _start, _finish)
     local state = files.getState(uri)
     if not state then
         return

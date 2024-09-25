@@ -25,7 +25,7 @@ local function eachLocal(source, callback)
 end
 
 ---@async
-local function find(source, uri, callback)
+local function find(source, callback)
     if     source.type == 'local' then
         eachLocal(source, callback)
     elseif source.type == 'getlocal'
@@ -254,7 +254,7 @@ return function (uri, offset)
     if source then
         local isGlobal  = guide.isGlobal(source)
         local isLiteral = isLiteralValue(source)
-        find(source, uri, function (target)
+        find(source, function (target)
             if not target then
                 return
             end

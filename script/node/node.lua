@@ -128,6 +128,23 @@ M.__getter.value = function (self)
     return self, true
 end
 
+---@type Node
+M.truly = nil
+
+M.__getter.truly = function (self)
+    return self
+end
+
+---@type Node
+M.falsy = nil
+
+M.__getter.falsy = function (self)
+    return ls.node.NEVER
+end
+
+---@type boolean | number | string | nil
+M.literal = nil
+
 ---@generic T: Node
 ---@param nodeType `T`
 ---@return T

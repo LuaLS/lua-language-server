@@ -332,7 +332,7 @@ function M:onCanCast(other)
 end
 
 ---@type { [string]: Node.Type}
-ls.node.TYPE = setmetatable({}, {
+ls.node.TYPE_POOL = setmetatable({}, {
     __mode = 'v',
     __index = function (t, k)
         local v = New 'Node.Type' (k)
@@ -343,5 +343,5 @@ ls.node.TYPE = setmetatable({}, {
 
 ---@overload fun(name: string): Node.Type
 function ls.node.type(name)
-    return ls.node.TYPE[name]
+    return ls.node.TYPE_POOL[name]
 end

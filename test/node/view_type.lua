@@ -1,6 +1,6 @@
 
 do
-    ls.node.TYPE['A'] = nil
+    ls.node.TYPE_POOL['A'] = nil
     local a = ls.node.type('A')
 
     assert(a:view() == 'A')
@@ -8,7 +8,7 @@ do
 end
 
 do
-    ls.node.TYPE['A'] = nil
+    ls.node.TYPE_POOL['A'] = nil
     local a = ls.node.type('A')
         : addField {
             key   = ls.node.value 'x',
@@ -24,10 +24,10 @@ do
 end
 
 do
-    ls.node.TYPE['A'] = nil
-    ls.node.TYPE['B'] = nil
-    ls.node.TYPE['C'] = nil
-    ls.node.TYPE['D'] = nil
+    ls.node.TYPE_POOL['A'] = nil
+    ls.node.TYPE_POOL['B'] = nil
+    ls.node.TYPE_POOL['C'] = nil
+    ls.node.TYPE_POOL['D'] = nil
     local a = ls.node.type('A')
     local b = ls.node.type('B')
         : addField {
@@ -54,10 +54,10 @@ do
 end
 
 do
-    ls.node.TYPE['A'] = nil
-    ls.node.TYPE['B'] = nil
-    ls.node.TYPE['C'] = nil
-    ls.node.TYPE['D'] = nil
+    ls.node.TYPE_POOL['A'] = nil
+    ls.node.TYPE_POOL['B'] = nil
+    ls.node.TYPE_POOL['C'] = nil
+    ls.node.TYPE_POOL['D'] = nil
     local a = ls.node.type('A')
         : addField {
             key   = ls.node.value 'w',
@@ -96,7 +96,7 @@ do
 end
 
 do
-    ls.node.TYPE['A'] = nil
+    ls.node.TYPE_POOL['A'] = nil
     local a = ls.node.type('A')
         : addAlias(ls.node.value(1))
         : addAlias(ls.node.value(2))
@@ -107,10 +107,10 @@ do
 end
 
 do
-    ls.node.TYPE['A'] = nil
-    ls.node.TYPE['B'] = nil
-    ls.node.TYPE['C'] = nil
-    ls.node.TYPE['D'] = nil
+    ls.node.TYPE_POOL['A'] = nil
+    ls.node.TYPE_POOL['B'] = nil
+    ls.node.TYPE_POOL['C'] = nil
+    ls.node.TYPE_POOL['D'] = nil
     local a = ls.node.type('A')
         : addAlias(ls.node.type 'B')
         : addAlias(ls.node.type 'C')

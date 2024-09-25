@@ -83,7 +83,7 @@ do
     local names = {'A', 'A1', 'A2', 'A11', 'A12', 'A21', 'A22'}
 
     for _, name in ipairs(names) do
-        ls.node.TYPE[name] = nil
+        ls.node.TYPE_POOL[name] = nil
         t[name] = ls.node.type(name)
     end
 

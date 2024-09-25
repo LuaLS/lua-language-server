@@ -10,15 +10,31 @@ ls.node.ANY = ls.node.type 'any'
     : setConfig('basicType', true)
 ls.node.UNKNOWN = ls.node.type 'unknown'
     : setConfig('onCanCast', function (self, other)
-        if other.typeName ~= 'nil' then
+        if other.value ~= ls.node.NIL then
             return true
         end
     end)
     : setConfig('onCanBeCast', function (self, other)
-        if other.typeName ~= 'nil' then
+        if other.value ~= ls.node.NIL then
             return true
         end
     end)
+ls.node.TRULY = ls.node.type 'truly'
+    : setConfig('onCanCast', function (self, other)
+        if  other.value ~= ls.node.NIL
+        and other.value ~= ls.node.FALSE then
+            return true
+        end
+    end)
+    : setConfig('onCanBeCast', function (self, other)
+        if  other.value ~= ls.node.NIL
+        and other.value ~= ls.node.FALSE then
+            return true
+        end
+    end)
+    : setConfig('basicType', true)
+ls.node.TRUE = ls.node.value(true)
+ls.node.FALSE = ls.node.value(false)
 ls.node.NIL = ls.node.type 'nil'
     : setConfig('basicType', true)
 ls.node.NUMBER = ls.node.type 'number'
@@ -43,14 +59,35 @@ ls.node.ANY:addField {
     key   = ls.node.ANY,
     value = ls.node.ANY,
 }
+ls.node.ANY.truly = ls.node.TRULY
+ls.node.ANY.falsy = ls.node.value(false) | ls.node.NIL
+
 ls.node.UNKNOWN:addField {
     key   = ls.node.ANY,
     value = ls.node.ANY,
 }
+ls.node.UNKNOWN.truly = ls.node.TRULY
+ls.node.UNKNOWN.falsy = ls.node.value(false)
+
+ls.node.TRULY:addField {
+    key   = ls.node.ANY,
+    value = ls.node.ANY,
+}
+
+ls.node.NIL.truly = ls.node.NEVER
+ls.node.NIL.falsy = ls.node.NIL
+
+ls.node.BOOLEAN.truly = ls.node.TRUE
+ls.node.BOOLEAN.falsy = ls.node.FALSE
+
+ls.node.FALSE.truly = ls.node.NEVER
+ls.node.FALSE.falsy = ls.node.FALSE
+
 ls.node.TABLE:addField {
     key   = ls.node.ANY,
     value = ls.node.ANY,
 }
+
 ls.node.USERDATA:addField {
     key   = ls.node.ANY,
     value = ls.node.ANY,

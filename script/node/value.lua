@@ -58,7 +58,7 @@ M.__getter.nodeType = function (self)
 end
 
 ---@type { [string | number | boolean]: Node.Value }
-ls.node.VALUE = setmetatable({}, {
+ls.node.VALUE_POOL = setmetatable({}, {
     __mode = 'v',
     __index = function (t, k)
         local v = New 'Node.Value' (k)
@@ -68,7 +68,7 @@ ls.node.VALUE = setmetatable({}, {
 })
 
 ---@type { string: Node.Value }
-ls.node.VALUE_STR2 = setmetatable({}, {
+ls.node.VALUE_POOL_STR2 = setmetatable({}, {
     __mode = 'v',
     __index = function (t, k)
         local v = New 'Node.Value' (k, "'")
@@ -78,7 +78,7 @@ ls.node.VALUE_STR2 = setmetatable({}, {
 })
 
 ---@type { string: Node.Value }
-ls.node.VALUE_STR3 = setmetatable({}, {
+ls.node.VALUE_POOL_STR3 = setmetatable({}, {
     __mode = 'v',
     __index = function (t, k)
         local v = New 'Node.Value' (k, '[[')
@@ -92,10 +92,10 @@ ls.node.VALUE_STR3 = setmetatable({}, {
 ---@overload fun(v: string, quo?: '"' | "'" | '[['): Node.Value
 function ls.node.value(v, quo)
     if quo == "'" then
-        return ls.node.VALUE_STR2[v]
+        return ls.node.VALUE_POOL_STR2[v]
     end
     if quo == '[[' then
-        return ls.node.VALUE_STR3[v]
+        return ls.node.VALUE_POOL_STR3[v]
     end
-    return ls.node.VALUE[v]
+    return ls.node.VALUE_POOL[v]
 end

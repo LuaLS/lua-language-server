@@ -47,17 +47,17 @@ do
 end
 
 do
-    ls.node.TYPE['A'] = nil
-    ls.node.TYPE['B'] = nil
+    ls.node.TYPE_POOL['A'] = nil
+    ls.node.TYPE_POOL['B'] = nil
     local a = ls.node.type('A') & ls.node.type('B')
 
     assert(a:view() == 'A & B')
 end
 
 do
-    ls.node.TYPE['A'] = nil
-    ls.node.TYPE['B'] = nil
-    ls.node.TYPE['C'] = nil
+    ls.node.TYPE_POOL['A'] = nil
+    ls.node.TYPE_POOL['B'] = nil
+    ls.node.TYPE_POOL['C'] = nil
     local a = ls.node.type('A') & ls.node.type('B') & ls.node.type('C')
 
     assert(a:view() == 'A & B & C')
@@ -80,28 +80,28 @@ do
 end
 
 do
-    ls.node.TYPE['A'] = nil
-    ls.node.TYPE['B'] = nil
-    ls.node.TYPE['C'] = nil
+    ls.node.TYPE_POOL['A'] = nil
+    ls.node.TYPE_POOL['B'] = nil
+    ls.node.TYPE_POOL['C'] = nil
     local a = ls.node.type('A') & ls.node.type('B') & ls.node.type('C') & ls.node.type('A')
 
     assert(a:view() == 'A & B & C')
 end
 
 do
-    ls.node.TYPE['A'] = nil
-    ls.node.TYPE['B'] = nil
-    ls.node.TYPE['C'] = nil
-    ls.node.TYPE['D'] = nil
+    ls.node.TYPE_POOL['A'] = nil
+    ls.node.TYPE_POOL['B'] = nil
+    ls.node.TYPE_POOL['C'] = nil
+    ls.node.TYPE_POOL['D'] = nil
     local a = ls.node.type('A') & (ls.node.type('B') | ls.node.type('C')) & ls.node.type('D')
 
     assert(a:view() == 'A & (B | C) & D')
 end
 
 do
-    ls.node.TYPE['A'] = nil
-    ls.node.TYPE['B'] = nil
-    ls.node.TYPE['C'] = nil
+    ls.node.TYPE_POOL['A'] = nil
+    ls.node.TYPE_POOL['B'] = nil
+    ls.node.TYPE_POOL['C'] = nil
     local a = ls.node.type('A') & (ls.node.type('B') | ls.node.type('C')) & ls.node.type('A')
 
     assert(a:view() == 'A & (B | C)')

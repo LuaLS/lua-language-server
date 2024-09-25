@@ -4529,3 +4529,45 @@ if obj.type == 'a' then
     local <?r?> = obj
 end
 ]]
+
+TEST 'A|B' [[
+--- @class A
+--- @field mode? 'a' | 'b'
+
+--- @class B
+
+local a --- @type A | B
+
+if a.mode == 'a' then
+    local b = a
+else
+    local <?b?> = a
+end
+]]
+
+TEST 'A|B' [[
+--- @class A
+--- @field mode? 'a' | 'b'
+
+--- @class B
+
+local a --- @type A | B
+
+if a.mode ~= 'a' then
+    local <?b?> = a
+end
+]]
+
+TEST 'A' [[
+--- @class A
+--- @field mode? 'a' | 'b'
+
+--- @class B
+
+local a --- @type A | B
+
+if a.mode ~= 'a' then
+else
+    local <?b?> = a
+end
+]]

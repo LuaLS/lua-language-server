@@ -233,17 +233,47 @@ function M:onCanCast(other)
     if self == other then
         return true
     end
-    if  other.kind ~= 'table' then
-        return false
+    if other.kind == 'table' then
+        ---@cast other Node.Table
+        for _, field in ipairs(other.sortedFields) do
+            local v = self:get(field.key) or ls.node.NIL
+            if not v:canCast(field.value) then
+                return false
+            end
+        end
+        return true
     end
-    ---@cast other Node.Table | Node.Type
-    for _, field in ipairs(other.sortedFields) do
-        local v = self:get(field.key) or ls.node.NIL
-        if not v:canCast(field.value) then
+    if other.kind == 'array' then
+        ---@cast other Node.Array
+        local myType = self:get(ls.node.INTEGER)
+        if myType:canCast(other.head) then
+            return true
+        elseif myType ~= ls.node.NIL then
             return false
         end
+        for k, v in pairs(self.literals) do
+            if  type(k) == 'number'
+            and k % 1 == 0
+            and k >= 1
+            and (not other.len or k <= other.len) then
+                if not v:canCast(other.head) then
+                    return false
+                end
+            end
+        end
+        return true
     end
-    return true
+    if other.kind == 'tuple' then
+        ---@cast other Node.Tuple
+        for i, v in ipairs(other.values) do
+            local myValue = self:get(i)
+            if not myValue:canCast(v) then
+                return false
+            end
+        end
+        return true
+    end
+    return false
 end
 
 function M:view(skipLevel)

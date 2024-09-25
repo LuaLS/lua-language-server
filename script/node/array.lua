@@ -11,7 +11,7 @@ M.kind = 'array'
 ---@param len? integer
 function M:__init(value, len)
     self.head = value
-    self.len = len or math.huge
+    self.len = len
 end
 
 function M:get(key)
@@ -32,7 +32,7 @@ function M:get(key)
     if type(key) ~= 'table' then
         if  type(key) == 'number'
         and key >= 1
-        and key <= self.len
+        and (not self.len or key <= self.len)
         and key % 1 == 0 then
             return self.head
         else

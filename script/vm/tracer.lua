@@ -261,7 +261,7 @@ end
 --- @param source parser.object
 --- @param fieldName string
 --- @param literal parser.object
---- @return string[]?
+--- @return [string, boolean][]?
 local function getNodeTypesWithLiteralField(uri, source, fieldName, literal)
     local loc = vm.getVariable(source)
     if not loc then
@@ -279,7 +279,7 @@ local function getNodeTypesWithLiteralField(uri, source, fieldName, literal)
                             for _, t in ipairs(f.extends.types) do
                                 if t[1] == literal[1] then
                                   tys = tys or {}
-                                  table.insert(tys, set.class[1])
+                                  table.insert(tys, {set.class[1], #f.extends.types > 1})
                                   break
                                 end
                             end
@@ -682,15 +682,19 @@ local lookIntoChild = util.switch()
 
                 -- TODO: handle more types
                 if tys and #tys == 1 then
-                    local ty = tys[1]
+                    -- If the type is in a union (e.g. 'lit' | foo), then the type
+                    -- cannot be removed from the node.
+                    local ty, tyInUnion = tys[1][1], tys[1][2]
                     topNode = topNode:copy()
                     if action.op.type == '==' then
                         topNode:narrow(tracer.uri, ty)
-                        if outNode then
+                        if not tyInUnion and outNode then
                             outNode:remove(ty)
                         end
                     else
-                        topNode:remove(ty)
+                        if not tyInUnion then
+                            topNode:remove(ty)
+                        end
                         if outNode then
                             outNode:narrow(tracer.uri, ty)
                         end

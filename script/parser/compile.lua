@@ -3743,7 +3743,7 @@ local function parseWhile()
         local left  = getPosition(Tokens[Index], 'left')
         local right = getPosition(Tokens[Index] + #doToken - 1, 'right')
         action.finish                     = left
-        action.bstart                     = action.finish
+        action.bstart                     = right
         action.keyword[#action.keyword+1] = left
         action.keyword[#action.keyword+1] = right
         if doToken == 'then' then

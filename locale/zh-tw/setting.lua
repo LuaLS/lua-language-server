@@ -280,6 +280,10 @@ config.misc.parameters                   =
 'VSCode中啟動語言伺服時的[命令列參數](https://luals.github.io/wiki/usage#arguments)。'
 config.misc.executablePath               = -- TODO: need translate!
 'Specify the executable path in VSCode.'
+config.language.fixIndent                = -- TODO: need translate!
+'(VSCode only) Fix incorrect auto-indentation, such as incorrect indentation when line breaks occur within a string containing the word "function."'
+config.language.completeAnnotation       = -- TODO: need translate!
+'(VSCode only) Automatically insert "---@ " after a line break following a annotation.'
 config.type.castNumberToInteger          =
 '允許將 `number` 類型賦值給 `integer` 類型。'
 config.type.weakUnionCheck               =

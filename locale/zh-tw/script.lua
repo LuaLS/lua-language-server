@@ -658,6 +658,7 @@ CLI_DOC_DONE      = -- TODO: need translate!
 'Document exporting completed!'
 CLI_DOC_WORKING   =
 '正在產生文件...'
+
 TYPE_ERROR_ENUM_GLOBAL_DISMATCH = -- TODO: need translate!
 'Type `{child}` cannot match enumeration type of `{parent}`'
 TYPE_ERROR_ENUM_GENERIC_UNSUPPORTED = -- TODO: need translate!

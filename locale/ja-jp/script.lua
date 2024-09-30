@@ -662,6 +662,8 @@ CLI_DOC_DONE      =
 元データ: {}
 Markdown(例): {}
 ]]
+CLI_DOC_WORKING   = -- TODO: need translate!
+'Building docs...'
 
 TYPE_ERROR_ENUM_GLOBAL_DISMATCH =
 'タイプ `{child}` は `{parent}` の列挙型に一致しません'

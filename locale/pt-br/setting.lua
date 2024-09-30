@@ -281,6 +281,10 @@ config.misc.parameters                   = -- TODO: need translate!
 '[Command line parameters](https://github.com/LuaLS/lua-telemetry-server/tree/master/method) when starting the language service in VSCode.'
 config.misc.executablePath               = -- TODO: need translate!
 'Specify the executable path in VSCode.'
+config.language.fixIndent                = -- TODO: need translate!
+'(VSCode only) Fix incorrect auto-indentation, such as incorrect indentation when line breaks occur within a string containing the word "function."'
+config.language.completeAnnotation       = -- TODO: need translate!
+'(VSCode only) Automatically insert "---@ " after a line break following a annotation.'
 config.type.castNumberToInteger          = -- TODO: need translate!
 'Allowed to assign the `number` type to the `integer` type.'
 config.type.weakUnionCheck               = -- TODO: need translate!

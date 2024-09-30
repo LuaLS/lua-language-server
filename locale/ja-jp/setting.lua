@@ -281,6 +281,10 @@ config.misc.parameters                   = -- TODO: need translate!
 '[Command line parameters](https://github.com/LuaLS/lua-telemetry-server/tree/master/method) when starting the language server in VSCode.'
 config.misc.executablePath               = -- TODO: need translate!
 'Specify the executable path in VSCode.'
+config.language.fixIndent                = -- TODO: need translate!
+'(VSCode only) Fix incorrect auto-indentation, such as incorrect indentation when line breaks occur within a string containing the word "function."'
+config.language.completeAnnotation       = -- TODO: need translate!
+'(VSCode only) Automatically insert "---@ " after a line break following a annotation.'
 config.type.castNumberToInteger          = -- TODO: need translate!
 'Allowed to assign the `number` type to the `integer` type.'
 config.type.weakUnionCheck               = -- TODO: need translate!
@@ -300,6 +304,10 @@ config.type.inferParamType               = -- TODO: need translate!
 When a parameter type is not annotated, it is inferred from the function's call sites.
 
 When this setting is `false`, the type of the parameter is `any` when it is not annotated.
+]]
+config.type.checkTableShape              = -- TODO: need translate!
+[[
+Strictly check the shape of the table.
 ]]
 config.doc.privateName                   = -- TODO: need translate!
 'Treat specific field names as private, e.g. `m_*` means `XXX.m_id` and `XXX.m_type` are private, witch can only be accessed in the class where the definition is located.'

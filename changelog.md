@@ -4,12 +4,15 @@
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `NEW` Added support for Japanese locale
 * `NEW` Infer function parameter types when overriding the same-named class function in an instance of that class [#2158](https://github.com/LuaLS/lua-language-server/issues/2158)
-* `FIX` Eliminate floating point error in test benchmark output
-* `FIX` Remove luamake install from make scripts
-* `FIX` Incorrect `table` type injected to the global variable created by `rawset(_G, ...)` [#2863](https://github.com/LuaLS/lua-language-server/issues/2863)
 * `NEW` Types with literal fields can be narrowed.
 * `NEW` Reference addons installed via the addon manager with `${addons}` [#2866](https://github.com/LuaLS/lua-language-server/pull/2866).
 * `NEW` Support using `---@class` on `rawset(_G, ...)` to annotate the created global variable [#2862](https://github.com/LuaLS/lua-language-server/issues/2862)
+* `NEW` Settings:
+  + `Lua.language.fixIndent`
+  + `Lua.language.completeAnnotation`
+* `FIX` Eliminate floating point error in test benchmark output
+* `FIX` Remove luamake install from make scripts
+* `FIX` Incorrect `table` type injected to the global variable created by `rawset(_G, ...)` [#2863](https://github.com/LuaLS/lua-language-server/issues/2863)
 
 ## 3.10.6
 `2024-9-10`

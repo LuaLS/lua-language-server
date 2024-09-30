@@ -1605,7 +1605,8 @@ local function refreshLanguageConfiguration()
     if not client.getOption('languageConfiguration') then
         return
     end
-    proto.notify('$/languageConfiguration', require 'provider.language-configuration')
+    local lc = require 'provider.language-configuration'
+    proto.notify('$/languageConfiguration', lc.make())
 end
 
 config.watch(function (_uri, key, _value)

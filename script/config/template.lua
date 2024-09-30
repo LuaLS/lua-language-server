@@ -396,6 +396,8 @@ local template = {
                                             >> {},
     ['Lua.misc.parameters']                 = Type.Array(Type.String),
     ['Lua.misc.executablePath']             = Type.String,
+    ['Lua.language.fixIndent']              = Type.Boolean >> true,
+    ['Lua.language.completeAnnotation']     = Type.Boolean >> true,
     ['Lua.type.castNumberToInteger']        = Type.Boolean >> true,
     ['Lua.type.weakUnionCheck']             = Type.Boolean >> false,
     ['Lua.type.weakNilCheck']               = Type.Boolean >> false,

@@ -1,3 +1,13 @@
+local config = require 'config'
+local ws = require 'workspace'
+local util = require 'utility'
+
+local function getConfig(key)
+    local scope = ws.getFirstScope()
+    local uri = scope.uri
+    return config.get(uri, key)
+end
+
 -- Enumeration of commonly encountered syntax token types.
 local SyntaxTokenType = {
     Other = 0, -- Everything except tokens that are part of comments, string literals and regular expressions.
@@ -51,6 +61,13 @@ local languageConfiguration = {
                     indentAction = IndentAction.IndentOutdent,
                 }
             },
+        },
+    },
+}
+
+local completeAnnotation = {
+    configuration = {
+        onEnterRules = {
             {
                 beforeText = [[^\s*---@]],
                 action = {
@@ -83,4 +100,14 @@ local languageConfiguration = {
     },
 }
 
-return languageConfiguration
+local M = {}
+
+function M.make()
+    local result = languageConfiguration
+    if getConfig 'Lua.language.completeAnnotation' then
+        result = util.mergeStruct(result, completeAnnotation)
+    end
+    return result
+end
+
+return M

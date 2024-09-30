@@ -4,6 +4,7 @@ local proto = require 'proto.proto'
 local lookBackward = require 'core.look-backward'
 local util = require 'utility'
 local client = require 'client'
+local config = require 'config'
 
 ---@param uri uri
 ---@param change table
@@ -169,6 +170,10 @@ end
 
 return function (uri, changes)
     if not client.getOption('fixIndents') then
+        return
+    end
+
+    if not config.get(uri, 'Lua.language.fixIndent') then
         return
     end
 

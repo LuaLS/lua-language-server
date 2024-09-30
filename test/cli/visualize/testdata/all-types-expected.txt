@@ -181,7 +181,7 @@ digraph AST {
 	"local:40006:40007" -> "integer:40010:40011"
 	"while:50000:70003" [
 		label="while\l\l"
-		tooltip="start: 50000\nfinish: 70003\nbfinish: 70000\nfilter: <node binary>\nkeyword: <table>\nbstart: 50013\n1: <node setlocal>\n"
+		tooltip="start: 50000\nfinish: 70003\nbfinish: 70000\nfilter: <node binary>\nkeyword: <table>\nbstart: 50015\n1: <node setlocal>\n"
 	]
 	"main:0:300000" -> "while:50000:70003"
 	"binary:50006:50012" [

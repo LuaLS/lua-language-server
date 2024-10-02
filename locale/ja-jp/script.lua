@@ -465,7 +465,6 @@ COMMAND_MARK_GLOBAL        =
 'グローバル変数として指定します'
 COMMAND_REMOVE_SPACE       =
 'すべての行末スペースを削除します'
-'Clear all postemptive spaces'
 COMMAND_ADD_BRACKETS       =
 '括弧を追加します。'
 COMMAND_RUNTIME_VERSION    =

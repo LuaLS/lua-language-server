@@ -14,7 +14,7 @@ local function performTest()
             size = size + #buf
         end
     end)
-    print(string.format('以收集[%d]个文件，总大小[%.3f]mb'
+    print(string.format('已收集[%d]个文件，总大小[%.3f]mb'
         , ls.util.countTable(files)
         , size / 1000 / 1000
     ))
@@ -31,7 +31,7 @@ local function performTest()
         --ch:pop()
     end
     local passed = os.clock() - clock
-    print(('综合性能测试完成，总大小[%.3f]kb，速度[%.3f]mb/s，用时[%.3f]秒'):format(size / 1000, size / passed / 1000 / 1000, passed))
+    print(('综合性能测试完成，总大小[%.3f]mb，速度[%.3f]mb/s，用时[%.3f]秒'):format(size / 1000 / 1000, size / passed / 1000 / 1000, passed))
 end
 
 local function test(path)

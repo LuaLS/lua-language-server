@@ -3,6 +3,7 @@
 ## Unreleased
 <!-- Add all new changes here. They will be moved under a version at release -->
 * `FIX` Fixed an issue preventing to set the locale to Japanese
+* `FIX` Preserve newlines between function comment and @see
 
 ## 3.11.0
 * `NEW` Added support for Japanese locale

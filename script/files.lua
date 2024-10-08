@@ -906,6 +906,8 @@ function m.countStates()
     return n
 end
 
+local addonsPath
+
 ---Resolve path variables/placeholders like ${3rd} and ${addons}
 ---@param path string
 ---@return string resolvedPath
@@ -914,6 +916,9 @@ function m.resolvePathPlaceholders(path)
         if key == "3rd" then
             return (ROOT / "meta" / "3rd"):string()
         elseif key == "addons" then
+            if addonsPath then
+                return addonsPath
+            end
             -- Common path across OSes
             local dataPath = "User/globalStorage/sumneko.lua/addonManager/addons"
 
@@ -923,13 +928,33 @@ function m.resolvePathPlaceholders(path)
                 local serverPath = util.expandPath(fs.path("~/.vscode-server/data"):string())
                 if fs.exists(serverPath) then
                     -- addons are installed via SSH remote
-                    return serverPath .."/" .. dataPath
+                    addonsPath = serverPath .."/" .. dataPath
+                    return addonsPath
                 else
-                    return "~/.config/Code/" .. dataPath
+                    -- Check the config directories of well known VSCode forks
+                    -- This will break if the user has two forks installed and is using the latter one
+                    local configDirs = { "Code", "VSCodium", "Code - OSS" }
+                    for _, configDir in ipairs(configDirs) do
+                        local configPath = util.expandPath(fs.path("~/.config/" .. configDir):string())
+                        if fs.exists( configPath ) then
+                            addonsPath = configPath .. "/" .. dataPath
+                            return addonsPath
+                        end
+                    end
+                    -- Fall back to checking every config directory for users/distros/etc that custom rename VSCode
+                    local configRootPath = util.expandPath(fs.path("~/.config"):string())
+                    for configPath in fs.pairs( configRootPath ) do
+                        if (fs.exists( configPath .. "/User/globalStorage/sumneko.lua" )) then
+                            addonsPath = configPath .. "/" .. dataPath
+                            return addonsPath
+                        end
+                    end
                 end
             elseif platform.os == "macos" then
-                return "~/Library/Application Support/Code/" .. dataPath
+                addonsPath = "~/Library/Application Support/Code/" .. dataPath
+                return addonsPath
             end
+            log.error("Could not find config path for addons directory")
         elseif key:sub(1, 4) == "env:" then
             local env = os.getenv(key:sub(5))
             return env
